@@ -21,9 +21,23 @@ import {
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import type { FieldValidity, NormalizedRules } from '@wordpress/dataviews';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { archive, audio, video, file, closeSmall } from '@wordpress/icons';
+import {
+	archive,
+	audio,
+	video,
+	file,
+	closeSmall,
+	error as errorIcon,
+} from '@wordpress/icons';
 import {
 	MediaUpload,
 	uploadMedia,
@@ -393,6 +407,18 @@ function CompactMediaEditAttachments( {
 	);
 }
 
+function getCustomValidity< Item >(
+	isValid: NormalizedRules< Item >,
+	validity: FieldValidity | undefined
+) {
+	if ( isValid?.required && validity?.required ) {
+		// If the consumer provides a message for required,
+		// use it instead of the native built-in message.
+		return validity.required.message ? validity.required : undefined;
+	}
+	return undefined;
+}
+
 /**
  * A media edit control component that provides a media picker UI with upload functionality
  * for selecting WordPress media attachments. Supports both the traditional WordPress media
@@ -440,8 +466,25 @@ export default function MediaEdit< Item >( {
 	allowedTypes = [ 'image' ],
 	multiple,
 	isExpanded,
+	validity,
 }: MediaEditProps< Item > ) {
 	const value = field.getValue( { item: data } );
+	const [ isTouched, setIsTouched ] = useState( false );
+	const validityTargetRef = useRef< HTMLInputElement >( null );
+	const [ customValidity, setCustomValidity ] = useState<
+		| { type: 'valid' | 'validating' | 'invalid'; message?: string }
+		| undefined
+	>( undefined );
+	// Listen for invalid event (e.g., form submission, reportValidity())
+	// to show validation messages even before blur.
+	useEffect( () => {
+		const validityTarget = validityTargetRef.current;
+		const handler = () => {
+			setIsTouched( true );
+		};
+		validityTarget?.addEventListener( 'invalid', handler );
+		return () => validityTarget?.removeEventListener( 'invalid', handler );
+	}, [] );
 	const attachments = useSelect(
 		( select ) => {
 			if ( ! value ) {
@@ -464,11 +507,19 @@ export default function MediaEdit< Item >( {
 			onChange( field.setValue( { item: data, value: newValue } ) ),
 		[ data, field, onChange ]
 	);
-	const removeItem = ( itemId: number ) => {
-		const currentIds = Array.isArray( value ) ? value : [ value ];
-		const newIds = currentIds.filter( ( id ) => id !== itemId );
-		onChangeControl( newIds.length ? newIds : undefined );
-	};
+	const removeItem = useCallback(
+		( itemId: number ) => {
+			const currentIds = Array.isArray( value ) ? value : [ value ];
+			const newIds = currentIds.filter( ( id ) => id !== itemId );
+			// If field is required and we're removing the last item, mark as touched
+			// to immediately show validation error.
+			if ( field.isValid?.required && ! newIds.length ) {
+				setIsTouched( true );
+			}
+			onChangeControl( newIds.length ? newIds : undefined );
+		},
+		[ value, field.isValid?.required, onChangeControl ]
+	);
 	const onFilesDrop = useCallback(
 		( files: File[], _replacementId?: number ) => {
 			uploadMedia( {
@@ -560,57 +611,135 @@ export default function MediaEdit< Item >( {
 		items.push( ...blobItems );
 		return items;
 	}, [ attachments, replacementId, blobs ] );
+	useEffect( () => {
+		if ( ! isTouched ) {
+			return;
+		}
+		const timeoutId = setTimeout( () => {
+			if ( validity ) {
+				setCustomValidity(
+					getCustomValidity( field.isValid, validity )
+				);
+			} else {
+				// Check HTML5 validity
+				const input = validityTargetRef.current;
+				if ( input && ! input.validity.valid ) {
+					setCustomValidity( {
+						type: 'invalid',
+						message: input.validationMessage,
+					} );
+					return;
+				}
+				// No errors
+				setCustomValidity( undefined );
+			}
+		}, 0 );
+		return () => clearTimeout( timeoutId );
+	}, [ isTouched, field.isValid, validity, value ] );
+	const onBlur = useCallback(
+		( event: React.FocusEvent< HTMLElement > ) => {
+			if ( isTouched ) {
+				return;
+			}
+			if (
+				! event.relatedTarget ||
+				! event.currentTarget.contains( event.relatedTarget )
+			) {
+				setIsTouched( true );
+			}
+		},
+		[ isTouched ]
+	);
 	return (
-		<fieldset className="fields__media-edit" data-field-id={ field.id }>
-			<ConditionalMediaUpload
-				onSelect={ ( selectedMedia: any ) => {
-					if ( multiple ) {
-						const newIds = Array.isArray( selectedMedia )
-							? selectedMedia.map( ( m: any ) => m.id )
-							: [ selectedMedia.id ];
-						onChangeControl( newIds );
-					} else {
-						onChangeControl( selectedMedia.id );
+		<div onBlur={ onBlur }>
+			<fieldset className="fields__media-edit" data-field-id={ field.id }>
+				<ConditionalMediaUpload
+					onSelect={ ( selectedMedia: any ) => {
+						if ( multiple ) {
+							const newIds = Array.isArray( selectedMedia )
+								? selectedMedia.map( ( m: any ) => m.id )
+								: [ selectedMedia.id ];
+							onChangeControl( newIds );
+						} else {
+							onChangeControl( selectedMedia.id );
+						}
+					} }
+					allowedTypes={ allowedTypes }
+					value={ value }
+					multiple={ multiple }
+					title={ field.label }
+					render={ ( { open }: any ) => {
+						const AttachmentsComponent = isExpanded
+							? ExpandedMediaEditAttachments
+							: CompactMediaEditAttachments;
+						return (
+							<VStack spacing={ 2 }>
+								{ field.label &&
+									( hideLabelFromVision ? (
+										<VisuallyHidden as="legend">
+											{ field.label }
+										</VisuallyHidden>
+									) : (
+										<BaseControl.VisualLabel as="legend">
+											{ field.label }
+										</BaseControl.VisualLabel>
+									) ) }
+								<AttachmentsComponent
+									allItems={ allItems }
+									addButtonLabel={ addButtonLabel }
+									multiple={ multiple }
+									removeItem={ removeItem }
+									open={ open }
+									onFilesDrop={ onFilesDrop }
+									isUploading={ !! blobs.length }
+								/>
+								{ field.description && (
+									<Text variant="muted">
+										{ field.description }
+									</Text>
+								) }
+							</VStack>
+						);
+					} }
+				/>
+			</fieldset>
+			{ /* Visually hidden text input for validation. */ }
+			<VisuallyHidden>
+				<input
+					type="text"
+					ref={ validityTargetRef }
+					required={ !! field.isValid?.required }
+					value={
+						( Array.isArray( value ) && !! value.length ) || value
+							? 'v' // We don't care about the actual value, just that it exists.
+							: ''
 					}
-				} }
-				allowedTypes={ allowedTypes }
-				value={ value }
-				multiple={ multiple }
-				title={ field.label }
-				render={ ( { open }: any ) => {
-					const AttachmentsComponent = isExpanded
-						? ExpandedMediaEditAttachments
-						: CompactMediaEditAttachments;
-					return (
-						<VStack spacing={ 2 }>
-							{ field.label &&
-								( hideLabelFromVision ? (
-									<VisuallyHidden as="legend">
-										{ field.label }
-									</VisuallyHidden>
-								) : (
-									<BaseControl.VisualLabel as="legend">
-										{ field.label }
-									</BaseControl.VisualLabel>
-								) ) }
-							<AttachmentsComponent
-								allItems={ allItems }
-								addButtonLabel={ addButtonLabel }
-								multiple={ multiple }
-								removeItem={ removeItem }
-								open={ open }
-								onFilesDrop={ onFilesDrop }
-								isUploading={ !! blobs.length }
-							/>
-							{ field.description && (
-								<Text variant="muted">
-									{ field.description }
-								</Text>
-							) }
-						</VStack>
-					);
-				} }
-			/>
-		</fieldset>
+					tabIndex={ -1 }
+					aria-hidden="true"
+					onChange={ () => {} }
+				/>
+			</VisuallyHidden>
+			{ customValidity && (
+				<div aria-live="polite">
+					<p
+						className={ clsx(
+							'components-validated-control__indicator',
+							{
+								'is-invalid': customValidity.type === 'invalid',
+								'is-valid': customValidity.type === 'valid',
+							}
+						) }
+					>
+						<Icon
+							className="components-validated-control__indicator-icon"
+							icon={ errorIcon }
+							size={ 16 }
+							fill="currentColor"
+						/>
+						{ customValidity.message }
+					</p>
+				</div>
+			) }
+		</div>
 	);
 }
