@@ -125,6 +125,10 @@ function getSassOptions( workingDir ) {
 		loadPaths: [
 			// Package's own node_modules (for pnpm isolated deps)
 			path.join( workingDir, 'node_modules' ),
+			// All workspace package node_modules (for pnpm's non-hoisted deps)
+			...PACKAGES.map( ( pkg ) =>
+				path.join( PACKAGES_DIR, pkg, 'node_modules' )
+			),
 			// Root node_modules (for npm hoisted deps)
 			path.join( ROOT_DIR, 'node_modules' ),
 			// For local imports like @use "mixins"
@@ -1614,48 +1618,23 @@ async function buildAll( baseUrlExpression ) {
 		};
 	} );
 
-	// Bundle boot, route, and theme packages from node_modules when pages exist
+	// Bundle boot, route, theme, and private-apis packages when pages exist
 	if ( pageData.length > 0 ) {
-		try {
-			const { createRequire } = await import( 'module' );
-			const require = createRequire( import.meta.url );
+		const externalPackages = [ 'boot', 'route', 'theme', 'private-apis' ];
+		for ( const pkgName of externalPackages ) {
+			const result = await bundlePackage( pkgName, {
+				// Use PACKAGES_DIR (default) since these are workspace packages
+				handlePrefix: 'wp',
+				scriptGlobal: 'wp',
+				packageNamespace: 'wordpress',
+			} );
 
-			// Resolve the @wordpress packages directory from node_modules
-			const bootPackageJson = require.resolve(
-				'@wordpress/boot/package.json',
-				{ paths: [ ROOT_DIR ] }
-			);
-			const wordpressPackagesDir = path.dirname(
-				path.dirname( bootPackageJson )
-			);
-
-			// Bundle boot, route, theme, and private-apis packages
-			const externalPackages = [
-				'boot',
-				'route',
-				'theme',
-				'private-apis',
-			];
-			for ( const pkgName of externalPackages ) {
-				const result = await bundlePackage( pkgName, {
-					sourceDir: wordpressPackagesDir,
-					handlePrefix: 'wp',
-					scriptGlobal: 'wp',
-					packageNamespace: 'wordpress',
-				} );
-
-				if ( result && result.modules ) {
-					modules.push( ...result.modules );
-				}
-				if ( result && result.scripts ) {
-					scripts.push( ...result.scripts );
-				}
+			if ( result && result.modules ) {
+				modules.push( ...result.modules );
 			}
-		} catch ( error ) {
-			console.warn(
-				'\n⚠️  Warning: Could not bundle WordPress packages for pages:',
-				error.message
-			);
+			if ( result && result.scripts ) {
+				scripts.push( ...result.scripts );
+			}
 		}
 	}
 
