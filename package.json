@@ -180,14 +180,14 @@
 		"prestorybook:build": "npm run build -- --skip-types",
 		"storybook:build": "npm run --workspace @wordpress/storybook storybook:build",
 		"storybook:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook storybook:dev\"",
-		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && storybook dev -c test/storybook-playwright/storybook -p 50241\"",
+		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook-playwright storybook:dev\"",
 		"test": "npm-run-all lint test:unit",
 		"test:create-block": "bash ./bin/test-create-block.sh",
 		"test:e2e": "wp-scripts test-playwright --config test/e2e/playwright.config.ts",
 		"test:e2e:debug": "wp-scripts test-playwright --config test/e2e/playwright.config.ts --ui",
 		"test:e2e:playwright": "npm run test:e2e",
 		"test:e2e:playwright:debug": "npm run test:e2e:debug",
-		"test:e2e:storybook": "playwright test --config test/storybook-playwright/playwright.config.ts",
+		"test:e2e:storybook": "npm run --workspace @wordpress/storybook-playwright test:e2e",
 		"test:e2e:watch": "npm run test:e2e -- --watch",
 		"test:native": "cross-env NODE_ENV=test jest --config test/native/jest.config.js",
 		"test:native:watch": "npm run test:native -- --watch",
@@ -253,6 +253,7 @@
 	"workspaces": [
 		"packages/*",
 		"routes/*",
-		"storybook"
+		"storybook",
+		"test/storybook-playwright"
 	]
 }
