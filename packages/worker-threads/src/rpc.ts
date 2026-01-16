@@ -95,6 +95,9 @@ export function createErrorMessage( id: number, error: unknown ): ErrorMessage {
 /**
  * Type guard to check if a message is an RPC message.
  *
+ * Since we completely control the postMessage channel between the worker
+ * and its creator, we only need a minimal check to identify our messages.
+ *
  * @param data - The data to check.
  * @return True if the data is a valid RPC message.
  */
@@ -104,26 +107,13 @@ export function isRPCMessage( data: unknown ): data is RPCMessage {
 	}
 
 	const msg = data as Record< string, unknown >;
+	const type = msg.type;
 
-	if ( typeof msg.type !== 'number' || typeof msg.id !== 'number' ) {
-		return false;
-	}
-
-	switch ( msg.type ) {
-		case MessageType.CALL:
-			return typeof msg.method === 'string' && Array.isArray( msg.args );
-		case MessageType.RESULT:
-			return 'result' in msg;
-		case MessageType.ERROR:
-			return (
-				typeof msg.error === 'object' &&
-				msg.error !== null &&
-				typeof ( msg.error as Record< string, unknown > ).message ===
-					'string'
-			);
-		default:
-			return false;
-	}
+	return (
+		type === MessageType.CALL ||
+		type === MessageType.RESULT ||
+		type === MessageType.ERROR
+	);
 }
 
 /**
