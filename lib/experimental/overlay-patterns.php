@@ -33,7 +33,7 @@ function gutenberg_register_overlay_block_patterns() {
 <div class="wp-block-group alignwide"><!-- wp:navigation-overlay-close /--></div>
 <!-- /wp:group -->
 
-<!-- wp:navigation {"layout":{"type":"flex","orientation":"vertical"}} /--></div>
+<!-- wp:navigation {"layout":{"type":"flex","orientation":"vertical"},"showSubmenuIcon":false,"submenuVisibility":"always"} /--></div>
 <!-- /wp:group -->',
 			'categories'  => array( 'navigation' ),
 			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
