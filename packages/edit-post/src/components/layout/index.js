@@ -196,7 +196,6 @@ function MetaBoxesMain( { isLegacy } ) {
 	const separatorRef = useRef();
 	const separatorHelpId = useId();
 
-	const didDragGestureRef = useRef( false );
 	const heightRef = useRef();
 
 	/**
@@ -248,12 +247,11 @@ function MetaBoxesMain( { isLegacy } ) {
 	// TODO: Support more/all keyboard interactions from the window splitter pattern:
 	// https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
 	const bindDragGesture = useDrag(
-		( { movement, first, last, memo } ) => {
+		( { movement, first, last, memo, tap, args } ) => {
 			const pane = metaBoxesMainRef.current;
 			const [ , yMovement ] = movement;
 			if ( first ) {
 				pane.classList.add( 'is-resizing' );
-				didDragGestureRef.current = true;
 				let fromHeight = heightRef.current ?? pane.offsetHeight;
 				if ( isOpen ) {
 					// Starts from max in case shortening the window has imposed it.
@@ -267,13 +265,18 @@ function MetaBoxesMain( { isLegacy } ) {
 				return { fromHeight };
 			}
 
-			if ( ! first && ! last ) {
+			if ( ! first && ! last && ! tap ) {
 				applyHeight( memo.fromHeight - yMovement );
 				return memo;
 			}
 			// Here, `last === true` – it’s the final event of the gesture.
 
 			pane.classList.remove( 'is-resizing' );
+			if ( tap ) {
+				const [ onTap ] = args;
+				onTap?.();
+				return;
+			}
 			const nextIsOpen = heightRef.current > min;
 			persistIsOpen( nextIsOpen );
 			// Persists height only if still open. This is so that when closed by a drag the
@@ -281,7 +284,7 @@ function MetaBoxesMain( { isLegacy } ) {
 			// the pane open again.
 			applyHeight( heightRef.current, nextIsOpen );
 		},
-		{ delay: 200, threshold: 5, keyboardDisplacement: 20 }
+		{ keyboardDisplacement: 20, filterTaps: true }
 	);
 
 	if ( ! hasAnyVisible ) {
@@ -317,32 +320,21 @@ function MetaBoxesMain( { isLegacy } ) {
 
 	const paneLabel = __( 'Meta Boxes' );
 
-	let toggleDragProps;
-	// Allows resizing from the toggle only in tall viewports.
-	if ( ! isShort ) {
-		toggleDragProps = bindDragGesture();
-		const gesturePointerDown = toggleDragProps.onPointerDown;
-		// Clears the flag `didDragGestureRef` when the toggle is pressed and
-		// passes the event along the to the gesture handler.
-		toggleDragProps.onPointerDown = ( event ) => {
-			didDragGestureRef.current = false;
-			gesturePointerDown( event );
-		};
-	}
 	// The toggle button. It also resizes when the viewport is tall to provide
 	// a larger hit area than the small separator button.
 	const toggle = (
 		<button
 			aria-expanded={ isOpen }
+			// Toggles for all clicks when short and only keyboard “clicks” when
+			// resizable because pointer input is handled by the drag gesture.
 			onClick={ ( { detail } ) => {
-				const isToggleInferred = ! didDragGestureRef.current;
-				const isKeyboard = ! detail;
-				// Toggles only if a resize couldn’t or didn’t happen.
-				if ( isShort || isKeyboard || isToggleInferred ) {
+				if ( isShort || ! detail ) {
 					persistIsOpen();
 				}
 			} }
-			{ ...toggleDragProps }
+			// Passes a toggle callback that the drag gesture handler calls when
+			// it interprets the input as a click/tap.
+			{ ...( ! isShort && bindDragGesture( persistIsOpen ) ) }
 		>
 			{ paneLabel }
 			<Icon icon={ isOpen ? chevronUp : chevronDown } />
