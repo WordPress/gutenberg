@@ -257,10 +257,30 @@ $navigation-icon-size: 24px;
 		flex-direction: var(--navigation-layout-direction, initial);
 		justify-content: var(--navigation-layout-justify, initial);
 		align-items: var(--navigation-layout-align, initial);
+		gap: var(--wp--style--block-gap, 2em);
 
 		.wp-block-navigation-item {
 			justify-content: var(--navigation-layout-justify, initial);
-			padding: 0 2em;
+		}
+
+		// Reset padding top for submenus so they can rely on consistent gap spacing between items.
+		&.wp-block-navigation-submenu,
+		.wp-block-navigation__submenu-container,
+		.wp-block-navigation-item {
+			padding-top: 0;
+			padding-bottom: 0;
+			gap: var(--wp--style--block-gap, 2em);
+		}
+
+		// Give auto indention for submenus sized by the gap spacing
+		.wp-block-navigation__submenu-container {
+			padding-left: var(--wp--style--block-gap, 2em);
+			padding-right: var(--wp--style--block-gap, 2em);
+
+			// Padding reset
+			.wp-block-navigation-item__content {
+				padding: 0;
+			}
 		}
 
 		> .wp-block-navigation-item__content,
@@ -268,13 +288,10 @@ $navigation-icon-size: 24px;
 			flex-grow: 0;
 		}
 
-		.wp-block-navigation__submenu-icon svg {
-			transform: rotate(0deg);
-		}
-
 		> .wp-block-navigation__submenu-container {
 			flex-basis: 100%;
 			visibility: visible;
+			overflow: visible;
 			opacity: 1;
 			position: static;
 			height: auto;
