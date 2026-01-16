@@ -25,7 +25,6 @@ import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useCallback,
-	useEffect,
 	useMemo,
 	useId,
 	useRef,
@@ -48,7 +47,6 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
-	useEvent,
 	useMediaQuery,
 	useMergeRefs,
 	useRefEffect,
@@ -154,7 +152,7 @@ function MetaBoxesMain( { isLegacy } ) {
 
 	const isShort = useMediaQuery( '(max-height: 549px)' );
 
-	const [ { min, max }, setHeightConstraints ] = useState( () => ( {} ) );
+	const [ { min = 0, max }, setHeightConstraints ] = useState( () => ( {} ) );
 	// Keeps the resizable area’s size constraints updated taking into account
 	// editor notices. The constraints are also used to derive the value for the
 	// aria-valuenow attribute on the separator.
@@ -230,18 +228,10 @@ function MetaBoxesMain( { isLegacy } ) {
 		}
 	};
 
-	const getRenderValues = useEvent( () => ( { isOpen, openHeight, min } ) );
-	// Sets the height to 'auto' when not resizable (isShort) and to the
-	// preferred height when resizable.
-	useEffect( () => {
-		const fresh = getRenderValues();
-		// Tests for `min` having a value to skip the first render.
-		if ( fresh.min !== undefined && metaBoxesMainRef.current ) {
-			const usedOpenHeight = isShort ? 'auto' : fresh.openHeight;
-			const usedHeight = fresh.isOpen ? usedOpenHeight : fresh.min;
-			applyHeight( usedHeight );
-		}
-	}, [ isShort ] );
+	const getContextualHeight = () => {
+		const usedOpenHeight = isShort ? 'auto' : openHeight;
+		return isOpen ? usedOpenHeight : min;
+	};
 
 	// useDrag includes keyboard support with arrow keys emulating a drag.
 	// TODO: Support more/all keyboard interactions from the window splitter pattern:
@@ -313,7 +303,7 @@ function MetaBoxesMain( { isLegacy } ) {
 	const usedAriaValueNow =
 		max === undefined || isAutoHeight
 			? 50
-			: getAriaValueNow( isOpen ? openHeight : min );
+			: getAriaValueNow( getContextualHeight() );
 
 	const persistIsOpen = ( to = ! isOpen ) =>
 		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', to );
@@ -370,7 +360,7 @@ function MetaBoxesMain( { isLegacy } ) {
 				'edit-post-meta-boxes-main',
 				! isShort && 'is-resizable'
 			) }
-			style={ { height: isOpen ? openHeight : min } }
+			style={ { height: getContextualHeight() } }
 		>
 			<div className="edit-post-meta-boxes-main__presenter">
 				{ toggle }
