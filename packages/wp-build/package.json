@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/build",
-	"version": "0.5.0",
+	"version": "0.6.0-prerelease",
 	"description": "Build tool for WordPress plugins.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

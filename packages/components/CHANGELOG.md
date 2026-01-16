@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 32.0.0 (2026-01-16)
+
 ### Code Quality
 
 -   Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
