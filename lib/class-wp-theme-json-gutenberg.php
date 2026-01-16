@@ -243,6 +243,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
 	 * @since 7.0.0 Added `dimensions.width` and `dimensions.height`.
 	 * @since 7.0.0 Added `gap` property.
+	 * @since 7.0.0 Added `text-indent` property.
 	 *
 	 * @var array
 	 */
@@ -306,6 +307,7 @@ class WP_Theme_JSON_Gutenberg {
 		'--wp--style--root--padding-left'   => array( 'spacing', 'padding', 'left' ),
 		'text-decoration'                   => array( 'typography', 'textDecoration' ),
 		'text-transform'                    => array( 'typography', 'textTransform' ),
+		'text-indent'                       => array( 'typography', 'textIndent' ),
 		'filter'                            => array( 'filter', 'duotone' ),
 		'box-shadow'                        => array( 'shadow' ),
 		'height'                            => array( 'dimensions', 'height' ),
@@ -386,7 +388,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.4.0 Added `layout.allowEditing`.
 	 * @since 6.4.0 Added `lightbox`.
 	 * @since 7.0.0 Added type markers to the schema for boolean values.
-	 * @since 7.0.0 Added `dimensions.width` and `dimensions.height`.
+	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`. and
+	 *              `text-indent` properties.
 	 * @var array
 	 */
 	const VALID_SETTINGS = array(
@@ -472,6 +475,8 @@ class WP_Theme_JSON_Gutenberg {
 			'textAlign'        => null,
 			'textColumns'      => null,
 			'textDecoration'   => null,
+			'textIndent'       => null,
+			'textIndentAll'    => null,
 			'textTransform'    => null,
 			'writingMode'      => null,
 		),
@@ -515,7 +520,8 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.2.0 Added `outline`, and `minHeight` properties.
 	 * @since 6.6.0 Added `background` sub properties to top-level only.
 	 * @since 6.6.0 Added `dimensions.aspectRatio`.
-	 * @since 7.0.0 Added `dimensions.width` and `dimensions.height`.
+	 * @since 7.0.0 Added `dimensions.width`, `dimensions.height`. and
+	 *              `text-indent` properties.
 	 * @var array
 	 */
 	const VALID_STYLES = array(
@@ -572,6 +578,8 @@ class WP_Theme_JSON_Gutenberg {
 			'textAlign'      => null,
 			'textColumns'    => null,
 			'textDecoration' => null,
+			'textIndent'     => null,
+			'textIndentAll'  => null,
 			'textTransform'  => null,
 			'writingMode'    => null,
 		),
@@ -1425,6 +1433,7 @@ class WP_Theme_JSON_Gutenberg {
 		$blocks_metadata = static::get_blocks_metadata();
 		$style_nodes     = static::get_style_nodes( $this->theme_json, $blocks_metadata, $options );
 		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
+
 
 		$root_style_key    = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $style_nodes, 'selector' ), true );
 		$root_settings_key = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $setting_nodes, 'selector' ), true );
@@ -4486,6 +4495,26 @@ class WP_Theme_JSON_Gutenberg {
 
 		$settings = $this->theme_json['settings'] ?? null;
 
+		// Handle textIndent/textIndentAll precedence based on setting.
+		// Only process the property that matches the current setting to avoid conflicts.
+		if ( isset( $node['typography'] ) ) {
+			// Check block-level settings first, then fall back to global settings.
+			$block_name              = $metadata['name'] ?? null;
+			$block_settings          = $block_name ? ( $settings['blocks'][ $block_name ] ?? null ) : null;
+			$text_indent_all_setting = $block_settings['typography']['textIndentAll']
+				?? $settings['typography']['textIndentAll']
+				?? false;
+
+			if ( isset( $node['typography']['textIndent'] ) && isset( $node['typography']['textIndentAll'] ) ) {
+				// Both properties are set - remove the inactive one based on setting.
+				if ( $text_indent_all_setting ) {
+					unset( $node['typography']['textIndent'] );
+				} else {
+					unset( $node['typography']['textIndentAll'] );
+				}
+			}
+		}
+
 		foreach ( $metadata['selectors'] as $feature => $feature_selectors ) {
 			// Skip if this is the block's root selector or the block doesn't
 			// have any styles for the feature.
@@ -4507,8 +4536,16 @@ class WP_Theme_JSON_Gutenberg {
 						),
 					);
 
+					// For textIndentAll, we need to map it to the text-indent CSS property.
+					$properties = null;
+					if ( 'textIndentAll' === $subfeature ) {
+						$properties = array(
+							'text-indent' => array( 'typography', 'textIndentAll' ),
+						);
+					}
+
 					// Generate style declarations.
-					$new_declarations = static::compute_style_properties( $subfeature_node, $settings, null, $this->theme_json );
+					$new_declarations = static::compute_style_properties( $subfeature_node, $settings, $properties, $this->theme_json );
 
 					// Merge subfeature declarations into feature declarations.
 					if ( isset( $declarations[ $subfeature_selector ] ) ) {

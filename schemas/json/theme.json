@@ -637,6 +637,16 @@
 							"type": "boolean",
 							"default": false
 						},
+						"textIndent": {
+							"description": "Allow users to set custom line indent for all subsequent paragraphs.",
+							"type": "boolean",
+							"default": false
+						},
+						"textIndentAll": {
+							"description": "Allow users to set custom line indent for all paragraphs.",
+							"type": "boolean",
+							"default": false
+						},
 						"textAlign": {
 							"description": "Allow users to set the text align.",
 							"type": "boolean",
@@ -1730,6 +1740,20 @@
 						},
 						"lineHeight": {
 							"description": "Sets the `line-height` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
+						"textIndent": {
+							"description": "Sets the `text-indent` CSS property for subsequent paragraphs.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
+						"textIndentAll": {
+							"description": "Sets the `text-indent` CSS property for all paragraphs.",
 							"oneOf": [
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }

@@ -345,13 +345,34 @@ function concatFeatureVariationSelectorString(
  *
  * @param selectors Custom selectors object for a block
  * @param styles    A block's styles object
+ * @param settings  Theme.json settings
  * @return Style declarations
  */
 const getFeatureDeclarations = (
 	selectors: Record< string, any >,
-	styles: Record< string, any >
+	styles: Record< string, any >,
+	settings?: Record< string, any >
 ): Record< string, string[] > => {
 	const declarations: Record< string, string[] > = {};
+
+	// Handle textIndent/textIndentAll precedence based on setting.
+	// Only process the property that matches the current setting to avoid conflicts.
+	if ( styles?.typography ) {
+		const textIndentAllSetting =
+			settings?.typography?.textIndentAll ?? false;
+
+		if (
+			styles.typography.textIndent !== undefined &&
+			styles.typography.textIndentAll !== undefined
+		) {
+			// Both properties are set - remove the inactive one based on setting.
+			if ( textIndentAllSetting ) {
+				delete styles.typography.textIndent;
+			} else {
+				delete styles.typography.textIndentAll;
+			}
+		}
+	}
 
 	Object.entries( selectors ).forEach( ( [ feature, selector ] ) => {
 		// We're only processing features/subfeatures that have styles.
@@ -1196,7 +1217,8 @@ export const transformToStyles = (
 				if ( featureSelectors ) {
 					const featureDeclarations = getFeatureDeclarations(
 						featureSelectors,
-						styles
+						styles,
+						tree.settings
 					);
 
 					Object.entries( featureDeclarations ).forEach(
@@ -1273,7 +1295,8 @@ export const transformToStyles = (
 									const featureDeclarations =
 										getFeatureDeclarations(
 											featureSelectors,
-											styleVariations
+											styleVariations,
+											tree.settings
 										);
 
 									Object.entries(
