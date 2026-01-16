@@ -71,14 +71,13 @@ const StylesTab = ( {
 	return (
 		<>
 			{ hasBlockStyles && <BlockStyles clientId={ clientId } /> }
-			{ isSectionBlock &&
-				window?.__experimentalContentOnlyPatternInsertion && (
-					<SectionBlockColorControls
-						blockName={ blockName }
-						clientId={ clientId }
-						contentClientIds={ contentClientIds }
-					/>
-				) }
+			{ isSectionBlock && (
+				<SectionBlockColorControls
+					blockName={ blockName }
+					clientId={ clientId }
+					contentClientIds={ contentClientIds }
+				/>
+			) }
 			{ ! isSectionBlock && (
 				<>
 					<InspectorControls.Slot
