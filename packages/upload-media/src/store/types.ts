@@ -130,18 +130,24 @@ interface UploadMediaArgs {
 	signal?: AbortSignal;
 }
 
+/**
+ * Arguments for sideloading a file to an existing attachment.
+ *
+ * Sideloading adds additional image sizes (thumbnails) to an already
+ * uploaded attachment without creating a new attachment.
+ */
 export interface SideloadMediaArgs {
-	// File to sideload.
+	/** File to sideload (typically a resized version of the original). */
 	file: File;
-	// Attachment ID to sideload to.
+	/** Attachment ID to add the sideloaded file to. */
 	attachmentId: number;
-	// Additional data to include in the request.
+	/** Additional data to include in the request. */
 	additionalData?: AdditionalData;
-	// Function called when an error happens.
+	/** Function called when an error happens. */
 	onError?: OnErrorHandler;
-	// Function called each time a file or a temporary representation of the file is available.
+	/** Function called when the file or a temporary representation is available. */
 	onFileChange?: OnChangeHandler;
-	// Abort signal.
+	/** Abort signal to cancel the sideload operation. */
 	signal?: AbortSignal;
 }
 
@@ -200,12 +206,24 @@ export enum OperationType {
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
 }
 
+/**
+ * Defines the dimensions and cropping behavior for an image size.
+ */
 export interface ImageSizeCrop {
+	/** Target width in pixels. */
 	width: number;
+	/** Target height in pixels. */
 	height: number;
+	/**
+	 * Crop behavior.
+	 * - `true` for hard crop centered.
+	 * - Positional array like `['left', 'top']` for specific crop anchor.
+	 * - `false` or undefined for soft proportional resize.
+	 */
 	crop?:
 		| boolean
 		| [ 'left' | 'center' | 'right', 'top' | 'center' | 'bottom' ];
+	/** Size name identifier (e.g., 'thumbnail', 'medium'). */
 	name?: string;
 }
 
@@ -220,8 +238,16 @@ export type Operation = OperationType | OperationWithArgs;
 
 export type AdditionalData = Record< string, unknown >;
 
+/**
+ * Additional data specific to sideload operations.
+ *
+ * This extends the base AdditionalData with fields required for
+ * sideloading image sizes to an existing attachment.
+ */
 export interface SideloadAdditionalData extends AdditionalData {
+	/** The attachment ID to add the image size to. */
 	post: number;
+	/** The name of the image size being generated (e.g., 'thumbnail', 'medium'). */
 	image_size: string;
 }
 
