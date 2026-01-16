@@ -55,29 +55,35 @@ export interface ProviderCreatorResult {
 
 export type SyncConnectionStatus = 'connected' | 'disconnected';
 
-export type SyncConnectionErrorType =
-	| 'auth-failed'
-	| 'too-many-connections'
-	| 'connection-expired'
-	| 'custom';
+/**
+ * Sync connection error object.
+ */
+export interface SyncConnectionError {
+	/**
+	 * Error code identifier for programmatic handling and default message lookup.
+	 */
+	code: string;
+
+	/**
+	 * Short error title/message to display in UI.
+	 * If not provided, UI components will use a default based on the code.
+	 */
+	message?: string;
+
+	/**
+	 * Longer error description for display.
+	 * If not provided, UI components will use a default based on the code.
+	 */
+	description?: string;
+}
 
 export interface SyncConnectionState {
 	status: SyncConnectionStatus;
 
 	/**
-	 * Type of error - can be a standard type or a custom string.
+	 * Error information when status is 'disconnected'.
 	 */
-	errorType?: SyncConnectionErrorType | string;
-
-	/**
-	 * Custom title to override the default title for this error type.
-	 */
-	title?: string;
-
-	/**
-	 * Custom description to override the default description for this error type.
-	 */
-	description?: string;
+	error?: SyncConnectionError;
 }
 
 export type OnStateChangeCallback = ( state: SyncConnectionState ) => void;
@@ -90,8 +96,32 @@ export interface ProviderCreatorOptions {
 	/**
 	 * Callback to report connection state changes.
 	 *
-	 * Network providers should call this when connection status changes.
-	 * Local providers can ignore it.
+	 * Providers should call this when connection status changes.
+	 *
+	 * Example usage in providers:
+	 *
+	 * ```js
+	 * // Report disconnection with a standard error code
+	 * onStateChange({
+	 *   status: 'disconnected',
+	 *   error: {
+	 *     code: 'too-many-connections'
+	 *   }
+	 * });
+	 *
+	 * // Report disconnection with custom messages
+	 * onStateChange({
+	 *   status: 'disconnected',
+	 *   error: {
+	 *     code: 'rate-limited',
+	 *     message: 'Too Many Requests',
+	 *     description: 'You have made too many requests. Please try again in 5 minutes.'
+	 *   }
+	 * });
+	 *
+	 * // Report successful connection
+	 * onStateChange({ status: 'connected' });
+	 * ```
 	 */
 	onStateChange: OnStateChangeCallback;
 }

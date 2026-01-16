@@ -18,7 +18,11 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { error as errorIcon } from '@wordpress/icons';
-import { getConnectionStatusMessage } from '@wordpress/sync';
+
+/**
+ * Internal dependencies
+ */
+import { getSyncErrorMessages } from '../../utils';
 
 /**
  * Sync connection modal that displays when any entity reports a disconnection.
@@ -43,12 +47,13 @@ export function SyncConnectionModal() {
 
 	const copyButtonRef = useCopyToClipboard( content ?? '' );
 
-	if ( ! connectionState ) {
+	if ( ! connectionState?.error ) {
 		return null;
 	}
 
-	const { title, description } =
-		getConnectionStatusMessage( connectionState );
+	const { title, description } = getSyncErrorMessages(
+		connectionState.error
+	);
 
 	return (
 		<BlockCanvasCover.Fill>
