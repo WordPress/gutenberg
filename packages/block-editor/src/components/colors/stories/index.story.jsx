@@ -17,7 +17,7 @@ export default {
 			canvas: { sourceState: 'shown' },
 			description: {
 				component:
-					'Higher-Order Component (HOC) that injects color props.',
+					'Higher-Order Component (HOC) that injects color props. \n\n **Default Usage:** The component above demonstrates the standard usage, where it retrieves its color palette (Red and Blue) dynamically from the global Block Editor settings.',
 			},
 		},
 	},
@@ -121,6 +121,13 @@ const WrappedCustomBox =
 	createCustomColorsHOC( CUSTOM_PALETTE )( 'backgroundColor' )( CustomBox );
 
 export const CustomPalette = {
+	parameters: {
+		docs: {
+			description: {
+				story: 'This shows `createCustomColorsHOC`. It uses a hardcoded, static palette (Cyan and Magenta) that is isolated from the global theme settings.',
+			},
+		},
+	},
 	render: function Template() {
 		const [ attributes, setAttributes ] = useState( {} );
 
