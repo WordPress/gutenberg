@@ -116,6 +116,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		allImageSizes,
+		bigImageSizeThreshold,
 		allowRightClickOverrides,
 		blockTypes,
 		focusMode,
@@ -171,6 +172,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 			return {
 				allImageSizes: baseData?.image_sizes,
+				bigImageSizeThreshold: baseData?.image_size_threshold,
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
@@ -324,6 +326,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
 			allImageSizes,
+			bigImageSizeThreshold,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
@@ -429,6 +432,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		wrappedOnNavigateToEntityRecord,
 		deviceType,
 		allImageSizes,
+		bigImageSizeThreshold,
 	] );
 }
 
