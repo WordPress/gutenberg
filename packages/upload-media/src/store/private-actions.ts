@@ -233,7 +233,7 @@ export function addSideloadItem( {
 	batchId,
 	parentId,
 }: AddSideloadItemArgs ) {
-	return async ( { dispatch }: ThunkArgs ) => {
+	return ( { dispatch }: ThunkArgs ) => {
 		const itemId = uuidv4();
 		dispatch< AddAction >( {
 			type: Type.Add,
