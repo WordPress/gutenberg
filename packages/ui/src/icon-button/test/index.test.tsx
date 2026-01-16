@@ -20,7 +20,7 @@ describe( 'IconButton', () => {
 	} );
 
 	it( 'respects custom render prop as handled by Button', () => {
-		const { getByRole } = render(
+		render(
 			<IconButton
 				label="Click me"
 				icon={ <svg /> }
@@ -32,7 +32,7 @@ describe( 'IconButton', () => {
 		);
 
 		// Should render as a button from `render` prop...
-		const button = getByRole( 'button', { name: 'Click me' } );
+		const button = screen.getByRole( 'button', { name: 'Click me' } );
 		expect( button ).toHaveAttribute( 'data-testid', 'button' );
 
 		// ...and still inherit the behavior of Button
@@ -42,7 +42,7 @@ describe( 'IconButton', () => {
 
 	describe( 'shortcut', () => {
 		it( 'sets aria-keyshortcuts attribute on the button', () => {
-			const { rerender, getByRole } = render(
+			const { rerender } = render(
 				<IconButton
 					label="Save"
 					icon={ <svg /> }
@@ -53,7 +53,7 @@ describe( 'IconButton', () => {
 				/>
 			);
 
-			const button = getByRole( 'button', { name: 'Save' } );
+			const button = screen.getByRole( 'button', { name: 'Save' } );
 			expect( button ).toHaveAttribute( 'aria-keyshortcuts', 'Meta+S' );
 
 			// The aria-keyshortcuts attribute is removed when there is no
@@ -65,7 +65,7 @@ describe( 'IconButton', () => {
 		it( 'displays the shortcut in the tooltip but hides it from assistive technology', async () => {
 			const user = userEvent.setup();
 
-			const { getByRole, getByText } = render(
+			render(
 				<IconButton
 					label="Save"
 					icon={ <svg /> }
@@ -76,17 +76,18 @@ describe( 'IconButton', () => {
 				/>
 			);
 
-			const button = getByRole( 'button', { name: 'Save' } );
+			const button = screen.getByRole( 'button', { name: 'Save' } );
 			await user.hover( button );
 
 			await waitFor( () => {
-				const shortcutElement = getByText( '⌘S' );
+				const shortcutElement = screen.getByText( '⌘S' );
 				expect( shortcutElement ).toBeVisible();
-				expect( shortcutElement ).toHaveAttribute(
-					'aria-hidden',
-					'true'
-				);
 			} );
+
+			expect( screen.getByText( '⌘S' ) ).toHaveAttribute(
+				'aria-hidden',
+				'true'
+			);
 		} );
 	} );
 } );
