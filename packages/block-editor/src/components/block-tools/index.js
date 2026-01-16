@@ -36,6 +36,7 @@ import { unlock } from '../../lock-unlock';
 import { cleanEmptyObject } from '../../hooks/utils';
 import usePasteStyles from '../use-paste-styles';
 import { BlockRenameModal } from '../block-rename';
+import { BlockVisibilityModal } from '../block-visibility';
 
 function selector( select ) {
 	const {
@@ -75,7 +76,8 @@ export default function BlockTools( {
 } ) {
 	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode, isDragging } =
 		useSelect( selector, [] );
-
+	const [ visibilityModalClientIds, setVisibilityModalClientIds ] =
+		useState( null );
 	const isMatch = useShortcutEventMatch();
 	const {
 		getBlocksByClientId,
@@ -243,36 +245,41 @@ export default function BlockTools( {
 			if ( clientIds.length ) {
 				event.preventDefault();
 				const blocks = getBlocksByClientId( clientIds );
-				const canToggleBlockVisibility = blocks.every( ( block ) =>
-					hasBlockSupport(
-						getBlockName( block.clientId ),
-						'visibility',
-						true
-					)
+				const supportsBlockVisibility = blocks.every( ( block ) =>
+					hasBlockSupport( block.name, 'visibility', true )
 				);
-				if ( ! canToggleBlockVisibility ) {
+
+				if ( ! supportsBlockVisibility ) {
 					return;
 				}
-				const hasHiddenBlock = blocks.some(
-					( block ) =>
-						block.attributes.metadata?.blockVisibility === false
-				);
-				const attributesByClientId = Object.fromEntries(
-					blocks.map( ( { clientId: mapClientId, attributes } ) => [
-						mapClientId,
-						{
-							metadata: cleanEmptyObject( {
-								...attributes?.metadata,
-								blockVisibility: hasHiddenBlock
-									? undefined
-									: false,
-							} ),
-						},
-					] )
-				);
-				updateBlockAttributes( clientIds, attributesByClientId, {
-					uniqueByBlock: true,
-				} );
+
+				if ( window.__experimentalHideBlocksBasedOnScreenSize ) {
+					// Open the visibility breakpoints modal.
+					setVisibilityModalClientIds( clientIds );
+				} else {
+					const hasHiddenBlock = blocks.some(
+						( block ) =>
+							block.attributes.metadata?.blockVisibility === false
+					);
+					const attributesByClientId = Object.fromEntries(
+						blocks.map(
+							( { clientId: mapClientId, attributes } ) => [
+								mapClientId,
+								{
+									metadata: cleanEmptyObject( {
+										...attributes?.metadata,
+										blockVisibility: hasHiddenBlock
+											? undefined
+											: false,
+									} ),
+								},
+							]
+						)
+					);
+					updateBlockAttributes( clientIds, attributesByClientId, {
+						uniqueByBlock: true,
+					} );
+				}
 			}
 		}
 
@@ -343,6 +350,12 @@ export default function BlockTools( {
 				<BlockRenameModal
 					clientId={ renamingBlockClientId }
 					onClose={ () => setRenamingBlockClientId( null ) }
+				/>
+			) }
+			{ visibilityModalClientIds && (
+				<BlockVisibilityModal
+					clientIds={ visibilityModalClientIds }
+					onClose={ () => setVisibilityModalClientIds( null ) }
 				/>
 			) }
 		</div>

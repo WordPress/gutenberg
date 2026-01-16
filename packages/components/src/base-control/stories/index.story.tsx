@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -64,7 +64,9 @@ export const WithVisualLabel: StoryFn< typeof BaseControl > = ( props ) => {
 		<BaseControl { ...props }>
 			<BaseControl.VisualLabel>Visual label</BaseControl.VisualLabel>
 			<div>
-				<Button variant="secondary">Select an author</Button>
+				<Button __next40pxDefaultSize variant="secondary">
+					Select an author
+				</Button>
 			</div>
 		</BaseControl>
 	);

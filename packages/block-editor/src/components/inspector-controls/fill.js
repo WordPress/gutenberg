@@ -15,15 +15,15 @@ import { useEffect, useContext } from '@wordpress/element';
 import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
+	mayDisplayPatternEditingControlsKey,
 } from '../block-edit/context';
 import groups from './groups';
 
-export function PrivateInspectorControlsFill( {
+export default function InspectorControlsFill( {
 	children,
 	group = 'default',
 	__experimentalGroup,
 	resetAllFilter,
-	forceDisplayControls,
 } ) {
 	if ( __experimentalGroup ) {
 		deprecated(
@@ -43,7 +43,14 @@ export function PrivateInspectorControlsFill( {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
-	if ( ! forceDisplayControls && ! context[ mayDisplayControlsKey ] ) {
+	const shouldDisplayForPatternEditing =
+		context[ mayDisplayPatternEditingControlsKey ] &&
+		( group === 'list' || group === 'content' );
+
+	if (
+		! context[ mayDisplayControlsKey ] &&
+		! shouldDisplayForPatternEditing
+	) {
 		return null;
 	}
 
@@ -61,23 +68,6 @@ export function PrivateInspectorControlsFill( {
 				} }
 			</Fill>
 		</StyleProvider>
-	);
-}
-
-export default function InspectorControlsFill( {
-	children,
-	group = 'default',
-	__experimentalGroup,
-	resetAllFilter,
-} ) {
-	return (
-		<PrivateInspectorControlsFill
-			group={ group }
-			__experimentalGroup={ __experimentalGroup }
-			resetAllFilter={ resetAllFilter }
-		>
-			{ children }
-		</PrivateInspectorControlsFill>
 	);
 }
 

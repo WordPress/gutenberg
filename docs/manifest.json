@@ -1854,6 +1854,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/media-editor",
+		"slug": "packages-media-editor",
+		"markdown_source": "../packages/media-editor/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/media-fields",
 		"slug": "packages-media-fields",
 		"markdown_source": "../packages/media-fields/README.md",
@@ -2100,7 +2106,7 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/wp-build",
+		"title": "@wordpress/build",
 		"slug": "packages-wp-build",
 		"markdown_source": "../packages/wp-build/README.md",
 		"parent": "packages"

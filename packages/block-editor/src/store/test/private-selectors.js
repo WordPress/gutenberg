@@ -20,6 +20,7 @@ import {
 	isRemoveLockedBlock,
 	isLockedBlock,
 	isBlockHidden,
+	areBlocksHiddenAnywhere,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -1197,14 +1198,16 @@ describe( 'private selectors', () => {
 
 		it( 'returns false when experimental flag is disabled and block has breakpoint visibility', () => {
 			window.__experimentalHideBlocksBasedOnScreenSize = false;
-			const state = createState( { mobile: false, tablet: true } );
+			const state = createState( {
+				viewport: { mobile: false, tablet: true },
+			} );
 			const result = isBlockHidden( state, 'test-block' );
 			expect( result ).toBe( false );
 		} );
 
 		it( 'returns false when Desktop is selected and block has breakpoint visibility', () => {
 			const state = createState(
-				{ mobile: false, tablet: true },
+				{ viewport: { mobile: false, tablet: true } },
 				'Desktop'
 			);
 			const result = isBlockHidden( state, 'test-block' );
@@ -1212,14 +1215,17 @@ describe( 'private selectors', () => {
 		} );
 
 		it( 'returns true when Desktop is selected and block is hidden on desktop', () => {
-			const state = createState( { desktop: false }, 'Desktop' );
+			const state = createState(
+				{ viewport: { desktop: false } },
+				'Desktop'
+			);
 			const result = isBlockHidden( state, 'test-block' );
 			expect( result ).toBe( true );
 		} );
 
 		it( 'returns true when Tablet is selected and block is hidden on tablet', () => {
 			const state = createState(
-				{ mobile: true, tablet: false },
+				{ viewport: { mobile: true, tablet: false } },
 				'Tablet'
 			);
 			const result = isBlockHidden( state, 'test-block' );
@@ -1228,7 +1234,7 @@ describe( 'private selectors', () => {
 
 		it( 'returns true when Mobile is selected and block is hidden on mobile', () => {
 			const state = createState(
-				{ mobile: false, tablet: true },
+				{ viewport: { mobile: false, tablet: true } },
 				'Mobile'
 			);
 			const result = isBlockHidden( state, 'test-block' );
@@ -1237,11 +1243,92 @@ describe( 'private selectors', () => {
 
 		it( 'returns false when Tablet is selected and block is visible on tablet', () => {
 			const state = createState(
-				{ mobile: false, tablet: true },
+				{ viewport: { mobile: false, tablet: true } },
 				'Tablet'
 			);
 			const result = isBlockHidden( state, 'test-block' );
 			expect( result ).toBe( false );
+		} );
+	} );
+
+	describe( 'areBlocksHiddenAnywhere', () => {
+		it( 'should return false when clientIds array is empty', () => {
+			const state = {
+				blocks: {
+					attributes: new Map(),
+				},
+			};
+			expect( areBlocksHiddenAnywhere( state, [] ) ).toBe( false );
+			expect( areBlocksHiddenAnywhere( state, null ) ).toBe( false );
+			expect( areBlocksHiddenAnywhere( state, undefined ) ).toBe( false );
+		} );
+
+		it( 'should return false when no blocks are hidden', () => {
+			const state = {
+				blocks: {
+					attributes: new Map( [
+						[ 'block-1', { metadata: { blockVisibility: true } } ],
+						[ 'block-2', { metadata: {} } ],
+					] ),
+				},
+			};
+			expect(
+				areBlocksHiddenAnywhere( state, [ 'block-1', 'block-2' ] )
+			).toBe( false );
+		} );
+
+		it( 'should return true when a block is hidden everywhere', () => {
+			const state = {
+				blocks: {
+					attributes: new Map( [
+						[ 'block-1', { metadata: { blockVisibility: false } } ],
+						[ 'block-2', { metadata: { blockVisibility: true } } ],
+					] ),
+				},
+			};
+			expect(
+				areBlocksHiddenAnywhere( state, [ 'block-1', 'block-2' ] )
+			).toBe( true );
+		} );
+
+		it( 'should return true when a block is hidden in any viewport', () => {
+			const state = {
+				blocks: {
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: {
+										viewport: {
+											mobile: false,
+											tablet: true,
+										},
+									},
+								},
+							},
+						],
+						[ 'block-2', { metadata: { blockVisibility: true } } ],
+					] ),
+				},
+			};
+			expect(
+				areBlocksHiddenAnywhere( state, [ 'block-1', 'block-2' ] )
+			).toBe( true );
+		} );
+
+		it( 'should return false when clientId is null or undefined', () => {
+			const state = {
+				blocks: {
+					attributes: new Map( [
+						[ 'block-1', { metadata: { blockVisibility: false } } ],
+					] ),
+				},
+			};
+			expect( areBlocksHiddenAnywhere( state, [ null ] ) ).toBe( false );
+			expect( areBlocksHiddenAnywhere( state, [ undefined ] ) ).toBe(
+				false
+			);
 		} );
 	} );
 } );

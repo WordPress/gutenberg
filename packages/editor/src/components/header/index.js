@@ -25,6 +25,7 @@ import PreviewDropdown from '../preview-dropdown';
 import ZoomOutToggle from '../zoom-out-toggle';
 import { store as editorStore } from '../../store';
 import {
+	ATTACHMENT_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	PATTERN_POST_TYPE,
 	NAVIGATION_POST_TYPE,
@@ -64,6 +65,7 @@ function Header( {
 		hasBlockSelection,
 		hasSectionRootClientId,
 		isStylesCanvasActive,
+		isAttachment,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
@@ -89,6 +91,9 @@ function Header( {
 			isStylesCanvasActive:
 				!! getStylesPath()?.startsWith( '/revisions' ) ||
 				getShowStylebook(),
+			isAttachment:
+				getCurrentPostType() === ATTACHMENT_POST_TYPE &&
+				window?.__experimentalMediaEditor,
 		};
 	}, [] );
 
@@ -98,6 +103,7 @@ function Header( {
 
 	const disablePreviewOption =
 		[
+			ATTACHMENT_POST_TYPE,
 			NAVIGATION_POST_TYPE,
 			TEMPLATE_PART_POST_TYPE,
 			PATTERN_POST_TYPE,
@@ -133,9 +139,13 @@ function Header( {
 				className="editor-header__toolbar"
 				transition={ { type: 'tween' } }
 			>
-				<DocumentTools
-					disableBlockTools={ isStylesCanvasActive || isTextEditor }
-				/>
+				{ ! isAttachment && (
+					<DocumentTools
+						disableBlockTools={
+							isStylesCanvasActive || isTextEditor
+						}
+					/>
+				) }
 				{ hasFixedToolbar && isLargeViewport && (
 					<CollapsibleBlockToolbar
 						isCollapsed={ isBlockToolsCollapsed }
@@ -197,7 +207,7 @@ function Header( {
 					/>
 				) }
 				{ customSaveButton }
-				<MoreMenu />
+				{ ! isAttachment && <MoreMenu /> }
 			</motion.div>
 		</div>
 	);

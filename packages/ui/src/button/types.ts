@@ -1,9 +1,11 @@
 import { type ReactNode, type HTMLAttributes } from 'react';
-import { type ButtonProps as AriakitButtonProps } from '@ariakit/react';
-import { type ComponentProps } from '../utils/types';
+import type { Button as _Button } from '@base-ui/react/button';
+import type { ComponentProps } from '../utils/types';
+
+type _ButtonProps = ComponentProps< typeof _Button >;
 
 export interface ButtonProps
-	extends Omit< ComponentProps< 'button' >, 'disabled' | 'aria-pressed' > {
+	extends Omit< _ButtonProps, 'disabled' | 'aria-pressed' > {
 	/**
 	 * The variant of the button. Variants describe the visual style treatment
 	 * of the button.
@@ -13,7 +15,10 @@ export interface ButtonProps
 	variant?: 'solid' | 'outline' | 'minimal' | 'unstyled';
 
 	/**
-	 * The tone of the button. Tone describes a semantic color intent.
+	 * The tone of the button, describing a semantic color intent:
+	 *
+	 * - `'brand': for the most prominent actions, using the brand colors.
+	 * - `'neutral'` for less prominent actions.
 	 *
 	 * @default "brand"
 	 */
@@ -40,7 +45,7 @@ export interface ButtonProps
 	 *
 	 * @default true
 	 */
-	accessibleWhenDisabled?: AriakitButtonProps[ 'accessibleWhenDisabled' ];
+	focusableWhenDisabled?: _ButtonProps[ 'focusableWhenDisabled' ];
 
 	/**
 	 * Indicates the current "pressed" state of toggle buttons. This should only

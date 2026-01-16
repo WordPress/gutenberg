@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta } from '@storybook/react-webpack5';
+import type { Meta } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -11,6 +11,7 @@ import LayoutActivityComponent from './layout-activity';
 import LayoutTableComponent from './layout-table';
 import LayoutGridComponent from './layout-grid';
 import LayoutListComponent from './layout-list';
+import LayoutCustomComponent from './layout-custom';
 import InfiniteScrollComponent from './infinite-scroll';
 import WithCardComponent from './with-card';
 import FreeCompositionComponent from './free-composition';
@@ -189,6 +190,10 @@ export const LayoutActivity = {
 			description: 'Whether to display the media field',
 		},
 	},
+};
+
+export const LayoutCustom = {
+	render: LayoutCustomComponent,
 };
 
 export const Empty = {

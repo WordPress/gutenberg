@@ -19,17 +19,17 @@ import {
 	applyPostChangesToCRDTDoc,
 	getPostChangesFromCRDTDoc,
 	type PostChanges,
+	type YPostRecord,
 } from '../crdt';
 import type { YBlock, YBlocks } from '../crdt-blocks';
+import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
 import type { Post, Type } from '../../entity-types';
 
 describe( 'crdt', () => {
 	let doc: Y.Doc;
-	let map: Y.Map< string | object | YBlocks >;
 
 	beforeEach( () => {
 		doc = new Y.Doc();
-		map = doc.getMap( CRDT_RECORD_MAP_KEY );
 		jest.clearAllMocks();
 	} );
 
@@ -39,6 +39,12 @@ describe( 'crdt', () => {
 
 	describe( 'applyPostChangesToCRDTDoc', () => {
 		const mockPostType = {} as Type;
+
+		let map: YMapWrap< YPostRecord >;
+
+		beforeEach( () => {
+			map = getRootMap< YPostRecord >( doc, CRDT_RECORD_MAP_KEY );
+		} );
 
 		it( 'applies simple property changes', () => {
 			const changes = {
@@ -164,7 +170,7 @@ describe( 'crdt', () => {
 				},
 			};
 
-			const metaMap = new Y.Map< unknown >();
+			const metaMap = createYMap();
 			metaMap.set( 'some_meta', 'old value' );
 			map.set( 'meta', metaMap );
 
@@ -180,7 +186,7 @@ describe( 'crdt', () => {
 				},
 			};
 
-			const metaMap = new Y.Map< unknown >();
+			const metaMap = createYMap();
 			metaMap.set( 'some_meta', 'old value' );
 			map.set( 'meta', metaMap );
 
@@ -201,9 +207,9 @@ describe( 'crdt', () => {
 
 			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
 
-			const metaMap = map.get( 'meta' ) as Y.Map< unknown >;
+			const metaMap = map.get( 'meta' );
 			expect( metaMap ).toBeInstanceOf( Y.Map );
-			expect( metaMap.get( 'custom_field' ) ).toBe( 'value' );
+			expect( metaMap?.get( 'custom_field' ) ).toBe( 'value' );
 		} );
 	} );
 
@@ -216,7 +222,10 @@ describe( 'crdt', () => {
 			},
 		} as unknown as Type;
 
+		let map: YMapWrap< YPostRecord >;
+
 		beforeEach( () => {
+			map = getRootMap< YPostRecord >( doc, CRDT_RECORD_MAP_KEY );
 			map.set( 'title', 'CRDT Title' );
 			map.set( 'status', 'draft' );
 			map.set( 'date', '2025-01-01' );
@@ -344,9 +353,9 @@ describe( 'crdt', () => {
 		} );
 
 		it( 'includes meta in changes', () => {
-			map.set( 'meta', {
-				public_meta: 'new value',
-			} );
+			const metaMap = createYMap();
+			metaMap.set( 'public_meta', 'new value' );
+			map.set( 'meta', metaMap );
 
 			const editedRecord = {
 				meta: {
@@ -366,9 +375,9 @@ describe( 'crdt', () => {
 		} );
 
 		it( 'includes non-single meta in changes', () => {
-			map.set( 'meta', {
-				public_meta: [ 'value', 'value 2' ],
-			} );
+			const metaMap = createYMap();
+			metaMap.set( 'public_meta', [ 'value', 'value 2' ] );
+			map.set( 'meta', metaMap );
 
 			const editedRecord = {
 				meta: {
@@ -388,10 +397,13 @@ describe( 'crdt', () => {
 		} );
 
 		it( 'excludes disallowed meta keys in changes', () => {
-			map.set( 'meta', {
-				public_meta: 'new value',
-				[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: 'exclude me',
-			} );
+			const metaMap = createYMap();
+			metaMap.set( 'public_meta', 'new value' );
+			metaMap.set(
+				WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+				'exclude me'
+			);
+			map.set( 'meta', metaMap );
 
 			const editedRecord = {
 				meta: {

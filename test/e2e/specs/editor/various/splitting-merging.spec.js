@@ -391,7 +391,13 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 		};
 		const emptyAlignedHeading = {
 			name: 'core/heading',
-			attributes: { content: '', textAlign: 'center', level: 2 },
+			attributes: {
+				content: '',
+				level: 2,
+				style: {
+					typography: { textAlign: 'center' },
+				},
+			},
 			innerBlocks: [],
 		};
 		const headingWithContent = {

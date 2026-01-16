@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -44,6 +44,7 @@ const Template: StoryFn< typeof NumberControl > = ( {
 	return (
 		<>
 			<NumberControl
+				__next40pxDefaultSize
 				{ ...props }
 				value={ value }
 				onChange={ ( v, extra ) => {

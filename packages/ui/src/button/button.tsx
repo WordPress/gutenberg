@@ -1,4 +1,4 @@
-import { Button as AriakitButton } from '@ariakit/react';
+import { Button as _Button } from '@base-ui/react/button';
 import clsx from 'clsx';
 import { speak } from '@wordpress/a11y';
 import { forwardRef, useEffect } from '@wordpress/element';
@@ -15,7 +15,7 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
 			variant = 'solid',
 			size = 'default',
 			className,
-			accessibleWhenDisabled = true,
+			focusableWhenDisabled = true,
 			disabled,
 			loading,
 			loadingAnnouncement = __( 'Loading' ),
@@ -43,15 +43,15 @@ export const Button = forwardRef< HTMLButtonElement, ButtonProps >(
 		}, [ loading, loadingAnnouncement ] );
 
 		return (
-			<AriakitButton
+			<_Button
 				ref={ ref }
 				className={ mergedClassName }
-				accessibleWhenDisabled={ accessibleWhenDisabled }
+				focusableWhenDisabled={ focusableWhenDisabled }
 				disabled={ disabled ?? loading }
 				{ ...props }
 			>
 				{ children }
-			</AriakitButton>
+			</_Button>
 		);
 	}
 );

@@ -1,5 +1,5 @@
 import { Fragment, useState } from '@wordpress/element';
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { cog } from '@wordpress/icons';
 import { Button } from '../index';
 
@@ -131,11 +131,6 @@ export const AllTonesAndVariants: Story = {
 									{ ...args }
 									tone={ tone }
 									variant={ variant }
-									// Disabling because this lint rule was meant for the
-									// `@wordpress/components` Button, but is being applied here.
-									// TODO: rework the lint rule so that it checks the package
-									// where the Button comes from.
-									// eslint-disable-next-line no-restricted-syntax
 									disabled
 								/>
 							</div>
@@ -145,17 +140,6 @@ export const AllTonesAndVariants: Story = {
 			) ) }
 		</div>
 	),
-};
-
-export const LinkStyledAsButton: Story = {
-	...Default,
-	args: {
-		...Default.args,
-		// Link content passed through `children`
-		// eslint-disable-next-line jsx-a11y/anchor-has-content
-		render: <a href="https://example.com" />,
-		children: 'Link',
-	},
 };
 
 export const WithIcon: Story = {

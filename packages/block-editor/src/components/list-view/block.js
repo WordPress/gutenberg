@@ -55,6 +55,7 @@ import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { cleanEmptyObject } from '../../hooks/utils';
+import { BlockVisibilityModal } from '../block-visibility';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -81,7 +82,8 @@ function ListViewBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
-
+	const [ visibilityModalClientIds, setVisibilityModalClientIds ] =
+		useState( null );
 	const { isLocked } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
@@ -100,6 +102,7 @@ function ListViewBlock( {
 		insertBeforeBlock,
 		updateBlockAttributes,
 	} = unlock( useDispatch( blockEditorStore ) );
+
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
 		50
@@ -130,15 +133,18 @@ function ListViewBlock( {
 	const { block, blockName, allowRightClickOverrides, isBlockHidden } =
 		useSelect(
 			( select ) => {
-				const { getBlock, getBlockName, getSettings } =
-					select( blockEditorStore );
+				const {
+					getBlock,
+					getBlockName: _getBlockName,
+					getSettings,
+				} = select( blockEditorStore );
 				const { isBlockHidden: _isBlockHidden } = unlock(
 					select( blockEditorStore )
 				);
 
 				return {
 					block: getBlock( clientId ),
-					blockName: getBlockName( clientId ),
+					blockName: _getBlockName( clientId ),
 					allowRightClickOverrides:
 						getSettings().allowRightClickOverrides,
 					isBlockHidden: _isBlockHidden( clientId ),
@@ -380,30 +386,40 @@ function ListViewBlock( {
 			event.preventDefault();
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const blocks = getBlocksByClientId( blocksToUpdate );
-			const canToggleVisibility = blocks.every( ( blockToUpdate ) =>
-				hasBlockSupport( blockToUpdate.name, 'visibility', true )
+			const supportsBlockVisibility = blocks.every( ( _block ) =>
+				hasBlockSupport( _block.name, 'visibility', true )
 			);
-			if ( ! canToggleVisibility ) {
+
+			if ( ! supportsBlockVisibility ) {
 				return;
 			}
-			const hasHiddenBlock = blocks.some(
-				( blockToUpdate ) =>
-					blockToUpdate.attributes.metadata?.blockVisibility === false
-			);
-			const attributesByClientId = Object.fromEntries(
-				blocks.map( ( { clientId: mapClientId, attributes } ) => [
-					mapClientId,
-					{
-						metadata: cleanEmptyObject( {
-							...attributes?.metadata,
-							blockVisibility: hasHiddenBlock ? undefined : false,
-						} ),
-					},
-				] )
-			);
-			updateBlockAttributes( blocksToUpdate, attributesByClientId, {
-				uniqueByBlock: true,
-			} );
+
+			if ( window.__experimentalHideBlocksBasedOnScreenSize ) {
+				// Open the visibility breakpoints modal.
+				setVisibilityModalClientIds( blocksToUpdate );
+			} else {
+				const hasHiddenBlock = blocks.some(
+					( blockToUpdate ) =>
+						blockToUpdate.attributes.metadata?.blockVisibility ===
+						false
+				);
+				const attributesByClientId = Object.fromEntries(
+					blocks.map( ( { clientId: mapClientId, attributes } ) => [
+						mapClientId,
+						{
+							metadata: cleanEmptyObject( {
+								...attributes?.metadata,
+								blockVisibility: hasHiddenBlock
+									? undefined
+									: false,
+							} ),
+						},
+					] )
+				);
+				updateBlockAttributes( blocksToUpdate, attributesByClientId, {
+					uniqueByBlock: true,
+				} );
+			}
 		} else if ( isMatch( 'core/block-editor/rename', event ) ) {
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const isContentOnly =
@@ -640,7 +656,9 @@ function ListViewBlock( {
 									currentlyEditingBlockInCanvas ? 0 : tabIndex
 								}
 								onFocus={ onFocus }
-								isExpanded={ canEditBlock ? isExpanded : undefined }
+								isExpanded={
+									canEditBlock ? isExpanded : undefined
+								}
 								selectedClientIds={ selectedClientIds }
 								ariaDescribedBy={ descriptionId }
 							/>
@@ -705,7 +723,8 @@ function ListViewBlock( {
 								} }
 								toggleProps={ {
 									ref,
-									className: 'block-editor-list-view-block__menu',
+									className:
+										'block-editor-list-view-block__menu',
 									tabIndex,
 									onClick: clearSettingsAnchorRect,
 									onFocus,
@@ -727,6 +746,12 @@ function ListViewBlock( {
 				<BlockRenameModal
 					clientId={ clientId }
 					onClose={ () => setIsRenameModalOpen( false ) }
+				/>
+			) }
+			{ visibilityModalClientIds && (
+				<BlockVisibilityModal
+					clientIds={ visibilityModalClientIds }
+					onClose={ () => setVisibilityModalClientIds( null ) }
 				/>
 			) }
 		</>

@@ -1,0 +1,22 @@
+// Page-specific route registration functions for {{PAGE_SLUG}}
+if ( ! function_exists( '{{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_page_routes' ) ) {
+	/**
+	 * Register routes for {{PAGE_SLUG}} page (full-page mode).
+	 */
+	function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_page_routes() {
+		global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes_data;
+		{{PREFIX}}_register_page_routes( ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes_data, '{{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_route' );
+	}
+}
+add_action( '{{PAGE_SLUG}}_init', '{{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_page_routes' );
+
+if ( ! function_exists( '{{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_page_routes' ) ) {
+	/**
+	 * Register routes for {{PAGE_SLUG}} page (wp-admin mode).
+	 */
+	function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_page_routes() {
+		global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes_data;
+		{{PREFIX}}_register_page_routes( ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes_data, '{{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_route' );
+	}
+}
+add_action( '{{PAGE_SLUG}}-wp-admin_init', '{{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_wp_admin_page_routes' );
