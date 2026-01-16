@@ -86,11 +86,13 @@ describe( 'SyncManager', () => {
 		};
 
 		mockHandlers = {
+			addUndoMeta: jest.fn(),
 			editRecord: jest.fn(),
 			getEditedRecord: jest.fn( async () =>
 				Promise.resolve( mockRecord )
 			),
 			refetchRecord: jest.fn( async () => Promise.resolve() ),
+			restoreUndoMeta: jest.fn(),
 			saveRecord: jest.fn( async () => Promise.resolve() ),
 		};
 	} );
@@ -486,7 +488,7 @@ describe( 'SyncManager', () => {
 			mockProviderCreator.mockImplementation(
 				async (
 					_objectType: string,
-					_objectId: string,
+					_objectId: string | null,
 					ydoc: Y.Doc
 				) => {
 					capturedDoc = ydoc;
@@ -539,7 +541,7 @@ describe( 'SyncManager', () => {
 			mockProviderCreator.mockImplementation(
 				async (
 					_objectType: string,
-					_objectId: string,
+					_objectId: string | null,
 					ydoc: Y.Doc
 				) => {
 					capturedDoc = ydoc;
@@ -583,7 +585,7 @@ describe( 'SyncManager', () => {
 			mockProviderCreator.mockImplementation(
 				async (
 					_objectType: string,
-					_objectId: string,
+					_objectId: string | null,
 					ydoc: Y.Doc
 				) => {
 					capturedDoc = ydoc;
@@ -631,7 +633,7 @@ describe( 'SyncManager', () => {
 			mockProviderCreator.mockImplementation(
 				async (
 					_objectType: string,
-					_objectId: string,
+					_objectId: string | null,
 					ydoc: Y.Doc
 				) => {
 					capturedDoc = ydoc;
@@ -680,7 +682,7 @@ describe( 'SyncManager', () => {
 			mockProviderCreator.mockImplementation(
 				async (
 					_objectType: string,
-					_objectId: string,
+					_objectId: string | null,
 					ydoc: Y.Doc
 				) => {
 					capturedDoc = ydoc;
