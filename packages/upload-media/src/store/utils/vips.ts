@@ -105,12 +105,13 @@ export async function vipsHasTransparency( url: string ) {
 /**
  * Resizes an image using vips in a web worker.
  *
- * @param id        Queue item ID.
- * @param file      File object.
- * @param resize    Resize options (width, height, crop).
- * @param smartCrop Whether to use smart cropping (saliency-aware).
- * @param addSuffix Whether to add dimension suffix to filename.
- * @param signal    Optional abort signal to cancel the operation.
+ * @param id           Queue item ID.
+ * @param file         File object.
+ * @param resize       Resize options (width, height, crop).
+ * @param smartCrop    Whether to use smart cropping (saliency-aware).
+ * @param addSuffix    Whether to add dimension suffix to filename.
+ * @param signal       Optional abort signal to cancel the operation.
+ * @param scaledSuffix Whether to add '-scaled' suffix instead of dimensions (for big image threshold).
  * @return Resized ImageFile with dimension metadata.
  */
 export async function vipsResizeImage(
@@ -119,7 +120,8 @@ export async function vipsResizeImage(
 	resize: ImageSizeCrop,
 	smartCrop: boolean,
 	addSuffix: boolean,
-	signal?: AbortSignal
+	signal?: AbortSignal,
+	scaledSuffix?: boolean
 ) {
 	if ( signal?.aborted ) {
 		throw new Error( 'Operation aborted' );
@@ -135,13 +137,21 @@ export async function vipsResizeImage(
 		);
 
 	let fileName = file.name;
+	const wasResized = originalWidth > width || originalHeight > height;
 
-	if ( addSuffix && ( originalWidth > width || originalHeight > height ) ) {
+	if ( wasResized ) {
 		const basename = getFileBasename( file.name );
-		fileName = file.name.replace(
-			basename,
-			`${ basename }-${ width }x${ height }`
-		);
+		if ( scaledSuffix ) {
+			// Add '-scaled' suffix for big image threshold resizing.
+			// This matches WordPress core's behavior in wp_create_image_subsizes().
+			fileName = file.name.replace( basename, `${ basename }-scaled` );
+		} else if ( addSuffix ) {
+			// Add dimension suffix for thumbnails.
+			fileName = file.name.replace(
+				basename,
+				`${ basename }-${ width }x${ height }`
+			);
+		}
 	}
 
 	const resultFile = new ImageFile(

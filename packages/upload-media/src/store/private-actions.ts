@@ -553,8 +553,26 @@ export function prepareItem( id: QueueItemId ) {
 
 		const isImage = file.type.startsWith( 'image/' );
 
-		// For images, add upload and thumbnail generation.
+		// For images, check if we need to scale down based on threshold.
 		if ( isImage ) {
+			const bigImageSizeThreshold =
+				select.getSettings().bigImageSizeThreshold;
+
+			// If a threshold is set, add a resize operation to scale down large images.
+			// This matches WordPress core's behavior in wp_create_image_subsizes().
+			if ( bigImageSizeThreshold ) {
+				operations.push( [
+					OperationType.ResizeCrop,
+					{
+						resize: {
+							width: bigImageSizeThreshold,
+							height: bigImageSizeThreshold,
+						},
+						isThresholdResize: true,
+					},
+				] );
+			}
+
 			operations.push(
 				OperationType.Upload,
 				OperationType.ThumbnailGeneration
@@ -669,7 +687,10 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 			return;
 		}
 
+		// Add dimension suffix for sub-sizes (thumbnails).
 		const addSuffix = Boolean( item.parentId );
+		// Add '-scaled' suffix for big image threshold resizing.
+		const scaledSuffix = Boolean( args.isThresholdResize );
 
 		try {
 			const file = await vipsResizeImage(
@@ -678,7 +699,8 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				args.resize,
 				false, // smartCrop
 				addSuffix,
-				item.abortController?.signal
+				item.abortController?.signal,
+				scaledSuffix
 			);
 
 			const blobUrl = createBlobURL( file );

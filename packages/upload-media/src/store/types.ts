@@ -232,7 +232,14 @@ export interface ImageSizeCrop {
 }
 
 export interface OperationArgs {
-	[ OperationType.ResizeCrop ]: { resize: ImageSizeCrop };
+	[ OperationType.ResizeCrop ]: {
+		resize: ImageSizeCrop;
+		/**
+		 * Whether this resize is for the big image size threshold.
+		 * If true, uses '-scaled' suffix instead of dimension suffix.
+		 */
+		isThresholdResize?: boolean;
+	};
 }
 
 type OperationWithArgs< T extends keyof OperationArgs = keyof OperationArgs > =
