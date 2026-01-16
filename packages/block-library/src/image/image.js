@@ -379,6 +379,7 @@ export default function Image( {
 	const [ hasImageErrored, setHasImageErrored ] = useState( false );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
+	const showDimensionsControls = allowResize && hasNonContentControls;
 	const isResizable =
 		allowResize &&
 		hasNonContentControls &&
@@ -582,9 +583,7 @@ export default function Image( {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const dimensionsControl =
-		allowResize &&
-		hasNonContentControls &&
-		isLargeViewport &&
+		showDimensionsControls &&
 		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
 			<DimensionsTool
 				panelId={ clientId }
@@ -627,9 +626,9 @@ export default function Image( {
 				scaleOptions={ scaleOptions }
 				unitsOptions={ dimensionsUnitsOptions }
 				tools={
-					isResizable
-						? [ 'aspectRatio', 'widthHeight', 'scale' ]
-						: [ 'aspectRatio', 'scale' ]
+					isWideAligned
+						? [ 'aspectRatio', 'scale' ]
+						: [ 'aspectRatio', 'widthHeight', 'scale' ]
 				}
 			/>
 		) );
