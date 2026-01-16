@@ -78,11 +78,11 @@ export function createSyncManager(): SyncManager {
 	/**
 	 * Load an entity for syncing and manage its lifecycle.
 	 *
-	 * @param {SyncConfig}     syncConfig Sync configuration for the object type.
-	 * @param {ObjectType}     objectType Object type.
-	 * @param {ObjectID}       objectId   Object ID.
-	 * @param {ObjectData}     record     Entity record representing this object type.
-	 * @param {RecordHandlers} handlers   Handlers for updating and fetching the record.
+	 * @param {SyncConfig}        syncConfig  Sync configuration for the object type.
+	 * @param {ObjectType}        objectType  Object type.
+	 * @param {ObjectID}          objectId    Object ID.
+	 * @param {ObjectData}        record      Entity record representing this object type.
+	 * @param {RecordHandlers}    handlers    Handlers for updating and fetching the record.
 	 */
 	async function loadEntity(
 		syncConfig: SyncConfig,
@@ -147,8 +147,16 @@ export function createSyncManager(): SyncManager {
 
 		entityStates.set( entityId, entityState );
 
+		// Get the current user from the handlers.
+		const currentUser = await handlers.getCurrentUser();
+
 		// Create awareness for the given entity and its Yjs document.
-		const awareness = await createAwareness( objectType, objectId, ydoc );
+		const awareness = await createAwareness(
+			objectType,
+			objectId,
+			ydoc,
+			currentUser
+		);
 
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(

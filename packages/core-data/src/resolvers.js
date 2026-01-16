@@ -223,6 +223,9 @@ export const getEntityRecord =
 									key
 								);
 							},
+							// Get the current user.
+							getCurrentUser: async () =>
+								await resolveSelect.getCurrentUser(),
 						}
 					);
 				}

@@ -111,9 +111,12 @@ export function areMapsEqual< Key, Value >(
  * Compare two user infos for equality.
  * @param userInfo1 - The first user info to compare.
  * @param userInfo2 - The second user info to compare.
- * @returns True if the user infos are equal, false otherwise.
+ * @return True if the user infos are equal, false otherwise.
  */
-export function areUserInfosEqual( userInfo1?: UserInfo, userInfo2?: UserInfo ): boolean {
+export function areUserInfosEqual(
+	userInfo1?: UserInfo,
+	userInfo2?: UserInfo
+): boolean {
 	if ( ! userInfo1 || ! userInfo2 ) {
 		return userInfo1 === userInfo2;
 	}
@@ -130,7 +133,7 @@ export function areUserInfosEqual( userInfo1?: UserInfo, userInfo2?: UserInfo ):
 
 /**
  * Get the browser name from the user agent.
- * @returns The browser name.
+ * @return The browser name.
  */
 export function getBrowserName(): string {
 	const userAgent = window.navigator.userAgent;
@@ -140,11 +143,20 @@ export function getBrowserName(): string {
 		browserName = 'Firefox';
 	} else if ( userAgent.includes( 'Edg' ) ) {
 		browserName = 'Microsoft Edge';
-	} else if ( userAgent.includes( 'Chrome' ) && ! userAgent.includes( 'Edg' ) ) {
+	} else if (
+		userAgent.includes( 'Chrome' ) &&
+		! userAgent.includes( 'Edg' )
+	) {
 		browserName = 'Chrome';
-	} else if ( userAgent.includes( 'Safari' ) && ! userAgent.includes( 'Chrome' ) ) {
+	} else if (
+		userAgent.includes( 'Safari' ) &&
+		! userAgent.includes( 'Chrome' )
+	) {
 		browserName = 'Safari';
-	} else if ( userAgent.includes( 'MSIE' ) || userAgent.includes( 'Trident' ) ) {
+	} else if (
+		userAgent.includes( 'MSIE' ) ||
+		userAgent.includes( 'Trident' )
+	) {
 		browserName = 'Internet Explorer';
 	} else if ( userAgent.includes( 'Opera' ) || userAgent.includes( 'OPR' ) ) {
 		browserName = 'Opera';

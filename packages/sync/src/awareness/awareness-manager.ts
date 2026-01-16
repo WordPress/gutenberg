@@ -4,17 +4,12 @@
 import type * as Y from 'yjs';
 
 /**
- * WordPress dependencies
- */
-import { select } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
 import type { ObjectID, ObjectType } from '../types';
 import type { AwarenessState } from './awareness-state';
 import { PostEditorAwarenessState } from './post-editor-awareness-state';
-import { UserInfo, WordPressUserInfo } from './awareness-types';
+import type { UserInfo, WordPressUserInfo } from './awareness-types';
 import { getBrowserName } from '../utils';
 
 const awarenessInstances: Map< string, AwarenessState > = new Map();
@@ -64,24 +59,21 @@ export function getPostEditorAwareness(
 
 /**
  * Create an awareness instance for the given object type and object ID.
- * @param objectType Object type.
- * @param objectId   Object ID.
- * @param ydoc       Yjs document.
+ * @param objectType  Object type.
+ * @param objectId    Object ID.
+ * @param ydoc        Yjs document.
+ * @param currentUser Current user.
  * @return Awareness instance.
  */
 export async function createAwareness(
 	objectType: ObjectType,
 	objectId: ObjectID | null,
-	ydoc: Y.Doc
+	ydoc: Y.Doc,
+	currentUser: WordPressUserInfo
 ): Promise< AwarenessState | undefined > {
 	if ( objectId && objectType.startsWith( 'postType/' ) ) {
 		const awareness = new PostEditorAwarenessState( ydoc );
-
-		const currentUser = select( 'core/data' ).getCurrentUser();
-
-		console.log( 'currentUser', currentUser );
 		const userInfo = getUserInfo( currentUser );
-		console.log( 'userInfo', userInfo );
 
 		awareness.setUp( userInfo );
 		awarenessInstances.set(

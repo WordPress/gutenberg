@@ -13,6 +13,7 @@ import type { Awareness } from 'y-protocols/awareness';
  * Internal dependencies
  */
 import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
+import type { WordPressUserInfo } from './awareness/awareness-types';
 
 /* globalThis */
 declare global {
@@ -64,6 +65,7 @@ export interface RecordHandlers {
 	editRecord: ( data: Partial< ObjectData > ) => void;
 	getEditedRecord: () => Promise< ObjectData >;
 	saveRecord: () => Promise< void >;
+	getCurrentUser: () => Promise< WordPressUserInfo >;
 }
 
 export interface SyncConfig {

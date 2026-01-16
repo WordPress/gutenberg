@@ -31,6 +31,7 @@ import type {
 	RecordHandlers,
 	SyncConfig,
 } from '../types';
+import type { WordPressUserInfo } from '../awareness/awareness-types';
 
 // Mock dependencies.
 jest.mock( '../providers', () => ( {
@@ -43,6 +44,7 @@ describe( 'SyncManager', () => {
 	let mockProviderCreator: jest.Mock< ProviderCreator >;
 	let mockProviderResult: ProviderCreatorResult;
 	let mockRecord: ObjectData;
+	let mockCurrentUser: WordPressUserInfo;
 	let mockSyncConfig: jest.MockedObject< SyncConfig >;
 
 	beforeEach( () => {
@@ -52,6 +54,16 @@ describe( 'SyncManager', () => {
 		mockRecord = {
 			id: '123',
 			title: 'Test Post',
+		};
+
+		mockCurrentUser = {
+			id: 1,
+			name: 'Test User',
+			avatar_urls: {
+				'24': 'https://example.com/avatar.jpg',
+				'48': 'https://example.com/avatar-48.jpg',
+				'96': 'https://example.com/avatar-96.jpg',
+			},
 		};
 
 		mockProviderResult = {
@@ -89,6 +101,9 @@ describe( 'SyncManager', () => {
 				Promise.resolve( mockRecord )
 			),
 			saveRecord: jest.fn( async () => Promise.resolve() ),
+			getCurrentUser: jest.fn( async () =>
+				Promise.resolve( mockCurrentUser )
+			),
 		};
 	} );
 

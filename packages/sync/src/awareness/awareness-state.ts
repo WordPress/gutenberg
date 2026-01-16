@@ -1,9 +1,9 @@
 /**
  * Internal dependencies
  */
+import type { UserInfo } from './awareness-types';
 import {
 	TypedAwareness,
-	UserInfo,
 	type BaseState,
 	type EnhancedState,
 	type EqualityFieldCheck,
@@ -150,8 +150,9 @@ export abstract class AwarenessState<
 
 	/**
 	 * Set up.
+	 * @param userInfo
 	 */
-	public setUp( userInfo: UserInfo): void {
+	public setUp( userInfo: UserInfo ): void {
 		this.setLocalStateField( 'userInfo', userInfo );
 
 		this.on(
@@ -232,34 +233,32 @@ export abstract class AwarenessState<
 
 		const updatedStates = new Map< number, EnhancedState< State > >(
 			[ ...this.disconnectedUsers, ...states.keys() ]
-				.filter( clientId => {
+				.filter( ( clientId ) => {
 					// Exclude any users without `userInfo`.
 					// This can happen from the Yjs inspector, which joins the awareness
 					// state without providing user data.
 					return Boolean( this.seenStates.get( clientId )?.userInfo );
 				} )
-				.map(
-					( clientId ) => {
-						// The filter above ensures that seenStates has the clientId.
-						const rawState: State = this.seenStates.get( clientId )!;
+				.map( ( clientId ) => {
+					// The filter above ensures that seenStates has the clientId.
+					const rawState: State = this.seenStates.get( clientId )!;
 
-						const isConnected =
-							! this.disconnectedUsers.has( clientId );
-						const isMe = clientId === this.clientID;
-						const myState: Partial< State > = isMe
-							? this.myThrottledState
-							: {};
-						const state: EnhancedState< State > = {
-							...rawState,
-							...myState,
-							clientId,
-							isConnected,
-							isMe,
-						};
+					const isConnected =
+						! this.disconnectedUsers.has( clientId );
+					const isMe = clientId === this.clientID;
+					const myState: Partial< State > = isMe
+						? this.myThrottledState
+						: {};
+					const state: EnhancedState< State > = {
+						...rawState,
+						...myState,
+						clientId,
+						isConnected,
+						isMe,
+					};
 
-						return [ clientId, state ];
-					}
-				)
+					return [ clientId, state ];
+				} )
 		);
 
 		if ( ! forceUpdate ) {
