@@ -10,7 +10,7 @@ import type { ObjectID, ObjectType } from '../types';
 import type { AwarenessState } from './awareness-state';
 import { PostEditorAwarenessState } from './post-editor-awareness-state';
 import type { UserInfo, WordPressUserInfo } from './awareness-types';
-import { getBrowserName } from '../utils';
+import { getBrowserName, getNewUserColor } from '../user-utils';
 
 const awarenessInstances: Map< string, AwarenessState > = new Map();
 
@@ -28,10 +28,23 @@ function getAwarenessInstance(
 	return awarenessInstances.get( getAwarenessId( objectType, objectId ) );
 }
 
-function getUserInfo( wpUser: WordPressUserInfo ): UserInfo {
+function getUserInfo(
+	awareness: AwarenessState,
+	wpUser: WordPressUserInfo
+): UserInfo {
+	const states = awareness.getStates();
+	const otherUserColors = Array.from( states.entries() )
+		.filter(
+			( [ clientId, state ] ) =>
+				state.userInfo && clientId !== awareness.clientID
+		)
+		.map( ( [ _clientId, state ] ) => state.userInfo.color )
+		.filter( Boolean );
+
 	return {
 		...wpUser,
 		browserType: getBrowserName(),
+		color: getNewUserColor( otherUserColors ),
 		enteredAt: Date.now(),
 	};
 }
@@ -73,8 +86,7 @@ export async function createAwareness(
 ): Promise< AwarenessState | undefined > {
 	if ( objectId && objectType.startsWith( 'postType/' ) ) {
 		const awareness = new PostEditorAwarenessState( ydoc );
-		const userInfo = getUserInfo( currentUser );
-
+		const userInfo = getUserInfo( awareness, currentUser );
 		awareness.setUp( userInfo );
 		awarenessInstances.set(
 			getAwarenessId( objectType, objectId ),
@@ -83,7 +95,6 @@ export async function createAwareness(
 
 		return awareness;
 	}
-
 	return undefined;
 }
 

@@ -48,6 +48,7 @@ export class TypedAwareness< State extends BaseState > extends Awareness {
 export interface WordPressUserInfo {
 	id: number;
 	name: string;
+	slug: string;
 	avatar_urls: Record< string, string >;
 }
 
@@ -57,6 +58,7 @@ export interface WordPressUserInfo {
  */
 export interface UserInfo extends WordPressUserInfo {
 	browserType: string;
+	color: string;
 	enteredAt: number;
 }
 

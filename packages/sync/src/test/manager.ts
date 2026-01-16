@@ -59,6 +59,7 @@ describe( 'SyncManager', () => {
 		mockCurrentUser = {
 			id: 1,
 			name: 'Test User',
+			slug: 'test-user',
 			avatar_urls: {
 				'24': 'https://example.com/avatar.jpg',
 				'48': 'https://example.com/avatar-48.jpg',
