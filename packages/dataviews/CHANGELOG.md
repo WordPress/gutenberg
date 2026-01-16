@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- DataViews: Add missing `@base-ui/react` dependency. [#74705](https://github.com/WordPress/gutenberg/pull/74705)
+
 ## 11.2.0 (2026-01-16)
 
 ### Code Quality
