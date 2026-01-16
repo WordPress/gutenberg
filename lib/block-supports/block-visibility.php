@@ -39,16 +39,16 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		}
 
 		/*
-		 * Breakpoints definitions are in several places in WordPress packages.
+		 * Viewport size definitions are in several places in WordPress packages.
 		 * The following are taken from: https://github.com/WordPress/gutenberg/blob/trunk/packages/base-styles/_breakpoints.scss
 		 * The array is in a future, potential JSON format, and will be centralized
 		 * as the feature is developed.
 		 *
-		 * Breakpoints as array items are defined sequentially. The first item's size is the max value.
+		 * Viewport sizes as array items are defined sequentially. The first item's size is the max value.
 		 * Each subsequent item starts after the previous size (using > operator), and its size is the max.
 		 * The last item starts after the previous size (using > operator), and it has no max.
 		 */
-		$breakpoints = array(
+		$viewport_sizes = array(
 			array(
 				'name' => 'Mobile',
 				'slug' => 'mobile',
@@ -63,34 +63,34 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 				'name' => 'Desktop',
 				'slug' => 'desktop',
 				/*
-				 * Note: the last item in the breakpoints array does not technically require a size,
+				 * Note: the last item in the $viewport_sizes array does not technically require a size,
 				 * as the last item's media query is calculated using `width > previous size`.
-				 * It's included for consistency and as a record of the "official"breakpoint size.
+				 * It's included for consistency and as a record of the "official" breakpoint size.
 				 */
 				'size' => '960px',
 			),
 		);
 
 		/*
-		 * Build media queries from breakpoint definitions using the CSS range syntax.
+		 * Build media queries from viewport size definitions using the CSS range syntax.
 		 * Could be absorbed into the style engine,
 		 * as well as classname building, and declaration of the display property, if required.
 		 */
-		$breakpoint_queries = array();
-		$previous_size      = null;
-		foreach ( $breakpoints as $index => $breakpoint ) {
-			$slug = $breakpoint['slug'];
-			$size = $breakpoint['size'];
+		$viewport_media_queries = array();
+		$previous_size          = null;
+		foreach ( $viewport_sizes as $index => $viewport_size ) {
+			$slug = $viewport_size['slug'];
+			$size = $viewport_size['size'];
 
 			// First item: width <= size.
 			if ( 0 === $index ) {
-				$breakpoint_queries[ $slug ] = "@media (width <= $size)";
-			} elseif ( count( $breakpoints ) - 1 === $index ) {
+				$viewport_media_queries[ $slug ] = "@media (width <= $size)";
+			} elseif ( count( $viewport_sizes ) - 1 === $index ) {
 				// Last item: width > previous size.
-				$breakpoint_queries[ $slug ] = "@media (width > $previous_size)";
+				$viewport_media_queries[ $slug ] = "@media (width > $previous_size)";
 			} else {
 				// Middle items: previous size < width <= size.
-				$breakpoint_queries[ $slug ] = "@media ($previous_size < width <= $size)";
+				$viewport_media_queries[ $slug ] = "@media ($previous_size < width <= $size)";
 			}
 
 			$previous_size = $size;
@@ -98,37 +98,37 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 
 		$hidden_on = array();
 
-		// Collect which breakpoints the block is hidden on (only known breakpoints).
-		foreach ( $viewport_config as $breakpoint => $is_visible ) {
-			if ( false === $is_visible && isset( $breakpoint_queries[ $breakpoint ] ) ) {
-				$hidden_on[] = $breakpoint;
+		// Collect which viewport the block is hidden on (only known viewport sizes).
+		foreach ( $viewport_config as $viewport_config_size => $is_visible ) {
+			if ( false === $is_visible && isset( $viewport_media_queries[ $viewport_config_size ] ) ) {
+				$hidden_on[] = $viewport_config_size;
 			}
 		}
 
-		// If no breakpoints have visibility set to false, return unchanged.
+		// If no viewport sizes have visibility set to false, return unchanged.
 		if ( empty( $hidden_on ) ) {
 			return $block_content;
 		}
 
-		// Maintain consistent order of breakpoints for class name generation.
+		// Maintain consistent order of viewport sizes for class name generation.
 		sort( $hidden_on );
 
 		$css_rules   = array();
 		$class_names = array();
 
-		foreach ( $hidden_on as $breakpoint ) {
+		foreach ( $hidden_on as $hidden_viewport_size ) {
 			/*
 			 * If these values ever become user-defined,
 			 * they should be sanitized and kebab-cased.
 			 */
-			$visibility_class = 'wp-block-hidden-' . $breakpoint;
+			$visibility_class = 'wp-block-hidden-' . $hidden_viewport_size;
 			$class_names[]    = $visibility_class;
 			$css_rules[]      = array(
 				'selector'     => '.' . $visibility_class,
 				'declarations' => array(
 					'display' => 'none !important',
 				),
-				'rules_group'  => $breakpoint_queries[ $breakpoint ],
+				'rules_group'  => $viewport_media_queries[ $hidden_viewport_size ],
 			);
 		}
 
