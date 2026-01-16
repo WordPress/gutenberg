@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
-import { render, waitFor } from '@testing-library/react';
-import { userEvent } from '@testing-library/user-event';
-import { createRef } from 'react';
-
-/**
- * Internal dependencies
- */
+import { render, waitFor, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { createRef } from '@wordpress/element';
 import { IconButton } from '../index';
 
 describe( 'IconButton', () => {

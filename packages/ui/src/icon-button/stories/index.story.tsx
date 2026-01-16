@@ -1,28 +1,17 @@
-/**
- * External dependencies
- */
-import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import {
 	cog,
-	wordpress,
-	plus,
-	pencil,
-	trash,
-	download,
-	upload,
 	copy,
+	download,
+	pencil,
+	plus,
+	trash,
+	upload,
+	wordpress,
 } from '@wordpress/icons';
-import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
-
-/**
- * Internal dependencies
- */
-import { IconButton } from './index';
+import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
+import { useState } from '@wordpress/element';
+import { IconButton } from '../index';
 
 const meta: Meta< typeof IconButton > = {
 	title: 'Design System/IconButton',

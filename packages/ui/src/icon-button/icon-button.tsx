@@ -1,17 +1,10 @@
-/**
- * External dependencies
- */
-import { forwardRef } from 'react';
 import clsx from 'clsx';
-
-/**
- * Internal dependencies
- */
-import { type IconButtonProps } from './types';
+import { forwardRef } from '@wordpress/element';
 import { Button } from '../button';
 import { Icon } from '../icon';
 import * as Tooltip from '../tooltip';
 import styles from './style.module.css';
+import { type IconButtonProps } from './types';
 
 /**
  * An icon-only button with automatic tooltip and optimized styling.

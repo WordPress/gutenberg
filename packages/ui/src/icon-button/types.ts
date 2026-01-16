@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { type ButtonProps } from '../button/types';
 import { type IconProps } from '../icon/types';
 import { type DistributiveOmit } from '../utils/types';
