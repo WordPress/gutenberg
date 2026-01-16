@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.2.0 (2026-01-16)
+
 ### Code Quality
 
 - Replace HStack/VStack from `wordpress/components` by Stack from `wordpress/ui`. [#74174](https://github.com/WordPress/gutenberg/pull/74174)
