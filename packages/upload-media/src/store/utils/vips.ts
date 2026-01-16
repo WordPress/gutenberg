@@ -6,6 +6,7 @@ import {
 	vipsCompressImage as compressImage,
 	vipsHasTransparency as hasTransparency,
 	vipsResizeImage as resizeImage,
+	vipsRotateImage as rotateImage,
 	vipsCancelOperations as cancelOperations,
 } from '@wordpress/vips/worker';
 
@@ -166,6 +167,60 @@ export async function vipsResizeImage(
 		height,
 		originalWidth,
 		originalHeight
+	);
+
+	return resultFile;
+}
+
+/**
+ * Rotates an image based on EXIF orientation using vips in a web worker.
+ *
+ * This applies the correct rotation/flip transformation based on the EXIF
+ * orientation value (1-8), and adds a '-rotated' suffix to the filename.
+ * This matches WordPress core's behavior when rotating images based on EXIF.
+ *
+ * @param id          Queue item ID.
+ * @param file        File object.
+ * @param orientation EXIF orientation value (1-8).
+ * @param signal      Optional abort signal to cancel the operation.
+ * @return Rotated ImageFile with updated dimensions.
+ */
+export async function vipsRotateImage(
+	id: QueueItemId,
+	file: File,
+	orientation: number,
+	signal?: AbortSignal
+) {
+	if ( signal?.aborted ) {
+		throw new Error( 'Operation aborted' );
+	}
+
+	// If orientation is 1 (normal), no rotation needed.
+	if ( orientation === 1 ) {
+		return file;
+	}
+
+	const { buffer, width, height } = await rotateImage(
+		id,
+		await file.arrayBuffer(),
+		file.type,
+		orientation
+	);
+
+	// Add '-rotated' suffix to filename, matching WordPress core behavior.
+	const basename = getFileBasename( file.name );
+	const fileName = file.name.replace( basename, `${ basename }-rotated` );
+
+	const resultFile = new ImageFile(
+		new File(
+			[ new Blob( [ buffer as ArrayBuffer ], { type: file.type } ) ],
+			fileName,
+			{
+				type: file.type,
+			}
+		),
+		width,
+		height
 	);
 
 	return resultFile;
