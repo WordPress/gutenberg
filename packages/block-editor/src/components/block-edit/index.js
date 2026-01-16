@@ -13,6 +13,7 @@ import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
 	mayDisplayParentControlsKey,
+	mayDisplayPatternEditingControlsKey,
 	blockEditingModeKey,
 	blockBindingsKey,
 	isPreviewModeKey,
@@ -33,6 +34,7 @@ export { useBlockEditContext };
 export default function BlockEdit( {
 	mayDisplayControls,
 	mayDisplayParentControls,
+	mayDisplayPatternEditingControls,
 	blockEditingMode,
 	isPreviewMode,
 	// The remaining props are passed through the BlockEdit filters and are thus
@@ -69,6 +71,9 @@ export default function BlockEdit( {
 					// usage outside of the package (this context is exposed).
 					[ mayDisplayControlsKey ]: mayDisplayControls,
 					[ mayDisplayParentControlsKey ]: mayDisplayParentControls,
+					[ mayDisplayPatternEditingControlsKey ]:
+						mayDisplayPatternEditingControls &&
+						blockEditingMode !== 'disabled',
 					[ blockEditingModeKey ]: blockEditingMode,
 					[ blockBindingsKey ]: bindings,
 					[ isPreviewModeKey ]: isPreviewMode,
@@ -82,6 +87,7 @@ export default function BlockEdit( {
 					__unstableLayoutClassNames,
 					mayDisplayControls,
 					mayDisplayParentControls,
+					mayDisplayPatternEditingControls,
 					blockEditingMode,
 					bindings,
 					isPreviewMode,

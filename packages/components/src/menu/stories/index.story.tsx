@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { StoryObj, Meta } from '@storybook/react-webpack5';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 import { css } from '@emotion/react';
 import { fn } from 'storybook/test';
 
@@ -666,7 +666,10 @@ export const InsideModal: StoryObj< typeof Menu > = {
 								</Menu>
 							</Menu.Popover>
 						</Menu>
-						<Button onClick={ () => setModalOpen( false ) }>
+						<Button
+							__next40pxDefaultSize
+							onClick={ () => setModalOpen( false ) }
+						>
 							Close modal
 						</Button>
 					</Modal>

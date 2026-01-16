@@ -15,6 +15,7 @@ import type { View, Field, ActionButton } from '@wordpress/dataviews';
 import {
 	altTextField,
 	attachedToField,
+	authorField,
 	captionField,
 	dateAddedField,
 	dateModifiedField,
@@ -184,7 +185,11 @@ export function MediaUploadModal( {
 			}
 			// Handle author filters
 			if ( filter.field === 'author' ) {
-				filters.author = filter.value;
+				if ( filter.operator === 'isAny' ) {
+					filters.author = filter.value;
+				} else if ( filter.operator === 'isNone' ) {
+					filters.author_exclude = filter.value;
+				}
 			}
 			// Handle date filters
 			if ( filter.field === 'date' || filter.field === 'modified' ) {
@@ -214,7 +219,7 @@ export function MediaUploadModal( {
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
 			search: view.search,
-			_embed: 'wp:attached-to',
+			_embed: 'author,wp:attached-to',
 			...filters,
 		};
 	}, [ view, allowedTypes ] );
@@ -249,6 +254,7 @@ export function MediaUploadModal( {
 			descriptionField as Field< RestAttachment >,
 			dateAddedField as Field< RestAttachment >,
 			dateModifiedField as Field< RestAttachment >,
+			authorField as Field< RestAttachment >,
 			filenameField as Field< RestAttachment >,
 			filesizeField as Field< RestAttachment >,
 			mediaDimensionsField as Field< RestAttachment >,
@@ -335,7 +341,13 @@ export function MediaUploadModal( {
 				showTitle: false,
 			},
 			[ LAYOUT_PICKER_TABLE ]: {
-				fields: [ 'filename', 'filesize', 'media_dimensions', 'date' ],
+				fields: [
+					'filename',
+					'filesize',
+					'media_dimensions',
+					'author',
+					'date',
+				],
 				showTitle: true,
 			},
 		} ),

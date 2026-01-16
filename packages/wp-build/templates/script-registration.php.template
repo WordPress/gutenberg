@@ -59,7 +59,7 @@ if ( ! function_exists( '{{PREFIX}}_register_package_scripts' ) ) {
 		$extension       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 
 		$scripts_dir  = __DIR__ . '/scripts';
-		$scripts_file = $scripts_dir . '/index.php';
+		$scripts_file = $scripts_dir . '/registry.php';
 
 		if ( ! file_exists( $scripts_file ) ) {
 			return;

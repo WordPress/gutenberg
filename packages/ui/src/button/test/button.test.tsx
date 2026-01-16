@@ -25,11 +25,6 @@ describe( 'Button', () => {
 
 		const onClickMock = jest.fn();
 		render(
-			// Disabling because this lint rule was meant for the
-			// `@wordpress/components` Button, but is being applied here.
-			// TODO: rework the lint rule so that it checks the package
-			// where the Button comes from.
-			// eslint-disable-next-line no-restricted-syntax
 			<Button disabled onClick={ onClickMock }>
 				Click me
 			</Button>
@@ -57,12 +52,6 @@ describe( 'Button', () => {
 
 	it( 'can be enabled explicitly when loading', () => {
 		render(
-			// Disabling because this lint rule was meant for the
-			// `@wordpress/components` Button, but is being applied here.
-			// TODO: rework the lint rule so that it checks the package
-			// where the Button comes from.
-			// TODO: Additional improvement in the original lint rule: only error if disabled=true?
-			// eslint-disable-next-line no-restricted-syntax
 			<Button loading disabled={ false }>
 				Click me
 			</Button>
@@ -74,14 +63,14 @@ describe( 'Button', () => {
 		expect( button ).not.toHaveAttribute( 'aria-disabled', 'true' );
 	} );
 
-	it( 'supports custom render prop while retaining the default accessible when disabled behavior', () => {
+	it( 'supports custom render prop while retaining the default focusable when disabled behavior', () => {
 		render(
-			// eslint-disable-next-line jsx-a11y/anchor-has-content, no-restricted-syntax
-			<Button render={ <a href="/" /> } disabled>
+			// eslint-disable-next-line jsx-a11y/anchor-has-content
+			<Button render={ <a href="/" /> } nativeButton={ false } disabled>
 				Click me
 			</Button>
 		);
-		const button = screen.getByRole( 'link', { name: 'Click me' } );
+		const button = screen.getByRole( 'button', { name: 'Click me' } );
 
 		expect( button ).toHaveAttribute( 'aria-disabled', 'true' );
 	} );
@@ -93,7 +82,6 @@ describe( 'Button', () => {
 				Click me
 			</Button>
 		);
-
 		expect(
 			screen.getByRole( 'button', { name: 'Click me' } )
 		).toHaveClass( customClass );

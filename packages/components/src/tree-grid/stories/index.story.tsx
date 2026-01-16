@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 /**
@@ -104,7 +104,11 @@ const Rows = ( {
 								{ ( props ) => (
 									<>
 										<Descender level={ level } />
-										<Button variant="primary" { ...props }>
+										<Button
+											__next40pxDefaultSize
+											variant="primary"
+											{ ...props }
+										>
 											{ item.name }
 										</Button>
 									</>

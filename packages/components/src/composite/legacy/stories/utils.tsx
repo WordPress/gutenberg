@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { StoryContext } from '@storybook/react';
+import type { StoryContext } from '@storybook/react-vite';
 
 /**
  * Internal dependencies

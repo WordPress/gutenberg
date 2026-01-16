@@ -9,6 +9,9 @@ import * as Y from 'yjs';
 import {
 	CRDT_RECORD_MAP_KEY as RECORD_KEY,
 	LOCAL_SYNC_MANAGER_ORIGIN,
+	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_KEY,
+	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
+	CRDT_RECORD_METADATA_SAVED_BY_KEY as SAVED_BY_KEY,
 } from './config';
 import { createPersistedCRDTDoc, getPersistedCrdtDoc } from './persistence';
 import { getProviderCreators } from './providers';
@@ -18,13 +21,14 @@ import type {
 	ObjectID,
 	ObjectData,
 	ObjectType,
-	ProviderCreator,
 	RecordHandlers,
 	SyncConfig,
 	SyncManager,
+	SyncUndoManager,
 } from './types';
 import { createUndoManager } from './undo-manager';
 import { createYjsDoc } from './utils';
+import { createAwareness } from './awareness/awareness-manager';
 
 interface EntityState {
 	handlers: RecordHandlers;
@@ -42,7 +46,37 @@ interface EntityState {
  */
 export function createSyncManager(): SyncManager {
 	const entityStates: Map< EntityID, EntityState > = new Map();
-	const undoManager = createUndoManager();
+
+	/**
+	 * A "sync-aware" undo manager for all synced entities. It is lazily created
+	 * when the first entity is loaded.
+	 *
+	 * IMPORTANT: In Gutenberg, the undo manager is effectively global and manages
+	 * undo/redo state for all entities. If the default WPUndoManager is used,
+	 * changes to entities are recorded in the `editEntityRecord` action:
+	 *
+	 * https://github.com/WordPress/gutenberg/blob/b63451e26e3c91b6bb291a2f9994722e3850417e/packages/core-data/src/actions.js#L428-L442
+	 *
+	 * In contrast, the `SyncUndoManager` only manages undo/redo for entities that
+	 * **are being synced by this sync manager**. The `addRecord` method is still
+	 * called in the code linked above, but it is a no-op. Yjs automatically tracks
+	 * changes to entities via the associated CRDT doc:
+	 *
+	 * https://github.com/WordPress/gutenberg/blob/b63451e26e3c91b6bb291a2f9994722e3850417e/packages/sync/src/undo-manager.ts#L42-L48
+	 *
+	 * This means that if at least one entity is being synced, then undo/redo
+	 * operations will be **restricted to synced entities only.**
+	 *
+	 * We could improve the `SyncUndoManager` to also track non-synced entities by
+	 * delegating to a secondary `WPUndoManager`, but this would add complexity
+	 * since we would need to maintain two separate undo/redo stacks and ensure
+	 * that they retain ordering and integrity.
+	 *
+	 * However, we also anticipate that most entities being edited in Gutenberg
+	 * will be synced entities (e.g. posts, pages, templates, template parts,
+	 * etc.), so this limitation may be temporary.
+	 */
+	let undoManager: SyncUndoManager | undefined;
 
 	/**
 	 * Load an entity for syncing and manage its lifecycle.
@@ -60,7 +94,7 @@ export function createSyncManager(): SyncManager {
 		record: ObjectData,
 		handlers: RecordHandlers
 	): Promise< void > {
-		const providerCreators: ProviderCreator[] = getProviderCreators();
+		const providerCreators = getProviderCreators();
 
 		if ( 0 === providerCreators.length ) {
 			return; // No provider creators, so syncing is effectively disabled.
@@ -74,6 +108,8 @@ export function createSyncManager(): SyncManager {
 
 		const ydoc = createYjsDoc( { objectType } );
 		const recordMap = ydoc.getMap( RECORD_KEY );
+		const recordMetaMap = ydoc.getMap( RECORD_METADATA_KEY );
+		const now = Date.now();
 
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
@@ -99,6 +135,32 @@ export function createSyncManager(): SyncManager {
 			void updateEntityRecord( objectType, objectId );
 		};
 
+		const onRecordMetaUpdate = (
+			event: Y.YMapEvent< unknown >,
+			transaction: Y.Transaction
+		) => {
+			if ( transaction.local ) {
+				return;
+			}
+
+			event.keysChanged.forEach( ( key ) => {
+				switch ( key ) {
+					case SAVED_AT_KEY:
+						const newValue = recordMetaMap.get( SAVED_AT_KEY );
+						if ( 'number' === typeof newValue && newValue > now ) {
+							// Another peer has saved the record. Refetch it so that we have
+							// a correct understanding of our own unsaved edits.
+							void handlers.refetchRecord().catch( () => {} );
+						}
+						break;
+				}
+			} );
+		};
+
+		// Lazily create the undo manager when the first entity is loaded.
+		if ( ! undoManager ) {
+			undoManager = createUndoManager();
+		}
 		undoManager.addToScope( recordMap );
 
 		const entityState: EntityState = {
@@ -112,32 +174,22 @@ export function createSyncManager(): SyncManager {
 
 		entityStates.set( entityId, entityState );
 
+		// Create awareness for the given entity and its Yjs document.
+		const awareness = await createAwareness( objectType, objectId, ydoc );
+
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
 			providerCreators.map( ( create ) =>
-				create( objectType, objectId, ydoc )
+				create( objectType, objectId, ydoc, awareness )
 			)
 		);
 
 		// Attach observers.
 		recordMap.observeDeep( onRecordUpdate );
+		recordMetaMap.observe( onRecordMetaUpdate );
 
 		// Get and apply the persisted CRDT document, if it exists.
-		const isInvalid = applyPersistedCrdtDoc( syncConfig, ydoc, record );
-
-		// If there is no persisted document or if it has been invalidated by out-of-
-		// band updates, apply changes from the current entity record to the CRDT
-		// document. This ensures that the CRDT document reflects the latest state of
-		// the entity record.
-		if ( isInvalid ) {
-			ydoc.transact( () => {
-				syncConfig.applyChangesToCRDTDoc( ydoc, record );
-			}, LOCAL_SYNC_MANAGER_ORIGIN );
-
-			const meta = createEntityMeta( objectType, objectId );
-			handlers.editRecord( { meta } );
-			handlers.saveRecord();
-		}
+		applyPersistedCrdtDoc( objectType, objectId, record );
 	}
 
 	/**
@@ -164,52 +216,99 @@ export function createSyncManager(): SyncManager {
 	}
 
 	/**
-	 * Apply a persisted CRDT document to the current document, if it exists.
-	 * Return true if the document exists and is valid, otherwise false. Returning
-	 * a boolean allows us to destroy the temporary document and prevent it from
-	 * leaking out.
+	 * Load and inspect the persisted CRDT document. If supported and it exists,
+	 * compare it against the current entity record. If there are differences,
+	 * apply the changes from the entity record.
 	 *
-	 * @param {SyncConfig} syncConfig Sync configuration for the object type.
-	 * @param {CRDTDoc}    targetDoc  Target CRDT doc.
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
 	 * @param {ObjectData} record     Entity record representing this object type.
-	 * @return {boolean} Whether the persisted document is non-existent or invalid.
 	 */
 	function applyPersistedCrdtDoc(
-		syncConfig: SyncConfig,
-		targetDoc: CRDTDoc,
+		objectType: ObjectType,
+		objectId: ObjectID,
 		record: ObjectData
-	): boolean {
-		if ( ! syncConfig.supports?.crdtPersistence ) {
-			return true;
+	): void {
+		const entityId = getEntityId( objectType, objectId );
+		const entityState = entityStates.get( entityId );
+
+		if ( ! entityState ) {
+			return;
 		}
 
-		// Get the persisted CRDT document, if it exists.
-		const tempDoc = getPersistedCrdtDoc( record );
+		const {
+			handlers,
+			syncConfig: {
+				applyChangesToCRDTDoc,
+				getChangesFromCRDTDoc,
+				supports,
+			},
+			ydoc: targetDoc,
+		} = entityState;
 
-		if ( ! tempDoc ) {
-			return true;
-		}
-
-		// Apply the persisted document to the current document as a singular update.
-		// This is done even if the persisted document has been invalidated. This
-		// prevents a newly joining peer (or refreshing user) from re-initializing
-		// the CRDT document (the "initialization problem").
-		const update = Y.encodeStateAsUpdateV2( tempDoc );
 		targetDoc.transact( () => {
+			if ( ! supports?.crdtPersistence ) {
+				// Apply the current record as changes.
+				applyChangesToCRDTDoc( targetDoc, record );
+				return;
+			}
+
+			// Get the persisted CRDT document, if it exists.
+			const tempDoc = getPersistedCrdtDoc( record );
+
+			if ( ! tempDoc ) {
+				// Apply the current record as changes and trigger a save, which will
+				// persist the CRDT document. (The entity should call `createEntityMeta`
+				// via its pre-persist hook.)
+				applyChangesToCRDTDoc( targetDoc, record );
+				handlers.saveRecord();
+				return;
+			}
+
+			// Apply the persisted document to the current document as a single update.
+			// This is done even if the persisted document has been invalidated. This
+			// prevents a newly joining peer (or refreshing user) from re-initializing
+			// the CRDT document (the "initialization problem").
+			const update = Y.encodeStateAsUpdateV2( tempDoc );
 			Y.applyUpdateV2( targetDoc, update );
+
+			// Compute the differences between the persisted doc and the current
+			// record. This can happen when:
+			//
+			// 1. The server makes updates on save that mutate the entity. Example: On
+			//    initial save, the server adds the "Uncategorized" category to the
+			//    post.
+			// 2. An "out-of-band" update occurs. Example: a WP-CLI command or direct
+			//    database update mutates the entity.
+			// 3. Unsaved changes are synced from a peer _before_ this code runs. We
+			//    can't control when (or if) remote changes are synced, so this is a
+			//    race condition.
+			const invalidations = getChangesFromCRDTDoc( tempDoc, record );
+			const invalidatedKeys = Object.keys( invalidations );
+
+			// Destroy the temporary document to prevent leaks.
+			tempDoc.destroy();
+
+			if ( 0 === invalidatedKeys.length ) {
+				// The persisted CRDT document is valid. There are no updates to apply.
+				return;
+			}
+
+			// Use the invalidated keys to get the updated values from the entity.
+			const changes = invalidatedKeys.reduce(
+				( acc, key ) =>
+					Object.assign( acc, {
+						[ key ]: record[ key ],
+					} ),
+				{}
+			);
+
+			// Apply the changes and trigger a save, which will persist the CRDT
+			// document. (The entity should call `createEntityMeta` via its pre-persist
+			// hook.)
+			applyChangesToCRDTDoc( targetDoc, changes );
+			handlers.saveRecord();
 		}, LOCAL_SYNC_MANAGER_ORIGIN );
-
-		// Check if the persisted doc has been invalidated by out-of-band updates
-		// (e.g., a WP CLI command or direct database update) by determining if the
-		// persisted document introduces any changes that are not present in the
-		// current record. If it has been invalidated, then we return true as a
-		// signal that we need to apply the entity record to the target document.
-		const changes = syncConfig.getChangesFromCRDTDoc( tempDoc, record );
-
-		// Destroy the temporary document to prevent leaks.
-		tempDoc.destroy();
-
-		return Object.keys( changes ).length > 0;
 	}
 
 	/**
@@ -219,12 +318,14 @@ export function createSyncManager(): SyncManager {
 	 * @param {ObjectID}              objectId   Object ID.
 	 * @param {Partial< ObjectData >} changes    Updates to make.
 	 * @param {string}                origin     The source of change.
+	 * @param {boolean}               isSave     Whether this update is part of a save operation.
 	 */
 	function updateCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID,
 		changes: Partial< ObjectData >,
-		origin: string
+		origin: string,
+		isSave: boolean = false
 	): void {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
@@ -237,6 +338,13 @@ export function createSyncManager(): SyncManager {
 
 		ydoc.transact( () => {
 			syncConfig.applyChangesToCRDTDoc( ydoc, changes );
+
+			if ( isSave ) {
+				// Mark the document as saved in the record metadata map.
+				const recordMeta = ydoc.getMap( RECORD_METADATA_KEY );
+				recordMeta.set( SAVED_AT_KEY, Date.now() );
+				recordMeta.set( SAVED_BY_KEY, ydoc.clientID );
+			}
 		}, origin );
 	}
 
@@ -301,7 +409,10 @@ export function createSyncManager(): SyncManager {
 	return {
 		createMeta: createEntityMeta,
 		load: loadEntity,
-		undoManager,
+		// Use getter to ensure we always return the current value of `undoManager`.
+		get undoManager(): SyncUndoManager | undefined {
+			return undoManager;
+		},
 		unload: unloadEntity,
 		update: updateCRDTDoc,
 	};
