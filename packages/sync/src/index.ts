@@ -27,15 +27,12 @@ export {
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './config';
 export { createSyncManager } from './manager';
-export {
-	store as syncConnectionStore,
-	SyncConnectionErrorType,
-	SyncConnectionStatus,
-} from './store/connection-status';
-export type {
-	SyncConnectionMetadata,
-	SyncConnectionStoreActions,
-	SyncConnectionStoreSelectors,
-} from './store/connection-status';
 export { getConnectionStatusMessage } from './store/utils';
+export type {
+	OnStateChangeCallback,
+	ProviderCreatorOptions,
+	SyncConnectionErrorType,
+	SyncConnectionState,
+	SyncConnectionStatus,
+} from './types';
 export type * from './types';

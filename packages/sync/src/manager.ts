@@ -195,7 +195,13 @@ export function createSyncManager(): SyncManager {
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
 			providerCreators.map( ( create ) =>
-				create( objectType, objectId, ydoc, awareness )
+				create( {
+					objectType,
+					objectId,
+					ydoc,
+					awareness,
+					onStateChange: handlers.onStateChange,
+				} )
 			)
 		);
 
@@ -275,7 +281,12 @@ export function createSyncManager(): SyncManager {
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
 			providerCreators.map( ( create ) => {
-				return create( objectType, null, ydoc );
+				return create( {
+					objectType,
+					objectId: null,
+					ydoc,
+					onStateChange: handlers.onStateChange,
+				} );
 			} )
 		);
 

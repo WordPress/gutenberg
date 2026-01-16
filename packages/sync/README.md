@@ -42,6 +42,20 @@ The sync manager orchestrates the lifecycle of syncing entity records. It create
 
 Deltas are used to calculate incremental Y.Text updates.
 
+### getConnectionStatusMessage
+
+Get title and description for a connection error.
+
+Returns default messages based on error type, with custom title/description taking precedence if provided.
+
+_Parameters_
+
+-   _connectionState_ `SyncConnectionState`: Connection state with error information.
+
+_Returns_
+
+-   `{ title: string; description: string; }`: Object containing title and description strings.
+
 ### LOCAL_EDITOR_ORIGIN
 
 Origin string for CRDT document changes originating from the local editor.
@@ -49,6 +63,26 @@ Origin string for CRDT document changes originating from the local editor.
 ### LOCAL_SYNC_MANAGER_ORIGIN
 
 Origin string for CRDT document changes originating from the sync manager.
+
+### OnStateChangeCallback
+
+Undocumented declaration.
+
+### ProviderCreatorOptions
+
+Undocumented declaration.
+
+### SyncConnectionErrorType
+
+Undocumented declaration.
+
+### SyncConnectionState
+
+Undocumented declaration.
+
+### SyncConnectionStatus
+
+Undocumented declaration.
 
 ### WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE
 

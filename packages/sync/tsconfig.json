@@ -8,6 +8,7 @@
 	"references": [
 		{ "path": "../hooks" },
 		{ "path": "../undo-manager" },
-		{ "path": "../url" }
+		{ "path": "../url" },
+		{ "path": "../i18n" }
 	]
 }

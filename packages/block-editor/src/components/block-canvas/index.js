@@ -17,7 +17,6 @@ import WritingFlow from '../writing-flow';
 import { useMouseMoveTypingReset } from '../observe-typing';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useBlockCommands } from '../use-block-commands';
-import { SyncConnectionModal } from '../sync-connection-modal';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -99,7 +98,6 @@ export function ExperimentalBlockCanvas( {
 						) )
 					}
 				</BlockCanvasCover.Slot>
-				<SyncConnectionModal />
 			</BlockTools>
 		);
 	}
@@ -141,7 +139,6 @@ export function ExperimentalBlockCanvas( {
 						) )
 					}
 				</BlockCanvasCover.Slot>
-				<SyncConnectionModal />
 			</Iframe>
 		</BlockTools>
 	);

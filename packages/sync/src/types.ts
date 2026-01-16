@@ -53,21 +53,63 @@ export interface ProviderCreatorResult {
 	destroy: () => void;
 }
 
+export type SyncConnectionStatus = 'connected' | 'disconnected';
+
+export type SyncConnectionErrorType =
+	| 'auth-failed'
+	| 'too-many-connections'
+	| 'connection-expired'
+	| 'custom';
+
+export interface SyncConnectionState {
+	status: SyncConnectionStatus;
+
+	/**
+	 * Type of error - can be a standard type or a custom string.
+	 */
+	errorType?: SyncConnectionErrorType | string;
+
+	/**
+	 * Custom title to override the default title for this error type.
+	 */
+	title?: string;
+
+	/**
+	 * Custom description to override the default description for this error type.
+	 */
+	description?: string;
+}
+
+export type OnStateChangeCallback = ( state: SyncConnectionState ) => void;
+
+export interface ProviderCreatorOptions {
+	objectType: ObjectType;
+	objectId: ObjectID | null;
+	ydoc: Y.Doc;
+	awareness?: Awareness;
+	/**
+	 * Callback to report connection state changes.
+	 *
+	 * Network providers should call this when connection status changes.
+	 * Local providers can ignore it.
+	 */
+	onStateChange: OnStateChangeCallback;
+}
+
 export type ProviderCreator = (
-	objectType: ObjectType,
-	objectId: ObjectID | null,
-	ydoc: Y.Doc,
-	awareness?: Awareness
+	options: ProviderCreatorOptions
 ) => Promise< ProviderCreatorResult >;
 
 export interface CollectionHandlers {
 	refetchRecords: () => Promise< void >;
+	onStateChange: OnStateChangeCallback;
 }
 
 export interface RecordHandlers {
 	addUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	editRecord: ( data: Partial< ObjectData > ) => void;
 	getEditedRecord: () => Promise< ObjectData >;
+	onStateChange: OnStateChangeCallback;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	saveRecord: () => Promise< void >;

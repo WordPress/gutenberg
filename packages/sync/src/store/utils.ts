@@ -6,17 +6,14 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	SyncConnectionErrorType,
-	type SyncConnectionMetadata,
-} from './connection-status';
+import type { SyncConnectionState } from '../types';
 
 const SyncConnectionErrorMessages: Map<
 	string,
 	{ title: string; description: string }
 > = new Map( [
 	[
-		SyncConnectionErrorType.TOO_MANY_CONNECTIONS,
+		'too-many-connections',
 		{
 			title: __( 'Connection Limit Reached' ),
 			description: __(
@@ -33,11 +30,11 @@ const SyncConnectionErrorMessages: Map<
  * Returns default messages based on error type, with custom title/description
  * taking precedence if provided.
  *
- * @param metadata Connection metadata with error information.
+ * @param connectionState Connection state with error information.
  * @return Object containing title and description strings.
  */
 export function getConnectionStatusMessage(
-	metadata?: SyncConnectionMetadata
+	connectionState?: SyncConnectionState
 ): {
 	title: string;
 	description: string;
@@ -49,9 +46,9 @@ export function getConnectionStatusMessage(
 			'Editing is temporarily disabled to prevent conflicts with other users.'
 	);
 
-	if ( metadata?.errorType ) {
+	if ( connectionState?.errorType ) {
 		const errorMessage = SyncConnectionErrorMessages.get(
-			metadata.errorType
+			connectionState.errorType
 		);
 		if ( errorMessage ) {
 			defaultTitle = errorMessage.title;
@@ -60,7 +57,7 @@ export function getConnectionStatusMessage(
 	}
 
 	return {
-		title: metadata?.title || defaultTitle,
-		description: metadata?.description || defaultDescription,
+		title: connectionState?.title || defaultTitle,
+		description: connectionState?.description || defaultDescription,
 	};
 }
