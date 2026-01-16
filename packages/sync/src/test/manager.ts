@@ -58,6 +58,7 @@ describe( 'SyncManager', () => {
 
 		mockProviderResult = {
 			destroy: jest.fn(),
+			on: jest.fn(),
 		};
 		mockProviderCreator = jest.fn( () =>
 			Promise.resolve( mockProviderResult )
@@ -145,7 +146,6 @@ describe( 'SyncManager', () => {
 				objectId: '123',
 				ydoc: expect.any( Y.Doc ),
 				awareness: expect.any( Awareness ),
-				onStateChange: expect.any( Function ),
 			} );
 		} );
 

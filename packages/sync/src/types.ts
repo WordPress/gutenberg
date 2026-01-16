@@ -49,8 +49,27 @@ export interface ObjectMeta extends Record< string, unknown > {
 	[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]?: string;
 }
 
+/**
+ * Event map for provider events.
+ * Add new event types here as needed.
+ */
+export interface ProviderEventMap {
+	status: SyncConnectionState;
+}
+
+/**
+ * Generic event listener type for providers.
+ * Providers should call registered callbacks when events occur like connection status changes.
+ * Providers are responsible for cleaning up listeners in their destroy() method.
+ */
+export type ProviderOn = < K extends keyof ProviderEventMap >(
+	event: K,
+	callback: ( data: ProviderEventMap[ K ] ) => void
+) => void;
+
 export interface ProviderCreatorResult {
 	destroy: () => void;
+	on: ProviderOn;
 }
 
 export type SyncConnectionStatus = 'connected' | 'disconnected';
@@ -93,37 +112,6 @@ export interface ProviderCreatorOptions {
 	objectId: ObjectID | null;
 	ydoc: Y.Doc;
 	awareness?: Awareness;
-	/**
-	 * Callback to report connection state changes.
-	 *
-	 * Providers should call this when connection status changes.
-	 *
-	 * Example usage in providers:
-	 *
-	 * ```js
-	 * // Report disconnection with a standard error code
-	 * onStateChange({
-	 *   status: 'disconnected',
-	 *   error: {
-	 *     code: 'too-many-connections'
-	 *   }
-	 * });
-	 *
-	 * // Report disconnection with custom messages
-	 * onStateChange({
-	 *   status: 'disconnected',
-	 *   error: {
-	 *     code: 'rate-limited',
-	 *     message: 'Too Many Requests',
-	 *     description: 'You have made too many requests. Please try again in 5 minutes.'
-	 *   }
-	 * });
-	 *
-	 * // Report successful connection
-	 * onStateChange({ status: 'connected' });
-	 * ```
-	 */
-	onStateChange: OnStateChangeCallback;
 }
 
 export type ProviderCreator = (
