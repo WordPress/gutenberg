@@ -40,6 +40,23 @@ import {
 	useTemplatePartArea,
 } from './utils/hooks';
 
+const SUPPORTED_AREAS = [ 'header', 'footer' ];
+
+/**
+ * Returns the list of supported template part areas for pattern replacement.
+ * Includes 'overlay' only if the navigation overlays experiment is enabled.
+ *
+ * @return {string[]} Array of supported area names.
+ */
+function getSupportedAreas() {
+	const isOverlayExperimentEnabled =
+		typeof window !== 'undefined' &&
+		window.__experimentalNavigationOverlays === true;
+	return isOverlayExperimentEnabled
+		? [ ...SUPPORTED_AREAS, 'navigation-overlay' ]
+		: SUPPORTED_AREAS;
+}
+
 function ReplaceButton( {
 	isEntityAvailable,
 	area,
@@ -54,10 +71,9 @@ function ReplaceButton( {
 		templatePartId
 	);
 	const hasReplacements = !! templateParts.length;
+	const supportedAreas = getSupportedAreas();
 	const canReplace =
-		isEntityAvailable &&
-		hasReplacements &&
-		( area === 'header' || area === 'footer' );
+		isEntityAvailable && hasReplacements && supportedAreas.includes( area );
 
 	if ( ! canReplace ) {
 		return null;
@@ -80,10 +96,11 @@ function TemplatesList( { area, clientId, isEntityAvailable, onSelect } ) {
 	// This hook fetches patterns, so don't run it unconditionally in the main
 	// edit function!
 	const blockPatterns = useAlternativeBlockPatterns( area, clientId );
+	const supportedAreas = getSupportedAreas();
 	const canReplace =
 		isEntityAvailable &&
 		!! blockPatterns.length &&
-		( area === 'header' || area === 'footer' );
+		supportedAreas.includes( area );
 
 	if ( ! canReplace ) {
 		return null;

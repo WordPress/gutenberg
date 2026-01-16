@@ -1,18 +1,9 @@
-/**
- * WordPress dependencies
- */
+import { useRender, mergeProps } from '@base-ui/react';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { type BoxProps } from './types';
-import { renderElement } from '../utils/element';
 
 /**
  * Default render function that renders a div element with the given props.
- *
- * @param props The props to apply to the HTML element.
  */
 const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'div' > ) => (
 	<div { ...props } />
@@ -20,30 +11,25 @@ const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'div' > ) => (
 
 /**
  * Capitalizes the first character of a string.
- *
- * @param str The string to capitalize.
- * @return The capitalized string.
  */
 const capitalize = ( str: string ): string =>
 	str.charAt( 0 ).toUpperCase() + str.slice( 1 );
 
 /**
- * Converts a size value to a CSS design token property reference (with
- * fallback) or a calculated value based on the base unit.
+ * Converts a size token name to a CSS design token property reference (with
+ * fallback).
  *
  * @param property The CSS property name.
  * @param target   The design system token target.
- * @param value    The size value, either a number (multiplier of base unit) or a string (token name).
+ * @param value    The size token name.
  * @return A CSS value string with variable references.
  */
 const getSpacingValue = (
 	property: string,
 	target: string,
-	value: number | string
+	value: string
 ): string =>
-	typeof value === 'number'
-		? `calc(var(--wpds-dimension-base) * ${ value })`
-		: `var(--wpds-dimension-${ property }-${ target }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
+	`var(--wpds-dimension-${ property }-${ target }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
 
 /**
  * Generates CSS styles for properties with optionally directional values,
@@ -92,7 +78,7 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 	},
 	ref
 ) {
-	const style: React.CSSProperties = { ...props.style };
+	const style: React.CSSProperties = {};
 
 	if ( backgroundColor ) {
 		style.backgroundColor = `var(--wpds-color-bg-${ target }-${ backgroundColor }, var(--wpds-color-bg-surface-${ backgroundColor }))`;
@@ -122,9 +108,11 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 		style.borderColor = `var(--wpds-color-stroke-${ target }-${ borderColor }, var(--wpds-color-stroke-surface-${ borderColor }))`;
 	}
 
-	return renderElement< 'div' >( {
+	const element = useRender( {
 		render,
 		ref,
-		props: { ...props, style },
+		props: mergeProps< 'div' >( props, { style } ),
 	} );
+
+	return element;
 } );

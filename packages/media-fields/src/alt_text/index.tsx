@@ -19,7 +19,6 @@ const altTextField: Partial< Field< Updatable< Attachment > > > = {
 				value={ data.alt_text || '' }
 				onChange={ ( value ) => onChange( { alt_text: value } ) }
 				rows={ 2 }
-				__nextHasNoMarginBottom
 			/>
 		);
 	},

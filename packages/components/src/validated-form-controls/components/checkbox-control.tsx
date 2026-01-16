@@ -17,11 +17,7 @@ const UnforwardedValidatedCheckboxControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof CheckboxControl >,
-		'__nextHasNoMarginBottom'
-	> &
-		ValidatedControlProps,
+	}: React.ComponentProps< typeof CheckboxControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
 	const validityTargetRef = useRef< HTMLDivElement >( null );
@@ -40,7 +36,6 @@ const UnforwardedValidatedCheckboxControl = (
 			}
 		>
 			<CheckboxControl
-				__nextHasNoMarginBottom
 				// TODO: Upstream limitation - CheckboxControl doesn't support uncontrolled mode, visually.
 				{ ...restProps }
 			/>

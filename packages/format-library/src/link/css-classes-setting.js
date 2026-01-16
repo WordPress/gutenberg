@@ -58,7 +58,6 @@ const CSSClassesSettingComponent = ( { setting, value, onChange } ) => {
 			<VisuallyHidden as="legend">{ setting.title }</VisuallyHidden>
 			<VStack spacing={ 3 }>
 				<CheckboxControl
-					__nextHasNoMarginBottom
 					label={ setting.title }
 					onChange={ handleCheckboxChange }
 					checked={ isSettingActive || hasValue }

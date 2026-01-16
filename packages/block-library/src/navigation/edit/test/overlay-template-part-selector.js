@@ -8,20 +8,41 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { useEntityRecords } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import OverlayTemplatePartSelector from '../overlay-template-part-selector';
+import useCreateOverlayTemplatePart from '../use-create-overlay';
 
 // Mock useEntityRecords
-jest.mock( '@wordpress/core-data', () => {
-	const actual = jest.requireActual( '@wordpress/core-data' );
-	return {
-		...actual,
-		useEntityRecords: jest.fn(),
-	};
-} );
+jest.mock( '@wordpress/core-data', () => ( {
+	useEntityRecords: jest.fn(),
+	store: {},
+} ) );
+
+// Mock useCreateOverlayTemplatePart hook
+jest.mock( '../use-create-overlay', () => ( {
+	__esModule: true,
+	default: jest.fn(),
+} ) );
+
+// Mock useDispatch specifically to avoid needing to set up full data store
+jest.mock( '@wordpress/data', () => ( {
+	useDispatch: jest.fn(),
+	createSelector: jest.fn( ( fn ) => fn ),
+	createRegistrySelector: jest.fn( ( fn ) => fn ),
+	createReduxStore: jest.fn( () => ( {} ) ),
+	combineReducers: jest.fn( ( reducers ) => ( state = {}, action ) => {
+		const newState = {};
+		Object.keys( reducers ).forEach( ( key ) => {
+			newState[ key ] = reducers[ key ]( state[ key ], action );
+		} );
+		return newState;
+	} ),
+	register: jest.fn(),
+} ) );
 
 const mockSetAttributes = jest.fn();
 const mockOnNavigateToEntityRecord = jest.fn();
@@ -39,7 +60,7 @@ const templatePart1 = {
 	title: {
 		rendered: 'My Overlay',
 	},
-	area: 'overlay',
+	area: 'navigation-overlay',
 };
 
 const templatePart2 = {
@@ -49,7 +70,7 @@ const templatePart2 = {
 	title: {
 		rendered: 'Another Overlay',
 	},
-	area: 'overlay',
+	area: 'navigation-overlay',
 };
 
 const templatePartOtherArea = {
@@ -69,6 +90,9 @@ const allTemplateParts = [
 ];
 
 describe( 'OverlayTemplatePartSelector', () => {
+	const mockCreateOverlayTemplatePart = jest.fn();
+	const mockCreateErrorNotice = jest.fn();
+
 	beforeEach( () => {
 		jest.clearAllMocks();
 		useEntityRecords.mockReturnValue( {
@@ -76,10 +100,17 @@ describe( 'OverlayTemplatePartSelector', () => {
 			isResolving: false,
 			hasResolved: false,
 		} );
+		useCreateOverlayTemplatePart.mockReturnValue(
+			mockCreateOverlayTemplatePart
+		);
+		// Mock useDispatch to return createErrorNotice for noticesStore
+		useDispatch.mockReturnValue( {
+			createErrorNotice: mockCreateErrorNotice,
+		} );
 	} );
 
 	describe( 'Loading state', () => {
-		it( 'should show loading spinner when template parts are resolving', () => {
+		it( 'should disable select control when template parts are resolving', () => {
 			useEntityRecords.mockReturnValue( {
 				records: null,
 				isResolving: true,
@@ -88,14 +119,15 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
-			expect(
-				screen.getByText( 'Loading overlays…' )
-			).toBeInTheDocument();
+			const select = screen.getByRole( 'combobox', {
+				name: 'Overlay template',
+			} );
+			expect( select ).toBeDisabled();
 		} );
 	} );
 
-	describe( 'Template part selection', () => {
-		it( 'should show selector with "None (default)" option when no template parts are available', () => {
+	describe( 'Overlay selection', () => {
+		it( 'should show selector with "None (default)" option when no overlays are available', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [],
 				isResolving: false,
@@ -116,7 +148,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should filter template parts by overlay area', () => {
+		it( 'should only show overlay (template parts) in the selector', () => {
 			useEntityRecords.mockReturnValue( {
 				records: allTemplateParts,
 				isResolving: false,
@@ -144,7 +176,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'should display template part slug when title is missing', () => {
+		it( 'should display overlay slug when title is missing', () => {
 			const templatePartNoTitle = {
 				...templatePart1,
 				title: null,
@@ -163,7 +195,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'should call setAttributes when a template part is selected', async () => {
+		it( 'should call set the overlay attribute when an overlay is selected', async () => {
 			const user = userEvent.setup();
 
 			useEntityRecords.mockReturnValue( {
@@ -185,7 +217,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			} );
 		} );
 
-		it( 'should call setAttributes with undefined when "None (default)" is selected', async () => {
+		it( 'unsets custom overlay when "None (default)" is selected', async () => {
 			const user = userEvent.setup();
 
 			useEntityRecords.mockReturnValue( {
@@ -212,7 +244,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			} );
 		} );
 
-		it( 'should display selected template part', () => {
+		it( 'should display selected overlay', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: false,
@@ -235,7 +267,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 	} );
 
 	describe( 'Edit button', () => {
-		it( 'should not render when no template part is selected', () => {
+		it( 'should not render when no overlay is selected', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: false,
@@ -251,7 +283,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( editButton ).not.toBeInTheDocument();
 		} );
 
-		it( 'should not render button when template parts are initially loading', () => {
+		it( 'should not display edit button while overlays templates are loading', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: true,
@@ -265,18 +297,22 @@ describe( 'OverlayTemplatePartSelector', () => {
 				/>
 			);
 
-			// Component shows spinner when initially loading, button doesn't render
-			expect(
-				screen.getByText( 'Loading overlays…' )
-			).toBeInTheDocument();
+			// Component shows disabled select and disabled button when loading
+			const select = screen.getByRole( 'combobox', {
+				name: 'Overlay template',
+			} );
+			expect( select ).toBeDisabled();
+
+			// Expect Edit button to not be in the document
 			expect(
 				screen.queryByRole( 'button', {
-					name: /Edit overlay/,
+					name: ( accessibleName ) =>
+						accessibleName.startsWith( 'Edit overlay' ),
 				} )
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'should be enabled when a valid template part is selected', () => {
+		it( 'should be enabled when a valid overlay is selected', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: false,
@@ -296,9 +332,10 @@ describe( 'OverlayTemplatePartSelector', () => {
 			} );
 
 			expect( editButton ).toBeEnabled();
+			expect( editButton ).toHaveAccessibleName();
 		} );
 
-		it( 'should be disabled when onNavigateToEntityRecord is not available', () => {
+		it( 'should be disabled when navigation to focused overlay editor is not available', () => {
 			useEntityRecords.mockReturnValue( {
 				records: [ templatePart1 ],
 				isResolving: false,
@@ -322,7 +359,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect( editButton ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 
-		it( 'should call onNavigateToEntityRecord when edit button is clicked', async () => {
+		it( 'should navigate to focused overlay editor when edit button is clicked', async () => {
 			const user = userEvent.setup();
 
 			useEntityRecords.mockReturnValue( {
@@ -351,7 +388,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			} );
 		} );
 
-		it( 'should not call onNavigateToEntityRecord when button is disabled', async () => {
+		it( 'should not navigate to focused overlay editor when button is disabled', async () => {
 			const user = userEvent.setup();
 
 			useEntityRecords.mockReturnValue( {
@@ -396,6 +433,11 @@ describe( 'OverlayTemplatePartSelector', () => {
 			expect(
 				screen.getByText( 'No overlays found.' )
 			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Create new overlay template',
+				} )
+			).toBeInTheDocument();
 		} );
 
 		it( 'should show default help text when overlays are available', () => {
@@ -408,54 +450,102 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			expect(
-				screen.getByText(
-					'Select an overlay to use for the navigation.'
-				)
+				screen.getByText( 'Select an overlay for navigation.' )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'button', {
+					name: 'Create new overlay template',
+				} )
 			).toBeInTheDocument();
 		} );
 	} );
 
-	describe( 'Accessibility', () => {
-		it( 'should have proper ARIA labels on edit button', () => {
+	describe( 'Create overlay', () => {
+		it( 'should call createOverlayTemplatePart when create button is clicked', async () => {
+			const user = userEvent.setup();
+			const newOverlay = {
+				id: 'twentytwentyfive//overlay',
+				theme: 'twentytwentyfive',
+				slug: 'overlay',
+				title: {
+					rendered: 'Overlay',
+				},
+				area: 'navigation-overlay',
+			};
+
+			mockCreateOverlayTemplatePart.mockResolvedValue( newOverlay );
+
 			useEntityRecords.mockReturnValue( {
-				records: [ templatePart1 ],
+				records: [],
 				isResolving: false,
 				hasResolved: true,
 			} );
 
-			render(
-				<OverlayTemplatePartSelector
-					{ ...defaultProps }
-					overlay="twentytwentyfive//my-overlay"
-				/>
-			);
+			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
-			const editButton = screen.getByRole( 'button', {
-				name: ( accessibleName ) =>
-					accessibleName.startsWith( 'Edit overlay' ),
+			const createButton = screen.getByRole( 'button', {
+				name: 'Create new overlay template',
 			} );
 
-			expect( editButton ).toHaveAccessibleName();
+			await user.click( createButton );
+
+			expect( mockCreateOverlayTemplatePart ).toHaveBeenCalled();
+			expect( mockSetAttributes ).toHaveBeenCalledWith( {
+				overlay: 'twentytwentyfive//overlay',
+			} );
+			expect( mockOnNavigateToEntityRecord ).toHaveBeenCalledWith( {
+				postId: 'twentytwentyfive//overlay',
+				postType: 'wp_template_part',
+			} );
 		} );
 
-		it( 'should show loading spinner instead of select control when initially loading', () => {
+		it( 'should show error notice when creation fails', async () => {
+			const user = userEvent.setup();
+
+			const error = new Error( 'Failed to create overlay' );
+			error.code = 'create_error';
+
+			mockCreateOverlayTemplatePart.mockRejectedValue( error );
+
 			useEntityRecords.mockReturnValue( {
-				records: null,
+				records: [],
+				isResolving: false,
+				hasResolved: true,
+			} );
+
+			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
+
+			const createButton = screen.getByRole( 'button', {
+				name: 'Create new overlay template',
+			} );
+
+			await user.click( createButton );
+
+			// Wait for async operations
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
+			expect( mockCreateErrorNotice ).toHaveBeenCalledWith(
+				'Failed to create overlay',
+				{ type: 'snackbar' }
+			);
+			expect( mockSetAttributes ).not.toHaveBeenCalled();
+			expect( mockOnNavigateToEntityRecord ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should disable create button when overlays are resolving', () => {
+			useEntityRecords.mockReturnValue( {
+				records: [],
 				isResolving: true,
 				hasResolved: false,
 			} );
 
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
-			// Should show loading spinner, not the select control
-			expect(
-				screen.getByText( 'Loading overlays…' )
-			).toBeInTheDocument();
-			expect(
-				screen.queryByRole( 'combobox', {
-					name: 'Overlay template',
-				} )
-			).not.toBeInTheDocument();
+			const createButton = screen.getByRole( 'button', {
+				name: 'Create new overlay template',
+			} );
+
+			expect( createButton ).toHaveAttribute( 'aria-disabled', 'true' );
 		} );
 	} );
 } );

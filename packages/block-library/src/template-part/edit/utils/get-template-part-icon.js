@@ -12,7 +12,7 @@ import {
 /**
  * Helper function to retrieve the corresponding icon by area name or icon name.
  *
- * @param {string} areaOrIconName The area name (e.g., 'header', 'overlay') or icon name (e.g., 'menu').
+ * @param {string} areaOrIconName The area name (e.g., 'header', 'navigation-overlay') or icon name (e.g., 'menu').
  *
  * @return {Object} The corresponding icon.
  */

@@ -10,6 +10,7 @@
 		{ "path": "../compose" },
 		{ "path": "../data" },
 		{ "path": "../deprecated" },
+		{ "path": "../dom" },
 		{ "path": "../element" },
 		{ "path": "../escape-html" },
 		{ "path": "../i18n" },

@@ -266,7 +266,6 @@ export function PageAttributesParent( {
 
 	return (
 		<ComboboxControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			label={ __( 'Parent' ) }
 			help={ __( 'Choose a parent page.' ) }

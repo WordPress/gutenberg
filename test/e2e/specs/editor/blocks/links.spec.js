@@ -529,7 +529,7 @@ test.describe( 'Links', () => {
 		// Insert a Link.
 		await editor.clickBlockToolbarButton( 'Link' );
 
-		await page.keyboard.type( 'http://#test.com' );
+		await page.keyboard.type( 'http://#example.com' );
 		await pageUtils.pressKeys( 'Enter' );
 		expect(
 			page.getByText(

@@ -194,7 +194,6 @@ export function PageAttributesParent() {
 
 	return (
 		<ComboboxControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			className="editor-page-attributes__parent"
 			label={ __( 'Parent' ) }

@@ -3,7 +3,11 @@
  */
 import { heading as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
-import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
+import {
+	privateApis as blocksPrivateApis,
+	getBlockType,
+	unregisterBlockVariation,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -78,7 +82,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'content',
 			label: __( 'Content' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 	];
 	settings[ formKey ] = {
@@ -86,4 +91,21 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 	};
 }
 
-export const init = () => initBlock( { name, metadata, settings } );
+export const init = () => {
+	const block = initBlock( { name, metadata, settings } );
+
+	// Unregister heading level variations based on `levelOptions` attribute.
+	// This is for backwards compatibility, as extenders can now unregister the
+	// variation directly: `wp.blocks.unregisterBlockVariation( 'core/heading', 'h1' )`.
+	const levelOptions =
+		getBlockType( name )?.attributes?.levelOptions?.default;
+	if ( levelOptions ) {
+		[ 1, 2, 3, 4, 5, 6 ].forEach( ( level ) => {
+			if ( ! levelOptions.includes( level ) ) {
+				unregisterBlockVariation( name, `h${ level }` );
+			}
+		} );
+	}
+
+	return block;
+};

@@ -49,7 +49,6 @@ function LibraryFontVariant( {
 				<CheckboxControl
 					checked={ isInstalled }
 					onChange={ handleToggleActivation }
-					__nextHasNoMarginBottom
 					id={ checkboxId }
 				/>
 				<label htmlFor={ checkboxId }>

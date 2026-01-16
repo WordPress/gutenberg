@@ -34,9 +34,12 @@ export default function ResponsiveWrapper( {
 		return children;
 	}
 
+	// Only apply overlay colors if there's no custom overlay template part.
+	const hasCustomOverlay = !! overlay;
+
 	const responsiveContainerClasses = clsx(
 		'wp-block-navigation__responsive-container',
-		{
+		! hasCustomOverlay && {
 			'has-text-color':
 				!! overlayTextColor.color || !! overlayTextColor?.class,
 			[ getColorClassName( 'color', overlayTextColor?.slug ) ]:
@@ -48,18 +51,22 @@ export default function ResponsiveWrapper( {
 				'background-color',
 				overlayBackgroundColor?.slug
 			) ]: !! overlayBackgroundColor?.slug,
+		},
+		{
 			'is-menu-open': isOpen,
 			'hidden-by-default': isHiddenByDefault,
 		}
 	);
 
-	const styles = {
-		color: ! overlayTextColor?.slug && overlayTextColor?.color,
-		backgroundColor:
-			! overlayBackgroundColor?.slug &&
-			overlayBackgroundColor?.color &&
-			overlayBackgroundColor.color,
-	};
+	const styles = ! hasCustomOverlay
+		? {
+				color: ! overlayTextColor?.slug && overlayTextColor?.color,
+				backgroundColor:
+					! overlayBackgroundColor?.slug &&
+					overlayBackgroundColor?.color &&
+					overlayBackgroundColor.color,
+		  }
+		: {};
 
 	const openButtonClasses = clsx(
 		'wp-block-navigation__responsive-container-open',

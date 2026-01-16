@@ -126,18 +126,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-sync-collaboration',
-		__( 'Collaboration: add real time editing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables live collaboration and offline persistence between peers.', 'gutenberg' ),
-			'id'    => 'gutenberg-sync-collaboration',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-color-randomizer',
 		__( 'Color randomizer', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -146,18 +134,6 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables the Global Styles color randomizer in the Site Editor; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
 			'id'    => 'gutenberg-color-randomizer',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-new-posts-dashboard',
-		__( 'Data Views: enable for Posts', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables a redesigned posts dashboard accessible through a submenu item in the Gutenberg plugin.', 'gutenberg' ),
-			'id'    => 'gutenberg-new-posts-dashboard',
 		)
 	);
 
@@ -199,7 +175,7 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-content-only-pattern-insertion',
-		__( 'contentOnly: Make patterns contentOnly by default upon insertion', 'gutenberg' ),
+		__( 'Pattern Editing: Make patterns contentOnly by default upon insertion', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
@@ -211,14 +187,13 @@ function gutenberg_initialize_experiments_settings() {
 
 	add_settings_field(
 		'gutenberg-content-only-inspector-fields',
-		__( 'contentOnly: Enable editable inspector fields', 'gutenberg' ),
+		__( 'Block fields: Show dataform driven inspector fields on blocks that support them', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label'    => __( 'Enables editable inspector fields (media, links, alt text, etc.) in the content-only pattern editing interface. Requires "contentOnly: Make patterns contentOnly by default upon insertion" to be enabled.', 'gutenberg' ),
-			'id'       => 'gutenberg-content-only-inspector-fields',
-			'requires' => 'gutenberg-content-only-pattern-insertion',
+			'label' => __( 'Enables editable block inspector fields that are generated using a dataform.', 'gutenberg' ),
+			'id'    => 'gutenberg-content-only-inspector-fields',
 		)
 	);
 
@@ -243,6 +218,31 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables custom mobile overlay design and content control for Navigation blocks, allowing you to create flexible, professional menu experiences.', 'gutenberg' ),
 			'id'    => 'gutenberg-customizable-navigation-overlays',
+		)
+	);
+
+	// create a new experiment for hiding blocks based on screen size
+	add_settings_field(
+		'gutenberg-hide-blocks-based-on-screen-size',
+		__( 'Hide blocks based on screen size', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Extends block visibility block supports with responsive design controls for hiding blocks based on screen size.', 'gutenberg' ),
+			'id'    => 'gutenberg-hide-blocks-based-on-screen-size',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-extensible-site-editor',
+		__( 'Extensible Site Editor', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
+			'id'    => 'gutenberg-extensible-site-editor',
 		)
 	);
 

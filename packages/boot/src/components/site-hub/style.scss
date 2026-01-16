@@ -17,17 +17,15 @@
 }
 
 .boot-site-hub__title {
-	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
-	font-size: variables.$font-size-medium;
-	font-weight: variables.$font-weight-medium;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+	display: flex;
+	align-items: center;
 	text-decoration: none;
 
 	.components-external-link__contents {
 		text-decoration: none;
 		margin-inline-start: variables.$grid-unit-05;
+		overflow: hidden;
+		max-width: 140px;
 	}
 
 	// Show icon on hover
@@ -51,4 +49,21 @@
 			var(--wpds-color-stroke-focus-brand, #0073aa);
 		outline-offset: calc(-1 * var(--wpds-border-width-interactive-focus, 2px));
 	}
+}
+
+.boot-site-hub__title-text {
+	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
+	font-size: variables.$font-size-medium;
+	font-weight: variables.$font-weight-medium;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.boot-site-hub__url {
+	color: var(--wpds-color-fg-content-neutral-weak, #757575);
+	font-size: variables.$font-size-small;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }

@@ -20,6 +20,7 @@ import isValidMinLength from './utils/is-valid-min-length';
 import isValidMaxLength from './utils/is-valid-max-length';
 import isValidPattern from './utils/is-valid-pattern';
 import isValidElements from './utils/is-valid-elements';
+import getValueFormatted from './utils/get-value-formatted-default';
 
 export default {
 	type: 'url',
@@ -41,7 +42,8 @@ export default {
 		OPERATOR_IS_ALL,
 		OPERATOR_IS_NOT_ALL,
 	],
-	getFormat: () => ( {} ),
+	format: {},
+	getValueFormatted,
 	validate: {
 		required: isValidRequired,
 		pattern: isValidPattern,

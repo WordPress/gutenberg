@@ -229,7 +229,9 @@ Pages can be defined as simple strings or as objects with initialization modules
 
 **Page Configuration:**
 - **String format**: `"my-admin-page"` - Simple page with no init modules
-- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"] }` - Page with init modules
+- **Object format**: `{ "id": "page-slug", "init": ["@scope/package"] }` - Page with optional init modules
+  - **`id`** (required): The page slug used in WordPress admin URLs
+  - **`init`** (optional): Array of script module IDs to execute during page initialization
 
 **Generated Files:**
 
@@ -241,15 +243,40 @@ This generates two page modes:
 Each mode provides route/menu registration functions and a render callback. Routes are automatically registered for both modes.
 
 **Registering a menu item for WP-Admin mode:**
+
+WP-Admin mode integrates within the standard WordPress admin interface (keeping the sidebar and header). Menu items should be registered with a simple slug and callback:
+
 ```php
-// Build URL with initial route via 'p' query parameter
-$url = admin_url( 'admin.php?page=my-admin-page-wp-admin&p=' . urlencode( '/my/route' ) );
-add_menu_page( 'Title', 'Menu', 'capability', $url, '', 'icon', 20 );
+add_submenu_page(
+	'themes.php',                                      // Parent menu
+	__( 'My Page', 'my-plugin' ),                     // Page title
+	__( 'My Page', 'my-plugin' ),                     // Menu title
+	'edit_theme_options',                              // Capability
+	'my-admin-page-wp-admin',                          // Menu slug (simple)
+	'my_plugin_my_admin_page_wp_admin_render_page'     // Callback from generated PHP (prefixed)
+);
 ```
 
-**Registering a menu item for full-page mode:**
+Note: The callback function name is prefixed with your plugin name (from `wpPlugin.name` in root `package.json`). For example, if your plugin name is `my-plugin`, the function will be `my_plugin_my_admin_page_wp_admin_render_page`.
+
+The page slug is `my-admin-page-wp-admin` (your page ID + `-wp-admin`). WordPress routes all requests to this callback, and the JavaScript router handles internal navigation.
+
+**Deep linking with the `p` query parameter:**
+
+Users and extensions can link directly to specific routes using the `p` query parameter:
 ```php
-add_menu_page( 'Title', 'Menu', 'capability', 'my-admin-page', 'my_admin_page_render_page', 'icon', 20 );
+// Link to a specific route
+$url = admin_url( 'admin.php?page=my-admin-page-wp-admin&p=' . urlencode( '/settings' ) );
+```
+
+When the page loads, the JavaScript boot system reads the `p` parameter and navigates to that route automatically.
+
+**Registering a menu item for full-page mode:**
+
+Full-page mode takes over the entire admin screen with a custom sidebar:
+
+```php
+add_menu_page( 'Title', 'Menu', 'capability', 'my-admin-page', 'my_plugin_my_admin_page_render_page', 'icon', 20 );
 ```
 
 **Init Modules:**
@@ -339,7 +366,7 @@ The built tool generates several files in the `build/` directory, but the primar
 Make sure to include the generated PHP file in your plugin file.
 
 ```php
-require_once plugin_dir_path( __FILE__ ) . 'build/index.php';
+require_once plugin_dir_path( __FILE__ ) . 'build/build.php';
 ```
 
 ## Routes (Experimental)
@@ -371,7 +398,24 @@ In `routes/{route-name}/package.json`:
 }
 ```
 
-The `page` field must match one of the pages defined in `wpPlugin.pages` in your root `package.json`. This tells the build system which page this route belongs to. It can also map to an existing page registered by another plugin.
+For routes that should appear on multiple pages:
+
+```json
+{
+	"route": {
+		"path": "/settings",
+		"page": ["my-admin-page", "other-page"]
+	}
+}
+```
+
+The `page` field can be either:
+- **String**: Route belongs to a single page
+- **Array**: Route appears on multiple pages (the build system will register the route for each page)
+
+Each page ID must match one of the pages defined in `wpPlugin.pages` in your root `package.json`. This tells the build system which page(s) this route belongs to. It can also map to existing pages registered by other plugins.
+
+Multi-page routes are useful for shared functionality across different admin pages, such as settings routes accessible from both a main page and a dedicated settings page.
 
 ### Components
 
@@ -428,7 +472,7 @@ The `canvas()` function controls which canvas is rendered:
 The build system generates:
 - `build/routes/{route-name}/content.js` - Bundled stage/inspector/canvas components
 - `build/routes/{route-name}/route.js` - Bundled lifecycle hooks (if present)
-- `build/routes/index.php` - Route registry data
+- `build/routes/registry.php` - Route registry data
 - `build/routes.php` - Route registration logic
 
 The boot package in Gutenberg will automatically use these routes and make them available.

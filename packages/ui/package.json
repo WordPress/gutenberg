@@ -22,13 +22,20 @@
 		"node": ">=20.10.0",
 		"npm": ">=10.2.3"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
-			"default": "./build/index.js"
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
@@ -36,12 +43,22 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
+		"@base-ui/react": "^1.0.0",
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/element": "file:../element",
-		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/primitives": "file:../primitives",
 		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
-		"@wordpress/theme": "file:../theme"
+		"@storybook/addon-docs": "^10.1.11",
+		"@storybook/react-vite": "^10.1.11",
+		"@testing-library/jest-dom": "^6.6.3",
+		"@types/jest": "^29.5.14",
+		"@types/node": "^20.17.10",
+		"@wordpress/theme": "file:../theme",
+		"storybook": "^10.1.11"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

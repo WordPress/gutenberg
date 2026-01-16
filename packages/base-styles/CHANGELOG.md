@@ -2,7 +2,9 @@
 
 ## Unreleased
 
-## 6.13.0 (2025-12-23)
+### Internal
+
+-   Remove outdated vendor prefix properties ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
 
 ## 6.12.0 (2025-11-26)
 

@@ -852,12 +852,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "DimensionControl",
-		"slug": "dimension-control",
-		"markdown_source": "../packages/components/src/dimension-control/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "Disabled",
 		"slug": "disabled",
 		"markdown_source": "../packages/components/src/disabled/README.md",
@@ -2106,7 +2100,7 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/wp-build",
+		"title": "@wordpress/build",
 		"slug": "packages-wp-build",
 		"markdown_source": "../packages/wp-build/README.md",
 		"parent": "packages"

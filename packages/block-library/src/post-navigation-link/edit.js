@@ -125,7 +125,6 @@ export default function PostNavigationLinkEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Display the title as a link' ) }
 							help={ __(
 								'If you have entered a custom label, it will be prepended before the title.'
@@ -150,7 +149,6 @@ export default function PostNavigationLinkEdit( {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __(
 									'Include the label as part of the link'
 								) }
@@ -171,7 +169,6 @@ export default function PostNavigationLinkEdit( {
 					>
 						<ToggleGroupControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Arrow' ) }
 							value={ arrow }
 							onChange={ ( value ) => {
@@ -210,7 +207,6 @@ export default function PostNavigationLinkEdit( {
 			<InspectorControls group="advanced">
 				<SelectControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ __( 'Filter by taxonomy' ) }
 					value={ taxonomy }
 					options={ getTaxonomyOptions() }

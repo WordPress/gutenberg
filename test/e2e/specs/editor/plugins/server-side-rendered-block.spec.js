@@ -232,4 +232,35 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		);
 		await expect( colorText ).toBeVisible();
 	} );
+
+	test( 'should generate inspector controls from block attributes', async ( {
+		editor,
+		page,
+	} ) => {
+		// Insert the block with auto-generated controls
+		await editor.insertBlock( {
+			name: 'test/auto-register-with-controls',
+		} );
+
+		// Open the document settings sidebar
+		await editor.openDocumentSettingsSidebar();
+
+		// Verify auto-generated controls are present
+		// String attribute → text input
+		await expect( page.getByLabel( 'Title' ) ).toBeVisible();
+
+		// Integer attribute → number input
+		await expect( page.getByLabel( 'Count' ) ).toBeVisible();
+
+		// Number attribute → number control
+		await expect( page.getByLabel( 'Spacing' ) ).toBeVisible();
+
+		// Boolean attribute → toggle/checkbox
+		await expect( page.getByLabel( 'Show Emojis' ) ).toBeVisible();
+
+		// Enum attribute → select control
+		await expect(
+			page.getByLabel( 'Emoji', { exact: true } )
+		).toBeVisible();
+	} );
 } );

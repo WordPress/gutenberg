@@ -19,11 +19,7 @@ const UnforwardedValidatedToggleControl = (
 		customValidity,
 		markWhenOptional,
 		...restProps
-	}: Omit<
-		React.ComponentProps< typeof ToggleControl >,
-		'__nextHasNoMarginBottom'
-	> &
-		ValidatedControlProps,
+	}: React.ComponentProps< typeof ToggleControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
 	const validityTargetRef = useRef< HTMLInputElement >( null );
@@ -44,11 +40,7 @@ const UnforwardedValidatedToggleControl = (
 			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<ToggleControl
-				__nextHasNoMarginBottom
-				ref={ mergedRefs }
-				{ ...restProps }
-			/>
+			<ToggleControl ref={ mergedRefs } { ...restProps } />
 		</ControlWithError>
 	);
 };

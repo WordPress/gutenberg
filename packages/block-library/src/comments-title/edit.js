@@ -59,8 +59,8 @@ export default function Edit( {
 		pageComments,
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().__experimentalDiscussionSettings;
-	} );
+		return getSettings().__experimentalDiscussionSettings ?? {};
+	}, [] );
 
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -141,7 +141,6 @@ export default function Edit( {
 					}
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Show post title' ) }
 						checked={ showPostTitle }
 						onChange={ ( value ) =>
@@ -158,7 +157,6 @@ export default function Edit( {
 					}
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Show comments count' ) }
 						checked={ showCommentsCount }
 						onChange={ ( value ) =>
@@ -170,20 +168,23 @@ export default function Edit( {
 		</InspectorControls>
 	);
 
-	const postTitle = isSiteEditor ? __( '“Post Title”' ) : `"${ rawTitle }"`;
+	const postTitle = isSiteEditor ? __( 'Post Title' ) : rawTitle;
 
 	let placeholder;
 	if ( showCommentsCount && commentsCount !== undefined ) {
 		if ( showPostTitle ) {
 			if ( commentsCount === 1 ) {
-				/* translators: %s: Post title. */
-				placeholder = sprintf( __( 'One response to %s' ), postTitle );
+				placeholder = sprintf(
+					/* translators: %s: Post title. */
+					__( 'One response to "%s"' ),
+					postTitle
+				);
 			} else {
 				placeholder = sprintf(
 					/* translators: 1: Number of comments, 2: Post title. */
 					_n(
-						'%1$s response to %2$s',
-						'%1$s responses to %2$s',
+						'%1$s response to "%2$s"',
+						'%1$s responses to "%2$s"',
 						commentsCount
 					),
 					commentsCount,
@@ -202,10 +203,10 @@ export default function Edit( {
 	} else if ( showPostTitle ) {
 		if ( commentsCount === 1 ) {
 			/* translators: %s: Post title. */
-			placeholder = sprintf( __( 'Response to %s' ), postTitle );
+			placeholder = sprintf( __( 'Response to "%s"' ), postTitle );
 		} else {
 			/* translators: %s: Post title. */
-			placeholder = sprintf( __( 'Responses to %s' ), postTitle );
+			placeholder = sprintf( __( 'Responses to "%s"' ), postTitle );
 		}
 	} else if ( commentsCount === 1 ) {
 		placeholder = __( 'Response' );

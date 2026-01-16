@@ -244,9 +244,8 @@ const EditWithGeneratedProps = ( props ) => {
 					! ( hasPatternOverrides && hasParentPattern ) &&
 					Object.keys( keptAttributes ).length
 				) {
-					// Don't update caption and href until they are supported.
+					// Don't update href until it is supported.
 					if ( hasPatternOverrides ) {
-						delete keptAttributes.caption;
 						delete keptAttributes.href;
 					}
 					setAttributes( keptAttributes );

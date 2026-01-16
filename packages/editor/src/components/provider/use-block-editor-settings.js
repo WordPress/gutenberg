@@ -98,6 +98,7 @@ const {
 	mediaEditKey,
 	getMediaSelectKey,
 	isIsolatedEditorKey,
+	deviceTypeKey,
 } = unlock( privateApis );
 
 /**
@@ -128,6 +129,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		userPatternCategories,
 		restBlockPatternCategories,
 		sectionRootClientId,
+		deviceType,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -139,6 +141,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			} = select( coreStore );
 			const { get } = select( preferencesStore );
 			const { getBlockTypes } = select( blocksStore );
+			const { getDeviceType } = unlock( select( editorStore ) );
 			const { getBlocksByName, getBlockAttributes } =
 				select( blockEditorStore );
 			const siteSettings = canUser( 'read', {
@@ -192,6 +195,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				userPatternCategories: getUserPatternCategories(),
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
+				deviceType: getDeviceType(),
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -259,6 +263,27 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ saveEntityRecord, userCanCreatePages ]
 	);
 
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
+
+	/**
+	 * Wraps onNavigateToEntityRecord to automatically include the currently selected block.
+	 * This ensures that navigation can restore the selection when returning to the previous entity.
+	 */
+	const wrappedOnNavigateToEntityRecord = useCallback(
+		( params ) => {
+			if ( ! settings.onNavigateToEntityRecord ) {
+				return;
+			}
+			const selectedBlockClientId = getSelectedBlockClientId();
+
+			return settings.onNavigateToEntityRecord( {
+				...params,
+				selectedBlockClientId,
+			} );
+		},
+		[ settings, getSelectedBlockClientId ]
+	);
+
 	const allowedBlockTypes = useMemo( () => {
 		// Omit hidden block types if exists and non-empty.
 		if ( hiddenBlockTypes && hiddenBlockTypes.length > 0 ) {
@@ -283,9 +308,12 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	return useMemo( () => {
 		const blockEditorSettings = {
 			...Object.fromEntries(
-				Object.entries( settings ).filter( ( [ key ] ) =>
-					BLOCK_EDITOR_SETTINGS.includes( key )
-				)
+				Object.entries( settings )
+					.filter( ( [ key ] ) =>
+						BLOCK_EDITOR_SETTINGS.includes( key )
+					)
+					// Exclude onNavigateToEntityRecord since we're wrapping it
+					.filter( ( [ key ] ) => key !== 'onNavigateToEntityRecord' )
 			),
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
@@ -295,6 +323,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			hasFixedToolbar,
 			isDistractionFree,
 			keepCaretInsideBlock,
+			onNavigateToEntityRecord: settings.onNavigateToEntityRecord
+				? wrappedOnNavigateToEntityRecord
+				: undefined,
 			[ getMediaSelectKey ]: ( select, attachmentId ) => {
 				return select( coreStore ).getEntityRecord(
 					'postType',
@@ -356,6 +387,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				'wp_block',
 				'wp_navigation',
 			].includes( postType ),
+			...( window.__experimentalHideBlocksBasedOnScreenSize && deviceType
+				? { [ deviceTypeKey ]: deviceType }
+				: {} ),
 		};
 
 		return blockEditorSettings;
@@ -385,6 +419,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		globalStylesLinksData,
 		renderingMode,
 		editMediaEntity,
+		wrappedOnNavigateToEntityRecord,
+		deviceType,
 	] );
 }
 

@@ -10,9 +10,6 @@
  */
 function gutenberg_enable_experiments() {
 	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-sync-collaboration', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableSync = true', 'before' );
-	}
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-color-randomizer', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableColorRandomizer = true', 'before' );
 	}
@@ -33,21 +30,26 @@ function gutenberg_enable_experiments() {
 	}
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-content-only-pattern-insertion', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalContentOnlyPatternInsertion = true', 'before' );
-		// Only enable inspector fields if both parent and sub-experiment are enabled
-		if ( array_key_exists( 'gutenberg-content-only-inspector-fields', $gutenberg_experiments ) ) {
-			wp_add_inline_script( 'wp-block-editor', 'window.__experimentalContentOnlyInspectorFields = true', 'before' );
-		}
+	}
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-content-only-inspector-fields', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalContentOnlyInspectorFields = true', 'before' );
 	}
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-customizable-navigation-overlays', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalNavigationOverlays = true', 'before' );
 	}
+	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-hide-blocks-based-on-screen-size', $gutenberg_experiments ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalHideBlocksBasedOnScreenSize = true', 'before' );
+	}
 	if ( gutenberg_is_experiment_enabled( 'active_templates' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalTemplateActivate = true', 'before' );
+	}
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
+		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalExtensibleSiteEditor = true', 'before' );
 	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_experiments' );
-add_action( 'gutenberg-boot_init', 'gutenberg_enable_experiments' );
+add_action( 'site-editor-v2_init', 'gutenberg_enable_experiments' );
 
 /**
  * Sets a global JS variable used to trigger the availability of form & input blocks.

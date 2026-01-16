@@ -11,7 +11,6 @@ export default function InheritControl( { value, onChange, label } ) {
 	return (
 		<ToggleGroupControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label={ label }
 			isBlock
 			onChange={ ( newValue ) => {

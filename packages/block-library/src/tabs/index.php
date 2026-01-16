@@ -133,6 +133,35 @@ function block_core_tabs_generate_tabs_list_from_innerblocks( array $innerblocks
 }
 
 /**
+ * Build inline CSS custom properties for border settings.
+ *
+ * @param array $attributes Block attributes.
+ *
+ * @return string Inline CSS string.
+ */
+function block_core_tabs_generate_border_styles( array $attributes ): string {
+	$radius = $attributes['style']['border']['radius'] ?? null;
+
+	if ( empty( $radius ) ) {
+		return '';
+	}
+
+	if ( is_array( $radius ) ) {
+		$radius_value = wp_sprintf(
+			'%s %s %s %s',
+			$radius['topLeft'] ?? '0',
+			$radius['topRight'] ?? '0',
+			$radius['bottomRight'] ?? '0',
+			$radius['bottomLeft'] ?? '0'
+		);
+	} else {
+		$radius_value = $radius;
+	}
+
+	return wp_sprintf( '--tab-border-radius: %s;', (string) $radius_value );
+}
+
+/**
  * Render callback for core/tabs.
  *
  * @param array     $attributes Block attributes.
@@ -185,6 +214,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	$style  = (string) $tag_processor->get_attribute( 'style' );
 	$style .= block_core_tabs_generate_color_styles( $attributes );
 	$style .= block_core_tabs_generate_gap_styles( $attributes, $is_vertical );
+	$style .= block_core_tabs_generate_border_styles( $attributes );
 	$tag_processor->set_attribute( 'style', $style );
 
 	$updated_content = $tag_processor->get_updated_html();

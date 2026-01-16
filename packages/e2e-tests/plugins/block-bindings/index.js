@@ -84,7 +84,6 @@ const withBlockBindingsInspectorControl = createHigherOrderComponent(
 						{ title: 'Bindings' },
 						el( TextControl, {
 							__next40pxDefaultSize: true,
-							__nextHasNoMarginBottom: true,
 							label: 'Content',
 							value: props.attributes.content,
 							onChange: ( content ) =>

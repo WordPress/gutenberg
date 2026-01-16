@@ -75,7 +75,7 @@ function Edit( { attributes } ) {
 -   Type: `boolean`
 -   Default value: `false`
 
-Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link. _Important: It doesn't work with dynamic blocks yet._
+Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
 
 ```js
 // Declare support for anchor links.
@@ -629,6 +629,7 @@ _**Note:** Since WordPress 6.2._
 -   Type: `Object`
 -   Default value: null
 -   Subproperties:
+    -   `height`: type `boolean`, default value `false`
     -   `minHeight`: type `boolean`, default value `false`
     -   `width`: type `boolean`, default value `false`
 
@@ -638,6 +639,7 @@ This value signals that a block supports some of the CSS style properties relate
 supports: {
 	dimensions: {
 		aspectRatio: true // Enable aspect ratio control.
+		height: true // Enable height control.
 		minHeight: true // Enable min height control.
 		width: true // Enable width control.
 	}
@@ -646,13 +648,14 @@ supports: {
 
 When a block declares support for a specific dimensions property, its attributes definition is extended to include the `style` attribute.
 
--   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `minHeight`, or `width` support is declared. It stores the custom values set by the user. For example:
+-   `style`: an attribute of `object` type with no default assigned. This is added when `aspectRatio`, `height`, `minHeight`, or `width` support is declared. It stores the custom values set by the user. For example:
 
 ```js
 attributes: {
     style: {
         dimensions: {
             aspectRatio: "16/9",
+            height: "40vh",
             minHeight: "50vh",
             width: "400px",
         }
@@ -758,6 +761,8 @@ Set it to true only if the block is not interactive or if it is interactive usin
 
 The `interactive` sub-property indicates whether the block is using the Interactivity API directives.
 
+If you set `supports.interactivity` to `true`, it is equivalent to setting both `supports.interactivity.clientNavigation` and `supports.interactivity.interactive` to `true` as well.
+
 ## layout
 
 -   Type: `boolean` or `Object`
@@ -771,6 +776,7 @@ The `interactive` sub-property indicates whether the block is using the Interact
     -   `allowVerticalAlignment`: type `boolean`, default value `true`
     -   `allowJustification`: type `boolean`, default value `true`
     -   `allowOrientation`: type `boolean`, default value `true`
+    -   `allowWrap`: type `boolean`, default value `true`
     -   `allowCustomContentAndWideSize`: type `boolean`, default value `true`
 
 This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.
@@ -830,6 +836,13 @@ For the `flex` layout type, determines display of the justification control in t
 -   Default value: `true`
 
 For the `flex` layout type only, determines display of the orientation control in the block toolbar.
+
+### layout.allowWrap
+
+-   Type: `boolean`
+-   Default value: `true`
+
+For the `flex` layout type only, determines display of the "Allow to wrap to multiple lines" toggle in the block sidebar. When set to `false`, the wrap behavior is controlled by the `flexWrap` value in `layout.default`.
 
 ### layout.allowCustomContentAndWideSize
 

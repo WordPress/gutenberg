@@ -56,7 +56,6 @@ const AvatarInspectorControls = ( {
 					onDeselect={ () => setAttributes( { size: 96 } ) }
 				>
 					<RangeControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Image size' ) }
 						onChange={ ( newSize ) =>
@@ -77,7 +76,6 @@ const AvatarInspectorControls = ( {
 					onDeselect={ () => setAttributes( { isLink: false } ) }
 				>
 					<ToggleControl
-						__nextHasNoMarginBottom
 						label={ __( 'Link to user profile' ) }
 						onChange={ () =>
 							setAttributes( { isLink: ! attributes.isLink } )
@@ -95,7 +93,6 @@ const AvatarInspectorControls = ( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Open in new tab' ) }
 							onChange={ ( value ) =>
 								setAttributes( {

@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalHStack as HStack } from '@wordpress/components';
 import { useContext } from '@wordpress/element';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -37,14 +37,16 @@ export default function DataViewsFooter() {
 	}
 	return (
 		!! totalItems && (
-			<HStack
-				expanded={ false }
+			<Stack
+				direction="row"
 				justify="end"
+				align="center"
 				className="dataviews-footer"
+				gap="xs"
 			>
 				{ hasBulkActions && <BulkActionsFooter /> }
 				<DataViewsPagination />
-			</HStack>
+			</Stack>
 		)
 	);
 }

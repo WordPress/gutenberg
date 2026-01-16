@@ -408,7 +408,6 @@ function InstalledFonts() {
 									checked={ isSelectAllChecked }
 									onChange={ toggleSelectAll }
 									indeterminate={ isIndeterminate }
-									__nextHasNoMarginBottom
 								/>
 								<Spacer margin={ 8 } />
 								{ /*

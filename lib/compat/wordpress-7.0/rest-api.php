@@ -49,17 +49,16 @@ function gutenberg_modify_wp_template_part_post_type_args_7_0( $args ) {
 add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_wp_template_part_post_type_args_7_0' );
 
 /**
- * Registers the 'overlay' template part area when the experiment is enabled.
+ * Registers the 'navigation-overlay' template part area when the experiment is enabled.
  *
  * @param array $areas Array of template part area definitions.
  * @return array Modified array of template part area definitions.
  */
 if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
 	function gutenberg_register_overlay_template_part_area( $areas ) {
-
 		$areas[] = array(
-			'area'        => 'overlay',
-			'label'       => __( 'Overlay', 'gutenberg' ),
+			'area'        => 'navigation-overlay',
+			'label'       => __( 'Navigation Overlay', 'gutenberg' ),
 			'description' => __( 'Custom overlay area for navigation overlays.', 'gutenberg' ),
 			'icon'        => 'overlay',
 			'area_tag'    => 'div',
@@ -69,3 +68,45 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlay
 	}
 	add_filter( 'default_wp_template_part_areas', 'gutenberg_register_overlay_template_part_area' );
 }
+
+/**
+ * Adds user global styles link relation to all theme responses.
+ *
+ * This ensures that all themes (including classic themes) have access to the
+ * wp:user-global-styles link, which is required for the font library to function.
+ *
+ * WordPress core only adds this link for block themes with theme.json support.
+ * This filter extends that functionality to all themes.
+ *
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Theme         $theme    Theme object used to create response.
+ * @return WP_REST_Response Modified response object.
+ */
+function gutenberg_rest_theme_global_styles_link_rel_7_0( $response, $theme ) {
+	// Only add the link for the active theme to match WordPress core behavior.
+	if ( $theme->get_stylesheet() !== get_stylesheet() ) {
+		return $response;
+	}
+
+	// Check if the link already exists (WordPress core adds it for block themes).
+	$all_links = $response->get_links();
+	if ( isset( $all_links['https://api.w.org/user-global-styles'] ) ) {
+		return $response;
+	}
+
+	// Get or create the global styles post ID for this theme.
+	// Now that we've removed the theme.json check, this works for all themes.
+	$global_styles_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
+	if ( ! $global_styles_id ) {
+		return $response;
+	}
+
+	// Add the wp:user-global-styles link.
+	$response->add_link(
+		'https://api.w.org/user-global-styles',
+		rest_url( 'wp/v2/global-styles/' . $global_styles_id )
+	);
+
+	return $response;
+}
+add_filter( 'rest_prepare_theme', 'gutenberg_rest_theme_global_styles_link_rel_7_0', 10, 2 );

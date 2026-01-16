@@ -76,11 +76,15 @@ describe( 'useHandleLinkChange', () => {
 			clearBinding: mockClearBinding,
 		} );
 
-		// Mock updateAttributes to return default values
-		updateAttributes.mockImplementation( ( attrs ) => ( {
-			isEntityLink: !! ( attrs.id && attrs.kind !== 'custom' ),
-			attributes: attrs,
-		} ) );
+		// Mock updateAttributes to simulate real behavior:
+		// Call setAttributes with the new attrs and return metadata
+		updateAttributes.mockImplementation( ( attrs, setAttributes ) => {
+			setAttributes( attrs );
+			return {
+				isEntityLink: !! ( attrs.id && attrs.kind !== 'custom' ),
+				attributes: attrs,
+			};
+		} );
 	} );
 
 	afterEach( () => {
@@ -529,7 +533,7 @@ describe( 'useHandleLinkChange', () => {
 			);
 		} );
 
-		it( 'should include title when link has no URL (new link)', () => {
+		it( 'should include title when link has no URL and no label (new link)', () => {
 			const attributes = {
 				label: '',
 			};
@@ -558,6 +562,47 @@ describe( 'useHandleLinkChange', () => {
 				} ),
 				mockSetAttributes,
 				attributes
+			);
+		} );
+
+		it( 'should preserve label when adding URL to link with existing label but no URL', () => {
+			const attributes = {
+				label: 'Empty Link',
+			};
+
+			const { result } = renderHook( () =>
+				useHandleLinkChange( {
+					clientId,
+					attributes,
+					setAttributes: mockSetAttributes,
+				} )
+			);
+
+			const updatedLink = {
+				id: 123,
+				url: 'https://example.com/page',
+				title: 'Page Title',
+				kind: 'post-type',
+				type: 'page',
+			};
+
+			result.current( updatedLink );
+
+			// Verify the attrs passed to updateAttributes don't include title
+			expect( updateAttributes ).toHaveBeenCalledWith(
+				expect.not.objectContaining( {
+					title: 'Page Title',
+				} ),
+				mockSetAttributes,
+				attributes
+			);
+
+			// Verify the final result: setAttributes should be called WITHOUT title
+			// This means the label 'Empty Link' will be preserved by updateAttributes
+			expect( mockSetAttributes ).toHaveBeenCalledWith(
+				expect.not.objectContaining( {
+					title: 'Page Title',
+				} )
 			);
 		} );
 

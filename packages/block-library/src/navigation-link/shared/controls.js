@@ -4,27 +4,27 @@
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalInputControl as InputControl,
-	Button,
 	CheckboxControl,
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
-import { useRef, useEffect, useState } from '@wordpress/element';
-import { useInstanceId } from '@wordpress/compose';
-import { safeDecodeURI } from '@wordpress/url';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { linkOff as unlinkIcon } from '@wordpress/icons';
-import { useDispatch } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
-import { updateAttributes } from './update-attributes';
+import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
+import { getSuggestionsQuery } from '../link-ui';
+import { useLinkPreview } from './use-link-preview';
+import { unlock } from '../../lock-unlock';
+
+const { LinkPicker } = unlock( blockEditorPrivateApis );
 
 /**
  * Get a human-readable entity type name.
@@ -70,56 +70,74 @@ function getEntityTypeName( type, kind ) {
  */
 export function Controls( { attributes, setAttributes, clientId } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
-	const lastURLRef = useRef( url );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const urlInputRef = useRef();
-	const shouldFocusURLInputRef = useRef( false );
-	const inputId = useInstanceId( Controls, 'link-input' );
-	const helpTextId = `${ inputId }__help`;
 
-	// Local state to control the input value
-	const [ inputValue, setInputValue ] = useState( url );
-
-	// Sync local state when url prop changes (e.g., from undo/redo or external updates)
-	useEffect( () => {
-		setInputValue( url );
-		lastURLRef.current = url;
-	}, [ url ] );
-
-	// Use the entity binding hook internally
-	const { hasUrlBinding, isBoundEntityAvailable, clearBinding } =
+	// Use the entity binding hook for UI state (help text, link preview, etc.)
+	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
 		useEntityBinding( {
 			clientId,
 			attributes,
 		} );
 
-	// Get direct store dispatch to bypass setBoundAttributes wrapper
-	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+	const needsHelpText = hasUrlBinding;
+	const helpText = isBoundEntityAvailable
+		? BindingHelpText( {
+				type: attributes.type,
+				kind: attributes.kind,
+		  } )
+		: MissingEntityHelpText( {
+				type: attributes.type,
+				kind: attributes.kind,
+		  } );
 
-	const unsyncBoundLink = () => {
-		// Clear the binding first
-		clearBinding();
+	// Get the link change handler with built-in binding management
+	const handleLinkChange = useHandleLinkChange( {
+		clientId,
+		attributes,
+		setAttributes,
+	} );
 
-		// Use direct store dispatch to bypass block bindings safeguards
-		// which prevent updates to bound attributes when calling setAttributes.
-		// setAttributes is actually setBoundAttributes, a wrapper function that
-		// processes attributes through the binding system.
-		// See: packages/block-editor/src/components/block-edit/edit.js
-		updateBlockAttributes( clientId, {
-			url: lastURLRef.current, // set the lastURLRef as the new editable value so we avoid bugs from empty link states
-			id: undefined,
-		} );
-	};
+	const linkTitle =
+		entityRecord?.title?.rendered ||
+		entityRecord?.title ||
+		entityRecord?.name;
 
-	useEffect( () => {
-		// Only want to focus the input if the url is not bound to an entity.
-		if ( ! hasUrlBinding && shouldFocusURLInputRef.current ) {
-			// focuses and highlights the url input value, giving the user
-			// the ability to delete the value quickly or edit it.
-			urlInputRef.current?.select();
-		}
-		shouldFocusURLInputRef.current = false;
-	}, [ hasUrlBinding ] );
+	const linkImage = useSelect(
+		( select ) => {
+			// Only fetch for post-type entities with featured media
+			if ( ! entityRecord?.featured_media ) {
+				return null;
+			}
+
+			const { getEntityRecord } = select( coreStore );
+
+			// Get the media entity to fetch the image URL
+			const media = getEntityRecord(
+				'postType',
+				'attachment',
+				entityRecord.featured_media
+			);
+
+			// Return the thumbnail or medium size URL, fallback to source_url
+			return (
+				media?.media_details?.sizes?.thumbnail?.source_url ||
+				media?.media_details?.sizes?.medium?.source_url ||
+				media?.source_url ||
+				null
+			);
+		},
+		[ entityRecord?.featured_media ]
+	);
+
+	const preview = useLinkPreview( {
+		url,
+		title: linkTitle,
+		image: linkImage,
+		type: attributes.type,
+		entityStatus: entityRecord?.status,
+		hasBinding: hasUrlBinding,
+		isEntityAvailable: isBoundEntityAvailable,
+	} );
 
 	return (
 		<ToolsPanel
@@ -142,7 +160,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<TextControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label={ __( 'Text' ) }
 					value={ label ? stripHTML( label ) : '' }
@@ -155,108 +172,19 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 
 			<ToolsPanelItem
 				hasValue={ () => !! url }
-				label={ __( 'Link' ) }
+				label={ __( 'Link to' ) }
 				onDeselect={ () => setAttributes( { url: '' } ) }
 				isShownByDefault
 			>
-				<InputControl
-					ref={ urlInputRef }
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					id={ inputId }
-					label={ __( 'Link' ) }
-					value={ ( () => {
-						if ( hasUrlBinding && ! isBoundEntityAvailable ) {
-							return '';
-						}
-						return inputValue ? safeDecodeURI( inputValue ) : '';
-					} )() }
-					autoComplete="off"
-					type="url"
-					disabled={ hasUrlBinding }
-					aria-invalid={
-						hasUrlBinding && ! isBoundEntityAvailable
-							? 'true'
-							: undefined
-					}
-					aria-describedby={ helpTextId }
-					className={
-						hasUrlBinding && ! isBoundEntityAvailable
-							? 'navigation-link-control__input-with-error-suffix'
-							: undefined
-					}
-					onChange={ ( newValue ) => {
-						if ( isBoundEntityAvailable ) {
-							return;
-						}
-
-						// Defer updating the url attribute until onBlur to prevent the canvas from
-						// treating a temporary empty value as a committed value, which replaces the
-						// label with placeholder text.
-						setInputValue( newValue );
-					} }
-					onFocus={ () => {
-						if ( isBoundEntityAvailable ) {
-							return;
-						}
-						lastURLRef.current = url;
-					} }
-					onBlur={ () => {
-						if ( isBoundEntityAvailable ) {
-							return;
-						}
-
-						const finalValue = ! inputValue
-							? lastURLRef.current
-							: inputValue;
-
-						// Update local state immediately so input reflects the reverted value if the value was cleared
-						setInputValue( finalValue );
-
-						// Defer the updateAttributes call to ensure entity connection isn't severed by accident.
-						updateAttributes( { url: finalValue }, setAttributes, {
-							...attributes,
-							url: lastURLRef.current,
-						} );
-					} }
-					help={
-						hasUrlBinding && ! isBoundEntityAvailable ? (
-							<MissingEntityHelp
-								id={ helpTextId }
-								type={ attributes.type }
-								kind={ attributes.kind }
-							/>
-						) : (
-							isBoundEntityAvailable && (
-								<BindingHelpText
-									type={ attributes.type }
-									kind={ attributes.kind }
-								/>
-							)
-						)
-					}
-					suffix={
-						hasUrlBinding && (
-							<Button
-								icon={ unlinkIcon }
-								onClick={ () => {
-									unsyncBoundLink();
-									// Focus management to send focus to the URL input
-									// on next render after disabled state is removed.
-									shouldFocusURLInputRef.current = true;
-								} }
-								aria-describedby={ helpTextId }
-								showTooltip
-								label={ __( 'Unsync and edit' ) }
-								__next40pxDefaultSize
-								className={
-									hasUrlBinding && ! isBoundEntityAvailable
-										? 'navigation-link-control__error-suffix-button'
-										: undefined
-								}
-							/>
-						)
-					}
+				<LinkPicker
+					preview={ preview }
+					onSelect={ handleLinkChange }
+					suggestionsQuery={ getSuggestionsQuery(
+						attributes.type,
+						attributes.kind
+					) }
+					label={ __( 'Link to' ) }
+					help={ needsHelpText ? helpText : undefined }
 				/>
 			</ToolsPanelItem>
 
@@ -267,7 +195,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<CheckboxControl
-					__nextHasNoMarginBottom
 					label={ __( 'Open in new tab' ) }
 					checked={ opensInNewTab }
 					onChange={ ( value ) =>
@@ -283,7 +210,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<TextareaControl
-					__nextHasNoMarginBottom
 					label={ __( 'Description' ) }
 					value={ description || '' }
 					onChange={ ( descriptionValue ) => {
@@ -302,7 +228,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				isShownByDefault
 			>
 				<TextControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label={ __( 'Rel attribute' ) }
 					value={ rel || '' }
@@ -350,13 +275,5 @@ export function MissingEntityHelpText( { type, kind } ) {
 		/* translators: %s is the entity type (e.g., "page", "post", "category") */
 		__( 'Synced %s is missing. Please update or remove this link.' ),
 		entityType
-	);
-}
-
-function MissingEntityHelp( { id, type, kind } ) {
-	return (
-		<span id={ id } className="navigation-link-control__error-text">
-			<MissingEntityHelpText type={ type } kind={ kind } />
-		</span>
 	);
 }

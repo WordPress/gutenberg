@@ -673,7 +673,6 @@ export default function GalleryEdit( props ) {
 								}
 							>
 								<RangeControl
-									__nextHasNoMarginBottom
 									label={ __( 'Columns' ) }
 									value={
 										columns
@@ -705,7 +704,6 @@ export default function GalleryEdit( props ) {
 								}
 							>
 								<SelectControl
-									__nextHasNoMarginBottom
 									label={ __( 'Resolution' ) }
 									help={ __(
 										'Select the size of the source images.'
@@ -727,7 +725,6 @@ export default function GalleryEdit( props ) {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Crop images to fit' ) }
 								checked={ !! imageCrop }
 								onChange={ toggleImageCrop }
@@ -742,7 +739,6 @@ export default function GalleryEdit( props ) {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Randomize order' ) }
 								checked={ !! randomOrder }
 								onChange={ toggleRandomOrder }
@@ -756,7 +752,6 @@ export default function GalleryEdit( props ) {
 								onDeselect={ () => toggleOpenInNewTab( false ) }
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Open images in new tab' ) }
 									checked={ linkTarget === '_blank' }
 									onChange={ toggleOpenInNewTab }
@@ -774,7 +769,6 @@ export default function GalleryEdit( props ) {
 							>
 								<SelectControl
 									__next40pxDefaultSize
-									__nextHasNoMarginBottom
 									label={ __( 'Aspect ratio' ) }
 									help={ __(
 										'Set a consistent aspect ratio for all images in the gallery.'
@@ -791,7 +785,6 @@ export default function GalleryEdit( props ) {
 					<PanelBody title={ __( 'Settings' ) }>
 						{ images.length > 1 && (
 							<RangeControl
-								__nextHasNoMarginBottom
 								label={ __( 'Columns' ) }
 								value={
 									columns
@@ -808,7 +801,6 @@ export default function GalleryEdit( props ) {
 						) }
 						{ imageSizeOptions?.length > 0 && (
 							<SelectControl
-								__nextHasNoMarginBottom
 								label={ __( 'Resolution' ) }
 								help={ __(
 									'Select the size of the source images.'
@@ -821,7 +813,6 @@ export default function GalleryEdit( props ) {
 							/>
 						) }
 						<SelectControl
-							__nextHasNoMarginBottom
 							label={ __( 'Link' ) }
 							value={ linkTo }
 							onChange={ setLinkTo }
@@ -830,20 +821,17 @@ export default function GalleryEdit( props ) {
 							size="__unstable-large"
 						/>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Crop images to fit' ) }
 							checked={ !! imageCrop }
 							onChange={ toggleImageCrop }
 						/>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Randomize order' ) }
 							checked={ !! randomOrder }
 							onChange={ toggleRandomOrder }
 						/>
 						{ hasLinkTo && (
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Open images in new tab' ) }
 								checked={ linkTarget === '_blank' }
 								onChange={ toggleOpenInNewTab }
@@ -851,7 +839,6 @@ export default function GalleryEdit( props ) {
 						) }
 						{ aspectRatioOptions.length > 1 && (
 							<SelectControl
-								__nextHasNoMarginBottom
 								label={ __( 'Aspect Ratio' ) }
 								help={ __(
 									'Set a consistent aspect ratio for all images in the gallery.'
@@ -920,6 +907,7 @@ export default function GalleryEdit( props ) {
 									.filter( ( image ) => image.id )
 									.map( ( image ) => image.id ) }
 								addToGallery={ hasImageIds }
+								variant="toolbar"
 							/>
 						</BlockControls>
 					) }

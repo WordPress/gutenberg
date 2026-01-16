@@ -273,14 +273,38 @@ export type Field< Item > = {
 	/**
 	 * Display format configuration for fields.
 	 */
-	format?: FormatDate | FormatNumber | FormatInteger;
+	format?: FormatDatetime | FormatDate | FormatNumber | FormatInteger;
+
+	/**
+	 * Callback used to format the value of the field for display.
+	 */
+	getValueFormatted?: ( {
+		item,
+		field,
+	}: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => string;
+};
+
+/**
+ * Format for datetime fields:
+ *
+ * - datetime: the format string (e.g., "M j, Y g:i a" for "Jan 1, 2021 2:30 pm").
+ * - weekStartsOn: to specify the first day of the week (0 for 'sunday', 1 for 'monday', etc.).
+ *
+ * If not provided, defaults to WordPress date format settings.
+ */
+export type FormatDatetime = {
+	datetime?: string;
+	weekStartsOn?: DayNumber;
 };
 
 /**
  * Format for date fields:
  *
- * - date: the format string (e.g., 'F j, Y' for WordPress default format like 'March 10, 2023')
- * - weekStartsOn: to specify the first day of the week ('sunday', 'monday', etc.).
+ * - date: the format string (e.g., 'F j, Y' for 'March 10, 2023')
+ * - weekStartsOn: to specify the first day of the week (0 for 'sunday', 1 for 'monday', etc.).
  *
  * If not provided, defaults to WordPress date format settings.
  */
@@ -316,7 +340,10 @@ export type FormatInteger = {
 	separatorThousand?: string;
 };
 
-type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' | 'isValid' > & {
+export type NormalizedField< Item > = Omit<
+	Field< Item >,
+	'Edit' | 'isValid'
+> & {
 	label: string;
 	header: string | ReactElement;
 	getValue: ( args: { item: Item } ) => any;
@@ -330,29 +357,19 @@ type NormalizedFieldBase< Item > = Omit< Field< Item >, 'Edit' | 'isValid' > & {
 	enableSorting: boolean;
 	filterBy: Required< FilterByConfig > | false;
 	readOnly: boolean;
-	format: {};
+	format:
+		| {}
+		| Required< FormatDate >
+		| Required< FormatInteger >
+		| Required< FormatNumber >;
+	getValueFormatted: ( {
+		item,
+		field,
+	}: {
+		item: Item;
+		field: NormalizedField< Item >;
+	} ) => string;
 };
-
-export type NormalizedFieldDate< Item > = NormalizedFieldBase< Item > & {
-	type: 'date';
-	format: Required< FormatDate >;
-};
-
-export type NormalizedFieldNumber< Item > = NormalizedFieldBase< Item > & {
-	type: 'number';
-	format: Required< FormatNumber >;
-};
-
-export type NormalizedFieldInteger< Item > = NormalizedFieldBase< Item > & {
-	type: 'integer';
-	format: Required< FormatInteger >;
-};
-
-export type NormalizedField< Item > =
-	| NormalizedFieldBase< Item >
-	| NormalizedFieldDate< Item >
-	| NormalizedFieldNumber< Item >
-	| NormalizedFieldInteger< Item >;
 
 /**
  * A collection of dataview fields for a data type.

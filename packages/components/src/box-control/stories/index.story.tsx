@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -31,7 +31,7 @@ const meta: Meta< typeof BoxControl > = {
 export default meta;
 
 const TemplateUncontrolled: StoryFn< typeof BoxControl > = ( props ) => {
-	return <BoxControl { ...props } />;
+	return <BoxControl __next40pxDefaultSize { ...props } />;
 };
 
 const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
@@ -39,6 +39,7 @@ const TemplateControlled: StoryFn< typeof BoxControl > = ( props ) => {
 
 	return (
 		<BoxControl
+			__next40pxDefaultSize
 			values={ values }
 			{ ...props }
 			onChange={ ( nextValue ) => {

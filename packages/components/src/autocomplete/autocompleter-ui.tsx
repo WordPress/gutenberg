@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import { createPortal } from 'react-dom';
 
 /**
  * WordPress dependencies
@@ -24,7 +25,6 @@ import getDefaultUseItems from './get-default-use-items';
 import Button from '../button';
 import Popover from '../popover';
 import { VisuallyHidden } from '../visually-hidden';
-import { createPortal } from 'react-dom';
 import type { AutocompleterUIProps, KeyedOption, WPCompleter } from './types';
 
 type ListBoxProps = {
@@ -177,6 +177,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 		return (
 			<>
 				<Popover
+					offset={ 8 }
 					focusOnMount={ false }
 					onClose={ onReset }
 					placement="top-start"

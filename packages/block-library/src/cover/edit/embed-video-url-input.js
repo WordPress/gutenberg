@@ -63,7 +63,6 @@ export default function EmbedVideoUrlInput( { onSubmit, onClose } ) {
 					placeholder={ __(
 						'Enter YouTube, Vimeo, or other video URL'
 					) }
-					__nextHasNoMarginBottom
 					help={ __(
 						'Add a background video to the cover block that will autoplay in a loop.'
 					) }

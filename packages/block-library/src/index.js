@@ -9,10 +9,16 @@ import {
 	registerBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { useDisabled } from '@wordpress/compose';
 import { select } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import HtmlRenderer from './utils/html-renderer';
 
 /**
  * Internal dependencies
@@ -82,6 +88,7 @@ import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
 import * as navigationSubmenu from './navigation-submenu';
 import * as nextpage from './nextpage';
+import * as navigationOverlayClose from './navigation-overlay-close';
 import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as pageListItem from './page-list-item';
@@ -261,10 +268,10 @@ const getAllBlocks = () => {
 		termTemplate,
 		queryTitle,
 		postAuthorBiography,
+		breadcrumbs,
 	];
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( breadcrumbs );
 		blocks.push( tab );
 		blocks.push( tabs );
 	}
@@ -274,6 +281,10 @@ const getAllBlocks = () => {
 		blocks.push( formInput );
 		blocks.push( formSubmitButton );
 		blocks.push( formSubmissionNotification );
+	}
+
+	if ( window?.__experimentalNavigationOverlays ) {
+		blocks.push( navigationOverlayClose );
 	}
 
 	// When in a WordPress context, conditionally
@@ -345,8 +356,10 @@ export const registerCoreBlocks = (
 				...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
 					apiVersion: 3,
 				} ),
+				// Inspector controls are rendered by the auto-register hook in block-editor
 				edit: function Edit( { attributes } ) {
-					const blockProps = useBlockProps();
+					const disabledRef = useDisabled();
+					const blockProps = useBlockProps( { ref: disabledRef } );
 					const { content, status, error } = useServerSideRender( {
 						block: blockName,
 						attributes,
@@ -371,11 +384,9 @@ export const registerCoreBlocks = (
 					}
 
 					return (
-						<div
-							{ ...blockProps }
-							dangerouslySetInnerHTML={ {
-								__html: content || '',
-							} }
+						<HtmlRenderer
+							wrapperProps={ blockProps }
+							html={ content }
 						/>
 					);
 				},

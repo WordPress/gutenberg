@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -44,7 +44,6 @@ const Template: StoryFn< typeof Placeholder > = ( args ) => {
 		<Placeholder { ...args }>
 			<div>
 				<TextControl
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 					label="Sample Field"
 					placeholder="Enter something here"

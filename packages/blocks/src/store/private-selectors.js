@@ -28,6 +28,7 @@ const ROOT_BLOCK_SUPPORTS = [
 	'contentSize',
 	'wideSize',
 	'blockGap',
+	'textAlign',
 	'textDecoration',
 	'textTransform',
 	'letterSpacing',

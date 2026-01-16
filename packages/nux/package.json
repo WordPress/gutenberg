@@ -22,12 +22,20 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
-			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json",
 		"./build-style/": "./build-style/"
@@ -39,10 +47,10 @@
 		"src/**/*.scss",
 		"src/index.js",
 		"src/store/index.js",
-		"build/index.js",
-		"build/store/index.js",
-		"build-module/index.js",
-		"build-module/store/index.js"
+		"build/index.cjs",
+		"build/store/index.cjs",
+		"build-module/index.mjs",
+		"build-module/store/index.mjs"
 	],
 	"dependencies": {
 		"@wordpress/base-styles": "file:../base-styles",

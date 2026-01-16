@@ -1,38 +1,27 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState, useCallback } from '@wordpress/element';
 import { useEntityRecords } from '@wordpress/core-data';
-import { SelectControl, Spinner, Button } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
+import {
+	SelectControl,
+	Button,
+	FlexBlock,
+	FlexItem,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
+import { store as noticesStore } from '@wordpress/notices';
+import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
-
-/**
- * Parses a template part ID into theme and slug components.
- *
- * @param {string} templatePartId Template part ID in format "theme//slug".
- * @return {{theme: string, slug: string}|null} Parsed components or null if invalid.
- */
-function parseTemplatePartId( templatePartId ) {
-	if ( ! templatePartId || typeof templatePartId !== 'string' ) {
-		return null;
-	}
-
-	const parts = templatePartId.split( '//' );
-	if ( parts.length !== 2 ) {
-		return null;
-	}
-
-	return {
-		theme: parts[ 0 ],
-		slug: parts[ 1 ],
-	};
-}
+import useCreateOverlayTemplatePart from './use-create-overlay';
+import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 
 /**
  * Overlay Template Part Selector component.
@@ -56,15 +45,25 @@ export default function OverlayTemplatePartSelector( {
 		per_page: -1,
 	} );
 
+	const { createErrorNotice } = useDispatch( noticesStore );
+
+	// Track if we're currently creating a new overlay
+	const [ isCreating, setIsCreating ] = useState( false );
+
 	// Filter template parts by overlay area
 	const overlayTemplateParts = useMemo( () => {
 		if ( ! templateParts ) {
 			return [];
 		}
 		return templateParts.filter(
-			( templatePart ) => templatePart.area === 'overlay'
+			( templatePart ) =>
+				templatePart.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
 		);
 	}, [ templateParts ] );
+
+	// Hook to create overlay template part
+	const createOverlayTemplatePart =
+		useCreateOverlayTemplatePart( overlayTemplateParts );
 
 	// Build options for SelectControl
 	const options = useMemo( () => {
@@ -99,11 +98,6 @@ export default function OverlayTemplatePartSelector( {
 		return [ ...baseOptions, ...templatePartOptions ];
 	}, [ overlayTemplateParts, hasResolved, isResolving ] );
 
-	// Parse selected template part for navigation
-	const parsedTemplatePart = useMemo( () => {
-		return parseTemplatePartId( overlay );
-	}, [ overlay ] );
-
 	// Find the selected template part to get its title
 	const selectedTemplatePart = useMemo( () => {
 		if ( ! overlay || ! overlayTemplateParts ) {
@@ -135,64 +129,114 @@ export default function OverlayTemplatePartSelector( {
 		} );
 	};
 
-	const isEditButtonDisabled =
-		! overlay ||
-		! parsedTemplatePart ||
-		! onNavigateToEntityRecord ||
-		isResolving;
+	const handleCreateOverlay = useCallback( async () => {
+		try {
+			setIsCreating( true );
 
-	if ( isResolving && ! hasResolved ) {
-		return (
-			<div className="wp-block-navigation__overlay-selector">
-				<Spinner />
-				<p>{ __( 'Loading overlays…' ) }</p>
-			</div>
-		);
-	}
+			const templatePart = await createOverlayTemplatePart();
+
+			setAttributes( {
+				overlay: templatePart.id,
+			} );
+
+			// Navigate to the new overlay for editing
+			if ( onNavigateToEntityRecord ) {
+				onNavigateToEntityRecord( {
+					postId: templatePart.id,
+					postType: 'wp_template_part',
+				} );
+			}
+		} catch ( error ) {
+			// Error handling pattern matches CreateTemplatePartModalContents.
+			// See: packages/fields/src/components/create-template-part-modal/index.tsx
+			// The 'unknown_error' code check ensures generic error codes don't show
+			// potentially confusing technical messages, instead showing a user-friendly fallback.
+			const errorMessage =
+				error instanceof Error &&
+				'code' in error &&
+				error.message &&
+				error.code !== 'unknown_error'
+					? error.message
+					: __( 'An error occurred while creating the overlay.' );
+
+			createErrorNotice( errorMessage, { type: 'snackbar' } );
+		} finally {
+			setIsCreating( false );
+		}
+	}, [
+		createOverlayTemplatePart,
+		setAttributes,
+		onNavigateToEntityRecord,
+		createErrorNotice,
+	] );
+
+	const isCreateButtonDisabled = isResolving || isCreating;
+
+	// Build help text
+	const helpText = useMemo( () => {
+		if ( overlayTemplateParts.length === 0 && hasResolved ) {
+			return __( 'No overlays found.' );
+		}
+		return __( 'Select an overlay for navigation.' );
+	}, [ overlayTemplateParts.length, hasResolved ] );
+
+	// Tooltip/aria-label text for the edit button
+	const editButtonLabel = useMemo( () => {
+		return selectedTemplatePart
+			? sprintf(
+					/* translators: %s: Overlay title. */
+					__( 'Edit overlay: %s' ),
+					selectedTemplatePart.title?.rendered
+						? decodeEntities( selectedTemplatePart.title.rendered )
+						: selectedTemplatePart.slug
+			  )
+			: __( 'Edit overlay' );
+	}, [ selectedTemplatePart ] );
 
 	return (
 		<div className="wp-block-navigation__overlay-selector">
-			<SelectControl
-				__next40pxDefaultSize
-				__nextHasNoMarginBottom
-				label={ __( 'Overlay template' ) }
-				value={ overlay || '' }
-				options={ options }
-				onChange={ handleSelectChange }
-				disabled={ isResolving }
+			<Button
+				size="small"
+				icon={ plus }
+				onClick={ handleCreateOverlay }
+				disabled={ isCreateButtonDisabled }
 				accessibleWhenDisabled
-				help={
-					overlayTemplateParts.length === 0 && hasResolved
-						? __( 'No overlays found.' )
-						: __( 'Select an overlay to use for the navigation.' )
-				}
+				isBusy={ isCreating }
+				label={ __( 'Create new overlay template' ) }
+				showTooltip
+				className="wp-block-navigation__overlay-create-button"
 			/>
-			{ overlay && (
-				<Button
-					__next40pxDefaultSize
-					variant="secondary"
-					onClick={ handleEditClick }
-					disabled={ isEditButtonDisabled }
-					accessibleWhenDisabled
-					aria-label={
-						selectedTemplatePart
-							? sprintf(
-									/* translators: %s: Overlay title. */
-									__( 'Edit overlay: %s' ),
-									selectedTemplatePart.title?.rendered
-										? decodeEntities(
-												selectedTemplatePart.title
-													.rendered
-										  )
-										: selectedTemplatePart.slug
-							  )
-							: __( 'Edit overlay' )
-					}
-					className="wp-block-navigation__overlay-edit-button"
-				>
-					{ __( 'Edit' ) }
-				</Button>
-			) }
+			<HStack alignment="flex-start">
+				<FlexBlock>
+					<SelectControl
+						__next40pxDefaultSize
+						__nextHasNoMarginBottom
+						label={ __( 'Overlay template' ) }
+						value={ overlay || '' }
+						options={ options }
+						onChange={ handleSelectChange }
+						disabled={ isResolving }
+						accessibleWhenDisabled
+						help={ helpText }
+					/>
+				</FlexBlock>
+				{ overlay && hasResolved && selectedTemplatePart && (
+					<FlexItem>
+						<Button
+							__next40pxDefaultSize
+							variant="secondary"
+							onClick={ handleEditClick }
+							disabled={ ! onNavigateToEntityRecord }
+							accessibleWhenDisabled
+							label={ editButtonLabel }
+							showTooltip
+							className="wp-block-navigation__overlay-edit-button"
+						>
+							{ __( 'Edit' ) }
+						</Button>
+					</FlexItem>
+				) }
+			</HStack>
 		</div>
 	);
 }

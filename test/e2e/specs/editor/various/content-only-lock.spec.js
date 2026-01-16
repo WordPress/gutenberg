@@ -120,7 +120,7 @@ test.describe( 'Content-only lock', () => {
 		await editor.clickBlockOptionsMenuItem( 'Delete' );
 		// Select an outside block
 		await editor.canvas
-			.locator( 'role=document[name="Block: Heading"i]' )
+			.locator( 'role=document[name="Block: Heading 2"i]' )
 			.click();
 		// Select a locked nested paragraph block again
 		await pageUtils.pressKeys( 'ArrowUp' );

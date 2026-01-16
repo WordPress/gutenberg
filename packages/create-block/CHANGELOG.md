@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 4.80.0 (2025-12-23)
-
 ### Bug Fixes
 
 -   Fixed scaffolded `package.json` dependencies to include WordPress packages used in default templates. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))

@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react';
-import { expect, userEvent, waitFor, within } from '@storybook/test';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import clsx from 'clsx';
 
 /**
@@ -17,11 +17,18 @@ import { debounce } from '@wordpress/compose';
 import { ValidatedInputControl } from '..';
 import { formDecorator } from './story-utils';
 import type { ControlWithError } from '../../control-with-error';
+import Dropdown from '../../../dropdown';
+import { Button } from '../../../button';
+import Modal from '../../../modal';
+import { HStack } from '../../../h-stack';
+import { VStack } from '../../../v-stack';
 
 const meta: Meta< typeof ControlWithError > = {
 	title: 'Components/Selection & Input/Validated Form Controls/Overview',
 	id: 'components-validated-form-controls-overview',
-	decorators: formDecorator,
+	parameters: {
+		controls: { disable: true },
+	},
 };
 export default meta;
 
@@ -32,6 +39,7 @@ type Story = StoryObj< typeof ControlWithError >;
  * move focus to the first control with an error.
  */
 export const WithMultipleControls: Story = {
+	decorators: formDecorator,
 	render: function Template() {
 		const [ text, setText ] = useState< string | undefined >( '' );
 		const [ text2, setText2 ] = useState< string | undefined >( '' );
@@ -78,6 +86,7 @@ export const WithMultipleControls: Story = {
  * will depend on context.
  */
 export const WithHelpTextReplacement: Story = {
+	decorators: formDecorator,
 	render: function Template() {
 		const [ text, setText ] = useState< string | undefined >( '' );
 		const isInvalid = text?.toLowerCase() === 'error';
@@ -130,6 +139,7 @@ export const WithHelpTextReplacement: Story = {
  * They may be unnecessary when responses are generally quick.
  */
 export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
+	decorators: formDecorator,
 	render: function Template( { ...args } ) {
 		const [ text, setText ] = useState( '' );
 		const [ customValidity, setCustomValidity ] =
@@ -195,6 +205,7 @@ export const AsyncValidation: StoryObj< typeof ValidatedInputControl > = {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
 	...AsyncValidation,
+	decorators: formDecorator,
 	play: async ( { canvasElement } ) => {
 		const canvas = within( canvasElement );
 		await userEvent.click( canvas.getByRole( 'textbox' ) );
@@ -276,6 +287,7 @@ const AsyncValidationWithTest: StoryObj< typeof ValidatedInputControl > = {
  * even if the input has never been interacted with.
  */
 export const CustomErrorsOnSubmit: StoryObj< typeof ValidatedInputControl > = {
+	decorators: formDecorator,
 	args: {
 		label: 'Text',
 		required: true,
@@ -303,3 +315,205 @@ export const CustomErrorsOnSubmit: StoryObj< typeof ValidatedInputControl > = {
 		);
 	},
 };
+
+/**
+ * While it is recommended to rely on the built-in behavior for showing errors by
+ * using a `form` element and `type="submit"` button around validated fields,
+ * it is also possible to show errors at arbitrary times.
+ * This can be done by calling the [`reportValidity()` method](https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/reportValidity)
+ * on a ref of the field itself, or the wrapping `form` element.
+ */
+export const ShowingErrorsAtArbitraryTimes: StoryObj<
+	typeof ValidatedInputControl
+> = {
+	args: {
+		label: 'Text',
+		required: true,
+		help: 'The word "error" will trigger an error.',
+	},
+	decorators: [],
+	render: function Template( { ...args } ) {
+		const [ text, setText ] = useState< string | undefined >( 'error' );
+		const ref = useRef< HTMLInputElement >( null );
+
+		return (
+			<VStack spacing={ 4 } alignment="left">
+				<ValidatedInputControl
+					ref={ ref }
+					{ ...args }
+					value={ text }
+					onChange={ setText }
+					customValidity={
+						text === 'error'
+							? {
+									type: 'invalid',
+									message: 'The word "error" is not allowed.',
+							  }
+							: undefined
+					}
+				/>
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ () => ref.current?.reportValidity() }
+				>
+					Report validity
+				</Button>
+			</VStack>
+		);
+	},
+};
+
+/**
+ * A `form` wrapper and `type="submit"` button can be used to force validation when
+ * the user tries to commit their changes, while still allowing the modal to be closed by canceling.
+ * Optionally, the `shouldCloseOnClickOutside`, `isDismissible`, and `shouldCloseOnEsc` props
+ * on `Modal` can be disabled to force users to more explicitly signal whether they are trying to
+ * "submit close" or "cancel close" the dialog, as well as preventing data loss on accidental closures.
+ */
+export const ValidateInModal: StoryObj< typeof ValidatedInputControl > = {
+	render: function Template( { ...args } ) {
+		const [ isOpen, setIsOpen ] = useState( false );
+		const [ text, setText ] = useState< string | undefined >( '' );
+
+		return (
+			<>
+				<Button
+					variant="secondary"
+					__next40pxDefaultSize
+					onClick={ () => setIsOpen( true ) }
+				>
+					Open in modal
+				</Button>
+				{ isOpen && (
+					<Modal
+						title="Dialog title"
+						onRequestClose={ () => setIsOpen( false ) }
+						shouldCloseOnClickOutside={ false }
+						shouldCloseOnEsc={ false }
+						isDismissible={ false }
+					>
+						<form
+							onSubmit={ ( event ) => {
+								event.preventDefault();
+								setIsOpen( false );
+							} }
+						>
+							<VStack spacing={ 2 }>
+								<ValidatedInputControl
+									{ ...args }
+									value={ text }
+									onChange={ setText }
+									customValidity={
+										text === 'error'
+											? {
+													type: 'invalid',
+													message:
+														'The word "error" is not allowed.',
+											  }
+											: undefined
+									}
+								/>
+
+								<HStack justify="flex-end" spacing={ 2 }>
+									<Button
+										variant="tertiary"
+										__next40pxDefaultSize
+										onClick={ () => setIsOpen( false ) }
+									>
+										Cancel
+									</Button>
+									<Button
+										variant="primary"
+										__next40pxDefaultSize
+										type="submit"
+									>
+										Save
+									</Button>
+								</HStack>
+							</VStack>
+						</form>
+					</Modal>
+				) }
+			</>
+		);
+	},
+	args: {
+		label: 'Text',
+		required: true,
+		help: 'The word "error" will trigger an error.',
+	},
+};
+
+/**
+ * [Form methods](https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement#instance_methods) like
+ * `reportValidity()` can be used to validate the fields when a popover is about to be closed,
+ * and prevent the closing of the popover when invalid.
+ */
+export const ValidateOnPopoverClose: StoryObj< typeof ValidatedInputControl > =
+	{
+		render: function Template( { ...args } ) {
+			const [ isOpen, setIsOpen ] = useState( false );
+			const formRef = useRef< HTMLFormElement >( null );
+			const [ text, setText ] = useState< string | undefined >( '' );
+
+			return (
+				<Dropdown
+					popoverProps={ { placement: 'bottom-start' } }
+					open={ isOpen }
+					onToggle={ ( willOpen ) => {
+						if ( ! willOpen ) {
+							const isValid = formRef.current?.reportValidity();
+							setIsOpen( ! isValid );
+						} else {
+							setIsOpen( true );
+						}
+					} }
+					renderContent={ () => (
+						<form
+							ref={ formRef }
+							onSubmit={ ( event ) => {
+								event.preventDefault();
+								setIsOpen( false );
+							} }
+						>
+							<ValidatedInputControl
+								{ ...args }
+								value={ text }
+								onChange={ setText }
+								customValidity={
+									text === 'error'
+										? {
+												type: 'invalid',
+												message:
+													'The word "error" is not allowed.',
+										  }
+										: undefined
+								}
+							/>
+						</form>
+					) }
+					renderToggle={ () => {
+						return (
+							<Button
+								__next40pxDefaultSize
+								variant="secondary"
+								onClick={ () => setIsOpen( ! isOpen ) }
+								aria-expanded={ isOpen }
+							>
+								Open in popover
+							</Button>
+						);
+					} }
+				/>
+			);
+		},
+		args: {
+			label: 'Text',
+			help: 'The word "error" will trigger an error.',
+			required: true,
+			style: {
+				width: '200px',
+			},
+		},
+	};

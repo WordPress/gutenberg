@@ -22,7 +22,6 @@ export default function OverlayVisibilityControl( {
 	return (
 		<ToggleGroupControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label={ __( 'Overlay Visibility' ) }
 			aria-label={ __( 'Configure overlay visibility' ) }
 			value={ overlayMenu }

@@ -1,23 +1,10 @@
-/**
- * External dependencies
- */
-import type { Meta, StoryObj } from '@storybook/react';
-
-/**
- * WordPress dependencies
- */
-import '@wordpress/theme/design-tokens.css';
-
-/**
- * Internal dependencies
- */
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Stack } from '../index';
 import { Box } from '../../box';
 
 const meta: Meta< typeof Stack > = {
 	title: 'Design System/Components/Stack',
 	component: Stack,
-	tags: [ 'status-experimental' ],
 };
 export default meta;
 

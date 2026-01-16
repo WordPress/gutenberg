@@ -443,7 +443,6 @@ function LinkControl( {
 					>
 						{ showTextControl && (
 							<TextControl
-								__nextHasNoMarginBottom
 								ref={ textInputRef }
 								className="block-editor-link-control__field block-editor-link-control__text-content"
 								label={ __( 'Text' ) }

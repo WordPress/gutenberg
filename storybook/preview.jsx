@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import {
 	Controls,
 	Description,
@@ -8,18 +5,15 @@ import {
 	Stories,
 	Subtitle,
 	Title,
-} from '@storybook/blocks';
+} from '@storybook/addon-docs/blocks';
 
 /**
  * Internal dependencies
  */
 import { WithGlobalCSS } from './decorators/with-global-css';
-import { WithMarginChecker } from './decorators/with-margin-checker';
 import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
-import { WithTheme } from './decorators/with-theme';
 import { WithDesignSystemTheme } from './decorators/with-design-system-theme';
-import badgesConfig from './badges';
 
 export const globalTypes = {
 	direction: {
@@ -31,20 +25,6 @@ export const globalTypes = {
 			items: [
 				{ value: 'ltr', title: 'LTR' },
 				{ value: 'rtl', title: 'RTL' },
-			],
-		},
-	},
-	componentsTheme: {
-		name: 'Theme',
-		description: 'Change the components theme. (Work in progress)',
-		defaultValue: 'default',
-		toolbar: {
-			icon: 'paintbrush',
-			items: [
-				{ value: 'default', title: 'Default' },
-				{ value: 'darkBg', title: 'Dark (background)' },
-				{ value: 'lightGrayBg', title: 'Light gray (background)' },
-				{ value: 'classic', title: 'Classic (accent)' },
 			],
 		},
 	},
@@ -62,19 +42,6 @@ export const globalTypes = {
 					value: 'wordpress',
 					title: 'WordPress (common, forms, dashicons)',
 				},
-			],
-		},
-	},
-	marginChecker: {
-		name: 'Margin Checker',
-		description:
-			'Show a div before and after the component to check for unwanted margins.',
-		defaultValue: 'hide',
-		toolbar: {
-			icon: 'collapse',
-			items: [
-				{ value: 'hide', title: 'Hide' },
-				{ value: 'show', title: 'Show' },
 			],
 		},
 	},
@@ -98,18 +65,17 @@ export const globalTypes = {
 
 export const decorators = [
 	WithGlobalCSS,
-	WithMarginChecker,
 	WithRTL,
 	WithMaxWidthWrapper,
-	WithTheme,
 	WithDesignSystemTheme,
 ];
 
 export const parameters = {
-	// For @geometricpanda/storybook-addon-badges
-	badgesConfig,
 	controls: {
 		sort: 'requiredFirst',
+	},
+	backgrounds: {
+		disable: true,
 	},
 	docs: {
 		controls: {
@@ -165,10 +131,11 @@ export const parameters = {
 					'Typography',
 				],
 				'Icons',
+				'Design System',
+				[ 'Introduction', 'Theme', 'Components', [ 'Introduction' ] ],
 			],
 		},
 	},
-	sourceLinkPrefix: 'https://github.com/WordPress/gutenberg/blob/trunk/',
 };
 
 export const tags = [ 'autodocs' ];

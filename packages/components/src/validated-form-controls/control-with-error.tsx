@@ -36,7 +36,9 @@ function appendRequiredIndicator(
 	}
 	return label;
 }
+
 const VALIDITY_VISIBLE_ATTRIBUTE = 'data-validity-visible';
+const className = 'components-validated-control';
 
 /**
  * HTML elements that support the Constraint Validation API.
@@ -107,6 +109,53 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 
 		validityTarget?.addEventListener( 'invalid', handler );
 		return () => validityTarget?.removeEventListener( 'invalid', handler );
+	}, [ getValidityTarget ] );
+
+	// Suppress the native error popover, while keeping the focus behavior intact.
+	useEffect( () => {
+		const validityTarget = getValidityTarget();
+
+		const suppressNativePopover = ( event: Event ) => {
+			event.preventDefault();
+
+			const target = event.target as ValidityTarget;
+			const firstErrorInForm = Array.from(
+				target.form?.elements ?? []
+			).find( ( el ) => ! ( el as ValidityTarget ).validity.valid );
+
+			if ( ! target.form || firstErrorInForm === target ) {
+				target.focus();
+			}
+		};
+
+		// Radio inputs need special handling because all radio inputs with the
+		// same `name` will be marked as invalid. Without this handling, the last radio option
+		// will be focused with an unsuppressed native popover.
+		const radioSibilings =
+			validityTarget?.type === 'radio' && validityTarget?.name
+				? Array.from(
+						validityTarget
+							?.closest( `.${ className }` )
+							?.querySelectorAll< HTMLInputElement >(
+								`input[type="radio"][name="${ validityTarget?.name }"]`
+							) ?? []
+				  ).filter( ( sibling ) => sibling !== validityTarget )
+				: [];
+
+		validityTarget?.addEventListener( 'invalid', suppressNativePopover );
+		radioSibilings.forEach( ( sibling ) =>
+			sibling.addEventListener( 'invalid', suppressNativePopover )
+		);
+
+		return () => {
+			validityTarget?.removeEventListener(
+				'invalid',
+				suppressNativePopover
+			);
+			radioSibilings.forEach( ( sibling ) =>
+				sibling.removeEventListener( 'invalid', suppressNativePopover )
+			);
+		};
 	}, [ getValidityTarget ] );
 
 	// Handle validity messages.
@@ -207,11 +256,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 	};
 
 	return (
-		<div
-			className="components-validated-control"
-			ref={ forwardedRef }
-			onBlur={ onBlur }
-		>
+		<div className={ className } ref={ forwardedRef } onBlur={ onBlur }>
 			{ cloneElement( children, {
 				label: appendRequiredIndicator(
 					children.props.label,

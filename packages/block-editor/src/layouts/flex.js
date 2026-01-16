@@ -71,8 +71,11 @@ export default {
 		onChange,
 		layoutBlockSupport = {},
 	} ) {
-		const { allowOrientation = true, allowJustification = true } =
-			layoutBlockSupport;
+		const {
+			allowOrientation = true,
+			allowJustification = true,
+			allowWrap = true,
+		} = layoutBlockSupport;
 		return (
 			<>
 				<Flex>
@@ -93,7 +96,9 @@ export default {
 						</FlexItem>
 					) }
 				</Flex>
-				<FlexWrapControl layout={ layout } onChange={ onChange } />
+				{ allowWrap && (
+					<FlexWrapControl layout={ layout } onChange={ onChange } />
+				) }
 			</>
 		);
 	},
@@ -298,7 +303,6 @@ function FlexLayoutJustifyContentControl( {
 	return (
 		<ToggleGroupControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label={ __( 'Justification' ) }
 			value={ justifyContent }
 			onChange={ onJustificationChange }
@@ -322,7 +326,6 @@ function FlexWrapControl( { layout, onChange } ) {
 	const { flexWrap = 'wrap' } = layout;
 	return (
 		<ToggleControl
-			__nextHasNoMarginBottom
 			label={ __( 'Allow to wrap to multiple lines' ) }
 			onChange={ ( value ) => {
 				onChange( {
@@ -344,7 +347,6 @@ function OrientationControl( { layout, onChange } ) {
 	return (
 		<ToggleGroupControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			className="block-editor-hooks__flex-layout-orientation-controls"
 			label={ __( 'Orientation' ) }
 			value={ orientation }

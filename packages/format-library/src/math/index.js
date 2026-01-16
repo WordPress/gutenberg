@@ -90,7 +90,6 @@ function InlineUI( {
 			<div style={ { minWidth: '300px', padding: '4px' } }>
 				<VStack spacing={ 1 }>
 					<TextControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						hideLabelFromVision
 						label={ __( 'LaTeX math syntax' ) }

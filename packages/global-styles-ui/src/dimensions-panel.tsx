@@ -20,6 +20,7 @@ const DEFAULT_CONTROLS = {
 	padding: true,
 	margin: true,
 	blockGap: true,
+	height: true,
 	minHeight: true,
 	width: true,
 	childLayout: false,

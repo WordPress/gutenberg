@@ -53,7 +53,8 @@ const ANIMATION_DURATION = 0.3;
 
 function Layout() {
 	const { query, name: routeKey, areas, widths } = useLocation();
-	const { canvas = 'view' } = query;
+	// Force canvas to 'view' on notfound route to show the error message and allow navigation.
+	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
 	const navigateRegionsProps = useNavigateRegions();

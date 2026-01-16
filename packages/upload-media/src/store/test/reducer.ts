@@ -276,4 +276,135 @@ describe( 'reducer', () => {
 			} );
 		} );
 	} );
+
+	describe( `${ Type.PauseItem }`, () => {
+		it( 'pauses a specific item', () => {
+			const initialState: State = {
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+					} as QueueItem,
+					{
+						id: '2',
+						status: ItemStatus.Processing,
+					} as QueueItem,
+				],
+			};
+			const state = reducer( initialState, {
+				type: Type.PauseItem,
+				id: '2',
+			} );
+
+			expect( state.queue[ 0 ].status ).toBe( ItemStatus.Processing );
+			expect( state.queue[ 1 ].status ).toBe( ItemStatus.Paused );
+		} );
+	} );
+
+	describe( `${ Type.ResumeItem }`, () => {
+		it( 'resumes a paused item', () => {
+			const initialState: State = {
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Paused,
+					} as QueueItem,
+				],
+			};
+			const state = reducer( initialState, {
+				type: Type.ResumeItem,
+				id: '1',
+			} );
+
+			expect( state.queue[ 0 ].status ).toBe( ItemStatus.Processing );
+		} );
+	} );
+
+	describe( `${ Type.RetryItem }`, () => {
+		it( 'retries a failed item', () => {
+			const initialState: State = {
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						error: new Error( 'Upload failed' ),
+						retryCount: 0,
+					} as QueueItem,
+				],
+			};
+			const state = reducer( initialState, {
+				type: Type.RetryItem,
+				id: '1',
+			} );
+
+			expect( state.queue[ 0 ].status ).toBe( ItemStatus.Processing );
+			expect( state.queue[ 0 ].error ).toBeUndefined();
+			expect( state.queue[ 0 ].retryCount ).toBe( 1 );
+		} );
+
+		it( 'increments retry count on subsequent retries', () => {
+			const initialState: State = {
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						error: new Error( 'Upload failed' ),
+						retryCount: 2,
+					} as QueueItem,
+				],
+			};
+			const state = reducer( initialState, {
+				type: Type.RetryItem,
+				id: '1',
+			} );
+
+			expect( state.queue[ 0 ].retryCount ).toBe( 3 );
+		} );
+	} );
+
+	describe( `${ Type.UpdateProgress }`, () => {
+		it( 'updates the progress of an item', () => {
+			const initialState: State = {
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						progress: 0,
+					} as QueueItem,
+				],
+			};
+			const state = reducer( initialState, {
+				type: Type.UpdateProgress,
+				id: '1',
+				progress: 50,
+			} );
+
+			expect( state.queue[ 0 ].progress ).toBe( 50 );
+		} );
+	} );
 } );
