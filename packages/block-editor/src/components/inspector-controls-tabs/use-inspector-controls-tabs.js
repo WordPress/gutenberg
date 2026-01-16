@@ -107,7 +107,7 @@ export default function useInspectorControlsTabs(
 		( settingsFills.length ||
 			// Advanded fills who up in settings tab if available or they blend into the default tab, if there's only one tab.
 			( advancedFills.length && ( hasContentTab || hasListFills ) ) ) &&
-		! isSectionBlock
+		( ! isSectionBlock || blockName === 'core/template-part' )
 	) {
 		tabs.push( TAB_SETTINGS );
 	}

@@ -332,7 +332,6 @@ const BlockInspectorSingleBlock = ( {
 		renderedBlockClientId
 	);
 	const isBlockSynced = blockInformation.isSynced;
-	const shouldShowTabs = ! isBlockSynced && hasMultipleTabs;
 	const isSectionBlockSelected =
 		window?.__experimentalContentOnlyPatternInsertion &&
 		selectedBlockClientId === renderedBlockClientId;
@@ -358,17 +357,19 @@ const BlockInspectorSingleBlock = ( {
 				<EditContents clientId={ renderedBlockClientId } />
 			) }
 			<BlockVariationTransforms blockClientId={ renderedBlockClientId } />
-			{ shouldShowTabs && (
-				<InspectorControlsTabs
-					hasBlockStyles={ hasBlockStyles }
-					clientId={ renderedBlockClientId }
-					blockName={ blockName }
-					tabs={ availableTabs }
-					isSectionBlock={ isSectionBlock }
-					contentClientIds={ contentClientIds }
-				/>
+			{ hasMultipleTabs && (
+				<>
+					<InspectorControlsTabs
+						hasBlockStyles={ hasBlockStyles }
+						clientId={ renderedBlockClientId }
+						blockName={ blockName }
+						tabs={ availableTabs }
+						isSectionBlock={ isSectionBlock }
+						contentClientIds={ contentClientIds }
+					/>
+				</>
 			) }
-			{ ! shouldShowTabs && (
+			{ ! hasMultipleTabs && (
 				<>
 					{ hasBlockStyles && (
 						<BlockStyles clientId={ renderedBlockClientId } />
@@ -379,15 +380,6 @@ const BlockInspectorSingleBlock = ( {
 					{ ! isSectionBlock && (
 						<StyleInspectorSlots blockName={ blockName } />
 					) }
-					{ isSectionBlock &&
-						isBlockSynced &&
-						isSectionBlockSelected && (
-							<>
-								<InspectorControls.Slot />
-								{ /* Allow AdvancedControls so users can adjust local attributes (e.g. additional CSS classes, HTML element). */ }
-								<AdvancedControls />
-							</>
-						) }
 				</>
 			) }
 			<SkipToSelectedBlock key="back" />
