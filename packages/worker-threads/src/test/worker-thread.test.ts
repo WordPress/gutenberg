@@ -1,25 +1,36 @@
-// Store the original self
+// Store the original self.
 const originalSelf = globalThis.self;
 
-// Mock self for worker context
+// Mock self for worker context.
 let mockPostMessage: jest.Mock;
-let onMessageHandler: ( ( event: MessageEvent ) => void ) | null = null;
+let messageListeners: Array< ( event: MessageEvent ) => void > = [];
 
 function setupMockSelf() {
 	mockPostMessage = jest.fn();
+	messageListeners = [];
 
-	// Override self with onmessage setter pattern (matching worker-rpc usage)
+	// Override self with addEventListener pattern (matching comctx usage).
 	const mockSelf = {
 		postMessage: mockPostMessage,
-	};
-
-	Object.defineProperty( mockSelf, 'onmessage', {
-		get: () => onMessageHandler,
-		set: ( handler ) => {
-			onMessageHandler = handler;
+		addEventListener: (
+			type: string,
+			handler: ( event: MessageEvent ) => void
+		) => {
+			if ( type === 'message' ) {
+				messageListeners.push( handler );
+			}
 		},
-		configurable: true,
-	} );
+		removeEventListener: (
+			type: string,
+			handler: ( event: MessageEvent ) => void
+		) => {
+			if ( type === 'message' ) {
+				messageListeners = messageListeners.filter(
+					( h ) => h !== handler
+				);
+			}
+		},
+	};
 
 	Object.defineProperty( globalThis, 'self', {
 		value: mockSelf,
@@ -34,7 +45,7 @@ function restoreSelf() {
 		writable: true,
 		configurable: true,
 	} );
-	onMessageHandler = null;
+	messageListeners = [];
 }
 
 describe( 'worker-thread', () => {
@@ -48,14 +59,13 @@ describe( 'worker-thread', () => {
 	} );
 
 	describe( 'expose', () => {
-		it( 'should set up onmessage handler', async () => {
+		it( 'should set up message handler', async () => {
 			const { expose } = await import( '../worker-thread' );
 			const api = { method: jest.fn() };
 
 			expose( api );
 
-			expect( onMessageHandler ).toBeDefined();
-			expect( typeof onMessageHandler ).toBe( 'function' );
+			expect( messageListeners.length ).toBeGreaterThan( 0 );
 		} );
 
 		it( 'should register handlers for all methods on target', async () => {
@@ -68,7 +78,7 @@ describe( 'worker-thread', () => {
 				notAFunction: 'string value',
 			};
 
-			// expose() should complete without error
+			// expose() should complete without error.
 			expect( () => expose( api ) ).not.toThrow();
 		} );
 
@@ -81,7 +91,7 @@ describe( 'worker-thread', () => {
 				objectProp: { nested: true },
 			};
 
-			// Should not throw
+			// Should not throw.
 			expect( () => expose( api ) ).not.toThrow();
 		} );
 
@@ -89,7 +99,7 @@ describe( 'worker-thread', () => {
 			const { expose } = await import( '../worker-thread' );
 			const api = {};
 
-			// Should not throw
+			// Should not throw.
 			expect( () => expose( api ) ).not.toThrow();
 		} );
 
