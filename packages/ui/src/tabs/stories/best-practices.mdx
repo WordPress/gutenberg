@@ -1,7 +1,7 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import * as TabsStories from './stories/index.stories';
+import * as TabsStories from './index.story';
 
-<Meta of={ TabsStories } name="Best Practices" />
+<Meta of={ TabsStories } title="Best Practices" />
 
 # Tabs
 
@@ -16,7 +16,7 @@ import { Tabs } from '@automattic/design-system';
 
 const MyUncontrolledTabs = () => (
 	<Tabs.Root
-		onValueChange={ console.log( 'New selected tab: ', tabName ) }
+		onValueChange={ ( tab ) => console.log( 'New selected tab: ', tab ) }
 		defaultValue="tab2"
 	>
 		<Tabs.List>
