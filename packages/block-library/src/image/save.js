@@ -13,6 +13,7 @@ import {
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
 } from '@wordpress/block-editor';
+import { escapeAttribute } from '@wordpress/escape-html';
 
 /**
  * Internal dependencies
@@ -60,10 +61,13 @@ export default function save( { attributes } ) {
 		[ `wp-image-${ id }` ]: !! id,
 	} );
 
+	// ✅ FIX: Escape alt text to prevent malformed HTML for non-unfiltered users
+	const safeAlt = alt ? escapeAttribute( alt ) : undefined;
+
 	const image = (
 		<img
 			src={ url }
-			alt={ alt }
+			alt={ safeAlt }
 			className={ imageClasses || undefined }
 			style={ {
 				...borderProps.style,
