@@ -6,7 +6,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { serialize, parse, createBlock } from '@wordpress/blocks';
+import { serialize, createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -24,8 +24,11 @@ import { unlock } from '../../lock-unlock';
  */
 export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const getPatternBySlug = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).getPatternBySlug,
+	const pattern = useSelect(
+		( select ) =>
+			unlock( select( blockEditorStore ) ).getPatternBySlug(
+				'gutenberg/navigation-overlay'
+			),
 		[]
 	);
 
@@ -41,8 +44,6 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 		);
 		const cleanSlug = getCleanTemplatePartSlug( uniqueTitle );
 
-		// Get the navigation overlay pattern
-		const pattern = getPatternBySlug( 'gutenberg/navigation-overlay' );
 		let initialContent = '';
 
 		if ( pattern?.content ) {
@@ -66,7 +67,7 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 		);
 
 		return templatePart;
-	}, [ overlayTemplateParts, saveEntityRecord, getPatternBySlug ] );
+	}, [ overlayTemplateParts, saveEntityRecord, pattern ] );
 
 	return createOverlayTemplatePart;
 }
