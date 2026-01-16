@@ -9,6 +9,7 @@ jest.mock( '@wordpress/vips/worker', () => ( {
 	vipsCompressImage: jest.fn(),
 	vipsHasTransparency: jest.fn(),
 	vipsResizeImage: jest.fn(),
+	vipsRotateImage: jest.fn(),
 	vipsCancelOperations: jest.fn(),
 } ) );
 
@@ -27,6 +28,7 @@ import {
 	vipsCompressImage,
 	vipsHasTransparency,
 	vipsResizeImage,
+	vipsRotateImage,
 	vipsCancelOperations,
 } from '../utils/vips';
 
@@ -35,6 +37,7 @@ const mockConvertImageFormat = vipsWorker.vipsConvertImageFormat as jest.Mock;
 const mockCompressImage = vipsWorker.vipsCompressImage as jest.Mock;
 const mockHasTransparency = vipsWorker.vipsHasTransparency as jest.Mock;
 const mockResizeImage = vipsWorker.vipsResizeImage as jest.Mock;
+const mockRotateImage = vipsWorker.vipsRotateImage as jest.Mock;
 const mockCancelOperations = vipsWorker.vipsCancelOperations as jest.Mock;
 
 const jpegFile = new File( [ 'test-content' ], 'test.jpg', {
@@ -131,6 +134,7 @@ describe( 'vips utilities', () => {
 
 		beforeEach( () => {
 			mockFetch = jest.fn().mockResolvedValue( {
+				ok: true,
 				arrayBuffer: () => Promise.resolve( new ArrayBuffer( 0 ) ),
 			} as Response );
 			window.fetch = mockFetch;
@@ -184,9 +188,6 @@ describe( 'vips utilities', () => {
 			expect( result.height ).toBe( 150 );
 			expect( result.originalWidth ).toBe( 300 );
 			expect( result.originalHeight ).toBe( 300 );
-
-			// Debug logging is expected.
-			expect( console ).toHaveLogged();
 		} );
 
 		it( 'does not add suffix when dimensions unchanged', async () => {
@@ -208,9 +209,6 @@ describe( 'vips utilities', () => {
 			);
 
 			expect( result.name ).toBe( 'test.jpg' );
-
-			// Debug logging is expected.
-			expect( console ).toHaveLogged();
 		} );
 
 		it( 'does not add suffix when addSuffix is false', async () => {
@@ -232,9 +230,6 @@ describe( 'vips utilities', () => {
 			);
 
 			expect( result.name ).toBe( 'test.jpg' );
-
-			// Debug logging is expected.
-			expect( console ).toHaveLogged();
 		} );
 
 		it( 'passes smart crop parameter to worker', async () => {
@@ -258,9 +253,52 @@ describe( 'vips utilities', () => {
 			expect( mockResizeImage.mock.calls[ 0 ][ 2 ] ).toBe( 'image/jpeg' );
 			expect( mockResizeImage.mock.calls[ 0 ][ 3 ] ).toEqual( resize );
 			expect( mockResizeImage.mock.calls[ 0 ][ 4 ] ).toBe( true );
+		} );
+	} );
 
-			// Debug logging is expected.
-			expect( console ).toHaveLogged();
+	describe( 'vipsRotateImage', () => {
+		it( 'rotates image and returns ImageFile with -rotated suffix', async () => {
+			mockRotateImage.mockResolvedValue( {
+				buffer: new ArrayBuffer( 10 ),
+				width: 200,
+				height: 300,
+			} );
+
+			const result = await vipsRotateImage( 'item-1', jpegFile, 6 );
+
+			expect( result ).toBeInstanceOf( ImageFile );
+			expect( result.name ).toBe( 'test-rotated.jpg' );
+			expect( result.type ).toBe( 'image/jpeg' );
+			expect( result.width ).toBe( 200 );
+			expect( result.height ).toBe( 300 );
+
+			expect( mockRotateImage ).toHaveBeenCalledTimes( 1 );
+			expect( mockRotateImage.mock.calls[ 0 ][ 0 ] ).toBe( 'item-1' );
+			expect( mockRotateImage.mock.calls[ 0 ][ 2 ] ).toBe( 'image/jpeg' );
+			expect( mockRotateImage.mock.calls[ 0 ][ 3 ] ).toBe( 6 );
+		} );
+
+		it( 'returns original file when orientation is 1 (no rotation needed)', async () => {
+			const result = await vipsRotateImage( 'item-1', jpegFile, 1 );
+
+			expect( result ).toBe( jpegFile );
+			expect( mockRotateImage ).not.toHaveBeenCalled();
+		} );
+
+		it( 'handles different EXIF orientation values', async () => {
+			mockRotateImage.mockResolvedValue( {
+				buffer: new ArrayBuffer( 10 ),
+				width: 300,
+				height: 200,
+			} );
+
+			// Test orientation 3 (180° rotation)
+			await vipsRotateImage( 'item-1', jpegFile, 3 );
+			expect( mockRotateImage.mock.calls[ 0 ][ 3 ] ).toBe( 3 );
+
+			// Test orientation 8 (90° CCW rotation)
+			await vipsRotateImage( 'item-2', jpegFile, 8 );
+			expect( mockRotateImage.mock.calls[ 1 ][ 3 ] ).toBe( 8 );
 		} );
 	} );
 

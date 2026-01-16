@@ -17,7 +17,7 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 import { cloneFile, convertBlobToFile, renameFile } from '../utils';
 import { StubFile } from '../stub-file';
 import { UploadError } from '../upload-error';
-import { vipsResizeImage } from './utils';
+import { vipsResizeImage, vipsRotateImage } from './utils';
 import type {
 	AddAction,
 	AdditionalData,
@@ -61,6 +61,7 @@ type ActionCreators = {
 	uploadItem: typeof uploadItem;
 	sideloadItem: typeof sideloadItem;
 	resizeCropItem: typeof resizeCropItem;
+	rotateItem: typeof rotateItem;
 	generateThumbnails: typeof generateThumbnails;
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
@@ -388,6 +389,13 @@ export function processItem( id: QueueItemId ) {
 				dispatch.resizeCropItem(
 					item.id,
 					operationArgs as OperationArgs[ OperationType.ResizeCrop ]
+				);
+				break;
+
+			case OperationType.Rotate:
+				dispatch.rotateItem(
+					item.id,
+					operationArgs as OperationArgs[ OperationType.Rotate ]
 				);
 				break;
 
@@ -730,8 +738,73 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 	};
 }
 
+type RotateItemArgs = OperationArgs[ OperationType.Rotate ];
+
+/**
+ * Rotates an image based on EXIF orientation.
+ *
+ * This is used for images that need rotation but don't need resizing
+ * (i.e., smaller than the big image size threshold).
+ * Matches WordPress core's behavior of creating a '-rotated' version.
+ *
+ * @param id     Item ID.
+ * @param [args] Rotation arguments including EXIF orientation value.
+ */
+export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		// If no orientation provided or orientation is 1 (normal), skip rotation.
+		if ( ! args?.orientation || args.orientation === 1 ) {
+			dispatch.finishOperation( id, {
+				file: item.file,
+			} );
+			return;
+		}
+
+		try {
+			const file = await vipsRotateImage(
+				item.id,
+				item.file,
+				args.orientation,
+				item.abortController?.signal
+			);
+
+			const blobUrl = createBlobURL( file );
+			dispatch< CacheBlobUrlAction >( {
+				type: Type.CacheBlobUrl,
+				id,
+				blobUrl,
+			} );
+
+			dispatch.finishOperation( id, {
+				file,
+				attachment: {
+					url: blobUrl,
+				},
+			} );
+		} catch ( error ) {
+			dispatch.cancelItem(
+				id,
+				new UploadError( {
+					code: 'IMAGE_ROTATION_ERROR',
+					message: 'Image could not be rotated',
+					file: item.file,
+					cause: error instanceof Error ? error : undefined,
+				} )
+			);
+		}
+	};
+}
+
 /**
  * Adds thumbnail versions to the queue for sideloading.
+ *
+ * Also handles image rotation for images that need EXIF-based rotation
+ * but weren't scaled down (and thus weren't auto-rotated by vips).
  *
  * @param id Item ID.
  */
@@ -748,6 +821,48 @@ export function generateThumbnails( id: QueueItemId ) {
 		}
 		const attachment = item.attachment;
 
+		// Check if image needs rotation.
+		// If exif_orientation is not 1, the image needs rotation.
+		// Images that were scaled (bigImageSizeThreshold) are already rotated by vips.
+		const needsRotation =
+			attachment.exif_orientation &&
+			attachment.exif_orientation !== 1 &&
+			! item.file.name.includes( '-scaled' );
+
+		// If rotation is needed for a non-scaled image, sideload the rotated version.
+		// This matches WordPress core's behavior of creating a -rotated version.
+		if ( needsRotation && attachment.id ) {
+			try {
+				const rotatedFile = await vipsRotateImage(
+					item.id,
+					item.sourceFile,
+					attachment.exif_orientation,
+					item.abortController?.signal
+				);
+
+				// Sideload the rotated file as the "original" to set original_image metadata.
+				// The server will store this in $metadata['original_image'].
+				dispatch.addSideloadItem( {
+					file: rotatedFile,
+					batchId: uuidv4(),
+					parentId: item.id,
+					additionalData: {
+						post: attachment.id,
+						image_size: 'original',
+						convert_format: false,
+					},
+					operations: [ OperationType.Upload ],
+				} );
+			} catch {
+				// If rotation fails, continue with thumbnail generation.
+				// Thumbnails will still be rotated correctly by vips.
+				// eslint-disable-next-line no-console
+				console.warn(
+					'Failed to rotate image, continuing with thumbnails'
+				);
+			}
+		}
+
 		// Client-side thumbnail generation for images.
 		if (
 			! item.parentId &&
@@ -756,6 +871,7 @@ export function generateThumbnails( id: QueueItemId ) {
 		) {
 			// Use sourceFile for thumbnail generation to preserve quality.
 			// WordPress core generates thumbnails from the original (unscaled) image.
+			// Vips will auto-rotate based on EXIF orientation during thumbnail generation.
 			const file = attachment.media_filename
 				? renameFile( item.sourceFile, attachment.media_filename )
 				: item.sourceFile;
