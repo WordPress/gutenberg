@@ -7,6 +7,7 @@ import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
  * External dependencies
  */
 import type * as Y from 'yjs';
+import type { Awareness } from 'y-protocols/awareness';
 
 /**
  * Internal dependencies
@@ -55,12 +56,14 @@ export interface ProviderCreatorResult {
 export type ProviderCreator = (
 	objectType: ObjectType,
 	objectId: ObjectID,
-	ydoc: Y.Doc
+	ydoc: Y.Doc,
+	awareness?: Awareness
 ) => Promise< ProviderCreatorResult >;
 
 export interface RecordHandlers {
 	editRecord: ( data: Partial< ObjectData > ) => void;
 	getEditedRecord: () => Promise< ObjectData >;
+	refetchRecord: () => Promise< void >;
 	saveRecord: () => Promise< void >;
 }
 
@@ -88,13 +91,15 @@ export interface SyncManager {
 		record: ObjectData,
 		handlers: RecordHandlers
 	) => Promise< void >;
-	undoManager: SyncUndoManager;
+	// undoManager is undefined until the first entity is loaded.
+	undoManager: SyncUndoManager | undefined;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
 	update: (
 		objectType: ObjectType,
 		objectId: ObjectID,
 		changes: Partial< ObjectData >,
-		origin: string
+		origin: string,
+		isSave?: boolean
 	) => void;
 }
 

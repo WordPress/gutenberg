@@ -12,7 +12,6 @@ import { checkDeps, getLicenses } from '../packages/scripts/utils/license.js';
 
 const ignored = [
 	'@ampproject/remapping',
-	'webpack',
 	// Jest internals with Apache-2.0 license - only used for testing, not distributed.
 	'bser',
 	'fb-watchman',

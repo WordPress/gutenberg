@@ -218,6 +218,56 @@ describe( 'toVdom', () => {
 
 			console.warn = originalWarn;
 		} );
+
+		it( 'should convert boolean attribute "open" to true', () => {
+			const element = createElementFromHTML( '<details open></details>' );
+			expect( toVdom( element ) ).toMatchVNode(
+				h( 'details', { open: true }, [] )
+			);
+		} );
+
+		it( 'should convert boolean attribute "disabled" to true', () => {
+			const element = createElementFromHTML(
+				'<button disabled></button>'
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h( 'button', { disabled: true }, [] )
+			);
+		} );
+
+		it( 'should convert boolean attribute "checked" to true', () => {
+			const element = createElementFromHTML(
+				'<input type="checkbox" checked />'
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h( 'input', { type: 'checkbox', checked: true }, [] )
+			);
+		} );
+
+		it( 'should keep camelCase boolean attributes as empty strings', () => {
+			// readonly maps to readOnly property, so typeof element['readonly']
+			// is undefined, not boolean. This falls through to Preact's setAttribute.
+			const element = createElementFromHTML( '<input readonly />' );
+			expect( toVdom( element ) ).toMatchVNode(
+				h( 'input', { readonly: '' }, [] )
+			);
+		} );
+
+		it( 'should preserve non-boolean empty string attributes', () => {
+			const element = createElementFromHTML( '<input value="" />' );
+			expect( toVdom( element ) ).toMatchVNode(
+				h( 'input', { value: '' }, [] )
+			);
+		} );
+
+		it( 'should preserve non-empty attribute values unchanged', () => {
+			const element = createElementFromHTML(
+				'<input type="text" value="hello" />'
+			);
+			expect( toVdom( element ) ).toMatchVNode(
+				h( 'input', { type: 'text', value: 'hello' }, [] )
+			);
+		} );
 	} );
 
 	describe( 'Directive processing', () => {

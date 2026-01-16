@@ -72,7 +72,7 @@ function ListViewBlockSelectButton(
 		( select ) => {
 			const { getBlockName, getBlockAttributes } =
 				select( blockEditorStore );
-			const { isBlockHidden: _isBlockHidden } = unlock(
+			const { areBlocksHiddenAnywhere } = unlock(
 				select( blockEditorStore )
 			);
 			const blockAttributes = getBlockAttributes( clientId );
@@ -88,10 +88,8 @@ function ListViewBlockSelectButton(
 					'visibility',
 					true
 				),
-				isBlockHidden: _isBlockHidden( clientId ),
+				isBlockHidden: areBlocksHiddenAnywhere( [ clientId ] ),
 				hasPatternName: !! blockAttributes?.metadata?.patternName,
-				// Navigation link blocks have a `type` attribute (e.g., 'page', 'post', 'custom').
-				// These blocks don't support renaming via the block settings menu.
 				isNavigationLink: !! blockAttributes?.type,
 			};
 		},

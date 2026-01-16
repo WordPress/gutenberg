@@ -4,7 +4,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { to, serialize, sRGB, getAll } from 'colorjs.io/fn';
+import { to, sRGB, getAll } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
@@ -15,6 +15,7 @@ import {
 	buildBgRamp,
 	buildAccentRamp,
 } from '../../src/color-ramps/index';
+import { getColorString } from '../../src/color-ramps/lib/color-utils';
 
 const __filename = fileURLToPath( import.meta.url );
 const __dirname = path.dirname( __filename );
@@ -35,7 +36,7 @@ const transformColorStringToDTCGValue = ( color: string ) => {
 		colorSpace: 'srgb',
 		components: getAll( parsed, { precision: HEX_ROUNDING_PRECISION } ),
 		...( ( parsed.alpha ?? 1 ) < 1 ? { alpha: parsed.alpha } : undefined ),
-		hex: serialize( parsed, { format: 'hex' } ),
+		hex: getColorString( parsed ),
 	};
 };
 

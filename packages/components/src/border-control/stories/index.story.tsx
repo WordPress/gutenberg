@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
 
 /**
@@ -82,6 +82,7 @@ const Template: StoryFn< typeof BorderControl > = ( {
 
 	return (
 		<BorderControl
+			__next40pxDefaultSize
 			onChange={ onChangeMerged }
 			value={ border }
 			{ ...props }

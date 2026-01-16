@@ -4,6 +4,7 @@
 import { isBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
+	FocalPointPicker,
 	ResizableBox,
 	Spinner,
 	TextareaControl,
@@ -61,7 +62,7 @@ import {
 	SIZED_LAYOUTS,
 	DEFAULT_MEDIA_SIZE_SLUG,
 } from './constants';
-import { evalAspectRatio } from './utils';
+import { evalAspectRatio, mediaPosition } from './utils';
 
 const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
 
@@ -279,6 +280,7 @@ export default function Image( {
 		height,
 		aspectRatio,
 		scale,
+		focalPoint,
 		linkTarget,
 		sizeSlug,
 		lightbox,
@@ -302,16 +304,39 @@ export default function Image( {
 	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
 	const { allowResize = true } = context;
 
-	const image = useSelect(
-		( select ) =>
-			id && isSingleSelected
-				? select( coreStore ).getEntityRecord(
-						'postType',
-						'attachment',
-						id,
-						{ context: 'view' }
-				  )
-				: null,
+	const { image, canUserEdit } = useSelect(
+		( select ) => {
+			const imageRecord =
+				id && isSingleSelected
+					? select( coreStore ).getEntityRecord(
+							'postType',
+							'attachment',
+							id,
+							{ context: 'view' }
+					  )
+					: null;
+
+			// Check edit permissions. When the media editor experiment is enabled,
+			// use getEntityRecordPermissions which checks via canUser API.
+			// Only check when the image is selected to avoid unnecessary API requests.
+			let canEdit = false;
+			if ( id && isSingleSelected && window?.__experimentalMediaEditor ) {
+				const { getEntityRecordPermissions } = unlock(
+					select( coreStore )
+				);
+				const permissions = getEntityRecordPermissions(
+					'postType',
+					'attachment',
+					id
+				);
+				canEdit = permissions?.update || false;
+			}
+
+			return {
+				image: imageRecord,
+				canUserEdit: canEdit,
+			};
+		},
 		[ id, isSingleSelected ]
 	);
 
@@ -336,6 +361,7 @@ export default function Image( {
 		[ clientId ]
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
+	const onNavigateToEntityRecord = getSettings().onNavigateToEntityRecord;
 
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
@@ -467,6 +493,15 @@ export default function Image( {
 	function updateAlt( newAlt ) {
 		setAttributes( { alt: newAlt } );
 	}
+
+	const imperativeFocalPointPreview = ( value ) => {
+		if ( imageElement ) {
+			imageElement.style.setProperty(
+				'object-position',
+				mediaPosition( value )
+			);
+		}
+	};
 
 	function updateImage( newSizeSlug ) {
 		const newUrl = image?.media_details?.sizes?.[ newSizeSlug ]?.source_url;
@@ -713,8 +748,28 @@ export default function Image( {
 		);
 
 	const hasDataFormBlockFields =
-		window?.__experimentalContentOnlyPatternInsertion &&
 		window?.__experimentalContentOnlyInspectorFields;
+
+	const editMediaButton = window?.__experimentalMediaEditor &&
+		id &&
+		isSingleSelected &&
+		canUserEdit &&
+		! isExternalImage( id, url ) &&
+		! isEditingImage &&
+		onNavigateToEntityRecord && (
+			<BlockControls group="other">
+				<ToolbarButton
+					onClick={ () => {
+						onNavigateToEntityRecord( {
+							postId: id,
+							postType: 'attachment',
+						} );
+					} }
+				>
+					{ __( 'Edit media' ) }
+				</ToolbarButton>
+			</BlockControls>
+		);
 
 	const controls = (
 		<>
@@ -778,14 +833,14 @@ export default function Image( {
 					/>
 				</BlockControls>
 			) }
-			{ ! hasDataFormBlockFields && (
+			{ ! hasDataFormBlockFields && isSingleSelected && (
 				<InspectorControls group="content">
 					<ToolsPanel
 						label={ __( 'Media' ) }
 						resetAll={ () => onSelectImage( undefined ) }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
-						{ isSingleSelected && ! lockUrlControls && (
+						{ ! lockUrlControls && (
 							<ToolsPanelItem
 								label={ __( 'Image' ) }
 								hasValue={ () => !! url }
@@ -812,47 +867,45 @@ export default function Image( {
 								/>
 							</ToolsPanelItem>
 						) }
-						{ isSingleSelected && (
-							<ToolsPanelItem
+						<ToolsPanelItem
+							label={ __( 'Alternative text' ) }
+							isShownByDefault
+							hasValue={ () => !! alt }
+							onDeselect={ () =>
+								setAttributes( { alt: undefined } )
+							}
+						>
+							<TextareaControl
 								label={ __( 'Alternative text' ) }
-								isShownByDefault
-								hasValue={ () => !! alt }
-								onDeselect={ () =>
-									setAttributes( { alt: undefined } )
-								}
-							>
-								<TextareaControl
-									label={ __( 'Alternative text' ) }
-									value={ alt || '' }
-									onChange={ updateAlt }
-									readOnly={ lockAltControls }
-									help={
-										lockAltControls ? (
-											<>{ lockAltControlsMessage }</>
-										) : (
-											<>
-												<ExternalLink
-													href={
-														// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
-														__(
-															'https://www.w3.org/WAI/tutorials/images/decision-tree/'
-														)
-													}
-												>
-													{ __(
-														'Describe the purpose of the image.'
-													) }
-												</ExternalLink>
-												<br />
+								value={ alt || '' }
+								onChange={ updateAlt }
+								readOnly={ lockAltControls }
+								help={
+									lockAltControls ? (
+										<>{ lockAltControlsMessage }</>
+									) : (
+										<>
+											<ExternalLink
+												href={
+													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+													__(
+														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+													)
+												}
+											>
 												{ __(
-													'Leave empty if decorative.'
+													'Describe the purpose of the image.'
 												) }
-											</>
-										)
-									}
-								/>
-							</ToolsPanelItem>
-						) }
+											</ExternalLink>
+											<br />
+											{ __(
+												'Leave empty if decorative.'
+											) }
+										</>
+									)
+								}
+							/>
+						</ToolsPanelItem>
 					</ToolsPanel>
 				</InspectorControls>
 			) }
@@ -864,9 +917,36 @@ export default function Image( {
 					width: undefined,
 					height: undefined,
 					scale: undefined,
+					focalPoint: undefined,
 				} ) }
 			>
 				{ dimensionsControl }
+				{ url && scale && (
+					<ToolsPanelItem
+						label={ __( 'Focal point' ) }
+						isShownByDefault
+						hasValue={ () => !! focalPoint }
+						onDeselect={ () =>
+							setAttributes( {
+								focalPoint: undefined,
+							} )
+						}
+						panelId={ clientId }
+					>
+						<FocalPointPicker
+							label={ __( 'Focal point' ) }
+							url={ url }
+							value={ focalPoint }
+							onDragStart={ imperativeFocalPointPreview }
+							onDrag={ imperativeFocalPointPreview }
+							onChange={ ( newFocalPoint ) =>
+								setAttributes( {
+									focalPoint: newFocalPoint,
+								} )
+							}
+						/>
+					</ToolsPanelItem>
+				) }
 			</InspectorControls>
 			{ !! imageSizeOptions.length && (
 				<InspectorControls>
@@ -965,6 +1045,10 @@ export default function Image( {
 							  }
 							: { width, height } ),
 						objectFit: scale,
+						objectPosition:
+							focalPoint && scale
+								? mediaPosition( focalPoint )
+								: undefined,
 						...borderProps.style,
 						...shadowProps.style,
 					} }
@@ -1160,6 +1244,7 @@ export default function Image( {
 
 	return (
 		<>
+			{ editMediaButton }
 			{ mediaReplaceFlow }
 			{ controls }
 			{ featuredImageControl }
