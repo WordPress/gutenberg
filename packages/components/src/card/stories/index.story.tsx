@@ -66,7 +66,9 @@ export const Default: StoryObj< typeof Card > = {
 				</CardMedia>
 				<CardFooter>
 					<Text>CardFooter</Text>
-					<Button variant="secondary">Action Button</Button>
+					<Button __next40pxDefaultSize variant="secondary">
+						Action Button
+					</Button>
 				</CardFooter>
 			</>
 		),

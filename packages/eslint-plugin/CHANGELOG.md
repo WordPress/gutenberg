@@ -11,6 +11,8 @@
 
 -   Added [`no-setting-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-setting-ds-tokens.md) rule to disallow setting Design System token CSS custom properties (`--wpds-*`). ([#74325](https://github.com/WordPress/gutenberg/pull/74325))
 -   Added [`no-unknown-ds-tokens`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/no-unknown-ds-tokens.md) rule to disallow unknown Design System tokens. ([#74325](https://github.com/WordPress/gutenberg/pull/74325))
+-   Added [`components-no-missing-40px-size-prop`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/components-no-missing-40px-size-prop.md) rule to opt-in to the new 40px default size for components from the `@wordpress/components` package. ([#74611](https://github.com/WordPress/gutenberg/pull/74611))
+-   Added [`components-no-unsafe-button-disabled`](https://github.com/WordPress/gutenberg/blob/HEAD/packages/eslint-plugin/docs/rules/components-no-unsafe-button-disabled.md) rule to ensure that buttons from the `@wordpress/components` package are accessible when disabled. ([#74611](https://github.com/WordPress/gutenberg/pull/74611))
 
 ### Enhancements
 

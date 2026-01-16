@@ -666,7 +666,10 @@ export const InsideModal: StoryObj< typeof Menu > = {
 								</Menu>
 							</Menu.Popover>
 						</Menu>
-						<Button onClick={ () => setModalOpen( false ) }>
+						<Button
+							__next40pxDefaultSize
+							onClick={ () => setModalOpen( false ) }
+						>
 							Close modal
 						</Button>
 					</Modal>

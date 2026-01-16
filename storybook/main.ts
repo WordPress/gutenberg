@@ -1,10 +1,17 @@
-import { mergeConfig, transformWithEsbuild } from 'vite';
+import { type InlineConfig, mergeConfig, transformWithEsbuild } from 'vite';
 import react from '@vitejs/plugin-react';
 import type { StorybookConfig } from '@storybook/react-vite';
 
+const { NODE_ENV = 'development' } = process.env;
+
 const stories = [
-	process.env.NODE_ENV !== 'test' ? './stories/**/*.story.@(jsx|tsx)' : '',
-	process.env.NODE_ENV !== 'test' ? './stories/**/*.mdx' : '',
+	// Smoke tests ensure that the stories are rendered without any errors, but
+	// we don't need to test everything:
+	// - `.mdx` documentation is generally plain text and unlikely to break.
+	// - Playground stories are complex renderings of many components, which is
+	//   both slow and redundant with individual component stories.
+	NODE_ENV === 'test' ? '' : './stories/playground/**/*.story.@(jsx|tsx)',
+	NODE_ENV === 'test' ? '' : './stories/**/*.mdx',
 	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
@@ -36,7 +43,9 @@ export default {
 		import.meta.resolve( './addons/design-system-theme/preset.ts' ),
 	],
 	framework: '@storybook/react-vite',
-	docs: {},
+	features: {
+		experimentalComponentsManifest: NODE_ENV === 'production',
+	},
 	typescript: {
 		reactDocgen: 'react-docgen-typescript',
 		// Should match defaults in Storybook except for the propFilter.
@@ -81,10 +90,13 @@ export default {
 					},
 				},
 			],
+			build: {
+				minify: NODE_ENV === 'production',
+			},
 			define: {
 				// Ensures that `@wordpress/warning` can properly detect dev mode.
 				'globalThis.SCRIPT_DEBUG': JSON.stringify(
-					process.env.NODE_ENV === 'development'
+					NODE_ENV === 'development'
 				),
 			},
 			optimizeDeps: {
@@ -94,6 +106,6 @@ export default {
 					},
 				},
 			},
-		} );
+		} satisfies InlineConfig );
 	},
 } satisfies StorybookConfig;
