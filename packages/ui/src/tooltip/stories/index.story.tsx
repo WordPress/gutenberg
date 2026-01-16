@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { Button, Tooltip } from '../..';
+import { Tooltip } from '../..';
 
 const meta: Meta< typeof Tooltip.Root > = {
 	title: 'Design System/Components/Tooltip',
@@ -51,22 +51,22 @@ export const Positioning: StoryObj< typeof Tooltip.Root > = {
 			} }
 		>
 			<Tooltip.Root>
-				<Tooltip.Trigger render={ <Button>Top</Button> } />
+				<Tooltip.Trigger>Top</Tooltip.Trigger>
 				<Tooltip.Popup side="top">Tooltip on top</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
-				<Tooltip.Trigger render={ <Button>Right</Button> } />
+				<Tooltip.Trigger>Right</Tooltip.Trigger>
 				<Tooltip.Popup side="right">Tooltip on right</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
-				<Tooltip.Trigger render={ <Button>Bottom</Button> } />
+				<Tooltip.Trigger>Bottom</Tooltip.Trigger>
 				<Tooltip.Popup side="bottom">Tooltip on bottom</Tooltip.Popup>
 			</Tooltip.Root>
 
 			<Tooltip.Root>
-				<Tooltip.Trigger render={ <Button>Left</Button> } />
+				<Tooltip.Trigger>Left</Tooltip.Trigger>
 				<Tooltip.Popup side="left">Tooltip on left</Tooltip.Popup>
 			</Tooltip.Root>
 		</div>
@@ -83,30 +83,15 @@ export const WithProvider: StoryObj< typeof Tooltip.Root > = {
 		<Tooltip.Provider delay={ 0 }>
 			<div style={ { display: 'flex', gap: '1rem' } }>
 				<Tooltip.Root>
-					<Tooltip.Trigger render={ <Button>First</Button> } />
+					<Tooltip.Trigger>First</Tooltip.Trigger>
 					<Tooltip.Popup>First tooltip</Tooltip.Popup>
 				</Tooltip.Root>
 
 				<Tooltip.Root>
-					<Tooltip.Trigger render={ <Button>Second</Button> } />
+					<Tooltip.Trigger>Second</Tooltip.Trigger>
 					<Tooltip.Popup>Second tooltip</Tooltip.Popup>
 				</Tooltip.Root>
 			</div>
 		</Tooltip.Provider>
-	),
-};
-
-/**
- * Tooltips work seamlessly with Button components using the `render` prop
- * on the trigger.
- */
-export const WithButton: StoryObj< typeof Tooltip.Root > = {
-	render: () => (
-		<Tooltip.Root>
-			<Tooltip.Trigger
-				render={ <Button variant="outline">Hover this button</Button> }
-			/>
-			<Tooltip.Popup>This is a tooltip for the button</Tooltip.Popup>
-		</Tooltip.Root>
 	),
 };
