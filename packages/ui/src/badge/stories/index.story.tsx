@@ -1,11 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Fragment } from '@wordpress/element';
 import { Badge } from '../index';
 
 const meta: Meta< typeof Badge > = {
 	title: 'Design System/Components/Badge',
 	component: Badge,
-	tags: [ 'status-experimental' ],
 };
 export default meta;
 
@@ -82,7 +81,6 @@ export const AllIntents: Story = {
 				gridTemplateColumns: 'max-content min-content',
 				gap: '1rem',
 				color: 'var(--wpds-color-fg-content-neutral)',
-				backgroundColor: 'var(--wpds-color-bg-surface-neutral-strong)',
 			} }
 		>
 			{ (

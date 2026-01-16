@@ -6,7 +6,7 @@ import type { ReactNode, Ref, PropsWithoutRef, RefAttributes } from 'react';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { arrowLeft, arrowRight, unseen, funnel } from '@wordpress/icons';
 import {
 	Button,
@@ -113,6 +113,8 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 	const canInsert =
 		( canInsertLeft || canInsertRight ) && !! hiddenFields.length;
 
+	const isRtl = isRTL();
+
 	return (
 		<Menu>
 			<Menu.TriggerButton
@@ -208,21 +210,29 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 							{ canMove && (
 								<Menu.Item
 									prefix={ <Icon icon={ arrowLeft } /> }
-									disabled={ index < 1 }
+									disabled={
+										isRtl
+											? index >=
+											  visibleFieldIds.length - 1
+											: index < 1
+									}
 									onClick={ () => {
+										// In RTL, moving left visually means moving right in the array
+										const targetIndex = isRtl
+											? index + 1
+											: index - 1;
+										const newFields = [
+											...visibleFieldIds,
+										];
+										newFields.splice( index, 1 );
+										newFields.splice(
+											targetIndex,
+											0,
+											fieldId
+										);
 										onChangeView( {
 											...view,
-											fields: [
-												...( visibleFieldIds.slice(
-													0,
-													index - 1
-												) ?? [] ),
-												fieldId,
-												visibleFieldIds[ index - 1 ],
-												...visibleFieldIds.slice(
-													index + 1
-												),
-											],
+											fields: newFields,
 										} );
 									} }
 								>
@@ -235,22 +245,28 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 								<Menu.Item
 									prefix={ <Icon icon={ arrowRight } /> }
 									disabled={
-										index >= visibleFieldIds.length - 1
+										isRtl
+											? index < 1
+											: index >=
+											  visibleFieldIds.length - 1
 									}
 									onClick={ () => {
+										// In RTL, moving right visually means moving left in the array
+										const targetIndex = isRtl
+											? index - 1
+											: index + 1;
+										const newFields = [
+											...visibleFieldIds,
+										];
+										newFields.splice( index, 1 );
+										newFields.splice(
+											targetIndex,
+											0,
+											fieldId
+										);
 										onChangeView( {
 											...view,
-											fields: [
-												...( visibleFieldIds.slice(
-													0,
-													index
-												) ?? [] ),
-												visibleFieldIds[ index + 1 ],
-												fieldId,
-												...visibleFieldIds.slice(
-													index + 2
-												),
-											],
+											fields: newFields,
 										} );
 									} }
 								>

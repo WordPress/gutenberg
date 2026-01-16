@@ -5,6 +5,7 @@ import { useCallback } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { serialize, createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -41,6 +42,7 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 			{
 				slug: cleanSlug,
 				title: uniqueTitle,
+				content: serialize( [ createBlock( 'core/paragraph' ) ] ),
 				area: NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 			},
 			{ throwOnError: true }

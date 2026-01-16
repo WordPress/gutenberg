@@ -106,6 +106,7 @@ function BlockListBlock( {
 	const {
 		mayDisplayControls,
 		mayDisplayParentControls,
+		isSelectionWithinCurrentSection,
 		themeSupportsLayout,
 		...context
 	} = useContext( PrivateBlockContext );
@@ -135,6 +136,7 @@ function BlockListBlock( {
 			}
 			mayDisplayControls={ mayDisplayControls }
 			mayDisplayParentControls={ mayDisplayParentControls }
+			mayDisplayPatternEditingControls={ isSelectionWithinCurrentSection }
 			blockEditingMode={ context.blockEditingMode }
 			isPreviewMode={ context.isPreviewMode }
 		/>
@@ -231,6 +233,7 @@ function BlockListBlock( {
 			value={ {
 				wrapperProps: updatedWrapperProps,
 				isAligned,
+				isSelectionWithinCurrentSection,
 				...context,
 			} }
 		>
