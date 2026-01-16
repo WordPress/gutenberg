@@ -45,8 +45,11 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@types/diff": "7.0.2",
+		"@types/simple-peer": "^9.11.5",
+		"@wordpress/data": "file:../data",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/undo-manager": "file:../undo-manager",
+		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/url": "file:../url",
 		"diff": "4.0.2",
 		"fast-deep-equal": "3.1.3",

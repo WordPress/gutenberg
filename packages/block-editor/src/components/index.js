@@ -107,6 +107,7 @@ export {
 	isValueSpacingPreset,
 	getCustomValueFromPreset,
 } from './spacing-sizes-control/utils';
+export { SyncConnectionModal } from './sync-connection-modal';
 /*
  * Content Related Components
  */
