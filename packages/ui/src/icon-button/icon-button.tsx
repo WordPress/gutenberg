@@ -15,7 +15,6 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 		{
 			label,
 			className,
-			// @ts-expect-error Destructure to prevent unintended children from overwriting the icon
 			children: _children,
 			icon,
 			size,
