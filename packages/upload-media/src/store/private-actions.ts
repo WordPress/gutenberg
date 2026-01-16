@@ -247,7 +247,10 @@ export function processItem( id: QueueItemId ) {
 			return;
 		}
 
-		const item = select.getItem( id ) as QueueItem;
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
 
 		const {
 			attachment,
@@ -520,7 +523,10 @@ export function finishOperation(
  */
 export function prepareItem( id: QueueItemId ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getItem( id ) as QueueItem;
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
 		const { file } = item;
 
 		const operations: Operation[] = [];
@@ -554,7 +560,10 @@ export function prepareItem( id: QueueItemId ) {
  */
 export function uploadItem( id: QueueItemId ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getItem( id ) as QueueItem;
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
 
 		select.getSettings().mediaUpload( {
 			filesList: [ item.file ],
@@ -586,7 +595,10 @@ export function uploadItem( id: QueueItemId ) {
  */
 export function sideloadItem( id: QueueItemId ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getItem( id ) as QueueItem;
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
 
 		const { post, ...additionalData } =
 			item.additionalData as SideloadAdditionalData;
