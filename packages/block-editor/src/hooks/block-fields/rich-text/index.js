@@ -33,10 +33,6 @@ export default function RichTextControl( {
 	const attrValue = field.getValue( { item: data } );
 	const fieldConfig = field.config || {};
 	const { clientId } = config;
-	const updateAttributes = ( html ) => {
-		const mappedChanges = field.setValue( { item: data, value: html } );
-		onChange( mappedChanges );
-	};
 	const [ selection, setSelection ] = useState( {
 		start: undefined,
 		end: undefined,
@@ -107,7 +103,7 @@ export default function RichTextControl( {
 	} = useRichText( {
 		value: attrValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
-			updateAttributes( html );
+			onChange( field.setValue( { item: data, value: html } ) );
 			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
 				changeHandler( __unstableFormats, __unstableText );
 			} );

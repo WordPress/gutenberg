@@ -72,32 +72,45 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'image',
 			label: __( 'Image' ),
 			type: 'media',
-			mapping: {
-				id: 'id',
-				url: 'url',
-				caption: 'caption',
-				alt: 'alt',
-			},
-			args: {
+			Edit: {
+				control: 'media', // TODO: replace with custom component
 				allowedTypes: [ 'image' ],
 				multiple: false,
 			},
+			getValue: ( { item } ) => ( {
+				id: item.id,
+				url: item.url,
+				alt: item.alt,
+				caption: item.caption,
+			} ),
+			setValue: ( { value } ) => ( {
+				id: value.id,
+				url: value.url,
+				alt: value.alt,
+				caption: value.caption,
+			} ),
 		},
 		{
 			id: 'link',
 			label: __( 'Link' ),
-			type: 'link',
-			mapping: {
-				url: 'href',
-				rel: 'rel',
-				linkTarget: 'linkTarget',
-				destination: 'linkDestination',
-			},
+			type: 'url',
+			Edit: 'link', // TODO: replace with custom component
+			getValue: ( { item } ) => ( {
+				url: item.href,
+				rel: item.rel,
+				linkTarget: item.linkTarget,
+			} ),
+			setValue: ( { value } ) => ( {
+				href: value.url,
+				rel: value.rel,
+				linkTarget: value.linkTarget,
+			} ),
 		},
 		{
 			id: 'caption',
 			label: __( 'Caption' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 		{
 			id: 'alt',
