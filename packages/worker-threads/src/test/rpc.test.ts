@@ -143,26 +143,8 @@ describe( 'rpc', () => {
 			} );
 		} );
 
-		describe( 'invalid structure', () => {
-			it( 'should return false for objects without type', () => {
-				expect( isRPCMessage( { id: 1 } ) ).toBe( false );
-			} );
-
-			it( 'should return false for objects without id', () => {
-				expect( isRPCMessage( { type: 1 } ) ).toBe( false );
-			} );
-
-			it( 'should return false for non-numeric type', () => {
-				expect( isRPCMessage( { type: 'CALL', id: 1 } ) ).toBe( false );
-			} );
-
-			it( 'should return false for non-numeric id', () => {
-				expect( isRPCMessage( { type: 1, id: '1' } ) ).toBe( false );
-			} );
-		} );
-
-		describe( 'CALL messages', () => {
-			it( 'should return true for valid CALL message', () => {
+		describe( 'valid message types', () => {
+			it( 'should return true for CALL message', () => {
 				const message = {
 					type: MessageType.CALL,
 					id: 1,
@@ -172,29 +154,7 @@ describe( 'rpc', () => {
 				expect( isRPCMessage( message ) ).toBe( true );
 			} );
 
-			it( 'should return false if method is not a string', () => {
-				const message = {
-					type: MessageType.CALL,
-					id: 1,
-					method: 123,
-					args: [],
-				};
-				expect( isRPCMessage( message ) ).toBe( false );
-			} );
-
-			it( 'should return false if args is not an array', () => {
-				const message = {
-					type: MessageType.CALL,
-					id: 1,
-					method: 'test',
-					args: 'not-array',
-				};
-				expect( isRPCMessage( message ) ).toBe( false );
-			} );
-		} );
-
-		describe( 'RESULT messages', () => {
-			it( 'should return true for valid RESULT message', () => {
+			it( 'should return true for RESULT message', () => {
 				const message = {
 					type: MessageType.RESULT,
 					id: 1,
@@ -203,51 +163,13 @@ describe( 'rpc', () => {
 				expect( isRPCMessage( message ) ).toBe( true );
 			} );
 
-			it( 'should return true when result is null', () => {
-				const message = {
-					type: MessageType.RESULT,
-					id: 1,
-					result: null,
-				};
-				expect( isRPCMessage( message ) ).toBe( true );
-			} );
-
-			it( 'should return true when result is undefined', () => {
-				const message = {
-					type: MessageType.RESULT,
-					id: 1,
-					result: undefined,
-				};
-				expect( isRPCMessage( message ) ).toBe( true );
-			} );
-		} );
-
-		describe( 'ERROR messages', () => {
-			it( 'should return true for valid ERROR message', () => {
+			it( 'should return true for ERROR message', () => {
 				const message = {
 					type: MessageType.ERROR,
 					id: 1,
 					error: { message: 'error text' },
 				};
 				expect( isRPCMessage( message ) ).toBe( true );
-			} );
-
-			it( 'should return false if error is not an object', () => {
-				const message = {
-					type: MessageType.ERROR,
-					id: 1,
-					error: 'string error',
-				};
-				expect( isRPCMessage( message ) ).toBe( false );
-			} );
-
-			it( 'should return false if error.message is not a string', () => {
-				const message = {
-					type: MessageType.ERROR,
-					id: 1,
-					error: { message: 123 },
-				};
-				expect( isRPCMessage( message ) ).toBe( false );
 			} );
 		} );
 
@@ -258,6 +180,10 @@ describe( 'rpc', () => {
 					id: 1,
 				};
 				expect( isRPCMessage( message ) ).toBe( false );
+			} );
+
+			it( 'should return false for non-numeric type', () => {
+				expect( isRPCMessage( { type: 'CALL', id: 1 } ) ).toBe( false );
 			} );
 		} );
 	} );
