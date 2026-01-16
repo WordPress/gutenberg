@@ -5,7 +5,7 @@ import { findTransferables } from '../transferables';
 
 describe( 'transferables', () => {
 	describe( 'findTransferables', () => {
-		describe( 'non-message values', () => {
+		describe( 'non-array values', () => {
 			it( 'should return empty array for null', () => {
 				expect( findTransferables( null ) ).toEqual( [] );
 			} );
@@ -20,157 +20,56 @@ describe( 'transferables', () => {
 				expect( findTransferables( true ) ).toEqual( [] );
 			} );
 
-			it( 'should return empty array for empty objects', () => {
+			it( 'should return empty array for objects', () => {
 				expect( findTransferables( {} ) ).toEqual( [] );
 			} );
 		} );
 
-		describe( 'CALL messages with args', () => {
-			it( 'should find ArrayBuffer in args', () => {
+		describe( 'arrays with transferables', () => {
+			it( 'should find ArrayBuffer in array', () => {
 				const buffer = new ArrayBuffer( 8 );
-				const message = {
-					type: 1,
-					id: 1,
-					method: 'test',
-					args: [ buffer ],
-				};
-
-				const result = findTransferables( message );
+				const result = findTransferables( [ buffer ] );
 
 				expect( result ).toHaveLength( 1 );
 				expect( result[ 0 ] ).toBe( buffer );
 			} );
 
-			it( 'should find TypedArray buffer in args', () => {
+			it( 'should find TypedArray buffer in array', () => {
 				const typedArray = new Uint8Array( [ 1, 2, 3, 4 ] );
-				const message = {
-					type: 1,
-					id: 1,
-					method: 'test',
-					args: [ typedArray ],
-				};
-
-				const result = findTransferables( message );
+				const result = findTransferables( [ typedArray ] );
 
 				expect( result ).toHaveLength( 1 );
 				expect( result[ 0 ] ).toBe( typedArray.buffer );
 			} );
 
-			it( 'should find multiple transferables in args', () => {
+			it( 'should find multiple transferables in array', () => {
 				const buffer1 = new ArrayBuffer( 8 );
 				const buffer2 = new ArrayBuffer( 16 );
-				const message = {
-					type: 1,
-					id: 1,
-					method: 'test',
-					args: [ buffer1, 'string', buffer2 ],
-				};
-
-				const result = findTransferables( message );
+				const result = findTransferables( [
+					buffer1,
+					'string',
+					buffer2,
+				] );
 
 				expect( result ).toHaveLength( 2 );
 				expect( result ).toContain( buffer1 );
 				expect( result ).toContain( buffer2 );
 			} );
 
-			it( 'should not duplicate same buffer in args', () => {
+			it( 'should not duplicate same buffer in array', () => {
 				const buffer = new ArrayBuffer( 8 );
-				const message = {
-					type: 1,
-					id: 1,
-					method: 'test',
-					args: [ buffer, buffer ],
-				};
-
-				const result = findTransferables( message );
+				const result = findTransferables( [ buffer, buffer ] );
 
 				expect( result ).toHaveLength( 1 );
 			} );
 
-			it( 'should handle empty args array', () => {
-				const message = {
-					type: 1,
-					id: 1,
-					method: 'test',
-					args: [],
-				};
-
-				expect( findTransferables( message ) ).toEqual( [] );
+			it( 'should handle empty array', () => {
+				expect( findTransferables( [] ) ).toEqual( [] );
 			} );
 
-			it( 'should not find nested transferables in args', () => {
+			it( 'should not find nested transferables', () => {
 				const buffer = new ArrayBuffer( 8 );
-				const message = {
-					type: 1,
-					id: 1,
-					method: 'test',
-					args: [ { nested: buffer } ],
-				};
-
-				const result = findTransferables( message );
-
-				expect( result ).toHaveLength( 0 );
-			} );
-		} );
-
-		describe( 'RESULT messages with result', () => {
-			it( 'should find ArrayBuffer in result', () => {
-				const buffer = new ArrayBuffer( 8 );
-				const message = {
-					type: 2,
-					id: 1,
-					result: buffer,
-				};
-
-				const result = findTransferables( message );
-
-				expect( result ).toHaveLength( 1 );
-				expect( result[ 0 ] ).toBe( buffer );
-			} );
-
-			it( 'should find TypedArray buffer in result', () => {
-				const typedArray = new Uint8Array( 8 );
-				const message = {
-					type: 2,
-					id: 1,
-					result: typedArray,
-				};
-
-				const result = findTransferables( message );
-
-				expect( result ).toHaveLength( 1 );
-				expect( result[ 0 ] ).toBe( typedArray.buffer );
-			} );
-
-			it( 'should handle null result', () => {
-				const message = {
-					type: 2,
-					id: 1,
-					result: null,
-				};
-
-				expect( findTransferables( message ) ).toEqual( [] );
-			} );
-
-			it( 'should handle undefined result', () => {
-				const message = {
-					type: 2,
-					id: 1,
-					result: undefined,
-				};
-
-				expect( findTransferables( message ) ).toEqual( [] );
-			} );
-
-			it( 'should not find nested transferables in result', () => {
-				const buffer = new ArrayBuffer( 8 );
-				const message = {
-					type: 2,
-					id: 1,
-					result: { data: buffer },
-				};
-
-				const result = findTransferables( message );
+				const result = findTransferables( [ { nested: buffer } ] );
 
 				expect( result ).toHaveLength( 0 );
 			} );
@@ -179,9 +78,7 @@ describe( 'transferables', () => {
 		describe( 'TypedArray varieties', () => {
 			it( 'should extract buffer from Int32Array', () => {
 				const typedArray = new Int32Array( 4 );
-				const message = { args: [ typedArray ] };
-
-				const result = findTransferables( message );
+				const result = findTransferables( [ typedArray ] );
 
 				expect( result ).toHaveLength( 1 );
 				expect( result[ 0 ] ).toBe( typedArray.buffer );
@@ -189,9 +86,7 @@ describe( 'transferables', () => {
 
 			it( 'should extract buffer from Float64Array', () => {
 				const typedArray = new Float64Array( 2 );
-				const message = { args: [ typedArray ] };
-
-				const result = findTransferables( message );
+				const result = findTransferables( [ typedArray ] );
 
 				expect( result ).toHaveLength( 1 );
 				expect( result[ 0 ] ).toBe( typedArray.buffer );
@@ -201,9 +96,7 @@ describe( 'transferables', () => {
 				const buffer = new ArrayBuffer( 16 );
 				const view1 = new Uint8Array( buffer, 0, 8 );
 				const view2 = new Uint8Array( buffer, 8, 8 );
-				const message = { args: [ view1, view2 ] };
-
-				const result = findTransferables( message );
+				const result = findTransferables( [ view1, view2 ] );
 
 				expect( result ).toHaveLength( 1 );
 				expect( result[ 0 ] ).toBe( buffer );
