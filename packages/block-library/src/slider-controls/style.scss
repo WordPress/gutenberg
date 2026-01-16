@@ -1,0 +1,41 @@
+.wp-block-slider-controls {
+	position: absolute;
+	top: 50%;
+	left: 0;
+	right: 0;
+	transform: translateY(-50%);
+	display: flex;
+	justify-content: space-between;
+	pointer-events: none;
+	z-index: 10;
+	padding: 0 16px;
+}
+
+.wp-block-slider-controls__button {
+	pointer-events: auto;
+	background: rgba(255, 255, 255, 0.9);
+	border: 1px solid rgba(0, 0, 0, 0.1);
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	padding: 0;
+
+	&:hover:not(:disabled) {
+		background: rgba(255, 255, 255, 1);
+		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	}
+
+	&:disabled {
+		opacity: 0.3;
+		cursor: not-allowed;
+	}
+
+	svg {
+		fill: currentColor;
+	}
+}

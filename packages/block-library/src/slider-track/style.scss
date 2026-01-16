@@ -1,0 +1,21 @@
+.wp-block-slider-track {
+	display: flex;
+	overflow-x: scroll;
+	overflow-y: hidden;
+	scroll-snap-type: x mandatory;
+	scroll-behavior: smooth;
+	scrollbar-width: none; // Firefox
+	-ms-overflow-style: none; // IE and Edge
+	gap: 0;
+
+	// Hide scrollbar in Chrome, Safari and Opera
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	// Disable scrolling in editor (per requirements)
+	.editor-styles-wrapper & {
+		overflow-x: hidden;
+		scroll-snap-type: none;
+	}
+}

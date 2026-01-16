@@ -1,0 +1,9 @@
+.wp-block-slide {
+	scroll-snap-align: center;
+	flex-shrink: 0;
+	width: 100%;
+	min-height: 400px;
+	display: flex;
+	flex-direction: column;
+	box-sizing: border-box;
+}

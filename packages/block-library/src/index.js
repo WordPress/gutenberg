@@ -132,6 +132,10 @@ import * as siteTitle from './site-title';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
+import * as slide from './slide';
+import * as slider from './slider';
+import * as sliderControls from './slider-controls';
+import * as sliderTrack from './slider-track';
 import * as tab from './tab';
 import * as table from './table';
 import * as tableOfContents from './table-of-contents';
@@ -274,6 +278,10 @@ const getAllBlocks = () => {
 	if ( window?.__experimentalEnableBlockExperiments ) {
 		blocks.push( tab );
 		blocks.push( tabs );
+		blocks.push( slider );
+		blocks.push( sliderTrack );
+		blocks.push( slide );
+		blocks.push( sliderControls );
 	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
