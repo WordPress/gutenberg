@@ -110,6 +110,7 @@ export async function vipsHasTransparency( url: string ) {
  * @param resize    Resize options (width, height, crop).
  * @param smartCrop Whether to use smart cropping (saliency-aware).
  * @param addSuffix Whether to add dimension suffix to filename.
+ * @param signal    Optional abort signal to cancel the operation.
  * @return Resized ImageFile with dimension metadata.
  */
 export async function vipsResizeImage(
@@ -117,8 +118,13 @@ export async function vipsResizeImage(
 	file: File,
 	resize: ImageSizeCrop,
 	smartCrop: boolean,
-	addSuffix: boolean
+	addSuffix: boolean,
+	signal?: AbortSignal
 ) {
+	if ( signal?.aborted ) {
+		throw new Error( 'Operation aborted' );
+	}
+
 	const { buffer, width, height, originalWidth, originalHeight } =
 		await resizeImage(
 			id,
