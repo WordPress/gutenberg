@@ -699,6 +699,10 @@ export function generateThumbnails( id: QueueItemId ) {
 			for ( const name of attachment.missing_image_sizes ) {
 				const imageSize = allImageSizes[ name ];
 				if ( ! imageSize ) {
+					// eslint-disable-next-line no-console
+					console.warn(
+						`Image size "${ name }" not found in configuration`
+					);
 					continue;
 				}
 
