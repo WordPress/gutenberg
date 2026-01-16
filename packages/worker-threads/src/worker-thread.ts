@@ -1,13 +1,12 @@
 /**
+ * External dependencies
+ */
+import { RpcProvider } from 'worker-rpc';
+
+/**
  * Internal dependencies
  */
-import { MessageType, type CallMessage } from './types';
-import {
-	createResultMessage,
-	createErrorMessage,
-	isRPCMessage,
-	postRPCMessage,
-} from './rpc';
+import { findTransferables } from './transferables';
 
 /**
  * Exposes an object's methods to be called from the main thread.
@@ -41,43 +40,21 @@ import {
  * @param target - Object containing methods to expose to the main thread.
  */
 export function expose< T extends object >( target: T ): void {
-	// Set up the message listener.
-	self.addEventListener( 'message', async ( event: MessageEvent ) => {
-		const data = event.data;
+	const provider = new RpcProvider( ( message, transfer ) =>
+		self.postMessage( message, { transfer: transfer ?? [] } )
+	);
 
-		// Ignore non-RPC messages.
-		if ( ! isRPCMessage( data ) ) {
-			return;
+	self.onmessage = ( e ) => provider.dispatch( e.data );
+
+	// Register all methods from target.
+	for ( const key of Object.keys( target ) ) {
+		const fn = ( target as Record< string, unknown > )[ key ];
+		if ( typeof fn === 'function' ) {
+			provider.registerRpcHandler( key, async ( ...args: unknown[] ) => {
+				const result = await fn.apply( target, args );
+				// Return with transferables for efficient transfer.
+				return { result, transfer: findTransferables( [ result ] ) };
+			} );
 		}
-
-		// Only handle call messages in the worker.
-		if ( data.type !== MessageType.CALL ) {
-			return;
-		}
-
-		const callMessage = data as CallMessage;
-		const { id, method, args } = callMessage;
-
-		try {
-			// Get the method from the target.
-			const fn = ( target as Record< string, unknown > )[ method ];
-
-			if ( typeof fn !== 'function' ) {
-				throw new Error(
-					`Method "${ method }" is not a function or does not exist`
-				);
-			}
-
-			// Call the method with the provided arguments.
-			const result = await fn.apply( target, args );
-
-			// Send the result back to the main thread.
-			const resultMessage = createResultMessage( id, result );
-			postRPCMessage( self, resultMessage );
-		} catch ( error ) {
-			// Send the error back to the main thread.
-			const errorMessage = createErrorMessage( id, error );
-			postRPCMessage( self, errorMessage );
-		}
-	} );
+	}
 }

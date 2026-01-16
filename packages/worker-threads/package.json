@@ -49,6 +49,9 @@
 	},
 	"types": "build-types",
 	"sideEffects": false,
+	"dependencies": {
+		"worker-rpc": "^0.2.0"
+	},
 	"publishConfig": {
 		"access": "public"
 	}
