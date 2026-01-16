@@ -50,7 +50,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"worker-rpc": "^0.2.0"
+		"comctx": "^1.4.3"
 	},
 	"publishConfig": {
 		"access": "public"
