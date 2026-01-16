@@ -62,6 +62,11 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 			array(
 				'name' => 'Desktop',
 				'slug' => 'desktop',
+				/*
+				 * Note: the last item in the breakpoints array does not technically require a size,
+				 * as the last item's media query is calculated using `width > previous size`.
+				 * It's included for consistency and as a record of the "official"breakpoint size.
+				 */
 				'size' => '960px',
 			),
 		);
@@ -103,16 +108,6 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		// If no breakpoints have visibility set to false, return unchanged.
 		if ( empty( $hidden_on ) ) {
 			return $block_content;
-		}
-
-		/*
-		 * If the block is hidden on all breakpoints,
-		 * do not render the block. If these values ever become user-defined,
-		 * we might need to output the CSS regardless of the breakpoint count.
-		 * For example, if there is one breakpoint defined and it's hidden.
-		 */
-		if ( count( $hidden_on ) === count( $breakpoint_queries ) ) {
-			return '';
 		}
 
 		// Maintain consistent order of breakpoints for class name generation.

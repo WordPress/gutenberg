@@ -252,16 +252,16 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		);
 	}
 
-	public function test_block_visibility_support_generated_css_with_multiple_breakpoints() {
+	public function test_block_visibility_support_generated_css_with_two_breakpoints() {
 		$this->enable_viewport_visibility_experiment();
 
 		$this->register_visibility_block_with_support(
-			'test/viewport-multiple',
+			'test/viewport-two',
 			array( 'visibility' => true )
 		);
 
 		$block = array(
-			'blockName' => 'test/viewport-multiple',
+			'blockName' => 'test/viewport-two',
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
@@ -347,7 +347,7 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		$block_content = '<div>Test content</div>';
 		$result        = gutenberg_render_block_visibility_support( $block_content, $block );
 
-		$this->assertSame( '', $result, 'Block content should be empty when all breakpoints are hidden.' );
+		$this->assertSame( '<div class="wp-block-hidden-desktop wp-block-hidden-mobile wp-block-hidden-tablet">Test content</div>', $result, 'Block content should have the visibility classes for all breakpoints in the class attribute.' );
 	}
 
 	public function test_block_visibility_support_generated_css_with_empty_object() {
