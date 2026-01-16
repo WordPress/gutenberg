@@ -20,6 +20,7 @@ import {
 	isRemoveLockedBlock,
 	isLockedBlock,
 	isBlockHiddenAnywhere,
+	isBlockHiddenAtViewport,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -1148,6 +1149,85 @@ describe( 'private selectors', () => {
 			expect( isBlockHiddenAnywhere( state, 'non-existent-block' ) ).toBe(
 				false
 			);
+		} );
+	} );
+
+	describe( 'isBlockHiddenAtViewport', () => {
+		beforeAll( () => {
+			registerBlockType( 'core/test-block-with-visibility', {
+				save: () => null,
+				category: 'text',
+				title: 'Test Block With Visibility',
+				supports: {
+					visibility: true,
+				},
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( 'core/test-block-with-visibility' );
+		} );
+
+		it( 'returns true when block is hidden everywhere', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: false,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect(
+				isBlockHiddenAtViewport( state, 'block-1', 'Desktop' )
+			).toBe( true );
+		} );
+
+		it( 'returns visibility based on the requested viewport', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: {
+										viewport: {
+											mobile: false,
+											tablet: true,
+										},
+									},
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect(
+				isBlockHiddenAtViewport( state, 'block-1', 'Mobile' )
+			).toBe( true );
+			expect(
+				isBlockHiddenAtViewport( state, 'block-1', 'Tablet' )
+			).toBe( false );
 		} );
 	} );
 

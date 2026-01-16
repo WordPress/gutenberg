@@ -727,20 +727,15 @@ export const isBlockHiddenAnywhere = ( state, clientId ) => {
 		return true;
 	}
 
-	if ( ! window.__experimentalHideBlocksBasedOnScreenSize ) {
-		return false;
-	}
-
-	if ( typeof blockVisibility !== 'object' ) {
-		return false;
-	}
-
 	if (
+		window.__experimentalHideBlocksBasedOnScreenSize &&
 		typeof blockVisibility?.viewport === 'object' &&
-		blockVisibility?.viewport !== null ) {
+		blockVisibility?.viewport !== null
+	) {
 		// Check if the block is hidden at any viewport.
 		return Object.values( BLOCK_VISIBILITY_VIEWPORTS ).some(
-			( viewport ) => blockVisibility?.viewport?.[ viewport.key ] === false
+			( viewport ) =>
+				blockVisibility?.viewport?.[ viewport.key ] === false
 		);
 	}
 	return false;
@@ -803,13 +798,13 @@ export const isBlockParentHiddenEverywhere = ( state, clientId ) => {
  * @return {boolean} Whether the block is hidden at the viewport.
  */
 export const isBlockHiddenAtViewport = ( state, clientId, viewport ) => {
-	if ( isBlockHiddenEverywhere( state, clientId ) === false ) {
+	if ( isBlockHiddenEverywhere( state, clientId ) ) {
 		return true;
 	}
 
 	const attributes = state.blocks.attributes.get( clientId );
-	const blockVisibilityViewport = attributes?.metadata?.blockVisibility?.viewport;
-
+	const blockVisibilityViewport =
+		attributes?.metadata?.blockVisibility?.viewport;
 	if (
 		typeof blockVisibilityViewport === 'object' &&
 		blockVisibilityViewport !== null &&
