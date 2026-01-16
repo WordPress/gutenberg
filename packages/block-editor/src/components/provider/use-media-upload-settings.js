@@ -18,6 +18,7 @@ function useMediaUploadSettings( settings = {} ) {
 			maxUploadFileSize: settings.maxUploadFileSize,
 			allowedMimeTypes: settings.allowedMimeTypes,
 			allImageSizes: settings.allImageSizes,
+			bigImageSizeThreshold: settings.bigImageSizeThreshold,
 		} ),
 		[ settings ]
 	);
