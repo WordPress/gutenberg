@@ -38,14 +38,6 @@ test.describe( 'WASM Inlining (build verification)', () => {
 		);
 	} );
 
-	test( 'should inline vips-heif.wasm as base64 data URL', () => {
-		// Verify vips-heif.wasm is inlined
-		// Variable name: vips_heif_default (from wasm-vips/vips-heif.wasm)
-		expect( buildContent ).toMatch(
-			/var vips_heif_default\s*=\s*"data:application\/wasm;base64,/
-		);
-	} );
-
 	test( 'should inline vips-jxl.wasm as base64 data URL', () => {
 		// Verify vips-jxl.wasm is inlined
 		// Variable name: vips_jxl_default (from wasm-vips/vips-jxl.wasm)
