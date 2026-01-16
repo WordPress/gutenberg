@@ -13,8 +13,8 @@ import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordp
 import { useRef, useState } from '@wordpress/element';
 import {
 	switchToBlockType,
-	store as blocksStore,
 	hasBlockSupport,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, sprintf, _n } from '@wordpress/i18n';
@@ -85,8 +85,8 @@ export default function BlockTools( {
 		getBlockRootClientId,
 		getBlockEditingMode,
 		getBlockAttributes,
-		isGroupable,
 		getBlockName,
+		isGroupable,
 		getEditedContentOnlySection,
 	} = unlock( useSelect( blockEditorStore ) );
 	const { getGroupingBlockName } = useSelect( blocksStore );
