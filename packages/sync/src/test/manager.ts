@@ -97,11 +97,13 @@ describe( 'SyncManager', () => {
 		};
 
 		mockHandlers = {
+			addUndoMeta: jest.fn(),
 			editRecord: jest.fn(),
 			getEditedRecord: jest.fn( async () =>
 				Promise.resolve( mockRecord )
 			),
 			refetchRecord: jest.fn( async () => Promise.resolve() ),
+			restoreUndoMeta: jest.fn(),
 			saveRecord: jest.fn( async () => Promise.resolve() ),
 		};
 	} );
