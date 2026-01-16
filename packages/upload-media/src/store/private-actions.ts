@@ -22,7 +22,6 @@ import type {
 	AddAction,
 	AdditionalData,
 	AddOperationsAction,
-	Attachment,
 	BatchId,
 	CacheBlobUrlAction,
 	OnBatchSuccessHandler,
@@ -55,7 +54,7 @@ type ActionCreators = {
 	addSideloadItem: typeof addSideloadItem;
 	removeItem: typeof removeItem;
 	pauseItem: typeof pauseItem;
-	resumeItem: typeof resumeItem;
+	resumeItemByPostId: typeof resumeItemByPostId;
 	prepareItem: typeof prepareItem;
 	processItem: typeof processItem;
 	finishOperation: typeof finishOperation;
@@ -82,6 +81,32 @@ type ThunkArgs = {
 	dispatch: ActionCreators;
 	registry: WPDataRegistry;
 };
+
+/**
+ * Determines if an upload should be paused to avoid race conditions.
+ *
+ * When sideloading thumbnails, we need to pause uploads if another
+ * upload to the same post is already in progress.
+ *
+ * @param item      Queue item to check.
+ * @param operation Current operation type.
+ * @param select    Store selectors.
+ * @return Whether the upload should be paused.
+ */
+function shouldPauseForSideload(
+	item: QueueItem,
+	operation: OperationType | undefined,
+	select: Selectors
+): boolean {
+	if (
+		operation !== OperationType.Upload ||
+		! item.parentId ||
+		! item.additionalData.post
+	) {
+		return false;
+	}
+	return select.isUploadingToPost( item.additionalData.post as number );
+}
 
 interface AddItemArgs {
 	// It should always be a File, but some consumers might still pass Blobs only.
@@ -270,21 +295,12 @@ export function processItem( id: QueueItemId ) {
 
 		// If we're sideloading a thumbnail, pause upload to avoid race conditions.
 		// It will be resumed after the previous upload finishes.
-		if (
-			operation === OperationType.Upload &&
-			item.parentId &&
-			item.additionalData.post
-		) {
-			const isAlreadyUploading = select.isUploadingToPost(
-				item.additionalData.post as number
-			);
-			if ( isAlreadyUploading ) {
-				dispatch< PauseItemAction >( {
-					type: Type.PauseItem,
-					id,
-				} );
-				return;
-			}
+		if ( shouldPauseForSideload( item, operation, select ) ) {
+			dispatch< PauseItemAction >( {
+				type: Type.PauseItem,
+				id,
+			} );
+			return;
 		}
 
 		/*
@@ -438,9 +454,13 @@ export function pauseItem( id: QueueItemId ) {
 /**
  * Resumes processing for a given post/attachment ID.
  *
+ * This function looks up paused uploads by post ID and resumes them.
+ * It's typically called after a sideload completes to resume paused
+ * thumbnail uploads.
+ *
  * @param postOrAttachmentId Post or attachment ID.
  */
-export function resumeItem( postOrAttachmentId: number ) {
+export function resumeItemByPostId( postOrAttachmentId: number ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
 		const item = select.getPausedUploadForPost( postOrAttachmentId );
 		if ( item ) {
@@ -617,11 +637,11 @@ export function sideloadItem( id: QueueItemId ) {
 			signal: item.abortController?.signal,
 			onFileChange: ( [ attachment ] ) => {
 				dispatch.finishOperation( id, { attachment } );
-				dispatch.resumeItem( post as number );
+				dispatch.resumeItemByPostId( post as number );
 			},
 			onError: ( error ) => {
 				dispatch.cancelItem( id, error );
-				dispatch.resumeItem( post as number );
+				dispatch.resumeItemByPostId( post as number );
 			},
 		} );
 	};
@@ -657,7 +677,8 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				item.file,
 				args.resize,
 				false, // smartCrop
-				addSuffix
+				addSuffix,
+				item.abortController?.signal
 			);
 
 			const blobUrl = createBlobURL( file );
@@ -694,9 +715,16 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
  */
 export function generateThumbnails( id: QueueItemId ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getItem( id ) as QueueItem;
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
 
-		const attachment: Attachment = item.attachment as Attachment;
+		if ( ! item.attachment ) {
+			dispatch.finishOperation( id, {} );
+			return;
+		}
+		const attachment = item.attachment;
 
 		// Client-side thumbnail generation for images.
 		if (
