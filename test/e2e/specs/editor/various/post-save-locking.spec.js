@@ -292,11 +292,9 @@ test.describe( 'Post save locking during image upload', () => {
 		uploadResolvers[ 0 ]();
 
 		// Wait for the first image to appear.
-		const firstImage = imageBlocks
-			.nth( 0 )
-			.getByRole( 'img', {
-				name: 'This image has an empty alt attribute',
-			} );
+		const firstImage = imageBlocks.nth( 0 ).getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 		await expect( firstImage ).toBeVisible();
 
 		// Verify that post saving is STILL locked (second upload in progress).
@@ -309,11 +307,9 @@ test.describe( 'Post save locking during image upload', () => {
 		uploadResolvers[ 1 ]();
 
 		// Wait for the second image to appear.
-		const secondImage = imageBlocks
-			.nth( 1 )
-			.getByRole( 'img', {
-				name: 'This image has an empty alt attribute',
-			} );
+		const secondImage = imageBlocks.nth( 1 ).getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 		await expect( secondImage ).toBeVisible();
 
 		// Verify that post saving is now unlocked (all uploads complete).
@@ -421,8 +417,10 @@ test.describe( 'Post save locking during image upload', () => {
 		// Fail the first upload.
 		uploadHandlers[ 0 ].resolve( { shouldFail: true } );
 
-		// Wait a moment for the failure to process.
-		await page.waitForTimeout( 500 );
+		// Wait for the error notification to appear (indicates failure processed).
+		await expect(
+			page.getByRole( 'button', { name: 'Dismiss this notice' } )
+		).toBeVisible();
 
 		// Verify that post saving is STILL locked (second upload in progress).
 		const isStillLocked = await page.evaluate( () =>
@@ -434,11 +432,9 @@ test.describe( 'Post save locking during image upload', () => {
 		uploadHandlers[ 1 ].resolve( { shouldFail: false } );
 
 		// Wait for the second image to appear.
-		const secondImage = imageBlocks
-			.nth( 1 )
-			.getByRole( 'img', {
-				name: 'This image has an empty alt attribute',
-			} );
+		const secondImage = imageBlocks.nth( 1 ).getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
 		await expect( secondImage ).toBeVisible();
 
 		// Verify that post saving is now unlocked (all uploads resolved).
