@@ -89,7 +89,17 @@ export async function vipsCompressImage(
  * @return Whether the image has transparency.
  */
 export async function vipsHasTransparency( url: string ) {
-	return hasTransparency( await ( await fetch( url ) ).arrayBuffer() );
+	try {
+		const response = await fetch( url );
+		if ( ! response.ok ) {
+			throw new Error( `Failed to fetch image: ${ response.status }` );
+		}
+		return hasTransparency( await response.arrayBuffer() );
+	} catch ( error ) {
+		// eslint-disable-next-line no-console
+		console.error( 'Error checking transparency:', error );
+		return false; // Safe fallback
+	}
 }
 
 /**
