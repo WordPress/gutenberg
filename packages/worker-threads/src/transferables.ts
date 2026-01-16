@@ -26,42 +26,28 @@ function getTransferable( value: unknown ): Transferable | null {
 }
 
 /**
- * Finds transferable objects in an RPC message.
+ * Finds transferable objects in an array of values.
  *
- * This function only checks direct arguments (for CALL messages) or the
- * result value (for RESULT messages). Transferables should be passed as
- * standalone parameters, not nested within objects.
+ * This function checks direct values in the array. Transferables should be
+ * passed as standalone parameters, not nested within objects.
  *
- * @param message - The RPC message to search for transferables.
+ * @param values - The array of values to search for transferables.
  * @return Array of all transferable objects found.
  */
-export function findTransferables( message: unknown ): Transferable[] {
-	if ( typeof message !== 'object' || message === null ) {
+export function findTransferables( values: unknown ): Transferable[] {
+	if ( ! Array.isArray( values ) ) {
 		return [];
 	}
 
-	const msg = message as Record< string, unknown >;
 	const transferables: Transferable[] = [];
 	const seen = new Set< Transferable >();
 
-	function addTransferable( value: unknown ): void {
+	for ( const value of values ) {
 		const transferable = getTransferable( value );
 		if ( transferable && ! seen.has( transferable ) ) {
 			seen.add( transferable );
 			transferables.push( transferable );
 		}
-	}
-
-	// Check args array for CALL messages.
-	if ( Array.isArray( msg.args ) ) {
-		for ( const arg of msg.args ) {
-			addTransferable( arg );
-		}
-	}
-
-	// Check result for RESULT messages.
-	if ( 'result' in msg ) {
-		addTransferable( msg.result );
 	}
 
 	return transferables;
