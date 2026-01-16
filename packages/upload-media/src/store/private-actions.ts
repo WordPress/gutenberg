@@ -637,7 +637,10 @@ type ResizeCropItemArgs = OperationArgs[ OperationType.ResizeCrop ];
  */
 export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getItem( id ) as QueueItem;
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
 
 		if ( ! args?.resize ) {
 			dispatch.finishOperation( id, {
