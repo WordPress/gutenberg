@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { createWorkerFactory, type WorkerCreator } from '@shopify/web-worker';
+import {
+	vipsConvertImageFormat as convertImageFormat,
+	vipsCompressImage as compressImage,
+	vipsHasTransparency as hasTransparency,
+	vipsResizeImage as resizeImage,
+	vipsCancelOperations as cancelOperations,
+} from '@wordpress/vips/worker';
 
 /**
  * Internal dependencies
@@ -9,23 +15,6 @@ import { createWorkerFactory, type WorkerCreator } from '@shopify/web-worker';
 import { ImageFile } from '../../image-file';
 import { getFileBasename } from '../../utils';
 import type { ImageSizeCrop, QueueItemId } from '../types';
-
-let vipsWorker:
-	| ReturnType< WorkerCreator< typeof import('@wordpress/vips') > >
-	| undefined;
-
-function getVipsWorker() {
-	if ( vipsWorker !== undefined ) {
-		return vipsWorker;
-	}
-
-	const createWorker = createWorkerFactory(
-		() => import( /* webpackChunkName: 'vips' */ '@wordpress/vips' )
-	);
-	vipsWorker = createWorker();
-
-	return vipsWorker;
-}
 
 /**
  * Converts an image to a different format using vips in a web worker.
@@ -49,7 +38,7 @@ export async function vipsConvertImageFormat(
 	quality: number,
 	interlaced?: boolean
 ) {
-	const buffer = await getVipsWorker().convertImageFormat(
+	const buffer = await convertImageFormat(
 		id,
 		await file.arrayBuffer(),
 		file.type,
@@ -79,7 +68,7 @@ export async function vipsCompressImage(
 	quality: number,
 	interlaced?: boolean
 ) {
-	const buffer = await getVipsWorker().compressImage(
+	const buffer = await compressImage(
 		id,
 		await file.arrayBuffer(),
 		file.type,
@@ -100,9 +89,7 @@ export async function vipsCompressImage(
  * @return Whether the image has transparency.
  */
 export async function vipsHasTransparency( url: string ) {
-	return getVipsWorker().hasTransparency(
-		await ( await fetch( url ) ).arrayBuffer()
-	);
+	return hasTransparency( await ( await fetch( url ) ).arrayBuffer() );
 }
 
 /**
@@ -123,7 +110,7 @@ export async function vipsResizeImage(
 	addSuffix: boolean
 ) {
 	const { buffer, width, height, originalWidth, originalHeight } =
-		await getVipsWorker().resizeImage(
+		await resizeImage(
 			id,
 			await file.arrayBuffer(),
 			file.type,
@@ -141,7 +128,7 @@ export async function vipsResizeImage(
 		);
 	}
 
-	return new ImageFile(
+	const resultFile = new ImageFile(
 		new File(
 			[ new Blob( [ buffer as ArrayBuffer ], { type: file.type } ) ],
 			fileName,
@@ -154,6 +141,8 @@ export async function vipsResizeImage(
 		originalWidth,
 		originalHeight
 	);
+
+	return resultFile;
 }
 
 /**
@@ -163,5 +152,5 @@ export async function vipsResizeImage(
  * @return Whether any operation was cancelled.
  */
 export async function vipsCancelOperations( id: QueueItemId ) {
-	return getVipsWorker().cancelOperations( id );
+	return cancelOperations( id );
 }
