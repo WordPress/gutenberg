@@ -77,7 +77,6 @@ function StyleInspectorSlots( {
 function BlockInspector() {
 	const {
 		selectedBlockCount,
-		selectedBlockClientId,
 		renderedBlockName,
 		renderedBlockClientId,
 		blockType,
@@ -119,7 +118,6 @@ function BlockInspector() {
 
 		return {
 			selectedBlockCount: getSelectedBlockCount(),
-			selectedBlockClientId: _selectedBlockClientId,
 			renderedBlockClientId: _renderedBlockClientId,
 			renderedBlockName: _renderedBlockName,
 			blockType: _blockType,
@@ -257,7 +255,6 @@ function BlockInspector() {
 		>
 			<BlockInspectorSingleBlock
 				renderedBlockClientId={ renderedBlockClientId }
-				selectedBlockClientId={ selectedBlockClientId }
 				blockName={ blockType.name }
 				isSectionBlock={ isSectionBlock }
 				availableTabs={ availableTabs }
@@ -309,10 +306,6 @@ const BlockInspectorSingleBlock = ( {
 	// The block that is displayed in the inspector. This is the block whose
 	// controls and information are shown to the user.
 	renderedBlockClientId,
-	// The actual block that is selected in the editor. This may or may not
-	// be the same as the rendered block (e.g., when a child block is selected
-	// but its parent section block is the main one rendered in the inspector).
-	selectedBlockClientId,
 	blockName,
 	isSectionBlock,
 	availableTabs,
@@ -332,9 +325,6 @@ const BlockInspectorSingleBlock = ( {
 		renderedBlockClientId
 	);
 	const isBlockSynced = blockInformation.isSynced;
-	const isSectionBlockSelected =
-		window?.__experimentalContentOnlyPatternInsertion &&
-		selectedBlockClientId === renderedBlockClientId;
 
 	return (
 		<div className="block-editor-block-inspector">
