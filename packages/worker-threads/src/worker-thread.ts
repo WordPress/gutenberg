@@ -13,7 +13,7 @@ import {
  */
 class WorkerProvideAdapter implements Adapter {
 	sendMessage: SendMessage = ( message, transfer ) => {
-		self.postMessage( message, transfer );
+		self.postMessage( message, { transfer } );
 	};
 
 	onMessage: OnMessage = ( callback ) => {
