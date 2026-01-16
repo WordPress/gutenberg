@@ -115,6 +115,35 @@ test.describe( 'Big image size threshold', () => {
 					2560
 				);
 				expect( media.source_url ).toContain( '-scaled' );
+
+				// Verify original_image is preserved in metadata.
+				// WordPress core stores the original filename when scaling.
+				expect( media.media_details.original_image ).toBeDefined();
+
+				// Verify thumbnails were generated.
+				// WordPress core generates thumbnails from the original image for quality.
+				const sizes = media.media_details.sizes;
+				expect( sizes ).toBeDefined();
+
+				// Check that at least some standard sizes were created.
+				// The exact sizes depend on theme/site configuration.
+				const hasStandardSizes =
+					sizes.thumbnail || sizes.medium || sizes.large;
+				expect( hasStandardSizes ).toBeTruthy();
+
+				// If thumbnail exists, verify it has reasonable dimensions.
+				// Default thumbnail size is 150x150.
+				if ( sizes.thumbnail ) {
+					expect( sizes.thumbnail.width ).toBeLessThanOrEqual( 150 );
+					expect( sizes.thumbnail.height ).toBeLessThanOrEqual( 150 );
+				}
+
+				// If medium exists, verify dimensions.
+				// Default medium size is 300x300.
+				if ( sizes.medium ) {
+					expect( sizes.medium.width ).toBeLessThanOrEqual( 300 );
+					expect( sizes.medium.height ).toBeLessThanOrEqual( 300 );
+				}
 			} else {
 				// If server-side processing happened, the image should still be
 				// scaled down to the threshold.
