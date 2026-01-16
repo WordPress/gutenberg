@@ -88,13 +88,10 @@ store( 'core/slider', {
 			const context = getContext();
 			const { ref } = getElement();
 
-			const slides = ref.querySelectorAll( '.wp-block-slide' );
+			// Context is already initialized from PHP with currentIndex and totalSlides
+			// Just set up accessibility and keyboard navigation
 
-			// Initialize state
-			context.currentIndex = 0;
-			context.totalSlides = slides.length;
-
-			// Add keyboard navigation
+			// Add ARIA attributes
 			ref.setAttribute( 'tabindex', '0' );
 			ref.setAttribute( 'role', 'region' );
 			ref.setAttribute( 'aria-roledescription', 'carousel' );
