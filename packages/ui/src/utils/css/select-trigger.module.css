@@ -33,7 +33,7 @@
 		}
 
 		&:focus {
-			outline: none; /* handled by InputBase component */
+			outline: none; /* handled by InputLayout component */
 		}
 
 		&[data-disabled] {
