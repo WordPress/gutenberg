@@ -262,18 +262,10 @@ $navigation-icon-size: 24px;
 			justify-content: var(--navigation-layout-justify, initial);
 		}
 
-		// Progressive padding based on nesting level with any layout orientation.
-		// Applying it to the submenu container and letting the nested padding causes the 100% width items to be pushed
-		// off the edge of the screen.
-		@for $i from 1 through 5 {
-			$selector: "";
-			@for $j from 1 through $i {
-				$selector: $selector + ".wp-block-navigation__submenu-container ";
-			}
-			#{$selector}.wp-block-navigation-item__content {
-				padding-left: #{$i * 2}em;
-				padding-right: #{$i * 2}em;
-			}
+		.wp-block-navigation__submenu-container .wp-block-navigation-item__content {
+			// Allows for natural indenting of submenus for any level of nesting with any layout orientation.
+			padding-left: 2em;
+			padding-right: 2em;
 		}
 
 		> .wp-block-navigation-item__content,
@@ -296,9 +288,8 @@ $navigation-icon-size: 24px;
 
 .wp-block-navigation:has(.open-on-always) {
 	.wp-block-navigation__container,
-	.wp-block-navigation__submenu-container,
-	.wp-block-navigation-submenu.wp-block-navigation-item,
-	.wp-block-navigation-submenu .wp-block-navigation-item {
+	.wp-block-navigation-item,
+	.wp-block-navigation__submenu-container {
 		width: 100%;
 	}
 }
