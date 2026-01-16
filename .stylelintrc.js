@@ -87,7 +87,7 @@ module.exports = {
 					true,
 					{
 						ignoreProperties: [
-							// https://github.com/css-modules/css-modules#composition
+							// https://github.com/css-modules/css-modules/blob/master/docs/composition.md
 							'composes',
 						],
 					},
