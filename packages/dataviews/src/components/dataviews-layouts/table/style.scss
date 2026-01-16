@@ -334,10 +334,27 @@
 			content: "";
 			position: absolute;
 			background-color: $gray-300;
-			inset: 4px 0;
+			inset: 0;
+			height: $grid-unit-10;
+			margin: auto 0;
+			border-radius: var(--wpds-border-radius-surface-sm);
 			pointer-events: none;
 			visibility: visible;
 			@include skeleton();
+			max-width: 320px;
+		}
+	}
+
+	tbody tr:nth-child(even) td > *:first-child {
+		&::after {
+			max-width: 480px;
+		}
+	}
+
+	tbody td.dataviews-view-table__checkbox-column > *:first-child {
+		&::after {
+			width: $grid-unit-20;
+			height: $grid-unit-20;
 		}
 	}
 }
