@@ -46,11 +46,7 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 		let initialContent = '';
 
 		if ( pattern?.content ) {
-			// Parse the pattern content into blocks and serialize it
-			const blocks = parse( pattern.content, {
-				__unstableSkipMigrationLogs: true,
-			} );
-			initialContent = serialize( blocks );
+			initialContent = pattern.content;
 		} else {
 			// Fallback to empty paragraph if pattern is not found
 			initialContent = serialize( [ createBlock( 'core/paragraph' ) ] );
