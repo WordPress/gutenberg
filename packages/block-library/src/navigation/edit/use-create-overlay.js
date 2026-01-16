@@ -6,7 +6,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { serialize, createBlock } from '@wordpress/blocks';
+import { parse, serialize, createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -47,7 +47,11 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 		let initialContent = '';
 
 		if ( pattern?.content ) {
-			initialContent = pattern.content;
+			// Parse the pattern content into blocks and serialize it
+			const blocks = parse( pattern.content, {
+				__unstableSkipMigrationLogs: true,
+			} );
+			initialContent = serialize( blocks );
 		} else {
 			// Fallback to empty paragraph if pattern is not found
 			initialContent = serialize( [ createBlock( 'core/paragraph' ) ] );
