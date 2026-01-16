@@ -304,29 +304,41 @@ export default function Image( {
 	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
 	const { allowResize = true } = context;
 
-	const image = useSelect(
-		( select ) =>
-			id && isSingleSelected
-				? select( coreStore ).getEntityRecord(
-						'postType',
-						'attachment',
-						id,
-						{ context: 'view' }
-				  )
-				: null,
+	const { image, canUserEdit } = useSelect(
+		( select ) => {
+			const imageRecord =
+				id && isSingleSelected
+					? select( coreStore ).getEntityRecord(
+							'postType',
+							'attachment',
+							id,
+							{ context: 'view' }
+					  )
+					: null;
+
+			// Check edit permissions. When the media editor experiment is enabled,
+			// use getEntityRecordPermissions which checks via canUser API.
+			// Only check when the image is selected to avoid unnecessary API requests.
+			let canEdit = false;
+			if ( id && isSingleSelected && window?.__experimentalMediaEditor ) {
+				const { getEntityRecordPermissions } = unlock(
+					select( coreStore )
+				);
+				const permissions = getEntityRecordPermissions(
+					'postType',
+					'attachment',
+					id
+				);
+				canEdit = permissions?.update || false;
+			}
+
+			return {
+				image: imageRecord,
+				canUserEdit: canEdit,
+			};
+		},
 		[ id, isSingleSelected ]
 	);
-
-	// Check edit permission from the entity's _links without making an additional API request.
-	// If image data isn't loaded yet, show the button (it will be hidden later if no permission).
-	// This maintains consistent toolbar positioning.
-	const isLoadingImageData = id && isSingleSelected && ! image;
-	const allowedMethods = image?._links?.self?.[ 0 ]?.targetHints?.allow;
-	const canUserEdit = isLoadingImageData
-		? true // Show button while loading to reserve toolbar space
-		: allowedMethods?.includes( 'PUT' ) ||
-		  allowedMethods?.includes( 'PATCH' ) ||
-		  false;
 
 	const { canInsertCover, imageEditing, imageSizes, maxWidth } = useSelect(
 		( select ) => {
