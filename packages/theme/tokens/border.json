@@ -4,19 +4,19 @@
 		"radius": {
 			"xs": {
 				"$value": { "value": 1, "unit": "px" },
-				"$description": "Extra small radius for surfaces"
+				"$description": "Extra small radius"
 			},
 			"sm": {
 				"$value": { "value": 2, "unit": "px" },
-				"$description": "Small radius for surfaces"
+				"$description": "Small radius"
 			},
 			"md": {
 				"$value": { "value": 4, "unit": "px" },
-				"$description": "Medium radius for surfaces"
+				"$description": "Medium radius"
 			},
 			"lg": {
 				"$value": { "value": 8, "unit": "px" },
-				"$description": "Large radius for surfaces"
+				"$description": "Large radius"
 			},
 			"$extensions": {
 				"com.figma.scopes": [ "CORNER_RADIUS" ]
@@ -25,28 +25,28 @@
 		"width": {
 			"xs": {
 				"$value": { "value": 1, "unit": "px" },
-				"$description": "Extra small width for surfaces",
+				"$description": "Extra small width",
 				"$extensions": {
 					"com.figma.scopes": [ "STROKE_FLOAT" ]
 				}
 			},
 			"sm": {
 				"$value": { "value": 2, "unit": "px" },
-				"$description": "Small width for surfaces",
+				"$description": "Small width",
 				"$extensions": {
 					"com.figma.scopes": [ "STROKE_FLOAT" ]
 				}
 			},
 			"md": {
 				"$value": { "value": 4, "unit": "px" },
-				"$description": "Medium width for surfaces",
+				"$description": "Medium width",
 				"$extensions": {
 					"com.figma.scopes": [ "STROKE_FLOAT" ]
 				}
 			},
 			"lg": {
 				"$value": { "value": 8, "unit": "px" },
-				"$description": "Large width for surfaces",
+				"$description": "Large width",
 				"$extensions": {
 					"com.figma.scopes": [ "STROKE_FLOAT" ]
 				}
