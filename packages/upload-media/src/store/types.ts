@@ -167,6 +167,10 @@ export interface Settings {
 	maxUploadFileSize?: number;
 	// Maximum number of concurrent uploads.
 	maxConcurrentUploads: number;
+	// Big image size threshold in pixels.
+	// Images larger than this will be scaled down before upload.
+	// Default is 2560 (matching WordPress core).
+	bigImageSizeThreshold?: number;
 }
 
 // Must match the Attachment type from the media-utils package.
