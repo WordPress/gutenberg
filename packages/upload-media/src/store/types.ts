@@ -188,6 +188,22 @@ export interface Attachment {
 	missing_image_sizes?: string[];
 	media_filename?: string;
 	poster?: string;
+	/**
+	 * EXIF orientation value from the original image.
+	 * Values 1-8 follow the EXIF specification.
+	 * A value other than 1 indicates the image needs rotation.
+	 *
+	 * Orientation values:
+	 * 1 = Normal (no rotation needed)
+	 * 2 = Flipped horizontally
+	 * 3 = Rotated 180°
+	 * 4 = Flipped vertically
+	 * 5 = Rotated 90° CCW and flipped horizontally
+	 * 6 = Rotated 90° CW
+	 * 7 = Rotated 90° CW and flipped horizontally
+	 * 8 = Rotated 90° CCW
+	 */
+	exif_orientation?: number;
 }
 
 export type OnChangeHandler = ( attachments: Partial< Attachment >[] ) => void;
@@ -207,6 +223,7 @@ export enum OperationType {
 	Prepare = 'PREPARE',
 	Upload = 'UPLOAD',
 	ResizeCrop = 'RESIZE_CROP',
+	Rotate = 'ROTATE',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
 }
 
@@ -239,6 +256,13 @@ export interface OperationArgs {
 		 * If true, uses '-scaled' suffix instead of dimension suffix.
 		 */
 		isThresholdResize?: boolean;
+	};
+	[ OperationType.Rotate ]: {
+		/**
+		 * EXIF orientation value (1-8) indicating the required rotation.
+		 * Used to apply the correct rotation/flip transformation.
+		 */
+		orientation: number;
 	};
 }
 
