@@ -38,7 +38,6 @@ function SliderEdit( { attributes, setAttributes } ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		template: SLIDER_TEMPLATE,
-		templateLock: 'insert',
 		renderAppender: false,
 	} );
 
