@@ -30,7 +30,7 @@ const meta: Meta< typeof FormFileUpload > = {
 export default meta;
 
 const Template: StoryFn< typeof FormFileUpload > = ( props ) => {
-	return <FormFileUpload { ...props } />;
+	return <FormFileUpload __next40pxDefaultSize { ...props } />;
 };
 
 export const Default = Template.bind( {} );

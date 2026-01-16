@@ -30,6 +30,14 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 	}
 
 	if ( is_array( $block_visibility ) && ! empty( $block_visibility ) ) {
+		// Get viewport configuration from nested structure.
+		$viewport_config = $block_visibility['viewport'] ?? null;
+
+		// If no viewport config, return unchanged.
+		if ( ! is_array( $viewport_config ) || empty( $viewport_config ) ) {
+			return $block_content;
+		}
+
 		/*
 		 * Breakpoints definitions are in several places in WordPress packages.
 		 * The following are taken from: https://github.com/WordPress/gutenberg/blob/trunk/packages/base-styles/_breakpoints.scss
@@ -86,7 +94,7 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		$hidden_on = array();
 
 		// Collect which breakpoints the block is hidden on (only known breakpoints).
-		foreach ( $block_visibility as $breakpoint => $is_visible ) {
+		foreach ( $viewport_config as $breakpoint => $is_visible ) {
 			if ( false === $is_visible && isset( $breakpoint_queries[ $breakpoint ] ) ) {
 				$hidden_on[] = $breakpoint;
 			}

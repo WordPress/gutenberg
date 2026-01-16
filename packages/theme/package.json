@@ -70,6 +70,7 @@
 		"memize": "^2.1.0"
 	},
 	"devDependencies": {
+		"@storybook/react-vite": "^10.1.11",
 		"@terrazzo/cli": "^0.10.2",
 		"@terrazzo/plugin-css": "^0.10.2",
 		"@terrazzo/token-tools": "^0.10.2",

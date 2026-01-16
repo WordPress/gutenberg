@@ -14,12 +14,8 @@ define( 'IS_GUTENBERG_PLUGIN', true );
 require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/upgrade.php';
 
-// Clear Core's routes before Gutenberg's build/index.php registers its own.
-// This must be loaded before build/index.php to ensure correct action ordering.
-require_once __DIR__ . '/clear-core-routes.php';
-
 // Load auto-generated build registration.
-$build_registration = plugin_dir_path( __DIR__ ) . 'build/index.php';
+$build_registration = plugin_dir_path( __DIR__ ) . 'build/build.php';
 if ( file_exists( $build_registration ) ) {
 	require_once $build_registration;
 }
@@ -86,6 +82,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 }
 
+require_once __DIR__ . '/remove-core-enqueue-scripts.php';
 require_once __DIR__ . '/experimental/editor-settings.php';
 require_once __DIR__ . '/experimental/rest-api-overrides.php';
 

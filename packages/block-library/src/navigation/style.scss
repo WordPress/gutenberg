@@ -238,25 +238,9 @@ $navigation-icon-size: 24px;
 
 	// Custom menu items.
 	// Show submenus on hover unless they open on click.
-	&:not(.open-on-click):hover > .wp-block-navigation__submenu-container {
-		visibility: visible;
-		overflow: visible;
-		opacity: 1;
-		width: auto;
-		height: auto;
-		min-width: 200px;
-	}
-
+	&:not(.open-on-click):hover > .wp-block-navigation__submenu-container,
 	// Keep submenus open when focus is within.
-	&:not(.open-on-click):not(.open-on-hover-click):focus-within > .wp-block-navigation__submenu-container {
-		visibility: visible;
-		overflow: visible;
-		opacity: 1;
-		width: auto;
-		height: auto;
-		min-width: 200px;
-	}
-
+	&:not(.open-on-click):not(.open-on-hover-click):focus-within > .wp-block-navigation__submenu-container,
 	// Show submenus on click.
 	.wp-block-navigation-submenu__toggle[aria-expanded="true"] ~ .wp-block-navigation__submenu-container {
 		visibility: visible;

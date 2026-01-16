@@ -733,11 +733,15 @@ export const isBlockHidden = ( state, clientId ) => {
 	// Check viewport-specific hiding based on current device preview
 	// Only apply when a device is explicitly selected.
 	if ( typeof blockVisibility === 'object' && blockVisibility !== null ) {
-		const settings = getSettings( state );
-		const viewportType =
-			settings[ deviceTypeKey ] ?? BLOCK_VISIBILITY_VIEWPORTS.desktop.key;
-		const viewportKey = viewportType.toLowerCase();
-		return blockVisibility?.[ viewportKey ] === false;
+		const viewportConfig = blockVisibility.viewport;
+		if ( viewportConfig && typeof viewportConfig === 'object' ) {
+			const settings = getSettings( state );
+			const viewportType =
+				settings[ deviceTypeKey ] ??
+				BLOCK_VISIBILITY_VIEWPORTS.desktop.key;
+			const viewportKey = viewportType.toLowerCase();
+			return viewportConfig[ viewportKey ] === false;
+		}
 	}
 
 	return false;
@@ -795,9 +799,13 @@ export const areBlocksHiddenAnywhere = ( state, clientIds ) => {
 		}
 
 		// Check viewport-specific visibility.
-		return BLOCK_VISIBILITY_VIEWPORT_ENTRIES.some(
-			( [ , { key } ] ) => blockVisibility?.[ key ] === false
-		);
+		const viewportConfig = blockVisibility.viewport;
+		if ( viewportConfig && typeof viewportConfig === 'object' ) {
+			return BLOCK_VISIBILITY_VIEWPORT_ENTRIES.some(
+				( [ , { key } ] ) => viewportConfig[ key ] === false
+			);
+		}
+		return false;
 	} );
 };
 

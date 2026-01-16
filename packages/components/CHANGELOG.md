@@ -5,6 +5,7 @@
 ### Code Quality
 
 -   Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
+-   Fix generated TS types referencing unavailable `csstype`. [#74655](https://github.com/WordPress/gutenberg/pull/74655)
 
 ### Breaking Changes
 

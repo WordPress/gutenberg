@@ -1,0 +1,56 @@
+{
+	"name": "@wordpress/media-editor",
+	"version": "0.1.0",
+	"description": "Media editor components for WordPress.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"media",
+		"editor",
+		"attachment"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/media-editor/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/media-editor"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
+	"react-native": "src/index",
+	"types": "build-types",
+	"sideEffects": [
+		"build-style/**",
+		"src/**/*.scss"
+	],
+	"dependencies": {
+		"@babel/runtime": "^7.16.0",
+		"@wordpress/components": "file:../components",
+		"@wordpress/dataviews": "file:../dataviews",
+		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n"
+	},
+	"peerDependencies": {
+		"react": "^18.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

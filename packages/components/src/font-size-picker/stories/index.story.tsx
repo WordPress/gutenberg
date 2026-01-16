@@ -42,6 +42,7 @@ const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
 	const [ fontSize, setFontSize ] = useState( value );
 	return (
 		<FontSizePicker
+			__next40pxDefaultSize
 			{ ...props }
 			value={ fontSize }
 			onChange={ ( nextValue ) => {
