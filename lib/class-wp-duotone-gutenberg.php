@@ -42,7 +42,7 @@ class WP_Duotone_Gutenberg {
 	 * Block names from global, theme, and custom styles that use duotone presets and the slug of
 	 * the preset they are using.
 	 *
-	 * This property shouldn't be accessed directly, but rather via global_styles_block_names().
+	 * This property shouldn't be accessed directly, but rather via {@see self::global_styles_block_names()}.
 	 * This ensures that it gets initialized correctly before use.
 	 *
 	 * Example:
@@ -74,7 +74,7 @@ class WP_Duotone_Gutenberg {
 	 *      …
 	 *  ]
 	 *
-	 * @var array|null
+	 * @var array<string, string>|null
 	 */
 	private static $__global_styles_presets = null;
 
@@ -137,7 +137,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Simple getter for `$__global_styles_block_names`, to ensure it's initialized on demand.
 	 *
-	 * @return array The styles block names.
+	 * @return array<string, string> The styles block names.
 	 */
 	private static function global_styles_block_names() {
 		if ( is_null( self::$__global_styles_block_names ) ) {
