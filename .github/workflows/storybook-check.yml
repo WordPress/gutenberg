@@ -32,6 +32,8 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Build Storybook
+              env:
+                  NODE_ENV: test
               run: npm run storybook:build
 
             - name: Install test-runner and Playwright dependencies

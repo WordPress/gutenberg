@@ -23,6 +23,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import { STATUS_OPTIONS } from '../../components/post-status';
 import { store as editorStore } from '../../store';
+import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 
 /**
  * Component showing whether the post is saved or not and providing save
@@ -49,6 +50,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 		showIconLabels,
 		postStatus,
 		postStatusHasChanged,
+		postType,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -77,6 +79,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 				showIconLabels: get( 'core', 'showIconLabels' ),
 				postStatus: getEditedPostAttribute( 'status' ),
 				postStatusHasChanged: !! getPostEdits()?.status,
+				postType: select( editorStore ).getCurrentPostType(),
 			};
 		},
 		[ forceIsDirty ]
@@ -98,6 +101,11 @@ export default function PostSavedState( { forceIsDirty } ) {
 
 		return () => clearTimeout( timeoutId );
 	}, [ isSaving ] );
+
+	// Attachments don't support draft mode, so hide this button.
+	if ( postType === ATTACHMENT_POST_TYPE ) {
+		return null;
+	}
 
 	// Once the post has been submitted for review this button
 	// is not needed for the contributor role.

@@ -69,6 +69,7 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 	return (
 		<>
 			<ComboboxControl
+				__next40pxDefaultSize
 				{ ...args }
 				value={ value }
 				onChange={ ( ...changeArgs ) => {

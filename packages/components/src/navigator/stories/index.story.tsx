@@ -141,6 +141,7 @@ const NavigatorButtonWithSkipFocus = ( {
 
 	return (
 		<Button
+			__next40pxDefaultSize
 			{ ...props }
 			style={ {
 				marginInline: '8px',

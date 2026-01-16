@@ -64,6 +64,7 @@ export type ProviderCreator = (
 export interface RecordHandlers {
 	editRecord: ( data: Partial< ObjectData > ) => void;
 	getEditedRecord: () => Promise< ObjectData >;
+	refetchRecord: () => Promise< void >;
 	saveRecord: () => Promise< void >;
 	getCurrentUser: () => Promise< WordPressUserInfo >;
 }
@@ -99,7 +100,8 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID,
 		changes: Partial< ObjectData >,
-		origin: string
+		origin: string,
+		isSave?: boolean
 	) => void;
 }
 

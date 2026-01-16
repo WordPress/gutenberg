@@ -25,8 +25,7 @@ import { getMediaSelectKey } from '../../../store/private-keys';
 import { store as blockEditorStore } from '../../../store';
 
 function MediaThumbnail( { data, field, attachment, config } ) {
-	const { fieldDef } = config;
-	const { allowedTypes = [], multiple = false } = fieldDef.args || {};
+	const { allowedTypes = [], multiple = false } = config || {};
 
 	if ( multiple ) {
 		return 'todo multiple';
@@ -85,12 +84,11 @@ export default function Media( { data, field, onChange, config = {} } ) {
 		isControl: true,
 	} );
 	const value = field.getValue( { item: data } );
-	const { fieldDef } = config;
-	const { allowedTypes = [], multiple = false } = fieldDef.args || {};
-
-	// Check if featured image is supported by checking if it's in the mapping
-	const hasFeaturedImageSupport =
-		fieldDef?.mapping && 'featuredImage' in fieldDef.mapping;
+	const {
+		allowedTypes = [],
+		multiple = false,
+		useFeaturedImage = false,
+	} = config;
 
 	const id = value?.id;
 	const url = value?.url;
@@ -140,23 +138,14 @@ export default function Media( { data, field, onChange, config = {} } ) {
 				multiple={ multiple }
 				popoverProps={ popoverProps }
 				onReset={ () => {
-					// Build reset value dynamically based on mapping
-					const resetValue = {};
-
-					if ( fieldDef?.mapping ) {
-						Object.keys( fieldDef.mapping ).forEach( ( key ) => {
-							resetValue[ key ] = undefined;
-						} );
-					}
-
 					onChange(
 						field.setValue( {
 							item: data,
-							value: resetValue,
+							value: {},
 						} )
 					);
 				} }
-				{ ...( hasFeaturedImageSupport && {
+				{ ...( useFeaturedImage && {
 					useFeaturedImage: !! value?.featuredImage,
 					onToggleFeaturedImage: () => {
 						onChange(
@@ -171,14 +160,13 @@ export default function Media( { data, field, onChange, config = {} } ) {
 				} ) }
 				onSelect={ ( selectedMedia ) => {
 					if ( selectedMedia.id && selectedMedia.url ) {
-						// Build new value dynamically based on what's in the mapping
 						const newValue = {
 							...selectedMedia,
 							mediaType: selectedMedia.media_type,
 						};
 
 						// Turn off featured image when manually selecting media
-						if ( hasFeaturedImageSupport ) {
+						if ( useFeaturedImage ) {
 							newValue.featuredImage = false;
 						}
 

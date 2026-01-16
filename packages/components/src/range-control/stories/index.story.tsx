@@ -66,6 +66,7 @@ const Template: StoryFn< typeof RangeControl > = ( { onChange, ...args } ) => {
 
 	return (
 		<RangeControl
+			__next40pxDefaultSize
 			{ ...args }
 			value={ value }
 			onChange={ ( v ) => {
@@ -100,6 +101,7 @@ export const WithAnyStep: StoryFn< typeof RangeControl > = ( {
 	return (
 		<>
 			<RangeControl
+				__next40pxDefaultSize
 				{ ...args }
 				value={ value }
 				onChange={ ( v ) => {
@@ -130,6 +132,7 @@ const MarkTemplate: StoryFn< typeof RangeControl > = ( {
 		<>
 			<h2>{ label }</h2>
 			<RangeControl
+				__next40pxDefaultSize
 				{ ...args }
 				label="Automatic marks"
 				marks
@@ -140,6 +143,7 @@ const MarkTemplate: StoryFn< typeof RangeControl > = ( {
 				value={ automaticValue }
 			/>
 			<RangeControl
+				__next40pxDefaultSize
 				{ ...args }
 				label="Custom marks"
 				onChange={ ( v ) => {

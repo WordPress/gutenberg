@@ -22,6 +22,6 @@ function gutenberg_register_fonts_menu_item() {
 		__( 'Fonts', 'gutenberg' ),
 		'edit_theme_options',
 		'font-library-wp-admin',
-		'font_library_wp_admin_render_page'
+		'gutenberg_font_library_wp_admin_render_page'
 	);
 }

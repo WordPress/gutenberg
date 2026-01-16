@@ -160,7 +160,9 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
-						'mobile' => false,
+						'viewport' => array(
+							'mobile' => false,
+						),
 					),
 				),
 			),
@@ -193,7 +195,9 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
-						'tablet' => false,
+						'viewport' => array(
+							'tablet' => false,
+						),
 					),
 				),
 			),
@@ -226,7 +230,9 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
-						'desktop' => false,
+						'viewport' => array(
+							'desktop' => false,
+						),
 					),
 				),
 			),
@@ -259,8 +265,10 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
-						'mobile'  => false,
-						'desktop' => false,
+						'viewport' => array(
+							'mobile'  => false,
+							'desktop' => false,
+						),
 					),
 				),
 			),
@@ -297,9 +305,11 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
-						'mobile'  => true,
-						'tablet'  => true,
-						'desktop' => true,
+						'viewport' => array(
+							'mobile'  => true,
+							'tablet'  => true,
+							'desktop' => true,
+						),
 					),
 				),
 			),
@@ -324,9 +334,11 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
-						'mobile'  => false,
-						'tablet'  => false,
-						'desktop' => false,
+						'viewport' => array(
+							'mobile'  => false,
+							'tablet'  => false,
+							'desktop' => false,
+						),
 					),
 				),
 			),
@@ -374,9 +386,11 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
-						'mobile'       => false,
-						'unknownBreak' => false,
-						'largeScreen'  => false,
+						'viewport' => array(
+							'mobile'       => false,
+							'unknownBreak' => false,
+							'largeScreen'  => false,
+						),
 					),
 				),
 			),
@@ -405,7 +419,9 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 			'attrs'     => array(
 				'metadata' => array(
 					'blockVisibility' => array(
-						'mobile' => false,
+						'viewport' => array(
+							'mobile' => false,
+						),
 					),
 				),
 			),

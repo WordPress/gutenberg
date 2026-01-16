@@ -131,11 +131,6 @@ export const AllTonesAndVariants: Story = {
 									{ ...args }
 									tone={ tone }
 									variant={ variant }
-									// Disabling because this lint rule was meant for the
-									// `@wordpress/components` Button, but is being applied here.
-									// TODO: rework the lint rule so that it checks the package
-									// where the Button comes from.
-									// eslint-disable-next-line no-restricted-syntax
 									disabled
 								/>
 							</div>

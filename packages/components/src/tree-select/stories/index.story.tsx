@@ -40,6 +40,7 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
 
 	return (
 		<TreeSelect
+			__next40pxDefaultSize
 			{ ...props }
 			onChange={ setSelection }
 			selectedId={ selection }
