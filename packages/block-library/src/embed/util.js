@@ -203,7 +203,7 @@ export const removeAspectRatioClasses = ( existingClassNames ) => {
  * @param {string} html The embed HTML to check.
  * @return {boolean} True if the HTML already has responsive styling.
  */
-export function hasResponsiveWrapper( html ) {
+export function hasInlineResponsivePadding( html ) {
 	// Check for padding-bottom or padding-top with percentage values in style attributes
 	// This pattern matches: padding-bottom: 56.25%; or padding-top: 50%; etc.
 	const paddingPattern = /padding-(top|bottom)\s*:\s*[\d.]+%/i;
@@ -229,7 +229,7 @@ export function getClassNames(
 
 	// If the embed HTML already contains responsive wrapper styling (like Flickr),
 	// don't add our own aspect ratio classes to avoid double padding.
-	if ( hasResponsiveWrapper( html ) ) {
+	if ( hasInlineResponsivePadding( html ) ) {
 		return removeAspectRatioClasses( existingClassNames );
 	}
 

@@ -18,7 +18,7 @@ import {
 	getEmbedInfoByProvider,
 	removeAspectRatioClasses,
 	hasAspectRatioClass,
-	hasResponsiveWrapper,
+	hasInlineResponsivePadding,
 } from '../util';
 import { embedInstagramIcon } from '../icons';
 import variations from '../variations';
@@ -124,28 +124,28 @@ describe( 'utils', () => {
 			);
 		} );
 	} );
-	describe( 'hasResponsiveWrapper', () => {
+	describe( 'hasInlineResponsivePadding', () => {
 		it( 'should return true when HTML contains padding-bottom percentage', () => {
 			const html =
 				'<div style="padding-bottom: 56.25%;"><iframe></iframe></div>';
-			expect( hasResponsiveWrapper( html ) ).toBe( true );
+			expect( hasInlineResponsivePadding( html ) ).toBe( true );
 		} );
 
 		it( 'should return true when HTML contains padding-top percentage', () => {
 			const html =
 				'<div style="padding-top: 75%;"><iframe></iframe></div>';
-			expect( hasResponsiveWrapper( html ) ).toBe( true );
+			expect( hasInlineResponsivePadding( html ) ).toBe( true );
 		} );
 
 		it( 'should return false when HTML has no padding percentage', () => {
 			const html = '<iframe width="640" height="360"></iframe>';
-			expect( hasResponsiveWrapper( html ) ).toBe( false );
+			expect( hasInlineResponsivePadding( html ) ).toBe( false );
 		} );
 
 		it( 'should return false when padding uses pixels instead of percentage', () => {
 			const html =
 				'<div style="padding-bottom: 20px;"><iframe></iframe></div>';
-			expect( hasResponsiveWrapper( html ) ).toBe( false );
+			expect( hasInlineResponsivePadding( html ) ).toBe( false );
 		} );
 	} );
 
