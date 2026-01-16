@@ -777,87 +777,87 @@ export default function Image( {
 					/>
 				</BlockControls>
 			) }
-		{ ! hasDataFormBlockFields && isSingleSelected && (
-			<InspectorControls
-				group="media"
-				resetAllFilter={ () => ( {
-					url: undefined,
-					alt: undefined,
-					id: undefined,
-				} ) }
-			>
-				{ ! lockUrlControls && (
+			{ ! hasDataFormBlockFields && isSingleSelected && (
+				<InspectorControls
+					group="media"
+					resetAllFilter={ () => ( {
+						url: undefined,
+						alt: undefined,
+						id: undefined,
+					} ) }
+				>
+					{ ! lockUrlControls && (
+						<ToolsPanelItem
+							label={ __( 'Image' ) }
+							hasValue={ () => !! url }
+							onDeselect={ () => onSelectImage( undefined ) }
+							resetAllFilter={ () => ( {
+								url: undefined,
+								id: undefined,
+							} ) }
+							isShownByDefault
+							panelId={ clientId }
+						>
+							<MediaControl
+								mediaId={ id }
+								mediaUrl={ url }
+								alt={ alt }
+								filename={
+									image?.media_details?.sizes?.full?.file ||
+									image?.slug ||
+									getFilename( url )
+								}
+								allowedTypes={ ALLOWED_MEDIA_TYPES }
+								onSelect={ onSelectImage }
+								onSelectURL={ onSelectURL }
+								onError={ onUploadError }
+								onReset={ () => onSelectImage( undefined ) }
+								isUploading={ !! temporaryURL }
+								emptyLabel={ __( 'Add image' ) }
+							/>
+						</ToolsPanelItem>
+					) }
 					<ToolsPanelItem
-						label={ __( 'Image' ) }
-						hasValue={ () => !! url }
-						onDeselect={ () => onSelectImage( undefined ) }
-						resetAllFilter={ () => ( {
-							url: undefined,
-							id: undefined,
-						} ) }
+						label={ __( 'Alternative text' ) }
 						isShownByDefault
+						hasValue={ () => !! alt }
+						onDeselect={ () => setAttributes( { alt: undefined } ) }
+						resetAllFilter={ () => ( {
+							alt: undefined,
+						} ) }
 						panelId={ clientId }
 					>
-						<MediaControl
-							mediaId={ id }
-							mediaUrl={ url }
-							alt={ alt }
-							filename={
-								image?.media_details?.sizes?.full?.file ||
-								image?.slug ||
-								getFilename( url )
+						<TextareaControl
+							label={ __( 'Alternative text' ) }
+							value={ alt || '' }
+							onChange={ updateAlt }
+							readOnly={ lockAltControls }
+							help={
+								lockAltControls ? (
+									<>{ lockAltControlsMessage }</>
+								) : (
+									<>
+										<ExternalLink
+											href={
+												// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+												__(
+													'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+												)
+											}
+										>
+											{ __(
+												'Describe the purpose of the image.'
+											) }
+										</ExternalLink>
+										<br />
+										{ __( 'Leave empty if decorative.' ) }
+									</>
+								)
 							}
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							onSelect={ onSelectImage }
-							onSelectURL={ onSelectURL }
-							onError={ onUploadError }
-							onReset={ () => onSelectImage( undefined ) }
-							isUploading={ !! temporaryURL }
-							emptyLabel={ __( 'Add image' ) }
 						/>
 					</ToolsPanelItem>
-				) }
-				<ToolsPanelItem
-					label={ __( 'Alternative text' ) }
-					isShownByDefault
-					hasValue={ () => !! alt }
-					onDeselect={ () => setAttributes( { alt: undefined } ) }
-					resetAllFilter={ () => ( {
-						alt: undefined,
-					} ) }
-					panelId={ clientId }
-				>
-					<TextareaControl
-						label={ __( 'Alternative text' ) }
-						value={ alt || '' }
-						onChange={ updateAlt }
-						readOnly={ lockAltControls }
-						help={
-							lockAltControls ? (
-								<>{ lockAltControlsMessage }</>
-							) : (
-								<>
-									<ExternalLink
-										href={
-											// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
-											__(
-												'https://www.w3.org/WAI/tutorials/images/decision-tree/'
-											)
-										}
-									>
-										{ __(
-											'Describe the purpose of the image.'
-										) }
-									</ExternalLink>
-									<br />
-									{ __( 'Leave empty if decorative.' ) }
-								</>
-							)
-						}
-					/>
-				</ToolsPanelItem>
-			</InspectorControls>
-		) }
+				</InspectorControls>
+			) }
 			<InspectorControls
 				group="dimensions"
 				resetAllFilter={ ( attrs ) => ( {
@@ -897,25 +897,25 @@ export default function Image( {
 					</ToolsPanelItem>
 				) }
 			</InspectorControls>
-		{ !! imageSizeOptions.length && (
-			<InspectorControls
-				group="settings"
-				resetAllFilter={ () => ( {
-					sizeSlug: DEFAULT_MEDIA_SIZE_SLUG,
-				} ) }
-			>
-				<ResolutionTool
-					value={ sizeSlug }
-					defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
-					onChange={ updateImage }
-					options={ imageSizeOptions }
-					panelId={ clientId }
+			{ !! imageSizeOptions.length && (
+				<InspectorControls
+					group="settings"
 					resetAllFilter={ () => ( {
 						sizeSlug: DEFAULT_MEDIA_SIZE_SLUG,
 					} ) }
-				/>
-			</InspectorControls>
-		) }
+				>
+					<ResolutionTool
+						value={ sizeSlug }
+						defaultValue={ DEFAULT_MEDIA_SIZE_SLUG }
+						onChange={ updateImage }
+						options={ imageSizeOptions }
+						panelId={ clientId }
+						resetAllFilter={ () => ( {
+							sizeSlug: DEFAULT_MEDIA_SIZE_SLUG,
+						} ) }
+					/>
+				</InspectorControls>
+			) }
 			<InspectorControls group="advanced">
 				<TextControl
 					__next40pxDefaultSize

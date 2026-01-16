@@ -689,20 +689,20 @@ function Navigation( {
 								/>
 							) }
 
-						<ToolsPanelItem
-							hasValue={ () => overlayMenu !== 'mobile' }
-							label={ __( 'Overlay Visibility' ) }
-							onDeselect={ () =>
-								setAttributes( {
+							<ToolsPanelItem
+								hasValue={ () => overlayMenu !== 'mobile' }
+								label={ __( 'Overlay Visibility' ) }
+								onDeselect={ () =>
+									setAttributes( {
+										overlayMenu: 'mobile',
+									} )
+								}
+								resetAllFilter={ () => ( {
 									overlayMenu: 'mobile',
-								} )
-							}
-							resetAllFilter={ () => ( {
-								overlayMenu: 'mobile',
-							} ) }
-							isShownByDefault
-							panelId={ clientId }
-						>
+								} ) }
+								isShownByDefault
+								panelId={ clientId }
+							>
 								<OverlayVisibilityControl
 									overlayMenu={ overlayMenu }
 									setAttributes={ setAttributes }
@@ -716,22 +716,22 @@ function Navigation( {
 							<h3 className="wp-block-navigation__submenu-header">
 								{ __( 'Submenus' ) }
 							</h3>
-						<ToolsPanelItem
-							hasValue={ () => openSubmenusOnClick }
-							label={ __( 'Open on click' ) }
-							onDeselect={ () =>
-								setAttributes( {
+							<ToolsPanelItem
+								hasValue={ () => openSubmenusOnClick }
+								label={ __( 'Open on click' ) }
+								onDeselect={ () =>
+									setAttributes( {
+										openSubmenusOnClick: false,
+										showSubmenuIcon: true,
+									} )
+								}
+								resetAllFilter={ () => ( {
 									openSubmenusOnClick: false,
 									showSubmenuIcon: true,
-								} )
-							}
-							resetAllFilter={ () => ( {
-								openSubmenusOnClick: false,
-								showSubmenuIcon: true,
-							} ) }
-							isShownByDefault
-							panelId={ clientId }
-						>
+								} ) }
+								isShownByDefault
+								panelId={ clientId }
+							>
 								<ToggleControl
 									checked={ openSubmenusOnClick }
 									onChange={ ( value ) => {
@@ -746,21 +746,21 @@ function Navigation( {
 								/>
 							</ToolsPanelItem>
 
-						<ToolsPanelItem
-							hasValue={ () => ! showSubmenuIcon }
-							label={ __( 'Show arrow' ) }
-							onDeselect={ () =>
-								setAttributes( {
+							<ToolsPanelItem
+								hasValue={ () => ! showSubmenuIcon }
+								label={ __( 'Show arrow' ) }
+								onDeselect={ () =>
+									setAttributes( {
+										showSubmenuIcon: true,
+									} )
+								}
+								resetAllFilter={ () => ( {
 									showSubmenuIcon: true,
-								} )
-							}
-							resetAllFilter={ () => ( {
-								showSubmenuIcon: true,
-							} ) }
-							isDisabled={ attributes.openSubmenusOnClick }
-							isShownByDefault
-							panelId={ clientId }
-						>
+								} ) }
+								isDisabled={ attributes.openSubmenusOnClick }
+								isShownByDefault
+								panelId={ clientId }
+							>
 								<ToggleControl
 									checked={ showSubmenuIcon }
 									onChange={ ( value ) => {
