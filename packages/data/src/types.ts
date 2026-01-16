@@ -4,6 +4,12 @@
 // eslint-disable-next-line no-restricted-imports
 import type { combineReducers as reduxCombineReducers } from 'redux';
 
+/**
+ * The Action object types for metadata actions.
+ * This is exposed to allow 3rd-party reducer functions to inform the TypeScript compiler of additional potential actions.
+ */
+export type MetaAction = import('./redux-store/metadata/reducer').Action;
+
 type MapOf< T > = { [ name: string ]: T };
 
 export type ActionCreator = ( ...args: any[] ) => any | Generator;

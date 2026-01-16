@@ -21,7 +21,7 @@ import type {
  */
 import { selectorArgsToStateKey, onSubKey } from './utils';
 
-type Action =
+export type Action =
 	| ReturnType< typeof startResolution >
 	| ReturnType< typeof finishResolution >
 	| ReturnType< typeof failResolution >

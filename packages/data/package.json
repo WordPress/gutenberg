@@ -38,12 +38,6 @@
 			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
-		"./redux-store/metadata/actions": {
-			"types": "./build-types/redux-store/metadata/actions.d.ts"
-		},
-		"./redux-store/metadata/selectors": {
-			"types": "./build-types/redux-store/metadata/selectors.d.ts"
-		},
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
