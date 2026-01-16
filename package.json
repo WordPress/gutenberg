@@ -88,7 +88,6 @@
 		"eslint-plugin-testing-library": "6.0.2",
 		"execa": "4.0.2",
 		"fast-glob": "^3.2.7",
-		"filenamify": "4.2.0",
 		"glob": "7.1.2",
 		"husky": "7.0.0",
 		"jest": "29.6.2",
@@ -183,8 +182,8 @@
 		"storybook:e2e:dev": "concurrently \"npm run dev\" \"wait-on .dev-ready && npm run --workspace @wordpress/storybook-playwright storybook:dev\"",
 		"test": "npm-run-all lint test:unit",
 		"test:create-block": "bash ./bin/test-create-block.sh",
-		"test:e2e": "wp-scripts test-playwright --config test/e2e/playwright.config.ts",
-		"test:e2e:debug": "wp-scripts test-playwright --config test/e2e/playwright.config.ts --ui",
+		"test:e2e": "npm run --workspace @wordpress/e2e-tests-playwright test:e2e",
+		"test:e2e:debug": "npm run --workspace @wordpress/e2e-tests-playwright test:e2e:debug",
 		"test:e2e:playwright": "npm run test:e2e",
 		"test:e2e:playwright:debug": "npm run test:e2e:debug",
 		"test:e2e:storybook": "npm run --workspace @wordpress/storybook-playwright test:e2e",
@@ -254,6 +253,7 @@
 		"packages/*",
 		"routes/*",
 		"storybook",
+		"test/e2e",
 		"test/storybook-playwright"
 	]
 }
