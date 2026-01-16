@@ -7,6 +7,7 @@ import { subDays, subWeeks, subMonths, subYears } from 'date-fns';
 /**
  * WordPress dependencies
  */
+import deprecated from '@wordpress/deprecated';
 import { getDate } from '@wordpress/date';
 
 /**
@@ -163,6 +164,10 @@ export default function filterSortAndPaginate< Item >(
 					filter.operator === OPERATOR_IS_NOT_ALL &&
 					filter?.value?.length > 0
 				) {
+					deprecated( "The 'isNotAll' filter operator", {
+						since: '7.0',
+						alternative: "'isNone'",
+					} );
 					filteredData = filteredData.filter( ( item ) => {
 						return filter.value.every( ( value: any ) => {
 							return ! field
@@ -384,12 +389,18 @@ export default function filterSortAndPaginate< Item >(
 	// Handle sorting.
 	const sortByField = view.sort?.field
 		? _fields.find( ( field ) => {
-				return field.id === view.sort?.field;
+				return (
+					field.enableSorting !== false &&
+					field.id === view.sort?.field
+				);
 		  } )
 		: null;
 	const groupByField = view.groupBy?.field
 		? _fields.find( ( field ) => {
-				return field.id === view.groupBy?.field;
+				return (
+					field.enableSorting !== false &&
+					field.id === view.groupBy?.field
+				);
 		  } )
 		: null;
 	if ( sortByField || groupByField ) {

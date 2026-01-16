@@ -36,28 +36,47 @@ export const settings = {
 		...a,
 		text: ( a.text || '' ) + text,
 	} ),
+	__experimentalLabel( attributes, { context } ) {
+		const { text } = attributes;
+
+		const customName = attributes?.metadata?.name;
+		const hasContent = text?.trim().length > 0;
+
+		// In the list view, use the block's text as the label.
+		// If the text is empty, fall back to the default label.
+		if ( context === 'list-view' && ( customName || hasContent ) ) {
+			return customName || text;
+		}
+	},
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
+if ( window.__experimentalContentOnlyInspectorFields ) {
 	settings[ fieldsKey ] = [
 		{
 			id: 'text',
 			label: __( 'Content' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 		{
 			id: 'link',
 			label: __( 'Link' ),
-			type: 'link',
-			mapping: {
-				url: 'url',
-				rel: 'rel',
-				linkTarget: 'linkTarget',
-			},
+			type: 'url',
+			Edit: 'link', // TODO: replace with custom component
+			getValue: ( { item } ) => ( {
+				url: item.url,
+				rel: item.rel,
+				linkTarget: item.linkTarget,
+			} ),
+			setValue: ( { value } ) => ( {
+				url: value.url,
+				rel: value.rel,
+				linkTarget: value.linkTarget,
+			} ),
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'text' ],
+		fields: [ 'text', 'link' ],
 	};
 }
 

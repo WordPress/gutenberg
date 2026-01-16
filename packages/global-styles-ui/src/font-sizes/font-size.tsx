@@ -241,7 +241,6 @@ function FontSize() {
 								) }
 								checked={ isFluid }
 								onChange={ handleFluidChange }
-								__nextHasNoMarginBottom
 							/>
 
 							{ isFluid && (
@@ -252,7 +251,6 @@ function FontSize() {
 									) }
 									checked={ isCustomFluid }
 									onChange={ handleCustomFluidValues }
-									__nextHasNoMarginBottom
 								/>
 							) }
 

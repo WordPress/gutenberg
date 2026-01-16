@@ -36,34 +36,41 @@ export const settings = {
 	save,
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
+if ( window.__experimentalContentOnlyInspectorFields ) {
 	settings[ fieldsKey ] = [
 		{
 			id: 'file',
 			label: __( 'File' ),
 			type: 'media',
-			mapping: {
-				id: 'id',
-				url: 'href',
-			},
-			args: {
+			Edit: {
+				control: 'media', // TODO: replace with custom component
 				allowedTypes: [],
 				multiple: false,
 			},
+			getValue: ( { item } ) => ( {
+				id: item.id,
+				url: item.href,
+			} ),
+			setValue: ( { value } ) => ( {
+				id: value.id,
+				href: value.url,
+			} ),
 		},
 		{
 			id: 'fileName',
 			label: __( 'Filename' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 		{
 			id: 'downloadButtonText',
 			label: __( 'Button Text' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'file' ],
+		fields: [ 'file', 'fileName', 'downloadButtonText' ],
 	};
 }
 

@@ -40,21 +40,23 @@ export const settings = {
 	deprecated,
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
+if ( window.__experimentalContentOnlyInspectorFields ) {
 	settings[ fieldsKey ] = [
 		{
 			id: 'value',
 			label: __( 'Content' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 		{
 			id: 'citation',
 			label: __( 'Citation' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 	];
 	settings[ formKey ] = {
-		fields: [ 'value' ],
+		fields: [ 'value', 'citation' ],
 	};
 }
 

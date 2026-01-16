@@ -32,7 +32,6 @@ import { BlockGroupToolbar } from '../convert-to-group-buttons';
 import BlockEditVisuallyButton from '../block-edit-visually-button';
 import { useShowHoveredOrFocusedGestures } from './utils';
 import { store as blockEditorStore } from '../../store';
-import __unstableBlockNameContext from './block-name-context';
 import NavigableToolbar from '../navigable-toolbar';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
 import ChangeDesign from './change-design';
@@ -265,11 +264,7 @@ export function PrivateBlockToolbar( {
 							group="other"
 							className="block-editor-block-toolbar__slot"
 						/>
-						<__unstableBlockNameContext.Provider
-							value={ blockType?.name }
-						>
-							<__unstableBlockToolbarLastItem.Slot />
-						</__unstableBlockNameContext.Provider>
+						<__unstableBlockToolbarLastItem.Slot />
 					</>
 				) }
 				<BlockEditVisuallyButton clientIds={ blockClientIds } />

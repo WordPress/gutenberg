@@ -1,7 +1,12 @@
 /**
  * Internal dependencies
  */
-import type { Field, FormatDate, NormalizedField, Operator } from './field-api';
+import type {
+	CustomValidator,
+	NormalizedField,
+	Operator,
+	Validator,
+} from './field-api';
 
 export type SelectionOrUpdater = string[] | ( ( prev: string[] ) => string[] );
 export type SetSelection = ( selection: SelectionOrUpdater ) => void;
@@ -10,14 +15,22 @@ export type FieldType< Item > = Pick<
 	| 'type'
 	| 'render'
 	| 'sort'
-	| 'isValid'
 	| 'enableSorting'
 	| 'enableGlobalSearch'
+	| 'format'
+	| 'getValueFormatted'
 > & {
 	Edit: string | null;
 	validOperators: Operator[];
 	defaultOperators: Operator[];
-	getFormat: (
-		field: Field< Item >
-	) => Record< string, any > | Required< FormatDate >;
+	validate: {
+		required?: Validator< Item >;
+		elements?: Validator< Item >;
+		pattern?: Validator< Item >;
+		minLength?: Validator< Item >;
+		maxLength?: Validator< Item >;
+		min?: Validator< Item >;
+		max?: Validator< Item >;
+		custom?: CustomValidator< Item >;
+	};
 };

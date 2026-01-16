@@ -38,7 +38,7 @@ jobs:
         steps:
             - name: Checkout (for CLI)
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
                   path: cli
                   ref: trunk
@@ -47,7 +47,7 @@ jobs:
 
             - name: Checkout (for publishing)
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
@@ -58,7 +58,7 @@ jobs:
 
             - name: Checkout (for publishing WP major version)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
-              uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
                   path: publish
                   ref: wp/${{ github.event.inputs.wp_version }}
@@ -77,7 +77,7 @@ jobs:
 
             - name: Setup Node.js
               if: ${{ github.event.inputs.release_type != 'wp' }}
-              uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+              uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
               with:
                   node-version-file: 'cli/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'
@@ -85,7 +85,7 @@ jobs:
 
             - name: Setup Node.js (for WP major version)
               if: ${{ github.event.inputs.release_type == 'wp' && github.event.inputs.wp_version }}
-              uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+              uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
               with:
                   node-version-file: 'publish/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'

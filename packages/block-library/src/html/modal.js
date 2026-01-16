@@ -8,6 +8,7 @@ import {
 	Modal,
 	Button,
 	Flex,
+	Notice,
 	privateApis as componentsPrivateApis,
 	__experimentalHStack as HStack,
 	__experimentalGrid as Grid,
@@ -48,8 +49,9 @@ export default function HTMLEditModal( {
 		};
 	}, [] );
 
-	// Show JS tab if user has permission OR if block contains JavaScript
-	const shouldShowJsTab = canUserUseUnfilteredHTML || js.trim() !== '';
+	// Determine if we should show a warning about CSS/JS content being stripped
+	const hasRestrictedContent =
+		! canUserUseUnfilteredHTML && ( css.trim() || js.trim() );
 
 	if ( ! isOpen ) {
 		return null;
@@ -68,11 +70,13 @@ export default function HTMLEditModal( {
 		setIsDirty( true );
 	};
 	const handleUpdate = () => {
+		// For users without unfiltered_html capability, strip CSS and JS content
+		// to prevent kses from leaving broken content
 		setAttributes( {
 			content: serializeContent( {
 				html: editedHtml,
-				css: editedCss,
-				js: editedJs,
+				css: canUserUseUnfilteredHTML ? editedCss : '',
+				js: canUserUseUnfilteredHTML ? editedJs : '',
 			} ),
 		} );
 		setIsDirty( false );
@@ -130,8 +134,10 @@ export default function HTMLEditModal( {
 							<div>
 								<Tabs.TabList>
 									<Tabs.Tab tabId="html">HTML</Tabs.Tab>
-									<Tabs.Tab tabId="css">CSS</Tabs.Tab>
-									{ shouldShowJsTab && (
+									{ canUserUseUnfilteredHTML && (
+										<Tabs.Tab tabId="css">CSS</Tabs.Tab>
+									) }
+									{ canUserUseUnfilteredHTML && (
 										<Tabs.Tab tabId="js">
 											{ __( 'JavaScript' ) }
 										</Tabs.Tab>
@@ -148,6 +154,17 @@ export default function HTMLEditModal( {
 								/>
 							</div>
 						</HStack>
+						{ hasRestrictedContent && (
+							<Notice
+								status="warning"
+								isDismissible={ false }
+								className="block-library-html__modal-notice"
+							>
+								{ __(
+									'This block contains CSS or JavaScript that will be removed when you save because you do not have permission to use unfiltered HTML.'
+								) }
+							</Notice>
+						) }
 						<HStack
 							alignment="stretch"
 							justify="flex-start"
@@ -168,20 +185,22 @@ export default function HTMLEditModal( {
 										className="block-library-html__modal-editor"
 									/>
 								</Tabs.TabPanel>
-								<Tabs.TabPanel
-									tabId="css"
-									focusable={ false }
-									className="block-library-html__modal-tab"
-								>
-									<PlainText
-										value={ editedCss }
-										onChange={ handleCssChange }
-										placeholder={ __( 'Write CSS…' ) }
-										aria-label={ __( 'CSS' ) }
-										className="block-library-html__modal-editor"
-									/>
-								</Tabs.TabPanel>
-								{ shouldShowJsTab && (
+								{ canUserUseUnfilteredHTML && (
+									<Tabs.TabPanel
+										tabId="css"
+										focusable={ false }
+										className="block-library-html__modal-tab"
+									>
+										<PlainText
+											value={ editedCss }
+											onChange={ handleCssChange }
+											placeholder={ __( 'Write CSS…' ) }
+											aria-label={ __( 'CSS' ) }
+											className="block-library-html__modal-editor"
+										/>
+									</Tabs.TabPanel>
+								) }
+								{ canUserUseUnfilteredHTML && (
 									<Tabs.TabPanel
 										tabId="js"
 										focusable={ false }

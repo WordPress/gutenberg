@@ -39,55 +39,44 @@ export const toggleGroupControl = ( {
 		content: '';
 		position: absolute;
 		pointer-events: none;
-		background: ${ COLORS.theme.foreground };
+		background: ${ COLORS.theme.foregroundInverted };
+		border: 1px solid ${ COLORS.theme.gray[ 700 ] };
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
 		outline-offset: -3px;
 
-		/* Using a large value to avoid antialiasing rounding issues
-			when scaling in the transform, see: https://stackoverflow.com/a/52159123 */
-		--antialiasing-factor: 100;
-		/* Adjusting the border radius to match the scaling in the x axis. */
-		border-radius: calc(
-				${ CONFIG.radiusXSmall } /
-					(
-						var( --selected-width, 0 ) /
-							var( --antialiasing-factor )
-					)
-			) / ${ CONFIG.radiusXSmall };
-		left: -1px; // Correcting for border.
-		width: calc( var( --antialiasing-factor ) * 1px );
-		height: calc( var( --selected-height, 0 ) * 1px );
-		transform-origin: left top;
-		transform: translateX( calc( var( --selected-left, 0 ) * 1px ) )
-			scaleX(
-				calc(
-					var( --selected-width, 0 ) / var( --antialiasing-factor )
-				)
-			);
+		border-radius: ${ CONFIG.radiusSmall };
+		top: -1px;
+		left: -2px;
+		width: calc( calc( var( --selected-width, 0 ) * 1px ) + 2px );
+		height: calc( calc( var( --selected-height, 0 ) * 1px ) + 2px );
+		transform: translateX( calc( var( --selected-left, 0 ) * 1px ) );
+		/* Hide when dimensions are unset (0) */
+		opacity: min(
+			1,
+			max( 0, var( --selected-width, 0 ), var( --selected-height, 0 ) )
+		);
 	}
 `;
 
 const enclosingBorders = ( isBlock: ToggleGroupControlProps[ 'isBlock' ] ) => {
 	const enclosingBorder = css`
-		border-color: ${ COLORS.ui.border };
+		border-color: ${ COLORS.gray[ 300 ] };
 	`;
 
 	return css`
 		${ isBlock && enclosingBorder }
 
 		&:hover {
-			border-color: ${ COLORS.ui.borderHover };
+			border-color: ${ COLORS.gray[ 400 ] };
 		}
 
 		&:focus-within {
-			border-color: ${ COLORS.ui.borderFocus };
-			box-shadow: ${ CONFIG.controlBoxShadowFocus };
 			z-index: 1;
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 2px solid transparent;
-			outline-offset: -2px;
+			outline: ${ CONFIG.borderWidthFocus } solid
+				${ COLORS.ui.borderFocus };
+			outline-offset: 1px;
 		}
 	`;
 };
@@ -97,12 +86,10 @@ export const toggleGroupControlSize = (
 ) => {
 	const styles = {
 		default: css`
-			min-height: 36px;
-			padding: 2px;
+			height: 36px;
 		`,
 		'__unstable-large': css`
-			min-height: 40px;
-			padding: 3px;
+			height: 40px;
 		`,
 	};
 

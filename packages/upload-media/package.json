@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/upload-media",
-	"version": "0.21.0",
+	"version": "0.23.0",
 	"description": "Core media upload logic.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -21,13 +21,20 @@
 		"node": ">=18.12.0",
 		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},

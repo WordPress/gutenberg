@@ -23,7 +23,7 @@ jobs:
 
         steps:
             - name: Checkout
-              uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
@@ -32,11 +32,13 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Build Storybook
+              env:
+                  NODE_ENV: test
               run: npm run storybook:build
 
             - name: Install test-runner and Playwright dependencies
               run: |
-                  npm install --no-save @storybook/test-runner@0.22.1
+                  npm install --no-save @storybook/test-runner@0.24.2
                   npx playwright install --with-deps
 
             - name: Serve Storybook and run tests

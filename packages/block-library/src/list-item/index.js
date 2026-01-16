@@ -36,12 +36,13 @@ export const settings = {
 	[ unlock( privateApis ).requiresWrapperOnCopy ]: true,
 };
 
-if ( window.__experimentalContentOnlyPatternInsertion ) {
+if ( window.__experimentalContentOnlyInspectorFields ) {
 	settings[ fieldsKey ] = [
 		{
 			id: 'content',
 			label: __( 'Content' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text', // TODO: replace with custom component
 		},
 	];
 	settings[ formKey ] = {

@@ -25,6 +25,7 @@ import { useState } from '@wordpress/element';
 import { Subtitle } from './subtitle';
 import { NavigationButtonAsItem } from './navigation-button';
 import { ScreenHeader } from './screen-header';
+import { ScreenBody } from './screen-body';
 import { getNewIndexFromPresets } from './utils';
 import ConfirmResetShadowDialog from './confirm-reset-shadow-dialog';
 import { useSetting } from './hooks';
@@ -73,7 +74,7 @@ export default function ShadowsPanel() {
 					'Manage and create shadow styles for use across the site.'
 				) }
 			/>
-			<div className="global-styles-ui-screen">
+			<ScreenBody>
 				<VStack
 					className="global-styles-ui__shadows-panel"
 					spacing={ 7 }
@@ -101,7 +102,7 @@ export default function ShadowsPanel() {
 						onReset={ toggleResetDialog }
 					/>
 				</VStack>
-			</div>
+			</ScreenBody>
 		</>
 	);
 }

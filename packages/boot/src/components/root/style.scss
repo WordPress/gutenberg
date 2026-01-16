@@ -69,6 +69,11 @@
 
 	@include mixins.break-medium {
 		margin: variables.$grid-unit-10;
+
+		.boot-layout--single-page & {
+			margin-top: 0;
+			margin-left: 0;
+		}
 	}
 }
 

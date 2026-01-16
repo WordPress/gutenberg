@@ -8,11 +8,12 @@ import clsx from 'clsx';
  */
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
 import { useSelect } from '@wordpress/data';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -27,6 +28,7 @@ import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import StylesCanvas from '../styles-canvas';
+import { MediaPreview } from '../media';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -55,22 +57,23 @@ export default function EditorInterface( {
 } ) {
 	const {
 		mode,
+		isAttachment,
 		isInserterOpened,
 		isListViewOpened,
 		isDistractionFree,
 		isPreviewMode,
 		showBlockBreadcrumbs,
-		documentLabel,
+		postTypeLabel,
 		stylesPath,
 		showStylebook,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
+		const { getEditorSettings, getPostTypeLabel, getCurrentPostType } =
+			select( editorStore );
 		const { getStylesPath, getShowStylebook } = unlock(
 			select( editorStore )
 		);
 		const editorSettings = getEditorSettings();
-		const postTypeLabel = getPostTypeLabel();
 
 		let _mode = select( editorStore ).getEditorMode();
 		if ( ! editorSettings.richEditingEnabled && _mode === 'visual' ) {
@@ -87,19 +90,24 @@ export default function EditorInterface( {
 			isDistractionFree: get( 'core', 'distractionFree' ),
 			isPreviewMode: editorSettings.isPreviewMode,
 			showBlockBreadcrumbs: get( 'core', 'showBlockBreadcrumbs' ),
-			documentLabel:
-				// translators: Default label for the Document in the Block Breadcrumb.
-				postTypeLabel || _x( 'Document', 'noun, breadcrumb' ),
+			postTypeLabel: getPostTypeLabel(),
 			stylesPath: getStylesPath(),
 			showStylebook: getShowStylebook(),
+			isAttachment:
+				getCurrentPostType() === 'attachment' &&
+				window?.__experimentalMediaEditor,
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
 		: __( 'Block Library' );
+	const shouldShowMediaEditor = !! isAttachment;
 	const shouldShowStylesCanvas =
-		showStylebook || stylesPath?.startsWith( '/revisions' );
+		! isAttachment &&
+		( showStylebook || stylesPath?.startsWith( '/revisions' ) );
+	const shouldShowBlockEditor =
+		! shouldShowMediaEditor && ! shouldShowStylesCanvas;
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
@@ -140,6 +148,7 @@ export default function EditorInterface( {
 			}
 			editorNotices={ <EditorNotices /> }
 			secondarySidebar={
+				! isAttachment &&
 				! isPreviewMode &&
 				mode === 'visual' &&
 				( ( isInserterOpened && <InserterSidebar /> ) ||
@@ -154,10 +163,11 @@ export default function EditorInterface( {
 					{ ! isDistractionFree && ! isPreviewMode && (
 						<EditorNotices />
 					) }
-
-					{ shouldShowStylesCanvas ? (
-						<StylesCanvas />
-					) : (
+					{ shouldShowMediaEditor && (
+						<MediaPreview { ...iframeProps } />
+					) }
+					{ shouldShowStylesCanvas && <StylesCanvas /> }
+					{ shouldShowBlockEditor && (
 						<>
 							{ ! isPreviewMode && mode === 'text' && (
 								<TextEditor
@@ -192,7 +202,13 @@ export default function EditorInterface( {
 				isLargeViewport &&
 				showBlockBreadcrumbs &&
 				mode === 'visual' && (
-					<BlockBreadcrumb rootLabelText={ documentLabel } />
+					<BlockBreadcrumb
+						rootLabelText={
+							postTypeLabel
+								? decodeEntities( postTypeLabel )
+								: undefined
+						}
+					/>
 				)
 			}
 			actions={

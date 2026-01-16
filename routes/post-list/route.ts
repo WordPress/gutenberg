@@ -13,6 +13,12 @@ import { ensureView, viewToQuery } from './view-utils';
  * Route configuration for post list.
  */
 export const route = {
+	title: async ( { params }: { params: { type: string } } ) => {
+		const postType = await resolveSelect( coreStore ).getPostType(
+			params.type
+		);
+		return postType?.labels?.name || params.type;
+	},
 	async canvas( context: {
 		params: {
 			type: string;

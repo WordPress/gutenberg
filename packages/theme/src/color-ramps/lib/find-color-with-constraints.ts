@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, OKLCH, type ColorTypes } from 'colorjs.io/fn';
+import { get, OKLCH, type PlainColorObject } from 'colorjs.io/fn';
 
 /**
  * Internal dependencies
@@ -28,7 +28,6 @@ function cdiff( c1: number, c2: number ) {
  *  - the L applied to the seed meets the contrast target against the reference
  *  - the search is performed in one direction (ie lighter / darker)
  *  - more constraints can be applied around lightness
- *  - chroma could be tapered
  * @param reference
  * @param seed
  * @param target
@@ -40,8 +39,8 @@ function cdiff( c1: number, c2: number ) {
  * @param options.taperChromaOptions
  */
 export function findColorMeetingRequirements(
-	reference: ColorTypes,
-	seed: ColorTypes,
+	reference: PlainColorObject,
+	seed: PlainColorObject,
 	target: number,
 	direction: 'lighter' | 'darker',
 	{
@@ -54,7 +53,12 @@ export function findColorMeetingRequirements(
 		};
 		taperChromaOptions?: TaperChromaOptions;
 	} = {}
-): { color: ColorTypes; reached: boolean; achieved: number; deficit?: number } {
+): {
+	color: PlainColorObject;
+	reached: boolean;
+	achieved: number;
+	deficit?: number;
+} {
 	// A target of 1 means same color.
 	// A target lower than 1 doesn't make sense.
 	if ( target <= 1 ) {
@@ -65,7 +69,7 @@ export function findColorMeetingRequirements(
 		};
 	}
 
-	function getColorForL( l: number ): ColorTypes {
+	function getColorForL( l: number ): PlainColorObject {
 		let newL = l;
 		let newC = get( seed, [ OKLCH, 'c' ] );
 
@@ -140,7 +144,7 @@ export function findColorMeetingRequirements(
 
 	const bestColor = solveWithBisect(
 		getColorForL,
-		( c: ColorTypes ) => cdiff( getContrast( reference, c ), target ),
+		( c ) => cdiff( getContrast( reference, c ), target ),
 		lowerL,
 		lowerContrast,
 		upperL,

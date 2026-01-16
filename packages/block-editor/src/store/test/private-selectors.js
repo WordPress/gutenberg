@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import {
@@ -14,8 +19,11 @@ import {
 	isMoveLockedBlock,
 	isRemoveLockedBlock,
 	isLockedBlock,
+	isBlockHidden,
+	areBlocksHiddenAnywhere,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
+import { deviceTypeKey } from '../private-keys';
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -921,6 +929,406 @@ describe( 'private selectors', () => {
 				remove: false,
 			} );
 			expect( isLockedBlock( state, 'block-1' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isBlockHidden', () => {
+		beforeAll( () => {
+			// Register a block with visibility support
+			registerBlockType( 'core/test-block-with-visibility', {
+				save: () => null,
+				category: 'text',
+				title: 'Test Block With Visibility',
+				supports: {
+					visibility: true,
+				},
+			} );
+
+			// Register a block without visibility support
+			registerBlockType( 'core/test-block-without-visibility', {
+				save: () => null,
+				category: 'text',
+				title: 'Test Block Without Visibility',
+				supports: {
+					visibility: false,
+				},
+			} );
+
+			// Register a block with no supports defined (defaults to true for visibility)
+			registerBlockType( 'core/test-block-default-visibility', {
+				save: () => null,
+				category: 'text',
+				title: 'Test Block Default Visibility',
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( 'core/test-block-with-visibility' );
+			unregisterBlockType( 'core/test-block-without-visibility' );
+			unregisterBlockType( 'core/test-block-default-visibility' );
+		} );
+
+		it( 'should return false when block has visibility support and is not hidden', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: true,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return true when block has visibility support and is hidden', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: false,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHidden( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'should return false when block does not have visibility support', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-without-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: false,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			// Even though blockVisibility is false, the block doesn't support visibility,
+			// so it should return false
+			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return false when block has default visibility support and is not hidden', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-default-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: true,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return true when block has default visibility support and is hidden', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-default-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: false,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHidden( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'should return false when block has no metadata', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [ [ 'block-1', {} ] ] ),
+				},
+			};
+
+			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should return false when block has metadata but no blockVisibility property', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									someOtherProperty: 'value',
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should handle non-existent block gracefully', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map(),
+					attributes: new Map(),
+				},
+			};
+
+			// When block doesn't exist, getBlockName returns null,
+			// and hasBlockSupport should handle null gracefully
+			expect( isBlockHidden( state, 'non-existent-block' ) ).toBe(
+				false
+			);
+		} );
+	} );
+
+	describe( 'isBlockHidden in different devices', () => {
+		const originalExperimentalFlag =
+			window.__experimentalHideBlocksBasedOnScreenSize;
+
+		beforeEach( () => {
+			window.__experimentalHideBlocksBasedOnScreenSize = true;
+		} );
+
+		afterEach( () => {
+			window.__experimentalHideBlocksBasedOnScreenSize =
+				originalExperimentalFlag;
+		} );
+
+		const createState = ( blockVisibility, deviceType = 'Desktop' ) => ( {
+			settings: {
+				[ deviceTypeKey ]: deviceType,
+			},
+			blocks: {
+				byClientId: new Map( [
+					[
+						'test-block',
+						{
+							name: 'core/paragraph',
+							attributes: {
+								metadata: {
+									blockVisibility,
+								},
+							},
+						},
+					],
+				] ),
+				attributes: new Map( [
+					[
+						'test-block',
+						{
+							metadata: {
+								blockVisibility,
+							},
+						},
+					],
+				] ),
+			},
+		} );
+
+		it( 'returns false when experimental flag is disabled and block has breakpoint visibility', () => {
+			window.__experimentalHideBlocksBasedOnScreenSize = false;
+			const state = createState( {
+				viewport: { mobile: false, tablet: true },
+			} );
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( false );
+		} );
+
+		it( 'returns false when Desktop is selected and block has breakpoint visibility', () => {
+			const state = createState(
+				{ viewport: { mobile: false, tablet: true } },
+				'Desktop'
+			);
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( false );
+		} );
+
+		it( 'returns true when Desktop is selected and block is hidden on desktop', () => {
+			const state = createState(
+				{ viewport: { desktop: false } },
+				'Desktop'
+			);
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true when Tablet is selected and block is hidden on tablet', () => {
+			const state = createState(
+				{ viewport: { mobile: true, tablet: false } },
+				'Tablet'
+			);
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true when Mobile is selected and block is hidden on mobile', () => {
+			const state = createState(
+				{ viewport: { mobile: false, tablet: true } },
+				'Mobile'
+			);
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns false when Tablet is selected and block is visible on tablet', () => {
+			const state = createState(
+				{ viewport: { mobile: false, tablet: true } },
+				'Tablet'
+			);
+			const result = isBlockHidden( state, 'test-block' );
+			expect( result ).toBe( false );
+		} );
+	} );
+
+	describe( 'areBlocksHiddenAnywhere', () => {
+		it( 'should return false when clientIds array is empty', () => {
+			const state = {
+				blocks: {
+					attributes: new Map(),
+				},
+			};
+			expect( areBlocksHiddenAnywhere( state, [] ) ).toBe( false );
+			expect( areBlocksHiddenAnywhere( state, null ) ).toBe( false );
+			expect( areBlocksHiddenAnywhere( state, undefined ) ).toBe( false );
+		} );
+
+		it( 'should return false when no blocks are hidden', () => {
+			const state = {
+				blocks: {
+					attributes: new Map( [
+						[ 'block-1', { metadata: { blockVisibility: true } } ],
+						[ 'block-2', { metadata: {} } ],
+					] ),
+				},
+			};
+			expect(
+				areBlocksHiddenAnywhere( state, [ 'block-1', 'block-2' ] )
+			).toBe( false );
+		} );
+
+		it( 'should return true when a block is hidden everywhere', () => {
+			const state = {
+				blocks: {
+					attributes: new Map( [
+						[ 'block-1', { metadata: { blockVisibility: false } } ],
+						[ 'block-2', { metadata: { blockVisibility: true } } ],
+					] ),
+				},
+			};
+			expect(
+				areBlocksHiddenAnywhere( state, [ 'block-1', 'block-2' ] )
+			).toBe( true );
+		} );
+
+		it( 'should return true when a block is hidden in any viewport', () => {
+			const state = {
+				blocks: {
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: {
+										viewport: {
+											mobile: false,
+											tablet: true,
+										},
+									},
+								},
+							},
+						],
+						[ 'block-2', { metadata: { blockVisibility: true } } ],
+					] ),
+				},
+			};
+			expect(
+				areBlocksHiddenAnywhere( state, [ 'block-1', 'block-2' ] )
+			).toBe( true );
+		} );
+
+		it( 'should return false when clientId is null or undefined', () => {
+			const state = {
+				blocks: {
+					attributes: new Map( [
+						[ 'block-1', { metadata: { blockVisibility: false } } ],
+					] ),
+				},
+			};
+			expect( areBlocksHiddenAnywhere( state, [ null ] ) ).toBe( false );
+			expect( areBlocksHiddenAnywhere( state, [ undefined ] ) ).toBe(
+				false
+			);
 		} );
 	} );
 } );

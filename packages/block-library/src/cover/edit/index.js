@@ -56,7 +56,11 @@ function getInnerBlocksTemplate( attributes ) {
 		[
 			'core/paragraph',
 			{
-				align: 'center',
+				style: {
+					typography: {
+						textAlign: 'center',
+					},
+				},
 				placeholder: __( 'Write title…' ),
 				...attributes,
 			},

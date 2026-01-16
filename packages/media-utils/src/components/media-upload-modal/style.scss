@@ -1,0 +1,23 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.media-upload-modal {
+	.components-modal__header {
+		padding-bottom: $grid-unit-10;
+	}
+
+	.components-modal__frame.is-full-screen .components-modal__content {
+		margin-bottom: $grid-unit-20;
+	}
+
+	.components-modal__content {
+		padding: 0;
+	}
+
+	.dataviews-picker-wrapper > .dataviews__view-actions {
+		padding-top: $grid-unit-10;
+	}
+
+	.dataviews-footer {
+		padding-bottom: $grid-unit-10;
+	}
+}

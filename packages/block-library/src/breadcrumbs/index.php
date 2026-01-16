@@ -136,7 +136,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 		}
 
 		// Add post title: linked when viewing a paginated page, plain text otherwise.
-		$is_paged = (int) get_query_var( 'page' ) > 1;
+		$is_paged = (int) get_query_var( 'page' ) > 1 || (int) get_query_var( 'cpage' ) > 1;
 		$title    = block_core_breadcrumbs_get_post_title( $post );
 
 		if ( $is_paged ) {
@@ -145,8 +145,7 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 				'url'        => get_permalink( $post ),
 				'allow_html' => true,
 			);
-
-			$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item( 'page' );
+			$breadcrumb_items[] = block_core_breadcrumbs_create_page_number_item( (int) get_query_var( 'cpage' ) > 1 ? 'cpage' : 'page' );
 		} else {
 			$breadcrumb_items[] = array(
 				'label'      => $title,
@@ -159,6 +158,26 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 	if ( ! $attributes['showCurrentItem'] && ! empty( $breadcrumb_items ) ) {
 		array_pop( $breadcrumb_items );
 	}
+
+	/**
+	 * Filters the breadcrumb items array before rendering.
+	 *
+	 * Allows developers to modify, add, or remove breadcrumb items.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array[] $breadcrumb_items {
+	 *     Array of breadcrumb item data.
+	 *
+	 *     @type string $label      The breadcrumb text.
+	 *     @type string $url        Optional. The breadcrumb link URL.
+	 *     @type bool   $allow_html Optional. Whether to allow HTML in the label.
+	 *                              When true, the label will be sanitized with wp_kses_post(),
+	 *                              allowing only safe HTML tags. When false or omitted, all HTML
+	 *                              will be escaped with esc_html(). Default false.
+	 * }
+	 */
+	$breadcrumb_items = apply_filters( 'block_core_breadcrumbs_items', $breadcrumb_items );
 
 	if ( empty( $breadcrumb_items ) ) {
 		return '';
@@ -213,6 +232,16 @@ function block_core_breadcrumbs_is_paged() {
  */
 function block_core_breadcrumbs_create_page_number_item( $query_var = 'paged' ) {
 	$paged = (int) get_query_var( $query_var );
+
+	if ( 'cpage' === $query_var ) {
+		return array(
+			'label' => sprintf(
+				/* translators: %s: comment page number */
+				__( 'Comments Page %s' ),
+				number_format_i18n( $paged )
+			),
+		);
+	}
 
 	return array(
 		'label' => sprintf(
@@ -426,10 +455,14 @@ function block_core_breadcrumbs_get_archive_breadcrumbs() {
 			$post_type = reset( $post_type );
 		}
 		$post_type_object = get_post_type_object( $post_type );
+
+		/** This filter is documented in wp-includes/general-template.php */
+		$title = apply_filters( 'post_type_archive_title', $post_type_object->labels->archives, $post_type ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
 		if ( $post_type_object ) {
 			// Add post type (current if not paginated, link if paginated).
 			$breadcrumb_items[] = block_core_breadcrumbs_create_item(
-				$post_type_object->labels->archives,
+				$title ? $title : $post_type_object->labels->archives,
 				$is_paged
 			);
 		}
@@ -481,9 +514,11 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	}
 
 	/**
-	 * Filters breadcrumb settings on a per-post-type basis.
+	 * Filters breadcrumb settings (taxonomy and term selection) for a post or post type.
 	 *
-	 * Allow developers to customize breadcrumb behavior for specific post types.
+	 * Allows developers to specify which taxonomy and term should be used in the
+	 * breadcrumb trail when a post type has multiple taxonomies or when a post is
+	 * assigned to multiple terms within a taxonomy.
 	 *
 	 * @since 7.0.0
 	 *
@@ -500,8 +535,9 @@ function block_core_breadcrumbs_get_terms_breadcrumbs( $post_id, $post_type ) {
 	 *                            post has only one term, that term is used regardless.
 	 * }
 	 * @param string $post_type The post type slug.
+	 * @param int    $post_id   The post ID.
 	 */
-	$settings = apply_filters( 'block_core_breadcrumbs_post_type_settings', array(), $post_type );
+	$settings = apply_filters( 'block_core_breadcrumbs_post_type_settings', array(), $post_type, $post_id );
 
 	$taxonomy_name = null;
 	$terms         = array();

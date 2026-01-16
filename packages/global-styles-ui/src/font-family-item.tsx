@@ -13,8 +13,8 @@ import type { FontFamily } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { FontLibraryContext } from './font-library-modal/context';
-import { getFamilyPreviewStyle } from './font-library-modal/utils/preview-styles';
+import { FontLibraryContext } from './font-library/context';
+import { getFamilyPreviewStyle } from './font-library/utils/preview-styles';
 
 interface FontFamilyItemProps {
 	font: FontFamily;

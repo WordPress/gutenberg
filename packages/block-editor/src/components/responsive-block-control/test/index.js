@@ -43,7 +43,6 @@ const renderTestDefaultControlComponent = ( labelComponent, device ) => {
 				__next40pxDefaultSize
 				label={ labelComponent }
 				options={ sizeOptions }
-				__nextHasNoMarginBottom
 			/>
 			<p id={ device.id }>
 				{ device.label } is used here for testing purposes to ensure we

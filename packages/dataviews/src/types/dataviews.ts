@@ -190,6 +190,13 @@ interface ViewBase {
 		 * The direction to sort by.
 		 */
 		direction: SortDirection;
+
+		/**
+		 * Whether to show the field label in the group header.
+		 *
+		 * @default true
+		 */
+		showLabel?: boolean;
 	};
 
 	/**
@@ -245,6 +252,13 @@ export interface ViewTable extends ViewBase {
 
 export interface ViewList extends ViewBase {
 	type: 'list';
+
+	layout?: {
+		/**
+		 * The density of the view.
+		 */
+		density?: Density;
+	};
 }
 
 export interface ViewActivity extends ViewBase {

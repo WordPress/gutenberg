@@ -129,7 +129,6 @@ export function LinkUIPageCreator( {
 					<VStack spacing={ 4 }>
 						<TextControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Title' ) }
 							onChange={ setTitle }
 							placeholder={ __( 'No title' ) }
@@ -137,7 +136,6 @@ export function LinkUIPageCreator( {
 						/>
 
 						<CheckboxControl
-							__nextHasNoMarginBottom
 							label={ __( 'Publish immediately' ) }
 							help={ __(
 								'If unchecked, the page will be created as a draft.'

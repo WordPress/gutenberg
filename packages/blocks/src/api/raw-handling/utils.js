@@ -113,14 +113,39 @@ export function getBlockContentSchema( context ) {
 
 /**
  * Checks whether HTML can be considered plain text. That is, it does not contain
- * any elements that are not line breaks.
+ * any elements that are not line breaks, or it only contains a single non-semantic
+ * wrapper element (span) with no semantic child elements.
  *
  * @param {string} HTML The HTML to check.
  *
  * @return {boolean} Whether the HTML can be considered plain text.
  */
 export function isPlain( HTML ) {
-	return ! /<(?!br[ />])/i.test( HTML );
+	if ( ! /<(?!br[ />])/i.test( HTML ) ) {
+		return true;
+	}
+
+	const doc = document.implementation.createHTMLDocument( '' );
+	doc.body.innerHTML = HTML;
+
+	if ( doc.body.children.length !== 1 ) {
+		return false;
+	}
+
+	const wrapper = doc.body.children.item( 0 );
+
+	const descendants = wrapper.getElementsByTagName( '*' );
+	for ( let i = 0; i < descendants.length; i++ ) {
+		if ( descendants.item( i ).tagName !== 'BR' ) {
+			return false;
+		}
+	}
+
+	if ( wrapper.tagName !== 'SPAN' ) {
+		return false;
+	}
+
+	return true;
 }
 
 /**

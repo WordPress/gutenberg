@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -41,20 +41,17 @@ const Form = () => {
 	return (
 		<VStack>
 			<TextControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				label="Text Control"
 				value={ textControlValue }
 				onChange={ setTextControlValue }
 			/>
 			<TextareaControl
-				__nextHasNoMarginBottom
 				label="TextArea Control"
 				value={ textAreaValue }
 				onChange={ setTextAreaValue }
 			/>
 			<SelectControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				label="Select Control"
 				onChange={ () => {} }

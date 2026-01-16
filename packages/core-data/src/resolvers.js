@@ -23,6 +23,7 @@ import {
 	getUserPermissionsFromAllowHeader,
 	ALLOWED_RESOURCE_ACTIONS,
 	RECEIVE_INTERMEDIATE_RESULTS,
+	isNumericID,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
 
@@ -154,12 +155,12 @@ export const getEntityRecord =
 			}
 
 			// Entity supports syncing.
-			if (
-				window.__experimentalEnableSync &&
-				entityConfig.syncConfig &&
-				! query
-			) {
-				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+				if (
+					entityConfig.syncConfig &&
+					isNumericID( key ) &&
+					! query
+				) {
 					const objectType = `${ kind }/${ name }`;
 					const objectId = key;
 
@@ -214,6 +215,15 @@ export const getEntityRecord =
 									name,
 									key
 								),
+							// Refetch the current entity record from the database.
+							refetchRecord: async () => {
+								dispatch.receiveEntityRecords(
+									kind,
+									name,
+									await apiFetch( { path, parse: true } ),
+									query
+								);
+							},
 							// Save the current entity record's unsaved edits.
 							saveRecord: () => {
 								dispatch.saveEditedEntityRecord(

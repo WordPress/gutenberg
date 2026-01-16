@@ -51,7 +51,6 @@ export default function BlockAllowedBlocksControl( { clientId } ) {
 				help={ __(
 					'Specify which blocks are allowed inside this container.'
 				) }
-				__nextHasNoMarginBottom
 			>
 				<BaseControl.VisualLabel>
 					{ __( 'Allowed Blocks' ) }

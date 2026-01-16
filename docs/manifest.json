@@ -362,8 +362,14 @@
 	{
 		"title": "API Versions",
 		"slug": "block-api-versions",
-		"markdown_source": "../docs/reference-guides/block-api/block-api-versions.md",
+		"markdown_source": "../docs/reference-guides/block-api/block-api-versions/README.md",
 		"parent": "block-api"
+	},
+	{
+		"title": "Migrating Blocks for iframe Editor Compatibility",
+		"slug": "block-migration-for-iframe-editor-compatibility",
+		"markdown_source": "../docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md",
+		"parent": "block-api-versions"
 	},
 	{
 		"title": "Attributes",
@@ -843,12 +849,6 @@
 		"title": "DateTime",
 		"slug": "date-time",
 		"markdown_source": "../packages/components/src/date-time/README.md",
-		"parent": "components"
-	},
-	{
-		"title": "DimensionControl",
-		"slug": "dimension-control",
-		"markdown_source": "../packages/components/src/dimension-control/README.md",
 		"parent": "components"
 	},
 	{
@@ -1560,6 +1560,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/core-abilities",
+		"slug": "packages-core-abilities",
+		"markdown_source": "../packages/core-abilities/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/core-commands",
 		"slug": "packages-core-commands",
 		"markdown_source": "../packages/core-commands/README.md",
@@ -1764,6 +1770,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/image-cropper",
+		"slug": "packages-image-cropper",
+		"markdown_source": "../packages/image-cropper/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/interactivity-router",
 		"slug": "packages-interactivity-router",
 		"markdown_source": "../packages/interactivity-router/README.md",
@@ -1839,6 +1851,18 @@
 		"title": "@wordpress/list-reusable-blocks",
 		"slug": "packages-list-reusable-blocks",
 		"markdown_source": "../packages/list-reusable-blocks/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/media-editor",
+		"slug": "packages-media-editor",
+		"markdown_source": "../packages/media-editor/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/media-fields",
+		"slug": "packages-media-fields",
+		"markdown_source": "../packages/media-fields/README.md",
 		"parent": "packages"
 	},
 	{
@@ -2082,7 +2106,7 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/wp-build",
+		"title": "@wordpress/build",
 		"slug": "packages-wp-build",
 		"markdown_source": "../packages/wp-build/README.md",
 		"parent": "packages"

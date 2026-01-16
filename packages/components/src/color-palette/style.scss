@@ -1,6 +1,7 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 @use "../utils/theme-variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
 
 $border-as-box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
 
@@ -32,17 +33,8 @@ $border-as-box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
 		position: absolute;
 		inset: $border-width;
 		z-index: -1;
-		// The background image creates a checkerboard pattern. Ignore rtlcss to
-		// make it work both in LTR and RTL.
-		// See https://github.com/WordPress/gutenberg/pull/42510
-		/*rtl:begin:ignore*/
-		background-image:
-			repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200),
-			repeating-linear-gradient(45deg, $gray-200 25%, transparent 25%, transparent 75%, $gray-200 75%, $gray-200);
-		background-position: 0 0, 24px 24px;
-		/*rtl:end:ignore*/
-		background-size: calc(2 * 24px) calc(2 * 24px);
 		border-radius: $radius-medium - $border-width $radius-medium - $border-width 0 0;
+		@include checkerboard-background( 24px );
 	}
 }
 

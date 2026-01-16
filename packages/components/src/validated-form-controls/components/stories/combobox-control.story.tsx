@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * External dependencies
  */
-import type { StoryObj, Meta } from '@storybook/react';
+import type { StoryObj, Meta } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -35,12 +35,6 @@ export const Default: StoryObj< typeof ValidatedComboboxControl > = {
 					typeof ValidatedComboboxControl
 				>[ 'value' ]
 			>();
-		const [ customValidity, setCustomValidity ] =
-			useState<
-				React.ComponentProps<
-					typeof ValidatedComboboxControl
-				>[ 'customValidity' ]
-			>( undefined );
 
 		return (
 			<ValidatedComboboxControl
@@ -50,17 +44,14 @@ export const Default: StoryObj< typeof ValidatedComboboxControl > = {
 					setValue( newValue );
 					onChange?.( newValue );
 				} }
-				onValidate={ ( v ) => {
-					if ( v === 'a' ) {
-						setCustomValidity( {
-							type: 'invalid',
-							message: 'Option A is not allowed.',
-						} );
-					} else {
-						setCustomValidity( undefined );
-					}
-				} }
-				customValidity={ customValidity }
+				customValidity={
+					value === 'a'
+						? {
+								type: 'invalid',
+								message: 'Option A is not allowed.',
+						  }
+						: undefined
+				}
 			/>
 		);
 	},

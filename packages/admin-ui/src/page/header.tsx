@@ -29,12 +29,8 @@ export default function Header( {
 } ) {
 	return (
 		<VStack className="admin-ui-page__header" as="header">
-			<HStack
-				className="admin-ui-page__header-title"
-				justify="space-between"
-				spacing={ 2 }
-			>
-				<HStack spacing={ 2 } justify="flex-start">
+			<HStack justify="space-between" spacing={ 2 }>
+				<HStack spacing={ 2 } justify="left">
 					{ showSidebarToggle && (
 						<SidebarToggleSlot
 							bubblesVirtually

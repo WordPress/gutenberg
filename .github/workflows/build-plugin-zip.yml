@@ -81,7 +81,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
                   token: ${{ secrets.GUTENBERG_TOKEN }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
@@ -195,14 +195,14 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
                   ref: ${{ needs.bump-version.outputs.release_branch || github.ref }}
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
                   persist-credentials: false
 
             - name: Use desired version of Node.js
-              uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+              uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
               with:
                   node-version-file: '.nvmrc'
                   check-latest: true
@@ -254,7 +254,7 @@ jobs:
 
         steps:
             - name: Checkout code
-              uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
                   fetch-depth: 2
                   ref: ${{ needs.bump-version.outputs.release_branch }}
@@ -355,7 +355,7 @@ jobs:
         if: ${{ endsWith( needs.bump-version.outputs.new_version, '-rc.1' ) }}
         steps:
             - name: Checkout (for CLI)
-              uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
                   path: main
                   ref: trunk
@@ -363,7 +363,7 @@ jobs:
                   persist-credentials: false
 
             - name: Checkout (for publishing)
-              uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+              uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
                   path: publish
                   # Later, we switch this branch in the script that publishes packages.
@@ -379,7 +379,7 @@ jobs:
                   git config user.email gutenberg@wordpress.org
 
             - name: Setup Node.js
-              uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+              uses: actions/setup-node@395ad3262231945c25e8478fd5baf05154b1d79f # v6.1.0
               with:
                   node-version-file: 'main/.nvmrc'
                   registry-url: 'https://registry.npmjs.org'

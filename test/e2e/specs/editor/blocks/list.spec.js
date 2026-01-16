@@ -1611,4 +1611,48 @@ test.describe( 'List (@firefox)', () => {
 			},
 		] );
 	} );
+
+	test( 'should outdent list items when deleting an empty parent at the top', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/list',
+			innerBlocks: [
+				{
+					name: 'core/list-item',
+					attributes: { content: '' },
+					innerBlocks: [
+						{
+							name: 'core/list',
+							innerBlocks: [
+								{
+									name: 'core/list-item',
+									attributes: { content: 'a' },
+								},
+								{
+									name: 'core/list-item',
+									attributes: { content: 'b' },
+								},
+							],
+						},
+					],
+				},
+			],
+		} );
+
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'ArrowDown' );
+		await page.keyboard.press( 'Backspace' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/list',
+				innerBlocks: [
+					{ name: 'core/list-item', attributes: { content: 'a' } },
+					{ name: 'core/list-item', attributes: { content: 'b' } },
+				],
+			},
+		] );
+	} );
 } );

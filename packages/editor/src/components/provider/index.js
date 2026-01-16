@@ -23,6 +23,7 @@ import { createBlock } from '@wordpress/blocks';
  */
 import withRegistryProvider from './with-registry-provider';
 import { store as editorStore } from '../../store';
+import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
 import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
@@ -325,6 +326,8 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				// Clear any notices dependent on the post context.
 				removeNotice( 'template-activate-notice' );
 			}
+
+			return () => setEditedPost( null, null );
 		}, [ post.type, post.id, setEditedPost, removeNotice ] );
 
 		// Synchronize the editor settings as they change.
@@ -351,6 +354,31 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		if ( ! isReady || ! mode ) {
 			return null;
+		}
+
+		const isAttachment =
+			post.type === ATTACHMENT_POST_TYPE &&
+			window?.__experimentalMediaEditor;
+
+		// Early return for attachments - no block editor needed
+		if ( isAttachment ) {
+			return (
+				<EntityProvider kind="root" type="site">
+					<EntityProvider
+						kind="postType"
+						type={ post.type }
+						id={ post.id }
+					>
+						{ children }
+						{ ! settings.isPreviewMode && (
+							<>
+								<EditorKeyboardShortcuts />
+								<KeyboardShortcutHelpModal />
+							</>
+						) }
+					</EntityProvider>
+				</EntityProvider>
+			);
 		}
 
 		return (

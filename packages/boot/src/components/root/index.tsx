@@ -7,9 +7,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { privateApis as routePrivateApis } from '@wordpress/route';
-// @ts-expect-error Commands is not typed properly.
-import { CommandMenu } from '@wordpress/commands';
-import { privateApis as themePrivateApis } from '@wordpress/theme';
 import { EditorSnackbars } from '@wordpress/editor';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
@@ -29,11 +26,12 @@ import { Page } from '@wordpress/admin-ui';
 import Sidebar from '../sidebar';
 import SavePanel from '../save-panel';
 import CanvasRenderer from '../canvas-renderer';
+import useRouteTitle from '../app/use-route-title';
 import { unlock } from '../../lock-unlock';
 import type { CanvasData } from '../../store/types';
 import './style.scss';
+import { UserThemeProvider } from '../user-theme-provider';
 
-const { ThemeProvider } = unlock( themePrivateApis );
 const { useLocation, useMatches, Outlet } = unlock( routePrivateApis );
 
 export default function Root() {
@@ -48,6 +46,8 @@ export default function Root() {
 		?.routeContentModule as string | undefined;
 	const isFullScreen = canvas && ! canvas.isPreview;
 
+	useRouteTitle();
+
 	// Mobile sidebar state
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ isMobileSidebarOpen, setIsMobileSidebarOpen ] = useState( false );
@@ -59,18 +59,14 @@ export default function Root() {
 
 	return (
 		<SlotFillProvider>
-			<ThemeProvider
-				isRoot
-				color={ { bg: '#f8f8f8', primary: '#3858e9' } }
-			>
-				<ThemeProvider color={ { bg: '#1d2327', primary: '#3858e9' } }>
+			<UserThemeProvider isRoot color={ { bg: '#f8f8f8' } }>
+				<UserThemeProvider color={ { bg: '#1d2327' } }>
 					<div
 						className={ clsx( 'boot-layout', {
 							'has-canvas': !! canvas || canvas === null,
 							'has-full-canvas': isFullScreen,
 						} ) }
 					>
-						<CommandMenu />
 						<SavePanel />
 						<EditorSnackbars />
 						{ isMobileViewport && (
@@ -143,48 +139,50 @@ export default function Root() {
 							</div>
 						) }
 						<div className="boot-layout__surfaces">
-							<ThemeProvider
-								color={ { bg: '#ffffff', primary: '#3858e9' } }
-							>
+							<UserThemeProvider color={ { bg: '#ffffff' } }>
 								<Outlet />
-							</ThemeProvider>
-							{ /* Render Canvas in Root to prevent remounting on route changes */ }
-							{ ( canvas || canvas === null ) && (
-								<div
-									className={ clsx( 'boot-layout__canvas', {
-										'has-mobile-drawer':
-											canvas?.isPreview &&
-											isMobileViewport,
-									} ) }
-								>
-									{ canvas?.isPreview && isMobileViewport && (
-										<div className="boot-layout__mobile-sidebar-drawer">
-											<Button
-												icon={ menu }
-												onClick={ () =>
-													setIsMobileSidebarOpen(
-														true
-													)
-												}
-												label={ __(
-													'Open navigation panel'
-												) }
-												size="compact"
-											/>
-										</div>
-									) }
-									<CanvasRenderer
-										canvas={ canvas }
-										routeContentModule={
-											routeContentModule
-										}
-									/>
-								</div>
-							) }
+								{ /* Render Canvas in Root to prevent remounting on route changes */ }
+								{ ( canvas || canvas === null ) && (
+									<div
+										className={ clsx(
+											'boot-layout__canvas',
+											{
+												'has-mobile-drawer':
+													canvas?.isPreview &&
+													isMobileViewport,
+											}
+										) }
+									>
+										{ canvas?.isPreview &&
+											isMobileViewport && (
+												<div className="boot-layout__mobile-sidebar-drawer">
+													<Button
+														icon={ menu }
+														onClick={ () =>
+															setIsMobileSidebarOpen(
+																true
+															)
+														}
+														label={ __(
+															'Open navigation panel'
+														) }
+														size="compact"
+													/>
+												</div>
+											) }
+										<CanvasRenderer
+											canvas={ canvas }
+											routeContentModule={
+												routeContentModule
+											}
+										/>
+									</div>
+								) }
+							</UserThemeProvider>
 						</div>
 					</div>
-				</ThemeProvider>
-			</ThemeProvider>
+				</UserThemeProvider>
+			</UserThemeProvider>
 		</SlotFillProvider>
 	);
 }

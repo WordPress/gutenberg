@@ -59,7 +59,7 @@
 		height: $button-size;
 		justify-content: center;
 		margin: 0 0 $grid-unit-30 0;
-		padding: 0 $grid-unit-40;
+		padding: 0 $grid-unit-30;
 		position: relative;
 		width: 100%;
 	}
@@ -103,11 +103,11 @@
 	}
 
 	&.components-guide__back-button {
-		left: $grid-unit-40;
+		left: $grid-unit-30;
 	}
 
 	&.components-guide__forward-button,
 	&.components-guide__finish-button {
-		right: $grid-unit-40;
+		right: $grid-unit-30;
 	}
 }

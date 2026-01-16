@@ -98,7 +98,6 @@ function AuthorCombobox( { value, onChange } ) {
 	return (
 		<ComboboxControl
 			__next40pxDefaultSize
-			__nextHasNoMarginBottom
 			label={ __( 'Author' ) }
 			options={ authorOptions }
 			value={ value?.id }
@@ -228,7 +227,6 @@ function PostAuthorEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show avatar' ) }
 							checked={ showAvatar }
 							onChange={ () =>
@@ -249,7 +247,6 @@ function PostAuthorEdit( {
 						>
 							<SelectControl
 								__next40pxDefaultSize
-								__nextHasNoMarginBottom
 								label={ __( 'Avatar size' ) }
 								value={ avatarSize }
 								options={ avatarSizes }
@@ -270,7 +267,6 @@ function PostAuthorEdit( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show bio' ) }
 							checked={ !! showBio }
 							onChange={ () =>
@@ -285,7 +281,6 @@ function PostAuthorEdit( {
 						onDeselect={ () => setAttributes( { isLink: false } ) }
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Link author name to author page' ) }
 							checked={ isLink }
 							onChange={ () =>
@@ -303,7 +298,6 @@ function PostAuthorEdit( {
 							}
 						>
 							<ToggleControl
-								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
 								onChange={ ( value ) =>
 									setAttributes( {

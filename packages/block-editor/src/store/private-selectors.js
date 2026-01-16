@@ -35,7 +35,13 @@ import {
 	selectBlockPatternsKey,
 	reusableBlocksSelectKey,
 	sectionRootClientIdKey,
+	isIsolatedEditorKey,
+	deviceTypeKey,
 } from './private-keys';
+import {
+	BLOCK_VISIBILITY_VIEWPORT_ENTRIES,
+	BLOCK_VISIBILITY_VIEWPORTS,
+} from '../components/block-visibility/constants';
 
 const { isContentBlock } = unlock( blocksPrivateApis );
 
@@ -195,16 +201,6 @@ export function getRemovalPromptData( state ) {
  */
 export function getBlockRemovalRules( state ) {
 	return state.blockRemovalRules;
-}
-
-/**
- * Returns the client ID of the block settings menu that is currently open.
- *
- * @param {Object} state Global application state.
- * @return {string|null} The client ID of the block menu that is currently open.
- */
-export function getOpenedBlockSettingsMenu( state ) {
-	return state.openedBlockSettingsMenu;
 }
 
 /**
@@ -524,9 +520,15 @@ export function isSectionBlock( state, clientId ) {
 
 	const attributes = getBlockAttributes( state, clientId );
 	const isTemplatePart = blockName === 'core/template-part';
+
+	// When in an isolated editing context (e.g., editing a template part or pattern directly),
+	// don't treat nested unsynced patterns as section blocks.
+	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
+
 	if (
 		( attributes?.metadata?.patternName || isTemplatePart ) &&
-		!! window?.__experimentalContentOnlyPatternInsertion
+		!! window?.__experimentalContentOnlyPatternInsertion &&
+		! isIsolatedEditor
 	) {
 		return true;
 	}
@@ -703,6 +705,10 @@ export function getInsertionPoint( state ) {
 /**
  * Returns true if the block is hidden, or false otherwise.
  *
+ * A block is considered hidden if:
+ * - blockVisibility is false (hidden everywhere)
+ * - blockVisibility is an object with the current device preview set to false
+ *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
  *
@@ -710,11 +716,97 @@ export function getInsertionPoint( state ) {
  */
 export const isBlockHidden = ( state, clientId ) => {
 	const blockName = getBlockName( state, clientId );
-	if ( ! hasBlockSupport( state, blockName, 'visibility', true ) ) {
+	if ( ! hasBlockSupport( blockName, 'visibility', true ) ) {
 		return false;
 	}
 	const attributes = state.blocks.attributes.get( clientId );
-	return attributes?.metadata?.blockVisibility === false;
+	const blockVisibility = attributes?.metadata?.blockVisibility;
+
+	if ( blockVisibility === false ) {
+		return true;
+	}
+
+	if ( ! window.__experimentalHideBlocksBasedOnScreenSize ) {
+		return false;
+	}
+
+	// Check viewport-specific hiding based on current device preview
+	// Only apply when a device is explicitly selected.
+	if ( typeof blockVisibility === 'object' && blockVisibility !== null ) {
+		const viewportConfig = blockVisibility.viewport;
+		if ( viewportConfig && typeof viewportConfig === 'object' ) {
+			const settings = getSettings( state );
+			const viewportType =
+				settings[ deviceTypeKey ] ??
+				BLOCK_VISIBILITY_VIEWPORTS.desktop.key;
+			const viewportKey = viewportType.toLowerCase();
+			return viewportConfig[ viewportKey ] === false;
+		}
+	}
+
+	return false;
+};
+
+/**
+ * Returns true if any of the provided blocks are hidden.
+ *
+ * @param {Object} state     Global application state.
+ * @param {Array}  clientIds Array of block client IDs to check.
+ * @return {boolean} Whether any block is hidden.
+ */
+export const areBlocksHidden = ( state, clientIds ) => {
+	if ( ! clientIds || clientIds.length === 0 ) {
+		return false;
+	}
+	return clientIds.some( ( clientId ) => isBlockHidden( state, clientId ) );
+};
+
+/**
+ * Checks if at least one block in an array is hidden according to viewport visibility metadata.
+ *
+ * This is typically used to determine if the block visibility button should be shown in the toolbar.
+ * TODO: This is temporary for now. Later the UI will
+ * want to know where exactly the block is hidden, e.g., to display icons or other things.
+ *
+ * A block is considered hidden if:
+ * - Its `blockVisibility` metadata is `false` (hidden everywhere), or
+ * - Any viewport is set to `false`
+ *
+ * @param {Object} state     Global application state.
+ * @param {Array}  clientIds Array of block client IDs to check.
+ * @return {boolean} `true` if at least one block meets the visibility criteria, `false` otherwise.
+ */
+export const areBlocksHiddenAnywhere = ( state, clientIds ) => {
+	if ( ! clientIds?.length ) {
+		return false;
+	}
+	return clientIds.some( ( clientId ) => {
+		if ( ! clientId ) {
+			return false;
+		}
+
+		const attributes = state.blocks.attributes.get( clientId );
+		const blockVisibility = attributes?.metadata?.blockVisibility;
+
+		// If explicitly hidden everywhere (false), return true.
+		if ( typeof blockVisibility === 'boolean' ) {
+			return blockVisibility === false;
+		}
+
+		// If not an object, block is not hidden in any viewport.
+		if ( 'object' !== typeof blockVisibility ) {
+			return false;
+		}
+
+		// Check viewport-specific visibility.
+		const viewportConfig = blockVisibility.viewport;
+		if ( viewportConfig && typeof viewportConfig === 'object' ) {
+			return BLOCK_VISIBILITY_VIEWPORT_ENTRIES.some(
+				( [ , { key } ] ) => viewportConfig[ key ] === false
+			);
+		}
+		return false;
+	} );
 };
 
 /**
