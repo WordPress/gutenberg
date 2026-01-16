@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import { Tooltip } from '@base-ui/react/tooltip';
-
-/**
- * Internal dependencies
- */
 import type { RootProps } from './types';
 
 function Root( props: RootProps ) {

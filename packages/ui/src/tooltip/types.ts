@@ -1,12 +1,5 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
 import type { Tooltip } from '@base-ui/react/tooltip';
-
-/**
- * Internal dependencies
- */
 import type { ComponentProps } from '../utils/types';
 
 export type RootProps = Pick< Tooltip.Root.Props, 'disabled' | 'children' >;
