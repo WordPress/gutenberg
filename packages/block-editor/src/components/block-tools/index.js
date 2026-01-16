@@ -33,10 +33,10 @@ import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
-import { cleanEmptyObject } from '../../hooks/utils';
 import usePasteStyles from '../use-paste-styles';
 import { BlockRenameModal } from '../block-rename';
 import { BlockVisibilityModal } from '../block-visibility';
+import { cleanEmptyObject } from '../../hooks/utils';
 
 function selector( select ) {
 	const {
@@ -106,8 +106,8 @@ export default function BlockTools( {
 		moveBlocksUp,
 		moveBlocksDown,
 		expandBlock,
-		updateBlockAttributes,
 		stopEditingContentOnlySection,
+		updateBlockAttributes,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	function onKeyDown( event ) {
