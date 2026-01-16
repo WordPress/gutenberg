@@ -1,12 +1,27 @@
 /**
  * External dependencies
  */
-import { RpcProvider } from 'worker-rpc';
+import {
+	defineProxy,
+	type Adapter,
+	type SendMessage,
+	type OnMessage,
+} from 'comctx';
 
 /**
- * Internal dependencies
+ * Adapter for providing (worker exposing methods to main thread).
  */
-import { findTransferables } from './transferables';
+class WorkerProvideAdapter implements Adapter {
+	sendMessage: SendMessage = ( message, transfer ) => {
+		self.postMessage( message, transfer );
+	};
+
+	onMessage: OnMessage = ( callback ) => {
+		const handler = ( event: MessageEvent ) => callback( event.data );
+		self.addEventListener( 'message', handler );
+		return () => self.removeEventListener( 'message', handler );
+	};
+}
 
 /**
  * Exposes an object's methods to be called from the main thread.
@@ -40,21 +55,13 @@ import { findTransferables } from './transferables';
  * @param target - Object containing methods to expose to the main thread.
  */
 export function expose< T extends object >( target: T ): void {
-	const provider = new RpcProvider( ( message, transfer ) =>
-		self.postMessage( message, { transfer: transfer ?? [] } )
-	);
+	// Create the provide function using defineProxy with the target.
+	const [ provide ] = defineProxy( () => target, {
+		namespace: '__wordpress_worker__',
+		heartbeatCheck: false,
+		transfer: true,
+	} );
 
-	self.onmessage = ( e ) => provider.dispatch( e.data );
-
-	// Register all methods from target.
-	for ( const key of Object.keys( target ) ) {
-		const fn = ( target as Record< string, unknown > )[ key ];
-		if ( typeof fn === 'function' ) {
-			provider.registerRpcHandler( key, async ( ...args: unknown[] ) => {
-				const result = await fn.apply( target, args );
-				// Return with transferables for efficient transfer.
-				return { result, transfer: findTransferables( [ result ] ) };
-			} );
-		}
-	}
+	// Start providing the target through the adapter.
+	provide( new WorkerProvideAdapter() );
 }
