@@ -19,6 +19,7 @@ function FontSizePicker( props ) {
 			{ ...props }
 			fontSizes={ fontSizes }
 			disableCustomFontSizes={ ! customFontSize }
+			__next40pxDefaultSize
 		/>
 	);
 }

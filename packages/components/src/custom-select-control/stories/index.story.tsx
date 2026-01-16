@@ -57,6 +57,7 @@ const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
 
 	return (
 		<CustomSelectControl
+			__next40pxDefaultSize
 			{ ...props }
 			onChange={ onChange }
 			value={ value }

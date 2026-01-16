@@ -43,6 +43,8 @@ function UnforwardedRadio(
 			ref={ ref }
 			value={ value }
 			render={
+				// Disable: the parent component already takes care of the `__next40pxDefaultSize` prop.
+				// eslint-disable-next-line @wordpress/components-no-missing-40px-size-prop
 				<Button
 					variant={ isChecked ? 'primary' : 'secondary' }
 					{ ...props }

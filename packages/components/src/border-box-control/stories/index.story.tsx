@@ -53,6 +53,7 @@ const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
 	return (
 		<>
 			<BorderBoxControl
+				__next40pxDefaultSize
 				{ ...otherProps }
 				onChange={ onChangeMerged }
 				value={ borders }
@@ -71,6 +72,7 @@ const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
 				convenience.
 			</p>
 			<Button
+				__next40pxDefaultSize
 				variant="primary"
 				onClick={ () => onChangeMerged( undefined ) }
 			>

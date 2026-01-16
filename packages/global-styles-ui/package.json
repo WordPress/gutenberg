@@ -61,7 +61,6 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/private-apis": "file:../private-apis",
 		"change-case": "^4.1.2",
-		"classnames": "^2.3.2",
 		"clsx": "^2.1.0",
 		"colord": "^2.7.0"
 	},

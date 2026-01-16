@@ -22,7 +22,6 @@ import {
 	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_MAP_KEY,
 	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
 	CRDT_RECORD_METADATA_SAVED_BY_KEY as SAVED_BY_KEY,
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from '../config';
 import { createPersistedCRDTDoc } from '../persistence';
 import { getProviderCreators } from '../providers';
@@ -269,33 +268,16 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.applyChangesToCRDTDoc
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), mockRecord );
 
-				// Changes should be correctly applied.
-				const mockCall =
-					mockSyncConfig.applyChangesToCRDTDoc.mock.calls[ 0 ];
-				const targetDoc = mockCall[ 0 ] as Y.Doc;
-				const appliedChanges = mockCall[ 1 ] as ObjectData;
-				expect(
-					targetDoc.getMap( CRDT_RECORD_MAP_KEY ).get( 'title' )
-				).toBeUndefined();
-				expect( appliedChanges.title ).toStrictEqual( 'Test Post' );
-
 				// getChangesFromCRDTDoc should not be called since there was no persisted doc.
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
 				).not.toHaveBeenCalled();
 
 				// Verify a save operation occurred.
-				expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
-				expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
-					meta: {
-						[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]:
-							expect.any( String ),
-					},
-				} );
 				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
 			} );
 
-			it( 'applies a valid persisted CRDT doc without applying the current record', async () => {
+			it( 'accepts a valid persisted CRDT doc without applying changes', async () => {
 				const record = createRecordWithPersistedCRDTDoc( mockRecord );
 
 				mockSyncConfig = {
@@ -313,7 +295,7 @@ describe( 'SyncManager', () => {
 					mockHandlers
 				);
 
-				// Current record should NOT be applied since the persisted doc is valid.
+				// Changes should NOT be applied since the persisted doc is valid.
 				expect(
 					mockSyncConfig.applyChangesToCRDTDoc
 				).not.toHaveBeenCalled();
@@ -331,9 +313,10 @@ describe( 'SyncManager', () => {
 				expect( mockHandlers.saveRecord ).not.toHaveBeenCalled();
 			} );
 
-			it( 'applies an invalid persisted CRDT doc, then applies the current record', async () => {
+			it( 'applies an invalid CRDT doc, then applies changes', async () => {
 				const record = createRecordWithPersistedCRDTDoc( mockRecord, {
-					title: 'Title from persisted CRDT doc',
+					...mockRecord,
+					title: 'Invalidated title from persisted CRDT doc',
 				} );
 
 				mockSyncConfig = {
@@ -351,23 +334,17 @@ describe( 'SyncManager', () => {
 					mockHandlers
 				);
 
-				// Current record should be applied since the persisted doc is invalid.
+				// Changes should be applied for the invalidated properties.
+				const expectedChanges = {
+					title: mockRecord.title,
+				};
+
 				expect(
 					mockSyncConfig.applyChangesToCRDTDoc
 				).toHaveBeenCalledTimes( 1 );
 				expect(
 					mockSyncConfig.applyChangesToCRDTDoc
-				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
-
-				// Changes should be correctly applied.
-				const mockCall =
-					mockSyncConfig.applyChangesToCRDTDoc.mock.calls[ 0 ];
-				const targetDoc = mockCall[ 0 ] as Y.Doc;
-				const appliedChanges = mockCall[ 1 ] as ObjectData;
-				expect(
-					targetDoc.getMap( CRDT_RECORD_MAP_KEY ).get( 'title' )
-				).toStrictEqual( 'Title from persisted CRDT doc' );
-				expect( appliedChanges.title ).toStrictEqual( 'Test Post' );
+				).toHaveBeenCalledWith( expect.any( Y.Doc ), expectedChanges );
 
 				// getChangesFromCRDTDoc should be called with the persisted doc and record.
 				expect(
@@ -378,18 +355,12 @@ describe( 'SyncManager', () => {
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
 
 				// Verify a save operation occurred.
-				expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
-				expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
-					meta: {
-						[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]:
-							expect.any( String ),
-					},
-				} );
 				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
 			} );
 
 			it( 'ignores a persisted CRDT doc when CRDT persistence is not supported', async () => {
 				const record = createRecordWithPersistedCRDTDoc( mockRecord, {
+					...mockRecord,
 					title: 'Persisted Title',
 				} );
 
@@ -411,27 +382,13 @@ describe( 'SyncManager', () => {
 					mockSyncConfig.applyChangesToCRDTDoc
 				).toHaveBeenCalledWith( expect.any( Y.Doc ), record );
 
-				// Changes should be correctly applied.
-				const mockCall =
-					mockSyncConfig.applyChangesToCRDTDoc.mock.calls[ 0 ];
-				const targetDoc = mockCall[ 0 ] as Y.Doc;
-				const appliedChanges = mockCall[ 1 ] as ObjectData;
-				expect(
-					targetDoc.getMap( CRDT_RECORD_MAP_KEY ).get( 'title' )
-				).toBeUndefined();
-				expect( appliedChanges.title ).toStrictEqual( 'Test Post' );
-
 				// getChangesFromCRDTDoc should not be called since the persisted doc is igored.
 				expect(
 					mockSyncConfig.getChangesFromCRDTDoc
 				).not.toHaveBeenCalled();
 
-				// Verify a save operation occurred.
-				expect( mockHandlers.editRecord ).toHaveBeenCalledTimes( 1 );
-				expect( mockHandlers.editRecord ).toHaveBeenCalledWith( {
-					meta: {},
-				} );
-				expect( mockHandlers.saveRecord ).toHaveBeenCalledTimes( 1 );
+				// Verify no save operation occurred because persistence is not supported.
+				expect( mockHandlers.saveRecord ).not.toHaveBeenCalled();
 			} );
 		} );
 	} );

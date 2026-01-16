@@ -104,7 +104,11 @@ const Rows = ( {
 								{ ( props ) => (
 									<>
 										<Descender level={ level } />
-										<Button variant="primary" { ...props }>
+										<Button
+											__next40pxDefaultSize
+											variant="primary"
+											{ ...props }
+										>
 											{ item.name }
 										</Button>
 									</>
