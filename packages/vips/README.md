@@ -69,6 +69,29 @@ _Returns_
 
 -   `Promise< boolean >`: Whether the image has an alpha channel.
 
+### isWasmModuleAvailable
+
+Checks if a WASM module has been registered.
+
+_Parameters_
+
+-   _moduleName_ `string`: The WASM module filename (e.g., 'vips-heif.wasm').
+
+_Returns_
+
+-   `boolean`: Whether the module is available.
+
+### registerWasmModule
+
+Registers a WASM module URL for dynamic loading.
+
+This allows external plugins to provide WASM modules (like vips-heif.wasm) that may have different licensing requirements.
+
+_Parameters_
+
+-   _moduleName_ `string`: The WASM module filename (e.g., 'vips-heif.wasm').
+-   _moduleUrl_ `string`: The URL where the WASM module can be loaded from.
+
 ### resizeImage
 
 Resizes an image using vips.

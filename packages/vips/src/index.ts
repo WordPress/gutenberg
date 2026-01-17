@@ -7,10 +7,39 @@ import Vips from 'wasm-vips';
 import VipsModule from 'wasm-vips/vips.wasm';
 
 // @ts-expect-error
-import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
-
-// @ts-expect-error
 import VipsJxlModule from 'wasm-vips/vips-jxl.wasm';
+
+/**
+ * Registry for dynamically loaded WASM modules.
+ * Allows external plugins to register WASM module URLs.
+ */
+const wasmModuleRegistry: Record< string, string > = {};
+
+/**
+ * Registers a WASM module URL for dynamic loading.
+ *
+ * This allows external plugins to provide WASM modules (like vips-heif.wasm)
+ * that may have different licensing requirements.
+ *
+ * @param moduleName The WASM module filename (e.g., 'vips-heif.wasm').
+ * @param moduleUrl  The URL where the WASM module can be loaded from.
+ */
+export function registerWasmModule(
+	moduleName: string,
+	moduleUrl: string
+): void {
+	wasmModuleRegistry[ moduleName ] = moduleUrl;
+}
+
+/**
+ * Checks if a WASM module has been registered.
+ *
+ * @param moduleName The WASM module filename (e.g., 'vips-heif.wasm').
+ * @return Whether the module is available.
+ */
+export function isWasmModuleAvailable( moduleName: string ): boolean {
+	return moduleName in wasmModuleRegistry;
+}
 
 /**
  * Internal dependencies
@@ -60,11 +89,16 @@ async function getVips(): Promise< typeof Vips > {
 	vipsInstance = await Vips( {
 		locateFile: ( fileName: string ) => {
 			if ( fileName.endsWith( 'vips.wasm' ) ) {
-				fileName = VipsModule;
+				return location + VipsModule;
 			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
-				fileName = VipsHeifModule;
+				// HEIF module is loaded from external plugin via registry
+				if ( wasmModuleRegistry[ 'vips-heif.wasm' ] ) {
+					return wasmModuleRegistry[ 'vips-heif.wasm' ];
+				}
+				// Return empty string if not registered - vips will handle gracefully
+				return '';
 			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) ) {
-				fileName = VipsJxlModule;
+				return location + VipsJxlModule;
 			}
 
 			return location + fileName;

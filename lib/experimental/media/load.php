@@ -24,6 +24,29 @@ function gutenberg_get_all_image_sizes(): array {
 }
 
 /**
+ * Checks if HEIF image support is available.
+ *
+ * HEIF support requires an external plugin that provides the vips-heif.wasm module
+ * due to licensing requirements (LGPL-3.0 for libheif is incompatible with GPLv2).
+ *
+ * Plugins can enable HEIF support by:
+ * 1. Filtering 'gutenberg_heif_support_available' to return true
+ * 2. Registering the vips-heif.wasm module URL via JavaScript
+ *
+ * @return bool Whether HEIF support is available.
+ */
+function gutenberg_is_heif_support_available(): bool {
+	/**
+	 * Filters whether HEIF image support is available.
+	 *
+	 * @since 6.8.0
+	 *
+	 * @param bool $available Whether HEIF support is available. Default false.
+	 */
+	return (bool) apply_filters( 'gutenberg_heif_support_available', false );
+}
+
+/**
  * Returns the default output format mapping for the supported image formats.
  *
  * @return array<string,string> Map of input formats to output formats.
@@ -35,8 +58,12 @@ function gutenberg_get_default_image_output_formats() {
 		'image/gif',
 		'image/webp',
 		'image/avif',
-		'image/heic',
 	);
+
+	// Only include HEIC if HEIF support is available.
+	if ( gutenberg_is_heif_support_available() ) {
+		$input_formats[] = 'image/heic';
+	}
 
 	$output_formats = array();
 
@@ -72,12 +99,13 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 	$gif_interlaced = (bool) apply_filters( 'image_save_progressive', false, 'image/gif' ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 	if ( current_user_can( 'upload_files' ) ) {
-		$response->data['image_sizes']          = gutenberg_get_all_image_sizes();
-		$response->data['image_size_threshold'] = $image_size_threshold;
-		$response->data['image_output_formats'] = (object) $default_image_output_formats;
-		$response->data['jpeg_interlaced']      = $jpeg_interlaced;
-		$response->data['png_interlaced']       = $png_interlaced;
-		$response->data['gif_interlaced']       = $gif_interlaced;
+		$response->data['image_sizes']            = gutenberg_get_all_image_sizes();
+		$response->data['image_size_threshold']   = $image_size_threshold;
+		$response->data['image_output_formats']   = (object) $default_image_output_formats;
+		$response->data['jpeg_interlaced']        = $jpeg_interlaced;
+		$response->data['png_interlaced']         = $png_interlaced;
+		$response->data['gif_interlaced']         = $gif_interlaced;
+		$response->data['heif_support_available'] = gutenberg_is_heif_support_available();
 	}
 
 	return $response;
