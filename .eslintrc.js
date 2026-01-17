@@ -433,6 +433,7 @@ module.exports = {
 		},
 		{
 			files: [
+				'packages/block-editor/src/**',
 				'packages/components/src/**',
 				'packages/dataviews/src/**',
 				'packages/ui/src/**',
