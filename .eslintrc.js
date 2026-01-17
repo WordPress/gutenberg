@@ -432,6 +432,18 @@ module.exports = {
 			extends: [ 'plugin:ssr-friendly/recommended' ],
 		},
 		{
+			files: [
+				'packages/components/src/**',
+				'packages/dataviews/src/**',
+				'packages/ui/src/**',
+			],
+			excludedFiles: [ '**/@(test|stories)/**', '*.native.*' ],
+			rules: {
+				// Enforce display names for easier debugging and better storybook integration.
+				'react/display-name': 'error',
+			},
+		},
+		{
 			files: [ 'packages/components/src/**', 'packages/ui/src/**' ],
 			rules: {
 				'no-restricted-imports': [
