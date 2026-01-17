@@ -766,4 +766,6 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }
 
+FormTokenField.displayName = 'FormTokenField';
+
 export default FormTokenField;

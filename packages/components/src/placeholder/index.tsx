@@ -108,5 +108,6 @@ export function Placeholder(
 		</div>
 	);
 }
+Placeholder.displayName = 'Placeholder';
 
 export default Placeholder;

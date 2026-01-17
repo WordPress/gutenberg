@@ -41,5 +41,6 @@ function Shortcut( props: ShortcutProps ) {
 		</span>
 	);
 }
+Shortcut.displayName = 'Shortcut';
 
 export default Shortcut;

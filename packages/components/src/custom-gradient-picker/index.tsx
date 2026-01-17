@@ -207,4 +207,6 @@ export function CustomGradientPicker( {
 	);
 }
 
+CustomGradientPicker.displayName = 'CustomGradientPicker';
+
 export default CustomGradientPicker;

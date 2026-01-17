@@ -213,4 +213,6 @@ function CustomSelectControl< T extends CustomSelectOption >(
 	);
 }
 
+CustomSelectControl.displayName = 'CustomSelectControl';
+
 export default CustomSelectControl;

@@ -292,4 +292,6 @@ function SandBox( {
 	);
 }
 
+SandBox.displayName = 'SandBox';
+
 export default SandBox;

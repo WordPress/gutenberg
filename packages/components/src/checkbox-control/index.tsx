@@ -152,5 +152,6 @@ export function CheckboxControl(
 		</BaseControl>
 	);
 }
+CheckboxControl.displayName = 'CheckboxControl';
 
 export default CheckboxControl;

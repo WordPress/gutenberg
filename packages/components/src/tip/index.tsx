@@ -18,5 +18,6 @@ export function Tip( props: TipProps ) {
 		</div>
 	);
 }
+Tip.displayName = 'Tip';
 
 export default Tip;

@@ -182,4 +182,6 @@ function Notice( {
 	);
 }
 
+Notice.displayName = 'Notice';
+
 export default Notice;
