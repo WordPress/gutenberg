@@ -836,7 +836,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				const rotatedFile = await vipsRotateImage(
 					item.id,
 					item.sourceFile,
-					attachment.exif_orientation,
+					attachment.exif_orientation as number,
 					item.abortController?.signal
 				);
 

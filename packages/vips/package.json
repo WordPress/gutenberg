@@ -40,6 +40,11 @@
 			"types": "./build-types/vips-worker.d.ts",
 			"import": "./build-module/vips-worker.mjs"
 		},
+		"./worker": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
+		},
 		"./package.json": "./package.json"
 	},
 	"types": "build-types",
