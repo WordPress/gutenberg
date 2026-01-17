@@ -19,6 +19,7 @@ import { BlockRefsProvider } from './block-refs-provider';
 import { unlock } from '../../lock-unlock';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import useMediaUploadSettings from './use-media-upload-settings';
+import useUploadSaveLock from './use-upload-save-lock';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
@@ -121,7 +122,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 					settings={ mediaUploadSettings }
 					useSubRegistry={ false }
 				>
-					{ children }
+					<UploadSaveLockWrapper>{ children }</UploadSaveLockWrapper>
 				</MediaUploadProvider>
 			);
 		}
@@ -129,6 +130,18 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		return children;
 	}
 );
+
+/**
+ * Wrapper component that manages post save locks based on upload state.
+ * Must be rendered inside MediaUploadProvider to access the upload-media store.
+ *
+ * @param {Object} props          Component props.
+ * @param {Object} props.children Children elements.
+ */
+function UploadSaveLockWrapper( { children } ) {
+	useUploadSaveLock();
+	return children;
+}
 
 export const BlockEditorProvider = ( props ) => {
 	return (
