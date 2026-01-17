@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import type { ReactNode } from 'react';
-
-/**
- * Internal dependencies
- */
 import type { ComponentProps } from '../utils/types';
 import type { IconProps } from '../icon/types';
 

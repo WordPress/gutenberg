@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Icon as IconComponent } from '../icon';
 import { Visual } from './visual';
 import type { EmptyStateIconProps } from './types';

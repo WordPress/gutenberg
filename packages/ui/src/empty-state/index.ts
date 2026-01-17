@@ -1,6 +1,3 @@
-/**
- * Internal dependencies
- */
 import { Root } from './root';
 import { Visual } from './visual';
 import { Icon } from './icon';

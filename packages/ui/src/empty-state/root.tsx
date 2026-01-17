@@ -1,17 +1,6 @@
-/**
- * External dependencies
- */
 import { useRender, mergeProps } from '@base-ui/react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import type { EmptyStateRootProps } from './types';
 import styles from './style.module.css';
 

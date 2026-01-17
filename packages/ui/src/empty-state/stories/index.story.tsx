@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import type { Meta, StoryObj } from '@storybook/react-vite';
-
-/**
- * WordPress dependencies
- */
 import { search } from '@wordpress/icons';
-
-/**
- * Internal dependencies
- */
 import { Button, EmptyState } from '../..';
 
 const meta: Meta< typeof EmptyState.Root > = {

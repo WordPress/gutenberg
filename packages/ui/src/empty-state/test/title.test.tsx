@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { createRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Title } from '../index';
 
 describe( 'EmptyState.Title', () => {
