@@ -38,6 +38,11 @@
 			"import": "./build-module/index.mjs",
 			"default": "./build/index.cjs"
 		},
+		"./worker": {
+			"types": "./build-types/index.d.ts",
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
+		},
 		"./package.json": "./package.json"
 	},
 	"types": "build-types",
