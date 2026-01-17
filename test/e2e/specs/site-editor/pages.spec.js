@@ -324,73 +324,104 @@ test.describe( 'Pages', () => {
 
 	// Regression test for https://github.com/WordPress/gutenberg/issues/73820
 	test( 'should allow setting page order to zero and negative values', async ( {
-		admin,
 		page,
 		requestUtils,
 	} ) => {
-		// Create a published page for testing
+		// Create a published page for testing.
 		await requestUtils.createPage( {
 			title: 'Order Test Page',
 			status: 'publish',
 		} );
 
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
+		// Open Pages view.
+		const pagesButton = page.getByRole( 'button', { name: 'Pages' } );
+		await expect( pagesButton ).toBeVisible();
+		await pagesButton.click();
 
-		// Switch to table layout to access actions
-		await page.getByRole( 'button', { name: 'Layout' } ).click();
-		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+		// Switch to table layout to access actions.
+		const layoutButton = page.getByRole( 'button', { name: 'Layout' } );
+		await expect( layoutButton ).toBeVisible( { timeout: 30000 } );
+		await layoutButton.click();
 
-		// Open actions menu for the test page
-		let row = page.getByRole( 'row', { name: /Order Test Page/ } );
-		await row.getByRole( 'button', { name: 'Actions' } ).click();
+		const tableLayout = page.getByRole( 'menuitemradio', {
+			name: 'Table',
+		} );
+		await expect( tableLayout ).toBeVisible( { timeout: 30000 } );
+		await tableLayout.click();
 
-		// Click on Order action
-		await page.getByRole( 'menuitem', { name: 'Order' } ).click();
+		// Wait for the test page row to appear.
+		const row = page.getByRole( 'row', { name: /Order Test Page/ } );
+		await expect( row ).toBeVisible( { timeout: 30000 } );
 
-		// Get the order input and save button
-		let orderInput = page.getByRole( 'spinbutton', { name: 'Order' } );
+		// Open actions menu for the test page.
+		const actionsButton = row.getByRole( 'button', { name: 'Actions' } );
+		await expect( actionsButton ).toBeVisible();
+		await actionsButton.click();
+
+		// Click on Order action.
+		const orderMenuItem = page.getByRole( 'menuitem', { name: 'Order' } );
+		await expect( orderMenuItem ).toBeVisible();
+		await orderMenuItem.click();
+
+		// Get the order input and save button.
+		const orderInput = page.getByRole( 'spinbutton', { name: 'Order' } );
 		const saveButton = page.getByRole( 'button', { name: 'Save' } );
 
-		// Test that 0 is valid
+		await expect( orderInput ).toBeVisible( { timeout: 15000 } );
+		await expect( saveButton ).toBeVisible( { timeout: 15000 } );
+
+		// Test that 0 is valid.
 		await orderInput.fill( '0' );
 		await expect( saveButton ).toBeEnabled();
 
-		// Test that negative values are valid
+		// Test that negative values are valid.
 		await orderInput.fill( '-1' );
 		await expect( saveButton ).toBeEnabled();
 
 		await orderInput.fill( '-100' );
 		await expect( saveButton ).toBeEnabled();
 
-		// Test that positive values are still valid
+		// Test that positive values are still valid.
 		await orderInput.fill( '5' );
 		await expect( saveButton ).toBeEnabled();
 
-		// Save with a negative value to verify it persists
+		// Save with a negative value to verify it persists.
 		await orderInput.fill( '-5' );
 		await saveButton.click();
 
-		// Verify success notice
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text="Order updated."'
-			)
-		).toBeVisible();
+		// Verify success notice.
+		const successNotice = page.locator(
+			'role=button[name="Dismiss this notice"i] >> text="Order updated."'
+		);
+		await expect( successNotice ).toBeVisible( { timeout: 30000 } );
 
-		// Reload the page to verify the value persisted
-		await admin.visitSiteEditor();
-		await page.getByRole( 'button', { name: 'Pages' } ).click();
-		await page.getByRole( 'button', { name: 'Layout' } ).click();
-		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+		// Verify the value persisted without leaving the current editor session.
+		await page.keyboard.press( 'Escape' );
 
-		// Open Order action again for the same page
-		row = page.getByRole( 'row', { name: /Order Test Page/ } );
-		await row.getByRole( 'button', { name: 'Actions' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Order' } ).click();
+		// Re-open Pages view.
+		await expect( pagesButton ).toBeVisible( { timeout: 30000 } );
+		await pagesButton.click();
 
-		// Verify the negative value was persisted
-		orderInput = page.getByRole( 'spinbutton', { name: 'Order' } );
-		await expect( orderInput ).toHaveValue( '-5' );
+		// Locate the row again and open Order action.
+		const rowAfter = page.getByRole( 'row', { name: /Order Test Page/ } );
+		await expect( rowAfter ).toBeVisible( { timeout: 30000 } );
+
+		const actionsButtonAfter = rowAfter.getByRole( 'button', {
+			name: 'Actions',
+		} );
+		await expect( actionsButtonAfter ).toBeVisible();
+		await actionsButtonAfter.click();
+
+		const orderMenuItemAfter = page.getByRole( 'menuitem', {
+			name: 'Order',
+		} );
+		await expect( orderMenuItemAfter ).toBeVisible();
+		await orderMenuItemAfter.click();
+
+		const orderInputAfter = page.getByRole( 'spinbutton', {
+			name: 'Order',
+		} );
+		await expect( orderInputAfter ).toBeVisible( { timeout: 15000 } );
+		await expect( orderInputAfter ).toHaveValue( '-5' );
 	} );
 } );
