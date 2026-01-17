@@ -139,6 +139,24 @@ export function createWordpressExternalsPlugin(
 					jquery: { global: 'jQuery', handle: 'jquery' },
 				};
 
+				// Packages that should always be external due to special requirements
+				// (e.g., WASM imports that esbuild can't handle)
+				const alwaysExternalPackages = [
+					'@wordpress/vips',
+					'wasm-vips',
+				];
+
+				// Mark always-external packages as external
+				for ( const pkgPattern of alwaysExternalPackages ) {
+					build.onResolve(
+						{ filter: new RegExp( `^${ pkgPattern.replace( '/', '\\/' ) }(\\/.*)?$` ) },
+						( args ) => ( {
+							path: args.path,
+							external: true,
+						} )
+					);
+				}
+
 				// Build list of package namespace configurations
 				const packageExternals = [
 					{
