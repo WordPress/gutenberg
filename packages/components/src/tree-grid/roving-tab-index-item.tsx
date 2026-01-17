@@ -48,5 +48,6 @@ export const RovingTabIndexItem = forwardRef(
 		return <Component { ...allProps }>{ children }</Component>;
 	}
 );
+RovingTabIndexItem.displayName = 'RovingTabIndexItem';
 
 export default RovingTabIndexItem;

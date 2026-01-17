@@ -43,6 +43,7 @@ export const Slot = forwardRef(
 		return <BaseSlot { ...restProps } />;
 	}
 );
+Slot.displayName = 'Slot';
 
 export function Provider( {
 	children,

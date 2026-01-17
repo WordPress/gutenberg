@@ -60,4 +60,5 @@ function UnforwardedRadio(
  * @deprecated Use `RadioControl` or `ToggleGroupControl` instead.
  */
 export const Radio = forwardRef( UnforwardedRadio );
+Radio.displayName = 'Radio';
 export default Radio;

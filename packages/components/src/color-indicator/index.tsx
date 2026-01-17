@@ -43,5 +43,6 @@ function UnforwardedColorIndicator(
  * ```
  */
 export const ColorIndicator = forwardRef( UnforwardedColorIndicator );
+ColorIndicator.displayName = 'ColorIndicator';
 
 export default ColorIndicator;

@@ -60,3 +60,4 @@ const UnforwardedValidatedComboboxControl = (
 export const ValidatedComboboxControl = forwardRef(
 	UnforwardedValidatedComboboxControl
 );
+ValidatedComboboxControl.displayName = 'ValidatedComboboxControl';

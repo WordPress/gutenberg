@@ -304,4 +304,5 @@ export function UnforwardedButton(
  * ```
  */
 export const Button = forwardRef( UnforwardedButton );
+Button.displayName = 'Button';
 export default Button;
