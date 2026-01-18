@@ -25,7 +25,6 @@ export type InterpolationString< Input > = Input extends TranslatableText<
 
 /**
  * Helper type to extract tag name and handle closing/self-closing indicators
- * Matches the tokenizer regex: /<(\/)?(\w+)\s*(\/)?>/g
  * Filters out tags with spaces as they won't be parsed by the tokenizer
  */
 type ExtractTagName< T extends string > = T extends `/${ string }`
