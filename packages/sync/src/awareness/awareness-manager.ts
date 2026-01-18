@@ -33,22 +33,14 @@ function getUserInfo(
 	wpUser: WordPressUserInfo
 ): UserInfo {
 	const states = awareness.getStates();
-	console.log( 'clientID:', awareness.clientID );
-	console.log( 'states snapshot:', JSON.stringify( Object.fromEntries( states ) ) );
+	// TODO: There is a timing issue here. The other users aren't yet synced, and as a result the same color could be assigned to multiple users.
 	const otherUserColors = Array.from( states.entries() )
 		.filter(
-			( [ clientId, state ] ) => {
-				console.log( { clientId, state } );
-				return state.userInfo && clientId !== awareness.clientID;
-			}
+			( [ clientId, state ] ) =>
+				state.userInfo && clientId !== awareness.clientID
 		)
-		.map( ( [ _clientId, state ] ) => {
-			console.log( { state } );
-			return state.userInfo?.color;
-		} )
+		.map( ( [ _clientId, state ] ) => state.userInfo.color )
 		.filter( Boolean );
-
-	console.log( { otherUserColors } );
 
 	return {
 		...wpUser,
@@ -95,10 +87,6 @@ export async function createAwareness(
 ): Promise< AwarenessState | undefined > {
 	if ( objectId && objectType.startsWith( 'postType/' ) ) {
 		const awareness = new PostEditorAwarenessState( ydoc );
-
-		// Wait for initial sync before assigning color
-		await new Promise( ( resolve ) => setTimeout( resolve, 500 ) );
-
 		const userInfo = getUserInfo( awareness, currentUser );
 		awareness.setUp( userInfo );
 		awarenessInstances.set(
