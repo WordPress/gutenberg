@@ -19,6 +19,9 @@ import { store as blockEditorStore } from '../store';
 // Stable reference for useInstanceId.
 const CUSTOM_CSS_INSTANCE_REFERENCE = {};
 
+// Stable empty object reference for useSelect.
+const EMPTY_STYLE = {};
+
 /**
  * Inspector control for custom CSS.
  *
@@ -57,12 +60,22 @@ function CustomCSSControl( { blockName, setAttributes, style } ) {
 }
 
 function CustomCSSEdit( { clientId, name, setAttributes } ) {
-	const style = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockAttributes( clientId )?.style ||
-			{},
+	const { style, canEditCSS } = useSelect(
+		( select ) => {
+			const { getBlockAttributes, getSettings } =
+				select( blockEditorStore );
+			return {
+				style: getBlockAttributes( clientId )?.style || EMPTY_STYLE,
+				canEditCSS: getSettings().canEditCSS,
+			};
+		},
 		[ clientId ]
 	);
+
+	// Don't render the panel if user lacks edit_css capability.
+	if ( ! canEditCSS ) {
+		return null;
+	}
 
 	return (
 		<CustomCSSControl

@@ -50,6 +50,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'maxUploadFileSize',
 	'allowedMimeTypes',
 	'bodyPlaceholder',
+	'canEditCSS',
 	'canLockBlocks',
 	'canUpdateBlockBindings',
 	'capabilities',

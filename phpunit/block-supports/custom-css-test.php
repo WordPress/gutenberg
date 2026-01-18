@@ -338,4 +338,79 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 
 		$this->assertArrayHasKey( 'className', $result['attrs'], 'Block should have className added by default when customCSS support is not explicitly set.' );
 	}
+
+	/**
+	 * Tests that custom CSS containing HTML opening tags is rejected.
+	 *
+	 * @covers ::gutenberg_render_custom_css_support_styles
+	 */
+	public function test_custom_css_rejects_html_opening_tags() {
+		$this->register_custom_css_block_with_support(
+			'test/custom-css-html-open',
+			array( 'customCSS' => true )
+		);
+
+		$parsed_block = array(
+			'blockName' => 'test/custom-css-html-open',
+			'attrs'     => array(
+				'style' => array(
+					'css' => '<script>alert(1)</script>',
+				),
+			),
+		);
+
+		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
+
+		$this->assertArrayNotHasKey( 'className', $result['attrs'], 'Block should not have className added when CSS contains HTML opening tags.' );
+	}
+
+	/**
+	 * Tests that custom CSS containing HTML closing tags is rejected.
+	 *
+	 * @covers ::gutenberg_render_custom_css_support_styles
+	 */
+	public function test_custom_css_rejects_html_closing_tags() {
+		$this->register_custom_css_block_with_support(
+			'test/custom-css-html-close',
+			array( 'customCSS' => true )
+		);
+
+		$parsed_block = array(
+			'blockName' => 'test/custom-css-html-close',
+			'attrs'     => array(
+				'style' => array(
+					'css' => 'color: red;</style><script>alert(1)</script>',
+				),
+			),
+		);
+
+		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
+
+		$this->assertArrayNotHasKey( 'className', $result['attrs'], 'Block should not have className added when CSS contains HTML closing tags.' );
+	}
+
+	/**
+	 * Tests that valid CSS without HTML markup is accepted.
+	 *
+	 * @covers ::gutenberg_render_custom_css_support_styles
+	 */
+	public function test_custom_css_accepts_valid_css() {
+		$this->register_custom_css_block_with_support(
+			'test/custom-css-valid',
+			array( 'customCSS' => true )
+		);
+
+		$parsed_block = array(
+			'blockName' => 'test/custom-css-valid',
+			'attrs'     => array(
+				'style' => array(
+					'css' => 'color: red; background: url("image.png"); font-size: 16px;',
+				),
+			),
+		);
+
+		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
+
+		$this->assertArrayHasKey( 'className', $result['attrs'], 'Block should have className added for valid CSS.' );
+	}
 }

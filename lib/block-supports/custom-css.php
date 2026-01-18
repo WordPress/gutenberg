@@ -26,6 +26,11 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 		return $parsed_block;
 	}
 
+	// Validate CSS doesn't contain HTML markup (same validation as global styles REST API).
+	if ( preg_match( '#</?\w+#', $custom_css ) ) {
+		return $parsed_block;
+	}
+
 	// Generate a unique class name for this block instance.
 	$class_name         = wp_unique_id_from_values( $parsed_block, 'wp-custom-css-' );
 	$updated_class_name = isset( $parsed_block['attrs']['className'] )
