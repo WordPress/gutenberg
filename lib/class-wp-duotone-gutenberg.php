@@ -53,7 +53,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @var null|array<string, string>
 	 */
-	private static $__global_styles_block_names = null;
+	private static $global_styles_block_names = null;
 
 	/**
 	 * An array of duotone filter data from global, theme, and custom presets.
@@ -76,7 +76,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @var null|array<string, array<string, string|string[]>>
 	 */
-	private static $__global_styles_presets = null;
+	private static $global_styles_presets = null;
 
 	/**
 	 * All of the duotone filter data from presets for CSS custom properties on
@@ -135,27 +135,27 @@ class WP_Duotone_Gutenberg {
 	private static $block_css_declarations = array();
 
 	/**
-	 * Simple getter for `$__global_styles_block_names`, to ensure it's initialized on demand.
+	 * Simple getter for `$global_styles_block_names`, to ensure it's initialized on demand.
 	 *
 	 * @return array<string, string> The styles block names.
 	 */
 	private static function global_styles_block_names() {
-		if ( is_null( self::$__global_styles_block_names ) ) {
+		if ( is_null( self::$global_styles_block_names ) ) {
 			self::set_global_style_block_names();
 		}
-		return self::$__global_styles_block_names;
+		return self::$global_styles_block_names;
 	}
 
 	/**
-	 * Simple getter for `$__global_styles_presets`, to ensure it's initialized on demand.
+	 * Simple getter for `$global_styles_presets`, to ensure it's initialized on demand.
 	 *
 	 * @return array<string, array<string, string|string[]>> The styles presets.
 	 */
 	private static function global_styles_presets() {
-		if ( is_null( self::$__global_styles_presets ) ) {
+		if ( is_null( self::$global_styles_presets ) ) {
 			self::set_global_styles_presets();
 		}
-		return self::$__global_styles_presets;
+		return self::$global_styles_presets;
 	}
 
 	/**
@@ -805,19 +805,19 @@ class WP_Duotone_Gutenberg {
 		$tree              = gutenberg_get_global_settings();
 		$presets_by_origin = $tree['color']['duotone'] ?? array();
 
-		self::$__global_styles_presets = array();
+		self::$global_styles_presets = array();
 
 		foreach ( $presets_by_origin as $presets ) {
 			foreach ( $presets as $preset ) {
 				$filter_id = self::get_filter_id( _wp_to_kebab_case( $preset['slug'] ) );
 
-				self::$__global_styles_presets[ $filter_id ] = $preset;
+				self::$global_styles_presets[ $filter_id ] = $preset;
 			}
 		}
 	}
 
 	/**
-	 * Scrape all block names from global styles and store in self::$__global_styles_block_names
+	 * Scrape all block names from global styles and store in self::$global_styles_block_names
 	 *
 	 * @since 6.3.0
 	 */
@@ -827,7 +827,7 @@ class WP_Duotone_Gutenberg {
 		$block_nodes = $tree->get_styles_block_nodes();
 		$theme_json  = $tree->get_raw_data();
 
-		self::$__global_styles_block_names = array();
+		self::$global_styles_block_names = array();
 
 		foreach ( $block_nodes as $block_node ) {
 			// This block definition doesn't include any duotone settings. Skip it.
@@ -846,7 +846,7 @@ class WP_Duotone_Gutenberg {
 			$slug = self::get_slug_from_attribute( $duotone_attr );
 
 			if ( $slug && $slug !== $duotone_attr ) {
-				self::$__global_styles_block_names[ $block_node['name'] ] = $slug;
+				self::$global_styles_block_names[ $block_node['name'] ] = $slug;
 			}
 		}
 	}
