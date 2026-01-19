@@ -243,17 +243,10 @@ describe( 'diffRevisionContent', () => {
 		const blocks = diffRevisionContent( current, previous );
 		const normalized = normalizeBlockTree( blocks );
 
-		// Current behavior: LCS doesn't match old/new paragraph as "modified"
-		// because their content differs. Shows old as removed + new as added.
-		expect( normalized ).toHaveLength( 4 );
+		// Post-LCS pairing detects similar blocks and marks them as modified.
+		// The removed block is filtered out, modified block shows inline diff.
+		expect( normalized ).toHaveLength( 3 );
 		expect( normalized ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: {
-					content: 'This is some existing content',
-					__revisionDiffStatus: 'removed',
-				},
-			},
 			{
 				name: 'core/paragraph',
 				attributes: {
@@ -271,8 +264,10 @@ describe( 'diffRevisionContent', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: 'This is some modified content',
-					__revisionDiffStatus: 'added',
+					// Inline diff: "existing" → "modified"
+					content:
+						'This is some <del title="Removed" class="revision-diff-removed">existing</del><ins title="Added" class="revision-diff-added">modified</ins> content',
+					__revisionDiffStatus: 'modified',
 				},
 			},
 		] );
@@ -593,6 +588,8 @@ describe( 'diffRevisionContent', () => {
 			] );
 			const blocks = diffRevisionContent( current, previous );
 
+			// Post-LCS pairing matches B with D (same block type, high HTML similarity).
+			// C remains removed since it has no matching added block.
 			expect( normalizeBlockTree( blocks ) ).toMatchObject( [
 				{
 					name: 'core/group',
@@ -610,13 +607,6 @@ describe( 'diffRevisionContent', () => {
 						{
 							name: 'core/paragraph',
 							attributes: {
-								content: 'B',
-								__revisionDiffStatus: 'removed',
-							},
-						},
-						{
-							name: 'core/paragraph',
-							attributes: {
 								content: 'C',
 								__revisionDiffStatus: 'removed',
 							},
@@ -624,7 +614,82 @@ describe( 'diffRevisionContent', () => {
 						{
 							name: 'core/paragraph',
 							attributes: {
-								content: 'D',
+								// B→D modification with inline diff
+								content:
+									'<del title="Removed" class="revision-diff-removed">B</del><ins title="Added" class="revision-diff-added">D</ins>',
+								__revisionDiffStatus: 'modified',
+							},
+						},
+					],
+				},
+			] );
+		} );
+
+		it( 'does not pair blocks with completely different content', () => {
+			const previous = serialize( [
+				createBlock( 'core/group', {}, [
+					createBlock( 'core/paragraph', {
+						content: 'First paragraph stays the same',
+					} ),
+					createBlock( 'core/paragraph', {
+						content:
+							'The quick brown fox jumps over the lazy dog near the riverbank',
+					} ),
+					createBlock( 'core/paragraph', {
+						content: 'Third paragraph also removed from this post',
+					} ),
+				] ),
+			] );
+			const current = serialize( [
+				createBlock( 'core/group', {}, [
+					createBlock( 'core/paragraph', {
+						content: 'First paragraph stays the same',
+					} ),
+					createBlock( 'core/paragraph', {
+						content:
+							'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod',
+					} ),
+				] ),
+			] );
+			const blocks = diffRevisionContent( current, previous );
+
+			// With word-based similarity, completely different sentences are NOT paired.
+			// They appear as separate removed + added blocks.
+			expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+				{
+					name: 'core/group',
+					attributes: {
+						__revisionDiffStatus: undefined,
+					},
+					innerBlocks: [
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content: 'First paragraph stays the same',
+								__revisionDiffStatus: undefined,
+							},
+						},
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content:
+									'The quick brown fox jumps over the lazy dog near the riverbank',
+								__revisionDiffStatus: 'removed',
+							},
+						},
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content:
+									'Third paragraph also removed from this post',
+								__revisionDiffStatus: 'removed',
+							},
+						},
+						{
+							name: 'core/paragraph',
+							attributes: {
+								content:
+									'Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod',
 								__revisionDiffStatus: 'added',
 							},
 						},

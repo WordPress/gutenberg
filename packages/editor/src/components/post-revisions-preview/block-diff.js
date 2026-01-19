@@ -78,6 +78,114 @@ function injectDiffStatus( rawBlock, status ) {
 }
 
 /**
+ * Calculate text similarity using word diff (semantically meaningful).
+ * Returns ratio of unchanged words to total words.
+ *
+ * @param {string} text1 First text to compare.
+ * @param {string} text2 Second text to compare.
+ * @return {number} Similarity score between 0 and 1.
+ */
+function textSimilarity( text1, text2 ) {
+	if ( ! text1 && ! text2 ) {
+		return 1;
+	}
+	if ( ! text1 || ! text2 ) {
+		return 0;
+	}
+
+	const changes = diffWords( text1, text2 );
+	const unchanged = changes
+		.filter( ( c ) => ! c.added && ! c.removed )
+		.reduce( ( sum, c ) => sum + c.value.length, 0 );
+	const total = Math.max( text1.length, text2.length );
+	return total > 0 ? unchanged / total : 0;
+}
+
+/**
+ * Post-process diff result to pair similar removed/added blocks as modifications.
+ * This catches modifications that LCS missed due to content changes.
+ *
+ * @param {Array} blocks Raw blocks with diff status.
+ * @return {Array} Blocks with similar pairs converted to modifications.
+ */
+function pairSimilarBlocks( blocks ) {
+	const removed = [];
+	const added = [];
+
+	// Separate blocks by status, tracking original indices.
+	blocks.forEach( ( block, index ) => {
+		const status = block.attrs?.__revisionDiffStatus;
+		if ( status === 'removed' ) {
+			removed.push( { block, index } );
+		} else if ( status === 'added' ) {
+			added.push( { block, index } );
+		}
+	} );
+
+	// If no removed or no added, nothing to pair.
+	if ( removed.length === 0 || added.length === 0 ) {
+		return blocks;
+	}
+
+	const pairedRemoved = new Set(); // Indices of removed blocks that were paired.
+	const modifications = new Map(); // Map from added block index to modified block.
+	const SIMILARITY_THRESHOLD = 0.3;
+
+	// For each removed block, find best matching added block.
+	for ( const rem of removed ) {
+		let bestMatch = null;
+		let bestScore = 0;
+
+		for ( const add of added ) {
+			if ( modifications.has( add.index ) ) {
+				continue;
+			}
+			if ( add.block.blockName !== rem.block.blockName ) {
+				continue;
+			}
+
+			const score = textSimilarity(
+				rem.block.innerHTML || '',
+				add.block.innerHTML || ''
+			);
+			if ( score > bestScore && score > SIMILARITY_THRESHOLD ) {
+				bestScore = score;
+				bestMatch = add;
+			}
+		}
+
+		if ( bestMatch ) {
+			pairedRemoved.add( rem.index );
+
+			// Create modified block with previous content stored.
+			modifications.set( bestMatch.index, {
+				...bestMatch.block,
+				attrs: {
+					...bestMatch.block.attrs,
+					__revisionDiffStatus: 'modified',
+				},
+				__previousRawBlock: rem.block,
+			} );
+		}
+	}
+
+	// Rebuild result: filter out paired removed, replace paired added with modified.
+	return blocks
+		.map( ( block, index ) => {
+			// Skip paired removed blocks.
+			if ( pairedRemoved.has( index ) ) {
+				return null;
+			}
+			// Replace paired added blocks with modified version.
+			if ( modifications.has( index ) ) {
+				return modifications.get( index );
+			}
+			return block;
+		} )
+		.filter( Boolean );
+}
+
+/**
  * Diff raw block arrays using LCS, recursively handling innerBlocks.
  * Detects modifications when exactly 1 block is removed and 1 is added
  * with the same blockName (1:1 replacement = modification).
@@ -166,7 +274,8 @@ function diffRawBlocks( currentRaw, previousRaw ) {
 		}
 	}
 
-	return result;
+	// Post-process to pair similar removed/added blocks as modifications.
+	return pairSimilarBlocks( result );
 }
 
 /**
