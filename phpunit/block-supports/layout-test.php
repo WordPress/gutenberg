@@ -522,7 +522,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_output' => '<div class="wp-block-group is-horizontal is-nowrap is-layout-flex wp-container-core-group-is-layout-67f0b8e2 wp-block-group-is-layout-flex"></div>',
+				'expected_output' => '<div class="wp-block-group is-horizontal is-nowrap is-layout-flex wp-container-core-group-is-layout-7c467009 wp-block-group-is-layout-flex"></div>',
 			),
 			'single wrapper block layout with grid type'   => array(
 				'args'            => array(
@@ -541,7 +541,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_output' => '<div class="wp-block-group is-layout-grid wp-container-core-group-is-layout-9649a0d9 wp-block-group-is-layout-grid"></div>',
+				'expected_output' => '<div class="wp-block-group is-layout-grid wp-container-core-group-is-layout-b8d196d0 wp-block-group-is-layout-grid"></div>',
 			),
 		);
 	}
@@ -696,7 +696,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-c5c7d83f',
+				'expected_class'   => 'wp-container-core-group-is-layout-88585e05',
 			),
 			'default type block gap 24px'      => array(
 				'block_attributes' => array(
@@ -709,7 +709,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-634f0b9d',
+				'expected_class'   => 'wp-container-core-group-is-layout-b7442c2d',
 			),
 			'constrained type justified left'  => array(
 				'block_attributes' => array(
@@ -718,7 +718,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'justifyContent' => 'left',
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-12dd3699',
+				'expected_class'   => 'wp-container-core-group-is-layout-2bc87c5a',
 			),
 			'constrained type justified right' => array(
 				'block_attributes' => array(
@@ -727,7 +727,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'justifyContent' => 'right',
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-f1f2ed93',
+				'expected_class'   => 'wp-container-core-group-is-layout-b4e6f329',
 			),
 			'flex type horizontal'             => array(
 				'block_attributes' => array(
@@ -737,7 +737,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'flexWrap'    => 'nowrap',
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-2487dcaa',
+				'expected_class'   => 'wp-container-core-group-is-layout-5a57f1ed',
 			),
 			'flex type vertical'               => array(
 				'block_attributes' => array(
@@ -746,7 +746,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'orientation' => 'vertical',
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-fe9cc265',
+				'expected_class'   => 'wp-container-core-group-is-layout-38bdbeba',
 			),
 			'grid type'                        => array(
 				'block_attributes' => array(
@@ -754,7 +754,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'type' => 'grid',
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-478b6e6b',
+				'expected_class'   => 'wp-container-core-group-is-layout-0202eb5e',
 			),
 			'grid type 3 columns'              => array(
 				'block_attributes' => array(
@@ -763,7 +763,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'columnCount' => 3,
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-d3b710ac',
+				'expected_class'   => 'wp-container-core-group-is-layout-35c51620',
 			),
 		);
 	}
