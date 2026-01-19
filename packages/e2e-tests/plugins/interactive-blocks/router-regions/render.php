@@ -13,8 +13,6 @@
 	<div
 		data-wp-interactive="router-regions"
 		data-wp-router-region="region-1"
-		data-wp-key="region-1"
-		data-wp-run="callbacks.nope"
 	>
 		<p
 			data-testid="region-1-text"
@@ -56,8 +54,10 @@
 <section>
 	<h2>Region 2</h2>
 	<div
+		data-wp-key="region-2"
 		data-wp-interactive="router-regions"
 		data-wp-router-region="region-2"
+		data-wp-run="callbacks.nope"
 	>
 		<p
 			data-testid="region-2-text"
@@ -115,6 +115,7 @@
 	<!-- Router region inside data-wp-interactive -->
 	<div
 		data-testid="valid-inside-interactive"
+		data-wp-key="valid-inside-interactive"
 		data-wp-interactive="router-regions"
 		data-wp-router-region="valid-inside-interactive"
 		data-wp-context='{ "counter": { "value": 0 } }'
@@ -133,6 +134,7 @@
 		<!-- Router region inside data-wp-router-region -->
 		<div
 			data-testid="valid-inside-router-region"
+			data-wp-key="valid-inside-router-region"
 			data-wp-interactive="router-regions"
 			data-wp-router-region="valid-inside-router-region"
 			data-wp-context='{ "counter": { "value": 0 } }'
@@ -194,6 +196,7 @@
 			data-wp-interactive="router-regions"
 			data-wp-router-region='$region_data'
 			data-testid="$region_id"
+			data-wp-key="$region_id"
 			$has_directives
 		>
 			<div $context_data>
