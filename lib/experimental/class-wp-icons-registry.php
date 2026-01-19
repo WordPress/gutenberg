@@ -71,13 +71,15 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 			}
 
 			if (
-				! isset( $icon_properties['content'] )
-				xor ! isset( $icon_properties['filePath'] ) ) {
+				( ! isset( $icon_properties['content'] ) && ! isset( $icon_properties['filePath'] ) ) ||
+				( isset( $icon_properties['content'] ) && isset( $icon_properties['filePath'] ) )
+			) {
 				_doing_it_wrong(
 					__METHOD__,
 					__( 'Icons must provide either `content` or `filePath`', 'gutenberg' ),
 					'7.0.0'
 				);
+				return false;
 			}
 
 			if ( isset( $icon_properties['content'] ) && ! is_string( $icon_properties['content'] ) ) {
