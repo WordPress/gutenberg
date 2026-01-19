@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DataViews: Add card form layout validation. [#74547](https://github.com/WordPress/gutenberg/pull/74547)
+
 ### Bug Fixes
 
 - Fix primary action visibility in table layout when the action doesn't support bulk operations, and fix compact action menu not visible on mobile when there is only one action. [#74836](https://github.com/WordPress/gutenberg/pull/74836)
