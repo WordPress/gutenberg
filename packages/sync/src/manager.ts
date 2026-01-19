@@ -182,6 +182,7 @@ export function createSyncManager(): SyncManager {
 			objectType,
 			objectId,
 			ydoc,
+			handlers,
 			currentUser
 		);
 

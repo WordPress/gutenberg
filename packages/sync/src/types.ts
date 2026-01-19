@@ -62,7 +62,10 @@ export type ProviderCreator = (
 ) => Promise< ProviderCreatorResult >;
 
 export interface RecordHandlers {
-	editRecord: ( data: Partial< ObjectData > ) => void;
+	editRecord: (
+		data: Partial< ObjectData >,
+		options?: { undoIgnore?: boolean }
+	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
 	refetchRecord: () => Promise< void >;
 	saveRecord: () => Promise< void >;

@@ -10,6 +10,7 @@ import {
 } from './awareness-types';
 import { getTypedKeys, areMapsEqual } from '../utils';
 import { REMOVAL_DELAY_IN_MS } from '../config';
+import type { RecordHandlers } from '../types';
 
 type AwarenessClientID = number;
 
@@ -145,14 +146,16 @@ export abstract class AwarenessState<
 	 * value -- even if it hasn't yet been set on the awareness instance.
 	 */
 	private myThrottledState: Partial< State > = {};
+	private throttleTimeouts: Map< string, NodeJS.Timeout > = new Map();
 
 	/** CUSTOM METHODS */
 
 	/**
-	 * Set up.
-	 * @param userInfo
+	 * Set up the awareness state.
+	 * @param _recordHandlers - Record handlers.
+	 * @param userInfo        - User info.
 	 */
-	public setUp( userInfo: UserInfo ): void {
+	public setUp( _recordHandlers: RecordHandlers, userInfo: UserInfo ): void {
 		this.setLocalStateField( 'userInfo', userInfo );
 
 		this.on(
@@ -199,6 +202,34 @@ export abstract class AwarenessState<
 				( cb ) => cb !== callback
 			);
 		};
+	}
+
+	/**
+	 * Set a local state field on an awareness document with throttle. See caveats
+	 * of this.setLocalStateField.
+	 * @param field
+	 * @param value
+	 * @param wait
+	 */
+	public setThrottledLocalStateField<
+		FieldName extends string & keyof State,
+	>( field: FieldName, value: State[ FieldName ], wait: number ): void {
+		this.setLocalStateField( field, value );
+
+		this.throttleTimeouts.set(
+			field,
+			setTimeout( () => {
+				this.throttleTimeouts.delete( field );
+				if ( this.myThrottledState[ field ] ) {
+					this.setLocalStateField(
+						field,
+						this.myThrottledState[ field ]
+					);
+
+					delete this.myThrottledState[ field ];
+				}
+			}, wait )
+		);
 	}
 
 	/**

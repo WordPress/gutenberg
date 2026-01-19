@@ -14,7 +14,6 @@ import {
 	CRDT_STATE_VERSION_KEY,
 } from './config';
 import type { CRDTDoc } from './types';
-import type { UserInfo } from './awareness/awareness-types';
 
 // An object representation of CRDT document metadata.
 type DocumentMeta = Record< string, DocumentMetaValue >;

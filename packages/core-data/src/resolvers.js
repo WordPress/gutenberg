@@ -192,7 +192,7 @@ export const getEntityRecord =
 						recordWithTransients,
 						{
 							// Handle edits sourced from the sync manager.
-							editRecord: ( edits ) => {
+							editRecord: ( edits, options = {} ) => {
 								if ( ! Object.keys( edits ).length ) {
 									return;
 								}
@@ -206,6 +206,7 @@ export const getEntityRecord =
 									meta: {
 										undo: undefined,
 									},
+									options,
 								} );
 							},
 							// Get the current entity record (with edits)

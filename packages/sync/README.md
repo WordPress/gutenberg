@@ -50,6 +50,16 @@ Origin string for CRDT document changes originating from the local editor.
 
 Origin string for CRDT document changes originating from the sync manager.
 
+### setConnectionStatus
+
+Set the current user's connection status in the awareness instance for the given object type and object ID.
+
+_Parameters_
+
+-   _objectType_ `ObjectType`: Object type.
+-   _objectId_ `ObjectID | null`: Object ID.
+-   _isConnected_ `boolean`: Connection status.
+
 ### WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE
 
 WordPress meta key used to persist the CRDT document for an entity.

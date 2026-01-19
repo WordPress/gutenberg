@@ -82,7 +82,8 @@ function generateColorVariation( hexColor: string ): string {
 	const newB = Math.min( 255, Math.max( 0, b + shift ) );
 
 	// Convert back to hex
-	const toHex = ( n: number ) => n.toString( 16 ).padStart( 2, '0' ).toUpperCase();
+	const toHex = ( n: number ) =>
+		n.toString( 16 ).padStart( 2, '0' ).toUpperCase();
 	return `#${ toHex( newR ) }${ toHex( newG ) }${ toHex( newB ) }`;
 }
 

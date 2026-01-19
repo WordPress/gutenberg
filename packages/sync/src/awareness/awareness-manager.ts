@@ -39,7 +39,7 @@ function getUserInfo(
 			( [ clientId, state ] ) =>
 				state.userInfo && clientId !== awareness.clientID
 		)
-		.map( ( [ _clientId, state ] ) => state.userInfo.color )
+		.map( ( [ , state ] ) => state.userInfo.color )
 		.filter( Boolean );
 
 	return {

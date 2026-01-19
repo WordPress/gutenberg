@@ -1,6 +1,7 @@
 import { Awareness } from 'y-protocols/awareness';
 
 import { getRecordValue } from '../utils';
+import type { SelectionState } from '../selection-utils';
 
 /**
  * Extended Awareness class with typed state accessors.
@@ -81,15 +82,44 @@ export type EnhancedState< State extends BaseState > = State & {
 	isMe: boolean;
 };
 
+/**
+ * A block selection object.
+ *
+ * In order to avoid circular dependencies, we define it here instead of importing
+ * the WPBlockSelection interface from @wordpress/editor.
+ */
+export type WPBlockSelection = {
+	/**
+	 * A block client ID.
+	 */
+	clientId: string;
+	/**
+	 * A block attribute key.
+	 */
+	attributeKey: string;
+	/**
+	 * An attribute value offset, based on the rich
+	 * text value. See `wp.richText.create`.
+	 */
+	offset: number;
+};
+
 export type EqualityFieldCheck<
 	State extends BaseState,
 	FieldName extends keyof State,
 > = ( value1?: State[ FieldName ], value2?: State[ FieldName ] ) => boolean;
 
 /**
+ * The editor state includes information about the user's current selection.
+ */
+export interface EditorState {
+	selection: SelectionState;
+}
+
+/**
  * The post editor state extends the base state with information used to render
  * presence indicators in the post editor.
- *
- * TODO: Add in the presence indicators.
  */
-export interface PostEditorState extends BaseState {}
+export interface PostEditorState extends BaseState {
+	editorState?: EditorState;
+}
