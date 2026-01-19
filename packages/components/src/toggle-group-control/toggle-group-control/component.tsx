@@ -60,7 +60,7 @@ function UnconnectedToggleGroupControl(
 		prefix: 'selected',
 		dataAttribute: 'indicator-animated',
 		transitionEndFilter: ( event ) => event.pseudoElement === '::before',
-		roundRect: true,
+		roundRect: false,
 	} );
 
 	const cx = useCx();
@@ -91,7 +91,7 @@ function UnconnectedToggleGroupControl(
 	} );
 
 	return (
-		<BaseControl help={ help } __nextHasNoMarginBottom>
+		<BaseControl help={ help }>
 			{ ! hideLabelFromVision && (
 				<VisualLabelWrapper>
 					<BaseControl.VisualLabel>{ label }</BaseControl.VisualLabel>

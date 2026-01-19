@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { copyFile, mkdir, writeFile } from 'fs/promises';
+import { copyFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import esbuild from 'esbuild';
@@ -108,61 +108,6 @@ async function bundleReactJsxRuntime() {
 }
 
 /**
- * Bundle React Refresh files for hot module replacement during development.
- * Only needed when SCRIPT_DEBUG is enabled.
- */
-async function bundleReactRefresh() {
-	console.log( '📦 Bundling React Refresh...' );
-
-	// Bundle react-refresh-entry
-	const entryDir = path.join( BUILD_DIR, 'react-refresh-entry' );
-	await mkdir( entryDir, { recursive: true } );
-
-	await esbuild.build( {
-		entryPoints: [
-			'@pmmmwh/react-refresh-webpack-plugin/client/ReactRefreshEntry.js',
-		],
-		outfile: path.join( entryDir, 'index.min.js' ),
-		bundle: true,
-		format: 'iife',
-		target: 'es2015',
-		platform: 'browser',
-		minify: false,
-	} );
-
-	// Generate asset file for react-refresh-entry
-	const entryAssetContent = `<?php return array('dependencies' => array('wp-react-refresh-runtime'), 'version' => '${ Date.now() }');`;
-	await writeFile(
-		path.join( entryDir, 'index.min.asset.php' ),
-		entryAssetContent
-	);
-
-	// Bundle react-refresh-runtime
-	const runtimeDir = path.join( BUILD_DIR, 'react-refresh-runtime' );
-	await mkdir( runtimeDir, { recursive: true } );
-
-	await esbuild.build( {
-		entryPoints: [ 'react-refresh/runtime' ],
-		outfile: path.join( runtimeDir, 'index.min.js' ),
-		bundle: true,
-		format: 'iife',
-		globalName: 'ReactRefreshRuntime',
-		target: 'es2015',
-		platform: 'browser',
-		minify: false,
-	} );
-
-	// Generate asset file for react-refresh-runtime
-	const runtimeAssetContent = `<?php return array('dependencies' => array(), 'version' => '${ Date.now() }');`;
-	await writeFile(
-		path.join( runtimeDir, 'index.min.asset.php' ),
-		runtimeAssetContent
-	);
-
-	console.log( '   ✔ Bundled React Refresh' );
-}
-
-/**
  * Main build function.
  */
 async function buildVendors() {
@@ -170,11 +115,7 @@ async function buildVendors() {
 
 	const startTime = Date.now();
 
-	await Promise.all( [
-		copyReactUMDFiles(),
-		bundleReactJsxRuntime(),
-		bundleReactRefresh(),
-	] );
+	await Promise.all( [ copyReactUMDFiles(), bundleReactJsxRuntime() ] );
 
 	const totalTime = Date.now() - startTime;
 	console.log( `\n🎉 Vendor files built successfully! (${ totalTime }ms)` );

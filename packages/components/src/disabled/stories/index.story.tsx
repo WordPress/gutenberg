@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -52,7 +52,6 @@ const Form = () => {
 				onChange={ setTextAreaValue }
 			/>
 			<SelectControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				label="Select Control"
 				onChange={ () => {} }

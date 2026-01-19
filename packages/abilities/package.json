@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/abilities",
-	"version": "0.2.0",
+	"version": "0.4.0",
 	"description": "JavaScript client for WordPress Abilities API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -24,24 +24,24 @@
 		"npm": ">=8.19.2"
 	},
 	"files": [
+		"src",
 		"build",
 		"build-module",
 		"build-types",
-		"src",
 		"*.md"
 	],
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
-			"require": "./build/index.js"
+			"import": "./build-module/index.mjs",
+			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
 	},
 	"wpScriptModuleExports": {
-		".": "./build-module/index.js"
+		".": "./build-module/index.mjs"
 	},
 	"types": "build-types",
 	"dependencies": {

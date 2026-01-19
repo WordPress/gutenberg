@@ -46,7 +46,6 @@ export default function ResolutionTool( {
 			resetAllFilter={ resetAllFilter }
 		>
 			<SelectControl
-				__nextHasNoMarginBottom
 				label={ __( 'Resolution' ) }
 				value={ displayValue }
 				options={ options }

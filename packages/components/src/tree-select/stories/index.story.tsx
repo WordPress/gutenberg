@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
 /**
  * WordPress dependencies
@@ -40,6 +40,7 @@ const TreeSelectWithState: StoryFn< typeof TreeSelect > = ( props ) => {
 
 	return (
 		<TreeSelect
+			__next40pxDefaultSize
 			{ ...props }
 			onChange={ setSelection }
 			selectedId={ selection }

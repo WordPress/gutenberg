@@ -46,7 +46,7 @@ Setting that enables the following UI tools:
 - background: backgroundImage, backgroundSize
 - border: color, radius, style, width
 - color: link, heading, button, caption
-- dimensions: aspectRatio, minHeight, width
+- dimensions: aspectRatio, height, minHeight, width
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
@@ -111,6 +111,7 @@ Settings related to dimensions.
 | aspectRatio | Allow users to set an aspect ratio. | `boolean` | `false` |
 | defaultAspectRatios | Allow users to choose aspect ratios from the default set of aspect ratios. | `boolean` | `true` |
 | aspectRatios | Allow users to define aspect ratios for some blocks. | `[ { name, slug, ratio } ]` |  |
+| height | Allow users to set custom height. | `boolean` | `false` |
 | minHeight | Allow users to set custom minimum height. | `boolean` | `false` |
 | width | Allow users to set custom width. | `boolean` | `false` |
 | dimensionSizes | Dimension size presets for dimension block supports. | `[ { name, slug, size } ]` |  |
@@ -269,6 +270,7 @@ Dimensions styles.
 | Property | Description | Type |
 | -------- | ----------- | ---- |
 | aspectRatio | Sets the `aspect-ratio` CSS property. | `string`, `{ ref }` |
+| height | Sets the `height` CSS property. | `string`, `{ ref }` |
 | minHeight | Sets the `min-height` CSS property. | `string`, `{ ref }` |
 | width | Sets the `width` CSS property. | `string`, `{ ref }` |
 

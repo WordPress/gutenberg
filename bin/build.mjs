@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { spawn } from 'child_process';
+import spawn from 'cross-spawn';
 import { fileURLToPath } from 'url';
 import path from 'path';
 
@@ -27,7 +27,6 @@ function exec( command, args = [], options = {} ) {
 		const childOptions = {
 			cwd: ROOT_DIR,
 			stdio: silent ? 'pipe' : 'inherit',
-			shell: true,
 			...spawnOptions,
 		};
 
@@ -79,6 +78,8 @@ function exec( command, args = [], options = {} ) {
  * Main build orchestration function.
  */
 async function build() {
+	const skipTypes = process.argv.includes( '--skip-types' );
+
 	console.log( '🔨 Starting build process...\n' );
 
 	const startTime = Date.now();
@@ -96,26 +97,28 @@ async function build() {
 			{ silent: true }
 		);
 
-		// Step 3: Validate TypeScript version
-		console.log( '\n🔍 Validating TypeScript version...' );
-		await exec( 'node', [
-			'./bin/packages/validate-typescript-version.js',
-		] );
+		if ( ! skipTypes ) {
+			// Step 3: Validate TypeScript version
+			console.log( '\n🔍 Validating TypeScript version...' );
+			await exec( 'node', [
+				'./bin/packages/validate-typescript-version.js',
+			] );
 
-		// Step 4: Build TypeScript types
-		console.log( '\n📘 Building TypeScript types...' );
-		await exec( 'tsc', [ '--build' ] ).catch( () => {
-			console.error(
-				'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
-			);
-			throw new Error( 'TypeScript compilation failed' );
-		} );
+			// Step 4: Build TypeScript types
+			console.log( '\n📘 Building TypeScript types...' );
+			await exec( 'tsc', [ '--build' ] ).catch( () => {
+				console.error(
+					'\n❌ TypeScript compilation failed. Try cleaning up first: `npm run clean:package-types`'
+				);
+				throw new Error( 'TypeScript compilation failed' );
+			} );
 
-		// Step 5: Check build type declaration files
-		console.log( '\n✅ Checking type declaration files...' );
-		await exec( 'node', [
-			'./bin/packages/check-build-type-declaration-files.js',
-		] );
+			// Step 5: Check build type declaration files
+			console.log( '\n✅ Checking type declaration files...' );
+			await exec( 'node', [
+				'./bin/packages/check-build-type-declaration-files.js',
+			] );
+		}
 
 		// Step 6: Build vendors
 		console.log( '\n📦 Building vendor files...' );
@@ -123,7 +126,10 @@ async function build() {
 
 		// Step 7: Build packages
 		console.log( '\n📦 Building packages (production mode)...' );
-		await exec( 'wp-build', [], {
+		const buildArgs = process.argv
+			.slice( 2 )
+			.filter( ( arg ) => arg !== '--skip-types' );
+		await exec( 'wp-build', buildArgs, {
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );
 

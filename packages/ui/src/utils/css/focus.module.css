@@ -1,0 +1,31 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-utilities {
+	.outset-ring--focus,
+	.outset-ring--focus-except-active,
+	.outset-ring--focus-visible,
+	.outset-ring--focus-within,
+	.outset-ring--focus-within-except-active,
+	.outset-ring--focus-within-visible {
+		@media not ( prefers-reduced-motion ) {
+			transition: outline 0.1s ease-out;
+		}
+
+		/* Outline width must be kept at 0 even with a transparent color,
+		or else the outline will be visible in forced-colors mode. */
+		outline-width: 0;
+		outline-style: solid;
+		outline-color: transparent;
+		outline-offset: 1px;
+	}
+
+	.outset-ring--focus:focus,
+	.outset-ring--focus-except-active:focus:not(:active),
+	.outset-ring--focus-visible:focus-visible,
+	.outset-ring--focus-within:focus-within,
+	.outset-ring--focus-within-except-active:focus-within:not(:has(:active)),
+	.outset-ring--focus-within-visible:focus-within:has(:focus-visible) {
+		outline-width: var(--wpds-border-width-interactive-focus);
+		outline-color: var(--wpds-color-stroke-focus-brand);
+	}
+}

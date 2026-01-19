@@ -199,7 +199,6 @@ const WithControlsContent = ( args: ImageCropperProps ) => {
 						options={ aspectRatioOptions }
 						onChange={ handleAspectRatioChange }
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					/>
 				</VStack>
 				<HStack style={ { marginBottom: '20px' } } spacing={ 2 }>

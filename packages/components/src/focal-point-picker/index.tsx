@@ -286,9 +286,7 @@ export function FocalPointPicker( {
 					onChange?.( getFinalValue( value ) );
 				} }
 			/>
-			{ !! help && (
-				<StyledHelp __nextHasNoMarginBottom>{ help }</StyledHelp>
-			) }
+			{ !! help && <StyledHelp>{ help }</StyledHelp> }
 		</Container>
 	);
 }

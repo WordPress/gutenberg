@@ -42,9 +42,9 @@ export function useHandleLinkChange( { clientId, attributes, setAttributes } ) {
 				id: updatedLink.id,
 			};
 
-			// Only include title when creating a new link (not updating existing)
+			// Only include title when there's no existing label
 			// This preserves user-customized labels when updating links
-			if ( ! attributes.url || ! attributes.label ) {
+			if ( ! attributes.label || attributes.label === '' ) {
 				attrs.title = updatedLink.title;
 			}
 

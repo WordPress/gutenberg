@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -35,7 +35,11 @@ const Template: StoryFn< typeof Guide > = ( { onFinish, ...props } ) => {
 
 	return (
 		<>
-			<Button variant="secondary" onClick={ openGuide }>
+			<Button
+				__next40pxDefaultSize
+				variant="secondary"
+				onClick={ openGuide }
+			>
 				Open Guide
 			</Button>
 			{ isOpen && (

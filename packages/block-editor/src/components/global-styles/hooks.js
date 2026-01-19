@@ -152,7 +152,7 @@ export function useSettingsForBlockElement(
 			}
 		} );
 
-		[ 'aspectRatio', 'minHeight', 'width' ].forEach( ( key ) => {
+		[ 'aspectRatio', 'height', 'minHeight', 'width' ].forEach( ( key ) => {
 			if ( ! supportedStyles.includes( key ) ) {
 				updatedSettings.dimensions = {
 					...updatedSettings.dimensions,

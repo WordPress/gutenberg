@@ -19,11 +19,7 @@ const UnforwardedValidatedSelectControl = (
 		...restProps
 	}: Omit<
 		React.ComponentProps< typeof SelectControl >,
-		| '__next40pxDefaultSize'
-		| '__nextHasNoMarginBottom'
-		| 'multiple'
-		| 'onChange'
-		| 'value'
+		'__next40pxDefaultSize' | 'multiple' | 'onChange' | 'value'
 	> & {
 		value?: string;
 		onChange: ( value: string ) => void;
@@ -41,7 +37,6 @@ const UnforwardedValidatedSelectControl = (
 			getValidityTarget={ () => validityTargetRef.current }
 		>
 			<SelectControl
-				__nextHasNoMarginBottom
 				__next40pxDefaultSize
 				ref={ mergedRefs }
 				{ ...restProps }

@@ -138,7 +138,6 @@ export function RadioControl(
 						</label>
 						{ !! option.description ? (
 							<StyledHelp
-								__nextHasNoMarginBottom
 								id={ generateOptionDescriptionId( id, index ) }
 								className="components-radio-control__option-description"
 							>
@@ -150,7 +149,6 @@ export function RadioControl(
 			</VStack>
 			{ !! help && (
 				<StyledHelp
-					__nextHasNoMarginBottom
 					id={ generateHelpId( id ) }
 					className="components-base-control__help"
 				>

@@ -93,7 +93,6 @@ export default function PatternSelection( {
 			{ showSearch && (
 				<div className="block-library-query-pattern__selection-search">
 					<SearchControl
-						__nextHasNoMarginBottom
 						onChange={ setSearchValue }
 						value={ searchValue }
 						label={ __( 'Search' ) }

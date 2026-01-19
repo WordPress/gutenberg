@@ -7,7 +7,7 @@ import {
 	getUnregisteredTypeHandlerName,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { PanelBody, __unstableMotion as motion } from '@wordpress/components';
+import { __unstableMotion as motion } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -29,28 +29,19 @@ import PositionControls from '../inspector-controls-tabs/position-controls-panel
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import { useBorderPanelLabel } from '../../hooks/border';
 import ContentTab from '../inspector-controls-tabs/content-tab';
+import BlockVisibilityInfo from '../block-visibility/block-visibility-info';
 import { unlock } from '../../lock-unlock';
-
-function BlockStylesPanel( { clientId } ) {
-	return (
-		<PanelBody title={ __( 'Styles' ) }>
-			<BlockStyles clientId={ clientId } />
-		</PanelBody>
-	);
-}
 
 function StyleInspectorSlots( {
 	blockName,
 	showAdvancedControls = true,
 	showPositionControls = true,
-	showListControls = false,
 	showBindingsControls = true,
 } ) {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 	return (
 		<>
 			<InspectorControls.Slot />
-			{ showListControls && <InspectorControls.Slot group="list" /> }
 			<InspectorControls.Slot
 				group="color"
 				label={ __( 'Color' ) }
@@ -362,6 +353,7 @@ const BlockInspectorSingleBlock = ( {
 				isChild={ hasParentChildBlockCards }
 				clientId={ renderedBlockClientId }
 			/>
+			<BlockVisibilityInfo clientId={ renderedBlockClientId } />
 			{ window?.__experimentalContentOnlyPatternInsertion && (
 				<EditContents clientId={ renderedBlockClientId } />
 			) }
@@ -379,17 +371,13 @@ const BlockInspectorSingleBlock = ( {
 			{ ! shouldShowTabs && (
 				<>
 					{ hasBlockStyles && (
-						<BlockStylesPanel clientId={ renderedBlockClientId } />
+						<BlockStyles clientId={ renderedBlockClientId } />
 					) }
-					<ContentTab
-						rootClientId={ renderedBlockClientId }
-						contentClientIds={ contentClientIds }
-					/>
+					<ContentTab contentClientIds={ contentClientIds } />
+					<InspectorControls.Slot group="content" />
+					<InspectorControls.Slot group="list" />
 					{ ! isSectionBlock && (
-						<StyleInspectorSlots
-							blockName={ blockName }
-							showListControls
-						/>
+						<StyleInspectorSlots blockName={ blockName } />
 					) }
 					{ isSectionBlock &&
 						isBlockSynced &&

@@ -3,8 +3,8 @@
  */
 import type { Moment } from 'moment';
 import momentLib from 'moment';
-import 'moment-timezone/moment-timezone';
-import 'moment-timezone/moment-timezone-utils';
+import 'moment-timezone/moment-timezone.js';
+import 'moment-timezone/moment-timezone-utils.js';
 
 /**
  * WordPress dependencies
@@ -15,7 +15,7 @@ import deprecated from '@wordpress/deprecated';
  */
 import type { DateSettings } from './types';
 
-export * from './types';
+export type * from './types';
 
 const WP_ZONE = 'WP';
 
@@ -86,10 +86,10 @@ let settings: DateSettings = {
 		startOfWeek: 0,
 	},
 	formats: {
-		time: 'g: i a',
+		time: 'g:i a',
 		date: 'F j, Y',
-		datetime: 'F j, Y g: i a',
-		datetimeAbbreviated: 'M j, Y g: i a',
+		datetime: 'F j, Y g:i a',
+		datetimeAbbreviated: 'M j, Y g:i a',
 	},
 	timezone: { offset: 0, offsetFormatted: '0', string: '', abbr: '' },
 };
@@ -605,13 +605,11 @@ function buildMoment(
 ) {
 	const dateMoment = momentLib( dateValue );
 
-	if ( timezone && ! isUTCOffset( timezone ) ) {
-		// The ! isUTCOffset() check guarantees that timezone is a string.
-		return dateMoment.tz( timezone as string );
-	}
-
-	if ( timezone && isUTCOffset( timezone ) ) {
-		return dateMoment.utcOffset( timezone );
+	if ( timezone !== '' ) {
+		return isUTCOffset( timezone )
+			? dateMoment.utcOffset( timezone )
+			: // A false isUTCOffset() guarantees that timezone is a string.
+			  dateMoment.tz( timezone as string );
 	}
 
 	if ( settings.timezone.string ) {

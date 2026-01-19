@@ -38,6 +38,7 @@ export function useHasDimensionsPanel( settings ) {
 	const hasPadding = useHasPadding( settings );
 	const hasMargin = useHasMargin( settings );
 	const hasGap = useHasGap( settings );
+	const hasHeight = useHasHeight( settings );
 	const hasMinHeight = useHasMinHeight( settings );
 	const hasWidth = useHasWidth( settings );
 	const hasAspectRatio = useHasAspectRatio( settings );
@@ -50,6 +51,7 @@ export function useHasDimensionsPanel( settings ) {
 			hasPadding ||
 			hasMargin ||
 			hasGap ||
+			hasHeight ||
 			hasMinHeight ||
 			hasWidth ||
 			hasAspectRatio ||
@@ -75,6 +77,10 @@ function useHasMargin( settings ) {
 
 function useHasGap( settings ) {
 	return settings?.spacing?.blockGap;
+}
+
+function useHasHeight( settings ) {
+	return settings?.dimensions?.height;
 }
 
 function useHasMinHeight( settings ) {
@@ -211,6 +217,7 @@ const DEFAULT_CONTROLS = {
 	padding: true,
 	margin: true,
 	blockGap: true,
+	height: true,
 	minHeight: true,
 	width: true,
 	aspectRatio: true,
@@ -391,6 +398,29 @@ export default function DimensionsPanel( {
 	};
 	const hasMinHeightValue = () => !! value?.dimensions?.minHeight;
 
+	// Height
+	const showHeightControl = useHasHeight( settings );
+	const heightValue = decodeValue( inheritedValue?.dimensions?.height );
+	const setHeightValue = ( newValue ) => {
+		const tempValue = setImmutably(
+			value,
+			[ 'dimensions', 'height' ],
+			newValue
+		);
+		// Apply height, while removing any applied aspect ratio.
+		onChange(
+			setImmutably(
+				tempValue,
+				[ 'dimensions', 'aspectRatio' ],
+				undefined
+			)
+		);
+	};
+	const resetHeightValue = () => {
+		setHeightValue( undefined );
+	};
+	const hasHeightValue = () => !! value?.dimensions?.height;
+
 	// Width
 	const showWidthControl = useHasWidth( settings );
 	const widthValue = decodeValue( inheritedValue?.dimensions?.width );
@@ -455,6 +485,7 @@ export default function DimensionsPanel( {
 			},
 			dimensions: {
 				...previousValue?.dimensions,
+				height: undefined,
 				minHeight: undefined,
 				aspectRatio: undefined,
 				width: undefined,
@@ -704,6 +735,23 @@ export default function DimensionsPanel( {
 						label={ __( 'Minimum height' ) }
 						value={ minHeightValue }
 						onChange={ setMinHeightValue }
+					/>
+				</ToolsPanelItem>
+			) }
+			{ showHeightControl && (
+				<ToolsPanelItem
+					hasValue={ hasHeightValue }
+					label={ __( 'Height' ) }
+					onDeselect={ resetHeightValue }
+					isShownByDefault={
+						defaultControls.height ?? DEFAULT_CONTROLS.height
+					}
+					panelId={ panelId }
+				>
+					<DimensionControl
+						label={ __( 'Height' ) }
+						value={ heightValue }
+						onChange={ setHeightValue }
 					/>
 				</ToolsPanelItem>
 			) }

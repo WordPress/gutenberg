@@ -56,7 +56,6 @@ const AvatarInspectorControls = ( {
 					onDeselect={ () => setAttributes( { size: 96 } ) }
 				>
 					<RangeControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Image size' ) }
 						onChange={ ( newSize ) =>

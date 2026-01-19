@@ -1,15 +1,14 @@
 /**
+ * External dependencies
+ */
+const JSDOMEnvironment = require( 'jest-environment-jsdom' ).default;
+
+/**
  * Internal dependencies
  */
 const { setupEditor } = require( './__device-tests__/pages/editor-page' );
 const utils = require( './__device-tests__/helpers/utils' );
 const testData = require( './__device-tests__/helpers/test-data' );
-
-/**
- * External dependencies
- */
-// eslint-disable-next-line import/no-extraneous-dependencies
-const JSDOMEnvironment = require( 'jest-environment-jsdom' ).default;
 
 class CustomEnvironment extends JSDOMEnvironment {
 	async setup() {

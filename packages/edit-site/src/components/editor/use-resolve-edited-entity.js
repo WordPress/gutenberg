@@ -12,6 +12,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as editSiteStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import {
+	ATTACHMENT_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
@@ -21,6 +22,7 @@ import {
 const { useLocation } = unlock( routerPrivateApis );
 
 const postTypesWithoutParentTemplate = [
+	ATTACHMENT_POST_TYPE,
 	TEMPLATE_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	NAVIGATION_POST_TYPE,
@@ -45,6 +47,8 @@ function getPostType( name ) {
 		postType = 'page';
 	} else if ( name === 'post-item' || name === 'posts' ) {
 		postType = 'post';
+	} else if ( name === 'attachment-item' ) {
+		postType = ATTACHMENT_POST_TYPE;
 	}
 
 	return postType;

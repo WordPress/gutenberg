@@ -19,6 +19,8 @@ export interface QueueItem {
 	currentOperation?: OperationType;
 	operations?: Operation[];
 	error?: Error;
+	retryCount?: number;
+	progress?: number;
 	batchId?: string;
 	sourceUrl?: string;
 	sourceAttachmentId?: number;
@@ -38,6 +40,7 @@ export enum Type {
 	Prepare = 'PREPARE_ITEM',
 	Cancel = 'CANCEL_ITEM',
 	Remove = 'REMOVE_ITEM',
+	RetryItem = 'RETRY_ITEM',
 	PauseItem = 'PAUSE_ITEM',
 	ResumeItem = 'RESUME_ITEM',
 	PauseQueue = 'PAUSE_QUEUE',
@@ -47,6 +50,7 @@ export enum Type {
 	AddOperations = 'ADD_OPERATIONS',
 	CacheBlobUrl = 'CACHE_BLOB_URL',
 	RevokeBlobUrls = 'REVOKE_BLOB_URLS',
+	UpdateProgress = 'UPDATE_PROGRESS',
 	UpdateSettings = 'UPDATE_SETTINGS',
 }
 
@@ -81,6 +85,7 @@ export type CancelAction = Action<
 	Type.Cancel,
 	{ id: QueueItemId; error: Error }
 >;
+export type RetryItemAction = Action< Type.RetryItem, { id: QueueItemId } >;
 export type PauseItemAction = Action< Type.PauseItem, { id: QueueItemId } >;
 export type ResumeItemAction = Action< Type.ResumeItem, { id: QueueItemId } >;
 export type PauseQueueAction = Action< Type.PauseQueue >;
@@ -93,6 +98,10 @@ export type CacheBlobUrlAction = Action<
 export type RevokeBlobUrlsAction = Action<
 	Type.RevokeBlobUrls,
 	{ id: QueueItemId }
+>;
+export type UpdateProgressAction = Action<
+	Type.UpdateProgress,
+	{ id: QueueItemId; progress: number }
 >;
 export type UpdateSettingsAction = Action<
 	Type.UpdateSettings,
@@ -125,8 +134,10 @@ export interface Settings {
 	mediaUpload: ( args: UploadMediaArgs ) => void;
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes?: Record< string, string > | null;
-	// Maximum upload file size
+	// Maximum upload file size.
 	maxUploadFileSize?: number;
+	// Maximum number of concurrent uploads.
+	maxConcurrentUploads: number;
 }
 
 // Must match the Attachment type from the media-utils package.
@@ -151,8 +162,11 @@ export type OnErrorHandler = ( error: Error ) => void;
 export type OnBatchSuccessHandler = () => void;
 
 export enum ItemStatus {
+	Queued = 'QUEUED',
 	Processing = 'PROCESSING',
 	Paused = 'PAUSED',
+	Uploaded = 'UPLOADED',
+	Error = 'ERROR',
 }
 
 export enum OperationType {

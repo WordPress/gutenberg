@@ -108,7 +108,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 						isShownByDefault
 					>
 						<SelectControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label={ __( 'Submissions method' ) }
 							options={ [
@@ -176,7 +175,6 @@ const Edit = ( { attributes, setAttributes, clientId } ) => {
 				<InspectorControls group="advanced">
 					<SelectControl
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 						label={ __( 'Method' ) }
 						options={ [
 							{ label: 'Get', value: 'get' },

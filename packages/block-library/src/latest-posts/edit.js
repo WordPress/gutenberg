@@ -268,7 +268,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
 							isShownByDefault
 						>
 							<RangeControl
-								__nextHasNoMarginBottom
 								__next40pxDefaultSize
 								label={ __( 'Max number of words' ) }
 								value={ excerptLength }
@@ -537,7 +536,6 @@ function Controls( { attributes, setAttributes, postCount } ) {
 						isShownByDefault
 					>
 						<RangeControl
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 							label={ __( 'Columns' ) }
 							value={ columns }

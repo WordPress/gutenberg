@@ -92,6 +92,10 @@ fi
 status "Linting CSS files..."
 ../node_modules/.bin/wp-scripts lint-style
 
+# Ensure monorepo prelint:js scripts have run (e.g., to build design tokens for ESLint).
+status "Running prelint:js..."
+( cd .. && npm run prelint:js )
+
 status "Linting JavaScript files..."
 ../node_modules/.bin/wp-scripts lint-js
 

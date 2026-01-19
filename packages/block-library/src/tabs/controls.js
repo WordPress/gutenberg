@@ -169,7 +169,6 @@ export default function Controls( {
 								metadata: { ...metadata, name: value },
 							} );
 						} }
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 					/>
 				</PanelBody>

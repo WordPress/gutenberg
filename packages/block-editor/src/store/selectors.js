@@ -2154,24 +2154,22 @@ const buildBlockTypeItem =
 			'inserter'
 		);
 		const blockVariations = getBlockVariations( blockType.name, 'block' );
-		// Combine inserter and block variations. Block-scope variations without
-		// inserter scope are searchable via slash commands but hidden from browse.
-		const inserterVariationNames = new Set(
-			inserterVariations.map( ( variation ) => variation.name )
-		);
 		const allVariations = [
 			...inserterVariations,
+			// Built-in heading level variations have block scope but allow
+			// insertion via slash inserter.
+			// See https://github.com/WordPress/gutenberg/issues/74233.
 			...blockVariations
 				.filter(
 					( variation ) =>
-						! inserterVariationNames.has( variation.name )
+						blockType.name === 'core/heading' &&
+						[ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6' ].includes(
+							variation.name
+						)
 				)
 				.map( ( variation ) => ( {
 					...variation,
 					isSearchOnly: true,
-					// Block-scope `isDefault` is for the placeholder picker,
-					// not for the inserter, so don't carry it over.
-					isDefault: false,
 				} ) ),
 		];
 		return {
@@ -2281,13 +2279,21 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 						)
 				);
 			} else {
+				const { getClosestAllowedInsertionPoint } = unlock(
+					select( STORE_NAME )
+				);
 				blockTypeInserterItems = blockTypeInserterItems
-					.filter( ( blockType ) =>
-						isBlockVisibleInTheInserter(
-							state,
-							blockType,
-							rootClientId
-						)
+					.filter(
+						( blockType ) =>
+							isBlockVisibleInTheInserter(
+								state,
+								blockType,
+								rootClientId
+							) &&
+							getClosestAllowedInsertionPoint(
+								blockType.name,
+								rootClientId
+							) !== null
 					)
 					.map( ( blockType ) => ( {
 						...blockType,
@@ -2299,8 +2305,6 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 					} ) );
 			}
 
-			// Hardcode: Collect stretch variations separately to add at the end
-			const stretchVariations = [];
 			const items = blockTypeInserterItems.reduce(
 				( accumulator, item ) => {
 					const { variations = [] } = item;
@@ -2313,26 +2317,14 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 							state,
 							item
 						);
-						variations
-							.map( variationMapper )
-							.forEach( ( variation ) => {
-								if (
-									variation.id ===
-										'core/paragraph/stretchy-paragraph' ||
-									variation.id ===
-										'core/heading/stretchy-heading'
-								) {
-									stretchVariations.push( variation );
-								} else {
-									accumulator.push( variation );
-								}
-							} );
+						accumulator.push(
+							...variations.map( variationMapper )
+						);
 					}
 					return accumulator;
 				},
 				[]
 			);
-			items.push( ...stretchVariations );
 
 			// Ensure core blocks are prioritized in the returned results,
 			// because third party blocks can be registered earlier than

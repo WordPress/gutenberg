@@ -65,7 +65,6 @@ function UnforwardedToggleControl(
 				)
 			}
 			className={ clsx( 'components-toggle-control', className ) }
-			__nextHasNoMarginBottom
 		>
 			<HStack justify="flex-start" spacing={ 2 }>
 				<FormToggle

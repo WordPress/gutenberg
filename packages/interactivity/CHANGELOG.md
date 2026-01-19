@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 6.38.0 (2026-01-16)
+
+### Bug Fixes
+
+-   Preserve boolean HTML attributes during client-side navigation. ([#74446](https://github.com/WordPress/gutenberg/pull/74446))
+-   Fix and refactor runtime initialization logic. ([#71123](https://github.com/WordPress/gutenberg/pull/71123))
+
 ## 6.36.0 (2025-11-26)
 
 ### Bug Fixes

@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -21,7 +21,6 @@ const meta: Meta< typeof Notice > = {
 	title: 'Components/Feedback/Notice',
 	id: 'components-notice',
 	component: Notice,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { NoticeList },
 	args: {
 		onDismiss: fn(),
@@ -141,3 +140,23 @@ export const NoticeListSubcomponent: StoryFn< typeof NoticeList > = () => {
 	);
 };
 NoticeListSubcomponent.storyName = 'NoticeList Subcomponent';
+
+/**
+ * Action buttons can be disabled.
+ */
+export const WithDisabledAction = Template.bind( {} );
+WithDisabledAction.args = {
+	...Default.args,
+	children: 'This notice has a disabled action.',
+	actions: [
+		{
+			label: 'Disabled action',
+			onClick: () => {},
+			disabled: true,
+		},
+		{
+			label: 'Enabled action',
+			onClick: () => {},
+		},
+	],
+};

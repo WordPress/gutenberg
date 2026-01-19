@@ -418,7 +418,6 @@ export function HierarchicalTermSelector( { slug } ) {
 			{ showFilter && ! loading && (
 				<SearchControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					label={ filterLabel }
 					placeholder={ filterLabel }
 					value={ filterValue }

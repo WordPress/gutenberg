@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 9.38.0 (2026-01-16)
+
+-   Post Date Block: Improve semantic HTML to add `<time>` inside link element.
+
+## 9.37.0 (2025-12-23)
+
 ## 9.36.0 (2025-11-26)
 
 ## 9.35.0 (2025-11-12)

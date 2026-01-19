@@ -93,3 +93,7 @@ export function isValidFileType( file ) {
 		( mediaType ) => file.type.indexOf( mediaType ) === 0
 	);
 }
+
+export function mediaPosition( { x, y } = { x: 0.5, y: 0.5 } ) {
+	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
+}

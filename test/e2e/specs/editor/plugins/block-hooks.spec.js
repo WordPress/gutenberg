@@ -10,7 +10,7 @@ const dummyBlocksContent = `<!-- wp:heading -->
 <p class="dummy-paragraph">This is a dummy paragraph.</p>
 <!-- /wp:paragraph -->`;
 const dummyClassicContent =
-	'<h2 class="dummy-heading">This is a dummy heading</h2><p class="dummy-paragraph">This is a dummy paragraph.</p>';
+	'<h2 class="dummy-classic-heading">This is a dummy heading</h2><p class="dummy-classic-paragraph">This is a dummy paragraph.</p>';
 
 const getHookedBlockClassName = ( relativePosition, anchorBlock ) =>
 	`hooked-block-${ relativePosition }-${ anchorBlock.replace(
@@ -84,9 +84,11 @@ test.describe( 'Block Hooks API', () => {
 					page.locator( '.entry-content > *' )
 				).toHaveClass( [
 					'wp-block-heading',
-					getHookedBlockClassName( 'after', 'core/heading' ),
-					'dummy-paragraph',
-					getHookedBlockClassName( 'last_child', blockType ),
+					getHookedBlockClassName( 'after', 'core/heading' ) +
+						' wp-block-paragraph',
+					'dummy-paragraph wp-block-paragraph',
+					getHookedBlockClassName( 'last_child', blockType ) +
+						' wp-block-paragraph',
 				] );
 			} );
 
@@ -158,9 +160,11 @@ test.describe( 'Block Hooks API', () => {
 					page.locator( '.entry-content > *' )
 				).toHaveClass( [
 					'wp-block-heading',
-					getHookedBlockClassName( 'after', 'core/heading' ),
-					getHookedBlockClassName( 'last_child', blockType ),
-					'dummy-paragraph',
+					getHookedBlockClassName( 'after', 'core/heading' ) +
+						' wp-block-paragraph',
+					getHookedBlockClassName( 'last_child', blockType ) +
+						' wp-block-paragraph',
+					'dummy-paragraph wp-block-paragraph',
 				] );
 			} );
 		} );
@@ -212,9 +216,10 @@ test.describe( 'Block Hooks API', () => {
 				await expect(
 					page.locator( '.entry-content > *' )
 				).toHaveClass( [
-					'dummy-heading',
-					'dummy-paragraph',
-					getHookedBlockClassName( 'last_child', blockType ),
+					'dummy-classic-heading',
+					'dummy-classic-paragraph',
+					getHookedBlockClassName( 'last_child', blockType ) +
+						' wp-block-paragraph',
 				] );
 			} );
 
@@ -271,9 +276,10 @@ test.describe( 'Block Hooks API', () => {
 				await expect(
 					page.locator( '.entry-content > *' )
 				).toHaveClass( [
-					getHookedBlockClassName( 'last_child', blockType ),
-					'dummy-heading',
-					'dummy-paragraph',
+					getHookedBlockClassName( 'last_child', blockType ) +
+						' wp-block-paragraph',
+					'dummy-classic-heading',
+					'dummy-classic-paragraph',
 				] );
 			} );
 		} );

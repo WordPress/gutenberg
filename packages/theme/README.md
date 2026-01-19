@@ -11,14 +11,14 @@ A theming package that's part of the WordPress Design System. It has two parts:
 
 ## Design Tokens
 
-In the **[Design Tokens Reference](docs/ds-tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
+In the **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
 
 ### Architecture
 
 Internally, the design system uses a tiered token architecture:
 
-- **Primitive tokens**: Raw values like hex colors or pixel dimensions which are what the browsers eventually interpret. These live in the `/tokens` directory as JSON source files and are an internal implementation detail.
-- **Semantic tokens**: Purpose-driven tokens with meaningful names that reference primitives and describe their intended use. These are what get exported as CSS custom properties.
+-   **Primitive tokens**: Raw values like hex colors or pixel dimensions which are what the browsers eventually interpret. These live in the `/tokens` directory as JSON source files and are an internal implementation detail.
+-   **Semantic tokens**: Purpose-driven tokens with meaningful names that reference primitives and describe their intended use. These are what get exported as CSS custom properties.
 
 This separation allows the design system to maintain consistency while providing flexibility, since primitive values can be updated without changing the semantic token names that developers use in their code.
 
@@ -62,17 +62,17 @@ Semantic tokens follow a consistent naming pattern:
 
 **Property** is the specific design property being defined.
 
-| Value    | Description                        |
-| -------- | ---------------------------------- |
-| `bg`     | Background color                   |
-| `fg`     | Foreground color (text and icons)  |
-| `stroke` | Border and outline color           |
-| `padding`| Internal spacing within an element |
-| `gap`    | Spacing between elements           |
-| `radius` | Border radius for rounded corners  |
-| `width`  | Border width                       |
-| `size`   | Font size                          |
-| `family` | Font family                        |
+| Value     | Description                        |
+| --------- | ---------------------------------- |
+| `bg`      | Background color                   |
+| `fg`      | Foreground color (text and icons)  |
+| `stroke`  | Border and outline color           |
+| `padding` | Internal spacing within an element |
+| `gap`     | Spacing between elements           |
+| `radius`  | Border radius for rounded corners  |
+| `width`   | Border width                       |
+| `size`    | Font size                          |
+| `family`  | Font family                        |
 
 **Target** is the component or element type the token applies to.
 
@@ -117,10 +117,10 @@ Color tokens extend the base pattern with additional modifiers for tone, emphasi
 
 **Emphasis** adjusts color strength relative to the base tone, if specified. The default is a normal emphasis.
 
-| Value                | Description                                    |
-| -------------------- | ---------------------------------------------- |
-| `strong`             | Higher contrast and/or elevated emphasis       |
-| `weak`               | Subtle variant for secondary or muted elements |
+| Value    | Description                                    |
+| -------- | ---------------------------------------------- |
+| `strong` | Higher contrast and/or elevated emphasis       |
+| `weak`   | Subtle variant for secondary or muted elements |
 
 **State** represents the interactive state of the element, if specified. The default is an idle state.
 
@@ -195,6 +195,60 @@ This step will:
 The files generated in this step will all be committed to the repo.
 
 After the prebuild step, the package will be built into its final form via the repo's standard package build script.
+
+## Stylelint Plugins
+
+This package provides Stylelint plugins to help enforce consistent usage of design tokens. To use them, add the plugins to your Stylelint configuration:
+
+```json
+{
+	"plugins": [
+		"@wordpress/theme/stylelint-plugins/no-unknown-ds-tokens",
+		"@wordpress/theme/stylelint-plugins/no-setting-wpds-custom-properties"
+	],
+	"rules": {
+		"plugin-wpds/no-unknown-ds-tokens": true,
+		"plugin-wpds/no-setting-wpds-custom-properties": true
+	}
+}
+```
+
+### `plugin-wpds/no-unknown-ds-tokens`
+
+This rule reports an error when a CSS value references a `--wpds-*` custom property that is not a valid design token. This helps catch typos and ensures that only valid design tokens are used.
+
+```css
+/* ✗ Error: '--wpds-unknown-token' is not a valid Design System token */
+.example {
+	color: var(--wpds-unknown-token);
+}
+
+/* ✓ OK */
+.example {
+	color: var(--wpds-color-fg-content-neutral);
+}
+```
+
+### `plugin-wpds/no-setting-wpds-custom-properties`
+
+This rule reports an error when a CSS declaration sets (defines) a custom property in the `--wpds-*` namespace. The design system tokens should only be consumed, not defined or overridden in consuming code.
+
+```css
+/* ✗ Error: Do not set CSS custom properties using the Design System tokens namespace */
+.example {
+	--wpds-my-token: red;
+}
+
+/* ✗ Error: Overriding existing tokens is also not allowed */
+.example {
+	--wpds-color-fg-content-neutral: red;
+}
+
+/* ✓ OK */
+.example {
+	--my-custom-token: red;
+}
+```
 
 ## Contributing to this package
 

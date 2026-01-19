@@ -147,7 +147,6 @@ function SingleTrackEditor( {
 			<VStack spacing="4">
 				<SelectControl
 					__next40pxDefaultSize
-					__nextHasNoMarginBottom
 					className="block-library-video-tracks-editor__single-track-editor-kind-select"
 					options={ KIND_OPTIONS }
 					value={ kind }

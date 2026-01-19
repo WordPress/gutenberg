@@ -48,7 +48,6 @@ function UnforwardedTextControl(
 
 	return (
 		<BaseControl
-			__nextHasNoMarginBottom
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }

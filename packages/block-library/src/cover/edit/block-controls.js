@@ -112,6 +112,7 @@ export default function CoverBlockControls( {
 					useFeaturedImage={ useFeaturedImage }
 					name={ ! url ? __( 'Add media' ) : __( 'Replace' ) }
 					onReset={ onClearMedia }
+					variant="toolbar"
 				>
 					{ ( { onClose } ) => (
 						<MenuItem

@@ -27,7 +27,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
 import { speak } from '@wordpress/a11y';
 
@@ -54,6 +54,7 @@ import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { cleanEmptyObject } from '../../hooks/utils';
+import { BlockVisibilityModal } from '../block-visibility';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -79,7 +80,8 @@ function ListViewBlock( {
 	const settingsRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
-
+	const [ visibilityModalClientIds, setVisibilityModalClientIds ] =
+		useState( null );
 	const { isLocked } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
@@ -96,9 +98,9 @@ function ListViewBlock( {
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-		setOpenedBlockSettingsMenu,
 		updateBlockAttributes,
 	} = unlock( useDispatch( blockEditorStore ) );
+
 	const debouncedToggleBlockHighlight = useDebounce(
 		toggleBlockHighlight,
 		50
@@ -126,15 +128,18 @@ function ListViewBlock( {
 	const { block, blockName, allowRightClickOverrides, isBlockHidden } =
 		useSelect(
 			( select ) => {
-				const { getBlock, getBlockName, getSettings } =
-					select( blockEditorStore );
+				const {
+					getBlock,
+					getBlockName: _getBlockName,
+					getSettings,
+				} = select( blockEditorStore );
 				const { isBlockHidden: _isBlockHidden } = unlock(
 					select( blockEditorStore )
 				);
 
 				return {
 					block: getBlock( clientId ),
-					blockName: getBlockName( clientId ),
+					blockName: _getBlockName( clientId ),
 					allowRightClickOverrides:
 						getSettings().allowRightClickOverrides,
 					isBlockHidden: _isBlockHidden( clientId ),
@@ -298,7 +303,6 @@ function ListViewBlock( {
 			const newlySelectedBlocks = getSelectedBlockClientIds();
 
 			// Focus the first block of the newly inserted blocks, to keep focus within the list view.
-			setOpenedBlockSettingsMenu( undefined );
 			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
 			event.preventDefault();
@@ -308,7 +312,6 @@ function ListViewBlock( {
 			const newlySelectedBlocks = getSelectedBlockClientIds();
 
 			// Focus the first block of the newly inserted blocks, to keep focus within the list view.
-			setOpenedBlockSettingsMenu( undefined );
 			updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 		} else if ( isMatch( 'core/block-editor/select-all', event ) ) {
 			event.preventDefault();
@@ -368,7 +371,6 @@ function ListViewBlock( {
 				speak( __( 'Selected blocks are grouped.' ) );
 				const newlySelectedBlocks = getSelectedBlockClientIds();
 				// Focus the first block of the newly inserted blocks, to keep focus within the list view.
-				setOpenedBlockSettingsMenu( undefined );
 				updateFocusAndSelection( newlySelectedBlocks[ 0 ], false );
 			}
 		} else if (
@@ -377,30 +379,40 @@ function ListViewBlock( {
 			event.preventDefault();
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const blocks = getBlocksByClientId( blocksToUpdate );
-			const canToggleVisibility = blocks.every( ( blockToUpdate ) =>
-				hasBlockSupport( blockToUpdate.name, 'visibility', true )
+			const supportsBlockVisibility = blocks.every( ( _block ) =>
+				hasBlockSupport( _block.name, 'visibility', true )
 			);
-			if ( ! canToggleVisibility ) {
+
+			if ( ! supportsBlockVisibility ) {
 				return;
 			}
-			const hasHiddenBlock = blocks.some(
-				( blockToUpdate ) =>
-					blockToUpdate.attributes.metadata?.blockVisibility === false
-			);
-			const attributesByClientId = Object.fromEntries(
-				blocks.map( ( { clientId: mapClientId, attributes } ) => [
-					mapClientId,
-					{
-						metadata: cleanEmptyObject( {
-							...attributes?.metadata,
-							blockVisibility: hasHiddenBlock ? undefined : false,
-						} ),
-					},
-				] )
-			);
-			updateBlockAttributes( blocksToUpdate, attributesByClientId, {
-				uniqueByBlock: true,
-			} );
+
+			if ( window.__experimentalHideBlocksBasedOnScreenSize ) {
+				// Open the visibility breakpoints modal.
+				setVisibilityModalClientIds( blocksToUpdate );
+			} else {
+				const hasHiddenBlock = blocks.some(
+					( blockToUpdate ) =>
+						blockToUpdate.attributes.metadata?.blockVisibility ===
+						false
+				);
+				const attributesByClientId = Object.fromEntries(
+					blocks.map( ( { clientId: mapClientId, attributes } ) => [
+						mapClientId,
+						{
+							metadata: cleanEmptyObject( {
+								...attributes?.metadata,
+								blockVisibility: hasHiddenBlock
+									? undefined
+									: false,
+							} ),
+						},
+					] )
+				);
+				updateBlockAttributes( blocksToUpdate, attributesByClientId, {
+					uniqueByBlock: true,
+				} );
+			}
 		}
 	}
 
@@ -449,6 +461,11 @@ function ListViewBlock( {
 	// Allow right-clicking an item in the List View to open up the block settings dropdown.
 	const onContextMenu = useCallback(
 		( event ) => {
+			const { ownerDocument } = settingsRef?.current || {};
+			if ( ! ownerDocument || ! ownerDocument.hasFocus() ) {
+				return;
+			}
+
 			if ( showBlockActions && allowRightClickOverrides ) {
 				settingsRef.current?.click();
 				// Ensure the position of the settings dropdown is at the cursor.
@@ -697,6 +714,12 @@ function ListViewBlock( {
 						/>
 					) }
 				</TreeGridCell>
+			) }
+			{ visibilityModalClientIds && (
+				<BlockVisibilityModal
+					clientIds={ visibilityModalClientIds }
+					onClose={ () => setVisibilityModalClientIds( null ) }
+				/>
 			) }
 		</ListViewLeaf>
 	);

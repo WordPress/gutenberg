@@ -185,7 +185,6 @@ export default function HeightControl( {
 							}
 							withInputField={ false }
 							onChange={ handleSliderChange }
-							__nextHasNoMarginBottom
 							label={ label }
 							hideLabelFromVision
 						/>

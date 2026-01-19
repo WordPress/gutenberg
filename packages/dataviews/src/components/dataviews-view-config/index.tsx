@@ -15,8 +15,6 @@ import {
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	SelectControl,
 	__experimentalGrid as Grid,
-	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
 	__experimentalText as Text,
 	privateApis as componentsPrivateApis,
@@ -26,12 +24,13 @@ import { memo, useContext, useMemo } from '@wordpress/element';
 import { cog } from '@wordpress/icons';
 import warning from '@wordpress/warning';
 import { useInstanceId } from '@wordpress/compose';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import { SORTING_DIRECTIONS, sortIcons, sortLabels } from '../../constants';
-import { VIEW_LAYOUTS } from '../../dataviews-layouts';
+import { VIEW_LAYOUTS } from '../dataviews-layouts';
 import type { View } from '../../types';
 import DataViewsContext from '../dataviews-context';
 import InfiniteScrollToggle from './infinite-scroll-toggle';
@@ -128,7 +127,6 @@ function SortFieldControl() {
 
 	return (
 		<SelectControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			label={ __( 'Sort by' ) }
 			value={ view.sort?.field }
@@ -320,12 +318,20 @@ export function DataviewsViewConfigDropdown() {
 					paddingSize="medium"
 					className="dataviews-config__popover-content-wrapper"
 				>
-					<VStack className="dataviews-view-config" spacing={ 6 }>
+					<Stack
+						direction="column"
+						className="dataviews-view-config"
+						gap="lg"
+					>
 						<SettingsSection title={ __( 'Appearance' ) }>
-							<HStack expanded className="is-divided-in-two">
+							<Stack
+								direction="row"
+								gap="xs"
+								className="is-divided-in-two"
+							>
 								<SortFieldControl />
 								<SortDirectionControl />
-							</HStack>
+							</Stack>
 							{ !! activeLayout?.viewConfigOptions && (
 								<activeLayout.viewConfigOptions />
 							) }
@@ -333,7 +339,7 @@ export function DataviewsViewConfigDropdown() {
 							<ItemsPerPageControl />
 							<PropertiesSection />
 						</SettingsSection>
-					</VStack>
+					</Stack>
 				</DropdownContentWrapper>
 			) }
 		/>

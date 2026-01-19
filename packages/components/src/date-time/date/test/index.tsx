@@ -25,7 +25,7 @@ describe( 'DatePicker', () => {
 		const todayDescription = format( new Date(), 'MMMM d, yyyy' );
 		expect(
 			screen.getByRole( 'button', {
-				name: `${ todayDescription }. Selected`,
+				name: `${ todayDescription }. Selected. Today`,
 			} )
 		).toBeInTheDocument();
 	} );

@@ -181,7 +181,6 @@ export default function TypographyPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
-	fitText = false,
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
@@ -469,7 +468,7 @@ export default function TypographyPanel( {
 					/>
 				</ToolsPanelItem>
 			) }
-			{ hasFontSizeEnabled && ! fitText && (
+			{ hasFontSizeEnabled && (
 				<ToolsPanelItem
 					label={ __( 'Size' ) }
 					hasValue={ hasFontSize }
@@ -596,7 +595,6 @@ export default function TypographyPanel( {
 						value={ writingMode }
 						onChange={ setWritingMode }
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
@@ -614,7 +612,6 @@ export default function TypographyPanel( {
 						showNone
 						isBlock
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 				</ToolsPanelItem>
 			) }
@@ -631,7 +628,6 @@ export default function TypographyPanel( {
 						onChange={ setTextAlign }
 						options={ [ 'left', 'center', 'right', 'justify' ] }
 						size="__unstable-large"
-						__nextHasNoMarginBottom
 					/>
 
 					{ textAlign === 'justify' && (

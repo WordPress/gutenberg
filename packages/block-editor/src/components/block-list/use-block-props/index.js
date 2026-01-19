@@ -30,6 +30,7 @@ import { useIntersectionObserver } from './use-intersection-observer';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useFlashEditableBlocks } from '../../use-flash-editable-blocks';
 import { useFirefoxDraggableCompatibility } from './use-firefox-draggable-compatibility';
+import { useBlockVisibility } from '../../block-visibility/';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -102,7 +103,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		isSectionBlock,
 		isWithinSectionBlock,
 		canMove,
-		isBlockHidden,
+		blockVisibility,
+		deviceType,
 	} = useContext( PrivateBlockContext );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
@@ -137,6 +139,12 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					'var(--wp-block-synced-color--rgb)',
 		  }
 		: {};
+
+	// Use block visibility hook with data from context to avoid extra subscription.
+	const { isBlockCurrentlyHidden } = useBlockVisibility( {
+		blockVisibility,
+		deviceType,
+	} );
 
 	// Ensures it warns only inside the `edit` implementation for the block.
 	if ( blockApiVersion < 2 && clientId === blockEditContext.clientId ) {
@@ -185,7 +193,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				'has-editable-outline': hasEditableOutline,
 				'has-negative-margin': hasNegativeMargin,
 				'is-editing-content-only-section': isEditingContentOnlySection,
-				'is-block-hidden': isBlockHidden,
+				'is-block-hidden': isBlockCurrentlyHidden,
 			},
 			className,
 			props.className,

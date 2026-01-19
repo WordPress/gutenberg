@@ -79,7 +79,6 @@ export default function FileBlockInspector( {
 								onDeselect={ () => changePreviewHeight( 600 ) }
 							>
 								<RangeControl
-									__nextHasNoMarginBottom
 									__next40pxDefaultSize
 									label={ __( 'Height in pixels' ) }
 									min={ MIN_PREVIEW_HEIGHT }
@@ -112,7 +111,6 @@ export default function FileBlockInspector( {
 					>
 						<SelectControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Link to' ) }
 							value={ textLinkHref }
 							options={ linkDestinationOptions }
