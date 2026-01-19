@@ -227,6 +227,57 @@ describe( 'diffRevisionContent', () => {
 		] );
 	} );
 
+	it( 'handles two blocks added above a slightly modified paragraph', () => {
+		const previous = serialize( [
+			createBlock( 'core/paragraph', {
+				content: 'This is some existing content',
+			} ),
+		] );
+		const current = serialize( [
+			createBlock( 'core/paragraph', { content: 'First new block' } ),
+			createBlock( 'core/paragraph', { content: 'Second new block' } ),
+			createBlock( 'core/paragraph', {
+				content: 'This is some modified content',
+			} ),
+		] );
+		const blocks = diffRevisionContent( current, previous );
+		const normalized = normalizeBlockTree( blocks );
+
+		// Current behavior: LCS doesn't match old/new paragraph as "modified"
+		// because their content differs. Shows old as removed + new as added.
+		expect( normalized ).toHaveLength( 4 );
+		expect( normalized ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'This is some existing content',
+					__revisionDiffStatus: 'removed',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'First new block',
+					__revisionDiffStatus: 'added',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Second new block',
+					__revisionDiffStatus: 'added',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'This is some modified content',
+					__revisionDiffStatus: 'added',
+				},
+			},
+		] );
+	} );
+
 	it( 'handles inner block changes without marking parent', () => {
 		const previous = serialize( [
 			createBlock( 'core/group', {}, [
