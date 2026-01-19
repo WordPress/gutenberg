@@ -434,6 +434,13 @@ export function createSyncManager(): SyncManager {
 
 			// Apply the current record as changes and trigger a save
 			applyChangesToCRDTDoc( targetDoc, record );
+
+			// Note that triggering a save with only a version change will not
+			// persist the CRDT document if the version is the only change, as
+			// saveRecord() only persists entity edits, which does not include
+			// CRDT version changes.
+			// However, any real changes to the entity will result in a version
+			// change in the CRDT document on next save.
 			handlers.saveRecord();
 			return;
 		}
