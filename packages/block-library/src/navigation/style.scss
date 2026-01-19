@@ -263,12 +263,13 @@ $navigation-icon-size: 24px;
 			justify-content: var(--navigation-layout-justify, initial);
 		}
 
-		// Reset padding top for submenus so they can rely on consistent gap spacing between items.
+		// Reset gap for submenus so they can rely on consistent gap spacing between items.
 		&.wp-block-navigation-submenu,
 		.wp-block-navigation__submenu-container {
 			gap: var(--wp--style--block-gap, 2em);
 		}
 
+		// Reset padding top for submenus so they can rely on consistent gap spacing between items.
 		&.wp-block-navigation-submenu,
 		.wp-block-navigation__submenu-container,
 		.wp-block-navigation-item {
