@@ -242,6 +242,9 @@ function UploadFonts() {
 						).join( ',' ) }
 						multiple
 						onChange={ onFilesUpload }
+						onClick={ ( event ) => {
+							event.currentTarget.value = '';
+						} }
 						render={ ( { openFileDialog } ) => (
 							<Button
 								__next40pxDefaultSize
