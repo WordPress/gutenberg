@@ -6,6 +6,7 @@ import type * as Y from 'yjs';
 /**
  * WordPress dependencies
  */
+// @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { select, subscribe } from '@wordpress/data';
 
