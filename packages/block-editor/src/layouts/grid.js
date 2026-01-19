@@ -113,6 +113,7 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
+		globalBlockGapValue,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const {
@@ -146,12 +147,17 @@ export default {
 				? getGapCSSValue( style?.spacing?.blockGap, '0.5em' )
 				: undefined;
 
+		// Use the global blockGap value for grid column calculations when available
+		const fallbackGapValue = globalBlockGapValue
+			? getGapCSSValue( globalBlockGapValue, '0.5em' )
+			: '1.2rem';
+
 		let output = '';
 		const rules = [];
 
 		if ( minimumColumnWidth && columnCount > 0 ) {
 			const maxValue = `max(${ minimumColumnWidth }, ( 100% - (${
-				blockGapValue || '1.2rem'
+				blockGapValue || fallbackGapValue
 			}*${ columnCount - 1 }) ) / ${ columnCount })`;
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(${ maxValue }, 1fr))`,

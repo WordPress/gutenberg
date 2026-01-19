@@ -475,7 +475,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 	} elseif ( 'grid' === $layout_type ) {
 		// Deal with block gap first so it can be used for responsive computation.
-		$responsive_gap_value = '1.2rem';
+		$responsive_gap_value = $fallback_gap_value;
 		if ( $has_block_gap_support && isset( $gap_value ) ) {
 			$combined_gap_value = '';
 			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
@@ -871,6 +871,15 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 
 		$block_gap             = $global_settings['spacing']['blockGap'] ?? null;
 		$has_block_gap_support = isset( $block_gap );
+
+		// Get default blockGap value from global styles for use in layouts like grid.
+		// Check block-specific styles first, then fall back to root styles.
+		$block_name                   = $block['blockName'] ?? '';
+		$block_specific_global_styles = gutenberg_get_global_styles( array( 'blocks', $block_name, 'spacing', 'blockGap' ) );
+		$global_block_gap_value       = ! empty( $block_specific_global_styles ) ? $block_specific_global_styles : gutenberg_get_global_styles( array( 'spacing', 'blockGap' ) );
+		if ( ! empty( $global_block_gap_value ) ) {
+			$fallback_gap_value = $global_block_gap_value;
+		}
 
 		/*
 		 * We generate a unique ID based on all the data required to obtain the
