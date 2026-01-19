@@ -124,18 +124,32 @@ test.describe( 'Router regions', () => {
 
 	test( 'should preserve state across pages', async ( { page } ) => {
 		const counter = page.getByTestId( 'state-counter' );
+
 		await expect( counter ).toHaveText( '0' );
+
+		// Adds a tag to know whether the counter element was replaced.
+		await counter.evaluate( ( ref ) => {
+			if ( ref instanceof HTMLElement ) {
+				ref.dataset.tag = 'state-counter';
+			}
+		} );
 
 		await counter.click( { clickCount: 3, delay: 50 } );
 		await expect( counter ).toHaveText( '3' );
+
+		await expect( counter ).toHaveAttribute( 'data-tag', 'state-counter' );
 
 		await page.getByTestId( 'next' ).click();
 		await counter.click( { clickCount: 3, delay: 50 } );
 		await expect( counter ).toHaveText( '6' );
 
+		await expect( counter ).toHaveAttribute( 'data-tag', 'state-counter' );
+
 		await page.getByTestId( 'back' ).click();
 		await counter.click( { clickCount: 3, delay: 50 } );
 		await expect( counter ).toHaveText( '9' );
+
+		await expect( counter ).toHaveAttribute( 'data-tag', 'state-counter' );
 	} );
 
 	test( 'should preserve context across pages', async ( { page } ) => {

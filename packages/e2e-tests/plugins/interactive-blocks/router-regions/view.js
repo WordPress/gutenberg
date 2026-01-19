@@ -64,5 +64,8 @@ const { state } = store( 'router-regions', {
 		init() {
 			state.initCount += 1;
 		},
+		nope() {
+			// This function does nothing.
+		},
 	},
 } );

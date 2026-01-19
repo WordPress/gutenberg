@@ -13,6 +13,8 @@
 	<div
 		data-wp-interactive="router-regions"
 		data-wp-router-region="region-1"
+		data-wp-key="region-1"
+		data-wp-run="callbacks.nope"
 	>
 		<p
 			data-testid="region-1-text"
