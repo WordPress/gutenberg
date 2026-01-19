@@ -48,7 +48,7 @@ class WP_Duotone_Gutenberg {
 	 *       …
 	 *  ]
 	 *
-	 * @var null|array<string, string>
+	 * @var ?array<string, string>
 	 */
 	private static $global_styles_block_names;
 
@@ -68,7 +68,7 @@ class WP_Duotone_Gutenberg {
 	 *      …
 	 *  ]
 	 *
-	 * @var null|array<string, array<string, string|string[]>>
+	 * @var ?array<string, array<string, string|string[]>>
 	 */
 	private static $global_styles_presets;
 
@@ -671,7 +671,7 @@ class WP_Duotone_Gutenberg {
 		 * If the experimental duotone support was set, that value is to be
 		 * treated as a selector and requires scoping.
 		 */
-		$experimental_duotone = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
+		$experimental_duotone = $block_type->supports['color']['__experimentalDuotone'] ?? false;
 		if ( $experimental_duotone ) {
 			$root_selector = wp_get_block_css_selector( $block_type );
 			return is_string( $experimental_duotone )
@@ -785,7 +785,7 @@ class WP_Duotone_Gutenberg {
 
 		// Get the per block settings from the theme.json.
 		$tree              = gutenberg_get_global_settings();
-		$presets_by_origin = _wp_array_get( $tree, array( 'color', 'duotone' ), array() );
+		$presets_by_origin = $tree['color']['duotone'] ?? array();
 
 		self::$global_styles_presets = array();
 		foreach ( $presets_by_origin as $presets ) {
