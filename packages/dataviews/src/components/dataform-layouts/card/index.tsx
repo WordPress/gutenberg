@@ -227,14 +227,11 @@ export default function FormCardField< Item >( {
 
 	const { isOpen, CardHeader, touched, setTouched } = useCardHeader( layout );
 
-	// Mark the card as touched when any field changes value.
-	const handleChange: typeof onChange = useCallback(
-		( value ) => {
-			setTouched( true );
-			onChange( value );
-		},
-		[ onChange, setTouched ]
-	);
+	// Mark the card as touched when any field inside it is blurred.
+	// This aligns with how validated controls show errors on blur.
+	const handleBlur = useCallback( () => {
+		setTouched( true );
+	}, [ setTouched ] );
 
 	// When the card is expanded after being touched (collapsed with errors),
 	// trigger reportValidity to show field-level errors.
@@ -326,6 +323,7 @@ export default function FormCardField< Item >( {
 						size={ sizeCardBody }
 						className="dataforms-layouts-card__field-control"
 						ref={ cardBodyRef }
+						onBlur={ handleBlur }
 					>
 						{ field.description && (
 							<div className="dataforms-layouts-card__field-description">
@@ -335,7 +333,7 @@ export default function FormCardField< Item >( {
 						<DataFormLayout
 							data={ data }
 							form={ form }
-							onChange={ handleChange }
+							onChange={ onChange }
 							validity={ validity?.children }
 						/>
 					</CardBody>
@@ -393,11 +391,11 @@ export default function FormCardField< Item >( {
 					size={ sizeCardBody }
 					className="dataforms-layouts-card__field-control"
 				>
-					<div ref={ cardBodyRef }>
+					<div ref={ cardBodyRef } onBlur={ handleBlur }>
 						<RegularLayout
 							data={ data }
 							field={ field }
-							onChange={ handleChange }
+							onChange={ onChange }
 							hideLabelFromVision={
 								hideLabelFromVision || withHeader
 							}
