@@ -127,29 +127,16 @@ test.describe( 'Router regions', () => {
 
 		await expect( counter ).toHaveText( '0' );
 
-		// Adds a tag to know whether the counter element was replaced.
-		await counter.evaluate( ( ref ) => {
-			if ( ref instanceof HTMLElement ) {
-				ref.dataset.tag = 'state-counter';
-			}
-		} );
-
 		await counter.click( { clickCount: 3, delay: 50 } );
 		await expect( counter ).toHaveText( '3' );
-
-		await expect( counter ).toHaveAttribute( 'data-tag', 'state-counter' );
 
 		await page.getByTestId( 'next' ).click();
 		await counter.click( { clickCount: 3, delay: 50 } );
 		await expect( counter ).toHaveText( '6' );
 
-		await expect( counter ).toHaveAttribute( 'data-tag', 'state-counter' );
-
 		await page.getByTestId( 'back' ).click();
 		await counter.click( { clickCount: 3, delay: 50 } );
 		await expect( counter ).toHaveText( '9' );
-
-		await expect( counter ).toHaveAttribute( 'data-tag', 'state-counter' );
 	} );
 
 	test( 'should preserve context across pages', async ( { page } ) => {
@@ -492,10 +479,34 @@ test.describe( 'Router regions', () => {
 		await expect( region8 ).toBeVisible();
 	} );
 
-	test( 'with `data-wp-key` and other directives should not be recreated on first navigation', async ( {
+	test( 'should be preserved on first navigation without `data-wp-key`', async ( {
 		page,
 	} ) => {
-		const region2 = page.getByTestId( 'region-2-ssr' ).locator( '..' );
+		const region1 = page.getByTestId( 'region-1' );
+		const region1Text = page.getByTestId( 'region-1-text' );
+		await expect( region1Text ).toHaveText( 'hydrated' );
+
+		// Adds a tag to know whether the counter element was replaced.
+		await region1.evaluate( ( ref ) => {
+			if ( ref instanceof HTMLElement ) {
+				ref.dataset.tag = 'region-1';
+			}
+		} );
+
+		// Navigate to the next page.
+		await page.getByTestId( 'next' ).click();
+		await expect( page ).toHaveTitle(
+			'router regions – page 2 – gutenberg'
+		);
+
+		// The region element should retain the same attributes when it doesn't change.
+		await expect( region1 ).toHaveAttribute( 'data-tag', 'region-1' );
+	} );
+
+	test( 'should be preserved on first navigation with `data-wp-key` and other directives ', async ( {
+		page,
+	} ) => {
+		const region2 = page.getByTestId( 'region-2' );
 		const validInsideInteractive = page.getByTestId(
 			'valid-inside-interactive'
 		);
@@ -532,7 +543,7 @@ test.describe( 'Router regions', () => {
 		);
 	} );
 
-	test( 'with `data-wp-key`, `attachTo`, and other directives should not be recreated on first navigation', async ( {
+	test( 'should be preserved on first navigation with `data-wp-key` and `attachTo`', async ( {
 		page,
 		interactivityUtils: utils,
 	} ) => {

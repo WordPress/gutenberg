@@ -11,6 +11,7 @@
 <section>
 	<h2>Region 1</h2>
 	<div
+		data-testid="region-1"
 		data-wp-interactive="router-regions"
 		data-wp-router-region="region-1"
 	>
@@ -54,6 +55,7 @@
 <section>
 	<h2>Region 2</h2>
 	<div
+		data-testid="region-2"
 		data-wp-key="region-2"
 		data-wp-interactive="router-regions"
 		data-wp-router-region="region-2"
