@@ -7,12 +7,12 @@ import { useInstanceId } from '@wordpress/compose';
 import { getBlockType, hasBlockSupport } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { processCSSNesting } from '@wordpress/global-styles-engine';
+import { TextareaControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
-import AdvancedPanel from '../components/global-styles/advanced-panel';
 import { cleanEmptyObject, useStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 
@@ -33,9 +33,12 @@ const EMPTY_STYLE = {};
 function CustomCSSControl( { blockName, setAttributes, style } ) {
 	const blockType = getBlockType( blockName );
 
-	function onChange( newStyle ) {
+	function onChange( newValue ) {
 		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
+			style: cleanEmptyObject( {
+				...style,
+				css: newValue,
+			} ),
 		} );
 	}
 
@@ -49,10 +52,14 @@ function CustomCSSControl( { blockName, setAttributes, style } ) {
 
 	return (
 		<InspectorControls group="advanced">
-			<AdvancedPanel
-				value={ style }
+			<TextareaControl
+				__nextHasNoMarginBottom
+				__next40pxDefaultSize
+				label={ __( 'Additional CSS' ) }
+				value={ style?.css || '' }
 				onChange={ onChange }
-				inheritedValue={ style }
+				className="block-editor-global-styles-advanced-panel__custom-css-input"
+				spellCheck={ false }
 				help={ cssHelpText }
 			/>
 		</InspectorControls>
