@@ -1,11 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
+import { InnerBlocks } from '@wordpress/block-editor';
 
 export default function save() {
-	const blockProps = useBlockProps.save();
-	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
-
-	return <div { ...innerBlocksProps }>{ innerBlocksProps.children }</div>;
+	// Don't save wrapper - PHP renders it with directives
+	// Just save the inner blocks (slides)
+	return <InnerBlocks.Content />;
 }
