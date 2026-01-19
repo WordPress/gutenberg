@@ -390,18 +390,18 @@ export default function FormCardField< Item >( {
 				<CardBody
 					size={ sizeCardBody }
 					className="dataforms-layouts-card__field-control"
+					ref={ cardBodyRef }
+					onBlur={ handleBlur }
 				>
-					<div ref={ cardBodyRef } onBlur={ handleBlur }>
-						<RegularLayout
-							data={ data }
-							field={ field }
-							onChange={ onChange }
-							hideLabelFromVision={
-								hideLabelFromVision || withHeader
-							}
-							validity={ validity }
-						/>
-					</div>
+					<RegularLayout
+						data={ data }
+						field={ field }
+						onChange={ onChange }
+						hideLabelFromVision={
+							hideLabelFromVision || withHeader
+						}
+						validity={ validity }
+					/>
 				</CardBody>
 			) }
 		</Card>
