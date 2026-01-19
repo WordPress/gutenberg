@@ -95,14 +95,12 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 	}, [ isOpened ] );
 
 	const toggle = useCallback( () => {
-		setIsOpen( ( prev ) => {
-			// Mark as touched when collapsing (going from open to closed)
-			if ( prev ) {
-				setTouched( true );
-			}
-			return ! prev;
-		} );
-	}, [] );
+		// Mark as touched when collapsing (going from open to closed)
+		if ( isOpen ) {
+			setTouched( true );
+		}
+		setIsOpen( ( prev ) => ! prev );
+	}, [ isOpen ] );
 
 	const CollapsibleCardHeader = useCallback(
 		( {
