@@ -388,6 +388,42 @@ class PlaygroundRuntime {
 	}
 
 	/**
+	 * Kill a process tree (the process and all its descendants).
+	 *
+	 * @param {number} pid    The parent process ID.
+	 * @param {string} signal The signal to send.
+	 */
+	async _killProcessTree( pid, signal = 'SIGTERM' ) {
+		return new Promise( ( resolve ) => {
+			// Use pkill to kill all processes with the given parent PID
+			// This works on both Linux and macOS
+			const pkill = spawn( 'pkill', [
+				`-${ signal }`,
+				'-P',
+				String( pid ),
+			] );
+			pkill.on( 'close', () => {
+				// Also kill the parent process itself
+				try {
+					process.kill( pid, signal );
+				} catch {
+					// Process may already be dead
+				}
+				resolve();
+			} );
+			pkill.on( 'error', () => {
+				// pkill not available, try direct kill
+				try {
+					process.kill( pid, signal );
+				} catch {
+					// Process may already be dead
+				}
+				resolve();
+			} );
+		} );
+	}
+
+	/**
 	 * Stop any existing server from a previous run.
 	 *
 	 * @param {string} workDir Work directory path.
@@ -398,10 +434,20 @@ class PlaygroundRuntime {
 			const pid = await fs.readFile( pidFile, 'utf8' );
 			const pidNum = parseInt( pid.trim(), 10 );
 			if ( pidNum ) {
+				// Kill the process tree (parent and all children)
+				await this._killProcessTree( pidNum, 'SIGTERM' );
+
+				// Wait a bit for graceful shutdown
+				await new Promise( ( r ) => setTimeout( r, 1000 ) );
+
+				// Check if still running and force kill if needed
 				try {
-					process.kill( pidNum );
+					// Sending signal 0 checks if process exists without killing it
+					process.kill( pidNum, 0 );
+					// Process still exists, force kill
+					await this._killProcessTree( pidNum, 'SIGKILL' );
 				} catch {
-					// Process may already be dead
+					// Process already dead, good
 				}
 			}
 			await fs.unlink( pidFile );
