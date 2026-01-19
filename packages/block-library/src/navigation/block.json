@@ -47,8 +47,7 @@
 			"default": true
 		},
 		"openSubmenusOnClick": {
-			"type": "boolean",
-			"default": false
+			"type": "boolean"
 		},
 		"submenuVisibility": {
 			"type": "string",
