@@ -41,8 +41,8 @@ test.describe( 'hydration timing', () => {
 		await page.route(
 			/hydration-timing-slow\/view\.js/,
 			async ( route ) => {
-				// Add a 500ms delay to simulate slow module loading.
-				await new Promise( ( resolve ) => setTimeout( resolve, 500 ) );
+				// Add a noticeable delay to simulate slow module loading.
+				await new Promise( ( resolve ) => setTimeout( resolve, 3000 ) );
 				await route.continue();
 			}
 		);
