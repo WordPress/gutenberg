@@ -22,7 +22,7 @@ import { store as editorStore } from '../../store';
  */
 import { unlock } from '../../lock-unlock';
 import VisualEditor from '../visual-editor';
-import { diffRevisionContent } from './block-diff';
+import { diffRevisionContent, preserveClientIds } from './block-diff';
 import DiffMarkers from './diff-markers';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
@@ -219,6 +219,9 @@ export default function RevisionsCanvas( { revision, previousRevision } ) {
 		originalStylesRef.current = editorSettings.styles || [];
 	}
 
+	// Track previously rendered blocks to preserve clientIds between renders.
+	const previousBlocksRef = useRef( [] );
+
 	// Add diff styles and SVG filter to editor settings on mount, restore on unmount.
 	useEffect( () => {
 		const originalStyles = originalStylesRef.current;
@@ -235,13 +238,28 @@ export default function RevisionsCanvas( { revision, previousRevision } ) {
 	}, [ updateEditorSettings ] );
 
 	// Diff revision content and parse into blocks with diff status.
+	// Also preserve clientIds from previous render to prevent flashing.
 	const blocks = useMemo( () => {
 		const currentContent = revision?.content?.raw || '';
 		const previousContent = previousRevision?.content?.raw || '';
 
 		// diffRevisionContent handles both normal diffing and the case
 		// where there's no previous revision (oldest revision shows all as added).
-		return diffRevisionContent( currentContent, previousContent );
+		const diffedBlocks = diffRevisionContent(
+			currentContent,
+			previousContent
+		);
+
+		// Preserve clientIds from previous render to prevent React unmount/remount.
+		const blocksWithStableIds = preserveClientIds(
+			diffedBlocks,
+			previousBlocksRef.current
+		);
+
+		// Update ref for next render.
+		previousBlocksRef.current = blocksWithStableIds;
+
+		return blocksWithStableIds;
 	}, [ revision?.content?.raw, previousRevision?.content?.raw ] );
 
 	// Modify settings to enable preview mode.
