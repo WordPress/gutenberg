@@ -6,6 +6,10 @@
 
 - DataViews: Use regular casing for bulk selection count. [#74573](https://github.com/WordPress/gutenberg/pull/74573)
 
+### Enhancements
+
+- Add `required` validation support for `media` field type. [#74704](https://github.com/WordPress/gutenberg/pull/74704)
+
 ## 11.2.0 (2026-01-16)
 
 ### Code Quality
