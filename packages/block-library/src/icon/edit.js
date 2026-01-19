@@ -8,12 +8,8 @@ import clsx from 'clsx';
  */
 import { __ } from '@wordpress/i18n';
 import {
-	Dropdown,
 	DropdownMenu,
 	ExternalLink,
-	MenuGroup,
-	MenuItem,
-	NavigableMenu,
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
@@ -28,7 +24,6 @@ import {
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
-import { DOWN } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -50,7 +45,6 @@ export function Edit( props ) {
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 	const [ isQuickInserterOpen, setQuickInserterOpen ] = useState( false );
-	const [ isCustomInserterOpen, setCustomInserterOpen ] = useState( false );
 
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 
@@ -86,13 +80,6 @@ export function Edit( props ) {
 			label: undefined,
 		} );
 	}
-
-	const openOnArrowDown = ( event ) => {
-		if ( event.keyCode === DOWN ) {
-			event.preventDefault();
-			event.target.click();
-		}
-	};
 
 	const replaceText = icon || iconName ? __( 'Replace' ) : __( 'Add icon' );
 
