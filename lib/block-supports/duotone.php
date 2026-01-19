@@ -13,13 +13,13 @@ WP_Block_Supports::get_instance()->register(
 	)
 );
 
-// Set up metadata prior to rendering any blocks.
+// Remove the Core metadata setup (for older versions of Core).
+// In newer versions, we don't need to set up metadata prior to rendering any blocks,
+// since the computation gets deferred until it's needed.
 if ( class_exists( 'WP_Duotone' ) ) {
 	remove_action( 'wp_loaded', array( 'WP_Duotone', 'set_global_styles_presets' ) );
 	remove_action( 'wp_loaded', array( 'WP_Duotone', 'set_global_style_block_names' ) );
 }
-add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_styles_presets' ), 10 );
-add_action( 'wp_loaded', array( 'WP_Duotone_Gutenberg', 'set_global_style_block_names' ), 10 );
 
 // Add classnames to blocks using duotone support.
 if ( function_exists( 'wp_render_duotone_support' ) ) {
@@ -30,7 +30,7 @@ if ( class_exists( 'WP_Duotone' ) ) {
 	remove_filter( 'render_block', array( 'WP_Duotone', 'render_duotone_support' ) );
 	remove_filter( 'render_block_core/image', array( 'WP_Duotone', 'restore_image_outer_container' ) );
 }
-add_filter( 'render_block', array( 'WP_Duotone_Gutenberg', 'render_duotone_support' ), 10, 2 );
+add_filter( 'render_block', array( 'WP_Duotone_Gutenberg', 'render_duotone_support' ), 10, 3 );
 add_filter( 'render_block_core/image', array( 'WP_Duotone_Gutenberg', 'restore_image_outer_container' ), 10, 1 );
 
 // Enqueue styles.
