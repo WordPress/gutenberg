@@ -312,6 +312,11 @@ function Navigation( {
 		};
 	}, [] );
 
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
+		[]
+	);
+
 	const isOverlayExperimentEnabled =
 		typeof window !== 'undefined' &&
 		window.__experimentalNavigationOverlays === true;
@@ -829,6 +834,7 @@ function Navigation( {
 						overlayMenuPreviewClasses={ overlayMenuPreviewClasses }
 						overlayMenuPreviewId={ overlayMenuPreviewId }
 						isResponsive={ isResponsive }
+						currentTheme={ currentTheme }
 					/>
 				</InspectorControls>
 			) }
