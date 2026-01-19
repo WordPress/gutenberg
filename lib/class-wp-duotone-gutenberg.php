@@ -149,7 +149,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Simple getter for `$__global_styles_presets`, to ensure it's initialized on demand.
 	 *
-	 * @return array The styles presets.
+	 * @return array<string, array<string, string|string[]>> The styles presets.
 	 */
 	private static function global_styles_presets() {
 		if ( is_null( self::$__global_styles_presets ) ) {
