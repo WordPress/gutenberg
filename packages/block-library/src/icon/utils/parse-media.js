@@ -4,46 +4,6 @@
 import { displayMessages } from './display-messages';
 
 /**
- * Parse a saved SVG file in the Media Library as a string and
- * set the icon attribute.
- *
- * @param {Object}   media         The media object for the selected SVG file.
- * @param {Object}   attributes    All set block attributes.
- * @param {Function} setAttributes Sets the block attributes.
- */
-export function parseUploadedMediaAndSetIcon(
-	media,
-	attributes,
-	setAttributes
-) {
-	const { width } = attributes;
-
-	// TODO: Very basic file type validation, likely needs more refinement.
-	if ( ! media.url?.endsWith( '.svg' ) ) {
-		displayMessages( 'fileTypeSelect' );
-		return;
-	}
-
-	return fetch( media.url )
-		.then( ( response ) => response.text() )
-		.then( ( rawString ) => {
-			const svgString = sanitizeRawSVGString( rawString );
-
-			if ( ! svgString ) {
-				displayMessages( 'fileTypeError' );
-				return;
-			}
-
-			setAttributes( {
-				icon: svgString,
-				iconName: '',
-				width: width ? width : media?.width,
-			} );
-		} )
-		.catch( () => displayMessages( 'fileTypeError' ) );
-}
-
-/**
  * Parse the SVG file dropped in the DropZone and set the icon if valid.
  *
  * @param {string}   media         The media object for the selected SVG file.

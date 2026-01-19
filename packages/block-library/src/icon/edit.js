@@ -23,31 +23,18 @@ import {
 import {
 	BlockControls,
 	InspectorControls,
-	MediaUpload,
 	useBlockProps,
 	useBlockEditingMode,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 import { DOWN } from '@wordpress/keycodes';
-import { code, media as mediaIcon } from '@wordpress/icons';
-import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-import {
-	CustomInserterModal,
-	IconDropZone,
-	IconPlaceholder,
-	InserterModal,
-} from './components';
-import {
-	flattenIconsArray,
-	parseIcon,
-	parseUploadedMediaAndSetIcon,
-} from './utils';
+import { IconPlaceholder, InserterModal } from './components';
+import { flattenIconsArray, parseIcon } from './utils';
 import { bolt as defaultIcon } from './icons/bolt';
 import getIcons from './icons';
 import { useToolsPanelDropdownMenuProps } from './utils/hooks';
@@ -108,55 +95,6 @@ export function Edit( props ) {
 	};
 
 	const replaceText = icon || iconName ? __( 'Replace' ) : __( 'Add icon' );
-	const customIconText =
-		icon || iconName
-			? __( 'Add/edit custom icon' )
-			: __( 'Add custom icon' );
-
-	const replaceDropdown = (
-		<Dropdown
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<ToolbarButton
-					aria-expanded={ isOpen }
-					aria-haspopup="true"
-					onClick={ onToggle }
-					onKeyDown={ openOnArrowDown }
-				>
-					{ replaceText }
-				</ToolbarButton>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<NavigableMenu>
-					<MenuGroup>
-						<MenuItem
-							onClick={ () => {
-								setInserterOpen( true );
-								onClose( true );
-							} }
-							icon={ defaultIcon }
-						>
-							{ __( 'Browse Icon Library' ) }
-						</MenuItem>
-					</MenuGroup>
-					{ ( icon || iconName ) && (
-						<MenuGroup>
-							<MenuItem
-								onClick={ () => {
-									setAttributes( {
-										icon: undefined,
-										iconName: undefined,
-									} );
-									onClose( true );
-								} }
-							>
-								{ __( 'Reset' ) }
-							</MenuItem>
-						</MenuGroup>
-					) }
-				</NavigableMenu>
-			) }
-		/>
-	);
 
 	const blockControls = (
 		<>
@@ -170,6 +108,15 @@ export function Edit( props ) {
 					></ToolbarGroup>
 				</BlockControls>
 			) }
+			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
+				<ToolbarButton
+					onClick={ () => {
+						setInserterOpen( true );
+					} }
+				>
+					{ replaceText }
+				</ToolbarButton>
+			</BlockControls>
 			{ isContentOnlyMode && ( icon || iconName ) && (
 				// Add some extra controls for content attributes when content only mode is active.
 				// With content only mode active, the inspector is hidden, so users need another way
@@ -195,7 +142,6 @@ export function Edit( props ) {
 									help={ __(
 										'Briefly describe the icon to help screen reader users.'
 									) }
-									__nextHasNoMarginBottom
 									__next40pxDefaultSize
 								/>
 							) }
@@ -231,7 +177,6 @@ export function Edit( props ) {
 							onChange={ ( value ) =>
 								setAttributes( { label: value } )
 							}
-							__nextHasNoMarginBottom
 							__next40pxDefaultSize
 						/>
 					</ToolsPanelItem>
@@ -256,7 +201,6 @@ export function Edit( props ) {
 							</ExternalLink>
 						</>
 					}
-					__nextHasNoMarginBottom
 					__next40pxDefaultSize
 				/>
 			</InspectorControls>
@@ -272,8 +216,6 @@ export function Edit( props ) {
 					setInserterOpen={ setInserterOpen }
 					isQuickInserterOpen={ isQuickInserterOpen }
 					setQuickInserterOpen={ setQuickInserterOpen }
-					isCustomInserterOpen={ isCustomInserterOpen }
-					setCustomInserterOpen={ setCustomInserterOpen }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 				/>
@@ -294,11 +236,6 @@ export function Edit( props ) {
 				} ) }
 			>
 				{ iconMarkup }
-				<IconDropZone
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					mediaUpload={ mediaUpload }
-				/>
 			</div>
 			<InserterModal
 				isInserterOpen={ isInserterOpen }
