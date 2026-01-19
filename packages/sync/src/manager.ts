@@ -174,16 +174,12 @@ export function createSyncManager(): SyncManager {
 
 		entityStates.set( entityId, entityState );
 
-		// Get the current user from the handlers.
-		const currentUser = await handlers.getCurrentUser();
-
 		// Create awareness for the given entity and its Yjs document.
 		const awareness = await createAwareness(
 			objectType,
 			objectId,
 			ydoc,
-			handlers,
-			currentUser
+			handlers
 		);
 
 		// Create providers for the given entity and its Yjs document.
