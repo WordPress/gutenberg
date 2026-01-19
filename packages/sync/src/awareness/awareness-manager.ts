@@ -88,6 +88,7 @@ export async function createAwareness(
 	if ( objectId && objectType.startsWith( 'postType/' ) ) {
 		const awareness = new PostEditorAwarenessState( ydoc );
 
+		// TODO: Is there still a need to memoize the current user?
 		const currentUser = await recordHandlers.getCurrentUser();
 		const userInfo = getUserInfo( awareness, currentUser );
 
@@ -104,6 +105,9 @@ export async function createAwareness(
 
 /**
  * Set the current user's connection status in the awareness instance for the given object type and object ID.
+ *
+ * TODO: Use this in a generic way with each provider so it doesn't need to be exported externally.
+ *
  * @param objectType  Object type.
  * @param objectId    Object ID.
  * @param isConnected Connection status.

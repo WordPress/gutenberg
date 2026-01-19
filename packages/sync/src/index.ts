@@ -28,4 +28,3 @@ export {
 } from './config';
 export { createSyncManager } from './manager';
 export type * from './types';
-export { setConnectionStatus } from './awareness/awareness-manager';
