@@ -7,6 +7,8 @@ import { pasteHandler } from '@wordpress/blocks';
  */
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
 import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';
+import { init as initAndRegisterImageBlock } from '../../../../../block-library/src/image';
+import { init as initAndRegisterEmbedBlock } from '../../../../../block-library/src/embed';
 
 const tableWithHeaderFooterAndBodyUsingColspan = `
 <table>
@@ -85,6 +87,8 @@ describe( 'pasteHandler', () => {
 	beforeAll( () => {
 		initAndRegisterTableBlock();
 		initAndRegisterVideoBlock();
+		initAndRegisterImageBlock();
+		initAndRegisterEmbedBlock();
 	} );
 
 	it( 'can handle a table with thead, tbody and tfoot using colspan', () => {
@@ -286,5 +290,61 @@ describe( 'pasteHandler', () => {
 		} );
 		expect( result.name ).toEqual( 'core/video' );
 		expect( result.isValid ).toBeTruthy();
+	} );
+
+	it( 'creates an image block when pasting a direct image URL', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<p>https://example.com/image.jpg</p>',
+			plainText: 'https://example.com/image.jpg',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result.name ).toEqual( 'core/image' );
+		expect( result.attributes.url ).toEqual(
+			'https://example.com/image.jpg'
+		);
+	} );
+
+	it( 'creates an image block for various image extensions', () => {
+		const extensions = [ 'jpg', 'jpeg', 'png', 'gif', 'webp', 'avif' ];
+
+		for ( const ext of extensions ) {
+			const url = `https://example.com/image.${ ext }`;
+			const [ result ] = pasteHandler( {
+				HTML: `<p>${ url }</p>`,
+				plainText: url,
+				mode: 'BLOCKS',
+			} );
+
+			expect( result.name ).toEqual( 'core/image' );
+			expect( result.attributes.url ).toEqual( url );
+		}
+
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'creates an image block for image URLs with query parameters', () => {
+		const url = 'https://example.com/image.jpg?size=large&quality=80';
+		const [ result ] = pasteHandler( {
+			HTML: `<p>${ url }</p>`,
+			plainText: url,
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result.name ).toEqual( 'core/image' );
+		expect( result.attributes.url ).toEqual( url );
+	} );
+
+	it( 'creates an embed block for non-image URLs', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<p>https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>',
+			plainText: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result.name ).toEqual( 'core/embed' );
 	} );
 } );

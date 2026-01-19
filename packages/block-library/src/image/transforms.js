@@ -69,8 +69,42 @@ const schema = ( { phrasingContentSchema } ) => ( {
 	},
 } );
 
+/**
+ * Image file extensions that indicate a URL points directly to an image.
+ */
+const IMAGE_EXTENSIONS =
+	/\.(?:jpe?g|png|gif|webp|avif|ico|heic|heif|bmp|tiff?)(?:\?.*)?$/i;
+
+/**
+ * Checks if a URL points directly to an image file.
+ *
+ * @param {string} url The URL to check.
+ * @return {boolean} True if the URL appears to be a direct image URL.
+ */
+function isImageFileUrl( url ) {
+	try {
+		const { pathname } = new URL( url );
+		return IMAGE_EXTENSIONS.test( pathname );
+	} catch {
+		return false;
+	}
+}
+
 const transforms = {
 	from: [
+		{
+			type: 'raw',
+			isMatch: ( node ) =>
+				node.nodeName === 'P' &&
+				/^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ) &&
+				node.textContent?.match( /https/gi )?.length === 1 &&
+				isImageFileUrl( node.textContent.trim() ),
+			transform: ( node ) => {
+				return createBlock( 'core/image', {
+					url: node.textContent.trim(),
+				} );
+			},
+		},
 		{
 			type: 'raw',
 			isMatch: ( node ) =>
