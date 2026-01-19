@@ -178,24 +178,46 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
                     type="button"
                   />
                   <div
-                    class="components-flex components-h-stack components-v-stack components-color-palette__custom-color-text-wrapper emotion-12 emotion-5"
-                    data-wp-c16t="true"
-                    data-wp-component="VStack"
+                    class="components-color-palette__custom-color-text-wrapper"
                   >
-                    <span
-                      class="components-truncate components-color-palette__custom-color-name emotion-14 emotion-5"
+                    <div
+                      class="components-flex components-h-stack components-v-stack emotion-12 emotion-5"
                       data-wp-c16t="true"
-                      data-wp-component="Truncate"
+                      data-wp-component="VStack"
                     >
-                      red
-                    </span>
-                    <span
-                      class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
-                      data-wp-c16t="true"
-                      data-wp-component="Truncate"
+                      <span
+                        class="components-truncate components-color-palette__custom-color-name emotion-14 emotion-5"
+                        data-wp-c16t="true"
+                        data-wp-component="Truncate"
+                      >
+                        red
+                      </span>
+                      <span
+                        class="components-truncate components-color-palette__custom-color-value components-color-palette__custom-color-value--is-hex emotion-14 emotion-5"
+                        data-wp-c16t="true"
+                        data-wp-component="Truncate"
+                      >
+                        #f00
+                      </span>
+                    </div>
+                    <button
+                      aria-label="Edit custom color"
+                      class="components-color-palette__custom-color-edit-button"
+                      type="button"
                     >
-                      #f00
-                    </span>
+                      <svg
+                        aria-hidden="true"
+                        focusable="false"
+                        height="16"
+                        viewBox="0 0 24 24"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          d="m19 7-3-3-8.5 8.5-1 4 4-1L19 7Zm-7 11.5H5V20h7v-1.5Z"
+                        />
+                      </svg>
+                    </button>
                   </div>
                 </div>
               </div>
