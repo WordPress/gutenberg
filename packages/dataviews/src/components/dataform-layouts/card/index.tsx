@@ -151,6 +151,7 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 		isOpen: effectiveIsOpen,
 		CardHeader: CardHeaderComponent,
 		touched,
+		setTouched,
 	};
 }
 
@@ -224,7 +225,16 @@ export default function FormCardField< Item >( {
 		[ field ]
 	);
 
-	const { isOpen, CardHeader, touched } = useCardHeader( layout );
+	const { isOpen, CardHeader, touched, setTouched } = useCardHeader( layout );
+
+	// Mark the card as touched when any field changes value.
+	const handleChange: typeof onChange = useCallback(
+		( value ) => {
+			setTouched( true );
+			onChange( value );
+		},
+		[ onChange, setTouched ]
+	);
 
 	// When the card is expanded after being touched (collapsed with errors),
 	// trigger reportValidity to show field-level errors.
@@ -325,7 +335,7 @@ export default function FormCardField< Item >( {
 						<DataFormLayout
 							data={ data }
 							form={ form }
-							onChange={ onChange }
+							onChange={ handleChange }
 							validity={ validity?.children }
 						/>
 					</CardBody>
@@ -387,7 +397,7 @@ export default function FormCardField< Item >( {
 						<RegularLayout
 							data={ data }
 							field={ field }
-							onChange={ onChange }
+							onChange={ handleChange }
 							hideLabelFromVision={
 								hideLabelFromVision || withHeader
 							}
