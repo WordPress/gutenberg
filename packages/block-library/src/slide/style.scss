@@ -1,9 +1,19 @@
 .wp-block-slide {
-	scroll-snap-align: center;
+	scroll-snap-align: start;
 	flex-shrink: 0;
 	width: 100%;
 	min-height: 400px;
 	display: flex;
 	flex-direction: column;
 	box-sizing: border-box;
+
+	// In editor, show slides side by side for easier editing
+	.editor-styles-wrapper & {
+		border: 1px dashed #ddd;
+		margin-right: 16px;
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
 }

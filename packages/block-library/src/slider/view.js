@@ -31,39 +31,84 @@ store( 'core/slider', {
 		nextSlide() {
 			const { ref } = getElement();
 
+			// Debug logging
+			// eslint-disable-next-line no-console
+			console.log( 'nextSlide called, ref:', ref );
+
 			// Find the track element (go up to slider, then find track)
 			const slider = ref.closest( '.wp-block-slider' );
 			const track = slider?.querySelector( '.wp-block-slider-track' );
 
+			// eslint-disable-next-line no-console
+			console.log( 'slider:', slider, 'track:', track );
+
 			if ( ! track ) {
+				// eslint-disable-next-line no-console
+				console.warn( 'Track not found!' );
 				return;
 			}
 
 			const slides = track.querySelectorAll( '.wp-block-slide' );
 			if ( slides.length === 0 ) {
+				// eslint-disable-next-line no-console
+				console.warn( 'No slides found!' );
 				return;
 			}
 
 			const slideWidth = slides[ 0 ].offsetWidth;
+
+			// Debug scroll dimensions
+			// eslint-disable-next-line no-console
+			console.log( 'Track dimensions:', {
+				scrollWidth: track.scrollWidth,
+				clientWidth: track.clientWidth,
+				scrollLeft: track.scrollLeft,
+				canScroll: track.scrollWidth > track.clientWidth,
+				slideWidth,
+				slideCount: slides.length,
+			} );
+
+			// eslint-disable-next-line no-console
+			console.log(
+				'Scrolling by',
+				slideWidth,
+				'current scrollLeft:',
+				track.scrollLeft
+			);
 			track.scrollBy( { left: slideWidth, behavior: 'smooth' } );
 		},
 		prevSlide() {
 			const { ref } = getElement();
+
+			// Debug logging
+			// eslint-disable-next-line no-console
+			console.log( 'prevSlide called, ref:', ref );
 
 			// Find the track element
 			const slider = ref.closest( '.wp-block-slider' );
 			const track = slider?.querySelector( '.wp-block-slider-track' );
 
 			if ( ! track ) {
+				// eslint-disable-next-line no-console
+				console.warn( 'Track not found!' );
 				return;
 			}
 
 			const slides = track.querySelectorAll( '.wp-block-slide' );
 			if ( slides.length === 0 ) {
+				// eslint-disable-next-line no-console
+				console.warn( 'No slides found!' );
 				return;
 			}
 
 			const slideWidth = slides[ 0 ].offsetWidth;
+			// eslint-disable-next-line no-console
+			console.log(
+				'Scrolling by',
+				-slideWidth,
+				'current scrollLeft:',
+				track.scrollLeft
+			);
 			track.scrollBy( { left: -slideWidth, behavior: 'smooth' } );
 		},
 		handleScroll: debounce( function () {
