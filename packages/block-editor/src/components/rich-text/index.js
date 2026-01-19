@@ -352,7 +352,9 @@ export function RichTextWrapper(
 		identifier,
 		allowedFormats: adjustedAllowedFormats,
 		withoutInteractiveFormatting,
-		disableNoneEssentialFormatting: isContentOnly,
+		disableNoneEssentialFormatting:
+			isContentOnly &&
+			window?.__experimentalRestrictFormattingInContentOnlyMode,
 	} );
 
 	function addEditorOnlyFormats( value ) {

@@ -67,6 +67,8 @@ function getPrefixedSelectKeys( selected, prefix ) {
  * @param {Array}   options.allowedFormats                 Allowed formats
  * @param {boolean} options.withoutInteractiveFormatting   Whether to clean the interactive formatting or not.
  * @param {boolean} options.disableNoneEssentialFormatting Whether to disable none-essential formatting or not.
+ *                                                         This option is pnly available when "Restrict formatting
+ *                                                         controls in Content Only mode" experimental setting is enabled.
  */
 export function useFormatTypes( {
 	clientId,
@@ -88,7 +90,11 @@ export function useFormatTypes( {
 					return false;
 				}
 
-				if ( disableNoneEssentialFormatting && ! isEssential ) {
+				if (
+					disableNoneEssentialFormatting &&
+					! isEssential &&
+					window?.__experimentalRestrictFormattingInContentOnlyMode
+				) {
 					return false;
 				}
 

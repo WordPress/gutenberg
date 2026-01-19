@@ -258,6 +258,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-restrict-formatting-in-content-only-mode',
+		__( 'Restrict formatting controls in Content Only mode', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Restricts RichText formatting controls when in Content Only mode to provide a simpler, more focused editing experience while maintaining essential content functionality.', 'gutenberg' ),
+			'id'    => 'gutenberg-restrict-formatting-in-content-only-mode',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

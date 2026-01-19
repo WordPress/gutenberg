@@ -58,7 +58,8 @@ export default function RichTextControl( {
 		identifier: field.id,
 		allowedFormats: adjustedAllowedFormats,
 		withoutInteractiveFormatting: fieldConfig?.withoutInteractiveFormatting,
-		disableNoneEssentialFormatting: true,
+		disableNoneEssentialFormatting:
+			window?.__experimentalRestrictFormattingInContentOnlyMode,
 	} );
 
 	function addEditorOnlyFormats( value ) {
