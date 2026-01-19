@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 /**
@@ -42,6 +42,7 @@ const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
 	const [ fontSize, setFontSize ] = useState( value );
 	return (
 		<FontSizePicker
+			__next40pxDefaultSize
 			{ ...props }
 			value={ fontSize }
 			onChange={ ( nextValue ) => {

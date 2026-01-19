@@ -34,7 +34,7 @@ if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
 
 /**
  * Registers the Registered Templates Parts REST API routes.
- * The template activation experiement does not, however, register the routes for the wp_template_part post type,
+ * The template activation experiment does not, however, register the routes for the wp_template_part post type,
  * so we need to register the routes for that post type here.
  * See: lib/compat/wordpress-7.0/template-activate.php
  *
@@ -49,17 +49,16 @@ function gutenberg_modify_wp_template_part_post_type_args_7_0( $args ) {
 add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_wp_template_part_post_type_args_7_0' );
 
 /**
- * Registers the 'overlay' template part area when the experiment is enabled.
+ * Registers the 'navigation-overlay' template part area when the experiment is enabled.
  *
  * @param array $areas Array of template part area definitions.
  * @return array Modified array of template part area definitions.
  */
 if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
 	function gutenberg_register_overlay_template_part_area( $areas ) {
-
 		$areas[] = array(
-			'area'        => 'overlay',
-			'label'       => __( 'Overlay', 'gutenberg' ),
+			'area'        => 'navigation-overlay',
+			'label'       => __( 'Navigation Overlay', 'gutenberg' ),
 			'description' => __( 'Custom overlay area for navigation overlays.', 'gutenberg' ),
 			'icon'        => 'overlay',
 			'area_tag'    => 'div',

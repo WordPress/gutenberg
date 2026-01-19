@@ -71,18 +71,19 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 		const mediaUploadSettings = useMediaUploadSettings( _settings );
 
-		let settings = _settings;
-
-		if ( window.__experimentalMediaProcessing && _settings.mediaUpload ) {
-			// Create a new variable so that the original props.settings.mediaUpload is not modified.
-			settings = useMemo(
-				() => ( {
+		const settings = useMemo( () => {
+			if (
+				window.__experimentalMediaProcessing &&
+				_settings?.mediaUpload
+			) {
+				// Create a new object so that the original props.settings.mediaUpload is not modified.
+				return {
 					..._settings,
 					mediaUpload: mediaUpload.bind( null, registry ),
-				} ),
-				[ _settings, registry ]
-			);
-		}
+				};
+			}
+			return _settings;
+		}, [ _settings, registry ] );
 
 		const { __experimentalUpdateSettings } = unlock(
 			useDispatch( blockEditorStore )

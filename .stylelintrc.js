@@ -83,6 +83,15 @@ module.exports = {
 						],
 					},
 				],
+				'property-no-unknown': [
+					true,
+					{
+						ignoreProperties: [
+							// https://github.com/css-modules/css-modules/blob/master/docs/composition.md
+							'composes',
+						],
+					},
+				],
 			},
 		},
 	],

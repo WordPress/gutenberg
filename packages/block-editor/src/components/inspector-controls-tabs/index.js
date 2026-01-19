@@ -44,7 +44,11 @@ export default function InspectorControlsTabs( {
 
 	// Auto-select first available tab unless user has made a selection
 	useEffect( () => {
-		if ( ! tabs?.length || hasUserSelectionRef.current ) {
+		if (
+			! tabs?.length ||
+			( hasUserSelectionRef.current &&
+				tabs.some( ( tab ) => tab.name === selectedTabId ) )
+		) {
 			return;
 		}
 
@@ -98,10 +102,7 @@ export default function InspectorControlsTabs( {
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
 					<InspectorControls.Slot group="content" />
-					<ContentTab
-						rootClientId={ clientId }
-						contentClientIds={ contentClientIds }
-					/>
+					<ContentTab contentClientIds={ contentClientIds } />
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name } focusable={ false }>
 					<InspectorControls.Slot group="list" />

@@ -11,6 +11,7 @@
 	},
 	"dependencies": {
 		"@wordpress/admin-ui": "file:../../packages/admin-ui",
+		"@wordpress/base-styles": "file:../../packages/base-styles",
 		"@wordpress/components": "file:../../packages/components",
 		"@wordpress/compose": "file:../../packages/compose",
 		"@wordpress/core-data": "file:../../packages/core-data",

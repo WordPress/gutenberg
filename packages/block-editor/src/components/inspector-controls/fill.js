@@ -15,6 +15,7 @@ import { useEffect, useContext } from '@wordpress/element';
 import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
+	mayDisplayPatternEditingControlsKey,
 } from '../block-edit/context';
 import groups from './groups';
 
@@ -42,7 +43,14 @@ export default function InspectorControlsFill( {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
-	if ( ! context[ mayDisplayControlsKey ] ) {
+	const shouldDisplayForPatternEditing =
+		context[ mayDisplayPatternEditingControlsKey ] &&
+		( group === 'list' || group === 'content' );
+
+	if (
+		! context[ mayDisplayControlsKey ] &&
+		! shouldDisplayForPatternEditing
+	) {
 		return null;
 	}
 

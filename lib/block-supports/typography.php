@@ -119,7 +119,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$typography_block_styles = array();
 	if ( $has_font_size_support && ! $should_skip_font_size ) {
 		$preset_font_size                    = array_key_exists( 'fontSize', $block_attributes ) ? "var:preset|font-size|{$block_attributes['fontSize']}" : null;
-		$custom_font_size                    = isset( $block_attributes['style']['typography']['fontSize'] ) ? $block_attributes['style']['typography']['fontSize'] : null;
+		$custom_font_size                    = $block_attributes['style']['typography']['fontSize'] ?? null;
 		$typography_block_styles['fontSize'] = $preset_font_size ? $preset_font_size : gutenberg_get_typography_font_size_value(
 			array(
 				'size' => $custom_font_size,
@@ -382,11 +382,11 @@ function gutenberg_get_typography_value_and_unit( $raw_value, $options = array()
  * @return string|null A font-size value using clamp().
  */
 function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
-	$maximum_viewport_width_raw = isset( $args['maximum_viewport_width'] ) ? $args['maximum_viewport_width'] : null;
-	$minimum_viewport_width_raw = isset( $args['minimum_viewport_width'] ) ? $args['minimum_viewport_width'] : null;
-	$maximum_font_size_raw      = isset( $args['maximum_font_size'] ) ? $args['maximum_font_size'] : null;
-	$minimum_font_size_raw      = isset( $args['minimum_font_size'] ) ? $args['minimum_font_size'] : null;
-	$scale_factor               = isset( $args['scale_factor'] ) ? $args['scale_factor'] : null;
+	$maximum_viewport_width_raw = $args['maximum_viewport_width'] ?? null;
+	$minimum_viewport_width_raw = $args['minimum_viewport_width'] ?? null;
+	$maximum_font_size_raw      = $args['maximum_font_size'] ?? null;
+	$minimum_font_size_raw      = $args['minimum_font_size'] ?? null;
+	$scale_factor               = $args['scale_factor'] ?? null;
 
 	// Normalizes the minimum font size in order to use the value for calculations.
 	$minimum_font_size = gutenberg_get_typography_value_and_unit( $minimum_font_size_raw );
@@ -395,7 +395,7 @@ function gutenberg_get_computed_fluid_typography_value( $args = array() ) {
 	 * We get a 'preferred' unit to keep units consistent when calculating,
 	 * otherwise the result will not be accurate.
 	 */
-	$font_size_unit = isset( $minimum_font_size['unit'] ) ? $minimum_font_size['unit'] : 'rem';
+	$font_size_unit = $minimum_font_size['unit'] ?? 'rem';
 
 	// Grabs the maximum font size and normalize it in order to use the value for calculations.
 	$maximum_font_size = gutenberg_get_typography_value_and_unit(
@@ -529,8 +529,8 @@ function gutenberg_get_typography_font_size_value( $preset, $settings = array() 
 		return $preset['size'];
 	}
 
-	$fluid_settings  = isset( $typography_settings['fluid'] ) ? $typography_settings['fluid'] : array();
-	$layout_settings = isset( $settings['layout'] ) ? $settings['layout'] : array();
+	$fluid_settings  = $typography_settings['fluid'] ?? array();
+	$layout_settings = $settings['layout'] ?? array();
 
 	// Defaults.
 	$default_maximum_viewport_width       = '1600px';
@@ -541,7 +541,7 @@ function gutenberg_get_typography_font_size_value( $preset, $settings = array() 
 	$default_minimum_font_size_limit      = '14px';
 
 	// Defaults overrides.
-	$minimum_viewport_width = isset( $fluid_settings['minViewportWidth'] ) ? $fluid_settings['minViewportWidth'] : $default_minimum_viewport_width;
+	$minimum_viewport_width = $fluid_settings['minViewportWidth'] ?? $default_minimum_viewport_width;
 	$maximum_viewport_width = isset( $layout_settings['wideSize'] ) && ! empty( gutenberg_get_typography_value_and_unit( $layout_settings['wideSize'] ) ) ? $layout_settings['wideSize'] : $default_maximum_viewport_width;
 	if ( isset( $fluid_settings['maxViewportWidth'] ) ) {
 		$maximum_viewport_width = $fluid_settings['maxViewportWidth'];
@@ -550,8 +550,8 @@ function gutenberg_get_typography_font_size_value( $preset, $settings = array() 
 	$minimum_font_size_limit = $has_min_font_size ? $fluid_settings['minFontSize'] : $default_minimum_font_size_limit;
 
 	// Try to grab explicit min and max fluid font sizes.
-	$minimum_font_size_raw = isset( $fluid_font_size_settings['min'] ) ? $fluid_font_size_settings['min'] : null;
-	$maximum_font_size_raw = isset( $fluid_font_size_settings['max'] ) ? $fluid_font_size_settings['max'] : null;
+	$minimum_font_size_raw = $fluid_font_size_settings['min'] ?? null;
+	$maximum_font_size_raw = $fluid_font_size_settings['max'] ?? null;
 
 	// Font sizes.
 	$preferred_size = gutenberg_get_typography_value_and_unit( $preset['size'] );

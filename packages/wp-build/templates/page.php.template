@@ -9,10 +9,10 @@
 
 // Global storage for {{PAGE_SLUG}} routes and menu items
 global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes, ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_menu_items;
-${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes = array();
+${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes     = array();
 ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_menu_items = array();
 
-if ( ! function_exists( 'register_{{PAGE_SLUG_UNDERSCORE}}_route' ) ) {
+if ( ! function_exists( '{{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_route' ) ) {
 	/**
 	 * Register a route for the {{PAGE_SLUG}} page.
 	 *
@@ -20,7 +20,7 @@ if ( ! function_exists( 'register_{{PAGE_SLUG_UNDERSCORE}}_route' ) ) {
 	 * @param string|null $content_module Script module ID for content (stage/inspector).
 	 * @param string|null $route_module   Script module ID for route lifecycle hooks.
 	 */
-	function register_{{PAGE_SLUG_UNDERSCORE}}_route( $path, $content_module = null, $route_module = null ) {
+	function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_route( $path, $content_module = null, $route_module = null ) {
 		global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes;
 
 		$route = array( 'path' => $path );
@@ -35,7 +35,7 @@ if ( ! function_exists( 'register_{{PAGE_SLUG_UNDERSCORE}}_route' ) ) {
 	}
 }
 
-if ( ! function_exists( 'register_{{PAGE_SLUG_UNDERSCORE}}_menu_item' ) ) {
+if ( ! function_exists( '{{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_menu_item' ) ) {
 	/**
 	 * Register a menu item for the {{PAGE_SLUG}} page.
 	 *
@@ -45,7 +45,7 @@ if ( ! function_exists( 'register_{{PAGE_SLUG_UNDERSCORE}}_menu_item' ) ) {
 	 * @param string $parent_id   Optional. Parent menu item ID.
 	 * @param string $parent_type Optional. Parent type: 'drilldown' or 'dropdown'.
 	 */
-	function register_{{PAGE_SLUG_UNDERSCORE}}_menu_item( $id, $label, $to, $parent_id = '', $parent_type = '' ) {
+	function {{PREFIX}}_register_{{PAGE_SLUG_UNDERSCORE}}_menu_item( $id, $label, $to, $parent_id = '', $parent_type = '' ) {
 		global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_menu_items;
 
 		$menu_item = array(
@@ -66,36 +66,36 @@ if ( ! function_exists( 'register_{{PAGE_SLUG_UNDERSCORE}}_menu_item' ) ) {
 	}
 }
 
-if ( ! function_exists( 'get_{{PAGE_SLUG_UNDERSCORE}}_routes' ) ) {
+if ( ! function_exists( '{{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_routes' ) ) {
 	/**
 	 * Get all registered routes for the {{PAGE_SLUG}} page.
 	 *
 	 * @return array Array of route objects.
 	 */
-	function get_{{PAGE_SLUG_UNDERSCORE}}_routes() {
+	function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_routes() {
 		global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes;
 		return ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_routes ?? array();
 	}
 }
 
-if ( ! function_exists( 'get_{{PAGE_SLUG_UNDERSCORE}}_menu_items' ) ) {
+if ( ! function_exists( '{{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_menu_items' ) ) {
 	/**
 	 * Get all registered menu items for the {{PAGE_SLUG}} page.
 	 *
 	 * @return array Array of menu item objects.
 	 */
-	function get_{{PAGE_SLUG_UNDERSCORE}}_menu_items() {
+	function {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_menu_items() {
 		global ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_menu_items;
 		return ${{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_menu_items ?? array();
 	}
 }
 
-if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_preload_data' ) ) {
+if ( ! function_exists( '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_preload_data' ) ) {
 	/**
 	 * Preload REST API data for the {{PAGE_SLUG}} page.
 	 * Automatically called during page rendering.
 	 */
-	function {{PAGE_SLUG_UNDERSCORE}}_preload_data() {
+	function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_preload_data() {
 		// Define paths to preload - same for all pages
 		$preload_paths = array(
 			'/?_fields=description,gmt_offset,home,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front',
@@ -121,12 +121,12 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_preload_data' ) ) {
 	}
 }
 
-if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
+if ( ! function_exists( '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 	/**
 	 * Render the {{PAGE_SLUG}} page.
 	 * Call this function from add_menu_page or add_submenu_page.
 	 */
-	function {{PAGE_SLUG_UNDERSCORE}}_render_page() {
+	function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page() {
 		// Load build constants
 		$build_constants = require __DIR__ . '/../../constants.php';
 
@@ -153,11 +153,11 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 		}
 
 		// Preload REST API data
-		{{PAGE_SLUG_UNDERSCORE}}_preload_data();
+		{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_preload_data();
 
 		// Get all registered routes and menu items
-		$menu_items = get_{{PAGE_SLUG_UNDERSCORE}}_menu_items();
-		$routes = get_{{PAGE_SLUG_UNDERSCORE}}_routes();
+		$menu_items = {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_menu_items();
+		$routes = {{PREFIX}}_get_{{PAGE_SLUG_UNDERSCORE}}_routes();
 
 		// Get boot module asset file for dependencies
 		$asset_file = __DIR__ . '/../../modules/boot/index.min.asset.php';
@@ -312,19 +312,19 @@ if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_render_page' ) ) {
 	}
 }
 
-if ( ! function_exists( '{{PAGE_SLUG_UNDERSCORE}}_intercept_render' ) ) {
+if ( ! function_exists( '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_intercept_render' ) ) {
 	/**
 	 * Intercept admin_init to render the page early.
 	 * This bypasses the default WordPress admin template.
 	 */
-	function {{PAGE_SLUG_UNDERSCORE}}_intercept_render() {
+	function {{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_intercept_render() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['page'] ) && '{{PAGE_SLUG}}' === $_GET['page'] ) {
-			{{PAGE_SLUG_UNDERSCORE}}_render_page();
+			{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_render_page();
 			exit;
 		}
 	}
 }
 
 // Hook the interceptor to admin_init
-add_action( 'admin_init', '{{PAGE_SLUG_UNDERSCORE}}_intercept_render' );
+add_action( 'admin_init', '{{PREFIX}}_{{PAGE_SLUG_UNDERSCORE}}_intercept_render' );
