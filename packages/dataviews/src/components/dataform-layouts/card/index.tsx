@@ -228,7 +228,6 @@ export default function FormCardField< Item >( {
 
 	// When the card is expanded after being touched (collapsed with errors),
 	// trigger reportValidity to show field-level errors.
-	// This matches the pattern from the "Showing Errors At Arbitrary Times" story.
 	useEffect( () => {
 		if ( isOpen && touched && cardBodyRef.current ) {
 			// Trigger reportValidity on each input within the card to fire the
