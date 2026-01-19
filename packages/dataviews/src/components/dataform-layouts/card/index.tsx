@@ -235,6 +235,20 @@ export default function FormCardField< Item >( {
 	const showValidationBadge =
 		touched && invalidCount > 0 && layout.isCollapsible;
 
+	const validationBadge = showValidationBadge ? (
+		<Badge intent="high">
+			{ sprintf(
+				/* translators: %d: Number of fields that need attention */
+				_n(
+					'%d field needs attention',
+					'%d fields need attention',
+					invalidCount
+				),
+				invalidCount
+			) }
+		</Badge>
+	) : null;
+
 	const sizeCard = {
 		blockStart: 'medium' as const,
 		blockEnd: 'medium' as const,
@@ -261,19 +275,7 @@ export default function FormCardField< Item >( {
 						<span className="dataforms-layouts-card__field-header-label">
 							{ field.label }
 						</span>
-						{ showValidationBadge && (
-							<Badge intent="high">
-								{ sprintf(
-									/* translators: %s: Number of fields that need attention */
-									_n(
-										'%s field needs attention',
-										'%s fields need attention',
-										invalidCount
-									),
-									invalidCount.toString()
-								) }
-							</Badge>
-						) }
+						{ validationBadge }
 						{ visibleSummaryFields.length > 0 &&
 							layout.withHeader && (
 								<div className="dataforms-layouts-card__field-summary">
@@ -342,19 +344,7 @@ export default function FormCardField< Item >( {
 					<span className="dataforms-layouts-card__field-header-label">
 						{ fieldDefinition.label }
 					</span>
-					{ showValidationBadge && (
-						<Badge intent="high">
-							{ sprintf(
-								/* translators: %s: Number of fields that need attention */
-								_n(
-									'%s field needs attention',
-									'%s fields need attention',
-									invalidCount
-								),
-								invalidCount.toString()
-							) }
-						</Badge>
-					) }
+					{ validationBadge }
 					{ visibleSummaryFields.length > 0 && layout.withHeader && (
 						<div className="dataforms-layouts-card__field-summary">
 							{ visibleSummaryFields.map( ( summaryField ) => (
