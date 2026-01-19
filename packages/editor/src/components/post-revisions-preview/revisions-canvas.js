@@ -23,6 +23,7 @@ import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import VisualEditor from '../visual-editor';
 import { diffRevisionContent } from './block-diff';
+import DiffMarkers from './diff-markers';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
@@ -87,6 +88,35 @@ const REVISION_DIFF_STYLES = `
 	.revision-diff-format-changed {
 		text-decoration: underline wavy color-mix(in srgb, currentColor 30%, #dba617 70%);
 		text-decoration-thickness: 2px;
+	}
+	.revision-diff-markers {
+		position: fixed;
+		right: 0;
+		top: 0;
+		bottom: 0;
+		width: 12px;
+		background: rgba(0, 0, 0, 0.05);
+		z-index: 1000;
+	}
+	.revision-diff-marker {
+		position: absolute;
+		width: 100%;
+		min-height: 4px;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+	}
+	.revision-diff-marker.is-added {
+		background: #00a32a;
+	}
+	.revision-diff-marker.is-removed {
+		background: #d63638;
+	}
+	.revision-diff-marker.is-modified {
+		background: #dba617;
+	}
+	.revision-diff-marker:hover {
+		opacity: 0.7;
 	}
 `;
 
@@ -233,7 +263,7 @@ export default function RevisionsCanvas( { revision, previousRevision } ) {
 
 	return (
 		<ExperimentalBlockEditorProvider value={ blocks } settings={ settings }>
-			<VisualEditor />
+			<VisualEditor canvasOverlay={ <DiffMarkers /> } />
 		</ExperimentalBlockEditorProvider>
 	);
 }

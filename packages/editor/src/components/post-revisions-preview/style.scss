@@ -56,3 +56,45 @@
 	background-color: rgba(0, 163, 42, 0.2);
 	color: #006400;
 }
+
+// Diff markers minimap
+.revision-diff-markers {
+	position: absolute;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	width: 12px;
+	background: rgba(0, 0, 0, 0.05);
+	z-index: 1;
+
+	.revision-diff-marker {
+		position: absolute;
+		width: 100%;
+		min-height: 4px;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		transition: opacity 0.1s ease;
+
+		&.is-added {
+			background: #00a32a;
+		}
+
+		&.is-removed {
+			background: #d63638;
+		}
+
+		&.is-modified {
+			background: #dba617;
+		}
+
+		&:hover {
+			opacity: 0.7;
+		}
+
+		&:focus {
+			outline: 2px solid $gray-900;
+			outline-offset: -2px;
+		}
+	}
+}
