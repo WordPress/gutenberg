@@ -123,7 +123,7 @@ class WP_Navigation_Block_Renderer {
 		$is_responsive_menu = static::is_responsive( $attributes );
 		$submenu_visibility = isset( $attributes['submenuVisibility'] ) ? $attributes['submenuVisibility'] : null;
 		// For backward compatibility, fall back to openSubmenusOnClick
-		$open_on_click      = 'click' === $submenu_visibility || ( ! $submenu_visibility && ! empty( $attributes['openSubmenusOnClick'] ) );
+		$open_on_click = 'click' === $submenu_visibility || ( ! $submenu_visibility && ! empty( $attributes['openSubmenusOnClick'] ) );
 		return ( $has_submenus && ( $open_on_click || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
 	}
 
@@ -1125,7 +1125,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 
 		$submenu_visibility = isset( $block_attributes['submenuVisibility'] ) ? $block_attributes['submenuVisibility'] : null;
 		// For backward compatibility, check openSubmenusOnClick if submenuVisibility is not set
-		$open_on_click      = 'click' === $submenu_visibility || ( ! $submenu_visibility && ! empty( $block_attributes['openSubmenusOnClick'] ) );
+		$open_on_click = 'click' === $submenu_visibility || ( ! $submenu_visibility && ! empty( $block_attributes['openSubmenusOnClick'] ) );
 
 		if ( ! $open_on_click && 'always' !== $submenu_visibility ) {
 			$tags->set_attribute( 'data-wp-on--mouseenter', 'actions.openMenuOnHover' );
