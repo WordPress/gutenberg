@@ -34,7 +34,7 @@ if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
 
 /**
  * Registers the Registered Templates Parts REST API routes.
- * The template activation experiement does not, however, register the routes for the wp_template_part post type,
+ * The template activation experiment does not, however, register the routes for the wp_template_part post type,
  * so we need to register the routes for that post type here.
  * See: lib/compat/wordpress-7.0/template-activate.php
  *

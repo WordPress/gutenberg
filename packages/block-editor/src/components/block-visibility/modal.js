@@ -118,7 +118,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			return sprintf(
 				// translators: %s: The shortcut key to access the List View.
 				__(
-					'Block visibility settings saved. You can access them via the List View (%s).'
+					'Block visibility settings updated. You can access them via the List View (%s).'
 				),
 				listViewShortcut
 			);
@@ -192,7 +192,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			createSuccessNotice( noticeMessage, {
 				id: hideEverywhere
 					? 'block-visibility-hidden'
-					: 'block-visibility-viewports-saved',
+					: 'block-visibility-viewports-updated',
 				type: 'snackbar',
 			} );
 			onClose();

@@ -621,6 +621,10 @@ button.wp-block-navigation-item__content {
 			width: 100%;
 		}
 
+		.wp-block-navigation__responsive-close {
+			max-width: none;
+		}
+
 		// When menu is open with custom overlay, hide default navigation and show overlay.
 		&.is-menu-open {
 			.wp-block-navigation__responsive-container-content {

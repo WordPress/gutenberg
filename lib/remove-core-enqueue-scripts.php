@@ -8,5 +8,5 @@
  * @package gutenberg
  */
 
-remove_action( 'admin_enqueue_scripts', 'font_library_wp_admin_enqueue_scripts' );
-remove_action( 'admin_enqueue_scripts', 'site_editor_v2_wp_admin_enqueue_scripts' );
+remove_action( 'admin_enqueue_scripts', 'wp_font_library_wp_admin_enqueue_scripts' );
+remove_action( 'admin_enqueue_scripts', 'wp_site_editor_v2_wp_admin_enqueue_scripts' );

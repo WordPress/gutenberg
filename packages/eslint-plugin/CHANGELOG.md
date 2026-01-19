@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 24.0.0 (2026-01-16)
+
 ### Breaking Changes
 
 -   Updated recommended ruleset to enforce [`import/no-unresolved`](https://github.com/import-js/eslint-plugin-import/blob/main/docs/rules/no-unresolved.md) for `@wordpress/` packages. These packages were previously exempted from the rule. ([#72978](https://github.com/WordPress/gutenberg/pull/72978))
