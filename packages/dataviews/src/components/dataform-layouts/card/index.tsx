@@ -150,7 +150,6 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 		isOpen: effectiveIsOpen,
 		CardHeader: CardHeaderComponent,
 		touched,
-		setTouched,
 	};
 }
 
