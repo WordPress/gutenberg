@@ -73,7 +73,9 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 		 */
 		$wp_duotone                      = new WP_Duotone_Gutenberg();
 		$block_css_declarations_property = new ReflectionProperty( 'WP_Duotone_Gutenberg', 'block_css_declarations' );
-		$block_css_declarations_property->setAccessible( true );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$block_css_declarations_property->setAccessible( true );
+		}
 		$previous_value = $block_css_declarations_property->getValue();
 		$block_css_declarations_property->setValue( $wp_duotone, array() );
 		WP_Duotone_Gutenberg::render_duotone_support( '', $block, $wp_block );
@@ -81,7 +83,9 @@ class WP_Duotone_Gutenberg_Test extends WP_UnitTestCase {
 
 		// Reset the property.
 		$block_css_declarations_property->setValue( $wp_duotone, $previous_value );
-		$block_css_declarations_property->setAccessible( false );
+		if ( PHP_VERSION_ID < 80100 ) {
+			$block_css_declarations_property->setAccessible( false );
+		}
 
 		$this->assertNotEmpty( $actual );
 	}
