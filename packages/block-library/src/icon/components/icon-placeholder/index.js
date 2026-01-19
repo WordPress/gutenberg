@@ -3,22 +3,13 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button, Placeholder } from '@wordpress/components';
-import { MediaUpload } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { bolt } from './../../icons/bolt';
-import QuickInserterPopover from './../quick-inserter';
 
-export default function IconPlaceholder( props ) {
-	const {
-		setInserterOpen,
-		isQuickInserterOpen,
-		setQuickInserterOpen,
-		setAttributes,
-	} = props;
-
+export default function IconPlaceholder( { setInserterOpen } ) {
 	return (
 		<Placeholder
 			icon={ bolt }
@@ -29,17 +20,11 @@ export default function IconPlaceholder( props ) {
 		>
 			<Button
 				variant="primary"
-				onClick={ () => setQuickInserterOpen( true ) }
+				onClick={ () => setInserterOpen( true ) }
 				__next40pxDefaultSize
 			>
 				{ __( 'Icon Library' ) }
 			</Button>
-			<QuickInserterPopover
-				setInserterOpen={ setInserterOpen }
-				isQuickInserterOpen={ isQuickInserterOpen }
-				setQuickInserterOpen={ setQuickInserterOpen }
-				setAttributes={ setAttributes }
-			/>
 		</Placeholder>
 	);
 }
