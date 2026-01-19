@@ -61,31 +61,9 @@ export function Edit( props ) {
 	const { attributes, setAttributes } = props;
 	const { icon, iconName, label, title } = attributes;
 
-	// Allowed types for the current user.
-	const { allowedMimeTypes, mediaUpload } = useSelect( ( select ) => {
-		// Disabling this rule for the following line so as to not couple the block editor package to block-library.
-		// eslint-disable-next-line @wordpress/data-no-store-string-literals
-		const { getSettings } = select( 'core/block-editor' );
-
-		return {
-			allowedMimeTypes: getSettings().allowedMimeTypes,
-			mediaUpload: getSettings().mediaUpload,
-		};
-	}, [] );
-
-	const isSVGUploadAllowed = allowedMimeTypes
-		? Object.values( allowedMimeTypes ).includes( 'image/svg+xml' )
-		: false;
-
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 	const [ isQuickInserterOpen, setQuickInserterOpen ] = useState( false );
 	const [ isCustomInserterOpen, setCustomInserterOpen ] = useState( false );
-
-	// Allow users to disable custom SVG icons.
-	const enableCustomIcons = applyFilters(
-		'iconBlock.enableCustomIcons',
-		true
-	);
 
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 
@@ -159,38 +137,6 @@ export function Edit( props ) {
 						>
 							{ __( 'Browse Icon Library' ) }
 						</MenuItem>
-						{ isSVGUploadAllowed && (
-							<MediaUpload
-								onSelect={ ( media ) => {
-									parseUploadedMediaAndSetIcon(
-										media,
-										attributes,
-										setAttributes
-									);
-									onClose( true );
-								} }
-								allowedTypes={ [ 'image/svg+xml' ] }
-								render={ ( { open } ) => (
-									<MenuItem
-										onClick={ open }
-										icon={ mediaIcon }
-									>
-										{ __( 'Open Media Library' ) }
-									</MenuItem>
-								) }
-							/>
-						) }
-						{ enableCustomIcons && (
-							<MenuItem
-								onClick={ () => {
-									setCustomInserterOpen( true );
-									onClose( true );
-								} }
-								icon={ code }
-							>
-								{ customIconText }
-							</MenuItem>
-						) }
 					</MenuGroup>
 					{ ( icon || iconName ) && (
 						<MenuGroup>
@@ -224,21 +170,6 @@ export function Edit( props ) {
 					></ToolbarGroup>
 				</BlockControls>
 			) }
-			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
-				<>
-					{ enableCustomIcons || isSVGUploadAllowed ? (
-						replaceDropdown
-					) : (
-						<ToolbarButton
-							onClick={ () => {
-								setInserterOpen( true );
-							} }
-						>
-							{ replaceText }
-						</ToolbarButton>
-					) }
-				</>
-			</BlockControls>
 			{ isContentOnlyMode && ( icon || iconName ) && (
 				// Add some extra controls for content attributes when content only mode is active.
 				// With content only mode active, the inspector is hidden, so users need another way
@@ -345,8 +276,6 @@ export function Edit( props ) {
 					setCustomInserterOpen={ setCustomInserterOpen }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					enableCustomIcons={ enableCustomIcons }
-					isSVGUploadAllowed={ isSVGUploadAllowed }
 				/>
 			) : (
 				<>{ printedIcon }</>
@@ -369,7 +298,6 @@ export function Edit( props ) {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					mediaUpload={ mediaUpload }
-					isSVGUploadAllowed={ isSVGUploadAllowed }
 				/>
 			</div>
 			<InserterModal
@@ -378,14 +306,6 @@ export function Edit( props ) {
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
-			{ enableCustomIcons && (
-				<CustomInserterModal
-					isCustomInserterOpen={ isCustomInserterOpen }
-					setCustomInserterOpen={ setCustomInserterOpen }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-				/>
-			) }
 		</>
 	);
 }
