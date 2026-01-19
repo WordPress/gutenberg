@@ -192,6 +192,7 @@ export default function EditorInterface( {
 						previousRevision={ previousRevision }
 					/>
 				}
+				sidebar={ <ComplementaryArea.Slot scope="core" /> }
 			/>
 		);
 	}

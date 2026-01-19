@@ -22,8 +22,13 @@ import { store as editorStore } from '../../store';
  */
 import { unlock } from '../../lock-unlock';
 import VisualEditor from '../visual-editor';
-import { diffRevisionContent, preserveClientIds } from './block-diff';
 import DiffMarkers from './diff-markers';
+import RevisionsSidebar from '../sidebar/revisions-sidebar';
+import {
+	diffRevisionContent,
+	preserveClientIds,
+	calculateDiffStatistics,
+} from './block-diff';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
@@ -194,6 +199,7 @@ addFilter( 'editor.BlockListBlock', FILTER_NAME, withRevisionDiffClasses );
 
 /**
  * Canvas component that renders a post revision in read-only mode.
+ * Renders the sidebar with diff statistics.
  *
  * @param {Object} props                  Component props.
  * @param {Object} props.revision         The revision object to display.
@@ -262,6 +268,12 @@ export default function RevisionsCanvas( { revision, previousRevision } ) {
 		return blocksWithStableIds;
 	}, [ revision?.content?.raw, previousRevision?.content?.raw ] );
 
+	// Calculate diff statistics for sidebar.
+	const diffStats = useMemo(
+		() => calculateDiffStatistics( blocks ),
+		[ blocks ]
+	);
+
 	// Modify settings to enable preview mode.
 	const settings = useMemo(
 		() => ( {
@@ -280,8 +292,17 @@ export default function RevisionsCanvas( { revision, previousRevision } ) {
 	}
 
 	return (
-		<ExperimentalBlockEditorProvider value={ blocks } settings={ settings }>
-			<VisualEditor canvasOverlay={ <DiffMarkers /> } />
-		</ExperimentalBlockEditorProvider>
+		<>
+			<ExperimentalBlockEditorProvider
+				value={ blocks }
+				settings={ settings }
+			>
+				<VisualEditor canvasOverlay={ <DiffMarkers /> } />
+			</ExperimentalBlockEditorProvider>
+			<RevisionsSidebar
+				diffStats={ diffStats }
+				revisionDate={ revision?.date }
+			/>
+		</>
 	);
 }

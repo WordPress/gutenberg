@@ -692,6 +692,64 @@ export function diffRevisionContent( currentContent, previousContent ) {
 }
 
 /**
+ * Calculate diff statistics from parsed blocks with diff status.
+ *
+ * @param {Array} blocks Parsed blocks with __revisionDiffStatus attributes.
+ * @return {Object} Statistics object with blocksAdded, blocksRemoved, blocksModified, wordsAdded, wordsRemoved.
+ */
+export function calculateDiffStatistics( blocks ) {
+	let blocksAdded = 0;
+	let blocksRemoved = 0;
+	let blocksModified = 0;
+	let wordsAdded = 0;
+	let wordsRemoved = 0;
+
+	function countWords( text ) {
+		return ( text || '' ).trim().split( /\s+/ ).filter( Boolean ).length;
+	}
+
+	function processBlock( block ) {
+		const status = block.attributes?.__revisionDiffStatus;
+		const content = block.attributes?.content?.toString?.() || '';
+
+		if ( status === 'added' ) {
+			blocksAdded++;
+			wordsAdded += countWords( content );
+		} else if ( status === 'removed' ) {
+			blocksRemoved++;
+			wordsRemoved += countWords( content );
+		} else if ( status === 'modified' ) {
+			blocksModified++;
+			// Modified blocks have inline diff - parse del/ins for word counts
+			const htmlContent = content;
+			const delMatches =
+				htmlContent.match( /<del[^>]*>([^<]*)<\/del>/g ) || [];
+			const insMatches =
+				htmlContent.match( /<ins[^>]*>([^<]*)<\/ins>/g ) || [];
+			delMatches.forEach( ( m ) => {
+				wordsRemoved += countWords( m.replace( /<[^>]+>/g, '' ) );
+			} );
+			insMatches.forEach( ( m ) => {
+				wordsAdded += countWords( m.replace( /<[^>]+>/g, '' ) );
+			} );
+		}
+
+		// Recurse into inner blocks
+		block.innerBlocks?.forEach( processBlock );
+	}
+
+	blocks.forEach( processBlock );
+
+	return {
+		blocksAdded,
+		blocksRemoved,
+		blocksModified,
+		wordsAdded,
+		wordsRemoved,
+	};
+}
+
+/**
  * Preserves clientIds from previously rendered blocks to prevent flashing.
  * Uses LCS algorithm to match blocks by blockName between renders.
  *
