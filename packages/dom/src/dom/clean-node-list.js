@@ -52,9 +52,14 @@ export default function cleanNodeList( nodeList, doc, schema, inline ) {
 					} = schema[ tag ];
 
 					// If the node is empty and it's supposed to have children,
-					// remove the node.
+					// remove the node. For phrasing content, unwrap instead to
+					// preserve any whitespace content (e.g. <b> </b> between words).
 					if ( children && ! allowEmpty && isEmpty( node ) ) {
-						remove( node );
+						if ( isPhrasingContent( node ) ) {
+							unwrap( node );
+						} else {
+							remove( node );
+						}
 						return;
 					}
 
