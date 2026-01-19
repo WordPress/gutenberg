@@ -237,17 +237,22 @@ $navigation-icon-size: 24px;
 	}
 
 	// Custom menu items.
+	// Mixin for showing submenu containers
+	@mixin show-submenu {
+		visibility: visible;
+		overflow: visible;
+		opacity: 1;
+		width: auto;
+		height: auto;
+	}
+
 	// Show submenus on hover unless they open on click.
 	&:not(.open-on-click):hover > .wp-block-navigation__submenu-container,
 	// Keep submenus open when focus is within.
 	&:not(.open-on-click):not(.open-on-hover-click):focus-within > .wp-block-navigation__submenu-container,
 	// Show submenus on click.
 	.wp-block-navigation-submenu__toggle[aria-expanded="true"] ~ .wp-block-navigation__submenu-container {
-		visibility: visible;
-		overflow: visible;
-		opacity: 1;
-		width: auto;
-		height: auto;
+		@include show-submenu;
 		min-width: 200px;
 	}
 
@@ -294,13 +299,9 @@ $navigation-icon-size: 24px;
 		}
 
 		> .wp-block-navigation__submenu-container {
+			@include show-submenu;
 			flex-basis: 100%;
-			visibility: visible;
-			overflow: visible;
-			opacity: 1;
 			position: static;
-			height: auto;
-			width: auto;
 			border: none;
 			background-color: transparent;
 			color: inherit;
