@@ -8,8 +8,6 @@ import type * as Y from 'yjs';
  */
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { select, subscribe } from '@wordpress/data';
-// @ts-expect-error No exported types for block editor store selectors.
-import { type BlockEditorStoreSelectors } from '@wordpress/block-editor/build-types/store/selectors';
 
 /**
  * Internal dependencies
@@ -51,7 +49,7 @@ export class PostEditorAwarenessState extends AwarenessState< PostEditorState > 
 			getSelectionStart,
 			getSelectionEnd,
 			getSelectedBlocksInitialCaretPosition,
-		} = select( blockEditorStore ) as BlockEditorStoreSelectors;
+		} = select( blockEditorStore );
 
 		// Keep track of the current selection in the outer scope so we can compare
 		// in the subscription.
