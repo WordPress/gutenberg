@@ -15,7 +15,10 @@ const InspectorControlsFilter = createSlotFill( 'InspectorControlsFilter' );
 const InspectorControlsDimensions = createSlotFill(
 	'InspectorControlsDimensions'
 );
+const InspectorControlsDisplay = createSlotFill( 'InspectorControlsDisplay' );
+const InspectorControlsMedia = createSlotFill( 'InspectorControlsMedia' );
 const InspectorControlsPosition = createSlotFill( 'InspectorControlsPosition' );
+const InspectorControlsSettings = createSlotFill( 'InspectorControlsSettings' );
 const InspectorControlsTypography = createSlotFill(
 	'InspectorControlsTypography'
 );
@@ -33,14 +36,41 @@ const groups = {
 	color: InspectorControlsColor,
 	content: InspectorControlsContent,
 	dimensions: InspectorControlsDimensions,
+	display: InspectorControlsDisplay,
 	effects: InspectorControlsEffects,
 	filter: InspectorControlsFilter,
 	list: InspectorControlsListView,
+	media: InspectorControlsMedia,
 	position: InspectorControlsPosition,
-	settings: InspectorControlsDefault, // Alias for default.
+	settings: InspectorControlsSettings,
 	styles: InspectorControlsStyles,
 	typography: InspectorControlsTypography,
 };
+
+/**
+ * Gets or creates a SlotFill for the given group name.
+ * Supports namespaced groups (e.g., 'query/filters') by dynamically creating SlotFills.
+ *
+ * @param {string} groupName The group name.
+ * @return {Object|null} The SlotFill object or null if invalid.
+ */
+export function getGroup( groupName ) {
+	if ( groups[ groupName ] ) {
+		return groups[ groupName ];
+	}
+
+	// Support namespaced groups for block-specific panels
+	if ( groupName && groupName.includes( '/' ) ) {
+		if ( ! groups[ groupName ] ) {
+			groups[ groupName ] = createSlotFill(
+				`InspectorControls/${ groupName }`
+			);
+		}
+		return groups[ groupName ];
+	}
+
+	return null;
+}
 
 export default groups;
 

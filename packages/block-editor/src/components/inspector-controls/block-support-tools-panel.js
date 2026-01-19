@@ -22,6 +22,18 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 	} = useSelect( blockEditorStore );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const panelId = getSelectedBlockClientId();
+	
+	// Determine if this is a style-based panel (design tools) or attribute-based panel (settings, display, media)
+	const isStylePanel = [
+		'color',
+		'background',
+		'typography',
+		'dimensions',
+		'border',
+		'effects',
+		'filter',
+	].includes( group );
+	
 	const resetAll = useCallback(
 		( resetFilters = [] ) => {
 			const newAttributes = {};
@@ -31,21 +43,35 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 				: [ panelId ];
 
 			clientIds.forEach( ( clientId ) => {
-				const { style } = getBlockAttributes( clientId );
-				let newBlockAttributes = { style };
+				let newBlockAttributes = {};
+				
+				if ( isStylePanel ) {
+					// For style-based panels, work with the style object
+					const { style } = getBlockAttributes( clientId );
+					newBlockAttributes = { style };
 
-				resetFilters.forEach( ( resetFilter ) => {
+					resetFilters.forEach( ( resetFilter ) => {
+						newBlockAttributes = {
+							...newBlockAttributes,
+							...resetFilter( newBlockAttributes ),
+						};
+					} );
+
+					// Enforce a cleaned style object.
 					newBlockAttributes = {
 						...newBlockAttributes,
-						...resetFilter( newBlockAttributes ),
+						style: cleanEmptyObject( newBlockAttributes.style ),
 					};
-				} );
-
-				// Enforce a cleaned style object.
-				newBlockAttributes = {
-					...newBlockAttributes,
-					style: cleanEmptyObject( newBlockAttributes.style ),
-				};
+				} else {
+					// For attribute-based panels, directly apply reset filters
+					resetFilters.forEach( ( resetFilter ) => {
+						const resetAttributes = resetFilter( getBlockAttributes( clientId ) );
+						newBlockAttributes = {
+							...newBlockAttributes,
+							...resetAttributes,
+						};
+					} );
+				}
 
 				newAttributes[ clientId ] = newBlockAttributes;
 			} );
@@ -56,6 +82,7 @@ export default function BlockSupportToolsPanel( { children, group, label } ) {
 			getBlockAttributes,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
+			isStylePanel,
 			panelId,
 			updateBlockAttributes,
 		]

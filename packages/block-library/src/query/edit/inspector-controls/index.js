@@ -6,7 +6,6 @@ import {
 	SelectControl,
 	Notice,
 	__experimentalVStack as VStack,
-	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
@@ -16,6 +15,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import { debounce } from '@wordpress/compose';
 import { useState, useMemo } from '@wordpress/element';
+import { InspectorControls } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -37,10 +37,9 @@ import {
 	useTaxonomies,
 	useOrderByOptions,
 } from '../../utils';
-import { useToolsPanelDropdownMenuProps } from '../../../utils/hooks';
 
 export default function QueryInspectorControls( props ) {
-	const { attributes, setQuery, isSingular } = props;
+	const { attributes, setQuery, isSingular, clientId } = props;
 	const { query } = attributes;
 	const {
 		order,
@@ -177,7 +176,6 @@ export default function QueryInspectorControls( props ) {
 		showSearchControl ||
 		showParentControl ||
 		showFormatControl;
-	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const showPostCountControl = isControlAllowed(
 		allowedControls,
@@ -196,25 +194,24 @@ export default function QueryInspectorControls( props ) {
 	return (
 		<>
 			{ showSettingsPanel && (
-				<ToolsPanel
-					label={ __( 'Settings' ) }
-					resetAll={ () => {
-						setQuery( {
-							postType: 'post',
-							order: 'desc',
-							orderBy: 'date',
-							sticky: '',
-							inherit: true,
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
+				<InspectorControls
+					group="settings"
+					resetAllFilter={ () => ( {
+						postType: 'post',
+						order: 'desc',
+						orderBy: 'date',
+						sticky: '',
+						inherit: true,
+					} ) }
 				>
 					{ showInheritControl && (
 						<ToolsPanelItem
 							hasValue={ () => ! inherit }
 							label={ __( 'Query type' ) }
 							onDeselect={ () => setQuery( { inherit: true } ) }
+							resetAllFilter={ () => ( { inherit: true } ) }
 							isShownByDefault
+							panelId={ clientId }
 						>
 							<VStack spacing={ 4 }>
 								<ToggleGroupControl
@@ -265,7 +262,9 @@ export default function QueryInspectorControls( props ) {
 							hasValue={ () => postType !== 'post' }
 							label={ postTypeControlLabel }
 							onDeselect={ () => onPostTypeChange( 'post' ) }
+							resetAllFilter={ () => ( { postType: 'post' } ) }
 							isShownByDefault
+							panelId={ clientId }
 						>
 							{ postTypesSelectOptions.length > 2 ? (
 								<SelectControl
@@ -308,7 +307,12 @@ export default function QueryInspectorControls( props ) {
 							onDeselect={ () =>
 								setQuery( { order: 'desc', orderBy: 'date' } )
 							}
+							resetAllFilter={ () => ( {
+								order: 'desc',
+								orderBy: 'date',
+							} ) }
 							isShownByDefault
+							panelId={ clientId }
 						>
 							<OrderControl
 								{ ...{ order, orderBy, orderByOptions } }
@@ -322,7 +326,9 @@ export default function QueryInspectorControls( props ) {
 							hasValue={ () => !! sticky }
 							label={ __( 'Sticky posts' ) }
 							onDeselect={ () => setQuery( { sticky: '' } ) }
+							resetAllFilter={ () => ( { sticky: '' } ) }
 							isShownByDefault
+							panelId={ clientId }
 						>
 							<StickyControl
 								value={ sticky }
@@ -332,23 +338,20 @@ export default function QueryInspectorControls( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
-				</ToolsPanel>
+				</InspectorControls>
 			) }
 			{ ! inherit && showDisplayPanel && (
-				<ToolsPanel
-					className="block-library-query-toolspanel__display"
-					label={ __( 'Display' ) }
-					resetAll={ () => {
-						setQuery( {
-							offset: 0,
-							pages: 0,
-						} );
-					} }
-					dropdownMenuProps={ dropdownMenuProps }
+				<InspectorControls
+					group="display"
+					resetAllFilter={ () => ( {
+						offset: 0,
+						pages: 0,
+					} ) }
 				>
 					<ToolsPanelItem
 						label={ __( 'Items per page' ) }
 						hasValue={ () => perPage > 0 }
+						panelId={ clientId }
 					>
 						<PerPageControl
 							perPage={ perPage }
@@ -360,6 +363,8 @@ export default function QueryInspectorControls( props ) {
 						label={ __( 'Offset' ) }
 						hasValue={ () => offset > 0 }
 						onDeselect={ () => setQuery( { offset: 0 } ) }
+						resetAllFilter={ () => ( { offset: 0 } ) }
+						panelId={ clientId }
 					>
 						<OffsetControl
 							offset={ offset }
@@ -370,26 +375,26 @@ export default function QueryInspectorControls( props ) {
 						label={ __( 'Max pages to show' ) }
 						hasValue={ () => pages > 0 }
 						onDeselect={ () => setQuery( { pages: 0 } ) }
+						resetAllFilter={ () => ( { pages: 0 } ) }
+						panelId={ clientId }
 					>
 						<PagesControl pages={ pages } onChange={ setQuery } />
 					</ToolsPanelItem>
-				</ToolsPanel>
+				</InspectorControls>
 			) }
 			{ ! inherit && showFiltersPanel && (
-				<ToolsPanel
-					className="block-library-query-toolspanel__filters" // unused but kept for backward compatibility
-					label={ __( 'Filters' ) }
-					resetAll={ () => {
-						setQuery( {
+				<InspectorControls
+					group="query/filters"
+					resetAllFilter={ () => {
+						setQuerySearch( '' );
+						return {
 							author: '',
 							parents: [],
 							search: '',
 							taxQuery: null,
 							format: [],
-						} );
-						setQuerySearch( '' );
+						};
 					} }
-					dropdownMenuProps={ dropdownMenuProps }
 				>
 					{ showTaxControl && (
 						<ToolsPanelItem
@@ -403,6 +408,8 @@ export default function QueryInspectorControls( props ) {
 								)
 							}
 							onDeselect={ () => setQuery( { taxQuery: null } ) }
+							resetAllFilter={ () => ( { taxQuery: null } ) }
+							panelId={ clientId }
 						>
 							<TaxonomyControls
 								onChange={ setQuery }
@@ -415,6 +422,8 @@ export default function QueryInspectorControls( props ) {
 							hasValue={ () => !! authorIds }
 							label={ __( 'Authors' ) }
 							onDeselect={ () => setQuery( { author: '' } ) }
+							resetAllFilter={ () => ( { author: '' } ) }
+							panelId={ clientId }
 						>
 							<AuthorControl
 								value={ authorIds }
@@ -430,6 +439,8 @@ export default function QueryInspectorControls( props ) {
 								setQuery( { search: '' } );
 								setQuerySearch( '' );
 							} }
+							resetAllFilter={ () => ( { search: '' } ) }
+							panelId={ clientId }
 						>
 							<TextControl
 								__next40pxDefaultSize
@@ -447,6 +458,8 @@ export default function QueryInspectorControls( props ) {
 							hasValue={ () => !! parents?.length }
 							label={ __( 'Parents' ) }
 							onDeselect={ () => setQuery( { parents: [] } ) }
+							resetAllFilter={ () => ( { parents: [] } ) }
+							panelId={ clientId }
 						>
 							<ParentControl
 								parents={ parents }
@@ -460,6 +473,8 @@ export default function QueryInspectorControls( props ) {
 							hasValue={ () => !! format?.length }
 							label={ __( 'Formats' ) }
 							onDeselect={ () => setQuery( { format: [] } ) }
+							resetAllFilter={ () => ( { format: [] } ) }
+							panelId={ clientId }
 						>
 							<FormatControls
 								onChange={ setQuery }
@@ -467,7 +482,7 @@ export default function QueryInspectorControls( props ) {
 							/>
 						</ToolsPanelItem>
 					) }
-				</ToolsPanel>
+				</InspectorControls>
 			) }
 		</>
 	);

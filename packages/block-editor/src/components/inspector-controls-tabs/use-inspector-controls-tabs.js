@@ -42,8 +42,11 @@ export default function useInspectorControlsTabs(
 		content: contentGroup,
 		default: defaultGroup,
 		dimensions: dimensionsGroup,
+		display: displayGroup,
 		list: listGroup,
+		media: mediaGroup,
 		position: positionGroup,
+		settings: settingsGroup,
 		styles: stylesGroup,
 		typography: typographyGroup,
 		effects: effectsGroup,
@@ -80,6 +83,9 @@ export default function useInspectorControlsTabs(
 
 	const settingsFills = [
 		...( useSlotFills( defaultGroup.name ) || [] ),
+		...( useSlotFills( settingsGroup.name ) || [] ),
+		...( useSlotFills( displayGroup.name ) || [] ),
+		...( useSlotFills( mediaGroup.name ) || [] ),
 		...( useSlotFills( positionGroup.name ) || [] ),
 		...( hasListFills && hasStyleFills > 1 ? advancedFills : [] ),
 	];
