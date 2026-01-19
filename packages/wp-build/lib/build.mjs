@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
+import { readFile, writeFile, copyFile, mkdir, unlink, stat } from 'fs/promises';
 import path from 'path';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
@@ -699,18 +699,21 @@ async function inferStyleDependencies( scriptDependencies, packageName ) {
 
 			// ONLY include if it has wpScript: true (which means it builds styles)
 			if ( depPackageJson.wpScript === true ) {
-				// Double-check the style file actually exists
-				const styleFile = path.join(
-					BUILD_DIR,
-					'styles',
+				// Double-check the package has build-style directory (will be registered)
+				// Checking just for the output file isn't sufficient since packages
+				// may have orphaned build outputs without proper source setup
+				const buildStyleDir = path.join(
+					PACKAGES_DIR,
 					shortName,
-					'style.css'
+					'build-style'
 				);
 				try {
-					await readFile( styleFile );
-					styleDeps.push( scriptHandle );
+					const stats = await stat( buildStyleDir );
+					if ( stats.isDirectory() ) {
+						styleDeps.push( scriptHandle );
+					}
 				} catch {
-					// Style file doesn't exist, skip it
+					// build-style directory doesn't exist, skip it
 				}
 			}
 		} catch {
