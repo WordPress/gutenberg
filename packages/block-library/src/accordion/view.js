@@ -25,6 +25,13 @@ const { actions } = store(
 				);
 				return accordionItem?.isOpen ? null : 'until-found';
 			},
+			get panelRole() {
+				const { id, accordionItems } = getContext();
+				const accordionItem = accordionItems.find(
+					( item ) => item.id === id
+				);
+				return accordionItem?.isOpen ? 'region' : null;
+			},
 		},
 		actions: {
 			toggle: () => {
