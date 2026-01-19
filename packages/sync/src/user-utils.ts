@@ -15,7 +15,7 @@ const COLOR_PALETTE = [
 	'#37C5F0', // cyan
 ];
 
-const LOCAL_STORAGE_KEY = 'gutenberg-rtc-preferred-color';
+const LOCAL_STORAGE_KEY = 'GUTENBERG_PREFERRED_COLOR_KEY';
 
 /**
  * Generate a random integer between min and max, inclusive.
