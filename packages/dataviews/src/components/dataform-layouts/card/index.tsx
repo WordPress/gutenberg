@@ -13,6 +13,7 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
@@ -213,6 +214,7 @@ export default function FormCardField< Item >( {
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedCardLayout;
+	const cardBodyRef = useRef< HTMLDivElement >( null );
 
 	const form: NormalizedForm = useMemo(
 		() => ( {
@@ -223,6 +225,22 @@ export default function FormCardField< Item >( {
 	);
 
 	const { isOpen, CardHeader, touched } = useCardHeader( layout );
+
+	// When the card is expanded after being touched (collapsed with errors),
+	// trigger reportValidity to show field-level errors.
+	// This matches the pattern from the "Showing Errors At Arbitrary Times" story.
+	useEffect( () => {
+		if ( isOpen && touched && cardBodyRef.current ) {
+			// Trigger reportValidity on each input within the card to fire the
+			// 'invalid' event, which makes validated controls show errors.
+			const inputs = cardBodyRef.current.querySelectorAll(
+				'input, textarea, select, fieldset'
+			);
+			inputs.forEach( ( input ) => {
+				( input as HTMLInputElement ).reportValidity();
+			} );
+		}
+	}, [ isOpen, touched ] );
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
 
@@ -298,6 +316,7 @@ export default function FormCardField< Item >( {
 					<CardBody
 						size={ sizeCardBody }
 						className="dataforms-layouts-card__field-control"
+						ref={ cardBodyRef }
 					>
 						{ field.description && (
 							<div className="dataforms-layouts-card__field-description">
@@ -365,15 +384,17 @@ export default function FormCardField< Item >( {
 					size={ sizeCardBody }
 					className="dataforms-layouts-card__field-control"
 				>
-					<RegularLayout
-						data={ data }
-						field={ field }
-						onChange={ onChange }
-						hideLabelFromVision={
-							hideLabelFromVision || withHeader
-						}
-						validity={ validity }
-					/>
+					<div ref={ cardBodyRef }>
+						<RegularLayout
+							data={ data }
+							field={ field }
+							onChange={ onChange }
+							hideLabelFromVision={
+								hideLabelFromVision || withHeader
+							}
+							validity={ validity }
+						/>
+					</div>
 				</CardBody>
 			) }
 		</Card>
