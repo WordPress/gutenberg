@@ -14,16 +14,10 @@
  *
  * @return string Returns the block markup.
  */
-function render_block_core_slider_track( $attributes, $content, $block ) {
+function render_block_core_slider_track( $attributes, $content ) {
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class'              => 'wp-block-slider-track',
-			'data-wp-context'    => wp_json_encode(
-				array(
-					'currentIndex' => 0,
-					'totalSlides'  => count( $block->inner_blocks ),
-				)
-			),
 			'data-wp-on--scroll' => 'actions.handleScroll',
 			'data-wp-init'       => 'callbacks.initTrack',
 			'data-wp-watch'      => 'callbacks.updateTrack',

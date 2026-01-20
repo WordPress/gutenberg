@@ -16,11 +16,26 @@
  */
 function render_block_core_slider( $attributes, $content, $block ) {
 	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	unset( $attributes, $block );
+	unset( $attributes );
+
+	// Find the slider-track to get slide count
+	$slide_count = 0;
+	foreach ( $block->inner_blocks as $inner_block ) {
+		if ( 'core/slider-track' === $inner_block->name ) {
+			$slide_count = count( $inner_block->inner_blocks );
+			break;
+		}
+	}
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'data-wp-interactive' => 'core/slider',
+			'data-wp-context'     => wp_json_encode(
+				array(
+					'currentIndex' => 0,
+					'totalSlides'  => $slide_count,
+				)
+			),
 		)
 	);
 

@@ -107,8 +107,9 @@ store( 'core/slider', {
 			const context = getContext();
 			const { ref } = getElement();
 
-			// Context is already initialized from PHP with currentIndex and totalSlides
-			// Just set up accessibility and keyboard navigation
+			// Update totalSlides from actual DOM (in case it differs from PHP count)
+			const slides = ref.querySelectorAll( '.wp-block-slide' );
+			context.totalSlides = slides.length;
 
 			// Add ARIA attributes
 			ref.setAttribute( 'tabindex', '0' );
