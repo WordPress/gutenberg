@@ -41,6 +41,16 @@ function PostEditForm( { postType, postId } ) {
 	const history = useHistory();
 	const { path } = useLocation();
 	const formRef = useRef( null );
+	const containerRef = useRef( null );
+	const previousFocusRef = useRef( null );
+
+	// Store the element to restore focus to when closing.
+	useEffect( () => {
+		if ( containerRef.current ) {
+			previousFocusRef.current =
+				containerRef.current.ownerDocument.activeElement;
+		}
+	}, [ postId ] );
 
 	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
@@ -195,6 +205,10 @@ function PostEditForm( { postType, postId } ) {
 	}, [ fields, settings ] );
 
 	const closeQuickEdit = () => {
+		// Restore focus to the element that opened QuickEdit.
+		if ( previousFocusRef.current ) {
+			previousFocusRef.current.focus();
+		}
 		history.navigate(
 			addQueryArgs( path, {
 				quickEdit: undefined,
@@ -203,7 +217,7 @@ function PostEditForm( { postType, postId } ) {
 	};
 
 	return (
-		<VStack spacing={ 4 }>
+		<VStack ref={ containerRef } spacing={ 4 }>
 			<PostCardPanel
 				postType={ postType }
 				postId={ ids }
