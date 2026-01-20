@@ -83,6 +83,7 @@ const REVISION_DIFF_STYLES = `
 	.revision-diff-added {
 		background-color: color-mix(in srgb, currentColor 5%, #00a32a 15%);
 		color: color-mix(in srgb, currentColor 50%, #006400 50%);
+		text-decoration: none;
 	}
 	.revision-diff-format-added {
 		text-decoration: underline wavy color-mix(in srgb, currentColor 30%, #00a32a 70%);
