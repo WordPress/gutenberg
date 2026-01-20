@@ -77,6 +77,9 @@ export function SuggestionsList<
 			.normalize( 'NFKC' )
 			.toLocaleLowerCase()
 			.indexOf( matchText );
+		if ( indexOfMatch < 0 ) {
+			return null;
+		}
 
 		return {
 			suggestionBeforeMatch: transformedSuggestion.substring(

@@ -516,14 +516,18 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			match = match.normalize( 'NFKC' ).toLocaleLowerCase();
 
 			_suggestions.forEach( ( suggestion ) => {
-				const index = suggestion
+				const normalizedSuggestion = suggestion
 					.normalize( 'NFKC' )
-					.toLocaleLowerCase()
-					.indexOf( match );
+					.toLocaleLowerCase();
+				const normalizedSuggestionLabel = displayTransform( suggestion )
+					.normalize( 'NFKC' )
+					.toLocaleLowerCase();
+				const index = normalizedSuggestion.indexOf( match );
+				const labelIndex = normalizedSuggestionLabel.indexOf( match );
 				if ( normalizedValue.indexOf( suggestion ) === -1 ) {
-					if ( index === 0 ) {
+					if ( index === 0 || labelIndex === 0 ) {
 						startsWithMatch.push( suggestion );
-					} else if ( index > 0 ) {
+					} else if ( index > 0 || labelIndex > 0 ) {
 						containsMatch.push( suggestion );
 					}
 				}

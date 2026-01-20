@@ -158,7 +158,8 @@ const data: DataType[] = [
 		mediaWithElements:
 			'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
 		array: [ 'item1', 'item2', 'item3' ],
-		arrayWithElements: [ 'item1', 'item2', 'item3' ],
+		// Use short values here so it's easy to verify searching by value still works.
+		arrayWithElements: [ 'a', 'b', 'item3' ],
 		notype: 'No type',
 		notypeWithElements: 'No type',
 		priceWithPrefix: '25.99',
@@ -461,8 +462,8 @@ const fields: Field< DataType >[] = [
 		label: 'Array (with elements)',
 		description: 'Help for array with elements.',
 		elements: [
-			{ value: 'item1', label: 'Item 1' },
-			{ value: 'item2', label: 'Item 2' },
+			{ value: 'a', label: 'Item 1' },
+			{ value: 'b', label: 'Item 2' },
 			{ value: 'item3', label: 'Item 3' },
 		],
 	},
