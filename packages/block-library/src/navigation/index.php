@@ -1151,9 +1151,9 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		$tags->set_attribute( 'tabindex', '-1' );
 
 		$effective_visibility = block_core_navigation_get_submenu_visibility( $block_attributes );
-		$open_on_click        = 'click' === $effective_visibility;
+		$open_on_hover        = 'hover' === $effective_visibility;
 
-		if ( ! $open_on_click && 'always' !== $effective_visibility ) {
+		if ( $open_on_hover && 'always' !== $effective_visibility ) {
 			$tags->set_attribute( 'data-wp-on--mouseenter', 'actions.openMenuOnHover' );
 			$tags->set_attribute( 'data-wp-on--mouseleave', 'actions.closeMenuOnHover' );
 		}
@@ -1165,12 +1165,9 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 				'class_name' => 'wp-block-navigation-submenu__toggle',
 			)
 		) ) {
-			// Don't add interactive directives when submenus are always visible.
-			if ( 'always' !== $effective_visibility ) {
-				$tags->set_attribute( 'data-wp-on--click', 'actions.toggleMenuOnClick' );
-				$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isMenuOpen' );
-				// The `aria-expanded` attribute for SSR is already added in the submenu block.
-			}
+			$tags->set_attribute( 'data-wp-on--click', 'actions.toggleMenuOnClick' );
+			$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isMenuOpen' );
+			// The `aria-expanded` attribute for SSR is already added in the submenu block.
 		}
 		// Add directives to the submenu.
 		if ( $tags->next_tag(
