@@ -148,7 +148,12 @@ function pairSimilarBlocks( blocks ) {
 				rem.block.innerHTML || '',
 				add.block.innerHTML || ''
 			);
-			if ( score > bestScore && score > SIMILARITY_THRESHOLD ) {
+			// Only pair if similar but not identical - identical blocks are just moved.
+			if (
+				score > bestScore &&
+				score > SIMILARITY_THRESHOLD &&
+				score < 1
+			) {
 				bestScore = score;
 				bestMatch = add;
 			}

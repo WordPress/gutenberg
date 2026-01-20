@@ -358,6 +358,86 @@ describe( 'diffRevisionContent', () => {
 		expect( blocks ).toEqual( [] );
 	} );
 
+	it( 'handles two blocks that swapped positions', () => {
+		const previous = serialize( [
+			createBlock( 'core/paragraph', { content: 'First block content' } ),
+			createBlock( 'core/paragraph', {
+				content: 'Second block content',
+			} ),
+		] );
+		const current = serialize( [
+			createBlock( 'core/paragraph', {
+				content: 'Second block content',
+			} ),
+			createBlock( 'core/paragraph', { content: 'First block content' } ),
+		] );
+		const blocks = diffRevisionContent( current, previous );
+
+		// LCS matches one block ("First block content" at prev[0] -> curr[1]).
+		// The other block appears as removed + added (showing the reorder).
+		// We intentionally don't pair identical blocks as "modified" since
+		// there's no actual content change - just a position change.
+		expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Second block content',
+					__revisionDiffStatus: 'added',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'First block content',
+					__revisionDiffStatus: undefined,
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Second block content',
+					__revisionDiffStatus: 'removed',
+				},
+			},
+		] );
+	} );
+
+	it( 'handles block move with a tiny change', () => {
+		const previous = serialize( [
+			createBlock( 'core/paragraph', { content: 'First block content' } ),
+			createBlock( 'core/paragraph', {
+				content: 'Second block content',
+			} ),
+		] );
+		const current = serialize( [
+			createBlock( 'core/paragraph', {
+				content: 'Second block content modified',
+			} ),
+			createBlock( 'core/paragraph', { content: 'First block content' } ),
+		] );
+		const blocks = diffRevisionContent( current, previous );
+
+		// The moved+modified block is correctly paired and shows inline diff.
+		// The unchanged block remains unmarked.
+		expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'Second block content<ins title="Added" class="revision-diff-added"> modified</ins>',
+					__revisionDiffStatus: 'modified',
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'First block content',
+					__revisionDiffStatus: undefined,
+				},
+			},
+		] );
+	} );
+
 	describe( 'inner blocks', () => {
 		it( 'handles deeply nested inner blocks', () => {
 			const previous = serialize( [
