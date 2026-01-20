@@ -475,7 +475,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 	} elseif ( 'grid' === $layout_type ) {
 		// Deal with block gap first so it can be used for responsive computation.
-		$responsive_gap_value = $fallback_gap_value;
+		$responsive_gap_value = $fallback_gap_value || '1.2rem';
 		if ( $has_block_gap_support && isset( $gap_value ) ) {
 			$combined_gap_value = '';
 			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
@@ -876,8 +876,16 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		// Check block-specific styles first, then fall back to root styles.
 		$block_name                   = $block['blockName'] ?? '';
 		$block_specific_global_styles = gutenberg_get_global_styles( array( 'blocks', $block_name, 'spacing', 'blockGap' ) );
-		$global_block_gap_value       = ! empty( $block_specific_global_styles ) ? $block_specific_global_styles : gutenberg_get_global_styles( array( 'spacing', 'blockGap' ) );
-		if ( ! empty( $global_block_gap_value ) ) {
+		// If the value is an array, use the first value.
+		if ( is_array( $block_specific_global_styles ) ) {
+			$block_specific_global_styles = $block_specific_global_styles['top'] ?? null;
+		}
+		$global_block_gap_value = $block_specific_global_styles ?? gutenberg_get_global_styles( array( 'spacing', 'blockGap' ) );
+		// If the value is an array, use the first value.
+		if ( is_array( $global_block_gap_value ) ) {
+			$global_block_gap_value = $global_block_gap_value['top'] ?? null;
+		}
+		if ( null !== $global_block_gap_value ) {
 			$fallback_gap_value = $global_block_gap_value;
 		}
 
