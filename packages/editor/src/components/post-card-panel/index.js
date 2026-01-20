@@ -35,12 +35,14 @@ const { Badge } = unlock( componentsPrivateApis );
  * @param {string}          [props.postType]          - The post type string.
  * @param {string|string[]} [props.postId]            - The post id or list of post ids.
  * @param {Function}        [props.onActionPerformed] - A callback function for when a quick action is performed.
+ * @param {React.ReactNode} [props.actions]           - Additional actions to render in the header.
  * @return {React.ReactNode} The rendered component.
  */
 export default function PostCardPanel( {
 	postType,
 	postId,
 	onActionPerformed,
+	actions,
 } ) {
 	const postIds = useMemo(
 		() => ( Array.isArray( postId ) ? postId : [ postId ] ),
@@ -125,6 +127,7 @@ export default function PostCardPanel( {
 						onActionPerformed={ onActionPerformed }
 					/>
 				) }
+				{ actions }
 			</HStack>
 			{ postIds.length > 1 && (
 				<Text className="editor-post-card-panel__description">

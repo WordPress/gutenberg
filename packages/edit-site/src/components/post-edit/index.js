@@ -11,8 +11,11 @@ import { __ } from '@wordpress/i18n';
 import { DataForm } from '@wordpress/dataviews';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import { Button, __experimentalVStack as VStack } from '@wordpress/components';
 import { useState, useMemo, useEffect } from '@wordpress/element';
+import { closeSmall } from '@wordpress/icons';
+import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { addQueryArgs } from '@wordpress/url';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -23,6 +26,7 @@ import { unlock } from '../../lock-unlock';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 
 const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 const fieldsWithBulkEditSupport = [
 	'title',
@@ -34,6 +38,8 @@ const fieldsWithBulkEditSupport = [
 
 function PostEditForm( { postType, postId } ) {
 	const ids = useMemo( () => postId.split( ',' ), [ postId ] );
+	const history = useHistory();
+	const { path } = useLocation();
 	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
 			const args = [ 'postType', postType, ids[ 0 ] ];
@@ -174,9 +180,28 @@ function PostEditForm( { postType, postId } ) {
 		} );
 	}, [ fields, settings ] );
 
+	const closeQuickEdit = () => {
+		history.navigate(
+			addQueryArgs( path, {
+				quickEdit: undefined,
+			} )
+		);
+	};
+
 	return (
 		<VStack spacing={ 4 }>
-			<PostCardPanel postType={ postType } postId={ ids } />
+			<PostCardPanel
+				postType={ postType }
+				postId={ ids }
+				actions={
+					<Button
+						size="small"
+						icon={ closeSmall }
+						label={ __( 'Close' ) }
+						onClick={ closeQuickEdit }
+					/>
+				}
+			/>
 			{ hasFinishedResolution && (
 				<DataForm
 					data={ ids.length === 1 ? record : multiEdits }
