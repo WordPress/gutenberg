@@ -15,7 +15,8 @@
 	"supports": {
 		"anchor": false,
 		"html": false,
-		"reusable": false
+		"reusable": false,
+		"listView": true
 	},
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
