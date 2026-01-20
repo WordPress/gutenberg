@@ -1,6 +1,71 @@
 /**
+ * WordPress dependencies
+ */
+import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
+import { useState, useCallback, useMemo } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
-export { default as usePostRevisions } from './use-post-revisions';
-export { default as RevisionsHeader } from './revisions-header';
-export { default as RevisionsCanvas } from './revisions-canvas';
+import usePostRevisions from './use-post-revisions';
+import RevisionsHeader from './revisions-header';
+import RevisionsCanvas from './revisions-canvas';
+
+export { usePostRevisions, RevisionsHeader, RevisionsCanvas };
+
+/**
+ * Revisions mode interface component.
+ * Manages revision selection state and renders the revisions UI.
+ *
+ * @param {Object} props           Component props.
+ * @param {string} props.className Additional class name for the interface.
+ * @return {JSX.Element} The revisions interface component.
+ */
+export function RevisionsInterface( props ) {
+	const { revisions, isLoading: isRevisionsLoading } = usePostRevisions();
+	const [ selectedRevisionIndex, setSelectedRevisionIndex ] = useState( 0 );
+	const [ showDiff, setShowDiff ] = useState( true );
+
+	// Sort revisions by date (newest first) and memoize.
+	const sortedRevisions = useMemo( () => {
+		if ( ! revisions.length ) {
+			return [];
+		}
+		return [ ...revisions ].sort(
+			( a, b ) => new Date( b.date ) - new Date( a.date )
+		);
+	}, [ revisions ] );
+
+	const selectedRevision = sortedRevisions[ selectedRevisionIndex ] || null;
+	const previousRevision =
+		sortedRevisions[ selectedRevisionIndex + 1 ] || null;
+
+	const handleSelectRevisionIndex = useCallback( ( index ) => {
+		setSelectedRevisionIndex( index );
+	}, [] );
+
+	return (
+		<InterfaceSkeleton
+			{ ...props }
+			header={
+				<RevisionsHeader
+					revisions={ sortedRevisions }
+					selectedRevision={ selectedRevision }
+					selectedIndex={ selectedRevisionIndex }
+					onSelectIndex={ handleSelectRevisionIndex }
+					isLoading={ isRevisionsLoading }
+					showDiff={ showDiff }
+					onToggleDiff={ () => setShowDiff( ! showDiff ) }
+				/>
+			}
+			content={
+				<RevisionsCanvas
+					revision={ selectedRevision }
+					previousRevision={ previousRevision }
+					showDiff={ showDiff }
+				/>
+			}
+			sidebar={ <ComplementaryArea.Slot scope="core" /> }
+		/>
+	);
+}

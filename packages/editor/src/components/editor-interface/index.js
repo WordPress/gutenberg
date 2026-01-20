@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { useState, useCallback, useMemo } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -24,11 +24,7 @@ import EditorNotices from '../editor-notices';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
-import {
-	usePostRevisions,
-	RevisionsHeader,
-	RevisionsCanvas,
-} from '../post-revisions-preview';
+import { RevisionsInterface } from '../post-revisions-preview';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
@@ -132,54 +128,12 @@ export default function EditorInterface( {
 		[ entitiesSavedStatesCallback ]
 	);
 
-	// Revisions mode state management.
-	const { revisions, isLoading: isRevisionsLoading } = usePostRevisions();
-	const [ selectedRevisionIndex, setSelectedRevisionIndex ] = useState( 0 );
-	const [ showDiff, setShowDiff ] = useState( true );
-
-	// Sort revisions by date (newest first) and memoize.
-	const sortedRevisions = useMemo( () => {
-		if ( ! revisions.length ) {
-			return [];
-		}
-		return [ ...revisions ].sort(
-			( a, b ) => new Date( b.date ) - new Date( a.date )
-		);
-	}, [ revisions ] );
-
-	const selectedRevision = sortedRevisions[ selectedRevisionIndex ] || null;
-	const previousRevision =
-		sortedRevisions[ selectedRevisionIndex + 1 ] || null;
-
-	const handleSelectRevisionIndex = useCallback( ( index ) => {
-		setSelectedRevisionIndex( index );
-	}, [] );
-
-	// When in revisions mode, render with separate header and content.
+	// When in revisions mode, render the revisions interface.
 	if ( isRevisionsMode ) {
 		return (
-			<InterfaceSkeleton
+			<RevisionsInterface
 				className={ clsx( 'editor-editor-interface', className ) }
 				labels={ interfaceLabels }
-				header={
-					<RevisionsHeader
-						revisions={ sortedRevisions }
-						selectedRevision={ selectedRevision }
-						selectedIndex={ selectedRevisionIndex }
-						onSelectIndex={ handleSelectRevisionIndex }
-						isLoading={ isRevisionsLoading }
-						showDiff={ showDiff }
-						onToggleDiff={ () => setShowDiff( ! showDiff ) }
-					/>
-				}
-				content={
-					<RevisionsCanvas
-						revision={ selectedRevision }
-						previousRevision={ previousRevision }
-						showDiff={ showDiff }
-					/>
-				}
-				sidebar={ <ComplementaryArea.Slot scope="core" /> }
 			/>
 		);
 	}
