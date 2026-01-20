@@ -88,7 +88,6 @@ export async function createAwareness(
 	if ( objectId && objectType.startsWith( 'postType/' ) ) {
 		const awareness = new PostEditorAwarenessState( ydoc );
 
-		// TODO: Is there still a need to memoize the current user?
 		const currentUser = await recordHandlers.getCurrentUser();
 		const userInfo = getUserInfo( awareness, currentUser );
 
