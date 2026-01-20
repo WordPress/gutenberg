@@ -1,27 +1,15 @@
 .wp-block-slider-controls {
-	position: absolute;
-	top: 50%;
-	left: 0;
-	right: 0;
-	transform: translateY(-50%);
-	z-index: 10;
-	padding: 0 16px;
-	pointer-events: none;
-
+	// Controls use normal flow - positioning is up to the user via layout options
 	// The buttons wrapper needs space-between layout
 	.wp-block-buttons {
 		justify-content: space-between;
 		width: 100%;
 	}
 
-	// Style the actual button wrappers
+	// Disabled state styling
 	.wp-block-slider-controls__previous,
 	.wp-block-slider-controls__next {
-		pointer-events: auto;
-
-		// Style the button/link inside
 		.wp-block-button__link {
-
 			&:disabled {
 				filter: brightness(0.7);
 				cursor: not-allowed;
