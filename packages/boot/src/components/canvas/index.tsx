@@ -68,8 +68,7 @@ export default function Canvas( { canvas }: CanvasProps ) {
 		<div style={ { height: '100%', position: 'relative' } }>
 			<div
 				style={ { height: '100%' } }
-				// @ts-expect-error inert not typed properly
-				inert={ canvas.isPreview ? 'true' : undefined }
+				inert={ canvas.isPreview ? true : undefined }
 			>
 				<Editor
 					postType={ canvas.postType }

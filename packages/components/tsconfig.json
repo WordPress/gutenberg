@@ -3,6 +3,7 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"types": [
+			"react/experimental",
 			"gutenberg-env",
 			"gutenberg-test-env",
 			"css-modules",

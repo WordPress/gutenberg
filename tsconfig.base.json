@@ -31,7 +31,7 @@
 		"resolveJsonModule": true,
 
 		"typeRoots": [ "./typings", "./node_modules/@types" ],
-		"types": [],
+		"types": [ "react/experimental" ],
 
 		"rootDir": "${configDir}/src",
 		"declarationDir": "${configDir}/build-types"

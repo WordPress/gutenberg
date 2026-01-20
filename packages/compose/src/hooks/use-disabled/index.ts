@@ -52,7 +52,7 @@ export default function useDisabled( {
 						return;
 					}
 					if ( ! child.getAttribute( 'inert' ) ) {
-						child.setAttribute( 'inert', 'true' );
+						child.setAttribute( 'inert', '' );
 						updates.push( () => {
 							child.removeAttribute( 'inert' );
 						} );
