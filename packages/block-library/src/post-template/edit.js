@@ -51,7 +51,6 @@ function PostTemplateBlockPreview( {
 	blocks,
 	blockContextId,
 	classList,
-	isHidden,
 	setActiveBlockContextId,
 } ) {
 	const blockPreviewProps = useBlockPreview( {
@@ -65,10 +64,6 @@ function PostTemplateBlockPreview( {
 		setActiveBlockContextId( blockContextId );
 	};
 
-	const style = {
-		display: isHidden ? 'none' : undefined,
-	};
-
 	return (
 		<li
 			{ ...blockPreviewProps }
@@ -77,7 +72,6 @@ function PostTemplateBlockPreview( {
 			role="button"
 			onClick={ handleOnClick }
 			onKeyPress={ handleOnClick }
-			style={ style }
 		/>
 	);
 }
@@ -320,10 +314,6 @@ export default function PostTemplateEdit( {
 		},
 	];
 
-	// To avoid flicker when switching active block contexts, a preview is rendered
-	// for each block context, but the preview for the active block context is hidden.
-	// This ensures that when it is displayed again, the cached rendering of the
-	// block preview is used, instead of having to re-render the preview from scratch.
 	return (
 		<>
 			<BlockControls>
@@ -343,20 +333,16 @@ export default function PostTemplateEdit( {
 								<PostTemplateInnerBlocks
 									classList={ blockContext.classList }
 								/>
-							) : null }
-							<MemoizedPostTemplateBlockPreview
-								blocks={ blocks }
-								blockContextId={ blockContext.postId }
-								classList={ blockContext.classList }
-								setActiveBlockContextId={
-									setActiveBlockContextId
-								}
-								isHidden={
-									blockContext.postId ===
-									( activeBlockContextId ||
-										blockContexts[ 0 ]?.postId )
-								}
-							/>
+							) : (
+								<MemoizedPostTemplateBlockPreview
+									blocks={ blocks }
+									blockContextId={ blockContext.postId }
+									classList={ blockContext.classList }
+									setActiveBlockContextId={
+										setActiveBlockContextId
+									}
+								/>
+							) }
 						</BlockContextProvider>
 					) ) }
 			</ul>

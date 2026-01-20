@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
-import { memo, useMemo, useEffect, useId, useState } from '@wordpress/element';
+import { memo, useMemo, useEffect, useId } from '@wordpress/element';
 import { useDispatch, useRegistry } from '@wordpress/data';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
@@ -584,105 +584,80 @@ export function createBlockEditFilter( features ) {
 	addFilter( 'editor.BlockEdit', 'core/editor/hooks', withBlockEditHooks );
 }
 
-function BlockProps( {
-	index,
-	useBlockProps: hook,
-	setAllWrapperProps,
-	...props
-} ) {
-	const wrapperProps = hook( props );
-	const setWrapperProps = ( next ) =>
-		setAllWrapperProps( ( prev ) => {
-			const nextAll = [ ...prev ];
-			nextAll[ index ] = next;
-			return nextAll;
-		} );
-	// Setting state after every render is fine because this component is
-	// pure and will only re-render when needed props change.
-	useEffect( () => {
-		// We could shallow compare the props, but since this component only
-		// changes when needed attributes change, the benefit is probably small.
-		setWrapperProps( wrapperProps );
-		return () => {
-			setWrapperProps( undefined );
-		};
+function getFeatureWrapperProps( feature, props ) {
+	const { hasSupport, attributeKeys = [], useBlockProps, isMatch } = feature;
+
+	const neededProps = {};
+	for ( const key of attributeKeys ) {
+		if ( props.attributes[ key ] ) {
+			neededProps[ key ] = props.attributes[ key ];
+		}
+	}
+
+	if (
+		// Skip if none of the needed attributes are set.
+		! hasSupport( props.name )
+	) {
+		return null;
+	}
+
+	// Call the hook directly to get wrapper props
+	// eslint-disable-next-line react-hooks/rules-of-hooks
+	const wrapperProps = useBlockProps( {
+		name: props.name,
+		clientId: props.clientId,
+		...( neededProps ?? {} ),
 	} );
-	return null;
+
+	if (
+		// Skip if none of the needed attributes are set.
+		! Object.keys( neededProps ).length ||
+		( isMatch && ! isMatch( neededProps ) )
+	) {
+		return null;
+	}
+
+	return wrapperProps;
 }
 
-const BlockPropsPure = memo( BlockProps );
+export function useBlockPropsWithHooks( features, props ) {
+	// Collect all wrapper props by calling hooks directly in a loop
+	const allWrapperProps = [];
+
+	for ( let i = 0; i < features.length; i++ ) {
+		const wrapperProps = getFeatureWrapperProps( features[ i ], props );
+		allWrapperProps.push( wrapperProps );
+	}
+
+	// Merge all wrapper props
+	return allWrapperProps.filter( Boolean ).reduce( ( acc, wrapperProps ) => {
+		return {
+			...acc,
+			...wrapperProps,
+			className: clsx( acc.className, wrapperProps.className ),
+			style: {
+				...acc.style,
+				...wrapperProps.style,
+			},
+		};
+	}, props.wrapperProps || {} );
+}
 
 export function createBlockListBlockFilter( features ) {
 	const withBlockListBlockHooks = createHigherOrderComponent(
 		( BlockListBlock ) => ( props ) => {
-			const [ allWrapperProps, setAllWrapperProps ] = useState(
-				Array( features.length ).fill( undefined )
+			const mergedWrapperProps = useBlockPropsWithHooks(
+				features,
+				props
 			);
-			return [
-				...features.map( ( feature, i ) => {
-					const {
-						hasSupport,
-						attributeKeys = [],
-						useBlockProps,
-						isMatch,
-					} = feature;
 
-					const neededProps = {};
-					for ( const key of attributeKeys ) {
-						if ( props.attributes[ key ] ) {
-							neededProps[ key ] = props.attributes[ key ];
-						}
-					}
-
-					if (
-						// Skip rendering if none of the needed attributes are
-						// set.
-						! Object.keys( neededProps ).length ||
-						! hasSupport( props.name ) ||
-						( isMatch && ! isMatch( neededProps ) )
-					) {
-						return null;
-					}
-
-					return (
-						<BlockPropsPure
-							// We can use the index because the array length
-							// is fixed per page load right now.
-							key={ i }
-							index={ i }
-							useBlockProps={ useBlockProps }
-							// This component is pure, so we must pass a stable
-							// function reference.
-							setAllWrapperProps={ setAllWrapperProps }
-							name={ props.name }
-							clientId={ props.clientId }
-							// This component is pure, so only pass needed
-							// props!!!
-							{ ...neededProps }
-						/>
-					);
-				} ),
+			return (
 				<BlockListBlock
 					key="edit"
 					{ ...props }
-					wrapperProps={ allWrapperProps
-						.filter( Boolean )
-						.reduce( ( acc, wrapperProps ) => {
-							return {
-								...acc,
-								...wrapperProps,
-								className: clsx(
-									acc.className,
-									wrapperProps.className
-								),
-								style: {
-									...acc.style,
-									...wrapperProps.style,
-								},
-							};
-						}, props.wrapperProps || {} ) }
-				/>,
-			];
+					wrapperProps={ mergedWrapperProps }
+				/>
+			);
 		},
 		'withBlockListBlockHooks'
 	);
