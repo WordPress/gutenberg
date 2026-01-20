@@ -975,7 +975,7 @@ Container for slides in a slider. ([Source](https://github.com/WordPress/gutenbe
 -	**Category:** design
 -	**Parent:** core/slider
 -	**Allowed Blocks:** core/slide
--	**Supports:** listView, ~~anchor~~, ~~html~~, ~~reusable~~
+-	**Supports:** dimensions (aspectRatio, height), listView, ~~anchor~~, ~~html~~, ~~reusable~~
 
 ## Social Icon
 

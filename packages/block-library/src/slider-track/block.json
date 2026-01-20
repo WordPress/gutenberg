@@ -16,7 +16,11 @@
 		"anchor": false,
 		"html": false,
 		"reusable": false,
-		"listView": true
+		"listView": true,
+		"dimensions": {
+			"aspectRatio": true,
+			"height": true
+		}
 	},
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",

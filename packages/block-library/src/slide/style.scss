@@ -2,8 +2,9 @@
 	scroll-snap-align: start;
 	flex-shrink: 0;
 	width: 100%;
-	min-height: 400px;
+	height: 100%; // Fill the track's height
 	display: flex;
 	flex-direction: column;
 	box-sizing: border-box;
+	overflow: hidden; // Clip content that exceeds slide bounds
 }
