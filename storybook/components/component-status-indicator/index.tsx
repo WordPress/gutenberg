@@ -36,6 +36,8 @@ export function ComponentStatusIndicator() {
 	return (
 		<dl
 			style={ {
+				display: 'flex',
+				gap: '40px',
 				flexDirection: 'row',
 				marginBottom: '20px',
 				fontSize: '14px',
@@ -45,6 +47,7 @@ export function ComponentStatusIndicator() {
 				style={ {
 					display: 'flex',
 					flexDirection: 'column',
+					width: 'fit-content',
 				} }
 			>
 				<dt style={ { fontStyle: 'normal', color: '#757575' } }>
@@ -65,6 +68,7 @@ export function ComponentStatusIndicator() {
 					style={ {
 						display: 'flex',
 						flexDirection: 'column',
+						width: 'fit-content',
 					} }
 				>
 					<dt style={ { fontStyle: 'normal', color: '#757575' } }>
