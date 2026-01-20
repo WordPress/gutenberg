@@ -6,6 +6,10 @@
 
 - DataViews: Use regular casing for bulk selection count. [#74573](https://github.com/WordPress/gutenberg/pull/74573)
 
+### Code Quality
+
+- DataViews: Move filtering logic in field types. [#74733](https://github.com/WordPress/gutenberg/pull/74733)
+
 ## 11.2.0 (2026-01-16)
 
 ### Code Quality
