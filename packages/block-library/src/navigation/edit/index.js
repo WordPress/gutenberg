@@ -453,8 +453,12 @@ function Navigation( {
 
 	const navRef = useRef();
 
-	// The standard HTML5 tag for the block wrapper.
-	const TagName = 'nav';
+	// Detect if we're editing inside an overlay template part.
+	const isWithinOverlay = useSelect( () => isWithinNavigationOverlay(), [] );
+
+	// Use div wrapper if this navigation block is within an overlay template part.
+	// Otherwise, use nav as the standard HTML5 tag.
+	const TagName = isWithinOverlay ? 'div' : 'nav';
 
 	// "placeholder" shown if:
 	// - there is no ref attribute pointing to a Navigation Post.
@@ -490,9 +494,6 @@ function Navigation( {
 			),
 		[ clientId ]
 	);
-
-	// Check if this navigation block is inside an overlay template part.
-	const isWithinOverlay = useSelect( () => isWithinNavigationOverlay(), [] );
 
 	// Force overlayMenu to 'never' if within an overlay template part
 	// to prevent overlays within overlays.

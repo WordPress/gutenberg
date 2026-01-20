@@ -968,8 +968,13 @@ class WP_Navigation_Block_Renderer {
 
 		static::handle_view_script_module_loading( $attributes, $block, $inner_blocks );
 
+		// Use div wrapper if this navigation block is within an overlay template part.
+		$is_within_overlay = $attributes['_isWithinOverlayTemplatePart'] ?? false;
+		$tag_name          = $is_within_overlay ? 'div' : 'nav';
+
 		return sprintf(
-			'<nav %1$s>%2$s</nav>',
+			'<%1$s %2$s>%3$s</%1$s>',
+			$tag_name,
 			static::get_nav_attributes( $attributes, $inner_blocks ),
 			static::get_inner_block_markup( $attributes, $inner_blocks )
 		);
