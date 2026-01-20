@@ -33,13 +33,11 @@ export default function RevisionsCanvas() {
 		};
 	}, [] );
 
-	// Parse revision content into blocks.
-	const blocks = useMemo( () => {
-		const currentContent = revision?.content?.raw || '';
-		return parse( currentContent );
-	}, [ revision?.content?.raw ] );
+	const blocks = useMemo(
+		() => parse( revision?.content?.raw ?? '' ),
+		[ revision?.content?.raw ]
+	);
 
-	// Modify settings to enable preview mode.
 	const settings = useMemo(
 		() => ( {
 			...blockEditorSettings,
@@ -48,20 +46,13 @@ export default function RevisionsCanvas() {
 		[ blockEditorSettings ]
 	);
 
-	return (
-		<>
-			{ revision ? (
-				<ExperimentalBlockEditorProvider
-					value={ blocks }
-					settings={ settings }
-				>
-					<VisualEditor />
-				</ExperimentalBlockEditorProvider>
-			) : (
-				<div className="editor-revisions-canvas__loading">
-					<Spinner />
-				</div>
-			) }
-		</>
+	return revision ? (
+		<ExperimentalBlockEditorProvider value={ blocks } settings={ settings }>
+			<VisualEditor />
+		</ExperimentalBlockEditorProvider>
+	) : (
+		<div className="editor-revisions-canvas__loading">
+			<Spinner />
+		</div>
 	);
 }
