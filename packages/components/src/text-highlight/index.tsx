@@ -42,6 +42,4 @@ export const TextHighlight = ( props: TextHighlightProps ) => {
 	} );
 };
 
-TextHighlight.displayName = 'TextHighlight';
-
 export default TextHighlight;

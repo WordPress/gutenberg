@@ -239,7 +239,5 @@ function BoxControl( {
 	);
 }
 
-BoxControl.displayName = 'BoxControl';
-
 export { applyValueToSides } from './utils';
 export default BoxControl;

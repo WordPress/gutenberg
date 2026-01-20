@@ -158,6 +158,5 @@ export function RadioControl(
 		</fieldset>
 	);
 }
-RadioControl.displayName = 'RadioControl';
 
 export default RadioControl;

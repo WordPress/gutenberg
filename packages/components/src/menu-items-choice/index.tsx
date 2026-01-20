@@ -81,6 +81,4 @@ function MenuItemsChoice( {
 	);
 }
 
-MenuItemsChoice.displayName = 'MenuItemsChoice';
-
 export default MenuItemsChoice;

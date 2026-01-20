@@ -137,5 +137,4 @@ export function DropZoneComponent( {
 	);
 }
 
-DropZoneComponent.displayName = 'DropZone';
 export default DropZoneComponent;

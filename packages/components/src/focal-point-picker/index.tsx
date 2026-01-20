@@ -291,6 +291,4 @@ export function FocalPointPicker( {
 	);
 }
 
-FocalPointPicker.displayName = 'FocalPointPicker';
-
 export default FocalPointPicker;

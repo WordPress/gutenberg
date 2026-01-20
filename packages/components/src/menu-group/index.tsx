@@ -59,6 +59,5 @@ export function MenuGroup( props: MenuGroupProps ) {
 		</div>
 	);
 }
-MenuGroup.displayName = 'MenuGroup';
 
 export default MenuGroup;

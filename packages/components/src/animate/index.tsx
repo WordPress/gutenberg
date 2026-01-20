@@ -69,6 +69,4 @@ export function Animate( { type, options = {}, children }: AnimateProps ) {
 	} );
 }
 
-Animate.displayName = 'Animate';
-
 export default Animate;

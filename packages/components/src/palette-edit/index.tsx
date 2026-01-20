@@ -629,6 +629,4 @@ export function PaletteEdit( {
 	);
 }
 
-PaletteEdit.displayName = 'PaletteEdit';
-
 export default PaletteEdit;

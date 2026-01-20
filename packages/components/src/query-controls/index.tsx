@@ -201,6 +201,4 @@ export function QueryControls( {
 	);
 }
 
-QueryControls.displayName = 'QueryControls';
-
 export default QueryControls;

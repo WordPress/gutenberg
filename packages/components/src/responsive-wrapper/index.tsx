@@ -63,5 +63,4 @@ function ResponsiveWrapper( {
 	);
 }
 
-ResponsiveWrapper.displayName = 'ResponsiveWrapper';
 export default ResponsiveWrapper;

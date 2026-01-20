@@ -83,6 +83,5 @@ export function FormFileUpload( {
 		</div>
 	);
 }
-FormFileUpload.displayName = 'FormFileUpload';
 
 export default FormFileUpload;
