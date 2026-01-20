@@ -4,38 +4,48 @@
 	left: 0;
 	right: 0;
 	transform: translateY(-50%);
-	display: flex;
-	justify-content: space-between;
-	pointer-events: none;
 	z-index: 10;
 	padding: 0 16px;
-}
+	pointer-events: none;
 
-.wp-block-slider-controls__button {
-	pointer-events: auto;
-	background: rgba(255, 255, 255, 0.9);
-	border: 1px solid rgba(0, 0, 0, 0.1);
-	border-radius: 50%;
-	width: 40px;
-	height: 40px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	cursor: pointer;
-	transition: all 0.2s ease;
-	padding: 0;
-
-	&:hover:not(:disabled) {
-		background: rgba(255, 255, 255, 1);
-		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	// The buttons wrapper needs space-between layout
+	.wp-block-buttons {
+		justify-content: space-between;
+		width: 100%;
 	}
 
-	&:disabled {
-		opacity: 0.3;
-		cursor: not-allowed;
-	}
+	// Style the actual button wrappers
+	.wp-block-slider-controls__previous,
+	.wp-block-slider-controls__next {
+		pointer-events: auto;
 
-	svg {
-		fill: currentColor;
+		// Style the button/link inside
+		.wp-block-button__link {
+			background: rgba(255, 255, 255, 0.9);
+			border: 1px solid rgba(0, 0, 0, 0.1);
+			border-radius: 50%;
+			width: 40px;
+			height: 40px;
+			min-width: 40px;
+			padding: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			font-size: 18px;
+			line-height: 1;
+			color: #1e1e1e;
+
+			&:hover:not(:disabled) {
+				background: rgba(255, 255, 255, 1);
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+			}
+
+			&:disabled {
+				opacity: 0.3;
+				cursor: not-allowed;
+			}
+		}
 	}
 }
