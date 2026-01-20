@@ -576,3 +576,75 @@ export function setCanvasMinHeight( minHeight ) {
 		minHeight,
 	};
 }
+
+/**
+ * Enter revisions preview mode.
+ *
+ * @param {number} [revisionId] Optional revision ID to select initially.
+ * @return {Object} Action object.
+ */
+export function enterRevisionsMode( revisionId = null ) {
+	return {
+		type: 'ENTER_REVISIONS_MODE',
+		revisionId,
+	};
+}
+
+/**
+ * Exit revisions preview mode.
+ *
+ * @return {Object} Action object.
+ */
+export function exitRevisionsMode() {
+	return {
+		type: 'EXIT_REVISIONS_MODE',
+	};
+}
+
+/**
+ * Select a revision to preview.
+ *
+ * @param {number} revisionId The revision ID to select.
+ * @return {Object} Action object.
+ */
+export function selectRevision( revisionId ) {
+	return {
+		type: 'SELECT_REVISION',
+		revisionId,
+	};
+}
+
+/**
+ * Restore a revision by replacing the current content with the revision's content
+ * and auto-saving.
+ *
+ * @param {Object} revision The revision object to restore.
+ */
+export const restoreRevision =
+	( revision ) =>
+	async ( { dispatch, registry } ) => {
+		// Parse the revision content into blocks.
+		const blocks = parse( revision.content?.raw || '' );
+
+		// Reset editor blocks with the revision content.
+		dispatch.resetEditorBlocks( blocks );
+
+		// Update the title if the revision has one.
+		if ( revision.title?.raw ) {
+			dispatch.editPost( { title: revision.title.raw } );
+		}
+
+		// Exit revisions mode.
+		dispatch.exitRevisionsMode();
+
+		// Save the post to persist the restored revision.
+		await dispatch.savePost();
+
+		// Show success notice.
+		registry
+			.dispatch( noticesStore )
+			.createSuccessNotice( __( 'Revision restored.' ), {
+				type: 'snackbar',
+				id: 'editor-revision-restored',
+			} );
+	};

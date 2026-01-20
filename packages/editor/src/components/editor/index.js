@@ -20,6 +20,7 @@ import Sidebar from '../sidebar';
 import NotesSidebar from '../collab-sidebar';
 import GlobalStylesSidebar from '../global-styles-sidebar';
 import { GlobalStylesRenderer } from '../global-styles-renderer';
+import { unlock } from '../../lock-unlock';
 
 function Editor( {
 	postType,
@@ -46,6 +47,7 @@ function Editor( {
 		error,
 		isBlockTheme,
 		showGlobalStyles,
+		isRevisionsMode,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -58,6 +60,9 @@ function Editor( {
 			} = select( coreStore );
 			const { getRenderingMode, getCurrentPostType } =
 				select( editorStore );
+			const { isRevisionsMode: _isRevisionsMode } = unlock(
+				select( editorStore )
+			);
 
 			const postArgs = [ 'postType', postType, postId ];
 			const renderingMode = getRenderingMode();
@@ -93,6 +98,7 @@ function Editor( {
 					userCanEditGlobalStyles &&
 					( currentPostType === 'wp_template' ||
 						renderingMode === 'template-locked' ),
+				isRevisionsMode: _isRevisionsMode(),
 			};
 		},
 		[ postType, postId, templateId ]
@@ -150,10 +156,12 @@ function Editor( {
 						{ extraContent }
 					</EditorInterface>
 					{ children }
-					<Sidebar
-						onActionPerformed={ onActionPerformed }
-						extraPanels={ extraSidebarPanels }
-					/>
+					{ ! isRevisionsMode && (
+						<Sidebar
+							onActionPerformed={ onActionPerformed }
+							extraPanels={ extraSidebarPanels }
+						/>
+					) }
 					<NotesSidebar />
 					{ isBlockTheme && <GlobalStylesRenderer /> }
 					{ showGlobalStyles && <GlobalStylesSidebar /> }
