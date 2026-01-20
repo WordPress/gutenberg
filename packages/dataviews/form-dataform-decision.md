@@ -90,22 +90,6 @@ Use this path when your form edits an existing data object that gets updated inc
 
 ## Examples
 
-### Login form
-
--   **Path**: Path A (action/flow)
--   **Complexity**: Simple (2-3 fields)
--   **Layout**: Simple vertical
--   **Validation**: Required (username/email and password validation)
--   **Decision**: Use `validated` family of components from `@wordpress/components`
-
-### Search form
-
--   **Path**: Path A (action/flow)
--   **Complexity**: Simple (1-2 fields)
--   **Layout**: Simple horizontal or vertical
--   **Validation**: Not required (search can accept any input)
--   **Decision**: Use components from `@wordpress/ui` (like `Field`, `Input`, `Button`)
-
 ### Post editor
 
 -   **Path**: Path B (editing data object)
@@ -113,6 +97,8 @@ Use this path when your form edits an existing data object that gets updated inc
 -   **Layout**: Panels, grouped fields
 -   **Validation**: Advanced (async, cross-field)
 -   **Decision**: Use `DataForm`
+
+Let editors manage structured fields associated with a post (custom fields/meta, attributes, taxonomies, editorial details) alongside the main content. `DataForm` standardizes how those metadata fields are displayed, edited, and validated, while keeping the underlying post/meta data model consistent.
 
 ### Media editing
 
@@ -122,6 +108,8 @@ Use this path when your form edits an existing data object that gets updated inc
 -   **Validation**: Advanced
 -   **Decision**: Use `DataForm`
 
+Provide a focused details panel/page for a single media item where users can view and edit metadata (alt text, caption, credit/license, organization fields). `DataForm` supplies a consistent editing experience and validation for these fields, while the product handles saving back to the media record.
+
 ### Simple settings page
 
 -   **Path**: Path B (editing data object)
@@ -130,6 +118,8 @@ Use this path when your form edits an existing data object that gets updated inc
 -   **Validation**: Basic
 -   **Decision**: Use `DataForm` (since it's editing a data object, even if simple)
 
+Provide a lightweight screen to edit a small number of related configuration values (usually one section, minimal grouping). `DataForm` renders a straightforward layout from a short field list, enabling quick edits and predictable updates that the product can save as one settings object.
+
 ### Complex settings page
 
 -   **Path**: Path B (editing data object)
@@ -137,6 +127,8 @@ Use this path when your form edits an existing data object that gets updated inc
 -   **Layout**: Panels or cards
 -   **Validation**: Advanced (dependencies, async)
 -   **Decision**: Use `DataForm`
+
+Provide an organized, scalable interface for editing many settings with clear grouping, conditional structure, and consistent validation—often spanning multiple categories (e.g., General, Security, Integrations, Notifications). `DataForm` is used to define fields once and control the screen structure via the form layout (sections/panels/rows/cards), while emitting granular updates so the product can manage dependencies, validation state, and save workflows.
 
 ---
 
