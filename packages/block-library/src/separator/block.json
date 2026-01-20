@@ -16,6 +16,10 @@
 			"type": "string",
 			"enum": [ "hr", "div" ],
 			"default": "hr"
+		},
+		"isDecorative": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {
@@ -39,9 +43,19 @@
 		}
 	},
 	"styles": [
-		{ "name": "default", "label": "Default", "isDefault": true },
-		{ "name": "wide", "label": "Wide Line" },
-		{ "name": "dots", "label": "Dots" }
+		{
+			"name": "default",
+			"label": "Default",
+			"isDefault": true
+		},
+		{
+			"name": "wide",
+			"label": "Wide Line"
+		},
+		{
+			"name": "dots",
+			"label": "Dots"
+		}
 	],
 	"editorStyle": "wp-block-separator-editor",
 	"style": "wp-block-separator"
