@@ -88,6 +88,10 @@ export default function PostList( { postType } ) {
 	} );
 
 	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
+	// Sync selection with postId query param (e.g., when QuickEdit action updates postId).
+	useEffect( () => {
+		setSelection( postId?.split( ',' ) ?? [] );
+	}, [ postId ] );
 	const onChangeSelection = useCallback(
 		( items ) => {
 			setSelection( items );
