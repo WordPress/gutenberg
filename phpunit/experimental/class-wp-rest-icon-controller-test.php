@@ -10,19 +10,6 @@ class WP_Test_REST_Icon_Controller extends WP_Test_REST_TestCase {
 	protected static $contributor_id;
 	protected static $subscriber_id;
 
-	public function setUp(): void {
-		parent::setUp();
-
-		// Force load the experimental classes since they're conditionally loaded
-		require ABSPATH . 'wp-content/plugins/gutenberg/lib/experimental/class-wp-icons-registry.php';
-		require ABSPATH . 'wp-content/plugins/gutenberg/lib/experimental/class-wp-rest-icon-controller.php';
-		add_action( 'rest_api_init', array( $this, 'register_test_routes_and_icons' ) );
-	}
-
-	public function register_test_routes_and_icons() {
-		( new WP_REST_Icon_Controller() )->register_routes();
-	}
-
 	public static function wpSetUpBeforeClass( WP_UnitTest_Factory $factory ) {
 		self::$admin_id       = $factory->user->create( array( 'role' => 'administrator' ) );
 		self::$editor_id      = $factory->user->create( array( 'role' => 'editor' ) );
