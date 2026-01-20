@@ -14,41 +14,28 @@
  *
  * @return string Returns the block markup.
  */
-function render_block_core_slider_controls( $attributes, $content, $block ) {
-	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	unset( $attributes );
+function render_block_core_slider_controls( $attributes, $content ) {
 
-	// Process inner blocks to add Interactivity API directives
-	$processed_content = $content;
+	// Use HTML Tag Processor to add Interactivity API directives to buttons
+	$processor = new WP_HTML_Tag_Processor( $content );
 
-	// Find core/button blocks and add directives
-	if ( ! empty( $block->inner_blocks ) ) {
-		foreach ( $block->inner_blocks as $buttons_block ) {
-			if ( 'core/buttons' === $buttons_block->name && ! empty( $buttons_block->inner_blocks ) ) {
-				foreach ( $buttons_block->inner_blocks as $index => $button_block ) {
-					if ( 'core/button' === $button_block->name ) {
-						$button_html      = $button_block->render();
-						$button_classname = isset( $button_block->attributes['className'] ) ? $button_block->attributes['className'] : '';
+	// Find all <a> tags (core/button renders as links)
+	while ( $processor->next_tag( 'a' ) ) {
+		$class_attribute = $processor->get_attribute( 'class' );
 
-						// Add directives based on button class
-						if ( strpos( $button_classname, 'wp-block-slider-controls__previous' ) !== false ) {
-							$modified_button   = str_replace(
-								'<a ',
-								'<a data-wp-on--click="actions.prevSlide" data-wp-bind--disabled="state.isAtStart" ',
-								$button_html
-							);
-							$processed_content = str_replace( $button_html, $modified_button, $processed_content );
-						} elseif ( strpos( $button_classname, 'wp-block-slider-controls__next' ) !== false ) {
-							$modified_button   = str_replace(
-								'<a ',
-								'<a data-wp-on--click="actions.nextSlide" data-wp-bind--disabled="state.isAtEnd" ',
-								$button_html
-							);
-							$processed_content = str_replace( $button_html, $modified_button, $processed_content );
-						}
-					}
-				}
-			}
+		if ( ! $class_attribute ) {
+			continue;
+		}
+
+		// Add directives based on button class
+		if ( strpos( $class_attribute, 'wp-block-slider-controls__previous' ) !== false ) {
+			$processor->set_attribute( 'data-wp-on--click', 'actions.prevSlide' );
+			$processor->set_attribute( 'data-wp-bind--disabled', 'state.isAtStart' );
+			$processor->set_attribute( 'role', 'button' );
+		} elseif ( strpos( $class_attribute, 'wp-block-slider-controls__next' ) !== false ) {
+			$processor->set_attribute( 'data-wp-on--click', 'actions.nextSlide' );
+			$processor->set_attribute( 'data-wp-bind--disabled', 'state.isAtEnd' );
+			$processor->set_attribute( 'role', 'button' );
 		}
 	}
 
@@ -61,7 +48,7 @@ function render_block_core_slider_controls( $attributes, $content, $block ) {
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
-		$processed_content
+		$processor->get_updated_html()
 	);
 }
 
