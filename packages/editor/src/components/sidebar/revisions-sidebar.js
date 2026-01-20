@@ -5,7 +5,10 @@ import { __, isRTL, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+import {
+	Spinner,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
 import {
 	useCallback,
@@ -108,19 +111,24 @@ const RevisionsSidebarContent_ = ( {
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					<RevisionsSidebarContent
-						diffStats={ diffStats }
-						revisionId={ revisionId }
-						revisionDate={ revisionDate }
-						revisionContent={ revisionContent }
-					/>
+					{ revisionId && (
+						<RevisionsSidebarContent
+							diffStats={ diffStats }
+							revisionId={ revisionId }
+							revisionDate={ revisionDate }
+							revisionContent={ revisionContent }
+						/>
+					) }
+					{ ! revisionId && <Spinner /> }
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
-					<div className="editor-sidebar__revisions-block-message">
-						{ __(
-							'Block settings are not available when previewing revisions.'
-						) }
-					</div>
+					{ revisionId && (
+						<div className="editor-sidebar__revisions-block-message">
+							{ __(
+								'Block settings are not available when previewing revisions.'
+							) }
+						</div>
+					) }
 				</Tabs.TabPanel>
 			</Tabs.Context.Provider>
 		</PluginSidebar>

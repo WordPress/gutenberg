@@ -302,24 +302,22 @@ export default function RevisionsCanvas( {
 		[ blockEditorSettings ]
 	);
 
-	if ( ! revision ) {
-		return (
-			<div className="editor-revisions-canvas__loading">
-				<Spinner />
-			</div>
-		);
-	}
-
 	return (
 		<>
-			<ExperimentalBlockEditorProvider
-				value={ blocks }
-				settings={ settings }
-			>
-				<VisualEditor
-					canvasOverlay={ showDiff ? <DiffMarkers /> : undefined }
-				/>
-			</ExperimentalBlockEditorProvider>
+			{ revision ? (
+				<ExperimentalBlockEditorProvider
+					value={ blocks }
+					settings={ settings }
+				>
+					<VisualEditor
+						canvasOverlay={ showDiff ? <DiffMarkers /> : undefined }
+					/>
+				</ExperimentalBlockEditorProvider>
+			) : (
+				<div className="editor-revisions-canvas__loading">
+					<Spinner />
+				</div>
+			) }
 			<RevisionsSidebar
 				diffStats={ diffStats }
 				revisionId={ revision?.id }
