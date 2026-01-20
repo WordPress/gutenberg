@@ -15,9 +15,6 @@
  * @return string Returns the block markup.
  */
 function render_block_core_slider( $attributes, $content, $block ) {
-	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-	unset( $attributes );
-
 	// Find the slider-track to get slide count
 	$slide_count = 0;
 	foreach ( $block->inner_blocks as $inner_block ) {

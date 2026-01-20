@@ -23,6 +23,7 @@ const BUTTONS_TEMPLATE = [
 				'core/button',
 				{
 					text: '←',
+					tagName: 'button',
 					className: 'wp-block-slider-controls__previous',
 				},
 			],
@@ -30,6 +31,7 @@ const BUTTONS_TEMPLATE = [
 				'core/button',
 				{
 					text: '→',
+					tagName: 'button',
 					className: 'wp-block-slider-controls__next',
 				},
 			],

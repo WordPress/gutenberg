@@ -8,34 +8,52 @@
 /**
  * Renders the `core/slider-controls` block on the server.
  *
- * @param array    $attributes Block attributes.
- * @param string   $content    Block default content.
- * @param WP_Block $block      Block instance.
+ * @param array  $attributes Block attributes.
+ * @param string $content    Block default content.
  *
  * @return string Returns the block markup.
  */
 function render_block_core_slider_controls( $attributes, $content ) {
+	// If no content, return empty (shouldn't happen with template)
+	if ( empty( $content ) ) {
+		return '';
+	}
 
 	// Use HTML Tag Processor to add Interactivity API directives to buttons
 	$processor = new WP_HTML_Tag_Processor( $content );
 
-	// Find all <a> tags (core/button renders as links)
-	while ( $processor->next_tag( 'a' ) ) {
-		$class_attribute = $processor->get_attribute( 'class' );
+	// Track whether we just saw a previous/next wrapper
+	$next_button_is_previous = false;
+	$next_button_is_next     = false;
 
-		if ( ! $class_attribute ) {
-			continue;
+	// Process all tags
+	while ( $processor->next_tag() ) {
+		$tag = $processor->get_tag();
+
+		// Check if this is a button wrapper div
+		if ( 'DIV' === $tag ) {
+			if ( $processor->has_class( 'wp-block-slider-controls__previous' ) ) {
+				$next_button_is_previous = true;
+				$next_button_is_next     = false;
+			} elseif ( $processor->has_class( 'wp-block-slider-controls__next' ) ) {
+				$next_button_is_next     = true;
+				$next_button_is_previous = false;
+			}
 		}
 
-		// Add directives based on button class
-		if ( strpos( $class_attribute, 'wp-block-slider-controls__previous' ) !== false ) {
-			$processor->set_attribute( 'data-wp-on--click', 'actions.prevSlide' );
-			$processor->set_attribute( 'data-wp-bind--disabled', 'state.isAtStart' );
-			$processor->set_attribute( 'role', 'button' );
-		} elseif ( strpos( $class_attribute, 'wp-block-slider-controls__next' ) !== false ) {
-			$processor->set_attribute( 'data-wp-on--click', 'actions.nextSlide' );
-			$processor->set_attribute( 'data-wp-bind--disabled', 'state.isAtEnd' );
-			$processor->set_attribute( 'role', 'button' );
+		// Check if this is a button or anchor with wp-block-button__link class
+		if ( ( 'BUTTON' === $tag || 'A' === $tag ) && $processor->has_class( 'wp-block-button__link' ) ) {
+			if ( $next_button_is_previous ) {
+				$processor->set_attribute( 'data-wp-on--click', 'actions.prevSlide' );
+				$processor->set_attribute( 'data-wp-bind--disabled', 'state.isAtStart' );
+				$processor->set_attribute( 'aria-label', __( 'Previous slide', 'gutenberg' ) );
+				$next_button_is_previous = false;
+			} elseif ( $next_button_is_next ) {
+				$processor->set_attribute( 'data-wp-on--click', 'actions.nextSlide' );
+				$processor->set_attribute( 'data-wp-bind--disabled', 'state.isAtEnd' );
+				$processor->set_attribute( 'aria-label', __( 'Next slide', 'gutenberg' ) );
+				$next_button_is_next = false;
+			}
 		}
 	}
 
