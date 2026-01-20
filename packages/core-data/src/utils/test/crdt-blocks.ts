@@ -19,19 +19,26 @@ import {
  * Mock uuid module
  */
 jest.mock( 'uuid', () => ( {
-	v4: jest.fn( () => 'mocked-uuid-' + Math.random() ),
+	v4: () => 'mocked-uuid-' + Math.random(),
 } ) );
 
 /**
  * Mock @wordpress/blocks module
  */
 jest.mock( '@wordpress/blocks', () => ( {
-	getBlockTypes: jest.fn( () => [
+	getBlockTypes: () => [
 		{
 			name: 'core/paragraph',
 			attributes: { content: { type: 'rich-text' } },
 		},
-	] ),
+	],
+} ) );
+
+/**
+ * Mock @wordpress/block-editor to avoid private-apis unlock errors
+ */
+jest.mock( '@wordpress/block-editor', () => ( {
+	store: {},
 } ) );
 
 /**
