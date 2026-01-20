@@ -5,11 +5,13 @@ import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
+	ExternalLink,
 } from '@wordpress/components';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { humanTimeDiff } from '@wordpress/date';
 import { count as wordCount } from '@wordpress/wordcount';
 import { useMemo } from '@wordpress/element';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -203,6 +205,10 @@ export default function RevisionsSidebarContent( {
 		);
 	}, [ revisionDate ] );
 
+	const classicRevisionsUrl = addQueryArgs( 'revision.php', {
+		revision: revisionId,
+	} );
+
 	return (
 		<VStack className="editor-revisions-sidebar-content" spacing={ 4 }>
 			<PostCardPanel postType="revision" postId={ revisionId } />
@@ -219,6 +225,12 @@ export default function RevisionsSidebarContent( {
 				) }
 			</VStack>
 			{ diffStats && <DiffStats stats={ diffStats } /> }
+			<ExternalLink
+				className="editor-revisions-sidebar-content__classic-link"
+				href={ classicRevisionsUrl }
+			>
+				{ __( 'Open classic revisions screen' ) }
+			</ExternalLink>
 		</VStack>
 	);
 }

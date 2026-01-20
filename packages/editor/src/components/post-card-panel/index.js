@@ -72,7 +72,9 @@ export default function PostCardPanel( {
 				_title = _record?.title?.rendered || _record?.title;
 				return {
 					postTitle: _title,
-					icon: getPostIcon( parentPostType ),
+					icon: getPostIcon( parentPostType, {
+						area: _record?.area,
+					} ),
 					labels: getPostType( parentPostType )?.labels,
 				};
 			}
