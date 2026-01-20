@@ -1,0 +1,8 @@
+.wp-block-slide {
+	// Minimal hint for block boundaries - only when selected
+	&.is-selected,
+	&.has-child-selected {
+		outline: 1px dashed rgba(0, 0, 0, 0.2);
+		outline-offset: -1px;
+	}
+}

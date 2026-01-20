@@ -6,14 +6,4 @@
 	display: flex;
 	flex-direction: column;
 	box-sizing: border-box;
-
-	// In editor, show slides side by side for easier editing
-	.editor-styles-wrapper & {
-		border: 1px dashed #ddd;
-		margin-right: 16px;
-
-		&:last-child {
-			margin-right: 0;
-		}
-	}
 }

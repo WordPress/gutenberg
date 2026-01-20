@@ -9,6 +9,7 @@
 	"category": "design",
 	"textdomain": "default",
 	"parent": [ "core/slider" ],
+	"allowedBlocks": [ "core/buttons", "core/button" ],
 	"attributes": {},
 	"usesContext": [ "core/slider-id" ],
 	"supports": {
@@ -21,5 +22,6 @@
 		}
 	},
 	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css"
 }
