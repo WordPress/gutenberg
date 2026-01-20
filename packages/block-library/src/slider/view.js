@@ -3,7 +3,7 @@
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
 
-// Debounce helper
+// Debounce utility for scroll handling
 function debounce( func, wait ) {
 	let timeout;
 	return function executedFunction( ...args ) {
@@ -14,6 +14,32 @@ function debounce( func, wait ) {
 		clearTimeout( timeout );
 		timeout = setTimeout( later, wait );
 	};
+}
+
+// Create debounced update function outside the store
+// to avoid context issues with getElement()
+const debouncedUpdates = new Map();
+
+function getDebouncedUpdate( trackElement ) {
+	if ( ! debouncedUpdates.has( trackElement ) ) {
+		debouncedUpdates.set(
+			trackElement,
+			debounce( ( ref, context ) => {
+				const slides = ref.querySelectorAll( '.wp-block-slide' );
+				if ( slides.length === 0 ) {
+					return;
+				}
+
+				const slideWidth = slides[ 0 ].offsetWidth;
+				const scrollLeft = ref.scrollLeft;
+				const currentIndex = Math.round( scrollLeft / slideWidth );
+
+				context.currentIndex = currentIndex;
+				context.totalSlides = slides.length;
+			}, 150 )
+		);
+	}
+	return debouncedUpdates.get( trackElement );
 }
 
 store( 'core/slider', {
@@ -66,22 +92,15 @@ store( 'core/slider', {
 			const slideWidth = slides[ 0 ].offsetWidth;
 			track.scrollBy( { left: -slideWidth, behavior: 'smooth' } );
 		},
-		handleScroll: debounce( function () {
+		handleScroll() {
+			// Get ref and context in the action scope (before debounce)
 			const { ref } = getElement();
-
-			const slides = ref.querySelectorAll( '.wp-block-slide' );
-			if ( slides.length === 0 ) {
-				return;
-			}
-
-			const slideWidth = slides[ 0 ].offsetWidth;
-			const scrollLeft = ref.scrollLeft;
-			const currentIndex = Math.round( scrollLeft / slideWidth );
-
 			const context = getContext();
-			context.currentIndex = currentIndex;
-			context.totalSlides = slides.length;
-		}, 150 ),
+
+			// Get the debounced update function for this track
+			const updateScroll = getDebouncedUpdate( ref );
+			updateScroll( ref, context );
+		},
 	},
 	callbacks: {
 		initTrack() {
