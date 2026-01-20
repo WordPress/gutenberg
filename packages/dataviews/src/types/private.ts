@@ -3,7 +3,6 @@
  */
 import type {
 	CustomValidator,
-	FilterOperatorMap,
 	NormalizedField,
 	Operator,
 	Validator,
@@ -24,7 +23,6 @@ export type FieldType< Item > = Pick<
 	Edit: string | null;
 	validOperators: Operator[];
 	defaultOperators: Operator[];
-	filter?: FilterOperatorMap< Item >;
 	validate: {
 		required?: Validator< Item >;
 		elements?: Validator< Item >;
