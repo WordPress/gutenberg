@@ -216,6 +216,7 @@ export function createSyncManager(): SyncManager {
 					`Disconnecting due to version mismatch (local: ${ currentVersion }, remote: ${ remoteVersion })`
 				);
 
+				// Disconnect providers when outdated client is detected
 				providerResults.forEach( ( result ) => result.destroy() );
 			}
 		);
@@ -308,12 +309,12 @@ export function createSyncManager(): SyncManager {
 		const onStateUpdate = createVersionObserver(
 			ydoc,
 			( currentVersion, remoteVersion ) => {
-				// Disconnect providers when outdated client is detected
 				/* eslint-disable-next-line no-console */
 				console.log(
 					`Disconnecting due to version mismatch (local: ${ currentVersion }, remote: ${ remoteVersion })`
 				);
 
+				// Disconnect providers when outdated client is detected
 				providerResults.forEach( ( result ) => result.destroy() );
 			}
 		);
@@ -407,40 +408,22 @@ export function createSyncManager(): SyncManager {
 			| number
 			| undefined;
 
-		// If we're at a lower version than persisted, this client is outdated.
-		if (
-			persistedVersion !== undefined &&
-			persistedVersion > CRDT_DOC_VERSION
-		) {
-			/* eslint-disable-next-line no-console */
-			console.error(
-				`Cannot load persisted document: local version (${ CRDT_DOC_VERSION }) is older than persisted version (${ persistedVersion }). Please refresh the page.`
-			);
+		// If the saved CRDT document has a different version, then it's either:
+		// - Older than our version (persistedVersion < CRDT_DOC_VERSION) and outdated.
+		// - Newer than our version (persistedVersion > CRDT_DOC_VERSION), which shouldn't
+		//   happen, but could if the CRDT_DOC_VERSION is rolled back after a save.
+		// In either case, just ignore the existing CRDT document and load from the record.
+		if ( persistedVersion !== CRDT_DOC_VERSION ) {
 			tempDoc.destroy();
 
-			// Unload the entity (this will destroy providers and clean up)
-			entityState.unload();
-
-			return;
-		}
-
-		// If we're at a later version than persisted, trash the persisted doc
-		// and save our version.
-		if (
-			persistedVersion !== undefined &&
-			persistedVersion < CRDT_DOC_VERSION
-		) {
-			tempDoc.destroy();
-
-			// Apply the current record as changes and trigger a save
+			// Apply the current record as changes
 			applyChangesToCRDTDoc( targetDoc, record );
 
 			// Note that triggering a save with only a version change will not
-			// persist the CRDT document if the version is the only change, as
-			// saveRecord() only persists entity edits, which does not include
-			// CRDT version changes.
-			// However, any real changes to the entity will result in a version
-			// change in the CRDT document on next save.
+			// persist the CRDT document unless there are other changes to the entity
+			// (see saveRecord & saveEditedEntityRecord).
+			// However, the next manual save with any other change will result
+			// in stored CRDT version change.
 			handlers.saveRecord();
 			return;
 		}
