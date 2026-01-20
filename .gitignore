@@ -59,3 +59,7 @@ packages/react-native-editor/src/setup-local.js
 # Files related to applying patches
 *.rej
 *.orig
+
+# wasm-vips vendor build artifacts (built via npm run build:wasm-vips)
+packages/vips/vendor/*
+!packages/vips/vendor/README.md

@@ -207,10 +207,30 @@ jobs:
                   node-version-file: '.nvmrc'
                   check-latest: true
 
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Cache wasm-vips Docker build
+              uses: actions/cache@v4
+              with:
+                  path: /tmp/.buildx-cache
+                  key: ${{ runner.os }}-wasm-vips-0.0.16
+                  restore-keys: |
+                      ${{ runner.os }}-wasm-vips-
+
+            - name: Cache wasm-vips vendor files
+              uses: actions/cache@v4
+              with:
+                  path: packages/vips/vendor
+                  key: ${{ runner.os }}-wasm-vips-vendor-0.0.16
+                  restore-keys: |
+                      ${{ runner.os }}-wasm-vips-vendor-
+
             - name: Build Gutenberg plugin ZIP file
               run: ./bin/build-plugin-zip.sh
               env:
                   NO_CHECKS: 'true'
+                  DOCKER_BUILDKIT: '1'
 
             - name: Upload artifact
               uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0

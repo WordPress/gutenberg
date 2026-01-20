@@ -1,16 +1,20 @@
 /**
  * External dependencies
+ *
+ * Using vendor directory with GPLv2-compatible wasm-vips build (no UltraHDR).
+ * Build with: npm run build:wasm-vips
  */
-import Vips from 'wasm-vips';
+// @ts-expect-error - vendor files don't have type definitions
+import Vips from '../vendor/vips-es6.js';
 
 // @ts-expect-error
-import VipsModule from 'wasm-vips/vips.wasm';
+import VipsModule from '../vendor/vips.wasm';
 
 // @ts-expect-error
-import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
+import VipsHeifModule from '../vendor/vips-heif.wasm';
 
 // @ts-expect-error
-import VipsJxlModule from 'wasm-vips/vips-jxl.wasm';
+import VipsJxlModule from '../vendor/vips-jxl.wasm';
 
 /**
  * Internal dependencies
