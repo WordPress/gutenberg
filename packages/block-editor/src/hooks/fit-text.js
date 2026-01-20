@@ -360,7 +360,7 @@ function WithFitTextFontSize( { fitText, name, clientId, children } ) {
  * `editor.BlockEdit` filter.
  */
 const addFitTextControl = createHigherOrderComponent( ( BlockEdit ) => {
-	return ( props ) => {
+	return function AddFitTextControl( props ) {
 		const { name, attributes, clientId, isSelected, setAttributes } = props;
 		const { fitText } = attributes;
 		const supportsFitText = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );

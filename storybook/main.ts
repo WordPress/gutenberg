@@ -91,7 +91,19 @@ export default {
 				},
 			],
 			build: {
-				minify: NODE_ENV === 'production',
+				/**
+				 * Use terser with keep_fnames to preserve component names in source code display.
+				 * Without this, Vite's esbuild minifier mangles component names (e.g., BoxControl -> J)
+				 * which breaks the Storybook docs source code display.
+				 * @see https://github.com/storybookjs/storybook/issues/20769
+				 */
+				minify: NODE_ENV === 'production' ? 'terser' : false,
+				terserOptions: {
+					keep_fnames: true,
+					mangle: {
+						keep_fnames: true,
+					},
+				},
 			},
 			define: {
 				// Ensures that `@wordpress/warning` can properly detect dev mode.

@@ -46,3 +46,4 @@ const UnforwardedValidatedRangeControl = (
 export const ValidatedRangeControl = forwardRef(
 	UnforwardedValidatedRangeControl
 );
+ValidatedRangeControl.displayName = 'ValidatedRangeControl';

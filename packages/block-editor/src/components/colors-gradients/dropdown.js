@@ -80,9 +80,8 @@ const LabeledColorIndicator = ( { colorValue, label } ) => (
 // Renders a color dropdown's toggle as an `Item` if it is within an `ItemGroup`
 // or as a `Button` if it isn't e.g. the controls are being rendered in
 // a `ToolsPanel`.
-const renderToggle =
-	( settings ) =>
-	( { onToggle, isOpen } ) => {
+const renderToggle = ( settings ) =>
+	function Toggle( { onToggle, isOpen } ) {
 		const {
 			clearable,
 			colorValue,
