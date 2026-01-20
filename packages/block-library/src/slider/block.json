@@ -13,6 +13,10 @@
 		"sliderId": {
 			"type": "string",
 			"default": ""
+		},
+		"activeSlideIndex": {
+			"type": "number",
+			"default": 0
 		}
 	},
 	"supports": {
@@ -29,7 +33,8 @@
 		}
 	},
 	"providesContext": {
-		"core/slider-id": "sliderId"
+		"core/slider-id": "sliderId",
+		"core/slider-activeSlideIndex": "activeSlideIndex"
 	},
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",

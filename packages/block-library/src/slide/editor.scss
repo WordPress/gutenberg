@@ -1,8 +1,12 @@
 .wp-block-slide {
-	// Minimal hint for block boundaries - only when selected
-	&.is-selected,
-	&.has-child-selected {
-		outline: 1px dashed rgba(0, 0, 0, 0.2);
-		outline-offset: -1px;
+	// Hidden slides in editor (similar to tabs)
+	&[hidden] {
+		display: none !important;
+	}
+
+	// Active/visible slide styling
+	&.is-selected-slide {
+		display: flex;
+		flex-direction: column;
 	}
 }

@@ -9,6 +9,7 @@
 	"category": "design",
 	"textdomain": "default",
 	"parent": [ "core/slider-track" ],
+	"usesContext": [ "core/slider-activeSlideIndex" ],
 	"attributes": {},
 	"supports": {
 		"anchor": true,

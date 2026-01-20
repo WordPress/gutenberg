@@ -21,29 +21,9 @@
 
 		// Style the button/link inside
 		.wp-block-button__link {
-			background: rgba(255, 255, 255, 0.9);
-			border: 1px solid rgba(0, 0, 0, 0.1);
-			border-radius: 50%;
-			width: 40px;
-			height: 40px;
-			min-width: 40px;
-			padding: 0;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			cursor: pointer;
-			transition: all 0.2s ease;
-			font-size: 18px;
-			line-height: 1;
-			color: #1e1e1e;
-
-			&:hover:not(:disabled) {
-				background: rgba(255, 255, 255, 1);
-				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-			}
 
 			&:disabled {
-				opacity: 0.3;
+				filter: brightness(0.7);
 				cursor: not-allowed;
 			}
 		}

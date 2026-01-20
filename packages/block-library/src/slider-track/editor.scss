@@ -1,4 +1,6 @@
 .wp-block-slider-track {
-	// In editor: disable scroll-snap for easier editing, but keep similar layout
+	// In editor: show one slide at a time (like tabs)
+	display: block;
+	overflow: visible;
 	scroll-snap-type: none;
 }

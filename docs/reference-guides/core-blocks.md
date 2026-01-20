@@ -953,7 +953,7 @@ Display content in a horizontally scrolling slider. ([Source](https://github.com
 -	**Category:** design
 -	**Allowed Blocks:** core/slider-controls, core/slider-track
 -	**Supports:** align, color (background, ~~text~~), interactivity, spacing (margin, padding), ~~html~~
--	**Attributes:** sliderId
+-	**Attributes:** activeSlideIndex, sliderId
 
 ## Slider Controls
 
