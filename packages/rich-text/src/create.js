@@ -375,11 +375,6 @@ function filterRange( node, range, filter ) {
  * browser will litter the content with non breaking spaces, among other issues.
  * See packages/rich-text/src/component/use-default-style.js.
  *
- * IMPORTANT: This function now correctly preserves whitespace at inline element
- * boundaries (like <mark>, <strong>, <em>, etc.) to fix issue #74628.
- * Only the root element's leading/trailing whitespace is trimmed, not the
- * whitespace at the boundaries of inline child elements.
- *
  * @see
  * https://developer.mozilla.org/en-US/docs/Web/CSS/white-space-collapse#collapsing_of_white_space
  *
@@ -405,24 +400,11 @@ function collapseWhiteSpace( element, isRoot = true ) {
 				newNodeValue = newNodeValue.replace( / {2,}/g, ' ' );
 			}
 
-			// FIX FOR ISSUE #74628:
-			// Only trim leading whitespace if this is the root element AND
-			// this is the first text node. Previously, this was trimming
-			// leading spaces from the first child of ANY element, which
-			// incorrectly removed spaces at the start of inline elements
-			// like <mark>, <strong>, <em>, etc.
-			//
-			// Example that was broken:
-			//   "outer text<mark> inner text</mark>"
-			// Was incorrectly rendered as:
-			//   "outer text<mark>inner text</mark>"
-			// Because the space at the start of " inner text" was trimmed.
 			if ( isRoot && i === 0 && newNodeValue.startsWith( ' ' ) ) {
 				newNodeValue = newNodeValue.slice( 1 );
 			}
 
-			// Only trim trailing whitespace at the root level AND
-			// only for the last text node.
+			// Only trim trailing whitespace at the root level
 			if (
 				isRoot &&
 				i === nodes.length - 1 &&
@@ -433,8 +415,7 @@ function collapseWhiteSpace( element, isRoot = true ) {
 
 			node.nodeValue = newNodeValue;
 		} else if ( node.nodeType === node.ELEMENT_NODE ) {
-			// Pass isRoot=false for child elements so their boundary
-			// whitespace is preserved.
+			// Pass isRoot=false for child elements so their boundary so whitespace is preserved.
 			node.replaceWith( collapseWhiteSpace( node, false ) );
 		}
 	} );
