@@ -963,6 +963,7 @@ Navigation controls for a slider. ([Source](https://github.com/WordPress/gutenbe
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/slider
+-	**Allowed Blocks:** core/buttons, core/button
 -	**Supports:** spacing (~~margin~~, ~~padding~~), ~~anchor~~, ~~html~~, ~~reusable~~
 
 ## Slider Track
