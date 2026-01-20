@@ -161,9 +161,14 @@ export default {
 		const rules = [];
 
 		if ( minimumColumnWidth && columnCount > 0 ) {
-			const maxValue = `max(${ minimumColumnWidth }, ( 100% - (${
-				blockGapValue || fallbackGapValue
-			}*${ columnCount - 1 }) ) / ${ columnCount })`;
+			let blockGapToUse = blockGapValue || fallbackGapValue;
+			// Ensure 0 values have a unit so they work in calc().
+			if ( blockGapToUse === '0' || blockGapToUse === 0 ) {
+				blockGapToUse = '0px';
+			}
+			const maxValue = `max(${ minimumColumnWidth }, ( 100% - (${ blockGapToUse }*${
+				columnCount - 1
+			}) ) / ${ columnCount })`;
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(${ maxValue }, 1fr))`,
 				`container-type: inline-size`

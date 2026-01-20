@@ -515,6 +515,11 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			$responsive_gap_value = $gap_value;
 		}
 
+		// Ensure 0 values have a unit so they work in calc().
+		if ( '0' === $responsive_gap_value || 0 === $responsive_gap_value ) {
+			$responsive_gap_value = '0px';
+		}
+
 		if ( ! empty( $layout['columnCount'] ) && ! empty( $layout['minimumColumnWidth'] ) ) {
 			$max_value       = 'max(' . $layout['minimumColumnWidth'] . ', (100% - (' . $responsive_gap_value . ' * (' . $layout['columnCount'] . ' - 1))) /' . $layout['columnCount'] . ')';
 			$layout_styles[] = array(
