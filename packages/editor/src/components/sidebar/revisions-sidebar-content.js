@@ -8,11 +8,7 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
-import {
-	humanTimeDiff,
-	dateI18n,
-	getSettings as getDateSettings,
-} from '@wordpress/date';
+import { humanTimeDiff } from '@wordpress/date';
 import { count as wordCount } from '@wordpress/wordcount';
 import { useMemo } from '@wordpress/element';
 
@@ -21,7 +17,6 @@ import { useMemo } from '@wordpress/element';
  */
 import { store as editorStore } from '../../store';
 import PostCardPanel from '../post-card-panel';
-import PostPanelRow from '../post-panel-row';
 
 // Average reading rate in words per minute.
 const AVERAGE_READING_RATE = 189;
@@ -92,15 +87,10 @@ export default function RevisionsSidebarContent( {
 		}
 		return sprintf(
 			// translators: %s: Human-readable time difference, e.g. "2 days ago".
-			__( 'Last edited %s.' ),
+			__( 'Created %s.' ),
 			humanTimeDiff( revisionDate )
 		);
 	}, [ revisionDate ] );
-
-	const dateSettings = getDateSettings();
-	const formattedDate = revisionDate
-		? dateI18n( dateSettings.formats.datetime, revisionDate )
-		: '';
 
 	// Calculate the ratio squares (like GitHub's diffstat).
 	// Number of squares scales with total changes, ratio determines colors.
@@ -168,26 +158,32 @@ export default function RevisionsSidebarContent( {
 	return (
 		<VStack className="editor-revisions-sidebar-content" spacing={ 4 }>
 			<PostCardPanel postType={ postType } postId={ postId } />
-			{ ( contentInfoText || lastEditedText ) && (
-				<div className="editor-post-content-information">
-					<Text>
-						{ contentInfoText }
-						{ contentInfoText && lastEditedText && ' ' }
-						{ lastEditedText }
-					</Text>
-				</div>
-			) }
-			{ formattedDate && (
-				<PostPanelRow label={ __( 'Date' ) }>
-					{ formattedDate }
-				</PostPanelRow>
-			) }
-			<PostPanelRow label={ __( 'Blocks' ) }>
+			<VStack spacing={ 1 }>
+				{ contentInfoText && (
+					<div className="editor-post-content-information">
+						<Text>{ contentInfoText }</Text>
+					</div>
+				) }
+				{ lastEditedText && (
+					<div className="editor-post-last-edited-panel">
+						<Text>{ lastEditedText }</Text>
+					</div>
+				) }
+			</VStack>
+			<VStack spacing={ 1 }>
 				<HStack
 					className="editor-revisions-sidebar-content__diff"
 					spacing={ 2 }
-					justify="flex-end"
+					justify="flex-start"
 				>
+					<span className="diff-squares">
+						{ blockSquares.map( ( type, i ) => (
+							<span
+								key={ i }
+								className={ `diff-square is-${ type }` }
+							/>
+						) ) }
+					</span>
 					{ stats.blocksAdded > 0 && (
 						<span className="is-added">+{ stats.blocksAdded }</span>
 					) }
@@ -201,30 +197,15 @@ export default function RevisionsSidebarContent( {
 							-{ stats.blocksRemoved }
 						</span>
 					) }
-					<span className="diff-squares">
-						{ blockSquares.map( ( type, i ) => (
-							<span
-								key={ i }
-								className={ `diff-square is-${ type }` }
-							/>
-						) ) }
+					<span className="editor-revisions-sidebar-content__diff-label">
+						{ __( 'blocks' ) }
 					</span>
 				</HStack>
-			</PostPanelRow>
-			<PostPanelRow label={ __( 'Words' ) }>
 				<HStack
 					className="editor-revisions-sidebar-content__diff"
 					spacing={ 2 }
-					justify="flex-end"
+					justify="flex-start"
 				>
-					{ stats.wordsAdded > 0 && (
-						<span className="is-added">+{ stats.wordsAdded }</span>
-					) }
-					{ stats.wordsRemoved > 0 && (
-						<span className="is-removed">
-							-{ stats.wordsRemoved }
-						</span>
-					) }
 					<span className="diff-squares">
 						{ wordSquares.map( ( type, i ) => (
 							<span
@@ -233,8 +214,19 @@ export default function RevisionsSidebarContent( {
 							/>
 						) ) }
 					</span>
+					{ stats.wordsAdded > 0 && (
+						<span className="is-added">+{ stats.wordsAdded }</span>
+					) }
+					{ stats.wordsRemoved > 0 && (
+						<span className="is-removed">
+							-{ stats.wordsRemoved }
+						</span>
+					) }
+					<span className="editor-revisions-sidebar-content__diff-label">
+						{ __( 'words' ) }
+					</span>
 				</HStack>
-			</PostPanelRow>
+			</VStack>
 		</VStack>
 	);
 }

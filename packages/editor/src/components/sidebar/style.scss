@@ -51,7 +51,6 @@
 		.diff-squares {
 			display: inline-flex;
 			gap: 2px;
-			margin-left: $grid-unit-05;
 		}
 
 		.diff-square {
@@ -75,5 +74,9 @@
 				background-color: $gray-300;
 			}
 		}
+	}
+
+	&__diff-label {
+		color: $gray-700;
 	}
 }
