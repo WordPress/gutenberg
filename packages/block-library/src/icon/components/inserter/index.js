@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -9,10 +9,25 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-
-// temporary import of icon data until API integration is done
-import allIcons from '../../icons/icon-api-results.json';
 import { parseIcon } from '../../utils';
+
+/**
+ * Mock function to simulate fetching icons from an API.
+ * @return {Promise<Array>} A promise that resolves to an array of icon data.
+ */
+const getIcons = async () => {
+	// Dynamically import the icon data
+	const { default: allIcons } = await import(
+		'../../icons/icon-api-results.json'
+	);
+
+	// Return a new Promise that resolves after a delay
+	return new Promise( ( resolve ) => {
+		setTimeout( () => {
+			resolve( allIcons ); // Resolve with the mock data
+		}, 1000 ); // Simulate a 1-second network delay
+	} );
+};
 
 const fields = [
 	{
@@ -40,13 +55,9 @@ const fields = [
 	},
 ];
 
-// Use a subset of data for the picker example (first 10 items)
-const data = allIcons.slice( 0, 50 );
-
 const InserterModal = ( {
 	isInserterOpen,
 	setInserterOpen,
-
 	setAttributes,
 } ) => {
 	const [ view, setView ] = useState( {
@@ -62,15 +73,30 @@ const InserterModal = ( {
 		descriptionField: '',
 		type: 'pickerGrid',
 		layout: {
-			previewSize: 150,
+			previewSize: 100,
 		},
 	} );
+
+	const [ icons, setIcons ] = useState( [] );
+	const [ isLoading, setIsLoading ] = useState( true );
+
+	useEffect( () => {
+		if ( isInserterOpen ) {
+			// This will be replaced with an actual API call later.
+			const requestIcons = async () => {
+				const iconList = await getIcons();
+				setIcons( iconList );
+				setIsLoading( false );
+			};
+			requestIcons();
+		}
+	}, [ isInserterOpen ] );
 
 	const [ selection, setSelection ] = useState( [] );
 
 	const { data: processedData, paginationInfo } = useMemo( () => {
-		return filterSortAndPaginate( data, view, fields );
-	}, [ view ] );
+		return filterSortAndPaginate( icons, view, fields );
+	}, [ icons, view ] );
 
 	const actions = [
 		{
@@ -99,6 +125,7 @@ const InserterModal = ( {
 		},
 	];
 
+	// Only render the modal if it's open.
 	if ( ! isInserterOpen ) {
 		return null;
 	}
@@ -121,12 +148,12 @@ const InserterModal = ( {
 				} }
 				fields={ fields }
 				getItemId={ ( item ) => item.name.toString() }
-				itemListLabel="Galactic Bodies"
 				onChangeSelection={ setSelection }
 				onChangeView={ setView }
 				paginationInfo={ paginationInfo }
 				selection={ selection }
 				view={ view }
+				isLoading={ isLoading }
 			/>
 		</Modal>
 	);
