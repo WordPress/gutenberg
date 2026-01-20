@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { PanelBody, Button } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
-import { useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Context preview component.
@@ -15,11 +15,23 @@ import { useState } from '@wordpress/element';
  */
 export default function ContextPreview( { packet } ) {
 	const [ copied, setCopied ] = useState( false );
+	const timeoutRef = useRef( null );
 
 	const copyRef = useCopyToClipboard( packet?.packet_text || '', () => {
 		setCopied( true );
-		setTimeout( () => setCopied( false ), 2000 );
+		if ( timeoutRef.current ) {
+			clearTimeout( timeoutRef.current );
+		}
+		timeoutRef.current = setTimeout( () => setCopied( false ), 2000 );
 	} );
+
+	useEffect( () => {
+		return () => {
+			if ( timeoutRef.current ) {
+				clearTimeout( timeoutRef.current );
+			}
+		};
+	}, [] );
 
 	if ( ! packet ) {
 		return null;

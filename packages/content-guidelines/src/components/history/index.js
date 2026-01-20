@@ -133,6 +133,7 @@ export default function HistoryPanel( { onClose } ) {
 												handleRestore( revision.id )
 											}
 											disabled={ isRestoring }
+											accessibleWhenDisabled
 										>
 											{ __( 'Restore' ) }
 										</Button>

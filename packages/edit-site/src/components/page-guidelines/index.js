@@ -3,7 +3,7 @@
  */
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
-import { useState, useCallback, useMemo } from '@wordpress/element';
+import { useState, useCallback, useEffect, useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { Button } from '@wordpress/components';
 import { backup } from '@wordpress/icons';
@@ -53,14 +53,15 @@ function HeaderActions( { onShowHistory } ) {
 			icon={ backup }
 			label={ __( 'History' ) }
 			onClick={ onShowHistory }
+			__next40pxDefaultSize
 		/>
 	);
 }
 
 export default function PageGuidelines() {
-	const [ showHistory, setShowHistory ] = useState( false );
 	const { path, query } = useLocation();
 	const history = useHistory();
+	const [ showHistory, setShowHistory ] = useState( query.history === '1' );
 
 	// Current navigation state from URL
 	const currentSection = query.section || DEFAULT_SECTION;
@@ -119,6 +120,21 @@ export default function PageGuidelines() {
 		[ history, path, query ]
 	);
 
+	const updateHistoryQuery = useCallback(
+		( shouldShow ) => {
+			const newQuery = { ...query };
+
+			if ( shouldShow ) {
+				newQuery.history = '1';
+			} else {
+				delete newQuery.history;
+			}
+
+			history.navigate( addQueryArgs( path, newQuery ) );
+		},
+		[ history, path, query ]
+	);
+
 	// Handlers for child component navigation
 	const handleSubsectionChange = useCallback(
 		( subsection ) => {
@@ -133,6 +149,20 @@ export default function PageGuidelines() {
 		},
 		[ navigateTo ]
 	);
+
+	const handleShowHistory = useCallback( () => {
+		setShowHistory( true );
+		updateHistoryQuery( true );
+	}, [ updateHistoryQuery ] );
+
+	const handleCloseHistory = useCallback( () => {
+		setShowHistory( false );
+		updateHistoryQuery( false );
+	}, [ updateHistoryQuery ] );
+
+	useEffect( () => {
+		setShowHistory( query.history === '1' );
+	}, [ query.history ] );
 
 	// Create navigation context for child components
 	const navigationProps = useMemo(
@@ -162,16 +192,12 @@ export default function PageGuidelines() {
 				title={ title }
 				subTitle={ description }
 				actions={
-					<HeaderActions
-						onShowHistory={ () => setShowHistory( true ) }
-					/>
+					<HeaderActions onShowHistory={ handleShowHistory } />
 				}
 			>
 				<Component { ...navigationProps } />
 			</Page>
-			{ showHistory && (
-				<HistoryPanel onClose={ () => setShowHistory( false ) } />
-			) }
+			{ showHistory && <HistoryPanel onClose={ handleCloseHistory } /> }
 		</>
 	);
 }

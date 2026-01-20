@@ -9,6 +9,14 @@ import { useCallback } from '@wordpress/element';
  */
 import { ENTITY_KIND, ENTITY_NAME, ENTITY_ID } from '../store';
 
+const getLegacyBlockKey = ( blockName ) => {
+	if ( ! blockName || ! blockName.includes( '/' ) ) {
+		return null;
+	}
+
+	return blockName.replace( '/', '' );
+};
+
 /**
  * Hook to access and edit content guidelines using the canonical core-data pattern.
  *
@@ -42,7 +50,7 @@ export function useGuidelines() {
 		hasEdits,
 		edits,
 		edit,
-		save,
+		save: saveEntity,
 		isResolving,
 		hasResolved,
 	} = useEntityRecord( ENTITY_KIND, ENTITY_NAME, ENTITY_ID );
@@ -77,15 +85,24 @@ export function useGuidelines() {
 				return;
 			}
 			const currentBlocks = editedRecord.blocks || {};
-			const currentBlock = currentBlocks[ blockName ] || {};
-			edit( {
-				blocks: {
-					...currentBlocks,
-					[ blockName ]: {
-						...currentBlock,
-						...updates,
-					},
+			const legacyBlockName = getLegacyBlockKey( blockName );
+			const currentBlock =
+				currentBlocks[ blockName ] ||
+				( legacyBlockName ? currentBlocks[ legacyBlockName ] : null ) ||
+				{};
+			const newBlocks = {
+				...currentBlocks,
+				[ blockName ]: {
+					...currentBlock,
+					...updates,
 				},
+			};
+
+			if ( legacyBlockName ) {
+				delete newBlocks[ legacyBlockName ];
+			}
+			edit( {
+				blocks: newBlocks,
 			} );
 		},
 		[ editedRecord, edit ]
@@ -99,7 +116,14 @@ export function useGuidelines() {
 			if ( ! editedRecord?.blocks ) {
 				return null;
 			}
-			return editedRecord.blocks[ blockName ] || null;
+			const legacyBlockName = getLegacyBlockKey( blockName );
+			return (
+				editedRecord.blocks[ blockName ] ||
+				( legacyBlockName
+					? editedRecord.blocks[ legacyBlockName ]
+					: null ) ||
+				null
+			);
 		},
 		[ editedRecord ]
 	);
@@ -123,17 +147,26 @@ export function useGuidelines() {
 				return;
 			}
 			const currentBlocks = editedRecord.blocks || {};
+			const legacyBlockName = getLegacyBlockKey( blockName );
 			const newBlocks = { ...currentBlocks };
 			delete newBlocks[ blockName ];
+			if ( legacyBlockName ) {
+				delete newBlocks[ legacyBlockName ];
+			}
 			edit( { blocks: newBlocks } );
 		},
 		[ editedRecord, edit ]
 	);
 
+	const normalizedGuidelines = normalizeGuidelines( editedRecord );
+	const normalizedSavedGuidelines = normalizeGuidelines( record );
+
+	const save = useCallback( () => saveEntity(), [ saveEntity ] );
+
 	return {
 		// Data
-		guidelines: editedRecord,
-		savedGuidelines: record,
+		guidelines: normalizedGuidelines,
+		savedGuidelines: normalizedSavedGuidelines,
 		edits,
 
 		// State
@@ -173,12 +206,13 @@ function getEmptySection( sectionId ) {
 				tone_traits: [],
 				tone_notes: '',
 				pov: '',
-				readability: '',
+				readability: 'general',
 			};
 		case 'copy_rules':
 			return {
 				dos: [],
 				donts: [],
+				formatting: [],
 			};
 		case 'vocabulary':
 			return {
@@ -191,12 +225,12 @@ function getEmptySection( sectionId ) {
 			};
 		case 'heuristics':
 			return {
-				words_per_sentence: '',
-				sentences_per_paragraph: '',
-				paragraphs_per_section: '',
+				words_per_sentence: null,
+				sentences_per_paragraph: null,
+				paragraphs_per_section: null,
 				reading_level: '',
 				reading_level_custom: '',
-				max_syllables: '',
+				max_syllables: null,
 			};
 		case 'references':
 			return {
@@ -219,6 +253,84 @@ function getEmptySection( sectionId ) {
 		default:
 			return {};
 	}
+}
+
+/**
+ * Normalize guidelines object, ensuring block keys keep their namespaces.
+ *
+ * @param {Object|null} guidelines Guidelines object.
+ * @return {Object|null} Normalized guidelines.
+ */
+function normalizeGuidelines( guidelines ) {
+	if ( ! guidelines ) {
+		return guidelines;
+	}
+
+	const cleanGuidelines = Object.fromEntries(
+		Object.entries( guidelines ).filter(
+			( [ key ] ) => ! key.startsWith( '__' )
+		)
+	);
+
+	return {
+		...cleanGuidelines,
+		blocks: normalizeBlockKeys( cleanGuidelines.blocks ),
+	};
+}
+
+/**
+ * Normalize block keys from stripped format (coreparagraph) to canonical (core/paragraph).
+ *
+ * @param {Object} blocks Blocks object.
+ * @return {Object} Normalized blocks object.
+ */
+function normalizeBlockKeys( blocks ) {
+	if ( ! blocks || typeof blocks !== 'object' ) {
+		return blocks;
+	}
+
+	const normalized = {};
+	const namespaces = [
+		'core',
+		'jetpack',
+		'woocommerce',
+		'generateblocks',
+		'kadence',
+		'stackable',
+		'spectra',
+		'otter',
+	];
+
+	for ( const [ key, value ] of Object.entries( blocks ) ) {
+		if ( key.includes( '/' ) ) {
+			normalized[ key ] = value;
+			continue;
+		}
+
+		let matched = false;
+		let normalizedKey = key;
+		for ( const ns of namespaces ) {
+			if ( key.startsWith( ns ) && key.length > ns.length ) {
+				const blockName = key.slice( ns.length );
+				normalizedKey = `${ ns }/${ blockName }`;
+				matched = true;
+				break;
+			}
+		}
+
+		if ( normalized[ normalizedKey ] ) {
+			continue;
+		}
+
+		if ( ! matched ) {
+			normalized[ normalizedKey ] = value;
+			continue;
+		}
+
+		normalized[ normalizedKey ] = value;
+	}
+
+	return normalized;
 }
 
 export default useGuidelines;

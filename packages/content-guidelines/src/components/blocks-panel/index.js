@@ -1,13 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import {
 	Button,
 	SearchControl,
-	Navigator,
-	useNavigator,
 	__experimentalVStack as VStack,
 	__experimentalText as Text,
 	__experimentalHeading as Heading,
@@ -16,10 +14,11 @@ import {
 	FlexItem,
 	TextareaControl,
 	Spinner,
+	Notice,
 } from '@wordpress/components';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
-import { isRTL } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
+import { SVG, Path } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -45,26 +44,12 @@ const PRIORITY_BLOCKS = [
  */
 const BLOCKS_PER_PAGE = 20;
 
-/**
- * Block card component.
- *
- * @param {Object}   props               Component props.
- * @param {Object}   props.block         Block type object.
- * @param {string}   props.variantsText  Status text.
- * @param {Function} props.onClick       Click handler.
- * @param {string}   props.navigatorPath Navigator path.
- * @return {JSX.Element} Block card.
- */
-function BlockCard( { block, variantsText, onClick, navigatorPath } ) {
-	const navigator = useNavigator();
-	const { title, icon } = block;
+function BlockCard( { block, variantsText, onClick } ) {
+	const { title } = block;
 
 	const handleClick = () => {
 		if ( onClick ) {
 			onClick();
-		}
-		if ( navigatorPath ) {
-			navigator.goTo( navigatorPath );
 		}
 	};
 
@@ -90,16 +75,15 @@ function BlockCard( { block, variantsText, onClick, navigatorPath } ) {
 						</FlexItem>
 					) }
 					<FlexItem>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
+						<SVG
 							width="24"
 							height="24"
+							viewBox="0 0 24 24"
 							aria-hidden="true"
 							focusable="false"
 						>
-							<path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z" />
-						</svg>
+							<Path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z" />
+						</SVG>
 					</FlexItem>
 				</Flex>
 			</Flex>
@@ -138,6 +122,12 @@ function BlockDetailScreen( { block, onBack } ) {
 
 	const handleClear = () => {
 		clearBlockGuidelines( block.name );
+	};
+
+	const handleBackClick = () => {
+		if ( onBack ) {
+			onBack();
+		}
 	};
 
 	if ( ! block ) {
@@ -188,11 +178,13 @@ function BlockDetailScreen( { block, onBack } ) {
 	return (
 		<div className="blocks-panel__detail-container">
 			<div className="blocks-panel__detail-header">
-				<Navigator.BackButton
+				<Button
 					icon={ isRTL() ? chevronRight : chevronLeft }
+					variant="tertiary"
 					size="small"
-					onClick={ onBack }
-					label={ __( 'Back' ) }
+					onClick={ handleBackClick }
+					__next40pxDefaultSize
+					aria-label={ __( 'Back' ) }
 				/>
 				<Heading
 					level={ 2 }
@@ -275,7 +267,7 @@ function BlockDetailScreen( { block, onBack } ) {
 }
 
 /**
- * Blocks panel component with Navigator drill-down.
+ * Blocks panel component with drill-down.
  *
  * @param {Object}   props               Component props.
  * @param {string}   props.initialBlock  Initial block name from URL.
@@ -286,10 +278,23 @@ export default function BlocksPanel( { initialBlock, onBlockChange } ) {
 	const [ searchTerm, setSearchTerm ] = useState( '' );
 	const [ selectedBlock, setSelectedBlock ] = useState( null );
 	const [ pendingBlockName, setPendingBlockName ] = useState( initialBlock );
+	const [ invalidBlockName, setInvalidBlockName ] = useState( null );
 	const [ blockTypes, setBlockTypes ] = useState( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
 	const [ currentPage, setCurrentPage ] = useState( 1 );
+	const [ reloadKey, setReloadKey ] = useState( 0 );
+
+	// Keep pending block aligned with URL query changes.
+	useEffect( () => {
+		if ( initialBlock ) {
+			setPendingBlockName( initialBlock );
+		} else {
+			setPendingBlockName( null );
+			setSelectedBlock( null );
+			setInvalidBlockName( null );
+		}
+	}, [ initialBlock ] );
 
 	// Fetch block types from REST API on mount.
 	// This works on any admin page, unlike the blocks store which
@@ -301,6 +306,7 @@ export default function BlocksPanel( { initialBlock, onBlockChange } ) {
 			try {
 				setIsLoading( true );
 				setError( null );
+				setInvalidBlockName( null );
 
 				// Fetch all block types from the REST API.
 				const response = await apiFetch( {
@@ -334,24 +340,35 @@ export default function BlocksPanel( { initialBlock, onBlockChange } ) {
 		return () => {
 			isMounted = false;
 		};
-	}, [] );
+	}, [ reloadKey ] );
 
 	// Set selected block from URL after blocks are loaded.
 	useEffect( () => {
-		if ( pendingBlockName && blockTypes.length > 0 && ! selectedBlock ) {
+		if ( pendingBlockName && blockTypes.length > 0 ) {
 			const found = blockTypes.find(
 				( b ) => b.name === pendingBlockName
 			);
+
 			if ( found ) {
 				setSelectedBlock( found );
+				setCurrentPage( 1 );
+				setInvalidBlockName( null );
+			} else {
+				setInvalidBlockName( pendingBlockName );
+				setSelectedBlock( null );
+				if ( onBlockChange ) {
+					onBlockChange( null );
+				}
 			}
+
 			setPendingBlockName( null );
 		}
-	}, [ pendingBlockName, blockTypes, selectedBlock ] );
+	}, [ pendingBlockName, blockTypes, onBlockChange ] );
 
 	// Handle block selection with URL callback.
 	const handleBlockSelect = ( block ) => {
 		setSelectedBlock( block );
+		setInvalidBlockName( null );
 		if ( onBlockChange ) {
 			onBlockChange( block.name );
 		}
@@ -360,8 +377,15 @@ export default function BlocksPanel( { initialBlock, onBlockChange } ) {
 	// Handle back navigation with URL callback.
 	const handleBack = () => {
 		setSelectedBlock( null );
+		setInvalidBlockName( null );
 		if ( onBlockChange ) {
 			onBlockChange( null );
+		}
+		// Ensure URL is cleared when using browser back/forward.
+		if ( typeof window !== 'undefined' ) {
+			const url = new URL( window.location.href );
+			url.searchParams.delete( 'block' );
+			window.history.replaceState( {}, '', url );
 		}
 	};
 
@@ -477,8 +501,16 @@ export default function BlocksPanel( { initialBlock, onBlockChange } ) {
 				<div className="blocks-panel__loading">
 					<Text className="blocks-panel__error">{ error }</Text>
 					<Button
+						__next40pxDefaultSize
 						variant="secondary"
-						onClick={ () => window.location.reload() }
+						onClick={ () => {
+							setError( null );
+							setPendingBlockName( initialBlock || null );
+							setSelectedBlock( null );
+							setCurrentPage( 1 );
+							setSearchTerm( '' );
+							setReloadKey( ( key ) => key + 1 );
+						} }
 					>
 						{ __( 'Retry' ) }
 					</Button>
@@ -487,128 +519,123 @@ export default function BlocksPanel( { initialBlock, onBlockChange } ) {
 		);
 	}
 
+	const renderList = () => (
+		<div className="blocks-panel__content">
+			{ invalidBlockName && (
+				<Notice status="warning" isDismissible={ false }>
+					{ __(
+						'The requested block was not found. Choose another block.'
+					) }
+				</Notice>
+			) }
+
+			<div className="blocks-panel__search">
+				<SearchControl
+					__nextHasNoMarginBottom
+					value={ searchTerm }
+					onChange={ setSearchTerm }
+					placeholder={ __( 'Search blocks…' ) }
+				/>
+			</div>
+
+			{ priorityBlocks.length > 0 && (
+				<div className="blocks-panel__section">
+					<h2 className="blocks-panel__list-title">
+						{ __( 'Common' ) }
+					</h2>
+					<ul className="blocks-panel__list">
+						{ priorityBlocks.map( ( block ) => (
+							<li
+								key={ block.name }
+								className="blocks-panel__list-item"
+							>
+								<BlockCard
+									block={ block }
+									variantsText={ getBlockStatus(
+										block.name
+									) }
+									onClick={ () => handleBlockSelect( block ) }
+								/>
+							</li>
+						) ) }
+					</ul>
+				</div>
+			) }
+
+			{ otherBlocks.length > 0 && (
+				<div className="blocks-panel__section">
+					<h2 className="blocks-panel__list-title">
+						{ __( 'All Blocks' ) }
+						<span className="blocks-panel__list-count">
+							{ otherBlocks.length }
+						</span>
+					</h2>
+					<ul className="blocks-panel__list">
+						{ paginatedOtherBlocks.map( ( block ) => (
+							<li
+								key={ block.name }
+								className="blocks-panel__list-item"
+							>
+								<BlockCard
+									block={ block }
+									variantsText={ getBlockStatus(
+										block.name
+									) }
+									onClick={ () => handleBlockSelect( block ) }
+								/>
+							</li>
+						) ) }
+					</ul>
+					{ totalPages > 1 && (
+						<div className="blocks-panel__pagination">
+							<Button
+								variant="secondary"
+								size="small"
+								disabled={ currentPage === 1 }
+								accessibleWhenDisabled
+								onClick={ () =>
+									setCurrentPage( currentPage - 1 )
+								}
+							>
+								{ __( 'Previous' ) }
+							</Button>
+							<span className="blocks-panel__pagination-info">
+								{ currentPage } / { totalPages }
+							</span>
+							<Button
+								variant="secondary"
+								size="small"
+								disabled={ currentPage === totalPages }
+								accessibleWhenDisabled
+								onClick={ () =>
+									setCurrentPage( currentPage + 1 )
+								}
+							>
+								{ __( 'Next' ) }
+							</Button>
+						</div>
+					) }
+				</div>
+			) }
+
+			{ filteredBlocks.length === 0 && (
+				<Text variant="muted" className="blocks-panel__empty">
+					{ __( 'No blocks found.' ) }
+				</Text>
+			) }
+		</div>
+	);
+
 	return (
 		<div className="blocks-panel">
-			<Navigator initialPath={ selectedBlock ? '/block' : '/' }>
-				<Navigator.Screen path="/">
-					<div className="blocks-panel__content">
-						<div className="blocks-panel__search">
-							<SearchControl
-								__nextHasNoMarginBottom
-								value={ searchTerm }
-								onChange={ setSearchTerm }
-								placeholder={ __( 'Search blocks…' ) }
-							/>
-						</div>
-
-						{ priorityBlocks.length > 0 && (
-							<div className="blocks-panel__section">
-								<h2 className="blocks-panel__list-title">
-									{ __( 'Common' ) }
-								</h2>
-								<ul role="list" className="blocks-panel__list">
-									{ priorityBlocks.map( ( block ) => (
-										<li
-											key={ block.name }
-											className="blocks-panel__list-item"
-										>
-											<BlockCard
-												block={ block }
-												variantsText={ getBlockStatus(
-													block.name
-												) }
-												navigatorPath="/block"
-												onClick={ () =>
-													handleBlockSelect( block )
-												}
-											/>
-										</li>
-									) ) }
-								</ul>
-							</div>
-						) }
-
-						{ otherBlocks.length > 0 && (
-							<div className="blocks-panel__section">
-								<h2 className="blocks-panel__list-title">
-									{ __( 'All Blocks' ) }
-									<span className="blocks-panel__list-count">
-										{ otherBlocks.length }
-									</span>
-								</h2>
-								<ul role="list" className="blocks-panel__list">
-									{ paginatedOtherBlocks.map( ( block ) => (
-										<li
-											key={ block.name }
-											className="blocks-panel__list-item"
-										>
-											<BlockCard
-												block={ block }
-												variantsText={ getBlockStatus(
-													block.name
-												) }
-												navigatorPath="/block"
-												onClick={ () =>
-													handleBlockSelect( block )
-												}
-											/>
-										</li>
-									) ) }
-								</ul>
-								{ totalPages > 1 && (
-									<div className="blocks-panel__pagination">
-										<Button
-											variant="secondary"
-											size="small"
-											disabled={ currentPage === 1 }
-											onClick={ () =>
-												setCurrentPage(
-													currentPage - 1
-												)
-											}
-										>
-											{ __( 'Previous' ) }
-										</Button>
-										<span className="blocks-panel__pagination-info">
-											{ currentPage } / { totalPages }
-										</span>
-										<Button
-											variant="secondary"
-											size="small"
-											disabled={
-												currentPage === totalPages
-											}
-											onClick={ () =>
-												setCurrentPage(
-													currentPage + 1
-												)
-											}
-										>
-											{ __( 'Next' ) }
-										</Button>
-									</div>
-								) }
-							</div>
-						) }
-
-						{ filteredBlocks.length === 0 && (
-							<Text
-								variant="muted"
-								className="blocks-panel__empty"
-							>
-								{ __( 'No blocks found.' ) }
-							</Text>
-						) }
-					</div>
-				</Navigator.Screen>
-
-				<Navigator.Screen path="/block">
-					<BlockDetailScreen
-						block={ selectedBlock }
-						onBack={ handleBack }
-					/>
-				</Navigator.Screen>
-			</Navigator>
+			{ selectedBlock ? (
+				<BlockDetailScreen
+					block={ selectedBlock }
+					onBack={ handleBack }
+				/>
+			) : (
+				renderList()
+			) }
 		</div>
 	);
 }

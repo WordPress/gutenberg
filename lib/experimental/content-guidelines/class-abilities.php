@@ -19,6 +19,7 @@ defined( 'ABSPATH' ) || exit;
  * enabling AI assistants and external services to discover and execute
  * guidelines-related actions in a standardized way.
  */
+// phpcs:ignore Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.ClassNotGuardedAgainstRedeclaration -- Namespaced class won't conflict with Core.
 class Abilities {
 
 	/**
@@ -55,8 +56,8 @@ class Abilities {
 		wp_register_ability_category(
 			self::CATEGORY,
 			array(
-				'label'       => __( 'Content Guidelines', 'content-guidelines' ),
-				'description' => __( 'Manage site-level editorial guidelines for voice, tone, vocabulary, and copy rules that AI features can consume.', 'content-guidelines' ),
+				'label'       => __( 'Content Guidelines', 'gutenberg' ),
+				'description' => __( 'Manage site-level editorial guidelines for voice, tone, vocabulary, and copy rules that AI features can consume.', 'gutenberg' ),
 				'icon'        => 'edit',
 			)
 		);
@@ -98,15 +99,15 @@ class Abilities {
 		wp_register_ability(
 			self::NAMESPACE . '/get-guidelines',
 			array(
-				'label'               => __( 'Get Content Guidelines', 'content-guidelines' ),
-				'description'         => __( 'Retrieve the site content guidelines including brand context, voice and tone, copy rules, vocabulary, and image style preferences.', 'content-guidelines' ),
+				'label'               => __( 'Get Content Guidelines', 'gutenberg' ),
+				'description'         => __( 'Retrieve the site content guidelines including brand context, voice and tone, copy rules, vocabulary, and image style preferences.', 'gutenberg' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
 					'properties' => array(
 						'use' => array(
 							'type'        => 'string',
-							'description' => __( 'Which version to retrieve: "active" for published guidelines or "draft" for unpublished changes.', 'content-guidelines' ),
+							'description' => __( 'Which version to retrieve: "active" for published guidelines or "draft" for unpublished changes.', 'gutenberg' ),
 							'enum'        => array( 'active', 'draft' ),
 							'default'     => 'active',
 						),
@@ -117,27 +118,27 @@ class Abilities {
 					'properties' => array(
 						'active'         => array(
 							'type'        => 'object',
-							'description' => __( 'The currently active (published) guidelines.', 'content-guidelines' ),
+							'description' => __( 'The currently active (published) guidelines.', 'gutenberg' ),
 						),
 						'draft'          => array(
 							'type'        => array( 'object', 'null' ),
-							'description' => __( 'The draft guidelines if any unpublished changes exist.', 'content-guidelines' ),
+							'description' => __( 'The draft guidelines if any unpublished changes exist.', 'gutenberg' ),
 						),
 						'has_draft'      => array(
 							'type'        => 'boolean',
-							'description' => __( 'Whether there are unpublished draft changes.', 'content-guidelines' ),
+							'description' => __( 'Whether there are unpublished draft changes.', 'gutenberg' ),
 						),
 						'post_id'        => array(
 							'type'        => array( 'integer', 'null' ),
-							'description' => __( 'The post ID of the guidelines entity.', 'content-guidelines' ),
+							'description' => __( 'The post ID of the guidelines entity.', 'gutenberg' ),
 						),
 						'updated_at'     => array(
 							'type'        => array( 'string', 'null' ),
-							'description' => __( 'ISO 8601 timestamp of the last update.', 'content-guidelines' ),
+							'description' => __( 'ISO 8601 timestamp of the last update.', 'gutenberg' ),
 						),
 						'revision_count' => array(
 							'type'        => 'integer',
-							'description' => __( 'Number of saved revisions.', 'content-guidelines' ),
+							'description' => __( 'Number of saved revisions.', 'gutenberg' ),
 						),
 					),
 				),
@@ -157,31 +158,31 @@ class Abilities {
 		wp_register_ability(
 			self::NAMESPACE . '/get-context-packet',
 			array(
-				'label'               => __( 'Get Context Packet', 'content-guidelines' ),
-				'description'         => __( 'Get a task-specific context packet formatted for LLM consumption. The packet contains relevant guidelines sections based on the task type.', 'content-guidelines' ),
+				'label'               => __( 'Get Context Packet', 'gutenberg' ),
+				'description'         => __( 'Get a task-specific context packet formatted for LLM consumption. The packet contains relevant guidelines sections based on the task type.', 'gutenberg' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
 					'properties' => array(
 						'task'      => array(
 							'type'        => 'string',
-							'description' => __( 'The type of task to get guidelines for.', 'content-guidelines' ),
+							'description' => __( 'The type of task to get guidelines for.', 'gutenberg' ),
 							'enum'        => array( 'writing', 'headline', 'cta', 'image', 'coach' ),
 							'default'     => 'writing',
 						),
 						'post_id'   => array(
 							'type'        => 'integer',
-							'description' => __( 'Optional post ID for context-specific overrides.', 'content-guidelines' ),
+							'description' => __( 'Optional post ID for context-specific overrides.', 'gutenberg' ),
 						),
 						'use'       => array(
 							'type'        => 'string',
-							'description' => __( 'Which guidelines version to use.', 'content-guidelines' ),
+							'description' => __( 'Which guidelines version to use.', 'gutenberg' ),
 							'enum'        => array( 'active', 'draft' ),
 							'default'     => 'active',
 						),
 						'max_chars' => array(
 							'type'        => 'integer',
-							'description' => __( 'Maximum characters for the packet text.', 'content-guidelines' ),
+							'description' => __( 'Maximum characters for the packet text.', 'gutenberg' ),
 							'default'     => 2000,
 							'minimum'     => 100,
 							'maximum'     => 10000,
@@ -193,23 +194,23 @@ class Abilities {
 					'properties' => array(
 						'packet_text'       => array(
 							'type'        => 'string',
-							'description' => __( 'Formatted text optimized for LLM system prompts.', 'content-guidelines' ),
+							'description' => __( 'Formatted text optimized for LLM system prompts.', 'gutenberg' ),
 						),
 						'packet_structured' => array(
 							'type'        => 'object',
-							'description' => __( 'Structured subset of guidelines relevant to the task.', 'content-guidelines' ),
+							'description' => __( 'Structured subset of guidelines relevant to the task.', 'gutenberg' ),
 						),
 						'guidelines_id'     => array(
 							'type'        => array( 'integer', 'null' ),
-							'description' => __( 'Post ID of the guidelines entity.', 'content-guidelines' ),
+							'description' => __( 'Post ID of the guidelines entity.', 'gutenberg' ),
 						),
 						'revision_id'       => array(
 							'type'        => array( 'integer', 'null' ),
-							'description' => __( 'Current revision ID.', 'content-guidelines' ),
+							'description' => __( 'Current revision ID.', 'gutenberg' ),
 						),
 						'updated_at'        => array(
 							'type'        => array( 'string', 'null' ),
-							'description' => __( 'ISO 8601 timestamp of last update.', 'content-guidelines' ),
+							'description' => __( 'ISO 8601 timestamp of last update.', 'gutenberg' ),
 						),
 					),
 				),
@@ -229,8 +230,8 @@ class Abilities {
 		wp_register_ability(
 			self::NAMESPACE . '/update-draft',
 			array(
-				'label'               => __( 'Update Draft Guidelines', 'content-guidelines' ),
-				'description'         => __( 'Save changes to draft guidelines without publishing. Use this to incrementally update guidelines before publishing.', 'content-guidelines' ),
+				'label'               => __( 'Update Draft Guidelines', 'gutenberg' ),
+				'description'         => __( 'Save changes to draft guidelines without publishing. Use this to incrementally update guidelines before publishing.', 'gutenberg' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
@@ -238,11 +239,11 @@ class Abilities {
 					'properties' => array(
 						'guidelines' => array(
 							'type'        => 'object',
-							'description' => __( 'The guidelines object to save as draft.', 'content-guidelines' ),
+							'description' => __( 'The guidelines object to save as draft.', 'gutenberg' ),
 							'properties'  => array(
 								'brand_context' => array(
 									'type'        => 'object',
-									'description' => __( 'Brand identity and audience context.', 'content-guidelines' ),
+									'description' => __( 'Brand identity and audience context.', 'gutenberg' ),
 									'properties'  => array(
 										'site_description' => array( 'type' => 'string' ),
 										'audience'         => array( 'type' => 'string' ),
@@ -254,7 +255,7 @@ class Abilities {
 								),
 								'voice_tone'    => array(
 									'type'        => 'object',
-									'description' => __( 'Voice and tone preferences.', 'content-guidelines' ),
+									'description' => __( 'Voice and tone preferences.', 'gutenberg' ),
 									'properties'  => array(
 										'tone_traits' => array(
 											'type'  => 'array',
@@ -272,7 +273,7 @@ class Abilities {
 								),
 								'copy_rules'    => array(
 									'type'        => 'object',
-									'description' => __( 'Writing dos and donts.', 'content-guidelines' ),
+									'description' => __( 'Writing dos and donts.', 'gutenberg' ),
 									'properties'  => array(
 										'dos'        => array(
 											'type'  => 'array',
@@ -290,12 +291,12 @@ class Abilities {
 								),
 								'vocabulary'    => array(
 									'type'        => 'object',
-									'description' => __( 'Preferred and avoided terms.', 'content-guidelines' ),
+									'description' => __( 'Preferred and avoided terms.', 'gutenberg' ),
 									'properties'  => array(
 										'prefer' => array(
 											'type'  => 'array',
 											'items' => array(
-												'type'       => 'object',
+												'type' => 'object',
 												'properties' => array(
 													'term' => array( 'type' => 'string' ),
 													'note' => array( 'type' => 'string' ),
@@ -305,7 +306,7 @@ class Abilities {
 										'avoid'  => array(
 											'type'  => 'array',
 											'items' => array(
-												'type'       => 'object',
+												'type' => 'object',
 												'properties' => array(
 													'term' => array( 'type' => 'string' ),
 													'note' => array( 'type' => 'string' ),
@@ -316,7 +317,7 @@ class Abilities {
 								),
 								'image_style'   => array(
 									'type'        => 'object',
-									'description' => __( 'Image style preferences and reference images.', 'content-guidelines' ),
+									'description' => __( 'Image style preferences and reference images.', 'gutenberg' ),
 									'properties'  => array(
 										'dos'              => array(
 											'type'  => 'array',
@@ -332,13 +333,13 @@ class Abilities {
 										),
 										'reference_images' => array(
 											'type'        => 'array',
-											'description' => __( 'Reference images from media library.', 'content-guidelines' ),
+											'description' => __( 'Reference images from media library.', 'gutenberg' ),
 											'items'       => array(
-												'type'       => 'object',
+												'type' => 'object',
 												'properties' => array(
-													'id'    => array( 'type' => 'integer' ),
-													'url'   => array( 'type' => 'string' ),
-													'alt'   => array( 'type' => 'string' ),
+													'id'  => array( 'type' => 'integer' ),
+													'url' => array( 'type' => 'string' ),
+													'alt' => array( 'type' => 'string' ),
 													'notes' => array( 'type' => 'string' ),
 												),
 											),
@@ -347,71 +348,71 @@ class Abilities {
 								),
 								'heuristics'    => array(
 									'type'        => 'object',
-									'description' => __( 'Target metrics for content structure and readability.', 'content-guidelines' ),
+									'description' => __( 'Target metrics for content structure and readability.', 'gutenberg' ),
 									'properties'  => array(
-										'words_per_sentence'      => array(
+										'words_per_sentence' => array(
 											'type'        => 'integer',
-											'description' => __( 'Target average words per sentence.', 'content-guidelines' ),
+											'description' => __( 'Target average words per sentence.', 'gutenberg' ),
 										),
 										'sentences_per_paragraph' => array(
 											'type'        => 'integer',
-											'description' => __( 'Target sentences per paragraph.', 'content-guidelines' ),
+											'description' => __( 'Target sentences per paragraph.', 'gutenberg' ),
 										),
-										'paragraphs_per_section'  => array(
+										'paragraphs_per_section' => array(
 											'type'        => 'integer',
-											'description' => __( 'Target paragraphs per section.', 'content-guidelines' ),
+											'description' => __( 'Target paragraphs per section.', 'gutenberg' ),
 										),
-										'reading_level'           => array(
+										'reading_level' => array(
 											'type'        => 'string',
-											'description' => __( 'Target reading level.', 'content-guidelines' ),
+											'description' => __( 'Target reading level.', 'gutenberg' ),
 											'enum'        => array( '5th_grade', '8th_grade', 'high_school', 'college', 'custom' ),
 										),
-										'custom_reading_level'    => array(
+										'custom_reading_level' => array(
 											'type'        => 'string',
-											'description' => __( 'Custom reading level description when reading_level is "custom".', 'content-guidelines' ),
+											'description' => __( 'Custom reading level description when reading_level is "custom".', 'gutenberg' ),
 										),
-										'max_syllables_per_word'  => array(
+										'max_syllables_per_word' => array(
 											'type'        => 'integer',
-											'description' => __( 'Maximum average syllables per word.', 'content-guidelines' ),
+											'description' => __( 'Maximum average syllables per word.', 'gutenberg' ),
 										),
 									),
 								),
 								'references'    => array(
 									'type'        => 'array',
-									'description' => __( 'External content references to emulate.', 'content-guidelines' ),
+									'description' => __( 'External content references to emulate.', 'gutenberg' ),
 									'items'       => array(
 										'type'       => 'object',
 										'properties' => array(
 											'title' => array(
-												'type'        => 'string',
-												'description' => __( 'Reference title or name.', 'content-guidelines' ),
+												'type' => 'string',
+												'description' => __( 'Reference title or name.', 'gutenberg' ),
 											),
 											'url'   => array(
-												'type'        => 'string',
-												'description' => __( 'URL to the reference.', 'content-guidelines' ),
+												'type' => 'string',
+												'description' => __( 'URL to the reference.', 'gutenberg' ),
 											),
 											'type'  => array(
-												'type'        => 'string',
-												'description' => __( 'Type of reference.', 'content-guidelines' ),
-												'enum'        => array( 'website', 'article', 'book', 'document', 'competitor', 'other' ),
+												'type' => 'string',
+												'description' => __( 'Type of reference.', 'gutenberg' ),
+												'enum' => array( 'website', 'article', 'book', 'document', 'competitor', 'other' ),
 											),
 											'notes' => array(
-												'type'        => 'string',
-												'description' => __( 'Notes about what to emulate.', 'content-guidelines' ),
+												'type' => 'string',
+												'description' => __( 'Notes about what to emulate.', 'gutenberg' ),
 											),
 										),
 									),
 								),
 								'blocks'        => array(
 									'type'                 => 'object',
-									'description'          => __( 'Per-block guidelines keyed by block name.', 'content-guidelines' ),
+									'description'          => __( 'Per-block guidelines keyed by block name.', 'gutenberg' ),
 									'additionalProperties' => array(
 										'type'       => 'object',
 										'properties' => array(
 											'copy_rules' => array(
-												'type'       => 'object',
+												'type' => 'object',
 												'properties' => array(
-													'dos'   => array(
+													'dos' => array(
 														'type'  => 'array',
 														'items' => array( 'type' => 'string' ),
 													),
@@ -427,7 +428,7 @@ class Abilities {
 								),
 								'notes'         => array(
 									'type'        => 'string',
-									'description' => __( 'General notes and additional context.', 'content-guidelines' ),
+									'description' => __( 'General notes and additional context.', 'gutenberg' ),
 								),
 							),
 						),
@@ -438,11 +439,11 @@ class Abilities {
 					'properties' => array(
 						'success' => array(
 							'type'        => 'boolean',
-							'description' => __( 'Whether the draft was saved successfully.', 'content-guidelines' ),
+							'description' => __( 'Whether the draft was saved successfully.', 'gutenberg' ),
 						),
 						'message' => array(
 							'type'        => 'string',
-							'description' => __( 'Status message.', 'content-guidelines' ),
+							'description' => __( 'Status message.', 'gutenberg' ),
 						),
 					),
 				),
@@ -462,8 +463,8 @@ class Abilities {
 		wp_register_ability(
 			self::NAMESPACE . '/publish-draft',
 			array(
-				'label'               => __( 'Publish Draft Guidelines', 'content-guidelines' ),
-				'description'         => __( 'Publish the current draft guidelines, making them the active guidelines for the site.', 'content-guidelines' ),
+				'label'               => __( 'Publish Draft Guidelines', 'gutenberg' ),
+				'description'         => __( 'Publish the current draft guidelines, making them the active guidelines for the site.', 'gutenberg' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
@@ -474,15 +475,15 @@ class Abilities {
 					'properties' => array(
 						'success' => array(
 							'type'        => 'boolean',
-							'description' => __( 'Whether the publish was successful.', 'content-guidelines' ),
+							'description' => __( 'Whether the publish was successful.', 'gutenberg' ),
 						),
 						'post_id' => array(
 							'type'        => 'integer',
-							'description' => __( 'The post ID of the published guidelines.', 'content-guidelines' ),
+							'description' => __( 'The post ID of the published guidelines.', 'gutenberg' ),
 						),
 						'message' => array(
 							'type'        => 'string',
-							'description' => __( 'Status message.', 'content-guidelines' ),
+							'description' => __( 'Status message.', 'gutenberg' ),
 						),
 					),
 				),
@@ -502,8 +503,8 @@ class Abilities {
 		wp_register_ability(
 			self::NAMESPACE . '/discard-draft',
 			array(
-				'label'               => __( 'Discard Draft Guidelines', 'content-guidelines' ),
-				'description'         => __( 'Discard all unpublished draft changes and revert to the active guidelines.', 'content-guidelines' ),
+				'label'               => __( 'Discard Draft Guidelines', 'gutenberg' ),
+				'description'         => __( 'Discard all unpublished draft changes and revert to the active guidelines.', 'gutenberg' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
@@ -514,11 +515,11 @@ class Abilities {
 					'properties' => array(
 						'success' => array(
 							'type'        => 'boolean',
-							'description' => __( 'Whether the discard was successful.', 'content-guidelines' ),
+							'description' => __( 'Whether the discard was successful.', 'gutenberg' ),
 						),
 						'message' => array(
 							'type'        => 'string',
-							'description' => __( 'Status message.', 'content-guidelines' ),
+							'description' => __( 'Status message.', 'gutenberg' ),
 						),
 					),
 				),
@@ -538,20 +539,20 @@ class Abilities {
 		wp_register_ability(
 			self::NAMESPACE . '/list-blocks',
 			array(
-				'label'               => __( 'List Blocks', 'content-guidelines' ),
-				'description'         => __( 'List all available block types and their guidelines configuration status.', 'content-guidelines' ),
+				'label'               => __( 'List Blocks', 'gutenberg' ),
+				'description'         => __( 'List all available block types and their guidelines configuration status.', 'gutenberg' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
 					'properties' => array(
 						'configured_only' => array(
 							'type'        => 'boolean',
-							'description' => __( 'Only return blocks that have guidelines configured.', 'content-guidelines' ),
+							'description' => __( 'Only return blocks that have guidelines configured.', 'gutenberg' ),
 							'default'     => false,
 						),
 						'search'          => array(
 							'type'        => 'string',
-							'description' => __( 'Search blocks by name or title.', 'content-guidelines' ),
+							'description' => __( 'Search blocks by name or title.', 'gutenberg' ),
 						),
 					),
 				),
@@ -560,7 +561,7 @@ class Abilities {
 					'properties' => array(
 						'blocks' => array(
 							'type'        => 'array',
-							'description' => __( 'Array of block types.', 'content-guidelines' ),
+							'description' => __( 'Array of block types.', 'gutenberg' ),
 							'items'       => array(
 								'type'       => 'object',
 								'properties' => array(
@@ -574,7 +575,7 @@ class Abilities {
 						),
 						'total'  => array(
 							'type'        => 'integer',
-							'description' => __( 'Total number of blocks returned.', 'content-guidelines' ),
+							'description' => __( 'Total number of blocks returned.', 'gutenberg' ),
 						),
 					),
 				),
@@ -594,8 +595,8 @@ class Abilities {
 		wp_register_ability(
 			self::NAMESPACE . '/get-block-guidelines',
 			array(
-				'label'               => __( 'Get Block Guidelines', 'content-guidelines' ),
-				'description'         => __( 'Get guidelines for a specific block type.', 'content-guidelines' ),
+				'label'               => __( 'Get Block Guidelines', 'gutenberg' ),
+				'description'         => __( 'Get guidelines for a specific block type.', 'gutenberg' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
@@ -603,11 +604,11 @@ class Abilities {
 					'properties' => array(
 						'block_name' => array(
 							'type'        => 'string',
-							'description' => __( 'The block name (e.g., "core/paragraph").', 'content-guidelines' ),
+							'description' => __( 'The block name (e.g., "core/paragraph").', 'gutenberg' ),
 						),
 						'use'        => array(
 							'type'        => 'string',
-							'description' => __( 'Which version to retrieve.', 'content-guidelines' ),
+							'description' => __( 'Which version to retrieve.', 'gutenberg' ),
 							'enum'        => array( 'active', 'draft' ),
 							'default'     => 'active',
 						),
@@ -618,15 +619,15 @@ class Abilities {
 					'properties' => array(
 						'block_name'  => array(
 							'type'        => 'string',
-							'description' => __( 'The block name.', 'content-guidelines' ),
+							'description' => __( 'The block name.', 'gutenberg' ),
 						),
 						'block_title' => array(
 							'type'        => 'string',
-							'description' => __( 'The block display title.', 'content-guidelines' ),
+							'description' => __( 'The block display title.', 'gutenberg' ),
 						),
 						'guidelines'  => array(
 							'type'        => 'object',
-							'description' => __( 'The block guidelines.', 'content-guidelines' ),
+							'description' => __( 'The block guidelines.', 'gutenberg' ),
 							'properties'  => array(
 								'copy_rules' => array(
 									'type'       => 'object',
@@ -646,7 +647,7 @@ class Abilities {
 						),
 						'has_content' => array(
 							'type'        => 'boolean',
-							'description' => __( 'Whether the block has any guidelines configured.', 'content-guidelines' ),
+							'description' => __( 'Whether the block has any guidelines configured.', 'gutenberg' ),
 						),
 					),
 				),
@@ -666,8 +667,8 @@ class Abilities {
 		wp_register_ability(
 			self::NAMESPACE . '/update-block-guidelines',
 			array(
-				'label'               => __( 'Update Block Guidelines', 'content-guidelines' ),
-				'description'         => __( 'Update guidelines for a specific block type. Changes are saved to draft.', 'content-guidelines' ),
+				'label'               => __( 'Update Block Guidelines', 'gutenberg' ),
+				'description'         => __( 'Update guidelines for a specific block type. Changes are saved to draft.', 'gutenberg' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
@@ -675,11 +676,11 @@ class Abilities {
 					'properties' => array(
 						'block_name' => array(
 							'type'        => 'string',
-							'description' => __( 'The block name (e.g., "core/paragraph").', 'content-guidelines' ),
+							'description' => __( 'The block name (e.g., "core/paragraph").', 'gutenberg' ),
 						),
 						'guidelines' => array(
 							'type'        => 'object',
-							'description' => __( 'The block guidelines to save.', 'content-guidelines' ),
+							'description' => __( 'The block guidelines to save.', 'gutenberg' ),
 							'properties'  => array(
 								'copy_rules' => array(
 									'type'       => 'object',
@@ -704,11 +705,11 @@ class Abilities {
 					'properties' => array(
 						'success' => array(
 							'type'        => 'boolean',
-							'description' => __( 'Whether the update was successful.', 'content-guidelines' ),
+							'description' => __( 'Whether the update was successful.', 'gutenberg' ),
 						),
 						'message' => array(
 							'type'        => 'string',
-							'description' => __( 'Status message.', 'content-guidelines' ),
+							'description' => __( 'Status message.', 'gutenberg' ),
 						),
 					),
 				),
@@ -728,15 +729,15 @@ class Abilities {
 		wp_register_ability(
 			self::NAMESPACE . '/get-revisions',
 			array(
-				'label'               => __( 'Get Revisions', 'content-guidelines' ),
-				'description'         => __( 'Get the revision history for guidelines.', 'content-guidelines' ),
+				'label'               => __( 'Get Revisions', 'gutenberg' ),
+				'description'         => __( 'Get the revision history for guidelines.', 'gutenberg' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
 					'properties' => array(
 						'limit' => array(
 							'type'        => 'integer',
-							'description' => __( 'Maximum number of revisions to return.', 'content-guidelines' ),
+							'description' => __( 'Maximum number of revisions to return.', 'gutenberg' ),
 							'default'     => 20,
 							'minimum'     => 1,
 							'maximum'     => 100,
@@ -748,21 +749,21 @@ class Abilities {
 					'properties' => array(
 						'revisions' => array(
 							'type'        => 'array',
-							'description' => __( 'Array of revisions.', 'content-guidelines' ),
+							'description' => __( 'Array of revisions.', 'gutenberg' ),
 							'items'       => array(
 								'type'       => 'object',
 								'properties' => array(
-									'id'         => array( 'type' => 'integer' ),
-									'date'       => array( 'type' => 'string' ),
-									'date_gmt'   => array( 'type' => 'string' ),
-									'author'     => array( 'type' => 'integer' ),
+									'id'          => array( 'type' => 'integer' ),
+									'date'        => array( 'type' => 'string' ),
+									'date_gmt'    => array( 'type' => 'string' ),
+									'author'      => array( 'type' => 'integer' ),
 									'author_name' => array( 'type' => 'string' ),
 								),
 							),
 						),
 						'total'     => array(
 							'type'        => 'integer',
-							'description' => __( 'Total number of revisions.', 'content-guidelines' ),
+							'description' => __( 'Total number of revisions.', 'gutenberg' ),
 						),
 					),
 				),
@@ -782,8 +783,8 @@ class Abilities {
 		wp_register_ability(
 			self::NAMESPACE . '/restore-revision',
 			array(
-				'label'               => __( 'Restore Revision', 'content-guidelines' ),
-				'description'         => __( 'Restore guidelines to a previous revision. The revision becomes the new draft.', 'content-guidelines' ),
+				'label'               => __( 'Restore Revision', 'gutenberg' ),
+				'description'         => __( 'Restore guidelines to a previous revision. The revision becomes the new draft.', 'gutenberg' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
@@ -791,7 +792,7 @@ class Abilities {
 					'properties' => array(
 						'revision_id' => array(
 							'type'        => 'integer',
-							'description' => __( 'The revision ID to restore.', 'content-guidelines' ),
+							'description' => __( 'The revision ID to restore.', 'gutenberg' ),
 						),
 					),
 				),
@@ -800,15 +801,15 @@ class Abilities {
 					'properties' => array(
 						'success'    => array(
 							'type'        => 'boolean',
-							'description' => __( 'Whether the restore was successful.', 'content-guidelines' ),
+							'description' => __( 'Whether the restore was successful.', 'gutenberg' ),
 						),
 						'message'    => array(
 							'type'        => 'string',
-							'description' => __( 'Status message.', 'content-guidelines' ),
+							'description' => __( 'Status message.', 'gutenberg' ),
 						),
 						'guidelines' => array(
 							'type'        => 'object',
-							'description' => __( 'The restored guidelines (now in draft).', 'content-guidelines' ),
+							'description' => __( 'The restored guidelines (now in draft).', 'gutenberg' ),
 						),
 					),
 				),
@@ -828,21 +829,21 @@ class Abilities {
 		wp_register_ability(
 			self::NAMESPACE . '/export-guidelines',
 			array(
-				'label'               => __( 'Export Guidelines', 'content-guidelines' ),
-				'description'         => __( 'Export guidelines as a portable JSON object.', 'content-guidelines' ),
+				'label'               => __( 'Export Guidelines', 'gutenberg' ),
+				'description'         => __( 'Export guidelines as a portable JSON object.', 'gutenberg' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
 					'properties' => array(
-						'use'             => array(
+						'use'          => array(
 							'type'        => 'string',
-							'description' => __( 'Which version to export.', 'content-guidelines' ),
+							'description' => __( 'Which version to export.', 'gutenberg' ),
 							'enum'        => array( 'active', 'draft' ),
 							'default'     => 'active',
 						),
-						'include_meta'    => array(
+						'include_meta' => array(
 							'type'        => 'boolean',
-							'description' => __( 'Include metadata like export date and version.', 'content-guidelines' ),
+							'description' => __( 'Include metadata like export date and version.', 'gutenberg' ),
 							'default'     => true,
 						),
 					),
@@ -852,12 +853,12 @@ class Abilities {
 					'properties' => array(
 						'export' => array(
 							'type'        => 'object',
-							'description' => __( 'The exported guidelines object.', 'content-guidelines' ),
+							'description' => __( 'The exported guidelines object.', 'gutenberg' ),
 							'properties'  => array(
-								'version'       => array( 'type' => 'string' ),
-								'exported_at'   => array( 'type' => 'string' ),
-								'site_url'      => array( 'type' => 'string' ),
-								'guidelines'    => array( 'type' => 'object' ),
+								'version'     => array( 'type' => 'string' ),
+								'exported_at' => array( 'type' => 'string' ),
+								'site_url'    => array( 'type' => 'string' ),
+								'guidelines'  => array( 'type' => 'object' ),
 							),
 						),
 					),
@@ -878,8 +879,8 @@ class Abilities {
 		wp_register_ability(
 			self::NAMESPACE . '/import-guidelines',
 			array(
-				'label'               => __( 'Import Guidelines', 'content-guidelines' ),
-				'description'         => __( 'Import guidelines from a JSON export. Imported guidelines become the new draft.', 'content-guidelines' ),
+				'label'               => __( 'Import Guidelines', 'gutenberg' ),
+				'description'         => __( 'Import guidelines from a JSON export. Imported guidelines become the new draft.', 'gutenberg' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
@@ -887,17 +888,17 @@ class Abilities {
 					'properties' => array(
 						'import' => array(
 							'type'        => 'object',
-							'description' => __( 'The guidelines export object to import.', 'content-guidelines' ),
+							'description' => __( 'The guidelines export object to import.', 'gutenberg' ),
 							'properties'  => array(
 								'guidelines' => array(
 									'type'        => 'object',
-									'description' => __( 'The guidelines data.', 'content-guidelines' ),
+									'description' => __( 'The guidelines data.', 'gutenberg' ),
 								),
 							),
 						),
 						'merge'  => array(
 							'type'        => 'boolean',
-							'description' => __( 'Merge with existing guidelines instead of replacing.', 'content-guidelines' ),
+							'description' => __( 'Merge with existing guidelines instead of replacing.', 'gutenberg' ),
 							'default'     => false,
 						),
 					),
@@ -907,11 +908,11 @@ class Abilities {
 					'properties' => array(
 						'success' => array(
 							'type'        => 'boolean',
-							'description' => __( 'Whether the import was successful.', 'content-guidelines' ),
+							'description' => __( 'Whether the import was successful.', 'gutenberg' ),
 						),
 						'message' => array(
 							'type'        => 'string',
-							'description' => __( 'Status message.', 'content-guidelines' ),
+							'description' => __( 'Status message.', 'gutenberg' ),
 						),
 					),
 				),
@@ -931,8 +932,8 @@ class Abilities {
 		wp_register_ability(
 			self::NAMESPACE . '/run-test',
 			array(
-				'label'               => __( 'Run Playground Test', 'content-guidelines' ),
-				'description'         => __( 'Test how guidelines affect AI-generated content by running a task against a fixture post. Returns lint results, context packet, and optionally AI-generated output if a provider is available.', 'content-guidelines' ),
+				'label'               => __( 'Run Playground Test', 'gutenberg' ),
+				'description'         => __( 'Test how guidelines affect AI-generated content by running a task against a fixture post. Returns lint results, context packet, and optionally AI-generated output if a provider is available.', 'gutenberg' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
@@ -940,28 +941,28 @@ class Abilities {
 					'properties' => array(
 						'task'               => array(
 							'type'        => 'string',
-							'description' => __( 'The type of test to run.', 'content-guidelines' ),
+							'description' => __( 'The type of test to run.', 'gutenberg' ),
 							'enum'        => array( 'rewrite_intro', 'generate_headlines', 'write_cta' ),
 							'default'     => 'rewrite_intro',
 						),
 						'fixture_post_id'    => array(
 							'type'        => 'integer',
-							'description' => __( 'The post ID to use as test fixture content.', 'content-guidelines' ),
+							'description' => __( 'The post ID to use as test fixture content.', 'gutenberg' ),
 						),
 						'use'                => array(
 							'type'        => 'string',
-							'description' => __( 'Which guidelines version to test with.', 'content-guidelines' ),
+							'description' => __( 'Which guidelines version to test with.', 'gutenberg' ),
 							'enum'        => array( 'active', 'draft' ),
 							'default'     => 'draft',
 						),
 						'compare'            => array(
 							'type'        => 'boolean',
-							'description' => __( 'Whether to also run the test with active guidelines for comparison.', 'content-guidelines' ),
+							'description' => __( 'Whether to also run the test with active guidelines for comparison.', 'gutenberg' ),
 							'default'     => false,
 						),
 						'extra_instructions' => array(
 							'type'        => 'string',
-							'description' => __( 'Additional instructions to pass to the AI provider.', 'content-guidelines' ),
+							'description' => __( 'Additional instructions to pass to the AI provider.', 'gutenberg' ),
 						),
 					),
 				),
@@ -970,27 +971,27 @@ class Abilities {
 					'properties' => array(
 						'lint_results'   => array(
 							'type'        => 'object',
-							'description' => __( 'Results from vocabulary and copy rule lint checks.', 'content-guidelines' ),
+							'description' => __( 'Results from vocabulary and copy rule lint checks.', 'gutenberg' ),
 						),
 						'context_packet' => array(
 							'type'        => 'object',
-							'description' => __( 'The context packet that would be sent to AI.', 'content-guidelines' ),
+							'description' => __( 'The context packet that would be sent to AI.', 'gutenberg' ),
 						),
 						'fixture'        => array(
 							'type'        => 'object',
-							'description' => __( 'Information about the fixture post used.', 'content-guidelines' ),
+							'description' => __( 'Information about the fixture post used.', 'gutenberg' ),
 						),
 						'ai_result'      => array(
 							'type'        => 'object',
-							'description' => __( 'AI-generated result if a provider is available.', 'content-guidelines' ),
+							'description' => __( 'AI-generated result if a provider is available.', 'gutenberg' ),
 						),
 						'ai_available'   => array(
 							'type'        => 'boolean',
-							'description' => __( 'Whether AI generation was available.', 'content-guidelines' ),
+							'description' => __( 'Whether AI generation was available.', 'gutenberg' ),
 						),
 						'compare'        => array(
 							'type'        => 'object',
-							'description' => __( 'Comparison results using active guidelines.', 'content-guidelines' ),
+							'description' => __( 'Comparison results using active guidelines.', 'gutenberg' ),
 						),
 					),
 				),
@@ -1010,8 +1011,8 @@ class Abilities {
 		wp_register_ability(
 			self::NAMESPACE . '/check-lint',
 			array(
-				'label'               => __( 'Check Content Lint', 'content-guidelines' ),
-				'description'         => __( 'Run vocabulary and copy rule lint checks against provided content without running AI generation.', 'content-guidelines' ),
+				'label'               => __( 'Check Content Lint', 'gutenberg' ),
+				'description'         => __( 'Run vocabulary and copy rule lint checks against provided content without running AI generation.', 'gutenberg' ),
 				'category'            => self::CATEGORY,
 				'input_schema'        => array(
 					'type'       => 'object',
@@ -1019,11 +1020,11 @@ class Abilities {
 					'properties' => array(
 						'content' => array(
 							'type'        => 'string',
-							'description' => __( 'The content to check against guidelines.', 'content-guidelines' ),
+							'description' => __( 'The content to check against guidelines.', 'gutenberg' ),
 						),
 						'use'     => array(
 							'type'        => 'string',
-							'description' => __( 'Which guidelines version to check against.', 'content-guidelines' ),
+							'description' => __( 'Which guidelines version to check against.', 'gutenberg' ),
 							'enum'        => array( 'active', 'draft' ),
 							'default'     => 'active',
 						),
@@ -1032,9 +1033,9 @@ class Abilities {
 				'output_schema'       => array(
 					'type'       => 'object',
 					'properties' => array(
-						'issues'       => array(
+						'issues'      => array(
 							'type'        => 'array',
-							'description' => __( 'Array of lint issues found.', 'content-guidelines' ),
+							'description' => __( 'Array of lint issues found.', 'gutenberg' ),
 							'items'       => array(
 								'type'       => 'object',
 								'properties' => array(
@@ -1045,13 +1046,13 @@ class Abilities {
 								),
 							),
 						),
-						'issue_count'  => array(
+						'issue_count' => array(
 							'type'        => 'integer',
-							'description' => __( 'Total number of issues found.', 'content-guidelines' ),
+							'description' => __( 'Total number of issues found.', 'gutenberg' ),
 						),
-						'passed'       => array(
+						'passed'      => array(
 							'type'        => 'boolean',
-							'description' => __( 'Whether the content passed all lint checks.', 'content-guidelines' ),
+							'description' => __( 'Whether the content passed all lint checks.', 'gutenberg' ),
 						),
 					),
 				),
@@ -1138,7 +1139,7 @@ class Abilities {
 		if ( ! isset( $input['guidelines'] ) ) {
 			return new \WP_Error(
 				'missing_guidelines',
-				__( 'Guidelines data is required.', 'content-guidelines' )
+				__( 'Guidelines data is required.', 'gutenberg' )
 			);
 		}
 
@@ -1151,7 +1152,7 @@ class Abilities {
 
 		return array(
 			'success' => true,
-			'message' => __( 'Draft saved.', 'content-guidelines' ),
+			'message' => __( 'Draft saved.', 'gutenberg' ),
 		);
 	}
 
@@ -1171,7 +1172,7 @@ class Abilities {
 		return array(
 			'success' => true,
 			'post_id' => $result,
-			'message' => __( 'Guidelines published.', 'content-guidelines' ),
+			'message' => __( 'Guidelines published.', 'gutenberg' ),
 		);
 	}
 
@@ -1186,7 +1187,7 @@ class Abilities {
 
 		return array(
 			'success' => true,
-			'message' => __( 'Draft discarded.', 'content-guidelines' ),
+			'message' => __( 'Draft discarded.', 'gutenberg' ),
 		);
 	}
 
@@ -1200,7 +1201,7 @@ class Abilities {
 		if ( ! isset( $input['fixture_post_id'] ) ) {
 			return new \WP_Error(
 				'missing_fixture',
-				__( 'Fixture post ID is required.', 'content-guidelines' )
+				__( 'Fixture post ID is required.', 'gutenberg' )
 			);
 		}
 
@@ -1209,7 +1210,7 @@ class Abilities {
 		if ( ! $fixture_post ) {
 			return new \WP_Error(
 				'invalid_fixture',
-				__( 'Invalid fixture post.', 'content-guidelines' )
+				__( 'Invalid fixture post.', 'gutenberg' )
 			);
 		}
 
@@ -1302,7 +1303,7 @@ class Abilities {
 		if ( ! isset( $input['content'] ) || empty( $input['content'] ) ) {
 			return new \WP_Error(
 				'missing_content',
-				__( 'Content is required.', 'content-guidelines' )
+				__( 'Content is required.', 'gutenberg' )
 			);
 		}
 
@@ -1377,9 +1378,12 @@ class Abilities {
 		}
 
 		// Sort alphabetically by title.
-		usort( $blocks, function( $a, $b ) {
-			return strcasecmp( $a['title'], $b['title'] );
-		} );
+		usort(
+			$blocks,
+			function ( $a, $b ) {
+				return strcasecmp( $a['title'], $b['title'] );
+			}
+		);
 
 		return array(
 			'blocks' => $blocks,
@@ -1397,7 +1401,7 @@ class Abilities {
 		if ( ! isset( $input['block_name'] ) ) {
 			return new \WP_Error(
 				'missing_block_name',
-				__( 'Block name is required.', 'content-guidelines' )
+				__( 'Block name is required.', 'gutenberg' )
 			);
 		}
 
@@ -1438,7 +1442,7 @@ class Abilities {
 		if ( ! isset( $input['block_name'] ) || ! isset( $input['guidelines'] ) ) {
 			return new \WP_Error(
 				'missing_params',
-				__( 'Block name and guidelines are required.', 'content-guidelines' )
+				__( 'Block name and guidelines are required.', 'gutenberg' )
 			);
 		}
 
@@ -1475,7 +1479,7 @@ class Abilities {
 			'success' => true,
 			'message' => sprintf(
 				/* translators: %s: block name */
-				__( 'Guidelines for %s updated.', 'content-guidelines' ),
+				__( 'Guidelines for %s updated.', 'gutenberg' ),
 				$block_name
 			),
 		);
@@ -1510,7 +1514,7 @@ class Abilities {
 
 		foreach ( $revisions as $revision ) {
 			$author      = get_user_by( 'id', $revision->post_author );
-			$author_name = $author ? $author->display_name : __( 'Unknown', 'content-guidelines' );
+			$author_name = $author ? $author->display_name : __( 'Unknown', 'gutenberg' );
 
 			$result[] = array(
 				'id'          => $revision->ID,
@@ -1537,7 +1541,7 @@ class Abilities {
 		if ( ! isset( $input['revision_id'] ) ) {
 			return new \WP_Error(
 				'missing_revision_id',
-				__( 'Revision ID is required.', 'content-guidelines' )
+				__( 'Revision ID is required.', 'gutenberg' )
 			);
 		}
 
@@ -1547,7 +1551,7 @@ class Abilities {
 		if ( ! $revision ) {
 			return new \WP_Error(
 				'invalid_revision',
-				__( 'Invalid revision ID.', 'content-guidelines' )
+				__( 'Invalid revision ID.', 'gutenberg' )
 			);
 		}
 
@@ -1558,7 +1562,7 @@ class Abilities {
 		if ( json_last_error() !== JSON_ERROR_NONE || ! is_array( $guidelines ) ) {
 			return new \WP_Error(
 				'invalid_revision_content',
-				__( 'Revision content is not valid guidelines data.', 'content-guidelines' )
+				__( 'Revision content is not valid guidelines data.', 'gutenberg' )
 			);
 		}
 
@@ -1571,7 +1575,7 @@ class Abilities {
 
 		return array(
 			'success'    => true,
-			'message'    => __( 'Revision restored as draft.', 'content-guidelines' ),
+			'message'    => __( 'Revision restored as draft.', 'gutenberg' ),
 			'guidelines' => $guidelines,
 		);
 	}
@@ -1619,7 +1623,7 @@ class Abilities {
 		if ( ! isset( $input['import'] ) ) {
 			return new \WP_Error(
 				'missing_import',
-				__( 'Import data is required.', 'content-guidelines' )
+				__( 'Import data is required.', 'gutenberg' )
 			);
 		}
 
@@ -1632,7 +1636,7 @@ class Abilities {
 		if ( ! is_array( $guidelines ) ) {
 			return new \WP_Error(
 				'invalid_import',
-				__( 'Invalid import data format.', 'content-guidelines' )
+				__( 'Invalid import data format.', 'gutenberg' )
 			);
 		}
 
@@ -1662,8 +1666,8 @@ class Abilities {
 		return array(
 			'success' => true,
 			'message' => $merge
-				? __( 'Guidelines merged and saved as draft.', 'content-guidelines' )
-				: __( 'Guidelines imported and saved as draft.', 'content-guidelines' ),
+				? __( 'Guidelines merged and saved as draft.', 'gutenberg' )
+				: __( 'Guidelines imported and saved as draft.', 'gutenberg' ),
 		);
 	}
 

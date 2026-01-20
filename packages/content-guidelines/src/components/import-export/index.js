@@ -88,7 +88,7 @@ export default function ImportExportPanel() {
 		setImportError( null );
 		setImportSuccess( false );
 
-		const reader = new FileReader();
+		const reader = new window.FileReader();
 
 		reader.onload = ( e ) => {
 			try {
@@ -177,6 +177,8 @@ export default function ImportExportPanel() {
 						icon={ download }
 						onClick={ handleExport }
 						disabled={ ! hasGuidelines }
+						__next40pxDefaultSize
+						accessibleWhenDisabled
 					>
 						{ __( 'Export JSON' ) }
 					</Button>
@@ -202,6 +204,7 @@ export default function ImportExportPanel() {
 						variant="secondary"
 						icon={ upload }
 						onClick={ handleImportClick }
+						__next40pxDefaultSize
 					>
 						{ __( 'Import JSON' ) }
 					</Button>

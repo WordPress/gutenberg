@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * REST API controller for content guidelines.
  */
+// phpcs:ignore Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.ClassNotGuardedAgainstRedeclaration -- Namespaced class won't conflict with Core.
 class REST_Controller {
 
 	/**
@@ -405,7 +406,7 @@ class REST_Controller {
 		return rest_ensure_response(
 			array(
 				'success' => true,
-				'message' => __( 'Draft saved.', 'content-guidelines' ),
+				'message' => __( 'Draft saved.', 'gutenberg' ),
 			)
 		);
 	}
@@ -473,7 +474,7 @@ class REST_Controller {
 			array(
 				'success' => true,
 				'post_id' => $result,
-				'message' => __( 'Guidelines published.', 'content-guidelines' ),
+				'message' => __( 'Guidelines published.', 'gutenberg' ),
 			)
 		);
 	}
@@ -490,7 +491,7 @@ class REST_Controller {
 		return rest_ensure_response(
 			array(
 				'success' => true,
-				'message' => __( 'Draft discarded.', 'content-guidelines' ),
+				'message' => __( 'Draft discarded.', 'gutenberg' ),
 			)
 		);
 	}
@@ -532,16 +533,22 @@ class REST_Controller {
 				$date           = $date_mysql ? mysql_to_rfc3339( $date_mysql ) : '';
 
 				$author_id = ! empty( $entry['author_id'] ) ? absint( $entry['author_id'] ) : 0;
-				$items[] = array(
-					'id'          => absint( $entry['id'] ),
-					'author'      => array(
+				$items[]   = array(
+					'id'           => absint( $entry['id'] ),
+					'author'       => array(
 						'id'     => $author_id,
-						'name'   => $author ? $author->display_name : __( 'Unknown', 'content-guidelines' ),
-						'avatar' => get_avatar_url( $author_id, array( 'size' => 48, 'default' => 'mystery' ) ),
+						'name'   => $author ? $author->display_name : __( 'Unknown', 'gutenberg' ),
+						'avatar' => get_avatar_url(
+							$author_id,
+							array(
+								'size'    => 48,
+								'default' => 'mystery',
+							)
+						),
 					),
-					'date'        => $date,
-					'date_gmt'    => $date_gmt,
-					'modified'    => $date,
+					'date'         => $date,
+					'date_gmt'     => $date_gmt,
+					'modified'     => $date,
 					'modified_gmt' => $date_gmt,
 				);
 			}
@@ -563,15 +570,21 @@ class REST_Controller {
 
 		// Always include the current version first.
 		$items[] = array(
-			'id'          => $post->ID,
-			'author'      => array(
+			'id'           => $post->ID,
+			'author'       => array(
 				'id'     => absint( $post->post_author ),
-				'name'   => $author ? $author->display_name : __( 'Unknown', 'content-guidelines' ),
-				'avatar' => get_avatar_url( $post->post_author, array( 'size' => 48, 'default' => 'mystery' ) ),
+				'name'   => $author ? $author->display_name : __( 'Unknown', 'gutenberg' ),
+				'avatar' => get_avatar_url(
+					$post->post_author,
+					array(
+						'size'    => 48,
+						'default' => 'mystery',
+					)
+				),
 			),
-			'date'        => mysql_to_rfc3339( $post->post_modified ),
-			'date_gmt'    => mysql_to_rfc3339( $post->post_modified_gmt ),
-			'modified'    => mysql_to_rfc3339( $post->post_modified ),
+			'date'         => mysql_to_rfc3339( $post->post_modified ),
+			'date_gmt'     => mysql_to_rfc3339( $post->post_modified_gmt ),
+			'modified'     => mysql_to_rfc3339( $post->post_modified ),
 			'modified_gmt' => mysql_to_rfc3339( $post->post_modified_gmt ),
 		);
 
@@ -579,15 +592,21 @@ class REST_Controller {
 			$author = get_userdata( $revision->post_author );
 
 			$items[] = array(
-				'id'          => $revision->ID,
-				'author'      => array(
+				'id'           => $revision->ID,
+				'author'       => array(
 					'id'     => $revision->post_author,
-					'name'   => $author ? $author->display_name : __( 'Unknown', 'content-guidelines' ),
-					'avatar' => get_avatar_url( $revision->post_author, array( 'size' => 48, 'default' => 'mystery' ) ),
+					'name'   => $author ? $author->display_name : __( 'Unknown', 'gutenberg' ),
+					'avatar' => get_avatar_url(
+						$revision->post_author,
+						array(
+							'size'    => 48,
+							'default' => 'mystery',
+						)
+					),
 				),
-				'date'        => mysql_to_rfc3339( $revision->post_date ),
-				'date_gmt'    => mysql_to_rfc3339( $revision->post_date_gmt ),
-				'modified'    => mysql_to_rfc3339( $revision->post_modified ),
+				'date'         => mysql_to_rfc3339( $revision->post_date ),
+				'date_gmt'     => mysql_to_rfc3339( $revision->post_date_gmt ),
+				'modified'     => mysql_to_rfc3339( $revision->post_modified ),
 				'modified_gmt' => mysql_to_rfc3339( $revision->post_modified_gmt ),
 			);
 		}
@@ -613,7 +632,7 @@ class REST_Controller {
 			array(
 				'success' => true,
 				'post_id' => $result,
-				'message' => __( 'Revision restored.', 'content-guidelines' ),
+				'message' => __( 'Revision restored.', 'gutenberg' ),
 			)
 		);
 	}
@@ -656,7 +675,7 @@ class REST_Controller {
 		if ( ! $fixture_post ) {
 			return new \WP_Error(
 				'invalid_fixture',
-				__( 'Invalid fixture post.', 'content-guidelines' )
+				__( 'Invalid fixture post.', 'gutenberg' )
 			);
 		}
 
@@ -717,7 +736,7 @@ class REST_Controller {
 			$result['ai_result'] = $ai_result;
 		} else {
 			$result['ai_available'] = false;
-			$result['ai_message']   = __( 'No AI provider connected. Showing lint checks and context preview only.', 'content-guidelines' );
+			$result['ai_message']   = __( 'No AI provider connected. Showing lint checks and context preview only.', 'gutenberg' );
 		}
 
 		// If compare mode, also get active guidelines results.
@@ -725,7 +744,7 @@ class REST_Controller {
 			$active_guidelines = Post_Type::get_active_guidelines();
 
 			if ( $active_guidelines ) {
-				$active_lint = Lint_Checker::check( $fixture_content, $active_guidelines );
+				$active_lint   = Lint_Checker::check( $fixture_content, $active_guidelines );
 				$active_packet = Context_Packet_Builder::get_packet(
 					array(
 						'task'    => self::map_playground_task( $task ),
@@ -822,7 +841,7 @@ class REST_Controller {
 		if ( ! $post ) {
 			return new \WP_Error(
 				'invalid_post',
-				__( 'Post not found.', 'content-guidelines' ),
+				__( 'Post not found.', 'gutenberg' ),
 				array( 'status' => 404 )
 			);
 		}

@@ -25,6 +25,7 @@ import './style.scss';
  * @param {Array}    props.items       Array of string items.
  * @param {Function} props.onChange    Change handler.
  * @param {string}   props.placeholder Placeholder text for new items.
+ * @param {Function} props.onDirty     Optional dirty callback.
  * @return {JSX.Element} Repeater control.
  */
 export default function RepeaterControl( {
@@ -32,6 +33,7 @@ export default function RepeaterControl( {
 	items = [],
 	onChange,
 	placeholder = '',
+	onDirty = () => {},
 } ) {
 	const [ newItem, setNewItem ] = useState( '' );
 
@@ -39,6 +41,7 @@ export default function RepeaterControl( {
 		if ( newItem.trim() ) {
 			onChange( [ ...items, newItem.trim() ] );
 			setNewItem( '' );
+			onDirty();
 		}
 	};
 
@@ -46,12 +49,14 @@ export default function RepeaterControl( {
 		const newItems = [ ...items ];
 		newItems.splice( index, 1 );
 		onChange( newItems );
+		onDirty();
 	};
 
 	const updateItem = ( index, value ) => {
 		const newItems = [ ...items ];
 		newItems[ index ] = value;
 		onChange( newItems );
+		onDirty();
 	};
 
 	const handleKeyDown = ( event ) => {
@@ -71,6 +76,7 @@ export default function RepeaterControl( {
 					<HStack key={ index } spacing={ 2 } alignment="center">
 						<TextControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							className="repeater-control__input"
 							value={ item }
 							onChange={ ( value ) => updateItem( index, value ) }
@@ -87,6 +93,7 @@ export default function RepeaterControl( {
 				<HStack spacing={ 2 } alignment="center">
 					<TextControl
 						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 						className="repeater-control__input"
 						value={ newItem }
 						onChange={ setNewItem }
@@ -100,6 +107,7 @@ export default function RepeaterControl( {
 						size="small"
 						className="repeater-control__add"
 						disabled={ ! newItem.trim() }
+						accessibleWhenDisabled
 					/>
 				</HStack>
 			</VStack>

@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Manages provider hooks for AI features.
  */
+// phpcs:ignore Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.ClassNotGuardedAgainstRedeclaration -- Namespaced class won't conflict with Core.
 class Hooks {
 
 	/**

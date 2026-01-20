@@ -4,7 +4,16 @@
 import { useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __, isRTL } from '@wordpress/i18n';
-import { rotateLeft, rotateRight, help, backup } from '@wordpress/icons';
+import {
+	rotateLeft,
+	rotateRight,
+	help,
+	backup,
+	pencil,
+	category,
+	seen,
+	download,
+} from '@wordpress/icons';
 import { useCommandLoader } from '@wordpress/commands';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -21,6 +30,9 @@ import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
+const isContentGuidelinesEnabled =
+	typeof window !== 'undefined' &&
+	window.__experimentalEnableContentGuidelines === true;
 const { useGlobalStyles } = unlock( editorPrivateApis );
 
 const getGlobalStylesToggleWelcomeGuideCommands = () =>
@@ -173,4 +185,83 @@ export function useCommonCommands() {
 		name: 'core/edit-site/open-styles-revisions',
 		hook: getGlobalStylesOpenRevisionsCommands(),
 	} );
+
+	useCommandLoader( {
+		name: 'core/edit-site/content-guidelines',
+		hook: getContentGuidelinesCommands(),
+	} );
+}
+
+const getContentGuidelinesCommands = () => useContentGuidelinesCommands;
+
+function useContentGuidelinesCommands() {
+	const history = useHistory();
+
+	const commands = useMemo( () => {
+		if ( ! isContentGuidelinesEnabled ) {
+			return [];
+		}
+
+		return [
+			{
+				name: 'core/edit-site/open-guidelines',
+				label: __( 'Open content guidelines' ),
+				icon: pencil,
+				callback: ( { close } ) => {
+					close();
+					history.navigate( '/guidelines' );
+				},
+			},
+			{
+				name: 'core/edit-site/open-guidelines-library',
+				label: __( 'Guidelines: Library' ),
+				icon: pencil,
+				callback: ( { close } ) => {
+					close();
+					history.navigate( '/guidelines?section=library' );
+				},
+			},
+			{
+				name: 'core/edit-site/open-guidelines-blocks',
+				label: __( 'Guidelines: Blocks' ),
+				icon: category,
+				callback: ( { close } ) => {
+					close();
+					history.navigate( '/guidelines?section=blocks' );
+				},
+			},
+			{
+				name: 'core/edit-site/open-guidelines-playground',
+				label: __( 'Guidelines: Playground' ),
+				icon: seen,
+				callback: ( { close } ) => {
+					close();
+					history.navigate( '/guidelines?section=playground' );
+				},
+			},
+			{
+				name: 'core/edit-site/open-guidelines-import-export',
+				label: __( 'Guidelines: Import / Export' ),
+				icon: download,
+				callback: ( { close } ) => {
+					close();
+					history.navigate( '/guidelines?section=import-export' );
+				},
+			},
+			{
+				name: 'core/edit-site/open-guidelines-history',
+				label: __( 'Guidelines: History' ),
+				icon: backup,
+				callback: ( { close } ) => {
+					close();
+					history.navigate( '/guidelines?section=library&history=1' );
+				},
+			},
+		];
+	}, [ history ] );
+
+	return {
+		isLoading: false,
+		commands,
+	};
 }

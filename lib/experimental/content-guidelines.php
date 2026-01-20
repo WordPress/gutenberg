@@ -41,9 +41,26 @@ spl_autoload_register(
 );
 
 /**
+ * Check whether the Content Guidelines experiment is enabled.
+ *
+ * @return bool Whether the experiment is enabled.
+ */
+function is_content_guidelines_enabled() {
+	return function_exists( 'gutenberg_is_experiment_enabled' ) &&
+		gutenberg_is_experiment_enabled( 'gutenberg-content-guidelines' );
+}
+
+/**
  * Initialize Content Guidelines.
  */
 function init() {
+	// Pass experiment flag to editor settings.
+	add_filter( 'block_editor_settings_all', __NAMESPACE__ . '\\add_editor_settings' );
+
+	if ( ! is_content_guidelines_enabled() ) {
+		return;
+	}
+
 	// Initialize components.
 	Post_Type::init();
 	REST_Controller::init();
@@ -54,8 +71,6 @@ function init() {
 		Abilities::init();
 	}
 
-	// Pass experiment flag to editor settings.
-	add_filter( 'block_editor_settings_all', __NAMESPACE__ . '\\add_editor_settings' );
 }
 add_action( 'init', __NAMESPACE__ . '\\init' );
 
@@ -66,7 +81,7 @@ add_action( 'init', __NAMESPACE__ . '\\init' );
  * @return array Modified settings.
  */
 function add_editor_settings( $settings ) {
-	$settings['contentGuidelinesEnabled'] = true;
+	$settings['contentGuidelinesEnabled'] = is_content_guidelines_enabled();
 	return $settings;
 }
 

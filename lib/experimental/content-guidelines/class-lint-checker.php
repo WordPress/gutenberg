@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Checks content against guidelines and returns validation results.
  */
+// phpcs:ignore Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.ClassNotGuardedAgainstRedeclaration -- Namespaced class won't conflict with Core.
 class Lint_Checker {
 
 	/**
@@ -80,7 +81,7 @@ class Lint_Checker {
 							'Found "%1$s" (%2$d occurrence)',
 							'Found "%1$s" (%2$d occurrences)',
 							$count,
-							'content-guidelines'
+							'gutenberg'
 						),
 						$term,
 						$count
@@ -118,7 +119,7 @@ class Lint_Checker {
 						'term'    => $term,
 						'message' => sprintf(
 							/* translators: %s: preferred term */
-							__( 'Consider using "%s"', 'content-guidelines' ),
+							__( 'Consider using "%s"', 'gutenberg' ),
 							$term
 						),
 						'note'    => $note,
@@ -167,7 +168,7 @@ class Lint_Checker {
 				'type'    => 'readability',
 				'message' => sprintf(
 					/* translators: 1: actual average, 2: target average */
-					__( 'Average sentence length is %1$s words. Target for "%2$s" readability is around %3$s words.', 'content-guidelines' ),
+					__( 'Average sentence length is %1$s words. Target for "%2$s" readability is around %3$s words.', 'gutenberg' ),
 					$avg_sentence,
 					$target,
 					$max_avg
@@ -190,7 +191,7 @@ class Lint_Checker {
 						'%d sentence is very long and may be hard to read.',
 						'%d sentences are very long and may be hard to read.',
 						count( $long_sentences ),
-						'content-guidelines'
+						'gutenberg'
 					),
 					count( $long_sentences )
 				),
@@ -243,7 +244,7 @@ class Lint_Checker {
 							'rule'    => 'no_urgency',
 							'message' => sprintf(
 								/* translators: %s: phrase found */
-								__( 'Found urgency phrase: "%s"', 'content-guidelines' ),
+								__( 'Found urgency phrase: "%s"', 'gutenberg' ),
 								$pattern
 							),
 							'pattern' => $pattern,
@@ -279,7 +280,7 @@ class Lint_Checker {
 							'rule'    => 'no_superlatives',
 							'message' => sprintf(
 								/* translators: %s: word found */
-								__( 'Found superlative claim: "%s"', 'content-guidelines' ),
+								__( 'Found superlative claim: "%s"', 'gutenberg' ),
 								$matches[0]
 							),
 							'pattern' => $matches[0],

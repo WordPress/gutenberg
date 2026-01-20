@@ -12,8 +12,7 @@
  * WordPress dependencies
  */
 import { createRoot } from '@wordpress/element';
-import { PluginArea } from '@wordpress/plugins';
-import { registerPlugin } from '@wordpress/plugins';
+import { PluginArea, registerPlugin } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -51,7 +50,7 @@ function initCommandsPluginArea() {
 	}
 
 	// Only render if we have the commands package available
-	if ( typeof wp !== 'undefined' && wp.commands ) {
+	if ( window?.wp?.commands ) {
 		const root = createRoot( mountPoint );
 		root.render( <PluginArea scope="content-guidelines" /> );
 	}

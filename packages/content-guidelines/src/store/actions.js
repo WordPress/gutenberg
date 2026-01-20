@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { dispatch as dataDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Action types.
@@ -115,11 +117,19 @@ export function restoreRevision( revisionId ) {
 				method: 'POST',
 			} );
 
-			// The entity will be invalidated and re-fetched by core-data
-			// when the page refreshes or the user navigates.
-
 			// Refresh revisions.
 			await dispatch.fetchRevisions();
+
+			// Invalidate guidelines entity so core-data refetches fresh data.
+			dataDispatch( coreStore ).invalidateResolution( 'getEntityRecord', [
+				'root',
+				'contentGuidelines',
+				'current',
+			] );
+			dataDispatch( coreStore ).invalidateResolution(
+				'getEditedEntityRecord',
+				[ 'root', 'contentGuidelines', 'current' ]
+			);
 		} catch ( error ) {
 			dispatch.setError( error.message || 'Failed to restore revision.' );
 		} finally {

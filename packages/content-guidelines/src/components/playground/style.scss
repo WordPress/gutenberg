@@ -2,22 +2,31 @@
  * Playground Styles
  */
 
-.content-guidelines-playground {
+// Wrapper for scrolling - applied by GuidelinesPlayground
+.guidelines-playground-wrapper {
+	width: 100%;
+	height: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
 	padding: 24px;
+	box-sizing: border-box;
+}
+
+.content-guidelines-playground {
 	min-width: 400px;
 	max-width: 640px;
 	width: 100%;
-	margin: 24px auto;
+	margin: 0 auto;
 	box-sizing: border-box;
-	border: 1px solid #e0e0e0;
-	border-radius: 2px;
 }
 
 .content-guidelines-playground__controls {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
-	margin-bottom: 24px;
+	margin-bottom: 32px;
+	padding-bottom: 24px;
+	border-bottom: 1px solid #e0e0e0;
 
 	.components-toggle-control {
 		margin-bottom: 0;
@@ -47,9 +56,18 @@
 }
 
 .content-guidelines-playground__results {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+
 	.components-panel__body {
 		border: 1px solid #e0e0e0;
-		margin-bottom: 12px;
+		margin-bottom: 0;
+	}
+
+	// No AI provider notice - subtle inline message
+	> .components-notice {
+		margin: 0;
 	}
 }
 

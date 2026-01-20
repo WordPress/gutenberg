@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Handles the content_guidelines custom post type.
  */
+// phpcs:ignore Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.ClassNotGuardedAgainstRedeclaration -- Namespaced class won't conflict with Core.
 class Post_Type {
 
 	/**
@@ -88,19 +89,19 @@ class Post_Type {
 	 */
 	public static function register_post_type() {
 		$labels = array(
-			'name'          => _x( 'Content Guidelines', 'post type general name', 'content-guidelines' ),
-			'singular_name' => _x( 'Content Guidelines', 'post type singular name', 'content-guidelines' ),
+			'name'          => _x( 'Content Guidelines', 'post type general name', 'gutenberg' ),
+			'singular_name' => _x( 'Content Guidelines', 'post type singular name', 'gutenberg' ),
 		);
 
 		$args = array(
-			'labels'              => $labels,
-			'public'              => false,
-			'publicly_queryable'  => false,
-			'show_ui'             => false,
-			'show_in_menu'        => false,
-			'query_var'           => false,
-			'capability_type'     => 'post',
-			'capabilities'        => array(
+			'labels'             => $labels,
+			'public'             => false,
+			'publicly_queryable' => false,
+			'show_ui'            => false,
+			'show_in_menu'       => false,
+			'query_var'          => false,
+			'capability_type'    => 'post',
+			'capabilities'       => array(
 				'read'                   => 'edit_theme_options',
 				'create_posts'           => 'edit_theme_options',
 				'edit_posts'             => 'edit_theme_options',
@@ -111,13 +112,12 @@ class Post_Type {
 				'delete_others_posts'    => 'edit_theme_options',
 				'publish_posts'          => 'edit_theme_options',
 			),
-			'map_meta_cap'        => true,
-			'hierarchical'        => false,
-			'supports'            => array( 'revisions', 'custom-fields' ),
-			'has_archive'         => false,
-			'rewrite'             => false,
-			'show_in_rest'        => true,
-			'rest_base'           => 'content-guidelines',
+			'map_meta_cap'       => true,
+			'hierarchical'       => false,
+			'supports'           => array( 'revisions', 'custom-fields' ),
+			'has_archive'        => false,
+			'rewrite'            => false,
+			'show_in_rest'       => false,
 		);
 
 		register_post_type( self::POST_TYPE, $args );
@@ -147,9 +147,9 @@ class Post_Type {
 			self::POST_TYPE,
 			self::SOURCES_META_KEY,
 			array(
-				'type'          => 'array',
-				'single'        => true,
-				'show_in_rest'  => array(
+				'type'              => 'array',
+				'single'            => true,
+				'show_in_rest'      => array(
 					'schema' => array(
 						'type'  => 'array',
 						'items' => array(
@@ -157,8 +157,23 @@ class Post_Type {
 						),
 					),
 				),
-				'auth_callback' => function () {
+				'auth_callback'     => function () {
 					return current_user_can( 'edit_theme_options' );
+				},
+				'sanitize_callback' => function ( $value ) {
+					if ( ! is_array( $value ) ) {
+						return array();
+					}
+
+					$sanitized = array_map( 'absint', $value );
+					$sanitized = array_filter(
+						$sanitized,
+						function ( $source_id ) {
+							return $source_id > 0;
+						}
+					);
+
+					return array_values( $sanitized );
 				},
 			)
 		);
@@ -412,6 +427,11 @@ class Post_Type {
 		$sanitized = array();
 
 		foreach ( $data as $key => $value ) {
+			// Skip internal/transient keys (e.g., client dirty markers).
+			if ( is_string( $key ) && 0 === strpos( $key, '__' ) ) {
+				continue;
+			}
+
 			// For numeric keys (array indices), preserve as-is.
 			// For block names (e.g., 'core/list'), allow slashes.
 			// For other keys, use sanitize_key.
@@ -426,10 +446,12 @@ class Post_Type {
 
 			if ( is_array( $value ) ) {
 				// Pass context for 'blocks' key to allow block names with slashes.
-				$child_context = ( 'blocks' === $key ) ? 'blocks' : $context;
+				$child_context               = ( 'blocks' === $key ) ? 'blocks' : $context;
 				$sanitized[ $sanitized_key ] = self::deep_sanitize( $value, $child_context );
 			} elseif ( is_string( $value ) ) {
-				$sanitized[ $sanitized_key ] = sanitize_text_field( $value );
+				$sanitized[ $sanitized_key ] = sanitize_textarea_field( $value );
+			} elseif ( is_null( $value ) ) {
+				$sanitized[ $sanitized_key ] = null;
 			} elseif ( is_int( $value ) ) {
 				$sanitized[ $sanitized_key ] = intval( $value );
 			} elseif ( is_float( $value ) ) {
@@ -669,7 +691,7 @@ class Post_Type {
 			array(
 				'post_type'    => self::POST_TYPE,
 				'post_status'  => 'publish',
-				'post_title'   => __( 'Content Guidelines', 'content-guidelines' ),
+				'post_title'   => __( 'Content Guidelines', 'gutenberg' ),
 				'post_content' => self::json_encode_unicode( self::get_default_guidelines( $data ) ),
 			),
 			true
@@ -836,7 +858,7 @@ class Post_Type {
 		if ( ! $post ) {
 			return new \WP_Error(
 				'no_guidelines',
-				__( 'No guidelines exist to publish.', 'content-guidelines' )
+				__( 'No guidelines exist to publish.', 'gutenberg' )
 			);
 		}
 
@@ -845,7 +867,7 @@ class Post_Type {
 		if ( ! $draft ) {
 			return new \WP_Error(
 				'no_draft',
-				__( 'No draft changes to publish.', 'content-guidelines' )
+				__( 'No draft changes to publish.', 'gutenberg' )
 			);
 		}
 
@@ -972,7 +994,7 @@ class Post_Type {
 		if ( ! $revision ) {
 			return new \WP_Error(
 				'invalid_revision',
-				__( 'Invalid revision ID.', 'content-guidelines' )
+				__( 'Invalid revision ID.', 'gutenberg' )
 			);
 		}
 
@@ -981,7 +1003,7 @@ class Post_Type {
 		if ( ! $post || $revision->post_parent !== $post->ID ) {
 			return new \WP_Error(
 				'revision_mismatch',
-				__( 'Revision does not belong to guidelines.', 'content-guidelines' )
+				__( 'Revision does not belong to guidelines.', 'gutenberg' )
 			);
 		}
 

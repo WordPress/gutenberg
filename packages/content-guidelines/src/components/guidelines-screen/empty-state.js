@@ -98,6 +98,7 @@ export default function EmptyState() {
 					variant="primary"
 					icon={ pencil }
 					onClick={ handleStartWriting }
+					__next40pxDefaultSize
 				>
 					{ __( 'Start writing' ) }
 				</Button>

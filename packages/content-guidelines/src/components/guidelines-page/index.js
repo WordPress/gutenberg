@@ -3,7 +3,7 @@
  */
 import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { Spinner, Notice, Button } from '@wordpress/components';
 import { backup } from '@wordpress/icons';
 
@@ -63,12 +63,15 @@ function HeaderActions( {
 					icon={ backup }
 					label={ __( 'History' ) }
 					onClick={ onShowHistory }
+					__next40pxDefaultSize
 				/>
 				<Button
 					variant="primary"
 					onClick={ onSave }
 					isBusy={ isSaving }
 					disabled={ isSaving || ! hasChanges }
+					accessibleWhenDisabled
+					__next40pxDefaultSize
 				>
 					{ __( 'Save' ) }
 				</Button>
@@ -84,10 +87,16 @@ function HeaderActions( {
  */
 function getUrlParams() {
 	const params = new URLSearchParams( window.location.search );
+	const urlTab = params.get( 'tab' ) || params.get( 'section' );
+	const postIdParam = params.get( 'post' );
+	const parsedPostId = postIdParam ? parseInt( postIdParam, 10 ) : null;
+	const fixturePostId = Number.isNaN( parsedPostId ) ? null : parsedPostId;
 	return {
-		tab: params.get( 'tab' ) || 'library',
+		tab: urlTab || 'library',
 		section: params.get( 'section' ) || null,
 		block: params.get( 'block' ) || null,
+		history: params.get( 'history' ) === '1',
+		fixturePostId,
 	};
 }
 
@@ -116,15 +125,16 @@ function updateUrl( updates ) {
  * @return {JSX.Element} The guidelines page.
  */
 export default function GuidelinesPage() {
-	const [ showHistory, setShowHistory ] = useState( false );
 	const [ isSaving, setIsSaving ] = useState( false );
 	const [ error, setError ] = useState( null );
 
 	// Initialize from URL params.
 	const initialParams = getUrlParams();
+	const [ showHistory, setShowHistory ] = useState( initialParams.history );
 	const [ activeTab, setActiveTab ] = useState( initialParams.tab );
 	const [ urlSection, setUrlSection ] = useState( initialParams.section );
 	const [ urlBlock, setUrlBlock ] = useState( initialParams.block );
+	const fixturePostId = initialParams.fixturePostId;
 
 	// Keys to force panel remount when clicking tab while drilled down.
 	const [ libraryKey, setLibraryKey ] = useState( 0 );
@@ -134,7 +144,7 @@ export default function GuidelinesPage() {
 	const { guidelines, hasChanges, isLoading, save } = useGuidelines();
 
 	// Save handler.
-	const handleSave = async () => {
+	const handleSave = useCallback( async () => {
 		setIsSaving( true );
 		setError( null );
 		try {
@@ -144,7 +154,7 @@ export default function GuidelinesPage() {
 		} finally {
 			setIsSaving( false );
 		}
-	};
+	}, [ save ] );
 
 	// Handle tab changes with URL sync.
 	const handleTabChange = ( tab ) => {
@@ -161,6 +171,16 @@ export default function GuidelinesPage() {
 		setUrlSection( null );
 		setUrlBlock( null );
 		updateUrl( { tab, section: null, block: null } );
+	};
+
+	const handleShowHistory = () => {
+		setShowHistory( true );
+		updateUrl( { history: '1' } );
+	};
+
+	const handleCloseHistory = () => {
+		setShowHistory( false );
+		updateUrl( { history: null } );
 	};
 
 	// Handle section changes from LibraryPanel.
@@ -190,7 +210,7 @@ export default function GuidelinesPage() {
 		return () => {
 			document.removeEventListener( 'keydown', handleKeyDown );
 		};
-	}, [ hasChanges, isSaving ] );
+	}, [ handleSave, hasChanges, isSaving ] );
 
 	if ( isLoading ) {
 		return (
@@ -235,7 +255,7 @@ export default function GuidelinesPage() {
 					onSave={ handleSave }
 					error={ error }
 					onClearError={ () => setError( null ) }
-					onShowHistory={ () => setShowHistory( true ) }
+					onShowHistory={ handleShowHistory }
 				/>
 			}
 		>
@@ -288,14 +308,14 @@ export default function GuidelinesPage() {
 							onBlockChange={ handleBlockChange }
 						/>
 					) }
-					{ activeTab === 'playground' && <PlaygroundPanel /> }
+					{ activeTab === 'playground' && (
+						<PlaygroundPanel fixturePostId={ fixturePostId } />
+					) }
 					{ activeTab === 'import-export' && <ImportExportPanel /> }
 				</div>
 			</div>
 
-			{ showHistory && (
-				<HistoryPanel onClose={ () => setShowHistory( false ) } />
-			) }
+			{ showHistory && <HistoryPanel onClose={ handleCloseHistory } /> }
 		</Page>
 	);
 }

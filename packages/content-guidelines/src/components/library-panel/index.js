@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { __, isRTL } from '@wordpress/i18n';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	Navigator,
 	useNavigator,
@@ -12,8 +12,6 @@ import {
 	__experimentalHeading as Heading,
 	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
-	Flex,
-	FlexItem,
 	TextareaControl,
 	TextControl,
 	SelectControl,
@@ -21,7 +19,7 @@ import {
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { chevronRight, chevronLeft } from '@wordpress/icons';
-import { isRTL } from '@wordpress/i18n';
+import { SVG, Path } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -123,51 +121,39 @@ function SectionCard( { section, statusText, onClick } ) {
 	};
 
 	return (
-		<Button
-			__next40pxDefaultSize
+		<button
+			type="button"
 			className="library-panel__section-card"
 			onClick={ handleClick }
 		>
-			<Flex justify="space-between">
-				<FlexItem>
-					<VStack spacing={ 1 }>
-						<Text className="library-panel__section-title">
-							{ section.title }
-						</Text>
-						<Text
-							className="library-panel__section-description"
-							variant="muted"
-						>
-							{ section.description }
-						</Text>
-					</VStack>
-				</FlexItem>
-				<Flex justify="flex-end" gap={ 2 }>
+			<div className="library-panel__section-card-content">
+				<div className="library-panel__section-card-text">
+					<span className="library-panel__section-title">
+						{ section.title }
+					</span>
+					<span className="library-panel__section-description">
+						{ section.description }
+					</span>
+				</div>
+				<div className="library-panel__section-card-meta">
 					{ statusText && (
-						<FlexItem>
-							<Text
-								className="library-panel__section-status"
-								variant="muted"
-							>
-								{ statusText }
-							</Text>
-						</FlexItem>
+						<span className="library-panel__section-status">
+							{ statusText }
+						</span>
 					) }
-					<FlexItem>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							width="24"
-							height="24"
-							aria-hidden="true"
-							focusable="false"
-						>
-							<path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z" />
-						</svg>
-					</FlexItem>
-				</Flex>
-			</Flex>
-		</Button>
+					<SVG
+						className="library-panel__section-chevron"
+						width="24"
+						height="24"
+						viewBox="0 0 24 24"
+						aria-hidden="true"
+						focusable="false"
+					>
+						<Path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z" />
+					</SVG>
+				</div>
+			</div>
+		</button>
 	);
 }
 
@@ -293,6 +279,7 @@ function HeuristicsContent( { sectionData, onChange } ) {
 		<VStack spacing={ 4 }>
 			<TextControl
 				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				type="number"
 				label={ __( 'Target words per sentence' ) }
 				value={ sectionData.words_per_sentence || '' }
@@ -307,6 +294,7 @@ function HeuristicsContent( { sectionData, onChange } ) {
 			/>
 			<TextControl
 				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				type="number"
 				label={ __( 'Target sentences per paragraph' ) }
 				value={ sectionData.sentences_per_paragraph || '' }
@@ -322,6 +310,7 @@ function HeuristicsContent( { sectionData, onChange } ) {
 			/>
 			<TextControl
 				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				type="number"
 				label={ __( 'Target paragraphs per section' ) }
 				value={ sectionData.paragraphs_per_section || '' }
@@ -343,6 +332,7 @@ function HeuristicsContent( { sectionData, onChange } ) {
 
 			<SelectControl
 				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				label={ __( 'Target reading level' ) }
 				value={ sectionData.reading_level || '' }
 				options={ [
@@ -372,6 +362,7 @@ function HeuristicsContent( { sectionData, onChange } ) {
 			{ isCustomReadingLevel && (
 				<TextControl
 					__nextHasNoMarginBottom
+					__next40pxDefaultSize
 					label={ __( 'Custom reading level' ) }
 					value={ sectionData.reading_level_custom || '' }
 					onChange={ ( value ) =>
@@ -384,6 +375,7 @@ function HeuristicsContent( { sectionData, onChange } ) {
 			) }
 			<TextControl
 				__nextHasNoMarginBottom
+				__next40pxDefaultSize
 				type="number"
 				label={ __( 'Maximum word length (syllables)' ) }
 				help={ __(
@@ -412,11 +404,17 @@ function HeuristicsContent( { sectionData, onChange } ) {
 					onClick={ runAnalysis }
 					disabled={ isAnalyzing }
 					isBusy={ isAnalyzing }
+					accessibleWhenDisabled
+					__next40pxDefaultSize
 				>
 					{ isAnalyzing ? __( 'Analyzing…' ) : __( 'Analyze posts' ) }
 				</Button>
 				{ analysisResult && (
-					<Button variant="primary" onClick={ applyAnalysis }>
+					<Button
+						variant="primary"
+						onClick={ applyAnalysis }
+						__next40pxDefaultSize
+					>
 						{ __( 'Apply' ) }
 					</Button>
 				) }
@@ -431,6 +429,113 @@ function HeuristicsContent( { sectionData, onChange } ) {
 				</Text>
 			) }
 		</VStack>
+	);
+}
+
+/**
+ * Reference types that are web-based (use URL field type).
+ */
+const WEB_TYPES = [ 'website', 'article', 'competitor' ];
+
+/**
+ * Single reference item component.
+ *
+ * @param {Object}   props           Component props.
+ * @param {Object}   props.reference The reference data.
+ * @param {Function} props.onUpdate  Update handler.
+ * @param {Function} props.onRemove  Remove handler.
+ * @return {JSX.Element} Reference item.
+ */
+function ReferenceItem( { reference, onUpdate, onRemove } ) {
+	const isWebType = WEB_TYPES.includes( reference.type || 'website' );
+
+	return (
+		<div className="library-panel__reference-item">
+			<div className="library-panel__reference-fields">
+				<VStack spacing={ 2 }>
+					<HStack spacing={ 2 }>
+						<SelectControl
+							__nextHasNoMarginBottom
+							__next40pxDefaultSize
+							label={ __( 'Type' ) }
+							value={ reference.type || 'website' }
+							options={ [
+								{
+									value: 'website',
+									label: __( 'Website' ),
+								},
+								{
+									value: 'article',
+									label: __( 'Article' ),
+								},
+								{
+									value: 'book',
+									label: __( 'Book' ),
+								},
+								{
+									value: 'document',
+									label: __( 'Document' ),
+								},
+								{
+									value: 'competitor',
+									label: __( 'Competitor' ),
+								},
+								{
+									value: 'other',
+									label: __( 'Other' ),
+								},
+							] }
+							onChange={ ( value ) => onUpdate( 'type', value ) }
+						/>
+						<div style={ { flex: 1 } }>
+							<TextControl
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								label={ __( 'Title' ) }
+								value={ reference.title || '' }
+								onChange={ ( value ) =>
+									onUpdate( 'title', value )
+								}
+								placeholder={ __( 'Reference name' ) }
+							/>
+						</div>
+					</HStack>
+					<TextControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={
+							isWebType ? __( 'URL' ) : __( 'URL / Location' )
+						}
+						value={ reference.url || '' }
+						onChange={ ( value ) => onUpdate( 'url', value ) }
+						placeholder={
+							reference.type === 'book'
+								? __( 'ISBN or link' )
+								: 'https://example.com'
+						}
+						type={ isWebType ? 'url' : 'text' }
+					/>
+					<TextareaControl
+						__nextHasNoMarginBottom
+						label={ __( 'Why you like it' ) }
+						value={ reference.notes || '' }
+						onChange={ ( value ) => onUpdate( 'notes', value ) }
+						rows={ 2 }
+						placeholder={ __(
+							'What aspects do you want to emulate?'
+						) }
+					/>
+					<Button
+						variant="tertiary"
+						isDestructive
+						size="small"
+						onClick={ onRemove }
+					>
+						{ __( 'Remove' ) }
+					</Button>
+				</VStack>
+			</div>
+		</div>
 	);
 }
 
@@ -468,93 +573,21 @@ function ReferencesContent( { sectionData, onChange } ) {
 	return (
 		<VStack spacing={ 4 }>
 			{ references.map( ( ref, index ) => (
-				<div key={ index } className="library-panel__reference-item">
-					<VStack spacing={ 2 }>
-						<HStack spacing={ 2 }>
-							<SelectControl
-								__nextHasNoMarginBottom
-								label={ __( 'Type' ) }
-								value={ ref.type || 'website' }
-								options={ [
-									{
-										value: 'website',
-										label: __( 'Website' ),
-									},
-									{
-										value: 'article',
-										label: __( 'Article' ),
-									},
-									{
-										value: 'book',
-										label: __( 'Book' ),
-									},
-									{
-										value: 'document',
-										label: __( 'Document' ),
-									},
-									{
-										value: 'competitor',
-										label: __( 'Competitor' ),
-									},
-									{
-										value: 'other',
-										label: __( 'Other' ),
-									},
-								] }
-								onChange={ ( value ) =>
-									updateReference( index, 'type', value )
-								}
-							/>
-							<div style={ { flex: 1 } }>
-								<TextControl
-									__nextHasNoMarginBottom
-									label={ __( 'Title' ) }
-									value={ ref.title || '' }
-									onChange={ ( value ) =>
-										updateReference( index, 'title', value )
-									}
-									placeholder={ __( 'Reference name' ) }
-								/>
-							</div>
-						</HStack>
-						<TextControl
-							__nextHasNoMarginBottom
-							label={ __( 'URL / Location' ) }
-							value={ ref.url || '' }
-							onChange={ ( value ) =>
-								updateReference( index, 'url', value )
-							}
-							placeholder={
-								ref.type === 'book'
-									? __( 'ISBN or link' )
-									: 'https://'
-							}
-						/>
-						<TextareaControl
-							__nextHasNoMarginBottom
-							label={ __( 'Why you like it' ) }
-							value={ ref.notes || '' }
-							onChange={ ( value ) =>
-								updateReference( index, 'notes', value )
-							}
-							rows={ 2 }
-							placeholder={ __(
-								'What aspects do you want to emulate?'
-							) }
-						/>
-						<Button
-							variant="tertiary"
-							isDestructive
-							size="small"
-							onClick={ () => removeReference( index ) }
-						>
-							{ __( 'Remove' ) }
-						</Button>
-					</VStack>
-				</div>
+				<ReferenceItem
+					key={ index }
+					reference={ ref }
+					onUpdate={ ( field, value ) =>
+						updateReference( index, field, value )
+					}
+					onRemove={ () => removeReference( index ) }
+				/>
 			) ) }
 
-			<Button variant="secondary" onClick={ addReference }>
+			<Button
+				variant="secondary"
+				onClick={ addReference }
+				__next40pxDefaultSize
+			>
 				{ __( 'Add reference' ) }
 			</Button>
 
@@ -667,6 +700,7 @@ function ImagesContent( { sectionData, onChange } ) {
 							<img src={ img.url } alt={ img.alt || '' } />
 							<TextControl
 								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								placeholder={ __( 'Why this image?' ) }
 								value={ img.notes || '' }
 								onChange={ ( value ) =>
@@ -686,7 +720,11 @@ function ImagesContent( { sectionData, onChange } ) {
 				</div>
 			) }
 
-			<Button variant="secondary" onClick={ openMediaLibrary }>
+			<Button
+				variant="secondary"
+				onClick={ openMediaLibrary }
+				__next40pxDefaultSize
+			>
 				{ __( 'Add reference images' ) }
 			</Button>
 		</VStack>
@@ -733,6 +771,7 @@ function SectionDetailScreen( { section, onBack } ) {
 						/>
 						<TextControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Target audience' ) }
 							help={ __( 'Who are you writing for?' ) }
 							value={ sectionData.audience || '' }
@@ -742,6 +781,7 @@ function SectionDetailScreen( { section, onBack } ) {
 						/>
 						<SelectControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Primary goal' ) }
 							help={ __( 'What do you want visitors to do?' ) }
 							value={ sectionData.primary_goal || '' }
@@ -756,6 +796,7 @@ function SectionDetailScreen( { section, onBack } ) {
 							onChange={ ( value ) =>
 								handleChange( 'topics', value )
 							}
+							__next40pxDefaultSize
 							__experimentalExpandOnFocus
 							__experimentalShowHowTo={ false }
 						/>
@@ -783,11 +824,13 @@ function SectionDetailScreen( { section, onBack } ) {
 							onChange={ ( value ) =>
 								handleChange( 'tone_traits', value )
 							}
+							__next40pxDefaultSize
 							__experimentalExpandOnFocus
 							__experimentalShowHowTo={ false }
 						/>
 						<SelectControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Point of view' ) }
 							value={ sectionData.pov || '' }
 							options={ [
@@ -814,6 +857,7 @@ function SectionDetailScreen( { section, onBack } ) {
 						/>
 						<SelectControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Readability level' ) }
 							value={ sectionData.readability || '' }
 							options={ [
@@ -917,6 +961,7 @@ function SectionDetailScreen( { section, onBack } ) {
 						/>
 						<SelectControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							label={ __( 'Usage style' ) }
 							value={
 								sectionData.acronym_usage || 'expand_first'
@@ -952,6 +997,7 @@ function SectionDetailScreen( { section, onBack } ) {
 							onChange={ ( value ) =>
 								handleChange( 'custom_dictionary', value )
 							}
+							__next40pxDefaultSize
 							__experimentalExpandOnFocus
 							__experimentalShowHowTo={ false }
 						/>
@@ -1123,6 +1169,21 @@ export default function LibraryPanel( { initialSection, onSectionChange } ) {
 
 	const { guidelines } = useGuidelines();
 
+	// Sync internal state with prop changes (e.g., when clicking "Library" in sidebar)
+	useEffect( () => {
+		if ( initialSection === null && selectedSection !== null ) {
+			setSelectedSection( null );
+		} else if (
+			initialSection &&
+			( ! selectedSection || selectedSection.id !== initialSection )
+		) {
+			const section = SECTIONS.find( ( s ) => s.id === initialSection );
+			if ( section ) {
+				setSelectedSection( section );
+			}
+		}
+	}, [ initialSection, selectedSection ] );
+
 	const handleSectionClick = ( section ) => {
 		setSelectedSection( section );
 		if ( onSectionChange ) {
@@ -1135,6 +1196,13 @@ export default function LibraryPanel( { initialSection, onSectionChange } ) {
 		if ( onSectionChange ) {
 			onSectionChange( null );
 		}
+		// Keep URL in sync so reload returns to the list view.
+		if ( typeof window !== 'undefined' ) {
+			const url = new URL( window.location.href );
+			url.searchParams.delete( 'subsection' );
+			url.searchParams.delete( 'block' );
+			window.history.replaceState( {}, '', url );
+		}
 	};
 
 	return (
@@ -1146,7 +1214,7 @@ export default function LibraryPanel( { initialSection, onSectionChange } ) {
 			>
 				<Navigator.Screen path="/">
 					<VStack spacing={ 0 }>
-						<ul role="list" className="library-panel__list">
+						<ul className="library-panel__list">
 							{ SECTIONS.map( ( section ) => (
 								<li
 									key={ section.id }

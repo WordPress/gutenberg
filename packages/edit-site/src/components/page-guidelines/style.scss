@@ -1,0 +1,18 @@
+// Page Guidelines styles
+
+.edit-site-page-guidelines {
+	// Ensure content area fills available space and scrolls
+	.edit-site-page__content {
+		display: flex;
+		flex-direction: column;
+		height: 100%;
+		overflow: hidden;
+
+		// Direct children should fill and scroll
+		> * {
+			flex: 1;
+			min-height: 0;
+			overflow-y: auto;
+		}
+	}
+}

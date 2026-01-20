@@ -1,6 +1,17 @@
 // Library panel styles - matching fonts library pattern
 
+// Root container - ensure proper sizing and scrolling
 .library-panel {
+	width: 100%;
+	height: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
+
+	// Navigator must fill the container
+	.components-navigator {
+		width: 100%;
+		height: 100%;
+	}
 }
 
 // Draft notice
@@ -19,27 +30,30 @@
 	max-width: 640px;
 	width: 100%;
 	border: 1px solid #e0e0e0;
+	border-radius: 2px;
+	overflow: hidden; // keep borders unified
 }
 
 .library-panel__list-item {
-	border-bottom: 1px solid #e0e0e0;
-
-	&:last-child {
-		border-bottom: none;
-	}
+	// Borders handled by the button for proper focus states
 }
 
 // Section card button - table style
 .library-panel__section-card {
+	display: block;
 	box-sizing: border-box;
 	width: 100%;
-	height: auto !important;
 	padding: 16px;
 	background: #fff;
-	border: none;
-	border-radius: 0;
+	border: 0;
+	border-top: 1px solid #e0e0e0;
 	cursor: pointer;
 	text-align: left;
+	font-family: inherit;
+
+	&:first-child {
+		border-top: 0;
+	}
 
 	&:hover {
 		background: #f8f8f8;
@@ -47,24 +61,47 @@
 
 	&:focus {
 		position: relative;
-		box-shadow: inset 0 0 0 1.5px var(--wp-admin-theme-color, #3858e9);
+		z-index: 1;
+		border-color: var(--wp-admin-theme-color, #3858e9);
+		box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color, #3858e9);
 		outline: none;
 	}
+}
 
-	.components-flex {
-		width: 100%;
-	}
+.library-panel__section-card-content {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	width: 100%;
+}
+
+.library-panel__section-card-text {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
 }
 
 .library-panel__section-title {
 	font-size: 14px;
-	font-weight: 600;
+	font-weight: normal;
 	color: #1e1e1e;
+	line-height: 1.4;
 }
 
 .library-panel__section-description {
 	font-size: 12px;
 	color: #757575;
+	line-height: 1.5;
+}
+
+.library-panel__section-card-meta {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-shrink: 0;
 }
 
 .library-panel__section-status {
@@ -72,10 +109,8 @@
 	color: #757575;
 }
 
-// Chevron icon
-.library-panel__section-card svg {
+.library-panel__section-chevron {
 	fill: #757575;
-	flex-shrink: 0;
 }
 
 // Navigator screens
@@ -146,6 +181,11 @@
 .library-panel dd,
 .library-panel li {
 	margin-bottom: 0;
+	border-bottom: 1px solid #e0e0e0;
+
+	&:last-child {
+		border-bottom: none;
+	}
 }
 
 // Divider with centered text
@@ -179,6 +219,95 @@
 	background: #f6f7f7;
 	border: 1px solid #e0e0e0;
 	border-radius: 2px;
+
+	// Two-column layout when screenshot is present
+	&--with-screenshot {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 16px;
+
+		// On smaller containers, stack vertically
+		@container (max-width: 500px) {
+			flex-direction: column;
+		}
+	}
+}
+
+// Reference screenshot container (left side)
+.library-panel__reference-screenshot {
+	flex: 1 1 200px;
+	max-width: 280px;
+	min-width: 180px;
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	background: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 2px;
+	overflow: hidden;
+	// 4:3 aspect ratio container
+	aspect-ratio: 4 / 3;
+
+	// Stack full width on small containers
+	@container (max-width: 500px) {
+		max-width: 100%;
+		flex: 1 1 100%;
+	}
+}
+
+// Placeholder when no fill is provided
+.library-panel__reference-screenshot-placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
+	color: #757575;
+	font-size: 12px;
+}
+
+// Reference form fields container (right side or full width)
+.library-panel__reference-fields {
+	flex: 1 1 200px;
+	min-width: 0;
+}
+
+// Screenshot component styles (for the mshots fill)
+.reference-screenshot {
+	width: 100%;
+	height: 100%;
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.reference-screenshot__loading {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 24px;
+	color: #757575;
+	font-size: 12px;
+}
+
+.reference-screenshot__error {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px;
+	color: #757575;
+	font-size: 12px;
+}
+
+.reference-screenshot__image {
+	width: 100%;
+	height: auto;
+	max-height: 100%;
+	object-fit: contain;
+	display: block;
 }
 
 // Image grid

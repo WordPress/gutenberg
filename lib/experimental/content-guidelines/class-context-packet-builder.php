@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Builds task-specific context packets from guidelines.
  */
+// phpcs:ignore Gutenberg.CodeAnalysis.GuardedFunctionAndClassNames.ClassNotGuardedAgainstRedeclaration -- Namespaced class won't conflict with Core.
 class Context_Packet_Builder {
 
 	/**
@@ -84,7 +85,13 @@ class Context_Packet_Builder {
 		// Get revision info.
 		$revision_id = null;
 		if ( $post ) {
-			$revisions = wp_get_post_revisions( $post->ID, array( 'posts_per_page' => 1, 'check_enabled' => false ) );
+			$revisions = wp_get_post_revisions(
+				$post->ID,
+				array(
+					'posts_per_page' => 1,
+					'check_enabled'  => false,
+				)
+			);
 			if ( ! empty( $revisions ) ) {
 				$revision_id = current( $revisions )->ID;
 			}
@@ -155,13 +162,13 @@ class Context_Packet_Builder {
 
 			// Append block-specific dos.
 			if ( ! empty( $block_guidelines['copy_rules']['dos'] ) ) {
-				$existing_dos = isset( $relevant['copy_rules']['dos'] ) ? $relevant['copy_rules']['dos'] : array();
+				$existing_dos                  = isset( $relevant['copy_rules']['dos'] ) ? $relevant['copy_rules']['dos'] : array();
 				$relevant['copy_rules']['dos'] = array_merge( $existing_dos, $block_guidelines['copy_rules']['dos'] );
 			}
 
 			// Append block-specific donts.
 			if ( ! empty( $block_guidelines['copy_rules']['donts'] ) ) {
-				$existing_donts = isset( $relevant['copy_rules']['donts'] ) ? $relevant['copy_rules']['donts'] : array();
+				$existing_donts                  = isset( $relevant['copy_rules']['donts'] ) ? $relevant['copy_rules']['donts'] : array();
 				$relevant['copy_rules']['donts'] = array_merge( $existing_donts, $block_guidelines['copy_rules']['donts'] );
 			}
 		}
@@ -187,7 +194,7 @@ class Context_Packet_Builder {
 	 * @return string The formatted packet text.
 	 */
 	private static function build_text_packet( $relevant, $task, $max_chars, $block_name = null ) {
-		$lines = array();
+		$lines   = array();
 		$lines[] = '## SITE CONTENT GUIDELINES';
 
 		// Add block context if provided.
@@ -304,8 +311,8 @@ class Context_Packet_Builder {
 			if ( ! empty( $vocab['prefer'] ) ) {
 				$lines[] = 'PREFER these terms:';
 				foreach ( $vocab['prefer'] as $item ) {
-					$term = is_array( $item ) ? $item['term'] : $item;
-					$note = is_array( $item ) && ! empty( $item['note'] ) ? ' (' . $item['note'] . ')' : '';
+					$term    = is_array( $item ) ? $item['term'] : $item;
+					$note    = is_array( $item ) && ! empty( $item['note'] ) ? ' (' . $item['note'] . ')' : '';
 					$lines[] = '- "' . $term . '"' . $note;
 				}
 			}
@@ -313,8 +320,8 @@ class Context_Packet_Builder {
 			if ( ! empty( $vocab['avoid'] ) ) {
 				$lines[] = 'AVOID these terms:';
 				foreach ( $vocab['avoid'] as $item ) {
-					$term = is_array( $item ) ? $item['term'] : $item;
-					$note = is_array( $item ) && ! empty( $item['note'] ) ? ' (' . $item['note'] . ')' : '';
+					$term    = is_array( $item ) ? $item['term'] : $item;
+					$note    = is_array( $item ) && ! empty( $item['note'] ) ? ' (' . $item['note'] . ')' : '';
 					$lines[] = '- "' . $term . '"' . $note;
 				}
 			}

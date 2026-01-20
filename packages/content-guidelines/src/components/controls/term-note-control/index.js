@@ -26,6 +26,7 @@ import './style.scss';
  * @param {Function} props.onChange        Callback when items change.
  * @param {string}   props.termPlaceholder Placeholder for term input.
  * @param {string}   props.notePlaceholder Placeholder for note input.
+ * @param {Function} props.onDirty         Optional dirty callback.
  * @return {JSX.Element} TermNoteControl component.
  */
 export default function TermNoteControl( {
@@ -34,6 +35,7 @@ export default function TermNoteControl( {
 	onChange,
 	termPlaceholder = __( 'Term' ),
 	notePlaceholder = __( 'Why? (optional)' ),
+	onDirty = () => {},
 } ) {
 	const [ newTerm, setNewTerm ] = useState( '' );
 	const [ newNote, setNewNote ] = useState( '' );
@@ -47,12 +49,14 @@ export default function TermNoteControl( {
 			note: newNote.trim(),
 		};
 		onChange( [ ...items, newItem ] );
+		onDirty();
 		setNewTerm( '' );
 		setNewNote( '' );
 	};
 
 	const handleRemove = ( index ) => {
 		onChange( items.filter( ( _, i ) => i !== index ) );
+		onDirty();
 	};
 
 	const handleKeyDown = ( e ) => {
@@ -109,6 +113,7 @@ export default function TermNoteControl( {
 					<div style={ { flex: 1 } }>
 						<TextControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							placeholder={ termPlaceholder }
 							value={ newTerm }
 							onChange={ setNewTerm }
@@ -118,6 +123,7 @@ export default function TermNoteControl( {
 					<div style={ { flex: 2 } }>
 						<TextControl
 							__nextHasNoMarginBottom
+							__next40pxDefaultSize
 							placeholder={ notePlaceholder }
 							value={ newNote }
 							onChange={ setNewNote }
@@ -127,8 +133,10 @@ export default function TermNoteControl( {
 					<Button
 						icon={ plus }
 						variant="secondary"
+						__next40pxDefaultSize
 						onClick={ handleAdd }
 						disabled={ ! newTerm.trim() }
+						accessibleWhenDisabled
 						label={ __( 'Add' ) }
 					/>
 				</HStack>

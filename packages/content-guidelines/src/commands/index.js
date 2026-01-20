@@ -12,10 +12,12 @@
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import { useCommand, useCommandLoader } from '@wordpress/commands';
-import { __ } from '@wordpress/i18n';
+import { __, _n, numberFormat, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 import { edit, backup, check, pencil, seen, external } from '@wordpress/icons';
 
 /**
@@ -36,7 +38,7 @@ export function useContentGuidelinesCommands() {
 		label: __( 'Open Content Guidelines' ),
 		icon: edit,
 		callback: ( { close } ) => {
-			window.location.href = 'themes.php?page=guidelines';
+			window.location.assign( 'themes.php?page=guidelines' );
 			close();
 		},
 		context: 'site-editor',
@@ -47,7 +49,7 @@ export function useContentGuidelinesCommands() {
 		label: __( 'View Guidelines History' ),
 		icon: backup,
 		callback: ( { close } ) => {
-			window.location.href = 'themes.php?page=guidelines#/history';
+			window.location.assign( 'themes.php?page=guidelines&history=1' );
 			close();
 		},
 	} );
@@ -57,7 +59,9 @@ export function useContentGuidelinesCommands() {
 		label: __( 'Open Guidelines Playground' ),
 		icon: seen,
 		callback: ( { close } ) => {
-			window.location.href = 'themes.php?page=guidelines#/playground';
+			window.location.assign(
+				'themes.php?page=guidelines&tab=playground'
+			);
 			close();
 		},
 	} );
@@ -73,7 +77,7 @@ export function useContentGuidelinesDynamicCommands() {
 	// Register save command dynamically
 	useCommandLoader( {
 		name: 'content-guidelines/save-commands',
-		hook: useContentGuidelinesSaveCommands,
+		hook: getContentGuidelinesSaveCommands(),
 		context: 'site-editor',
 	} );
 }
@@ -83,40 +87,41 @@ export function useContentGuidelinesDynamicCommands() {
  *
  * @return {Object} Commands configuration for the loader.
  */
-function useContentGuidelinesSaveCommands() {
-	const { hasChanges, save } = useGuidelines();
+const getContentGuidelinesSaveCommands = () =>
+	function useContentGuidelinesSaveCommands() {
+		const { hasChanges, save } = useGuidelines();
 
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
 
-	const commands = [];
+		const commands = [];
 
-	if ( hasChanges ) {
-		commands.push( {
-			name: 'content-guidelines/save-guidelines',
-			label: __( 'Save Content Guidelines' ),
-			icon: check,
-			callback: async ( { close } ) => {
-				try {
-					await save();
-					createSuccessNotice( __( 'Guidelines saved.' ), {
-						type: 'snackbar',
-					} );
-				} catch ( error ) {
-					createErrorNotice( __( 'Failed to save guidelines.' ), {
-						type: 'snackbar',
-					} );
-				}
-				close();
-			},
-		} );
-	}
+		if ( hasChanges ) {
+			commands.push( {
+				name: 'content-guidelines/save-guidelines',
+				label: __( 'Save Content Guidelines' ),
+				icon: check,
+				callback: async ( { close } ) => {
+					try {
+						await save();
+						createSuccessNotice( __( 'Guidelines saved.' ), {
+							type: 'snackbar',
+						} );
+					} catch ( error ) {
+						createErrorNotice( __( 'Failed to save guidelines.' ), {
+							type: 'snackbar',
+						} );
+					}
+					close();
+				},
+			} );
+		}
 
-	return {
-		commands,
-		isLoading: false,
+		return {
+			commands,
+			isLoading: false,
+		};
 	};
-}
 
 /**
  * Hook to register post-context commands.
@@ -127,7 +132,7 @@ function useContentGuidelinesSaveCommands() {
 export function useContentGuidelinesPostCommands() {
 	useCommandLoader( {
 		name: 'content-guidelines/post-commands',
-		hook: usePostContextCommands,
+		hook: getPostContextCommands(),
 		context: 'post-editor',
 	} );
 }
@@ -137,84 +142,95 @@ export function useContentGuidelinesPostCommands() {
  *
  * @return {Object} Commands configuration.
  */
-function usePostContextCommands() {
-	const { currentPostId, currentPostType } = useSelect( ( select ) => {
-		const editor = select( 'core/editor' );
-		return {
-			currentPostId: editor?.getCurrentPostId?.() ?? null,
-			currentPostType: editor?.getCurrentPostType?.() ?? null,
-		};
-	}, [] );
+const getPostContextCommands = () =>
+	function usePostContextCommands() {
+		const { currentPostId, currentPostType } = useSelect( ( select ) => {
+			const editor = select( editorStore );
+			return {
+				currentPostId: editor?.getCurrentPostId?.() ?? null,
+				currentPostType: editor?.getCurrentPostType?.() ?? null,
+			};
+		}, [] );
 
-	const { createSuccessNotice, createErrorNotice } =
-		useDispatch( noticesStore );
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
 
-	const commands = [];
+		const commands = [];
 
-	if ( currentPostId && currentPostType === 'post' ) {
-		commands.push( {
-			name: 'content-guidelines/check-post-guidelines',
-			label: __( 'Check Post Against Guidelines' ),
-			icon: pencil,
-			callback: async ( { close } ) => {
-				try {
-					const response = await wp.apiFetch( {
-						path: '/wp/v2/content-guidelines/test',
-						method: 'POST',
-						data: {
-							task: 'rewrite_intro',
-							fixture_post_id: currentPostId,
-						},
-					} );
+		if ( currentPostId && currentPostType === 'post' ) {
+			commands.push( {
+				name: 'content-guidelines/check-post-guidelines',
+				label: __( 'Check Post Against Guidelines' ),
+				icon: pencil,
+				callback: async ( { close } ) => {
+					try {
+						const response = await apiFetch( {
+							path: '/wp/v2/content-guidelines/test',
+							method: 'POST',
+							data: {
+								task: 'rewrite_intro',
+								fixture_post_id: currentPostId,
+							},
+						} );
 
-					const issueCount = response.lint_results?.issue_count ?? 0;
+						const issueCount =
+							response.lint_results?.issue_count ?? 0;
 
-					if ( issueCount === 0 ) {
-						createSuccessNotice(
-							__( 'Content passes all guidelines checks!' ),
-							{ type: 'snackbar' }
-						);
-					} else {
-						createErrorNotice(
-							`${ issueCount } ${ __(
-								'guideline issues found. Open Content Guidelines to review.'
-							) }`,
-							{
+						if ( issueCount === 0 ) {
+							createSuccessNotice(
+								__( 'Content passes all guidelines checks!' ),
+								{ type: 'snackbar' }
+							);
+						} else {
+							const issueMessage = sprintf(
+								/* translators: %d: number of guideline issues found. */
+								_n(
+									'%d guideline issue found. Open Content Guidelines to review.',
+									'%d guideline issues found. Open Content Guidelines to review.',
+									issueCount
+								),
+								numberFormat( issueCount )
+							);
+							createErrorNotice( issueMessage, {
 								type: 'snackbar',
 								actions: [
 									{
 										label: __( 'View' ),
-										url: 'themes.php?page=guidelines#/playground',
+										url: 'themes.php?page=guidelines&tab=playground',
 									},
 								],
+							} );
+						}
+					} catch ( error ) {
+						createErrorNotice(
+							__( 'Failed to check guidelines.' ),
+							{
+								type: 'snackbar',
 							}
 						);
 					}
-				} catch ( error ) {
-					createErrorNotice( __( 'Failed to check guidelines.' ), {
-						type: 'snackbar',
-					} );
-				}
-				close();
-			},
-		} );
+					close();
+				},
+			} );
 
-		commands.push( {
-			name: 'content-guidelines/test-post-in-playground',
-			label: __( 'Test Current Post in Guidelines Playground' ),
-			icon: external,
-			callback: ( { close } ) => {
-				window.location.href = `themes.php?page=guidelines#/playground?post=${ currentPostId }`;
-				close();
-			},
-		} );
-	}
+			commands.push( {
+				name: 'content-guidelines/test-post-in-playground',
+				label: __( 'Test Current Post in Guidelines Playground' ),
+				icon: external,
+				callback: ( { close } ) => {
+					window.location.assign(
+						`themes.php?page=guidelines&tab=playground&post=${ currentPostId }`
+					);
+					close();
+				},
+			} );
+		}
 
-	return {
-		commands,
-		isLoading: false,
+		return {
+			commands,
+			isLoading: false,
+		};
 	};
-}
 
 /**
  * Register all Content Guidelines commands.
