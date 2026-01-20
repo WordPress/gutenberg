@@ -6,6 +6,34 @@
  */
 
 /**
+ * Returns the submenu visibility value with backward compatibility
+ * for the deprecated openSubmenusOnClick attribute.
+ *
+ * This function centralizes the migration logic from the boolean
+ * openSubmenusOnClick to the new submenuVisibility enum.
+ *
+ * @since 6.9.0
+ *
+ * @param array $attributes Block attributes containing submenuVisibility and/or openSubmenusOnClick.
+ * @return string The visibility mode: 'hover', 'click', or 'always'.
+ */
+function block_core_navigation_get_submenu_visibility( $attributes ) {
+	$submenu_visibility     = isset( $attributes['submenuVisibility'] ) ? $attributes['submenuVisibility'] : null;
+	$open_submenus_on_click = isset( $attributes['openSubmenusOnClick'] ) ? $attributes['openSubmenusOnClick'] : null;
+
+	// If new attribute is set, use it.
+	if ( null !== $submenu_visibility ) {
+		return $submenu_visibility;
+	}
+
+	// Fall back to old attribute for backward compatibility.
+	// openSubmenusOnClick: true  -> 'click'
+	// openSubmenusOnClick: false -> 'hover'
+	// openSubmenusOnClick: null  -> 'hover' (default)
+	return ! empty( $open_submenus_on_click ) ? 'click' : 'hover';
+}
+
+/**
  * Helper functions used to render the navigation block.
  *
  * @since 6.5.0
@@ -119,11 +147,10 @@ class WP_Navigation_Block_Renderer {
 	 * @return bool Returns whether or not to load the view script.
 	 */
 	private static function is_interactive( $attributes, $inner_blocks ) {
-		$has_submenus       = static::has_submenus( $inner_blocks );
-		$is_responsive_menu = static::is_responsive( $attributes );
-		$submenu_visibility = isset( $attributes['submenuVisibility'] ) ? $attributes['submenuVisibility'] : null;
-		// For backward compatibility, fall back to openSubmenusOnClick
-		$open_on_click = 'click' === $submenu_visibility || ( ! $submenu_visibility && ! empty( $attributes['openSubmenusOnClick'] ) );
+		$has_submenus         = static::has_submenus( $inner_blocks );
+		$is_responsive_menu   = static::is_responsive( $attributes );
+		$effective_visibility = block_core_navigation_get_submenu_visibility( $attributes );
+		$open_on_click        = 'click' === $effective_visibility;
 		return ( $has_submenus && ( $open_on_click || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
 	}
 
@@ -1123,11 +1150,10 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		// event.
 		$tags->set_attribute( 'tabindex', '-1' );
 
-		$submenu_visibility = isset( $block_attributes['submenuVisibility'] ) ? $block_attributes['submenuVisibility'] : null;
-		// For backward compatibility, check openSubmenusOnClick if submenuVisibility is not set
-		$open_on_click = 'click' === $submenu_visibility || ( ! $submenu_visibility && ! empty( $block_attributes['openSubmenusOnClick'] ) );
+		$effective_visibility = block_core_navigation_get_submenu_visibility( $block_attributes );
+		$open_on_click        = 'click' === $effective_visibility;
 
-		if ( ! $open_on_click && 'always' !== $submenu_visibility ) {
+		if ( ! $open_on_click && 'always' !== $effective_visibility ) {
 			$tags->set_attribute( 'data-wp-on--mouseenter', 'actions.openMenuOnHover' );
 			$tags->set_attribute( 'data-wp-on--mouseleave', 'actions.closeMenuOnHover' );
 		}
@@ -1140,7 +1166,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 			)
 		) ) {
 			// Don't add interactive directives when submenus are always visible.
-			if ( 'always' !== $submenu_visibility ) {
+			if ( 'always' !== $effective_visibility ) {
 				$tags->set_attribute( 'data-wp-on--click', 'actions.toggleMenuOnClick' );
 				$tags->set_attribute( 'data-wp-bind--aria-expanded', 'state.isMenuOpen' );
 				// The `aria-expanded` attribute for SSR is already added in the submenu block.

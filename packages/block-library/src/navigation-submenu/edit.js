@@ -48,6 +48,7 @@ import {
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
 import { DEFAULT_BLOCK } from '../navigation/constants';
+import { getSubmenuVisibility } from '../navigation/utils/get-submenu-visibility';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -93,8 +94,10 @@ export default function NavigationSubmenuEdit( {
 	const blockEditingMode = useBlockEditingMode();
 
 	// Determine effective submenu visibility with backward compatibility
-	const effectiveSubmenuVisibility =
-		submenuVisibility || ( contextOpenSubmenusOnClick ? 'click' : 'hover' );
+	const effectiveSubmenuVisibility = getSubmenuVisibility( {
+		submenuVisibility,
+		openSubmenusOnClick: contextOpenSubmenusOnClick,
+	} );
 
 	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
 	const openSubmenusOnClick =

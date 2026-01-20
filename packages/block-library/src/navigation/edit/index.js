@@ -81,6 +81,7 @@ import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import { DEFAULT_BLOCK } from '../constants';
 import useMigrateAttributes from './use-migrate-attributes';
+import { getSubmenuVisibility } from '../utils/get-submenu-visibility';
 
 /**
  * Component that renders the Add page button for the Navigation block.
@@ -685,8 +686,7 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
-	const effectiveSubmenuVisibility =
-		submenuVisibility || ( openSubmenusOnClick ? 'click' : 'hover' );
+	const effectiveSubmenuVisibility = getSubmenuVisibility( attributes );
 
 	const submenuAccessibilityNotice =
 		! showSubmenuIcon &&
