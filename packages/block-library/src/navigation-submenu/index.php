@@ -5,6 +5,34 @@
  * @package WordPress
  */
 
+/**
+ * Returns the submenu visibility value with backward compatibility
+ * for the deprecated openSubmenusOnClick attribute.
+ *
+ * This function centralizes the migration logic from the boolean
+ * openSubmenusOnClick to the new submenuVisibility enum.
+ *
+ * @since 6.9.0
+ *
+ * @param array $attributes Block attributes containing submenuVisibility and/or openSubmenusOnClick.
+ * @return string The visibility mode: 'hover', 'click', or 'always'.
+ */
+function block_core_navigation_submenu_get_submenu_visibility( $attributes ) {
+	$submenu_visibility     = isset( $attributes['submenuVisibility'] ) ? $attributes['submenuVisibility'] : null;
+	$open_submenus_on_click = isset( $attributes['openSubmenusOnClick'] ) ? $attributes['openSubmenusOnClick'] : null;
+
+	// If new attribute is set, use it.
+	if ( null !== $submenu_visibility ) {
+		return $submenu_visibility;
+	}
+
+	// Fall back to old attribute for backward compatibility.
+	// openSubmenusOnClick: true  -> 'click'
+	// openSubmenusOnClick: false -> 'hover'
+	// openSubmenusOnClick: null  -> 'hover' (default)
+	return ! empty( $open_submenus_on_click ) ? 'click' : 'hover';
+}
+
 // Path differs between source and build: '../navigation-link/shared/helpers.php' in source, './navigation-link/shared/helpers.php' in build.
 if ( file_exists( __DIR__ . '/../navigation-link/shared/helpers.php' ) ) {
 	require_once __DIR__ . '/../navigation-link/shared/helpers.php';
@@ -105,7 +133,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 
 	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
-	$effective_visibility    = block_core_navigation_get_submenu_visibility( $block->context );
+	$effective_visibility    = block_core_navigation_submenu_get_submenu_visibility( $block->context );
 	$open_on_click           = 'click' === $effective_visibility;
 	$open_on_hover           = 'hover' === $effective_visibility;
 	$open_on_hover_and_click = $open_on_hover && $show_submenu_indicators;
