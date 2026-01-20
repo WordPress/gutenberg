@@ -12,7 +12,7 @@ import { DataForm } from '@wordpress/dataviews';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { Button, __experimentalVStack as VStack } from '@wordpress/components';
-import { useState, useMemo, useEffect } from '@wordpress/element';
+import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs } from '@wordpress/url';
@@ -40,6 +40,8 @@ function PostEditForm( { postType, postId } ) {
 	const ids = useMemo( () => postId.split( ',' ), [ postId ] );
 	const history = useHistory();
 	const { path } = useLocation();
+	const formRef = useRef( null );
+
 	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
 			const args = [ 'postType', postType, ids[ 0 ] ];
@@ -61,6 +63,18 @@ function PostEditForm( { postType, postId } ) {
 		[ postType, ids ]
 	);
 	const [ multiEdits, setMultiEdits ] = useState( {} );
+
+	useEffect( () => {
+		if ( hasFinishedResolution && formRef.current ) {
+			const firstInput = formRef.current.querySelector(
+				'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])'
+			);
+			if ( firstInput ) {
+				firstInput.focus( { focusVisible: true } );
+			}
+		}
+	}, [ postId, hasFinishedResolution ] );
+
 	const { editEntityRecord } = useDispatch( coreDataStore );
 	const _fields = usePostFields( { postType } );
 	const fields = useMemo(
@@ -203,12 +217,14 @@ function PostEditForm( { postType, postId } ) {
 				}
 			/>
 			{ hasFinishedResolution && (
-				<DataForm
-					data={ ids.length === 1 ? record : multiEdits }
-					fields={ fieldsWithDependency }
-					form={ form }
-					onChange={ onChange }
-				/>
+				<div ref={ formRef }>
+					<DataForm
+						data={ ids.length === 1 ? record : multiEdits }
+						fields={ fieldsWithDependency }
+						form={ form }
+						onChange={ onChange }
+					/>
+				</div>
 			) }
 		</VStack>
 	);
