@@ -36,21 +36,41 @@ export function ComponentStatusIndicator() {
 	return (
 		<dl
 			style={ {
-				flexDirection: 'column',
-				marginBottom: '24px',
+				flexDirection: 'row',
+				marginBottom: '20px',
 				fontSize: '14px',
 			} }
 		>
-			<div style={ { display: 'flex', gap: '24px' } }>
-				<dt style={ { color: '#757575' } }>Status</dt>
-				<dd style={ { margin: 0, fontWeight: 'bold' } }>
+			<div
+				style={ {
+					display: 'flex',
+					flexDirection: 'column',
+				} }
+			>
+				<dt style={ { fontStyle: 'normal', color: '#757575' } }>
+					Status
+				</dt>
+				<dd
+					style={ {
+						fontStyle: 'normal',
+						padding: 0,
+						fontWeight: 'bold',
+					} }
+				>
 					{ statusInfo.label.toLowerCase() }
 				</dd>
 			</div>
 			{ componentData.notes && (
-				<div style={ { display: 'flex', gap: '24px' } }>
-					<dt style={ { color: '#757575' } }>Notes</dt>
-					<dd style={ { margin: 0, fontWeight: 'bold' } }>
+				<div
+					style={ {
+						display: 'flex',
+						flexDirection: 'column',
+					} }
+				>
+					<dt style={ { fontStyle: 'normal', color: '#757575' } }>
+						Notes
+					</dt>
+					<dd style={ { padding: 0, fontWeight: 'bold' } }>
 						{ componentData.notes }
 					</dd>
 				</div>
