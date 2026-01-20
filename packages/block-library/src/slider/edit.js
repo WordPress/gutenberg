@@ -15,7 +15,11 @@ const SLIDER_TEMPLATE = [
 	[
 		'core/slider-track',
 		{},
-		[ [ 'core/slide' ], [ 'core/slide' ], [ 'core/slide' ] ],
+		[
+			[ 'core/slide', {}, [ [ 'core/image' ] ] ],
+			[ 'core/slide', {}, [ [ 'core/image' ] ] ],
+			[ 'core/slide', {}, [ [ 'core/image' ] ] ],
+		],
 	],
 ];
 
