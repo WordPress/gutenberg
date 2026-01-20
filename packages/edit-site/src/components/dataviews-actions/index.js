@@ -7,6 +7,7 @@ import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -14,7 +15,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { PATTERN_TYPES } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 export const useSetActiveTemplateAction = () => {
 	const activeTheme = useSelect( ( select ) =>
@@ -96,5 +97,37 @@ export const useEditPostAction = () => {
 			},
 		} ),
 		[ history ]
+	);
+};
+
+export const useQuickEditAction = () => {
+	const history = useHistory();
+	const { path } = useLocation();
+	return useMemo(
+		() => ( {
+			id: 'quick-edit',
+			label: __( 'Quick Edit' ),
+			isPrimary: true,
+			icon: pencil,
+			isEligible( post ) {
+				if ( ! window.__experimentalQuickEditDataViews ) {
+					return false;
+				}
+				if ( post.status === 'trash' ) {
+					return false;
+				}
+				return post.type === 'page';
+			},
+			callback( items ) {
+				const post = items[ 0 ];
+				history.navigate(
+					addQueryArgs( path, {
+						postId: post.id,
+						quickEdit: true,
+					} )
+				);
+			},
+		} ),
+		[ history, path ]
 	);
 };
