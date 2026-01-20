@@ -17,7 +17,6 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { unlock } from '../../lock-unlock';
 import { usePostActions } from './actions';
-import { store as editorStore } from '../../store';
 
 const { Menu, kebabCase } = unlock( componentsPrivateApis );
 
@@ -28,10 +27,6 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 		( select ) => {
 			const { getEditedEntityRecord, getEntityRecordPermissions } =
 				unlock( select( coreStore ) );
-			const { isRevisionsMode } = unlock( select( editorStore ) );
-			if ( isRevisionsMode() ) {
-				return {};
-			}
 			return {
 				item: getEditedEntityRecord( 'postType', postType, postId ),
 				permissions: getEntityRecordPermissions(
@@ -49,10 +44,7 @@ export default function PostActions( { postType, postId, onActionPerformed } ) {
 			permissions,
 		};
 	}, [ item, permissions ] );
-	const allActions = usePostActions( {
-		postType: item?.type,
-		onActionPerformed,
-	} );
+	const allActions = usePostActions( { postType, onActionPerformed } );
 
 	const actions = useMemo( () => {
 		return allActions.filter( ( action ) => {

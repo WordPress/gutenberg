@@ -605,14 +605,16 @@ export const restoreRevision =
 
 		const revision = registry
 			.select( coreStore )
-			.getRevision( 'postType', postType, postId, revisionId );
+			.getRevision( 'postType', postType, postId, revisionId, {
+				context: 'edit',
+			} );
 
 		if ( ! revision ) {
 			return;
 		}
 
 		// Parse the revision content into blocks.
-		const blocks = parse( revision.content?.raw || '' );
+		const blocks = parse( revision.content.raw );
 
 		// Reset editor blocks with the revision content.
 		dispatch.resetEditorBlocks( blocks );

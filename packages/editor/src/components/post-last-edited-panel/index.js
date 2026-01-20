@@ -18,7 +18,7 @@ export default function PostLastEditedPanel() {
 			unlock( select( editorStore ) );
 		const _isRevisionMode = isRevisionsMode();
 		return {
-			isRevisionMode: _isRevisionMode,
+			isRevision: _isRevisionMode,
 			date: _isRevisionMode
 				? getCurrentRevision()?.date
 				: getEditedPostAttribute( 'modified' ),

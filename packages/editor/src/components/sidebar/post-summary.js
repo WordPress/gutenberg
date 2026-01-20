@@ -1,8 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	__experimentalVStack as VStack,
+	ExternalLink,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -37,7 +42,7 @@ import { unlock } from '../../lock-unlock';
 const PANEL_NAME = 'post-status';
 
 export default function PostSummary( { onActionPerformed } ) {
-	const { isRemovedPostStatusPanel, postType, postId, isRevisionsMode } =
+	const { isRemovedPostStatusPanel, postType, postId, revisionId } =
 		useSelect( ( select ) => {
 			// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do
 			// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
@@ -45,16 +50,17 @@ export default function PostSummary( { onActionPerformed } ) {
 				isEditorPanelRemoved,
 				getCurrentPostType,
 				getCurrentPostId,
-				isRevisionsMode: _isRevisionsMode,
+				getCurrentRevisionId,
 			} = unlock( select( editorStore ) );
 			return {
 				isRemovedPostStatusPanel: isEditorPanelRemoved( PANEL_NAME ),
 				postType: getCurrentPostType(),
 				postId: getCurrentPostId(),
-				isRevisionsMode: _isRevisionsMode(),
+				revisionId: getCurrentRevisionId(),
 			};
 		}, [] );
 
+	const isRevisionsMode = !! revisionId;
 	const shouldShowPostStatusPanel =
 		! isRemovedPostStatusPanel && ! isRevisionsMode;
 
@@ -79,6 +85,15 @@ export default function PostSummary( { onActionPerformed } ) {
 								<PostContentInformation />
 								<PostLastEditedPanel />
 							</VStack>
+							{ isRevisionsMode && revisionId && (
+								<ExternalLink
+									href={ addQueryArgs( 'revision.php', {
+										revision: revisionId,
+									} ) }
+								>
+									{ __( 'Open classic revisions screen' ) }
+								</ExternalLink>
+							) }
 							{ shouldShowPostStatusPanel && (
 								<VStack spacing={ 4 }>
 									<VStack spacing={ 1 }>
