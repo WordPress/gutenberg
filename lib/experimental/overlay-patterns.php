@@ -41,7 +41,7 @@ function gutenberg_register_overlay_block_patterns() {
 	);
 
 	register_block_pattern(
-		'gutenberg/navigation-overlay-close',
+		'gutenberg/navigation-overlay-half-width',
 		array(
 			'title'       => __( 'Half width overlay', 'gutenberg' ),
 			'description' => _x( 'A navigation overlay that spans half the width of the viewport', 'Block pattern description', 'gutenberg' ),
@@ -68,6 +68,8 @@ function gutenberg_register_overlay_block_patterns() {
 <!-- /wp:column --></div>
 <!-- /wp:columns --></div>
 <!-- /wp:group -->',
+			'categories'  => array( 'navigation' ),
+			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
 		)
 	);
 }
