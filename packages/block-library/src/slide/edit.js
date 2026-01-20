@@ -18,37 +18,33 @@ import { useMemo } from '@wordpress/element';
 function SlideEdit( { clientId, isSelected, context } ) {
 	const activeSlideIndex = context[ 'core/slider-activeSlideIndex' ] ?? 0;
 
-	const {
-		blockIndex,
-		hasInnerBlocksSelected,
-		sliderHasSelectedBlock,
-		isSliderSelected,
-	} = useSelect(
-		( select ) => {
-			const {
-				getBlockRootClientId,
-				getBlockIndex,
-				isBlockSelected,
-				hasSelectedInnerBlock,
-			} = select( blockEditorStore );
+	const { blockIndex, hasInnerBlocksSelected, trackHasSelectedSlide } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlockRootClientId,
+					getBlockIndex,
+					hasSelectedInnerBlock,
+				} = select( blockEditorStore );
 
-			// Get the slider-track parent, then slider grandparent
-			const trackClientId = getBlockRootClientId( clientId );
-			const _sliderClientId = getBlockRootClientId( trackClientId );
+				// Get the slider-track parent
+				const trackClientId = getBlockRootClientId( clientId );
 
-			return {
-				blockIndex: getBlockIndex( clientId ),
-				hasInnerBlocksSelected: hasSelectedInnerBlock( clientId, true ),
-				sliderHasSelectedBlock: hasSelectedInnerBlock(
-					_sliderClientId,
-					true
-				),
-				sliderClientId: _sliderClientId,
-				isSliderSelected: isBlockSelected( _sliderClientId ),
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					blockIndex: getBlockIndex( clientId ),
+					hasInnerBlocksSelected: hasSelectedInnerBlock(
+						clientId,
+						true
+					),
+					// Check if any slide in the track is selected (not controls)
+					trackHasSelectedSlide: hasSelectedInnerBlock(
+						trackClientId,
+						true
+					),
+				};
+			},
+			[ clientId ]
+		);
 
 	// Determine if this slide should be visible
 	const isSelectedSlide = useMemo( () => {
@@ -56,16 +52,8 @@ function SlideEdit( { clientId, isSelected, context } ) {
 		if ( isSelected || hasInnerBlocksSelected ) {
 			return true;
 		}
-		// Show if this is the active slide and slider itself is selected (no specific slide selected)
-		if (
-			blockIndex === activeSlideIndex &&
-			isSliderSelected &&
-			! sliderHasSelectedBlock
-		) {
-			return true;
-		}
-		// Show if this is the active slide and nothing in slider is selected
-		if ( blockIndex === activeSlideIndex && ! sliderHasSelectedBlock ) {
+		// Show if this is the active slide and no other slide is selected
+		if ( blockIndex === activeSlideIndex && ! trackHasSelectedSlide ) {
 			return true;
 		}
 		return false;
@@ -74,8 +62,7 @@ function SlideEdit( { clientId, isSelected, context } ) {
 		hasInnerBlocksSelected,
 		blockIndex,
 		activeSlideIndex,
-		isSliderSelected,
-		sliderHasSelectedBlock,
+		trackHasSelectedSlide,
 	] );
 
 	const blockProps = useBlockProps( {
