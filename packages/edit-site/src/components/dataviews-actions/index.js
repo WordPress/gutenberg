@@ -76,13 +76,13 @@ export const useSetActiveTemplateAction = () => {
 	);
 };
 
-export const useEditPostAction = () => {
+export const useEditPostAction = ( viewType ) => {
 	const history = useHistory();
 	return useMemo(
 		() => ( {
 			id: 'edit-post',
 			label: __( 'Edit' ),
-			isPrimary: true,
+			isPrimary: viewType !== 'table',
 			icon: pencil,
 			isEligible( post ) {
 				if ( post.status === 'trash' ) {
@@ -96,11 +96,11 @@ export const useEditPostAction = () => {
 				history.navigate( `/${ post.type }/${ post.id }?canvas=edit` );
 			},
 		} ),
-		[ history ]
+		[ history, viewType ]
 	);
 };
 
-export const useQuickEditAction = () => {
+export const useQuickEditAction = ( viewType ) => {
 	const history = useHistory();
 	const { path } = useLocation();
 	return useMemo(
@@ -110,6 +110,10 @@ export const useQuickEditAction = () => {
 			isPrimary: true,
 			icon: pencil,
 			isEligible( post ) {
+				if ( viewType !== 'table' ) {
+					return false;
+				}
+
 				if ( ! window.__experimentalQuickEditDataViews ) {
 					return false;
 				}
@@ -128,6 +132,6 @@ export const useQuickEditAction = () => {
 				);
 			},
 		} ),
-		[ history, path ]
+		[ history, path, viewType ]
 	);
 };

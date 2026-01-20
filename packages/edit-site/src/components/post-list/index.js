@@ -29,7 +29,7 @@ import {
 
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
-import { useQuickEditAction } from '../dataviews-actions';
+import { useEditPostAction, useQuickEditAction } from '../dataviews-actions';
 import { defaultLayouts, getDefaultView } from './view-utils';
 import useNotesCount from './use-notes-count';
 
@@ -235,10 +235,11 @@ export default function PostList( { postType } ) {
 		postType,
 		context: 'list',
 	} );
-	const quickEditAction = useQuickEditAction();
+	const editAction = useEditPostAction( view.type );
+	const quickEditAction = useQuickEditAction( view.type );
 	const actions = useMemo(
-		() => [ quickEditAction, ...postTypeActions ],
-		[ postTypeActions, quickEditAction ]
+		() => [ quickEditAction, editAction, ...postTypeActions ],
+		[ postTypeActions, quickEditAction, editAction ]
 	);
 
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
