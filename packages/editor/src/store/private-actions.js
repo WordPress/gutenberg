@@ -613,16 +613,24 @@ export const restoreRevision =
 			return;
 		}
 
-		// Parse the revision content into blocks.
-		const blocks = parse( revision.content.raw );
-
-		// Reset editor blocks with the revision content.
-		dispatch.resetEditorBlocks( blocks );
-
-		// Update the title if the revision has one.
-		if ( revision.title?.raw ) {
-			dispatch.editPost( { title: revision.title.raw } );
+		// Build the edits object with all restorable fields from the revision.
+		// Setting blocks to undefined clears edited blocks, forcing a re-parse of content.
+		const edits = {
+			blocks: undefined,
+			content: revision.content.raw,
+		};
+		if ( revision.title?.raw !== undefined ) {
+			edits.title = revision.title.raw;
 		}
+		if ( revision.excerpt?.raw !== undefined ) {
+			edits.excerpt = revision.excerpt.raw;
+		}
+		if ( revision.meta !== undefined ) {
+			edits.meta = revision.meta;
+		}
+
+		// Apply edits and save.
+		dispatch.editPost( edits );
 
 		// Exit revisions mode.
 		dispatch.setCurrentRevisionId( null );
