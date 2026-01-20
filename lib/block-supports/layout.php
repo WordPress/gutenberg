@@ -217,7 +217,7 @@ function gutenberg_register_layout_support( $block_type ) {
  * @param bool                 $has_block_gap_support         Optional. Whether the theme has support for the block gap. Default false.
  * @param string|string[]|null $gap_value                     Optional. The block gap value to apply. Default null.
  * @param bool                 $should_skip_gap_serialization Optional. Whether to skip applying the user-defined value set in the editor. Default false.
- * @param string               $fallback_gap_value            Optional. The block gap value to apply. Default '0.5em'.
+ * @param string|array         $fallback_gap_value     Optional. The block gap value to apply. Default '0.5em'.
  * @param array|null           $block_spacing                 Optional. Custom spacing set on the block. Default null.
  * @return string CSS styles on success. Else, empty string.
  */
@@ -411,7 +411,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			foreach ( $gap_sides as $gap_side ) {
 				$process_value = $gap_value;
 				if ( is_array( $gap_value ) ) {
-					$process_value = $gap_value[ $gap_side ] ?? $fallback_gap_value;
+					if ( is_array( $fallback_gap_value ) ) {
+						$fallback_value = $fallback_gap_value[ $gap_side ] ?? reset( $fallback_gap_value );
+					} else {
+						$fallback_value = $fallback_gap_value;
+					}
+					$process_value = $gap_value[ $gap_side ] ?? $fallback_value;
 				}
 				// Get spacing CSS variable from preset value if provided.
 				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
@@ -474,8 +479,16 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			}
 		}
 	} elseif ( 'grid' === $layout_type ) {
-		// Deal with block gap first so it can be used for responsive computation.
-		$responsive_gap_value = $fallback_gap_value || '1.2rem';
+		/*
+		 * If the gap value is an array, we use the "left" value because it represents the vertical gap, which
+		 * is the relevant one for computation of responsive grid columns.
+		 */
+		if ( is_array( $fallback_gap_value ) ) {
+			$responsive_gap_value = $fallback_gap_value['left'] ?? reset( $fallback_gap_value );
+		} else {
+			$responsive_gap_value = $fallback_gap_value;
+		}
+
 		if ( $has_block_gap_support && isset( $gap_value ) ) {
 			$combined_gap_value = '';
 			$gap_sides          = is_array( $gap_value ) ? array( 'top', 'left' ) : array( 'top' );
@@ -483,7 +496,12 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 			foreach ( $gap_sides as $gap_side ) {
 				$process_value = $gap_value;
 				if ( is_array( $gap_value ) ) {
-					$process_value = $gap_value[ $gap_side ] ?? $fallback_gap_value;
+					if ( is_array( $fallback_gap_value ) ) {
+						$fallback_value = $fallback_gap_value[ $gap_side ] ?? reset( $fallback_gap_value );
+					} else {
+						$fallback_value = $fallback_gap_value;
+					}
+					$process_value = $gap_value[ $gap_side ] ?? $fallback_value;
 				}
 				// Get spacing CSS variable from preset value if provided.
 				if ( is_string( $process_value ) && str_contains( $process_value, 'var:preset|spacing|' ) ) {
@@ -876,15 +894,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		// Check block-specific styles first, then fall back to root styles.
 		$block_name                   = $block['blockName'] ?? '';
 		$block_specific_global_styles = gutenberg_get_global_styles( array( 'blocks', $block_name, 'spacing', 'blockGap' ) );
-		// If the value is an array, use the first value.
-		if ( is_array( $block_specific_global_styles ) ) {
-			$block_specific_global_styles = $block_specific_global_styles['top'] ?? null;
-		}
-		$global_block_gap_value = $block_specific_global_styles ?? gutenberg_get_global_styles( array( 'spacing', 'blockGap' ) );
-		// If the value is an array, use the first value.
-		if ( is_array( $global_block_gap_value ) ) {
-			$global_block_gap_value = $global_block_gap_value['top'] ?? null;
-		}
+		$global_block_gap_value       = $block_specific_global_styles ?? gutenberg_get_global_styles( array( 'spacing', 'blockGap' ) );
+
 		if ( null !== $global_block_gap_value ) {
 			$fallback_gap_value = $global_block_gap_value;
 		}
