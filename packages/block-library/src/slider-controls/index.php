@@ -8,13 +8,49 @@
 /**
  * Renders the `core/slider-controls` block on the server.
  *
- * @param array $attributes Block attributes.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  *
  * @return string Returns the block markup.
  */
-function render_block_core_slider_controls( $attributes ) {
+function render_block_core_slider_controls( $attributes, $content, $block ) {
 	// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	unset( $attributes );
+
+	// Process inner blocks to add Interactivity API directives
+	$processed_content = $content;
+
+	// Find core/button blocks and add directives
+	if ( ! empty( $block->inner_blocks ) ) {
+		foreach ( $block->inner_blocks as $buttons_block ) {
+			if ( 'core/buttons' === $buttons_block->name && ! empty( $buttons_block->inner_blocks ) ) {
+				foreach ( $buttons_block->inner_blocks as $index => $button_block ) {
+					if ( 'core/button' === $button_block->name ) {
+						$button_html      = $button_block->render();
+						$button_classname = isset( $button_block->attributes['className'] ) ? $button_block->attributes['className'] : '';
+
+						// Add directives based on button class
+						if ( strpos( $button_classname, 'wp-block-slider-controls__previous' ) !== false ) {
+							$modified_button   = str_replace(
+								'<a ',
+								'<a data-wp-on--click="actions.prevSlide" data-wp-bind--disabled="state.isAtStart" ',
+								$button_html
+							);
+							$processed_content = str_replace( $button_html, $modified_button, $processed_content );
+						} elseif ( strpos( $button_classname, 'wp-block-slider-controls__next' ) !== false ) {
+							$modified_button   = str_replace(
+								'<a ',
+								'<a data-wp-on--click="actions.nextSlide" data-wp-bind--disabled="state.isAtEnd" ',
+								$button_html
+							);
+							$processed_content = str_replace( $button_html, $modified_button, $processed_content );
+						}
+					}
+				}
+			}
+		}
+	}
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
@@ -23,33 +59,9 @@ function render_block_core_slider_controls( $attributes ) {
 	);
 
 	return sprintf(
-		'<div %1$s>
-			<button
-				type="button"
-				class="wp-block-slider-controls__button wp-block-slider-controls__previous"
-				aria-label="%2$s"
-				data-wp-on--click="actions.prevSlide"
-				data-wp-bind--disabled="state.isAtStart"
-			>
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
-					<path d="M14.6 7l-1.2-1L8 12l5.4 6 1.2-1-4.6-5z" />
-				</svg>
-			</button>
-			<button
-				type="button"
-				class="wp-block-slider-controls__button wp-block-slider-controls__next"
-				aria-label="%3$s"
-				data-wp-on--click="actions.nextSlide"
-				data-wp-bind--disabled="state.isAtEnd"
-			>
-				<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false">
-					<path d="M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z" />
-				</svg>
-			</button>
-		</div>',
+		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
-		esc_attr__( 'Previous slide', 'gutenberg' ),
-		esc_attr__( 'Next slide', 'gutenberg' )
+		$processed_content
 	);
 }
 
