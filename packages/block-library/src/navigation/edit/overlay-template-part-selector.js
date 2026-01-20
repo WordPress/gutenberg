@@ -21,6 +21,7 @@ import { plus } from '@wordpress/icons';
  */
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 import useCreateOverlayTemplatePart from './use-create-overlay';
+import DeletedOverlayWarning from './deleted-overlay-warning';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 
 /**
@@ -70,6 +71,16 @@ export default function OverlayTemplatePartSelector( {
 	const createOverlayTemplatePart =
 		useCreateOverlayTemplatePart( overlayTemplateParts );
 
+	// Find the selected template part to get its title
+	const selectedTemplatePart = useMemo( () => {
+		if ( ! overlay || ! overlayTemplateParts ) {
+			return null;
+		}
+		return overlayTemplateParts.find(
+			( templatePart ) => templatePart.slug === overlay
+		);
+	}, [ overlay, overlayTemplateParts ] );
+
 	// Build options for SelectControl
 	const options = useMemo( () => {
 		const baseOptions = [
@@ -96,18 +107,26 @@ export default function OverlayTemplatePartSelector( {
 			}
 		);
 
-		return [ ...baseOptions, ...templatePartOptions ];
-	}, [ overlayTemplateParts, hasResolved, isResolving ] );
-
-	// Find the selected template part to get its title
-	const selectedTemplatePart = useMemo( () => {
-		if ( ! overlay || ! overlayTemplateParts ) {
-			return null;
+		// If an overlay is selected but not found in the list, add it as a "missing" option
+		if ( overlay && ! selectedTemplatePart ) {
+			templatePartOptions.unshift( {
+				label: sprintf(
+					/* translators: %s: Overlay slug. */
+					__( '%s (missing)' ),
+					overlay
+				),
+				value: overlay,
+			} );
 		}
-		return overlayTemplateParts.find(
-			( templatePart ) => templatePart.slug === overlay
-		);
-	}, [ overlay, overlayTemplateParts ] );
+
+		return [ ...baseOptions, ...templatePartOptions ];
+	}, [
+		overlayTemplateParts,
+		hasResolved,
+		isResolving,
+		overlay,
+		selectedTemplatePart,
+	] );
 
 	const handleSelectChange = ( value ) => {
 		setAttributes( {
@@ -183,7 +202,18 @@ export default function OverlayTemplatePartSelector( {
 		currentTheme,
 	] );
 
+	const handleClearOverlay = useCallback( () => {
+		setAttributes( { overlay: undefined } );
+	}, [ setAttributes ] );
+
 	const isCreateButtonDisabled = isResolving || isCreating;
+
+	// Check if the selected overlay is missing (deleted)
+	const isOverlayMissing = useMemo( () => {
+		return (
+			overlay && hasResolved && ! isResolving && ! selectedTemplatePart
+		);
+	}, [ overlay, hasResolved, isResolving, selectedTemplatePart ] );
 
 	// Build help text
 	const helpText = useMemo( () => {
@@ -250,6 +280,13 @@ export default function OverlayTemplatePartSelector( {
 					</FlexItem>
 				) }
 			</HStack>
+			{ isOverlayMissing && (
+				<DeletedOverlayWarning
+					onClear={ handleClearOverlay }
+					onCreate={ handleCreateOverlay }
+					isCreating={ isCreating }
+				/>
+			) }
 		</div>
 	);
 }
