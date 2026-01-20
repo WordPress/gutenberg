@@ -320,3 +320,29 @@ export function isRevisionsMode( state ) {
 export function getCurrentRevisionId( state ) {
 	return state.revisionId;
 }
+
+/**
+ * Returns the current revision object in revisions mode.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object|null|undefined} The revision object, null if loading, or undefined if not in revisions mode.
+ */
+export const getCurrentRevision = createRegistrySelector(
+	( select ) => ( state ) => {
+		const revisionId = getCurrentRevisionId( state );
+		if ( ! revisionId ) {
+			return undefined;
+		}
+
+		const { type: postType, id: postId } = getCurrentPost( state );
+		return (
+			select( coreStore ).getRevision(
+				'postType',
+				postType,
+				postId,
+				revisionId,
+				{ context: 'edit' }
+			) ?? null
+		);
+	}
+);

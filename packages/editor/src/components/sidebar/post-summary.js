@@ -29,6 +29,7 @@ import SiteDiscussion from '../site-discussion';
 import { store as editorStore } from '../../store';
 import { PrivatePostLastRevision } from '../post-last-revision';
 import PostTrash from '../post-trash';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Module Constants
@@ -36,23 +37,26 @@ import PostTrash from '../post-trash';
 const PANEL_NAME = 'post-status';
 
 export default function PostSummary( { onActionPerformed } ) {
-	const { isRemovedPostStatusPanel, postType, postId } = useSelect(
-		( select ) => {
+	const { isRemovedPostStatusPanel, postType, postId, isRevisionsMode } =
+		useSelect( ( select ) => {
 			// We use isEditorPanelRemoved to hide the panel if it was programmatically removed. We do
 			// not use isEditorPanelEnabled since this panel should not be disabled through the UI.
 			const {
 				isEditorPanelRemoved,
 				getCurrentPostType,
 				getCurrentPostId,
-			} = select( editorStore );
+				isRevisionsMode: _isRevisionsMode,
+			} = unlock( select( editorStore ) );
 			return {
 				isRemovedPostStatusPanel: isEditorPanelRemoved( PANEL_NAME ),
 				postType: getCurrentPostType(),
 				postId: getCurrentPostId(),
+				isRevisionsMode: _isRevisionsMode(),
 			};
-		},
-		[]
-	);
+		}, [] );
+
+	const shouldShowPostStatusPanel =
+		! isRemovedPostStatusPanel && ! isRevisionsMode;
 
 	return (
 		<PostPanelSection className="editor-post-summary">
@@ -65,13 +69,17 @@ export default function PostSummary( { onActionPerformed } ) {
 								postId={ postId }
 								onActionPerformed={ onActionPerformed }
 							/>
-							<PostFeaturedImagePanel withPanelBody={ false } />
-							<PostExcerptPanel />
+							{ ! isRevisionsMode && (
+								<PostFeaturedImagePanel
+									withPanelBody={ false }
+								/>
+							) }
+							{ ! isRevisionsMode && <PostExcerptPanel /> }
 							<VStack spacing={ 1 }>
 								<PostContentInformation />
 								<PostLastEditedPanel />
 							</VStack>
-							{ ! isRemovedPostStatusPanel && (
+							{ shouldShowPostStatusPanel && (
 								<VStack spacing={ 4 }>
 									<VStack spacing={ 1 }>
 										<PostStatusPanel />

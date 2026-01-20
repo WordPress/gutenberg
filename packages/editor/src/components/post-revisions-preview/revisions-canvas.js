@@ -17,7 +17,6 @@ import { useMemo } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import VisualEditor from '../visual-editor';
-import RevisionsSidebar from '../sidebar/revisions-sidebar';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
@@ -86,11 +85,6 @@ export default function RevisionsCanvas() {
 					<Spinner />
 				</div>
 			) }
-			<RevisionsSidebar
-				revisionId={ revision?.id }
-				revisionDate={ revision?.date }
-				revisionContent={ revision?.content?.raw }
-			/>
 		</>
 	);
 }

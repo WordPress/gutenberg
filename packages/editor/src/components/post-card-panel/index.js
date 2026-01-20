@@ -48,27 +48,20 @@ export default function PostCardPanel( {
 	);
 	const { postTitle, icon, labels } = useSelect(
 		( select ) => {
+			const { getEditedEntityRecord, getCurrentTheme, getPostType } =
+				select( coreStore );
 			const {
-				getEditedEntityRecord,
-				getCurrentTheme,
-				getPostType,
-				getRevision,
-			} = select( coreStore );
-			const { getPostIcon, getCurrentPostType, getCurrentPostId } =
-				unlock( select( editorStore ) );
+				getPostIcon,
+				getCurrentPostType,
+				isRevisionsMode,
+				getCurrentRevision,
+			} = unlock( select( editorStore ) );
 			let _title = '';
 
-			// Handle revision post type differently - fetch via getRevision.
-			if ( postType === 'revision' ) {
+			// In revisions mode, use the current revision.
+			if ( isRevisionsMode() ) {
 				const parentPostType = getCurrentPostType();
-				const parentPostId = getCurrentPostId();
-				const _record = getRevision(
-					'postType',
-					parentPostType,
-					parentPostId,
-					postIds[ 0 ],
-					{ context: 'edit' }
-				);
+				const _record = getCurrentRevision();
 				_title = _record?.title?.rendered || _record?.title;
 				return {
 					postTitle: _title,

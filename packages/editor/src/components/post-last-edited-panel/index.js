@@ -10,26 +10,31 @@ import { humanTimeDiff } from '@wordpress/date';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 export default function PostLastEditedPanel() {
-	const modified = useSelect(
-		( select ) =>
-			select( editorStore ).getEditedPostAttribute( 'modified' ),
-		[]
-	);
-	const lastEditedText =
-		modified &&
-		sprintf(
-			// translators: %s: Human-readable time difference, e.g. "2 days ago".
-			__( 'Last edited %s.' ),
-			humanTimeDiff( modified )
-		);
-	if ( ! lastEditedText ) {
+	const { date, isRevision } = useSelect( ( select ) => {
+		const { getEditedPostAttribute, getCurrentRevision, isRevisionsMode } =
+			unlock( select( editorStore ) );
+		const _isRevisionMode = isRevisionsMode();
+		return {
+			isRevisionMode: _isRevisionMode,
+			date: _isRevisionMode
+				? getCurrentRevision()?.date
+				: getEditedPostAttribute( 'modified' ),
+		};
+	}, [] );
+	if ( ! date ) {
 		return null;
 	}
+	const text = isRevision
+		? // translators: %s: Human-readable time difference, e.g. "2 days ago".
+		  __( 'Created %s.' )
+		: // translators: %s: Human-readable time difference, e.g. "2 days ago".
+		  __( 'Last edited %s.' );
 	return (
 		<div className="editor-post-last-edited-panel">
-			<Text>{ lastEditedText }</Text>
+			<Text>{ sprintf( text, humanTimeDiff( date ) ) }</Text>
 		</div>
 	);
 }
