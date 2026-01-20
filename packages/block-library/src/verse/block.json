@@ -20,6 +20,7 @@
 		}
 	},
 	"supports": {
+		"align": [ "wide", "full" ],
 		"anchor": true,
 		"background": {
 			"backgroundImage": true,
