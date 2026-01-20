@@ -22,6 +22,7 @@ results
 /perf-envs
 /composer.lock
 /ts-traces
+.claude
 
 # The /.cache folder is needed for phpcs to cache results between runs, while other .cache folders must be ignored
 # It is not possible to re-include a file if a parent directory of that file is excluded
