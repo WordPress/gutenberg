@@ -3,6 +3,12 @@
 
 .edit-site-post-edit {
 	padding: $grid-unit-30;
+
+	// Fallback for programmatic focus when :focus-visible doesn't apply.
+	.is-focus-visible {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		outline: 3px solid transparent; // For Windows High Contrast mode.
+	}
 }
 
 .dataforms-layouts-panel__field-dropdown {

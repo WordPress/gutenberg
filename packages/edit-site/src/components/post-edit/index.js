@@ -76,11 +76,18 @@ function PostEditForm( { postType, postId } ) {
 
 	useEffect( () => {
 		if ( hasFinishedResolution && formRef.current ) {
-			const firstInput = formRef.current.querySelector(
-				'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled])'
+			const firstTabbable = formRef.current.querySelector(
+				'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [role="button"]:not([aria-disabled="true"]), [tabindex="0"]'
 			);
-			if ( firstInput ) {
-				firstInput.focus( { focusVisible: true } );
+			if ( firstTabbable ) {
+				firstTabbable.focus( { focusVisible: true } );
+				// Fallback: add class for browsers that don't support focusVisible option.
+				firstTabbable.classList.add( 'is-focus-visible' );
+				firstTabbable.addEventListener(
+					'blur',
+					() => firstTabbable.classList.remove( 'is-focus-visible' ),
+					{ once: true }
+				);
 			}
 		}
 	}, [ postId, hasFinishedResolution ] );
