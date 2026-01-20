@@ -101,7 +101,11 @@ export default function OverlayPreview( { overlay, currentTheme } ) {
 	}
 
 	return (
-		<div className="wp-block-navigation__overlay-preview">
+		<div
+			className="wp-block-navigation__overlay-preview"
+			aria-label={ __( 'Navigation Overlay template part preview' ) }
+			role="region"
+		>
 			<BlockPreview.Async
 				placeholder={
 					<div className="wp-block-navigation__overlay-preview-placeholder" />
