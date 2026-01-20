@@ -699,21 +699,20 @@ export function getInsertionPoint( state ) {
 }
 
 /**
- * Returns true if the block is hidden, or false otherwise.
+ * Returns true if the block is hidden anywhere, or false otherwise.
  *
- * TODO: with the introduction of visibility according to screen size,
- * this selector will probably be deprecated (or repurposed) as it only considers visibility
- * according to the device preview state. What would be more useful is a selector that returns
- * whether the block is hidden anywhere to flag that the block has visibility metadata set.
+ * This selector checks whether a block has visibility metadata set that would
+ * hide it at any viewport or everywhere. It's useful for flagging blocks that
+ * have visibility restrictions.
  *
- * A block is considered hidden if:
+ * A block is considered hidden anywhere if:
  * - blockVisibility is false (hidden everywhere)
- * - blockVisibility is an object with the current device preview set to false
+ * - blockVisibility.viewport has any viewport set to false (hidden at specific screen sizes)
  *
  * @param {Object} state    Global application state.
  * @param {string} clientId Client ID of the block.
  *
- * @return {boolean} Whether the block is hidden.
+ * @return {boolean} Whether the block is hidden anywhere.
  */
 export const isBlockHiddenAnywhere = ( state, clientId ) => {
 	const blockName = getBlockName( state, clientId );

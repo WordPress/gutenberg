@@ -27,7 +27,7 @@ const DEFAULT_VISIBILITY_STATE = {
 	selectedDeviceType: BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
 };
 
-export default function BlockVisibilityInfo( { clientId } ) {
+export default function ViewportVisibilityInfo( { clientId } ) {
 	const {
 		currentBlockVisibility,
 		selectedDeviceType,
