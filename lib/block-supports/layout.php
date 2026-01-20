@@ -899,7 +899,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		// Check block-specific styles first, then fall back to root styles.
 		$block_name                   = $block['blockName'] ?? '';
 		$block_specific_global_styles = gutenberg_get_global_styles( array( 'blocks', $block_name, 'spacing', 'blockGap' ) );
-		$global_block_gap_value       = $block_specific_global_styles ?? gutenberg_get_global_styles( array( 'spacing', 'blockGap' ) );
+
+		// Validate that the value is in the expected format (string or array with 'top'/'left' properties).
+		if ( ! is_string( $block_specific_global_styles ) && ! isset( $block_specific_global_styles['top'] ) && ! isset( $block_specific_global_styles['left'] ) ) {
+			$block_specific_global_styles = null;
+		}
+
+		$global_block_gap_value = $block_specific_global_styles ?? gutenberg_get_global_styles( array( 'spacing', 'blockGap' ) );
+
+		// Validate the fallback value as well.
+		if ( ! is_string( $global_block_gap_value ) && ! isset( $global_block_gap_value['top'] ) && ! isset( $global_block_gap_value['left'] ) ) {
+			$global_block_gap_value = null;
+		}
 
 		if ( null !== $global_block_gap_value ) {
 			$fallback_gap_value = $global_block_gap_value;
