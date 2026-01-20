@@ -53,9 +53,33 @@ function parseCSS( css = '' ) {
 	}, {} );
 }
 
+function trimSelectionWhitespace( value ) {
+	const { text, start, end } = value;
+
+	let newStart = start;
+	let newEnd = end;
+
+	while ( newStart < newEnd && /\s/.test( text[ newStart ] ) ) {
+		newStart++;
+	}
+
+	while ( newEnd > newStart && /\s/.test( text[ newEnd - 1 ] ) ) {
+		newEnd--;
+	}
+
+	if ( newStart === start && newEnd === end ) {
+		return value;
+	}
+
+	return {
+		...value,
+		start: newStart,
+		end: newEnd,
+	};
+}
+
 export function parseClassName( className = '', colorSettings ) {
 	return className.split( ' ' ).reduce( ( accumulator, name ) => {
-		// `colorSlug` could contain dashes, so simply match the start and end.
 		if ( name.startsWith( 'has-' ) && name.endsWith( '-color' ) ) {
 			const colorSlug = name
 				.replace( /^has-/, '' )
@@ -100,7 +124,6 @@ function setColors( value, name, colorSettings, colors ) {
 	if ( backgroundColor ) {
 		styles.push( [ 'background-color', backgroundColor ].join( ':' ) );
 	} else {
-		// Override default browser color for mark element.
 		styles.push( [ 'background-color', transparentValue ].join( ':' ) );
 	}
 
@@ -121,7 +144,12 @@ function setColors( value, name, colorSettings, colors ) {
 		attributes.class = classNames.join( ' ' );
 	}
 
-	return applyFormat( value, { type: name, attributes } );
+	const trimmedValue = trimSelectionWhitespace( value );
+
+	return applyFormat( trimmedValue, {
+		type: name,
+		attributes,
+	} );
 }
 
 function ColorPicker( { name, property, value, onChange } ) {
@@ -143,7 +171,6 @@ function ColorPicker( { name, property, value, onChange } ) {
 				);
 			} }
 			enableAlpha
-			// Prevent the text and color picker from overlapping.
 			__experimentalIsRenderedInSidebar
 		/>
 	);

@@ -124,6 +124,7 @@ export const textColor = {
 	title,
 	tagName: 'mark',
 	className: 'has-inline-color',
+	preserveWhiteSpace: true,
 	attributes: {
 		style: 'style',
 		class: 'class',
