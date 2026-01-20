@@ -3,6 +3,11 @@ export type ComponentStatus =
 	| 'use-with-caution'
 	| 'not-recommended'
 	| 'unaudited';
+
+/**
+ * - `global`: Intended to be used anywhere.
+ * - `editor`: Intended to be used specifically in the block editor.
+ */
 export type ComponentWhereUsed = 'global' | 'editor';
 
 export type ComponentData = {
@@ -10,6 +15,7 @@ export type ComponentData = {
 	name: string;
 	whereUsed: ComponentWhereUsed;
 	status: ComponentStatus;
+	/** Human-facing Storybook documentation URL. */
 	docs: string;
 	notes?: string;
 };
