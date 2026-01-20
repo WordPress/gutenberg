@@ -6,7 +6,14 @@ import { Y } from '@wordpress/sync';
 /**
  * External dependencies
  */
-import { describe, expect, it, jest, beforeEach } from '@jest/globals';
+import {
+	describe,
+	expect,
+	it,
+	jest,
+	beforeEach,
+	afterEach,
+} from '@jest/globals';
 
 /**
  * Mock uuid module
