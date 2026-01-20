@@ -70,6 +70,15 @@ store( 'core/slider', {
 				return;
 			}
 
+			const context = getContext();
+
+			// Update state immediately (don't wait for scroll event)
+			const nextIndex = Math.min(
+				context.currentIndex + 1,
+				context.totalSlides - 1
+			);
+			context.currentIndex = nextIndex;
+
 			const slideWidth = slides[ 0 ].offsetWidth;
 			track.scrollBy( { left: slideWidth, behavior: 'smooth' } );
 		},
@@ -88,6 +97,12 @@ store( 'core/slider', {
 			if ( slides.length === 0 ) {
 				return;
 			}
+
+			const context = getContext();
+
+			// Update state immediately (don't wait for scroll event)
+			const prevIndex = Math.max( context.currentIndex - 1, 0 );
+			context.currentIndex = prevIndex;
 
 			const slideWidth = slides[ 0 ].offsetWidth;
 			track.scrollBy( { left: -slideWidth, behavior: 'smooth' } );
