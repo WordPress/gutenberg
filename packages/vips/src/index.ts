@@ -7,6 +7,9 @@ import Vips from 'wasm-vips';
 import VipsModule from 'wasm-vips/vips.wasm';
 
 // @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
+
+// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
 import VipsJxlModule from 'wasm-vips/vips-jxl.wasm';
 
 /**
@@ -47,6 +50,8 @@ async function getVips(): Promise< typeof Vips > {
 			// issues with hosts not serving WASM files with correct MIME types.
 			if ( fileName.endsWith( 'vips.wasm' ) ) {
 				return VipsModule;
+			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
+				return VipsHeifModule;
 			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) ) {
 				return VipsJxlModule;
 			}
