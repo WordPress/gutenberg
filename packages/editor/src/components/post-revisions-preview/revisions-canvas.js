@@ -301,6 +301,7 @@ export default function RevisionsCanvas( { revision, previousRevision } ) {
 			</ExperimentalBlockEditorProvider>
 			<RevisionsSidebar
 				diffStats={ diffStats }
+				revisionId={ revision?.id }
 				revisionDate={ revision?.date }
 				revisionContent={ revision?.content?.raw }
 			/>

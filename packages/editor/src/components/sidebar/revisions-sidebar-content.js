@@ -6,7 +6,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalText as Text,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { humanTimeDiff } from '@wordpress/date';
 import { count as wordCount } from '@wordpress/wordcount';
@@ -15,7 +14,6 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { store as editorStore } from '../../store';
 import PostCardPanel from '../post-card-panel';
 
 // Average reading rate in words per minute.
@@ -23,17 +21,10 @@ const AVERAGE_READING_RATE = 189;
 
 export default function RevisionsSidebarContent( {
 	diffStats,
+	revisionId,
 	revisionDate,
 	revisionContent,
 } ) {
-	const { postType, postId } = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
-		return {
-			postType: getCurrentPostType(),
-			postId: getCurrentPostId(),
-		};
-	}, [] );
-
 	const stats = diffStats || {
 		wordsAdded: 0,
 		wordsRemoved: 0,
@@ -157,7 +148,7 @@ export default function RevisionsSidebarContent( {
 
 	return (
 		<VStack className="editor-revisions-sidebar-content" spacing={ 4 }>
-			<PostCardPanel postType={ postType } postId={ postId } />
+			<PostCardPanel postType="revision" postId={ revisionId } />
 			<VStack spacing={ 1 }>
 				{ contentInfoText && (
 					<div className="editor-post-content-information">

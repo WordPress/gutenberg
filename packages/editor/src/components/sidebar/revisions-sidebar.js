@@ -55,6 +55,7 @@ const RevisionsSidebarContent_ = ( {
 	tabName,
 	keyboardShortcut,
 	diffStats,
+	revisionId,
 	revisionDate,
 	revisionContent,
 } ) => {
@@ -109,6 +110,7 @@ const RevisionsSidebarContent_ = ( {
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
 					<RevisionsSidebarContent
 						diffStats={ diffStats }
+						revisionId={ revisionId }
 						revisionDate={ revisionDate }
 						revisionContent={ revisionContent }
 					/>
@@ -127,6 +129,7 @@ const RevisionsSidebarContent_ = ( {
 
 export default function RevisionsSidebar( {
 	diffStats,
+	revisionId,
 	revisionDate,
 	revisionContent,
 } ) {
@@ -175,6 +178,7 @@ export default function RevisionsSidebar( {
 				tabName={ tabName }
 				keyboardShortcut={ keyboardShortcut }
 				diffStats={ diffStats }
+				revisionId={ revisionId }
 				revisionDate={ revisionDate }
 				revisionContent={ revisionContent }
 			/>
