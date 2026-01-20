@@ -300,7 +300,14 @@ function Navigation( {
 	);
 
 	const recursionId = `navigationMenu/${ ref }`;
-	const hasAlreadyRendered = useHasRecursion( recursionId );
+	const recursionDetected = useHasRecursion( recursionId );
+
+	// Skip recursion check when in preview mode.
+	const isPreviewMode = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		return settings.isPreviewMode;
+	}, [] );
+	const hasAlreadyRendered = isPreviewMode ? false : recursionDetected;
 
 	const blockEditingMode = useBlockEditingMode();
 

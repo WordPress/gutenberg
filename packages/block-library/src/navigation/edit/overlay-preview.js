@@ -69,15 +69,15 @@ export default function OverlayPreview( { overlay, currentTheme } ) {
 			return null;
 		}
 
-		if ( editedBlocks ) {
+		if ( editedBlocks && editedBlocks.length > 0 ) {
 			return editedBlocks;
 		}
 
-		if ( ! content || typeof content !== 'string' ) {
-			return [];
+		if ( content && typeof content === 'string' ) {
+			return parse( content );
 		}
 
-		return parse( content );
+		return [];
 	}, [ templatePartId, editedBlocks, content ] );
 
 	if ( ! overlay ) {
