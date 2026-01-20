@@ -1,60 +1,151 @@
-# DataForm vs Field Components: Decision for Login Form
+# When to use DataForm
 
-## Overview
+It can be difficult to determine when to use `DataForm` versus building a form with components from `@wordpress/ui` or the `validated` family of components from `@wordpress/components`. The decision should be based on the complexity of your form, the data model you're working with, and the validation requirements.
 
-This document explains why the login form component uses `Field` + `Input` + `Button` components from `@wordpress/ui` rather than the `DataForm` component from `@wordpress/dataviews`.
+Here is a decision tree to help identify which approach is the right choice.
 
-## Decision: Not Using DataForm
+## 1. Ask first: are you editing a data object?
 
-**DataForm is not suitable for a login form** for the following reasons:
+Is this form editing an existing data object (like a post, media item, user, or settings object) that gets updated incrementally?
 
-### 1. Simplicity
+-   If **no** → see [Path A: Action/flow forms](#path-a-actionflow-forms)
+-   If **yes** → see [Path B: Editing data objects](#path-b-editing-data-objects)
 
-Login forms are simple, typically containing only 2-3 fields (username/email, password, and optionally "remember me"). DataForm is designed for complex data editing scenarios with many fields, complex validation rules, and advanced layouts.
+---
 
-### 2. Data Model Mismatch
+## Path A: Action/flow forms
 
-DataForm expects a data object to edit and provides an `onChange` callback for incremental updates. Login forms submit directly via form submission and don't follow a "edit data object" pattern.
+Use this path when your form represents an action or flow (login, search, contact, submit) rather than editing a data object.
 
-### 3. Layout Needs
+### Do you need validation?
 
-Login forms require a simple vertical layout with fields stacked on top of each other. DataForm offers complex layouts (panel, card, row, details) that are unnecessary overhead for this use case.
+Does your form need validation (required fields, format validation, custom validation rules)?
 
-### 4. Validation Complexity
+-   If **yes** → use the `validated` family of components from `@wordpress/components` (like `ValidatedInputControl`, `ValidatedTextControl`, `ValidatedSelectControl`, etc.). These components extend WordPress components with HTML5 Constraint Validation API support.
+-   If **no** → use components from `@wordpress/ui` (like `Field`, `Input`, `Button`, etc.). These provide a clean, accessible form structure without validation overhead.
 
-While DataForm provides advanced validation features (async validation, complex rules, field dependencies), login forms only need basic HTML5 validation and simple client-side checks.
+### Characteristics of action/flow forms
 
-### 5. Purpose
+-   Data is submitted directly via form submission
+-   No incremental updates needed
+-   Form state is temporary (not persisted until submission)
+-   Simple layouts are typically sufficient
 
-DataForm is designed for CRUD operations on data items (like editing posts, media, or other entities). Login is an action/authentication flow, not a data editing operation.
+*E.g. Login forms, search forms, contact forms, wizards*
 
-## Decision Criteria for Form Component Selection
+---
 
-### Use `DataForm` when:
+## Path B: Editing data objects
 
-- Editing structured data objects (posts, media, settings, etc.)
-- Need complex field layouts (panels, cards, grouped fields)
-- Require advanced validation (async, cross-field validation)
-- Building admin interfaces for data management
-- Fields have visibility rules based on other field values
+Use this path when your form edits an existing data object that gets updated incrementally.
 
-### Use `Field` + `Input` + `Button` (as in this component) when:
+### Use DataForm
 
-- Simple forms with direct submission (login, contact, search)
-- Standard HTML form behavior is sufficient
-- Simple validation requirements
-- No need for complex layouts or field grouping
-- Form is an action/flow rather than data editing
+`DataForm` is designed for editing structured data objects. Use it when:
 
-## Implementation Notes
+-   Editing existing data objects (posts, media, users, settings, etc.)
+-   Incremental updates via `onChange` callback
+-   Data persists as user edits
+-   Part of a data management interface
 
-The login form uses:
+### Complexity considerations
 
-- `Field` components for accessible form structure
-- `Input` components for text and password inputs
-- `Button` component for form submission
-- `Stack` component for vertical layout
-- `Box` component for container styling
-- Design System tokens for consistent styling
+#### Simple forms (2-5 fields)
 
-This approach provides a clean, accessible, and maintainable solution that aligns with WordPress Design System patterns while avoiding unnecessary complexity.
+`DataForm` works well even for simple forms when editing data objects, as it provides the proper data model pattern with incremental updates.
+
+*E.g. Simple post editing, basic media metadata editing*
+
+#### Complex forms (many fields, advanced features)
+
+`DataForm` excels when you need:
+
+-   Many fields (typically 6+)
+-   Complex layouts (panels, cards, grouped fields, side-by-side labels)
+-   Advanced validation (async validation, cross-field validation, custom rules)
+-   Conditional field visibility based on other field values
+-   Field dependencies and relationships
+
+*E.g. Post editor, media editing, complex settings pages, data management interfaces*
+
+### Layout options
+
+`DataForm` supports various layouts:
+
+-   **Panel layout** – Fields organized in collapsible sections
+-   **Card layout** – Fields grouped in visual cards
+-   **Row layout** – Fields arranged horizontally
+-   **Details layout** – Summary/details pattern for nested information
+-   **Side-by-side labels** – Labels positioned next to fields rather than above
+-   **Simple vertical layout** – Standard stacked fields
+
+### Validation capabilities
+
+`DataForm` supports:
+
+-   **Basic validation** – HTML5 validation attributes and simple client-side checks
+-   **Advanced validation** – Async validation, cross-field validation, custom rules, field dependencies, and real-time validation feedback
+
+---
+
+## Examples
+
+### Login form
+
+-   **Path**: Path A (action/flow)
+-   **Complexity**: Simple (2-3 fields)
+-   **Layout**: Simple vertical
+-   **Validation**: Required (username/email and password validation)
+-   **Decision**: Use `validated` family of components from `@wordpress/components`
+
+### Search form
+
+-   **Path**: Path A (action/flow)
+-   **Complexity**: Simple (1-2 fields)
+-   **Layout**: Simple horizontal or vertical
+-   **Validation**: Not required (search can accept any input)
+-   **Decision**: Use components from `@wordpress/ui` (like `Field`, `Input`, `Button`)
+
+### Post editor
+
+-   **Path**: Path B (editing data object)
+-   **Complexity**: Complex (many fields)
+-   **Layout**: Panels, grouped fields
+-   **Validation**: Advanced (async, cross-field)
+-   **Decision**: Use `DataForm`
+
+### Media editing
+
+-   **Path**: Path B (editing data object)
+-   **Complexity**: Complex (metadata, alt text, etc.)
+-   **Layout**: Panels or cards
+-   **Validation**: Advanced
+-   **Decision**: Use `DataForm`
+
+### Simple settings page
+
+-   **Path**: Path B (editing data object)
+-   **Complexity**: Simple (few fields)
+-   **Layout**: Simple vertical
+-   **Validation**: Basic
+-   **Decision**: Use `DataForm` (since it's editing a data object, even if simple)
+
+### Complex settings page
+
+-   **Path**: Path B (editing data object)
+-   **Complexity**: Complex (many fields, grouped)
+-   **Layout**: Panels or cards
+-   **Validation**: Advanced (dependencies, async)
+-   **Decision**: Use `DataForm`
+
+---
+
+## When in doubt…
+
+**Quick reference:**
+
+-   **No data object + No validation** → `@wordpress/ui` components (`Field`, `Input`, `Button`)
+-   **No data object + Validation needed** → `validated` family from `@wordpress/components`
+-   **Editing data object** → `DataForm` (regardless of complexity)
+
+When the requirements are borderline, start with the simpler approach and migrate to a more complex solution if you find yourself needing advanced features.
