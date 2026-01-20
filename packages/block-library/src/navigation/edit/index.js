@@ -311,6 +311,7 @@ function Navigation( {
 		if ( orientation === 'horizontal' && submenuVisibility === 'always' ) {
 			setAttributes( {
 				submenuVisibility: undefined,
+				showSubmenuIcon: true,
 			} );
 		}
 	}, [ orientation, submenuVisibility, setAttributes ] );
@@ -803,20 +804,19 @@ function Navigation( {
 											const newAttributes = {
 												submenuVisibility: value,
 											};
+											const prevSubmenuVisibility =
+												submenuVisibility;
 											// If "always" is selected, switch to vertical orientation and hide arrow
 											if ( value === 'always' ) {
-												newAttributes.layout = {
-													...attributes.layout,
-													orientation: 'vertical',
-												};
 												newAttributes.showSubmenuIcon = false;
-											} else if ( value === 'click' ) {
-												// When switching to "click", arrow must be shown (needed for clicking)
-												newAttributes.showSubmenuIcon = true;
-											} else {
-												// When switching to "hover", show the arrow to avoid showing the accessibility notice
+											} else if (
+												prevSubmenuVisibility ===
+												'always'
+											) {
+												// When switching away from "always", show the arrow to avoid showing the accessibility notice
 												newAttributes.showSubmenuIcon = true;
 											}
+
 											setAttributes( newAttributes );
 										} }
 										isBlock
@@ -829,10 +829,12 @@ function Navigation( {
 											value="click"
 											label={ __( 'Click' ) }
 										/>
-										<ToggleGroupControlOption
-											value="always"
-											label={ __( 'Always' ) }
-										/>
+										{ orientation === 'vertical' && (
+											<ToggleGroupControlOption
+												value="always"
+												label={ __( 'Always' ) }
+											/>
+										) }
 									</ToggleGroupControl>
 								</ToolsPanelItem>
 
