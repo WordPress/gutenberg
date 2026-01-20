@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { subDays, subWeeks, subMonths, subYears } from 'date-fns';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -40,12 +45,32 @@ import {
 	OPERATOR_STARTS_WITH,
 } from '../constants';
 
-import getRelativeDate from '../field-types/utils/get-relative-date';
-
 const filterTextWrappers = {
 	Name: <span className="dataviews-filters__summary-filter-text-name" />,
 	Value: <span className="dataviews-filters__summary-filter-text-value" />,
 };
+
+/**
+ * Calculates a date offset from now.
+ *
+ * @param value Number of units to offset.
+ * @param unit  Unit of time to offset (days, weeks, months, years).
+ * @return      Date offset from now.
+ */
+function getRelativeDate( value: number, unit: string ): Date {
+	switch ( unit ) {
+		case 'days':
+			return subDays( new Date(), value );
+		case 'weeks':
+			return subWeeks( new Date(), value );
+		case 'months':
+			return subMonths( new Date(), value );
+		case 'years':
+			return subYears( new Date(), value );
+		default:
+			return new Date();
+	}
+}
 
 // Shared operator definition for IS_NONE and IS_NOT_ALL (deprecated).
 const isNoneOperatorDefinition = {
