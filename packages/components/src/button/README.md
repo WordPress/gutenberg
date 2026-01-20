@@ -4,6 +4,20 @@
 
 <p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-button--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
 
+Lets users take actions and make choices with a single click or tap.
+
+```jsx
+import { Button } from '@wordpress/components';
+const Mybutton = () => (
+  <Button
+    variant="primary"
+    onClick={ handleClick }
+  >
+    Click here
+  </Button>
+);
+```
+
 ## Props
 
 ### `__next40pxDefaultSize`
