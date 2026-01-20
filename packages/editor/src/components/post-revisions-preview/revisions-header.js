@@ -170,6 +170,7 @@ function RevisionsHeader( {
 			>
 				<Button
 					__next40pxDefaultSize
+					size="compact"
 					icon={ seen }
 					label={ _x( 'Show changes', 'revisions' ) }
 					isPressed={ showDiff }

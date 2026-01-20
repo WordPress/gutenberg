@@ -12,11 +12,10 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { parse } from '@wordpress/blocks';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useMemo, useEffect, useRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { registerFormatType } from '@wordpress/rich-text';
-import { store as editorStore } from '../../store';
 
 /**
  * Internal dependencies
@@ -31,7 +30,9 @@ import {
 	calculateDiffStatistics,
 } from './block-diff';
 
-const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
+const { ExperimentalBlockEditorProvider, usePrivateStyleOverride } = unlock(
+	blockEditorPrivateApis
+);
 
 // SVG filter for removed blocks: grayscale + red tint
 const REVISION_REMOVED_FILTER_SVG = `
@@ -199,6 +200,24 @@ const FILTER_NAME = 'editor/revisions-canvas/withRevisionDiffClasses';
 addFilter( 'editor.BlockListBlock', FILTER_NAME, withRevisionDiffClasses );
 
 /**
+ * Component to inject diff styles via style overrides.
+ * Must be rendered inside ExperimentalBlockEditorProvider.
+ *
+ * @param {Object}  props          Component props.
+ * @param {boolean} props.showDiff Whether to show diff highlighting.
+ */
+function DiffStyleOverrides( { showDiff } ) {
+	usePrivateStyleOverride( {
+		css: showDiff ? REVISION_DIFF_STYLES : '',
+	} );
+	usePrivateStyleOverride( {
+		assets: showDiff ? REVISION_REMOVED_FILTER_SVG : '',
+		__unstableType: 'svgs',
+	} );
+	return null;
+}
+
+/**
  * Canvas component that renders a post revision in read-only mode.
  * Renders the sidebar with diff statistics.
  *
@@ -213,48 +232,14 @@ export default function RevisionsCanvas( {
 	previousRevision,
 	showDiff = true,
 } ) {
-	const { updateEditorSettings } = useDispatch( editorStore );
-
-	// Get current editor settings.
-	const { editorSettings, blockEditorSettings } = useSelect( ( select ) => {
-		const { getEditorSettings } = select( editorStore );
-		const { getSettings } = select( blockEditorStore );
-		return {
-			editorSettings: getEditorSettings(),
-			blockEditorSettings: getSettings(),
-		};
-	}, [] );
-
-	// Store original styles on first render.
-	const originalStylesRef = useRef( null );
-	if ( originalStylesRef.current === null ) {
-		originalStylesRef.current = editorSettings.styles || [];
-	}
+	// Get block editor settings.
+	const blockEditorSettings = useSelect(
+		( select ) => select( blockEditorStore ).getSettings(),
+		[]
+	);
 
 	// Track previously rendered blocks to preserve clientIds between renders.
 	const previousBlocksRef = useRef( [] );
-
-	// Add diff styles and SVG filter to editor settings when showDiff is true.
-	useEffect( () => {
-		const originalStyles = originalStylesRef.current;
-		if ( showDiff ) {
-			updateEditorSettings( {
-				styles: [
-					...originalStyles,
-					{ css: REVISION_DIFF_STYLES },
-					{
-						assets: REVISION_REMOVED_FILTER_SVG,
-						__unstableType: 'svgs',
-					},
-				],
-			} );
-		} else {
-			updateEditorSettings( { styles: originalStyles } );
-		}
-		return () => {
-			updateEditorSettings( { styles: originalStyles } );
-		};
-	}, [ updateEditorSettings, showDiff ] );
 
 	// Diff revision content and parse into blocks with diff status.
 	// Also preserve clientIds from previous render to prevent flashing.
@@ -309,6 +294,7 @@ export default function RevisionsCanvas( {
 					value={ blocks }
 					settings={ settings }
 				>
+					<DiffStyleOverrides showDiff={ showDiff } />
 					<VisualEditor
 						canvasOverlay={ showDiff ? <DiffMarkers /> : undefined }
 					/>

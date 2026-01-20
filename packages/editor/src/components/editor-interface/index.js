@@ -7,14 +7,13 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
-import { useState, useCallback, useMemo, useEffect } from '@wordpress/element';
+import { useState, useCallback, useMemo } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -137,7 +136,6 @@ export default function EditorInterface( {
 	const { revisions, isLoading: isRevisionsLoading } = usePostRevisions();
 	const [ selectedRevisionIndex, setSelectedRevisionIndex ] = useState( 0 );
 	const [ showDiff, setShowDiff ] = useState( true );
-	const { exitRevisionsMode } = unlock( useDispatch( editorStore ) );
 
 	// Sort revisions by date (newest first) and memoize.
 	const sortedRevisions = useMemo( () => {
@@ -156,21 +154,6 @@ export default function EditorInterface( {
 	const handleSelectRevisionIndex = useCallback( ( index ) => {
 		setSelectedRevisionIndex( index );
 	}, [] );
-
-	// Handle Escape key to exit revisions mode.
-	useEffect( () => {
-		if ( ! isRevisionsMode ) {
-			return;
-		}
-		const handleKeyDown = ( event ) => {
-			if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
-				event.preventDefault();
-				exitRevisionsMode();
-			}
-		};
-		document.addEventListener( 'keydown', handleKeyDown );
-		return () => document.removeEventListener( 'keydown', handleKeyDown );
-	}, [ isRevisionsMode, exitRevisionsMode ] );
 
 	// When in revisions mode, render with separate header and content.
 	if ( isRevisionsMode ) {
