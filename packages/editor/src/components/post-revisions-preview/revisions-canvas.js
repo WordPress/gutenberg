@@ -6,7 +6,6 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
 import { parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -27,31 +26,9 @@ const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
  */
 export default function RevisionsCanvas() {
 	const { revision, blockEditorSettings } = useSelect( ( select ) => {
-		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
-		const { getRevisions } = select( coreStore );
-
-		const postId = getCurrentPostId();
-		const postType = getCurrentPostType();
-		const currentRevisionId = unlock(
-			select( editorStore )
-		).getCurrentRevisionId();
-
-		let selectedRevision = null;
-		if ( postId && postType && currentRevisionId ) {
-			const query = { per_page: -1, context: 'edit' };
-			const revisions = getRevisions(
-				'postType',
-				postType,
-				postId,
-				query
-			);
-			selectedRevision = revisions?.find(
-				( r ) => r.id === currentRevisionId
-			);
-		}
-
+		const { getCurrentRevision } = unlock( select( editorStore ) );
 		return {
-			revision: selectedRevision,
+			revision: getCurrentRevision(),
 			blockEditorSettings: select( blockEditorStore ).getSettings(),
 		};
 	}, [] );
