@@ -1,3 +1,7 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="DataViews/DataForm/When to use DataForm" />
+
 # When to use DataForm
 
 It can be difficult to determine when to use `DataForm` versus building a form with components from `@wordpress/ui` or the `validated` family of components from `@wordpress/components`. The decision should be based on the complexity of your form, the data model you're working with, and the validation requirements.
@@ -98,7 +102,7 @@ Use this path when your form edits an existing data object that gets updated inc
 -   **Validation**: Required (username/email and password validation)
 -   **Decision**: Use `validated` family of components from `@wordpress/components`
 
-Don’t use `DataForm` when the goal is to authenticate a user (collect credentials and submit once). Instead, use more primitive components like `InputControl` and `RadioControl`.
+Don't use `DataForm` when the goal is to authenticate a user (collect credentials and submit once). Instead, use more primitive components like `InputControl` and `RadioControl`.
 
 ### Search form
 
