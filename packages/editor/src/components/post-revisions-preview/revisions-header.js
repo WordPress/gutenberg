@@ -1,20 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	Button,
-	RangeControl,
-	Spinner,
-	__unstableMotion as motion,
-} from '@wordpress/components';
+import { Button, __unstableMotion as motion } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { PinnedItems } from '@wordpress/interface';
 import { __, _x } from '@wordpress/i18n';
 import { seen } from '@wordpress/icons';
-import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -23,6 +16,7 @@ import BackButton, { useHasBackButton } from '../header/back-button';
 import MoreMenu from '../more-menu';
 import PostPreviewButton from '../post-preview-button';
 import PreviewDropdown from '../preview-dropdown';
+import RevisionsSlider from './revisions-slider';
 import { store as editorStore } from '../../store';
 import {
 	TEMPLATE_PART_POST_TYPE,
@@ -49,40 +43,26 @@ const backButtonVariations = {
 
 /**
  * Header component for revisions preview mode.
- * Based on the main Header component but with revision-specific controls.
  *
- * @param {Object}   props                  Component props.
- * @param {Array}    props.revisions        Array of revision objects.
- * @param {Object}   props.selectedRevision The currently selected revision.
- * @param {number}   props.selectedIndex    Index of the selected revision.
- * @param {Function} props.onSelectIndex    Callback when slider value changes.
- * @param {boolean}  props.isLoading        Whether revisions are loading.
  * @return {JSX.Element} The revisions header component.
  */
-function RevisionsHeader( {
-	revisions,
-	selectedRevision,
-	selectedIndex,
-	onSelectIndex,
-	isLoading,
-} ) {
+function RevisionsHeader() {
 	const isWideViewport = useViewportMatch( 'large' );
-	const { postType, showIconLabels } = useSelect( ( select ) => {
-		const { get: getPreference } = select( preferencesStore );
-		const { getEditorMode, getCurrentPostType } = select( editorStore );
-		const { getBlockSelectionStart, getSectionRootClientId } = unlock(
-			select( blockEditorStore )
-		);
+	const { postType, showIconLabels, currentRevisionId } = useSelect(
+		( select ) => {
+			const { get: getPreference } = select( preferencesStore );
+			const { getCurrentPostType } = select( editorStore );
 
-		return {
-			postType: getCurrentPostType(),
-			isTextEditor: getEditorMode() === 'text',
-			showIconLabels: getPreference( 'core', 'showIconLabels' ),
-			hasFixedToolbar: getPreference( 'core', 'fixedToolbar' ),
-			hasBlockSelection: !! getBlockSelectionStart(),
-			hasSectionRootClientId: !! getSectionRootClientId(),
-		};
-	}, [] );
+			return {
+				postType: getCurrentPostType(),
+				showIconLabels: getPreference( 'core', 'showIconLabels' ),
+				currentRevisionId: unlock(
+					select( editorStore )
+				).getCurrentRevisionId(),
+			};
+		},
+		[]
+	);
 
 	const { setCurrentRevisionId, restoreRevision } = unlock(
 		useDispatch( editorStore )
@@ -95,59 +75,14 @@ function RevisionsHeader( {
 	].includes( postType );
 
 	const hasBackButton = useHasBackButton();
-
-	const hasRevisions = revisions.length > 0;
-	const canRestore = selectedRevision && ! isLoading;
+	const canRestore = !! currentRevisionId;
 
 	const handleRestore = () => {
-		if ( selectedRevision ) {
-			restoreRevision( selectedRevision );
+		if ( currentRevisionId ) {
+			restoreRevision( currentRevisionId );
 		}
 	};
 
-	// Format date for tooltip.
-	const dateSettings = getDateSettings();
-	const renderTooltipContent = ( index ) => {
-		const revision = revisions[ index ];
-		if ( ! revision ) {
-			return index;
-		}
-		return dateI18n( dateSettings.formats.datetime, revision.date );
-	};
-
-	const renderCenterContent = () => {
-		if ( isLoading ) {
-			return <Spinner />;
-		}
-		if ( hasRevisions ) {
-			return (
-				<RangeControl
-					__nextHasNoMarginBottom
-					__next40pxDefaultSize
-					className="editor-revisions-header__slider"
-					hideLabelFromVision
-					label={ __( 'Revision' ) }
-					max={ revisions.length - 1 }
-					min={ 0 }
-					marks
-					onChange={ onSelectIndex }
-					renderTooltipContent={ renderTooltipContent }
-					value={ selectedIndex }
-					withInputField={ false }
-				/>
-			);
-		}
-		return (
-			<span className="editor-revisions-header__no-revisions">
-				{ __( 'No revisions found.' ) }
-			</span>
-		);
-	};
-
-	/*
-	 * The edit-post-header classname is only kept for backward compatibility
-	 * as some plugins might be relying on its presence.
-	 */
 	return (
 		<div className="editor-header edit-post-header">
 			{ hasBackButton && (
@@ -177,7 +112,7 @@ function RevisionsHeader( {
 				className="editor-header__center"
 				style={ { clipPath: 'none' } }
 			>
-				{ renderCenterContent() }
+				<RevisionsSlider />
 			</div>
 			<motion.div
 				variants={ toolbarVariations }

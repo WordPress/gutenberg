@@ -595,11 +595,22 @@ export function setCurrentRevisionId( revisionId ) {
  * Restore a revision by replacing the current content with the revision's content
  * and auto-saving.
  *
- * @param {Object} revision The revision object to restore.
+ * @param {number} revisionId The revision ID to restore.
  */
 export const restoreRevision =
-	( revision ) =>
-	async ( { dispatch, registry } ) => {
+	( revisionId ) =>
+	async ( { select, dispatch, registry } ) => {
+		const postType = select.getCurrentPostType();
+		const postId = select.getCurrentPostId();
+
+		const revision = registry
+			.select( coreStore )
+			.getRevision( 'postType', postType, postId, revisionId );
+
+		if ( ! revision ) {
+			return;
+		}
+
 		// Parse the revision content into blocks.
 		const blocks = parse( revision.content?.raw || '' );
 

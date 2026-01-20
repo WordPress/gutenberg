@@ -6,6 +6,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 import { parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -14,6 +15,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { store as editorStore } from '../../store';
 import VisualEditor from '../visual-editor';
 import RevisionsSidebar from '../sidebar/revisions-sidebar';
 
@@ -22,16 +24,38 @@ const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 /**
  * Canvas component that renders a post revision in read-only mode.
  *
- * @param {Object} props          Component props.
- * @param {Object} props.revision The revision object to display.
  * @return {JSX.Element} The revisions canvas component.
  */
-export default function RevisionsCanvas( { revision } ) {
-	// Get block editor settings.
-	const blockEditorSettings = useSelect(
-		( select ) => select( blockEditorStore ).getSettings(),
-		[]
-	);
+export default function RevisionsCanvas() {
+	const { revision, blockEditorSettings } = useSelect( ( select ) => {
+		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+		const { getRevisions } = select( coreStore );
+
+		const postId = getCurrentPostId();
+		const postType = getCurrentPostType();
+		const currentRevisionId = unlock(
+			select( editorStore )
+		).getCurrentRevisionId();
+
+		let selectedRevision = null;
+		if ( postId && postType && currentRevisionId ) {
+			const query = { per_page: -1, context: 'edit' };
+			const revisions = getRevisions(
+				'postType',
+				postType,
+				postId,
+				query
+			);
+			selectedRevision = revisions?.find(
+				( r ) => r.id === currentRevisionId
+			);
+		}
+
+		return {
+			revision: selectedRevision,
+			blockEditorSettings: select( blockEditorStore ).getSettings(),
+		};
+	}, [] );
 
 	// Parse revision content into blocks.
 	const blocks = useMemo( () => {

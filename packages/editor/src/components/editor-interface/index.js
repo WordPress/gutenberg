@@ -24,7 +24,7 @@ import EditorNotices from '../editor-notices';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
-import { RevisionsInterface } from '../post-revisions-preview';
+import { RevisionsHeader, RevisionsCanvas } from '../post-revisions-preview';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
@@ -131,9 +131,12 @@ export default function EditorInterface( {
 	// When in revisions mode, render the revisions interface.
 	if ( isRevisionsMode ) {
 		return (
-			<RevisionsInterface
+			<InterfaceSkeleton
 				className={ clsx( 'editor-editor-interface', className ) }
 				labels={ interfaceLabels }
+				header={ <RevisionsHeader /> }
+				content={ <RevisionsCanvas /> }
+				sidebar={ <ComplementaryArea.Slot scope="core" /> }
 			/>
 		);
 	}
