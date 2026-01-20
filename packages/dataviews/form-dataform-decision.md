@@ -90,6 +90,26 @@ Use this path when your form edits an existing data object that gets updated inc
 
 ## Examples
 
+### Login form
+
+-   **Path**: Path A (action/flow)
+-   **Complexity**: Simple (2-3 fields)
+-   **Layout**: Simple vertical
+-   **Validation**: Required (username/email and password validation)
+-   **Decision**: Use `validated` family of components from `@wordpress/components`
+
+Don’t use `DataForm` when the goal is to authenticate a user (collect credentials and submit once). Instead, use more primitive components like `InputControl` and `RadioControl`.
+
+### Search form
+
+-   **Path**: Path A (action/flow)
+-   **Complexity**: Simple (1-2 fields)
+-   **Layout**: Simple horizontal or vertical
+-   **Validation**: Not required (search can accept any input)
+-   **Decision**: Use components from `@wordpress/ui` (like `Field`, `Input`, `Button`)
+
+Let users define search criteria to find items in a dataset, from simple keyword search to advanced filters (status, author, date ranges, taxonomy, etc.). Instead, use `SearchControl` and other components related to the search features, along with the data the search is searching.
+
 ### Post editor
 
 -   **Path**: Path B (editing data object)
