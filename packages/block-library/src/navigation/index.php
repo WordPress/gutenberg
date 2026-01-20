@@ -1153,7 +1153,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		$effective_visibility = block_core_navigation_get_submenu_visibility( $block_attributes );
 		$open_on_hover        = 'hover' === $effective_visibility;
 
-		if ( $open_on_hover && 'always' !== $effective_visibility ) {
+		if ( $open_on_hover ) {
 			$tags->set_attribute( 'data-wp-on--mouseenter', 'actions.openMenuOnHover' );
 			$tags->set_attribute( 'data-wp-on--mouseleave', 'actions.closeMenuOnHover' );
 		}
