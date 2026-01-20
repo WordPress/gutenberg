@@ -217,7 +217,7 @@ function gutenberg_register_layout_support( $block_type ) {
  * @param bool                 $has_block_gap_support         Optional. Whether the theme has support for the block gap. Default false.
  * @param string|string[]|null $gap_value                     Optional. The block gap value to apply. Default null.
  * @param bool                 $should_skip_gap_serialization Optional. Whether to skip applying the user-defined value set in the editor. Default false.
- * @param string|array         $fallback_gap_value     Optional. The block gap value to apply. Default '0.5em'.
+ * @param string|array         $fallback_gap_value            Optional. The block gap value to apply. If it's an array expected properties are "top" and/or "left". Default '0.5em'.
  * @param array|null           $block_spacing                 Optional. Custom spacing set on the block. Default null.
  * @return string CSS styles on success. Else, empty string.
  */
