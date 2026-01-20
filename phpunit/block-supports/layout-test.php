@@ -672,9 +672,19 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		$processor = new WP_HTML_Tag_Processor( $output );
 		$processor->next_tag();
 
-		$this->assertTrue(
-			$processor->has_class( $expected_class ),
-			"Expected class '$expected_class' not found in the rendered output, probably because of a different hash."
+		// Extract the actual container class from the output for better error messages.
+		$actual_class = '';
+		foreach ( $processor->class_list() as $class_name ) {
+			if ( str_starts_with( $class_name, 'wp-container-core-group-is-layout-' ) ) {
+				$actual_class = $class_name;
+				break;
+			}
+		}
+
+		$this->assertEquals(
+			$expected_class,
+			$actual_class,
+			'Expected class not found in the rendered output, probably because of a different hash.'
 		);
 	}
 
