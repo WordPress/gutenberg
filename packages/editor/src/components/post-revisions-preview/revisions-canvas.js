@@ -11,6 +11,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { parse } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo, useEffect, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
@@ -201,12 +202,17 @@ addFilter( 'editor.BlockListBlock', FILTER_NAME, withRevisionDiffClasses );
  * Canvas component that renders a post revision in read-only mode.
  * Renders the sidebar with diff statistics.
  *
- * @param {Object} props                  Component props.
- * @param {Object} props.revision         The revision object to display.
- * @param {Object} props.previousRevision The previous revision for diffing.
+ * @param {Object}  props                  Component props.
+ * @param {Object}  props.revision         The revision object to display.
+ * @param {Object}  props.previousRevision The previous revision for diffing.
+ * @param {boolean} props.showDiff         Whether to show diff highlighting.
  * @return {JSX.Element} The revisions canvas component.
  */
-export default function RevisionsCanvas( { revision, previousRevision } ) {
+export default function RevisionsCanvas( {
+	revision,
+	previousRevision,
+	showDiff = true,
+} ) {
 	const { updateEditorSettings } = useDispatch( editorStore );
 
 	// Get current editor settings.
@@ -228,37 +234,50 @@ export default function RevisionsCanvas( { revision, previousRevision } ) {
 	// Track previously rendered blocks to preserve clientIds between renders.
 	const previousBlocksRef = useRef( [] );
 
-	// Add diff styles and SVG filter to editor settings on mount, restore on unmount.
+	// Add diff styles and SVG filter to editor settings when showDiff is true.
 	useEffect( () => {
 		const originalStyles = originalStylesRef.current;
-		updateEditorSettings( {
-			styles: [
-				...originalStyles,
-				{ css: REVISION_DIFF_STYLES },
-				{ assets: REVISION_REMOVED_FILTER_SVG, __unstableType: 'svgs' },
-			],
-		} );
+		if ( showDiff ) {
+			updateEditorSettings( {
+				styles: [
+					...originalStyles,
+					{ css: REVISION_DIFF_STYLES },
+					{
+						assets: REVISION_REMOVED_FILTER_SVG,
+						__unstableType: 'svgs',
+					},
+				],
+			} );
+		} else {
+			updateEditorSettings( { styles: originalStyles } );
+		}
 		return () => {
 			updateEditorSettings( { styles: originalStyles } );
 		};
-	}, [ updateEditorSettings ] );
+	}, [ updateEditorSettings, showDiff ] );
 
 	// Diff revision content and parse into blocks with diff status.
 	// Also preserve clientIds from previous render to prevent flashing.
 	const blocks = useMemo( () => {
 		const currentContent = revision?.content?.raw || '';
-		const previousContent = previousRevision?.content?.raw || '';
 
-		// diffRevisionContent handles both normal diffing and the case
-		// where there's no previous revision (oldest revision shows all as added).
-		const diffedBlocks = diffRevisionContent(
-			currentContent,
-			previousContent
-		);
+		let parsedBlocks;
+		if ( showDiff ) {
+			const previousContent = previousRevision?.content?.raw || '';
+			// diffRevisionContent handles both normal diffing and the case
+			// where there's no previous revision (oldest revision shows all as added).
+			parsedBlocks = diffRevisionContent(
+				currentContent,
+				previousContent
+			);
+		} else {
+			// When diff is disabled, just parse the current revision content.
+			parsedBlocks = parse( currentContent );
+		}
 
 		// Preserve clientIds from previous render to prevent React unmount/remount.
 		const blocksWithStableIds = preserveClientIds(
-			diffedBlocks,
+			parsedBlocks,
 			previousBlocksRef.current
 		);
 
@@ -266,12 +285,12 @@ export default function RevisionsCanvas( { revision, previousRevision } ) {
 		previousBlocksRef.current = blocksWithStableIds;
 
 		return blocksWithStableIds;
-	}, [ revision?.content?.raw, previousRevision?.content?.raw ] );
+	}, [ revision?.content?.raw, previousRevision?.content?.raw, showDiff ] );
 
-	// Calculate diff statistics for sidebar.
+	// Calculate diff statistics for sidebar (only when diff is enabled).
 	const diffStats = useMemo(
-		() => calculateDiffStatistics( blocks ),
-		[ blocks ]
+		() => ( showDiff ? calculateDiffStatistics( blocks ) : null ),
+		[ blocks, showDiff ]
 	);
 
 	// Modify settings to enable preview mode.
@@ -297,7 +316,9 @@ export default function RevisionsCanvas( { revision, previousRevision } ) {
 				value={ blocks }
 				settings={ settings }
 			>
-				<VisualEditor canvasOverlay={ <DiffMarkers /> } />
+				<VisualEditor
+					canvasOverlay={ showDiff ? <DiffMarkers /> : undefined }
+				/>
 			</ExperimentalBlockEditorProvider>
 			<RevisionsSidebar
 				diffStats={ diffStats }

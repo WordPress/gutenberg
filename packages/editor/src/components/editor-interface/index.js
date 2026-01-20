@@ -136,6 +136,7 @@ export default function EditorInterface( {
 	// Revisions mode state management.
 	const { revisions, isLoading: isRevisionsLoading } = usePostRevisions();
 	const [ selectedRevisionIndex, setSelectedRevisionIndex ] = useState( 0 );
+	const [ showDiff, setShowDiff ] = useState( true );
 	const { exitRevisionsMode } = unlock( useDispatch( editorStore ) );
 
 	// Sort revisions by date (newest first) and memoize.
@@ -184,12 +185,15 @@ export default function EditorInterface( {
 						selectedIndex={ selectedRevisionIndex }
 						onSelectIndex={ handleSelectRevisionIndex }
 						isLoading={ isRevisionsLoading }
+						showDiff={ showDiff }
+						onToggleDiff={ () => setShowDiff( ! showDiff ) }
 					/>
 				}
 				content={
 					<RevisionsCanvas
 						revision={ selectedRevision }
 						previousRevision={ previousRevision }
+						showDiff={ showDiff }
 					/>
 				}
 				sidebar={ <ComplementaryArea.Slot scope="core" /> }

@@ -12,8 +12,8 @@ import {
 } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { PinnedItems } from '@wordpress/interface';
-import { __ } from '@wordpress/i18n';
-import { closeSmall } from '@wordpress/icons';
+import { __, _x } from '@wordpress/i18n';
+import { seen } from '@wordpress/icons';
 import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 
 /**
@@ -57,6 +57,8 @@ const backButtonVariations = {
  * @param {number}   props.selectedIndex    Index of the selected revision.
  * @param {Function} props.onSelectIndex    Callback when slider value changes.
  * @param {boolean}  props.isLoading        Whether revisions are loading.
+ * @param {boolean}  props.showDiff         Whether diff highlighting is enabled.
+ * @param {Function} props.onToggleDiff     Callback to toggle diff highlighting.
  * @return {JSX.Element} The revisions header component.
  */
 function RevisionsHeader( {
@@ -65,6 +67,8 @@ function RevisionsHeader( {
 	selectedIndex,
 	onSelectIndex,
 	isLoading,
+	showDiff,
+	onToggleDiff,
 } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const { postType, showIconLabels } = useSelect( ( select ) => {
@@ -166,10 +170,10 @@ function RevisionsHeader( {
 			>
 				<Button
 					__next40pxDefaultSize
-					className="editor-revisions-header__close-button"
-					icon={ closeSmall }
-					label={ __( 'Close revisions' ) }
-					onClick={ exitRevisionsMode }
+					icon={ seen }
+					label={ _x( 'Show changes', 'revisions' ) }
+					isPressed={ showDiff }
+					onClick={ onToggleDiff }
 				/>
 			</motion.div>
 			<div
@@ -191,6 +195,14 @@ function RevisionsHeader( {
 					<PinnedItems.Slot scope="core" />
 				) }
 
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					size="compact"
+					onClick={ exitRevisionsMode }
+				>
+					{ __( 'Exit' ) }
+				</Button>
 				<Button
 					__next40pxDefaultSize
 					accessibleWhenDisabled

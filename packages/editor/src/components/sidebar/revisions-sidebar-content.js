@@ -19,70 +19,14 @@ import PostCardPanel from '../post-card-panel';
 // Average reading rate in words per minute.
 const AVERAGE_READING_RATE = 189;
 
-export default function RevisionsSidebarContent( {
-	diffStats,
-	revisionId,
-	revisionDate,
-	revisionContent,
-} ) {
-	const stats = diffStats || {
-		wordsAdded: 0,
-		wordsRemoved: 0,
-		blocksAdded: 0,
-		blocksRemoved: 0,
-		blocksModified: 0,
-	};
-
-	// Calculate word count and reading time for this revision.
-	/*
-	 * translators: If your word count is based on single characters (e.g. East Asian characters),
-	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
-	 * Do not translate into your own language.
-	 */
-	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
-	const wordsCounted = useMemo(
-		() =>
-			revisionContent ? wordCount( revisionContent, wordCountType ) : 0,
-		[ revisionContent, wordCountType ]
-	);
-
-	const readingTime = Math.round( wordsCounted / AVERAGE_READING_RATE );
-	const contentInfoText = useMemo( () => {
-		if ( ! wordsCounted ) {
-			return '';
-		}
-		const wordsCountText = sprintf(
-			// translators: %s: the number of words in the post.
-			_n( '%s word', '%s words', wordsCounted ),
-			wordsCounted.toLocaleString()
-		);
-		const minutesText =
-			readingTime <= 1
-				? __( '1 minute' )
-				: sprintf(
-						/* translators: %s: the number of minutes to read the post. */
-						_n( '%s minute', '%s minutes', readingTime ),
-						readingTime.toLocaleString()
-				  );
-		return sprintf(
-			/* translators: 1: How many words a post has. 2: the number of minutes to read the post (e.g. 130 words, 2 minutes read time.) */
-			__( '%1$s, %2$s read time.' ),
-			wordsCountText,
-			minutesText
-		);
-	}, [ wordsCounted, readingTime ] );
-
-	const lastEditedText = useMemo( () => {
-		if ( ! revisionDate ) {
-			return '';
-		}
-		return sprintf(
-			// translators: %s: Human-readable time difference, e.g. "2 days ago".
-			__( 'Created %s.' ),
-			humanTimeDiff( revisionDate )
-		);
-	}, [ revisionDate ] );
-
+/**
+ * Component to display diff statistics with GitHub-style squares.
+ *
+ * @param {Object} props       Component props.
+ * @param {Object} props.stats The diff statistics object.
+ * @return {JSX.Element} The diff stats component.
+ */
+function DiffStats( { stats } ) {
 	// Calculate the ratio squares (like GitHub's diffstat).
 	// Number of squares scales with total changes, ratio determines colors.
 	const getSquareCount = ( total ) => {
@@ -147,6 +91,119 @@ export default function RevisionsSidebarContent( {
 	}
 
 	return (
+		<VStack spacing={ 1 }>
+			<HStack
+				className="editor-revisions-sidebar-content__diff"
+				spacing={ 2 }
+				justify="flex-start"
+			>
+				<span className="diff-squares">
+					{ blockSquares.map( ( type, i ) => (
+						<span
+							key={ i }
+							className={ `diff-square is-${ type }` }
+						/>
+					) ) }
+				</span>
+				{ stats.blocksAdded > 0 && (
+					<span className="is-added">+{ stats.blocksAdded }</span>
+				) }
+				{ stats.blocksModified > 0 && (
+					<span className="is-modified">
+						~{ stats.blocksModified }
+					</span>
+				) }
+				{ stats.blocksRemoved > 0 && (
+					<span className="is-removed">-{ stats.blocksRemoved }</span>
+				) }
+				<span className="editor-revisions-sidebar-content__diff-label">
+					{ __( 'blocks' ) }
+				</span>
+			</HStack>
+			<HStack
+				className="editor-revisions-sidebar-content__diff"
+				spacing={ 2 }
+				justify="flex-start"
+			>
+				<span className="diff-squares">
+					{ wordSquares.map( ( type, i ) => (
+						<span
+							key={ i }
+							className={ `diff-square is-${ type }` }
+						/>
+					) ) }
+				</span>
+				{ stats.wordsAdded > 0 && (
+					<span className="is-added">+{ stats.wordsAdded }</span>
+				) }
+				{ stats.wordsRemoved > 0 && (
+					<span className="is-removed">-{ stats.wordsRemoved }</span>
+				) }
+				<span className="editor-revisions-sidebar-content__diff-label">
+					{ __( 'words' ) }
+				</span>
+			</HStack>
+		</VStack>
+	);
+}
+
+export default function RevisionsSidebarContent( {
+	diffStats,
+	revisionId,
+	revisionDate,
+	revisionContent,
+} ) {
+	// Calculate word count and reading time for this revision.
+	/*
+	 * translators: If your word count is based on single characters (e.g. East Asian characters),
+	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
+	 * Do not translate into your own language.
+	 */
+	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
+	const wordsCounted = useMemo(
+		() =>
+			revisionContent ? wordCount( revisionContent, wordCountType ) : 0,
+		[ revisionContent, wordCountType ]
+	);
+
+	const readingTime = Math.round( wordsCounted / AVERAGE_READING_RATE );
+	const contentInfoText = useMemo( () => {
+		if ( ! wordsCounted ) {
+			return '';
+		}
+		const wordsCountText = sprintf(
+			// translators: %s: the number of words in the post.
+			_n( '%s word', '%s words', wordsCounted ),
+			wordsCounted.toLocaleString()
+		);
+		const minutesText =
+			readingTime <= 1
+				? __( '1 minute' )
+				: sprintf(
+						/* translators: %s: the number of minutes to read the post. */
+						_n( '%s minute', '%s minutes', readingTime ),
+						readingTime.toLocaleString()
+				  );
+		return sprintf(
+			/* translators: 1: How many words a post has. 2: the number of minutes to read the post (e.g. 130 words, 2 minutes read time.) */
+			__( '%1$s, %2$s read time.' ),
+			wordsCountText,
+			minutesText
+		);
+	}, [ wordsCounted, readingTime ] );
+
+	const lastEditedText = useMemo( () => {
+		if ( ! revisionDate ) {
+			return '';
+		}
+		return sprintf(
+			// translators: %s: Human-readable time difference, e.g. "2 days ago".
+			__( 'Created %s.' ),
+			humanTimeDiff( revisionDate )
+		);
+	}, [ revisionDate ] );
+
+	return (
 		<VStack className="editor-revisions-sidebar-content" spacing={ 4 }>
 			<PostCardPanel postType="revision" postId={ revisionId } />
 			<VStack spacing={ 1 }>
@@ -161,63 +218,7 @@ export default function RevisionsSidebarContent( {
 					</div>
 				) }
 			</VStack>
-			<VStack spacing={ 1 }>
-				<HStack
-					className="editor-revisions-sidebar-content__diff"
-					spacing={ 2 }
-					justify="flex-start"
-				>
-					<span className="diff-squares">
-						{ blockSquares.map( ( type, i ) => (
-							<span
-								key={ i }
-								className={ `diff-square is-${ type }` }
-							/>
-						) ) }
-					</span>
-					{ stats.blocksAdded > 0 && (
-						<span className="is-added">+{ stats.blocksAdded }</span>
-					) }
-					{ stats.blocksModified > 0 && (
-						<span className="is-modified">
-							~{ stats.blocksModified }
-						</span>
-					) }
-					{ stats.blocksRemoved > 0 && (
-						<span className="is-removed">
-							-{ stats.blocksRemoved }
-						</span>
-					) }
-					<span className="editor-revisions-sidebar-content__diff-label">
-						{ __( 'blocks' ) }
-					</span>
-				</HStack>
-				<HStack
-					className="editor-revisions-sidebar-content__diff"
-					spacing={ 2 }
-					justify="flex-start"
-				>
-					<span className="diff-squares">
-						{ wordSquares.map( ( type, i ) => (
-							<span
-								key={ i }
-								className={ `diff-square is-${ type }` }
-							/>
-						) ) }
-					</span>
-					{ stats.wordsAdded > 0 && (
-						<span className="is-added">+{ stats.wordsAdded }</span>
-					) }
-					{ stats.wordsRemoved > 0 && (
-						<span className="is-removed">
-							-{ stats.wordsRemoved }
-						</span>
-					) }
-					<span className="editor-revisions-sidebar-content__diff-label">
-						{ __( 'words' ) }
-					</span>
-				</HStack>
-			</VStack>
+			{ diffStats && <DiffStats stats={ diffStats } /> }
 		</VStack>
 	);
 }
