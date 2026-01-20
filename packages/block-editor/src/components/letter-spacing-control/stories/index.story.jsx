@@ -79,25 +79,6 @@ export const Default = {
 	},
 };
 
-export const WithValue = {
-	args: {
-		__next40pxDefaultSize: true,
-	},
-	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState( '2px' );
-		return (
-			<LetterSpacingControl
-				{ ...args }
-				value={ value }
-				onChange={ ( newValue ) => {
-					onChange( newValue );
-					setValue( newValue );
-				} }
-			/>
-		);
-	},
-};
-
 export const WithCustomWidth = {
 	args: {
 		__next40pxDefaultSize: true,
