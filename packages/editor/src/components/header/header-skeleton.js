@@ -47,6 +47,10 @@ export default function HeaderSkeleton( {
 } ) {
 	const hasBackButton = useHasBackButton();
 
+	/*
+	 * The edit-post-header classname is only kept for backward compatibility
+	 * as some plugins might be relying on its presence.
+	 */
 	return (
 		<div className={ clsx( 'editor-header edit-post-header', className ) }>
 			{ hasBackButton && (
