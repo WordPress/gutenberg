@@ -578,38 +578,15 @@ export function setCanvasMinHeight( minHeight ) {
 }
 
 /**
- * Enter revisions preview mode.
+ * Set the current revision ID for revisions preview mode.
+ * Pass a revision ID to enter revisions mode, or null to exit.
  *
- * @param {number} [revisionId] Optional revision ID to select initially.
+ * @param {number|null} revisionId The revision ID, or null to exit revisions mode.
  * @return {Object} Action object.
  */
-export function enterRevisionsMode( revisionId = null ) {
+export function setCurrentRevisionId( revisionId ) {
 	return {
-		type: 'ENTER_REVISIONS_MODE',
-		revisionId,
-	};
-}
-
-/**
- * Exit revisions preview mode.
- *
- * @return {Object} Action object.
- */
-export function exitRevisionsMode() {
-	return {
-		type: 'EXIT_REVISIONS_MODE',
-	};
-}
-
-/**
- * Select a revision to preview.
- *
- * @param {number} revisionId The revision ID to select.
- * @return {Object} Action object.
- */
-export function selectRevision( revisionId ) {
-	return {
-		type: 'SELECT_REVISION',
+		type: 'SET_CURRENT_REVISION_ID',
 		revisionId,
 	};
 }
@@ -635,7 +612,7 @@ export const restoreRevision =
 		}
 
 		// Exit revisions mode.
-		dispatch.exitRevisionsMode();
+		dispatch.setCurrentRevisionId( null );
 
 		// Save the post to persist the restored revision.
 		await dispatch.savePost();

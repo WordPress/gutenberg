@@ -84,7 +84,7 @@ function RevisionsHeader( {
 		};
 	}, [] );
 
-	const { exitRevisionsMode, restoreRevision } = unlock(
+	const { setCurrentRevisionId, restoreRevision } = unlock(
 		useDispatch( editorStore )
 	);
 
@@ -196,7 +196,7 @@ function RevisionsHeader( {
 					__next40pxDefaultSize
 					variant="secondary"
 					size="compact"
-					onClick={ exitRevisionsMode }
+					onClick={ () => setCurrentRevisionId( null ) }
 				>
 					{ __( 'Exit' ) }
 				</Button>

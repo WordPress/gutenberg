@@ -308,15 +308,15 @@ export function getCanvasMinHeight( state ) {
  * @return {boolean} Whether revisions mode is active.
  */
 export function isRevisionsMode( state ) {
-	return state.revisionsMode?.isActive ?? false;
+	return state.revisionId !== null;
 }
 
 /**
- * Returns the currently selected revision ID in revisions mode.
+ * Returns the current revision ID in revisions mode.
  *
  * @param {Object} state Global application state.
- * @return {number|null} The selected revision ID, or null if none selected.
+ * @return {number|null} The revision ID, or null if not in revisions mode.
  */
-export function getSelectedRevisionId( state ) {
-	return state.revisionsMode?.selectedRevisionId ?? null;
+export function getCurrentRevisionId( state ) {
+	return state.revisionId;
 }

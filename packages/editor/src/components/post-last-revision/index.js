@@ -31,14 +31,14 @@ function usePostLastRevisionInfo() {
  * @return {React.ReactNode} The rendered component.
  */
 function PostLastRevision() {
-	const { revisionsCount } = usePostLastRevisionInfo();
-	const { enterRevisionsMode } = unlock( useDispatch( editorStore ) );
+	const { lastRevisionId, revisionsCount } = usePostLastRevisionInfo();
+	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
 
 	return (
 		<PostLastRevisionCheck>
 			<Button
 				__next40pxDefaultSize
-				onClick={ enterRevisionsMode }
+				onClick={ () => setCurrentRevisionId( lastRevisionId ) }
 				className="editor-post-last-revision__title"
 				icon={ backup }
 				iconPosition="right"
@@ -53,14 +53,14 @@ function PostLastRevision() {
 }
 
 export function PrivatePostLastRevision() {
-	const { revisionsCount } = usePostLastRevisionInfo();
-	const { enterRevisionsMode } = unlock( useDispatch( editorStore ) );
+	const { lastRevisionId, revisionsCount } = usePostLastRevisionInfo();
+	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
 
 	return (
 		<PostLastRevisionCheck>
 			<PostPanelRow label={ __( 'Revisions' ) }>
 				<Button
-					onClick={ enterRevisionsMode }
+					onClick={ () => setCurrentRevisionId( lastRevisionId ) }
 					className="editor-private-post-last-revision__button"
 					text={ revisionsCount }
 					variant="tertiary"
