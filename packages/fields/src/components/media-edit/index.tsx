@@ -21,7 +21,6 @@ import {
 import { isBlobURL, getBlobTypeByURL } from '@wordpress/blob';
 import { store as coreStore, type Attachment } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import type { FieldValidity, NormalizedRules } from '@wordpress/dataviews';
 import {
 	useCallback,
 	useEffect,
@@ -407,18 +406,6 @@ function CompactMediaEditAttachments( {
 	);
 }
 
-function getCustomValidity< Item >(
-	isValid: NormalizedRules< Item >,
-	validity: FieldValidity | undefined
-) {
-	if ( isValid?.required && validity?.required ) {
-		// If the consumer provides a message for required,
-		// use it instead of the native built-in message.
-		return validity.required.message ? validity.required : undefined;
-	}
-	return undefined;
-}
-
 /**
  * A media edit control component that provides a media picker UI with upload functionality
  * for selecting WordPress media attachments. Supports both the traditional WordPress media
@@ -511,14 +498,11 @@ export default function MediaEdit< Item >( {
 		( itemId: number ) => {
 			const currentIds = Array.isArray( value ) ? value : [ value ];
 			const newIds = currentIds.filter( ( id ) => id !== itemId );
-			// If field is required and we're removing the last item, mark as touched
-			// to immediately show validation error.
-			if ( field.isValid?.required && ! newIds.length ) {
-				setIsTouched( true );
-			}
+			// Mark as touched to immediately show any validation error.
+			setIsTouched( true );
 			onChangeControl( newIds.length ? newIds : undefined );
 		},
-		[ value, field.isValid?.required, onChangeControl ]
+		[ value, onChangeControl ]
 	);
 	const onFilesDrop = useCallback(
 		( files: File[], _replacementId?: number ) => {
@@ -615,27 +599,29 @@ export default function MediaEdit< Item >( {
 		if ( ! isTouched ) {
 			return;
 		}
-		const timeoutId = setTimeout( () => {
-			if ( validity ) {
-				setCustomValidity(
-					getCustomValidity( field.isValid, validity )
+		const input = validityTargetRef.current;
+		if ( ! input ) {
+			return;
+		}
+
+		if ( validity ) {
+			const customValidityResult = validity?.custom;
+			setCustomValidity( customValidityResult );
+
+			// Set custom validity on hidden input for HTML5 form validation.
+			if ( customValidityResult?.type === 'invalid' ) {
+				input.setCustomValidity(
+					customValidityResult.message || __( 'Invalid' )
 				);
 			} else {
-				// Check HTML5 validity
-				const input = validityTargetRef.current;
-				if ( input && ! input.validity.valid ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message: input.validationMessage,
-					} );
-					return;
-				}
-				// No errors
-				setCustomValidity( undefined );
+				input.setCustomValidity( '' ); // Clear validity
 			}
-		}, 0 );
-		return () => clearTimeout( timeoutId );
-	}, [ isTouched, field.isValid, validity, value ] );
+		} else {
+			// Clear any previous validation.
+			input.setCustomValidity( '' );
+			setCustomValidity( undefined );
+		}
+	}, [ isTouched, field.isValid, validity ] );
 	const onBlur = useCallback(
 		( event: React.FocusEvent< HTMLElement > ) => {
 			if ( isTouched ) {
@@ -708,12 +694,7 @@ export default function MediaEdit< Item >( {
 				<input
 					type="text"
 					ref={ validityTargetRef }
-					required={ !! field.isValid?.required }
-					value={
-						( Array.isArray( value ) && !! value.length ) || value
-							? 'v' // We don't care about the actual value, just that it exists.
-							: ''
-					}
+					value={ value ?? '' }
 					tabIndex={ -1 }
 					aria-hidden="true"
 					onChange={ () => {} }
