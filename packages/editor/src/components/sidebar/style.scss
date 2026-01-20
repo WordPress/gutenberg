@@ -32,19 +32,7 @@
 .editor-revisions-sidebar-content {
 	padding: $grid-unit-20;
 
-	&__row {
-		width: 100%;
-		min-height: $grid-unit-40;
-		justify-content: space-between !important;
-		align-items: center !important;
-	}
-
-	&__label {
-		flex-shrink: 0;
-		font-size: $default-font-size;
-	}
-
-	&__value {
+	&__diff {
 		font-size: $default-font-size;
 		align-items: center;
 

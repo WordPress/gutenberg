@@ -7,7 +7,13 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { store as interfaceStore } from '@wordpress/interface';
-import { useCallback, useContext, useEffect, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useContext,
+	useEffect,
+	useRef,
+	forwardRef,
+} from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -15,11 +21,29 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import PluginSidebar from '../plugin-sidebar';
 import RevisionsSidebarContent from './revisions-sidebar-content';
-import SidebarHeader from './header';
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
 
 const { Tabs } = unlock( componentsPrivateApis );
+
+/**
+ * Custom header for revisions sidebar that shows "Revision" instead of post type.
+ */
+const RevisionsSidebarHeader = forwardRef( ( _, ref ) => {
+	return (
+		<Tabs.TabList ref={ ref }>
+			<Tabs.Tab
+				tabId={ sidebars.document }
+				data-tab-id={ sidebars.document }
+			>
+				{ __( 'Revision' ) }
+			</Tabs.Tab>
+			<Tabs.Tab tabId={ sidebars.block } data-tab-id={ sidebars.block }>
+				{ __( 'Block' ) }
+			</Tabs.Tab>
+		</Tabs.TabList>
+	);
+} );
 
 /**
  * Standalone sidebar for revisions mode.
@@ -32,6 +56,7 @@ const RevisionsSidebarContent_ = ( {
 	keyboardShortcut,
 	diffStats,
 	revisionDate,
+	revisionContent,
 } ) => {
 	const tabListRef = useRef( null );
 	// Because `PluginSidebar` renders a `ComplementaryArea`, we
@@ -66,7 +91,7 @@ const RevisionsSidebarContent_ = ( {
 			identifier={ tabName }
 			header={
 				<Tabs.Context.Provider value={ tabsContextValue }>
-					<SidebarHeader ref={ tabListRef } />
+					<RevisionsSidebarHeader ref={ tabListRef } />
 				</Tabs.Context.Provider>
 			}
 			closeLabel={ __( 'Close Settings' ) }
@@ -85,6 +110,7 @@ const RevisionsSidebarContent_ = ( {
 					<RevisionsSidebarContent
 						diffStats={ diffStats }
 						revisionDate={ revisionDate }
+						revisionContent={ revisionContent }
 					/>
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
@@ -99,7 +125,11 @@ const RevisionsSidebarContent_ = ( {
 	);
 };
 
-export default function RevisionsSidebar( { diffStats, revisionDate } ) {
+export default function RevisionsSidebar( {
+	diffStats,
+	revisionDate,
+	revisionContent,
+} ) {
 	const { tabName, keyboardShortcut } = useSelect( ( select ) => {
 		const shortcut = select(
 			keyboardShortcutsStore
@@ -146,6 +176,7 @@ export default function RevisionsSidebar( { diffStats, revisionDate } ) {
 				keyboardShortcut={ keyboardShortcut }
 				diffStats={ diffStats }
 				revisionDate={ revisionDate }
+				revisionContent={ revisionContent }
 			/>
 		</Tabs>
 	);

@@ -4,18 +4,33 @@
 import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
+import { __, _x, _n, sprintf } from '@wordpress/i18n';
+import {
+	humanTimeDiff,
+	dateI18n,
+	getSettings as getDateSettings,
+} from '@wordpress/date';
+import { count as wordCount } from '@wordpress/wordcount';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 import PostCardPanel from '../post-card-panel';
+import PostPanelRow from '../post-panel-row';
 
-export default function RevisionsSidebarContent( { diffStats, revisionDate } ) {
+// Average reading rate in words per minute.
+const AVERAGE_READING_RATE = 189;
+
+export default function RevisionsSidebarContent( {
+	diffStats,
+	revisionDate,
+	revisionContent,
+} ) {
 	const { postType, postId } = useSelect( ( select ) => {
 		const { getCurrentPostType, getCurrentPostId } = select( editorStore );
 		return {
@@ -31,6 +46,56 @@ export default function RevisionsSidebarContent( { diffStats, revisionDate } ) {
 		blocksRemoved: 0,
 		blocksModified: 0,
 	};
+
+	// Calculate word count and reading time for this revision.
+	/*
+	 * translators: If your word count is based on single characters (e.g. East Asian characters),
+	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
+	 * Do not translate into your own language.
+	 */
+	const wordCountType = _x( 'words', 'Word count type. Do not translate!' );
+	const wordsCounted = useMemo(
+		() =>
+			revisionContent ? wordCount( revisionContent, wordCountType ) : 0,
+		[ revisionContent, wordCountType ]
+	);
+
+	const readingTime = Math.round( wordsCounted / AVERAGE_READING_RATE );
+	const contentInfoText = useMemo( () => {
+		if ( ! wordsCounted ) {
+			return '';
+		}
+		const wordsCountText = sprintf(
+			// translators: %s: the number of words in the post.
+			_n( '%s word', '%s words', wordsCounted ),
+			wordsCounted.toLocaleString()
+		);
+		const minutesText =
+			readingTime <= 1
+				? __( '1 minute' )
+				: sprintf(
+						/* translators: %s: the number of minutes to read the post. */
+						_n( '%s minute', '%s minutes', readingTime ),
+						readingTime.toLocaleString()
+				  );
+		return sprintf(
+			/* translators: 1: How many words a post has. 2: the number of minutes to read the post (e.g. 130 words, 2 minutes read time.) */
+			__( '%1$s, %2$s read time.' ),
+			wordsCountText,
+			minutesText
+		);
+	}, [ wordsCounted, readingTime ] );
+
+	const lastEditedText = useMemo( () => {
+		if ( ! revisionDate ) {
+			return '';
+		}
+		return sprintf(
+			// translators: %s: Human-readable time difference, e.g. "2 days ago".
+			__( 'Last edited %s.' ),
+			humanTimeDiff( revisionDate )
+		);
+	}, [ revisionDate ] );
 
 	const dateSettings = getDateSettings();
 	const formattedDate = revisionDate
@@ -103,28 +168,23 @@ export default function RevisionsSidebarContent( { diffStats, revisionDate } ) {
 	return (
 		<VStack className="editor-revisions-sidebar-content" spacing={ 4 }>
 			<PostCardPanel postType={ postType } postId={ postId } />
-			{ formattedDate && (
-				<HStack
-					className="editor-revisions-sidebar-content__row"
-					alignment="flex-start"
-				>
-					<div className="editor-revisions-sidebar-content__label">
-						{ __( 'Date' ) }
-					</div>
-					<div className="editor-revisions-sidebar-content__value">
-						{ formattedDate }
-					</div>
-				</HStack>
-			) }
-			<HStack
-				className="editor-revisions-sidebar-content__row"
-				alignment="flex-start"
-			>
-				<div className="editor-revisions-sidebar-content__label">
-					{ __( 'Blocks' ) }
+			{ ( contentInfoText || lastEditedText ) && (
+				<div className="editor-post-content-information">
+					<Text>
+						{ contentInfoText }
+						{ contentInfoText && lastEditedText && ' ' }
+						{ lastEditedText }
+					</Text>
 				</div>
+			) }
+			{ formattedDate && (
+				<PostPanelRow label={ __( 'Date' ) }>
+					{ formattedDate }
+				</PostPanelRow>
+			) }
+			<PostPanelRow label={ __( 'Blocks' ) }>
 				<HStack
-					className="editor-revisions-sidebar-content__value"
+					className="editor-revisions-sidebar-content__diff"
 					spacing={ 2 }
 					justify="flex-end"
 				>
@@ -150,16 +210,10 @@ export default function RevisionsSidebarContent( { diffStats, revisionDate } ) {
 						) ) }
 					</span>
 				</HStack>
-			</HStack>
-			<HStack
-				className="editor-revisions-sidebar-content__row"
-				alignment="flex-start"
-			>
-				<div className="editor-revisions-sidebar-content__label">
-					{ __( 'Words' ) }
-				</div>
+			</PostPanelRow>
+			<PostPanelRow label={ __( 'Words' ) }>
 				<HStack
-					className="editor-revisions-sidebar-content__value"
+					className="editor-revisions-sidebar-content__diff"
 					spacing={ 2 }
 					justify="flex-end"
 				>
@@ -180,7 +234,7 @@ export default function RevisionsSidebarContent( { diffStats, revisionDate } ) {
 						) ) }
 					</span>
 				</HStack>
-			</HStack>
+			</PostPanelRow>
 		</VStack>
 	);
 }

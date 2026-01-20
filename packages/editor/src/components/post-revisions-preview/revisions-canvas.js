@@ -302,6 +302,7 @@ export default function RevisionsCanvas( { revision, previousRevision } ) {
 			<RevisionsSidebar
 				diffStats={ diffStats }
 				revisionDate={ revision?.date }
+				revisionContent={ revision?.content?.raw }
 			/>
 		</>
 	);
