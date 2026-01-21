@@ -82,28 +82,6 @@ export type EnhancedState< State extends BaseState > = State & {
 	isMe: boolean;
 };
 
-/**
- * A block selection object.
- *
- * In order to avoid circular dependencies, we define it here instead of importing
- * the WPBlockSelection interface from @wordpress/editor.
- */
-export type WPBlockSelection = {
-	/**
-	 * A block client ID.
-	 */
-	clientId: string;
-	/**
-	 * A block attribute key.
-	 */
-	attributeKey: string;
-	/**
-	 * An attribute value offset, based on the rich
-	 * text value. See `wp.richText.create`.
-	 */
-	offset: number;
-};
-
 export type EqualityFieldCheck<
 	State extends BaseState,
 	FieldName extends keyof State,

@@ -25,14 +25,12 @@ import type {
 	SyncConfig,
 	SyncManager,
 	SyncUndoManager,
+	AwarenessID,
 } from './types';
 import { createUndoManager } from './undo-manager';
 import { createYjsDoc } from './utils';
 import { createAwareness } from './awareness/awareness-manager';
 import type { AwarenessState } from './awareness/awareness-state';
-
-const AWARENESS_INSTANCE_SEPARATOR = ':';
-const ENTITY_INSTANCE_SEPARATOR = '_';
 
 interface EntityState {
 	handlers: RecordHandlers;
@@ -50,7 +48,7 @@ interface EntityState {
  */
 export function createSyncManager(): SyncManager {
 	const entityStates: Map< EntityID, EntityState > = new Map();
-	const awarenessInstances: Map< string, AwarenessState > = new Map();
+	const awarenessInstances: Map< AwarenessID, AwarenessState > = new Map();
 
 	/**
 	 * A "sync-aware" undo manager for all synced entities. It is lazily created
@@ -230,7 +228,7 @@ export function createSyncManager(): SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID
 	): EntityID {
-		return getInstanceId( objectType, objectId, ENTITY_INSTANCE_SEPARATOR );
+		return `${ objectType }_${ objectId }`;
 	}
 
 	/**
@@ -242,27 +240,8 @@ export function createSyncManager(): SyncManager {
 	function getAwarenessId(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): string {
-		return getInstanceId(
-			objectType,
-			objectId,
-			AWARENESS_INSTANCE_SEPARATOR
-		);
-	}
-
-	/**
-	 * Get the instance ID for the given object type and object ID.
-	 *
-	 * @param {ObjectType} objectType Object type.
-	 * @param {ObjectID}   objectId   Object ID.
-	 * @param {string}     separator  Separator between object type and object ID.
-	 */
-	function getInstanceId(
-		objectType: ObjectType,
-		objectId: ObjectID,
-		separator: string
-	): string {
-		return `${ objectType }${ separator }${ objectId }`;
+	): AwarenessID {
+		return `${ objectType }:${ objectId }`;
 	}
 
 	/**

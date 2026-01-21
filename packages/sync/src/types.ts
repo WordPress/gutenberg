@@ -31,6 +31,7 @@ declare global {
 }
 
 export type CRDTDoc = Y.Doc;
+export type AwarenessID = string;
 export type EntityID = string;
 export type ObjectID = string;
 export type ObjectType = string;
