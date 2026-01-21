@@ -97,7 +97,8 @@ export default function PostList( { postType } ) {
 			setSelection( items );
 			history.navigate(
 				addQueryArgs( path, {
-					postId: items.join( ',' ),
+					postId: items.length === 0 ? undefined : items.join( ',' ),
+					...( items.length === 0 && { quickEdit: undefined } ),
 				} )
 			);
 		},
