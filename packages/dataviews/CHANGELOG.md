@@ -59,6 +59,7 @@
 
 ### Enhancements
 
+- Include total items count in footer. [#73491](https://github.com/WordPress/gutenberg/pull/73491)
 - Simplify field normalization and types. [#73387](https://github.com/WordPress/gutenberg/pull/73387)
 - DataViews table layout: make checkboxes permanently visible when bulk actions are available. [#73245](https://github.com/WordPress/gutenberg/pull/73245)
 - DataViews: Add insert left/right in table column header. [#72929](https://github.com/WordPress/gutenberg/pull/72929)
