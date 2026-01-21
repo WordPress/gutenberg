@@ -46,6 +46,23 @@ const migrateWithLayout = ( attributes ) => {
 	return updatedAttributes;
 };
 
+const migrateOpenSubmenusOnClick = ( attributes ) => {
+	const { openSubmenusOnClick, ...restAttributes } = attributes;
+
+	// Don't migrate if openSubmenusOnClick doesn't exist or submenuVisibility already exists
+	if (
+		openSubmenusOnClick === undefined ||
+		restAttributes.submenuVisibility !== undefined
+	) {
+		return attributes;
+	}
+
+	return {
+		...restAttributes,
+		submenuVisibility: openSubmenusOnClick ? 'click' : 'hover',
+	};
+};
+
 const v6 = {
 	attributes: {
 		navigationMenuId: {
@@ -132,8 +149,9 @@ const v6 = {
 	save() {
 		return <InnerBlocks.Content />;
 	},
-	isEligible: ( { navigationMenuId } ) => !! navigationMenuId,
-	migrate: migrateIdToRef,
+	isEligible: ( { navigationMenuId, openSubmenusOnClick } ) =>
+		!! navigationMenuId || openSubmenusOnClick !== undefined,
+	migrate: compose( migrateIdToRef, migrateOpenSubmenusOnClick ),
 };
 
 const v5 = {
@@ -224,7 +242,11 @@ const v5 = {
 	},
 	isEligible: ( { itemsJustification, orientation } ) =>
 		!! itemsJustification || !! orientation,
-	migrate: compose( migrateIdToRef, migrateWithLayout ),
+	migrate: compose(
+		migrateIdToRef,
+		migrateWithLayout,
+		migrateOpenSubmenusOnClick
+	),
 };
 
 const v4 = {
@@ -307,7 +329,12 @@ const v4 = {
 	save() {
 		return <InnerBlocks.Content />;
 	},
-	migrate: compose( migrateIdToRef, migrateWithLayout, migrateFontFamily ),
+	migrate: compose(
+		migrateIdToRef,
+		migrateWithLayout,
+		migrateFontFamily,
+		migrateOpenSubmenusOnClick
+	),
 	isEligible( { style } ) {
 		return style?.typography?.fontFamily;
 	},
@@ -430,7 +457,8 @@ const deprecated = [
 			migrateIdToRef,
 			migrateWithLayout,
 			migrateFontFamily,
-			migrateIsResponsive
+			migrateIsResponsive,
+			migrateOpenSubmenusOnClick
 		),
 		save() {
 			return <InnerBlocks.Content />;

@@ -4,12 +4,8 @@
 		"isValid": true,
 		"attributes": {
 			"showSubmenuIcon": true,
-			"submenuVisibility": "hover",
 			"overlayMenu": "mobile",
-			"layout": {
-				"type": "flex",
-				"orientation": "horizontal"
-			}
+			"submenuVisibility": "hover"
 		},
 		"innerBlocks": [
 			{

@@ -80,7 +80,6 @@ import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import { DEFAULT_BLOCK } from '../constants';
-import useMigrateAttributes from './use-migrate-attributes';
 import { getSubmenuVisibility } from '../utils/get-submenu-visibility';
 
 /**
@@ -303,9 +302,6 @@ function Navigation( {
 		},
 		[ setAttributes ]
 	);
-
-	// Migrate deprecated attributes
-	useMigrateAttributes( attributes, setAttributes );
 
 	// Reset submenuVisibility to default if orientation changes to horizontal while "always" is selected
 	useEffect( () => {
