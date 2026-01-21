@@ -166,7 +166,7 @@ export default {
 			if ( blockGapToUse === '0' || blockGapToUse === 0 ) {
 				blockGapToUse = '0px';
 			}
-			const maxValue = `max(${ minimumColumnWidth }, ( 100% - (${ blockGapToUse }*${
+			const maxValue = `max(min( ${ minimumColumnWidth }, 100%), ( 100% - (${ blockGapToUse }*${
 				columnCount - 1
 			}) ) / ${ columnCount })`;
 			rules.push(
