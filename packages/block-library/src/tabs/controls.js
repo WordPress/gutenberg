@@ -119,6 +119,8 @@ export default function Controls( {
 	setTabActiveTextColor,
 	tabHoverTextColor,
 	setTabHoverTextColor,
+	tabDividerColor,
+	setTabDividerColor,
 } ) {
 	const {
 		customTabInactiveColor,
@@ -127,6 +129,7 @@ export default function Controls( {
 		customTabTextColor,
 		customTabActiveTextColor,
 		customTabHoverTextColor,
+		customTabDividerColor,
 		orientation,
 		metadata = {
 			name: '',
@@ -242,6 +245,17 @@ export default function Controls( {
 								setTabHoverTextColor( value );
 								setAttributes( {
 									customTabHoverTextColor: value,
+								} );
+							},
+						},
+						{
+							label: __( 'Divider Color' ),
+							colorValue:
+								tabDividerColor?.color ?? customTabDividerColor,
+							onColorChange: ( value ) => {
+								setTabDividerColor( value );
+								setAttributes( {
+									customTabDividerColor: value,
 								} );
 							},
 						},

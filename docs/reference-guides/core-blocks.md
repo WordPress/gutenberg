@@ -1002,7 +1002,7 @@ Display content in a tabbed interface to help users navigate detailed content wi
 -	**Category:** design
 -	**Allowed Blocks:** core/tab
 -	**Supports:** align, color (~~background~~, ~~text~~), interactivity, spacing (blockGap, margin, ~~padding~~), typography (fontSize), ~~html~~
--	**Attributes:** activeTabIndex, customTabActiveColor, customTabActiveTextColor, customTabHoverColor, customTabHoverTextColor, customTabInactiveColor, customTabTextColor, orientation, tabActiveColor, tabActiveTextColor, tabHoverColor, tabHoverTextColor, tabInactiveColor, tabTextColor, tabsId
+-	**Attributes:** activeTabIndex, customTabActiveColor, customTabActiveTextColor, customTabDividerColor, customTabHoverColor, customTabHoverTextColor, customTabInactiveColor, customTabTextColor, orientation, tabActiveColor, tabActiveTextColor, tabDividerColor, tabHoverColor, tabHoverTextColor, tabInactiveColor, tabTextColor, tabsId
 
 ## Tag Cloud
 

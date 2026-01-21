@@ -23,7 +23,7 @@
 	--tab-padding-block: var(--wp--preset--spacing--20, 0.5em);
 	--tab-padding-inline: var(--wp--preset--spacing--30, 1em);
 	--tab-border-radius: 0;
-	--tabs-divider-color: var(--custom-tab-active-color, #000);
+	--tabs-divider-color: var(--custom-tab-divider-color, var(--custom-tab-active-color, #000));
 
 	.tabs__title {
 		display: none;
@@ -98,9 +98,10 @@
 	&.is-vertical {
 		flex-wrap: nowrap;
 		.tabs__list {
-			flex-grow: 0;
 			flex-direction: column;
-			max-width: 30%;
+			align-items: flex-start;
+			flex: 0 0 var(--wp--style--tabs-vertical-nav-width, 16rem);
+			max-width: fit-content;
 			border-inline-end: 1px solid var(--tabs-divider-color);
 			border-block-end: none;
 			overflow-x: hidden;
@@ -186,7 +187,7 @@
 		.tabs__list {
 			border-block-end: none;
 			border-inline-end: none;
-			align-items: flex-end;
+			align-items: flex-start;
 		}
 	}
 }

@@ -58,6 +58,12 @@
 		},
 		"customTabHoverTextColor": {
 			"type": "string"
+		},
+		"tabDividerColor": {
+			"type": "string"
+		},
+		"customTabDividerColor": {
+			"type": "string"
 		}
 	},
 	"styles": [
