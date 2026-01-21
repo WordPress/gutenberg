@@ -7,9 +7,10 @@ import {
 	privateApis as coreDataPrivateApis,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { resolveSelect } from '@wordpress/data';
+import { resolveSelect, useDispatch } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
+import { store as noticesStore } from '@wordpress/notices';
 import { DataViewsPicker } from '@wordpress/dataviews';
 import type { View, Field, ActionButton } from '@wordpress/dataviews';
 import {
@@ -174,6 +175,10 @@ export function MediaUploadModal( {
 		filters: [],
 	} ) );
 
+	// Dispatch hooks for notices and query invalidation
+	const { createErrorNotice } = useDispatch( noticesStore );
+	const { invalidateResolution } = useDispatch( coreStore );
+
 	// Build query args based on view properties, similar to PostList
 	const queryArgs = useMemo( () => {
 		const filters: Record< string, any > = {};
@@ -320,10 +325,31 @@ export function MediaUploadModal( {
 				handleUpload( {
 					allowedTypes,
 					filesList: filesArray,
+					onFileChange() {
+						// Invalidate query to refresh the media list
+						invalidateResolution( 'getEntityRecords', [
+							'postType',
+							'attachment',
+							queryArgs,
+						] );
+					},
+					onError( error ) {
+						createErrorNotice( error.message, {
+							type: 'snackbar',
+						} );
+					},
+					multiple,
 				} );
 			}
 		},
-		[ allowedTypes, handleUpload ]
+		[
+			allowedTypes,
+			handleUpload,
+			invalidateResolution,
+			queryArgs,
+			createErrorNotice,
+			multiple,
+		]
 	);
 
 	const paginationInfo = useMemo(
@@ -413,6 +439,20 @@ export function MediaUploadModal( {
 						handleUpload( {
 							allowedTypes,
 							filesList: filteredFiles,
+							onFileChange() {
+								// Invalidate query to refresh the media list
+								invalidateResolution( 'getEntityRecords', [
+									'postType',
+									'attachment',
+									queryArgs,
+								] );
+							},
+							onError( error ) {
+								createErrorNotice( error.message, {
+									type: 'snackbar',
+								} );
+							},
+							multiple,
 						} );
 					}
 				} }
