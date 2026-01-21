@@ -26,12 +26,32 @@ export {
 	LOCAL_SYNC_MANAGER_ORIGIN,
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './config';
+
 export { createSyncManager } from './manager';
-export type {
-	OnStateChangeCallback,
-	ProviderCreatorOptions,
-	SyncConnectionError,
-	SyncConnectionState,
-	SyncConnectionStatus,
-} from './types';
+
+/**
+ * Callback registered as event handler for provider 'status' events.
+ */
+export type { OnStateChangeCallback } from './types';
+
+/**
+ * Options passed to a provider creator function when initializing a sync provider.
+ */
+export type { ProviderCreatorOptions } from './types';
+
+/**
+ * Error information reported by a sync provider when a disconnection occurs.
+ */
+export type { SyncConnectionError } from './types';
+
+/**
+ * Current connection state of a sync provider, including status and optional error information.
+ */
+export type { SyncConnectionState } from './types';
+
+/**
+ * Connection status of a sync provider: either connected or disconnected.
+ */
+export type { SyncConnectionStatus } from './types';
+
 export type * from './types';
