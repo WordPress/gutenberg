@@ -35,13 +35,6 @@ jest.mock( '@wordpress/blocks', () => ( {
 } ) );
 
 /**
- * Mock @wordpress/block-editor to avoid private-apis unlock errors
- */
-jest.mock( '@wordpress/block-editor', () => ( {
-	store: {},
-} ) );
-
-/**
  * Internal dependencies
  */
 import {
