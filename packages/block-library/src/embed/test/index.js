@@ -30,6 +30,7 @@ jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {} ) );
 describe( 'utils', () => {
 	beforeAll( () => {
 		registerBlockType( DEFAULT_EMBED_BLOCK, {
+			apiVersion: 3,
 			title: 'Embed',
 			category: 'embed',
 			attributes,
@@ -148,6 +149,7 @@ describe( 'utils', () => {
 				).toBeUndefined();
 
 				registerBlockType( DEFAULT_EMBED_BLOCK, {
+					apiVersion: 3,
 					title: 'Embed',
 					category: 'embed',
 					attributes,
