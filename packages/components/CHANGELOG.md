@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   FormTokenField: Add support for matching both the key and label in suggestions
+-   FormTokenField: Add support for matching both the key and label in suggestions. [#74772](https://github.com/WordPress/gutenberg/pull/74772)
 
 ## 32.0.0 (2026-01-16)
 
