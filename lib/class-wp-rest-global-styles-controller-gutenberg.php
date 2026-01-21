@@ -323,6 +323,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		 * @todo Remove this when supported WordPress version is >= 7.0
 		 */
 		$filter_priority = has_filter( 'content_save_pre', 'wp_filter_global_styles_post' );
+		assert( false !== $filter_priority, 'Expected to find wp_filter_global_styles_post filter.' );
 		if ( false !== $filter_priority ) {
 			remove_filter( 'content_save_pre', 'wp_filter_global_styles_post', $filter_priority );
 			add_filter(
