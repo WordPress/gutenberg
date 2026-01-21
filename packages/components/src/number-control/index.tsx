@@ -281,5 +281,6 @@ function UnforwardedNumberControl(
 }
 
 export const NumberControl = forwardRef( UnforwardedNumberControl );
+NumberControl.displayName = 'NumberControl';
 
 export default NumberControl;

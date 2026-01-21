@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { useMemo, useState, useCallback } from '@wordpress/element';
-import { useEntityRecords } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	SelectControl,
 	Button,
@@ -47,6 +47,11 @@ export default function OverlayTemplatePartSelector( {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
+		[]
+	);
+
 	// Track if we're currently creating a new overlay
 	const [ isCreating, setIsCreating ] = useState( false );
 
@@ -80,17 +85,13 @@ export default function OverlayTemplatePartSelector( {
 
 		const templatePartOptions = overlayTemplateParts.map(
 			( templatePart ) => {
-				const templatePartId = createTemplatePartId(
-					templatePart.theme,
-					templatePart.slug
-				);
 				const label = templatePart.title?.rendered
 					? decodeEntities( templatePart.title.rendered )
 					: templatePart.slug;
 
 				return {
 					label,
-					value: templatePartId,
+					value: templatePart.slug,
 				};
 			}
 		);
@@ -103,13 +104,9 @@ export default function OverlayTemplatePartSelector( {
 		if ( ! overlay || ! overlayTemplateParts ) {
 			return null;
 		}
-		return overlayTemplateParts.find( ( templatePart ) => {
-			const templatePartId = createTemplatePartId(
-				templatePart.theme,
-				templatePart.slug
-			);
-			return templatePartId === overlay;
-		} );
+		return overlayTemplateParts.find(
+			( templatePart ) => templatePart.slug === overlay
+		);
 	}, [ overlay, overlayTemplateParts ] );
 
 	const handleSelectChange = ( value ) => {
@@ -119,12 +116,21 @@ export default function OverlayTemplatePartSelector( {
 	};
 
 	const handleEditClick = () => {
-		if ( ! overlay || ! onNavigateToEntityRecord ) {
+		if (
+			! overlay ||
+			! selectedTemplatePart ||
+			! onNavigateToEntityRecord
+		) {
 			return;
 		}
 
+		// Resolve the full template part ID using theme
+		// Default to current theme if not set
+		const theme = selectedTemplatePart.theme || currentTheme;
+		const templatePartId = createTemplatePartId( theme, overlay );
+
 		onNavigateToEntityRecord( {
-			postId: overlay,
+			postId: templatePartId,
 			postType: 'wp_template_part',
 		} );
 	};
@@ -136,13 +142,19 @@ export default function OverlayTemplatePartSelector( {
 			const templatePart = await createOverlayTemplatePart();
 
 			setAttributes( {
-				overlay: templatePart.id,
+				overlay: templatePart.slug,
 			} );
 
 			// Navigate to the new overlay for editing
+			// Create the full ID using theme and slug
 			if ( onNavigateToEntityRecord ) {
+				const theme = templatePart.theme || currentTheme;
+				const templatePartId = createTemplatePartId(
+					theme,
+					templatePart.slug
+				);
 				onNavigateToEntityRecord( {
-					postId: templatePart.id,
+					postId: templatePartId,
 					postType: 'wp_template_part',
 				} );
 			}
@@ -168,6 +180,7 @@ export default function OverlayTemplatePartSelector( {
 		setAttributes,
 		onNavigateToEntityRecord,
 		createErrorNotice,
+		currentTheme,
 	] );
 
 	const isCreateButtonDisabled = isResolving || isCreating;

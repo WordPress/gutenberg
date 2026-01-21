@@ -44,7 +44,38 @@ export function WithDesignSystemTheme(
 
 	return (
 		<ThemeProvider color={ color } density={ density } isRoot>
-			<Story { ...context } />
+			<div
+				style={
+					color?.bg
+						? {
+								background:
+									'var(--wpds-color-bg-surface-neutral-strong)',
+								padding:
+									'var(--wpds-dimension-padding-surface-sm) var(--wpds-dimension-padding-surface-sm) var(--wpds-dimension-padding-surface-xs)',
+								outline:
+									'1px dashed var(--wpds-color-stroke-surface-neutral)',
+								outlineOffset: '2px',
+						  }
+						: undefined
+				}
+			>
+				<Story { ...context } />
+				{ color?.bg && (
+					<small
+						style={ {
+							display: 'block',
+							opacity: 0.5,
+							marginTop: 'var(--wpds-dimension-gap-sm)',
+							fontSize: 'var(--wpds-font-size-xs)',
+							color: 'var(--wpds-color-fg-content-neutral-weak)',
+							textTransform: 'uppercase',
+							textAlign: 'end',
+						} }
+					>
+						Themed background
+					</small>
+				) }
+			</div>
 		</ThemeProvider>
 	);
 }

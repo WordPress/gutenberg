@@ -48,3 +48,4 @@ const UnforwardedValidatedToggleControl = (
 export const ValidatedToggleControl = forwardRef(
 	UnforwardedValidatedToggleControl
 );
+ValidatedToggleControl.displayName = 'ValidatedToggleControl';

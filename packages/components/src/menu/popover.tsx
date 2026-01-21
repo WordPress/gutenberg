@@ -84,6 +84,7 @@ export const Popover = forwardRef<
 			shift={ shift ?? ( menuContext.store.parent ? -4 : 0 ) }
 			hideOnHoverOutside={ false }
 			data-side={ appliedPlacementSide }
+			data-submenu={ !! menuContext.store.parent || undefined }
 			wrapperProps={ wrapperProps }
 			hideOnEscape={ hideOnEscape }
 			unmountOnHide

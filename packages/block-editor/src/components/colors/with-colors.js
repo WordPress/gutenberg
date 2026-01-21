@@ -39,9 +39,10 @@ const upperFirst = ( [ firstLetter, ...rest ] ) =>
  */
 const withCustomColorPalette = ( colorsArray ) =>
 	createHigherOrderComponent(
-		( WrappedComponent ) => ( props ) => (
-			<WrappedComponent { ...props } colors={ colorsArray } />
-		),
+		( WrappedComponent ) =>
+			function WithCustomColorPalette( props ) {
+				return <WrappedComponent { ...props } colors={ colorsArray } />;
+			},
 		'withCustomColorPalette'
 	);
 
@@ -53,22 +54,24 @@ const withCustomColorPalette = ( colorsArray ) =>
  */
 const withEditorColorPalette = () =>
 	createHigherOrderComponent(
-		( WrappedComponent ) => ( props ) => {
-			const [ userPalette, themePalette, defaultPalette ] = useSettings(
-				'color.palette.custom',
-				'color.palette.theme',
-				'color.palette.default'
-			);
-			const allColors = useMemo(
-				() => [
-					...( userPalette || [] ),
-					...( themePalette || [] ),
-					...( defaultPalette || [] ),
-				],
-				[ userPalette, themePalette, defaultPalette ]
-			);
-			return <WrappedComponent { ...props } colors={ allColors } />;
-		},
+		( WrappedComponent ) =>
+			function WithEditorColorPalette( props ) {
+				const [ userPalette, themePalette, defaultPalette ] =
+					useSettings(
+						'color.palette.custom',
+						'color.palette.theme',
+						'color.palette.default'
+					);
+				const allColors = useMemo(
+					() => [
+						...( userPalette || [] ),
+						...( themePalette || [] ),
+						...( defaultPalette || [] ),
+					],
+					[ userPalette, themePalette, defaultPalette ]
+				);
+				return <WrappedComponent { ...props } colors={ allColors } />;
+			},
 		'withEditorColorPalette'
 	);
 
@@ -94,7 +97,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
 	return compose( [
 		withColorPalette,
 		( WrappedComponent ) => {
-			return class extends Component {
+			return class WithColors extends Component {
 				constructor( props ) {
 					super( props );
 

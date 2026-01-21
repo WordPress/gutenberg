@@ -26,7 +26,7 @@ function getSubRegistry( subRegistries, registry, useSubRegistry ) {
 
 const withRegistryProvider = createHigherOrderComponent(
 	( WrappedComponent ) =>
-		( { useSubRegistry = true, ...props } ) => {
+		function WithRegistryProvider( { useSubRegistry = true, ...props } ) {
 			const registry = useRegistry();
 			const [ subRegistries ] = useState( () => new WeakMap() );
 			const subRegistry = getSubRegistry(
