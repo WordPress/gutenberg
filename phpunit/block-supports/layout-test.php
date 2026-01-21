@@ -706,7 +706,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-e322cd19',
+				'expected_class'   => 'wp-container-core-group-is-layout-a6248535',
 			),
 			'default type block gap 24px'      => array(
 				'block_attributes' => array(
@@ -719,7 +719,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						),
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-918747b6',
+				'expected_class'   => 'wp-container-core-group-is-layout-61b496ee',
 			),
 			'constrained type justified left'  => array(
 				'block_attributes' => array(
@@ -728,7 +728,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'justifyContent' => 'left',
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-8c890d92',
+				'expected_class'   => 'wp-container-core-group-is-layout-54d22900',
 			),
 			'constrained type justified right' => array(
 				'block_attributes' => array(
@@ -737,7 +737,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'justifyContent' => 'right',
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-07b51d56',
+				'expected_class'   => 'wp-container-core-group-is-layout-2910ada7',
 			),
 			'flex type horizontal'             => array(
 				'block_attributes' => array(
@@ -747,7 +747,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'flexWrap'    => 'nowrap',
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-67f0b8e2',
+				'expected_class'   => 'wp-container-core-group-is-layout-f5d79bea',
 			),
 			'flex type vertical'               => array(
 				'block_attributes' => array(
@@ -756,7 +756,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'orientation' => 'vertical',
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-8cf370e7',
+				'expected_class'   => 'wp-container-core-group-is-layout-2c90304e',
 			),
 			'grid type'                        => array(
 				'block_attributes' => array(
@@ -764,7 +764,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'type' => 'grid',
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-9649a0d9',
+				'expected_class'   => 'wp-container-core-group-is-layout-5a23bf8e',
 			),
 			'grid type 3 columns'              => array(
 				'block_attributes' => array(
@@ -773,7 +773,7 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 						'columnCount' => 3,
 					),
 				),
-				'expected_class'   => 'wp-container-core-group-is-layout-29f43435',
+				'expected_class'   => 'wp-container-core-group-is-layout-cda6dc4f',
 			),
 		);
 	}
