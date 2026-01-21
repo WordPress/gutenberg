@@ -141,6 +141,29 @@ export async function vipsHasTransparency(
 }
 
 /**
+ * Rotates an image based on EXIF orientation using vips in a worker.
+ *
+ * @param id          Item ID.
+ * @param buffer      Original file buffer.
+ * @param type        Mime type.
+ * @param orientation EXIF orientation value (1-8).
+ * @return Rotated file data plus the new dimensions.
+ */
+export async function vipsRotateImage(
+	id: ItemId,
+	buffer: ArrayBuffer,
+	type: string,
+	orientation: number
+): Promise< {
+	buffer: ArrayBuffer | ArrayBufferLike;
+	width: number;
+	height: number;
+} > {
+	const api = getWorkerAPI();
+	return api.rotateImage( id, buffer, type, orientation );
+}
+
+/**
  * Cancels all ongoing image operations for a given item ID.
  *
  * @param id Item ID.
