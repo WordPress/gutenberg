@@ -74,7 +74,7 @@ export interface ProviderCreatorResult {
 	on: ProviderOn;
 }
 
-export type SyncConnectionStatus = 'connected' | 'disconnected';
+export type SyncConnectionStatus = 'connected' | 'connecting' | 'disconnected';
 
 /**
  * Sync connection error object.
