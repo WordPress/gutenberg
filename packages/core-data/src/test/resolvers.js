@@ -173,6 +173,7 @@ describe( 'getEntityRecord', () => {
 				refetchRecord: expect.any( Function ),
 				saveRecord: expect.any( Function ),
 				getCurrentUser: expect.any( Function ),
+				subscribeToUserSelectionChanges: expect.any( Function ),
 			}
 		);
 	} );
@@ -227,6 +228,7 @@ describe( 'getEntityRecord', () => {
 				refetchRecord: expect.any( Function ),
 				saveRecord: expect.any( Function ),
 				getCurrentUser: expect.any( Function ),
+				subscribeToUserSelectionChanges: expect.any( Function ),
 			}
 		);
 	} );

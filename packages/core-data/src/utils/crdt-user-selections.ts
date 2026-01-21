@@ -13,7 +13,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { store as coreStore } from '../';
+import { STORE_NAME } from '../name';
 import { type WPBlockSelection } from '../types';
 
 /**
@@ -308,9 +308,15 @@ export async function updateSelectionInEntityRecord(
 	const options = {
 		undoIgnore: true,
 	};
-	const { editEntityRecord } = dispatch( coreStore );
 
-	editEntityRecord( kind, name, recordId, edits, options );
+	// @ts-ignore - Using STORE_NAME to avoid a circular dependency in the tests.
+	dispatch( STORE_NAME ).editEntityRecord(
+		kind,
+		name,
+		recordId,
+		edits,
+		options
+	);
 }
 
 /**
