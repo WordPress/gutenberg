@@ -42,7 +42,6 @@ import {
 	sectionRootClientIdKey,
 	mediaEditKey,
 	getMediaSelectKey,
-	essentialFormatKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
 } from './store/private-keys';
@@ -122,7 +121,6 @@ lock( privateApis, {
 	CommentIconToolbarSlotFill,
 	mediaEditKey,
 	getMediaSelectKey,
-	essentialFormatKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
 	useBlockElement,
