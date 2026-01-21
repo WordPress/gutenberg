@@ -46,13 +46,10 @@
 			"type": "boolean",
 			"default": true
 		},
-		"openSubmenusOnClick": {
-			"type": "boolean",
-			"default": false
-		},
 		"submenuVisibility": {
 			"type": "string",
-			"enum": [ "hover", "click", "always" ]
+			"enum": [ "hover", "click", "always" ],
+			"default": "hover"
 		},
 		"overlayMenu": {
 			"type": "string",
