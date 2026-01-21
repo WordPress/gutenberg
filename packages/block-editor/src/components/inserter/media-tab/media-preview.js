@@ -127,7 +127,6 @@ export function MediaPreview( { media, onClick, category } ) {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isInserting, setIsInserting ] = useState( false );
 	const { getSettings, getBlock } = useSelect( blockEditorStore );
-	const { imageDefaultSize } = getSettings();
 	const [ block, preview ] = useMemo(
 		() => getBlockAndPreviewFromMedia( media, category.mediaType ),
 		[ media, category.mediaType ]
@@ -189,11 +188,13 @@ export function MediaPreview( { media, onClick, category } ) {
 									img.media_type === 'image'
 								) {
 									const sizeSlug =
-										img.sizes?.[ imageDefaultSize ] ||
+										img.sizes?.[
+											settings.imageDefaultSize
+										] ||
 										img.media_details?.sizes?.[
-											imageDefaultSize
+											settings.imageDefaultSize
 										]
-											? imageDefaultSize
+											? settings.imageDefaultSize
 											: 'full';
 									onClick( {
 										...clonedBlock,
@@ -252,7 +253,6 @@ export function MediaPreview( { media, onClick, category } ) {
 			updateBlockAttributes,
 			createErrorNotice,
 			getBlock,
-			imageDefaultSize,
 		]
 	);
 

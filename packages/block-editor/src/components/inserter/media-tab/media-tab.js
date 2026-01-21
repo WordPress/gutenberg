@@ -1,12 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { Icon, chevronRight, chevronLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -35,7 +34,6 @@ function MediaTab( {
 	const isMobile = useViewportMatch( 'medium', '<' );
 	const baseCssClass = 'block-editor-inserter__media-tabs';
 	const { getSettings } = useSelect( blockEditorStore );
-	const { imageDefaultSize } = getSettings();
 	const onSelectMedia = useCallback(
 		( media ) => {
 			if ( ! media?.url ) {
@@ -47,6 +45,8 @@ function MediaTab( {
 				window.__experimentalDataViewsMediaModal && media.mime_type
 					? media.mime_type.split( '/' )[ 0 ]
 					: media.type;
+
+			const { imageDefaultSize } = getSettings();
 			const [ block ] = getBlockAndPreviewFromMedia(
 				media,
 				mediaType,
@@ -54,7 +54,7 @@ function MediaTab( {
 			);
 			onInsert( block );
 		},
-		[ onInsert, imageDefaultSize ]
+		[ onInsert, getSettings ]
 	);
 	const categories = useMemo(
 		() =>
