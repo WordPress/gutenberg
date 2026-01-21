@@ -109,7 +109,7 @@ function RevisionsHeader() {
 					>
 						{ __( 'Restore' ) }
 					</Button>
-					<MoreMenu />
+					<MoreMenu disabled />
 				</>
 			}
 		/>
