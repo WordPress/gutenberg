@@ -26,6 +26,33 @@ import { edit, backup, check, pencil, seen, external } from '@wordpress/icons';
 import { useGuidelines } from '../hooks';
 
 /**
+ * Get the Site Editor URL for guidelines.
+ *
+ * @param {Object} params         Query parameters.
+ * @param {string} params.section Section to navigate to (library, blocks, playground, import-export).
+ * @param {string} params.history Whether to show history panel ('1' or undefined).
+ * @param {number} params.post    Post ID for playground testing.
+ * @return {string} The Site Editor URL.
+ */
+function getSiteEditorGuidelinesUrl( params = {} ) {
+	const baseUrl = 'site-editor.php?path=/guidelines';
+	const queryParams = new URLSearchParams();
+
+	if ( params.section ) {
+		queryParams.set( 'section', params.section );
+	}
+	if ( params.history ) {
+		queryParams.set( 'history', params.history );
+	}
+	if ( params.post ) {
+		queryParams.set( 'post', params.post );
+	}
+
+	const queryString = queryParams.toString();
+	return queryString ? `${ baseUrl }&${ queryString }` : baseUrl;
+}
+
+/**
  * Hook to register static Content Guidelines commands.
  *
  * These commands are always available in the Command Palette
@@ -38,7 +65,7 @@ export function useContentGuidelinesCommands() {
 		label: __( 'Open Content Guidelines' ),
 		icon: edit,
 		callback: ( { close } ) => {
-			window.location.assign( 'themes.php?page=guidelines' );
+			window.location.assign( getSiteEditorGuidelinesUrl() );
 			close();
 		},
 		context: 'site-editor',
@@ -49,7 +76,12 @@ export function useContentGuidelinesCommands() {
 		label: __( 'View Guidelines History' ),
 		icon: backup,
 		callback: ( { close } ) => {
-			window.location.assign( 'themes.php?page=guidelines&history=1' );
+			window.location.assign(
+				getSiteEditorGuidelinesUrl( {
+					section: 'library',
+					history: '1',
+				} )
+			);
 			close();
 		},
 	} );
@@ -60,7 +92,7 @@ export function useContentGuidelinesCommands() {
 		icon: seen,
 		callback: ( { close } ) => {
 			window.location.assign(
-				'themes.php?page=guidelines&tab=playground'
+				getSiteEditorGuidelinesUrl( { section: 'playground' } )
 			);
 			close();
 		},
@@ -196,7 +228,9 @@ const getPostContextCommands = () =>
 								actions: [
 									{
 										label: __( 'View' ),
-										url: 'themes.php?page=guidelines&tab=playground',
+										url: getSiteEditorGuidelinesUrl( {
+											section: 'playground',
+										} ),
 									},
 								],
 							} );
@@ -219,7 +253,10 @@ const getPostContextCommands = () =>
 				icon: external,
 				callback: ( { close } ) => {
 					window.location.assign(
-						`themes.php?page=guidelines&tab=playground&post=${ currentPostId }`
+						getSiteEditorGuidelinesUrl( {
+							section: 'playground',
+							post: currentPostId,
+						} )
 					);
 					close();
 				},

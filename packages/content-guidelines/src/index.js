@@ -14,15 +14,7 @@ import './store';
 import './style.scss';
 
 /**
- * Export the main GuidelinesPage component.
- *
- * This is the primary UI component for the Content Guidelines panel.
- * It can be used standalone or embedded in the Site Editor.
- */
-export { default as GuidelinesPage } from './components/guidelines-page';
-
-/**
- * Export individual panel components for granular use.
+ * Export panel components for use in the Site Editor.
  */
 export { default as LibraryPanel } from './components/library-panel';
 export { default as BlocksPanel } from './components/blocks-panel';
