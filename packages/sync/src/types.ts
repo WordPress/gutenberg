@@ -69,7 +69,7 @@ export interface ProviderCreatorResult {
 /**
  * Connection status of a sync provider: either connected or disconnected.
  */
-export type SyncConnectionStatus = 'connected' | 'disconnected';
+export type SyncConnectionStatus = 'connected' | 'connecting' | 'disconnected';
 
 /**
  * Error information reported by a sync provider when a disconnection occurs.
