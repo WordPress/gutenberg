@@ -7,7 +7,7 @@ const { readdir, readFile, stat } = require( 'fs' ).promises;
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
 
 /*
- * For now, now much is needed to pass validation:
+ * For now, not much is needed to pass validation:
  *
  * - Expect a manifest of icons called `index.json`
  * - Expect it to include the filename of every SVG icon in the library
