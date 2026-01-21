@@ -3,11 +3,12 @@
  */
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
-import { Spinner } from '@wordpress/components';
+import { Spinner, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BlockPreview } from '@wordpress/block-editor';
+import { chevronDown, chevronUp } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -23,6 +24,8 @@ import { createTemplatePartId } from '../../template-part/edit/utils/create-temp
  * @return {JSX.Element|null} The overlay preview component or null if no overlay is selected.
  */
 export default function OverlayPreview( { overlay, currentTheme } ) {
+	const [ isExpanded, setIsExpanded ] = useState( false );
+
 	const templatePartId = useMemo( () => {
 		if ( ! overlay || ! currentTheme ) {
 			return null;
@@ -112,22 +115,43 @@ export default function OverlayPreview( { overlay, currentTheme } ) {
 	}
 
 	return (
-		<div
-			className="wp-block-navigation__overlay-preview"
-			aria-label={ __( 'Navigation Overlay template part preview' ) }
-			role="region"
-		>
-			<BlockPreview.Async
-				placeholder={
-					<div className="wp-block-navigation__overlay-preview-placeholder" />
+		<div>
+			<div
+				className={ `wp-block-navigation__overlay-preview${
+					isExpanded
+						? ' wp-block-navigation__overlay-preview--expanded'
+						: ''
+				}` }
+				aria-label={ __( 'Navigation Overlay template part preview' ) }
+				role="region"
+			>
+				<BlockPreview.Async
+					placeholder={
+						<div className="wp-block-navigation__overlay-preview-placeholder" />
+					}
+				>
+					<BlockPreview
+						blocks={ blocks }
+						viewportWidth={ 400 }
+						minHeight={ 200 }
+					/>
+				</BlockPreview.Async>
+			</div>
+			<Button
+				__next40pxDefaultSize
+				variant="tertiary"
+				onClick={ () => setIsExpanded( ! isExpanded ) }
+				icon={ isExpanded ? chevronUp : chevronDown }
+				iconPosition="right"
+				className="wp-block-navigation__overlay-preview-toggle"
+				aria-label={
+					isExpanded
+						? __( 'Collapse navigation overlay preview' )
+						: __( 'Expand navigation overlay preview' )
 				}
 			>
-				<BlockPreview
-					blocks={ blocks }
-					viewportWidth={ 400 }
-					minHeight={ 200 }
-				/>
-			</BlockPreview.Async>
+				{ isExpanded ? __( 'Collapse' ) : __( 'Expand' ) }
+			</Button>
 		</div>
 	);
 }
