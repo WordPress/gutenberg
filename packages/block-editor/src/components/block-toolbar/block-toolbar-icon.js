@@ -27,6 +27,7 @@ function getBlockIconVariant( { select, clientIds } ) {
 		canRemoveBlocks,
 		getTemplateLock,
 		getBlockEditingMode,
+		canEditBlock,
 	} = unlock( select( blockEditorStore ) );
 	const { getBlockStyles } = select( blocksStore );
 
@@ -53,7 +54,7 @@ function getBlockIconVariant( { select, clientIds } ) {
 			0
 	);
 	const canRemove = canRemoveBlocks( clientIds );
-
+	const canEdit = clientIds.every( ( clientId ) => canEditBlock( clientId ) );
 	const isDefaultEditingMode =
 		getBlockEditingMode( clientIds[ 0 ] ) === 'default';
 	const _hideTransformsForSections =
@@ -63,7 +64,8 @@ function getBlockIconVariant( { select, clientIds } ) {
 		! _hideTransformsForSections &&
 		isDefaultEditingMode &&
 		( hasBlockStyles || canRemove ) &&
-		! hasTemplateLock;
+		! hasTemplateLock &&
+		canEdit;
 
 	const _showPatternOverrides = hasPatternOverrides && hasParentPattern;
 
