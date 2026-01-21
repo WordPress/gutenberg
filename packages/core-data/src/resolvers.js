@@ -1088,7 +1088,7 @@ export const getRevisions =
 
 				// When requesting all fields, the list of results can be used to
 				// resolve the `getRevision` selector in addition to `getRevisions`.
-				if ( ! query?._fields ) {
+				if ( ! query?._fields && ! query.context ) {
 					const key = entityConfig.key || DEFAULT_ENTITY_KEY;
 					const resolutionsArgs = records
 						.filter( ( record ) => record[ key ] )
@@ -1097,7 +1097,6 @@ export const getRevisions =
 							name,
 							recordKey,
 							record[ key ],
-							query,
 						] );
 
 					dispatch.finishResolutions(
@@ -1130,25 +1129,13 @@ getRevisions.shouldInvalidate = ( action, kind, name, recordKey ) =>
  */
 export const getRevision =
 	( kind, name, recordKey, revisionKey, query ) =>
-	async ( { dispatch, resolveSelect, select } ) => {
+	async ( { dispatch, resolveSelect } ) => {
 		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.name === name && config.kind === kind
 		);
 
 		if ( ! entityConfig ) {
-			return;
-		}
-
-		// Check if revision already exists in cache before making API call.
-		const existingRevision = select.getRevision(
-			kind,
-			name,
-			recordKey,
-			revisionKey,
-			query
-		);
-		if ( existingRevision ) {
 			return;
 		}
 

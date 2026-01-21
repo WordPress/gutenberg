@@ -335,14 +335,22 @@ export const getCurrentRevision = createRegistrySelector(
 		}
 
 		const { type: postType, id: postId } = getCurrentPost( state );
-		return (
-			select( coreStore ).getRevision(
-				'postType',
-				postType,
-				postId,
-				revisionId,
-				{ context: 'edit' }
-			) ?? null
+		// - Use getRevisions (plural) instead of getRevision (singular) to
+		//   avoid a race condition where both API calls complete around the
+		//   same time and the single revision fetch overwrites the list in the
+		//   store.
+		// - getRevision also needs to be updated to check if there's any
+		//   received revisions from the collection API call to avoid unnecessary
+		//   API calls.
+		const revisions = select( coreStore ).getRevisions(
+			'postType',
+			postType,
+			postId,
+			{ per_page: -1, context: 'edit' }
 		);
+		if ( ! revisions ) {
+			return null;
+		}
+		return revisions.find( ( r ) => r.id === revisionId ) ?? null;
 	}
 );
