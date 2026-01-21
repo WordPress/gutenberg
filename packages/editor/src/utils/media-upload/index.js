@@ -78,9 +78,18 @@ export default function mediaUpload( {
 		allowedTypes,
 		filesList,
 		onFileChange: ( file ) => {
-			if ( ! imageIsUploading ) {
-				setSaveLock();
-			} else {
+			// Check if any files are still uploading by looking for blob URLs without IDs.
+			// This pattern is consistent with how the gallery block detects uploads in progress.
+			const isUploadInProgress = file.some(
+				( item ) => ! item.id && item.url?.indexOf( 'blob:' ) === 0
+			);
+
+			// Set the save lock when upload starts, clear it when all files are processed.
+			if ( isUploadInProgress ) {
+				if ( ! imageIsUploading ) {
+					setSaveLock();
+				}
+			} else if ( imageIsUploading ) {
 				clearSaveLock();
 			}
 			onFileChange?.( file );
