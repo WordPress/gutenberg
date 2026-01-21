@@ -155,7 +155,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$classes[] = 'open-on-hover-click';
 	}
 	if ( 'always' === $effective_visibility ) {
-		$classes[] = 'open-on-always';
+		$classes[] = 'open-always';
 	}
 	if ( $is_active ) {
 		$classes[] = 'current-menu-item';

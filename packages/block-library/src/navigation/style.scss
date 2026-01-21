@@ -256,8 +256,8 @@ $navigation-icon-size: 24px;
 		min-width: 200px;
 	}
 
-	// Always show submenus when open-on-always class is present
-	&.open-on-always {
+	// Always show submenus when open-always class is present
+	&.open-always {
 		flex-wrap: var(--navigation-layout-wrap, wrap);
 		flex-direction: var(--navigation-layout-direction, initial);
 		justify-content: var(--navigation-layout-justify, initial);

@@ -256,7 +256,7 @@ export default function NavigationSubmenuEdit( {
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
 			'open-on-click': openSubmenusOnClick,
-			'open-on-always': submenuVisibility === 'always',
+			'open-always': submenuVisibility === 'always',
 		} ),
 		style: {
 			color: ! textColor && customTextColor,
