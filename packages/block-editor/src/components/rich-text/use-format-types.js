@@ -5,11 +5,6 @@ import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as richTextStore } from '@wordpress/rich-text';
 
-/**
- * Internal dependencies
- */
-import { essentialFormatKey } from '../../store/private-keys';
-
 function formatTypesSelector( select ) {
 	return select( richTextStore ).getFormatTypes();
 }
@@ -61,53 +56,35 @@ function getPrefixedSelectKeys( selected, prefix ) {
  * This hook provides RichText with the `formatTypes` and its derived props from
  * experimental format type settings.
  *
- * @param {Object}  options                                Options
- * @param {string}  options.clientId                       Block client ID.
- * @param {string}  options.identifier                     Block attribute.
- * @param {Array}   options.allowedFormats                 Allowed formats
- * @param {boolean} options.withoutInteractiveFormatting   Whether to clean the interactive formatting or not.
- * @param {boolean} options.disableNoneEssentialFormatting Whether to disable none-essential formatting or not.
+ * @param {Object}  $0                              Options
+ * @param {string}  $0.clientId                     Block client ID.
+ * @param {string}  $0.identifier                   Block attribute.
+ * @param {boolean} $0.withoutInteractiveFormatting Whether to clean the interactive formatting or not.
+ * @param {Array}   $0.allowedFormats               Allowed formats
  */
 export function useFormatTypes( {
 	clientId,
 	identifier,
-	allowedFormats,
 	withoutInteractiveFormatting,
-	disableNoneEssentialFormatting = false,
+	allowedFormats,
 } ) {
 	const allFormatTypes = useSelect( formatTypesSelector, [] );
 	const formatTypes = useMemo( () => {
-		return allFormatTypes.filter(
-			( {
-				name,
-				interactive,
-				tagName,
-				[ essentialFormatKey ]: isEssential,
-			} ) => {
-				if ( allowedFormats && ! allowedFormats.includes( name ) ) {
-					return false;
-				}
-
-				if ( disableNoneEssentialFormatting && ! isEssential ) {
-					return false;
-				}
-
-				if (
-					withoutInteractiveFormatting &&
-					( interactive || interactiveContentTags.has( tagName ) )
-				) {
-					return false;
-				}
-
-				return true;
+		return allFormatTypes.filter( ( { name, interactive, tagName } ) => {
+			if ( allowedFormats && ! allowedFormats.includes( name ) ) {
+				return false;
 			}
-		);
-	}, [
-		allFormatTypes,
-		allowedFormats,
-		disableNoneEssentialFormatting,
-		withoutInteractiveFormatting,
-	] );
+
+			if (
+				withoutInteractiveFormatting &&
+				( interactive || interactiveContentTags.has( tagName ) )
+			) {
+				return false;
+			}
+
+			return true;
+		} );
+	}, [ allFormatTypes, allowedFormats, withoutInteractiveFormatting ] );
 	const keyedSelected = useSelect(
 		( select ) =>
 			formatTypes.reduce( ( accumulator, type ) => {
