@@ -1,0 +1,47 @@
+{
+	"name": "@wordpress/ultrahdr-wasm",
+	"version": "1.0.0-prerelease",
+	"private": true,
+	"description": "UltraHDR (ISO 21496-1) gain map WASM implementation for WordPress Gutenberg.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"media",
+		"ultrahdr",
+		"hdr",
+		"gain-map",
+		"wasm"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/ultrahdr-wasm/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/ultrahdr-wasm"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
+	},
+	"files": [
+		"pkg",
+		"*.md"
+	],
+	"main": "pkg/wordpress_ultrahdr.js",
+	"module": "pkg/wordpress_ultrahdr.js",
+	"exports": {
+		".": {
+			"types": "./pkg/wordpress_ultrahdr.d.ts",
+			"import": "./pkg/wordpress_ultrahdr.js",
+			"default": "./pkg/wordpress_ultrahdr.js"
+		},
+		"./pkg/*": "./pkg/*",
+		"./package.json": "./package.json"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

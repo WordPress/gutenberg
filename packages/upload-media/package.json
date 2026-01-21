@@ -56,6 +56,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
+		"@wordpress/ultrahdr": "file:../ultrahdr",
 		"@wordpress/url": "file:../url",
 		"@wordpress/vips": "file:../vips",
 		"uuid": "^9.0.1"

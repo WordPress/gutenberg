@@ -238,6 +238,10 @@ export enum OperationType {
 	TranscodeImage = 'TRANSCODE_IMAGE',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
 	Finalize = 'FINALIZE',
+	// UltraHDR operations
+	DetectUltraHdr = 'DETECT_ULTRAHDR',
+	ExtractSdr = 'EXTRACT_SDR',
+	CreateUltraHdr = 'CREATE_ULTRAHDR',
 }
 
 /**

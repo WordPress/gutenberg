@@ -1,0 +1,39 @@
+[package]
+name = "wordpress-ultrahdr"
+version = "0.1.0"
+edition = "2021"
+license = "GPL-2.0-or-later"
+authors = ["The WordPress Contributors"]
+description = "UltraHDR (ISO 21496-1) gain map implementation for WordPress Gutenberg"
+repository = "https://github.com/WordPress/gutenberg"
+readme = "README.md"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# WASM bindings (MIT/Apache-2.0)
+wasm-bindgen = "0.2"
+js-sys = "0.3"
+web-sys = { version = "0.3", features = ["console"] }
+
+# Image processing (MIT/Apache-2.0)
+image = { version = "0.25", default-features = false, features = ["jpeg"] }
+zune-jpeg = { version = "0.4", default-features = false, features = ["std"] }
+
+# XMP/XML parsing (MIT)
+quick-xml = "0.31"
+
+# Serialization (MIT/Apache-2.0)
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Error handling (MIT/Apache-2.0)
+thiserror = "1.0"
+
+[dev-dependencies]
+wasm-bindgen-test = "0.3"
+
+[profile.release]
+opt-level = "s"
+lto = true

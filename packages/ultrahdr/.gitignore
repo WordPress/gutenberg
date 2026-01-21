@@ -1,0 +1,4 @@
+# Build artifacts
+/build/
+/build-module/
+/build-types/
