@@ -34,6 +34,7 @@ import SiteDiscussion from '../site-discussion';
 import { store as editorStore } from '../../store';
 import { PrivatePostLastRevision } from '../post-last-revision';
 import PostTrash from '../post-trash';
+import RevisionAuthorPanel from '../revision-author-panel';
 import { unlock } from '../../lock-unlock';
 
 /**
@@ -86,13 +87,18 @@ export default function PostSummary( { onActionPerformed } ) {
 								<PostLastEditedPanel />
 							</VStack>
 							{ isRevisionsMode && revisionId && (
-								<ExternalLink
-									href={ addQueryArgs( 'revision.php', {
-										revision: revisionId,
-									} ) }
-								>
-									{ __( 'Open classic revisions screen' ) }
-								</ExternalLink>
+								<>
+									<ExternalLink
+										href={ addQueryArgs( 'revision.php', {
+											revision: revisionId,
+										} ) }
+									>
+										{ __(
+											'Open classic revisions screen'
+										) }
+									</ExternalLink>
+									<RevisionAuthorPanel />
+								</>
 							) }
 							{ shouldShowPostStatusPanel && (
 								<VStack spacing={ 4 }>
