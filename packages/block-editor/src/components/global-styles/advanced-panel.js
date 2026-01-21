@@ -70,8 +70,6 @@ export default function AdvancedPanel( {
 				</Notice>
 			) }
 			<TextareaControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
 				label={ __( 'Additional CSS' ) }
 				value={ customCSS }
 				onChange={ ( newValue ) => handleOnChange( newValue ) }

@@ -119,7 +119,6 @@ function gutenberg_get_block_editor_settings( $settings ) {
 		$settings['spacingSizes'] = $spacing_sizes_by_origin['custom'] ?? $spacing_sizes_by_origin['theme'] ?? $spacing_sizes_by_origin['default'];
 	}
 
-	// Check if user has capability to edit custom CSS.
 	$settings['canEditCSS'] = current_user_can( 'edit_css' );
 
 	return $settings;

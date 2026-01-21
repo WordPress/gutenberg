@@ -42,7 +42,7 @@ function CustomCSSControl( { blockName, setAttributes, style } ) {
 	const cssHelpText = sprintf(
 		// translators: %s: is the name of a block e.g., 'Image' or 'Quote'.
 		__(
-			'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value.'
+			'Add your own CSS to customize the appearance of the %s block. You do not need to include a CSS selector, just add the property and value, e.g. color: red;.'
 		),
 		blockType?.title
 	);
