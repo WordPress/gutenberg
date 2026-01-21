@@ -17,7 +17,7 @@ import fieldsLtr from '../package-styles/fields-ltr.lazy.scss?inline';
 import fieldsRtl from '../package-styles/fields-rtl.lazy.scss?inline';
 import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss?inline';
 import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss?inline';
-import ui from '../package-styles/ui.lazy.scss?inline';
+import designTokens from '../package-styles/design-tokens.lazy.scss?inline';
 
 /**
  * Stylesheets to lazy load when the story's context.componentId matches the
@@ -70,8 +70,8 @@ const CONFIG = [
 	},
 	{
 		componentIdMatcher: /^design-system-/,
-		ltr: [ ui ],
-		rtl: [ ui ],
+		ltr: [ designTokens ],
+		rtl: [ designTokens ],
 	},
 ];
 
