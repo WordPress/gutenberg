@@ -95,6 +95,12 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		$classnames .= ' ' . sanitize_title( 'columns-' . $attributes['layout']['columnCount'] );
 	}
 
+	// Check if this is inside a slider query variation (detected by className on post-template).
+	$is_slider = isset( $attributes['className'] ) && strpos( $attributes['className'], 'is-slider-track' ) !== false;
+	if ( $is_slider ) {
+		$classnames .= ' is-slider-track';
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => trim( $classnames ) ) );
 
 	$content = '';
@@ -124,11 +130,16 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 		remove_filter( 'render_block_context', $filter_block_context, 1 );
 
 		// Wrap the render inner blocks in a `li` element with the appropriate post classes.
+		// For slider mode, use div with slide class instead.
 		$post_classes = implode( ' ', get_post_class( 'wp-block-post' ) );
 
 		$inner_block_directives = $enhanced_pagination ? ' data-wp-key="post-template-item-' . $post_id . '"' : '';
 
-		$content .= '<li' . $inner_block_directives . ' class="' . esc_attr( $post_classes ) . '">' . $block_content . '</li>';
+		if ( $is_slider ) {
+			$content .= '<div class="wp-block-slide ' . esc_attr( $post_classes ) . '">' . $block_content . '</div>';
+		} else {
+			$content .= '<li' . $inner_block_directives . ' class="' . esc_attr( $post_classes ) . '">' . $block_content . '</li>';
+		}
 	}
 
 	/*
@@ -137,6 +148,18 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 	 * Since we use two custom loops, it's safest to always restore.
 	*/
 	wp_reset_postdata();
+
+	// For slider mode, add track directives and use div instead of ul/li.
+	if ( $is_slider ) {
+		$slider_directives = ' data-wp-on--scroll="actions.handleScroll" data-wp-init="callbacks.initTrack" data-wp-watch="callbacks.updateTrack"';
+
+		return sprintf(
+			'<div %1$s%2$s>%3$s</div>',
+			$wrapper_attributes,
+			$slider_directives,
+			$content
+		);
+	}
 
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',

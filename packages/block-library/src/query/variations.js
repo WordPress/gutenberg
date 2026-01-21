@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { gallery as sliderIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -28,6 +29,39 @@ const postDate = [
 ];
 
 const variations = [
+	{
+		name: 'slider',
+		title: __( 'Slider' ),
+		icon: sliderIcon,
+		attributes: {
+			className: 'is-style-slider',
+			query: {
+				perPage: 10,
+				pages: 1,
+				offset: 0,
+				postType: 'post',
+				order: 'desc',
+				orderBy: 'date',
+				author: '',
+				search: '',
+				sticky: 'exclude',
+				inherit: false,
+			},
+		},
+		innerBlocks: [
+			[ 'core/slider-controls' ],
+			[
+				'core/post-template',
+				{
+					className: 'is-slider-track',
+				},
+				[ [ 'core/post-featured-image' ], [ 'core/post-title' ] ],
+			],
+		],
+		scope: [ 'block', 'inserter' ],
+		isActive: ( blockAttributes ) =>
+			blockAttributes.className?.includes( 'is-style-slider' ),
+	},
 	{
 		name: 'title-date',
 		title: __( 'Title & Date' ),
