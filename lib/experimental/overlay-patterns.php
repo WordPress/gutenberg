@@ -83,6 +83,25 @@ function gutenberg_register_overlay_block_patterns() {
 			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
 		)
 	);
+
+	register_block_pattern(
+		'gutenberg/navigation-overlay-white-bg',
+		array(
+			'title'       => __( 'Overlay with transparent background', 'gutenberg' ),
+			'description' => _x( 'A navigation overlay transparent background covering half the screen', 'Block pattern description', 'gutenberg' ),
+			'content'     => '<!-- wp:group {"metadata":{"name":"Navigation Overlay"},"style":{"spacing":{"padding":{"right":"0","left":"0","top":"0","bottom":"0"}},"dimensions":{"minHeight":"100vh"},"color":{"background":"#ffffff61"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group has-background" style="background-color:#ffffff61;min-height:100vh;padding-top:0;padding-right:0;padding-bottom:0;padding-left:0"><!-- wp:group {"align":"full","style":{"color":{"background":"#eeeeeef2"}},"layout":{"type":"default"}} -->
+<div class="wp-block-group alignfull has-background" style="background-color:#eeeeeef2"><!-- wp:group {"align":"wide","style":{"spacing":{"margin":{"bottom":"4rem"}}},"layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"right"}} -->
+<div class="wp-block-group alignwide" style="margin-bottom:4rem"><!-- wp:navigation-overlay-close /--></div>
+<!-- /wp:group -->
+
+<!-- wp:navigation {"style":{"typography":{"lineHeight":"1.2"}},"fontSize":"large","layout":{"type":"flex","orientation":"vertical","justifyContent":"left"}} /--></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->',
+			'categories'  => array( 'navigation' ),
+			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
+		)
+	);
 }
 
 add_action( 'init', 'gutenberg_register_overlay_block_patterns', 20 );
