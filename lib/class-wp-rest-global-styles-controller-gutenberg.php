@@ -319,56 +319,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 			}
 		}
 
-		/*
-		 * @todo Remove this when supported WordPress version is >= 7.0
-		 */
-		$filter_priority = has_filter( 'content_save_pre', 'wp_filter_global_styles_post' );
-		assert( false !== $filter_priority, 'Expected to find wp_filter_global_styles_post filter.' );
-		if ( false !== $filter_priority ) {
-			remove_filter( 'content_save_pre', 'wp_filter_global_styles_post', $filter_priority );
-			add_filter(
-				'content_save_pre',
-				/**
-				 * Sanitizes global styles user content removing unsafe rules.
-				 *
-				 * This function was updated in WordPress 7.0
-				 *
-				 * The version here replaces it with the corrected 7.0 version.
-				 * This function is taken from r61503.
-				 *
-				 * @see https://core.trac.wordpress.org/browser/trunk/src/wp-includes/kses.php?rev=61503
-				 *
-				 * @param string $data Post content to filter.
-				 * @return string Filtered post content with unsafe rules removed.
-				 */
-				function ( $data ) {
-					$decoded_data        = json_decode( wp_unslash( $data ), true );
-					$json_decoding_error = json_last_error();
-					if (
-						JSON_ERROR_NONE === $json_decoding_error &&
-						is_array( $decoded_data ) &&
-						isset( $decoded_data['isGlobalStylesUserThemeJSON'] ) &&
-						$decoded_data['isGlobalStylesUserThemeJSON']
-					) {
-						unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
-
-						$data_to_encode = WP_Theme_JSON::remove_insecure_properties( $decoded_data, 'custom' );
-
-						$data_to_encode['isGlobalStylesUserThemeJSON'] = true;
-						/**
-						 * JSON encode the data stored in post content.
-						 * Escape characters that are likely to be mangled by HTML filters: "<>&".
-						 *
-						 * This matches the escaping in {@see WP_REST_Global_Styles_Controller::prepare_item_for_database()}.
-						 */
-						return wp_slash( wp_json_encode( $data_to_encode, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP ) );
-					}
-					return $data;
-				},
-				$filter_priority
-			);
-		}
-
 		return $changes;
 	}
 
