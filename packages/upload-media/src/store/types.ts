@@ -172,6 +172,10 @@ export enum ItemStatus {
 export enum OperationType {
 	Prepare = 'PREPARE',
 	Upload = 'UPLOAD',
+	// UltraHDR operations
+	DetectUltraHdr = 'DETECT_ULTRAHDR',
+	ExtractSdr = 'EXTRACT_SDR',
+	CreateUltraHdr = 'CREATE_ULTRAHDR',
 }
 
 export interface OperationArgs {}

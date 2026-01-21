@@ -1,0 +1,6 @@
+# Build artifacts
+/target/
+/pkg/
+
+# Cargo lock is typically committed for applications but not libraries
+# However, for reproducible builds in monorepo, we commit it

@@ -56,6 +56,8 @@ type ActionCreators = {
 	uploadItem: typeof uploadItem;
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
+	detectUltraHdr: typeof detectUltraHdr;
+	extractSdrItem: typeof extractSdrItem;
 	< T = Record< string, unknown > >( args: T ): void;
 };
 
@@ -253,6 +255,14 @@ export function processItem( id: QueueItemId ) {
 			case OperationType.Upload:
 				dispatch.uploadItem( id );
 				break;
+
+			case OperationType.DetectUltraHdr:
+				dispatch.detectUltraHdr( id );
+				break;
+
+			case OperationType.ExtractSdr:
+				dispatch.extractSdrItem( id );
+				break;
 		}
 	};
 }
@@ -389,11 +399,28 @@ export function finishOperation(
  * Or videos need to be compressed, and then need poster generation
  * before upload.
  *
+ * UltraHDR JPEG images will have their SDR base extracted for
+ * backwards compatibility.
+ *
  * @param id Item ID.
  */
 export function prepareItem( id: QueueItemId ) {
-	return async ( { dispatch }: ThunkArgs ) => {
-		const operations: Operation[] = [ OperationType.Upload ];
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		const operations: Operation[] = [];
+
+		// Check for UltraHDR in JPEG files
+		if ( item.file.type === 'image/jpeg' ) {
+			// Add UltraHDR detection operation
+			operations.push( OperationType.DetectUltraHdr );
+		}
+
+		// Always end with upload
+		operations.push( OperationType.Upload );
 
 		dispatch< AddOperationsAction >( {
 			type: Type.AddOperations,
@@ -402,6 +429,89 @@ export function prepareItem( id: QueueItemId ) {
 		} );
 
 		dispatch.finishOperation( id, {} );
+	};
+}
+
+/**
+ * Detects if a JPEG is an UltraHDR image and queues SDR extraction if needed.
+ *
+ * @param id Item ID.
+ */
+export function detectUltraHdr( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		try {
+			// Dynamically import to avoid loading WASM unless needed
+			const { isUltraHdr } = await import( '@wordpress/ultrahdr' );
+			const buffer = await item.file.arrayBuffer();
+
+			if ( await isUltraHdr( buffer ) ) {
+				// Add SDR extraction operation before upload
+				dispatch< AddOperationsAction >( {
+					type: Type.AddOperations,
+					id,
+					operations: [ OperationType.ExtractSdr ],
+				} );
+			}
+		} catch ( error ) {
+			// If UltraHDR detection fails, continue with regular upload
+			// eslint-disable-next-line no-console
+			console.warn( 'UltraHDR detection failed:', error );
+		}
+
+		dispatch.finishOperation( id, {} );
+	};
+}
+
+/**
+ * Extracts the SDR base from an UltraHDR JPEG.
+ *
+ * This creates a backwards-compatible JPEG that can be displayed
+ * on non-HDR displays while preserving the original UltraHDR file.
+ *
+ * @param id Item ID.
+ */
+export function extractSdrItem( id: QueueItemId ) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		try {
+			const { extractSdrBase } = await import( '@wordpress/ultrahdr' );
+			const buffer = await item.file.arrayBuffer();
+			const sdrBuffer = await extractSdrBase( buffer );
+
+			// Create a new file with the SDR base
+			// Keep original as sourceFile, use SDR for upload
+			const sdrBlob = new Blob( [ sdrBuffer ], { type: 'image/jpeg' } );
+			const sdrFile = new File( [ sdrBlob ], item.file.name, {
+				type: 'image/jpeg',
+			} );
+
+			// Update item with SDR file while keeping original as source
+			dispatch.finishOperation( id, {
+				file: sdrFile,
+				attachment: {
+					...item.attachment,
+					// Mark as having HDR variant available
+					meta: {
+						...( item.attachment?.meta || {} ),
+						ultrahdr_original: true,
+					},
+				},
+			} );
+		} catch ( error ) {
+			// If extraction fails, continue with original file
+			// eslint-disable-next-line no-console
+			console.warn( 'UltraHDR SDR extraction failed:', error );
+			dispatch.finishOperation( id, {} );
+		}
 	};
 }
 

@@ -71,6 +71,7 @@
 		{ "path": "packages/ui" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/undo-manager" },
+		{ "path": "packages/ultrahdr" },
 		{ "path": "packages/upload-media" },
 		{ "path": "packages/url" },
 		{ "path": "packages/views" },
