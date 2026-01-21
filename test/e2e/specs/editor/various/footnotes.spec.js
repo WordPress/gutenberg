@@ -371,7 +371,7 @@ test.describe( 'Footnotes', () => {
 			.locator( '.editor-private-post-last-revision__button' )
 			.click();
 		await page.locator( '.components-range-control__slider' ).focus();
-		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowLeft' );
 		await page.getByRole( 'button', { name: 'Restore' } ).click();
 
 		expect( await getFootnotes( page, true ) ).toMatchObject( [

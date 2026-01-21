@@ -52,20 +52,18 @@ function RevisionsSlider() {
 
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
 
-	// Sort revisions by date (newest first).
 	const sortedRevisions = useMemo( () => {
 		return (
 			revisions
 				?.slice()
-				.sort( ( a, b ) => new Date( b.date ) - new Date( a.date ) ) ??
+				.sort( ( a, b ) => new Date( a.date ) - new Date( b.date ) ) ??
 			[]
 		);
 	}, [ revisions ] );
 
-	// Find the index of the selected revision.
-	const selectedIndex = currentRevisionId
-		? sortedRevisions.findIndex( ( r ) => r.id === currentRevisionId )
-		: 0;
+	const selectedIndex = sortedRevisions.findIndex(
+		( r ) => r.id === currentRevisionId
+	);
 
 	const handleSliderChange = ( index ) => {
 		const revision = sortedRevisions[ index ];
