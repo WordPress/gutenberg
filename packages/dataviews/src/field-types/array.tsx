@@ -6,11 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import type {
-	DataViewRenderFieldProps,
-	NormalizedField,
-	SortDirection,
-} from '../types';
+import type { NormalizedField, SortDirection } from '../types';
 import type { FieldType } from '../types/private';
 import {
 	OPERATOR_IS_ALL,
@@ -20,6 +16,7 @@ import {
 } from '../constants';
 import isValidRequiredForArray from './utils/is-valid-required-for-array';
 import isValidElements from './utils/is-valid-elements';
+import render from './utils/render-default';
 
 function getValueFormatted< Item >( {
 	item,
@@ -31,10 +28,6 @@ function getValueFormatted< Item >( {
 	const value = field.getValue( { item } );
 	const arr = Array.isArray( value ) ? value : [];
 	return arr.join( ', ' );
-}
-
-function render( { item, field }: DataViewRenderFieldProps< any > ) {
-	return getValueFormatted( { item, field } );
 }
 
 function isValidCustom< Item >( item: Item, field: NormalizedField< Item > ) {
