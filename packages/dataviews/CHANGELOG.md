@@ -9,6 +9,7 @@
 ### Code Quality
 
 - DataViews: Move filtering logic in field types. [#74733](https://github.com/WordPress/gutenberg/pull/74733)
+- DataViews: Adjust table primary media field styles. [#74813](https://github.com/WordPress/gutenberg/pull/74813)
 
 ### Enhancements
 
