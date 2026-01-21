@@ -7,6 +7,7 @@ import { SlotFillProvider } from '@wordpress/components';
 import {
 	MediaUploadProvider,
 	store as uploadStore,
+	detectClientSideMediaSupport,
 } from '@wordpress/upload-media';
 
 /**
@@ -23,6 +24,41 @@ import useMediaUploadSettings from './use-media-upload-settings';
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
 const noop = () => {};
+
+/**
+ * Flag to track if we've already logged the fallback message.
+ */
+let hasLoggedFallback = false;
+
+/**
+ * Checks if client-side media processing should be enabled.
+ *
+ * Returns true only if:
+ * 1. The experimental media processing flag is enabled
+ * 2. The browser supports WebAssembly, SharedArrayBuffer, and cross-origin isolation
+ *
+ * @return {boolean} Whether client-side media processing should be enabled.
+ */
+function shouldEnableClientSideMediaProcessing() {
+	if ( ! window.__experimentalMediaProcessing ) {
+		return false;
+	}
+
+	const detection = detectClientSideMediaSupport();
+	if ( ! detection.supported ) {
+		// Only log once per session to avoid console spam.
+		if ( ! hasLoggedFallback ) {
+			// eslint-disable-next-line no-console
+			console.info(
+				`Client-side media processing unavailable: ${ detection.reason }. Using server-side processing.`
+			);
+			hasLoggedFallback = true;
+		}
+		return false;
+	}
+
+	return true;
+}
 
 /**
  * Upload a media file when the file upload button is activated
@@ -71,11 +107,11 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 		const mediaUploadSettings = useMediaUploadSettings( _settings );
 
+		const isClientSideMediaEnabled =
+			shouldEnableClientSideMediaProcessing();
+
 		const settings = useMemo( () => {
-			if (
-				window.__experimentalMediaProcessing &&
-				_settings?.mediaUpload
-			) {
+			if ( isClientSideMediaEnabled && _settings?.mediaUpload ) {
 				// Create a new object so that the original props.settings.mediaUpload is not modified.
 				return {
 					..._settings,
@@ -83,7 +119,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 				};
 			}
 			return _settings;
-		}, [ _settings, registry ] );
+		}, [ _settings, registry, isClientSideMediaEnabled ] );
 
 		const { __experimentalUpdateSettings } = unlock(
 			useDispatch( blockEditorStore )
@@ -115,7 +151,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			</SlotFillProvider>
 		);
 
-		if ( window.__experimentalMediaProcessing ) {
+		if ( isClientSideMediaEnabled ) {
 			return (
 				<MediaUploadProvider
 					settings={ mediaUploadSettings }
