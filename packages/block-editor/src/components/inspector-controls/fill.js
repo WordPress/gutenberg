@@ -19,6 +19,9 @@ import {
 } from '../block-edit/context';
 import groups from './groups';
 
+const PATTERN_EDITING_GROUPS = [ 'content', 'list' ];
+const TEMPLATE_PART_GROUPS = [ 'default', 'settings', 'advanced' ];
+
 export default function InspectorControlsFill( {
 	children,
 	group = 'default',
@@ -43,14 +46,32 @@ export default function InspectorControlsFill( {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
+
 	const shouldDisplayForPatternEditing =
 		context[ mayDisplayPatternEditingControlsKey ] &&
-		( group === 'list' || group === 'content' );
+		PATTERN_EDITING_GROUPS.includes( group );
+
+	// For pattern editing, the template part is the only block that can display the settings tab.
+	// This is to allow it to show 'Design' and 'Advanced' panels.
+	const shouldDisplayTemplatePartSettings =
+		context[ mayDisplayPatternEditingControlsKey ] &&
+		context.name === 'core/template-part' &&
+		TEMPLATE_PART_GROUPS.includes( group );
 
 	if (
 		! context[ mayDisplayControlsKey ] &&
-		! shouldDisplayForPatternEditing
+		! shouldDisplayForPatternEditing &&
+		! shouldDisplayTemplatePartSettings
 	) {
+		return null;
+	}
+
+	const hideNonTemplatePartSettings =
+		context[ mayDisplayPatternEditingControlsKey ] &&
+		context.name !== 'core/template-part' &&
+		TEMPLATE_PART_GROUPS.includes( group );
+
+	if ( hideNonTemplatePartSettings ) {
 		return null;
 	}
 
