@@ -58,6 +58,26 @@ Origin string for CRDT document changes originating from the local editor.
 
 Origin string for CRDT document changes originating from the sync manager.
 
+### OnStateChangeCallback
+
+Callback registered as event handler for provider 'status' events.
+
+### ProviderCreatorOptions
+
+Options passed to a provider creator function when initializing a sync provider.
+
+### SyncConnectionError
+
+Error information reported by a sync provider when a disconnection occurs.
+
+### SyncConnectionState
+
+Current connection state of a sync provider, including status and optional error information.
+
+### SyncConnectionStatus
+
+Connection status of a sync provider: either connected or disconnected.
+
 ### WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE
 
 WordPress meta key used to persist the CRDT document for an entity.

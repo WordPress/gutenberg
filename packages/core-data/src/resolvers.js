@@ -264,6 +264,15 @@ export const getEntityRecord =
 									}, 0 );
 								}
 							},
+							// Handle sync connection state changes.
+							onStateChange: ( connectionState ) => {
+								dispatch.setEntitySyncConnectionState(
+									kind,
+									name,
+									key,
+									connectionState
+								);
+							},
 						}
 					);
 				}
@@ -475,6 +484,15 @@ export const getEntityRecords =
 									name,
 									await apiFetch( { path, parse: true } ),
 									query
+								);
+							},
+							// Handle sync connection state changes for collections.
+							onStateChange: ( connectionState ) => {
+								dispatch.setEntitySyncConnectionState(
+									kind,
+									name,
+									null,
+									connectionState
 								);
 							},
 						}
