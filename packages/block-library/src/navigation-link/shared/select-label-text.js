@@ -1,7 +1,7 @@
 /**
  * Focus the Link label text and select it.
  *
- * @param {Object} ref - React ref object pointing to the label element.
+ * @param {Object} ref React ref object pointing to the label element.
  */
 export function selectLabelText( ref ) {
 	ref.current.focus();
