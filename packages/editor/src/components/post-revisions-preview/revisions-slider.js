@@ -96,6 +96,14 @@ function RevisionsSlider() {
 		);
 	}
 
+	if ( sortedRevisions.length === 1 ) {
+		return (
+			<span className="editor-revisions-header__no-revisions">
+				{ __( 'Only one revision found.' ) }
+			</span>
+		);
+	}
+
 	return (
 		<RangeControl
 			__nextHasNoMarginBottom
