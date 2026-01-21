@@ -6,8 +6,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { PinnedItems } from '@wordpress/interface';
-import { __, _x } from '@wordpress/i18n';
-import { seen } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -69,16 +68,6 @@ function RevisionsHeader() {
 	return (
 		<HeaderSkeleton
 			className="editor-revisions-header"
-			toolbar={
-				<Button
-					__next40pxDefaultSize
-					accessibleWhenDisabled
-					size="compact"
-					icon={ seen }
-					label={ _x( 'Show changes', 'revisions' ) }
-					disabled
-				/>
-			}
 			center={ <RevisionsSlider /> }
 			settings={
 				<>
