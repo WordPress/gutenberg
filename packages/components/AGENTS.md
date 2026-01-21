@@ -10,7 +10,7 @@ Due to the nature of the transition, some components may be deprecated or remove
 
 Is the form going to edit items of a dataset, rather than simply submitting data somewhere? If so, consider using `DataForm` from the `@wordpress/dataviews` package.
 
-For adding validation, consider using the Validated Form Components.
+For adding validation, consider using the [Validated Form Components](./src/validated-form-controls).
 
 ## Storybook
 
