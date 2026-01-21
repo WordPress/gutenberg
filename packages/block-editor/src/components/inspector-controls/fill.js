@@ -47,31 +47,30 @@ export default function InspectorControlsFill( {
 		return null;
 	}
 
-	const shouldDisplayForPatternEditing =
-		context[ mayDisplayPatternEditingControlsKey ] &&
-		PATTERN_EDITING_GROUPS.includes( group );
+	// During pattern editing:
+	// - All blocks can show pattern editing groups (content, list).
+	// - Template parts can show a settings tab (default, settings, advanced groups).
+	// - Other blocks cannot show a settings tab.
+	if ( context[ mayDisplayPatternEditingControlsKey ] ) {
+		// Template parts are allowed to show a settings tab to allow access to the
+		// 'Design' and 'Advanced' panels.
+		const isTemplatePart = context.name === 'core/template-part';
+		const isTemplatePartGroup = TEMPLATE_PART_GROUPS.includes( group );
+		const isPatternEditingGroup = PATTERN_EDITING_GROUPS.includes( group );
 
-	// For pattern editing, the template part is the only block that can display the settings tab.
-	// This is to allow it to show 'Design' and 'Advanced' panels.
-	const shouldDisplayTemplatePartSettings =
-		context[ mayDisplayPatternEditingControlsKey ] &&
-		context.name === 'core/template-part' &&
-		TEMPLATE_PART_GROUPS.includes( group );
+		const canShowGroup =
+			( isTemplatePart && isTemplatePartGroup ) || isPatternEditingGroup;
 
-	if (
-		! context[ mayDisplayControlsKey ] &&
-		! shouldDisplayForPatternEditing &&
-		! shouldDisplayTemplatePartSettings
-	) {
-		return null;
+		if ( ! canShowGroup ) {
+			return null;
+		}
 	}
 
-	const hideNonTemplatePartSettings =
-		context[ mayDisplayPatternEditingControlsKey ] &&
-		context.name !== 'core/template-part' &&
-		TEMPLATE_PART_GROUPS.includes( group );
-
-	if ( hideNonTemplatePartSettings ) {
+	// Outside pattern editing, use the standard rules for displaying controls.
+	if (
+		! context[ mayDisplayPatternEditingControlsKey ] &&
+		! context[ mayDisplayControlsKey ]
+	) {
 		return null;
 	}
 
