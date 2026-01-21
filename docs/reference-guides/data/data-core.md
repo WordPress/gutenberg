@@ -264,6 +264,18 @@ _Returns_
 
 -   `string`: The default template id for the given query.
 
+### getDisconnectedSyncConnectionState
+
+Returns the first disconnected sync connection state, if any.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `SyncConnectionState | undefined`: The first disconnected connection state, or undefined if all connected.
+
 ### getEditedEntityRecord
 
 Returns the specified entity record, merged with its edits.
@@ -442,6 +454,21 @@ _Parameters_
 _Returns_
 
 -   `number | null`: number | null.
+
+### getEntitySyncConnectionState
+
+Returns the sync connection state for a specific entity record or collection.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+-   _kind_ `string`: Entity kind.
+-   _name_ `string`: Entity name.
+-   _key_ `string | number | null`: Entity key, or null for collections.
+
+_Returns_
+
+-   `SyncConnectionState | undefined`: The sync connection state, or undefined if not set.
 
 ### getLastEntityDeleteError
 
@@ -782,6 +809,20 @@ _Returns_
 
 -   `Object`: Action object.
 
+### clearEntitySyncConnectionState
+
+Returns an action object used to clear the sync connection state for an entity or collection.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the entity.
+-   _name_ `string`: Name of the entity.
+-   _key_ `number|string|null`: The entity key, or null for collections.
+
+_Returns_
+
+-   `Object`: Action object.
+
 ### deleteEntityRecord
 
 Action triggered to delete an entity record.
@@ -922,6 +963,21 @@ _Parameters_
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
 -   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
+
+### setEntitySyncConnectionState
+
+Returns an action object used to set the sync connection state for an entity or collection.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the entity.
+-   _name_ `string`: Name of the entity.
+-   _key_ `number|string|null`: The entity key, or null for collections.
+-   _connectionState_ `Object`: The connection state object.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### undo
 
