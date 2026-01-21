@@ -5,7 +5,6 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const https = require( 'https' );
 const [ token, branch, hash, baseHash, timestamp ] = process.argv.slice( 2 );
 
 const resultsFiles = [
@@ -36,66 +35,53 @@ const performanceResults = resultsFiles.map( ( { file } ) =>
 	)
 );
 
-const data = new TextEncoder().encode(
-	JSON.stringify( {
-		branch,
-		hash,
-		baseHash,
-		timestamp,
-		metrics: resultsFiles.reduce( ( result, { metricsPrefix }, index ) => {
-			return {
-				...result,
-				...Object.fromEntries(
-					Object.entries(
-						performanceResults[ index ][ hash ] ?? {}
-					).map( ( [ key, value ] ) => [
+const data = JSON.stringify( {
+	branch,
+	hash,
+	baseHash,
+	timestamp,
+	metrics: resultsFiles.reduce( ( result, { metricsPrefix }, index ) => {
+		return {
+			...result,
+			...Object.fromEntries(
+				Object.entries( performanceResults[ index ][ hash ] ?? {} ).map(
+					( [ key, value ] ) => [
 						metricsPrefix + key,
 						typeof value === 'object' ? value.q50 : value,
-					] )
-				),
-			};
-		}, {} ),
-		baseMetrics: resultsFiles.reduce(
-			( result, { metricsPrefix }, index ) => {
-				return {
-					...result,
-					...Object.fromEntries(
-						Object.entries(
-							performanceResults[ index ][ baseHash ] ?? {}
-						).map( ( [ key, value ] ) => [
-							metricsPrefix + key,
-							typeof value === 'object' ? value.q50 : value,
-						] )
-					),
-				};
-			},
-			{}
-		),
-	} )
-);
+					]
+				)
+			),
+		};
+	}, {} ),
+	baseMetrics: resultsFiles.reduce( ( result, { metricsPrefix }, index ) => {
+		return {
+			...result,
+			...Object.fromEntries(
+				Object.entries(
+					performanceResults[ index ][ baseHash ] ?? {}
+				).map( ( [ key, value ] ) => [
+					metricsPrefix + key,
+					typeof value === 'object' ? value.q50 : value,
+				] )
+			),
+		};
+	}, {} ),
+} );
 
-const options = {
-	hostname: 'codevitals.run',
-	port: 443,
-	path: '/api/log?token=' + token,
+fetch( 'https://codevitals.run/api/log?token=' + token, {
 	method: 'POST',
 	headers: {
 		'Content-Type': 'application/json',
-		'Content-Length': data.length,
 	},
-};
-
-const req = https.request( options, ( res ) => {
-	console.log( `statusCode: ${ res.statusCode }` );
-
-	res.on( 'data', ( d ) => {
-		process.stdout.write( d );
+	body: data,
+} )
+	.then( async ( response ) => {
+		console.log( `statusCode: ${ response.status }` );
+		const text = await response.text();
+		if ( text ) {
+			console.log( text );
+		}
+	} )
+	.catch( ( error ) => {
+		console.error( error );
 	} );
-} );
-
-req.on( 'error', ( error ) => {
-	console.error( error );
-} );
-
-req.write( data );
-req.end();
