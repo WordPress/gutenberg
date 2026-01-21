@@ -6,6 +6,7 @@ import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -18,18 +19,33 @@ import { sidebars } from './constants';
 const { Tabs } = unlock( componentsPrivateApis );
 
 const SidebarHeader = ( _, ref ) => {
-	const { postTypeLabel, isAttachment, isRevisionsMode } = useSelect(
+	const { postTypeLabel, isAttachment, isImageAttachment, isRevisionsMode } = useSelect(
 		( select ) => {
-			const { getPostTypeLabel, getCurrentPostType } =
+			const { getPostTypeLabel, getCurrentPostType, getCurrentPostId } =
 				select( editorStore );
 			const { isRevisionsMode: _isRevisionsMode } = unlock(
 				select( editorStore )
 			);
+			const currentPostType = getCurrentPostType();
+			const _isAttachment =
+				currentPostType === ATTACHMENT_POST_TYPE &&
+				window?.__experimentalMediaEditor;
+
+			let _isImageAttachment = false;
+			if ( _isAttachment ) {
+				const media = select( coreStore ).getEditedEntityRecord(
+					'postType',
+					currentPostType,
+					getCurrentPostId()
+				);
+				_isImageAttachment =
+					media?.mime_type?.split( '/' )[ 0 ] === 'image';
+			}
+
 			return {
 				postTypeLabel: getPostTypeLabel(),
-				isAttachment:
-					getCurrentPostType() === ATTACHMENT_POST_TYPE &&
-					window?.__experimentalMediaEditor,
+				isAttachment: _isAttachment,
+				isImageAttachment: _isImageAttachment,
 				isRevisionsMode: _isRevisionsMode(),
 			};
 		},
@@ -55,6 +71,15 @@ const SidebarHeader = ( _, ref ) => {
 			>
 				{ documentLabel }
 			</Tabs.Tab>
+			{ isImageAttachment && (
+				<Tabs.Tab
+					tabId={ sidebars.crop }
+					// Used for focus management in the SettingsSidebar component.
+					data-tab-id={ sidebars.crop }
+				>
+					{ __( 'Crop' ) }
+				</Tabs.Tab>
+			) }
 			{ ! isAttachment && (
 				<Tabs.Tab
 					tabId={ sidebars.block }

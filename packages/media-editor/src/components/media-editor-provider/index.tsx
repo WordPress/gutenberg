@@ -1,9 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useContext } from '@wordpress/element';
+import { createContext, useContext, useState } from '@wordpress/element';
 import type { Field } from '@wordpress/dataviews';
 import type { ReactNode } from 'react';
+import { ImageCropperProvider } from '@wordpress/image-cropper';
 
 /**
  * Media object from WordPress REST API.
@@ -26,6 +27,9 @@ export interface MediaEditorContextValue {
 	media?: Media;
 	onChange?: ( updates: Partial< Media > ) => void;
 	fields: Field< Media >[];
+	isEditingImage: boolean;
+	setIsEditingImage: ( editing: boolean ) => void;
+	onSaveImage?: ( media: Media ) => Promise< void >;
 }
 
 /**
@@ -41,6 +45,12 @@ export interface MediaEditorProviderProps {
 	 * useful for preview-only scenarios.
 	 */
 	onChange?: ( updates: Partial< Media > ) => void;
+	/**
+	 * Callback when an edited image is saved.
+	 *
+	 * Optional - called after image editing is complete, useful for server persistence.
+	 */
+	onSaveImage?: ( media: Media ) => Promise< void >;
 	/** Configuration settings for the media editor. */
 	settings?: {
 		fields?: Field< Media >[];
@@ -56,18 +66,31 @@ const MediaEditorContext = createContext< MediaEditorContextValue | undefined >(
 export function MediaEditorProvider( {
 	value,
 	onChange,
+	onSaveImage,
 	settings = {},
 	children,
 }: MediaEditorProviderProps ) {
+	const [ isEditingImage, setIsEditingImage ] = useState( false );
+
 	const contextValue: MediaEditorContextValue = {
 		media: value,
 		onChange,
 		fields: settings.fields || [],
+		isEditingImage,
+		setIsEditingImage,
+		onSaveImage,
 	};
+
+	// Detect if this is an image media type
+	const isImage = value?.mime_type?.split( '/' )[ 0 ] === 'image';
 
 	return (
 		<MediaEditorContext.Provider value={ contextValue }>
-			{ children }
+			{ isImage ? (
+				<ImageCropperProvider>{ children }</ImageCropperProvider>
+			) : (
+				children
+			) }
 		</MediaEditorContext.Provider>
 	);
 }
