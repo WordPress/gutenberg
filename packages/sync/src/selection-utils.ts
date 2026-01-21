@@ -9,20 +9,6 @@ import type * as Y from 'yjs';
 import type { EditorState } from './awareness/awareness-types';
 
 /**
- * Convenience types to manage block values with a clientId, attributes, and innerBlocks.
- */
-type BlockClientId = string;
-type BlockInnerBlocks = Y.Array< SelectableBlock >;
-type BlockAttributes = Y.Map< Y.Text >;
-
-/**
- * A block that can be selected.
- */
-export type SelectableBlock = Y.Map<
-	BlockClientId | BlockAttributes | BlockInnerBlocks
->;
-
-/**
  * The type of selection.
  */
 export enum SelectionType {

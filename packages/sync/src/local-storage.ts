@@ -1,3 +1,5 @@
+// TODO: Drop this file, and use @wordpress/preferences instead.
+
 /**
  * Load data from localStorage with error handling
  * @param key          - The localStorage key to read from

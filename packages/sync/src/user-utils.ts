@@ -40,6 +40,7 @@ export function getNewUserColor( existingColors: string[] ): string {
 		( color ) => ! existingColors.includes( color )
 	);
 
+	// TODO: Drop this, and use @wordpress/preferences instead.
 	const preferredColor = loadFromLocalStorage< string | null >(
 		LOCAL_STORAGE_KEY,
 		null
@@ -59,6 +60,7 @@ export function getNewUserColor( existingColors: string[] ): string {
 		hexColor = generateColorVariation( baseColor );
 	}
 
+	// TODO: Drop this, and use @wordpress/preferences instead.
 	saveToLocalStorage( LOCAL_STORAGE_KEY, hexColor );
 	return hexColor;
 }
