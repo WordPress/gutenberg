@@ -69,7 +69,7 @@ const CONFIG = [
 		rtl: [ componentsRtl, dataviewsRtl, fieldsRtl, mediaFieldsRtl ],
 	},
 	{
-		componentIdMatcher: /^design-system-components-/,
+		componentIdMatcher: /^design-system-/,
 		ltr: [ ui ],
 		rtl: [ ui ],
 	},
