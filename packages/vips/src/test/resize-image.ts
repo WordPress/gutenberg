@@ -23,11 +23,17 @@ class MockVipsImage {
 	static newFromBuffer = mockNewFromBuffer;
 }
 
-jest.mock( 'wasm-vips', () =>
+// Mock the vendor vips module (used instead of wasm-vips npm package)
+jest.mock( '../../vendor/vips-es6.js', () =>
 	jest.fn( () => ( {
 		Image: MockVipsImage,
 	} ) )
 );
+
+// Mock the wasm files
+jest.mock( '../../vendor/vips.wasm', () => 'mock-vips.wasm' );
+jest.mock( '../../vendor/vips-heif.wasm', () => 'mock-vips-heif.wasm' );
+jest.mock( '../../vendor/vips-jxl.wasm', () => 'mock-vips-jxl.wasm' );
 
 describe( 'resizeImage', () => {
 	afterEach( () => {
