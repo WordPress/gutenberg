@@ -41,6 +41,7 @@ import {
 	InvalidDraftDisplay,
 	useEnableLinkStatusValidation,
 	useIsDraggingWithin,
+	selectLabelText,
 } from '../navigation-link/shared';
 import {
 	getColors,
@@ -208,25 +209,10 @@ export default function NavigationSubmenuEdit( {
 				/^.+\.[a-z]+/.test( label )
 			) {
 				// Focus and select the label text.
-				selectLabelText();
+				selectLabelText( ref );
 			}
 		}
 	}, [ url ] );
-
-	/**
-	 * Focus the Link label text and select it.
-	 */
-	function selectLabelText() {
-		ref.current.focus();
-		const { ownerDocument } = ref.current;
-		const { defaultView } = ownerDocument;
-		const selection = defaultView.getSelection();
-		const range = ownerDocument.createRange();
-		// Get the range of the current ref contents so we can add this range to the selection.
-		range.selectNodeContents( ref.current );
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}
 
 	const {
 		textColor,
