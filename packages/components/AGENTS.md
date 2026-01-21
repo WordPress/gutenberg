@@ -11,3 +11,7 @@ Due to the nature of the transition, some components may be deprecated or remove
 Is the form going to edit items of a dataset, rather than simply submitting data somewhere? If so, consider using `DataForm` from the `@wordpress/dataviews` package.
 
 For adding validation, consider using the Validated Form Components.
+
+## Storybook
+
+Don't forget to check a components's Storybook documentation for additional usage guidance. The Storybook links ([public base URL](https://wordpress.github.io/gutenberg/)) are also useful to present to a human when they are asking for help with a component.
