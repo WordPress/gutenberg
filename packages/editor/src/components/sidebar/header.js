@@ -55,7 +55,7 @@ const SidebarHeader = ( _, ref ) => {
 			>
 				{ documentLabel }
 			</Tabs.Tab>
-			{ ! isAttachment && (
+			{ ! isAttachment && ! isRevisionsMode && (
 				<Tabs.Tab
 					tabId={ sidebars.block }
 					// Used for focus management in the SettingsSidebar component.
