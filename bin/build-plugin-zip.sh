@@ -70,18 +70,12 @@ status "Installing dependencies... 📦"
 npm cache verify
 npm ci
 
-# Build GPLv2-compatible wasm-vips (if Docker is available and files don't exist)
-if command -v docker &> /dev/null && docker info &> /dev/null; then
-	status "Building GPLv2-compatible wasm-vips... 🔧"
-	npm run build:wasm-vips || {
-		warning "wasm-vips build failed, but continuing with build..."
-	}
-else
-	if [ ! -f "packages/vips/vendor/vips.wasm" ]; then
-		warning "Docker not available and wasm-vips vendor files missing."
-		warning "Run 'npm run build:wasm-vips' with Docker to build wasm-vips."
-	fi
-fi
+# Download GPLv2-compatible wasm-vips from GitHub releases
+# Falls back to Docker build if download fails
+status "Downloading GPLv2-compatible wasm-vips... 🔧"
+npm run build:wasm-vips || {
+	warning "wasm-vips download/build failed, but continuing with build..."
+}
 
 status "Generating build... 👷‍♀️"
 npm run build -- --skip-types

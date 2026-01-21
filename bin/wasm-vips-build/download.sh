@@ -136,6 +136,57 @@ EOF
     echo "Created $OUTPUT_DIR/package.json"
 }
 
+# Fallback to npm package download
+# Note: wasm-vips v0.0.16 predates UltraHDR support, so the npm package is GPLv2-compatible
+fallback_to_npm() {
+    echo ""
+    echo "GitHub release not available. Downloading from npm package..."
+    echo "Note: wasm-vips v${WASM_VIPS_VERSION} predates UltraHDR support, so it's GPLv2-compatible."
+    echo ""
+
+    # Create temp directory
+    local temp_dir
+    temp_dir=$(mktemp -d)
+    cd "$temp_dir"
+
+    # Download and extract npm package
+    echo "  Downloading wasm-vips@${WASM_VIPS_VERSION} from npm..."
+    if ! npm pack "wasm-vips@${WASM_VIPS_VERSION}" --silent > /dev/null 2>&1; then
+        echo "  Failed to download npm package"
+        cd - > /dev/null
+        rm -rf "$temp_dir"
+        return 1
+    fi
+
+    echo "  Extracting package..."
+    tar -xzf "wasm-vips-${WASM_VIPS_VERSION}.tgz"
+
+    # Copy files to output directory
+    mkdir -p "$OUTPUT_DIR"
+
+    for file in "${REQUIRED_FILES[@]}"; do
+        if [[ -f "package/lib/$file" ]]; then
+            cp "package/lib/$file" "$OUTPUT_DIR/"
+            echo "  Copied $file"
+        else
+            echo "  Warning: $file not found in npm package"
+        fi
+    done
+
+    for file in "${OPTIONAL_FILES[@]}"; do
+        if [[ -f "package/lib/$file" ]]; then
+            cp "package/lib/$file" "$OUTPUT_DIR/"
+            echo "  Copied $file"
+        fi
+    done
+
+    # Cleanup
+    cd - > /dev/null
+    rm -rf "$temp_dir"
+
+    return 0
+}
+
 # Fallback to Docker build
 fallback_to_docker() {
     echo ""
@@ -170,6 +221,15 @@ main() {
         echo "  $OUTPUT_DIR"
         echo ""
         echo "The @wordpress/vips package will use these files instead of the npm package."
+    elif fallback_to_npm; then
+        create_vendor_package_json
+
+        echo ""
+        echo "=== Download Complete (from npm) ==="
+        echo "GPLv2-compatible wasm-vips files are now in:"
+        echo "  $OUTPUT_DIR"
+        echo ""
+        echo "Note: Downloaded from npm package. For production, create a GitHub release."
     else
         fallback_to_docker
     fi

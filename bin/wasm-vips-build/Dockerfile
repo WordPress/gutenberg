@@ -5,12 +5,15 @@ FROM emscripten/emsdk:3.1.61
 
 # Install additional build dependencies
 RUN apt-get update && apt-get install -y \
-    meson \
     ninja-build \
     pkg-config \
     curl \
     git \
+    python3-pip \
     && rm -rf /var/lib/apt/lists/*
+
+# Install newer Meson via pip (apt version is too old for glib)
+RUN pip3 install meson>=1.4.0
 
 # Install Rust (needed for resvg)
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -24,8 +27,10 @@ WORKDIR /build
 ARG WASM_VIPS_VERSION=0.0.16
 RUN git clone --depth 1 --branch v${WASM_VIPS_VERSION} https://github.com/kleisauke/wasm-vips.git .
 
-# Build with GPLv2-compatible options (disable UltraHDR)
-RUN ./build.sh --disable-uhdr
+# Build wasm-vips
+# Note: v0.0.16 predates UltraHDR support, so no --disable-uhdr flag needed
+# For future versions that include UltraHDR, add --disable-uhdr flag
+RUN ./build.sh
 
 # Output directory for built files
 RUN mkdir -p /output && \

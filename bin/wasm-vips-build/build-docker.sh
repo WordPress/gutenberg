@@ -68,9 +68,10 @@ check_docker() {
 build_docker_image() {
     echo "Building Docker image for wasm-vips..."
 
-    # Use buildx with cache if available (for CI)
-    if docker buildx version &> /dev/null; then
-        CACHE_DIR="${BUILDX_CACHE_DIR:-/tmp/.buildx-cache}"
+    # Try buildx with cache first (for CI with proper driver setup)
+    # Fall back to regular docker build if cache export isn't supported
+    if docker buildx version &> /dev/null && [[ -n "${BUILDX_CACHE_DIR:-}" ]]; then
+        CACHE_DIR="$BUILDX_CACHE_DIR"
         echo "Using Docker Buildx with cache at $CACHE_DIR"
 
         docker buildx build \
@@ -81,6 +82,7 @@ build_docker_image() {
             -t "$DOCKER_IMAGE" \
             "$SCRIPT_DIR"
     else
+        echo "Using standard Docker build"
         docker build \
             --build-arg WASM_VIPS_VERSION="$WASM_VIPS_VERSION" \
             -t "$DOCKER_IMAGE" \
