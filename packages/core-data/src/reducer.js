@@ -660,6 +660,33 @@ export function editorAssets( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing sync connection states for entities.
+ * Keyed by "kind/name:id" (e.g., "postType/post:123").
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function syncConnectionStates( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_ENTITY_SYNC_CONNECTION_STATE': {
+			const key = `${ action.kind }/${ action.name }:${ action.key }`;
+			return {
+				...state,
+				[ key ]: action.connectionState,
+			};
+		}
+		case 'CLEAR_ENTITY_SYNC_CONNECTION_STATE': {
+			const key = `${ action.kind }/${ action.name }:${ action.key }`;
+			const { [ key ]: _, ...rest } = state;
+			return rest;
+		}
+	}
+	return state;
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -682,4 +709,5 @@ export default combineReducers( {
 	registeredPostMeta,
 	editorSettings,
 	editorAssets,
+	syncConnectionStates,
 } );

@@ -5,6 +5,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import type { UndoManager } from '@wordpress/undo-manager';
 import deprecated from '@wordpress/deprecated';
+import type { SyncConnectionState } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -52,6 +53,7 @@ export interface State {
 	registeredPostMeta: Record< string, Object >;
 	editorSettings: Record< string, any > | null;
 	editorAssets: Record< string, any > | null;
+	syncConnectionStates?: Record< string, SyncConnectionState >;
 }
 
 type EntityRecordKey = string | number;
@@ -1595,3 +1597,48 @@ export const getRevision = createSelector(
 		];
 	}
 );
+
+/**
+ * Returns the sync connection state for a specific entity record or collection.
+ *
+ * @param state Data state.
+ * @param kind  Entity kind.
+ * @param name  Entity name.
+ * @param key   Entity key, or null for collections.
+ *
+ * @return The sync connection state, or undefined if not set.
+ */
+export function getEntitySyncConnectionState(
+	state: State,
+	kind: string,
+	name: string,
+	key: string | number | null
+): SyncConnectionState | undefined {
+	const stateKey = `${ kind }/${ name }:${ key }`;
+	return state.syncConnectionStates?.[ stateKey ];
+}
+
+/**
+ * Returns the first disconnected sync connection state, if any.
+ *
+ * @param state Data state.
+ *
+ * @return The first disconnected connection state, or undefined if all connected.
+ */
+export function getDisconnectedSyncConnectionState(
+	state: State
+): SyncConnectionState | undefined {
+	if ( ! state.syncConnectionStates ) {
+		return undefined;
+	}
+
+	for ( const connectionState of Object.values(
+		state.syncConnectionStates
+	) ) {
+		if ( connectionState?.status === 'disconnected' ) {
+			return connectionState;
+		}
+	}
+
+	return undefined;
+}
