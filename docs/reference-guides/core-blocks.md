@@ -197,7 +197,7 @@ Displays the date on which the comment was posted. ([Source](https://github.com/
 -	**Name:** core/comment-date
 -	**Category:** theme
 -	**Ancestor:** core/comment-template
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** format, isLink
 
 ## Comment Edit Link
@@ -207,8 +207,8 @@ Displays a link to edit the comment in the WordPress Dashboard. This link is onl
 -	**Name:** core/comment-edit-link
 -	**Category:** theme
 -	**Ancestor:** core/comment-template
--	**Supports:** anchor, color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** linkTarget, textAlign
+-	**Supports:** anchor, color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** linkTarget
 
 ## Comment Reply Link
 
@@ -599,7 +599,7 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 
 -	**Name:** core/paragraph
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign), ~~className~~
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns), ~~className~~
 -	**Attributes:** content, direction, dropCap, placeholder
 
 ## Pattern Placeholder
@@ -1125,8 +1125,8 @@ Insert poetry. Use special spacing formats. Or quote song lyrics. ([Source](http
 
 -	**Name:** core/verse
 -	**Category:** text
--	**Supports:** anchor, background (backgroundImage, backgroundSize), color (background, gradients, link, text), dimensions (minHeight), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
--	**Attributes:** content, textAlign
+-	**Supports:** anchor, background (backgroundImage, backgroundSize), color (background, gradients, link, text), dimensions (minHeight), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign)
+-	**Attributes:** content
 
 ## Video
 

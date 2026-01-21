@@ -16,22 +16,26 @@ import {
  * Internal dependencies
  */
 import { useBlockPreview } from '../';
+import { useBlockProps } from '../../block-list/use-block-props';
 
 describe( 'useBlockPreview', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			save: () => (
-				<div>
+				<div { ...useBlockProps.save() }>
 					Test block save view
 					<button>Button</button>
 				</div>
 			),
-			edit: () => (
-				<div>
-					Test block edit view
-					<button>Button</button>
-				</div>
-			),
+			edit: function Edit() {
+				return (
+					<div { ...useBlockProps() }>
+						Test block edit view
+						<button>Button</button>
+					</div>
+				);
+			},
 			category: 'text',
 			title: 'test block',
 		} );

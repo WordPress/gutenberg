@@ -246,66 +246,74 @@ export function createSyncManager(): SyncManager {
 			ydoc: targetDoc,
 		} = entityState;
 
-		targetDoc.transact( () => {
-			if ( ! supports?.crdtPersistence ) {
-				// Apply the current record as changes.
+		if ( ! supports?.crdtPersistence ) {
+			// Apply the current record as changes.
+			targetDoc.transact( () => {
 				applyChangesToCRDTDoc( targetDoc, record );
-				return;
-			}
+			}, LOCAL_SYNC_MANAGER_ORIGIN );
+			return;
+		}
 
-			// Get the persisted CRDT document, if it exists.
-			const tempDoc = getPersistedCrdtDoc( record );
+		// Get the persisted CRDT document, if it exists.
+		const tempDoc = getPersistedCrdtDoc( record );
 
-			if ( ! tempDoc ) {
-				// Apply the current record as changes and trigger a save, which will
-				// persist the CRDT document. (The entity should call `createEntityMeta`
-				// via its pre-persist hook.)
+		if ( ! tempDoc ) {
+			// Apply the current record as changes and trigger a save, which will
+			// persist the CRDT document. (The entity should call `createEntityMeta`
+			// via its pre-persist hook.)
+			targetDoc.transact( () => {
 				applyChangesToCRDTDoc( targetDoc, record );
 				handlers.saveRecord();
-				return;
-			}
+			}, LOCAL_SYNC_MANAGER_ORIGIN );
+			return;
+		}
 
-			// Apply the persisted document to the current document as a single update.
-			// This is done even if the persisted document has been invalidated. This
-			// prevents a newly joining peer (or refreshing user) from re-initializing
-			// the CRDT document (the "initialization problem").
-			const update = Y.encodeStateAsUpdateV2( tempDoc );
-			Y.applyUpdateV2( targetDoc, update );
+		// Apply the persisted document to the current document as a single update.
+		// This is done even if the persisted document has been invalidated. This
+		// prevents a newly joining peer (or refreshing user) from re-initializing
+		// the CRDT document (the "initialization problem").
+		//
+		// IMPORTANT: Do not wrap this in a transaction with the local origin. It
+		// effectively advances the state vector for the current client, which causes
+		// Yjs to think that another client is using this client ID.
+		const update = Y.encodeStateAsUpdateV2( tempDoc );
+		Y.applyUpdateV2( targetDoc, update );
 
-			// Compute the differences between the persisted doc and the current
-			// record. This can happen when:
-			//
-			// 1. The server makes updates on save that mutate the entity. Example: On
-			//    initial save, the server adds the "Uncategorized" category to the
-			//    post.
-			// 2. An "out-of-band" update occurs. Example: a WP-CLI command or direct
-			//    database update mutates the entity.
-			// 3. Unsaved changes are synced from a peer _before_ this code runs. We
-			//    can't control when (or if) remote changes are synced, so this is a
-			//    race condition.
-			const invalidations = getChangesFromCRDTDoc( tempDoc, record );
-			const invalidatedKeys = Object.keys( invalidations );
+		// Compute the differences between the persisted doc and the current
+		// record. This can happen when:
+		//
+		// 1. The server makes updates on save that mutate the entity. Example: On
+		//    initial save, the server adds the "Uncategorized" category to the
+		//    post.
+		// 2. An "out-of-band" update occurs. Example: a WP-CLI command or direct
+		//    database update mutates the entity.
+		// 3. Unsaved changes are synced from a peer _before_ this code runs. We
+		//    can't control when (or if) remote changes are synced, so this is a
+		//    race condition.
+		const invalidations = getChangesFromCRDTDoc( tempDoc, record );
+		const invalidatedKeys = Object.keys( invalidations );
 
-			// Destroy the temporary document to prevent leaks.
-			tempDoc.destroy();
+		// Destroy the temporary document to prevent leaks.
+		tempDoc.destroy();
 
-			if ( 0 === invalidatedKeys.length ) {
-				// The persisted CRDT document is valid. There are no updates to apply.
-				return;
-			}
+		if ( 0 === invalidatedKeys.length ) {
+			// The persisted CRDT document is valid. There are no updates to apply.
+			return;
+		}
 
-			// Use the invalidated keys to get the updated values from the entity.
-			const changes = invalidatedKeys.reduce(
-				( acc, key ) =>
-					Object.assign( acc, {
-						[ key ]: record[ key ],
-					} ),
-				{}
-			);
+		// Use the invalidated keys to get the updated values from the entity.
+		const changes = invalidatedKeys.reduce(
+			( acc, key ) =>
+				Object.assign( acc, {
+					[ key ]: record[ key ],
+				} ),
+			{}
+		);
 
-			// Apply the changes and trigger a save, which will persist the CRDT
-			// document. (The entity should call `createEntityMeta` via its pre-persist
-			// hook.)
+		// Apply the changes and trigger a save, which will persist the CRDT
+		// document. (The entity should call `createEntityMeta` via its pre-persist
+		// hook.)
+		targetDoc.transact( () => {
 			applyChangesToCRDTDoc( targetDoc, changes );
 			handlers.saveRecord();
 		}, LOCAL_SYNC_MANAGER_ORIGIN );

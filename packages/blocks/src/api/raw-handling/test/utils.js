@@ -65,6 +65,7 @@ describe( 'isPlain', () => {
 describe( 'getBlockContentSchema', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/paragraph', {
+			apiVersion: 3,
 			title: 'Paragraph',
 			supports: {
 				anchor: true,

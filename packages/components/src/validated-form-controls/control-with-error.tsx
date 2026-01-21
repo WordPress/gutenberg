@@ -271,3 +271,4 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 }
 
 export const ControlWithError = forwardRef( UnforwardedControlWithError );
+ControlWithError.displayName = 'ControlWithError';

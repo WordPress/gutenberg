@@ -936,6 +936,7 @@ describe( 'private selectors', () => {
 		beforeAll( () => {
 			// Register a block with visibility support
 			registerBlockType( 'core/test-block-with-visibility', {
+				apiVersion: 3,
 				save: () => null,
 				category: 'text',
 				title: 'Test Block With Visibility',
@@ -946,6 +947,7 @@ describe( 'private selectors', () => {
 
 			// Register a block without visibility support
 			registerBlockType( 'core/test-block-without-visibility', {
+				apiVersion: 3,
 				save: () => null,
 				category: 'text',
 				title: 'Test Block Without Visibility',
@@ -956,6 +958,7 @@ describe( 'private selectors', () => {
 
 			// Register a block with no supports defined (defaults to true for visibility)
 			registerBlockType( 'core/test-block-default-visibility', {
+				apiVersion: 3,
 				save: () => null,
 				category: 'text',
 				title: 'Test Block Default Visibility',

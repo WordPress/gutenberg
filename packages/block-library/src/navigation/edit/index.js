@@ -29,7 +29,6 @@ import {
 	BlockControls,
 } from '@wordpress/block-editor';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
-
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	__experimentalToolsPanel as ToolsPanel,
@@ -77,6 +76,7 @@ import AccessibleDescription from './accessible-description';
 import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
+import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import { DEFAULT_BLOCK } from '../constants';
 
 /**
@@ -139,6 +139,10 @@ function ColorTools( {
 		setDetectedOverlayBackgroundColor,
 	] = useState();
 	const [ detectedOverlayColor, setDetectedOverlayColor ] = useState();
+
+	// Detect if we're editing inside an overlay template part.
+	const isWithinOverlay = useSelect( () => isWithinNavigationOverlay(), [] );
+
 	// Turn on contrast checker for web only since it's not supported on mobile yet.
 	const enableContrastChecking = Platform.OS === 'web';
 	useEffect( () => {
@@ -179,48 +183,57 @@ function ColorTools( {
 	if ( ! colorGradientSettings.hasColorsOrGradients ) {
 		return null;
 	}
+
+	const colorSettings = [
+		{
+			colorValue: textColor.color,
+			label: __( 'Text' ),
+			onColorChange: setTextColor,
+			resetAllFilter: () => setTextColor(),
+			clearable: true,
+			enableAlpha: true,
+		},
+		{
+			colorValue: backgroundColor.color,
+			label: __( 'Background' ),
+			onColorChange: setBackgroundColor,
+			resetAllFilter: () => setBackgroundColor(),
+			clearable: true,
+			enableAlpha: true,
+		},
+	];
+
+	// Only show overlay controls when using the default overlay.
+	if ( ! hasCustomOverlay ) {
+		colorSettings.push(
+			{
+				colorValue: overlayTextColor.color,
+				label: isWithinOverlay
+					? __( 'Submenu text' )
+					: __( 'Submenu & overlay text' ),
+				onColorChange: setOverlayTextColor,
+				resetAllFilter: () => setOverlayTextColor(),
+				clearable: true,
+				enableAlpha: true,
+			},
+			{
+				colorValue: overlayBackgroundColor.color,
+				label: isWithinOverlay
+					? __( 'Submenu background' )
+					: __( 'Submenu & overlay background' ),
+				onColorChange: setOverlayBackgroundColor,
+				resetAllFilter: () => setOverlayBackgroundColor(),
+				clearable: true,
+				enableAlpha: true,
+			}
+		);
+	}
+
 	return (
 		<>
 			<ColorGradientSettingsDropdown
 				__experimentalIsRenderedInSidebar
-				settings={ [
-					{
-						colorValue: textColor.color,
-						label: __( 'Text' ),
-						onColorChange: setTextColor,
-						resetAllFilter: () => setTextColor(),
-						clearable: true,
-						enableAlpha: true,
-					},
-					{
-						colorValue: backgroundColor.color,
-						label: __( 'Background' ),
-						onColorChange: setBackgroundColor,
-						resetAllFilter: () => setBackgroundColor(),
-						clearable: true,
-						enableAlpha: true,
-					},
-					{
-						colorValue: overlayTextColor.color,
-						label: hasCustomOverlay
-							? __( 'Submenu text' )
-							: __( 'Submenu & overlay text' ),
-						onColorChange: setOverlayTextColor,
-						resetAllFilter: () => setOverlayTextColor(),
-						clearable: true,
-						enableAlpha: true,
-					},
-					{
-						colorValue: overlayBackgroundColor.color,
-						label: hasCustomOverlay
-							? __( 'Submenu background' )
-							: __( 'Submenu & overlay background' ),
-						onColorChange: setOverlayBackgroundColor,
-						resetAllFilter: () => setOverlayBackgroundColor(),
-						clearable: true,
-						enableAlpha: true,
-					},
-				] }
+				settings={ colorSettings }
 				panelId={ clientId }
 				{ ...colorGradientSettings }
 				gradients={ [] }
@@ -440,8 +453,12 @@ function Navigation( {
 
 	const navRef = useRef();
 
-	// The standard HTML5 tag for the block wrapper.
-	const TagName = 'nav';
+	// Detect if we're editing inside an overlay template part.
+	const isWithinOverlay = useSelect( () => isWithinNavigationOverlay(), [] );
+
+	// Use div wrapper if this navigation block is within an overlay template part.
+	// Otherwise, use nav as the standard HTML5 tag.
+	const TagName = isWithinOverlay ? 'div' : 'nav';
 
 	// "placeholder" shown if:
 	// - there is no ref attribute pointing to a Navigation Post.
@@ -477,6 +494,15 @@ function Navigation( {
 			),
 		[ clientId ]
 	);
+
+	// Force overlayMenu to 'never' if within an overlay template part
+	// to prevent overlays within overlays.
+	useEffect( () => {
+		if ( isWithinOverlay && overlayMenu !== 'never' ) {
+			setAttributes( { overlayMenu: 'never' } );
+		}
+	}, [ isWithinOverlay, overlayMenu, setAttributes ] );
+
 	const isResponsive = 'never' !== overlayMenu;
 	const blockProps = useBlockProps( {
 		ref: navRef,
@@ -789,7 +815,7 @@ function Navigation( {
 					</ToolsPanel>
 				) }
 			</InspectorControls>
-			{ isOverlayExperimentEnabled && (
+			{ isOverlayExperimentEnabled && ! isWithinOverlay && (
 				<InspectorControls>
 					<OverlayPanel
 						overlayMenu={ overlayMenu }
