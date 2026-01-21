@@ -702,37 +702,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 	 * @return true|WP_Error True if the input was validated, otherwise WP_Error.
 	 */
 	protected function validate_custom_css( $css ) {
-		/*
-		 * This is a feature check for a fix in WordPress 7.0.
-		 *
-		 * This block contains the fallback behavior for WordPress versions prior to 7.0. This
-		 * restricts CSS content disallow text that is susceptible to mangling by post
-		 * content filters.
-		 *
-		 * This checks the JSON encoding of the `&` character. It is expected to be Unicode escaped
-		 * in the JSON content after filtering by `wp_filter_global_styles_post()`.
-		 *
-		 * @see https://core.trac.wordpress.org/changeset/61486
-		 *
-		 * This block should be removed when the minimum supported WordPress version is >= 7.0.
-		 */
-		if ( false !== strpos(
-			'&',
-			wp_filter_global_styles_post(
-				'{"isGlobalStylesUserThemeJSON":true,"version":3,"styles":{"css":"&"}}',
-				'custom'
-			)
-		) ) {
-			if ( preg_match( '#(?:</?\w+)|&#', $css ) ) {
-				return new WP_Error(
-					'rest_custom_css_illegal_markup',
-					__( 'Markup is not allowed in CSS.', 'gutenberg' ),
-					array( 'status' => 400 )
-				);
-			}
-			return true;
-		}
-
 		$length = strlen( $css );
 		for (
 			$at = strcspn( $css, '<' );
