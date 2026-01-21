@@ -102,16 +102,6 @@ _Returns_
 
 -   `Promise< { buffer: ArrayBuffer | ArrayBufferLike; width: number; height: number; } >`: Rotated file data plus the new dimensions.
 
-### setLocation
-
-Dynamically sets the location / public path to use for loading the WASM files.
-
-This is required when loading this module in an inline worker, where globals such as **webpack_public_path** are not available.
-
-_Parameters_
-
--   _newLocation_ `string`: Location, typically a base URL such as "<https://example.com/path/to/js/...">.
-
 ### vipsCancelOperations
 
 Cancels all ongoing image operations for a given item ID.
