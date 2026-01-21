@@ -78,7 +78,7 @@ return array(
 		'filePath' => 'aspect-ratio.svg',
 	),
 	'at-symbol'                      => array(
-		'label'    => _x( 'At Symbol', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'At Symbol (@)', 'icon label', 'gutenberg' ),
 		'filePath' => 'at-symbol.svg',
 	),
 	'audio'                          => array(
@@ -1286,7 +1286,7 @@ return array(
 		'filePath' => 'word-count.svg',
 	),
 	'wordpress'                      => array(
-		'label'    => _x( 'Wordpress', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'WordPress', 'icon label', 'gutenberg' ),
 		'filePath' => 'wordpress.svg',
 	),
 );
