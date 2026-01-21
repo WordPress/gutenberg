@@ -230,6 +230,9 @@ RUN apk update
 # Install some basic PHP dependencies.
 RUN apk --no-cache add $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
 
+# Install git
+RUN apk --no-cache add git
+
 # Set up sudo so they can have root access.
 RUN apk --no-cache add sudo linux-headers
 RUN echo "#$HOST_UID ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers`;
