@@ -34,6 +34,11 @@ const meta: Meta< typeof Tabs > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'When building for the Gutenberg repo, use this component instead of `TabPanel`. Otherwise, continue using `TabPanel` for now.',
+		},
 	},
 	args: {
 		onActiveTabIdChange: fn(),

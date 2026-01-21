@@ -29,6 +29,10 @@ const meta: Meta< typeof NumberControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 	},
 };
 

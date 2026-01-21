@@ -1,8 +1,6 @@
-import { useOf } from '@storybook/addon-docs/blocks';
-import {
-	data as componentStatusData,
-	statuses,
-} from '../../../packages/components/component-status';
+import { Markdown, useOf } from '@storybook/addon-docs/blocks';
+import type { Parameters } from 'storybook/internal/types';
+import { statuses } from './statuses';
 
 export function ComponentStatusIndicator() {
 	const resolvedOf = useOf( 'meta' );
@@ -11,22 +9,16 @@ export function ComponentStatusIndicator() {
 		return null;
 	}
 
-	const { title } = resolvedOf.preparedMeta;
+	const { parameters } = resolvedOf.preparedMeta;
+	const componentStatus =
+		parameters?.componentStatus as Parameters[ 'componentStatus' ];
 
-	// Extract component name from title (e.g., "Components/Button" -> "Button")
-	const componentName = title?.split( '/' ).pop();
-
-	// Look up status data
-	const componentData = componentStatusData.find(
-		( c ) => c.name === componentName
-	);
-
-	if ( ! componentData ) {
+	if ( ! componentStatus?.status ) {
 		return null;
 	}
 
 	const statusInfo = statuses.find(
-		( s ) => s.value === componentData.status
+		( s ) => s.value === componentStatus.status
 	);
 
 	if ( ! statusInfo ) {
@@ -48,6 +40,7 @@ export function ComponentStatusIndicator() {
 					display: 'flex',
 					flexDirection: 'column',
 					width: 'fit-content',
+					flexShrink: 0,
 				} }
 			>
 				<dt style={ { fontStyle: 'normal', color: '#757575' } }>
@@ -60,10 +53,10 @@ export function ComponentStatusIndicator() {
 						fontWeight: 'bold',
 					} }
 				>
-					{ statusInfo.label.toLowerCase() }
+					{ statusInfo.icon } { statusInfo.label }
 				</dd>
 			</div>
-			{ componentData.notes && (
+			{ componentStatus.notes && (
 				<div
 					style={ {
 						display: 'flex',
@@ -75,7 +68,7 @@ export function ComponentStatusIndicator() {
 						Notes
 					</dt>
 					<dd style={ { padding: 0, fontWeight: 'bold' } }>
-						{ componentData.notes }
+						<Markdown>{ componentStatus.notes }</Markdown>
 					</dd>
 				</div>
 			) }

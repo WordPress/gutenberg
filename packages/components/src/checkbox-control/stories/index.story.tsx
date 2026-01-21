@@ -34,6 +34,10 @@ const meta: Meta< typeof CheckboxControl > = {
 			exclude: [ 'heading' ],
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 	},
 };
 export default meta;
