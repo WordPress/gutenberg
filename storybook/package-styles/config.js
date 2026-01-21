@@ -73,6 +73,11 @@ const CONFIG = [
 		ltr: [ ui ],
 		rtl: [ ui ],
 	},
+	{
+		componentIdMatcher: /^design-system-patterns-/,
+		ltr: [ componentsLtr, dataviewsLtr ],
+		rtl: [ componentsRtl, dataviewsRtl ],
+	},
 ];
 
 export default CONFIG;

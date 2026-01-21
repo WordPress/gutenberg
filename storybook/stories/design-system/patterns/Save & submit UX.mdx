@@ -1,6 +1,7 @@
-import { Meta } from '@storybook/addon-docs/blocks';
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as SaveSubmitStories from './save-submit-ux.story';
 
-<Meta title="Design System/Patterns/Save & submit UX" />
+<Meta of={ SaveSubmitStories } />
 
 # Save / submit UX
 
@@ -14,6 +15,8 @@ The following feedback patterns help users interpret save and submit results.
 
 - While saving the button state switches to busy.
 - A [Snackbar](https://wordpress.github.io/gutenberg/?path=/docs/components-snackbar--docs) confirms a successful save.
+
+<Canvas of={ SaveSubmitStories.SaveFormLayoutCard } />
 
 ### No unsaved changes
 
