@@ -7,7 +7,7 @@ import type { ReactElement } from 'react';
  * WordPress dependencies
  */
 import { Button, CheckboxControl } from '@wordpress/components';
-import { __, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useMemo, useState, useRef, useContext } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
