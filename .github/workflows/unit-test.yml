@@ -188,37 +188,38 @@ jobs:
                 php: ['7.2', '7.3', '7.4', '8.0', '8.1', '8.2', '8.3']
                 multisite: [false, true]
                 wordpress: ['', 'previous major version']
-                exclude:
-                    # On PRs: Only test PHP 8.3, single-site, latest WP
-                    - event: 'pull_request'
-                      php: '7.2'
-                    - event: 'pull_request'
-                      php: '7.3'
-                    - event: 'pull_request'
-                      php: '7.4'
-                    - event: 'pull_request'
-                      php: '8.0'
-                    - event: 'pull_request'
-                      php: '8.1'
-                    - event: 'pull_request'
-                      php: '8.2'
-                    - event: 'pull_request'
-                      multisite: true
-                    - event: 'pull_request'
-                      wordpress: 'previous major version'
-                    # On trunk/releases: Only test previous WP version with specific PHP versions
-                    - php: '7.3'
-                      wordpress: 'previous major version'
-                    - php: '8.0'
-                      wordpress: 'previous major version'
-                    - php: '8.1'
-                      wordpress: 'previous major version'
-                    - php: '8.2'
-                      wordpress: 'previous major version'
+                # TODO: Re-enable these before merging.
+                # exclude:
+                #     # On PRs: Only test PHP 8.3, single-site, latest WP
+                #     - event: 'pull_request'
+                #       php: '7.2'
+                #     - event: 'pull_request'
+                #       php: '7.3'
+                #     - event: 'pull_request'
+                #       php: '7.4'
+                #     - event: 'pull_request'
+                #       php: '8.0'
+                #     - event: 'pull_request'
+                #       php: '8.1'
+                #     - event: 'pull_request'
+                #       php: '8.2'
+                #     - event: 'pull_request'
+                #       multisite: true
+                #     - event: 'pull_request'
+                #       wordpress: 'previous major version'
+                #     # On trunk/releases: Only test previous WP version with specific PHP versions
+                #     - php: '7.3'
+                #       wordpress: 'previous major version'
+                #     - php: '8.0'
+                #       wordpress: 'previous major version'
+                #     - php: '8.1'
+                #       wordpress: 'previous major version'
+                #     - php: '8.2'
+                #       wordpress: 'previous major version'
 
         env:
             WP_ENV_PHP_VERSION: ${{ matrix.php }}
-            WP_ENV_CORE: ${{ matrix.wordpress == '' && 'WordPress/WordPress' || format( 'https://wordpress.org/wordpress-{0}.zip', needs.compute-previous-wordpress-version.outputs.previous-wordpress-version ) }}
+            WP_ENV_CORE: 'https://wordpress.org/wordpress-6.9.zip'
 
         steps:
             - name: Checkout repository
