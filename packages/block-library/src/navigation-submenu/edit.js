@@ -22,7 +22,7 @@ import {
 	getColorClassName,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { link as linkIcon, removeSubmenu } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 import { createBlock } from '@wordpress/blocks';
@@ -99,7 +99,7 @@ const useIsDraggingWithin = ( elementRef ) => {
 			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
 			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
 		};
-	}, [] );
+	}, [ elementRef ] );
 
 	return isDraggingWithin;
 };
@@ -168,6 +168,7 @@ export default function NavigationSubmenuEdit( {
 		hasChildren,
 		selectedBlockHasChildren,
 		onlyDescendantIsEmptyLink,
+		getBlockAttributes,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -177,6 +178,7 @@ export default function NavigationSubmenuEdit( {
 				getBlock,
 				getBlockCount,
 				getBlockOrder,
+				getBlockAttributes: _getBlockAttributes,
 			} = select( blockEditorStore );
 
 			let _onlyDescendantIsEmptyLink;
@@ -212,6 +214,7 @@ export default function NavigationSubmenuEdit( {
 				hasChildren: !! getBlockCount( clientId ),
 				selectedBlockHasChildren: !! selectedBlockChildren?.length,
 				onlyDescendantIsEmptyLink: _onlyDescendantIsEmptyLink,
+				getBlockAttributes: _getBlockAttributes,
 			};
 		},
 		[ clientId ]
@@ -237,7 +240,7 @@ export default function NavigationSubmenuEdit( {
 		if ( ! openSubmenusOnClick && ! url ) {
 			setIsLinkOpen( true );
 		}
-	}, [] );
+	}, [ openSubmenusOnClick, url ] );
 
 	/**
 	 * The hook shouldn't be necessary but due to a focus loss happening
@@ -261,7 +264,7 @@ export default function NavigationSubmenuEdit( {
 				selectLabelText();
 			}
 		}
-	}, [ url ] );
+	}, [ isLinkOpen, url, label ] );
 
 	/**
 	 * Focus the Link label text and select it.
@@ -352,10 +355,14 @@ export default function NavigationSubmenuEdit( {
 
 	const ParentElement = openSubmenusOnClick ? 'button' : 'a';
 
-	function transformToLink() {
-		const newLinkBlock = createBlock( 'core/navigation-link', attributes );
+	const transformToLink = useCallback( () => {
+		const currentAttributes = getBlockAttributes( clientId );
+		const newLinkBlock = createBlock(
+			'core/navigation-link',
+			currentAttributes
+		);
 		replaceBlock( clientId, newLinkBlock );
-	}
+	}, [ replaceBlock, clientId, getBlockAttributes ] );
 
 	useEffect( () => {
 		// If block becomes empty, transform to Navigation Link.
@@ -365,7 +372,12 @@ export default function NavigationSubmenuEdit( {
 			__unstableMarkNextChangeAsNotPersistent();
 			transformToLink();
 		}
-	}, [ hasChildren, prevHasChildren ] );
+	}, [
+		hasChildren,
+		prevHasChildren,
+		__unstableMarkNextChangeAsNotPersistent,
+		transformToLink,
+	] );
 
 	const canConvertToLink =
 		! selectedBlockHasChildren || onlyDescendantIsEmptyLink;
