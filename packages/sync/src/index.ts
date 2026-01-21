@@ -60,4 +60,29 @@ export { Awareness } from 'y-protocols/awareness';
  */
 export { privateApis } from './private-apis';
 
+/**
+ * Callback registered as event handler for provider 'status' events.
+ */
+export type { OnStateChangeCallback } from './types';
+
+/**
+ * Options passed to a provider creator function when initializing a sync provider.
+ */
+export type { ProviderCreatorOptions } from './types';
+
+/**
+ * Error information reported by a sync provider when a disconnection occurs.
+ */
+export type { SyncConnectionError } from './types';
+
+/**
+ * Current connection state of a sync provider, including status and optional error information.
+ */
+export type { SyncConnectionState } from './types';
+
+/**
+ * Connection status of a sync provider: either connected or disconnected.
+ */
+export type { SyncConnectionStatus } from './types';
+
 export type * from './types';
