@@ -49,25 +49,85 @@ export interface ObjectMeta extends Record< string, unknown > {
 	[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]?: string;
 }
 
+/**
+ * Event map for provider events.
+ * Add new event types here as needed.
+ */
+export interface ProviderEventMap {
+	status: SyncConnectionState;
+}
+
+/**
+ * Generic event listener type for providers.
+ * Providers should call registered callbacks when events occur like connection status changes.
+ * Providers are responsible for cleaning up listeners in their destroy() method.
+ */
+export type ProviderOn = < K extends keyof ProviderEventMap >(
+	event: K,
+	callback: ( data: ProviderEventMap[ K ] ) => void
+) => void;
+
 export interface ProviderCreatorResult {
 	destroy: () => void;
+	on: ProviderOn;
+}
+
+export type SyncConnectionStatus = 'connected' | 'disconnected';
+
+/**
+ * Sync connection error object.
+ */
+export interface SyncConnectionError {
+	/**
+	 * Error code identifier for programmatic handling and default message lookup.
+	 */
+	code: string;
+
+	/**
+	 * Short error title/message to display in UI.
+	 * If not provided, UI components will use a default based on the code.
+	 */
+	message?: string;
+
+	/**
+	 * Longer error description for display.
+	 * If not provided, UI components will use a default based on the code.
+	 */
+	description?: string;
+}
+
+export interface SyncConnectionState {
+	status: SyncConnectionStatus;
+
+	/**
+	 * Error information when status is 'disconnected'.
+	 */
+	error?: SyncConnectionError;
+}
+
+export type OnStateChangeCallback = ( state: SyncConnectionState ) => void;
+
+export interface ProviderCreatorOptions {
+	objectType: ObjectType;
+	objectId: ObjectID | null;
+	ydoc: Y.Doc;
+	awareness?: Awareness;
 }
 
 export type ProviderCreator = (
-	objectType: ObjectType,
-	objectId: ObjectID | null,
-	ydoc: Y.Doc,
-	awareness?: Awareness
+	options: ProviderCreatorOptions
 ) => Promise< ProviderCreatorResult >;
 
 export interface CollectionHandlers {
 	refetchRecords: () => Promise< void >;
+	onStateChange: OnStateChangeCallback;
 }
 
 export interface RecordHandlers {
 	addUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	editRecord: ( data: Partial< ObjectData > ) => void;
 	getEditedRecord: () => Promise< ObjectData >;
+	onStateChange: OnStateChangeCallback;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	saveRecord: () => Promise< void >;

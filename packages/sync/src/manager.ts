@@ -199,9 +199,19 @@ export function createSyncManager(): SyncManager {
 
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
-			providerCreators.map( ( create ) =>
-				create( objectType, objectId, ydoc, awareness )
-			)
+			providerCreators.map( async ( create ) => {
+				const provider = await create( {
+					objectType,
+					objectId,
+					ydoc,
+					awareness,
+				} );
+
+				// Attach status listener after provider creation.
+				provider.on( 'status', handlers.onStateChange );
+
+				return provider;
+			} )
 		);
 
 		// Attach observers.
@@ -298,8 +308,17 @@ export function createSyncManager(): SyncManager {
 
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
-			providerCreators.map( ( create ) => {
-				return create( objectType, null, ydoc );
+			providerCreators.map( async ( create ) => {
+				const provider = await create( {
+					objectType,
+					objectId: null,
+					ydoc,
+				} );
+
+				// Attach status listener after provider creation.
+				provider.on( 'status', handlers.onStateChange );
+
+				return provider;
 			} )
 		);
 

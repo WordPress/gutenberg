@@ -58,6 +58,7 @@ describe( 'SyncManager', () => {
 
 		mockProviderResult = {
 			destroy: jest.fn(),
+			on: jest.fn(),
 		};
 		mockProviderCreator = jest.fn( () =>
 			Promise.resolve( mockProviderResult )
@@ -91,6 +92,7 @@ describe( 'SyncManager', () => {
 			getEditedRecord: jest.fn( async () =>
 				Promise.resolve( mockRecord )
 			),
+			onStateChange: jest.fn(),
 			refetchRecord: jest.fn( async () => Promise.resolve() ),
 			restoreUndoMeta: jest.fn(),
 			saveRecord: jest.fn( async () => Promise.resolve() ),
@@ -139,12 +141,12 @@ describe( 'SyncManager', () => {
 			);
 
 			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
-			expect( mockProviderCreator ).toHaveBeenCalledWith(
-				'postType/post',
-				'123',
-				expect.any( Y.Doc ),
-				expect.any( Awareness )
-			);
+			expect( mockProviderCreator ).toHaveBeenCalledWith( {
+				objectType: 'postType/post',
+				objectId: '123',
+				ydoc: expect.any( Y.Doc ),
+				awareness: expect.any( Awareness ),
+			} );
 		} );
 
 		it( 'does not load entity when no providers are available', async () => {
@@ -485,16 +487,10 @@ describe( 'SyncManager', () => {
 		it( 'updates CRDT document with local changes', async () => {
 			// Capture the Y.Doc from provider creator
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string | null,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
 
 			const manager = createSyncManager();
 
@@ -538,16 +534,10 @@ describe( 'SyncManager', () => {
 		it( 'applies changes with specified origin', async () => {
 			// Capture the Y.Doc from provider creator
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string | null,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
 
 			const manager = createSyncManager();
 
@@ -582,16 +572,10 @@ describe( 'SyncManager', () => {
 		it( 'updates the record metadata when the update is associated with a save', async () => {
 			// Capture the Y.Doc from provider creator.
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string | null,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
 
 			const manager = createSyncManager();
 
@@ -630,16 +614,10 @@ describe( 'SyncManager', () => {
 		it( 'edits the local entity record when remote updates arrive', async () => {
 			// Capture the Y.Doc from provider creator.
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string | null,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
 
 			const manager = createSyncManager();
 
@@ -679,16 +657,10 @@ describe( 'SyncManager', () => {
 		it( 'does not edit the local record for local transactions', async () => {
 			// Capture the Y.Doc from provider creator.
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string | null,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
 
 			const manager = createSyncManager();
 
