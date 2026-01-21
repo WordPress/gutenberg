@@ -1,0 +1,34 @@
+# Save / submit UX
+
+Guidelines for form submission and saving settings.
+
+## Feedback
+
+The following feedback patterns help users interpret save & submit results.
+
+### Saving
+
+- While saving the button state switches to busy.
+- A [Snackbar](https://wordpress.github.io/gutenberg/?path=/docs/components-snackbar--docs) confirms a successful save.
+
+### No unsaved changes
+
+When all changes are saved the Save button is disabled and reveals a ‘No unsaved changes’ tooltip on hover / focus.
+
+### Invalid fields
+
+If the save or submit fails due to user error (an invalid field, or a required field is omitted) then the page scrolls (with animation) to the first invalid field which shows a validation error message.
+
+### Failed save
+
+If the save process fails for any reason the user if notified via ConfirmDialog.
+
+
+### Auto-save
+
+- Auto-saving is restricted to `ToggleControl` fields.
+- Follows the same feedback conventions as other save methods.
+- It is preferable to use a toggle instead of a checkbox for turning features on and off. The exception would be if the checkbox is part of form with other fields that also need to be updated at the same time.
+- Keep labels short, use the description under the toggle or in the card title to provide more context. Keep that short too and link off to guide (that opens in the help center) if you need to say more. Make sure not to duplicate descriptions in the page and card titles.
+- Lead labels with a verb like “Use, Allow, Show” or even “Enable” if you’re all out of options.
+- Vary the leading verbs so that we don’t duplicate the same action over, and over, again.
