@@ -14,6 +14,7 @@ import type { Awareness } from 'y-protocols/awareness';
  */
 import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
 import type { WordPressUserInfo } from './awareness/awareness-types';
+import type { SelectionState } from './selection-utils';
 
 /* globalThis */
 declare global {
@@ -70,6 +71,10 @@ export interface RecordHandlers {
 	refetchRecord: () => Promise< void >;
 	saveRecord: () => Promise< void >;
 	getCurrentUser: () => Promise< WordPressUserInfo >;
+	subscribeToUserSelectionChanges: (
+		yDoc: Y.Doc,
+		setSelectionState: ( selectionState: SelectionState ) => void
+	) => void;
 }
 
 export interface SyncConfig {

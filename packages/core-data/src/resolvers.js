@@ -26,6 +26,7 @@ import {
 	isNumericID,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
+import { subscribeToUserSelectionChanges } from './utils/crdt-user-selections';
 
 /**
  * Requests authors from the REST API.
@@ -234,8 +235,22 @@ export const getEntityRecord =
 								);
 							},
 							// Get the current user.
-							getCurrentUser: async () =>
-								await resolveSelect.getCurrentUser(),
+							getCurrentUser: async () => {
+								await resolveSelect.getCurrentUser();
+							},
+							// Subscribe to user selection changes.
+							subscribeToUserSelectionChanges: (
+								yDoc,
+								setSelectionState
+							) => {
+								subscribeToUserSelectionChanges(
+									kind,
+									name,
+									key,
+									yDoc,
+									setSelectionState
+								);
+							},
 						}
 					);
 				}

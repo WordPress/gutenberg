@@ -108,6 +108,7 @@ describe( 'SyncManager', () => {
 			getCurrentUser: jest.fn( async () =>
 				Promise.resolve( mockCurrentUser )
 			),
+			subscribeToUserSelectionChanges: jest.fn(),
 		};
 	} );
 

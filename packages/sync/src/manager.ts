@@ -29,6 +29,10 @@ import type {
 import { createUndoManager } from './undo-manager';
 import { createYjsDoc } from './utils';
 import { createAwareness } from './awareness/awareness-manager';
+import type { AwarenessState } from './awareness/awareness-state';
+
+const AWARENESS_INSTANCE_SEPARATOR = ':';
+const ENTITY_INSTANCE_SEPARATOR = '_';
 
 interface EntityState {
 	handlers: RecordHandlers;
@@ -46,6 +50,7 @@ interface EntityState {
  */
 export function createSyncManager(): SyncManager {
 	const entityStates: Map< EntityID, EntityState > = new Map();
+	const awarenessInstances: Map< string, AwarenessState > = new Map();
 
 	/**
 	 * A "sync-aware" undo manager for all synced entities. It is lazily created
@@ -106,6 +111,8 @@ export function createSyncManager(): SyncManager {
 			return; // Already bootstrapped.
 		}
 
+		const awarenessId = getAwarenessId( objectType, objectId );
+
 		const ydoc = createYjsDoc( { objectType } );
 		const recordMap = ydoc.getMap( RECORD_KEY );
 		const recordMetaMap = ydoc.getMap( RECORD_METADATA_KEY );
@@ -117,6 +124,7 @@ export function createSyncManager(): SyncManager {
 			recordMap.unobserveDeep( onRecordUpdate );
 			ydoc.destroy();
 			entityStates.delete( entityId );
+			awarenessInstances.delete( awarenessId );
 		};
 
 		// When the CRDT document is updated by an UndoManager or a connection (not
@@ -182,6 +190,11 @@ export function createSyncManager(): SyncManager {
 			handlers
 		);
 
+		// Awareness can be undefined, if the object type is not supported.
+		if ( awareness ) {
+			awarenessInstances.set( awarenessId, awareness );
+		}
+
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
 			providerCreators.map( ( create ) =>
@@ -217,7 +230,39 @@ export function createSyncManager(): SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID
 	): EntityID {
-		return `${ objectType }_${ objectId }`;
+		return getInstanceId( objectType, objectId, ENTITY_INSTANCE_SEPARATOR );
+	}
+
+	/**
+	 * Get the awareness ID for the given object type and object ID.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 */
+	function getAwarenessId(
+		objectType: ObjectType,
+		objectId: ObjectID
+	): string {
+		return getInstanceId(
+			objectType,
+			objectId,
+			AWARENESS_INSTANCE_SEPARATOR
+		);
+	}
+
+	/**
+	 * Get the instance ID for the given object type and object ID.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 * @param {string}     separator  Separator between object type and object ID.
+	 */
+	function getInstanceId(
+		objectType: ObjectType,
+		objectId: ObjectID,
+		separator: string
+	): string {
+		return `${ objectType }${ separator }${ objectId }`;
 	}
 
 	/**

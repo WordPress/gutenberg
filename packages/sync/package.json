@@ -44,8 +44,6 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@types/diff": "7.0.2",
-		"@wordpress/block-editor": "file:../block-editor",
-		"@wordpress/data": "file:../data",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/undo-manager": "file:../undo-manager",
 		"@wordpress/url": "file:../url",

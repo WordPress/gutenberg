@@ -42,6 +42,10 @@ The sync manager orchestrates the lifecycle of syncing entity records. It create
 
 Deltas are used to calculate incremental Y.Text updates.
 
+### LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS
+
+Delay in milliseconds before updating the cursor position.
+
 ### LOCAL_EDITOR_ORIGIN
 
 Origin string for CRDT document changes originating from the local editor.
