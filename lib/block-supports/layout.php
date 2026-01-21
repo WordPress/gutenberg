@@ -521,7 +521,7 @@ function gutenberg_get_layout_style( $selector, $layout, $has_block_gap_support 
 		}
 
 		if ( ! empty( $layout['columnCount'] ) && ! empty( $layout['minimumColumnWidth'] ) ) {
-			$max_value       = 'max(' . $layout['minimumColumnWidth'] . ', (100% - (' . $responsive_gap_value . ' * (' . $layout['columnCount'] . ' - 1))) /' . $layout['columnCount'] . ')';
+			$max_value       = 'max(min(' . $layout['minimumColumnWidth'] . ', 100%), (100% - (' . $responsive_gap_value . ' * (' . $layout['columnCount'] . ' - 1))) /' . $layout['columnCount'] . ')';
 			$layout_styles[] = array(
 				'selector'     => $selector,
 				'declarations' => array(
