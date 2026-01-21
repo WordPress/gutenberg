@@ -203,31 +203,31 @@ function ColorTools( {
 		},
 	];
 
-	// Only show overlay controls when using the default overlay.
-	if ( ! hasCustomOverlay ) {
-		colorSettings.push(
-			{
-				colorValue: overlayTextColor.color,
-				label: isWithinOverlay
+	// Only show overlay controls when not in an overlay template.
+	colorSettings.push(
+		{
+			colorValue: overlayTextColor.color,
+			label:
+				hasCustomOverlay || isWithinOverlay
 					? __( 'Submenu text' )
 					: __( 'Submenu & overlay text' ),
-				onColorChange: setOverlayTextColor,
-				resetAllFilter: () => setOverlayTextColor(),
-				clearable: true,
-				enableAlpha: true,
-			},
-			{
-				colorValue: overlayBackgroundColor.color,
-				label: isWithinOverlay
+			onColorChange: setOverlayTextColor,
+			resetAllFilter: () => setOverlayTextColor(),
+			clearable: true,
+			enableAlpha: true,
+		},
+		{
+			colorValue: overlayBackgroundColor.color,
+			label:
+				hasCustomOverlay || isWithinOverlay
 					? __( 'Submenu background' )
 					: __( 'Submenu & overlay background' ),
-				onColorChange: setOverlayBackgroundColor,
-				resetAllFilter: () => setOverlayBackgroundColor(),
-				clearable: true,
-				enableAlpha: true,
-			}
-		);
-	}
+			onColorChange: setOverlayBackgroundColor,
+			resetAllFilter: () => setOverlayBackgroundColor(),
+			clearable: true,
+			enableAlpha: true,
+		}
+	);
 
 	return (
 		<>
