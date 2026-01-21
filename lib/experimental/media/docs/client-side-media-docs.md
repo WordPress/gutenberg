@@ -30,22 +30,15 @@ The fallback occurs when any of the following conditions are detected:
 
 ## Cross-origin isolation / `SharedArrayBuffer`
 
-WASM-based image optimization requires `SharedArrayBuffer` support, which in turn requires [cross-origin isolation](https://web.dev/articles/cross-origin-isolation-guide). To implement this, the editor uses the following headers:
-- `Cross-Origin-Opener-Policy: same-origin`
-- `Cross-Origin-Embedder-Policy: credentialless` (or `require-corp` for Safari)
+WASM-based image optimization requires `SharedArrayBuffer` support, which in turn requires [cross-origin isolation](https://web.dev/articles/cross-origin-isolation-guide).
 
-Once the page is served with these headers, `SharedArrayBuffer` will be available in the browser, and WASM-based image optimization will work as expected. However, all embedded resources (e.g., images, iframes, scripts) must also be served with appropriate CORS headers to ensure cross-origin isolation is maintained. For third party embeds (for example a YouTube video), the plugin uses [iframe `credentialless` attribute](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/IFrame_credentialless) to help with this. For browsers that do not support this attribute, embeds will show an information pane instead of a live preview.
+Once the page is served with these headers, `SharedArrayBuffer` will be available in the browser, and WASM-based image optimization will work as expected. However, all embedded resources (e.g., images, iframes, scripts) must also be served with appropriate CORS headers (or iframe with `iframe-credentialless` for supporting browsers) to ensure cross-origin isolation is maintained. For third party embeds (for example a YouTube video), the plugin uses [iframe `credentialless` attribute](https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/IFrame_credentialless) to help with this. For browsers that do not support this attribute, embeds will show an information pane instead of a live preview.
 
 ### Troubleshooting
 
 If client-side media processing is not working, check the browser console for messages. Common issues include:
 
-1. **"SharedArrayBuffer is not available"**: The server is not sending the required cross-origin isolation headers. Ensure your server configuration includes:
-   ```
-   Cross-Origin-Opener-Policy: same-origin
-   Cross-Origin-Embedder-Policy: credentialless
-   ```
-
+1. **"SharedArrayBuffer is not available"**: The server is not sending the required cross-origin isolation headers.
 2. **"Cross-origin isolation is not enabled"**: The headers are present but cross-origin isolation is not active. This can happen if:
    - Third-party resources are blocking isolation
    - Headers are being stripped by a proxy or CDN
