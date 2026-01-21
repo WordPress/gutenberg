@@ -158,7 +158,7 @@ type ValidationMessagesData = {
 export const ValidationMessages: Story = {
 	render: () => {
 		const [ data, setData ] = useState< ValidationMessagesData >( {
-			name: 'A',
+			name: '',
 			email: 'invalid-email',
 			phone: '123',
 		} );
@@ -172,15 +172,6 @@ export const ValidationMessages: Story = {
 					placeholder: 'Jane Doe',
 					isValid: {
 						required: true,
-						custom: ( item ) => {
-							if ( ! item.name ) {
-								return null;
-							}
-							if ( item.name.length < 2 ) {
-								return 'Name must be at least 2 characters long.';
-							}
-							return null;
-						},
 					},
 				},
 				{
