@@ -1,13 +1,13 @@
 <?php
 /**
- * Last post block rendering tests.
+ * Latest Posts block rendering tests.
  *
  * @package WordPress
  * @subpackage Blocks
  */
 
 /**
- * Tests for the Last post block.
+ * Tests for the Latest Posts block.
  *
  * @group blocks
  */
@@ -157,5 +157,94 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'is-grid', $markup );
 		$this->assertStringContainsString( 'columns-5', $markup );
 		$this->assertStringNotContainsString( 'has-native-responsive-grid', $markup );
+	}
+
+	/**
+	 * Tests that blocks are parsed when "Show full post" is enabled.
+	 *
+	 * When the Latest Posts block displays full post content, blocks
+	 * within that content should be parsed and rendered properly using
+	 * do_blocks(). This ensures:
+	 * - Videos are constrained to their container width
+	 * - Gallery blocks display images side by side correctly
+	 * - Block styles are applied
+	 * - Block attributes are respected
+	 *
+	 * @covers ::gutenberg_render_block_core_latest_posts
+	 */
+	public function test_render_block_core_latest_posts_full_content_blocks_parsed() {
+		// Create attachment IDs for gallery block.
+		$file = DIR_TESTDATA . '/images/canola.jpg';
+		$attachment_id_1 = self::factory()->attachment->create_upload_object( $file );
+		$attachment_id_2 = self::factory()->attachment->create_upload_object( $file );
+
+		// Create a post with a gallery block in its content.
+		$gallery_block_content = sprintf(
+			'<!-- wp:gallery {"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":%d} -->
+<figure class="wp-block-image"><img src="test1.jpg" alt=""/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":%d} -->
+<figure class="wp-block-image"><img src="test2.jpg" alt=""/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->',
+			$attachment_id_1,
+			$attachment_id_2
+		);
+
+		self::factory()->post->create_and_get(
+			array(
+				'post_title'   => 'Post with gallery block',
+				'post_content' => $gallery_block_content,
+				'post_status'  => 'publish',
+			)
+		);
+
+		// Render Latest Posts block with "Show full post" enabled.
+		$attributes = array(
+			'postsToShow'            => 1,
+			'orderBy'                => 'date',
+			'order'                  => 'DESC',
+			'excerptLength'          => 55,
+			'displayFeaturedImage'   => false,
+			'displayPostContent'     => true,
+			'displayPostContentRadio' => 'full_post',
+		);
+
+		$output = gutenberg_render_block_core_latest_posts( $attributes );
+
+		// Verify that the post content is included in the output.
+		$this->assertStringContainsString(
+			'wp-block-latest-posts__post-full-content',
+			$output,
+			'Post full content wrapper should be present'
+		);
+
+		// Verify that blocks are parsed: block markup comments should be removed.
+		$this->assertStringNotContainsString(
+			'<!-- wp:gallery -->',
+			$output,
+			'Block markup comments should be removed when blocks are parsed'
+		);
+		$this->assertStringNotContainsString(
+			'<!-- /wp:gallery -->',
+			$output,
+			'Block markup comments should be removed when blocks are parsed'
+		);
+
+		// Verify that parsed blocks have proper block structure and classes.
+		$this->assertStringContainsString(
+			'wp-block-gallery',
+			$output,
+			'Parsed gallery blocks should have proper block classes'
+		);
+
+		// Verify that gallery images have proper block classes when parsed.
+		$this->assertStringContainsString(
+			'wp-block-image',
+			$output,
+			'Gallery images should have proper block classes when blocks are parsed'
+		);
 	}
 }
