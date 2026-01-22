@@ -8,6 +8,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount, useFocusReturn } from '@wordpress/compose';
 import { store as preferencesStore } from '@wordpress/preferences';
+
 /**
  * Internal dependencies
  */
@@ -41,25 +42,27 @@ export function getStylesCanvasTitle( path, showStylebook ) {
  * @return {JSX.Element|null} The styles canvas or null if nothing to render.
  */
 export default function StylesCanvas() {
-	const { stylesPath, showStylebook, showListViewByDefault } = useSelect(
-		( select ) => {
-			const { getStylesPath, getShowStylebook } = unlock(
-				select( editorStore )
-			);
+	const {
+		stylesPath,
+		showStylebook,
+		showListViewByDefault,
+		styleVariationId,
+	} = useSelect( ( select ) => {
+		const { getStylesPath, getShowStylebook, getSelectedStyleVariationId } =
+			unlock( select( editorStore ) );
 
-			const _showListViewByDefault = select( preferencesStore ).get(
-				'core',
-				'showListViewByDefault'
-			);
+		const _showListViewByDefault = select( preferencesStore ).get(
+			'core',
+			'showListViewByDefault'
+		);
 
-			return {
-				stylesPath: getStylesPath(),
-				showStylebook: getShowStylebook(),
-				showListViewByDefault: _showListViewByDefault,
-			};
-		},
-		[]
-	);
+		return {
+			stylesPath: getStylesPath(),
+			showStylebook: getShowStylebook(),
+			showListViewByDefault: _showListViewByDefault,
+			styleVariationId: getSelectedStyleVariationId(),
+		};
+	}, [] );
 	const { resetStylesNavigation, setStylesPath } = unlock(
 		useDispatch( editorStore )
 	);
@@ -76,6 +79,7 @@ export default function StylesCanvas() {
 			<StylesCanvasStyleBook
 				path={ stylesPath }
 				onPathChange={ setStylesPath }
+				styleVariationId={ styleVariationId }
 				ref={ sectionFocusReturnRef }
 			/>
 		);

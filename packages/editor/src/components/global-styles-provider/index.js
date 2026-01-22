@@ -11,8 +11,11 @@ import { mergeGlobalStyles } from '@wordpress/global-styles-engine';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { store as editorStore } from '../../store';
 
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
+
+const STYLE_VARIATION_META_KEY = '_wp_connected_style_variation';
 
 function useGlobalStylesUserConfig() {
 	const { globalStylesId, isReady, settings, styles, _links } = useSelect(
@@ -173,26 +176,135 @@ function useGlobalStylesBaseConfig() {
 	return [ !! baseConfig, baseConfig ];
 }
 
-export function useGlobalStylesContext() {
+/**
+ * Hook to fetch the connected style variation's config for the current post.
+ * This allows the editor to render with the style variation's styles when a post
+ * is linked to a style variation.
+ *
+ * @param {string} postType Optional post type. If not provided, uses editor store.
+ * @param {string} postId   Optional post ID. If not provided, uses editor store.
+ * @return {Array} Tuple of [isReady, connectedStyleVariationId, styleVariationConfig].
+ */
+function useConnectedStyleVariationConfig( postType, postId ) {
+	// First, get the connected style variation ID from the current post's meta.
+	const connectedStyleVariationId = useSelect(
+		( select ) => {
+			const editorSelectors = select( editorStore );
+
+			// Safely get current post info.
+			const currentPostId =
+				postId ?? editorSelectors?.getCurrentPostId?.();
+			const currentPostType =
+				postType ?? editorSelectors?.getCurrentPostType?.();
+
+			if ( ! currentPostId || ! currentPostType ) {
+				return 0;
+			}
+
+			const { getEditedEntityRecord } = select( coreStore );
+			const post = getEditedEntityRecord(
+				'postType',
+				currentPostType,
+				currentPostId
+			);
+
+			return post?.meta?.[ STYLE_VARIATION_META_KEY ] || 0;
+		},
+		[ postType, postId ]
+	);
+
+	// Separately fetch the style variation if we have an ID.
+	const { styleVariationConfig, isReady } = useSelect(
+		( select ) => {
+			if ( ! connectedStyleVariationId ) {
+				return {
+					styleVariationConfig: null,
+					isReady: true,
+				};
+			}
+
+			const { getEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+
+			// Fetch the style variation.
+			const styleVariation = getEntityRecord(
+				'postType',
+				'wp_global_styles',
+				connectedStyleVariationId
+			);
+
+			const hasResolved = hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				'wp_global_styles',
+				connectedStyleVariationId,
+			] );
+
+			const config =
+				styleVariation && hasResolved
+					? {
+							settings: styleVariation.settings ?? {},
+							styles: styleVariation.styles ?? {},
+					  }
+					: null;
+
+			return {
+				styleVariationConfig: config,
+				isReady: hasResolved,
+			};
+		},
+		[ connectedStyleVariationId ]
+	);
+
+	return [ isReady, connectedStyleVariationId, styleVariationConfig ];
+}
+
+/**
+ * Hook to get the global styles context, including connected style variation if applicable.
+ *
+ * @param {string} postType Optional post type for connected style variation lookup.
+ * @param {string} postId   Optional post ID for connected style variation lookup.
+ * @return {Object} Global styles context.
+ */
+export function useGlobalStylesContext( postType, postId ) {
 	const [ isUserConfigReady, userConfig, setUserConfig ] =
 		useGlobalStylesUserConfig();
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
+	const [
+		isStyleVariationReady,
+		connectedStyleVariationId,
+		styleVariationConfig,
+	] = useConnectedStyleVariationConfig( postType, postId );
 
 	const mergedConfig = useMemo( () => {
 		if ( ! baseConfig || ! userConfig ) {
 			return {};
 		}
 
-		return mergeGlobalStyles( baseConfig, userConfig );
-	}, [ userConfig, baseConfig ] );
+		// First merge base with user config (main global styles).
+		const baseUserMerged = mergeGlobalStyles( baseConfig, userConfig );
+
+		// If there's a connected style variation, merge its config on top.
+		if ( connectedStyleVariationId && styleVariationConfig ) {
+			return mergeGlobalStyles( baseUserMerged, styleVariationConfig );
+		}
+
+		return baseUserMerged;
+	}, [
+		userConfig,
+		baseConfig,
+		connectedStyleVariationId,
+		styleVariationConfig,
+	] );
 
 	const context = useMemo( () => {
 		return {
-			isReady: isUserConfigReady && isBaseConfigReady,
+			isReady:
+				isUserConfigReady && isBaseConfigReady && isStyleVariationReady,
 			user: userConfig,
 			base: baseConfig,
 			merged: mergedConfig,
 			setUserConfig,
+			connectedStyleVariationId,
 		};
 	}, [
 		mergedConfig,
@@ -201,6 +313,8 @@ export function useGlobalStylesContext() {
 		setUserConfig,
 		isUserConfigReady,
 		isBaseConfigReady,
+		isStyleVariationReady,
+		connectedStyleVariationId,
 	] );
 
 	return context;

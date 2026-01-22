@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
+import {
+	useMemo,
+	useCallback,
+	createContext,
+	useContext,
+} from '@wordpress/element';
 import {
 	mergeGlobalStyles,
 	getStyle,
@@ -19,9 +24,17 @@ import { unlock } from '../../lock-unlock';
 const { cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
 /**
- * Hook to fetch and manage user global styles config
+ * Context for the currently editing style variation ID.
+ * When null or 0, the main global styles is being edited.
  */
-function useGlobalStylesUserConfig() {
+export const StyleVariationContext = createContext( 0 );
+
+/**
+ * Hook to fetch and manage user global styles config
+ *
+ * @param {number} styleVariationId Optional style variation ID. If provided, edits that style variation instead of main styles.
+ */
+function useGlobalStylesUserConfig( styleVariationId = 0 ) {
 	const { globalStylesId, isReady, settings, styles, _links } = useSelect(
 		( select ) => {
 			const {
@@ -30,58 +43,79 @@ function useGlobalStylesUserConfig() {
 				hasFinishedResolution,
 				canUser,
 			} = select( coreStore );
-			const _globalStylesId =
-				select( coreStore ).__experimentalGetCurrentGlobalStylesId();
+
+			// If editing a style variation, use that ID. Otherwise use main global styles.
+			const _globalStylesId = styleVariationId
+				? styleVariationId
+				: select( coreStore ).__experimentalGetCurrentGlobalStylesId();
 
 			let record;
 
-			const userCanEditGlobalStyles = _globalStylesId
-				? canUser( 'update', {
-						kind: 'root',
-						name: 'globalStyles',
-						id: _globalStylesId,
-				  } )
-				: null;
+			// For style variations, use postType entity. For main styles, use root/globalStyles.
+			// Both use the same REST endpoint (/wp/v2/global-styles) but different entity tracking.
+			const entityKind = styleVariationId ? 'postType' : 'root';
+			const entityName = styleVariationId
+				? 'wp_global_styles'
+				: 'globalStyles';
 
-			if (
-				_globalStylesId &&
-				typeof userCanEditGlobalStyles === 'boolean'
-			) {
-				if ( userCanEditGlobalStyles ) {
-					record = getEditedEntityRecord(
-						'root',
-						'globalStyles',
-						_globalStylesId
-					);
-				} else {
-					record = getEntityRecord(
-						'root',
-						'globalStyles',
-						_globalStylesId,
-						{ context: 'view' }
-					);
+			// For style variations, fetch immediately without waiting for canUser.
+			// This avoids a waterfall where we wait for permission check before fetching.
+			if ( styleVariationId && _globalStylesId ) {
+				// Trigger the fetch.
+				getEntityRecord( entityKind, entityName, _globalStylesId );
+				// Use edited record to include local edits.
+				record = getEditedEntityRecord(
+					entityKind,
+					entityName,
+					_globalStylesId
+				);
+			} else if ( _globalStylesId ) {
+				// For main global styles, use the original canUser-gated logic.
+				const userCanEdit = canUser( 'update', {
+					kind: entityKind,
+					name: entityName,
+					id: _globalStylesId,
+				} );
+
+				if ( typeof userCanEdit === 'boolean' ) {
+					getEntityRecord( entityKind, entityName, _globalStylesId );
+
+					if ( userCanEdit ) {
+						record = getEditedEntityRecord(
+							entityKind,
+							entityName,
+							_globalStylesId
+						);
+					} else {
+						record = getEntityRecord(
+							entityKind,
+							entityName,
+							_globalStylesId,
+							{ context: 'view' }
+						);
+					}
 				}
 			}
 
 			let hasResolved = false;
-			if (
+			if ( styleVariationId ) {
+				// For style variations, check if the entity record has resolved.
+				hasResolved = hasFinishedResolution( 'getEntityRecord', [
+					entityKind,
+					entityName,
+					_globalStylesId,
+				] );
+			} else if (
 				hasFinishedResolution(
 					'__experimentalGetCurrentGlobalStylesId'
 				)
 			) {
 				if ( _globalStylesId ) {
-					hasResolved = userCanEditGlobalStyles
-						? hasFinishedResolution( 'getEditedEntityRecord', [
-								'root',
-								'globalStyles',
-								_globalStylesId,
-						  ] )
-						: hasFinishedResolution( 'getEntityRecord', [
-								'root',
-								'globalStyles',
-								_globalStylesId,
-								{ context: 'view' },
-						  ] );
+					hasResolved = hasFinishedResolution( 'getEntityRecord', [
+						entityKind,
+						entityName,
+						_globalStylesId,
+					] );
 				} else {
 					hasResolved = true;
 				}
@@ -95,7 +129,7 @@ function useGlobalStylesUserConfig() {
 				_links: record?._links,
 			};
 		},
-		[]
+		[ styleVariationId ]
 	);
 
 	const { getEditedEntityRecord } = useSelect( coreStore );
@@ -111,9 +145,15 @@ function useGlobalStylesUserConfig() {
 
 	const setConfig = useCallback(
 		( callbackOrObject, options = {} ) => {
+			// For style variations, use postType entity. For main styles, use root/globalStyles.
+			const entityKind = styleVariationId ? 'postType' : 'root';
+			const entityName = styleVariationId
+				? 'wp_global_styles'
+				: 'globalStyles';
+
 			const record = getEditedEntityRecord(
-				'root',
-				'globalStyles',
+				entityKind,
+				entityName,
 				globalStylesId
 			);
 
@@ -128,19 +168,28 @@ function useGlobalStylesUserConfig() {
 					? callbackOrObject( currentConfig )
 					: callbackOrObject;
 
+			// Both style variations and main global styles use the same format.
+			const newStyles = cleanEmptyObject( updatedConfig.styles ) || {};
+			const newSettings =
+				cleanEmptyObject( updatedConfig.settings ) || {};
+
 			editEntityRecord(
-				'root',
-				'globalStyles',
+				entityKind,
+				entityName,
 				globalStylesId,
 				{
-					styles: cleanEmptyObject( updatedConfig.styles ) || {},
-					settings: cleanEmptyObject( updatedConfig.settings ) || {},
-					_links: cleanEmptyObject( updatedConfig._links ) || {},
+					styles: newStyles,
+					settings: newSettings,
 				},
 				options
 			);
 		},
-		[ globalStylesId, editEntityRecord, getEditedEntityRecord ]
+		[
+			globalStylesId,
+			styleVariationId,
+			editEntityRecord,
+			getEditedEntityRecord,
+		]
 	);
 
 	return [ isReady, config, setConfig ];
@@ -161,12 +210,18 @@ function useGlobalStylesBaseConfig() {
 /**
  * Hook to get merged global styles configuration
  *
+ * @param {number} styleVariationId Optional style variation ID. If provided, edits that style variation.
  * @return {Object} Object containing merged, base, user configs and setUser function
  *                  { merged, base, user, setUser }
  */
-export function useGlobalStyles() {
+export function useGlobalStyles( styleVariationId ) {
+	// Use context if no styleVariationId is provided directly.
+	const contextStyleVariationId = useContext( StyleVariationContext );
+	const effectiveStyleVariationId =
+		styleVariationId ?? contextStyleVariationId;
+
 	const [ isUserConfigReady, userConfig, setUserConfig ] =
-		useGlobalStylesUserConfig();
+		useGlobalStylesUserConfig( effectiveStyleVariationId );
 	const [ isBaseConfigReady, baseConfig ] = useGlobalStylesBaseConfig();
 
 	const merged = useMemo( () => {

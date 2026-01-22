@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { FlexItem, Flex, Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { styles, seen, backup } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
@@ -16,6 +16,10 @@ import { store as interfaceStore } from '@wordpress/interface';
  */
 import GlobalStylesUI from '../global-styles';
 import { GlobalStylesActionMenu } from '../global-styles/menu';
+import {
+	StyleVariationSelector,
+	useStyleVariations,
+} from '../global-styles/style-variation-selector';
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import DefaultSidebar from './default-sidebar';
@@ -29,11 +33,11 @@ export default function GlobalStylesSidebar() {
 		showListViewByDefault,
 		hasRevisions,
 		activeComplementaryArea,
+		selectedStyleVariation,
 	} = useSelect( ( select ) => {
 		const { getActiveComplementaryArea } = select( interfaceStore );
-		const { getStylesPath, getShowStylebook } = unlock(
-			select( editorStore )
-		);
+		const { getStylesPath, getShowStylebook, getSelectedStyleVariationId } =
+			unlock( select( editorStore ) );
 		const _isVisualEditorMode =
 			'visual' === select( editorStore ).getEditorMode();
 		const _showListViewByDefault = select( preferencesStore ).get(
@@ -60,11 +64,15 @@ export default function GlobalStylesSidebar() {
 				!! globalStyles?._links?.[ 'version-history' ]?.[ 0 ]?.count,
 			activeComplementaryArea:
 				select( interfaceStore ).getActiveComplementaryArea( 'core' ),
+			selectedStyleVariation: getSelectedStyleVariationId(),
 		};
 	}, [] );
-	const { setStylesPath, setShowStylebook, resetStylesNavigation } = unlock(
-		useDispatch( editorStore )
-	);
+	const {
+		setStylesPath,
+		setShowStylebook,
+		resetStylesNavigation,
+		setSelectedStyleVariationId,
+	} = unlock( useDispatch( editorStore ) );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 
 	// Derive state from path and showStylebook
@@ -92,6 +100,17 @@ export default function GlobalStylesSidebar() {
 	}, [ shouldResetNavigation, resetStylesNavigation ] );
 
 	const { setIsListViewOpened } = useDispatch( editorStore );
+
+	// Get style variations for the selector.
+	const { styleVariations } = useStyleVariations();
+
+	// Find the selected style variation info.
+	const selectedStyleVariationInfo =
+		selectedStyleVariation !== 0
+			? styleVariations.find(
+					( variation ) => variation.id === selectedStyleVariation
+			  )
+			: null;
 
 	const toggleRevisions = () => {
 		setIsListViewOpened( false );
@@ -132,6 +151,17 @@ export default function GlobalStylesSidebar() {
 							gap={ 1 }
 							className="editor-global-styles-sidebar__header-actions"
 						>
+							<FlexItem>
+								<StyleVariationSelector
+									selectedStyleVariation={
+										selectedStyleVariation
+									}
+									onSelect={ setSelectedStyleVariationId }
+									onOpenStyleBook={ () =>
+										setShowStylebook( true )
+									}
+								/>
+							</FlexItem>
 							{ ! isMobileViewport && (
 								<FlexItem>
 									<Button
@@ -166,9 +196,21 @@ export default function GlobalStylesSidebar() {
 					</Flex>
 				}
 			>
+				{ selectedStyleVariationInfo && (
+					<p className="editor-global-styles-sidebar__style-variation-info">
+						{ sprintf(
+							/* translators: %s: The name of the style variation being edited. */
+							__(
+								'Editing "%s" style variation. Changes apply only when this style is connected to a post, page, template, or pattern.'
+							),
+							selectedStyleVariationInfo.title
+						) }
+					</p>
+				) }
 				<GlobalStylesUI
 					path={ stylesPath }
 					onPathChange={ setStylesPath }
+					styleVariationId={ selectedStyleVariation }
 				/>
 			</DefaultSidebar>
 			<WelcomeGuideStyles />

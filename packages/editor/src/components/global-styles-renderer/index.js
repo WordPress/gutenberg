@@ -8,10 +8,16 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { useGlobalStylesOutput } from '../../hooks/use-global-styles-output';
+import { useGlobalStylesOutputWithConfig } from '../../hooks/use-global-styles-output';
+import { useGlobalStylesContext } from '../global-styles-provider';
 
 function useGlobalStylesRenderer( disableRootPadding ) {
-	const [ styles, settings ] = useGlobalStylesOutput( disableRootPadding );
+	// Use useGlobalStylesContext which includes connected style variation for the current post.
+	const { merged: mergedConfig } = useGlobalStylesContext();
+	const [ styles, settings ] = useGlobalStylesOutputWithConfig(
+		mergedConfig,
+		disableRootPadding
+	);
 	const { getEditorSettings } = useSelect( editorStore );
 	const { updateEditorSettings } = useDispatch( editorStore );
 

@@ -12,7 +12,7 @@ import { uploadMedia } from '@wordpress/media-utils';
  */
 import { store as editorStore } from '../../store';
 import { GlobalStylesBlockLink } from './block-link';
-import { useGlobalStyles } from './hooks';
+import { useGlobalStyles, StyleVariationContext } from './hooks';
 
 /**
  * Hook to fetch server CSS and settings for BlockEditorProvider that are not Global Styles.
@@ -87,13 +87,17 @@ function useServerData() {
 	return { serverCSS, serverSettings, fontLibraryEnabled };
 }
 
-export default function GlobalStylesUIWrapper( { path, onPathChange } ) {
+export default function GlobalStylesUIWrapper( {
+	path,
+	onPathChange,
+	styleVariationId = 0,
+} ) {
 	const {
 		user: userConfig,
 		base: baseConfig,
 		setUser: setUserConfig,
 		isReady,
-	} = useGlobalStyles();
+	} = useGlobalStyles( styleVariationId );
 	const { serverCSS, serverSettings, fontLibraryEnabled } = useServerData();
 
 	// Show loading state while data is being fetched
@@ -102,7 +106,7 @@ export default function GlobalStylesUIWrapper( { path, onPathChange } ) {
 	}
 
 	return (
-		<>
+		<StyleVariationContext.Provider value={ styleVariationId }>
 			<GlobalStylesUI
 				value={ userConfig }
 				baseValue={ baseConfig || {} }
@@ -117,7 +121,7 @@ export default function GlobalStylesUIWrapper( { path, onPathChange } ) {
 				path={ path }
 				onPathChange={ onPathChange }
 			/>
-		</>
+		</StyleVariationContext.Provider>
 	);
 }
 

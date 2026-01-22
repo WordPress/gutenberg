@@ -7,6 +7,11 @@ import {
 	templateTitleField,
 } from '@wordpress/fields';
 import * as interfaceApis from '@wordpress/interface';
+import {
+	CreateTemplatePartModal,
+	patternTitleField,
+	templateTitleField,
+} from '@wordpress/fields';
 
 /**
  * Internal dependencies
@@ -29,6 +34,10 @@ import GlobalStylesUIWrapper from './components/global-styles';
 import { StyleBookPreview } from './components/style-book';
 import { useGlobalStyles, useStyle } from './components/global-styles/hooks';
 import { GlobalStylesActionMenu } from './components/global-styles/menu';
+import {
+	StyleVariationSelector,
+	useStyleVariations,
+} from './components/global-styles/style-variation-selector';
 import {
 	useGenerateBlockPath,
 	useRestoreBlockFromPath,
@@ -57,6 +66,8 @@ lock( privateApis, {
 	// Global Styles
 	GlobalStylesUIWrapper,
 	GlobalStylesActionMenu,
+	StyleVariationSelector,
+	useStyleVariations,
 	StyleBookPreview,
 	useGlobalStyles,
 	useStyle,

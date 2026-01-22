@@ -16,8 +16,12 @@ import { seen } from '@wordpress/icons';
  */
 import { unlock } from '../../lock-unlock';
 
-const { GlobalStylesUIWrapper, GlobalStylesActionMenu } =
-	unlock( editorPrivateApis );
+const {
+	GlobalStylesUIWrapper,
+	GlobalStylesActionMenu,
+	StyleVariationSelector,
+	useStyleVariations,
+} = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const GlobalStylesPageActions = ( {
@@ -25,11 +29,26 @@ const GlobalStylesPageActions = ( {
 	setIsStyleBookOpened,
 	path,
 	onChangeSection,
+	selectedStyleVariation,
+	onSelectStyleVariation,
 } ) => {
 	const history = useHistory();
 
+	const openStyleBook = () => {
+		if ( ! isStyleBookOpened ) {
+			setIsStyleBookOpened( true );
+			const updatedPath = addQueryArgs( path, { preview: 'stylebook' } );
+			history.navigate( updatedPath );
+		}
+	};
+
 	return (
 		<HStack>
+			<StyleVariationSelector
+				selectedStyleVariation={ selectedStyleVariation }
+				onSelect={ onSelectStyleVariation }
+				onOpenStyleBook={ openStyleBook }
+			/>
 			<Button
 				isPressed={ isStyleBookOpened }
 				icon={ seen }
@@ -80,8 +99,20 @@ export default function SidebarGlobalStyles() {
 	const [ isStyleBookOpened, setIsStyleBookOpened ] = useState(
 		path.includes( 'preview=stylebook' )
 	);
+	const [ selectedStyleVariation, setSelectedStyleVariation ] = useState( 0 );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const [ section, onChangeSection ] = useSection();
+
+	// Get style variations for showing info paragraph.
+	const { styleVariations } = useStyleVariations();
+
+	// Find the selected style variation info.
+	const selectedStyleVariationInfo =
+		selectedStyleVariation !== 0
+			? styleVariations.find(
+					( variation ) => variation.id === selectedStyleVariation
+			  )
+			: null;
 
 	return (
 		<Page
@@ -92,15 +123,23 @@ export default function SidebarGlobalStyles() {
 						setIsStyleBookOpened={ setIsStyleBookOpened }
 						path={ path }
 						onChangeSection={ onChangeSection }
+						selectedStyleVariation={ selectedStyleVariation }
+						onSelectStyleVariation={ setSelectedStyleVariation }
 					/>
 				) : null
 			}
 			className="edit-site-styles"
 			title={ __( 'Styles' ) }
 		>
+			{ selectedStyleVariationInfo && (
+				<p className="edit-site-styles__style-variation-info">
+					{ `Editing "${ selectedStyleVariationInfo.title }" style variation. Changes apply only when this style is connected to a post, page, template, or pattern.` }
+				</p>
+			) }
 			<GlobalStylesUIWrapper
 				path={ section }
 				onPathChange={ onChangeSection }
+				styleVariationId={ selectedStyleVariation }
 			/>
 		</Page>
 	);

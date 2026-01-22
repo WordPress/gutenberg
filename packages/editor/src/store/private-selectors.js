@@ -300,3 +300,14 @@ export function getShowStylebook( state ) {
 export function getCanvasMinHeight( state ) {
 	return state.canvasMinHeight;
 }
+
+/**
+ * Get the currently selected style variation ID.
+ * Returns 0 when main global styles are selected.
+ *
+ * @param {Object} state Global application state.
+ * @return {number} The selected style variation ID.
+ */
+export function getSelectedStyleVariationId( state ) {
+	return state.selectedStyleVariationId ?? 0;
+}

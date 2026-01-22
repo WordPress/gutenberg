@@ -576,3 +576,17 @@ export function setCanvasMinHeight( minHeight ) {
 		minHeight,
 	};
 }
+
+/**
+ * Set the currently selected style variation ID.
+ * Use 0 to select the main global styles.
+ *
+ * @param {number} id Style variation ID.
+ * @return {Object} Action object.
+ */
+export function setSelectedStyleVariationId( id ) {
+	return {
+		type: 'SET_SELECTED_STYLE_VARIATION_ID',
+		id,
+	};
+}
