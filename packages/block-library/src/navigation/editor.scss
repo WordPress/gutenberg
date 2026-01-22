@@ -675,19 +675,9 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	margin-top: $grid-unit-20;
 	border: 1px solid $gray-300;
 	border-radius: 2px;
-	overflow: hidden;
+	overflow-y: auto;
 	max-height: 200px;
 	background: $white;
-
-	&--expanded {
-		max-height: none;
-	}
-}
-
-.wp-block-navigation__overlay-preview-toggle {
-	width: 100%;
-	justify-content: center;
-	margin-top: $grid-unit-10;
 }
 
 .wp-block-navigation__overlay-preview-loading {
