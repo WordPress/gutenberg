@@ -35,7 +35,8 @@ interface Action< Item > {
 function isItemValid( item: BasePost ): boolean {
 	return (
 		typeof item.menu_order === 'number' &&
-		Number.isInteger( item.menu_order )
+		Number.isInteger( item.menu_order ) &&
+		item.menu_order > 0
 	);
 }
 
