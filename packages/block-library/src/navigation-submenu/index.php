@@ -133,9 +133,9 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 
 	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
-	$effective_visibility    = block_core_navigation_submenu_get_submenu_visibility( $block->context );
-	$open_on_click           = 'click' === $effective_visibility;
-	$open_on_hover           = 'hover' === $effective_visibility;
+	$computed_visibility     = block_core_navigation_submenu_get_submenu_visibility( $block->context );
+	$open_on_click           = 'click' === $computed_visibility;
+	$open_on_hover           = 'hover' === $computed_visibility;
 	$open_on_hover_and_click = $open_on_hover && $show_submenu_indicators;
 
 	$classes = array(
@@ -154,7 +154,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	if ( $open_on_hover_and_click ) {
 		$classes[] = 'open-on-hover-click';
 	}
-	if ( 'always' === $effective_visibility ) {
+	if ( 'always' === $computed_visibility ) {
 		$classes[] = 'open-always';
 	}
 	if ( $is_active ) {
