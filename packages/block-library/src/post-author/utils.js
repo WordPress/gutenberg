@@ -89,6 +89,9 @@ export function recreateWithRecommendedBlocks( attributes, blockTypes ) {
 							selfStretch: 'fill',
 							flexSize: null,
 						},
+						spacing: {
+							blockGap: '0',
+						},
 					},
 					layout: {
 						type: 'flex',
