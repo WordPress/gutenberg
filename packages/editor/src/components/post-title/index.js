@@ -10,8 +10,8 @@ import { forwardRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { ENTER } from '@wordpress/keycodes';
-import { pasteHandler } from '@wordpress/blocks';
+import { ENTER, DELETE } from '@wordpress/keycodes';
+import { pasteHandler, isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import {
 	__unstableUseRichText as useRichText,
 	create,
@@ -31,16 +31,17 @@ import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
 const PostTitle = forwardRef( ( _, forwardedRef ) => {
-	const { placeholder, isEditingContentOnlySection } = useSelect(
+	const { placeholder, isEditingContentOnlySection, firstBlock } = useSelect(
 		( select ) => {
-			const { getSettings, getEditedContentOnlySection } = unlock(
-				select( blockEditorStore )
-			);
+			const { getSettings, getEditedContentOnlySection, getBlocks } =
+				unlock( select( blockEditorStore ) );
 			const { titlePlaceholder } = getSettings();
+			const blocks = getBlocks();
 
 			return {
 				placeholder: titlePlaceholder,
 				isEditingContentOnlySection: !! getEditedContentOnlySection(),
+				firstBlock: blocks[ 0 ],
 			};
 		},
 		[]
@@ -54,8 +55,12 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 
 	const [ selection, setSelection ] = useState( {} );
 
-	const { clearSelectedBlock, insertBlocks, insertDefaultBlock } =
-		useDispatch( blockEditorStore );
+	const {
+		clearSelectedBlock,
+		insertBlocks,
+		insertDefaultBlock,
+		removeBlock,
+	} = useDispatch( blockEditorStore );
 
 	const decodedPlaceholder =
 		decodeEntities( placeholder ) || __( 'Add title' );
@@ -105,10 +110,38 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		insertDefaultBlock( undefined, undefined, 0 );
 	}
 
+	function handleDeleteAtEndOfTitle() {
+		if ( ! firstBlock ) {
+			return false;
+		}
+
+		// If the first block is an empty default block, remove it.
+		// We don't pass a role parameter to isUnmodifiedDefaultBlock because we want
+		// to check if the block is truly unmodified across all attributes.
+		if ( isUnmodifiedDefaultBlock( firstBlock ) ) {
+			removeBlock( firstBlock.clientId, false );
+			return true;
+		}
+
+		// For now, we only handle the empty default block case.
+		// Future enhancement: merge content from non-empty blocks into title.
+		return false;
+	}
+
 	function onKeyDown( event ) {
 		if ( event.keyCode === ENTER ) {
 			event.preventDefault();
 			onEnterPress();
+		}
+
+		if ( event.keyCode === DELETE ) {
+			// Check if cursor is at the end of the title
+			const { start, end, text } = value;
+			const isAtEnd = start === end && end === text.length;
+
+			if ( isAtEnd && handleDeleteAtEndOfTitle() ) {
+				event.preventDefault();
+			}
 		}
 	}
 
@@ -144,18 +177,18 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 		}
 
 		if ( typeof content !== 'string' ) {
-			const [ firstBlock ] = content;
+			const [ pastedBlock ] = content;
 
 			if (
 				! title &&
-				( firstBlock.name === 'core/heading' ||
-					firstBlock.name === 'core/paragraph' )
+				( pastedBlock.name === 'core/heading' ||
+					pastedBlock.name === 'core/paragraph' )
 			) {
 				// Strip HTML to avoid unwanted HTML being added to the title.
 				// In the majority of cases it is assumed that HTML in the title
 				// is undesirable.
 				const contentNoHTML = stripHTML(
-					firstBlock.attributes.content
+					pastedBlock.attributes.content
 				);
 				onUpdate( contentNoHTML );
 				onInsertBlockAfter( content.slice( 1 ) );

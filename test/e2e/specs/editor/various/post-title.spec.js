@@ -364,4 +364,143 @@ test.describe( 'Post title', () => {
 			).toBeHidden();
 		} );
 	} );
+
+	test.describe( 'Delete key handling', () => {
+		test( 'should delete empty default block after title when pressing Delete at end of title', async ( {
+			editor,
+			page,
+			admin,
+		} ) => {
+			await admin.createNewPost();
+
+			const pageTitleField = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			// Type a title
+			await pageTitleField.fill( 'My Title' );
+
+			// Press Enter twice to create an empty block and then another block
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.press( 'Enter' );
+
+			// Type content in the second block
+			await page.keyboard.type( 'My second paragraph' );
+
+			// Now we should have: title, empty block, paragraph with text
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: '' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'My second paragraph' },
+				},
+			] );
+
+			// Focus back on the title at the end
+			await pageTitleField.focus();
+			await page.keyboard.press( 'End' );
+
+			// Press Delete key
+			await page.keyboard.press( 'Delete' );
+
+			// The empty block should be deleted
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'My second paragraph' },
+				},
+			] );
+		} );
+
+		test( 'should not affect non-empty blocks when pressing Delete at end of title', async ( {
+			editor,
+			page,
+			admin,
+		} ) => {
+			await admin.createNewPost();
+
+			const pageTitleField = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			// Type a title
+			await pageTitleField.fill( 'My Title' );
+
+			// Press Enter and type content immediately
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( 'First paragraph' );
+
+			// Now we should have: title and a paragraph with text
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'First paragraph' },
+				},
+			] );
+
+			// Focus back on the title at the end
+			await pageTitleField.focus();
+			await page.keyboard.press( 'End' );
+
+			// Press Delete key
+			await page.keyboard.press( 'Delete' );
+
+			// The paragraph should still exist (not deleted since it has content)
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'First paragraph' },
+				},
+			] );
+		} );
+
+		test( 'should not delete blocks when pressing Delete from middle of title', async ( {
+			editor,
+			page,
+			admin,
+		} ) => {
+			await admin.createNewPost();
+
+			const pageTitleField = editor.canvas.getByRole( 'textbox', {
+				name: 'Add title',
+			} );
+
+			// Type a title
+			const originalTitle = 'My Title';
+			await pageTitleField.fill( originalTitle );
+
+			// Press Enter twice to create an empty block
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.press( 'Enter' );
+			await page.keyboard.type( 'Paragraph' );
+
+			// Focus back on the title in the middle
+			await pageTitleField.focus();
+			await page.keyboard.press( 'Home' );
+			// Move cursor 2 positions to the right (after "My")
+			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'ArrowRight' );
+
+			// Press Delete key (cursor is in middle of "My Title", not at end)
+			// This should delete the space character
+			await page.keyboard.press( 'Delete' );
+
+			// Should just delete the space character in title, not affect blocks
+			const expectedTitle = 'MyTitle'; // "My Title" with space removed
+			await expect( pageTitleField ).toHaveText( expectedTitle );
+			await expect.poll( editor.getBlocks ).toMatchObject( [
+				{
+					name: 'core/paragraph',
+					attributes: { content: '' },
+				},
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'Paragraph' },
+				},
+			] );
+		} );
+	} );
 } );
