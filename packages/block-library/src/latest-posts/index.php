@@ -187,6 +187,9 @@ function render_block_core_latest_posts( $attributes ) {
 
 			if ( post_password_required( $post ) ) {
 				$post_content = __( 'This content is password protected.' );
+			} else {
+				// Parse blocks so they are properly rendered with styles and attributes.
+				$post_content = do_blocks( $post_content );
 			}
 
 			$list_items_markup .= sprintf(
