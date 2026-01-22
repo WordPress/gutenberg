@@ -39,9 +39,7 @@ import { AwarenessState } from '../awareness/awareness-state';
  * A minimal mock awareness class for testing.
  */
 class MockAwarenessState extends AwarenessState {
-	protected equalityFieldChecks = {
-		userInfo: () => true,
-	};
+	protected equalityFieldChecks = {};
 }
 
 // Mock dependencies.
