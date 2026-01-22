@@ -450,18 +450,20 @@ export function createSyncManager(): SyncManager {
 	/**
 	 * Update CRDT document with changes from the local store.
 	 *
-	 * @param {ObjectType}            objectType Object type.
-	 * @param {ObjectID}              objectId   Object ID.
-	 * @param {Partial< ObjectData >} changes    Updates to make.
-	 * @param {string}                origin     The source of change.
-	 * @param {boolean}               isSave     Whether this update is part of a save operation.
+	 * @param {ObjectType}            objectType     Object type.
+	 * @param {ObjectID}              objectId       Object ID.
+	 * @param {Partial< ObjectData >} changes        Updates to make.
+	 * @param {string}                origin         The source of change.
+	 * @param {boolean}               isSave         Whether this update is part of a save operation.
+	 * @param                         isNewUndoLevel Whether to create a new undo level for this change.
 	 */
 	function updateCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID | null,
 		changes: Partial< ObjectData >,
 		origin: string,
-		isSave: boolean = false
+		isSave: boolean = false,
+		isNewUndoLevel: boolean = false
 	): void {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
@@ -469,6 +471,16 @@ export function createSyncManager(): SyncManager {
 
 		if ( entityState ) {
 			const { syncConfig, ydoc } = entityState;
+
+			// If this is change should create a new undo level, tell the undo
+			// manager to stop capturing and create a new undo group.
+			// We can't do this in the undo manager itself, because addRecord() is
+			// called after the CRDT changes have been applied, and we want to
+			// ensure that the undo set is created before the changes are applied.
+			if ( isNewUndoLevel && undoManager ) {
+				undoManager.stopCapturing?.();
+			}
+
 			ydoc.transact( () => {
 				syncConfig.applyChangesToCRDTDoc( ydoc, changes );
 
