@@ -21,8 +21,9 @@ function render_block_core_query( $attributes, $content, $block ) {
 		&& true === $attributes['enhancedPagination']
 		&& isset( $attributes['queryId'] );
 
-	// Check if this is a slider variation (detected by className).
-	$is_slider = isset( $attributes['className'] ) && strpos( $attributes['className'], 'is-style-slider' ) !== false;
+	// Check if this is a slider variation (detected by className on query or is-slider-track in content).
+	$is_slider = ( isset( $attributes['className'] ) && strpos( $attributes['className'], 'is-style-slider' ) !== false )
+		|| strpos( $content, 'is-slider-track' ) !== false;
 
 	// Enqueue the script module and add the necessary directives if the block is
 	// interactive.
