@@ -15,7 +15,7 @@ test.describe( 'Router regions', () => {
 			alias: 'router regions - page 2',
 			attributes: { page: 2 },
 		} );
-		await utils.addPostWithBlock( 'test/router-regions', {
+		const page1 = await utils.addPostWithBlock( 'test/router-regions', {
 			alias: 'router regions - page 1',
 			attributes: { page: 1, next },
 		} );
@@ -53,9 +53,10 @@ test.describe( 'Router regions', () => {
 		const pageAttachTo2 = await utils.addPostWithBlock(
 			'test/router-regions',
 			{
-				alias: 'router regions - page 2',
+				alias: 'router regions - page 2 - attachTo',
 				attributes: {
 					page: 'attachTo2',
+					next: page1,
 					regionsWithAttachTo: [
 						region3,
 						region4,
@@ -71,7 +72,7 @@ test.describe( 'Router regions', () => {
 		const pageAttachTo1 = await utils.addPostWithBlock(
 			'test/router-regions',
 			{
-				alias: 'router regions - page 2',
+				alias: 'router regions - page 1 - attachTo',
 				attributes: {
 					page: 'attachTo1',
 					next: pageAttachTo2,
@@ -80,7 +81,7 @@ test.describe( 'Router regions', () => {
 			}
 		);
 		await utils.addPostWithBlock( 'test/router-regions', {
-			alias: 'router regions - page 1 - attachTo',
+			alias: 'router regions - main - attachTo',
 			attributes: { page: 1, next: pageAttachTo1 },
 		} );
 	} );
@@ -254,9 +255,7 @@ test.describe( 'Router regions', () => {
 		page,
 		interactivityUtils: utils,
 	} ) => {
-		await page.goto(
-			utils.getLink( 'router regions - page 1 - attachTo' )
-		);
+		await page.goto( utils.getLink( 'router regions - main - attachTo' ) );
 
 		const bodyLocator = page.locator( 'body' );
 		const regionsLocator = page.locator( '#regions-with-attach-to' );
@@ -391,9 +390,7 @@ test.describe( 'Router regions', () => {
 		page,
 		interactivityUtils: utils,
 	} ) => {
-		await page.goto(
-			utils.getLink( 'router regions - page 1 - attachTo' )
-		);
+		await page.goto( utils.getLink( 'router regions - main - attachTo' ) );
 
 		const region7 = page.locator( 'body' ).getByTestId( 'region7' );
 		const region8 = page
@@ -569,7 +566,7 @@ test.describe( 'Router regions', () => {
 		// The text of this element is used to check a navigation is completed.
 		const region1Ssr = page.getByTestId( 'region-1-ssr' );
 
-		await expect( region1Ssr ).toHaveText( 'content from page 1' );
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
 
 		// Navigate to "Page attachTo 1".
 		await page.getByTestId( 'next' ).click();
@@ -591,6 +588,125 @@ test.describe( 'Router regions', () => {
 		for ( const regionId in regions ) {
 			const region = regions[ regionId ];
 			await expect( region ).toHaveAttribute( 'data-tag', regionId );
+		}
+	} );
+
+	test( 'should not be duplicated after `navigate()` when they use `attachTo` and appeared in the initial page', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		const bodyLocator = page.locator( 'body' );
+		const regionsLocator = page.locator( '#regions-with-attach-to' );
+
+		const regionsPage1: Record< string, Locator > = {
+			region3: bodyLocator.getByTestId( 'region3' ),
+			region4: regionsLocator.getByTestId( 'region4' ),
+			region5: bodyLocator.getByTestId( 'region5' ),
+			region6: regionsLocator.getByTestId( 'region6' ),
+		};
+
+		const regionsPage2: Record< string, Locator > = {
+			region7: bodyLocator.getByTestId( 'region7' ),
+			region8: regionsLocator.getByTestId( 'region8' ),
+		};
+
+		const allRegions: Record< string, Locator > = {
+			...regionsPage1,
+			...regionsPage2,
+		};
+
+		// The text of this element is used to check a navigation is completed.
+		const region1Ssr = page.getByTestId( 'region-1-ssr' );
+
+		// 1. Visit page 1 - attachTo using "goto".
+		await page.goto(
+			utils.getLink( 'router regions - page 1 - attachTo' )
+		);
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
+
+		// 2. Ensure regions 3 to 6 are unique and interactive.
+		for ( const regionId in regionsPage1 ) {
+			const region = regionsPage1[ regionId ];
+			await expect( region ).toBeVisible();
+			await expect( region ).toHaveCount( 1 );
+
+			const text = region.getByTestId( 'text' );
+			const clientCounter = region.getByTestId( 'client-counter' );
+
+			await expect( text ).toHaveText( regionId );
+			await expect( clientCounter ).toHaveText( '0' );
+
+			await clientCounter.click( { clickCount: 3, delay: 50 } );
+			await expect( clientCounter ).toHaveText( '3' );
+		}
+
+		// 3. Navigate to page 2 - attachTo.
+		await page.getByTestId( 'next' ).click();
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo2' );
+
+		// 4. Ensure regions 3 to 6 are unique and still interactive.
+		for ( const regionId in regionsPage1 ) {
+			const region = regionsPage1[ regionId ];
+			await expect( region ).toBeVisible();
+			await expect( region ).toHaveCount( 1 );
+
+			const text = region.getByTestId( 'text' );
+			const clientCounter = region.getByTestId( 'client-counter' );
+
+			await expect( text ).toHaveText( regionId );
+			// Counter state is preserved from step 2.
+			await expect( clientCounter ).toHaveText( '3' );
+
+			await clientCounter.click( { clickCount: 3, delay: 50 } );
+			await expect( clientCounter ).toHaveText( '6' );
+		}
+
+		// 5. Ensure regions 7 and 8 are visible, unique, and interactive.
+		for ( const regionId in regionsPage2 ) {
+			const region = regionsPage2[ regionId ];
+			await expect( region ).toBeVisible();
+			await expect( region ).toHaveCount( 1 );
+
+			const text = region.getByTestId( 'text' );
+			const clientCounter = region.getByTestId( 'client-counter' );
+
+			await expect( text ).toHaveText( regionId );
+			// Counter for page 2 regions starts at 10.
+			await expect( clientCounter ).toHaveText( '10' );
+
+			await clientCounter.click( { clickCount: 3, delay: 50 } );
+			await expect( clientCounter ).toHaveText( '13' );
+		}
+
+		// 6. Navigate to page 1 (no regions with `attachTo`).
+		await page.getByTestId( 'next' ).click();
+		await expect( region1Ssr ).toHaveText( 'content from page 1' );
+
+		// 7. Ensure all regions have been unmounted after navigation.
+		for ( const regionId in allRegions ) {
+			const region = allRegions[ regionId ];
+			await expect( region ).toBeHidden();
+		}
+
+		// 8. Navigate back to page 2 - attachTo.
+		await page.goBack();
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo2' );
+
+		// 9. Ensure all regions are there again, are interactive, and there are no duplications.
+		for ( const regionId in allRegions ) {
+			const region = allRegions[ regionId ];
+			await expect( region ).toBeVisible();
+			await expect( region ).toHaveCount( 1 );
+
+			const text = region.getByTestId( 'text' );
+			const clientCounter = region.getByTestId( 'client-counter' );
+
+			await expect( text ).toHaveText( regionId );
+			// After a full page reload, all counters start at 10 (server value).
+			await expect( clientCounter ).toHaveText( '10' );
+
+			await clientCounter.click( { clickCount: 3, delay: 50 } );
+			await expect( clientCounter ).toHaveText( '13' );
 		}
 	} );
 } );
