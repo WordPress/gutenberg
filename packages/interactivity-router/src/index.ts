@@ -138,6 +138,15 @@ const regionsToAttachByParent = new WeakMap< Element, string[] >();
 const rootFragmentsByParent = new WeakMap< Element, any >();
 
 /**
+ * Set of router regions using the `attachTo` property that are present in the
+ * initial page.
+ *
+ * These regions should be treated as regular regions without the `attachTo`
+ * attribute as they don't need to be appended; they are already in the HTML.
+ */
+const initialRegionsToAttach = new Set< string >();
+
+/**
  * Fetches and prepares a page from a given URL.
  *
  * @param url          The URL of the page to fetch.
@@ -201,7 +210,7 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 				: toVdom( region );
 		}
 
-		if ( attachTo ) {
+		if ( attachTo && ! initialRegionsToAttach.has( id ) ) {
 			regionsToAttach[ id ] = attachTo;
 		}
 	} );
@@ -333,6 +342,16 @@ window.addEventListener( 'popstate', async () => {
 		} );
 	} else {
 		window.location.reload();
+	}
+} );
+
+// Detect router regions with `attachTo` in the initial page. This step should
+// be done before the initial page is processed with `preparePage()` so this
+// function treats them as regular router regions.
+document.querySelectorAll( regionsSelector ).forEach( ( region ) => {
+	const { id, attachTo } = parseRegionAttribute( region );
+	if ( attachTo ) {
+		initialRegionsToAttach.add( id );
 	}
 } );
 
