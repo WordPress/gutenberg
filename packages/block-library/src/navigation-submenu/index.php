@@ -13,54 +13,6 @@ if ( file_exists( __DIR__ . '/../navigation-link/shared/helpers.php' ) ) {
 }
 
 /**
- * Build an array with CSS classes and inline styles defining the font sizes
- * which will be applied to the navigation markup in the front-end.
- *
- * @since 5.9.0
- *
- * @param  array $context Navigation block context.
- * @return array Font size CSS classes and inline styles.
- */
-function block_core_navigation_submenu_build_css_font_sizes( $context ) {
-	// CSS classes.
-	$font_sizes = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-
-	$has_named_font_size  = array_key_exists( 'fontSize', $context );
-	$has_custom_font_size = isset( $context['style']['typography']['fontSize'] );
-
-	if ( $has_named_font_size ) {
-		// Add the font size class.
-		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
-	} elseif ( $has_custom_font_size ) {
-		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf(
-			'font-size: %s;',
-			wp_get_typography_font_size_value(
-				array(
-					'size' => $context['style']['typography']['fontSize'],
-				)
-			)
-		);
-	}
-
-	return $font_sizes;
-}
-
-/**
- * Returns the top-level submenu SVG chevron icon.
- *
- * @since 5.9.0
- *
- * @return string
- */
-function block_core_navigation_submenu_render_submenu_icon() {
-	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
-}
-
-/**
  * Renders the `core/navigation-submenu` block.
  *
  * @since 5.9.0
@@ -84,7 +36,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$font_sizes      = block_core_navigation_submenu_build_css_font_sizes( $block->context );
+	$font_sizes      = block_core_shared_navigation_build_css_font_sizes( $block->context );
 	$style_attribute = $font_sizes['inline_styles'];
 
 	// Render inner blocks first to check if any menu items will actually display.
@@ -94,15 +46,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 	$has_submenu = ! empty( trim( $inner_blocks_html ) );
 
-	$kind      = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
-	$is_active = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
-
-	if ( is_post_type_archive() && ! empty( $attributes['url'] ) ) {
-		$queried_archive_link = get_post_type_archive_link( get_queried_object()->name );
-		if ( $attributes['url'] === $queried_archive_link ) {
-			$is_active = true;
-		}
-	}
+	$is_active = block_core_shared_navigation_determine_active_state( $attributes );
 
 	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
 	$open_on_click           = isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'];
@@ -204,7 +148,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		if ( $show_submenu_indicators && $has_submenu ) {
 			// The submenu icon is rendered in a button here
 			// so that there's a clickable element to open the submenu.
-			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
+			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_shared_navigation_render_submenu_icon() . '</button>';
 		}
 	} else {
 		// If menus open on click, we render the parent as a button.
@@ -227,7 +171,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$html .= '</button>';
 
 		if ( $has_submenu ) {
-			$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_submenu_render_submenu_icon() . '</span>';
+			$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_shared_navigation_render_submenu_icon() . '</span>';
 		}
 	}
 

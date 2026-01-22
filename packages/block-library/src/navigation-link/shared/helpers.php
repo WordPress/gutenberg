@@ -44,3 +44,71 @@ function block_core_shared_navigation_item_should_render( $attributes, $block ) 
 
 	return true;
 }
+
+/**
+ * Builds CSS classes and inline styles for font sizes in navigation items.
+ *
+ * @since 7.0.0
+ *
+ * @param array $context Block context containing fontSize and style settings.
+ * @return array Array containing 'css_classes' and 'inline_styles' keys.
+ */
+function block_core_shared_navigation_build_css_font_sizes( $context ) {
+	$font_sizes = array(
+		'css_classes'   => array(),
+		'inline_styles' => '',
+	);
+
+	$has_named_font_size  = array_key_exists( 'fontSize', $context );
+	$has_custom_font_size = isset( $context['style']['typography']['fontSize'] );
+
+	if ( $has_named_font_size ) {
+		// Add the font size class.
+		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
+	} elseif ( $has_custom_font_size ) {
+		// Add the custom font size inline style.
+		$font_sizes['inline_styles'] = sprintf(
+			'font-size: %s;',
+			wp_get_typography_font_size_value(
+				array(
+					'size' => $context['style']['typography']['fontSize'],
+				)
+			)
+		);
+	}
+
+	return $font_sizes;
+}
+
+/**
+ * Returns the submenu SVG chevron icon.
+ *
+ * @since 7.0.0
+ *
+ * @return string SVG icon markup.
+ */
+function block_core_shared_navigation_render_submenu_icon() {
+	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
+}
+
+/**
+ * Determines if a navigation item is active based on current page context.
+ *
+ * @since 7.0.0
+ *
+ * @param array $attributes Block attributes containing 'kind', 'id', and 'url'.
+ * @return bool True if the navigation item is active, false otherwise.
+ */
+function block_core_shared_navigation_determine_active_state( $attributes ) {
+	$kind      = empty( $attributes['kind'] ) ? 'post_type' : str_replace( '-', '_', $attributes['kind'] );
+	$is_active = ! empty( $attributes['id'] ) && get_queried_object_id() === (int) $attributes['id'] && ! empty( get_queried_object()->$kind );
+
+	if ( is_post_type_archive() && ! empty( $attributes['url'] ) ) {
+		$queried_archive_link = get_post_type_archive_link( get_queried_object()->name );
+		if ( $attributes['url'] === $queried_archive_link ) {
+			$is_active = true;
+		}
+	}
+
+	return $is_active;
+}
