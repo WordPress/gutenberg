@@ -81,7 +81,15 @@ export const pagesRoute = {
 			const isList = await isListView( query );
 			const hasQuickEdit = ! isList && !! query.quickEdit;
 			return hasQuickEdit ? (
-				<PostEdit postType="page" postId={ query.postId } />
+				<PostEdit
+					// Intentionally force remounting PostEdit when postId changes,
+					// so useFocusReturn captures the new trigger element.
+					// Try clicking a different QuickEdit button when PostEdit is mounted, then, close PostEdit.
+					// The expected result is that focus returns to the last QuickEdit button.
+					key={ query.postId }
+					postType="page"
+					postId={ query.postId }
+				/>
 			) : undefined;
 		},
 	},

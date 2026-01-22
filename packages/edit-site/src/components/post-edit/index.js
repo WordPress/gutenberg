@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { DataForm } from '@wordpress/dataviews';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { focus } from '@wordpress/dom';
+import { useFocusReturn } from '@wordpress/compose';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { Button, __experimentalVStack as VStack } from '@wordpress/components';
 import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
@@ -42,16 +43,7 @@ function PostEditForm( { postType, postId } ) {
 	const history = useHistory();
 	const { path } = useLocation();
 	const formRef = useRef( null );
-	const containerRef = useRef( null );
-	const previousFocusRef = useRef( null );
-
-	// Store the element to restore focus to when closing.
-	useEffect( () => {
-		if ( containerRef.current ) {
-			previousFocusRef.current =
-				containerRef.current.ownerDocument.activeElement;
-		}
-	}, [ postId ] );
+	const focusReturnRef = useFocusReturn();
 
 	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
@@ -81,6 +73,7 @@ function PostEditForm( { postType, postId } ) {
 			if ( firstTabbable ) {
 				firstTabbable.focus( { focusVisible: true } );
 				// Fallback: add class for browsers that don't support focusVisible option.
+				// This is a browser quirk: they won't add the focus styles when the user is using the mouse.
 				firstTabbable.classList.add( 'is-focus-visible' );
 				firstTabbable.addEventListener(
 					'blur',
@@ -211,10 +204,6 @@ function PostEditForm( { postType, postId } ) {
 	}, [ fields, settings ] );
 
 	const closeQuickEdit = () => {
-		// Restore focus to the element that opened QuickEdit.
-		if ( previousFocusRef.current ) {
-			previousFocusRef.current.focus();
-		}
 		history.navigate(
 			addQueryArgs( path, {
 				quickEdit: undefined,
@@ -223,7 +212,7 @@ function PostEditForm( { postType, postId } ) {
 	};
 
 	return (
-		<VStack ref={ containerRef } spacing={ 4 }>
+		<VStack ref={ focusReturnRef } spacing={ 4 }>
 			<PostCardPanel
 				postType={ postType }
 				postId={ ids }
