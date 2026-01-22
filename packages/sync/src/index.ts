@@ -26,6 +26,10 @@ export {
 	LOCAL_SYNC_MANAGER_ORIGIN,
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
+	AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS,
 } from './config';
 export { createSyncManager } from './manager';
 export type * from './types';
+export type * from './awareness/awareness-types';
+export { AwarenessState } from './awareness/awareness-state';
+export { areUserInfosEqual, generateUserInfo } from './user-utils';

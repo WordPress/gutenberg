@@ -1,4 +1,4 @@
-import type { UserInfo } from './awareness/awareness-types';
+import type { UserInfo, WordPressUserInfo } from './awareness/awareness-types';
 import { loadFromLocalStorage, saveToLocalStorage } from './local-storage';
 
 /**
@@ -35,7 +35,7 @@ function generateRandomInt( min: number, max: number ): number {
  * @param existingColors - Colors that are already in use.
  * @return The new user color, in hex format.
  */
-export function getNewUserColor( existingColors: string[] ): string {
+function getNewUserColor( existingColors: string[] ): string {
 	const availableColors = COLOR_PALETTE.filter(
 		( color ) => ! existingColors.includes( color )
 	);
@@ -93,7 +93,7 @@ function generateColorVariation( hexColor: string ): string {
  * Get the browser name from the user agent.
  * @return The browser name.
  */
-export function getBrowserName(): string {
+function getBrowserName(): string {
 	const userAgent = window.navigator.userAgent;
 	let browserName = 'Unknown';
 
@@ -123,6 +123,13 @@ export function getBrowserName(): string {
 	return browserName;
 }
 
+/**
+ * Check if two user infos are equal.
+ *
+ * @param userInfo1 - The first user info.
+ * @param userInfo2 - The second user info.
+ * @return True if the user infos are equal, false otherwise.
+ */
 export function areUserInfosEqual(
 	userInfo1?: UserInfo,
 	userInfo2?: UserInfo
@@ -139,4 +146,23 @@ export function areUserInfosEqual(
 		// Update this function with any non-primitive fields added to UserInfo.
 		return value === userInfo2[ key as keyof UserInfo ];
 	} );
+}
+
+/**
+ * Generate a user info object from a current user and a list of existing colors.
+ *
+ * @param currentUser    - The current user.
+ * @param existingColors - The existing colors.
+ * @return The user info object.
+ */
+export function generateUserInfo(
+	currentUser: WordPressUserInfo,
+	existingColors: string[]
+): UserInfo {
+	return {
+		...currentUser,
+		browserType: getBrowserName(),
+		color: getNewUserColor( existingColors ),
+		enteredAt: Date.now(),
+	};
 }

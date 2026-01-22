@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import type { UserInfo } from './awareness-types';
+import type { RecordHandlers } from '../types';
 import {
 	TypedAwareness,
 	type BaseState,
@@ -10,7 +11,6 @@ import {
 } from './awareness-types';
 import { getTypedKeys, areMapsEqual } from '../utils';
 import { REMOVAL_DELAY_IN_MS } from '../config';
-import type { RecordHandlers } from '../types';
 
 type AwarenessClientID = number;
 
@@ -152,10 +152,10 @@ export abstract class AwarenessState<
 
 	/**
 	 * Set up the awareness state.
-	 * @param _recordHandlers - Record handlers.
-	 * @param userInfo        - User info.
+	 * @param recordHandlers - Record handlers.
+	 * @param userInfo       - User info.
 	 */
-	public setUp( _recordHandlers: RecordHandlers, userInfo: UserInfo ): void {
+	public setUp( recordHandlers: RecordHandlers, userInfo: UserInfo ): void {
 		this.setLocalStateField( 'userInfo', userInfo );
 
 		this.on(

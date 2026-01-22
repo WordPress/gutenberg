@@ -1,7 +1,12 @@
+/**
+ * External dependencies
+ */
 import { Awareness } from 'y-protocols/awareness';
 
+/**
+ * Internal dependencies
+ */
 import { getRecordValue } from '../utils';
-import type { SelectionState } from '../selection-utils';
 
 /**
  * Extended Awareness class with typed state accessors.
@@ -86,18 +91,3 @@ export type EqualityFieldCheck<
 	State extends BaseState,
 	FieldName extends keyof State,
 > = ( value1?: State[ FieldName ], value2?: State[ FieldName ] ) => boolean;
-
-/**
- * The editor state includes information about the user's current selection.
- */
-export interface EditorState {
-	selection: SelectionState;
-}
-
-/**
- * The post editor state extends the base state with information used to render
- * presence indicators in the post editor.
- */
-export interface PostEditorState extends BaseState {
-	editorState?: EditorState;
-}

@@ -14,7 +14,7 @@ import type { Awareness } from 'y-protocols/awareness';
  */
 import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
 import type { WordPressUserInfo } from './awareness/awareness-types';
-import type { SelectionState } from './selection-utils';
+import type { AwarenessState } from './awareness/awareness-state';
 
 /* globalThis */
 declare global {
@@ -71,11 +71,6 @@ export interface RecordHandlers {
 	getEditedRecord: () => Promise< ObjectData >;
 	refetchRecord: () => Promise< void >;
 	saveRecord: () => Promise< void >;
-	getCurrentUser: () => Promise< WordPressUserInfo >;
-	subscribeToUserSelectionChanges: (
-		yDoc: Y.Doc,
-		setSelectionState: ( selectionState: SelectionState ) => void
-	) => void;
 }
 
 export interface SyncConfig {
@@ -88,6 +83,11 @@ export interface SyncConfig {
 		editedRecord: ObjectData
 	) => ObjectData;
 	supports?: Record< string, true >;
+	createAwareness?: (
+		ydoc: Y.Doc,
+		recordHandlers: RecordHandlers,
+		currentUser: WordPressUserInfo
+	) => AwarenessState | undefined;
 }
 
 export interface SyncManager {
@@ -95,12 +95,17 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => Record< string, string >;
+	getAwarenessInstance: (
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => AwarenessState | undefined;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,
 		objectId: ObjectID,
 		record: ObjectData,
-		handlers: RecordHandlers
+		handlers: RecordHandlers,
+		currentUser: WordPressUserInfo
 	) => Promise< void >;
 	// undoManager is undefined until the first entity is loaded.
 	undoManager: SyncUndoManager | undefined;

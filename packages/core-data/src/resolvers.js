@@ -26,7 +26,6 @@ import {
 	isNumericID,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
-import { subscribeToUserSelectionChanges } from './utils/crdt-user-selections';
 
 /**
  * Requests authors from the REST API.
@@ -185,6 +184,8 @@ export const getEntityRecord =
 								transientConfig.read( recordWithTransients );
 						} );
 
+					const currentUser = await resolveSelect.getCurrentUser();
+
 					// Load the entity record for syncing.
 					await getSyncManager()?.load(
 						entityConfig.syncConfig,
@@ -234,24 +235,8 @@ export const getEntityRecord =
 									key
 								);
 							},
-							// Get the current user.
-							getCurrentUser: async () => {
-								await resolveSelect.getCurrentUser();
-							},
-							// Subscribe to user selection changes.
-							subscribeToUserSelectionChanges: (
-								yDoc,
-								setSelectionState
-							) => {
-								subscribeToUserSelectionChanges(
-									kind,
-									name,
-									key,
-									yDoc,
-									setSelectionState
-								);
-							},
-						}
+						},
+						currentUser
 					);
 				}
 			}
