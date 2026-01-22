@@ -818,7 +818,7 @@ export function detectUltraHdr( id: QueueItemId ) {
 
 		try {
 			// Dynamically import to avoid loading WASM unless needed
-			const { isUltraHdr } = await import( '@wordpress/ultrahdr' );
+			const { isUltraHdr } = await import( 'open-ultrahdr' );
 			const buffer = await item.file.arrayBuffer();
 
 			if ( await isUltraHdr( buffer ) ) {
@@ -855,7 +855,7 @@ export function extractSdrItem( id: QueueItemId ) {
 		}
 
 		try {
-			const { extractSdrBase } = await import( '@wordpress/ultrahdr' );
+			const { extractSdrBase } = await import( 'open-ultrahdr' );
 			const buffer = await item.file.arrayBuffer();
 			const sdrBuffer = await extractSdrBase( buffer );
 
