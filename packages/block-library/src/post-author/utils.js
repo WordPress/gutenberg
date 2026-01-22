@@ -54,6 +54,7 @@ export function recreateWithRecommendedBlocks( attributes, blockTypes ) {
 			style: cleanEmptyObject( {
 				...style,
 				spacing: {
+					...style?.spacing,
 					blockGap: '1em',
 				},
 				color: {
