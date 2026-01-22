@@ -566,7 +566,7 @@ test.describe( 'Router regions', () => {
 		// The text of this element is used to check a navigation is completed.
 		const region1Ssr = page.getByTestId( 'region-1-ssr' );
 
-		await expect( region1Ssr ).toHaveText( 'content from page 1' );
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
 
 		// Navigate to "Page attachTo 1".
 		await page.getByTestId( 'next' ).click();
