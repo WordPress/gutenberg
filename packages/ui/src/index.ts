@@ -1,6 +1,7 @@
 export * from './badge';
 export * from './box';
 export * from './button';
+export * from './card';
 export * from './form/primitives';
 export * from './icon';
 export * from './stack';
