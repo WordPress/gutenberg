@@ -294,4 +294,28 @@ class Block_Library_Navigation_Link_Test extends WP_UnitTestCase {
 			) !== false
 		);
 	}
+
+	public function test_applies_font_size_from_context() {
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:navigation-link {"label":"Test Link","url":"https://example.com"} /-->'
+		);
+		$this->assertEquals( 1, count( $parsed_blocks ) );
+
+		$context = array(
+			'fontSize' => 'large',
+		);
+
+		$navigation_link_block = new WP_Block( $parsed_blocks[0], $context );
+		$rendered_html         = gutenberg_render_block_core_navigation_link(
+			$navigation_link_block->attributes,
+			array(),
+			$navigation_link_block
+		);
+
+		$this->assertStringContainsString(
+			'has-large-font-size',
+			$rendered_html,
+			'Font size class from context should be applied to navigation link'
+		);
+	}
 }

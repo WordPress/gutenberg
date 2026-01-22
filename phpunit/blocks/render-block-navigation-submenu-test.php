@@ -209,4 +209,36 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 			'Submenu block should not apply "has-*" color classes if missing from context'
 		);
 	}
+
+	/**
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 */
+	public function test_applies_font_size_from_context() {
+		$page_id = self::$page->ID;
+
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:navigation-submenu {"label":"Submenu Label","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type"} -->
+            <!-- wp:navigation-link {"label":"Submenu Item Link Label","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type"} /-->
+        <!-- /wp:navigation-submenu -->'
+		);
+
+		$this->assertEquals( 1, count( $parsed_blocks ), 'Submenu block not parsable.' );
+
+		$context = array(
+			'fontSize' => 'medium',
+		);
+
+		$navigation_submenu_block = new WP_Block( $parsed_blocks[0], $context );
+		$rendered_html            = gutenberg_render_block_core_navigation_submenu(
+			$navigation_submenu_block->attributes,
+			array(),
+			$navigation_submenu_block
+		);
+
+		$this->assertStringContainsString(
+			'has-medium-font-size',
+			$rendered_html,
+			'Font size class from context should be applied to navigation submenu'
+		);
+	}
 }
