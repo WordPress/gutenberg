@@ -25,7 +25,8 @@
 		"@storybook/icons": "^2.0.1",
 		"@storybook/react-vite": "^10.1.11",
 		"storybook": "^10.1.11",
-		"storybook-addon-tag-badges": "^3.0.4"
+		"storybook-addon-tag-badges": "^3.0.4",
+		"terser": "^5.37.0"
 	},
 	"publishConfig": {
 		"access": "public"

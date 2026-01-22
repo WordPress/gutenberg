@@ -24,7 +24,6 @@ module.exports = {
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-env.js',
-		'<rootDir>/test/unit/config/suppress-browser-warnings.js',
 	],
 	setupFilesAfterEnv: [
 		'<rootDir>/test/unit/config/testing-library.js',

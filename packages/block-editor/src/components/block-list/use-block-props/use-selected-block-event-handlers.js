@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -31,6 +32,7 @@ export function useEventHandlers( { clientId, isSelected } ) {
 		hasMultiSelection,
 		isSectionBlock,
 		editedContentOnlySection,
+		getBlock,
 	} = unlock( useSelect( blockEditorStore ) );
 	const {
 		insertAfterBlock,
@@ -294,12 +296,22 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			 */
 			function onDoubleClick( event ) {
 				const isSection = isSectionBlock( clientId );
+				const block = getBlock( clientId );
+				const isSyncedPattern = isReusableBlock( block );
+				const isTemplatePartBlock = isTemplatePart( block );
 				const isAlreadyEditing = editedContentOnlySection === clientId;
 
-				if ( isSection && ! isAlreadyEditing ) {
-					event.preventDefault();
-					editContentOnlySection( clientId );
+				if (
+					! isSection ||
+					isAlreadyEditing ||
+					isSyncedPattern ||
+					isTemplatePartBlock
+				) {
+					return;
 				}
+
+				event.preventDefault();
+				editContentOnlySection( clientId );
 			}
 
 			// Only add double-click listener if experimental flag is enabled
@@ -319,6 +331,9 @@ export function useEventHandlers( { clientId, isSelected } ) {
 			clientId,
 			isSelected,
 			getBlockRootClientId,
+			getBlock,
+			isReusableBlock,
+			isTemplatePart,
 			insertAfterBlock,
 			removeBlock,
 			isZoomOut,
