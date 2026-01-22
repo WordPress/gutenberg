@@ -9,6 +9,9 @@
  * Returns the submenu visibility value with backward compatibility
  * for the deprecated openSubmenusOnClick attribute.
  *
+ * NOTE: Keep this function in sync with getSubmenuVisibility in
+ * packages/block-library/src/navigation/utils/get-submenu-visibility.js
+ *
  * This function centralizes the migration logic from the boolean
  * openSubmenusOnClick to the new submenuVisibility enum.
  *

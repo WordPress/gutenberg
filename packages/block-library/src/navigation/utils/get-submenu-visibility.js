@@ -5,6 +5,9 @@
  * This function centralizes the migration logic from the boolean
  * openSubmenusOnClick to the new submenuVisibility enum.
  *
+ * NOTE: Keep this function in sync with block_core_navigation_get_submenu_visibility
+ * in packages/block-library/src/navigation/index.php
+ *
  * @param {Object} attributes Block attributes containing submenuVisibility and/or openSubmenusOnClick.
  * @return {string} The visibility mode: 'hover', 'click', or 'always'.
  */
