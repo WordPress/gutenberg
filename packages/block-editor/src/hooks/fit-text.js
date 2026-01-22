@@ -68,9 +68,10 @@ function useFitText( { fitText, name, clientId } ) {
 	const hasFitTextSupport = hasBlockSupport( name, FIT_TEXT_SUPPORT_KEY );
 	const blockElement = useBlockElement( clientId );
 
-	// Monitor block attribute changes, and parent changes.
+	// Monitor block attribute changes, parent changes, and block mode.
 	// Any attribute or parent change may change the available space.
-	const { blockAttributes, parentId } = useSelect(
+	// Block mode is needed to disable fit text when in HTML editing mode.
+	const { blockAttributes, parentId, blockMode } = useSelect(
 		( select ) => {
 			if ( ! clientId || ! hasFitTextSupport || ! fitText ) {
 				return EMPTY_OBJECT;
@@ -80,6 +81,7 @@ function useFitText( { fitText, name, clientId } ) {
 					select( blockEditorStore ).getBlockAttributes( clientId ),
 				parentId:
 					select( blockEditorStore ).getBlockRootClientId( clientId ),
+				blockMode: select( blockEditorStore ).getBlockMode( clientId ),
 			};
 		},
 		[ clientId, hasFitTextSupport, fitText ]
@@ -118,7 +120,8 @@ function useFitText( { fitText, name, clientId } ) {
 			! fitText ||
 			! blockElement ||
 			! clientId ||
-			! hasFitTextSupport
+			! hasFitTextSupport ||
+			blockMode === 'html'
 		) {
 			return;
 		}
@@ -189,11 +192,17 @@ function useFitText( { fitText, name, clientId } ) {
 		applyFitText,
 		blockElement,
 		hasFitTextSupport,
+		blockMode,
 	] );
 
 	// Trigger fit text recalculation when content changes
 	useEffect( () => {
-		if ( fitText && blockElement && hasFitTextSupport ) {
+		if (
+			fitText &&
+			blockElement &&
+			hasFitTextSupport &&
+			blockMode !== 'html'
+		) {
 			// Wait for next frame to ensure DOM has updated after content changes
 			const frameId = window.requestAnimationFrame( () => {
 				if ( blockElement ) {
@@ -209,6 +218,7 @@ function useFitText( { fitText, name, clientId } ) {
 		applyFitText,
 		blockElement,
 		hasFitTextSupport,
+		blockMode,
 	] );
 
 	return { fontSize };
