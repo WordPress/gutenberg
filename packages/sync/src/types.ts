@@ -53,11 +53,15 @@ export interface ProviderCreatorResult {
 	destroy: () => void;
 }
 
+export interface ProviderCreatorOptions {
+	objectType: ObjectType;
+	objectId: ObjectID | null;
+	ydoc: Y.Doc;
+	awareness?: Awareness;
+}
+
 export type ProviderCreator = (
-	objectType: ObjectType,
-	objectId: ObjectID,
-	ydoc: Y.Doc,
-	awareness?: Awareness
+	options: ProviderCreatorOptions
 ) => Promise< ProviderCreatorResult >;
 
 export interface RecordHandlers {
