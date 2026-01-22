@@ -19,7 +19,6 @@ export default function save( { attributes } ) {
 	return (
 		<TagName { ...blockProps }>
 			<button
-				type="button"
 				className="wp-block-accordion-heading__toggle"
 				style={ spacingProps.style }
 			>
