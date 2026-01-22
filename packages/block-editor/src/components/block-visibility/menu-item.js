@@ -13,8 +13,9 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  */
 import { cleanEmptyObject } from '../../hooks/utils';
 import { store as blockEditorStore } from '../../store';
+import BlockVisibilityViewportMenuItem from './viewport-menu-item';
 
-export default function BlockVisibilityMenuItem( { clientIds } ) {
+function BlockVisibilityMenuItemDefault( { clientIds } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const blocks = useSelect(
@@ -92,5 +93,13 @@ export default function BlockVisibilityMenuItem( { clientIds } ) {
 		>
 			{ hasHiddenBlock ? __( 'Show' ) : __( 'Hide' ) }
 		</MenuItem>
+	);
+}
+
+export default function BlockVisibilityMenuItem( { clientIds } ) {
+	return window.__experimentalHideBlocksBasedOnScreenSize ? (
+		<BlockVisibilityViewportMenuItem clientIds={ clientIds } />
+	) : (
+		<BlockVisibilityMenuItemDefault clientIds={ clientIds } />
 	);
 }
