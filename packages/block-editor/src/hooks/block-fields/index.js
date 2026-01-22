@@ -6,7 +6,6 @@ import {
 } from '@wordpress/blocks';
 import { useDebounce } from '@wordpress/compose';
 import {
-	Button,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
@@ -208,33 +207,15 @@ function BlockFields( {
 				<HStack spacing={ 1 }>
 					{ isCollapsed && (
 						<>
-							<Button
-								__next40pxDefaultSize
-								className="block-editor-block-fields__selection-button"
-								onHoverIn={ () =>
-									debouncedToggleBlockHighlight(
-										clientId,
-										true
-									)
-								}
-								onHoverOut={ () =>
-									debouncedToggleBlockHighlight(
-										clientId,
-										false
-									)
-								}
-								onClick={ () => selectBlock( clientId ) }
-							>
-								<BlockIcon
-									className="block-editor-block-fields__header-icon"
-									icon={ blockInformation?.icon }
-								/>
-								<h2 className="block-editor-block-fields__header-title">
-									<Truncate numberOfLines={ 1 }>
-										{ blockTitle }
-									</Truncate>
-								</h2>
-							</Button>
+							<BlockIcon
+								className="block-editor-block-fields__header-icon"
+								icon={ blockInformation?.icon }
+							/>
+							<h2 className="block-editor-block-fields__header-title">
+								<Truncate numberOfLines={ 1 }>
+									{ blockTitle }
+								</Truncate>
+							</h2>
 							<FieldsDropdownMenu
 								fields={ dataFormFields }
 								visibleFields={ form.fields }

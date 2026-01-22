@@ -15,17 +15,8 @@
 		 */
 		border-top: $border-width solid $gray-200;
 	}
-}
 
-.block-editor-block-fields__selection-button {
-	padding: 0;
-	height: auto;
-
-	&:hover .block-editor-block-fields__header-title {
-		color: var(--wp-admin-theme-color);
-	}
-
-	.is-selected & {
+	&.is-selected {
 		.block-editor-block-fields__header-icon svg {
 			fill: var(--wp-admin-theme-color);
 		}
