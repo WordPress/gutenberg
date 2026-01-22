@@ -243,7 +243,7 @@ export function BlockSettingsDropdown( {
 											parentBlockType={ parentBlockType }
 										/>
 									) }
-									{ count === 1 && (
+									{ canEdit && count === 1 && (
 										<BlockHTMLConvertButton
 											clientId={ firstBlockClientId }
 										/>
