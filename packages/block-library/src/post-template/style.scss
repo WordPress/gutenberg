@@ -58,3 +58,29 @@
 	margin-inline-start: auto;
 	margin-inline-end: auto;
 }
+
+// Slider track styles when post-template is inside a slider query variation.
+.wp-block-post-template.is-slider-track {
+	display: flex;
+	flex-wrap: nowrap;
+	overflow-x: auto;
+	scroll-snap-type: x mandatory;
+	scroll-behavior: smooth;
+	-webkit-overflow-scrolling: touch;
+
+	// Hide scrollbar but keep functionality.
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	// Style each slide (post).
+	> .wp-block-slide {
+		scroll-snap-align: start;
+		flex-shrink: 0;
+		width: 100%;
+		box-sizing: border-box;
+	}
+}

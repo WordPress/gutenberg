@@ -57,9 +57,13 @@ store( 'core/slider', {
 		nextSlide() {
 			const { ref } = getElement();
 
-			// Find the track element (go up to slider, then find track)
-			const slider = ref.closest( '.wp-block-slider' );
-			const track = slider?.querySelector( '.wp-block-slider-track' );
+			// Find the track element - support both dedicated slider and query loop slider
+			const container =
+				ref.closest( '.wp-block-slider' ) ||
+				ref.closest( '.wp-block-query' );
+			const track =
+				container?.querySelector( '.wp-block-slider-track' ) ||
+				container?.querySelector( '.is-slider-track' );
 
 			if ( ! track ) {
 				return;
@@ -85,9 +89,13 @@ store( 'core/slider', {
 		prevSlide() {
 			const { ref } = getElement();
 
-			// Find the track element
-			const slider = ref.closest( '.wp-block-slider' );
-			const track = slider?.querySelector( '.wp-block-slider-track' );
+			// Find the track element - support both dedicated slider and query loop slider
+			const container =
+				ref.closest( '.wp-block-slider' ) ||
+				ref.closest( '.wp-block-query' );
+			const track =
+				container?.querySelector( '.wp-block-slider-track' ) ||
+				container?.querySelector( '.is-slider-track' );
 
 			if ( ! track ) {
 				return;
@@ -139,20 +147,23 @@ store( 'core/slider', {
 
 			// Handle keyboard events
 			ref.addEventListener( 'keydown', ( event ) => {
+				// Support both dedicated slider and query loop slider
+				const container =
+					ref.closest( '.wp-block-slider' ) ||
+					ref.closest( '.wp-block-query' );
+
 				if ( event.key === 'ArrowLeft' ) {
 					event.preventDefault();
-					const slider = ref.closest( '.wp-block-slider' );
-					const prevButton = slider?.querySelector(
-						'.wp-block-slider-controls__previous'
+					const prevButton = container?.querySelector(
+						'.wp-block-slider-controls__previous .wp-block-button__link'
 					);
 					if ( prevButton && ! prevButton.disabled ) {
 						prevButton.click();
 					}
 				} else if ( event.key === 'ArrowRight' ) {
 					event.preventDefault();
-					const slider = ref.closest( '.wp-block-slider' );
-					const nextButton = slider?.querySelector(
-						'.wp-block-slider-controls__next'
+					const nextButton = container?.querySelector(
+						'.wp-block-slider-controls__next .wp-block-button__link'
 					);
 					if ( nextButton && ! nextButton.disabled ) {
 						nextButton.click();

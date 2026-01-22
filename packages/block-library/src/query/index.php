@@ -21,6 +21,10 @@ function render_block_core_query( $attributes, $content, $block ) {
 		&& true === $attributes['enhancedPagination']
 		&& isset( $attributes['queryId'] );
 
+	// Check if this is a slider variation (detected by className on query or is-slider-track in content).
+	$is_slider = ( isset( $attributes['className'] ) && strpos( $attributes['className'], 'is-style-slider' ) !== false )
+		|| strpos( $content, 'is-slider-track' ) !== false;
+
 	// Enqueue the script module and add the necessary directives if the block is
 	// interactive.
 	if ( $is_interactive ) {
@@ -33,6 +37,31 @@ function render_block_core_query( $attributes, $content, $block ) {
 			$p->set_attribute( 'data-wp-router-region', 'query-' . $attributes['queryId'] );
 			$p->set_attribute( 'data-wp-context', '{}' );
 			$p->set_attribute( 'data-wp-key', $attributes['queryId'] );
+			$content = $p->get_updated_html();
+		}
+	}
+
+	// Add slider directives if this is a slider variation.
+	if ( $is_slider ) {
+		wp_enqueue_script_module( '@wordpress/block-library/slider/view' );
+
+		// Count slides (posts) from post-template inner block.
+		$slide_count = 0;
+		$per_page    = isset( $attributes['query']['perPage'] ) ? (int) $attributes['query']['perPage'] : 10;
+		$slide_count = $per_page; // Approximate - actual count depends on query results.
+
+		$p = new WP_HTML_Tag_Processor( $content );
+		if ( $p->next_tag() ) {
+			$p->set_attribute( 'data-wp-interactive', 'core/slider' );
+			$p->set_attribute(
+				'data-wp-context',
+				wp_json_encode(
+					array(
+						'currentIndex' => 0,
+						'totalSlides'  => $slide_count,
+					)
+				)
+			);
 			$content = $p->get_updated_html();
 		}
 	}

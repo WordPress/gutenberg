@@ -8,7 +8,7 @@
 	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
-	"parent": [ "core/slider" ],
+	"parent": [ "core/slider", "core/query" ],
 	"allowedBlocks": [ "core/buttons", "core/button" ],
 	"attributes": {},
 	"usesContext": [ "core/slider-id" ],
