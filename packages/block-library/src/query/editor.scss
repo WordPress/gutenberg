@@ -64,3 +64,28 @@
 .wp-block-query > .block-editor-media-placeholder.is-small {
 	min-height: 60px;
 }
+
+// Slider variation styles - horizontal layout preview in editor
+.wp-block-query.is-style-slider,
+.wp-block-query:has(.is-slider-track) {
+	// Post template acts as slider track
+	.wp-block-post-template.is-slider-track {
+		display: flex;
+		flex-direction: row;
+		gap: $grid-unit-20;
+		overflow: hidden; // Hide overflow, no scrolling in editor
+
+		// Each post/slide
+		> .wp-block-post {
+			flex: 0 0 100%; // Full width slides by default
+			min-width: 0;
+		}
+	}
+
+	// Slider controls styling in editor
+	.wp-block-slider-controls {
+		display: flex;
+		justify-content: space-between;
+		margin-bottom: $grid-unit-15;
+	}
+}
