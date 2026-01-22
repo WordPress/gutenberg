@@ -8,7 +8,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  */
 import { RampTable } from './ramp-table';
 import { buildBgRamp, buildAccentRamp, checkAccessibleCombinations } from '..';
-import { DEFAULT_SEED_COLORS } from '../lib/constants';
+import { DEFAULT_SEED_COLORS, getQualitativeSeeds } from '../lib/constants';
 
 const ColorGen = ( props: {
 	background: string;
@@ -97,6 +97,22 @@ export const Default: StoryObj< typeof ColorGen > = {
 			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.error, bgRamp ).ramp,
 		};
 
+		// Generate qualitative accent ramps from the primary seed
+		const qualitativeSeeds = getQualitativeSeeds( primarySeed );
+		const accentRampObjs = (
+			Object.entries( qualitativeSeeds ) as [
+				keyof typeof qualitativeSeeds,
+				string,
+			][]
+		 ).map( ( [ name, seed ] ) => ( {
+			seed: {
+				name: 'bgFill1' as const,
+				value: seed,
+			},
+			ramp: buildAccentRamp( seed, bgRamp ).ramp,
+			label: name,
+		} ) );
+
 		const unmetTargets = checkAccessibleCombinations( {
 			bgRamp,
 		} );
@@ -109,17 +125,40 @@ export const Default: StoryObj< typeof ColorGen > = {
 					gap: '32px',
 				} }
 			>
-				<RampTable
-					ramps={ [
-						bgRampObj,
-						primaryRampObj,
-						infoRampObj,
-						successRampObj,
-						warningRampObj,
-						cautionRampObj,
-						errorRampObj,
-					] }
-				/>
+				<div>
+					<h3 style={ { marginBottom: 8 } }>Semantic Color Ramps</h3>
+					<RampTable
+						ramps={ [
+							bgRampObj,
+							primaryRampObj,
+							infoRampObj,
+							successRampObj,
+							warningRampObj,
+							cautionRampObj,
+							errorRampObj,
+						] }
+					/>
+				</div>
+
+				<div>
+					<h3 style={ { marginBottom: 8 } }>
+						Qualitative Accent Ramps (hue rotations from primary)
+					</h3>
+					<p
+						style={ {
+							fontSize: 12,
+							color: '#666',
+							marginBottom: 12,
+						} }
+					>
+						8 distinct colors for visual differentiation (e.g.,
+						collaborator avatars). Primary (0°) + accent1-7 (45°
+						increments).
+					</p>
+					<RampTable
+						ramps={ [ primaryRampObj, ...accentRampObjs ] }
+					/>
+				</div>
 
 				{ unmetTargets.length === 0 ? (
 					<p>All accessibility targets met</p>
@@ -261,4 +300,241 @@ export const SampleCombinations: StoryObj< typeof ColorGen > = {
 			control: false,
 		},
 	},
+};
+
+export const QualitativePalette: StoryObj< typeof ColorGen > = {
+	render: ( args ) => {
+		const primarySeed = args.primary ?? DEFAULT_SEED_COLORS.primary;
+		const bgSeed = args.background ?? DEFAULT_SEED_COLORS.bg;
+		const bgRamp = buildBgRamp( bgSeed );
+
+		// Generate all 8 qualitative colors (primary + accent1-7)
+		const qualitativeSeeds = getQualitativeSeeds( primarySeed );
+		const allSeeds = [
+			{ name: 'primary', seed: primarySeed, rotation: '0°' },
+			{
+				name: 'accent1',
+				seed: qualitativeSeeds.accent1,
+				rotation: '45°',
+			},
+			{
+				name: 'accent2',
+				seed: qualitativeSeeds.accent2,
+				rotation: '90°',
+			},
+			{
+				name: 'accent3',
+				seed: qualitativeSeeds.accent3,
+				rotation: '135°',
+			},
+			{
+				name: 'accent4',
+				seed: qualitativeSeeds.accent4,
+				rotation: '180°',
+			},
+			{
+				name: 'accent5',
+				seed: qualitativeSeeds.accent5,
+				rotation: '225°',
+			},
+			{
+				name: 'accent6',
+				seed: qualitativeSeeds.accent6,
+				rotation: '270°',
+			},
+			{
+				name: 'accent7',
+				seed: qualitativeSeeds.accent7,
+				rotation: '315°',
+			},
+		];
+
+		const ramps = allSeeds.map( ( { name, seed, rotation } ) => {
+			const accentRamp = buildAccentRamp( seed, bgRamp );
+			return { name, seed, rotation, ramp: accentRamp.ramp };
+		} );
+
+		return (
+			<div
+				style={ {
+					display: 'flex',
+					flexDirection: 'column',
+					gap: 32,
+					fontFamily: '-apple-system, "system-ui", sans-serif',
+				} }
+			>
+				<div>
+					<h3>Qualitative Color Palette</h3>
+					<p style={ { fontSize: 14, color: '#666', maxWidth: 600 } }>
+						8 visually distinct colors derived by rotating the
+						primary hue in 45° increments. Use for distinguishing
+						items that need color differentiation without semantic
+						meaning (e.g., collaborator avatars, chart series,
+						tags).
+					</p>
+				</div>
+
+				<div>
+					<h4 style={ { marginBottom: 12 } }>Avatar Example</h4>
+					<div
+						style={ {
+							display: 'flex',
+							gap: 8,
+							flexWrap: 'wrap',
+						} }
+					>
+						{ ramps.map( ( { name, ramp }, i ) => (
+							<div
+								key={ name }
+								style={ {
+									width: 48,
+									height: 48,
+									borderRadius: '50%',
+									backgroundColor: ramp.bgFill1,
+									color: ramp.fgFill,
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									fontWeight: 600,
+									fontSize: 16,
+								} }
+								title={ name }
+							>
+								{ String.fromCharCode( 65 + i ) }
+								{ String.fromCharCode(
+									65 + ( ( i + 1 ) % 26 )
+								) }
+							</div>
+						) ) }
+					</div>
+				</div>
+
+				<div>
+					<h4 style={ { marginBottom: 12 } }>Color Swatches</h4>
+					<div
+						style={ {
+							display: 'grid',
+							gridTemplateColumns: 'repeat(8, 1fr)',
+							gap: 8,
+						} }
+					>
+						{ ramps.map( ( { name, seed, rotation, ramp } ) => (
+							<div
+								key={ name }
+								style={ {
+									display: 'flex',
+									flexDirection: 'column',
+									alignItems: 'center',
+									gap: 4,
+								} }
+							>
+								<div
+									style={ {
+										width: '100%',
+										height: 60,
+										backgroundColor: ramp.bgFill1,
+										borderRadius: 8,
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										color: ramp.fgFill,
+										fontWeight: 500,
+									} }
+								>
+									Aa
+								</div>
+								<span
+									style={ { fontSize: 11, fontWeight: 500 } }
+								>
+									{ name }
+								</span>
+								<span style={ { fontSize: 10, color: '#888' } }>
+									{ rotation }
+								</span>
+								<span style={ { fontSize: 10, color: '#888' } }>
+									{ seed }
+								</span>
+							</div>
+						) ) }
+					</div>
+				</div>
+
+				<div>
+					<h4 style={ { marginBottom: 12 } }>
+						Full Ramps (bgFill1 + fgFill pairs)
+					</h4>
+					<div
+						style={ {
+							display: 'grid',
+							gridTemplateColumns: 'repeat(4, 1fr)',
+							gap: 16,
+						} }
+					>
+						{ ramps.map( ( { name, ramp } ) => (
+							<div
+								key={ name }
+								style={ {
+									display: 'flex',
+									flexDirection: 'column',
+									gap: 2,
+								} }
+							>
+								<span
+									style={ {
+										fontSize: 11,
+										fontWeight: 500,
+										marginBottom: 4,
+									} }
+								>
+									{ name }
+								</span>
+								<div
+									style={ {
+										height: 32,
+										backgroundColor: ramp.bgFill1,
+										borderRadius: '4px 4px 0 0',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										color: ramp.fgFill,
+										fontSize: 12,
+									} }
+								>
+									bgFill1 + fgFill
+								</div>
+								<div
+									style={ {
+										height: 24,
+										backgroundColor: ramp.surface4,
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										color: ramp.fgSurface4,
+										fontSize: 10,
+									} }
+								>
+									surface4
+								</div>
+								<div
+									style={ {
+										height: 24,
+										backgroundColor: ramp.surface2,
+										borderRadius: '0 0 4px 4px',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										color: ramp.fgSurface3,
+										fontSize: 10,
+									} }
+								>
+									surface2
+								</div>
+							</div>
+						) ) }
+					</div>
+				</div>
+			</div>
+		);
+	},
+	args: {},
 };

@@ -28,6 +28,13 @@
 	--wpds-color-bg-interactive-neutral-weak: #00000000; /* Background color for interactive elements with neutral tone and weak emphasis. */
 	--wpds-color-bg-interactive-neutral-weak-active: #eaeaea; /* Background color for interactive elements with neutral tone and weak emphasis that are hovered, focused, or active. */
 	--wpds-color-bg-interactive-neutral-weak-disabled: #00000000; /* Background color for interactive elements with weak emphasis, in their disabled state, regardless of the tone. */
+	--wpds-color-bg-surface-accent1: #9730c4; /* Background color for qualitative accent 1 (45° hue rotation from primary). */
+	--wpds-color-bg-surface-accent2: #c4006b; /* Background color for qualitative accent 2 (90° hue rotation from primary). */
+	--wpds-color-bg-surface-accent3: #bd3700; /* Background color for qualitative accent 3 (135° hue rotation from primary). */
+	--wpds-color-bg-surface-accent4: #8a6600; /* Background color for qualitative accent 4 (180° hue rotation from primary). */
+	--wpds-color-bg-surface-accent5: #3f7f00; /* Background color for qualitative accent 5 (225° hue rotation from primary). */
+	--wpds-color-bg-surface-accent6: #00816c; /* Background color for qualitative accent 6 (270° hue rotation from primary). */
+	--wpds-color-bg-surface-accent7: #00799e; /* Background color for qualitative accent 7 (315° hue rotation from primary). */
 	--wpds-color-bg-surface-brand: #ecf0f9; /* Background color for surfaces with brand tone and normal emphasis. */
 	--wpds-color-bg-surface-caution: #fee994; /* Background color for surfaces with caution tone and normal emphasis. */
 	--wpds-color-bg-surface-caution-weak: #fff9c9; /* Background color for surfaces with caution tone and weak emphasis. */
@@ -49,6 +56,13 @@
 	--wpds-color-bg-thumb-neutral-weak-active: #6c6c6c; /* Background color for thumbs with a neutral tone and weak emphasis (eg. scrollbar thumb) that are hovered, focused, or active. */
 	--wpds-color-bg-track-neutral: #d8d8d8; /* Background color for tracks with a neutral tone and normal emphasis (eg. slider or progressbar track). */
 	--wpds-color-bg-track-neutral-weak: #e0e0e0; /* Background color for tracks with a neutral tone and weak emphasis (eg. scrollbar track). */
+	--wpds-color-fg-content-accent1: #f1eff2; /* Foreground color for qualitative accent 1 (use on accent1 background). */
+	--wpds-color-fg-content-accent2: #f3eff0; /* Foreground color for qualitative accent 2 (use on accent2 background). */
+	--wpds-color-fg-content-accent3: #f2efee; /* Foreground color for qualitative accent 3 (use on accent3 background). */
+	--wpds-color-fg-content-accent4: #f4f0e7; /* Foreground color for qualitative accent 4 (use on accent4 background). */
+	--wpds-color-fg-content-accent5: #f0f7ed; /* Foreground color for qualitative accent 5 (use on accent5 background). */
+	--wpds-color-fg-content-accent6: #f4f9f7; /* Foreground color for qualitative accent 6 (use on accent6 background). */
+	--wpds-color-fg-content-accent7: #f1f5f7; /* Foreground color for qualitative accent 7 (use on accent7 background). */
 	--wpds-color-fg-content-caution: #281d00; /* Foreground color for content like text with caution tone and normal emphasis. */
 	--wpds-color-fg-content-caution-weak: #826a00; /* Foreground color for content like text with caution tone and weak emphasis. */
 	--wpds-color-fg-content-error: #470000; /* Foreground color for content like text with error tone and normal emphasis. */

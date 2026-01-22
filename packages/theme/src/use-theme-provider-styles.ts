@@ -27,6 +27,7 @@ import {
 	buildBgRamp,
 	buildAccentRamp,
 	DEFAULT_SEED_COLORS,
+	getQualitativeSeeds,
 	type RampResult,
 } from './color-ramps';
 import { getColorString } from './color-ramps/lib/color-utils';
@@ -198,10 +199,13 @@ export function useThemeProviderStyles( {
 
 	const themeProviderStyles = useMemo( () => {
 		// Determine which seeds are needed for generating ramps.
+		// Derive qualitative accent seeds from the current primary color
+		// so they update when primary changes.
 		const seeds = {
 			...DEFAULT_SEED_COLORS,
 			bg,
 			primary,
+			...getQualitativeSeeds( primary ),
 		};
 
 		// Generate ramps.

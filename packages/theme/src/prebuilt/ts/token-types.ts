@@ -51,7 +51,14 @@ export type SurfaceBackgroundColor =
 	| 'caution'
 	| 'caution-weak'
 	| 'error'
-	| 'error-weak';
+	| 'error-weak'
+	| 'accent1'
+	| 'accent2'
+	| 'accent3'
+	| 'accent4'
+	| 'accent5'
+	| 'accent6'
+	| 'accent7';
 
 /**
  * Background color variants for interactive elements.
@@ -80,7 +87,14 @@ export type ContentForegroundColor =
 	| 'caution'
 	| 'caution-weak'
 	| 'error'
-	| 'error-weak';
+	| 'error-weak'
+	| 'accent1'
+	| 'accent2'
+	| 'accent3'
+	| 'accent4'
+	| 'accent5'
+	| 'accent6'
+	| 'accent7';
 
 /**
  * Foreground color variants for interactive element text and icons.
@@ -138,6 +152,13 @@ export type ForegroundColor =
 	| 'caution-weak'
 	| 'error'
 	| 'error-weak'
+	| 'accent1'
+	| 'accent2'
+	| 'accent3'
+	| 'accent4'
+	| 'accent5'
+	| 'accent6'
+	| 'accent7'
 	| 'neutral-active'
 	| 'neutral-disabled'
 	| 'neutral-strong'

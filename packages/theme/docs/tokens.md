@@ -39,6 +39,13 @@ Do not edit directly.
 | `--wpds-color-bg-surface-caution-weak`                | Background color for surfaces with caution tone and weak emphasis.                                                                          |
 | `--wpds-color-bg-surface-error`                       | Background color for surfaces with error tone and normal emphasis.                                                                          |
 | `--wpds-color-bg-surface-error-weak`                  | Background color for surfaces with error tone and weak emphasis.                                                                            |
+| `--wpds-color-bg-surface-accent1`                     | Background color for qualitative accent 1 (45° hue rotation from primary).                                                                  |
+| `--wpds-color-bg-surface-accent2`                     | Background color for qualitative accent 2 (90° hue rotation from primary).                                                                  |
+| `--wpds-color-bg-surface-accent3`                     | Background color for qualitative accent 3 (135° hue rotation from primary).                                                                 |
+| `--wpds-color-bg-surface-accent4`                     | Background color for qualitative accent 4 (180° hue rotation from primary).                                                                 |
+| `--wpds-color-bg-surface-accent5`                     | Background color for qualitative accent 5 (225° hue rotation from primary).                                                                 |
+| `--wpds-color-bg-surface-accent6`                     | Background color for qualitative accent 6 (270° hue rotation from primary).                                                                 |
+| `--wpds-color-bg-surface-accent7`                     | Background color for qualitative accent 7 (315° hue rotation from primary).                                                                 |
 | `--wpds-color-bg-interactive-neutral-strong`          | Background color for interactive elements with neutral tone and strong emphasis.                                                            |
 | `--wpds-color-bg-interactive-neutral-strong-active`   | Background color for interactive elements with neutral tone and strong emphasis that are hovered, focused, or active.                       |
 | `--wpds-color-bg-interactive-neutral-strong-disabled` | Background color for interactive elements with neutral tone and strong emphasis, in their disabled state.                                   |
@@ -74,6 +81,13 @@ Do not edit directly.
 | `--wpds-color-fg-content-caution-weak`                | Foreground color for content like text with caution tone and weak emphasis.                                                                 |
 | `--wpds-color-fg-content-error`                       | Foreground color for content like text with error tone and normal emphasis.                                                                 |
 | `--wpds-color-fg-content-error-weak`                  | Foreground color for content like text with error tone and weak emphasis.                                                                   |
+| `--wpds-color-fg-content-accent1`                     | Foreground color for qualitative accent 1 (use on accent1 background).                                                                      |
+| `--wpds-color-fg-content-accent2`                     | Foreground color for qualitative accent 2 (use on accent2 background).                                                                      |
+| `--wpds-color-fg-content-accent3`                     | Foreground color for qualitative accent 3 (use on accent3 background).                                                                      |
+| `--wpds-color-fg-content-accent4`                     | Foreground color for qualitative accent 4 (use on accent4 background).                                                                      |
+| `--wpds-color-fg-content-accent5`                     | Foreground color for qualitative accent 5 (use on accent5 background).                                                                      |
+| `--wpds-color-fg-content-accent6`                     | Foreground color for qualitative accent 6 (use on accent6 background).                                                                      |
+| `--wpds-color-fg-content-accent7`                     | Foreground color for qualitative accent 7 (use on accent7 background).                                                                      |
 | `--wpds-color-fg-interactive-neutral`                 | Foreground color for interactive elements with neutral tone and normal emphasis.                                                            |
 | `--wpds-color-fg-interactive-neutral-active`          | Foreground color for interactive elements with neutral tone and normal emphasis that are hovered, focused, or active.                       |
 | `--wpds-color-fg-interactive-neutral-disabled`        | Foreground color for interactive elements with normal emphasis, in their disabled state, regardless of the tone.                            |

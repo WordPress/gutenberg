@@ -8,6 +8,7 @@ import { to, OKLCH } from 'colorjs.io/fn';
  */
 import './register-color-spaces';
 import type { Ramp } from './types';
+import { rotateHue } from './color-utils';
 
 export const WHITE = to( 'white', OKLCH );
 export const BLACK = to( 'black', OKLCH );
@@ -39,6 +40,13 @@ export const ACCENT_SCALE_BASE_LIGHTNESS_THRESHOLDS = {
 export const CONTRAST_EPSILON = 4e-3;
 
 export const MAX_BISECTION_ITERATIONS = 10;
+
+// Hue rotation step for generating qualitative accent colors (in degrees).
+// 45° produces 8 distinct colors when including the primary (0°).
+export const QUALITATIVE_HUE_STEP = 45;
+
+// Number of qualitative accent colors to generate (accent1 through accent7).
+export const QUALITATIVE_ACCENT_COUNT = 7;
 
 export const CONTRAST_COMBINATIONS: {
 	bgs: ( keyof Ramp )[];
@@ -77,8 +85,34 @@ export const CONTRAST_COMBINATIONS: {
 	},
 ];
 
-// Used when generating the DTCG tokens and the static color ramps.
-export const DEFAULT_SEED_COLORS = {
+/**
+ * Generates qualitative accent seed colors by rotating the primary hue.
+ * Returns an object with accent1 through accent7 keys.
+ * @param primarySeed The primary seed color to rotate from.
+ * @return Object containing accent1-7 seed colors.
+ */
+export function getQualitativeSeeds( primarySeed: string ): {
+	accent1: string;
+	accent2: string;
+	accent3: string;
+	accent4: string;
+	accent5: string;
+	accent6: string;
+	accent7: string;
+} {
+	return {
+		accent1: rotateHue( primarySeed, QUALITATIVE_HUE_STEP * 1 ),
+		accent2: rotateHue( primarySeed, QUALITATIVE_HUE_STEP * 2 ),
+		accent3: rotateHue( primarySeed, QUALITATIVE_HUE_STEP * 3 ),
+		accent4: rotateHue( primarySeed, QUALITATIVE_HUE_STEP * 4 ),
+		accent5: rotateHue( primarySeed, QUALITATIVE_HUE_STEP * 5 ),
+		accent6: rotateHue( primarySeed, QUALITATIVE_HUE_STEP * 6 ),
+		accent7: rotateHue( primarySeed, QUALITATIVE_HUE_STEP * 7 ),
+	};
+}
+
+// Base seed colors (without derived qualitative accents).
+const BASE_SEED_COLORS = {
 	bg: '#f8f8f8',
 	primary: '#3858e9',
 	info: '#0090ff',
@@ -86,4 +120,11 @@ export const DEFAULT_SEED_COLORS = {
 	caution: '#f0d149',
 	warning: '#f0b849',
 	error: '#cc1818',
+};
+
+// Used when generating the DTCG tokens and the static color ramps.
+// Includes qualitative accent colors derived from the primary.
+export const DEFAULT_SEED_COLORS = {
+	...BASE_SEED_COLORS,
+	...getQualitativeSeeds( BASE_SEED_COLORS.primary ),
 };

@@ -8,6 +8,9 @@ import {
 	contrastWCAG21,
 	sRGB,
 	OKLCH,
+	clone,
+	get,
+	set,
 	type ColorTypes,
 } from 'colorjs.io/fn';
 
@@ -43,4 +46,19 @@ export function getContrast( colorA: ColorTypes, colorB: ColorTypes ): number {
 export function clampToGamut( c: ColorTypes ) {
 	// map into sRGB using CSS OKLCH method
 	return to( toGamut( c, { space: sRGB, method: 'css' } ), OKLCH );
+}
+
+/**
+ * Rotates a color's hue by the specified degrees in OKLCH color space.
+ * Preserves lightness and chroma, only modifying the hue angle.
+ * @param seed    The seed color string (hex, rgb, etc.)
+ * @param degrees The number of degrees to rotate the hue (positive = counterclockwise)
+ * @return The rotated color as a hex string
+ */
+export function rotateHue( seed: string, degrees: number ): string {
+	const color = clampToGamut( seed );
+	const currentHue = get( color, [ OKLCH, 'h' ] ) || 0;
+	const newHue = ( currentHue + degrees ) % 360;
+	const rotated = set( clone( color ), [ OKLCH, 'h' ], newHue );
+	return getColorString( toGamut( rotated, { space: sRGB, method: 'css' } ) );
 }
