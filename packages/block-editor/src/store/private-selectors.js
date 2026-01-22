@@ -4,6 +4,7 @@
 import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
 	hasBlockSupport,
+	getBlockType,
 	privateApis as blocksPrivateApis,
 } from '@wordpress/blocks';
 
@@ -23,6 +24,7 @@ import {
 	getBlockAttributes,
 } from './selectors';
 import {
+	checkAllowList,
 	checkAllowListRecursive,
 	getAllPatternsDependants,
 	getInsertBlockTypeDependants,
@@ -102,14 +104,37 @@ export function isContainerInsertableToInContentOnlyMode(
 	blockName,
 	rootClientId
 ) {
-	const isBlockContentBlock = isContentBlock( blockName );
 	const rootBlockName = getBlockName( state, rootClientId );
-	const isContainerContentBlock = isContentBlock( rootBlockName );
 	const isRootBlockMain = getSectionRootClientId( state ) === rootClientId;
+
+	// Special case: Allow all navigation child blocks in contentOnly mode
+	if ( rootBlockName === 'core/navigation' ) {
+		const blockType = getBlockType( blockName );
+		const parentBlockType = getBlockType( rootBlockName );
+
+		// Check if block has core/navigation as parent
+		const hasNavigationParent = checkAllowList(
+			blockType?.parent,
+			'core/navigation'
+		);
+
+		// Check if block is in navigation's allowedBlocks
+		const isInNavigationAllowedBlocks = checkAllowList(
+			parentBlockType?.allowedBlocks,
+			blockName
+		);
+
+		// If it's a valid navigation child, allow insertion
+		if ( hasNavigationParent || isInNavigationAllowedBlocks ) {
+			return true;
+		}
+	}
 
 	// In contentOnly mode, containers shouldn't be inserted into unless:
 	// 1. they are a section root;
 	// 2. they are a content block and the block to be inserted is also content.
+	const isBlockContentBlock = isContentBlock( blockName );
+	const isContainerContentBlock = isContentBlock( rootBlockName );
 	return (
 		isRootBlockMain || ( isContainerContentBlock && isBlockContentBlock )
 	);
