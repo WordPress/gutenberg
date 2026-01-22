@@ -41,7 +41,7 @@ import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { focusCommentThread, getCommentExcerpt } from './utils';
-import { useFloatingThread } from './hooks';
+import { useFloatingThread, useAnnotateThreadSelections } from './hooks';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
 
@@ -472,6 +472,7 @@ function Thread( {
 		commentLastUpdated,
 	} );
 	const isKeyboardTabbingRef = useRef( false );
+	useAnnotateThreadSelections( thread );
 
 	const onMouseEnter = () => {
 		debouncedToggleBlockHighlight( thread.blockClientId, true );

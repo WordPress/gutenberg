@@ -26,6 +26,7 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as annotationsStore } from '@wordpress/annotations';
 
 /**
  * Internal dependencies
@@ -174,8 +175,12 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
-	const { getBlockAttributes, getSelectedBlockClientId } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockAttributes,
+		getSelectedBlockClientId,
+		getSelectionStart,
+		getSelectionEnd,
+	} = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const onError = ( error ) => {
@@ -191,6 +196,21 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 
 	const onCreate = async ( { content, parent } ) => {
 		try {
+			const selectionStart = getSelectionStart();
+			const selectionEnd = getSelectionEnd();
+			const hasValidSelection =
+				selectionStart.clientId === selectionEnd.clientId &&
+				selectionStart.offset !== selectionEnd.offset;
+			const textSelection = hasValidSelection
+				? {
+						_wp_note_selection: {
+							attributeKey: selectionStart.attributeKey,
+							start: selectionStart.offset,
+							end: selectionEnd.offset,
+						},
+				  }
+				: undefined;
+
 			const savedRecord = await saveEntityRecord(
 				'root',
 				'comment',
@@ -200,6 +220,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 					status: 'hold',
 					type: 'note',
 					parent: parent || 0,
+					meta: textSelection,
 				},
 				{ throwOnError: true }
 			);
@@ -428,4 +449,59 @@ export function useFloatingThread( {
 		y,
 		refs,
 	};
+}
+
+export function useAnnotateThreadSelections( thread ) {
+	const {
+		__experimentalAddAnnotation,
+		__experimentalRemoveAnnotationsBySource,
+	} = useDispatch( annotationsStore );
+	const selections = useMemo( () => {
+		const meta = [];
+
+		if ( ! thread?.meta ) {
+			return meta;
+		}
+
+		// Empty object meta data is returned as array.
+		if ( ! Array.isArray( thread.meta._wp_note_selection ) ) {
+			meta.push( { id: thread.id, ...thread.meta._wp_note_selection } );
+		}
+
+		for ( const reply of thread.reply ) {
+			if ( ! Array.isArray( reply.meta._wp_note_selection ) ) {
+				meta.push( { id: reply.id, ...reply.meta._wp_note_selection } );
+			}
+		}
+
+		return meta;
+	}, [ thread ] );
+
+	useEffect( () => {
+		if ( ! selections.length ) {
+			return;
+		}
+
+		selections.forEach( ( selection ) => {
+			__experimentalAddAnnotation( {
+				id: selection.id,
+				source: 'core-note',
+				blockClientId: thread.blockClientId,
+				richTextIdentifier: selection.attributeKey,
+				range: {
+					start: selection.start,
+					end: selection.end,
+				},
+			} );
+		} );
+
+		return () => {
+			__experimentalRemoveAnnotationsBySource( 'core-note' );
+		};
+	}, [
+		selections,
+		thread.blockClientId,
+		__experimentalAddAnnotation,
+		__experimentalRemoveAnnotationsBySource,
+	] );
 }

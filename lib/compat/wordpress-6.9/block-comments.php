@@ -48,6 +48,34 @@ function gutenberg_register_block_comment_metadata() {
 			},
 		)
 	);
+	register_meta(
+		'comment',
+		'_wp_note_selection',
+		array(
+			'type'          => 'object',
+			'description'   => __( 'Note text selection', 'gutenberg' ),
+			'single'        => true,
+			'show_in_rest'  => array(
+				'schema' => array(
+					'type'       => 'object',
+					'properties' => array(
+						'attributeKey' => array(
+							'type' => 'string',
+						),
+						'start'        => array(
+							'type' => 'integer',
+						),
+						'end'          => array(
+							'type' => 'integer',
+						),
+					),
+				),
+			),
+			'auth_callback' => function ( $allowed, $meta_key, $object_id ) {
+				return current_user_can( 'edit_comment', $object_id );
+			},
+		)
+	);
 }
 add_action( 'init', 'gutenberg_register_block_comment_metadata' );
 
