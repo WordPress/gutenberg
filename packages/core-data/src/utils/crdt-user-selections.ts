@@ -6,18 +6,82 @@ import { Y, CRDT_RECORD_MAP_KEY } from '@wordpress/sync';
 /**
  * Internal dependencies
  */
-import type {
-	WPBlockSelection,
-	SelectionState,
-	SelectableBlock,
-	CursorPosition,
-	SelectionNone,
-	SelectionCursor,
-	SelectionInOneBlock,
-	SelectionInMultipleBlocks,
-	SelectionWholeBlock,
-} from '../types';
-import { SelectionType, type BlockInnerBlocks } from '../types';
+import type { YPostRecord } from './crdt';
+import type { YBlock, YBlocks } from './crdt-blocks';
+import { getRootMap } from './crdt-utils';
+import type { WPBlockSelection } from '../types';
+
+/**
+ * The type of selection.
+ */
+export enum SelectionType {
+	None = 'none',
+	Cursor = 'cursor',
+	SelectionInOneBlock = 'selection-in-one-block',
+	SelectionInMultipleBlocks = 'selection-in-multiple-blocks',
+	WholeBlock = 'whole-block',
+}
+
+/**
+ * The position of the cursor.
+ */
+export type CursorPosition = {
+	relativePosition: Y.RelativePosition;
+
+	// Also store the absolute offset index of the cursor from the perspective
+	// of the user who is updating the selection.
+	//
+	// Do not use this value directly, instead use `createAbsolutePositionFromRelativePosition()`
+	// on relativePosition for the most up-to-date positioning.
+	//
+	// This is used because local Y.Text changes (e.g. adding or deleting a character)
+	// can result in the same relative position if it is pinned to an unchanged
+	// character. With both of these values as editor state, a change in perceived
+	// position will always result in a redraw.
+	absoluteOffset: number;
+};
+
+export type SelectionNone = {
+	// The user has not made a selection.
+	type: SelectionType.None;
+};
+
+export type SelectionCursor = {
+	// The user has a cursor position in a block with no text highlighted.
+	type: SelectionType.Cursor;
+	blockId: string;
+	cursorPosition: CursorPosition;
+};
+
+export type SelectionInOneBlock = {
+	// The user has highlighted text in a single block.
+	type: SelectionType.SelectionInOneBlock;
+	blockId: string;
+	cursorStartPosition: CursorPosition;
+	cursorEndPosition: CursorPosition;
+};
+
+export type SelectionInMultipleBlocks = {
+	// The user has highlighted text over multiple blocks.
+	type: SelectionType.SelectionInMultipleBlocks;
+	blockStartId: string;
+	blockEndId: string;
+	cursorStartPosition: CursorPosition;
+	cursorEndPosition: CursorPosition;
+};
+
+export type SelectionWholeBlock = {
+	// The user has a non-text block selected, like an image block.
+	type: SelectionType.WholeBlock;
+	blockId: string;
+};
+
+export type SelectionState =
+	| SelectionNone
+	| SelectionCursor
+	| SelectionInOneBlock
+	| SelectionInMultipleBlocks
+	| SelectionWholeBlock;
 
 /**
  * Converts WordPress block editor selection to a SelectionState.
@@ -32,8 +96,8 @@ export function getSelectionState(
 	selectionEnd: WPBlockSelection,
 	yDoc: Y.Doc
 ): SelectionState {
-	const ydoc = yDoc.getMap( CRDT_RECORD_MAP_KEY );
-	const yBlocks = ydoc.get( 'blocks' ) as Y.Array< SelectableBlock >;
+	const ymap = getRootMap< YPostRecord >( yDoc, CRDT_RECORD_MAP_KEY );
+	const yBlocks = ymap.get( 'blocks' ) ?? new Y.Array< YBlock >();
 
 	const isSelectionEmpty = Object.keys( selectionStart ).length === 0;
 	const noSelection: SelectionNone = {
@@ -122,7 +186,7 @@ export function getSelectionState(
  */
 function getCursorPosition(
 	selection: WPBlockSelection,
-	blocks: Y.Array< SelectableBlock >
+	blocks: YBlocks
 ): CursorPosition | null {
 	const block = findBlockByClientId( selection.clientId, blocks );
 	if ( ! block ) {
@@ -152,20 +216,17 @@ function getCursorPosition(
  */
 function findBlockByClientId(
 	blockId: string,
-	blocks: Y.Array< SelectableBlock >
-): SelectableBlock | null {
+	blocks: YBlocks
+): YBlock | null {
 	for ( const block of blocks ) {
 		if ( block.get( 'clientId' ) === blockId ) {
 			return block;
 		}
 
-		const innerBlocks = block.get( 'innerBlocks' ) as BlockInnerBlocks;
+		const innerBlocks = block.get( 'innerBlocks' );
 
-		if ( innerBlocks.length > 0 ) {
-			const innerBlock = findBlockByClientId(
-				blockId,
-				block.get( 'innerBlocks' ) as Y.Array< SelectableBlock >
-			);
+		if ( innerBlocks && innerBlocks.length > 0 ) {
+			const innerBlock = findBlockByClientId( blockId, innerBlocks );
 
 			if ( innerBlock ) {
 				return innerBlock;
