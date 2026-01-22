@@ -107,7 +107,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		// surrounded by spaces.
 		// see: https://html.spec.whatwg.org/multipage/links.html#links-created-by-a-and-area-elements.
 		if ( ! empty( $item_url ) ) {
-			$html .= ' href="' . esc_url( $item_url ) . '"';
+			$html .= ' href="' . esc_url( block_core_shared_navigation_maybe_urldecode( $item_url ) ) . '"';
 		}
 
 		if ( $is_active ) {

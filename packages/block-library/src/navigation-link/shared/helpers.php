@@ -112,3 +112,35 @@ function block_core_shared_navigation_determine_active_state( $attributes ) {
 
 	return $is_active;
 }
+
+/**
+ * Decodes a url if it's encoded, returning the same url if not.
+ *
+ * @since 7.0.0
+ *
+ * @param string $url The url to decode.
+ *
+ * @return string $url Returns the decoded url.
+ */
+function block_core_shared_navigation_maybe_urldecode( $url ) {
+	$is_url_encoded = false;
+	$query          = parse_url( $url, PHP_URL_QUERY );
+	$query_params   = wp_parse_args( $query );
+
+	foreach ( $query_params as $query_param ) {
+		$can_query_param_be_encoded = is_string( $query_param ) && ! empty( $query_param );
+		if ( ! $can_query_param_be_encoded ) {
+			continue;
+		}
+		if ( rawurldecode( $query_param ) !== $query_param ) {
+			$is_url_encoded = true;
+			break;
+		}
+	}
+
+	if ( $is_url_encoded ) {
+		return rawurldecode( $url );
+	}
+
+	return $url;
+}
