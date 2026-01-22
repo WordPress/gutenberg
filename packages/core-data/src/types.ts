@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Y, BaseState } from '@wordpress/sync';
+import type { Y } from '@wordpress/sync';
 
 export interface AnyFunction {
 	( ...args: any[] ): any;
@@ -104,18 +104,3 @@ export type SelectionState =
 	| SelectionInOneBlock
 	| SelectionInMultipleBlocks
 	| SelectionWholeBlock;
-
-/**
- * The editor state includes information about the user's current selection.
- */
-export interface EditorState {
-	selection: SelectionState;
-}
-
-/**
- * The post editor state extends the base state with information used to render
- * presence indicators in the post editor.
- */
-export interface PostEditorState extends BaseState {
-	editorState?: EditorState;
-}

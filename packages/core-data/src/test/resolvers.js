@@ -146,9 +146,6 @@ describe( 'getEntityRecord', () => {
 		const resolveSelectWithSync = {
 			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
 			getEditedEntityRecord: jest.fn(),
-			getCurrentUser: jest.fn( () =>
-				Promise.resolve( { id: 1, name: 'Test User' } )
-			),
 		};
 
 		triggerFetch.mockImplementation( () => POST_RESPONSE );
@@ -175,8 +172,7 @@ describe( 'getEntityRecord', () => {
 				getEditedRecord: expect.any( Function ),
 				refetchRecord: expect.any( Function ),
 				saveRecord: expect.any( Function ),
-			},
-			{ id: 1, name: 'Test User' }
+			}
 		);
 	} );
 
@@ -203,9 +199,6 @@ describe( 'getEntityRecord', () => {
 		const resolveSelectWithSync = {
 			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
 			getEditedEntityRecord: jest.fn(),
-			getCurrentUser: jest.fn( () =>
-				Promise.resolve( { id: 1, name: 'Test User' } )
-			),
 		};
 
 		triggerFetch.mockImplementation( () => POST_RESPONSE );
@@ -232,8 +225,7 @@ describe( 'getEntityRecord', () => {
 				getEditedRecord: expect.any( Function ),
 				refetchRecord: expect.any( Function ),
 				saveRecord: expect.any( Function ),
-			},
-			{ id: 1, name: 'Test User' }
+			}
 		);
 	} );
 

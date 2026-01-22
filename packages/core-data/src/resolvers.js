@@ -184,8 +184,6 @@ export const getEntityRecord =
 								transientConfig.read( recordWithTransients );
 						} );
 
-					const currentUser = await resolveSelect.getCurrentUser();
-
 					// Load the entity record for syncing.
 					await getSyncManager()?.load(
 						entityConfig.syncConfig,
@@ -235,8 +233,7 @@ export const getEntityRecord =
 									key
 								);
 							},
-						},
-						currentUser
+						}
 					);
 				}
 			}

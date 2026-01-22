@@ -12,9 +12,8 @@ import type { Awareness } from 'y-protocols/awareness';
 /**
  * Internal dependencies
  */
-import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
-import type { WordPressUserInfo } from './awareness/awareness-types';
 import type { AwarenessState } from './awareness/awareness-state';
+import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
 
 /* globalThis */
 declare global {
@@ -78,16 +77,15 @@ export interface SyncConfig {
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >
 	) => void;
+	createAwareness?: (
+		ydoc: Y.Doc,
+		objectId: ObjectID
+	) => AwarenessState | undefined;
 	getChangesFromCRDTDoc: (
 		ydoc: Y.Doc,
 		editedRecord: ObjectData
 	) => ObjectData;
 	supports?: Record< string, true >;
-	createAwareness?: (
-		ydoc: Y.Doc,
-		recordHandlers: RecordHandlers,
-		currentUser: WordPressUserInfo
-	) => AwarenessState | undefined;
 }
 
 export interface SyncManager {
@@ -104,8 +102,7 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID,
 		record: ObjectData,
-		handlers: RecordHandlers,
-		currentUser: WordPressUserInfo
+		handlers: RecordHandlers
 	) => Promise< void >;
 	// undoManager is undefined until the first entity is loaded.
 	undoManager: SyncUndoManager | undefined;

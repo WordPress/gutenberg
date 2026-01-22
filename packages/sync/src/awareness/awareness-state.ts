@@ -1,11 +1,8 @@
 /**
  * Internal dependencies
  */
-import type { UserInfo } from './awareness-types';
-import type { RecordHandlers } from '../types';
 import {
 	TypedAwareness,
-	type BaseState,
 	type EnhancedState,
 	type EqualityFieldCheck,
 } from './awareness-types';
@@ -21,7 +18,7 @@ interface AwarenessStateChange {
 }
 
 abstract class AwarenessWithEqualityChecks<
-	State extends BaseState = BaseState,
+	State extends object,
 > extends TypedAwareness< State > {
 	/** OVERRIDDEN METHODS */
 
@@ -115,7 +112,7 @@ abstract class AwarenessWithEqualityChecks<
  * state updates.
  */
 export abstract class AwarenessState<
-	State extends BaseState = BaseState,
+	State extends object = {},
 > extends AwarenessWithEqualityChecks< State > {
 	/** CUSTOM PROPERTIES */
 
@@ -152,12 +149,8 @@ export abstract class AwarenessState<
 
 	/**
 	 * Set up the awareness state.
-	 * @param recordHandlers - Record handlers.
-	 * @param userInfo       - User info.
 	 */
-	public setUp( recordHandlers: RecordHandlers, userInfo: UserInfo ): void {
-		this.setLocalStateField( 'userInfo', userInfo );
-
+	public setUp(): void {
 		this.on(
 			'change',
 			( { added, removed, updated }: AwarenessStateChange ) => {
@@ -265,10 +258,12 @@ export abstract class AwarenessState<
 		const updatedStates = new Map< number, EnhancedState< State > >(
 			[ ...this.disconnectedUsers, ...states.keys() ]
 				.filter( ( clientId ) => {
-					// Exclude any users without `userInfo`.
-					// This can happen from the Yjs inspector, which joins the awareness
-					// state without providing user data.
-					return Boolean( this.seenStates.get( clientId )?.userInfo );
+					// Exclude any users with empty awareness state. This can happen from
+					// the Yjs inspector.
+					return (
+						Object.keys( this.seenStates.get( clientId ) ?? {} )
+							.length > 0
+					);
 				} )
 				.map( ( clientId ) => {
 					// The filter above ensures that seenStates has the clientId.

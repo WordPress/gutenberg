@@ -29,14 +29,13 @@ import type {
 import { createUndoManager } from './undo-manager';
 import { createYjsDoc } from './utils';
 import type { AwarenessState } from './awareness/awareness-state';
-import type { WordPressUserInfo } from './awareness/awareness-types';
 
 interface EntityState {
+	awareness?: AwarenessState;
 	handlers: RecordHandlers;
 	objectId: ObjectID;
 	objectType: ObjectType;
 	syncConfig: SyncConfig;
-	awareness?: AwarenessState;
 	unload: () => void;
 	ydoc: CRDTDoc;
 }
@@ -83,20 +82,18 @@ export function createSyncManager(): SyncManager {
 	/**
 	 * Load an entity for syncing and manage its lifecycle.
 	 *
-	 * @param {SyncConfig}        syncConfig  Sync configuration for the object type.
-	 * @param {ObjectType}        objectType  Object type.
-	 * @param {ObjectID}          objectId    Object ID.
-	 * @param {ObjectData}        record      Entity record representing this object type.
-	 * @param {RecordHandlers}    handlers    Handlers for updating and fetching the record.
-	 * @param {WordPressUserInfo} currentUser Current user.
+	 * @param {SyncConfig}     syncConfig Sync configuration for the object type.
+	 * @param {ObjectType}     objectType Object type.
+	 * @param {ObjectID}       objectId   Object ID.
+	 * @param {ObjectData}     record     Entity record representing this object type.
+	 * @param {RecordHandlers} handlers   Handlers for updating and fetching the record.
 	 */
 	async function loadEntity(
 		syncConfig: SyncConfig,
 		objectType: ObjectType,
 		objectId: ObjectID,
 		record: ObjectData,
-		handlers: RecordHandlers,
-		currentUser: WordPressUserInfo
+		handlers: RecordHandlers
 	): Promise< void > {
 		const providerCreators = getProviderCreators();
 
@@ -124,11 +121,8 @@ export function createSyncManager(): SyncManager {
 		};
 
 		// If the sync config supports awareness, create it.
-		const awareness = syncConfig.createAwareness?.(
-			ydoc,
-			handlers,
-			currentUser
-		);
+		const awareness = syncConfig.createAwareness?.( ydoc, objectId );
+		awareness?.setUp();
 
 		// When the CRDT document is updated by an UndoManager or a connection (not
 		// a local origin), update the local store.
@@ -175,11 +169,11 @@ export function createSyncManager(): SyncManager {
 		undoManager.addToScope( recordMap );
 
 		const entityState: EntityState = {
+			awareness,
 			handlers,
 			objectId,
 			objectType,
 			syncConfig,
-			awareness,
 			unload,
 			ydoc,
 		};

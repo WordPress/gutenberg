@@ -1,5 +1,8 @@
-import type { UserInfo, WordPressUserInfo } from './awareness/awareness-types';
-import { loadFromLocalStorage, saveToLocalStorage } from './local-storage';
+/**
+ * Internal dependencies
+ */
+import type { User } from '../entity-types';
+import type { UserInfo } from './types';
 
 /**
  * The color palette for the user highlight.
@@ -14,8 +17,6 @@ const COLOR_PALETTE = [
 	'#00FDD9', // teal
 	'#37C5F0', // cyan
 ];
-
-const LOCAL_STORAGE_KEY = 'GUTENBERG_PREFERRED_COLOR_KEY';
 
 /**
  * Generate a random integer between min and max, inclusive.
@@ -40,17 +41,9 @@ function getNewUserColor( existingColors: string[] ): string {
 		( color ) => ! existingColors.includes( color )
 	);
 
-	// TODO: Drop this, and use @wordpress/preferences instead.
-	const preferredColor = loadFromLocalStorage< string | null >(
-		LOCAL_STORAGE_KEY,
-		null
-	);
-
 	let hexColor: string;
 
-	if ( preferredColor && availableColors.includes( preferredColor ) ) {
-		hexColor = preferredColor;
-	} else if ( availableColors.length > 0 ) {
+	if ( availableColors.length > 0 ) {
 		const randomIndex = generateRandomInt( 0, availableColors.length - 1 );
 		hexColor = availableColors[ randomIndex ];
 	} else {
@@ -60,8 +53,6 @@ function getNewUserColor( existingColors: string[] ): string {
 		hexColor = generateColorVariation( baseColor );
 	}
 
-	// TODO: Drop this, and use @wordpress/preferences instead.
-	saveToLocalStorage( LOCAL_STORAGE_KEY, hexColor );
 	return hexColor;
 }
 
@@ -156,7 +147,7 @@ export function areUserInfosEqual(
  * @return The user info object.
  */
 export function generateUserInfo(
-	currentUser: WordPressUserInfo,
+	currentUser: User< 'view' >,
 	existingColors: string[]
 ): UserInfo {
 	return {

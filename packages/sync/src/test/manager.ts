@@ -33,16 +33,12 @@ import type {
 	RecordHandlers,
 	SyncConfig,
 } from '../types';
-import type {
-	WordPressUserInfo,
-	BaseState,
-} from '../awareness/awareness-types';
 import { AwarenessState } from '../awareness/awareness-state';
 
 /**
  * A minimal mock awareness class for testing.
  */
-class MockAwarenessState extends AwarenessState< BaseState > {
+class MockAwarenessState extends AwarenessState {
 	protected equalityFieldChecks = {
 		userInfo: () => true,
 	};
@@ -59,7 +55,6 @@ describe( 'SyncManager', () => {
 	let mockProviderCreator: jest.Mock< ProviderCreator >;
 	let mockProviderResult: ProviderCreatorResult;
 	let mockRecord: ObjectData;
-	let mockCurrentUser: WordPressUserInfo;
 	let mockSyncConfig: jest.MockedObject< SyncConfig >;
 
 	beforeEach( () => {
@@ -69,17 +64,6 @@ describe( 'SyncManager', () => {
 		mockRecord = {
 			id: '123',
 			title: 'Test Post',
-		};
-
-		mockCurrentUser = {
-			id: 1,
-			name: 'Test User',
-			slug: 'test-user',
-			avatar_urls: {
-				'24': 'https://example.com/avatar.jpg',
-				'48': 'https://example.com/avatar-48.jpg',
-				'96': 'https://example.com/avatar-96.jpg',
-			},
 		};
 
 		mockProviderResult = {
@@ -144,8 +128,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			// Verify that applyChangesToCRDTDoc was called with the record data
@@ -163,8 +146,7 @@ describe( 'SyncManager', () => {
 				'postType/post',
 				'123',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
@@ -186,8 +168,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			expect(
@@ -204,8 +185,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			await manager.load(
@@ -213,8 +193,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			// Should only be called once despite two load attempts
@@ -235,8 +214,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				record1,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			await manager.load(
@@ -244,8 +222,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'456',
 				record2,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			expect(
@@ -293,8 +270,7 @@ describe( 'SyncManager', () => {
 					'post',
 					'123',
 					mockRecord,
-					mockHandlers,
-					mockCurrentUser
+					mockHandlers
 				);
 
 				// Current record should be applied as changes since the persisted doc does not exist.
@@ -329,8 +305,7 @@ describe( 'SyncManager', () => {
 					'post',
 					'123',
 					record,
-					mockHandlers,
-					mockCurrentUser
+					mockHandlers
 				);
 
 				// Changes should NOT be applied since the persisted doc is valid.
@@ -369,8 +344,7 @@ describe( 'SyncManager', () => {
 					'post',
 					'123',
 					record,
-					mockHandlers,
-					mockCurrentUser
+					mockHandlers
 				);
 
 				// Changes should be applied for the invalidated properties.
@@ -410,8 +384,7 @@ describe( 'SyncManager', () => {
 					'post',
 					'123',
 					record,
-					mockHandlers,
-					mockCurrentUser
+					mockHandlers
 				);
 
 				// Current record should be applied since the persisted doc does not exist.
@@ -442,8 +415,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			manager.unload( 'post', '123' );
@@ -467,8 +439,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			manager.unload( 'post', '123' );
@@ -480,8 +451,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			expect(
@@ -498,8 +468,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			await manager.load(
@@ -507,8 +476,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'456',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			manager.unload( 'post', '123' );
@@ -546,8 +514,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			jest.clearAllMocks();
@@ -600,8 +567,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			// Get the captured Y.Doc
@@ -645,8 +611,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			jest.clearAllMocks();
@@ -694,8 +659,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			// Clear calls of editRecord, which is called during load.
@@ -744,8 +708,7 @@ describe( 'SyncManager', () => {
 				'post',
 				'123',
 				mockRecord,
-				mockHandlers,
-				mockCurrentUser
+				mockHandlers
 			);
 
 			// Clear calls of editRecord, which is called during load.
