@@ -39,7 +39,6 @@ function addUseSettingFilter( callback ) {
 
 describe( 'useBlockProps', () => {
 	const blockSettings = {
-		apiVersion: 3,
 		save: () => noop,
 		category: 'text',
 		title: 'font size title',

@@ -174,7 +174,6 @@ describe( 'metadata', () => {
 
 		it( 'should preserve custom name metadata', () => {
 			registerBlockType( 'core/bar', {
-				apiVersion: 3,
 				title: 'Bar',
 			} );
 			const source = [
@@ -200,7 +199,6 @@ describe( 'metadata', () => {
 
 		it( 'should not preserve custom name metadata when target block does not support renaming', () => {
 			registerBlockType( 'core/bar', {
-				apiVersion: 3,
 				title: 'Bar',
 				supports: {
 					renaming: false,
@@ -228,7 +226,6 @@ describe( 'metadata', () => {
 
 		it( 'should preserve block visibility metadata', () => {
 			registerBlockType( 'core/bar', {
-				apiVersion: 3,
 				title: 'Bar',
 			} );
 
@@ -255,7 +252,6 @@ describe( 'metadata', () => {
 
 		it( 'should not preserve block visibility metadata when target block does not support it', () => {
 			registerBlockType( 'core/bar', {
-				apiVersion: 3,
 				title: 'Bar',
 				supports: {
 					visibility: false,

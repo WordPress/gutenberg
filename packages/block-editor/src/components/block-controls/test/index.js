@@ -43,7 +43,6 @@ describe( 'BlockControls', () => {
 		const edit = ( { children } ) => <>{ children }</>;
 
 		registerBlockType( 'core/test-block', {
-			apiVersion: 3,
 			save: () => {},
 			category: 'text',
 			title: 'block title',

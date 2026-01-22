@@ -50,7 +50,6 @@ function createRegistryWithStores() {
 describe( 'Actions', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {
-			apiVersion: 3,
 			title: 'Test block',
 			category: 'text',
 			save: () => null,
@@ -60,7 +59,6 @@ describe( 'Actions', () => {
 		} );
 
 		registerBlockType( 'core/block', {
-			apiVersion: 3,
 			title: 'Reusable block',
 			category: 'text',
 			save: () => null,

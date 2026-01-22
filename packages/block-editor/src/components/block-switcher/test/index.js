@@ -33,7 +33,6 @@ describe( 'BlockSwitcher', () => {
 		clientId: 'a1303fd6-3e60-4fff-a770-0e0ea656c5b9',
 	};
 	const headingBlockType = {
-		apiVersion: 3,
 		category: 'text',
 		title: 'Heading',
 		edit: () => {},
@@ -55,7 +54,6 @@ describe( 'BlockSwitcher', () => {
 		},
 	};
 	const paragraphBlockType = {
-		apiVersion: 3,
 		category: 'text',
 		title: 'Paragraph',
 		edit: () => {},

@@ -206,7 +206,6 @@ describe( 'selectors', () => {
 
 	beforeEach( () => {
 		registerBlockType( 'core/block', {
-			apiVersion: 3,
 			save: () => null,
 			category: 'reusable',
 			title: 'Reusable Block Stub',
@@ -216,7 +215,6 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-a', {
-			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'design',
 			title: 'Test Block A',
@@ -225,7 +223,6 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-b', {
-			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block B',
@@ -237,7 +234,6 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-c', {
-			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block C',
@@ -247,7 +243,6 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/freeform', {
-			apiVersion: 3,
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
 			category: 'text',
 			title: 'Test Freeform Content Handler',
@@ -263,7 +258,6 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-default', {
-			apiVersion: 3,
 			category: 'text',
 			title: 'default',
 			attributes: {
@@ -2338,7 +2332,6 @@ describe( 'selectors', () => {
 			originalDefaultBlockName = getDefaultBlockName();
 
 			registerBlockType( 'core/default', {
-				apiVersion: 3,
 				category: 'text',
 				title: 'default',
 				attributes: {

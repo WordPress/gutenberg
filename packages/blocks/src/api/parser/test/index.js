@@ -14,7 +14,6 @@ import serialize from '../../serializer';
 
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
-		apiVersion: 3,
 		attributes: {
 			fruit: {
 				type: 'string',
@@ -26,7 +25,6 @@ describe( 'block parser', () => {
 	};
 
 	const unknownBlockSettings = {
-		apiVersion: 3,
 		category: 'text',
 		title: 'unknown block',
 		attributes: {
@@ -264,7 +262,6 @@ describe( 'block parser', () => {
 		// Run the test cases using the PegJS defined parser.
 		it( 'should parse the post content, including block attributes', () => {
 			registerBlockType( 'core/test-block', {
-				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',
@@ -304,7 +301,6 @@ describe( 'block parser', () => {
 
 		it( 'should parse the post content, ignoring unknown blocks', () => {
 			registerBlockType( 'core/test-block', {
-				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',
@@ -438,7 +434,6 @@ describe( 'block parser', () => {
 
 		it( 'should parse with unicode escaped returned to original representation', () => {
 			registerBlockType( 'core/code', {
-				apiVersion: 3,
 				category: 'text',
 				title: 'Code Block',
 				attributes: {

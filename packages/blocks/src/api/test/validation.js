@@ -28,7 +28,6 @@ import {
 
 describe( 'validation', () => {
 	const defaultBlockSettings = {
-		apiVersion: 3,
 		save: ( { attributes } ) => attributes.fruit,
 		category: 'text',
 		title: 'block title',
