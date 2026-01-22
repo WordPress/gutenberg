@@ -97,7 +97,7 @@ export function recreateWithRecommendedBlocks( attributes, blockTypes ) {
 					layout: {
 						type: 'flex',
 						orientation: 'vertical',
-						justifyContent: textAlign,
+						justifyContent: 'stretch',
 					},
 				},
 				[
@@ -108,6 +108,7 @@ export function recreateWithRecommendedBlocks( attributes, blockTypes ) {
 							style: {
 								typography: {
 									fontSize: '0.5em',
+									textAlign,
 								},
 							},
 						} ),
@@ -115,6 +116,7 @@ export function recreateWithRecommendedBlocks( attributes, blockTypes ) {
 						createBlock( 'core/post-author-name', {
 							isLink,
 							linkTarget,
+							textAlign,
 							style: {
 								typography: {
 									fontSize: '1em',
@@ -123,6 +125,7 @@ export function recreateWithRecommendedBlocks( attributes, blockTypes ) {
 						} ),
 					shouldInsertPostAuthorBiographyBlock &&
 						createBlock( 'core/post-author-biography', {
+							textAlign,
 							style: {
 								typography: {
 									fontSize: '0.7em',
