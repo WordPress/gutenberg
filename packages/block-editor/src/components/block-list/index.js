@@ -27,7 +27,6 @@ import { getDefaultBlockName } from '@wordpress/blocks';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
-import { useTabNavBlocksOnly } from './use-tab-nav-blocks-only';
 import { store as blockEditorStore } from '../../store';
 import { LayoutProvider, defaultLayout } from './layout';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
@@ -115,7 +114,6 @@ function Root( { className, ...settings } ) {
 				useBlockSelectionClearer(),
 				useInBetweenInserter(),
 				useTypingObserver(),
-				useTabNavBlocksOnly( isPreviewMode ),
 			] ),
 			className: clsx( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,

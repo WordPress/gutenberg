@@ -209,38 +209,8 @@ export default function useArrowNav() {
 				return;
 			}
 
-			// In preview mode, only navigate between blocks.
-			const { isPreviewMode } = getSettings();
-			if ( isPreviewMode ) {
-				const currentBlock = target.closest( '[data-block]' );
-				if ( ! currentBlock ) {
-					return;
-				}
-
-				const blocks = Array.from(
-					node.querySelectorAll( '[data-block]' )
-				);
-				const currentIndex = blocks.indexOf( currentBlock );
-
-				if ( currentIndex === -1 ) {
-					return;
-				}
-
-				let nextIndex;
-				if ( isReverse ) {
-					nextIndex =
-						currentIndex <= 0
-							? blocks.length - 1
-							: currentIndex - 1;
-				} else {
-					nextIndex =
-						currentIndex >= blocks.length - 1
-							? 0
-							: currentIndex + 1;
-				}
-
-				event.preventDefault();
-				blocks[ nextIndex ].focus();
+			// In preview mode, navigation is handled by useSelectableBlocksNav.
+			if ( getSettings().isPreviewMode ) {
 				return;
 			}
 
