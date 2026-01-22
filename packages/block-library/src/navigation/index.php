@@ -154,7 +154,8 @@ class WP_Navigation_Block_Renderer {
 		$is_responsive_menu  = static::is_responsive( $attributes );
 		$computed_visibility = block_core_navigation_get_submenu_visibility( $attributes );
 		$open_on_click       = 'click' === $computed_visibility;
-		return ( $has_submenus && $open_on_click ) || $is_responsive_menu;
+		$show_submenu_icon   = ! empty( $attributes['showSubmenuIcon'] );
+		return ( $has_submenus && ( $open_on_click || $show_submenu_icon ) ) || $is_responsive_menu;
 	}
 
 	/**
