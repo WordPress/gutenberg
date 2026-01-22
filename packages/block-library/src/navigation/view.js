@@ -244,6 +244,45 @@ const { state, actions } = store(
 					focusableElements?.[ 0 ]?.focus();
 				}
 			},
+			checkSubmenuPosition() {
+				const { type } = getContext();
+
+				// Only check positioning for submenus, not overlays
+				if ( type !== 'submenu' ) {
+					return;
+				}
+
+				const { ref } = getElement();
+
+				if ( state.isMenuOpen ) {
+					// Find the submenu container within this navigation item
+					const submenuContainer = ref.querySelector(
+						':scope > .wp-block-navigation__submenu-container'
+					);
+
+					if ( ! submenuContainer ) {
+						return;
+					}
+
+					// Measure based on parent item position, not submenu position
+					// This prevents issues when the submenu is already repositioned
+					const parentRect = ref.getBoundingClientRect();
+					const viewportWidth = window.innerWidth;
+
+					// Estimate submenu width (minimum 200px as per CSS)
+					// If parent is close enough to right edge that submenu would overflow, flip it
+					const submenuMinWidth = 200;
+					const wouldOverflow =
+						parentRect.right + submenuMinWidth > viewportWidth;
+
+					// Add or remove class based on overflow prediction
+					if ( wouldOverflow ) {
+						ref.classList.add( 'open-on-left' );
+					} else {
+						ref.classList.remove( 'open-on-left' );
+					}
+				}
+			},
 		},
 	},
 	{ lock: true }

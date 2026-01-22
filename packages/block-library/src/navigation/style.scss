@@ -463,6 +463,39 @@ button.wp-block-navigation-item__content {
 	}
 }
 
+// When a submenu would overflow the viewport, open it leftward.
+// This class is dynamically added by JavaScript when overflow is detected.
+.wp-block-navigation .open-on-left {
+	// Move submenu arrow to the left side
+	> .wp-block-navigation-item__content {
+		.wp-block-navigation__submenu-icon {
+			margin-left: 0;
+			margin-right: 0.25em;
+			/* stylelint-disable-next-line property-disallowed-list -- The submenu icon is decorative only. Moving it visually to indicate leftward submenu opening does not affect reading order or interaction. */
+			order: -1; // Move icon before the label text
+		}
+	}
+
+	// First submenu.
+	> .wp-block-navigation__submenu-container {
+		left: auto;
+		right: 0;
+
+		// Nested submenus.
+		// On smaller breakpoints, nested menus open downwards.
+		.wp-block-navigation__submenu-container {
+			left: -1px; // Border width.
+			right: -1px;
+		}
+		@include break-medium {
+			.wp-block-navigation__submenu-container {
+				left: auto;
+				right: 100%;
+			}
+		}
+	}
+}
+
 // Default background and font color.
 .wp-block-navigation:not(.has-background) .wp-block-navigation__submenu-container {
 	// Set a background color for submenus so that they're not transparent.
