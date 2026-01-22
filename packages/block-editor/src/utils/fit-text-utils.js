@@ -18,18 +18,23 @@ function findOptimalFontSize( textElement, applyFontSize ) {
 	let bestSize = minSize;
 
 	const computedStyle = window.getComputedStyle( textElement );
-	const paddingLeft = parseFloat( computedStyle.paddingLeft ) || 0;
-	const paddingRight = parseFloat( computedStyle.paddingRight ) || 0;
+	let paddingLeft = parseFloat( computedStyle.paddingLeft ) || 0;
+	let paddingRight = parseFloat( computedStyle.paddingRight ) || 0;
 	const range = document.createRange();
 	range.selectNodeContents( textElement );
 
 	let referenceElement = textElement;
 	const parentElement = textElement.parentElement;
-	if (
-		parentElement &&
-		window?.getComputedStyle( parentElement )?.display === 'flex'
-	) {
+	if ( parentElement ) {
+		const parentElementComputedStyle =
+			window.getComputedStyle( parentElement );
+		if ( parentElementComputedStyle?.display === 'flex' ) {
 		referenceElement = parentElement;
+			paddingLeft +=
+				parseFloat( parentElementComputedStyle.paddingLeft ) || 0;
+			paddingRight +=
+				parseFloat( parentElementComputedStyle.paddingRight ) || 0;
+		}
 	}
 	let maxclientHeight = referenceElement.clientHeight;
 
