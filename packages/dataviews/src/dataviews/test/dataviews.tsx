@@ -637,6 +637,7 @@ describe( 'DataViews component', () => {
 			{
 				id: 'edit',
 				label: 'Edit',
+				isPrimary: true,
 				callback: () => {},
 			},
 		];
