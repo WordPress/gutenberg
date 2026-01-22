@@ -6,7 +6,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { parse } from '@wordpress/blocks';
+import { createBlock, parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 
@@ -25,18 +25,33 @@ const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
  * @return {JSX.Element} The revisions canvas component.
  */
 export default function RevisionsCanvas() {
-	const { revision, blockEditorSettings } = useSelect( ( select ) => {
-		const { getCurrentRevision } = unlock( select( editorStore ) );
-		return {
-			revision: getCurrentRevision(),
-			blockEditorSettings: select( blockEditorStore ).getSettings(),
-		};
-	}, [] );
-
-	const blocks = useMemo(
-		() => parse( revision?.content?.raw ?? '' ),
-		[ revision?.content?.raw ]
+	const { revision, postType, blockEditorSettings } = useSelect(
+		( select ) => {
+			const { getCurrentRevision, getCurrentPostType } = unlock(
+				select( editorStore )
+			);
+			return {
+				revision: getCurrentRevision(),
+				postType: getCurrentPostType(),
+				blockEditorSettings: select( blockEditorStore ).getSettings(),
+			};
+		},
+		[]
 	);
+
+	const blocks = useMemo( () => {
+		const parsedBlocks = parse( revision?.content?.raw ?? '' );
+		if ( postType === 'wp_navigation' ) {
+			return [
+				createBlock(
+					'core/navigation',
+					{ templateLock: false },
+					parsedBlocks
+				),
+			];
+		}
+		return parsedBlocks;
+	}, [ revision?.content?.raw, postType ] );
 
 	const settings = useMemo(
 		() => ( {
