@@ -13,6 +13,13 @@
  */
 class Block_Core_Shared_Navigation_Build_Css_Font_Sizes_Test extends WP_UnitTestCase {
 
+	public static function set_up_before_class() {
+		parent::set_up_before_class();
+
+		// Load the shared navigation helpers file.
+		require_once dirname( dirname( __DIR__ ) ) . '/packages/block-library/src/navigation-link/shared/helpers.php';
+	}
+
 	/**
 	 * Test that the function exists.
 	 */
