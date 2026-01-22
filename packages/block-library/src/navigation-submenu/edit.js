@@ -85,25 +85,15 @@ export default function NavigationSubmenuEdit( {
 } ) {
 	const { label, url, description, kind, type, id } = attributes;
 
-	const {
-		showSubmenuIcon,
-		maxNestingLevel,
-		openSubmenusOnClick: contextOpenSubmenusOnClick,
-		submenuVisibility,
-	} = context;
+	const { showSubmenuIcon, maxNestingLevel } = context;
 	const blockEditingMode = useBlockEditingMode();
 
 	// Determine effective submenu visibility with backward compatibility
-	const effectiveSubmenuVisibility = getSubmenuVisibility( {
-		submenuVisibility,
-		openSubmenusOnClick: contextOpenSubmenusOnClick,
-	} );
+	const submenuVisibility = getSubmenuVisibility( context );
 
 	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
 	const openSubmenusOnClick =
-		blockEditingMode !== 'default'
-			? true
-			: effectiveSubmenuVisibility === 'click';
+		blockEditingMode !== 'default' ? true : submenuVisibility === 'click';
 
 	// URL binding logic
 	const { clearBinding, createBinding } = useEntityBinding( {
