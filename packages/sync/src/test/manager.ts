@@ -33,7 +33,20 @@ import type {
 	RecordHandlers,
 	SyncConfig,
 } from '../types';
-import type { WordPressUserInfo } from '../awareness/awareness-types';
+import type {
+	WordPressUserInfo,
+	BaseState,
+} from '../awareness/awareness-types';
+import { AwarenessState } from '../awareness/awareness-state';
+
+/**
+ * A minimal mock awareness class for testing.
+ */
+class MockAwarenessState extends AwarenessState< BaseState > {
+	protected equalityFieldChecks = {
+		userInfo: () => true,
+	};
+}
 
 // Mock dependencies.
 jest.mock( '../providers', () => ( {
@@ -96,8 +109,9 @@ describe( 'SyncManager', () => {
 				}
 			),
 			supports: {},
-			// TODO: Switch this to the generic awareness state implementation instead.
-			createAwareness: jest.fn( () => undefined ),
+			createAwareness: jest.fn(
+				( ydoc: Y.Doc ) => new MockAwarenessState( ydoc )
+			),
 		};
 
 		mockHandlers = {
