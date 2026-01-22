@@ -2,7 +2,7 @@
  * External dependencies
  */
 import deepMerge from 'deepmerge';
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies

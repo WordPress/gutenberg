@@ -52,11 +52,11 @@ function CategoriesGroup( {
 				}
 			/>
 			{ Object.entries( templatePartAreas ).map(
-				( [ area, { label, templateParts } ] ) => (
+				( [ area, { label, templateParts, icon } ] ) => (
 					<CategoryItem
 						key={ area }
 						count={ templateParts?.length }
-						icon={ getTemplatePartIcon( area ) }
+						icon={ getTemplatePartIcon( icon ) }
 						label={ label }
 						id={ area }
 						type={ TEMPLATE_PART_POST_TYPE }

@@ -57,10 +57,8 @@ export type SurfaceBackgroundColor =
  * Background color variants for interactive elements.
  */
 export type InteractiveBackgroundColor =
-	| 'neutral'
 	| 'neutral-strong'
 	| 'neutral-weak'
-	| 'brand'
 	| 'brand-strong'
 	| 'brand-weak'
 	| 'error'
@@ -148,15 +146,11 @@ export type ForegroundColor =
 	| 'neutral-weak-disabled'
 	| 'brand'
 	| 'brand-active'
-	| 'brand-disabled'
 	| 'brand-strong'
 	| 'brand-strong-active'
-	| 'brand-strong-disabled'
 	| 'error-active'
-	| 'error-disabled'
 	| 'error-strong'
-	| 'error-strong-active'
-	| 'error-strong-disabled';
+	| 'error-strong-active';
 
 /**
  * Font family variants.

@@ -37,14 +37,12 @@ function StyleInspectorSlots( {
 	blockName,
 	showAdvancedControls = true,
 	showPositionControls = true,
-	showListControls = false,
 	showBindingsControls = true,
 } ) {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 	return (
 		<>
 			<InspectorControls.Slot />
-			{ showListControls && <InspectorControls.Slot group="list" /> }
 			<InspectorControls.Slot
 				group="color"
 				label={ __( 'Color' ) }
@@ -376,15 +374,11 @@ const BlockInspectorSingleBlock = ( {
 					{ hasBlockStyles && (
 						<BlockStyles clientId={ renderedBlockClientId } />
 					) }
-					<ContentTab
-						rootClientId={ renderedBlockClientId }
-						contentClientIds={ contentClientIds }
-					/>
+					<ContentTab contentClientIds={ contentClientIds } />
+					<InspectorControls.Slot group="content" />
+					<InspectorControls.Slot group="list" />
 					{ ! isSectionBlock && (
-						<StyleInspectorSlots
-							blockName={ blockName }
-							showListControls
-						/>
+						<StyleInspectorSlots blockName={ blockName } />
 					) }
 					{ isSectionBlock &&
 						isBlockSynced &&

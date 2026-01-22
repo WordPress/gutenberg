@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- DataViews: Use regular casing for bulk selection count. [#74573](https://github.com/WordPress/gutenberg/pull/74573)
+
+### Code Quality
+
+- DataViews: Move filtering logic in field types. [#74733](https://github.com/WordPress/gutenberg/pull/74733)
+
+### Enhancements
+
+- Include total items count in footer. [#73491](https://github.com/WordPress/gutenberg/pull/73491)
+
+## 11.2.0 (2026-01-16)
+
 ### Code Quality
 
 - Replace HStack/VStack from `wordpress/components` by Stack from `wordpress/ui`. [#74174](https://github.com/WordPress/gutenberg/pull/74174)
@@ -11,6 +25,10 @@
 - Reorganize internal code. [#74188](https://github.com/WordPress/gutenberg/pull/74188)
 - Improve stories and tests. [#74192](https://github.com/WordPress/gutenberg/pull/74192)
 - Update DataForm stories. [#74196](https://github.com/WordPress/gutenberg/pull/74196)
+- Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
+- Add details layout to DataForm validation story. [#74445](https://github.com/WordPress/gutenberg/pull/74445)
+- Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530))
+- Add "custom layout" story via "free form". [#74605](https://github.com/WordPress/gutenberg/pull/74605)
 
 ### Bug Fixes
 
@@ -20,6 +38,9 @@
 - DataViews: Combined field alignment in table layout. [#73908](https://github.com/WordPress/gutenberg/pull/73908)
 - DataViews: Fix table row multiselection in Firefox [#73945](https://github.com/WordPress/gutenberg/pull/73945)
 - DataViews: `filterSortAndPaginate()` will ignore sorting on non-sortable fields [#73950](https://github.com/WordPress/gutenberg/pull/73950)
+- DataViews: Fix locked fields order when toggling visibility in properties section. [#74326](https://github.com/WordPress/gutenberg/pull/74326)
+- Dataviews: Fix column header move item in RTL moves in the opposite direction to the arrow. [#74644](https://github.com/WordPress/gutenberg/pull/74644)
+- Dataviews: Fix insert left and right handling in table layout for RTL languages. [#74681](https://github.com/WordPress/gutenberg/pull/74681)
 
 ### Enhancements
 
@@ -34,7 +55,9 @@
 - DataViews: Update padding to 24px for consistency. [#73334](https://github.com/WordPress/gutenberg/pull/73334)
 - DataViews: Simplify list layout field color styles. [#73884](https://github.com/WordPress/gutenberg/pull/73884)
 - DataViews: Add panel form layout validation. [#73700](https://github.com/WordPress/gutenberg/pull/73700)
-- Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822))
+- Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822) and [#74348](https://github.com/WordPress/gutenberg/pull/74348))
+- Add density preference support to List view with compact, balanced (default), and comfortable options. ([#71050](https://github.com/WordPress/gutenberg/pull/71050))
+
 
 ## 11.0.0 (2025-11-26)
 

@@ -197,7 +197,7 @@ Displays the date on which the comment was posted. ([Source](https://github.com/
 -	**Name:** core/comment-date
 -	**Category:** theme
 -	**Ancestor:** core/comment-template
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 -	**Attributes:** format, isLink
 
 ## Comment Edit Link
@@ -207,8 +207,8 @@ Displays a link to edit the comment in the WordPress Dashboard. This link is onl
 -	**Name:** core/comment-edit-link
 -	**Category:** theme
 -	**Ancestor:** core/comment-template
--	**Supports:** anchor, color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** linkTarget, textAlign
+-	**Supports:** anchor, color (background, gradients, link, ~~text~~), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** linkTarget
 
 ## Comment Reply Link
 
@@ -217,8 +217,7 @@ Displays a link to reply to a comment. ([Source](https://github.com/WordPress/gu
 -	**Name:** core/comment-reply-link
 -	**Category:** theme
 -	**Ancestor:** core/comment-template
--	**Supports:** anchor, color (background, gradients, link, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** textAlign
+-	**Supports:** anchor, color (background, gradients, link, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 
 ## Comment Template
 
@@ -408,8 +407,8 @@ Introduce new sections and organize content to help visitors (and search engines
 
 -	**Name:** core/heading
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight)
--	**Attributes:** content, level, levelOptions, placeholder, textAlign
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, className, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign)
+-	**Attributes:** content, level, levelOptions, placeholder
 
 ## Home Link
 
@@ -437,7 +436,7 @@ Insert an image to make a visual statement. ([Source](https://github.com/WordPre
 -	**Name:** core/image
 -	**Category:** media
 -	**Supports:** align (center, full, left, right, wide), anchor, color (~~background~~, ~~text~~), filter (duotone), interactivity, shadow (), spacing (margin)
--	**Attributes:** alt, aspectRatio, blob, caption, height, href, id, lightbox, linkClass, linkDestination, linkTarget, rel, scale, sizeSlug, title, url, width
+-	**Attributes:** alt, aspectRatio, blob, caption, focalPoint, height, href, id, lightbox, linkClass, linkDestination, linkTarget, rel, scale, sizeSlug, title, url, width
 
 ## Latest Comments
 
@@ -520,7 +519,7 @@ Content before this block will be shown in the excerpt on your archives page. ([
 
 -	**Name:** core/more
 -	**Category:** design
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~, ~~multiple~~
+-	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~, ~~multiple~~, ~~visibility~~
 -	**Attributes:** customText, noTeaser
 
 ## Navigation
@@ -571,7 +570,7 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 -	**Name:** core/nextpage
 -	**Category:** design
 -	**Parent:** core/post-content
--	**Supports:** anchor, interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~
+-	**Supports:** anchor, interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~, ~~visibility~~
 
 ## Page List
 
@@ -599,7 +598,7 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 
 -	**Name:** core/paragraph
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign), ~~className~~
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns), ~~className~~
 -	**Attributes:** content, direction, dropCap, placeholder
 
 ## Pattern Placeholder
@@ -1082,8 +1081,8 @@ Insert poetry. Use special spacing formats. Or quote song lyrics. ([Source](http
 
 -	**Name:** core/verse
 -	**Category:** text
--	**Supports:** anchor, background (backgroundImage, backgroundSize), color (background, gradients, link, text), dimensions (minHeight), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
--	**Attributes:** content, textAlign
+-	**Supports:** anchor, background (backgroundImage, backgroundSize), color (background, gradients, link, text), dimensions (minHeight), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign)
+-	**Attributes:** content
 
 ## Video
 

@@ -142,7 +142,7 @@ export type CoreDataError = { message?: string; code?: string };
 export interface MediaEditProps< Item >
 	extends Pick<
 		DataFormControlProps< Item >,
-		'data' | 'field' | 'onChange' | 'hideLabelFromVision'
+		'data' | 'field' | 'onChange' | 'hideLabelFromVision' | 'validity'
 	> {
 	/**
 	 * Array of allowed media types (e.g., ['image', 'video']).
@@ -156,4 +156,10 @@ export interface MediaEditProps< Item >
 	 * @default false
 	 */
 	multiple?: boolean;
+	/**
+	 * Whether to render in an expanded form.
+	 *
+	 * @default false
+	 */
+	isExpanded?: boolean;
 }

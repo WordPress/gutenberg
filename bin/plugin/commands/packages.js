@@ -375,7 +375,7 @@ async function publishPackagesToNpm( {
 		);
 
 		await command(
-			`npx lerna version pre${ minimumVersionBump } --preid next.${ beforeCommitHash } --no-private ${ yesFlag }`,
+			`npx lerna version pre${ minimumVersionBump } --preid next.v --build-metadata ${ beforeCommitHash } --no-private ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',

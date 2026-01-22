@@ -22,6 +22,7 @@ describe( 'allowedBlocks', () => {
 	describe( 'addTransforms()', () => {
 		it( 'should not preserve allowedBlocks in wrapping transforms', () => {
 			registerBlockType( 'core/bar', {
+				apiVersion: 3,
 				title: 'Bar',
 				supports: { allowedBlocks: true },
 			} );
@@ -53,6 +54,7 @@ describe( 'allowedBlocks', () => {
 
 		it( 'should not preserve allowedBlocks in one-to-many transforms', () => {
 			registerBlockType( 'core/bar', {
+				apiVersion: 3,
 				title: 'Bar',
 				supports: { allowedBlocks: true },
 			} );
@@ -83,6 +85,7 @@ describe( 'allowedBlocks', () => {
 
 		it( 'should not preserve allowedBlocks in many-to-one transforms', () => {
 			registerBlockType( 'core/bar', {
+				apiVersion: 3,
 				title: 'Bar',
 				supports: { allowedBlocks: true },
 			} );
@@ -114,6 +117,7 @@ describe( 'allowedBlocks', () => {
 
 		it( 'should not preserve allowedBlocks in many-to-many transforms with different counts', () => {
 			registerBlockType( 'core/bar', {
+				apiVersion: 3,
 				title: 'Bar',
 				supports: { allowedBlocks: true },
 			} );
@@ -155,6 +159,7 @@ describe( 'allowedBlocks', () => {
 
 		it( 'should preserve allowedBlocks in many-to-many transforms with same counts', () => {
 			registerBlockType( 'core/bar', {
+				apiVersion: 3,
 				title: 'Bar',
 				supports: { allowedBlocks: true },
 			} );
@@ -194,6 +199,7 @@ describe( 'allowedBlocks', () => {
 
 		it( "should filter allowedBlocks based on destination block's allowedBlocks", () => {
 			registerBlockType( 'core/bar', {
+				apiVersion: 3,
 				title: 'Bar',
 				supports: { allowedBlocks: true },
 				allowedBlocks: [ 'core/paragraph' ],
@@ -227,6 +233,7 @@ describe( 'allowedBlocks', () => {
 
 		it( 'should not override existing allowedBlocks in target block', () => {
 			registerBlockType( 'core/bar', {
+				apiVersion: 3,
 				title: 'Bar',
 				supports: { allowedBlocks: true },
 			} );
@@ -253,6 +260,7 @@ describe( 'allowedBlocks', () => {
 
 		it( 'should not preserve allowedBlocks when target block does not support allowedBlocks', () => {
 			registerBlockType( 'core/bar', {
+				apiVersion: 3,
 				title: 'Bar',
 			} );
 

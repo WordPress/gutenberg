@@ -206,5 +206,6 @@ function UnforwardedSnackbar(
  * ```
  */
 export const Snackbar = forwardRef( UnforwardedSnackbar );
+Snackbar.displayName = 'Snackbar';
 
 export default Snackbar;
