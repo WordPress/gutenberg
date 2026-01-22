@@ -1,23 +1,19 @@
-/**
- * WordPress dependencies
- */
+import clsx from 'clsx';
 import {
 	privateApis as blocksPrivateApis,
 	getBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { useDebounce } from '@wordpress/compose';
 import {
+	Button,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
 import { useContext, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import BlockContext from '../../components/block-context';
@@ -76,7 +72,7 @@ function BlockFields( {
 
 	const blockContext = useContext( BlockContext );
 
-	const attributes = useSelect(
+	const { attributes, selectedBlockClientIds } = useSelect(
 		( select ) => {
 			const _attributes =
 				select( blockEditorStore ).getBlockAttributes( clientId );
@@ -85,23 +81,35 @@ function BlockFields( {
 			}
 
 			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
-			return Object.entries( _attributes.metadata.bindings ).reduce(
-				( acc, [ attribute, binding ] ) => {
-					const source = getBlockBindingsSource( binding.source );
-					if ( ! source ) {
-						return acc;
-					}
-					const values = source.getValues( {
-						select,
-						context: blockContext,
-						bindings: { [ attribute ]: binding },
-					} );
-					return { ...acc, ...values };
-				},
-				_attributes
-			);
+			const computedAttributes = Object.entries(
+				_attributes.metadata.bindings
+			).reduce( ( acc, [ attribute, binding ] ) => {
+				const source = getBlockBindingsSource( binding.source );
+				if ( ! source ) {
+					return acc;
+				}
+				const values = source.getValues( {
+					select,
+					context: blockContext,
+					bindings: { [ attribute ]: binding },
+				} );
+				return { ...acc, ...values };
+			}, _attributes );
+
+			return {
+				attributes: computedAttributes,
+				selectedBlockClientIds:
+					select( blockEditorStore ).getSelectedBlockClientIds(),
+			};
 		},
 		[ blockContext, clientId ]
+	);
+	const { selectBlock, toggleBlockHighlight } =
+		useDispatch( blockEditorStore );
+
+	const debouncedToggleBlockHighlight = useDebounce(
+		toggleBlockHighlight,
+		50
 	);
 
 	const computedForm = useMemo( () => {
@@ -182,20 +190,51 @@ function BlockFields( {
 	};
 
 	return (
-		<div className="block-editor-block-fields__container">
+		<div
+			className={ clsx( 'block-editor-block-fields__container', {
+				'is-selected': selectedBlockClientIds.includes( clientId ),
+			} ) }
+			onMouseEnter={ () =>
+				debouncedToggleBlockHighlight( clientId, true )
+			}
+			onMouseLeave={ () =>
+				debouncedToggleBlockHighlight( clientId, false )
+			}
+			onFocus={ () => {
+				selectBlock( clientId, null /* null to avoid focus */ );
+			} }
+		>
 			<div className="block-editor-block-fields__header">
 				<HStack spacing={ 1 }>
 					{ isCollapsed && (
 						<>
-							<BlockIcon
-								className="block-editor-block-fields__header-icon"
-								icon={ blockInformation?.icon }
-							/>
-							<h2 className="block-editor-block-fields__header-title">
-								<Truncate numberOfLines={ 1 }>
-									{ blockTitle }
-								</Truncate>
-							</h2>
+							<Button
+								__next40pxDefaultSize
+								className="block-editor-block-fields__selection-button"
+								onHoverIn={ () =>
+									debouncedToggleBlockHighlight(
+										clientId,
+										true
+									)
+								}
+								onHoverOut={ () =>
+									debouncedToggleBlockHighlight(
+										clientId,
+										false
+									)
+								}
+								onClick={ () => selectBlock( clientId ) }
+							>
+								<BlockIcon
+									className="block-editor-block-fields__header-icon"
+									icon={ blockInformation?.icon }
+								/>
+								<h2 className="block-editor-block-fields__header-title">
+									<Truncate numberOfLines={ 1 }>
+										{ blockTitle }
+									</Truncate>
+								</h2>
+							</Button>
 							<FieldsDropdownMenu
 								fields={ dataFormFields }
 								visibleFields={ form.fields }

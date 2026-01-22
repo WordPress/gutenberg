@@ -5,17 +5,34 @@
 @use "./rich-text/styles.scss" as *;
 
 .block-editor-block-fields__container {
-	padding: 0 $grid-unit-20;
+	padding: 0 $grid-unit-20 $grid-unit-20;
 
 	&:first-of-type {
 		padding-block-start: $grid-unit-10;
-		// Add border for the entire content controls and remove the similar border
-		// for tools panel.
+		/*
+		 * Add border for the entire content controls and remove the similar border
+		 * for tools panel.
+		 */
 		border-top: $border-width solid $gray-200;
 	}
+}
 
-	&:last-of-type {
-		padding-block-end: $grid-unit-20;
+.block-editor-block-fields__selection-button {
+	padding: 0;
+	height: auto;
+
+	&:hover .block-editor-block-fields__header-title {
+		color: var(--wp-admin-theme-color);
+	}
+
+	.is-selected & {
+		.block-editor-block-fields__header-icon svg {
+			fill: var(--wp-admin-theme-color);
+		}
+
+		.block-editor-block-fields__header-title {
+			color: var(--wp-admin-theme-color);
+		}
 	}
 }
 
@@ -26,10 +43,11 @@
 
 .block-editor-block-fields__header-icon {
 	flex: 0 0 $icon-size;
+	margin-inline-end: $grid-unit-05;
 }
 
 .block-editor-block-fields__header-title {
 	flex: 1;
-	// Override the default margin on a h2 element.
+	/* Override the default margin on a h2 element. */
 	margin: 0 !important;
 }
