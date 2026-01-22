@@ -7,6 +7,7 @@ import {
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
 	Icon,
+	Spinner,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import type { Attachment } from '@wordpress/core-data';
@@ -50,6 +51,28 @@ function FallbackView( {
 	);
 }
 
+function UploadingView( { filename }: { filename: string } ) {
+	return (
+		<div className="dataviews-media-field__media-thumbnail dataviews-media-field__media-thumbnail--uploading">
+			<VStack
+				justify="center"
+				alignment="center"
+				className="dataviews-media-field__media-thumbnail__stack"
+				spacing={ 0 }
+			>
+				<Spinner />
+				{ !! filename && (
+					<div className="dataviews-media-field__media-thumbnail__filename">
+						<Truncate className="dataviews-media-field__media-thumbnail__filename__truncate">
+							{ filename }
+						</Truncate>
+					</div>
+				) }
+			</VStack>
+		</div>
+	);
+}
+
 export default function MediaThumbnailView( {
 	item,
 	config,
@@ -76,6 +99,16 @@ export default function MediaThumbnailView( {
 	// Fetching.
 	if ( ! featuredMedia ) {
 		return null;
+	}
+
+	// Check if this is an uploading placeholder
+	const isUploading = !! ( item as any ).isUploading;
+
+	// For uploading items, show uploading view with the upload title
+	if ( isUploading ) {
+		const uploadTitle =
+			item.title?.raw || item.title?.rendered || 'Uploading…';
+		return <UploadingView filename={ uploadTitle } />;
 	}
 
 	const filename = getFilename( featuredMedia.source_url || '' );

@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { useState, useCallback, useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	privateApis as coreDataPrivateApis,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { resolveSelect } from '@wordpress/data';
+import { resolveSelect, useDispatch } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
@@ -161,6 +161,12 @@ export function MediaUploadModal( {
 			: [ String( value ) ];
 	} );
 
+	// Track files being uploaded
+	const [ uploadingFiles, setUploadingFiles ] = useState< File[] >( [] );
+
+	// Get dispatch for invalidating resolution
+	const { invalidateResolution } = useDispatch( coreStore );
+
 	// DataViews configuration - allow view updates
 	const [ view, setView ] = useState< View >( () => ( {
 		type: LAYOUT_PICKER_GRID,
@@ -231,6 +237,61 @@ export function MediaUploadModal( {
 		totalItems,
 		totalPages,
 	} = useEntityRecordsWithPermissions( 'postType', 'attachment', queryArgs );
+
+	// Create placeholder record for uploading files and inject at beginning of list
+	const dataWithUploading = useMemo( () => {
+		if ( uploadingFiles.length === 0 ) {
+			return mediaRecords || [];
+		}
+
+		// Create a title showing the files being uploaded
+		const uploadTitle =
+			uploadingFiles.length === 1
+				? uploadingFiles[ 0 ].name
+				: sprintf(
+						// translators: %d: number of files being uploaded
+						__( 'Uploading %d files…' ),
+						uploadingFiles.length
+				  );
+
+		// Create a placeholder attachment record to show in the list
+		const placeholderRecord: RestAttachment = {
+			id: -1, // Temporary ID that won't conflict
+			featured_media: 0,
+			link: '',
+			date: new Date().toISOString(),
+			date_gmt: new Date().toISOString(),
+			modified: new Date().toISOString(),
+			modified_gmt: new Date().toISOString(),
+			slug: 'uploading',
+			status: 'inherit',
+			type: 'attachment',
+			alt_text: '',
+			caption: { rendered: '' },
+			description: { rendered: '' },
+			media_type: 'file',
+			mime_type: 'application/uploading', // Custom mime type
+			media_details: {},
+			post: null,
+			source_url: '',
+			class_list: [],
+			title: {
+				raw: uploadTitle,
+				rendered: uploadTitle,
+			},
+			author: 0,
+			comment_status: 'closed',
+			ping_status: 'closed',
+			meta: [],
+			template: '',
+			_links: {},
+			// Custom flag to indicate uploading state
+			isUploading: true,
+		} as RestAttachment;
+
+		// Inject placeholder record at the beginning
+		return [ placeholderRecord, ...( mediaRecords || [] ) ];
+	}, [ uploadingFiles, mediaRecords ] );
 
 	const fields: Field< RestAttachment >[] = useMemo(
 		() => [
@@ -309,21 +370,75 @@ export function MediaUploadModal( {
 		onClose?.();
 	}, [ onClose ] );
 
+	// Wrap selection handler to prevent selecting the uploading placeholder
+	const handleSelectionChange = useCallback(
+		( newSelection: string[] ) => {
+			// Filter out the placeholder record ID (-1) if it's in the selection
+			const filteredSelection = newSelection.filter(
+				( id ) => id !== '-1'
+			);
+			// If the filtered selection is empty but we had a real selection attempt,
+			// it means the user tried to select only the placeholder item - ignore it
+			if (
+				filteredSelection.length === 0 &&
+				newSelection.length > 0 &&
+				selection.length > 0
+			) {
+				return;
+			}
+			setSelection( filteredSelection );
+		},
+		[ selection ]
+	);
+
 	// Use onUpload if provided, otherwise fall back to uploadMedia
 	const handleUpload = onUpload || uploadMedia;
+
+	const handleUploadWithTracking = useCallback(
+		( files: File[] ) => {
+			// Track that these files are being uploaded
+			setUploadingFiles( files );
+
+			handleUpload( {
+				allowedTypes,
+				filesList: files,
+				onFileChange: ( attachments ) => {
+					// When upload completes (attachments have real IDs), clear uploading state
+					const hasRealAttachments = attachments.some(
+						( attachment ) =>
+							attachment &&
+							typeof attachment.id === 'number' &&
+							attachment.id > 0
+					);
+
+					if ( hasRealAttachments ) {
+						setUploadingFiles( [] );
+						// Invalidate the entity records cache to refetch the list with the new item
+						invalidateResolution( 'getEntityRecords', [
+							'postType',
+							'attachment',
+							queryArgs,
+						] );
+					}
+				},
+				onError: () => {
+					// Clear uploading state on error
+					setUploadingFiles( [] );
+				},
+			} );
+		},
+		[ allowedTypes, handleUpload, invalidateResolution, queryArgs ]
+	);
 
 	const handleFileSelect = useCallback(
 		( event: React.ChangeEvent< HTMLInputElement > ) => {
 			const files = event.target.files;
 			if ( files && files.length > 0 ) {
 				const filesArray = Array.from( files );
-				handleUpload( {
-					allowedTypes,
-					filesList: filesArray,
-				} );
+				handleUploadWithTracking( filesArray );
 			}
 		},
-		[ allowedTypes, handleUpload ]
+		[ handleUploadWithTracking ]
 	);
 
 	const paginationInfo = useMemo(
@@ -410,22 +525,19 @@ export function MediaUploadModal( {
 						);
 					}
 					if ( filteredFiles.length > 0 ) {
-						handleUpload( {
-							allowedTypes,
-							filesList: filteredFiles,
-						} );
+						handleUploadWithTracking( filteredFiles );
 					}
 				} }
 				label={ __( 'Drop files to upload' ) }
 			/>
 			<DataViewsPicker
-				data={ mediaRecords || [] }
+				data={ dataWithUploading }
 				fields={ fields }
 				view={ view }
 				onChangeView={ setView }
 				actions={ actions }
 				selection={ selection }
-				onChangeSelection={ setSelection }
+				onChangeSelection={ handleSelectionChange }
 				isLoading={ isLoading }
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
