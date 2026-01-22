@@ -416,11 +416,29 @@ export const editEntityRecord =
 				const objectType = `${ kind }/${ name }`;
 				const objectId = recordId;
 
+				// Determine whether this edit should create a new undo level.
+				//
+				// In Gutenberg, block changes flow through two callbacks:
+				// - `onInput`: For transient/in-progress changes (e.g., typing each
+				//   character). These use `isCached: true` and get merged into
+				//   the current undo item.
+				// - `onChange`: For persistent/completed changes (e.g., formatting
+				//   transforms, block insertions). These use `isCached: false` and
+				//   should create a new undo level.
+				//
+				// Additionally, `undoIgnore: true` means the change should not
+				// affect the undo history at all (e.g., selection-only changes).
+				const isNewUndoLevel = options.undoIgnore
+					? false
+					: ! options.isCached;
+
 				getSyncManager()?.update(
 					objectType,
 					objectId,
 					edit.edits,
-					LOCAL_EDITOR_ORIGIN
+					LOCAL_EDITOR_ORIGIN,
+					false, // isSave
+					isNewUndoLevel
 				);
 			}
 		}
