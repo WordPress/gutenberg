@@ -17,7 +17,7 @@ import { createInterpolateElement } from '@wordpress/element';
 function DeletedOverlayWarning( { onClear, onCreate, isCreating = false } ) {
 	const message = createInterpolateElement(
 		__(
-			'The selected overlay template part is missing or has been deleted. <clearButton>Clear selection</clearButton> or <createButton>create a new overlay</createButton>.'
+			'The selected overlay template part is missing or has been deleted. <clearButton>Reset to default overlay</clearButton> or <createButton>create a new overlay</createButton>.'
 		),
 		{
 			clearButton: (
