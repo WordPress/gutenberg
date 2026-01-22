@@ -8,7 +8,6 @@
 -   Fix using `getServerContext` in derived state getters. ([#73518](https://github.com/WordPress/gutenberg/pull/73518))
 -   Fix derived state closures processing on client-side navigation. ([#72725](https://github.com/WordPress/gutenberg/pull/72725))
 -   Fix and refactor runtime initialization logic. ([#71123](https://github.com/WordPress/gutenberg/pull/71123))
--   Update deprecation warning for unique ID format. ([#74580](https://github.com/WordPress/gutenberg/pull/74580))
 
 ## 6.33.0 (2025-10-17)
 
