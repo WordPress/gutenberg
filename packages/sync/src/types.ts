@@ -93,7 +93,7 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => Record< string, string >;
-	getAwarenessInstance: (
+	getAwareness: (
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => AwarenessState | undefined;

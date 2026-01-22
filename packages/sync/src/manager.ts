@@ -225,7 +225,7 @@ export function createSyncManager(): SyncManager {
 	 * @param {ObjectID}   objectId   Object ID.
 	 * @return {AwarenessState | undefined} The awareness instance, or undefined if not supported.
 	 */
-	function getAwarenessInstance(
+	function getAwareness(
 		objectType: ObjectType,
 		objectId: ObjectID
 	): AwarenessState | undefined {
@@ -440,7 +440,7 @@ export function createSyncManager(): SyncManager {
 
 	return {
 		createMeta: createEntityMeta,
-		getAwarenessInstance,
+		getAwareness,
 		load: loadEntity,
 		// Use getter to ensure we always return the current value of `undoManager`.
 		get undoManager(): SyncUndoManager | undefined {
