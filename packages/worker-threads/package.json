@@ -47,7 +47,7 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"types": "build-types",
+	"types": "build-types/index.d.ts",
 	"sideEffects": false,
 	"dependencies": {
 		"comctx": "^1.4.3"
