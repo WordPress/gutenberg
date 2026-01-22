@@ -279,7 +279,6 @@ function Navigation( {
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const {
-		openSubmenusOnClick,
 		submenuVisibility,
 		overlayMenu,
 		overlay,
@@ -682,12 +681,12 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
-	const effectiveSubmenuVisibility = getSubmenuVisibility( attributes );
+	const computedSubmenuVisibility = getSubmenuVisibility( attributes );
 
 	const submenuAccessibilityNotice =
 		! showSubmenuIcon &&
-		effectiveSubmenuVisibility !== 'click' &&
-		effectiveSubmenuVisibility !== 'always'
+		computedSubmenuVisibility !== 'click' &&
+		computedSubmenuVisibility !== 'always'
 			? __(
 					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
 			  )
@@ -790,19 +789,14 @@ function Navigation( {
 										__nextHasNoMarginBottom
 										__next40pxDefaultSize
 										label={ __( 'Submenu Visibility' ) }
-										value={
-											submenuVisibility ||
-											( openSubmenusOnClick
-												? 'click'
-												: 'hover' )
-										}
+										value={ submenuVisibility }
 										onChange={ ( value ) => {
 											const newAttributes = {
 												submenuVisibility: value,
 											};
 											const prevSubmenuVisibility =
 												submenuVisibility;
-											// If "always" is selected, switch to vertical orientation and hide arrow
+											// If "always" is selected, hide the arrow because the formatting is broken for it when using center alignment.
 											if ( value === 'always' ) {
 												newAttributes.showSubmenuIcon = false;
 											} else if (
@@ -843,9 +837,8 @@ function Navigation( {
 										} )
 									}
 									isDisabled={
-										effectiveSubmenuVisibility ===
-											'click' ||
-										effectiveSubmenuVisibility === 'always'
+										computedSubmenuVisibility === 'click' ||
+										computedSubmenuVisibility === 'always'
 									}
 									isShownByDefault
 								>
@@ -857,9 +850,9 @@ function Navigation( {
 											} );
 										} }
 										disabled={
-											effectiveSubmenuVisibility ===
+											computedSubmenuVisibility ===
 												'click' ||
-											effectiveSubmenuVisibility ===
+											computedSubmenuVisibility ===
 												'always'
 										}
 										label={ __( 'Show arrow' ) }
