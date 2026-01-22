@@ -1,15 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { select, subscribe } from '@wordpress/data';
-import {
-	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
-	AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS,
-	type RecordHandlers,
-	AwarenessState,
-	type UserInfo,
-	areUserInfosEqual,
-} from '@wordpress/sync';
+import { dispatch, select, subscribe } from '@wordpress/data';
+import { AwarenessState, type Y } from '@wordpress/sync';
 // @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -17,10 +10,18 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import {
+	AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS,
+	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
+} from './config';
+import { store as coreStore } from '../index';
+import { generateUserInfo, areUserInfosEqual } from './utils';
+import {
 	areSelectionsStatesEqual,
 	getSelectionState,
-} from './utils/crdt-user-selections';
-import type { WPBlockSelection, PostEditorState, EditorState } from './types';
+} from '../utils/crdt-user-selections';
+
+import type { WPBlockSelection } from '../types';
+import type { EditorState, PostEditorState } from './types';
 
 export class PostEditorAwareness extends AwarenessState< PostEditorState > {
 	protected equalityFieldChecks = {
@@ -28,20 +29,45 @@ export class PostEditorAwareness extends AwarenessState< PostEditorState > {
 		userInfo: areUserInfosEqual,
 	};
 
-	public setUp( recordHandlers: RecordHandlers, userInfo: UserInfo ): void {
-		super.setUp( recordHandlers, userInfo );
+	public constructor(
+		doc: Y.Doc,
+		private kind: string,
+		private name: string,
+		private postId: number
+	) {
+		super( doc );
+	}
 
-		this.subscribeToUserSelectionChanges( recordHandlers );
+	public setUp(): void {
+		super.setUp();
+
+		this.setCurrentUserInfo();
+		this.subscribeToUserSelectionChanges();
+	}
+
+	/**
+	 * Set the current user info in the local state.
+	 */
+	private setCurrentUserInfo(): void {
+		const states = this.getStates();
+		const otherUserColors = Array.from( states.entries() )
+			.filter(
+				( [ clientId, state ] ) =>
+					state.userInfo && clientId !== this.clientID
+			)
+			.map( ( [ , state ] ) => state.userInfo.color )
+			.filter( Boolean );
+
+		// Get current user info and set it in local state.
+		const currentUser = select( coreStore ).getCurrentUser();
+		const userInfo = generateUserInfo( currentUser, otherUserColors );
+		this.setLocalStateField( 'userInfo', userInfo );
 	}
 
 	/**
 	 * Subscribe to user selection changes and update the selection state.
-	 *
-	 * @param recordHandlers - The record handlers.
 	 */
-	private subscribeToUserSelectionChanges(
-		recordHandlers: RecordHandlers
-	): void {
+	private subscribeToUserSelectionChanges(): void {
 		const {
 			getSelectionStart,
 			getSelectionEnd,
@@ -73,7 +99,6 @@ export class PostEditorAwareness extends AwarenessState< PostEditorState > {
 			// Ensure we update the controlled selection right away, persisting our cursor position locally.
 			const initialPosition = getSelectedBlocksInitialCaretPosition();
 			void this.updateSelectionInEntityRecord(
-				recordHandlers,
 				selectionStart,
 				selectionEnd,
 				initialPosition
@@ -107,13 +132,11 @@ export class PostEditorAwareness extends AwarenessState< PostEditorState > {
 	/**
 	 * Update the entity record with the current user's selection.
 	 *
-	 * @param recordHandlers
 	 * @param selectionStart  - The start position of the selection.
 	 * @param selectionEnd    - The end position of the selection.
 	 * @param initialPosition - The initial position of the selection.
 	 */
 	private async updateSelectionInEntityRecord(
-		recordHandlers: RecordHandlers,
 		selectionStart: WPBlockSelection,
 		selectionEnd: WPBlockSelection,
 		initialPosition: number | null
@@ -134,7 +157,13 @@ export class PostEditorAwareness extends AwarenessState< PostEditorState > {
 			undoIgnore: true,
 		};
 
-		recordHandlers.editRecord( edits, options );
+		dispatch( coreStore ).editEntityRecord(
+			this.kind,
+			this.name,
+			this.postId,
+			edits,
+			options
+		);
 	}
 
 	/**

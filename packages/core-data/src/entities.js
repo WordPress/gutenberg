@@ -9,17 +9,16 @@ import { capitalCase, pascalCase } from 'change-case';
 import apiFetch from '@wordpress/api-fetch';
 import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { generateUserInfo } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
+import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
 	getPostChangesFromCRDTDoc,
 } from './utils/crdt';
-import { PostEditorAwareness } from './post-editor-awareness';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
@@ -361,6 +360,19 @@ async function loadPostTypeEntities() {
 					applyPostChangesToCRDTDoc( crdtDoc, changes, postType ),
 
 				/**
+				 * Create the awareness instance for the entity's CRDT document.
+				 *
+				 * @param {import('@wordpress/sync').CRDTDoc}  ydoc
+				 * @param {import('@wordpress/sync').ObjectID} objectId
+				 * @return {import('@wordpress/sync').AwarenessState} AwarenessState instance
+				 */
+				createAwareness: ( ydoc, objectId ) => {
+					const kind = 'postType';
+					const id = parseInt( objectId, 10 );
+					return new PostEditorAwareness( ydoc, kind, name, id );
+				},
+
+				/**
 				 * Extract changes from a CRDT document that can be used to update the
 				 * local editor state.
 				 *
@@ -382,29 +394,6 @@ async function loadPostTypeEntities() {
 				 */
 				supports: {
 					crdtPersistence: true,
-				},
-
-				createAwareness: ( ydoc, recordHandlers, currentUser ) => {
-					const awareness = new PostEditorAwareness( ydoc );
-
-					const states = awareness.getStates();
-					const otherUserColors = Array.from( states.entries() )
-						.filter(
-							( [ clientId, state ] ) =>
-								state.userInfo &&
-								clientId !== awareness.clientID
-						)
-						.map( ( [ , state ] ) => state.userInfo.color )
-						.filter( Boolean );
-
-					const userInfo = generateUserInfo(
-						currentUser,
-						otherUserColors
-					);
-
-					awareness.setUp( recordHandlers, userInfo );
-
-					return awareness;
 				},
 			};
 		}
