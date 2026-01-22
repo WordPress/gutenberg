@@ -14,7 +14,7 @@ import { store as blockEditorStore } from '../store';
 import { PrivateListView } from '../components/list-view';
 import InspectorControls from '../components/inspector-controls/fill';
 import { PrivateBlockContext } from '../components/block-list/private-block-context';
-import useBlockDisplayTitle from '../components/block-title/use-block-display-title.js';
+import useBlockDisplayTitle from '../components/block-title/use-block-display-title';
 
 export const LIST_VIEW_SUPPORT_KEY = 'listView';
 
