@@ -496,6 +496,39 @@ button.wp-block-navigation-item__content {
 	}
 }
 
+// When a submenu would overflow the viewport on the left, open it rightward.
+// This class is dynamically added by JavaScript when left overflow is detected
+// (e.g., for right-justified navigation items near the left edge).
+// Uses !important to override justification-based positioning rules.
+.wp-block-navigation .open-on-right {
+	// Keep submenu arrow on the right side (default positioning)
+	> .wp-block-navigation-item__content {
+		.wp-block-navigation__submenu-icon {
+			margin-left: 0.25em;
+			margin-right: 0;
+		}
+	}
+
+	// First submenu - force rightward opening
+	> .wp-block-navigation__submenu-container {
+		left: 0 !important;
+		right: auto !important;
+
+		// Nested submenus.
+		// On smaller breakpoints, nested menus open downwards.
+		.wp-block-navigation__submenu-container {
+			left: -1px !important; // Border width.
+			right: -1px !important;
+		}
+		@include break-medium {
+			.wp-block-navigation__submenu-container {
+				left: 100% !important;
+				right: auto !important;
+			}
+		}
+	}
+}
+
 // Default background and font color.
 .wp-block-navigation:not(.has-background) .wp-block-navigation__submenu-container {
 	// Set a background color for submenus so that they're not transparent.

@@ -270,16 +270,27 @@ const { state, actions } = store(
 					const viewportWidth = window.innerWidth;
 
 					// Estimate submenu width (minimum 200px as per CSS)
-					// If parent is close enough to right edge that submenu would overflow, flip it
 					const submenuMinWidth = 200;
-					const wouldOverflow =
-						parentRect.right + submenuMinWidth > viewportWidth;
 
-					// Add or remove class based on overflow prediction
-					if ( wouldOverflow ) {
+					// Check if opening in either direction would overflow
+					const wouldOverflowRight =
+						parentRect.right + submenuMinWidth > viewportWidth;
+					const wouldOverflowLeft =
+						parentRect.left - submenuMinWidth < 0;
+
+					// Determine optimal positioning
+					if ( wouldOverflowRight && ! wouldOverflowLeft ) {
+						// Open left to avoid right overflow
 						ref.classList.add( 'open-on-left' );
-					} else {
+						ref.classList.remove( 'open-on-right' );
+					} else if ( wouldOverflowLeft && ! wouldOverflowRight ) {
+						// Open right to avoid left overflow
+						ref.classList.add( 'open-on-right' );
 						ref.classList.remove( 'open-on-left' );
+					} else {
+						// No overflow or both would overflow - use default positioning
+						ref.classList.remove( 'open-on-left' );
+						ref.classList.remove( 'open-on-right' );
 					}
 				}
 			},
