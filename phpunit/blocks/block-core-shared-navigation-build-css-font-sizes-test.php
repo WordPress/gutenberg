@@ -17,7 +17,7 @@ class Block_Core_Shared_Navigation_Build_Css_Font_Sizes_Test extends WP_UnitTest
 		parent::set_up_before_class();
 
 		// Load the shared navigation helpers file.
-		require_once dirname( dirname( __DIR__ ) ) . '/packages/block-library/src/navigation-link/shared/helpers.php';
+		require_once dirname( __DIR__, 2 ) . '/packages/block-library/src/navigation-link/shared/helpers.php';
 	}
 
 	/**
