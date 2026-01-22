@@ -1158,6 +1158,7 @@ describe( 'private selectors', () => {
 	describe( 'isBlockHiddenAtViewport', () => {
 		beforeAll( () => {
 			registerBlockType( 'core/test-block-with-visibility', {
+				apiVersion: 3,
 				save: () => null,
 				category: 'text',
 				title: 'Test Block With Visibility',
