@@ -351,8 +351,8 @@ export function processItem( id: QueueItemId ) {
 					return;
 				}
 
-				if ( attachment ) {
-					parentItem.onSuccess?.( [ attachment ] );
+				if ( parentItem.attachment ) {
+					parentItem.onSuccess?.( [ parentItem.attachment ] );
 				}
 
 				dispatch.removeItem( parentId );
@@ -821,6 +821,9 @@ export function generateThumbnails( id: QueueItemId ) {
 		}
 		const attachment = item.attachment;
 
+		// Generate a shared batchId for rotated image and thumbnails so they are treated as one batch.
+		const sideloadBatchId = uuidv4();
+
 		// Check if image needs rotation.
 		// If exif_orientation is not 1, the image needs rotation.
 		// Images that were scaled (bigImageSizeThreshold) are already rotated by vips.
@@ -844,7 +847,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				// The server will store this in $metadata['original_image'].
 				dispatch.addSideloadItem( {
 					file: rotatedFile,
-					batchId: uuidv4(),
+					batchId: sideloadBatchId,
 					parentId: item.id,
 					additionalData: {
 						post: attachment.id,
@@ -875,7 +878,6 @@ export function generateThumbnails( id: QueueItemId ) {
 			const file = attachment.media_filename
 				? renameFile( item.sourceFile, attachment.media_filename )
 				: item.sourceFile;
-			const batchId = uuidv4();
 
 			const allImageSizes = select.getSettings().allImageSizes || {};
 
@@ -903,7 +905,7 @@ export function generateThumbnails( id: QueueItemId ) {
 						// image item in the editor with the new one with the added sub-size.
 						item.onChange?.( [ updatedAttachment ] );
 					},
-					batchId,
+					batchId: sideloadBatchId,
 					parentId: item.id,
 					additionalData: {
 						// Sideloading does not use the parent post ID but the

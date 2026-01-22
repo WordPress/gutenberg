@@ -24,6 +24,15 @@ test.use( {
 test.describe( 'Big image size threshold', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
+		// Enable the media processing experiment for cross-origin isolation headers.
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-media-processing',
+		] );
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		// Disable all experiments after tests complete.
+		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -211,19 +220,19 @@ test.describe( 'Big image size threshold', () => {
 					?.attributes?.id
 		);
 
-		if ( imageId ) {
-			// Fetch the attachment details from the REST API.
-			const media = await requestUtils.rest( {
-				method: 'GET',
-				path: `/wp/v2/media/${ imageId }`,
-			} );
+		expect( imageId ).toBeDefined();
 
-			// The image should NOT be scaled since it's below the threshold.
-			expect( media.source_url ).not.toContain( '-scaled' );
-			// Original dimensions should be preserved.
-			expect( media.media_details.width ).toBe( 1024 );
-			expect( media.media_details.height ).toBe( 768 );
-		}
+		// Fetch the attachment details from the REST API.
+		const media = await requestUtils.rest( {
+			method: 'GET',
+			path: `/wp/v2/media/${ imageId }`,
+		} );
+
+		// The image should NOT be scaled since it's below the threshold.
+		expect( media.source_url ).not.toContain( '-scaled' );
+		// Original dimensions should be preserved.
+		expect( media.media_details.width ).toBe( 1024 );
+		expect( media.media_details.height ).toBe( 768 );
 	} );
 } );
 
