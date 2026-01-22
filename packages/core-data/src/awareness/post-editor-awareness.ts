@@ -13,7 +13,7 @@ import {
 	AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS,
 	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
 } from './config';
-import { store as coreStore } from '../index';
+import { STORE_NAME as coreStore } from '../name';
 import { generateUserInfo, areUserInfosEqual } from './utils';
 import {
 	areSelectionsStatesEqual,
@@ -157,6 +157,7 @@ export class PostEditorAwareness extends AwarenessState< PostEditorState > {
 			undoIgnore: true,
 		};
 
+		// @ts-ignore Types are not provided when using store name instead of store instance.
 		dispatch( coreStore ).editEntityRecord(
 			this.kind,
 			this.name,
