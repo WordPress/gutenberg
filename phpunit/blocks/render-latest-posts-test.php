@@ -162,23 +162,28 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 	/**
 	 * Tests that blocks are parsed when "Show full post" is enabled.
 	 *
-	 * When the Latest Posts block displays full post content, blocks
+	 * When the Latest Posts block displays full post content, ALL blocks
 	 * within that content should be parsed and rendered properly using
-	 * do_blocks(). This ensures:
+	 * do_blocks(). This applies to any block type (video, gallery, paragraph,
+	 * etc.), not just specific blocks. This ensures:
 	 * - Videos are constrained to their container width
 	 * - Gallery blocks display images side by side correctly
 	 * - Block styles are applied
 	 * - Block attributes are respected
 	 *
+	 * This test uses a gallery block as an example, but the issue affects
+	 * all block types. See #61477 and #69517.
+	 *
 	 * @covers ::gutenberg_render_block_core_latest_posts
 	 */
 	public function test_render_block_core_latest_posts_full_content_blocks_parsed() {
-		// Create attachment IDs for gallery block.
+		// Create attachment IDs for gallery block (used as example block type).
 		$file = DIR_TESTDATA . '/images/canola.jpg';
 		$attachment_id_1 = self::factory()->attachment->create_upload_object( $file );
 		$attachment_id_2 = self::factory()->attachment->create_upload_object( $file );
 
 		// Create a post with a gallery block in its content.
+		// Note: Gallery is used as an example, but this issue affects ALL blocks.
 		$gallery_block_content = sprintf(
 			'<!-- wp:gallery {"linkTo":"none"} -->
 <figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":%d} -->
