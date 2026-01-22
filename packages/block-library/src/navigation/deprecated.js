@@ -49,17 +49,18 @@ const migrateWithLayout = ( attributes ) => {
 const migrateOpenSubmenusOnClick = ( attributes ) => {
 	const { openSubmenusOnClick, ...restAttributes } = attributes;
 
-	// Don't migrate if openSubmenusOnClick doesn't exist or submenuVisibility already exists
-	if (
-		openSubmenusOnClick === undefined ||
-		restAttributes.submenuVisibility !== undefined
-	) {
+	// Don't migrate if openSubmenusOnClick doesn't exist
+	if ( openSubmenusOnClick === null || openSubmenusOnClick === undefined ) {
 		return attributes;
 	}
 
+	// Always remove openSubmenusOnClick
+	// If submenuVisibility already exists, keep it; otherwise set based on openSubmenusOnClick
 	return {
 		...restAttributes,
-		submenuVisibility: openSubmenusOnClick ? 'click' : 'hover',
+		submenuVisibility:
+			restAttributes.submenuVisibility ??
+			( openSubmenusOnClick ? 'click' : 'hover' ),
 	};
 };
 
@@ -173,7 +174,7 @@ const v7 = {
 		return <InnerBlocks.Content />;
 	},
 	isEligible: ( { openSubmenusOnClick } ) =>
-		openSubmenusOnClick !== undefined,
+		openSubmenusOnClick !== null && openSubmenusOnClick !== undefined,
 	migrate: migrateOpenSubmenusOnClick,
 };
 

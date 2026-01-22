@@ -306,7 +306,7 @@ function Navigation( {
 	useEffect( () => {
 		if ( orientation === 'horizontal' && submenuVisibility === 'always' ) {
 			setAttributes( {
-				submenuVisibility: undefined,
+				submenuVisibility: 'hover',
 				showSubmenuIcon: true,
 			} );
 		}
@@ -716,7 +716,7 @@ function Navigation( {
 						resetAll={ () => {
 							setAttributes( {
 								showSubmenuIcon: true,
-								submenuVisibility: undefined,
+								submenuVisibility: 'hover',
 								overlayMenu: 'mobile',
 								hasIcon: true,
 								icon: 'handle',
@@ -775,12 +775,12 @@ function Navigation( {
 								</h3>
 								<ToolsPanelItem
 									hasValue={ () =>
-										submenuVisibility !== undefined
+										submenuVisibility !== 'hover'
 									}
 									label={ __( 'Submenu Visibility' ) }
 									onDeselect={ () =>
 										setAttributes( {
-											submenuVisibility: undefined,
+											submenuVisibility: 'hover',
 										} )
 									}
 									isShownByDefault
@@ -800,10 +800,11 @@ function Navigation( {
 											if ( value === 'always' ) {
 												newAttributes.showSubmenuIcon = false;
 											} else if (
+												value === 'click' ||
 												prevSubmenuVisibility ===
-												'always'
+													'always'
 											) {
-												// When switching away from "always", show the arrow to avoid showing the accessibility notice
+												// When switching to "click" or away from "always", show the arrow
 												newAttributes.showSubmenuIcon = true;
 											}
 
