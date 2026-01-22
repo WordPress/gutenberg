@@ -625,6 +625,7 @@ function BlockListBlockProvider( props ) {
 
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
 			const isMultiSelected = isBlockMultiSelected( clientId );
+			const blockEditingMode = getBlockEditingMode( clientId );
 			const previewContext = {
 				isPreviewMode,
 				blockWithoutAttributes,
@@ -645,6 +646,8 @@ function BlockListBlockProvider( props ) {
 				blockVisibility,
 				deviceType,
 				isMultiSelected,
+				blockEditingMode,
+				isEditingDisabled: blockEditingMode === 'disabled',
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -661,7 +664,6 @@ function BlockListBlockProvider( props ) {
 				clientId,
 				checkDeep
 			);
-			const blockEditingMode = getBlockEditingMode( clientId );
 			const sectionBlockClientId = _isSectionBlock( clientId )
 				? clientId
 				: getParentSectionBlock( clientId );
