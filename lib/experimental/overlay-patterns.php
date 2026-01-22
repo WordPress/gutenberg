@@ -133,6 +133,25 @@ function gutenberg_register_overlay_block_patterns() {
 			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
 		)
 	);
+
+	register_block_pattern(
+		'gutenberg/navigation-overlay-accent-bg',
+		array(
+			'title'       => __( 'Overlay with centered navigation', 'gutenberg' ),
+			'description' => _x( 'A navigation overlay with vertically and horizontally centered navigation', 'Block pattern description', 'gutenberg' ),
+			'content'     => '<!-- wp:group {"metadata":{"name":"Navigation Overlay"},"style":{"spacing":{"padding":{"right":"var:preset|spacing|40","left":"var:preset|spacing|40","top":"var:preset|spacing|40","bottom":"var:preset|spacing|40"}},"dimensions":{"minHeight":"100vh"}},"backgroundColor":"white","layout":{"type":"default"}} -->
+<div class="wp-block-group has-white-background-color has-background" style="min-height:100vh;padding-top:var(--wp--preset--spacing--40);padding-right:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--40);padding-left:var(--wp--preset--spacing--40)"><!-- wp:group {"align":"wide","layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"right"}} -->
+<div class="wp-block-group alignwide"><!-- wp:navigation-overlay-close /--></div>
+<!-- /wp:group -->
+
+<!-- wp:group {"align":"wide","style":{"dimensions":{"minHeight":"90vh"}},"layout":{"type":"flex","orientation":"vertical","justifyContent":"center","verticalAlignment":"center"}} -->
+<div class="wp-block-group alignwide" style="min-height:90vh"><!-- wp:navigation {"layout":{"type":"flex","orientation":"vertical","justifyContent":"center"}} /--></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->',
+			'categories'  => array( 'navigation' ),
+			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
+		)
+	);
 }
 
 add_action( 'init', 'gutenberg_register_overlay_block_patterns', 20 );
