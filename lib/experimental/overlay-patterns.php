@@ -85,7 +85,7 @@ function gutenberg_register_overlay_block_patterns() {
 	);
 
 	register_block_pattern(
-		'gutenberg/navigation-overlay-white-bg',
+		'gutenberg/navigation-overlay-half-height',
 		array(
 			'title'       => __( 'Overlay with transparent background', 'gutenberg' ),
 			'description' => _x( 'A navigation overlay transparent background covering half the screen', 'Block pattern description', 'gutenberg' ),
@@ -135,7 +135,7 @@ function gutenberg_register_overlay_block_patterns() {
 	);
 
 	register_block_pattern(
-		'gutenberg/navigation-overlay-accent-bg',
+		'gutenberg/navigation-overlay-centered',
 		array(
 			'title'       => __( 'Overlay with centered navigation', 'gutenberg' ),
 			'description' => _x( 'A navigation overlay with vertically and horizontally centered navigation', 'Block pattern description', 'gutenberg' ),
