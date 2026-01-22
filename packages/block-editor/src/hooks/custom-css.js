@@ -12,7 +12,9 @@ import { processCSSNesting } from '@wordpress/global-styles-engine';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
-import AdvancedPanel from '../components/global-styles/advanced-panel';
+import AdvancedPanel, {
+	validateCSS,
+} from '../components/global-styles/advanced-panel';
 import { cleanEmptyObject, useStyleOverride } from './utils';
 import { store as blockEditorStore } from '../store';
 
@@ -97,6 +99,12 @@ function CustomCSSEdit( { clientId, name, setAttributes } ) {
 function useBlockProps( { style } ) {
 	const customCSS = style?.css;
 
+	// Validate CSS is non-empty and passes validation checks.
+	const isValidCSS =
+		typeof customCSS === 'string' &&
+		customCSS.length > 0 &&
+		validateCSS( customCSS );
+
 	const customCSSIdentifier = useInstanceId(
 		CUSTOM_CSS_INSTANCE_REFERENCE,
 		'wp-custom-css'
@@ -105,15 +113,19 @@ function useBlockProps( { style } ) {
 	const customCSSSelector = `.${ customCSSIdentifier }`;
 
 	// Transform the custom CSS using the same logic as global styles.
+	// Only process if CSS is valid (doesn't contain HTML markup).
 	const transformedCSS = useMemo( () => {
+		if ( ! isValidCSS ) {
+			return undefined;
+		}
 		return processCSSNesting( customCSS, customCSSSelector );
-	}, [ customCSS, customCSSSelector ] );
+	}, [ customCSS, customCSSSelector, isValidCSS ] );
 
 	// Inject the CSS via style override.
 	useStyleOverride( { css: transformedCSS } );
 
-	// Only add the class if there's custom CSS.
-	if ( ! customCSS ) {
+	// Only add the class if there's valid custom CSS.
+	if ( ! isValidCSS ) {
 		return {};
 	}
 
