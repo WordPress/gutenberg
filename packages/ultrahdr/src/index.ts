@@ -116,13 +116,13 @@ async function getWasm(): Promise< UltraHdrWasmModule > {
 	initPromise = ( async () => {
 		// Dynamic import of the WASM package
 		const UltraHdrWasm = ( await import(
-			'@wordpress/ultrahdr-wasm'
+			'open-ultrahdr-wasm'
 		) ) as unknown as UltraHdrWasmModule;
 
 		// Initialize WASM with the location prefix for the .wasm file
 		// If location is set, construct the full URL to the WASM file
 		if ( location ) {
-			const wasmUrl = location + 'wordpress_ultrahdr_bg.wasm';
+			const wasmUrl = location + 'open_ultrahdr_bg.wasm';
 			await UltraHdrWasm.default( wasmUrl );
 		} else {
 			// Let the WASM module use its default URL resolution (import.meta.url)

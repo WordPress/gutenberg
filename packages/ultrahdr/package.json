@@ -44,7 +44,7 @@
 	},
 	"types": "build-types",
 	"dependencies": {
-		"@wordpress/ultrahdr-wasm": "file:../ultrahdr-wasm"
+		"open-ultrahdr-wasm": "^0.1.1"
 	},
 	"publishConfig": {
 		"access": "public"
