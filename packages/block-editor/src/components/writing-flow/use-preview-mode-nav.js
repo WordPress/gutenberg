@@ -57,6 +57,24 @@ export function usePreviewModeNav() {
 					? blocks.indexOf( currentBlock )
 					: -1;
 
+				// If focus is not on a block, don't intercept navigation.
+				if ( currentIndex === -1 ) {
+					return;
+				}
+
+				// For Tab navigation, allow escaping the block list at boundaries.
+				// For arrow keys, wrap around.
+				if ( isTab ) {
+					if ( isReverse && currentIndex === 0 ) {
+						// At first block, Shift+Tab should exit the block list.
+						return;
+					}
+					if ( ! isReverse && currentIndex === blocks.length - 1 ) {
+						// At last block, Tab should exit the block list.
+						return;
+					}
+				}
+
 				let nextIndex;
 				if ( isReverse ) {
 					nextIndex =
