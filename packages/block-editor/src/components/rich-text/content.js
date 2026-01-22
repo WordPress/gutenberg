@@ -18,9 +18,7 @@ import { getMultilineTag } from './utils';
 export function valueToHTMLString( value, multiline ) {
 	if ( RichText.isEmpty( value ) ) {
 		const multilineTag = getMultilineTag( multiline );
-		return multilineTag
-			? `<${ multilineTag }></${ multilineTag }>`
-			: '<br>';
+		return multilineTag ? `<${ multilineTag }></${ multilineTag }>` : '';
 	}
 
 	if ( Array.isArray( value ) ) {
