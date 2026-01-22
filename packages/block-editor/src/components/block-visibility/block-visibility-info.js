@@ -16,11 +16,10 @@ import { unseen } from '@wordpress/icons';
  */
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
-import ViewportVisibilityInfo from './viewport-visibility-info';
 
 const { Badge } = unlock( componentsPrivateApis );
 
-function BlockVisibilityInfoDefault( { clientId } ) {
+export default function BlockVisibilityInfo( { clientId } ) {
 	const { isBlockHidden, hasHiddenParent } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
@@ -58,13 +57,5 @@ function BlockVisibilityInfoDefault( { clientId } ) {
 				</Text>
 			</HStack>
 		</Badge>
-	);
-}
-
-export default function BlockVisibilityInfo( { clientId } ) {
-	return window.__experimentalHideBlocksBasedOnScreenSize ? (
-		<ViewportVisibilityInfo clientId={ clientId } />
-	) : (
-		<BlockVisibilityInfoDefault clientId={ clientId } />
 	);
 }

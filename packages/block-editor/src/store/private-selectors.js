@@ -727,7 +727,6 @@ export const isBlockHiddenAnywhere = ( state, clientId ) => {
 	}
 
 	if (
-		window.__experimentalHideBlocksBasedOnScreenSize &&
 		typeof blockVisibility?.viewport === 'object' &&
 		blockVisibility?.viewport !== null
 	) {

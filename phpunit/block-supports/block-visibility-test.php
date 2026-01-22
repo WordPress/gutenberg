@@ -72,22 +72,6 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 		return $registry->get_registered( $this->test_block_name );
 	}
 
-	/**
-	 * Enable the viewport visibility experiment.
-	 */
-	private function enable_viewport_visibility_experiment() {
-		add_filter(
-			'pre_option_gutenberg-experiments',
-			function ( $value ) {
-				if ( ! is_array( $value ) ) {
-					$value = array();
-				}
-				$value['gutenberg-hide-blocks-based-on-screen-size'] = true;
-				return $value;
-			}
-		);
-	}
-
 	public function test_block_visibility_support_hides_block_when_visibility_false() {
 		$this->register_visibility_block_with_support(
 			'test/visibility-block',
@@ -148,8 +132,6 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_mobile_viewport_size() {
-		$this->enable_viewport_visibility_experiment();
-
 		$this->register_visibility_block_with_support(
 			'test/viewport-mobile',
 			array( 'visibility' => true )
@@ -183,8 +165,6 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_tablet_viewport_size() {
-		$this->enable_viewport_visibility_experiment();
-
 		$this->register_visibility_block_with_support(
 			'test/viewport-tablet',
 			array( 'visibility' => true )
@@ -253,8 +233,6 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_two_viewport_sizes() {
-		$this->enable_viewport_visibility_experiment();
-
 		$this->register_visibility_block_with_support(
 			'test/viewport-two',
 			array( 'visibility' => true )
@@ -293,8 +271,6 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_all_viewport_sizes_visible() {
-		$this->enable_viewport_visibility_experiment();
-
 		$this->register_visibility_block_with_support(
 			'test/viewport-all-visible',
 			array( 'visibility' => true )
@@ -322,8 +298,6 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_all_viewport_sizes_hidden() {
-		$this->enable_viewport_visibility_experiment();
-
 		$this->register_visibility_block_with_support(
 			'test/viewport-all-hidden',
 			array( 'visibility' => true )
@@ -351,8 +325,6 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_empty_object() {
-		$this->enable_viewport_visibility_experiment();
-
 		$this->register_visibility_block_with_support(
 			'test/viewport-empty',
 			array( 'visibility' => true )
@@ -374,8 +346,6 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_unknown_viewport_sizes_ignored() {
-		$this->enable_viewport_visibility_experiment();
-
 		$this->register_visibility_block_with_support(
 			'test/viewport-unknown-sizes',
 			array( 'visibility' => true )
@@ -407,8 +377,6 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_empty_content() {
-		$this->enable_viewport_visibility_experiment();
-
 		$this->register_visibility_block_with_support(
 			'test/viewport-empty-content',
 			array( 'visibility' => true )

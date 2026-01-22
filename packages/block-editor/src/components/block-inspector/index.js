@@ -29,7 +29,7 @@ import PositionControls from '../inspector-controls-tabs/position-controls-panel
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import { useBorderPanelLabel } from '../../hooks/border';
 import ContentTab from '../inspector-controls-tabs/content-tab';
-import BlockVisibilityInfo from '../block-visibility/block-visibility-info';
+import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
 import { unlock } from '../../lock-unlock';
 
 function StyleInspectorSlots( {
@@ -342,7 +342,7 @@ const BlockInspectorSingleBlock = ( {
 				isChild={ hasParentChildBlockCards }
 				clientId={ renderedBlockClientId }
 			/>
-			<BlockVisibilityInfo clientId={ renderedBlockClientId } />
+			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			{ window?.__experimentalContentOnlyPatternInsertion && (
 				<EditContents clientId={ renderedBlockClientId } />
 			) }

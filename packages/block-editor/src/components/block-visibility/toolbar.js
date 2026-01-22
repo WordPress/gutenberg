@@ -14,9 +14,8 @@ import { hasBlockSupport } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import { cleanEmptyObject } from '../../hooks/utils';
 import { unlock } from '../../lock-unlock';
-import ViewportVisibilityToolbar from './viewport-toolbar';
 
-function BlockVisibilityToolbarDefault( { clientIds } ) {
+export default function BlockVisibilityToolbar( { clientIds } ) {
 	const { blocks, canToggleBlockVisibility, hasHiddenBlock } = useSelect(
 		( select ) => {
 			const { getBlockName, getBlocksByClientId, isBlockHiddenAnywhere } =
@@ -85,13 +84,5 @@ function BlockVisibilityToolbarDefault( { clientIds } ) {
 				/>
 			</ToolbarGroup>
 		</>
-	);
-}
-
-export default function BlockVisibilityToolbar( { clientIds } ) {
-	return window.__experimentalHideBlocksBasedOnScreenSize ? (
-		<ViewportVisibilityToolbar clientIds={ clientIds } />
-	) : (
-		<BlockVisibilityToolbarDefault clientIds={ clientIds } />
 	);
 }
