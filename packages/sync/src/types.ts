@@ -127,7 +127,8 @@ export interface SyncManager {
 		objectId: ObjectID | null,
 		changes: Partial< ObjectData >,
 		origin: string,
-		isSave?: boolean
+		isSave?: boolean,
+		isNewUndoLevel?: boolean
 	) => void;
 }
 
@@ -136,4 +137,5 @@ export interface SyncUndoManager extends WPUndoManager< ObjectData > {
 		ymap: Y.Map< any >,
 		handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
 	) => void;
+	stopCapturing: () => void;
 }
