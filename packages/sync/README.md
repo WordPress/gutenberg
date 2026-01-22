@@ -58,14 +58,6 @@ Origin string for CRDT document changes originating from the local editor.
 
 Origin string for CRDT document changes originating from the sync manager.
 
-### TypedAwareness
-
-Extended Awareness class with typed state accessors.
-
-_Type_
-
--   `TypedAwareness`
-
 ### WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE
 
 WordPress meta key used to persist the CRDT document for an entity.
