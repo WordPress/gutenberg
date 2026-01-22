@@ -209,6 +209,41 @@ export default function useArrowNav() {
 				return;
 			}
 
+			// In preview mode, only navigate between blocks.
+			const { isPreviewMode } = getSettings();
+			if ( isPreviewMode ) {
+				const currentBlock = target.closest( '[data-block]' );
+				if ( ! currentBlock ) {
+					return;
+				}
+
+				const blocks = Array.from(
+					node.querySelectorAll( '[data-block]' )
+				);
+				const currentIndex = blocks.indexOf( currentBlock );
+
+				if ( currentIndex === -1 ) {
+					return;
+				}
+
+				let nextIndex;
+				if ( isReverse ) {
+					nextIndex =
+						currentIndex <= 0
+							? blocks.length - 1
+							: currentIndex - 1;
+				} else {
+					nextIndex =
+						currentIndex >= blocks.length - 1
+							? 0
+							: currentIndex + 1;
+				}
+
+				event.preventDefault();
+				blocks[ nextIndex ].focus();
+				return;
+			}
+
 			// If there is a multi-selection, the arrow keys should collapse the
 			// selection to the start or end of the selection.
 			if ( hasMultiSelection() ) {
