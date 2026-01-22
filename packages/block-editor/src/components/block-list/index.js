@@ -27,6 +27,7 @@ import { getDefaultBlockName } from '@wordpress/blocks';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import { useInBetweenInserter } from './use-in-between-inserter';
+import { useTabNavBlocksOnly } from './use-tab-nav-blocks-only';
 import { store as blockEditorStore } from '../../store';
 import { LayoutProvider, defaultLayout } from './layout';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
@@ -48,23 +49,30 @@ const delayedBlockVisibilityDebounceOptions = {
 };
 
 function Root( { className, ...settings } ) {
-	const { isOutlineMode, isFocusMode, editedContentOnlySection } = useSelect(
-		( select ) => {
-			const {
-				getSettings,
-				isTyping,
-				hasBlockSpotlight,
-				getEditedContentOnlySection,
-			} = unlock( select( blockEditorStore ) );
-			const { outlineMode, focusMode } = getSettings();
-			return {
-				isOutlineMode: outlineMode && ! isTyping(),
-				isFocusMode: focusMode || hasBlockSpotlight(),
-				editedContentOnlySection: getEditedContentOnlySection(),
-			};
-		},
-		[]
-	);
+	const {
+		isOutlineMode,
+		isFocusMode,
+		isPreviewMode,
+		editedContentOnlySection,
+	} = useSelect( ( select ) => {
+		const {
+			getSettings,
+			isTyping,
+			hasBlockSpotlight,
+			getEditedContentOnlySection,
+		} = unlock( select( blockEditorStore ) );
+		const {
+			outlineMode,
+			focusMode,
+			isPreviewMode: _isPreviewMode,
+		} = getSettings();
+		return {
+			isOutlineMode: outlineMode && ! isTyping(),
+			isFocusMode: focusMode || hasBlockSpotlight(),
+			isPreviewMode: _isPreviewMode,
+			editedContentOnlySection: getEditedContentOnlySection(),
+		};
+	}, [] );
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
@@ -107,10 +115,12 @@ function Root( { className, ...settings } ) {
 				useBlockSelectionClearer(),
 				useInBetweenInserter(),
 				useTypingObserver(),
+				useTabNavBlocksOnly( isPreviewMode ),
 			] ),
 			className: clsx( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode,
+				'is-preview-mode': isPreviewMode,
 			} ),
 		},
 		settings
