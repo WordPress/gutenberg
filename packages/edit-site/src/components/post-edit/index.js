@@ -10,6 +10,7 @@ import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { DataForm } from '@wordpress/dataviews';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { focus } from '@wordpress/dom';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { Button, __experimentalVStack as VStack } from '@wordpress/components';
 import { useState, useMemo, useEffect, useRef } from '@wordpress/element';
@@ -76,9 +77,7 @@ function PostEditForm( { postType, postId } ) {
 
 	useEffect( () => {
 		if ( hasFinishedResolution && formRef.current ) {
-			const firstTabbable = formRef.current.querySelector(
-				'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled]), button:not([disabled]), [role="button"]:not([aria-disabled="true"]), [tabindex="0"]'
-			);
+			const firstTabbable = focus.tabbable.find( formRef.current )[ 0 ];
 			if ( firstTabbable ) {
 				firstTabbable.focus( { focusVisible: true } );
 				// Fallback: add class for browsers that don't support focusVisible option.
