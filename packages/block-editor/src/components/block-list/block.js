@@ -624,6 +624,7 @@ function BlockListBlockProvider( props ) {
 				settings?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
 
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
+			const isMultiSelected = isBlockMultiSelected( clientId );
 			const previewContext = {
 				isPreviewMode,
 				blockWithoutAttributes,
@@ -643,6 +644,7 @@ function BlockListBlockProvider( props ) {
 				bindableAttributes,
 				blockVisibility,
 				deviceType,
+				isMultiSelected,
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -654,7 +656,6 @@ function BlockListBlockProvider( props ) {
 			const canRemove = canRemoveBlock( clientId );
 			const canMove = canMoveBlock( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
-			const isMultiSelected = isBlockMultiSelected( clientId );
 			const checkDeep = true;
 			const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
 				clientId,
