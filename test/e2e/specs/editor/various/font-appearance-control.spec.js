@@ -80,6 +80,9 @@ test.describe( 'Font Appearance Control dropdown menu', () => {
 		await page
 			.getByRole( 'button', { name: 'Typography options' } )
 			.click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Show Appearance' } )
+			.click();
 		await expect(
 			page.getByRole( 'combobox', { name: 'Appearance' } )
 		).toHaveText( 'Default' );
