@@ -180,6 +180,31 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that custom CSS support returns unchanged block when CSS is whitespace only.
+	 *
+	 * @covers ::gutenberg_render_custom_css_support_styles
+	 */
+	public function test_custom_css_support_returns_unchanged_when_css_whitespace_only() {
+		$this->register_custom_css_block_with_support(
+			'test/custom-css-whitespace',
+			array( 'customCSS' => true )
+		);
+
+		$parsed_block = array(
+			'blockName' => 'test/custom-css-whitespace',
+			'attrs'     => array(
+				'style' => array(
+					'css' => '   ',
+				),
+			),
+		);
+
+		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
+
+		$this->assertArrayNotHasKey( 'className', $result['attrs'], 'Block should not have className added when CSS is whitespace only.' );
+	}
+
+	/**
 	 * Tests that custom CSS support returns unchanged block when style attribute is missing.
 	 *
 	 * @covers ::gutenberg_render_custom_css_support_styles

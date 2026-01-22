@@ -20,7 +20,7 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 		return $parsed_block;
 	}
 
-	$custom_css = $parsed_block['attrs']['style']['css'] ?? null;
+	$custom_css = trim( $parsed_block['attrs']['style']['css'] ?? '' );
 
 	if ( empty( $custom_css ) ) {
 		return $parsed_block;

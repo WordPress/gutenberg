@@ -36,8 +36,10 @@ function CustomCSSControl( { blockName, setAttributes, style } ) {
 	const blockType = getBlockType( blockName );
 
 	function onChange( newStyle ) {
+		// Normalize whitespace-only CSS to undefined so it gets cleaned up.
+		const css = newStyle?.css?.trim() ? newStyle.css : undefined;
 		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
+			style: cleanEmptyObject( { ...newStyle, css } ),
 		} );
 	}
 
@@ -102,7 +104,7 @@ function useBlockProps( { style } ) {
 	// Validate CSS is non-empty and passes validation checks.
 	const isValidCSS =
 		typeof customCSS === 'string' &&
-		customCSS.length > 0 &&
+		customCSS.trim().length > 0 &&
 		validateCSS( customCSS );
 
 	const customCSSIdentifier = useInstanceId(
@@ -147,7 +149,7 @@ function addSaveProps( props, blockType, attributes ) {
 		return props;
 	}
 
-	if ( ! attributes?.style?.css ) {
+	if ( ! attributes?.style?.css?.trim() ) {
 		return props;
 	}
 
