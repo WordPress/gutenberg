@@ -18,7 +18,11 @@ function gutenberg_reregister_core_block_types() {
 
 	foreach ( $blocks_dirs as $blocks_dir ) {
 		$manifest_path = $blocks_dir . 'blocks-manifest.php';
-		$blocks        = require $manifest_path;
+
+		// Register the metadata collection for efficient lookups.
+		wp_register_block_metadata_collection( $blocks_dir, $manifest_path );
+
+		$blocks = require $manifest_path;
 
 		foreach ( $blocks as $block_name_folder => $metadata ) {
 			if ( ! is_array( $metadata ) || ! isset( $metadata['name'] ) ) {
