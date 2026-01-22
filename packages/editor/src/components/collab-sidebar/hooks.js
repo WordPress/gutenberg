@@ -372,17 +372,6 @@ export function useFloatingThread( {
 	const blockRef = useRef();
 	useBlockElementRef( thread.blockClientId, blockRef );
 
-	const blockMode = useSelect(
-		( select ) => {
-			return thread.blockClientId
-				? select( blockEditorStore ).getBlockMode(
-						thread.blockClientId
-				  )
-				: null;
-		},
-		[ thread.blockClientId ]
-	);
-
 	const updateHeight = useCallback(
 		( id, newHeight ) => {
 			setHeights( ( prev ) => {
@@ -411,7 +400,7 @@ export function useFloatingThread( {
 		if ( blockRef.current ) {
 			refs.setReference( blockRef.current );
 		}
-	}, [ blockRef, refs, commentLastUpdated, blockMode ] );
+	}, [ blockRef, refs, commentLastUpdated ] );
 
 	// Track thread heights.
 	useEffect( () => {
