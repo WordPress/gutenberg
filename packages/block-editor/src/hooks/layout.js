@@ -439,7 +439,8 @@ export const withLayoutStyles = createHigherOrderComponent(
 					const { getSettings, getBlockSettings } = unlock(
 						select( blockEditorStore )
 					);
-					const { disableLayoutStyles } = getSettings();
+					const settings = getSettings();
+					const { disableLayoutStyles } = settings;
 
 					if ( disableLayoutStyles ) {
 						return;
@@ -452,7 +453,6 @@ export const withLayoutStyles = createHigherOrderComponent(
 
 					// Get default blockGap value from global styles for use in layouts like grid.
 					// Check block-specific styles first, then fall back to root styles.
-					const settings = getSettings();
 					const globalStyles = settings[ globalStylesDataKey ];
 					const globalBlockGapValue =
 						globalStyles?.blocks?.[ name ]?.spacing?.blockGap ??
