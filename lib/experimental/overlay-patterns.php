@@ -87,7 +87,7 @@ function gutenberg_register_overlay_block_patterns() {
 		array(
 			'title'       => __( 'Overlay with centered navigation', 'gutenberg' ),
 			'description' => _x( 'A navigation overlay with vertically and horizontally centered navigation', 'Block pattern description', 'gutenberg' ),
-			'content'     => '<!-- wp:group {"metadata":{"name":"Navigation Overlay"},"style":{"spacing":{"padding":{"right":"var:preset|spacing|40","left":"var:preset|spacing|40","top":"var:preset|spacing|40","bottom":"var:preset|spacing|40"}},"dimensions":{"minHeight":"100vh"}},"backgroundColor":"white","layout":{"type":"default"}} -->
+			'content'     => '<!-- wp:group {"metadata":{"name":"' . esc_attr( __( 'Navigation Overlay', 'gutenberg' ) ) . '"},"style":{"spacing":{"padding":{"right":"var:preset|spacing|40","left":"var:preset|spacing|40","top":"var:preset|spacing|40","bottom":"var:preset|spacing|40"}},"dimensions":{"minHeight":"100vh"}},"backgroundColor":"white","layout":{"type":"default"}} -->
 <div class="wp-block-group has-white-background-color has-background" style="min-height:100vh;padding-top:var(--wp--preset--spacing--40);padding-right:var(--wp--preset--spacing--40);padding-bottom:var(--wp--preset--spacing--40);padding-left:var(--wp--preset--spacing--40)"><!-- wp:group {"align":"wide","layout":{"type":"flex","flexWrap":"nowrap","justifyContent":"right"}} -->
 <div class="wp-block-group alignwide"><!-- wp:navigation-overlay-close /--></div>
 <!-- /wp:group -->
@@ -105,12 +105,12 @@ function gutenberg_register_overlay_block_patterns() {
 
 <!-- wp:group {"align":"full","style":{"border":{"top":{"color":"#eeeeee","width":"1px"}},"spacing":{"padding":{"top":"var:preset|spacing|60","bottom":"var:preset|spacing|60"}}},"layout":{"type":"constrained"}} -->
 <div class="wp-block-group alignfull" style="border-top-color:#eeeeee;border-top-width:1px;padding-top:var(--wp--preset--spacing--60);padding-bottom:var(--wp--preset--spacing--60)"><!-- wp:paragraph {"style":{"typography":{"textAlign":"center"}}} -->
-<p class="has-text-align-center">Find out how we can help your business. <a href="#">Learn more</a></p>
+<p class="has-text-align-center">' . esc_html( __( 'Find out how we can help your business.', 'gutenberg' ) ) . ' <a href="#">' . esc_html( __( 'Learn more', 'gutenberg' ) ) . '</a></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
 <div class="wp-block-buttons"><!-- wp:button {"style":{"typography":{"textTransform":"uppercase"}}} -->
-<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" style="text-transform:uppercase">Get started today!</a></div>
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button" style="text-transform:uppercase">' . esc_html( __( 'Get started today!', 'gutenberg' ) ) . '</a></div>
 <!-- /wp:button -->
 
 <!-- wp:button -->
