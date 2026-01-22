@@ -178,7 +178,7 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 	 */
 	public function test_render_block_core_latest_posts_full_content_blocks_parsed() {
 		// Create attachment IDs for gallery block (used as example block type).
-		$file = DIR_TESTDATA . '/images/canola.jpg';
+		$file            = DIR_TESTDATA . '/images/canola.jpg';
 		$attachment_id_1 = self::factory()->attachment->create_upload_object( $file );
 		$attachment_id_2 = self::factory()->attachment->create_upload_object( $file );
 
@@ -198,6 +198,7 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 			$attachment_id_2
 		);
 
+		// Create a post with gallery block content for the Latest Posts block to display.
 		self::factory()->post->create_and_get(
 			array(
 				'post_title'   => 'Post with gallery block',
@@ -208,12 +209,12 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 
 		// Render Latest Posts block with "Show full post" enabled.
 		$attributes = array(
-			'postsToShow'            => 1,
-			'orderBy'                => 'date',
-			'order'                  => 'DESC',
-			'excerptLength'          => 55,
-			'displayFeaturedImage'   => false,
-			'displayPostContent'     => true,
+			'postsToShow'             => 1,
+			'orderBy'                 => 'date',
+			'order'                   => 'DESC',
+			'excerptLength'           => 55,
+			'displayFeaturedImage'    => false,
+			'displayPostContent'      => true,
 			'displayPostContentRadio' => 'full_post',
 		);
 
