@@ -79,7 +79,7 @@ function useFitText( { fitText, name, clientId } ) {
 			const _blockMode =
 				select( blockEditorStore ).getBlockMode( clientId );
 			if ( _blockMode === 'html' ) {
-				return { mode: _blockMode };
+				return { blockMode: _blockMode };
 			}
 			return {
 				blockAttributes:
