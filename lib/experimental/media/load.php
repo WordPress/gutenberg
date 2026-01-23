@@ -6,6 +6,34 @@
  */
 
 /**
+ * Debug logging for client-side media processing (load.php).
+ * Enabled by default for this testing branch.
+ *
+ * @param string $message Log message.
+ * @param array  $data    Optional data to include in log.
+ */
+function gutenberg_media_load_debug_log( $message, $data = array() ) {
+	// Enable by default for testing branch.
+	$debug_enabled = true;
+
+	if ( ! $debug_enabled ) {
+		return;
+	}
+
+	$timestamp = gmdate( 'H:i:s.v' );
+	$prefix    = "[MEDIA:PHP:LOAD] $timestamp";
+
+	if ( ! empty( $data ) ) {
+		$data_str = wp_json_encode( $data, JSON_PRETTY_PRINT );
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( "$prefix $message\n  └─ Details: $data_str" );
+	} else {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( "$prefix $message" );
+	}
+}
+
+/**
  * Returns a list of all available image sizes.
  *
  * @return array Existing image sizes.
@@ -78,6 +106,18 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 		$response->data['jpeg_interlaced']      = $jpeg_interlaced;
 		$response->data['png_interlaced']       = $png_interlaced;
 		$response->data['gif_interlaced']       = $gif_interlaced;
+
+		gutenberg_media_load_debug_log(
+			'REST API settings provided to client',
+			array(
+				'image_size_threshold' => $image_size_threshold,
+				'image_sizes_count'    => count( $response->data['image_sizes'] ),
+				'image_sizes'          => array_keys( $response->data['image_sizes'] ),
+				'jpeg_interlaced'      => $jpeg_interlaced,
+				'png_interlaced'       => $png_interlaced,
+				'gif_interlaced'       => $gif_interlaced,
+			)
+		);
 	}
 
 	return $response;
@@ -254,6 +294,15 @@ function gutenberg_start_cross_origin_isolation_output_buffer(): void {
 	global $is_safari;
 
 	$coep = $is_safari ? 'require-corp' : 'credentialless';
+
+	gutenberg_media_load_debug_log(
+		'Setting up cross-origin isolation for WebAssembly/SharedArrayBuffer',
+		array(
+			'is_safari' => $is_safari ? 'yes' : 'no',
+			'COOP'      => 'same-origin',
+			'COEP'      => $coep,
+		)
+	);
 
 	ob_start(
 		function ( string $output ) use ( $coep ): string {
