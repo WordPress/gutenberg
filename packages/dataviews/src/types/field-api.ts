@@ -76,6 +76,13 @@ export type FieldTypeName =
 	| 'url'
 	| 'array';
 
+/**
+ * A map of property names for declarative getValue/setValue definitions.
+ * For getValue: { outputKey: 'itemPath' } - maps item property paths to output keys.
+ * For setValue: { itemKey: 'valueKey' } - maps value keys to item property paths.
+ */
+export type PropertyMap = Record< string, string >;
+
 export type Rules< Item > = {
 	required?: boolean;
 	elements?: boolean;
@@ -271,14 +278,24 @@ export type Field< Item > = {
 	/**
 	 * Callback used to retrieve the value of the field from the item.
 	 * Defaults to `item[ field.id ]`.
+	 *
+	 * Can be a function or a PropertyMap for declarative property mapping.
+	 * Map syntax: `{ outputKey: 'itemPath' }` - reads `item[itemPath]` as `outputKey`.
+	 * Example: `{ id: 'id', url: 'src' }` reads `item.src` as `url`.
 	 */
-	getValue?: ( args: { item: Item } ) => any;
+	getValue?: ( ( args: { item: Item } ) => any ) | PropertyMap;
 
 	/**
 	 * Callback used to set the value of the field on the item.
 	 * Used for editing operations to update field values.
+	 *
+	 * Can be a function or a PropertyMap for declarative property mapping.
+	 * Map syntax: `{ itemKey: 'valueKey' }` - writes `value[valueKey]` to `itemKey`.
+	 * Example: `{ id: 'id', src: 'url' }` writes `value.url` to `src`.
 	 */
-	setValue?: ( args: { item: Item; value: any } ) => DeepPartial< Item >;
+	setValue?:
+		| ( ( args: { item: Item; value: any } ) => DeepPartial< Item > )
+		| PropertyMap;
 
 	/**
 	 * Display format configuration for fields.

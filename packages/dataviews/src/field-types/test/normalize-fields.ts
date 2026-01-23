@@ -42,6 +42,60 @@ describe( 'normalizeFields: default getValue', () => {
 			expect( result ).toBe( 'value' );
 		} );
 	} );
+	describe( 'getValue from map', () => {
+		it( 'maps simple properties', () => {
+			const item = { id: 1, src: 'https://example.com/audio.mp3' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'audio',
+					getValue: { id: 'id', url: 'src' },
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].getValue( { item } );
+			expect( result ).toEqual( { id: 1, url: 'https://example.com/audio.mp3' } );
+		} );
+
+		it( 'maps properties with same names', () => {
+			const item = { id: 1, url: 'https://example.com/image.jpg', alt: 'Description' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'image',
+					getValue: { id: 'id', url: 'url', alt: 'alt' },
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].getValue( { item } );
+			expect( result ).toEqual( { id: 1, url: 'https://example.com/image.jpg', alt: 'Description' } );
+		} );
+
+		it( 'supports nested property paths', () => {
+			const item = { user: { profile: { name: 'John' } } };
+			const fields: Field< {} >[] = [
+				{
+					id: 'name',
+					getValue: { name: 'user.profile.name' },
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].getValue( { item } );
+			expect( result ).toEqual( { name: 'John' } );
+		} );
+
+		it( 'returns undefined for missing properties', () => {
+			const item = { id: 1 };
+			const fields: Field< {} >[] = [
+				{
+					id: 'audio',
+					getValue: { id: 'id', url: 'src' },
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].getValue( { item } );
+			expect( result ).toEqual( { id: 1, url: undefined } );
+		} );
+	} );
+
 	describe( 'setValue from ID', () => {
 		it( 'user', () => {
 			const item = { user: 'value', email: 'user@example.com' };
@@ -153,6 +207,72 @@ describe( 'normalizeFields: default getValue', () => {
 				value: undefined,
 			} );
 			expect( result ).toEqual( { user: undefined } );
+		} );
+	} );
+
+	describe( 'setValue from map', () => {
+		it( 'maps simple properties', () => {
+			const item = { id: 1, src: 'https://example.com/audio.mp3' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'audio',
+					setValue: { id: 'id', src: 'url' },
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].setValue( {
+				item,
+				value: { id: 2, url: 'https://example.com/new.mp3' },
+			} );
+			expect( result ).toEqual( { id: 2, src: 'https://example.com/new.mp3' } );
+		} );
+
+		it( 'maps properties with same names', () => {
+			const item = { id: 1, url: 'https://example.com/image.jpg', alt: 'Old' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'image',
+					setValue: { id: 'id', url: 'url', alt: 'alt' },
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].setValue( {
+				item,
+				value: { id: 2, url: 'https://example.com/new.jpg', alt: 'New' },
+			} );
+			expect( result ).toEqual( { id: 2, url: 'https://example.com/new.jpg', alt: 'New' } );
+		} );
+
+		it( 'supports nested property paths', () => {
+			const item = { user: { profile: { name: 'John' } } };
+			const fields: Field< {} >[] = [
+				{
+					id: 'name',
+					setValue: { 'user.profile.name': 'name' },
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].setValue( {
+				item,
+				value: { name: 'Jane' },
+			} );
+			expect( result ).toEqual( { user: { profile: { name: 'Jane' } } } );
+		} );
+
+		it( 'handles undefined values', () => {
+			const item = { id: 1, src: 'https://example.com/audio.mp3' };
+			const fields: Field< {} >[] = [
+				{
+					id: 'audio',
+					setValue: { id: 'id', src: 'url' },
+				},
+			];
+			const normalizedFields = normalizeFields( fields );
+			const result = normalizedFields[ 0 ].setValue( {
+				item,
+				value: { id: 2, url: undefined },
+			} );
+			expect( result ).toEqual( { id: 2, src: undefined } );
 		} );
 	} );
 
