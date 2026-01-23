@@ -35,6 +35,9 @@ test.describe( 'Block Hiding', () => {
 			.getByRole( 'button', { name: 'Apply' } )
 			.click();
 
+		// Open the settings sidebar.
+		await editor.openDocumentSettingsSidebar();
+
 		// Verify the block inspector shows "Block is hidden".
 		await expect(
 			page
@@ -83,6 +86,9 @@ test.describe( 'Block Hiding', () => {
 			.getByRole( 'button', { name: 'View', exact: true } )
 			.click();
 		await page.getByRole( 'menuitemradio', { name: 'Mobile' } ).click();
+
+		// Open the settings sidebar.
+		await editor.openDocumentSettingsSidebar();
 
 		// Verify the block inspector shows "Block is hidden in Mobile".
 		await expect(
