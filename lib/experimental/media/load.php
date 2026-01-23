@@ -422,10 +422,11 @@ add_action( 'wp_enqueue_media', 'gutenberg_override_media_templates' );
 function gutenberg_media_processing_preload_paths( $paths ) {
 	foreach ( $paths as $key => $path ) {
 		if ( is_string( $path ) && str_starts_with( $path, '/?_fields=' ) ) {
-			// Add image_sizes and image_size_threshold to the existing fields.
+			// Add image_sizes and image_size_threshold after "home," to match
+			// the field order in packages/core-data/src/entities.js.
 			$paths[ $key ] = str_replace(
-				'/?_fields=',
-				'/?_fields=image_sizes,image_size_threshold,',
+				',home,',
+				',home,image_sizes,image_size_threshold,',
 				$path
 			);
 			break;
