@@ -12,7 +12,7 @@
 
 ### Enhancements
 
-- DataViews: Use labels when rendering a list of options. [#74733](https://github.com/WordPress/gutenberg/pull/74733)
+- DataViews: Use labels when rendering a list of options. [#74772](https://github.com/WordPress/gutenberg/pull/74772)
 
 ## 11.2.0 (2026-01-16)
 
