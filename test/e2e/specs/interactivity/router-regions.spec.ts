@@ -124,6 +124,7 @@ test.describe( 'Router regions', () => {
 
 	test( 'should preserve state across pages', async ( { page } ) => {
 		const counter = page.getByTestId( 'state-counter' );
+
 		await expect( counter ).toHaveText( '0' );
 
 		await counter.click( { clickCount: 3, delay: 50 } );
@@ -476,5 +477,120 @@ test.describe( 'Router regions', () => {
 		// Regions should still be unmounted.
 		await expect( region7 ).toBeVisible();
 		await expect( region8 ).toBeVisible();
+	} );
+
+	test( 'should be preserved on first navigation without `data-wp-key`', async ( {
+		page,
+	} ) => {
+		const region1 = page.getByTestId( 'region-1' );
+		const region1Text = page.getByTestId( 'region-1-text' );
+		await expect( region1Text ).toHaveText( 'hydrated' );
+
+		// Adds a tag to know whether the counter element was replaced.
+		await region1.evaluate( ( ref ) => {
+			if ( ref instanceof HTMLElement ) {
+				ref.dataset.tag = 'region-1';
+			}
+		} );
+
+		// Navigate to the next page.
+		await page.getByTestId( 'next' ).click();
+		await expect( page ).toHaveTitle(
+			'router regions – page 2 – gutenberg'
+		);
+
+		// The region element should retain the same attributes when it doesn't change.
+		await expect( region1 ).toHaveAttribute( 'data-tag', 'region-1' );
+	} );
+
+	test( 'should be preserved on first navigation with `data-wp-key` and other directives ', async ( {
+		page,
+	} ) => {
+		const region2 = page.getByTestId( 'region-2' );
+		const validInsideInteractive = page.getByTestId(
+			'valid-inside-interactive'
+		);
+		const validInsideRouterRegion = page.getByTestId(
+			'valid-inside-router-region'
+		);
+
+		// Add tags to know whether the region elements were replaced.
+		await region2.evaluate( ( el ) => {
+			el.dataset.tag = 'region-2';
+		} );
+		await validInsideInteractive.evaluate( ( el ) => {
+			el.dataset.tag = 'valid-inside-interactive';
+		} );
+		await validInsideRouterRegion.evaluate( ( el ) => {
+			el.dataset.tag = 'valid-inside-router-region';
+		} );
+
+		// Navigate to the next page.
+		await page.getByTestId( 'next' ).click();
+		await expect( page ).toHaveTitle(
+			'router regions – page 2 – gutenberg'
+		);
+
+		// Regions with `data-wp-key` and other directives should not be recreated.
+		await expect( region2 ).toHaveAttribute( 'data-tag', 'region-2' );
+		await expect( validInsideInteractive ).toHaveAttribute(
+			'data-tag',
+			'valid-inside-interactive'
+		);
+		await expect( validInsideRouterRegion ).toHaveAttribute(
+			'data-tag',
+			'valid-inside-router-region'
+		);
+	} );
+
+	test( 'should be preserved on first navigation with `data-wp-key` and `attachTo`', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		await page.goto(
+			utils.getLink( 'router regions - page 1 - attachTo' )
+		);
+
+		const bodyLocator = page.locator( 'body' );
+		const regionsLocator = page.locator( '#regions-with-attach-to' );
+
+		const region3 = bodyLocator.getByTestId( 'region3' );
+		const region4 = regionsLocator.getByTestId( 'region4' );
+		const region5 = bodyLocator.getByTestId( 'region5' );
+		const region6 = regionsLocator.getByTestId( 'region6' );
+
+		const regions: Record< string, Locator > = {
+			region3,
+			region4,
+			region5,
+			region6,
+		};
+
+		// The text of this element is used to check a navigation is completed.
+		const region1Ssr = page.getByTestId( 'region-1-ssr' );
+
+		await expect( region1Ssr ).toHaveText( 'content from page 1' );
+
+		// Navigate to "Page attachTo 1".
+		await page.getByTestId( 'next' ).click();
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo1' );
+
+		// Add tags to know whether the region elements were replaced.
+		for ( const regionId in regions ) {
+			const region = regions[ regionId ];
+			await region.evaluate( ( el, id ) => {
+				el.dataset.tag = id;
+			}, regionId );
+		}
+
+		// Navigate to "Page attachTo 2".
+		await page.getByTestId( 'next' ).click();
+		await expect( region1Ssr ).toHaveText( 'content from page attachTo2' );
+
+		// Regions with `data-wp-key` and other directives should not be recreated.
+		for ( const regionId in regions ) {
+			const region = regions[ regionId ];
+			await expect( region ).toHaveAttribute( 'data-tag', regionId );
+		}
 	} );
 } );
