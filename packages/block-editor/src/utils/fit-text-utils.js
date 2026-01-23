@@ -22,7 +22,7 @@ function findOptimalFontSize( textElement, applyFontSize ) {
 	const paddingRight = parseFloat( computedStyle.paddingRight ) || 0;
 	const range = document.createRange();
 	range.selectNodeContents( textElement );
-
+	let maxclientHeight = textElement.clientHeight;
 	while ( minSize <= maxSize ) {
 		const midSize = Math.floor( ( minSize + maxSize ) / 2 );
 		applyFontSize( midSize );
@@ -41,7 +41,17 @@ function findOptimalFontSize( textElement, applyFontSize ) {
 		// Check if text fits within the element's height.
 		const fitsHeight =
 			alreadyHasScrollableHeight ||
-			textElement.scrollHeight <= textElement.clientHeight;
+			textElement.scrollHeight <= textElement.clientHeight ||
+			textElement.scrollHeight <= maxclientHeight;
+
+		// When there are calculated line heights, text may jump in height
+		// the available space may decrease while the font size decreases,
+		// making text not fit.
+		// We store a maximum reference height: the maximum reference element height that was observed
+		// during the loop to avoid issues with such jumps.
+		if ( textElement.clientHeight > maxclientHeight ) {
+			maxclientHeight = textElement.clientHeight;
+		}
 
 		if ( fitsWidth && fitsHeight ) {
 			bestSize = midSize;
