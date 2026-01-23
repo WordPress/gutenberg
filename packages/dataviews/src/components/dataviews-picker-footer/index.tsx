@@ -136,6 +136,7 @@ export function DataViewsPickerFooter() {
 		getItemId,
 		actions = EMPTY_ARRAY,
 		paginationInfo,
+		view,
 	} = useContext( DataViewsContext );
 
 	const isMultiselect = useIsMultiselectPicker( actions );
@@ -143,7 +144,8 @@ export function DataViewsPickerFooter() {
 	const message = getFooterMessage(
 		selection.length,
 		data.length,
-		paginationInfo.totalItems
+		paginationInfo.totalItems,
+		view.infiniteScrollEnabled
 	);
 
 	const selectedItems = useMemo(

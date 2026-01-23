@@ -250,12 +250,14 @@ function renderFooterContent< Item >(
 	paginationInfo: {
 		totalItems: number;
 		totalPages: number;
-	}
+	},
+	infiniteScrollEnabled?: boolean
 ) {
 	const message = getFooterMessage(
 		selection.length,
 		data.length,
-		paginationInfo.totalItems
+		paginationInfo.totalItems,
+		infiniteScrollEnabled
 	);
 	return (
 		<Stack
@@ -317,6 +319,7 @@ function FooterContent< Item >( {
 	getItemId,
 	paginationInfo,
 }: ToolbarContentProps< Item > ) {
+	const { view } = useContext( DataViewsContext );
 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
 		null
 	);
@@ -371,7 +374,8 @@ function FooterContent< Item >( {
 			actionInProgress,
 			setActionInProgress,
 			onChangeSelection,
-			paginationInfo
+			paginationInfo,
+			view.infiniteScrollEnabled
 		);
 	} else if ( ! footerContentRef.current ) {
 		footerContentRef.current = renderFooterContent(
@@ -384,7 +388,8 @@ function FooterContent< Item >( {
 			actionInProgress,
 			setActionInProgress,
 			onChangeSelection,
-			paginationInfo
+			paginationInfo,
+			view.infiniteScrollEnabled
 		);
 	}
 	return footerContentRef.current;
