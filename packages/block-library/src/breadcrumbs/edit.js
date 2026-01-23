@@ -159,7 +159,15 @@ export default function BreadcrumbEdit( {
 			placeholderItems.push( __( 'Ancestor' ), __( 'Parent' ) );
 		}
 		placeholder = (
-			<nav { ...blockProps }>
+			<nav
+				{ ...blockProps }
+				style={ {
+					'--separator': `"${ separator
+						.replace( /\\/g, '\\\\' )
+						.replace( /"/g, '\\"' ) }"`,
+					...blockProps.style,
+				} }
+			>
 				<ol>
 					{ placeholderItems.map( ( text, index ) => (
 						<li key={ index }>
@@ -278,7 +286,7 @@ export default function BreadcrumbEdit( {
 					) }
 				/>
 			</InspectorControls>
-			{ status === 'loading' && (
+			{ status === 'loading' && ! showPlaceholder && (
 				<div { ...blockProps }>
 					<Spinner />
 				</div>

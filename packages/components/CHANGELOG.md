@@ -2,11 +2,16 @@
 
 ## Unreleased
 
-## 32.0.0-next.0 (2026-01-14)
+### Code Quality
+
+-   Add `displayName` to components to improve debugging and fix Storybook source code. [#74716](https://github.com/WordPress/gutenberg/pull/74716)
+
+## 32.0.0 (2026-01-16)
 
 ### Code Quality
 
 -   Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
+-   Fix generated TS types referencing unavailable `csstype`. [#74655](https://github.com/WordPress/gutenberg/pull/74655)
 
 ### Breaking Changes
 
@@ -50,6 +55,7 @@
 -   `DatePicker`: Fix missing scheduled events and current date indicators. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
 -   `DatePicker`: Fix handling of `currentDate` when passed values as Date or timestamp. ([#73887](https://github.com/WordPress/gutenberg/pull/73887))
 -   `Popover`: Fix bug where clicking outside nested popovers only closed the inner one. ([#74340](https://github.com/WordPress/gutenberg/pull/74340))
+-   `InputControl`: Allow label to wrap for long labels/translations. ([#74301](https://github.com/WordPress/gutenberg/pull/74301)).
 
 ### Internal
 
@@ -57,7 +63,8 @@
 -   `AnglePickerControl`: Migrate styles from Emotion to a CSS module ([#73786](https://github.com/WordPress/gutenberg/pull/73786)).
 -   `Menu`: Clean up popover wrappers ([#74207](https://github.com/WordPress/gutenberg/pull/74207)).
 -   `Button`, `DateCalendar`, `DateRangeCalendar`, `CheckboxControl`, `Panel`, `Placeholder`: Remove outdated vendor prefix properties in CSS ([#74213](https://github.com/WordPress/gutenberg/pull/74213)).
--    Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530)).
+-   Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530)).
+-   `SlotFill`: unify context providers and `Fill` implementations ([#68056](https://github.com/WordPress/gutenberg/pull/68056)).
 
 ## 30.9.0 (2025-11-26)
 

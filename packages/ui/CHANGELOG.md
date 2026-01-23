@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 0.5.0-next.0 (2026-01-14)
+## 0.5.0 (2026-01-16)
 
 ### Breaking Changes
 
@@ -17,3 +17,5 @@
 -   Add `Icon` component ([#74311](https://github.com/WordPress/gutenberg/pull/74311)).
 -   Add `Button` component ([#74415](https://github.com/WordPress/gutenberg/pull/74415), [#74416](https://github.com/WordPress/gutenberg/pull/74416), [#74470](https://github.com/WordPress/gutenberg/pull/74470)).
 -   Add `InputLayout` primitive ([#74313](https://github.com/WordPress/gutenberg/pull/74313)).
+-   Add `Input` primitive ([#74615](https://github.com/WordPress/gutenberg/pull/74615)).
+-   Add `Select` primitive ([#74661](https://github.com/WordPress/gutenberg/pull/74661)).

@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 0.5.0-next.0 (2026-01-14)
+## 0.5.0 (2026-01-16)
 
 ### Breaking changes
 

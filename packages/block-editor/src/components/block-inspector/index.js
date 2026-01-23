@@ -29,21 +29,19 @@ import PositionControls from '../inspector-controls-tabs/position-controls-panel
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import { useBorderPanelLabel } from '../../hooks/border';
 import ContentTab from '../inspector-controls-tabs/content-tab';
-import BlockVisibilityInfo from '../block-visibility/block-visibility-info';
+import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
 import { unlock } from '../../lock-unlock';
 
 function StyleInspectorSlots( {
 	blockName,
 	showAdvancedControls = true,
 	showPositionControls = true,
-	showListControls = false,
 	showBindingsControls = true,
 } ) {
 	const borderPanelLabel = useBorderPanelLabel( { blockName } );
 	return (
 		<>
 			<InspectorControls.Slot />
-			{ showListControls && <InspectorControls.Slot group="list" /> }
 			<InspectorControls.Slot
 				group="color"
 				label={ __( 'Color' ) }
@@ -79,7 +77,6 @@ function StyleInspectorSlots( {
 function BlockInspector() {
 	const {
 		selectedBlockCount,
-		selectedBlockClientId,
 		renderedBlockName,
 		renderedBlockClientId,
 		blockType,
@@ -121,7 +118,6 @@ function BlockInspector() {
 
 		return {
 			selectedBlockCount: getSelectedBlockCount(),
-			selectedBlockClientId: _selectedBlockClientId,
 			renderedBlockClientId: _renderedBlockClientId,
 			renderedBlockName: _renderedBlockName,
 			blockType: _blockType,
@@ -259,7 +255,6 @@ function BlockInspector() {
 		>
 			<BlockInspectorSingleBlock
 				renderedBlockClientId={ renderedBlockClientId }
-				selectedBlockClientId={ selectedBlockClientId }
 				blockName={ blockType.name }
 				isSectionBlock={ isSectionBlock }
 				availableTabs={ availableTabs }
@@ -311,10 +306,6 @@ const BlockInspectorSingleBlock = ( {
 	// The block that is displayed in the inspector. This is the block whose
 	// controls and information are shown to the user.
 	renderedBlockClientId,
-	// The actual block that is selected in the editor. This may or may not
-	// be the same as the rendered block (e.g., when a child block is selected
-	// but its parent section block is the main one rendered in the inspector).
-	selectedBlockClientId,
 	blockName,
 	isSectionBlock,
 	availableTabs,
@@ -334,10 +325,6 @@ const BlockInspectorSingleBlock = ( {
 		renderedBlockClientId
 	);
 	const isBlockSynced = blockInformation.isSynced;
-	const shouldShowTabs = ! isBlockSynced && hasMultipleTabs;
-	const isSectionBlockSelected =
-		window?.__experimentalContentOnlyPatternInsertion &&
-		selectedBlockClientId === renderedBlockClientId;
 
 	return (
 		<div className="block-editor-block-inspector">
@@ -355,43 +342,34 @@ const BlockInspectorSingleBlock = ( {
 				isChild={ hasParentChildBlockCards }
 				clientId={ renderedBlockClientId }
 			/>
-			<BlockVisibilityInfo clientId={ renderedBlockClientId } />
+			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
 			{ window?.__experimentalContentOnlyPatternInsertion && (
 				<EditContents clientId={ renderedBlockClientId } />
 			) }
 			<BlockVariationTransforms blockClientId={ renderedBlockClientId } />
-			{ shouldShowTabs && (
-				<InspectorControlsTabs
-					hasBlockStyles={ hasBlockStyles }
-					clientId={ renderedBlockClientId }
-					blockName={ blockName }
-					tabs={ availableTabs }
-					isSectionBlock={ isSectionBlock }
-					contentClientIds={ contentClientIds }
-				/>
+			{ hasMultipleTabs && (
+				<>
+					<InspectorControlsTabs
+						hasBlockStyles={ hasBlockStyles }
+						clientId={ renderedBlockClientId }
+						blockName={ blockName }
+						tabs={ availableTabs }
+						isSectionBlock={ isSectionBlock }
+						contentClientIds={ contentClientIds }
+					/>
+				</>
 			) }
-			{ ! shouldShowTabs && (
+			{ ! hasMultipleTabs && (
 				<>
 					{ hasBlockStyles && (
 						<BlockStyles clientId={ renderedBlockClientId } />
 					) }
 					<ContentTab contentClientIds={ contentClientIds } />
 					<InspectorControls.Slot group="content" />
+					<InspectorControls.Slot group="list" />
 					{ ! isSectionBlock && (
-						<StyleInspectorSlots
-							blockName={ blockName }
-							showListControls
-						/>
+						<StyleInspectorSlots blockName={ blockName } />
 					) }
-					{ isSectionBlock &&
-						isBlockSynced &&
-						isSectionBlockSelected && (
-							<>
-								<InspectorControls.Slot />
-								{ /* Allow AdvancedControls so users can adjust local attributes (e.g. additional CSS classes, HTML element). */ }
-								<AdvancedControls />
-							</>
-						) }
 				</>
 			) }
 			<SkipToSelectedBlock key="back" />

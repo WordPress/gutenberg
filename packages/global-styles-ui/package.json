@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/global-styles-ui",
-	"version": "1.4.1-next.v.0+500f87dd8",
+	"version": "1.5.0",
 	"description": "Global Styles UI components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -61,7 +61,6 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/private-apis": "file:../private-apis",
 		"change-case": "^4.1.2",
-		"classnames": "^2.3.2",
 		"clsx": "^2.1.0",
 		"colord": "^2.7.0"
 	},

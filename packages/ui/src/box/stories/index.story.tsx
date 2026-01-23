@@ -1,4 +1,4 @@
-import { type Meta, type StoryObj } from '@storybook/react-webpack5';
+import { type Meta, type StoryObj } from '@storybook/react-vite';
 import { type PaddingSize } from '@wordpress/theme';
 import { Box } from '../box';
 

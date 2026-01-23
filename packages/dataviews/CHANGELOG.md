@@ -2,7 +2,21 @@
 
 ## Unreleased
 
-## 11.2.0-next.0 (2026-01-14)
+### Bug Fixes
+
+- Fix primary action visibility in table layout when the action doesn't support bulk operations, and fix compact action menu not visible on mobile when there is only one action. [#74836](https://github.com/WordPress/gutenberg/pull/74836)
+- DataViews: Use regular casing for bulk selection count. [#74573](https://github.com/WordPress/gutenberg/pull/74573)
+
+### Code Quality
+
+- DataViews: Move filtering logic in field types. [#74733](https://github.com/WordPress/gutenberg/pull/74733)
+- DataViews: Adjust table primary media field styles. [#74813](https://github.com/WordPress/gutenberg/pull/74813)
+
+### Enhancements
+
+- Include total items count in footer. [#73491](https://github.com/WordPress/gutenberg/pull/73491)
+
+## 11.2.0 (2026-01-16)
 
 ### Code Quality
 
@@ -16,6 +30,7 @@
 - Fix missing dependencies. [#74310](https://github.com/WordPress/gutenberg/pull/74310)
 - Add details layout to DataForm validation story. [#74445](https://github.com/WordPress/gutenberg/pull/74445)
 - Updated `fast-deep-equal` imports for compatibility with strict Node.js resolution ([#74530](https://github.com/WordPress/gutenberg/pull/74530))
+- Add "custom layout" story via "free form". [#74605](https://github.com/WordPress/gutenberg/pull/74605)
 
 ### Bug Fixes
 
@@ -26,6 +41,8 @@
 - DataViews: Fix table row multiselection in Firefox [#73945](https://github.com/WordPress/gutenberg/pull/73945)
 - DataViews: `filterSortAndPaginate()` will ignore sorting on non-sortable fields [#73950](https://github.com/WordPress/gutenberg/pull/73950)
 - DataViews: Fix locked fields order when toggling visibility in properties section. [#74326](https://github.com/WordPress/gutenberg/pull/74326)
+- Dataviews: Fix column header move item in RTL moves in the opposite direction to the arrow. [#74644](https://github.com/WordPress/gutenberg/pull/74644)
+- Dataviews: Fix insert left and right handling in table layout for RTL languages. [#74681](https://github.com/WordPress/gutenberg/pull/74681)
 
 ### Enhancements
 

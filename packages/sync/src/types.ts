@@ -7,10 +7,12 @@ import type { UndoManager as WPUndoManager } from '@wordpress/undo-manager';
  * External dependencies
  */
 import type * as Y from 'yjs';
+import type { Awareness } from 'y-protocols/awareness';
 
 /**
  * Internal dependencies
  */
+import type { AwarenessState } from './awareness/awareness-state';
 import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
 
 /* globalThis */
@@ -28,6 +30,7 @@ declare global {
 }
 
 export type CRDTDoc = Y.Doc;
+export type AwarenessID = string;
 export type EntityID = string;
 export type ObjectID = string;
 export type ObjectType = string;
@@ -52,15 +55,24 @@ export interface ProviderCreatorResult {
 	destroy: () => void;
 }
 
+export interface ProviderCreatorOptions {
+	objectType: ObjectType;
+	objectId: ObjectID | null;
+	ydoc: Y.Doc;
+	awareness?: Awareness;
+}
+
 export type ProviderCreator = (
-	objectType: ObjectType,
-	objectId: ObjectID,
-	ydoc: Y.Doc
+	options: ProviderCreatorOptions
 ) => Promise< ProviderCreatorResult >;
 
 export interface RecordHandlers {
-	editRecord: ( data: Partial< ObjectData > ) => void;
+	editRecord: (
+		data: Partial< ObjectData >,
+		options?: { undoIgnore?: boolean }
+	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
+	refetchRecord: () => Promise< void >;
 	saveRecord: () => Promise< void >;
 }
 
@@ -69,6 +81,10 @@ export interface SyncConfig {
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >
 	) => void;
+	createAwareness?: (
+		ydoc: Y.Doc,
+		objectId: ObjectID
+	) => AwarenessState | undefined;
 	getChangesFromCRDTDoc: (
 		ydoc: Y.Doc,
 		editedRecord: ObjectData
@@ -81,6 +97,10 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => Record< string, string >;
+	getAwareness: (
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => AwarenessState | undefined;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,
@@ -88,13 +108,15 @@ export interface SyncManager {
 		record: ObjectData,
 		handlers: RecordHandlers
 	) => Promise< void >;
-	undoManager: SyncUndoManager;
+	// undoManager is undefined until the first entity is loaded.
+	undoManager: SyncUndoManager | undefined;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
 	update: (
 		objectType: ObjectType,
 		objectId: ObjectID,
 		changes: Partial< ObjectData >,
-		origin: string
+		origin: string,
+		isSave?: boolean
 	) => void;
 }
 

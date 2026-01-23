@@ -92,5 +92,6 @@ function UnforwardedExternalLink(
  * ```
  */
 export const ExternalLink = forwardRef( UnforwardedExternalLink );
+ExternalLink.displayName = 'ExternalLink';
 
 export default ExternalLink;
