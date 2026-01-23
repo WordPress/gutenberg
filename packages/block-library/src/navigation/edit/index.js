@@ -516,35 +516,20 @@ function Navigation( {
 		[ clientId ]
 	);
 
-	// Force overlayMenu to 'never' if within an overlay template part
-	// to prevent overlays within overlays.
+	// Configure navigation blocks in overlay templates.
+	const hasSetOverlayDefault = useRef( false );
 	useEffect( () => {
-		if ( isWithinOverlay && overlayMenu !== 'never' ) {
+		if ( ! isWithinOverlay ) {
+			return;
+		}
+
+		// Prevent nested overlays.
+		if ( overlayMenu !== 'never' ) {
 			setAttributes( { overlayMenu: 'never' } );
 		}
-	}, [ isWithinOverlay, overlayMenu, setAttributes ] );
 
-	// Set submenuVisibility to 'always' by default when in navigation overlay template
-	const hasSetOverlayDefault = useRef( false );
-	const { hasInnerBlocks } = useSelect(
-		( select ) => {
-			const { getBlockCount } = select( blockEditorStore );
-			return {
-				hasInnerBlocks: getBlockCount( clientId ) > 0,
-			};
-		},
-		[ clientId ]
-	);
-
-	useEffect( () => {
-		// Set overlay-friendly defaults when block is first created in an overlay template.
-		if (
-			isWithinOverlay &&
-			! hasSetOverlayDefault.current &&
-			submenuVisibility === 'hover' &&
-			! hasInnerBlocks &&
-			! ref
-		) {
+		// Set vertical orientation and always-open submenus for new blocks.
+		if ( ! hasSetOverlayDefault.current && ! ref ) {
 			hasSetOverlayDefault.current = true;
 			setAttributes( {
 				submenuVisibility: 'always',
@@ -558,9 +543,7 @@ function Navigation( {
 	}, [
 		attributes.layout,
 		isWithinOverlay,
-		submenuVisibility,
-		orientation,
-		hasInnerBlocks,
+		overlayMenu,
 		ref,
 		setAttributes,
 	] );
