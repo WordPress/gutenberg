@@ -1,5 +1,24 @@
 == Changelog ==
 
+= 22.4.1 =
+
+
+## Changelog
+
+### Code Quality
+
+- Style Engine: Bail early when adding a declaration if not passed a string. ([74881](https://github.com/WordPress/gutenberg/pull/74881))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@andrewserong
+
+
 = 22.4.0 =
 
 ## Changelog

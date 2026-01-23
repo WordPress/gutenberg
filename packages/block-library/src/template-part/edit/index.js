@@ -324,7 +324,7 @@ export default function TemplatePartEdit( {
 					} }
 				</BlockSettingsMenuControls>
 
-				<InspectorControls>
+				<InspectorControls group="settings">
 					<TemplatesList
 						area={ area }
 						clientId={ clientId }

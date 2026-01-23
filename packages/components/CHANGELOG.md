@@ -6,6 +6,10 @@
 
 -   Add `displayName` to components to improve debugging and fix Storybook source code. [#74716](https://github.com/WordPress/gutenberg/pull/74716)
 
+### Internal
+
+-   `ValidatedComboboxControl`: Expose the component under private API's. [#74891](https://github.com/WordPress/gutenberg/pull/74891)
+
 ## 32.0.0 (2026-01-16)
 
 ### Code Quality

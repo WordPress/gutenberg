@@ -85,6 +85,7 @@ describe( 'selectors', () => {
 
 	beforeEach( () => {
 		registerBlockType( 'core/block', {
+			apiVersion: 3,
 			save: () => null,
 			category: 'reusable',
 			title: 'Reusable Block Stub',
@@ -94,6 +95,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-a', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'design',
 			title: 'Test Block A',
@@ -102,6 +104,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-b', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block B',
@@ -113,6 +116,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-c', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block C',
@@ -122,6 +126,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/freeform', {
+			apiVersion: 3,
 			save: ( props ) => <RawHTML>{ props.attributes.content }</RawHTML>,
 			category: 'text',
 			title: 'Test Freeform Content Handler',
@@ -134,6 +139,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/post-content-child', {
+			apiVersion: 3,
 			save: () => null,
 			category: 'text',
 			title: 'Test Block Post Content Child',
@@ -143,6 +149,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-ancestor', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block required as ancestor',
@@ -151,6 +158,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-parent', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block required as parent',
@@ -159,6 +167,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-requires-ancestor', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block that requires ancestor',
@@ -168,6 +177,7 @@ describe( 'selectors', () => {
 		} );
 
 		registerBlockType( 'core/test-block-requires-ancestor-parent', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'text',
 			title: 'Test Block that requires both ancestor and parent',
@@ -3548,6 +3558,7 @@ describe( 'selectors', () => {
 	describe( 'getBlockTransformItems', () => {
 		beforeAll( () => {
 			registerBlockType( 'core/with-tranforms-a', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Transforms a',
 				edit: () => {},
@@ -3577,6 +3588,7 @@ describe( 'selectors', () => {
 				},
 			} );
 			registerBlockType( 'core/with-tranforms-b', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Transforms b',
 				edit: () => {},
@@ -3592,6 +3604,7 @@ describe( 'selectors', () => {
 				},
 			} );
 			registerBlockType( 'core/with-tranforms-c', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Transforms c',
 				edit: () => {},
@@ -4259,18 +4272,21 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 	// the core blocks (usually by using the `init` action), thus affecting the display order.
 	beforeEach( () => {
 		registerBlockType( 'plugin/block-a', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Plugin Block A',
 			icon: 'test',
 		} );
 		registerBlockType( 'another-plugin/block-b', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Another Plugin Block B',
 			icon: 'test',
 		} );
 		registerBlockType( 'plugin/block-c-with-variations', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Plugin Block C with variations',
@@ -4278,11 +4294,13 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			variations: [ { name: 'variation-a' }, { name: 'variation-b' } ],
 		} );
 		registerBlockType( 'core/block', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Core Block A',
 		} );
 		registerBlockType( 'core/test-block-a', {
+			apiVersion: 3,
 			save: ( props ) => props.attributes.text,
 			category: 'design',
 			title: 'Core Block B',
@@ -4290,6 +4308,7 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			keywords: [ 'testing' ],
 		} );
 		registerBlockType( 'core/test-block-with-variations', {
+			apiVersion: 3,
 			save() {},
 			category: 'text',
 			title: 'Core Block C with variations',

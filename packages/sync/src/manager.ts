@@ -28,9 +28,10 @@ import type {
 } from './types';
 import { createUndoManager } from './undo-manager';
 import { createYjsDoc } from './utils';
-import { createAwareness } from './awareness/awareness-manager';
+import type { AwarenessState } from './awareness/awareness-state';
 
 interface EntityState {
+	awareness?: AwarenessState;
 	handlers: RecordHandlers;
 	objectId: ObjectID;
 	objectType: ObjectType;
@@ -119,6 +120,10 @@ export function createSyncManager(): SyncManager {
 			entityStates.delete( entityId );
 		};
 
+		// If the sync config supports awareness, create it.
+		const awareness = syncConfig.createAwareness?.( ydoc, objectId );
+		awareness?.setUp();
+
 		// When the CRDT document is updated by an UndoManager or a connection (not
 		// a local origin), update the local store.
 		const onRecordUpdate = (
@@ -164,6 +169,7 @@ export function createSyncManager(): SyncManager {
 		undoManager.addToScope( recordMap );
 
 		const entityState: EntityState = {
+			awareness,
 			handlers,
 			objectId,
 			objectType,
@@ -174,13 +180,10 @@ export function createSyncManager(): SyncManager {
 
 		entityStates.set( entityId, entityState );
 
-		// Create awareness for the given entity and its Yjs document.
-		const awareness = await createAwareness( objectType, objectId, ydoc );
-
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
 			providerCreators.map( ( create ) =>
-				create( objectType, objectId, ydoc, awareness )
+				create( { objectType, objectId, ydoc, awareness } )
 			)
 		);
 
@@ -213,6 +216,27 @@ export function createSyncManager(): SyncManager {
 		objectId: ObjectID
 	): EntityID {
 		return `${ objectType }_${ objectId }`;
+	}
+
+	/**
+	 * Get the awareness instance for the given object type and object ID, if supported.
+	 *
+	 * @param {ObjectType} objectType Object type.
+	 * @param {ObjectID}   objectId   Object ID.
+	 * @return {AwarenessState | undefined} The awareness instance, or undefined if not supported.
+	 */
+	function getAwareness(
+		objectType: ObjectType,
+		objectId: ObjectID
+	): AwarenessState | undefined {
+		const entityId = getEntityId( objectType, objectId );
+		const entityState = entityStates.get( entityId );
+
+		if ( ! entityState || ! entityState.awareness ) {
+			return undefined;
+		}
+
+		return entityState.awareness;
 	}
 
 	/**
@@ -416,6 +440,7 @@ export function createSyncManager(): SyncManager {
 
 	return {
 		createMeta: createEntityMeta,
+		getAwareness,
 		load: loadEntity,
 		// Use getter to ensure we always return the current value of `undoManager`.
 		get undoManager(): SyncUndoManager | undefined {

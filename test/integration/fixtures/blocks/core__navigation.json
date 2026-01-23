@@ -4,7 +4,7 @@
 		"isValid": true,
 		"attributes": {
 			"showSubmenuIcon": true,
-			"openSubmenusOnClick": false,
+			"submenuVisibility": "hover",
 			"overlayMenu": "mobile",
 			"icon": "handle",
 			"hasIcon": true,

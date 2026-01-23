@@ -82,7 +82,7 @@ Reuse this design across your site. ([Source](https://github.com/WordPress/guten
 
 -	**Name:** core/block
 -	**Category:** reusable
--	**Supports:** interactivity (clientNavigation), ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
+-	**Supports:** interactivity (clientNavigation), ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~renaming~~
 -	**Attributes:** content, ref
 
 ## Breadcrumbs
@@ -217,8 +217,7 @@ Displays a link to reply to a comment. ([Source](https://github.com/WordPress/gu
 -	**Name:** core/comment-reply-link
 -	**Category:** theme
 -	**Ancestor:** core/comment-template
--	**Supports:** anchor, color (background, gradients, link, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** textAlign
+-	**Supports:** anchor, color (background, gradients, link, ~~text~~), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
 
 ## Comment Template
 
@@ -380,7 +379,7 @@ Use the classic WordPress editor. ([Source](https://github.com/WordPress/gutenbe
 
 -	**Name:** core/freeform
 -	**Category:** text
--	**Supports:** ~~className~~, ~~customClassName~~, ~~lock~~, ~~renaming~~, ~~reusable~~, ~~visibility~~
+-	**Supports:** ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~lock~~, ~~renaming~~, ~~reusable~~, ~~visibility~~
 -	**Attributes:** content
 
 ## Gallery
@@ -427,7 +426,7 @@ Add custom HTML code and preview it as you edit. ([Source](https://github.com/Wo
 
 -	**Name:** core/html
 -	**Category:** widgets
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~
+-	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~
 -	**Attributes:** content
 
 ## Image
@@ -511,7 +510,7 @@ Your site doesn’t include support for this block. ([Source](https://github.com
 
 -	**Name:** core/missing
 -	**Category:** text
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~renaming~~, ~~reusable~~, ~~visibility~~
+-	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~renaming~~, ~~reusable~~, ~~visibility~~
 -	**Attributes:** originalContent, originalName, originalUndelimitedContent
 
 ## More
@@ -520,7 +519,7 @@ Content before this block will be shown in the excerpt on your archives page. ([
 
 -	**Name:** core/more
 -	**Category:** design
--	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~, ~~multiple~~, ~~visibility~~
+-	**Supports:** interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~multiple~~, ~~visibility~~
 -	**Attributes:** customText, noTeaser
 
 ## Navigation
@@ -531,7 +530,7 @@ A collection of blocks that allow visitors to get around your site. ([Source](ht
 -	**Category:** theme
 -	**Allowed Blocks:** core/navigation-link, core/search, core/social-links, core/page-list, core/spacer, core/home-link, core/site-title, core/site-logo, core/navigation-submenu, core/loginout, core/buttons
 -	**Supports:** align (full, wide), anchor, ariaLabel, contentRole, inserter, interactivity, layout (allowSizingOnChildren, default, ~~allowInheriting~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (blockGap, units), typography (fontSize, lineHeight), ~~html~~, ~~renaming~~
--	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, icon, maxNestingLevel, openSubmenusOnClick, overlay, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, templateLock, textColor
+-	**Attributes:** __unstableLocation, backgroundColor, customBackgroundColor, customOverlayBackgroundColor, customOverlayTextColor, customTextColor, hasIcon, icon, maxNestingLevel, overlay, overlayBackgroundColor, overlayMenu, overlayTextColor, ref, rgbBackgroundColor, rgbTextColor, showSubmenuIcon, submenuVisibility, templateLock, textColor
 
 ## Custom Link
 
@@ -571,7 +570,7 @@ Separate your content into a multi-page experience. ([Source](https://github.com
 -	**Name:** core/nextpage
 -	**Category:** design
 -	**Parent:** core/post-content
--	**Supports:** anchor, interactivity (clientNavigation), ~~className~~, ~~customClassName~~, ~~html~~, ~~visibility~~
+-	**Supports:** anchor, interactivity (clientNavigation), ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~, ~~visibility~~
 
 ## Page List
 
@@ -904,7 +903,7 @@ Insert additional custom elements with a WordPress shortcode. ([Source](https://
 
 -	**Name:** core/shortcode
 -	**Category:** widgets
--	**Supports:** ~~className~~, ~~customClassName~~, ~~html~~
+-	**Supports:** ~~className~~, ~~customCSS~~, ~~customClassName~~, ~~html~~
 -	**Attributes:** text
 
 ## Site Logo

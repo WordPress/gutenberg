@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
@@ -359,6 +360,19 @@ async function loadPostTypeEntities() {
 				 */
 				applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
 					applyPostChangesToCRDTDoc( crdtDoc, changes, postType ),
+
+				/**
+				 * Create the awareness instance for the entity's CRDT document.
+				 *
+				 * @param {import('@wordpress/sync').CRDTDoc}  ydoc
+				 * @param {import('@wordpress/sync').ObjectID} objectId
+				 * @return {import('@wordpress/sync').AwarenessState} AwarenessState instance
+				 */
+				createAwareness: ( ydoc, objectId ) => {
+					const kind = 'postType';
+					const id = parseInt( objectId, 10 );
+					return new PostEditorAwareness( ydoc, kind, name, id );
+				},
 
 				/**
 				 * Extract changes from a CRDT document that can be used to update the

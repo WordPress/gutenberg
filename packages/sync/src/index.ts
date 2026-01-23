@@ -16,6 +16,7 @@ export * as Y from 'yjs';
  */
 export { default as Delta } from './quill-delta/Delta';
 
+export { AwarenessState } from './awareness/awareness-state';
 export {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,
