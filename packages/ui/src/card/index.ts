@@ -12,3 +12,5 @@ export const Card = Object.assign( CardRoot, {
 	Header: typeof CardHeader;
 	Body: typeof CardBody;
 };
+
+export { CollapsibleCard } from './collapsible-card';

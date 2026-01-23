@@ -1,26 +1,10 @@
-/**
- * WordPress dependencies
- */
-import {
-	Button,
-	Card,
-	CardBody,
-	CardHeader as OriginalCardHeader,
-} from '@wordpress/components';
-import {
-	useCallback,
-	useContext,
-	useEffect,
-	useMemo,
-	useState,
-} from '@wordpress/element';
-import { chevronDown, chevronUp } from '@wordpress/icons';
+import { useCallback, useContext, useMemo, useState } from '@wordpress/element';
+import { Card, CollapsibleCard } from '@wordpress/ui';
 
 /**
  * Internal dependencies
  */
 import { getFormFieldLayout } from '..';
-import DataFormContext from '../../dataform-context';
 import type {
 	FieldLayoutProps,
 	NormalizedCardLayout,
@@ -28,91 +12,10 @@ import type {
 	NormalizedForm,
 	NormalizedLayout,
 } from '../../../types';
+import DataFormContext from '../../dataform-context';
 import { DataFormLayout } from '../data-form-layout';
-import { DEFAULT_LAYOUT } from '../normalize-form';
 import { getSummaryFields } from '../get-summary-fields';
-
-const NonCollapsibleCardHeader = ( {
-	children,
-	...props
-}: {
-	children: React.ReactNode;
-} ) => (
-	<OriginalCardHeader isBorderless { ...props }>
-		<div
-			style={ {
-				height: '40px', // This is to match the chevron's __next40pxDefaultSize
-				width: '100%',
-				display: 'flex',
-				justifyContent: 'space-between',
-				alignItems: 'center',
-			} }
-		>
-			{ children }
-		</div>
-	</OriginalCardHeader>
-);
-
-export function useCardHeader( layout: NormalizedCardLayout ) {
-	const { isOpened, isCollapsible } = layout;
-	const [ isOpen, setIsOpen ] = useState( isOpened );
-
-	// Sync internal state when the isOpened prop changes.
-	// This is unlikely to happen in production, but it helps with storybook controls.
-	useEffect( () => {
-		setIsOpen( isOpened );
-	}, [ isOpened ] );
-
-	const toggle = useCallback( () => {
-		setIsOpen( ( prev ) => ! prev );
-	}, [] );
-
-	const CollapsibleCardHeader = useCallback(
-		( {
-			children,
-			...props
-		}: {
-			children: React.ReactNode;
-			[ key: string ]: any;
-		} ) => (
-			<OriginalCardHeader
-				{ ...props }
-				onClick={ toggle }
-				style={ {
-					cursor: 'pointer',
-					...props.style,
-				} }
-				isBorderless
-			>
-				<div
-					style={ {
-						width: '100%',
-						display: 'flex',
-						justifyContent: 'space-between',
-						alignItems: 'center',
-					} }
-				>
-					{ children }
-				</div>
-				<Button
-					__next40pxDefaultSize
-					variant="tertiary"
-					icon={ isOpen ? chevronUp : chevronDown }
-					aria-expanded={ isOpen }
-					aria-label={ isOpen ? 'Collapse' : 'Expand' }
-				/>
-			</OriginalCardHeader>
-		),
-		[ toggle, isOpen ]
-	);
-
-	const effectiveIsOpen = isCollapsible ? isOpen : true;
-	const CardHeaderComponent = isCollapsible
-		? CollapsibleCardHeader
-		: NonCollapsibleCardHeader;
-
-	return { isOpen: effectiveIsOpen, CardHeader: CardHeaderComponent };
-}
+import { DEFAULT_LAYOUT } from '../normalize-form';
 
 function isSummaryFieldVisible< Item >(
 	summaryField: NormalizedField< Item >,
@@ -183,75 +86,87 @@ export default function FormCardField< Item >( {
 		[ field ]
 	);
 
-	const { isOpen, CardHeader } = useCardHeader( layout );
+	const { isOpened, isCollapsible } = layout;
+	const [ isOpen, setIsOpen ] = useState( isOpened );
+
+	const onOpenChange = useCallback( ( nextOpen: boolean ) => {
+		setIsOpen( nextOpen );
+	}, [] );
+
+	const effectiveIsOpen = isCollapsible ? isOpen : true;
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
 
 	const visibleSummaryFields = summaryFields.filter( ( summaryField ) =>
-		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
+		isSummaryFieldVisible( summaryField, layout.summary, effectiveIsOpen )
 	);
 
-	const sizeCard = {
-		blockStart: 'medium' as const,
-		blockEnd: 'medium' as const,
-		inlineStart: 'medium' as const,
-		inlineEnd: 'medium' as const,
-	};
+	const Summary = visibleSummaryFields.length > 0 && layout.withHeader && (
+		<span className="dataforms-layouts-card__field-summary">
+			{ visibleSummaryFields.map( ( summaryField ) => (
+				<summaryField.render
+					key={ summaryField.id }
+					item={ data }
+					field={ summaryField }
+				/>
+			) ) }
+		</span>
+	);
 
 	if ( !! field.children ) {
 		const withHeader = !! field.label && layout.withHeader;
 
-		const sizeCardBody = {
-			blockStart: withHeader
-				? ( 'none' as const )
-				: ( 'medium' as const ),
-			blockEnd: 'medium' as const,
-			inlineStart: 'medium' as const,
-			inlineEnd: 'medium' as const,
-		};
+		const content = (
+			<>
+				{ field.description && (
+					<div className="dataforms-layouts-card__field-description">
+						{ field.description }
+					</div>
+				) }
+				<DataFormLayout
+					data={ data }
+					form={ form }
+					onChange={ onChange }
+					validity={ validity?.children }
+				/>
+			</>
+		);
 
-		return (
-			<Card className="dataforms-layouts-card__field" size={ sizeCard }>
-				{ withHeader && (
-					<CardHeader className="dataforms-layouts-card__field-header">
+		if ( isCollapsible && withHeader ) {
+			return (
+				<CollapsibleCard
+					className="dataforms-layouts-card__field"
+					open={ effectiveIsOpen }
+					onOpenChange={ onOpenChange }
+					title={
 						<span className="dataforms-layouts-card__field-header-label">
 							{ field.label }
 						</span>
-						{ visibleSummaryFields.length > 0 &&
-							layout.withHeader && (
-								<div className="dataforms-layouts-card__field-summary">
-									{ visibleSummaryFields.map(
-										( summaryField ) => (
-											<summaryField.render
-												key={ summaryField.id }
-												item={ data }
-												field={ summaryField }
-											/>
-										)
-									) }
-								</div>
-							) }
-					</CardHeader>
+					}
+					summary={ Summary || undefined }
+					toggleLabel={ effectiveIsOpen ? 'Collapse' : 'Expand' }
+				>
+					{ content }
+				</CollapsibleCard>
+			);
+		}
+
+		return (
+			<Card className="dataforms-layouts-card__field">
+				{ withHeader && (
+					<Card.Header className="dataforms-layouts-card__field-header">
+						<span className="dataforms-layouts-card__field-header-label">
+							{ field.label }
+						</span>
+						{ Summary }
+					</Card.Header>
 				) }
-				{ ( isOpen || ! withHeader ) && (
+				{ ( effectiveIsOpen || ! withHeader ) && (
 					// If it doesn't have a header, keep it open.
 					// Otherwise, the card will not be visible.
-					<CardBody
-						size={ sizeCardBody }
-						className="dataforms-layouts-card__field-control"
-					>
-						{ field.description && (
-							<div className="dataforms-layouts-card__field-description">
-								{ field.description }
-							</div>
-						) }
-						<DataFormLayout
-							data={ data }
-							form={ form }
-							onChange={ onChange }
-							validity={ validity?.children }
-						/>
-					</CardBody>
+					<Card.Body className="dataforms-layouts-card__field-control">
+						{ content }
+					</Card.Body>
 				) }
 			</Card>
 		);
@@ -271,50 +186,47 @@ export default function FormCardField< Item >( {
 	}
 	const withHeader = !! fieldDefinition.label && layout.withHeader;
 
-	const sizeCardBody = {
-		blockStart: withHeader ? ( 'none' as const ) : ( 'medium' as const ),
-		blockEnd: 'medium' as const,
-		inlineStart: 'medium' as const,
-		inlineEnd: 'medium' as const,
-	};
+	const content = (
+		<RegularLayout
+			data={ data }
+			field={ field }
+			onChange={ onChange }
+			hideLabelFromVision={ hideLabelFromVision || withHeader }
+			validity={ validity }
+		/>
+	);
+
+	if ( isCollapsible && withHeader ) {
+		return (
+			<CollapsibleCard
+				className="dataforms-layouts-card__field"
+				open={ effectiveIsOpen }
+				onOpenChange={ onOpenChange }
+				title={ fieldDefinition.label }
+				summary={ Summary || undefined }
+				toggleLabel={ effectiveIsOpen ? 'Collapse' : 'Expand' }
+			>
+				{ content }
+			</CollapsibleCard>
+		);
+	}
 
 	return (
-		<Card className="dataforms-layouts-card__field" size={ sizeCard }>
+		<Card className="dataforms-layouts-card__field">
 			{ withHeader && (
-				<CardHeader className="dataforms-layouts-card__field-header">
+				<Card.Header className="dataforms-layouts-card__field-header">
 					<span className="dataforms-layouts-card__field-header-label">
 						{ fieldDefinition.label }
 					</span>
-					{ visibleSummaryFields.length > 0 && layout.withHeader && (
-						<div className="dataforms-layouts-card__field-summary">
-							{ visibleSummaryFields.map( ( summaryField ) => (
-								<summaryField.render
-									key={ summaryField.id }
-									item={ data }
-									field={ summaryField }
-								/>
-							) ) }
-						</div>
-					) }
-				</CardHeader>
+					{ Summary }
+				</Card.Header>
 			) }
-			{ ( isOpen || ! withHeader ) && (
+			{ ( effectiveIsOpen || ! withHeader ) && (
 				// If it doesn't have a header, keep it open.
 				// Otherwise, the card will not be visible.
-				<CardBody
-					size={ sizeCardBody }
-					className="dataforms-layouts-card__field-control"
-				>
-					<RegularLayout
-						data={ data }
-						field={ field }
-						onChange={ onChange }
-						hideLabelFromVision={
-							hideLabelFromVision || withHeader
-						}
-						validity={ validity }
-					/>
-				</CardBody>
+				<Card.Body className="dataforms-layouts-card__field-control">
+					{ content }
+				</Card.Body>
 			) }
 		</Card>
 	);
