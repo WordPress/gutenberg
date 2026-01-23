@@ -18,6 +18,8 @@ import {
 /**
  * Internal dependencies
  */
+import { BaseAwareness } from '../awareness/base-awareness';
+import { type BaseState } from '../awareness/types';
 import {
 	mergeCrdtBlocks,
 	type Block,
@@ -407,8 +409,9 @@ export function getPostChangesFromCRDTDoc(
  * This default sync config can be used for entities that are flat maps of
  * primitive values and do not require custom logic to merge changes.
  */
-export const defaultSyncConfig: SyncConfig = {
+export const defaultSyncConfig: SyncConfig< BaseState > = {
 	applyChangesToCRDTDoc: defaultApplyChangesToCRDTDoc,
+	createAwareness: ( ydoc: CRDTDoc ) => new BaseAwareness( ydoc ),
 	getChangesFromCRDTDoc: defaultGetChangesFromCRDTDoc,
 };
 

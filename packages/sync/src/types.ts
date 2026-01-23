@@ -82,7 +82,7 @@ export interface RecordHandlers {
 	saveRecord: () => Promise< void >;
 }
 
-export interface SyncConfig {
+export interface SyncConfig< State extends object = {} > {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >
@@ -90,7 +90,7 @@ export interface SyncConfig {
 	createAwareness?: (
 		ydoc: Y.Doc,
 		objectId?: ObjectID
-	) => AwarenessState | undefined;
+	) => AwarenessState< State > | undefined;
 	getChangesFromCRDTDoc: (
 		ydoc: Y.Doc,
 		editedRecord: ObjectData
