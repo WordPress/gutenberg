@@ -76,12 +76,17 @@ function useFitText( { fitText, name, clientId } ) {
 			if ( ! clientId || ! hasFitTextSupport || ! fitText ) {
 				return EMPTY_OBJECT;
 			}
+			const _blockMode =
+				select( blockEditorStore ).getBlockMode( clientId );
+			if ( _blockMode === 'html' ) {
+				return { mode: _blockMode };
+			}
 			return {
 				blockAttributes:
 					select( blockEditorStore ).getBlockAttributes( clientId ),
 				parentId:
 					select( blockEditorStore ).getBlockRootClientId( clientId ),
-				blockMode: select( blockEditorStore ).getBlockMode( clientId ),
+				blockMode: _blockMode,
 			};
 		},
 		[ clientId, hasFitTextSupport, fitText ]
