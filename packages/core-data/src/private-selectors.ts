@@ -278,9 +278,20 @@ export const getTemplateId = createRegistrySelector(
 				postType === 'page'
 					? `${ postType }-${ editedEntity.slug }`
 					: `single-${ postType }-${ editedEntity.slug }`;
-		} else {
-			slugToCheck = postType === 'page' ? 'page' : `single-${ postType }`;
+
+			// Try the slug-specific template first
+			if ( slugToCheck ) {
+				const templateId = select( STORE_NAME ).getDefaultTemplateId( {
+					slug: slugToCheck,
+				} );
+				if ( templateId ) {
+					return templateId;
+				}
+			}
 		}
+
+		// Fall back to the generic template for this post type
+		slugToCheck = postType === 'page' ? 'page' : `single-${ postType }`;
 		return select( STORE_NAME ).getDefaultTemplateId( {
 			slug: slugToCheck,
 		} );
