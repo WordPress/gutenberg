@@ -63,7 +63,13 @@
 		"innerBlocks": [
 			{
 				"name": "core/tabs-menu",
-				"attributes": {}
+				"attributes": {},
+				"innerBlocks": [
+					{
+						"name": "core/tabs-menu-item",
+						"attributes": {}
+					}
+				]
 			},
 			{
 				"name": "core/tab-panels",
