@@ -305,6 +305,9 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		} );
 		await expect( patternBlock ).toBeFocused();
 
+		// Select the Paragraph block (the drop target) so it's selected when we drag over it.
+		await page.keyboard.press( 'ArrowUp' );
+
 		// Insert a synced pattern.
 		await page.click(
 			'role=region[name="Editor top bar"i] >> role=button[name="Block Inserter"i]'
