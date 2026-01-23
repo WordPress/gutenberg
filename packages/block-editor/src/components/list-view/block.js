@@ -159,7 +159,7 @@ function ListViewBlock( {
 			}
 			return sprintf(
 				/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
-				__( 'Block is hidden in %s' ),
+				__( 'Block is hidden on %s' ),
 				BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ]?.label ||
 					currentViewport
 			);

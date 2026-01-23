@@ -90,11 +90,11 @@ test.describe( 'Block Hiding', () => {
 		// Open the settings sidebar.
 		await editor.openDocumentSettingsSidebar();
 
-		// Verify the block inspector shows "Block is hidden in Mobile".
+		// Verify the block inspector shows "Block is hidden on Mobile".
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByText( 'Block is hidden in Mobile' )
+				.getByText( 'Block is hidden on Mobile' )
 		).toBeVisible();
 
 		// Verify the Options menu now shows "Show" instead of "Hide".
