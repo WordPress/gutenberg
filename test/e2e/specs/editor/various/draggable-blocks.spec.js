@@ -26,7 +26,7 @@ async function dragTo( page, x, y ) {
 	}
 }
 
-test.describe( 'Draggable block', () => {
+test.describe( 'Draggable block (@webkit)', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -68,7 +68,11 @@ test.describe( 'Draggable block', () => {
 			'role=document[name="Block: Paragraph"i] >> text=1'
 		);
 		const firstParagraphBound = await firstParagraph.boundingBox();
-		await dragTo( page, firstParagraphBound.x, firstParagraphBound.y );
+		await dragTo(
+			page,
+			firstParagraphBound.x + firstParagraphBound.width * 0.5,
+			firstParagraphBound.y + 1
+		);
 
 		await expect(
 			page.locator( 'data-testid=block-draggable-chip >> visible=true' )
@@ -333,7 +337,12 @@ test.describe( 'Draggable block', () => {
 		page,
 		editor,
 		pageUtils,
-	} ) => {
+	}, testInfo ) => {
+		testInfo.skip(
+			testInfo.project.name !== 'chromium',
+			'pageUtils.dragFiles uses CDP which is Chromium-only'
+		);
+
 		// Insert a row.
 		await editor.insertBlock( {
 			name: 'core/group',
@@ -457,7 +466,10 @@ test.describe( 'Draggable block', () => {
 		}
 	} );
 
-	test( 'can directly drag an image', async ( { page, editor } ) => {
+	test( 'can directly drag an image (@firefox)', async ( {
+		page,
+		editor,
+	} ) => {
 		await editor.insertBlock( { name: 'core/image' } );
 		await editor.insertBlock( {
 			name: 'core/group',
