@@ -1,0 +1,38 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var( --wpds-dimension-gap-xs );
+	}
+
+	.title {
+		flex: 1;
+	}
+
+	.header-actions {
+		display: flex;
+		align-items: center;
+		gap: var( --wpds-dimension-gap-xs );
+	}
+
+	.summary {
+		font-family: var( --wpds-font-family-body );
+		font-size: var( --wpds-font-size-sm );
+		font-weight: var( --wpds-font-weight-regular );
+	}
+
+	.content {
+		display: flex;
+		flex-direction: column;
+		gap: var( --wpds-dimension-gap-sm );
+	}
+
+	.trigger {
+		svg {
+			display: block;
+		}
+	}
+}
