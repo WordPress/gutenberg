@@ -95,6 +95,40 @@ const config: StorybookConfig = {
 						} );
 					},
 				},
+				// Stub the vips package for Storybook since it uses WASM modules that Vite can't handle.
+				{
+					name: 'stub-vips',
+					resolveId( id: string ) {
+						if (
+							id === '@wordpress/vips' ||
+							id.startsWith( '@wordpress/vips/' )
+						) {
+							return '\0virtual:vips-stub';
+						}
+						return null;
+					},
+					load( id: string ) {
+						if ( id === '\0virtual:vips-stub' ) {
+							// Return a stub module with no-op exports for Storybook.
+							return `
+								export const setLocation = () => {};
+								export const cancelOperations = async () => false;
+								export const convertImageFormat = async () => new ArrayBuffer(0);
+								export const compressImage = async () => new ArrayBuffer(0);
+								export const resizeImage = async () => ({ buffer: new ArrayBuffer(0), width: 0, height: 0, originalWidth: 0, originalHeight: 0 });
+								export const rotateImage = async () => ({ buffer: new ArrayBuffer(0), width: 0, height: 0 });
+								export const hasTransparency = async () => false;
+								export const vipsConvertImageFormat = convertImageFormat;
+								export const vipsCompressImage = compressImage;
+								export const vipsResizeImage = resizeImage;
+								export const vipsRotateImage = rotateImage;
+								export const vipsHasTransparency = hasTransparency;
+								export const vipsCancelOperations = cancelOperations;
+							`;
+						}
+						return null;
+					},
+				},
 			],
 			build: {
 				/**
@@ -123,12 +157,6 @@ const config: StorybookConfig = {
 						'.js': 'tsx',
 					},
 				},
-				// Exclude vips package which contains WASM modules that Vite can't handle directly.
-				exclude: [ '@wordpress/vips', 'wasm-vips' ],
-			},
-			ssr: {
-				// Externalize vips for SSR/build since it uses WASM modules.
-				external: [ '@wordpress/vips', 'wasm-vips' ],
 			},
 		} satisfies InlineConfig );
 	},
