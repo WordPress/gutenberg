@@ -149,14 +149,7 @@ export function createWordpressExternalsPlugin(
 				// Mark always-external packages as external
 				for ( const pkgPattern of alwaysExternalPackages ) {
 					build.onResolve(
-						{
-							filter: new RegExp(
-								`^${ pkgPattern.replace(
-									'/',
-									'\\/'
-								) }(\\/.*)?$`
-							),
-						},
+						{ filter: new RegExp( `^${ pkgPattern.replace( '/', '\\/' ) }(\\/.*)?$` ) },
 						( args ) => ( {
 							path: args.path,
 							external: true,
