@@ -22,7 +22,7 @@ const InfiniteScroll = () => {
 		type: LAYOUT_GRID,
 		search: '',
 		page: 1,
-		perPage: 6, // Start with a small number to demonstrate pagination
+		perPage: 8, // Start with a small number to demonstrate pagination
 		filters: [],
 		fields: [ 'satellites' ],
 		titleField: 'title',
@@ -38,7 +38,7 @@ const InfiniteScroll = () => {
 		<>
 			<style>{ `
 			.dataviews-wrapper {
-				height: 600px;
+				height: 750px;
 				overflow: auto;
 			}
 		` }</style>

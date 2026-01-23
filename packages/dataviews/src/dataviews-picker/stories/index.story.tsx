@@ -133,7 +133,7 @@ const DataViewsPickerContent = ( {
 			{ infiniteScrollEnabled && (
 				<style>{ `
 					.dataviews-picker-wrapper {
-						height: 600px;
+						height: 750px;
 						overflow: auto;
 					}
 				` }</style>
