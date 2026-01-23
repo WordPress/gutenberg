@@ -198,7 +198,6 @@ class WP_Block_Supports_Block_Visibility_Test extends WP_UnitTestCase {
 	}
 
 	public function test_block_visibility_support_generated_css_with_desktop_viewport_size() {
-		$this->enable_viewport_visibility_experiment();
 
 		$this->register_visibility_block_with_support(
 			'test/viewport-desktop',
