@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -17,10 +18,16 @@ const meta: Meta< typeof FontSizePicker > = {
 	title: 'Components/FontSizePicker',
 	component: FontSizePicker,
 	argTypes: {
-		value: { control: { type: null } },
+		value: { control: false },
+		units: {
+			control: 'inline-check',
+			options: [ 'px', 'em', 'rem', 'vw', 'vh' ],
+		},
+	},
+	args: {
+		onChange: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -35,6 +42,7 @@ const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
 	const [ fontSize, setFontSize ] = useState( value );
 	return (
 		<FontSizePicker
+			__next40pxDefaultSize
 			{ ...props }
 			value={ fontSize }
 			onChange={ ( nextValue ) => {
@@ -66,6 +74,7 @@ const TwoFontSizePickersWithState: StoryFn< typeof FontSizePicker > = ( {
 export const Default: StoryFn< typeof FontSizePicker > =
 	FontSizePickerWithState.bind( {} );
 Default.args = {
+	__next40pxDefaultSize: true,
 	disableCustomFontSizes: false,
 	fontSizes: [
 		{

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -10,9 +10,10 @@ import ResponsiveWrapper from '..';
 
 const meta: Meta< typeof ResponsiveWrapper > = {
 	component: ResponsiveWrapper,
-	title: 'Components/ResponsiveWrapper',
+	title: 'Components/Layout/ResponsiveWrapper',
+	id: 'components-responsivewrapper',
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },

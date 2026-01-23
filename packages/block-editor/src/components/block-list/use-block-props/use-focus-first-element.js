@@ -15,6 +15,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { isInsideRootBlock } from '../../../utils/dom';
 import { store as blockEditorStore } from '../../../store';
+import { unlock } from '../../../lock-unlock';
 
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
@@ -28,15 +29,16 @@ import { store as blockEditorStore } from '../../../store';
  */
 export function useFocusFirstElement( { clientId, initialPosition } ) {
 	const ref = useRef();
-	const { isBlockSelected, isMultiSelecting, __unstableGetEditorMode } =
-		useSelect( blockEditorStore );
+	const { isBlockSelected, isMultiSelecting, isZoomOut } = unlock(
+		useSelect( blockEditorStore )
+	);
 
 	useEffect( () => {
 		// Check if the block is still selected at the time this effect runs.
 		if (
 			! isBlockSelected( clientId ) ||
 			isMultiSelecting() ||
-			__unstableGetEditorMode() === 'zoom-out'
+			isZoomOut()
 		) {
 			return;
 		}

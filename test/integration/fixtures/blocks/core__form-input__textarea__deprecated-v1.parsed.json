@@ -1,0 +1,13 @@
+[
+	{
+		"blockName": "core/form-input",
+		"attrs": {
+			"type": "textarea"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<label class=\"wp-block-form-input__label\">\n\t<span class=\"wp-block-form-input__label-content\">Label</span>\n\t<textarea class=\"wp-block-form-input__input\" name=\"label\" aria-required=\"false\"></textarea>\n</label>\n",
+		"innerContent": [
+			"\n<label class=\"wp-block-form-input__label\">\n\t<span class=\"wp-block-form-input__label-content\">Label</span>\n\t<textarea class=\"wp-block-form-input__input\" name=\"label\" aria-required=\"false\"></textarea>\n</label>\n"
+		]
+	}
+]

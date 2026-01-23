@@ -1,178 +1,19 @@
 /**
- * External dependencies
- */
-import { deepSignal } from 'deepsignal';
-import { computed } from '@preact/signals';
-
-/**
  * Internal dependencies
  */
-import {
-	getScope,
-	setScope,
-	resetScope,
-	getNamespace,
-	setNamespace,
-	resetNamespace,
-} from './hooks';
-
-const isObject = ( item: unknown ): item is Record< string, unknown > =>
-	Boolean( item && typeof item === 'object' && item.constructor === Object );
-
-const deepMerge = ( target: any, source: any ) => {
-	if ( isObject( target ) && isObject( source ) ) {
-		for ( const key in source ) {
-			const getter = Object.getOwnPropertyDescriptor( source, key )?.get;
-			if ( typeof getter === 'function' ) {
-				Object.defineProperty( target, key, { get: getter } );
-			} else if ( isObject( source[ key ] ) ) {
-				if ( ! target[ key ] ) {
-					target[ key ] = {};
-				}
-				deepMerge( target[ key ], source[ key ] );
-			} else {
-				try {
-					target[ key ] = source[ key ];
-				} catch ( e ) {
-					// Assignemnts fail for properties that are only getters.
-					// When that's the case, the assignment is simply ignored.
-				}
-			}
-		}
-	}
-};
+import { proxifyState, proxifyStore, deepMerge, peek } from './proxies';
+import { PENDING_GETTER } from './proxies/state';
+import { getNamespace } from './namespaces';
+import { isPlainObject, navigationSignal, deepClone } from './utils';
 
 export const stores = new Map();
 const rawStores = new Map();
 const storeLocks = new Map();
 const storeConfigs = new Map();
-
-const objToProxy = new WeakMap();
-const proxyToNs = new WeakMap();
-const scopeToGetters = new WeakMap();
-
-const proxify = ( obj: any, ns: string ) => {
-	if ( ! objToProxy.has( obj ) ) {
-		const proxy = new Proxy( obj, handlers );
-		objToProxy.set( obj, proxy );
-		proxyToNs.set( proxy, ns );
-	}
-	return objToProxy.get( obj );
-};
-
-const handlers = {
-	get: ( target: any, key: string | symbol, receiver: any ) => {
-		const ns = proxyToNs.get( receiver );
-
-		// Check if the property is a getter and we are inside an scope. If that is
-		// the case, we clone the getter to avoid overwriting the scoped
-		// dependencies of the computed each time that getter runs.
-		const getter = Object.getOwnPropertyDescriptor( target, key )?.get;
-		if ( getter ) {
-			const scope = getScope();
-			if ( scope ) {
-				const getters =
-					scopeToGetters.get( scope ) ||
-					scopeToGetters.set( scope, new Map() ).get( scope );
-				if ( ! getters.has( getter ) ) {
-					getters.set(
-						getter,
-						computed( () => {
-							setNamespace( ns );
-							setScope( scope );
-							try {
-								return getter.call( target );
-							} finally {
-								resetScope();
-								resetNamespace();
-							}
-						} )
-					);
-				}
-				return getters.get( getter ).value;
-			}
-		}
-
-		const result = Reflect.get( target, key );
-
-		// Check if the proxy is the store root and no key with that name exist. In
-		// that case, return an empty object for the requested key.
-		if ( typeof result === 'undefined' && receiver === stores.get( ns ) ) {
-			const obj = {};
-			Reflect.set( target, key, obj );
-			return proxify( obj, ns );
-		}
-
-		// Check if the property is a generator. If it is, we turn it into an
-		// asynchronous function where we restore the default namespace and scope
-		// each time it awaits/yields.
-		if ( result?.constructor?.name === 'GeneratorFunction' ) {
-			return async ( ...args: unknown[] ) => {
-				const scope = getScope();
-				const gen: Generator< any > = result( ...args );
-
-				let value: unknown;
-				let it: IteratorResult< any >;
-
-				while ( true ) {
-					setNamespace( ns );
-					setScope( scope );
-					try {
-						it = gen.next( value );
-					} finally {
-						resetScope();
-						resetNamespace();
-					}
-
-					try {
-						value = await it.value;
-					} catch ( e ) {
-						setNamespace( ns );
-						setScope( scope );
-						gen.throw( e );
-					} finally {
-						resetScope();
-						resetNamespace();
-					}
-
-					if ( it.done ) {
-						break;
-					}
-				}
-
-				return value;
-			};
-		}
-
-		// Check if the property is a synchronous function. If it is, set the
-		// default namespace. Synchronous functions always run in the proper scope,
-		// which is set by the Directives component.
-		if ( typeof result === 'function' ) {
-			return ( ...args: unknown[] ) => {
-				setNamespace( ns );
-				try {
-					return result( ...args );
-				} finally {
-					resetNamespace();
-				}
-			};
-		}
-
-		// Check if the property is an object. If it is, proxyify it.
-		if ( isObject( result ) ) {
-			return proxify( result, ns );
-		}
-
-		return result;
-	},
-	// Prevents passing the current proxy as the receiver to the deepSignal.
-	set( target: any, key: string, value: any ) {
-		return Reflect.set( target, key, value );
-	},
-};
+const serverStates = new Map();
 
 /**
- * Get the defined config for the store with the passed namespace.
+ * Gets the defined config for the store with the passed namespace.
  *
  * @param namespace Store's namespace from which to retrieve the config.
  * @return Defined config for the given namespace.
@@ -180,12 +21,53 @@ const handlers = {
 export const getConfig = ( namespace?: string ) =>
 	storeConfigs.get( namespace || getNamespace() ) || {};
 
+/**
+ * Gets the state defined and updated from the server.
+ *
+ * The object returned is a deep clone of the state defined in PHP with
+ * `wp_interactivity_state()`. When using `actions.navigate()`, this object is
+ * updated to reflect the changes in its properties, without affecting the state
+ * returned by `store()`. Directives can subscribe to those changes to update
+ * the state if needed.
+ *
+ * @example
+ * ```js
+ *  const { state } = store( 'myPlugin', {
+ *    callbacks: {
+ *      updateServerState() {
+ *        const serverState = getServerState();
+ *        // Override some property with the new value that came from the server.
+ *        state.overridableProp = serverState.overridableProp;
+ *      },
+ *    },
+ *  } );
+ * ```
+ *
+ * @param namespace Store namespace. By default, it inherits the namespace of
+ *                  the store where it is defined.
+ * @return The server state for the given namespace.
+ */
+export function getServerState( namespace?: string ): Record< string, unknown >;
+export function getServerState< T extends object >( namespace?: string ): T;
+export function getServerState< T extends object >( namespace?: string ): T {
+	const ns = namespace || getNamespace();
+	if ( ! serverStates.has( ns ) ) {
+		serverStates.set( ns, {} );
+	}
+	// Accesses the navigation signal to make this reactive. It assigns it to an
+	// arbitrary property (`subscribe`) to prevent the JavaScript minifier from
+	// removing this line.
+	getServerState.subscribe = navigationSignal.value;
+	return deepClone( serverStates.get( ns ) ) as T;
+}
+getServerState.subscribe = 0;
+
 interface StoreOptions {
 	/**
 	 * Property to block/unblock private store namespaces.
 	 *
 	 * If the passed value is `true`, it blocks the given namespace, making it
-	 * accessible only trough the returned variables of the `store()` call. In
+	 * accessible only through the returned variables of the `store()` call. In
 	 * the case a lock string is passed, it also blocks the namespace, but can
 	 * be unblocked for other `store()` calls using the same lock string.
 	 *
@@ -207,6 +89,45 @@ interface StoreOptions {
 	 */
 	lock?: boolean | string;
 }
+
+export type AsyncAction< T > = Generator< any, T, unknown >;
+export type TypeYield< T extends ( ...args: any[] ) => Promise< any > > =
+	Awaited< ReturnType< T > >;
+type Prettify< T > = { [ K in keyof T ]: T[ K ] } & {};
+type DeepPartial< T > = T extends object
+	? { [ P in keyof T ]?: DeepPartial< T[ P ] > }
+	: T;
+type DeepPartialState< T extends { state: object } > = Omit< T, 'state' > & {
+	state?: DeepPartial< T[ 'state' ] >;
+};
+type ConvertGeneratorToPromise< T > = T extends (
+	...args: infer A
+) => Generator< any, infer R, any >
+	? ( ...args: A ) => Promise< R >
+	: never;
+type ConvertGeneratorsToPromises< T > = {
+	[ K in keyof T ]: T[ K ] extends ( ...args: any[] ) => any
+		? ConvertGeneratorToPromise< T[ K ] > extends never
+			? T[ K ]
+			: ConvertGeneratorToPromise< T[ K ] >
+		: T[ K ] extends object
+		? Prettify< ConvertGeneratorsToPromises< T[ K ] > >
+		: T[ K ];
+};
+type ConvertPromiseToGenerator< T > = T extends (
+	...args: infer A
+) => Promise< infer R >
+	? ( ...args: A ) => Generator< any, R, any >
+	: never;
+type ConvertPromisesToGenerators< T > = {
+	[ K in keyof T ]: T[ K ] extends ( ...args: any[] ) => any
+		? ConvertPromiseToGenerator< T[ K ] > extends never
+			? T[ K ]
+			: ConvertPromiseToGenerator< T[ K ] >
+		: T[ K ] extends object
+		? Prettify< ConvertPromisesToGenerators< T[ K ] > >
+		: T[ K ];
+};
 
 export const universalUnlock =
 	'I acknowledge that using a private store means my plugin will inevitably break on the next store release.';
@@ -256,17 +177,34 @@ export const universalUnlock =
  *
  * @return A reference to the namespace content.
  */
-export function store< S extends object = {} >(
-	namespace: string,
-	storePart?: S,
-	options?: StoreOptions
-): S;
 
+// Overload for when the types are inferred.
 export function store< T extends object >(
 	namespace: string,
-	storePart?: T,
+	storePart: T,
 	options?: StoreOptions
-): T;
+): Prettify< ConvertGeneratorsToPromises< T > >;
+
+// Overload for when types are passed via generics and they contain state.
+export function store< T extends { state: object } >(
+	namespace: string,
+	storePart?: ConvertPromisesToGenerators< DeepPartialState< T > >,
+	options?: StoreOptions
+): Prettify< ConvertGeneratorsToPromises< T > >;
+
+// Overload for when types are passed via generics and they don't contain state.
+export function store< T extends object >(
+	namespace: string,
+	storePart?: ConvertPromisesToGenerators< T >,
+	options?: StoreOptions
+): Prettify< ConvertGeneratorsToPromises< T > >;
+
+// Overload for when types are divided into multiple parts.
+export function store< T extends object >(
+	namespace: string,
+	storePart: ConvertPromisesToGenerators< DeepPartial< T > >,
+	options?: StoreOptions
+): Prettify< ConvertGeneratorsToPromises< T > >;
 
 export function store(
 	namespace: string,
@@ -281,13 +219,15 @@ export function store(
 			storeLocks.set( namespace, lock );
 		}
 		const rawStore = {
-			state: deepSignal( isObject( state ) ? state : {} ),
+			state: proxifyState(
+				namespace,
+				isPlainObject( state ) ? state : {}
+			),
 			...block,
 		};
-		const proxiedStore = new Proxy( rawStore, handlers );
+		const proxifiedStore = proxifyStore( namespace, rawStore );
 		rawStores.set( namespace, rawStore );
-		stores.set( namespace, proxiedStore );
-		proxyToNs.set( proxiedStore, namespace );
+		stores.set( namespace, proxifiedStore );
 	} else {
 		// Lock the store if it wasn't locked yet and the passed lock is
 		// different from the universal unlock. If no lock is given, the store
@@ -319,36 +259,73 @@ export function store(
 	return stores.get( namespace );
 }
 
-export const parseInitialData = ( dom = document ) => {
-	const storeTag = dom.querySelector(
-		`script[type="application/json"]#wp-interactivity-data`
-	);
-	if ( storeTag?.textContent ) {
+export const parseServerData = ( dom = document ) => {
+	const jsonDataScriptTag =
+		// Preferred Script Module data passing form
+		dom.getElementById(
+			'wp-script-module-data-@wordpress/interactivity'
+		) ??
+		// Legacy form
+		dom.getElementById( 'wp-interactivity-data' );
+	if ( jsonDataScriptTag?.textContent ) {
 		try {
-			return JSON.parse( storeTag.textContent );
-		} catch ( e ) {
-			// Do nothing.
-		}
+			return JSON.parse( jsonDataScriptTag.textContent );
+		} catch {}
 	}
 	return {};
 };
 
-export const populateInitialData = ( data?: {
+export const populateServerData = ( data?: {
 	state?: Record< string, unknown >;
 	config?: Record< string, unknown >;
+	derivedStateClosures?: Record< string, string[] >;
 } ) => {
-	if ( isObject( data?.state ) ) {
+	// Resets all the previous server states and configs.
+	serverStates.clear();
+	storeConfigs.clear();
+
+	if ( isPlainObject( data?.state ) ) {
 		Object.entries( data!.state ).forEach( ( [ namespace, state ] ) => {
-			store( namespace, { state }, { lock: universalUnlock } );
+			const st = store< any >( namespace, {}, { lock: universalUnlock } );
+			deepMerge( st.state, state, false );
+			serverStates.set( namespace, state! );
 		} );
 	}
-	if ( isObject( data?.config ) ) {
+	if ( isPlainObject( data?.config ) ) {
 		Object.entries( data!.config ).forEach( ( [ namespace, config ] ) => {
 			storeConfigs.set( namespace, config );
 		} );
 	}
-};
+	if ( isPlainObject( data?.derivedStateClosures ) ) {
+		Object.entries( data!.derivedStateClosures ).forEach(
+			( [ namespace, paths ] ) => {
+				const st = store< any >(
+					namespace,
+					{},
+					{ lock: universalUnlock }
+				);
+				paths.forEach( ( path ) => {
+					const pathParts = path.split( '.' );
+					const prop = pathParts.splice( -1, 1 )[ 0 ];
+					const parent = pathParts.reduce(
+						( prev, key ) => peek( prev, key ),
+						st
+					);
 
-// Parse and populate the initial state and config.
-const data = parseInitialData();
-populateInitialData( data );
+					// Get the descriptor of the derived state prop.
+					const desc = Object.getOwnPropertyDescriptor(
+						parent,
+						prop
+					);
+
+					// The derived state prop is considered a pending getter
+					// only if its value is a plain object, which is how
+					// closures are serialized from PHP.
+					if ( isPlainObject( desc?.value ) ) {
+						parent[ prop ] = PENDING_GETTER;
+					}
+				} );
+			}
+		);
+	}
+};

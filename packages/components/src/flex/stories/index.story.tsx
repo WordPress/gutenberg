@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -12,12 +12,11 @@ import { View } from '../../view';
 const meta: Meta< typeof Flex > = {
 	component: Flex,
 	title: 'Components/Flex',
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { FlexBlock, FlexItem },
 	argTypes: {
 		align: { control: { type: 'text' } },
 		as: { control: { type: 'text' } },
-		children: { control: { type: null } },
+		children: { control: false },
 		gap: { control: { type: 'text' } },
 		justify: { control: { type: 'text' } },
 		// Disabled isReversed because it's deprecated.

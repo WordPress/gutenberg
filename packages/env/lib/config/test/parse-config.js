@@ -21,6 +21,9 @@ jest.mock( '../../wordpress', () => ( {
 const DEFAULT_CONFIG = {
 	port: 8888,
 	testsPort: 8889,
+	mysqlPort: null,
+	phpmyadminPort: null,
+	multisite: false,
 	phpVersion: null,
 	coreSource: {
 		type: 'git',
@@ -253,6 +256,26 @@ describe( 'parseConfig', () => {
 		} );
 	} );
 
+	it( 'should ignore `$schema` key', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					$schema: 'test',
+				};
+			}
+
+			if ( configFile === '/test/gutenberg/.wp-env.override.json' ) {
+				return {};
+			}
+
+			throw new Error( 'Invalid File: ' + configFile );
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		expect( parsed ).toEqual( DEFAULT_CONFIG );
+	} );
+
 	it( 'should override with environment variables', async () => {
 		process.env.WP_ENV_PORT = 123;
 		process.env.WP_ENV_TESTS_PORT = 456;
@@ -378,5 +401,58 @@ describe( 'parseConfig', () => {
 				`Invalid /test/gutenberg/.wp-env.json: "development.env" is not a configuration option.`
 			)
 		);
+	} );
+
+	it( 'should parse phpmyadmin configuration for a given environment', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					core: 'WordPress/WordPress#Test',
+					phpVersion: '1.0',
+					lifecycleScripts: {
+						afterStart: 'test',
+					},
+					env: {
+						development: {
+							phpmyadminPort: 9001,
+						},
+					},
+				};
+			}
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		const expected = {
+			development: {
+				...DEFAULT_CONFIG.env.development,
+				phpmyadminPort: 9001,
+			},
+			tests: DEFAULT_CONFIG.env.tests,
+		};
+		expect( parsed.env ).toEqual( expected );
+	} );
+
+	it( 'should ignore root-level configuration for phpmyadmin', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					core: 'WordPress/WordPress#Test',
+					phpVersion: '1.0',
+					lifecycleScripts: {
+						afterStart: 'test',
+					},
+					phpmyadminPort: 9001,
+				};
+			}
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+
+		const expected = {
+			development: DEFAULT_CONFIG.env.development,
+			tests: DEFAULT_CONFIG.env.tests,
+		};
+		expect( parsed.env ).toEqual( expected );
 	} );
 } );

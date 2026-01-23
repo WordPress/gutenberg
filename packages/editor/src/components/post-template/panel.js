@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -11,8 +10,12 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 import ClassicThemeControl from './classic-theme';
 import BlockThemeControl from './block-theme';
-import PostPanelRow from '../post-panel-row';
 
+/**
+ * Displays the template controls based on the current editor settings and user permissions.
+ *
+ * @return {React.ReactNode} The rendered PostTemplatePanel component.
+ */
 export default function PostTemplatePanel() {
 	const { templateId, isBlockTheme } = useSelect( ( select ) => {
 		const { getCurrentTemplateId, getEditorSettings } =
@@ -43,28 +46,31 @@ export default function PostTemplatePanel() {
 		}
 
 		const canCreateTemplates =
-			select( coreStore ).canUser( 'create', 'templates' ) ?? false;
+			select( coreStore ).canUser( 'create', {
+				kind: 'postType',
+				name: 'wp_template',
+			} ) ?? false;
 		return canCreateTemplates;
 	}, [] );
 
-	const canViewTemplates = useSelect( ( select ) => {
-		return select( coreStore ).canUser( 'read', 'templates' ) ?? false;
-	}, [] );
+	const canViewTemplates = useSelect(
+		( select ) => {
+			return isVisible
+				? select( coreStore ).canUser( 'read', {
+						kind: 'postType',
+						name: 'wp_template',
+				  } )
+				: false;
+		},
+		[ isVisible ]
+	);
 
 	if ( ( ! isBlockTheme || ! canViewTemplates ) && isVisible ) {
-		return (
-			<PostPanelRow label={ __( 'Template' ) }>
-				<ClassicThemeControl />
-			</PostPanelRow>
-		);
+		return <ClassicThemeControl />;
 	}
 
 	if ( isBlockTheme && !! templateId ) {
-		return (
-			<PostPanelRow label={ __( 'Template' ) }>
-				<BlockThemeControl id={ templateId } />
-			</PostPanelRow>
-		);
+		return <BlockThemeControl id={ templateId } />;
 	}
 	return null;
 }

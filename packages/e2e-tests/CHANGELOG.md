@@ -2,6 +2,86 @@
 
 ## Unreleased
 
+## 9.3.0 (2026-01-16)
+
+## 9.1.0 (2025-11-26)
+
+## 9.0.0 (2025-11-12)
+
+### Breaking Changes
+
+- Removed test configurations from the package, as this package is now deprecated in favor of Playwright end-to-end tests residing at the root of the Gutenberg project.
+
+## 8.34.0 (2025-10-29)
+
+## 8.33.0 (2025-10-17)
+
+## 8.32.0 (2025-10-01)
+
+## 8.31.0 (2025-09-17)
+
+## 8.30.0 (2025-09-03)
+
+## 8.29.0 (2025-08-20)
+
+## 8.28.0 (2025-08-07)
+
+## 8.27.0 (2025-07-23)
+
+## 8.26.0 (2025-06-25)
+
+## 8.25.0 (2025-06-04)
+
+## 8.24.0 (2025-05-22)
+
+## 8.23.0 (2025-05-07)
+
+## 8.22.0 (2025-04-11)
+
+## 8.21.0 (2025-03-27)
+
+## 8.20.0 (2025-03-13)
+
+## 8.19.0 (2025-02-28)
+
+## 8.18.0 (2025-02-12)
+
+## 8.17.0 (2025-01-29)
+
+## 8.16.0 (2025-01-15)
+
+## 8.15.0 (2025-01-02)
+
+## 8.14.0 (2024-12-11)
+
+## 8.13.0 (2024-11-27)
+
+## 8.12.0 (2024-11-16)
+
+## 8.11.0 (2024-10-30)
+
+## 8.10.0 (2024-10-16)
+
+## 8.9.0 (2024-10-03)
+
+## 8.8.0 (2024-09-19)
+
+## 8.7.0 (2024-09-05)
+
+## 8.6.0 (2024-08-21)
+
+## 8.5.0 (2024-08-07)
+
+## 8.4.0 (2024-07-24)
+
+## 8.3.0 (2024-07-10)
+
+## 8.2.0 (2024-06-26)
+
+## 8.1.0 (2024-06-15)
+
+## 8.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
@@ -95,7 +175,7 @@
 
 ## 5.3.0 (2022-10-05)
 
-### New features
+### New Features
 
 -   Added Autocomplete Component e2e test suite. [#42905](https://github.com/WordPress/gutenberg/pull/42905).
 
@@ -103,7 +183,7 @@
 
 ## 5.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
@@ -154,7 +234,7 @@
 
 ## 1.2.0 (2019-05-21)
 
-### New features
+### New Features
 
 -   Added Axe (the Accessibility Engine) API integration with e2e tests suite.
 

@@ -8,8 +8,8 @@
  */
 // eslint-disable-next-line @typescript-eslint/no-restricted-imports
 import { createElement, useMemo } from 'react';
-import { useStorybookApi } from '@storybook/manager-api';
-import { styled } from '@storybook/theming';
+import { useStorybookApi } from 'storybook/manager-api';
+import { styled } from 'storybook/theming';
 
 /**
  * Internal dependencies
@@ -28,7 +28,9 @@ const Title = styled.span( {
 
 const Icons = styled.span( {} );
 
-const Icon = styled.span( {} );
+const Icon = styled.span( {
+	lineHeight: 1,
+} );
 
 /**
  * Fetches tags from the Storybook API, and returns Icon
@@ -41,7 +43,7 @@ function useIcons( item ) {
 	return useMemo( () => {
 		let data = {};
 
-		if ( item.isComponent && item.children?.length ) {
+		if ( item.type === 'component' && item.children?.length ) {
 			data = api.getData( item.children[ 0 ] ) ?? {};
 		}
 
@@ -59,7 +61,7 @@ function useIcons( item ) {
 					  )
 					: null
 			);
-	}, [ api, item.children, item.isComponent ] );
+	}, [ api, item.children, item.type ] );
 }
 
 /**

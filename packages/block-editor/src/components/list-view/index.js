@@ -19,7 +19,6 @@ import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import {
 	useCallback,
-	useEffect,
 	useMemo,
 	useRef,
 	useReducer,
@@ -118,21 +117,18 @@ function ListViewComponent(
 		useListViewClientIds( { blocks, rootClientId } );
 	const blockIndexes = useListViewBlockIndexes( clientIdsTree );
 
-	const { getBlock } = useSelect( blockEditorStore );
-	const { visibleBlockCount, shouldShowInnerBlocks } = useSelect(
+	const { getBlock, getSelectedBlockClientIds } =
+		useSelect( blockEditorStore );
+	const { visibleBlockCount } = useSelect(
 		( select ) => {
-			const {
-				getGlobalBlockCount,
-				getClientIdsOfDescendants,
-				__unstableGetEditorMode,
-			} = select( blockEditorStore );
+			const { getGlobalBlockCount, getClientIdsOfDescendants } =
+				select( blockEditorStore );
 			const draggedBlockCount =
 				draggedClientIds?.length > 0
 					? getClientIdsOfDescendants( draggedClientIds ).length + 1
 					: 0;
 			return {
 				visibleBlockCount: getGlobalBlockCount() - draggedBlockCount,
-				shouldShowInnerBlocks: __unstableGetEditorMode() !== 'zoom-out',
 			};
 		},
 		[ draggedClientIds ]
@@ -176,22 +172,25 @@ function ListViewComponent(
 		selectBlock: selectEditorBlock,
 	} );
 
+	const focusSelectedBlock = useCallback(
+		( node ) => {
+			const [ firstSelectedClientId ] = getSelectedBlockClientIds();
+			// If a blocks are already selected when the list view is initially
+			// mounted, shift focus to the first selected block.
+			if ( firstSelectedClientId && node ) {
+				focusListItem( firstSelectedClientId, node );
+			}
+		},
+		[ getSelectedBlockClientIds ]
+	);
+
 	const treeGridRef = useMergeRefs( [
 		clipBoardRef,
+		focusSelectedBlock,
 		elementRef,
 		dropZoneRef,
 		ref,
 	] );
-
-	useEffect( () => {
-		// If a blocks are already selected when the list view is initially
-		// mounted, shift focus to the first selected block.
-		if ( selectedClientIds?.length ) {
-			focusListItem( selectedClientIds[ 0 ], elementRef?.current );
-		}
-		// Disable reason: Only focus on the selected item when the list view is mounted.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [] );
 
 	const expand = useCallback(
 		( clientId ) => {
@@ -397,7 +396,6 @@ function ListViewComponent(
 						fixedListWindow={ fixedListWindow }
 						selectedClientIds={ selectedClientIds }
 						isExpanded={ isExpanded }
-						shouldShowInnerBlocks={ shouldShowInnerBlocks }
 						showAppender={ showAppender }
 					/>
 				</ListViewContext.Provider>

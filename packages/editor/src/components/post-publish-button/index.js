@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { Component, createRef } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 
@@ -17,7 +17,6 @@ const noop = () => {};
 export class PostPublishButton extends Component {
 	constructor( props ) {
 		super( props );
-		this.buttonNode = createRef();
 
 		this.createOnClick = this.createOnClick.bind( this );
 		this.closeEntitiesSavedStates =
@@ -26,21 +25,6 @@ export class PostPublishButton extends Component {
 		this.state = {
 			entitiesSavedStatesCallback: false,
 		};
-	}
-
-	componentDidMount() {
-		if ( this.props.focusOnMount ) {
-			// This timeout is necessary to make sure the `useEffect` hook of
-			// `useFocusReturn` gets the correct element (the button that opens the
-			// PostPublishPanel) otherwise it will get this button.
-			this.timeoutID = setTimeout( () => {
-				this.buttonNode.current.focus();
-			}, 0 );
-		}
-	}
-
-	componentWillUnmount() {
-		clearTimeout( this.timeoutID );
 	}
 
 	createOnClick( callback ) {
@@ -130,10 +114,10 @@ export class PostPublishButton extends Component {
 				( ! isPublishable && ! forceIsDirty ) ) &&
 			( ! hasNonPostEntityChanges || isSavingNonPostEntityChanges );
 
-		// If the new status has not changed explicitely, we derive it from
+		// If the new status has not changed explicitly, we derive it from
 		// other factors, like having a publish action, etc.. We need to preserve
 		// this because it affects when to show the pre and post publish panels.
-		// If it has changed though explicitely, we need to respect that.
+		// If it has changed though explicitly, we need to respect that.
 		let publishStatus = 'publish';
 		if ( postStatusHasChanged ) {
 			publishStatus = postStatus;
@@ -167,6 +151,7 @@ export class PostPublishButton extends Component {
 			isBusy: ! isAutoSaving && isSaving,
 			variant: 'primary',
 			onClick: this.createOnClick( onClickButton ),
+			'aria-haspopup': hasNonPostEntityChanges ? 'dialog' : undefined,
 		};
 
 		const toggleProps = {
@@ -177,12 +162,12 @@ export class PostPublishButton extends Component {
 			variant: 'primary',
 			size: 'compact',
 			onClick: this.createOnClick( onClickToggle ),
+			'aria-haspopup': hasNonPostEntityChanges ? 'dialog' : undefined,
 		};
 		const componentProps = isToggle ? toggleProps : buttonProps;
 		return (
 			<>
 				<Button
-					ref={ this.buttonNode }
 					{ ...componentProps }
 					className={ `${ componentProps.className } editor-post-publish-button__button` }
 					size="compact"
@@ -194,6 +179,9 @@ export class PostPublishButton extends Component {
 	}
 }
 
+/**
+ * Renders the publish button.
+ */
 export default compose( [
 	withSelect( ( select ) => {
 		const {

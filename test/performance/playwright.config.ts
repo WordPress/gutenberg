@@ -8,15 +8,13 @@ import { defineConfig } from '@playwright/test';
 /**
  * WordPress dependencies
  */
-const baseConfig = require( '@wordpress/scripts/config/playwright.config' );
+import baseConfig from '@wordpress/scripts/config/playwright.config.js';
 
 process.env.ASSETS_PATH = path.join( __dirname, 'assets' );
 
 const config = defineConfig( {
 	...baseConfig,
-	reporter: process.env.CI
-		? './config/performance-reporter.ts'
-		: [ [ 'list' ], [ './config/performance-reporter.ts' ] ],
+	reporter: [ [ 'list' ], [ './config/performance-reporter.ts' ] ],
 	forbidOnly: !! process.env.CI,
 	fullyParallel: false,
 	retries: 0,

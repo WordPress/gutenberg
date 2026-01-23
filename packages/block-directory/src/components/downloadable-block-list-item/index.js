@@ -1,12 +1,17 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
-	Button,
+	Tooltip,
 	Spinner,
 	VisuallyHidden,
-	privateApis as componentsPrivateApis,
+	Composite,
 } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -20,9 +25,6 @@ import BlockRatings from '../block-ratings';
 import DownloadableBlockIcon from '../downloadable-block-icon';
 import DownloadableBlockNotice from '../downloadable-block-notice';
 import { store as blockDirectoryStore } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-const { CompositeItemV2: CompositeItem } = unlock( componentsPrivateApis );
 
 // Return the appropriate block item label, given the block data and status.
 function getDownloadableBlockLabel(
@@ -32,28 +34,28 @@ function getDownloadableBlockLabel(
 	const stars = Math.round( rating / 0.5 ) * 0.5;
 
 	if ( ! isInstalled && hasNotice ) {
-		/* translators: %1$s: block title */
+		/* translators: %s: block title */
 		return sprintf( 'Retry installing %s.', decodeEntities( title ) );
 	}
 
 	if ( isInstalled ) {
-		/* translators: %1$s: block title */
+		/* translators: %s: block title */
 		return sprintf( 'Add %s.', decodeEntities( title ) );
 	}
 
 	if ( isInstalling ) {
-		/* translators: %1$s: block title */
+		/* translators: %s: block title */
 		return sprintf( 'Installing %s.', decodeEntities( title ) );
 	}
 
 	// No ratings yet, just use the title.
 	if ( ratingCount < 1 ) {
-		/* translators: %1$s: block title */
+		/* translators: %s: block title */
 		return sprintf( 'Install %s.', decodeEntities( title ) );
 	}
 
 	return sprintf(
-		/* translators: %1$s: block title, %2$s: average rating, %3$s: total ratings count. */
+		/* translators: 1: block title, 2: average rating, 3: total ratings count. */
 		_n(
 			'Install %1$s. %2$s stars with %3$s review.',
 			'Install %1$s. %2$s stars with %3$s reviews.',
@@ -65,7 +67,7 @@ function getDownloadableBlockLabel(
 	);
 }
 
-function DownloadableBlockListItem( { composite, item, onClick } ) {
+function DownloadableBlockListItem( { item, onClick } ) {
 	const { author, description, icon, rating, title } = item;
 	// getBlockType returns a block object if this block exists, or null if not.
 	const isInstalled = !! getBlockType( item.name );
@@ -92,76 +94,75 @@ function DownloadableBlockListItem( { composite, item, onClick } ) {
 		statusText = __( 'Installing…' );
 	}
 
+	const itemLabel = getDownloadableBlockLabel( item, {
+		hasNotice,
+		isInstalled,
+		isInstalling,
+	} );
+
 	return (
-		<CompositeItem
-			render={
-				<Button
-					__experimentalIsFocusable
-					type="button"
-					role="option"
-					className="block-directory-downloadable-block-list-item"
-					isBusy={ isInstalling }
-					onClick={ ( event ) => {
-						event.preventDefault();
-						onClick();
-					} }
-					label={ getDownloadableBlockLabel( item, {
-						hasNotice,
-						isInstalled,
-						isInstalling,
-					} ) }
-					showTooltip
-					tooltipPosition="top center"
-				/>
-			}
-			store={ composite }
-			disabled={ isInstalling || ! isInstallable }
-		>
-			<div className="block-directory-downloadable-block-list-item__icon">
-				<DownloadableBlockIcon icon={ icon } title={ title } />
-				{ isInstalling ? (
-					<span className="block-directory-downloadable-block-list-item__spinner">
-						<Spinner />
-					</span>
-				) : (
-					<BlockRatings rating={ rating } />
+		<Tooltip placement="top" text={ itemLabel }>
+			<Composite.Item
+				className={ clsx(
+					'block-directory-downloadable-block-list-item',
+					isInstalling && 'is-installing'
 				) }
-			</div>
-			<span className="block-directory-downloadable-block-list-item__details">
-				<span className="block-directory-downloadable-block-list-item__title">
-					{ createInterpolateElement(
-						sprintf(
-							/* translators: %1$s: block title, %2$s: author name. */
-							__( '%1$s <span>by %2$s</span>' ),
-							decodeEntities( title ),
-							author
-						),
-						{
-							span: (
-								<span className="block-directory-downloadable-block-list-item__author" />
+				accessibleWhenDisabled
+				disabled={ isInstalling || ! isInstallable }
+				onClick={ ( event ) => {
+					event.preventDefault();
+					onClick();
+				} }
+				aria-label={ itemLabel }
+				type="button"
+				role="option"
+			>
+				<div className="block-directory-downloadable-block-list-item__icon">
+					<DownloadableBlockIcon icon={ icon } title={ title } />
+					{ isInstalling ? (
+						<span className="block-directory-downloadable-block-list-item__spinner">
+							<Spinner />
+						</span>
+					) : (
+						<BlockRatings rating={ rating } />
+					) }
+				</div>
+				<span className="block-directory-downloadable-block-list-item__details">
+					<span className="block-directory-downloadable-block-list-item__title">
+						{ createInterpolateElement(
+							sprintf(
+								/* translators: 1: block title. 2: author name. */
+								__( '%1$s <span>by %2$s</span>' ),
+								decodeEntities( title ),
+								author
 							),
-						}
+							{
+								span: (
+									<span className="block-directory-downloadable-block-list-item__author" />
+								),
+							}
+						) }
+					</span>
+					{ hasNotice ? (
+						<DownloadableBlockNotice block={ item } />
+					) : (
+						<>
+							<span className="block-directory-downloadable-block-list-item__desc">
+								{ !! statusText
+									? statusText
+									: decodeEntities( description ) }
+							</span>
+							{ isInstallable &&
+								! ( isInstalled || isInstalling ) && (
+									<VisuallyHidden>
+										{ __( 'Install block' ) }
+									</VisuallyHidden>
+								) }
+						</>
 					) }
 				</span>
-				{ hasNotice ? (
-					<DownloadableBlockNotice block={ item } />
-				) : (
-					<>
-						<span className="block-directory-downloadable-block-list-item__desc">
-							{ !! statusText
-								? statusText
-								: decodeEntities( description ) }
-						</span>
-						{ isInstallable &&
-							! ( isInstalled || isInstalling ) && (
-								<VisuallyHidden>
-									{ __( 'Install block' ) }
-								</VisuallyHidden>
-							) }
-					</>
-				) }
-			</span>
-		</CompositeItem>
+			</Composite.Item>
+		</Tooltip>
 	);
 }
 

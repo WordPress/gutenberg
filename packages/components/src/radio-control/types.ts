@@ -24,6 +24,10 @@ export type RadioControlProps = Pick<
 		 * The internal value compared against select and passed to onChange
 		 */
 		value: string;
+		/**
+		 * Optional help text to be shown in addition the label.
+		 */
+		description?: string;
 	}[];
 	/**
 	 * The value property of the currently selected option.

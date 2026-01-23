@@ -19,7 +19,7 @@ jest.mock( '@wordpress/compose/src/hooks/use-viewport-match', () => jest.fn() );
 
 describe( 'EditPostPreferencesModal', () => {
 	it( 'should not render when the modal is not active', () => {
-		useSelect.mockImplementation( () => [ false, false, false ] );
+		useSelect.mockImplementation( () => false );
 		render( <EditPostPreferencesModal /> );
 		expect(
 			screen.queryByRole( 'dialog', { name: 'Preferences' } )

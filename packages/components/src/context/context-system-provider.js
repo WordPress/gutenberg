@@ -2,7 +2,8 @@
  * External dependencies
  */
 import deepmerge from 'deepmerge';
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
+// @ts-expect-error https://github.com/jonschlinkert/is-plain-object/pull/47
 import { isPlainObject } from 'is-plain-object';
 
 /**
@@ -25,6 +26,8 @@ import { useUpdateEffect } from '../utils';
 export const ComponentsContext = createContext(
 	/** @type {Record<string, any>} */ ( {} )
 );
+ComponentsContext.displayName = 'ComponentsContext';
+
 export const useComponentsContext = () => useContext( ComponentsContext );
 
 /**

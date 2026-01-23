@@ -1,0 +1,12 @@
+{
+	"$schema": "../../schemas/docs-manifest.json",
+	"displayName": "AlignmentMatrixControl",
+	"filePath": "./index.tsx",
+	"subcomponents": [
+		{
+			"displayName": "AlignmentMatrixControlIcon",
+			"preferredDisplayName": "AlignmentMatrixControl.Icon",
+			"filePath": "./icon.tsx"
+		}
+	]
+}

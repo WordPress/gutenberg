@@ -1,20 +1,14 @@
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	useRef,
-	useLayoutEffect,
-	useEffect,
-	useReducer,
-} from '@wordpress/element';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { useState, useRef, useEffect, useReducer } from '@wordpress/element';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
  */
 import BlockPopoverCover from '../components/block-popover/cover';
-import { __unstableUseBlockElement as useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
+import { useBlockElement } from '../components/block-list/use-block-props/use-block-refs';
 
 function SpacingVisualizer( { clientId, value, computeStyle, forceShow } ) {
 	const blockElement = useBlockElement( clientId );
@@ -22,30 +16,41 @@ function SpacingVisualizer( { clientId, value, computeStyle, forceShow } ) {
 		computeStyle( blockElement )
 	);
 
-	useLayoutEffect( () => {
+	// Force style computation when forceShow becomes true (e.g., when hovering control)
+	// to ensure visualizer displays correct dimensions on first render.
+	useEffect( () => {
+		if ( blockElement && forceShow ) {
+			updateStyle();
+		}
+	}, [ blockElement, forceShow ] );
+
+	// It's not sufficient to read the block's computed style when `value` changes because
+	// the effect would run before the block’s style has updated. Thus observing mutations
+	// to the block’s attributes is used to trigger updates to the visualizer’s styles.
+	useEffect( () => {
 		if ( ! blockElement ) {
 			return;
 		}
-		// It's not sufficient to read the computed spacing value when value.spacing changes as
-		// useEffect may run before the browser recomputes CSS. We therefore combine
-		// useLayoutEffect and two rAF calls to ensure that we read the spacing after the current
-		// paint but before the next paint.
-		// See https://github.com/WordPress/gutenberg/pull/59227.
-		window.requestAnimationFrame( () =>
-			window.requestAnimationFrame( updateStyle )
-		);
-	}, [ blockElement, value ] );
+		const observer = new window.MutationObserver( updateStyle );
+		observer.observe( blockElement, {
+			attributes: true,
+			attributeFilter: [ 'style', 'class' ],
+		} );
+		return () => {
+			observer.disconnect();
+		};
+	}, [ blockElement ] );
 
-	const previousValue = useRef( value );
+	const previousValueRef = useRef( value );
 	const [ isActive, setIsActive ] = useState( false );
 
 	useEffect( () => {
-		if ( isShallowEqual( value, previousValue.current ) || forceShow ) {
+		if ( isShallowEqual( value, previousValueRef.current ) || forceShow ) {
 			return;
 		}
 
 		setIsActive( true );
-		previousValue.current = value;
+		previousValueRef.current = value;
 
 		const timeout = setTimeout( () => {
 			setIsActive( false );

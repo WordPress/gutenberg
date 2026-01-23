@@ -1,5 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Editor adds empty image block when pasting unsupported HTML local image path 1`] = `
+"<!-- wp:image -->
+<figure class="wp-block-image"><img src="" alt=""/></figure>
+<!-- /wp:image -->"
+`;
+
+exports[`Editor adds image block when pasting HTML local image path 1`] = `
+"<!-- wp:image -->
+<figure class="wp-block-image"><img src="file:///path/to/file.png" alt=""/></figure>
+<!-- /wp:image -->"
+`;
+
 exports[`Editor appends media correctly for allowed types 1`] = `
 "<!-- wp:image -->
 <figure class="wp-block-image"><img src="https://test-site.files.wordpress.com/local-image-1.jpeg" alt=""/></figure>
@@ -18,4 +30,76 @@ exports[`Editor appends media correctly for allowed types and skips unsupported 
 <!-- wp:video -->
 <figure class="wp-block-video"><video controls src="file:///local-video-4.mp4"></video></figure>
 <!-- /wp:video -->"
+`;
+
+exports[`Editor on content update parses markdown into blocks 1`] = `
+"<!-- wp:paragraph -->
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing<br />elit.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Overview</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Lorem ipsum dolor sit amet</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Consectetur adipiscing<br>elit</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Integer nec odio</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Details</h2>
+<!-- /wp:heading -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Sed cursus ante dapibus diam</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Nulla quis sem at nibh elementum imperdiet</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Duis sagittis ipsum <code>## Mixed Lists</code></li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Key Points:</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:list {"ordered":true} -->
+<ol class="wp-block-list"><!-- wp:list-item -->
+<li>Lorem ipsum dolor sit amet</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li><br>Consectetur adipiscing elit</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Integer nec odio</li>
+<!-- /wp:list-item --></ol>
+<!-- /wp:list -->
+
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Additional Info:<br>-<br>Sed cursus ante dapibus diam</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Nulla quis sem at nibh elementum imperdiet</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->"
 `;

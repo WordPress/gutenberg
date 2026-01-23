@@ -86,6 +86,19 @@ function enqueue_plugins_api_plugin_scripts() {
 		filemtime( plugin_dir_path( __FILE__ ) . 'plugins-api/document-setting.js' ),
 		true
 	);
+
+	wp_enqueue_script(
+		'gutenberg-test-plugins-api-preview-menu',
+		plugins_url( 'plugins-api/preview-menu.js', __FILE__ ),
+		array(
+			'wp-editor',
+			'wp-element',
+			'wp-i18n',
+			'wp-plugins',
+		),
+		filemtime( plugin_dir_path( __FILE__ ) . 'plugins-api/preview-menu.js' ),
+		true
+	);
 }
 
 add_action( 'init', 'enqueue_plugins_api_plugin_scripts' );

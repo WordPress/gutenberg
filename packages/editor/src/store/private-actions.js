@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { store as coreStore } from '@wordpress/core-data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -15,7 +15,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import isTemplateRevertable from './utils/is-template-revertable';
-import { TEMPLATE_POST_TYPE } from './constants';
+export * from '../dataviews/store/private-actions';
 
 /**
  * Returns an action object used to set which template is currently being used/edited.
@@ -34,7 +34,7 @@ export function setCurrentTemplateId( id ) {
 /**
  * Create a block based template.
  *
- * @param {Object?} template Template to create and assign.
+ * @param {?Object} template Template to create and assign.
  */
 export const createTemplate =
 	( template ) =>
@@ -137,7 +137,9 @@ export const saveDirtyEntities =
 			{ kind: 'postType', name: 'wp_navigation' },
 		];
 		const saveNoticeId = 'site-editor-save-success';
-		const homeUrl = registry.select( coreStore ).getUnstableBase()?.home;
+		const homeUrl = registry
+			.select( coreStore )
+			.getEntityRecord( 'root', '__unstableBase' )?.home;
 		registry.dispatch( noticesStore ).removeNotice( saveNoticeId );
 		const entitiesToSave = dirtyEntityRecords.filter(
 			( { kind, name, key, property } ) => {
@@ -214,6 +216,7 @@ export const saveDirtyEntities =
 								{
 									label: __( 'View site' ),
 									url: homeUrl,
+									openInNewTab: true,
 								},
 							],
 						} );
@@ -269,7 +272,7 @@ export const revertTemplate =
 
 			const fileTemplatePath = addQueryArgs(
 				`${ templateEntityConfig.baseURL }/${ template.id }`,
-				{ context: 'edit', source: 'theme' }
+				{ context: 'edit', source: template.origin }
 			);
 
 			const fileTemplate = await apiFetch( { path: fileTemplatePath } );
@@ -363,14 +366,15 @@ export const revertTemplate =
 	};
 
 /**
- * Action that removes an array of templates.
+ * Action that removes an array of templates, template parts or patterns.
  *
- * @param {Array} items An array of template or template part objects to remove.
+ * @param {Array} items An array of template,template part or pattern objects to remove.
  */
 export const removeTemplates =
 	( items ) =>
 	async ( { registry } ) => {
-		const isTemplate = items[ 0 ].type === TEMPLATE_POST_TYPE;
+		const isResetting = items.every( ( item ) => item?.has_theme_file );
+
 		const promiseResult = await Promise.allSettled(
 			items.map( ( item ) => {
 				return registry
@@ -385,33 +389,43 @@ export const removeTemplates =
 			} )
 		);
 
-		// If all the promises were fulfilled with sucess.
+		// If all the promises were fulfilled with success.
 		if ( promiseResult.every( ( { status } ) => status === 'fulfilled' ) ) {
 			let successMessage;
 
 			if ( items.length === 1 ) {
 				// Depending on how the entity was retrieved its title might be
 				// an object or simple string.
-				const title =
-					typeof items[ 0 ].title === 'string'
-						? items[ 0 ].title
-						: items[ 0 ].title?.rendered;
-				successMessage = sprintf(
-					/* translators: The template/part's name. */
-					__( '"%s" deleted.' ),
-					decodeEntities( title )
-				);
+				let title;
+				if ( typeof items[ 0 ].title === 'string' ) {
+					title = items[ 0 ].title;
+				} else if ( typeof items[ 0 ].title?.rendered === 'string' ) {
+					title = items[ 0 ].title?.rendered;
+				} else if ( typeof items[ 0 ].title?.raw === 'string' ) {
+					title = items[ 0 ].title?.raw;
+				}
+				successMessage = isResetting
+					? sprintf(
+							/* translators: %s: The template/part's name. */
+							__( '"%s" reset.' ),
+							decodeEntities( title )
+					  )
+					: sprintf(
+							/* translators: %s: The template/part's name. */
+							_x( '"%s" deleted.', 'template part' ),
+							decodeEntities( title )
+					  );
 			} else {
-				successMessage = isTemplate
-					? __( 'Templates deleted.' )
-					: __( 'Template parts deleted.' );
+				successMessage = isResetting
+					? __( 'Items reset.' )
+					: __( 'Items deleted.' );
 			}
 
 			registry
 				.dispatch( noticesStore )
 				.createSuccessNotice( successMessage, {
 					type: 'snackbar',
-					id: 'site-editor-template-deleted-success',
+					id: 'editor-template-deleted-success',
 				} );
 		} else {
 			// If there was at lease one failure.
@@ -421,11 +435,9 @@ export const removeTemplates =
 				if ( promiseResult[ 0 ].reason?.message ) {
 					errorMessage = promiseResult[ 0 ].reason.message;
 				} else {
-					errorMessage = isTemplate
-						? __( 'An error occurred while deleting the template.' )
-						: __(
-								'An error occurred while deleting the template part.'
-						  );
+					errorMessage = isResetting
+						? __( 'An error occurred while reverting the item.' )
+						: __( 'An error occurred while deleting the item.' );
 				}
 				// If we were trying to delete a multiple templates
 			} else {
@@ -439,42 +451,38 @@ export const removeTemplates =
 					}
 				}
 				if ( errorMessages.size === 0 ) {
-					errorMessage = isTemplate
-						? __(
-								'An error occurred while deleting the templates.'
-						  )
-						: __(
-								'An error occurred while deleting the template parts.'
-						  );
+					errorMessage = __(
+						'An error occurred while deleting the items.'
+					);
 				} else if ( errorMessages.size === 1 ) {
-					errorMessage = isTemplate
+					errorMessage = isResetting
 						? sprintf(
 								/* translators: %s: an error message */
 								__(
-									'An error occurred while deleting the templates: %s'
+									'An error occurred while reverting the items: %s'
 								),
 								[ ...errorMessages ][ 0 ]
 						  )
 						: sprintf(
 								/* translators: %s: an error message */
 								__(
-									'An error occurred while deleting the template parts: %s'
+									'An error occurred while deleting the items: %s'
 								),
 								[ ...errorMessages ][ 0 ]
 						  );
 				} else {
-					errorMessage = isTemplate
+					errorMessage = isResetting
 						? sprintf(
 								/* translators: %s: a list of comma separated error messages */
 								__(
-									'Some errors occurred while deleting the templates: %s'
+									'Some errors occurred while reverting the items: %s'
 								),
 								[ ...errorMessages ].join( ',' )
 						  )
 						: sprintf(
 								/* translators: %s: a list of comma separated error messages */
 								__(
-									'Some errors occurred while deleting the template parts: %s'
+									'Some errors occurred while deleting the items: %s'
 								),
 								[ ...errorMessages ].join( ',' )
 						  );
@@ -485,3 +493,86 @@ export const removeTemplates =
 				.createErrorNotice( errorMessage, { type: 'snackbar' } );
 		}
 	};
+
+/**
+ * Set the default rendering mode preference for the current post type.
+ *
+ * @param {string} mode The rendering mode to set as default.
+ */
+export const setDefaultRenderingMode =
+	( mode ) =>
+	( { select, registry } ) => {
+		const postType = select.getCurrentPostType();
+		const theme = registry
+			.select( coreStore )
+			.getCurrentTheme()?.stylesheet;
+		const renderingModes =
+			registry
+				.select( preferencesStore )
+				.get( 'core', 'renderingModes' )?.[ theme ] ?? {};
+
+		if ( renderingModes[ postType ] === mode ) {
+			return;
+		}
+
+		const newModes = {
+			[ theme ]: {
+				...renderingModes,
+				[ postType ]: mode,
+			},
+		};
+
+		registry
+			.dispatch( preferencesStore )
+			.set( 'core', 'renderingModes', newModes );
+	};
+
+/**
+ * Set the current global styles navigation path.
+ *
+ * @param {string} path The navigation path.
+ * @return {Object} Action object.
+ */
+export function setStylesPath( path ) {
+	return {
+		type: 'SET_STYLES_PATH',
+		path,
+	};
+}
+
+/**
+ * Set whether the stylebook is visible.
+ *
+ * @param {boolean} show Whether to show the stylebook.
+ * @return {Object} Action object.
+ */
+export function setShowStylebook( show ) {
+	return {
+		type: 'SET_SHOW_STYLEBOOK',
+		show,
+	};
+}
+
+/**
+ * Reset the global styles navigation to initial state.
+ *
+ * @return {Object} Action object.
+ */
+export function resetStylesNavigation() {
+	return {
+		type: 'RESET_STYLES_NAVIGATION',
+	};
+}
+
+/**
+ * Set the minimum height of the canvas.
+ *
+ * @param {number} minHeight
+ * @return {Object} Action object.
+ */
+export function setCanvasMinHeight( minHeight ) {
+	return {
+		type: 'SET_CANVAS_MIN_HEIGHT',
+		minHeight,
+	};
+}

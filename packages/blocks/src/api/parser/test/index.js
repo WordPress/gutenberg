@@ -14,6 +14,7 @@ import serialize from '../../serializer';
 
 describe( 'block parser', () => {
 	const defaultBlockSettings = {
+		apiVersion: 3,
 		attributes: {
 			fruit: {
 				type: 'string',
@@ -25,6 +26,7 @@ describe( 'block parser', () => {
 	};
 
 	const unknownBlockSettings = {
+		apiVersion: 3,
 		category: 'text',
 		title: 'unknown block',
 		attributes: {
@@ -50,6 +52,102 @@ describe( 'block parser', () => {
 	} );
 
 	describe( 'parseRawBlock', () => {
+		it( 'should apply className block validation fixes', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					fruit: {
+						type: 'string',
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				save: ( { attributes } ) => (
+					// eslint-disable-next-line react/no-unknown-property
+					<div class={ attributes.className }>
+						{ attributes.fruit }
+					</div>
+				),
+			} );
+
+			const block = parseRawBlock( {
+				blockName: 'core/test-block',
+				innerHTML:
+					'<div class="custom-class another-custom-class">Bananas</div>',
+				attrs: { fruit: 'Bananas' },
+			} );
+
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( {
+				fruit: 'Bananas',
+				className: 'custom-class another-custom-class',
+			} );
+		} );
+
+		it( 'should apply aria-label block validation fixes', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					fruit: {
+						type: 'string',
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				supports: {
+					ariaLabel: true,
+				},
+				save: ( { attributes } ) => (
+					<div aria-label={ attributes.ariaLabel }>
+						{ attributes.fruit }
+					</div>
+				),
+			} );
+
+			const block = parseRawBlock( {
+				blockName: 'core/test-block',
+				innerHTML: '<div aria-label="custom-label">Bananas</div>',
+				attrs: { fruit: 'Bananas' },
+			} );
+
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( {
+				fruit: 'Bananas',
+				ariaLabel: 'custom-label',
+			} );
+		} );
+
+		it( 'should apply anchor block validation fixes', () => {
+			registerBlockType( 'core/test-block', {
+				...defaultBlockSettings,
+				attributes: {
+					fruit: {
+						type: 'string',
+						source: 'text',
+						selector: 'div',
+					},
+				},
+				supports: {
+					anchor: true,
+				},
+				save: ( { attributes } ) => (
+					<div id={ attributes.anchor }>{ attributes.fruit }</div>
+				),
+			} );
+
+			const block = parseRawBlock( {
+				blockName: 'core/test-block',
+				innerHTML: '<div id="custom-anchor">Bananas</div>',
+				attrs: { fruit: 'Bananas' },
+			} );
+
+			expect( block.name ).toEqual( 'core/test-block' );
+			expect( block.attributes ).toEqual( {
+				fruit: 'Bananas',
+				anchor: 'custom-anchor',
+			} );
+		} );
+
 		it( 'should create the requested block if it exists', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
 
@@ -197,6 +295,7 @@ describe( 'block parser', () => {
 		// Run the test cases using the PegJS defined parser.
 		it( 'should parse the post content, including block attributes', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',
@@ -236,6 +335,7 @@ describe( 'block parser', () => {
 
 		it( 'should parse the post content, ignoring unknown blocks', () => {
 			registerBlockType( 'core/test-block', {
+				apiVersion: 3,
 				attributes: {
 					content: {
 						type: 'string',
@@ -369,6 +469,7 @@ describe( 'block parser', () => {
 
 		it( 'should parse with unicode escaped returned to original representation', () => {
 			registerBlockType( 'core/code', {
+				apiVersion: 3,
 				category: 'text',
 				title: 'Code Block',
 				attributes: {

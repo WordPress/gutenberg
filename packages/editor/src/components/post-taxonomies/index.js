@@ -18,7 +18,11 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
 	const { postType, taxonomies } = useSelect( ( select ) => {
 		return {
 			postType: select( editorStore ).getCurrentPostType(),
-			taxonomies: select( coreStore ).getTaxonomies( { per_page: -1 } ),
+			taxonomies: select( coreStore ).getEntityRecords(
+				'root',
+				'taxonomy',
+				{ per_page: -1 }
+			),
 		};
 	}, [] );
 	const visibleTaxonomies = ( taxonomies ?? [] ).filter(
@@ -32,6 +36,7 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
 		const TaxonomyComponent = taxonomy.hierarchical
 			? HierarchicalTermSelector
 			: FlatTermSelector;
+
 		return (
 			<Fragment key={ `taxonomy-${ taxonomy.slug }` }>
 				{ taxonomyWrapper(
@@ -43,4 +48,12 @@ export function PostTaxonomies( { taxonomyWrapper = identity } ) {
 	} );
 }
 
+/**
+ * Renders the taxonomies associated with a post.
+ *
+ * @param {Object}   props                 The component props.
+ * @param {Function} props.taxonomyWrapper The wrapper function for each taxonomy component.
+ *
+ * @return {Array} An array of JSX elements representing the visible taxonomies.
+ */
 export default PostTaxonomies;

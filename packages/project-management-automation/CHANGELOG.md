@@ -2,6 +2,86 @@
 
 ## Unreleased
 
+## 2.38.0 (2026-01-16)
+
+## 2.36.0 (2025-11-26)
+
+## 2.35.0 (2025-11-12)
+
+## 2.34.0 (2025-10-29)
+
+## 2.33.0 (2025-10-17)
+
+## 2.32.0 (2025-10-01)
+
+## 2.31.0 (2025-09-17)
+
+## 2.30.0 (2025-09-03)
+
+## 2.29.0 (2025-08-20)
+
+## 2.28.0 (2025-08-07)
+
+## 2.27.0 (2025-07-23)
+
+## 2.26.0 (2025-06-25)
+
+## 2.25.0 (2025-06-04)
+
+## 2.24.0 (2025-05-22)
+
+## 2.23.0 (2025-05-07)
+
+## 2.22.0 (2025-04-11)
+
+## 2.21.0 (2025-03-27)
+
+## 2.20.0 (2025-03-13)
+
+## 2.19.0 (2025-02-28)
+
+## 2.18.0 (2025-02-12)
+
+## 2.17.0 (2025-01-29)
+
+## 2.16.0 (2025-01-15)
+
+## 2.15.0 (2025-01-02)
+
+## 2.14.0 (2024-12-11)
+
+## 2.13.0 (2024-11-27)
+
+## 2.12.0 (2024-11-16)
+
+## 2.11.0 (2024-10-30)
+
+## 2.10.0 (2024-10-16)
+
+## 2.9.0 (2024-10-03)
+
+## 2.8.0 (2024-09-19)
+
+## 2.7.0 (2024-09-05)
+
+## 2.6.0 (2024-08-21)
+
+## 2.5.0 (2024-08-07)
+
+## 2.4.0 (2024-07-24)
+
+## 2.3.0 (2024-07-10)
+
+## 2.2.0 (2024-06-26)
+
+### Internal
+
+-   Upgrade `@octokit/webhooks` dependency ([#62666](https://github.com/WordPress/gutenberg/pull/62666)).
+
+## 2.1.0 (2024-06-15)
+
+## 2.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
@@ -90,12 +170,12 @@
 
 ## 1.4.0 (2020-04-15)
 
-### New feature
+### New Features
 
 -   Include TypeScript type declarations ([#18942](https://github.com/WordPress/gutenberg/pull/18942))
 -   The "Add First Time Contributor Label" task now prompts the user to link their GitHub account to their WordPress.org profile if necessary for props credit. The task has been renamed "First Time Contributor".
 
-### Improvements
+### Enhancements
 
 -   The "Add First Time Contributor Label" task now runs retroactively on pushes to trunk, due to [permission constraints](https://help.github.com/en/actions/configuring-and-managing-workflows/authenticating-with-the-github_token#permissions-for-the-github_token) of GitHub Actions.
 

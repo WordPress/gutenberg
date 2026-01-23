@@ -76,6 +76,7 @@ export default function NavigationPlaceholder( {
 
 						{ canUserCreateNavigationMenus && (
 							<Button
+								__next40pxDefaultSize
 								variant="tertiary"
 								onClick={ onCreateEmpty }
 							>

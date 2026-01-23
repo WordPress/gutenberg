@@ -11,15 +11,11 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import PostLastRevisionCheck from './check';
+import PostPanelRow from '../post-panel-row';
 import { store as editorStore } from '../../store';
 
-/**
- * Renders the component for displaying the last revision of a post.
- *
- * @return {Component} The component to be rendered.
- */
-function PostLastRevision() {
-	const { lastRevisionId, revisionsCount } = useSelect( ( select ) => {
+function usePostLastRevisionInfo() {
+	return useSelect( ( select ) => {
 		const { getCurrentPostLastRevisionId, getCurrentPostRevisionsCount } =
 			select( editorStore );
 		return {
@@ -27,10 +23,20 @@ function PostLastRevision() {
 			revisionsCount: getCurrentPostRevisionsCount(),
 		};
 	}, [] );
+}
+
+/**
+ * Renders the component for displaying the last revision of a post.
+ *
+ * @return {React.ReactNode} The rendered component.
+ */
+function PostLastRevision() {
+	const { lastRevisionId, revisionsCount } = usePostLastRevisionInfo();
 
 	return (
 		<PostLastRevisionCheck>
 			<Button
+				__next40pxDefaultSize
 				href={ addQueryArgs( 'revision.php', {
 					revision: lastRevisionId,
 				} ) }
@@ -38,11 +44,30 @@ function PostLastRevision() {
 				icon={ backup }
 				iconPosition="right"
 				text={ sprintf(
-					/* translators: %s: number of revisions */
+					/* translators: %s: number of revisions. */
 					__( 'Revisions (%s)' ),
 					revisionsCount
 				) }
 			/>
+		</PostLastRevisionCheck>
+	);
+}
+
+export function PrivatePostLastRevision() {
+	const { lastRevisionId, revisionsCount } = usePostLastRevisionInfo();
+	return (
+		<PostLastRevisionCheck>
+			<PostPanelRow label={ __( 'Revisions' ) }>
+				<Button
+					href={ addQueryArgs( 'revision.php', {
+						revision: lastRevisionId,
+					} ) }
+					className="editor-private-post-last-revision__button"
+					text={ revisionsCount }
+					variant="tertiary"
+					size="compact"
+				/>
+			</PostPanelRow>
 		</PostLastRevisionCheck>
 	);
 }

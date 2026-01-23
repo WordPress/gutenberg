@@ -29,6 +29,7 @@ const MyFontSizePicker = () => {
 
 	return (
 		<FontSizePicker
+			__next40pxDefaultSize
 			fontSizes={ fontSizes }
 			value={ fontSize }
 			fallbackFontSize={ fallbackFontSize }
@@ -92,13 +93,25 @@ Size of the control.
 Available units for custom font size selection.
 
 -   Required: No
--   Default: `[ 'px', 'em', 'rem' ]`
+-   Default: `[ 'px', 'em', 'rem', 'vw', 'vh' ]`
 
 ### `value`: `number | string`
 
 The current font size value.
 
+**Note**: For the `units` property to work, the current font size value must be specified as strings with units (e.g., `'12px'` instead of `12`). When the font size is provided as a number, the component operates in "unitless mode" where the `units` property has no effect.
+
 -   Required: No
+
+### `valueMode`: `'literal' | 'slug'`
+
+Determines how the `value` prop should be interpreted.
+
+- `'literal'`: The `value` prop contains the actual font size value (number or string).
+- `'slug'`: The `value` prop contains the slug of the selected font size.
+
+-   Required: No
+-   Default: `'literal'`
 
 ### `withReset`: `boolean`
 
@@ -113,3 +126,10 @@ If `true`, a slider will be displayed alongside the input field when a custom fo
 
 -   Required: no
 -   Default: `false`
+
+### `__next40pxDefaultSize`: `boolean`
+
+Start opting into the larger default height that will become the default size in a future version.
+
+- Required: No
+- Default: `false`

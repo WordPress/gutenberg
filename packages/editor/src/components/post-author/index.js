@@ -16,7 +16,7 @@ const minimumUsersForCombobox = 25;
 /**
  * Renders the component for selecting the post author.
  *
- * @return {Component} The component to be rendered.
+ * @return {React.ReactNode} The rendered component.
  */
 function PostAuthor() {
 	const showCombobox = useSelect( ( select ) => {

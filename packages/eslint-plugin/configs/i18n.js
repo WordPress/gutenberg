@@ -8,5 +8,7 @@ module.exports = {
 		'@wordpress/i18n-no-placeholders-only': 'error',
 		'@wordpress/i18n-no-variables': 'error',
 		'@wordpress/i18n-ellipsis': 'error',
+		'@wordpress/i18n-no-flanking-whitespace': 'error',
+		'@wordpress/i18n-hyphenated-range': 'error',
 	},
 };

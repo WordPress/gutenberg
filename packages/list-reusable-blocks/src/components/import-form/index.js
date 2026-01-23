@@ -84,8 +84,10 @@ function ImportForm( { instanceId, onUpload } ) {
 			</label>
 			<input id={ inputId } type="file" onChange={ onChangeFile } />
 			<Button
+				__next40pxDefaultSize
 				type="submit"
 				isBusy={ isLoading }
+				accessibleWhenDisabled
 				disabled={ ! file || isLoading }
 				variant="secondary"
 				className="list-reusable-blocks-import-form__button"

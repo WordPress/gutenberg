@@ -18,8 +18,10 @@ import {
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -32,9 +34,8 @@ import {
 import {
 	__experimentalUpdateSettings,
 	privateRemoveBlocks,
+	editContentOnlySection,
 } from './private-actions';
-import { STORE_NAME } from './constants';
-import { unlock } from '../lock-unlock';
 
 /** @typedef {import('../components/use-on-block-drop/types').WPDropOperation} WPDropOperation */
 
@@ -104,7 +105,6 @@ export const validateBlocksToTemplate =
  * @property {WPBlockSelection} end   The selection end.
  */
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that selection state should be
  * reset to the specified selection.
@@ -120,7 +120,6 @@ export function resetSelection(
 	selectionEnd,
 	initialPosition
 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'RESET_SELECTION',
 		selectionStart,
@@ -155,22 +154,26 @@ export function receiveBlocks( blocks ) {
 /**
  * Action that updates attributes of multiple blocks with the specified client IDs.
  *
- * @param {string|string[]} clientIds     Block client IDs.
- * @param {Object}          attributes    Block attributes to be merged. Should be keyed by clientIds if
- *                                        uniqueByBlock is true.
- * @param {boolean}         uniqueByBlock true if each block in clientIds array has a unique set of attributes
+ * @param {string|string[]} clientIds                     Block client IDs.
+ * @param {Object}          attributes                    Block attributes to be merged. Should be keyed by clientIds if `options.uniqueByBlock` is true.
+ * @param {Object}          options                       Updating options.
+ * @param {boolean}         [options.uniqueByBlock=false] Whether each block in clientIds array has a unique set of attributes.
  * @return {Object} Action object.
  */
 export function updateBlockAttributes(
 	clientIds,
 	attributes,
-	uniqueByBlock = false
+	options = { uniqueByBlock: false }
 ) {
+	if ( typeof options === 'boolean' ) {
+		options = { uniqueByBlock: options };
+	}
+
 	return {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
 		clientIds: castArray( clientIds ),
 		attributes,
-		uniqueByBlock,
+		options,
 	};
 }
 
@@ -190,7 +193,6 @@ export function updateBlock( clientId, updates ) {
 	};
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the block with the
  * specified client ID has been selected, optionally accepting a position
@@ -198,17 +200,32 @@ export function updateBlock( clientId, updates ) {
  * reflects a reverse selection.
  *
  * @param {string}    clientId        Block client ID.
- * @param {0|-1|null} initialPosition Optional initial position. Pass as -1 to
- *                                    reflect reverse selection.
+ * @param {0|-1|null} initialPosition Optional initial position. Pass -1 to reflect reverse selection
+ *                                    or `null` to prevent focusing the block.
  *
  * @return {Object} Action object.
  */
 export function selectBlock( clientId, initialPosition = 0 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'SELECT_BLOCK',
 		initialPosition,
 		clientId,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the block with the
+ * specified client ID has been hovered.
+ *
+ * @deprecated
+ */
+export function hoverBlock() {
+	deprecated( 'wp.data.dispatch( "core/block-editor" ).hoverBlock', {
+		since: '6.9',
+		version: '7.1',
+	} );
+	return {
+		type: 'DO_NOTHING',
 	};
 }
 
@@ -335,7 +352,6 @@ export function toggleSelection( isSelectionEnabled = true ) {
 	};
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Action that replaces given blocks with one or more replacement blocks.
  *
@@ -350,7 +366,6 @@ export function toggleSelection( isSelectionEnabled = true ) {
 export const replaceBlocks =
 	( clientIds, blocks, indexToSelect, initialPosition = 0, meta ) =>
 	( { select, dispatch, registry } ) => {
-		/* eslint-enable jsdoc/valid-types */
 		clientIds = castArray( clientIds );
 		blocks = castArray( blocks );
 		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
@@ -408,7 +423,7 @@ const createOnMove =
 	( clientIds, rootClientId ) =>
 	( { select, dispatch } ) => {
 		// If one of the blocks is locked or the parent is locked, we cannot move any block.
-		const canMoveBlocks = select.canMoveBlocks( clientIds, rootClientId );
+		const canMoveBlocks = select.canMoveBlocks( clientIds );
 		if ( ! canMoveBlocks ) {
 			return;
 		}
@@ -430,10 +445,7 @@ export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
 export const moveBlocksToPosition =
 	( clientIds, fromRootClientId = '', toRootClientId = '', index ) =>
 	( { select, dispatch } ) => {
-		const canMoveBlocks = select.canMoveBlocks(
-			clientIds,
-			fromRootClientId
-		);
+		const canMoveBlocks = select.canMoveBlocks( clientIds );
 
 		// If one of the blocks is locked or the parent is locked, we cannot move any block.
 		if ( ! canMoveBlocks ) {
@@ -442,10 +454,7 @@ export const moveBlocksToPosition =
 
 		// If moving inside the same root block the move is always possible.
 		if ( fromRootClientId !== toRootClientId ) {
-			const canRemoveBlocks = select.canRemoveBlocks(
-				clientIds,
-				fromRootClientId
-			);
+			const canRemoveBlocks = select.canRemoveBlocks( clientIds );
 
 			// If we're moving to another block, it means we're deleting blocks from
 			// the original block, so we need to check if removing is possible.
@@ -526,7 +535,6 @@ export function insertBlock(
 	);
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Action that inserts an array of blocks, optionally at a specific index respective a root block list.
  *
@@ -552,7 +560,6 @@ export const insertBlocks =
 		meta
 	) =>
 	( { select, dispatch } ) => {
-		/* eslint-enable jsdoc/valid-types */
 		if ( initialPosition !== null && typeof initialPosition === 'object' ) {
 			meta = initialPosition;
 			initialPosition = 0;
@@ -872,6 +879,30 @@ export const __unstableSplitSelection =
 			typeof selectionB.attributeKey === 'string'
 				? selectionB.attributeKey
 				: findRichTextAttributeKey( blockBType );
+		const blockAttributes = select.getBlockAttributes(
+			selectionA.clientId
+		);
+		const bindings = blockAttributes?.metadata?.bindings;
+
+		// If the attribute is bound, don't split the selection and insert a new block instead.
+		if ( bindings?.[ attributeKeyA ] ) {
+			// Show warning if user tries to insert a block into another block with bindings.
+			if ( blocks.length ) {
+				const { createWarningNotice } =
+					registry.dispatch( noticesStore );
+				createWarningNotice(
+					__(
+						"Blocks can't be inserted into other blocks with bindings"
+					),
+					{
+						type: 'snackbar',
+					}
+				);
+				return;
+			}
+			dispatch.insertAfterBlock( selectionA.clientId );
+			return;
+		}
 
 		// Can't split if the selection is not set.
 		if (
@@ -892,7 +923,7 @@ export const __unstableSplitSelection =
 			// If an unmodified default block is selected, replace it. We don't
 			// want to be converting into a default block.
 			if ( blocks.length ) {
-				if ( isUnmodifiedDefaultBlock( blockA ) ) {
+				if ( isUnmodifiedDefaultBlock( blockA, 'content' ) ) {
 					dispatch.replaceBlocks(
 						[ selectionA.clientId ],
 						blocks,
@@ -918,9 +949,7 @@ export const __unstableSplitSelection =
 						  );
 				}
 
-				const length = select.getBlockAttributes( selectionA.clientId )[
-					attributeKeyA
-				].length;
+				const length = blockAttributes[ attributeKeyA ].length;
 
 				if ( selectionA.offset === 0 && length ) {
 					dispatch.insertBlocks(
@@ -965,7 +994,7 @@ export const __unstableSplitSelection =
 			},
 		};
 
-		const tail = {
+		let tail = {
 			...blockB,
 			// Only preserve the original client ID if the end is different.
 			clientId:
@@ -977,6 +1006,26 @@ export const __unstableSplitSelection =
 				[ attributeKeyB ]: toHTMLString( { value: valueB } ),
 			},
 		};
+
+		// When splitting a block, attempt to convert the tail block to the
+		// default block type. For example, when splitting a heading block, the
+		// tail block will be converted to a paragraph block. Note that for
+		// blocks such as a list item and button, this will be skipped because
+		// the default block type cannot be inserted.
+		const defaultBlockName = getDefaultBlockName();
+		if (
+			// A block is only split when the selection is within the same
+			// block.
+			blockA.clientId === blockB.clientId &&
+			defaultBlockName &&
+			tail.name !== defaultBlockName &&
+			select.canInsertBlockType( defaultBlockName, anchorRootClientId )
+		) {
+			const switched = switchToBlockType( tail, defaultBlockName );
+			if ( switched?.length === 1 ) {
+				tail = switched[ 0 ];
+			}
+		}
 
 		if ( ! blocks.length ) {
 			dispatch.replaceBlocks( select.getSelectedBlockClientIds(), [
@@ -1000,7 +1049,10 @@ export const __unstableSplitSelection =
 			const first = firstBlocks.shift();
 			head = {
 				...head,
-				attributes: headType.merge( head.attributes, first.attributes ),
+				attributes: {
+					...head.attributes,
+					...headType.merge( head.attributes, first.attributes ),
+				},
 			};
 			output.push( head );
 			selection = {
@@ -1034,10 +1086,10 @@ export const __unstableSplitSelection =
 				const last = lastBlocks.pop();
 				output.push( {
 					...tail,
-					attributes: tailType.merge(
-						last.attributes,
-						tail.attributes
-					),
+					attributes: {
+						...tail.attributes,
+						...tailType.merge( last.attributes, tail.attributes ),
+					},
 				} );
 				output.push( ...lastBlocks );
 				selection = {
@@ -1103,7 +1155,11 @@ export const mergeBlocks =
 		const blockA = select.getBlock( clientIdA );
 		const blockAType = getBlockType( blockA.name );
 
-		if ( ! blockAType ) {
+		if (
+			! blockAType ||
+			select.getBlockEditingMode( clientIdA ) === 'disabled' ||
+			select.getBlockEditingMode( clientIdB ) === 'disabled'
+		) {
 			return;
 		}
 
@@ -1196,7 +1252,14 @@ export const mergeBlocks =
 		}
 
 		if ( ! blockAType.merge ) {
-			dispatch.selectBlock( blockA.clientId );
+			if ( isUnmodifiedBlock( blockB, 'content' ) ) {
+				dispatch.removeBlock(
+					clientIdB,
+					select.isBlockSelected( clientIdB )
+				);
+			} else {
+				dispatch.selectBlock( blockA.clientId );
+			}
 			return;
 		}
 
@@ -1212,7 +1275,7 @@ export const mergeBlocks =
 			offset !== undefined &&
 			// We cannot restore text selection if the RichText identifier
 			// is not a defined block attribute key. This can be the case if the
-			// fallback intance ID is used to store selection (and no RichText
+			// fallback instance ID is used to store selection (and no RichText
 			// identifier is set), or when the identifier is wrong.
 			!! attributeDefinition;
 
@@ -1330,7 +1393,6 @@ export function removeBlock( clientId, selectPrevious ) {
 	return removeBlocks( [ clientId ], selectPrevious );
 }
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Returns an action object used in signalling that the inner blocks with the
  * specified client ID should be replaced.
@@ -1347,7 +1409,6 @@ export function replaceInnerBlocks(
 	updateSelection = false,
 	initialPosition = 0
 ) {
-	/* eslint-enable jsdoc/valid-types */
 	return {
 		type: 'REPLACE_INNER_BLOCKS',
 		rootClientId,
@@ -1596,94 +1657,41 @@ export const __unstableMarkAutomaticChange =
 	};
 
 /**
- * Action that enables or disables the navigation mode.
- *
- * @param {boolean} isNavigationMode Enable/Disable navigation mode.
- */
-export const setNavigationMode =
-	( isNavigationMode = true ) =>
-	( { dispatch } ) => {
-		dispatch.__unstableSetEditorMode(
-			isNavigationMode ? 'navigation' : 'edit'
-		);
-	};
-
-/**
  * Action that sets the editor mode
  *
  * @param {string} mode Editor mode
  */
 export const __unstableSetEditorMode =
 	( mode ) =>
-	( { dispatch, select, registry } ) => {
-		// When switching to zoom-out mode, we need to select the parent section
-		if ( mode === 'zoom-out' ) {
-			const firstSelectedClientId = select.getBlockSelectionStart();
-			const { sectionRootClientId } = unlock(
-				registry.select( STORE_NAME ).getSettings()
-			);
-			if ( firstSelectedClientId ) {
-				let sectionClientId;
-
-				if ( sectionRootClientId ) {
-					const sectionClientIds =
-						select.getBlockOrder( sectionRootClientId );
-					sectionClientId = select
-						.getBlockParents( firstSelectedClientId )
-						.find( ( parent ) =>
-							sectionClientIds.includes( parent )
-						);
-				} else {
-					sectionClientId = select.getBlockHierarchyRootClientId(
-						firstSelectedClientId
-					);
-				}
-
-				if ( sectionClientId ) {
-					dispatch.selectBlock( sectionClientId );
-				} else {
-					dispatch.clearSelectedBlock();
-				}
-			}
-		}
-
-		dispatch( { type: 'SET_EDITOR_MODE', mode } );
+	( { registry } ) => {
+		registry.dispatch( preferencesStore ).set( 'core', 'editorTool', mode );
 
 		if ( mode === 'navigation' ) {
-			speak(
-				__(
-					'You are currently in navigation mode. Navigate blocks using the Tab key and Arrow keys. Use Left and Right Arrow keys to move between nesting levels. To exit navigation mode and edit the selected block, press Enter.'
-				)
-			);
+			speak( __( 'You are currently in Write mode.' ) );
 		} else if ( mode === 'edit' ) {
-			speak(
-				__(
-					'You are currently in edit mode. To return to the navigation mode, press Escape.'
-				)
-			);
-		} else if ( mode === 'zoom-out' ) {
-			speak( __( 'You are currently in zoom-out mode.' ) );
+			speak( __( 'You are currently in Design mode.' ) );
 		}
 	};
 
 /**
- * Action that enables or disables the block moving mode.
+ * Set the block moving client ID.
  *
- * @param {string|null} hasBlockMovingClientId Enable/Disable block moving mode.
+ * @deprecated
+ *
+ * @return {Object} Action object.
  */
-export const setBlockMovingClientId =
-	( hasBlockMovingClientId = null ) =>
-	( { dispatch } ) => {
-		dispatch( { type: 'SET_BLOCK_MOVING_MODE', hasBlockMovingClientId } );
-
-		if ( hasBlockMovingClientId ) {
-			speak(
-				__(
-					'Use the Tab key and Arrow keys to choose new block location. Use Left and Right Arrow keys to move between nesting levels. Once location is selected press Enter or Space to move the block.'
-				)
-			);
+export function setBlockMovingClientId() {
+	deprecated(
+		'wp.data.dispatch( "core/block-editor" ).setBlockMovingClientId',
+		{
+			since: '6.7',
+			hint: 'Block moving mode feature has been removed',
 		}
+	);
+	return {
+		type: 'DO_NOTHING',
 	};
+}
 
 /**
  * Action that duplicates a list of blocks.
@@ -1846,12 +1854,13 @@ export function toggleBlockHighlight( clientId, isHighlighted ) {
  * Action that "flashes" the block with a given `clientId` by rhythmically highlighting it.
  *
  * @param {string} clientId Target block client ID.
+ * @param {number} timeout  Duration in milliseconds to keep the highlight. Defaults to 150ms.
  */
 export const flashBlock =
-	( clientId ) =>
+	( clientId, timeout = 150 ) =>
 	async ( { dispatch } ) => {
 		dispatch( toggleBlockHighlight( clientId, true ) );
-		await new Promise( ( resolve ) => setTimeout( resolve, 150 ) );
+		await new Promise( ( resolve ) => setTimeout( resolve, timeout ) );
 		dispatch( toggleBlockHighlight( clientId, false ) );
 	};
 
@@ -1891,18 +1900,16 @@ export function setBlockVisibility( updates ) {
  * This action is created for internal/experimental only usage and may be
  * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
  *
- * @param {?string} temporarilyEditingAsBlocks The block's clientId being temporarily edited as blocks.
- * @param {?string} focusModeToRevert          The focus mode to revert after temporarily edit as blocks finishes.
+ * @param {?string} clientId The clientId of the block being temporarily edited.
  */
-export function __unstableSetTemporarilyEditingAsBlocks(
-	temporarilyEditingAsBlocks,
-	focusModeToRevert
-) {
-	return {
-		type: 'SET_TEMPORARILY_EDITING_AS_BLOCKS',
-		temporarilyEditingAsBlocks,
-		focusModeToRevert,
-	};
+export function __unstableSetTemporarilyEditingAsBlocks( clientId ) {
+	deprecated(
+		"wp.data.dispatch( 'core/block-editor' ).__unstableSetTemporarilyEditingAsBlocks",
+		{
+			since: '7.0',
+		}
+	);
+	return editContentOnlySection( clientId );
 }
 
 /**
@@ -1984,7 +1991,7 @@ export function __unstableSetTemporarilyEditingAsBlocks(
  * 	 		per_page: 'page_size',
  * 	 		search: 'q',
  * 	 	};
- * 	 	const url = new URL( 'https://api.openverse.engineering/v1/images/' );
+ * 	 	const url = new URL( 'https://api.openverse.org/v1/images/' );
  * 	 	Object.entries( finalQuery ).forEach( ( [ key, value ] ) => {
  * 	 		const queryKey = mapFromInserterMediaRequest[ key ] || key;
  * 	 		url.searchParams.set( queryKey, value );

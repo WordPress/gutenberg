@@ -18,18 +18,13 @@ export type FocalPointAxis = 'x' | 'y';
 
 export type FocalPointPickerProps = Pick<
 	BaseControlProps,
-	'help' | 'hideLabelFromVision' | 'label'
+	'__nextHasNoMarginBottom' | 'help' | 'hideLabelFromVision' | 'label'
 > & {
-	/**
-	 * Start opting into the new margin-free styles that will become the default in a future version.
-	 *
-	 * @default false
-	 */
-	__nextHasNoMarginBottom?: boolean;
 	/**
 	 * Start opting into the larger default height that will become the default size in a future version.
 	 *
-	 * @default false
+	 * @deprecated Default behavior since WP 6.7. Prop can be safely removed.
+	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
 	/**
@@ -67,8 +62,6 @@ export type FocalPointPickerProps = Pick<
 };
 
 export type FocalPointPickerControlsProps = {
-	__nextHasNoMarginBottom?: boolean;
-	__next40pxDefaultSize?: boolean;
 	/**
 	 * A bit of extra bottom margin will be added if a `help` text
 	 * needs to be rendered under it.

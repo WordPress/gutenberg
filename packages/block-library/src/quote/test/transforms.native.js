@@ -14,18 +14,14 @@ import {
 
 const block = 'Quote';
 const initialHtml = `
-<!-- wp:quote {"align":"left","className":"is-style-large"} -->
+<!-- wp:quote {"textAlign":"left","className":"is-style-large"} -->
 <blockquote class="wp-block-quote has-text-align-left is-style-large"><!-- wp:paragraph -->
 <p>"This will make running your own blog a viable alternative again."</p>
 <!-- /wp:paragraph --><cite>— <a href="https://twitter.com/azumbrunnen_/status/1019347243084800005">Adrian Zumbrunnen</a></cite></blockquote>
 <!-- /wp:quote -->`;
 
 const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
-const blockTransforms = [
-	'Pullquote',
-	'Paragraph',
-	...transformsWithInnerBlocks,
-];
+const blockTransforms = [ 'Paragraph', ...transformsWithInnerBlocks ];
 
 setupCoreBlocks();
 

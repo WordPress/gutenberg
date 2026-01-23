@@ -1,14 +1,7 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .editor-post-url__panel-dropdown {
 	width: 100%;
-}
-
-.components-button.editor-post-url__panel-toggle {
-	display: block;
-	max-width: 100%;
-	overflow: hidden;
-	text-align: left;
-	text-overflow: ellipsis;
-	white-space: nowrap;
 }
 
 .editor-post-url__panel-dialog .editor-post-url {
@@ -18,13 +11,31 @@
 }
 
 /* rtl:begin:ignore */
-.editor-post-url__link {
+.editor-post-url__link,
+.editor-post-url__front-page-link {
 	direction: ltr;
 	word-break: break-word;
-	margin-top: $grid-unit-05;
-	color: $gray-700;
 }
 /* rtl:end:ignore */
+
+.editor-post-url__front-page-link {
+	// Match padding on tertiary buttons for alignment.
+	padding: $grid-unit-15 * 0.5 $grid-unit-15;
+	border-radius: $radius-small;
+	color: var(--wp-admin-theme-color);
+
+	&:hover {
+		background: color-mix(in srgb, var(--wp-admin-theme-color) 4%, transparent);
+		color: var(--wp-admin-theme-color-darker-20, #183ad6);
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		color: var(--wp-admin-theme-color);
+		outline: 3px solid #0000;
+	}
+}
+
 
 .editor-post-url__link-slug {
 	font-weight: 600;
@@ -34,4 +45,22 @@
 // there is no way currently to control the padding when adding prefix/suffix.
 .editor-post-url__input input.components-input-control__input {
 	padding-inline-start: 0 !important;
+}
+
+.editor-post-url__panel-toggle,
+.editor-post-parent__panel-toggle {
+	word-break: break-word;
+}
+
+.editor-post-url__intro {
+	margin: 0;
+}
+
+.editor-post-url__permalink {
+	margin-top: $grid-unit-10;
+	margin-bottom: 0;
+
+	&-visual-label {
+		display: block;
+	}
 }

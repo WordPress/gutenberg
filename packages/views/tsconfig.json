@@ -1,0 +1,10 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"references": [
+		{ "path": "../data" },
+		{ "path": "../dataviews" },
+		{ "path": "../element" },
+		{ "path": "../preferences" }
+	]
+}

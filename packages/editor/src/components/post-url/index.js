@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { safeDecodeURIComponent, cleanForSlug } from '@wordpress/url';
-import { useState } from '@wordpress/element';
+import { useState, createInterpolateElement } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -11,12 +11,13 @@ import {
 	Button,
 	__experimentalInputControl as InputControl,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
+	__experimentalInputControlSuffixWrapper as InputControlSuffixWrapper,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
 import { copySmall } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
-import { useCopyToClipboard } from '@wordpress/compose';
+import { useCopyToClipboard, useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -31,9 +32,10 @@ import { store as editorStore } from '../../store';
  * <PostURL />
  * ```
  *
- * @param {Function} onClose Callback function to be executed when the popover is closed.
+ * @param {{ onClose: () => void }} props         The props for the component.
+ * @param {() => void}              props.onClose Callback function to be executed when the popover is closed.
  *
- * @return {Component} The rendered PostURL component.
+ * @return {React.ReactNode} The rendered PostURL component.
  */
 export default function PostURL( { onClose } ) {
 	const {
@@ -69,78 +71,99 @@ export default function PostURL( { onClose } ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const [ forceEmptyField, setForceEmptyField ] = useState( false );
 	const copyButtonRef = useCopyToClipboard( permalink, () => {
-		createNotice( 'info', __( 'Copied URL to clipboard.' ), {
+		createNotice( 'info', __( 'Copied Permalink to clipboard.' ), {
 			isDismissible: true,
 			type: 'snackbar',
 		} );
 	} );
+	const postUrlSlugDescriptionId =
+		'editor-post-url__slug-description-' + useInstanceId( PostURL );
+
 	return (
 		<div className="editor-post-url">
 			<InspectorPopoverHeader
-				title={ __( 'Link' ) }
+				title={ __( 'Slug' ) }
 				onClose={ onClose }
 			/>
 			<VStack spacing={ 3 }>
 				{ isEditable && (
-					<div>
-						{ __( 'Customize the last part of the URL. ' ) }
-						<ExternalLink
-							href={ __(
-								'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
-							) }
-						>
-							{ __( 'Learn more.' ) }
-						</ExternalLink>
-					</div>
+					<p className="editor-post-url__intro">
+						{ createInterpolateElement(
+							__(
+								'<span>Customize the last part of the Permalink.</span> <a>Learn more.</a>'
+							),
+							{
+								span: <span id={ postUrlSlugDescriptionId } />,
+								a: (
+									<ExternalLink
+										href={ __(
+											'https://wordpress.org/documentation/article/page-post-settings-sidebar/#permalink'
+										) }
+									/>
+								),
+							}
+						) }
+					</p>
 				) }
 				<div>
 					{ isEditable && (
-						<InputControl
-							__next40pxDefaultSize
-							prefix={
-								<InputControlPrefixWrapper>
-									/
-								</InputControlPrefixWrapper>
-							}
-							suffix={
-								<Button
-									icon={ copySmall }
-									ref={ copyButtonRef }
-									label={ __( 'Copy' ) }
-								/>
-							}
-							label={ __( 'Link' ) }
-							hideLabelFromVision
-							value={ forceEmptyField ? '' : postSlug }
-							autoComplete="off"
-							spellCheck="false"
-							type="text"
-							className="editor-post-url__input"
-							onChange={ ( newValue ) => {
-								editPost( { slug: newValue } );
-								// When we delete the field the permalink gets
-								// reverted to the original value.
-								// The forceEmptyField logic allows the user to have
-								// the field temporarily empty while typing.
-								if ( ! newValue ) {
-									if ( ! forceEmptyField ) {
-										setForceEmptyField( true );
+						<>
+							<InputControl
+								__next40pxDefaultSize
+								prefix={
+									<InputControlPrefixWrapper>
+										/
+									</InputControlPrefixWrapper>
+								}
+								suffix={
+									<InputControlSuffixWrapper variant="control">
+										<Button
+											icon={ copySmall }
+											ref={ copyButtonRef }
+											size="small"
+											label="Copy"
+										/>
+									</InputControlSuffixWrapper>
+								}
+								label={ __( 'Slug' ) }
+								hideLabelFromVision
+								value={ forceEmptyField ? '' : postSlug }
+								autoComplete="off"
+								spellCheck="false"
+								type="text"
+								className="editor-post-url__input"
+								onChange={ ( newValue ) => {
+									editPost( { slug: newValue } );
+									// When we delete the field the permalink gets
+									// reverted to the original value.
+									// The forceEmptyField logic allows the user to have
+									// the field temporarily empty while typing.
+									if ( ! newValue ) {
+										if ( ! forceEmptyField ) {
+											setForceEmptyField( true );
+										}
+										return;
 									}
-									return;
-								}
-								if ( forceEmptyField ) {
-									setForceEmptyField( false );
-								}
-							} }
-							onBlur={ ( event ) => {
-								editPost( {
-									slug: cleanForSlug( event.target.value ),
-								} );
-								if ( forceEmptyField ) {
-									setForceEmptyField( false );
-								}
-							} }
-							help={
+									if ( forceEmptyField ) {
+										setForceEmptyField( false );
+									}
+								} }
+								onBlur={ ( event ) => {
+									editPost( {
+										slug: cleanForSlug(
+											event.target.value
+										),
+									} );
+									if ( forceEmptyField ) {
+										setForceEmptyField( false );
+									}
+								} }
+								aria-describedby={ postUrlSlugDescriptionId }
+							/>
+							<p className="editor-post-url__permalink">
+								<span className="editor-post-url__permalink-visual-label">
+									{ __( 'Permalink:' ) }
+								</span>
 								<ExternalLink
 									className="editor-post-url__link"
 									href={ postLink }
@@ -156,8 +179,8 @@ export default function PostURL( { onClose } ) {
 										{ permalinkSuffix }
 									</span>
 								</ExternalLink>
-							}
-						/>
+							</p>
+						</>
 					) }
 					{ ! isEditable && (
 						<ExternalLink

@@ -13,31 +13,41 @@ import {
 	useBlockProps,
 	Warning,
 	HeadingLevelDropdown,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { ToggleControl, PanelBody } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import {
+	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
+import { __, _x, sprintf } from '@wordpress/i18n';
 
-const SUPPORTED_TYPES = [ 'archive', 'search' ];
+/**
+ * Internal dependencies
+ */
+import { useArchiveLabel } from './use-archive-label';
+import { usePostTypeLabel } from './use-post-type-label';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+
+const SUPPORTED_TYPES = [ 'archive', 'search', 'post-type' ];
 
 export default function QueryTitleEdit( {
-	attributes: { type, level, textAlign, showPrefix, showSearchTerm },
+	attributes: {
+		type,
+		level,
+		levelOptions,
+		textAlign,
+		showPrefix,
+		showSearchTerm,
+	},
 	setAttributes,
+	context: { query },
 } ) {
-	const { archiveTypeTitle, archiveNameLabel } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const {
-			__experimentalArchiveTitleNameLabel,
-			__experimentalArchiveTitleTypeLabel,
-		} = getSettings();
-		return {
-			archiveTypeTitle: __experimentalArchiveTitleTypeLabel,
-			archiveNameLabel: __experimentalArchiveTitleNameLabel,
-		};
-	} );
+	const { archiveTypeLabel, archiveNameLabel } = useArchiveLabel();
+	const { postTypeLabel } = usePostTypeLabel( query?.postType );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const TagName = `h${ level }`;
+	const TagName = level === 0 ? 'p' : `h${ level }`;
+
 	const blockProps = useBlockProps( {
 		className: clsx( 'wp-block-query-title__placeholder', {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -55,20 +65,20 @@ export default function QueryTitleEdit( {
 	let titleElement;
 	if ( type === 'archive' ) {
 		let title;
-		if ( archiveTypeTitle ) {
+		if ( archiveTypeLabel ) {
 			if ( showPrefix ) {
 				if ( archiveNameLabel ) {
 					title = sprintf(
 						/* translators: 1: Archive type title e.g: "Category", 2: Label of the archive e.g: "Shoes" */
-						__( '%1$s: %2$s' ),
-						archiveTypeTitle,
+						_x( '%1$s: %2$s', 'archive label' ),
+						archiveTypeLabel,
 						archiveNameLabel
 					);
 				} else {
 					title = sprintf(
 						/* translators: %s: Archive type title e.g: "Category", "Tag"... */
 						__( '%s: Name' ),
-						archiveTypeTitle
+						archiveTypeLabel
 					);
 				}
 			} else if ( archiveNameLabel ) {
@@ -77,7 +87,7 @@ export default function QueryTitleEdit( {
 				title = sprintf(
 					/* translators: %s: Archive type title e.g: "Category", "Tag"... */
 					__( '%s name' ),
-					archiveTypeTitle
+					archiveTypeLabel
 				);
 			}
 		} else {
@@ -89,16 +99,34 @@ export default function QueryTitleEdit( {
 		titleElement = (
 			<>
 				<InspectorControls>
-					<PanelBody title={ __( 'Settings' ) }>
-						<ToggleControl
-							__nextHasNoMarginBottom
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () =>
+							setAttributes( {
+								showPrefix: true,
+							} )
+						}
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<ToolsPanelItem
+							hasValue={ () => ! showPrefix }
 							label={ __( 'Show archive type in title' ) }
-							onChange={ () =>
-								setAttributes( { showPrefix: ! showPrefix } )
+							onDeselect={ () =>
+								setAttributes( { showPrefix: true } )
 							}
-							checked={ showPrefix }
-						/>
-					</PanelBody>
+							isShownByDefault
+						>
+							<ToggleControl
+								label={ __( 'Show archive type in title' ) }
+								onChange={ () =>
+									setAttributes( {
+										showPrefix: ! showPrefix,
+									} )
+								}
+								checked={ showPrefix }
+							/>
+						</ToolsPanelItem>
+					</ToolsPanel>
 				</InspectorControls>
 				<TagName { ...blockProps }>{ title }</TagName>
 			</>
@@ -109,18 +137,34 @@ export default function QueryTitleEdit( {
 		titleElement = (
 			<>
 				<InspectorControls>
-					<PanelBody title={ __( 'Settings' ) }>
-						<ToggleControl
-							__nextHasNoMarginBottom
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () =>
+							setAttributes( {
+								showSearchTerm: true,
+							} )
+						}
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<ToolsPanelItem
+							hasValue={ () => ! showSearchTerm }
 							label={ __( 'Show search term in title' ) }
-							onChange={ () =>
-								setAttributes( {
-									showSearchTerm: ! showSearchTerm,
-								} )
+							onDeselect={ () =>
+								setAttributes( { showSearchTerm: true } )
 							}
-							checked={ showSearchTerm }
-						/>
-					</PanelBody>
+							isShownByDefault
+						>
+							<ToggleControl
+								label={ __( 'Show search term in title' ) }
+								onChange={ () =>
+									setAttributes( {
+										showSearchTerm: ! showSearchTerm,
+									} )
+								}
+								checked={ showSearchTerm }
+							/>
+						</ToolsPanelItem>
+					</ToolsPanel>
 				</InspectorControls>
 
 				<TagName { ...blockProps }>
@@ -132,11 +176,65 @@ export default function QueryTitleEdit( {
 		);
 	}
 
+	if ( type === 'post-type' ) {
+		let title;
+		if ( postTypeLabel ) {
+			if ( showPrefix ) {
+				title = sprintf(
+					/* translators: %s: Singular post type name of the queried object */
+					__( 'Post Type: "%s"' ),
+					postTypeLabel
+				);
+			} else {
+				title = postTypeLabel;
+			}
+		} else {
+			title = showPrefix ? __( 'Post Type: Name' ) : __( 'Name' );
+		}
+
+		titleElement = (
+			<>
+				<InspectorControls>
+					<ToolsPanel
+						label={ __( 'Settings' ) }
+						resetAll={ () =>
+							setAttributes( {
+								showPrefix: true,
+							} )
+						}
+						dropdownMenuProps={ dropdownMenuProps }
+					>
+						<ToolsPanelItem
+							hasValue={ () => ! showPrefix }
+							label={ __( 'Show post type label' ) }
+							onDeselect={ () =>
+								setAttributes( { showPrefix: true } )
+							}
+							isShownByDefault
+						>
+							<ToggleControl
+								label={ __( 'Show post type label' ) }
+								onChange={ () =>
+									setAttributes( {
+										showPrefix: ! showPrefix,
+									} )
+								}
+								checked={ showPrefix }
+							/>
+						</ToolsPanelItem>
+					</ToolsPanel>
+				</InspectorControls>
+				<TagName { ...blockProps }>{ title }</TagName>
+			</>
+		);
+	}
+
 	return (
 		<>
 			<BlockControls group="block">
 				<HeadingLevelDropdown
 					value={ level }
+					options={ levelOptions }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

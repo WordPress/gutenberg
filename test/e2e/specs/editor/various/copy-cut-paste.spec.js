@@ -494,6 +494,32 @@ test.describe( 'Copy/cut/paste', () => {
 		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	test( 'should paste list in list', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		pageUtils.setClipboardData( { html: '<ul><li>x</li><li>y</li></ul>' } );
+		await editor.insertBlock( { name: 'core/list' } );
+		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	test( 'should paste paragraphs in list', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		pageUtils.setClipboardData( { html: '<p>x</p><p>y</p>' } );
+		await editor.insertBlock( { name: 'core/list' } );
+		await pageUtils.pressKeys( 'primary+v' );
+		// Ensure the selection is correct.
+		await page.keyboard.type( '‸' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	test( 'should link selection', async ( { pageUtils, editor } ) => {
 		await editor.insertBlock( {
 			name: 'core/paragraph',
@@ -510,6 +536,75 @@ test.describe( 'Copy/cut/paste', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: '<a href="https://wordpress.org/gutenberg">a</a>',
+				},
+			},
+		] );
+	} );
+
+	test( 'should paste styles using keyboard shortcut', async ( {
+		pageUtils,
+		editor,
+		page,
+		context,
+	} ) => {
+		// Grant clipboard access for copying and pasting styles between blocks.
+		await context.grantPermissions( [
+			'clipboard-read',
+			'clipboard-write',
+		] );
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'First Block',
+				style: {
+					color: {
+						text: '#ff0000',
+						background: '#00ff00',
+					},
+				},
+			},
+		} );
+
+		await editor.clickBlockToolbarButton( 'Options' );
+		await page
+			.getByRole( 'menu', { name: 'Options' } )
+			.getByRole( 'menuitem', {
+				name: 'Copy Styles',
+			} )
+			.click();
+
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content: 'Second Block',
+			},
+		} );
+
+		await pageUtils.pressKeys( 'primaryAlt+v' );
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'First Block',
+					style: {
+						color: {
+							text: '#ff0000',
+							background: '#00ff00',
+						},
+					},
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Second Block',
+					style: {
+						color: {
+							text: '#ff0000',
+							background: '#00ff00',
+						},
+					},
 				},
 			},
 		] );
@@ -537,6 +632,27 @@ test.describe( 'Copy/cut/paste', () => {
 				},
 			},
 		] );
+	} );
+
+	test( 'should paste link to formatted text', async ( {
+		page,
+		pageUtils,
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<strong>test</strong>' },
+		} );
+		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowRight' );
+		await pageUtils.pressKeys( 'shift+ArrowRight' );
+		await pageUtils.pressKeys( 'shift+ArrowRight' );
+		pageUtils.setClipboardData( {
+			plainText: 'https://wordpress.org/gutenberg',
+			html: 'https://wordpress.org/gutenberg',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+		expect( await editor.getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	test( 'should auto-link', async ( { pageUtils, editor } ) => {
@@ -636,6 +752,77 @@ test.describe( 'Copy/cut/paste', () => {
 				name: 'core/paragraph',
 				attributes: {
 					content: 'b]',
+				},
+			},
+		] );
+	} );
+
+	// See https://github.com/WordPress/gutenberg/pull/61900
+	test( 'should inherit heading attributes on paste split', async ( {
+		pageUtils,
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: {
+				content: 'AB',
+			},
+		} );
+		await page.keyboard.press( 'ArrowRight' );
+
+		pageUtils.setClipboardData( {
+			html: '<p>a</p><p>b</p>',
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'Aa',
+					level: 2,
+				},
+			},
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'bB',
+				},
+			},
+		] );
+	} );
+
+	test( 'should replace the default block on paste when the content is unmodified', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/heading',
+			attributes: {
+				content: 'AB',
+			},
+		} );
+		await pageUtils.pressKeys( 'primary+c' );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { metadata: { name: 'Test' } },
+		} );
+		await pageUtils.pressKeys( 'primary+v' );
+
+		expect( await editor.getBlocks() ).toMatchObject( [
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'AB',
+					level: 2,
+				},
+			},
+			{
+				name: 'core/heading',
+				attributes: {
+					content: 'AB',
+					level: 2,
 				},
 			},
 		] );

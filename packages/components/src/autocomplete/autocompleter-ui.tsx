@@ -2,6 +2,7 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import { createPortal } from 'react-dom';
 
 /**
  * WordPress dependencies
@@ -24,7 +25,6 @@ import getDefaultUseItems from './get-default-use-items';
 import Button from '../button';
 import Popover from '../popover';
 import { VisuallyHidden } from '../visually-hidden';
-import { createPortal } from 'react-dom';
 import type { AutocompleterUIProps, KeyedOption, WPCompleter } from './types';
 
 type ListBoxProps = {
@@ -57,15 +57,19 @@ function ListBox( {
 					key={ option.key }
 					id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
 					role="option"
+					__next40pxDefaultSize
 					aria-selected={ index === selectedIndex }
+					accessibleWhenDisabled
 					disabled={ option.isDisabled }
 					className={ clsx(
 						'components-autocomplete__result',
 						className,
 						{
+							// Unused, for backwards compatibility.
 							'is-selected': index === selectedIndex,
 						}
 					) }
+					variant={ index === selectedIndex ? 'primary' : undefined }
 					onClick={ () => onSelect( option ) }
 				>
 					{ option.label }
@@ -162,9 +166,8 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 		useLayoutEffect( () => {
 			onChangeOptions( items );
 			announce( items );
-			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
+			// We want to avoid introducing unexpected side effects.
 			// See https://github.com/WordPress/gutenberg/pull/41820
-			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [ items ] );
 
 		if ( items.length === 0 ) {
@@ -174,6 +177,7 @@ export function getAutoCompleterUI( autocompleter: WPCompleter ) {
 		return (
 			<>
 				<Popover
+					offset={ 8 }
 					focusOnMount={ false }
 					onClose={ onReset }
 					placement="top-start"
@@ -232,8 +236,5 @@ function useOnClickOutside(
 			document.removeEventListener( 'mousedown', listener );
 			document.removeEventListener( 'touchstart', listener );
 		};
-		// Disable reason: `ref` is a ref object and should not be included in a
-		// hook's dependency list.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ handler ] );
+	}, [ handler, ref ] );
 }

@@ -1,14 +1,23 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isTextField } from '@wordpress/dom';
 import { Popover } from '@wordpress/components';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
-import { useRef } from '@wordpress/element';
-import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
+import { useRef, useState } from '@wordpress/element';
+import {
+	switchToBlockType,
+	hasBlockSupport,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -19,32 +28,33 @@ import {
 	default as InsertionPoint,
 } from './insertion-point';
 import BlockToolbarPopover from './block-toolbar-popover';
-import BlockToolbarBreadcrumb from './block-toolbar-breadcrumb';
 import { store as blockEditorStore } from '../../store';
 import usePopoverScroll from '../block-popover/use-popover-scroll';
 import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
+import usePasteStyles from '../use-paste-styles';
+import { BlockVisibilityModal } from '../block-visibility';
 
 function selector( select ) {
 	const {
 		getSelectedBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		getSettings,
-		__unstableGetEditorMode,
 		isTyping,
-	} = select( blockEditorStore );
+		isDragging,
+		isZoomOut,
+	} = unlock( select( blockEditorStore ) );
 
 	const clientId =
 		getSelectedBlockClientId() || getFirstMultiSelectedBlockClientId();
-
-	const editorMode = __unstableGetEditorMode();
 
 	return {
 		clientId,
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		isTyping: isTyping(),
-		isZoomOutMode: editorMode === 'zoom-out',
+		isZoomOutMode: isZoomOut(),
+		isDragging: isDragging(),
 	};
 }
 
@@ -62,23 +72,22 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode } = useSelect(
-		selector,
-		[]
-	);
+	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode, isDragging } =
+		useSelect( selector, [] );
+	const [ visibilityModalClientIds, setVisibilityModalClientIds ] =
+		useState( null );
 	const isMatch = useShortcutEventMatch();
 	const {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,
 		getBlockRootClientId,
 		isGroupable,
-	} = useSelect( blockEditorStore );
+		getEditedContentOnlySection,
+	} = unlock( useSelect( blockEditorStore ) );
 	const { getGroupingBlockName } = useSelect( blocksStore );
-	const {
-		showEmptyBlockSideInserter,
-		showBreadcrumb,
-		showBlockToolbarPopover,
-	} = useShowBlockTools();
+	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
+		useShowBlockTools();
+	const pasteStyles = usePasteStyles();
 
 	const {
 		duplicateBlocks,
@@ -90,6 +99,7 @@ export default function BlockTools( {
 		moveBlocksUp,
 		moveBlocksDown,
 		expandBlock,
+		stopEditingContentOnlySection,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	function onKeyDown( event ) {
@@ -97,19 +107,35 @@ export default function BlockTools( {
 			return;
 		}
 
-		if ( isMatch( 'core/block-editor/move-up', event ) ) {
+		if (
+			isMatch( 'core/block-editor/move-up', event ) ||
+			isMatch( 'core/block-editor/move-down', event )
+		) {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length ) {
 				event.preventDefault();
 				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-				moveBlocksUp( clientIds, rootClientId );
-			}
-		} else if ( isMatch( 'core/block-editor/move-down', event ) ) {
-			const clientIds = getSelectedBlockClientIds();
-			if ( clientIds.length ) {
-				event.preventDefault();
-				const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
-				moveBlocksDown( clientIds, rootClientId );
+				const direction = isMatch( 'core/block-editor/move-up', event )
+					? 'up'
+					: 'down';
+				if ( direction === 'up' ) {
+					moveBlocksUp( clientIds, rootClientId );
+				} else {
+					moveBlocksDown( clientIds, rootClientId );
+				}
+				const blockLength = Array.isArray( clientIds )
+					? clientIds.length
+					: 1;
+				const message = sprintf(
+					// translators: %d: the name of the block that has been moved
+					_n(
+						'%d block moved.',
+						'%d blocks moved.',
+						clientIds.length
+					),
+					blockLength
+				);
+				speak( message );
 			}
 		} else if ( isMatch( 'core/block-editor/duplicate', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
@@ -122,6 +148,13 @@ export default function BlockTools( {
 			if ( clientIds.length ) {
 				event.preventDefault();
 				removeBlocks( clientIds );
+			}
+		} else if ( isMatch( 'core/block-editor/paste-styles', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				const blocks = getBlocksByClientId( clientIds );
+				pasteStyles( blocks );
 			}
 		} else if ( isMatch( 'core/block-editor/insert-after', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
@@ -180,17 +213,50 @@ export default function BlockTools( {
 				replaceBlocks( clientIds, newBlocks );
 				speak( __( 'Selected blocks are grouped.' ) );
 			}
+		} else if (
+			isMatch( 'core/block-editor/toggle-block-visibility', event )
+		) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				const blocks = getBlocksByClientId( clientIds );
+				const supportsBlockVisibility = blocks.every( ( block ) =>
+					hasBlockSupport( block.name, 'visibility', true )
+				);
+
+				if ( ! supportsBlockVisibility ) {
+					return;
+				}
+
+				// Open the visibility breakpoints modal.
+				setVisibilityModalClientIds( clientIds );
+			}
+		}
+
+		// Has the same keyboard shortcut as 'unselect', so can't be within the
+		// if/else chain above.
+		if ( isMatch( 'core/block-editor/stop-editing-as-blocks', event ) ) {
+			if ( getEditedContentOnlySection() ) {
+				stopEditingContentOnlySection();
+			}
 		}
 	}
-
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );
 
 	return (
 		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
-		<div { ...props } onKeyDown={ onKeyDown }>
+		<div
+			{ ...props }
+			onKeyDown={ onKeyDown }
+			// Popover slots cannot be unmounted during dragging because the
+			// will just be rendered in a fallback popover slot instead.
+			className={ clsx( props.className, {
+				'block-editor-block-tools--is-dragging': isDragging,
+			} ) }
+		>
 			<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-				{ ! isTyping && (
+				{ ! isTyping && ! isZoomOutMode && (
 					<InsertionPoint
 						__unstableContentRef={ __unstableContentRef }
 					/>
@@ -211,13 +277,6 @@ export default function BlockTools( {
 					/>
 				) }
 
-				{ showBreadcrumb && (
-					<BlockToolbarBreadcrumb
-						__unstableContentRef={ __unstableContentRef }
-						clientId={ clientId }
-					/>
-				) }
-
 				{ /* Used for the inline rich text toolbar. Until this toolbar is combined into BlockToolbar, someone implementing their own BlockToolbar will also need to use this to see the image caption toolbar. */ }
 				{ ! isZoomOutMode && ! hasFixedToolbar && (
 					<Popover.Slot
@@ -231,13 +290,18 @@ export default function BlockTools( {
 					name="__unstable-block-tools-after"
 					ref={ blockToolbarAfterRef }
 				/>
-				{ window.__experimentalEnableZoomedOutPatternsTab &&
-					isZoomOutMode && (
-						<ZoomOutModeInserters
-							__unstableContentRef={ __unstableContentRef }
-						/>
-					) }
+				{ isZoomOutMode && ! isDragging && (
+					<ZoomOutModeInserters
+						__unstableContentRef={ __unstableContentRef }
+					/>
+				) }
 			</InsertionPointOpenRef.Provider>
+			{ visibilityModalClientIds && (
+				<BlockVisibilityModal
+					clientIds={ visibilityModalClientIds }
+					onClose={ () => setVisibilityModalClientIds( null ) }
+				/>
+			) }
 		</div>
 	);
 }

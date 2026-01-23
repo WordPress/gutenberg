@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { getBlockSupport } from '@wordpress/blocks';
@@ -14,16 +19,13 @@ import {
 	useBlockEditContext,
 	mayDisplayControlsKey,
 	mayDisplayParentControlsKey,
+	mayDisplayPatternEditingControlsKey,
 } from '../components/block-edit/context';
 import { useSettings } from '../components';
 import { useSettingsForBlockElement } from '../components/global-styles/hooks';
 import { getValueFromObjectPath, setImmutably } from '../utils/object';
 import { store as blockEditorStore } from '../store';
 import { unlock } from '../lock-unlock';
-/**
- * External dependencies
- */
-import clsx from 'clsx';
 
 /**
  * Removed falsy values from nested object.
@@ -135,11 +137,25 @@ export function shouldSkipSerialization(
 
 const pendingStyleOverrides = new WeakMap();
 
-export function useStyleOverride( {
+/**
+ * Override a block editor settings style. Leave the ID blank to create a new
+ * style.
+ *
+ * @param {Object}  override     Override object.
+ * @param {?string} override.id  Id of the style override, leave blank to create
+ *                               a new style.
+ * @param {string}  override.css CSS to apply.
+ */
+export function useStyleOverride( { id, css } ) {
+	return usePrivateStyleOverride( { id, css } );
+}
+
+export function usePrivateStyleOverride( {
 	id,
 	css,
 	assets,
 	__unstableType,
+	variation,
 	clientId,
 } = {} ) {
 	const { setStyleOverride, deleteStyleOverride } = unlock(
@@ -159,6 +175,7 @@ export function useStyleOverride( {
 			css,
 			assets,
 			__unstableType,
+			variation,
 			clientId,
 		};
 		// Batch updates to style overrides to avoid triggering cascading renders
@@ -203,6 +220,7 @@ export function useStyleOverride( {
 		setStyleOverride,
 		deleteStyleOverride,
 		registry,
+		variation,
 	] );
 }
 
@@ -240,15 +258,23 @@ export function useBlockSettings( name, parentLayout ) {
 		padding,
 		margin,
 		blockGap,
-		spacingSizes,
+		defaultSpacingSizesEnabled,
+		customSpacingSize,
+		userSpacingSizes,
+		defaultSpacingSizes,
+		themeSpacingSizes,
 		units,
 		aspectRatio,
+		height,
 		minHeight,
+		width,
+		dimensionSizes,
 		layout,
 		borderColor,
 		borderRadius,
 		borderStyle,
 		borderWidth,
+		borderRadiusSizes,
 		customColorsEnabled,
 		customColors,
 		customDuotone,
@@ -293,15 +319,23 @@ export function useBlockSettings( name, parentLayout ) {
 		'spacing.padding',
 		'spacing.margin',
 		'spacing.blockGap',
-		'spacing.spacingSizes',
+		'spacing.defaultSpacingSizes',
+		'spacing.customSpacingSize',
+		'spacing.spacingSizes.custom',
+		'spacing.spacingSizes.default',
+		'spacing.spacingSizes.theme',
 		'spacing.units',
 		'dimensions.aspectRatio',
+		'dimensions.height',
 		'dimensions.minHeight',
+		'dimensions.width',
+		'dimensions.dimensionSizes',
 		'layout',
 		'border.color',
 		'border.radius',
 		'border.style',
 		'border.width',
+		'border.radiusSizes',
 		'color.custom',
 		'color.palette.custom',
 		'color.customDuotone',
@@ -384,8 +418,12 @@ export function useBlockSettings( name, parentLayout ) {
 			},
 			spacing: {
 				spacingSizes: {
-					custom: spacingSizes,
+					custom: userSpacingSizes,
+					default: defaultSpacingSizes,
+					theme: themeSpacingSizes,
 				},
+				customSpacingSize,
+				defaultSpacingSizes: defaultSpacingSizesEnabled,
 				padding,
 				margin,
 				blockGap,
@@ -396,10 +434,14 @@ export function useBlockSettings( name, parentLayout ) {
 				radius: borderRadius,
 				style: borderStyle,
 				width: borderWidth,
+				radiusSizes: borderRadiusSizes,
 			},
 			dimensions: {
 				aspectRatio,
+				height,
 				minHeight,
+				width,
+				dimensionSizes,
 			},
 			layout,
 			parentLayout,
@@ -428,16 +470,24 @@ export function useBlockSettings( name, parentLayout ) {
 		padding,
 		margin,
 		blockGap,
-		spacingSizes,
+		defaultSpacingSizesEnabled,
+		customSpacingSize,
+		userSpacingSizes,
+		defaultSpacingSizes,
+		themeSpacingSizes,
 		units,
 		aspectRatio,
+		height,
 		minHeight,
+		width,
+		dimensionSizes,
 		layout,
 		parentLayout,
 		borderColor,
 		borderRadius,
 		borderStyle,
 		borderWidth,
+		borderRadiusSizes,
 		customColorsEnabled,
 		customColors,
 		customDuotone,
@@ -472,67 +522,78 @@ export function createBlockEditFilter( features ) {
 		return { ...settings, Edit: memo( settings.edit ) };
 	} );
 	const withBlockEditHooks = createHigherOrderComponent(
-		( OriginalBlockEdit ) => ( props ) => {
-			const context = useBlockEditContext();
-			// CAUTION: code added before this line will be executed for all
-			// blocks, not just those that support the feature! Code added
-			// above this line should be carefully evaluated for its impact on
-			// performance.
-			return [
-				...features.map( ( feature, i ) => {
-					const {
-						Edit,
-						hasSupport,
-						attributeKeys = [],
-						shareWithChildBlocks,
-					} = feature;
-					const shouldDisplayControls =
-						context[ mayDisplayControlsKey ] ||
-						( context[ mayDisplayParentControlsKey ] &&
-							shareWithChildBlocks );
+		( OriginalBlockEdit ) =>
+			function WithBlockEditHooks( props ) {
+				const context = useBlockEditContext();
+				// CAUTION: code added before this line will be executed for all
+				// blocks, not just those that support the feature! Code added
+				// above this line should be carefully evaluated for its impact on
+				// performance.
+				return [
+					...features.map( ( feature, i ) => {
+						const {
+							Edit,
+							hasSupport,
+							attributeKeys = [],
+							shareWithChildBlocks,
+							supportsPatternEditing,
+						} = feature;
+						const shouldDisplayControls =
+							( supportsPatternEditing &&
+								context[
+									mayDisplayPatternEditingControlsKey
+								] ) ||
+							context[ mayDisplayControlsKey ] ||
+							( context[ mayDisplayParentControlsKey ] &&
+								shareWithChildBlocks );
 
-					if (
-						! shouldDisplayControls ||
-						! hasSupport( props.name )
-					) {
-						return null;
-					}
-
-					const neededProps = {};
-					for ( const key of attributeKeys ) {
-						if ( props.attributes[ key ] ) {
-							neededProps[ key ] = props.attributes[ key ];
+						if (
+							! shouldDisplayControls ||
+							! hasSupport( props.name )
+						) {
+							return null;
 						}
-					}
 
-					return (
-						<Edit
-							// We can use the index because the array length
-							// is fixed per page load right now.
-							key={ i }
-							name={ props.name }
-							isSelected={ props.isSelected }
-							clientId={ props.clientId }
-							setAttributes={ props.setAttributes }
-							__unstableParentLayout={
-								props.__unstableParentLayout
+						const neededProps = {};
+						for ( const key of attributeKeys ) {
+							if ( props.attributes[ key ] ) {
+								neededProps[ key ] = props.attributes[ key ];
 							}
-							// This component is pure, so only pass needed
-							// props!!!
-							{ ...neededProps }
-						/>
-					);
-				} ),
-				<OriginalBlockEdit key="edit" { ...props } />,
-			];
-		},
+						}
+
+						return (
+							<Edit
+								// We can use the index because the array length
+								// is fixed per page load right now.
+								key={ i }
+								name={ props.name }
+								isSelected={ props.isSelected }
+								clientId={ props.clientId }
+								setAttributes={ props.setAttributes }
+								__unstableParentLayout={
+									props.__unstableParentLayout
+								}
+								// This component is pure, so only pass needed
+								// props!!!
+								{ ...neededProps }
+							/>
+						);
+					} ),
+					<OriginalBlockEdit key="edit" { ...props } />,
+				];
+			},
 		'withBlockEditHooks'
 	);
 	addFilter( 'editor.BlockEdit', 'core/editor/hooks', withBlockEditHooks );
 }
 
-function BlockProps( { index, useBlockProps, setAllWrapperProps, ...props } ) {
-	const wrapperProps = useBlockProps( props );
+function BlockProps( {
+	index,
+	useBlockProps: hook,
+	setAllWrapperProps,
+	...props
+} ) {
+	const wrapperProps = hook( props );
 	const setWrapperProps = ( next ) =>
 		setAllWrapperProps( ( prev ) => {
 			const nextAll = [ ...prev ];
@@ -556,73 +617,77 @@ const BlockPropsPure = memo( BlockProps );
 
 export function createBlockListBlockFilter( features ) {
 	const withBlockListBlockHooks = createHigherOrderComponent(
-		( BlockListBlock ) => ( props ) => {
-			const [ allWrapperProps, setAllWrapperProps ] = useState(
-				Array( features.length ).fill( undefined )
-			);
-			return [
-				...features.map( ( feature, i ) => {
-					const {
-						hasSupport,
-						attributeKeys = [],
-						useBlockProps,
-					} = feature;
+		( BlockListBlock ) =>
+			function WithBlockListBlockHooks( props ) {
+				const [ allWrapperProps, setAllWrapperProps ] = useState(
+					Array( features.length ).fill( undefined )
+				);
+				return [
+					...features.map( ( feature, i ) => {
+						const {
+							hasSupport,
+							attributeKeys = [],
+							useBlockProps,
+							isMatch,
+						} = feature;
 
-					const neededProps = {};
-					for ( const key of attributeKeys ) {
-						if ( props.attributes[ key ] ) {
-							neededProps[ key ] = props.attributes[ key ];
+						const neededProps = {};
+						for ( const key of attributeKeys ) {
+							if ( props.attributes[ key ] ) {
+								neededProps[ key ] = props.attributes[ key ];
+							}
 						}
-					}
 
-					if (
-						// Skip rendering if none of the needed attributes are
-						// set.
-						! Object.keys( neededProps ).length ||
-						! hasSupport( props.name )
-					) {
-						return null;
-					}
+						if (
+							// Skip rendering if none of the needed attributes are
+							// set.
+							! Object.keys( neededProps ).length ||
+							! hasSupport( props.name ) ||
+							( isMatch && ! isMatch( neededProps ) )
+						) {
+							return null;
+						}
 
-					return (
-						<BlockPropsPure
-							// We can use the index because the array length
-							// is fixed per page load right now.
-							key={ i }
-							index={ i }
-							useBlockProps={ useBlockProps }
-							// This component is pure, so we must pass a stable
-							// function reference.
-							setAllWrapperProps={ setAllWrapperProps }
-							name={ props.name }
-							// This component is pure, so only pass needed
-							// props!!!
-							{ ...neededProps }
-						/>
-					);
-				} ),
-				<BlockListBlock
-					key="edit"
-					{ ...props }
-					wrapperProps={ allWrapperProps
-						.filter( Boolean )
-						.reduce( ( acc, wrapperProps ) => {
-							return {
-								...acc,
-								...wrapperProps,
-								className: clsx(
-									acc.className,
-									wrapperProps.className
-								),
-								style: {
-									...acc.style,
-									...wrapperProps.style,
-								},
-							};
-						}, props.wrapperProps || {} ) }
-				/>,
-			];
-		},
+						return (
+							<BlockPropsPure
+								// We can use the index because the array length
+								// is fixed per page load right now.
+								key={ i }
+								index={ i }
+								useBlockProps={ useBlockProps }
+								// This component is pure, so we must pass a stable
+								// function reference.
+								setAllWrapperProps={ setAllWrapperProps }
+								name={ props.name }
+								clientId={ props.clientId }
+								// This component is pure, so only pass needed
+								// props!!!
+								{ ...neededProps }
+							/>
+						);
+					} ),
+					<BlockListBlock
+						key="edit"
+						{ ...props }
+						wrapperProps={ allWrapperProps
+							.filter( Boolean )
+							.reduce( ( acc, wrapperProps ) => {
+								return {
+									...acc,
+									...wrapperProps,
+									className: clsx(
+										acc.className,
+										wrapperProps.className
+									),
+									style: {
+										...acc.style,
+										...wrapperProps.style,
+									},
+								};
+							}, props.wrapperProps || {} ) }
+					/>,
+				];
+			},
 		'withBlockListBlockHooks'
 	);
 	addFilter(

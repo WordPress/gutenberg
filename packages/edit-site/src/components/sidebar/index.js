@@ -16,6 +16,8 @@ import {
 import { focus } from '@wordpress/dom';
 
 export const SidebarNavigationContext = createContext( () => {} );
+SidebarNavigationContext.displayName = 'SidebarNavigationContext';
+
 // Focus a sidebar element after a navigation. The element to focus is either
 // specified by `focusSelector` (when navigating back) or it is the first
 // tabbable element (usually the "Back" button).
@@ -55,7 +57,7 @@ function createNavState() {
 	};
 }
 
-function SidebarContentWrapper( { children } ) {
+function SidebarContentWrapper( { children, shouldAnimate } ) {
 	const navState = useContext( SidebarNavigationContext );
 	const wrapperRef = useRef();
 	const [ navAnimation, setNavAnimation ] = useState( null );
@@ -66,10 +68,19 @@ function SidebarContentWrapper( { children } ) {
 		setNavAnimation( direction );
 	}, [ navState ] );
 
-	const wrapperCls = clsx( 'edit-site-sidebar__screen-wrapper', {
-		'slide-from-left': navAnimation === 'back',
-		'slide-from-right': navAnimation === 'forward',
-	} );
+	const wrapperCls = clsx(
+		'edit-site-sidebar__screen-wrapper',
+		/*
+		 * Some panes do not have sub-panes and therefore
+		 * should not animate when clicked on.
+		 */
+		shouldAnimate
+			? {
+					'slide-from-left': navAnimation === 'back',
+					'slide-from-right': navAnimation === 'forward',
+			  }
+			: {}
+	);
 
 	return (
 		<div ref={ wrapperRef } className={ wrapperCls }>
@@ -78,16 +89,25 @@ function SidebarContentWrapper( { children } ) {
 	);
 }
 
-export default function SidebarContent( { routeKey, children } ) {
+export function SidebarNavigationProvider( { children } ) {
 	const [ navState ] = useState( createNavState );
 
 	return (
 		<SidebarNavigationContext.Provider value={ navState }>
-			<div className="edit-site-sidebar__content">
-				<SidebarContentWrapper key={ routeKey }>
-					{ children }
-				</SidebarContentWrapper>
-			</div>
+			{ children }
 		</SidebarNavigationContext.Provider>
+	);
+}
+
+export function SidebarContent( { routeKey, shouldAnimate, children } ) {
+	return (
+		<div className="edit-site-sidebar__content">
+			<SidebarContentWrapper
+				shouldAnimate={ shouldAnimate }
+				key={ routeKey }
+			>
+				{ children }
+			</SidebarContentWrapper>
+		</div>
 	);
 }

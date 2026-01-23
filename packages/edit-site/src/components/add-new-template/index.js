@@ -16,16 +16,17 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { decodeEntities } from '@wordpress/html-entities';
-import { useState, memo } from '@wordpress/element';
+import { useState, memo, useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { useViewportMatch } from '@wordpress/compose';
 import {
 	archive,
 	blockMeta,
 	calendar,
 	category,
 	commentAuthorAvatar,
-	edit,
+	pencil,
 	home,
 	layout,
 	list,
@@ -40,6 +41,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { focus } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -51,7 +53,6 @@ import { TEMPLATE_POST_TYPE } from '../../utils/constants';
  */
 import AddCustomTemplateModalContent from './add-custom-template-modal-content';
 import {
-	useExistingTemplates,
 	useDefaultTemplateTypes,
 	useTaxonomiesMenuItems,
 	usePostTypeMenuItems,
@@ -106,6 +107,7 @@ function TemplateListItem( {
 } ) {
 	return (
 		<Button
+			__next40pxDefaultSize
 			className={ className }
 			onClick={ onClick }
 			label={ description }
@@ -128,6 +130,7 @@ function TemplateListItem( {
 					spacing={ 0 }
 				>
 					<Text
+						align="center"
 						weight={ 500 }
 						lineHeight={ 1.53846153846 } // 20px
 					>
@@ -159,15 +162,13 @@ function NewTemplateModal( { onClose } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
+	const containerRef = useRef( null );
+	const isMobile = useViewportMatch( 'medium', '<' );
 
-	const { homeUrl } = useSelect( ( select ) => {
-		const {
-			getUnstableBase, // Site index.
-		} = select( coreStore );
-
-		return {
-			homeUrl: getUnstableBase()?.home,
-		};
+	const homeUrl = useSelect( ( select ) => {
+		// Site index.
+		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			?.home;
 	}, [] );
 
 	const TEMPLATE_SHORT_DESCRIPTIONS = {
@@ -178,6 +179,20 @@ function NewTemplateModal( { onClose } ) {
 			homeUrl + '/' + new Date().getFullYear()
 		),
 	};
+
+	useEffect( () => {
+		// Focus the first focusable element when component mounts or UI changes
+		// We don't want to focus on the other modals because they have their own focus management.
+		if (
+			containerRef.current &&
+			modalContent === modalContentMap.templatesList
+		) {
+			const [ firstFocusable ] = focus.focusable.find(
+				containerRef.current
+			);
+			firstFocusable?.focus();
+		}
+	}, [ modalContent ] );
 
 	async function createTemplate( template, isWPSuggestion = true ) {
 		if ( isSubmitting ) {
@@ -196,23 +211,24 @@ function NewTemplateModal( { onClose } ) {
 					status: 'publish',
 					title,
 					// This adds a post meta field in template that is part of `is_custom` value calculation.
-					is_wp_suggestion: isWPSuggestion,
+					meta: {
+						is_wp_suggestion: isWPSuggestion,
+					},
 				},
 				{ throwOnError: true }
 			);
 
 			// Navigate to the created template editor.
-			history.push( {
-				postId: newTemplate.id,
-				postType: TEMPLATE_POST_TYPE,
-				canvas: 'edit',
-			} );
+			history.navigate(
+				`/${ TEMPLATE_POST_TYPE }/${ newTemplate.id }?canvas=edit`
+			);
 
 			createSuccessNotice(
 				sprintf(
-					// translators: %s: Title of the created template e.g: "Category".
+					// translators: %s: Title of the created post or template, e.g: "Hello world".
 					__( '"%s" successfully created.' ),
-					decodeEntities( newTemplate.title?.rendered || title )
+					decodeEntities( newTemplate.title?.rendered || title ) ||
+						__( '(no title)' )
 				),
 				{
 					type: 'snackbar',
@@ -262,10 +278,11 @@ function NewTemplateModal( { onClose } ) {
 					? 'edit-site-custom-generic-template__modal'
 					: undefined
 			}
+			ref={ containerRef }
 		>
 			{ modalContent === modalContentMap.templatesList && (
 				<Grid
-					columns={ 3 }
+					columns={ isMobile ? 2 : 3 }
 					gap={ 4 }
 					align="flex-start"
 					justify="center"
@@ -300,7 +317,7 @@ function NewTemplateModal( { onClose } ) {
 						title={ __( 'Custom template' ) }
 						direction="row"
 						className="edit-site-add-new-template__custom-template-button"
-						icon={ edit }
+						icon={ pencil }
 						onClick={ () =>
 							setModalContent(
 								modalContentMap.customGenericTemplate
@@ -321,12 +338,18 @@ function NewTemplateModal( { onClose } ) {
 				<AddCustomTemplateModalContent
 					onSelect={ createTemplate }
 					entityForSuggestions={ entityForSuggestions }
+					onBack={ () =>
+						setModalContent( modalContentMap.templatesList )
+					}
+					containerRef={ containerRef }
 				/>
 			) }
 			{ modalContent === modalContentMap.customGenericTemplate && (
 				<AddCustomGenericTemplateModalContent
-					onClose={ onModalClose }
 					createTemplate={ createTemplate }
+					onBack={ () =>
+						setModalContent( modalContentMap.templatesList )
+					}
 				/>
 			) }
 		</Modal>
@@ -354,6 +377,7 @@ function NewTemplate() {
 				variant="primary"
 				onClick={ () => setShowModal( true ) }
 				label={ postType.labels.add_new_item }
+				__next40pxDefaultSize
 			>
 				{ postType.labels.add_new_item }
 			</Button>
@@ -365,15 +389,9 @@ function NewTemplate() {
 }
 
 function useMissingTemplates( setEntityForSuggestions, onClick ) {
-	const existingTemplates = useExistingTemplates();
 	const defaultTemplateTypes = useDefaultTemplateTypes();
-	const existingTemplateSlugs = ( existingTemplates || [] ).map(
-		( { slug } ) => slug
-	);
 	const missingDefaultTemplates = ( defaultTemplateTypes || [] ).filter(
-		( template ) =>
-			DEFAULT_TEMPLATE_SLUGS.includes( template.slug ) &&
-			! existingTemplateSlugs.includes( template.slug )
+		( template ) => DEFAULT_TEMPLATE_SLUGS.includes( template.slug )
 	);
 	const onClickMenuItem = ( _entityForSuggestions ) => {
 		onClick?.();

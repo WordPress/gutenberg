@@ -1,4 +1,3 @@
-{{#isBasicVariant}}
 <?php
 /**
  * PHP file to use when rendering the block type on the server to show on the front end.
@@ -11,8 +10,19 @@
  * @see https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/block-api/block-metadata.md#render
  */
 
-// Generate unique id for aria-controls.
+// Generates a unique id for aria-controls.
 $unique_id = wp_unique_id( 'p-' );
+
+// Adds the global state.
+wp_interactivity_state(
+	'{{namespace}}',
+	array(
+		'isDark'    => false,
+		'darkText'  => esc_html__( 'Switch to Light', '{{textdomain}}' ),
+		'lightText' => esc_html__( 'Switch to Dark', '{{textdomain}}' ),
+		'themeText'	=> esc_html__( 'Switch to Dark', '{{textdomain}}' ),
+	)
+);
 ?>
 
 <div
@@ -20,9 +30,15 @@ $unique_id = wp_unique_id( 'p-' );
 	data-wp-interactive="{{namespace}}"
 	<?php echo wp_interactivity_data_wp_context( array( 'isOpen' => false ) ); ?>
 	data-wp-watch="callbacks.logIsOpen"
+	data-wp-class--dark-theme="state.isDark"
 >
 	<button
-		data-wp-on--click="actions.toggle"
+		data-wp-on--click="actions.toggleTheme"
+		data-wp-text="state.themeText"
+	></button>
+
+	<button
+		data-wp-on--click="actions.toggleOpen"
 		data-wp-bind--aria-expanded="context.isOpen"
 		aria-controls="<?php echo esc_attr( $unique_id ); ?>"
 	>
@@ -38,4 +54,3 @@ $unique_id = wp_unique_id( 'p-' );
 		?>
 	</p>
 </div>
-{{/isBasicVariant}}

@@ -45,7 +45,18 @@ export type AuthorSelectProps = Pick<
 };
 
 type Order = 'asc' | 'desc';
-type OrderBy = 'date' | 'title';
+type OrderBy = 'date' | 'title' | 'menu_order';
+
+export type OrderByOption = {
+	/**
+	 * The label to be shown to the user.
+	 */
+	label: string;
+	/**
+	 * Option value passed to `onChange` when the option is selected.
+	 */
+	value: `${ OrderBy }/${ Order }`;
+};
 
 type BaseQueryControlsProps = {
 	/**
@@ -100,6 +111,10 @@ type BaseQueryControlsProps = {
 	 */
 	orderBy?: OrderBy;
 	/**
+	 * List of available ordering options.
+	 */
+	orderByOptions?: OrderByOption[];
+	/**
 	 * The selected author ID.
 	 */
 	selectedAuthorId?: AuthorSelectProps[ 'selectedAuthorId' ];
@@ -107,7 +122,8 @@ type BaseQueryControlsProps = {
 	 * Start opting into the larger default height that will become the
 	 * default size in a future version.
 	 *
-	 * @default false
+	 * @deprecated Default behavior since WP 6.7. Prop can be safely removed.
+	 * @ignore
 	 */
 	__next40pxDefaultSize?: boolean;
 };

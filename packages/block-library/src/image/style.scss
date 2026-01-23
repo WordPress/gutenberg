@@ -1,9 +1,28 @@
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .wp-block-image {
+
+	> a,
+	> figure > a {
+		display: inline-block;
+	}
+
 	img {
 		height: auto;
 		max-width: 100%;
 		vertical-align: bottom;
 		box-sizing: border-box;
+
+		@media not (prefers-reduced-motion) {
+			&.hide {
+				visibility: hidden;
+			}
+
+			&.show {
+				animation: show-content-image 0.4s;
+			}
+		}
 	}
 
 	// The following style maintains border radius application for deprecated
@@ -25,6 +44,11 @@
 
 	&.aligncenter {
 		text-align: center;
+	}
+
+	&.alignfull > a,
+	&.alignwide > a {
+		width: 100%;
 	}
 
 	&.alignfull img,
@@ -78,20 +102,14 @@
 	// Supply caption styles to images, even if the theme hasn't opted in.
 	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
 	// so we supply the styles so as to not appear broken or unstyled in those themes.
-	figcaption {
+	:where(figcaption) {
 		@include caption-style();
-	}
-
-	// Variations
-	&.is-style-rounded img,
-	.is-style-rounded img {
-		// We use an absolute pixel to prevent the oval shape that a value of 50% would give
-		// to rectangular images. A pill-shape is better than otherwise.
-		border-radius: 9999px;
 	}
 
 	// The following variation is deprecated.
 	// The CSS is kept here for the time being, to support blocks using the old variation.
+	// The selector is not scoped with `:root :where()` like global styles are to keep its
+	// specificity the same as it was when it was deprecated.
 	&.is-style-circle-mask img {
 		// We use an absolute pixel to prevent the oval shape that a value of 50% would give
 		// to rectangular images. A pill-shape is better than otherwise.
@@ -108,42 +126,13 @@
 			border-radius: 0;
 		}
 	}
+}
 
-	// The following is required to overcome WP Core applying styles that clear
-	// img borders with a higher specificity than those added by the border
-	// block support to provide a default border-style of solid when a border
-	// color or width has been set.
-	:where(.has-border-color) {
-		border-style: solid;
-	}
-	:where([style*="border-top-color"]) {
-		border-top-style: solid;
-	}
-	:where([style*="border-right-color"]) {
-		border-right-style: solid;
-	}
-	:where([style*="border-bottom-color"]) {
-		border-bottom-style: solid;
-	}
-	:where([style*="border-left-color"]) {
-		border-left-style: solid;
-	}
-
-	:where([style*="border-width"]) {
-		border-style: solid;
-	}
-	:where([style*="border-top-width"]) {
-		border-top-style: solid;
-	}
-	:where([style*="border-right-width"]) {
-		border-right-style: solid;
-	}
-	:where([style*="border-bottom-width"]) {
-		border-bottom-style: solid;
-	}
-	:where([style*="border-left-width"]) {
-		border-left-style: solid;
-	}
+// Variations
+:root :where(.wp-block-image.is-style-rounded img, .wp-block-image .is-style-rounded img) {
+	// We use an absolute pixel to prevent the oval shape that a value of 50% would give
+	// to rectangular images. A pill-shape is better than otherwise.
+	border-radius: 9999px;
 }
 
 .wp-block-image figure {
@@ -181,7 +170,9 @@
 		text-align: center;
 		padding: 0;
 		border-radius: 4px;
-		transition: opacity 0.2s ease;
+		@media not (prefers-reduced-motion) {
+			transition: opacity 0.2s ease;
+		}
 
 		&:focus-visible {
 			outline: 3px auto rgb(90 90 90 / 25%);
@@ -294,21 +285,29 @@
 	// or faster than the scrim to give a sense of depth.
 	&.active {
 		visibility: visible;
-		animation: both turn-on-visibility 0.25s;
+		@media not (prefers-reduced-motion) {
+			animation: both turn-on-visibility 0.25s;
+		}
 		img {
-			animation: both turn-on-visibility 0.35s;
+			@media not (prefers-reduced-motion) {
+				animation: both turn-on-visibility 0.35s;
+			}
 		}
 	}
 	&.show-closing-animation {
 		&:not(.active) {
-			animation: both turn-off-visibility 0.35s;
+			@media not (prefers-reduced-motion) {
+				animation: both turn-off-visibility 0.35s;
+			}
 			img {
-				animation: both turn-off-visibility 0.25s;
+				@media not (prefers-reduced-motion) {
+					animation: both turn-off-visibility 0.25s;
+				}
 			}
 		}
 	}
 
-	@media (prefers-reduced-motion: no-preference) {
+	@media not (prefers-reduced-motion) {
 		&.zoom {
 			&.active {
 				opacity: 1;
@@ -341,6 +340,18 @@
 				}
 			}
 		}
+	}
+}
+
+@keyframes show-content-image {
+	0% {
+		visibility: hidden;
+	}
+	99% {
+		visibility: hidden;
+	}
+	100% {
+		visibility: visible;
 	}
 }
 

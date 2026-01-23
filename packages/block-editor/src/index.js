@@ -13,7 +13,7 @@ export {
 	getGapCSSValue as __experimentalGetGapCSSValue,
 	getShadowClassesAndStyles as __experimentalGetShadowClassesAndStyles,
 	useCachedTruthy,
-	useZoomOut,
+	useStyleOverride,
 } from './hooks';
 export * from './components';
 export * from './elements';

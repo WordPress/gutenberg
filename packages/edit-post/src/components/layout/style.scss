@@ -1,28 +1,139 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.edit-post-meta-boxes-main {
+	filter: drop-shadow(0 -1px rgba($color: #000, $alpha: 0.133)); // 0.133 = $gray-200 but with alpha.
+	// Windows High Contrast mode will show this outline, but not the shadow.
+	outline: 1px solid transparent;
+	background-color: $white;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	padding-block-start: $button-size-compact;
+}
+
+.edit-post-meta-boxes-main__presenter {
+	display: flex;
+	box-shadow: 0 $border-width $gray-300;
+	// Windows High Contrast mode will show this outline, but not the shadow.
+	outline: 1px solid transparent;
+	position: relative;
+	// Re-resizable adds an invisible overlay during resizes (apparently meant to avoid text selections)
+	// and this has to appear in front of it or else click events will be blocked on touch devices.
+	z-index: 10000;
+	inset: 0 0 auto;
+	height: $button-size-compact;
+
+	// Style reset for both toggle and separator buttons.
+	> button {
+		appearance: none;
+		padding: 0;
+		border: none;
+		outline: none;
+		background-color: transparent;
+	}
+
+	> button[aria-expanded] {
+		cursor: pointer;
+		width: 100%;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-inline: $grid-unit-30 $grid-unit-15;
+
+		&:is(:hover, :focus-visible) {
+			color: var(--wp-admin-theme-color);
+		}
+		&:focus-visible::after {
+			content: "";
+			position: absolute;
+			inset: var(--wp-admin-border-width-focus);
+			@include button-style__focus();
+		}
+		> svg {
+			fill: currentColor;
+		}
+	}
+
+	button[role="separator"] {
+		cursor: row-resize;
+		width: $grid-unit-80;
+		margin: auto;
+		position: absolute;
+		inset: 0;
+
+		&::before {
+			content: "";
+			background-color: $gray-300;
+			// Windows High Contrast mode will show this outline, but not the background-color.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
+			position: absolute;
+			inset-block: calc(50% - #{$grid-unit-05} / 2) auto;
+			transform: translateX(-50%);
+			width: inherit;
+			height: $grid-unit-05;
+			border-radius: $radius-small;
+			@media not (prefers-reduced-motion) {
+				transition: width 0.3s ease-out;
+			}
+		}
+
+		&:is(:hover, :focus-visible)::before {
+			background-color: var(--wp-admin-theme-color);
+			width: $grid-unit-80 + $grid-unit-20;
+		}
+	}
+}
+
+// Enlarge the toggle/resizable hit area on touch devices.
+@media (pointer: coarse) {
+	.edit-post-meta-boxes-main {
+		padding-block-start: $button-size;
+	}
+	.edit-post-meta-boxes-main__presenter {
+		height: $button-size;
+	}
+}
+
+.edit-post-meta-boxes-main__liner {
+	// Enable scrolling only for the split view.
+	.edit-post-meta-boxes-main & {
+		overflow: auto;
+	}
+	// Keep the contents behind the resize handle.
+	isolation: isolate;
+
+	// While resizing override hidden attribute in case starting from closed state.
+	.is-resizing.edit-post-meta-boxes-main & {
+		display: unset;
+	}
+}
+
+// In case the canvas is not iframe’d.
 .edit-post-layout__metaboxes {
-	flex-shrink: 0;
 	clear: both;
 }
 
+// Only when the split view is active the visual editor should allow shrinking and
+// its main size should be zero.
+.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main) .editor-visual-editor {
+	flex-shrink: 1;
+	flex-basis: 0%;
+}
+
+.has-metaboxes .editor-visual-editor.is-iframed {
+	isolation: isolate;
+}
+
 // Adjust the position of the notices
-.edit-post-layout .components-editor-notices__snackbar {
+.components-editor-notices__snackbar {
 	position: fixed;
 	right: 0;
-	bottom: 16px;
-	padding-left: 16px;
-	padding-right: 16px;
-}
-
-.is-distraction-free {
-	.components-editor-notices__snackbar {
-		bottom: 16px;
-	}
-}
-
-// Adjust the position of the notices when breadcrumbs are present
-.has-block-breadcrumbs {
-	.components-editor-notices__snackbar {
-		bottom: 40px;
-	}
+	bottom: 24px;
+	padding-left: 24px;
+	padding-right: 24px;
 }
 
 @include editor-left(".edit-post-layout .components-editor-notices__snackbar");

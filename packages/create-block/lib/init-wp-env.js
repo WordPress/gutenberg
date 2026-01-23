@@ -10,21 +10,19 @@ const { writeFile } = require( 'fs' ).promises;
  */
 const { info } = require( './log' );
 
-module.exports = async ( { slug } ) => {
-	const cwd = join( process.cwd(), slug );
-
+module.exports = async ( { rootDirectory } ) => {
 	info( '' );
 	info(
 		'Installing `@wordpress/env` package. It might take a couple of minutes...'
 	);
 	await command( 'npm install @wordpress/env --save-dev', {
-		cwd,
+		cwd: rootDirectory,
 	} );
 
 	info( '' );
 	info( 'Configuring `@wordpress/env`...' );
 	await writeFile(
-		join( cwd, '.wp-env.json' ),
+		join( rootDirectory, '.wp-env.json' ),
 		JSON.stringify(
 			{
 				core: 'WordPress/WordPress',

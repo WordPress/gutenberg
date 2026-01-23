@@ -25,7 +25,7 @@ test.describe( 'Site editor title', () => {
 		const title = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'heading', {
-				name: 'Editing template: Index',
+				name: 'Index',
 			} );
 
 		await expect( title ).toBeVisible();
@@ -44,7 +44,7 @@ test.describe( 'Site editor title', () => {
 		const title = page
 			.getByRole( 'region', { name: 'Editor top bar' } )
 			.getByRole( 'heading', {
-				name: 'Editing template part: header',
+				name: 'header',
 			} );
 
 		await expect( title ).toBeVisible();

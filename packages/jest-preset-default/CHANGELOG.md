@@ -2,6 +2,82 @@
 
 ## Unreleased
 
+## 12.38.0 (2026-01-16)
+
+## 12.36.0 (2025-11-26)
+
+## 12.35.0 (2025-11-12)
+
+## 12.34.0 (2025-10-29)
+
+## 12.33.0 (2025-10-17)
+
+## 12.32.0 (2025-10-01)
+
+## 12.31.0 (2025-09-17)
+
+## 12.30.0 (2025-09-03)
+
+## 12.29.0 (2025-08-20)
+
+## 12.28.0 (2025-08-07)
+
+## 12.27.0 (2025-07-23)
+
+## 12.26.0 (2025-06-25)
+
+## 12.25.0 (2025-06-04)
+
+## 12.24.0 (2025-05-22)
+
+## 12.23.0 (2025-05-07)
+
+## 12.22.0 (2025-04-11)
+
+## 12.21.0 (2025-03-27)
+
+## 12.20.0 (2025-03-13)
+
+## 12.19.0 (2025-02-28)
+
+## 12.18.0 (2025-02-12)
+
+## 12.17.0 (2025-01-29)
+
+## 12.16.0 (2025-01-15)
+
+## 12.15.0 (2025-01-02)
+
+## 12.14.0 (2024-12-11)
+
+## 12.13.0 (2024-11-27)
+
+## 12.12.0 (2024-11-16)
+
+## 12.11.0 (2024-10-30)
+
+## 12.10.0 (2024-10-16)
+
+## 12.9.0 (2024-10-03)
+
+## 12.8.0 (2024-09-19)
+
+## 12.7.0 (2024-09-05)
+
+## 12.6.0 (2024-08-21)
+
+## 12.5.0 (2024-08-07)
+
+## 12.4.0 (2024-07-24)
+
+## 12.3.0 (2024-07-10)
+
+## 12.2.0 (2024-06-26)
+
+## 12.1.0 (2024-06-15)
+
+## 12.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Variables like `process.env.IS_GUTENBERG_PLUGIN` have been replaced by `globalThis.IS_GUTENBERG_PLUGIN`. Build systems using `process.env` should be updated ([#61486](https://github.com/WordPress/gutenberg/pull/61486)).
@@ -91,7 +167,7 @@
 
 ## 10.0.0 (2022-10-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Testing: Remove enzyme completely ([#44494](https://github.com/WordPress/gutenberg/pull/44494)). See the [example in the README](./README.md#using-enzyme) for instructions on how to continue using `enzyme` in your project.
 
@@ -99,23 +175,23 @@
 
 ## 9.0.0 (2022-08-24)
 
-### Breaking Change
+### Breaking Changes
 
 -   Increase the minimum Node.js version to 14 ([#43141](https://github.com/WordPress/gutenberg/pull/43141)).
 
-### Bug Fix
+### Bug Fixes
 
 -   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
 ## 8.5.2 (2022-08-17)
 
-### Bug Fix
+### Bug Fixes
 
 -   Jest Preset: Improve `is-plain-obj` transformation ignore ([#43271](https://github.com/WordPress/gutenberg/pull/43271)).
 
 ## 8.5.1 (2022-08-12)
 
-### Bug Fix
+### Bug Fixes
 
 -   Jest Preset: Ignore `is-plain-obj` transformation ([#43179](https://github.com/WordPress/gutenberg/pull/43179)).
 
@@ -132,13 +208,13 @@
 
 ## 7.1.2 (2021-10-22)
 
-### Bug Fix
+### Bug Fixes
 
 -   Provide more complete mocks of browser timing functions. ([#35368](https://github.com/WordPress/gutenberg/pull/35368))
 
 ## 7.1.1 (2021-09-09)
 
-### Bug Fix
+### Bug Fixes
 
 -   Restore the default setting for the `verbose` option. In effect, each test won't get reported during the run ([#34327](https://github.com/WordPress/gutenberg/pull/34327)).
 
@@ -217,13 +293,13 @@
 
 ## 3.0.0 (2018-11-03)
 
-### Breaking Change
+### Breaking Changes
 
 -   Remove coverage support.
 
 ## 2.0.0 (2018-07-12)
 
-### Breaking Change
+### Breaking Changes
 
 -   Updated code to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 
@@ -233,13 +309,13 @@
 
 ## 1.0.6 (2018-05-18)
 
-### Polish
+### Internal
 
 -   Fix: Standardized `package.json` format ([#119](https://github.com/WordPress/packages/pull/119))
 
 ## 1.0.5 (2018-03-22)
 
-### Polish
+### Internal
 
 -   Docs: Wrap filename in backticks ([#89](https://github.com/WordPress/packages/pull/89))
 -   Add `jest-preset` keyword to `jest-preset-default` package ([#92](https://github.com/WordPress/packages/pull/92))

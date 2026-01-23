@@ -18,12 +18,19 @@ export type Border = {
 
 export type ColorProps = Pick<
 	ColorPaletteProps,
-	'colors' | 'enableAlpha' | '__experimentalIsRenderedInSidebar'
+	'colors' | '__experimentalIsRenderedInSidebar'
 > & {
 	/**
 	 * This toggles the ability to choose custom colors.
 	 */
 	disableCustomColors?: boolean;
+	/**
+	 * This controls whether the alpha channel will be offered when selecting
+	 * custom colors.
+	 *
+	 * @default true
+	 */
+	enableAlpha?: boolean;
 };
 
 export type LabelProps = {
@@ -78,9 +85,8 @@ export type BorderControlProps = ColorProps &
 		 */
 		shouldSanitizeBorder?: boolean;
 		/**
-		 * Whether or not to show the header for the border color and style
-		 * picker dropdown. The header includes a label for the color picker
-		 * and a close button.
+		 * @deprecated This prop no longer has any effect.
+		 * @ignore
 		 */
 		showDropdownHeader?: boolean;
 		/**
@@ -110,6 +116,13 @@ export type BorderControlProps = ColorProps &
 		 * @default false
 		 */
 		__next40pxDefaultSize?: boolean;
+		/**
+		 * Do not throw a warning for the deprecated 36px default size.
+		 * For internal components of other components that already throw the warning.
+		 *
+		 * @ignore
+		 */
+		__shouldNotWarnDeprecated36pxSize?: boolean;
 	};
 
 export type DropdownProps = ColorProps &
@@ -139,9 +152,8 @@ export type DropdownProps = ColorProps &
 		 */
 		previousStyleSelection?: string;
 		/**
-		 * Whether or not to render a header for the border color and style picker
-		 * dropdown. The header includes a label for the color picker and a
-		 * close button.
+		 * @deprecated This prop no longer has any effect.
+		 * @ignore
 		 */
 		showDropdownHeader?: boolean;
 	};

@@ -75,7 +75,7 @@ export default function QuoteEdit( {
 	style,
 	isSelected,
 } ) {
-	const { textAlign } = attributes;
+	const { textAlign, allowedBlocks } = attributes;
 
 	useMigrateOnLoad( attributes, clientId );
 
@@ -90,6 +90,7 @@ export default function QuoteEdit( {
 		templateInsertUpdatesSelection: true,
 		__experimentalCaptureToolbars: true,
 		renderAppender: false,
+		allowedBlocks,
 	} );
 
 	return (
@@ -121,6 +122,7 @@ export default function QuoteEdit( {
 					}
 					addLabel={ __( 'Add citation' ) }
 					removeLabel={ __( 'Remove citation' ) }
+					excludeElementClassName
 					className="wp-block-quote__citation"
 					insertBlocksAfter={ insertBlocksAfter }
 					{ ...( ! isWebPlatform ? { textAlign } : {} ) }

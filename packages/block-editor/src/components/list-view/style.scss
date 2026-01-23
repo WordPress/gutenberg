@@ -1,3 +1,8 @@
+@use "@wordpress/base-styles/animations" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
 .block-editor-list-view-tree {
 	width: 100%;
 	border-collapse: collapse;
@@ -41,6 +46,15 @@
 		&:hover {
 			color: var(--wp-admin-theme-color);
 		}
+
+		svg {
+			fill: currentColor;
+			// Optimize for high contrast modes.
+			// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
+			@media (forced-colors: active) {
+				fill: CanvasText;
+			}
+		}
 	}
 
 	&:not(.is-selected) .block-editor-list-view-block-select-button {
@@ -69,10 +83,7 @@
 		}
 
 		&:focus::after {
-			box-shadow:
-				inset 0 0 0 1px $white,
-				0 0 0 var(--wp-admin-border-width-focus)
-				var(--wp-block-synced-color);
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-block-synced-color);
 		}
 	}
 	&.is-selected .block-editor-list-view-block-contents,
@@ -101,16 +112,16 @@
 
 	// Border radius for corners of the selected item.
 	&.is-first-selected td:first-child {
-		border-top-left-radius: $radius-block-ui;
+		border-top-left-radius: $radius-small;
 	}
 	&.is-first-selected td:last-child {
-		border-top-right-radius: $radius-block-ui;
+		border-top-right-radius: $radius-small;
 	}
 	&.is-last-selected td:first-child {
-		border-bottom-left-radius: $radius-block-ui;
+		border-bottom-left-radius: $radius-small;
 	}
 	&.is-last-selected td:last-child {
-		border-bottom-right-radius: $radius-block-ui;
+		border-bottom-right-radius: $radius-small;
 	}
 	&.is-branch-selected:not(.is-selected):not(.is-synced-branch) {
 		background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
@@ -119,23 +130,23 @@
 		background: rgba(var(--wp-block-synced-color--rgb), 0.04);
 	}
 	&.is-branch-selected.is-first-selected td:first-child {
-		border-top-left-radius: $radius-block-ui;
+		border-top-left-radius: $radius-small;
 	}
 	&.is-branch-selected.is-first-selected td:last-child {
-		border-top-right-radius: $radius-block-ui;
+		border-top-right-radius: $radius-small;
 	}
 	&[data-expanded="false"] {
 		&.is-branch-selected.is-first-selected td:first-child {
-			border-top-left-radius: $radius-block-ui;
+			border-top-left-radius: $radius-small;
 		}
 		&.is-branch-selected.is-first-selected td:last-child {
-			border-top-right-radius: $radius-block-ui;
+			border-top-right-radius: $radius-small;
 		}
 		&.is-branch-selected.is-last-selected td:first-child {
-			border-bottom-left-radius: $radius-block-ui;
+			border-bottom-left-radius: $radius-small;
 		}
 		&.is-branch-selected.is-last-selected td:last-child {
-			border-bottom-right-radius: $radius-block-ui;
+			border-bottom-right-radius: $radius-small;
 		}
 	}
 	&.is-branch-selected:not(.is-selected) td {
@@ -149,21 +160,27 @@
 	// without attaching the transition to the list view leaf itself. This prevents rows
 	// from animating too much once the user has dropped the block.
 	&.is-displacement-normal {
-		transition: transform 0.2s;
+		@media not ( prefers-reduced-motion ) {
+			transition: transform 0.2s;
+		}
 		transform: translateY(0);
-		@include reduce-motion("transition");
+
 	}
 
 	&.is-displacement-up {
-		transition: transform 0.2s;
+		@media not ( prefers-reduced-motion ) {
+			transition: transform 0.2s;
+		}
 		transform: translateY(-32px);
-		@include reduce-motion("transition");
+
 	}
 
 	&.is-displacement-down {
-		transition: transform 0.2s;
+		@media not ( prefers-reduced-motion ) {
+			transition: transform 0.2s;
+		}
 		transform: translateY(32px);
-		@include reduce-motion("transition");
+
 	}
 
 	// Collapse multi-selections down into a single row space while dragging. The following
@@ -171,23 +188,30 @@
 	// when displacing up and down. The result is that there should only ever be a single row's
 	// worth of space for the visual indicator of where a block will be placed when dropped.
 	&.is-after-dragged-blocks {
-		transition: transform 0.2s;
+
+		@media not ( prefers-reduced-motion ) {
+			transition: transform 0.2s;
+		}
 		transform: translateY(calc(var(--wp-admin--list-view-dragged-items-height, 32px) * -1));
-		@include reduce-motion("transition");
+
 	}
 
 	&.is-after-dragged-blocks.is-displacement-up {
-		transition: transform 0.2s;
+		@media not ( prefers-reduced-motion ) {
+			transition: transform 0.2s;
+		}
 		transform: translateY(calc(-32px + var(--wp-admin--list-view-dragged-items-height, 32px) * -1));
-		@include reduce-motion("transition");
+
 	}
 
 	&.is-after-dragged-blocks.is-displacement-down {
-		transition: transform 0.2s;
+		@media not ( prefers-reduced-motion ) {
+			transition: transform 0.2s;
+		}
 		transform:
 			translateY(calc(32px + var(--wp-admin--list-view-dragged-items-height, 32px) *
 			-1));
-		@include reduce-motion("transition");
+
 	}
 
 	// To ensure displaced rows behave correctly, ensure that blocks that are currently being dragged
@@ -214,22 +238,18 @@
 		height: $grid-unit-40;
 		padding: ($grid-unit-15 * 0.5) $grid-unit-05 ($grid-unit-15 * 0.5) 0;
 		text-align: left;
-		border-radius: $radius-block-ui;
 		position: relative;
 		white-space: nowrap;
-
-		&.is-dropping-before::before {
-			content: "";
-			position: absolute;
-			pointer-events: none;
-			transition:
-				border-color 0.1s linear,
-				border-style 0.1s linear,
-				box-shadow 0.1s linear;
-			top: -2px;
-			right: 0;
-			left: 0;
-			border-top: 4px solid var(--wp-admin-theme-color);
+		border-radius: 2px;
+		box-sizing: border-box;
+		color: inherit;
+		font-family: inherit;
+		font-size: 13px;
+		font-weight: 400;
+		margin: 0;
+		text-decoration: none;
+		@media not ( prefers-reduced-motion ) {
+			transition: box-shadow 0.1s linear;
 		}
 
 		.components-modal__content & {
@@ -273,7 +293,7 @@
 
 	&.is-visible .block-editor-list-view-block-contents {
 		opacity: 1;
-		@include edit-post__fade-in-animation;
+		@include animation__fade-in;
 	}
 
 	.block-editor-block-icon {
@@ -290,7 +310,7 @@
 	.block-editor-list-view-block__menu-cell,
 	.block-editor-list-view-block__mover-cell {
 		line-height: 0;
-		width: $button-size;
+		width: $button-size-small + $grid-unit-05;
 		vertical-align: middle;
 
 		> * {
@@ -304,21 +324,6 @@
 			> * {
 				opacity: 1;
 			}
-		}
-
-		&,
-		.components-button.has-icon {
-			width: $button-size-small;
-			min-width: $button-size-small;
-			padding: 0;
-		}
-	}
-
-	.block-editor-list-view-block__menu-cell {
-		padding-right: $grid-unit-05;
-
-		.components-button.has-icon {
-			height: 24px;
 		}
 	}
 
@@ -405,18 +410,16 @@
 		position: absolute;
 		right: 0;
 		transform: translateY(-50%);
-		background: rgba($black, 0.1);
-		border-radius: $radius-block-ui;
-		padding: 2px 6px;
-		max-width: 100%;
-		box-sizing: border-box;
 	}
 
 	&.is-selected .block-editor-list-view-block-select-button__anchor {
 		background: rgba($black, 0.3);
+		color: $white;
 	}
 
-	.block-editor-list-view-block-select-button__lock {
+	.block-editor-list-view-block-select-button__block-visibility,
+	.block-editor-list-view-block-select-button__lock,
+	.block-editor-list-view-block-select-button__sticky {
 		line-height: 0;
 	}
 
@@ -428,10 +431,10 @@
 		background-size: cover;
 		width: 18px;
 		height: 18px;
-		border-radius: $radius-block-ui;
+		border-radius: $radius-x-small;
 
 		&:not(:only-child) {
-			box-shadow: 0 0 0 $radius-block-ui $white;
+			box-shadow: 0 0 0 $radius-small $white;
 		}
 
 		&:not(:first-child) {
@@ -441,7 +444,7 @@
 
 	&.is-selected .block-editor-list-view-block-select-button__image {
 		&:not(:only-child) {
-			box-shadow: 0 0 0 $radius-block-ui var(--wp-admin-theme-color);
+			box-shadow: 0 0 0 $radius-small var(--wp-admin-theme-color);
 		}
 	}
 }
@@ -480,7 +483,7 @@ $block-navigation-max-indent: 8;
 	.block-editor-list-view-leaf[aria-level="#{ $i + 1 }"]
 	.block-editor-list-view__expander {
 		@if $i - 1 >= 0 {
-			margin-left: ($grid-unit-30 * $i); // Effectivly centers the expander below the parent's icon.
+			margin-left: ($grid-unit-30 * $i); // Effectively centers the expander below the parent's icon.
 		} @else {
 			margin-left: 0;
 		}
@@ -496,9 +499,10 @@ $block-navigation-max-indent: 8;
 .block-editor-list-view__expander
 svg {
 	visibility: visible;
-	transition: transform 0.2s ease;
+	@media not ( prefers-reduced-motion ) {
+		transition: transform 0.2s ease;
+	}
 	transform: rotate(90deg);
-	@include reduce-motion("transition");
 }
 
 // Point rightwards when closed
@@ -507,8 +511,9 @@ svg {
 svg {
 	visibility: visible;
 	transform: rotate(0deg);
-	transition: transform 0.2s ease;
-	@include reduce-motion("transition");
+	@media not ( prefers-reduced-motion ) {
+		transition: transform 0.2s ease;
+	}
 }
 
 .block-editor-list-view-drop-indicator {
@@ -549,13 +554,17 @@ svg {
 }
 
 .list-view-appender .block-editor-inserter__toggle {
-	background-color: #1e1e1e;
-	color: #fff;
-	margin: $grid-unit-10 0 0 24px;
-	border-radius: 2px;
-	height: 24px;
-	min-width: 24px;
+	background-color: $gray-900;
+	color: $white;
+	margin: $grid-unit-10 0 0 $grid-unit-30;
+	height: $button-size-small;
 	padding: 0;
+
+	// TODO: Consider passing size="small" to the Inserter toggle instead.
+	// Special dimensions for this button.
+	&.has-icon.is-next-40px-default-size {
+		min-width: $button-size-small;
+	}
 
 	&:hover,
 	&:focus {

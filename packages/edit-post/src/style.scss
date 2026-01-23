@@ -1,25 +1,11 @@
-@import "./components/header/style.scss";
-@import "./components/header/fullscreen-mode-close/style.scss";
-@import "./components/layout/style.scss";
-@import "./components/meta-boxes/meta-boxes-area/style.scss";
-@import "./components/visual-editor/style.scss";
-@import "./components/welcome-guide/style.scss";
-
-/**
- * Animations
- */
-
-// These keyframes should not be part of the _animations.scss mixins file.
-// Because keyframe animations can't be defined as mixins properly, they are duplicated.
-// Since hey are intended only for the editor, we add them here instead.
-@keyframes edit-post__fade-in-animation {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
-}
+@use "@wordpress/base-styles/default-custom-properties";
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/admin-ui/build-style/style.css" as *;
+@use "./components/back-button/style.scss" as *;
+@use "./components/layout/style.scss" as *;
+@use "./components/meta-boxes/meta-boxes-area/style.scss" as *;
+@use "./components/welcome-guide/style.scss" as *;
 
 body.js.block-editor-page {
 	@include wp-admin-reset( ".block-editor" );
@@ -33,11 +19,7 @@ body.js.block-editor-page {
 	}
 }
 
-// Target the editor UI excluding the visual editor contents, metaboxes and custom fields areas.
-.editor-header,
-.editor-text-editor,
-.editor-sidebar,
-.editor-post-publish-panel {
+.edit-post-visual-editor.is-iframed {
 	@include reset;
 }
 
@@ -67,5 +49,3 @@ body.js.block-editor-page {
 		height: auto;
 	}
 }
-
-@include wordpress-admin-schemes();

@@ -11,8 +11,8 @@ import { parseQuantityAndUnitFromRawValue } from '../../unit-control/utils';
 import type { WordPressComponentProps } from '../../context';
 import { useContextSystem } from '../../context';
 import { useCx } from '../../utils/hooks/use-cx';
-
 import type { Border, BorderControlProps } from '../types';
+import { maybeWarnDeprecated36pxSize } from '../../utils/deprecated-36px-size';
 
 // If either width or color are defined, the border is considered valid
 // and a border style can be set as well.
@@ -38,8 +38,16 @@ export function useBorderControl(
 		width,
 		__experimentalIsRenderedInSidebar = false,
 		__next40pxDefaultSize,
+		__shouldNotWarnDeprecated36pxSize,
 		...otherProps
 	} = useContextSystem( props, 'BorderControl' );
+
+	maybeWarnDeprecated36pxSize( {
+		componentName: 'BorderControl',
+		__next40pxDefaultSize,
+		size,
+		__shouldNotWarnDeprecated36pxSize,
+	} );
 
 	const computedSize =
 		size === 'default' && __next40pxDefaultSize ? '__unstable-large' : size;

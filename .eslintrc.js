@@ -1,23 +1,5 @@
-/**
- * External dependencies
- */
-const glob = require( 'glob' ).sync;
 const { join } = require( 'path' );
-
-/**
- * Internal dependencies
- */
-const { version } = require( './package' );
-
-/**
- * Regular expression string matching a SemVer string with equal major/minor to
- * the current package version. Used in identifying deprecations.
- *
- * @type {string}
- */
-const majorMinorRegExp =
-	version.replace( /\.\d+$/, '' ).replace( /[\\^$.*+?()[\]{}|]/g, '\\$&' ) +
-	'(\\.\\d+)?';
+const glob = require( 'glob' ).sync;
 
 /**
  * The list of patterns matching files used only for development purposes.
@@ -29,6 +11,8 @@ const developmentFiles = [
 	'**/@(__mocks__|__tests__|test)/**/*.[tj]s?(x)',
 	'**/@(storybook|stories)/**/*.[tj]s?(x)',
 	'packages/babel-preset-default/bin/**/*.js',
+	'packages/theme/bin/**/*.[tj]s?(x)',
+	'packages/theme/terrazzo.config.ts',
 ];
 
 // All files from packages that have types provided with TypeScript.
@@ -83,6 +67,47 @@ const restrictedImports = [
 	},
 ];
 
+const restrictedSyntax = [
+	{
+		selector:
+			'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
+		message:
+			'This method is deprecated. You should use the more explicit API methods available.',
+	},
+	{
+		selector:
+			'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
+		message: 'Prefer page.waitForSelector instead.',
+	},
+	{
+		selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
+		message: 'Do not use string literals for IDs; use useId hook instead.',
+	},
+	{
+		selector:
+			'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
+		message:
+			'withDispatch must return an object with consistent keys. Avoid performing logic in `mapDispatchToProps`.',
+	},
+	{
+		selector:
+			'LogicalExpression[operator="&&"][left.property.name="length"][right.type="JSXElement"]',
+		message:
+			'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
+	},
+	{
+		selector:
+			'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] > Literal[value=/toggle\\b/i]',
+		message: "Avoid using the verb 'Toggle' in translatable strings",
+	},
+	{
+		selector:
+			'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] > Literal[value=/(?<![-\\w])sidebar(?![-\\w])/i]',
+		message:
+			"Avoid using the word 'sidebar' in translatable strings. Consider using 'panel' instead.",
+	},
+];
+
 module.exports = {
 	root: true,
 	extends: [
@@ -90,6 +115,7 @@ module.exports = {
 		'plugin:eslint-comments/recommended',
 		'plugin:storybook/recommended',
 	],
+	plugins: [ 'react-compiler' ],
 	globals: {
 		wp: 'off',
 		globalThis: 'readonly',
@@ -98,15 +124,19 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
-		'import/internal-regex': null,
 		'import/resolver': require.resolve( './tools/eslint/import-resolver' ),
 	},
 	rules: {
 		'jest/expect-expect': 'off',
 		'react/jsx-boolean-value': 'error',
-		'@wordpress/dependency-group': 'error',
+		'react/jsx-curly-brace-presence': [
+			'error',
+			{ props: 'never', children: 'never' },
+		],
 		'@wordpress/wp-global-usage': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
+		'@wordpress/i18n-hyphenated-range': 'error',
+		'@wordpress/i18n-no-flanking-whitespace': 'error',
 		'@wordpress/i18n-text-domain': [
 			'error',
 			{
@@ -115,6 +145,7 @@ module.exports = {
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
 		'@wordpress/data-no-store-string-literals': 'error',
+		'eslint-comments/no-unused-disable': 'error',
 		'import/default': 'error',
 		'import/named': 'error',
 		'no-restricted-imports': [
@@ -143,61 +174,20 @@ module.exports = {
 				disallowTypeAnnotations: false,
 			},
 		],
-		'no-restricted-syntax': [
+		'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+		'jsdoc/check-tag-names': [
 			'error',
-			// NOTE: We can't include the forward slash in our regex or
-			// we'll get a `SyntaxError` (Invalid regular expression: \ at end of pattern)
-			// here. That's why we use \\u002F in the regexes below.
 			{
-				selector:
-					'ImportDeclaration[source.value=/^@wordpress\\u002F.+\\u002F/]',
-				message:
-					'Path access on WordPress dependencies is not allowed.',
+				definedTags: [ 'jest-environment' ],
 			},
+		],
+		'react-compiler/react-compiler': [
+			'error',
 			{
-				selector:
-					'CallExpression[callee.name="deprecated"] Property[key.name="version"][value.value=/' +
-					majorMinorRegExp +
-					'/]',
-				message:
-					'Deprecated functions must be removed before releasing this version.',
-			},
-			{
-				selector:
-					'CallExpression[callee.object.name="page"][callee.property.name="waitFor"]',
-				message:
-					'This method is deprecated. You should use the more explicit API methods available.',
-			},
-			{
-				selector:
-					'CallExpression[callee.object.name="page"][callee.property.name="waitForTimeout"]',
-				message: 'Prefer page.waitForSelector instead.',
-			},
-			{
-				selector: 'JSXAttribute[name.name="id"][value.type="Literal"]',
-				message:
-					'Do not use string literals for IDs; use withInstanceId instead.',
-			},
-			{
-				// Discourage the usage of `Math.random()` as it's a code smell
-				// for UUID generation, for which we already have a higher-order
-				// component: `withInstanceId`.
-				selector:
-					'CallExpression[callee.object.name="Math"][callee.property.name="random"]',
-				message:
-					'Do not use Math.random() to generate unique IDs; use withInstanceId instead. (If you’re not generating unique IDs: ignore this message.)',
-			},
-			{
-				selector:
-					'CallExpression[callee.name="withDispatch"] > :function > BlockStatement > :not(VariableDeclaration,ReturnStatement)',
-				message:
-					'withDispatch must return an object with consistent keys. Avoid performing logic in `mapDispatchToProps`.',
-			},
-			{
-				selector:
-					'LogicalExpression[operator="&&"][left.property.name="length"][right.type="JSXElement"]',
-				message:
-					'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
+				environment: {
+					enableTreatRefLikeIdentifiersAsRefs: true,
+					validateRefAccessDuringRender: false,
+				},
 			},
 		],
 	},
@@ -214,6 +204,7 @@ module.exports = {
 				'import/no-unresolved': 'off',
 				'import/named': 'off',
 				'@wordpress/data-no-store-string-literals': 'off',
+				'react-compiler/react-compiler': 'off',
 			},
 		},
 		{
@@ -251,14 +242,25 @@ module.exports = {
 		},
 		{
 			files: [
-				// Components package.
-				'packages/components/src/**/*.[tj]s?(x)',
-				// Navigation block.
-				'packages/block-library/src/navigation/**/*.[tj]s?(x)',
+				'packages/*/src/**/*.[tj]s?(x)',
+				'storybook/stories/**/*.[tj]s?(x)',
 			],
-			excludedFiles: [ ...developmentFiles ],
+			excludedFiles: [ '**/*.@(android|ios|native).[tj]s?(x)' ],
 			rules: {
-				'react-hooks/exhaustive-deps': 'error',
+				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+				'@wordpress/components-no-unsafe-button-disabled': 'error',
+			},
+		},
+		{
+			files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
+			excludedFiles: [
+				'packages/*/src/**/@(test|stories)/**',
+				'**/*.@(android|ios|native).[tj]s?(x)',
+			],
+			rules: {
+				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+				'@wordpress/components-no-unsafe-button-disabled': 'error',
+				'@wordpress/components-no-missing-40px-size-prop': 'error',
 			},
 		},
 		{
@@ -336,7 +338,12 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js', 'bin/**/*.mjs', 'packages/env/**' ],
+			files: [
+				'bin/**/*.js',
+				'bin/**/*.mjs',
+				'packages/env/**',
+				'packages/theme/bin/**/*.[tj]s?(x)',
+			],
 			rules: {
 				'no-console': 'off',
 			},
@@ -348,10 +355,26 @@ module.exports = {
 				'jsdoc/valid-types': 'off',
 			},
 		},
+		// Progressively opting in to stricter rules for enforcing file
+		// extensions matching the presence of JSX syntax. This should be
+		// expanded and eventually enforced on all files.
 		{
 			files: [
-				'**/@(storybook|stories)/*',
+				'**/@(storybook|stories)/**',
 				'packages/components/src/**/*.tsx',
+			],
+			rules: {
+				'react/jsx-filename-extension': [
+					'error',
+					{ extensions: [ '.jsx', '.tsx' ] },
+				],
+			},
+		},
+		{
+			files: [
+				'**/@(storybook|stories)/**',
+				'packages/components/src/**/*.tsx',
+				'packages/ui/src/**/*.tsx',
 			],
 			rules: {
 				// Useful to add story descriptions via JSDoc without specifying params,
@@ -368,6 +391,7 @@ module.exports = {
 			rules: {
 				'no-restricted-syntax': [
 					'error',
+					...restrictedSyntax,
 					{
 						selector:
 							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
@@ -385,10 +409,60 @@ module.exports = {
 			},
 		},
 		{
+			// Override the @wordpress/components-* rules by adding the
+			// `checkLocalImports` flag, which adds the linting also to relative
+			// imports.
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ '**/*.@(android|ios|native).[tj]s?(x)' ],
+			rules: {
+				'@wordpress/components-no-unsafe-button-disabled': [
+					'error',
+					{ checkLocalImports: true },
+				],
+				'@wordpress/components-no-missing-40px-size-prop': [
+					'error',
+					{ checkLocalImports: true },
+				],
+			},
+		},
+		{
 			files: [ 'packages/components/src/**' ],
 			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
 			plugins: [ 'ssr-friendly' ],
 			extends: [ 'plugin:ssr-friendly/recommended' ],
+		},
+		{
+			files: [
+				'packages/block-editor/src/**',
+				'packages/components/src/**',
+				'packages/dataviews/src/**',
+				'packages/ui/src/**',
+			],
+			excludedFiles: [ '**/@(test|stories)/**', '*.native.*' ],
+			rules: {
+				// Enforce display names for easier debugging and better storybook integration.
+				'react/display-name': 'error',
+			},
+		},
+		{
+			files: [ 'packages/components/src/**', 'packages/ui/src/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					// The `ariakit` and `framer-motion` APIs are meant to be consumed via
+					// the `@wordpress/components` and @wordpress/ui` packages, hence why
+					// importing those imports should be allowed only in those packages.
+					{
+						paths: restrictedImports.filter(
+							( { name } ) =>
+								! [
+									'@ariakit/react',
+									'framer-motion',
+								].includes( name )
+						),
+					},
+				],
+			},
 		},
 		{
 			files: [ 'packages/block-editor/**' ],
@@ -434,6 +508,7 @@ module.exports = {
 		{
 			files: [ 'packages/interactivity*/src/**' ],
 			rules: {
+				'react-compiler/react-compiler': 'off',
 				'react/react-in-jsx-scope': 'error',
 			},
 		},

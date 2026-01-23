@@ -1,7 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, getElement } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getElement,
+	withSyncEvent,
+	withScope,
+} from '@wordpress/interactivity';
+
+/**
+ * Internal dependencies
+ */
+import { IMAGE_PRELOAD_DELAY } from './constants';
 
 /**
  * Tracks whether user is touching screen; used to differentiate behavior for
@@ -20,26 +31,40 @@ let isTouching = false;
 let lastTouchTime = 0;
 
 /**
- * Stores the image reference of the currently opened lightbox.
+ * Returns the appropriate src URL for an image.
  *
- * @type {HTMLElement}
+ * @param {string} uploadedSrc - Full size image src.
+ * @return {string} The source URL.
  */
-let imageRef;
+function getImageSrc( { uploadedSrc } ) {
+	return (
+		uploadedSrc ||
+		'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
+	);
+}
 
 /**
- * Stores the button reference of the currently opened lightbox.
+ * Returns the appropriate srcset for an image.
  *
- * @type {HTMLElement}
+ * @param {string} lightboxSrcset - Image srcset.
+ * @return {string} The srcset value.
  */
-let buttonRef;
+function getImageSrcset( { lightboxSrcset } ) {
+	return lightboxSrcset || '';
+}
 
 const { state, actions, callbacks } = store(
 	'core/image',
 	{
 		state: {
-			currentImage: {},
+			currentImageId: null,
+			preloadTimers: new Map(),
+			preloadedImageIds: new Set(),
+			get currentImage() {
+				return state.metadata[ state.currentImageId ];
+			},
 			get overlayOpened() {
-				return state.currentImage.currentSrc;
+				return state.currentImageId !== null;
 			},
 			get roleAttribute() {
 				return state.overlayOpened ? 'dialog' : null;
@@ -48,9 +73,18 @@ const { state, actions, callbacks } = store(
 				return state.overlayOpened ? 'true' : null;
 			},
 			get enlargedSrc() {
+				return getImageSrc( state.currentImage );
+			},
+			get enlargedSrcset() {
+				return getImageSrcset( state.currentImage );
+			},
+			get figureStyles() {
 				return (
-					state.currentImage.uploadedSrc ||
-					'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='
+					state.overlayOpened &&
+					`${ state.currentImage.figureStyles?.replace(
+						/margin[^;]*;?/g,
+						''
+					) };`
 				);
 			},
 			get imgStyles() {
@@ -62,33 +96,53 @@ const { state, actions, callbacks } = store(
 					) }; object-fit:cover;`
 				);
 			},
+			get imageButtonRight() {
+				const { imageId } = getContext();
+				return state.metadata[ imageId ].imageButtonRight;
+			},
+			get imageButtonTop() {
+				const { imageId } = getContext();
+				return state.metadata[ imageId ].imageButtonTop;
+			},
+			get isContentHidden() {
+				const ctx = getContext();
+				return (
+					state.overlayEnabled && state.currentImageId === ctx.imageId
+				);
+			},
+			get isContentVisible() {
+				const ctx = getContext();
+				return (
+					! state.overlayEnabled &&
+					state.currentImageId === ctx.imageId
+				);
+			},
 		},
 		actions: {
 			showLightbox() {
-				const ctx = getContext();
+				const { imageId } = getContext();
 
 				// Bails out if the image has not loaded yet.
-				if ( ! ctx.imageRef?.complete ) {
+				if ( ! state.metadata[ imageId ].imageRef?.complete ) {
 					return;
 				}
 
-				// Stores the positons of the scroll to fix it until the overlay is
+				// Stores the positions of the scroll to fix it until the overlay is
 				// closed.
 				state.scrollTopReset = document.documentElement.scrollTop;
 				state.scrollLeftReset = document.documentElement.scrollLeft;
 
-				// Moves the information of the expaned image to the state.
-				ctx.currentSrc = ctx.imageRef.currentSrc;
-				imageRef = ctx.imageRef;
-				buttonRef = ctx.buttonRef;
-				state.currentImage = ctx;
+				// Sets the current expanded image in the state and enables the overlay.
 				state.overlayEnabled = true;
+				state.currentImageId = imageId;
 
 				// Computes the styles of the overlay for the animation.
 				callbacks.setOverlayStyles();
 			},
 			hideLightbox() {
 				if ( state.overlayEnabled ) {
+					state.overlayEnabled = false;
+
 					// Waits until the close animation has completed before allowing a
 					// user to scroll again. The duration of this animation is defined in
 					// the `styles.scss` file, but in any case we should wait a few
@@ -98,23 +152,16 @@ const { state, actions, callbacks } = store(
 						// Delays before changing the focus. Otherwise the focus ring will
 						// appear on Firefox before the image has finished animating, which
 						// looks broken.
-						buttonRef.focus( {
+						state.currentImage.buttonRef.focus( {
 							preventScroll: true,
 						} );
 
-						// Resets the current image to mark the overlay as closed.
-						state.currentImage = {};
-						imageRef = null;
-						buttonRef = null;
+						// Resets the current image id to mark the overlay as closed.
+						state.currentImageId = null;
 					}, 450 );
-
-					// Starts the overlay closing animation. The showClosingAnimation
-					// class is used to avoid showing it on page load.
-					state.showClosingAnimation = true;
-					state.overlayEnabled = false;
 				}
 			},
-			handleKeydown( event ) {
+			handleKeydown: withSyncEvent( ( event ) => {
 				if ( state.overlayEnabled ) {
 					// Focuses the close button when the user presses the tab key.
 					if ( event.key === 'Tab' ) {
@@ -127,8 +174,8 @@ const { state, actions, callbacks } = store(
 						actions.hideLightbox();
 					}
 				}
-			},
-			handleTouchMove( event ) {
+			} ),
+			handleTouchMove: withSyncEvent( ( event ) => {
 				// On mobile devices, prevents triggering the scroll event because
 				// otherwise the page jumps around when it resets the scroll position.
 				// This also means that closing the lightbox requires that a user
@@ -138,7 +185,7 @@ const { state, actions, callbacks } = store(
 				if ( state.overlayEnabled ) {
 					event.preventDefault();
 				}
-			},
+			} ),
 			handleTouchStart() {
 				isTouching = true;
 			},
@@ -171,10 +218,59 @@ const { state, actions, callbacks } = store(
 					}
 				}
 			},
+			preloadImage() {
+				const { imageId } = getContext();
+
+				// Bails if it has already been preloaded. This could help
+				// prevent unnecessary preloading of the same image multiple times,
+				// leading to duplicate link elements in the document head.
+				if ( state.preloadedImageIds.has( imageId ) ) {
+					return;
+				}
+
+				// Link element to preload the image.
+				const imageMetadata = state.metadata[ imageId ];
+				const imageLink = document.createElement( 'link' );
+				imageLink.rel = 'preload';
+				imageLink.as = 'image';
+				imageLink.href = getImageSrc( imageMetadata );
+
+				// Apply srcset if available for responsive preloading
+				const srcset = getImageSrcset( imageMetadata );
+				if ( srcset ) {
+					imageLink.setAttribute( 'imagesrcset', srcset );
+					imageLink.setAttribute( 'imagesizes', '100vw' );
+				}
+
+				document.head.appendChild( imageLink );
+				state.preloadedImageIds.add( imageId );
+			},
+			preloadImageWithDelay() {
+				const { imageId } = getContext();
+
+				actions.cancelPreload();
+
+				// Set a new timer to preload the image after a short delay.
+				const timerId = setTimeout(
+					withScope( () => {
+						actions.preloadImage();
+						state.preloadTimers.delete( imageId );
+					} ),
+					IMAGE_PRELOAD_DELAY
+				);
+				state.preloadTimers.set( imageId, timerId );
+			},
+			cancelPreload() {
+				const { imageId } = getContext();
+				if ( state.preloadTimers.has( imageId ) ) {
+					clearTimeout( state.preloadTimers.get( imageId ) );
+					state.preloadTimers.delete( imageId );
+				}
+			},
 		},
 		callbacks: {
 			setOverlayStyles() {
-				if ( ! imageRef ) {
+				if ( ! state.overlayEnabled ) {
 					return;
 				}
 
@@ -183,9 +279,9 @@ const { state, actions, callbacks } = store(
 					naturalHeight,
 					offsetWidth: originalWidth,
 					offsetHeight: originalHeight,
-				} = imageRef;
+				} = state.currentImage.imageRef;
 				let { x: screenPosX, y: screenPosY } =
-					imageRef.getBoundingClientRect();
+					state.currentImage.imageRef.getBoundingClientRect();
 
 				// Natural ratio of the image clicked to open the lightbox.
 				const naturalRatio = naturalWidth / naturalHeight;
@@ -231,6 +327,7 @@ const { state, actions, callbacks } = store(
 				let containerMaxHeight = imgMaxHeight;
 				let containerWidth = imgMaxWidth;
 				let containerHeight = imgMaxHeight;
+
 				// Checks if the target image has a different ratio than the original
 				// one (thumbnail). Recalculates the width and height.
 				if ( naturalRatio.toFixed( 2 ) !== imgRatio.toFixed( 2 ) ) {
@@ -326,7 +423,6 @@ const { state, actions, callbacks } = store(
 				// adding 1 pixel to the container width and height solves the problem,
 				// though this can be removed if the issue is fixed in the future.
 				state.overlayStyles = `
-				:root {
 					--wp--lightbox-initial-top-position: ${ screenPosY }px;
 					--wp--lightbox-initial-left-position: ${ screenPosX }px;
 					--wp--lightbox-container-width: ${ containerWidth + 1 }px;
@@ -337,13 +433,24 @@ const { state, actions, callbacks } = store(
 					--wp--lightbox-scrollbar-width: ${
 						window.innerWidth - document.documentElement.clientWidth
 					}px;
-				}
-			`;
+				`;
 			},
 			setButtonStyles() {
-				const ctx = getContext();
 				const { ref } = getElement();
-				ctx.imageRef = ref;
+
+				// This guard prevents errors in images with the `srcset`
+				// attribute, which can dispatch `load` events even after DOM
+				// removal. Preact doesn't automatically clean up `load` event
+				// listeners on unmounted `img` elements (see
+				// https://github.com/preactjs/preact/issues/3141).
+				if ( ! ref ) {
+					return;
+				}
+
+				const { imageId } = getContext();
+
+				state.metadata[ imageId ].imageRef = ref;
+				state.metadata[ imageId ].currentSrc = ref.currentSrc;
 
 				const {
 					naturalWidth,
@@ -386,10 +493,13 @@ const { state, actions, callbacks } = store(
 				const buttonOffsetTop = figureHeight - offsetHeight;
 				const buttonOffsetRight = figureWidth - offsetWidth;
 
+				let imageButtonTop = buttonOffsetTop + 16;
+				let imageButtonRight = buttonOffsetRight + 16;
+
 				// In the case of an image with object-fit: contain, the size of the
 				// <img> element can be larger than the image itself, so it needs to
 				// calculate where to place the button.
-				if ( ctx.scaleAttr === 'contain' ) {
+				if ( state.metadata[ imageId ].scaleAttr === 'contain' ) {
 					// Natural ratio of the image.
 					const naturalRatio = naturalWidth / naturalHeight;
 					// Offset ratio of the image.
@@ -399,25 +509,25 @@ const { state, actions, callbacks } = store(
 						// If it reaches the width first, it keeps the width and compute the
 						// height.
 						const referenceHeight = offsetWidth / naturalRatio;
-						ctx.imageButtonTop =
+						imageButtonTop =
 							( offsetHeight - referenceHeight ) / 2 +
 							buttonOffsetTop +
 							16;
-						ctx.imageButtonRight = buttonOffsetRight + 16;
+						imageButtonRight = buttonOffsetRight + 16;
 					} else {
 						// If it reaches the height first, it keeps the height and compute
 						// the width.
 						const referenceWidth = offsetHeight * naturalRatio;
-						ctx.imageButtonTop = buttonOffsetTop + 16;
-						ctx.imageButtonRight =
+						imageButtonTop = buttonOffsetTop + 16;
+						imageButtonRight =
 							( offsetWidth - referenceWidth ) / 2 +
 							buttonOffsetRight +
 							16;
 					}
-				} else {
-					ctx.imageButtonTop = buttonOffsetTop + 16;
-					ctx.imageButtonRight = buttonOffsetRight + 16;
 				}
+
+				state.metadata[ imageId ].imageButtonTop = imageButtonTop;
+				state.metadata[ imageId ].imageButtonRight = imageButtonRight;
 			},
 			setOverlayFocus() {
 				if ( state.overlayEnabled ) {
@@ -427,9 +537,9 @@ const { state, actions, callbacks } = store(
 				}
 			},
 			initTriggerButton() {
-				const ctx = getContext();
+				const { imageId } = getContext();
 				const { ref } = getElement();
-				ctx.buttonRef = ref;
+				state.metadata[ imageId ].buttonRef = ref;
 			},
 		},
 	},

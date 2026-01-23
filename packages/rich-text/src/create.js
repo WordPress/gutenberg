@@ -125,6 +125,13 @@ export class RichTextData {
 	static fromHTMLString( html ) {
 		return new RichTextData( create( { html } ) );
 	}
+	/**
+	 * Create a RichTextData instance from an HTML element.
+	 *
+	 * @param {HTMLElement}                    htmlElement The HTML element to create the instance from.
+	 * @param {{preserveWhiteSpace?: boolean}} options     Options.
+	 * @return {RichTextData} The RichTextData instance.
+	 */
 	static fromHTMLElement( htmlElement, options = {} ) {
 		const { preserveWhiteSpace = false } = options;
 		const element = preserveWhiteSpace
@@ -144,6 +151,12 @@ export class RichTextData {
 	}
 	// We could expose `toHTMLElement` at some point as well, but we'd only use
 	// it internally.
+	/**
+	 * Convert the rich text value to an HTML string.
+	 *
+	 * @param {{preserveWhiteSpace?: boolean}} options Options.
+	 * @return {string} The HTML string.
+	 */
 	toHTMLString( { preserveWhiteSpace } = {} ) {
 		return (
 			this.originalHTML ||
@@ -397,7 +410,7 @@ function collapseWhiteSpace( element, isRoot = true ) {
 
 			node.nodeValue = newNodeValue;
 		} else if ( node.nodeType === node.ELEMENT_NODE ) {
-			collapseWhiteSpace( node, false );
+			node.replaceWith( collapseWhiteSpace( node, false ) );
 		}
 	} );
 	return clone;
@@ -431,7 +444,7 @@ export function removeReservedCharacters( string ) {
 /**
  * Creates a Rich Text value from a DOM element and range.
  *
- * @param {Object}  $1                  Named argements.
+ * @param {Object}  $1                  Named arguments.
  * @param {Element} [$1.element]        Element to create value from.
  * @param {Range}   [$1.range]          Range to create value from.
  * @param {boolean} [$1.isEditableTree]
@@ -466,6 +479,34 @@ function createFromElement( { element, range, isEditableTree } ) {
 			accumulator.formats.length += text.length;
 			accumulator.replacements.length += text.length;
 			accumulator.text += text;
+			continue;
+		}
+
+		if (
+			node.nodeType === node.COMMENT_NODE ||
+			( node.nodeType === node.ELEMENT_NODE &&
+				node.tagName === 'SPAN' &&
+				node.hasAttribute( 'data-rich-text-comment' ) )
+		) {
+			const value = {
+				formats: [ , ],
+				replacements: [
+					{
+						type: '#comment',
+						attributes: {
+							'data-rich-text-comment':
+								node.nodeType === node.COMMENT_NODE
+									? node.nodeValue
+									: node.getAttribute(
+											'data-rich-text-comment'
+									  ),
+						},
+					},
+				],
+				text: OBJECT_REPLACEMENT_CHARACTER,
+			};
+			accumulateSelection( accumulator, node, range, value );
+			mergePair( accumulator, value );
 			continue;
 		}
 
@@ -546,7 +587,11 @@ function createFromElement( { element, range, isEditableTree } ) {
 
 		// Ignore any placeholders, but keep their content since the browser
 		// might insert text inside them when the editable element is flex.
-		if ( ! format || node.getAttribute( 'data-rich-text-placeholder' ) ) {
+		if (
+			! format ||
+			node.getAttribute( 'data-rich-text-placeholder' ) ||
+			node.getAttribute( 'data-rich-text-bogus' )
+		) {
 			mergePair( accumulator, value );
 		} else if ( value.text.length === 0 ) {
 			if ( format.attributes ) {
@@ -591,7 +636,7 @@ function createFromElement( { element, range, isEditableTree } ) {
 /**
  * Gets the attributes of an element in object shape.
  *
- * @param {Object}  $1         Named argements.
+ * @param {Object}  $1         Named arguments.
  * @param {Element} $1.element Element to get attributes from.
  *
  * @return {Object|void} Attribute object or `undefined` if the element has no

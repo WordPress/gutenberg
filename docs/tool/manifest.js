@@ -15,10 +15,10 @@ const componentPaths = glob( 'packages/components/src/*/**/README.md', {
 		'**/src/mobile/**/README.md',
 		'packages/components/src/theme/README.md',
 		'packages/components/src/view/README.md',
-		'packages/components/src/dropdown-menu-v2/README.md',
-		'packages/components/src/progress-bar/README.md',
+		'packages/components/src/menu/README.md',
 		'packages/components/src/tabs/README.md',
 		'packages/components/src/custom-select-control-v2/README.md',
+		'packages/components/src/badge/README.md',
 	],
 } );
 const packagePaths = glob( 'packages/*/package.json' )
@@ -40,10 +40,20 @@ function getPackageManifest( packageFolderNames ) {
 	return packageFolderNames.reduce( ( manifest, folderName ) => {
 		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
 		const tocPath = `${ baseRepoUrl }/packages/${ folderName }/docs/toc.json`;
+		const packageJson = require(
+			join(
+				__dirname,
+				'..',
+				'..',
+				'packages',
+				folderName,
+				'package.json'
+			)
+		);
 
 		// First add any README files to the TOC
 		manifest.push( {
-			title: `@wordpress/${ folderName }`,
+			title: packageJson.name,
 			slug: `packages-${ folderName }`,
 			markdown_source: path,
 			parent: 'packages',

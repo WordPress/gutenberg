@@ -2,6 +2,82 @@
 
 ## Unreleased
 
+## 4.38.0 (2026-01-16)
+
+## 4.36.0 (2025-11-26)
+
+## 4.35.0 (2025-11-12)
+
+## 4.34.0 (2025-10-29)
+
+## 4.33.0 (2025-10-17)
+
+## 4.32.0 (2025-10-01)
+
+## 4.31.0 (2025-09-17)
+
+## 4.30.0 (2025-09-03)
+
+## 4.29.0 (2025-08-20)
+
+## 4.28.0 (2025-08-07)
+
+## 4.27.0 (2025-07-23)
+
+## 4.26.0 (2025-06-25)
+
+## 4.25.0 (2025-06-04)
+
+## 4.24.0 (2025-05-22)
+
+## 4.23.0 (2025-05-07)
+
+## 4.22.0 (2025-04-11)
+
+## 4.21.0 (2025-03-27)
+
+## 4.20.0 (2025-03-13)
+
+## 4.19.0 (2025-02-28)
+
+## 4.18.0 (2025-02-12)
+
+## 4.17.0 (2025-01-29)
+
+## 4.16.0 (2025-01-15)
+
+## 4.15.0 (2025-01-02)
+
+## 4.14.0 (2024-12-11)
+
+## 4.13.0 (2024-11-27)
+
+## 4.12.0 (2024-11-16)
+
+## 4.11.0 (2024-10-30)
+
+## 4.10.0 (2024-10-16)
+
+## 4.9.0 (2024-10-03)
+
+## 4.8.0 (2024-09-19)
+
+## 4.7.0 (2024-09-05)
+
+## 4.6.0 (2024-08-21)
+
+## 4.5.0 (2024-08-07)
+
+## 4.4.0 (2024-07-24)
+
+## 4.3.0 (2024-07-10)
+
+## 4.2.0 (2024-06-26)
+
+## 4.1.0 (2024-06-15)
+
+## 4.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
@@ -126,7 +202,7 @@
 
 ## 2.1.1 (2022-02-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `@wordpress/url` dependency ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
@@ -134,7 +210,7 @@
 
 ## 2.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 

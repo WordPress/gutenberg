@@ -40,7 +40,7 @@ export function getUpdatedLinkAttributes( {
 	if ( nofollow ) {
 		updatedRel = updatedRel?.includes( NOFOLLOW_REL )
 			? updatedRel
-			: updatedRel + ` ${ NOFOLLOW_REL }`;
+			: ( updatedRel + ` ${ NOFOLLOW_REL }` ).trim();
 	} else {
 		const relRegex = new RegExp( `\\b${ NOFOLLOW_REL }\\s*`, 'g' );
 		updatedRel = updatedRel?.replace( relRegex, '' ).trim();

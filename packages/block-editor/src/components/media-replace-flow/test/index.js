@@ -8,7 +8,7 @@ import userEvent from '@testing-library/user-event';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-
+import { SlotFillProvider } from '@wordpress/components';
 /**
  * Internal dependencies
  */
@@ -19,16 +19,18 @@ const noop = () => {};
 function TestWrapper() {
 	const [ mediaURL, setMediaURL ] = useState( 'https://example.media' );
 	return (
-		<MediaReplaceFlow
-			mediaId={ 1 }
-			mediaURL={ mediaURL }
-			allowedTypes={ [ 'png' ] }
-			accept="image/*"
-			onSelect={ noop }
-			onSelectURL={ setMediaURL }
-			onError={ noop }
-			onCloseModal={ noop }
-		/>
+		<SlotFillProvider>
+			<MediaReplaceFlow
+				mediaId={ 1 }
+				mediaURL={ mediaURL }
+				allowedTypes={ [ 'png' ] }
+				accept="image/*"
+				onSelect={ noop }
+				onSelectURL={ setMediaURL }
+				onError={ noop }
+				onCloseModal={ noop }
+			/>
+		</SlotFillProvider>
 	);
 }
 
@@ -110,7 +112,7 @@ describe( 'General media replace flow', () => {
 		);
 
 		const mediaURLInput = screen.getByRole( 'combobox', {
-			name: 'Link',
+			name: 'Paste or type URL',
 			expanded: false,
 		} );
 
@@ -119,7 +121,7 @@ describe( 'General media replace flow', () => {
 
 		await user.click(
 			screen.getByRole( 'button', {
-				name: 'Save',
+				name: 'Apply',
 			} )
 		);
 

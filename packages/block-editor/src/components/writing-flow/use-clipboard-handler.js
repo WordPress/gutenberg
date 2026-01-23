@@ -6,6 +6,7 @@ import {
 	findTransform,
 	getBlockTransforms,
 	hasBlockSupport,
+	switchToBlockType,
 } from '@wordpress/blocks';
 import {
 	documentHasSelection,
@@ -136,6 +137,7 @@ export default function useClipboardHandler() {
 				const {
 					__experimentalCanUserUseUnfilteredHTML:
 						canUserUseUnfilteredHTML,
+					mediaUpload,
 				} = getSettings();
 				const isInternal =
 					event.clipboardData.getData( 'rich-text' ) === 'true';
@@ -147,6 +149,11 @@ export default function useClipboardHandler() {
 				let blocks = [];
 
 				if ( files.length ) {
+					if ( ! mediaUpload ) {
+						event.preventDefault();
+						return;
+					}
+
 					const fromTransforms = getBlockTransforms( 'from' );
 					blocks = files
 						.reduce( ( accumulator, file ) => {
@@ -208,15 +215,36 @@ export default function useClipboardHandler() {
 					firstSelectedClientId
 				);
 
-				if (
-					! blocks.every( ( block ) =>
-						canInsertBlockType( block.name, rootClientId )
-					)
-				) {
-					return;
+				const newBlocks = [];
+
+				for ( const block of blocks ) {
+					if ( canInsertBlockType( block.name, rootClientId ) ) {
+						newBlocks.push( block );
+					} else {
+						// If a block cannot be inserted in a root block, try
+						// converting it to that root block type and insert the
+						// inner blocks.
+						// Example: paragraphs cannot be inserted into a list,
+						// so convert the paragraphs to a list for list items.
+						const rootBlockName = getBlockName( rootClientId );
+						const switchedBlocks =
+							block.name !== rootBlockName
+								? switchToBlockType( block, rootBlockName )
+								: [ block ];
+
+						if ( ! switchedBlocks ) {
+							return;
+						}
+
+						for ( const switchedBlock of switchedBlocks ) {
+							for ( const innerBlock of switchedBlock.innerBlocks ) {
+								newBlocks.push( innerBlock );
+							}
+						}
+					}
 				}
 
-				__unstableSplitSelection( blocks );
+				__unstableSplitSelection( newBlocks );
 				event.preventDefault();
 			}
 		}

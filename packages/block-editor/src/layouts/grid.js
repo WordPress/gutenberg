@@ -13,6 +13,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
 	__experimentalParseQuantityAndUnitFromRawValue as parseQuantityAndUnitFromRawValue,
+	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
@@ -23,7 +24,6 @@ import { appendSelectors, getBlockGapCSS } from './utils';
 import { getGapCSSValue } from '../hooks/gap';
 import { shouldSkipSerialization } from '../hooks/utils';
 import { LAYOUT_DEFINITIONS } from './definitions';
-import { GridVisualizer } from '../components/grid-visualizer';
 
 const RANGE_CONTROL_MAX_VALUES = {
 	px: 600,
@@ -71,29 +71,41 @@ export default {
 		layoutBlockSupport = {},
 	} ) {
 		const { allowSizingOnChildren = false } = layoutBlockSupport;
+
+		// Always show both column and minimum width controls in Auto mode.
+		// Manual mode (with isManualPlacement) is only available behind the experiment flag.
+		const showColumnsControl = true;
+		const showMinWidthControl =
+			! layout?.isManualPlacement ||
+			window.__experimentalEnableGridInteractivity;
 		return (
 			<>
-				<GridLayoutTypeControl
-					layout={ layout }
-					onChange={ onChange }
-				/>
-				{ layout?.columnCount ? (
-					<GridLayoutColumnsAndRowsControl
-						layout={ layout }
-						onChange={ onChange }
-						allowSizingOnChildren={ allowSizingOnChildren }
-					/>
-				) : (
-					<GridLayoutMinimumWidthControl
+				{ window.__experimentalEnableGridInteractivity && (
+					<GridLayoutTypeControl
 						layout={ layout }
 						onChange={ onChange }
 					/>
 				) }
+				<VStack spacing={ 4 }>
+					{ showColumnsControl && (
+						<GridLayoutColumnsAndRowsControl
+							layout={ layout }
+							onChange={ onChange }
+							allowSizingOnChildren={ allowSizingOnChildren }
+						/>
+					) }
+					{ showMinWidthControl && (
+						<GridLayoutMinimumWidthControl
+							layout={ layout }
+							onChange={ onChange }
+						/>
+					) }
+				</VStack>
 			</>
 		);
 	},
-	toolBarControls: function GridLayoutToolbarControls( { clientId } ) {
-		return <GridVisualizer clientId={ clientId } />;
+	toolBarControls: function GridLayoutToolbarControls() {
+		return null;
 	},
 	getLayoutStyle: function getLayoutStyle( {
 		selector,
@@ -101,13 +113,31 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
+		globalBlockGapValue,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const {
-			minimumColumnWidth = '12rem',
+			minimumColumnWidth = null,
 			columnCount = null,
 			rowCount = null,
 		} = layout;
+
+		// Check that the grid layout attributes are of the correct type, so that we don't accidentally
+		// write code that stores a string attribute instead of a number.
+		if ( process.env.NODE_ENV === 'development' ) {
+			if (
+				minimumColumnWidth &&
+				typeof minimumColumnWidth !== 'string'
+			) {
+				throw new Error( 'minimumColumnWidth must be a string' );
+			}
+			if ( columnCount && typeof columnCount !== 'number' ) {
+				throw new Error( 'columnCount must be a number' );
+			}
+			if ( rowCount && typeof rowCount !== 'number' ) {
+				throw new Error( 'rowCount must be a number' );
+			}
+		}
 
 		// If a block's block.json skips serialization for spacing or spacing.blockGap,
 		// don't apply the user-defined value to the styles.
@@ -117,28 +147,56 @@ export default {
 				? getGapCSSValue( style?.spacing?.blockGap, '0.5em' )
 				: undefined;
 
+		// Use the global blockGap value for grid column calculations when available
+		// If the gap value has both top and left (separated by space), use the left value for horizontal calculations
+		let fallbackGapValue = '1.2rem';
+		if ( globalBlockGapValue ) {
+			const processedGap = getGapCSSValue( globalBlockGapValue, '0.5em' );
+			const gapParts = processedGap.split( ' ' );
+			fallbackGapValue =
+				gapParts.length > 1 ? gapParts[ 1 ] : gapParts[ 0 ];
+		}
+
 		let output = '';
 		const rules = [];
 
-		if ( columnCount ) {
+		if ( minimumColumnWidth && columnCount > 0 ) {
+			let blockGapToUse = blockGapValue || fallbackGapValue;
+			// Ensure 0 values have a unit so they work in calc().
+			if ( blockGapToUse === '0' || blockGapToUse === 0 ) {
+				blockGapToUse = '0px';
+			}
+			const maxValue = `max(min( ${ minimumColumnWidth }, 100%), ( 100% - (${ blockGapToUse }*${
+				columnCount - 1
+			}) ) / ${ columnCount })`;
+			rules.push(
+				`grid-template-columns: repeat(auto-fill, minmax(${ maxValue }, 1fr))`,
+				`container-type: inline-size`
+			);
+			if ( rowCount ) {
+				rules.push(
+					`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
+				);
+			}
+		} else if ( columnCount ) {
 			rules.push(
 				`grid-template-columns: repeat(${ columnCount }, minmax(0, 1fr))`
 			);
 			if ( rowCount ) {
 				rules.push(
-					`grid-template-rows: repeat(${ rowCount }, minmax(0, 1fr))`
+					`grid-template-rows: repeat(${ rowCount }, minmax(1rem, auto))`
 				);
 			}
-		} else if ( minimumColumnWidth ) {
+		} else {
 			rules.push(
-				`grid-template-columns: repeat(auto-fill, minmax(min(${ minimumColumnWidth }, 100%), 1fr))`,
+				`grid-template-columns: repeat(auto-fill, minmax(min(${
+					minimumColumnWidth || '12rem'
+				}, 100%), 1fr))`,
 				'container-type: inline-size'
 			);
 		}
 
 		if ( rules.length ) {
-			// Reason to disable: the extra line breaks added by prettier mess with the unit tests.
-			// eslint-disable-next-line prettier/prettier
 			output = `${ appendSelectors( selector ) } { ${ rules.join(
 				'; '
 			) }; }`;
@@ -165,8 +223,11 @@ export default {
 
 // Enables setting minimum width of grid items.
 function GridLayoutMinimumWidthControl( { layout, onChange } ) {
-	const { minimumColumnWidth: value = '12rem' } = layout;
-	const [ quantity, unit ] = parseQuantityAndUnitFromRawValue( value );
+	const { minimumColumnWidth, columnCount, isManualPlacement } = layout;
+	const defaultValue = isManualPlacement || columnCount ? null : '12rem';
+	const value = minimumColumnWidth || defaultValue;
+	const [ quantity, unit = 'rem' ] =
+		parseQuantityAndUnitFromRawValue( value );
 
 	const handleSliderChange = ( next ) => {
 		onChange( {
@@ -196,18 +257,19 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 	};
 
 	return (
-		<fieldset>
+		<fieldset className="block-editor-hooks__grid-layout-minimum-width-control">
 			<BaseControl.VisualLabel as="legend">
-				{ __( 'Minimum column width' ) }
+				{ __( 'Min. column width' ) }
 			</BaseControl.VisualLabel>
 			<Flex gap={ 4 }>
 				<FlexItem isBlock>
 					<UnitControl
-						size={ '__unstable-large' }
+						size="__unstable-large"
 						onChange={ ( newValue ) => {
 							onChange( {
 								...layout,
-								minimumColumnWidth: newValue,
+								minimumColumnWidth:
+									newValue === '' ? undefined : newValue,
 							} );
 						} }
 						onUnitChange={ handleUnitChange }
@@ -220,8 +282,9 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 				</FlexItem>
 				<FlexItem isBlock>
 					<RangeControl
+						__next40pxDefaultSize
 						onChange={ handleSliderChange }
-						value={ quantity }
+						value={ quantity || 0 }
 						min={ 0 }
 						max={ RANGE_CONTROL_MAX_VALUES[ unit ] || 600 }
 						withInputField={ false }
@@ -230,6 +293,11 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 					/>
 				</FlexItem>
 			</Flex>
+			<p className="components-base-control__help">
+				{ __(
+					'Columns will wrap to fewer per row when they can no longer maintain the minimum width.'
+				) }
+			</p>
 		</fieldset>
 	);
 }
@@ -240,101 +308,97 @@ function GridLayoutColumnsAndRowsControl( {
 	onChange,
 	allowSizingOnChildren,
 } ) {
-	const { columnCount = 3, rowCount } = layout;
+	// Allow unsetting the column count in Auto mode.
+	const defaultColumnCount = undefined;
+	const {
+		columnCount = defaultColumnCount,
+		rowCount,
+		isManualPlacement,
+	} = layout;
 
 	return (
 		<>
-			<fieldset>
-				<BaseControl.VisualLabel as="legend">
-					{ __( 'Columns' ) }
-				</BaseControl.VisualLabel>
+			<fieldset className="block-editor-hooks__grid-layout-columns-and-rows-controls">
+				{ ! isManualPlacement && (
+					<BaseControl.VisualLabel as="legend">
+						{ __( 'Max. columns' ) }
+					</BaseControl.VisualLabel>
+				) }
 				<Flex gap={ 4 }>
 					<FlexItem isBlock>
 						<NumberControl
-							size={ '__unstable-large' }
+							size="__unstable-large"
 							onChange={ ( value ) => {
-								/**
-								 * If the input is cleared, avoid switching
-								 * back to "Auto" by setting a value of "1".
-								 */
-								const validValue = value !== '' ? value : '1';
+								// Allow unsetting the column count when in auto mode.
+								const defaultNewColumnCount = isManualPlacement
+									? 1
+									: undefined;
+								const newColumnCount =
+									value === '' || value === '0'
+										? defaultNewColumnCount
+										: parseInt( value, 10 );
 								onChange( {
 									...layout,
-									columnCount: validValue,
+									columnCount: newColumnCount,
 								} );
 							} }
 							value={ columnCount }
 							min={ 1 }
 							label={ __( 'Columns' ) }
-							hideLabelFromVision
+							hideLabelFromVision={ ! isManualPlacement }
 						/>
 					</FlexItem>
+
 					<FlexItem isBlock>
-						<RangeControl
-							value={ parseInt( columnCount, 10 ) } // RangeControl can't deal with strings.
-							onChange={ ( value ) =>
-								onChange( {
-									...layout,
-									columnCount: value,
-								} )
-							}
-							min={ 1 }
-							max={ 16 }
-							withInputField={ false }
-							label={ __( 'Columns' ) }
-							hideLabelFromVision
-						/>
+						{ allowSizingOnChildren && isManualPlacement ? (
+							<NumberControl
+								size="__unstable-large"
+								onChange={ ( value ) => {
+									// Don't allow unsetting the row count.
+									const newRowCount =
+										value === '' || value === '0'
+											? 1
+											: parseInt( value, 10 );
+									onChange( {
+										...layout,
+										rowCount: newRowCount,
+									} );
+								} }
+								value={ rowCount }
+								min={ 1 }
+								label={ __( 'Rows' ) }
+							/>
+						) : (
+							<RangeControl
+								__next40pxDefaultSize
+								value={ columnCount ?? 1 }
+								onChange={ ( value ) =>
+									onChange( {
+										...layout,
+										columnCount:
+											value === '' || value === '0'
+												? 1
+												: value,
+									} )
+								}
+								min={ 1 }
+								max={ 16 }
+								withInputField={ false }
+								label={ __( 'Columns' ) }
+								hideLabelFromVision
+							/>
+						) }
 					</FlexItem>
 				</Flex>
 			</fieldset>
-			{ allowSizingOnChildren &&
-				window.__experimentalEnableGridInteractivity && (
-					<fieldset>
-						<BaseControl.VisualLabel as="legend">
-							{ __( 'Rows' ) }
-						</BaseControl.VisualLabel>
-						<Flex gap={ 4 }>
-							<FlexItem isBlock>
-								<NumberControl
-									size={ '__unstable-large' }
-									onChange={ ( value ) => {
-										onChange( {
-											...layout,
-											rowCount: value,
-										} );
-									} }
-									value={ rowCount }
-									min={ 1 }
-									label={ __( 'Rows' ) }
-									hideLabelFromVision
-								/>
-							</FlexItem>
-							<FlexItem isBlock>
-								<RangeControl
-									value={ parseInt( rowCount, 10 ) } // RangeControl can't deal with strings.
-									onChange={ ( value ) =>
-										onChange( {
-											...layout,
-											rowCount: value,
-										} )
-									}
-									min={ 1 }
-									max={ 16 }
-									withInputField={ false }
-									label={ __( 'Rows' ) }
-									hideLabelFromVision
-								/>
-							</FlexItem>
-						</Flex>
-					</fieldset>
-				) }
 		</>
 	);
 }
 
 // Enables switching between grid types
 function GridLayoutTypeControl( { layout, onChange } ) {
-	const { columnCount, minimumColumnWidth } = layout;
+	const { columnCount, rowCount, minimumColumnWidth, isManualPlacement } =
+		layout;
 
 	/**
 	 * When switching, temporarily save any custom values set on the
@@ -343,41 +407,55 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 	const [ tempColumnCount, setTempColumnCount ] = useState(
 		columnCount || 3
 	);
+	const [ tempRowCount, setTempRowCount ] = useState( rowCount );
 	const [ tempMinimumColumnWidth, setTempMinimumColumnWidth ] = useState(
 		minimumColumnWidth || '12rem'
 	);
 
-	const isManual = !! columnCount ? 'manual' : 'auto';
+	const gridPlacement = isManualPlacement ? 'manual' : 'auto';
 
 	const onChangeType = ( value ) => {
 		if ( value === 'manual' ) {
 			setTempMinimumColumnWidth( minimumColumnWidth || '12rem' );
 		} else {
 			setTempColumnCount( columnCount || 3 );
+			setTempRowCount( rowCount );
 		}
 		onChange( {
 			...layout,
-			columnCount: value === 'manual' ? tempColumnCount : null,
+			columnCount: value === 'manual' ? tempColumnCount : tempColumnCount,
+			rowCount: value === 'manual' ? tempRowCount : undefined,
+			isManualPlacement: value === 'manual' ? true : undefined,
 			minimumColumnWidth:
 				value === 'auto' ? tempMinimumColumnWidth : null,
 		} );
 	};
 
+	const helpText =
+		gridPlacement === 'manual'
+			? __(
+					'Grid items can be manually placed in any position on the grid.'
+			  )
+			: __(
+					'Grid items are placed automatically depending on their order.'
+			  );
+
 	return (
 		<ToggleGroupControl
-			__nextHasNoMarginBottom
-			label={ __( 'Type' ) }
-			value={ isManual }
+			__next40pxDefaultSize
+			label={ __( 'Grid item position' ) }
+			value={ gridPlacement }
 			onChange={ onChangeType }
 			isBlock
+			help={ helpText }
 		>
 			<ToggleGroupControlOption
-				key={ 'auto' }
+				key="auto"
 				value="auto"
 				label={ __( 'Auto' ) }
 			/>
 			<ToggleGroupControlOption
-				key={ 'manual' }
+				key="manual"
 				value="manual"
 				label={ __( 'Manual' ) }
 			/>

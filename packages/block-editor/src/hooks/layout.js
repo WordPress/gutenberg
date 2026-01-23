@@ -11,8 +11,8 @@ import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
-	Button,
-	ButtonGroup,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToggleControl,
 	PanelBody,
 	privateApis as componentsPrivateApis,
@@ -30,6 +30,7 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 import { useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
+import { globalStylesDataKey } from '../store/private-keys';
 
 const layoutBlockSupportKey = 'layout';
 const { kebabCase } = unlock( componentsPrivateApis );
@@ -74,13 +75,17 @@ export function useLayoutClasses( blockAttributes = {}, blockName = '' ) {
 
 	const hasGlobalPadding = useSelect(
 		( select ) => {
-			return (
-				( usedLayout?.inherit ||
-					usedLayout?.contentSize ||
-					usedLayout?.type === 'constrained' ) &&
-				select( blockEditorStore ).getSettings().__experimentalFeatures
-					?.useRootPaddingAwareAlignments
-			);
+			// Early return to avoid subscription when layout doesn't use global padding
+			if (
+				! usedLayout?.inherit &&
+				! usedLayout?.contentSize &&
+				usedLayout?.type !== 'constrained'
+			) {
+				return false;
+			}
+
+			return select( blockEditorStore ).getSettings()
+				.__experimentalFeatures?.useRootPaddingAwareAlignments;
 		},
 		[ usedLayout?.contentSize, usedLayout?.inherit, usedLayout?.type ]
 	);
@@ -232,8 +237,6 @@ function LayoutPanelPure( {
 					{ showInheritToggle && (
 						<>
 							<ToggleControl
-								__nextHasNoMarginBottom
-								className="block-editor-hooks__toggle-control"
 								label={ __( 'Inner blocks use content width' ) }
 								checked={
 									layoutType?.name === 'constrained' ||
@@ -258,7 +261,7 @@ function LayoutPanelPure( {
 												'Nested blocks use content width with options for full and wide widths.'
 										  )
 										: __(
-												'Nested blocks will fill the width of this container. Toggle to constrain.'
+												'Nested blocks will fill the width of this container.'
 										  )
 								}
 							/>
@@ -316,19 +319,25 @@ export default {
 
 function LayoutTypeSwitcher( { type, onChange } ) {
 	return (
-		<ButtonGroup>
+		<ToggleGroupControl
+			__next40pxDefaultSize
+			isBlock
+			label={ __( 'Layout type' ) }
+			hideLabelFromVision
+			isAdaptiveWidth
+			value={ type }
+			onChange={ onChange }
+		>
 			{ getLayoutTypes().map( ( { name, label } ) => {
 				return (
-					<Button
+					<ToggleGroupControlOption
 						key={ name }
-						isPressed={ type === name }
-						onClick={ () => onChange( name ) }
-					>
-						{ label }
-					</Button>
+						value={ name }
+						label={ label }
+					/>
 				);
 			} ) }
-		</ButtonGroup>
+		</ToggleGroupControl>
 	);
 }
 
@@ -359,6 +368,7 @@ function BlockWithLayoutStyles( {
 	block: BlockListBlock,
 	props,
 	blockGapSupport,
+	globalBlockGapValue,
 	layoutClasses,
 } ) {
 	const { name, attributes } = props;
@@ -385,6 +395,7 @@ function BlockWithLayoutStyles( {
 		layout: usedLayout,
 		style: attributes?.style,
 		hasBlockGapSupport,
+		globalBlockGapValue,
 	} );
 
 	// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
@@ -413,56 +424,65 @@ function BlockWithLayoutStyles( {
  * @return {Function} Wrapped component.
  */
 export const withLayoutStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const { clientId, name, attributes } = props;
-		const blockSupportsLayout = hasLayoutBlockSupport( name );
-		const layoutClasses = useLayoutClasses( attributes, name );
-		const extraProps = useSelect(
-			( select ) => {
-				// The callback returns early to avoid block editor subscription.
-				if ( ! blockSupportsLayout ) {
-					return;
-				}
-
-				const { getSettings, getBlockSettings } = unlock(
-					select( blockEditorStore )
-				);
-				const { disableLayoutStyles } = getSettings();
-
-				if ( disableLayoutStyles ) {
-					return;
-				}
-
-				const [ blockGapSupport ] = getBlockSettings(
-					clientId,
-					'spacing.blockGap'
-				);
-
-				return { blockGapSupport };
-			},
-			[ blockSupportsLayout, clientId ]
-		);
-
-		if ( ! extraProps ) {
-			return (
-				<BlockListBlock
-					{ ...props }
-					__unstableLayoutClassNames={
-						blockSupportsLayout ? layoutClasses : undefined
+	( BlockListBlock ) =>
+		function WithLayoutStyles( props ) {
+			const { clientId, name, attributes } = props;
+			const blockSupportsLayout = hasLayoutBlockSupport( name );
+			const layoutClasses = useLayoutClasses( attributes, name );
+			const extraProps = useSelect(
+				( select ) => {
+					// The callback returns early to avoid block editor subscription.
+					if ( ! blockSupportsLayout ) {
+						return;
 					}
+
+					const { getSettings, getBlockSettings } = unlock(
+						select( blockEditorStore )
+					);
+					const settings = getSettings();
+					const { disableLayoutStyles } = settings;
+
+					if ( disableLayoutStyles ) {
+						return;
+					}
+
+					const [ blockGapSupport ] = getBlockSettings(
+						clientId,
+						'spacing.blockGap'
+					);
+
+					// Get default blockGap value from global styles for use in layouts like grid.
+					// Check block-specific styles first, then fall back to root styles.
+					const globalStyles = settings[ globalStylesDataKey ];
+					const globalBlockGapValue =
+						globalStyles?.blocks?.[ name ]?.spacing?.blockGap ??
+						globalStyles?.spacing?.blockGap;
+
+					return { blockGapSupport, globalBlockGapValue };
+				},
+				[ blockSupportsLayout, clientId ]
+			);
+
+			if ( ! extraProps ) {
+				return (
+					<BlockListBlock
+						{ ...props }
+						__unstableLayoutClassNames={
+							blockSupportsLayout ? layoutClasses : undefined
+						}
+					/>
+				);
+			}
+
+			return (
+				<BlockWithLayoutStyles
+					block={ BlockListBlock }
+					props={ props }
+					layoutClasses={ layoutClasses }
+					{ ...extraProps }
 				/>
 			);
-		}
-
-		return (
-			<BlockWithLayoutStyles
-				block={ BlockListBlock }
-				props={ props }
-				layoutClasses={ layoutClasses }
-				{ ...extraProps }
-			/>
-		);
-	},
+		},
 	'withLayoutStyles'
 );
 

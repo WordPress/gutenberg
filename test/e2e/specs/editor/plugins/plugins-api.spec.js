@@ -230,4 +230,25 @@ test.describe( 'Plugins API', () => {
 			).toBeVisible();
 		} );
 	} );
+
+	test.describe( 'Preview Menu Item', () => {
+		test( 'Should render and interact with PluginPreviewMenuItem', async ( {
+			page,
+		} ) => {
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.locator( '.editor-preview-dropdown__toggle' )
+				.click();
+
+			const customPreviewItem = page.getByRole( 'menuitem', {
+				name: 'Custom Preview',
+			} );
+
+			await expect( customPreviewItem ).toBeVisible();
+
+			await customPreviewItem.click();
+
+			await expect( customPreviewItem ).toBeHidden();
+		} );
+	} );
 } );

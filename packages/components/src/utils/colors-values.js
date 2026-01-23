@@ -75,6 +75,9 @@ export const COLORS = Object.freeze( {
 	 * @deprecated Use semantic aliases in `COLORS.ui` or theme-ready variables in `COLORS.theme.gray`.
 	 */
 	gray: GRAY, // TODO: Stop exporting this when everything is migrated to `theme` or `ui`
+	/**
+	 * @deprecated Prefer theme-ready variables in `COLORS.theme`.
+	 */
 	white,
 	alert: ALERT,
 	/**

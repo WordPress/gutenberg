@@ -1,11 +1,13 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
+
 /**
  * WordPress dependencies
  */
-import { seen, unseen } from '@wordpress/icons';
+import { closeSmall, Icon, link, seen, unseen } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
@@ -16,21 +18,26 @@ import { InputControlSuffixWrapper } from '../input-suffix-wrapper';
 import Button from '../../button';
 
 const meta: Meta< typeof InputControl > = {
-	title: 'Components (Experimental)/InputControl',
+	title: 'Components/Selection & Input/Common/InputControl',
+	id: 'components-inputcontrol',
 	component: InputControl,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { InputControlPrefixWrapper, InputControlSuffixWrapper },
 	argTypes: {
 		__unstableInputWidth: { control: { type: 'text' } },
-		__unstableStateReducer: { control: { type: null } },
-		onChange: { control: { type: null } },
-		prefix: { control: { type: null } },
-		suffix: { control: { type: null } },
+		__unstableStateReducer: { control: false },
+		onChange: { control: false },
+		prefix: { control: false },
+		suffix: { control: false },
 		type: { control: { type: 'text' } },
 		value: { control: { disable: true } },
 	},
+	tags: [ 'status-experimental' ],
+	args: {
+		onChange: fn(),
+		onValidate: fn(),
+		onKeyDown: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -38,13 +45,14 @@ const meta: Meta< typeof InputControl > = {
 export default meta;
 
 const Template: StoryFn< typeof InputControl > = ( args ) => (
-	<InputControl { ...args } />
+	<InputControl __next40pxDefaultSize { ...args } />
 );
 
 export const Default = Template.bind( {} );
 Default.args = {
 	label: 'Value',
 	placeholder: 'Placeholder',
+	__next40pxDefaultSize: true,
 };
 
 export const WithHelpText = Template.bind( {} );
@@ -75,6 +83,29 @@ WithSuffix.args = {
 	suffix: <InputControlSuffixWrapper>%</InputControlSuffixWrapper>,
 };
 
+/**
+ * `<InputControlPrefixWrapper>` and `<InputControlSuffixWrapper>` have a `variant` prop that can be used to
+ * adjust the wrapper based on the prefix or suffix content.
+ *
+ * - `'default'`: Standard padding for text content.
+ * - `'icon'`: For icons.
+ * - `'control'`: For controls, like buttons or selects.
+ */
+export const WithIconOrControl = Template.bind( {} );
+WithIconOrControl.args = {
+	...Default.args,
+	prefix: (
+		<InputControlPrefixWrapper variant="icon">
+			<Icon icon={ link } />
+		</InputControlPrefixWrapper>
+	),
+	suffix: (
+		<InputControlSuffixWrapper variant="control">
+			<Button icon={ closeSmall } size="small" label="Clear" />
+		</InputControlSuffixWrapper>
+	),
+};
+
 export const WithSideLabel = Template.bind( {} );
 WithSideLabel.args = {
 	...Default.args,
@@ -92,23 +123,24 @@ export const ShowPassword: StoryFn< typeof InputControl > = ( args ) => {
 	const [ visible, setVisible ] = useState( false );
 	return (
 		<InputControl
+			__next40pxDefaultSize
 			type={ visible ? 'text' : 'password' }
-			label="Password"
 			suffix={
-				<InputControlSuffixWrapper>
-					<div style={ { display: 'flex' } }>
-						<Button
-							size="small"
-							icon={ visible ? unseen : seen }
-							onClick={ () => setVisible( ( value ) => ! value ) }
-							label={
-								visible ? 'Hide password' : 'Show password'
-							}
-						/>
-					</div>
+				<InputControlSuffixWrapper variant="control">
+					<Button
+						size="small"
+						icon={ visible ? unseen : seen }
+						onClick={ () => setVisible( ( value ) => ! value ) }
+						label={ visible ? 'Hide password' : 'Show password' }
+					/>
 				</InputControlSuffixWrapper>
 			}
 			{ ...args }
 		/>
 	);
+};
+ShowPassword.args = {
+	...Default.args,
+	label: 'Password',
+	placeholder: undefined,
 };

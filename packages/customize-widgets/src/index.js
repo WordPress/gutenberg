@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createRoot } from '@wordpress/element';
+import { createRoot, StrictMode } from '@wordpress/element';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
@@ -56,7 +56,8 @@ export function initialize( editorName, blockEditorSettings ) {
 			block.name.startsWith( 'core/post' ) ||
 			block.name.startsWith( 'core/query' ) ||
 			block.name.startsWith( 'core/site' ) ||
-			block.name.startsWith( 'core/navigation' )
+			block.name.startsWith( 'core/navigation' ) ||
+			block.name.startsWith( 'core/term' )
 		);
 	} );
 	registerCoreBlocks( coreBlocks );
@@ -92,11 +93,13 @@ export function initialize( editorName, blockEditorSettings ) {
 		} );
 
 		createRoot( container ).render(
-			<CustomizeWidgets
-				api={ wp.customize }
-				sidebarControls={ sidebarControls }
-				blockEditorSettings={ blockEditorSettings }
-			/>
+			<StrictMode>
+				<CustomizeWidgets
+					api={ wp.customize }
+					sidebarControls={ sidebarControls }
+					blockEditorSettings={ blockEditorSettings }
+				/>
+			</StrictMode>
 		);
 	} );
 }

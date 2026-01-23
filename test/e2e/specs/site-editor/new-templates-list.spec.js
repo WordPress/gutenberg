@@ -22,22 +22,20 @@ test.describe( 'Templates', () => {
 	test( 'Sorting', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( { postType: 'wp_template' } );
 
+		// Wait for the template list to be visible.
+		await expect(
+			page.locator( '[aria-label="Templates"]' )
+		).toBeVisible();
+
+		const firstTitle = page.locator( '.fields-field__title' ).first();
+
 		// Descending by title.
 		await page.getByRole( 'button', { name: 'View options' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Sort by' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Template' } ).click();
-		await page.getByRole( 'menuitemradio', { name: 'descending' } ).click();
-		const firstTitle = page
-			.getByRole( 'region', {
-				name: 'Template',
-				includeHidden: true,
-			} )
-			.getByRole( 'link', { includeHidden: true } )
-			.first();
+		await page.getByRole( 'radio', { name: 'Sort descending' } ).click();
 		await expect( firstTitle ).toHaveText( 'Tag Archives' );
 
 		// Ascending by title.
-		await page.getByRole( 'menuitemradio', { name: 'ascending' } ).click();
+		await page.getByRole( 'radio', { name: 'Sort ascending' } ).click();
 		await expect( firstTitle ).toHaveText( 'Category Archives' );
 	} );
 
@@ -50,13 +48,11 @@ test.describe( 'Templates', () => {
 		await admin.visitSiteEditor( { postType: 'wp_template' } );
 		// Global search.
 		await page.getByRole( 'searchbox', { name: 'Search' } ).fill( 'tag' );
-		const titles = page
-			.getByRole( 'region', { name: 'Template' } )
-			.getByRole( 'link', { includeHidden: true } );
+		const titles = page.locator( '.fields-field__title' );
 		await expect( titles ).toHaveCount( 1 );
 		await expect( titles.first() ).toHaveText( 'Tag Archives' );
 		await page
-			.getByRole( 'button', { name: 'Reset', exact: true } )
+			.getByRole( 'button', { name: 'Reset search', exact: true } )
 			.click();
 		await expect( titles ).toHaveCount( 6 );
 
@@ -86,15 +82,14 @@ test.describe( 'Templates', () => {
 	test( 'Field visibility', async ( { admin, page } ) => {
 		await admin.visitSiteEditor( { postType: 'wp_template' } );
 
-		await page.getByRole( 'button', { name: 'View options' } ).click();
-		await page.getByRole( 'menuitem', { name: 'Layout' } ).click();
+		await page.getByRole( 'button', { name: 'Layout' } ).click();
 		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
-		await page.getByRole( 'button', { name: 'Description' } ).click();
+		await page.getByRole( 'button', { name: 'Author' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Hide' } ).click();
 
 		await expect(
-			page.getByRole( 'button', { name: 'Description' } )
+			page.getByRole( 'button', { name: 'Author' } )
 		).toBeHidden();
 	} );
 } );

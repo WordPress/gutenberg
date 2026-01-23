@@ -17,47 +17,55 @@ export function useNotifyCopy() {
 	const { getBlockType } = useSelect( blocksStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	return useCallback( ( eventType, selectedBlockClientIds ) => {
-		let notice = '';
-		if ( selectedBlockClientIds.length === 1 ) {
-			const clientId = selectedBlockClientIds[ 0 ];
-			const title = getBlockType( getBlockName( clientId ) )?.title;
-			notice =
-				eventType === 'copy'
-					? sprintf(
-							// Translators: Name of the block being copied, e.g. "Paragraph".
-							__( 'Copied "%s" to clipboard.' ),
-							title
-					  )
-					: sprintf(
-							// Translators: Name of the block being cut, e.g. "Paragraph".
-							__( 'Moved "%s" to clipboard.' ),
-							title
-					  );
-		} else {
-			notice =
-				eventType === 'copy'
-					? sprintf(
-							// Translators: %d: Number of blocks being copied.
-							_n(
-								'Copied %d block to clipboard.',
-								'Copied %d blocks to clipboard.',
-								selectedBlockClientIds.length
-							),
-							selectedBlockClientIds.length
-					  )
-					: sprintf(
-							// Translators: %d: Number of blocks being cut.
-							_n(
-								'Moved %d block to clipboard.',
-								'Moved %d blocks to clipboard.',
-								selectedBlockClientIds.length
-							),
-							selectedBlockClientIds.length
-					  );
-		}
-		createSuccessNotice( notice, {
-			type: 'snackbar',
-		} );
-	}, [] );
+	return useCallback(
+		( eventType, selectedBlockClientIds ) => {
+			let notice = '';
+
+			if ( eventType === 'copyStyles' ) {
+				notice = __( 'Styles copied to clipboard.' );
+			} else if ( selectedBlockClientIds.length === 1 ) {
+				const clientId = selectedBlockClientIds[ 0 ];
+				const title = getBlockType( getBlockName( clientId ) )?.title;
+
+				if ( eventType === 'copy' ) {
+					notice = sprintf(
+						// Translators: %s: Name of the block being copied, e.g. "Paragraph".
+						__( 'Copied "%s" to clipboard.' ),
+						title
+					);
+				} else {
+					notice = sprintf(
+						// Translators: %s: Name of the block being cut, e.g. "Paragraph".
+						__( 'Moved "%s" to clipboard.' ),
+						title
+					);
+				}
+			} else if ( eventType === 'copy' ) {
+				notice = sprintf(
+					// Translators: %d: Number of blocks being copied.
+					_n(
+						'Copied %d block to clipboard.',
+						'Copied %d blocks to clipboard.',
+						selectedBlockClientIds.length
+					),
+					selectedBlockClientIds.length
+				);
+			} else {
+				notice = sprintf(
+					// Translators: %d: Number of blocks being moved.
+					_n(
+						'Moved %d block to clipboard.',
+						'Moved %d blocks to clipboard.',
+						selectedBlockClientIds.length
+					),
+					selectedBlockClientIds.length
+				);
+			}
+
+			createSuccessNotice( notice, {
+				type: 'snackbar',
+			} );
+		},
+		[ createSuccessNotice, getBlockName, getBlockType ]
+	);
 }

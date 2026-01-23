@@ -9,13 +9,11 @@ import clsx from 'clsx';
 import {
 	AlignmentControl,
 	BlockControls,
-	Warning,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
 
 export default function PostCommentsCountEdit( {
 	attributes,
@@ -68,13 +66,7 @@ export default function PostCommentsCountEdit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps } style={ blockStyles }>
-				{ hasPostAndComments ? (
-					commentsCount
-				) : (
-					<Warning>
-						{ __( 'Post Comments Count block: post not found.' ) }
-					</Warning>
-				) }
+				{ hasPostAndComments ? commentsCount : '0' }
 			</div>
 		</>
 	);

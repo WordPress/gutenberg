@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
 
 .components-popover.block-editor-block-popover {
 	z-index: z-index(".block-editor-block-popover");
@@ -57,6 +59,6 @@
 		position: absolute;
 		inset: 0;
 		background-color: var(--wp-admin-theme-color);
-		border-radius: 2px;
+		border-radius: $radius-small;
 	}
 }

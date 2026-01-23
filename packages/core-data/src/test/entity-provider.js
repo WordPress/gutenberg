@@ -14,13 +14,14 @@ import {
 } from '@wordpress/blocks';
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createRegistry, RegistryProvider } from '@wordpress/data';
-import '@wordpress/block-library';
+import { registerCoreBlocks } from '@wordpress/block-library';
+import { unregisterFormatType } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
  */
 import { store as coreDataStore } from '../index';
-import { useEntityBlockEditor } from '../entity-provider';
+import useEntityBlockEditor from '../hooks/use-entity-block-editor';
 
 const postTypeConfig = {
 	kind: 'postType',
@@ -85,6 +86,7 @@ describe( 'useEntityBlockEditor', () => {
 		const edit = ( { children } ) => <>{ children }</>;
 
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			supports: {
 				className: false,
 			},
@@ -103,7 +105,7 @@ describe( 'useEntityBlockEditor', () => {
 					source: 'html',
 					selector: 'p',
 					default: '',
-					__experimentalRole: 'content',
+					role: 'content',
 				},
 			},
 			title: 'block title',
@@ -111,6 +113,7 @@ describe( 'useEntityBlockEditor', () => {
 		} );
 
 		registerBlockType( 'core/test-block-with-array-of-strings', {
+			apiVersion: 3,
 			supports: {
 				className: false,
 			},
@@ -137,12 +140,15 @@ describe( 'useEntityBlockEditor', () => {
 			title: 'block title',
 			edit,
 		} );
+
+		registerCoreBlocks();
 	} );
 
 	afterEach( () => {
 		getBlockTypes().forEach( ( block ) => {
 			unregisterBlockType( block.name );
 		} );
+		unregisterFormatType( 'core/footnote' );
 	} );
 
 	it( 'does not mutate block attributes that include an array of strings or null values', async () => {

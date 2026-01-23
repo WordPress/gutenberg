@@ -6,13 +6,13 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import deprecated from '@wordpress/deprecated';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import {
 	BaseControl,
 	Button,
+	__experimentalInputControl as InputControl,
 	Spinner,
 	withSpokenMessages,
 	Popover,
@@ -52,7 +52,7 @@ class URLInput extends Component {
 		this.handleOnClick = this.handleOnClick.bind( this );
 		this.bindSuggestionNode = this.bindSuggestionNode.bind( this );
 		this.autocompleteRef = props.autocompleteRef || createRef();
-		this.inputRef = createRef();
+		this.inputRef = props.inputRef || createRef();
 		this.updateSuggestions = debounce(
 			this.updateSuggestions.bind( this ),
 			200
@@ -196,7 +196,7 @@ class URLInput extends Component {
 				if ( !! suggestions.length ) {
 					this.props.debouncedSpeak(
 						sprintf(
-							/* translators: %s: number of results. */
+							/* translators: %d: number of results. */
 							_n(
 								'%d result found, use up and down arrow keys to navigate.',
 								'%d results found, use up and down arrow keys to navigate.',
@@ -235,8 +235,8 @@ class URLInput extends Component {
 		this.suggestionsRequest = request;
 	}
 
-	onChange( event ) {
-		this.props.onChange( event.target.value );
+	onChange( newValue ) {
+		this.props.onChange( newValue );
 	}
 
 	onFocus() {
@@ -416,8 +416,6 @@ class URLInput extends Component {
 
 	renderControl() {
 		const {
-			/** Start opting into the new margin-free styles that will become the default in a future version. */
-			__nextHasNoMarginBottom = false,
 			label = null,
 			className,
 			isFullWidth,
@@ -426,6 +424,8 @@ class URLInput extends Component {
 			__experimentalRenderControl: renderControl,
 			value = '',
 			hideLabelFromVision = false,
+			help = null,
+			disabled = false,
 		} = this.props;
 
 		const {
@@ -451,12 +451,13 @@ class URLInput extends Component {
 			id: inputId,
 			value,
 			required: true,
-			className: 'block-editor-url-input__input',
 			type: 'text',
-			onChange: this.onChange,
-			onFocus: this.onFocus,
+			name: inputId,
+			autoComplete: 'off',
+			onChange: disabled ? () => {} : this.onChange, // Disable onChange when disabled
+			onFocus: disabled ? () => {} : this.onFocus, // Disable onFocus when disabled
 			placeholder,
-			onKeyDown: this.onKeyDown,
+			onKeyDown: disabled ? () => {} : this.onKeyDown, // Disable onKeyDown when disabled
 			role: 'combobox',
 			'aria-label': label ? undefined : __( 'URL' ), // Ensure input always has an accessible label
 			'aria-expanded': showSuggestions,
@@ -467,26 +468,18 @@ class URLInput extends Component {
 					? `${ suggestionOptionIdPrefix }-${ selectedSuggestion }`
 					: undefined,
 			ref: this.inputRef,
+			disabled,
+			suffix: this.props.suffix,
+			help,
 		};
 
 		if ( renderControl ) {
 			return renderControl( controlProps, inputProps, loading );
 		}
 
-		if ( ! __nextHasNoMarginBottom ) {
-			deprecated( 'Bottom margin styles for wp.blockEditor.URLInput', {
-				since: '6.2',
-				version: '6.5',
-				hint: 'Set the `__nextHasNoMarginBottom` prop to true to start opting into the new styles, which will become the default in a future version',
-			} );
-		}
-
 		return (
-			<BaseControl
-				__nextHasNoMarginBottom={ __nextHasNoMarginBottom }
-				{ ...controlProps }
-			>
-				<input { ...inputProps } />
+			<BaseControl { ...controlProps }>
+				<InputControl { ...inputProps } __next40pxDefaultSize />
 				{ loading && <Spinner /> }
 			</BaseControl>
 		);
@@ -546,13 +539,13 @@ class URLInput extends Component {
 			<Popover placement="bottom" focusOnMount={ false }>
 				<div
 					{ ...suggestionsListProps }
-					className={ clsx(
-						'block-editor-url-input__suggestions',
-						`${ className }__suggestions`
-					) }
+					className={ clsx( 'block-editor-url-input__suggestions', {
+						[ `${ className }__suggestions` ]: className,
+					} ) }
 				>
 					{ suggestions.map( ( suggestion, index ) => (
 						<Button
+							__next40pxDefaultSize
 							{ ...buildSuggestionItemProps( suggestion, index ) }
 							key={ suggestion.id }
 							className={ clsx(

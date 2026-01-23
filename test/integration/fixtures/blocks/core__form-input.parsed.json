@@ -7,5 +7,77 @@
 		"innerContent": [
 			"\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Label</span><input class=\"wp-block-form-input__input\" type=\"text\" name=\"label\" aria-required=\"false\"/></label></div>\n"
 		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/form-input",
+		"attrs": {
+			"type": "email"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Label</span><input class=\"wp-block-form-input__input\" type=\"email\" name=\"label\" aria-required=\"false\"/></label></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Label</span><input class=\"wp-block-form-input__input\" type=\"email\" name=\"label\" aria-required=\"false\"/></label></div>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/form-input",
+		"attrs": {
+			"type": "number"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Label</span><input class=\"wp-block-form-input__input\" type=\"number\" name=\"label\" aria-required=\"false\"/></label></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Label</span><input class=\"wp-block-form-input__input\" type=\"number\" name=\"label\" aria-required=\"false\"/></label></div>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/form-input",
+		"attrs": {
+			"type": "tel"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Label</span><input class=\"wp-block-form-input__input\" type=\"tel\" name=\"label\" aria-required=\"false\"/></label></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Label</span><input class=\"wp-block-form-input__input\" type=\"tel\" name=\"label\" aria-required=\"false\"/></label></div>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "core/form-input",
+		"attrs": {
+			"type": "url"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Label</span><input class=\"wp-block-form-input__input\" type=\"url\" name=\"label\" aria-required=\"false\"/></label></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-form-input\"><label class=\"wp-block-form-input__label\"><span class=\"wp-block-form-input__label-content\">Label</span><input class=\"wp-block-form-input__input\" type=\"url\" name=\"label\" aria-required=\"false\"/></label></div>\n"
+		]
 	}
 ]

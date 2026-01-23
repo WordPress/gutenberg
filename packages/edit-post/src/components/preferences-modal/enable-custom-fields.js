@@ -4,7 +4,7 @@
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { privateApis as preferencesPrivateApis } from '@wordpress/preferences';
 import { getPathAndQueryString } from '@wordpress/url';
@@ -39,9 +39,10 @@ export function CustomFieldsConfirmation( { willEnable } ) {
 				) }
 			</p>
 			<Button
-				className="edit-post-preferences-modal__custom-fields-confirmation-button"
+				__next40pxDefaultSize
 				variant="secondary"
 				isBusy={ isReloading }
+				accessibleWhenDisabled
 				disabled={ isReloading }
 				onClick={ () => {
 					setIsReloading( true );
@@ -56,7 +57,10 @@ export function CustomFieldsConfirmation( { willEnable } ) {
 	);
 }
 
-export function EnableCustomFieldsOption( { label, areCustomFieldsEnabled } ) {
+export default function EnableCustomFieldsOption( { label } ) {
+	const areCustomFieldsEnabled = useSelect( ( select ) => {
+		return !! select( editorStore ).getEditorSettings().enableCustomFields;
+	}, [] );
 	const [ isChecked, setIsChecked ] = useState( areCustomFieldsEnabled );
 
 	return (
@@ -71,8 +75,3 @@ export function EnableCustomFieldsOption( { label, areCustomFieldsEnabled } ) {
 		</PreferenceBaseOption>
 	);
 }
-
-export default withSelect( ( select ) => ( {
-	areCustomFieldsEnabled:
-		!! select( editorStore ).getEditorSettings().enableCustomFields,
-} ) )( EnableCustomFieldsOption );

@@ -98,16 +98,16 @@ test.describe( 'Gallery', () => {
 		);
 		await expect( galleryBlock ).toBeVisible();
 
-		const filename = await galleryBlockUtils.upload(
+		const fileName = await galleryBlockUtils.upload(
 			galleryBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
 		const image = galleryBlock.locator( 'role=img' );
 		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', new RegExp( filename ) );
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
 
 		const regex = new RegExp(
-			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"(?:full|large)\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image (?:size-full|size-large)\\"><img src=\\"[^"]+\/${ filename }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
+			`<!-- wp:gallery {\\"linkTo\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-gallery has-nested-images columns-default is-cropped\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"(?:full|large)\\",\\"linkDestination\\":\\"none\\"} -->\\s*<figure class=\\"wp-block-image (?:size-full|size-large)\\"><img src=\\"[^"]+\/${ fileName }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure>\\s*<!-- \/wp:image --><\/figure>\\s*<!-- \/wp:gallery -->`
 		);
 		await expect.poll( editor.getEditedPostContent ).toMatch( regex );
 	} );
@@ -219,6 +219,67 @@ test.describe( 'Gallery', () => {
 			mediaLibrary.locator( 'role=button[name="Create a new gallery"i]' )
 		).toBeVisible();
 	} );
+
+	test( 'can randomize the image on the front end', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		const numbers = Array.from( { length: 10 }, ( _, i ) => i + 1 );
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				randomOrder: true,
+			},
+			innerBlocks: numbers.map( ( i ) => ( {
+				name: 'core/image',
+				attributes: {
+					id: uploadedMedia.id,
+					alt: i.toString(),
+					url: uploadedMedia.source_url,
+				},
+			} ) ),
+		} );
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		const imageElements = page.locator( '.wp-block-gallery img' );
+		const imageAltTexts = await imageElements.evaluateAll( ( imgs ) =>
+			imgs.map( ( img ) => parseInt( img.alt, 10 ) )
+		);
+		expect( numbers ).not.toEqual( imageAltTexts );
+	} );
+
+	test( 'can randomize the image with a lightbox effect on the front end', async ( {
+		admin,
+		editor,
+		page,
+	} ) => {
+		const numbers = Array.from( { length: 10 }, ( _, i ) => i + 1 );
+		await admin.createNewPost();
+		await editor.insertBlock( {
+			name: 'core/gallery',
+			attributes: {
+				randomOrder: true,
+			},
+			innerBlocks: numbers.map( ( i ) => ( {
+				name: 'core/image',
+				attributes: {
+					id: uploadedMedia.id,
+					alt: i.toString(),
+					url: uploadedMedia.source_url,
+					lightbox: { enabled: true },
+				},
+			} ) ),
+		} );
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+		const imageElements = page.locator( '.wp-block-gallery img' );
+		const imageAltTexts = await imageElements.evaluateAll( ( imgs ) =>
+			imgs.map( ( img ) => parseInt( img.alt, 10 ) )
+		);
+		expect( numbers ).not.toEqual( imageAltTexts );
+	} );
 } );
 
 class GalleryBlockUtils {
@@ -239,12 +300,12 @@ class GalleryBlockUtils {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const filename = uuid();
-		const tmpFileName = path.join( tmpDirectory, filename + '.png' );
+		const fileName = uuid();
+		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
 
 		await inputElement.setInputFiles( tmpFileName );
 
-		return filename;
+		return fileName;
 	}
 }

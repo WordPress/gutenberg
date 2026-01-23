@@ -2,11 +2,26 @@
  * External dependencies
  */
 import { TextDecoder, TextEncoder } from 'node:util';
+import { Blob as BlobPolyfill, File as FilePolyfill } from 'node:buffer';
 
 jest.mock( '@wordpress/compose', () => {
 	return {
 		...jest.requireActual( '@wordpress/compose' ),
 		useViewportMatch: jest.fn(),
+	};
+} );
+
+jest.mock( '@wordpress/block-editor/src/hooks/list-view', () => {
+	return {
+		__esModule: true,
+		LIST_VIEW_SUPPORT_KEY: 'listView',
+		hasListViewSupport: jest.fn( () => false ),
+		ListViewPanel: jest.fn( () => null ),
+		default: {
+			edit: jest.fn( () => null ),
+			hasSupport: jest.fn( () => false ),
+			attributeKeys: [],
+		},
 	};
 } );
 
@@ -18,19 +33,6 @@ jest.mock( '@wordpress/compose', () => {
 jest.mock( 'client-zip', () => ( {
 	downloadZip: jest.fn(),
 } ) );
-
-/**
- * The new gallery block format is not compatible with the use_BalanceTags option
- * so a flag is set in lib/compat.php to allow disabling the new block in this instance.
- * This flag needs to be mocked here to ensure tests and fixtures run with the v2
- * version of the Gallery block enabled.
- *
- * Note: This should be removed when the minimum required WP version is >= 5.9.
- *
- */
-if ( ! window.wp?.galleryBlockV2Enabled ) {
-	window.wp = { ...window.wp, galleryBlockV2Enabled: true };
-}
 
 global.ResizeObserver = require( 'resize-observer-polyfill' );
 
@@ -57,3 +59,7 @@ if ( ! global.TextDecoder ) {
 if ( ! global.TextEncoder ) {
 	global.TextEncoder = TextEncoder;
 }
+
+// Override jsdom built-ins with native node implementation.
+global.Blob = BlobPolyfill;
+global.File = FilePolyfill;

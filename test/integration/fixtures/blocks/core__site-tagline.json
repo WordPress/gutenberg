@@ -3,7 +3,8 @@
 		"name": "core/site-tagline",
 		"isValid": true,
 		"attributes": {
-			"level": 0
+			"level": 0,
+			"levelOptions": [ 0, 1, 2, 3, 4, 5, 6 ]
 		},
 		"innerBlocks": []
 	}

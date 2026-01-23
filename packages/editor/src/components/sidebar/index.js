@@ -13,7 +13,7 @@ import {
 	useEffect,
 	useRef,
 } from '@wordpress/element';
-import { isRTL, __ } from '@wordpress/i18n';
+import { isRTL, __, _x } from '@wordpress/i18n';
 import { drawerLeft, drawerRight } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 import { privateApis as componentsPrivateApis } from '@wordpress/components';
@@ -22,21 +22,22 @@ import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import PageAttributesPanel from '../page-attributes/panel';
 import PatternOverridesPanel from '../pattern-overrides-panel';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebar from '../plugin-sidebar';
-import PostLastRevisionPanel from '../post-last-revision/panel';
 import PostSummary from './post-summary';
 import PostTaxonomiesPanel from '../post-taxonomies/panel';
 import PostTransformPanel from '../post-transform-panel';
 import SidebarHeader from './header';
 import TemplateContentPanel from '../template-content-panel';
+import TemplatePartContentPanel from '../template-part-content-panel';
+import { MediaMetadataPanel } from '../media';
 import useAutoSwitchEditorSidebars from '../provider/use-auto-switch-editor-sidebars';
 import { sidebars } from './constants';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import {
+	ATTACHMENT_POST_TYPE,
 	NAVIGATION_POST_TYPE,
 	TEMPLATE_PART_POST_TYPE,
 	TEMPLATE_POST_TYPE,
@@ -52,15 +53,16 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 const SidebarContent = ( {
 	tabName,
 	keyboardShortcut,
-	renderingMode,
 	onActionPerformed,
 	extraPanels,
+	postType,
 } ) => {
 	const tabListRef = useRef( null );
 	// Because `PluginSidebar` renders a `ComplementaryArea`, we
 	// need to forward the `Tabs` context so it can be passed through the
 	// underlying slot/fill.
 	const tabsContextValue = useContext( Tabs.Context );
+	const isAttachment = postType === ATTACHMENT_POST_TYPE;
 
 	// This effect addresses a race condition caused by tabbing from the last
 	// block in the editor into the settings sidebar. Without this effect, the
@@ -103,29 +105,40 @@ const SidebarContent = ( {
 			// see https://github.com/WordPress/gutenberg/pull/55360#pullrequestreview-1737671049
 			className="editor-sidebar__panel"
 			headerClassName="editor-sidebar__panel-tabs"
-			/* translators: button label text should, if possible, be under 16 characters. */
-			title={ __( 'Settings' ) }
+			title={
+				/* translators: button label text should, if possible, be under 16 characters. */
+				_x( 'Settings', 'panel button label' )
+			}
 			toggleShortcut={ keyboardShortcut }
 			icon={ isRTL() ? drawerLeft : drawerRight }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
 			<Tabs.Context.Provider value={ tabsContextValue }>
 				<Tabs.TabPanel tabId={ sidebars.document } focusable={ false }>
-					<PostSummary onActionPerformed={ onActionPerformed } />
-					<PluginDocumentSettingPanel.Slot />
-					{ renderingMode !== 'post-only' && (
-						<TemplateContentPanel />
+					{ isAttachment ? (
+						<MediaMetadataPanel
+							onActionPerformed={ onActionPerformed }
+						/>
+					) : (
+						<>
+							<PostSummary
+								onActionPerformed={ onActionPerformed }
+							/>
+							<PluginDocumentSettingPanel.Slot />
+							<TemplateContentPanel />
+							<TemplatePartContentPanel />
+							<PostTransformPanel />
+							<PostTaxonomiesPanel />
+							<PatternOverridesPanel />
+							{ extraPanels }
+						</>
 					) }
-					<PostTransformPanel />
-					<PostLastRevisionPanel />
-					<PostTaxonomiesPanel />
-					<PageAttributesPanel />
-					<PatternOverridesPanel />
-					{ extraPanels }
 				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
-					<BlockInspector />
-				</Tabs.TabPanel>
+				{ ! isAttachment && (
+					<Tabs.TabPanel tabId={ sidebars.block } focusable={ false }>
+						<BlockInspector />
+					</Tabs.TabPanel>
+				) }
 			</Tabs.Context.Provider>
 		</PluginSidebar>
 	);
@@ -133,7 +146,7 @@ const SidebarContent = ( {
 
 const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 	useAutoSwitchEditorSidebars();
-	const { tabName, keyboardShortcut, showSummary, renderingMode } = useSelect(
+	const { tabName, keyboardShortcut, showSummary, postType } = useSelect(
 		( select ) => {
 			const shortcut = select(
 				keyboardShortcutsStore
@@ -154,6 +167,8 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 					: sidebars.document;
 			}
 
+			const _postType = select( editorStore ).getCurrentPostType();
+
 			return {
 				tabName: _tabName,
 				keyboardShortcut: shortcut,
@@ -161,8 +176,8 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 					TEMPLATE_POST_TYPE,
 					TEMPLATE_PART_POST_TYPE,
 					NAVIGATION_POST_TYPE,
-				].includes( select( editorStore ).getCurrentPostType() ),
-				renderingMode: select( editorStore ).getRenderingMode(),
+				].includes( _postType ),
+				postType: _postType,
 			};
 		},
 		[]
@@ -189,9 +204,9 @@ const Sidebar = ( { extraPanels, onActionPerformed } ) => {
 				tabName={ tabName }
 				keyboardShortcut={ keyboardShortcut }
 				showSummary={ showSummary }
-				renderingMode={ renderingMode }
 				onActionPerformed={ onActionPerformed }
 				extraPanels={ extraPanels }
+				postType={ postType }
 			/>
 		</Tabs>
 	);

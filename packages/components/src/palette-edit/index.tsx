@@ -15,19 +15,16 @@ import {
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { lineSolid, moreVertical, plus } from '@wordpress/icons';
-import {
-	__experimentalUseFocusOutside as useFocusOutside,
-	useDebounce,
-} from '@wordpress/compose';
+import { useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
 import { ColorPicker } from '../color-picker';
-import { FlexItem } from '../flex';
+import { FlexBlock, FlexItem } from '../flex';
 import { HStack } from '../h-stack';
-import { ItemGroup } from '../item-group';
+import { Item, ItemGroup } from '../item-group';
 import { VStack } from '../v-stack';
 import GradientPicker from '../gradient-picker';
 import ColorPalette from '../color-palette';
@@ -38,7 +35,6 @@ import {
 	PaletteEditStyles,
 	PaletteHeading,
 	IndicatorStyled,
-	PaletteItem,
 	NameContainer,
 	NameInputControl,
 	DoneButton,
@@ -52,7 +48,6 @@ import { kebabCase } from '../utils/strings';
 import type {
 	Color,
 	ColorPickerPopoverProps,
-	Gradient,
 	NameInputProps,
 	OptionProps,
 	PaletteEditListViewProps,
@@ -65,12 +60,35 @@ const DEFAULT_COLOR = '#000';
 function NameInput( { value, onChange, label }: NameInputProps ) {
 	return (
 		<NameInputControl
+			size="compact"
 			label={ label }
 			hideLabelFromVision
 			value={ value }
 			onChange={ onChange }
 		/>
 	);
+}
+
+/*
+ * Deduplicates the slugs of the provided elements.
+ */
+export function deduplicateElementSlugs< T extends PaletteElement >(
+	elements: T[]
+) {
+	const slugCounts: { [ slug: string ]: number } = {};
+
+	return elements.map( ( element ) => {
+		let newSlug: string | undefined;
+
+		const { slug } = element;
+		slugCounts[ slug ] = ( slugCounts[ slug ] || 0 ) + 1;
+
+		if ( slugCounts[ slug ] > 1 ) {
+			newSlug = `${ slug }-${ slugCounts[ slug ] - 1 }`;
+		}
+
+		return { ...element, slug: newSlug ?? slug };
+	} );
 }
 
 /**
@@ -104,15 +122,15 @@ export function getNameAndSlugForPosition(
 
 	return {
 		name: sprintf(
-			/* translators: %s: is an id for a custom color */
-			__( 'Color %s' ),
+			/* translators: %d: is an id for a custom color */
+			__( 'Color %d' ),
 			position
 		),
 		slug: `${ slugPrefix }color-${ position }`,
 	};
 }
 
-function ColorPickerPopover< T extends Color | Gradient >( {
+function ColorPickerPopover< T extends PaletteElement >( {
 	isGradient,
 	element,
 	onChange,
@@ -170,20 +188,17 @@ function ColorPickerPopover< T extends Color | Gradient >( {
 	);
 }
 
-function Option< T extends Color | Gradient >( {
+function Option< T extends PaletteElement >( {
 	canOnlyChangeValues,
 	element,
 	onChange,
-	isEditing,
-	onStartEditing,
 	onRemove,
-	onStopEditing,
 	popoverProps: receivedPopoverProps,
 	slugPrefix,
 	isGradient,
 }: OptionProps< T > ) {
-	const focusOutsideProps = useFocusOutside( onStopEditing );
 	const value = isGradient ? element.gradient : element.color;
+	const [ isEditingColor, setIsEditingColor ] = useState( false );
 
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
@@ -198,26 +213,24 @@ function Option< T extends Color | Gradient >( {
 	);
 
 	return (
-		<PaletteItem
-			className={ isEditing ? 'is-selected' : undefined }
-			as={ isEditing ? 'div' : 'button' }
-			onClick={ onStartEditing }
-			aria-label={
-				isEditing
-					? undefined
-					: sprintf(
-							// translators: %s is a color or gradient name, e.g. "Red".
-							__( 'Edit: %s' ),
-							element.name.trim().length ? element.name : value
-					  )
-			}
-			ref={ setPopoverAnchor }
-			{ ...( isEditing ? { ...focusOutsideProps } : {} ) }
-		>
+		<Item ref={ setPopoverAnchor } size="small">
 			<HStack justify="flex-start">
-				<IndicatorStyled colorValue={ value } />
-				<FlexItem>
-					{ isEditing && ! canOnlyChangeValues ? (
+				<Button
+					size="small"
+					onClick={ () => {
+						setIsEditingColor( true );
+					} }
+					aria-label={ sprintf(
+						// translators: %s is a color or gradient name, e.g. "Red".
+						__( 'Edit: %s' ),
+						element.name.trim().length ? element.name : value || ''
+					) }
+					style={ { padding: 0 } }
+				>
+					<IndicatorStyled colorValue={ value } />
+				</Button>
+				<FlexBlock>
+					{ ! canOnlyChangeValues ? (
 						<NameInput
 							label={
 								isGradient
@@ -243,62 +256,67 @@ function Option< T extends Color | Gradient >( {
 								  '\u00A0' }
 						</NameContainer>
 					) }
-				</FlexItem>
-				{ isEditing && ! canOnlyChangeValues && (
+				</FlexBlock>
+				{ ! canOnlyChangeValues && (
 					<FlexItem>
 						<RemoveButton
 							size="small"
 							icon={ lineSolid }
-							label={ __( 'Remove color' ) }
+							label={ sprintf(
+								// translators: %s is a color or gradient name, e.g. "Red".
+								__( 'Remove color: %s' ),
+								element.name.trim().length
+									? element.name
+									: value || ''
+							) }
 							onClick={ onRemove }
 						/>
 					</FlexItem>
 				) }
 			</HStack>
-			{ isEditing && (
+			{ isEditingColor && (
 				<ColorPickerPopover
 					isGradient={ isGradient }
 					onChange={ onChange }
 					element={ element }
 					popoverProps={ popoverProps }
+					onClose={ () => setIsEditingColor( false ) }
 				/>
 			) }
-		</PaletteItem>
+		</Item>
 	);
 }
 
-function PaletteEditListView< T extends Color | Gradient >( {
+function PaletteEditListView< T extends PaletteElement >( {
 	elements,
 	onChange,
-	editingElement,
-	setEditingElement,
 	canOnlyChangeValues,
 	slugPrefix,
 	isGradient,
 	popoverProps,
+	addColorRef,
 }: PaletteEditListViewProps< T > ) {
 	// When unmounting the component if there are empty elements (the user did not complete the insertion) clean them.
-	const elementsReference = useRef< typeof elements >();
+	const elementsReferenceRef = useRef< typeof elements >();
 	useEffect( () => {
-		elementsReference.current = elements;
+		elementsReferenceRef.current = elements;
 	}, [ elements ] );
 
-	const debounceOnChange = useDebounce( onChange, 100 );
+	const debounceOnChange = useDebounce(
+		( updatedElements: T[] ) =>
+			onChange( deduplicateElementSlugs( updatedElements ) ),
+		100
+	);
 
 	return (
 		<VStack spacing={ 3 }>
-			<ItemGroup isRounded>
+			<ItemGroup isRounded isBordered isSeparated>
 				{ elements.map( ( element, index ) => (
 					<Option
 						isGradient={ isGradient }
 						canOnlyChangeValues={ canOnlyChangeValues }
 						key={ index }
 						element={ element }
-						onStartEditing={ () => {
-							if ( editingElement !== index ) {
-								setEditingElement( index );
-							}
-						} }
 						onChange={ ( newElement ) => {
 							debounceOnChange(
 								elements.map(
@@ -312,7 +330,6 @@ function PaletteEditListView< T extends Color | Gradient >( {
 							);
 						} }
 						onRemove={ () => {
-							setEditingElement( null );
 							const newElements = elements.filter(
 								( _currentElement, currentIndex ) => {
 									if ( currentIndex === index ) {
@@ -324,12 +341,7 @@ function PaletteEditListView< T extends Color | Gradient >( {
 							onChange(
 								newElements.length ? newElements : undefined
 							);
-						} }
-						isEditing={ index === editingElement }
-						onStopEditing={ () => {
-							if ( index === editingElement ) {
-								setEditingElement( null );
-							}
+							addColorRef.current?.focus();
 						} }
 						slugPrefix={ slugPrefix }
 						popoverProps={ popoverProps }
@@ -408,6 +420,8 @@ export function PaletteEdit( {
 		[ isGradient, elements ]
 	);
 
+	const addColorRef = useRef< HTMLButtonElement | null >( null );
+
 	return (
 		<PaletteEditStyles>
 			<HStack>
@@ -428,6 +442,7 @@ export function PaletteEdit( {
 					) }
 					{ ! canOnlyChangeValues && (
 						<Button
+							ref={ addColorRef }
 							size="small"
 							isPressed={ isAdding }
 							icon={ plus }
@@ -488,6 +503,7 @@ export function PaletteEdit( {
 										<NavigableMenu role="menu">
 											{ ! isEditing && (
 												<Button
+													__next40pxDefaultSize
 													variant="tertiary"
 													onClick={ () => {
 														setIsEditing( true );
@@ -500,6 +516,7 @@ export function PaletteEdit( {
 											) }
 											{ ! canOnlyChangeValues && (
 												<Button
+													__next40pxDefaultSize
 													variant="tertiary"
 													onClick={ () => {
 														setEditingElement(
@@ -522,6 +539,8 @@ export function PaletteEdit( {
 											) }
 											{ canReset && (
 												<Button
+													__next40pxDefaultSize
+													className="components-palette-edit__menu-button"
 													variant="tertiary"
 													onClick={ () => {
 														setEditingElement(
@@ -551,11 +570,10 @@ export function PaletteEdit( {
 							elements={ elements }
 							// @ts-expect-error TODO: Don't know how to resolve
 							onChange={ onChange }
-							editingElement={ editingElement }
-							setEditingElement={ setEditingElement }
 							slugPrefix={ slugPrefix }
 							isGradient={ isGradient }
 							popoverProps={ popoverProps }
+							addColorRef={ addColorRef }
 						/>
 					) }
 					{ ! isEditing && editingElement !== null && (

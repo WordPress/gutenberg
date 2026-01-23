@@ -61,9 +61,13 @@ export default function useFixedWindowList(
 			return;
 		}
 		const scrollContainer = getScrollContainer( elementRef.current );
-		const measureWindow = (
-			/** @type {boolean | undefined} */ initRender
-		) => {
+		/**
+		 *  Measures and sets the window of items to render based on the scroll position
+		 *
+		 * @param {boolean} [initRender] Indicates if this is the initial render
+		 * @return {void}
+		 */
+		const measureWindow = ( initRender ) => {
 			if ( ! scrollContainer ) {
 				return;
 			}

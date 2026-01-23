@@ -18,3 +18,6 @@ c56e8a1910ed74f405b74bbb12fe81dea974e5c3
 
 # Autofix eslint curly rule.
 0221522f253e094b277a1485b7a2d186cb172632
+
+# ESLint: Enable react/jsx-curly-brace-presence
+5d4baa9ab5f57d207cc3a048003216a8574574d9

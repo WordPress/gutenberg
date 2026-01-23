@@ -82,7 +82,7 @@ function ConvertToGroupButton( {
 				>
 					{ _x(
 						'Ungroup',
-						'Ungrouping blocks from within a grouping block back into individual blocks within the Editor '
+						'Ungrouping blocks from within a grouping block back into individual blocks within the Editor'
 					) }
 				</MenuItem>
 			) }

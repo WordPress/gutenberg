@@ -18,6 +18,7 @@ import {
 } from '@wordpress/icons';
 import { useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -53,15 +54,17 @@ export function IndentUI( { clientId } ) {
 			<ToolbarButton
 				icon={ isRTL() ? formatOutdentRTL : formatOutdent }
 				title={ __( 'Outdent' ) }
-				describedBy={ __( 'Outdent list item' ) }
+				shortcut={ displayShortcut.shift( 'Tab' ) }
+				description={ __( 'Outdent list item' ) }
 				disabled={ ! canOutdent }
 				onClick={ () => outdentListItem() }
 			/>
 			<ToolbarButton
 				icon={ isRTL() ? formatIndentRTL : formatIndent }
 				title={ __( 'Indent' ) }
-				describedBy={ __( 'Indent list item' ) }
-				isDisabled={ ! canIndent }
+				shortcut="Tab"
+				description={ __( 'Indent list item' ) }
+				disabled={ ! canIndent }
 				onClick={ () => indentListItem() }
 			/>
 		</>

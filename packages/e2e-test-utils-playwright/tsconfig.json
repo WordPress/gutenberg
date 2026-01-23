@@ -6,22 +6,13 @@
 		"composite": false,
 		"module": "Node16",
 		"moduleResolution": "node16",
-		"types": [ "node" ],
-		"rootDir": "src",
 		"noEmit": false,
 		"outDir": "build",
 		"sourceMap": true,
 		"declaration": true,
 		"declarationMap": true,
-		"declarationDir": "build-types",
 		"emitDeclarationOnly": false,
 		"allowJs": true,
 		"checkJs": false
-	},
-	"references": [
-		{ "path": "../api-fetch" },
-		{ "path": "../keycodes" },
-		{ "path": "../url" }
-	],
-	"include": [ "src/**/*" ]
+	}
 }

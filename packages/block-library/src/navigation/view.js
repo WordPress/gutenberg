@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { store, getContext, getElement } from '@wordpress/interactivity';
+import {
+	store,
+	getContext,
+	getElement,
+	withSyncEvent,
+} from '@wordpress/interactivity';
 
 const focusableSelectors = [
 	'a[href]',
@@ -12,6 +17,28 @@ const focusableSelectors = [
 	'[contenteditable]',
 	'[tabindex]:not([tabindex^="-"])',
 ];
+
+/**
+ * Gets all visible focusable elements within a container.
+ * Filters out elements that are hidden.
+ *
+ * @param {HTMLElement} ref - The container element to search within
+ * @return {HTMLElement[]} Array of visible focusable elements
+ */
+function getFocusableElements( ref ) {
+	const focusableElements = ref.querySelectorAll( focusableSelectors );
+	return Array.from( focusableElements ).filter( ( element ) => {
+		// Use modern checkVisibility API if available (Chrome 105+, Firefox 106+, Safari 17.4+)
+		if ( typeof element.checkVisibility === 'function' ) {
+			return element.checkVisibility( {
+				checkOpacity: false,
+				checkVisibilityCSS: true,
+			} );
+		}
+		// Fallback for older browsers
+		return element.offsetParent !== null;
+	} );
+}
 
 // This is a fix for Safari in iOS/iPadOS. Without it, Safari doesn't focus out
 // when the user taps in the body. It can be removed once we add an overlay to
@@ -106,12 +133,13 @@ const { state, actions } = store(
 					actions.openMenu( 'click' );
 				}
 			},
-			handleMenuKeydown( event ) {
+			handleMenuKeydown: withSyncEvent( ( event ) => {
 				const { type, firstFocusableElement, lastFocusableElement } =
 					getContext();
 				if ( state.menuOpenedBy.click ) {
 					// If Escape close the menu.
-					if ( event?.key === 'Escape' ) {
+					if ( event.key === 'Escape' ) {
+						event.stopPropagation(); // Keeps ancestor menus open.
 						actions.closeMenu( 'click' );
 						actions.closeMenu( 'focus' );
 						return;
@@ -137,13 +165,13 @@ const { state, actions } = store(
 						}
 					}
 				}
-			},
-			handleMenuFocusout( event ) {
+			} ),
+			handleMenuFocusout: withSyncEvent( ( event ) => {
 				const { modal, type } = getContext();
 				// If focus is outside modal, and in the document, close menu
 				// event.target === The element losing focus
 				// event.relatedTarget === The element receiving focus (if any)
-				// When focusout is outsite the document,
+				// When focusout is outside the document,
 				// `window.document.activeElement` doesn't change.
 
 				// The event.relatedTarget is null when something outside the navigation menu is clicked. This is only necessary for Safari.
@@ -156,7 +184,7 @@ const { state, actions } = store(
 					actions.closeMenu( 'click' );
 					actions.closeMenu( 'focus' );
 				}
-			},
+			} ),
 
 			openMenu( menuOpenedOn = 'click' ) {
 				const { type } = getContext();
@@ -192,8 +220,7 @@ const { state, actions } = store(
 				const ctx = getContext();
 				const { ref } = getElement();
 				if ( state.isMenuOpen ) {
-					const focusableElements =
-						ref.querySelectorAll( focusableSelectors );
+					const focusableElements = getFocusableElements( ref );
 					ctx.modal = ref;
 					ctx.firstFocusableElement = focusableElements[ 0 ];
 					ctx.lastFocusableElement =
@@ -203,8 +230,7 @@ const { state, actions } = store(
 			focusFirstElement() {
 				const { ref } = getElement();
 				if ( state.isMenuOpen ) {
-					const focusableElements =
-						ref.querySelectorAll( focusableSelectors );
+					const focusableElements = getFocusableElements( ref );
 					focusableElements?.[ 0 ]?.focus();
 				}
 			},

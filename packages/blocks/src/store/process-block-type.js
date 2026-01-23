@@ -9,6 +9,7 @@ import { isValidElementType } from 'react-is';
  */
 import deprecated from '@wordpress/deprecated';
 import { applyFilters } from '@wordpress/hooks';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -17,9 +18,6 @@ import { isValidIcon, normalizeIconObject, omit } from '../api/utils';
 import { BLOCK_ICON_DEFAULT, DEPRECATED_ENTRY_KEYS } from '../api/constants';
 
 /** @typedef {import('../api/registration').WPBlockType} WPBlockType */
-
-const error = ( ...args ) => window?.console?.error?.( ...args );
-const warn = ( ...args ) => window?.console?.warn?.( ...args );
 
 /**
  * Mapping of legacy category slugs to their latest normal values, used to
@@ -80,6 +78,7 @@ export const processBlockType =
 		const bootstrappedBlockType = select.getBootstrappedBlockType( name );
 
 		const blockType = {
+			apiVersion: 1,
 			name,
 			icon: BLOCK_ICON_DEFAULT,
 			keywords: [],
@@ -93,11 +92,29 @@ export const processBlockType =
 			save: () => null,
 			...bootstrappedBlockType,
 			...blockSettings,
+			// blockType.variations can be defined as a filePath.
 			variations: mergeBlockVariations(
-				bootstrappedBlockType?.variations,
-				blockSettings?.variations
+				Array.isArray( bootstrappedBlockType?.variations )
+					? bootstrappedBlockType.variations
+					: [],
+				Array.isArray( blockSettings?.variations )
+					? blockSettings.variations
+					: []
 			),
 		};
+
+		// If the block is registering attributes as null or undefined, warn and default to empty object.
+		if (
+			! blockType.attributes ||
+			typeof blockType.attributes !== 'object'
+		) {
+			warning(
+				'The block "' +
+					name +
+					'" is registering attributes as `null` or `undefined`. Use an empty object (`attributes: {}`) or exclude the `attributes` key.'
+			);
+			blockType.attributes = {};
+		}
 
 		const settings = applyFilters(
 			'blocks.registerBlockType',
@@ -105,6 +122,14 @@ export const processBlockType =
 			name,
 			null
 		);
+
+		if ( settings.apiVersion <= 2 ) {
+			deprecated( 'Block with API version 2 or lower', {
+				since: '6.9',
+				hint: `The block "${ name }" is registered with API version ${ settings.apiVersion }. This means that the post editor may work as a non-iframe editor. Since all editors are planned to work as iframes in the future, set the \`apiVersion\` field to 3 and test the block inside the iframe editor.`,
+				link: 'https://developer.wordpress.org/block-editor/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility/',
+			} );
+		}
 
 		if (
 			settings.description &&
@@ -142,16 +167,16 @@ export const processBlockType =
 		}
 
 		if ( ! isPlainObject( settings ) ) {
-			error( 'Block settings must be a valid object.' );
+			warning( 'Block settings must be a valid object.' );
 			return;
 		}
 
 		if ( typeof settings.save !== 'function' ) {
-			error( 'The "save" property must be a valid function.' );
+			warning( 'The "save" property must be a valid function.' );
 			return;
 		}
 		if ( 'edit' in settings && ! isValidElementType( settings.edit ) ) {
-			error( 'The "edit" property must be a valid component.' );
+			warning( 'The "edit" property must be a valid component.' );
 			return;
 		}
 
@@ -166,7 +191,7 @@ export const processBlockType =
 				.getCategories()
 				.some( ( { slug } ) => slug === settings.category )
 		) {
-			warn(
+			warning(
 				'The block "' +
 					name +
 					'" is registered with an invalid category "' +
@@ -177,19 +202,55 @@ export const processBlockType =
 		}
 
 		if ( ! ( 'title' in settings ) || settings.title === '' ) {
-			error( 'The block "' + name + '" must have a title.' );
+			warning( 'The block "' + name + '" must have a title.' );
 			return;
 		}
 		if ( typeof settings.title !== 'string' ) {
-			error( 'Block titles must be strings.' );
+			warning( 'Block titles must be strings.' );
 			return;
 		}
 
 		settings.icon = normalizeIconObject( settings.icon );
 		if ( ! isValidIcon( settings.icon.src ) ) {
-			error(
+			warning(
 				'The icon passed is invalid. ' +
 					'The icon should be a string, an element, a function, or an object following the specifications documented in https://developer.wordpress.org/block-editor/developers/block-api/block-registration/#icon-optional'
+			);
+			return;
+		}
+
+		if (
+			typeof settings?.parent === 'string' ||
+			settings?.parent instanceof String
+		) {
+			settings.parent = [ settings.parent ];
+			warning(
+				'Parent must be undefined or an array of strings (block types), but it is a string.'
+			);
+			// Intentionally continue:
+			//
+			// While string values were never supported, they appeared to work with some unintended side-effects
+			// that have been fixed by [#66250](https://github.com/WordPress/gutenberg/pull/66250).
+			//
+			// To be backwards-compatible, this code that automatically migrates strings to arrays.
+		}
+
+		if (
+			! Array.isArray( settings?.parent ) &&
+			settings?.parent !== undefined
+		) {
+			warning(
+				'Parent must be undefined or an array of block types, but it is ',
+				settings.parent
+			);
+			return;
+		}
+
+		if ( 1 === settings?.parent?.length && name === settings.parent[ 0 ] ) {
+			warning(
+				'Block "' +
+					name +
+					'" cannot be a parent of itself. Please remove the block name from the parent list.'
 			);
 			return;
 		}

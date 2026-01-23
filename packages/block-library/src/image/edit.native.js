@@ -147,7 +147,7 @@ function LinkSettings( {
 			label: __( 'Open in new tab' ),
 		},
 		linkRel: {
-			label: __( 'Link Rel' ),
+			label: __( 'Link relation' ),
 			placeholder: _x( 'None', 'Link rel attribute value placeholder' ),
 		},
 	};
@@ -581,7 +581,10 @@ export class ImageEdit extends Component {
 						) }{ ' ' }
 						<FooterMessageLink
 							href={
-								'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+								// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+								__(
+									'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+								)
 							}
 							value={ __( 'What is alt text?' ) }
 						/>
@@ -617,7 +620,7 @@ export class ImageEdit extends Component {
 					styles.removeFeaturedButton,
 				] }
 				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
-				separatorType={ 'none' }
+				separatorType="none"
 				onPress={ () =>
 					this.onSetFeatured( MEDIA_ID_NO_FEATURED_IMAGE_SET )
 				}
@@ -629,7 +632,7 @@ export class ImageEdit extends Component {
 				label={ __( 'Set as Featured Image' ) }
 				labelStyle={ setFeaturedButtonStyle }
 				cellContainerStyle={ styles.setFeaturedButtonCellContainer }
-				separatorType={ 'none' }
+				separatorType="none"
 				onPress={ () => this.onSetFeatured( attributes.id ) }
 			/>
 		);
@@ -902,7 +905,7 @@ export class ImageEdit extends Component {
 
 export default compose( [
 	withSelect( ( select, props ) => {
-		const { getMedia } = select( coreStore );
+		const { getEntityRecord } = select( coreStore );
 		const { getSettings, wasBlockJustInserted } =
 			select( blockEditorStore );
 		const { getEditedPostAttribute } = select( 'core/editor' );
@@ -923,7 +926,9 @@ export default compose( [
 				isNotFileUrl &&
 				url &&
 				! hasQueryArg( url, 'w' ) );
-		const image = shouldGetMedia ? getMedia( id ) : null;
+		const image = shouldGetMedia
+			? getEntityRecord( 'postType', 'attachment', id )
+			: null;
 
 		return {
 			image,

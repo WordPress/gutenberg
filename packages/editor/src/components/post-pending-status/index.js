@@ -11,6 +11,11 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import PostPendingStatusCheck from './check';
 import { store as editorStore } from '../../store';
 
+/**
+ * A component for displaying and toggling the pending status of a post.
+ *
+ * @return {React.ReactNode} The rendered component.
+ */
 export function PostPendingStatus() {
 	const status = useSelect(
 		( select ) => select( editorStore ).getEditedPostAttribute( 'status' ),
@@ -25,7 +30,6 @@ export function PostPendingStatus() {
 	return (
 		<PostPendingStatusCheck>
 			<CheckboxControl
-				__nextHasNoMarginBottom
 				label={ __( 'Pending review' ) }
 				checked={ status === 'pending' }
 				onChange={ togglePendingStatus }

@@ -51,6 +51,7 @@ export default function TemplateValidationNotice() {
 					synchronizeTemplate();
 				} }
 				onCancel={ () => setShowConfirmDialog( false ) }
+				size="medium"
 			>
 				{ __(
 					'Resetting the template may result in loss of content, do you want to continue?'

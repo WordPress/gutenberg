@@ -4,6 +4,8 @@ exports[`flags warnings with invalid selectors scss snapshot matches warnings 1`
 [
   {
     "column": 2,
+    "endColumn": 3,
+    "endLine": 3,
     "line": 3,
     "rule": "scss/selector-no-redundant-nesting-selector",
     "severity": "error",
@@ -11,6 +13,8 @@ exports[`flags warnings with invalid selectors scss snapshot matches warnings 1`
   },
   {
     "column": 2,
+    "endColumn": 3,
+    "endLine": 10,
     "line": 10,
     "rule": "scss/selector-no-redundant-nesting-selector",
     "severity": "error",
@@ -18,6 +22,8 @@ exports[`flags warnings with invalid selectors scss snapshot matches warnings 1`
   },
   {
     "column": 2,
+    "endColumn": 3,
+    "endLine": 17,
     "line": 17,
     "rule": "scss/selector-no-redundant-nesting-selector",
     "severity": "error",
@@ -25,6 +31,8 @@ exports[`flags warnings with invalid selectors scss snapshot matches warnings 1`
   },
   {
     "column": 2,
+    "endColumn": 3,
+    "endLine": 24,
     "line": 24,
     "rule": "scss/selector-no-redundant-nesting-selector",
     "severity": "error",
@@ -32,6 +40,8 @@ exports[`flags warnings with invalid selectors scss snapshot matches warnings 1`
   },
   {
     "column": 2,
+    "endColumn": 3,
+    "endLine": 31,
     "line": 31,
     "rule": "scss/selector-no-redundant-nesting-selector",
     "severity": "error",
@@ -39,6 +49,8 @@ exports[`flags warnings with invalid selectors scss snapshot matches warnings 1`
   },
   {
     "column": 10,
+    "endColumn": 11,
+    "endLine": 31,
     "line": 31,
     "rule": "selector-pseudo-element-colon-notation",
     "severity": "error",

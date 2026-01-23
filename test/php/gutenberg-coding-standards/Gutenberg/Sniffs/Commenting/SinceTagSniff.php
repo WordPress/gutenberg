@@ -3,8 +3,7 @@
  * Gutenberg Coding Standards.
  *
  * @package gutenberg/gutenberg-coding-standards
- * @link    https://github.com/WordPress/gutenberg
- * @license https://opensource.org/licenses/MIT MIT
+ * @link    https://github.com/WordPress/gutenberg/tree/trunk/test/php/gutenberg-coding-standards
  */
 
 namespace GutenbergCS\Gutenberg\Sniffs\Commenting;
@@ -22,7 +21,7 @@ use PHPCSUtils\Utils\Variables;
 /**
  * This sniff verifies the presence of valid `@since` tags in the docblocks of various PHP structures
  * and WordPress hooks. Supported structures include classes, interfaces, traits, enums, functions, methods and properties.
- * Files located within the __experimental block of the block-library are excluded from checks.
+ * Files located within the __experimental blocks of the block-library folder are excluded from checks.
  */
 class SinceTagSniff implements Sniff {
 
@@ -147,7 +146,7 @@ class SinceTagSniff implements Sniff {
 
 		$violation_codes = static::get_violation_codes( 'Hook' );
 
-		$docblock = static::find_hook_docblock( $phpcs_file, $stack_pointer );
+		$docblock = static::find_docblock( $phpcs_file, $stack_pointer );
 
 		$version_tags = static::parse_since_tags( $phpcs_file, $docblock );
 		if ( empty( $version_tags ) ) {
@@ -436,31 +435,55 @@ class SinceTagSniff implements Sniff {
 	}
 
 	/**
-	 * Finds the docblock associated with a hook, starting from a specified position in the token stack.
-	 * Since a line containing a hook can include any type of tokens, this method backtracks through the tokens
-	 * to locate the first token on the current line. This token is then used as the starting point for searching the docblock.
+	 * Finds the first token on the previous line relative to the stack pointer passed to the method.
 	 *
 	 * @param File $phpcs_file    The file being scanned.
-	 * @param int  $stack_pointer The position to start looking for the docblock.
-	 * @return array|false An associative array containing the start and end tokens of the docblock, or false if not found.
+	 * @param int  $stack_pointer The position to find the previous line token from.
+	 * @return int|false The last token on the previous line, or false if not found.
 	 */
-	protected static function find_hook_docblock( File $phpcs_file, $stack_pointer ) {
+	protected static function find_previous_line_token( File $phpcs_file, $stack_pointer ) {
 		$tokens       = $phpcs_file->getTokens();
 		$current_line = $tokens[ $stack_pointer ]['line'];
 
-		for ( $i = $stack_pointer; $i >= 0; $i-- ) {
-			if ( $tokens[ $i ]['line'] < $current_line ) {
-				// The previous token is on the previous line, so the current token is the first on the line.
-				return static::find_docblock( $phpcs_file, $i + 1 );
+		for ( $token = $stack_pointer; $token >= 0; $token-- ) {
+			if ( $tokens[ $token ]['line'] < $current_line ) {
+				return $token;
 			}
 		}
 
-		return static::find_docblock( $phpcs_file, 0 );
+		return false;
+	}
+
+	/**
+	 * Finds the docblock preceding a specified position (stack pointer) in a given PHP file.
+	 *
+	 * @param File $phpcs_file    The file being scanned.
+	 * @param int  $stack_pointer The position (stack pointer) in the token stack from which to start searching backwards.
+	 * @return array|false An associative array containing the start and end tokens of the docblock, or false if not found.
+	 */
+	protected static function find_docblock( File $phpcs_file, $stack_pointer ) {
+		// It can be assumed that the DocBlock should end on the previous line, not the current one.
+		$previous_line_end_token = static::find_previous_line_token( $phpcs_file, $stack_pointer );
+		if ( false === $previous_line_end_token ) {
+			return false;
+		}
+
+		$docblock_end_token = $phpcs_file->findPrevious( array( T_WHITESPACE ), $previous_line_end_token, null, true );
+
+		$tokens = $phpcs_file->getTokens();
+		if ( false === $docblock_end_token || T_DOC_COMMENT_CLOSE_TAG !== $tokens[ $docblock_end_token ]['code'] ) {
+			// Only "/**" style comments are supported.
+			return false;
+		}
+
+		return array(
+			'start_token' => $tokens[ $docblock_end_token ]['comment_opener'],
+			'end_token'   => $docblock_end_token,
+		);
 	}
 
 	/**
 	 * Determines if a T_STRING token represents a function call.
-	 * The implementation was copied from PHPCompatibility\Sniffs\Extensions\RemovedExtensionsSniff::process().
 	 *
 	 * @param File $phpcs_file    The file being scanned.
 	 * @param int  $stack_pointer The position of the T_STRING token in question.
@@ -469,81 +492,24 @@ class SinceTagSniff implements Sniff {
 	protected static function is_function_call( File $phpcs_file, $stack_pointer ) {
 		$tokens = $phpcs_file->getTokens();
 
+		// Find the previous non-empty token.
+		$previous = $phpcs_file->findPrevious( Tokens::$emptyTokens, ( $stack_pointer - 1 ), null, true );
+
+		$previous_tokens_to_ignore = array(
+			T_NEW,             // Creating an object.
+			T_OBJECT_OPERATOR, // Calling an object.
+			T_FUNCTION,        // Function declaration.
+		);
+
+		if ( in_array( $tokens[ $previous ]['code'], $previous_tokens_to_ignore, true ) ) {
+			// This is an object or function declaration.
+			return false;
+		}
+
 		// Find the next non-empty token.
 		$open_bracket = $phpcs_file->findNext( Tokens::$emptyTokens, ( $stack_pointer + 1 ), null, true );
 
-		if ( T_OPEN_PARENTHESIS !== $tokens[ $open_bracket ]['code'] ) {
-			// Not a function call.
-			return false;
-		}
-
-		if ( false === isset( $tokens[ $open_bracket ]['parenthesis_closer'] ) ) {
-			// Not a function call.
-			return false;
-		}
-
-		// Find the previous non-empty token.
-		$search   = Tokens::$emptyTokens;
-		$search[] = T_BITWISE_AND;
-		$previous = $phpcs_file->findPrevious( $search, ( $stack_pointer - 1 ), null, true );
-
-		$previous_tokens_to_ignore = array(
-			T_FUNCTION, // Function declaration.
-			T_NEW, // Creating an object.
-			T_OBJECT_OPERATOR, // Calling an object.
-		);
-
-		return ! in_array( $tokens[ $previous ]['code'], $previous_tokens_to_ignore, true );
-	}
-
-	/**
-	 * Finds the docblock preceding a specified position (stack pointer) in a given PHP file.
-	 * The implementation was copied from PHP_CodeSniffer\Standards\PEAR\Sniffs\Commenting\FunctionCommentSniff::process().
-	 *
-	 * @param File $phpcs_file    The file being scanned.
-	 * @param int  $stack_pointer The position (stack pointer) in the token stack from which to start searching backwards.
-	 * @return array|false An associative array containing the start and end tokens of the docblock, or false if not found.
-	 */
-	protected static function find_docblock( File $phpcs_file, $stack_pointer ) {
-		$tokens                 = $phpcs_file->getTokens();
-		$ignore                 = Tokens::$methodPrefixes;
-		$ignore[ T_WHITESPACE ] = T_WHITESPACE;
-
-		for ( $comment_end = ( $stack_pointer - 1 ); $comment_end >= 0; $comment_end-- ) {
-			if ( isset( $ignore[ $tokens[ $comment_end ]['code'] ] ) ) {
-				continue;
-			}
-
-			if ( T_ATTRIBUTE_END === $tokens[ $comment_end ]['code']
-			     && isset( $tokens[ $comment_end ]['attribute_opener'] )
-			) {
-				$comment_end = $tokens[ $comment_end ]['attribute_opener'];
-				continue;
-			}
-
-			break;
-		}
-
-		if ( $tokens[ $comment_end ]['code'] === T_COMMENT ) {
-			// Inline comments might just be closing comments for
-			// control structures or functions instead of function comments
-			// using the wrong comment type. If there is other code on the line,
-			// assume they relate to that code.
-			$previous = $phpcs_file->findPrevious( $ignore, ( $comment_end - 1 ), null, true );
-			if ( false !== $previous && $tokens[ $previous ]['line'] === $tokens[ $comment_end ]['line'] ) {
-				$comment_end = $previous;
-			}
-		}
-
-		if ( T_DOC_COMMENT_CLOSE_TAG !== $tokens[ $comment_end ]['code'] ) {
-			// Only "/**" style comments are supported.
-			return false;
-		}
-
-		return array(
-			'start_token' => $tokens[ $comment_end ]['comment_opener'],
-			'end_token'   => $comment_end,
-		);
+		return ( false !== $open_bracket ) && ( T_OPEN_PARENTHESIS === $tokens[ $open_bracket ]['code'] );
 	}
 
 	/**

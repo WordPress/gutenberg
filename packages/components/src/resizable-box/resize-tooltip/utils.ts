@@ -25,7 +25,7 @@ interface UseResizeLabelProps {
 interface UseResizeLabelArgs {
 	axis?: Axis;
 	fadeTimeout: number;
-	onResize( data: { width: number | null; height: number | null } ): void;
+	onResize: ( data: { width: number | null; height: number | null } ) => void;
 	position: Position;
 	showPx: boolean;
 }

@@ -1,5 +1,24 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
 .editor-post-template__swap-template-modal {
 	z-index: z-index(".editor-post-template__swap-template-modal");
+
+	.editor-post-template__swap-template-search {
+		background: $white;
+		position: sticky;
+		top: 0;
+		padding: $grid-unit-20 0;
+		transform: translateY(- $grid-unit-05); // Offsets the top padding on the modal content container
+		margin-bottom: - $grid-unit-05;
+		z-index: z-index(".editor-post-template__swap-template-search");
+	}
+}
+
+.editor-post-template__create-template-modal {
+	z-index: z-index(".editor-post-template__create-template-modal");
 }
 
 .editor-post-template__swap-template-modal-content .block-editor-block-patterns-list {
@@ -19,14 +38,6 @@
 
 	.block-editor-block-patterns-list__list-item {
 		break-inside: avoid-column;
-	}
-
-	.block-editor-block-patterns-list__item {
-		// Avoid to override the BlockPatternList component
-		// default hover and focus styles.
-		&:not(:focus):not(:hover) .block-editor-block-preview__container {
-			box-shadow: 0 0 0 1px $gray-300;
-		}
 	}
 }
 

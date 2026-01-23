@@ -111,7 +111,7 @@ body {
 
 ## Specification
 
-This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `theme.json`. Users, via the site editor, will also be able to override theme's or core's preferences via an user interface that is being worked on.
+This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `theme.json`. Users, via the site editor, will also be able to override theme's or core's preferences via a user interface that is being worked on.
 
 ```json
 {
@@ -237,7 +237,9 @@ The settings section has the following structure:
 		"custom": {},
 		"dimensions": {
 			"aspectRatio": false,
+			"height": false,
 			"minHeight": false,
+			"width": false,
 		},
 		"layout": {
 			"contentSize": "800px",
@@ -301,7 +303,7 @@ There's one special setting property, `appearanceTools`, which is a boolean and 
 - background: backgroundImage, backgroundSize
 - border: color, radius, style, width
 - color: link
-- dimensions: aspectRatio, minHeight
+- dimensions: aspectRatio, height, minHeight, width
 - position: sticky
 - spacing: blockGap, margin, padding
 - typography: lineHeight
@@ -310,20 +312,21 @@ There's one special setting property, `appearanceTools`, which is a boolean and 
 
 To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the top-level section. For example, if a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as setting `settings.color.custom` to `false`. If the `theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`. This is the complete list of equivalences:
 
-| add_theme_support           | theme.json setting                                        |
-| --------------------------- | --------------------------------------------------------- |
-| `custom-line-height`        | Set `typography.lineHeight` to `true`.              |
-| `custom-spacing`            | Set `spacing.padding` to `true`.                    |
-| `custom-units`              | Provide the list of units via `spacing.units`.            |
-| `disable-custom-colors`     | Set `color.custom` to `false`.                            |
-| `disable-custom-font-sizes` | Set `typography.customFontSize` to `false`.               |
-| `disable-custom-gradients`  | Set `color.customGradient` to `false`.                    |
-| `editor-color-palette`      | Provide the list of colors via `color.palette`.           |
-| `editor-font-sizes`         | Provide the list of font size via `typography.fontSizes`. |
-| `editor-gradient-presets`   | Provide the list of gradients via `color.gradients`.      |
-| `appearance-tools`          | Set `appearanceTools` to `true`.                          |
-| `border`                    | Set `border: color, radius, style, width` to `true`.      |
-| `link-color `               | Set `color.link` to `true`.                               |
+| add_theme_support           | theme.json setting                                            |
+| --------------------------- | ------------------------------------------------------------- |
+| `custom-line-height`        | Set `typography.lineHeight` to `true`.                        |
+| `custom-spacing`            | Set `spacing.padding` to `true`.                              |
+| `custom-units`              | Provide the list of units via `spacing.units`.                |
+| `disable-custom-colors`     | Set `color.custom` to `false`.                                |
+| `disable-custom-font-sizes` | Set `typography.customFontSize` to `false`.                   |
+| `disable-custom-gradients`  | Set `color.customGradient` to `false`.                        |
+| `editor-color-palette`      | Provide the list of colors via `color.palette`.               |
+| `editor-font-sizes`         | Provide the list of font size via `typography.fontSizes`.     |
+| `editor-gradient-presets`   | Provide the list of gradients via `color.gradients`.          |
+| `editor-spacing-sizes`      | Provide the list of spacing sizes via `spacing.spacingSizes`. |
+| `appearance-tools`          | Set `appearanceTools` to `true`.                              |
+| `border`                    | Set `border: color, radius, style, width` to `true`.          |
+| `link-color `               | Set `color.link` to `true`.                                   |
 
 #### Presets
 
@@ -336,16 +339,7 @@ The following presets can be defined via `theme.json`:
 - `color.palette`:
     - generates 3 classes per preset value: color, background-color, and border-color.
     - generates a single custom property per preset value.
-- `spacing.spacingScale`: used to generate an array of spacing preset sizes for use with padding, margin, and gap settings.
-    - `operator`: specifies how to calculate the steps with either `*` for multiplier, or `+` for sum.
-    - `increment`: the amount to increment each step by. Core by default uses a 'perfect 5th' multiplier of `1.5`.
-    - `steps`: the number of steps to generate in the spacing scale. The default is 7. To prevent the generation of the spacing presets, and to disable the related UI, this can be set to `0`.
-    - `mediumStep`: the steps in the scale are generated descending and ascending from a medium step, so this should be the size value of the medium space, without the unit. The default medium step is `1.5rem` so the mediumStep value is `1.5`.
-    - `unit`: the unit the scale uses, eg. `px, rem, em, %`. The default is `rem`.
-- `spacing.spacingSizes`: themes can choose to include a static `spacing.spacingSizes` array of spacing preset sizes if they have a sequence of sizes that can't be generated via an increment or multiplier.
-    - `name`: a human readable name for the size, eg. `Small, Medium, Large`.
-    - `slug`: the machine readable name. In order to provide the best cross site/theme compatibility the slugs should be in the format, "10","20","30","40","50","60", with "50" representing the `Medium` size value.
-    - `size`: the size, including the unit, eg. `1.5rem`. It is possible to include fluid values like `clamp(2rem, 10vw, 20rem)`.
+- `spacing.spacingSizes`/`spacing.spacingScale`: generates a single custom property per preset value.
 - `typography.fontSizes`: generates a single class and custom property per preset value.
 - `typography.fontFamilies`: generates a single custom property per preset value.
 
@@ -779,7 +773,9 @@ Each block declares which style properties it exposes via the [block supports me
 		},
 		"dimensions": {
 			"aspectRatio": "value",
+			"height": "value"
 			"minHeight": "value"
+			"width": "value"
 		},
 		"filter": {
 			"duotone": "value"
@@ -937,7 +933,7 @@ If you register a background color for the root using styles.color.background:
 	}
 ```
 
-You can use `ref: "styles.color.background"`  to re-use the style for a block:
+You can use `ref: "styles.color.background"`  to reuse the style for a block:
 
 ```JSON
 {
@@ -1042,7 +1038,7 @@ h3 {
 {% end %}
 ##### Element pseudo selectors
 
-Pseudo selectors `:hover`, `:focus`, `:visited`, `:active`, `:link`, `:any-link` are supported by Gutenberg.
+Pseudo selectors `:hover`, `:focus`, `:focus-visible`, `:visited`, `:active`, `:link`, `:any-link` are supported by Gutenberg.
 
 ```json
 "elements": {
@@ -1061,16 +1057,16 @@ Pseudo selectors `:hover`, `:focus`, `:visited`, `:active`, `:link`, `:any-link`
 
 #### Variations
 
-A block can have a "style variation", as defined per the [block.json specification](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#styles-optional). Theme authors can define the style attributes for an existing style variation using the theme.json file. Styles for unregistered style variations will be ignored.
+A block can have a "style variation," as defined in the [block.json specification](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/#styles-optional). Theme authors can define the style attributes for an existing style variation using the `theme.json` file. Styles for unregistered style variations will be ignored.
 
-Note that variations are a "block concept", they only exist bound to blocks. The `theme.json` specification respects that distinction by only allowing `variations` at the block-level but not at the top-level. It's also worth highlighting that only variations defined in the `block.json` file of the block are considered "registered": so far, the style variations added via `register_block_style` or in the client are ignored, see [this issue](https://github.com/WordPress/gutenberg/issues/49602) for more information.
+Note that variations are a "block concept"—they only exist when bound to blocks. The `theme.json` specification respects this distinction by only allowing `variations` at the block level, not the top level. It’s also worth highlighting that only variations defined in the `block.json` file of the block or via `register_block_style` on the server are considered "registered" for `theme.json` styling purposes.
 
 For example, this is how to provide styles for the existing `plain` variation for the `core/quote` block:
 
 ```json
 {
 	"version": 3,
-	"styles":{
+	"styles": {
 		"blocks": {
 			"core/quote": {
 				"variations": {
@@ -1086,12 +1082,105 @@ For example, this is how to provide styles for the existing `plain` variation fo
 }
 ```
 
-The resulting CSS output is this:
+The resulting CSS output is:
 
 ```css
 .wp-block-quote.is-style-plain {
 	background-color: red;
 }
+```
+
+It is also possible for multiple block types to share the same variation styles. There are two recommended ways to define such shared styles:
+
+1. `theme.json` partial files
+2. programmatically, using `register_block_style`
+
+##### Variation Theme.json Partials
+
+Like theme style variation partials, those for block style variations reside within a theme's `/styles` directory. However, they are differentiated from theme style variations by the introduction of a top-level property called `blockTypes`. The `blockTypes` property is an array of block types for which the block style variation has been registered.
+
+Additionally, a `slug` property is available to provide consistency between the different sources that may define block style variations and to decouple the `slug` from the translatable `title` property.
+
+The following is an example of a `theme.json` partial that defines styles for the "Variation A" block style for the Group, Columns, and Media & Text block types:
+
+```json
+{
+	"$schema": "https://schemas.wp.org/trunk/theme.json",
+	"version": 3,
+	"title": "Variation A",
+	"slug": "variation-a",
+	"blockTypes": [ "core/group", "core/columns", "core/media-text" ],
+	"styles": {
+		"color": {
+			"background": "#eed8d3",
+			"text": "#201819"
+		},
+		"elements": {
+			"heading": {
+				"color": {
+					"text": "#201819"
+				}
+			}
+		},
+		"blocks": {
+			"core/group": {
+				"color": {
+					"background": "#825f58",
+					"text": "#eed8d3"
+				},
+				"elements": {
+					"heading": {
+						"color": {
+							"text": "#eed8d3"
+						}
+					}
+				}
+			}
+		}
+	}
+}
+```
+
+##### Programmatically Registering Variation Styles
+
+As an alternative to `theme.json` partials, you can register variation styles at the same time as registering the variation itself through `register_block_style`. This is done by registering the block style for an array of block types while also passing a "style object" within the `style_data` option.
+
+The example below registers a "Green" variation for the Group and Columns blocks. Note that the style object passed via `style_data` follows the same shape as the `styles` property of a `theme.json` partial.
+
+```php
+register_block_style(
+    array( 'core/group', 'core/columns' ),
+    array(
+        'name'       => 'green',
+        'label'      => __( 'Green' ),
+        'style_data' => array(
+            'color'    => array(
+                'background' => '#4f6f52',
+                'text'       => '#d2e3c8',
+            ),
+            'blocks'   => array(
+                'core/group' => array(
+                    'color' => array(
+                        'background' => '#739072',
+                        'text'       => '#e3eedd',
+                    ),
+                ),
+            ),
+            'elements' => array(
+                'link'   => array(
+                    'color'  => array(
+                        'text' => '#ead196',
+                    ),
+                    ':hover' => array(
+                        'color' => array(
+                            'text' => '#ebd9b4',
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
+);
 ```
 
 ### customTemplates
@@ -1183,14 +1272,14 @@ One thing you may have noticed is the naming schema used for the CSS Custom Prop
 **Presets** such as `--wp--preset--color--black` can be divided into the following chunks:
 
 - `--wp`: prefix to namespace the CSS variable.
-- `preset `: indicates is a CSS variable that belongs to the presets.
+- `preset `: indicates that this is a CSS variable that belongs to the presets.
 - `color`: indicates which preset category the variable belongs to. It can be `color`, `font-size`, `gradients`.
 - `black`: the `slug` of the particular preset value.
 
 **Custom** properties such as `--wp--custom--line-height--body`, which can be divided into the following chunks:
 
 - `--wp`: prefix to namespace the CSS variable.
-- `custom`: indicates is a "free-form" CSS variable created by the theme.
+- `custom`: indicates that this is a "free-form" CSS variable created by the theme.
 - `line-height--body`: the result of converting the "custom" object keys into a string.
 
 The `--` as a separator has two functions:

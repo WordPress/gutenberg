@@ -54,11 +54,11 @@ Concatenate two or more React children objects.
 
 _Parameters_
 
--   _childrenArguments_ `...?Object`: Array of children arguments (array of arrays/strings/objects) to concatenate.
+-   _childrenArguments_ `ReactNode[][]`: - Array of children arguments (array of arrays/strings/objects) to concatenate.
 
 _Returns_
 
--   `Array`: The concatenated value.
+-   `ReactNode[]`: The concatenated value.
 
 ### createContext
 
@@ -110,11 +110,11 @@ You would have something like this as the conversionMap value:
 _Parameters_
 
 -   _interpolatedString_ `string`: The interpolation string to be parsed.
--   _conversionMap_ `Record<string, Element>`: The map used to convert the string to a react element.
+-   _conversionMap_ `Record< string, ReactElement >`: The map used to convert the string to a react element.
 
 _Returns_
 
--   `Element`: A wp element.
+-   `ReactElement`: A wp element.
 
 ### createPortal
 
@@ -209,7 +209,7 @@ Checks if the provided WP element is empty.
 
 _Parameters_
 
--   _element_ `*`: WP element to check.
+-   _element_ `unknown`: WP element to check.
 
 _Returns_
 
@@ -231,17 +231,17 @@ _Returns_
 
 _Related_
 
--   <https://reactjs.org/docs/react-api.html#reactlazy>
+-   <https://react.dev/reference/react/lazy>
 
 ### memo
 
 _Related_
 
--   <https://reactjs.org/docs/react-api.html#reactmemo>
+-   <https://react.dev/reference/react/memo>
 
 ### Platform
 
-Component used to detect the current Platform being used. Use Platform.OS === 'web' to detect if running on web enviroment.
+Component used to detect the current Platform being used. Use Platform.OS === 'web' to detect if running on web environment.
 
 This is the same concept as the React Native implementation.
 
@@ -266,11 +266,27 @@ const placeholderLabel = Platform.select( {
 
 _Related_
 
--   <https://reactjs.org/docs/react-api.html#reactpurecomponent>
+-   <https://react.dev/reference/react/PureComponent>
 
 ### RawHTML
 
-Component used as equivalent of Fragment with unescaped HTML, in cases where it is desirable to render dangerous HTML without needing a wrapper element. To preserve additional props, a `div` wrapper _will_ be created if any props aside from `children` are passed.
+Component used to render unescaped HTML.
+
+Note: The `renderElement` serializer will remove the `div` wrapper unless non-children props are present; typically when preparing a block for saving.
+
+_Usage_
+
+```jsx
+import { RawHTML } from '@wordpress/element';
+
+const Component = () => (
+	<RawHTML>
+		<h3>Hello world</h3>
+	</RawHTML>
+);
+// Edit: <div><h3>Hello world</h3></div>
+// save: <h3>Hello world</h3>
+```
 
 _Parameters_
 
@@ -296,19 +312,15 @@ Serializes a React element to string.
 
 _Parameters_
 
--   _element_ `import('react').ReactNode`: Element to serialize.
--   _context_ `[Object]`: Context object.
--   _legacyContext_ `[Object]`: Legacy context object.
-
-_Returns_
-
--   `string`: Serialized element.
+-   _element_ `React.ReactNode`:
+-   _context_ `any`:
+-   _legacyContext_ `Record< string, any >`:
 
 ### startTransition
 
 _Related_
 
--   <https://reactjs.org/docs/react-api.html#starttransition>
+-   <https://react.dev/reference/react/startTransition>
 
 ### StrictMode
 
@@ -318,7 +330,7 @@ Component that activates additional checks and warnings for its descendants.
 
 _Related_
 
--   <https://reactjs.org/docs/react-api.html#reactsuspense>
+-   <https://react.dev/reference/react/Suspense>
 
 ### switchChildrenNodeName
 
@@ -326,12 +338,12 @@ Switches the nodeName of all the elements in the children object.
 
 _Parameters_
 
--   _children_ `?Object`: Children object.
+-   _children_ `ReactNode`: Children object.
 -   _nodeName_ `string`: Node name.
 
 _Returns_
 
--   `?Object`: The updated children object.
+-   `ReactNode`: The updated children object.
 
 ### unmountComponentAtNode
 
@@ -347,91 +359,91 @@ _Related_
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#usecallback>
+-   <https://react.dev/reference/react/useCallback>
 
 ### useContext
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#usecontext>
+-   <https://react.dev/reference/react/useContext>
 
 ### useDebugValue
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#usedebugvalue>
+-   <https://react.dev/reference/react/useDebugValue>
 
 ### useDeferredValue
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#usedeferredvalue>
+-   <https://react.dev/reference/react/useDeferredValue>
 
 ### useEffect
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#useeffect>
+-   <https://react.dev/reference/react/useEffect>
 
 ### useId
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#useid>
+-   <https://react.dev/reference/react/useId>
 
 ### useImperativeHandle
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#useimperativehandle>
+-   <https://react.dev/reference/react/useImperativeHandle>
 
 ### useInsertionEffect
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#useinsertioneffect>
+-   <https://react.dev/reference/react/useInsertionEffect>
 
 ### useLayoutEffect
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#uselayouteffect>
+-   <https://react.dev/reference/react/useLayoutEffect>
 
 ### useMemo
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#usememo>
+-   <https://react.dev/reference/react/useMemo>
 
 ### useReducer
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#usereducer>
+-   <https://react.dev/reference/react/useReducer>
 
 ### useRef
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#useref>
+-   <https://react.dev/reference/react/useRef>
 
 ### useState
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#usestate>
+-   <https://react.dev/reference/react/useState>
 
 ### useSyncExternalStore
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#usesyncexternalstore>
+-   <https://react.dev/reference/react/useSyncExternalStore>
 
 ### useTransition
 
 _Related_
 
--   <https://reactjs.org/docs/hooks-reference.html#usetransition>
+-   <https://react.dev/reference/react/useTransition>
 
 <!-- END TOKEN(Autogenerated API docs) -->
 

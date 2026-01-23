@@ -14,6 +14,7 @@ import {
 	isPatternFiltered,
 	allPatternsCategory,
 	myPatternsCategory,
+	starterPatternsCategory,
 	INSERTER_PATTERN_TYPES,
 } from './utils';
 
@@ -66,6 +67,13 @@ export function usePatternCategories( rootClientId, sourceFilter = 'all' ) {
 				name: 'uncategorized',
 				label: _x( 'Uncategorized' ),
 			} );
+		}
+		if (
+			filteredPatterns.some( ( pattern ) =>
+				pattern.blockTypes?.includes( 'core/post-content' )
+			)
+		) {
+			categories.unshift( starterPatternsCategory );
 		}
 		if (
 			filteredPatterns.some(

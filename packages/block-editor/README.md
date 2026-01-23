@@ -45,7 +45,7 @@ In this example, we're instantiating a block editor. A block editor is composed 
 
 Inside `BlockEditorProvider`, you can nest any of the available `@wordpress/block-editor` UI components to build the UI of your editor.
 
-In the example above we're rendering the `BlockList` to show and edit the block list. For instance we could add a custom sidebar and use the `BlockInspector` component to be able to edit the advanced settings for the currently selected block. (See the [API](#API) for the list of all the available components).
+In the example above we're rendering the `BlockList` to show and edit the block list. For instance we could add a custom sidebar and use the `BlockInspector` component to be able to edit the advanced settings for the currently selected block. (See the [API](#api) for the list of all the available components).
 
 The `BlockTools` component is used to render the toolbar for a selected block.
 
@@ -99,6 +99,14 @@ _Related_
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-alignment-control/README.md>
+
+### BlockBindingsAttributeControl
+
+Internal dependencies
+
+### BlockBindingsSourceFieldsList
+
+Undocumented declaration.
 
 ### BlockBreadcrumb
 
@@ -384,6 +392,25 @@ _Returns_
 
 Undocumented declaration.
 
+### DimensionControl
+
+DimensionControl renders a linked unit control and range control for adjusting dimensions of a block.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/dimension-control/README.md>
+
+_Parameters_
+
+-   _props_ `Object`:
+-   _props.label_ `?string`: A label for the control.
+-   _props.onChange_ `( value: string ) => void`: Called when the dimension value changes.
+-   _props.value_ `string`: The current dimension value.
+
+_Returns_
+
+-   `Component`: The component to be rendered.
+
 ### FontSizePicker
 
 _Related_
@@ -547,7 +574,7 @@ _Returns_
 
 > **Deprecated**
 
-This function was accidentially exposed for mobile/native usage.
+This function was accidentally exposed for mobile/native usage.
 
 _Returns_
 
@@ -591,6 +618,8 @@ _Returns_
 -   `ComponentType`: The toolbar.
 
 ### HeightControl
+
+> **Deprecated** Use DimensionControl instead.
 
 HeightControl renders a linked unit control and range control for adjusting the height of a block.
 
@@ -659,6 +688,14 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/line-height-control/README.md>
 
+### LinkControl
+
+Renders a link control. A link control is a controlled input which maintains a value associated with a link (HTML anchor element) and relevant settings for how that link is expected to behave.
+
+_Parameters_
+
+-   _props_ `WPLinkControlProps`: Component props.
+
 ### MediaPlaceholder
 
 _Related_
@@ -705,9 +742,49 @@ Undocumented declaration.
 
 ### PlainText
 
+Render an auto-growing textarea allow users to fill any textual content.
+
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md>
+
+_Usage_
+
+```jsx
+import { registerBlockType } from '@wordpress/blocks';
+import { PlainText } from '@wordpress/block-editor';
+
+registerBlockType( 'my-plugin/example-block', {
+	// ...
+
+	attributes: {
+		content: {
+			type: 'string',
+		},
+	},
+
+	edit( { className, attributes, setAttributes } ) {
+		return (
+			<PlainText
+				className={ className }
+				value={ attributes.content }
+				onChange={ ( content ) => setAttributes( { content } ) }
+			/>
+		);
+	},
+} );
+```
+
+_Parameters_
+
+-   _props_ `Object`: Component props.
+-   _props.value_ `string`: String value of the textarea.
+-   _props.onChange_ `Function`: Function called when the text value changes.
+-   _props.ref_ `[Object]`: The component forwards the `ref` property to the `TextareaAutosize` component.
+
+_Returns_
+
+-   `Element`: Plain text component
 
 ### privateApis
 
@@ -729,10 +806,6 @@ _Parameters_
 _Returns_
 
 -   `JSX.Element`: A React element.
-
-### ReusableBlocksRenameHint
-
-Undocumented declaration.
 
 ### RichText
 
@@ -780,7 +853,6 @@ _Properties_
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
--   _\_\_unstableGalleryWithImageBlocks_ `boolean`: Whether the user has enabled the refactored gallery block which uses InnerBlocks
 
 ### SkipToSelectedBlock
 
@@ -806,7 +878,7 @@ _Related_
 
 ### ToolSelector
 
-Undocumented declaration.
+This component has been deprecated and no longer renders anything.
 
 ### transformStyles
 
@@ -816,20 +888,11 @@ _Parameters_
 
 -   _styles_ `EditorStyle[]`: CSS rules.
 -   _wrapperSelector_ `string`: Wrapper selector.
+-   _transformOptions_ `TransformOptions`: Additional options for style transformation.
 
 _Returns_
 
 -   `Array`: converted rules.
-
-_Type Definition_
-
--   _EditorStyle_ `Object`
-
-_Properties_
-
--   _css_ `string`: the CSS block(s), as a single string.
--   _baseURL_ `?string`: the base URL to be used as the reference when rewritting urls.
--   _ignoredSelectors_ `?string[]`: the selectors not to wrap.
 
 ### Typewriter
 
@@ -852,6 +915,56 @@ _Related_
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-popover/README.md>
+
+### useBlockBindingsUtils
+
+Retrieves the existing utils needed to update the block `bindings` metadata. They can be used to create, modify, or remove connections from the existing block attributes.
+
+It contains the following utils:
+
+-   `updateBlockBindings`: Updates the value of the bindings connected to block attributes. It can be used to remove a specific binding by setting the value to `undefined`.
+-   `removeAllBlockBindings`: Removes the bindings property of the `metadata` attribute.
+
+_Usage_
+
+```js
+import { useBlockBindingsUtils } from '@wordpress/block-editor';
+const { updateBlockBindings, removeAllBlockBindings } = useBlockBindingsUtils();
+
+// Update url and alt attributes.
+updateBlockBindings( {
+	url: {
+		source: 'core/post-meta',
+		args: {
+			key: 'url_custom_field',
+		},
+	},
+	alt: {
+		source: 'core/post-meta',
+		args: {
+			key: 'text_custom_field',
+		},
+	},
+} );
+
+// Remove binding from url attribute.
+updateBlockBindings( { url: undefined } );
+
+// Remove bindings from all attributes.
+removeAllBlockBindings();
+```
+
+_Parameters_
+
+-   _clientId_ `?string`: Optional block client ID. If not set, it will use the current block client ID from the context.
+
+_Returns_
+
+-   `?WPBlockBindingsUtils`: Object containing the block bindings utils.
+
+_Changelog_
+
+`6.7.0` Introduced in WordPress core.
 
 ### useBlockCommands
 
@@ -925,20 +1038,15 @@ _Usage_
 import { useBlockProps } from '@wordpress/block-editor';
 
 export default function Edit() {
+	const blockProps = useBlockProps( {
+		className: 'my-custom-class',
+		style: {
+			color: '#222222',
+			backgroundColor: '#eeeeee',
+		},
+	} );
 
-  const blockProps = useBlockProps(
-    className: 'my-custom-class',
-    style: {
-      color: '#222222',
-      backgroundColor: '#eeeeee'
-    }
-  )
-
-  return (
-    <div { ...blockProps }>
-
-    </div>
-  )
+	return <div { ...blockProps }></div>;
 }
 ```
 
@@ -1034,13 +1142,15 @@ _Returns_
 
 -   `any[]`: Returns the values defined for the settings.
 
-### useZoomOut
+### useStyleOverride
 
-A hook used to set the editor mode to zoomed out mode, invoking the hook sets the mode.
+Override a block editor settings style. Leave the ID blank to create a new style.
 
 _Parameters_
 
--   _zoomOut_ `boolean`: If we should enter into zoomOut mode or not
+-   _override_ `Object`: Override object.
+-   _override.id_ `?string`: Id of the style override, leave blank to create a new style.
+-   _override.css_ `string`: CSS to apply.
 
 ### Warning
 

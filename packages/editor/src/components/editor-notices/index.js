@@ -18,7 +18,7 @@ import TemplateValidationNotice from '../template-validation-notice';
  * <EditorNotices />
  * ```
  *
- * @return {JSX.Element} The rendered EditorNotices component.
+ * @return {React.ReactNode} The rendered EditorNotices component.
  */
 export function EditorNotices() {
 	const { notices } = useSelect(

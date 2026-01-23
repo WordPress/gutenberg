@@ -2,6 +2,82 @@
 
 ## Unreleased
 
+## 4.38.0 (2026-01-16)
+
+## 4.36.0 (2025-11-26)
+
+## 4.35.0 (2025-11-12)
+
+## 4.34.0 (2025-10-29)
+
+## 4.33.0 (2025-10-17)
+
+## 4.32.0 (2025-10-01)
+
+## 4.31.0 (2025-09-17)
+
+## 4.30.0 (2025-09-03)
+
+## 4.29.0 (2025-08-20)
+
+## 4.28.0 (2025-08-07)
+
+## 4.27.0 (2025-07-23)
+
+## 4.26.0 (2025-06-25)
+
+## 4.25.0 (2025-06-04)
+
+## 4.24.0 (2025-05-22)
+
+## 4.23.0 (2025-05-07)
+
+## 4.22.0 (2025-04-11)
+
+## 4.21.0 (2025-03-27)
+
+## 4.20.0 (2025-03-13)
+
+## 4.19.0 (2025-02-28)
+
+## 4.18.0 (2025-02-12)
+
+## 4.17.0 (2025-01-29)
+
+## 4.16.0 (2025-01-15)
+
+## 4.15.0 (2025-01-02)
+
+## 4.14.0 (2024-12-11)
+
+## 4.13.0 (2024-11-27)
+
+## 4.12.0 (2024-11-16)
+
+## 4.11.0 (2024-10-30)
+
+## 4.10.0 (2024-10-16)
+
+## 4.9.0 (2024-10-03)
+
+## 4.8.0 (2024-09-19)
+
+## 4.7.0 (2024-09-05)
+
+## 4.6.0 (2024-08-21)
+
+## 4.5.0 (2024-08-07)
+
+## 4.4.0 (2024-07-24)
+
+## 4.3.0 (2024-07-10)
+
+## 4.2.0 (2024-06-26)
+
+## 4.1.0 (2024-06-15)
+
+## 4.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
@@ -122,7 +198,7 @@
 
 ## 3.1.0 (2021-05-20)
 
-### Enhancement
+### Enhancements
 
 -   Adjusted count logic to recognize also numbers as words ([#27288](https://github.com/WordPress/gutenberg/pull/27288)).
 
@@ -137,46 +213,46 @@
 
 ## 2.0.3 (2018-10-29)
 
-### Polish
+### Internal
 
 -   Fix: `count` returns 0 for empty strings ([#10602](https://github.com/WordPress/gutenberg/pull/10602))
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
 
 ## 1.1.0 (2018-07-12)
 
-### New Feature
+### New Features
 
 -   Updated build to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 
-### Polish
+### Internal
 
 -   Moved `@WordPress/packages` repository to `@WordPress/gutenberg` ([#7805](https://github.com/WordPress/gutenberg/pull/7805))
 
 ## 1.0.3 (2018-05-18)
 
-### Polish
+### Internal
 
 -   Fix: Standardized `package.json` format ([#119](https://github.com/WordPress/packages/pull/119))
 
 ## 1.0.2 (2018-05-08)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix: Resolve error when input strings contains only whitespace ([#123](https://github.com/WordPress/packages/pull/123))
 
 ## 1.0.1 (2018-05-01)
 
-### Polish
+### Internal
 
 -   Internal: Include `publishConfig` configuration in `package.json`. ([#114](https://github.com/WordPress/packages/pull/114))
 
 ## 1.0.0 (2018-04-24)
 
-### New Feature
+### New Features
 
 -   Initial release

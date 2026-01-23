@@ -1,87 +1,106 @@
 # FormFileUpload
 
-FormFileUpload is a component that allows users to select files from their local device.
+<!-- This file is generated automatically and cannot be edited directly. Make edits via TypeScript types and TSDocs. -->
 
-## Usage
+<p class="callout callout-info">See the <a href="https://wordpress.github.io/gutenberg/?path=/docs/components-formfileupload--docs">WordPress Storybook</a> for more detailed, interactive documentation.</p>
+
+FormFileUpload allows users to select files from their local device.
 
 ```jsx
 import { FormFileUpload } from '@wordpress/components';
 
 const MyFormFileUpload = () => (
-	<FormFileUpload
-		accept="image/*"
-		onChange={ ( event ) => console.log( event.currentTarget.files ) }
-	>
-		Upload
-	</FormFileUpload>
+  <FormFileUpload
+    __next40pxDefaultSize
+    accept="image/*"
+    onChange={ ( event ) => console.log( event.currentTarget.files ) }
+  >
+    Upload
+  </FormFileUpload>
 );
 ```
 
 ## Props
 
-The component accepts the following props. Props not included in this set will be passed to the `Button` component.
+### `__next40pxDefaultSize`
 
-### accept
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
 
-A string passed to `input` element that tells the browser which file types can be upload to the upload by the user use. e.g: `image/*,video/*`.
-More information about this string is available in https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#Unique_file_type_specifiers.
+Start opting into the larger default height that will become the default size in a future version.
 
--   Type: `String`
--   Required: No
+### `accept`
 
-### children
+ - Type: `string`
+ - Required: No
+
+A string passed to the `input` element that tells the browser which
+[file types](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#Unique_file_type_specifiers)
+can be uploaded by the user. e.g: `image/*,video/*`.
+
+### `children`
+
+ - Type: `ReactNode`
+ - Required: No
 
 Children are passed as children of `Button`.
 
--   Type: `Boolean`
--   Required: No
+### `icon`
 
-### icon
+ - Type: `IconType`
+ - Required: No
 
-The icon to render. Supported values are: Dashicons (specified as strings), functions, Component instances and `null`.
+The icon to render in the default button.
 
--   Type: `String|Function|Component|null`
--   Required: No
--   Default: `null`
+See the `Icon` component docs for more information.
 
-### multiple
+### `multiple`
+
+ - Type: `boolean`
+ - Required: No
+ - Default: `false`
 
 Whether to allow multiple selection of files or not.
 
--   Type: `Boolean`
--   Required: No
--   Default: `false`
+### `onChange`
 
-### onChange
+ - Type: `ChangeEventHandler<HTMLInputElement>`
+ - Required: Yes
 
 Callback function passed directly to the `input` file element.
 
 Select files will be available in `event.currentTarget.files`.
 
--   Type: `Function`
--   Required: Yes
+### `onClick`
 
-### onClick
+ - Type: `MouseEventHandler<HTMLInputElement>`
+ - Required: No
 
 Callback function passed directly to the `input` file element.
 
-This can be useful when you want to force a `change` event to fire when the user chooses the same file again. To do this, set the target value to an empty string in the `onClick` function.
+This can be useful when you want to force a `change` event to fire when
+the user chooses the same file again. To do this, set the target value to
+an empty string in the `onClick` function.
 
 ```jsx
 <FormFileUpload
-	onClick={ ( event ) => ( event.target.value = '' ) }
-	onChange={ onChange }
+  __next40pxDefaultSize
+  onClick={ ( event ) => ( event.target.value = '' ) }
+  onChange={ onChange }
 >
-	Upload
+  Upload
 </FormFileUpload>
 ```
 
--   Type: `Function`
--   Required: No
+### `render`
 
-### render
+ - Type: `(arg: { openFileDialog: () => void; }) => ReactNode`
+ - Required: No
 
-Optional callback function used to render the UI. If passed, the component does not render the default UI (a button) and calls this function to render it. The function receives an object with property `openFileDialog`, a function that, when called, opens the browser native file upload modal window.
+Optional callback function used to render the UI.
 
--   Type: `Function`
--   Required: No
+If passed, the component does not render the default UI (a button) and
+calls this function to render it. The function receives an object with
+property `openFileDialog`, a function that, when called, opens the browser
+native file upload modal window.

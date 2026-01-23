@@ -105,6 +105,8 @@ Callback called when the media modal is closed after media is selected.
 
 This is called subsequent to `onClose` when media is selected. The selected media are passed as an argument.
 
+The `image.sizes.full` resolution does always exist. Other defined sizes are only available when the image is larger and thus could be scaled down.
+
 -   Type: `Function`
 -   Required: Yes
 -   Platform: Web | Mobile

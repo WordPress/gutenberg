@@ -34,7 +34,14 @@ test.describe( 'Block Switcher', () => {
 		await blockSwitcher.click();
 		await expect(
 			page.getByRole( 'menu', { name: 'List' } ).getByRole( 'menuitem' )
-		).toHaveText( [ 'Paragraph', 'Heading', 'Quote', 'Columns', 'Group' ] );
+		).toHaveText( [
+			'Paragraph',
+			'Heading',
+			'Quote',
+			'Columns',
+			'Details',
+			'Group',
+		] );
 	} );
 
 	test( 'Should show the expected block transforms on the list block when the quote block is removed', async ( {
@@ -74,7 +81,13 @@ test.describe( 'Block Switcher', () => {
 		await blockSwitcher.click();
 		await expect(
 			page.getByRole( 'menu', { name: 'List' } ).getByRole( 'menuitem' )
-		).toHaveText( [ 'Paragraph', 'Heading', 'Columns', 'Group' ] );
+		).toHaveText( [
+			'Paragraph',
+			'Heading',
+			'Columns',
+			'Details',
+			'Group',
+		] );
 	} );
 
 	test( 'Should not show the block switcher if the block has no styles and cannot be removed', async ( {
@@ -90,11 +103,11 @@ test.describe( 'Block Switcher', () => {
 		await pageUtils.pressKeys( 'alt+F10' );
 		const button = page
 			.getByRole( 'toolbar', { name: 'Block tools' } )
-			.getByRole( 'button', { name: 'Paragraph' } );
+			.getByRole( 'button', { name: 'Paragraph', exact: true } );
 		await expect( button ).toBeEnabled();
 
 		await editor.clickBlockOptionsMenuItem( 'Lock' );
-		await page.click( 'role=checkbox[name="Prevent removal"]' );
+		await page.click( 'role=checkbox[name="Lock removal"]' );
 		await page.click( 'role=button[name="Apply"]' );
 
 		// Verify the block switcher isn't enabled.

@@ -1,14 +1,16 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
-
-// !!
-// This list must be kept in sync with the same list in tools/webpack/packages.js
-// !!
 const BUNDLED_PACKAGES = [
+	'@wordpress/admin-ui',
 	'@wordpress/dataviews',
+	'@wordpress/dataviews/wp',
 	'@wordpress/icons',
 	'@wordpress/interface',
 	'@wordpress/sync',
 	'@wordpress/undo-manager',
+	'@wordpress/upload-media',
+	'@wordpress/fields',
+	'@wordpress/views',
+	'@wordpress/ui',
 ];
 
 /**
@@ -89,9 +91,10 @@ function defaultRequestToExternalModule( request ) {
 		return `module ${ request }`;
 	}
 
-	if ( request === '@wordpress/interactivity-router' ) {
-		// Assumes this is usually going to be used as a dynamic import.
-		return `import ${ request }`;
+	switch ( request ) {
+		case '@wordpress/interactivity-router':
+		case '@wordpress/a11y':
+			return `import ${ request }`;
 	}
 
 	const isWordPressScript = Boolean( defaultRequestToExternal( request ) );
@@ -117,7 +120,7 @@ function defaultRequestToExternalModule( request ) {
 function defaultRequestToHandle( request ) {
 	switch ( request ) {
 		case '@babel/runtime/regenerator':
-			return 'wp-polyfill';
+			return 'regenerator-runtime';
 
 		case 'lodash-es':
 			return 'lodash';

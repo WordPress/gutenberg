@@ -1,363 +1,342 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
-import {
-	Icon,
-	__experimentalText as Text,
-	__experimentalHStack as HStack,
-	VisuallyHidden,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
-import { useEntityRecords } from '@wordpress/core-data';
+import { Page } from '@wordpress/admin-ui';
+import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { parse } from '@wordpress/blocks';
+import { useState, useMemo, useCallback } from '@wordpress/element';
 import {
-	BlockPreview,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+	privateApis as corePrivateApis,
+	store as coreStore,
+} from '@wordpress/core-data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { addQueryArgs } from '@wordpress/url';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEvent } from '@wordpress/compose';
+import { useView } from '@wordpress/views';
+import { Button, Modal } from '@wordpress/components';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import { Async } from '../async';
-import Page from '../page';
-import { default as Link, useLink } from '../routes/link';
 import AddNewTemplate from '../add-new-template';
-import { useAddedBy } from './hooks';
-import {
-	TEMPLATE_POST_TYPE,
-	OPERATOR_IS_ANY,
-	LAYOUT_GRID,
-	LAYOUT_TABLE,
-	LAYOUT_LIST,
-} from '../../utils/constants';
-
-import usePatternSettings from '../page-patterns/use-pattern-settings';
+import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
-import { useEditPostAction } from '../dataviews-actions';
+import {
+	useEditPostAction,
+	useSetActiveTemplateAction,
+} from '../dataviews-actions';
+import {
+	authorField,
+	descriptionField,
+	previewField,
+	activeField,
+	slugField,
+	useThemeField,
+} from './fields';
+import { defaultLayouts, getDefaultView } from './view-utils';
 
-const { usePostActions } = unlock( editorPrivateApis );
-
-const { ExperimentalBlockEditorProvider, useGlobalStyle } = unlock(
-	blockEditorPrivateApis
-);
+const { usePostActions, usePostFields, templateTitleField } =
+	unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
-
-const EMPTY_ARRAY = [];
-
-const defaultConfigPerViewType = {
-	[ LAYOUT_TABLE ]: {
-		primaryField: 'title',
-	},
-	[ LAYOUT_GRID ]: {
-		mediaField: 'preview',
-		primaryField: 'title',
-		columnFields: [ 'description' ],
-	},
-	[ LAYOUT_LIST ]: {
-		primaryField: 'title',
-		mediaField: 'preview',
-	},
-};
-
-const DEFAULT_VIEW = {
-	type: LAYOUT_GRID,
-	search: '',
-	page: 1,
-	perPage: 20,
-	sort: {
-		field: 'title',
-		direction: 'asc',
-	},
-	// All fields are visible by default, so it's
-	// better to keep track of the hidden ones.
-	hiddenFields: [ 'preview' ],
-	layout: defaultConfigPerViewType[ LAYOUT_GRID ],
-	filters: [],
-};
-
-function Title( { item, viewType } ) {
-	if ( viewType === LAYOUT_LIST ) {
-		return decodeEntities( item.title?.rendered ) || __( '(no title)' );
-	}
-	const linkProps = {
-		params: {
-			postId: item.id,
-			postType: item.type,
-			canvas: 'edit',
-		},
-	};
-	return (
-		<Link { ...linkProps }>
-			{ decodeEntities( item.title?.rendered ) || __( '(no title)' ) }
-		</Link>
-	);
-}
-
-function AuthorField( { item, viewType } ) {
-	const [ isImageLoaded, setIsImageLoaded ] = useState( false );
-	const { text, icon, imageUrl } = useAddedBy( item.type, item.id );
-	const withIcon = viewType !== LAYOUT_LIST;
-
-	return (
-		<HStack alignment="left" spacing={ 1 }>
-			{ withIcon && imageUrl && (
-				<div
-					className={ clsx( 'page-templates-author-field__avatar', {
-						'is-loaded': isImageLoaded,
-					} ) }
-				>
-					<img
-						onLoad={ () => setIsImageLoaded( true ) }
-						alt=""
-						src={ imageUrl }
-					/>
-				</div>
-			) }
-			{ withIcon && ! imageUrl && (
-				<div className="page-templates-author-field__icon">
-					<Icon icon={ icon } />
-				</div>
-			) }
-			<span className="page-templates-author-field__name">{ text }</span>
-		</HStack>
-	);
-}
-
-function Preview( { item, viewType } ) {
-	const settings = usePatternSettings();
-	const [ backgroundColor = 'white' ] = useGlobalStyle( 'color.background' );
-	const blocks = useMemo( () => {
-		return parse( item.content.raw );
-	}, [ item.content.raw ] );
-	const { onClick } = useLink( {
-		postId: item.id,
-		postType: item.type,
-		canvas: 'edit',
-	} );
-
-	const isEmpty = ! blocks?.length;
-	// Wrap everything in a block editor provider to ensure 'styles' that are needed
-	// for the previews are synced between the site editor store and the block editor store.
-	// Additionally we need to have the `__experimentalBlockPatterns` setting in order to
-	// render patterns inside the previews.
-	// TODO: Same approach is used in the patterns list and it becomes obvious that some of
-	// the block editor settings are needed in context where we don't have the block editor.
-	// Explore how we can solve this in a better way.
-	return (
-		<ExperimentalBlockEditorProvider settings={ settings }>
-			<div
-				className={ `page-templates-preview-field is-viewtype-${ viewType }` }
-				style={ { backgroundColor } }
-			>
-				{ viewType === LAYOUT_LIST && ! isEmpty && (
-					<Async>
-						<BlockPreview blocks={ blocks } />
-					</Async>
-				) }
-				{ viewType !== LAYOUT_LIST && (
-					<button
-						className="page-templates-preview-field__button"
-						type="button"
-						onClick={ onClick }
-						aria-label={ item.title?.rendered || item.title }
-					>
-						{ isEmpty && __( 'Empty template' ) }
-						{ ! isEmpty && (
-							<Async>
-								<BlockPreview blocks={ blocks } />
-							</Async>
-						) }
-					</button>
-				) }
-			</div>
-		</ExperimentalBlockEditorProvider>
-	);
-}
+const { useEntityRecordsWithPermissions } = unlock( corePrivateApis );
 
 export default function PageTemplates() {
-	const { params } = useLocation();
-	const { activeView = 'all', layout } = params;
+	const { path, query } = useLocation();
+	const { activeView = 'active', postId } = query;
+	const [ selection, setSelection ] = useState( [ postId ] );
+	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
+		useState( false );
 	const defaultView = useMemo( () => {
-		const usedType = layout ?? DEFAULT_VIEW.type;
-		return {
-			...DEFAULT_VIEW,
-			type: usedType,
-			layout: defaultConfigPerViewType[ usedType ],
-			filters:
-				activeView !== 'all'
-					? [
-							{
-								field: 'author',
-								operator: 'isAny',
-								value: [ activeView ],
-							},
-					  ]
-					: [],
-		};
-	}, [ layout, activeView ] );
-	const [ view, setView ] = useState( defaultView );
-	useEffect( () => {
-		setView( ( currentView ) => ( {
-			...currentView,
-			filters:
-				activeView !== 'all'
-					? [
-							{
-								field: 'author',
-								operator: OPERATOR_IS_ANY,
-								value: [ activeView ],
-							},
-					  ]
-					: [],
-		} ) );
+		return getDefaultView( activeView );
 	}, [ activeView ] );
+	const { view, updateView, isModified, resetToDefault } = useView( {
+		kind: 'postType',
+		name: TEMPLATE_POST_TYPE,
+		slug: activeView,
+		defaultView,
+		queryParams: {
+			page: query.pageNumber,
+			search: query.search,
+		},
+		onChangeQueryParams: ( newQueryParams ) => {
+			history.navigate(
+				addQueryArgs( path, {
+					...query,
+					pageNumber: newQueryParams.page,
+					search: newQueryParams.search || undefined,
+				} )
+			);
+		},
+	} );
 
-	const { records, isResolving: isLoadingData } = useEntityRecords(
-		'postType',
-		TEMPLATE_POST_TYPE,
-		{
+	const { activeTemplatesOption, activeTheme, defaultTemplateTypes } =
+		useSelect( ( select ) => {
+			const { getEntityRecord, getCurrentTheme } = select( coreStore );
+			return {
+				activeTemplatesOption: getEntityRecord( 'root', 'site' )
+					?.active_templates,
+				activeTheme: getCurrentTheme(),
+				defaultTemplateTypes:
+					select( coreStore ).getCurrentTheme()
+						?.default_template_types,
+			};
+		} );
+	// Todo: this will have to be better so that we're not fetching all the
+	// records all the time. Active templates query will need to move server
+	// side.
+	const { records: userRecords, isResolving: isLoadingUserRecords } =
+		useEntityRecordsWithPermissions( 'postType', TEMPLATE_POST_TYPE, {
 			per_page: -1,
+			combinedTemplates: false,
+		} );
+	const { records: staticRecords, isResolving: isLoadingStaticData } =
+		useEntityRecordsWithPermissions( 'root', 'registeredTemplate', {
+			// This should not be needed, the endpoint returns all registered
+			// templates, but it's not possible right now to turn off pagination
+			// for entity configs.
+			per_page: -1,
+		} );
+
+	const activeTemplates = useMemo( () => {
+		const _active = [ ...staticRecords ];
+		if ( activeTemplatesOption ) {
+			for ( const activeSlug in activeTemplatesOption ) {
+				const activeId = activeTemplatesOption[ activeSlug ];
+				// Replace the template in the array.
+				const template = userRecords.find(
+					( userRecord ) =>
+						userRecord.id === activeId &&
+						userRecord.theme === activeTheme.stylesheet
+				);
+				if ( template ) {
+					const index = _active.findIndex(
+						( { slug } ) => slug === template.slug
+					);
+					if ( index !== -1 ) {
+						_active[ index ] = template;
+					} else {
+						_active.push( template );
+					}
+				}
+			}
 		}
+		return _active;
+	}, [ userRecords, staticRecords, activeTemplatesOption, activeTheme ] );
+
+	let isLoadingData;
+	if ( activeView === 'active' ) {
+		isLoadingData = isLoadingUserRecords || isLoadingStaticData;
+	} else if ( activeView === 'user' ) {
+		isLoadingData = isLoadingUserRecords;
+	} else {
+		isLoadingData = isLoadingStaticData;
+	}
+
+	const records = useMemo( () => {
+		function isCustom( record ) {
+			// For registered templates, the is_custom field is defined.
+			return (
+				record.is_custom ??
+				// For user templates it's custom if the is_wp_suggestion meta
+				// field is not set and the slug is not found in the default
+				// template types.
+				( ! record.meta?.is_wp_suggestion &&
+					! defaultTemplateTypes.some(
+						( type ) => type.slug === record.slug
+					) )
+			);
+		}
+
+		let _records;
+		if ( activeView === 'active' ) {
+			// Don't show active custom templates in the active view.
+			_records = activeTemplates.filter(
+				( record ) => ! isCustom( record )
+			);
+		} else if ( activeView === 'user' ) {
+			_records = userRecords;
+		} else {
+			_records = staticRecords;
+		}
+		return _records.map( ( record ) => ( {
+			...record,
+			_isActive: activeTemplates.some(
+				( template ) => template.id === record.id
+			),
+			_isCustom: isCustom( record ),
+		} ) );
+	}, [
+		activeTemplates,
+		defaultTemplateTypes,
+		userRecords,
+		staticRecords,
+		activeView,
+	] );
+
+	const users = useSelect(
+		( select ) => {
+			const { getUser } = select( coreStore );
+			return records.reduce( ( acc, record ) => {
+				if ( record.author_text ) {
+					if ( ! acc[ record.author_text ] ) {
+						acc[ record.author_text ] = record.author_text;
+					}
+				} else if ( record.author ) {
+					if ( ! acc[ record.author ] ) {
+						acc[ record.author ] = getUser( record.author );
+					}
+				}
+				return acc;
+			}, {} );
+		},
+		[ records ]
 	);
+
 	const history = useHistory();
-	const onSelectionChange = useCallback(
+	const onChangeSelection = useCallback(
 		( items ) => {
-			if ( view?.type === LAYOUT_LIST ) {
-				history.push( {
-					...params,
-					postId: items.length === 1 ? items[ 0 ].id : undefined,
-				} );
+			setSelection( items );
+			if ( view?.type === 'list' ) {
+				history.navigate(
+					addQueryArgs( path, {
+						postId: items.length === 1 ? items[ 0 ] : undefined,
+					} )
+				);
 			}
 		},
-		[ history, params, view?.type ]
+		[ history, path, view?.type ]
 	);
 
-	const authors = useMemo( () => {
-		if ( ! records ) {
-			return EMPTY_ARRAY;
+	const postTypeFields = usePostFields( {
+		postType: TEMPLATE_POST_TYPE,
+	} );
+	const dateField = postTypeFields.find( ( field ) => field.id === 'date' );
+	const themeField = useThemeField();
+	const fields = useMemo( () => {
+		const _fields = [
+			previewField,
+			templateTitleField,
+			descriptionField,
+			activeField,
+			slugField,
+		];
+		if ( activeView === 'user' ) {
+			_fields.push( themeField );
+			if ( dateField ) {
+				_fields.push( dateField );
+			}
 		}
-		const authorsSet = new Set();
-		records.forEach( ( template ) => {
-			authorsSet.add( template.author_text );
+		const elements = [];
+		for ( const author in users ) {
+			elements.push( {
+				value: users[ author ]?.id ?? author,
+				label: users[ author ]?.name ?? author,
+			} );
+		}
+		_fields.push( {
+			...authorField,
+			elements,
 		} );
-		return Array.from( authorsSet ).map( ( author ) => ( {
-			value: author,
-			label: author,
-		} ) );
-	}, [ records ] );
-
-	const fields = useMemo(
-		() => [
-			{
-				header: __( 'Preview' ),
-				id: 'preview',
-				render: ( { item } ) => {
-					return <Preview item={ item } viewType={ view.type } />;
-				},
-				minWidth: 120,
-				maxWidth: 120,
-				enableSorting: false,
-			},
-			{
-				header: __( 'Template' ),
-				id: 'title',
-				getValue: ( { item } ) => item.title?.rendered,
-				render: ( { item } ) => (
-					<Title item={ item } viewType={ view.type } />
-				),
-				maxWidth: 400,
-				enableHiding: false,
-				enableGlobalSearch: true,
-			},
-			{
-				header: __( 'Description' ),
-				id: 'description',
-				render: ( { item } ) => {
-					return item.description ? (
-						<span className="page-templates-description">
-							{ decodeEntities( item.description ) }
-						</span>
-					) : (
-						view.type === LAYOUT_TABLE && (
-							<>
-								<Text variant="muted" aria-hidden="true">
-									&#8212;
-								</Text>
-								<VisuallyHidden>
-									{ __( 'No description.' ) }
-								</VisuallyHidden>
-							</>
-						)
-					);
-				},
-				maxWidth: 400,
-				minWidth: 320,
-				enableSorting: false,
-				enableGlobalSearch: true,
-			},
-			{
-				header: __( 'Author' ),
-				id: 'author',
-				getValue: ( { item } ) => item.author_text,
-				render: ( { item } ) => {
-					return <AuthorField viewType={ view.type } item={ item } />;
-				},
-				elements: authors,
-				width: '1%',
-			},
-		],
-		[ authors, view.type ]
-	);
+		return _fields;
+	}, [ users, activeView, themeField, dateField ] );
 
 	const { data, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( records, view, fields );
 	}, [ records, view, fields ] );
 
-	const postTypeActions = usePostActions( TEMPLATE_POST_TYPE );
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const onActionPerformed = useCallback(
+		( actionId, items ) => {
+			switch ( actionId ) {
+				case 'duplicate-post':
+					{
+						const newItem = items[ 0 ];
+						const _title =
+							typeof newItem.title === 'string'
+								? newItem.title
+								: newItem.title?.rendered;
+						history.navigate( `/template?activeView=user` );
+						createSuccessNotice(
+							sprintf(
+								// translators: %s: Title of the created post or template, e.g: "Hello world".
+								__( '"%s" successfully created.' ),
+								decodeEntities( _title ) || __( '(no title)' )
+							),
+							{
+								type: 'snackbar',
+								id: 'duplicate-post-action',
+								actions: [
+									{
+										label: __( 'Edit' ),
+										onClick: () => {
+											history.navigate(
+												`/${ newItem.type }/${ newItem.id }?canvas=edit`
+											);
+										},
+									},
+								],
+							}
+						);
+					}
+					break;
+			}
+		},
+		[ history, createSuccessNotice ]
+	);
+	const postTypeActions = usePostActions( {
+		postType: TEMPLATE_POST_TYPE,
+		context: 'list',
+		onActionPerformed,
+	} );
 	const editAction = useEditPostAction();
+	const setActiveTemplateAction = useSetActiveTemplateAction();
 	const actions = useMemo(
-		() => [ editAction, ...postTypeActions ],
-		[ postTypeActions, editAction ]
+		() =>
+			activeView === 'user'
+				? [ setActiveTemplateAction, editAction, ...postTypeActions ]
+				: [ setActiveTemplateAction, ...postTypeActions ],
+		[ postTypeActions, setActiveTemplateAction, editAction, activeView ]
 	);
 
-	const onChangeView = useCallback(
-		( newView ) => {
-			if ( newView.type !== view.type ) {
-				newView = {
-					...newView,
-					layout: {
-						...defaultConfigPerViewType[ newView.type ],
-					},
-				};
+	const onChangeView = useEvent( ( newView ) => {
+		if ( newView.type !== view.type ) {
+			// Retrigger the routing areas resolution.
+			history.invalidate();
+		}
+		updateView( newView );
+	} );
 
-				history.push( {
-					...params,
-					layout: newView.type,
-				} );
-			}
-
-			setView( newView );
-		},
-		[ view.type, setView, history, params ]
+	const duplicateAction = actions.find(
+		( action ) => action.id === 'duplicate-post'
 	);
 
 	return (
 		<Page
 			className="edit-site-page-templates"
 			title={ __( 'Templates' ) }
-			actions={ <AddNewTemplate /> }
+			actions={
+				<>
+					{ isModified && (
+						<Button
+							__next40pxDefaultSize
+							onClick={ () => {
+								resetToDefault();
+								history.invalidate();
+							} }
+						>
+							{ __( 'Reset view' ) }
+						</Button>
+					) }
+					<AddNewTemplate />
+				</>
+			}
 		>
 			<DataViews
+				key={ activeView }
 				paginationInfo={ paginationInfo }
 				fields={ fields }
 				actions={ actions }
@@ -365,8 +344,32 @@ export default function PageTemplates() {
 				isLoading={ isLoadingData }
 				view={ view }
 				onChangeView={ onChangeView }
-				onSelectionChange={ onSelectionChange }
+				onChangeSelection={ onChangeSelection }
+				isItemClickable={ () => true }
+				onClickItem={ ( item ) => {
+					if ( typeof item.id === 'string' ) {
+						setSelectedRegisteredTemplate( item );
+					} else {
+						history.navigate(
+							`/${ item.type }/${ item.id }?canvas=edit`
+						);
+					}
+				} }
+				selection={ selection }
+				defaultLayouts={ defaultLayouts }
 			/>
+			{ selectedRegisteredTemplate && duplicateAction && (
+				<Modal
+					title={ __( 'Duplicate' ) }
+					onRequestClose={ () => setSelectedRegisteredTemplate() }
+					size="small"
+				>
+					<duplicateAction.RenderModal
+						items={ [ selectedRegisteredTemplate ] }
+						closeModal={ () => setSelectedRegisteredTemplate() }
+					/>
+				</Modal>
+			) }
 		</Page>
 	);
 }

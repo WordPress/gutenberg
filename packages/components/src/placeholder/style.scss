@@ -1,3 +1,7 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 // This needs specificity to override individual block styles.
 .components-placeholder.components-placeholder {
 	font-size: $default-font-size;
@@ -14,12 +18,11 @@
 	gap: $grid-unit-20;
 
 	// Some editor styles unset this.
-	-moz-font-smoothing: subpixel-antialiased;
 	-webkit-font-smoothing: subpixel-antialiased;
 
 
 	// Block UI appearance.
-	border-radius: $radius-block-ui;
+	border-radius: $radius-small;	// Match the block toolbar material radius.
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
 	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
@@ -48,7 +51,7 @@
 	.block-editor-block-icon {
 		margin-right: $grid-unit-05;
 		fill: currentColor;
-		// Optimizate for high contrast modes.
+		// Optimize for high contrast modes.
 		// See also https://blogs.windows.com/msedgedev/2020/09/17/styling-for-windows-high-contrast-with-new-standards-for-forced-colors/.
 		@media (forced-colors: active) {
 			fill: CanvasText;
@@ -144,6 +147,9 @@
 	display: flex;
 	box-shadow: none;
 
+	// In the unselected state, radius should match Global Styles > Image > Radius.
+	border-radius: 0;
+
 	// Blur the background so layered dashed placeholders are still visually separate.
 	// Make the background transparent to not interfere with the background overlay in placeholder-style() pseudo element
 	backdrop-filter: blur(100px);
@@ -170,8 +176,10 @@
 	.components-button {
 		opacity: 0;
 		pointer-events: none;
-		transition: opacity 0.1s linear;
-		@include reduce-motion("transition");
+
+		@media not (prefers-reduced-motion) {
+			transition: opacity 0.1s linear;
+		}
 	}
 
 	.is-selected > & {
@@ -183,8 +191,17 @@
 		}
 	}
 
-	// By painting the borders here, we enable them to be replaced by the Border control.
-	@include placeholder-style();
+	&::before {
+		content: "";
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		pointer-events: none;
+		background: currentColor;
+		opacity: 0.1;
+	}
 
 	overflow: hidden;
 	.is-selected & {

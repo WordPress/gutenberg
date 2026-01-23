@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors" as *;
+
 .editor-autocompleters__user {
 	.editor-autocompleters__no-avatar::before {
 		/* stylelint-disable-next-line font-family-no-missing-generic-family-keyword -- dashicons don't need a generic family keyword. */
@@ -11,7 +13,7 @@
 		flex-grow: 0;
 		flex-shrink: 0;
 		max-width: none; // we must override the gutenberg default of 100%
-		width: 24px; // avoid jarring resize by seting the size upfront
+		width: 24px; // avoid jarring resize by setting the size upfront
 		height: 24px;
 	}
 	.editor-autocompleters__user-name {
@@ -24,7 +26,6 @@
 	}
 	.editor-autocompleters__user-slug {
 		margin-left: 8px;
-		color: $gray-700;
 		white-space: nowrap;
 		text-overflow: ellipsis;
 		overflow: none;
@@ -32,7 +33,7 @@
 		flex-grow: 0;
 		flex-shrink: 0;
 	}
-	&:hover .editor-autocompleters__user-slug {
-		color: var(--wp-admin-theme-color);
+	&:not(.is-primary) .editor-autocompleters__user-slug {
+		color: $gray-700;
 	}
 }

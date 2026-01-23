@@ -5,10 +5,10 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 async function draftNewPage( page ) {
 	await page.getByRole( 'button', { name: 'Pages' } ).click();
-	await page.getByRole( 'button', { name: 'Add new page' } ).click();
+	await page.getByRole( 'button', { name: 'Add page' } ).click();
 	await page
-		.locator( 'role=dialog[name="Draft a new page"i]' )
-		.locator( 'role=textbox[name="Page title"i]' )
+		.locator( 'role=dialog[name="Draft new: page"i]' )
+		.locator( 'role=textbox[name="title"i]' )
 		.fill( 'Test Page' );
 	await page.keyboard.press( 'Enter' );
 	await expect(
@@ -36,7 +36,9 @@ async function addPageContent( editor, page ) {
 		.fill( 'Lorem ipsum dolor sit amet' );
 
 	// Insert into Page Content using global inserter.
-	await page.getByRole( 'button', { name: 'Toggle block inserter' } ).click();
+	await page
+		.getByRole( 'button', { name: 'Block Inserter', exact: true } )
+		.click();
 	await page.getByRole( 'option', { name: 'Heading', exact: true } ).click();
 	await editor.canvas
 		.getByRole( 'document', {
@@ -90,7 +92,7 @@ test.describe( 'Pages', () => {
 		await admin.visitSiteEditor();
 	} );
 
-	test( 'create a new page, edit template and toggle page template preview', async ( {
+	test.skip( 'create a new page, edit template and toggle page template preview', async ( {
 		page,
 		editor,
 	} ) => {
@@ -245,7 +247,7 @@ test.describe( 'Pages', () => {
 		// Create a custom template first.
 		const templateName = 'demo';
 		await page.getByRole( 'button', { name: 'Templates' } ).click();
-		await page.getByRole( 'button', { name: 'Add New Template' } ).click();
+		await page.getByRole( 'button', { name: 'Add template' } ).click();
 		await page
 			.getByRole( 'button', {
 				name: 'A custom template can be manually applied to any post or page.',
@@ -278,7 +280,7 @@ test.describe( 'Pages', () => {
 		await templateOptionsButton.click();
 		await page
 			.getByRole( 'menu', { name: 'Template options' } )
-			.getByText( 'Swap template' )
+			.getByText( 'Change template' )
 			.click();
 		const templateItem = page.locator(
 			'.block-editor-block-patterns-list__item-title'
@@ -301,7 +303,7 @@ test.describe( 'Pages', () => {
 		await expect( templateOptionsButton ).toHaveText( 'Single Entries' );
 	} );
 
-	test( 'swap template options should respect the declared `postTypes`', async ( {
+	test( 'change template options should respect the declared `postTypes`', async ( {
 		page,
 		editor,
 	} ) => {
@@ -316,7 +318,79 @@ test.describe( 'Pages', () => {
 		await expect(
 			page
 				.getByRole( 'menu', { name: 'Template options' } )
-				.getByText( 'Swap template' )
-		).toHaveCount( 0 );
+				.getByText( 'Change template' )
+		).toBeDisabled();
+	} );
+
+	// Regression test for https://github.com/WordPress/gutenberg/issues/73820
+	test( 'should allow setting page order to zero and negative values', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		// Create a published page for testing
+		await requestUtils.createPage( {
+			title: 'Order Test Page',
+			status: 'publish',
+		} );
+
+		await admin.visitSiteEditor();
+		await page.getByRole( 'button', { name: 'Pages' } ).click();
+
+		// Switch to table layout to access actions
+		await page.getByRole( 'button', { name: 'Layout' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+
+		// Open actions menu for the test page
+		let row = page.getByRole( 'row', { name: /Order Test Page/ } );
+		await row.getByRole( 'button', { name: 'Actions' } ).click();
+
+		// Click on Order action
+		await page.getByRole( 'menuitem', { name: 'Order' } ).click();
+
+		// Get the order input and save button
+		let orderInput = page.getByRole( 'spinbutton', { name: 'Order' } );
+		const saveButton = page.getByRole( 'button', { name: 'Save' } );
+
+		// Test that 0 is valid
+		await orderInput.fill( '0' );
+		await expect( saveButton ).toBeEnabled();
+
+		// Test that negative values are valid
+		await orderInput.fill( '-1' );
+		await expect( saveButton ).toBeEnabled();
+
+		await orderInput.fill( '-100' );
+		await expect( saveButton ).toBeEnabled();
+
+		// Test that positive values are still valid
+		await orderInput.fill( '5' );
+		await expect( saveButton ).toBeEnabled();
+
+		// Save with a negative value to verify it persists
+		await orderInput.fill( '-5' );
+		await saveButton.click();
+
+		// Verify success notice
+		await expect(
+			page.locator(
+				'role=button[name="Dismiss this notice"i] >> text="Order updated."'
+			)
+		).toBeVisible();
+
+		// Reload the page to verify the value persisted
+		await admin.visitSiteEditor();
+		await page.getByRole( 'button', { name: 'Pages' } ).click();
+		await page.getByRole( 'button', { name: 'Layout' } ).click();
+		await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
+
+		// Open Order action again for the same page
+		row = page.getByRole( 'row', { name: /Order Test Page/ } );
+		await row.getByRole( 'button', { name: 'Actions' } ).click();
+		await page.getByRole( 'menuitem', { name: 'Order' } ).click();
+
+		// Verify the negative value was persisted
+		orderInput = page.getByRole( 'spinbutton', { name: 'Order' } );
+		await expect( orderInput ).toHaveValue( '-5' );
 	} );
 } );

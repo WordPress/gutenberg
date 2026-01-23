@@ -1,59 +1,56 @@
 /**
- * WordPress dependencies
- */
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
-
-/**
  * Internal dependencies
  */
-import {
-	Composite as CompositeV2,
-	CompositeGroup as CompositeGroupV2,
-	CompositeItem as CompositeItemV2,
-	CompositeRow as CompositeRowV2,
-	useCompositeStore as useCompositeStoreV2,
-} from './composite/v2';
-import { default as CustomSelectControl } from './custom-select-control';
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
-import { default as ProgressBar } from './progress-bar';
-import { createPrivateSlotFill } from './slot-fill';
-import {
-	DropdownMenu as DropdownMenuV2,
-	DropdownMenuGroup as DropdownMenuGroupV2,
-	DropdownMenuItem as DropdownMenuItemV2,
-	DropdownMenuCheckboxItem as DropdownMenuCheckboxItemV2,
-	DropdownMenuRadioItem as DropdownMenuRadioItemV2,
-	DropdownMenuSeparator as DropdownMenuSeparatorV2,
-	DropdownMenuItemLabel as DropdownMenuItemLabelV2,
-	DropdownMenuItemHelpText as DropdownMenuItemHelpTextV2,
-} from './dropdown-menu-v2';
+import { Menu } from './menu';
 import { ComponentsContext } from './context/context-system-provider';
 import Theme from './theme';
-import Tabs from './tabs';
-import { kebabCase } from './utils/strings';
+import { Tabs } from './tabs';
+import { kebabCase, normalizeTextString } from './utils/strings';
+import { withIgnoreIMEEvents } from './utils/with-ignore-ime-events';
 import { lock } from './lock-unlock';
+import Badge from './badge';
+
+import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
+import {
+	ValidatedCheckboxControl,
+	ValidatedComboboxControl,
+	ValidatedInputControl,
+	ValidatedNumberControl,
+	ValidatedSelectControl,
+	ValidatedRadioControl,
+	ValidatedTextControl,
+	ValidatedTextareaControl,
+	ValidatedToggleControl,
+	ValidatedToggleGroupControl,
+} from './validated-form-controls';
+import { ValidatedFormTokenField } from './validated-form-controls/components/form-token-field';
+import { Picker } from './color-picker/picker';
 
 export const privateApis = {};
 lock( privateApis, {
-	CompositeV2,
-	CompositeGroupV2,
-	CompositeItemV2,
-	CompositeRowV2,
-	useCompositeStoreV2,
-	CustomSelectControl,
 	__experimentalPopoverLegacyPositionToPlacement,
-	createPrivateSlotFill,
 	ComponentsContext,
-	ProgressBar,
 	Tabs,
 	Theme,
-	DropdownMenuV2,
-	DropdownMenuGroupV2,
-	DropdownMenuItemV2,
-	DropdownMenuCheckboxItemV2,
-	DropdownMenuRadioItemV2,
-	DropdownMenuSeparatorV2,
-	DropdownMenuItemLabelV2,
-	DropdownMenuItemHelpTextV2,
+	Menu,
 	kebabCase,
+	withIgnoreIMEEvents,
+	Badge,
+	normalizeTextString,
+	DateCalendar,
+	DateRangeCalendar,
+	TZDate,
+	Picker,
+	ValidatedInputControl,
+	ValidatedCheckboxControl,
+	ValidatedComboboxControl,
+	ValidatedNumberControl,
+	ValidatedSelectControl,
+	ValidatedRadioControl,
+	ValidatedTextControl,
+	ValidatedTextareaControl,
+	ValidatedToggleControl,
+	ValidatedToggleGroupControl,
+	ValidatedFormTokenField,
 } );

@@ -50,7 +50,6 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 	}
 
 	// Convert Post Comment blocks in existing content to Comment blocks.
-	// TODO: Remove these checks when WordPress 6.0 is released.
 	if ( name === 'core/post-comment-author' ) {
 		name = 'core/comment-author-name';
 	}
@@ -77,37 +76,43 @@ export function convertLegacyBlockNameAndAttributes( name, attributes ) {
 		newAttributes.legacy = true;
 	}
 
-	// The following code is only relevant for the Gutenberg plugin.
-	// It's a stand-alone if statement for dead-code elimination.
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		// Convert pattern overrides added during experimental phase.
-		// Only four blocks were supported initially.
-		// These checks can be removed in WordPress 6.6.
-		if (
-			newAttributes.metadata?.bindings &&
-			( name === 'core/paragraph' ||
-				name === 'core/heading' ||
-				name === 'core/image' ||
-				name === 'core/button' )
-		) {
-			const bindings = [
-				'content',
-				'url',
-				'title',
-				'alt',
-				'text',
-				'linkTarget',
-			];
-			bindings.forEach( ( binding ) => {
-				if (
-					newAttributes.metadata.bindings[ binding ]?.source?.name ===
-					'pattern_attributes'
-				) {
-					newAttributes.metadata.bindings[ binding ].source =
-						'core/pattern-overrides';
-				}
-			} );
-		}
+	// Column count was stored as a string from WP 6.3-6.6. Convert it to a number.
+	if (
+		attributes.layout?.type === 'grid' &&
+		typeof attributes.layout?.columnCount === 'string'
+	) {
+		newAttributes.layout = {
+			...newAttributes.layout,
+			columnCount: parseInt( attributes.layout.columnCount, 10 ),
+		};
 	}
+
+	// Column span and row span were stored as strings in WP 6.6. Convert them to numbers.
+	if ( typeof attributes.style?.layout?.columnSpan === 'string' ) {
+		const columnSpanNumber = parseInt(
+			attributes.style.layout.columnSpan,
+			10
+		);
+		newAttributes.style = {
+			...newAttributes.style,
+			layout: {
+				...newAttributes.style.layout,
+				columnSpan: isNaN( columnSpanNumber )
+					? undefined
+					: columnSpanNumber,
+			},
+		};
+	}
+	if ( typeof attributes.style?.layout?.rowSpan === 'string' ) {
+		const rowSpanNumber = parseInt( attributes.style.layout.rowSpan, 10 );
+		newAttributes.style = {
+			...newAttributes.style,
+			layout: {
+				...newAttributes.style.layout,
+				rowSpan: isNaN( rowSpanNumber ) ? undefined : rowSpanNumber,
+			},
+		};
+	}
+
 	return [ name, newAttributes ];
 }

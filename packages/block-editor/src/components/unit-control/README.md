@@ -34,7 +34,7 @@ const Example = () => {
 
 ### Props
 
-#### disabledUnits
+#### disableUnits
 
 If true, the unit `<select>` is hidden.
 

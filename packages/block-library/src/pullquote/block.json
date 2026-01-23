@@ -2,22 +2,22 @@
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
 	"name": "core/pullquote",
-	"title": "Pullquote",
+	"title": "Pullquote (deprecated)",
 	"category": "text",
-	"description": "Give special visual emphasis to a quote from your text.",
+	"description": "This block is deprecated. Please use the Quote block instead.",
 	"textdomain": "default",
 	"attributes": {
 		"value": {
 			"type": "rich-text",
 			"source": "rich-text",
 			"selector": "p",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"citation": {
 			"type": "rich-text",
 			"source": "rich-text",
 			"selector": "cite",
-			"__experimentalRole": "content"
+			"role": "content"
 		},
 		"textAlign": {
 			"type": "string"
@@ -26,6 +26,13 @@
 	"supports": {
 		"anchor": true,
 		"align": [ "left", "right", "wide", "full" ],
+		"background": {
+			"backgroundImage": true,
+			"backgroundSize": true,
+			"__experimentalDefaultControls": {
+				"backgroundImage": true
+			}
+		},
 		"color": {
 			"gradients": true,
 			"background": true,
@@ -35,6 +42,13 @@
 				"text": true
 			}
 		},
+		"dimensions": {
+			"minHeight": true,
+			"__experimentalDefaultControls": {
+				"minHeight": false
+			}
+		},
+		"inserter": false,
 		"spacing": {
 			"margin": true,
 			"padding": true

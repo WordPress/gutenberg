@@ -16,30 +16,52 @@ import { store as patternsStore } from '../store';
 import { unlock } from '../lock-unlock';
 
 function PatternsManageButton( { clientId } ) {
-	const { canRemove, isVisible, managePatternsUrl } = useSelect(
+	const {
+		attributes,
+		canDetach,
+		isVisible,
+		managePatternsUrl,
+		isSyncedPattern,
+		isUnsyncedPattern,
+	} = useSelect(
 		( select ) => {
-			const { getBlock, canRemoveBlock, getBlockCount } =
-				select( blockEditorStore );
+			const { canRemoveBlock, getBlock } = select( blockEditorStore );
 			const { canUser } = select( coreStore );
-			const reusableBlock = getBlock( clientId );
+			const block = getBlock( clientId );
+
+			const _isUnsyncedPattern =
+				window?.__experimentalContentOnlyPatternInsertion &&
+				!! block?.attributes?.metadata?.patternName;
+
+			const _isSyncedPattern =
+				!! block &&
+				isReusableBlock( block ) &&
+				!! canUser( 'update', {
+					kind: 'postType',
+					name: 'wp_block',
+					id: block.attributes.ref,
+				} );
 
 			return {
-				canRemove: canRemoveBlock( clientId ),
-				isVisible:
-					!! reusableBlock &&
-					isReusableBlock( reusableBlock ) &&
-					!! canUser(
-						'update',
-						'blocks',
-						reusableBlock.attributes.ref
-					),
-				innerBlockCount: getBlockCount( clientId ),
+				attributes: block.attributes,
+				// For unsynced patterns, detaching is simply removing the `patternName` attribute.
+				// For synced patterns, the `core:block` block is replaced with its inner blocks,
+				// so checking whether `canRemoveBlock` is possible is required.
+				canDetach:
+					_isUnsyncedPattern ||
+					( _isSyncedPattern && canRemoveBlock( clientId ) ),
+				isUnsyncedPattern: _isUnsyncedPattern,
+				isSyncedPattern: _isSyncedPattern,
+				isVisible: _isUnsyncedPattern || _isSyncedPattern,
 				// The site editor and templates both check whether the user
 				// has edit_theme_options capabilities. We can leverage that here
 				// and omit the manage patterns link if the user can't access it.
-				managePatternsUrl: canUser( 'create', 'templates' )
+				managePatternsUrl: canUser( 'create', {
+					kind: 'postType',
+					name: 'wp_template',
+				} )
 					? addQueryArgs( 'site-editor.php', {
-							path: '/patterns',
+							p: '/pattern',
 					  } )
 					: addQueryArgs( 'edit.php', {
 							post_type: 'wp_block',
@@ -48,6 +70,8 @@ function PatternsManageButton( { clientId } ) {
 		},
 		[ clientId ]
 	);
+
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	// Ignore reason: false positive of the lint rule.
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
@@ -61,11 +85,25 @@ function PatternsManageButton( { clientId } ) {
 
 	return (
 		<>
-			{ canRemove && (
+			{ canDetach && (
 				<MenuItem
-					onClick={ () => convertSyncedPatternToStatic( clientId ) }
+					onClick={ () => {
+						if ( isSyncedPattern ) {
+							convertSyncedPatternToStatic( clientId );
+						}
+
+						if ( isUnsyncedPattern ) {
+							const {
+								patternName,
+								...attributesWithoutPatternName
+							} = attributes?.metadata ?? {};
+							updateBlockAttributes( clientId, {
+								metadata: attributesWithoutPatternName,
+							} );
+						}
+					} }
 				>
-					{ __( 'Detach' ) }
+					{ __( 'Disconnect pattern' ) }
 				</MenuItem>
 			) }
 			<MenuItem href={ managePatternsUrl }>

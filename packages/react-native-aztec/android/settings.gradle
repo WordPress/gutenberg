@@ -1,6 +1,6 @@
 pluginManagement {
     gradle.ext.kotlinVersion = '1.8.0'
-    gradle.ext.agpVersion = '8.1.0'
+    gradle.ext.agpVersion = '8.5.1'
     gradle.ext.automatticPublishToS3Version = '0.8.0'
 
     plugins {

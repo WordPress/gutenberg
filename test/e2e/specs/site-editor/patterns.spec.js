@@ -43,21 +43,21 @@ test.describe( 'Patterns', () => {
 		await expect( patterns.content ).toContainText( 'No results' );
 
 		await patterns.content
-			.getByRole( 'button', { name: 'add new pattern' } )
+			.getByRole( 'button', { name: 'add pattern' } )
 			.click();
 
 		const addNewMenuItem = page
 			.getByRole( 'menu', {
-				name: 'add new pattern',
+				name: 'add pattern',
 			} )
 			.getByRole( 'menuitem', {
-				name: 'add new pattern',
+				name: 'add pattern',
 			} );
 		await expect( addNewMenuItem ).toBeFocused();
 		await addNewMenuItem.click();
 
 		const createPatternDialog = page.getByRole( 'dialog', {
-			name: 'add new pattern',
+			name: 'add pattern',
 		} );
 		await createPatternDialog
 			.getByRole( 'textbox', { name: 'Name' } )
@@ -148,6 +148,7 @@ test.describe( 'Patterns', () => {
 		await admin.visitSiteEditor( { postType: 'wp_block' } );
 
 		await expect( patterns.item ).toHaveCount( 3 );
+
 		const searchBox = patterns.content.getByRole( 'searchbox', {
 			name: 'Search',
 		} );
@@ -198,7 +199,7 @@ class Patterns {
 		this.#page = page;
 
 		this.content = this.#page.getByRole( 'region', {
-			name: 'Patterns content',
+			name: 'All patterns',
 		} );
 		this.navigation = this.#page.getByRole( 'region', {
 			name: 'Navigation',

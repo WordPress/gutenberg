@@ -51,7 +51,7 @@ function gutenberg_menu() {
 		'gutenberg',
 		__( 'Experiments Settings', 'gutenberg' ),
 		__( 'Experiments', 'gutenberg' ),
-		'edit_posts',
+		'manage_options',
 		'gutenberg-experiments',
 		'the_gutenberg_experiments'
 	);

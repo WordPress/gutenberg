@@ -12,28 +12,31 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { applyFilters } from '@wordpress/hooks';
+import {
+	applyFilters,
+	applyFiltersAsync,
+	doActionAsync,
+} from '@wordpress/hooks';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { TRASH_POST_NOTICE_ID } from './constants';
 import { localAutosaveSet } from './local-autosave';
 import {
 	getNotificationArgumentsForSaveSuccess,
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-
+import { unlock } from '../lock-unlock';
 /**
  * Returns an action generator used in signalling that editor has initialized with
  * the specified post object and editor settings.
  *
- * @param {Object} post     Post object.
- * @param {Object} edits    Initial edited attributes object.
- * @param {Array?} template Block Template.
+ * @param {Object} post       Post object.
+ * @param {Object} edits      Initial edited attributes object.
+ * @param {Array}  [template] Block Template.
  */
 export const setupEditor =
 	( post, edits, template ) =>
@@ -59,7 +62,7 @@ export const setupEditor =
 		}
 		if (
 			edits &&
-			Object.values( edits ).some(
+			Object.entries( edits ).some(
 				( [ key, edit ] ) =>
 					edit !== ( post[ key ]?.raw ?? post[ key ] )
 			)
@@ -153,8 +156,16 @@ export function setEditedPost( postType, postId ) {
  * Returns an action object used in signalling that attributes of the post have
  * been edited.
  *
- * @param {Object} edits   Post attributes to edit.
- * @param {Object} options Options for the edit.
+ * @param {Object} edits     Post attributes to edit.
+ * @param {Object} [options] Options for the edit.
+ *
+ * @example
+ * ```js
+ * // Update the post title
+ * wp.data.dispatch( 'core/editor' ).editPost( { title: `${ newTitle }` } );
+ * ```
+ *
+ * @return {Object} Action object
  */
 export const editPost =
 	( edits, options ) =>
@@ -168,7 +179,7 @@ export const editPost =
 /**
  * Action for saving the current post in the editor.
  *
- * @param {Object} options
+ * @param {Object} [options]
  */
 export const savePost =
 	( options = {} ) =>
@@ -184,7 +195,7 @@ export const savePost =
 		}
 
 		const previousRecord = select.getCurrentPost();
-		const edits = {
+		let edits = {
 			id: previousRecord.id,
 			...registry
 				.select( coreStore )
@@ -196,33 +207,82 @@ export const savePost =
 			content,
 		};
 		dispatch( { type: 'REQUEST_POST_UPDATE_START', options } );
-		await registry
-			.dispatch( coreStore )
-			.saveEntityRecord(
-				'postType',
-				previousRecord.type,
+
+		let error = false;
+		try {
+			edits = await applyFiltersAsync(
+				'editor.preSavePost',
 				edits,
 				options
 			);
-
-		let error = registry
-			.select( coreStore )
-			.getLastEntitySaveError(
-				'postType',
-				previousRecord.type,
-				previousRecord.id
-			);
+		} catch ( err ) {
+			error = err;
+		}
 
 		if ( ! error ) {
-			await applyFilters(
-				'editor.__unstableSavePost',
-				Promise.resolve(),
-				options
-			).catch( ( err ) => {
+			try {
+				await registry
+					.dispatch( coreStore )
+					.saveEntityRecord(
+						'postType',
+						previousRecord.type,
+						edits,
+						options
+					);
+			} catch ( err ) {
+				error =
+					err.message && err.code !== 'unknown_error'
+						? err.message
+						: __( 'An error occurred while updating.' );
+			}
+		}
+
+		if ( ! error ) {
+			error = registry
+				.select( coreStore )
+				.getLastEntitySaveError(
+					'postType',
+					previousRecord.type,
+					previousRecord.id
+				);
+		}
+
+		// Run the hook with legacy unstable name for backward compatibility
+		if ( ! error ) {
+			try {
+				await applyFilters(
+					'editor.__unstableSavePost',
+					Promise.resolve(),
+					options
+				);
+			} catch ( err ) {
 				error = err;
-			} );
+			}
+		}
+
+		if ( ! error ) {
+			try {
+				await doActionAsync(
+					'editor.savePost',
+					{ id: previousRecord.id, type: previousRecord.type },
+					options
+				);
+			} catch ( err ) {
+				error = err;
+			}
 		}
 		dispatch( { type: 'REQUEST_POST_UPDATE_FINISH', options } );
+
+		if (
+			typeof window !== 'undefined' &&
+			window.__experimentalTemplateActivate &&
+			! options.isAutosave &&
+			previousRecord.type === 'wp_template' &&
+			( typeof previousRecord.id === 'number' ||
+				/^\d+$/.test( previousRecord.id ) )
+		) {
+			templateActivationNotice( { select, dispatch, registry } );
+		}
 
 		if ( error ) {
 			const args = getNotificationArgumentsForSaveFail( {
@@ -258,6 +318,91 @@ export const savePost =
 		}
 	};
 
+async function templateActivationNotice( { select, registry } ) {
+	const editorSettings = select.getEditorSettings();
+
+	// Don't open for focused entity.
+	if ( editorSettings.onNavigateToPreviousEntityRecord ) {
+		return;
+	}
+
+	const { id, slug } = select.getCurrentPost();
+	const site = await registry
+		.select( coreStore )
+		.getEntityRecord( 'root', 'site' );
+
+	// Already active.
+	if ( site.active_templates[ slug ] === id ) {
+		return;
+	}
+
+	const currentTheme = await registry
+		.resolveSelect( coreStore )
+		.getCurrentTheme();
+	const templateType = currentTheme?.default_template_types.find(
+		( type ) => type.slug === slug
+	);
+
+	await registry.dispatch( noticesStore ).createNotice(
+		'info',
+		sprintf(
+			// translators: %s: The name (or slug) of the type of template.
+			__( 'Do you want to activate this "%s" template?' ),
+			templateType?.title ?? slug
+		),
+		{
+			id: 'template-activate-notice',
+			actions: [
+				{
+					label: __( 'Activate' ),
+					onClick: async () => {
+						await registry
+							.dispatch( noticesStore )
+							.createNotice(
+								'info',
+								__( 'Activating template…' ),
+								{ id: 'template-activate-notice' }
+							);
+						try {
+							const currentSite = await registry
+								.select( coreStore )
+								.getEntityRecord( 'root', 'site' );
+							await registry
+								.dispatch( coreStore )
+								.saveEntityRecord(
+									'root',
+									'site',
+									{
+										active_templates: {
+											...currentSite.active_templates,
+											[ slug ]: id,
+										},
+									},
+									{ throwOnError: true }
+								);
+							await registry
+								.dispatch( noticesStore )
+								.createSuccessNotice(
+									__( 'Template activated.' ),
+									{ id: 'template-activate-notice' }
+								);
+						} catch ( error ) {
+							await registry
+								.dispatch( noticesStore )
+								.createErrorNotice(
+									__( 'Template activation failed.' ),
+									{ id: 'template-activate-notice' }
+								);
+							// Rethrow for debugging.
+							throw error;
+						}
+					},
+				},
+			],
+		}
+	);
+}
+
 /**
  * Action for refreshing the current post.
  *
@@ -282,7 +427,6 @@ export const trashPost =
 		const postType = await registry
 			.resolveSelect( coreStore )
 			.getPostType( postTypeSlug );
-		registry.dispatch( noticesStore ).removeNotice( TRASH_POST_NOTICE_ID );
 		const { rest_base: restBase, rest_namespace: restNamespace = 'wp/v2' } =
 			postType;
 		dispatch( { type: 'REQUEST_POST_DELETE_START' } );
@@ -310,17 +454,13 @@ export const trashPost =
  * autosaving (e.g. on the Web, the post might be committed to Session
  * Storage).
  *
- * @param {Object?} options Extra flags to identify the autosave.
+ * @param {Object}  [options]       Extra flags to identify the autosave.
+ * @param {boolean} [options.local] Whether to perform a local autosave.
  */
 export const autosave =
 	( { local = false, ...options } = {} ) =>
 	async ( { select, dispatch } ) => {
 		const post = select.getCurrentPost();
-
-		// Currently template autosaving is not supported.
-		if ( post.type === 'wp_template' ) {
-			return;
-		}
 
 		if ( local ) {
 			const isPostNew = select.isEditedPostNew();
@@ -333,6 +473,14 @@ export const autosave =
 		}
 	};
 
+/**
+ * Save for preview.
+ *
+ * @param {Object}  options                     Options object.
+ * @param {boolean} options.forceIsAutosaveable Whether to force the post to be autosaveable.
+ *
+ * @return {Function} Thunk that saves for preview and returns the preview link.
+ */
 export const __unstableSaveForPreview =
 	( { forceIsAutosaveable } = {} ) =>
 	async ( { select, dispatch } ) => {
@@ -533,8 +681,8 @@ export function unlockPostAutosaving( lockName ) {
 /**
  * Returns an action object used to signal that the blocks have been updated.
  *
- * @param {Array}   blocks  Block Array.
- * @param {?Object} options Optional options.
+ * @param {Array}  blocks    Block Array.
+ * @param {Object} [options] Optional options.
  */
 export const resetEditorBlocks =
 	( blocks, options = {} ) =>
@@ -591,7 +739,10 @@ export function updateEditorSettings( settings ) {
 export const setRenderingMode =
 	( mode ) =>
 	( { dispatch, registry, select } ) => {
-		if ( select.__unstableIsEditorReady() ) {
+		if (
+			select.__unstableIsEditorReady() &&
+			! select.getEditorSettings().isPreviewMode
+		) {
 			// We clear the block selection but we also need to clear the selection from the core store.
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
 			dispatch.editPost( { selection: undefined }, { undoIgnore: true } );
@@ -703,15 +854,32 @@ export function removeEditorPanel( panelName ) {
  *                                              use an object.
  * @param {string}         value.rootClientId   The root client ID to insert at.
  * @param {number}         value.insertionIndex The index to insert at.
+ * @param {string}         value.filterValue    A query to filter the inserter results.
+ * @param {Function}       value.onSelect       A callback when an item is selected.
+ * @param {string}         value.tab            The tab to open in the inserter.
+ * @param {string}         value.category       The category to initialize in the inserter.
  *
  * @return {Object} Action object.
  */
-export function setIsInserterOpened( value ) {
-	return {
-		type: 'SET_IS_INSERTER_OPENED',
-		value,
+export const setIsInserterOpened =
+	( value ) =>
+	( { dispatch, registry } ) => {
+		if (
+			typeof value === 'object' &&
+			value.hasOwnProperty( 'rootClientId' ) &&
+			value.hasOwnProperty( 'insertionIndex' )
+		) {
+			unlock( registry.dispatch( blockEditorStore ) ).setInsertionPoint( {
+				rootClientId: value.rootClientId,
+				index: value.insertionIndex,
+			} );
+		}
+
+		dispatch( {
+			type: 'SET_IS_INSERTER_OPENED',
+			value,
+		} );
 	};
-}
 
 /**
  * Returns an action object used to open/close the list view.
@@ -730,9 +898,12 @@ export function setIsListViewOpened( isOpen ) {
  * Action that toggles Distraction free mode.
  * Distraction free mode expects there are no sidebars, as due to the
  * z-index values set, you can't close sidebars.
+ *
+ * @param {Object}  [options={}]                Optional configuration object
+ * @param {boolean} [options.createNotice=true] Whether to create a notice
  */
 export const toggleDistractionFree =
-	() =>
+	( { createNotice = true } = {} ) =>
 	( { dispatch, registry } ) => {
 		const isDistractionFree = registry
 			.select( preferencesStore )
@@ -749,46 +920,123 @@ export const toggleDistractionFree =
 					.set( 'core', 'fixedToolbar', true );
 				dispatch.setIsInserterOpened( false );
 				dispatch.setIsListViewOpened( false );
+				unlock(
+					registry.dispatch( blockEditorStore )
+				).resetZoomLevel();
 			} );
 		}
 		registry.batch( () => {
 			registry
 				.dispatch( preferencesStore )
 				.set( 'core', 'distractionFree', ! isDistractionFree );
-			registry
-				.dispatch( noticesStore )
-				.createInfoNotice(
-					isDistractionFree
-						? __( 'Distraction free off.' )
-						: __( 'Distraction free on.' ),
-					{
-						id: 'core/editor/distraction-free-mode/notice',
-						type: 'snackbar',
-						actions: [
-							{
-								label: __( 'Undo' ),
-								onClick: () => {
-									registry.batch( () => {
-										registry
-											.dispatch( preferencesStore )
-											.set(
-												'core',
-												'fixedToolbar',
-												isDistractionFree ? true : false
-											);
-										registry
-											.dispatch( preferencesStore )
-											.toggle(
-												'core',
-												'distractionFree'
-											);
-									} );
+
+			if ( createNotice ) {
+				registry
+					.dispatch( noticesStore )
+					.createInfoNotice(
+						isDistractionFree
+							? __( 'Distraction free mode deactivated.' )
+							: __( 'Distraction free mode activated.' ),
+						{
+							id: 'core/editor/distraction-free-mode/notice',
+							type: 'snackbar',
+							actions: [
+								{
+									label: __( 'Undo' ),
+									onClick: () => {
+										registry.batch( () => {
+											registry
+												.dispatch( preferencesStore )
+												.set(
+													'core',
+													'fixedToolbar',
+													isDistractionFree
+												);
+											registry
+												.dispatch( preferencesStore )
+												.toggle(
+													'core',
+													'distractionFree'
+												);
+										} );
+									},
 								},
-							},
-						],
-					}
-				);
+							],
+						}
+					);
+			}
 		} );
+	};
+
+/**
+ * Action that toggles the Spotlight Mode view option.
+ */
+export const toggleSpotlightMode =
+	() =>
+	( { registry } ) => {
+		registry.dispatch( preferencesStore ).toggle( 'core', 'focusMode' );
+
+		const isFocusMode = registry
+			.select( preferencesStore )
+			.get( 'core', 'focusMode' );
+
+		registry
+			.dispatch( noticesStore )
+			.createInfoNotice(
+				isFocusMode
+					? __( 'Spotlight mode activated.' )
+					: __( 'Spotlight mode deactivated.' ),
+				{
+					id: 'core/editor/toggle-spotlight-mode/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+							onClick: () => {
+								registry
+									.dispatch( preferencesStore )
+									.toggle( 'core', 'focusMode' );
+							},
+						},
+					],
+				}
+			);
+	};
+
+/**
+ * Action that toggles the Top Toolbar view option.
+ */
+export const toggleTopToolbar =
+	() =>
+	( { registry } ) => {
+		registry.dispatch( preferencesStore ).toggle( 'core', 'fixedToolbar' );
+
+		const isTopToolbar = registry
+			.select( preferencesStore )
+			.get( 'core', 'fixedToolbar' );
+
+		registry
+			.dispatch( noticesStore )
+			.createInfoNotice(
+				isTopToolbar
+					? __( 'Top toolbar activated.' )
+					: __( 'Top toolbar deactivated.' ),
+				{
+					id: 'core/editor/toggle-top-toolbar/notice',
+					type: 'snackbar',
+					actions: [
+						{
+							label: __( 'Undo' ),
+
+							onClick: () => {
+								registry
+									.dispatch( preferencesStore )
+									.toggle( 'core', 'fixedToolbar' );
+							},
+						},
+					],
+				}
+			);
 	};
 
 /**
@@ -801,9 +1049,11 @@ export const switchEditorMode =
 	( { dispatch, registry } ) => {
 		registry.dispatch( preferencesStore ).set( 'core', 'editorMode', mode );
 
-		// Unselect blocks when we switch to a non visual mode.
 		if ( mode !== 'visual' ) {
+			// Unselect blocks when we switch to a non visual mode.
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
+			// Exit zoom out state when switching to a non visual mode.
+			unlock( registry.dispatch( blockEditorStore ) ).resetZoomLevel();
 		}
 
 		if ( mode === 'visual' ) {

@@ -14,7 +14,7 @@ const withWideWidgetDisplay = createHigherOrderComponent(
 				( widget ) => widget.id_base === idBase
 			)?.is_wide ?? false;
 
-		return <BlockEdit { ...props } isWide={ isWide } />;
+		return <BlockEdit key="edit" { ...props } isWide={ isWide } />;
 	},
 	'withWideWidgetDisplay'
 );

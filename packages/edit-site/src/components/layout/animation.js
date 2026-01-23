@@ -41,7 +41,6 @@ function useMovingAnimation( { triggerAnimationOnChange } ) {
 			previous: ref.current && getAbsolutePosition( ref.current ),
 			prevRect: ref.current && ref.current.getBoundingClientRect(),
 		} ),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ triggerAnimationOnChange ]
 	);
 

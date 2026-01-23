@@ -45,49 +45,45 @@ export default function ScreenNavigationMoreMenu( props ) {
 				popoverProps={ POPOVER_PROPS }
 			>
 				{ ( { onClose } ) => (
-					<div>
-						<MenuGroup>
-							<MenuItem
-								onClick={ () => {
-									openRenameModal();
-									// Close the dropdown after opening the modal.
-									onClose();
-								} }
-							>
-								{ __( 'Rename' ) }
-							</MenuItem>
-							<MenuItem
-								onClick={ () => {
-									history.push( {
-										postId: menuId,
-										postType: 'wp_navigation',
-										canvas: 'edit',
-									} );
-								} }
-							>
-								{ __( 'Edit' ) }
-							</MenuItem>
-							<MenuItem
-								onClick={ () => {
-									onDuplicate();
-									onClose();
-								} }
-							>
-								{ __( 'Duplicate' ) }
-							</MenuItem>
-							<MenuItem
-								isDestructive
-								onClick={ () => {
-									openDeleteConfirmDialog();
+					<MenuGroup>
+						<MenuItem
+							onClick={ () => {
+								openRenameModal();
+								// Close the dropdown after opening the modal.
+								onClose();
+							} }
+						>
+							{ __( 'Rename' ) }
+						</MenuItem>
+						<MenuItem
+							onClick={ () => {
+								history.navigate(
+									`/wp_navigation/${ menuId }?canvas=edit`
+								);
+							} }
+						>
+							{ __( 'Edit' ) }
+						</MenuItem>
+						<MenuItem
+							onClick={ () => {
+								onDuplicate();
+								onClose();
+							} }
+						>
+							{ __( 'Duplicate' ) }
+						</MenuItem>
+						<MenuItem
+							isDestructive
+							onClick={ () => {
+								openDeleteConfirmDialog();
 
-									// Close the dropdown after opening the modal.
-									onClose();
-								} }
-							>
-								{ __( 'Delete' ) }
-							</MenuItem>
-						</MenuGroup>
-					</div>
+								// Close the dropdown after opening the modal.
+								onClose();
+							} }
+						>
+							{ __( 'Delete' ) }
+						</MenuItem>
+					</MenuGroup>
 				) }
 			</DropdownMenu>
 			{ deleteConfirmDialogOpen && (

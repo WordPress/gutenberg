@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
-import {
-	store as blockEditorStore,
-	privateApis as blockEditorPrivateApis,
-} from '@wordpress/block-editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useCallback, useState } from '@wordpress/element';
 import {
 	MenuItem,
@@ -26,11 +23,6 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store } from '../../store';
-import { unlock } from '../../lock-unlock';
-
-const { useReusableBlocksRenameHint, ReusableBlocksRenameHint } = unlock(
-	blockEditorPrivateApis
-);
 
 /**
  * Menu control to convert block(s) to reusable block.
@@ -46,7 +38,6 @@ export default function ReusableBlockConvertButton( {
 	rootClientId,
 	onClose,
 } ) {
-	const showRenameHint = useReusableBlocksRenameHint();
 	const [ syncType, setSyncType ] = useState( undefined );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
@@ -92,7 +83,11 @@ export default function ReusableBlockConvertButton( {
 						hasBlockSupport( block.name, 'reusable', true )
 				) &&
 				// Hide when current doesn't have permission to do that.
-				!! canUser( 'create', 'blocks' );
+				// Blocks refers to the wp_block post type, this checks the ability to create a post of that type.
+				!! canUser( 'create', {
+					kind: 'postType',
+					name: 'wp_block',
+				} );
 
 			return _canConvert;
 		},
@@ -152,9 +147,7 @@ export default function ReusableBlockConvertButton( {
 	return (
 		<>
 			<MenuItem icon={ symbol } onClick={ () => setIsModalOpen( true ) }>
-				{ showRenameHint
-					? __( 'Create pattern/reusable block' )
-					: __( 'Create pattern' ) }
+				{ __( 'Create pattern' ) }
 			</MenuItem>
 			{ isModalOpen && (
 				<Modal
@@ -175,19 +168,15 @@ export default function ReusableBlockConvertButton( {
 						} }
 					>
 						<VStack spacing="5">
-							<ReusableBlocksRenameHint />
 							<TextControl
-								__nextHasNoMarginBottom
+								__next40pxDefaultSize
 								label={ __( 'Name' ) }
 								value={ title }
 								onChange={ setTitle }
 								placeholder={ __( 'My pattern' ) }
 							/>
 							<ToggleControl
-								label={ _x(
-									'Synced',
-									'Option that makes an individual pattern synchronized'
-								) }
+								label={ _x( 'Synced', 'pattern (singular)' ) }
 								help={ __(
 									'Sync this pattern across multiple locations.'
 								) }
@@ -200,6 +189,7 @@ export default function ReusableBlockConvertButton( {
 							/>
 							<HStack justify="right">
 								<Button
+									__next40pxDefaultSize
 									variant="tertiary"
 									onClick={ () => {
 										setIsModalOpen( false );
@@ -209,7 +199,11 @@ export default function ReusableBlockConvertButton( {
 									{ __( 'Cancel' ) }
 								</Button>
 
-								<Button variant="primary" type="submit">
+								<Button
+									__next40pxDefaultSize
+									variant="primary"
+									type="submit"
+								>
 									{ __( 'Create' ) }
 								</Button>
 							</HStack>

@@ -82,7 +82,7 @@ exports[`Gallery block inserts block 1`] = `
 <!-- /wp:gallery -->"
 `;
 
-exports[`Gallery block overrides "Link to" setting of gallery items 1`] = `
+exports[`Gallery block overrides "Link" setting of gallery items 1`] = `
 "<!-- wp:gallery {"linkTo":"media"} -->
 <figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":1,"linkDestination":"media"} -->
 <figure class="wp-block-image"><img src="file:///local-image-1.jpeg" alt="" class="wp-image-1"/></figure>

@@ -57,6 +57,8 @@ function RenameModal( { category, onClose } ) {
 			existingCategories={ existingCategories }
 			onClose={ onClose }
 			overlayClassName="edit-site-list__rename-modal"
+			focusOnMount="firstContentElement"
+			size="small"
 		/>
 	);
 }

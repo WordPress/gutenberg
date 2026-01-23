@@ -2,7 +2,7 @@
  * External dependencies
  */
 import Mousetrap from 'mousetrap';
-import 'mousetrap/plugins/global-bind/mousetrap-global-bind';
+import 'mousetrap/plugins/global-bind/mousetrap-global-bind.js';
 
 /**
  * WordPress dependencies
@@ -21,7 +21,6 @@ import { isAppleOS } from '@wordpress/keycodes';
  * @property {import('react').RefObject<HTMLElement>} [target]     React reference to the DOM element used to catch the keyboard event.
  */
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Attach a keyboard shortcut handler.
  *
@@ -32,7 +31,6 @@ import { isAppleOS } from '@wordpress/keycodes';
  * @param {WPKeyboardShortcutConfig}                                              options   Shortcut options.
  */
 function useKeyboardShortcut(
-	/* eslint-enable jsdoc/valid-types */
 	shortcuts,
 	callback,
 	{
@@ -42,9 +40,9 @@ function useKeyboardShortcut(
 		target,
 	} = {}
 ) {
-	const currentCallback = useRef( callback );
+	const currentCallbackRef = useRef( callback );
 	useEffect( () => {
-		currentCallback.current = callback;
+		currentCallbackRef.current = callback;
 	}, [ callback ] );
 
 	useEffect( () => {
@@ -89,11 +87,8 @@ function useKeyboardShortcut(
 			mousetrap[ bindFn ](
 				shortcut,
 				(
-					/* eslint-disable jsdoc/valid-types */
 					/** @type {[e: import('mousetrap').ExtendedKeyboardEvent, combo: string]} */ ...args
-				) =>
-					/* eslint-enable jsdoc/valid-types */
-					currentCallback.current( ...args ),
+				) => currentCallbackRef.current( ...args ),
 				eventName
 			);
 		} );

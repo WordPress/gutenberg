@@ -82,9 +82,9 @@ const BottomSheetTextControl = ( {
 						defaultValue={ initialValue }
 						multiline
 						placeholder={ placeholder }
-						placeholderTextColor={ '#87a6bc' }
+						placeholderTextColor="#87a6bc"
 						style={ textEditorStyle }
-						textAlignVertical={ 'top' }
+						textAlignVertical="top"
 					/>
 				</PanelBody>
 			</>

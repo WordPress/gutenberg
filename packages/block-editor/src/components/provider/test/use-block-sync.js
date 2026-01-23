@@ -22,7 +22,9 @@ jest.mock( '../../../store/actions', () => {
 		...actions,
 		resetBlocks: jest.fn( actions.resetBlocks ),
 		replaceInnerBlocks: jest.fn( actions.replaceInnerBlocks ),
-		setHasControlledInnerBlocks: jest.fn( actions.replaceInnerBlocks ),
+		setHasControlledInnerBlocks: jest.fn(
+			actions.setHasControlledInnerBlocks
+		),
 	};
 } );
 
@@ -37,6 +39,7 @@ const TestWrapper = withRegistryProvider( ( props ) => {
 describe( 'useBlockSync hook', () => {
 	beforeAll( () => {
 		registerBlockType( 'test/test-block', {
+			apiVersion: 3,
 			title: 'Test block',
 			attributes: {
 				foo: { type: 'number' },

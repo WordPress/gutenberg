@@ -27,7 +27,9 @@
 }
 
 .wp-block-media-text.is-image-fill .editor-media-container__resizer,
-.wp-block-media-text.is-image-fill .components-placeholder.has-illustration {
+.wp-block-media-text.is-image-fill .components-placeholder.has-illustration,
+.wp-block-media-text.is-image-fill-element .editor-media-container__resizer,
+.wp-block-media-text.is-image-fill-element .components-placeholder.has-illustration {
 	// The resizer sets an inline height but for the image fill we set it to full height.
 	height: 100% !important;
 }

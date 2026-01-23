@@ -78,7 +78,6 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 			label={ __( 'Aspect Ratio' ) }
 			popoverProps={ POPOVER_PROPS }
 			toggleProps={ toggleProps }
-			className="wp-block-image__aspect-ratio"
 		>
 			{ ( { onClose } ) => (
 				<>
@@ -94,7 +93,7 @@ export default function AspectRatioDropdown( { toggleProps } ) {
 							{
 								slug: 'original',
 								name: __( 'Original' ),
-								aspect: defaultAspect,
+								ratio: defaultAspect,
 							},
 							...( showDefaultRatios
 								? defaultRatios

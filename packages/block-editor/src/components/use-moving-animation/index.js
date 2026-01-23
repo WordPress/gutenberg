@@ -52,6 +52,7 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 		isFirstMultiSelectedBlock,
 		isBlockMultiSelected,
 		isAncestorMultiSelected,
+		isDraggingBlocks,
 	} = useSelect( blockEditorStore );
 
 	// Whenever the trigger changes, we need to take a snapshot of the current
@@ -61,7 +62,6 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 			previous: ref.current && getAbsolutePosition( ref.current ),
 			prevRect: ref.current && ref.current.getBoundingClientRect(),
 		} ),
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 		[ triggerAnimationOnChange ]
 	);
 
@@ -74,8 +74,14 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 		const isSelected = isBlockSelected( clientId );
 		const adjustScrolling =
 			isSelected || isFirstMultiSelectedBlock( clientId );
+		const isDragging = isDraggingBlocks();
 
 		function preserveScrollPosition() {
+			// The user already scrolled when dragging blocks.
+			if ( isDragging ) {
+				return;
+			}
+
 			if ( adjustScrolling && prevRect ) {
 				const blockRect = ref.current.getBoundingClientRect();
 				const diff = blockRect.top - prevRect.top;
@@ -90,7 +96,7 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 		// motion, if the user is typing (insertion by Enter), or if the block
 		// count exceeds the threshold (insertion caused all the blocks that
 		// follow to animate).
-		// To do: consider enableing the _moving_ animation even for large
+		// To do: consider enabling the _moving_ animation even for large
 		// posts, while only disabling the _insertion_ animation?
 		const disableAnimation =
 			window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches ||
@@ -108,6 +114,13 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 			isSelected ||
 			isBlockMultiSelected( clientId ) ||
 			isAncestorMultiSelected( clientId );
+
+		// The user already dragged the blocks to the new position, so don't
+		// animate the dragged blocks.
+		if ( isPartOfSelection && isDragging ) {
+			return;
+		}
+
 		// Make sure the other blocks move under the selected block(s).
 		const zIndex = isPartOfSelection ? '1' : '';
 
@@ -154,6 +167,7 @@ function useMovingAnimation( { triggerAnimationOnChange, clientId } ) {
 		isFirstMultiSelectedBlock,
 		isBlockMultiSelected,
 		isAncestorMultiSelected,
+		isDraggingBlocks,
 	] );
 
 	return ref;

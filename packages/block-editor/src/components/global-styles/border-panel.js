@@ -2,23 +2,23 @@
  * WordPress dependencies
  */
 import {
-	__experimentalBorderBoxControl as BorderBoxControl,
+	BorderBoxControl,
 	__experimentalHasSplitBorders as hasSplitBorders,
 	__experimentalIsDefinedBorder as isDefinedBorder,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalItemGroup as ItemGroup,
 	BaseControl,
 } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
 import BorderRadiusControl from '../border-radius-control';
 import { useColorsPerOrigin } from './hooks';
-import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
 import { useBorderPanelLabel } from '../../hooks/border';
 import { ShadowPopover, useShadowPresets } from './shadow-panel-components';
@@ -69,6 +69,7 @@ function BorderToolsPanel( {
 	children,
 	label,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -79,7 +80,7 @@ function BorderToolsPanel( {
 			label={ label }
 			resetAll={ resetAll }
 			panelId={ panelId }
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
 		</ToolsPanel>
@@ -145,7 +146,22 @@ export default function BorderPanel( {
 
 	// Border radius.
 	const showBorderRadius = useHasBorderRadiusControl( settings );
-	const borderRadiusValues = decodeValue( border?.radius );
+	const borderRadiusValues = useMemo( () => {
+		if ( typeof inheritedValue?.border?.radius !== 'object' ) {
+			return decodeValue( inheritedValue?.border?.radius );
+		}
+
+		return {
+			topLeft: decodeValue( inheritedValue?.border?.radius?.topLeft ),
+			topRight: decodeValue( inheritedValue?.border?.radius?.topRight ),
+			bottomLeft: decodeValue(
+				inheritedValue?.border?.radius?.bottomLeft
+			),
+			bottomRight: decodeValue(
+				inheritedValue?.border?.radius?.bottomRight
+			),
+		};
+	}, [ inheritedValue?.border?.radius, decodeValue ] );
 	const setBorderRadius = ( newBorderRadius ) =>
 		setBorder( { ...border, radius: newBorderRadius } );
 	const hasBorderRadius = () => {
@@ -261,7 +277,7 @@ export default function BorderPanel( {
 						popoverPlacement="left-start"
 						value={ border }
 						__experimentalIsRenderedInSidebar
-						size={ '__unstable-large' }
+						size="__unstable-large"
 						hideLabelFromVision={ ! hasShadowControl }
 						label={ __( 'Border' ) }
 					/>
@@ -276,6 +292,7 @@ export default function BorderPanel( {
 					panelId={ panelId }
 				>
 					<BorderRadiusControl
+						presets={ settings?.border?.radiusSizes }
 						values={ borderRadiusValues }
 						onChange={ ( newValue ) => {
 							setBorderRadius( newValue || undefined );
@@ -297,13 +314,11 @@ export default function BorderPanel( {
 						</BaseControl.VisualLabel>
 					) : null }
 
-					<ItemGroup isBordered isSeparated>
-						<ShadowPopover
-							shadow={ shadow }
-							onShadowChange={ setShadow }
-							settings={ settings }
-						/>
-					</ItemGroup>
+					<ShadowPopover
+						shadow={ shadow }
+						onShadowChange={ setShadow }
+						settings={ settings }
+					/>
 				</ToolsPanelItem>
 			) }
 		</Wrapper>

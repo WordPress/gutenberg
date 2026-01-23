@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, SelectControl } from '@wordpress/components';
+import { Button, RadioControl } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
@@ -46,7 +46,7 @@ export const POST_FORMATS = [
  * <PostFormat />
  * ```
  *
- * @return {JSX.Element} The rendered PostFormat component.
+ * @return {React.ReactNode} The rendered PostFormat component.
  */
 export default function PostFormat() {
 	const instanceId = useInstanceId( PostFormat );
@@ -85,20 +85,22 @@ export default function PostFormat() {
 	return (
 		<PostFormatCheck>
 			<div className="editor-post-format">
-				<SelectControl
-					__nextHasNoMarginBottom
+				<RadioControl
+					className="editor-post-format__options"
 					label={ __( 'Post Format' ) }
-					value={ postFormat }
+					selected={ postFormat }
 					onChange={ ( format ) => onUpdatePostFormat( format ) }
 					id={ postFormatSelectorId }
 					options={ formats.map( ( format ) => ( {
 						label: format.caption,
 						value: format.id,
 					} ) ) }
+					hideLabelFromVision
 				/>
 				{ suggestion && suggestion.id !== postFormat && (
 					<p className="editor-post-format__suggestion">
 						<Button
+							__next40pxDefaultSize
 							variant="link"
 							onClick={ () =>
 								onUpdatePostFormat( suggestion.id )

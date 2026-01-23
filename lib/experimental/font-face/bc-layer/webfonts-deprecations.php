@@ -28,7 +28,7 @@ if ( ! function_exists( 'wp_webfonts' ) ) {
 		global $wp_webfonts;
 
 		if ( ! ( $wp_webfonts instanceof WP_Webfonts ) ) {
-			$wp_webfonts = new WP_Webfonts( wp_fonts() );
+			$wp_webfonts = new WP_Webfonts();
 		}
 
 		return $wp_webfonts;

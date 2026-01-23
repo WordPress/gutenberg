@@ -10,9 +10,9 @@ runs:
     using: 'composite'
     steps:
         - name: Use desired version of Node.js
-          uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+          uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
           with:
-              node-version-file: '.nvmrc'
+              node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
               check-latest: true
               cache: npm
@@ -20,15 +20,15 @@ runs:
         - name: Get Node.js and npm version
           id: node-version
           run: |
-              echo "NODE_VERSION=$(node -v)" >> $GITHUB_OUTPUT
+              echo "NODE_VERSION=$(node -v)" >> "$GITHUB_OUTPUT"
           shell: bash
 
         - name: Cache node_modules
           id: cache-node_modules
-          uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
+          uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
           with:
               path: '**/node_modules'
-              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
+              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
 
         - name: Install npm dependencies
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
@@ -36,7 +36,7 @@ runs:
               npm ci
           shell: bash
         - name: Upload npm logs as an artifact on failure
-          uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+          uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
           if: failure()
           with:
               name: npm-logs

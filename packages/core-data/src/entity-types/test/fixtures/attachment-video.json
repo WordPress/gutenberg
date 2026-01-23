@@ -1,0 +1,121 @@
+{
+	"id": 93,
+	"date": "2025-11-06T05:11:23",
+	"date_gmt": "2025-11-06T05:11:23",
+	"guid": {
+		"rendered": "http://localhost:8888/wp-content/uploads/2025/11/sample-5s.mp4",
+		"raw": "http://localhost:8888/wp-content/uploads/2025/11/sample-5s.mp4"
+	},
+	"modified": "2025-11-06T05:11:23",
+	"modified_gmt": "2025-11-06T05:11:23",
+	"slug": "sample-video",
+	"status": "inherit",
+	"type": "attachment",
+	"link": "http://localhost:8888/sample-video/",
+	"title": {
+		"raw": "Sample Video",
+		"rendered": "Sample Video"
+	},
+	"author": 1,
+	"featured_media": 0,
+	"comment_status": "open",
+	"ping_status": "closed",
+	"template": "",
+	"meta": [],
+	"permalink_template": "http://localhost:8888/?attachment_id=93",
+	"generated_slug": "sample-video",
+	"class_list": [
+		"post-93",
+		"attachment",
+		"type-attachment",
+		"status-inherit",
+		"hentry"
+	],
+	"description": {
+		"raw": "",
+		"rendered": "<div style=\"width: 1920px;\" class=\"wp-video\"><!--[if lt IE 9]><script>document.createElement('video');</script><![endif]-->\n<video class=\"wp-video-shortcode\" id=\"video-93-1\" width=\"1920\" height=\"1080\" preload=\"metadata\" controls=\"controls\"><source type=\"video/mp4\" src=\"http://localhost:8888/wp-content/uploads/2025/11/sample-5s.mp4?_=1\" /><a href=\"http://localhost:8888/wp-content/uploads/2025/11/sample-5s.mp4\">http://localhost:8888/wp-content/uploads/2025/11/sample-5s.mp4</a></video></div>\n"
+	},
+	"caption": {
+		"raw": "",
+		"rendered": "<p>Sample video file</p>\n"
+	},
+	"alt_text": "",
+	"media_type": "file",
+	"mime_type": "video/mp4",
+	"media_details": {
+		"bitrate": 3828466,
+		"filesize": 2848208,
+		"mime_type": "video/mp4",
+		"length": 6,
+		"length_formatted": "0:06",
+		"width": 1920,
+		"height": 1080,
+		"fileformat": "mp4",
+		"dataformat": "quicktime",
+		"audio": {
+			"dataformat": "mp4",
+			"bitrate": 127998,
+			"codec": "ISO/IEC 14496-3 AAC",
+			"sample_rate": 44100,
+			"channels": 2,
+			"bits_per_sample": 16,
+			"lossless": false,
+			"channelmode": "stereo",
+			"compression_ratio": 0.0907015306122449
+		},
+		"created_timestamp": -2082844800,
+		"sizes": {}
+	},
+	"post": 75,
+	"source_url": "http://localhost:8888/wp-content/uploads/2025/11/sample-5s.mp4",
+	"missing_image_sizes": [],
+	"_links": {
+		"self": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/93",
+				"targetHints": {
+					"allow": [ "GET", "POST", "PUT", "PATCH", "DELETE" ]
+				}
+			}
+		],
+		"collection": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media"
+			}
+		],
+		"about": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/types/attachment"
+			}
+		],
+		"author": [
+			{
+				"embeddable": true,
+				"href": "http://localhost:8888/wp-json/wp/v2/users/1"
+			}
+		],
+		"replies": [
+			{
+				"embeddable": true,
+				"href": "http://localhost:8888/wp-json/wp/v2/comments?post=93"
+			}
+		],
+		"wp:action-unfiltered-html": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/93"
+			}
+		],
+		"wp:action-assign-author": [
+			{
+				"href": "http://localhost:8888/wp-json/wp/v2/media/93"
+			}
+		],
+		"curies": [
+			{
+				"name": "wp",
+				"href": "https://api.w.org/{rel}",
+				"templated": true
+			}
+		]
+	}
+}

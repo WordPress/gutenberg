@@ -13,6 +13,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -22,6 +23,7 @@ import PostExcerptCheck from './check';
 import PluginPostExcerpt from './plugin';
 import { TEMPLATE_ORIGINS } from '../../store/constants';
 import { store as editorStore } from '../../store';
+import { getTemplateInfo } from '../../utils/get-template-info';
 
 /**
  * Module Constants
@@ -79,6 +81,11 @@ function ExcerptPanel() {
 	);
 }
 
+/**
+ * Is rendered if the post type supports excerpts and allows editing the excerpt.
+ *
+ * @return {React.ReactNode} The rendered PostExcerptPanel component.
+ */
 export default function PostExcerptPanel() {
 	return (
 		<PostExcerptCheck>
@@ -117,6 +124,7 @@ function PrivateExcerpt() {
 			const _usedAttribute = isTemplateOrTemplatePart
 				? 'description'
 				: 'excerpt';
+			const _excerpt = getEditedPostAttribute( _usedAttribute );
 			// We need to fetch the entity in this case to check if we'll allow editing.
 			const template =
 				isTemplateOrTemplatePart &&
@@ -125,13 +133,22 @@ function PrivateExcerpt() {
 					postType,
 					getCurrentPostId()
 				);
+			const fallback =
+				! _excerpt && isTemplateOrTemplatePart
+					? getTemplateInfo( {
+							template,
+							templateTypes:
+								select( coreStore ).getCurrentTheme()
+									?.default_template_types,
+					  } )?.description
+					: undefined;
 			// For post types that use excerpt as description, we do not abide
 			// by the `isEnabled` panel flag in order to render them as text.
 			const _shouldRender =
 				isEditorPanelEnabled( PANEL_NAME ) ||
 				_shouldBeUsedAsDescription;
 			return {
-				excerpt: getEditedPostAttribute( _usedAttribute ),
+				excerpt: _excerpt ?? fallback,
 				shouldRender: _shouldRender,
 				shouldBeUsedAsDescription: _shouldBeUsedAsDescription,
 				// If we should render, allow editing for all post types that are not used as description.
@@ -142,7 +159,8 @@ function PrivateExcerpt() {
 						isPattern ||
 						( template &&
 							template.source === TEMPLATE_ORIGINS.custom &&
-							! template.has_theme_file ) ),
+							! template.has_theme_file &&
+							template.is_custom ) ),
 			};
 		}, [] );
 	const [ popoverAnchor, setPopoverAnchor ] = useState( null );
@@ -167,8 +185,8 @@ function PrivateExcerpt() {
 		return false;
 	}
 	const excerptText = !! excerpt && (
-		<Text align="left" numberOfLines={ 4 } truncate>
-			{ excerpt }
+		<Text align="left" numberOfLines={ 4 } truncate={ allowEditing }>
+			{ decodeEntities( excerpt ) }
 		</Text>
 	);
 	if ( ! allowEditing ) {
@@ -191,7 +209,7 @@ function PrivateExcerpt() {
 				ref={ setPopoverAnchor }
 				renderToggle={ ( { onToggle } ) => (
 					<Button
-						className="editor-post-excerpt__dropdown__trigger"
+						__next40pxDefaultSize
 						onClick={ onToggle }
 						variant="link"
 					>

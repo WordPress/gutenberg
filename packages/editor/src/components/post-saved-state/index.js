@@ -21,7 +21,9 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
+import { STATUS_OPTIONS } from '../../components/post-status';
 import { store as editorStore } from '../../store';
+import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 
 /**
  * Component showing whether the post is saved or not and providing save
@@ -48,6 +50,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 		showIconLabels,
 		postStatus,
 		postStatusHasChanged,
+		postType,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -76,6 +79,7 @@ export default function PostSavedState( { forceIsDirty } ) {
 				showIconLabels: get( 'core', 'showIconLabels' ),
 				postStatus: getEditedPostAttribute( 'status' ),
 				postStatusHasChanged: !! getPostEdits()?.status,
+				postType: select( editorStore ).getCurrentPostType(),
 			};
 		},
 		[ forceIsDirty ]
@@ -98,16 +102,30 @@ export default function PostSavedState( { forceIsDirty } ) {
 		return () => clearTimeout( timeoutId );
 	}, [ isSaving ] );
 
+	// Attachments don't support draft mode, so hide this button.
+	if ( postType === ATTACHMENT_POST_TYPE ) {
+		return null;
+	}
+
 	// Once the post has been submitted for review this button
 	// is not needed for the contributor role.
 	if ( ! hasPublishAction && isPending ) {
 		return null;
 	}
 
+	// We shouldn't render the button if the post has not one of the following statuses: pending, draft, auto-draft.
+	// The reason for this is that this button handles the `save as pending` and `save draft` actions.
+	// An exception for this is when the post has a custom status and there should be a way to save changes without
+	// having to publish. This should be handled better in the future when custom statuses have better support.
+	// @see https://github.com/WordPress/gutenberg/issues/3144.
+	const isIneligibleStatus =
+		! [ 'pending', 'draft', 'auto-draft' ].includes( postStatus ) &&
+		STATUS_OPTIONS.map( ( { value } ) => value ).includes( postStatus );
+
 	if (
 		isPublished ||
 		isScheduled ||
-		! [ 'pending', 'draft', 'auto-draft' ].includes( postStatus ) ||
+		isIneligibleStatus ||
 		( postStatusHasChanged &&
 			[ 'pending', 'draft' ].includes( postStatus ) )
 	) {

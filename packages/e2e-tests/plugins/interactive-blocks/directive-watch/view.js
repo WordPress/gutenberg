@@ -12,8 +12,14 @@ const { directive } = privateApis(
 directive(
 	'show-mock',
 	( { directives: { 'show-mock': showMock }, element, evaluate } ) => {
-		const entry = showMock.find( ( { suffix } ) => suffix === 'default' );
-		if ( ! evaluate( entry ) ) {return null;}
+		const entry = showMock.find( ( { suffix } ) => suffix === null );
+		const result = evaluate( entry );
+		if ( ! result ) {
+			return null;
+		}
+		if ( typeof result === 'function' && ! result() ) {
+			return null;
+		}
 		return element;
 	}
 );
@@ -28,6 +34,8 @@ const { state } = store( 'directive-watch', {
 				? 'element is in the DOM'
 				: 'element is not in the DOM';
 		},
+		watch1: false,
+		watch2: false,
 	},
 	actions: {
 		toggle() {
@@ -52,6 +60,12 @@ const { state } = store( 'directive-watch', {
 		},
 		infiniteLoop: () => {
 			state.counter = state.counter + 1;
+		},
+		watch1: () => {
+			state.watch1 = true;
+		},
+		watch2: () => {
+			state.watch2 = true;
 		},
 	},
 } );

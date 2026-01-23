@@ -18,7 +18,8 @@ const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const [ rawBlockTypes, , collections ] = useBlockTypesState(
 		rootClientId,
-		onSelect
+		onSelect,
+		true
 	);
 	const clipboardBlock = useClipboardBlock( rootClientId );
 	const filteredBlockTypes = filterInserterItems( rawBlockTypes );

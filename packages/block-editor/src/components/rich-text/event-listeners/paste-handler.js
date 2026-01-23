@@ -28,8 +28,8 @@ export default ( props ) => ( element ) => {
 		} = props.current;
 
 		// The event listener is attached to the window, so we need to check if
-		// the target is the element.
-		if ( event.target !== element ) {
+		// the target is the element or inside the element.
+		if ( ! element.contains( event.target ) ) {
 			return;
 		}
 

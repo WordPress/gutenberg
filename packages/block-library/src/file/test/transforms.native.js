@@ -15,8 +15,8 @@ const initialHtml = `
 <div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button wp-element-button" download>Download</a></div>
 <!-- /wp:file -->`;
 
-const tranformsWithInnerBlocks = [ 'Columns', 'Group' ];
-const blockTransforms = [ ...tranformsWithInnerBlocks ];
+const transformsWithInnerBlocks = [ 'Columns', 'Group' ];
+const blockTransforms = [ ...transformsWithInnerBlocks ];
 
 setupCoreBlocks();
 
@@ -25,7 +25,8 @@ describe( `${ block } block transformations`, () => {
 		const screen = await initializeEditor( { initialHtml } );
 		const newBlock = await transformBlock( screen, block, blockTransform, {
 			isMediaBlock: false,
-			hasInnerBlocks: tranformsWithInnerBlocks.includes( blockTransform ),
+			hasInnerBlocks:
+				transformsWithInnerBlocks.includes( blockTransform ),
 		} );
 		expect( newBlock ).toBeVisible();
 		expect( getEditorHtml() ).toMatchSnapshot();

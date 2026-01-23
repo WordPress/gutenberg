@@ -104,6 +104,7 @@ export default function useText(
 			const isOptimalTextColorDark =
 				getOptimalTextShade( optimizeReadabilityFor ) === 'dark';
 
+			// Should not use theme colors
 			sx.optimalTextColor = isOptimalTextColorDark
 				? css( { color: COLORS.gray[ 900 ] } )
 				: css( { color: COLORS.white } );

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -17,18 +18,19 @@ import { HStack } from '../../h-stack';
 import type { AlignmentMatrixControlProps } from '../types';
 
 const meta: Meta< typeof AlignmentMatrixControl > = {
-	title: 'Components (Experimental)/AlignmentMatrixControl',
+	title: 'Components/AlignmentMatrixControl',
 	component: AlignmentMatrixControl,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		'AlignmentMatrixControl.Icon': AlignmentMatrixControl.Icon,
 	},
 	argTypes: {
-		onChange: { control: { type: null } },
-		value: { control: { type: null } },
+		onChange: { control: false },
+		value: { control: false },
+	},
+	args: {
+		onChange: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -59,18 +61,9 @@ export const Default = Template.bind( {} );
 export const IconSubcomponent = () => {
 	return (
 		<HStack justify="flex-start">
+			<Icon icon={ <AlignmentMatrixControl.Icon value="top left" /> } />
 			<Icon
-				icon={
-					<AlignmentMatrixControl.Icon size={ 24 } value="top left" />
-				}
-			/>
-			<Icon
-				icon={
-					<AlignmentMatrixControl.Icon
-						size={ 24 }
-						value="center center"
-					/>
-				}
+				icon={ <AlignmentMatrixControl.Icon value="center center" /> }
 			/>
 		</HStack>
 	);

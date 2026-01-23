@@ -24,8 +24,13 @@ export default function PostsPerPage() {
 	const { postsPerPage, isTemplate, postSlug } = useSelect( ( select ) => {
 		const { getEditedPostAttribute, getCurrentPostType } =
 			select( editorStore );
-		const { getEditedEntityRecord } = select( coreStore );
-		const siteSettings = getEditedEntityRecord( 'root', 'site' );
+		const { getEditedEntityRecord, canUser } = select( coreStore );
+		const siteSettings = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
+			? getEditedEntityRecord( 'root', 'site' )
+			: undefined;
 		return {
 			isTemplate: getCurrentPostType() === TEMPLATE_POST_TYPE,
 			postSlug: getEditedPostAttribute( 'slug' ),
@@ -82,7 +87,7 @@ export default function PostsPerPage() {
 						<NumberControl
 							placeholder={ 0 }
 							value={ postsPerPage }
-							size={ '__unstable-large' }
+							size="__unstable-large"
 							spinControls="custom"
 							step="1"
 							min="1"

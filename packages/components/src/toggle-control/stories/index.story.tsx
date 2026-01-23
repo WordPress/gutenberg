@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -14,10 +14,11 @@ import { useState } from '@wordpress/element';
 import ToggleControl from '..';
 
 const meta: Meta< typeof ToggleControl > = {
-	title: 'Components/ToggleControl',
+	title: 'Components/Selection & Input/Common/ToggleControl',
+	id: 'components-togglecontrol',
 	component: ToggleControl,
 	argTypes: {
-		checked: { control: { type: null } },
+		checked: { control: false },
 		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },
 		onChange: { action: 'onChange' },

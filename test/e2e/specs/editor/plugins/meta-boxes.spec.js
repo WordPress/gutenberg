@@ -26,7 +26,7 @@ test.describe( 'Meta boxes', () => {
 		await expect( saveDraft ).toBeDisabled();
 
 		// Add title to enable valid non-empty post save.
-		await page
+		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'Hello Meta' );
 
@@ -44,7 +44,7 @@ test.describe( 'Meta boxes', () => {
 		page,
 	} ) => {
 		// Publish a post so there's something for the latest posts dynamic block to render.
-		await page
+		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'A published post' );
 		await page.keyboard.press( 'Enter' );
@@ -53,7 +53,7 @@ test.describe( 'Meta boxes', () => {
 
 		// Publish a post with the latest posts dynamic block.
 		await admin.createNewPost();
-		await page
+		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'Dynamic block test' );
 		await editor.insertBlock( { name: 'core/latest-posts' } );
@@ -70,10 +70,12 @@ test.describe( 'Meta boxes', () => {
 		editor,
 		page,
 	} ) => {
-		await page
+		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'A published post' );
-		await page.getByRole( 'button', { name: 'Add default block' } ).click();
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'Excerpt from content.' );
 
 		const postId = await editor.publishPost();
@@ -89,9 +91,11 @@ test.describe( 'Meta boxes', () => {
 		page,
 	} ) => {
 		await editor.openDocumentSettingsSidebar();
-		await page.getByRole( 'button', { name: 'Add default block' } ).click();
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
 		await page.keyboard.type( 'Excerpt from content.' );
-		await page
+		await editor.canvas
 			.getByRole( 'textbox', { name: 'Add title' } )
 			.fill( 'A published post' );
 

@@ -21,7 +21,7 @@ import useNavigationEntities from '../use-navigation-entities';
 
 function buildMenuLabel( title, id, status ) {
 	if ( ! title ) {
-		/* translators: %s is the index of the menu in the list of menus. */
+		/* translators: %s: the index of the menu in the list of menus. */
 		return sprintf( __( '(no title %s)' ), id );
 	}
 
@@ -30,7 +30,7 @@ function buildMenuLabel( title, id, status ) {
 	}
 
 	return sprintf(
-		// translators: %1s: title of the menu; %2s: status of the menu (draft, pending, etc.).
+		// translators: 1: title of the menu. 2: status of the menu (draft, pending, etc.).
 		__( '%1$s (%2$s)' ),
 		decodeEntities( title ),
 		status
@@ -61,7 +61,8 @@ function NavigationMenuSelector( {
 		hasResolvedNavigationMenus,
 		canUserCreateNavigationMenus,
 		canSwitchNavigationMenu,
-	} = useNavigationMenu();
+		isNavigationMenuMissing,
+	} = useNavigationMenu( currentMenuId );
 
 	const [ currentTitle ] = useEntityProp(
 		'postType',
@@ -106,12 +107,18 @@ function NavigationMenuSelector( {
 	const noBlockMenus = ! hasNavigationMenus && hasResolvedNavigationMenus;
 	const menuUnavailable =
 		hasResolvedNavigationMenus && currentMenuId === null;
+	const navMenuHasBeenDeleted = currentMenuId && isNavigationMenuMissing;
 
 	let selectorLabel = '';
 
 	if ( isResolvingNavigationMenus ) {
 		selectorLabel = __( 'Loading…' );
-	} else if ( noMenuSelected || noBlockMenus || menuUnavailable ) {
+	} else if (
+		noMenuSelected ||
+		noBlockMenus ||
+		menuUnavailable ||
+		navMenuHasBeenDeleted
+	) {
 		// Note: classic Menus may be available.
 		selectorLabel = __( 'Choose or create a Navigation Menu' );
 	} else {

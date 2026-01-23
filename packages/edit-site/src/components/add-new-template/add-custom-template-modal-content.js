@@ -9,25 +9,20 @@ import {
 	FlexItem,
 	SearchControl,
 	TextHighlight,
-	privateApis as componentsPrivateApis,
+	Composite,
 	__experimentalText as Text,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useEntityRecords } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
 import { useDebouncedInput } from '@wordpress/compose';
+import { focus } from '@wordpress/dom';
+import { safeDecodeURI } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { unlock } from '../../lock-unlock';
 import { mapToIHasNameAndId } from './utils';
-
-const {
-	CompositeV2: Composite,
-	CompositeItemV2: CompositeItem,
-	useCompositeStoreV2: useCompositeStore,
-} = unlock( componentsPrivateApis );
 
 const EMPTY_ARRAY = [];
 
@@ -40,9 +35,10 @@ function SuggestionListItem( {
 	const baseCssClass =
 		'edit-site-custom-template-modal__suggestions_list__list-item';
 	return (
-		<CompositeItem
+		<Composite.Item
 			render={
 				<Button
+					__next40pxDefaultSize
 					role="option"
 					className={ baseCssClass }
 					onClick={ () =>
@@ -72,10 +68,10 @@ function SuggestionListItem( {
 					lineHeight={ 1.53846153846 } // 20px
 					className={ `${ baseCssClass }__info` }
 				>
-					{ suggestion.link }
+					{ safeDecodeURI( suggestion.link ) }
 				</Text>
 			) }
-		</CompositeItem>
+		</Composite.Item>
 	);
 }
 
@@ -120,7 +116,6 @@ function useSearchSuggestions( entityForSuggestions, search ) {
 }
 
 function SuggestionList( { entityForSuggestions, onSelect } ) {
-	const composite = useCompositeStore( { orientation: 'vertical' } );
 	const [ search, setSearch, debouncedSearch ] = useDebouncedInput();
 	const suggestions = useSearchSuggestions(
 		entityForSuggestions,
@@ -135,7 +130,6 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 		<>
 			{ showSearchControl && (
 				<SearchControl
-					__nextHasNoMarginBottom
 					onChange={ setSearch }
 					value={ search }
 					label={ labels.search_items }
@@ -144,7 +138,7 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 			) }
 			{ !! suggestions?.length && (
 				<Composite
-					store={ composite }
+					orientation="vertical"
 					role="listbox"
 					className="edit-site-custom-template-modal__suggestions_list"
 					aria-label={ __( 'Suggestions list' ) }
@@ -172,10 +166,25 @@ function SuggestionList( { entityForSuggestions, onSelect } ) {
 	);
 }
 
-function AddCustomTemplateModalContent( { onSelect, entityForSuggestions } ) {
-	const [ showSearchEntities, setShowSearchEntities ] = useState(
-		entityForSuggestions.hasGeneralTemplate
-	);
+function AddCustomTemplateModalContent( {
+	onSelect,
+	entityForSuggestions,
+	onBack,
+	containerRef,
+} ) {
+	const [ showSearchEntities, setShowSearchEntities ] = useState();
+
+	// Focus on the first focusable element when the modal opens.
+	// We handle focus management in the parent modal, just need to focus on the first focusable element.
+	useEffect( () => {
+		if ( containerRef.current ) {
+			const [ firstFocusable ] = focus.focusable.find(
+				containerRef.current
+			);
+			firstFocusable?.focus();
+		}
+	}, [ showSearchEntities ] );
+
 	return (
 		<VStack
 			spacing={ 4 }
@@ -254,6 +263,15 @@ function AddCustomTemplateModalContent( { onSelect, entityForSuggestions } ) {
 							</Text>
 						</FlexItem>
 					</Flex>
+					<Flex justify="right">
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ onBack }
+						>
+							{ __( 'Back' ) }
+						</Button>
+					</Flex>
 				</>
 			) }
 			{ showSearchEntities && (
@@ -267,6 +285,23 @@ function AddCustomTemplateModalContent( { onSelect, entityForSuggestions } ) {
 						entityForSuggestions={ entityForSuggestions }
 						onSelect={ onSelect }
 					/>
+					<Flex justify="right">
+						<Button
+							__next40pxDefaultSize
+							variant="tertiary"
+							onClick={ () => {
+								// If general template exists, go directly back to main screen
+								// instead of showing the choice screen
+								if ( entityForSuggestions.hasGeneralTemplate ) {
+									onBack();
+								} else {
+									setShowSearchEntities( false );
+								}
+							} }
+						>
+							{ __( 'Back' ) }
+						</Button>
+					</Flex>
 				</>
 			) }
 		</VStack>

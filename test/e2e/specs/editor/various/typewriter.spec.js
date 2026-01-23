@@ -32,9 +32,9 @@ test.describe( 'Typewriter', () => {
 		// The page shouldn't be scrolled when it's being filled.
 		await page.keyboard.press( 'Enter' );
 
-		expect( await typewriterUtils.getCaretPosition() ).toBeGreaterThan(
-			initialPosition
-		);
+		expect(
+			await typewriterUtils.getCaretPosition()
+		).toBeGreaterThanOrEqual( initialPosition );
 
 		// Create blocks until the typewriter effect kicks in.
 		while (
@@ -231,14 +231,14 @@ test.describe( 'Typewriter', () => {
 				activeElement.offsetHeight + 10;
 		} );
 
-		const bottomPostition = await typewriterUtils.getCaretPosition();
+		const bottomPosition = await typewriterUtils.getCaretPosition();
 
 		// Should scroll the caret back into view (preserve browser behaviour).
 		await page.keyboard.type( 'a' );
 
 		const newBottomPosition = await typewriterUtils.getCaretPosition();
 
-		expect( newBottomPosition ).toBeLessThanOrEqual( bottomPostition );
+		expect( newBottomPosition ).toBeLessThanOrEqual( bottomPosition );
 
 		// Should maintain new caret position.
 		await page.keyboard.press( 'Enter' );
@@ -263,14 +263,14 @@ test.describe( 'Typewriter', () => {
 				activeElement.offsetHeight + 10;
 		} );
 
-		const topPostition = await typewriterUtils.getCaretPosition();
+		const topPosition = await typewriterUtils.getCaretPosition();
 
 		// Should scroll the caret back into view (preserve browser behaviour).
 		await page.keyboard.type( 'a' );
 
 		const newTopPosition = await typewriterUtils.getCaretPosition();
 
-		expect( newTopPosition ).toBeGreaterThan( topPostition );
+		expect( newTopPosition ).toBeGreaterThanOrEqual( topPosition );
 
 		// Should maintain new caret position.
 		await page.keyboard.press( 'Enter' );

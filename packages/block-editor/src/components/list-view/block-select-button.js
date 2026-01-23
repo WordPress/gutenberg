@@ -7,15 +7,19 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import {
-	Button,
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
-	Tooltip,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { Icon, lockSmall as lock, pinSmall } from '@wordpress/icons';
+import {
+	Icon,
+	lockSmall as lock,
+	pinSmall,
+	unseen,
+	symbol,
+} from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
-import { __, sprintf } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -28,6 +32,9 @@ import ListViewExpander from './expander';
 import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { Badge } = unlock( componentsPrivateApis );
 
 function ListViewBlockSelectButton(
 	{
@@ -53,25 +60,24 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { isContentOnly } = useSelect(
-		( select ) => ( {
-			isContentOnly:
-				select( blockEditorStore ).getBlockEditingMode( clientId ) ===
-				'contentOnly',
-		} ),
+	const { isBlockHidden, hasPatternName } = useSelect(
+		( select ) => {
+			const {
+				isBlockHiddenAnywhere: _isBlockHidden,
+				getBlockAttributes,
+			} = unlock( select( blockEditorStore ) );
+			return {
+				isBlockHidden: _isBlockHidden( clientId ),
+				hasPatternName:
+					!! getBlockAttributes( clientId )?.metadata?.patternName,
+			};
+		},
 		[ clientId ]
 	);
-	const shouldShowLockIcon = isLocked && ! isContentOnly;
+
+	const shouldShowLockIcon = isLocked;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
-
-	const positionLabel = blockInformation?.positionLabel
-		? sprintf(
-				// translators: 1: Position of selected block, e.g. "Sticky" or "Fixed".
-				__( 'Position: %1$s' ),
-				blockInformation.positionLabel
-		  )
-		: '';
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -92,7 +98,7 @@ function ListViewBlockSelectButton(
 	}
 
 	return (
-		<Button
+		<a
 			className={ clsx(
 				'block-editor-list-view-block-select-button',
 				className
@@ -113,7 +119,7 @@ function ListViewBlockSelectButton(
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
 			<BlockIcon
-				icon={ blockInformation?.icon }
+				icon={ hasPatternName ? symbol : blockInformation?.icon }
 				showColors
 				context="list-view"
 			/>
@@ -128,18 +134,15 @@ function ListViewBlockSelectButton(
 				</span>
 				{ blockInformation?.anchor && (
 					<span className="block-editor-list-view-block-select-button__anchor-wrapper">
-						<Truncate
-							className="block-editor-list-view-block-select-button__anchor"
-							ellipsizeMode="auto"
-						>
+						<Badge className="block-editor-list-view-block-select-button__anchor">
 							{ blockInformation.anchor }
-						</Truncate>
+						</Badge>
 					</span>
 				) }
-				{ positionLabel && isSticky && (
-					<Tooltip text={ positionLabel }>
+				{ isSticky && (
+					<span className="block-editor-list-view-block-select-button__sticky">
 						<Icon icon={ pinSmall } />
-					</Tooltip>
+					</span>
 				) }
 				{ images.length ? (
 					<span
@@ -158,13 +161,18 @@ function ListViewBlockSelectButton(
 						) ) }
 					</span>
 				) : null }
+				{ isBlockHidden && (
+					<span className="block-editor-list-view-block-select-button__block-visibility">
+						<Icon icon={ unseen } />
+					</span>
+				) }
 				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">
 						<Icon icon={ lock } />
 					</span>
 				) }
 			</HStack>
-		</Button>
+		</a>
 	);
 }
 

@@ -3,7 +3,7 @@
 /**
  * Test the background block support.
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	/**
@@ -64,6 +64,12 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 		return $this->theme_root;
 	}
 
+	private function get_apostrophe_entity() {
+		// WP 6.9+ has get_block_bindings_supported_attributes() and uses &apos;
+		// WP 6.8 and earlier use &#039;
+		return function_exists( 'get_block_bindings_supported_attributes' ) ? '&apos;' : '&#039;';
+	}
+
 	/**
 	 * Tests that background image block support works as expected.
 	 *
@@ -121,6 +127,10 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 	 * @return array
 	 */
 	public function data_background_block_support() {
+		// Get the appropriate apostrophe encoding based on WordPress version.
+		// function_exists() works in data providers, unlike get_bloginfo().
+		$apos = $this->get_apostrophe_entity();
+
 		return array(
 			'background image style is applied' => array(
 				'theme_name'          => 'block-theme-child-with-fluid-typography',
@@ -130,11 +140,10 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				),
 				'background_style'    => array(
 					'backgroundImage' => array(
-						'url'    => 'https://example.com/image.jpg',
-						'source' => 'file',
+						'url' => 'https://example.com/image.jpg',
 					),
 				),
-				'expected_wrapper'    => '<div class="has-background" style="background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
+				'expected_wrapper'    => '<div class="has-background" style="background-image:url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
 			'background image style is applied when backgroundImage is a string' => array(
@@ -146,24 +155,24 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				'background_style'    => array(
 					'backgroundImage' => "url('https://example.com/image.jpg')",
 				),
-				'expected_wrapper'    => '<div class="has-background" style="background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
+				'expected_wrapper'    => '<div class="has-background" style="background-image:url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
-			'background image style with contain, position, and repeat is applied' => array(
+			'background image style with contain, position, attachment, and repeat is applied' => array(
 				'theme_name'          => 'block-theme-child-with-fluid-typography',
 				'block_name'          => 'test/background-rules-are-output',
 				'background_settings' => array(
 					'backgroundImage' => true,
 				),
 				'background_style'    => array(
-					'backgroundImage'  => array(
-						'url'    => 'https://example.com/image.jpg',
-						'source' => 'file',
+					'backgroundImage'      => array(
+						'url' => 'https://example.com/image.jpg',
 					),
-					'backgroundRepeat' => 'no-repeat',
-					'backgroundSize'   => 'contain',
+					'backgroundRepeat'     => 'no-repeat',
+					'backgroundSize'       => 'contain',
+					'backgroundAttachment' => 'fixed',
 				),
-				'expected_wrapper'    => '<div class="has-background" style="background-image:url(&#039;https://example.com/image.jpg&#039;);background-position:center;background-repeat:no-repeat;background-size:contain;">Content</div>',
+				'expected_wrapper'    => '<div class="has-background" style="background-image:url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-position:50% 50%;background-repeat:no-repeat;background-size:contain;background-attachment:fixed;">Content</div>',
 				'wrapper'             => '<div>Content</div>',
 			),
 			'background image style is appended if a style attribute already exists' => array(
@@ -174,11 +183,10 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				),
 				'background_style'    => array(
 					'backgroundImage' => array(
-						'url'    => 'https://example.com/image.jpg',
-						'source' => 'file',
+						'url' => 'https://example.com/image.jpg',
 					),
 				),
-				'expected_wrapper'    => '<div class="wp-block-test has-background" style="color: red;background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
+				'expected_wrapper'    => '<div class="wp-block-test has-background" style="color: red;background-image:url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;">Content</div>',
 				'wrapper'             => '<div class="wp-block-test" style="color: red">Content</div>',
 			),
 			'background image style is appended if a style attribute containing multiple styles already exists' => array(
@@ -189,11 +197,10 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				),
 				'background_style'    => array(
 					'backgroundImage' => array(
-						'url'    => 'https://example.com/image.jpg',
-						'source' => 'file',
+						'url' => 'https://example.com/image.jpg',
 					),
 				),
-				'expected_wrapper'    => '<div class="wp-block-test has-background" style="color: red;font-size: 15px;background-image:url(&#039;https://example.com/image.jpg&#039;);background-size:cover;">Content</div>',
+				'expected_wrapper'    => '<div class="wp-block-test has-background" style="color: red;font-size: 15px;background-image:url(' . $apos . 'https://example.com/image.jpg' . $apos . ');background-size:cover;">Content</div>',
 				'wrapper'             => '<div class="wp-block-test" style="color: red;font-size: 15px;">Content</div>',
 			),
 			'background image style is not applied if the block does not support background image' => array(
@@ -204,8 +211,7 @@ class WP_Block_Supports_Background_Test extends WP_UnitTestCase {
 				),
 				'background_style'    => array(
 					'backgroundImage' => array(
-						'url'    => 'https://example.com/image.jpg',
-						'source' => 'file',
+						'url' => 'https://example.com/image.jpg',
 					),
 				),
 				'expected_wrapper'    => '<div>Content</div>',

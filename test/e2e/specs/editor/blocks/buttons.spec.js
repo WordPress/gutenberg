@@ -34,6 +34,9 @@ test.describe( 'Buttons', () => {
 			.locator( 'role=button[name="Add default block"i]' )
 			.click();
 		await page.keyboard.type( '/buttons' );
+		await expect(
+			page.getByRole( 'option', { name: 'Buttons' } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Content' );
 
@@ -60,7 +63,7 @@ test.describe( 'Buttons', () => {
 		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
-			page.locator( 'role=combobox[name="Link"i]' )
+			page.locator( 'role=combobox[name="Search or type URL"i]' )
 		).toBeFocused();
 		await page.keyboard.press( 'Escape' );
 		await expect(
@@ -91,7 +94,7 @@ test.describe( 'Buttons', () => {
 		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 		await expect(
-			page.locator( 'role=combobox[name="Link"i]' )
+			page.locator( 'role=combobox[name="Search or type URL"i]' )
 		).toBeFocused();
 		await page.keyboard.type( 'https://example.com' );
 		await page.keyboard.press( 'Enter' );
@@ -123,7 +126,9 @@ test.describe( 'Buttons', () => {
 		).toBeFocused();
 		await pageUtils.pressKeys( 'primary+k' );
 
-		const urlInput = page.locator( 'role=combobox[name="Link"i]' );
+		const urlInput = page.locator(
+			'role=combobox[name="Search or type URL"i]'
+		);
 
 		await expect( urlInput ).toBeFocused();
 		await page.keyboard.type( 'example.com' );
@@ -145,7 +150,9 @@ test.describe( 'Buttons', () => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'WordPress' );
 		await pageUtils.pressKeys( 'primary+k' );
-		await page.keyboard.type( 'https://www.wordpress.org/' );
+		await page
+			.getByRole( 'combobox', { name: 'Search or type URL' } )
+			.fill( 'https://www.wordpress.org/' );
 		await page.keyboard.press( 'Enter' );
 		// Make sure that the dialog is still opened, and that focus is retained
 		// within (focusing on the link preview).
@@ -172,7 +179,9 @@ test.describe( 'Buttons', () => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'WordPress' );
 		await pageUtils.pressKeys( 'primary+k' );
-		await page.keyboard.type( 'https://www.wordpress.org/' );
+		await page
+			.getByRole( 'combobox', { name: 'Search or type URL' } )
+			.fill( 'https://www.wordpress.org/' );
 		await page.keyboard.press( 'Enter' );
 
 		// Edit link.
@@ -201,7 +210,7 @@ test.describe( 'Buttons', () => {
 		await page
 			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
 			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
+			.getByRole( 'button', { name: 'Apply' } )
 			.click();
 
 		// The link should have been inserted.
@@ -235,7 +244,7 @@ test.describe( 'Buttons', () => {
 		await page
 			//TODO: change to a better selector when https://github.com/WordPress/gutenberg/issues/51060 is resolved.
 			.locator( '.block-editor-link-control' )
-			.getByRole( 'button', { name: 'Save' } )
+			.getByRole( 'button', { name: 'Apply' } )
 			.click();
 
 		// Check the content again.
@@ -261,12 +270,14 @@ test.describe( 'Buttons', () => {
 		await editor.insertBlock( { name: 'core/buttons' } );
 		await page.keyboard.type( 'Content' );
 		await editor.openDocumentSettingsSidebar();
-		await page.click(
-			`role=region[name="Editor settings"i] >> role=tab[name="Settings"i]`
-		);
-		await page.click(
-			'role=group[name="Button width"i] >> role=button[name="25%"i]'
-		);
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Settings' } )
+			.click();
+		await page
+			.getByRole( 'radiogroup', { name: 'Width' } )
+			.getByRole( 'radio', { name: '25%' } )
+			.click();
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
@@ -289,13 +300,13 @@ test.describe( 'Buttons', () => {
 			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
 		);
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Color Text styles"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
-		await page.click( 'role=option[name="Color: Cyan bluish gray"i]' );
+		await page.click( 'role=option[name="Cyan bluish gray"i]' );
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
-		await page.click( 'role=option[name="Color: Vivid red"i]' );
+		await page.click( 'role=option[name="Vivid red"i]' );
 
 		// Check the content.
 		const content = await editor.getEditedPostContent();
@@ -318,15 +329,15 @@ test.describe( 'Buttons', () => {
 			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
 		);
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Color Text styles"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Text"i]'
 		);
-		await page.click( 'role=button[name="Custom color picker."i]' );
+		await page.click( 'role=button[name="Custom color picker"i]' );
 		await page.fill( 'role=textbox[name="Hex color"i]', 'ff0000' );
 
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
-		await page.click( 'role=button[name="Custom color picker."i]' );
+		await page.click( 'role=button[name="Custom color picker"i]' );
 		await page.fill( 'role=textbox[name="Hex color"i]', '00ff00' );
 
 		// Check the content.
@@ -353,7 +364,7 @@ test.describe( 'Buttons', () => {
 			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
 		);
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
 		await page.click( 'role=tab[name="Gradient"i]' );
 		await page.click( 'role=option[name="Gradient: Purple to yellow"i]' );
@@ -382,7 +393,7 @@ test.describe( 'Buttons', () => {
 			`role=region[name="Editor settings"i] >> role=tab[name="Styles"i]`
 		);
 		await page.click(
-			'role=region[name="Editor settings"i] >> role=button[name="Color Background styles"i]'
+			'role=region[name="Editor settings"i] >> role=button[name="Background"i]'
 		);
 		await page.click( 'role=tab[name="Gradient"i]' );
 		await page.click(

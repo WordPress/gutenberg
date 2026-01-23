@@ -132,7 +132,7 @@ export interface RenderedText< C extends Context > {
  * For example, in the block editor, content.rendered could used as a visual preview, and
  * content.raw could be used to populate the code editor.
  *
- * When updating these rendered fields, Javascript is not be able to properly render arbitrary block
+ * When updating these rendered fields, JavaScript is not be able to properly render arbitrary block
  * markup. Therefore, it stores only the raw markup without the rendered part. And since that's a string,
  * the entire field becomes a string.
  *

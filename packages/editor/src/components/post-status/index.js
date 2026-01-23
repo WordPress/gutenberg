@@ -5,7 +5,6 @@ import {
 	Button,
 	CheckboxControl,
 	Dropdown,
-	__experimentalText as Text,
 	__experimentalVStack as VStack,
 	TextControl,
 	RadioControl,
@@ -16,91 +15,58 @@ import { useState, useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalInspectorPopoverHeader as InspectorPopoverHeader } from '@wordpress/block-editor';
 import { useInstanceId } from '@wordpress/compose';
+import {
+	drafts,
+	published,
+	scheduled,
+	pending,
+	notAllowed,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import {
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_POST_TYPE,
-	NAVIGATION_POST_TYPE,
-} from '../../store/constants';
+import { DESIGN_POST_TYPES } from '../../store/constants';
 import PostPanelRow from '../post-panel-row';
+import PostSticky from '../post-sticky';
+import { PrivatePostSchedule } from '../post-schedule';
 import { store as editorStore } from '../../store';
 
-const labels = {
-	'auto-draft': __( 'Draft' ),
-	draft: __( 'Draft' ),
-	pending: __( 'Pending' ),
-	private: __( 'Private' ),
-	future: __( 'Scheduled' ),
-	publish: __( 'Published' ),
+const postStatusesInfo = {
+	'auto-draft': { label: __( 'Draft' ), icon: drafts },
+	draft: { label: __( 'Draft' ), icon: drafts },
+	pending: { label: __( 'Pending' ), icon: pending },
+	private: { label: __( 'Private' ), icon: notAllowed },
+	future: { label: __( 'Scheduled' ), icon: scheduled },
+	publish: { label: __( 'Published' ), icon: published },
 };
 
-const STATUS_OPTIONS = [
+export const STATUS_OPTIONS = [
 	{
-		label: (
-			<>
-				{ __( 'Draft' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Not ready to publish.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Draft' ),
 		value: 'draft',
+		description: __( 'Not ready to publish.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Pending' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Waiting for review before publishing.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Pending' ),
 		value: 'pending',
+		description: __( 'Waiting for review before publishing.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Private' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Only visible to site admins and editors.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Private' ),
 		value: 'private',
+		description: __( 'Only visible to site admins and editors.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Scheduled' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Publish automatically on a chosen date.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Scheduled' ),
 		value: 'future',
+		description: __( 'Publish automatically on a chosen date.' ),
 	},
 	{
-		label: (
-			<>
-				{ __( 'Published' ) }
-				<Text variant="muted" size={ 12 }>
-					{ __( 'Visible to everyone.' ) }
-				</Text>
-			</>
-		),
+		label: __( 'Published' ),
 		value: 'publish',
+		description: __( 'Visible to everyone.' ),
 	},
-];
-
-const DESIGN_POST_TYPES = [
-	TEMPLATE_POST_TYPE,
-	TEMPLATE_PART_POST_TYPE,
-	PATTERN_POST_TYPE,
-	NAVIGATION_POST_TYPE,
 ];
 
 export default function PostStatus() {
@@ -174,11 +140,6 @@ export default function PostStatus() {
 		let newPassword = password;
 		if ( status === 'future' && new Date( date ) > new Date() ) {
 			newDate = null;
-		} else if ( value === 'future' ) {
-			if ( ! date || new Date( date ) < new Date() ) {
-				newDate = new Date();
-				newDate.setDate( newDate.getDate() + 7 );
-			}
 		}
 		if ( value === 'private' && password ) {
 			newPassword = '';
@@ -198,18 +159,21 @@ export default function PostStatus() {
 					contentClassName="editor-change-status__content"
 					popoverProps={ popoverProps }
 					focusOnMount
-					renderToggle={ ( { onToggle } ) => (
+					renderToggle={ ( { onToggle, isOpen } ) => (
 						<Button
+							className="editor-post-status__toggle"
 							variant="tertiary"
 							size="compact"
 							onClick={ onToggle }
+							icon={ postStatusesInfo[ status ]?.icon }
 							aria-label={ sprintf(
 								// translators: %s: Current post status.
-								__( 'Change post status: %s' ),
-								labels[ status ]
+								__( 'Change status: %s' ),
+								postStatusesInfo[ status ]?.label
 							) }
+							aria-expanded={ isOpen }
 						>
-							{ labels[ status ] }
+							{ postStatusesInfo[ status ]?.label }
 						</Button>
 					) }
 					renderContent={ ( { onClose } ) => (
@@ -218,7 +182,12 @@ export default function PostStatus() {
 								title={ __( 'Status & visibility' ) }
 								onClose={ onClose }
 							/>
-							<form>
+							<form
+								onSubmit={ ( event ) => {
+									event.preventDefault();
+									onClose();
+								} }
+							>
 								<VStack spacing={ 4 }>
 									<RadioControl
 										className="editor-change-status__options"
@@ -232,6 +201,16 @@ export default function PostStatus() {
 												: status
 										}
 									/>
+									{ status === 'future' && (
+										<div className="editor-change-status__publish-date-wrapper">
+											<PrivatePostSchedule
+												showPopoverHeaderActions={
+													false
+												}
+												isCompact
+											/>
+										</div>
+									) }
 									{ status !== 'private' && (
 										<VStack
 											as="fieldset"
@@ -239,12 +218,11 @@ export default function PostStatus() {
 											className="editor-change-status__password-fieldset"
 										>
 											<CheckboxControl
-												__nextHasNoMarginBottom
 												label={ __(
 													'Password protected'
 												) }
 												help={ __(
-													'Only visible to those who know the password'
+													'Only visible to those who know the password.'
 												) }
 												checked={ showPassword }
 												onChange={
@@ -269,12 +247,13 @@ export default function PostStatus() {
 														type="text"
 														id={ passwordInputId }
 														__next40pxDefaultSize
-														__nextHasNoMarginBottom
+														maxLength={ 255 }
 													/>
 												</div>
 											) }
 										</VStack>
 									) }
+									<PostSticky />
 								</VStack>
 							</form>
 						</>
@@ -282,7 +261,7 @@ export default function PostStatus() {
 				/>
 			) : (
 				<div className="editor-post-status is-read-only">
-					{ labels[ status ] }
+					{ postStatusesInfo[ status ]?.label }
 				</div>
 			) }
 		</PostPanelRow>

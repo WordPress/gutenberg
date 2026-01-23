@@ -154,10 +154,17 @@
 						"docs/reference-guides/block-api/block-annotations.md": []
 					},
 					{
-						"docs/reference-guides/block-api/block-api-versions.md": []
+						"docs/reference-guides/block-api/block-api-versions/README.md": [
+							{
+								"docs/reference-guides/block-api/block-api-versions/block-migration-for-iframe-editor-compatibility.md": []
+							}
+						]
 					},
 					{
 						"docs/reference-guides/block-api/block-attributes.md": []
+					},
+					{
+						"docs/reference-guides/block-api/block-bindings.md": []
 					},
 					{ "docs/reference-guides/block-api/block-context.md": [] },
 					{
@@ -204,6 +211,22 @@
 			},
 			{
 				"docs/reference-guides/interactivity-api/README.md": [
+					{
+						"docs/reference-guides/interactivity-api/core-concepts/README.md": [
+							{
+								"docs/reference-guides/interactivity-api/core-concepts/the-reactive-and-declarative-mindset.md": []
+							},
+							{
+								"docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md": []
+							},
+							{
+								"docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md": []
+							},
+							{
+								"docs/reference-guides/interactivity-api/core-concepts/using-typescript.md": []
+							}
+						]
+					},
 					{
 						"docs/reference-guides/interactivity-api/iapi-quick-start-guide.md": []
 					},
@@ -355,9 +378,6 @@
 							{
 								"docs/contributors/code/e2e/README.md": [
 									{
-										"docs/contributors/code/e2e/migration.md": []
-									},
-									{
 										"docs/contributors/code/e2e/overusing-snapshots.md": []
 									}
 								]
@@ -367,7 +387,13 @@
 					{ "docs/contributors/code/scripts.md": [] },
 					{ "docs/contributors/code/managing-packages.md": [] },
 					{
-						"docs/contributors/code/release.md": [
+						"docs/contributors/code/release/README.md": [
+							{
+								"docs/contributors/code/release/plugin-release.md": []
+							},
+							{
+								"docs/contributors/code/release/package-release-and-core-updates.md": []
+							},
 							{
 								"docs/contributors/code/auto-cherry-picking.md": []
 							}

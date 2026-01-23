@@ -49,7 +49,7 @@ function getStoreName( storeNameOrDescriptor ) {
  * configurations.
  *
  * @param {Object}  storeConfigs Initial store configurations.
- * @param {Object?} parent       Parent registry.
+ * @param {?Object} parent       Parent registry.
  *
  * @return {WPDataRegistry} Data registry.
  */
@@ -322,9 +322,14 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 
 		emitter.pause();
 		Object.values( stores ).forEach( ( store ) => store.emitter.pause() );
-		callback();
-		emitter.resume();
-		Object.values( stores ).forEach( ( store ) => store.emitter.resume() );
+		try {
+			callback();
+		} finally {
+			emitter.resume();
+			Object.values( stores ).forEach( ( store ) =>
+				store.emitter.resume()
+			);
+		}
 	}
 
 	let registry = {

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -18,7 +19,8 @@ const ICONS = { starEmpty, starFilled, styles, wordpress };
 
 const meta: Meta< typeof RangeControl > = {
 	component: RangeControl,
-	title: 'Components/RangeControl',
+	title: 'Components/Selection & Input/Common/RangeControl',
+	id: 'components-rangecontrol',
 	argTypes: {
 		afterIcon: {
 			control: { type: 'select' },
@@ -32,21 +34,27 @@ const meta: Meta< typeof RangeControl > = {
 		},
 		color: { control: { type: 'color' } },
 		help: { control: { type: 'text' } },
-		icon: { control: { type: null } },
+		icon: { control: false },
 		marks: { control: { type: 'object' } },
-		onBlur: { control: { type: null } },
-		onChange: { control: { type: null } },
-		onFocus: { control: { type: null } },
-		onMouseLeave: { control: { type: null } },
-		onMouseMove: { control: { type: null } },
+		onBlur: { control: false },
+		onChange: { control: false },
+		onFocus: { control: false },
+		onMouseLeave: { control: false },
+		onMouseMove: { control: false },
 		railColor: { control: { type: 'color' } },
 		step: { control: { type: 'number' } },
 		trackColor: { control: { type: 'color' } },
 		type: { control: { type: 'check' }, options: [ 'stepper' ] },
-		value: { control: { type: null } },
+		value: { control: false },
+	},
+	args: {
+		onBlur: fn(),
+		onChange: fn(),
+		onFocus: fn(),
+		onMouseLeave: fn(),
+		onMouseMove: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -58,6 +66,7 @@ const Template: StoryFn< typeof RangeControl > = ( { onChange, ...args } ) => {
 
 	return (
 		<RangeControl
+			__next40pxDefaultSize
 			{ ...args }
 			value={ value }
 			onChange={ ( v ) => {
@@ -70,6 +79,7 @@ const Template: StoryFn< typeof RangeControl > = ( { onChange, ...args } ) => {
 
 export const Default: StoryFn< typeof RangeControl > = Template.bind( {} );
 Default.args = {
+	__next40pxDefaultSize: true,
 	help: 'Please select how transparent you would like this.',
 	initialPosition: 50,
 	label: 'Opacity',
@@ -91,6 +101,7 @@ export const WithAnyStep: StoryFn< typeof RangeControl > = ( {
 	return (
 		<>
 			<RangeControl
+				__next40pxDefaultSize
 				{ ...args }
 				value={ value }
 				onChange={ ( v ) => {
@@ -104,6 +115,7 @@ export const WithAnyStep: StoryFn< typeof RangeControl > = ( {
 	);
 };
 WithAnyStep.args = {
+	__next40pxDefaultSize: true,
 	label: 'Brightness',
 	step: 'any',
 };
@@ -120,6 +132,7 @@ const MarkTemplate: StoryFn< typeof RangeControl > = ( {
 		<>
 			<h2>{ label }</h2>
 			<RangeControl
+				__next40pxDefaultSize
 				{ ...args }
 				label="Automatic marks"
 				marks
@@ -130,6 +143,7 @@ const MarkTemplate: StoryFn< typeof RangeControl > = ( {
 				value={ automaticValue }
 			/>
 			<RangeControl
+				__next40pxDefaultSize
 				{ ...args }
 				label="Custom marks"
 				onChange={ ( v ) => {
@@ -167,6 +181,7 @@ export const WithIntegerStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
 WithIntegerStepAndMarks.args = {
+	__next40pxDefaultSize: true,
 	label: 'Integer Step',
 	marks: marksBase,
 	max: 10,
@@ -183,6 +198,7 @@ export const WithDecimalStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
 WithDecimalStepAndMarks.args = {
+	__next40pxDefaultSize: true,
 	marks: [
 		...marksBase,
 		{ value: 3.5, label: '3.5' },
@@ -202,6 +218,7 @@ export const WithNegativeMinimumAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
 WithNegativeMinimumAndMarks.args = {
+	__next40pxDefaultSize: true,
 	marks: marksWithNegatives,
 	max: 10,
 	min: -10,
@@ -217,6 +234,7 @@ export const WithNegativeRangeAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
 WithNegativeRangeAndMarks.args = {
+	__next40pxDefaultSize: true,
 	marks: marksWithNegatives,
 	max: -1,
 	min: -10,
@@ -232,6 +250,7 @@ export const WithAnyStepAndMarks: StoryFn< typeof RangeControl > =
 	MarkTemplate.bind( {} );
 
 WithAnyStepAndMarks.args = {
+	__next40pxDefaultSize: true,
 	marks: marksBase,
 	max: 10,
 	min: 0,

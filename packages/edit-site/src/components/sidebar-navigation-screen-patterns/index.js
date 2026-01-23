@@ -7,8 +7,6 @@ import {
 } from '@wordpress/components';
 import { getTemplatePartIcon } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { store as coreStore } from '@wordpress/core-data';
-import { useSelect } from '@wordpress/data';
 import { file } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -54,11 +52,11 @@ function CategoriesGroup( {
 				}
 			/>
 			{ Object.entries( templatePartAreas ).map(
-				( [ area, { label, templateParts } ] ) => (
+				( [ area, { label, templateParts, icon } ] ) => (
 					<CategoryItem
 						key={ area }
 						count={ templateParts?.length }
-						icon={ getTemplatePartIcon( area ) }
+						icon={ getTemplatePartIcon( icon ) }
 						label={ label }
 						id={ area }
 						type={ TEMPLATE_PART_POST_TYPE }
@@ -104,26 +102,25 @@ function CategoriesGroup( {
 
 export default function SidebarNavigationScreenPatterns( { backPath } ) {
 	const {
-		params: { postType, categoryId },
+		query: { postType = 'wp_block', categoryId },
 	} = useLocation();
-	const currentCategory = categoryId || PATTERN_DEFAULT_CATEGORY;
-	const currentType = postType || PATTERN_TYPES.user;
+	const currentCategory =
+		categoryId ||
+		( postType === PATTERN_TYPES.user
+			? PATTERN_DEFAULT_CATEGORY
+			: TEMPLATE_PART_ALL_AREAS_CATEGORY );
 
 	const { templatePartAreas, hasTemplateParts, isLoading } =
 		useTemplatePartAreas();
 	const { patternCategories, hasPatterns } = usePatternCategories();
-	const isBlockBasedTheme = useSelect(
-		( select ) => select( coreStore ).getCurrentTheme()?.is_block_theme,
-		[]
-	);
 
 	return (
 		<SidebarNavigationScreen
-			isRoot={ ! isBlockBasedTheme }
 			title={ __( 'Patterns' ) }
 			description={ __(
 				'Manage what patterns are available when editing the site.'
 			) }
+			isRoot={ ! backPath }
 			backPath={ backPath }
 			content={
 				<>
@@ -139,7 +136,7 @@ export default function SidebarNavigationScreenPatterns( { backPath } ) {
 								templatePartAreas={ templatePartAreas }
 								patternCategories={ patternCategories }
 								currentCategory={ currentCategory }
-								currentType={ currentType }
+								currentType={ postType }
 							/>
 						</>
 					) }

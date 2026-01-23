@@ -129,6 +129,7 @@ const BlockMoverButton = forwardRef(
 		return (
 			<>
 				<Button
+					__next40pxDefaultSize
 					ref={ ref }
 					className={ clsx(
 						'block-editor-block-mover-button',
@@ -143,7 +144,7 @@ const BlockMoverButton = forwardRef(
 					{ ...props }
 					onClick={ isDisabled ? null : onClick }
 					disabled={ isDisabled }
-					__experimentalIsFocusable
+					accessibleWhenDisabled
 				/>
 				<VisuallyHidden id={ descriptionId }>
 					{ getBlockMoverDescription(

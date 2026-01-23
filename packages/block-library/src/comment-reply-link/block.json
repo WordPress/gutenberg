@@ -8,12 +8,8 @@
 	"description": "Displays a link to reply to a comment.",
 	"textdomain": "default",
 	"usesContext": [ "commentId" ],
-	"attributes": {
-		"textAlign": {
-			"type": "string"
-		}
-	},
 	"supports": {
+		"anchor": true,
 		"color": {
 			"gradients": true,
 			"link": true,
@@ -25,11 +21,16 @@
 		},
 		"spacing": {
 			"margin": true,
-			"padding": true
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
 		},
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
@@ -40,6 +41,13 @@
 				"fontSize": true
 			}
 		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		},
 		"html": false
-	}
+	},
+	"style": "wp-block-comment-reply-link"
 }

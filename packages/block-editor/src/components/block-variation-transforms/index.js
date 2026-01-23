@@ -5,22 +5,22 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	Button,
-	DropdownMenu,
-	MenuGroup,
-	MenuItemsChoice,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	VisuallyHidden,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
-import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { Menu } = unlock( componentsPrivateApis );
 
 function VariationsButtons( {
 	className,
@@ -35,6 +35,8 @@ function VariationsButtons( {
 			</VisuallyHidden>
 			{ variations.map( ( variation ) => (
 				<Button
+					__next40pxDefaultSize
+					size="compact"
 					key={ variation.name }
 					icon={ <BlockIcon icon={ variation.icon } showColors /> }
 					isPressed={ selectedValue === variation.name }
@@ -42,7 +44,7 @@ function VariationsButtons( {
 						selectedValue === variation.name
 							? variation.title
 							: sprintf(
-									/* translators: %s: Name of the block variation */
+									/* translators: %s: Block or block variation name. */
 									__( 'Transform to %s' ),
 									variation.title
 							  )
@@ -62,38 +64,45 @@ function VariationsDropdown( {
 	selectedValue,
 	variations,
 } ) {
-	const selectOptions = variations.map(
-		( { name, title, description } ) => ( {
-			value: name,
-			label: title,
-			info: description,
-		} )
-	);
-
 	return (
-		<DropdownMenu
-			className={ className }
-			label={ __( 'Transform to variation' ) }
-			text={ __( 'Transform to variation' ) }
-			popoverProps={ {
-				position: 'bottom center',
-				className: `${ className }__popover`,
-			} }
-			icon={ chevronDown }
-			toggleProps={ { iconPosition: 'right' } }
-		>
-			{ () => (
-				<div className={ `${ className }__container` }>
-					<MenuGroup>
-						<MenuItemsChoice
-							choices={ selectOptions }
-							value={ selectedValue }
-							onSelect={ onSelectVariation }
-						/>
-					</MenuGroup>
-				</div>
-			) }
-		</DropdownMenu>
+		<div className={ className }>
+			<Menu>
+				<Menu.TriggerButton
+					render={
+						<Button
+							className="block-editor-block-variation-transforms__button"
+							__next40pxDefaultSize
+							variant="secondary"
+						>
+							{ __( 'Transform to variation' ) }
+						</Button>
+					}
+				/>
+				<Menu.Popover position="bottom">
+					<Menu.Group>
+						{ variations.map( ( variation ) => (
+							<Menu.RadioItem
+								key={ variation.name }
+								value={ variation.name }
+								checked={ selectedValue === variation.name }
+								onChange={ () =>
+									onSelectVariation( variation.name )
+								}
+							>
+								<Menu.ItemLabel>
+									{ variation.title }
+								</Menu.ItemLabel>
+								{ variation.description && (
+									<Menu.ItemHelpText>
+										{ variation.description }
+									</Menu.ItemHelpText>
+								) }
+							</Menu.RadioItem>
+						) ) }
+					</Menu.Group>
+				</Menu.Popover>
+			</Menu>
+		</div>
 	);
 }
 
@@ -111,7 +120,6 @@ function VariationsToggleGroupControl( {
 				hideLabelFromVision
 				onChange={ onSelectVariation }
 				__next40pxDefaultSize
-				__nextHasNoMarginBottom
 			>
 				{ variations.map( ( variation ) => (
 					<ToggleGroupControlOptionIcon
@@ -124,7 +132,7 @@ function VariationsToggleGroupControl( {
 							selectedValue === variation.name
 								? variation.title
 								: sprintf(
-										/* translators: %s: Name of the block variation */
+										/* translators: %s: Block or block variation name. */
 										__( 'Transform to %s' ),
 										variation.title
 								  )
@@ -138,23 +146,41 @@ function VariationsToggleGroupControl( {
 
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
-	const { activeBlockVariation, variations } = useSelect(
-		( select ) => {
-			const { getActiveBlockVariation, getBlockVariations } =
-				select( blocksStore );
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
-			const name = blockClientId && getBlockName( blockClientId );
-			return {
-				activeBlockVariation: getActiveBlockVariation(
-					name,
-					getBlockAttributes( blockClientId )
-				),
-				variations: name && getBlockVariations( name, 'transform' ),
-			};
-		},
-		[ blockClientId ]
-	);
+	const { activeBlockVariation, variations, isContentOnly, isSection } =
+		useSelect(
+			( select ) => {
+				const { getActiveBlockVariation, getBlockVariations } =
+					select( blocksStore );
+
+				const {
+					getBlockName,
+					getBlockAttributes,
+					getBlockEditingMode,
+					isSectionBlock,
+				} = unlock( select( blockEditorStore ) );
+
+				const name = blockClientId && getBlockName( blockClientId );
+
+				const { hasContentRoleAttribute } = unlock(
+					select( blocksStore )
+				);
+				const isContentBlock = hasContentRoleAttribute( name );
+
+				return {
+					activeBlockVariation: getActiveBlockVariation(
+						name,
+						getBlockAttributes( blockClientId ),
+						'transform'
+					),
+					variations: name && getBlockVariations( name, 'transform' ),
+					isContentOnly:
+						getBlockEditingMode( blockClientId ) ===
+							'contentOnly' && ! isContentBlock,
+					isSection: isSectionBlock( blockClientId ),
+				};
+			},
+			[ blockClientId ]
+		);
 
 	const selectedValue = activeBlockVariation?.name;
 
@@ -179,15 +205,17 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		} );
 	};
 
-	// Skip rendering if there are no variations
-	if ( ! variations?.length ) {
+	const hideVariationsForSections =
+		window?.__experimentalContentOnlyPatternInsertion && isSection;
+
+	if ( ! variations?.length || isContentOnly || hideVariationsForSections ) {
 		return null;
 	}
 
 	const baseClass = 'block-editor-block-variation-transforms';
 
-	// Show buttons if there are more than 5 variations because the ToggleGroupControl does not wrap
-	const showButtons = variations.length > 5;
+	// Show buttons if there are more than 6 variations because the ToggleGroupControl does not wrap
+	const showButtons = variations.length > 6;
 
 	const ButtonComponent = showButtons
 		? VariationsButtons

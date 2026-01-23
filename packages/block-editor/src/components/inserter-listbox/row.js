@@ -2,17 +2,10 @@
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../../lock-unlock';
-
-const { CompositeGroupV2: CompositeGroup } = unlock( componentsPrivateApis );
+import { Composite } from '@wordpress/components';
 
 function InserterListboxRow( props, ref ) {
-	return <CompositeGroup role="presentation" ref={ ref } { ...props } />;
+	return <Composite.Group role="presentation" ref={ ref } { ...props } />;
 }
 
 export default forwardRef( InserterListboxRow );

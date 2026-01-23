@@ -12,8 +12,9 @@ import { space } from '../utils/space';
 import { rtl, useCx } from '../utils';
 import type { SpacerProps } from './types';
 
-const isDefined = < T >( o: T ): o is Exclude< T, null | undefined > =>
-	typeof o !== 'undefined' && o !== null;
+function isDefined< T >( o: T ): o is Exclude< T, null | undefined > {
+	return typeof o !== 'undefined' && o !== null;
+}
 
 export function useSpacer(
 	props: WordPressComponentProps< SpacerProps, 'div' >

@@ -4,37 +4,30 @@ on:
     push:
 name: Pull request automation
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
     pull-request-automation:
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            issues: write
+            pull-requests: write
         if: ${{ github.repository == 'WordPress/gutenberg' }}
 
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
-            - uses: actions/checkout@44c2b7a8a4ea60a981eaca3cf939b5f4305c123b # v4.1.5
+            - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
                   ref: trunk
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
-            - name: Use desired version of Node.js
-              uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
-              with:
-                  node-version-file: '.nvmrc'
-                  check-latest: true
-
-            - name: Cache NPM packages
-              uses: actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9 # v4.0.2
-              with:
-                  # npm cache files are stored in `~/.npm` on Linux/macOS
-                  path: ~/.npm
-                  key: ${{ runner.os }}-node-${{ matrix.node }}-npm-pr-automation-cache-${{ hashFiles('**/package-lock.json') }}
-
-            # Changing into the action's directory and running `npm install` is much
-            # faster than a full project-wide `npm ci`.
-            - name: Install NPM dependencies
-              run: npm install
-              working-directory: packages/project-management-automation
+            - name: Setup Node.js and install dependencies
+              uses: ./.github/setup-node
 
             - uses: ./packages/project-management-automation
               with:

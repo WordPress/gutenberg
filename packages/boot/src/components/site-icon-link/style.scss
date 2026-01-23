@@ -1,0 +1,24 @@
+@use "@wordpress/base-styles/variables";
+
+$header-height: variables.$header-height;
+
+.boot-site-icon-link {
+	width: $header-height;
+	height: $header-height;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: var(--wpds-color-bg-surface-neutral-weak, #f0f0f0);
+	text-decoration: none;
+
+	@media not (prefers-reduced-motion) {
+		transition: outline 0.1s ease-out;
+	}
+
+	&:focus:not(:active) {
+		outline:
+			var(--wpds-border-width-interactive-focus, 2px) solid
+			var(--wpds-color-stroke-focus-brand, #0073aa);
+		outline-offset: calc(-1 * var(--wpds-border-width-interactive-focus, 2px));
+	}
+}

@@ -18,7 +18,6 @@ import {
 	blockInserterPanel,
 	listViewPanel,
 } from '../reducer';
-import { setIsInserterOpened } from '../actions';
 
 describe( 'state', () => {
 	describe( 'hasSameKeys()', () => {
@@ -298,15 +297,6 @@ describe( 'state', () => {
 			expect( blockInserterPanel( true, {} ) ).toBe( true );
 		} );
 
-		it( 'should set the open state of the inserter panel', () => {
-			expect(
-				blockInserterPanel( false, setIsInserterOpened( true ) )
-			).toBe( true );
-			expect(
-				blockInserterPanel( true, setIsInserterOpened( false ) )
-			).toBe( false );
-		} );
-
 		it( 'should close the inserter when opening the list view panel', () => {
 			expect(
 				blockInserterPanel( true, {
@@ -348,18 +338,6 @@ describe( 'state', () => {
 					isOpen: false,
 				} )
 			).toBe( false );
-		} );
-
-		it( 'should close the list view when opening the inserter panel', () => {
-			expect( listViewPanel( true, setIsInserterOpened( true ) ) ).toBe(
-				false
-			);
-		} );
-
-		it( 'should not change the state when closing the inserter panel', () => {
-			expect( listViewPanel( true, setIsInserterOpened( false ) ) ).toBe(
-				true
-			);
 		} );
 	} );
 } );

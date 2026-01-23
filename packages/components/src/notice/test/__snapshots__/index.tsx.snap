@@ -21,19 +21,19 @@ exports[`Notice should match snapshot 1`] = `
         class="components-notice__actions"
       >
         <a
-          class="components-button components-notice__action is-link"
+          class="components-button components-notice__action is-next-40px-default-size is-link"
           href="https://example.com"
         >
           More information
         </a>
         <button
-          class="components-button components-notice__action is-secondary"
+          class="components-button components-notice__action is-next-40px-default-size is-secondary"
           type="button"
         >
           Cancel
         </button>
         <button
-          class="components-button components-notice__action is-primary"
+          class="components-button components-notice__action is-next-40px-default-size is-primary"
           type="button"
         >
           Submit
@@ -42,7 +42,7 @@ exports[`Notice should match snapshot 1`] = `
     </div>
     <button
       aria-label="Close"
-      class="components-button components-notice__dismiss has-icon"
+      class="components-button components-notice__dismiss is-small has-icon"
       type="button"
     >
       <svg
@@ -54,7 +54,7 @@ exports[`Notice should match snapshot 1`] = `
         xmlns="http://www.w3.org/2000/svg"
       >
         <path
-          d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"
+          d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"
         />
       </svg>
     </button>

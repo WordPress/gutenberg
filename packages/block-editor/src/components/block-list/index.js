@@ -12,17 +12,14 @@ import {
 	useDispatch,
 	useRegistry,
 } from '@wordpress/data';
-import {
-	useViewportMatch,
-	useMergeRefs,
-	useDebounce,
-} from '@wordpress/compose';
+import { useMergeRefs, useDebounce } from '@wordpress/compose';
 import {
 	createContext,
+	useEffect,
 	useMemo,
 	useCallback,
-	useEffect,
 } from '@wordpress/element';
+import { getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -39,33 +36,35 @@ import {
 	DEFAULT_BLOCK_EDIT_CONTEXT,
 } from '../block-edit/context';
 import { useTypingObserver } from '../observe-typing';
+import { ZoomOutSeparator } from './zoom-out-separator';
 import { unlock } from '../../lock-unlock';
 
 export const IntersectionObserver = createContext();
+IntersectionObserver.displayName = 'IntersectionObserverContext';
+
 const pendingBlockVisibilityUpdatesPerRegistry = new WeakMap();
+const delayedBlockVisibilityDebounceOptions = {
+	trailing: true,
+};
 
 function Root( { className, ...settings } ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
-	const {
-		isOutlineMode,
-		isFocusMode,
-		editorMode,
-		temporarilyEditingAsBlocks,
-	} = useSelect( ( select ) => {
-		const {
-			getSettings,
-			__unstableGetEditorMode,
-			getTemporarilyEditingAsBlocks,
-			isTyping,
-		} = unlock( select( blockEditorStore ) );
-		const { outlineMode, focusMode } = getSettings();
-		return {
-			isOutlineMode: outlineMode && ! isTyping(),
-			isFocusMode: focusMode,
-			editorMode: __unstableGetEditorMode(),
-			temporarilyEditingAsBlocks: getTemporarilyEditingAsBlocks(),
-		};
-	}, [] );
+	const { isOutlineMode, isFocusMode, editedContentOnlySection } = useSelect(
+		( select ) => {
+			const {
+				getSettings,
+				isTyping,
+				hasBlockSpotlight,
+				getEditedContentOnlySection,
+			} = unlock( select( blockEditorStore ) );
+			const { outlineMode, focusMode } = getSettings();
+			return {
+				isOutlineMode: outlineMode && ! isTyping(),
+				isFocusMode: focusMode || hasBlockSpotlight(),
+				editedContentOnlySection: getEditedContentOnlySection(),
+			};
+		},
+		[]
+	);
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
@@ -80,9 +79,7 @@ function Root( { className, ...settings } ) {
 			setBlockVisibility( updates );
 		}, [ registry ] ),
 		300,
-		{
-			trailing: true,
-		}
+		delayedBlockVisibilityDebounceOptions
 	);
 	const intersectionObserver = useMemo( () => {
 		const { IntersectionObserver: Observer } = window;
@@ -113,8 +110,7 @@ function Root( { className, ...settings } ) {
 			] ),
 			className: clsx( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
-				'is-focus-mode': isFocusMode && isLargeViewport,
-				'is-navigate-mode': editorMode === 'navigation',
+				'is-focus-mode': isFocusMode,
 			} ),
 		},
 		settings
@@ -122,33 +118,41 @@ function Root( { className, ...settings } ) {
 	return (
 		<IntersectionObserver.Provider value={ intersectionObserver }>
 			<div { ...innerBlocksProps } />
-			{ !! temporarilyEditingAsBlocks && (
-				<StopEditingAsBlocksOnOutsideSelect
-					clientId={ temporarilyEditingAsBlocks }
+			{ !! editedContentOnlySection && (
+				<StopEditingContentOnlySectionOnOutsideSelect
+					clientId={ editedContentOnlySection }
 				/>
 			) }
 		</IntersectionObserver.Provider>
 	);
 }
 
-function StopEditingAsBlocksOnOutsideSelect( { clientId } ) {
-	const { stopEditingAsBlocks } = unlock( useDispatch( blockEditorStore ) );
+function StopEditingContentOnlySectionOnOutsideSelect( { clientId } ) {
+	const { stopEditingContentOnlySection } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const isBlockOrDescendantSelected = useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock } =
-				select( blockEditorStore );
+			const {
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				getBlockSelectionStart,
+			} = select( blockEditorStore );
 			return (
+				! getBlockSelectionStart() ||
 				isBlockSelected( clientId ) ||
 				hasSelectedInnerBlock( clientId, true )
 			);
 		},
 		[ clientId ]
 	);
+
 	useEffect( () => {
 		if ( ! isBlockOrDescendantSelected ) {
-			stopEditingAsBlocks( clientId );
+			stopEditingContentOnlySection();
 		}
-	}, [ isBlockOrDescendantSelected, clientId, stopEditingAsBlocks ] );
+	}, [ isBlockOrDescendantSelected, stopEditingContentOnlySection ] );
+
 	return null;
 }
 
@@ -174,49 +178,78 @@ function Items( {
 	// function on every render.
 	const hasAppender = CustomAppender !== false;
 	const hasCustomAppender = !! CustomAppender;
-	const { order, selectedBlocks, visibleBlocks, shouldRenderAppender } =
-		useSelect(
-			( select ) => {
-				const {
-					getSettings,
-					getBlockOrder,
-					getSelectedBlockClientId,
-					getSelectedBlockClientIds,
-					__unstableGetVisibleBlocks,
-					getTemplateLock,
-					getBlockEditingMode,
-					__unstableGetEditorMode,
-				} = select( blockEditorStore );
+	const {
+		order,
+		isZoomOut,
+		selectedBlocks,
+		visibleBlocks,
+		shouldRenderAppender,
+	} = useSelect(
+		( select ) => {
+			const {
+				getSettings,
+				getBlockOrder,
+				getSelectedBlockClientIds,
+				__unstableGetVisibleBlocks,
+				getTemplateLock,
+				getBlockEditingMode,
+				isSectionBlock,
+				isContainerInsertableToInContentOnlyMode,
+				getBlockName,
+				isZoomOut: _isZoomOut,
+				canInsertBlockType,
+			} = unlock( select( blockEditorStore ) );
 
-				const _order = getBlockOrder( rootClientId );
+			const _order = getBlockOrder( rootClientId );
 
-				if ( getSettings().__unstableIsPreviewMode ) {
-					return {
-						order: _order,
-						selectedBlocks: EMPTY_ARRAY,
-						visibleBlocks: EMPTY_SET,
-					};
-				}
-
-				const selectedBlockClientId = getSelectedBlockClientId();
+			if ( getSettings().isPreviewMode ) {
 				return {
 					order: _order,
-					selectedBlocks: getSelectedBlockClientIds(),
-					visibleBlocks: __unstableGetVisibleBlocks(),
-					shouldRenderAppender:
-						hasAppender &&
-						__unstableGetEditorMode() !== 'zoom-out' &&
-						( hasCustomAppender
-							? ! getTemplateLock( rootClientId ) &&
-							  getBlockEditingMode( rootClientId ) !== 'disabled'
-							: rootClientId === selectedBlockClientId ||
-							  ( ! rootClientId &&
-									! selectedBlockClientId &&
-									! _order.length ) ),
+					selectedBlocks: EMPTY_ARRAY,
+					visibleBlocks: EMPTY_SET,
 				};
-			},
-			[ rootClientId, hasAppender, hasCustomAppender ]
-		);
+			}
+
+			const selectedBlockClientIds = getSelectedBlockClientIds();
+			const selectedBlockClientId = selectedBlockClientIds[ 0 ];
+			const showRootAppender =
+				! rootClientId &&
+				! selectedBlockClientId &&
+				( ! _order.length ||
+					! canInsertBlockType(
+						getDefaultBlockName(),
+						rootClientId
+					) );
+			const hasSelectedRoot = !! (
+				rootClientId &&
+				selectedBlockClientId &&
+				rootClientId === selectedBlockClientId
+			);
+
+			const templateLock = getTemplateLock( rootClientId );
+
+			return {
+				order: _order,
+				selectedBlocks: selectedBlockClientIds,
+				visibleBlocks: __unstableGetVisibleBlocks(),
+				isZoomOut: _isZoomOut(),
+				shouldRenderAppender:
+					( ! isSectionBlock( rootClientId ) ||
+						isContainerInsertableToInContentOnlyMode(
+							getBlockName( selectedBlockClientId ),
+							rootClientId
+						) ) &&
+					getBlockEditingMode( rootClientId ) !== 'disabled' &&
+					( ! templateLock || templateLock === 'contentOnly' ) &&
+					hasAppender &&
+					! _isZoomOut() &&
+					( hasCustomAppender ||
+						hasSelectedRoot ||
+						showRootAppender ),
+			};
+		},
+		[ rootClientId, hasAppender, hasCustomAppender ]
+	);
 
 	return (
 		<LayoutProvider value={ layout }>
@@ -230,10 +263,24 @@ function Items( {
 						! selectedBlocks.includes( clientId )
 					}
 				>
+					{ isZoomOut && (
+						<ZoomOutSeparator
+							clientId={ clientId }
+							rootClientId={ rootClientId }
+							position="top"
+						/>
+					) }
 					<BlockListBlock
 						rootClientId={ rootClientId }
 						clientId={ clientId }
 					/>
+					{ isZoomOut && (
+						<ZoomOutSeparator
+							clientId={ clientId }
+							rootClientId={ rootClientId }
+							position="bottom"
+						/>
+					) }
 				</AsyncModeProvider>
 			) ) }
 			{ order.length < 1 && placeholder }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -17,9 +17,10 @@ import Shortcut from '../../shortcut';
 
 const meta: Meta< typeof MenuItem > = {
 	component: MenuItem,
-	title: 'Components/MenuItem',
+	title: 'Components/Actions/MenuItem',
+	id: 'components-menuitem',
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
 		icon: {
 			control: { type: 'select' },
 			options: [ 'check', 'link', 'more' ],

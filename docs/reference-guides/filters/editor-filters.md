@@ -226,9 +226,9 @@ function example_filter_block_editor_rest_api_preload_paths_when_post_provided( 
 
 ## Logging errors
 
-A JavaScript error in a part of the UI shouldn't break the whole app. To solve this problem for users, React library uses the concept of an ["error boundary"](https://reactjs.org/docs/error-boundaries.html). Error boundaries are React components that catch JavaScript errors anywhere in their child component tree and display a fallback UI instead of the component tree that crashed.
+A JavaScript error in a part of the UI shouldn't break the whole app. To solve this problem for users, React library uses the concept of an ["error boundary"](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary). Error boundaries are React components that catch JavaScript errors anywhere in their child component tree and display a fallback UI instead of the component tree that crashed.
 
-The `editor.ErrorBoundary.errorLogged` action allows you to hook into the [Error Boundaries](https://reactjs.org/docs/error-boundaries.html) and gives you access to the error object.
+The `editor.ErrorBoundary.errorLogged` action allows you to hook into the [Error Boundaries](https://react.dev/reference/react/Component#catching-rendering-errors-with-an-error-boundary) and gives you access to the error object.
 
 You can use this action to get hold of the error object handled by the boundaries. For example, you may want to send them to an external error-tracking tool. Here's an example:
 

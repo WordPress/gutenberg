@@ -37,7 +37,7 @@ function Inserter( { setIsOpened } ) {
 					{ __( 'Add a block' ) }
 				</h2>
 				<Button
-					className="customize-widgets-layout__inserter-panel-header-close-button"
+					size="small"
 					icon={ closeSmall }
 					onClick={ () => setIsOpened( false ) }
 					aria-label={ __( 'Close inserter' ) }

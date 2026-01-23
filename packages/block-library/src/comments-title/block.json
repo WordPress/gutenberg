@@ -23,10 +23,13 @@
 		"level": {
 			"type": "number",
 			"default": 2
+		},
+		"levelOptions": {
+			"type": "array"
 		}
 	},
 	"supports": {
-		"anchor": false,
+		"anchor": true,
 		"align": true,
 		"html": false,
 		"__experimentalBorder": {

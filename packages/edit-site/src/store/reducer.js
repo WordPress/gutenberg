@@ -60,39 +60,16 @@ export function saveViewPanel( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_IS_SAVE_VIEW_OPENED':
 			return action.isOpen;
-		case 'SET_CANVAS_MODE':
-			return false;
 	}
 	return state;
 }
 
-/**
- * Reducer used to track the site editor canvas mode (edit or view).
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- */
-function canvasMode( state = 'init', action ) {
+function routes( state = [], action ) {
 	switch ( action.type ) {
-		case 'SET_CANVAS_MODE':
-			return action.mode;
-	}
-
-	return state;
-}
-
-/**
- * Reducer used to track the site editor canvas container view.
- * Default is `undefined`, denoting the default, visual block editor.
- * This could be, for example, `'style-book'` (the style book).
- *
- * @param {string|undefined} state  Current state.
- * @param {Object}           action Dispatched action.
- */
-function editorCanvasContainerView( state = undefined, action ) {
-	switch ( action.type ) {
-		case 'SET_EDITOR_CANVAS_CONTAINER_VIEW':
-			return action.view;
+		case 'REGISTER_ROUTE':
+			return [ ...state, action.route ];
+		case 'UNREGISTER_ROUTE':
+			return state.filter( ( route ) => route.name !== action.name );
 	}
 
 	return state;
@@ -102,6 +79,5 @@ export default combineReducers( {
 	settings,
 	editedPost,
 	saveViewPanel,
-	canvasMode,
-	editorCanvasContainerView,
+	routes,
 } );

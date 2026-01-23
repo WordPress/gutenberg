@@ -32,6 +32,9 @@ import brRemover from './br-remover';
 import { deepFilterHTML, isPlain, getBlockContentSchema } from './utils';
 import emptyParagraphRemover from './empty-paragraph-remover';
 import slackParagraphCorrector from './slack-paragraph-corrector';
+import isLatexMathMode from './latex-to-math';
+import { createBlock } from '../factory';
+import headingTransformer from './heading-transformer';
 
 const log = ( ...args ) => window?.console?.log?.( ...args );
 
@@ -100,12 +103,17 @@ export function pasteHandler( {
 		const content = HTML ? HTML : plainText;
 
 		if ( content.indexOf( '<!-- wp:' ) !== -1 ) {
-			return parse( content );
+			const parseResult = parse( content );
+			const isSingleFreeFormBlock =
+				parseResult.length === 1 &&
+				parseResult[ 0 ].name === 'core/freeform';
+			if ( ! isSingleFreeFormBlock ) {
+				return parseResult;
+			}
 		}
 	}
 
 	// Normalize unicode to use composed characters.
-	// This is unsupported in IE 11 but it's a nice-to-have feature, not mandatory.
 	// Not normalizing the content will only affect older browsers and won't
 	// entirely break the app.
 	// See: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/normalize
@@ -122,6 +130,10 @@ export function pasteHandler( {
 	// * There is a plain text version.
 	// * There is no HTML version, or it has no formatting.
 	const isPlainText = plainText && ( ! HTML || isPlain( HTML ) );
+
+	if ( isPlainText && isLatexMathMode( plainText ) ) {
+		return [ createBlock( 'core/math', { latex: plainText } ) ];
+	}
 
 	// Parse Markdown (and encoded HTML) if it's considered plain text.
 	if ( isPlainText ) {
@@ -193,6 +205,7 @@ export function pasteHandler( {
 				figureContentReducer,
 				blockquoteNormaliser(),
 				divNormaliser,
+				headingTransformer,
 			];
 
 			const schema = {

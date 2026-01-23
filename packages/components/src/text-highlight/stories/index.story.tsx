@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -10,7 +10,8 @@ import TextHighlight from '..';
 
 const meta: Meta< typeof TextHighlight > = {
 	component: TextHighlight,
-	title: 'Components/TextHighlight',
+	title: 'Components/Typography/TextHighlight',
+	id: 'components-texthighlight',
 	parameters: {
 		controls: {
 			expanded: true,

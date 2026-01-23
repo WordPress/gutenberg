@@ -23,7 +23,7 @@ function getDefaultOrigin( type?: GetAnimateOptions[ 'type' ] ) {
  */
 export function getAnimateClassName( options: GetAnimateOptions ) {
 	if ( options.type === 'loading' ) {
-		return clsx( 'components-animate__loading' );
+		return 'components-animate__loading';
 	}
 
 	const { type, origin = getDefaultOrigin( type ) } = options;

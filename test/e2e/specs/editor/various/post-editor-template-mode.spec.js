@@ -77,7 +77,7 @@ test.describe( 'Post Editor Template mode', () => {
 		).toBeVisible();
 	} );
 
-	test( 'Swap templates and proper template resolution when switching to default template', async ( {
+	test( 'Change templates and proper template resolution when switching to default template', async ( {
 		editor,
 		page,
 		requestUtils,
@@ -88,25 +88,21 @@ test.describe( 'Post Editor Template mode', () => {
 		await page.reload();
 		await postEditorTemplateMode.disableTemplateWelcomeGuide();
 		await postEditorTemplateMode.openTemplatePopover();
-		// Swap to a custom template, save and reload.
-		await page
-			.getByRole( 'menuitem', {
-				name: 'Swap template',
-			} )
-			.click();
-		await page
-			.getByRole( 'option', {
-				name: 'Custom',
-			} )
-			.click();
+		// Change to a custom template, save and reload.
+		await page.getByRole( 'menuitem', { name: 'Change template' } ).click();
+		await page.getByRole( 'option', { name: 'Custom' } ).click();
+		await expect(
+			page.getByRole( 'button', { name: 'Template options' } )
+		).toHaveText( 'Custom' );
 		await editor.saveDraft();
 		await page.reload();
-		// Swap to the default template.
+		await expect(
+			page.getByRole( 'button', { name: 'Template options' } )
+		).toHaveText( 'Custom' );
+		// Change to the default template.
 		await postEditorTemplateMode.openTemplatePopover();
 		await page
-			.getByRole( 'menuitem', {
-				name: 'Use default template',
-			} )
+			.getByRole( 'menuitem', { name: 'Use default template' } )
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Template options' } )
@@ -196,7 +192,7 @@ class PostEditorTemplateMode {
 		);
 
 		const title = this.editorTopBar.getByRole( 'heading', {
-			name: 'Editing template: Single Entries',
+			name: 'Single Entries',
 		} );
 
 		await expect( title ).toBeVisible();

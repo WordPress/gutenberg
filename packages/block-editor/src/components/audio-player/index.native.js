@@ -17,7 +17,7 @@ import { View } from '@wordpress/primitives';
 import { Icon } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { audio, warning } from '@wordpress/icons';
+import { audio, cautionFilled } from '@wordpress/icons';
 import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
@@ -167,7 +167,7 @@ function Player( {
 					<View style={ styles.subtitleContainer }>
 						{ isUploadFailed && (
 							<Icon
-								icon={ warning }
+								icon={ cautionFilled }
 								style={ {
 									...styles.errorIcon,
 									...uploadFailedStyle,
@@ -183,7 +183,7 @@ function Player( {
 				{ ! isDisabled && (
 					<TouchableWithoutFeedback
 						accessibilityLabel={ __( 'Audio Player' ) }
-						accessibilityRole={ 'button' }
+						accessibilityRole="button"
 						accessibilityHint={ __(
 							'Double tap to listen the audio file'
 						) }
@@ -204,7 +204,7 @@ function Player( {
 							this.player = ref;
 						} }
 						controls={ false }
-						ignoreSilentSwitch={ 'ignore' }
+						ignoreSilentSwitch="ignore"
 						onFullscreenPlayerWillPresent={ () => {
 							setPaused( false );
 						} }

@@ -5,15 +5,9 @@ import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
-/**
- * Internal dependencies
- */
-import useEditedEntityRecord from '../use-edited-entity-record';
-
 const MAX_LOADING_TIME = 10000; // 10 seconds
 
 export function useIsSiteEditorLoading() {
-	const { isLoaded: hasLoadedPost } = useEditedEntityRecord();
 	const [ loaded, setLoaded ] = useState( false );
 	const inLoadingPause = useSelect(
 		( select ) => {
@@ -64,5 +58,5 @@ export function useIsSiteEditorLoading() {
 		}
 	}, [ inLoadingPause ] );
 
-	return ! loaded || ! hasLoadedPost;
+	return ! loaded;
 }

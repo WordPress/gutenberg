@@ -4,6 +4,8 @@ exports[`flags warnings with invalid functions css snapshot matches warnings 1`]
 [
   {
     "column": 9,
+    "endColumn": 13,
+    "endLine": 4,
     "line": 4,
     "rule": "function-name-case",
     "severity": "error",

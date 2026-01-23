@@ -10,21 +10,21 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	__experimentalBoxControl as BoxControl,
-	__experimentalHStack as HStack,
+	BoxControl,
 	__experimentalUnitControl as UnitControl,
 	__experimentalUseCustomUnits as useCustomUnits,
-	__experimentalView as View,
+	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
 } from '@wordpress/components';
-import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
+import { Icon, alignNone, stretchWide } from '@wordpress/icons';
 import { useCallback, useState, Platform } from '@wordpress/element';
+import { getValueFromVariable } from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
  */
-import { getValueFromVariable, TOOLSPANEL_DROPDOWNMENU_PROPS } from './utils';
+import { useToolsPanelDropdownMenuProps } from './utils';
 import SpacingSizesControl from '../spacing-sizes-control';
-import HeightControl from '../height-control';
+import DimensionControl from '../dimension-control';
 import ChildLayoutControl from '../child-layout-control';
 import AspectRatioTool from '../dimensions-tool/aspect-ratio-tool';
 import { cleanEmptyObject } from '../../hooks/utils';
@@ -38,7 +38,9 @@ export function useHasDimensionsPanel( settings ) {
 	const hasPadding = useHasPadding( settings );
 	const hasMargin = useHasMargin( settings );
 	const hasGap = useHasGap( settings );
+	const hasHeight = useHasHeight( settings );
 	const hasMinHeight = useHasMinHeight( settings );
+	const hasWidth = useHasWidth( settings );
 	const hasAspectRatio = useHasAspectRatio( settings );
 	const hasChildLayout = useHasChildLayout( settings );
 
@@ -49,7 +51,9 @@ export function useHasDimensionsPanel( settings ) {
 			hasPadding ||
 			hasMargin ||
 			hasGap ||
+			hasHeight ||
 			hasMinHeight ||
+			hasWidth ||
 			hasAspectRatio ||
 			hasChildLayout )
 	);
@@ -75,8 +79,16 @@ function useHasGap( settings ) {
 	return settings?.spacing?.blockGap;
 }
 
+function useHasHeight( settings ) {
+	return settings?.dimensions?.height;
+}
+
 function useHasMinHeight( settings ) {
 	return settings?.dimensions?.minHeight;
+}
+
+function useHasWidth( settings ) {
+	return settings?.dimensions?.width;
 }
 
 function useHasAspectRatio( settings ) {
@@ -100,14 +112,13 @@ function useHasChildLayout( settings ) {
 }
 
 function useHasSpacingPresets( settings ) {
-	const {
-		custom,
-		theme,
-		default: defaultPresets,
-	} = settings?.spacing?.spacingSizes || {};
-	const presets = custom ?? theme ?? defaultPresets ?? [];
-
-	return presets.length > 0;
+	const { defaultSpacingSizes, spacingSizes } = settings?.spacing || {};
+	return (
+		( defaultSpacingSizes !== false &&
+			spacingSizes?.default?.length > 0 ) ||
+		spacingSizes?.theme?.length > 0 ||
+		spacingSizes?.custom?.length > 0
+	);
 }
 
 function filterValuesBySides( values, sides ) {
@@ -149,24 +160,30 @@ function splitStyleValue( value ) {
 	return value;
 }
 
-function splitGapValue( value ) {
+function splitGapValue( value, isAxialGap ) {
+	if ( ! value ) {
+		return value;
+	}
+
 	// Check for shorthand value (a string value).
-	if ( value && typeof value === 'string' ) {
-		// If the value is a string, treat it as a single side (top) for the spacing controls.
-		return {
-			top: value,
-		};
+	if ( typeof value === 'string' ) {
+		/*
+		 * Map the string value to appropriate sides for the spacing control depending
+		 * on whether the current block has axial gap support or not.
+		 *
+		 * Note: The axial value pairs must match for the spacing control to display
+		 * the appropriate horizontal/vertical sliders.
+		 */
+		return isAxialGap
+			? { top: value, right: value, bottom: value, left: value }
+			: { top: value };
 	}
 
-	if ( value ) {
-		return {
-			...value,
-			right: value?.left,
-			bottom: value?.top,
-		};
-	}
-
-	return value;
+	return {
+		...value,
+		right: value?.left,
+		bottom: value?.top,
+	};
 }
 
 function DimensionsToolsPanel( {
@@ -176,6 +193,7 @@ function DimensionsToolsPanel( {
 	panelId,
 	children,
 } ) {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	const resetAll = () => {
 		const updatedValue = resetAllFilter( value );
 		onChange( updatedValue );
@@ -186,7 +204,7 @@ function DimensionsToolsPanel( {
 			label={ __( 'Dimensions' ) }
 			resetAll={ resetAll }
 			panelId={ panelId }
-			dropdownMenuProps={ TOOLSPANEL_DROPDOWNMENU_PROPS }
+			dropdownMenuProps={ dropdownMenuProps }
 		>
 			{ children }
 		</ToolsPanel>
@@ -199,7 +217,9 @@ const DEFAULT_CONTROLS = {
 	padding: true,
 	margin: true,
 	blockGap: true,
+	height: true,
 	minHeight: true,
+	width: true,
 	aspectRatio: true,
 	childLayout: true,
 };
@@ -252,7 +272,7 @@ export default function DimensionsPanel( {
 	const minimumMargin = -Infinity;
 	const [ minMarginValue, setMinMarginValue ] = useState( minimumMargin );
 
-	// Content Size
+	// Content Width
 	const showContentSizeControl =
 		useHasContentSize( settings ) && includeLayoutControls;
 	const contentSizeValue = decodeValue( inheritedValue?.layout?.contentSize );
@@ -268,7 +288,7 @@ export default function DimensionsPanel( {
 	const hasUserSetContentSizeValue = () => !! value?.layout?.contentSize;
 	const resetContentSizeValue = () => setContentSizeValue( undefined );
 
-	// Wide Size
+	// Wide Width
 	const showWideSizeControl =
 		useHasWideSize( settings ) && includeLayoutControls;
 	const wideSizeValue = decodeValue( inheritedValue?.layout?.wideSize );
@@ -326,13 +346,13 @@ export default function DimensionsPanel( {
 
 	// Block Gap
 	const showGapControl = useHasGap( settings );
-	const gapValue = decodeValue( inheritedValue?.spacing?.blockGap );
-	const gapValues = splitGapValue( gapValue );
 	const gapSides = Array.isArray( settings?.spacing?.blockGap )
 		? settings?.spacing?.blockGap
 		: settings?.spacing?.blockGap?.sides;
 	const isAxialGap =
 		gapSides && gapSides.some( ( side ) => AXIAL_SIDES.includes( side ) );
+	const gapValue = decodeValue( inheritedValue?.spacing?.blockGap );
+	const gapValues = splitGapValue( gapValue, isAxialGap );
 	const setGapValue = ( newGapValue ) => {
 		onChange(
 			setImmutably( value, [ 'spacing', 'blockGap' ], newGapValue )
@@ -377,6 +397,40 @@ export default function DimensionsPanel( {
 		setMinHeightValue( undefined );
 	};
 	const hasMinHeightValue = () => !! value?.dimensions?.minHeight;
+
+	// Height
+	const showHeightControl = useHasHeight( settings );
+	const heightValue = decodeValue( inheritedValue?.dimensions?.height );
+	const setHeightValue = ( newValue ) => {
+		const tempValue = setImmutably(
+			value,
+			[ 'dimensions', 'height' ],
+			newValue
+		);
+		// Apply height, while removing any applied aspect ratio.
+		onChange(
+			setImmutably(
+				tempValue,
+				[ 'dimensions', 'aspectRatio' ],
+				undefined
+			)
+		);
+	};
+	const resetHeightValue = () => {
+		setHeightValue( undefined );
+	};
+	const hasHeightValue = () => !! value?.dimensions?.height;
+
+	// Width
+	const showWidthControl = useHasWidth( settings );
+	const widthValue = decodeValue( inheritedValue?.dimensions?.width );
+	const setWidthValue = ( newValue ) => {
+		onChange( setImmutably( value, [ 'dimensions', 'width' ], newValue ) );
+	};
+	const resetWidthValue = () => {
+		setWidthValue( undefined );
+	};
+	const hasWidthValue = () => !! value?.dimensions?.width;
 
 	// Aspect Ratio
 	const showAspectRatioControl = useHasAspectRatio( settings );
@@ -431,24 +485,15 @@ export default function DimensionsPanel( {
 			},
 			dimensions: {
 				...previousValue?.dimensions,
+				height: undefined,
 				minHeight: undefined,
 				aspectRatio: undefined,
+				width: undefined,
 			},
 		};
 	}, [] );
 
 	const onMouseLeaveControls = () => onVisualize( false );
-
-	const inputProps = {
-		min: minMarginValue,
-		onDragStart: () => {
-			//Reset to 0 in case the value was negative.
-			setMinMarginValue( 0 );
-		},
-		onDragEnd: () => {
-			setMinMarginValue( minimumMargin );
-		},
-	};
 
 	return (
 		<Wrapper
@@ -464,8 +509,7 @@ export default function DimensionsPanel( {
 			) }
 			{ showContentSizeControl && (
 				<ToolsPanelItem
-					className="single-column"
-					label={ __( 'Content size' ) }
+					label={ __( 'Content width' ) }
 					hasValue={ hasUserSetContentSizeValue }
 					onDeselect={ resetContentSizeValue }
 					isShownByDefault={
@@ -474,27 +518,26 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<HStack alignment="flex-end" justify="flex-start">
-						<UnitControl
-							label={ __( 'Content' ) }
-							labelPosition="top"
-							__unstableInputWidth="80px"
-							value={ contentSizeValue || '' }
-							onChange={ ( nextContentSize ) => {
-								setContentSizeValue( nextContentSize );
-							} }
-							units={ units }
-						/>
-						<View>
-							<Icon icon={ positionCenter } />
-						</View>
-					</HStack>
+					<UnitControl
+						__next40pxDefaultSize
+						label={ __( 'Content width' ) }
+						labelPosition="top"
+						value={ contentSizeValue || '' }
+						onChange={ ( nextContentSize ) => {
+							setContentSizeValue( nextContentSize );
+						} }
+						units={ units }
+						prefix={
+							<InputControlPrefixWrapper variant="icon">
+								<Icon icon={ alignNone } />
+							</InputControlPrefixWrapper>
+						}
+					/>
 				</ToolsPanelItem>
 			) }
 			{ showWideSizeControl && (
 				<ToolsPanelItem
-					className="single-column"
-					label={ __( 'Wide size' ) }
+					label={ __( 'Wide width' ) }
 					hasValue={ hasUserSetWideSizeValue }
 					onDeselect={ resetWideSizeValue }
 					isShownByDefault={
@@ -502,21 +545,21 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<HStack alignment="flex-end" justify="flex-start">
-						<UnitControl
-							label={ __( 'Wide' ) }
-							labelPosition="top"
-							__unstableInputWidth="80px"
-							value={ wideSizeValue || '' }
-							onChange={ ( nextWideSize ) => {
-								setWideSizeValue( nextWideSize );
-							} }
-							units={ units }
-						/>
-						<View>
-							<Icon icon={ stretchWide } />
-						</View>
-					</HStack>
+					<UnitControl
+						__next40pxDefaultSize
+						label={ __( 'Wide width' ) }
+						labelPosition="top"
+						value={ wideSizeValue || '' }
+						onChange={ ( nextWideSize ) => {
+							setWideSizeValue( nextWideSize );
+						} }
+						units={ units }
+						prefix={
+							<InputControlPrefixWrapper variant="icon">
+								<Icon icon={ stretchWide } />
+							</InputControlPrefixWrapper>
+						}
+					/>
 				</ToolsPanelItem>
 			) }
 			{ showPaddingControl && (
@@ -534,6 +577,7 @@ export default function DimensionsPanel( {
 				>
 					{ ! showSpacingPresetsControl && (
 						<BoxControl
+							__next40pxDefaultSize
 							values={ paddingValues }
 							onChange={ setPaddingValues }
 							label={ __( 'Padding' ) }
@@ -541,8 +585,10 @@ export default function DimensionsPanel( {
 							units={ units }
 							allowReset={ false }
 							splitOnAxis={ isAxialPadding }
-							onMouseOver={ onMouseOverPadding }
-							onMouseOut={ onMouseLeaveControls }
+							inputProps={ {
+								onMouseOver: onMouseOverPadding,
+								onMouseOut: onMouseLeaveControls,
+							} }
 						/>
 					) }
 					{ showSpacingPresetsControl && (
@@ -574,16 +620,26 @@ export default function DimensionsPanel( {
 				>
 					{ ! showSpacingPresetsControl && (
 						<BoxControl
+							__next40pxDefaultSize
 							values={ marginValues }
 							onChange={ setMarginValues }
-							inputProps={ inputProps }
+							inputProps={ {
+								min: minMarginValue,
+								onDragStart: () => {
+									// Reset to 0 in case the value was negative.
+									setMinMarginValue( 0 );
+								},
+								onDragEnd: () => {
+									setMinMarginValue( minimumMargin );
+								},
+								onMouseOver: onMouseOverMargin,
+								onMouseOut: onMouseLeaveControls,
+							} }
 							label={ __( 'Margin' ) }
 							sides={ marginSides }
 							units={ units }
 							allowReset={ false }
 							splitOnAxis={ isAxialMargin }
-							onMouseOver={ onMouseOverMargin }
-							onMouseOut={ onMouseLeaveControls }
 						/>
 					) }
 					{ showSpacingPresetsControl && (
@@ -611,12 +667,16 @@ export default function DimensionsPanel( {
 					}
 					className={ clsx( {
 						'tools-panel-item-spacing': showSpacingPresetsControl,
+						'single-column':
+							// If UnitControl is used, should be single-column.
+							! showSpacingPresetsControl && ! isAxialGap,
 					} ) }
 					panelId={ panelId }
 				>
 					{ ! showSpacingPresetsControl &&
 						( isAxialGap ? (
 							<BoxControl
+								__next40pxDefaultSize
 								label={ __( 'Block spacing' ) }
 								min={ 0 }
 								onChange={ setGapValues }
@@ -628,8 +688,8 @@ export default function DimensionsPanel( {
 							/>
 						) : (
 							<UnitControl
+								__next40pxDefaultSize
 								label={ __( 'Block spacing' ) }
-								__unstableInputWidth="80px"
 								min={ 0 }
 								onChange={ setGapValue }
 								units={ units }
@@ -671,10 +731,44 @@ export default function DimensionsPanel( {
 					}
 					panelId={ panelId }
 				>
-					<HeightControl
+					<DimensionControl
 						label={ __( 'Minimum height' ) }
 						value={ minHeightValue }
 						onChange={ setMinHeightValue }
+					/>
+				</ToolsPanelItem>
+			) }
+			{ showHeightControl && (
+				<ToolsPanelItem
+					hasValue={ hasHeightValue }
+					label={ __( 'Height' ) }
+					onDeselect={ resetHeightValue }
+					isShownByDefault={
+						defaultControls.height ?? DEFAULT_CONTROLS.height
+					}
+					panelId={ panelId }
+				>
+					<DimensionControl
+						label={ __( 'Height' ) }
+						value={ heightValue }
+						onChange={ setHeightValue }
+					/>
+				</ToolsPanelItem>
+			) }
+			{ showWidthControl && (
+				<ToolsPanelItem
+					hasValue={ hasWidthValue }
+					label={ __( 'Width' ) }
+					onDeselect={ resetWidthValue }
+					isShownByDefault={
+						defaultControls.width ?? DEFAULT_CONTROLS.width
+					}
+					panelId={ panelId }
+				>
+					<DimensionControl
+						label={ __( 'Width' ) }
+						value={ widthValue }
+						onChange={ setWidthValue }
 					/>
 				</ToolsPanelItem>
 			) }

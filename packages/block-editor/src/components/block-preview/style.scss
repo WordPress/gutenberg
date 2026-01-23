@@ -1,6 +1,6 @@
 // These rules ensure the preview scales smoothly regardless of the container size.
 .block-editor-block-preview__container {
-	// In the component, a top padding is provided as an inline style to provid an aspect-ratio.
+	// In the component, a top padding is provided as an inline style to provide an aspect-ratio.
 	// This positioning enables the content to sit on top of that padding to fit.
 	position: relative;
 
@@ -47,30 +47,4 @@
 	right: 0;
 	bottom: 0;
 	z-index: 1;
-}
-
-// Restrict these shadows to the context of the inserter.
-.editor-inserter-sidebar {
-	.block-editor-block-patterns-list__item {
-		.block-editor-block-preview__container {
-			box-shadow: 0 15px 25px rgb(0 0 0 / 7%);
-		}
-		&:focus,
-		&:hover {
-			.block-editor-block-preview__container {
-				box-shadow: 0 0 0 2px $gray-900, 0 15px 25px rgb(0 0 0 / 7%);
-			}
-		}
-
-		&.block-editor-block-patterns-list__list-item-synced {
-			&:hover,
-			&:focus {
-				.block-editor-block-preview__container {
-					box-shadow:
-						0 0 0 2px var(--wp-block-synced-color),
-						0 15px 25px rgb(0 0 0 / 7%);
-				}
-			}
-		}
-	}
 }

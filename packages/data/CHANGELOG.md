@@ -2,6 +2,90 @@
 
 ## Unreleased
 
+## 10.38.0 (2026-01-16)
+
+## 10.36.0 (2025-11-26)
+
+## 10.35.0 (2025-11-12)
+
+## 10.34.0 (2025-10-29)
+
+## 10.33.0 (2025-10-17)
+
+## 10.32.0 (2025-10-01)
+
+## 10.31.0 (2025-09-17)
+
+## 10.30.0 (2025-09-03)
+
+## 10.29.0 (2025-08-20)
+
+## 10.28.0 (2025-08-07)
+
+## 10.27.0 (2025-07-23)
+
+## 10.26.0 (2025-06-25)
+
+### Bug Fixes
+
+-   Add support for private selectors to `resolveSelect` and `suspendSelect` ([#52036](https://github.com/WordPress/gutenberg/pull/52036)).
+
+## 10.25.0 (2025-06-04)
+
+## 10.24.0 (2025-05-22)
+
+## 10.23.0 (2025-05-07)
+
+## 10.22.0 (2025-04-11)
+
+## 10.21.0 (2025-03-27)
+
+## 10.20.0 (2025-03-13)
+
+## 10.19.0 (2025-02-28)
+
+## 10.18.0 (2025-02-12)
+
+## 10.17.0 (2025-01-29)
+
+## 10.16.0 (2025-01-15)
+
+## 10.15.0 (2025-01-02)
+
+## 10.14.0 (2024-12-11)
+
+## 10.13.0 (2024-11-27)
+
+### Enhancements
+
+-   Upgrade `redux` dependency to `^5.0.1` ([#66966](https://github.com/WordPress/gutenberg/pull/66966))
+
+## 10.12.0 (2024-11-16)
+
+## 10.11.0 (2024-10-30)
+
+## 10.10.0 (2024-10-16)
+
+## 10.9.0 (2024-10-03)
+
+## 10.8.0 (2024-09-19)
+
+## 10.7.0 (2024-09-05)
+
+## 10.6.0 (2024-08-21)
+
+## 10.5.0 (2024-08-07)
+
+## 10.4.0 (2024-07-24)
+
+## 10.3.0 (2024-07-10)
+
+## 10.2.0 (2024-06-26)
+
+## 10.1.0 (2024-06-15)
+
+## 10.0.0 (2024-05-31)
+
 ### Breaking Changes
 
 -   Increase the minimum required Node.js version to v18.12.0 matching long-term support releases ([#31270](https://github.com/WordPress/gutenberg/pull/61930)). Learn more about [Node.js releases](https://nodejs.org/en/about/previous-releases).
@@ -42,7 +126,7 @@
 
 ## 9.13.1 (2023-10-12)
 
-### Bug Fix
+### Bug Fixes
 
 -   Fix `combineReducers()` types ([#55321](https://github.com/WordPress/gutenberg/pull/55321)).
 
@@ -64,7 +148,7 @@
 
 ## 9.9.0 (2023-08-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Update the type definitions for dispatched actions by accounting for Promisified return values and thunks. Previously, a dispatched action's return type was the same as the return type of the original action creator, which did not account for how dispatch works internally. (Plain actions get wrapped in a Promise, and thunk actions ultimately resolve to the innermost function's return type).
 -   Update the type definition for dispatch() to handle string store descriptors correctly.
@@ -131,7 +215,7 @@
 
 – Add TypeScript types to the built package (via "types": "build-types" in the package.json)
 
-### Bug Fix
+### Bug Fixes
 
 -   Packages: Replace `is-plain-obj` with `is-plain-object` ([#43511](https://github.com/WordPress/gutenberg/pull/43511)).
 
@@ -173,13 +257,13 @@
 
 ## 6.2.1 (2022-02-10)
 
-### Bug Fix
+### Bug Fixes
 
 -   Removed unused `memize` dependency ([#38388](https://github.com/WordPress/gutenberg/pull/38388)).
 
 ## 6.2.0 (2022-01-27)
 
-### Bug Fix
+### Bug Fixes
 
 -   Corrected expect type of action creators and selectors in Redux store configuration type
 -   Move `redux` to regular dependencies and update it to version `^4.1.2`.
@@ -199,7 +283,7 @@
 
 ## 6.0.0 (2021-07-29)
 
-### Breaking Change
+### Breaking Changes
 
 -   Upgraded React components to work with v17.0 ([#29118](https://github.com/WordPress/gutenberg/pull/29118)). There are no new features in React v17.0 as explained in the [blog post](https://reactjs.org/blog/2020/10/20/react-v17.html).
 
@@ -244,7 +328,7 @@
 
 ## 4.6.0 (2019-06-12)
 
-### New Feature
+### New Features
 
 -   Expose `useSelect` hook for usage in functional components. ([#15737](https://github.com/WordPress/gutenberg/pull/15737))
 -   Expose `useDispatch` hook for usage in functional components. ([#15896](https://github.com/WordPress/gutenberg/pull/15896))
@@ -256,7 +340,7 @@
 
 ## 4.5.0 (2019-05-21)
 
-### Bug Fix
+### Bug Fixes
 
 -   Restore functionality of action-generators returning a Promise. Clarify intent and behaviour for `dispatch` behaviour. Dispatch actions now always
     return a promise ([#14830](https://github.com/WordPress/gutenberg/pull/14830)
@@ -273,7 +357,7 @@
 -   Introduce new `invalidateResolutionForStore` dispatch action for signalling to invalidate the resolution cache for an entire given store.
 -   Introduce new `invalidateResolutionForStoreSelector` dispatch action for signalling to invalidate the resolution cache for a store selector (and all variations of arguments on that selector).
 
-### Bug Fix
+### Bug Fixes
 
 -   Resolves issue in the persistence plugin where passing `persist` as an array of reducer keys would wrongly replace state values for the unpersisted reducer keys.
 -   Restores a behavior in the persistence plugin where a default state provided as an object will be deeply merged as a base for the persisted value. This allows for a developer to include additional new keys in a persisted value default in future iterations of their store.
@@ -286,7 +370,7 @@
 
 ## 4.1.0 (2018-12-12)
 
-### New Feature
+### New Features
 
 -   `withDispatch`'s `mapDispatchToProps` function takes the `registry` object as the 3rd param ([#11851](https://github.com/WordPress/gutenberg/pull/11851)).
 -   `withSelect`'s `mapSelectToProps` function takes the `registry` object as the 3rd param ([#11851](https://github.com/WordPress/gutenberg/pull/11851)).
@@ -302,7 +386,7 @@
 -   `registry.registerActions` has been removed. Use `registry.registerStore` instead.
 -   `registry.registerResolvers` has been removed. Use `registry.registerStore` instead.
 
-### Bug Fix
+### Bug Fixes
 
 -   Resolve an issue where `withSelect`'s `mapSelectToProps` would not be rerun if the wrapped component had incurred a store change during its mount lifecycle.
 
@@ -345,7 +429,7 @@
 
 -   Adding support for using controls in resolvers using the controls plugin.
 
-### Polish
+### Internal
 
 -   Updated `redux` dependency to the latest version.
 
@@ -359,7 +443,7 @@
 
 ## 2.0.0 (2018-09-05)
 
-### Breaking Change
+### Breaking Changes
 
 -   The `withRehdyration` function is removed. Use the persistence plugin instead.
 -   The `loadAndPersist` function is removed. Use the persistence plugin instead.

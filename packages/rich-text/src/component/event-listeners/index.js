@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, useRef } from '@wordpress/element';
+import { useMemo, useRef, useInsertionEffect } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -13,6 +13,7 @@ import formatBoundaries from './format-boundaries';
 import deleteHandler from './delete';
 import inputAndSelection from './input-and-selection';
 import selectionChangeCompat from './selection-change-compat';
+import { preventFocusCapture } from './prevent-focus-capture';
 
 const allEventListeners = [
 	copyHandler,
@@ -21,11 +22,14 @@ const allEventListeners = [
 	deleteHandler,
 	inputAndSelection,
 	selectionChangeCompat,
+	preventFocusCapture,
 ];
 
 export function useEventListeners( props ) {
 	const propsRef = useRef( props );
-	propsRef.current = props;
+	useInsertionEffect( () => {
+		propsRef.current = props;
+	} );
 	const refEffects = useMemo(
 		() => allEventListeners.map( ( refEffect ) => refEffect( propsRef ) ),
 		[ propsRef ]

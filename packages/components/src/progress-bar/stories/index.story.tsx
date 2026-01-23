@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -10,11 +10,11 @@ import { ProgressBar } from '..';
 
 const meta: Meta< typeof ProgressBar > = {
 	component: ProgressBar,
-	title: 'Components (Experimental)/ProgressBar',
+	title: 'Components/Feedback/ProgressBar',
+	id: 'components-progressbar',
 	argTypes: {
 		value: { control: { type: 'number', min: 0, max: 100, step: 1 } },
 	},
-	tags: [ 'status-private' ],
 	parameters: {
 		controls: {
 			expanded: true,
@@ -30,3 +30,38 @@ const Template: StoryFn< typeof ProgressBar > = ( { ...args } ) => {
 
 export const Default: StoryFn< typeof ProgressBar > = Template.bind( {} );
 Default.args = {};
+
+const withCustomWidthCustomCSS = `
+	.custom-progress-bar {
+		width: 100%;
+	}
+`;
+
+/**
+ * A progress bar with a custom width.
+ *
+ * You can override the default `width` by passing a custom CSS class via the
+ * `className` prop.
+ *
+ * This example shows a progress bar with an overridden `width` of `100%` which
+ * makes it fit all available horizontal space of the parent element. The CSS
+ * class looks like this:
+ *
+ * ```css
+ * .custom-progress-bar {
+ *   width: 100%;
+ * }
+ * ```
+ */
+export const WithCustomWidth = Template.bind( {} );
+WithCustomWidth.args = {
+	className: 'custom-progress-bar',
+};
+WithCustomWidth.decorators = [
+	( Story ) => (
+		<>
+			<style>{ withCustomWidthCustomCSS }</style>
+			<Story />
+		</>
+	),
+];

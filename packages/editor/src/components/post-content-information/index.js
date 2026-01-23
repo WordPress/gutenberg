@@ -25,8 +25,14 @@ export default function PostContentInformation() {
 	const { postContent } = useSelect( ( select ) => {
 		const { getEditedPostAttribute, getCurrentPostType, getCurrentPostId } =
 			select( editorStore );
+		const { canUser } = select( coreStore );
 		const { getEntityRecord } = select( coreStore );
-		const siteSettings = getEntityRecord( 'root', 'site' );
+		const siteSettings = canUser( 'read', {
+			kind: 'root',
+			name: 'site',
+		} )
+			? getEntityRecord( 'root', 'site' )
+			: undefined;
 		const postType = getCurrentPostType();
 		const _id = getCurrentPostId();
 		const isPostsPage = +_id === siteSettings?.page_for_posts;
@@ -64,7 +70,7 @@ export default function PostContentInformation() {
 		readingTime <= 1
 			? __( '1 minute' )
 			: sprintf(
-					// translators: %s: the number of minutes to read the post.
+					/* translators: %s: the number of minutes to read the post. */
 					_n( '%s minute', '%s minutes', readingTime ),
 					readingTime.toLocaleString()
 			  );
