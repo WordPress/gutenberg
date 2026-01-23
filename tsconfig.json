@@ -80,6 +80,7 @@
 		{ "path": "packages/wp-build" },
 		{ "path": "test/e2e" },
 		{ "path": "packages/jest-console" },
+		{ "path": "storybook" },
 		{ "path": "test/performance" }
 	],
 	"files": []
