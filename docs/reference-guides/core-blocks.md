@@ -983,7 +983,7 @@ Container for tab panel content in a tabbed interface. ([Source](https://github.
 -	**Category:** design
 -	**Parent:** core/tabs
 -	**Allowed Blocks:** core/tab
--	**Supports:** dimensions (~~aspectRatio~~, ~~height~~, ~~minHeight~~, ~~width~~), layout (allowJustification, default, ~~allowSizingOnChildren~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (margin, padding, ~~blockGap~~), ~~anchor~~, ~~html~~, ~~lock~~, ~~reusable~~
+-	**Supports:** color (background, heading, link, text), dimensions (~~aspectRatio~~, ~~height~~, ~~minHeight~~, ~~width~~), layout (allowJustification, default, ~~allowOrientation~~, ~~allowSizingOnChildren~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (margin, padding, ~~blockGap~~), typography (fontSize), ~~anchor~~, ~~html~~, ~~lock~~, ~~reusable~~
 
 ## Table
 
@@ -1012,8 +1012,8 @@ Display content in a tabbed interface to help users navigate detailed content wi
 -	**Experimental:** true
 -	**Category:** design
 -	**Allowed Blocks:** core/tabs-menu, core/tab-panels
--	**Supports:** align, color (~~background~~, ~~text~~), interactivity, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowVerticalAlignment, default, ~~allowSwitching~~), renaming, spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
--	**Attributes:** activeTabIndex, editorActiveTabIndex, tabsId
+-	**Supports:** align, anchor, color (~~background~~, ~~text~~), interactivity, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowVerticalAlignment, default, ~~allowSwitching~~), renaming, spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
+-	**Attributes:** activeTabIndex, editorActiveTabIndex
 
 ## Tabs Menu
 
