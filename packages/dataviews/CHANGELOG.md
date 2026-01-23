@@ -62,7 +62,6 @@
 - DataViews: Update padding to 24px for consistency. [#73334](https://github.com/WordPress/gutenberg/pull/73334)
 - DataViews: Simplify list layout field color styles. [#73884](https://github.com/WordPress/gutenberg/pull/73884)
 - DataViews: Add panel form layout validation. [#73700](https://github.com/WordPress/gutenberg/pull/73700)
-- DataViews: Add card form layout validation. [#74547](https://github.com/WordPress/gutenberg/pull/74547)
 - Converted package to a compliant dual CJS/ESM module ([#73822](https://github.com/WordPress/gutenberg/pull/73822) and [#74348](https://github.com/WordPress/gutenberg/pull/74348))
 - Add density preference support to List view with compact, balanced (default), and comfortable options. ([#71050](https://github.com/WordPress/gutenberg/pull/71050))
 
