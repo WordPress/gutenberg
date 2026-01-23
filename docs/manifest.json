@@ -2106,12 +2106,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/worker-threads",
-		"slug": "packages-worker-threads",
-		"markdown_source": "../packages/worker-threads/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/build",
 		"slug": "packages-wp-build",
 		"markdown_source": "../packages/wp-build/README.md",

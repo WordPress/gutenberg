@@ -22,9 +22,6 @@ module.exports = {
 			'packages/$1/src',
 		'@wordpress/theme/design-tokens.js':
 			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
-		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
-		// Mock the auto-generated worker-code.ts file (gitignored, generated at build time)
-		'(.*/|^)worker-code$': '<rootDir>/test/unit/config/worker-code-stub.js',
 	},
 	preset: '@wordpress/jest-preset-default',
 	setupFiles: [
