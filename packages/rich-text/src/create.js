@@ -398,7 +398,10 @@ function collapseWhiteSpace( element, isRoot = true ) {
 				newNodeValue = newNodeValue.replace( / {2,}/g, ' ' );
 			}
 
-			if ( i === 0 && newNodeValue.startsWith( ' ' ) ) {
+			// Only trim leading space from first node if we're at root level
+			// Don't trim if we're inside an inline format element as this would
+			// incorrectly remove intentionally formatted whitespace
+			if ( isRoot && i === 0 && newNodeValue.startsWith( ' ' ) ) {
 				newNodeValue = newNodeValue.slice( 1 );
 			} else if (
 				isRoot &&
