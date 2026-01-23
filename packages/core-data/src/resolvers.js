@@ -253,7 +253,7 @@ export const getEntityRecord =
 									// Because Yjs initiates an undo, we need to
 									// wait until the content is restored before
 									// we can update the selection.
-									// Use queueMicrotask() to wait until content is
+									// Use setTimeout() to wait until content is
 									// finished updating, and then set the correct
 									// selection.
 									setTimeout( () => {

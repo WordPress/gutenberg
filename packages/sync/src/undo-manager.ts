@@ -30,9 +30,6 @@ interface StackItemEvent {
  * without conflicts.
  */
 export function createUndoManager(): SyncUndoManager {
-	// A map of Yjs document guids to their BlockSelectionHistory instances.
-	// const selectionHistoryMap = new Map< string, BlockSelectionHistory >();
-
 	const yUndoManager = new YMultiDocUndoManager( [], {
 		// Throttle undo/redo captures after 500ms of inactivity.
 		// 500 was selected from subjective local UX testing, shorter timeouts
