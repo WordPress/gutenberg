@@ -2,9 +2,9 @@
  * External dependencies
  */
 
-// Mock the vips worker module.
+// Mock the vips module.
 // The mock functions must be declared inside the factory to avoid hoisting issues.
-jest.mock( '@wordpress/vips/worker', () => ( {
+jest.mock( '@wordpress/vips', () => ( {
 	vipsConvertImageFormat: jest.fn(),
 	vipsCompressImage: jest.fn(),
 	vipsHasTransparency: jest.fn(),
@@ -14,7 +14,7 @@ jest.mock( '@wordpress/vips/worker', () => ( {
 } ) );
 
 // Import the mocked module to get access to the mock functions.
-import * as vipsWorker from '@wordpress/vips/worker';
+import * as vipsWorker from '@wordpress/vips';
 
 /**
  * Internal dependencies
