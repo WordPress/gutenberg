@@ -16,12 +16,10 @@ module.exports = {
 	moduleNameMapper: {
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
 			'packages/$1/src',
+		// Map the vips worker module to the source for testing.
 		'@wordpress/vips/worker': '<rootDir>/packages/vips/src/vips-worker.ts',
 		'@wordpress/theme/design-tokens.js':
 			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
-		// Map the vips worker module to the main vips source for testing.
-		// In production, this is handled by webpack's worker loader.
-		'@wordpress/vips/worker': '<rootDir>/packages/vips/src',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
 	},
 	preset: '@wordpress/jest-preset-default',
