@@ -302,16 +302,6 @@ function Navigation( {
 		[ setAttributes ]
 	);
 
-	// Reset submenuVisibility to default if orientation changes to horizontal while "always" is selected
-	useEffect( () => {
-		if ( orientation === 'horizontal' && submenuVisibility === 'always' ) {
-			setAttributes( {
-				submenuVisibility: 'hover',
-				showSubmenuIcon: true,
-			} );
-		}
-	}, [ orientation, submenuVisibility, setAttributes ] );
-
 	const recursionId = `navigationMenu/${ ref }`;
 
 	// Skip recursion check when in preview mode.
@@ -523,6 +513,62 @@ function Navigation( {
 			setAttributes( { overlayMenu: 'never' } );
 		}
 	}, [ isWithinOverlay, overlayMenu, setAttributes ] );
+
+	// Set submenuVisibility to 'always' by default when in navigation overlay template
+	const hasSetOverlayDefault = useRef( false );
+	const { hasInnerBlocks } = useSelect(
+		( select ) => {
+			const { getBlockCount } = select( blockEditorStore );
+			return {
+				hasInnerBlocks: getBlockCount( clientId ) > 0,
+			};
+		},
+		[ clientId ]
+	);
+
+	useEffect( () => {
+		// Set overlay-friendly defaults when block is first created in an overlay template.
+		if (
+			isWithinOverlay &&
+			! hasSetOverlayDefault.current &&
+			submenuVisibility === 'hover' &&
+			! hasInnerBlocks &&
+			! ref
+		) {
+			hasSetOverlayDefault.current = true;
+			setAttributes( {
+				submenuVisibility: 'always',
+				layout: {
+					...attributes.layout,
+					orientation: 'vertical',
+				},
+				showSubmenuIcon: false,
+			} );
+		}
+	}, [
+		attributes.layout,
+		isWithinOverlay,
+		submenuVisibility,
+		orientation,
+		hasInnerBlocks,
+		ref,
+		setAttributes,
+	] );
+
+	// Reset submenuVisibility to default if orientation is horizontal while "always" is selected.
+	// Skip this reset if we're in an overlay template.
+	useEffect( () => {
+		if (
+			! isWithinOverlay &&
+			orientation === 'horizontal' &&
+			submenuVisibility === 'always'
+		) {
+			setAttributes( {
+				submenuVisibility: 'hover',
+				showSubmenuIcon: true,
+			} );
+		}
+	}, [ isWithinOverlay, orientation, submenuVisibility, setAttributes ] );
 
 	const isResponsive = 'never' !== overlayMenu;
 	const blockProps = useBlockProps( {
