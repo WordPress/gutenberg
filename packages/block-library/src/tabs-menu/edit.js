@@ -92,7 +92,6 @@ function TabsMenuItemTemplateBlocks( { wrapperProps = {}, layout } ) {
 function Edit( {
 	context,
 	clientId,
-	isSelected,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	// Get the layout from block edit context to pass to inner blocks.

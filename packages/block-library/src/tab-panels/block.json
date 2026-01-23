@@ -49,11 +49,11 @@
 			"default": {
 				"type": "flex",
 				"flexWrap": "nowrap",
-				"justifyContent": "stretch",
-				"orientation": "vertical"
+				"justifyContent": "stretch"
 			},
 			"allowSwitching": false,
 			"allowVerticalAlignment": false,
+			"allowOrientation": false,
 			"allowJustification": true,
 			"allowSizingOnChildren": false
 		},

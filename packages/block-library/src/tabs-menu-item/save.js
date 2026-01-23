@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
+import { __ } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
 
 export default function Save( { attributes } ) {
@@ -34,5 +35,9 @@ export default function Save( { attributes } ) {
 		hidden: true,
 	} );
 
-	return <a { ...blockProps } />;
+	return (
+		<a { ...blockProps }>
+			<span className="screen-reader-text">{ __( 'Tab menu item' ) }</span>
+		</a>
+	);
 }
