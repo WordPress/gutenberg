@@ -21,8 +21,8 @@ const InfiniteScroll = () => {
 	const [ view, setView ] = useState< View >( {
 		type: LAYOUT_GRID,
 		search: '',
-		page: 1,
-		perPage: 8, // Start with a small number to demonstrate pagination
+		startPosition: 1,
+		endPosition: 8, // Start with a small number to demonstrate pagination
 		filters: [],
 		fields: [ 'satellites' ],
 		titleField: 'title',
