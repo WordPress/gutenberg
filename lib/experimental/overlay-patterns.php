@@ -56,7 +56,6 @@ function gutenberg_register_overlay_block_patterns() {
 			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
 		)
 	);
-	
 }
 
 add_action( 'init', 'gutenberg_register_overlay_block_patterns', 20 );
