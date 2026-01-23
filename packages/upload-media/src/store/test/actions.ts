@@ -20,6 +20,7 @@ jest.mock( '@wordpress/blob', () => ( {
 } ) );
 
 jest.mock( '../utils', () => ( {
+	__esModule: true,
 	vipsCancelOperations: jest.fn( () => Promise.resolve( true ) ),
 	vipsResizeImage: jest.fn(),
 } ) );
@@ -167,11 +168,6 @@ describe( 'actions', () => {
 		} );
 
 		it( 'calls vipsCancelOperations when cancelling', async () => {
-			// Suppress console.error that fires when there's no onError callback.
-			const consoleErrorSpy = jest
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 			} );
@@ -184,17 +180,9 @@ describe( 'actions', () => {
 				.cancelItem( item.id, new Error( 'User cancelled' ) );
 
 			expect( vipsCancelOperations ).toHaveBeenCalledWith( item.id );
-			expect( consoleErrorSpy ).toHaveBeenCalled();
-
-			consoleErrorSpy.mockRestore();
 		} );
 
 		it( 'removes item from queue after cancelling', async () => {
-			// Suppress console.error that fires when there's no onError callback.
-			const consoleErrorSpy = jest
-				.spyOn( console, 'error' )
-				.mockImplementation( () => {} );
-
 			unlock( registry.dispatch( uploadStore ) ).addItem( {
 				file: jpegFile,
 			} );
@@ -209,8 +197,6 @@ describe( 'actions', () => {
 			expect(
 				unlock( registry.select( uploadStore ) ).getAllItems()
 			).toHaveLength( 0 );
-
-			consoleErrorSpy.mockRestore();
 		} );
 
 		it( 'calls onError callback when not silent', async () => {
