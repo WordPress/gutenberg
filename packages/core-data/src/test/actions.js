@@ -50,6 +50,207 @@ describe( 'editEntityRecord', () => {
 		);
 		expect( select.getEntityConfig ).toHaveBeenCalledTimes( 1 );
 	} );
+
+	it( 'dispatches the correct action for non-merged edits', () => {
+		const dispatch = jest.fn();
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+				mergedEdits: {},
+			} ),
+			getRawEntityRecord: () => ( {
+				id: 1,
+				title: 'Original Title',
+				content: 'Original Content',
+			} ),
+			getEditedEntityRecord: () => ( {
+				id: 1,
+				title: 'Original Title',
+				content: 'Original Content',
+			} ),
+			getUndoManager: () => ( {
+				addRecord: jest.fn(),
+			} ),
+		};
+
+		editEntityRecord( 'postType', 'post', 1, { title: 'New Title' } )( {
+			select,
+			dispatch,
+		} );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: { title: 'New Title' },
+		} );
+	} );
+
+	it( 'merges edits for fields defined in mergedEdits config', () => {
+		const dispatch = jest.fn();
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+				mergedEdits: { meta: true },
+			} ),
+			getRawEntityRecord: () => ( {
+				id: 1,
+				meta: { existingKey: 'existingValue' },
+			} ),
+			getEditedEntityRecord: () => ( {
+				id: 1,
+				meta: {
+					existingKey: 'existingValue',
+					editedKey: 'editedValue',
+				},
+			} ),
+			getUndoManager: () => ( {
+				addRecord: jest.fn(),
+			} ),
+		};
+
+		editEntityRecord( 'postType', 'post', 1, {
+			meta: { newKey: 'newValue' },
+		} )( {
+			select,
+			dispatch,
+		} );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: {
+				meta: {
+					existingKey: 'existingValue',
+					editedKey: 'editedValue',
+					newKey: 'newValue',
+				},
+			},
+		} );
+	} );
+
+	it( 'handles both merged and non-merged edits together', () => {
+		const dispatch = jest.fn();
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+				mergedEdits: { meta: true },
+			} ),
+			getRawEntityRecord: () => ( {
+				id: 1,
+				title: 'Original Title',
+				meta: { existingKey: 'existingValue' },
+			} ),
+			getEditedEntityRecord: () => ( {
+				id: 1,
+				title: 'Original Title',
+				meta: { existingKey: 'existingValue' },
+			} ),
+			getUndoManager: () => ( {
+				addRecord: jest.fn(),
+			} ),
+		};
+
+		editEntityRecord( 'postType', 'post', 1, {
+			title: 'New Title',
+			meta: { newKey: 'newValue' },
+		} )( { select, dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: {
+				title: 'New Title',
+				meta: {
+					existingKey: 'existingValue',
+					newKey: 'newValue',
+				},
+			},
+		} );
+	} );
+
+	it( 'clears edit when merged value equals persisted record', () => {
+		const dispatch = jest.fn();
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+				mergedEdits: { meta: true },
+			} ),
+			getRawEntityRecord: () => ( {
+				id: 1,
+				meta: { key1: 'value1', key2: 'value2' },
+			} ),
+			getEditedEntityRecord: () => ( {
+				id: 1,
+				meta: { key1: 'value1' },
+			} ),
+			getUndoManager: () => ( {
+				addRecord: jest.fn(),
+			} ),
+		};
+
+		// Editing meta to add key2 back should result in a value equal to the persisted record
+		editEntityRecord( 'postType', 'post', 1, {
+			meta: { key2: 'value2' },
+		} )( { select, dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: {
+				// meta should be undefined because merged value equals persisted record
+				meta: undefined,
+			},
+		} );
+	} );
+
+	it( 'clears non-merged edit when value equals persisted record', () => {
+		const dispatch = jest.fn();
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+				mergedEdits: {},
+			} ),
+			getRawEntityRecord: () => ( {
+				id: 1,
+				title: 'Original Title',
+			} ),
+			getEditedEntityRecord: () => ( {
+				id: 1,
+				title: 'Edited Title',
+			} ),
+			getUndoManager: () => ( {
+				addRecord: jest.fn(),
+			} ),
+		};
+
+		// Editing title back to original should clear the edit
+		editEntityRecord( 'postType', 'post', 1, {
+			title: 'Original Title',
+		} )( { select, dispatch } );
+
+		expect( dispatch ).toHaveBeenCalledWith( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+			edits: {
+				title: undefined,
+			},
+		} );
+	} );
 } );
 
 describe( 'deleteEntityRecord', () => {
