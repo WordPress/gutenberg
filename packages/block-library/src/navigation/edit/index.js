@@ -302,6 +302,16 @@ function Navigation( {
 		[ setAttributes ]
 	);
 
+	// Reset submenuVisibility to default if orientation changes to horizontal while "always" is selected
+	useEffect( () => {
+		if ( orientation === 'horizontal' && submenuVisibility === 'always' ) {
+			setAttributes( {
+				submenuVisibility: 'hover',
+				showSubmenuIcon: true,
+			} );
+		}
+	}, [ orientation, submenuVisibility, setAttributes ] );
+
 	const recursionId = `navigationMenu/${ ref }`;
 
 	// Skip recursion check when in preview mode.
