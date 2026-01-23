@@ -58,11 +58,7 @@ export default function Edit( {
 		};
 	}, [] );
 
-	const {
-		blockIndex,
-		hasInnerBlocksSelected,
-		tabsClientId,
-	} = useSelect(
+	const { blockIndex, hasInnerBlocksSelected, tabsClientId } = useSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,
@@ -98,10 +94,16 @@ export default function Edit( {
 	useEffect( () => {
 		// Only update if this tab is selected and not already the active index
 		const isTabSelected = isSelected || hasInnerBlocksSelected;
-		if ( isTabSelected && tabsClientId && effectiveActiveIndex !== blockIndex ) {
+		if (
+			isTabSelected &&
+			tabsClientId &&
+			effectiveActiveIndex !== blockIndex
+		) {
 			// Mark as non-persistent so it doesn't add to undo history
 			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( tabsClientId, { editorActiveTabIndex: blockIndex } );
+			updateBlockAttributes( tabsClientId, {
+				editorActiveTabIndex: blockIndex,
+			} );
 		}
 	}, [
 		isSelected,
@@ -149,18 +151,12 @@ export default function Edit( {
 		id: tabPanelId,
 		role: 'tabpanel',
 		tabIndex: isSelectedTab ? 0 : -1,
-		className: clsx(
-			'wp-block-tab__editor-content',
-			layoutClassNames
-		),
+		className: clsx( 'wp-block-tab__editor-content', layoutClassNames ),
 	} );
 
-	const innerBlocksProps = useInnerBlocksProps(
-		blockProps,
-		{
-			template: TEMPLATE,
-		}
-	);
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template: TEMPLATE,
+	} );
 
 	return (
 		<section { ...innerBlocksProps }>

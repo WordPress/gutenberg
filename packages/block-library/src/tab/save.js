@@ -3,7 +3,7 @@
  */
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
-export default function Save( { attributes } ) {
+export default function save( { attributes } ) {
 	const { anchor } = attributes;
 
 	const tabPanelId = anchor;

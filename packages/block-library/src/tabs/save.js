@@ -3,7 +3,7 @@
  */
 import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 
-export default function Save( { attributes } ) {
+export default function save( { attributes } ) {
 	const { anchor } = attributes;
 
 	const tabsId = anchor;
@@ -11,7 +11,5 @@ export default function Save( { attributes } ) {
 	const blockProps = useBlockProps.save();
 	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 
-	return (
-		<div { ...innerBlocksProps } id={ tabsId }/>
-	);
+	return <div { ...innerBlocksProps } id={ tabsId } />;
 }
