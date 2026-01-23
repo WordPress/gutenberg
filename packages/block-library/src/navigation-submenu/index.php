@@ -5,6 +5,34 @@
  * @package WordPress
  */
 
+/**
+ * Returns the submenu visibility value with backward compatibility
+ * for the deprecated openSubmenusOnClick attribute.
+ *
+ * This function centralizes the migration logic from the boolean
+ * openSubmenusOnClick to the new submenuVisibility enum.
+ *
+ * @since 6.9.0
+ *
+ * @param array $attributes Block attributes containing submenuVisibility and/or openSubmenusOnClick.
+ * @return string The visibility mode: 'hover', 'click', or 'always'.
+ */
+function block_core_navigation_submenu_get_submenu_visibility( $attributes ) {
+	$submenu_visibility     = isset( $attributes['submenuVisibility'] ) ? $attributes['submenuVisibility'] : null;
+	$open_submenus_on_click = isset( $attributes['openSubmenusOnClick'] ) ? $attributes['openSubmenusOnClick'] : null;
+
+	// If new attribute is set, use it.
+	if ( null !== $submenu_visibility ) {
+		return $submenu_visibility;
+	}
+
+	// Fall back to old attribute for backward compatibility.
+	// openSubmenusOnClick: true  -> 'click'
+	// openSubmenusOnClick: false -> 'hover'
+	// openSubmenusOnClick: null  -> 'hover' (default)
+	return ! empty( $open_submenus_on_click ) ? 'click' : 'hover';
+}
+
 // Path differs between source and build: '../navigation-link/shared/helpers.php' in source, './navigation-link/shared/helpers.php' in build.
 if ( file_exists( __DIR__ . '/../navigation-link/shared/helpers.php' ) ) {
 	require_once __DIR__ . '/../navigation-link/shared/helpers.php';
@@ -105,9 +133,10 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 
 	$show_submenu_indicators = isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'];
-	$open_on_click           = isset( $block->context['openSubmenusOnClick'] ) && $block->context['openSubmenusOnClick'];
-	$open_on_hover_and_click = isset( $block->context['openSubmenusOnClick'] ) && ! $block->context['openSubmenusOnClick'] &&
-		$show_submenu_indicators;
+	$computed_visibility     = block_core_navigation_submenu_get_submenu_visibility( $block->context );
+	$open_on_click           = 'click' === $computed_visibility;
+	$open_on_hover           = 'hover' === $computed_visibility;
+	$open_on_hover_and_click = $open_on_hover && $show_submenu_indicators;
 
 	$classes = array(
 		'wp-block-navigation-item',
@@ -124,6 +153,9 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 	}
 	if ( $open_on_hover_and_click ) {
 		$classes[] = 'open-on-hover-click';
+	}
+	if ( 'always' === $computed_visibility ) {
+		$classes[] = 'open-always';
 	}
 	if ( $is_active ) {
 		$classes[] = 'current-menu-item';
@@ -150,7 +182,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 
 	$html = '<li ' . $wrapper_attributes . '>';
 
-	// If Submenus open on hover, we render an anchor tag with attributes.
+	// If Submenus open on hover or are always open, we render an anchor tag with attributes.
 	// If submenu icons are set to show, we also render a submenu button, so the submenu can be opened on click.
 	if ( ! $open_on_click ) {
 		$item_url = $attributes['url'] ?? '';
@@ -207,7 +239,6 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 			$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">' . block_core_navigation_submenu_render_submenu_icon() . '</button>';
 		}
 	} else {
-		// If menus open on click, we render the parent as a button.
 		$html .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation-item__content wp-block-navigation-submenu__toggle" aria-expanded="false">';
 
 		// Wrap title with span to isolate it from submenu icon.

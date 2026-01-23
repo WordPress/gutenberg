@@ -221,19 +221,6 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
-	// create a new experiment for hiding blocks based on screen size
-	add_settings_field(
-		'gutenberg-hide-blocks-based-on-screen-size',
-		__( 'Hide blocks based on screen size', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Extends block visibility block supports with responsive design controls for hiding blocks based on screen size.', 'gutenberg' ),
-			'id'    => 'gutenberg-hide-blocks-based-on-screen-size',
-		)
-	);
-
 	add_settings_field(
 		'gutenberg-extensible-site-editor',
 		__( 'Extensible Site Editor', 'gutenberg' ),

@@ -8,6 +8,7 @@
 
 -   Preserve boolean HTML attributes during client-side navigation. ([#74446](https://github.com/WordPress/gutenberg/pull/74446))
 -   Fix and refactor runtime initialization logic. ([#71123](https://github.com/WordPress/gutenberg/pull/71123))
+-   Update deprecation warning for unique ID format. ([#74580](https://github.com/WordPress/gutenberg/pull/74580))
 
 ## 6.36.0 (2025-11-26)
 
@@ -50,7 +51,7 @@
 
 ### Deprecations
 
--   Deprecated the `"data-wp-ignore"` directive of the Interactivity API.([#70945](https://github.com/WordPress/gutenberg/pull/70945))  
+-   Deprecated the `"data-wp-ignore"` directive of the Interactivity API.([#70945](https://github.com/WordPress/gutenberg/pull/70945))
     It is deprecated as of WordPress 6.9 and will be removed in version 7.0.
 
 ### Bug Fixes

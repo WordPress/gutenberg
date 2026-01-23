@@ -51,6 +51,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'maxUploadFileSize',
 	'allowedMimeTypes',
 	'bodyPlaceholder',
+	'canEditCSS',
 	'canLockBlocks',
 	'canUpdateBlockBindings',
 	'capabilities',
@@ -397,9 +398,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				'wp_block',
 				'wp_navigation',
 			].includes( postType ),
-			...( window.__experimentalHideBlocksBasedOnScreenSize && deviceType
-				? { [ deviceTypeKey ]: deviceType }
-				: {} ),
+			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
 		};
 
 		return blockEditorSettings;

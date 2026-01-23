@@ -304,7 +304,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 			 * JSON encode the data stored in post content.
 			 * Escape characters that are likely to be mangled by HTML filters: "<>&".
 			 *
-			 * This data is later re-encoded by {@see wp_filter_global_styles_post()}.
+			 * This data is later re-encoded by {@see gutenberg_filter_global_styles_post()}.
 			 * The escaping is also applied here as a precaution.
 			 */
 			$changes->post_content = wp_json_encode( $config, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP );
