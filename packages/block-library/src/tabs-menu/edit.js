@@ -13,6 +13,7 @@ import {
 	BlockContextProvider,
 	__experimentalUseBlockPreview as useBlockPreview,
 	store as blockEditorStore,
+	useBlockEditContext,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -27,7 +28,6 @@ import {
  * Internal dependencies
  */
 import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
-import AddTabRenderAppender from '../tab/add-tab-render-appender';
 import RemoveTabToolbarControl from '../tab/remove-tab-toolbar-control';
 
 const TABS_MENU_ITEM_TEMPLATE = [ [ 'core/tabs-menu-item', {} ] ];
@@ -77,12 +77,14 @@ const MemoizedTabsMenuItemPreview = memo( TabsMenuItemPreview );
  *
  * @param {Object} props              Component props.
  * @param {Object} props.wrapperProps Props to pass to the wrapper element.
+ * @param {Object} props.layout       The layout object to pass to inner blocks.
  */
-function TabsMenuItemTemplateBlocks( { wrapperProps = {} } ) {
+function TabsMenuItemTemplateBlocks( { wrapperProps = {}, layout } ) {
 	const innerBlocksProps = useInnerBlocksProps( wrapperProps, {
 		template: TABS_MENU_ITEM_TEMPLATE,
 		templateLock: 'all',
 		renderAppender: false,
+		layout,
 	} );
 	return innerBlocksProps.children;
 }
@@ -93,6 +95,10 @@ function Edit( {
 	isSelected,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
+	// Get the layout from block edit context to pass to inner blocks.
+	// This ensures the correct orientation is used from the start.
+	const { layout } = useBlockEditContext();
+
 	const tabsId = context[ 'core/tabs-id' ] || null;
 	const tabsList = context[ 'core/tabs-list' ] || [];
 	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ] ?? 0;
@@ -223,6 +229,7 @@ function Edit( {
 										onClick: () =>
 											handleTabContextClick( index ),
 									} }
+									layout={ layout }
 								/>
 							) : null }
 							<MemoizedTabsMenuItemPreview

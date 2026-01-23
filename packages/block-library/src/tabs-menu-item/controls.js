@@ -29,7 +29,13 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
 import RemoveTabToolbarControl from '../tab/remove-tab-toolbar-control';
 
-function TabBlockMover( { tabClientId, tabIndex, tabsCount, tabsMenuClientId, tabsClientId } ) {
+function TabBlockMover( {
+	tabClientId,
+	tabIndex,
+	tabsCount,
+	tabsMenuClientId,
+	tabsClientId,
+} ) {
 	const {
 		moveBlocksUp,
 		moveBlocksDown,
@@ -39,12 +45,17 @@ function TabBlockMover( { tabClientId, tabIndex, tabsCount, tabsMenuClientId, ta
 
 	const { tabPanelsClientId, orientation } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getBlockListSettings } =
+			const { getBlockRootClientId, getBlockAttributes } =
 				select( blockEditorStore );
+			// Get orientation directly from the tabs-menu block's layout attribute.
+			// This is more reliable than getBlockListSettings which is set asynchronously.
+			const tabsMenuAttributes = tabsMenuClientId
+				? getBlockAttributes( tabsMenuClientId )
+				: null;
 			return {
 				tabPanelsClientId: getBlockRootClientId( tabClientId ),
 				orientation:
-					getBlockListSettings( tabsMenuClientId )?.orientation || 'horizontal',
+					tabsMenuAttributes?.layout?.orientation || 'horizontal',
 			};
 		},
 		[ tabClientId, tabsMenuClientId ]
@@ -54,29 +65,26 @@ function TabBlockMover( { tabClientId, tabIndex, tabsCount, tabsMenuClientId, ta
 	const isLast = tabIndex === tabsCount - 1;
 	const isHorizontal = orientation === 'horizontal';
 
-	// Icons based on orientation (respects RTL for horizontal)
-	const upIcon = isHorizontal
-		? isRTL()
-			? chevronRight
-			: chevronLeft
-		: chevronUp;
-	const downIcon = isHorizontal
-		? isRTL()
-			? chevronLeft
-			: chevronRight
-		: chevronDown;
-
-	// Labels based on orientation
-	const upLabel = isHorizontal
-		? isRTL()
-			? __( 'Move tab right' )
-			: __( 'Move tab left' )
-		: __( 'Move tab up' );
-	const downLabel = isHorizontal
-		? isRTL()
-			? __( 'Move tab left' )
-			: __( 'Move tab right' )
-		: __( 'Move tab down' );
+	// Icons and labels based on orientation (respects RTL for horizontal)
+	let upIcon, downIcon, upLabel, downLabel;
+	if ( isHorizontal ) {
+		if ( isRTL() ) {
+			upIcon = chevronRight;
+			downIcon = chevronLeft;
+			upLabel = __( 'Move tab right' );
+			downLabel = __( 'Move tab left' );
+		} else {
+			upIcon = chevronLeft;
+			downIcon = chevronRight;
+			upLabel = __( 'Move tab left' );
+			downLabel = __( 'Move tab right' );
+		}
+	} else {
+		upIcon = chevronUp;
+		downIcon = chevronDown;
+		upLabel = __( 'Move tab up' );
+		downLabel = __( 'Move tab down' );
+	}
 
 	// Handle moving tab and updating active index to follow the moved tab
 	const handleMoveUp = () => {
@@ -84,7 +92,9 @@ function TabBlockMover( { tabClientId, tabIndex, tabsCount, tabsMenuClientId, ta
 		// Update editorActiveTabIndex to follow the moved tab
 		if ( tabsClientId ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( tabsClientId, { editorActiveTabIndex: tabIndex - 1 } );
+			updateBlockAttributes( tabsClientId, {
+				editorActiveTabIndex: tabIndex - 1,
+			} );
 		}
 	};
 
@@ -93,7 +103,9 @@ function TabBlockMover( { tabClientId, tabIndex, tabsCount, tabsMenuClientId, ta
 		// Update editorActiveTabIndex to follow the moved tab
 		if ( tabsClientId ) {
 			__unstableMarkNextChangeAsNotPersistent();
-			updateBlockAttributes( tabsClientId, { editorActiveTabIndex: tabIndex + 1 } );
+			updateBlockAttributes( tabsClientId, {
+				editorActiveTabIndex: tabIndex + 1,
+			} );
 		}
 	};
 
@@ -120,7 +132,9 @@ function TabBlockMover( { tabClientId, tabIndex, tabsCount, tabsMenuClientId, ta
 								icon={ upIcon }
 								label={ upLabel }
 								disabled={ isFirst }
+								accessibleWhenDisabled
 								onClick={ handleMoveUp }
+								__next40pxDefaultSize
 								{ ...itemProps }
 							/>
 						) }
@@ -135,7 +149,9 @@ function TabBlockMover( { tabClientId, tabIndex, tabsCount, tabsMenuClientId, ta
 								icon={ downIcon }
 								label={ downLabel }
 								disabled={ isLast }
+								accessibleWhenDisabled
 								onClick={ handleMoveDown }
+								__next40pxDefaultSize
 								{ ...itemProps }
 							/>
 						) }

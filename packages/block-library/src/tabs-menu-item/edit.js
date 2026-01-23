@@ -15,7 +15,14 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
-import { RawHTML, useRef, useCallback, useState, useEffect, useMemo } from '@wordpress/element';
+import {
+	RawHTML,
+	useRef,
+	useCallback,
+	useState,
+	useEffect,
+	useMemo,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -65,8 +72,12 @@ function Edit( {
 	const tabLabel = context[ 'core/tabs-menu-item-label' ] ?? '';
 	const tabClientId = context[ 'core/tabs-menu-item-clientId' ] ?? '';
 
-	// Context from parent tabs block
-	const tabsList = context[ 'core/tabs-list' ] || [];
+	// Context from parent tabs block, memoized to prevent unnecessary re-renders.
+	const contextTabsList = context[ 'core/tabs-list' ];
+	const tabsList = useMemo(
+		() => contextTabsList || [],
+		[ contextTabsList ]
+	);
 	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ] ?? 0;
 	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
 
@@ -77,7 +88,8 @@ function Edit( {
 
 	const isActiveTab = tabIndex === effectiveActiveIndex;
 
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch( blockEditorStore );
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 	const focusRef = useRef();
 	const labelElementRef = useRef( null );
 	const [ isEditing, setIsEditing ] = useState( false );
@@ -86,17 +98,26 @@ function Edit( {
 	// Get parent tabs clientId for updating editorActiveTabIndex
 	const { tabsClientId, tabsMenuClientId, selectedTabClientId } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getSelectedBlockClientIds, hasSelectedInnerBlock } = select( blockEditorStore );
+			const {
+				getBlockRootClientId,
+				getSelectedBlockClientIds,
+				hasSelectedInnerBlock,
+			} = select( blockEditorStore );
 			// tabs-menu-item -> tabs-menu -> tabs
 			const _tabsMenuClientId = getBlockRootClientId( clientId );
-			const _tabsClientId = _tabsMenuClientId ? getBlockRootClientId( _tabsMenuClientId ) : null;
+			const _tabsClientId = _tabsMenuClientId
+				? getBlockRootClientId( _tabsMenuClientId )
+				: null;
 
 			const selectedIds = getSelectedBlockClientIds();
 
 			// Find if any tab is selected
 			let selectedTab = null;
 			for ( const tab of tabsList ) {
-				if ( selectedIds.includes( tab.clientId ) || hasSelectedInnerBlock( tab.clientId, true ) ) {
+				if (
+					selectedIds.includes( tab.clientId ) ||
+					hasSelectedInnerBlock( tab.clientId, true )
+				) {
 					selectedTab = tab.clientId;
 					break;
 				}
@@ -119,7 +140,10 @@ function Edit( {
 	const handleLabelChange = useCallback(
 		( newLabel ) => {
 			if ( tabClientId ) {
-				updateBlockAttributes( tabClientId, { label: newLabel, anchor: slugFromLabel( newLabel, tabIndex ) } );
+				updateBlockAttributes( tabClientId, {
+					label: newLabel,
+					anchor: slugFromLabel( newLabel, tabIndex ),
+				} );
 			}
 		},
 		[ updateBlockAttributes, tabClientId, tabIndex ]
@@ -133,15 +157,23 @@ function Edit( {
 			// Update the parent tabs block's editorActiveTabIndex (ephemeral, not persisted)
 			if ( tabsClientId && tabIndex !== effectiveActiveIndex ) {
 				__unstableMarkNextChangeAsNotPersistent();
-				updateBlockAttributes( tabsClientId, { editorActiveTabIndex: tabIndex } );
+				updateBlockAttributes( tabsClientId, {
+					editorActiveTabIndex: tabIndex,
+				} );
 			}
 
 			// Don't select block if we're editing this tab's label
 			if ( isEditing ) {
-				return;
 			}
 		},
-		[ isEditing, tabsClientId, tabIndex, effectiveActiveIndex, updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent ]
+		[
+			isEditing,
+			tabsClientId,
+			tabIndex,
+			effectiveActiveIndex,
+			updateBlockAttributes,
+			__unstableMarkNextChangeAsNotPersistent,
+		]
 	);
 
 	// Callback ref for label RichText
@@ -174,10 +206,16 @@ function Edit( {
 		const styles = {};
 
 		// Active/hover colors from custom attributes
-		const activeBg = activeBackgroundColor?.color || attributes.customActiveBackgroundColor;
-		const activeText = activeTextColor?.color || attributes.customActiveTextColor;
-		const hoverBg = hoverBackgroundColor?.color || attributes.customHoverBackgroundColor;
-		const hoverText = hoverTextColor?.color || attributes.customHoverTextColor;
+		const activeBg =
+			activeBackgroundColor?.color ||
+			attributes.customActiveBackgroundColor;
+		const activeText =
+			activeTextColor?.color || attributes.customActiveTextColor;
+		const hoverBg =
+			hoverBackgroundColor?.color ||
+			attributes.customHoverBackgroundColor;
+		const hoverText =
+			hoverTextColor?.color || attributes.customHoverTextColor;
 
 		if ( activeBg ) {
 			styles[ '--custom-tab-active-color' ] = activeBg;
@@ -269,10 +307,7 @@ function Edit( {
 						} }
 					/>
 				) : (
-					<StaticLabel
-						label={ tabLabel }
-						index={ tabIndex }
-					/>
+					<StaticLabel label={ tabLabel } index={ tabIndex } />
 				) }
 			</div>
 		</>
