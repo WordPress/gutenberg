@@ -555,21 +555,6 @@ function Navigation( {
 		setAttributes,
 	] );
 
-	// Reset submenuVisibility to default if orientation is horizontal while "always" is selected.
-	// Skip this reset if we're in an overlay template.
-	useEffect( () => {
-		if (
-			! isWithinOverlay &&
-			orientation === 'horizontal' &&
-			submenuVisibility === 'always'
-		) {
-			setAttributes( {
-				submenuVisibility: 'hover',
-				showSubmenuIcon: true,
-			} );
-		}
-	}, [ isWithinOverlay, orientation, submenuVisibility, setAttributes ] );
-
 	const isResponsive = 'never' !== overlayMenu;
 	const blockProps = useBlockProps( {
 		ref: navRef,
