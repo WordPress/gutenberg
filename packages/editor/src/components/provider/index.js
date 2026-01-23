@@ -26,7 +26,6 @@ import { store as editorStore } from '../../store';
 import { ATTACHMENT_POST_TYPE } from '../../store/constants';
 import useBlockEditorSettings from './use-block-editor-settings';
 import { unlock } from '../../lock-unlock';
-import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import NavigationBlockEditingMode from './navigation-block-editing-mode';
 import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
 import useCommands from '../commands';
@@ -402,9 +401,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 								<>
 									<PatternsMenuItems />
 									<TemplatePartMenuItems />
-									{ mode === 'template-locked' && (
-										<DisableNonPageContentBlocks />
-									) }
 									{ type === 'wp_navigation' && (
 										<NavigationBlockEditingMode />
 									) }
