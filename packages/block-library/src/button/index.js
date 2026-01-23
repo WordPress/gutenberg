@@ -63,16 +63,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			label: __( 'Link' ),
 			type: 'url',
 			Edit: 'link', // TODO: replace with custom component
-			getValue: ( { item } ) => ( {
-				url: item.url,
-				rel: item.rel,
-				linkTarget: item.linkTarget,
-			} ),
-			setValue: ( { value } ) => ( {
-				url: value.url,
-				rel: value.rel,
-				linkTarget: value.linkTarget,
-			} ),
+			getValue: { url: 'url', rel: 'rel', linkTarget: 'linkTarget' },
+			setValue: { url: 'url', rel: 'rel', linkTarget: 'linkTarget' },
 		},
 	];
 	settings[ formKey ] = {

@@ -48,18 +48,18 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 				allowedTypes: [ 'video' ],
 				multiple: false,
 			},
-			getValue: ( { item } ) => ( {
-				id: item.id,
-				url: item.src,
-				caption: item.caption,
-				poster: item.poster,
-			} ),
-			setValue: ( { value } ) => ( {
-				id: value.id,
-				src: value.url,
-				caption: value.caption,
-				poster: value.poster,
-			} ),
+			getValue: {
+				id: 'id',
+				url: 'src',
+				caption: 'caption',
+				poster: 'poster',
+			},
+			setValue: {
+				id: 'id',
+				src: 'url',
+				caption: 'caption',
+				poster: 'poster',
+			},
 		},
 		{
 			id: 'caption',

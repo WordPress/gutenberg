@@ -47,14 +47,8 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 				allowedTypes: [ 'audio' ],
 				multiple: false,
 			},
-			getValue: ( { item } ) => ( {
-				id: item.id,
-				url: item.src,
-			} ),
-			setValue: ( { value } ) => ( {
-				id: value.id,
-				src: value.url,
-			} ),
+			getValue: { id: 'id', url: 'src' },
+			setValue: { id: 'id', src: 'url' },
 		},
 		{
 			id: 'caption',

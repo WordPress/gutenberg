@@ -65,34 +65,26 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 				allowedTypes: [ 'image', 'video' ],
 				multiple: false,
 			},
-			getValue: ( { item } ) => ( {
-				id: item.mediaId,
-				url: item.mediaUrl,
-				mediaType: item.mediaType,
-				link: item.mediaLink,
-			} ),
-			setValue: ( { value } ) => ( {
-				mediaId: value.id,
-				mediaUrl: value.url,
-				mediaType: value.mediaType,
-				mediaLink: value.link,
-			} ),
+			getValue: {
+				id: 'mediaId',
+				url: 'mediaUrl',
+				mediaType: 'mediaType',
+				link: 'mediaLink',
+			},
+			setValue: {
+				mediaId: 'id',
+				mediaUrl: 'url',
+				mediaType: 'mediaType',
+				mediaLink: 'link',
+			},
 		},
 		{
 			id: 'link',
 			label: __( 'Link' ),
 			type: 'url',
 			Edit: 'link', // TODO: replace with custom component
-			getValue: ( { item } ) => ( {
-				url: item.href,
-				rel: item.rel,
-				linkTarget: item.linkTarget,
-			} ),
-			setValue: ( { value } ) => ( {
-				href: value.url,
-				rel: value.rel,
-				linkTarget: value.linkTarget,
-			} ),
+			getValue: { url: 'href', rel: 'rel', linkTarget: 'linkTarget' },
+			setValue: { href: 'url', rel: 'rel', linkTarget: 'linkTarget' },
 		},
 	];
 	settings[ formKey ] = {
