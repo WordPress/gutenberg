@@ -14,8 +14,8 @@
 
 ### Enhancements
 
-- Include total items count in footer. [#73491](https://github.com/WordPress/gutenberg/pull/73491)
 - Add new `combobox` DataForm control. [#74891](https://github.com/WordPress/gutenberg/pull/74891)
+- Include total items count in footer. [#73491](https://github.com/WordPress/gutenberg/pull/73491)
 
 ## 11.2.0 (2026-01-16)
 
