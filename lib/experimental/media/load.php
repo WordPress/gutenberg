@@ -7,14 +7,14 @@
 
 /**
  * Debug logging for client-side media processing (load.php).
- * Enabled by default for this testing branch.
+ * Set $debug_enabled to true to enable logging.
  *
  * @param string $message Log message.
  * @param array  $data    Optional data to include in log.
  */
 function gutenberg_media_load_debug_log( $message, $data = array() ) {
-	// Enable by default for testing branch.
-	$debug_enabled = true;
+	// Set to true to enable debug logging.
+	$debug_enabled = false;
 
 	if ( ! $debug_enabled ) {
 		return;

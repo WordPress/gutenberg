@@ -2,13 +2,14 @@
  * Debug logger for client-side media processing.
  *
  * Provides detailed console logging for tracking the media upload pipeline.
- * Enabled by default for this testing branch.
+ * Set DEBUG_ENABLED to true to enable logging.
  */
 
 /* eslint-disable jsdoc/require-param */
 
-// Enable logging by default for this testing branch.
-const DEBUG_ENABLED = true;
+// Set to true to enable debug logging for client-side media processing.
+// Keep disabled by default to avoid test failures from unexpected console output.
+const DEBUG_ENABLED = false;
 
 // Color codes for different log types.
 const COLORS = {

@@ -7,14 +7,14 @@
 
 /**
  * Debug logging for client-side media processing.
- * Enabled by default for this testing branch.
+ * Set $debug_enabled to true to enable logging.
  *
  * @param string $message Log message.
  * @param array  $data    Optional data to include in log.
  */
 function gutenberg_media_debug_log( $message, $data = array() ) {
-	// Enable by default for testing branch.
-	$debug_enabled = true;
+	// Set to true to enable debug logging.
+	$debug_enabled = false;
 
 	if ( ! $debug_enabled ) {
 		return;
@@ -225,7 +225,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
-		$files = $request->get_file_params();
+		$files     = $request->get_file_params();
 		$file_info = isset( $files['file'] ) ? $files['file'] : array();
 
 		gutenberg_media_debug_log(
