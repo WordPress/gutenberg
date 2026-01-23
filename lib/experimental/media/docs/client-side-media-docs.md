@@ -14,14 +14,14 @@ Client-side media processing requires the following browser capabilities:
 
 | Browser | Minimum Version | Notes |
 |---------|-----------------|-------|
-| Chrome | 92+ | Full support with proper headers |
-| Firefox | 79+ | Full support with proper headers |
+| Chrome | 92+ | Full support |
+| Firefox | 79+ | Full support except embed previews |
 | Safari | 15.2+ | Requires `require-corp` instead of `credentialless` |
-| Edge | 92+ | Full support with proper headers |
+| Edge | 92+ | Full support |
 
 ### Automatic Fallback
 
-When client-side media processing is unavailable (due to missing browser support or server configuration), the system automatically falls back to server-side processing. This fallback is transparent to users and requires no action. A message is logged to the browser console indicating the reason for the fallback.
+When client-side media processing is unavailable, the system automatically falls back to server-side processing. This fallback is transparent to users and requires no action. A message is logged to the browser console indicating the reason for the fallback.
 
 The fallback occurs when any of the following conditions are detected:
 - WebAssembly is not supported in the browser
@@ -46,5 +46,5 @@ If client-side media processing is not working, check the browser console for me
 
 3. **"WebAssembly is not supported"**: The browser does not support WebAssembly. This is rare in modern browsers but can occur in older versions or restricted environments.
 
-Check out [this tracking issue](https://github.com/swissspidy/media-experiments/issues/294) for more details and further resources.
+Check out [this tracking issue](https://github.com/WordPress/gutenberg/issues/74464) for more details and further resources.
 
