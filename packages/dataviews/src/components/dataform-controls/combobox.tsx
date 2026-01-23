@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { privateApis, Spinner } from '@wordpress/components';
-import { useCallback, useMemo, useState } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,8 +25,6 @@ export default function Combobox< Item >( {
 		field;
 	const value = getValue( { item: data } ) ?? '';
 
-	const [ filterValue, setFilterValue ] = useState( '' );
-
 	const onChangeControl = useCallback(
 		( newValue: string | null ) =>
 			onChange( setValue( { item: data, value: newValue ?? '' } ) ),
@@ -37,20 +35,6 @@ export default function Combobox< Item >( {
 		elements: field.elements,
 		getElements: field.getElements,
 	} );
-
-	const filteredOptions = useMemo( () => {
-		if ( ! filterValue ) {
-			return elements;
-		}
-		const normalizedFilter = filterValue.toLowerCase();
-		return elements.filter( ( option ) =>
-			option.label.toLowerCase().includes( normalizedFilter )
-		);
-	}, [ elements, filterValue ] );
-
-	const onFilterValueChange = useCallback( ( inputValue: string ) => {
-		setFilterValue( inputValue );
-	}, [] );
 
 	if ( isLoading ) {
 		return <Spinner />;
@@ -64,9 +48,8 @@ export default function Combobox< Item >( {
 			value={ value }
 			help={ description }
 			placeholder={ placeholder }
-			options={ filteredOptions }
+			options={ elements }
 			onChange={ onChangeControl }
-			onFilterValueChange={ onFilterValueChange }
 			hideLabelFromVision={ hideLabelFromVision }
 			allowReset
 			expandOnFocus
