@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.38.1-next.0 (2026-01-23)
+
 ### Bug Fixes
 
 -   Prevent router regions with data-wp-key from being recreated on navigation. ([#74750](https://github.com/WordPress/gutenberg/pull/74750))
