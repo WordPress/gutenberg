@@ -138,7 +138,12 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		page,
 		editor,
 		insertingBlocksUtils,
-	} ) => {
+	}, testInfo ) => {
+		testInfo.skip(
+			testInfo.project.name === 'firefox',
+			'Firefox does not dispatch drag events to the iframe content when dragging from outside the iframe.'
+		);
+
 		await admin.createNewPost();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
@@ -264,7 +269,46 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 		const PATTERN_NAME = 'My synced pattern';
 
+		// Propagate console logs from page to Playwright output
+		page.on( 'console', ( msg ) => {
+			// eslint-disable-next-line no-console
+			console.log( `[page] ${ msg.text() }` );
+		} );
+
 		await admin.createNewPost();
+
+		// Setup mouse event logging in iframe
+		const frame = page.frame( 'editor-canvas' );
+		await frame.evaluate( () => {
+			const events = [
+				'mousedown',
+				'mouseup',
+				'mousemove',
+				'mouseenter',
+				'mouseleave',
+				'mouseover',
+				'mouseout',
+				'drag',
+				'dragstart',
+				'dragend',
+				'dragenter',
+				'dragleave',
+				'dragover',
+				'drop',
+			];
+			events.forEach( ( eventName ) => {
+				document.addEventListener(
+					eventName,
+					( e ) => {
+						// eslint-disable-next-line no-console
+						console.log(
+							`[${ eventName }] x=${ e.clientX } y=${ e.clientY } target=${ e.target?.tagName }#${ e.target?.id }`
+						);
+					},
+					true
+				);
+			} );
+		} );
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -356,7 +400,12 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		page,
 		editor,
 		insertingBlocksUtils,
-	} ) => {
+	}, testInfo ) => {
+		testInfo.skip(
+			testInfo.project.name === 'firefox',
+			'Firefox does not dispatch drag events to the iframe content when dragging from outside the iframe.'
+		);
+
 		await admin.createNewPost();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
