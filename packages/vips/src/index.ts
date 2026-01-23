@@ -23,9 +23,9 @@ import { supportsAnimation, supportsInterlace, supportsQuality } from './utils';
 
 /**
  * Debug logging for VIPS operations.
- * Enabled by default for this testing branch.
+ * Set to true to enable debug logging.
  */
-const DEBUG_ENABLED = true;
+const DEBUG_ENABLED = false;
 
 function vipsLog( message: string, data?: Record< string, unknown > ): void {
 	if ( ! DEBUG_ENABLED ) {
