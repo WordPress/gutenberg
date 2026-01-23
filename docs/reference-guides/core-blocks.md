@@ -933,6 +933,49 @@ Displays the name of this site. Update the block, and the changes apply everywhe
 -	**Supports:** align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** isLink, level, levelOptions, linkTarget, textAlign
 
+## Slide
+
+A single slide within a slider. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slide))
+
+-	**Name:** core/slide
+-	**Experimental:** true
+-	**Category:** design
+-	**Parent:** core/slider-track
+-	**Supports:** anchor, color (background, gradients, text), layout (allowJustification, allowOrientation, allowSizingOnChildren, allowSwitching, allowVerticalAlignment, ~~allowInheriting~~), spacing (blockGap, padding, ~~margin~~), ~~html~~, ~~reusable~~
+
+## Slider
+
+Display content in a horizontally scrolling slider. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider))
+
+-	**Name:** core/slider
+-	**Experimental:** true
+-	**Category:** design
+-	**Allowed Blocks:** core/slider-controls, core/slider-track
+-	**Supports:** align, color (background, ~~text~~), interactivity, spacing (margin, padding), ~~html~~
+-	**Attributes:** activeSlideIndex, sliderId
+
+## Slider Controls
+
+Navigation controls for a slider. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider-controls))
+
+-	**Name:** core/slider-controls
+-	**Experimental:** true
+-	**Category:** design
+-	**Parent:** core/slider
+-	**Allowed Blocks:** core/buttons, core/button
+-	**Supports:** spacing (~~margin~~, ~~padding~~), ~~anchor~~, ~~html~~, ~~reusable~~
+
+## Slider Track
+
+Container for slides in a slider. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/slider-track))
+
+-	**Name:** core/slider-track
+-	**Experimental:** true
+-	**Category:** design
+-	**Parent:** core/slider
+-	**Allowed Blocks:** core/slide
+-	**Supports:** dimensions (aspectRatio, height), listView, ~~anchor~~, ~~html~~, ~~reusable~~
+
 ## Social Icon
 
 Display an icon linking to a social profile or site. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/social-link))

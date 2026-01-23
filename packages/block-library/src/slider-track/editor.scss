@@ -1,0 +1,6 @@
+.wp-block-slider-track {
+	// In editor: show one slide at a time (like tabs)
+	display: block;
+	scroll-snap-type: none;
+	overflow: hidden;
+}

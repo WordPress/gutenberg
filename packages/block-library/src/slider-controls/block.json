@@ -1,0 +1,26 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/slider-controls",
+	"title": "Slider Controls",
+	"description": "Navigation controls for a slider.",
+	"version": "1.0.0",
+	"category": "design",
+	"textdomain": "default",
+	"parent": [ "core/slider" ],
+	"allowedBlocks": [ "core/buttons", "core/button" ],
+	"attributes": {},
+	"usesContext": [ "core/slider-id" ],
+	"supports": {
+		"anchor": false,
+		"html": false,
+		"reusable": false,
+		"spacing": {
+			"padding": false,
+			"margin": false
+		}
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css"
+}

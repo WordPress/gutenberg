@@ -1,0 +1,12 @@
+.wp-block-slide {
+	// Hidden slides in editor (similar to tabs)
+	&[hidden] {
+		display: none !important;
+	}
+
+	// Active/visible slide styling
+	&.is-selected-slide {
+		display: flex;
+		flex-direction: column;
+	}
+}

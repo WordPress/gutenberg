@@ -1,0 +1,43 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/slider",
+	"title": "Slider",
+	"description": "Display content in a horizontally scrolling slider.",
+	"version": "1.0.0",
+	"category": "design",
+	"textdomain": "default",
+	"allowedBlocks": [ "core/slider-controls", "core/slider-track" ],
+	"attributes": {
+		"sliderId": {
+			"type": "string",
+			"default": ""
+		},
+		"activeSlideIndex": {
+			"type": "number",
+			"default": 0
+		}
+	},
+	"supports": {
+		"align": true,
+		"html": false,
+		"interactivity": true,
+		"spacing": {
+			"margin": true,
+			"padding": true
+		},
+		"color": {
+			"background": true,
+			"text": false
+		}
+	},
+	"providesContext": {
+		"core/slider-id": "sliderId",
+		"core/slider-activeSlideIndex": "activeSlideIndex"
+	},
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./index.css",
+	"style": "file:./style-index.css",
+	"viewScriptModule": "@wordpress/block-library/slider/view"
+}
