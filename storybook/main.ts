@@ -123,6 +123,12 @@ const config: StorybookConfig = {
 						'.js': 'tsx',
 					},
 				},
+				// Exclude vips package which contains WASM modules that Vite can't handle directly.
+				exclude: [ '@wordpress/vips', 'wasm-vips' ],
+			},
+			ssr: {
+				// Externalize vips for SSR/build since it uses WASM modules.
+				external: [ '@wordpress/vips', 'wasm-vips' ],
 			},
 		} satisfies InlineConfig );
 	},
