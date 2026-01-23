@@ -138,6 +138,36 @@ class Media_Processing_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers ::gutenberg_get_default_image_output_formats
+	 */
+	public function test_get_default_image_output_formats_returns_empty_by_default() {
+		$output_formats = gutenberg_get_default_image_output_formats();
+		$this->assertEmpty( $output_formats );
+	}
+
+	/**
+	 * @covers ::gutenberg_get_default_image_output_formats
+	 */
+	public function test_get_default_image_output_formats_with_filter() {
+		// Add a filter that converts JPEG to WebP.
+		$filter_callback = function ( $formats, $filename, $mime_type ) {
+			if ( 'image/jpeg' === $mime_type ) {
+				$formats['image/jpeg'] = 'image/webp';
+			}
+			return $formats;
+		};
+
+		add_filter( 'image_editor_output_format', $filter_callback, 10, 3 );
+
+		$output_formats = gutenberg_get_default_image_output_formats();
+
+		remove_filter( 'image_editor_output_format', $filter_callback, 10 );
+
+		$this->assertArrayHasKey( 'image/jpeg', $output_formats );
+		$this->assertSame( 'image/webp', $output_formats['image/jpeg'] );
+	}
+
+	/**
 	 * @covers ::gutenberg_add_crossorigin_attributes
 	 */
 	public function test_add_crossorigin_attributes() {
