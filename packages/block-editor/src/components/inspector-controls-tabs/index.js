@@ -19,6 +19,7 @@ import StylesTab from './styles-tab';
 import ContentTab from './content-tab';
 import InspectorControls from '../inspector-controls';
 import { unlock } from '../../lock-unlock';
+import { store as blockEditorStore } from '../../store';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -32,6 +33,14 @@ export default function InspectorControlsTabs( {
 } ) {
 	const showIconLabels = useSelect( ( select ) => {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
+	}, [] );
+
+	// Get the actual selected block name (not the rendered parent in contentOnly mode)
+	const selectedBlockName = useSelect( ( select ) => {
+		const { getSelectedBlockClientId, getBlockName } =
+			select( blockEditorStore );
+		const selectedClientId = getSelectedBlockClientId();
+		return selectedClientId ? getBlockName( selectedClientId ) : null;
 	}, [] );
 
 	const [ selectedTabId, setSelectedTabId ] = useState( tabs[ 0 ]?.name );
@@ -52,15 +61,39 @@ export default function InspectorControlsTabs( {
 			return;
 		}
 
+		// Special case: Navigation block should default to list view tab
+		// when available instead of content tab
+		const hasListTab = tabs.some( ( tab ) => tab.name === 'list' );
+		if ( selectedBlockName === 'core/navigation' && hasListTab ) {
+			if ( selectedTabId !== 'list' ) {
+				setSelectedTabId( 'list' );
+			}
+			return;
+		}
+
 		const firstTabName = tabs[ 0 ]?.name;
 		if ( selectedTabId !== firstTabName ) {
 			setSelectedTabId( firstTabName );
 		}
-	}, [ tabs, selectedTabId ] );
+	}, [ tabs, selectedTabId, selectedBlockName ] );
 
 	const handleTabSelect = ( tabId ) => {
 		setSelectedTabId( tabId );
 		hasUserSelectionRef.current = true;
+	};
+
+	const { getBlockName } = useSelect( blockEditorStore );
+
+	// Handle block selection from ContentTab - switch to list tab if navigation
+	const handleContentBlockSelect = ( selectedClientId ) => {
+		const clickedBlockName = getBlockName( selectedClientId );
+
+		if ( clickedBlockName === 'core/navigation' ) {
+			const hasListTab = tabs.some( ( tab ) => tab.name === 'list' );
+			if ( hasListTab ) {
+				setSelectedTabId( 'list' );
+			}
+		}
 	};
 
 	return (
@@ -102,7 +135,10 @@ export default function InspectorControlsTabs( {
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
 					<InspectorControls.Slot group="content" />
-					<ContentTab contentClientIds={ contentClientIds } />
+					<ContentTab
+						contentClientIds={ contentClientIds }
+						onBlockSelect={ handleContentBlockSelect }
+					/>
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name } focusable={ false }>
 					<InspectorControls.Slot group="list" />
