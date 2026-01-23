@@ -81,7 +81,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -89,7 +88,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Dummy text' },
 		} );
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -141,7 +140,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		insertingBlocksUtils,
 	} ) => {
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -152,7 +150,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -179,6 +177,12 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'Escape' );
 
+		// Move mouse 1px to trigger drag end in some browsers.
+		await page.mouse.move(
+			paragraphBoundingBox.x + 1,
+			paragraphBoundingBox.y + 1
+		);
+
 		await expect( insertingBlocksUtils.indicator ).toBeHidden();
 		await expect( insertingBlocksUtils.draggableChip ).toBeHidden();
 
@@ -199,7 +203,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		);
 
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -208,7 +211,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			attributes: { content: 'Dummy text' },
 		} );
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -262,7 +265,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		const PATTERN_NAME = 'My synced pattern';
 
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -271,7 +273,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			attributes: { content: 'Dummy text' },
 		} );
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -298,7 +300,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await createPatternDialog
 			.getByRole( 'button', { name: 'Add' } )
 			.click();
-		const patternBlock = page.getByRole( 'document', {
+		const patternBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Pattern',
 		} );
 		await expect( patternBlock ).toBeFocused();
@@ -353,7 +355,6 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		insertingBlocksUtils,
 	} ) => {
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -364,7 +365,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -393,6 +394,12 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await expect( insertingBlocksUtils.draggableChip ).toBeVisible();
 
 		await page.keyboard.press( 'Escape' );
+
+		// Move mouse 1px to trigger drag end in some browsers.
+		await page.mouse.move(
+			paragraphBoundingBox.x + 1,
+			paragraphBoundingBox.y + 1
+		);
 
 		await expect( insertingBlocksUtils.indicator ).toBeHidden();
 		await expect( insertingBlocksUtils.draggableChip ).toBeHidden();
