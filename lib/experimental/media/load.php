@@ -409,3 +409,29 @@ function gutenberg_override_media_templates(): void {
 }
 
 add_action( 'wp_enqueue_media', 'gutenberg_override_media_templates' );
+
+/**
+ * Filters the block editor preload paths to include media processing fields.
+ *
+ * Adds image_sizes and image_size_threshold to the root endpoint preload
+ * to avoid an extra API request when these fields are needed.
+ *
+ * @param array                   $paths   REST API paths to preload.
+ * @param WP_Block_Editor_Context $context Current block editor context.
+ * @return array Filtered preload paths.
+ */
+function gutenberg_media_processing_preload_paths( $paths, $_context ) {
+	foreach ( $paths as $key => $path ) {
+		if ( is_string( $path ) && str_starts_with( $path, '/?_fields=' ) ) {
+			// Add image_sizes and image_size_threshold to the existing fields.
+			$paths[ $key ] = str_replace(
+				'/?_fields=',
+				'/?_fields=image_sizes,image_size_threshold,',
+				$path
+			);
+			break;
+		}
+	}
+	return $paths;
+}
+add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_media_processing_preload_paths', 10, 2 );
