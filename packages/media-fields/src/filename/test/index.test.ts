@@ -4,6 +4,11 @@
 import filenameField from '../index';
 import type { MediaItem } from '../../types';
 
+// Type assertion for getValue since it's defined as a function in this field
+const getValue = filenameField.getValue as ( args: {
+	item: MediaItem;
+} ) => string | undefined;
+
 describe( 'filenameField', () => {
 	it( 'has correct field configuration', () => {
 		expect( filenameField ).toMatchObject( {
@@ -23,7 +28,7 @@ describe( 'filenameField', () => {
 					'https://example.com/wp-content/uploads/2024/image.jpg',
 			};
 
-			const result = filenameField.getValue?.( {
+			const result = getValue?.( {
 				item: item as MediaItem,
 			} );
 
@@ -33,7 +38,7 @@ describe( 'filenameField', () => {
 		it( 'returns undefined when source_url is undefined', () => {
 			const item: Partial< MediaItem > = {};
 
-			const result = filenameField.getValue?.( {
+			const result = getValue?.( {
 				item: item as MediaItem,
 			} );
 
@@ -45,7 +50,7 @@ describe( 'filenameField', () => {
 				source_url: '',
 			};
 
-			const result = filenameField.getValue?.( {
+			const result = getValue?.( {
 				item: item as MediaItem,
 			} );
 

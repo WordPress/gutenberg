@@ -8,6 +8,11 @@ import type { Attachment, Updatable } from '@wordpress/core-data';
  */
 import mediaDimensionsField from '../index';
 
+// Type assertion for getValue since it's defined as a function in this field
+const getValue = mediaDimensionsField.getValue as
+	| ( ( args: { item: Updatable< Attachment > } ) => string )
+	| undefined;
+
 describe( 'mediaDimensionsField', () => {
 	it( 'has correct field configuration', () => {
 		expect( mediaDimensionsField ).toMatchObject( {
@@ -26,7 +31,7 @@ describe( 'mediaDimensionsField', () => {
 				media_details: { width: 1920, height: 1080, sizes: {} },
 			} as Updatable< Attachment >;
 
-			const result = mediaDimensionsField.getValue?.( {
+			const result = getValue?.( {
 				item,
 			} );
 
@@ -60,7 +65,7 @@ describe( 'mediaDimensionsField', () => {
 				'when both width and height are 0',
 			],
 		] )( 'returns empty string %s', ( item, description ) => {
-			const result = mediaDimensionsField.getValue?.( {
+			const result = getValue?.( {
 				item: item as Updatable< Attachment >,
 			} );
 
