@@ -2,19 +2,19 @@
  * WordPress dependencies
  */
 import { dispatch, select, subscribe } from '@wordpress/data';
-import { AwarenessState, type Y } from '@wordpress/sync';
+import type { Y } from '@wordpress/sync';
 // @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
 import {
 	AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS,
 	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
 } from './config';
 import { STORE_NAME as coreStore } from '../name';
-import { generateUserInfo, areUserInfosEqual } from './utils';
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,
@@ -23,10 +23,10 @@ import {
 import type { WPBlockSelection } from '../types';
 import type { EditorState, PostEditorState } from './types';
 
-export class PostEditorAwareness extends AwarenessState< PostEditorState > {
+export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	protected equalityFieldChecks = {
+		...baseEqualityFieldChecks,
 		editorState: this.areEditorStatesEqual,
-		userInfo: areUserInfosEqual,
 	};
 
 	public constructor(
@@ -41,27 +41,7 @@ export class PostEditorAwareness extends AwarenessState< PostEditorState > {
 	public setUp(): void {
 		super.setUp();
 
-		this.setCurrentUserInfo();
 		this.subscribeToUserSelectionChanges();
-	}
-
-	/**
-	 * Set the current user info in the local state.
-	 */
-	private setCurrentUserInfo(): void {
-		const states = this.getStates();
-		const otherUserColors = Array.from( states.entries() )
-			.filter(
-				( [ clientId, state ] ) =>
-					state.userInfo && clientId !== this.clientID
-			)
-			.map( ( [ , state ] ) => state.userInfo.color )
-			.filter( Boolean );
-
-		// Get current user info and set it in local state.
-		const currentUser = select( coreStore ).getCurrentUser();
-		const userInfo = generateUserInfo( currentUser, otherUserColors );
-		this.setLocalStateField( 'userInfo', userInfo );
 	}
 
 	/**

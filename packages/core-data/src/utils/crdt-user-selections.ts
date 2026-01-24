@@ -189,12 +189,16 @@ function getCursorPosition(
 	blocks: YBlocks
 ): CursorPosition | null {
 	const block = findBlockByClientId( selection.clientId, blocks );
-	if ( ! block ) {
+	if (
+		! block ||
+		! selection.attributeKey ||
+		undefined === selection.offset
+	) {
 		return null;
 	}
 
-	const attributes = block.get( 'attributes' ) as Y.Map< Y.Text >;
-	const currentYText = attributes.get( selection.attributeKey ) as Y.Text;
+	const attributes = block.get( 'attributes' );
+	const currentYText = attributes?.get( selection.attributeKey ) as Y.Text;
 
 	const relativePosition = Y.createRelativePositionFromTypeIndex(
 		currentYText,

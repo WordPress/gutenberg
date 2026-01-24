@@ -1,0 +1,98 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/tabs-menu-item",
+	"title": "Tab Menu Item",
+	"description": "A single tab button in the tabs menu. Used as a template for styling all tab buttons.",
+	"version": "1.0.0",
+	"category": "design",
+	"textdomain": "default",
+	"parent": [
+		"core/tabs-menu"
+	],
+	"usesContext": [
+		"core/tabs-menu-item-index",
+		"core/tabs-menu-item-id",
+		"core/tabs-menu-item-label",
+		"core/tabs-menu-item-clientId",
+		"core/tabs-list",
+		"core/tabs-activeTabIndex",
+		"core/tabs-editorActiveTabIndex"
+	],
+	"attributes": {
+		"activeBackgroundColor": {
+			"type": "string"
+		},
+		"customActiveBackgroundColor": {
+			"type": "string"
+		},
+		"activeTextColor": {
+			"type": "string"
+		},
+		"customActiveTextColor": {
+			"type": "string"
+		},
+		"hoverBackgroundColor": {
+			"type": "string"
+		},
+		"customHoverBackgroundColor": {
+			"type": "string"
+		},
+		"hoverTextColor": {
+			"type": "string"
+		},
+		"customHoverTextColor": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"html": false,
+		"reusable": false,
+		"lock": false,
+		"color": {
+			"background": true,
+			"text": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"shadow": true,
+		"typography": {
+			"fontSize": true,
+			"__experimentalFontFamily": true,
+			"textAlign": true,
+			"__experimentalDefaultControls": {
+				"fontSize": true
+			}
+		},
+		"layout": {
+			"default": {
+				"type": "flex",
+				"orientation": "vertical",
+				"flexWrap": "nowrap"
+			},
+			"allowVerticalAlignment": true,
+			"allowJustification": true,
+			"allowSwitching": false,
+			"allowOrientation": false,
+			"allowWrap": false
+		},
+		"spacing": {
+			"padding": true,
+			"__experimentalDefaultControls": {
+				"padding": true
+			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		}
+	},
+	"editorScript": "file:./index.js",
+	"editorStyle": "file:./editor.css",
+	"style": "file:./style-index.css"
+}
