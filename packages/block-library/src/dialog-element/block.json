@@ -49,7 +49,11 @@
 		},
 		"dialogSize": {
 			"type": "string",
-			"enum": [ "small", "medium", "large" ],
+			"enum": [
+				"small",
+				"medium",
+				"large"
+			],
 			"default": "small"
 		},
 		"dialogPosition": {
@@ -103,13 +107,18 @@
 		},
 		"interactivity": true
 	},
-	"usesContext": [ "core/dialog-id" ],
+	"usesContext": [
+		"core/dialog-id"
+	],
 	"providesContext": {
 		"core/dialog-label": "dialogLabel"
 	},
-	"parent": [ "core/dialog" ],
+	"parent": [
+		"core/dialog"
+	],
 	"textdomain": "dialog-element",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css"
+	"style": "file:./style-index.css",
+	"viewScriptModule": "@wordpress/block-library/dialog-element/view"
 }
