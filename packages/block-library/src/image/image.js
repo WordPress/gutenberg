@@ -64,6 +64,11 @@ import {
 } from './constants';
 import { evalAspectRatio, mediaPosition } from './utils';
 
+/**
+ * Internal dependencies - Crop to Content
+ */
+import { useCropToContentAnalysis } from './image-editor/use-crop-to-content-analysis';
+
 const { DimensionsTool, ResolutionTool } = unlock( blockEditorPrivateApis );
 
 const scaleOptions = [
@@ -404,6 +409,14 @@ export default function Image( {
 				imageElement?.naturalHeight || loadedNaturalHeight || undefined,
 		};
 	}, [ loadedNaturalWidth, loadedNaturalHeight, imageElement?.complete ] );
+
+	// Use shared hook for crop-to-content analysis
+	const { cropToContentBounds } = useCropToContentAnalysis(
+		isSingleSelected ? url : null,
+		naturalWidth,
+		naturalHeight,
+		context
+	);
 
 	function onImageError() {
 		setHasImageErrored( true );
@@ -1030,6 +1043,7 @@ export default function Image( {
 						setIsEditingImage( false );
 					} }
 					borderProps={ isRounded ? undefined : borderProps }
+					cropToContentBounds={ cropToContentBounds }
 				/>
 			</ImageWrapper>
 		);

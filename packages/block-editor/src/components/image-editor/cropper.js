@@ -23,7 +23,8 @@ export default function ImageCropper( {
 	naturalWidth,
 	borderProps,
 } ) {
-	const { isInProgress, editedUrl, rotation } = useImageEditingContext();
+	const { isInProgress, editedUrl, rotation, cropToContentApplied } =
+		useImageEditingContext();
 	const [ contentResizeListener, { width: clientWidth } ] =
 		useResizeObserver();
 
@@ -40,6 +41,7 @@ export default function ImageCropper( {
 				borderProps?.className,
 				{
 					'is-applying': isInProgress,
+					'has-crop-to-content': cropToContentApplied,
 				}
 			) }
 			style={ {
@@ -48,6 +50,14 @@ export default function ImageCropper( {
 				height: editedHeight,
 			} }
 		>
+			<style>
+				{ `
+					/* Blue outline on the crop area (the part being kept) */
+					.has-crop-to-content .image-cropper__crop-area {
+						box-shadow: inset 0 0 0 3px #007cba !important;
+					}
+				` }
+			</style>
 			<ImageCropperComponent src={ editedUrl || url } />
 			{ isInProgress && <Spinner /> }
 		</div>
