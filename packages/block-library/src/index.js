@@ -63,6 +63,9 @@ import * as commentsPaginationNumbers from './comments-pagination-numbers';
 import * as commentsTitle from './comments-title';
 import * as cover from './cover';
 import * as details from './details';
+import * as dialog from './dialog';
+import * as dialogElement from './dialog-element';
+import * as dialogTrigger from './dialog-trigger';
 import * as embed from './embed';
 import * as file from './file';
 import * as form from './form';
@@ -279,21 +282,24 @@ const getAllBlocks = () => {
 		breadcrumbs,
 	];
 
-	if ( window?.__experimentalEnableFormBlocks ) {
-		blocks.push( form );
-		blocks.push( formInput );
-		blocks.push( formSubmitButton );
-		blocks.push( formSubmissionNotification );
+	if (window?.__experimentalEnableFormBlocks) {
+		blocks.push(form);
+		blocks.push(formInput);
+		blocks.push(formSubmitButton);
+		blocks.push(formSubmissionNotification);
 	}
 
-	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( tab );
-		blocks.push( tabs );
-		blocks.push( tabsMenu );
-		blocks.push( tabsMenuItem );
-		blocks.push( tabPanel );
-		blocks.push( playlist );
-		blocks.push( playlistTrack );
+	if (window?.__experimentalEnableBlockExperiments) {
+		blocks.push(dialog);
+		blocks.push(dialogElement);
+		blocks.push(dialogTrigger);
+		blocks.push(tab);
+		blocks.push(tabs);
+		blocks.push(tabsMenu);
+		blocks.push(tabsMenuItem);
+		blocks.push(tabPanel);
+		blocks.push(playlist);
+		blocks.push(playlistTrack);
 	}
 
 	// When in a WordPress context, conditionally
@@ -304,16 +310,16 @@ const getAllBlocks = () => {
 	//   - a query argument specifies that TinyMCE should be loaded
 	if (
 		window?.wp?.oldEditor &&
-		( window?.wp?.needsClassicBlock ||
-			! window?.__experimentalDisableTinymce ||
-			!! new URLSearchParams( window?.location?.search ).get(
+		(window?.wp?.needsClassicBlock ||
+			!window?.__experimentalDisableTinymce ||
+			!!new URLSearchParams(window?.location?.search).get(
 				'requiresTinymce'
-			) )
+			))
 	) {
-		blocks.push( classic );
+		blocks.push(classic);
 	}
 
-	return blocks.filter( Boolean );
+	return blocks.filter(Boolean);
 };
 
 /**
@@ -328,7 +334,7 @@ const getAllBlocks = () => {
  */
 export const __experimentalGetCoreBlocks = () =>
 	getAllBlocks().filter(
-		( { metadata } ) => ! isBlockMetadataExperimental( metadata )
+		({ metadata }) => !isBlockMetadataExperimental(metadata)
 	);
 
 /**
@@ -343,77 +349,73 @@ export const __experimentalGetCoreBlocks = () =>
  * registerCoreBlocks();
  * ```
  */
-export const registerCoreBlocks = (
-	blocks = __experimentalGetCoreBlocks()
-) => {
-	blocks.forEach( ( { init } ) => init() );
+export const registerCoreBlocks = (blocks = __experimentalGetCoreBlocks()) => {
+	blocks.forEach(({ init }) => init());
 
 	// Auto-register PHP-only blocks with ServerSideRender
-	if ( window.__unstableAutoRegisterBlocks ) {
-		window.__unstableAutoRegisterBlocks.forEach( ( blockName ) => {
+	if (window.__unstableAutoRegisterBlocks) {
+		window.__unstableAutoRegisterBlocks.forEach((blockName) => {
 			const bootstrappedBlockType = unlock(
-				select( blocksStore )
-			).getBootstrappedBlockType( blockName );
+				select(blocksStore)
+			).getBootstrappedBlockType(blockName);
 
-			registerBlockType( blockName, {
+			registerBlockType(blockName, {
 				// Use all metadata from PHP registration,
 				// but fall back title to block name if not provided,
 				// ensure minimum apiVersion 3 for block wrapper support,
 				// and override with a ServerSideRender-based edit function.
 				...bootstrappedBlockType,
 				title: bootstrappedBlockType?.title || blockName,
-				...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
+				...((bootstrappedBlockType?.apiVersion ?? 0) < 3 && {
 					apiVersion: 3,
-				} ),
+				}),
 				// Inspector controls are rendered by the auto-register hook in block-editor
-				edit: function Edit( { attributes } ) {
+				edit: function Edit({ attributes }) {
 					const disabledRef = useDisabled();
-					const blockProps = useBlockProps( { ref: disabledRef } );
-					const { content, status, error } = useServerSideRender( {
+					const blockProps = useBlockProps({ ref: disabledRef });
+					const { content, status, error } = useServerSideRender({
 						block: blockName,
 						attributes,
-					} );
+					});
 
-					if ( status === 'loading' ) {
-						return (
-							<div { ...blockProps }>{ __( 'Loading…' ) }</div>
-						);
+					if (status === 'loading') {
+						return <div {...blockProps}>{__('Loading…')}</div>;
 					}
 
-					if ( status === 'error' ) {
+					if (status === 'error') {
 						return (
-							<div { ...blockProps }>
-								{ sprintf(
+							<div {...blockProps}>
+								{sprintf(
 									/* translators: %s: error message describing the problem */
-									__( 'Error loading block: %s' ),
+									__('Error loading block: %s'),
 									error
-								) }
+								)}
 							</div>
 						);
 					}
 
 					return (
 						<HtmlRenderer
-							wrapperProps={ blockProps }
-							html={ content }
+							wrapperProps={blockProps}
+							html={content}
 						/>
 					);
 				},
 				save: () => null,
-			} );
-		} );
+			});
+		});
 	}
 
-	setDefaultBlockName( paragraph.name );
+	setDefaultBlockName(paragraph.name);
 	if (
 		window.wp &&
 		window.wp.oldEditor &&
-		blocks.some( ( { name } ) => name === classic.name )
+		blocks.some(({ name }) => name === classic.name)
 	) {
-		setFreeformContentHandlerName( classic.name );
+		setFreeformContentHandlerName(classic.name);
 	}
-	setUnregisteredTypeHandlerName( missing.name );
-	setGroupingBlockName( group.name );
+	setUnregisteredTypeHandlerName(missing.name);
+	setGroupingBlockName(group.name);
 };
 
 /**
@@ -429,18 +431,18 @@ export const registerCoreBlocks = (
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	globalThis.IS_GUTENBERG_PLUGIN
-		? ( { enableFSEBlocks } = {} ) => {
-				const enabledExperiments = [ enableFSEBlocks ? 'fse' : null ];
+		? ({ enableFSEBlocks } = {}) => {
+				const enabledExperiments = [enableFSEBlocks ? 'fse' : null];
 				getAllBlocks()
-					.filter( ( { metadata } ) =>
-						isBlockMetadataExperimental( metadata )
+					.filter(({ metadata }) =>
+						isBlockMetadataExperimental(metadata)
 					)
 					.filter(
-						( { metadata: { __experimental } } ) =>
+						({ metadata: { __experimental } }) =>
 							__experimental === true ||
-							enabledExperiments.includes( __experimental )
+							enabledExperiments.includes(__experimental)
 					)
-					.forEach( ( { init } ) => init() );
+					.forEach(({ init }) => init());
 		  }
 		: undefined;
 

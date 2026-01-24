@@ -305,6 +305,38 @@ Hide and show additional content. ([Source](https://github.com/WordPress/gutenbe
 -	**Supports:** align (full, wide), allowedBlocks, anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** name, placeholder, showContent, summary
 
+## Dialog
+
+Render content in a <dialog/> element modal. Includes a trigger to open the dialog, and dialog element to render content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog))
+
+-	**Name:** core/dialog
+-	**Experimental:** true
+-	**Category:** media
+-	**Allowed Blocks:** core/dialog-trigger, core/dialog-element
+-	**Supports:** align (center, full, left, right, wide), interactivity, typography (fontSize), ~~anchor~~, ~~html~~
+-	**Attributes:** dialogId
+
+## Dialog Element
+
+undefined ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-element))
+
+-	**Name:** core/dialog-element
+-	**Experimental:** true
+-	**Category:** media
+-	**Parent:** core/dialog
+-	**Supports:** animations, color (background, enableContrastChecker, link, text), interactivity, layout (allowEditing), shadow, spacing (blockGap, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~
+-	**Attributes:** animation, animationDuration, autoActivateOnRender, autoActivationTimer, backdropColor, customBackdropColor, dialogLabel, dialogPosition, dialogSize, enableDeepLink
+
+## Dialog Trigger
+
+The content inside this block will act as the clickable 'trigger' to display the dialog element. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-trigger))
+
+-	**Name:** core/dialog-trigger
+-	**Experimental:** true
+-	**Category:** media
+-	**Parent:** core/dialog
+-	**Supports:** interactivity, spacing (margin, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~
+
 ## Embed
 
 Add a block that displays content pulled from other sites, like Twitter or YouTube. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/embed))

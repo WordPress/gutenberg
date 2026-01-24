@@ -6,7 +6,9 @@
 	"title": "Dialog",
 	"description": "Render content in a <dialog/> element modal. Includes a trigger to open the dialog, and dialog element to render content.",
 	"category": "media",
-	"keywords": ["dialog", "modal", "popup"],
+	"keywords": [ "dialog", "modal", "popup" ],
+	"__experimental": true,
+	"allowedBlocks": [ "core/dialog-trigger", "core/dialog-element" ],
 	"attributes": {
 		"dialogId": {
 			"type": "string",
@@ -16,7 +18,7 @@
 	"supports": {
 		"anchor": false,
 		"html": false,
-		"align": ["full", "wide", "left", "right", "center"],
+		"align": [ "full", "wide", "left", "right", "center" ],
 		"typography": {
 			"fontSize": true,
 			"__experimentalFontFamily": true,
@@ -28,9 +30,8 @@
 		"interactivity": true
 	},
 	"providesContext": {
-		"dialog/id": "dialogId"
+		"core/dialog-id": "dialogId"
 	},
 	"textdomain": "dialog",
-	"render": "file:./render.php",
 	"editorScript": "file:./index.js"
 }

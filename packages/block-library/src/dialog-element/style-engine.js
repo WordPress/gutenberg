@@ -4,7 +4,6 @@
 import { useStyleOverride } from '@wordpress/block-editor';
 
 const calculatePositionStyles = ( position ) => {
-	console.log('calculatePositionStyles', position);
 	switch ( position ) {
 		case 'top left':
 			return `margin-top: 1em; margin-left: 1em;`;
@@ -25,7 +24,7 @@ const calculatePositionStyles = ( position ) => {
 		default:
 			return '';
 	}
-}
+};
 
 /**
  * Injects backdrop color CSS custom properties for the dialog-element block, mirroring the pattern
@@ -36,18 +35,11 @@ const calculatePositionStyles = ( position ) => {
  * @param {Object} props
  * @param {Object} props.attributes Block attributes
  * @param {string} props.clientId   Block client ID
- * @returns {null} No UI output
+ * @return {null} No UI output
  */
 export default function ColorStyles( { attributes, clientId } ) {
-	if ( ! clientId ) {
-		return null;
-	}
-
-	const {
-		customBackdropColor,
-		animationDuration,
-		dialogPosition,
-	} = attributes || {};
+	const { customBackdropColor, animationDuration, dialogPosition } =
+		attributes || {};
 
 	// Helper to normalize color objects (preset { slug } vs direct value).
 	function getColorValue( color ) {
@@ -61,8 +53,11 @@ export default function ColorStyles( { attributes, clientId } ) {
 	}
 
 	const cssMap = {
-		'--wp--style--dialog-backdrop-color': getColorValue( customBackdropColor ),
-		'--wp--style--dialog-animation-duration': animationDuration ? `${ animationDuration }ms` : null,
+		'--wp--style--dialog-backdrop-color':
+			getColorValue( customBackdropColor ),
+		'--wp--style--dialog-animation-duration': animationDuration
+			? `${ animationDuration }ms`
+			: null,
 	};
 
 	// Build scoped CSS only for defined values to avoid unnecessary empty declarations.
@@ -73,11 +68,12 @@ export default function ColorStyles( { attributes, clientId } ) {
 
 	declarations += calculatePositionStyles( dialogPosition );
 
-	if ( declarations.length ) {
-		useStyleOverride( {
-			css: `#block-${ clientId } {\n${ declarations }\n}`,
-		} );
-	}
+	useStyleOverride( {
+		css:
+			declarations.length && clientId
+				? `#block-${ clientId } {\n${ declarations }\n}`
+				: '',
+	} );
 
 	return null;
 }

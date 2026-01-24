@@ -1,34 +1,23 @@
 /**
- * External Dependencies
+ * Internal dependencies
  */
-
-/**
- * WordPress Dependencies
- */
-import { __ } from '@wordpress/i18n';
-import { registerBlockType } from '@wordpress/blocks';
-
-/**
- * Internal Dependencies
- */
-
-import icon from './icon';
+import initBlock from '../utils/init-block';
 import edit from './edit';
 import save from './save';
-import './style.scss';
-import './editor.scss';
 import registerDialogElementLabelBinding from './block-bindings';
 
 import metadata from './block.json';
 
 const { name } = metadata;
 
-const settings = {
-	icon,
+export { metadata, name };
+
+export const settings = {
 	edit,
 	save,
 };
 
-registerBlockType(name, { ...metadata, ...settings });
-
-registerDialogElementLabelBinding();
+export const init = () => {
+	registerDialogElementLabelBinding();
+	return initBlock( { name, metadata, settings } );
+};

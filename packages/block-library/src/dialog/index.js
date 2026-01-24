@@ -1,28 +1,18 @@
 /**
- * External Dependencies
+ * Internal dependencies
  */
-
-/**
- * WordPress Dependencies
- */
-import { registerBlockType } from '@wordpress/blocks';
-
-/**
- * Internal Dependencies
- */
+import initBlock from '../utils/init-block';
 import edit from './edit';
 import save from './save';
-import icon from './icon';
-import deprecated from './deprecated';
 import metadata from './block.json';
 
 const { name } = metadata;
 
-const settings = {
-	icon,
+export { metadata, name };
+
+export const settings = {
 	edit,
 	save,
-	deprecated,
 };
 
-registerBlockType(name, { ...metadata, ...settings });
+export const init = () => initBlock( { name, metadata, settings } );

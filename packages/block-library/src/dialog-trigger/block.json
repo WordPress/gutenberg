@@ -6,13 +6,14 @@
 	"title": "Dialog Trigger",
 	"description": "The content inside this block will act as the clickable 'trigger' to display the dialog element.",
 	"category": "media",
+	"__experimental": true,
 	"attributes": {},
 	"supports": {
 		"html": false,
 		"align": false,
 		"inserter": false,
 		"spacing": {
-			"margin": ["top", "bottom"],
+			"margin": [ "top", "bottom" ],
 			"padding": true,
 			"__experimentalDefaultControls": {
 				"padding": true
@@ -28,8 +29,8 @@
 		},
 		"interactivity": true
 	},
-	"usesContext": ["dialog/id", "dialog/className"],
-	"parent": ["prc-block/dialog"],
+	"usesContext": [ "core/dialog-id" ],
+	"parent": [ "core/dialog" ],
 	"textdomain": "dialog-trigger",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
