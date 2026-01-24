@@ -142,6 +142,7 @@ class Media_Processing_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_default_image_output_formats_returns_empty_by_default() {
 		$output_formats = gutenberg_get_default_image_output_formats();
+		$this->assertIsArray( $output_formats );
 		$this->assertEmpty( $output_formats );
 	}
 

@@ -19,10 +19,10 @@ function useMediaUploadSettings( settings = {} ) {
 			allowedMimeTypes: settings.allowedMimeTypes,
 			allImageSizes: settings.allImageSizes,
 			bigImageSizeThreshold: settings.bigImageSizeThreshold,
-			imageOutputFormats: settings.imageOutputFormats,
-			jpegInterlaced: settings.jpegInterlaced,
-			pngInterlaced: settings.pngInterlaced,
-			gifInterlaced: settings.gifInterlaced,
+			imageOutputFormats: settings.imageOutputFormats || {},
+			jpegInterlaced: settings.jpegInterlaced ?? false,
+			pngInterlaced: settings.pngInterlaced ?? false,
+			gifInterlaced: settings.gifInterlaced ?? false,
 		} ),
 		[ settings ]
 	);
