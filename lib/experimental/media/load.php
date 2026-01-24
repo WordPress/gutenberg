@@ -422,7 +422,6 @@ add_action( 'wp_enqueue_media', 'gutenberg_override_media_templates' );
  * to avoid an extra API request when these fields are needed.
  *
  * @param array                   $paths   REST API paths to preload.
- * @param WP_Block_Editor_Context $context Current block editor context.
  * @return array Filtered preload paths.
  */
 function gutenberg_media_processing_preload_paths( $paths, $context ) {
