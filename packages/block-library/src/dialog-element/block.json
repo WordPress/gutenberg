@@ -49,11 +49,7 @@
 		},
 		"dialogSize": {
 			"type": "string",
-			"enum": [
-				"small",
-				"medium",
-				"large"
-			],
+			"enum": [ "small", "medium", "large" ],
 			"default": "small"
 		},
 		"dialogPosition": {
@@ -107,15 +103,11 @@
 		},
 		"interactivity": true
 	},
-	"usesContext": [
-		"core/dialog-id"
-	],
+	"usesContext": [ "core/dialog-id", "core/dialog-isDialogOpen" ],
 	"providesContext": {
 		"core/dialog-label": "dialogLabel"
 	},
-	"parent": [
-		"core/dialog"
-	],
+	"parent": [ "core/dialog" ],
 	"textdomain": "dialog-element",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",

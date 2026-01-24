@@ -313,8 +313,8 @@ Render content in a <dialog/> element modal. Includes a trigger to open the dial
 -	**Experimental:** true
 -	**Category:** media
 -	**Allowed Blocks:** core/dialog-trigger, core/dialog-element
--	**Supports:** align (center, full, left, right, wide), interactivity, ~~anchor~~, ~~html~~
--	**Attributes:** dialogId
+-	**Supports:** align (center, full, left, right, wide), anchor, interactivity, ~~html~~
+-	**Attributes:** editorIsDialogOpen
 
 ## Dialog Element
 

@@ -29,7 +29,7 @@
 		},
 		"interactivity": true
 	},
-	"usesContext": [ "core/dialog-id" ],
+	"usesContext": [ "core/dialog-id", "core/dialog-isDialogOpen" ],
 	"parent": [ "core/dialog" ],
 	"textdomain": "dialog-trigger",
 	"editorScript": "file:./index.js",

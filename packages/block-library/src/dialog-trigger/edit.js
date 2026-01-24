@@ -12,40 +12,33 @@ import {
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import { STORE_NAME } from '../dialog/store';
-
 export default function Edit( { context, clientId } ) {
 	const dialogId = context[ 'core/dialog-id' ] ?? '';
+	const isDialogOpen = context[ 'core/dialog-isDialogOpen' ] ?? false;
 
-	// Get the dialog-element block from the parent dialog block
-	const { dialogElementClientId, isDialogOpen } = useSelect(
+	// Get the parent dialog block's clientId
+	const { dialogClientId } = useSelect(
 		( select ) => {
-			const { getBlock, getBlockRootClientId } =
-				select( blockEditorStore );
-			const parentClientId = getBlockRootClientId( clientId );
-			const parentBlock = getBlock( parentClientId );
-
-			// Find the dialog-element block in the parent's inner blocks
-			const dialogElementBlock = parentBlock?.innerBlocks?.find(
-				( innerBlock ) => innerBlock.name === 'core/dialog-element'
-			);
-			const dialogElementId = dialogElementBlock?.clientId;
-
 			return {
-				dialogElementClientId: dialogElementId,
-				isDialogOpen: dialogElementId
-					? select( STORE_NAME ).isOpen( dialogElementId )
-					: false,
+				dialogClientId:
+					select( blockEditorStore ).getBlockRootClientId( clientId ),
 			};
 		},
-		[ clientId, context ]
+		[ clientId ]
 	);
 
-	// Get store actions
-	const { open, close } = useDispatch( STORE_NAME );
+	// Get block editor dispatch for non-persistent updates
+	const { updateBlockAttributes, __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
+	const toggleDialog = () => {
+		if ( dialogClientId ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			updateBlockAttributes( dialogClientId, {
+				editorIsDialogOpen: ! isDialogOpen,
+			} );
+		}
+	};
 
 	const blockProps = useBlockProps( {
 		'aria-haspopup': 'dialog',
@@ -70,16 +63,7 @@ export default function Edit( { context, clientId } ) {
 					<ToolbarButton
 						label={ buttonLabel }
 						aria-controls={ dialogId }
-						onClick={ () => {
-							if ( ! dialogElementClientId ) {
-								return;
-							}
-							if ( isDialogOpen ) {
-								close( dialogElementClientId );
-							} else {
-								open( dialogElementClientId );
-							}
-						} }
+						onClick={ toggleDialog }
 					>
 						{ buttonLabel }
 					</ToolbarButton>

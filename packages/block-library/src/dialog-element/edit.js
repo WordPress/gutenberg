@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { Icon, cancelCircleFilled } from '@wordpress/icons';
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -22,7 +22,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { Toolbar, InspectorPanel } from './controls';
 import StyleEngine from './style-engine';
-import { STORE_NAME } from '../dialog/store';
 
 function Edit( {
 	attributes,
@@ -33,17 +32,30 @@ function Edit( {
 	backdropColor,
 	setBackdropColor,
 } ) {
-	const { dialogSize = 'medium', animation = 'fade' } = attributes;
-	const { selectBlock } = useDispatch( blockEditorStore );
-	const { init, destroy, open, close } = useDispatch( STORE_NAME );
+	const {
+		dialogSize = 'medium',
+		animation = 'fade',
+		animationDuration = 500,
+	} = attributes;
+	const {
+		selectBlock,
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
 
-	const { rootClientId, isOpen, isClosingModal } = useSelect(
+	// Get isOpen from context
+	const isOpen = context[ 'core/dialog-isDialogOpen' ] ?? false;
+
+	// Local state for closing animation
+	const [ isClosingModal, setIsClosingModal ] = useState( false );
+
+	const { rootClientId, dialogClientId } = useSelect(
 		( select ) => {
 			return {
 				rootClientId:
 					select( blockEditorStore ).getBlockRootClientId( clientId ),
-				isOpen: select( STORE_NAME ).isOpen( clientId ),
-				isClosingModal: select( STORE_NAME ).isClosingModal( clientId ),
+				dialogClientId:
+					select( blockEditorStore ).getBlockRootClientId( clientId ),
 			};
 		},
 		[ clientId ]
@@ -53,34 +65,63 @@ function Edit( {
 	 * Setup state and ref for the dialog.
 	 */
 	const dialogElementRef = useRef( null );
+	const closeTimeoutRef = useRef( null );
 
-	// Initialize dialog in store and cleanup on unmount
-	useEffect( () => {
-		init( clientId );
-
-		return () => {
-			destroy( clientId );
-		};
-	}, [ clientId, init, destroy ] );
-
-	// Sync DOM state with store state
+	// Sync DOM state with context state
 	useEffect( () => {
 		if ( dialogElementRef.current ) {
 			if ( isOpen && ! dialogElementRef.current.open ) {
 				dialogElementRef.current.showModal();
+				// Reset closing state when opening and clear any pending close timeout
+				setIsClosingModal( false );
+				if ( closeTimeoutRef.current ) {
+					clearTimeout( closeTimeoutRef.current );
+					closeTimeoutRef.current = null;
+				}
 			} else if ( ! isOpen && dialogElementRef.current.open ) {
 				dialogElementRef.current.close();
 			}
 		}
 	}, [ isOpen ] );
 
+	// Cleanup timeout on unmount
+	useEffect( () => {
+		return () => {
+			if ( closeTimeoutRef.current ) {
+				clearTimeout( closeTimeoutRef.current );
+			}
+		};
+	}, [] );
+
 	/**
 	 * Helper functions:
 	 */
-	const openDialog = () => open( clientId );
+	const openDialog = () => {
+		if ( dialogClientId ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			updateBlockAttributes( dialogClientId, {
+				editorIsDialogOpen: true,
+			} );
+		}
+	};
 	const closeDialog = () => {
-		close( clientId );
-		selectBlock( rootClientId );
+		// Clear any existing timeout before setting a new one
+		if ( closeTimeoutRef.current ) {
+			clearTimeout( closeTimeoutRef.current );
+		}
+		setIsClosingModal( true );
+		// After animation, actually close
+		closeTimeoutRef.current = setTimeout( () => {
+			if ( dialogClientId ) {
+				__unstableMarkNextChangeAsNotPersistent();
+				updateBlockAttributes( dialogClientId, {
+					editorIsDialogOpen: false,
+				} );
+			}
+			setIsClosingModal( false );
+			selectBlock( rootClientId );
+			closeTimeoutRef.current = null;
+		}, animationDuration );
 	};
 	const onEscHandler = ( e ) => {
 		e.preventDefault();

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useMemo, useEffect } from '@wordpress/element';
+import { useRef, useMemo } from '@wordpress/element';
 import {
 	BlockControls,
 	useBlockProps,
@@ -18,11 +18,6 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { STORE_NAME } from './store';
 const TEMPLATE = [
 	[
 		'core/dialog-trigger',
@@ -71,8 +66,10 @@ const TEMPLATE = [
 ];
 
 export default function Edit( { attributes, setAttributes, clientId } ) {
+	const { editorIsDialogOpen = false } = attributes;
+
 	// Get the dialog-element block from inner blocks.
-	const { dialogElementClientId, isDialogOpen } = useSelect(
+	const { dialogElementClientId } = useSelect(
 		( select ) => {
 			const { getBlock } = select( blockEditorStore );
 			const block = getBlock( clientId );
@@ -83,9 +80,6 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 
 			return {
 				dialogElementClientId: dialogElementId,
-				isDialogOpen: dialogElementId
-					? select( STORE_NAME ).isOpen( dialogElementId )
-					: false,
 			};
 		},
 		[ clientId ]
@@ -95,8 +89,9 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 		return `block-${ dialogElementClientId }`;
 	}, [ dialogElementClientId ] );
 
-	// Get store actions
-	const { open, close } = useDispatch( STORE_NAME );
+	// Get block editor dispatch for non-persistent updates
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
 
 	// Set up a ref for the block container
 	const ref = useRef( null );
@@ -115,9 +110,17 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	);
 
 	const buttonLabel = useMemo(
-		() => ( isDialogOpen ? __( 'Close Dialog' ) : __( 'Edit Dialog' ) ),
-		[ isDialogOpen ]
+		() =>
+			editorIsDialogOpen ? __( 'Close Dialog' ) : __( 'Edit Dialog' ),
+		[ editorIsDialogOpen ]
 	);
+
+	const toggleDialog = () => {
+		__unstableMarkNextChangeAsNotPersistent();
+		setAttributes( {
+			editorIsDialogOpen: ! editorIsDialogOpen,
+		} );
+	};
 
 	return (
 		<>
@@ -129,11 +132,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 							if ( ! dialogElementClientId ) {
 								return;
 							}
-							if ( isDialogOpen ) {
-								close( dialogElementClientId );
-							} else {
-								open( dialogElementClientId );
-							}
+							toggleDialog();
 						} }
 					>
 						{ buttonLabel }
@@ -151,19 +150,11 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
-							onClick={ () => {
-								if ( dialogElementClientId ) {
-									if ( isDialogOpen ) {
-										close( dialogElementClientId );
-									} else {
-										open( dialogElementClientId );
-									}
-								}
-							} }
+							onClick={ toggleDialog }
 							disabled={ ! dialogElementClientId }
 							accessibleWhenDisabled
 						>
-							{ isDialogOpen
+							{ editorIsDialogOpen
 								? __( 'Close Dialog' )
 								: __( 'Edit Dialog' ) }
 						</Button>
@@ -172,7 +163,10 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 			</InspectorControls>
 			<div { ...blockProps }>
 				<BlockContextProvider
-					value={ { 'core/dialog-id': dialogId || null } }
+					value={ {
+						'core/dialog-id': dialogId || null,
+						'core/dialog-isDialogOpen': editorIsDialogOpen,
+					} }
 				>
 					{ innerBlocksProps.children }
 				</BlockContextProvider>
