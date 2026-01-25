@@ -45,7 +45,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	 * wp_trim_words is used instead.
 	 *
 	 * To ensure the block's excerptLength setting works correctly for auto-generated
-	 * excerpts, we temporarily override excerpt_length to 100 (the max block setting)
+	 * excerpts, we temporarily override excerpt_length to 101 (the max block setting)
 	 * so that wp_trim_excerpt doesn't pre-trim the content before wp_trim_words can
 	 * apply the user's desired length.
 	 */
