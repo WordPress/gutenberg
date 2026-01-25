@@ -260,16 +260,8 @@ describe( 'editEntityRecord', () => {
 
 	describe( 'with SyncManager', () => {
 		let syncManager;
-		let originalIsGutenbergPlugin;
 
 		beforeEach( () => {
-			// Store original value
-			// eslint-disable-next-line @wordpress/wp-global-usage
-			originalIsGutenbergPlugin = globalThis.IS_GUTENBERG_PLUGIN;
-			// Set the flag to enable sync manager code path
-			// eslint-disable-next-line @wordpress/wp-global-usage
-			globalThis.IS_GUTENBERG_PLUGIN = true;
-
 			// Create a mock sync manager
 			syncManager = {
 				update: jest.fn(),
@@ -278,9 +270,6 @@ describe( 'editEntityRecord', () => {
 		} );
 
 		afterEach( () => {
-			// Restore original value
-			// eslint-disable-next-line @wordpress/wp-global-usage
-			globalThis.IS_GUTENBERG_PLUGIN = originalIsGutenbergPlugin;
 			getSyncManager.mockReset();
 		} );
 
