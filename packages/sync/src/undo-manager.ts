@@ -13,7 +13,15 @@ import type { HistoryRecord } from '@wordpress/undo-manager';
  */
 import { LOCAL_EDITOR_ORIGIN } from './config';
 import { YMultiDocUndoManager } from './y-utilities/y-multidoc-undomanager';
-import type { ObjectData, SyncUndoManager } from './types';
+import type { ObjectData, RecordHandlers, SyncUndoManager } from './types';
+
+interface StackItemEvent {
+	stackItem: { meta: Map< any, any > };
+	origin: any;
+	type: 'undo' | 'redo';
+	changedParentTypes: Map< Y.AbstractType< any >, Y.YEvent< any >[] >;
+	ydoc: Y.Doc;
+}
 
 /**
  * Implementation of the WordPress UndoManager interface using YMultiDocUndoManager
@@ -23,8 +31,10 @@ import type { ObjectData, SyncUndoManager } from './types';
  */
 export function createUndoManager(): SyncUndoManager {
 	const yUndoManager = new YMultiDocUndoManager( [], {
-		// Throttle undo/redo captures. (default: 500ms)
-		captureTimeout: 200,
+		// Throttle undo/redo captures after 500ms of inactivity.
+		// 500 was selected from subjective local UX testing, shorter timeouts
+		// may cause mid-word undo stack items.
+		captureTimeout: 500,
 		// Ensure that we only scope the undo/redo to the current editor.
 		// The yjs document's clientID is added once it's available.
 		trackedOrigins: new Set( [ LOCAL_EDITOR_ORIGIN ] ),
@@ -50,10 +60,32 @@ export function createUndoManager(): SyncUndoManager {
 		/**
 		 * Add a Yjs map to the scope of the undo manager.
 		 *
-		 * @param {Y.Map< any >} ymap The Yjs map to add to the scope.
+		 * @param {Y.Map< any >} ymap                     The Yjs map to add to the scope.
+		 * @param                handlers
+		 * @param                handlers.addUndoMeta
+		 * @param                handlers.restoreUndoMeta
 		 */
-		addToScope( ymap: Y.Map< any > ): void {
+		addToScope(
+			ymap: Y.Map< any >,
+			handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
+		): void {
+			if ( ymap.doc === null ) {
+				// Necessary for a type check, but this shouldn't happen.
+				return;
+			}
+
+			const ydoc = ymap.doc;
 			yUndoManager.addToScope( ymap );
+
+			const { addUndoMeta, restoreUndoMeta } = handlers;
+
+			yUndoManager.on( 'stack-item-added', ( event: StackItemEvent ) => {
+				addUndoMeta( ydoc, event.stackItem.meta );
+			} );
+
+			yUndoManager.on( 'stack-item-popped', ( event: StackItemEvent ) => {
+				restoreUndoMeta( ydoc, event.stackItem.meta );
+			} );
 		},
 
 		/**

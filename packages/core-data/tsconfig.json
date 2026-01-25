@@ -3,7 +3,8 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"checkJs": false,
-		"noImplicitAny": false
+		"noImplicitAny": false,
+		"types": [ "node" ]
 	},
 	"references": [
 		{ "path": "../api-fetch" },

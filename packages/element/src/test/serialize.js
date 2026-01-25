@@ -578,7 +578,7 @@ describe( 'renderAttributes()', () => {
 			} );
 
 			expect( result ).toBe(
-				' style="background:url(&quot;foo.png&quot;)" href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;&gt;"'
+				' style="background:url(&quot;foo.png&quot;)" href="/index.php?foo=bar&amp;qux=&lt;&quot;scary&quot;&gt;"'
 			);
 		} );
 

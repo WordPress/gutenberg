@@ -136,6 +136,18 @@ Files to copy with optional PHP transformations:
 
 Configure your root `package.json` with a `wpPlugin` object to control global namespace and externalization behavior:
 
+### `wpPlugin.name`
+
+Name used to prefix genereated PHP functions. Must follow function name rules in PHP, i.e. valid name starts with a letter or underscore, followed by any number of letters, numbers, or underscores.
+
+```json
+{
+	"wpPlugin": {
+		"name": "myPlugin"
+	}
+}
+```
+
 ### `wpPlugin.scriptGlobal`
 
 The global variable name for your packages (e.g., `"wp"`, `"myPlugin"`). Set to `false` to disable global exposure:
@@ -339,6 +351,7 @@ This configuration:
 ```json
 {
 	"wpPlugin": {
+		"name": "acme",
 		"scriptGlobal": "acme",
 		"packageNamespace": "acme"
 	}

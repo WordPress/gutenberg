@@ -21,7 +21,6 @@ import {
 } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
-import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -64,17 +63,16 @@ function ListViewBlockSelectButton(
 	const {
 		isContentOnly,
 		blockName,
-		canToggleBlockVisibility,
 		isBlockHidden,
 		hasPatternName,
 		isNavigationLink,
 	} = useSelect(
 		( select ) => {
-			const { getBlockName, getBlockAttributes } =
-				select( blockEditorStore );
-			const { areBlocksHiddenAnywhere } = unlock(
-				select( blockEditorStore )
-			);
+			const {
+				isBlockHiddenAnywhere: _isBlockHidden,
+				getBlockAttributes,
+				getBlockName,
+			} = unlock( select( blockEditorStore ) );
 			const blockAttributes = getBlockAttributes( clientId );
 
 			return {
@@ -83,21 +81,16 @@ function ListViewBlockSelectButton(
 						clientId
 					) === 'contentOnly',
 				blockName: getBlockName( clientId ),
-				canToggleBlockVisibility: hasBlockSupport(
-					getBlockName( clientId ),
-					'visibility',
-					true
-				),
-				isBlockHidden: areBlocksHiddenAnywhere( [ clientId ] ),
-				hasPatternName: !! blockAttributes?.metadata?.patternName,
+				isBlockHidden: _isBlockHidden( clientId ),
+				hasPatternName:
+					!! getBlockAttributes( clientId )?.metadata?.patternName,
 				isNavigationLink: !! blockAttributes?.type,
 			};
 		},
 		[ clientId ]
 	);
+
 	const shouldShowLockIcon = isLocked;
-	const shouldShowBlockVisibilityIcon =
-		canToggleBlockVisibility && isBlockHidden;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 	const { canRename: blockSupportsRename } = useBlockRename( blockName );
@@ -191,7 +184,7 @@ function ListViewBlockSelectButton(
 							) ) }
 						</span>
 					) : null }
-					{ shouldShowBlockVisibilityIcon && (
+					{ isBlockHidden && (
 						<span className="block-editor-list-view-block-select-button__block-visibility">
 							<Icon icon={ unseen } />
 						</span>
@@ -203,7 +196,6 @@ function ListViewBlockSelectButton(
 					) }
 				</HStack>
 			</a>
-
 			{ isRenameModalOpen && canRename && (
 				<BlockRenameModal
 					clientId={ clientId }

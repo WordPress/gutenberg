@@ -134,5 +134,6 @@ function UnforwardedResizableBox(
 }
 
 export const ResizableBox = forwardRef( UnforwardedResizableBox );
+ResizableBox.displayName = 'ResizableBox';
 
 export default ResizableBox;
