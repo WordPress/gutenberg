@@ -213,6 +213,8 @@ export default function PostExcerptEditor( {
 			}
 			onChange={ setExcerpt }
 			tagName="p"
+			allowedFormats={ [] }
+			preserveWhiteSpace
 		/>
 	) : (
 		<p className={ excerptClassName }>
