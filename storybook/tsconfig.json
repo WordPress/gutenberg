@@ -6,5 +6,16 @@
 		"rootDir": ".",
 		"noEmit": true
 	},
-	"include": [ "**/*.tsx", "**/*.ts" ]
+	"include": [ "**/*.tsx", "**/*.ts" ],
+	"references": [
+		{ "path": "../packages/components" },
+		{ "path": "../packages/block-editor" },
+		{ "path": "../packages/icons" },
+		{ "path": "../packages/dataviews" },
+		{ "path": "../packages/fields" },
+		{ "path": "../packages/image-cropper" },
+		{ "path": "../packages/media-fields" },
+		{ "path": "../packages/theme" },
+		{ "path": "../packages/ui" }
+	]
 }
