@@ -46,6 +46,7 @@ test.describe( 'Block Hiding', () => {
 		).toBeVisible();
 
 		// Verify the Options menu now shows "Show" instead of "Hide".
+		await editor.clickBlockToolbarButton( 'Options' );
 		await expect(
 			page
 				.getByRole( 'menu', { name: 'Options' } )
