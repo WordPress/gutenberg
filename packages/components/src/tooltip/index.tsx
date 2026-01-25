@@ -158,5 +158,6 @@ function UnforwardedTooltip(
 	);
 }
 export const Tooltip = forwardRef( UnforwardedTooltip );
+Tooltip.displayName = 'Tooltip';
 
 export default Tooltip;

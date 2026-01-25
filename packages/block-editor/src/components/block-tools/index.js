@@ -36,7 +36,6 @@ import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
 import { BlockRenameModal } from '../block-rename';
 import { BlockVisibilityModal } from '../block-visibility';
-import { cleanEmptyObject } from '../../hooks/utils';
 
 function selector( select ) {
 	const {
@@ -107,7 +106,6 @@ export default function BlockTools( {
 		moveBlocksDown,
 		expandBlock,
 		stopEditingContentOnlySection,
-		updateBlockAttributes,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	function onKeyDown( event ) {
@@ -253,33 +251,8 @@ export default function BlockTools( {
 					return;
 				}
 
-				if ( window.__experimentalHideBlocksBasedOnScreenSize ) {
-					// Open the visibility breakpoints modal.
-					setVisibilityModalClientIds( clientIds );
-				} else {
-					const hasHiddenBlock = blocks.some(
-						( block ) =>
-							block.attributes.metadata?.blockVisibility === false
-					);
-					const attributesByClientId = Object.fromEntries(
-						blocks.map(
-							( { clientId: mapClientId, attributes } ) => [
-								mapClientId,
-								{
-									metadata: cleanEmptyObject( {
-										...attributes?.metadata,
-										blockVisibility: hasHiddenBlock
-											? undefined
-											: false,
-									} ),
-								},
-							]
-						)
-					);
-					updateBlockAttributes( clientIds, attributesByClientId, {
-						uniqueByBlock: true,
-					} );
-				}
+				// Open the visibility breakpoints modal.
+				setVisibilityModalClientIds( clientIds );
 			}
 		}
 

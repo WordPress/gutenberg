@@ -27,6 +27,7 @@ import fontSize from './font-size';
 import textAlign from './text-align';
 import fitText from './fit-text';
 import border from './border';
+import customCSS from './custom-css';
 import position from './position';
 import blockStyleVariation from './block-style-variation';
 import layout from './layout';
@@ -47,6 +48,7 @@ createBlockEditFilter(
 		anchor,
 		customClassName,
 		style,
+		customCSS,
 		duotone,
 		fitText,
 		position,
@@ -73,6 +75,7 @@ createBlockListBlockFilter( [
 	fontSize,
 	fitText,
 	border,
+	customCSS,
 	position,
 	blockStyleVariation,
 	childLayout,
@@ -84,6 +87,7 @@ createBlockSaveFilter( [
 	ariaLabel,
 	customClassName,
 	border,
+	customCSS,
 	fitText,
 	color,
 	style,

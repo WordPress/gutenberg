@@ -106,6 +106,7 @@ const ValidationComponent = ( {
 		password: string;
 		toggle?: boolean;
 		toggleGroup?: string;
+		combobox?: string;
 		date?: string;
 		dateRange?: string;
 		datetime?: string;
@@ -129,6 +130,7 @@ const ValidationComponent = ( {
 		password: 'secretpassword123',
 		toggle: undefined,
 		toggleGroup: undefined,
+		combobox: undefined,
 		date: undefined,
 		dateRange: undefined,
 		datetime: undefined,
@@ -235,6 +237,25 @@ const ValidationComponent = ( {
 										{
 											value: 'option3',
 											label: 'Option 3',
+										},
+									] ),
+								3500
+							)
+						);
+						break;
+
+					case 'combobox':
+						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
+							setTimeout(
+								() =>
+									resolve( [
+										{ value: 'apple', label: 'Apple' },
+										{ value: 'banana', label: 'Banana' },
+										{ value: 'cherry', label: 'Cherry' },
+										{ value: 'date', label: 'Date' },
+										{
+											value: 'elderberry',
+											label: 'Elderberry',
 										},
 									] ),
 								3500
@@ -359,6 +380,14 @@ const ValidationComponent = ( {
 		const customToggleGroupRule = ( value: ValidatedItem ) => {
 			if ( value.toggleGroup !== 'option1' ) {
 				return 'Value must be Option 1.';
+			}
+
+			return null;
+		};
+
+		const customComboboxRule = ( value: ValidatedItem ) => {
+			if ( value.combobox !== 'apple' ) {
+				return 'Value must be Apple.';
 			}
 
 			return null;
@@ -769,6 +798,48 @@ const ValidationComponent = ( {
 				},
 			},
 			{
+				id: 'combobox',
+				type: 'text',
+				Edit: 'combobox',
+				label: 'Combobox',
+				placeholder: 'Search and select a fruit',
+				elements:
+					elements === 'async'
+						? undefined
+						: [
+								{ value: 'apple', label: 'Apple' },
+								{ value: 'banana', label: 'Banana' },
+								{ value: 'blueberry', label: 'Blueberry' },
+								{ value: 'cherry', label: 'Cherry' },
+								{ value: 'date', label: 'Date' },
+								{ value: 'elderberry', label: 'Elderberry' },
+								{ value: 'fig', label: 'Fig' },
+								{ value: 'grape', label: 'Grape' },
+								{ value: 'honeydew', label: 'Honeydew' },
+								{ value: 'kiwi', label: 'Kiwi' },
+								{ value: 'lemon', label: 'Lemon' },
+								{ value: 'mango', label: 'Mango' },
+								{ value: 'nectarine', label: 'Nectarine' },
+								{ value: 'orange', label: 'Orange' },
+								{ value: 'papaya', label: 'Papaya' },
+								{ value: 'pear', label: 'Pear' },
+								{ value: 'quince', label: 'Quince' },
+								{ value: 'raspberry', label: 'Raspberry' },
+								{ value: 'strawberry', label: 'Strawberry' },
+								{ value: 'tangerine', label: 'Tangerine' },
+								{ value: 'watermelon', label: 'Watermelon' },
+						  ],
+				getElements:
+					elements === 'async'
+						? getElements( 'combobox' )
+						: undefined,
+				isValid: {
+					required,
+					elements: elements !== 'none' ? true : false,
+					custom: maybeCustomRule( customComboboxRule ),
+				},
+			},
+			{
 				id: 'date',
 				type: 'date',
 				label: 'Date',
@@ -853,6 +924,7 @@ const ValidationComponent = ( {
 					'password',
 					'textarea',
 					'select',
+					'combobox',
 					'textWithRadio',
 					'boolean',
 					'toggle',
@@ -885,7 +957,7 @@ const ValidationComponent = ( {
 			{
 				id: 'selectFields',
 				label: 'Selection Fields',
-				children: [ 'select', 'textWithRadio' ],
+				children: [ 'select', 'combobox', 'textWithRadio' ],
 			},
 			{
 				id: 'booleanFields',
