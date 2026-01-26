@@ -77,19 +77,23 @@ export default function normalizeFields< Item >(
 	return fields.map( ( field ) => {
 		const fieldType = getFieldTypeByName< Item >( field.type );
 
-		const getValue =
-			typeof field.getValue === 'function'
-				? field.getValue
-				: field.getValue
-					? getValueFromMap( field.getValue )
-					: getValueFromId( field.id );
+		let getValue;
+		if ( typeof field.getValue === 'function' ) {
+			getValue = field.getValue;
+		} else if ( typeof field.getValue === 'object' ) {
+			getValue = getValueFromMap( field.getValue );
+		} else {
+			getValue = getValueFromId( field.id );
+		}
 
-		const setValue =
-			typeof field.setValue === 'function'
-				? field.setValue
-				: field.setValue
-					? setValueFromMap( field.setValue )
-					: setValueFromId( field.id );
+		let setValue;
+		if ( typeof field.setValue === 'function' ) {
+			setValue = field.setValue;
+		} else if ( typeof field.setValue === 'object' ) {
+			setValue = setValueFromMap( field.setValue );
+		} else {
+			setValue = setValueFromId( field.id );
+		}
 
 		const sort = function ( a: any, b: any, direction: SortDirection ) {
 			const aValue = getValue( { item: a } );
