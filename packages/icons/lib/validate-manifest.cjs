@@ -25,7 +25,7 @@ async function validateCollection() {
 
 	/*
 	 * Validating the icons collection means verifying that each icon defined
-	 * in the manifest must have a corresponding SVG file found in the library/
+	 * in the manifest has a corresponding SVG file found in the library/
 	 * folder and vice versa. Violations of this requirement will be collected
 	 * as strings in this array.
 	 */
@@ -42,9 +42,8 @@ async function validateCollection() {
 		} ),
 	} );
 
-	// Scan the manifest.php file for the keys (slugs) and `filePath` property
-	// (paths) of every icon, ensuring that for each icon the path matches the
-	// slug.
+	// Scan manifest.php for the keys (slugs) and `filePath` property (paths)
+	// of every icon, ensuring that for each icon the path matches the slug.
 	//
 	// Later we will reuse manifestSlugs to compare these with the SVG files
 	// found in the file system.
@@ -115,9 +114,10 @@ async function validateCollection() {
 	for ( const file of svgFiles ) {
 		if ( ! manifestPaths.includes( file ) ) {
 			problems.push(
-				`- Missing entry for icon ${
-					( '.', ICON_LIBRARY_DIR )
-				}/${ file }`
+				`- Missing entry for icon ${ path.join(
+					ICON_LIBRARY_DIR,
+					path.basename( file )
+				) }`
 			);
 		}
 	}
