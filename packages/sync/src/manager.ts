@@ -25,6 +25,7 @@ import type {
 	RecordHandlers,
 	SyncConfig,
 	SyncManager,
+	SyncManagerUpdateOptions,
 	SyncUndoManager,
 } from './types';
 import { createUndoManager } from './undo-manager';
@@ -47,11 +48,6 @@ interface EntityState {
 	syncConfig: SyncConfig;
 	unload: () => void;
 	ydoc: CRDTDoc;
-}
-
-export interface SyncManagerUpdateOptions {
-	isSave?: boolean;
-	isNewUndoLevel?: boolean;
 }
 
 /**
