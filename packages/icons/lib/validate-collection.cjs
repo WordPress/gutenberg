@@ -108,7 +108,10 @@ async function validateCollection() {
 	 */
 	const svgFiles = ( await readdir( ICON_LIBRARY_DIR ) )
 		.filter( ( file ) => file.match( /^[a-z0-9--]+\.svg$/ ) )
-		.map( ( file ) => path.join( 'library', file ) );
+		.map( ( file ) => path.join( 'library', file ) )
+
+		// Enforce "/" as path separator, even on Windows
+		.map( ( file ) => file.replaceAll( path.sep, '/' ) );
 
 	for ( const file of svgFiles ) {
 		if ( ! manifestPaths.includes( file ) ) {
