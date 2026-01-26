@@ -132,6 +132,22 @@ Files to copy with optional PHP transformations:
 }
 ```
 
+### `wpPostcss`
+
+Package-level PostCSS configuration overrides. This field allows individual packages to customize PostCSS processing:
+
+```json
+{
+	"wpPostcss": {
+		"plugins": ["postcss-nesting"],
+		"autoprefixer": { "grid": false },
+		"modules": { "generateScopedName": "[local]__[hash:base64:3]" }
+	}
+}
+```
+
+See [PostCSS Configuration](#postcss-configuration) below for full details.
+
 ## Root Configuration
 
 Configure your root `package.json` with a `wpPlugin` object to control global namespace and externalization behavior:
@@ -371,6 +387,121 @@ This configuration:
 - **Dependencies**: `@wordpress/*` packages are always externalized to `wp.*` globals
 - **Vendors**: React, lodash, jQuery, moment are always externalized to their standard globals
 - **Asset files**: `.asset.php` files are always generated for WordPress dependency management
+
+## PostCSS Configuration
+
+`@wordpress/build` supports customizable PostCSS configuration for CSS processing. You can provide custom PostCSS plugins and override default options via standard config files or package.json fields.
+
+### Configuration Files
+
+The build tool looks for PostCSS configuration in the following files (in order of priority):
+
+- `postcss.config.js`
+- `postcss.config.cjs`
+- `postcss.config.mjs`
+- `.postcssrc`
+- `.postcssrc.json`
+- `.postcssrc.js`
+- `.postcssrc.yaml`
+- `.postcssrc.yml`
+
+### Configuration Schema
+
+```javascript
+// postcss.config.js
+module.exports = {
+	// Custom PostCSS plugins to add to the processing pipeline
+	plugins: [
+		require('postcss-preset-env')({ stage: 2 }),
+		['postcss-nesting', { /* options */ }],
+	],
+
+	// Autoprefixer configuration
+	autoprefixer: {
+		grid: true,           // Enable Grid Layout prefixes (default: true)
+		flexbox: 'no-2009',   // Flexbox prefixes
+	},
+
+	// cssnano configuration for minification
+	cssnano: {
+		preset: ['default', { discardComments: { removeAll: true } }],
+	},
+
+	// rtlcss configuration for RTL stylesheet generation
+	rtlcss: {
+		autoRename: false,
+	},
+
+	// CSS Modules configuration
+	modules: {
+		generateScopedName: '[name]__[local]__[hash:base64:8]',
+	},
+};
+```
+
+### Default Configuration
+
+If no configuration is provided, the following defaults are used:
+
+```javascript
+{
+	autoprefixer: { grid: true },
+	cssnano: { preset: ['default', { discardComments: { removeAll: true } }] },
+	rtlcss: {},
+	modules: { generateScopedName: '[name]__[local]__[hash:base64:5]' },
+	plugins: [],
+}
+```
+
+### Package-Level Overrides
+
+Individual packages can override root-level PostCSS configuration using the `wpPostcss` field in their `package.json`:
+
+```json
+{
+	"name": "@my-plugin/components",
+	"wpPostcss": {
+		"plugins": ["postcss-nesting"],
+		"autoprefixer": { "grid": false },
+		"modules": { "generateScopedName": "[local]__[hash:base64:3]" }
+	}
+}
+```
+
+Package-level configuration is merged with root-level configuration:
+- Object properties are shallow-merged (package values override root values)
+- Plugin arrays are concatenated (package plugins run after root plugins)
+
+### Processing Stages
+
+CSS processing happens in three stages, each using different plugins:
+
+| Stage | Plugins Applied | Description |
+|-------|-----------------|-------------|
+| `ltr` | autoprefixer → custom plugins | Generates LTR stylesheet |
+| `rtl` | autoprefixer → custom plugins → rtlcss | Generates RTL stylesheet |
+| `minify` | cssnano | Minifies CSS for production |
+
+**Note:** rtlcss always runs during RTL processing to ensure RTL stylesheets are generated (WordPress requirement).
+
+### Plugin Formats
+
+Custom plugins can be specified in multiple formats:
+
+```javascript
+module.exports = {
+	plugins: [
+		// Already instantiated plugin
+		require('postcss-nesting')(),
+
+		// Plugin name (will be imported and called with no options)
+		'postcss-preset-env',
+
+		// Array format: [plugin-name, options]
+		['postcss-preset-env', { stage: 2 }],
+	],
+};
+```
 
 ## Output Structure
 
