@@ -77,6 +77,109 @@ const fieldsSelector = {
 };
 
 describe( 'DataForm component', () => {
+	describe( 'custom controls via settings', () => {
+		it( 'should render custom control from settings', () => {
+			const CustomTitleControl = () => {
+				return <span>Custom Title Control</span>;
+			};
+
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'title',
+							label: 'Title',
+							type: 'text' as const,
+							Edit: 'customTitle',
+						},
+					] }
+					form={ { fields: [ 'title' ] } }
+					data={ { title: 'Hello' } }
+					settings={ {
+						controls: { customTitle: CustomTitleControl },
+					} }
+				/>
+			);
+
+			expect(
+				screen.getByText( 'Custom Title Control' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should allow custom controls to override built-in controls', () => {
+			const CustomTextControl = () => {
+				return <span>Overridden Text Control</span>;
+			};
+
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'title',
+							label: 'Title',
+							type: 'text' as const,
+							Edit: 'text',
+						},
+					] }
+					form={ { fields: [ 'title' ] } }
+					data={ { title: 'Hello' } }
+					settings={ { controls: { text: CustomTextControl } } }
+				/>
+			);
+
+			expect(
+				screen.getByText( 'Overridden Text Control' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should use built-in controls when no custom controls provided', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'title',
+							label: 'Title',
+							type: 'text' as const,
+							Edit: 'text',
+						},
+					] }
+					form={ { fields: [ 'title' ] } }
+					data={ { title: 'Hello' } }
+				/>
+			);
+
+			expect(
+				screen.getByRole( 'textbox', { name: /title/i } )
+			).toBeInTheDocument();
+		} );
+
+		it( 'should not render field when control name is unknown', () => {
+			render(
+				<Dataform
+					onChange={ noop }
+					fields={ [
+						{
+							id: 'title',
+							label: 'Title',
+							type: 'text' as const,
+							Edit: 'unknownControl',
+						},
+					] }
+					form={ { fields: [ 'title' ] } }
+					data={ { title: 'Hello' } }
+				/>
+			);
+
+			// The field should not be rendered as no Edit component is available
+			expect(
+				screen.queryByRole( 'textbox', { name: /title/i } )
+			).not.toBeInTheDocument();
+		} );
+	} );
+
 	describe( 'in regular mode', () => {
 		it( 'should display fields', () => {
 			render(

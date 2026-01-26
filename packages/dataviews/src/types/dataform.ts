@@ -1,7 +1,12 @@
 /**
+ * External dependencies
+ */
+import type { ComponentType } from 'react';
+
+/**
  * Internal dependencies
  */
-import type { Field, FieldValidity } from './field-api';
+import type { DataFormControlProps, Field, FieldValidity } from './field-api';
 
 /**
  * DataForm layouts.
@@ -150,12 +155,21 @@ export type NormalizedForm = {
 	fields: NormalizedFormField[];
 };
 
+export interface DataFormControls {
+	[ key: string ]: ComponentType< DataFormControlProps< any > >;
+}
+
+export interface DataFormSettings {
+	controls?: DataFormControls;
+}
+
 export interface DataFormProps< Item > {
 	data: Item;
 	fields: Field< Item >[];
 	form: Form;
 	onChange: ( value: Record< string, any > ) => void;
 	validity?: FormValidity;
+	settings?: DataFormSettings;
 }
 
 export type FormValidity = Record< string, FieldValidity > | undefined;

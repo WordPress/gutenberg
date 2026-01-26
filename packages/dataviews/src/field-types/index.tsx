@@ -1,7 +1,13 @@
 /**
+ * External dependencies
+ */
+import type { ComponentType } from 'react';
+
+/**
  * Internal dependencies
  */
 import type {
+	DataFormControlProps,
 	Field,
 	FieldTypeName,
 	NormalizedField,
@@ -63,14 +69,20 @@ function getFieldTypeByName< Item >( type?: FieldTypeName ): FieldType< Item > {
 	return noType;
 }
 
+interface CustomControls {
+	[ key: string ]: ComponentType< DataFormControlProps< any > >;
+}
+
 /**
  * Apply default values and normalize the fields config.
  *
- * @param fields Fields config.
+ * @param fields         Fields config.
+ * @param customControls Optional custom controls to use for Edit fields.
  * @return Normalized fields config.
  */
 export default function normalizeFields< Item >(
-	fields: Field< Item >[]
+	fields: Field< Item >[],
+	customControls?: CustomControls
 ): NormalizedField< Item >[] {
 	return fields.map( ( field ) => {
 		const fieldType = getFieldTypeByName< Item >( field.type );
@@ -101,7 +113,7 @@ export default function normalizeFields< Item >(
 			// The type provides defaults for the following props
 			type: fieldType.type,
 			render: field.render ?? fieldType.render,
-			Edit: getControl( field, fieldType.Edit ),
+			Edit: getControl( field, fieldType.Edit, customControls ),
 			sort,
 			enableSorting: field.enableSorting ?? fieldType.enableSorting,
 			enableGlobalSearch:

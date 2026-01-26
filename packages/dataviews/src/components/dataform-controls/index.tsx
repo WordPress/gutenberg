@@ -58,9 +58,12 @@ function isEditConfig( value: any ): value is EditConfig {
 	);
 }
 
-function createConfiguredControl( config: EditConfig ) {
+function createConfiguredControl(
+	config: EditConfig,
+	customControls?: FormControls
+) {
 	const { control, ...controlConfig } = config;
-	const BaseControlType = getControlByType( control );
+	const BaseControlType = getControlByType( control, customControls );
 	if ( BaseControlType === null ) {
 		return null;
 	}
@@ -74,32 +77,41 @@ function createConfiguredControl( config: EditConfig ) {
 
 export function getControl< Item >(
 	field: Field< Item >,
-	fallback: string | null
+	fallback: string | null,
+	customControls?: FormControls
 ): ComponentType< DataFormControlProps< Item > > | null {
 	if ( typeof field.Edit === 'function' ) {
 		return field.Edit;
 	}
 
 	if ( typeof field.Edit === 'string' ) {
-		return getControlByType( field.Edit );
+		return getControlByType( field.Edit, customControls );
 	}
 
 	if ( isEditConfig( field.Edit ) ) {
-		return createConfiguredControl( field.Edit );
+		return createConfiguredControl( field.Edit, customControls );
 	}
 
 	if ( hasElements( field ) && field.type !== 'array' ) {
-		return getControlByType( 'select' );
+		return getControlByType( 'select', customControls );
 	}
 
 	if ( fallback === null ) {
 		return null;
 	}
 
-	return getControlByType( fallback );
+	return getControlByType( fallback, customControls );
 }
 
-export function getControlByType( type: string ) {
+export function getControlByType(
+	type: string,
+	customControls?: FormControls
+) {
+	// Check custom controls first (they take precedence)
+	if ( customControls && Object.keys( customControls ).includes( type ) ) {
+		return customControls[ type ];
+	}
+
 	if ( Object.keys( FORM_CONTROLS ).includes( type ) ) {
 		return FORM_CONTROLS[ type ];
 	}
