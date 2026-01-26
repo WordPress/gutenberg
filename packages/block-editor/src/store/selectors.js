@@ -2031,6 +2031,11 @@ export function canEditBlock( state, clientId ) {
  * @return {boolean} Whether a given block type can be locked/unlocked.
  */
 export function canLockBlockType( state, nameOrType ) {
+	// Disable locking in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	if ( ! hasBlockSupport( nameOrType, 'lock', true ) ) {
 		return false;
 	}
