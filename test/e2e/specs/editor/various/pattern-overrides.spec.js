@@ -1244,14 +1244,14 @@ test.describe( 'Pattern Overrides', () => {
 			await requestUtils.uploadMedia(
 				path.resolve(
 					process.cwd(),
-					'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
+					'assets/10x10_e2e_test_image_z9T8jK.png'
 				)
 			);
 		const { id: overrideImageId, source_url: overrideImageSrc } =
 			await requestUtils.uploadMedia(
 				path.resolve(
 					process.cwd(),
-					'test/e2e/assets/1024x768_e2e_test_image_size.jpeg'
+					'assets/1024x768_e2e_test_image_size.jpeg'
 				)
 			);
 		const overrideName = 'test';
@@ -1313,14 +1313,14 @@ test.describe( 'Pattern Overrides', () => {
 			await requestUtils.uploadMedia(
 				path.resolve(
 					process.cwd(),
-					'test/e2e/assets/10x10_e2e_test_image_z9T8jK.png'
+					'assets/10x10_e2e_test_image_z9T8jK.png'
 				)
 			);
 		const { id: overrideImageId, source_url: overrideImageSrc } =
 			await requestUtils.uploadMedia(
 				path.resolve(
 					process.cwd(),
-					'test/e2e/assets/1024x768_e2e_test_image_size.jpeg'
+					'assets/1024x768_e2e_test_image_size.jpeg'
 				)
 			);
 		const overrideName = 'test';
