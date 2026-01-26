@@ -28,9 +28,8 @@ ARG WASM_VIPS_VERSION=0.0.16
 RUN git clone --depth 1 --branch v${WASM_VIPS_VERSION} https://github.com/kleisauke/wasm-vips.git .
 
 # Build wasm-vips
-# Note: v0.0.16 predates UltraHDR support, so no --disable-uhdr flag needed
-# For future versions that include UltraHDR, add --disable-uhdr flag
-RUN ./build.sh
+# Note: v0.0.16 due to licensing, exclude UltraHDR, add --disable-uhdr flag
+RUN ./build.sh --disable-uhdr
 
 # Output directory for built files
 RUN mkdir -p /output && \
