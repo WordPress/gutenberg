@@ -18,12 +18,17 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		private static $instance = null;
 
 		public function __construct() {
-			$icons_directory = __DIR__ . '/../../packages/icons/src/';
+			/** This filter is documented in wp-includes/class-wp-icons-registry.php */
+			$icons_directory = apply_filters(
+				'wp_icons_registry_directory',
+				__DIR__ . '/../../packages/icons/src/'
+			);
+
 			if ( ! is_dir( $icons_directory ) ) {
 				return;
 			}
 
-			$collection = include $icons_directory . 'manifest.php';
+			$collection = include $icons_directory . '/manifest.php';
 
 			if ( empty( $collection ) ) {
 				wp_trigger_error(
