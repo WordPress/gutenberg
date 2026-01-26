@@ -74,8 +74,7 @@
 	"devDependencies": {
 		"@types/jest": "^29.5.14",
 		"@types/node": "^20.17.10",
-		"deep-freeze": "0.0.1",
-		"yjs": "~13.6.6"
+		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
