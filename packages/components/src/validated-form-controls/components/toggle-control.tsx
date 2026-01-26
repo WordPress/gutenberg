@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef, useRef, useEffect } from '@wordpress/element';
+import { forwardRef, useRef, useLayoutEffect } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -27,7 +27,7 @@ const UnforwardedValidatedToggleControl = (
 
 	// TODO: Upstream limitation - The `required` attribute is not passed down to the input,
 	// so we need to set it manually.
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( validityTargetRef.current ) {
 			validityTargetRef.current.required = required ?? false;
 		}
