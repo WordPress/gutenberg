@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { next, replace, attrs } from '../';
+import { next, replace, attrs, string } from '../';
 
 describe( 'shortcode', () => {
 	describe( 'next', () => {
@@ -304,6 +304,25 @@ describe( 'shortcode', () => {
 			};
 
 			expect( result ).toEqual( expected );
+		} );
+	} );
+
+	describe( 'string', () => {
+		it( 'should coerce non-string attribute values to strings', () => {
+			const result = string( {
+				tag: 'gallery',
+				attrs: {
+					// @ts-expect-error TS is not happy about unknown properties here.
+					ids: [ 1, 2, 3 ],
+					columns: 4,
+					data: { test: 'value' },
+					flip: true,
+				},
+				type: 'single',
+			} );
+			expect( result ).toBe(
+				'[gallery ids="1,2,3" columns="4" data="[object Object]" flip="true"]'
+			);
 		} );
 	} );
 } );

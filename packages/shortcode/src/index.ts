@@ -298,12 +298,8 @@ class Shortcode implements ShortcodeInstance {
 			// Handle a flat object of attributes (e.g., { foo: 'bar', baz: 'qux' }).
 		} else {
 			Object.entries( attributes ).forEach( ( [ key, value ] ) => {
-				if (
-					typeof value === 'string' ||
-					typeof value === 'undefined'
-				) {
-					this.set( key, value );
-				}
+				// Coerce non-string values to strings to maintain backward compatibility.
+				this.set( key, String( value ) );
 			} );
 		}
 	}
