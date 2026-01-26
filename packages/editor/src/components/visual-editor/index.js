@@ -93,7 +93,6 @@ function checkForPostContentAtRootLevel( blocks ) {
 function VisualEditor( {
 	// Ideally as we unify post and site editors, we won't need these props.
 	autoFocus,
-	disableIframe = false,
 	iframeProps,
 	contentRef,
 	className,
@@ -405,13 +404,13 @@ function VisualEditor( {
 				{
 					'has-padding': isFocusedEntity || enableResizing,
 					'is-resizable': enableResizing,
-					'is-iframed': ! disableIframe,
+					'is-iframed': true,
 				}
 			) }
 		>
 			<ResizableEditor enableResizing={ enableResizing } height="100%">
 				<BlockCanvas
-					shouldIframe={ ! disableIframe }
+					shouldIframe
 					contentRef={ contentRef }
 					styles={ iframeStyles }
 					height="100%"
@@ -488,11 +487,10 @@ function VisualEditor( {
 							) }
 							layout={ blockListLayout }
 							dropZoneElement={
-								// When iframed, pass in the html element of the iframe to
-								// ensure the drop zone extends to the edges of the iframe.
-								disableIframe
-									? localRef.current
-									: localRef.current?.parentNode
+								// Pass in the html element of the iframe to
+								// ensure the drop zone extends to the edges of
+								// the iframe.
+								localRef.current?.parentNode
 							}
 							__unstableDisableDropZone={
 								// In template preview mode, disable drop zones at the root of the template.
