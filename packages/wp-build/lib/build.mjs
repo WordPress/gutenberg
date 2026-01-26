@@ -12,9 +12,6 @@ import chokidar from 'chokidar';
 import browserslistToEsbuild from 'browserslist-to-esbuild';
 import { sassPlugin, postcssModules } from 'esbuild-sass-plugin';
 import postcss from 'postcss';
-import autoprefixer from 'autoprefixer';
-import rtlcss from 'rtlcss';
-import cssnano from 'cssnano';
 import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
@@ -40,6 +37,12 @@ import {
 	getRouteMetadata,
 	generateContentEntryPoint,
 } from './route-utils.mjs';
+import {
+	getPostcssConfig,
+	createPostcssPlugins,
+	defaultPostcssConfig,
+	getModulesConfig,
+} from './postcss-config.mjs';
 
 const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
@@ -136,19 +139,19 @@ function getSassOptions( workingDir ) {
 /**
  * Create style bundling plugins with the given working directory.
  *
- * @param {string} workingDir - The directory where we're working (for NodePackageImporter).
+ * @param {string} workingDir    - The directory where we're working (for NodePackageImporter).
+ * @param {Object} postcssConfig - PostCSS configuration object.
  * @return {object[]} Array of esbuild plugins for handling CSS/SCSS.
  */
-function createStyleBundlingPlugins( workingDir ) {
+function createStyleBundlingPlugins( workingDir, postcssConfig = defaultPostcssConfig ) {
 	const sassOptions = getSassOptions( workingDir );
+	const modulesConfig = getModulesConfig( postcssConfig );
 	return [
 		// Handle CSS modules (.module.css and .module.scss)
 		sassPlugin( {
 			embedded: true,
 			filter: /\.module\.(css|scss)$/,
-			transform: postcssModules( {
-				generateScopedName: '[name]__[local]__[hash:base64:5]',
-			} ),
+			transform: postcssModules( modulesConfig ),
 			type: 'style',
 			...sassOptions,
 		} ),
@@ -491,6 +494,9 @@ async function bundlePackage( packageName, options = {} ) {
 			normalizePath( path.join( buildStyleDir, '**/*.css' ) )
 		);
 
+		// Get PostCSS config for minification
+		const postcssConfig = await getPostcssConfig( packageDir, ROOT_DIR );
+
 		for ( const cssFile of cssFiles ) {
 			const relativePath = path.relative( buildStyleDir, cssFile );
 			const destPath = path.join( outputDir, relativePath );
@@ -515,19 +521,9 @@ async function bundlePackage( packageName, options = {} ) {
 					// Write non-minified version
 					await writeFile( destPath, content );
 
-					// Write minified version
-					const result = await postcss( [
-						cssnano( {
-							preset: [
-								'default',
-								{
-									discardComments: {
-										removeAll: true,
-									},
-								},
-							],
-						} ),
-					] ).process( content, {
+					// Write minified version using dynamic PostCSS config
+					const minifyPlugins = await createPostcssPlugins( postcssConfig, 'minify' );
+					const result = await postcss( minifyPlugins ).process( content, {
 						from: cssFile,
 						to: minifiedPath,
 					} );
@@ -1128,10 +1124,13 @@ async function transpilePackage( packageName ) {
 			} );
 		},
 	};
+
+	// Get PostCSS config for style bundling
+	const postcssConfig = await getPostcssConfig( packageDir, ROOT_DIR );
 	const plugins = [
 		needsEmotionPlugin && emotionPlugin,
 		externalizeAllExceptCssPlugin,
-		...createStyleBundlingPlugins( packageDir ),
+		...createStyleBundlingPlugins( packageDir, postcssConfig ),
 	].filter( Boolean );
 
 	if ( packageJson.main ) {
@@ -1239,6 +1238,9 @@ async function compileStyles( packageName ) {
 	const buildStyleDir = path.join( packageDir, 'build-style' );
 	const srcDir = path.join( packageDir, 'src' );
 
+	// Get PostCSS config for this package
+	const postcssConfig = await getPostcssConfig( packageDir, ROOT_DIR );
+
 	// Process SCSS files
 	await Promise.all(
 		scssEntries.map( async ( styleEntryPath ) => {
@@ -1267,15 +1269,13 @@ async function compileStyles( packageName ) {
 						embedded: true,
 						...getSassOptions( packageDir ),
 						async transform( source ) {
-							// Process with autoprefixer for LTR version
-							const ltrResult = await postcss( [
-								autoprefixer( { grid: true } ),
-							] ).process( source, { from: undefined } );
+							// Process with autoprefixer + custom plugins for LTR version
+							const ltrPlugins = await createPostcssPlugins( postcssConfig, 'ltr' );
+							const ltrResult = await postcss( ltrPlugins ).process( source, { from: undefined } );
 
-							// Process with rtlcss for RTL version
-							const rtlResult = await postcss( [
-								rtlcss(),
-							] ).process( ltrResult.css, { from: undefined } );
+							// Process with autoprefixer + custom plugins + rtlcss for RTL version
+							const rtlPlugins = await createPostcssPlugins( postcssConfig, 'rtl' );
+							const rtlResult = await postcss( rtlPlugins ).process( source, { from: undefined } );
 
 							await Promise.all( [
 								writeFile(
@@ -1427,6 +1427,9 @@ async function buildRoute( routeName ) {
 		// Write temporary entry file
 		await writeFile( tempEntryPath, syntheticEntry );
 
+		// Get PostCSS config for route style bundling
+		const postcssConfig = await getPostcssConfig( routeDir, ROOT_DIR );
+
 		// Build both minified and non-minified versions in parallel
 		await Promise.all( [
 			esbuild.build( {
@@ -1444,7 +1447,7 @@ async function buildRoute( routeName ) {
 						[],
 						true // Generate asset file for minified build
 					),
-					...createStyleBundlingPlugins( routeDir ),
+					...createStyleBundlingPlugins( routeDir, postcssConfig ),
 				],
 			} ),
 			esbuild.build( {
@@ -1462,7 +1465,7 @@ async function buildRoute( routeName ) {
 						[],
 						false // Skip asset file for non-minified build
 					),
-					...createStyleBundlingPlugins( routeDir ),
+					...createStyleBundlingPlugins( routeDir, postcssConfig ),
 				],
 			} ),
 		] );
