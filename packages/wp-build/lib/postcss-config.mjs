@@ -4,6 +4,7 @@
 import { existsSync, readFileSync } from 'fs';
 import path from 'path';
 import { pathToFileURL } from 'url';
+import { createRequire } from 'module';
 import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
 import rtlcss from 'rtlcss';
@@ -192,26 +193,33 @@ export function mergePostcssConfigs( base, override ) {
  * Resolve a plugin from its name or configuration.
  * Handles both string names and plugin instances.
  *
- * @param {string|Function|Array} plugin Plugin name, instance, or [name, options] array.
+ * @param {string|Function|Array} plugin  Plugin name, instance, or [name, options] array.
+ * @param {string}                rootDir Root directory of the project (for resolving plugins).
  * @return {Promise<Function>} Resolved PostCSS plugin instance.
  */
-async function resolvePlugin( plugin ) {
+async function resolvePlugin( plugin, rootDir ) {
 	// Already a function (plugin instance)
 	if ( typeof plugin === 'function' ) {
 		return plugin;
 	}
 
+	// Create require function that resolves from the project root
+	const require = createRequire( path.join( rootDir, 'package.json' ) );
+
 	// Array format: [pluginName, options]
 	if ( Array.isArray( plugin ) ) {
 		const [ name, options = {} ] = plugin;
-		const pluginModule = await import( name );
+		// Resolve from project directory using require.resolve, then import
+		const resolvedPath = require.resolve( name );
+		const pluginModule = await import( pathToFileURL( resolvedPath ).href );
 		const pluginFn = pluginModule.default || pluginModule;
 		return pluginFn( options );
 	}
 
 	// String format: plugin name without options
 	if ( typeof plugin === 'string' ) {
-		const pluginModule = await import( plugin );
+		const resolvedPath = require.resolve( plugin );
+		const pluginModule = await import( pathToFileURL( resolvedPath ).href );
 		const pluginFn = pluginModule.default || pluginModule;
 		return pluginFn();
 	}
@@ -227,11 +235,12 @@ async function resolvePlugin( plugin ) {
  * - 'rtl': autoprefixer + custom plugins + rtlcss (for RTL stylesheet)
  * - 'minify': cssnano only (for minification)
  *
- * @param {Object} config PostCSS configuration object.
- * @param {string} stage  Processing stage: 'ltr', 'rtl', or 'minify'.
+ * @param {Object} config  PostCSS configuration object.
+ * @param {string} stage   Processing stage: 'ltr', 'rtl', or 'minify'.
+ * @param {string} rootDir Root directory of the project (for resolving plugins).
  * @return {Promise<Function[]>} Array of PostCSS plugin instances.
  */
-export async function createPostcssPlugins( config, stage ) {
+export async function createPostcssPlugins( config, stage, rootDir ) {
 	const plugins = [];
 
 	if ( stage === 'ltr' || stage === 'rtl' ) {
@@ -242,7 +251,7 @@ export async function createPostcssPlugins( config, stage ) {
 		// Add custom plugins
 		if ( config.plugins && config.plugins.length > 0 ) {
 			for ( const plugin of config.plugins ) {
-				plugins.push( await resolvePlugin( plugin ) );
+				plugins.push( await resolvePlugin( plugin, rootDir ) );
 			}
 		}
 

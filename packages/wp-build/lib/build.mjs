@@ -522,7 +522,7 @@ async function bundlePackage( packageName, options = {} ) {
 					await writeFile( destPath, content );
 
 					// Write minified version using dynamic PostCSS config
-					const minifyPlugins = await createPostcssPlugins( postcssConfig, 'minify' );
+					const minifyPlugins = await createPostcssPlugins( postcssConfig, 'minify', ROOT_DIR );
 					const result = await postcss( minifyPlugins ).process( content, {
 						from: cssFile,
 						to: minifiedPath,
@@ -1241,13 +1241,14 @@ async function compileStyles( packageName ) {
 	// Get PostCSS config for this package
 	const postcssConfig = await getPostcssConfig( packageDir, ROOT_DIR );
 
-	// Process SCSS files
+	// Process style entry files (SCSS or CSS)
 	await Promise.all(
 		scssEntries.map( async ( styleEntryPath ) => {
 			// Calculate relative path from src/ to preserve directory structure
 			const relativePath = path.relative( srcDir, styleEntryPath );
 			const relativeDir = path.dirname( relativePath );
-			const entryName = path.basename( styleEntryPath, '.scss' );
+			const ext = path.extname( styleEntryPath );
+			const entryName = path.basename( styleEntryPath, ext );
 
 			const outputDir =
 				relativeDir === '.'
@@ -1263,6 +1264,7 @@ async function compileStyles( packageName ) {
 				write: false,
 				loader: {
 					'.scss': 'css',
+					'.css': 'css',
 				},
 				plugins: [
 					sassPlugin( {
@@ -1270,11 +1272,11 @@ async function compileStyles( packageName ) {
 						...getSassOptions( packageDir ),
 						async transform( source ) {
 							// Process with autoprefixer + custom plugins for LTR version
-							const ltrPlugins = await createPostcssPlugins( postcssConfig, 'ltr' );
+							const ltrPlugins = await createPostcssPlugins( postcssConfig, 'ltr', ROOT_DIR );
 							const ltrResult = await postcss( ltrPlugins ).process( source, { from: undefined } );
 
 							// Process with autoprefixer + custom plugins + rtlcss for RTL version
-							const rtlPlugins = await createPostcssPlugins( postcssConfig, 'rtl' );
+							const rtlPlugins = await createPostcssPlugins( postcssConfig, 'rtl', ROOT_DIR );
 							const rtlResult = await postcss( rtlPlugins ).process( source, { from: undefined } );
 
 							await Promise.all( [
