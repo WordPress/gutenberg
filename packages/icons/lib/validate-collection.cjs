@@ -8,9 +8,10 @@ const { createInterface } = require( 'readline/promises' );
 
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
 
-/**
- * FIXME: Decide between i18n-ready JSON-based manifest (instead of PHP) or a
- * proper PHP script to validate the manifest.
+/*
+ * Validating the icons collection means verifying that each icon defined in
+ * the manifest has a corresponding SVG file found in the library/ folder and
+ * vice versa.
  */
 async function validateCollection() {
 	const manifestPath = path.join( ICON_LIBRARY_DIR, '..', 'manifest.php' );
@@ -24,10 +25,7 @@ async function validateCollection() {
 	}
 
 	/*
-	 * Validating the icons collection means verifying that each icon defined
-	 * in the manifest has a corresponding SVG file found in the library/
-	 * folder and vice versa. Violations of this requirement will be collected
-	 * as strings in this array.
+	 * Collect policy violations as strings.
 	 */
 	const problems = [];
 
@@ -42,11 +40,12 @@ async function validateCollection() {
 		} ),
 	} );
 
-	// Scan manifest.php for the keys (slugs) and `filePath` property (paths)
-	// of every icon, ensuring that for each icon the path matches the slug.
-	//
-	// Later we will reuse manifestSlugs to compare these with the SVG files
-	// found in the file system.
+	/* Scan manifest.php for the keys (slugs) and `filePath` property (paths)
+	 * of every icon, ensuring that for each icon the path matches the slug.
+	 *
+	 * Later we will reuse manifestSlugs to compare these with the SVG files
+	 * found in the file system.
+	 */
 	const manifestSlugs = [];
 	const manifestPaths = [];
 	for await ( const line of rl ) {

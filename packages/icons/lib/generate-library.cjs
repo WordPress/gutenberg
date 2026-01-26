@@ -9,7 +9,7 @@ const { promisify } = require( 'util' );
 /**
  * Internal dependencies
  */
-const { validateCollection } = require( './validate-manifest.cjs' );
+const { validateCollection } = require( './validate-collection.cjs' );
 
 const execFileAsync = promisify( execFile );
 
