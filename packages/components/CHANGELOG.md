@@ -5,7 +5,6 @@
 ### Code Quality
 
 -   Add `displayName` to components to improve debugging and fix Storybook source code. [#74716](https://github.com/WordPress/gutenberg/pull/74716)
--   Storybook: Configure TypeScript project references. [#74835](https://github.com/WordPress/gutenberg/pull/74835)
 
 ### Internal
 
