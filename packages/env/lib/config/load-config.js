@@ -4,6 +4,7 @@
  */
 const path = require( 'path' );
 const fs = require( 'fs' ).promises;
+const { existsSync } = require( 'fs' );
 
 /**
  * Internal dependencies
@@ -25,7 +26,7 @@ const postProcessConfig = require( './post-process-config' );
  * @property {string}                               name                    Name of the environment.
  * @property {string}                               configDirectoryPath     Path to the .wp-env.json file.
  * @property {string}                               workDirectoryPath       Path to the work directory located in ~/.wp-env.
- * @property {string}                               dockerComposeConfigPath Path to the docker-compose.yml file.
+ * @property {string[]}                             dockerComposeConfigPath Paths to the docker-compose.yml files.
  * @property {boolean}                              detectedLocalConfig     If true, wp-env detected local config and used it.
  * @property {Object.<string, string>}              lifecycleScripts        Any lifecycle scripts that we might need to execute.
  * @property {Object.<string, WPEnvironmentConfig>} env                     Specific config for different environments.
@@ -56,12 +57,21 @@ module.exports = async function loadConfig( configDirectoryPath ) {
 	// consumption elsewhere in the tool.
 	config = postProcessConfig( config );
 
+	const dockerComposeConfigPath = [
+		path.resolve( cacheDirectoryPath, 'docker-compose.yml' ),
+	];
+
+	const overridePath = path.resolve(
+		configDirectoryPath,
+		'docker-compose.override.yml'
+	);
+	if ( existsSync( overridePath ) ) {
+		dockerComposeConfigPath.push( overridePath );
+	}
+
 	return {
 		name: path.basename( configDirectoryPath ),
-		dockerComposeConfigPath: path.resolve(
-			cacheDirectoryPath,
-			'docker-compose.yml'
-		),
+		dockerComposeConfigPath,
 		configDirectoryPath,
 		workDirectoryPath: cacheDirectoryPath,
 		detectedLocalConfig: await hasLocalConfig( [

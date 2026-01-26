@@ -83,7 +83,7 @@ module.exports = async function initConfig( {
 		await mkdir( config.workDirectoryPath, { recursive: true } );
 
 		await writeFile(
-			config.dockerComposeConfigPath,
+			config.dockerComposeConfigPath[ 0 ],
 			yaml.dump( dockerComposeConfig )
 		);
 

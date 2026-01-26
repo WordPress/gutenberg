@@ -4,6 +4,7 @@
  * External dependencies
  */
 const { readFile } = require( 'fs' ).promises;
+const { existsSync } = require( 'fs' );
 
 /**
  * Internal dependencies
@@ -18,6 +19,7 @@ jest.mock( 'fs', () => ( {
 		mkdir: jest.fn(),
 		writeFile: jest.fn(),
 	},
+	existsSync: jest.fn( () => false ),
 } ) );
 
 // This mocks a small response with a format matching the stable-check API.
@@ -199,5 +201,26 @@ describe( 'Config Integration', () => {
 			'test'
 		);
 		expect( config ).toMatchSnapshot();
+	} );
+
+	it( 'should include docker-compose.override.yml when it exists', async () => {
+		readFile.mockImplementation( async () => {
+			throw { code: 'ENOENT' };
+		} );
+
+		existsSync.mockImplementation(
+			( filePath ) =>
+				filePath === '/test/gutenberg/docker-compose.override.yml'
+		);
+
+		const config = await loadConfig( '/test/gutenberg' );
+
+		expect( config.dockerComposeConfigPath ).toHaveLength( 2 );
+		expect( config.dockerComposeConfigPath[ 0 ] ).toContain(
+			'docker-compose.yml'
+		);
+		expect( config.dockerComposeConfigPath[ 1 ] ).toBe(
+			'/test/gutenberg/docker-compose.override.yml'
+		);
 	} );
 } );
