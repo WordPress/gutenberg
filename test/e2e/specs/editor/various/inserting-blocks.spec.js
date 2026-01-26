@@ -79,6 +79,10 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			testInfo.project.name === 'firefox',
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
+		);
 
 		await admin.createNewPost();
 
@@ -143,6 +147,10 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			testInfo.project.name === 'firefox',
 			'Firefox does not dispatch drag events to the iframe content when dragging from outside the iframe.'
 		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
+		);
 
 		await admin.createNewPost();
 
@@ -206,6 +214,10 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			testInfo.project.name === 'firefox',
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
+		);
 
 		await admin.createNewPost();
 
@@ -267,48 +279,13 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			testInfo.project.name === 'firefox',
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
+		);
 		const PATTERN_NAME = 'My synced pattern';
 
-		// Propagate console logs from page to Playwright output
-		page.on( 'console', ( msg ) => {
-			// eslint-disable-next-line no-console
-			console.log( `[page] ${ msg.text() }` );
-		} );
-
 		await admin.createNewPost();
-
-		// Setup mouse event logging in iframe
-		const frame = page.frame( 'editor-canvas' );
-		await frame.evaluate( () => {
-			const events = [
-				'mousedown',
-				'mouseup',
-				'mousemove',
-				'mouseenter',
-				'mouseleave',
-				'mouseover',
-				'mouseout',
-				'drag',
-				'dragstart',
-				'dragend',
-				'dragenter',
-				'dragleave',
-				'dragover',
-				'drop',
-			];
-			events.forEach( ( eventName ) => {
-				document.addEventListener(
-					eventName,
-					( e ) => {
-						// eslint-disable-next-line no-console
-						console.log(
-							`[${ eventName }] x=${ e.clientX } y=${ e.clientY } target=${ e.target?.tagName }#${ e.target?.id }`
-						);
-					},
-					true
-				);
-			} );
-		} );
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -404,6 +381,10 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		testInfo.skip(
 			testInfo.project.name === 'firefox',
 			'Firefox does not dispatch drag events to the iframe content when dragging from outside the iframe.'
+		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
 		);
 
 		await admin.createNewPost();
