@@ -142,7 +142,6 @@ function normalizeForm( form: Form ): NormalizedForm {
 	return {
 		layout: normalizedFormLayout,
 		fields: normalizedFields,
-		labelMode: 'showRequired',
 	};
 }
 

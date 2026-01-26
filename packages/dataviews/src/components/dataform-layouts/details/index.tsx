@@ -27,7 +27,6 @@ export default function FormDetailsField< Item >( {
 		() => ( {
 			layout: DEFAULT_LAYOUT,
 			fields: field.children ?? [],
-			labelMode: 'showRequired',
 		} ),
 		[ field ]
 	);

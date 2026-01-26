@@ -56,7 +56,6 @@ export default function FormRegularField< Item >( {
 		() => ( {
 			layout: DEFAULT_LAYOUT,
 			fields: !! field.children ? field.children : [],
-			labelMode: 'showRequired',
 		} ),
 		[ field ]
 	);

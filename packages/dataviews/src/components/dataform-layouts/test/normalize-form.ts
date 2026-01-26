@@ -11,7 +11,6 @@ describe( 'normalizeFormFields', () => {
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
 				fields: [],
-				labelMode: 'showRequired',
 				layout: { labelPosition: 'top', type: 'regular' },
 			} );
 		} );
@@ -21,7 +20,6 @@ describe( 'normalizeFormFields', () => {
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
 				fields: [],
-				labelMode: 'showRequired',
 				layout: { labelPosition: 'top', type: 'regular' },
 			} );
 		} );
@@ -34,7 +32,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
-				labelMode: 'showRequired',
 				layout: { labelPosition: 'top', type: 'regular' },
 				fields: [
 					{
@@ -67,7 +64,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
-				labelMode: 'showRequired',
 				layout: { labelPosition: 'top', type: 'regular' },
 				fields: [
 					{
@@ -98,7 +94,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
-				labelMode: 'showRequired',
 				layout: { labelPosition: 'top', type: 'regular' },
 				fields: [
 					{
@@ -119,7 +114,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
-				labelMode: 'showRequired',
 				layout: { labelPosition: 'side', type: 'regular' },
 				fields: [
 					{
@@ -140,7 +134,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
-				labelMode: 'showRequired',
 				layout: {
 					labelPosition: 'side',
 					type: 'panel',
@@ -168,7 +161,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
-				labelMode: 'showRequired',
 				layout: {
 					labelPosition: 'top',
 					type: 'panel',
@@ -196,7 +188,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
-				labelMode: 'showRequired',
 				layout: {
 					type: 'card',
 					isCollapsible: true,
@@ -233,7 +224,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
-				labelMode: 'showRequired',
 				layout: {
 					type: 'card',
 					isCollapsible: false,
@@ -268,7 +258,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
-				labelMode: 'showRequired',
 				layout: {
 					type: 'card',
 					isCollapsible: true,
@@ -307,7 +296,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
-				labelMode: 'showRequired',
 				layout: {
 					type: 'card',
 					withHeader: true,
@@ -351,7 +339,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
-				labelMode: 'showRequired',
 				layout: {
 					type: 'regular',
 					labelPosition: 'top',
@@ -390,7 +377,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toEqual( {
-				labelMode: 'showRequired',
 				layout: {
 					type: 'card',
 					isCollapsible: false,
@@ -441,7 +427,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toStrictEqual( {
-				labelMode: 'showRequired',
 				layout: { type: 'regular', labelPosition: 'top' },
 				fields: [
 					{
@@ -494,7 +479,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toStrictEqual( {
-				labelMode: 'showRequired',
 				layout: { type: 'regular', labelPosition: 'top' },
 				fields: [
 					{
@@ -560,7 +544,6 @@ describe( 'normalizeFormFields', () => {
 			};
 			const result = normalizeForm( form );
 			expect( result ).toStrictEqual( {
-				labelMode: 'showRequired',
 				layout: CARD,
 				fields: [
 					{

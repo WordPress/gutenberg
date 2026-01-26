@@ -48,7 +48,8 @@ export function DataFormLayout< Item >( {
 	) => React.JSX.Element;
 	as?: React.ComponentType< { children: React.ReactNode } >;
 } ) {
-	const { fields: fieldDefinitions } = useContext( DataFormContext );
+	const { fields: fieldDefinitions, markWhenOptional } =
+		useContext( DataFormContext );
 
 	function getFieldDefinition( field: NormalizedFormField ) {
 		return fieldDefinitions.find(
@@ -97,7 +98,7 @@ export function DataFormLayout< Item >( {
 						data={ data }
 						field={ formField }
 						onChange={ onChange }
-						markWhenOptional={ form.labelMode === 'showOptional' }
+						markWhenOptional={ markWhenOptional }
 						validity={ validity?.[ formField.id ] }
 					/>
 				);

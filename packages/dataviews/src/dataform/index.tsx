@@ -25,44 +25,28 @@ export default function DataForm< Item >( {
 		[ fields ]
 	);
 
-	// Calculate required count for stable dependency
-	const requiredCount = useMemo(
-		() => normalizedFields.filter( ( f ) => !! f.isValid?.required ).length,
-		[ normalizedFields ]
-	);
-
-	// Resolve labelMode (handles 'auto')
-	const effectiveLabelMode: 'showRequired' | 'showOptional' = useMemo( () => {
-		if ( form.labelMode === 'showOptional' ) {
-			return 'showOptional';
-		}
-		if ( form.labelMode === 'showRequired' ) {
-			return 'showRequired';
-		}
-		if ( form.labelMode === 'auto' ) {
-			const optionalCount = normalizedFields.length - requiredCount;
-			return requiredCount >= optionalCount
-				? 'showOptional'
-				: 'showRequired';
-		}
-		return 'showRequired';
-	}, [ form.labelMode, requiredCount, normalizedFields.length ] );
-
-	// Merge resolved labelMode into form
-	const formWithResolvedLabelMode = useMemo(
-		() => ( { ...normalizedForm, labelMode: effectiveLabelMode } ),
-		[ normalizedForm, effectiveLabelMode ]
-	);
+	// Auto-compute: mark the minority of fields
+	// When counts are equal, mark optional fields (arbitrary but consistent)
+	const markWhenOptional = useMemo( () => {
+		const requiredCount = normalizedFields.filter(
+			( f ) => !! f.isValid?.required
+		).length;
+		const optionalCount = normalizedFields.length - requiredCount;
+		return requiredCount >= optionalCount;
+	}, [ normalizedFields ] );
 
 	if ( ! form.fields ) {
 		return null;
 	}
 
 	return (
-		<DataFormProvider fields={ normalizedFields }>
+		<DataFormProvider
+			fields={ normalizedFields }
+			markWhenOptional={ markWhenOptional }
+		>
 			<DataFormLayout
 				data={ data }
-				form={ formWithResolvedLabelMode }
+				form={ normalizedForm }
 				onChange={ onChange }
 				validity={ validity }
 			/>

@@ -80,7 +80,6 @@ const ValidationComponent = ( {
 	pattern,
 	minMax,
 	layout,
-	labelMode,
 }: {
 	required: boolean;
 	elements: 'sync' | 'async' | 'none';
@@ -88,7 +87,6 @@ const ValidationComponent = ( {
 	pattern: boolean;
 	minMax: boolean;
 	layout: 'regular' | 'panel' | 'card' | 'details';
-	labelMode: 'showRequired' | 'showOptional' | 'auto';
 } ) => {
 	type ValidatedItem = {
 		text: string;
@@ -807,7 +805,6 @@ const ValidationComponent = ( {
 	const form = useMemo( () => {
 		if ( layout === 'regular' ) {
 			return {
-				labelMode,
 				fields: [
 					'text',
 					{ id: 'customEdit' },
@@ -906,7 +903,6 @@ const ValidationComponent = ( {
 
 		if ( layout === 'panel' ) {
 			return {
-				labelMode,
 				layout: { type: 'panel' as const },
 				fields: groupedFields,
 			};
@@ -920,11 +916,10 @@ const ValidationComponent = ( {
 		}
 
 		return {
-			labelMode,
 			layout: { type: 'card' as const },
 			fields: groupedFields,
 		};
-	}, [ layout, labelMode ] );
+	}, [ layout ] );
 
 	const { validity, isValid } = useFormValidity( post, _fields, form );
 

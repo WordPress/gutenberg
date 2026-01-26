@@ -144,12 +144,10 @@ export type NormalizedFormField = {
 export type Form = {
 	layout?: Layout;
 	fields?: Array< FormField | string >;
-	labelMode?: 'showRequired' | 'showOptional' | 'auto';
 };
 export type NormalizedForm = {
 	layout: NormalizedLayout;
 	fields: NormalizedFormField[];
-	labelMode: 'showRequired' | 'showOptional';
 };
 
 export interface DataFormProps< Item > {
