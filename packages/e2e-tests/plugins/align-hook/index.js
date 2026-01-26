@@ -1,23 +1,22 @@
 ( function () {
 	const registerBlockType = wp.blocks.registerBlockType;
 	const el = wp.element.createElement;
+	const { useBlockProps } = wp.blockEditor;
 
 	const baseBlock = {
 		icon: 'cart',
 		category: 'text',
-		edit() {
-			return el(
-				'div',
-				{ style: { outline: '1px solid gray', padding: 5 } },
-				'Test Align Hook'
-			);
+		edit: function Edit() {
+			const blockProps = useBlockProps( {
+				style: { outline: '1px solid gray', padding: 5 },
+			} );
+			return el( 'div', blockProps, 'Test Align Hook' );
 		},
 		save() {
-			return el(
-				'div',
-				{ style: { outline: '1px solid gray', padding: 5 } },
-				'Test Align Hook'
-			);
+			const blockProps = useBlockProps.save( {
+				style: { outline: '1px solid gray', padding: 5 },
+			} );
+			return el( 'div', blockProps, 'Test Align Hook' );
 		},
 	};
 
