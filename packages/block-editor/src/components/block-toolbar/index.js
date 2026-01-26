@@ -27,7 +27,7 @@ import BlockControls from '../block-controls';
 import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
 import { BlockLockToolbar } from '../block-lock';
-import { BlockVisibilityToolbar } from '../block-visibility';
+import { ViewportVisibilityToolbar } from '../block-visibility';
 import { BlockGroupToolbar } from '../convert-to-group-buttons';
 import BlockEditVisuallyButton from '../block-edit-visually-button';
 import { useShowHoveredOrFocusedGestures } from './utils';
@@ -213,7 +213,7 @@ export function PrivateBlockToolbar( {
 							/>
 							{ isDefaultEditingMode &&
 								showBlockVisibilityButton && (
-									<BlockVisibilityToolbar
+									<ViewportVisibilityToolbar
 										clientIds={ blockClientIds }
 									/>
 								) }

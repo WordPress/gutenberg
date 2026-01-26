@@ -21,7 +21,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import { ModifyContentOnlySectionMenuItem } from '../content-lock';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
-import { BlockVisibilityMenuItem } from '../block-visibility';
+import { BlockVisibilityViewportMenuItem } from '../block-visibility';
 import { EditSectionMenuItem } from './edit-section-menu-item';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
@@ -116,7 +116,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 							/>
 						) }
 						{ showVisibilityButton && (
-							<BlockVisibilityMenuItem
+							<BlockVisibilityViewportMenuItem
 								clientIds={ selectedClientIds }
 							/>
 						) }

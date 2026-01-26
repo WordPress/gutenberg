@@ -34,6 +34,18 @@ export const settings = {
 	},
 	transforms,
 	[ unlock( privateApis ).requiresWrapperOnCopy ]: true,
+	__experimentalLabel( attributes, { context } ) {
+		const { content } = attributes;
+
+		const customName = attributes?.metadata?.name;
+		const hasContent = content?.trim().length > 0;
+
+		// In the list view, use the block's content as the label.
+		// If the content is empty, fall back to the default label.
+		if ( context === 'list-view' && ( customName || hasContent ) ) {
+			return customName || content;
+		}
+	},
 };
 
 if ( window.__experimentalContentOnlyInspectorFields ) {

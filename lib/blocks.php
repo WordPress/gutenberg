@@ -10,7 +10,6 @@
  * with the built result from the plugin.
  */
 function gutenberg_reregister_core_block_types() {
-	// Blocks directory may not exist if working from a fresh clone.
 	$blocks_dirs = array(
 		__DIR__ . '/../build/scripts/block-library/',
 		__DIR__ . '/../build/scripts/edit-widgets/blocks/',
@@ -18,31 +17,22 @@ function gutenberg_reregister_core_block_types() {
 	);
 
 	foreach ( $blocks_dirs as $blocks_dir ) {
-		if ( ! is_dir( $blocks_dir ) ) {
-			continue;
-		}
+		$manifest_path = $blocks_dir . 'blocks-manifest.php';
+		$blocks        = require $manifest_path;
 
-		// Scan for block directories (those with block.json).
-		$block_json_files = glob( $blocks_dir . '*/block.json' );
-
-		foreach ( $block_json_files as $block_json_file ) {
-			$block_folder      = dirname( $block_json_file );
-			$block_name_folder = basename( $block_folder );
-
-			// Read block.json to get block name.
-			$metadata = json_decode( file_get_contents( $block_json_file ), true );
+		foreach ( $blocks as $block_name_folder => $metadata ) {
 			if ( ! is_array( $metadata ) || ! isset( $metadata['name'] ) ) {
 				continue;
 			}
 
-			// Deregister core version.
 			gutenberg_deregister_core_block_and_assets( $metadata['name'] );
 			gutenberg_register_core_block_assets( $block_name_folder );
-			$php_file = dirname( $block_folder ) . '/' . $block_name_folder . '.php';
+
+			$php_file = $blocks_dir . $block_name_folder . '.php';
 			if ( file_exists( $php_file ) ) {
 				require_once $php_file;
 			} else {
-				register_block_type_from_metadata( $block_json_file );
+				register_block_type_from_metadata( $blocks_dir . $block_name_folder );
 			}
 		}
 	}

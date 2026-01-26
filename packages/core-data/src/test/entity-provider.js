@@ -86,6 +86,7 @@ describe( 'useEntityBlockEditor', () => {
 		const edit = ( { children } ) => <>{ children }</>;
 
 		registerBlockType( 'core/test-block', {
+			apiVersion: 3,
 			supports: {
 				className: false,
 			},
@@ -112,6 +113,7 @@ describe( 'useEntityBlockEditor', () => {
 		} );
 
 		registerBlockType( 'core/test-block-with-array-of-strings', {
+			apiVersion: 3,
 			supports: {
 				className: false,
 			},
