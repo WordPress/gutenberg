@@ -7,12 +7,55 @@ import { pathToFileURL } from 'url';
 import { createRequire } from 'module';
 import autoprefixer from 'autoprefixer';
 import cssnano from 'cssnano';
+// @ts-ignore - rtlcss doesn't have type definitions
 import rtlcss from 'rtlcss';
 
 /**
  * Internal dependencies
  */
 import { getPackageInfoFromFile } from './package-utils.mjs';
+
+/**
+ * @typedef {Object} AutoprefixerOptions
+ * @property {boolean}             [grid]    Enable/disable grid prefixes.
+ * @property {boolean|'no-2009'}   [flexbox] Enable/disable flexbox prefixes.
+ */
+
+/**
+ * @typedef {Object} CssnanoOptions
+ * @property {Array<string|Object>} [preset] Cssnano preset configuration.
+ */
+
+/**
+ * @typedef {Object} RtlcssOptions
+ * @property {boolean} [autoRename] Enable/disable auto-renaming.
+ */
+
+/**
+ * @typedef {Object} ModulesOptions
+ * @property {string} [generateScopedName] Pattern for generating scoped class names.
+ */
+
+/**
+ * @typedef {string|Function|[string, Object]} PluginConfig
+ */
+
+/**
+ * @typedef {Object} PostcssConfigBase
+ * @property {AutoprefixerOptions} [autoprefixer] Autoprefixer options.
+ * @property {CssnanoOptions}      [cssnano]      Cssnano options.
+ * @property {RtlcssOptions}       [rtlcss]       RTL CSS options.
+ * @property {ModulesOptions}      [modules]      CSS modules options.
+ * @property {PluginConfig[]}      [plugins]      Custom PostCSS plugins.
+ */
+
+/**
+ * @typedef {PostcssConfigBase & Record<string, unknown>} PostcssConfig
+ */
+
+/**
+ * @typedef {import('type-fest').PackageJson & { wpPostcss?: PostcssConfig }} ExtendedPackageJson
+ */
 
 /**
  * Supported PostCSS configuration file names in order of priority.
@@ -73,7 +116,10 @@ export function hasPostcssConfig( dir ) {
 	// Check for wpPostcss in package.json
 	const packageJsonPath = path.join( dir, 'package.json' );
 	if ( existsSync( packageJsonPath ) ) {
-		const packageJson = getPackageInfoFromFile( packageJsonPath );
+		const packageJson =
+			/** @type {ExtendedPackageJson|null} */ (
+				getPackageInfoFromFile( packageJsonPath )
+			);
 		if ( packageJson && packageJson.wpPostcss ) {
 			return true;
 		}
@@ -87,7 +133,7 @@ export function hasPostcssConfig( dir ) {
  * Supports JS (CommonJS/ESM), JSON, and YAML formats.
  *
  * @param {string} configPath Path to the config file.
- * @return {Promise<Object>} Loaded configuration object.
+ * @return {Promise<PostcssConfig>} Loaded configuration object.
  */
 export async function loadPostcssConfigFile( configPath ) {
 	const ext = path.extname( configPath ).toLowerCase();
@@ -132,9 +178,10 @@ export async function loadPostcssConfigFile( configPath ) {
  *
  * @param {string} packageDir Directory of the package being built.
  * @param {string} rootDir    Root directory of the project.
- * @return {Promise<Object>} Merged PostCSS configuration.
+ * @return {Promise<PostcssConfig>} Merged PostCSS configuration.
  */
 export async function getPostcssConfig( packageDir, rootDir ) {
+	/** @type {PostcssConfig} */
 	let config = { ...defaultPostcssConfig };
 
 	// Load root-level config if it exists
@@ -147,7 +194,10 @@ export async function getPostcssConfig( packageDir, rootDir ) {
 	// Load package-level overrides from package.json wpPostcss field
 	const packageJsonPath = path.join( packageDir, 'package.json' );
 	if ( existsSync( packageJsonPath ) ) {
-		const packageJson = getPackageInfoFromFile( packageJsonPath );
+		const packageJson =
+			/** @type {ExtendedPackageJson|null} */ (
+				getPackageInfoFromFile( packageJsonPath )
+			);
 		if ( packageJson && packageJson.wpPostcss ) {
 			config = mergePostcssConfigs( config, packageJson.wpPostcss );
 		}
@@ -160,29 +210,35 @@ export async function getPostcssConfig( packageDir, rootDir ) {
  * Deep merge two PostCSS configurations.
  * Override config values take precedence, arrays are concatenated.
  *
- * @param {Object} base     Base configuration.
- * @param {Object} override Override configuration.
- * @return {Object} Merged configuration.
+ * @param {PostcssConfig} base     Base configuration.
+ * @param {PostcssConfig} override Override configuration.
+ * @return {PostcssConfig} Merged configuration.
  */
 export function mergePostcssConfigs( base, override ) {
+	/** @type {PostcssConfig} */
 	const result = { ...base };
 
 	for ( const [ key, value ] of Object.entries( override ) ) {
 		if ( key === 'plugins' ) {
 			// Concatenate plugins arrays
-			result.plugins = [ ...( base.plugins || [] ), ...( value || [] ) ];
+			const basePlugins = base.plugins || [];
+			const overridePlugins = /** @type {PluginConfig[]} */ ( value ) || [];
+			result.plugins = [ ...basePlugins, ...overridePlugins ];
 		} else if (
 			typeof value === 'object' &&
 			value !== null &&
 			! Array.isArray( value )
 		) {
 			// Deep merge objects
+			const baseValue = /** @type {Record<string, unknown>} */ ( base )[ key ] || {};
+			// @ts-ignore - dynamic key assignment
 			result[ key ] = {
-				...( base[ key ] || {} ),
-				...value,
+				...baseValue,
+				.../** @type {Record<string, unknown>} */ ( value ),
 			};
 		} else {
 			// Direct assignment for primitives and arrays
+			// @ts-ignore - dynamic key assignment
 			result[ key ] = value;
 		}
 	}
@@ -194,8 +250,8 @@ export function mergePostcssConfigs( base, override ) {
  * Resolve a plugin from its name or configuration.
  * Handles both string names and plugin instances.
  *
- * @param {string|Function|Array} plugin  Plugin name, instance, or [name, options] array.
- * @param {string}                rootDir Root directory of the project (for resolving plugins).
+ * @param {PluginConfig} plugin  Plugin name, instance, or [name, options] array.
+ * @param {string}       rootDir Root directory of the project (for resolving plugins).
  * @return {Promise<Function>} Resolved PostCSS plugin instance.
  */
 async function resolvePlugin( plugin, rootDir ) {
@@ -216,8 +272,9 @@ async function resolvePlugin( plugin, rootDir ) {
 			const pluginFn = pluginModule.default || pluginModule;
 			return pluginFn( options );
 		} catch ( error ) {
+			const errorMessage = error instanceof Error ? error.message : String( error );
 			throw new Error(
-				`Failed to load PostCSS plugin "${ name }": ${ error.message }. ` +
+				`Failed to load PostCSS plugin "${ name }": ${ errorMessage }. ` +
 				`Make sure the plugin is installed in your project.`
 			);
 		}
@@ -231,8 +288,9 @@ async function resolvePlugin( plugin, rootDir ) {
 			const pluginFn = pluginModule.default || pluginModule;
 			return pluginFn();
 		} catch ( error ) {
+			const errorMessage = error instanceof Error ? error.message : String( error );
 			throw new Error(
-				`Failed to load PostCSS plugin "${ plugin }": ${ error.message }. ` +
+				`Failed to load PostCSS plugin "${ plugin }": ${ errorMessage }. ` +
 				`Make sure the plugin is installed in your project.`
 			);
 		}
@@ -249,10 +307,10 @@ async function resolvePlugin( plugin, rootDir ) {
  * - 'rtl': rtlcss only (applied to LTR output to generate RTL stylesheet)
  * - 'minify': cssnano only (for minification)
  *
- * @param {Object} config  PostCSS configuration object.
- * @param {string} stage   Processing stage: 'ltr', 'rtl', or 'minify'.
- * @param {string} rootDir Root directory of the project (for resolving plugins).
- * @return {Promise<Function[]>} Array of PostCSS plugin instances.
+ * @param {PostcssConfig}          config  PostCSS configuration object.
+ * @param {'ltr'|'rtl'|'minify'}   stage   Processing stage: 'ltr', 'rtl', or 'minify'.
+ * @param {string}                 rootDir Root directory of the project (for resolving plugins).
+ * @return {Promise<Array<Function>>} Array of PostCSS plugin instances.
  */
 export async function createPostcssPlugins( config, stage, rootDir ) {
 	const plugins = [];
@@ -284,8 +342,8 @@ export async function createPostcssPlugins( config, stage, rootDir ) {
 /**
  * Get CSS modules configuration from PostCSS config.
  *
- * @param {Object} config PostCSS configuration object.
- * @return {Object} CSS modules configuration.
+ * @param {PostcssConfig} config PostCSS configuration object.
+ * @return {ModulesOptions} CSS modules configuration.
  */
 export function getModulesConfig( config ) {
 	return config.modules || defaultPostcssConfig.modules;
