@@ -61,7 +61,6 @@
 		"@types/semver": "7.3.8",
 		"@types/sprintf-js": "1.1.2",
 		"@types/uuid": "8.3.1",
-		"@vitejs/plugin-react": "5.1.2",
 		"@wordpress/build": "file:./packages/wp-build",
 		"@wordpress/vips": "file:./packages/vips",
 		"ajv": "8.17.1",
@@ -124,7 +123,6 @@
 		"stylelint-plugin-logical-css": "^1.2.3",
 		"typescript": "5.9.3",
 		"uuid": "9.0.1",
-		"vite": "7.3.0",
 		"wait-on": "8.0.1"
 	},
 	"overrides": {
