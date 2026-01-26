@@ -516,13 +516,37 @@ function Navigation( {
 		[ clientId ]
 	);
 
-	// Force overlayMenu to 'never' if within an overlay template part
-	// to prevent overlays within overlays.
+	// Configure navigation blocks in overlay templates.
+	const hasSetOverlayDefault = useRef( false );
 	useEffect( () => {
-		if ( isWithinOverlay && overlayMenu !== 'never' ) {
+		if ( ! isWithinOverlay ) {
+			return;
+		}
+
+		// Prevent nested overlays.
+		if ( overlayMenu !== 'never' ) {
 			setAttributes( { overlayMenu: 'never' } );
 		}
-	}, [ isWithinOverlay, overlayMenu, setAttributes ] );
+
+		// Set vertical orientation and always-open submenus for new blocks.
+		if ( ! hasSetOverlayDefault.current && ! ref ) {
+			hasSetOverlayDefault.current = true;
+			setAttributes( {
+				submenuVisibility: 'always',
+				layout: {
+					...attributes.layout,
+					orientation: 'vertical',
+				},
+				showSubmenuIcon: false,
+			} );
+		}
+	}, [
+		attributes.layout,
+		isWithinOverlay,
+		overlayMenu,
+		ref,
+		setAttributes,
+	] );
 
 	const isResponsive = 'never' !== overlayMenu;
 	const blockProps = useBlockProps( {

@@ -11,6 +11,8 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useView } from '@wordpress/views';
 import { useSelect } from '@wordpress/data';
+import { addQueryArgs } from '@wordpress/url';
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -32,9 +34,7 @@ import {
 	previewField,
 	templatePartAuthorField,
 } from './fields';
-import { addQueryArgs } from '@wordpress/url';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
-import { Button } from '@wordpress/components';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
@@ -214,7 +214,10 @@ export default function DataviewsPatterns() {
 								{ __( 'Reset view' ) }
 							</Button>
 						) }
-						<PatternsActions />
+						<PatternsActions
+							categoryId={ categoryId }
+							postType={ postType }
+						/>
 					</>
 				}
 			>
