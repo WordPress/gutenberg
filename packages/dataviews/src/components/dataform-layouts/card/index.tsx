@@ -7,14 +7,17 @@ import {
 	CardBody,
 	CardHeader as OriginalCardHeader,
 } from '@wordpress/components';
+import { Badge } from '@wordpress/ui';
 import {
 	useCallback,
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 } from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
+import { sprintf, _n } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -23,6 +26,7 @@ import { getFormFieldLayout } from '..';
 import DataFormContext from '../../dataform-context';
 import type {
 	FieldLayoutProps,
+	FieldValidity,
 	NormalizedCardLayout,
 	NormalizedField,
 	NormalizedForm,
@@ -31,6 +35,33 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import { getSummaryFields } from '../get-summary-fields';
+
+function countInvalidFields( validity: FieldValidity | undefined ): number {
+	if ( ! validity ) {
+		return 0;
+	}
+
+	let count = 0;
+	const validityRules = Object.keys( validity ).filter(
+		( key ) => key !== 'children'
+	);
+
+	for ( const key of validityRules ) {
+		const rule = validity[ key as keyof Omit< FieldValidity, 'children' > ];
+		if ( rule?.type === 'invalid' ) {
+			count++;
+		}
+	}
+
+	// Count children recursively
+	if ( validity.children ) {
+		for ( const childValidity of Object.values( validity.children ) ) {
+			count += countInvalidFields( childValidity );
+		}
+	}
+
+	return count;
+}
 
 const NonCollapsibleCardHeader = ( {
 	children,
@@ -56,6 +87,7 @@ const NonCollapsibleCardHeader = ( {
 export function useCardHeader( layout: NormalizedCardLayout ) {
 	const { isOpened, isCollapsible } = layout;
 	const [ isOpen, setIsOpen ] = useState( isOpened );
+	const [ touched, setTouched ] = useState( false );
 
 	// Sync internal state when the isOpened prop changes.
 	// This is unlikely to happen in production, but it helps with storybook controls.
@@ -64,8 +96,12 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 	}, [ isOpened ] );
 
 	const toggle = useCallback( () => {
+		// Mark as touched when collapsing (going from open to closed)
+		if ( isOpen ) {
+			setTouched( true );
+		}
 		setIsOpen( ( prev ) => ! prev );
-	}, [] );
+	}, [ isOpen ] );
 
 	const CollapsibleCardHeader = useCallback(
 		( {
@@ -111,7 +147,12 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 		? CollapsibleCardHeader
 		: NonCollapsibleCardHeader;
 
-	return { isOpen: effectiveIsOpen, CardHeader: CardHeaderComponent };
+	return {
+		isOpen: effectiveIsOpen,
+		CardHeader: CardHeaderComponent,
+		touched,
+		setTouched,
+	};
 }
 
 function isSummaryFieldVisible< Item >(
@@ -174,6 +215,7 @@ export default function FormCardField< Item >( {
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedCardLayout;
+	const cardBodyRef = useRef< HTMLDivElement >( null );
 
 	const form: NormalizedForm = useMemo(
 		() => ( {
@@ -183,13 +225,53 @@ export default function FormCardField< Item >( {
 		[ field ]
 	);
 
-	const { isOpen, CardHeader } = useCardHeader( layout );
+	const { isOpen, CardHeader, touched, setTouched } = useCardHeader( layout );
+
+	// Mark the card as touched when any field inside it is blurred.
+	// This aligns with how validated controls show errors on blur.
+	const handleBlur = useCallback( () => {
+		setTouched( true );
+	}, [ setTouched ] );
+
+	// When the card is expanded after being touched (collapsed with errors),
+	// trigger reportValidity to show field-level errors.
+	useEffect( () => {
+		if ( isOpen && touched && cardBodyRef.current ) {
+			// Trigger reportValidity on each input within the card to fire the
+			// 'invalid' event, which makes validated controls show errors.
+			const inputs = cardBodyRef.current.querySelectorAll(
+				'input, textarea, select, fieldset'
+			);
+			inputs.forEach( ( input ) => {
+				( input as HTMLInputElement ).reportValidity();
+			} );
+		}
+	}, [ isOpen, touched ] );
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
 
 	const visibleSummaryFields = summaryFields.filter( ( summaryField ) =>
 		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
 	);
+
+	// Count invalid fields for validation badge
+	const invalidCount = countInvalidFields( validity );
+	const showValidationBadge =
+		touched && invalidCount > 0 && layout.isCollapsible;
+
+	const validationBadge = showValidationBadge ? (
+		<Badge intent="high">
+			{ sprintf(
+				/* translators: %d: Number of fields that need attention */
+				_n(
+					'%d field needs attention',
+					'%d fields need attention',
+					invalidCount
+				),
+				invalidCount
+			) }
+		</Badge>
+	) : null;
 
 	const sizeCard = {
 		blockStart: 'medium' as const,
@@ -217,6 +299,7 @@ export default function FormCardField< Item >( {
 						<span className="dataforms-layouts-card__field-header-label">
 							{ field.label }
 						</span>
+						{ validationBadge }
 						{ visibleSummaryFields.length > 0 &&
 							layout.withHeader && (
 								<div className="dataforms-layouts-card__field-summary">
@@ -239,6 +322,8 @@ export default function FormCardField< Item >( {
 					<CardBody
 						size={ sizeCardBody }
 						className="dataforms-layouts-card__field-control"
+						ref={ cardBodyRef }
+						onBlur={ handleBlur }
 					>
 						{ field.description && (
 							<div className="dataforms-layouts-card__field-description">
@@ -285,6 +370,7 @@ export default function FormCardField< Item >( {
 					<span className="dataforms-layouts-card__field-header-label">
 						{ fieldDefinition.label }
 					</span>
+					{ validationBadge }
 					{ visibleSummaryFields.length > 0 && layout.withHeader && (
 						<div className="dataforms-layouts-card__field-summary">
 							{ visibleSummaryFields.map( ( summaryField ) => (
@@ -304,6 +390,8 @@ export default function FormCardField< Item >( {
 				<CardBody
 					size={ sizeCardBody }
 					className="dataforms-layouts-card__field-control"
+					ref={ cardBodyRef }
+					onBlur={ handleBlur }
 				>
 					<RegularLayout
 						data={ data }

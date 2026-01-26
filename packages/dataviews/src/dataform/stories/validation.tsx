@@ -86,7 +86,12 @@ const ValidationComponent = ( {
 	custom: 'sync' | 'async' | 'none';
 	pattern: boolean;
 	minMax: boolean;
-	layout: 'regular' | 'panel' | 'card' | 'details';
+	layout:
+		| 'regular'
+		| 'panel'
+		| 'card-collapsible'
+		| 'card-not-collapsible'
+		| 'details';
 } ) => {
 	type ValidatedItem = {
 		text: string;
@@ -987,8 +992,16 @@ const ValidationComponent = ( {
 			};
 		}
 
+		if ( layout === 'card-collapsible' ) {
+			return {
+				layout: { type: 'card' as const },
+				fields: groupedFields,
+			};
+		}
+
+		// card-not-collapsible
 		return {
-			layout: { type: 'card' as const },
+			layout: { type: 'card' as const, isCollapsible: false },
 			fields: groupedFields,
 		};
 	}, [ layout ] );
