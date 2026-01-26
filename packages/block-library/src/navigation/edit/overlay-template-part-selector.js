@@ -85,7 +85,7 @@ export default function OverlayTemplatePartSelector( {
 	const options = useMemo( () => {
 		const baseOptions = [
 			{
-				label: __( 'None (default)' ),
+				label: __( 'Default' ),
 				value: '',
 			},
 		];
@@ -238,54 +238,79 @@ export default function OverlayTemplatePartSelector( {
 
 	return (
 		<div className="wp-block-navigation__overlay-selector">
-			<Button
-				size="small"
-				icon={ plus }
-				onClick={ handleCreateOverlay }
-				disabled={ isCreateButtonDisabled }
-				accessibleWhenDisabled
-				isBusy={ isCreating }
-				label={ __( 'Create new overlay template' ) }
-				showTooltip
-				className="wp-block-navigation__overlay-create-button"
-			/>
-			<HStack alignment="flex-start">
-				<FlexBlock>
-					<SelectControl
+			<h3 className="wp-block-navigation__overlay-selector-header">
+				{ __( 'Overlay Template' ) }
+			</h3>
+			{ hasResolved && overlayTemplateParts.length === 0 ? (
+				<>
+					<Button
 						__next40pxDefaultSize
-						__nextHasNoMarginBottom
-						label={ __( 'Overlay template' ) }
-						value={ overlay || '' }
-						options={ options }
-						onChange={ handleSelectChange }
-						disabled={ isResolving }
+						variant="secondary"
+						onClick={ handleCreateOverlay }
+						disabled={ isCreateButtonDisabled }
 						accessibleWhenDisabled
-						help={ helpText }
+						isBusy={ isCreating }
+						className="wp-block-navigation__overlay-create-button-prominent"
+					>
+						{ __( 'Create overlay' ) }
+					</Button>
+					<p className="wp-block-navigation__overlay-help-text">
+						{ __(
+							'An overlay template allows you to customize the appearance of the dialog that opens when the menu button is pressed.'
+						) }
+					</p>
+				</>
+			) : (
+				<>
+					<Button
+						size="small"
+						icon={ plus }
+						onClick={ handleCreateOverlay }
+						disabled={ isCreateButtonDisabled }
+						accessibleWhenDisabled
+						isBusy={ isCreating }
+						label={ __( 'Create new overlay template' ) }
+						showTooltip
+						className="wp-block-navigation__overlay-create-button"
 					/>
-				</FlexBlock>
-				{ overlay && hasResolved && selectedTemplatePart && (
-					<FlexItem>
-						<Button
-							__next40pxDefaultSize
-							variant="secondary"
-							onClick={ handleEditClick }
-							disabled={ ! onNavigateToEntityRecord }
-							accessibleWhenDisabled
-							label={ editButtonLabel }
-							showTooltip
-							className="wp-block-navigation__overlay-edit-button"
-						>
-							{ __( 'Edit' ) }
-						</Button>
-					</FlexItem>
-				) }
-			</HStack>
-			{ isOverlayMissing && (
-				<DeletedOverlayWarning
-					onClear={ handleClearOverlay }
-					onCreate={ handleCreateOverlay }
-					isCreating={ isCreating }
-				/>
+					<HStack alignment="flex-start">
+						<FlexBlock>
+							<SelectControl
+								__next40pxDefaultSize
+								__nextHasNoMarginBottom
+								value={ overlay || '' }
+								options={ options }
+								onChange={ handleSelectChange }
+								disabled={ isResolving }
+								accessibleWhenDisabled
+								help={ helpText }
+							/>
+						</FlexBlock>
+						{ overlay && hasResolved && selectedTemplatePart && (
+							<FlexItem>
+								<Button
+									__next40pxDefaultSize
+									variant="secondary"
+									onClick={ handleEditClick }
+									disabled={ ! onNavigateToEntityRecord }
+									accessibleWhenDisabled
+									label={ editButtonLabel }
+									showTooltip
+									className="wp-block-navigation__overlay-edit-button"
+								>
+									{ __( 'Edit' ) }
+								</Button>
+							</FlexItem>
+						) }
+					</HStack>
+					{ isOverlayMissing && (
+						<DeletedOverlayWarning
+							onClear={ handleClearOverlay }
+							onCreate={ handleCreateOverlay }
+							isCreating={ isCreating }
+						/>
+					) }
+				</>
 			) }
 		</div>
 	);
