@@ -169,6 +169,7 @@ class PlaygroundRuntime {
 
 		const siteUrl = `http://localhost:${ port }`;
 		const logFile = path.join( config.workDirectoryPath, 'playground.log' );
+		const pidFile = path.join( config.workDirectoryPath, 'playground.pid' );
 
 		// Use cross-spawn with detached mode for cross-platform support
 		// Create write stream for log file
@@ -202,6 +203,9 @@ class PlaygroundRuntime {
 				.then( async () => {
 					spinner.text = `WordPress Playground started at ${ siteUrl }`;
 
+					// Save PID to file so stop command can find the process
+					await fs.writeFile( pidFile, String( child.pid ) );
+
 					const message =
 						'WordPress development site started at ' + siteUrl;
 
@@ -215,6 +219,13 @@ class PlaygroundRuntime {
 					if ( this.serverProcess ) {
 						this.serverProcess.kill( 'SIGKILL' );
 						this.serverProcess = null;
+					}
+
+					// Clean up PID file
+					try {
+						await fs.unlink( pidFile );
+					} catch {
+						// Ignore if file doesn't exist
 					}
 
 					// Read log file for error details
@@ -248,16 +259,46 @@ class PlaygroundRuntime {
 	async stop( config, { spinner } ) {
 		spinner.text = 'Stopping WordPress Playground.';
 
-		if ( this.serverProcess ) {
-			// Try graceful shutdown first
-			this.serverProcess.kill( 'SIGTERM' );
+		const pidFile = path.join( config.workDirectoryPath, 'playground.pid' );
 
-			// Give it a moment for graceful shutdown
-			await new Promise( ( r ) => setTimeout( r, 1000 ) );
+		// Try to read PID from file if process reference not available
+		let pid = this.serverProcess?.pid;
+		if ( ! pid ) {
+			try {
+				const pidContent = await fs.readFile( pidFile, 'utf8' );
+				pid = parseInt( pidContent.trim(), 10 );
+			} catch ( error ) {
+				// PID file doesn't exist or can't be read
+				spinner.text = 'Stopped WordPress Playground.';
+				return;
+			}
+		}
 
-			// Force kill if still running
-			if ( ! this.serverProcess.killed ) {
-				this.serverProcess.kill( 'SIGKILL' );
+		if ( pid ) {
+			try {
+				// Kill the entire process group (negative PID)
+				// This ensures both the npm process and child node process are killed
+				process.kill( -pid, 'SIGTERM' );
+
+				// Give it a moment for graceful shutdown
+				await new Promise( ( r ) => setTimeout( r, 1000 ) );
+
+				// Check if still running and force kill if needed
+				try {
+					process.kill( -pid, 0 ); // Check if process group exists
+					process.kill( -pid, 'SIGKILL' ); // Force kill entire group
+				} catch {
+					// Process group already terminated
+				}
+			} catch ( error ) {
+				// Process group doesn't exist or already terminated
+			}
+
+			// Clean up PID file
+			try {
+				await fs.unlink( pidFile );
+			} catch {
+				// Ignore if file doesn't exist
 			}
 
 			this.serverProcess = null;
