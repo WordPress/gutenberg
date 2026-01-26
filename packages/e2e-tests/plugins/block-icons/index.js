@@ -17,6 +17,7 @@
 	);
 
 	registerBlockType( 'test/test-single-svg-icon', {
+		apiVersion: 3,
 		title: 'TestSimpleSvgIcon',
 		icon: svg,
 		category: 'text',
@@ -55,6 +56,7 @@
 	} );
 
 	registerBlockType( 'test/test-dash-icon', {
+		apiVersion: 3,
 		title: 'TestSimpleDashIcon',
 		icon: 'cart',
 		category: 'text',
@@ -93,6 +95,7 @@
 	} );
 
 	registerBlockType( 'test/test-function-icon', {
+		apiVersion: 3,
 		title: 'TestFunctionIcon',
 		icon() {
 			return svg;
@@ -133,6 +136,7 @@
 	} );
 
 	registerBlockType( 'test/test-dash-icon-colors', {
+		apiVersion: 3,
 		title: 'TestDashIconColors',
 		icon: {
 			background: '#010000',
@@ -175,6 +179,7 @@
 	} );
 
 	registerBlockType( 'test/test-svg-icon-background', {
+		apiVersion: 3,
 		title: 'TestSvgIconBackground',
 		icon: {
 			background: '#010000',

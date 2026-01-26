@@ -19,6 +19,7 @@
 	};
 
 	registerBlockType( 'test/test-inner-blocks-locking-all-embed', {
+		apiVersion: 3,
 		title: 'Test Inner Blocks Locking All Embed',
 		icon: 'cart',
 		category: 'text',

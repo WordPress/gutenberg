@@ -4,6 +4,7 @@
 	const { InnerBlocks } = wp.blockEditor;
 
 	registerBlockType( 'gutenberg/test-context-provider', {
+		apiVersion: 3,
 		title: 'Test Context Provider',
 
 		icon: 'list-view',
@@ -43,6 +44,7 @@
 	} );
 
 	registerBlockType( 'gutenberg/test-context-consumer', {
+		apiVersion: 3,
 		title: 'Test Context Consumer',
 
 		icon: 'list-view',

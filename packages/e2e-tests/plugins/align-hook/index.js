@@ -25,6 +25,7 @@
 		'test/test-no-alignment-set',
 		Object.assign(
 			{
+				apiVersion: 3,
 				title: 'Test No Alignment Set',
 			},
 			baseBlock
@@ -35,6 +36,7 @@
 		'test/test-align-true',
 		Object.assign(
 			{
+				apiVersion: 3,
 				title: 'Test Align True',
 				supports: {
 					align: true,
@@ -48,6 +50,7 @@
 		'test/test-align-array',
 		Object.assign(
 			{
+				apiVersion: 3,
 				title: 'Test Align Array',
 				supports: {
 					align: [ 'left', 'center' ],
@@ -61,6 +64,7 @@
 		'test/test-default-align',
 		Object.assign(
 			{
+				apiVersion: 3,
 				title: 'Test Default Align',
 				attributes: {
 					align: {

@@ -3,6 +3,7 @@
 	const el = wp.element.createElement;
 
 	registerBlockType( 'test/test-meta-attribute-block-early', {
+		apiVersion: 3,
 		title: 'Test Meta Attribute Block (Early Registration)',
 		icon: 'star',
 		category: 'text',

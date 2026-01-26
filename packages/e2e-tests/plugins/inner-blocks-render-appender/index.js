@@ -55,6 +55,7 @@
 	}
 
 	registerBlockType( 'test/inner-blocks-render-appender', {
+		apiVersion: 3,
 		title: 'InnerBlocks renderAppender',
 		icon: 'carrot',
 		category: 'text',
@@ -80,6 +81,7 @@
 	} );
 
 	registerBlockType( 'test/inner-blocks-render-appender-dynamic', {
+		apiVersion: 3,
 		title: 'InnerBlocks renderAppender dynamic',
 		icon: 'carrot',
 		category: 'text',

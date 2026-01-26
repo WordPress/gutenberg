@@ -4,6 +4,7 @@
 	const { registerBlockType } = wp.blocks;
 
 	registerBlockType( 'test/child-blocks-unrestricted-parent', {
+		apiVersion: 3,
 		title: 'Child Blocks Unrestricted Parent',
 		icon: 'carrot',
 		category: 'text',
@@ -18,6 +19,7 @@
 	} );
 
 	registerBlockType( 'test/child-blocks-restricted-parent', {
+		apiVersion: 3,
 		title: 'Child Blocks Restricted Parent',
 		icon: 'carrot',
 		category: 'text',
@@ -38,6 +40,7 @@
 	} );
 
 	registerBlockType( 'test/child-blocks-child', {
+		apiVersion: 3,
 		title: 'Child Blocks Child',
 		icon: 'carrot',
 		category: 'text',

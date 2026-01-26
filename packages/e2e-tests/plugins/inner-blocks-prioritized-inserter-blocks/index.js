@@ -16,6 +16,7 @@
 		return el( 'div', divProps, el( InnerBlocks.Content ) );
 	};
 	registerBlockType( 'test/prioritized-inserter-blocks-unset', {
+		apiVersion: 3,
 		title: 'Prioritized Inserter Blocks Unset',
 		icon: 'carrot',
 		category: 'text',
@@ -28,6 +29,7 @@
 	} );
 
 	registerBlockType( 'test/prioritized-inserter-blocks-set', {
+		apiVersion: 3,
 		title: 'Prioritized Inserter Blocks Set',
 		icon: 'carrot',
 		category: 'text',
@@ -52,6 +54,7 @@
 	registerBlockType(
 		'test/prioritized-inserter-blocks-set-with-conflicting-allowed-blocks',
 		{
+			apiVersion: 3,
 			title: 'Prioritized Inserter Blocks Set With Conflicting Allowed Blocks',
 			icon: 'carrot',
 			category: 'text',
