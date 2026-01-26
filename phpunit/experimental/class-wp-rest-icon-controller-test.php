@@ -102,8 +102,10 @@ class WP_Test_REST_Icon_Controller extends WP_Test_REST_TestCase {
 
 		$this->assertSame( 200, $response->get_status() );
 		$this->assertArrayHasKey( 'name', $data );
+		$this->assertArrayHasKey( 'label', $data );
 		$this->assertArrayHasKey( 'content', $data );
 		$this->assertSame( 'core/arrow-left', $data['name'] );
+		$this->assertSame( 'Arrow Left', $data['label'] );
 		$this->assertNotEmpty( $data['content'] );
 		$this->assertStringStartsWith(
 			'<svg xmlns="',

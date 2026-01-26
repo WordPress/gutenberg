@@ -18,12 +18,13 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		private static $instance = null;
 
 		public function __construct() {
-			$icons_directory = __DIR__ . '/../../packages/icons/src/library/';
+			$icons_directory = __DIR__ . '/../../packages/icons/src/';
 			if ( ! is_dir( $icons_directory ) ) {
 				return;
 			}
 
-			$collection = wp_json_file_decode( $icons_directory . 'index.json' );
+			$collection = include $icons_directory . 'manifest.php';
+
 			if ( empty( $collection ) ) {
 				wp_trigger_error(
 					'WP_Icons_Registry::__construct',
@@ -33,13 +34,13 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				return;
 			}
 
-			foreach ( $collection as $svg_src ) {
-				$icon_name = basename( $svg_src, '.svg' );
+			foreach ( $collection as $icon_name => $icon_data ) {
 				$this->register(
 					'core/' . $icon_name,
 					array(
 						'name'     => $icon_name,
-						'filePath' => $svg_src,
+						'label'    => $icon_data['label'],
+						'filePath' => $icons_directory . $icon_data['filePath'],
 					)
 				);
 			}
@@ -155,12 +156,10 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 */
 		private function get_content( $icon_name ) {
 			if ( ! isset( $this->registered_icons[ $icon_name ]['content'] ) ) {
-				$icons_directory = __DIR__ . '/../../packages/icons/src/library/';
-				$content         = file_get_contents(
-					$icons_directory .
+				$content = file_get_contents(
 					$this->registered_icons[ $icon_name ]['filePath']
 				);
-				$content         = $this->sanitize_icon_content( $content );
+				$content = $this->sanitize_icon_content( $content );
 
 				if ( empty( $content ) ) {
 					return new WP_Error(

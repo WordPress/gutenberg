@@ -173,7 +173,7 @@ if ( ! class_exists( 'WP_REST_Icon_Controller' ) ) {
 			$fields = $this->get_fields_for_response( $request );
 			$keys   = array(
 				'name'    => 'name',
-				'title'   => 'title',
+				'label'   => 'label',
 				'content' => 'content',
 			);
 			$data   = array();
@@ -206,6 +206,12 @@ if ( ! class_exists( 'WP_REST_Icon_Controller' ) ) {
 				'properties' => array(
 					'name'    => array(
 						'description' => __( 'The icon name.', 'gutenberg' ),
+						'type'        => 'string',
+						'readonly'    => true,
+						'context'     => array( 'view', 'edit', 'embed' ),
+					),
+					'label'   => array(
+						'description' => __( 'The icon label.', 'gutenberg' ),
 						'type'        => 'string',
 						'readonly'    => true,
 						'context'     => array( 'view', 'edit', 'embed' ),
