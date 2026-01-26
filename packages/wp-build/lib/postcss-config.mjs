@@ -24,6 +24,7 @@ const CONFIG_FILES = [
 	'.postcssrc',
 	'.postcssrc.json',
 	'.postcssrc.js',
+	'.postcssrc.cjs',
 	'.postcssrc.yaml',
 	'.postcssrc.yml',
 ];
@@ -209,19 +210,32 @@ async function resolvePlugin( plugin, rootDir ) {
 	// Array format: [pluginName, options]
 	if ( Array.isArray( plugin ) ) {
 		const [ name, options = {} ] = plugin;
-		// Resolve from project directory using require.resolve, then import
-		const resolvedPath = require.resolve( name );
-		const pluginModule = await import( pathToFileURL( resolvedPath ).href );
-		const pluginFn = pluginModule.default || pluginModule;
-		return pluginFn( options );
+		try {
+			const resolvedPath = require.resolve( name );
+			const pluginModule = await import( pathToFileURL( resolvedPath ).href );
+			const pluginFn = pluginModule.default || pluginModule;
+			return pluginFn( options );
+		} catch ( error ) {
+			throw new Error(
+				`Failed to load PostCSS plugin "${ name }": ${ error.message }. ` +
+				`Make sure the plugin is installed in your project.`
+			);
+		}
 	}
 
 	// String format: plugin name without options
 	if ( typeof plugin === 'string' ) {
-		const resolvedPath = require.resolve( plugin );
-		const pluginModule = await import( pathToFileURL( resolvedPath ).href );
-		const pluginFn = pluginModule.default || pluginModule;
-		return pluginFn();
+		try {
+			const resolvedPath = require.resolve( plugin );
+			const pluginModule = await import( pathToFileURL( resolvedPath ).href );
+			const pluginFn = pluginModule.default || pluginModule;
+			return pluginFn();
+		} catch ( error ) {
+			throw new Error(
+				`Failed to load PostCSS plugin "${ plugin }": ${ error.message }. ` +
+				`Make sure the plugin is installed in your project.`
+			);
+		}
 	}
 
 	throw new Error( `Invalid plugin format: ${ typeof plugin }` );
@@ -231,8 +245,8 @@ async function resolvePlugin( plugin, rootDir ) {
  * Create PostCSS plugins array for a specific processing stage.
  *
  * Processing stages:
- * - 'ltr': autoprefixer + custom plugins (for LTR stylesheet)
- * - 'rtl': autoprefixer + custom plugins + rtlcss (for RTL stylesheet)
+ * - 'ltr': autoprefixer + custom plugins (for LTR stylesheet, applied to source)
+ * - 'rtl': rtlcss only (applied to LTR output to generate RTL stylesheet)
  * - 'minify': cssnano only (for minification)
  *
  * @param {Object} config  PostCSS configuration object.
@@ -243,8 +257,8 @@ async function resolvePlugin( plugin, rootDir ) {
 export async function createPostcssPlugins( config, stage, rootDir ) {
 	const plugins = [];
 
-	if ( stage === 'ltr' || stage === 'rtl' ) {
-		// Add autoprefixer with config options
+	if ( stage === 'ltr' ) {
+		// LTR stage: autoprefixer + custom plugins (applied to source)
 		const autoprefixerOptions = config.autoprefixer || defaultPostcssConfig.autoprefixer;
 		plugins.push( autoprefixer( autoprefixerOptions ) );
 
@@ -254,12 +268,10 @@ export async function createPostcssPlugins( config, stage, rootDir ) {
 				plugins.push( await resolvePlugin( plugin, rootDir ) );
 			}
 		}
-
-		// Add rtlcss for RTL processing
-		if ( stage === 'rtl' ) {
-			const rtlcssOptions = config.rtlcss || defaultPostcssConfig.rtlcss;
-			plugins.push( rtlcss( rtlcssOptions ) );
-		}
+	} else if ( stage === 'rtl' ) {
+		// RTL stage: rtlcss only (applied to LTR output)
+		const rtlcssOptions = config.rtlcss || defaultPostcssConfig.rtlcss;
+		plugins.push( rtlcss( rtlcssOptions ) );
 	} else if ( stage === 'minify' ) {
 		// Minification stage: cssnano only
 		const cssnanoOptions = config.cssnano || defaultPostcssConfig.cssnano;

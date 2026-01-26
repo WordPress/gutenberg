@@ -1275,9 +1275,9 @@ async function compileStyles( packageName ) {
 							const ltrPlugins = await createPostcssPlugins( postcssConfig, 'ltr', ROOT_DIR );
 							const ltrResult = await postcss( ltrPlugins ).process( source, { from: undefined } );
 
-							// Process with autoprefixer + custom plugins + rtlcss for RTL version
+							// Process LTR output with rtlcss to generate RTL version
 							const rtlPlugins = await createPostcssPlugins( postcssConfig, 'rtl', ROOT_DIR );
-							const rtlResult = await postcss( rtlPlugins ).process( source, { from: undefined } );
+							const rtlResult = await postcss( rtlPlugins ).process( ltrResult.css, { from: undefined } );
 
 							await Promise.all( [
 								writeFile(
