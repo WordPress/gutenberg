@@ -1,3 +1,0 @@
-# Auto-generated worker code for inline Blob URL creation.
-# The build process generates a placeholder if needed, then overwrites it with real content.
-src/worker-code.ts

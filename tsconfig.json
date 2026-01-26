@@ -77,7 +77,6 @@
 		{ "path": "packages/vips" },
 		{ "path": "packages/warning" },
 		{ "path": "packages/wordcount" },
-		{ "path": "packages/worker-threads" },
 		{ "path": "packages/wp-build" },
 		{ "path": "test/e2e" },
 		{ "path": "packages/jest-console" },
