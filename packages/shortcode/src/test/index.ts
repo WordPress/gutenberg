@@ -308,15 +308,19 @@ describe( 'shortcode', () => {
 	} );
 
 	describe( 'string', () => {
-		it( 'should coerce non-string attribute values to strings', () => {
+		it( 'should coerce non-string attribute values to strings and skip undefined', () => {
 			const result = string( {
 				tag: 'gallery',
 				attrs: {
 					// @ts-expect-error TS is not happy about unknown properties here.
 					ids: [ 1, 2, 3 ],
 					columns: 4,
+					// Note: Objects are coerced to "[object Object]" which is not useful.
+					// Passing objects as attribute values should be avoided in real usage.
 					data: { test: 'value' },
 					flip: true,
+					// Undefined values should be skipped entirely.
+					missing: undefined,
 				},
 				type: 'single',
 			} );
