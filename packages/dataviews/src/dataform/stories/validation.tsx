@@ -993,8 +993,8 @@ const ValidationComponent = ( {
 		}
 
 		if ( layout === 'card-collapsible' ) {
-		return {
-			layout: { type: 'card' as const },
+			return {
+				layout: { type: 'card' as const },
 				fields: groupedFields,
 			};
 		}
