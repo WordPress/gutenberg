@@ -31,16 +31,9 @@ import type {
 	removeItem,
 	revokeBlobUrls,
 } from './private-actions';
-import { vipsCancelOperations } from './utils';
 import { validateMimeType } from '../validate-mime-type';
 import { validateMimeTypeForUser } from '../validate-mime-type-for-user';
 import { validateFileSize } from '../validate-file-size';
-import {
-	logInfo,
-	logCancel,
-	logError,
-	logBatchComplete,
-} from './utils/debug-logger';
 
 type ActionCreators = {
 	addItem: typeof addItem;
@@ -101,14 +94,6 @@ export function addItems( {
 }: AddItemsArgs ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
 		const batchId = uuidv4();
-
-		logInfo( `Adding ${ files.length } file(s) to upload queue`, {
-			batchId,
-			fileCount: files.length,
-			fileNames: files.map( ( f ) => f.name ),
-			allowedTypes: allowedTypes || 'all',
-		} );
-
 		for ( const file of files ) {
 			/*
 			 Check if the caller (e.g. a block) supports this mime type.
@@ -172,18 +157,15 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 			return;
 		}
 
-		logCancel( id, item.file.name, error );
-
 		item.abortController?.abort();
-
-		// Cancel any ongoing vips operations for this item.
-		await vipsCancelOperations( id );
 
 		if ( ! silent ) {
 			const { onError } = item;
 			onError?.( error ?? new Error( 'Upload cancelled' ) );
 			if ( ! onError && error ) {
-				logError( 'cancelItem', error, id );
+				// TODO: Find better way to surface errors with sideloads etc.
+				// eslint-disable-next-line no-console -- Deliberately log errors here.
+				console.error( 'Upload cancelled', error );
 			}
 		}
 
@@ -197,7 +179,6 @@ export function cancelItem( id: QueueItemId, error: Error, silent = false ) {
 
 		// All items of this batch were cancelled or finished.
 		if ( item.batchId && select.isBatchUploaded( item.batchId ) ) {
-			logBatchComplete( item.batchId );
 			item.onBatchSuccess?.();
 		}
 	};
@@ -220,11 +201,6 @@ export function retryItem( id: QueueItemId ) {
 		if ( ! item.error ) {
 			return;
 		}
-
-		logInfo( `Retrying failed item: ${ item.file.name }`, {
-			itemId: id,
-			previousError: item.error.message,
-		} );
 
 		dispatch< RetryItemAction >( {
 			type: Type.RetryItem,

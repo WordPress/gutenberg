@@ -6,34 +6,6 @@
  */
 
 /**
- * Debug logging for client-side media processing (load.php).
- * Set $debug_enabled to true to enable logging.
- *
- * @param string $message Log message.
- * @param array  $data    Optional data to include in log.
- */
-function gutenberg_media_load_debug_log( $message, $data = array() ) {
-	// Set to true to enable debug logging.
-	$debug_enabled = false;
-
-	if ( ! $debug_enabled ) {
-		return;
-	}
-
-	$timestamp = gmdate( 'H:i:s.v' );
-	$prefix    = "[MEDIA:PHP:LOAD] $timestamp";
-
-	if ( ! empty( $data ) ) {
-		$data_str = wp_json_encode( $data, JSON_PRETTY_PRINT );
-		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-		error_log( "$prefix $message\n  └─ Details: $data_str" );
-	} else {
-		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-		error_log( "$prefix $message" );
-	}
-}
-
-/**
  * Returns a list of all available image sizes.
  *
  * @return array Existing image sizes.
@@ -106,18 +78,6 @@ function gutenberg_media_processing_filter_rest_index( WP_REST_Response $respons
 		$response->data['jpeg_interlaced']      = $jpeg_interlaced;
 		$response->data['png_interlaced']       = $png_interlaced;
 		$response->data['gif_interlaced']       = $gif_interlaced;
-
-		gutenberg_media_load_debug_log(
-			'REST API settings provided to client',
-			array(
-				'image_size_threshold' => $image_size_threshold,
-				'image_sizes_count'    => count( $response->data['image_sizes'] ),
-				'image_sizes'          => array_keys( $response->data['image_sizes'] ),
-				'jpeg_interlaced'      => $jpeg_interlaced,
-				'png_interlaced'       => $png_interlaced,
-				'gif_interlaced'       => $gif_interlaced,
-			)
-		);
 	}
 
 	return $response;
@@ -295,15 +255,6 @@ function gutenberg_start_cross_origin_isolation_output_buffer(): void {
 
 	$coep = $is_safari ? 'require-corp' : 'credentialless';
 
-	gutenberg_media_load_debug_log(
-		'Setting up cross-origin isolation for WebAssembly/SharedArrayBuffer',
-		array(
-			'is_safari' => $is_safari ? 'yes' : 'no',
-			'COOP'      => 'same-origin',
-			'COEP'      => $coep,
-		)
-	);
-
 	ob_start(
 		function ( string $output ) use ( $coep ): string {
 			header( 'Cross-Origin-Opener-Policy: same-origin' );
@@ -409,29 +360,3 @@ function gutenberg_override_media_templates(): void {
 }
 
 add_action( 'wp_enqueue_media', 'gutenberg_override_media_templates' );
-
-/**
- * Filters the block editor preload paths to include media processing fields.
- *
- * Adds image_sizes and image_size_threshold to the root endpoint preload
- * to avoid an extra API request when these fields are needed.
- *
- * @param array                   $paths   REST API paths to preload.
- * @return array Filtered preload paths.
- */
-function gutenberg_media_processing_preload_paths( $paths ) {
-	foreach ( $paths as $key => $path ) {
-		if ( is_string( $path ) && str_starts_with( $path, '/?_fields=' ) ) {
-			// Add image_sizes and image_size_threshold after "home," to match
-			// the field order in packages/core-data/src/entities.js.
-			$paths[ $key ] = str_replace(
-				',home,',
-				',home,image_sizes,image_size_threshold,',
-				$path
-			);
-			break;
-		}
-	}
-	return $paths;
-}
-add_filter( 'block_editor_rest_api_preload_paths', 'gutenberg_media_processing_preload_paths', 10 );

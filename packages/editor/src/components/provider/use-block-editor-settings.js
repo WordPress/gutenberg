@@ -45,7 +45,6 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
-	'allImageSizes',
 	'alignWide',
 	'blockInspectorTabs',
 	'maxUploadFileSize',
@@ -116,8 +115,6 @@ const {
 function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
-		allImageSizes,
-		bigImageSizeThreshold,
 		allowRightClickOverrides,
 		blockTypes,
 		focusMode,
@@ -155,9 +152,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
 
-			// Fetch image sizes from REST API index for client-side media processing.
-			const baseData = getEntityRecord( 'root', '__unstableBase' );
-
 			function getSectionRootBlock() {
 				if ( renderingMode === 'template-locked' ) {
 					return getBlocksByName( 'core/post-content' )?.[ 0 ] ?? '';
@@ -172,8 +166,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			}
 
 			return {
-				allImageSizes: baseData?.image_sizes,
-				bigImageSizeThreshold: baseData?.image_size_threshold,
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
@@ -326,8 +318,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
-			allImageSizes,
-			bigImageSizeThreshold,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
@@ -430,8 +420,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		editMediaEntity,
 		wrappedOnNavigateToEntityRecord,
 		deviceType,
-		allImageSizes,
-		bigImageSizeThreshold,
 	] );
 }
 
