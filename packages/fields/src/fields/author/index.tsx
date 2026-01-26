@@ -22,18 +22,34 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 	id: 'author',
 	type: 'integer',
 	getElements: async () => {
-		const authors: Author[] =
-			( await resolveSelect( coreDataStore ).getEntityRecords(
+		const queryArgs: { per_page: number } = { per_page: -1 };
+		const [ authors, totalItems, totalPages ] = await Promise.all( [
+			resolveSelect( coreDataStore ).getEntityRecords< Author >(
 				'root',
 				'user',
-				{
-					per_page: -1,
-				}
-			) ) ?? [];
-		return authors.map( ( { id, name } ) => ( {
-			value: id,
-			label: name,
-		} ) );
+				queryArgs
+			),
+			resolveSelect( coreDataStore ).getEntityRecordsTotalItems(
+				'root',
+				'user',
+				queryArgs
+			),
+			resolveSelect( coreDataStore ).getEntityRecordsTotalPages(
+				'root',
+				'user',
+				queryArgs
+			),
+		] );
+		return {
+			elements: ( authors || [] ).map( ( { id, name } ) => ( {
+				value: id,
+				label: name,
+			} ) ),
+			paginationInfo: {
+				totalItems: totalItems ?? ( authors || [] ).length,
+				totalPages: totalPages ?? 1,
+			},
+		};
 	},
 	setValue: ( { value } ) => ( { author: Number( value ) } ),
 	render: AuthorView,

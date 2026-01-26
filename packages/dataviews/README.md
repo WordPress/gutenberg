@@ -1756,15 +1756,23 @@ Note this function may be called many times in the lifetime of the DataViews/Dat
 	type: 'integer',
 	label: 'Selected product',
 	getElements: () => {
-		return Promise.resolve( [
-			{ value: '1', label: 'Product A' },
-			{ value: '2', label: 'Product B' },
-			{ value: '3', label: 'Product C' },
-			{ value: '4', label: 'Product D' },
-		] );
+		return Promise.resolve( {
+			elements: [
+				{ value: '1', label: 'Product A' },
+				{ value: '2', label: 'Product B' },
+				{ value: '3', label: 'Product C' },
+				{ value: '4', label: 'Product D' },
+			],
+			paginationInfo: {
+				totalItems: 4,
+				totalPages: 1,
+			},
+		} );
 	}
 }
 ```
+
+**Note**: The `paginationInfo` property is optional. If omitted, it will be automatically calculated based on the number of elements returned, assuming there is one page of results.
 
 ### `filterBy`
 

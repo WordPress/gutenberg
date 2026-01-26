@@ -11,6 +11,7 @@ import checkbox from './checkbox';
 import combobox from './combobox';
 import datetime from './datetime';
 import date from './date';
+import elementsControl from './elements-control';
 import email from './email';
 import telephone from './telephone';
 import url from './url';
@@ -38,6 +39,7 @@ const FORM_CONTROLS: FormControls = {
 	combobox,
 	datetime,
 	date,
+	elementsControl,
 	email,
 	telephone,
 	url,
@@ -89,7 +91,7 @@ export function getControl< Item >(
 	}
 
 	if ( hasElements( field ) && field.type !== 'array' ) {
-		return getControlByType( 'select' );
+		return getControlByType( 'elementsControl' );
 	}
 
 	if ( fallback === null ) {

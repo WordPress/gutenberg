@@ -22,6 +22,22 @@ export interface Option< Value extends any = any > {
 	description?: string;
 }
 
+/**
+ * Pagination information returned by `getElements` function.
+ */
+export type GetElementsPaginationInfo = {
+	totalItems: number;
+	totalPages: number;
+};
+
+/**
+ * Result type for `getElements` function.
+ */
+export type GetElementsResult = {
+	elements: Option[];
+	paginationInfo?: GetElementsPaginationInfo;
+};
+
 export interface FilterByConfig {
 	/**
 	 * The list of operators supported by the field.
@@ -255,7 +271,7 @@ export type Field< Item > = {
 	/**
 	 * Retrieval function for elements.
 	 */
-	getElements?: () => Promise< Option[] >;
+	getElements?: () => Promise< GetElementsResult >;
 
 	/**
 	 * Filter config for the field.

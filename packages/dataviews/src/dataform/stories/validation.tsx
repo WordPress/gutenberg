@@ -157,16 +157,22 @@ const ValidationComponent = ( {
 						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
 							setTimeout(
 								() =>
-									resolve( [
-										{
-											value: 'option1',
-											label: 'Option 1',
+									resolve( {
+										elements: [
+											{
+												value: 'option1',
+												label: 'Option 1',
+											},
+											{
+												value: 'option2',
+												label: 'Option 2',
+											},
+										],
+										paginationInfo: {
+											totalItems: 2,
+											totalPages: 1,
 										},
-										{
-											value: 'option2',
-											label: 'Option 2',
-										},
-									] ),
+									} ),
 								3500
 							)
 						);
@@ -176,16 +182,22 @@ const ValidationComponent = ( {
 						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
 							setTimeout(
 								() =>
-									resolve( [
-										{
-											value: 'item1',
-											label: 'Item 1',
+									resolve( {
+										elements: [
+											{
+												value: 'item1',
+												label: 'Item 1',
+											},
+											{
+												value: 'item2',
+												label: 'Item 2',
+											},
+										],
+										paginationInfo: {
+											totalItems: 2,
+											totalPages: 1,
 										},
-										{
-											value: 'item2',
-											label: 'Item 2',
-										},
-									] ),
+									} ),
 								3500
 							)
 						);
@@ -195,33 +207,39 @@ const ValidationComponent = ( {
 						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
 							setTimeout(
 								() =>
-									resolve( [
-										{
-											value: 'us',
-											label: 'United States',
+									resolve( {
+										elements: [
+											{
+												value: 'us',
+												label: 'United States',
+											},
+											{
+												value: 'ca',
+												label: 'Canada',
+											},
+											{
+												value: 'uk',
+												label: 'United Kingdom',
+											},
+											{
+												value: 'fr',
+												label: 'France',
+											},
+											{
+												value: 'de',
+												label: 'Germany',
+											},
+											{ value: 'jp', label: 'Japan' },
+											{
+												value: 'au',
+												label: 'Australia',
+											},
+										],
+										paginationInfo: {
+											totalItems: 7,
+											totalPages: 1,
 										},
-										{
-											value: 'ca',
-											label: 'Canada',
-										},
-										{
-											value: 'uk',
-											label: 'United Kingdom',
-										},
-										{
-											value: 'fr',
-											label: 'France',
-										},
-										{
-											value: 'de',
-											label: 'Germany',
-										},
-										{ value: 'jp', label: 'Japan' },
-										{
-											value: 'au',
-											label: 'Australia',
-										},
-									] ),
+									} ),
 								3500
 							)
 						);
@@ -231,20 +249,26 @@ const ValidationComponent = ( {
 						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
 							setTimeout(
 								() =>
-									resolve( [
-										{
-											value: 'option1',
-											label: 'Option 1',
+									resolve( {
+										elements: [
+											{
+												value: 'option1',
+												label: 'Option 1',
+											},
+											{
+												value: 'option2',
+												label: 'Option 2',
+											},
+											{
+												value: 'option3',
+												label: 'Option 3',
+											},
+										],
+										paginationInfo: {
+											totalItems: 3,
+											totalPages: 1,
 										},
-										{
-											value: 'option2',
-											label: 'Option 2',
-										},
-										{
-											value: 'option3',
-											label: 'Option 3',
-										},
-									] ),
+									} ),
 								3500
 							)
 						);
@@ -254,16 +278,28 @@ const ValidationComponent = ( {
 						promiseCache[ fieldId ] = new Promise( ( resolve ) =>
 							setTimeout(
 								() =>
-									resolve( [
-										{ value: 'apple', label: 'Apple' },
-										{ value: 'banana', label: 'Banana' },
-										{ value: 'cherry', label: 'Cherry' },
-										{ value: 'date', label: 'Date' },
-										{
-											value: 'elderberry',
-											label: 'Elderberry',
+									resolve( {
+										elements: [
+											{ value: 'apple', label: 'Apple' },
+											{
+												value: 'banana',
+												label: 'Banana',
+											},
+											{
+												value: 'cherry',
+												label: 'Cherry',
+											},
+											{ value: 'date', label: 'Date' },
+											{
+												value: 'elderberry',
+												label: 'Elderberry',
+											},
+										],
+										paginationInfo: {
+											totalItems: 5,
+											totalPages: 1,
 										},
-									] ),
+									} ),
 								3500
 							)
 						);
