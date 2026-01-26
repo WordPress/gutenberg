@@ -73,7 +73,7 @@
 	},
 	"devDependencies": {
 		"@types/jest": "^29.5.14",
-		"@types/node": "^20.17.10",
+		"@types/node": "^20.19.0",
 		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
