@@ -28,8 +28,8 @@ function buildBlueprint( config ) {
 
 	// Add plugins
 	for ( const plugin of envConfig.pluginSources || [] ) {
-		if ( plugin.type === 'local' ) {
-			// Local plugins are mounted via CLI args, just activate
+		if ( plugin.type === 'local' || plugin.type === 'git' ) {
+			// Local and git plugins are mounted via CLI args, just activate
 			blueprint.steps.push( {
 				step: 'activatePlugin',
 				pluginPath: `/wordpress/wp-content/plugins/${ plugin.basename }`,
@@ -45,7 +45,7 @@ function buildBlueprint( config ) {
 				`Plugin source "${ plugin.basename || plugin.path }" of type "${
 					plugin.type
 				}" ` +
-					`is not supported with Playground runtime. Only local and zip plugins are supported.`
+					`is not supported with Playground runtime. Only local, git, and zip plugins are supported.`
 			);
 		}
 	}
@@ -90,7 +90,7 @@ function getMountArgs( config ) {
 
 	// Mount plugins
 	for ( const plugin of envConfig.pluginSources || [] ) {
-		if ( plugin.type === 'local' ) {
+		if ( plugin.type === 'local' || plugin.type === 'git' ) {
 			args.push(
 				'--mount-dir',
 				plugin.path,
@@ -101,14 +101,14 @@ function getMountArgs( config ) {
 				`Plugin source "${ plugin.basename || plugin.path }" of type "${
 					plugin.type
 				}" ` +
-					`is not supported with Playground runtime. Only local and zip plugins are supported.`
+					`is not supported with Playground runtime. Only local, git, and zip plugins are supported.`
 			);
 		}
 	}
 
 	// Mount themes
 	for ( const theme of envConfig.themeSources || [] ) {
-		if ( theme.type === 'local' ) {
+		if ( theme.type === 'local' || theme.type === 'git' ) {
 			args.push(
 				'--mount-dir',
 				theme.path,
@@ -119,7 +119,7 @@ function getMountArgs( config ) {
 				`Theme source "${ theme.basename || theme.path }" of type "${
 					theme.type
 				}" ` +
-					`is not supported with Playground runtime. Only local themes are supported.`
+					`is not supported with Playground runtime. Only local and git themes are supported.`
 			);
 		}
 	}
@@ -128,19 +128,22 @@ function getMountArgs( config ) {
 	for ( const [ wpDir, source ] of Object.entries(
 		envConfig.mappings || {}
 	) ) {
-		if ( source.type === 'local' ) {
+		if ( source.type === 'local' || source.type === 'git' ) {
 			args.push( '--mount-dir', source.path, `/wordpress/${ wpDir }` );
 		} else {
 			throw new Error(
 				`Mapping source "${ source.path }" for "${ wpDir }" of type "${ source.type }" ` +
-					`is not supported with Playground runtime. Only local mappings are supported.`
+					`is not supported with Playground runtime. Only local and git mappings are supported.`
 			);
 		}
 	}
 
 	// Mount core source if specified
 	if ( envConfig.coreSource ) {
-		if ( envConfig.coreSource.type === 'local' ) {
+		if (
+			envConfig.coreSource.type === 'local' ||
+			envConfig.coreSource.type === 'git'
+		) {
 			args.push(
 				'--mount-dir-before-install',
 				envConfig.coreSource.path,
@@ -149,7 +152,7 @@ function getMountArgs( config ) {
 		} else {
 			throw new Error(
 				`Core source of type "${ envConfig.coreSource.type }" is not supported ` +
-					`with Playground runtime. Only local core sources are supported.`
+					`with Playground runtime. Only local and git core sources are supported.`
 			);
 		}
 	}

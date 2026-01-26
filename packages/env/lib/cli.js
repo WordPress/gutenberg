@@ -2,7 +2,6 @@
 /**
  * External dependencies
  */
-const { execSync } = require( 'child_process' );
 const chalk = require( 'chalk' );
 const ora = require( 'ora' );
 const yargs = require( 'yargs' );
@@ -92,26 +91,6 @@ const withSpinner =
 	};
 
 module.exports = function cli() {
-	// Check if Playground runtime is explicitly requested
-	const runtimeArg = process.argv.find( ( arg ) =>
-		arg.startsWith( '--runtime=' )
-	);
-	const isPlaygroundRuntime =
-		runtimeArg === '--runtime=playground' ||
-		process.argv.includes( 'playground' );
-
-	// Do nothing if Docker is unavailable (unless using Playground runtime)
-	if ( ! isPlaygroundRuntime ) {
-		try {
-			execSync( 'docker info', { stdio: 'ignore' } );
-		} catch {
-			console.error(
-				chalk.red( 'Could not connect to Docker. Is it running?' )
-			);
-			process.exit( 1 );
-		}
-	}
-
 	yargs.usage( wpPrimary( '$0 <command>' ) );
 	yargs.option( 'debug', {
 		type: 'boolean',

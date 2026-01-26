@@ -18,6 +18,7 @@ const { rimraf } = require( 'rimraf' );
  */
 const { buildBlueprint, getMountArgs } = require( './blueprint-builder' );
 const { UnsupportedCommandError } = require( '../errors' );
+const { downloadSource } = require( '../../download-sources' );
 
 /**
  * Playground runtime implementation for wp-env.
@@ -87,6 +88,41 @@ class PlaygroundRuntime {
 		const envConfig = config.env.development;
 
 		spinner.text = 'Starting WordPress Playground.';
+
+		// Download remote sources (git/zip) if needed
+		const sources = [];
+		const addedSources = {};
+		const addSource = ( source ) => {
+			if (
+				source &&
+				( source.type === 'git' || source.type === 'zip' ) &&
+				! addedSources[ source.url ]
+			) {
+				sources.push( source );
+				addedSources[ source.url ] = true;
+			}
+		};
+
+		// Collect all sources that need downloading
+		envConfig.pluginSources.forEach( addSource );
+		envConfig.themeSources.forEach( addSource );
+		Object.values( envConfig.mappings ).forEach( addSource );
+		addSource( envConfig.coreSource );
+
+		// Download sources if any exist
+		if ( sources.length > 0 ) {
+			spinner.text = 'Downloading sources.';
+
+			await Promise.all(
+				sources.map( ( source ) =>
+					downloadSource( source, {
+						onProgress: () => {}, // Progress tracking could be added
+						spinner,
+						debug,
+					} )
+				)
+			);
+		}
 
 		// Build and save blueprint
 		const blueprint = buildBlueprint( config );

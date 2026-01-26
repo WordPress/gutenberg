@@ -43,14 +43,17 @@ function getAvailableRuntimes() {
 
 /**
  * Detect which runtime was used based on files in the work directory.
- * Returns 'playground' if playground.pid exists, otherwise 'docker'.
+ * Returns 'playground' if playground-blueprint.json exists, otherwise 'docker'.
  *
  * @param {string} workDirectoryPath Path to the wp-env work directory.
  * @return {string} Runtime name ('docker' or 'playground').
  */
 function detectRuntime( workDirectoryPath ) {
-	const playgroundPidFile = path.join( workDirectoryPath, 'playground.pid' );
-	if ( existsSync( playgroundPidFile ) ) {
+	const playgroundBlueprintFile = path.join(
+		workDirectoryPath,
+		'playground-blueprint.json'
+	);
+	if ( existsSync( playgroundBlueprintFile ) ) {
 		return 'playground';
 	}
 	return 'docker';
