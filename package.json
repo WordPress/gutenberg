@@ -50,7 +50,6 @@
 		"@emotion/styled": "11.14.1",
 		"@inquirer/prompts": "7.2.0",
 		"@octokit/rest": "16.26.0",
-		"@playwright/test": "1.58.2",
 		"@testing-library/jest-dom": "6.9.1",
 		"@testing-library/react": "16.3.2",
 		"@testing-library/user-event": "14.6.1",
@@ -193,8 +192,8 @@
 		"test:native:perf": "cross-env TEST_RUNNER_ARGS='--runInBand --config test/native/jest.config.js --testMatch \"**/performance/*.native.[jt]s?(x)\"' reassure",
 		"test:native:perf:baseline": "cross-env TEST_RUNNER_ARGS='--runInBand --config test/native/jest.config.js --testMatch \"**/performance/*.native.[jt]s?(x)\"' reassure --baseline",
 		"test:native:update": "npm run test:native -- --updateSnapshot",
-		"test:performance": "wp-scripts test-playwright --config test/performance/playwright.config.ts",
-		"test:performance:debug": "wp-scripts test-playwright --config test/performance/playwright.config.ts --debug",
+		"test:performance": "npm run --workspace @wordpress/performance-tests test:performance",
+		"test:performance:debug": "npm run --workspace @wordpress/performance-tests test:performance:debug",
 		"test:php": "npm-run-all lint:php test:unit:php",
 		"test:php:watch": "wp-env --config .wp-env.test.json run --env-cwd='wp-content/plugins/gutenberg' cli composer run-script test:watch",
 		"test:unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
@@ -252,6 +251,7 @@
 		"routes/*",
 		"storybook",
 		"test/e2e",
+		"test/performance",
 		"test/storybook-playwright"
 	]
 }
