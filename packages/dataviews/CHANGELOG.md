@@ -14,6 +14,7 @@
 
 ### Enhancements
 
+- Field API: `getValue` and `setValue` can provide an object. [#74900](https://github.com/WordPress/gutenberg/pull/74900)
 - Add new `combobox` DataForm control. [#74891](https://github.com/WordPress/gutenberg/pull/74891)
 - Include total items count in footer. [#73491](https://github.com/WordPress/gutenberg/pull/73491)
 
