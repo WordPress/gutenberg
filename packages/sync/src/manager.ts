@@ -49,6 +49,11 @@ interface EntityState {
 	ydoc: CRDTDoc;
 }
 
+export interface SyncManagerUpdateOptions {
+	isSave?: boolean;
+	isNewUndoLevel?: boolean;
+}
+
 /**
  * The sync manager orchestrates the lifecycle of syncing entity records. It
  * creates Yjs documents, connects to providers, creates awareness instances,
@@ -306,7 +311,7 @@ export function createSyncManager(): SyncManager {
 	 */
 	function unloadEntity( objectType: ObjectType, objectId: ObjectID ): void {
 		entityStates.get( getEntityId( objectType, objectId ) )?.unload();
-		updateCRDTDoc( objectType, null, {}, origin, true /* isSave */ );
+		updateCRDTDoc( objectType, null, {}, origin, { isSave: true } );
 	}
 
 	/**
@@ -450,21 +455,22 @@ export function createSyncManager(): SyncManager {
 	/**
 	 * Update CRDT document with changes from the local store.
 	 *
-	 * @param {ObjectType}            objectType     Object type.
-	 * @param {ObjectID}              objectId       Object ID.
-	 * @param {Partial< ObjectData >} changes        Updates to make.
-	 * @param {string}                origin         The source of change.
-	 * @param {boolean}               isSave         Whether this update is part of a save operation.
-	 * @param                         isNewUndoLevel Whether to create a new undo level for this change.
+	 * @param {ObjectType}               objectType             Object type.
+	 * @param {ObjectID}                 objectId               Object ID.
+	 * @param {Partial< ObjectData >}    changes                Updates to make.
+	 * @param {string}                   origin                 The source of change.
+	 * @param {SyncManagerUpdateOptions} options                Optional flags for the update.
+	 * @param {boolean}                  options.isSave         Whether this update is part of a save operation. Defaults to false.
+	 * @param {boolean}                  options.isNewUndoLevel Whether to create a new undo level for this change. Defaults to false.
 	 */
 	function updateCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID | null,
 		changes: Partial< ObjectData >,
 		origin: string,
-		isSave: boolean = false,
-		isNewUndoLevel: boolean = false
+		options: SyncManagerUpdateOptions = {}
 	): void {
+		const { isSave = false, isNewUndoLevel = false } = options;
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 		const collectionState = collectionStates.get( objectType );

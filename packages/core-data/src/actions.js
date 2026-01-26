@@ -453,8 +453,7 @@ export const editEntityRecord =
 					objectId,
 					editsWithMerges,
 					LOCAL_EDITOR_ORIGIN,
-					false, // isSave
-					isNewUndoLevel
+					{ isNewUndoLevel }
 				);
 			}
 		}
@@ -755,7 +754,7 @@ export const saveEntityRecord =
 								recordId,
 								updatedRecord,
 								LOCAL_EDITOR_ORIGIN,
-								true // isSave
+								{ isSave: true }
 							);
 						}
 					}
