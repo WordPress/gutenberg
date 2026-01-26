@@ -13,7 +13,6 @@
 		{ "path": "../i18n" },
 		{ "path": "../preferences" },
 		{ "path": "../private-apis" },
-		{ "path": "../url" },
-		{ "path": "../vips" }
+		{ "path": "../url" }
 	]
 }
