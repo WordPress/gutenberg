@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import type { CSSProperties } from 'react';
 import { Badge } from '../../badge';
-import { Button } from '../../button';
 import { Card } from '../index';
 
 const meta: Meta< typeof Card > = {
@@ -36,23 +35,14 @@ export const Default: Story = {
 	),
 };
 
-export const WithHeaderActions: Story = {
+export const WithSummary: Story = {
 	render: ( args ) => (
 		<Card { ...args }>
 			<Card.Header>
 				<span>Card title</span>
-				<span
-					style={ {
-						display: 'flex',
-						alignItems: 'center',
-						gap: 'var(--wpds-dimension-gap-xs)',
-					} }
-				>
-					<Badge intent="low">Badge</Badge>
-					<Button tone="neutral" variant="minimal" size="compact">
-						Action
-					</Button>
-				</span>
+				<Card.Summary>
+					<Badge intent="low">Summary</Badge>
+				</Card.Summary>
 			</Card.Header>
 			<Card.Body>
 				<div style={ placeholderStyles }>Content</div>

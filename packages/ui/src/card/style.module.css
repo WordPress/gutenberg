@@ -3,48 +3,45 @@
 @layer wp-ui-components {
 	.card {
 		--wp-ui-card-gap: calc(
-			var(--wpds-dimension-gap-md) + var(--wpds-dimension-gap-2xs)
+			var( --wpds-dimension-gap-md ) + var( --wpds-dimension-gap-2xs )
 		);
-		--wp-ui-card-padding-inline: var(--wpds-dimension-padding-surface-md);
+		--wp-ui-card-padding-inline: var( --wpds-dimension-padding-surface-md );
 		--wp-ui-card-padding-block-start: calc(
-			var(--wpds-dimension-padding-surface-sm) +
-				var(--wpds-dimension-gap-2xs)
+			var( --wpds-dimension-padding-surface-sm ) +
+				var( --wpds-dimension-gap-2xs )
 		);
-		--wp-ui-card-padding-block-end: var(--wpds-dimension-padding-surface-md);
+		--wp-ui-card-padding-block-end: var(
+			--wpds-dimension-padding-surface-md
+		);
 
 		display: flex;
 		flex-direction: column;
-		gap: var(--wp-ui-card-gap);
-		padding-block-start: var(--wp-ui-card-padding-block-start);
-		padding-block-end: var(--wp-ui-card-padding-block-end);
-		padding-inline: var(--wp-ui-card-padding-inline);
-		border: var(--wpds-border-width-surface-xs) solid
-			var(--wpds-color-stroke-surface-neutral-weak);
-		border-radius: var(--wpds-border-radius-surface-lg);
-		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		gap: var( --wp-ui-card-gap );
+		padding-block-start: var( --wp-ui-card-padding-block-start );
+		padding-block-end: var( --wp-ui-card-padding-block-end );
+		padding-inline: var( --wp-ui-card-padding-inline );
+		border: var( --wpds-border-width-surface-xs ) solid
+			var( --wpds-color-stroke-surface-neutral-weak );
+		border-radius: var( --wpds-border-radius-surface-lg );
+		background-color: var( --wpds-color-bg-surface-neutral-strong );
 	}
 
 	.header {
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		gap: var(--wpds-dimension-gap-xs);
-		font-family: var(--wpds-font-family-body);
-		font-size: var(--wpds-font-size-lg);
-		font-weight: var(--wpds-font-weight-medium);
-		line-height: var(--wpds-font-line-height-sm);
-		color: var(--wpds-color-fg-content-neutral);
+		gap: var( --wpds-dimension-gap-xs );
+		font-family: var( --wpds-font-family-body );
+		font-size: var( --wpds-font-size-lg );
+		font-weight: var( --wpds-font-weight-medium );
+		line-height: var( --wpds-font-line-height-sm );
+		color: var( --wpds-color-fg-content-neutral );
 	}
 
-	.body {
-		display: flex;
-		flex-direction: column;
-		gap: var(--wpds-dimension-gap-sm);
-	}
-
-	.footer {
+	.summary {
 		display: flex;
 		align-items: center;
-		gap: var(--wpds-dimension-gap-xs);
+		justify-content: space-between;
+		gap: var( --wpds-dimension-gap-xs );
 	}
 }
