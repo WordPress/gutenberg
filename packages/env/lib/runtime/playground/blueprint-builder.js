@@ -40,6 +40,13 @@ function buildBlueprint( config ) {
 				pluginZipFile: { url: plugin.url },
 				options: { activate: true },
 			} );
+		} else {
+			throw new Error(
+				`Plugin source "${ plugin.basename || plugin.path }" of type "${
+					plugin.type
+				}" ` +
+					`is not supported with Playground runtime. Only local and zip plugins are supported.`
+			);
 		}
 	}
 
@@ -85,8 +92,16 @@ function getMountArgs( config ) {
 	for ( const plugin of envConfig.pluginSources || [] ) {
 		if ( plugin.type === 'local' ) {
 			args.push(
-				'--mount',
-				`${ plugin.path }:/wordpress/wp-content/plugins/${ plugin.basename }`
+				'--mount-dir',
+				plugin.path,
+				`/wordpress/wp-content/plugins/${ plugin.basename }`
+			);
+		} else if ( plugin.type !== 'zip' ) {
+			throw new Error(
+				`Plugin source "${ plugin.basename || plugin.path }" of type "${
+					plugin.type
+				}" ` +
+					`is not supported with Playground runtime. Only local and zip plugins are supported.`
 			);
 		}
 	}
@@ -95,8 +110,16 @@ function getMountArgs( config ) {
 	for ( const theme of envConfig.themeSources || [] ) {
 		if ( theme.type === 'local' ) {
 			args.push(
-				'--mount',
-				`${ theme.path }:/wordpress/wp-content/themes/${ theme.basename }`
+				'--mount-dir',
+				theme.path,
+				`/wordpress/wp-content/themes/${ theme.basename }`
+			);
+		} else {
+			throw new Error(
+				`Theme source "${ theme.basename || theme.path }" of type "${
+					theme.type
+				}" ` +
+					`is not supported with Playground runtime. Only local themes are supported.`
 			);
 		}
 	}
@@ -106,16 +129,29 @@ function getMountArgs( config ) {
 		envConfig.mappings || {}
 	) ) {
 		if ( source.type === 'local' ) {
-			args.push( '--mount', `${ source.path }:/wordpress/${ wpDir }` );
+			args.push( '--mount-dir', source.path, `/wordpress/${ wpDir }` );
+		} else {
+			throw new Error(
+				`Mapping source "${ source.path }" for "${ wpDir }" of type "${ source.type }" ` +
+					`is not supported with Playground runtime. Only local mappings are supported.`
+			);
 		}
 	}
 
 	// Mount core source if specified
-	if ( envConfig.coreSource && envConfig.coreSource.type === 'local' ) {
-		args.push(
-			'--mount-before-install',
-			`${ envConfig.coreSource.path }:/wordpress`
-		);
+	if ( envConfig.coreSource ) {
+		if ( envConfig.coreSource.type === 'local' ) {
+			args.push(
+				'--mount-dir-before-install',
+				envConfig.coreSource.path,
+				'/wordpress'
+			);
+		} else {
+			throw new Error(
+				`Core source of type "${ envConfig.coreSource.type }" is not supported ` +
+					`with Playground runtime. Only local core sources are supported.`
+			);
+		}
 	}
 
 	return args;

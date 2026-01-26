@@ -3,10 +3,10 @@
 /**
  * External dependencies
  */
-const { spawn } = require( 'child_process' );
-const path = require( 'path' );
 const fs = require( 'fs' ).promises;
 const http = require( 'http' );
+const path = require( 'path' );
+const spawn = require( 'cross-spawn' );
 
 /**
  * Promisified dependencies
@@ -45,13 +45,13 @@ class PlaygroundRuntime {
 	getFeatures() {
 		return {
 			testsEnvironment: false, // Single environment only
-			xdebug: false, // Not supported in WebAssembly
+			xdebug: true, // Supported via --xdebug flag
 			spx: false, // Not supported in WebAssembly
-			phpMyAdmin: false, // No MySQL
+			phpMyAdmin: false, // Supported on playground.wordpress.net but not in CLI yet
 			multisite: true, // Supported via Blueprint
 			customPhpVersion: true, // Supported via --php flag
-			persistentDatabase: false, // SQLite resets
-			wpCli: true, // Limited support via Playground
+			persistentDatabase: false, // Could be supported via mounts (not yet implemented)
+			wpCli: true, // Limited support (not extensively tested)
 		};
 	}
 
@@ -81,8 +81,9 @@ class PlaygroundRuntime {
 	 * @param {Object}  options         Start options.
 	 * @param {Object}  options.spinner A CLI spinner which indicates progress.
 	 * @param {boolean} options.debug   True if debug mode is enabled.
+	 * @param {string}  options.xdebug  The Xdebug mode to set.
 	 */
-	async start( config, { spinner, debug } ) {
+	async start( config, { spinner, debug, xdebug } ) {
 		const envConfig = config.env.development;
 
 		spinner.text = 'Starting WordPress Playground.';
@@ -106,9 +107,6 @@ class PlaygroundRuntime {
 		const port = envConfig.port || 8888;
 		const phpVersion = envConfig.phpVersion || '8.2';
 
-		// Check if there's an existing server to stop
-		await this._stopExistingServer( config.workDirectoryPath );
-
 		// Build command arguments for direct execution
 		const cliArgs = [
 			'server',
@@ -127,46 +125,35 @@ class PlaygroundRuntime {
 			cliArgs.push( '--verbosity', 'debug' );
 		}
 
+		if ( xdebug ) {
+			cliArgs.push( '--xdebug' );
+		}
+
 		spinner.text = `Starting Playground on port ${ port }...`;
 
 		const siteUrl = `http://localhost:${ port }`;
 		const logFile = path.join( config.workDirectoryPath, 'playground.log' );
 
-		// Use nohup via shell to truly daemonize the process
-		// This ensures the process survives after the parent exits
-		const shellCommand = [
-			'nohup',
-			'npx',
-			'@wp-playground/cli',
-			...cliArgs.map( ( arg ) => `'${ arg.replace( /'/g, "'\\''" ) }'` ),
-			'>',
-			`'${ logFile }'`,
-			'2>&1',
-			'&',
-			'echo $!',
-		].join( ' ' );
+		// Use cross-spawn with detached mode for cross-platform support
+		// Create write stream for log file
+		const logFileStream = await fs.open( logFile, 'w' );
 
 		return new Promise( ( resolve, reject ) => {
-			const shell = spawn( 'sh', [ '-c', shellCommand ], {
-				stdio: [ 'ignore', 'pipe', 'pipe' ],
+			const child = spawn( 'npx', [ '@wp-playground/cli', ...cliArgs ], {
+				detached: true,
+				stdio: [ 'ignore', logFileStream.fd, logFileStream.fd ],
 				env: { ...process.env, FORCE_COLOR: '0' },
 			} );
 
-			let pidOutput = '';
-			let stderrOutput = '';
+			// Store child process reference
+			this.serverProcess = child;
+			this.serverPort = port;
 
-			shell.stdout.on( 'data', ( data ) => {
-				pidOutput += data.toString();
-			} );
+			// Allow parent to exit independently
+			child.unref();
 
-			shell.stderr.on( 'data', ( data ) => {
-				stderrOutput += data.toString();
-				if ( debug ) {
-					process.stderr.write( data );
-				}
-			} );
-
-			shell.on( 'error', ( error ) => {
+			child.on( 'error', ( error ) => {
+				logFileStream.close();
 				reject(
 					new Error(
 						`Failed to start Playground: ${ error.message }`
@@ -174,33 +161,9 @@ class PlaygroundRuntime {
 				);
 			} );
 
-			shell.on( 'close', async ( code ) => {
-				if ( code !== 0 ) {
-					reject(
-						new Error(
-							`Shell exited with code ${ code }: ${ stderrOutput }`
-						)
-					);
-					return;
-				}
-
-				// Extract PID from output
-				const pid = parseInt( pidOutput.trim(), 10 );
-				if ( ! pid || isNaN( pid ) ) {
-					reject(
-						new Error(
-							`Could not get PID from output: ${ pidOutput }`
-						)
-					);
-					return;
-				}
-
-				// Save PID
-				await this._savePid( config.workDirectoryPath, pid );
-
-				// Wait for server to be ready
-				try {
-					await this._waitForServer( port, 120000 );
+			// Wait for server to be ready
+			this._waitForServer( port, 120000 )
+				.then( async () => {
 					spinner.text = `WordPress Playground started at ${ siteUrl }`;
 
 					const message =
@@ -210,12 +173,12 @@ class PlaygroundRuntime {
 						message,
 						siteUrl,
 					} );
-				} catch ( error ) {
+				} )
+				.catch( async ( error ) => {
 					// Try to kill the process if it started but server never responded
-					try {
-						process.kill( pid );
-					} catch {
-						// Ignore
+					if ( this.serverProcess ) {
+						this.serverProcess.kill( 'SIGKILL' );
+						this.serverProcess = null;
 					}
 
 					// Read log file for error details
@@ -226,6 +189,8 @@ class PlaygroundRuntime {
 						// Ignore
 					}
 
+					await logFileStream.close();
+
 					reject(
 						new Error(
 							`${ error.message }\n\nPlayground log:\n${
@@ -233,8 +198,7 @@ class PlaygroundRuntime {
 							}`
 						)
 					);
-				}
-			} );
+				} );
 		} );
 	}
 
@@ -249,11 +213,20 @@ class PlaygroundRuntime {
 		spinner.text = 'Stopping WordPress Playground.';
 
 		if ( this.serverProcess ) {
-			this.serverProcess.kill();
-			this.serverProcess = null;
-		}
+			// Try graceful shutdown first
+			this.serverProcess.kill( 'SIGTERM' );
 
-		await this._stopExistingServer( config.workDirectoryPath );
+			// Give it a moment for graceful shutdown
+			await new Promise( ( r ) => setTimeout( r, 1000 ) );
+
+			// Force kill if still running
+			if ( ! this.serverProcess.killed ) {
+				this.serverProcess.kill( 'SIGKILL' );
+			}
+
+			this.serverProcess = null;
+			this.serverPort = null;
+		}
 
 		spinner.text = 'Stopped WordPress Playground.';
 	}
@@ -370,90 +343,6 @@ class PlaygroundRuntime {
 				reject( new Error( 'Timeout' ) );
 			} );
 		} );
-	}
-
-	/**
-	 * Save server PID for later cleanup.
-	 *
-	 * @param {string} workDir Work directory path.
-	 * @param {number} pid     Process ID.
-	 */
-	async _savePid( workDir, pid ) {
-		const pidFile = path.join( workDir, 'playground.pid' );
-		try {
-			await fs.writeFile( pidFile, String( pid ) );
-		} catch {
-			// Ignore errors
-		}
-	}
-
-	/**
-	 * Kill a process tree (the process and all its descendants).
-	 *
-	 * @param {number} pid    The parent process ID.
-	 * @param {string} signal The signal to send.
-	 */
-	async _killProcessTree( pid, signal = 'SIGTERM' ) {
-		return new Promise( ( resolve ) => {
-			// Use pkill to kill all processes with the given parent PID
-			// This works on both Linux and macOS
-			const pkill = spawn( 'pkill', [
-				`-${ signal }`,
-				'-P',
-				String( pid ),
-			] );
-			pkill.on( 'close', () => {
-				// Also kill the parent process itself
-				try {
-					process.kill( pid, signal );
-				} catch {
-					// Process may already be dead
-				}
-				resolve();
-			} );
-			pkill.on( 'error', () => {
-				// pkill not available, try direct kill
-				try {
-					process.kill( pid, signal );
-				} catch {
-					// Process may already be dead
-				}
-				resolve();
-			} );
-		} );
-	}
-
-	/**
-	 * Stop any existing server from a previous run.
-	 *
-	 * @param {string} workDir Work directory path.
-	 */
-	async _stopExistingServer( workDir ) {
-		const pidFile = path.join( workDir, 'playground.pid' );
-		try {
-			const pid = await fs.readFile( pidFile, 'utf8' );
-			const pidNum = parseInt( pid.trim(), 10 );
-			if ( pidNum ) {
-				// Kill the process tree (parent and all children)
-				await this._killProcessTree( pidNum, 'SIGTERM' );
-
-				// Wait a bit for graceful shutdown
-				await new Promise( ( r ) => setTimeout( r, 1000 ) );
-
-				// Check if still running and force kill if needed
-				try {
-					// Sending signal 0 checks if process exists without killing it
-					process.kill( pidNum, 0 );
-					// Process still exists, force kill
-					await this._killProcessTree( pidNum, 'SIGKILL' );
-				} catch {
-					// Process already dead, good
-				}
-			}
-			await fs.unlink( pidFile );
-		} catch {
-			// No PID file or already removed
-		}
 	}
 }
 
