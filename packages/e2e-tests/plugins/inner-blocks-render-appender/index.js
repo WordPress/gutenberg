@@ -2,7 +2,7 @@
 	const { wp } = window;
 	const { registerBlockType } = wp.blocks;
 	const { createElement: el } = wp.element;
-	const { InnerBlocks } = wp.blockEditor;
+	const { InnerBlocks, useBlockProps, useInnerBlocksProps } = wp.blockEditor;
 	const { useSelect } = wp.data;
 
 	const allowedBlocks = [ 'core/quote', 'core/video' ];
@@ -60,15 +60,15 @@
 		icon: 'carrot',
 		category: 'text',
 
-		edit() {
-			return el(
-				'div',
-				{ style: { outline: '1px solid gray', padding: 5 } },
-				el( InnerBlocks, {
-					allowedBlocks,
-					renderAppender: myCustomAppender,
-				} )
-			);
+		edit: function Edit() {
+			const blockProps = useBlockProps( {
+				style: { outline: '1px solid gray', padding: 5 },
+			} );
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
+				allowedBlocks,
+				renderAppender: myCustomAppender,
+			} );
+			return el( 'div', innerBlocksProps );
 		},
 
 		save() {
@@ -86,10 +86,10 @@
 		icon: 'carrot',
 		category: 'text',
 
-		edit( props ) {
-			// Disable reason: this is a react component, but the rule of hook
-			// fails because the block's edit function has a lowercase 'e'.
-			// eslint-disable-next-line react-hooks/rules-of-hooks
+		edit: function Edit( props ) {
+			const blockProps = useBlockProps( {
+				style: { outline: '1px solid gray', padding: 5 },
+			} );
 			const numberOfChildren = useSelect(
 				( select ) => {
 					const { getBlockOrder } = select( 'core/block-editor' );
@@ -109,14 +109,11 @@
 					renderAppender = multipleBlockAppender;
 					break;
 			}
-			return el(
-				'div',
-				{ style: { outline: '1px solid gray', padding: 5 } },
-				el( InnerBlocks, {
-					allowedBlocks,
-					renderAppender,
-				} )
-			);
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
+				allowedBlocks,
+				renderAppender,
+			} );
+			return el( 'div', innerBlocksProps );
 		},
 
 		save() {

@@ -1,5 +1,5 @@
 ( function () {
-	const { InnerBlocks } = wp.blockEditor;
+	const { InnerBlocks, useBlockProps, useInnerBlocksProps } = wp.blockEditor;
 	const { createElement: el } = wp.element;
 	const { registerBlockType } = wp.blocks;
 
@@ -9,8 +9,10 @@
 		icon: 'carrot',
 		category: 'text',
 
-		edit() {
-			return el( 'div', {}, el( InnerBlocks ) );
+		edit: function Edit() {
+			const blockProps = useBlockProps();
+			const innerBlocksProps = useInnerBlocksProps( blockProps );
+			return el( 'div', innerBlocksProps );
 		},
 
 		save() {
@@ -24,14 +26,12 @@
 		icon: 'carrot',
 		category: 'text',
 
-		edit() {
-			return el(
-				'div',
-				{},
-				el( InnerBlocks, {
-					allowedBlocks: [ 'core/paragraph', 'core/image' ],
-				} )
-			);
+		edit: function Edit() {
+			const blockProps = useBlockProps();
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
+				allowedBlocks: [ 'core/paragraph', 'core/image' ],
+			} );
+			return el( 'div', innerBlocksProps );
 		},
 
 		save() {
@@ -50,8 +50,9 @@
 			'test/child-blocks-restricted-parent',
 		],
 
-		edit() {
-			return el( 'div', {}, 'Child' );
+		edit: function Edit() {
+			const blockProps = useBlockProps();
+			return el( 'div', blockProps, 'Child' );
 		},
 
 		save() {

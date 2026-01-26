@@ -1,7 +1,7 @@
 ( function () {
-	const { createElement: el, Fragment } = wp.element;
+	const { createElement: el } = wp.element;
 	const { registerBlockType } = wp.blocks;
-	const { InnerBlocks } = wp.blockEditor;
+	const { InnerBlocks, useBlockProps, useInnerBlocksProps } = wp.blockEditor;
 
 	registerBlockType( 'gutenberg/test-context-provider', {
 		apiVersion: 3,
@@ -18,10 +18,16 @@
 
 		category: 'text',
 
-		edit( { attributes, setAttributes } ) {
+		edit: function Edit( { attributes, setAttributes } ) {
+			const blockProps = useBlockProps();
+			const innerBlocksProps = useInnerBlocksProps( blockProps, {
+				template: [ [ 'gutenberg/test-context-consumer', {} ] ],
+				templateLock: 'all',
+				templateInsertUpdatesSelection: true,
+			} );
 			return el(
-				Fragment,
-				null,
+				'div',
+				innerBlocksProps,
 				el( 'input', {
 					value: attributes.recordId,
 					onChange( event ) {
@@ -30,11 +36,7 @@
 						} );
 					},
 				} ),
-				el( InnerBlocks, {
-					template: [ [ 'gutenberg/test-context-consumer', {} ] ],
-					templateLock: 'all',
-					templateInsertUpdatesSelection: true,
-				} )
+				innerBlocksProps.children
 			);
 		},
 
@@ -56,8 +58,13 @@
 
 		category: 'text',
 
-		edit( { context } ) {
-			return 'The record ID is: ' + context[ 'gutenberg/recordId' ];
+		edit: function Edit( { context } ) {
+			const blockProps = useBlockProps();
+			return el(
+				'div',
+				blockProps,
+				'The record ID is: ' + context[ 'gutenberg/recordId' ]
+			);
 		},
 
 		save() {
