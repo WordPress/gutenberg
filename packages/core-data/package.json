@@ -72,6 +72,7 @@
 		"uuid": "^9.0.1"
 	},
 	"devDependencies": {
+		"@jest/globals": "^30.2.0",
 		"@types/jest": "^29.5.14",
 		"@types/node": "^20.19.0",
 		"deep-freeze": "0.0.1"
