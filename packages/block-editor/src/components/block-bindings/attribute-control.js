@@ -19,7 +19,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useContext, useMemo } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -69,7 +69,6 @@ function AttributeBindingMenu( { attribute, binding, blockName, isWritable } ) {
 		getAllSources,
 		getSourceFieldsList,
 		hasCompatibleFields,
-		invalidationKey,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -106,6 +105,7 @@ function AttributeBindingMenu( { attribute, binding, blockName, isWritable } ) {
 				getAllSources: getAllBlockBindingsSources,
 				getSourceFieldsList: getBlockBindingsSourceFieldsList,
 				hasCompatibleFields: allCompatibleFieldKeys.length > 0,
+				// Trigger a re-render when sources/fields change.
 				invalidationKey:
 					allCompatibleFieldKeys.join( '' ) + sourceNames.join( '' ),
 			};
@@ -113,35 +113,27 @@ function AttributeBindingMenu( { attribute, binding, blockName, isWritable } ) {
 		[ attribute, blockName, blockContext ]
 	);
 
-	const compatibleFields = useMemo( () => {
-		void invalidationKey; // Avoids react-hooks/exhaustive-deps warning this is unnecessary.
-		if ( ! hasCompatibleFields ) {
-			return {};
-		}
-		return Object.entries( getAllSources() ).reduce(
-			( sourceFields, [ sourceName, source ] ) => {
-				const fieldsList = getSourceFieldsList( source, blockContext );
-				if ( ! fieldsList?.length ) {
+	const compatibleFields = hasCompatibleFields
+		? Object.entries( getAllSources() ).reduce(
+				( sourceFields, [ sourceName, source ] ) => {
+					const fieldsList = getSourceFieldsList(
+						source,
+						blockContext
+					);
+					if ( ! fieldsList?.length ) {
+						return sourceFields;
+					}
+					const compatibleFieldsList = fieldsList.filter(
+						( field ) => field.type === attributeType
+					);
+					if ( compatibleFieldsList.length ) {
+						sourceFields[ sourceName ] = compatibleFieldsList;
+					}
 					return sourceFields;
-				}
-				const compatibleFieldsList = fieldsList.filter(
-					( field ) => field.type === attributeType
-				);
-				if ( compatibleFieldsList.length ) {
-					sourceFields[ sourceName ] = compatibleFieldsList;
-				}
-				return sourceFields;
-			},
-			{}
-		);
-	}, [
-		attributeType,
-		blockContext,
-		getAllSources,
-		getSourceFieldsList,
-		hasCompatibleFields,
-		invalidationKey,
-	] );
+				},
+				{}
+		  )
+		: {};
 
 	// Keep UI enabled only when there are fields to connect to.
 	isWritable &&= hasCompatibleFields;
