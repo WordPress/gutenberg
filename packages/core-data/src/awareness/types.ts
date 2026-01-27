@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { Y } from '@wordpress/sync';
+
+/**
  * Internal dependencies
  */
 import type { SelectionState } from '../types';
@@ -36,3 +41,37 @@ export interface EditorState {
 export interface PostEditorState extends BaseState {
 	editorState?: EditorState;
 }
+
+// WordPress user info for debug export (subset of UserInfo)
+export type DebugUserData = Pick< UserInfo, 'name' > & {
+	wpUserId: UserInfo[ 'id' ];
+};
+
+export interface YDocDebugData {
+	doc: Record< string, unknown >;
+	clients: Record< number, Array< SerializableYItem > >;
+	userMap: Record< string, DebugUserData >;
+}
+
+// Type for serializable left/right item references to avoid deep nesting
+export type SerializableYItemRef = Pick<
+	Y.Item,
+	'id' | 'length' | 'origin' | 'content'
+>;
+
+// Serializable Y.Item - only includes data properties with shallow left/right references
+export type SerializableYItem = Pick<
+	Y.Item,
+	| 'id'
+	| 'length'
+	| 'origin'
+	| 'rightOrigin'
+	| 'parent'
+	| 'parentSub'
+	| 'redone'
+	| 'content'
+	| 'info'
+> & {
+	left: SerializableYItemRef | null;
+	right: SerializableYItemRef | null;
+};

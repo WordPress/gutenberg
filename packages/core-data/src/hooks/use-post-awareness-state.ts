@@ -2,28 +2,32 @@
  * External dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
-import { type EnhancedState, Y } from '@wordpress/sync';
+import { type AwarenessState, type EnhancedState, Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
 import { getSyncManager } from '../sync';
-import type { PostEditorState } from '../awareness/types';
+import type {
+	BaseState,
+	PostEditorState,
+	YDocDebugData,
+} from '../awareness/types';
 import type { SelectionCursor } from '../types';
 import type { PostEditorAwareness } from '../awareness/post-editor-awareness';
-// import type { YDocDebugData } from '../utils/awareness-utils';
+import { getDebugData } from '../awareness/utils';
 
 interface PostEditorAwarenessState {
 	activeUsers: EnhancedState< PostEditorState >[];
 	getAbsolutePositionIndex: ( selection: SelectionCursor ) => number | null;
-	// getDebugData: () => YDocDebugData | null;
+	getDebugData: () => YDocDebugData | null;
 	isCurrentUserDisconnected: boolean;
 }
 
 const defaultState: PostEditorAwarenessState = {
 	activeUsers: [],
 	getAbsolutePositionIndex: () => null,
-	// getDebugData: () => null,
+	getDebugData: () => null,
 	isCurrentUserDisconnected: false,
 };
 
@@ -40,11 +44,10 @@ function usePostEditorAwarenessState(
 		}
 
 		// TODO: Not the biggest fan of hardcoding the object type here like this.
-		// @ts-ignore
 		const awareness = getSyncManager()?.getAwareness(
 			`postType/${ postType }`,
 			postId.toString()
-		) as PostEditorAwareness;
+		) as unknown as PostEditorAwareness | undefined;
 		const unsubscribe = awareness?.onStateChange(
 			( newState: EnhancedState< PostEditorState >[] ) => {
 				setState( {
@@ -54,7 +57,10 @@ function usePostEditorAwarenessState(
 							selection.cursorPosition.relativePosition,
 							awareness.doc
 						)?.index ?? null,
-					// getDebugData: () => getDebugData( awareness ),
+					getDebugData: () =>
+						getDebugData(
+							awareness as AwarenessState< BaseState >
+						),
 					isCurrentUserDisconnected:
 						newState.find( ( user ) => user.isMe )?.isConnected ===
 						false,
@@ -83,9 +89,12 @@ export function useGetAbsolutePositionIndex(
 		.getAbsolutePositionIndex;
 }
 
-// export function useGetDebugData( postId: number | null, postType: string | null ): () => YDocDebugData | null {
-// 	return usePostEditorAwarenessState( postId, postType ).getDebugData;
-// }
+export function useGetDebugData(
+	postId: number | null,
+	postType: string | null
+): () => YDocDebugData | null {
+	return usePostEditorAwarenessState( postId, postType ).getDebugData;
+}
 
 export function useIsDisconnected(
 	postId: number | null,
