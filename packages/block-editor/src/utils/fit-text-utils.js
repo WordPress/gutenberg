@@ -29,7 +29,7 @@ function findOptimalFontSize( textElement, applyFontSize ) {
 		const parentElementComputedStyle =
 			window.getComputedStyle( parentElement );
 		if ( parentElementComputedStyle?.display === 'flex' ) {
-		referenceElement = parentElement;
+			referenceElement = parentElement;
 			paddingLeft +=
 				parseFloat( parentElementComputedStyle.paddingLeft ) || 0;
 			paddingRight +=
