@@ -4,6 +4,7 @@
 import { dispatch, select, subscribe } from '@wordpress/data';
 // @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -14,7 +15,6 @@ import {
 	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
 } from './config';
 import { STORE_NAME as coreStore } from '../name';
-import { type CRDTDoc, Y } from '../sync';
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,
@@ -30,7 +30,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	};
 
 	public constructor(
-		doc: CRDTDoc,
+		doc: Y.Doc,
 		private kind: string,
 		private name: string,
 		private postId: number
