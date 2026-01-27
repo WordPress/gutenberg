@@ -1,7 +1,11 @@
 /**
+ * WordPress dependencies
+ */
+import type { EnhancedState } from '@wordpress/sync';
+
+/**
  * Internal dependencies
  */
-import type { EnhancedState } from '../sync';
 import type { SelectionState } from '../types';
 import type { User } from '../entity-types';
 
