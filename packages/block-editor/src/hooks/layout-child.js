@@ -16,6 +16,7 @@ import {
 	GridItemResizer,
 	GridItemMovers,
 } from '../components/grid';
+import useBlockVisibility from '../components/block-visibility/use-block-visibility';
 
 // Used for generating the instance ID
 const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};
@@ -199,12 +200,14 @@ function GridTools( {
 	isManualPlacement,
 	parentLayout,
 } ) {
-	const { rootClientId, isVisible } = useSelect(
+	const { rootClientId, isVisible, blockVisibility, deviceType } = useSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,
 				getBlockEditingMode,
 				getTemplateLock,
+				getBlockAttributes,
+				getSettings,
 			} = select( blockEditorStore );
 
 			const _rootClientId = getBlockRootClientId( clientId );
@@ -219,18 +222,30 @@ function GridTools( {
 				};
 			}
 
+			const attributes = getBlockAttributes( _rootClientId );
+			const settings = getSettings();
+
 			return {
 				rootClientId: _rootClientId,
 				isVisible: true,
+				blockVisibility: attributes?.metadata?.blockVisibility,
+				deviceType: settings?.__experimentalSetIsInserterOpened
+					? settings.deviceType
+					: undefined,
 			};
 		},
 		[ clientId ]
 	);
 
+	const { isBlockCurrentlyHidden } = useBlockVisibility( {
+		blockVisibility,
+		deviceType,
+	} );
+
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
 	const [ resizerBounds, setResizerBounds ] = useState();
 
-	if ( ! isVisible ) {
+	if ( ! isVisible || isBlockCurrentlyHidden ) {
 		return null;
 	}
 
