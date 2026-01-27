@@ -16,7 +16,6 @@ import { sprintf, _n, __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import type {
-	FieldValidity,
 	NormalizedForm,
 	NormalizedDetailsLayout,
 	FieldLayoutProps,
@@ -25,33 +24,7 @@ import DataFormContext from '../../dataform-context';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import useReportValidity from '../../../hooks/use-report-validity';
-
-function countInvalidFields( validity: FieldValidity | undefined ): number {
-	if ( ! validity ) {
-		return 0;
-	}
-
-	let count = 0;
-	const validityRules = Object.keys( validity ).filter(
-		( key ) => key !== 'children'
-	);
-
-	for ( const key of validityRules ) {
-		const rule = validity[ key as keyof Omit< FieldValidity, 'children' > ];
-		if ( rule?.type === 'invalid' ) {
-			count++;
-		}
-	}
-
-	// Count children recursively
-	if ( validity.children ) {
-		for ( const childValidity of Object.values( validity.children ) ) {
-			count += countInvalidFields( childValidity );
-		}
-	}
-
-	return count;
-}
+import countInvalidFields from '../count-invalid-fields';
 
 export default function FormDetailsField< Item >( {
 	data,
