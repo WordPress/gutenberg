@@ -58,7 +58,7 @@ const getIntentStyles = (
 /**
  * A badge component for displaying labels with semantic intent.
  */
-export const Badge = forwardRef< HTMLDivElement, BadgeProps >( function Badge(
+export const Badge = forwardRef< HTMLSpanElement, BadgeProps >( function Badge(
 	{ children, intent = 'none', render = DEFAULT_RENDER, ...props },
 	ref
 ) {
