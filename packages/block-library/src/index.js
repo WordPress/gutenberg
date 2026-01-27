@@ -266,6 +266,7 @@ const getAllBlocks = () => {
 		tableOfContents,
 		homeLink,
 		logInOut,
+		navigationOverlayClose,
 		termCount,
 		termDescription,
 		termName,
@@ -290,8 +291,6 @@ const getAllBlocks = () => {
 		blocks.push( formSubmitButton );
 		blocks.push( formSubmissionNotification );
 	}
-
-	blocks.push( navigationOverlayClose );
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
 		blocks.push( playlist );
