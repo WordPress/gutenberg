@@ -24,6 +24,11 @@ export default function DisableNonPageContentBlocks() {
 	}, [] );
 	const disabledIds = useSelect(
 		( select ) => {
+			// When the experiment is enabled, let the reducer handle content-only logic
+			// for template part children instead of disabling them all.
+			if ( window?.__experimentalContentOnlyPatternInsertion ) {
+				return [];
+			}
 			const { getBlockOrder } = select( blockEditorStore );
 			return templateParts.flatMap( ( clientId ) =>
 				getBlockOrder( clientId )
