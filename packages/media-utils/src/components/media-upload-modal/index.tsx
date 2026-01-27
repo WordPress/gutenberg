@@ -341,6 +341,60 @@ export function MediaUploadModal( {
 	// Use onUpload if provided, otherwise fall back to uploadMedia
 	const handleUpload = onUpload || uploadMedia;
 
+	// Shared upload success handler
+	const handleUploadComplete = useCallback(
+		( attachments: Partial< Attachment >[] ) => {
+			// Check if all uploads are complete (no blob URLs)
+			const allComplete = attachments.every(
+				( attachment ) =>
+					attachment.id &&
+					attachment.url &&
+					! isBlobURL( attachment.url )
+			);
+
+			if ( allComplete && attachments.length > 0 ) {
+				// Show success notice (replaces progress notice via ID)
+				createSuccessNotice(
+					sprintf(
+						// translators: %s: number of files
+						_n(
+							'Uploaded %s file',
+							'Uploaded %s files',
+							attachments.length
+						),
+						attachments.length.toLocaleString()
+					),
+					{
+						type: 'snackbar',
+						context: NOTICES_CONTEXT,
+						id: NOTICE_ID_UPLOAD_PROGRESS,
+					}
+				);
+
+				// Invalidate the entity records resolution to refresh the view
+				invalidateResolution( 'getEntityRecords', [
+					'postType',
+					'attachment',
+					queryArgs,
+				] );
+			}
+		},
+		[ createSuccessNotice, invalidateResolution, queryArgs ]
+	);
+
+	// Shared upload error handler
+	const handleUploadError = useCallback(
+		( error: Error ) => {
+			// Show error notice (replaces progress notice via ID)
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+				context: NOTICES_CONTEXT,
+				id: NOTICE_ID_UPLOAD_PROGRESS,
+			} );
+		},
+		[ createErrorNotice ]
+	);
+
 	const handleFileSelect = useCallback(
 		( event: React.ChangeEvent< HTMLInputElement > ) => {
 			const files = event.target.files;
@@ -369,50 +423,8 @@ export function MediaUploadModal( {
 				handleUpload( {
 					allowedTypes,
 					filesList: filesArray,
-					onFileChange: ( attachments ) => {
-						// Check if all uploads are complete (no blob URLs)
-						const allComplete = attachments.every(
-							( attachment ) =>
-								attachment.id &&
-								attachment.url &&
-								! isBlobURL( attachment.url )
-						);
-
-						if ( allComplete && attachments.length > 0 ) {
-							// Show success notice (replaces progress notice via ID)
-							createSuccessNotice(
-								sprintf(
-									// translators: %s: number of files
-									_n(
-										'Uploaded %s file',
-										'Uploaded %s files',
-										attachments.length
-									),
-									attachments.length.toLocaleString()
-								),
-								{
-									type: 'snackbar',
-									context: NOTICES_CONTEXT,
-									id: NOTICE_ID_UPLOAD_PROGRESS,
-								}
-							);
-
-							// Invalidate the entity records resolution to refresh the view
-							invalidateResolution( 'getEntityRecords', [
-								'postType',
-								'attachment',
-								queryArgs,
-							] );
-						}
-					},
-					onError: ( error ) => {
-						// Show error notice (replaces progress notice via ID)
-						createErrorNotice( error.message, {
-							type: 'snackbar',
-							context: NOTICES_CONTEXT,
-							id: NOTICE_ID_UPLOAD_PROGRESS,
-						} );
-					},
+					onFileChange: handleUploadComplete,
+					onError: handleUploadError,
 				} );
 			}
 		},
@@ -420,10 +432,8 @@ export function MediaUploadModal( {
 			allowedTypes,
 			handleUpload,
 			createInfoNotice,
-			createSuccessNotice,
-			createErrorNotice,
-			invalidateResolution,
-			queryArgs,
+			handleUploadComplete,
+			handleUploadError,
 		]
 	);
 
@@ -533,50 +543,8 @@ export function MediaUploadModal( {
 						handleUpload( {
 							allowedTypes,
 							filesList: filteredFiles,
-							onFileChange: ( attachments ) => {
-								// Check if all uploads are complete (no blob URLs)
-								const allComplete = attachments.every(
-									( attachment ) =>
-										attachment.id &&
-										attachment.url &&
-										! isBlobURL( attachment.url )
-								);
-
-								if ( allComplete && attachments.length > 0 ) {
-									// Show success notice (replaces progress notice via ID)
-									createSuccessNotice(
-										sprintf(
-											// translators: %s: number of files
-											_n(
-												'Uploaded %s file',
-												'Uploaded %s files',
-												attachments.length
-											),
-											attachments.length.toLocaleString()
-										),
-										{
-											type: 'snackbar',
-											context: NOTICES_CONTEXT,
-											id: NOTICE_ID_UPLOAD_PROGRESS,
-										}
-									);
-
-									// Invalidate the entity records resolution to refresh the view
-									invalidateResolution( 'getEntityRecords', [
-										'postType',
-										'attachment',
-										queryArgs,
-									] );
-								}
-							},
-							onError: ( error ) => {
-								// Show error notice (replaces progress notice via ID)
-								createErrorNotice( error.message, {
-									type: 'snackbar',
-									context: NOTICES_CONTEXT,
-									id: NOTICE_ID_UPLOAD_PROGRESS,
-								} );
-							},
+							onFileChange: handleUploadComplete,
+							onError: handleUploadError,
 						} );
 					}
 				} }
