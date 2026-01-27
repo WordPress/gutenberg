@@ -138,7 +138,7 @@ describe( 'feature-detection', () => {
 			const result1 = detectClientSideMediaSupport();
 			expect( result1.supported ).toBe( true );
 
-			// Now remove WebAssembly - cached result should still be returned.
+			// Now set WebAssembly to undefined - cached result should still be returned.
 			// @ts-ignore - Intentionally setting WebAssembly to undefined for testing.
 			global.WebAssembly = undefined;
 
@@ -182,7 +182,7 @@ describe( 'feature-detection', () => {
 			const result1 = detectClientSideMediaSupport();
 			expect( result1.supported ).toBe( true );
 
-			// Clear cache and remove WebAssembly.
+			// Clear cache and set WebAssembly to undefined.
 			clearFeatureDetectionCache();
 			// @ts-ignore - Intentionally setting WebAssembly to undefined for testing.
 			global.WebAssembly = undefined;
