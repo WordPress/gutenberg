@@ -131,7 +131,7 @@ export abstract class AwarenessState<
 	 * Hold a snapshot of the previous awareness state allows us to compare the
 	 * state values and avoid unnecessary updates to subscribers.
 	 */
-	private previousSnapshot = new Map< number, State >();
+	private previousSnapshot = new Map< number, EnhancedState< State > >();
 	private stateSubscriptions: Array<
 		( newState: EnhancedState< State >[] ) => void
 	> = [];
@@ -172,6 +172,15 @@ export abstract class AwarenessState<
 				this.updateSubscribers();
 			}
 		);
+	}
+
+	/**
+	 * Get the most recent state from the last processed change event.
+	 *
+	 * @return An array of EnhancedState< State >.
+	 */
+	public getCurrentState(): EnhancedState< State >[] {
+		return Array.from( this.previousSnapshot.values() );
 	}
 
 	/**

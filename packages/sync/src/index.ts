@@ -55,4 +55,10 @@ export type { SyncConnectionState } from './types';
  */
 export type { SyncConnectionStatus } from './types';
 
+/**
+ * An enhanced state includes additional metadata about the user's connection
+ * that is not appropriate to synchronize via Yjs awareness.
+ */
+export type { EnhancedState } from './awareness/awareness-types';
+
 export type * from './types';
