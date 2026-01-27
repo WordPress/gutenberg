@@ -767,4 +767,161 @@ test.describe( 'Navigation block - Frontend interactivity', () => {
 			} );
 		} );
 	} );
+
+	test.describe( 'Submenu overflow positioning (@firefox, @webkit)', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+				canvas: 'edit',
+			} );
+			await requestUtils.createNavigationMenu( {
+				title: 'Overflow menu',
+				content: `
+					<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-link {"label":"Item 3","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-link {"label":"Item 4","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-submenu {"label":"Right Edge Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- wp:navigation-link {"label":"Submenu Link 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- /wp:navigation-submenu -->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: { overlayMenu: 'off', submenuVisibility: 'click' },
+			} );
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
+		} );
+
+		test( 'submenu opens on left when it would overflow right edge', async ( {
+			page,
+		} ) => {
+			// Set a narrow viewport to force right edge overflow
+			await page.setViewportSize( { width: 600, height: 800 } );
+			await page.goto( '/' );
+
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Right Edge Submenu',
+			} );
+
+			// Open the submenu
+			await submenuButton.click();
+
+			// Get the navigation item element (parent of the button)
+			const navigationItem = page.locator(
+				'.wp-block-navigation-item.has-child',
+				{ has: submenuButton }
+			);
+
+			// Check that the submenu container is visible
+			const submenuContainer = navigationItem.locator(
+				'.wp-block-navigation__submenu-container'
+			);
+			await expect( submenuContainer ).toBeVisible();
+
+			// Verify that the open-on-left class is applied to prevent overflow
+			await expect( navigationItem ).toHaveClass( /open-on-left/ );
+		} );
+
+		test( 'submenu does not have overflow class when it fits in viewport', async ( {
+			page,
+		} ) => {
+			// Set a wide viewport where submenu won't overflow
+			await page.setViewportSize( { width: 1920, height: 1080 } );
+			await page.goto( '/' );
+
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Right Edge Submenu',
+			} );
+
+			// Open the submenu
+			await submenuButton.click();
+
+			// Get the navigation item element
+			const navigationItem = page.locator(
+				'.wp-block-navigation-item.has-child',
+				{ has: submenuButton }
+			);
+
+			// Verify that neither overflow class is applied
+			const hasOpenOnLeft = await navigationItem
+				.evaluate( ( el ) => el.classList.contains( 'open-on-left' ) )
+				.catch( () => false );
+			const hasOpenOnRight = await navigationItem
+				.evaluate( ( el ) => el.classList.contains( 'open-on-right' ) )
+				.catch( () => false );
+
+			expect( hasOpenOnLeft ).toBe( false );
+			expect( hasOpenOnRight ).toBe( false );
+		} );
+	} );
+
+	test.describe( 'Submenu overflow with right-justified navigation (@firefox, @webkit)', () => {
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			await admin.visitSiteEditor( {
+				postId: 'emptytheme//header',
+				postType: 'wp_template_part',
+				canvas: 'edit',
+			} );
+			await requestUtils.createNavigationMenu( {
+				title: 'Right-justified menu',
+				content: `
+					<!-- wp:navigation-submenu {"label":"Left Edge Submenu","type":"internal","url":"#heading","kind":"custom"} -->
+						<!-- wp:navigation-link {"label":"Submenu Link 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+						<!-- wp:navigation-link {"label":"Submenu Link 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- /wp:navigation-submenu -->
+					<!-- wp:navigation-link {"label":"Item 1","type":"custom","url":"http://www.wordpress.org/"} /-->
+					<!-- wp:navigation-link {"label":"Item 2","type":"custom","url":"http://www.wordpress.org/"} /-->
+					`,
+			} );
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					overlayMenu: 'off',
+					submenuVisibility: 'click',
+					layout: {
+						type: 'flex',
+						justifyContent: 'right',
+					},
+				},
+			} );
+			await editor.saveSiteEditorEntities( {
+				isOnlyCurrentEntityDirty: true,
+			} );
+		} );
+
+		test( 'submenu opens on right when it would overflow left edge', async ( {
+			page,
+		} ) => {
+			// Set a narrow viewport to force left edge overflow
+			await page.setViewportSize( { width: 600, height: 800 } );
+			await page.goto( '/' );
+
+			const submenuButton = page.getByRole( 'button', {
+				name: 'Left Edge Submenu',
+			} );
+
+			// Open the submenu
+			await submenuButton.click();
+
+			// Get the navigation item element
+			const navigationItem = page.locator(
+				'.wp-block-navigation-item.has-child',
+				{ has: submenuButton }
+			);
+
+			// Check that the submenu container is visible
+			const submenuContainer = navigationItem.locator(
+				'.wp-block-navigation__submenu-container'
+			);
+			await expect( submenuContainer ).toBeVisible();
+
+			// Verify that the open-on-right class is applied to prevent overflow
+			await expect( navigationItem ).toHaveClass( /open-on-right/ );
+		} );
+	} );
 } );
