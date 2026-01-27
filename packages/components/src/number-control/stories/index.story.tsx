@@ -44,6 +44,7 @@ const Template: StoryFn< typeof NumberControl > = ( {
 	return (
 		<>
 			<NumberControl
+				__next40pxDefaultSize
 				{ ...props }
 				value={ value }
 				onChange={ ( v, extra ) => {

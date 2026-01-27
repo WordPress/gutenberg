@@ -31,16 +31,21 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'link',
 			label: __( 'Link' ),
-			type: 'link',
-			mapping: {
-				href: 'url',
-				rel: 'rel',
-			},
+			type: 'url',
+			Edit: 'link', // TODO: replace with custom component
+			getValue: ( { item } ) => ( {
+				url: item.url,
+				rel: item.rel,
+			} ),
+			setValue: ( { value } ) => ( {
+				url: value.url,
+				rel: value.rel,
+			} ),
 		},
 		{
 			id: 'label',
 			label: __( 'Label' ),
-			type: 'richtext',
+			type: 'text',
 		},
 	];
 	settings[ formKey ] = {

@@ -781,6 +781,8 @@ If you set `supports.interactivity` to `true`, it is equivalent to setting both 
 
 This value only applies to blocks that are containers for inner blocks. If set to `true` the layout type will be `flow`. For other layout types it's necessary to set the `type` explicitly inside the `default` object.
 
+Note that for layout to work correctly, the block it applies to should have a classname as its selector. That classname will be concatenated with a layout type string to form the layout selector.
+
 ### layout.default
 
 -   Type: `Object`

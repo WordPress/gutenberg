@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.5.0 (2026-01-16)
+
 ### Breaking changes
 
 -   Renamed border tokens to remove the `surface` segment from token names ([#74617](https://github.com/WordPress/gutenberg/pull/74617)):

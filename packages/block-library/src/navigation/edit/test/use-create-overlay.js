@@ -6,16 +6,17 @@ import { renderHook, act } from '@testing-library/react';
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import useCreateOverlayTemplatePart from '../use-create-overlay';
 
-// Mock useDispatch
+// Mock useDispatch and useSelect
 jest.mock( '@wordpress/data', () => ( {
 	useDispatch: jest.fn(),
+	useSelect: jest.fn(),
 } ) );
 
 // Mock coreStore
@@ -23,9 +24,27 @@ jest.mock( '@wordpress/core-data', () => ( {
 	store: {},
 } ) );
 
+// Mock blockEditorStore
+jest.mock( '@wordpress/block-editor', () => ( {
+	store: {},
+} ) );
+
 // Mock @wordpress/blocks
 jest.mock( '@wordpress/blocks', () => ( {
 	serialize: jest.fn( ( blocks ) => JSON.stringify( blocks ) ),
+	parse: jest.fn( ( content ) => {
+		// Return mock blocks when parsing pattern content
+		if ( content && typeof content === 'string' ) {
+			return [
+				{
+					name: 'core/group',
+					attributes: {},
+					innerBlocks: [],
+				},
+			];
+		}
+		return [];
+	} ),
 	createBlock: jest.fn( ( name ) => ( {
 		name,
 		attributes: {},
@@ -33,13 +52,41 @@ jest.mock( '@wordpress/blocks', () => ( {
 	} ) ),
 } ) );
 
+// Mock lock-unlock
+const mockUnlock = jest.fn();
+jest.mock( '../../../lock-unlock', () => ( {
+	unlock: ( select ) => mockUnlock( select ),
+} ) );
+
 describe( 'useCreateOverlayTemplatePart', () => {
 	const mockSaveEntityRecord = jest.fn();
+	const mockGetPatternBySlug = jest.fn();
 
 	beforeEach( () => {
 		jest.clearAllMocks();
 		useDispatch.mockReturnValue( {
 			saveEntityRecord: mockSaveEntityRecord,
+		} );
+
+		mockUnlock.mockReturnValue( {
+			getPatternBySlug: mockGetPatternBySlug,
+		} );
+
+		useSelect.mockImplementation( ( selector ) => {
+			const mockSelect = jest.fn( ( store ) => {
+				if ( store === require( '@wordpress/block-editor' ).store ) {
+					return {}; // Return mock block editor store
+				}
+				return {};
+			} );
+			return selector( mockSelect );
+		} );
+
+		mockGetPatternBySlug.mockReturnValue( {
+			name: 'gutenberg/navigation-overlay',
+			title: 'Navigation Overlay',
+			content:
+				'<!-- wp:group --><div class="wp-block-group"><!-- wp:navigation-overlay-close /--><!-- wp:navigation /--></div><!-- /wp:group -->',
 		} );
 	} );
 
@@ -120,6 +167,86 @@ describe( 'useCreateOverlayTemplatePart', () => {
 				slug: 'overlay-2',
 				content: expect.any( String ),
 				area: 'navigation-overlay',
+			} ),
+			{ throwOnError: true }
+		);
+	} );
+
+	it( 'should use pattern content when pattern is found', async () => {
+		const overlayTemplateParts = [];
+		const createdOverlay = {
+			id: 'twentytwentyfive//overlay',
+			theme: 'twentytwentyfive',
+			slug: 'overlay',
+			title: {
+				rendered: 'Overlay',
+			},
+			area: 'navigation-overlay',
+		};
+
+		mockSaveEntityRecord.mockResolvedValue( createdOverlay );
+
+		// Import mocked functions
+		const blocksModule = require( '@wordpress/blocks' );
+		const { parse, serialize } = blocksModule;
+
+		const { result: createOverlayTemplatePart } = renderHook( () =>
+			useCreateOverlayTemplatePart( overlayTemplateParts )
+		);
+
+		await act( async () => {
+			await createOverlayTemplatePart.current();
+		} );
+
+		expect( mockGetPatternBySlug ).toHaveBeenCalledWith(
+			'gutenberg/navigation-overlay'
+		);
+
+		expect( parse ).toHaveBeenCalledWith( mockGetPatternBySlug().content, {
+			__unstableSkipMigrationLogs: true,
+		} );
+
+		expect( serialize ).toHaveBeenCalled();
+	} );
+
+	it( 'should use empty paragraph when pattern is not found', async () => {
+		const overlayTemplateParts = [];
+		const createdOverlay = {
+			id: 'twentytwentyfive//overlay',
+			theme: 'twentytwentyfive',
+			slug: 'overlay',
+			title: {
+				rendered: 'Overlay',
+			},
+			area: 'navigation-overlay',
+		};
+
+		mockSaveEntityRecord.mockResolvedValue( createdOverlay );
+		mockGetPatternBySlug.mockReturnValue( null );
+
+		// Import mocked functions
+		const blocksModule = require( '@wordpress/blocks' );
+		const { createBlock, serialize } = blocksModule;
+
+		const { result: createOverlayTemplatePart } = renderHook( () =>
+			useCreateOverlayTemplatePart( overlayTemplateParts )
+		);
+
+		await act( async () => {
+			await createOverlayTemplatePart.current();
+		} );
+
+		expect( createBlock ).toHaveBeenCalledWith( 'core/paragraph' );
+
+		expect( serialize ).toHaveBeenCalledWith( [
+			expect.objectContaining( { name: 'core/paragraph' } ),
+		] );
+
+		expect( mockSaveEntityRecord ).toHaveBeenCalledWith(
+			'postType',
+			'wp_template_part',
+			expect.objectContaining( {
+				content: expect.any( String ),
 			} ),
 			{ throwOnError: true }
 		);

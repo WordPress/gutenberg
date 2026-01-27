@@ -66,19 +66,28 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 			id: 'background',
 			label: __( 'Background' ),
 			type: 'media',
-			mapping: {
-				mediaType: 'backgroundType',
-				id: 'id',
-				url: 'url',
-				alt: 'alt',
-				featuredImage: 'useFeaturedImage',
-			},
-			args: {
+			Edit: {
+				control: 'media', // TODO: replace with custom component
 				// TODO - How to support custom gradient?
 				// Build it into Media, or use a custom control?
 				allowedTypes: [ 'image', 'video' ],
 				multiple: false,
+				useFeaturedImage: true,
 			},
+			getValue: ( { item } ) => ( {
+				id: item.id,
+				url: item.url,
+				alt: item.alt,
+				mediaType: item.backgroundType,
+				featuredImage: item.useFeaturedImage,
+			} ),
+			setValue: ( { value } ) => ( {
+				id: value.id,
+				url: value.url,
+				alt: value.alt,
+				mediaType: value.backgroundType,
+				useFeaturedImage: value.featuredImage,
+			} ),
 		},
 	];
 	settings[ formKey ] = {

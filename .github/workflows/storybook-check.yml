@@ -32,6 +32,9 @@ jobs:
               uses: ./.github/setup-node
 
             - name: Build Storybook
+              env:
+                  NODE_OPTIONS: --max-old-space-size=8192
+                  NODE_ENV: test
               run: npm run storybook:build
 
             - name: Install test-runner and Playwright dependencies

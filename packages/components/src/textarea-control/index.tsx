@@ -86,5 +86,6 @@ function UnforwardedTextareaControl(
  * ```
  */
 export const TextareaControl = forwardRef( UnforwardedTextareaControl );
+TextareaControl.displayName = 'TextareaControl';
 
 export default TextareaControl;

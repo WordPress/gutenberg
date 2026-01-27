@@ -58,7 +58,11 @@ const Template: StoryFn< typeof ConfirmDialog > = ( {
 
 	return (
 		<>
-			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
+			<Button
+				__next40pxDefaultSize
+				variant="primary"
+				onClick={ () => setIsOpen( true ) }
+			>
 				Open ConfirmDialog
 			</Button>
 

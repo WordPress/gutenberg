@@ -33,7 +33,8 @@
 			height: 24px;
 		}
 
-		&.is-disabled {
+		&.is-disabled,
+		&:has([data-can-disable-input-layout][data-disabled]) {
 			background-color: var(--wpds-color-bg-interactive-neutral-weak-disabled);
 			border-color: var(--wpds-color-stroke-interactive-neutral-disabled);
 			color: var(--wpds-color-fg-interactive-neutral-disabled);
@@ -53,7 +54,7 @@
 			outline: none;
 		}
 
-		&:hover:not(.is-disabled, .is-borderless) {
+		&:hover:not(.is-disabled, :has([data-can-disable-input-layout][data-disabled]), .is-borderless) {
 			border-color: var(--wpds-color-stroke-interactive-neutral-active);
 		}
 	}

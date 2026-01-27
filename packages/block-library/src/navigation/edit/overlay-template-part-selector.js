@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { useMemo, useState, useCallback } from '@wordpress/element';
-import { useEntityRecords } from '@wordpress/core-data';
-import { useDispatch } from '@wordpress/data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	SelectControl,
 	Button,
@@ -21,6 +21,7 @@ import { plus } from '@wordpress/icons';
  */
 import { createTemplatePartId } from '../../template-part/edit/utils/create-template-part-id';
 import useCreateOverlayTemplatePart from './use-create-overlay';
+import DeletedOverlayWarning from './deleted-overlay-warning';
 import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
 
 /**
@@ -47,6 +48,11 @@ export default function OverlayTemplatePartSelector( {
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 
+	const currentTheme = useSelect(
+		( select ) => select( coreStore ).getCurrentTheme()?.stylesheet,
+		[]
+	);
+
 	// Track if we're currently creating a new overlay
 	const [ isCreating, setIsCreating ] = useState( false );
 
@@ -65,6 +71,16 @@ export default function OverlayTemplatePartSelector( {
 	const createOverlayTemplatePart =
 		useCreateOverlayTemplatePart( overlayTemplateParts );
 
+	// Find the selected template part to get its title
+	const selectedTemplatePart = useMemo( () => {
+		if ( ! overlay || ! overlayTemplateParts ) {
+			return null;
+		}
+		return overlayTemplateParts.find(
+			( templatePart ) => templatePart.slug === overlay
+		);
+	}, [ overlay, overlayTemplateParts ] );
+
 	// Build options for SelectControl
 	const options = useMemo( () => {
 		const baseOptions = [
@@ -80,37 +96,37 @@ export default function OverlayTemplatePartSelector( {
 
 		const templatePartOptions = overlayTemplateParts.map(
 			( templatePart ) => {
-				const templatePartId = createTemplatePartId(
-					templatePart.theme,
-					templatePart.slug
-				);
 				const label = templatePart.title?.rendered
 					? decodeEntities( templatePart.title.rendered )
 					: templatePart.slug;
 
 				return {
 					label,
-					value: templatePartId,
+					value: templatePart.slug,
 				};
 			}
 		);
 
-		return [ ...baseOptions, ...templatePartOptions ];
-	}, [ overlayTemplateParts, hasResolved, isResolving ] );
-
-	// Find the selected template part to get its title
-	const selectedTemplatePart = useMemo( () => {
-		if ( ! overlay || ! overlayTemplateParts ) {
-			return null;
+		// If an overlay is selected but not found in the list, add it as a "missing" option
+		if ( overlay && ! selectedTemplatePart ) {
+			templatePartOptions.unshift( {
+				label: sprintf(
+					/* translators: %s: Overlay slug. */
+					__( '%s (missing)' ),
+					overlay
+				),
+				value: overlay,
+			} );
 		}
-		return overlayTemplateParts.find( ( templatePart ) => {
-			const templatePartId = createTemplatePartId(
-				templatePart.theme,
-				templatePart.slug
-			);
-			return templatePartId === overlay;
-		} );
-	}, [ overlay, overlayTemplateParts ] );
+
+		return [ ...baseOptions, ...templatePartOptions ];
+	}, [
+		overlayTemplateParts,
+		hasResolved,
+		isResolving,
+		overlay,
+		selectedTemplatePart,
+	] );
 
 	const handleSelectChange = ( value ) => {
 		setAttributes( {
@@ -119,12 +135,21 @@ export default function OverlayTemplatePartSelector( {
 	};
 
 	const handleEditClick = () => {
-		if ( ! overlay || ! onNavigateToEntityRecord ) {
+		if (
+			! overlay ||
+			! selectedTemplatePart ||
+			! onNavigateToEntityRecord
+		) {
 			return;
 		}
 
+		// Resolve the full template part ID using theme
+		// Default to current theme if not set
+		const theme = selectedTemplatePart.theme || currentTheme;
+		const templatePartId = createTemplatePartId( theme, overlay );
+
 		onNavigateToEntityRecord( {
-			postId: overlay,
+			postId: templatePartId,
 			postType: 'wp_template_part',
 		} );
 	};
@@ -136,13 +161,19 @@ export default function OverlayTemplatePartSelector( {
 			const templatePart = await createOverlayTemplatePart();
 
 			setAttributes( {
-				overlay: templatePart.id,
+				overlay: templatePart.slug,
 			} );
 
 			// Navigate to the new overlay for editing
+			// Create the full ID using theme and slug
 			if ( onNavigateToEntityRecord ) {
+				const theme = templatePart.theme || currentTheme;
+				const templatePartId = createTemplatePartId(
+					theme,
+					templatePart.slug
+				);
 				onNavigateToEntityRecord( {
-					postId: templatePart.id,
+					postId: templatePartId,
 					postType: 'wp_template_part',
 				} );
 			}
@@ -168,9 +199,21 @@ export default function OverlayTemplatePartSelector( {
 		setAttributes,
 		onNavigateToEntityRecord,
 		createErrorNotice,
+		currentTheme,
 	] );
 
+	const handleClearOverlay = useCallback( () => {
+		setAttributes( { overlay: undefined } );
+	}, [ setAttributes ] );
+
 	const isCreateButtonDisabled = isResolving || isCreating;
+
+	// Check if the selected overlay is missing (deleted)
+	const isOverlayMissing = useMemo( () => {
+		return (
+			overlay && hasResolved && ! isResolving && ! selectedTemplatePart
+		);
+	}, [ overlay, hasResolved, isResolving, selectedTemplatePart ] );
 
 	// Build help text
 	const helpText = useMemo( () => {
@@ -237,6 +280,13 @@ export default function OverlayTemplatePartSelector( {
 					</FlexItem>
 				) }
 			</HStack>
+			{ isOverlayMissing && (
+				<DeletedOverlayWarning
+					onClear={ handleClearOverlay }
+					onCreate={ handleCreateOverlay }
+					isCreating={ isCreating }
+				/>
+			) }
 		</div>
 	);
 }

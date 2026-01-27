@@ -4,8 +4,8 @@
 import { Button, CheckboxControl } from '@wordpress/components';
 import { useRegistry } from '@wordpress/data';
 import { useContext, useMemo, useState } from '@wordpress/element';
-import { __, sprintf, _n } from '@wordpress/i18n';
 import { Stack } from '@wordpress/ui';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -14,6 +14,7 @@ import DataViewsPagination from '../dataviews-pagination';
 import DataViewsContext from '../dataviews-context';
 import type { SetSelection } from '../../types/private';
 import type { Action } from '../../types';
+import getFooterMessage from '../../utils/get-footer-message';
 
 const EMPTY_ARRAY: [] = [];
 
@@ -134,27 +135,16 @@ export function DataViewsPickerFooter() {
 		onChangeSelection,
 		getItemId,
 		actions = EMPTY_ARRAY,
+		paginationInfo,
 	} = useContext( DataViewsContext );
 
-	const selectionCount = selection.length;
 	const isMultiselect = useIsMultiselectPicker( actions );
 
-	const message =
-		selectionCount > 0
-			? sprintf(
-					/* translators: %d: number of items. */
-					_n(
-						'%d Item selected',
-						'%d Items selected',
-						selectionCount
-					),
-					selectionCount
-			  )
-			: sprintf(
-					/* translators: %d: number of items. */
-					_n( '%d Item', '%d Items', data.length ),
-					data.length
-			  );
+	const message = getFooterMessage(
+		selection.length,
+		data.length,
+		paginationInfo.totalItems
+	);
 
 	const selectedItems = useMemo(
 		() =>

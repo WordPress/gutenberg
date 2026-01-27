@@ -405,5 +405,6 @@ function UnforwardedRangeControl(
  * ```
  */
 export const RangeControl = forwardRef( UnforwardedRangeControl );
+RangeControl.displayName = 'RangeControl';
 
 export default RangeControl;

@@ -26,6 +26,7 @@ import {
 	isNumericID,
 } from './utils';
 import { fetchBlockPatterns } from './fetch';
+import { restoreSelection, getSelectionHistory } from './utils/crdt-selection';
 
 /**
  * Requests authors from the REST API.
@@ -155,13 +156,12 @@ export const getEntityRecord =
 			}
 
 			// Entity supports syncing.
-			if (
-				window.__experimentalEnableSync &&
-				entityConfig.syncConfig &&
-				isNumericID( key ) &&
-				! query
-			) {
-				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+				if (
+					entityConfig.syncConfig &&
+					isNumericID( key ) &&
+					! query
+				) {
 					const objectType = `${ kind }/${ name }`;
 					const objectId = key;
 
@@ -193,7 +193,7 @@ export const getEntityRecord =
 						recordWithTransients,
 						{
 							// Handle edits sourced from the sync manager.
-							editRecord: ( edits ) => {
+							editRecord: ( edits, options = {} ) => {
 								if ( ! Object.keys( edits ).length ) {
 									return;
 								}
@@ -207,6 +207,7 @@ export const getEntityRecord =
 									meta: {
 										undo: undefined,
 									},
+									options,
 								} );
 							},
 							// Get the current entity record (with edits)
@@ -216,6 +217,15 @@ export const getEntityRecord =
 									name,
 									key
 								),
+							// Refetch the current entity record from the database.
+							refetchRecord: async () => {
+								dispatch.receiveEntityRecords(
+									kind,
+									name,
+									await apiFetch( { path, parse: true } ),
+									query
+								);
+							},
 							// Save the current entity record's unsaved edits.
 							saveRecord: () => {
 								dispatch.saveEditedEntityRecord(
@@ -223,6 +233,36 @@ export const getEntityRecord =
 									name,
 									key
 								);
+							},
+							addUndoMeta: ( ydoc, meta ) => {
+								const selectionHistory =
+									getSelectionHistory( ydoc );
+
+								if ( selectionHistory ) {
+									meta.set(
+										'selectionHistory',
+										selectionHistory
+									);
+								}
+							},
+							restoreUndoMeta: ( ydoc, meta ) => {
+								const selectionHistory =
+									meta.get( 'selectionHistory' );
+
+								if ( selectionHistory ) {
+									// Because Yjs initiates an undo, we need to
+									// wait until the content is restored before
+									// we can update the selection.
+									// Use setTimeout() to wait until content is
+									// finished updating, and then set the correct
+									// selection.
+									setTimeout( () => {
+										restoreSelection(
+											selectionHistory,
+											ydoc
+										);
+									}, 0 );
+								}
 							},
 						}
 					);
@@ -420,6 +460,26 @@ export const getEntityRecords =
 					totalItems: records.length,
 					totalPages: 1,
 				};
+			}
+
+			if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+				if ( entityConfig.syncConfig && -1 === query.per_page ) {
+					const objectType = `${ kind }/${ name }`;
+					getSyncManager()?.loadCollection(
+						entityConfig.syncConfig,
+						objectType,
+						{
+							refetchRecords: async () => {
+								dispatch.receiveEntityRecords(
+									kind,
+									name,
+									await apiFetch( { path, parse: true } ),
+									query
+								);
+							},
+						}
+					);
+				}
 			}
 
 			// If we request fields but the result doesn't contain the fields,

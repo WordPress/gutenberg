@@ -98,17 +98,22 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'label',
 			label: __( 'Label' ),
-			type: 'richtext',
+			type: 'text',
+			Edit: 'rich-text',
 		},
 		{
 			id: 'link',
 			label: __( 'Link' ),
-			type: 'link',
-			mapping: {
-				href: 'url',
-				rel: 'rel',
-				// TODO - opens in new tab? id?
-			},
+			type: 'url',
+			Edit: 'link',
+			getValue: ( { item } ) => ( {
+				url: item.url,
+				rel: item.rel,
+			} ),
+			setValue: ( { value } ) => ( {
+				url: value.url,
+				rel: value.rel,
+			} ),
 		},
 	];
 	settings[ formKey ] = {

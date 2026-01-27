@@ -44,7 +44,11 @@ export default function InspectorControlsTabs( {
 
 	// Auto-select first available tab unless user has made a selection
 	useEffect( () => {
-		if ( ! tabs?.length || hasUserSelectionRef.current ) {
+		if (
+			! tabs?.length ||
+			( hasUserSelectionRef.current &&
+				tabs.some( ( tab ) => tab.name === selectedTabId ) )
+		) {
 			return;
 		}
 
