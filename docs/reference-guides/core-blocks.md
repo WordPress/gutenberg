@@ -625,8 +625,7 @@ The author biography. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 
 -	**Name:** core/post-author-biography
 -	**Category:** theme
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
--	**Attributes:** textAlign
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign)
 
 ## Author Name
 
