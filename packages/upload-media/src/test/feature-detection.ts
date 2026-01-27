@@ -63,8 +63,12 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when WebAssembly is unavailable', () => {
-			// @ts-ignore - Intentionally removing WebAssembly for testing.
-			delete global.WebAssembly;
+			// Override WebAssembly to simulate it being unavailable.
+			Object.defineProperty( global, 'WebAssembly', {
+				value: undefined,
+				writable: true,
+				configurable: true,
+			} );
 
 			const result = detectClientSideMediaSupport();
 
@@ -76,8 +80,12 @@ describe( 'feature-detection', () => {
 
 		it( 'returns not supported when SharedArrayBuffer is unavailable', () => {
 			global.WebAssembly = originalWebAssembly;
-			// @ts-ignore - Intentionally removing SharedArrayBuffer for testing.
-			delete global.SharedArrayBuffer;
+			// Override SharedArrayBuffer to simulate it being unavailable.
+			Object.defineProperty( global, 'SharedArrayBuffer', {
+				value: undefined,
+				writable: true,
+				configurable: true,
+			} );
 
 			const result = detectClientSideMediaSupport();
 
@@ -138,9 +146,12 @@ describe( 'feature-detection', () => {
 			const result1 = detectClientSideMediaSupport();
 			expect( result1.supported ).toBe( true );
 
-			// Now remove WebAssembly - cached result should still be returned.
-			// @ts-ignore - Intentionally removing WebAssembly for testing.
-			delete global.WebAssembly;
+			// Now override WebAssembly - cached result should still be returned.
+			Object.defineProperty( global, 'WebAssembly', {
+				value: undefined,
+				writable: true,
+				configurable: true,
+			} );
 
 			const result2 = detectClientSideMediaSupport();
 			expect( result2.supported ).toBe( true );
@@ -162,8 +173,12 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns false when features are unavailable', () => {
-			// @ts-ignore - Intentionally removing WebAssembly for testing.
-			delete global.WebAssembly;
+			// Override WebAssembly to simulate it being unavailable.
+			Object.defineProperty( global, 'WebAssembly', {
+				value: undefined,
+				writable: true,
+				configurable: true,
+			} );
 
 			expect( isClientSideMediaSupported() ).toBe( false );
 		} );
@@ -182,10 +197,13 @@ describe( 'feature-detection', () => {
 			const result1 = detectClientSideMediaSupport();
 			expect( result1.supported ).toBe( true );
 
-			// Clear cache and remove WebAssembly.
+			// Clear cache and override WebAssembly.
 			clearFeatureDetectionCache();
-			// @ts-ignore - Intentionally removing WebAssembly for testing.
-			delete global.WebAssembly;
+			Object.defineProperty( global, 'WebAssembly', {
+				value: undefined,
+				writable: true,
+				configurable: true,
+			} );
 
 			const result2 = detectClientSideMediaSupport();
 			expect( result2.supported ).toBe( false );
