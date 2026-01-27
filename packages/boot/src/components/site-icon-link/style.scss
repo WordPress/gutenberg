@@ -17,8 +17,8 @@ $header-height: variables.$header-height;
 
 	&:focus:not(:active) {
 		outline:
-			var(--wpds-border-width-interactive-focus, 2px) solid
+			var(--wpds-border-width-focus, 2px) solid
 			var(--wpds-color-stroke-focus-brand, #0073aa);
-		outline-offset: calc(-1 * var(--wpds-border-width-interactive-focus, 2px));
+		outline-offset: calc(-1 * var(--wpds-border-width-focus, 2px));
 	}
 }

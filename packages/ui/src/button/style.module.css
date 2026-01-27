@@ -102,7 +102,7 @@
 			height: var(--wp-ui-button-font-size);
 			aspect-ratio: 1;
 
-			border: var(--wpds-border-width-interactive-focus) solid;
+			border: var(--wpds-border-width-focus) solid;
 			border-block-start-color: var(--wp-ui-button-foreground-color);
 			border-inline-end-color: var(--wp-ui-button-foreground-color);
 			border-block-end-color: transparent;
