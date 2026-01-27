@@ -44,6 +44,7 @@ import { focusCommentThread, getCommentExcerpt } from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
+import MinifiedThreadIndicator from './minified-thread-indicator';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -59,6 +60,7 @@ export function Comments( {
 	reflowComments,
 	isFloating = false,
 	commentLastUpdated,
+	isCompactNotes = false,
 } ) {
 	const [ heights, setHeights ] = useState( {} );
 	const [ selectedThread, setSelectedThread ] = useState( null );
@@ -404,35 +406,101 @@ export function Comments( {
 					commentSidebarRef={ commentSidebarRef }
 				/>
 			) }
-			{ threads.map( ( thread ) => (
-				<Thread
-					key={ thread.id }
-					thread={ thread }
-					onAddReply={ onAddReply }
-					onCommentDelete={ handleDelete }
-					onEditComment={ onEditComment }
-					isSelected={ selectedThread === thread.id }
-					setSelectedThread={ setSelectedThread }
-					setNewNoteFormState={ setNewNoteFormState }
-					commentSidebarRef={ commentSidebarRef }
-					reflowComments={ reflowComments }
-					isFloating={ isFloating }
-					calculatedOffset={ boardOffsets[ thread.id ] ?? 0 }
-					setHeights={ setHeights }
-					setBlockRef={ setBlockRef }
-					selectedThread={ selectedThread }
-					commentLastUpdated={ commentLastUpdated }
-					newNoteFormState={ newNoteFormState }
-					onKeyDown={ ( event ) =>
-						handleThreadNavigation(
-							event,
-							thread,
-							selectedThread === thread.id
-						)
-					}
-				/>
-			) ) }
+			{ threads.map( ( thread ) => {
+				const isSelected = selectedThread === thread.id;
+				const shouldShowMinified =
+					isCompactNotes &&
+					isFloating &&
+					! isSelected &&
+					thread.id !== 'new-note-thread';
+
+				if ( shouldShowMinified ) {
+					return (
+						<MinifiedThread
+							key={ thread.id }
+							thread={ thread }
+							calculatedOffset={ boardOffsets[ thread.id ] ?? 0 }
+							setHeights={ setHeights }
+							setBlockRef={ setBlockRef }
+							selectedThread={ selectedThread }
+							commentLastUpdated={ commentLastUpdated }
+							onExpand={ () => {
+								setNewNoteFormState( 'closed' );
+								setSelectedThread( thread.id );
+								if ( thread.blockClientId ) {
+									selectBlock( thread.blockClientId, null );
+									toggleBlockSpotlight(
+										thread.blockClientId,
+										true
+									);
+								}
+							} }
+							onKeyDown={ ( event ) =>
+								handleThreadNavigation( event, thread, false )
+							}
+						/>
+					);
+				}
+
+				return (
+					<Thread
+						key={ thread.id }
+						thread={ thread }
+						onAddReply={ onAddReply }
+						onCommentDelete={ handleDelete }
+						onEditComment={ onEditComment }
+						isSelected={ isSelected }
+						setSelectedThread={ setSelectedThread }
+						setNewNoteFormState={ setNewNoteFormState }
+						commentSidebarRef={ commentSidebarRef }
+						reflowComments={ reflowComments }
+						isFloating={ isFloating }
+						calculatedOffset={ boardOffsets[ thread.id ] ?? 0 }
+						setHeights={ setHeights }
+						setBlockRef={ setBlockRef }
+						selectedThread={ selectedThread }
+						commentLastUpdated={ commentLastUpdated }
+						newNoteFormState={ newNoteFormState }
+						onKeyDown={ ( event ) =>
+							handleThreadNavigation( event, thread, isSelected )
+						}
+					/>
+				);
+			} ) }
 		</>
+	);
+}
+
+/**
+ * Wrapper for MinifiedThreadIndicator that handles floating positioning.
+ */
+function MinifiedThread( {
+	thread,
+	calculatedOffset,
+	setHeights,
+	setBlockRef,
+	selectedThread,
+	commentLastUpdated,
+	onExpand,
+	onKeyDown,
+} ) {
+	const { y, refs } = useFloatingThread( {
+		thread,
+		calculatedOffset,
+		setHeights,
+		setBlockRef,
+		selectedThread,
+		commentLastUpdated,
+	} );
+
+	return (
+		<MinifiedThreadIndicator
+			thread={ thread }
+			y={ y }
+			refs={ refs }
+			onExpand={ onExpand }
+			onKeyDown={ onKeyDown }
+		/>
 	);
 }
 

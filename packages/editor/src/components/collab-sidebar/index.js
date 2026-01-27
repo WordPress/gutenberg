@@ -9,6 +9,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -42,6 +43,7 @@ function NotesSidebarContent( {
 	reflowComments,
 	commentLastUpdated,
 	isFloating = false,
+	isCompactNotes = false,
 } ) {
 	const { onCreate, onEdit, onDelete } =
 		useBlockCommentsActions( reflowComments );
@@ -75,6 +77,7 @@ function NotesSidebarContent( {
 				reflowComments={ reflowComments }
 				commentLastUpdated={ commentLastUpdated }
 				isFloating={ isFloating }
+				isCompactNotes={ isCompactNotes }
 			/>
 		</VStack>
 	);
@@ -91,8 +94,8 @@ function NotesSidebar( { postId } ) {
 
 	const showFloatingSidebar = isLargeViewport;
 
-	const { clientId, blockCommentId, isDistractionFree } = useSelect(
-		( select ) => {
+	const { clientId, blockCommentId, isDistractionFree, isCompactNotes } =
+		useSelect( ( select ) => {
 			const {
 				getBlockAttributes,
 				getSelectedBlockClientId,
@@ -105,10 +108,12 @@ function NotesSidebar( { postId } ) {
 					? getBlockAttributes( _clientId )?.metadata?.noteId
 					: null,
 				isDistractionFree: getSettings().isDistractionFree,
+				isCompactNotes: !! select( preferencesStore ).get(
+					'core',
+					'compactNotes'
+				),
 			};
-		},
-		[]
-	);
+		}, [] );
 
 	const {
 		resultComments,
@@ -219,6 +224,7 @@ function NotesSidebar( { postId } ) {
 							backgroundColor,
 						} }
 						isFloating
+						isCompactNotes={ isCompactNotes }
 					/>
 				</PluginSidebar>
 			) }
