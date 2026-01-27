@@ -9,6 +9,7 @@ Client-side media processing requires the following browser capabilities:
 | WebAssembly | Yes | Runs the wasm-vips image processing library |
 | SharedArrayBuffer | Yes | Enables multi-threaded WASM execution |
 | Cross-origin isolation | Yes | Required for SharedArrayBuffer in modern browsers |
+| CSP `blob:` workers | Yes | The WASM worker is loaded via a blob URL |
 
 ### Browser Support Matrix
 
@@ -27,6 +28,7 @@ The fallback occurs when any of the following conditions are detected:
 - WebAssembly is not supported in the browser
 - SharedArrayBuffer is not available
 - Cross-origin isolation is not enabled (missing required headers)
+- The site's Content Security Policy (CSP) blocks blob URL workers
 
 ## Cross-origin isolation / `SharedArrayBuffer`
 
@@ -45,6 +47,11 @@ If client-side media processing is not working, check the browser console for me
    - The page is being served over HTTP instead of HTTPS
 
 3. **"WebAssembly is not supported"**: The browser does not support WebAssembly. This is rare in modern browsers but can occur in older versions or restricted environments.
+
+4. **"Content Security Policy (CSP) does not allow blob: workers"**: A security plugin or server configuration is setting a `worker-src` CSP directive that does not include `blob:`. The WASM image processing worker is loaded via a blob URL, which requires CSP to permit it. To resolve this:
+   - Add `blob:` to the `worker-src` directive in the site's CSP header (e.g., `worker-src 'self' blob:`)
+   - If using a security plugin (e.g., WP Cerber, Wordfence, or similar), check its CSP settings and add `blob:` to the allowed worker sources
+   - If the CSP header is set at the server level (e.g., in `.htaccess`, Nginx config, or a CDN), update it there
 
 Check out [this tracking issue](https://github.com/WordPress/gutenberg/issues/74464) for more details and further resources.
 
