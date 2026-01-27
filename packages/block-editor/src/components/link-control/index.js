@@ -295,6 +295,54 @@ function LinkControl( {
 		} );
 	};
 
+	/**
+	 * Validates a URL string using a multi-stage validation process.
+	 * This helper consolidates URL validation logic used throughout the component.
+	 *
+	 * @param {string} urlToValidate - The URL string to validate
+	 * @return {Object} Validation result with isValid boolean and optional errorMessage
+	 */
+	const validateUrl = ( urlToValidate ) => {
+		const invalidResult = {
+			type: 'invalid',
+			message: __( 'Please enter a valid URL.' ),
+		};
+
+		const trimmedValue = urlToValidate?.trim();
+
+		// If empty or is not URL-like, return invalid
+		if ( ! trimmedValue?.length || ! isURLLike( trimmedValue ) ) {
+			return invalidResult;
+		}
+
+		// Hash links (internal anchor links like #section) are valid and don't need
+		// URL constructor validation. They're already validated by isURLLike.
+		const isValidHashLink =
+			trimmedValue.startsWith( '#' ) && isValidFragment( trimmedValue );
+
+		if ( ! isValidHashLink ) {
+			// Perform URL validation using the native URL constructor as the authoritative source.
+			// The native URL constructor is the standard for URL validity - if it accepts a URL,
+			// we should allow it. For URLs without a protocol (e.g., "www.wordpress.org"),
+			// prepend "http://" before validating, as the URL constructor requires a protocol.
+			//
+			// Note: Protocol URLs (mailto:, tel:, etc.) are also validated by the native
+			// URL constructor, so we don't need special handling for them.
+			//
+			// Note: We rely on the native URL constructor rather than implementing custom TLD
+			// validation to avoid blocking valid URLs. If a URL passes the native constructor,
+			// it's technically valid according to web standards.
+			const urlToCheck = prependHTTP( trimmedValue );
+			if ( ! isURL( urlToCheck ) ) {
+				return invalidResult;
+			}
+		}
+
+		return {
+			type: 'valid',
+		};
+	};
+
 	const handleSelectSuggestion = ( updatedValue ) => {
 		// Validate URL suggestions (link, mailto, tel, internal) or manually entered URLs.
 		// Entity suggestions (post, page, category, etc.) don't need validation as they come from the database.
@@ -311,43 +359,12 @@ function LinkControl( {
 			// Use the URL from the suggestion, or fall back to currentUrlInputValue
 			const urlToValidate = updatedValue?.url || currentUrlInputValue;
 
-			// If empty, validation will fail
-			if ( ! urlToValidate?.trim()?.length ) {
-				return;
-			}
-
-			// Perform validation using the same logic as validateAndSetValidity
-			const trimmedValue = urlToValidate.trim();
-
-			// First check if it looks like a URL (for UX - we only validate URL-like strings)
-			if ( ! trimmedValue || ! isURLLike( trimmedValue ) ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message: __( 'Please enter a valid URL.' ),
-				} );
+			// Validate the URL using the shared validation helper
+			const validation = validateUrl( urlToValidate );
+			if ( validation.type === 'invalid' ) {
+				setCustomValidity( validation );
 				triggerValidationDisplay();
 				return;
-			}
-
-			// Hash links (internal anchor links like #section) are valid and don't need
-			// URL constructor validation. They're already validated by isURLLike.
-			const isHashLink =
-				trimmedValue.startsWith( '#' ) &&
-				isValidFragment( trimmedValue );
-
-			if ( ! isHashLink ) {
-				// Perform URL validation using the native URL constructor as the authoritative source.
-				// Protocol URLs (mailto:, tel:, etc.) are also validated by the native
-				// URL constructor, so we don't need special handling for them.
-				const urlToCheck = prependHTTP( trimmedValue );
-				if ( ! isURL( urlToCheck ) ) {
-					setCustomValidity( {
-						type: 'invalid',
-						message: __( 'Please enter a valid URL.' ),
-					} );
-					triggerValidationDisplay();
-					return;
-				}
 			}
 		}
 
@@ -409,48 +426,16 @@ function LinkControl( {
 			return true;
 		}
 
-		// First check if it looks like a URL (for UX - we only validate URL-like strings)
-		if ( ! trimmedValue || ! isURLLike( trimmedValue ) ) {
-			setCustomValidity( {
-				type: 'invalid',
-				message: __( 'Please enter a valid URL.' ),
-			} );
-			// Trigger the invalid event to show the error message immediately
-			// even if the field hasn't been blurred.
+		// Validate the URL using the shared validation helper
+		const validation = validateUrl( currentUrlInputValue );
+
+		if ( validation.type === 'invalid' ) {
+			setCustomValidity( validation );
 			triggerValidationDisplay();
 			return false;
 		}
 
-		// Hash links (internal anchor links like #section) are valid and don't need
-		// URL constructor validation. They're already validated by isURLLike.
-		const isHashLink =
-			trimmedValue.startsWith( '#' ) && isValidFragment( trimmedValue );
-
-		if ( ! isHashLink ) {
-			// Perform URL validation using the native URL constructor as the authoritative source.
-			// The native URL constructor is the standard for URL validity - if it accepts a URL,
-			// we should allow it. For URLs without a protocol (e.g., "www.wordpress.org"),
-			// prepend "http://" before validating, as the URL constructor requires a protocol.
-			//
-			// Note: Protocol URLs (mailto:, tel:, etc.) are also validated by the native
-			// URL constructor, so we don't need special handling for them.
-			//
-			// Note: We rely on the native URL constructor rather than implementing custom TLD
-			// validation to avoid blocking valid URLs. If a URL passes the native constructor,
-			// it's technically valid according to web standards.
-			const urlToValidate = prependHTTP( trimmedValue );
-			if ( ! isURL( urlToValidate ) ) {
-				setCustomValidity( {
-					type: 'invalid',
-					message: __( 'Please enter a valid URL.' ),
-				} );
-				// Trigger the invalid event to show the error message immediately
-				// even if the field hasn't been blurred.
-				triggerValidationDisplay();
-				return false;
-			}
-		}
-
+		// Valid URL
 		setCustomValidity( undefined );
 		return true;
 	};
