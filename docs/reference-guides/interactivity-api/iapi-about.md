@@ -56,7 +56,7 @@ _Dynamic block example_
 </div>
 ```
 
-As you can see, directives like [`data-wp-on--click`](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#wp-on) or [`data-wp-bind--hidden`](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#wp-bind) are added as custom HTML attributes. WordPress can process this HTML on the server, handling the directives’ logic and creating the appropriate markup.
+As you can see, directives like [`data-wp-on--click`](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#wp-on) or [`data-wp-bind--hidden`](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#wp-bind) are added as custom HTML attributes. WordPress can process this HTML on the server, handling the directives' logic and creating the appropriate markup.
 
 ### Backward compatible
 
