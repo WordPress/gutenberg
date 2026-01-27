@@ -139,3 +139,6 @@ export * from './entity-types';
 export * from './fetch';
 export * from './hooks';
 export * from './private-apis';
+
+// Temporary export.
+export { SelectionType } from './utils/crdt-user-selections';

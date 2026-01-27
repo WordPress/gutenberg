@@ -1,4 +1,12 @@
+/**
+ * WordPress dependencies
+ */
 import type { Y } from '@wordpress/sync';
+
+/**
+ * Internal dependencies
+ */
+import type { SelectionType } from './utils/crdt-user-selections';
 
 export interface AnyFunction {
 	( ...args: any[] ): any;
@@ -43,17 +51,6 @@ export type CursorPosition = {
 	// position will always result in a redraw.
 	absoluteOffset: number;
 };
-
-/**
- * The type of selection.
- */
-export enum SelectionType {
-	None = 'none',
-	Cursor = 'cursor',
-	SelectionInOneBlock = 'selection-in-one-block',
-	SelectionInMultipleBlocks = 'selection-in-multiple-blocks',
-	WholeBlock = 'whole-block',
-}
 
 export type SelectionNone = {
 	// The user has not made a selection.

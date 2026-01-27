@@ -19,7 +19,17 @@ import type {
 	SelectionWholeBlock,
 	CursorPosition,
 } from '../types';
-import { SelectionType } from '../types';
+
+/**
+ * The type of selection.
+ */
+export enum SelectionType {
+	None = 'none',
+	Cursor = 'cursor',
+	SelectionInOneBlock = 'selection-in-one-block',
+	SelectionInMultipleBlocks = 'selection-in-multiple-blocks',
+	WholeBlock = 'whole-block',
+}
 
 /**
  * Converts WordPress block editor selection to a SelectionState.
