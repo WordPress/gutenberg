@@ -2,13 +2,19 @@
  * WordPress dependencies
  */
 import { useState, useCallback, useMemo } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	privateApis as coreDataPrivateApis,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { resolveSelect, useDispatch } from '@wordpress/data';
-import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
+import { resolveSelect, useDispatch, useSelect } from '@wordpress/data';
+import {
+	Modal,
+	DropZone,
+	FormFileUpload,
+	Button,
+	SnackbarList,
+} from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
 import type { View, Field, ActionButton } from '@wordpress/dataviews';
@@ -42,6 +48,12 @@ const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 // Layout constants - matching the picker layout types
 const LAYOUT_PICKER_GRID = 'pickerGrid';
 const LAYOUT_PICKER_TABLE = 'pickerTable';
+
+// Custom notices context for the media modal
+const NOTICES_CONTEXT = 'media-modal';
+
+// Notice ID - reused for all upload-related notices to prevent flooding
+const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
 
 interface MediaUploadModalProps {
 	/**
@@ -163,10 +175,20 @@ export function MediaUploadModal( {
 			: [ String( value ) ];
 	} );
 
-	const { createSuccessNotice, createErrorNotice, createInfoNotice } =
-		useDispatch( noticesStore );
+	const {
+		createSuccessNotice,
+		createErrorNotice,
+		createInfoNotice,
+		removeNotice,
+	} = useDispatch( noticesStore );
 	// @ts-expect-error - invalidateResolution is not in the typed actions but is available at runtime
 	const { invalidateResolution } = useDispatch( coreStore );
+
+	// Get notices for this modal context
+	const notices = useSelect(
+		( select ) => select( noticesStore ).getNotices( NOTICES_CONTEXT ),
+		[]
+	);
 
 	// DataViews configuration - allow view updates
 	const [ view, setView ] = useState< View >( () => ( {
@@ -326,25 +348,23 @@ export function MediaUploadModal( {
 				const filesArray = Array.from( files );
 
 				// Show upload start notice
-				if ( filesArray.length === 1 ) {
-					createInfoNotice(
-						sprintf(
-							// translators: %s: file name
-							__( 'Uploading %s' ),
-							filesArray[ 0 ].name
-						),
-						{ type: 'snackbar' }
-					);
-				} else {
-					createInfoNotice(
-						sprintf(
-							// translators: %d: number of files
-							__( 'Uploading %d files' ),
+				createInfoNotice(
+					sprintf(
+						// translators: %s: number of files
+						_n(
+							'Uploading %s file',
+							'Uploading %s files',
 							filesArray.length
 						),
-						{ type: 'snackbar' }
-					);
-				}
+						filesArray.length.toLocaleString()
+					),
+					{
+						type: 'snackbar',
+						context: NOTICES_CONTEXT,
+						id: NOTICE_ID_UPLOAD_PROGRESS,
+						explicitDismiss: true,
+					}
+				);
 
 				handleUpload( {
 					allowedTypes,
@@ -359,21 +379,23 @@ export function MediaUploadModal( {
 						);
 
 						if ( allComplete && attachments.length > 0 ) {
-							// Show success notice
-							if ( attachments.length === 1 ) {
-								createSuccessNotice( __( 'Upload complete' ), {
-									type: 'snackbar',
-								} );
-							} else {
-								createSuccessNotice(
-									sprintf(
-										// translators: %d: number of files
-										__( '%d files uploaded successfully' ),
+							// Show success notice (replaces progress notice via ID)
+							createSuccessNotice(
+								sprintf(
+									// translators: %s: number of files
+									_n(
+										'Uploaded %s file',
+										'Uploaded %s files',
 										attachments.length
 									),
-									{ type: 'snackbar' }
-								);
-							}
+									attachments.length.toLocaleString()
+								),
+								{
+									type: 'snackbar',
+									context: NOTICES_CONTEXT,
+									id: NOTICE_ID_UPLOAD_PROGRESS,
+								}
+							);
 
 							// Invalidate the entity records resolution to refresh the view
 							invalidateResolution( 'getEntityRecords', [
@@ -384,8 +406,11 @@ export function MediaUploadModal( {
 						}
 					},
 					onError: ( error ) => {
+						// Show error notice (replaces progress notice via ID)
 						createErrorNotice( error.message, {
 							type: 'snackbar',
+							context: NOTICES_CONTEXT,
+							id: NOTICE_ID_UPLOAD_PROGRESS,
 						} );
 					},
 				} );
@@ -487,25 +512,23 @@ export function MediaUploadModal( {
 					}
 					if ( filteredFiles.length > 0 ) {
 						// Show upload start notice
-						if ( filteredFiles.length === 1 ) {
-							createInfoNotice(
-								sprintf(
-									// translators: %s: file name
-									__( 'Uploading %s' ),
-									filteredFiles[ 0 ].name
-								),
-								{ type: 'snackbar' }
-							);
-						} else {
-							createInfoNotice(
-								sprintf(
-									// translators: %d: number of files
-									__( 'Uploading %d files' ),
+						createInfoNotice(
+							sprintf(
+								// translators: %s: number of files
+								_n(
+									'Uploading %s file',
+									'Uploading %s files',
 									filteredFiles.length
 								),
-								{ type: 'snackbar' }
-							);
-						}
+								filteredFiles.length.toLocaleString()
+							),
+							{
+								type: 'snackbar',
+								context: NOTICES_CONTEXT,
+								id: NOTICE_ID_UPLOAD_PROGRESS,
+								explicitDismiss: true,
+							}
+						);
 
 						handleUpload( {
 							allowedTypes,
@@ -520,26 +543,23 @@ export function MediaUploadModal( {
 								);
 
 								if ( allComplete && attachments.length > 0 ) {
-									// Show success notice
-									if ( attachments.length === 1 ) {
-										createSuccessNotice(
-											__( 'Upload complete' ),
-											{
-												type: 'snackbar',
-											}
-										);
-									} else {
-										createSuccessNotice(
-											sprintf(
-												// translators: %d: number of files
-												__(
-													'%d files uploaded successfully'
-												),
+									// Show success notice (replaces progress notice via ID)
+									createSuccessNotice(
+										sprintf(
+											// translators: %s: number of files
+											_n(
+												'Uploaded %s file',
+												'Uploaded %s files',
 												attachments.length
 											),
-											{ type: 'snackbar' }
-										);
-									}
+											attachments.length.toLocaleString()
+										),
+										{
+											type: 'snackbar',
+											context: NOTICES_CONTEXT,
+											id: NOTICE_ID_UPLOAD_PROGRESS,
+										}
+									);
 
 									// Invalidate the entity records resolution to refresh the view
 									invalidateResolution( 'getEntityRecords', [
@@ -550,8 +570,11 @@ export function MediaUploadModal( {
 								}
 							},
 							onError: ( error ) => {
+								// Show error notice (replaces progress notice via ID)
 								createErrorNotice( error.message, {
 									type: 'snackbar',
+									context: NOTICES_CONTEXT,
+									id: NOTICE_ID_UPLOAD_PROGRESS,
 								} );
 							},
 						} );
@@ -574,6 +597,13 @@ export function MediaUploadModal( {
 				search={ search }
 				searchLabel={ searchLabel }
 				itemListLabel={ __( 'Media items' ) }
+			/>
+			<SnackbarList
+				notices={ notices.filter(
+					( { type } ) => type === 'snackbar'
+				) }
+				className="media-upload-modal__snackbar"
+				onRemove={ ( id ) => removeNotice( id, NOTICES_CONTEXT ) }
 			/>
 		</Modal>
 	);
