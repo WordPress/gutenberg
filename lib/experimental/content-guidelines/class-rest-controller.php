@@ -22,6 +22,17 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	protected $post_type = 'wp_guidelines';
 
 	/**
+	 * JSON encoding flags for consistent and secure encoding.
+	 *
+	 * - JSON_UNESCAPED_SLASHES: Prevents escaping forward slashes (cleaner output)
+	 * - JSON_HEX_TAG: Encodes < and > as \u003C and \u003E (XSS prevention)
+	 * - JSON_HEX_AMP: Encodes & as \u0026 (XSS prevention)
+	 *
+	 * @var int
+	 */
+	protected $json_encode_flags = JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -318,7 +329,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 				'post_type'    => $this->post_type,
 				'post_status'  => isset( $prepared['status'] ) && 'published' === $prepared['status'] ? 'publish' : 'draft',
 				'post_title'   => __( 'Content Guidelines', 'gutenberg' ),
-				'post_content' => wp_json_encode( $prepared['content'] ),
+				'post_content' => $this->encode_json_for_storage( $prepared['content'] ),
 			),
 			true
 		);
@@ -351,16 +362,12 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 		$prepared = $this->prepare_item_for_database( $request );
 
 		// Get existing content and merge with new content.
-		$existing_content = json_decode( $post->post_content, true );
-		if ( ! is_array( $existing_content ) ) {
-			$existing_content = array();
-		}
-
-		$new_content = array_merge( $existing_content, $prepared['content'] );
+		$existing_content = $this->decode_json_from_storage( $post->post_content );
+		$new_content      = array_merge( $existing_content, $prepared['content'] );
 
 		$update_args = array(
 			'ID'           => $post->ID,
-			'post_content' => wp_json_encode( $new_content ),
+			'post_content' => $this->encode_json_for_storage( $new_content ),
 		);
 
 		if ( isset( $prepared['status'] ) ) {
@@ -500,10 +507,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 			);
 		}
 
-		$content = json_decode( $revision->post_content, true );
-		if ( ! is_array( $content ) ) {
-			$content = array();
-		}
+		$content = $this->decode_json_from_storage( $revision->post_content );
 
 		$author = get_user_by( 'id', $revision->post_author );
 
@@ -584,10 +588,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response Response object.
 	 */
 	public function prepare_item_for_response( $post, $request ) {
-		$content = json_decode( $post->post_content, true );
-		if ( ! is_array( $content ) ) {
-			$content = array();
-		}
+		$content = $this->decode_json_from_storage( $post->post_content );
 
 		$author = get_user_by( 'id', $post->post_author );
 
@@ -658,6 +659,35 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 			return null;
 		}
 		return $post;
+	}
+
+	/**
+	 * Encodes data as JSON for storage in post_content.
+	 *
+	 * Uses consistent encoding flags and wp_slash() for WordPress database compatibility.
+	 * This ensures special characters (quotes, HTML entities) are properly escaped.
+	 *
+	 * @param array $data Data to encode.
+	 * @return string Slashed JSON string ready for wp_insert_post/wp_update_post.
+	 */
+	protected function encode_json_for_storage( $data ) {
+		return wp_slash( wp_json_encode( $data, $this->json_encode_flags ) );
+	}
+
+	/**
+	 * Decodes JSON from post_content with error handling.
+	 *
+	 * @param string $json_string JSON string to decode.
+	 * @return array Decoded array, or empty array if decoding fails.
+	 */
+	protected function decode_json_from_storage( $json_string ) {
+		$decoded = json_decode( $json_string, true );
+
+		if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
+			return array();
+		}
+
+		return $decoded;
 	}
 
 	/**
