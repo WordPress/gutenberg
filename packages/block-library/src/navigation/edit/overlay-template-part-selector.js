@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useMemo, useState, useCallback } from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -10,6 +11,7 @@ import {
 	FlexBlock,
 	FlexItem,
 	__experimentalHStack as HStack,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -38,6 +40,11 @@ export default function OverlayTemplatePartSelector( {
 	setAttributes,
 	onNavigateToEntityRecord,
 } ) {
+	const headingId = useInstanceId(
+		OverlayTemplatePartSelector,
+		'wp-block-navigation__overlay-selector-heading'
+	);
+
 	const {
 		records: templateParts,
 		isResolving,
@@ -238,7 +245,10 @@ export default function OverlayTemplatePartSelector( {
 
 	return (
 		<div className="wp-block-navigation__overlay-selector">
-			<h3 className="wp-block-navigation__overlay-selector-header">
+			<h3
+				id={ headingId }
+				className="wp-block-navigation__overlay-selector-header"
+			>
 				{ __( 'Overlay Template' ) }
 			</h3>
 			{ hasResolved && overlayTemplateParts.length === 0 ? (
@@ -274,6 +284,8 @@ export default function OverlayTemplatePartSelector( {
 								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 								label={ __( 'Overlay template' ) }
+								hideLabelFromVision
+								aria-labelledby={ headingId }
 								value={ overlay || '' }
 								options={ options }
 								onChange={ handleSelectChange }
@@ -312,11 +324,15 @@ export default function OverlayTemplatePartSelector( {
 				alignment="flex-start"
 				className="wp-block-navigation__overlay-help-text-wrapper"
 			>
-				<p className="wp-block-navigation__overlay-help-text">
+				<Text
+					variant="muted"
+					isBlock
+					className="wp-block-navigation__overlay-help-text"
+				>
 					{ __(
 						'An overlay template allows you to customize the appearance of the dialog that opens when the menu button is pressed.'
 					) }
-				</p>
+				</Text>
 			</HStack>
 		</div>
 	);
