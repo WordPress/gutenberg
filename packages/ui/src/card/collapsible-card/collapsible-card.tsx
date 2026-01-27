@@ -41,11 +41,7 @@ export const CollapsibleCard = forwardRef<
 				<CardHeader className={ styles.header }>
 					<span className={ styles.title }>{ title }</span>
 					<span className={ styles[ 'header-actions' ] }>
-						{ summary ? (
-							<span className={ styles.summary }>
-								{ summary }
-							</span>
-						) : null }
+						<Card.Summary>{ summary }</Card.Summary>
 						<Collapsible.Trigger
 							aria-label={ toggleLabel }
 							className={ clsx(
