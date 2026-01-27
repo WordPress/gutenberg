@@ -139,4 +139,3 @@ export * from './entity-types';
 export * from './fetch';
 export * from './hooks';
 export * from './private-apis';
-export * from './types';
