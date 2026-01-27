@@ -3,13 +3,6 @@ import { forwardRef } from '@wordpress/element';
 import { type BadgeProps } from './types';
 
 /**
- * Default render function that renders a span element with the given props.
- */
-const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'span' > ) => (
-	<span { ...props } />
-);
-
-/**
  * Maps intent values to CSS styles using design tokens.
  */
 const getIntentStyles = (
@@ -59,7 +52,7 @@ const getIntentStyles = (
  * A badge component for displaying labels with semantic intent.
  */
 export const Badge = forwardRef< HTMLSpanElement, BadgeProps >( function Badge(
-	{ children, intent = 'none', render = DEFAULT_RENDER, ...props },
+	{ children, intent = 'none', render, ...props },
 	ref
 ) {
 	const intentStyles = getIntentStyles( intent );
@@ -78,6 +71,7 @@ export const Badge = forwardRef< HTMLSpanElement, BadgeProps >( function Badge(
 
 	const element = useRender( {
 		render,
+		defaultTagName: 'span',
 		ref,
 		props: mergeProps< 'span' >( props, { style, children } ),
 	} );
