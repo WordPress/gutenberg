@@ -3,7 +3,6 @@
  */
 import { lock } from '../lock-unlock';
 import { isContentBlock } from './utils';
-import { parseRawBlock } from './parser';
 
 // The blocktype is the most important concept within the block API. It defines
 // all aspects of the block configuration and its interfaces, including `edit`
@@ -183,4 +182,4 @@ const fieldsKey = Symbol( 'fields' );
 const formKey = Symbol( 'form' );
 
 export const privateApis = {};
-lock( privateApis, { isContentBlock, fieldsKey, formKey, parseRawBlock } );
+lock( privateApis, { isContentBlock, fieldsKey, formKey } );
