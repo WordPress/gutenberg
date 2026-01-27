@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -132,7 +137,7 @@ function useBlockProps( { style } ) {
 	}
 
 	return {
-		className: customCSSIdentifier,
+		className: clsx( 'has-custom-css', customCSSIdentifier ),
 	};
 }
 
