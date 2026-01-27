@@ -1,0 +1,23 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "test/compat-mode-error-block",
+	"title": "Compat Mode Error Block",
+	"category": "text",
+	"icon": "warning",
+	"description": "A test block that throws an error in compat mode",
+	"supports": {
+		"iframeCompatMode": true
+	},
+	"attributes": {
+		"content": {
+			"type": "string",
+			"default": ""
+		},
+		"shouldError": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"editorScript": "compat-mode-error-block-editor"
+}

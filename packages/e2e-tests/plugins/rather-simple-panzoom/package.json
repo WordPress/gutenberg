@@ -1,0 +1,30 @@
+{
+  "name": "rather-simple-panzoom",
+  "version": "1.0.0",
+  "license": "GPL-2.0-or-later",
+  "main": "build/index.js",
+  "dependencies": {
+    "@panzoom/panzoom": "^4.6.1",
+    "npm-check-updates": "^19.3.1"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^31.2.0"
+  },
+  "scripts": {
+    "build": "wp-scripts build",
+    "check-engines": "wp-scripts check-engines",
+    "check-licenses": "wp-scripts check-licenses",
+    "format": "wp-scripts format",
+    "lint:css": "wp-scripts lint-style",
+    "lint:js": "wp-scripts lint-js",
+    "lint:md:docs": "wp-scripts lint-md-docs",
+    "lint:pkg-json": "wp-scripts lint-pkg-json",
+    "packages-update": "wp-scripts packages-update",
+    "plugin-zip": "wp-scripts plugin-zip",
+    "start": "wp-scripts start",
+    "test:e2e": "wp-scripts test-e2e",
+    "test:unit": "wp-scripts test-unit-js",
+    "make-pot": "wp i18n make-pot . languages/rather-simple-panzoom.pot",
+    "make-json": "wp i18n make-json languages --no-purge"
+  }
+}

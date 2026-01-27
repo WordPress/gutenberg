@@ -1,0 +1,41 @@
+.wp-block-occ-rather-simple-panzoom {
+
+	.panzoom-parent {
+		position: relative;
+		margin: 10px;
+		padding: 25px;
+		background-color: #fff;
+	}
+
+	/*.panzoom-element {
+		height: 100%;
+	}
+
+	.panzoom-element img {
+		display: block;
+		margin: 0 auto;
+	}*/
+
+	.panzoom-buttons {
+		text-align: center;
+
+		button {
+			position: relative;
+			width: 40px;
+			height: 40px;
+			background-color: #000;
+			border: 0;
+			border-radius: 100%;
+			color: #fff;
+			cursor: pointer;
+			z-index: 999;
+
+			svg {
+				position: absolute;
+				top: 0;
+				left: 0;
+			}
+		}
+	}
+
+}

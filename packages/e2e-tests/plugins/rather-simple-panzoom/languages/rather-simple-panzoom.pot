@@ -1,0 +1,73 @@
+# Copyright (C) 2024 Oscar Ciutat
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Rather Simple Panzoom 1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/rather-simple-panzoom\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2024-06-20T08:06:03+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.8.1\n"
+"X-Domain: rather-simple-panzoom\n"
+
+#. Plugin Name of the plugin
+msgid "Rather Simple Panzoom"
+msgstr ""
+
+#. Description of the plugin
+msgid "A really simple panzoom"
+msgstr ""
+
+#. Author of the plugin
+msgid "Oscar Ciutat"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "http://oscarciutat.com/code/"
+msgstr ""
+
+#: build/blocks/panzoom/index.js:1
+#: src/blocks/panzoom/index.js:121
+msgid "Settings"
+msgstr ""
+
+#: build/blocks/panzoom/index.js:1
+#: src/blocks/panzoom/index.js:132
+msgid "Replace Image"
+msgstr ""
+
+#: build/blocks/panzoom/index.js:1
+#: src/blocks/panzoom/index.js:132
+msgid "Add Image"
+msgstr ""
+
+#: build/blocks/panzoom/index.js:1
+#: src/blocks/panzoom/index.js:148
+msgid "Zoom In"
+msgstr ""
+
+#: build/blocks/panzoom/index.js:1
+#: src/blocks/panzoom/index.js:152
+msgid "Zoom Out"
+msgstr ""
+
+#: build/blocks/panzoom/index.js:1
+#: src/blocks/panzoom/index.js:167
+msgid "Panzoom Image"
+msgstr ""
+
+#: build/blocks/panzoom/block.json
+#: src/blocks/panzoom/block.json
+msgctxt "block title"
+msgid "Rather Simple Panzoom"
+msgstr ""
+
+#: build/blocks/panzoom/block.json
+#: src/blocks/panzoom/block.json
+msgctxt "block description"
+msgid "Display a panzoom image."
+msgstr ""

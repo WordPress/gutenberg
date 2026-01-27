@@ -120,6 +120,9 @@ require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/extensible-site-editor.php';
 require __DIR__ . '/experimental/fonts/load.php';
 
+// Compat mode iframe for legacy blocks.
+require __DIR__ . '/compat-mode/index.php';
+
 if ( gutenberg_is_experiment_enabled( 'gutenberg-workflow-palette' ) ) {
 	require __DIR__ . '/experimental/workflow-palette.php';
 }

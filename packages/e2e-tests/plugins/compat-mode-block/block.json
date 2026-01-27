@@ -1,0 +1,19 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "test/compat-mode-block",
+	"title": "Compat Mode Block",
+	"category": "text",
+	"icon": "smiley",
+	"description": "A test block for compat mode iframe",
+	"supports": {
+		"iframeCompatMode": true
+	},
+	"attributes": {
+		"content": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"editorScript": "compat-mode-block-editor"
+}

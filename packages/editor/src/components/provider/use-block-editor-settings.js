@@ -88,6 +88,8 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__unstableHasCustomAppender',
 	'__unstableResolvedAssets',
 	'__unstableIsBlockBasedTheme',
+	'compatModeEditorUrl',
+	'compatModeNonce',
 ];
 
 const {

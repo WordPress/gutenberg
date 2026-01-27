@@ -373,9 +373,14 @@
 					}
 				},
 				"html": {
-					"description": "By default, a block’s markup can be edited individually. To disable this behavior, set html to false.",
+					"description": "By default, a block's markup can be edited individually. To disable this behavior, set html to false.",
 					"type": "boolean",
 					"default": true
+				},
+				"iframeCompatMode": {
+					"description": "When set to true, the block will render in a separate iframe for compatibility with legacy block implementations that require isolation from the main editor.",
+					"type": "boolean",
+					"default": false
 				},
 				"inserter": {
 					"description": "By default, all blocks will appear in the inserter, block transforms menu, Style Book, etc. To hide a block from all parts of the user interface so that it can only be inserted programmatically, set inserter to false.",

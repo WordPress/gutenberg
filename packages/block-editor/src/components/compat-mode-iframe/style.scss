@@ -1,0 +1,33 @@
+.block-editor-compat-mode-iframe {
+	position: relative;
+	width: 100%;
+	min-height: 50px;
+}
+
+.block-editor-compat-mode-iframe__loading {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	padding: 24px;
+	background: #f0f0f0;
+	border-radius: 4px;
+	color: #757575;
+	font-size: 13px;
+}
+
+.block-editor-compat-mode-iframe__frame {
+	display: block;
+	width: 100%;
+	border: none;
+	background: transparent;
+}
+
+.block-editor-compat-mode-iframe__error {
+	padding: 16px;
+	background: #fcf0f1;
+	border: 1px solid #d63638;
+	border-radius: 4px;
+	color: #d63638;
+	font-size: 13px;
+}

@@ -1,0 +1,16 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "test/crash-block",
+	"title": "Crash Block",
+	"category": "text",
+	"icon": "warning",
+	"description": "A test block that crashes without compat mode support",
+	"attributes": {
+		"content": {
+			"type": "string",
+			"default": ""
+		}
+	},
+	"editorScript": "crash-block-editor"
+}

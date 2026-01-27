@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { memo, RawHTML, useContext, useMemo } from '@wordpress/element';
+import { memo, RawHTML, useContext, useMemo, useState } from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveContent,
@@ -41,6 +41,7 @@ import { PrivateBlockContext } from './private-block-context';
 import { useBlockVisibility } from '../block-visibility/';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
+import CompatModeIframe from '../compat-mode-iframe';
 
 /**
  * Merges wrapper props with special handling for classNames and styles.
@@ -102,7 +103,11 @@ function BlockListBlock( {
 	onInsertBlocksAfter,
 	onMerge,
 	toggleSelection,
+	compatModeEditorUrl,
+	isCompatModeEditor,
 } ) {
+	// Track if we should use compat mode after a crash.
+	const [ useCompatMode, setUseCompatMode ] = useState( false );
 	const {
 		mayDisplayControls,
 		mayDisplayParentControls,
@@ -204,7 +209,37 @@ function BlockListBlock( {
 				</Block>
 			</>
 		);
+	} else if (
+		hasBlockSupport( name, 'iframeCompatMode' ) &&
+		! isCompatModeEditor
+	) {
+		// eslint-disable-next-line no-console
+		console.log( '[Block] Rendering in compat mode iframe:', name, { hasSupport: hasBlockSupport( name, 'iframeCompatMode' ), isCompatModeEditor } );
+		// Blocks with iframeCompatMode support render in a separate iframe
+		// to provide isolation from the main editor for legacy blocks.
+		// Skip this when already inside the compat mode editor to prevent
+		// recursive iframe rendering.
+		// Wrap the hidden blockEdit in an error boundary so that if it throws,
+		// we still render the compat mode iframe (which handles errors internally).
+		block = (
+			<Block>
+				<BlockCrashBoundary fallback={ null }>
+					<div style={ { display: 'none' } }>{ blockEdit }</div>
+				</BlockCrashBoundary>
+				<CompatModeIframe
+					clientId={ clientId }
+					name={ name }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSelected }
+				/>
+			</Block>
+		);
 	} else if ( blockType?.apiVersion > 1 ) {
+		// eslint-disable-next-line no-console
+		if ( name === 'occ/rather-simple-panzoom' ) {
+			console.log( '[Block] Rendering normally (apiVersion > 1):', name, { hasSupport: hasBlockSupport( name, 'iframeCompatMode' ), isCompatModeEditor, apiVersion: blockType?.apiVersion } );
+		}
 		block = blockEdit;
 	} else {
 		block = <Block>{ blockEdit }</Block>;
@@ -239,9 +274,27 @@ function BlockListBlock( {
 		>
 			<BlockCrashBoundary
 				fallback={
-					<Block className="has-warning">
-						<BlockCrashWarning />
-					</Block>
+					useCompatMode ? (
+						<Block>
+							<CompatModeIframe
+								clientId={ clientId }
+								name={ name }
+								attributes={ attributes }
+								setAttributes={ setAttributes }
+								isSelected={ isSelected }
+							/>
+						</Block>
+					) : (
+						<Block className="has-warning">
+							<BlockCrashWarning
+								onTryCompatMode={
+									compatModeEditorUrl
+										? () => setUseCompatMode( true )
+										: undefined
+								}
+							/>
+						</Block>
+					)
 				}
 			>
 				{ block }
@@ -616,6 +669,8 @@ function BlockListBlockProvider( props ) {
 				supportsLayout,
 				isPreviewMode,
 				__experimentalBlockBindingsSupportedAttributes,
+				compatModeEditorUrl,
+				isCompatModeEditor,
 			} = settings;
 			const bindableAttributes =
 				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
@@ -736,6 +791,8 @@ function BlockListBlockProvider( props ) {
 					: false,
 				blockVisibility,
 				deviceType,
+				compatModeEditorUrl,
+				isCompatModeEditor,
 			};
 		},
 		[ clientId, rootClientId ]
@@ -784,6 +841,8 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 		blockVisibility,
 		deviceType,
+		compatModeEditorUrl,
+		isCompatModeEditor,
 	} = selectedProps;
 
 	// Use block visibility hook with data from existing useSelect to avoid extra subscription
@@ -887,6 +946,8 @@ function BlockListBlockProvider( props ) {
 					attributes,
 					isValid,
 					isSelected,
+					compatModeEditorUrl,
+					isCompatModeEditor,
 				} }
 			/>
 		</PrivateBlockContext.Provider>
