@@ -523,7 +523,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	/**
 	 * Verifies that sideloaded sub-sizes include expected metadata fields.
 	 *
-	 * Sub-sizes should have file, width, height, mime-type, and filesize in their metadata.
+	 * Sub-sizes should have file, width, height, mime_type, and filesize in their metadata.
 	 *
 	 * @covers ::sideload_item
 	 */
