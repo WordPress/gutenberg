@@ -18,11 +18,26 @@ function findOptimalFontSize( textElement, applyFontSize ) {
 	let bestSize = minSize;
 
 	const computedStyle = window.getComputedStyle( textElement );
-	const paddingLeft = parseFloat( computedStyle.paddingLeft ) || 0;
-	const paddingRight = parseFloat( computedStyle.paddingRight ) || 0;
+	let paddingLeft = parseFloat( computedStyle.paddingLeft ) || 0;
+	let paddingRight = parseFloat( computedStyle.paddingRight ) || 0;
 	const range = document.createRange();
 	range.selectNodeContents( textElement );
-	let maxclientHeight = textElement.clientHeight;
+
+	let referenceElement = textElement;
+	const parentElement = textElement.parentElement;
+	if ( parentElement ) {
+		const parentElementComputedStyle =
+			window.getComputedStyle( parentElement );
+		if ( parentElementComputedStyle?.display === 'flex' ) {
+			referenceElement = parentElement;
+			paddingLeft +=
+				parseFloat( parentElementComputedStyle.paddingLeft ) || 0;
+			paddingRight +=
+				parseFloat( parentElementComputedStyle.paddingRight ) || 0;
+		}
+	}
+	let maxclientHeight = referenceElement.clientHeight;
+
 	while ( minSize <= maxSize ) {
 		const midSize = Math.floor( ( minSize + maxSize ) / 2 );
 		applyFontSize( midSize );
@@ -36,12 +51,13 @@ function findOptimalFontSize( textElement, applyFontSize ) {
 		// Check if text fits within the element's width and is not
 		// overflowing into the padding area.
 		const fitsWidth =
-			textElement.scrollWidth <= textElement.clientWidth &&
-			textWidth <= textElement.clientWidth - paddingLeft - paddingRight;
+			textElement.scrollWidth <= referenceElement.clientWidth &&
+			textWidth <=
+				referenceElement.clientWidth - paddingLeft - paddingRight;
 		// Check if text fits within the element's height.
 		const fitsHeight =
 			alreadyHasScrollableHeight ||
-			textElement.scrollHeight <= textElement.clientHeight ||
+			textElement.scrollHeight <= referenceElement.clientHeight ||
 			textElement.scrollHeight <= maxclientHeight;
 
 		// When there are calculated line heights, text may jump in height
@@ -49,8 +65,8 @@ function findOptimalFontSize( textElement, applyFontSize ) {
 		// making text not fit.
 		// We store a maximum reference height: the maximum reference element height that was observed
 		// during the loop to avoid issues with such jumps.
-		if ( textElement.clientHeight > maxclientHeight ) {
-			maxclientHeight = textElement.clientHeight;
+		if ( referenceElement.clientHeight > maxclientHeight ) {
+			maxclientHeight = referenceElement.clientHeight;
 		}
 
 		if ( fitsWidth && fitsHeight ) {
