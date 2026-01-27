@@ -2,32 +2,25 @@
  * External dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
-import { type AwarenessState, type EnhancedState, Y } from '@wordpress/sync';
+import { type EnhancedState, Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
 import { getSyncManager } from '../sync';
-import type {
-	BaseState,
-	PostEditorState,
-	YDocDebugData,
-} from '../awareness/types';
+import type { PostEditorState } from '../awareness/types';
 import type { SelectionCursor } from '../types';
 import type { PostEditorAwareness } from '../awareness/post-editor-awareness';
-import { getDebugData } from '../awareness/utils';
 
 interface PostEditorAwarenessState {
 	activeUsers: EnhancedState< PostEditorState >[];
 	getAbsolutePositionIndex: ( selection: SelectionCursor ) => number | null;
-	getDebugData: () => YDocDebugData | null;
 	isCurrentUserDisconnected: boolean;
 }
 
 const defaultState: PostEditorAwarenessState = {
 	activeUsers: [],
 	getAbsolutePositionIndex: () => null,
-	getDebugData: () => null,
 	isCurrentUserDisconnected: false,
 };
 
@@ -57,10 +50,6 @@ function usePostEditorAwarenessState(
 							selection.cursorPosition.relativePosition,
 							awareness.doc
 						)?.index ?? null,
-					getDebugData: () =>
-						getDebugData(
-							awareness as AwarenessState< BaseState >
-						),
 					isCurrentUserDisconnected:
 						newState.find( ( user ) => user.isMe )?.isConnected ===
 						false,
@@ -87,13 +76,6 @@ export function useGetAbsolutePositionIndex(
 ): ( selection: SelectionCursor ) => number | null {
 	return usePostEditorAwarenessState( postId, postType )
 		.getAbsolutePositionIndex;
-}
-
-export function useGetDebugData(
-	postId: number | null,
-	postType: string | null
-): () => YDocDebugData | null {
-	return usePostEditorAwarenessState( postId, postType ).getDebugData;
 }
 
 export function useIsDisconnected(

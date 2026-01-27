@@ -1,15 +1,8 @@
 /**
  * Internal dependencies
  */
-import type { AwarenessState, EnhancedState, Y } from '@wordpress/sync';
 import type { User } from '../entity-types';
-import type {
-	UserInfo,
-	YDocDebugData,
-	DebugUserData,
-	SerializableYItem,
-	BaseState,
-} from './types';
+import type { UserInfo } from './types';
 
 /**
  * The color palette for the user highlight.
@@ -163,81 +156,4 @@ export function generateUserInfo(
 		color: getNewUserColor( existingColors ),
 		enteredAt: Date.now(),
 	};
-}
-
-export function getDebugData(
-	awareness: AwarenessState< BaseState >
-): YDocDebugData {
-	const ydoc = awareness.doc;
-
-	// Manually extract doc data to avoid deprecated toJSON method
-	const docData: Record< string, unknown > = Object.fromEntries(
-		Array.from( ydoc.share, ( [ key, value ] ) => [ key, value.toJSON() ] )
-	);
-
-	// Build userMap from awareness store (all users seen this session)
-	const seenStates = awareness.getSeenStates() as Map<
-		number,
-		EnhancedState< BaseState >
-	>;
-	const userMapData = new Map< string, DebugUserData >(
-		Array.from( seenStates.entries() ).map( ( [ clientId, userState ] ) => [
-			String( clientId ),
-			{
-				name: userState.userInfo.name,
-				wpUserId: userState.userInfo.id,
-			},
-		] )
-	);
-
-	// Serialize Yjs client items to avoid deep nesting
-	const serializableClientItems: Record<
-		number,
-		Array< SerializableYItem >
-	> = {};
-
-	ydoc.store.clients.forEach( ( structs, clientId ) => {
-		// Filter for Y.Item only (skip Y.GC garbage collection structs)
-		const items = structs.filter( isYItem );
-
-		serializableClientItems[ clientId ] = items.map( ( item ) => {
-			const { left, right, ...rest } = item;
-
-			return {
-				...rest,
-				left: left
-					? {
-							id: left.id,
-							length: left.length,
-							origin: left.origin,
-							content: left.content,
-					  }
-					: null,
-				right: right
-					? {
-							id: right.id,
-							length: right.length,
-							origin: right.origin,
-							content: right.content,
-					  }
-					: null,
-			};
-		} );
-	} );
-
-	return {
-		doc: docData,
-		clients: serializableClientItems,
-		userMap: Object.fromEntries( userMapData ),
-	};
-}
-
-/**
- * Type guard to check if a struct is a Y.Item (not Y.GC)
- *
- * @param struct - The struct to check.
- * @return True if the struct is a Y.Item, false otherwise.
- */
-function isYItem( struct: Y.Item | Y.GC ): struct is Y.Item {
-	return 'content' in struct;
 }
