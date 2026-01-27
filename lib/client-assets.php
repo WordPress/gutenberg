@@ -283,7 +283,7 @@ add_action( 'wp_default_styles', 'gutenberg_register_packages_styles', 15 );
  *
  * @since 6.1
  *
- * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
+ * @link https://developer.wordpress.org/block-editor/reference-guides/packages/packages-style-engine/
  *
  * @param array $options {
  *     Optional. An array of options to pass to gutenberg_style_engine_get_stylesheet_from_context(). Default empty array.
