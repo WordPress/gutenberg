@@ -21,7 +21,11 @@ import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
 import { authorField, descriptionField, previewField } from './fields';
-import { defaultLayouts, getDefaultView } from './view-utils';
+import {
+	defaultLayouts,
+	getDefaultView,
+	getActiveFiltersForTab,
+} from './view-utils';
 
 const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
 const { useHistory, useLocation } = unlock( routerPrivateApis );
@@ -33,13 +37,18 @@ export default function PageTemplates() {
 	const [ selection, setSelection ] = useState( [ postId ] );
 
 	const defaultView = useMemo( () => {
-		return getDefaultView( activeView );
-	}, [ activeView ] );
+		return getDefaultView();
+	}, [] );
+	const activeFilters = useMemo(
+		() => getActiveFiltersForTab( activeView ),
+		[ activeView ]
+	);
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: TEMPLATE_POST_TYPE,
-		slug: activeView,
+		slug: 'default',
 		defaultView,
+		activeFilters,
 		queryParams: {
 			page: query.pageNumber,
 			search: query.search,
@@ -116,11 +125,11 @@ export default function PageTemplates() {
 	);
 
 	const onChangeView = useEvent( ( newView ) => {
+		updateView( newView );
 		if ( newView.type !== view.type ) {
 			// Retrigger the routing areas resolution.
 			history.invalidate();
 		}
-		updateView( newView );
 	} );
 
 	return (

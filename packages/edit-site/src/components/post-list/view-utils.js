@@ -148,8 +148,30 @@ export function getDefaultViews( postType ) {
 	];
 }
 
-export const getDefaultView = ( postType, activeView ) => {
-	return getDefaultViews( postType ).find(
-		( { slug } ) => slug === activeView
-	)?.view;
+export const getDefaultView = () => {
+	return DEFAULT_POST_BASE;
 };
+
+const SLUG_TO_STATUS = {
+	published: 'publish',
+	future: 'future',
+	drafts: 'draft',
+	pending: 'pending',
+	private: 'private',
+	trash: 'trash',
+};
+
+export function getActiveFiltersForTab( activeView ) {
+	const status = SLUG_TO_STATUS[ activeView ];
+	if ( ! status ) {
+		return [];
+	}
+	return [
+		{
+			field: 'status',
+			operator: OPERATOR_IS_ANY,
+			value: status,
+			isLocked: true,
+		},
+	];
+}

@@ -25,24 +25,22 @@ const DEFAULT_VIEW = {
 	...defaultLayouts.grid,
 };
 
-export function getDefaultView( activeView ) {
+export function getDefaultView() {
 	return {
 		...DEFAULT_VIEW,
-		sort:
-			activeView === 'user'
-				? {
-						field: 'date',
-						direction: 'desc',
-				  }
-				: DEFAULT_VIEW.sort,
-		filters: ! [ 'active', 'user' ].includes( activeView )
-			? [
-					{
-						field: 'author',
-						operator: 'isAny',
-						value: [ activeView ],
-					},
-			  ]
-			: [],
 	};
+}
+
+export function getActiveFiltersForTab( activeView ) {
+	if ( activeView === 'active' || activeView === 'user' ) {
+		return [];
+	}
+	// Author-based view
+	return [
+		{
+			field: 'author',
+			operator: 'isAny',
+			value: [ activeView ],
+		},
+	];
 }
