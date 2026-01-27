@@ -1,0 +1,78 @@
+name: Build wasm-vips GPL
+
+on:
+    workflow_dispatch:
+        inputs:
+            version:
+                description: 'wasm-vips version to build (e.g., 0.0.16)'
+                required: true
+                default: '0.0.16'
+
+jobs:
+    build:
+        name: Build wasm-vips without UltraHDR
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+
+        steps:
+            - name: Checkout repository
+              uses: actions/checkout@v4
+
+            - name: Set up Docker Buildx
+              uses: docker/setup-buildx-action@v3
+
+            - name: Build wasm-vips in Docker
+              run: |
+                  echo "Building wasm-vips v${{ inputs.version }} with --disable-uhdr..."
+
+                  # Build the Docker image
+                  docker build \
+                      --build-arg WASM_VIPS_VERSION="${{ inputs.version }}" \
+                      -t gutenberg-wasm-vips-builder \
+                      ./bin/wasm-vips-build
+
+                  # Extract built files
+                  mkdir -p ./wasm-vips-output
+                  CONTAINER_ID=$(docker create gutenberg-wasm-vips-builder)
+                  docker cp "$CONTAINER_ID:/output/." ./wasm-vips-output/
+                  docker rm "$CONTAINER_ID"
+
+                  # List built files
+                  echo "Built files:"
+                  ls -la ./wasm-vips-output/
+
+            - name: Create GitHub Release
+              uses: softprops/action-gh-release@v2
+              with:
+                  tag_name: wasm-vips-gpl-v${{ inputs.version }}
+                  name: wasm-vips GPL v${{ inputs.version }}
+                  body: |
+                      GPLv2-compatible wasm-vips build (without UltraHDR).
+
+                      This release contains pre-built wasm-vips files compiled with `--disable-uhdr` for GPLv2 compatibility.
+
+                      **Version:** ${{ inputs.version }}
+                      **Build date:** ${{ github.event.head_commit.timestamp || github.event.repository.updated_at }}
+
+                      ## Usage
+                      These files are automatically downloaded by the `build:wasm-vips` script in the Gutenberg repository.
+
+                      ## Files included
+                      - `vips.js` - Browser CommonJS module
+                      - `vips-es6.js` - Browser ES6 module
+                      - `vips-node.js` - Node.js CommonJS module
+                      - `vips-node.mjs` - Node.js ES module
+                      - `vips.wasm` - Main WebAssembly binary
+                      - `vips-heif.wasm` - HEIF codec (if available)
+                      - `vips-jxl.wasm` - JPEG XL codec (if available)
+                  files: |
+                      ./wasm-vips-output/vips.js
+                      ./wasm-vips-output/vips-es6.js
+                      ./wasm-vips-output/vips-node.js
+                      ./wasm-vips-output/vips-node.mjs
+                      ./wasm-vips-output/vips.wasm
+                      ./wasm-vips-output/vips-heif.wasm
+                      ./wasm-vips-output/vips-jxl.wasm
+                  fail_on_unmatched_files: false
+                  generate_release_notes: false

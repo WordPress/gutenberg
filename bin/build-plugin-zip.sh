@@ -69,6 +69,14 @@ fi
 status "Installing dependencies... 📦"
 npm cache verify
 npm ci
+
+# Download GPLv2-compatible wasm-vips from GitHub releases
+# Falls back to Docker build if download fails
+status "Downloading GPLv2-compatible wasm-vips... 🔧"
+npm run build:wasm-vips || {
+	warning "wasm-vips download/build failed, but continuing with build..."
+}
+
 status "Generating build... 👷‍♀️"
 npm run build -- --skip-types
 

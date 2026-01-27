@@ -52,3 +52,9 @@ runs:
               # Run the post-install scripts for workspaces.
               npx lerna run postinstall
           shell: bash
+
+        # Download wasm-vips vendor files for the @wordpress/vips package
+        - name: Download wasm-vips vendor files
+          run: |
+              npm run build:wasm-vips
+          shell: bash
