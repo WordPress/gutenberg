@@ -3977,6 +3977,9 @@ describe( 'state', () => {
 				expect( editingState.derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
+							// blocks outside the section are disabled.
+							'': 'disabled',
+							// blocks inside the section are fully editable.
 							'group-1': 'default',
 							'paragraph-1': 'default',
 							'group-2': 'default',
@@ -4086,9 +4089,13 @@ describe( 'state', () => {
 				expect( editingSection1.derivedBlockEditingModes ).toEqual(
 					new Map(
 						Object.entries( {
+							// Blocks outside the section are disabled.
+							'': 'disabled',
+							'section-2': 'disabled',
+							'section-2-paragraph': 'disabled',
+							// Block inside the section are fully editable.
 							'section-1': 'default',
 							'section-1-paragraph': 'default',
-							'section-2-paragraph': 'contentOnly',
 						} )
 					)
 				);
