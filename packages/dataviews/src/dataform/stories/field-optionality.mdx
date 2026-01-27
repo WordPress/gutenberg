@@ -1,10 +1,4 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import {
-	AllRequiredExample,
-	AllOptionalExample,
-	MostlyRequiredExample,
-	MostlyOptionalExample,
-} from './field-optionality-examples';
 
 <Meta title="DataViews/DataForm/Field Optionality Guidelines" />
 
@@ -12,131 +6,13 @@ import {
 
 When designing forms with DataForm, it's important to clearly communicate which fields are required and which are optional. This guide explains best practices for marking field optionality to create clear, scannable forms.
 
-## Main Rule: Mark the Fewest Fields
+## Main Rule: Mark the Minority
 
-For mixed forms (where some fields are required and some are optional), **mark the fewest fields**:
+For mixed forms (where some fields are required and some are optional), mark the minority to reduce visual noise:
 
--   If **most fields are required** → mark only the optional fields using `markWhenOptional: true`
--   If **most fields are optional** → mark only the required fields using `isValid: { required: true }`
-
-This reduces visual noise and makes exceptions stand out clearly.
+-   If **most fields are optional** → mark only the required fields
+-   If **most fields are required** → mark only the optional fields
 
 ## Uniform Forms: Use Card Description
 
-When all fields in a card are either all required or all optional, state this in the card's `description` property instead of marking individual fields. This provides a cleaner, more scannable interface.
-
-## Examples
-
-### Example 1: All Fields Required
-
-When all fields in a card are required, state this in the card description rather than marking each field individually.
-
-<AllRequiredExample />
-
-Key implementation details:
-
-```tsx
-const form: Form = {
-	layout: { type: 'card' },
-	fields: [
-		{
-			id: 'userInfo',
-			label: 'User Information',
-			description: 'All fields are required', // State in description
-			layout: { type: 'card' },
-			children: [ 'firstName', 'lastName', 'email' ],
-		},
-	],
-};
-```
-
-### Example 2: All Fields Optional
-
-When all fields in a card are optional, state this in the card description.
-
-<AllOptionalExample />
-
-Key implementation details:
-
-```tsx
-const form: Form = {
-	layout: { type: 'card' },
-	fields: [
-		{
-			id: 'userPreferences',
-			label: 'Preferences',
-			description: 'All fields are optional', // State in description
-			layout: { type: 'card' },
-			children: [ 'newsletter', 'notifications', 'theme' ],
-		},
-	],
-};
-```
-
-### Example 3: Mixed Form - Mostly Required
-
-When most fields are required and only a few are optional, mark only the optional fields. Use `isValid: { required: false }` on optional fields and ensure `markWhenOptional` is passed through to the validated controls (this may require custom Edit components or future DataForm support).
-
-<MostlyRequiredExample />
-
-Key implementation details:
-
-```tsx
-const fields: Field< Account >[] = [
-	{
-		id: 'username',
-		label: 'Username',
-		type: 'text',
-		isValid: { required: true }, // Required - no marker needed (majority)
-	},
-	{
-		id: 'bio',
-		label: 'Bio',
-		type: 'text',
-		Edit: 'textarea',
-		isValid: { required: false }, // Optional - should use markWhenOptional
-	},
-];
-```
-
-**Key points:**
--   Username, email, and password are required (no markers needed since they're the majority)
--   Bio and website are optional and should be marked with "(Optional)" when `markWhenOptional` support is available
-
-### Example 4: Mixed Form - Mostly Optional
-
-When most fields are optional and only a few are required, mark only the required fields.
-
-<MostlyOptionalExample />
-
-Key implementation details:
-
-```tsx
-const fields: Field< Profile >[] = [
-	{
-		id: 'name',
-		label: 'Name',
-		type: 'text',
-		isValid: { required: true }, // Required - mark this one
-	},
-	{
-		id: 'location',
-		label: 'Location',
-		type: 'text',
-		// Optional - no marker needed (majority)
-	},
-];
-```
-
-**Key points:**
--   Only the Name field is required and will show "(Required)" marker
--   All other fields are optional and don't need markers since they're the majority
-
-## Summary
-
--   **Uniform forms**: Use card `description` to state optionality for all fields
--   **Mixed forms**: Mark the fewest fields
-    -   Mostly required → mark optional fields with `markWhenOptional`
-    -   Mostly optional → mark required fields with `isValid: { required: true }`
--   This approach reduces visual clutter and makes exceptions clear
-
+When all fields are either required or optional it can be helpful to state this somewhere above the form. This provides a cleaner, more scannable interface.
