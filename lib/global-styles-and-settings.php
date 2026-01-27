@@ -412,37 +412,3 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
 function gutenberg_get_theme_directory_pattern_slugs() {
 	return WP_Theme_JSON_Resolver_Gutenberg::get_theme_data( array(), array( 'with_supports' => false ) )->get_patterns();
 }
-
-/**
- * Sets default value for textIndent setting based on RTL direction.
- *
- * The textIndent setting is an enum with values: 'subsequent' (default for LTR),
- * 'all' (default for RTL), or false (disabled).
- *
- * @since Gutenberg X.X.X
- *
- * @param WP_Theme_JSON_Data_Gutenberg $theme_json Class to access and update the underlying data.
- * @return WP_Theme_JSON_Data_Gutenberg The modified theme JSON data.
- */
-function gutenberg_set_text_indent_default_for_rtl( $theme_json ) {
-	if ( ! is_rtl() ) {
-		return $theme_json;
-	}
-
-	$data = $theme_json->get_data();
-
-	// Set default for RTL if not already defined.
-	// For RTL languages, 'all' makes more sense as the default.
-	if ( ! isset( $data['settings']['typography']['textIndent'] ) ) {
-		if ( ! isset( $data['settings'] ) ) {
-			$data['settings'] = array();
-		}
-		if ( ! isset( $data['settings']['typography'] ) ) {
-			$data['settings']['typography'] = array();
-		}
-		$data['settings']['typography']['textIndent'] = 'all';
-	}
-
-	return $theme_json->update_with( $data );
-}
-add_filter( 'wp_theme_json_data_default', 'gutenberg_set_text_indent_default_for_rtl' );
