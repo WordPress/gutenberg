@@ -64,19 +64,20 @@ export default function OverlayMenuPreviewButton( {
 					</>
 				) }
 			</Button>
-			{ overlayMenuPreview && (
-				<VStack
-					id={ overlayMenuPreviewId }
-					spacing={ 4 }
-					style={ containerStyle }
-				>
-					<OverlayMenuPreviewControls
-						hasIcon={ hasIcon }
-						icon={ icon }
-						setAttributes={ setAttributes }
-					/>
-				</VStack>
-			) }
+			<VStack
+				id={ overlayMenuPreviewId }
+				spacing={ 4 }
+				style={ {
+					...containerStyle,
+					display: overlayMenuPreview ? 'flex' : 'none',
+				} }
+			>
+				<OverlayMenuPreviewControls
+					hasIcon={ hasIcon }
+					icon={ icon }
+					setAttributes={ setAttributes }
+				/>
+			</VStack>
 		</>
 	);
 }
