@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Remove `Box` component. Components that previously used `Box` should use the equivalent design tokens in their CSS directly ([#74981](https://github.com/WordPress/gutenberg/issues/74981)).
+
 ### New Features
 
 -   Add `Tabs` primitive ([#74652](https://github.com/WordPress/gutenberg/pull/74652)).

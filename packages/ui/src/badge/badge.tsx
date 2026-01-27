@@ -1,6 +1,5 @@
+import { useRender, mergeProps } from '@base-ui/react';
 import { forwardRef } from '@wordpress/element';
-import { Box } from '../box';
-import { type BoxProps } from '../box/types';
 import { type BadgeProps } from './types';
 
 /**
@@ -11,55 +10,53 @@ const DEFAULT_RENDER = ( props: React.ComponentPropsWithoutRef< 'span' > ) => (
 );
 
 /**
- * Maps intent values to Box backgroundColor and color props.
- * Uses strong emphasis styles (as emphasis prop has been removed).
+ * Maps intent values to CSS styles using design tokens.
  */
 const getIntentStyles = (
 	intent: BadgeProps[ 'intent' ]
-): Partial< BoxProps > => {
+): React.CSSProperties => {
 	switch ( intent ) {
 		case 'high':
 			return {
-				backgroundColor: 'error',
-				color: 'error',
+				backgroundColor: 'var(--wpds-color-bg-surface-error)',
+				color: 'var(--wpds-color-fg-content-error)',
 			};
 		case 'medium':
 			return {
-				backgroundColor: 'warning',
-				color: 'warning',
+				backgroundColor: 'var(--wpds-color-bg-surface-warning)',
+				color: 'var(--wpds-color-fg-content-warning)',
 			};
 		case 'low':
 			return {
-				backgroundColor: 'caution',
-				color: 'caution',
+				backgroundColor: 'var(--wpds-color-bg-surface-caution)',
+				color: 'var(--wpds-color-fg-content-caution)',
 			};
 		case 'stable':
 			return {
-				backgroundColor: 'success',
-				color: 'success',
+				backgroundColor: 'var(--wpds-color-bg-surface-success)',
+				color: 'var(--wpds-color-fg-content-success)',
 			};
 		case 'informational':
 			return {
-				backgroundColor: 'info',
-				color: 'info',
+				backgroundColor: 'var(--wpds-color-bg-surface-info)',
+				color: 'var(--wpds-color-fg-content-info)',
 			};
 		case 'draft':
 			return {
-				backgroundColor: 'neutral-weak',
-				color: 'neutral',
+				backgroundColor: 'var(--wpds-color-bg-surface-neutral-weak)',
+				color: 'var(--wpds-color-fg-content-neutral)',
 			};
 		case 'none':
 		default:
 			return {
-				backgroundColor: 'neutral',
-				color: 'neutral-weak',
+				backgroundColor: 'var(--wpds-color-bg-surface-neutral)',
+				color: 'var(--wpds-color-fg-content-neutral-weak)',
 			};
 	}
 };
 
 /**
  * A badge component for displaying labels with semantic intent.
- * Built on the Box primitive for consistent theming and accessibility.
  */
 export const Badge = forwardRef< HTMLDivElement, BadgeProps >( function Badge(
 	{ children, intent = 'none', render = DEFAULT_RENDER, ...props },
@@ -67,22 +64,23 @@ export const Badge = forwardRef< HTMLDivElement, BadgeProps >( function Badge(
 ) {
 	const intentStyles = getIntentStyles( intent );
 
-	return (
-		<Box
-			{ ...intentStyles }
-			padding={ { inline: 'sm', block: 'xs' } }
-			borderRadius="lg"
-			render={ render }
-			style={ {
-				fontFamily: 'var(--wpds-font-family-body)',
-				fontSize: 'var(--wpds-font-size-sm)',
-				fontWeight: 'var(--wpds-font-weight-regular)',
-				lineHeight: 'var(--wpds-font-line-height-xs)',
-				...props.style,
-			} }
-			ref={ ref }
-		>
-			{ children }
-		</Box>
-	);
+	const style: React.CSSProperties = {
+		...intentStyles,
+		paddingInline: 'var(--wpds-dimension-padding-sm)',
+		paddingBlock: 'var(--wpds-dimension-padding-xs)',
+		borderRadius: 'var(--wpds-border-radius-lg)',
+		fontFamily: 'var(--wpds-font-family-body)',
+		fontSize: 'var(--wpds-font-size-sm)',
+		fontWeight: 'var(--wpds-font-weight-regular)',
+		lineHeight: 'var(--wpds-font-line-height-xs)',
+		...props.style,
+	};
+
+	const element = useRender( {
+		render,
+		ref,
+		props: mergeProps< 'span' >( props, { style, children } ),
+	} );
+
+	return element;
 } );
