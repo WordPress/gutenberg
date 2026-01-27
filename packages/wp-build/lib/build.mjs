@@ -1454,6 +1454,58 @@ export const workerCode = ${ JSON.stringify( workerContent ) };
 				);
 			}
 		}
+
+		// Re-transpile worker-code.ts to output directories.
+		// The initial transpilation used placeholder content because worker
+		// bundling hadn't completed yet. Now that src/worker-code.ts contains
+		// the real bundled worker code, re-transpile it so that
+		// build-module/worker-code.mjs (and build/worker-code.cjs if applicable)
+		// reflect the actual worker code in a single build run.
+		const workerCodeSrcFile = path.join(
+			packageDir,
+			'src',
+			'worker-code.ts'
+		);
+		const retranspileBuilds = [];
+		if ( packageJson.module ) {
+			retranspileBuilds.push(
+				esbuild.build( {
+					entryPoints: [ workerCodeSrcFile ],
+					outdir: buildModuleDir,
+					outbase: srcDir,
+					outExtension: { '.js': '.mjs' },
+					bundle: true,
+					platform: 'neutral',
+					format: 'esm',
+					sourcemap: true,
+					target,
+					jsx: 'automatic',
+					jsxImportSource: 'react',
+					loader: { '.js': 'jsx' },
+					plugins,
+				} )
+			);
+		}
+		if ( packageJson.main ) {
+			retranspileBuilds.push(
+				esbuild.build( {
+					entryPoints: [ workerCodeSrcFile ],
+					outdir: buildDir,
+					outbase: srcDir,
+					outExtension: { '.js': '.cjs' },
+					bundle: true,
+					platform: 'node',
+					format: 'cjs',
+					sourcemap: true,
+					target,
+					jsx: 'automatic',
+					jsxImportSource: 'react',
+					loader: { '.js': 'jsx' },
+					plugins,
+				} )
+			);
+		}
+		await Promise.all( retranspileBuilds );
 	}
 
 	await compileStyles( packageName );
