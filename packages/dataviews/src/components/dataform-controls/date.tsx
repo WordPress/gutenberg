@@ -191,36 +191,27 @@ function ValidatedDateControl< Item >( {
 		setCustomValidity( undefined );
 	}, [ inputRefs ] );
 
-	// Sync React-level validation to native inputs so that
-	// reportValidity() (for example called by the card on re-expand) correctly
-	// fires the 'invalid' event for custom validation errors.
+	// Sync React-level validation to native inputs and listen for
+	// 'invalid' events (e.g., from reportValidity() on card re-expand).
 	useEffect( () => {
 		const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
 		const result = validity
 			? getCustomValidity( isValid, validity )
 			: undefined;
-		for ( const ref of refs ) {
-			const input = ref.current;
-			if ( input ) {
-				if ( result?.type === 'invalid' && result.message ) {
-					input.setCustomValidity( result.message );
-				} else {
-					input.setCustomValidity( '' );
-				}
-			}
-		}
-	}, [ inputRefs, isValid, validity ] );
-
-	// Listen for 'invalid' events on input refs (e.g., triggered by
-	// reportValidity() when the card re-expands after being collapsed).
-	useEffect( () => {
-		const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
 		const handleInvalid = ( event: Event ) => {
 			event.preventDefault();
 			setIsTouched( true );
 		};
 		for ( const ref of refs ) {
-			ref.current?.addEventListener( 'invalid', handleInvalid );
+			const input = ref.current;
+			if ( input ) {
+				input.setCustomValidity(
+					result?.type === 'invalid' && result.message
+						? result.message
+						: ''
+				);
+				input.addEventListener( 'invalid', handleInvalid );
+			}
 		}
 		return () => {
 			for ( const ref of refs ) {
@@ -230,21 +221,16 @@ function ValidatedDateControl< Item >( {
 				);
 			}
 		};
-	}, [ inputRefs, setIsTouched ] );
+	}, [ inputRefs, isValid, validity, setIsTouched ] );
 
 	useEffect( () => {
 		if ( isTouched ) {
 			const timeoutId = setTimeout( () => {
-				if ( validity ) {
-					const result = getCustomValidity( isValid, validity );
-					if ( result ) {
-						setCustomValidity( result );
-					} else {
-						// Fall back to native validation for rules without
-						// custom messages (e.g., required without a custom
-						// error message).
-						validateRefs();
-					}
+				const result = validity
+					? getCustomValidity( isValid, validity )
+					: undefined;
+				if ( result ) {
+					setCustomValidity( result );
 				} else {
 					validateRefs();
 				}
