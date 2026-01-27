@@ -27,7 +27,7 @@ import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { video as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-import { prependHTTP } from '@wordpress/url';
+import { prependHTTPS } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -111,7 +111,7 @@ function VideoEdit( {
 
 	function onSelectURL( newSrc ) {
 		if ( newSrc !== src ) {
-			const url = prependHTTP( newSrc );
+			const url = prependHTTPS( newSrc );
 			// Check if there's an embed block that handles this URL.
 			const embedBlock = createUpgradedEmbedBlock( {
 				attributes: { url },
