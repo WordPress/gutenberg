@@ -119,11 +119,11 @@ export default function AdminPage() {
 		category: string,
 		value: string | BlockGuidelines
 	) => {
-		if ( category === 'blocks' ) {
-			updateCategory( category, value as BlockGuidelines );
-		} else {
-			updateCategory( category, { guidelines: value as string } );
-		}
+		const normalizedValue =
+			category === 'blocks'
+				? ( value as BlockGuidelines )
+				: { guidelines: value as string };
+		updateCategory( category, normalizedValue );
 	};
 
 	const handleImport = (
@@ -185,40 +185,46 @@ export default function AdminPage() {
 			<div className="content-guidelines-admin__layout">
 				<main className="content-guidelines-admin__main">
 					<Panel className="content-guidelines-admin__panel">
-						{ CATEGORIES.map( ( category, index ) =>
-							category.slug === 'blocks' ? (
-								<BlockGuidelinesPanel
-									key={ category.slug }
-									value={
-										guidelines?.guideline_categories
-											?.blocks || {}
-									}
-									onChange={ ( value ) =>
-										handleCategoryChange( 'blocks', value )
-									}
-								/>
-							) : (
+						{ CATEGORIES.map( ( category, index ) => {
+							if ( category.slug === 'blocks' ) {
+								return (
+									<BlockGuidelinesPanel
+										key={ category.slug }
+										value={
+											guidelines?.guideline_categories
+												?.blocks || {}
+										}
+										onChange={ ( blocksValue ) =>
+											handleCategoryChange(
+												'blocks',
+												blocksValue
+											)
+										}
+									/>
+								);
+							}
+
+							const categoryData = guidelines
+								?.guideline_categories?.[ category.slug ] as
+								| { guidelines?: string }
+								| undefined;
+
+							return (
 								<CategoryPanel
 									key={ category.slug }
 									label={ category.label }
 									description={ category.description }
-									value={
-										(
-											guidelines?.guideline_categories?.[
-												category.slug
-											] as { guidelines?: string }
-										 )?.guidelines || ''
-									}
-									onChange={ ( value ) =>
+									value={ categoryData?.guidelines || '' }
+									onChange={ ( categoryValue ) =>
 										handleCategoryChange(
 											category.slug,
-											value
+											categoryValue
 										)
 									}
 									initialOpen={ index === 0 }
 								/>
-							)
-						) }
+							);
+						} ) }
 					</Panel>
 				</main>
 				<aside className="content-guidelines-admin__sidebar">

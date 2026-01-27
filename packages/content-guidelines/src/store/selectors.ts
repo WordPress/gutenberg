@@ -123,21 +123,3 @@ export const getRestoringRevisionId = ( state: State ): number | null =>
  */
 export const getRevisionPagination = ( state: State ): RevisionPagination =>
 	state.revisionPagination;
-
-/**
- * Get the current revision page number.
- *
- * @param state Store state.
- * @return Current page number.
- */
-export const getRevisionCurrentPage = ( state: State ): number =>
-	state.revisionPagination.currentPage;
-
-/**
- * Get the total number of revision pages.
- *
- * @param state Store state.
- * @return Total number of pages.
- */
-export const getRevisionTotalPages = ( state: State ): number =>
-	state.revisionPagination.totalPages;

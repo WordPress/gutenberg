@@ -23,6 +23,32 @@ import { DEFAULT_STATE, DEFAULT_CATEGORIES } from './constants';
 import type { State, Guidelines } from './constants';
 
 /**
+ * Normalizes guidelines payload by merging with default categories.
+ *
+ * @param payload Raw guidelines from API response.
+ * @return Normalized guidelines with default categories applied.
+ */
+function normalizeGuidelines( payload: Guidelines ): Guidelines {
+	return {
+		...payload,
+		guideline_categories: {
+			...DEFAULT_CATEGORIES,
+			...( payload.guideline_categories || {} ),
+		},
+	};
+}
+
+/**
+ * Creates a deep clone of an object using JSON serialization.
+ *
+ * @param obj Object to clone.
+ * @return Deep cloned object.
+ */
+function deepClone< T >( obj: T ): T {
+	return JSON.parse( JSON.stringify( obj ) );
+}
+
+/**
  * Reducer for the content guidelines store.
  *
  * @param state  Current state.
@@ -42,17 +68,11 @@ export default function reducer(
 			};
 
 		case FETCH_GUIDELINES_SUCCESS: {
-			const guidelines: Guidelines = {
-				...action.payload,
-				guideline_categories: {
-					...DEFAULT_CATEGORIES,
-					...( action.payload.guideline_categories || {} ),
-				},
-			};
+			const guidelines = normalizeGuidelines( action.payload );
 			return {
 				...state,
 				guidelines,
-				originalGuidelines: JSON.parse( JSON.stringify( guidelines ) ),
+				originalGuidelines: deepClone( guidelines ),
 				isLoading: false,
 				error: null,
 			};
@@ -73,17 +93,11 @@ export default function reducer(
 			};
 
 		case SAVE_GUIDELINES_SUCCESS: {
-			const guidelines: Guidelines = {
-				...action.payload,
-				guideline_categories: {
-					...DEFAULT_CATEGORIES,
-					...( action.payload.guideline_categories || {} ),
-				},
-			};
+			const guidelines = normalizeGuidelines( action.payload );
 			return {
 				...state,
 				guidelines,
-				originalGuidelines: JSON.parse( JSON.stringify( guidelines ) ),
+				originalGuidelines: deepClone( guidelines ),
 				isSaving: false,
 				error: null,
 			};
@@ -97,37 +111,39 @@ export default function reducer(
 			};
 
 		case UPDATE_CATEGORY: {
+			if ( ! state.guidelines ) {
+				return state;
+			}
 			const { category, value } = action.payload;
 			return {
 				...state,
-				guidelines: state.guidelines
-					? {
-							...state.guidelines,
-							guideline_categories: {
-								...state.guidelines.guideline_categories,
-								[ category ]: value,
-							},
-					  }
-					: null,
+				guidelines: {
+					...state.guidelines,
+					guideline_categories: {
+						...state.guidelines.guideline_categories,
+						[ category ]: value,
+					},
+				},
 			};
 		}
 
 		case SET_STATUS:
+			if ( ! state.guidelines ) {
+				return state;
+			}
 			return {
 				...state,
-				guidelines: state.guidelines
-					? {
-							...state.guidelines,
-							status: action.payload,
-					  }
-					: null,
+				guidelines: {
+					...state.guidelines,
+					status: action.payload,
+				},
 			};
 
 		case RESET_CHANGES:
 			return {
 				...state,
 				guidelines: state.originalGuidelines
-					? JSON.parse( JSON.stringify( state.originalGuidelines ) )
+					? deepClone( state.originalGuidelines )
 					: null,
 			};
 
@@ -159,17 +175,11 @@ export default function reducer(
 			};
 
 		case RESTORE_REVISION_SUCCESS: {
-			const guidelines: Guidelines = {
-				...action.payload,
-				guideline_categories: {
-					...DEFAULT_CATEGORIES,
-					...( action.payload.guideline_categories || {} ),
-				},
-			};
+			const guidelines = normalizeGuidelines( action.payload );
 			return {
 				...state,
 				guidelines,
-				originalGuidelines: JSON.parse( JSON.stringify( guidelines ) ),
+				originalGuidelines: deepClone( guidelines ),
 				isRestoring: null,
 			};
 		}

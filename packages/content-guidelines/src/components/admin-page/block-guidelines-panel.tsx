@@ -34,6 +34,36 @@ interface BlockGuidelinesPanelProps {
 }
 
 /**
+ * Extracts the title string from a block type response.
+ *
+ * @param block Block type response object.
+ * @return Normalized title string.
+ */
+function extractBlockTitle( block: BlockTypeResponse ): string {
+	if ( typeof block.title === 'string' ) {
+		return block.title;
+	}
+	if ( block.title && typeof block.title === 'object' ) {
+		return block.title.rendered;
+	}
+	return block.name;
+}
+
+/**
+ * Truncates text to a maximum length with ellipsis.
+ *
+ * @param text      Text to truncate.
+ * @param maxLength Maximum length before truncation.
+ * @return Truncated text with ellipsis if needed.
+ */
+function truncateText( text: string, maxLength: number ): string {
+	if ( text.length <= maxLength ) {
+		return text;
+	}
+	return `${ text.substring( 0, maxLength ) }...`;
+}
+
+/**
  * Block guidelines panel component for managing per-block guidelines.
  *
  * @param props          Component props.
@@ -49,31 +79,17 @@ export default function BlockGuidelinesPanel( {
 	const [ blockTypes, setBlockTypes ] = useState< BlockType[] >( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
 
-	// Fetch block types from REST API.
 	useEffect( () => {
-		const fetchBlockTypes = async () => {
+		async function fetchBlockTypes(): Promise< void > {
 			try {
 				const response = await apiFetch< BlockTypeResponse[] >( {
 					path: '/wp/v2/block-types',
 				} );
-				// Process response to normalize title and filter out invalid entries.
 				const processedBlocks = response
-					.map( ( block ) => {
-						let title = '';
-						if ( typeof block.title === 'string' ) {
-							title = block.title;
-						} else if (
-							block.title &&
-							typeof block.title === 'object' &&
-							'rendered' in block.title
-						) {
-							title = block.title.rendered;
-						}
-						return {
-							name: block.name,
-							title: title || block.name, // Fallback to block name.
-						};
-					} )
+					.map( ( block ) => ( {
+						name: block.name,
+						title: extractBlockTitle( block ),
+					} ) )
 					.filter( ( block ) => block.name && block.title );
 				setBlockTypes( processedBlocks );
 			} catch ( err ) {
@@ -82,7 +98,7 @@ export default function BlockGuidelinesPanel( {
 			} finally {
 				setIsLoading( false );
 			}
-		};
+		}
 
 		fetchBlockTypes();
 	}, [] );
@@ -186,12 +202,7 @@ export default function BlockGuidelinesPanel( {
 										{ getBlockTitle( blockName ) }
 									</strong>
 									<p className="block-guideline-item__preview">
-										{ data.guidelines.length > 100
-											? `${ data.guidelines.substring(
-													0,
-													100
-											  ) }...`
-											: data.guidelines }
+										{ truncateText( data.guidelines, 100 ) }
 									</p>
 								</div>
 								<Button
