@@ -954,7 +954,7 @@ class WP_Duotone_Gutenberg {
 
 		// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
 		$tags = new WP_HTML_Tag_Processor( $block_content );
-		if ( $tags->next_tag() ) {
+		if ( $tags->next_tag() && isset( $filter_id ) ) {
 			$tags->add_class( $filter_id );
 		}
 
