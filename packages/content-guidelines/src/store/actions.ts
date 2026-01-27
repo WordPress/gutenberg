@@ -11,6 +11,7 @@ import type {
 	CategoryGuideline,
 	BlockGuidelines,
 	Revision,
+	RevisionPagination,
 } from './constants';
 
 /**
@@ -52,7 +53,10 @@ export type Action =
 	| { type: typeof SET_STATUS; payload: 'draft' | 'published' }
 	| { type: typeof RESET_CHANGES }
 	| { type: typeof FETCH_REVISIONS_START }
-	| { type: typeof FETCH_REVISIONS_SUCCESS; payload: Revision[] }
+	| {
+			type: typeof FETCH_REVISIONS_SUCCESS;
+			payload: { revisions: Revision[]; pagination: RevisionPagination };
+	  }
 	| { type: typeof FETCH_REVISIONS_ERROR; payload: string }
 	| { type: typeof RESTORE_REVISION_START; payload: number }
 	| { type: typeof RESTORE_REVISION_SUCCESS; payload: Guidelines }
@@ -170,22 +174,43 @@ export const resetChanges = (): Action => ( {
 /**
  * Fetch revisions for a guidelines post.
  *
- * @param postId The guidelines post ID.
+ * @param postId  The guidelines post ID.
+ * @param page    The page number (default: 1).
+ * @param perPage Number of revisions per page (default: 5).
  * @return Thunk action.
  */
 export const fetchRevisions =
-	( postId: number ) =>
+	( postId: number, page: number = 1, perPage: number = 5 ) =>
 	async ( { dispatch }: ThunkArgs ) => {
 		dispatch( { type: FETCH_REVISIONS_START } );
 
 		try {
-			const response = await apiFetch< Revision[] >( {
-				path: `/__experimental/content-guidelines/${ postId }/revisions`,
-			} );
+			const response = ( await apiFetch( {
+				path: `/__experimental/content-guidelines/${ postId }/revisions?page=${ page }&per_page=${ perPage }`,
+				parse: false,
+			} ) ) as Response;
+
+			const revisions = ( await response.json() ) as Revision[];
+			const totalItems = parseInt(
+				response.headers.get( 'X-WP-Total' ) || '0',
+				10
+			);
+			const totalPages = parseInt(
+				response.headers.get( 'X-WP-TotalPages' ) || '1',
+				10
+			);
 
 			dispatch( {
 				type: FETCH_REVISIONS_SUCCESS,
-				payload: response,
+				payload: {
+					revisions,
+					pagination: {
+						currentPage: page,
+						totalPages,
+						totalItems,
+						perPage,
+					},
+				},
 			} );
 		} catch ( error ) {
 			dispatch( {

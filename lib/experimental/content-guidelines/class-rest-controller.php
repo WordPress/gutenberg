@@ -111,9 +111,22 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'get_revisions' ),
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(
-						'id' => array(
+						'id'       => array(
 							'description' => __( 'Unique identifier for the guidelines.', 'gutenberg' ),
 							'type'        => 'integer',
+						),
+						'page'     => array(
+							'description' => __( 'Current page of the revisions collection.', 'gutenberg' ),
+							'type'        => 'integer',
+							'default'     => 1,
+							'minimum'     => 1,
+						),
+						'per_page' => array(
+							'description' => __( 'Maximum number of revisions to be returned per page.', 'gutenberg' ),
+							'type'        => 'integer',
+							'default'     => 5,
+							'minimum'     => 1,
+							'maximum'     => 100,
 						),
 					),
 				),
@@ -416,10 +429,26 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 			);
 		}
 
+		$page     = $request->get_param( 'page' );
+		$per_page = $request->get_param( 'per_page' );
+		$offset   = ( $page - 1 ) * $per_page;
+
+		// Get total count of revisions.
+		$all_revision_ids = wp_get_post_revisions(
+			$post->ID,
+			array(
+				'fields' => 'ids',
+			)
+		);
+		$total_items      = count( $all_revision_ids );
+		$total_pages      = (int) ceil( $total_items / $per_page );
+
+		// Get paginated revisions.
 		$revisions = wp_get_post_revisions(
 			$post->ID,
 			array(
-				'posts_per_page' => 10,
+				'posts_per_page' => $per_page,
+				'offset'         => $offset,
 				'orderby'        => 'date',
 				'order'          => 'DESC',
 			)
@@ -437,7 +466,11 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 			);
 		}
 
-		return rest_ensure_response( $data );
+		$response = rest_ensure_response( $data );
+		$response->header( 'X-WP-Total', $total_items );
+		$response->header( 'X-WP-TotalPages', $total_pages );
+
+		return $response;
 	}
 
 	/**

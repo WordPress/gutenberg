@@ -7,6 +7,7 @@ import {
 	Button,
 	Notice,
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 	__experimentalText as Text,
 	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
@@ -127,7 +128,14 @@ export default function ImportExportControls( {
 
 	return (
 		<div className="content-guidelines-import-export">
-			<VStack spacing={ 4 }>
+			<VStack spacing={ 3 }>
+				<Text weight="600">{ __( 'Export / Import' ) }</Text>
+				<Text variant="muted">
+					{ __(
+						'Export your guidelines as JSON or import from a file.'
+					) }
+				</Text>
+
 				{ importError && (
 					<Notice
 						status="error"
@@ -150,15 +158,17 @@ export default function ImportExportControls( {
 					</Notice>
 				) }
 
-				<div className="content-guidelines-import-export__section">
-					<Text weight="600">{ __( 'Export' ) }</Text>
-					<Spacer margin={ 1 } />
-					<Text variant="muted">
-						{ __(
-							'Download your current guidelines as a JSON file.'
-						) }
-					</Text>
-					<Spacer margin={ 3 } />
+				<Spacer margin={ 1 } />
+
+				<input
+					ref={ fileInputRef }
+					type="file"
+					accept=".json,application/json"
+					onChange={ handleFileSelect }
+					style={ { display: 'none' } }
+				/>
+
+				<HStack spacing={ 3 } wrap>
 					<Button
 						variant="secondary"
 						icon={ download }
@@ -167,35 +177,17 @@ export default function ImportExportControls( {
 						__next40pxDefaultSize
 						accessibleWhenDisabled
 					>
-						{ __( 'Export JSON' ) }
+						{ __( 'Export' ) }
 					</Button>
-				</div>
-
-				<div className="content-guidelines-import-export__section">
-					<Text weight="600">{ __( 'Import' ) }</Text>
-					<Spacer margin={ 1 } />
-					<Text variant="muted">
-						{ __(
-							'Load guidelines from a JSON file. Review before saving.'
-						) }
-					</Text>
-					<Spacer margin={ 3 } />
-					<input
-						ref={ fileInputRef }
-						type="file"
-						accept=".json,application/json"
-						onChange={ handleFileSelect }
-						style={ { display: 'none' } }
-					/>
 					<Button
 						variant="secondary"
 						icon={ upload }
 						onClick={ () => fileInputRef.current?.click() }
 						__next40pxDefaultSize
 					>
-						{ __( 'Import JSON' ) }
+						{ __( 'Import' ) }
 					</Button>
-				</div>
+				</HStack>
 			</VStack>
 		</div>
 	);

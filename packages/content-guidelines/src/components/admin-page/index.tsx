@@ -182,47 +182,56 @@ export default function AdminPage() {
 				onSave={ handleSave }
 			/>
 
-			<Panel className="content-guidelines-admin__panel">
-				{ CATEGORIES.map( ( category ) =>
-					category.slug === 'blocks' ? (
-						<BlockGuidelinesPanel
-							key={ category.slug }
-							value={
-								guidelines?.guideline_categories?.blocks || {}
-							}
-							onChange={ ( value ) =>
-								handleCategoryChange( 'blocks', value )
-							}
-						/>
-					) : (
-						<CategoryPanel
-							key={ category.slug }
-							label={ category.label }
-							description={ category.description }
-							value={
-								(
-									guidelines?.guideline_categories?.[
-										category.slug
-									] as { guidelines?: string }
-								 )?.guidelines || ''
-							}
-							onChange={ ( value ) =>
-								handleCategoryChange( category.slug, value )
-							}
-						/>
-					)
-				) }
-			</Panel>
-
-			<RevisionList
-				postId={ guidelines?.id }
-				onRestore={ handleImport }
-			/>
-
-			<ImportExportControls
-				guidelines={ guidelines }
-				onImport={ handleImport }
-			/>
+			<div className="content-guidelines-admin__layout">
+				<main className="content-guidelines-admin__main">
+					<Panel className="content-guidelines-admin__panel">
+						{ CATEGORIES.map( ( category, index ) =>
+							category.slug === 'blocks' ? (
+								<BlockGuidelinesPanel
+									key={ category.slug }
+									value={
+										guidelines?.guideline_categories
+											?.blocks || {}
+									}
+									onChange={ ( value ) =>
+										handleCategoryChange( 'blocks', value )
+									}
+								/>
+							) : (
+								<CategoryPanel
+									key={ category.slug }
+									label={ category.label }
+									description={ category.description }
+									value={
+										(
+											guidelines?.guideline_categories?.[
+												category.slug
+											] as { guidelines?: string }
+										 )?.guidelines || ''
+									}
+									onChange={ ( value ) =>
+										handleCategoryChange(
+											category.slug,
+											value
+										)
+									}
+									initialOpen={ index === 0 }
+								/>
+							)
+						) }
+					</Panel>
+				</main>
+				<aside className="content-guidelines-admin__sidebar">
+					<RevisionList
+						postId={ guidelines?.id }
+						onRestore={ handleImport }
+					/>
+					<ImportExportControls
+						guidelines={ guidelines }
+						onImport={ handleImport }
+					/>
+				</aside>
+			</div>
 		</div>
 	);
 }

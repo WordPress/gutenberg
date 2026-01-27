@@ -43,6 +43,13 @@ export interface Revision {
 	author_name: string;
 }
 
+export interface RevisionPagination {
+	currentPage: number;
+	totalPages: number;
+	totalItems: number;
+	perPage: number;
+}
+
 export interface State {
 	guidelines: Guidelines | null;
 	originalGuidelines: Guidelines | null;
@@ -52,6 +59,7 @@ export interface State {
 	revisions: Revision[];
 	isLoadingRevisions: boolean;
 	isRestoring: number | null;
+	revisionPagination: RevisionPagination;
 }
 
 /**
@@ -89,4 +97,10 @@ export const DEFAULT_STATE: State = {
 	revisions: [],
 	isLoadingRevisions: false,
 	isRestoring: null,
+	revisionPagination: {
+		currentPage: 1,
+		totalPages: 1,
+		totalItems: 0,
+		perPage: 5,
+	},
 };

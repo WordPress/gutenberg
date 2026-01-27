@@ -7,6 +7,7 @@ import type {
 	CategoryGuideline,
 	BlockGuidelines,
 	Revision,
+	RevisionPagination,
 } from './constants';
 
 /**
@@ -113,3 +114,30 @@ export const isLoadingRevisions = ( state: State ): boolean =>
  */
 export const getRestoringRevisionId = ( state: State ): number | null =>
 	state.isRestoring;
+
+/**
+ * Get the revision pagination state.
+ *
+ * @param state Store state.
+ * @return Pagination state object.
+ */
+export const getRevisionPagination = ( state: State ): RevisionPagination =>
+	state.revisionPagination;
+
+/**
+ * Get the current revision page number.
+ *
+ * @param state Store state.
+ * @return Current page number.
+ */
+export const getRevisionCurrentPage = ( state: State ): number =>
+	state.revisionPagination.currentPage;
+
+/**
+ * Get the total number of revision pages.
+ *
+ * @param state Store state.
+ * @return Total number of pages.
+ */
+export const getRevisionTotalPages = ( state: State ): number =>
+	state.revisionPagination.totalPages;

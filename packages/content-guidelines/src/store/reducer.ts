@@ -140,7 +140,8 @@ export default function reducer(
 		case FETCH_REVISIONS_SUCCESS:
 			return {
 				...state,
-				revisions: action.payload,
+				revisions: action.payload.revisions,
+				revisionPagination: action.payload.pagination,
 				isLoadingRevisions: false,
 			};
 

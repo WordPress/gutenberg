@@ -8,6 +8,7 @@ interface CategoryPanelProps {
 	description: string;
 	value: string;
 	onChange: ( value: string ) => void;
+	initialOpen?: boolean;
 }
 
 /**
@@ -18,6 +19,7 @@ interface CategoryPanelProps {
  * @param props.description Help text for the textarea.
  * @param props.value       Current value of the textarea.
  * @param props.onChange    Callback when value changes.
+ * @param props.initialOpen Whether the panel is initially open.
  * @return CategoryPanel component.
  */
 export default function CategoryPanel( {
@@ -25,9 +27,10 @@ export default function CategoryPanel( {
 	description,
 	value,
 	onChange,
+	initialOpen = false,
 }: CategoryPanelProps ) {
 	return (
-		<PanelBody title={ label } initialOpen={ false }>
+		<PanelBody title={ label } initialOpen={ initialOpen }>
 			<TextareaControl
 				__nextHasNoMarginBottom
 				help={ description }
