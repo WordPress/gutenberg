@@ -135,7 +135,7 @@ function gutenberg_reregister_core_block_types() {
 		),
 	);
 
-	foreach ( $blocks_dirs as $blocks_dir ) {
+	foreach ( $blocks_dirs as $blocks_dir => $blocks_config ) {
 		$manifest_path = $blocks_dir . 'blocks-manifest.php';
 		$blocks        = require $manifest_path;
 
