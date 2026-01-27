@@ -291,9 +291,7 @@ const getAllBlocks = () => {
 		blocks.push( formSubmissionNotification );
 	}
 
-	if ( window?.__experimentalNavigationOverlays ) {
-		blocks.push( navigationOverlayClose );
-	}
+	blocks.push( navigationOverlayClose );
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
 		blocks.push( playlist );

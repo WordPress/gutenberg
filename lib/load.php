@@ -200,10 +200,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 	Gutenberg_Interactivity_API_Full_Page_Navigation::instance();
 }
 
-// Block patterns (only load when navigation overlays experiment is enabled).
-if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
-	require __DIR__ . '/experimental/overlay-patterns.php';
-}
+// Block patterns for navigation overlays.
+require __DIR__ . '/overlay-patterns.php';
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-svg-icon-registry' ) ) {
 	require __DIR__ . '/experimental/class-wp-icons-registry.php';

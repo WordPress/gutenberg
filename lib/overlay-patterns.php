@@ -8,8 +8,8 @@
 /**
  * Registers block patterns for navigation overlays.
  *
- * This function adds patterns that are specific to the navigation overlays
- * experiment. It runs after core patterns are registered to ensure all patterns
+ * This function adds patterns that are specific to navigation overlays.
+ * It runs after core patterns are registered to ensure all patterns
  * are available.
  *
  * @since 6.0.0
