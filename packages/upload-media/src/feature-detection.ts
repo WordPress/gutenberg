@@ -24,6 +24,7 @@ let cachedResult: FeatureDetectionResult | null = null;
  * 1. WebAssembly support (required for wasm-vips)
  * 2. SharedArrayBuffer support (required for WASM threading)
  * 3. Cross-origin isolation (required for SharedArrayBuffer in modern browsers)
+ * 4. CSP compatibility for blob URL workers (required for inline worker creation)
  *
  * @return Feature detection result with supported status and reason if not supported.
  */
@@ -61,6 +62,30 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
 			reason: 'Cross-origin isolation is not enabled. Required headers: Cross-Origin-Opener-Policy: same-origin, Cross-Origin-Embedder-Policy: credentialless',
 		};
 		return cachedResult;
+	}
+
+	// Check that blob URL workers are allowed by CSP.
+	// Security plugins often set a strict worker-src directive that blocks blob: URLs,
+	// which would prevent creating the WASM processing worker at runtime.
+	if ( typeof window !== 'undefined' && typeof Worker !== 'undefined' ) {
+		try {
+			const testBlob = new Blob( [ '' ], {
+				type: 'application/javascript',
+			} );
+			const testUrl = URL.createObjectURL( testBlob );
+			try {
+				const testWorker = new Worker( testUrl );
+				testWorker.terminate();
+			} finally {
+				URL.revokeObjectURL( testUrl );
+			}
+		} catch {
+			cachedResult = {
+				supported: false,
+				reason: "The site's Content Security Policy (CSP) does not allow blob: workers. The worker-src directive must include blob: to enable client-side media processing.",
+			};
+			return cachedResult;
+		}
 	}
 
 	cachedResult = { supported: true };

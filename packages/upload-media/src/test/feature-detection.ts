@@ -11,16 +11,33 @@ describe( 'feature-detection', () => {
 	const originalWebAssembly = global.WebAssembly;
 	const originalSharedArrayBuffer = global.SharedArrayBuffer;
 	const originalCrossOriginIsolated = window.crossOriginIsolated;
+	const originalWorker = global.Worker;
+	const originalCreateObjectURL = global.URL.createObjectURL;
+	const originalRevokeObjectURL = global.URL.revokeObjectURL;
 
 	beforeEach( () => {
 		// Clear the cache before each test.
 		clearFeatureDetectionCache();
+
+		// By default, provide a mock Worker that does not throw (CSP allows blob workers).
+		global.Worker = class MockWorker {
+			terminate() {}
+		} as unknown as typeof Worker;
+
+		// jsdom does not implement URL.createObjectURL/revokeObjectURL.
+		global.URL.createObjectURL = jest.fn(
+			() => 'blob:http://localhost/test'
+		);
+		global.URL.revokeObjectURL = jest.fn();
 	} );
 
 	afterEach( () => {
 		// Restore original values.
 		global.WebAssembly = originalWebAssembly;
 		global.SharedArrayBuffer = originalSharedArrayBuffer;
+		global.Worker = originalWorker;
+		global.URL.createObjectURL = originalCreateObjectURL;
+		global.URL.revokeObjectURL = originalRevokeObjectURL;
 		Object.defineProperty( window, 'crossOriginIsolated', {
 			value: originalCrossOriginIsolated,
 			writable: true,
@@ -81,6 +98,32 @@ describe( 'feature-detection', () => {
 
 			expect( result.supported ).toBe( false );
 			expect( result.reason ).toContain( 'Cross-origin isolation' );
+		} );
+
+		it( 'returns not supported when CSP blocks blob workers', () => {
+			global.WebAssembly = originalWebAssembly;
+			global.SharedArrayBuffer = originalSharedArrayBuffer;
+			Object.defineProperty( window, 'crossOriginIsolated', {
+				value: true,
+				writable: true,
+				configurable: true,
+			} );
+
+			// Simulate CSP blocking blob URL workers by throwing a SecurityError.
+			global.Worker = class ThrowingWorker {
+				constructor() {
+					throw new DOMException(
+						"Refused to create a worker from 'blob:...' because it violates the Content Security Policy directive: \"worker-src 'self'\".",
+						'SecurityError'
+					);
+				}
+			} as unknown as typeof Worker;
+
+			const result = detectClientSideMediaSupport();
+
+			expect( result.supported ).toBe( false );
+			expect( result.reason ).toContain( 'Content Security Policy' );
+			expect( result.reason ).toContain( 'worker-src' );
 		} );
 
 		it( 'caches the result', () => {
