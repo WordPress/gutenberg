@@ -191,11 +191,40 @@ function ValidatedDateControl< Item >( {
 		setCustomValidity( undefined );
 	}, [ inputRefs ] );
 
+	// Listen for 'invalid' events on input refs (e.g., triggered by
+	// reportValidity() when the card re-expands after being collapsed).
+	useEffect( () => {
+		const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
+		const handleInvalid = ( event: Event ) => {
+			event.preventDefault();
+			setIsTouched( true );
+		};
+		for ( const ref of refs ) {
+			ref.current?.addEventListener( 'invalid', handleInvalid );
+		}
+		return () => {
+			for ( const ref of refs ) {
+				ref.current?.removeEventListener(
+					'invalid',
+					handleInvalid
+				);
+			}
+		};
+	}, [ inputRefs, setIsTouched ] );
+
 	useEffect( () => {
 		if ( isTouched ) {
 			const timeoutId = setTimeout( () => {
 				if ( validity ) {
-					setCustomValidity( getCustomValidity( isValid, validity ) );
+					const result = getCustomValidity( isValid, validity );
+					if ( result ) {
+						setCustomValidity( result );
+					} else {
+						// Fall back to native validation for rules without
+						// custom messages (e.g., required without a custom
+						// error message).
+						validateRefs();
+					}
 				} else {
 					validateRefs();
 				}
