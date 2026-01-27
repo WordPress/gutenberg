@@ -8,12 +8,6 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
  */
 // @ts-expect-error No exported types.
 import { __unstableSerializeAndClean } from '@wordpress/blocks';
-import {
-	type CRDTDoc,
-	type ObjectData,
-	type SyncConfig,
-	Y,
-} from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -29,9 +23,13 @@ import {
 import { type Post } from '../entity-types/post';
 import { type Type } from '../entity-types';
 import {
+	type CRDTDoc,
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,
+	type ObjectData,
+	type SyncConfig,
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	Y,
 } from '../sync';
 import type { WPSelection } from '../types';
 import { updateSelectionHistory } from './crdt-selection';

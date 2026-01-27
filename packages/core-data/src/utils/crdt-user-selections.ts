@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { Y, CRDT_RECORD_MAP_KEY } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -9,6 +8,7 @@ import { Y, CRDT_RECORD_MAP_KEY } from '@wordpress/sync';
 import type { YPostRecord } from './crdt';
 import type { YBlock, YBlocks } from './crdt-blocks';
 import { getRootMap } from './crdt-utils';
+import { CRDT_RECORD_MAP_KEY, Y, type YType } from '../sync';
 import type { WPBlockSelection } from '../types';
 
 /**
@@ -26,7 +26,7 @@ export enum SelectionType {
  * The position of the cursor.
  */
 export type CursorPosition = {
-	relativePosition: Y.RelativePosition;
+	relativePosition: YType.RelativePosition;
 
 	// Also store the absolute offset index of the cursor from the perspective
 	// of the user who is updating the selection.
@@ -94,7 +94,7 @@ export type SelectionState =
 export function getSelectionState(
 	selectionStart: WPBlockSelection,
 	selectionEnd: WPBlockSelection,
-	yDoc: Y.Doc
+	yDoc: YType.Doc
 ): SelectionState {
 	const ymap = getRootMap< YPostRecord >( yDoc, CRDT_RECORD_MAP_KEY );
 	const yBlocks = ymap.get( 'blocks' ) ?? new Y.Array< YBlock >();
@@ -198,7 +198,9 @@ function getCursorPosition(
 	}
 
 	const attributes = block.get( 'attributes' );
-	const currentYText = attributes?.get( selection.attributeKey ) as Y.Text;
+	const currentYText = attributes?.get(
+		selection.attributeKey
+	) as YType.Text;
 
 	const relativePosition = Y.createRelativePositionFromTypeIndex(
 		currentYText,

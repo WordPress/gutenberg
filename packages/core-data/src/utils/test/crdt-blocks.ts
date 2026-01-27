@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { Y } from '@wordpress/sync';
-
-/**
  * External dependencies
  */
 import {
@@ -14,6 +9,11 @@ import {
 	beforeEach,
 	afterEach,
 } from '@jest/globals';
+
+/**
+ * Internal dependencies
+ */
+import { type CRDTDoc, Y, type YType } from '../../sync';
 
 /**
  * Mock uuid module
@@ -35,6 +35,13 @@ jest.mock( '@wordpress/blocks', () => ( {
 } ) );
 
 /**
+ * Mock @wordpress/block-editor to avoid private-apis unlock errors
+ */
+jest.mock( '@wordpress/block-editor', () => ( {
+	store: {},
+} ) );
+
+/**
  * Internal dependencies
  */
 import {
@@ -46,8 +53,8 @@ import {
 } from '../crdt-blocks';
 
 describe( 'crdt-blocks', () => {
-	let doc: Y.Doc;
-	let yblocks: Y.Array< YBlock >;
+	let doc: CRDTDoc;
+	let yblocks: YType.Array< YBlock >;
 
 	beforeEach( () => {
 		doc = new Y.Doc();
@@ -76,7 +83,7 @@ describe( 'crdt-blocks', () => {
 			expect( block.get( 'name' ) ).toBe( 'core/paragraph' );
 			const content = (
 				block.get( 'attributes' ) as YBlockAttributes
-			 ).get( 'content' ) as Y.Text;
+			 ).get( 'content' ) as YType.Text;
 			expect( content.toString() ).toBe( 'Hello World' );
 		} );
 
@@ -107,7 +114,7 @@ describe( 'crdt-blocks', () => {
 			const block = yblocks.get( 0 );
 			const content = (
 				block.get( 'attributes' ) as YBlockAttributes
-			 ).get( 'content' ) as Y.Text;
+			 ).get( 'content' ) as YType.Text;
 			expect( content.toString() ).toBe( 'Updated content' );
 		} );
 
@@ -145,7 +152,7 @@ describe( 'crdt-blocks', () => {
 			const block = yblocks.get( 0 );
 			const content = (
 				block.get( 'attributes' ) as YBlockAttributes
-			 ).get( 'content' ) as Y.Text;
+			 ).get( 'content' ) as YType.Text;
 			expect( content.toString() ).toBe( 'Block 1' );
 		} );
 
@@ -262,13 +269,13 @@ describe( 'crdt-blocks', () => {
 			const block0 = yblocks.get( 0 );
 			const content0 = (
 				block0.get( 'attributes' ) as YBlockAttributes
-			 ).get( 'content' ) as Y.Text;
+			 ).get( 'content' ) as YType.Text;
 			expect( content0.toString() ).toBe( 'Second' );
 
 			const block1 = yblocks.get( 1 );
 			const content1 = (
 				block1.get( 'attributes' ) as YBlockAttributes
-			 ).get( 'content' ) as Y.Text;
+			 ).get( 'content' ) as YType.Text;
 			expect( content1.toString() ).toBe( 'First' );
 		} );
 
@@ -286,7 +293,7 @@ describe( 'crdt-blocks', () => {
 			const block = yblocks.get( 0 );
 			const contentAttr = (
 				block.get( 'attributes' ) as YBlockAttributes
-			 ).get( 'content' ) as Y.Text;
+			 ).get( 'content' ) as YType.Text;
 			expect( contentAttr ).toBeInstanceOf( Y.Text );
 			expect( contentAttr.toString() ).toBe( 'Rich text content' );
 		} );
@@ -325,7 +332,7 @@ describe( 'crdt-blocks', () => {
 			const updatedBlock = yblocks.get( 0 );
 			const updatedContentAttr = (
 				updatedBlock.get( 'attributes' ) as YBlockAttributes
-			 ).get( 'content' ) as Y.Text;
+			 ).get( 'content' ) as YType.Text;
 			expect( updatedBlock.get( 'name' ) ).toBe( 'core/paragraph' );
 			expect( updatedContentAttr ).toBeInstanceOf( Y.Text );
 			expect( updatedContentAttr.toString() ).toBe( 'Updated text' );
@@ -435,7 +442,7 @@ describe( 'crdt-blocks', () => {
 			const block = yblocks.get( 1 );
 			const content = (
 				block.get( 'attributes' ) as YBlockAttributes
-			 ).get( 'content' ) as Y.Text;
+			 ).get( 'content' ) as YType.Text;
 			expect( content.toString() ).toBe( 'Updated Middle' );
 		} );
 
@@ -471,7 +478,7 @@ describe( 'crdt-blocks', () => {
 
 			// The content attribute should now exist
 			expect( attributes.has( 'content' ) ).toBe( true );
-			const content = attributes.get( 'content' ) as Y.Text;
+			const content = attributes.get( 'content' ) as YType.Text;
 			expect( content.toString() ).toBe( 'New content added' );
 
 			// The level attribute should still exist

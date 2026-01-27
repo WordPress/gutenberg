@@ -15,20 +15,6 @@ import type { Awareness } from 'y-protocols/awareness';
 import type { AwarenessState } from './awareness/awareness-state';
 import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
 
-/* globalThis */
-declare global {
-	interface Window {
-		__experimentalCollaborativeEditingSecret?: string;
-		wp?: {
-			ajax?: {
-				settings?: {
-					url?: string;
-				};
-			};
-		};
-	}
-}
-
 export type CRDTDoc = Y.Doc;
 export type AwarenessID = string;
 export type EntityID = string;
@@ -58,7 +44,7 @@ export interface ProviderCreatorResult {
 export interface ProviderCreatorOptions {
 	objectType: ObjectType;
 	objectId: ObjectID | null;
-	ydoc: Y.Doc;
+	ydoc: CRDTDoc;
 	awareness?: Awareness;
 }
 
@@ -71,28 +57,28 @@ export interface CollectionHandlers {
 }
 
 export interface RecordHandlers {
-	addUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
+	addUndoMeta: ( ydoc: CRDTDoc, meta: Map< string, any > ) => void;
 	editRecord: (
 		data: Partial< ObjectData >,
 		options?: { undoIgnore?: boolean }
 	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
 	refetchRecord: () => Promise< void >;
-	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
+	restoreUndoMeta: ( ydoc: CRDTDoc, meta: Map< string, any > ) => void;
 	saveRecord: () => Promise< void >;
 }
 
 export interface SyncConfig< State extends object = {} > {
 	applyChangesToCRDTDoc: (
-		ydoc: Y.Doc,
+		ydoc: CRDTDoc,
 		changes: Partial< ObjectData >
 	) => void;
 	createAwareness?: (
-		ydoc: Y.Doc,
+		ydoc: CRDTDoc,
 		objectId?: ObjectID
 	) => AwarenessState< State > | undefined;
 	getChangesFromCRDTDoc: (
-		ydoc: Y.Doc,
+		ydoc: CRDTDoc,
 		editedRecord: ObjectData
 	) => ObjectData;
 	supports?: Record< string, true >;

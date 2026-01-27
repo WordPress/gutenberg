@@ -1,14 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { Y } from '@wordpress/sync';
+
+/**
+ * Internal dependencies
+ */
 
 /**
  * Internal dependencies
  */
 import type { YBlock, YBlocks } from './crdt-blocks';
 import type { YPostRecord } from './crdt';
-import { CRDT_RECORD_MAP_KEY } from '../sync';
+import { CRDT_RECORD_MAP_KEY, Y, type YType } from '../sync';
 
 /**
  * A YMapRecord represents the shape of the data stored in a Y.Map.
@@ -30,7 +33,8 @@ export type YMapRecord = Record< string, unknown >;
  * `instanceof` checks against Y.Map continue to work at runtime but will blur
  * the type at compile time. To navigate this, use the `isYMap` function below.
  */
-export interface YMapWrap< T extends YMapRecord > extends Y.AbstractType< T > {
+export interface YMapWrap< T extends YMapRecord >
+	extends YType.AbstractType< T > {
 	delete: < K extends keyof T >( key: K ) => void;
 	forEach: (
 		callback: (
@@ -54,7 +58,7 @@ export interface YMapWrap< T extends YMapRecord > extends Y.AbstractType< T > {
  * @param key Map key
  */
 export function getRootMap< T extends YMapRecord >(
-	doc: Y.Doc,
+	doc: YType.Doc,
 	key: string
 ): YMapWrap< T > {
 	return doc.getMap< T >( key ) as unknown as YMapWrap< T >;
@@ -92,7 +96,7 @@ export function isYMap< T extends YMapRecord >(
  */
 export function findBlockByClientIdInDoc(
 	blockId: string,
-	ydoc: Y.Doc
+	ydoc: YType.Doc
 ): YBlock | null {
 	const ymap = getRootMap< YPostRecord >( ydoc, CRDT_RECORD_MAP_KEY );
 	const blocks = ymap.get( 'blocks' );

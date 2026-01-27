@@ -4,7 +4,6 @@
 import { dispatch } from '@wordpress/data';
 // @ts-expect-error No exported types.
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { type CRDTDoc, Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -17,6 +16,7 @@ import {
 	type YSelection,
 } from './block-selection-history';
 import { findBlockByClientIdInDoc } from './crdt-utils';
+import { type CRDTDoc, Y } from '../sync';
 import type { WPBlockSelection, WPSelection } from '../types';
 
 // WeakMap to store BlockSelectionHistory instances per Y.Doc
@@ -58,7 +58,7 @@ export function updateSelectionHistory(
  */
 function convertYSelectionToBlockSelection(
 	ySelection: YSelection,
-	ydoc: Y.Doc
+	ydoc: CRDTDoc
 ): WPBlockSelection | null {
 	if ( ySelection.type === YSelectionType.RelativeSelection ) {
 		const { relativePosition, attributeKey, clientId } = ySelection;
@@ -94,7 +94,7 @@ function convertYSelectionToBlockSelection(
  * @return The most recent selection that exists in the document, or null if no selection exists.
  */
 function findSelectionFromHistory(
-	ydoc: Y.Doc,
+	ydoc: CRDTDoc,
 	selectionHistory: YFullSelection[]
 ): WPSelection | null {
 	// Try each position until we find one that exists in the document
@@ -138,7 +138,7 @@ function findSelectionFromHistory(
  */
 export function restoreSelection(
 	selectionHistory: YFullSelection[],
-	ydoc: Y.Doc
+	ydoc: CRDTDoc
 ): void {
 	// Find the most recent selection in history that is available in
 	// the document.
