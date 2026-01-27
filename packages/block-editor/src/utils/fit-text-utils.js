@@ -52,7 +52,6 @@ function findOptimalFontSize( textElement, applyFontSize ) {
 		// overflowing into the padding area.
 		const fitsWidth =
 			textElement.scrollWidth <= referenceElement.clientWidth &&
-			// textWidth <= textElement.parentElement.clientWidth &&
 			textWidth <=
 				referenceElement.clientWidth - paddingLeft - paddingRight;
 		// Check if text fits within the element's height.
