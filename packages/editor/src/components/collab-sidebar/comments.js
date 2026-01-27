@@ -33,6 +33,7 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
+import { getDate, humanTimeDiff } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -40,11 +41,14 @@ import {
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
-import { focusCommentThread, getCommentExcerpt } from './utils';
+import {
+	focusCommentThread,
+	getCommentExcerpt,
+	getAvatarBorderColor,
+} from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
-import MinifiedThreadIndicator from './minified-thread-indicator';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -472,7 +476,17 @@ export function Comments( {
 }
 
 /**
- * Wrapper for MinifiedThreadIndicator that handles floating positioning.
+ * Wrapper for compact Thread that handles floating positioning.
+ *
+ * @param {Object}   props                    Component props.
+ * @param {Object}   props.thread             The thread data.
+ * @param {number}   props.calculatedOffset   The calculated vertical offset.
+ * @param {Function} props.setHeights         Callback to set thread heights.
+ * @param {Function} props.setBlockRef        Callback to set block reference.
+ * @param {number}   props.selectedThread     The currently selected thread ID.
+ * @param {number}   props.commentLastUpdated Timestamp of last comment update.
+ * @param {Function} props.onExpand           Callback when thread is expanded.
+ * @param {Function} props.onKeyDown          Callback for keyboard navigation.
  */
 function MinifiedThread( {
 	thread,
@@ -494,8 +508,9 @@ function MinifiedThread( {
 	} );
 
 	return (
-		<MinifiedThreadIndicator
+		<Thread
 			thread={ thread }
+			variant="compact"
 			y={ y }
 			refs={ refs }
 			onExpand={ onExpand }
@@ -522,7 +537,13 @@ function Thread( {
 	commentLastUpdated,
 	newNoteFormState,
 	onKeyDown,
+	variant = 'full',
+	// Props for compact variant (passed from MinifiedThread wrapper).
+	y: compactY,
+	refs: compactRefs,
+	onExpand,
 } ) {
+	const [ isHovered, setIsHovered ] = useState( false );
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -621,6 +642,85 @@ function Thread( {
 				__( 'Original block deleted. Note: %s' ),
 				commentExcerpt
 		  );
+
+	// Compact variant: minimal avatar display that expands on hover.
+	if ( variant === 'compact' ) {
+		// Get the last comment (most recent reply, or the thread itself if no replies).
+		const lastComment =
+			allReplies.length > 0
+				? allReplies[ allReplies.length - 1 ]
+				: thread;
+
+		// Format the time for display using human-readable relative time (e.g., "3 days ago").
+		const commentDate = lastComment?.date
+			? getDate( lastComment.date )
+			: null;
+		const formattedTime = commentDate ? humanTimeDiff( commentDate ) : '';
+
+		const handleClick = ( event ) => {
+			event.stopPropagation();
+			onExpand();
+		};
+
+		const handleKeyDown = ( event ) => {
+			if ( event.key === 'Enter' || event.key === ' ' ) {
+				event.preventDefault();
+				onExpand();
+			} else if ( onKeyDown ) {
+				// Handle arrow key navigation.
+				onKeyDown( event );
+			}
+		};
+
+		if ( ! lastComment?.author_avatar_urls ) {
+			return null;
+		}
+
+		return (
+			<div
+				className={ clsx(
+					'editor-collab-sidebar-panel__minified-indicator',
+					{
+						'is-expanded': isHovered,
+					}
+				) }
+				id={ `comment-thread-${ thread.id }` }
+				onClick={ handleClick }
+				onKeyDown={ handleKeyDown }
+				onMouseEnter={ () => setIsHovered( true ) }
+				onMouseLeave={ () => setIsHovered( false ) }
+				onFocus={ () => setIsHovered( true ) }
+				onBlur={ () => setIsHovered( false ) }
+				tabIndex={ 0 }
+				role="treeitem"
+				aria-label={ ariaLabel }
+				aria-expanded={ isHovered }
+				ref={ compactRefs?.setFloating }
+				style={ { top: compactY } }
+			>
+				<img
+					src={ lastComment?.author_avatar_urls?.[ 48 ] }
+					alt={ lastComment?.author_name }
+					className="editor-collab-sidebar-panel__minified-avatar"
+					style={ {
+						borderColor: getAvatarBorderColor(
+							lastComment?.author
+						),
+					} }
+				/>
+				{ isHovered && (
+					<>
+						<span className="editor-collab-sidebar-panel__minified-author-name">
+							{ lastComment?.author_name }
+						</span>
+						<span className="editor-collab-sidebar-panel__minified-time">
+							{ formattedTime }
+						</span>
+					</>
+				) }
+			</div>
+		);
+	}
 
 	if (
 		thread.id === 'new-note-thread' &&
