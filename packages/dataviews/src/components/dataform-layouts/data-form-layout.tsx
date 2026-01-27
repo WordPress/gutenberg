@@ -12,6 +12,7 @@ import type {
 	FormValidity,
 	NormalizedForm,
 	NormalizedFormField,
+	NormalizedLayout,
 } from '../../types';
 import { getFormFieldLayout } from './index';
 import DataFormContext from '../dataform-context';
@@ -21,6 +22,29 @@ const DEFAULT_WRAPPER = ( { children }: { children: React.ReactNode } ) => (
 		{ children }
 	</Stack>
 );
+
+const getWrapper = (
+	layout: NormalizedLayout,
+	form: NormalizedForm,
+	as?: React.ComponentType< { children: React.ReactNode } >
+) => {
+	if ( as !== undefined ) {
+		return as;
+	}
+
+	if ( layout.type !== undefined ) {
+		return getFormFieldLayout( layout.type )?.wrapper ?? DEFAULT_WRAPPER;
+	}
+
+	const firstField = form.fields[ 0 ];
+	if ( ! firstField ) {
+		return DEFAULT_WRAPPER;
+	}
+
+	return (
+		getFormFieldLayout( firstField.layout.type )?.wrapper ?? DEFAULT_WRAPPER
+	);
+};
 
 export function DataFormLayout< Item >( {
 	data,
@@ -55,10 +79,7 @@ export function DataFormLayout< Item >( {
 		);
 	}
 
-	const Wrapper =
-		as ??
-		getFormFieldLayout( form.layout.type )?.wrapper ??
-		DEFAULT_WRAPPER;
+	const Wrapper = getWrapper( form.layout, form, as );
 
 	return (
 		<Wrapper layout={ form.layout }>
