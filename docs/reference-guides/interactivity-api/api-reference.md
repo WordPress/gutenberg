@@ -351,7 +351,7 @@ The returned value is used to change the inner content of the element: `<div>val
 ### `wp-on`
 
 <div class="callout callout-info">
-  This directive runs asynchronously by default to improve performance. If you need synchronous access to the <code>event</code> object, consider implementing an <a href="#async-actions"><code>async action</code></a> which yields to the main thread after calling the synchronous API.
+  This directive runs asynchronously by default to improve performance. If you need synchronous access to the <code>event</code> object, use <a href="#withsyncevent"><code>withSyncEvent()</code></a> to wrap your action. For async actions that also need synchronous event access, you can combine <code>withSyncEvent()</code> with a <a href="#async-actions">generator function</a> that yields to the main thread after calling the synchronous API.
 </div>
 
 This directive runs code on dispatched DOM events like `click` or `keyup`. The syntax is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`).
@@ -384,7 +384,7 @@ The callback passed as the reference receives [the event](https://developer.mozi
 ### `wp-on-window`
 
 <div class="callout callout-info">
-  This directive runs asynchronously by default to improve performance. If you need synchronous access to the <code>event</code> object, consider implementing an <a href="#async-actions"><code>async action</code></a> which yields to the main thread after calling the synchronous API.
+  This directive runs asynchronously by default to improve performance. If you need synchronous access to the <code>event</code> object, use <a href="#withsyncevent"><code>withSyncEvent()</code></a> to wrap your action. For async actions that also need synchronous event access, you can combine <code>withSyncEvent()</code> with a <a href="#async-actions">generator function</a> that yields to the main thread after calling the synchronous API.
 </div>
 
 This directive allows you to attach global window events like `resize`, `copy`, and `focus` and then execute a defined callback when those happen.
@@ -417,7 +417,7 @@ The callback passed as the reference receives [the event](https://developer.mozi
 ### `wp-on-document`
 
 <div class="callout callout-info">
-  This directive runs asynchronously by default to improve performance. If you need synchronous access to the <code>event</code> object, consider implementing an <a href="#async-actions"><code>async action</code></a> which yields to the main thread after calling the synchronous API.
+  This directive runs asynchronously by default to improve performance. If you need synchronous access to the <code>event</code> object, use <a href="#withsyncevent"><code>withSyncEvent()</code></a> to wrap your action. For async actions that also need synchronous event access, you can combine <code>withSyncEvent()</code> with a <a href="#async-actions">generator function</a> that yields to the main thread after calling the synchronous API.
 </div>
 
 This directive allows you to attach global document events like `scroll`, `mousemove`, and `keydown` and then execute a defined callback when those happen.
@@ -1274,6 +1274,23 @@ store( 'myPlugin', {
 		logSomething: () => {
 			console.log( 'something' );
 		},
+	},
+} );
+```
+
+You can also use `withSyncEvent()` with generator functions (async actions). This is useful when you need both synchronous event access and asynchronous operations:
+
+```js
+import { store, withSyncEvent } from '@wordpress/interactivity';
+
+store( 'myPlugin', {
+	actions: {
+		// Combining withSyncEvent with a generator function for async operations.
+		navigate: withSyncEvent( function* ( event ) {
+			event.preventDefault();
+			const { actions } = yield import( '@wordpress/interactivity-router' );
+			yield actions.navigate( event.target.href );
+		} ),
 	},
 } );
 ```
