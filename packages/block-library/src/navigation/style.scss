@@ -13,6 +13,44 @@
 // Size of burger and close icons.
 $navigation-icon-size: 24px;
 
+// Mixin for positioning submenus to open leftward
+@mixin submenu-open-left {
+	left: auto;
+	right: 0;
+
+	// Nested submenus.
+	// On smaller breakpoints, nested menus open downwards.
+	.wp-block-navigation__submenu-container {
+		left: -1px; // Border width.
+		right: -1px;
+	}
+	@include break-medium {
+		.wp-block-navigation__submenu-container {
+			left: auto;
+			right: 100%;
+		}
+	}
+}
+
+// Mixin for positioning submenus to open rightward
+@mixin submenu-open-right {
+	left: 0;
+	right: auto;
+
+	// Nested submenus.
+	// On smaller breakpoints, nested menus open downwards.
+	.wp-block-navigation__submenu-container {
+		left: -1px; // Border width.
+		right: -1px;
+	}
+	@include break-medium {
+		.wp-block-navigation__submenu-container {
+			left: 100%;
+			right: auto;
+		}
+	}
+}
+
 .wp-block-navigation {
 	position: relative;
 
@@ -445,21 +483,7 @@ button.wp-block-navigation-item__content {
 .wp-block-navigation.items-justified-right .wp-block-navigation__container .has-child {
 	// First submenu.
 	.wp-block-navigation__submenu-container {
-		left: auto;
-		right: 0;
-
-		// Nested submenus.
-		// On smaller breakpoints, nested menus open downwards.
-		.wp-block-navigation__submenu-container {
-			left: -1px; // Border width.
-			right: -1px;
-		}
-		@include break-medium {
-			.wp-block-navigation__submenu-container {
-				left: auto;
-				right: 100%;
-			}
-		}
+		@include submenu-open-left;
 	}
 }
 
@@ -478,21 +502,7 @@ button.wp-block-navigation-item__content {
 
 	// First submenu.
 	> .wp-block-navigation__submenu-container {
-		left: auto;
-		right: 0;
-
-		// Nested submenus.
-		// On smaller breakpoints, nested menus open downwards.
-		.wp-block-navigation__submenu-container {
-			left: -1px; // Border width.
-			right: -1px;
-		}
-		@include break-medium {
-			.wp-block-navigation__submenu-container {
-				left: auto;
-				right: 100%;
-			}
-		}
+		@include submenu-open-left;
 	}
 }
 
@@ -511,21 +521,7 @@ button.wp-block-navigation-item__content {
 	// First submenu - force rightward opening.
 	// Repeat class name to increase specificity and override justification rules.
 	> .wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
-		left: 0;
-		right: auto;
-
-		// Nested submenus.
-		// On smaller breakpoints, nested menus open downwards.
-		.wp-block-navigation__submenu-container {
-			left: -1px; // Border width.
-			right: -1px;
-		}
-		@include break-medium {
-			.wp-block-navigation__submenu-container {
-				left: 100%;
-				right: auto;
-			}
-		}
+		@include submenu-open-right;
 	}
 }
 

@@ -272,13 +272,14 @@ const { state, actions } = store(
 				const parentRect = ref.getBoundingClientRect();
 				const viewportWidth = window.innerWidth;
 
-				// Estimate submenu width (minimum 200px as per CSS)
-				const submenuMinWidth = 200;
+				// Get actual submenu width, fallback to 200px minimum if not measurable
+				const submenuRect = submenuContainer.getBoundingClientRect();
+				const submenuWidth = submenuRect.width || 200;
 
 				// Check if opening in either direction would overflow
 				const wouldOverflowRight =
-					parentRect.right + submenuMinWidth > viewportWidth;
-				const wouldOverflowLeft = parentRect.left - submenuMinWidth < 0;
+					parentRect.right + submenuWidth > viewportWidth;
+				const wouldOverflowLeft = parentRect.left - submenuWidth < 0;
 
 				// Determine optimal positioning
 				if ( wouldOverflowRight && ! wouldOverflowLeft ) {
