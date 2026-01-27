@@ -29,6 +29,8 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		editorState: this.areEditorStatesEqual,
 	};
 
+	private hasSetup = false;
+
 	public constructor(
 		doc: Y.Doc,
 		private kind: string,
@@ -39,6 +41,10 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	}
 
 	public setUp(): void {
+		if ( this.hasSetup ) {
+			return;
+		}
+
 		super.setUp();
 
 		this.subscribeToUserSelectionChanges();

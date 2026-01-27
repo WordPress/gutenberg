@@ -133,7 +133,6 @@ export function createSyncManager(): SyncManager {
 
 		// If the sync config supports awareness, create it.
 		const awareness = syncConfig.createAwareness?.( ydoc, objectId );
-		awareness?.setUp();
 
 		// When the CRDT document is updated by an UndoManager or a connection (not
 		// a local origin), update the local store.

@@ -62,6 +62,8 @@ function usePostEditorAwarenessState(
 			return;
 		}
 
+		awareness.setUp();
+
 		// Initialize with current awareness state.
 		setState( getAwarenessState( awareness ) );
 
