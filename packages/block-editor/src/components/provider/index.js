@@ -36,7 +36,7 @@ let hasLoggedFallback = false;
  *
  * Returns true only if:
  * 1. The experimental media processing flag is enabled
- * 2. The browser supports WebAssembly, SharedArrayBuffer, and cross-origin isolation
+ * 2. The browser supports WebAssembly, SharedArrayBuffer, cross-origin isolation, and CSP allows blob workers
  *
  * @return {boolean} Whether client-side media processing should be enabled.
  */
