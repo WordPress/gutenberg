@@ -648,7 +648,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @param WP_Block_Type $block_type Block type to check for support.
 	 *
-	 * @return string|null The CSS selector or null if there is no support.
+	 * @return string|null The CSS selector. Null if there is no support or the $block_type is not a WP_Block_Type.
 	 */
 	private static function get_selector( $block_type ) {
 		if ( ! ( $block_type instanceof WP_Block_Type ) ) {
@@ -776,7 +776,7 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @since 6.3.0
 	 *
-	 * @return array An array of global styles presets, keyed on the filter ID.
+	 * @return array<string, array<string, string|string[]>> An array of global styles presets, keyed on the filter ID.
 	 */
 	private static function get_all_global_styles_presets() {
 		if ( isset( self::$global_styles_presets ) ) {
@@ -808,6 +808,7 @@ class WP_Duotone_Gutenberg {
 	 * @deprecated
 	 */
 	public static function set_global_styles_presets() {
+		_deprecated_function( __METHOD__, 'Gutenberg 22.5.0' );
 		self::get_all_global_styles_presets();
 	}
 
@@ -868,6 +869,7 @@ class WP_Duotone_Gutenberg {
 	 * @deprecated
 	 */
 	public static function set_global_style_block_names() {
+		_deprecated_function( __METHOD__, 'Gutenberg 22.5.0' );
 		self::get_all_global_style_block_names();
 	}
 
