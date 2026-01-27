@@ -47,7 +47,7 @@ export default function PublishControls( {
 					accessibleWhenDisabled
 					__next40pxDefaultSize
 				>
-					{ isSaving ? __( 'Saving…' ) : __( 'Save' ) }
+					{ isSaving ? __( 'Updating…' ) : __( 'Update' ) }
 				</Button>
 			</div>
 		);
