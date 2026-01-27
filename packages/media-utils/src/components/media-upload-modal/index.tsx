@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { useState, useCallback, useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	privateApis as coreDataPrivateApis,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { resolveSelect } from '@wordpress/data';
+import { resolveSelect, useDispatch } from '@wordpress/data';
 import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
@@ -26,6 +26,8 @@ import {
 	mediaThumbnailField,
 	mimeTypeField,
 } from '@wordpress/media-fields';
+import { store as noticesStore } from '@wordpress/notices';
+import { isBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -160,6 +162,11 @@ export function MediaUploadModal( {
 			? value.map( String )
 			: [ String( value ) ];
 	} );
+
+	const { createSuccessNotice, createErrorNotice, createInfoNotice } =
+		useDispatch( noticesStore );
+	// @ts-expect-error - invalidateResolution is not in the typed actions but is available at runtime
+	const { invalidateResolution } = useDispatch( coreStore );
 
 	// DataViews configuration - allow view updates
 	const [ view, setView ] = useState< View >( () => ( {
@@ -317,13 +324,82 @@ export function MediaUploadModal( {
 			const files = event.target.files;
 			if ( files && files.length > 0 ) {
 				const filesArray = Array.from( files );
+
+				// Show upload start notice
+				if ( filesArray.length === 1 ) {
+					createInfoNotice(
+						sprintf(
+							// translators: %s: file name
+							__( 'Uploading %s' ),
+							filesArray[ 0 ].name
+						),
+						{ type: 'snackbar' }
+					);
+				} else {
+					createInfoNotice(
+						sprintf(
+							// translators: %d: number of files
+							__( 'Uploading %d files' ),
+							filesArray.length
+						),
+						{ type: 'snackbar' }
+					);
+				}
+
 				handleUpload( {
 					allowedTypes,
 					filesList: filesArray,
+					onFileChange: ( attachments ) => {
+						// Check if all uploads are complete (no blob URLs)
+						const allComplete = attachments.every(
+							( attachment ) =>
+								attachment.id &&
+								attachment.url &&
+								! isBlobURL( attachment.url )
+						);
+
+						if ( allComplete && attachments.length > 0 ) {
+							// Show success notice
+							if ( attachments.length === 1 ) {
+								createSuccessNotice( __( 'Upload complete' ), {
+									type: 'snackbar',
+								} );
+							} else {
+								createSuccessNotice(
+									sprintf(
+										// translators: %d: number of files
+										__( '%d files uploaded successfully' ),
+										attachments.length
+									),
+									{ type: 'snackbar' }
+								);
+							}
+
+							// Invalidate the entity records resolution to refresh the view
+							invalidateResolution( 'getEntityRecords', [
+								'postType',
+								'attachment',
+								queryArgs,
+							] );
+						}
+					},
+					onError: ( error ) => {
+						createErrorNotice( error.message, {
+							type: 'snackbar',
+						} );
+					},
 				} );
 			}
 		},
-		[ allowedTypes, handleUpload ]
+		[
+			allowedTypes,
+			handleUpload,
+			createInfoNotice,
+			createSuccessNotice,
+			createErrorNotice,
+			invalidateResolution,
+			queryArgs,
+		]
 	);
 
 	const paginationInfo = useMemo(
@@ -410,9 +486,74 @@ export function MediaUploadModal( {
 						);
 					}
 					if ( filteredFiles.length > 0 ) {
+						// Show upload start notice
+						if ( filteredFiles.length === 1 ) {
+							createInfoNotice(
+								sprintf(
+									// translators: %s: file name
+									__( 'Uploading %s' ),
+									filteredFiles[ 0 ].name
+								),
+								{ type: 'snackbar' }
+							);
+						} else {
+							createInfoNotice(
+								sprintf(
+									// translators: %d: number of files
+									__( 'Uploading %d files' ),
+									filteredFiles.length
+								),
+								{ type: 'snackbar' }
+							);
+						}
+
 						handleUpload( {
 							allowedTypes,
 							filesList: filteredFiles,
+							onFileChange: ( attachments ) => {
+								// Check if all uploads are complete (no blob URLs)
+								const allComplete = attachments.every(
+									( attachment ) =>
+										attachment.id &&
+										attachment.url &&
+										! isBlobURL( attachment.url )
+								);
+
+								if ( allComplete && attachments.length > 0 ) {
+									// Show success notice
+									if ( attachments.length === 1 ) {
+										createSuccessNotice(
+											__( 'Upload complete' ),
+											{
+												type: 'snackbar',
+											}
+										);
+									} else {
+										createSuccessNotice(
+											sprintf(
+												// translators: %d: number of files
+												__(
+													'%d files uploaded successfully'
+												),
+												attachments.length
+											),
+											{ type: 'snackbar' }
+										);
+									}
+
+									// Invalidate the entity records resolution to refresh the view
+									invalidateResolution( 'getEntityRecords', [
+										'postType',
+										'attachment',
+										queryArgs,
+									] );
+								}
+							},
+							onError: ( error ) => {
+								createErrorNotice( error.message, {
+									type: 'snackbar',
+								} );
+							},
 						} );
 					}
 				} }
