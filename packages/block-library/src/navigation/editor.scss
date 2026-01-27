@@ -720,7 +720,11 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	margin-bottom: $grid-unit-10;
 }
 
-.wp-block-navigation__overlay-help-text {
+.wp-block-navigation__overlay-selector .wp-block-navigation__overlay-help-text-wrapper {
+	margin-top: $grid-unit-10;
+}
+
+.wp-block-navigation__overlay-selector .wp-block-navigation__overlay-help-text {
 	margin-bottom: 0;
 	color: $gray-700;
 	font-size: 13px;

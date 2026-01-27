@@ -254,11 +254,6 @@ export default function OverlayTemplatePartSelector( {
 					>
 						{ __( 'Create overlay' ) }
 					</Button>
-					<p className="wp-block-navigation__overlay-help-text">
-						{ __(
-							'An overlay template allows you to customize the appearance of the dialog that opens when the menu button is pressed.'
-						) }
-					</p>
 				</>
 			) : (
 				<>
@@ -312,6 +307,16 @@ export default function OverlayTemplatePartSelector( {
 					) }
 				</>
 			) }
+			<HStack
+				alignment="flex-start"
+				className="wp-block-navigation__overlay-help-text-wrapper"
+			>
+				<p className="wp-block-navigation__overlay-help-text">
+					{ __(
+						'An overlay template allows you to customize the appearance of the dialog that opens when the menu button is pressed.'
+					) }
+				</p>
+			</HStack>
 		</div>
 	);
 }
