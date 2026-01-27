@@ -759,17 +759,17 @@ Let's consider a quiz that has multiple questions. Each question is a separate p
 ```javascript
 import { store, getServerState, withSyncEvent } from '@wordpress/interactivity';
 
-store( 'myPlugin', {
+const { state } = store( 'myPlugin', {
 	actions: {
 		// This action would be triggered by a directive, like:
-		// <button data-wp-on-click="actions.nextQuestion">Next Question</button>
-		*nextQuestion() {
-			withSyncEvent( () => event.preventDefault( event ) );
+		// <button data-wp-on--click="actions.nextQuestion">Next Question</button>
+		nextQuestion: withSyncEvent( function* ( event ) {
+			event.preventDefault();
 			const { actions } = yield import(
 				'@wordpress/interactivity-router'
 			);
 			actions.navigate( '/question-2' );
-		},
+		} ),
 	},
 	callbacks: {
 		// This callback would be triggered by a directive, like:
@@ -785,7 +785,7 @@ store( 'myPlugin', {
 } );
 ```
 
-_Please note that, when working with synchronous events in the Interactivity API, `withSyncEvent` is used to handle the event properly and prevent potential issues with event propagation and timing._
+_Note: Actions that need to call synchronous event methods like `event.preventDefault()` must wrap the handler with `withSyncEvent()`. See the [withSyncEvent() documentation](/docs/reference-guides/interactivity-api/api-reference.md#withsyncevent) for details._
 
 ### `getServerContext()`
 
@@ -802,19 +802,19 @@ Consider a quiz that has multiple questions. Each question is a separate page. W
 ```
 
 ```javascript
-import { store, getServerContext, withSyncEvent } from '@wordpress/interactivity';
+import { store, getContext, getServerContext, withSyncEvent } from '@wordpress/interactivity';
 
 store( 'myPlugin', {
 	actions: {
 		// This action would be triggered by a directive, like:
-		// <button data-wp-on-click="actions.nextQuestion">Next Question</button>
-		*nextQuestion() {
-			withSyncEvent( () => event.preventDefault( event ) );
+		// <button data-wp-on--click="actions.nextQuestion">Next Question</button>
+		nextQuestion: withSyncEvent( function* ( event ) {
+			event.preventDefault();
 			const { actions } = yield import(
 				'@wordpress/interactivity-router'
 			);
 			actions.navigate( '/question-2' );
-		},
+		} ),
 	},
 	callbacks: {
 		// This callback would be triggered by a directive, like:
