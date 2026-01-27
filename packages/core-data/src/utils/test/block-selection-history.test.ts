@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -12,7 +11,7 @@ import {
 	type YRelativeSelection,
 	type BlockSelectionHistory,
 } from '../block-selection-history';
-import { CRDT_RECORD_MAP_KEY } from '../../sync';
+import { type CRDTDoc, CRDT_RECORD_MAP_KEY, Y, type YType } from '../../sync';
 import type { WPSelection } from '../../types';
 
 /**
@@ -80,7 +79,7 @@ function createSelection(
 
 describe( 'BlockSelectionHistory', () => {
 	let history: BlockSelectionHistory;
-	let ydoc: Y.Doc;
+	let ydoc: CRDTDoc;
 
 	beforeEach( () => {
 		ydoc = createTestDoc();
@@ -459,9 +458,9 @@ describe( 'BlockSelectionHistory', () => {
 			const startPosition = fullSelection.start as YRelativeSelection;
 			// Get the Y.Text and insert text before the position
 			const documentMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
-			const blocks = documentMap.get( 'blocks' ) as Y.Array< any >;
-			const block1 = blocks.get( 0 ) as Y.Map< any >;
-			const attrs = block1.get( 'attributes' ) as Y.Map< Y.Text >;
+			const blocks = documentMap.get( 'blocks' ) as YType.Array< any >;
+			const block1 = blocks.get( 0 ) as YType.Map< any >;
+			const attrs = block1.get( 'attributes' ) as YType.Map< YType.Text >;
 			const ytext = attrs.get( 'content' );
 			if ( ! ytext ) {
 				throw new Error( 'Y.Text not found' );
@@ -497,9 +496,9 @@ describe( 'BlockSelectionHistory', () => {
 			const startPosition = fullSelection.start as YRelativeSelection;
 			// Delete text before the position
 			const documentMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
-			const blocks = documentMap.get( 'blocks' ) as Y.Array< any >;
-			const block1 = blocks.get( 0 ) as Y.Map< any >;
-			const attrs = block1.get( 'attributes' ) as Y.Map< Y.Text >;
+			const blocks = documentMap.get( 'blocks' ) as YType.Array< any >;
+			const block1 = blocks.get( 0 ) as YType.Map< any >;
+			const attrs = block1.get( 'attributes' ) as YType.Map< YType.Text >;
 			const ytext = attrs.get( 'content' );
 			if ( ! ytext ) {
 				throw new Error( 'Y.Text not found' );

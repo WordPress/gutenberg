@@ -5,19 +5,20 @@ import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,
 	LOCAL_EDITOR_ORIGIN,
-	LOCAL_SYNC_MANAGER_ORIGIN,
+	privateApis as syncPrivateApis,
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 	type SyncManager,
-	createSyncManager,
+	type SyncPrivateApis,
+	type Y as YType,
 } from '@wordpress/sync';
 
-export {
-	CRDT_DOC_META_PERSISTENCE_KEY,
-	CRDT_RECORD_MAP_KEY,
-	LOCAL_EDITOR_ORIGIN,
-	LOCAL_SYNC_MANAGER_ORIGIN,
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-};
+/**
+ * Internal dependencies
+ */
+import { unlock } from './lock-unlock';
+
+const { AwarenessState, Delta, Y, createSyncManager } =
+	unlock< SyncPrivateApis >( syncPrivateApis );
 
 let syncManager: SyncManager;
 
@@ -30,3 +31,16 @@ export function getSyncManager(): SyncManager | undefined {
 
 	return syncManager;
 }
+
+export type * from '@wordpress/sync';
+
+export {
+	AwarenessState,
+	CRDT_DOC_META_PERSISTENCE_KEY,
+	CRDT_RECORD_MAP_KEY,
+	Delta,
+	LOCAL_EDITOR_ORIGIN,
+	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	Y,
+	type YType,
+};

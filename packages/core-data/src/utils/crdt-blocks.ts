@@ -10,12 +10,12 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 // @ts-expect-error No exported types.
 import { getBlockTypes } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
-import { Y, Delta } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
 import { createYMap, type YMapRecord, type YMapWrap } from './crdt-utils';
+import { Delta, Y, type YType } from '../sync';
 
 interface BlockAttributes {
 	[ key: string ]: unknown;
@@ -48,11 +48,11 @@ interface YBlockRecord extends YMapRecord {
 }
 
 export type YBlock = YMapWrap< YBlockRecord >;
-export type YBlocks = Y.Array< YBlock >;
+export type YBlocks = YType.Array< YBlock >;
 
 // Block attribute schema cannot be known at compile time, so we use Y.Map.
 // Attribute values will be typed as the union of `Y.Text` and `unknown`.
-export type YBlockAttributes = Y.Map< Y.Text | unknown >;
+export type YBlockAttributes = YType.Map< YType.Text | unknown >;
 
 const serializableBlocksCache = new WeakMap< WeakKey, Block[] >();
 
@@ -82,8 +82,8 @@ function makeBlocksSerializable( blocks: Block[] ): Block[] {
 }
 
 /**
- * @param {any}   gblock
- * @param {Y.Map} yblock
+ * @param {any}    gblock
+ * @param {YBlock} yblock
  */
 function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 	const yblockAsJson = yblock.toJSON();
@@ -133,7 +133,7 @@ function createNewYAttributeValue(
 	blockName: string,
 	attributeName: string,
 	attributeValue: unknown
-): Y.Text | unknown {
+): YType.Text | unknown {
 	const isRichText = isRichTextAttribute( blockName, attributeName );
 
 	if ( isRichText ) {
@@ -462,7 +462,7 @@ function isRichTextAttribute(
 	);
 }
 
-let localDoc: Y.Doc;
+let localDoc: YType.Doc;
 
 /**
  * Given a Y.Text object and an updated string value, diff the new value and
@@ -473,7 +473,7 @@ let localDoc: Y.Doc;
  * @param cursorPosition The position of the cursor after the change occurs.
  */
 function mergeRichTextUpdate(
-	blockYText: Y.Text,
+	blockYText: YType.Text,
 	updatedValue: string,
 	cursorPosition: number | null
 ): void {

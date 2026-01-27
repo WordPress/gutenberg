@@ -1,11 +1,6 @@
 /**
  * WordPress dependencies
  */
-import {
-	CRDT_RECORD_MAP_KEY,
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-	Y,
-} from '@wordpress/sync';
 
 /**
  * External dependencies
@@ -24,9 +19,15 @@ import {
 import type { YBlock, YBlocks } from '../crdt-blocks';
 import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
 import type { Post, Type } from '../../entity-types';
+import {
+	type CRDTDoc,
+	CRDT_RECORD_MAP_KEY,
+	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+	Y,
+} from '../../sync';
 
 describe( 'crdt', () => {
-	let doc: Y.Doc;
+	let doc: CRDTDoc;
 
 	beforeEach( () => {
 		doc = new Y.Doc();

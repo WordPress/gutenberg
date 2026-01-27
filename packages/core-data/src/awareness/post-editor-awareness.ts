@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { dispatch, select, subscribe } from '@wordpress/data';
-import type { Y } from '@wordpress/sync';
 // @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -20,6 +19,7 @@ import {
 	getSelectionState,
 } from '../utils/crdt-user-selections';
 
+import type { CRDTDoc } from '../sync';
 import type { WPBlockSelection } from '../types';
 import type { EditorState, PostEditorState } from './types';
 
@@ -30,7 +30,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	};
 
 	public constructor(
-		doc: Y.Doc,
+		doc: CRDTDoc,
 		private kind: string,
 		private name: string,
 		private postId: number

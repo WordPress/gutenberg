@@ -1,15 +1,16 @@
 /**
  * External dependencies
  */
+
 /**
  * WordPress dependencies
  */
-import { Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
 import { findBlockByClientIdInDoc } from './crdt-utils';
+import { Y, type YType } from '../sync';
 import type { WPBlockSelection, WPSelection } from '../types';
 
 // Default size for selection history (not including current selection)
@@ -23,7 +24,7 @@ export enum YSelectionType {
 export interface YRelativeSelection {
 	type: YSelectionType.RelativeSelection;
 	attributeKey: string;
-	relativePosition: Y.RelativePosition;
+	relativePosition: YType.RelativePosition;
 	clientId: string;
 	offset: number;
 }
@@ -60,7 +61,7 @@ export interface BlockSelectionHistory {
  * @param historySize
  */
 export function createBlockSelectionHistory(
-	ydoc: Y.Doc,
+	ydoc: YType.Doc,
 	historySize: number = SELECTION_HISTORY_DEFAULT_SIZE
 ): BlockSelectionHistory {
 	let history: YFullSelection[] = [];
@@ -136,7 +137,7 @@ export function createBlockSelectionHistory(
  */
 function convertWPBlockSelectionToSelection(
 	selection: WPBlockSelection,
-	ydoc: Y.Doc
+	ydoc: YType.Doc
 ): YSelection {
 	const clientId = selection.clientId;
 	const block = findBlockByClientIdInDoc( clientId, ydoc );

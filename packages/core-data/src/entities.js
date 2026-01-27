@@ -355,15 +355,15 @@ async function loadPostTypeEntities() {
 
 		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 			/**
-			 * @type {import('@wordpress/sync').SyncConfig}
+			 * @type {import('../sync').SyncConfig}
 			 */
 			entity.syncConfig = {
 				/**
 				 * Apply changes from the local editor to the local CRDT document so
 				 * that those changes can be synced to other peers (via the provider).
 				 *
-				 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
-				 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
+				 * @param {import('../sync').CRDTDoc}               crdtDoc
+				 * @param {Partial< import('../sync').ObjectData >} changes
 				 * @return {void}
 				 */
 				applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
@@ -372,9 +372,9 @@ async function loadPostTypeEntities() {
 				/**
 				 * Create the awareness instance for the entity's CRDT document.
 				 *
-				 * @param {import('@wordpress/sync').CRDTDoc}  ydoc
-				 * @param {import('@wordpress/sync').ObjectID} objectId
-				 * @return {import('@wordpress/sync').AwarenessState} AwarenessState instance
+				 * @param {import('../sync').CRDTDoc}  ydoc
+				 * @param {import('../sync').ObjectID} objectId
+				 * @return {import('../sync').AwarenessState} AwarenessState instance
 				 */
 				createAwareness: ( ydoc, objectId ) => {
 					const kind = 'postType';
@@ -386,9 +386,9 @@ async function loadPostTypeEntities() {
 				 * Extract changes from a CRDT document that can be used to update the
 				 * local editor state.
 				 *
-				 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
-				 * @param {import('@wordpress/sync').ObjectData} editedRecord
-				 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+				 * @param {import('../sync').CRDTDoc}    crdtDoc
+				 * @param {import('../sync').ObjectData} editedRecord
+				 * @return {Partial< import('../sync').ObjectData >} Changes to record
 				 */
 				getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
 					getPostChangesFromCRDTDoc(
