@@ -5,6 +5,8 @@
 ### Enhancements
 
 - DataViews: Add card form layout validation. [#74547](https://github.com/WordPress/gutenberg/pull/74547)
+- DataForm: Refactor wrapper selection logic with improved fallback behavior. [#74978](https://github.com/WordPress/gutenberg/pull/74978)
+
 
 ### Bug Fixes
 
