@@ -119,7 +119,7 @@ export default defineConfig( {
 				{
 					name: 'BorderWidthSize',
 					description: 'Size scale for border width tokens.',
-					patterns: [ /^wpds-border\.width\.(xs|sm|md|lg)$/ ],
+					patterns: [ /^wpds-border\.width\.([^.]+)$/ ],
 				},
 				{
 					name: 'Target',
