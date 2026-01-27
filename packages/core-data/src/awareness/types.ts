@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import type { EnhancedState } from '../sync';
 import type { SelectionState } from '../types';
 import type { User } from '../entity-types';
 
@@ -36,3 +37,9 @@ export interface EditorState {
 export interface PostEditorState extends BaseState {
 	editorState?: EditorState;
 }
+
+/**
+ * An enhanced post editor awareness state includes additional metadata about
+ * the user and their connection.
+ */
+export type PostEditorAwarenessState = EnhancedState< PostEditorState >;

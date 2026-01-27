@@ -2,23 +2,22 @@
  * External dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
-import { type EnhancedState, Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
 import { getSyncManager } from '../sync';
-import type { PostEditorState } from '../awareness/types';
+import type { PostEditorAwarenessState as ActiveUser } from '../awareness/types';
 import type { SelectionCursor } from '../types';
 import type { PostEditorAwareness } from '../awareness/post-editor-awareness';
 
-interface PostEditorAwarenessState {
-	activeUsers: EnhancedState< PostEditorState >[];
+interface AwarenessState {
+	activeUsers: ActiveUser[];
 	getAbsolutePositionIndex: ( selection: SelectionCursor ) => number | null;
 	isCurrentUserDisconnected: boolean;
 }
 
-const defaultState: PostEditorAwarenessState = {
+const defaultState: AwarenessState = {
 	activeUsers: [],
 	getAbsolutePositionIndex: () => null,
 	isCurrentUserDisconnected: false,
@@ -27,32 +26,37 @@ const defaultState: PostEditorAwarenessState = {
 function usePostEditorAwarenessState(
 	postId: number | null,
 	postType: string | null
-): PostEditorAwarenessState {
-	const [ state, setState ] =
-		useState< PostEditorAwarenessState >( defaultState );
+): AwarenessState {
+	const [ state, setState ] = useState< AwarenessState >( defaultState );
 
 	useEffect( () => {
 		if ( null === postId || null === postType ) {
 			return;
 		}
 
-		// TODO: Not the biggest fan of hardcoding the object type here like this.
-		const awareness = getSyncManager()?.getAwareness(
-			`postType/${ postType }`,
-			postId.toString()
-		) as unknown as PostEditorAwareness | undefined;
+		// Compute object type and ID from post type and ID.
+		const objectType = `postType/${ postType }`;
+		const objectId = postId.toString();
+
+		const awareness = getSyncManager()?.getAwareness< PostEditorAwareness >(
+			objectType,
+			objectId
+		);
+
+		if ( ! awareness ) {
+			setState( defaultState );
+			return;
+		}
+
 		const unsubscribe = awareness?.onStateChange(
-			( newState: EnhancedState< PostEditorState >[] ) => {
+			( activeUsers: ActiveUser[] ) => {
 				setState( {
-					activeUsers: newState,
+					activeUsers,
 					getAbsolutePositionIndex: ( selection: SelectionCursor ) =>
-						Y.createAbsolutePositionFromRelativePosition(
-							selection.cursorPosition.relativePosition,
-							awareness.doc
-						)?.index ?? null,
+						awareness.getAbsolutePositionIndex( selection ),
 					isCurrentUserDisconnected:
-						newState.find( ( user ) => user.isMe )?.isConnected ===
-						false,
+						activeUsers.find( ( user ) => user.isMe )
+							?.isConnected === false,
 				} );
 			}
 		);
@@ -66,7 +70,7 @@ function usePostEditorAwarenessState(
 export function useActiveUsers(
 	postId: number | null,
 	postType: string | null
-): EnhancedState< PostEditorState >[] {
+): ActiveUser[] {
 	return usePostEditorAwarenessState( postId, postType ).activeUsers;
 }
 

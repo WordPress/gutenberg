@@ -1,4 +1,5 @@
 import type { Y } from '@wordpress/sync';
+
 export interface AnyFunction {
 	( ...args: any[] ): any;
 }

@@ -344,10 +344,10 @@ export function createSyncManager(): SyncManager {
 	 * @param {ObjectID}   objectId   Object ID.
 	 * @return {AwarenessState | undefined} The awareness instance, or undefined if not supported.
 	 */
-	function getAwareness(
+	function getAwareness< State extends AwarenessState >(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): AwarenessState | undefined {
+	): State | undefined {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
@@ -355,7 +355,7 @@ export function createSyncManager(): SyncManager {
 			return undefined;
 		}
 
-		return entityState.awareness;
+		return entityState.awareness as State;
 	}
 
 	/**

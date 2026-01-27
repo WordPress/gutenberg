@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { dispatch, select, subscribe } from '@wordpress/data';
-import type { Y } from '@wordpress/sync';
 // @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -15,12 +14,13 @@ import {
 	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
 } from './config';
 import { STORE_NAME as coreStore } from '../name';
+import { type CRDTDoc, Y } from '../sync';
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,
 } from '../utils/crdt-user-selections';
 
-import type { WPBlockSelection } from '../types';
+import type { SelectionCursor, WPBlockSelection } from '../types';
 import type { EditorState, PostEditorState } from './types';
 
 export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
@@ -30,7 +30,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	};
 
 	public constructor(
-		doc: Y.Doc,
+		doc: CRDTDoc,
 		private kind: string,
 		private name: string,
 		private postId: number
@@ -163,5 +163,22 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		}
 
 		return areSelectionsStatesEqual( state1.selection, state2.selection );
+	}
+
+	/**
+	 * Get the absolute position index from a selection cursor.
+	 *
+	 * @param selection - The selection cursor.
+	 * @return The absolute position index, or null if not found.
+	 */
+	public getAbsolutePositionIndex(
+		selection: SelectionCursor
+	): number | null {
+		return (
+			Y.createAbsolutePositionFromRelativePosition(
+				selection.cursorPosition.relativePosition,
+				this.doc
+			)?.index ?? null
+		);
 	}
 }

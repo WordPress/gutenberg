@@ -18,7 +18,7 @@ export abstract class BaseAwarenessState<
 	public setUp(): void {
 		super.setUp();
 
-		this.setCurrentUserInfo();
+		void this.setCurrentUserInfo();
 	}
 
 	/**
