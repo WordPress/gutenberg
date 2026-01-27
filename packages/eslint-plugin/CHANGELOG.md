@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The `dependency-group` rule now accepts an optional `"never"` mode to forbid dependency group comments.
+
 ## 24.0.0 (2026-01-16)
 
 ### Breaking Changes
