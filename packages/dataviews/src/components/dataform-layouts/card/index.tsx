@@ -35,6 +35,7 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import { getSummaryFields } from '../get-summary-fields';
+import useReportValidity from '../../../hooks/use-report-validity';
 
 function countInvalidFields( validity: FieldValidity | undefined ): number {
 	if ( ! validity ) {
@@ -235,18 +236,7 @@ export default function FormCardField< Item >( {
 
 	// When the card is expanded after being touched (collapsed with errors),
 	// trigger reportValidity to show field-level errors.
-	useEffect( () => {
-		if ( isOpen && touched && cardBodyRef.current ) {
-			// Trigger reportValidity on each input within the card to fire the
-			// 'invalid' event, which makes validated controls show errors.
-			const inputs = cardBodyRef.current.querySelectorAll(
-				'input, textarea, select, fieldset'
-			);
-			inputs.forEach( ( input ) => {
-				( input as HTMLInputElement ).reportValidity();
-			} );
-		}
-	}, [ isOpen, touched ] );
+	useReportValidity( cardBodyRef, isOpen && touched );
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
 

@@ -8,7 +8,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
@@ -26,6 +26,7 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
+import useReportValidity from '../../../hooks/use-report-validity';
 
 function DropdownHeader( {
 	title,
@@ -68,18 +69,7 @@ function DropdownContentWithValidation( {
 	children: React.ReactNode;
 } ) {
 	const ref = useRef< HTMLDivElement >( null );
-
-	useEffect( () => {
-		if ( touched && ref.current ) {
-			const inputs = ref.current.querySelectorAll(
-				'input, textarea, select, fieldset'
-			);
-			inputs.forEach( ( input ) => {
-				( input as HTMLInputElement ).reportValidity();
-			} );
-		}
-	}, [ touched ] );
-
+	useReportValidity( ref, touched );
 	return <div ref={ ref }>{ children }</div>;
 }
 

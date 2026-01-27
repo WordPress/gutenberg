@@ -12,13 +12,7 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import {
-	useContext,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from '@wordpress/element';
+import { useContext, useMemo, useRef, useState } from '@wordpress/element';
 import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
 
@@ -35,6 +29,7 @@ import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useFormValidity from '../../../hooks/use-form-validity';
+import useReportValidity from '../../../hooks/use-report-validity';
 import DataFormContext from '../../dataform-context';
 
 function ModalContent< Item >( {
@@ -105,16 +100,7 @@ function ModalContent< Item >( {
 
 	// When the modal is opened after being previously closed (touched),
 	// trigger reportValidity to show field-level errors.
-	useEffect( () => {
-		if ( touched && contentRef.current ) {
-			const inputs = contentRef.current.querySelectorAll(
-				'input, textarea, select, fieldset'
-			);
-			inputs.forEach( ( input ) => {
-				( input as HTMLInputElement ).reportValidity();
-			} );
-		}
-	}, [ touched ] );
+	useReportValidity( contentRef, touched );
 
 	return (
 		<Modal
