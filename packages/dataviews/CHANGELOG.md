@@ -8,6 +8,7 @@
 
 - DataViews: Add card form layout validation. [#74547](https://github.com/WordPress/gutenberg/pull/74547)
 - DataViews: Show validation errors when a panel closes. [#74995](https://github.com/WordPress/gutenberg/pull/74995)
+- DataViews: Add details form layout validation.
 
 ### Bug Fixes
 
