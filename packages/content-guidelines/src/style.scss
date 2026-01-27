@@ -186,10 +186,25 @@
 		margin: 0;
 	}
 
-	&__list {
-		list-style: none;
-		margin: 0;
-		padding: 0;
+	&__table {
+		width: 100%;
+		border-collapse: collapse;
+		font-size: 13px;
+
+		td {
+			padding: 8px 8px 8px 0;
+			border-bottom: 1px solid #f0f0f0;
+			vertical-align: middle;
+
+			&:last-child {
+				padding-right: 0;
+				text-align: right;
+			}
+		}
+
+		tr:last-child td {
+			border-bottom: none;
+		}
 	}
 
 	&__pagination {
@@ -200,24 +215,12 @@
 }
 
 .revision-item {
-	display: flex;
-	align-items: center;
-	padding: 8px 0;
-	border-bottom: 1px solid #f0f0f0;
-	gap: 16px;
-	font-size: 13px;
-
-	&:last-child {
-		border-bottom: none;
-	}
-
 	&__number {
 		font-weight: 600;
-		min-width: 60px;
+		white-space: nowrap;
 	}
 
 	&__date {
-		flex: 1;
 		color: #646970;
 	}
 
@@ -225,9 +228,8 @@
 		color: #2271b1;
 	}
 
-	&__restore {
-		flex-shrink: 0;
-		margin-left: auto;
+	&__action {
+		color: #646970;
 	}
 }
 

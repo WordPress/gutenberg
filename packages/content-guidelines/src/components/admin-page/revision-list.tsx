@@ -43,15 +43,20 @@ export default function RevisionList( {
 		error,
 		currentPage,
 		totalPages,
+		totalItems,
+		perPage,
 	} = useSelect( ( select ) => {
 		const selectors = select( store );
+		const pagination = selectors.getRevisionPagination();
 		return {
 			revisions: selectors.getRevisions(),
 			isLoading: selectors.isLoadingRevisions(),
 			restoringId: selectors.getRestoringRevisionId(),
 			error: selectors.getError(),
-			currentPage: selectors.getRevisionCurrentPage(),
-			totalPages: selectors.getRevisionTotalPages(),
+			currentPage: pagination.currentPage,
+			totalPages: pagination.totalPages,
+			totalItems: pagination.totalItems,
+			perPage: pagination.perPage,
 		};
 	}, [] );
 
@@ -121,44 +126,54 @@ export default function RevisionList( {
 
 	const dateFormat = getSettings().formats.datetime;
 
+	const isCurrent = ( index: number ) => currentPage === 1 && index === 0;
+
+	// Calculate revision number based on pagination
+	const getRevisionNumber = ( index: number ) => {
+		const offset = ( currentPage - 1 ) * perPage;
+		return totalItems - offset - index;
+	};
+
 	return (
 		<div className="content-guidelines-revisions">
 			<h3>{ __( 'Revision History' ) }</h3>
-			<ul className="content-guidelines-revisions__list">
-				{ revisions.map( ( revision, index ) => (
-					<li key={ revision.id } className="revision-item">
-						<span className="revision-item__number">
-							{ currentPage === 1 && index === 0
-								? __( 'Current' )
-								: `#${ revisions.length - index }` }
-						</span>
-						<span className="revision-item__date">
-							{ dateI18n( dateFormat, revision.date ) }
-						</span>
-						<span className="revision-item__author">
-							{ revision.author_name || __( 'Unknown' ) }
-						</span>
-						{ ! ( currentPage === 1 && index === 0 ) &&
-							onRestore && (
-								<Button
-									variant="tertiary"
-									size="small"
-									className="revision-item__restore"
-									onClick={ () =>
-										handleRestore( revision.id )
-									}
-									isBusy={ restoringId === revision.id }
-									disabled={ restoringId !== null }
-									accessibleWhenDisabled
-								>
-									{ restoringId === revision.id
-										? __( 'Restoring…' )
-										: __( 'Restore' ) }
-								</Button>
-							) }
-					</li>
-				) ) }
-			</ul>
+			<table className="content-guidelines-revisions__table">
+				<tbody>
+					{ revisions.map( ( revision, index ) => (
+						<tr key={ revision.id }>
+							<td className="revision-item__number">
+								{ isCurrent( index )
+									? __( 'Current' )
+									: `#${ getRevisionNumber( index ) }` }
+							</td>
+							<td className="revision-item__date">
+								{ dateI18n( dateFormat, revision.date ) }
+							</td>
+							<td className="revision-item__author">
+								{ revision.author_name || __( 'Unknown' ) }
+							</td>
+							<td className="revision-item__action">
+								{ ! isCurrent( index ) && onRestore && (
+									<Button
+										variant="tertiary"
+										size="small"
+										onClick={ () =>
+											handleRestore( revision.id )
+										}
+										isBusy={ restoringId === revision.id }
+										disabled={ restoringId !== null }
+										accessibleWhenDisabled
+									>
+										{ restoringId === revision.id
+											? __( 'Restoring…' )
+											: __( 'Restore' ) }
+									</Button>
+								) }
+							</td>
+						</tr>
+					) ) }
+				</tbody>
+			</table>
 			{ totalPages > 1 && (
 				<div className="content-guidelines-revisions__pagination">
 					<HStack spacing={ 2 } justify="center">
