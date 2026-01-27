@@ -278,7 +278,10 @@ export default function OverlayTemplatePartSelector( {
 						showTooltip
 						className="wp-block-navigation__overlay-create-button"
 					/>
-					<HStack alignment="flex-start">
+					<HStack
+						alignment="flex-start"
+						className="wp-block-navigation__overlay-selector-controls"
+					>
 						<FlexBlock>
 							<SelectControl
 								__next40pxDefaultSize

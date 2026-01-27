@@ -654,6 +654,14 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	position: relative;
 }
 
+.wp-block-navigation__overlay-selector-controls {
+	margin-bottom: $grid-unit-10;
+
+	.components-base-control__help {
+		margin-top: $grid-unit-20;
+	}
+}
+
 .wp-block-navigation__overlay-create-button {
 	position: absolute;
 	// Align with SelectControl label by offsetting by button padding
