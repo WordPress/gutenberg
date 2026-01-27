@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { SelectionState } from '../utils/crdt-user-selections';
+import type { SelectionState } from '../types';
 import type { User } from '../entity-types';
 
 export type UserInfo = Pick<
