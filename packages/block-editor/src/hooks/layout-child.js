@@ -17,6 +17,8 @@ import {
 	GridItemMovers,
 } from '../components/grid';
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
+import { deviceTypeKey } from '../store/private-keys';
+import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
 
 // Used for generating the instance ID
 const LAYOUT_CHILD_BLOCK_PROPS_REFERENCE = {};
@@ -229,9 +231,9 @@ function GridTools( {
 				rootClientId: _rootClientId,
 				isVisible: true,
 				blockVisibility: attributes?.metadata?.blockVisibility,
-				deviceType: settings?.__experimentalSetIsInserterOpened
-					? settings.deviceType
-					: undefined,
+				deviceType:
+					settings?.[ deviceTypeKey ]?.toLowerCase() ||
+					BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
 			};
 		},
 		[ clientId ]

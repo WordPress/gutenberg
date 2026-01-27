@@ -11,6 +11,8 @@ import { useSelect } from '@wordpress/data';
 import { GridVisualizer, useGridLayoutSync } from '../components/grid';
 import { store as blockEditorStore } from '../store';
 import useBlockVisibility from '../components/block-visibility/use-block-visibility';
+import { deviceTypeKey } from '../store/private-keys';
+import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
 
 function GridLayoutSync( props ) {
 	useGridLayoutSync( props );
@@ -44,9 +46,9 @@ function GridTools( { clientId, layout } ) {
 			return {
 				isVisible: true,
 				blockVisibility: attributes?.metadata?.blockVisibility,
-				deviceType: settings?.__experimentalSetIsInserterOpened
-					? settings.deviceType
-					: undefined,
+				deviceType:
+					settings?.[ deviceTypeKey ]?.toLowerCase() ||
+					BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
 			};
 		},
 		[ clientId ]
