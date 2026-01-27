@@ -191,6 +191,26 @@ function ValidatedDateControl< Item >( {
 		setCustomValidity( undefined );
 	}, [ inputRefs ] );
 
+	// Sync React-level validation to native inputs so that
+	// reportValidity() (for example called by the card on re-expand) correctly
+	// fires the 'invalid' event for custom validation errors.
+	useEffect( () => {
+		const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
+		const result = validity
+			? getCustomValidity( isValid, validity )
+			: undefined;
+		for ( const ref of refs ) {
+			const input = ref.current;
+			if ( input ) {
+				if ( result?.type === 'invalid' && result.message ) {
+					input.setCustomValidity( result.message );
+				} else {
+					input.setCustomValidity( '' );
+				}
+			}
+		}
+	}, [ inputRefs, isValid, validity ] );
+
 	// Listen for 'invalid' events on input refs (e.g., triggered by
 	// reportValidity() when the card re-expands after being collapsed).
 	useEffect( () => {
