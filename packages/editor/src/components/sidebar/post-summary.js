@@ -22,6 +22,7 @@ import { PrivatePostExcerptPanel as PostExcerptPanel } from '../post-excerpt/pan
 import PostFeaturedImagePanel from '../post-featured-image/panel';
 import PostFormatPanel from '../post-format/panel';
 import PostLastEditedPanel from '../post-last-edited-panel';
+import RevisionCreatedPanel from '../revision-created-panel';
 import PostPanelSection from '../post-panel-section';
 import PostSchedulePanel from '../post-schedule/panel';
 import PostStatusPanel from '../post-status';
@@ -84,7 +85,11 @@ export default function PostSummary( { onActionPerformed } ) {
 							{ ! isRevisionsMode && <PostExcerptPanel /> }
 							<VStack spacing={ 1 }>
 								<PostContentInformation />
-								<PostLastEditedPanel />
+								{ isRevisionsMode ? (
+									<RevisionCreatedPanel />
+								) : (
+									<PostLastEditedPanel />
+								) }
 							</VStack>
 							{ isRevisionsMode && revisionId && (
 								<>
