@@ -63,8 +63,8 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns not supported when WebAssembly is unavailable', () => {
-			// @ts-ignore - Intentionally removing WebAssembly for testing.
-			delete global.WebAssembly;
+			// @ts-ignore - Intentionally setting WebAssembly to undefined for testing.
+			global.WebAssembly = undefined;
 
 			const result = detectClientSideMediaSupport();
 
@@ -76,8 +76,8 @@ describe( 'feature-detection', () => {
 
 		it( 'returns not supported when SharedArrayBuffer is unavailable', () => {
 			global.WebAssembly = originalWebAssembly;
-			// @ts-ignore - Intentionally removing SharedArrayBuffer for testing.
-			delete global.SharedArrayBuffer;
+			// @ts-ignore - Intentionally setting SharedArrayBuffer to undefined for testing.
+			global.SharedArrayBuffer = undefined;
 
 			const result = detectClientSideMediaSupport();
 
@@ -138,9 +138,9 @@ describe( 'feature-detection', () => {
 			const result1 = detectClientSideMediaSupport();
 			expect( result1.supported ).toBe( true );
 
-			// Now remove WebAssembly - cached result should still be returned.
-			// @ts-ignore - Intentionally removing WebAssembly for testing.
-			delete global.WebAssembly;
+			// Now set WebAssembly to undefined - cached result should still be returned.
+			// @ts-ignore - Intentionally setting WebAssembly to undefined for testing.
+			global.WebAssembly = undefined;
 
 			const result2 = detectClientSideMediaSupport();
 			expect( result2.supported ).toBe( true );
@@ -162,8 +162,8 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns false when features are unavailable', () => {
-			// @ts-ignore - Intentionally removing WebAssembly for testing.
-			delete global.WebAssembly;
+			// @ts-ignore - Intentionally setting WebAssembly to undefined for testing.
+			global.WebAssembly = undefined;
 
 			expect( isClientSideMediaSupported() ).toBe( false );
 		} );
@@ -182,10 +182,10 @@ describe( 'feature-detection', () => {
 			const result1 = detectClientSideMediaSupport();
 			expect( result1.supported ).toBe( true );
 
-			// Clear cache and remove WebAssembly.
+			// Clear cache and set WebAssembly to undefined.
 			clearFeatureDetectionCache();
-			// @ts-ignore - Intentionally removing WebAssembly for testing.
-			delete global.WebAssembly;
+			// @ts-ignore - Intentionally setting WebAssembly to undefined for testing.
+			global.WebAssembly = undefined;
 
 			const result2 = detectClientSideMediaSupport();
 			expect( result2.supported ).toBe( false );
