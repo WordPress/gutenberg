@@ -11,6 +11,12 @@ import {
 	UPDATE_CATEGORY,
 	SET_STATUS,
 	RESET_CHANGES,
+	FETCH_REVISIONS_START,
+	FETCH_REVISIONS_SUCCESS,
+	FETCH_REVISIONS_ERROR,
+	RESTORE_REVISION_START,
+	RESTORE_REVISION_SUCCESS,
+	RESTORE_REVISION_ERROR,
 } from './actions';
 import type { Action } from './actions';
 import { DEFAULT_STATE, DEFAULT_CATEGORIES } from './constants';
@@ -123,6 +129,55 @@ export default function reducer(
 				guidelines: state.originalGuidelines
 					? JSON.parse( JSON.stringify( state.originalGuidelines ) )
 					: null,
+			};
+
+		case FETCH_REVISIONS_START:
+			return {
+				...state,
+				isLoadingRevisions: true,
+			};
+
+		case FETCH_REVISIONS_SUCCESS:
+			return {
+				...state,
+				revisions: action.payload,
+				isLoadingRevisions: false,
+			};
+
+		case FETCH_REVISIONS_ERROR:
+			return {
+				...state,
+				isLoadingRevisions: false,
+				error: action.payload,
+			};
+
+		case RESTORE_REVISION_START:
+			return {
+				...state,
+				isRestoring: action.payload,
+			};
+
+		case RESTORE_REVISION_SUCCESS: {
+			const guidelines: Guidelines = {
+				...action.payload,
+				guideline_categories: {
+					...DEFAULT_CATEGORIES,
+					...( action.payload.guideline_categories || {} ),
+				},
+			};
+			return {
+				...state,
+				guidelines,
+				originalGuidelines: JSON.parse( JSON.stringify( guidelines ) ),
+				isRestoring: null,
+			};
+		}
+
+		case RESTORE_REVISION_ERROR:
+			return {
+				...state,
+				isRestoring: null,
+				error: action.payload,
 			};
 
 		default:

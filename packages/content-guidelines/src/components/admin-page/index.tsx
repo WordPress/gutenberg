@@ -19,6 +19,7 @@ import CategoryPanel from './category-panel';
 import BlockGuidelinesPanel from './block-guidelines-panel';
 import PublishControls from './publish-controls';
 import RevisionList from './revision-list';
+import ImportExportControls from './import-export-controls';
 
 interface Category {
 	slug: keyof GuidelineCategories;
@@ -27,6 +28,13 @@ interface Category {
 }
 
 const CATEGORIES: Category[] = [
+	{
+		slug: 'site',
+		label: __( 'Site Context' ),
+		description: __(
+			'Describe your site goals, target audience, and overall content strategy.'
+		),
+	},
 	{
 		slug: 'copy',
 		label: __( 'Copy Guidelines' ),
@@ -39,13 +47,6 @@ const CATEGORIES: Category[] = [
 		label: __( 'Image Guidelines' ),
 		description: __(
 			'Describe preferred image styles, colors, compositions, and visual aesthetics.'
-		),
-	},
-	{
-		slug: 'site',
-		label: __( 'Site Context' ),
-		description: __(
-			'Describe your site goals, target audience, and overall content strategy.'
 		),
 	},
 	{
@@ -84,13 +85,26 @@ export default function AdminPage() {
 		fetchGuidelines();
 	}, [ fetchGuidelines ] );
 
-	const handleSave = async () => {
+	const handleSave = async ( targetStatus?: 'draft' | 'published' ) => {
 		if ( ! guidelines ) {
 			return;
 		}
+
+		// If targetStatus provided, update status before saving
+		if ( targetStatus && targetStatus !== guidelines.status ) {
+			setStatus( targetStatus );
+		}
+
 		try {
-			await saveGuidelines( guidelines );
-			createSuccessNotice( __( 'Guidelines saved successfully.' ), {
+			await saveGuidelines( {
+				...guidelines,
+				status: targetStatus || guidelines.status,
+			} );
+			const message =
+				targetStatus === 'published'
+					? __( 'Guidelines published successfully.' )
+					: __( 'Guidelines saved.' );
+			createSuccessNotice( message, {
 				type: 'snackbar',
 			} );
 		} catch ( err ) {
@@ -101,10 +115,6 @@ export default function AdminPage() {
 		}
 	};
 
-	const handleStatusChange = ( newStatus: 'draft' | 'published' ) => {
-		setStatus( newStatus );
-	};
-
 	const handleCategoryChange = (
 		category: string,
 		value: string | BlockGuidelines
@@ -113,6 +123,27 @@ export default function AdminPage() {
 			updateCategory( category, value as BlockGuidelines );
 		} else {
 			updateCategory( category, { guidelines: value as string } );
+		}
+	};
+
+	const handleImport = (
+		data: Partial< {
+			status: 'draft' | 'published';
+			guideline_categories: GuidelineCategories;
+		} >
+	) => {
+		if ( data.guideline_categories ) {
+			const categories = data.guideline_categories;
+
+			(
+				Object.keys( categories ) as Array< keyof GuidelineCategories >
+			 ).forEach( ( key ) => {
+				updateCategory( key, categories[ key ] );
+			} );
+		}
+
+		if ( data.status ) {
+			setStatus( data.status );
 		}
 	};
 
@@ -149,7 +180,6 @@ export default function AdminPage() {
 				isDirty={ isDirtyData }
 				isSaving={ isSavingData }
 				onSave={ handleSave }
-				onStatusChange={ handleStatusChange }
 			/>
 
 			<Panel className="content-guidelines-admin__panel">
@@ -184,7 +214,15 @@ export default function AdminPage() {
 				) }
 			</Panel>
 
-			<RevisionList postId={ guidelines?.id } />
+			<RevisionList
+				postId={ guidelines?.id }
+				onRestore={ handleImport }
+			/>
+
+			<ImportExportControls
+				guidelines={ guidelines }
+				onImport={ handleImport }
+			/>
 		</div>
 	);
 }

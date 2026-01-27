@@ -13,6 +13,8 @@ import {
 	updateCategory,
 	setStatus,
 	resetChanges,
+	fetchRevisions,
+	restoreRevision,
 } from './actions';
 import * as selectors from './selectors';
 import { STORE_NAME } from './constants';
@@ -26,6 +28,8 @@ const actions = {
 	updateCategory,
 	setStatus,
 	resetChanges,
+	fetchRevisions,
+	restoreRevision,
 };
 
 /**

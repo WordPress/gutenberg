@@ -1,61 +1,70 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
+import { useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { dateI18n, getSettings } from '@wordpress/date';
-import { Spinner } from '@wordpress/components';
+import { Spinner, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-interface Revision {
-	id: number;
-	date: string;
-	author_name: string;
-}
+/**
+ * Internal dependencies
+ */
+import { store } from '../../store';
+import type { GuidelineCategories } from '../../store/constants';
 
 interface RevisionListProps {
 	postId: number | undefined;
+	onRestore?: ( data: { guideline_categories: GuidelineCategories } ) => void;
 }
 
 /**
  * Revision list component for displaying revision history.
  *
- * @param props        Component props.
- * @param props.postId The guidelines post ID.
+ * @param props           Component props.
+ * @param props.postId    The guidelines post ID.
+ * @param props.onRestore Callback when a revision is restored.
  * @return RevisionList component.
  */
-export default function RevisionList( { postId }: RevisionListProps ) {
-	const [ revisions, setRevisions ] = useState< Revision[] >( [] );
-	const [ isLoading, setIsLoading ] = useState( false );
-	const [ error, setError ] = useState< string | null >( null );
+export default function RevisionList( {
+	postId,
+	onRestore,
+}: RevisionListProps ) {
+	const { revisions, isLoading, restoringId, error } = useSelect(
+		( select ) => {
+			const selectors = select( store );
+			return {
+				revisions: selectors.getRevisions(),
+				isLoading: selectors.isLoadingRevisions(),
+				restoringId: selectors.getRestoringRevisionId(),
+				error: selectors.getError(),
+			};
+		},
+		[]
+	);
+
+	const { fetchRevisions, restoreRevision } = useDispatch( store );
 
 	useEffect( () => {
-		if ( ! postId ) {
-			setRevisions( [] );
+		if ( postId ) {
+			fetchRevisions( postId );
+		}
+	}, [ postId, fetchRevisions ] );
+
+	const handleRestore = async ( revisionId: number ) => {
+		if ( ! postId || ! onRestore ) {
 			return;
 		}
 
-		const fetchRevisions = async () => {
-			setIsLoading( true );
-			setError( null );
-
-			try {
-				const response = await apiFetch< Revision[] >( {
-					path: `/__experimental/content-guidelines/${ postId }/revisions`,
-				} );
-				setRevisions( response );
-			} catch ( err ) {
-				setError(
-					( err as Error ).message ||
-						__( 'Failed to load revisions.' )
-				);
-			} finally {
-				setIsLoading( false );
-			}
-		};
-
-		fetchRevisions();
-	}, [ postId ] );
+		try {
+			const response = await restoreRevision( postId, revisionId );
+			onRestore( {
+				guideline_categories: response.guideline_categories,
+			} );
+		} catch {
+			// Error is handled by the store
+		}
+	};
 
 	if ( ! postId ) {
 		return null;
@@ -108,6 +117,21 @@ export default function RevisionList( { postId }: RevisionListProps ) {
 						<span className="revision-item__author">
 							{ revision.author_name || __( 'Unknown' ) }
 						</span>
+						{ index > 0 && onRestore && (
+							<Button
+								variant="tertiary"
+								size="small"
+								className="revision-item__restore"
+								onClick={ () => handleRestore( revision.id ) }
+								isBusy={ restoringId === revision.id }
+								disabled={ restoringId !== null }
+								accessibleWhenDisabled
+							>
+								{ restoringId === revision.id
+									? __( 'Restoring…' )
+									: __( 'Restore' ) }
+							</Button>
+						) }
 					</li>
 				) ) }
 			</ul>

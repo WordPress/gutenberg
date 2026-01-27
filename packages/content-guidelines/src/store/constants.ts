@@ -37,12 +37,21 @@ export interface Guidelines {
 	author_name?: string;
 }
 
+export interface Revision {
+	id: number;
+	date: string;
+	author_name: string;
+}
+
 export interface State {
 	guidelines: Guidelines | null;
 	originalGuidelines: Guidelines | null;
 	isLoading: boolean;
 	isSaving: boolean;
 	error: string | null;
+	revisions: Revision[];
+	isLoadingRevisions: boolean;
+	isRestoring: number | null;
 }
 
 /**
@@ -77,4 +86,7 @@ export const DEFAULT_STATE: State = {
 	isLoading: false,
 	isSaving: false,
 	error: null,
+	revisions: [],
+	isLoadingRevisions: false,
+	isRestoring: null,
 };

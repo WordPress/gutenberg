@@ -46,21 +46,19 @@
 
 .content-guidelines-publish-controls {
 	display: flex;
-	align-items: flex-start;
-	justify-content: space-between;
+	align-items: center;
+	justify-content: flex-end;
 	padding: 16px;
 	background: #fff;
 	border: 1px solid #e0e0e0;
 	border-radius: 2px;
-	gap: 16px;
-	flex-wrap: wrap;
+	gap: 12px;
 
-	.components-toggle-control {
-		margin-bottom: 0;
-	}
-
-	&__save-button {
-		flex-shrink: 0;
+	&__status {
+		margin-right: auto;
+		font-size: 13px;
+		font-weight: 600;
+		color: #007017;
 	}
 }
 
@@ -188,5 +186,34 @@
 
 	&__author {
 		color: #2271b1;
+	}
+
+	&__restore {
+		flex-shrink: 0;
+		margin-left: auto;
+	}
+}
+
+.content-guidelines-import-export {
+	margin-top: 24px;
+	padding: 16px;
+	background: #f6f7f7;
+	border: 1px solid #e0e0e0;
+	border-radius: 2px;
+
+	&__section {
+		padding: 16px 0;
+
+		&:first-of-type {
+			padding-top: 0;
+		}
+
+		&:not(:last-of-type) {
+			border-bottom: 1px solid #e0e0e0;
+		}
+
+		&:last-of-type {
+			padding-bottom: 0;
+		}
 	}
 }

@@ -6,6 +6,7 @@ import type {
 	Guidelines,
 	CategoryGuideline,
 	BlockGuidelines,
+	Revision,
 } from './constants';
 
 /**
@@ -86,3 +87,29 @@ export const isSaving = ( state: State ): boolean => state.isSaving;
  * @return Error message or null.
  */
 export const getError = ( state: State ): string | null => state.error;
+
+/**
+ * Get the list of revisions.
+ *
+ * @param state Store state.
+ * @return Array of revisions.
+ */
+export const getRevisions = ( state: State ): Revision[] => state.revisions;
+
+/**
+ * Check if revisions are currently being loaded.
+ *
+ * @param state Store state.
+ * @return True if loading revisions.
+ */
+export const isLoadingRevisions = ( state: State ): boolean =>
+	state.isLoadingRevisions;
+
+/**
+ * Get the ID of the revision currently being restored, if any.
+ *
+ * @param state Store state.
+ * @return Revision ID being restored or null.
+ */
+export const getRestoringRevisionId = ( state: State ): number | null =>
+	state.isRestoring;
