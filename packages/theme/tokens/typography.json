@@ -108,6 +108,93 @@
 			"$extensions": {
 				"com.figma.scopes": [ "FONT_WEIGHT" ]
 			}
+		},
+		"heading": {
+			"$type": "typography",
+			"2xl": {
+				"$value": {
+					"fontFamily": "{wpds-font.family.heading}",
+					"fontSize": "{wpds-font.size.2xl}",
+					"fontWeight": "{wpds-font.weight.medium}",
+					"lineHeight": "{wpds-font.line-height.2xl}"
+				},
+				"$description": "Extra large heading for hero sections"
+			},
+			"xl": {
+				"$value": {
+					"fontFamily": "{wpds-font.family.heading}",
+					"fontSize": "{wpds-font.size.xl}",
+					"fontWeight": "{wpds-font.weight.medium}",
+					"lineHeight": "{wpds-font.line-height.md}"
+				},
+				"$description": "Large heading for page titles"
+			},
+			"lg": {
+				"$value": {
+					"fontFamily": "{wpds-font.family.heading}",
+					"fontSize": "{wpds-font.size.lg}",
+					"fontWeight": "{wpds-font.weight.medium}",
+					"lineHeight": "{wpds-font.line-height.sm}"
+				},
+				"$description": "Medium-large heading for section titles"
+			},
+			"md": {
+				"$value": {
+					"fontFamily": "{wpds-font.family.heading}",
+					"fontSize": "{wpds-font.size.md}",
+					"fontWeight": "{wpds-font.weight.medium}",
+					"lineHeight": "{wpds-font.line-height.sm}"
+				},
+				"$description": "Medium heading for subsections"
+			},
+			"sm": {
+				"$value": {
+					"fontFamily": "{wpds-font.family.heading}",
+					"fontSize": "{wpds-font.size.xs}",
+					"fontWeight": "{wpds-font.weight.medium}",
+					"lineHeight": "{wpds-font.line-height.xs}"
+				},
+				"$description": "Small heading for labels and minor headings"
+			}
+		},
+		"body": {
+			"$type": "typography",
+			"xl": {
+				"$value": {
+					"fontFamily": "{wpds-font.family.body}",
+					"fontSize": "{wpds-font.size.xl}",
+					"fontWeight": "{wpds-font.weight.regular}",
+					"lineHeight": "{wpds-font.line-height.xl}"
+				},
+				"$description": "Large body text for lead paragraphs and introductions"
+			},
+			"lg": {
+				"$value": {
+					"fontFamily": "{wpds-font.family.body}",
+					"fontSize": "{wpds-font.size.lg}",
+					"fontWeight": "{wpds-font.weight.regular}",
+					"lineHeight": "{wpds-font.line-height.md}"
+				},
+				"$description": "Comfortable body text for extended reading"
+			},
+			"md": {
+				"$value": {
+					"fontFamily": "{wpds-font.family.body}",
+					"fontSize": "{wpds-font.size.md}",
+					"fontWeight": "{wpds-font.weight.regular}",
+					"lineHeight": "{wpds-font.line-height.sm}"
+				},
+				"$description": "Default body text for general content"
+			},
+			"sm": {
+				"$value": {
+					"fontFamily": "{wpds-font.family.body}",
+					"fontSize": "{wpds-font.size.sm}",
+					"fontWeight": "{wpds-font.weight.regular}",
+					"lineHeight": "{wpds-font.line-height.xs}"
+				},
+				"$description": "Small body text for help text and secondary content"
+			}
 		}
 	}
 }

@@ -120,11 +120,119 @@
 		0 6px 6px 0 #00000008, 0 8px 8px 0 #00000005; /* For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. */
 	--wpds-elevation-x-small: 0 1px 1px 0 #00000008, 0 1px 2px 0 #00000005,
 		0 3px 3px 0 #00000005, 0 4px 4px 0 #00000003; /* For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame. */
+	--wpds-font-body-lg-font-family: var(
+		--wpds-font-family-body
+	); /* Comfortable body text for extended reading */
+	--wpds-font-body-lg-font-size: var(
+		--wpds-font-size-lg
+	); /* Comfortable body text for extended reading */
+	--wpds-font-body-lg-font-weight: var(
+		--wpds-font-weight-regular
+	); /* Comfortable body text for extended reading */
+	--wpds-font-body-lg-line-height: var(
+		--wpds-font-line-height-md
+	); /* Comfortable body text for extended reading */
+	--wpds-font-body-md-font-family: var(
+		--wpds-font-family-body
+	); /* Default body text for general content */
+	--wpds-font-body-md-font-size: var(
+		--wpds-font-size-md
+	); /* Default body text for general content */
+	--wpds-font-body-md-font-weight: var(
+		--wpds-font-weight-regular
+	); /* Default body text for general content */
+	--wpds-font-body-md-line-height: var(
+		--wpds-font-line-height-sm
+	); /* Default body text for general content */
+	--wpds-font-body-sm-font-family: var(
+		--wpds-font-family-body
+	); /* Small body text for help text and secondary content */
+	--wpds-font-body-sm-font-size: var(
+		--wpds-font-size-sm
+	); /* Small body text for help text and secondary content */
+	--wpds-font-body-sm-font-weight: var(
+		--wpds-font-weight-regular
+	); /* Small body text for help text and secondary content */
+	--wpds-font-body-sm-line-height: var(
+		--wpds-font-line-height-xs
+	); /* Small body text for help text and secondary content */
+	--wpds-font-body-xl-font-family: var(
+		--wpds-font-family-body
+	); /* Large body text for lead paragraphs and introductions */
+	--wpds-font-body-xl-font-size: var(
+		--wpds-font-size-xl
+	); /* Large body text for lead paragraphs and introductions */
+	--wpds-font-body-xl-font-weight: var(
+		--wpds-font-weight-regular
+	); /* Large body text for lead paragraphs and introductions */
+	--wpds-font-body-xl-line-height: var(
+		--wpds-font-line-height-xl
+	); /* Large body text for lead paragraphs and introductions */
 	--wpds-font-family-body: -apple-system, system-ui, 'Segoe UI', 'Roboto',
 		'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif; /* Body font family */
 	--wpds-font-family-heading: -apple-system, system-ui, 'Segoe UI', 'Roboto',
 		'Oxygen-Sans', 'Ubuntu', 'Cantarell', 'Helvetica Neue', sans-serif; /* Headings font family */
 	--wpds-font-family-mono: 'Menlo', 'Consolas', monaco, monospace; /* Monospace font family */
+	--wpds-font-heading-2xl-font-family: var(
+		--wpds-font-family-heading
+	); /* Extra large heading for hero sections */
+	--wpds-font-heading-2xl-font-size: var(
+		--wpds-font-size-2xl
+	); /* Extra large heading for hero sections */
+	--wpds-font-heading-2xl-font-weight: var(
+		--wpds-font-weight-medium
+	); /* Extra large heading for hero sections */
+	--wpds-font-heading-2xl-line-height: var(
+		--wpds-font-line-height-2xl
+	); /* Extra large heading for hero sections */
+	--wpds-font-heading-lg-font-family: var(
+		--wpds-font-family-heading
+	); /* Medium-large heading for section titles */
+	--wpds-font-heading-lg-font-size: var(
+		--wpds-font-size-lg
+	); /* Medium-large heading for section titles */
+	--wpds-font-heading-lg-font-weight: var(
+		--wpds-font-weight-medium
+	); /* Medium-large heading for section titles */
+	--wpds-font-heading-lg-line-height: var(
+		--wpds-font-line-height-sm
+	); /* Medium-large heading for section titles */
+	--wpds-font-heading-md-font-family: var(
+		--wpds-font-family-heading
+	); /* Medium heading for subsections */
+	--wpds-font-heading-md-font-size: var(
+		--wpds-font-size-md
+	); /* Medium heading for subsections */
+	--wpds-font-heading-md-font-weight: var(
+		--wpds-font-weight-medium
+	); /* Medium heading for subsections */
+	--wpds-font-heading-md-line-height: var(
+		--wpds-font-line-height-sm
+	); /* Medium heading for subsections */
+	--wpds-font-heading-sm-font-family: var(
+		--wpds-font-family-heading
+	); /* Small heading for labels and minor headings */
+	--wpds-font-heading-sm-font-size: var(
+		--wpds-font-size-xs
+	); /* Small heading for labels and minor headings */
+	--wpds-font-heading-sm-font-weight: var(
+		--wpds-font-weight-medium
+	); /* Small heading for labels and minor headings */
+	--wpds-font-heading-sm-line-height: var(
+		--wpds-font-line-height-xs
+	); /* Small heading for labels and minor headings */
+	--wpds-font-heading-xl-font-family: var(
+		--wpds-font-family-heading
+	); /* Large heading for page titles */
+	--wpds-font-heading-xl-font-size: var(
+		--wpds-font-size-xl
+	); /* Large heading for page titles */
+	--wpds-font-heading-xl-font-weight: var(
+		--wpds-font-weight-medium
+	); /* Large heading for page titles */
+	--wpds-font-heading-xl-line-height: var(
+		--wpds-font-line-height-md
+	); /* Large heading for page titles */
 	--wpds-font-line-height-2xl: 40px; /* 2X large line height */
 	--wpds-font-line-height-lg: 28px; /* Large line height */
 	--wpds-font-line-height-md: 24px; /* Medium line height */

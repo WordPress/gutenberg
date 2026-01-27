@@ -142,22 +142,31 @@ Do not edit directly.
 
 ### Typography
 
-| Variable name                 | Description                                  |
-| ----------------------------- | -------------------------------------------- |
-| `--wpds-font-family-heading`  | Headings font family                         |
-| `--wpds-font-family-body`     | Body font family                             |
-| `--wpds-font-family-mono`     | Monospace font family                        |
-| `--wpds-font-size-xs`         | Extra small font size                        |
-| `--wpds-font-size-sm`         | Small font size                              |
-| `--wpds-font-size-md`         | Medium font size                             |
-| `--wpds-font-size-lg`         | Large font size                              |
-| `--wpds-font-size-xl`         | Extra large font size                        |
-| `--wpds-font-size-2xl`        | 2X large font size                           |
-| `--wpds-font-line-height-xs`  | Extra small line height                      |
-| `--wpds-font-line-height-sm`  | Small line height                            |
-| `--wpds-font-line-height-md`  | Medium line height                           |
-| `--wpds-font-line-height-lg`  | Large line height                            |
-| `--wpds-font-line-height-xl`  | Extra large line height                      |
-| `--wpds-font-line-height-2xl` | 2X large line height                         |
-| `--wpds-font-weight-regular`  | Regular font weight for body text            |
-| `--wpds-font-weight-medium`   | Medium font weight for emphasis and headings |
+| Variable name                 | Description                                           |
+| ----------------------------- | ----------------------------------------------------- |
+| `--wpds-font-family-heading`  | Headings font family                                  |
+| `--wpds-font-family-body`     | Body font family                                      |
+| `--wpds-font-family-mono`     | Monospace font family                                 |
+| `--wpds-font-size-xs`         | Extra small font size                                 |
+| `--wpds-font-size-sm`         | Small font size                                       |
+| `--wpds-font-size-md`         | Medium font size                                      |
+| `--wpds-font-size-lg`         | Large font size                                       |
+| `--wpds-font-size-xl`         | Extra large font size                                 |
+| `--wpds-font-size-2xl`        | 2X large font size                                    |
+| `--wpds-font-line-height-xs`  | Extra small line height                               |
+| `--wpds-font-line-height-sm`  | Small line height                                     |
+| `--wpds-font-line-height-md`  | Medium line height                                    |
+| `--wpds-font-line-height-lg`  | Large line height                                     |
+| `--wpds-font-line-height-xl`  | Extra large line height                               |
+| `--wpds-font-line-height-2xl` | 2X large line height                                  |
+| `--wpds-font-weight-regular`  | Regular font weight for body text                     |
+| `--wpds-font-weight-medium`   | Medium font weight for emphasis and headings          |
+| `--wpds-font-heading-2xl`     | Extra large heading for hero sections                 |
+| `--wpds-font-heading-xl`      | Large heading for page titles                         |
+| `--wpds-font-heading-lg`      | Medium-large heading for section titles               |
+| `--wpds-font-heading-md`      | Medium heading for subsections                        |
+| `--wpds-font-heading-sm`      | Small heading for labels and minor headings           |
+| `--wpds-font-body-xl`         | Large body text for lead paragraphs and introductions |
+| `--wpds-font-body-lg`         | Comfortable body text for extended reading            |
+| `--wpds-font-body-md`         | Default body text for general content                 |
+| `--wpds-font-body-sm`         | Small body text for help text and secondary content   |

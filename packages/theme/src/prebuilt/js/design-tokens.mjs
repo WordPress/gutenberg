@@ -134,4 +134,13 @@ export default [
 	'--wpds-font-line-height-2xl',
 	'--wpds-font-weight-regular',
 	'--wpds-font-weight-medium',
+	'--wpds-font-heading-2xl',
+	'--wpds-font-heading-xl',
+	'--wpds-font-heading-lg',
+	'--wpds-font-heading-md',
+	'--wpds-font-heading-sm',
+	'--wpds-font-body-xl',
+	'--wpds-font-body-lg',
+	'--wpds-font-body-md',
+	'--wpds-font-body-sm',
 ];
