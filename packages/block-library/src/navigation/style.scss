@@ -490,16 +490,6 @@ button.wp-block-navigation-item__content {
 // When a submenu would overflow the viewport, open it leftward.
 // This class is dynamically added by JavaScript when overflow is detected.
 .wp-block-navigation .open-on-left {
-	// Move submenu arrow to the left side
-	> .wp-block-navigation-item__content {
-		.wp-block-navigation__submenu-icon {
-			margin-left: 0;
-			margin-right: 0.25em;
-			/* stylelint-disable-next-line property-disallowed-list -- The submenu icon is decorative only. Moving it visually to indicate leftward submenu opening does not affect reading order or interaction. */
-			order: -1; // Move icon before the label text
-		}
-	}
-
 	// First submenu.
 	> .wp-block-navigation__submenu-container {
 		@include submenu-open-left;
@@ -510,14 +500,6 @@ button.wp-block-navigation-item__content {
 // This class is dynamically added by JavaScript when left overflow is detected
 // (e.g., for right-justified navigation items near the left edge).
 .wp-block-navigation .open-on-right {
-	// Keep submenu arrow on the right side (default positioning)
-	> .wp-block-navigation-item__content {
-		.wp-block-navigation__submenu-icon {
-			margin-left: 0.25em;
-			margin-right: 0;
-		}
-	}
-
 	// First submenu - force rightward opening.
 	// Repeat class name to increase specificity and override justification rules.
 	> .wp-block-navigation__submenu-container.wp-block-navigation__submenu-container.wp-block-navigation__submenu-container {
