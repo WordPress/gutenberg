@@ -1061,6 +1061,31 @@ describe( 'Link submission', () => {
 
 		expect( editSubmitButton ).toHaveAttribute( 'aria-disabled', 'false' );
 	} );
+
+	it( 'should disable Apply button when URL is cleared', async () => {
+		const user = userEvent.setup();
+		const mockOnChange = jest.fn();
+
+		const existingLink = { url: 'https://example.com', title: 'Example' };
+		render(
+			<LinkControl
+				value={ existingLink }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox' );
+		// Clear the input
+		await user.clear( searchInput );
+
+		// Apply button should be disabled when input is empty
+		const submitButton = screen.getByRole( 'button', { name: 'Apply' } );
+		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		// onChange should not be called
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
 } );
 
 describe( 'Default search suggestions', () => {
@@ -3282,9 +3307,9 @@ describe( 'URL validation', () => {
 		await user.type( searchInput, 'https://wordpress.org' );
 
 		// Wait for suggestion to appear and become stable
-		// await screen.findByRole( 'option', {
-		// 	name: /https:\/\/wordpress\.org/,
-		// } );
+		await screen.findByRole( 'option', {
+			name: /https:\/\/wordpress\.org/,
+		} );
 
 		triggerEnter( searchInput );
 
@@ -3300,7 +3325,7 @@ describe( 'URL validation', () => {
 		);
 	} );
 
-	it( 'should accept valid URLs without protocol (prepends http://)', async () => {
+	it( 'should accept valid URLs without protocol (without http://)', async () => {
 		render(
 			<LinkControl
 				value={ { url: '' } }
@@ -3403,38 +3428,6 @@ describe( 'URL validation', () => {
 		).not.toBeInTheDocument();
 	} );
 
-	it( 'should validate URL suggestions (link, mailto, tel, internal)', async () => {
-		render(
-			<LinkControl
-				value={ { url: '' } }
-				forceIsEditingLink
-				onChange={ mockOnChange }
-			/>
-		);
-
-		const searchInput = screen.getByRole( 'combobox' );
-		// Type a URL that passes isURLLike and URL constructor validation
-		await user.type( searchInput, 'www.wordpress.org' );
-
-		// Wait for suggestion to appear and become stable
-		await screen.findByRole( 'option', {
-			name: /www\.wordpress\.org/,
-		} );
-
-		triggerEnter( searchInput );
-
-		// Should succeed (www.wordpress.org is valid)
-		await waitFor( () => {
-			expect( mockOnChange ).toHaveBeenCalled();
-		} );
-
-		expect( mockOnChange ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				url: 'www.wordpress.org',
-			} )
-		);
-	} );
-
 	it( 'should show validation error when clicking Apply button with invalid URL', async () => {
 		// When editing an existing link, use Apply button
 		const existingLink = { url: 'https://example.com', title: 'Example' };
@@ -3454,14 +3447,6 @@ describe( 'URL validation', () => {
 
 		// Click the button - validation will run and prevent submission
 		await user.click( submitButton );
-
-		// Give validation time to process
-		await waitFor(
-			() => {
-				// Just wait for processing
-			},
-			{ timeout: 1000 }
-		);
 
 		// onChange should not be called because validation prevented submission
 		expect( mockOnChange ).not.toHaveBeenCalled();
@@ -3497,29 +3482,6 @@ describe( 'URL validation', () => {
 				url: 'www.wordpress',
 			} )
 		);
-	} );
-
-	it( 'should validate empty URLs and prevent submission', async () => {
-		// When editing an existing link, the Apply button should be disabled when empty
-		const existingLink = { url: 'https://example.com', title: 'Example' };
-		render(
-			<LinkControl
-				value={ existingLink }
-				forceIsEditingLink
-				onChange={ mockOnChange }
-			/>
-		);
-
-		const searchInput = screen.getByRole( 'combobox' );
-		// Clear the input
-		await user.clear( searchInput );
-
-		// Apply button should be disabled when input is empty
-		const submitButton = screen.getByRole( 'button', { name: 'Apply' } );
-		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
-
-		// onChange should not be called for empty URLs
-		expect( mockOnChange ).not.toHaveBeenCalled();
 	} );
 
 	// Note: mailto: and tel: protocol URLs are handled by the validation logic
