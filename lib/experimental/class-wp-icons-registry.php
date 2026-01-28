@@ -125,16 +125,17 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				return false;
 			}
 
-			if ( isset( $icon_properties['content'] ) && ! is_string( $icon_properties['content'] ) ) {
-				_doing_it_wrong(
-					__METHOD__,
-					__( 'Icon content must be a string.', 'gutenberg' ),
-					'7.0.0'
-				);
-				return false;
+			if ( isset( $icon_properties['content'] ) ) {
+				if ( ! is_string( $icon_properties['content'] ) ) {
+					_doing_it_wrong(
+						__METHOD__,
+						__( 'Icon content must be a string.', 'gutenberg' ),
+						'7.0.0'
+					);
+					return false;
+				}
 
 				$sanitized_icon_content = $this->sanitize_icon_content( $icon_properties['content'] );
-
 				if ( empty( $sanitized_icon_content ) ) {
 					_doing_it_wrong(
 						__METHOD__,
