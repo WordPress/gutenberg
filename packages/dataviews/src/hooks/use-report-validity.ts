@@ -8,12 +8,12 @@ import { useEffect } from '@wordpress/element';
  * This fires the browser's `invalid` event on each input, which validated
  * controls listen to in order to display their error states.
  *
- * Used by card, dropdown, and modal layouts to show validation errors
+ * Used by panel and card layouts to show validation errors
  * immediately when their content becomes visible after prior interaction.
  *
- * @param ref             A ref to the container element.
- * @param shouldReport    Whether to trigger reportValidity. Typically
- *                        derived from `touched` state and open/visible state.
+ * @param ref          A ref to the container element.
+ * @param shouldReport Whether to trigger reportValidity. Typically
+ *                     derived from `touched` state and open/visible state.
  */
 export default function useReportValidity(
 	ref: React.RefObject< HTMLElement | null >,
