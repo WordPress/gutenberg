@@ -39,7 +39,7 @@ import {
 	privateApis as blockEditorPrivateApis,
 	BlockSettingsMenuControls,
 } from '@wordpress/block-editor';
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
@@ -289,18 +289,12 @@ export default function Image( {
 	const [ imageElement, setImageElement ] = useState();
 	const [ resizeDelta, setResizeDelta ] = useState( null );
 	const [ pixelSize, setPixelSize ] = useState( {} );
-	const [ offsetTop, setOffsetTop ] = useState( 0 );
 	const setResizeObserved = useResizeObserver( ( [ entry ] ) => {
 		if ( ! resizeDelta ) {
 			const [ box ] = entry.borderBoxSize;
 			setPixelSize( { width: box.inlineSize, height: box.blockSize } );
 		}
-		// This is usually 0 unless the image height is less than the line-height.
-		setOffsetTop( entry.target.offsetTop );
 	} );
-	const effectResizeableBoxPlacement = useCallback( () => {
-		setOffsetTop( imageElement?.offsetTop ?? 0 );
-	}, [ imageElement ] );
 	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
 	const { allowResize = true } = context;
 
@@ -1144,14 +1138,7 @@ export default function Image( {
 		/* eslint-enable no-lonely-if */
 		resizableBox = (
 			<ResizableBox
-				ref={ effectResizeableBoxPlacement }
-				style={ {
-					position: 'absolute',
-					// To match the vertical-align: bottom of the img (from style.scss)
-					// syncs the top with the img. This matters when the img height is
-					// less than the line-height.
-					inset: `${ offsetTop }px 0 0 0`,
-				} }
+				style={ { position: 'absolute' } }
 				size={ pixelSize }
 				minWidth={ minWidth }
 				maxWidth={ maxResizeWidth }
@@ -1163,6 +1150,10 @@ export default function Image( {
 					right: showRightHandle,
 					bottom: true,
 					left: showLeftHandle,
+				} }
+				// Ensures that resizing stops when the pointer is released.
+				onPointerDown={ ( { currentTarget, pointerId } ) => {
+					currentTarget.setPointerCapture( pointerId );
 				} }
 				onResizeStart={ () => {
 					toggleSelection( false );
@@ -1255,7 +1246,20 @@ export default function Image( {
 			{ controls }
 			{ featuredImageControl }
 			{ img }
-			{ resizableBox }
+			{ resizableBox && (
+				<Popover
+					animate={ false }
+					focusOnMount={ false }
+					anchor={ imageElement }
+					__unstableSlotName="block-toolbar"
+					placement="top-start"
+					resize={ false }
+					flip={ false }
+					variant="unstyled"
+				>
+					{ resizableBox }
+				</Popover>
+			) }
 
 			<Caption
 				attributes={ attributes }
