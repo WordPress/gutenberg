@@ -161,6 +161,16 @@ echo 'RewriteRule . index.php [L]'
 		setupCommands.push( `wp plugin activate ${ pluginSource.basename }` );
 	}
 
+	// Activate all network plugins for the entire multisite network.
+	if ( isMultisite ) {
+		for ( const networkPluginSource of config.env[ environment ]
+			.networkPluginSources ) {
+			setupCommands.push(
+				`wp plugin activate ${ networkPluginSource.basename } --network`
+			);
+		}
+	}
+
 	if ( config.debug ) {
 		spinner.info(
 			`Running the following setup commands on the ${ environment } instance:\n - ${ setupCommands.join(

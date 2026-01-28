@@ -44,6 +44,11 @@ function getMounts(
 			`${ source.path }:/var/www/html/wp-content/plugins/${ source.basename }`
 	);
 
+	const networkPluginMounts = config.networkPluginSources.map(
+		( source ) =>
+			`${ source.path }:/var/www/html/wp-content/plugins/${ source.basename }`
+	);
+
 	const themeMounts = config.themeSources.map(
 		( source ) =>
 			`${ source.path }:/var/www/html/wp-content/themes/${ source.basename }`
@@ -74,6 +79,7 @@ function getMounts(
 			userHomeMount,
 			...directoryMounts,
 			...pluginMounts,
+			...networkPluginMounts,
 			...themeMounts,
 		] ),
 	];

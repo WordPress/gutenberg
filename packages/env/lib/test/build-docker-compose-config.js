@@ -9,6 +9,7 @@ const getHostUser = require( '../get-host-user' );
 const CONFIG = {
 	mappings: {},
 	pluginSources: [],
+	networkPluginSources: [],
 	themeSources: [],
 	port: 8888,
 	configDirectoryPath: '/path/to/config',

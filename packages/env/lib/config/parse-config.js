@@ -46,16 +46,17 @@ const mergeConfigs = require( './merge-configs' );
  * The environment-specific configuration options. (development/tests/etc)
  *
  * @typedef WPEnvironmentConfig
- * @property {WPSource}                  coreSource     The WordPress installation to load in the environment.
- * @property {WPSource[]}                pluginSources  Plugins to load in the environment.
- * @property {WPSource[]}                themeSources   Themes to load in the environment.
- * @property {number}                    port           The port to use.
- * @property {number}                    mysqlPort      The port to use for MySQL. Random if empty.
- * @property {number}                    phpmyadminPort The port to use for phpMyAdmin. If empty, disabled phpMyAdmin.
- * @property {boolean}                   multisite      Whether to set up a multisite installation.
- * @property {Object}                    config         Mapping of wp-config.php constants to their desired values.
- * @property {Object.<string, WPSource>} mappings       Mapping of WordPress directories to local directories which should be mounted.
- * @property {string|null}               phpVersion     Version of PHP to use in the environments, of the format 0.0.
+ * @property {WPSource}                  coreSource           The WordPress installation to load in the environment.
+ * @property {WPSource[]}                pluginSources        Plugins to load in the environment.
+ * @property {WPSource[]}                networkPluginSources Plugins to load in the entire network within the environment.
+ * @property {WPSource[]}                themeSources         Themes to load in the environment.
+ * @property {number}                    port                 The port to use.
+ * @property {number}                    mysqlPort            The port to use for MySQL. Random if empty.
+ * @property {number}                    phpmyadminPort       The port to use for phpMyAdmin. If empty, disabled phpMyAdmin.
+ * @property {boolean}                   multisite            Whether to set up a multisite installation.
+ * @property {Object}                    config               Mapping of wp-config.php constants to their desired values.
+ * @property {Object.<string, WPSource>} mappings             Mapping of WordPress directories to local directories which should be mounted.
+ * @property {string|null}               phpVersion           Version of PHP to use in the environments, of the format 0.0.
  */
 
 /**
@@ -85,6 +86,7 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	core: null,
 	phpVersion: null,
 	plugins: [],
+	networkPlugins: [],
 	themes: [],
 	port: 8888,
 	testsPort: 8889,
@@ -225,6 +227,10 @@ async function getDefaultConfig(
 			detectedDirectoryType === 'plugin'
 				? [ '.' ]
 				: DEFAULT_ENVIRONMENT_CONFIG.plugins,
+		networkPlugins:
+			detectedDirectoryType === 'plugin'
+				? [ '.' ]
+				: DEFAULT_ENVIRONMENT_CONFIG.networkPlugins,
 		themes:
 			detectedDirectoryType === 'theme'
 				? [ '.' ]
@@ -499,6 +505,17 @@ async function parseEnvironmentConfig(
 		);
 		parsedConfig.pluginSources = config.plugins.map( ( sourceString ) =>
 			parseSourceString( sourceString, options )
+		);
+	}
+
+	if ( config.networkPlugins !== undefined ) {
+		checkStringArray(
+			configFile,
+			`${ environmentPrefix }networkPlugins`,
+			config.networkPlugins
+		);
+		parsedConfig.networkPluginSources = config.networkPlugins.map(
+			( sourceString ) => parseSourceString( sourceString, options )
 		);
 	}
 

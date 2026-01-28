@@ -35,6 +35,7 @@ const DEFAULT_CONFIG = {
 		testsPath: '/cache/tests-WordPress',
 	},
 	pluginSources: [],
+	networkPluginSources: [],
 	themeSources: [],
 	config: {
 		FS_METHOD: 'direct',

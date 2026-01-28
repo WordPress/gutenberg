@@ -194,6 +194,11 @@ function deepCopyRootOptions( config ) {
 	if ( rootConfig.pluginSources !== undefined ) {
 		rootConfig.pluginSources = [ ...rootConfig.pluginSources ];
 	}
+	if ( rootConfig.networkPluginSources !== undefined ) {
+		rootConfig.networkPluginSources = [
+			...rootConfig.networkPluginSources,
+		];
+	}
 	if ( rootConfig.themeSources !== undefined ) {
 		rootConfig.themeSources = [ ...rootConfig.themeSources ];
 	}
