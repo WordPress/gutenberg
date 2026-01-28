@@ -19,6 +19,11 @@ import { unlock } from '../../lock-unlock';
  */
 export default function useEditedSectionDetails() {
 	return useSelect( ( select ) => {
+		// Only run when the content only pattern insertion experiment is enabled
+		if ( ! window?.__experimentalContentOnlyPatternInsertion ) {
+			return null;
+		}
+
 		const {
 			getBlockAttributes,
 			getBlockName,

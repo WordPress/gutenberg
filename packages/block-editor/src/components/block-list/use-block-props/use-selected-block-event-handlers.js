@@ -319,12 +319,17 @@ export function useEventHandlers( { clientId, isSelected } ) {
 				editContentOnlySection( clientId );
 			}
 
-			node.addEventListener( 'dblclick', onDoubleClick );
+			// Only add double-click listener if experimental flag is enabled
+			if ( window?.__experimentalContentOnlyPatternInsertion ) {
+				node.addEventListener( 'dblclick', onDoubleClick );
+			}
 
 			return () => {
 				node.removeEventListener( 'keydown', onKeyDown );
 				node.removeEventListener( 'dragstart', onDragStart );
-				node.removeEventListener( 'dblclick', onDoubleClick );
+				if ( window?.__experimentalContentOnlyPatternInsertion ) {
+					node.removeEventListener( 'dblclick', onDoubleClick );
+				}
 			};
 		},
 		[
