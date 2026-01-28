@@ -53,12 +53,16 @@ export function Comments( {
 	onEditComment,
 	onAddReply,
 	onCommentDelete,
-	newNoteFormState,
-	setNewNoteFormState,
+	openNoteForm,
+	closeNoteForm,
+	isNoteFormOpen,
 	commentSidebarRef,
 	reflowComments,
 	isFloating = false,
 	commentLastUpdated,
+	setDraftNote,
+	getDraftNote,
+	clearDraftNote,
 } ) {
 	const [ heights, setHeights ] = useState( {} );
 	const [ selectedThread, setSelectedThread ] = useState( null );
@@ -97,7 +101,7 @@ export function Comments( {
 		// add a "new note" entry to the threads. This special thread type
 		// gets sorted and floated like regular threads, but shows an AddComment
 		// component instead of a regular comment thread.
-		if ( isFloating && newNoteFormState === 'open' ) {
+		if ( isFloating && isNoteFormOpen( selectedBlockClientId ) ) {
 			// Insert the new note entry at the correct location for its blockId.
 			const newNoteThread = {
 				id: 'new-note-thread',
@@ -123,7 +127,7 @@ export function Comments( {
 	}, [
 		noteThreads,
 		isFloating,
-		newNoteFormState,
+		isNoteFormOpen,
 		selectedBlockClientId,
 		orderedBlockIds,
 	] );
@@ -150,9 +154,10 @@ export function Comments( {
 			focusCommentThread( prevThread.id, commentSidebarRef.current );
 		} else {
 			setSelectedThread( null );
-			setNewNoteFormState( 'closed' );
-			// Move focus to the related block.
-			relatedBlockElement?.focus();
+			if ( relatedBlockElement ) {
+				// Close the note form for this block if it was open
+				closeNoteForm( selectedBlockClientId );
+			}
 		}
 	};
 
@@ -160,9 +165,11 @@ export function Comments( {
 	useEffect( () => {
 		// Fallback to 'new-note-thread' when showing the comment board for a new note.
 		setSelectedThread(
-			newNoteFormState === 'open' ? 'new-note-thread' : blockCommentId
+			isNoteFormOpen( selectedBlockClientId )
+				? 'new-note-thread'
+				: blockCommentId
 		);
-	}, [ blockCommentId, newNoteFormState ] );
+	}, [ blockCommentId, isNoteFormOpen, selectedBlockClientId ] );
 
 	const setBlockRef = useCallback( ( id, blockRef ) => {
 		setBlockRefs( ( prev ) => ( { ...prev, [ id ]: blockRef } ) );
@@ -327,7 +334,9 @@ export function Comments( {
 			! isSelected
 		) {
 			// Expand thread.
-			setNewNoteFormState( 'closed' );
+			if ( thread.blockClientId ) {
+				closeNoteForm( thread.blockClientId );
+			}
 			setSelectedThread( thread.id );
 			if ( !! thread.blockClientId ) {
 				// Pass `null` as the second parameter to prevent focusing the block.
@@ -342,7 +351,9 @@ export function Comments( {
 		) {
 			// Collapse thread.
 			setSelectedThread( null );
-			setNewNoteFormState( 'closed' );
+			if ( thread.blockClientId ) {
+				closeNoteForm( thread.blockClientId );
+			}
 			if ( thread.blockClientId ) {
 				toggleBlockSpotlight( thread.blockClientId, false );
 			}
@@ -387,21 +398,29 @@ export function Comments( {
 		return (
 			<AddComment
 				onSubmit={ onAddReply }
-				newNoteFormState={ newNoteFormState }
-				setNewNoteFormState={ setNewNoteFormState }
+				openNoteForm={ openNoteForm }
+				closeNoteForm={ closeNoteForm }
+				isNoteFormOpen={ isNoteFormOpen }
 				commentSidebarRef={ commentSidebarRef }
+				setDraftNote={ setDraftNote }
+				getDraftNote={ getDraftNote }
+				clearDraftNote={ clearDraftNote }
 			/>
 		);
 	}
 
 	return (
 		<>
-			{ ! isFloating && newNoteFormState === 'open' && (
+			{ ! isFloating && isNoteFormOpen( selectedBlockClientId ) && (
 				<AddComment
 					onSubmit={ onAddReply }
-					newNoteFormState={ newNoteFormState }
-					setNewNoteFormState={ setNewNoteFormState }
+					openNoteForm={ openNoteForm }
+					closeNoteForm={ closeNoteForm }
+					isNoteFormOpen={ isNoteFormOpen }
 					commentSidebarRef={ commentSidebarRef }
+					setDraftNote={ setDraftNote }
+					getDraftNote={ getDraftNote }
+					clearDraftNote={ clearDraftNote }
 				/>
 			) }
 			{ threads.map( ( thread ) => (
@@ -413,7 +432,9 @@ export function Comments( {
 					onEditComment={ onEditComment }
 					isSelected={ selectedThread === thread.id }
 					setSelectedThread={ setSelectedThread }
-					setNewNoteFormState={ setNewNoteFormState }
+					openNoteForm={ openNoteForm }
+					closeNoteForm={ closeNoteForm }
+					isNoteFormOpen={ isNoteFormOpen }
 					commentSidebarRef={ commentSidebarRef }
 					reflowComments={ reflowComments }
 					isFloating={ isFloating }
@@ -422,7 +443,9 @@ export function Comments( {
 					setBlockRef={ setBlockRef }
 					selectedThread={ selectedThread }
 					commentLastUpdated={ commentLastUpdated }
-					newNoteFormState={ newNoteFormState }
+					setDraftNote={ setDraftNote }
+					getDraftNote={ getDraftNote }
+					clearDraftNote={ clearDraftNote }
 					onKeyDown={ ( event ) =>
 						handleThreadNavigation(
 							event,
@@ -442,7 +465,9 @@ function Thread( {
 	onAddReply,
 	onCommentDelete,
 	isSelected,
-	setNewNoteFormState,
+	openNoteForm,
+	closeNoteForm,
+	isNoteFormOpen,
 	commentSidebarRef,
 	reflowComments,
 	isFloating,
@@ -452,8 +477,10 @@ function Thread( {
 	setSelectedThread,
 	selectedThread,
 	commentLastUpdated,
-	newNoteFormState,
 	onKeyDown,
+	setDraftNote,
+	getDraftNote,
+	clearDraftNote,
 } ) {
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
@@ -517,7 +544,6 @@ function Thread( {
 	};
 
 	const handleCommentSelect = () => {
-		setNewNoteFormState( 'closed' );
 		setSelectedThread( thread.id );
 		toggleBlockSpotlight( thread.blockClientId, true );
 		if ( !! thread.blockClientId ) {
@@ -528,7 +554,9 @@ function Thread( {
 
 	const unselectThread = () => {
 		setSelectedThread( null );
-		setNewNoteFormState( 'closed' );
+		if ( thread.blockClientId ) {
+			closeNoteForm( thread.blockClientId );
+		}
 		toggleBlockSpotlight( thread.blockClientId, false );
 	};
 
@@ -556,19 +584,23 @@ function Thread( {
 
 	if (
 		thread.id === 'new-note-thread' &&
-		newNoteFormState === 'open' &&
+		isNoteFormOpen( thread.blockClientId ) &&
 		isFloating
 	) {
 		return (
 			<AddComment
 				onSubmit={ onAddReply }
-				newNoteFormState={ newNoteFormState }
-				setNewNoteFormState={ setNewNoteFormState }
+				openNoteForm={ openNoteForm }
+				closeNoteForm={ closeNoteForm }
+				isNoteFormOpen={ isNoteFormOpen }
 				commentSidebarRef={ commentSidebarRef }
 				reflowComments={ reflowComments }
 				isFloating={ isFloating }
 				y={ y }
 				refs={ refs }
+				setDraftNote={ setDraftNote }
+				getDraftNote={ getDraftNote }
+				clearDraftNote={ clearDraftNote }
 			/>
 		);
 	}
@@ -700,6 +732,7 @@ function Thread( {
 					<VStack spacing="2">
 						<CommentForm
 							onSubmit={ ( inputComment ) => {
+								const draftKey = `reply-${ thread.id }`;
 								if ( 'approved' === thread.status ) {
 									// For reopening, include the content in the reopen action.
 									onEditComment( {
@@ -714,10 +747,13 @@ function Thread( {
 										parent: thread.id,
 									} );
 								}
+								clearDraftNote( draftKey );
 							} }
 							onCancel={ ( event ) => {
 								// Prevent the parent onClick from being triggered.
 								event.stopPropagation();
+								const draftKey = `reply-${ thread.id }`;
+								clearDraftNote( draftKey );
 								unselectThread();
 								focusCommentThread(
 									thread.id,
@@ -737,6 +773,12 @@ function Thread( {
 								thread.author_name
 							) }
 							reflowComments={ reflowComments }
+							draftValue={ getDraftNote(
+								`reply-${ thread.id }`
+							) }
+							onDraftChange={ ( value ) =>
+								setDraftNote( `reply-${ thread.id }`, value )
+							}
 						/>
 					</VStack>
 				</VStack>

@@ -6,7 +6,7 @@ import TextareaAutosize from 'react-autosize-textarea';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import {
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
@@ -30,16 +30,24 @@ function CommentForm( {
 	submitButtonText,
 	labelText,
 	reflowComments = noop,
+	draftValue = '',
+	onDraftChange = noop,
 } ) {
 	const [ inputComment, setInputComment ] = useState(
-		thread?.content?.raw ?? ''
+		draftValue || thread?.content?.raw || ''
 	);
+
+	// Sync with draftValue when it changes (e.g., when switching blocks)
+	useEffect( () => {
+		setInputComment( draftValue || thread?.content?.raw || '' );
+	}, [ draftValue, thread?.content?.raw ] );
 
 	// Regularly trigger a reflow as the user types since the textarea may grow or shrink.
 	const debouncedCommentUpdated = useDebounce( reflowComments, 100 );
 
 	const updateComment = ( value ) => {
 		setInputComment( value );
+		onDraftChange( value );
 	};
 
 	const inputId = useInstanceId( CommentForm, 'comment-input' );

@@ -34,14 +34,18 @@ import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
 function NotesSidebarContent( {
-	newNoteFormState,
-	setNewNoteFormState,
+	openNoteForm,
+	closeNoteForm,
+	isNoteFormOpen,
 	styles,
 	comments,
 	commentSidebarRef,
 	reflowComments,
 	commentLastUpdated,
 	isFloating = false,
+	setDraftNote,
+	getDraftNote,
+	clearDraftNote,
 } ) {
 	const { onCreate, onEdit, onDelete } =
 		useBlockCommentsActions( reflowComments );
@@ -69,20 +73,26 @@ function NotesSidebarContent( {
 				onEditComment={ onEdit }
 				onAddReply={ onCreate }
 				onCommentDelete={ onDelete }
-				newNoteFormState={ newNoteFormState }
-				setNewNoteFormState={ setNewNoteFormState }
+				openNoteForm={ openNoteForm }
+				closeNoteForm={ closeNoteForm }
+				isNoteFormOpen={ isNoteFormOpen }
 				commentSidebarRef={ commentSidebarRef }
 				reflowComments={ reflowComments }
 				commentLastUpdated={ commentLastUpdated }
 				isFloating={ isFloating }
+				setDraftNote={ setDraftNote }
+				getDraftNote={ getDraftNote }
+				clearDraftNote={ clearDraftNote }
 			/>
 		</VStack>
 	);
 }
 
 function NotesSidebar( { postId } ) {
-	// Enum: 'closed' | 'creating' | 'open'
-	const [ newNoteFormState, setNewNoteFormState ] = useState( 'closed' );
+	// Track which blocks have open note forms (using Set for efficient lookup)
+	const [ openNoteFormsSet, setOpenNoteFormsSet ] = useState( new Set() );
+	// Track draft notes per block clientId (for new notes) and per thread id (for replies)
+	const [ draftNotes, setDraftNotes ] = useState( {} );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
@@ -90,6 +100,39 @@ function NotesSidebar( { postId } ) {
 	const commentSidebarRef = useRef( null );
 
 	const showFloatingSidebar = isLargeViewport;
+
+	// Helper functions to manage open note forms
+	const openNoteForm = ( blockClientId ) => {
+		setOpenNoteFormsSet( ( prev ) => new Set( prev ).add( blockClientId ) );
+	};
+
+	const closeNoteForm = ( blockClientId ) => {
+		setOpenNoteFormsSet( ( prev ) => {
+			const next = new Set( prev );
+			next.delete( blockClientId );
+			return next;
+		} );
+	};
+
+	const isNoteFormOpen = ( blockClientId ) =>
+		openNoteFormsSet.has( blockClientId );
+
+	// Helper functions to manage draft notes
+	const setDraftNote = ( key, content ) => {
+		setDraftNotes( ( prev ) => ( {
+			...prev,
+			[ key ]: content,
+		} ) );
+	};
+
+	const getDraftNote = ( key ) => draftNotes[ key ] || '';
+
+	const clearDraftNote = ( key ) => {
+		setDraftNotes( ( prev ) => {
+			const { [ key ]: _, ...rest } = prev;
+			return rest;
+		} );
+	};
 
 	const { clientId, blockCommentId, isDistractionFree } = useSelect(
 		( select ) => {
@@ -118,8 +161,7 @@ function NotesSidebar( { postId } ) {
 	} = useBlockComments( postId );
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
-			( unresolvedSortedThreads.length > 0 ||
-				newNoteFormState !== 'closed' )
+			( unresolvedSortedThreads.length > 0 || openNoteFormsSet.size > 0 )
 	);
 
 	// Get the global styles to set the background color of the sidebar.
@@ -153,7 +195,9 @@ function NotesSidebar( { postId } ) {
 			return;
 		}
 
-		setNewNoteFormState( ! currentThread ? 'open' : 'closed' );
+		if ( ! currentThread && clientId ) {
+			openNoteForm( clientId );
+		}
 		focusCommentThread(
 			currentThread?.id,
 			commentSidebarRef.current,
@@ -191,11 +235,15 @@ function NotesSidebar( { postId } ) {
 				>
 					<NotesSidebarContent
 						comments={ resultComments }
-						newNoteFormState={ newNoteFormState }
-						setNewNoteFormState={ setNewNoteFormState }
+						openNoteForm={ openNoteForm }
+						closeNoteForm={ closeNoteForm }
+						isNoteFormOpen={ isNoteFormOpen }
 						commentSidebarRef={ commentSidebarRef }
 						reflowComments={ reflowComments }
 						commentLastUpdated={ commentLastUpdated }
+						setDraftNote={ setDraftNote }
+						getDraftNote={ getDraftNote }
+						clearDraftNote={ clearDraftNote }
 					/>
 				</PluginSidebar>
 			) }
@@ -210,8 +258,9 @@ function NotesSidebar( { postId } ) {
 				>
 					<NotesSidebarContent
 						comments={ unresolvedSortedThreads }
-						newNoteFormState={ newNoteFormState }
-						setNewNoteFormState={ setNewNoteFormState }
+						openNoteForm={ openNoteForm }
+						closeNoteForm={ closeNoteForm }
+						isNoteFormOpen={ isNoteFormOpen }
 						commentSidebarRef={ commentSidebarRef }
 						reflowComments={ reflowComments }
 						commentLastUpdated={ commentLastUpdated }
@@ -219,6 +268,9 @@ function NotesSidebar( { postId } ) {
 							backgroundColor,
 						} }
 						isFloating
+						setDraftNote={ setDraftNote }
+						getDraftNote={ getDraftNote }
+						clearDraftNote={ clearDraftNote }
 					/>
 				</PluginSidebar>
 			) }

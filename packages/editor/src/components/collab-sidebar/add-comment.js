@@ -28,13 +28,18 @@ const { useBlockElement } = unlock( blockEditorPrivateApis );
 
 export function AddComment( {
 	onSubmit,
-	newNoteFormState,
-	setNewNoteFormState,
+	// eslint-disable-next-line no-unused-vars
+	openNoteForm,
+	closeNoteForm,
+	isNoteFormOpen,
 	commentSidebarRef,
 	reflowComments = noop,
 	isFloating = false,
 	y,
 	refs,
+	getDraftNote = () => '',
+	setDraftNote = noop,
+	clearDraftNote = noop,
 } ) {
 	const { clientId } = useSelect( ( select ) => {
 		const { getSelectedBlockClientId } = select( blockEditorStore );
@@ -45,13 +50,16 @@ export function AddComment( {
 	const blockElement = useBlockElement( clientId );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 
+	// Use clientId as the draft key for new notes
+	const draftKey = `new-note-${ clientId }`;
+
 	const unselectThread = () => {
-		setNewNoteFormState( 'closed' );
+		closeNoteForm( clientId );
 		blockElement?.focus();
 		toggleBlockSpotlight( clientId, false );
 	};
 
-	if ( newNoteFormState !== 'open' || ! clientId ) {
+	if ( ! isNoteFormOpen( clientId ) || ! clientId ) {
 		return null;
 	}
 
@@ -74,13 +82,6 @@ export function AddComment( {
 					  { top: y, opacity: ! y ? 0 : undefined }
 					: undefined
 			}
-			onBlur={ ( event ) => {
-				if ( event.currentTarget.contains( event.relatedTarget ) ) {
-					return;
-				}
-				toggleBlockSpotlight( clientId, false );
-				setNewNoteFormState( 'closed' );
-			} }
 		>
 			<HStack alignment="left" spacing="3">
 				<CommentAuthorInfo />
@@ -89,12 +90,18 @@ export function AddComment( {
 				onSubmit={ async ( inputComment ) => {
 					const { id } = await onSubmit( { content: inputComment } );
 					focusCommentThread( id, commentSidebarRef.current );
-					setNewNoteFormState( 'creating' );
+					closeNoteForm( clientId );
+					clearDraftNote( draftKey );
 				} }
-				onCancel={ unselectThread }
+				onCancel={ () => {
+					clearDraftNote( draftKey );
+					unselectThread();
+				} }
 				reflowComments={ reflowComments }
 				submitButtonText={ __( 'Add note' ) }
 				labelText={ __( 'New note' ) }
+				draftValue={ getDraftNote( draftKey ) }
+				onDraftChange={ ( value ) => setDraftNote( draftKey, value ) }
 			/>
 		</VStack>
 	);
