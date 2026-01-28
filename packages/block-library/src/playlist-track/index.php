@@ -45,7 +45,7 @@ function render_block_core_playlist_track( $attributes ) {
 		$html .= '<span class="wp-block-playlist-track__length">' .
 		sprintf(
 			/* translators: %s: track length in minutes:seconds */
-			'<span class="screen-reader-text">' . esc_html__( 'Length:' ) . ' </span>%s',
+			'<span class="screen-reader-text">Length:</span>%s',
 			$length
 		);
 		$html .= '</span>';
