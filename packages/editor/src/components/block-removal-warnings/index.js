@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 
-import { _n } from '@wordpress/i18n';
+import { __, _n } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -27,6 +27,27 @@ const BLOCK_REMOVAL_RULES = [
 		// The warning is only shown when a user manipulates templates or template parts.
 		postTypes: [ 'wp_template', 'wp_template_part' ],
 		callback( removedBlocks ) {
+			// Check specifically for post-content block first.
+			const removedPostContentBlocks = removedBlocks.filter(
+				( { name } ) => name === 'core/post-content'
+			);
+			if ( removedPostContentBlocks.length ) {
+				return {
+					title: __( 'Remove content block?' ),
+					description: __(
+						'This block displays the content of posts and pages using this template.'
+					),
+					warning: __(
+						'If you delete it, content using this template will not display.'
+					),
+					subtext: __( 'Visitors will see blank pages.' ),
+					requireConfirmation: true,
+					confirmLabel: __( 'I understand the consequences' ),
+					removeLabel: __( 'Remove' ),
+				};
+			}
+
+			// Other template blocks (post-template, query) - keep existing string message.
 			const removedTemplateBlocks = removedBlocks.filter( ( { name } ) =>
 				TEMPLATE_BLOCKS.includes( name )
 			);
