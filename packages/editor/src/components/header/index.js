@@ -30,6 +30,7 @@ import {
 	NAVIGATION_POST_TYPE,
 } from '../../store/constants';
 import { unlock } from '../../lock-unlock';
+import { CollaboratorsPresence } from '../collaborators-presence/index';
 
 function Header( {
 	customSaveButton,
@@ -120,7 +121,14 @@ function Header( {
 					) }
 				</>
 			}
-			center={ hasCenter ? <DocumentBar /> : undefined }
+			center={
+				hasCenter ? (
+					<>
+						<CollaboratorsPresence />
+						<DocumentBar />
+					</>
+				) : undefined
+			}
 			settings={
 				<>
 					{ ! customSaveButton && ! isPublishSidebarOpened && (
