@@ -19,7 +19,7 @@
 		},
 		"order": {
 			"type": "string",
-			"default": "ASC"
+			"default": "asc"
 		},
 		"showTracklist": {
 			"type": "boolean",

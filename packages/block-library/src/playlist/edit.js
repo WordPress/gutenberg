@@ -310,14 +310,13 @@ const PlaylistEdit = ( {
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
 			const sortedBlocks = [ ...innerBlockTracks ].sort( ( a, b ) => {
-				if ( trackOrder === 'ASC' ) {
-					return a.attributes.uniqueId.localeCompare(
-						b.attributes.uniqueId
-					);
+				const titleA = a.attributes.title || '';
+				const titleB = b.attributes.title || '';
+
+				if ( trackOrder === 'asc' ) {
+					return titleA.localeCompare( titleB );
 				}
-				return b.attributes.uniqueId.localeCompare(
-					a.attributes.uniqueId
-				);
+				return titleB.localeCompare( titleA );
 			} );
 			const sortedTracks = sortedBlocks.map(
 				( block ) => block.attributes
@@ -408,7 +407,7 @@ const PlaylistEdit = ( {
 							showArtists: true,
 							showNumbers: true,
 							showImages: true,
-							order: 'ASC',
+							order: 'asc',
 						} );
 					} }
 					dropdownMenuProps={ dropdownMenuProps }
@@ -486,8 +485,8 @@ const PlaylistEdit = ( {
 					<ToolsPanelItem
 						label={ __( 'Order' ) }
 						isShownByDefault
-						hasValue={ () => order !== 'ASC' }
-						onDeselect={ () => setAttributes( { order: 'ASC' } ) }
+						hasValue={ () => order !== 'asc' }
+						onDeselect={ () => setAttributes( { order: 'asc' } ) }
 					>
 						<SelectControl
 							__next40pxDefaultSize
@@ -495,8 +494,8 @@ const PlaylistEdit = ( {
 							label={ __( 'Order' ) }
 							value={ order }
 							options={ [
-								{ label: __( 'Descending' ), value: 'DESC' },
-								{ label: __( 'Ascending' ), value: 'ASC' },
+								{ label: __( 'Descending' ), value: 'desc' },
+								{ label: __( 'Ascending' ), value: 'asc' },
 							] }
 							onChange={ ( value ) => onChangeOrder( value ) }
 						/>
