@@ -13,7 +13,11 @@ import {
 	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_KEY,
 	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
 } from './config';
-import { logPerformanceTiming, passThru } from './performance';
+import {
+	logPerformanceTiming,
+	passThru,
+	yieldToEventLoop,
+} from './performance';
 import { createPersistedCRDTDoc, getPersistedCrdtDoc } from './persistence';
 import { getProviderCreators } from './providers';
 import type {
@@ -586,6 +590,6 @@ export function createSyncManager( debug = false ): SyncManager {
 			return undoManager;
 		},
 		unload: debugWrap( unloadEntity ),
-		update: debugWrap( updateCRDTDoc ),
+		update: debugWrap( yieldToEventLoop( updateCRDTDoc ) ),
 	};
 }
