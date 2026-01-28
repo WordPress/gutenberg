@@ -523,7 +523,6 @@ export function isSectionBlock( state, clientId ) {
 
 	if (
 		( attributes?.metadata?.patternName || isTemplatePart ) &&
-		!! window?.__experimentalContentOnlyPatternInsertion &&
 		! isIsolatedEditor
 	) {
 		return true;

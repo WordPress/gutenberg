@@ -14,21 +14,6 @@ import type { Awareness } from 'y-protocols/awareness';
  */
 import type { AwarenessState } from './awareness/awareness-state';
 import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
-import type { SyncManagerUpdateOptions } from './manager';
-
-/* globalThis */
-declare global {
-	interface Window {
-		__experimentalCollaborativeEditingSecret?: string;
-		wp?: {
-			ajax?: {
-				settings?: {
-					url?: string;
-				};
-			};
-		};
-	}
-}
 
 export type CRDTDoc = Y.Doc;
 export type AwarenessID = string;
@@ -69,6 +54,11 @@ export type ProviderCreator = (
 
 export interface CollectionHandlers {
 	refetchRecords: () => Promise< void >;
+}
+
+export interface SyncManagerUpdateOptions {
+	isSave?: boolean;
+	isNewUndoLevel?: boolean;
 }
 
 export interface RecordHandlers {

@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add experimental WordPress Playground runtime support. Use `--runtime=playground` flag to start wp-env with Playground instead of Docker.
+
 ## 10.38.0 (2026-01-16)
 
 ## 10.36.0 (2025-11-26)

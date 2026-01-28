@@ -1,5 +1,20 @@
 == Changelog ==
 
+= 22.4.2 =
+
+## Changelog
+
+### Bug Fixes
+
+- Remove link underline style from default theme.json. ([74901](https://github.com/WordPress/gutenberg/pull/74901))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@youknowriad
+
+
 = 22.4.1 =
 
 

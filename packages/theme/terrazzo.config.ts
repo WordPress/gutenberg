@@ -114,12 +114,12 @@ export default defineConfig( {
 				{
 					name: 'BorderRadiusSize',
 					description: 'Size scale for border radius tokens.',
-					patterns: [ /^wpds-border\.radius\.[^.]+\.([^.]+)$/ ],
+					patterns: [ /^wpds-border\.radius\.([^.]+)$/ ],
 				},
 				{
 					name: 'BorderWidthSize',
 					description: 'Size scale for border width tokens.',
-					patterns: [ /^wpds-border\.width\.surface\.([^.]+)$/ ],
+					patterns: [ /^wpds-border\.width\.([^.]+)$/ ],
 				},
 				{
 					name: 'Target',
