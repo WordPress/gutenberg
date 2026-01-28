@@ -94,7 +94,22 @@ function spawnCommandDirectly( config, container, command, envCwd, spinner ) {
 		composeCommand.push( '-T' );
 	}
 
-	composeCommand.push( container, ...command );
+	composeCommand.push( container, 'sh', '-c' );
+
+	// Join the command into a single string and escape special characters.
+	let joinedCmd;
+	if ( command.length > 0 ) {
+		// Properly escape the command to ensure it works with sh -c
+		joinedCmd = command
+			.map( ( part ) => {
+				return part.replace( /(["\\$`])/g, '\\$1' );
+			} )
+			.join( ' ' );
+	} else {
+		joinedCmd = '';
+	}
+
+	composeCommand.push( joinedCmd );
 
 	return new Promise( ( resolve, reject ) => {
 		// Note: since the npm docker-compose package uses the -T option, we
