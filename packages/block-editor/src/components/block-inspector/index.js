@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
+	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { __unstableMotion as motion } from '@wordpress/components';
@@ -145,32 +146,30 @@ function BlockInspector() {
 				renderedBlockClientId
 			);
 
-			// Temporary workaround for issue #71991
-			// Exclude Navigation block children from Content sidebar until proper
-			// drill-down experience is implemented (see #65699)
-			// This prevents a poor UX where all Nav block sub-items are shown
-			// when the parent block is in contentOnly mode.
-			// Build a Set of all navigation block descendants for efficient lookup
-			const navigationDescendants = new Set();
+			// Exclude items from the content tab that are already present in the
+			// List View tab.
+			const listViewDescendants = new Set();
 			descendants.forEach( ( clientId ) => {
-				if ( getBlockName( clientId ) === 'core/navigation' ) {
-					const navChildren = getClientIdsOfDescendants( clientId );
-					navChildren.forEach( ( childId ) =>
-						navigationDescendants.add( childId )
+				const blockName = getBlockName( clientId );
+				if (
+					blockName === 'core/navigation' ||
+					hasBlockSupport( blockName, 'listView' )
+				) {
+					const listViewChildren =
+						getClientIdsOfDescendants( clientId );
+					listViewChildren.forEach( ( childId ) =>
+						listViewDescendants.add( childId )
 					);
 				}
 			} );
 
 			return descendants.filter( ( current ) => {
 				// Exclude navigation block children
-				if ( navigationDescendants.has( current ) ) {
+				if ( listViewDescendants.has( current ) ) {
 					return false;
 				}
 
-				return (
-					getBlockName( current ) !== 'core/list-item' &&
-					getBlockEditingMode( current ) === 'contentOnly'
-				);
+				return getBlockEditingMode( current ) === 'contentOnly';
 			} );
 		},
 		[ isSectionBlock, renderedBlockClientId ]
