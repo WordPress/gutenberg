@@ -243,8 +243,10 @@ module.exports = async function start( {
 		await executeLifecycleScript( 'afterStart', config, spinner );
 	}
 
-	const siteUrl = config.env.development.config.WP_SITEURL;
-	const testsSiteUrl = config.env.tests.config.WP_SITEURL;
+	const siteUrl =
+		process.env.WP_ENV_SITEURL || config.env.development.config.WP_SITEURL;
+	const testsSiteUrl =
+		process.env.WP_ENV_TESTS_SITEURL || config.env.tests.config.WP_SITEURL;
 
 	const mySQLPort = await getPublicDockerPort(
 		'mysql',

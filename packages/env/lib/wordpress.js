@@ -96,8 +96,29 @@ async function configureWordPress( environment, config, spinner ) {
 
 	const isMultisite = config.env[ environment ].multisite;
 
+	const isDynamicUrlsEnabled =
+		process.env.WP_ENV_DYNAMIC_URLS_ENABLED !== 'false';
+
+	const hasCustomEnvUrls = !! (
+		process.env.WP_ENV_HOMEURL ||
+		process.env.WP_ENV_SITEURL ||
+		process.env.WP_ENV_TESTS_HOMEURL ||
+		process.env.WP_ENV_TESTS_SITEURL
+	);
+
+	let siteUrl;
+	if ( environment === 'development' ) {
+		siteUrl =
+			process.env.WP_ENV_SITEURL ||
+			config.env[ environment ].config.WP_SITEURL;
+	} else {
+		siteUrl =
+			process.env.WP_ENV_TESTS_SITEURL ||
+			config.env[ environment ].config.WP_SITEURL;
+	}
+
 	const installMethod = isMultisite ? 'multisite-install' : 'install';
-	const installCommand = `wp core ${ installMethod } --url="${ config.env[ environment ].config.WP_SITEURL }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
+	const installCommand = `wp core ${ installMethod } --url="${ siteUrl }" --title="${ config.name }" --admin_user=admin --admin_password=password --admin_email=wordpress@example.com --skip-email`;
 
 	// -eo pipefail exits the command as soon as anything fails in bash.
 	const setupCommands = [
@@ -147,6 +168,47 @@ echo 'RewriteRule . index.php [L]'
 			continue;
 		}
 
+		// Skip setting WP_HOME and WP_SITEURL when dynamic urls is enabled and custom urls are not set.
+		if (
+			isDynamicUrlsEnabled &&
+			! hasCustomEnvUrls &&
+			( key === 'WP_HOME' || key === 'WP_SITEURL' )
+		) {
+			continue;
+		}
+
+		if ( key === 'WP_HOME' ) {
+			const envVar =
+				environment === 'development'
+					? 'WP_ENV_HOMEURL'
+					: 'WP_ENV_TESTS_HOMEURL';
+			if ( process.env[ envVar ] ) {
+				value = process.env[ envVar ];
+			}
+		}
+
+		if ( key === 'WP_SITEURL' ) {
+			const envVar =
+				environment === 'development'
+					? 'WP_ENV_SITEURL'
+					: 'WP_ENV_TESTS_SITEURL';
+			if ( process.env[ envVar ] ) {
+				value = process.env[ envVar ];
+			}
+		}
+
+		if ( key === 'WP_TESTS_DOMAIN' ) {
+			const envVar =
+				environment === 'development'
+					? 'WP_ENV_SITEURL'
+					: 'WP_ENV_TESTS_SITEURL';
+			if ( process.env[ envVar ] ) {
+				value = process.env[ envVar ]
+					.replace( 'https://', '' )
+					.replace( 'http://', '' );
+			}
+		}
+
 		// Add quotes around string values to work with multi-word strings better.
 		value = typeof value === 'string' ? `"${ value }"` : value;
 		setupCommands.push(
@@ -179,6 +241,42 @@ echo 'RewriteRule . index.php [L]'
 			log: config.debug,
 		}
 	);
+
+	if ( isDynamicUrlsEnabled && ! hasCustomEnvUrls ) {
+		await dockerCompose.exec(
+			environment === 'development' ? 'wordpress' : 'tests-wordpress',
+			[
+				'sh',
+				'-c',
+				`grep -q "// BEGIN DYNAMIC_URLS" /var/www/html/wp-config.php || sed -i "/\\/\\/ a helper function to lookup \\"env_FILE\\", \\"env\\", then fallback/i \\
+\\/\\/ BEGIN DYNAMIC_URLS\\n\
+if (isset(\\$_SERVER['HTTP_X_FORWARDED_PROTO']) \\&\\& strpos(\\$_SERVER['HTTP_X_FORWARDED_PROTO'], 'https') !== false) {\\n\
+\\t\\$_SERVER['HTTPS'] = 'on';\\n\
+\\tdefine('DOCKER_REQUEST_URL', 'https://' . (!empty(\\$_SERVER['HTTP_HOST']) ? \\$_SERVER['HTTP_HOST'] : 'localhost'));\\n\
+\\tdefine('WP_HOME', DOCKER_REQUEST_URL);\\n\
+\\tdefine('WP_SITEURL', DOCKER_REQUEST_URL);\\n\
+}\\n\
+\\/\\/ END DYNAMIC_URLS" /var/www/html/wp-config.php`,
+			],
+			{
+				config: config.dockerComposeConfigPath,
+				log: config.debug,
+			}
+		);
+	} else {
+		await dockerCompose.exec(
+			environment === 'development' ? 'wordpress' : 'tests-wordpress',
+			[
+				'sh',
+				'-c',
+				`sed -i '/\\/\\/ BEGIN DYNAMIC_URLS/,/\\/\\/ END DYNAMIC_URLS/d' /var/www/html/wp-config.php`,
+			],
+			{
+				config: config.dockerComposeConfigPath,
+				log: config.debug,
+			}
+		);
+	}
 
 	// WordPress versions below 5.1 didn't use proper spacing in wp-config.
 	// Additionally, WordPress versions below 5.4 used `dirname( __FILE__ )` instead of `__DIR__`.
@@ -313,7 +411,7 @@ async function copyCoreFiles( fromPath, toPath ) {
  * @param {WPSource} coreSource The WordPress source.
  * @param {Object}   spinner    A CLI spinner which indicates progress.
  * @param {boolean}  debug      Indicates whether or not the CLI is in debug mode.
- * @return {string} The version of WordPress the source is for.
+ * @return {Promise<string>} The version of WordPress the source is for.
  */
 async function readWordPressVersion( coreSource, spinner, debug ) {
 	const versionFilePath = path.join(
