@@ -176,6 +176,7 @@ function getBlockSettingsFromMetadata( { textdomain, ...metadata } ) {
 		'icon',
 		'description',
 		'keywords',
+		'inserterPriority',
 		'attributes',
 		'providesContext',
 		'usesContext',

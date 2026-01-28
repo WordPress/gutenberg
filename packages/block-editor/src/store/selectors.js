@@ -2178,6 +2178,7 @@ const buildBlockTypeItem =
 			description: blockType.description,
 			category: blockType.category,
 			keywords: blockType.keywords,
+			inserterPriority: blockType.inserterPriority ?? 0,
 			parent: blockType.parent,
 			ancestor: blockType.ancestor,
 			variations: allVariations,
@@ -2338,10 +2339,23 @@ export const getInserterItems = createRegistrySelector( ( select ) =>
 				type.push( block );
 				return blocks;
 			};
+
+			// Sort by inserterPriority (lower values first).
+			const sortByInserterPriority = ( a, b ) => {
+				const priorityA = a.inserterPriority ?? 0;
+				const priorityB = b.inserterPriority ?? 0;
+				return priorityA - priorityB;
+			};
+
 			const { core: coreItems, noncore: nonCoreItems } = items.reduce(
 				groupByType,
 				{ core: [], noncore: [] }
 			);
+
+			// Sort each group by inserterPriority.
+			coreItems.sort( sortByInserterPriority );
+			nonCoreItems.sort( sortByInserterPriority );
+
 			const sortedBlockTypes = [ ...coreItems, ...nonCoreItems ];
 			return [ ...sortedBlockTypes, ...patternInserterItems ];
 		},

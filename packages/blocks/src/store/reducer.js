@@ -62,11 +62,6 @@ function bootstrappedBlockTypes( state = {}, action ) {
 		case 'ADD_BOOTSTRAPPED_BLOCK_TYPE':
 			const { name, blockType } = action;
 			const serverDefinition = state[ name ];
-			// Don't overwrite if already set. It covers the case when metadata
-			// was initialized from the server.
-			if ( serverDefinition ) {
-				return state;
-			}
 			const newDefinition = Object.fromEntries(
 				Object.entries( blockType )
 					.filter(
@@ -75,6 +70,13 @@ function bootstrappedBlockTypes( state = {}, action ) {
 					.map( ( [ key, value ] ) => [ camelCase( key ), value ] )
 			);
 			newDefinition.name = name;
+			// Merge with existing definition if already set.
+			if ( serverDefinition ) {
+				return {
+					...state,
+					[ name ]: { ...serverDefinition, ...newDefinition },
+				};
+			}
 			return {
 				...state,
 				[ name ]: newDefinition,

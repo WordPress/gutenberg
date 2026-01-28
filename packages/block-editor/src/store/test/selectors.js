@@ -3404,6 +3404,7 @@ describe( 'selectors', () => {
 				icon: { src: 'test' },
 				id: 'core/test-block-a',
 				initialAttributes: {},
+				inserterPriority: 0,
 				isDisabled: false,
 				keywords: [ 'testing' ],
 				name: 'core/test-block-a',
@@ -4342,6 +4343,88 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			'plugin/block-c-with-variations/variation-b',
 		];
 		expect( items.map( ( { id } ) => id ) ).toEqual( expectedResult );
+	} );
+} );
+
+describe( 'getInserterItems with inserterPriority', () => {
+	beforeEach( () => {
+		registerBlockType( 'plugin/high-priority', {
+			apiVersion: 3,
+			save() {},
+			category: 'text',
+			title: 'High Priority Block',
+			icon: 'test',
+			inserterPriority: 100,
+		} );
+		registerBlockType( 'plugin/medium-priority', {
+			apiVersion: 3,
+			save() {},
+			category: 'text',
+			title: 'Medium Priority Block',
+			icon: 'test',
+			inserterPriority: 50,
+		} );
+		registerBlockType( 'plugin/low-priority', {
+			apiVersion: 3,
+			save() {},
+			category: 'text',
+			title: 'Low Priority Block',
+			icon: 'test',
+			inserterPriority: 0,
+		} );
+		registerBlockType( 'plugin/negative-priority', {
+			apiVersion: 3,
+			save() {},
+			category: 'text',
+			title: 'Negative Priority Block',
+			icon: 'test',
+			inserterPriority: -10,
+		} );
+		registerBlockType( 'plugin/no-priority', {
+			apiVersion: 3,
+			save() {},
+			category: 'text',
+			title: 'No Priority Block',
+			icon: 'test',
+		} );
+	} );
+
+	afterEach( () => {
+		[
+			'plugin/high-priority',
+			'plugin/medium-priority',
+			'plugin/low-priority',
+			'plugin/negative-priority',
+			'plugin/no-priority',
+		].forEach( unregisterBlockType );
+	} );
+
+	it( 'should sort blocks by inserterPriority (lower values first)', () => {
+		const items = select( store ).getInserterItems();
+		const pluginItems = items
+			.filter( ( { id } ) => id.startsWith( 'plugin/' ) )
+			.map( ( { id } ) => id );
+
+		expect( pluginItems ).toEqual( [
+			'plugin/negative-priority',
+			'plugin/low-priority',
+			'plugin/no-priority',
+			'plugin/medium-priority',
+			'plugin/high-priority',
+		] );
+	} );
+
+	it( 'should include inserterPriority in the returned item', () => {
+		const items = select( store ).getInserterItems();
+		const highPriorityItem = items.find(
+			( item ) => item.id === 'plugin/high-priority'
+		);
+		const noPriorityItem = items.find(
+			( item ) => item.id === 'plugin/no-priority'
+		);
+
+		expect( highPriorityItem.inserterPriority ).toBe( 100 );
+		expect( noPriorityItem.inserterPriority ).toBe( 0 );
 	} );
 } );
 
