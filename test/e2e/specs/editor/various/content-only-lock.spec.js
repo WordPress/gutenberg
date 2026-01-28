@@ -131,7 +131,7 @@ test.describe( 'Content-only lock', () => {
 		await editor.canvas
 			.locator( 'role=document[name="Block: Paragraph"i]' )
 			.click();
-		// Block is content locked again simple styles like position can not be changed.
+		// Block is content locked again, simple styles like color cannot be changed.
 		await expect(
 			page.locator( '.color-block-support-panel' )
 		).not.toBeAttached();
