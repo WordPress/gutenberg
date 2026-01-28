@@ -22,7 +22,7 @@ export default function useReportValidity(
 	useEffect( () => {
 		if ( shouldReport && ref.current ) {
 			const inputs = ref.current.querySelectorAll(
-				'input, textarea, select, fieldset'
+				'input, textarea, select'
 			);
 			inputs.forEach( ( input ) => {
 				( input as HTMLInputElement ).reportValidity();
