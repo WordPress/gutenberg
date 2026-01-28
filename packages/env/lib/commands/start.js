@@ -67,13 +67,25 @@ module.exports = async function start( {
 		spinner.start();
 	}
 
-	const result = await runtime.start( config, {
-		spinner,
-		update,
-		xdebug,
-		spx,
-		debug,
-	} );
+	let result;
+	try {
+		result = await runtime.start( config, {
+			spinner,
+			update,
+			xdebug,
+			spx,
+			debug,
+		} );
+	} catch ( error ) {
+		// Attempt to stop any partially-started environment so that
+		// processes do not linger after a failed start.
+		try {
+			await runtime.stop( config, { spinner } );
+		} catch {
+			// Ignore cleanup errors.
+		}
+		throw error;
+	}
 
 	if ( scripts ) {
 		await executeLifecycleScript( 'afterStart', config, spinner );

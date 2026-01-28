@@ -186,8 +186,34 @@ class PlaygroundRuntime {
 			this.serverProcess = child;
 			this.serverPort = port;
 
+			// Save PID to file immediately so stop command can find the
+			// process even if startup fails before the server is ready.
+			fs.writeFile( pidFile, String( child.pid ) ).catch( () => {} );
+
 			// Allow parent to exit independently
 			child.unref();
+
+			// Track whether the process has exited so cleanup knows
+			// whether it still needs to kill it.
+			let processExited = false;
+
+			// If the process exits before the server is ready (e.g. blueprint
+			// validation error), reject immediately instead of waiting for
+			// the full 120-second timeout.
+			const earlyExitPromise = new Promise( ( _, rejectEarly ) => {
+				child.on( 'exit', ( code, signal ) => {
+					processExited = true;
+					const reason =
+						code !== null
+							? `with code ${ code }`
+							: `from signal ${ signal }`;
+					rejectEarly(
+						new Error(
+							`Playground process exited unexpectedly ${ reason }.`
+						)
+					);
+				} );
+			} );
 
 			child.on( 'error', ( error ) => {
 				logFileStream.close();
@@ -198,13 +224,13 @@ class PlaygroundRuntime {
 				);
 			} );
 
-			// Wait for server to be ready
-			this._waitForServer( port, 120000 )
+			// Race: wait for server to respond vs process early exit.
+			Promise.race( [
+				this._waitForServer( port, 120000 ),
+				earlyExitPromise,
+			] )
 				.then( async () => {
 					spinner.text = `WordPress Playground started at ${ siteUrl }`;
-
-					// Save PID to file so stop command can find the process
-					await fs.writeFile( pidFile, String( child.pid ) );
 
 					const message =
 						'WordPress development site started at ' + siteUrl;
@@ -215,8 +241,8 @@ class PlaygroundRuntime {
 					} );
 				} )
 				.catch( async ( error ) => {
-					// Try to kill the process if it started but server never responded
-					if ( this.serverProcess ) {
+					// Kill the process if it is still running.
+					if ( ! processExited && this.serverProcess ) {
 						this.serverProcess.kill( 'SIGKILL' );
 						this.serverProcess = null;
 					}

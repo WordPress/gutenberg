@@ -37,7 +37,7 @@ function buildBlueprint( config ) {
 		} else if ( plugin.type === 'zip' && plugin.url ) {
 			blueprint.steps.push( {
 				step: 'installPlugin',
-				pluginZipFile: { url: plugin.url },
+				pluginData: { resource: 'url', url: plugin.url },
 				options: { activate: true },
 			} );
 		} else {
