@@ -226,7 +226,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 * @param string $icon_name Icon name including namespace.
 		 * @return array|null Registered icon properties or `null` if the icon is not registered.
 		 */
-		public function get_registered( $icon_name ) {
+		public function get_registered_icon( $icon_name ) {
 			if ( ! $this->is_registered( $icon_name ) ) {
 				return null;
 			}
@@ -243,7 +243,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 *
 		 * @return array[] Array of arrays containing the registered icon properties.
 		 */
-		public function get_all_registered() {
+		public function get_registered_icons() {
 			$icons = $this->registered_icons;
 
 			foreach ( $icons as $index => $icon ) {

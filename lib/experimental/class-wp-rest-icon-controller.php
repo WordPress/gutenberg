@@ -112,7 +112,7 @@ if ( ! class_exists( 'WP_REST_Icon_Controller' ) ) {
 		 */
 		public function get_items( $request ) {
 			$response = array();
-			$icons    = WP_Icons_Registry::get_instance()->get_all_registered();
+			$icons    = WP_Icons_Registry::get_instance()->get_registered_icons();
 			$search   = $request->get_param( 'search' );
 			foreach ( $icons as $icon ) {
 				// Filter by search query if provided
@@ -149,7 +149,7 @@ if ( ! class_exists( 'WP_REST_Icon_Controller' ) ) {
 		 */
 		public function get_icon( $name ) {
 			$registry = WP_Icons_Registry::get_instance();
-			$icon     = $registry->get_registered( $name );
+			$icon     = $registry->get_registered_icon( $name );
 
 			if ( null === $icon ) {
 				return new WP_Error(
