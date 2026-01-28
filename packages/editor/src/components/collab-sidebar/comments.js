@@ -418,34 +418,6 @@ export function Comments( {
 					! isSelected &&
 					thread.id !== 'new-note-thread';
 
-				if ( shouldShowMinified ) {
-					return (
-						<MinifiedThread
-							key={ thread.id }
-							thread={ thread }
-							calculatedOffset={ boardOffsets[ thread.id ] ?? 0 }
-							setHeights={ setHeights }
-							setBlockRef={ setBlockRef }
-							selectedThread={ selectedThread }
-							commentLastUpdated={ commentLastUpdated }
-							onExpand={ () => {
-								setNewNoteFormState( 'closed' );
-								setSelectedThread( thread.id );
-								if ( thread.blockClientId ) {
-									selectBlock( thread.blockClientId, null );
-									toggleBlockSpotlight(
-										thread.blockClientId,
-										true
-									);
-								}
-							} }
-							onKeyDown={ ( event ) =>
-								handleThreadNavigation( event, thread, false )
-							}
-						/>
-					);
-				}
-
 				return (
 					<Thread
 						key={ thread.id }
@@ -468,54 +440,11 @@ export function Comments( {
 						onKeyDown={ ( event ) =>
 							handleThreadNavigation( event, thread, isSelected )
 						}
+						variant={ shouldShowMinified ? 'compact' : 'full' }
 					/>
 				);
 			} ) }
 		</>
-	);
-}
-
-/**
- * Wrapper for compact Thread that handles floating positioning.
- *
- * @param {Object}   props                    Component props.
- * @param {Object}   props.thread             The thread data.
- * @param {number}   props.calculatedOffset   The calculated vertical offset.
- * @param {Function} props.setHeights         Callback to set thread heights.
- * @param {Function} props.setBlockRef        Callback to set block reference.
- * @param {number}   props.selectedThread     The currently selected thread ID.
- * @param {number}   props.commentLastUpdated Timestamp of last comment update.
- * @param {Function} props.onExpand           Callback when thread is expanded.
- * @param {Function} props.onKeyDown          Callback for keyboard navigation.
- */
-function MinifiedThread( {
-	thread,
-	calculatedOffset,
-	setHeights,
-	setBlockRef,
-	selectedThread,
-	commentLastUpdated,
-	onExpand,
-	onKeyDown,
-} ) {
-	const { y, refs } = useFloatingThread( {
-		thread,
-		calculatedOffset,
-		setHeights,
-		setBlockRef,
-		selectedThread,
-		commentLastUpdated,
-	} );
-
-	return (
-		<Thread
-			thread={ thread }
-			variant="compact"
-			y={ y }
-			refs={ refs }
-			onExpand={ onExpand }
-			onKeyDown={ onKeyDown }
-		/>
 	);
 }
 
@@ -538,10 +467,6 @@ function Thread( {
 	newNoteFormState,
 	onKeyDown,
 	variant = 'full',
-	// Props for compact variant (passed from MinifiedThread wrapper).
-	y: compactY,
-	refs: compactRefs,
-	onExpand,
 } ) {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
@@ -657,21 +582,6 @@ function Thread( {
 			: null;
 		const formattedTime = commentDate ? humanTimeDiff( commentDate ) : '';
 
-		const handleClick = ( event ) => {
-			event.stopPropagation();
-			onExpand();
-		};
-
-		const handleKeyDown = ( event ) => {
-			if ( event.key === 'Enter' || event.key === ' ' ) {
-				event.preventDefault();
-				onExpand();
-			} else if ( onKeyDown ) {
-				// Handle arrow key navigation.
-				onKeyDown( event );
-			}
-		};
-
 		if ( ! lastComment?.author_avatar_urls ) {
 			return null;
 		}
@@ -685,8 +595,19 @@ function Thread( {
 					}
 				) }
 				id={ `comment-thread-${ thread.id }` }
-				onClick={ handleClick }
-				onKeyDown={ handleKeyDown }
+				onClick={ handleCommentSelect }
+				onKeyUp={ ( event ) => {
+					if ( event.key === 'Tab' ) {
+						isKeyboardTabbingRef.current = false;
+					}
+				} }
+				onKeyDown={ ( event ) => {
+					if ( event.key === 'Tab' ) {
+						isKeyboardTabbingRef.current = true;
+					} else {
+						onKeyDown( event );
+					}
+				} }
 				onMouseEnter={ () => setIsHovered( true ) }
 				onMouseLeave={ () => setIsHovered( false ) }
 				onFocus={ () => setIsHovered( true ) }
@@ -695,8 +616,8 @@ function Thread( {
 				role="treeitem"
 				aria-label={ ariaLabel }
 				aria-expanded={ isHovered }
-				ref={ compactRefs?.setFloating }
-				style={ { top: compactY } }
+				ref={ isFloating ? refs.setFloating : undefined }
+				style={ isFloating ? { top: y } : undefined }
 			>
 				<img
 					src={ lastComment?.author_avatar_urls?.[ 48 ] }
