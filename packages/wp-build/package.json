@@ -49,10 +49,12 @@
 		"postcss": "8.4.38",
 		"postcss-modules": "6.0.1",
 		"rtlcss": "4.3.0",
-		"sass-embedded": "^1.97.2"
+		"sass-embedded": "^1.97.2",
+		"tsx": "^4.19.0"
 	},
 	"devDependencies": {
-		"@types/node": "^20.17.10"
+		"@types/node": "^20.17.10",
+		"typescript": "5.9.3"
 	},
 	"peerDependencies": {
 		"@wordpress/boot": "^0.3.0",

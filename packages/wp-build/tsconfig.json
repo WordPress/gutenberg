@@ -2,13 +2,17 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"module": "node16",
-		"moduleResolution": "node16",
+		"module": "NodeNext",
+		"moduleResolution": "NodeNext",
 		"esModuleInterop": true,
-		"target": "es2021",
-		"lib": [ "es2021", "ES2020.string" ],
+		"target": "esnext",
+		"lib": [ "esnext" ],
 		"rootDir": ".",
 		"types": [ "node" ],
+		"strict": true,
+
+		// Allow importing .ts files with extension (required for tsx)
+		"allowImportingTsExtensions": true,
 
 		// This package isn't published with types.
 		// Don't generate types, this is strictly for validation.
