@@ -556,7 +556,10 @@ function LinkControl( {
 	const showTextControl = hasLinkValue && hasTextControl;
 
 	const isEditing = ( isEditingLink || ! value ) && ! isCreatingPage;
-	const isDisabled = ! valueHasChanges || currentInputIsEmpty || ! isUrlValid;
+	// When creating a new link (no existing value), allow submission if input is not empty and URL is valid
+	// When editing an existing link, also require that the value has changed
+	const isDisabled =
+		currentInputIsEmpty || ! isUrlValid || ( value && ! valueHasChanges );
 	const showSettings = !! settings?.length && isEditingLink && hasLinkValue;
 
 	const previewValue = useMemo( () => {
