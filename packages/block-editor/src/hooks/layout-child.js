@@ -202,7 +202,13 @@ function GridTools( {
 	isManualPlacement,
 	parentLayout,
 } ) {
-	const { rootClientId, isVisible, blockVisibility, deviceType } = useSelect(
+	const {
+		rootClientId,
+		isVisible,
+		parentBlockVisibility,
+		blockBlockVisibility,
+		deviceType,
+	} = useSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,
@@ -224,13 +230,17 @@ function GridTools( {
 				};
 			}
 
-			const attributes = getBlockAttributes( _rootClientId );
+			const parentAttributes = getBlockAttributes( _rootClientId );
+			const blockAttributes = getBlockAttributes( clientId );
 			const settings = getSettings();
 
 			return {
 				rootClientId: _rootClientId,
 				isVisible: true,
-				blockVisibility: attributes?.metadata?.blockVisibility,
+				parentBlockVisibility:
+					parentAttributes?.metadata?.blockVisibility,
+				blockBlockVisibility:
+					blockAttributes?.metadata?.blockVisibility,
 				deviceType:
 					settings?.[ deviceTypeKey ]?.toLowerCase() ||
 					BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
@@ -239,17 +249,26 @@ function GridTools( {
 		[ clientId ]
 	);
 
-	const { isBlockCurrentlyHidden } = useBlockVisibility( {
-		blockVisibility,
-		deviceType,
-	} );
+	const { isBlockCurrentlyHidden: isParentBlockCurrentlyHidden } =
+		useBlockVisibility( {
+			blockVisibility: parentBlockVisibility,
+			deviceType,
+		} );
+
+	const { isBlockCurrentlyHidden: isBlockItselfCurrentlyHidden } =
+		useBlockVisibility( {
+			blockVisibility: blockBlockVisibility,
+			deviceType,
+		} );
 
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
 	const [ resizerBounds, setResizerBounds ] = useState();
 
-	if ( ! isVisible || isBlockCurrentlyHidden ) {
+	if ( ! isVisible || isParentBlockCurrentlyHidden ) {
 		return null;
 	}
+
+	const showResizer = allowSizingOnChildren && ! isBlockItselfCurrentlyHidden;
 
 	function updateLayout( layout ) {
 		setAttributes( {
@@ -270,7 +289,7 @@ function GridTools( {
 				contentRef={ setResizerBounds }
 				parentLayout={ parentLayout }
 			/>
-			{ allowSizingOnChildren && (
+			{ showResizer && (
 				<GridItemResizer
 					clientId={ clientId }
 					// Don't allow resizing beyond the grid visualizer.
