@@ -20,11 +20,12 @@ import {
 	InnerBlocks,
 } from '@wordpress/block-editor';
 import {
-	PanelBody,
 	ToggleControl,
 	Disabled,
 	SelectControl,
 	Spinner,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
@@ -37,6 +38,7 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { Caption } from '../utils/caption';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
@@ -152,6 +154,7 @@ const PlaylistEdit = ( {
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 	function onUploadError( message ) {
 		createErrorNotice( message, { type: 'snackbar' } );
 	}
@@ -397,47 +400,108 @@ const PlaylistEdit = ( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						__nextHasNoMarginBottom
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							showTracklist: true,
+							showArtists: true,
+							showNumbers: true,
+							showImages: true,
+							order: 'ASC',
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
 						label={ __( 'Show Tracklist' ) }
-						onChange={ toggleAttribute( 'showTracklist' ) }
-						checked={ showTracklist }
-					/>
+						isShownByDefault
+						hasValue={ () => showTracklist !== true }
+						onDeselect={ () =>
+							setAttributes( { showTracklist: true } )
+						}
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Show Tracklist' ) }
+							onChange={ toggleAttribute( 'showTracklist' ) }
+							checked={ showTracklist }
+						/>
+					</ToolsPanelItem>
 					{ showTracklist && (
 						<>
-							<ToggleControl
-								__nextHasNoMarginBottom
+							<ToolsPanelItem
 								label={ __( 'Show artist name in Tracklist' ) }
-								onChange={ toggleAttribute( 'showArtists' ) }
-								checked={ showArtists }
-							/>
-							<ToggleControl
-								__nextHasNoMarginBottom
+								isShownByDefault
+								hasValue={ () => showArtists !== true }
+								onDeselect={ () =>
+									setAttributes( { showArtists: true } )
+								}
+							>
+								<ToggleControl
+									__nextHasNoMarginBottom
+									label={ __(
+										'Show artist name in Tracklist'
+									) }
+									onChange={ toggleAttribute(
+										'showArtists'
+									) }
+									checked={ showArtists }
+								/>
+							</ToolsPanelItem>
+							<ToolsPanelItem
 								label={ __( 'Show number in Tracklist' ) }
-								onChange={ toggleAttribute( 'showNumbers' ) }
-								checked={ showNumbers }
-							/>
+								isShownByDefault
+								hasValue={ () => showNumbers !== true }
+								onDeselect={ () =>
+									setAttributes( { showNumbers: true } )
+								}
+							>
+								<ToggleControl
+									__nextHasNoMarginBottom
+									label={ __( 'Show number in Tracklist' ) }
+									onChange={ toggleAttribute(
+										'showNumbers'
+									) }
+									checked={ showNumbers }
+								/>
+							</ToolsPanelItem>
 						</>
 					) }
-					<ToggleControl
-						__nextHasNoMarginBottom
+					<ToolsPanelItem
 						label={ __( 'Show images' ) }
-						onChange={ toggleAttribute( 'showImages' ) }
-						checked={ showImages }
-					/>
-					<SelectControl
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
+						isShownByDefault
+						hasValue={ () => showImages !== true }
+						onDeselect={ () =>
+							setAttributes( { showImages: true } )
+						}
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Show images' ) }
+							onChange={ toggleAttribute( 'showImages' ) }
+							checked={ showImages }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
 						label={ __( 'Order' ) }
-						value={ order }
-						options={ [
-							{ label: __( 'Descending' ), value: 'DESC' },
-							{ label: __( 'Ascending' ), value: 'ASC' },
-						] }
-						onChange={ ( value ) => onChangeOrder( value ) }
-					/>
-				</PanelBody>
+						isShownByDefault
+						hasValue={ () => order !== 'ASC' }
+						onDeselect={ () => setAttributes( { order: 'ASC' } ) }
+					>
+						<SelectControl
+							__next40pxDefaultSize
+							__nextHasNoMarginBottom
+							label={ __( 'Order' ) }
+							value={ order }
+							options={ [
+								{ label: __( 'Descending' ), value: 'DESC' },
+								{ label: __( 'Ascending' ), value: 'ASC' },
+							] }
+							onChange={ ( value ) => onChangeOrder( value ) }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
