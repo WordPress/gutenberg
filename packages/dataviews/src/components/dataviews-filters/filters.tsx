@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { memo, useContext, useRef } from '@wordpress/element';
@@ -65,7 +70,7 @@ function Filters( { className }: { className?: string } ) {
 			gap="xs"
 			style={ { width: 'fit-content' } }
 			wrap="wrap"
-			className={ className }
+			className={ clsx( 'dataviews-filters__container', className ) }
 		>
 			{ filterComponents }
 		</Stack>

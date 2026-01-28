@@ -101,7 +101,7 @@ function DefaultUI( {
 					<DataViewsViewConfig />
 				</Stack>
 			</Stack>
-			<FiltersToggled className="dataviews-filters__container" />
+			<FiltersToggled />
 			<DataViewsLayout />
 			<DataViewsPickerFooter />
 		</>
