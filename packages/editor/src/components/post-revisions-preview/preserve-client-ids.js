@@ -7,7 +7,6 @@ import { diffArrays } from 'diff/lib/diff/array';
  * Preserves clientIds from previously rendered blocks to prevent flashing.
  * Uses LCS algorithm to match blocks by name, attributes, and originalContent.
  *
- * This is separate from the visual diff (which compares revision content).
  * This compares the newly parsed blocks against the last rendered blocks
  * to maintain React key stability.
  *
@@ -20,7 +19,11 @@ export function preserveClientIds( newBlocks, prevBlocks ) {
 		return newBlocks;
 	}
 
-	// Create signatures for LCS matching using name, attributes, and originalContent.
+	// Create signatures for LCS matching using name, attributes, and
+	// originalContent. Note that the original content does not include the
+	// inner blocks (which is what we want because inner blocks are processed
+	// separately). In revisions, the blocks also don't change some it's fine to
+	// use the original content.
 	const createSignature = ( block ) =>
 		JSON.stringify( {
 			name: block.name,
