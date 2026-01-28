@@ -233,6 +233,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-content-guidelines',
+		__( 'Content Guidelines', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables the Content Guidelines panel in the Site Editor for managing editorial voice, tone, and content rules. While Global Styles define how your site looks, Content Guidelines define how your site sounds.', 'gutenberg' ),
+			'id'    => 'gutenberg-content-guidelines',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

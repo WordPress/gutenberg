@@ -1,0 +1,22 @@
+/**
+ * Import/Export Styles
+ *
+ * Matches the Playground card design pattern.
+ */
+
+.content-guidelines-import-export {
+	padding: 24px;
+	min-width: 400px;
+	max-width: 640px;
+	width: 100%;
+	margin: 24px auto;
+	box-sizing: border-box;
+	border: 1px solid #e0e0e0;
+	border-radius: 2px;
+}
+
+.content-guidelines-import-export__section {
+	padding: 20px;
+	background: #f6f7f7;
+	border-radius: 4px;
+}

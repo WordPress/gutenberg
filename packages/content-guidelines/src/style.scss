@@ -1,0 +1,81 @@
+/**
+ * Content Guidelines Main Styles
+ */
+
+// Panels shared styles
+.content-guidelines-panel-section {
+	margin-bottom: 24px;
+
+	&:last-child {
+		margin-bottom: 0;
+	}
+}
+
+.content-guidelines-panel-section__title {
+	margin: 0 0 8px;
+	font-size: 12px;
+	font-weight: 600;
+	text-transform: uppercase;
+	color: #757575;
+}
+
+.content-guidelines-panel-section__description {
+	margin: 0 0 12px;
+	font-size: 13px;
+	color: #757575;
+}
+
+// Repeater shared styles
+.content-guidelines-repeater,
+.content-guidelines-term-repeater {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+
+	.components-flex {
+		margin-bottom: 0;
+	}
+
+	.components-text-control__input {
+		margin-bottom: 0;
+	}
+
+	.components-button.is-secondary {
+		margin-top: 8px;
+	}
+}
+
+.content-guidelines-term-repeater__item {
+	padding: 12px;
+	background: #f6f7f7;
+	border-radius: 4px;
+	margin-bottom: 8px;
+
+	.components-base-control {
+		margin-bottom: 0;
+	}
+}
+
+// Panel body customization
+.content-guidelines-sidebar__panels {
+	.components-panel__body {
+		border: 1px solid #e0e0e0;
+		border-radius: 4px;
+		margin-bottom: 8px;
+		background: #fff;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	.components-panel__body-title {
+		border-bottom: none;
+	}
+
+	.components-panel__body.is-opened {
+		.components-panel__body-title {
+			border-bottom: 1px solid #e0e0e0;
+		}
+	}
+}

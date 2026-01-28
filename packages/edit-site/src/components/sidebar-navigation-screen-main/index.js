@@ -3,7 +3,14 @@
  */
 import { __experimentalItemGroup as ItemGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { layout, symbol, navigation, styles, page } from '@wordpress/icons';
+import {
+	layout,
+	symbol,
+	navigation,
+	styles,
+	page,
+	pencil,
+} from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -13,6 +20,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import SidebarNavigationScreen from '../sidebar-navigation-screen';
 import SidebarNavigationItem from '../sidebar-navigation-item';
 import { SidebarNavigationItemGlobalStyles } from '../sidebar-navigation-screen-global-styles';
+
+// Check if Content Guidelines experiment is enabled via window global.
+const isContentGuidelinesEnabled =
+	typeof window !== 'undefined' &&
+	window.__experimentalEnableContentGuidelines === true;
 
 export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 	return (
@@ -70,6 +82,16 @@ export function MainSidebarNavigationContent( { isBlockBasedTheme = true } ) {
 			>
 				{ __( 'Patterns' ) }
 			</SidebarNavigationItem>
+			{ isContentGuidelinesEnabled && (
+				<SidebarNavigationItem
+					uid="guidelines-navigation-item"
+					to="/guidelines"
+					withChevron
+					icon={ pencil }
+				>
+					{ __( 'Guidelines' ) }
+				</SidebarNavigationItem>
+			) }
 		</ItemGroup>
 	);
 }

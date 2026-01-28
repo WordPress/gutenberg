@@ -23,8 +23,9 @@ import { pageItemRoute } from './page-item';
 import { attachmentItemRoute } from './attachment-item';
 import { stylebookRoute } from './stylebook';
 import { notFoundRoute } from './notfound';
+import { guidelinesRoute } from './guidelines';
 
-const routes = [
+const baseRoutes = [
 	...( window?.__experimentalMediaEditor ? [ attachmentItemRoute ] : [] ),
 	pageItemRoute,
 	pagesRoute,
@@ -41,10 +42,23 @@ const routes = [
 	notFoundRoute,
 ];
 
+// Check if Content Guidelines experiment is enabled via window global.
+const isContentGuidelinesEnabled =
+	typeof window !== 'undefined' &&
+	window.__experimentalEnableContentGuidelines === true;
+
 export function useRegisterSiteEditorRoutes() {
 	const registry = useRegistry();
 	const { registerRoute } = unlock( useDispatch( siteEditorStore ) );
+
 	useEffect( () => {
+		const routes = [ ...baseRoutes ];
+
+		// Add guidelines route if experiment is enabled.
+		if ( isContentGuidelinesEnabled ) {
+			routes.push( guidelinesRoute );
+		}
+
 		registry.batch( () => {
 			routes.forEach( registerRoute );
 		} );

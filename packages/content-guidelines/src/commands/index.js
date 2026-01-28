@@ -1,0 +1,285 @@
+/**
+ * WordPress 6.9 Command Palette integration.
+ *
+ * Registers commands for the admin-wide Command Palette (Ctrl/Cmd + K).
+ * These commands allow quick access to Content Guidelines functionality
+ * from anywhere in the WordPress admin.
+ *
+ * @package
+ * @since 0.2.0
+ */
+
+/**
+ * WordPress dependencies
+ */
+import apiFetch from '@wordpress/api-fetch';
+import { useCommand, useCommandLoader } from '@wordpress/commands';
+import { __, _n, numberFormat, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
+import { edit, backup, check, pencil, seen, external } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import { useGuidelines } from '../hooks';
+
+/**
+ * Get the Site Editor URL for guidelines.
+ *
+ * @param {Object} params         Query parameters.
+ * @param {string} params.section Section to navigate to (library, blocks, playground, import-export).
+ * @param {string} params.history Whether to show history panel ('1' or undefined).
+ * @param {number} params.post    Post ID for playground testing.
+ * @return {string} The Site Editor URL.
+ */
+function getSiteEditorGuidelinesUrl( params = {} ) {
+	const baseUrl = 'site-editor.php?path=/guidelines';
+	const queryParams = new URLSearchParams();
+
+	if ( params.section ) {
+		queryParams.set( 'section', params.section );
+	}
+	if ( params.history ) {
+		queryParams.set( 'history', params.history );
+	}
+	if ( params.post ) {
+		queryParams.set( 'post', params.post );
+	}
+
+	const queryString = queryParams.toString();
+	return queryString ? `${ baseUrl }&${ queryString }` : baseUrl;
+}
+
+/**
+ * Hook to register static Content Guidelines commands.
+ *
+ * These commands are always available in the Command Palette
+ * when Content Guidelines is active.
+ */
+export function useContentGuidelinesCommands() {
+	// Navigation commands
+	useCommand( {
+		name: 'content-guidelines/open-guidelines',
+		label: __( 'Open Content Guidelines' ),
+		icon: edit,
+		callback: ( { close } ) => {
+			window.location.assign( getSiteEditorGuidelinesUrl() );
+			close();
+		},
+		context: 'site-editor',
+	} );
+
+	useCommand( {
+		name: 'content-guidelines/open-guidelines-history',
+		label: __( 'View Guidelines History' ),
+		icon: backup,
+		callback: ( { close } ) => {
+			window.location.assign(
+				getSiteEditorGuidelinesUrl( {
+					section: 'library',
+					history: '1',
+				} )
+			);
+			close();
+		},
+	} );
+
+	useCommand( {
+		name: 'content-guidelines/open-playground',
+		label: __( 'Open Guidelines Playground' ),
+		icon: seen,
+		callback: ( { close } ) => {
+			window.location.assign(
+				getSiteEditorGuidelinesUrl( { section: 'playground' } )
+			);
+			close();
+		},
+	} );
+}
+
+/**
+ * Hook to register dynamic commands based on guidelines state.
+ *
+ * Uses useCommandLoader to provide commands that depend on current state,
+ * such as save command that only appears when there are unsaved changes.
+ */
+export function useContentGuidelinesDynamicCommands() {
+	// Register save command dynamically
+	useCommandLoader( {
+		name: 'content-guidelines/save-commands',
+		hook: getContentGuidelinesSaveCommands(),
+		context: 'site-editor',
+	} );
+}
+
+/**
+ * Command loader hook for save-related commands.
+ *
+ * @return {Object} Commands configuration for the loader.
+ */
+const getContentGuidelinesSaveCommands = () =>
+	function useContentGuidelinesSaveCommands() {
+		const { hasChanges, save } = useGuidelines();
+
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
+
+		const commands = [];
+
+		if ( hasChanges ) {
+			commands.push( {
+				name: 'content-guidelines/save-guidelines',
+				label: __( 'Save Content Guidelines' ),
+				icon: check,
+				callback: async ( { close } ) => {
+					try {
+						await save();
+						createSuccessNotice( __( 'Guidelines saved.' ), {
+							type: 'snackbar',
+						} );
+					} catch ( error ) {
+						createErrorNotice( __( 'Failed to save guidelines.' ), {
+							type: 'snackbar',
+						} );
+					}
+					close();
+				},
+			} );
+		}
+
+		return {
+			commands,
+			isLoading: false,
+		};
+	};
+
+/**
+ * Hook to register post-context commands.
+ *
+ * These commands appear when editing a post and allow
+ * running guidelines checks on the current content.
+ */
+export function useContentGuidelinesPostCommands() {
+	useCommandLoader( {
+		name: 'content-guidelines/post-commands',
+		hook: getPostContextCommands(),
+		context: 'post-editor',
+	} );
+}
+
+/**
+ * Command loader hook for post editing context.
+ *
+ * @return {Object} Commands configuration.
+ */
+const getPostContextCommands = () =>
+	function usePostContextCommands() {
+		const { currentPostId, currentPostType } = useSelect( ( select ) => {
+			const editor = select( editorStore );
+			return {
+				currentPostId: editor?.getCurrentPostId?.() ?? null,
+				currentPostType: editor?.getCurrentPostType?.() ?? null,
+			};
+		}, [] );
+
+		const { createSuccessNotice, createErrorNotice } =
+			useDispatch( noticesStore );
+
+		const commands = [];
+
+		if ( currentPostId && currentPostType === 'post' ) {
+			commands.push( {
+				name: 'content-guidelines/check-post-guidelines',
+				label: __( 'Check Post Against Guidelines' ),
+				icon: pencil,
+				callback: async ( { close } ) => {
+					try {
+						const response = await apiFetch( {
+							path: '/wp/v2/content-guidelines/test',
+							method: 'POST',
+							data: {
+								task: 'rewrite_intro',
+								fixture_post_id: currentPostId,
+							},
+						} );
+
+						const issueCount =
+							response.lint_results?.issue_count ?? 0;
+
+						if ( issueCount === 0 ) {
+							createSuccessNotice(
+								__( 'Content passes all guidelines checks!' ),
+								{ type: 'snackbar' }
+							);
+						} else {
+							const issueMessage = sprintf(
+								/* translators: %d: number of guideline issues found. */
+								_n(
+									'%d guideline issue found. Open Content Guidelines to review.',
+									'%d guideline issues found. Open Content Guidelines to review.',
+									issueCount
+								),
+								numberFormat( issueCount )
+							);
+							createErrorNotice( issueMessage, {
+								type: 'snackbar',
+								actions: [
+									{
+										label: __( 'View' ),
+										url: getSiteEditorGuidelinesUrl( {
+											section: 'playground',
+										} ),
+									},
+								],
+							} );
+						}
+					} catch ( error ) {
+						createErrorNotice(
+							__( 'Failed to check guidelines.' ),
+							{
+								type: 'snackbar',
+							}
+						);
+					}
+					close();
+				},
+			} );
+
+			commands.push( {
+				name: 'content-guidelines/test-post-in-playground',
+				label: __( 'Test Current Post in Guidelines Playground' ),
+				icon: external,
+				callback: ( { close } ) => {
+					window.location.assign(
+						getSiteEditorGuidelinesUrl( {
+							section: 'playground',
+							post: currentPostId,
+						} )
+					);
+					close();
+				},
+			} );
+		}
+
+		return {
+			commands,
+			isLoading: false,
+		};
+	};
+
+/**
+ * Register all Content Guidelines commands.
+ *
+ * This component should be rendered once to register all commands.
+ * It uses React hooks internally to register with the Command Palette.
+ */
+export default function ContentGuidelinesCommands() {
+	useContentGuidelinesCommands();
+	useContentGuidelinesDynamicCommands();
+	useContentGuidelinesPostCommands();
+
+	// This component doesn't render anything
+	return null;
+}
