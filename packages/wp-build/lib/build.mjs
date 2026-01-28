@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env tsx
 
 /**
  * External dependencies
@@ -33,7 +33,7 @@ import {
 	generatePhpFromTemplate,
 	getPhpReplacements,
 	renderTemplateToString,
-} from './php-generator.mjs';
+} from './php-generator.ts';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 import {

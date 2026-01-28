@@ -9,25 +9,29 @@ import { fileURLToPath } from 'url';
  * Internal dependencies
  */
 import { getPackageInfoFromFile } from './package-utils.mjs';
+import type { PackageJson, PhpReplacements } from './types.ts';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 
 /**
  * Get PHP replacements from root package.json.
  *
- * @param {string} rootDir           Root directory path.
- * @param {string} baseUrlExpression PHP expression for base URL (e.g. "includes_url( 'build' )").
- * @return {Promise<Record<string, string>>} Replacements object with {{PREFIX}}, {{VERSION}}, {{BASE_URL}}.
+ * @param rootDir           Root directory path.
+ * @param baseUrlExpression PHP expression for base URL (e.g. "includes_url( 'build' )").
+ * @return Replacements object with {{PREFIX}}, {{VERSION}}, {{BASE_URL}}.
  */
-export async function getPhpReplacements( rootDir, baseUrlExpression ) {
+export async function getPhpReplacements(
+	rootDir: string,
+	baseUrlExpression: string
+): Promise< PhpReplacements > {
 	const rootPackageJson = getPackageInfoFromFile(
 		path.join( rootDir, 'package.json' )
-	);
+	) as PackageJson | null;
+
 	if ( ! rootPackageJson ) {
 		throw new Error( 'Could not read root package.json' );
 	}
 
-	// @ts-expect-error specific override to package.json
 	const name = rootPackageJson.wpPlugin?.name || 'gutenberg';
 	const version = rootPackageJson.version;
 
@@ -41,11 +45,14 @@ export async function getPhpReplacements( rootDir, baseUrlExpression ) {
 /**
  * Apply template replacements to a template string.
  *
- * @param {string}                 template     Template string with placeholders.
- * @param {Record<string, string>} replacements Replacements object (e.g. {'{{PREFIX}}': 'gutenberg'}).
- * @return {string} Template with replacements applied.
+ * @param template     Template string with placeholders.
+ * @param replacements Replacements object (e.g. {'{{PREFIX}}': 'gutenberg'}).
+ * @return Template with replacements applied.
  */
-export function applyTemplateReplacements( template, replacements ) {
+export function applyTemplateReplacements(
+	template: string,
+	replacements: PhpReplacements
+): string {
 	let content = template;
 	for ( const [ placeholder, value ] of Object.entries( replacements ) ) {
 		content = content.replaceAll( placeholder, value );
@@ -56,11 +63,14 @@ export function applyTemplateReplacements( template, replacements ) {
 /**
  * Render a template to a string with replacements.
  *
- * @param {string}                 templateName Template file name.
- * @param {Record<string, string>} replacements Replacements object (e.g. {'{{PREFIX}}': 'gutenberg'}).
- * @return {Promise<string>} Rendered template string.
+ * @param templateName Template file name.
+ * @param replacements Replacements object (e.g. {'{{PREFIX}}': 'gutenberg'}).
+ * @return Rendered template string.
  */
-export async function renderTemplateToString( templateName, replacements ) {
+export async function renderTemplateToString(
+	templateName: string,
+	replacements: PhpReplacements
+): Promise< string > {
 	// Templates directory
 	const templatesDir = path.join( __dirname, '..', 'templates' );
 
@@ -77,15 +87,15 @@ export async function renderTemplateToString( templateName, replacements ) {
 /**
  * Generate a PHP file from a template with replacements.
  *
- * @param {string}                 templateName Template file name.
- * @param {string}                 outputPath   Full output path.
- * @param {Record<string, string>} replacements Replacements object (e.g. {'{{PREFIX}}': 'gutenberg'}).
+ * @param templateName Template file name.
+ * @param outputPath   Full output path.
+ * @param replacements Replacements object (e.g. {'{{PREFIX}}': 'gutenberg'}).
  */
 export async function generatePhpFromTemplate(
-	templateName,
-	outputPath,
-	replacements
-) {
+	templateName: string,
+	outputPath: string,
+	replacements: PhpReplacements
+): Promise< void > {
 	// Render template to string
 	const content = await renderTemplateToString( templateName, replacements );
 
