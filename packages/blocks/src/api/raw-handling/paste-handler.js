@@ -36,7 +36,11 @@ import isLatexMathMode from './latex-to-math';
 import { createBlock } from '../factory';
 import headingTransformer from './heading-transformer';
 
-const log = ( ...args ) => window?.console?.log?.( ...args );
+const log = ( ...args ) => {
+	if ( globalThis.SCRIPT_DEBUG ) {
+		window?.console?.log?.( ...args );
+	}
+};
 
 /**
  * Filters HTML to only contain phrasing content.
