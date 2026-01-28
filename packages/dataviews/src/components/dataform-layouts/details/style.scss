@@ -4,6 +4,7 @@
 	display: inline-flex;
 	align-items: center;
 	gap: $grid-unit-15;
+	min-height: $grid-unit-30;
 }
 
 .dataforms-layouts-details__content {
