@@ -253,7 +253,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				}
 
 				$icon['content'] = $this->get_content( $icon['name'] );
-				$icons[] = $icon;
+				$icons[]         = $icon;
 			}
 
 			return $icons;
