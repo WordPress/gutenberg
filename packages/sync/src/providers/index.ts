@@ -6,7 +6,7 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-// import { createHttpPollingProvider } from './http-polling/http-polling-provider';
+import { createHttpPollingProvider } from './http-polling/http-polling-provider';
 import type { ProviderCreator } from '../types';
 
 let providerCreators: ProviderCreator[] | null = null;
@@ -17,10 +17,8 @@ let providerCreators: ProviderCreator[] | null = null;
  *
  * @return {ProviderCreator[]} Creator functions for Yjs providers.
  */
-function getDefaultProviderCreators(): ProviderCreator[] {
-	return [
-		/* createHttpPollingProvider() */
-	];
+export function getDefaultProviderCreators(): ProviderCreator[] {
+	return [ createHttpPollingProvider() ];
 }
 
 /**
@@ -48,7 +46,7 @@ export function getProviderCreators(): ProviderCreator[] {
 	 */
 	const filteredProviderCreators: unknown = applyFilters(
 		'sync.providers',
-		getDefaultProviderCreators()
+		[] // Replace with `getDefaultProviderCreators()` to enable sync
 	);
 
 	// If the returned value is not an array, ignore and set to empty array.
