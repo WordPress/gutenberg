@@ -123,7 +123,7 @@ class WP_Test_REST_Icon_Controller extends WP_Test_REST_TestCase {
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/icons/core/invalid-icon-name' );
 		$response = rest_get_server()->dispatch( $request );
 
-		$this->assertErrorResponse( 'rest_icon_invalid_name', $response, 404 );
+		$this->assertErrorResponse( 'rest_icon_not_found', $response, 404 );
 	}
 
 	/**
