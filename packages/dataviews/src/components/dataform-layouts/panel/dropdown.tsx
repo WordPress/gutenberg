@@ -140,11 +140,6 @@ function PanelDropdown< Item >( {
 			contentClassName="dataforms-layouts-panel__field-dropdown"
 			popoverProps={ popoverProps }
 			focusOnMount={ false }
-			onToggle={ ( willOpen ) => {
-				if ( ! willOpen ) {
-					onCloseCallback?.();
-				}
-			} }
 			toggleProps={ {
 				size: 'compact',
 				variant: 'tertiary',
@@ -157,7 +152,12 @@ function PanelDropdown< Item >( {
 					labelPosition={ labelPosition }
 					fieldLabel={ fieldLabel }
 					disabled={ fieldDefinition.readOnly === true }
-					onClick={ onToggle }
+					onClick={ () => {
+						if ( isOpen ) {
+							onCloseCallback?.();
+						}
+						onToggle();
+					} }
 					aria-expanded={ isOpen }
 				/>
 			) }
