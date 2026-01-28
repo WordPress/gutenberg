@@ -56,18 +56,28 @@ module.exports = async function loadConfig( configDirectoryPath ) {
 	// consumption elsewhere in the tool.
 	config = postProcessConfig( config );
 
+	const isLocalDockerOverride = await hasLocalConfig( [
+		path.resolve( cacheDirectoryPath, 'docker-compose.override.yml' ),
+	] );
+
 	return {
 		name: path.basename( configDirectoryPath ),
-		dockerComposeConfigPath: path.resolve(
-			cacheDirectoryPath,
-			'docker-compose.yml'
-		),
+		dockerComposeConfigPath: isLocalDockerOverride
+			? [
+					path.resolve( cacheDirectoryPath, 'docker-compose.yml' ),
+					path.resolve(
+						cacheDirectoryPath,
+						'docker-compose.override.yml'
+					),
+			  ]
+			: [ path.resolve( cacheDirectoryPath, 'docker-compose.yml' ) ],
 		configDirectoryPath,
 		workDirectoryPath: cacheDirectoryPath,
 		detectedLocalConfig: await hasLocalConfig( [
 			configFilePath,
 			getConfigFilePath( configDirectoryPath, 'override' ),
 		] ),
+		detectedLocalDockerOverride: isLocalDockerOverride,
 		lifecycleScripts: config.lifecycleScripts,
 		env: config.env,
 	};

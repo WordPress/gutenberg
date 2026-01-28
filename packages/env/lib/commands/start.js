@@ -2,11 +2,11 @@
 /**
  * External dependencies
  */
-const { v2: dockerCompose } = require( 'docker-compose' );
+const fs = require( 'fs' ).promises;
 const util = require( 'util' );
 const path = require( 'path' );
-const fs = require( 'fs' ).promises;
 const { confirm } = require( '@inquirer/prompts' );
+const { v2: dockerCompose } = require( 'docker-compose' );
 
 /**
  * Promisified dependencies
@@ -236,6 +236,14 @@ module.exports = async function start( {
 		// Set the cache key once everything has been configured.
 		await setCache( CONFIG_CACHE_KEY, configHash, {
 			workDirectoryPath,
+		} );
+	}
+
+	if ( config.detectedLocalDockerOverride ) {
+		spinner.text = 'Starting custom services.';
+		await dockerCompose.upAll( {
+			...dockerComposeConfig,
+			commandOptions: [ '--no-recreate' ],
 		} );
 	}
 
