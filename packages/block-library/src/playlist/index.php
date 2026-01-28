@@ -22,7 +22,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	}
 
 	$current_media_id  = $attributes['currentTrack'];
-	$playlist_id       = 'playlist-' . wp_generate_uuid4();
+	$playlist_id       = wp_unique_id( 'playlist-' );
 	$playlist_tracks   = array();
 	$tracks_data       = array();
 	$current_unique_id = null;
@@ -35,7 +35,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				$inner_block->context['playlistId'] = $playlist_id;
 
 				$track_attributes  = $inner_block->attributes;
-				$unique_id         = isset( $track_attributes['uniqueId'] ) ? $track_attributes['uniqueId'] : wp_generate_uuid4();
+				$unique_id         = isset( $track_attributes['uniqueId'] ) ? $track_attributes['uniqueId'] : wp_unique_id( 'playlist-track-' );
 				$playlist_tracks[] = $unique_id;
 
 				$inner_block->attributes['uniqueId'] = $unique_id;
