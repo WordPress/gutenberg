@@ -10,6 +10,14 @@ function titleCase( str: string ) {
 
 type TokensMap = Record< string, Record< string, string > >;
 
+// Typography composite tokens expand into these CSS property suffixes
+const TYPOGRAPHY_PROPERTIES = [
+	'font-family',
+	'font-size',
+	'font-weight',
+	'line-height',
+];
+
 export default function pluginDsTokenDocs( {
 	filename = 'design-tokens.md',
 } = {} ): Plugin {
@@ -43,8 +51,18 @@ export default function pluginDsTokenDocs( {
 
 				// Group by category
 				semanticTokens[ group ] ??= {};
-				semanticTokens[ group ][ token.localID ] =
-					token.token.$description ?? 'N/A';
+
+				// Typography composite tokens expand into multiple CSS variables
+				if ( token.token.$type === 'typography' ) {
+					for ( const prop of TYPOGRAPHY_PROPERTIES ) {
+						const expandedId = `${ token.localID }-${ prop }`;
+						semanticTokens[ group ][ expandedId ] =
+							token.token.$description ?? 'N/A';
+					}
+				} else {
+					semanticTokens[ group ][ token.localID ] =
+						token.token.$description ?? 'N/A';
+				}
 			}
 
 			function tokensToMdTable( tokens: TokensMap ) {

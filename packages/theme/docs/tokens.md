@@ -142,31 +142,58 @@ Do not edit directly.
 
 ### Typography
 
-| Variable name                 | Description                                           |
-| ----------------------------- | ----------------------------------------------------- |
-| `--wpds-font-family-heading`  | Headings font family                                  |
-| `--wpds-font-family-body`     | Body font family                                      |
-| `--wpds-font-family-mono`     | Monospace font family                                 |
-| `--wpds-font-size-xs`         | Extra small font size                                 |
-| `--wpds-font-size-sm`         | Small font size                                       |
-| `--wpds-font-size-md`         | Medium font size                                      |
-| `--wpds-font-size-lg`         | Large font size                                       |
-| `--wpds-font-size-xl`         | Extra large font size                                 |
-| `--wpds-font-size-2xl`        | 2X large font size                                    |
-| `--wpds-font-line-height-xs`  | Extra small line height                               |
-| `--wpds-font-line-height-sm`  | Small line height                                     |
-| `--wpds-font-line-height-md`  | Medium line height                                    |
-| `--wpds-font-line-height-lg`  | Large line height                                     |
-| `--wpds-font-line-height-xl`  | Extra large line height                               |
-| `--wpds-font-line-height-2xl` | 2X large line height                                  |
-| `--wpds-font-weight-regular`  | Regular font weight for body text                     |
-| `--wpds-font-weight-medium`   | Medium font weight for emphasis and headings          |
-| `--wpds-font-heading-2xl`     | Extra large heading for hero sections                 |
-| `--wpds-font-heading-xl`      | Large heading for page titles                         |
-| `--wpds-font-heading-lg`      | Medium-large heading for section titles               |
-| `--wpds-font-heading-md`      | Medium heading for subsections                        |
-| `--wpds-font-heading-sm`      | Small heading for labels and minor headings           |
-| `--wpds-font-body-xl`         | Large body text for lead paragraphs and introductions |
-| `--wpds-font-body-lg`         | Comfortable body text for extended reading            |
-| `--wpds-font-body-md`         | Default body text for general content                 |
-| `--wpds-font-body-sm`         | Small body text for help text and secondary content   |
+| Variable name                         | Description                                           |
+| ------------------------------------- | ----------------------------------------------------- |
+| `--wpds-font-family-heading`          | Headings font family                                  |
+| `--wpds-font-family-body`             | Body font family                                      |
+| `--wpds-font-family-mono`             | Monospace font family                                 |
+| `--wpds-font-size-xs`                 | Extra small font size                                 |
+| `--wpds-font-size-sm`                 | Small font size                                       |
+| `--wpds-font-size-md`                 | Medium font size                                      |
+| `--wpds-font-size-lg`                 | Large font size                                       |
+| `--wpds-font-size-xl`                 | Extra large font size                                 |
+| `--wpds-font-size-2xl`                | 2X large font size                                    |
+| `--wpds-font-line-height-xs`          | Extra small line height                               |
+| `--wpds-font-line-height-sm`          | Small line height                                     |
+| `--wpds-font-line-height-md`          | Medium line height                                    |
+| `--wpds-font-line-height-lg`          | Large line height                                     |
+| `--wpds-font-line-height-xl`          | Extra large line height                               |
+| `--wpds-font-line-height-2xl`         | 2X large line height                                  |
+| `--wpds-font-weight-regular`          | Regular font weight for body text                     |
+| `--wpds-font-weight-medium`           | Medium font weight for emphasis and headings          |
+| `--wpds-font-heading-2xl-font-family` | Extra large heading for hero sections                 |
+| `--wpds-font-heading-2xl-font-size`   | Extra large heading for hero sections                 |
+| `--wpds-font-heading-2xl-font-weight` | Extra large heading for hero sections                 |
+| `--wpds-font-heading-2xl-line-height` | Extra large heading for hero sections                 |
+| `--wpds-font-heading-xl-font-family`  | Large heading for page titles                         |
+| `--wpds-font-heading-xl-font-size`    | Large heading for page titles                         |
+| `--wpds-font-heading-xl-font-weight`  | Large heading for page titles                         |
+| `--wpds-font-heading-xl-line-height`  | Large heading for page titles                         |
+| `--wpds-font-heading-lg-font-family`  | Medium-large heading for section titles               |
+| `--wpds-font-heading-lg-font-size`    | Medium-large heading for section titles               |
+| `--wpds-font-heading-lg-font-weight`  | Medium-large heading for section titles               |
+| `--wpds-font-heading-lg-line-height`  | Medium-large heading for section titles               |
+| `--wpds-font-heading-md-font-family`  | Medium heading for subsections                        |
+| `--wpds-font-heading-md-font-size`    | Medium heading for subsections                        |
+| `--wpds-font-heading-md-font-weight`  | Medium heading for subsections                        |
+| `--wpds-font-heading-md-line-height`  | Medium heading for subsections                        |
+| `--wpds-font-heading-sm-font-family`  | Small heading for labels and minor headings           |
+| `--wpds-font-heading-sm-font-size`    | Small heading for labels and minor headings           |
+| `--wpds-font-heading-sm-font-weight`  | Small heading for labels and minor headings           |
+| `--wpds-font-heading-sm-line-height`  | Small heading for labels and minor headings           |
+| `--wpds-font-body-xl-font-family`     | Large body text for lead paragraphs and introductions |
+| `--wpds-font-body-xl-font-size`       | Large body text for lead paragraphs and introductions |
+| `--wpds-font-body-xl-font-weight`     | Large body text for lead paragraphs and introductions |
+| `--wpds-font-body-xl-line-height`     | Large body text for lead paragraphs and introductions |
+| `--wpds-font-body-lg-font-family`     | Comfortable body text for extended reading            |
+| `--wpds-font-body-lg-font-size`       | Comfortable body text for extended reading            |
+| `--wpds-font-body-lg-font-weight`     | Comfortable body text for extended reading            |
+| `--wpds-font-body-lg-line-height`     | Comfortable body text for extended reading            |
+| `--wpds-font-body-md-font-family`     | Default body text for general content                 |
+| `--wpds-font-body-md-font-size`       | Default body text for general content                 |
+| `--wpds-font-body-md-font-weight`     | Default body text for general content                 |
+| `--wpds-font-body-md-line-height`     | Default body text for general content                 |
+| `--wpds-font-body-sm-font-family`     | Small body text for help text and secondary content   |
+| `--wpds-font-body-sm-font-size`       | Small body text for help text and secondary content   |
+| `--wpds-font-body-sm-font-weight`     | Small body text for help text and secondary content   |
+| `--wpds-font-body-sm-line-height`     | Small body text for help text and secondary content   |
