@@ -40,7 +40,8 @@ $ wp-env start --runtime=playground
 |---------|--------|------------|
 | Requires Docker | Yes | No |
 | Test environment | Yes | No |
-| Xdebug/SPX profiling | Yes | No |
+| Xdebug | Yes | Yes |
+| SPX profiling | Yes | No |
 | phpMyAdmin | Yes | No |
 | MySQL database | Yes | No (SQLite) |
 | Multisite | Yes | Yes |
