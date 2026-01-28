@@ -174,9 +174,15 @@ USER root
 ARG HOST_USERNAME
 ARG HOST_UID
 ARG HOST_GID
+
+# Handle high numbers support for UID and GID, mostly for Mac OS
+RUN apk update
+RUN apk --no-cache add shadow
+ENV UID_MAX=$HOST_UID
+
 # When the IDs are already in use we can still safely move on.
-RUN addgroup -g $HOST_GID $HOST_USERNAME || true
-RUN adduser -h /home/$HOST_USERNAME -G $( getent group $HOST_GID | cut -d: -f1 ) -u $HOST_UID $HOST_USERNAME || true
+RUN /usr/sbin/groupadd -g $HOST_GID $HOST_USERNAME || true
+RUN /usr/sbin/useradd -m -d /home/$HOST_USERNAME -g $( getent group $HOST_GID | cut -d: -f1 ) -u $HOST_UID $HOST_USERNAME || true
 
 # Install any dependencies we need in the container.
 ${ installDependencies( 'cli', env, config ) }
