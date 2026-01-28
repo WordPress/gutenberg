@@ -2,12 +2,13 @@
 /**
  * External dependencies
  */
-const { v2: dockerCompose } = require( 'docker-compose' );
+const path = require( 'path' );
 
 /**
  * Internal dependencies
  */
-const initConfig = require( '../init-config' );
+const { loadConfig } = require( '../config' );
+const { getRuntime, detectRuntime } = require( '../runtime' );
 
 /**
  * Stops the development server.
@@ -17,17 +18,7 @@ const initConfig = require( '../init-config' );
  * @param {boolean} options.debug   True if debug mode is enabled.
  */
 module.exports = async function stop( { spinner, debug } ) {
-	const { dockerComposeConfigPath } = await initConfig( {
-		spinner,
-		debug,
-	} );
-
-	spinner.text = 'Stopping WordPress.';
-
-	await dockerCompose.down( {
-		config: dockerComposeConfigPath,
-		log: debug,
-	} );
-
-	spinner.text = 'Stopped WordPress.';
+	const config = await loadConfig( path.resolve( '.' ) );
+	const runtime = getRuntime( detectRuntime( config.workDirectoryPath ) );
+	await runtime.stop( config, { spinner, debug } );
 };

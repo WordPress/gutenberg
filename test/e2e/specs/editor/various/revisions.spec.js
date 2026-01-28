@@ -33,6 +33,7 @@ test.describe( 'Revisions', () => {
 		await editor.saveDraft();
 
 		// Open the post settings sidebar and click the Revisions button.
+		await editor.openDocumentSettingsSidebar();
 		const settingsSidebar = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );

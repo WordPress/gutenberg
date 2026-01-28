@@ -512,5 +512,11 @@ module.exports = {
 				'react/react-in-jsx-scope': 'error',
 			},
 		},
+		{
+			files: [ 'packages/ui/src/**' ],
+			rules: {
+				'@wordpress/dependency-group': [ 'error', 'never' ],
+			},
+		},
 	],
 };

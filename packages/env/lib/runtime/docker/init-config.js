@@ -10,11 +10,11 @@ const yaml = require( 'js-yaml' );
 /**
  * Internal dependencies
  */
-const { loadConfig, ValidationError } = require( './config' );
+const { loadConfig, ValidationError } = require( '../../config' );
 const buildDockerComposeConfig = require( './build-docker-compose-config' );
 
 /**
- * @typedef {import('./config').WPConfig} WPConfig
+ * @typedef {import('../../config').WPConfig} WPConfig
  */
 
 /**

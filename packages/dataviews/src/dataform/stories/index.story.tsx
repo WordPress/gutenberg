@@ -102,7 +102,8 @@ export const Validation = {
 			description: 'Choose the form layout type.',
 			options: [
 				'regular',
-				'panel',
+				'panel-dropdown',
+				'panel-modal',
 				'card-collapsible',
 				'card-not-collapsible',
 				'details',

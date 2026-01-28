@@ -6,7 +6,6 @@ const chalk = require( 'chalk' );
 const ora = require( 'ora' );
 const yargs = require( 'yargs' );
 const terminalLink = require( 'terminal-link' );
-const { execSync } = require( 'child_process' );
 
 /**
  * Internal dependencies
@@ -16,9 +15,10 @@ const env = require( './env' );
 const parseXdebugMode = require( './parse-xdebug-mode' );
 const parseSpxMode = require( './parse-spx-mode' );
 const {
-	RUN_CONTAINERS,
-	validateRunContainer,
-} = require( './validate-run-container' );
+	getAvailableRuntimes,
+	getRuntime,
+	UnsupportedCommandError,
+} = require( './runtime' );
 
 // Colors.
 const boldWhite = chalk.bold.white;
@@ -45,7 +45,11 @@ const withSpinner =
 				process.exit( 0 );
 			},
 			( error ) => {
-				if (
+				if ( error instanceof UnsupportedCommandError ) {
+					// Error is an unsupported command in the current runtime.
+					spinner.fail( error.message );
+					process.exit( 1 );
+				} else if (
 					error instanceof env.ValidationError ||
 					error instanceof env.LifecycleScriptError
 				) {
@@ -87,16 +91,6 @@ const withSpinner =
 	};
 
 module.exports = function cli() {
-	// Do nothing if Docker is unavailable.
-	try {
-		execSync( 'docker info', { stdio: 'ignore' } );
-	} catch {
-		console.error(
-			chalk.red( 'Could not connect to Docker. Is it running?' )
-		);
-		process.exit( 1 );
-	}
-
 	yargs.usage( wpPrimary( '$0 <command>' ) );
 	yargs.option( 'debug', {
 		type: 'boolean',
@@ -150,6 +144,13 @@ module.exports = function cli() {
 				describe: 'Execute any configured lifecycle scripts.',
 				default: true,
 			} );
+			args.option( 'runtime', {
+				type: 'string',
+				describe:
+					'The runtime environment to use. "docker" uses Docker containers, "playground" uses WordPress Playground (experimental).',
+				choices: getAvailableRuntimes(),
+				default: 'docker',
+			} );
 		},
 		withSpinner( env.start )
 	);
@@ -201,6 +202,10 @@ module.exports = function cli() {
 		'$0 logs --no-watch --environment=tests',
 		'Displays the latest logs for the e2e test environment without watching.'
 	);
+	// Get run containers from Docker runtime (run command is Docker-only for now)
+	const dockerRuntime = getRuntime( 'docker' );
+	const runContainers = dockerRuntime.getRunContainers();
+
 	yargs.command(
 		'run <container> [command...]',
 		'Runs an arbitrary command in one of the underlying Docker containers. A double dash can be used to pass arguments to the container without parsing them. This is necessary if you are using an option that is defined below. You can use `bash` to open a shell session and both `composer` and `phpunit` are available in all WordPress and CLI containers. WP-CLI is also available in the CLI containers.',
@@ -216,8 +221,7 @@ module.exports = function cli() {
 				type: 'string',
 				describe:
 					'The underlying Docker service to run the command on.',
-				choices: RUN_CONTAINERS,
-				coerce: validateRunContainer,
+				choices: runContainers,
 			} );
 			args.positional( 'command', {
 				type: 'array',

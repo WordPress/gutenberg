@@ -2,14 +2,14 @@
 /**
  * External dependencies
  */
-const { v2: dockerCompose } = require( 'docker-compose' );
+const path = require( 'path' );
 
 /**
  * Internal dependencies
  */
-const initConfig = require( '../init-config' );
-const { configureWordPress, resetDatabase } = require( '../wordpress' );
 const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
+const { loadConfig } = require( '../config' );
+const { getRuntime, detectRuntime } = require( '../runtime' );
 
 /**
  * @typedef {import('../wordpress').WPEnvironment} WPEnvironment
@@ -31,43 +31,12 @@ module.exports = async function clean( {
 	scripts,
 	debug,
 } ) {
-	const config = await initConfig( { spinner, debug } );
+	const config = await loadConfig( path.resolve( '.' ) );
+	const runtime = getRuntime( detectRuntime( config.workDirectoryPath ) );
 
-	const description = `${ environment } environment${
-		environment === 'all' ? 's' : ''
-	}`;
-	spinner.text = `Cleaning ${ description }.`;
-
-	const tasks = [];
-
-	// Start the database first to avoid race conditions where all tasks create
-	// different docker networks with the same name.
-	await dockerCompose.upOne( 'mysql', {
-		config: config.dockerComposeConfigPath,
-		log: config.debug,
-	} );
-
-	if ( environment === 'all' || environment === 'development' ) {
-		tasks.push(
-			resetDatabase( 'development', config )
-				.then( () => configureWordPress( 'development', config ) )
-				.catch( () => {} )
-		);
-	}
-
-	if ( environment === 'all' || environment === 'tests' ) {
-		tasks.push(
-			resetDatabase( 'tests', config )
-				.then( () => configureWordPress( 'tests', config ) )
-				.catch( () => {} )
-		);
-	}
-
-	await Promise.all( tasks );
+	await runtime.clean( config, { environment, spinner, debug } );
 
 	if ( scripts ) {
 		await executeLifecycleScript( 'afterClean', config, spinner );
 	}
-
-	spinner.text = `Cleaned ${ description }.`;
 };
