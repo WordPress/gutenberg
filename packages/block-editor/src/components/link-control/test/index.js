@@ -3264,16 +3264,6 @@ describe( 'URL validation', () => {
 		// but if it did, validation would prevent submission
 		triggerEnter( searchInput );
 
-		// onChange should not be called because validation should prevent submission
-		// Note: The exact behavior depends on whether a suggestion is created,
-		// but the key point is that invalid URLs should not be submitted
-		await waitFor(
-			() => {
-				// Give it a moment to process
-			},
-			{ timeout: 1000 }
-		);
-
 		// For URLs that don't pass isURLLike, no suggestion is created,
 		// so onChange won't be called (which is the expected behavior)
 		expect( mockOnChange ).not.toHaveBeenCalled();
