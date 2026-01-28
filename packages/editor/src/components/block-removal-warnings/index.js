@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 
-import { _n } from '@wordpress/i18n';
+import { _n, sprintf } from '@wordpress/i18n';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -21,7 +21,7 @@ const TEMPLATE_BLOCKS = [
 	'core/post-template',
 	'core/query',
 ];
-const BLOCK_REMOVAL_RULES = [
+const getBlockRemovalRules = ( currentTemplate ) => [
 	{
 		// Template blocks.
 		// The warning is only shown when a user manipulates templates or template parts.
@@ -30,11 +30,20 @@ const BLOCK_REMOVAL_RULES = [
 			const removedTemplateBlocks = removedBlocks.filter( ( { name } ) =>
 				TEMPLATE_BLOCKS.includes( name )
 			);
+			// Translators: %1$s is the block name, %2$s is the template name & %3$s are the block names if multiple blocks are deleted.
+			const message = _n(
+				'Deleting this "%1$s" block will stop your post or page content from displaying on the "%2$s" template. It is not recommended.',
+				'Deleting these "%3$s" blocks will stop your post or page content from displaying on the "%2$s" template. It is not recommended.',
+				removedBlocks.length
+			);
 			if ( removedTemplateBlocks.length ) {
-				return _n(
-					'Deleting this block will stop your post or page content from displaying on this template. It is not recommended.',
-					'Some of the deleted blocks will stop your post or page content from displaying on this template. It is not recommended.',
-					removedBlocks.length
+				return sprintf(
+					message,
+					removedBlocks[ 0 ].name,
+					currentTemplate,
+					removedTemplateBlocks
+						.map( ( block ) => block.name )
+						.join( ', ' )
 				);
 			}
 		},
@@ -69,12 +78,21 @@ export default function BlockRemovalWarnings() {
 		[]
 	);
 
+	const currentTemplate = useSelect(
+		( select ) =>
+			select( editorStore )
+				.getCurrentPostId()
+				?.toString()
+				.split( '//' )[ 1 ],
+		[]
+	);
+
 	const removalRulesForPostType = useMemo(
 		() =>
-			BLOCK_REMOVAL_RULES.filter( ( rule ) =>
+			getBlockRemovalRules( currentTemplate ).filter( ( rule ) =>
 				rule.postTypes.includes( currentPostType )
 			),
-		[ currentPostType ]
+		[ currentPostType, currentTemplate ]
 	);
 
 	// `BlockRemovalWarnings` is rendered in the editor provider, a shared component
