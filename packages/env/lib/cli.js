@@ -260,13 +260,7 @@ module.exports = function cli() {
 	yargs.command(
 		'status',
 		'Get the status of the wp-env environment including URLs, ports, and configuration.',
-		( args ) => {
-			args.option( 'json', {
-				type: 'boolean',
-				describe: 'Output status in JSON format.',
-				default: false,
-			} );
-		},
+		() => {},
 		withSpinner( env.status )
 	);
 

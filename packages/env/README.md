@@ -537,12 +537,6 @@ Config Directory: /home/user/my-plugin
 Work Directory: /home/user/.wp-env/63263e6506becb7b8613b02d42280a49
 ```
 
-Use `--json` flag for machine-readable output:
-
-```sh
-$ wp-env status --json
-```
-
 ## .wp-env.json
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
