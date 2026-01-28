@@ -9,6 +9,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -91,24 +92,23 @@ function NotesSidebar( { postId } ) {
 
 	const showFloatingSidebar = isLargeViewport;
 
-	const { clientId, blockCommentId, isDistractionFree } = useSelect(
-		( select ) => {
-			const {
-				getBlockAttributes,
-				getSelectedBlockClientId,
-				getSettings,
-			} = select( blockEditorStore );
-			const _clientId = getSelectedBlockClientId();
-			return {
-				clientId: _clientId,
-				blockCommentId: _clientId
-					? getBlockAttributes( _clientId )?.metadata?.noteId
-					: null,
-				isDistractionFree: getSettings().isDistractionFree,
-			};
-		},
-		[]
-	);
+	const { clientId, blockCommentId } = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId } =
+			select( blockEditorStore );
+		const _clientId = getSelectedBlockClientId();
+		return {
+			clientId: _clientId,
+			blockCommentId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.noteId
+				: null,
+		};
+	}, [] );
+	const { isDistractionFree } = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
+		return {
+			isDistractionFree: get( 'core', 'distractionFree' ),
+		};
+	}, [] );
 
 	const {
 		resultComments,
