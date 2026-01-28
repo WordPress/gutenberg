@@ -151,6 +151,9 @@ function LinkControl( {
 	}
 
 	const [ settingsOpen, setSettingsOpen ] = useState( false );
+	// Sets if the URL value is valid when submitted. The value could be set to
+	// { type: 'invalid', message: 'Please enter a valid URL.' } or { type: 'valid' }.
+	// When it is undefined, the URL value has not been validated.
 	const [ customValidity, setCustomValidity ] = useState( undefined );
 
 	const { advancedSettingsPreference } = useSelect( ( select ) => {

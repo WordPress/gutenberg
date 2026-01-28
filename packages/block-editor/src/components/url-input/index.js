@@ -12,7 +12,6 @@ import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import {
 	BaseControl,
 	Button,
-	__experimentalInputControl as InputControl,
 	Spinner,
 	withSpokenMessages,
 	Popover,
@@ -479,31 +478,23 @@ class URLInput extends Component {
 			help,
 		};
 
-		// Use ValidatedInputControl if validation props are provided
-		const useValidatedControl = !! customValidity;
-		const validationProps = useValidatedControl
-			? {
-					customValidity,
-					// Suppress the "(Required)" indicator in the label.
-					// The field is still required for validation, but the indicator
-					// can be hidden when markWhenOptional is set to true.
-					...( markWhenOptional !== undefined && {
-						markWhenOptional,
-					} ),
-			  }
-			: {};
+		const validationProps = {
+			customValidity,
+			// Suppress the "(Required)" indicator in the label.
+			// The field is still required for validation, but the indicator
+			// can be hidden when markWhenOptional is set to true.
+			...( markWhenOptional !== undefined && {
+				markWhenOptional,
+			} ),
+		};
 
 		if ( renderControl ) {
 			return renderControl( controlProps, inputProps, loading );
 		}
 
-		const InputComponent = useValidatedControl
-			? ValidatedInputControl
-			: InputControl;
-
 		return (
 			<BaseControl __nextHasNoMarginBottom { ...controlProps }>
-				<InputComponent
+				<ValidatedInputControl
 					{ ...inputProps }
 					{ ...validationProps }
 					__next40pxDefaultSize
