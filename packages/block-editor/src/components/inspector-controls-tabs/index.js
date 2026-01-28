@@ -69,6 +69,7 @@ export default function InspectorControlsTabs( {
 	] );
 
 	// Auto-select first available tab unless user has made a selection
+	// In contentOnly mode, prefer List View tab over Content tab
 	useEffect( () => {
 		if (
 			! tabs?.length ||
@@ -78,11 +79,23 @@ export default function InspectorControlsTabs( {
 			return;
 		}
 
-		const firstTabName = tabs[ 0 ]?.name;
-		if ( selectedTabId !== firstTabName ) {
-			setSelectedTabId( firstTabName );
+		// In contentOnly mode, prefer List View tab if it exists
+		const isContentOnlyMode =
+			isSectionBlock || contentClientIds?.length > 0;
+		const hasListViewTab = tabs.some(
+			( tab ) => tab.name === TAB_LIST_VIEW.name
+		);
+
+		let defaultTabName = tabs[ 0 ]?.name;
+		if ( isContentOnlyMode && hasListViewTab ) {
+			// Prefer List View tab in contentOnly mode
+			defaultTabName = TAB_LIST_VIEW.name;
 		}
-	}, [ tabs, selectedTabId ] );
+
+		if ( selectedTabId !== defaultTabName ) {
+			setSelectedTabId( defaultTabName );
+		}
+	}, [ tabs, selectedTabId, isSectionBlock, contentClientIds ] );
 
 	const handleTabSelect = ( tabId ) => {
 		setSelectedTabId( tabId );
