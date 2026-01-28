@@ -96,11 +96,6 @@ if ( ! class_exists( 'WP_REST_Icon_Controller' ) ) {
 				return $check;
 			}
 
-			$icon = $this->get_icon( $request['name'] );
-			if ( is_wp_error( $icon ) ) {
-				return $icon;
-			}
-
 			return true;
 		}
 
@@ -112,13 +107,9 @@ if ( ! class_exists( 'WP_REST_Icon_Controller' ) ) {
 		 */
 		public function get_items( $request ) {
 			$response = array();
-			$icons    = WP_Icons_Registry::get_instance()->get_registered_icons();
 			$search   = $request->get_param( 'search' );
+			$icons    = WP_Icons_Registry::get_instance()->get_registered_icons( $search );
 			foreach ( $icons as $icon ) {
-				// Filter by search query if provided
-				if ( ! empty( $search ) && false === stripos( $icon['name'], $search ) ) {
-					continue;
-				}
 				$prepared_icon = $this->prepare_item_for_response( $icon, $request );
 				$response[]    = $this->prepare_response_for_collection( $prepared_icon );
 			}

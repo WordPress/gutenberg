@@ -241,17 +241,22 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		/**
 		 * Retrieves all registered icons.
 		 *
+		 * @param string $search Optional. Search term by which to filter the icons.
 		 * @return array[] Array of arrays containing the registered icon properties.
 		 */
-		public function get_registered_icons() {
-			$icons = $this->registered_icons;
+		public function get_registered_icons( $search = '' ) {
+			$icons = array();
 
-			foreach ( $icons as $index => $icon ) {
-				$content                    = $this->get_content( $icon['name'] );
-				$icons[ $index ]['content'] = $content;
+			foreach ( $this->registered_icons as $icon ) {
+				if ( ! empty( $search ) && false === stripos( $icon['name'], $search ) ) {
+					continue;
+				}
+
+				$icon['content'] = $this->get_content( $icon['name'] );
+				$icons[] = $icon;
 			}
 
-			return array_values( $icons );
+			return $icons;
 		}
 
 		/**
