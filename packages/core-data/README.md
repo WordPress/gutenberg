@@ -174,6 +174,33 @@ _Returns_
 
 -   `Object`: Action object.
 
+**Example:**
+
+```javascript
+import { addEntities } from '@wordpress/core-data';
+
+// Define the entities you want to add
+const newEntities = [
+    {
+        kind: 'postType',
+        name: 'post',
+        title: 'Sample Post',
+        status: 'draft'
+    },
+    {
+        kind: 'taxonomy',
+        name: 'category',
+        slug: 'sample-category'
+    }
+];
+
+// Create the action object
+const action = addEntities(newEntities);
+
+// Dispatch the action (assuming you have a dispatch function available)
+dispatch(action);
+```
+
 ### deleteEntityRecord
 
 Action triggered to delete an entity record.
