@@ -88,7 +88,6 @@ export default function InspectorControlsTabs( {
 
 		let defaultTabName = tabs[ 0 ]?.name;
 		if ( isContentOnlyMode && hasListViewTab ) {
-			// Prefer List View tab in contentOnly mode
 			defaultTabName = TAB_LIST_VIEW.name;
 		}
 
