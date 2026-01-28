@@ -1,5 +1,5 @@
-#!/usr/bin/env tsx
-// TODO: Replace shebang with `#!/usr/bin/env -S node --experimental-strip-types` when upgrading to Node.js >= 22.20
+#!/usr/bin/env -S node --import tsx
+// TODO: Replace shebang with `#!/usr/bin/env -S node --experimental-strip-types` when upgrading to Node.js >= 22.6
 
 /**
  * External dependencies
