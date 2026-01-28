@@ -86,7 +86,7 @@ export function createWordpressExternalsPlugin(
 				 * and the specific import path (root or subpath) is declared in wpScriptModuleExports.
 				 *
 				 * @param {import('./types.ts').PackageJson} packageJson Package.json object.
-				 * @param {string|null}                               subpath     Subpath after package name, or null for root import.
+				 * @param {string|null}                      subpath     Subpath after package name, or null for root import.
 				 * @return {boolean} True if the import is a script module.
 				 */
 				function isScriptModuleImport( packageJson, subpath ) {
