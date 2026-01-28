@@ -227,15 +227,16 @@ function ValidatedDateControl< Item >( {
 	}, [ inputRefs, setIsTouched ] );
 
 	useEffect( () => {
-		if ( isTouched ) {
-			const result = validity
-				? getCustomValidity( isValid, validity )
-				: undefined;
-			if ( result ) {
-				setCustomValidity( result );
-			} else {
-				validateRefs();
-			}
+		if ( ! isTouched ) {
+			return;
+		}
+		const result = validity
+			? getCustomValidity( isValid, validity )
+			: undefined;
+		if ( result ) {
+			setCustomValidity( result );
+		} else {
+			validateRefs();
 		}
 	}, [ isTouched, isValid, validity, validateRefs ] );
 
