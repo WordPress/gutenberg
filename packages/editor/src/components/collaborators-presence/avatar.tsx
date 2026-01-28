@@ -1,6 +1,4 @@
-import { type UserInfo } from '../../../../core-data/src/awareness/types';
-
-import '@/components/avatar.scss';
+import './styles/avatar.scss';
 
 type AvatarSize = 'small' | 'medium';
 
@@ -16,7 +14,11 @@ export function Avatar( {
 	showUserColorBorder,
 	size = 'small',
 }: {
-	userInfo: UserInfo;
+	userInfo: {
+		name: string;
+		color: string;
+		avatar_urls?: Record< string, string >;
+	};
 	showUserColorBorder?: boolean;
 	size?: AvatarSize;
 } ) {

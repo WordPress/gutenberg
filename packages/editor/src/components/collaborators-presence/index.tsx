@@ -1,18 +1,31 @@
 import { Button } from '@wordpress/components';
-import { useActiveUsers } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
 
 import { Avatar } from './avatar';
 import { CollaboratorsList } from './list';
+import { unlock } from '../../lock-unlock';
 // import { type CursorRegistry } from '@/utilities/cursor-registry';
 
-import '@/components/avatars.scss';
+import './styles/collaborators-presence.scss';
+import { privateApis } from '@wordpress/core-data';
+const { useActiveUsers } = unlock( privateApis );
+
+interface UserInfo {
+	name: string;
+	color: string;
+	avatar_urls?: Record< string, string >;
+}
+
+interface UserState {
+	clientId: string;
+	isMe: boolean;
+	userInfo: UserInfo;
+}
 
 interface AvatarsProps {
 	// cursorRegistry: CursorRegistry;
 	postId: number | null;
 	postType: string | null;
-	isAvatarsEnabled: boolean;
 }
 
 /**
@@ -21,15 +34,13 @@ interface AvatarsProps {
  * @param root0
  * @param root0.postId
  * @param root0.postType
- * @param root0.isAvatarsEnabled
  */
 export function CollaboratorsPresence( {
 	// cursorRegistry,
 	postId,
 	postType,
-	isAvatarsEnabled,
 }: AvatarsProps ) {
-	const activeUsers = useActiveUsers( postId, postType );
+	const activeUsers = useActiveUsers( postId, postType ) as UserState[];
 
 	// Filter out current user - we never show ourselves in the list
 	const otherActiveUsers = activeUsers.filter( ( user ) => ! user.isMe );
@@ -50,7 +61,7 @@ export function CollaboratorsPresence( {
 		.map( ( { userInfo } ) => userInfo.name )
 		.join( ', ' );
 
-	return isAvatarsEnabled && visibleUsers.length > 0 ? (
+	return visibleUsers.length > 0 ? (
 		<>
 			<Button
 				__next40pxDefaultSize
@@ -80,7 +91,13 @@ export function CollaboratorsPresence( {
 			</Button>
 			{ isPopoverVisible && (
 				<CollaboratorsList
-					activeUsers={ otherActiveUsers }
+					activeUsers={ otherActiveUsers.map( ( user ) => (
+						{
+							clientId: user.clientId,
+							isConnected: true,
+							userInfo: user.userInfo,
+						}
+					) ) }
 					// cursorRegistry={ cursorRegistry }
 					popoverAnchor={ popoverAnchor }
 					setIsPopoverVisible={ setIsPopoverVisible }

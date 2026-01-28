@@ -1,0 +1,28 @@
+.vip-real-time-collaboration-avatar {
+	background-image: var(--avatar-url);
+	background-size: cover;
+	background-position: center;
+	border-radius: 6px;
+	border-width: 1.5px;
+	border-style: solid;
+	border-color: #ddd;
+	font-size: 0;
+
+	&--small {
+		width: 24px;
+		height: 24px;
+		border-radius: 6px;
+	}
+
+	&--medium {
+		width: 32px;
+		height: 32px;
+		border-radius: 8px;
+	}
+
+	&--with-color-border {
+		border-color: var(--user-color);
+		box-shadow: inset 0px 0px 0px 1px #ffffffb2;
+		background-clip: padding-box;
+	}
+}

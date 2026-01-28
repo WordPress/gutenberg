@@ -4,11 +4,18 @@ import { close } from '@wordpress/icons';
 
 import { Avatar } from './avatar';
 
-import '@/components/collaborators-list.scss';
-import { type PostEditorAwarenessState as ActiveUser } from '../../../../core-data/src/awareness/types';
+import './styles/collaborators-list.scss';
 
 interface CollaboratorsListProps {
-	activeUsers: ActiveUser[];
+	activeUsers: {
+		clientId: string;
+		isConnected: boolean;
+		userInfo: {
+			name: string;
+			color: string;
+			avatar_urls?: Record< string, string >;
+		};
+	}[];
 	popoverAnchor?: HTMLElement | null;
 	setIsPopoverVisible: ( isVisible: boolean ) => void;
 }
