@@ -39,7 +39,7 @@ import {
 } from './fields';
 import {
 	defaultLayouts,
-	getDefaultView,
+	DEFAULT_VIEW,
 	getActiveFiltersForTab,
 } from './view-utils';
 
@@ -55,7 +55,7 @@ export default function PageTemplates() {
 	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
 		useState( false );
 	const defaultView = useMemo( () => {
-		return getDefaultView();
+		return DEFAULT_VIEW;
 	}, [] );
 	const activeFilters = useMemo(
 		() => getActiveFiltersForTab( activeView ),
