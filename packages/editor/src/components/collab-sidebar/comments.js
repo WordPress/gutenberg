@@ -66,6 +66,7 @@ export function Comments( {
 } ) {
 	const [ heights, setHeights ] = useState( {} );
 	const [ selectedThread, setSelectedThread ] = useState( null );
+	const [ openReplyFormsSet, setOpenReplyFormsSet ] = useState( new Set() );
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
 	const [ blockRefs, setBlockRefs ] = useState( {} );
 
@@ -73,6 +74,21 @@ export function Comments( {
 	const { selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
+
+	// Helper functions to manage open reply forms
+	const openReplyForm = ( threadId ) => {
+		setOpenReplyFormsSet( ( prev ) => new Set( prev ).add( threadId ) );
+	};
+
+	const closeReplyForm = ( threadId ) => {
+		setOpenReplyFormsSet( ( prev ) => {
+			const next = new Set( prev );
+			next.delete( threadId );
+			return next;
+		} );
+	};
+
+	const isReplyFormOpen = ( threadId ) => openReplyFormsSet.has( threadId );
 
 	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
 		useSelect( ( select ) => {
@@ -435,6 +451,9 @@ export function Comments( {
 					openNoteForm={ openNoteForm }
 					closeNoteForm={ closeNoteForm }
 					isNoteFormOpen={ isNoteFormOpen }
+					openReplyForm={ openReplyForm }
+					closeReplyForm={ closeReplyForm }
+					isReplyFormOpen={ isReplyFormOpen }
 					commentSidebarRef={ commentSidebarRef }
 					reflowComments={ reflowComments }
 					isFloating={ isFloating }
@@ -468,6 +487,9 @@ function Thread( {
 	openNoteForm,
 	closeNoteForm,
 	isNoteFormOpen,
+	openReplyForm,
+	closeReplyForm,
+	isReplyFormOpen,
 	commentSidebarRef,
 	reflowComments,
 	isFloating,
@@ -544,7 +566,11 @@ function Thread( {
 	};
 
 	const handleCommentSelect = () => {
+		if ( thread.blockClientId ) {
+			closeNoteForm( thread.blockClientId );
+		}
 		setSelectedThread( thread.id );
+		openReplyForm( thread.id );
 		toggleBlockSpotlight( thread.blockClientId, true );
 		if ( !! thread.blockClientId ) {
 			// Pass `null` as the second parameter to prevent focusing the block.
@@ -554,6 +580,7 @@ function Thread( {
 
 	const unselectThread = () => {
 		setSelectedThread( null );
+		closeReplyForm( thread.id );
 		if ( thread.blockClientId ) {
 			closeNoteForm( thread.blockClientId );
 		}
@@ -724,7 +751,7 @@ function Thread( {
 					reflowComments={ reflowComments }
 				/>
 			) }
-			{ isSelected && (
+			{ isReplyFormOpen( thread.id ) && (
 				<VStack spacing="2" role="treeitem">
 					<HStack alignment="left" spacing="3" justify="flex-start">
 						<CommentAuthorInfo />
@@ -747,14 +774,15 @@ function Thread( {
 										parent: thread.id,
 									} );
 								}
+								closeReplyForm( thread.id );
 								clearDraftNote( draftKey );
 							} }
 							onCancel={ ( event ) => {
 								// Prevent the parent onClick from being triggered.
 								event.stopPropagation();
 								const draftKey = `reply-${ thread.id }`;
+								closeReplyForm( thread.id );
 								clearDraftNote( draftKey );
-								unselectThread();
 								focusCommentThread(
 									thread.id,
 									commentSidebarRef.current
