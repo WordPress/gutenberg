@@ -9,12 +9,12 @@ const path = require( 'path' );
  * Internal dependencies
  */
 const { hasSameCoreSource } = require( './wordpress' );
-const { dbEnv } = require( './config' );
+const { dbEnv } = require( '../../config' );
 const getHostUser = require( './get-host-user' );
 
 /**
- * @typedef {import('./config').WPConfig} WPConfig
- * @typedef {import('./config').WPEnvironmentConfig} WPEnvironmentConfig
+ * @typedef {import('../../config').WPConfig} WPConfig
+ * @typedef {import('../../config').WPEnvironmentConfig} WPEnvironmentConfig
  */
 
 /**

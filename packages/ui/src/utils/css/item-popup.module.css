@@ -12,7 +12,7 @@
 		max-height: min(var(--available-height), 480px, 60dvh);
 		min-width: var(--anchor-width);
 		max-width: var(--available-width);
-		border-radius: var(--wpds-border-radius-surface-md);
+		border-radius: var(--wpds-border-radius-md);
 		border: 1px solid var(--wpds-color-stroke-surface-neutral);
 		box-shadow: var(--wpds-elevation-medium);
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
@@ -61,7 +61,7 @@
 		justify-content: flex-start;
 		gap: var(--wpds-dimension-gap-2xs);
 		min-height: var(--wp-ui-popup-item-height);
-		border-radius: var(--wpds-border-radius-surface-sm);
+		border-radius: var(--wpds-border-radius-sm);
 		user-select: none;
 		margin-inline: var(--wp-ui-popup-padding);
 		padding-block: var(--wp-ui-popup-item-padding-block);

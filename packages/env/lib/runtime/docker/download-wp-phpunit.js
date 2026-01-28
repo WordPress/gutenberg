@@ -2,9 +2,9 @@
 /**
  * External dependencies
  */
-const SimpleGit = require( 'simple-git' );
 const fs = require( 'fs' );
 const path = require( 'path' );
+const SimpleGit = require( 'simple-git' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig

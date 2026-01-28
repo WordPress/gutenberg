@@ -57,9 +57,7 @@ function getBlockIconVariant( { select, clientIds } ) {
 	const canEdit = clientIds.every( ( clientId ) => canEditBlock( clientId ) );
 	const isDefaultEditingMode =
 		getBlockEditingMode( clientIds[ 0 ] ) === 'default';
-	const _hideTransformsForSections =
-		window?.__experimentalContentOnlyPatternInsertion &&
-		hasPatternNameInSelection;
+	const _hideTransformsForSections = hasPatternNameInSelection;
 	const _showBlockSwitcher =
 		! _hideTransformsForSections &&
 		isDefaultEditingMode &&
@@ -86,11 +84,7 @@ function getBlockIcon( { select, clientIds } ) {
 	const _isSingleBlock = clientIds.length === 1;
 	const firstClientId = clientIds[ 0 ];
 	const blockAttributes = getBlockAttributes( firstClientId );
-	if (
-		_isSingleBlock &&
-		blockAttributes?.metadata?.patternName &&
-		window?.__experimentalContentOnlyPatternInsertion
-	) {
+	if ( _isSingleBlock && blockAttributes?.metadata?.patternName ) {
 		return symbol;
 	}
 
