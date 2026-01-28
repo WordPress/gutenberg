@@ -6,8 +6,8 @@
  * @package gutenberg
  */
 
-if ( ! class_exists( 'WP_REST_Icon_Controller' ) ) {
-	class WP_REST_Icon_Controller extends WP_REST_Controller {
+if ( ! class_exists( 'WP_REST_Icons_Controller' ) ) {
+	class WP_REST_Icons_Controller extends WP_REST_Controller {
 		/**
 		 * Constructs the controller.
 		 */

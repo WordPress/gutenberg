@@ -200,5 +200,5 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlay
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-svg-icon-registry' ) ) {
 	require __DIR__ . '/experimental/class-wp-icons-registry.php';
-	require __DIR__ . '/experimental/class-wp-rest-icon-controller.php';
+	require __DIR__ . '/experimental/class-wp-rest-icons-controller.php';
 }

@@ -1,10 +1,10 @@
 <?php
 /**
- * Unit tests covering WP_REST_Icon_Controller functionality.
+ * Unit tests covering WP_REST_Icons_Controller functionality.
  *
  * @package Gutenberg
  */
-class WP_Test_REST_Icon_Controller extends WP_Test_REST_TestCase {
+class WP_Test_REST_Icons_Controller extends WP_Test_REST_TestCase {
 	protected static $admin_id;
 	protected static $editor_id;
 	protected static $contributor_id;
