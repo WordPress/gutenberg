@@ -9,7 +9,7 @@ import { createHash } from 'crypto';
 /**
  * Internal dependencies
  */
-import { getPackageInfo } from './package-utils.mjs';
+import { getPackageInfo } from './package-utils.ts';
 
 /**
  * Generate a content hash from file contents.
@@ -85,7 +85,7 @@ export function createWordpressExternalsPlugin(
 				 * A package is considered a script module if it has wpScriptModuleExports
 				 * and the specific import path (root or subpath) is declared in wpScriptModuleExports.
 				 *
-				 * @param {import('./package-utils.mjs').PackageJson} packageJson Package.json object.
+				 * @param {import('./types.ts').PackageJson} packageJson Package.json object.
 				 * @param {string|null}                               subpath     Subpath after package name, or null for root import.
 				 * @return {boolean} True if the import is a script module.
 				 */

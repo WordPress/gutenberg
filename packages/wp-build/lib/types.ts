@@ -149,6 +149,14 @@ export interface PackageJson {
 	 */
 	exports?: Record< string, string | Record< string, string > >;
 	/**
+	 * Runtime dependencies.
+	 */
+	dependencies?: Record< string, string >;
+	/**
+	 * Side effects configuration for tree shaking.
+	 */
+	sideEffects?: boolean | string[];
+	/**
 	 * Whether to build as a WordPress script.
 	 */
 	wpScript?: boolean;

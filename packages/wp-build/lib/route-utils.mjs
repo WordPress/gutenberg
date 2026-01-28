@@ -7,7 +7,7 @@ import path from 'path';
 /**
  * Internal dependencies
  */
-import { getPackageInfoFromFile } from './package-utils.mjs';
+import { getPackageInfoFromFile } from './package-utils.ts';
 
 /**
  * Get all route names from the routes directory.
@@ -44,7 +44,7 @@ export function getAllRoutes( rootDir ) {
  */
 export function getRouteMetadata( rootDir, routeName ) {
 	const routePackageJson =
-		/** @type {import('./package-utils.mjs').RoutePackageJson|null} */ (
+		/** @type {import('./types.ts').RoutePackageJson|null} */ (
 			getPackageInfoFromFile(
 				path.join( rootDir, 'routes', routeName, 'package.json' )
 			)

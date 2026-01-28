@@ -6,13 +6,13 @@
  */
 
 import path from 'path';
-import { getPackageInfoFromFile } from './package-utils.mjs';
+import { getPackageInfoFromFile } from './package-utils.ts';
 
 /**
  * Check if a package is a script or script module.
  * A package is a script if it has wpScript or wpScriptModuleExports.
  *
- * @param {import('./package-utils.mjs').PackageJson|null|undefined} packageJson The package.json object.
+ * @param {import('./types.ts').PackageJson|null|undefined} packageJson The package.json object.
  * @return {boolean} True if the package is a script or script module.
  */
 function isScriptOrModule( packageJson ) {
@@ -25,7 +25,7 @@ function isScriptOrModule( packageJson ) {
 /**
  * Get package dependencies from a package.json object.
  *
- * @param {import('./package-utils.mjs').PackageJson|null|undefined} packageJson The package.json object.
+ * @param {import('./types.ts').PackageJson|null|undefined} packageJson The package.json object.
  * @return {string[]} Array of package names this package depends on.
  */
 function getDependencies( packageJson ) {
@@ -42,7 +42,7 @@ function getDependencies( packageJson ) {
  * Group packages by dependency depth level.
  * Packages at the same depth level can be built in parallel.
  *
- * @param {Map<string, import('./package-utils.mjs').PackageJson>} packages Map of package names to package.json objects.
+ * @param {Map<string, import('./types.ts').PackageJson>} packages Map of package names to package.json objects.
  * @return {string[][]} Array of arrays, where each inner array is a depth level containing package names.
  */
 function groupByDepth( packages ) {
@@ -110,8 +110,8 @@ function groupByDepth( packages ) {
 /**
  * Get packages that depend on a given package (reverse dependencies).
  *
- * @param {string}                                                 packageName       The full package name to find dependents of.
- * @param {Map<string, import('./package-utils.mjs').PackageJson>} workspacePackages Map of workspace package names to package.json objects.
+ * @param {string}                                        packageName       The full package name to find dependents of.
+ * @param {Map<string, import('./types.ts').PackageJson>} workspacePackages Map of workspace package names to package.json objects.
  * @return {string[]} Array of package names that depend on the given package.
  */
 function getReverseDependencies( packageName, workspacePackages ) {
@@ -142,8 +142,8 @@ function getReverseDependencies( packageName, workspacePackages ) {
  * - D (script) depends on C
  * Result: Only C needs rebundling (D stops at C boundary)
  *
- * @param {string}                                                 changedPackage    The full package name that changed.
- * @param {Map<string, import('./package-utils.mjs').PackageJson>} workspacePackages Map of workspace package names to package.json objects.
+ * @param {string}                                        changedPackage    The full package name that changed.
+ * @param {Map<string, import('./types.ts').PackageJson>} workspacePackages Map of workspace package names to package.json objects.
  * @return {string[]} Array of script/module package names to rebundle.
  */
 function findScriptsToRebundle( changedPackage, workspacePackages ) {
@@ -222,10 +222,10 @@ function getRouteDependencies( rootDir, routeName ) {
  * - home (route) depends on B
  * Result: Both C and home need rebuilding
  *
- * @param {string}                                                 changedPackage    The full package name that changed.
- * @param {Map<string, import('./package-utils.mjs').PackageJson>} workspacePackages Map of workspace package names to package.json objects.
- * @param {string}                                                 rootDir           Root directory path.
- * @param {string[]}                                               allRoutes         Array of all route names.
+ * @param {string}                                        changedPackage    The full package name that changed.
+ * @param {Map<string, import('./types.ts').PackageJson>} workspacePackages Map of workspace package names to package.json objects.
+ * @param {string}                                        rootDir           Root directory path.
+ * @param {string[]}                                      allRoutes         Array of all route names.
  * @return {string[]} Array of route names to rebuild.
  */
 function findRoutesToRebuild(

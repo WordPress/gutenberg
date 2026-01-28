@@ -8,7 +8,7 @@ import { fileURLToPath } from 'url';
 /**
  * Internal dependencies
  */
-import { getPackageInfoFromFile } from './package-utils.mjs';
+import { getPackageInfoFromFile } from './package-utils.ts';
 import type { PackageJson, PhpReplacements } from './types.ts';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
