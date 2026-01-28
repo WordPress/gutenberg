@@ -498,16 +498,49 @@ Options:
   --watch    Watch for logs as they happen.            [boolean] [default: true]
 ```
 
-### `wp-env install-path`
+### `wp-env status`
 
-Get the path where all of the environment files are stored. This includes the Docker files, WordPress, PHPUnit files, and any sources that were downloaded.
+Get the status of the wp-env environment including whether it's running, URLs, ports, configuration, and file paths.
 
 Example:
 
 ```sh
-$ wp-env install-path
+$ wp-env status
 
-/home/user/.wp-env/63263e6506becb7b8613b02d42280a49
+wp-env Status
+────────────────────────────────────────
+
+Status: Running
+Runtime: docker
+
+URLs
+────────────────────────────────────────
+Development Site: http://localhost:8888
+Tests Site: http://localhost:8889
+
+Ports
+────────────────────────────────────────
+Development: 8888
+Tests: 8889
+MySQL: 13306
+Tests MySQL: 13307
+
+Configuration
+────────────────────────────────────────
+PHP Version: 8.2
+Multisite: No
+Plugins: my-plugin
+
+Paths
+────────────────────────────────────────
+Config Directory: /home/user/my-plugin
+Work Directory: /home/user/.wp-env/63263e6506becb7b8613b02d42280a49
+```
+
+Use `--json` flag for machine-readable output:
+
+```sh
+$ wp-env status --json
 ```
 
 ## .wp-env.json

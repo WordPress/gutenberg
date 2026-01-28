@@ -578,6 +578,105 @@ class DockerRuntime {
 	}
 
 	/**
+	 * Get the status of the Docker environment.
+	 *
+	 * @param {WPConfig} config          The wp-env config object.
+	 * @param {Object}   options         Status options.
+	 * @param {Object}   options.spinner A CLI spinner which indicates progress.
+	 * @param {boolean}  options.debug   True if debug mode is enabled.
+	 * @return {Promise<Object>} Status object with environment information.
+	 */
+	async getStatus( config, { spinner, debug } ) {
+		spinner.text = 'Getting environment status.';
+
+		const fullConfig = await initConfig( { spinner, debug } );
+		const dockerComposeConfig = {
+			config: fullConfig.dockerComposeConfigPath,
+			log: debug,
+		};
+
+		// Check if containers are running by trying to get a port.
+		let isRunning = false;
+		let mySQLPort = null;
+		let testsMySQLPort = null;
+		let phpmyadminPort = null;
+		let testsPhpmyadminPort = null;
+
+		try {
+			mySQLPort = await this._getPublicDockerPort(
+				'mysql',
+				3306,
+				dockerComposeConfig
+			);
+			isRunning = true;
+
+			testsMySQLPort = await this._getPublicDockerPort(
+				'tests-mysql',
+				3306,
+				dockerComposeConfig
+			);
+
+			if ( fullConfig.env.development.phpmyadminPort ) {
+				phpmyadminPort = await this._getPublicDockerPort(
+					'phpmyadmin',
+					80,
+					dockerComposeConfig
+				);
+			}
+
+			if ( fullConfig.env.tests.phpmyadminPort ) {
+				testsPhpmyadminPort = await this._getPublicDockerPort(
+					'tests-phpmyadmin',
+					80,
+					dockerComposeConfig
+				);
+			}
+		} catch {
+			// Containers are not running.
+		}
+
+		const siteUrl = fullConfig.env.development.config.WP_SITEURL;
+		const testsSiteUrl = fullConfig.env.tests.config.WP_SITEURL;
+
+		return {
+			status: isRunning ? 'running' : 'stopped',
+			runtime: 'docker',
+			urls: {
+				development: isRunning ? siteUrl : null,
+				tests: isRunning ? testsSiteUrl : null,
+				phpmyadmin:
+					isRunning && phpmyadminPort
+						? `http://localhost:${ phpmyadminPort }`
+						: null,
+				testsPhpmyadmin:
+					isRunning && testsPhpmyadminPort
+						? `http://localhost:${ testsPhpmyadminPort }`
+						: null,
+			},
+			ports: {
+				development: fullConfig.env.development.port,
+				tests: fullConfig.env.tests.port,
+				mysql: mySQLPort,
+				testsMysql: testsMySQLPort,
+			},
+			config: {
+				wpVersion: fullConfig.env.development.coreSource?.tag || null,
+				phpVersion: fullConfig.env.development.phpVersion,
+				multisite: fullConfig.env.development.multisite,
+				plugins: fullConfig.env.development.pluginSources.map(
+					( s ) => s.basename
+				),
+				themes: fullConfig.env.development.themeSources.map(
+					( s ) => s.basename
+				),
+				mappings: Object.keys( fullConfig.env.development.mappings ),
+			},
+			configDirectoryPath: fullConfig.configDirectoryPath,
+			workDirectoryPath: fullConfig.workDirectoryPath,
+		};
+	}
+
+	/**
 	 * Runs an arbitrary command on the given Docker container.
 	 *
 	 * @param {WPConfig} config    The wp-env configuration.
