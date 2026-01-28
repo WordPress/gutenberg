@@ -191,17 +191,12 @@ function ValidatedDateControl< Item >( {
 		setCustomValidity( undefined );
 	}, [ inputRefs ] );
 
-	// Sync React-level validation to native inputs and listen for
-	// 'invalid' events (e.g., from reportValidity() on card re-expand).
+	// Sync React-level validation to native inputs.
 	useEffect( () => {
 		const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
 		const result = validity
 			? getCustomValidity( isValid, validity )
 			: undefined;
-		const handleInvalid = ( event: Event ) => {
-			event.preventDefault();
-			setIsTouched( true );
-		};
 		for ( const ref of refs ) {
 			const input = ref.current;
 			if ( input ) {
@@ -210,18 +205,26 @@ function ValidatedDateControl< Item >( {
 						? result.message
 						: ''
 				);
-				input.addEventListener( 'invalid', handleInvalid );
 			}
+		}
+	}, [ inputRefs, isValid, validity ] );
+
+	// Listen for 'invalid' events (e.g., from reportValidity() on card re-expand).
+	useEffect( () => {
+		const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
+		const handleInvalid = ( event: Event ) => {
+			event.preventDefault();
+			setIsTouched( true );
+		};
+		for ( const ref of refs ) {
+			ref.current?.addEventListener( 'invalid', handleInvalid );
 		}
 		return () => {
 			for ( const ref of refs ) {
-				ref.current?.removeEventListener(
-					'invalid',
-					handleInvalid
-				);
+				ref.current?.removeEventListener( 'invalid', handleInvalid );
 			}
 		};
-	}, [ inputRefs, isValid, validity, setIsTouched ] );
+	}, [ inputRefs, setIsTouched ] );
 
 	useEffect( () => {
 		if ( isTouched ) {
