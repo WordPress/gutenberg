@@ -15,8 +15,8 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
 import { pasteHandler } from '@wordpress/blocks';
 import { store as blockEditorStore, RichText } from '@wordpress/block-editor';
-import { store as editorStore } from '@wordpress/editor';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { store as editorStore } from '@wordpress/editor';
 
 /** @typedef {import('./types').RichTextValue} RichTextValue */
 
@@ -114,14 +114,14 @@ class PostTitle extends Component {
 		this.props.onSelect();
 	}
 
-	onPaste( { value, plainText, html } ) {
+	async onPaste( { value, plainText, html } ) {
 		const {
 			title,
 			onInsertBlockAfter: onInsertBlocks,
 			onUpdate,
 		} = this.props;
 
-		const content = pasteHandler( {
+		const content = await pasteHandler( {
 			HTML: html,
 			plainText,
 		} );

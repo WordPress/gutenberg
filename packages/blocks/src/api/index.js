@@ -52,6 +52,7 @@ export {
 // pasting rich text or HTML data.
 export {
 	pasteHandler,
+	getLatexToMathML,
 	rawHandler,
 	deprecatedGetPhrasingContentSchema as getPhrasingContentSchema,
 } from './raw-handling';

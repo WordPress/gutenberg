@@ -1,0 +1,19 @@
+# Math with LaTeX
+
+The **quadratic formula** is $x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$ for any $ax^2 + bx + c = 0$.
+
+Here is a display equation:
+
+$$E = mc^2$$
+
+Another paragraph with inline $\pi$ and $e$.
+
+Display math with fractions:
+
+$$\frac{a}{b} + \frac{c}{d}$$
+
+Code blocks should not be converted: `$x^2$`
+
+Currency like $100 should remain as text.
+
+Mixed inline: Given $a$ and $b$, compute $a + b$.

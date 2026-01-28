@@ -49,7 +49,7 @@ export default function useClipboardHandler() {
 	const notifyCopy = useNotifyCopy();
 
 	return useRefEffect( ( node ) => {
-		function handler( event ) {
+		async function handler( event ) {
 			if ( event.defaultPrevented ) {
 				// This was likely already handled in rich-text/use-paste-handler.js.
 				return;
@@ -172,7 +172,7 @@ export default function useClipboardHandler() {
 						}, [] )
 						.flat();
 				} else {
-					blocks = pasteHandler( {
+					blocks = await pasteHandler( {
 						HTML: html,
 						plainText,
 						mode: isFullySelected ? 'BLOCKS' : 'AUTO',

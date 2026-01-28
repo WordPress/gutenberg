@@ -2,6 +2,8 @@
  * External dependencies
  */
 import temml from 'temml';
+// @ts-ignore - auto-render module doesn't have TypeScript definitions
+import renderMathInElement from 'temml/contrib/auto-render/auto-render.js';
 
 /**
  * Options for LaTeX to MathML conversion.
@@ -12,6 +14,21 @@ export interface LatexToMathMLOptions {
 	 * @default true
 	 */
 	displayMode?: boolean;
+}
+
+/**
+ * Options for rendering math in HTML strings.
+ */
+export interface RenderMathInHTMLOptions {
+	/**
+	 * Array of tag names to skip when searching for math delimiters.
+	 * Defaults to ['script', 'noscript', 'style', 'textarea', 'pre', 'code', 'option'].
+	 */
+	ignoredTags?: string[];
+	/**
+	 * Array of class names. Elements with these classes will be skipped.
+	 */
+	ignoredClasses?: string[];
 }
 
 /**
@@ -42,4 +59,52 @@ export default function latexToMathML(
 	const doc = document.implementation.createHTMLDocument( '' );
 	doc.body.innerHTML = mathML;
 	return doc.body.querySelector( 'math' )?.innerHTML ?? '';
+}
+
+/**
+ * Renders LaTeX math delimiters in an HTML string to MathML.
+ *
+ * Supports the following delimiter patterns:
+ * - `$...$` for inline math
+ * - `$$...$$` for display math
+ * - `\(...\)` for inline math
+ * - `\[...\]` for display math
+ *
+ * Content inside <code>, <pre>, <script>, <style>, and <textarea> tags
+ * is automatically skipped.
+ *
+ * @param html    - The HTML string containing LaTeX math delimiters.
+ * @param options - Options for controlling which elements to skip.
+ * @return The HTML string with math delimiters replaced by MathML.
+ *
+ * @example
+ * ```js
+ * import { renderMathInHTML } from '@wordpress/latex-to-mathml';
+ *
+ * const html = renderMathInHTML( '<p>The formula $x^2$ is important.</p>' );
+ * // Returns HTML with <math> elements instead of $...$ delimiters
+ * ```
+ */
+export function renderMathInHTML(
+	html: string,
+	options: RenderMathInHTMLOptions = {}
+): string {
+	const doc = document.implementation.createHTMLDocument( '' );
+	doc.body.innerHTML = html;
+
+	renderMathInElement( doc.body, {
+		delimiters: [
+			{ left: '$$', right: '$$', display: true },
+			{ left: '\\[', right: '\\]', display: true },
+			{ left: '\\(', right: '\\)', display: false },
+			{ left: '$', right: '$', display: false },
+		],
+		// Include LaTeX source as annotation for block transforms to extract
+		annotate: true,
+		throwOnError: false,
+		errorCallback: () => {},
+		...options,
+	} );
+
+	return doc.body.innerHTML;
 }

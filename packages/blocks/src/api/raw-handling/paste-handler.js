@@ -38,6 +38,73 @@ import headingTransformer from './heading-transformer';
 
 const log = ( ...args ) => window?.console?.log?.( ...args );
 
+// Module-level cache for lazy-loaded latex-to-mathml functions
+let latexToMathMLFn = null;
+let renderMathInHTMLFn = null;
+
+/**
+ * Quick regex check for LaTeX delimiters. Used to decide whether to lazy-load
+ * the math rendering library.
+ *
+ * @param {string} text The text to check.
+ * @return {boolean} True if any LaTeX delimiters are found.
+ */
+function hasLatexDelimiters( text ) {
+	if ( ! text ) {
+		return false;
+	}
+	// Check for $$...$$, $...$, \[...\], \(...\)
+	return /\$\$|\\\[|\\\(|\$[^$\n]+\$/.test( text );
+}
+
+/**
+ * Checks if the entire text is a single display math expression.
+ * Matches $$...$$ or \[...\] with optional whitespace.
+ *
+ * @param {string} text The text to check.
+ * @return {boolean} True if pure display math.
+ */
+function isPureDisplayMath( text ) {
+	if ( ! text ) {
+		return false;
+	}
+	const trimmed = text.trim();
+	// Match $$...$$ or \[...\]
+	return (
+		/^\$\$[\s\S]+\$\$$/.test( trimmed ) ||
+		/^\\\[[\s\S]+\\\]$/.test( trimmed )
+	);
+}
+
+/**
+ * Extracts the LaTeX content from display math delimiters.
+ *
+ * @param {string} text The text containing display math.
+ * @return {string} The LaTeX content without delimiters.
+ */
+function extractDisplayMathContent( text ) {
+	const trimmed = text.trim();
+	// Remove $$...$$ delimiters
+	if ( trimmed.startsWith( '$$' ) && trimmed.endsWith( '$$' ) ) {
+		return trimmed.slice( 2, -2 ).trim();
+	}
+	// Remove \[...\] delimiters
+	if ( trimmed.startsWith( '\\[' ) && trimmed.endsWith( '\\]' ) ) {
+		return trimmed.slice( 2, -2 ).trim();
+	}
+	return trimmed;
+}
+
+/**
+ * Returns the cached latex-to-mathml function, or null if not yet loaded.
+ * Used by math block transforms to generate MathML during paste.
+ *
+ * @return {Function|null} The latexToMathML function or null.
+ */
+export function getLatexToMathML() {
+	return latexToMathMLFn;
+}
+
 /**
  * Filters HTML to only contain phrasing content.
  *
@@ -68,6 +135,8 @@ function filterInlineHTML( HTML ) {
 /**
  * Converts an HTML string to known blocks. Strips everything else.
  *
+ * This is the async version that pre-loads latex-to-mathml for MathML generation.
+ *
  * @param {Object} options
  * @param {string} [options.HTML]      The HTML to convert.
  * @param {string} [options.plainText] Plain text version.
@@ -77,9 +146,37 @@ function filterInlineHTML( HTML ) {
  *                                     * 'BLOCKS': Always handle as blocks, and return array of blocks.
  * @param {Array}  [options.tagName]   The tag into which content will be inserted.
  *
- * @return {Array|string} A list of blocks or a string, depending on `handlerMode`.
+ * @return {Promise<Array|string>} A promise resolving to blocks or string.
  */
-export function pasteHandler( {
+export async function pasteHandler( options ) {
+	const { HTML = '', plainText = '' } = options;
+	if (
+		hasLatexDelimiters( HTML ) ||
+		hasLatexDelimiters( plainText ) ||
+		isPureDisplayMath( plainText ) ||
+		isLatexMathMode( plainText )
+	) {
+		if ( ! latexToMathMLFn || ! renderMathInHTMLFn ) {
+			const module = await import( '@wordpress/latex-to-mathml' );
+			latexToMathMLFn = module.default;
+			renderMathInHTMLFn = module.renderMathInHTML;
+		}
+	}
+	return pasteHandlerSync( options );
+}
+
+/**
+ * Synchronous version of pasteHandler for internal use and recursion.
+ *
+ * @param {Object} options
+ * @param {string} [options.HTML]      The HTML to convert.
+ * @param {string} [options.plainText] Plain text version.
+ * @param {string} [options.mode]      Handle content as blocks or inline content.
+ * @param {Array}  [options.tagName]   The tag into which content will be inserted.
+ *
+ * @return {Array|string} A list of blocks or a string.
+ */
+function pasteHandlerSync( {
 	HTML = '',
 	plainText = '',
 	mode = 'AUTO',
@@ -131,8 +228,31 @@ export function pasteHandler( {
 	// * There is no HTML version, or it has no formatting.
 	const isPlainText = plainText && ( ! HTML || isPlain( HTML ) );
 
+	// Check for pure display math with delimiters ($$...$$ or \[...\])
+	if ( isPlainText && isPureDisplayMath( plainText ) ) {
+		const latex = extractDisplayMathContent( plainText );
+		let mathML = '';
+		if ( latexToMathMLFn ) {
+			try {
+				mathML = latexToMathMLFn( latex, { displayMode: true } );
+			} catch ( e ) {
+				// Leave empty on error - editor will retry
+			}
+		}
+		return [ createBlock( 'core/math', { latex, mathML } ) ];
+	}
+
+	// Fallback: existing bare LaTeX detection (no delimiters)
 	if ( isPlainText && isLatexMathMode( plainText ) ) {
-		return [ createBlock( 'core/math', { latex: plainText } ) ];
+		let mathML = '';
+		if ( latexToMathMLFn ) {
+			try {
+				mathML = latexToMathMLFn( plainText, { displayMode: true } );
+			} catch ( e ) {
+				// Leave empty on error - editor will retry
+			}
+		}
+		return [ createBlock( 'core/math', { latex: plainText, mathML } ) ];
 	}
 
 	// Parse Markdown (and encoded HTML) if it's considered plain text.
@@ -143,6 +263,14 @@ export function pasteHandler( {
 		if ( ! /^\s+$/.test( plainText ) ) {
 			HTML = markdownConverter( HTML );
 		}
+	}
+
+	// Convert LaTeX delimiters to MathML.
+	// Runs AFTER markdown for plain text (only $...$ and $$...$$ work - backslash
+	// delimiters are consumed by markdown's escape handling).
+	// For HTML input, all delimiter types work.
+	if ( renderMathInHTMLFn && hasLatexDelimiters( HTML ) ) {
+		HTML = renderMathInHTMLFn( HTML );
 	}
 
 	// An array of HTML strings and block objects. The blocks replace matched
@@ -226,7 +354,7 @@ export function pasteHandler( {
 			// Allows us to ask for this information when we get a report.
 			log( 'Processed HTML piece:\n\n', piece );
 
-			return htmlToBlocks( piece, pasteHandler );
+			return htmlToBlocks( piece, pasteHandlerSync );
 		} )
 		.flat()
 		.filter( Boolean );

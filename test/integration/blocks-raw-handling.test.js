@@ -118,8 +118,8 @@ describe( 'Blocks raw handling', () => {
 		} );
 	} );
 
-	it( 'should filter inline content', () => {
-		const filtered = pasteHandler( {
+	it( 'should filter inline content', async () => {
+		const filtered = await pasteHandler( {
 			HTML: '<h2><em>test</em></h2>',
 			mode: 'INLINE',
 		} );
@@ -128,8 +128,8 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should ignore Google Docs UID tag', () => {
-		const filtered = pasteHandler( {
+	it( 'should ignore Google Docs UID tag', async () => {
+		const filtered = await pasteHandler( {
 			HTML: '<b id="docs-internal-guid-0"><em>test</em></b>',
 			mode: 'AUTO',
 		} );
@@ -138,8 +138,8 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should ignore Google Docs UID tag in inline mode', () => {
-		const filtered = pasteHandler( {
+	it( 'should ignore Google Docs UID tag in inline mode', async () => {
+		const filtered = await pasteHandler( {
 			HTML: '<b id="docs-internal-guid-0"><em>test</em></b>',
 			mode: 'INLINE',
 		} );
@@ -148,8 +148,8 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should paste special whitespace', () => {
-		const filtered = pasteHandler( {
+	it( 'should paste special whitespace', async () => {
+		const filtered = await pasteHandler( {
 			HTML: '<p>&thinsp;</p>',
 			plainText: ' ',
 			mode: 'AUTO',
@@ -159,8 +159,8 @@ describe( 'Blocks raw handling', () => {
 		expect( filtered ).toBe( ' ' );
 	} );
 
-	it( 'should paste special whitespace in plain text only', () => {
-		const filtered = pasteHandler( {
+	it( 'should paste special whitespace in plain text only', async () => {
+		const filtered = await pasteHandler( {
 			HTML: '',
 			plainText: ' ',
 			mode: 'AUTO',
@@ -170,12 +170,14 @@ describe( 'Blocks raw handling', () => {
 		expect( filtered ).toBe( ' ' );
 	} );
 
-	it( 'should parse Markdown', () => {
-		const filtered = pasteHandler( {
-			HTML: '* one<br>* two<br>* three',
-			plainText: '* one\n* two\n* three',
-			mode: 'AUTO',
-		} )
+	it( 'should parse Markdown', async () => {
+		const filtered = (
+			await pasteHandler( {
+				HTML: '* one<br>* two<br>* three',
+				plainText: '* one\n* two\n* three',
+				mode: 'AUTO',
+			} )
+		)
 			.map( getBlockContent )
 			.join( '' );
 
@@ -195,12 +197,14 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should parse bulleted list', () => {
-		const filtered = pasteHandler( {
-			HTML: '• one<br>• two<br>• three',
-			plainText: '• one\n• two\n• three',
-			mode: 'AUTO',
-		} )
+	it( 'should parse bulleted list', async () => {
+		const filtered = (
+			await pasteHandler( {
+				HTML: '• one<br>• two<br>• three',
+				plainText: '• one\n• two\n• three',
+				mode: 'AUTO',
+			} )
+		)
 			.map( getBlockContent )
 			.join( '' );
 
@@ -220,8 +224,8 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should parse inline Markdown', () => {
-		const filtered = pasteHandler( {
+	it( 'should parse inline Markdown', async () => {
+		const filtered = await pasteHandler( {
 			HTML: 'Some **bold** text.',
 			plainText: 'Some **bold** text.',
 			mode: 'AUTO',
@@ -231,8 +235,8 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should parse HTML in plainText', () => {
-		const filtered = pasteHandler( {
+	it( 'should parse HTML in plainText', async () => {
+		const filtered = await pasteHandler( {
 			HTML: '&lt;p&gt;Some &lt;strong&gt;bold&lt;/strong&gt; text.&lt;/p&gt;',
 			plainText: '<p>Some <strong>bold</strong> text.</p>',
 			mode: 'AUTO',
@@ -242,12 +246,14 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should parse Markdown with HTML', () => {
-		const filtered = pasteHandler( {
-			HTML: '',
-			plainText: '# Some <em>heading</em>\n\nA paragraph.',
-			mode: 'AUTO',
-		} )
+	it( 'should parse Markdown with HTML', async () => {
+		const filtered = (
+			await pasteHandler( {
+				HTML: '',
+				plainText: '# Some <em>heading</em>\n\nA paragraph.',
+				mode: 'AUTO',
+			} )
+		)
 			.map( getBlockContent )
 			.join( '' );
 
@@ -257,8 +263,8 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should break up forced inline content', () => {
-		const filtered = pasteHandler( {
+	it( 'should break up forced inline content', async () => {
+		const filtered = await pasteHandler( {
 			HTML: '<p>test</p><p>test</p>',
 			mode: 'INLINE',
 		} );
@@ -267,8 +273,8 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should normalize decomposed characters', () => {
-		const filtered = pasteHandler( {
+	it( 'should normalize decomposed characters', async () => {
+		const filtered = await pasteHandler( {
 			HTML: 'schön',
 			mode: 'INLINE',
 		} );
@@ -277,8 +283,8 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should not treat single non-inlineable block as inline text', () => {
-		const filtered = pasteHandler( {
+	it( 'should not treat single non-inlineable block as inline text', async () => {
+		const filtered = await pasteHandler( {
 			HTML: '<p>words to live by</p>',
 			plainText: 'words to live by\n',
 			mode: 'AUTO',
@@ -289,8 +295,8 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should treat single heading as inline text', () => {
-		const filtered = pasteHandler( {
+	it( 'should treat single heading as inline text', async () => {
+		const filtered = await pasteHandler( {
 			HTML: '<h1>FOO</h1>',
 			plainText: 'FOO\n',
 			mode: 'AUTO',
@@ -300,8 +306,8 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should treat single list item as inline text', () => {
-		const filtered = pasteHandler( {
+	it( 'should treat single list item as inline text', async () => {
+		const filtered = await pasteHandler( {
 			HTML: '<ul><li>Some <strong>bold</strong> text.</li></ul>',
 			plainText: 'Some <strong>bold</strong> text.\n',
 			mode: 'AUTO',
@@ -311,12 +317,14 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should treat multiple list items as a block', () => {
-		const filtered = pasteHandler( {
-			HTML: '<ul><li>One</li><li>Two</li><li>Three</li></ul>',
-			plainText: 'One\nTwo\nThree\n',
-			mode: 'AUTO',
-		} )
+	it( 'should treat multiple list items as a block', async () => {
+		const filtered = (
+			await pasteHandler( {
+				HTML: '<ul><li>One</li><li>Two</li><li>Three</li></ul>',
+				plainText: 'One\nTwo\nThree\n',
+				mode: 'AUTO',
+			} )
+		)
 			.map( getBlockContent )
 			.join( '' );
 
@@ -336,9 +344,9 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should correctly handle quotes with mixed content', () => {
+	it( 'should correctly handle quotes with mixed content', async () => {
 		const filtered = serialize(
-			pasteHandler( {
+			await pasteHandler( {
 				HTML: '<blockquote><h1 class="wp-block-heading">chicken</h1><p>ribs</p></blockquote>',
 				mode: 'AUTO',
 			} )
@@ -348,11 +356,11 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should paste gutenberg content from plain text', () => {
+	it( 'should paste gutenberg content from plain text', async () => {
 		const block = '<!-- wp:latest-posts /-->';
 		expect(
 			serialize(
-				pasteHandler( {
+				await pasteHandler( {
 					plainText: block,
 					mode: 'AUTO',
 				} )
@@ -360,11 +368,13 @@ describe( 'Blocks raw handling', () => {
 		).toBe( block );
 	} );
 
-	it( 'should handle transforms that return an array of blocks', () => {
-		const transformed = pasteHandler( {
-			HTML: '<p>P1 P2</p>',
-			plainText: 'P1 P2\n',
-		} )
+	it( 'should handle transforms that return an array of blocks', async () => {
+		const transformed = (
+			await pasteHandler( {
+				HTML: '<p>P1 P2</p>',
+				plainText: 'P1 P2\n',
+			} )
+		)
 			.map( getBlockContent )
 			.join( '' );
 
@@ -372,11 +382,13 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should convert pre', () => {
-		const transformed = pasteHandler( {
-			HTML: '<pre>1\n2</pre>',
-			plainText: '1\n2',
-		} )
+	it( 'should convert pre', async () => {
+		const transformed = (
+			await pasteHandler( {
+				HTML: '<pre>1\n2</pre>',
+				plainText: '1\n2',
+			} )
+		)
 			.map( getBlockContent )
 			.join( '' );
 
@@ -386,11 +398,13 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
-	it( 'should convert code', () => {
-		const transformed = pasteHandler( {
-			HTML: '<pre><code>1\n2</code></pre>',
-			plainText: '1\n2',
-		} )
+	it( 'should convert code', async () => {
+		const transformed = (
+			await pasteHandler( {
+				HTML: '<pre><code>1\n2</code></pre>',
+				plainText: '1\n2',
+			} )
+		)
 			.map( getBlockContent )
 			.join( '' );
 
@@ -429,9 +443,10 @@ describe( 'Blocks raw handling', () => {
 			'slack-quote',
 			'slack-paragraphs',
 			'mixed-content',
+			'latex-markdown',
 		].forEach( ( type ) => {
 			// eslint-disable-next-line jest/valid-title
-			it( type, () => {
+			it( type, async () => {
 				const HTML = readFile(
 					path.join(
 						__dirname,
@@ -455,7 +470,7 @@ describe( 'Blocks raw handling', () => {
 					throw new Error( `Expected fixtures for type ${ type }` );
 				}
 
-				const converted = pasteHandler( { HTML, plainText } );
+				const converted = await pasteHandler( { HTML, plainText } );
 				const serialized =
 					typeof converted === 'string'
 						? converted
@@ -463,7 +478,7 @@ describe( 'Blocks raw handling', () => {
 
 				expect( serialized ).toBe( output );
 
-				const convertedInline = pasteHandler( {
+				const convertedInline = await pasteHandler( {
 					HTML,
 					plainText,
 					mode: 'INLINE',
@@ -474,38 +489,44 @@ describe( 'Blocks raw handling', () => {
 			} );
 		} );
 
-		it( 'should strip some text-level elements', () => {
+		it( 'should strip some text-level elements', async () => {
 			const HTML = '<p>This is <u>ncorect</u></p>';
-			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
+			expect(
+				serialize( await pasteHandler( { HTML } ) )
+			).toMatchSnapshot();
 			expect( console ).toHaveLogged();
 		} );
 
-		it( 'should remove extra blank lines', () => {
+		it( 'should remove extra blank lines', async () => {
 			const HTML = readFile(
 				path.join(
 					__dirname,
 					'fixtures/documents/google-docs-blank-lines.html'
 				)
 			);
-			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
+			expect(
+				serialize( await pasteHandler( { HTML } ) )
+			).toMatchSnapshot();
 			expect( console ).toHaveLogged();
 		} );
 
-		it( 'should strip windows data', () => {
+		it( 'should strip windows data', async () => {
 			const HTML = readFile(
 				path.join( __dirname, 'fixtures/documents/windows.html' )
 			);
-			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
+			expect(
+				serialize( await pasteHandler( { HTML } ) )
+			).toMatchSnapshot();
 		} );
 
-		it( 'should strip HTML formatting space from inline text', () => {
+		it( 'should strip HTML formatting space from inline text', async () => {
 			const HTML = readFile(
 				path.join(
 					__dirname,
 					'fixtures/documents/inline-with-html-formatting-space.html'
 				)
 			);
-			expect( pasteHandler( { HTML } ) ).toMatchSnapshot();
+			expect( await pasteHandler( { HTML } ) ).toMatchSnapshot();
 			expect( console ).toHaveLogged();
 		} );
 	} );

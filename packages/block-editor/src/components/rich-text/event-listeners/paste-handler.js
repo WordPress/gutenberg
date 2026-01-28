@@ -14,7 +14,7 @@ import { getPasteEventData } from '../../../utils/pasting';
 /** @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue */
 
 export default ( props ) => ( element ) => {
-	function _onPaste( event ) {
+	async function _onPaste( event ) {
 		const {
 			disableFormats,
 			onChange,
@@ -104,7 +104,7 @@ export default ( props ) => ( element ) => {
 			mode = 'BLOCKS';
 		}
 
-		const content = pasteHandler( {
+		const content = await pasteHandler( {
 			HTML: html,
 			plainText,
 			mode,

@@ -87,8 +87,8 @@ describe( 'pasteHandler', () => {
 		initAndRegisterVideoBlock();
 	} );
 
-	it( 'can handle a table with thead, tbody and tfoot using colspan', () => {
-		const [ result ] = pasteHandler( {
+	it( 'can handle a table with thead, tbody and tfoot using colspan', async () => {
+		const [ result ] = await pasteHandler( {
 			HTML: tableWithHeaderFooterAndBodyUsingColspan,
 			tagName: 'p',
 		} );
@@ -127,8 +127,8 @@ describe( 'pasteHandler', () => {
 		expect( result.isValid ).toBeTruthy();
 	} );
 
-	it( 'can handle a table with thead, tbody and tfoot using rowspan', () => {
-		const [ result ] = pasteHandler( {
+	it( 'can handle a table with thead, tbody and tfoot using rowspan', async () => {
+		const [ result ] = await pasteHandler( {
 			HTML: tableWithHeaderFooterAndBodyUsingRowspan,
 			tagName: 'p',
 		} );
@@ -176,8 +176,8 @@ describe( 'pasteHandler', () => {
 		expect( result.isValid ).toBeTruthy();
 	} );
 
-	it( 'can handle a table with cell alignments', () => {
-		const [ result ] = pasteHandler( {
+	it( 'can handle a table with cell alignments', async () => {
+		const [ result ] = await pasteHandler( {
 			HTML: tableWithCellAlignments,
 			tagName: 'p',
 		} );
@@ -263,8 +263,8 @@ describe( 'pasteHandler', () => {
 		} );
 	} );
 
-	it( 'can handle a video', () => {
-		const [ result ] = pasteHandler( {
+	it( 'can handle a video', async () => {
+		const [ result ] = await pasteHandler( {
 			HTML: '<video controls src="https://example.com/media.mp4" autoplay loop muted controls playsinline preload="auto" poster="https://example.com/media.jpg"></video>',
 			tagName: 'p',
 			preserveWhiteSpace: false,
