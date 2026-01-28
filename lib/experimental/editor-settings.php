@@ -43,12 +43,6 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-media-editor' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalMediaEditor = true', 'before' );
 	}
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-theme-previews', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableThemePreviews = true', 'before' );
-	}
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-pattern-enhancements', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnablePatternEnhancements = true', 'before' );
-	}
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-playlist-block', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnablePlaylistBlock = true', 'before' );
 	}
