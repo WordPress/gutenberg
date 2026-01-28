@@ -236,11 +236,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 				<Button
 					className="wp-block-playlist-track__button"
 					__next40pxDefaultSize
-					data-playlist-track-url={ src }
-					data-playlist-track-title={ stripHTML( title ) }
-					data-playlist-track-artist={ stripHTML( artist ) }
-					data-playlist-track-album={ stripHTML( album ) }
-					data-playlist-track-image-src={ image ?? null }
 					data-wp-context={ JSON.stringify( { uniqueId } ) }
 					aria-current={
 						currentTrack === uniqueId ? 'true' : 'false'
