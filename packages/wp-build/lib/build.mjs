@@ -34,7 +34,7 @@ import {
 	getPhpReplacements,
 	renderTemplateToString,
 } from './php-generator.ts';
-import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
+import { getPackageInfo, getPackageInfoFromFile } from './package-utils.ts';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
 import {
 	getAllRoutes,
