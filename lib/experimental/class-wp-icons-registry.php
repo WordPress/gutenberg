@@ -126,6 +126,9 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		/**
 		 * Sanitizes the icon SVG content.
 		 *
+		 * Logic borrowed from twentytwenty.
+		 * @see twentytwenty_get_theme_svg
+		 *
 		 * @param string $icon_content The icon SVG content to sanitize.
 		 * @return string The sanitized icon SVG content.
 		 */
