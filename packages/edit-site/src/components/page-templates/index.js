@@ -55,7 +55,7 @@ export default function PageTemplates() {
 	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
 		useState( false );
 	const defaultView = useMemo( () => {
-		return DEFAULT_VIEW;
+		return { ...DEFAULT_VIEW };
 	}, [] );
 	const activeFilters = useMemo(
 		() => getActiveFiltersForTab( activeView ),

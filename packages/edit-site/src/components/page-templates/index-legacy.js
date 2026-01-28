@@ -37,7 +37,7 @@ export default function PageTemplates() {
 	const [ selection, setSelection ] = useState( [ postId ] );
 
 	const defaultView = useMemo( () => {
-		return DEFAULT_VIEW;
+		return { ...DEFAULT_VIEW };
 	}, [] );
 	const activeFilters = useMemo(
 		() => getActiveFiltersForTab( activeView ),
