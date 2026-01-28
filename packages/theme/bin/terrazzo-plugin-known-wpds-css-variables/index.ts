@@ -4,14 +4,6 @@
 import { FORMAT_ID } from '@terrazzo/plugin-css';
 import type { Plugin } from '@terrazzo/parser';
 
-// Typography composite tokens expand into these CSS property suffixes
-const TYPOGRAPHY_PROPERTIES = [
-	'font-family',
-	'font-size',
-	'font-weight',
-	'line-height',
-];
-
 export default function pluginKnownWpdsCssVariables( {
 	filename = 'design-tokens.mjs',
 } = {} ): Plugin {
@@ -35,13 +27,13 @@ export default function pluginKnownWpdsCssVariables( {
 					continue;
 				}
 
-				// Typography composite tokens expand into multiple CSS variables
-				if ( token.token.$type === 'typography' ) {
-					for ( const prop of TYPOGRAPHY_PROPERTIES ) {
+				// Composite tokens (e.g. typography) expand into multiple CSS variables
+				if ( typeof token.value === 'object' && token.value !== null ) {
+					for ( const prop of Object.keys( token.value ) ) {
 						const expandedId = `${ token.localID }-${ prop }`;
 						tokensToExport[ expandedId ] ??= {};
 						tokensToExport[ expandedId ][ token.mode ] =
-							token.value;
+							token.value[ prop ];
 					}
 				} else {
 					tokensToExport[ token.localID ] ??= {};
