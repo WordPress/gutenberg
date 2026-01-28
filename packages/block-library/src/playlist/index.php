@@ -59,12 +59,12 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				}
 
 				$tracks_data[ $unique_id ] = array(
-					'url'       => $url,
-					'title'     => $title,
-					'artist'    => $artist,
-					'album'     => $album,
-					'image'     => $image,
-					'ariaLabel' => $aria_label,
+					'url'       => esc_url( $url ),
+					'title'     => esc_html( $title ),
+					'artist'    => esc_html( $artist ),
+					'album'     => esc_html( $album ),
+					'image'     => esc_url( $image ),
+					'ariaLabel' => esc_attr( $aria_label ),
 				);
 
 				if ( $unique_id === $current_media_id ) {
