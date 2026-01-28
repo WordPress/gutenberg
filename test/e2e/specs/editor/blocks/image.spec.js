@@ -955,9 +955,11 @@ test.describe( 'Image - lightbox', () => {
 			const postId = await editor.publishPost();
 			await page.goto( `/?p=${ postId }` );
 
-			const lightboxImage = page.locator( '.wp-lightbox-container img' );
-			await expect( lightboxImage ).toBeVisible();
-			await lightboxImage.click();
+			const imageLightboxTrigger = page.locator(
+				'.wp-lightbox-container .lightbox-trigger'
+			);
+			await expect( imageLightboxTrigger ).toBeVisible();
+			await imageLightboxTrigger.click();
 
 			const figure = page
 				.locator( '.wp-lightbox-overlay .wp-block-image' )

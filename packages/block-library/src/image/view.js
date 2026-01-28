@@ -493,8 +493,11 @@ const { state, actions, callbacks } = store(
 				const buttonOffsetTop = figureHeight - offsetHeight;
 				const buttonOffsetRight = figureWidth - offsetWidth;
 
-				let imageButtonTop = buttonOffsetTop + 16;
-				let imageButtonRight = buttonOffsetRight + 16;
+				// The button should be at most 16px from the top and right and inside the image.
+				// For extremely small images take the minimum of 16px or 20% of the image size.
+				let imageButtonTop = Math.min( offsetHeight * 0.2, 16 );
+				let imageButtonRight =
+					buttonOffsetRight + Math.min( offsetWidth * 0.2, 16 );
 
 				// In the case of an image with object-fit: contain, the size of the
 				// <img> element can be larger than the image itself, so it needs to
