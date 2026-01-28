@@ -139,6 +139,3 @@ export * from './entity-types';
 export * from './fetch';
 export * from './hooks';
 export * from './private-apis';
-
-// Export in order to make the selection types available for the UI components.
-export { SelectionType } from './utils/crdt-user-selections';

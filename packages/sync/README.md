@@ -52,7 +52,7 @@ Deltas are used to calculate incremental Y.Text updates.
 
 ### EnhancedState
 
-An enhanced state includes additional metadata about the user's connection that is not appropriate to synchronize via Yjs awareness.
+An enhanced state includes additional metadata about the user's connection.
 
 ### LOCAL_EDITOR_ORIGIN
 

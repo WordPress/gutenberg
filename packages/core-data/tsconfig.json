@@ -16,7 +16,6 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../is-shallow-equal" },
-		{ "path": "../notices" },
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
 		{ "path": "../sync" },

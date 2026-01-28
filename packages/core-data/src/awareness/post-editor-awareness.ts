@@ -4,13 +4,6 @@
 import { dispatch, select, subscribe } from '@wordpress/data';
 // @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import {
-	CRDT_RECORD_MAP_KEY,
-	CRDT_RECORD_METADATA_MAP_KEY,
-	CRDT_RECORD_METADATA_SAVED_AT_KEY,
-	CRDT_RECORD_METADATA_SAVED_BY_KEY,
-	Y,
-} from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -25,7 +18,6 @@ import {
 	areSelectionsStatesEqual,
 	getSelectionState,
 } from '../utils/crdt-user-selections';
-import { sendNotification, NotificationType } from './notifications';
 
 import type { SelectionCursor, WPBlockSelection } from '../types';
 import type {
@@ -54,69 +46,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	public setUp(): void {
 		super.setUp();
 
-		this.subscribeToCRDTChanges();
 		this.subscribeToUserSelectionChanges();
-	}
-
-	private subscribeToCRDTChanges(): void {
-		const now = Date.now();
-		const recordMap = this.doc.getMap( CRDT_RECORD_MAP_KEY );
-		const recordMeta = this.doc.getMap( CRDT_RECORD_METADATA_MAP_KEY );
-
-		recordMeta.observe(
-			( event: Y.YMapEvent< unknown >, transaction: Y.Transaction ) => {
-				event.keysChanged.forEach( ( key: string ) => {
-					switch ( key ) {
-						// A remote user has saved the document.
-						case CRDT_RECORD_METADATA_SAVED_AT_KEY: {
-							if ( transaction.local ) {
-								break;
-							}
-
-							const savedTimestamp = recordMeta.get(
-								CRDT_RECORD_METADATA_SAVED_AT_KEY
-							);
-							const remoteClientId = recordMeta.get(
-								CRDT_RECORD_METADATA_SAVED_BY_KEY
-							);
-
-							// Type / "undefined" guard.
-							if (
-								'number' !== typeof remoteClientId ||
-								'number' !== typeof savedTimestamp
-							) {
-								break;
-							}
-
-							const userState =
-								this.getStates().get( remoteClientId );
-
-							if (
-								// Ignore if the savedAt timestamp is older than our session
-								now > savedTimestamp ||
-								// Ignore if we don't have a user state for the client ID
-								! userState ||
-								// Ignore if this is our own saved event (can happen on refresh or reconnect)
-								userState.userInfo.id ===
-									this.getLocalStateField( 'userInfo' )?.id
-							) {
-								break;
-							}
-
-							const status = recordMap.get( 'status' ) as string;
-
-							sendNotification(
-								NotificationType.PostUpdated,
-								userState.userInfo,
-								status
-							);
-
-							break;
-						}
-					}
-				} );
-			}
-		);
 	}
 
 	/**
