@@ -451,31 +451,55 @@ export function useFloatingThread( {
 	};
 }
 
-export function useAnnotateThreadSelections( thread ) {
+export function useAnnotateBlocks( threads ) {
 	const {
 		__experimentalAddAnnotation,
 		__experimentalRemoveAnnotationsBySource,
 	} = useDispatch( annotationsStore );
 	const selections = useMemo( () => {
-		const meta = [];
+		const values = [];
 
-		if ( ! thread?.meta ) {
-			return meta;
+		if ( ! threads?.length ) {
+			return values;
 		}
 
-		// Empty object meta data is returned as array.
-		if ( ! Array.isArray( thread.meta._wp_note_selection ) ) {
-			meta.push( { id: thread.id, ...thread.meta._wp_note_selection } );
+		function getSelectionMeta( thread ) {
+			// Empty object meta data is returned as array.
+			if (
+				! thread?.meta?._wp_note_selection ||
+				Array.isArray( thread.meta._wp_note_selection )
+			) {
+				return null;
+			}
+
+			return {
+				id: thread.id,
+				...thread.meta._wp_note_selection,
+			};
 		}
 
-		for ( const reply of thread.reply ) {
-			if ( ! Array.isArray( reply.meta._wp_note_selection ) ) {
-				meta.push( { id: reply.id, ...reply.meta._wp_note_selection } );
+		for ( const thread of threads ) {
+			const threadSelection = getSelectionMeta( thread );
+			if ( threadSelection ) {
+				values.push( {
+					clientId: thread.blockClientId,
+					...threadSelection,
+				} );
+			}
+
+			for ( const reply of thread.reply ) {
+				const replySelection = getSelectionMeta( reply );
+				if ( replySelection ) {
+					values.push( {
+						clientId: thread.blockClientId,
+						...replySelection,
+					} );
+				}
 			}
 		}
 
-		return meta;
-	}, [ thread ] );
+		return values;
+	}, [ threads ] );
 
 	useEffect( () => {
 		if ( ! selections.length ) {
@@ -486,7 +510,7 @@ export function useAnnotateThreadSelections( thread ) {
 			__experimentalAddAnnotation( {
 				id: selection.id,
 				source: 'core-note',
-				blockClientId: thread.blockClientId,
+				blockClientId: selection.clientId,
 				richTextIdentifier: selection.attributeKey,
 				range: {
 					start: selection.start,
@@ -500,7 +524,6 @@ export function useAnnotateThreadSelections( thread ) {
 		};
 	}, [
 		selections,
-		thread.blockClientId,
 		__experimentalAddAnnotation,
 		__experimentalRemoveAnnotationsBySource,
 	] );

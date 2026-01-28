@@ -29,6 +29,7 @@ import {
 	useBlockComments,
 	useBlockCommentsActions,
 	useEnableFloatingSidebar,
+	useAnnotateBlocks,
 } from './hooks';
 import { focusCommentThread } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
@@ -121,6 +122,7 @@ function NotesSidebar( { postId } ) {
 			( unresolvedSortedThreads.length > 0 ||
 				newNoteFormState !== 'closed' )
 	);
+	useAnnotateBlocks( unresolvedSortedThreads );
 
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
