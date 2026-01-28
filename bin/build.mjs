@@ -6,12 +6,9 @@
 import spawn from 'cross-spawn';
 import { fileURLToPath } from 'url';
 import path from 'path';
-import { readFile, writeFile, access, mkdir } from 'fs/promises';
-import glob from 'fast-glob';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '..' );
-const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
 
 /**
  * Execute a command and return a promise.
@@ -78,60 +75,6 @@ function exec( command, args = [], options = {} ) {
 }
 
 /**
- * Generate placeholder files for worker code in packages that define wpWorkers.
- * This must run before TypeScript compilation because vips-worker.ts imports worker-code.ts.
- */
-async function generateWorkerPlaceholders() {
-	const packageJsonPaths = await glob(
-		path.join( PACKAGES_DIR, '*', 'package.json' ).replace( /\\/g, '/' )
-	);
-
-	for ( const packageJsonPath of packageJsonPaths ) {
-		try {
-			const packageJsonContent = await readFile(
-				packageJsonPath,
-				'utf8'
-			);
-			const packageJson = JSON.parse( packageJsonContent );
-
-			if ( packageJson.wpWorkers ) {
-				const packageDir = path.dirname( packageJsonPath );
-				const workerCodeFile = path.join(
-					packageDir,
-					'src',
-					'worker-code.ts'
-				);
-
-				try {
-					await access( workerCodeFile );
-					// File exists, no need to create placeholder
-				} catch {
-					// File doesn't exist, create placeholder
-					const placeholderContent = `/**
- * Worker code for inline Blob URL creation.
- *
- * This file is a placeholder that gets overwritten by the build process.
- * If you see this placeholder content at runtime, run \`npm run build\` first.
- *
- * @package gutenberg
- */
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const workerCode = '/* Placeholder - run npm run build to generate actual worker code */';
-`;
-					await mkdir( path.dirname( workerCodeFile ), {
-						recursive: true,
-					} );
-					await writeFile( workerCodeFile, placeholderContent );
-				}
-			}
-		} catch {
-			// Skip packages with invalid package.json
-		}
-	}
-}
-
-/**
  * Main build orchestration function.
  */
 async function build() {
@@ -157,8 +100,9 @@ async function build() {
 		// Step 2.5: Generate worker placeholders
 		// This must happen before TypeScript compilation because some packages
 		// (like vips) have source files that import from generated worker-code.ts
-		console.log( '\n🔧 Generating worker placeholders...' );
-		await generateWorkerPlaceholders();
+		await exec( 'node', [
+			'./bin/packages/generate-worker-placeholders.mjs',
+		] );
 
 		if ( ! skipTypes ) {
 			// Step 3: Validate TypeScript version
