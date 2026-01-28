@@ -488,6 +488,11 @@
 
 	ul#adminmenu a.wp-has-current-submenu::after,
 	ul#adminmenu > li.current > a.current::after {
+		margin-right: -1px;
+
+		border: solid 9px transparent;
+		margin-top: -9px;
+
 		border-right-color: colors.$white;
 	}
 
