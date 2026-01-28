@@ -11,6 +11,7 @@ import LayoutPanelComponent from './layout-panel';
 import DataAdapterComponent from './data-adapter';
 import ValidationComponent from './validation';
 import VisibilityComponent from './visibility';
+import RegisterControlsComponent from './register-controls';
 
 const meta = {
 	title: 'DataViews/DataForm',
@@ -151,4 +152,29 @@ export const Visibility = {
 
 export const DataAdapter = {
 	render: DataAdapterComponent,
+};
+
+export const RegisterControls = {
+	render: RegisterControlsComponent,
+	argTypes: {
+		labelPosition: {
+			control: { type: 'select' },
+			description: 'Chooses the label position.',
+			options: [ 'default', 'top', 'side', 'none' ],
+		},
+		required: {
+			control: { type: 'boolean' },
+			description: 'Whether the required validation rule is active.',
+		},
+		custom: {
+			control: { type: 'boolean' },
+			description:
+				'Whether the custom validation rule is active (rating must be > 2).',
+		},
+	},
+	args: {
+		labelPosition: 'default',
+		required: false,
+		custom: false,
+	},
 };

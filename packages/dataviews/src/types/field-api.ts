@@ -164,13 +164,23 @@ export type EditConfigGeneric = {
 };
 
 /**
+ * Edit configuration for custom controls.
+ * Allows any control name and additional configuration properties.
+ */
+export type EditConfigCustom = {
+	control: string;
+	[ key: string ]: unknown;
+};
+
+/**
  * Edit configuration object with type-safe control options.
  * Each control type has its own specific configuration properties.
  */
 export type EditConfig =
 	| EditConfigTextarea
 	| EditConfigText
-	| EditConfigGeneric;
+	| EditConfigGeneric
+	| EditConfigCustom;
 
 /**
  * A dataview field for a specific property of a data type.
@@ -445,6 +455,7 @@ export type DataFormControlProps< Item > = {
 		prefix?: React.ComponentType;
 		suffix?: React.ComponentType;
 		rows?: number;
+		[ key: string ]: unknown;
 	};
 };
 

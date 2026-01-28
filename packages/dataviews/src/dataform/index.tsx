@@ -18,11 +18,12 @@ export default function DataForm< Item >( {
 	fields,
 	onChange,
 	validity,
+	settings,
 }: DataFormProps< Item > ) {
 	const normalizedForm = useMemo( () => normalizeForm( form ), [ form ] );
 	const normalizedFields = useMemo(
-		() => normalizeFields( fields ),
-		[ fields ]
+		() => normalizeFields( fields, settings?.controls ),
+		[ fields, settings?.controls ]
 	);
 
 	if ( ! form.fields ) {
