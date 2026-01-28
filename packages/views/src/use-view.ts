@@ -100,8 +100,9 @@ export function useView( config: ViewConfig ): UseViewReturn {
 				search: newView?.search,
 			};
 			// Strip activeFilters and URL params before persisting
+			// Cast is safe: omitting page/search doesn't change the discriminant (type field)
 			const preferenceView = stripActiveFilterFields(
-				omit( newView, [ 'page', 'search' ] ),
+				omit( newView, [ 'page', 'search' ] ) as View,
 				activeFilters
 			);
 
