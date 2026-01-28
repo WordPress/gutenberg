@@ -1,6 +1,15 @@
 /**
+ * External dependencies
+ */
+import { diffArrays } from 'diff/lib/diff/array';
+
+/**
  * Preserves clientIds from previously rendered blocks to prevent flashing.
- * Matches blocks by name between renders to maintain React key stability.
+ * Uses LCS algorithm to match blocks by name, attributes, and originalContent.
+ *
+ * This is separate from the visual diff (which compares revision content).
+ * This compares the newly parsed blocks against the last rendered blocks
+ * to maintain React key stability.
  *
  * @param {Array} newBlocks  Newly parsed blocks with fresh clientIds.
  * @param {Array} prevBlocks Previously rendered blocks with stable clientIds.
@@ -11,47 +20,47 @@ export function preserveClientIds( newBlocks, prevBlocks ) {
 		return newBlocks;
 	}
 
-	// Track which prevBlocks have been used.
-	const usedPrevIndices = new Set();
+	// Create signatures for LCS matching using name, attributes, and originalContent.
+	const createSignature = ( block ) =>
+		JSON.stringify( {
+			name: block.name,
+			attributes: block.attributes,
+			originalContent: block.originalContent,
+		} );
+	const newSigs = newBlocks.map( createSignature );
+	const prevSigs = prevBlocks.map( createSignature );
 
-	return newBlocks.map( ( newBlock, newIndex ) => {
-		// Try to find a matching block in prevBlocks by name.
-		// First, try the same index position.
-		if (
-			prevBlocks[ newIndex ] &&
-			prevBlocks[ newIndex ].name === newBlock.name &&
-			! usedPrevIndices.has( newIndex )
-		) {
-			usedPrevIndices.add( newIndex );
-			return {
-				...newBlock,
-				clientId: prevBlocks[ newIndex ].clientId,
-				innerBlocks: preserveClientIds(
-					newBlock.innerBlocks,
-					prevBlocks[ newIndex ].innerBlocks
-				),
-			};
-		}
+	const diffResult = diffArrays( prevSigs, newSigs );
 
-		// Otherwise, find the first unused block with matching name.
-		for ( let i = 0; i < prevBlocks.length; i++ ) {
-			if (
-				! usedPrevIndices.has( i ) &&
-				prevBlocks[ i ].name === newBlock.name
-			) {
-				usedPrevIndices.add( i );
-				return {
+	let newIndex = 0;
+	let prevIndex = 0;
+	const result = [];
+
+	for ( const chunk of diffResult ) {
+		if ( chunk.removed ) {
+			// Blocks only in prev render - skip them.
+			prevIndex += chunk.count;
+		} else if ( chunk.added ) {
+			// Blocks only in new render - keep new clientIds.
+			for ( let i = 0; i < chunk.count; i++ ) {
+				result.push( newBlocks[ newIndex++ ] );
+			}
+		} else {
+			// Matched blocks - preserve clientIds from prev render.
+			for ( let i = 0; i < chunk.count; i++ ) {
+				const newBlock = newBlocks[ newIndex++ ];
+				const prevBlock = prevBlocks[ prevIndex++ ];
+				result.push( {
 					...newBlock,
-					clientId: prevBlocks[ i ].clientId,
+					clientId: prevBlock.clientId,
 					innerBlocks: preserveClientIds(
 						newBlock.innerBlocks,
-						prevBlocks[ i ].innerBlocks
+						prevBlock.innerBlocks
 					),
-				};
+				} );
 			}
 		}
+	}
 
-		// No match found, keep new clientId.
-		return newBlock;
-	} );
+	return result;
 }
