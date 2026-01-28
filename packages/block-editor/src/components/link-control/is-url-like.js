@@ -24,34 +24,62 @@ export default function isURLLike( val ) {
 	const protocol = getProtocol( val );
 	const protocolIsValid = isValidProtocol( protocol );
 
-	const mayBeTLD = hasPossibleTLD( val );
+	// Protocols like mailto:, tel:, etc. are valid without domain validation.
+	if ( protocolIsValid && ! /^(https?|ftp):$/i.test( protocol ) ) {
+		return true;
+	}
+
+	const urlWithoutProtocol = protocol ? val.slice( protocol.length ) : val;
+	const urlForValidation = urlWithoutProtocol.replace( /^\/\//, '' );
+	const hasValidDomainTLD = isValidDomainTLD( urlForValidation );
 
 	const isWWW = val?.startsWith( 'www.' );
 
 	const isInternal = val?.startsWith( '#' ) && isValidFragment( val );
 
-	return protocolIsValid || isWWW || isInternal || mayBeTLD;
+	return isWWW || isInternal || hasValidDomainTLD;
 }
 
 /**
- * Checks if a given URL has a valid Top-Level Domain (TLD).
+ * Validates and checks if a URL has a valid domain and TLD structure.
+ * Validates according several RFC 1035 rules:
+ * - Labels can only contain alphanumeric characters and hyphens
+ * - Labels cannot start or end with a hyphen
+ * - TLD must be alphabetic only (2-63 chars)
+ * Note: Subdomains may have non-standard characters (like underscores),
+ * but the domain and TLD must be valid.
  *
- * @param {string} url       - The URL to check.
- * @param {number} maxLength - The maximum length of the TLD.
- * @return {boolean} Returns true if the URL has a valid TLD, false otherwise.
+ * @param {string} url - The URL to check (without protocol).
+ * @return {boolean} Returns true if URL has a valid domain+TLD structure, false otherwise.
  */
-function hasPossibleTLD( url, maxLength = 6 ) {
+function isValidDomainTLD( url ) {
 	// Clean the URL by removing anything after the first occurrence of "?" or "#".
 	const cleanedURL = url.split( /[?#]/ )[ 0 ];
 
-	// Regular expression explanation:
-	// - (?<=\S)                  : Positive lookbehind assertion to ensure there is at least one non-whitespace character before the TLD
-	// - \.                       : Matches a literal dot (.)
-	// - [a-zA-Z_]{2,maxLength}   : Matches 2 to maxLength letters or underscores, representing the TLD
-	// - (?:\/|$)                 : Non-capturing group that matches either a forward slash (/) or the end of the string
-	const regex = new RegExp(
-		`(?<=\\S)\\.(?:[a-zA-Z_]{2,${ maxLength }})(?:\\/|$)`
-	);
+	// Handling userinfo (user@host).
+	const hostname = cleanedURL.split( '/' )[ 0 ].split( '@' ).pop() || '';
 
-	return regex.test( cleanedURL );
+	// Handling port
+	const hostnameWithoutPort = hostname.split( ':' )[ 0 ];
+
+	// Get only domain and TLD
+	const hostParts = hostnameWithoutPort.split( '.' );
+	if ( hostParts.length < 2 ) {
+		return false;
+	}
+
+	const tld = hostParts[ hostParts.length - 1 ];
+	const domain = hostParts[ hostParts.length - 2 ];
+
+	// TLD: alphabetic only (2-63 chars).
+	if ( ! /^[a-zA-Z]{2,63}$/.test( tld ) ) {
+		return false;
+	}
+
+	// Domain: alphanumeric and hyphens only, cannot start/end with hyphen (1-63 chars).
+	if ( ! /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?$/.test( domain ) ) {
+		return false;
+	}
+
+	return true;
 }
