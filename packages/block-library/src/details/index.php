@@ -8,6 +8,8 @@
 /**
  * Renders the `core/details` block on the server.
  *
+ * @since 6.9.0 Added support for dynamic content in Query Loop.
+ *
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
@@ -15,14 +17,14 @@
  * @return string Returns the details block markup.
  */
 function render_block_core_details( $attributes, $content, $block ) {
-	// If not using dynamic content, return the default saved content
+	// If not using dynamic content, return the default saved content.
 	$use_dynamic_content = isset( $attributes['useDynamicContent'] ) && $attributes['useDynamicContent'];
 
 	if ( ! $use_dynamic_content || ! isset( $block->context['postId'] ) ) {
 		return $content;
 	}
 
-	// Get post data from context
+	// Get post data from context.
 	$post_id = $block->context['postId'];
 	$post    = get_post( $post_id );
 
@@ -30,24 +32,24 @@ function render_block_core_details( $attributes, $content, $block ) {
 		return $content;
 	}
 
-	// Get post title and content
+	// Get post title and content.
 	$title        = get_the_title( $post_id );
 	$post_content = apply_filters( 'the_content', get_the_content( null, false, $post_id ) );
 
-	// Get block attributes
+	// Get block attributes.
 	$show_content = isset( $attributes['showContent'] ) && $attributes['showContent'];
 	$name_attr    = isset( $attributes['name'] ) && $attributes['name'] ? $attributes['name'] : '';
 
-	// Build wrapper attributes
+	// Build wrapper attributes.
 	$wrapper_attributes = get_block_wrapper_attributes();
 
-	// Build the open attribute
+	// Build the open attribute.
 	$open_attr = $show_content ? ' open' : '';
 
-	// Build the name attribute
+	// Build the name attribute.
 	$name_html = $name_attr ? ' name="' . esc_attr( $name_attr ) . '"' : '';
 
-	// Build the details block markup
+	// Build the details block markup.
 	return sprintf(
 		'<details %1$s%2$s%3$s><summary>%4$s</summary><div class="wp-block-details__content">%5$s</div></details>',
 		$wrapper_attributes,
@@ -60,6 +62,8 @@ function render_block_core_details( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/details` block on the server.
+ *
+ * @since 6.9.0
  *
  * @return void
  */
