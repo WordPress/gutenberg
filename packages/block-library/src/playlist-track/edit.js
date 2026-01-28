@@ -254,7 +254,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						onChange={ ( value ) => {
 							setAttributes( { title: value } );
 						} }
-						keepPlaceholderOnFocus
 						allowedFormats={ [] }
 						withoutInteractiveFormatting
 					/>
@@ -267,7 +266,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 							onChange={ ( value ) =>
 								setAttributes( { artist: value } )
 							}
-							keepPlaceholderOnFocus
 							allowedFormats={ [] }
 							withoutInteractiveFormatting
 						/>
