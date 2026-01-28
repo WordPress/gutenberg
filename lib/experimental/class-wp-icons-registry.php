@@ -1,10 +1,5 @@
 <?php
 
-add_filter( 'wp_icons_registry_directory', 'gutenberg_icons_registry_directory', 10, 0 );
-function gutenberg_icons_registry_directory() {
-	return __DIR__ . '/../../packages/icons/src/';
-}
-
 if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 	class WP_Icons_Registry {
 		/**
@@ -23,11 +18,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		private static $instance = null;
 
 		public function __construct() {
-			/** This filter is documented in wp-includes/class-wp-icons-registry.php */
-			$icons_directory = apply_filters(
-				'wp_icons_registry_directory',
-				__DIR__ . '/../../packages/icons/src/'
-			);
+			$icons_directory = __DIR__ . '/../../packages/icons/src/';
 
 			if ( ! is_dir( $icons_directory ) ) {
 				return;
