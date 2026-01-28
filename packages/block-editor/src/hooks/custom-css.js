@@ -137,7 +137,7 @@ function useBlockProps( { style } ) {
 	}
 
 	return {
-		className: clsx( 'has-custom-css', customCSSIdentifier ),
+		className: `has-custom-css ${customCSSIdentifier}`
 	};
 }
 
