@@ -6,6 +6,7 @@ import {
 	useActiveUsers,
 	useGetAbsolutePositionIndex,
 	useIsDisconnected,
+	useGetDebugData,
 } from './hooks/use-post-editor-awareness-state';
 import { RECEIVE_INTERMEDIATE_RESULTS } from './utils';
 import { lock } from './lock-unlock';
@@ -16,5 +17,6 @@ lock( privateApis, {
 	useActiveUsers,
 	useGetAbsolutePositionIndex,
 	useIsDisconnected,
+	useGetDebugData,
 	RECEIVE_INTERMEDIATE_RESULTS,
 } );

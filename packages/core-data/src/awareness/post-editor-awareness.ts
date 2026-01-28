@@ -4,7 +4,13 @@
 import { dispatch, select, subscribe } from '@wordpress/data';
 // @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { Y } from '@wordpress/sync';
+import {
+	CRDT_RECORD_MAP_KEY,
+	CRDT_RECORD_METADATA_MAP_KEY,
+	CRDT_RECORD_METADATA_SAVED_AT_KEY,
+	CRDT_RECORD_METADATA_SAVED_BY_KEY,
+	Y,
+} from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -19,9 +25,16 @@ import {
 	areSelectionsStatesEqual,
 	getSelectionState,
 } from '../utils/crdt-user-selections';
+import { sendNotification, NotificationType } from './notifications';
 
 import type { SelectionCursor, WPBlockSelection } from '../types';
-import type { EditorState, PostEditorState } from './types';
+import type {
+	DebugUserData,
+	EditorState,
+	PostEditorState,
+	SerializableYItem,
+	YDocDebugData,
+} from './types';
 
 export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	protected equalityFieldChecks = {
@@ -41,7 +54,69 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	public setUp(): void {
 		super.setUp();
 
+		this.subscribeToCRDTChanges();
 		this.subscribeToUserSelectionChanges();
+	}
+
+	private subscribeToCRDTChanges(): void {
+		const now = Date.now();
+		const recordMap = this.doc.getMap( CRDT_RECORD_MAP_KEY );
+		const recordMeta = this.doc.getMap( CRDT_RECORD_METADATA_MAP_KEY );
+
+		recordMeta.observe(
+			( event: Y.YMapEvent< unknown >, transaction: Y.Transaction ) => {
+				event.keysChanged.forEach( ( key: string ) => {
+					switch ( key ) {
+						// A remote user has saved the document.
+						case CRDT_RECORD_METADATA_SAVED_AT_KEY: {
+							if ( transaction.local ) {
+								break;
+							}
+
+							const savedTimestamp = recordMeta.get(
+								CRDT_RECORD_METADATA_SAVED_AT_KEY
+							);
+							const remoteClientId = recordMeta.get(
+								CRDT_RECORD_METADATA_SAVED_BY_KEY
+							);
+
+							// Type / "undefined" guard.
+							if (
+								'number' !== typeof remoteClientId ||
+								'number' !== typeof savedTimestamp
+							) {
+								break;
+							}
+
+							const userState =
+								this.getStates().get( remoteClientId );
+
+							if (
+								// Ignore if the savedAt timestamp is older than our session
+								now > savedTimestamp ||
+								// Ignore if we don't have a user state for the client ID
+								! userState ||
+								// Ignore if this is our own saved event (can happen on refresh or reconnect)
+								userState.userInfo.id ===
+									this.getLocalStateField( 'userInfo' )?.id
+							) {
+								break;
+							}
+
+							const status = recordMap.get( 'status' ) as string;
+
+							sendNotification(
+								NotificationType.PostUpdated,
+								userState.userInfo,
+								status
+							);
+
+							break;
+						}
+					}
+				} );
+			}
+		);
 	}
 
 	/**
@@ -180,5 +255,85 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				this.doc
 			)?.index ?? null
 		);
+	}
+
+	/**
+	 * Type guard to check if a struct is a Y.Item (not Y.GC)
+	 * @param struct - The struct to check.
+	 * @return True if the struct is a Y.Item, false otherwise.
+	 */
+	private isYItem( struct: Y.Item | Y.GC ): struct is Y.Item {
+		return 'content' in struct;
+	}
+
+	/**
+	 * Get data for debugging, using the awareness state.
+	 *
+	 * @return {YDocDebugData} The debug data.
+	 */
+	public getDebugData(): YDocDebugData {
+		const ydoc = this.doc;
+
+		// Manually extract doc data to avoid deprecated toJSON method
+		const docData: Record< string, unknown > = Object.fromEntries(
+			Array.from( ydoc.share, ( [ key, value ] ) => [
+				key,
+				value.toJSON(),
+			] )
+		);
+
+		// Build userMap from awareness store (all users seen this session)
+		const userMapData = new Map< string, DebugUserData >(
+			Array.from( this.getSeenStates().entries() ).map(
+				( [ clientId, userState ] ) => [
+					String( clientId ),
+					{
+						name: userState.userInfo.name,
+						wpUserId: userState.userInfo.id,
+					},
+				]
+			)
+		);
+
+		// Serialize Yjs client items to avoid deep nesting
+		const serializableClientItems: Record<
+			number,
+			Array< SerializableYItem >
+		> = {};
+
+		ydoc.store.clients.forEach( ( structs, clientId ) => {
+			// Filter for Y.Item only (skip Y.GC garbage collection structs)
+			const items = structs.filter( this.isYItem );
+
+			serializableClientItems[ clientId ] = items.map( ( item ) => {
+				const { left, right, ...rest } = item;
+
+				return {
+					...rest,
+					left: left
+						? {
+								id: left.id,
+								length: left.length,
+								origin: left.origin,
+								content: left.content,
+						  }
+						: null,
+					right: right
+						? {
+								id: right.id,
+								length: right.length,
+								origin: right.origin,
+								content: right.content,
+						  }
+						: null,
+				};
+			} );
+		} );
+
+		return {
+			doc: docData,
+			clients: serializableClientItems,
+			userMap: Object.fromEntries( userMapData ),
+		};
 	}
 }

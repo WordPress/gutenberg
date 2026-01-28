@@ -7,19 +7,28 @@ import { useEffect, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { getSyncManager } from '../sync';
-import type { PostEditorAwarenessState as ActiveUser } from '../awareness/types';
+import type {
+	PostEditorAwarenessState as ActiveUser,
+	YDocDebugData,
+} from '../awareness/types';
 import type { SelectionCursor } from '../types';
 import type { PostEditorAwareness } from '../awareness/post-editor-awareness';
 
 interface AwarenessState {
 	activeUsers: ActiveUser[];
 	getAbsolutePositionIndex: ( selection: SelectionCursor ) => number | null;
+	getDebugData: () => YDocDebugData;
 	isCurrentUserDisconnected: boolean;
 }
 
 const defaultState: AwarenessState = {
 	activeUsers: [],
 	getAbsolutePositionIndex: () => null,
+	getDebugData: () => ( {
+		doc: {},
+		clients: {},
+		userMap: {},
+	} ),
 	isCurrentUserDisconnected: false,
 };
 
@@ -33,6 +42,7 @@ function getAwarenessState(
 		activeUsers,
 		getAbsolutePositionIndex: ( selection: SelectionCursor ) =>
 			awareness.getAbsolutePositionIndex( selection ),
+		getDebugData: () => awareness.getDebugData(),
 		isCurrentUserDisconnected:
 			activeUsers.find( ( user ) => user.isMe )?.isConnected === false,
 	};
@@ -106,6 +116,20 @@ export function useGetAbsolutePositionIndex(
 ): ( selection: SelectionCursor ) => number | null {
 	return usePostEditorAwarenessState( postId, postType )
 		.getAbsolutePositionIndex;
+}
+
+/**
+ * Hook to get data for debugging, using the awareness state.
+ *
+ * @param  postId   - The ID of the post.
+ * @param  postType - The type of the post.
+ * @return {YDocDebugData} The debug data.
+ */
+export function useGetDebugData(
+	postId: number | null,
+	postType: string | null
+): YDocDebugData {
+	return usePostEditorAwarenessState( postId, postType ).getDebugData();
 }
 
 /**
