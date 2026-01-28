@@ -24,6 +24,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -155,8 +156,14 @@ function CoverEdit( {
 
 			const averageBackgroundColor = await getMediaColor( mediaUrl );
 
+			// Allow disabling automatic overlay color selection via filter.
+			const shouldSetOverlayColor = applyFilters(
+				'blocks.cover.autoSetOverlayColor',
+				true
+			);
+
 			let newOverlayColor = overlayColor.color;
-			if ( ! isUserOverlayColor ) {
+			if ( ! isUserOverlayColor && shouldSetOverlayColor ) {
 				newOverlayColor = averageBackgroundColor;
 				__unstableMarkNextChangeAsNotPersistent();
 				setOverlayColor( newOverlayColor );
@@ -201,8 +208,14 @@ function CoverEdit( {
 			isImage ? newMedia?.url : undefined
 		);
 
+		// Allow disabling automatic overlay color selection via filter.
+		const shouldSetOverlayColor = applyFilters(
+			'blocks.cover.autoSetOverlayColor',
+			true
+		);
+
 		let newOverlayColor = overlayColor.color;
-		if ( ! isUserOverlayColor ) {
+		if ( ! isUserOverlayColor && shouldSetOverlayColor ) {
 			newOverlayColor = averageBackgroundColor;
 			setOverlayColor( newOverlayColor );
 
@@ -477,11 +490,18 @@ function CoverEdit( {
 			? await getMediaColor( mediaUrl )
 			: DEFAULT_BACKGROUND_COLOR;
 
-		const newOverlayColor = ! isUserOverlayColor
-			? averageBackgroundColor
-			: overlayColor.color;
+		// Allow disabling automatic overlay color selection via filter.
+		const shouldSetOverlayColor = applyFilters(
+			'blocks.cover.autoSetOverlayColor',
+			true
+		);
 
-		if ( ! isUserOverlayColor ) {
+		const newOverlayColor =
+			! isUserOverlayColor && shouldSetOverlayColor
+				? averageBackgroundColor
+				: overlayColor.color;
+
+		if ( ! isUserOverlayColor && shouldSetOverlayColor ) {
 			if ( newUseFeaturedImage ) {
 				setOverlayColor( newOverlayColor );
 			} else {
