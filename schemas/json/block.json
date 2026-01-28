@@ -95,6 +95,11 @@
 				"type": "string"
 			}
 		},
+		"inserterPriority": {
+			"description": "A numerical value that influences the display order of the block in the inserter. Lower values are displayed first. The default priority is 0.",
+			"type": "integer",
+			"default": 0
+		},
 		"version": {
 			"description": "The current version number of the block, such as 1.0 or 1.0.3. It’s similar to how plugins are versioned. This field might be used with block assets to control cache invalidation, and when the block author omits it, then the installed version of WordPress is used instead.",
 			"type": "string"
