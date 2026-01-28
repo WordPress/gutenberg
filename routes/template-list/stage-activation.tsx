@@ -28,7 +28,7 @@ import { published, commentAuthorAvatar } from '@wordpress/icons';
  */
 import { unlock } from '../lock-unlock';
 import {
-	getDefaultView,
+	DEFAULT_VIEW,
 	getActiveFiltersForTab,
 	DEFAULT_LAYOUTS,
 } from './view-utils';
@@ -70,7 +70,7 @@ function TemplateListActivation() {
 	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
 		useState< Template | null >( null );
 	const defaultView: View = useMemo( () => {
-		return getDefaultView();
+		return DEFAULT_VIEW;
 	}, [] );
 	const activeFilters = useMemo(
 		() => getActiveFiltersForTab( activeView ),

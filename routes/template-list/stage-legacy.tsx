@@ -27,7 +27,7 @@ import { layout } from '@wordpress/icons';
  */
 import { unlock } from '../lock-unlock';
 import {
-	getDefaultViewLegacy,
+	DEFAULT_VIEW,
 	getActiveFiltersForTabLegacy,
 	DEFAULT_LAYOUTS,
 } from './view-utils';
@@ -64,7 +64,10 @@ function TemplateListLegacy() {
 		[]
 	);
 	const defaultView: View = useMemo( () => {
-		return getDefaultViewLegacy();
+		return {
+			...DEFAULT_VIEW,
+			fields: [ 'author' ],
+		};
 	}, [] );
 	const activeFilters = useMemo(
 		() => getActiveFiltersForTabLegacy( activeView ),
