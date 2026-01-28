@@ -30,15 +30,15 @@ Destructive actions that have no immediate visible result on the frontend (e.g.,
 
 ### Implementation
 
-- Use standard trigger styling (no destructive (red) styling)
+- Use standard trigger styling, avoiding destructive (red) styling
 - No confirmation dialog required
 - Ensure undo functionality is available
 
 **Example**: Deleting a block in the editor. The block is removed but the change can be immediately undone using the undo command.
 
-## Use confirmDialog
+## Use ConfirmDialog
 
-Destructive actions that have an immediate visible result but can be easily undone (e.g., moving to trash) require a confirmation using `confirmDialog`. A snackbar with undo affordance should be displayed after the action completes.
+Destructive actions that have an immediate visible result but can be easily undone (e.g., moving to trash) require a confirmation using the `ConfirmDialog` component. A snackbar with undo affordance should be displayed after the action completes.
 
 ### When to Use
 
