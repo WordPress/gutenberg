@@ -228,19 +228,15 @@ function ValidatedDateControl< Item >( {
 
 	useEffect( () => {
 		if ( isTouched ) {
-			const timeoutId = setTimeout( () => {
-				const result = validity
-					? getCustomValidity( isValid, validity )
-					: undefined;
-				if ( result ) {
-					setCustomValidity( result );
-				} else {
-					validateRefs();
-				}
-			}, 0 );
-			return () => clearTimeout( timeoutId );
+			const result = validity
+				? getCustomValidity( isValid, validity )
+				: undefined;
+			if ( result ) {
+				setCustomValidity( result );
+			} else {
+				validateRefs();
+			}
 		}
-		return undefined;
 	}, [ isTouched, isValid, validity, validateRefs ] );
 
 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
