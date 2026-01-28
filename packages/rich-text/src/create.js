@@ -390,17 +390,22 @@ function collapseWhiteSpace( element, isRoot = true ) {
 		if ( node.nodeType === node.TEXT_NODE ) {
 			let newNodeValue = node.nodeValue;
 
+			// Replace newlines, tabs, carriage returns, and form feeds with spaces.
 			if ( /[\n\t\r\f]/.test( newNodeValue ) ) {
 				newNodeValue = newNodeValue.replace( /[\n\t\r\f]+/g, ' ' );
 			}
 
+			// Collapse multiple consecutive spaces to a single space.
 			if ( newNodeValue.indexOf( '  ' ) !== -1 ) {
 				newNodeValue = newNodeValue.replace( / {2,}/g, ' ' );
 			}
 
-			if ( i === 0 && newNodeValue.startsWith( ' ' ) ) {
+			if ( isRoot && i === 0 && newNodeValue.startsWith( ' ' ) ) {
 				newNodeValue = newNodeValue.slice( 1 );
-			} else if (
+			}
+
+			// Only trim trailing whitespace at the root level
+			if (
 				isRoot &&
 				i === nodes.length - 1 &&
 				newNodeValue.endsWith( ' ' )
@@ -410,6 +415,7 @@ function collapseWhiteSpace( element, isRoot = true ) {
 
 			node.nodeValue = newNodeValue;
 		} else if ( node.nodeType === node.ELEMENT_NODE ) {
+			// Pass isRoot=false for child elements so their boundary so whitespace is preserved.
 			node.replaceWith( collapseWhiteSpace( node, false ) );
 		}
 	} );
