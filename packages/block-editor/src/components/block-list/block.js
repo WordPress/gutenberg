@@ -213,19 +213,12 @@ function BlockListBlock( {
 		hasBlockSupport( name, 'iframeCompatMode' ) &&
 		! isCompatModeEditor
 	) {
-		// eslint-disable-next-line no-console
-		console.log( '[Block] Rendering in compat mode iframe:', name, { hasSupport: hasBlockSupport( name, 'iframeCompatMode' ), isCompatModeEditor } );
 		// Blocks with iframeCompatMode support render in a separate iframe
 		// to provide isolation from the main editor for legacy blocks.
 		// Skip this when already inside the compat mode editor to prevent
 		// recursive iframe rendering.
-		// Wrap the hidden blockEdit in an error boundary so that if it throws,
-		// we still render the compat mode iframe (which handles errors internally).
 		block = (
 			<Block>
-				<BlockCrashBoundary fallback={ null }>
-					<div style={ { display: 'none' } }>{ blockEdit }</div>
-				</BlockCrashBoundary>
 				<CompatModeIframe
 					clientId={ clientId }
 					name={ name }
@@ -236,10 +229,6 @@ function BlockListBlock( {
 			</Block>
 		);
 	} else if ( blockType?.apiVersion > 1 ) {
-		// eslint-disable-next-line no-console
-		if ( name === 'occ/rather-simple-panzoom' ) {
-			console.log( '[Block] Rendering normally (apiVersion > 1):', name, { hasSupport: hasBlockSupport( name, 'iframeCompatMode' ), isCompatModeEditor, apiVersion: blockType?.apiVersion } );
-		}
 		block = blockEdit;
 	} else {
 		block = <Block>{ blockEdit }</Block>;

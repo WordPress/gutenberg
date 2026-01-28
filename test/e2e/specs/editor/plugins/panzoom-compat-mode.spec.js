@@ -17,24 +17,6 @@ test.describe( 'Panzoom Compat Mode Block', () => {
 	} );
 
 	test( 'should render occ/rather-simple-panzoom in compat mode iframe', async ( { editor, page } ) => {
-		// Capture console logs
-		page.on( 'console', ( msg ) => {
-			if ( msg.text().includes( '[Block]' ) || msg.text().includes( 'iframeCompatMode' ) || msg.text().includes( '[Compat Mode]' ) ) {
-				console.log( 'BROWSER:', msg.text() );
-			}
-		} );
-
-		// Check block supports before inserting
-		const blockSupports = await page.evaluate( () => {
-			const blockType = wp.blocks.getBlockType( 'occ/rather-simple-panzoom' );
-			return blockType ? {
-				name: blockType.name,
-				supports: blockType.supports,
-				hasIframeCompatMode: blockType.supports?.iframeCompatMode
-			} : null;
-		} );
-		console.log( 'Block supports:', JSON.stringify( blockSupports, null, 2 ) );
-
 		// Insert the panzoom block
 		await editor.insertBlock( { name: 'occ/rather-simple-panzoom' } );
 
@@ -54,30 +36,9 @@ test.describe( 'Panzoom Compat Mode Block', () => {
 		// Wait for the block wrapper to render inside the iframe
 		await expect( compatFrame.locator( '.compat-mode-block-wrapper' ) ).toBeAttached( { timeout: 15000 } );
 
-		// Wait a bit for blocks to be inserted
-		await page.waitForTimeout( 2000 );
-
-		// Check what's in the block editor store inside the iframe
-		const iframeHandle = await compatIframe.elementHandle();
-		const frame = await iframeHandle.contentFrame();
-		const blocksInStore = await frame.evaluate( () => {
-			return wp.data.select( 'core/block-editor' ).getBlocks().map( b => ( { name: b.name, clientId: b.clientId } ) );
-		} );
-		console.log( 'Blocks in compat mode store:', JSON.stringify( blocksInStore ) );
-
-		// Also check the iframe HTML
-		const editorHTML = await frame.locator( '#compat-mode-editor' ).innerHTML();
-		console.log( 'Editor HTML:', editorHTML.substring( 0, 500 ) );
-
 		// Wait for the block to be inserted (look for the data-type attribute)
 		const blockElement = compatFrame.locator( '[data-type="occ/rather-simple-panzoom"]' );
 		await expect( blockElement ).toBeAttached( { timeout: 20000 } );
-
-		// Log what's in the iframe for debugging
-		const iframeContent = await compatFrame.locator( '#compat-mode-editor' ).innerHTML();
-		console.log( '=== IFRAME CONTENT ===' );
-		console.log( iframeContent );
-		console.log( '=== END IFRAME CONTENT ===' );
 
 		// Verify the block is visible
 		await expect( blockElement ).toBeVisible( { timeout: 10000 } );
@@ -87,8 +48,37 @@ test.describe( 'Panzoom Compat Mode Block', () => {
 		await expect( blockContent ).toBeVisible( { timeout: 10000 } );
 	} );
 
+	test( 'should show block toolbar and inspector controls in parent editor', async ( { editor, page } ) => {
+		// Insert the panzoom block
+		await editor.insertBlock( { name: 'occ/rather-simple-panzoom' } );
+
+		// Wait for compat mode iframe to become visible
+		const compatIframe = editor.canvas.locator( 'iframe.block-editor-compat-mode-iframe__frame' );
+		await expect( compatIframe ).toBeVisible( { timeout: 20000 } );
+
+		// Verify CompatModeSlotFills container exists in the parent document (outside canvas)
+		const slotFillsContainer = page.locator( '.block-editor-compat-mode-slot-fills' );
+		await expect( slotFillsContainer ).toBeAttached( { timeout: 5000 } );
+
+		// The block toolbar should be visible in the parent editor (not inside iframe)
+		// The panzoom block has a MediaReplaceFlow in BlockControls which shows "Add Image"
+		const blockToolbar = page.locator( '.block-editor-block-toolbar' );
+		await expect( blockToolbar ).toBeVisible( { timeout: 5000 } );
+
+		// Check for the MediaReplaceFlow button ("Add Image" or "Replace")
+		const mediaButton = blockToolbar.getByRole( 'button', { name: /Add Image|Replace/ } );
+		await expect( mediaButton ).toBeVisible( { timeout: 5000 } );
+
+		// The inspector controls should show the block name in sidebar
+		const inspector = page.locator( '.block-editor-block-inspector' );
+		await expect( inspector.getByText( 'Rather Simple Panzoom' ) ).toBeVisible( { timeout: 5000 } );
+
+		// The Settings panel from InspectorControls should be visible
+		await expect( inspector.getByRole( 'button', { name: 'Settings' } ) ).toBeVisible( { timeout: 5000 } );
+	} );
+
 	test( 'should not have infinite render loop (renders stabilize)', async ( { editor, page } ) => {
-		// Set up console log tracking for the iframe
+		// Set up console log tracking for render loops
 		let renderCount = 0;
 		page.on( 'console', ( msg ) => {
 			if ( msg.text().includes( 'BlockListWithBlock rendering' ) ) {
@@ -103,7 +93,7 @@ test.describe( 'Panzoom Compat Mode Block', () => {
 		const compatIframe = editor.canvas.locator( 'iframe.block-editor-compat-mode-iframe__frame' );
 		await expect( compatIframe ).toBeVisible( { timeout: 20000 } );
 
-		// Wait for 2 seconds to let things stabilize
+		// Wait for things to stabilize
 		await page.waitForTimeout( 2000 );
 
 		// Reset count and measure renders over 3 seconds
@@ -111,8 +101,6 @@ test.describe( 'Panzoom Compat Mode Block', () => {
 		await page.waitForTimeout( 3000 );
 
 		// Should have very few render logs after stabilization (not infinite)
-		// Allow some re-renders for legitimate updates, but not an infinite loop
-		console.log( `Render count in 3 seconds after stabilization: ${ renderCount }` );
 		expect( renderCount ).toBeLessThan( 10 );
 	} );
 } );

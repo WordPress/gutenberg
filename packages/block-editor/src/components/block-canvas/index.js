@@ -10,6 +10,7 @@ import { useSelect } from '@wordpress/data';
  */
 import BlockList from '../block-list';
 import BlockTools from '../block-tools';
+import CompatModeSlotFills from '../compat-mode-slot-fills';
 import EditorStyles from '../editor-styles';
 import Iframe from '../iframe';
 import WritingFlow from '../writing-flow';
@@ -58,6 +59,7 @@ export function ExperimentalBlockCanvas( {
 				__unstableContentRef={ localRef }
 				style={ { height, display: 'flex' } }
 			>
+				<CompatModeSlotFills />
 				<EditorStyles
 					styles={ styles }
 					scope=":where(.editor-styles-wrapper)"
@@ -83,6 +85,7 @@ export function ExperimentalBlockCanvas( {
 			__unstableContentRef={ localRef }
 			style={ { height, display: 'flex' } }
 		>
+			<CompatModeSlotFills />
 			<Iframe
 				{ ...iframeProps }
 				{ ...zoomOutIframeProps }
