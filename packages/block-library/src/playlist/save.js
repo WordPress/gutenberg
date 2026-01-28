@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -22,15 +27,11 @@ export default function saveWithInnerBlocks( { attributes } ) {
 	return (
 		<figure { ...innerBlocksProps }>
 			<TagName
-				className={
-					'wp-block-playlist__tracklist' +
-					( ! showTracklist
-						? ' wp-block-playlist__tracklist-is-hidden'
-						: '' ) +
-					( ! showArtists
-						? ' wp-block-playlist__tracklist-artist-is-hidden'
-						: '' )
-				}
+				className={ clsx( 'wp-block-playlist__tracklist', {
+					'wp-block-playlist__tracklist-is-hidden': ! showTracklist,
+					'wp-block-playlist__tracklist-artist-is-hidden':
+						! showArtists,
+				} ) }
 			>
 				{ innerBlocksProps.children }
 			</TagName>
