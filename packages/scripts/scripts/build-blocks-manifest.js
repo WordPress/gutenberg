@@ -37,8 +37,8 @@ const blocks = {};
 
 blockJsonFiles.forEach( ( file ) => {
 	const blockJson = JSON.parse( fs.readFileSync( file, 'utf8' ) );
-	const directoryName = path.basename( path.dirname( file ) );
-	blocks[ directoryName ] = blockJson;
+	const directoryNameOrPath = path.dirname(file.replace(resolvedInputDir, '')).substring(1);
+	blocks[ directoryNameOrPath ] = blockJson;
 } );
 
 if ( Object.keys( blocks ).length === 0 ) {
