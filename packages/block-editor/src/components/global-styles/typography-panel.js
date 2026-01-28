@@ -411,7 +411,7 @@ export default function TypographyPanel( {
 		: __( 'Indents the first line of each paragraph after the first one.' );
 	const textIndentHelp = isGlobalStyles
 		? textIndentGlobalStylesHelp
-		: __( 'Indents the first line of text.' );
+		: undefined;
 
 	// Text Columns
 	const hasTextColumnsControl = useHasTextColumnsControl( settings );
