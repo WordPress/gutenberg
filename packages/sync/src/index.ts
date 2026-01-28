@@ -28,4 +28,5 @@ export {
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './config';
 export { createSyncManager } from './manager';
+export type { EnhancedState } from './awareness/awareness-types';
 export type * from './types';

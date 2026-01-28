@@ -1,7 +1,12 @@
 /**
+ * WordPress dependencies
+ */
+import type { EnhancedState } from '@wordpress/sync';
+
+/**
  * Internal dependencies
  */
-import type { SelectionState } from '../utils/crdt-user-selections';
+import type { SelectionState } from '../types';
 import type { User } from '../entity-types';
 
 export type UserInfo = Pick<
@@ -36,3 +41,9 @@ export interface EditorState {
 export interface PostEditorState extends BaseState {
 	editorState?: EditorState;
 }
+
+/**
+ * An enhanced post editor awareness state includes additional metadata about
+ * the user and their connection.
+ */
+export type PostEditorAwarenessState = EnhancedState< PostEditorState >;
