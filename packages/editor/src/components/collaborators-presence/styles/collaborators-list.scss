@@ -1,0 +1,97 @@
+.vip-real-time-collaboration-collaborators-list.components-popover {
+	// Popover wrapper styles
+	.components-popover__content {
+		border: 1px solid #ddd;
+		border-width: 1px 0 0 1px;
+		border-radius: 8px;
+		background: #fff;
+		box-shadow:
+			0 1px 2px rgba(0, 0, 0, 0.05),
+			0 1px 2px rgba(0, 0, 0, 0.05),
+			0 1px 2px rgba(0, 0, 0, 0.05),
+			0 8px 8px rgba(0, 0, 0, 0.02);
+	}
+
+	.vip-real-time-collaboration-collaborators-list-content {
+		min-width: 280px;
+	}
+
+	// Header with title and action button
+	.vip-real-time-collaboration-collaborators-list-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0 16px;
+
+		&-title {
+			font-size: 13px;
+			font-weight: 500;
+			text-transform: uppercase;
+			line-height: 20px;
+			padding: 14px 0;
+
+			span {
+				color: var(--Gutenberg-Gray-700, #757575);
+			}
+		}
+
+		&-action {
+			padding: 8px 0;
+
+			button {
+				color: #1e1e1e;
+				height: 24px;
+				width: 24px;
+				padding: 0;
+			}
+		}
+	}
+
+	// List of collaborators
+	.vip-real-time-collaboration-collaborators-list-items {
+		display: flex;
+		flex-direction: column;
+		padding: 0 10px 16px;
+	}
+
+	.vip-real-time-collaboration-collaborators-list-item {
+		// Reset button styles
+		all: unset;
+		box-sizing: border-box;
+
+		// Layout styles
+		display: flex;
+		align-items: center;
+		padding: 6px;
+		gap: 8px;
+		border-radius: 12px;
+		width: 100%;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+
+		&:hover:not(:disabled) {
+			background-color: rgba(0, 0, 0, 0.05);
+		}
+
+		&:active:not(:disabled) {
+			background-color: rgba(0, 0, 0, 0.08);
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--wp-admin-theme-color, #007cba);
+			outline-offset: -2px;
+		}
+
+		&:disabled {
+			cursor: default;
+		}
+
+		&-info {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			line-height: 16px;
+			font-size: 12px;
+		}
+	}
+}
