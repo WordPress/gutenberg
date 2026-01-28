@@ -9,7 +9,6 @@ import type { MouseEventHandler } from 'react';
 import {
 	Button,
 	Modal,
-	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -17,6 +16,7 @@ import { useMemo, useState } from '@wordpress/element';
 import { moreVertical } from '@wordpress/icons';
 import { useRegistry } from '@wordpress/data';
 import { useViewportMatch } from '@wordpress/compose';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -200,6 +200,8 @@ export default function ItemActions< Item >( {
 		};
 	}, [ actions, item ] );
 
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
+
 	if ( isCompact ) {
 		return (
 			<CompactItemActions
@@ -212,8 +214,8 @@ export default function ItemActions< Item >( {
 	}
 
 	return (
-		<HStack
-			spacing={ 0 }
+		<Stack
+			direction="row"
 			justify="flex-end"
 			className="dataviews-item-actions"
 			style={ {
@@ -226,14 +228,17 @@ export default function ItemActions< Item >( {
 				actions={ primaryActions }
 				registry={ registry }
 			/>
-			{ primaryActions.length < eligibleActions.length && (
+			{ ( primaryActions.length < eligibleActions.length ||
+				// Since we hide primary actions on mobile, we need to show the menu
+				// there if there are any actions at all.
+				isMobileViewport ) && (
 				<CompactItemActions
 					item={ item }
 					actions={ eligibleActions }
 					registry={ registry }
 				/>
 			) }
-		</HStack>
+		</Stack>
 	);
 }
 

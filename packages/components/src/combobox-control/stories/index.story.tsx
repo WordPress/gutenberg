@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -69,6 +69,7 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 	return (
 		<>
 			<ComboboxControl
+				__next40pxDefaultSize
 				{ ...args }
 				value={ value }
 				onChange={ ( ...changeArgs ) => {

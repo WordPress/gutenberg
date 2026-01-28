@@ -1,12 +1,10 @@
-import { type Meta, type StoryObj } from '@storybook/react';
+import { type Meta, type StoryObj } from '@storybook/react-vite';
 import { type PaddingSize } from '@wordpress/theme';
-import '@wordpress/theme/design-tokens.css';
 import { Box } from '../box';
 
 const meta: Meta< typeof Box > = {
 	title: 'Design System/Components/Box',
 	component: Box,
-	tags: [ 'status-experimental' ],
 };
 export default meta;
 

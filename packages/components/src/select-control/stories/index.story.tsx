@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -42,6 +42,7 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 	if ( props.multiple ) {
 		return (
 			<SelectControl
+				__next40pxDefaultSize
 				{ ...props }
 				multiple
 				value={ selection }
@@ -55,6 +56,7 @@ const SelectControlWithState: StoryFn< typeof SelectControl > = ( props ) => {
 
 	return (
 		<SelectControl
+			__next40pxDefaultSize
 			{ ...props }
 			multiple={ false }
 			value={ selection?.[ 0 ] }

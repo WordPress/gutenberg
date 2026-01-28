@@ -11,15 +11,17 @@ if ( ! function_exists( '{{PREFIX}}_register_script_modules' ) ) {
 	 * Register all script modules.
 	 */
 	function {{PREFIX}}_register_script_modules() {
-		$modules_dir = __DIR__ . '/modules';
-		$modules_file = $modules_dir . '/index.php';
+		// Load build constants
+		$build_constants = require __DIR__ . '/constants.php';
+		$modules_dir     = __DIR__ . '/modules';
+		$modules_file    = $modules_dir . '/registry.php';
 
 		if ( ! file_exists( $modules_file ) ) {
 			return;
 		}
 
 		$modules = require $modules_file;
-		$base_url = {{BASE_URL}} . '/modules/';
+		$base_url = $build_constants['build_url'] . 'modules/';
 		$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
 
 		foreach ( $modules as $module ) {

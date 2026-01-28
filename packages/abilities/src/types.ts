@@ -86,6 +86,7 @@ export interface Ability {
 			destructive?: boolean;
 			idempotent?: boolean;
 		};
+		[ key: string ]: any;
 	};
 }
 
@@ -133,6 +134,7 @@ export interface AbilityCategory {
 			clientRegistered?: boolean;
 			serverRegistered?: boolean;
 		};
+		[ key: string ]: any;
 	};
 }
 

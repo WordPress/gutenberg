@@ -9,10 +9,16 @@ import {
 	registerBlockType,
 	store as blocksStore,
 } from '@wordpress/blocks';
+import { useDisabled } from '@wordpress/compose';
 import { select } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { useServerSideRender } from '@wordpress/server-side-render';
 import { __, sprintf } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import HtmlRenderer from './utils/html-renderer';
 
 /**
  * Internal dependencies
@@ -127,9 +133,12 @@ import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
 import * as tab from './tab';
+import * as tabPanels from './tab-panels';
 import * as table from './table';
 import * as tableOfContents from './table-of-contents';
 import * as tabs from './tabs';
+import * as tabsMenu from './tabs-menu';
+import * as tabsMenuItem from './tabs-menu-item';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termCount from './term-count';
@@ -268,6 +277,9 @@ const getAllBlocks = () => {
 	if ( window?.__experimentalEnableBlockExperiments ) {
 		blocks.push( tab );
 		blocks.push( tabs );
+		blocks.push( tabsMenu );
+		blocks.push( tabsMenuItem );
+		blocks.push( tabPanels );
 	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
@@ -350,8 +362,10 @@ export const registerCoreBlocks = (
 				...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
 					apiVersion: 3,
 				} ),
+				// Inspector controls are rendered by the auto-register hook in block-editor
 				edit: function Edit( { attributes } ) {
-					const blockProps = useBlockProps();
+					const disabledRef = useDisabled();
+					const blockProps = useBlockProps( { ref: disabledRef } );
 					const { content, status, error } = useServerSideRender( {
 						block: blockName,
 						attributes,
@@ -376,11 +390,9 @@ export const registerCoreBlocks = (
 					}
 
 					return (
-						<div
-							{ ...blockProps }
-							dangerouslySetInnerHTML={ {
-								__html: content || '',
-							} }
+						<HtmlRenderer
+							wrapperProps={ blockProps }
+							html={ content }
 						/>
 					);
 				},

@@ -4,5 +4,10 @@
 	"compilerOptions": {
 		"types": [ "node" ]
 	},
-	"references": [ { "path": "../hooks" }, { "path": "../url" } ]
+	"exclude": [ "src/y-utilities/y-multidoc-undomanager.js" ],
+	"references": [
+		{ "path": "../hooks" },
+		{ "path": "../undo-manager" },
+		{ "path": "../url" }
+	]
 }

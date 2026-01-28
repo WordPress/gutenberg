@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/data",
-	"version": "10.36.0",
+	"version": "10.38.0",
 	"description": "Data module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -30,13 +30,12 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"require": "./build/index.cjs"
 		},
 		"./package.json": "./package.json"
@@ -60,6 +59,9 @@
 		"redux": "^5.0.1",
 		"rememo": "^4.0.2",
 		"use-memo-one": "^1.1.1"
+	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0"

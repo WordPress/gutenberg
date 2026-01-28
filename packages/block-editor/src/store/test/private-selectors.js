@@ -19,9 +19,11 @@ import {
 	isMoveLockedBlock,
 	isRemoveLockedBlock,
 	isLockedBlock,
-	isBlockHidden,
+	isBlockHiddenAnywhere,
+	isBlockHiddenAtViewport,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
+import { deviceTypeKey } from '../private-keys';
 
 describe( 'private selectors', () => {
 	describe( 'isBlockInterfaceHidden', () => {
@@ -930,10 +932,11 @@ describe( 'private selectors', () => {
 		} );
 	} );
 
-	describe( 'isBlockHidden', () => {
+	describe( 'isBlockHiddenAnywhere', () => {
 		beforeAll( () => {
 			// Register a block with visibility support
 			registerBlockType( 'core/test-block-with-visibility', {
+				apiVersion: 3,
 				save: () => null,
 				category: 'text',
 				title: 'Test Block With Visibility',
@@ -944,6 +947,7 @@ describe( 'private selectors', () => {
 
 			// Register a block without visibility support
 			registerBlockType( 'core/test-block-without-visibility', {
+				apiVersion: 3,
 				save: () => null,
 				category: 'text',
 				title: 'Test Block Without Visibility',
@@ -954,6 +958,7 @@ describe( 'private selectors', () => {
 
 			// Register a block with no supports defined (defaults to true for visibility)
 			registerBlockType( 'core/test-block-default-visibility', {
+				apiVersion: 3,
 				save: () => null,
 				category: 'text',
 				title: 'Test Block Default Visibility',
@@ -988,7 +993,7 @@ describe( 'private selectors', () => {
 				},
 			};
 
-			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
 		} );
 
 		it( 'should return true when block has visibility support and is hidden', () => {
@@ -1013,7 +1018,7 @@ describe( 'private selectors', () => {
 				},
 			};
 
-			expect( isBlockHidden( state, 'block-1' ) ).toBe( true );
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( true );
 		} );
 
 		it( 'should return false when block does not have visibility support', () => {
@@ -1040,7 +1045,7 @@ describe( 'private selectors', () => {
 
 			// Even though blockVisibility is false, the block doesn't support visibility,
 			// so it should return false
-			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
 		} );
 
 		it( 'should return false when block has default visibility support and is not hidden', () => {
@@ -1065,7 +1070,7 @@ describe( 'private selectors', () => {
 				},
 			};
 
-			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
 		} );
 
 		it( 'should return true when block has default visibility support and is hidden', () => {
@@ -1090,7 +1095,7 @@ describe( 'private selectors', () => {
 				},
 			};
 
-			expect( isBlockHidden( state, 'block-1' ) ).toBe( true );
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( true );
 		} );
 
 		it( 'should return false when block has no metadata', () => {
@@ -1106,7 +1111,7 @@ describe( 'private selectors', () => {
 				},
 			};
 
-			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
 		} );
 
 		it( 'should return false when block has metadata but no blockVisibility property', () => {
@@ -1131,7 +1136,7 @@ describe( 'private selectors', () => {
 				},
 			};
 
-			expect( isBlockHidden( state, 'block-1' ) ).toBe( false );
+			expect( isBlockHiddenAnywhere( state, 'block-1' ) ).toBe( false );
 		} );
 
 		it( 'should handle non-existent block gracefully', () => {
@@ -1144,9 +1149,176 @@ describe( 'private selectors', () => {
 
 			// When block doesn't exist, getBlockName returns null,
 			// and hasBlockSupport should handle null gracefully
-			expect( isBlockHidden( state, 'non-existent-block' ) ).toBe(
+			expect( isBlockHiddenAnywhere( state, 'non-existent-block' ) ).toBe(
 				false
 			);
+		} );
+	} );
+
+	describe( 'isBlockHiddenAtViewport', () => {
+		beforeAll( () => {
+			registerBlockType( 'core/test-block-with-visibility', {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Test Block With Visibility',
+				supports: {
+					visibility: true,
+				},
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( 'core/test-block-with-visibility' );
+		} );
+
+		it( 'returns true when block is hidden everywhere', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: false,
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect(
+				isBlockHiddenAtViewport( state, 'block-1', 'Desktop' )
+			).toBe( true );
+		} );
+
+		it( 'returns visibility based on the requested viewport', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[
+							'block-1',
+							{ name: 'core/test-block-with-visibility' },
+						],
+					] ),
+					attributes: new Map( [
+						[
+							'block-1',
+							{
+								metadata: {
+									blockVisibility: {
+										viewport: {
+											mobile: false,
+											tablet: true,
+										},
+									},
+								},
+							},
+						],
+					] ),
+				},
+			};
+
+			expect(
+				isBlockHiddenAtViewport( state, 'block-1', 'Mobile' )
+			).toBe( true );
+			expect(
+				isBlockHiddenAtViewport( state, 'block-1', 'Tablet' )
+			).toBe( false );
+		} );
+	} );
+
+	describe( 'isBlockHiddenAnywhere in different devices', () => {
+		const createState = ( blockVisibility, deviceType = 'Desktop' ) => ( {
+			settings: {
+				[ deviceTypeKey ]: deviceType,
+			},
+			blocks: {
+				byClientId: new Map( [
+					[
+						'test-block',
+						{
+							name: 'core/paragraph',
+							attributes: {
+								metadata: {
+									blockVisibility,
+								},
+							},
+						},
+					],
+				] ),
+				attributes: new Map( [
+					[
+						'test-block',
+						{
+							metadata: {
+								blockVisibility,
+							},
+						},
+					],
+				] ),
+			},
+		} );
+
+		it( 'returns true when block is hidden at any viewport (mobile)', () => {
+			const state = createState(
+				{ viewport: { mobile: false, tablet: true } },
+				'Desktop'
+			);
+			const result = isBlockHiddenAnywhere( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true when block is hidden on desktop', () => {
+			const state = createState(
+				{ viewport: { desktop: false } },
+				'Desktop'
+			);
+			const result = isBlockHiddenAnywhere( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true when block is hidden on tablet', () => {
+			const state = createState(
+				{ viewport: { mobile: true, tablet: false } },
+				'Tablet'
+			);
+			const result = isBlockHiddenAnywhere( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true when block is hidden on mobile', () => {
+			const state = createState(
+				{ viewport: { mobile: false, tablet: true } },
+				'Mobile'
+			);
+			const result = isBlockHiddenAnywhere( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns true when block is hidden at any viewport even if visible at current device', () => {
+			const state = createState(
+				{ viewport: { mobile: false, tablet: true } },
+				'Tablet'
+			);
+			const result = isBlockHiddenAnywhere( state, 'test-block' );
+			expect( result ).toBe( true );
+		} );
+
+		it( 'returns false when block is visible at all viewports', () => {
+			const state = createState(
+				{ mobile: true, tablet: true, desktop: true },
+				'Desktop'
+			);
+			const result = isBlockHiddenAnywhere( state, 'test-block' );
+			expect( result ).toBe( false );
 		} );
 	} );
 } );

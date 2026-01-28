@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ReactNode } from 'react';
 
 /**
@@ -57,7 +57,7 @@ const meta: Meta< typeof Button > = {
 export default meta;
 
 const Template: StoryFn< typeof Button > = ( props ) => {
-	return <Button { ...props }></Button>;
+	return <Button __next40pxDefaultSize { ...props }></Button>;
 };
 
 export const Default = Template.bind( {} );
@@ -119,16 +119,19 @@ Icon.args = {
 	icon: 'wordpress',
 };
 
-export const GroupedIcons = () => {
-	const GroupContainer = ( { children }: { children: ReactNode } ) => (
-		<div style={ { display: 'inline-flex' } }>{ children }</div>
-	);
-
+const GroupContainer = ( { children }: { children: ReactNode } ) => (
+	<div style={ { display: 'inline-flex' } }>{ children }</div>
+);
+export function GroupedIcons() {
 	return (
 		<GroupContainer>
-			<Button icon={ formatBold } label="Bold" />
-			<Button icon={ formatItalic } label="Italic" />
-			<Button icon={ link } label="Link" />
+			<Button __next40pxDefaultSize icon={ formatBold } label="Bold" />
+			<Button
+				__next40pxDefaultSize
+				icon={ formatItalic }
+				label="Italic"
+			/>
+			<Button __next40pxDefaultSize icon={ link } label="Link" />
 		</GroupContainer>
 	);
-};
+}

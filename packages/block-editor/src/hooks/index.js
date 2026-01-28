@@ -7,12 +7,14 @@ import {
 	createBlockSaveFilter,
 } from './utils';
 import './compat';
+import './cross-origin-isolation';
 import align from './align';
 import background from './background';
 import './lock';
 import allowedBlocks from './allowed-blocks';
 import anchor from './anchor';
 import ariaLabel from './aria-label';
+import blockFields from './block-fields';
 import customClassName from './custom-class-name';
 import './generated-class-name';
 import style from './style';
@@ -25,6 +27,7 @@ import fontSize from './font-size';
 import textAlign from './text-align';
 import fitText from './fit-text';
 import border from './border';
+import customCSS from './custom-css';
 import position from './position';
 import blockStyleVariation from './block-style-variation';
 import layout from './layout';
@@ -33,8 +36,10 @@ import contentLockUI from './content-lock-ui';
 import './metadata';
 import blockHooks from './block-hooks';
 import blockBindingsPanel from './block-bindings';
+import listView from './list-view';
 import './block-renaming';
 import './grid-visualizer';
+import autoInspectorControls from './auto-inspector-controls';
 
 createBlockEditFilter(
 	[
@@ -43,6 +48,7 @@ createBlockEditFilter(
 		anchor,
 		customClassName,
 		style,
+		customCSS,
 		duotone,
 		fitText,
 		position,
@@ -52,6 +58,9 @@ createBlockEditFilter(
 		blockBindingsPanel,
 		childLayout,
 		allowedBlocks,
+		blockFields,
+		listView,
+		autoInspectorControls,
 	].filter( Boolean )
 );
 createBlockListBlockFilter( [
@@ -66,6 +75,7 @@ createBlockListBlockFilter( [
 	fontSize,
 	fitText,
 	border,
+	customCSS,
 	position,
 	blockStyleVariation,
 	childLayout,
@@ -77,6 +87,7 @@ createBlockSaveFilter( [
 	ariaLabel,
 	customClassName,
 	border,
+	customCSS,
 	fitText,
 	color,
 	style,

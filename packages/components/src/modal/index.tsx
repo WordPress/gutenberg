@@ -415,5 +415,6 @@ function UnforwardedModal(
  * ```
  */
 export const Modal = forwardRef( UnforwardedModal );
+Modal.displayName = 'Modal';
 
 export default Modal;

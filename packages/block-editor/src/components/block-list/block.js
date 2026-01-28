@@ -38,8 +38,9 @@ import { useBlockProps } from './use-block-props';
 import { store as blockEditorStore } from '../../store';
 import { useLayout } from './layout';
 import { PrivateBlockContext } from './private-block-context';
-
+import { useBlockVisibility } from '../block-visibility/';
 import { unlock } from '../../lock-unlock';
+import { deviceTypeKey } from '../../store/private-keys';
 
 /**
  * Merges wrapper props with special handling for classNames and styles.
@@ -105,6 +106,7 @@ function BlockListBlock( {
 	const {
 		mayDisplayControls,
 		mayDisplayParentControls,
+		isSelectionWithinCurrentSection,
 		themeSupportsLayout,
 		...context
 	} = useContext( PrivateBlockContext );
@@ -134,6 +136,7 @@ function BlockListBlock( {
 			}
 			mayDisplayControls={ mayDisplayControls }
 			mayDisplayParentControls={ mayDisplayParentControls }
+			mayDisplayPatternEditingControls={ isSelectionWithinCurrentSection }
 			blockEditingMode={ context.blockEditingMode }
 			isPreviewMode={ context.isPreviewMode }
 		/>
@@ -230,6 +233,7 @@ function BlockListBlock( {
 			value={ {
 				wrapperProps: updatedWrapperProps,
 				isAligned,
+				isSelectionWithinCurrentSection,
 				...context,
 			} }
 		>
@@ -607,16 +611,21 @@ function BlockListBlockProvider( props ) {
 			const attributes = getBlockAttributes( clientId );
 			const { name: blockName, isValid } = blockWithoutAttributes;
 			const blockType = getBlockType( blockName );
+			const settings = getSettings();
 			const {
 				supportsLayout,
 				isPreviewMode,
 				__experimentalBlockBindingsSupportedAttributes,
-			} = getSettings();
-
+			} = settings;
 			const bindableAttributes =
 				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
+			const blockVisibility = attributes?.metadata?.blockVisibility;
+			const deviceType =
+				settings?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
 
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
+			const isMultiSelected = isBlockMultiSelected( clientId );
+			const blockEditingMode = getBlockEditingMode( clientId );
 			const previewContext = {
 				isPreviewMode,
 				blockWithoutAttributes,
@@ -633,8 +642,12 @@ function BlockListBlockProvider( props ) {
 					? getBlockDefaultClassName( blockName )
 					: undefined,
 				blockTitle: blockType?.title,
-				isBlockHidden: attributes?.metadata?.blockVisibility === false,
 				bindableAttributes,
+				blockVisibility,
+				deviceType,
+				isMultiSelected,
+				blockEditingMode,
+				isEditingDisabled: blockEditingMode === 'disabled',
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -642,21 +655,18 @@ function BlockListBlockProvider( props ) {
 			if ( isPreviewMode ) {
 				return previewContext;
 			}
-
-			const { isBlockHidden: _isBlockHidden } = unlock(
-				select( blockEditorStore )
-			);
 			const _isSelected = isBlockSelected( clientId );
 			const canRemove = canRemoveBlock( clientId );
 			const canMove = canMoveBlock( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
-			const isMultiSelected = isBlockMultiSelected( clientId );
 			const checkDeep = true;
 			const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
 				clientId,
 				checkDeep
 			);
-			const blockEditingMode = getBlockEditingMode( clientId );
+			const sectionBlockClientId = _isSectionBlock( clientId )
+				? clientId
+				: getParentSectionBlock( clientId );
 
 			const multiple = hasBlockSupport( blockName, 'multiple', true );
 
@@ -675,9 +685,11 @@ function BlockListBlockProvider( props ) {
 				isSelectionEnabled: isSelectionEnabled(),
 				isLocked: !! getTemplateLock( rootClientId ),
 				isSectionBlock: _isSectionBlock( clientId ),
-				isWithinSectionBlock:
-					_isSectionBlock( clientId ) ||
-					!! getParentSectionBlock( clientId ),
+				isWithinSectionBlock: !! sectionBlockClientId,
+				isSelectionWithinCurrentSection:
+					isBlockSelected( sectionBlockClientId ) ||
+					hasSelectedInnerBlock( sectionBlockClientId, checkDeep ),
+				blockType,
 				canRemove,
 				canMove,
 				isSelected: _isSelected,
@@ -722,7 +734,8 @@ function BlockListBlockProvider( props ) {
 				originalBlockClientId: isInvalid
 					? blocksWithSameName[ 0 ]
 					: false,
-				isBlockHidden: _isBlockHidden( clientId ),
+				blockVisibility,
+				deviceType,
 			};
 		},
 		[ clientId, rootClientId ]
@@ -749,6 +762,7 @@ function BlockListBlockProvider( props ) {
 		mayDisplayParentControls,
 		index,
 		blockApiVersion,
+		blockType,
 		blockTitle,
 		isSubtreeDisabled,
 		hasOverlay,
@@ -761,14 +775,22 @@ function BlockListBlockProvider( props ) {
 		hasChildSelected,
 		isSectionBlock,
 		isWithinSectionBlock,
+		isSelectionWithinCurrentSection,
 		isEditingDisabled,
 		hasEditableOutline,
 		className,
 		defaultClassName,
 		originalBlockClientId,
-		isBlockHidden,
 		bindableAttributes,
+		blockVisibility,
+		deviceType,
 	} = selectedProps;
+
+	// Use block visibility hook with data from existing useSelect to avoid extra subscription
+	const { isBlockCurrentlyHidden } = useBlockVisibility( {
+		blockVisibility,
+		deviceType,
+	} );
 
 	// Users of the editor.BlockListBlock filter used to be able to
 	// access the block prop.
@@ -794,6 +816,7 @@ function BlockListBlockProvider( props ) {
 		mode,
 		name,
 		blockApiVersion,
+		blockType,
 		blockTitle,
 		isSelected,
 		isSubtreeDisabled,
@@ -808,6 +831,7 @@ function BlockListBlockProvider( props ) {
 		hasChildSelected,
 		isSectionBlock,
 		isWithinSectionBlock,
+		isSelectionWithinCurrentSection,
 		isEditingDisabled,
 		hasEditableOutline,
 		isEditingContentOnlySection,
@@ -817,12 +841,14 @@ function BlockListBlockProvider( props ) {
 		originalBlockClientId,
 		themeSupportsLayout,
 		canMove,
-		isBlockHidden,
+		isBlockCurrentlyHidden,
 		bindableAttributes,
+		blockVisibility,
+		deviceType,
 	};
 
 	if (
-		isBlockHidden &&
+		isBlockCurrentlyHidden &&
 		! isSelected &&
 		! isMultiSelected &&
 		! hasChildSelected

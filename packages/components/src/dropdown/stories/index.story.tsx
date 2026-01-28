@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * Internal dependencies
@@ -17,7 +17,6 @@ const meta: Meta< typeof Dropdown > = {
 	title: 'Components/Overlays/Dropdown',
 	id: 'components-dropdown',
 	component: Dropdown,
-	// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 	subcomponents: { DropdownContentWrapper },
 	args: {
 		onClose: fn(),
@@ -50,6 +49,7 @@ export const Default: StoryObj< typeof Dropdown > = {
 	args: {
 		renderToggle: ( { isOpen, onToggle } ) => (
 			<Button
+				__next40pxDefaultSize
 				onClick={ onToggle }
 				aria-expanded={ isOpen }
 				variant="primary"

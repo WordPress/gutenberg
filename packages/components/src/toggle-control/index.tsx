@@ -110,5 +110,6 @@ function UnforwardedToggleControl(
  * ```
  */
 export const ToggleControl = forwardRef( UnforwardedToggleControl );
+ToggleControl.displayName = 'ToggleControl';
 
 export default ToggleControl;

@@ -176,6 +176,7 @@ class Inserter extends Component {
 				onSelect={ () => {
 					onClose();
 				} }
+				onClose={ onClose }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
 				isAppender={ isAppender }

@@ -9,10 +9,6 @@
 	height: 100%;
 	overflow: auto;
 
-	@include break-small() {
-		-webkit-overflow-scrolling: touch;
-	}
-
 	@include break-medium() {
 		width: $sidebar-width;
 	}

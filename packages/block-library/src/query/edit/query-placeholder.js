@@ -10,7 +10,6 @@ import { useState } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	__experimentalBlockVariationPicker,
-	BlockControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { Button, Placeholder } from '@wordpress/components';
@@ -29,6 +28,7 @@ export default function QueryPlaceholder( {
 	clientId,
 	name,
 	openPatternSelectionModal,
+	isSelected,
 } ) {
 	const [ isStartingBlank, setIsStartingBlank ] = useState( false );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
@@ -79,13 +79,13 @@ export default function QueryPlaceholder( {
 	}
 	return (
 		<div { ...blockProps }>
-			<BlockControls>
+			{ isSelected && (
 				<QueryToolbar
 					clientId={ clientId }
 					attributes={ attributes }
 					hasInnerBlocks={ false }
 				/>
-			</BlockControls>
+			) }
 			<Placeholder
 				className="block-editor-media-placeholder"
 				icon={ ! isSmallContainer && icon }

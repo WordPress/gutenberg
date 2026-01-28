@@ -8,7 +8,7 @@ import type {
 	SortDirection,
 } from '../types';
 import type { FieldType } from '../types/private';
-import { getControl } from '../dataform-controls';
+import { getControl } from '../components/dataform-controls';
 import getFilterBy from './utils/get-filter-by';
 import getValueFromId from './utils/get-value-from-id';
 import hasElements from './utils/has-elements';
@@ -28,6 +28,7 @@ import { default as color } from './color';
 import { default as url } from './url';
 import { default as noType } from './no-type';
 import getIsValid from './utils/get-is-valid';
+import getFilter from './utils/get-filter';
 import getFormat from './utils/get-format';
 
 /**
@@ -111,6 +112,7 @@ export default function normalizeFields< Item >(
 				fieldType.defaultOperators,
 				fieldType.validOperators
 			),
+			filter: getFilter( fieldType ),
 			format: getFormat( field, fieldType ),
 			getValueFormatted:
 				field.getValueFormatted ?? fieldType.getValueFormatted,

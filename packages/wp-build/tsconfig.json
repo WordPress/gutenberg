@@ -22,6 +22,6 @@
 	"exclude": [
 		// Excluded to maintain consistency with bin/tsconfig.json
 		// where packages/build.mjs was also excluded
-		"src/build.mjs"
+		"lib/build.mjs"
 	]
 }

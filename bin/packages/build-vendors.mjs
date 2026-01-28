@@ -3,46 +3,15 @@
 /**
  * External dependencies
  */
-import { copyFile, mkdir, writeFile, readFile } from 'fs/promises';
+import { copyFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import esbuild from 'esbuild';
-import { createHash } from 'crypto';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build', 'scripts' );
 const VENDORS_DIR = path.join( BUILD_DIR, 'vendors' );
-
-/**
- * Generate a content hash from file contents.
- * Uses SHA256 algorithm for broad compatibility across Node.js versions.
- *
- * @param {string[]} filePaths - Absolute paths to files to hash
- * @param {string}   algorithm - Hash algorithm (default: 'sha256')
- * @param {number}   length    - Hash length (default: 20)
- * @return {Promise<string>} Content hash string
- */
-async function generateContentHash(
-	filePaths,
-	algorithm = 'sha256',
-	length = 20
-) {
-	const hashBuilder = createHash( algorithm );
-
-	// Sort paths for deterministic ordering
-	const sortedPaths = [ ...filePaths ].sort();
-
-	// Read and hash each file
-	for ( const filePath of sortedPaths ) {
-		const content = await readFile( filePath );
-		hashBuilder.update( content );
-	}
-
-	// Generate hash as hex string and truncate
-	const fullHash = hashBuilder.digest( 'hex' );
-	return fullHash.slice( 0, length );
-}
 
 /**
  * Copy React and ReactDOM UMD files from node_modules.
@@ -139,65 +108,6 @@ async function bundleReactJsxRuntime() {
 }
 
 /**
- * Bundle React Refresh files for hot module replacement during development.
- * Only needed when SCRIPT_DEBUG is enabled.
- */
-async function bundleReactRefresh() {
-	console.log( '📦 Bundling React Refresh...' );
-
-	// Bundle react-refresh-entry
-	const entryDir = path.join( BUILD_DIR, 'react-refresh-entry' );
-	await mkdir( entryDir, { recursive: true } );
-
-	await esbuild.build( {
-		entryPoints: [
-			'@pmmmwh/react-refresh-webpack-plugin/client/ReactRefreshEntry.js',
-		],
-		outfile: path.join( entryDir, 'index.min.js' ),
-		bundle: true,
-		format: 'iife',
-		target: 'es2015',
-		platform: 'browser',
-		minify: false,
-	} );
-
-	// Generate asset file for react-refresh-entry
-	const entryOutputFile = path.join( entryDir, 'index.min.js' );
-	const entryVersion = await generateContentHash( [ entryOutputFile ] );
-	const entryAssetContent = `<?php return array('dependencies' => array('wp-react-refresh-runtime'), 'version' => '${ entryVersion }');`;
-	await writeFile(
-		path.join( entryDir, 'index.min.asset.php' ),
-		entryAssetContent
-	);
-
-	// Bundle react-refresh-runtime
-	const runtimeDir = path.join( BUILD_DIR, 'react-refresh-runtime' );
-	await mkdir( runtimeDir, { recursive: true } );
-
-	await esbuild.build( {
-		entryPoints: [ 'react-refresh/runtime' ],
-		outfile: path.join( runtimeDir, 'index.min.js' ),
-		bundle: true,
-		format: 'iife',
-		globalName: 'ReactRefreshRuntime',
-		target: 'es2015',
-		platform: 'browser',
-		minify: false,
-	} );
-
-	// Generate asset file for react-refresh-runtime
-	const runtimeOutputFile = path.join( runtimeDir, 'index.min.js' );
-	const runtimeVersion = await generateContentHash( [ runtimeOutputFile ] );
-	const runtimeAssetContent = `<?php return array('dependencies' => array(), 'version' => '${ runtimeVersion }');`;
-	await writeFile(
-		path.join( runtimeDir, 'index.min.asset.php' ),
-		runtimeAssetContent
-	);
-
-	console.log( '   ✔ Bundled React Refresh' );
-}
-
-/**
  * Main build function.
  */
 async function buildVendors() {
@@ -205,11 +115,7 @@ async function buildVendors() {
 
 	const startTime = Date.now();
 
-	await Promise.all( [
-		copyReactUMDFiles(),
-		bundleReactJsxRuntime(),
-		bundleReactRefresh(),
-	] );
+	await Promise.all( [ copyReactUMDFiles(), bundleReactJsxRuntime() ] );
 
 	const totalTime = Date.now() - startTime;
 	console.log( `\n🎉 Vendor files built successfully! (${ totalTime }ms)` );

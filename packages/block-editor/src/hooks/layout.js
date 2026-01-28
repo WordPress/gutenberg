@@ -30,6 +30,7 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 import { useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
+import { globalStylesDataKey } from '../store/private-keys';
 
 const layoutBlockSupportKey = 'layout';
 const { kebabCase } = unlock( componentsPrivateApis );
@@ -367,6 +368,7 @@ function BlockWithLayoutStyles( {
 	block: BlockListBlock,
 	props,
 	blockGapSupport,
+	globalBlockGapValue,
 	layoutClasses,
 } ) {
 	const { name, attributes } = props;
@@ -393,6 +395,7 @@ function BlockWithLayoutStyles( {
 		layout: usedLayout,
 		style: attributes?.style,
 		hasBlockGapSupport,
+		globalBlockGapValue,
 	} );
 
 	// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
@@ -421,56 +424,65 @@ function BlockWithLayoutStyles( {
  * @return {Function} Wrapped component.
  */
 export const withLayoutStyles = createHigherOrderComponent(
-	( BlockListBlock ) => ( props ) => {
-		const { clientId, name, attributes } = props;
-		const blockSupportsLayout = hasLayoutBlockSupport( name );
-		const layoutClasses = useLayoutClasses( attributes, name );
-		const extraProps = useSelect(
-			( select ) => {
-				// The callback returns early to avoid block editor subscription.
-				if ( ! blockSupportsLayout ) {
-					return;
-				}
-
-				const { getSettings, getBlockSettings } = unlock(
-					select( blockEditorStore )
-				);
-				const { disableLayoutStyles } = getSettings();
-
-				if ( disableLayoutStyles ) {
-					return;
-				}
-
-				const [ blockGapSupport ] = getBlockSettings(
-					clientId,
-					'spacing.blockGap'
-				);
-
-				return { blockGapSupport };
-			},
-			[ blockSupportsLayout, clientId ]
-		);
-
-		if ( ! extraProps ) {
-			return (
-				<BlockListBlock
-					{ ...props }
-					__unstableLayoutClassNames={
-						blockSupportsLayout ? layoutClasses : undefined
+	( BlockListBlock ) =>
+		function WithLayoutStyles( props ) {
+			const { clientId, name, attributes } = props;
+			const blockSupportsLayout = hasLayoutBlockSupport( name );
+			const layoutClasses = useLayoutClasses( attributes, name );
+			const extraProps = useSelect(
+				( select ) => {
+					// The callback returns early to avoid block editor subscription.
+					if ( ! blockSupportsLayout ) {
+						return;
 					}
+
+					const { getSettings, getBlockSettings } = unlock(
+						select( blockEditorStore )
+					);
+					const settings = getSettings();
+					const { disableLayoutStyles } = settings;
+
+					if ( disableLayoutStyles ) {
+						return;
+					}
+
+					const [ blockGapSupport ] = getBlockSettings(
+						clientId,
+						'spacing.blockGap'
+					);
+
+					// Get default blockGap value from global styles for use in layouts like grid.
+					// Check block-specific styles first, then fall back to root styles.
+					const globalStyles = settings[ globalStylesDataKey ];
+					const globalBlockGapValue =
+						globalStyles?.blocks?.[ name ]?.spacing?.blockGap ??
+						globalStyles?.spacing?.blockGap;
+
+					return { blockGapSupport, globalBlockGapValue };
+				},
+				[ blockSupportsLayout, clientId ]
+			);
+
+			if ( ! extraProps ) {
+				return (
+					<BlockListBlock
+						{ ...props }
+						__unstableLayoutClassNames={
+							blockSupportsLayout ? layoutClasses : undefined
+						}
+					/>
+				);
+			}
+
+			return (
+				<BlockWithLayoutStyles
+					block={ BlockListBlock }
+					props={ props }
+					layoutClasses={ layoutClasses }
+					{ ...extraProps }
 				/>
 			);
-		}
-
-		return (
-			<BlockWithLayoutStyles
-				block={ BlockListBlock }
-				props={ props }
-				layoutClasses={ layoutClasses }
-				{ ...extraProps }
-			/>
-		);
-	},
+		},
 	'withLayoutStyles'
 );
 

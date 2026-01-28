@@ -7,12 +7,13 @@
 
 /**
  * Redirect the Appearance > Design menu to the extensible site editor
- * when both experiments are enabled.
+ * when the experiment is enabled.
+ *
+ * @global array $submenu WordPress admin submenu array.
  */
 function gutenberg_redirect_to_extensible_site_editor() {
-	// Only proceed if both required experiments are enabled.
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ||
-		! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
+	// Only proceed if the experiment is enabled.
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-extensible-site-editor' ) ) {
 		return;
 	}
 
@@ -22,7 +23,7 @@ function gutenberg_redirect_to_extensible_site_editor() {
 		foreach ( $submenu['themes.php'] as $key => $item ) {
 			// Find the Design/site-editor menu item and update its URL.
 			if ( isset( $item[2] ) && 'site-editor.php' === $item[2] ) {
-				$submenu['themes.php'][ $key ][2] = 'admin.php?page=site-editor';
+				$submenu['themes.php'][ $key ][2] = 'admin.php?page=site-editor-v2';
 				break;
 			}
 		}

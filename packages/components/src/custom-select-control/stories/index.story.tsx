@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
-import { fn } from '@storybook/test';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -57,6 +57,7 @@ const Template: StoryFn< typeof CustomSelectControl > = ( props ) => {
 
 	return (
 		<CustomSelectControl
+			__next40pxDefaultSize
 			{ ...props }
 			onChange={ onChange }
 			value={ value }

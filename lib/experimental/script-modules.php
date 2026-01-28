@@ -7,6 +7,7 @@
  *
  * @param array $settings Array of determined settings for registering a block type.
  * @param array $metadata Metadata provided for registering a block type.
+ * @return array The filtered block settings.
  */
 function gutenberg_filter_block_type_metadata_settings_register_view_module( $settings, $metadata = null ) {
 	$module_fields = array(
@@ -83,13 +84,13 @@ function gutenberg_register_block_module_id( $metadata, $field_name, $index = 0 
 	$module_path_norm    = wp_normalize_path( realpath( $path . '/' . $module_path ) );
 	$module_uri          = get_block_asset_url( $module_path_norm );
 	$module_asset        = ! empty( $module_asset_path ) ? require $module_asset_path : array();
-	$module_dependencies = isset( $module_asset['dependencies'] ) ? $module_asset['dependencies'] : array();
+	$module_dependencies = $module_asset['dependencies'] ?? array();
 
 	wp_register_script_module(
 		$module_id,
 		$module_uri,
 		$module_dependencies,
-		isset( $module_asset['version'] ) ? $module_asset['version'] : false
+		$module_asset['version'] ?? false
 	);
 
 	return $module_id;

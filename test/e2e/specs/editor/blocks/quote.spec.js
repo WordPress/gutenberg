@@ -241,6 +241,30 @@ test.describe( 'Quote', () => {
 		);
 	} );
 
+	test( 'can be converted to verse with mixed content', async ( {
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/quote',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'First paragraph' },
+				},
+				{
+					name: 'core/heading',
+					attributes: { content: 'A heading', level: 2 },
+				},
+			],
+		} );
+		await editor.transformBlockTo( 'core/verse' );
+		expect( await editor.getEditedPostContent() ).toBe(
+			`<!-- wp:verse -->
+<pre class="wp-block-verse">First paragraph<br>A heading</pre>
+<!-- /wp:verse -->`
+		);
+	} );
+
 	test( 'can be split at the end', async ( { editor, page } ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( '1' );

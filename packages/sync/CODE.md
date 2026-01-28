@@ -1,4 +1,4 @@
-# Status of the sync experiment in Gutenberg
+# Real-time collaboration in Gutenberg
 
 The sync package provides an implementation of real-time collaboration in Gutenberg.
 
@@ -9,14 +9,9 @@ Relevant docs and discussions:
 -   https://github.com/WordPress/gutenberg/discussions/65012
 -   https://docs.yjs.dev/
 
-## Enable the experiment
+## Availability
 
-The real-time collaboration experiment must be enabled on the "Gutenberg > Experiments" page. A WebRTC provider with HTTP signaling is used to connect peers.
-
-When it is enabled, the following global variables are defined::
-
--   `window.__experimentalEnableSync` (`boolean`): Used by the `core-data` package to determine whether entity syncing is available.
--   `window.__experimentalCollaborativeEditingSecret` (`string`). A secret (stored in a WordPress option) used by the WebRTC provider to create a secure connection between peers.
+Real-time collaboration is automatically enabled when using the Gutenberg plugin. The `core-data` package checks for `IS_GUTENBERG_PLUGIN` to determine whether entity syncing is available.
 
 ## The data flow
 
