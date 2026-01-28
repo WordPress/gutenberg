@@ -46,7 +46,7 @@ function render_block_core_playlist_track( $attributes ) {
 		sprintf(
 			/* translators: %s: track length in minutes:seconds */
 			'<span class="screen-reader-text">Length:</span>%s',
-			$length
+			esc_html( $length )
 		);
 		$html .= '</span>';
 	}
