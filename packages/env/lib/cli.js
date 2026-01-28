@@ -92,9 +92,44 @@ module.exports = function cli() {
 		execSync( 'docker info', { stdio: 'ignore' } );
 	} catch {
 		console.error(
-			chalk.red( 'Could not connect to Docker. Is it running?' )
+			chalk.red(
+				'Could not connect to Docker daemon. Is Docker running?'
+			)
+		);
+		console.error(
+			chalk.yellow(
+				'Please ensure Docker is installed and running on your system.'
+			)
 		);
 		process.exit( 1 );
+	}
+
+	// Check Docker Compose availability.
+	try {
+		execSync( 'docker compose version', { stdio: 'ignore' } );
+	} catch {
+		try {
+			execSync( 'docker-compose --version', { stdio: 'ignore' } );
+		} catch {
+			console.error( chalk.red( 'Docker Compose is not available.' ) );
+			console.error(
+				chalk.yellow(
+					'wp-env requires Docker Compose to manage containers.'
+				)
+			);
+			console.error( chalk.yellow( 'Please install Docker Compose:' ) );
+			console.error(
+				chalk.blue(
+					'• For Docker Desktop: Docker Compose is included by default'
+				)
+			);
+			console.error(
+				chalk.blue(
+					'• For Docker Engine: https://docs.docker.com/compose/install/clear'
+				)
+			);
+			process.exit( 1 );
+		}
 	}
 
 	yargs.usage( wpPrimary( '$0 <command>' ) );
