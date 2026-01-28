@@ -79,23 +79,20 @@ export function getActiveFiltersForTabLegacy( activeView: string ): Filter[] {
 	];
 }
 
-export function getDefaultViewLegacy(): View {
-	return {
-		...DEFAULT_VIEW,
-		fields: [ 'author' ],
-	};
-}
+export const DEFAULT_VIEW_LEGACY: View = {
+	...DEFAULT_VIEW,
+	fields: [ 'author' ],
+};
 
 export async function ensureViewLegacy(
 	activeView?: string,
 	search?: { page?: number; search?: string }
 ) {
-	const defaultView = getDefaultViewLegacy();
 	return loadView( {
 		kind: 'postType',
 		name: 'wp_template',
 		slug: 'default-new',
-		defaultView,
+		defaultView: DEFAULT_VIEW_LEGACY,
 		activeFilters: getActiveFiltersForTabLegacy( activeView ?? 'all' ),
 		queryParams: search,
 	} );
