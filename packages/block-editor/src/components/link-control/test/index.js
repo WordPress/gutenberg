@@ -3387,6 +3387,37 @@ describe( 'URL validation', () => {
 		);
 	} );
 
+	it( 'should accept relative paths (URLs starting with /)', async () => {
+		render(
+			<LinkControl
+				value={ { url: '' } }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox' );
+		await user.type( searchInput, '/handbook' );
+
+		// Wait for suggestion to appear and become stable
+		await screen.findByRole( 'option', {
+			name: /\/handbook/,
+		} );
+
+		triggerEnter( searchInput );
+
+		// No validation error - should succeed
+		await waitFor( () => {
+			expect( mockOnChange ).toHaveBeenCalled();
+		} );
+
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: '/handbook',
+			} )
+		);
+	} );
+
 	it( 'should skip validation for entity suggestions (posts, pages, categories)', async () => {
 		const entityLink = {
 			id: 1,
