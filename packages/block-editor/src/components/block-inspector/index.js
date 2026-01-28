@@ -151,6 +151,9 @@ function BlockInspector() {
 			const listViewDescendants = new Set();
 			descendants.forEach( ( clientId ) => {
 				const blockName = getBlockName( clientId );
+				// Navigation block doesn't have List View block support, but
+				// it does have a custom implementation that is shown within
+				// patterns, so it's included in this condition.
 				if (
 					blockName === 'core/navigation' ||
 					hasBlockSupport( blockName, 'listView' )
@@ -164,12 +167,10 @@ function BlockInspector() {
 			} );
 
 			return descendants.filter( ( current ) => {
-				// Exclude navigation block children
-				if ( listViewDescendants.has( current ) ) {
-					return false;
-				}
-
-				return getBlockEditingMode( current ) === 'contentOnly';
+				return (
+					! listViewDescendants.has( current ) &&
+					getBlockEditingMode( current ) === 'contentOnly'
+				);
 			} );
 		},
 		[ isSectionBlock, renderedBlockClientId ]
