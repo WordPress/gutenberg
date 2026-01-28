@@ -28,5 +28,10 @@ export {
 	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './config';
 export { createSyncManager } from './manager';
+
+/**
+ * An enhanced state includes additional metadata about the user's connection
+ * that is not appropriate to synchronize via Yjs awareness.
+ */
 export type { EnhancedState } from './awareness/awareness-types';
 export type * from './types';
