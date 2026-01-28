@@ -16,7 +16,7 @@ import PostList from '../post-list';
 import { unlock } from '../../lock-unlock';
 import { PostEdit } from '../post-edit';
 import {
-	getDefaultView,
+	DEFAULT_VIEW,
 	getActiveFiltersForTab,
 } from '../post-list/view-utils';
 
@@ -28,7 +28,7 @@ async function isListView( query ) {
 		kind: 'postType',
 		name: 'page',
 		slug: 'default',
-		defaultView: getDefaultView(),
+		defaultView: DEFAULT_VIEW,
 		activeFilters: getActiveFiltersForTab( activeView ),
 	} );
 	return view.type === 'list';

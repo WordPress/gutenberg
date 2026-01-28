@@ -34,7 +34,7 @@ import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
 import {
 	defaultLayouts,
-	getDefaultView,
+	DEFAULT_VIEW,
 	getActiveFiltersForTab,
 } from './view-utils';
 import useNotesCount from './use-notes-count';
@@ -58,7 +58,7 @@ export default function PostList( { postType } ) {
 	const { path, query } = useLocation();
 	const { activeView = 'all', postId, quickEdit = false } = query;
 	const history = useHistory();
-	const defaultView = useMemo( () => getDefaultView(), [] );
+	const defaultView = DEFAULT_VIEW;
 	const activeFilters = useMemo(
 		() => getActiveFiltersForTab( activeView ),
 		[ activeView ]

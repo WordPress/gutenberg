@@ -12,7 +12,7 @@ import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-uns
 import PageTemplates from '../page-templates';
 import PageTemplatesLegacy from '../page-templates/index-legacy';
 import {
-	getDefaultView,
+	DEFAULT_VIEW,
 	getActiveFiltersForTab,
 } from '../page-templates/view-utils';
 
@@ -22,7 +22,7 @@ async function isTemplateListView( query ) {
 		kind: 'postType',
 		name: 'wp_template',
 		slug: 'default',
-		defaultView: getDefaultView(),
+		defaultView: DEFAULT_VIEW,
 		activeFilters: getActiveFiltersForTab( activeView ),
 	} );
 	return view.type === 'list';

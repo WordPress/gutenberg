@@ -23,7 +23,7 @@ import { useEditPostAction } from '../dataviews-actions';
 import { authorField, descriptionField, previewField } from './fields';
 import {
 	defaultLayouts,
-	getDefaultView,
+	DEFAULT_VIEW,
 	getActiveFiltersForTab,
 } from './view-utils';
 
@@ -36,9 +36,7 @@ export default function PageTemplates() {
 	const { activeView = 'active', postId } = query;
 	const [ selection, setSelection ] = useState( [ postId ] );
 
-	const defaultView = useMemo( () => {
-		return getDefaultView();
-	}, [] );
+	const defaultView = DEFAULT_VIEW;
 	const activeFilters = useMemo(
 		() => getActiveFiltersForTab( activeView ),
 		[ activeView ]

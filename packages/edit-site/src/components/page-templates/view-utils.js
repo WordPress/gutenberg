@@ -10,7 +10,7 @@ export const defaultLayouts = {
 	},
 };
 
-const DEFAULT_VIEW = {
+export const DEFAULT_VIEW = {
 	type: 'grid',
 	perPage: 20,
 	sort: {
@@ -24,12 +24,6 @@ const DEFAULT_VIEW = {
 	filters: [],
 	...defaultLayouts.grid,
 };
-
-export function getDefaultView() {
-	return {
-		...DEFAULT_VIEW,
-	};
-}
 
 export function getActiveFiltersForTab( activeView ) {
 	if ( activeView === 'active' || activeView === 'user' ) {

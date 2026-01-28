@@ -27,7 +27,7 @@ import { layout } from '@wordpress/icons';
  */
 import { unlock } from '../lock-unlock';
 import {
-	getDefaultViewLegacy,
+	DEFAULT_VIEW_LEGACY,
 	getActiveFiltersForTabLegacy,
 	DEFAULT_LAYOUTS,
 } from './view-utils';
@@ -63,9 +63,7 @@ function TemplateListLegacy() {
 		( select ) => select( coreStore ).getPostType( 'wp_template' ),
 		[]
 	);
-	const defaultView: View = useMemo( () => {
-		return getDefaultViewLegacy();
-	}, [] );
+	const defaultView = DEFAULT_VIEW_LEGACY;
 	const activeFilters = useMemo(
 		() => getActiveFiltersForTabLegacy( activeView ),
 		[ activeView ]

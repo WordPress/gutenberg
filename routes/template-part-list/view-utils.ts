@@ -11,7 +11,7 @@ import type { View, Filter } from '@wordpress/dataviews';
  */
 const NAVIGATION_OVERLAY_TEMPLATE_PART_AREA = 'navigation-overlay';
 
-const DEFAULT_VIEW: View = {
+export const DEFAULT_VIEW: View = {
 	type: 'grid' as const,
 	sort: {
 		field: 'date',
@@ -71,20 +71,15 @@ export function getActiveFiltersForTab( area: string ): Filter[] {
 	];
 }
 
-export function getDefaultView(): View {
-	return DEFAULT_VIEW;
-}
-
 export async function ensureView(
 	area?: string,
 	search?: { page?: number; search?: string }
 ) {
-	const defaultView = getDefaultView();
 	return loadView( {
 		kind: 'postType',
 		name: 'wp_template_part',
 		slug: 'default-new',
-		defaultView,
+		defaultView: DEFAULT_VIEW,
 		activeFilters: getActiveFiltersForTab( area ?? 'all' ),
 		queryParams: search,
 	} );

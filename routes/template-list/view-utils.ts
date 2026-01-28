@@ -4,7 +4,7 @@
 import { loadView } from '@wordpress/views';
 import type { View, Filter } from '@wordpress/dataviews';
 
-const DEFAULT_VIEW: View = {
+export const DEFAULT_VIEW: View = {
 	type: 'grid' as const,
 	perPage: 20,
 	sort: {
@@ -16,6 +16,11 @@ const DEFAULT_VIEW: View = {
 	descriptionField: 'description',
 	mediaField: 'preview',
 	filters: [],
+};
+
+export const DEFAULT_VIEW_LEGACY: View = {
+	...DEFAULT_VIEW,
+	fields: [ 'author' ],
 };
 
 export const DEFAULT_LAYOUTS = {
@@ -44,22 +49,15 @@ export function getActiveFiltersForTab( activeView: string ): Filter[] {
 	];
 }
 
-export function getDefaultView(): View {
-	return {
-		...DEFAULT_VIEW,
-	};
-}
-
 export async function ensureView(
 	activeView?: string,
 	search?: { page?: number; search?: string }
 ) {
-	const defaultView = getDefaultView();
 	return loadView( {
 		kind: 'postType',
 		name: 'wp_template',
 		slug: 'default-new',
-		defaultView,
+		defaultView: DEFAULT_VIEW,
 		activeFilters: getActiveFiltersForTab( activeView ?? 'active' ),
 		queryParams: search,
 	} );
@@ -79,23 +77,15 @@ export function getActiveFiltersForTabLegacy( activeView: string ): Filter[] {
 	];
 }
 
-export function getDefaultViewLegacy(): View {
-	return {
-		...DEFAULT_VIEW,
-		fields: [ 'author' ],
-	};
-}
-
 export async function ensureViewLegacy(
 	activeView?: string,
 	search?: { page?: number; search?: string }
 ) {
-	const defaultView = getDefaultViewLegacy();
 	return loadView( {
 		kind: 'postType',
 		name: 'wp_template',
 		slug: 'default-new',
-		defaultView,
+		defaultView: DEFAULT_VIEW_LEGACY,
 		activeFilters: getActiveFiltersForTabLegacy( activeView ?? 'all' ),
 		queryParams: search,
 	} );

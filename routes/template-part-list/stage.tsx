@@ -32,7 +32,7 @@ import { CreateTemplatePartModal } from '@wordpress/fields';
  */
 import { unlock } from '../lock-unlock';
 import {
-	getDefaultView,
+	DEFAULT_VIEW,
 	getActiveFiltersForTab,
 	DEFAULT_VIEWS,
 	DEFAULT_LAYOUTS,
@@ -79,9 +79,7 @@ function TemplatePartList() {
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
 
-	const defaultView: View = useMemo( () => {
-		return getDefaultView();
-	}, [] );
+	const defaultView = DEFAULT_VIEW;
 
 	const activeFilters = useMemo(
 		() => getActiveFiltersForTab( area ),
