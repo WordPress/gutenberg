@@ -2766,7 +2766,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * When set to 'all', the selector should be '.wp-block-paragraph' instead of
 	 * '.wp-block-paragraph + .wp-block-paragraph' to apply indent to all paragraphs.
 	 *
-	 * @since 6.8.0
+	 * @since 7.0.0
 	 *
 	 * @param array  $feature_declarations The feature declarations keyed by selector.
 	 * @param array  $settings             The theme.json settings.
