@@ -132,7 +132,7 @@ function useBlockProps( { style } ) {
 	}
 
 	return {
-		className: `has-custom-css ${customCSSIdentifier}`
+		className: `has-custom-css ${ customCSSIdentifier }`,
 	};
 }
 
