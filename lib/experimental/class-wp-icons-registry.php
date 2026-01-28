@@ -19,27 +19,43 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 
 		public function __construct() {
 			$icons_directory = __DIR__ . '/../../packages/icons/src/';
+			$icons_directory = trailingslashit( $icons_directory );
+			$manifest_path   = $icons_directory . 'manifest.php';
 
-			if ( ! is_dir( $icons_directory ) ) {
+			if ( ! is_readable( $manifest_path ) ) {
+				wp_trigger_error(
+					__METHOD__,
+					__( 'Core icon collection manifest is missing or unreadable.', 'gutenberg' )
+				);
 				return;
 			}
 
-			$collection = include $icons_directory . '/manifest.php';
+			$collection = include $manifest_path;
 
 			if ( empty( $collection ) ) {
 				wp_trigger_error(
-					'WP_Icons_Registry::__construct',
-					'Core icon collection manifest is missing or empty',
-					E_USER_ERROR
+					__METHOD__,
+					__( 'Core icon collection manifest is empty or invalid.', 'gutenberg' )
 				);
 				return;
 			}
 
 			foreach ( $collection as $icon_name => $icon_data ) {
+				if (
+					empty( $icon_data['filePath'] )
+					|| ! is_string( $icon_data['filePath'] )
+				) {
+					_doing_it_wrong(
+						__METHOD__,
+						__( 'Core icon collection manifest must provide valid a "filePath" for each icon.', 'gutenberg' ),
+						'7.0.0'
+					);
+					return;
+				}
+
 				$this->register(
 					'core/' . $icon_name,
 					array(
-						'name'     => $icon_name,
 						'label'    => $icon_data['label'],
 						'filePath' => $icons_directory . $icon_data['filePath'],
 					)
@@ -54,7 +70,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 * @param array  $icon_properties {
 		 *     List of properties for the icon.
 		 *
-		 *     @type string $title    Required. A human-readable title for the icon.
+		 *     @type string $label    Required. A human-readable label for the icon.
 		 *     @type string $content  Optional. SVG markup for the icon.
 		 *                            If not provided, the content will be retrieved from the `filePath` if set.
 		 *                            If both `content` and `filePath` are not set, the icon will not be registered.
@@ -72,13 +88,38 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				return false;
 			}
 
+			$allowed_keys = array_flip( array( 'label', 'content', 'filePath' ) );
+			foreach ( array_keys( $icon_properties ) as $key ) {
+				if ( ! array_key_exists( $key, $allowed_keys ) ) {
+					_doing_it_wrong(
+						__METHOD__,
+						sprintf(
+							// translators: %s is the name of any user-provided key
+							__( 'Invalid icon property: "%s".', 'gutenberg' ),
+							$key
+						),
+						'7.0.0'
+					);
+					return false;
+				}
+			}
+
+			if ( ! isset( $icon_properties['label'] ) || ! is_string( $icon_properties['label'] ) ) {
+				_doing_it_wrong(
+					__METHOD__,
+					__( 'Icon label must be a string.', 'gutenberg' ),
+					'7.0.0'
+				);
+				return false;
+			}
+
 			if (
 				( ! isset( $icon_properties['content'] ) && ! isset( $icon_properties['filePath'] ) ) ||
 				( isset( $icon_properties['content'] ) && isset( $icon_properties['filePath'] ) )
 			) {
 				_doing_it_wrong(
 					__METHOD__,
-					__( 'Icons must provide either `content` or `filePath`', 'gutenberg' ),
+					__( 'Icons must provide either `content` or `filePath`.', 'gutenberg' ),
 					'7.0.0'
 				);
 				return false;
@@ -156,7 +197,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 * Retrieves the content of a registered icon.
 		 *
 		 * @param string $icon_name Icon name including namespace.
-		 * @return string|WP_Error The content of the icon.
+		 * @return string|null The content of the icon, if found.
 		 */
 		private function get_content( $icon_name ) {
 			if ( ! isset( $this->registered_icons[ $icon_name ]['content'] ) ) {
@@ -166,12 +207,11 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				$content = $this->sanitize_icon_content( $content );
 
 				if ( empty( $content ) ) {
-					return new WP_Error(
-						'wp-icons-registry-invalid-svg',
-						__( 'Icon content does not contain valid SVG markup.', 'gutenberg' ),
-						'7.0.0'
+					wp_trigger_error(
+						__METHOD__,
+						__( 'Icon content does not contain valid SVG markup.', 'gutenberg' )
 					);
-					return false;
+					return null;
 				}
 
 				$this->registered_icons[ $icon_name ]['content'] = $content;
