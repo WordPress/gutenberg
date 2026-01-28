@@ -194,8 +194,6 @@ function NotesSidebar( { postId } ) {
 						newNoteFormState={ newNoteFormState }
 						setNewNoteFormState={ setNewNoteFormState }
 						commentSidebarRef={ commentSidebarRef }
-						reflowComments={ reflowComments }
-						commentLastUpdated={ commentLastUpdated }
 					/>
 				</PluginSidebar>
 			) }
