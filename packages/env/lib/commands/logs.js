@@ -21,6 +21,13 @@ const { getRuntime, detectRuntime } = require( '../runtime' );
  */
 module.exports = async function logs( { environment, watch, spinner, debug } ) {
 	const config = await loadConfig( path.resolve( '.' ) );
-	const runtime = getRuntime( detectRuntime( config.workDirectoryPath ) );
+	const runtimeName = await detectRuntime( config.workDirectoryPath );
+	if ( ! runtimeName ) {
+		spinner.fail(
+			'Environment not initialized. Run `wp-env start` first.'
+		);
+		process.exit( 1 );
+	}
+	const runtime = getRuntime( runtimeName );
 	await runtime.logs( config, { environment, watch, spinner, debug } );
 };

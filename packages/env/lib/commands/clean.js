@@ -32,7 +32,14 @@ module.exports = async function clean( {
 	debug,
 } ) {
 	const config = await loadConfig( path.resolve( '.' ) );
-	const runtime = getRuntime( detectRuntime( config.workDirectoryPath ) );
+	const runtimeName = await detectRuntime( config.workDirectoryPath );
+	if ( ! runtimeName ) {
+		spinner.fail(
+			'Environment not initialized. Run `wp-env start` first.'
+		);
+		process.exit( 1 );
+	}
+	const runtime = getRuntime( runtimeName );
 
 	await runtime.clean( config, { environment, spinner, debug } );
 

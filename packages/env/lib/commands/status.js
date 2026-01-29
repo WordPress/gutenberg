@@ -70,7 +70,22 @@ module.exports = async function status( { spinner, debug, json } ) {
 	}
 
 	// Detect and get runtime.
-	const runtimeName = detectRuntime( config.workDirectoryPath );
+	const runtimeName = await detectRuntime( config.workDirectoryPath );
+	if ( ! runtimeName ) {
+		spinner.stop();
+		if ( json ) {
+			console.log(
+				JSON.stringify( {
+					status: 'uninitialized',
+					workDirectoryPath: config.workDirectoryPath,
+					configDirectoryPath: config.configDirectoryPath,
+				} )
+			);
+		} else {
+			console.log( formatNotInitialized( config ) );
+		}
+		return;
+	}
 	const runtime = getRuntime( runtimeName );
 
 	// Get status from runtime.
