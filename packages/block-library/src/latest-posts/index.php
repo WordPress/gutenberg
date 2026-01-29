@@ -15,6 +15,16 @@ global $block_core_latest_posts_excerpt_length;
 $block_core_latest_posts_excerpt_length = 0;
 
 /**
+ * Stack of post IDs currently being rendered in full content mode.
+ * Used to prevent infinite recursion when a Latest Posts block appears
+ * in a post that it's trying to display.
+ *
+ * @var array
+ */
+global $block_core_latest_posts_rendering_stack;
+$block_core_latest_posts_rendering_stack = array();
+
+/**
  * Callback for the excerpt_length filter used by
  * the Latest Posts block at render time.
  *
@@ -35,15 +45,16 @@ function block_core_latest_posts_get_excerpt_length() {
  *
  * @since 5.0.0
  *
- * @global WP_Post $post                                   Global post object.
- * @global int     $block_core_latest_posts_excerpt_length Excerpt length set by the Latest Posts core block.
+ * @global WP_Post $post                                      Global post object.
+ * @global int     $block_core_latest_posts_excerpt_length    Excerpt length set by the Latest Posts core block.
+ * @global array   $block_core_latest_posts_rendering_stack   Stack of post IDs being rendered to prevent recursion.
  *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the post content with latest posts added.
  */
 function render_block_core_latest_posts( $attributes ) {
-	global $post, $block_core_latest_posts_excerpt_length;
+	global $post, $block_core_latest_posts_excerpt_length, $block_core_latest_posts_rendering_stack;
 
 	$args = array(
 		'posts_per_page'      => $attributes['postsToShow'],
@@ -188,8 +199,20 @@ function render_block_core_latest_posts( $attributes ) {
 			if ( post_password_required( $post ) ) {
 				$post_content = __( 'This content is password protected.' );
 			} else {
-				// Parse blocks so they are properly rendered with styles and attributes.
-				$post_content = do_blocks( $post_content );
+				// Check if we're already rendering this post to prevent infinite recursion.
+				if ( in_array( $post->ID, $block_core_latest_posts_rendering_stack, true ) ) {
+					// Skip rendering to prevent recursion.
+					$post_content = '';
+				} else {
+					// Add this post to the rendering stack.
+					$block_core_latest_posts_rendering_stack[] = $post->ID;
+
+					// Parse blocks so they are properly rendered with styles and attributes.
+					$post_content = do_blocks( $post_content );
+
+					// Remove this post from the rendering stack.
+					array_pop( $block_core_latest_posts_rendering_stack );
+				}
 			}
 
 			$list_items_markup .= sprintf(
