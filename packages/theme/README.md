@@ -89,7 +89,7 @@ Semantic tokens follow a consistent naming pattern:
 
 | Value                               | Description          |
 | ----------------------------------- | -------------------- |
-| `2xs`, `xs`, `sm`, `md`, `lg`, `xl` | Size scale modifiers |
+| `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` | Size scale modifiers |
 
 #### Color Token Modifiers
 

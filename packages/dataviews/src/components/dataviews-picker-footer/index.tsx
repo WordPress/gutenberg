@@ -88,7 +88,7 @@ function ActionButtons< Item >( {
 	);
 
 	return (
-		<Stack direction="row" gap="2xs">
+		<Stack direction="row" gap="xs">
 			{ actions.map( ( action ) => {
 				// Only support actions with callbacks for DataViewsPicker.
 				// This is because many use cases of the picker will be already within modals.

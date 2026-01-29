@@ -124,7 +124,7 @@ function ActivityItem< Item >(
 			<Stack direction="row" gap="md" justify="start" align="flex-start">
 				<Stack
 					direction="column"
-					gap="2xs"
+					gap="xs"
 					align="center"
 					className="dataviews-view-activity__item-type"
 				>

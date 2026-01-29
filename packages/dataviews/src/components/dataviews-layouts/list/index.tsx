@@ -320,7 +320,7 @@ function ListItem< Item >( {
 					{ renderedMediaField }
 					<Stack
 						direction="column"
-						gap="2xs"
+						gap="xs"
 						className="dataviews-view-list__field-wrapper"
 					>
 						<Stack direction="row" align="center">
