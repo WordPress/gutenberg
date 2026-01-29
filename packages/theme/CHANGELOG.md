@@ -2,9 +2,16 @@
 
 ## Unreleased
 
-## 0.6.0 (2026-01-29)
+### Breaking changes
 
-## 0.5.0 (2026-01-16)
+-   Renamed padding tokens to remove the `surface` segment and updated the scale from `2xs`–`lg` to `2xs`–`2xl`. To preserve the same values:
+		- `--wpds-dimension-padding-surface-2xs`: use `--wpds-dimension-padding-2xs` instead.
+		- `--wpds-dimension-padding-surface-xs`: use `--wpds-dimension-padding-xs` instead.
+		- `--wpds-dimension-padding-surface-sm`: use `--wpds-dimension-padding-md` instead.
+		- `--wpds-dimension-padding-surface-md`: use `--wpds-dimension-padding-xl` instead.
+		- `--wpds-dimension-padding-surface-lg`: use `--wpds-dimension-padding-2xl` instead.
+
+## 0.6.0 (2026-01-29)
 
 ### Breaking changes
 
@@ -18,6 +25,10 @@
 		- `--wpds-border-width-surface-md`: use `--wpds-border-width-md` instead.
 		- `--wpds-border-width-surface-lg`: use `--wpds-border-width-lg` instead.
 		- `--wpds-border-width-interactive-focus`: use `--wpds-border-width-focus` instead.
+
+## 0.5.0 (2026-01-16)
+
+### Breaking changes
 
 -   Removed the following tokens ([#74470](https://github.com/WordPress/gutenberg/pull/74470)):
 		- `--wpds-color-bg-interactive-neutral`: use `--wpds-color-bg-interactive-neutral-weak` instead.
