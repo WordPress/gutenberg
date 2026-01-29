@@ -100,9 +100,9 @@ function ActivityItem< Item >(
 	const verticalGap = useMemo( () => {
 		switch ( density ) {
 			case 'comfortable':
-				return 'sm';
+				return 'md';
 			default:
-				return 'xs';
+				return 'sm';
 		}
 	}, [ density ] );
 
@@ -121,7 +121,7 @@ function ActivityItem< Item >(
 				density === 'comfortable' && 'is-comfortable'
 			) }
 		>
-			<Stack direction="row" gap="md" justify="start" align="flex-start">
+			<Stack direction="row" gap="lg" justify="start" align="flex-start">
 				<Stack
 					direction="column"
 					gap="xs"

@@ -109,7 +109,7 @@ export default function FormDetailsField< Item >( {
 				<Stack
 					direction="row"
 					align="center"
-					gap="sm"
+					gap="md"
 					className="dataforms-layouts-details__summary-content"
 				>
 					{ summaryContent }

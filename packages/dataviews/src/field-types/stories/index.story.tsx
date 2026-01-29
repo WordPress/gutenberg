@@ -619,7 +619,7 @@ const FieldTypeStory = ( {
 		null;
 
 	return (
-		<Stack direction="row" gap="xs" align="stretch">
+		<Stack direction="row" gap="sm" align="stretch">
 			<div style={ { flex: 2 } }>
 				<DataViews
 					getItemId={ ( item ) => item.id.toString() }
@@ -649,7 +649,7 @@ const FieldTypeStory = ( {
 				/>
 			</div>
 			{ selectedItem ? (
-				<Stack direction="column" gap="xs" align="top">
+				<Stack direction="column" gap="sm" align="top">
 					<DataForm
 						data={ selectedItem }
 						form={ form }
@@ -673,7 +673,7 @@ const FieldTypeStory = ( {
 			) : (
 				<Stack
 					direction="column"
-					gap="xs"
+					gap="sm"
 					align="center"
 					justify="center"
 				>

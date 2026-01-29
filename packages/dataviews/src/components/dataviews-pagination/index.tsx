@@ -51,7 +51,7 @@ export function DataViewsPagination() {
 				className="dataviews-pagination"
 				justify="end"
 				align="center"
-				gap="lg"
+				gap="xl"
 			>
 				<Stack
 					direction="row"

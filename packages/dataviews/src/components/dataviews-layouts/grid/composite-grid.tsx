@@ -222,7 +222,7 @@ const GridItem = forwardRef( function GridItem< Item >(
 					<Stack
 						direction="row"
 						className="dataviews-view-grid__badge-fields"
-						gap="xs"
+						gap="sm"
 						wrap="wrap"
 						align="top"
 						justify="flex-start"
