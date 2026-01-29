@@ -8,7 +8,7 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock, parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -16,6 +16,7 @@ import { useMemo } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import VisualEditor from '../visual-editor';
+import { preserveClientIds } from './preserve-client-ids';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 
@@ -39,10 +40,13 @@ export default function RevisionsCanvas() {
 		[]
 	);
 
+	// Track previously rendered blocks to preserve clientIds between renders.
+	const previousBlocksRef = useRef( [] );
+
 	const blocks = useMemo( () => {
-		const parsedBlocks = parse( revision?.content?.raw ?? '' );
+		let parsedBlocks = parse( revision?.content?.raw ?? '' );
 		if ( postType === 'wp_navigation' ) {
-			return [
+			parsedBlocks = [
 				createBlock(
 					'core/navigation',
 					{ templateLock: false },
@@ -50,7 +54,17 @@ export default function RevisionsCanvas() {
 				),
 			];
 		}
-		return parsedBlocks;
+
+		// Preserve clientIds from previous render to prevent React unmount/remount.
+		const blocksWithStableIds = preserveClientIds(
+			parsedBlocks,
+			previousBlocksRef.current
+		);
+
+		// Update ref for next render.
+		previousBlocksRef.current = blocksWithStableIds;
+
+		return blocksWithStableIds;
 	}, [ revision?.content?.raw, postType ] );
 
 	const settings = useMemo(

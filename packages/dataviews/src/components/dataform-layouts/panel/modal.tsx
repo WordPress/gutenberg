@@ -12,8 +12,8 @@ import {
 	Modal,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useContext, useState, useMemo } from '@wordpress/element';
-import { useFocusOnMount } from '@wordpress/compose';
+import { useContext, useMemo, useRef, useState } from '@wordpress/element';
+import { useFocusOnMount, useMergeRefs } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -29,6 +29,7 @@ import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useFormValidity from '../../../hooks/use-form-validity';
+import useReportValidity from '../../../hooks/use-report-validity';
 import DataFormContext from '../../dataform-context';
 
 function ModalContent< Item >( {
@@ -37,12 +38,14 @@ function ModalContent< Item >( {
 	onChange,
 	fieldLabel,
 	onClose,
+	touched,
 }: {
 	data: Item;
 	field: NormalizedFormField;
 	onChange: ( data: Partial< Item > ) => void;
 	onClose: () => void;
 	fieldLabel: string;
+	touched: boolean;
 } ) {
 	const { fields } = useContext( DataFormContext );
 	const [ changes, setChanges ] = useState< Partial< Item > >( {} );
@@ -92,6 +95,12 @@ function ModalContent< Item >( {
 	};
 
 	const focusOnMountRef = useFocusOnMount( 'firstInputElement' );
+	const contentRef = useRef< HTMLDivElement >( null );
+	const mergedRef = useMergeRefs( [ focusOnMountRef, contentRef ] );
+
+	// When the modal is opened after being previously closed (touched),
+	// trigger reportValidity to show field-level errors.
+	useReportValidity( contentRef, touched );
 
 	return (
 		<Modal
@@ -101,7 +110,7 @@ function ModalContent< Item >( {
 			title={ fieldLabel }
 			size="medium"
 		>
-			<div ref={ focusOnMountRef }>
+			<div ref={ mergedRef }>
 				<DataFormLayout
 					data={ modalData }
 					form={ form }
@@ -152,7 +161,8 @@ function PanelModal< Item >( {
 	labelPosition,
 	summaryFields,
 	fieldDefinition,
-	onOpen,
+	onClose: onCloseCallback,
+	touched,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -160,11 +170,17 @@ function PanelModal< Item >( {
 	labelPosition: 'side' | 'top' | 'none';
 	summaryFields: NormalizedField< Item >[];
 	fieldDefinition: NormalizedField< Item >;
-	onOpen?: () => void;
+	onClose?: () => void;
+	touched: boolean;
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
+
+	const handleClose = () => {
+		setIsOpen( false );
+		onCloseCallback?.();
+	};
 
 	return (
 		<>
@@ -174,12 +190,7 @@ function PanelModal< Item >( {
 				labelPosition={ labelPosition }
 				fieldLabel={ fieldLabel }
 				disabled={ fieldDefinition.readOnly === true }
-				onClick={ () => {
-					if ( onOpen ) {
-						onOpen();
-					}
-					setIsOpen( true );
-				} }
+				onClick={ () => setIsOpen( true ) }
 				aria-expanded={ isOpen }
 			/>
 			{ isOpen && (
@@ -188,7 +199,8 @@ function PanelModal< Item >( {
 					field={ field }
 					onChange={ onChange }
 					fieldLabel={ fieldLabel ?? '' }
-					onClose={ () => setIsOpen( false ) }
+					onClose={ handleClose }
+					touched={ touched }
 				/>
 			) }
 		</>

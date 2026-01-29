@@ -94,10 +94,10 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => Record< string, string >;
-	getAwareness: (
+	getAwareness: < State extends AwarenessState< any > >(
 		objectType: ObjectType,
 		objectId: ObjectID
-	) => AwarenessState | undefined;
+	) => State | undefined;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,

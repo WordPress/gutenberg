@@ -18,6 +18,7 @@
 		- `--wpds-dimension-gap-md`: use `--wpds-dimension-gap-lg` instead.
 		- `--wpds-dimension-gap-lg`: use `--wpds-dimension-gap-xl` instead.
 		- `--wpds-dimension-gap-xl`: use `--wpds-dimension-gap-2xl` instead.
+## 0.6.0 (2026-01-29)
 
 ## 0.5.0 (2026-01-16)
 

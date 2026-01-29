@@ -134,7 +134,6 @@ export function createSyncManager(): SyncManager {
 
 		// If the sync config supports awareness, create it.
 		const awareness = syncConfig.createAwareness?.( ydoc, objectId );
-		awareness?.setUp();
 
 		// When the CRDT document is updated by an UndoManager or a connection (not
 		// a local origin), update the local store.
@@ -326,14 +325,15 @@ export function createSyncManager(): SyncManager {
 	/**
 	 * Get the awareness instance for the given object type and object ID, if supported.
 	 *
+	 * @template {AwarenessState<any>} State
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
-	 * @return {AwarenessState | undefined} The awareness instance, or undefined if not supported.
+	 * @return {State | undefined} The awareness instance, or undefined if not supported.
 	 */
-	function getAwareness(
+	function getAwareness< State extends AwarenessState< any > >(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): AwarenessState | undefined {
+	): State | undefined {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
@@ -341,7 +341,7 @@ export function createSyncManager(): SyncManager {
 			return undefined;
 		}
 
-		return entityState.awareness;
+		return entityState.awareness as State;
 	}
 
 	/**
