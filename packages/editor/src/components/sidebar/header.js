@@ -19,8 +19,8 @@ import { sidebars } from './constants';
 const { Tabs } = unlock( componentsPrivateApis );
 
 const SidebarHeader = ( _, ref ) => {
-	const { postTypeLabel, isAttachment, isImageAttachment, isRevisionsMode } = useSelect(
-		( select ) => {
+	const { postTypeLabel, isAttachment, isImageAttachment, isRevisionsMode } =
+		useSelect( ( select ) => {
 			const { getPostTypeLabel, getCurrentPostType, getCurrentPostId } =
 				select( editorStore );
 			const { isRevisionsMode: _isRevisionsMode } = unlock(
@@ -48,9 +48,7 @@ const SidebarHeader = ( _, ref ) => {
 				isImageAttachment: _isImageAttachment,
 				isRevisionsMode: _isRevisionsMode(),
 			};
-		},
-		[]
-	);
+		}, [] );
 
 	let documentLabel;
 	if ( isRevisionsMode ) {
