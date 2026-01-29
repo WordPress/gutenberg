@@ -3,10 +3,10 @@
 /**
  * External dependencies
  */
-import { createRequire } from 'module';
+import { createRequire, findPackageJSON } from 'module';
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
 
 /**
  * Internal dependencies
@@ -36,11 +36,32 @@ const ignored = [
  * Resolve a package's path using Node's resolution algorithm.
  * This works regardless of package manager (npm, pnpm, yarn, etc.).
  *
+ * Uses `findPackageJSON` from node:module (available in Node.js 22.14.0+)
+ * for cleaner resolution, with a fallback for older Node.js versions.
+ *
  * @param {string} packageName - Name of the package to resolve
  * @param {string} fromDir     - Directory to resolve from
  * @return {string|null} Path to the package directory, or null if not found
  */
 function resolvePackagePath( packageName, fromDir ) {
+	// Use findPackageJSON when available (Node.js 22.14.0+)
+	if ( findPackageJSON ) {
+		try {
+			const parentURL = pathToFileURL(
+				path.join( fromDir, 'package.json' )
+			);
+
+			const pkgJsonPath = findPackageJSON( packageName, parentURL );
+			if ( pkgJsonPath ) {
+				return path.dirname( pkgJsonPath );
+			}
+		} catch {
+			// Package not found, fall through to return null
+		}
+		return null;
+	}
+
+	// Fallback for older Node.js versions (< 22.14.0)
 	try {
 		// Try to resolve the package.json directly first
 		const resolved = require.resolve( `${ packageName }/package.json`, {
