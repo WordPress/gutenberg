@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
 import { IconButton } from '../index';
 
 const meta: Meta< typeof IconButton > = {
-	title: 'Design System/IconButton',
+	title: 'Design System/Components/IconButton',
 	component: IconButton,
 	argTypes: {
 		'aria-pressed': {
