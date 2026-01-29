@@ -5,6 +5,10 @@ import {
 	type Ref,
 } from 'react';
 
+export type DistributiveOmit< T, K extends PropertyKey > = T extends T
+	? Omit< T, K >
+	: never;
+
 type HTMLAttributesWithRef< T extends ElementType = any > =
 	HTMLAttributes< T > & { ref?: Ref< T > | undefined };
 
