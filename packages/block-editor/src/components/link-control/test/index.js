@@ -3407,8 +3407,47 @@ describe( 'URL validation', () => {
 		// Click the button - validation will run and prevent submission
 		await user.click( submitButton );
 
-		// Assert the validation error is displayed
-		expect( screen.getByText( 'Please enter a valid URL.' ) ).toBeVisible();
+		// Wait for the next frame where validation error appears
+		await waitFor(
+			() => {
+				expect(
+					screen.getByText( 'Please enter a valid URL.' )
+				).toBeVisible();
+			},
+			{ timeout: 100 }
+		);
+
+		// onChange should not be called because validation prevented submission
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should show validation error when pressing Enter to submit with an invalid URL', async () => {
+		// When editing an existing link, use Apply button
+		const existingLink = { url: 'https://example.com', title: 'Example' };
+		render(
+			<LinkControl
+				value={ existingLink }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox' );
+		await user.clear( searchInput );
+		await user.type( searchInput, 'invalid url' );
+
+		// Click without blur - use fireEvent for synchronous click
+		triggerEnter( searchInput );
+
+		// Wait for the next frame where validation error appears
+		await waitFor(
+			() => {
+				expect(
+					screen.getByText( 'Please enter a valid URL.' )
+				).toBeVisible();
+			},
+			{ timeout: 100 }
+		);
 
 		// onChange should not be called because validation prevented submission
 		expect( mockOnChange ).not.toHaveBeenCalled();
