@@ -42,8 +42,9 @@ function isEnvironmentInitialized( config ) {
  * @param {Object}  options
  * @param {Object}  options.spinner A CLI spinner which indicates progress.
  * @param {boolean} options.debug   True if debug mode is enabled.
+ * @param {boolean} options.json    True to output as JSON.
  */
-module.exports = async function status( { spinner, debug } ) {
+module.exports = async function status( { spinner, debug, json } ) {
 	spinner.text = 'Getting environment status.';
 
 	const config = await loadConfig( path.resolve( '.' ) );
@@ -54,7 +55,17 @@ module.exports = async function status( { spinner, debug } ) {
 	// when `wp-env start` is actually run.
 	if ( ! isEnvironmentInitialized( config ) ) {
 		spinner.stop();
-		console.log( formatNotInitialized( config ) );
+		if ( json ) {
+			console.log(
+				JSON.stringify( {
+					status: 'uninitialized',
+					workDirectoryPath: config.workDirectoryPath,
+					configDirectoryPath: config.configDirectoryPath,
+				} )
+			);
+		} else {
+			console.log( formatNotInitialized( config ) );
+		}
 		return;
 	}
 
@@ -66,7 +77,11 @@ module.exports = async function status( { spinner, debug } ) {
 	const statusData = await runtime.getStatus( config, { spinner, debug } );
 
 	spinner.stop();
-	console.log( formatStatus( statusData ) );
+	if ( json ) {
+		console.log( JSON.stringify( statusData ) );
+	} else {
+		console.log( formatStatus( statusData ) );
+	}
 };
 
 /**
