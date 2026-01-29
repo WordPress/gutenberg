@@ -4,7 +4,7 @@
  * Handles building worker bundles and generating inline worker code
  * for packages that define wpWorkers in their package.json.
  *
- * @package gutenberg
+ * @package
  */
 
 /**
@@ -54,12 +54,12 @@ export const workerCode = '/* Placeholder - run npm run build to generate actual
  *
  * Workers are bundled as self-contained files with all dependencies included.
  *
- * @param {string}   packageDir       Path to the package directory.
- * @param {Object}   packageJson      Parsed package.json contents.
- * @param {Object}   options          Build options.
- * @param {string}   options.buildDir Path to the CJS build directory.
- * @param {string}   options.buildModuleDir Path to the ESM build-module directory.
- * @param {string[]} options.target   esbuild target configuration.
+ * @param {string}   packageDir               Path to the package directory.
+ * @param {Object}   packageJson              Parsed package.json contents.
+ * @param {Object}   options                  Build options.
+ * @param {string}   options.buildDir         Path to the CJS build directory.
+ * @param {string}   options.buildModuleDir   Path to the ESM build-module directory.
+ * @param {string[]} options.target           esbuild target configuration.
  * @param {Object}   options.wasmInlinePlugin The WASM inline plugin for esbuild.
  */
 export async function buildWorkers(
@@ -148,15 +148,15 @@ export async function buildWorkers(
  * Creates worker-code.ts with bundled content for Blob URL loading,
  * then re-transpiles it to the output directories.
  *
- * @param {string}   packageDir       Path to the package directory.
- * @param {string}   packageName      Name of the package.
- * @param {Object}   packageJson      Parsed package.json contents.
- * @param {Object}   options          Build options.
- * @param {string}   options.srcDir   Path to the source directory.
- * @param {string}   options.buildDir Path to the CJS build directory.
+ * @param {string}   packageDir             Path to the package directory.
+ * @param {string}   packageName            Name of the package.
+ * @param {Object}   packageJson            Parsed package.json contents.
+ * @param {Object}   options                Build options.
+ * @param {string}   options.srcDir         Path to the source directory.
+ * @param {string}   options.buildDir       Path to the CJS build directory.
  * @param {string}   options.buildModuleDir Path to the ESM build-module directory.
- * @param {string[]} options.target   esbuild target configuration.
- * @param {Array}    options.plugins  esbuild plugins for transpilation.
+ * @param {string[]} options.target         esbuild target configuration.
+ * @param {Array}    options.plugins        esbuild plugins for transpilation.
  */
 export async function generateWorkerCode(
 	packageDir,
