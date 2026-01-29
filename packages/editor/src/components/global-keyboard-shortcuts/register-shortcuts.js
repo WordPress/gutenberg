@@ -144,6 +144,16 @@ function EditorKeyboardShortcutsRegister() {
 				},
 			],
 		} );
+
+		registerShortcut( {
+			name: 'core/editor/add-note',
+			category: 'block',
+			description: __( 'Add a note to the selected block.' ),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'm',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return <BlockEditorKeyboardShortcuts.Register />;
