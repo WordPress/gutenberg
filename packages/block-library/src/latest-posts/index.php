@@ -15,16 +15,6 @@ global $block_core_latest_posts_excerpt_length;
 $block_core_latest_posts_excerpt_length = 0;
 
 /**
- * Stack of post IDs currently being rendered in full content mode.
- * Used to prevent infinite recursion when a Latest Posts block appears
- * in a post that it's trying to display.
- *
- * @var array
- */
-global $block_core_latest_posts_rendering_stack;
-$block_core_latest_posts_rendering_stack = array();
-
-/**
  * Callback for the excerpt_length filter used by
  * the Latest Posts block at render time.
  *
@@ -47,14 +37,14 @@ function block_core_latest_posts_get_excerpt_length() {
  *
  * @global WP_Post $post                                      Global post object.
  * @global int     $block_core_latest_posts_excerpt_length    Excerpt length set by the Latest Posts core block.
- * @global array   $block_core_latest_posts_rendering_stack   Stack of post IDs being rendered to prevent recursion.
  *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the post content with latest posts added.
  */
 function render_block_core_latest_posts( $attributes ) {
-	global $post, $block_core_latest_posts_excerpt_length, $block_core_latest_posts_rendering_stack;
+	global $post, $block_core_latest_posts_excerpt_length;
+	static $rendering_stack = array();
 
 	$args = array(
 		'posts_per_page'      => $attributes['postsToShow'],
@@ -200,18 +190,25 @@ function render_block_core_latest_posts( $attributes ) {
 				$post_content = __( 'This content is password protected.' );
 			} else {
 				// Check if we're already rendering this post to prevent infinite recursion.
-				if ( in_array( $post->ID, $block_core_latest_posts_rendering_stack, true ) ) {
+				if ( in_array( $post->ID, $rendering_stack, true ) ) {
 					// Skip rendering to prevent recursion.
 					$post_content = '';
 				} else {
 					// Add this post to the rendering stack.
-					$block_core_latest_posts_rendering_stack[] = $post->ID;
+					$rendering_stack[] = $post->ID;
 
-					// Parse blocks so they are properly rendered with styles and attributes.
-					$post_content = do_blocks( $post_content );
-
-					// Remove this post from the rendering stack.
-					array_pop( $block_core_latest_posts_rendering_stack );
+					try {
+						// Parse blocks so they are properly rendered with styles and attributes.
+						// This will parse any blocks in the post content, including nested Latest Posts blocks.
+						// If a nested Latest Posts block tries to render this same post (creating recursion),
+						// the check above (in_array check) will detect it and skip rendering that post's content,
+						// preventing infinite recursion while still allowing the nested block to render other posts.
+						$post_content = do_blocks( $post_content );
+					} finally {
+						// Remove this post from the rendering stack.
+						// Using finally ensures cleanup even if do_blocks() throws an exception.
+						array_pop( $rendering_stack );
+					}
 				}
 			}
 
