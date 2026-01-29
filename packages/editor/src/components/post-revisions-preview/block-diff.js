@@ -28,25 +28,6 @@ import { unlock } from '../../lock-unlock';
 const { parseRawBlock } = unlock( blocksPrivateApis );
 
 /**
- * Inject diff status into raw block at top level.
- * Does NOT mark inner blocks - parent styling is sufficient for added/removed.
- *
- * @param {Object} rawBlock Raw block to inject status into.
- * @param {string} status   Diff status ('added' or 'removed').
- * @return {Object} Raw block with injected status.
- */
-function injectDiffStatus( rawBlock, status ) {
-	if ( ! status ) {
-		return rawBlock;
-	}
-
-	return {
-		...rawBlock,
-		__revisionDiffStatus: status,
-	};
-}
-
-/**
  * Calculate text similarity using word diff (semantically meaningful).
  * Returns ratio of unchanged words to total words.
  *
@@ -191,9 +172,10 @@ function diffRawBlocks( currentRaw, previousRaw ) {
 
 		if ( part.added ) {
 			for ( let i = 0; i < part.count; i++ ) {
-				result.push(
-					injectDiffStatus( currentRaw[ currIdx++ ], 'added' )
-				);
+				result.push( {
+					...currentRaw[ currIdx++ ],
+					__revisionDiffStatus: 'added',
+				} );
 			}
 		} else if ( part.removed ) {
 			// Check for 1:1 modification pattern: exactly 1 removed followed by exactly 1 added.
@@ -227,9 +209,10 @@ function diffRawBlocks( currentRaw, previousRaw ) {
 			} else {
 				// Multiple removals or no matching addition - mark all as removed.
 				for ( let i = 0; i < part.count; i++ ) {
-					result.push(
-						injectDiffStatus( previousRaw[ prevIdx++ ], 'removed' )
-					);
+					result.push( {
+						...previousRaw[ prevIdx++ ],
+						__revisionDiffStatus: 'removed',
+					} );
 				}
 			}
 		} else {
@@ -576,28 +559,6 @@ function applyDiffRecursively( parsedBlock, rawBlock ) {
 }
 
 /**
- * Parse a raw block and apply diff status and rich text diffs.
- * Diff status is stored at the top level of raw blocks (not in attrs)
- * so it survives parseRawBlock's attribute filtering.
- *
- * @param {Object} rawBlock Raw block with potential diff status.
- * @return {Object|undefined} Parsed block with diff status applied.
- */
-function parseRawBlockWithDiffStatus( rawBlock ) {
-	// Parse the raw block (this recursively parses inner blocks too).
-	const parsed = parseRawBlock( rawBlock );
-
-	if ( ! parsed ) {
-		return undefined;
-	}
-
-	// Apply diff status and rich text diffs to the parsed block tree.
-	applyDiffRecursively( parsed, rawBlock );
-
-	return parsed;
-}
-
-/**
  * Diff two revision contents at the grammar level.
  *
  * @param {string} currentContent  Current revision's raw content.
@@ -612,8 +573,14 @@ export function diffRevisionContent( currentContent, previousContent ) {
 	// Diff the raw block arrays.
 	const mergedRaw = diffRawBlocks( currentRaw, previousRaw );
 
-	// Convert each raw block to full block, preserving diff status.
+	// Parse each raw block and apply diff status.
 	return mergedRaw
-		.map( ( rawBlock ) => parseRawBlockWithDiffStatus( rawBlock ) )
+		.map( ( rawBlock ) => {
+			const parsed = parseRawBlock( rawBlock );
+			if ( parsed ) {
+				applyDiffRecursively( parsed, rawBlock );
+			}
+			return parsed;
+		} )
 		.filter( Boolean );
 }

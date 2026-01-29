@@ -15,10 +15,10 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 function collectDiffBlocks( blocks ) {
 	const result = [];
 	for ( const block of blocks ) {
-		if ( block.attributes?.__revisionDiffStatus ) {
+		if ( block.__revisionDiffStatus ) {
 			result.push( {
 				clientId: block.clientId,
-				status: block.attributes.__revisionDiffStatus,
+				status: block.__revisionDiffStatus,
 			} );
 		}
 		if ( block.innerBlocks?.length ) {
@@ -38,8 +38,6 @@ function collectDiffBlocks( blocks ) {
 export default function DiffMarkers() {
 	const [ positions, setPositions ] = useState( {} );
 	const [ ownerDoc, setOwnerDoc ] = useState( null );
-
-	// Get blocks with diff status from store
 	const blocks = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks(),
 		[]
