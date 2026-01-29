@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.4.0-next.0 (2026-01-29)
+
 ### Enhancements
 - DataViews: Add details form layout validation. [#74996](https://github.com/WordPress/gutenberg/pull/74996)
 

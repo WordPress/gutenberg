@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.0.0-next.0 (2026-01-29)
+
 ### Breaking Changes
 
 -   Replaced `install-path` command with `status` command. The work directory path is now available as part of the status output.
