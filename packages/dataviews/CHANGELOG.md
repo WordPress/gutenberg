@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.3.0 (2026-01-29)
+
 ### Enhancements
 
 - DataViews: Add card form layout validation. [#74547](https://github.com/WordPress/gutenberg/pull/74547)
