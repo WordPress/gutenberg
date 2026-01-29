@@ -20,6 +20,10 @@ const InspectorControlsLastItem = ( props ) => {
 	}
 	return <Fill { ...props } />;
 };
-InspectorControlsLastItem.Slot = ( props ) => <Slot { ...props } />;
+InspectorControlsLastItem.Slot = function InspectorControlsLastItemSlot(
+	props
+) {
+	return <Slot { ...props } />;
+};
 
 export default InspectorControlsLastItem;
