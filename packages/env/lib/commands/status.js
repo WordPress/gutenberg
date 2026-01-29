@@ -59,8 +59,8 @@ module.exports = async function status( { spinner, debug, json } ) {
 			console.log(
 				JSON.stringify( {
 					status: 'uninitialized',
-					workDirectoryPath: config.workDirectoryPath,
-					configDirectoryPath: config.configDirectoryPath,
+					installPath: config.workDirectoryPath,
+					configPath: config.configDirectoryPath,
 				} )
 			);
 		} else {
@@ -114,8 +114,8 @@ function formatStatus( status ) {
 	let output = `
 ${ chalk.bold( 'status' ) }: ${ statusColor( status.status ) }
 ${ indent }runtime: ${ chalk.dim( status.runtime ) }
-${ indent }install path: ${ chalk.dim( status.workDirectoryPath ) }
-${ indent }config: ${ chalk.dim( status.configDirectoryPath ) }
+${ indent }install path: ${ chalk.dim( status.installPath ) }
+${ indent }config: ${ chalk.dim( status.configPath ) }
 `;
 
 	// Environment section.

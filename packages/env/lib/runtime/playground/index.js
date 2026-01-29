@@ -429,8 +429,8 @@ class PlaygroundRuntime {
 				multisite: envConfig.multisite,
 				xdebug: 'off',
 			},
-			configDirectoryPath: config.configDirectoryPath,
-			workDirectoryPath: config.workDirectoryPath,
+			configPath: config.configDirectoryPath,
+			installPath: config.workDirectoryPath,
 		};
 	}
 

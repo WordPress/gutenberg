@@ -640,8 +640,8 @@ class DockerRuntime {
 				multisite: fullConfig.env.development.multisite,
 				xdebug: fullConfig.xdebug || 'off',
 			},
-			configDirectoryPath: fullConfig.configDirectoryPath,
-			workDirectoryPath: fullConfig.workDirectoryPath,
+			configPath: fullConfig.configDirectoryPath,
+			installPath: fullConfig.workDirectoryPath,
 		};
 	}
 
