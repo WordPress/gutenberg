@@ -1,11 +1,17 @@
 import type { Fieldset as _Fieldset } from '@base-ui/react';
 import type { ComponentProps } from '../../../utils/types';
 
-export type FieldsetRootProps = ComponentProps< typeof _Fieldset.Root > & {
+export type FieldsetRootProps = ComponentProps<
+	typeof _Fieldset.Root,
+	_Fieldset.Root.State
+> & {
 	children?: React.ReactNode;
 };
 
-export type FieldsetLegendProps = ComponentProps< typeof _Fieldset.Legend > & {
+export type FieldsetLegendProps = ComponentProps<
+	typeof _Fieldset.Legend,
+	_Fieldset.Legend.State
+> & {
 	children?: React.ReactNode;
 };
 
