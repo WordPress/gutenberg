@@ -132,7 +132,7 @@ class WP_Duotone_Gutenberg {
 	 * Direct port of colord's clamp function. Using min/max instead of
 	 * nested ternaries.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L23
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L23
 	 *
 	 * @param float $number The number to clamp.
 	 * @param float $min   The minimum value.
@@ -146,7 +146,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's clampHue function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L32
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L32
 	 *
 	 * @param float $degrees The hue to clamp.
 	 * @return float The clamped hue.
@@ -159,7 +159,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's parseHue function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L40
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L40
 	 *
 	 * @param float  $value The hue value to parse.
 	 * @param string $unit  The unit of the hue value.
@@ -183,7 +183,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's parseHex function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hex.ts#L8
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hex.ts#L8
 	 *
 	 * @param string $hex The hex string to parse.
 	 * @return array|null An array of RGBA values or null if the hex string is invalid.
@@ -225,7 +225,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's clampRgba function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/rgb.ts#L5
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/rgb.ts#L5
 	 *
 	 * @param array $rgba The RGBA array to clamp.
 	 * @return array The clamped RGBA array.
@@ -242,7 +242,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's parseRgbaString function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/rgbString.ts#L18
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/rgbString.ts#L18
 	 *
 	 * @param string $input The RGBA string to parse.
 	 * @return array|null An array of RGBA values or null if the RGB string is invalid.
@@ -293,7 +293,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's clampHsla function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L6
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L6
 	 *
 	 * @param array $hsla The HSLA array to clamp.
 	 * @return array The clamped HSLA array.
@@ -310,7 +310,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's hsvaToRgba function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsv.ts#L52
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsv.ts#L52
 	 *
 	 * @param array $hsva The HSVA array to convert.
 	 * @return array The RGBA array.
@@ -338,7 +338,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's hslaToHsva function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L33
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L33
 	 *
 	 * @param array $hsla The HSLA array to convert.
 	 * @return array The HSVA array.
@@ -362,7 +362,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's hslaToRgba function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L55
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L55
 	 *
 	 * @param array $hsla The HSLA array to convert.
 	 * @return array The RGBA array.
@@ -374,7 +374,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's parseHslaString function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hslString.ts#L17
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hslString.ts#L17
 	 *
 	 * @param string $input The HSLA string to parse.
 	 * @return array|null An array of RGBA values or null if the RGB string is invalid.
@@ -424,7 +424,7 @@ class WP_Duotone_Gutenberg {
 	 * Direct port of colord's parse function simplified for our use case. This
 	 * version only supports string parsing and only returns RGBA values.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/parse.ts#L37
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/parse.ts#L37
 	 *
 	 * @param string $input The string to parse.
 	 * @return array|null An array of RGBA values or null if the string is invalid.

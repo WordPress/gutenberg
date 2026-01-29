@@ -17,6 +17,7 @@ import {
 	useLocation,
 	useMatches,
 	useRouter,
+	useRouterState,
 } from '@tanstack/react-router';
 
 /**
@@ -50,6 +51,7 @@ lock( privateApis, {
 	useLocation,
 	useMatches,
 	useRouter,
+	useRouterState,
 
 	// History utilities
 	parseHref,

@@ -46,3 +46,4 @@ const UnforwardedValidatedInputControl = (
 export const ValidatedInputControl = forwardRef(
 	UnforwardedValidatedInputControl
 );
+ValidatedInputControl.displayName = 'ValidatedInputControl';

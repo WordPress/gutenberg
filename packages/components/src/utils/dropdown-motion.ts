@@ -1,4 +1,5 @@
 // Motion configuration for dropdown-like popovers.
+// Keep constants in sync with: packages/ui/src/utils/css/dropdown-motion.module.css
 
 export const DROPDOWN_MOTION = Object.freeze( {
 	SLIDE_DISTANCE: 4,

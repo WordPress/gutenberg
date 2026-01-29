@@ -6,6 +6,37 @@
  */
 
 /**
+ * Returns the submenu visibility value with backward compatibility
+ * for the deprecated openSubmenusOnClick attribute.
+ *
+ * NOTE: Keep this function in sync with getSubmenuVisibility in
+ * packages/block-library/src/navigation/utils/get-submenu-visibility.js
+ *
+ * This function centralizes the migration logic from the boolean
+ * openSubmenusOnClick to the new submenuVisibility enum.
+ *
+ * @since 6.9.0
+ *
+ * @param array $attributes Block attributes containing submenuVisibility and/or openSubmenusOnClick.
+ * @return string The visibility mode: 'hover', 'click', or 'always'.
+ */
+function block_core_navigation_get_submenu_visibility( $attributes ) {
+	$submenu_visibility     = isset( $attributes['submenuVisibility'] ) ? $attributes['submenuVisibility'] : null;
+	$open_submenus_on_click = isset( $attributes['openSubmenusOnClick'] ) ? $attributes['openSubmenusOnClick'] : null;
+
+	// If new attribute is set, use it.
+	if ( null !== $submenu_visibility ) {
+		return $submenu_visibility;
+	}
+
+	// Fall back to old attribute for backward compatibility.
+	// openSubmenusOnClick: true  -> 'click'
+	// openSubmenusOnClick: false -> 'hover'
+	// openSubmenusOnClick: null  -> 'hover' (default)
+	return ! empty( $open_submenus_on_click ) ? 'click' : 'hover';
+}
+
+/**
  * Helper functions used to render the navigation block.
  *
  * @since 6.5.0
@@ -119,9 +150,12 @@ class WP_Navigation_Block_Renderer {
 	 * @return bool Returns whether or not to load the view script.
 	 */
 	private static function is_interactive( $attributes, $inner_blocks ) {
-		$has_submenus       = static::has_submenus( $inner_blocks );
-		$is_responsive_menu = static::is_responsive( $attributes );
-		return ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
+		$has_submenus        = static::has_submenus( $inner_blocks );
+		$is_responsive_menu  = static::is_responsive( $attributes );
+		$computed_visibility = block_core_navigation_get_submenu_visibility( $attributes );
+		$open_on_click       = 'click' === $computed_visibility;
+		$show_submenu_icon   = ! empty( $attributes['showSubmenuIcon'] );
+		return ( $has_submenus && ( $open_on_click || $show_submenu_icon ) ) || $is_responsive_menu;
 	}
 
 	/**
@@ -354,13 +388,17 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		// Parse the template part ID (format: "theme//slug").
+		// If it's just a slug, construct the full ID using the current theme.
 		$parts = explode( '//', $overlay_template_part_id, 2 );
-		if ( count( $parts ) !== 2 ) {
-			return new WP_Block_List( array(), $attributes );
+		if ( count( $parts ) === 2 ) {
+			// Already in "theme//slug" format (backward compatibility).
+			$theme = $parts[0];
+			$slug  = $parts[1];
+		} else {
+			// Just a slug, use current theme.
+			$theme = get_stylesheet();
+			$slug  = $overlay_template_part_id;
 		}
-
-		$theme = $parts[0];
-		$slug  = $parts[1];
 
 		// Only query for template parts from the active theme.
 		if ( get_stylesheet() !== $theme ) {
@@ -390,7 +428,9 @@ class WP_Navigation_Block_Renderer {
 
 		if ( ! $template_part_post ) {
 			// Try to get from theme file if not in database.
-			$block_template = get_block_file_template( $overlay_template_part_id, 'wp_template_part' );
+			// Construct the full template part ID for get_block_file_template.
+			$full_template_part_id = $theme . '//' . $slug;
+			$block_template        = get_block_file_template( $full_template_part_id, 'wp_template_part' );
 			if ( isset( $block_template->content ) ) {
 				$parsed_blocks = parse_blocks( $block_template->content );
 				$blocks        = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
@@ -962,8 +1002,13 @@ class WP_Navigation_Block_Renderer {
 
 		static::handle_view_script_module_loading( $attributes, $block, $inner_blocks );
 
+		// Use div wrapper if this navigation block is within an overlay template part.
+		$is_within_overlay = $attributes['_isWithinOverlayTemplatePart'] ?? false;
+		$tag_name          = $is_within_overlay ? 'div' : 'nav';
+
 		return sprintf(
-			'<nav %1$s>%2$s</nav>',
+			'<%1$s %2$s>%3$s</%1$s>',
+			$tag_name,
 			static::get_nav_attributes( $attributes, $inner_blocks ),
 			static::get_inner_block_markup( $attributes, $inner_blocks )
 		);
@@ -1109,7 +1154,10 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		// event.
 		$tags->set_attribute( 'tabindex', '-1' );
 
-		if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
+		$computed_visibility = block_core_navigation_get_submenu_visibility( $block_attributes );
+		$open_on_hover       = 'hover' === $computed_visibility;
+
+		if ( $open_on_hover ) {
 			$tags->set_attribute( 'data-wp-on--mouseenter', 'actions.openMenuOnHover' );
 			$tags->set_attribute( 'data-wp-on--mouseleave', 'actions.closeMenuOnHover' );
 		}

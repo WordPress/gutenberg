@@ -113,6 +113,7 @@ export default {
 		style,
 		blockName,
 		hasBlockGapSupport,
+		globalBlockGapValue,
 		layoutDefinitions = LAYOUT_DEFINITIONS,
 	} ) {
 		const {
@@ -146,13 +147,28 @@ export default {
 				? getGapCSSValue( style?.spacing?.blockGap, '0.5em' )
 				: undefined;
 
+		// Use the global blockGap value for grid column calculations when available
+		// If the gap value has both top and left (separated by space), use the left value for horizontal calculations
+		let fallbackGapValue = '1.2rem';
+		if ( globalBlockGapValue ) {
+			const processedGap = getGapCSSValue( globalBlockGapValue, '0.5em' );
+			const gapParts = processedGap.split( ' ' );
+			fallbackGapValue =
+				gapParts.length > 1 ? gapParts[ 1 ] : gapParts[ 0 ];
+		}
+
 		let output = '';
 		const rules = [];
 
 		if ( minimumColumnWidth && columnCount > 0 ) {
-			const maxValue = `max(${ minimumColumnWidth }, ( 100% - (${
-				blockGapValue || '1.2rem'
-			}*${ columnCount - 1 }) ) / ${ columnCount })`;
+			let blockGapToUse = blockGapValue || fallbackGapValue;
+			// Ensure 0 values have a unit so they work in calc().
+			if ( blockGapToUse === '0' || blockGapToUse === 0 ) {
+				blockGapToUse = '0px';
+			}
+			const maxValue = `max(min( ${ minimumColumnWidth }, 100%), ( 100% - (${ blockGapToUse }*${
+				columnCount - 1
+			}) ) / ${ columnCount })`;
 			rules.push(
 				`grid-template-columns: repeat(auto-fill, minmax(${ maxValue }, 1fr))`,
 				`container-type: inline-size`

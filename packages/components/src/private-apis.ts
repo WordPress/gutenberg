@@ -14,6 +14,7 @@ import Badge from './badge';
 import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
 import {
 	ValidatedCheckboxControl,
+	ValidatedComboboxControl,
 	ValidatedInputControl,
 	ValidatedNumberControl,
 	ValidatedSelectControl,
@@ -43,6 +44,7 @@ lock( privateApis, {
 	Picker,
 	ValidatedInputControl,
 	ValidatedCheckboxControl,
+	ValidatedComboboxControl,
 	ValidatedNumberControl,
 	ValidatedSelectControl,
 	ValidatedRadioControl,

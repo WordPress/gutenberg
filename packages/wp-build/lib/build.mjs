@@ -5,13 +5,15 @@
  */
 import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
+import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
 import glob from 'fast-glob';
 import chokidar from 'chokidar';
 import browserslistToEsbuild from 'browserslist-to-esbuild';
-import { sassPlugin, postcssModules } from 'esbuild-sass-plugin';
+import { sassPlugin } from 'esbuild-sass-plugin';
 import postcss from 'postcss';
+import postcssModules from 'postcss-modules';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
@@ -133,6 +135,61 @@ function getSassOptions( workingDir ) {
 	};
 }
 
+function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
+	return async function styleType( cssText, _dirname, filePath ) {
+		// Always hash the untransformed code.
+		const hash = createHash( 'sha1' )
+			.update( cssText )
+			.digest( 'hex' )
+			.slice( 0, 10 );
+
+		let moduleExports = null;
+
+		// Transform the code: CSS modules and minification.
+		const plugins = [
+			cssModules &&
+				postcssModules( {
+					generateScopedName: '[contenthash]__[local]',
+					getJSON: ( _, json ) => {
+						moduleExports = json;
+					},
+				} ),
+			minify &&
+				cssnano( {
+					preset: [
+						'default',
+						{ discardComments: { removeAll: true } },
+					],
+				} ),
+		].filter( Boolean );
+
+		const { css } = await postcss( plugins ).process( cssText, {
+			from: filePath,
+			map: false,
+		} );
+
+		let cssModule = `if (typeof document !== 'undefined' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
+	const style = document.createElement("style");
+	style.setAttribute("data-wp-hash", "${ hash }");
+	style.appendChild(document.createTextNode(${ JSON.stringify( css ) }));
+	document.head.appendChild(style);
+}
+`;
+
+		// The CSS modules transform produces an `exports` object with class name mappings.
+		if ( moduleExports ) {
+			const exportsString = JSON.stringify( moduleExports );
+			cssModule += `export default ${ exportsString };\n`;
+		}
+		return cssModule;
+	};
+}
+
+function inlineStyle( contents ) {
+	// The `contents` is already a JS code created by `compileInlineStyle`.
+	return contents;
+}
+
 /**
  * Create style bundling plugins with the given working directory.
  *
@@ -146,10 +203,8 @@ function createStyleBundlingPlugins( workingDir ) {
 		sassPlugin( {
 			embedded: true,
 			filter: /\.module\.(css|scss)$/,
-			transform: postcssModules( {
-				generateScopedName: '[name]__[local]__[hash:base64:5]',
-			} ),
-			type: 'style',
+			transform: compileInlineStyle( { cssModules: true } ),
+			type: inlineStyle,
 			...sassOptions,
 		} ),
 		// Handle regular CSS/SCSS files
@@ -157,7 +212,8 @@ function createStyleBundlingPlugins( workingDir ) {
 		sassPlugin( {
 			embedded: true,
 			filter: /\.(css|scss)$/,
-			type: 'style',
+			transform: compileInlineStyle(),
+			type: inlineStyle,
 			...sassOptions,
 		} ),
 	];

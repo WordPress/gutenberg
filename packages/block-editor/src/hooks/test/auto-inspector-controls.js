@@ -24,6 +24,7 @@ describe( 'auto-inspector-controls', () => {
 	describe( 'hasSupport()', () => {
 		it( 'should return false for blocks without __experimentalAutoInspectorControl markers', () => {
 			registerBlockType( blockName, {
+				apiVersion: 3,
 				title: 'Test Block',
 				category: 'text',
 				attributes: {
@@ -42,6 +43,7 @@ describe( 'auto-inspector-controls', () => {
 
 		it( 'should return true for blocks with __experimentalAutoInspectorControl markers', () => {
 			registerBlockType( blockName, {
+				apiVersion: 3,
 				title: 'Test Block',
 				category: 'text',
 				attributes: {
@@ -71,6 +73,7 @@ describe( 'auto-inspector-controls', () => {
 
 		it( 'should return false for blocks with no attributes', () => {
 			registerBlockType( blockName, {
+				apiVersion: 3,
 				title: 'Test Block',
 				category: 'text',
 				edit: () => null,
@@ -84,6 +87,7 @@ describe( 'auto-inspector-controls', () => {
 
 		it( 'should return true when at least one attribute has __experimentalAutoInspectorControl', () => {
 			registerBlockType( blockName, {
+				apiVersion: 3,
 				title: 'Test Block',
 				category: 'text',
 				attributes: {

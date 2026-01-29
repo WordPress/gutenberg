@@ -300,3 +300,57 @@ export function getShowStylebook( state ) {
 export function getCanvasMinHeight( state ) {
 	return state.canvasMinHeight;
 }
+
+/**
+ * Returns whether the editor is in revisions preview mode.
+ *
+ * @param {Object} state Global application state.
+ * @return {boolean} Whether revisions mode is active.
+ */
+export function isRevisionsMode( state ) {
+	return state.revisionId !== null;
+}
+
+/**
+ * Returns the current revision ID in revisions mode.
+ *
+ * @param {Object} state Global application state.
+ * @return {number|null} The revision ID, or null if not in revisions mode.
+ */
+export function getCurrentRevisionId( state ) {
+	return state.revisionId;
+}
+
+/**
+ * Returns the current revision object in revisions mode.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object|null|undefined} The revision object, null if loading, or undefined if not in revisions mode.
+ */
+export const getCurrentRevision = createRegistrySelector(
+	( select ) => ( state ) => {
+		const revisionId = getCurrentRevisionId( state );
+		if ( ! revisionId ) {
+			return undefined;
+		}
+
+		const { type: postType, id: postId } = getCurrentPost( state );
+		// - Use getRevisions (plural) instead of getRevision (singular) to
+		//   avoid a race condition where both API calls complete around the
+		//   same time and the single revision fetch overwrites the list in the
+		//   store.
+		// - getRevision also needs to be updated to check if there's any
+		//   received revisions from the collection API call to avoid unnecessary
+		//   API calls.
+		const revisions = select( coreStore ).getRevisions(
+			'postType',
+			postType,
+			postId,
+			{ per_page: -1, context: 'edit' }
+		);
+		if ( ! revisions ) {
+			return null;
+		}
+		return revisions.find( ( r ) => r.id === revisionId ) ?? null;
+	}
+);

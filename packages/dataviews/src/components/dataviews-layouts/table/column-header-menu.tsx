@@ -283,30 +283,35 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 										</Menu.ItemLabel>
 									</Menu.SubmenuTriggerItem>
 									<Menu.Popover>
-										{ hiddenFields.map( ( hiddenField ) => (
-											<Menu.Item
-												key={ hiddenField.id }
-												onClick={ () => {
-													onChangeView( {
-														...view,
-														fields: [
-															...visibleFieldIds.slice(
-																0,
-																index
-															),
-															hiddenField.id,
-															...visibleFieldIds.slice(
-																index
-															),
-														],
-													} );
-												} }
-											>
-												<Menu.ItemLabel>
-													{ hiddenField.label }
-												</Menu.ItemLabel>
-											</Menu.Item>
-										) ) }
+										{ hiddenFields.map( ( hiddenField ) => {
+											const insertIndex = isRtl
+												? index + 1
+												: index;
+											return (
+												<Menu.Item
+													key={ hiddenField.id }
+													onClick={ () => {
+														onChangeView( {
+															...view,
+															fields: [
+																...visibleFieldIds.slice(
+																	0,
+																	insertIndex
+																),
+																hiddenField.id,
+																...visibleFieldIds.slice(
+																	insertIndex
+																),
+															],
+														} );
+													} }
+												>
+													<Menu.ItemLabel>
+														{ hiddenField.label }
+													</Menu.ItemLabel>
+												</Menu.Item>
+											);
+										} ) }
 									</Menu.Popover>
 								</Menu>
 							) }
@@ -318,30 +323,35 @@ const _HeaderMenu = forwardRef( function HeaderMenu< Item >(
 										</Menu.ItemLabel>
 									</Menu.SubmenuTriggerItem>
 									<Menu.Popover>
-										{ hiddenFields.map( ( hiddenField ) => (
-											<Menu.Item
-												key={ hiddenField.id }
-												onClick={ () => {
-													onChangeView( {
-														...view,
-														fields: [
-															...visibleFieldIds.slice(
-																0,
-																index + 1
-															),
-															hiddenField.id,
-															...visibleFieldIds.slice(
-																index + 1
-															),
-														],
-													} );
-												} }
-											>
-												<Menu.ItemLabel>
-													{ hiddenField.label }
-												</Menu.ItemLabel>
-											</Menu.Item>
-										) ) }
+										{ hiddenFields.map( ( hiddenField ) => {
+											const insertIndex = isRtl
+												? index
+												: index + 1;
+											return (
+												<Menu.Item
+													key={ hiddenField.id }
+													onClick={ () => {
+														onChangeView( {
+															...view,
+															fields: [
+																...visibleFieldIds.slice(
+																	0,
+																	insertIndex
+																),
+																hiddenField.id,
+																...visibleFieldIds.slice(
+																	insertIndex
+																),
+															],
+														} );
+													} }
+												>
+													<Menu.ItemLabel>
+														{ hiddenField.label }
+													</Menu.ItemLabel>
+												</Menu.Item>
+											);
+										} ) }
 									</Menu.Popover>
 								</Menu>
 							) }

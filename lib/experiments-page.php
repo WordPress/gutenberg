@@ -174,18 +174,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-content-only-pattern-insertion',
-		__( 'Pattern Editing: Make patterns contentOnly by default upon insertion', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'When patterns are inserted, default to a simplified content only mode for editing pattern content.', 'gutenberg' ),
-			'id'    => 'gutenberg-content-only-pattern-insertion',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-content-only-inspector-fields',
 		__( 'Block fields: Show dataform driven inspector fields on blocks that support them', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -221,19 +209,6 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
-	// create a new experiment for hiding blocks based on screen size
-	add_settings_field(
-		'gutenberg-hide-blocks-based-on-screen-size',
-		__( 'Hide blocks based on screen size', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Extends block visibility block supports with responsive design controls for hiding blocks based on screen size.', 'gutenberg' ),
-			'id'    => 'gutenberg-hide-blocks-based-on-screen-size',
-		)
-	);
-
 	add_settings_field(
 		'gutenberg-extensible-site-editor',
 		__( 'Extensible Site Editor', 'gutenberg' ),
@@ -243,6 +218,18 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
 			'id'    => 'gutenberg-extensible-site-editor',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-media-editor',
+		__( 'Media Editor', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables editing media items (attachments) directly in the block editor with a dedicated media preview and metadata panel.', 'gutenberg' ),
+			'id'    => 'gutenberg-media-editor',
 		)
 	);
 

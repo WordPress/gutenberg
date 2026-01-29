@@ -20,11 +20,8 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const { canToggleBlockVisibility, areBlocksHiddenAnywhere } = useSelect(
 		( select ) => {
-			const {
-				getBlocksByClientId,
-				getBlockName,
-				areBlocksHiddenAnywhere: _areBlocksHiddenAnywhere,
-			} = unlock( select( blockEditorStore ) );
+			const { getBlocksByClientId, getBlockName, isBlockHiddenAnywhere } =
+				unlock( select( blockEditorStore ) );
 			const _blocks = getBlocksByClientId( clientIds );
 			return {
 				canToggleBlockVisibility: _blocks.every( ( { clientId } ) =>
@@ -34,7 +31,9 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 						true
 					)
 				),
-				areBlocksHiddenAnywhere: _areBlocksHiddenAnywhere( clientIds ),
+				areBlocksHiddenAnywhere: clientIds?.every( ( clientId ) =>
+					isBlockHiddenAnywhere( clientId )
+				),
 			};
 		},
 

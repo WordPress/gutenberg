@@ -118,7 +118,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			return sprintf(
 				// translators: %s: The shortcut key to access the List View.
 				__(
-					'Block visibility settings saved. You can access them via the List View (%s).'
+					'Block visibility settings updated. You can access them via the List View (%s).'
 				),
 				listViewShortcut
 			);
@@ -160,18 +160,20 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			event.preventDefault();
 			const newVisibility = hideEverywhere
 				? false
-				: BLOCK_VISIBILITY_VIEWPORT_ENTRIES.reduce(
-						( acc, [ , { key } ] ) => {
-							if ( viewportChecked[ key ] ) {
-								// Values are inverted to hide the block on the selected viewport.
-								// In the UI, the checkbox is checked (true) when the block is hidden on the selected viewport,
-								// so 'false' means hide the block on the selected viewport.
-								acc[ key ] = false;
-							}
-							return acc;
-						},
-						{}
-				  );
+				: {
+						viewport: BLOCK_VISIBILITY_VIEWPORT_ENTRIES.reduce(
+							( acc, [ , { key } ] ) => {
+								if ( viewportChecked[ key ] ) {
+									// Values are inverted to hide the block on the selected viewport.
+									// In the UI, the checkbox is checked (true) when the block is hidden on the selected viewport,
+									// so 'false' means hide the block on the selected viewport.
+									acc[ key ] = false;
+								}
+								return acc;
+							},
+							{}
+						),
+				  };
 			const attributesByClientId = Object.fromEntries(
 				blocks.map( ( { clientId, attributes } ) => [
 					clientId,
@@ -190,7 +192,7 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 			createSuccessNotice( noticeMessage, {
 				id: hideEverywhere
 					? 'block-visibility-hidden'
-					: 'block-visibility-viewports-saved',
+					: 'block-visibility-viewports-updated',
 				type: 'snackbar',
 			} );
 			onClose();

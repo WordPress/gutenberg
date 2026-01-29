@@ -432,6 +432,19 @@ module.exports = {
 			extends: [ 'plugin:ssr-friendly/recommended' ],
 		},
 		{
+			files: [
+				'packages/block-editor/src/**',
+				'packages/components/src/**',
+				'packages/dataviews/src/**',
+				'packages/ui/src/**',
+			],
+			excludedFiles: [ '**/@(test|stories)/**', '*.native.*' ],
+			rules: {
+				// Enforce display names for easier debugging and better storybook integration.
+				'react/display-name': 'error',
+			},
+		},
+		{
 			files: [ 'packages/components/src/**', 'packages/ui/src/**' ],
 			rules: {
 				'no-restricted-imports': [
@@ -497,6 +510,12 @@ module.exports = {
 			rules: {
 				'react-compiler/react-compiler': 'off',
 				'react/react-in-jsx-scope': 'error',
+			},
+		},
+		{
+			files: [ 'packages/ui/src/**' ],
+			rules: {
+				'@wordpress/dependency-group': [ 'error', 'never' ],
 			},
 		},
 	],

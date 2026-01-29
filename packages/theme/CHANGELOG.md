@@ -6,6 +6,17 @@
 
 ### Breaking changes
 
+-   Renamed border tokens to remove the `surface` segment from token names ([#74617](https://github.com/WordPress/gutenberg/pull/74617)):
+		- `--wpds-border-radius-surface-xs`: use `--wpds-border-radius-xs` instead.
+		- `--wpds-border-radius-surface-sm`: use `--wpds-border-radius-sm` instead.
+		- `--wpds-border-radius-surface-md`: use `--wpds-border-radius-md` instead.
+		- `--wpds-border-radius-surface-lg`: use `--wpds-border-radius-lg` instead.
+		- `--wpds-border-width-surface-xs`: use `--wpds-border-width-xs` instead.
+		- `--wpds-border-width-surface-sm`: use `--wpds-border-width-sm` instead.
+		- `--wpds-border-width-surface-md`: use `--wpds-border-width-md` instead.
+		- `--wpds-border-width-surface-lg`: use `--wpds-border-width-lg` instead.
+		- `--wpds-border-width-interactive-focus`: use `--wpds-border-width-focus` instead.
+
 -   Removed the following tokens ([#74470](https://github.com/WordPress/gutenberg/pull/74470)):
 		- `--wpds-color-bg-interactive-neutral`: use `--wpds-color-bg-interactive-neutral-weak` instead.
 		- `--wpds-color-bg-interactive-neutral-active`: use `--wpds-color-bg-interactive-neutral-weak-active` instead.

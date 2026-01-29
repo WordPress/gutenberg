@@ -304,16 +304,39 @@ export default function Image( {
 	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
 	const { allowResize = true } = context;
 
-	const image = useSelect(
-		( select ) =>
-			id && isSingleSelected
-				? select( coreStore ).getEntityRecord(
-						'postType',
-						'attachment',
-						id,
-						{ context: 'view' }
-				  )
-				: null,
+	const { image, canUserEdit } = useSelect(
+		( select ) => {
+			const imageRecord =
+				id && isSingleSelected
+					? select( coreStore ).getEntityRecord(
+							'postType',
+							'attachment',
+							id,
+							{ context: 'view' }
+					  )
+					: null;
+
+			// Check edit permissions. When the media editor experiment is enabled,
+			// use getEntityRecordPermissions which checks via canUser API.
+			// Only check when the image is selected to avoid unnecessary API requests.
+			let canEdit = false;
+			if ( id && isSingleSelected && window?.__experimentalMediaEditor ) {
+				const { getEntityRecordPermissions } = unlock(
+					select( coreStore )
+				);
+				const permissions = getEntityRecordPermissions(
+					'postType',
+					'attachment',
+					id
+				);
+				canEdit = permissions?.update || false;
+			}
+
+			return {
+				image: imageRecord,
+				canUserEdit: canEdit,
+			};
+		},
 		[ id, isSingleSelected ]
 	);
 
@@ -338,6 +361,7 @@ export default function Image( {
 		[ clientId ]
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
+	const onNavigateToEntityRecord = getSettings().onNavigateToEntityRecord;
 
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
@@ -355,6 +379,7 @@ export default function Image( {
 	const [ hasImageErrored, setHasImageErrored ] = useState( false );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
+	const showDimensionsControls = allowResize && hasNonContentControls;
 	const isResizable =
 		allowResize &&
 		hasNonContentControls &&
@@ -558,7 +583,7 @@ export default function Image( {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const dimensionsControl =
-		isResizable &&
+		showDimensionsControls &&
 		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
 			<DimensionsTool
 				panelId={ clientId }
@@ -600,6 +625,11 @@ export default function Image( {
 				defaultAspectRatio="auto"
 				scaleOptions={ scaleOptions }
 				unitsOptions={ dimensionsUnitsOptions }
+				tools={
+					isWideAligned
+						? [ 'aspectRatio', 'scale' ]
+						: [ 'aspectRatio', 'widthHeight', 'scale' ]
+				}
 			/>
 		) );
 
@@ -725,6 +755,27 @@ export default function Image( {
 
 	const hasDataFormBlockFields =
 		window?.__experimentalContentOnlyInspectorFields;
+
+	const editMediaButton = window?.__experimentalMediaEditor &&
+		id &&
+		isSingleSelected &&
+		canUserEdit &&
+		! isExternalImage( id, url ) &&
+		! isEditingImage &&
+		onNavigateToEntityRecord && (
+			<BlockControls group="other">
+				<ToolbarButton
+					onClick={ () => {
+						onNavigateToEntityRecord( {
+							postId: id,
+							postType: 'attachment',
+						} );
+					} }
+				>
+					{ __( 'Edit media' ) }
+				</ToolbarButton>
+			</BlockControls>
+		);
 
 	const controls = (
 		<>
@@ -1199,6 +1250,7 @@ export default function Image( {
 
 	return (
 		<>
+			{ editMediaButton }
 			{ mediaReplaceFlow }
 			{ controls }
 			{ featuredImageControl }
