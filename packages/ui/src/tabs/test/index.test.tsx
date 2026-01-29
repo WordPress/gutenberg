@@ -100,7 +100,7 @@ const UncontrolledTabs = ( {
 				<Tabs.Panel
 					key={ `${ tabObj.title }-${ index }` }
 					value={ tabObj.value }
-					tabIndex={ tabObj.tabpanel?.tabIndex }
+					tabIndex={ tabObj.tabpanel?.tabIndex ?? 0 }
 				>
 					{ tabObj.content }
 				</Tabs.Panel>
@@ -148,7 +148,7 @@ const ControlledTabs = ( {
 				<Tabs.Panel
 					key={ `${ tabObj.title }-${ index }` }
 					value={ tabObj.value }
-					tabIndex={ tabObj.tabpanel?.tabIndex }
+					tabIndex={ tabObj.tabpanel?.tabIndex ?? 0 }
 				>
 					{ tabObj.content }
 				</Tabs.Panel>
@@ -156,9 +156,6 @@ const ControlledTabs = ( {
 		</Tabs.Root>
 	);
 };
-
-let originalGetClientRects: typeof window.HTMLElement.prototype.getClientRects;
-let originalScrollTo: typeof Element.prototype.scrollTo;
 
 async function waitForComponentToBeInitializedWithSelectedTab(
 	selectedTabName: string | undefined
@@ -200,26 +197,6 @@ async function waitForComponentToBeInitializedWithSelectedTab(
 }
 
 describe( 'Tabs', () => {
-	beforeAll( () => {
-		originalGetClientRects = window.HTMLElement.prototype.getClientRects;
-		// Mocking `getClientRects()` is necessary to pass a check performed by
-		// the `focus.tabbable.find()` and by the `focus.focusable.find()` functions
-		// from the `@wordpress/dom` package.
-		// @ts-expect-error We're not trying to comply to the DOM spec, only mocking
-		window.HTMLElement.prototype.getClientRects = function () {
-			return [ 'trick-jsdom-into-having-size-for-element-rect' ];
-		};
-
-		// Mock scrollTo since it's not available in JSDOM
-		originalScrollTo = Element.prototype.scrollTo;
-		Element.prototype.scrollTo = jest.fn();
-	} );
-
-	afterAll( () => {
-		window.HTMLElement.prototype.getClientRects = originalGetClientRects;
-		Element.prototype.scrollTo = originalScrollTo;
-	} );
-
 	describe( 'Adherence to spec and basic behavior', () => {
 		it( 'should apply the correct roles, semantics and attributes', async () => {
 			render(
@@ -932,7 +909,7 @@ describe( 'Tabs', () => {
 				).toHaveFocus();
 			} );
 
-			it( 'should not focus the tabpanel container when its `focusable` property is set to `false`', async () => {
+			it( 'should not focus the tabpanel container when it is not tabbable', async () => {
 				const user = userEvent.setup();
 
 				const valueProps =
