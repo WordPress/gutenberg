@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,7 @@ import {
 } from '@wordpress/block-editor';
 
 export default function separatorSave( { attributes } ) {
-	const { backgroundColor, style, opacity } = attributes;
+	const { backgroundColor, style, opacity, tagName: Tag } = attributes;
 	const customColor = style?.color?.background;
 	const colorProps = getColorClassesAndStyles( attributes );
 	// The hr support changing color using border-color, since border-color
@@ -23,7 +23,7 @@ export default function separatorSave( { attributes } ) {
 	// using color, not backgroundColor.
 	const colorClass = getColorClassName( 'color', backgroundColor );
 
-	const className = classnames(
+	const className = clsx(
 		{
 			'has-text-color': backgroundColor || customColor,
 			[ colorClass ]: colorClass,
@@ -37,5 +37,5 @@ export default function separatorSave( { attributes } ) {
 		backgroundColor: colorProps?.style?.backgroundColor,
 		color: colorClass ? undefined : customColor,
 	};
-	return <hr { ...useBlockProps.save( { className, style: styles } ) } />;
+	return <Tag { ...useBlockProps.save( { className, style: styles } ) } />;
 }

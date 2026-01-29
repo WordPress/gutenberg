@@ -9,13 +9,13 @@
 	"attributes": {
 		"hasFixedLayout": {
 			"type": "boolean",
-			"default": false
+			"default": true
 		},
 		"caption": {
-			"type": "string",
-			"source": "html",
+			"type": "rich-text",
+			"source": "rich-text",
 			"selector": "figcaption",
-			"default": ""
+			"role": "content"
 		},
 		"head": {
 			"type": "array",
@@ -30,8 +30,9 @@
 					"selector": "td,th",
 					"query": {
 						"content": {
-							"type": "string",
-							"source": "html"
+							"type": "rich-text",
+							"source": "rich-text",
+							"role": "content"
 						},
 						"tag": {
 							"type": "string",
@@ -75,8 +76,9 @@
 					"selector": "td,th",
 					"query": {
 						"content": {
-							"type": "string",
-							"source": "html"
+							"type": "rich-text",
+							"source": "rich-text",
+							"role": "content"
 						},
 						"tag": {
 							"type": "string",
@@ -120,8 +122,9 @@
 					"selector": "td,th",
 					"query": {
 						"content": {
-							"type": "string",
-							"source": "html"
+							"type": "rich-text",
+							"source": "rich-text",
+							"role": "content"
 						},
 						"tag": {
 							"type": "string",
@@ -196,7 +199,13 @@
 				"width": true
 			}
 		},
-		"__experimentalSelector": ".wp-block-table > table"
+		"interactivity": {
+			"clientNavigation": true
+		}
+	},
+	"selectors": {
+		"root": ".wp-block-table > table",
+		"spacing": ".wp-block-table"
 	},
 	"styles": [
 		{

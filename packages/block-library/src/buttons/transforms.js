@@ -4,6 +4,11 @@
 import { createBlock } from '@wordpress/blocks';
 import { __unstableCreateElement as createElement } from '@wordpress/rich-text';
 
+/**
+ * Internal dependencies
+ */
+import { getTransformedAttributes } from '../utils/get-transformed-attributes';
+
 const transforms = {
 	from: [
 		{
@@ -33,10 +38,8 @@ const transforms = {
 					{},
 					// Loop the selected buttons.
 					buttons.map( ( attributes ) => {
-						const element = createElement(
-							document,
-							attributes.content
-						);
+						const { content } = attributes;
+						const element = createElement( document, content );
 						// Remove any HTML tags.
 						const text = element.innerText || '';
 						// Get first url.
@@ -44,6 +47,14 @@ const transforms = {
 						const url = link?.getAttribute( 'href' );
 						// Create singular button in the buttons block.
 						return createBlock( 'core/button', {
+							...attributes,
+							...getTransformedAttributes(
+								attributes,
+								'core/button',
+								( { content: contentBinding } ) => ( {
+									text: contentBinding,
+								} )
+							),
 							text,
 							url,
 						} );

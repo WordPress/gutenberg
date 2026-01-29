@@ -126,7 +126,7 @@ test.describe( 'data-wp-bind', () => {
 					 * Value that the HTMLElement instance property should
 					 * contain after hydration.
 					 */
-					entityPropValue: any
+					entityPropValue: any,
 				]
 			>;
 		};
@@ -210,6 +210,12 @@ test.describe( 'data-wp-bind', () => {
 					const el = container.getByTestId( testid );
 					const toggle = container.getByTestId( 'toggle value' );
 
+					// Ensure hydration has happened.
+					const checkbox = page.getByTestId(
+						'add missing checked at hydration'
+					);
+					await expect( checkbox ).toBeChecked();
+
 					const hydratedAttr = await el.getAttribute( name );
 					const hydratedProp = await el.evaluate(
 						( node, propName ) => ( node as any )[ propName ],
@@ -225,7 +231,7 @@ test.describe( 'data-wp-bind', () => {
 					] );
 
 					// Only check the rendered value if the new value is not
-					// `undefined` and the attibute is neither `value` nor
+					// `undefined` and the attribute is neither `value` nor
 					// `disabled` because Preact doesn't update the attribute
 					// for those cases.
 					// See https://github.com/preactjs/preact/blob/099c38c6ef92055428afbc116d18a6b9e0c2ea2c/src/diff/index.js#L471-L494
@@ -236,7 +242,13 @@ test.describe( 'data-wp-bind', () => {
 						return;
 					}
 
-					await toggle.click( { clickCount: 2, delay: 50 } );
+					await toggle.click( { clickCount: 2 } );
+
+					// Ensure values have been updated after toggling.
+					await expect( toggle ).toHaveAttribute(
+						'data-toggle-count',
+						'2'
+					);
 
 					// Values should be the same as before.
 					const renderedAttr = await el.getAttribute( name );
@@ -255,5 +267,14 @@ test.describe( 'data-wp-bind', () => {
 				}
 			} );
 		}
+	} );
+
+	test( 'should ignore unique ids', async ( { page } ) => {
+		let element = page.getByTestId( 'without-unique-id' );
+		await expect( element ).toHaveAttribute( 'data-test' );
+
+		element = page.getByTestId( 'with-unique-id' );
+		await expect( element ).not.toHaveAttribute( 'data-test' );
+		await expect( element ).not.toHaveAttribute( 'data-test---unique-id' );
 	} );
 } );

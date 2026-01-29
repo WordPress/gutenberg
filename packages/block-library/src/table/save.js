@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -25,7 +25,7 @@ export default function save( { attributes } ) {
 	const colorProps = getColorClassesAndStyles( attributes );
 	const borderProps = getBorderClassesAndStyles( attributes );
 
-	const classes = classnames( colorProps.className, borderProps.className, {
+	const classes = clsx( colorProps.className, borderProps.className, {
 		'has-fixed-layout': hasFixedLayout,
 	} );
 
@@ -54,7 +54,7 @@ export default function save( { attributes } ) {
 								},
 								cellIndex
 							) => {
-								const cellClasses = classnames( {
+								const cellClasses = clsx( {
 									[ `has-text-align-${ align }` ]: align,
 								} );
 

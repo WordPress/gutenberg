@@ -1,0 +1,31 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"checkJs": false
+	},
+	"references": [
+		{ "path": "../api-fetch" },
+		{ "path": "../blob" },
+		{ "path": "../components" },
+		{ "path": "../compose" },
+		{ "path": "../core-data" },
+		{ "path": "../block-editor" },
+		{ "path": "../data" },
+		{ "path": "../dataviews" },
+		{ "path": "../date" },
+		{ "path": "../element" },
+		{ "path": "../hooks" },
+		{ "path": "../html-entities" },
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../media-utils" },
+		{ "path": "../notices" },
+		{ "path": "../primitives" },
+		{ "path": "../private-apis" },
+		{ "path": "../router" },
+		{ "path": "../url" },
+		{ "path": "../block-editor" },
+		{ "path": "../warning" }
+	]
+}

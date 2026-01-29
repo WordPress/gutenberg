@@ -6,11 +6,6 @@ This only happens in the mobile WordPress apps.
 
 ![Ungroup button icon](https://user-images.githubusercontent.com/21242757/65593577-11006000-df91-11e9-8460-1179e9ef46d2.png)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage

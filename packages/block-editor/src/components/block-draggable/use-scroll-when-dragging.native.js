@@ -34,7 +34,7 @@ const VELOCITY_MULTIPLIER = 5000;
 export default function useScrollWhenDragging() {
 	const { scrollRef } = useBlockListContext();
 	const animatedScrollRef = useAnimatedRef();
-	animatedScrollRef( scrollRef );
+	animatedScrollRef( scrollRef?.scrollViewRef );
 
 	const { height: windowHeight } = useWindowDimensions();
 

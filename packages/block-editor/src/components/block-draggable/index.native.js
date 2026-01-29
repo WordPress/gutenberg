@@ -9,7 +9,6 @@ import {
 import Animated, {
 	runOnJS,
 	runOnUI,
-	useAnimatedRef,
 	useAnimatedStyle,
 	useSharedValue,
 	withDelay,
@@ -39,7 +38,6 @@ import RCTAztecView from '@wordpress/react-native-aztec';
 import useScrollWhenDragging from './use-scroll-when-dragging';
 import DraggableChip from './draggable-chip';
 import { store as blockEditorStore } from '../../store';
-import { useBlockListContext } from '../block-list/block-list-context';
 import DroppingInsertionPoint from './dropping-insertion-point';
 import useBlockDropZone from '../use-block-drop-zone';
 import styles from './style.scss';
@@ -74,13 +72,10 @@ const BlockDraggableWrapper = ( { children, isRTL } ) => {
 	const { selectBlock, startDraggingBlocks, stopDraggingBlocks } =
 		useDispatch( blockEditorStore );
 
-	const { scrollRef } = useBlockListContext();
-	const animatedScrollRef = useAnimatedRef();
 	const { left, right } = useSafeAreaInsets();
 	const { width } = useSafeAreaFrame();
 	const safeAreaOffset = left + right;
 	const contentWidth = width - safeAreaOffset;
-	animatedScrollRef( scrollRef );
 
 	const scroll = {
 		offsetY: useSharedValue( 0 ),

@@ -322,12 +322,11 @@ describe( 'renderElement()', () => {
 				<Provider value={ { value: '1st provided' } }>
 					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
-				{ '|' }
+				|
 				<Provider value={ { value: '2nd provided' } }>
 					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
-				{ '|' }
-				<Consumer>{ ( context ) => context.value }</Consumer>
+				|<Consumer>{ ( context ) => context.value }</Consumer>
 			</Fragment>
 		);
 
@@ -344,8 +343,7 @@ describe( 'renderElement()', () => {
 				<Provider value={ { value: 'inner provided' } }>
 					<Consumer>{ ( context ) => context.value }</Consumer>
 				</Provider>
-				{ '|' }
-				<Consumer>{ ( context ) => context.value }</Consumer>
+				|<Consumer>{ ( context ) => context.value }</Consumer>
 			</Provider>
 		);
 
@@ -580,7 +578,7 @@ describe( 'renderAttributes()', () => {
 			} );
 
 			expect( result ).toBe(
-				' style="background:url(&quot;foo.png&quot;)" href="/index.php?foo=bar&amp;qux=<&quot;scary&quot;&gt;"'
+				' style="background:url(&quot;foo.png&quot;)" href="/index.php?foo=bar&amp;qux=&lt;&quot;scary&quot;&gt;"'
 			);
 		} );
 
@@ -716,6 +714,14 @@ describe( 'renderStyle()', () => {
 			} );
 
 			expect( result ).toBe( 'order:10' );
+		} );
+
+		it( 'should not render numeric units for CSS custom properties', () => {
+			const result = renderStyle( {
+				'--myOrder': 10,
+			} );
+
+			expect( result ).toBe( '--myOrder:10' );
 		} );
 	} );
 } );

@@ -6,17 +6,52 @@ import { test, expect } from './fixtures';
 test.describe( 'Router navigate', () => {
 	test.beforeAll( async ( { interactivityUtils: utils } ) => {
 		await utils.activatePlugins();
+		const link1 = await utils.addPostWithBlock( 'test/router-navigate', {
+			alias: 'router navigate - link 1',
+			attributes: {
+				title: 'Link 1',
+				data: {
+					getterProp: 'value from link1',
+					prop1: 'link 1',
+					prop3: 'link 1',
+				},
+			},
+		} );
 		const link2 = await utils.addPostWithBlock( 'test/router-navigate', {
 			alias: 'router navigate - link 2',
 			attributes: { title: 'Link 2' },
 		} );
-		const link1 = await utils.addPostWithBlock( 'test/router-navigate', {
-			alias: 'router navigate - link 1',
-			attributes: { title: 'Link 1' },
+		const link3 = await utils.addPostWithBlock( 'test/router-navigate', {
+			alias: 'router navigate - disabled',
+			attributes: {
+				title: 'Main (navigation disabled)',
+				links: [ link1, link2 ],
+				disableNavigation: true,
+				data: {
+					getterProp: 'value from main (navigation disabled)',
+					prop1: 'main (navigation disabled)',
+				},
+			},
+		} );
+
+		const link4 = await utils.addPostWithBlock( 'test/router-navigate', {
+			alias: 'router navigate - closure',
+			attributes: {
+				title: 'Link with derivedStateClosure',
+				derivedStateClosure: true,
+			},
 		} );
 		await utils.addPostWithBlock( 'test/router-navigate', {
 			alias: 'router navigate - main',
-			attributes: { title: 'Main', links: [ link1, link2 ] },
+			attributes: {
+				title: 'Main',
+				links: [ link1, link2, link3, link4 ],
+				data: {
+					getterProp: 'value from main',
+					prop1: 'main',
+					prop2: 'main',
+				},
+			},
 		} );
 	} );
 
@@ -36,7 +71,7 @@ test.describe( 'Router navigate', () => {
 		const link1 = utils.getLink( 'router navigate - link 1' );
 		const link2 = utils.getLink( 'router navigate - link 2' );
 
-		const navigations = page.getByTestId( 'router navigations' );
+		const navigations = page.getByTestId( 'router navigations pending' );
 		const status = page.getByTestId( 'router status' );
 		const title = page.getByTestId( 'title' );
 
@@ -81,7 +116,7 @@ test.describe( 'Router navigate', () => {
 	} ) => {
 		const link1 = utils.getLink( 'router navigate - link 1' );
 
-		const navigations = page.getByTestId( 'router navigations' );
+		const navigations = page.getByTestId( 'router navigations pending' );
 		const status = page.getByTestId( 'router status' );
 		const title = page.getByTestId( 'title' );
 
@@ -106,24 +141,188 @@ test.describe( 'Router navigate', () => {
 		await expect( status ).toHaveText( 'busy' );
 		await expect( title ).toHaveText( 'Main' );
 
-		{
-			const resolver = resolvers.pop();
-			if ( resolver ) resolver();
-		}
+		resolvers.pop()!();
 
 		await expect( navigations ).toHaveText( '1' );
 		await expect( status ).toHaveText( 'busy' );
 		await expect( title ).toHaveText( 'Link 1' );
 		await expect( page ).toHaveURL( href );
 
-		{
-			const resolver = resolvers.pop();
-			if ( resolver ) resolver();
-		}
+		resolvers.pop()!();
 
 		await expect( navigations ).toHaveText( '0' );
 		await expect( status ).toHaveText( 'idle' );
 		await expect( title ).toHaveText( 'Link 1' );
 		await expect( page ).toHaveURL( href );
+	} );
+
+	test( 'should reload the next page when the timeout ends', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		const link1 = utils.getLink( 'router navigate - link 1' );
+
+		const title = page.getByTestId( 'title' );
+		const toggleTimeout = page.getByTestId( 'toggle timeout' );
+
+		let resolver: Function;
+
+		await page.route( link1, async ( route ) => {
+			// Only capture the first request.
+			if ( ! resolver ) {
+				await new Promise( ( r ) => ( resolver = r ) );
+				await route.abort();
+			} else {
+				await route.continue();
+			}
+		} );
+
+		await expect( toggleTimeout ).toHaveText( 'Timeout 10000' );
+
+		// Set timeout to 0.
+		await toggleTimeout.click();
+		await expect( toggleTimeout ).toHaveText( 'Timeout 0' );
+
+		// Navigation should timeout almost instantly.
+		await page.getByTestId( 'link 1' ).click();
+
+		await expect( page ).toHaveURL( link1 );
+		await expect( title ).toHaveText( 'Link 1' );
+
+		// If timeout is 10000, that means the page has been reloaded.
+		await expect( toggleTimeout ).toHaveText( 'Timeout 10000' );
+
+		// Make the fetch abort, just in case.
+		resolver!();
+	} );
+
+	test( 'should force a page reload when the `clientNavigationDisabled` config is set to true', async ( {
+		page,
+		interactivityUtils: utils,
+	} ) => {
+		await page.goto( utils.getLink( 'router navigate - disabled' ) );
+
+		const count = page.getByTestId( 'router navigations count' );
+		const status = page.getByTestId( 'router status' );
+		const title = page.getByTestId( 'title' );
+
+		// Check some elements to ensure the page has hydrated.
+		await expect( count ).toHaveText( '0' );
+		await expect( status ).toHaveText( 'idle' );
+
+		await page.getByTestId( 'link 1' ).click();
+
+		// Check the page has updated.
+		await expect( title ).toHaveText( 'Link 1' );
+
+		// Check that client-navigations count has not increased.
+		await expect( count ).toHaveText( '0' );
+	} );
+
+	test( 'should merge the state with the one serialized in the new page', async ( {
+		page,
+	} ) => {
+		const prop1 = page.getByTestId( 'prop1' );
+		const prop2 = page.getByTestId( 'prop2' );
+		const prop3 = page.getByTestId( 'prop3' );
+		const title = page.getByTestId( 'title' );
+
+		await expect( prop1 ).toHaveText( 'main' );
+		await expect( prop2 ).toHaveText( 'main' );
+		await expect( prop3 ).toBeEmpty();
+
+		await page.getByTestId( 'link 1' ).click();
+		await expect( title ).toHaveText( 'Link 1' );
+		await expect( prop1 ).toHaveText( 'main' );
+		await expect( prop2 ).toHaveText( 'main' );
+		await expect( prop3 ).toHaveText( 'link 1' );
+
+		await page.goBack();
+		await expect( title ).toHaveText( 'Main' );
+		await expect( prop1 ).toHaveText( 'main' );
+		await expect( prop2 ).toHaveText( 'main' );
+		await expect( prop3 ).toHaveText( 'link 1' );
+	} );
+
+	test( 'should not try to overwrite getters with values from the initial data', async ( {
+		page,
+	} ) => {
+		const title = page.getByTestId( 'title' );
+		const getter = page.getByTestId( 'getterProp' );
+
+		await expect( title ).toHaveText( 'Main' );
+		await expect( getter ).toHaveText( 'value from getter (main)' );
+
+		await page.getByTestId( 'link 1' ).click();
+		await expect( title ).toHaveText( 'Link 1' );
+		await expect( getter ).toHaveText( 'value from getter (main)' );
+
+		await page.goBack();
+		await expect( title ).toHaveText( 'Main' );
+		await expect( getter ).toHaveText( 'value from getter (main)' );
+
+		await page.goForward();
+		await expect( title ).toHaveText( 'Link 1' );
+		await expect( getter ).toHaveText( 'value from getter (main)' );
+	} );
+
+	test( 'should force a page reload when navigating to a page with `clientNavigationDisabled`', async ( {
+		page,
+	} ) => {
+		const count = page.getByTestId( 'router navigations count' );
+		const title = page.getByTestId( 'title' );
+
+		// Check the count to ensure the page has hydrated.
+		await expect( count ).toHaveText( '0' );
+
+		// Navigate to a page without clientNavigationDisabled.
+		await page.getByTestId( 'link 1' ).click();
+
+		// Check the page has updated and the navigation count has increased.
+		await expect( title ).toHaveText( 'Link 1' );
+		await expect( count ).toHaveText( '1' );
+
+		await page.goBack();
+		await expect( title ).toHaveText( 'Main' );
+		await expect( count ).toHaveText( '1' );
+
+		// Navigate to a page with clientNavigationDisabled.
+		await page.getByTestId( 'link 3' ).click();
+
+		// Check the page has updated and the navigation count is zero.
+		await expect( title ).toHaveText( 'Main (navigation disabled)' );
+		await expect( count ).toHaveText( '0' );
+	} );
+
+	test( 'should support derived state closures', async ( { page } ) => {
+		const count = page.getByTestId( 'router navigations count' );
+		const status = page.getByTestId( 'router status' );
+		const title = page.getByTestId( 'title' );
+		const derivedStateClosure = page.getByTestId( 'derivedStateClosure' );
+
+		// Check the count to ensure the page has hydrated.
+		await expect( count ).toHaveText( '0' );
+
+		// Ensure the value from the getter is correct.
+		await expect( derivedStateClosure ).toHaveText( 'helloFromGetter' );
+
+		// Navigate to a page without clientNavigationDisabled.
+		await page.getByTestId( 'link 4' ).click();
+
+		// Check the page has updated and the navigation was successfull.
+		await expect( status ).toHaveText( 'idle' );
+		await expect( title ).toHaveText( 'Link with derivedStateClosure' );
+		await expect( count ).toHaveText( '1' );
+
+		// Ensure the value from the getter has not changed.
+		await expect( derivedStateClosure ).toHaveText( 'helloFromGetter' );
+
+		await page.goBack();
+		await expect( status ).toHaveText( 'idle' );
+		await expect( title ).toHaveText( 'Main' );
+		await expect( count ).toHaveText( '1' );
+
+		// Ensure the value from the getter has not changed.
+		await expect( derivedStateClosure ).toHaveText( 'helloFromGetter' );
 	} );
 } );

@@ -7,7 +7,12 @@ import { SafeAreaView } from 'react-native';
  * WordPress dependencies
  */
 import { Children, useEffect, useContext } from '@wordpress/element';
-import { createSlotFill, BottomSheetContext } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import { BottomSheetContext } from '../bottom-sheet-context';
+import { createSlotFill } from '../../../slot-fill';
 
 const { Fill, Slot } = createSlotFill( 'BottomSheetSubSheet' );
 
@@ -23,9 +28,7 @@ const BottomSheetSubSheet = ( {
 		if ( showSheet ) {
 			setIsFullScreen( isFullScreen );
 		}
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ showSheet, isFullScreen ] );
 
 	return (

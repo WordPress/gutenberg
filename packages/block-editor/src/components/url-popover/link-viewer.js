@@ -1,14 +1,14 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { edit } from '@wordpress/icons';
+import { pencil } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -25,7 +25,7 @@ export default function LinkViewer( {
 } ) {
 	return (
 		<div
-			className={ classnames(
+			className={ clsx(
 				'block-editor-url-popover__link-viewer',
 				className
 			) }
@@ -38,9 +38,10 @@ export default function LinkViewer( {
 			/>
 			{ onEditLinkClick && (
 				<Button
-					icon={ edit }
+					icon={ pencil }
 					label={ __( 'Edit' ) }
 					onClick={ onEditLinkClick }
+					size="compact"
 				/>
 			) }
 		</div>

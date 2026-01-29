@@ -19,6 +19,7 @@ test.describe( 'toVdom', () => {
 	test( 'it should delete comments', async ( { page } ) => {
 		const el = page.getByTestId( 'it should delete comments' );
 		const c = await el.innerHTML();
+		expect( c ).not.toContain( '##last-child##' );
 		expect( c ).not.toContain( '##1##' );
 		expect( c ).not.toContain( '##2##' );
 		const el2 = page.getByTestId(
@@ -32,6 +33,7 @@ test.describe( 'toVdom', () => {
 			'it should delete processing instructions'
 		);
 		const c = await el.innerHTML();
+		expect( c ).not.toContain( '##last-child##' );
 		expect( c ).not.toContain( '##1##' );
 		expect( c ).not.toContain( '##2##' );
 		const el2 = page.getByTestId(

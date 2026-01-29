@@ -3,9 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { focus } from '@wordpress/dom';
 import { useReducer, useRef, useEffect } from '@wordpress/element';
-import { lock } from '@wordpress/icons';
+import { lock, unlock } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -13,55 +12,44 @@ import { lock } from '@wordpress/icons';
 import BlockLockModal from './modal';
 import useBlockLock from './use-block-lock';
 
-export default function BlockLockToolbar( { clientId, wrapperRef } ) {
-	const { canEdit, canMove, canRemove, canLock } = useBlockLock( clientId );
+export default function BlockLockToolbar( { clientId } ) {
+	const { canLock, isLocked } = useBlockLock( clientId );
 
 	const [ isModalOpen, toggleModal ] = useReducer(
 		( isActive ) => ! isActive,
 		false
 	);
 
-	const lockButtonRef = useRef( null );
-	const isFirstRender = useRef( true );
+	const hasLockButtonShownRef = useRef( false );
 
-	const shouldHideBlockLockUI =
-		! canLock || ( canEdit && canMove && canRemove );
-
-	// Restore focus manually on the first focusable element in the toolbar
-	// when the block lock modal is closed and the block is not locked anymore.
-	// See https://github.com/WordPress/gutenberg/issues/51447
+	// If the block lock button has been shown, we don't want to remove it
+	// from the toolbar until the toolbar is rendered again without it.
+	// Removing it beforehand can cause focus loss issues, such as when
+	// unlocking the block from the modal. It needs to return focus from
+	// whence it came, and to do that, we need to leave the button in the toolbar.
 	useEffect( () => {
-		if ( isFirstRender.current ) {
-			isFirstRender.current = false;
-			return;
+		if ( isLocked ) {
+			hasLockButtonShownRef.current = true;
 		}
+	}, [ isLocked ] );
 
-		if ( ! isModalOpen && shouldHideBlockLockUI ) {
-			focus.focusable
-				.find( wrapperRef.current, {
-					sequential: false,
-				} )
-				.find(
-					( element ) =>
-						element.tagName === 'BUTTON' &&
-						element !== lockButtonRef.current
-				)
-				?.focus();
-		}
-		// wrapperRef is a reference object and should be stable
-	}, [ isModalOpen, shouldHideBlockLockUI, wrapperRef ] );
-
-	if ( shouldHideBlockLockUI ) {
+	if ( ! isLocked && ! hasLockButtonShownRef.current ) {
 		return null;
+	}
+
+	let label = isLocked ? __( 'Unlock' ) : __( 'Lock' );
+
+	if ( ! canLock && isLocked ) {
+		label = __( 'Locked' );
 	}
 
 	return (
 		<>
 			<ToolbarGroup className="block-editor-block-lock-toolbar">
 				<ToolbarButton
-					ref={ lockButtonRef }
-					icon={ lock }
-					label={ __( 'Unlock' ) }
+					disabled={ ! canLock }
+					icon={ isLocked ? lock : unlock }
+					label={ label }
 					onClick={ toggleModal }
 					aria-expanded={ isModalOpen }
 					aria-haspopup="dialog"

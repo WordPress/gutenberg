@@ -98,9 +98,9 @@ The `disableDropZone` prop still takes precedence over `dropZoneUIOnly` – spec
 
 ### icon
 
-Icon to display left of the title. When passed as a `String`, the icon will be resolved as a [Dashicon](https://developer.wordpress.org/resource/dashicons/). Alternatively, you can pass in a `WPComponent` such as `BlockIcon`to render instead.
+Icon to display left of the title. When passed as a `String`, the icon will be resolved as a [Dashicon](https://developer.wordpress.org/resource/dashicons/). Alternatively, you can pass in a `Component` such as `BlockIcon`to render instead.
 
--   Type: `String|WPComponent`
+-   Type: `String|Component`
 -   Required: No
 -   Platform: Web | Mobile
 
@@ -198,9 +198,9 @@ Callback called when urls can be configured. No media insertion from url will be
 
 ### handleUpload
 
-When set to false the handling of the upload is left to the calling component.
+When the value is set to `false` or returned as `false`, the handling of the upload is left to the consumer component. The function signature accepts an array containing the files to be uploaded.
 
--   Type: `Boolean`
+-   Type: `Boolean|Function`
 -   Required: No
 -   Default: `true`
 -   Platform: Web
@@ -216,7 +216,7 @@ Replace implementation of the placeholder:
 ```js
 function replaceMediaPlaceholder() {
 	return function () {
-		return wp.element.createElement(
+		return React.createElement(
 			'div',
 			{},
 			'The replacement contents or components.'

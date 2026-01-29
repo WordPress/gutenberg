@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,37 +12,69 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 	useBlockProps,
-	useSetting,
+	useSettings,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	__experimentalUseCustomUnits as useCustomUnits,
-	PanelBody,
 	__experimentalUnitControl as UnitControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+
+function ColumnInspectorControls( { width, setAttributes } ) {
+	const [ availableUnits ] = useSettings( 'spacing.units' );
+	const units = useCustomUnits( {
+		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
+	} );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	return (
+		<ToolsPanel
+			label={ __( 'Settings' ) }
+			resetAll={ () => {
+				setAttributes( { width: undefined } );
+			} }
+			dropdownMenuProps={ dropdownMenuProps }
+		>
+			<ToolsPanelItem
+				hasValue={ () => width !== undefined }
+				label={ __( 'Width' ) }
+				onDeselect={ () => setAttributes( { width: undefined } ) }
+				isShownByDefault
+			>
+				<UnitControl
+					label={ __( 'Width' ) }
+					__unstableInputWidth="calc(50% - 8px)"
+					__next40pxDefaultSize
+					value={ width || '' }
+					onChange={ ( nextWidth ) => {
+						nextWidth =
+							0 > parseFloat( nextWidth ) ? '0' : nextWidth;
+						setAttributes( { width: nextWidth } );
+					} }
+					units={ units }
+				/>
+			</ToolsPanelItem>
+		</ToolsPanel>
+	);
+}
 
 function ColumnEdit( {
 	attributes: { verticalAlignment, width, templateLock, allowedBlocks },
 	setAttributes,
 	clientId,
 } ) {
-	const classes = classnames( 'block-core-columns', {
+	const classes = clsx( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
-
-	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'%',
-			'px',
-			'em',
-			'rem',
-			'vw',
-		],
-	} );
-
 	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
 		( select ) => {
 			const { getBlockOrder, getBlockRootClientId } =
@@ -108,20 +140,10 @@ function ColumnEdit( {
 				/>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Column settings' ) }>
-					<UnitControl
-						label={ __( 'Width' ) }
-						labelPosition="edge"
-						__unstableInputWidth="80px"
-						value={ width || '' }
-						onChange={ ( nextWidth ) => {
-							nextWidth =
-								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
-							setAttributes( { width: nextWidth } );
-						} }
-						units={ units }
-					/>
-				</PanelBody>
+				<ColumnInspectorControls
+					width={ width }
+					setAttributes={ setAttributes }
+				/>
 			</InspectorControls>
 			<div { ...innerBlocksProps } />
 		</>

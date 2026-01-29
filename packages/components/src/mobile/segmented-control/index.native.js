@@ -74,18 +74,14 @@ const SegmentedControls = ( {
 	useEffect( () => {
 		setActiveSegmentIndex( selectedSegmentIndex );
 		segmentHandler( segments[ selectedSegmentIndex ] );
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [] );
 
 	useEffect( () => {
 		positionAnimationValue.setValue(
 			calculateEndValue( activeSegmentIndex )
 		);
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ segmentsDimensions ] );
 
 	const containerStyle = usePreferredColorSchemeStyle(
@@ -173,7 +169,7 @@ const SegmentedControls = ( {
 							accessibilityState={ {
 								selected: activeSegmentIndex === index,
 							} }
-							accessibilityRole={ 'button' }
+							accessibilityRole="button"
 							accessibilityLabel={ segment }
 							accessibilityHint={ `${ index + 1 } on ${
 								segments.length

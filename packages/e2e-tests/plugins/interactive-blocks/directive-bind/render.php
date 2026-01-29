@@ -4,9 +4,9 @@
  *
  * @package gutenberg-test-interactive-blocks
  */
-
 ?>
-<div data-wp-interactive>
+
+<div data-wp-interactive="directive-bind">
 	<a
 		data-wp-bind--href="state.url"
 		data-testid="add missing href at hydration"
@@ -93,7 +93,19 @@
 		<button
 			data-testid="toggle value"
 			data-wp-on--click="actions.toggleValue"
+			data-wp-bind--data-toggle-count="context.count"
 		>Toggle</button>
 	</div>
 	<?php endforeach; ?>
+
+	<div data-wp-context='{"test": true}'>
+		<div
+			data-testid="without-unique-id"
+			data-wp-bind--data-test="context.test"
+		></div>
+		<div
+			data-testid="with-unique-id"
+			data-wp-bind--data-test---unique-id="context.test"
+		></div>
+	</div>
 </div>

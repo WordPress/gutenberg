@@ -5,8 +5,8 @@
 ## Usage
 
 ```jsx
+import { useState } from 'react';
 import { ColorPalette } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyColorPalette = () => {
 	const [ color, setColor ] = useState ( '#f00' )

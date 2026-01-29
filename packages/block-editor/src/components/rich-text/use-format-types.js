@@ -5,6 +5,11 @@ import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as richTextStore } from '@wordpress/rich-text';
 
+/**
+ * Internal dependencies
+ */
+import { essentialFormatKey } from '../../store/private-keys';
+
 function formatTypesSelector( select ) {
 	return select( richTextStore ).getFormatTypes();
 }
@@ -29,7 +34,9 @@ const interactiveContentTags = new Set( [
 ] );
 
 function prefixSelectKeys( selected, prefix ) {
-	if ( typeof selected !== 'object' ) return { [ prefix ]: selected };
+	if ( typeof selected !== 'object' ) {
+		return { [ prefix ]: selected };
+	}
 	return Object.fromEntries(
 		Object.entries( selected ).map( ( [ key, value ] ) => [
 			`${ prefix }.${ key }`,
@@ -39,7 +46,9 @@ function prefixSelectKeys( selected, prefix ) {
 }
 
 function getPrefixedSelectKeys( selected, prefix ) {
-	if ( selected[ prefix ] ) return selected[ prefix ];
+	if ( selected[ prefix ] ) {
+		return selected[ prefix ];
+	}
 	return Object.keys( selected )
 		.filter( ( key ) => key.startsWith( prefix + '.' ) )
 		.reduce( ( accumulator, key ) => {
@@ -52,35 +61,53 @@ function getPrefixedSelectKeys( selected, prefix ) {
  * This hook provides RichText with the `formatTypes` and its derived props from
  * experimental format type settings.
  *
- * @param {Object}  $0                              Options
- * @param {string}  $0.clientId                     Block client ID.
- * @param {string}  $0.identifier                   Block attribute.
- * @param {boolean} $0.withoutInteractiveFormatting Whether to clean the interactive formattings or not.
- * @param {Array}   $0.allowedFormats               Allowed formats
+ * @param {Object}  options                                Options
+ * @param {string}  options.clientId                       Block client ID.
+ * @param {string}  options.identifier                     Block attribute.
+ * @param {Array}   options.allowedFormats                 Allowed formats
+ * @param {boolean} options.withoutInteractiveFormatting   Whether to clean the interactive formatting or not.
+ * @param {boolean} options.disableNoneEssentialFormatting Whether to disable none-essential formatting or not.
  */
 export function useFormatTypes( {
 	clientId,
 	identifier,
-	withoutInteractiveFormatting,
 	allowedFormats,
+	withoutInteractiveFormatting,
+	disableNoneEssentialFormatting = false,
 } ) {
 	const allFormatTypes = useSelect( formatTypesSelector, [] );
 	const formatTypes = useMemo( () => {
-		return allFormatTypes.filter( ( { name, interactive, tagName } ) => {
-			if ( allowedFormats && ! allowedFormats.includes( name ) ) {
-				return false;
-			}
+		return allFormatTypes.filter(
+			( {
+				name,
+				interactive,
+				tagName,
+				[ essentialFormatKey ]: isEssential,
+			} ) => {
+				if ( allowedFormats && ! allowedFormats.includes( name ) ) {
+					return false;
+				}
 
-			if (
-				withoutInteractiveFormatting &&
-				( interactive || interactiveContentTags.has( tagName ) )
-			) {
-				return false;
-			}
+				if ( disableNoneEssentialFormatting && ! isEssential ) {
+					return false;
+				}
 
-			return true;
-		} );
-	}, [ allFormatTypes, allowedFormats, withoutInteractiveFormatting ] );
+				if (
+					withoutInteractiveFormatting &&
+					( interactive || interactiveContentTags.has( tagName ) )
+				) {
+					return false;
+				}
+
+				return true;
+			}
+		);
+	}, [
+		allFormatTypes,
+		allowedFormats,
+		disableNoneEssentialFormatting,
+		withoutInteractiveFormatting,
+	] );
 	const keyedSelected = useSelect(
 		( select ) =>
 			formatTypes.reduce( ( accumulator, type ) => {

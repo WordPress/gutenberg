@@ -10,29 +10,37 @@ runs:
     using: 'composite'
     steps:
         - name: Use desired version of Node.js
-          uses: actions/setup-node@64ed1c7eab4cce3362f8c340dee64e5eaeef8f7c # v3.6.0
+          uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
           with:
-              node-version-file: '.nvmrc'
+              node-version-file: ${{ inputs.node-version == '' && '.nvmrc' || '' }}
               node-version: ${{ inputs.node-version }}
+              check-latest: true
               cache: npm
 
         - name: Get Node.js and npm version
           id: node-version
           run: |
-              echo "NODE_VERSION=$(node -v)" >> $GITHUB_OUTPUT
+              echo "NODE_VERSION=$(node -v)" >> "$GITHUB_OUTPUT"
           shell: bash
 
         - name: Cache node_modules
           id: cache-node_modules
-          uses: actions/cache@88522ab9f39a2ea568f7027eddc7d8d8bc9d59c8 # v3.3.1
+          uses: actions/cache@8b402f58fbc84540c8b491a91e594a4576fec3d7 # v5.0.2
           with:
               path: '**/node_modules'
-              key: node_modules-${{ runner.os }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json') }}
+              key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
 
         - name: Install npm dependencies
           if: ${{ steps.cache-node_modules.outputs.cache-hit != 'true' }}
-          run: npm ci
+          run: |
+              npm ci
           shell: bash
+        - name: Upload npm logs as an artifact on failure
+          uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+          if: failure()
+          with:
+              name: npm-logs
+              path: C:\npm\cache\_logs
 
         # On cache hit, we run the post-install script to match the native `npm ci` behavior.
         # An example of this is to patch `node_modules` using patch-package.

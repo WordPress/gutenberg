@@ -3,6 +3,7 @@
 		"name": "core/more",
 		"isValid": true,
 		"attributes": {
+			"customText": "",
 			"noTeaser": false
 		},
 		"innerBlocks": []

@@ -9,13 +9,14 @@ import { View } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component, Fragment } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { PanelBody, TextControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import BottomSheet from '../bottom-sheet';
 import styles from './styles.scss';
+import PanelBody from '../../panel/body';
+import TextControl from '../../text-control';
 
 function Separator() {
 	const separatorStyle = usePreferredColorSchemeStyle(
@@ -61,7 +62,7 @@ export default class Picker extends Component {
 					icon={ option.icon }
 					leftAlign={ leftAlign }
 					label={ option.label }
-					separatorType={ 'none' }
+					separatorType="none"
 					onPress={ () => this.onCellPress( option.value ) }
 					disabled={ option.disabled }
 					style={
@@ -93,7 +94,7 @@ export default class Picker extends Component {
 						<TextControl
 							label={ __( 'Cancel' ) }
 							onPress={ this.onClose }
-							separatorType={ 'none' }
+							separatorType="none"
 						/>
 					) }
 				</PanelBody>

@@ -1,19 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useCallback, memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { RangeControl, SelectControl } from '../';
+import RangeControl from '../range-control';
+import SelectControl from '../select-control';
 import CategorySelect from './category-select';
 
 const DEFAULT_MIN_ITEMS = 1;
 const DEFAULT_MAX_ITEMS = 100;
 
-const options = [
+const defaultOrderByOptions = [
 	{
 		label: __( 'Newest to oldest' ),
 		value: 'date/desc',
@@ -23,12 +24,12 @@ const options = [
 		value: 'date/asc',
 	},
 	{
-		/* translators: label for ordering posts by title in ascending order */
+		/* translators: Label for ordering posts by title in ascending order. */
 		label: __( 'A → Z' ),
 		value: 'title/asc',
 	},
 	{
-		/* translators: label for ordering posts by title in descending order */
+		/* translators: Label for ordering posts by title in descending order. */
 		label: __( 'Z → A' ),
 		value: 'title/desc',
 	},
@@ -41,6 +42,7 @@ const QueryControls = memo(
 		numberOfItems,
 		order,
 		orderBy,
+		orderByOptions = defaultOrderByOptions,
 		maxItems = DEFAULT_MAX_ITEMS,
 		minItems = DEFAULT_MIN_ITEMS,
 		onCategoryChange,
@@ -67,19 +69,19 @@ const QueryControls = memo(
 					<SelectControl
 						label={ __( 'Order by' ) }
 						value={ `${ orderBy }/${ order }` }
-						options={ options }
+						options={ orderByOptions }
 						onChange={ onChange }
-						hideCancelButton={ true }
+						hideCancelButton
 					/>
 				) }
 				{ onCategoryChange && (
 					<CategorySelect
 						categoriesList={ categoriesList }
 						label={ __( 'Category' ) }
-						noOptionLabel={ __( 'All' ) }
+						noOptionLabel={ _x( 'All', 'categories' ) }
 						selectedCategoryId={ selectedCategoryId }
 						onChange={ onCategoryChange }
-						hideCancelButton={ true }
+						hideCancelButton
 					/>
 				) }
 				{ onNumberOfItemsChange && (

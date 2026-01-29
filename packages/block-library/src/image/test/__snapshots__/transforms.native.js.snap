@@ -12,7 +12,7 @@ exports[`Image block transformations to Columns block 1`] = `
 
 exports[`Image block transformations to Cover block 1`] = `
 "<!-- wp:cover {"url":"https://cldup.com/cXyG__fTLN.jpg","id":1,"dimRatio":50,"style":{"color":{}}} -->
-<div class="wp-block-cover"><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><img class="wp-block-cover__image-background wp-image-1" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","fontSize":"large"} -->
+<div class="wp-block-cover"><img class="wp-block-cover__image-background wp-image-1" alt="" src="https://cldup.com/cXyG__fTLN.jpg" data-object-fit="cover"/><span aria-hidden="true" class="wp-block-cover__background has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size">Mountain</p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->"

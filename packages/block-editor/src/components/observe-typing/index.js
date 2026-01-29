@@ -111,15 +111,14 @@ export function useMouseMoveTypingReset() {
  * Sets and removes the `isTyping` flag based on user actions:
  *
  * - Sets the flag if the user types within the given element.
- * - Removes the flag when the user selects some text, focusses a non-text
+ * - Removes the flag when the user selects some text, focuses a non-text
  *   field, presses ESC or TAB, or moves the mouse in the document.
  */
 export function useTypingObserver() {
-	const { isTyping, hasInlineToolbar } = useSelect( ( select ) => {
-		const { isTyping: _isTyping, getSettings } = select( blockEditorStore );
+	const { isTyping } = useSelect( ( select ) => {
+		const { isTyping: _isTyping } = select( blockEditorStore );
 		return {
 			isTyping: _isTyping(),
-			hasInlineToolbar: getSettings().hasInlineToolbar,
 		};
 	}, [] );
 	const { startTyping, stopTyping } = useDispatch( blockEditorStore );
@@ -183,12 +182,10 @@ export function useTypingObserver() {
 				node.addEventListener( 'focus', stopTypingOnNonTextField );
 				node.addEventListener( 'keydown', stopTypingOnEscapeKey );
 
-				if ( ! hasInlineToolbar ) {
-					ownerDocument.addEventListener(
-						'selectionchange',
-						stopTypingOnSelectionUncollapse
-					);
-				}
+				ownerDocument.addEventListener(
+					'selectionchange',
+					stopTypingOnSelectionUncollapse
+				);
 
 				return () => {
 					defaultView.clearTimeout( timerId );
@@ -245,7 +242,7 @@ export function useTypingObserver() {
 				node.removeEventListener( 'keydown', startTypingInTextField );
 			};
 		},
-		[ isTyping, hasInlineToolbar, startTyping, stopTyping ]
+		[ isTyping, startTyping, stopTyping ]
 	);
 
 	return useMergeRefs( [ ref1, ref2 ] );

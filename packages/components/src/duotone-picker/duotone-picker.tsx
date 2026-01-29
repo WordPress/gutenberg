@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
@@ -13,7 +13,9 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import ColorListPicker from './color-list-picker';
-import CircularOptionPicker from '../circular-option-picker';
+import CircularOptionPicker, {
+	getComputeCircularOptionPickerCommonProps,
+} from '../circular-option-picker';
 import { VStack } from '../v-stack';
 
 import CustomDuotoneBar from './custom-duotone-bar';
@@ -67,6 +69,7 @@ function DuotonePicker( {
 	onChange,
 	'aria-label': ariaLabel,
 	'aria-labelledby': ariaLabelledby,
+	...otherProps
 }: DuotonePickerProps ) {
 	const [ defaultDark, defaultLight ] = useMemo(
 		() => getDefaultColors( colorPalette ),
@@ -74,13 +77,15 @@ function DuotonePicker( {
 	);
 
 	const isUnset = value === 'unset';
+	const unsetOptionLabel = __( 'Unset' );
 
 	const unsetOption = (
 		<CircularOptionPicker.Option
 			key="unset"
 			value="unset"
 			isSelected={ isUnset }
-			tooltipText={ __( 'Unset' ) }
+			tooltipText={ unsetOptionLabel }
+			aria-label={ unsetOptionLabel }
 			className="components-duotone-picker__color-indicator"
 			onClick={ () => {
 				onChange( isUnset ? undefined : 'unset' );
@@ -88,7 +93,7 @@ function DuotonePicker( {
 		/>
 	);
 
-	const options = duotonePalette.map( ( { colors, slug, name } ) => {
+	const duotoneOptions = duotonePalette.map( ( { colors, slug, name } ) => {
 		const style = {
 			background: getGradientFromCSSColors( colors, '135deg' ),
 			color: 'transparent',
@@ -124,49 +129,36 @@ function DuotonePicker( {
 		);
 	} );
 
-	let metaProps:
-		| { asButtons: false; loop?: boolean; 'aria-label': string }
-		| { asButtons: false; loop?: boolean; 'aria-labelledby': string }
-		| { asButtons: true };
+	const { metaProps, labelProps } = getComputeCircularOptionPickerCommonProps(
+		asButtons,
+		loop,
+		ariaLabel,
+		ariaLabelledby
+	);
 
-	if ( asButtons ) {
-		metaProps = { asButtons: true };
-	} else {
-		const _metaProps: { asButtons: false; loop?: boolean } = {
-			asButtons: false,
-			loop,
-		};
-
-		if ( ariaLabel ) {
-			metaProps = { ..._metaProps, 'aria-label': ariaLabel };
-		} else if ( ariaLabelledby ) {
-			metaProps = {
-				..._metaProps,
-				'aria-labelledby': ariaLabelledby,
-			};
-		} else {
-			metaProps = {
-				..._metaProps,
-				'aria-label': __( 'Custom color picker.' ),
-			};
-		}
-	}
+	const options = unsetable
+		? [ unsetOption, ...duotoneOptions ]
+		: duotoneOptions;
 
 	return (
 		<CircularOptionPicker
+			{ ...otherProps }
 			{ ...metaProps }
-			options={ unsetable ? [ unsetOption, ...options ] : options }
+			{ ...labelProps }
+			options={ options }
 			actions={
 				!! clearable && (
 					<CircularOptionPicker.ButtonAction
 						onClick={ () => onChange( undefined ) }
+						accessibleWhenDisabled
+						disabled={ ! value }
 					>
 						{ __( 'Clear' ) }
 					</CircularOptionPicker.ButtonAction>
 				)
 			}
 		>
-			<Spacer paddingTop={ 4 }>
+			<Spacer paddingTop={ options.length === 0 ? 0 : 4 }>
 				<VStack spacing={ 3 }>
 					{ ! disableCustomColors && ! disableCustomDuotone && (
 						<CustomDuotoneBar

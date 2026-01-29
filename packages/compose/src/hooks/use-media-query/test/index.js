@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { act, render } from '@testing-library/react';
-import { matchMedia, setMedia, cleanup } from 'mock-match-media';
+import { matchMedia, setMedia } from 'mock-match-media';
 
 /**
  * Internal dependencies
@@ -26,10 +26,11 @@ describe( 'useMediaQuery', () => {
 	} );
 
 	afterEach( () => {
-		cleanup();
+		// Do not clean up, this will break our cache. Browsers also do not
+		// reset media queries.
 	} );
 
-	it( 'should return true when query matches', async () => {
+	it( 'should return true when the query matches', async () => {
 		const { container } = render(
 			<TestComponent query="(min-width: 782px)" />
 		);
@@ -53,7 +54,7 @@ describe( 'useMediaQuery', () => {
 		expect( container ).toHaveTextContent( 'useMediaQuery: false' );
 	} );
 
-	it( 'should return false when the query does not matches', async () => {
+	it( 'should return false when the query does not match', async () => {
 		const { container } = render(
 			<TestComponent query="(max-width: 782px)" />
 		);

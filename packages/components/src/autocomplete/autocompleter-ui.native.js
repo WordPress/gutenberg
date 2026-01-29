@@ -21,10 +21,6 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	Icon,
-	__unstableAutocompletionItemsFill as AutocompletionItemsFill,
-} from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
@@ -33,6 +29,8 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import BackgroundView from './background-view';
 import getDefaultUseItems from './get-default-use-items';
 import styles from './style.scss';
+import Icon from '../icon';
+import { __unstableAutocompletionItemsFill as AutocompletionItemsFill } from '../mobile/autocompletion-items';
 
 const { compose: stylesCompose } = StyleSheet;
 
@@ -71,9 +69,8 @@ export function getAutoCompleterUI( autocompleter ) {
 			} else if ( isVisible && text.length === 0 ) {
 				startAnimation( false );
 			}
-			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
+			// We want to avoid introducing unexpected side effects.
 			// See https://github.com/WordPress/gutenberg/pull/41820
-			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [ items, isVisible, text ] );
 
 		const activeItemStyles = usePreferredColorSchemeStyle(
@@ -114,9 +111,8 @@ export function getAutoCompleterUI( autocompleter ) {
 					}
 				} );
 			},
-			// Temporarily disabling exhaustive-deps to avoid introducing unexpected side effecst.
+			// We want to avoid introducing unexpected side effects.
 			// See https://github.com/WordPress/gutenberg/pull/41820
-			// eslint-disable-next-line react-hooks/exhaustive-deps
 			[ isVisible ]
 		);
 

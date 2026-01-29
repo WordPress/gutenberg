@@ -39,7 +39,7 @@ import {
 	button,
 	external,
 	link,
-	warning,
+	cautionFilled,
 } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
@@ -97,7 +97,7 @@ export class FileEdit extends Component {
 		const { attributes, setAttributes } = this.props;
 		const { downloadButtonText } = attributes;
 
-		if ( downloadButtonText === undefined || downloadButtonText === '' ) {
+		if ( RichText.isEmpty( downloadButtonText ) ) {
 			setAttributes( {
 				downloadButtonText: _x( 'Download', 'button label' ),
 			} );
@@ -282,7 +282,7 @@ export class FileEdit extends Component {
 						value={ textLinkHref }
 						onChange={ this.onChangeLinkDestinationOption }
 						options={ linkDestinationOptions }
-						hideCancelButton={ true }
+						hideCancelButton
 					/>
 					<ToggleControl
 						icon={ external }
@@ -469,7 +469,7 @@ export class FileEdit extends Component {
 										tagName="p"
 										underlineColorAndroid="transparent"
 										value={ fileName }
-										deleteEnter={ true }
+										deleteEnter
 										textAlign={ this.getTextAlignmentForAlignment(
 											align
 										) }
@@ -477,7 +477,7 @@ export class FileEdit extends Component {
 									{ isUploadFailed && (
 										<View style={ styles.errorContainer }>
 											<Icon
-												icon={ warning }
+												icon={ cautionFilled }
 												style={ errorIconStyle }
 											/>
 											<PlainText
@@ -505,7 +505,7 @@ export class FileEdit extends Component {
 												textAlign="center"
 												minWidth={ minWidth }
 												maxWidth={ this.state.maxWidth }
-												deleteEnter={ true }
+												deleteEnter
 												style={ styles.buttonText }
 												value={ downloadButtonText }
 												placeholder={ placeholderText }
@@ -565,7 +565,7 @@ export class FileEdit extends Component {
 		return (
 			<MediaUpload
 				allowedTypes={ [ MEDIA_TYPE_ANY ] }
-				isReplacingMedia={ true }
+				isReplacingMedia
 				onSelect={ this.onSelectFile }
 				render={ ( { open, getMediaOptions } ) => {
 					return this.getFileComponent( open, getMediaOptions );
@@ -583,7 +583,11 @@ export default compose( [
 		const isNotFileHref = id && getProtocol( href ) !== 'file:';
 		return {
 			media: isNotFileHref
-				? select( coreStore ).getMedia( id )
+				? select( coreStore ).getEntityRecord(
+						'postType',
+						'attachment',
+						id
+				  )
 				: undefined,
 			isSidebarOpened: isSelected && isEditorSidebarOpened(),
 			wasBlockJustInserted: select(

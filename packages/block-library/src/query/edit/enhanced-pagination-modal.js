@@ -12,11 +12,7 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContainsThirdPartyBlocks } from '../utils';
-
-const disableEnhancedPaginationDescription = __(
-	'Plugin blocks are not supported yet. For the enhanced pagination to work, remove the plugin block, then re-enable "Enhanced pagination" in the Query Block settings.'
-);
+import { useUnsupportedBlocks } from '../utils';
 
 const modalDescriptionId =
 	'wp-block-query-enhanced-pagination-modal__description';
@@ -27,34 +23,47 @@ export default function EnhancedPaginationModal( {
 	setAttributes,
 } ) {
 	const [ isOpen, setOpen ] = useState( false );
-
-	const containsThirdPartyBlocks = useContainsThirdPartyBlocks( clientId );
+	const hasUnsupportedBlocks = useUnsupportedBlocks( clientId );
 
 	useEffect( () => {
-		setOpen( containsThirdPartyBlocks && enhancedPagination );
-	}, [ containsThirdPartyBlocks, enhancedPagination, setOpen ] );
+		if ( enhancedPagination && hasUnsupportedBlocks ) {
+			setAttributes( { enhancedPagination: false } );
+			setOpen( true );
+		}
+	}, [ enhancedPagination, hasUnsupportedBlocks, setAttributes ] );
+
+	const closeModal = () => {
+		setOpen( false );
+	};
+
+	const notice =
+		__(
+			'Currently, avoiding full page reloads is not possible when non-interactive or non-client Navigation compatible blocks from plugins are present inside the Query block.'
+		) +
+		' ' +
+		__(
+			'If you still want to prevent full page reloads, remove that block, then disable "Reload full page" again in the Query Block settings.'
+		);
 
 	return (
 		isOpen && (
 			<Modal
-				title={ __( 'Enhanced pagination will be disabled' ) }
+				title={ __( 'Query block: Reload full page enabled' ) }
 				className="wp-block-query__enhanced-pagination-modal"
 				aria={ {
 					describedby: modalDescriptionId,
 				} }
+				role="alertdialog"
+				focusOnMount="firstElement"
 				isDismissible={ false }
-				shouldCloseOnEsc={ false }
-				shouldCloseOnClickOutside={ false }
+				onRequestClose={ closeModal }
 			>
 				<VStack alignment="right" spacing={ 5 }>
-					<span id={ modalDescriptionId }>
-						{ disableEnhancedPaginationDescription }
-					</span>
+					<span id={ modalDescriptionId }>{ notice }</span>
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
-						onClick={ () => {
-							setAttributes( { enhancedPagination: false } );
-						} }
+						onClick={ closeModal }
 					>
 						{ __( 'OK' ) }
 					</Button>

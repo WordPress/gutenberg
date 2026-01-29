@@ -1,18 +1,30 @@
 /**
  * WordPress dependencies
  */
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockList from '../block-list';
+import BlockTools from '../block-tools';
 import EditorStyles from '../editor-styles';
 import Iframe from '../iframe';
 import WritingFlow from '../writing-flow';
 import { useMouseMoveTypingReset } from '../observe-typing';
-import { useClipboardHandler } from '../copy-handler';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
+import { useBlockCommands } from '../use-block-commands';
+import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+// EditorStyles is a memoized component, so avoid passing a new
+// object reference on each render.
+const EDITOR_STYLE_TRANSFORM_OPTIONS = {
+	// Don't transform selectors that already specify `.editor-styles-wrapper`.
+	ignoredSelectors: [ /\.editor-styles-wrapper/gi ],
+};
 
 export function ExperimentalBlockCanvas( {
 	shouldIframe = true,
@@ -22,49 +34,69 @@ export function ExperimentalBlockCanvas( {
 	contentRef: contentRefProp,
 	iframeProps,
 } ) {
+	useBlockCommands();
+	const isTabletViewport = useViewportMatch( 'medium', '<' );
 	const resetTypingRef = useMouseMoveTypingReset();
-	const copyHandler = useClipboardHandler();
 	const clearerRef = useBlockSelectionClearer();
-	const contentRef = useMergeRefs( [
-		copyHandler,
-		contentRefProp,
-		clearerRef,
-	] );
+	const localRef = useRef();
+	const contentRef = useMergeRefs( [ contentRefProp, clearerRef, localRef ] );
+	const zoomLevel = useSelect(
+		( select ) => unlock( select( blockEditorStore ) ).getZoomLevel(),
+		[]
+	);
+	const zoomOutIframeProps =
+		zoomLevel !== 100 && ! isTabletViewport
+			? {
+					scale: zoomLevel,
+					frameSize: '40px',
+			  }
+			: {};
 
 	if ( ! shouldIframe ) {
 		return (
-			<>
+			<BlockTools
+				__unstableContentRef={ localRef }
+				style={ { height, display: 'flex' } }
+			>
 				<EditorStyles
 					styles={ styles }
-					scope=".editor-styles-wrapper"
+					scope=":where(.editor-styles-wrapper)"
+					transformOptions={ EDITOR_STYLE_TRANSFORM_OPTIONS }
 				/>
 				<WritingFlow
 					ref={ contentRef }
 					className="editor-styles-wrapper"
 					tabIndex={ -1 }
-					style={ { height } }
+					style={ {
+						height: '100%',
+						width: '100%',
+					} }
 				>
 					{ children }
 				</WritingFlow>
-			</>
+			</BlockTools>
 		);
 	}
 
 	return (
-		<Iframe
-			{ ...iframeProps }
-			ref={ resetTypingRef }
-			contentRef={ contentRef }
-			style={ {
-				width: '100%',
-				height,
-				...iframeProps?.style,
-			} }
-			name="editor-canvas"
+		<BlockTools
+			__unstableContentRef={ localRef }
+			style={ { height, display: 'flex' } }
 		>
-			<EditorStyles styles={ styles } />
-			{ children }
-		</Iframe>
+			<Iframe
+				{ ...iframeProps }
+				{ ...zoomOutIframeProps }
+				ref={ resetTypingRef }
+				contentRef={ contentRef }
+				style={ {
+					...iframeProps?.style,
+				} }
+				name="editor-canvas"
+			>
+				<EditorStyles styles={ styles } />
+				{ children }
+			</Iframe>
+		</BlockTools>
 	);
 }
 
@@ -91,11 +123,11 @@ export function ExperimentalBlockCanvas( {
  * }
  * ```
  *
- * @param {Object}    props          Component props.
- * @param {string}    props.height   Canvas height, defaults to 300px.
- * @param {Array}     props.styles   Content styles to inject into the iframe.
- * @param {WPElement} props.children Content of the canvas, defaults to the BlockList component.
- * @return {WPElement}               Block Breadcrumb.
+ * @param {Object}  props          Component props.
+ * @param {string}  props.height   Canvas height, defaults to 300px.
+ * @param {Array}   props.styles   Content styles to inject into the iframe.
+ * @param {Element} props.children Content of the canvas, defaults to the BlockList component.
+ * @return {Element}               Block Breadcrumb.
  */
 function BlockCanvas( { children, height, styles } ) {
 	return (

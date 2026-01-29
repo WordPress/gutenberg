@@ -54,7 +54,7 @@ function gutenberg_test_register_context_blocks() {
 					$block->context['postType'],
 				);
 
-				return implode( ',', $ordered_context );
+				return '<p>' . implode( ',', $ordered_context ) . '</p>';
 			},
 			'editor_script_handles' => array( 'gutenberg-test-block-context' ),
 		)

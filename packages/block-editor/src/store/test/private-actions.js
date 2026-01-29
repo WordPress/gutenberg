@@ -4,8 +4,11 @@
 import {
 	hideBlockInterface,
 	showBlockInterface,
+	expandBlock,
 	__experimentalUpdateSettings,
-	setOpenedBlockSettingsMenu,
+	setInsertionPoint,
+	startDragging,
+	stopDragging,
 } from '../private-actions';
 
 describe( 'private actions', () => {
@@ -80,18 +83,41 @@ describe( 'private actions', () => {
 		} );
 	} );
 
-	describe( 'setOpenedBlockSettingsMenu', () => {
-		it( 'should return the SET_OPENED_BLOCK_SETTINGS_MENU action', () => {
-			expect( setOpenedBlockSettingsMenu() ).toEqual( {
-				clientId: undefined,
-				type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
+	describe( 'startDragging', () => {
+		it( 'should return the START_DRAGGING action', () => {
+			expect( startDragging() ).toEqual( {
+				type: 'START_DRAGGING',
 			} );
 		} );
+	} );
 
-		it( 'should return the SET_OPENED_BLOCK_SETTINGS_MENU action with client id if provided', () => {
-			expect( setOpenedBlockSettingsMenu( 'abcd' ) ).toEqual( {
-				clientId: 'abcd',
-				type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
+	describe( 'stopDragging', () => {
+		it( 'should return the STOP_DRAGGING action', () => {
+			expect( stopDragging() ).toEqual( {
+				type: 'STOP_DRAGGING',
+			} );
+		} );
+	} );
+
+	describe( 'expandBlock', () => {
+		it( 'should return the SET_BLOCK_EXPANDED_IN_LIST_VIEW action', () => {
+			expect( expandBlock( 'block-1' ) ).toEqual( {
+				type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW',
+				clientId: 'block-1',
+			} );
+		} );
+	} );
+
+	describe( 'setInsertionPoint', () => {
+		it( 'should return the SET_INSERTION_POINT action', () => {
+			expect(
+				setInsertionPoint( {
+					rootClientId: '',
+					index: '123',
+				} )
+			).toEqual( {
+				type: 'SET_INSERTION_POINT',
+				value: { rootClientId: '', index: '123' },
 			} );
 		} );
 	} );

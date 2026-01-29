@@ -15,7 +15,7 @@ export type NumberControlProps = Omit<
 	 */
 	hideHTMLArrows?: boolean;
 	/**
-	 * The type of spin controls to display. These are butons that allow the
+	 * The type of spin controls to display. These are buttons that allow the
 	 * user to quickly increment and decrement the number.
 	 *
 	 * - 'none' - Do not show spin controls.
@@ -91,4 +91,11 @@ export type NumberControlProps = Omit<
 	 * The value of the input.
 	 */
 	value?: number | string;
+	/**
+	 * Do not throw a warning for the deprecated 36px default size.
+	 * For internal components of other components that already throw the warning.
+	 *
+	 * @ignore
+	 */
+	__shouldNotWarnDeprecated36pxSize?: boolean;
 };

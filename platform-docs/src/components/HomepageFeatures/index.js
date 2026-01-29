@@ -12,8 +12,7 @@ import styles from './styles.module.css';
 const FeatureList = [
 	{
 		title: 'Easy to Use',
-		Svg: require( '@site/static/img/undraw_docusaurus_mountain.svg' )
-			.default,
+		img: require( '@site/static/img/block-media-text.png' ).default,
 		description: (
 			<>
 				Gutenberg was designed from the ground up to be easily installed
@@ -23,7 +22,7 @@ const FeatureList = [
 	},
 	{
 		title: 'Flexible',
-		Svg: require( '@site/static/img/undraw_docusaurus_tree.svg' ).default,
+		img: require( '@site/static/img/plugin-icon.png' ).default,
 		description: (
 			<>
 				Gutenberg allows you to customize the UI of your block editor as
@@ -32,22 +31,32 @@ const FeatureList = [
 		),
 	},
 	{
+		title: 'Multi devices',
+		img: require( '@site/static/img/mobile-icon.png' ).default,
+		description: <>Work across screen sizes and devices.</>,
+	},
+	{
 		title: 'Powered by React',
-		Svg: require( '@site/static/img/undraw_docusaurus_react.svg' ).default,
+		svg: require( '@site/static/img/react-icon.svg' ).default,
 		description: <>Extend or customize your block editor using React.</>,
 	},
 ];
 
-function Feature( { Svg, title, description } ) {
+function Feature( { svg: Svg, img, title, description } ) {
 	return (
-		<div className={ clsx( 'col col--4' ) }>
-			<div className="text--center">
-				<Svg className={ styles.featureSvg } role="img" />
+		<div className={ styles.feature }>
+			<div>
+				{ !! Svg && <Svg className={ styles.featureSvg } role="img" /> }
+				{ !! img && (
+					<img
+						className={ styles.featureSvg }
+						src={ img }
+						alt={ title }
+					/>
+				) }
 			</div>
-			<div className="text--center padding-horiz--md">
-				<h3>{ title }</h3>
-				<p>{ description }</p>
-			</div>
+			<h3 className={ styles.title }>{ title }</h3>
+			<p>{ description }</p>
 		</div>
 	);
 }
@@ -55,12 +64,10 @@ function Feature( { Svg, title, description } ) {
 export default function HomepageFeatures() {
 	return (
 		<section className={ styles.features }>
-			<div className="container">
-				<div className="row">
-					{ FeatureList.map( ( props, idx ) => (
-						<Feature key={ idx } { ...props } />
-					) ) }
-				</div>
+			<div className={ clsx( 'container', styles.grid ) }>
+				{ FeatureList.map( ( props, idx ) => (
+					<Feature key={ idx } { ...props } />
+				) ) }
 			</div>
 		</section>
 	);

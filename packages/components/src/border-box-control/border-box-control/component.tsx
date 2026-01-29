@@ -14,8 +14,8 @@ import { BorderControl } from '../../border-control';
 import { StyledLabel } from '../../base-control/styles/base-control-styles';
 import { View } from '../../view';
 import { VisuallyHidden } from '../../visually-hidden';
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import { useBorderBoxControl } from './hook';
 
 import type { BorderBoxControlProps } from '../types';
@@ -89,7 +89,6 @@ const UnconnectedBorderBoxControl = (
 		);
 
 	const mergedRef = useMergeRefs( [ setPopoverAnchor, forwardedRef ] );
-
 	return (
 		<View className={ className } { ...otherProps } ref={ mergedRef }>
 			<BorderLabel
@@ -112,13 +111,14 @@ const UnconnectedBorderBoxControl = (
 						__unstablePopoverProps={ popoverProps }
 						shouldSanitizeBorder={ false } // This component will handle that.
 						value={ linkedValue }
-						withSlider={ true }
+						withSlider
 						width={
 							size === '__unstable-large' ? '116px' : '110px'
 						}
 						__experimentalIsRenderedInSidebar={
 							__experimentalIsRenderedInSidebar
 						}
+						__shouldNotWarnDeprecated36pxSize
 						size={ size }
 					/>
 				) : (
@@ -148,22 +148,11 @@ const UnconnectedBorderBoxControl = (
 };
 
 /**
- * The `BorderBoxControl` effectively has two view states. The first, a "linked"
- * view, allows configuration of a flat border via a single `BorderControl`.
- * The second, a "split" view, contains a `BorderControl` for each side
- * as well as a visualizer for the currently selected borders. Each view also
- * contains a button to toggle between the two.
- *
- * When switching from the "split" view to "linked", if the individual side
- * borders are not consistent, the "linked" view will display any border
- * properties selections that are consistent while showing a mixed state for
- * those that aren't. For example, if all borders had the same color and style
- * but different widths, then the border dropdown in the "linked" view's
- * `BorderControl` would show that consistent color and style but the "linked"
- * view's width input would show "Mixed" placeholder text.
+ * An input control for the color, style, and width of the border of a box. The
+ * border can be customized as a whole, or individually for each side of the box.
  *
  * ```jsx
- * import { __experimentalBorderBoxControl as BorderBoxControl } from '@wordpress/components';
+ * import { BorderBoxControl } from '@wordpress/components';
  * import { __ } from '@wordpress/i18n';
  *
  * const colors = [
@@ -187,6 +176,7 @@ const UnconnectedBorderBoxControl = (
  *
  * 	return (
  * 		<BorderBoxControl
+ * 			__next40pxDefaultSize
  * 			colors={ colors }
  * 			label={ __( 'Borders' ) }
  * 			onChange={ onChange }

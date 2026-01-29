@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -13,6 +13,7 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -49,7 +50,7 @@ const ShortcutList = ( { shortcuts } ) => (
 
 const ShortcutSection = ( { title, shortcuts, className } ) => (
 	<section
-		className={ classnames(
+		className={ clsx(
 			'customize-widgets-keyboard-shortcut-help-modal__section',
 			className
 		) }
@@ -90,15 +91,18 @@ export default function KeyboardShortcutHelpModal( {
 	toggleModal,
 } ) {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
-	registerShortcut( {
-		name: 'core/customize-widgets/keyboard-shortcuts',
-		category: 'main',
-		description: __( 'Display these keyboard shortcuts.' ),
-		keyCombination: {
-			modifier: 'access',
-			character: 'h',
-		},
-	} );
+
+	useEffect( () => {
+		registerShortcut( {
+			name: 'core/customize-widgets/keyboard-shortcuts',
+			category: 'main',
+			description: __( 'Display these keyboard shortcuts.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'h',
+			},
+		} );
+	}, [ registerShortcut ] );
 
 	useShortcut( 'core/customize-widgets/keyboard-shortcuts', toggleModal );
 

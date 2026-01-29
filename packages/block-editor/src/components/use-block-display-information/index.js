@@ -6,8 +6,10 @@ import {
 	store as blocksStore,
 	isReusableBlock,
 	isTemplatePart,
+	__experimentalGetBlockLabel as getBlockLabel,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import { symbol } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -67,25 +69,49 @@ function getPositionTypeLabel( attributes ) {
 export default function useBlockDisplayInformation( clientId ) {
 	return useSelect(
 		( select ) => {
-			if ( ! clientId ) return null;
+			if ( ! clientId ) {
+				return null;
+			}
 			const {
 				getBlockName,
 				getBlockAttributes,
-				__experimentalGetReusableBlockTitle,
+				__experimentalGetParsedPattern,
 			} = select( blockEditorStore );
 			const { getBlockType, getActiveBlockVariation } =
 				select( blocksStore );
 			const blockName = getBlockName( clientId );
 			const blockType = getBlockType( blockName );
-			if ( ! blockType ) return null;
+			if ( ! blockType ) {
+				return null;
+			}
 			const attributes = getBlockAttributes( clientId );
+
+			// Check if this block is a pattern
+			const patternName = attributes?.metadata?.patternName;
+
+			if ( patternName ) {
+				const pattern = __experimentalGetParsedPattern( patternName );
+				const positionLabel = getPositionTypeLabel( attributes );
+				return {
+					isSynced: false,
+					title: __( 'Pattern' ),
+					icon: symbol,
+					description:
+						pattern?.description || __( 'A block pattern.' ),
+					anchor: attributes?.anchor,
+					positionLabel,
+					positionType: attributes?.style?.position?.type,
+					name: pattern?.title || attributes?.metadata?.name,
+				};
+			}
+
 			const match = getActiveBlockVariation( blockName, attributes );
-			const isReusable = isReusableBlock( blockType );
-			const resusableTitle = isReusable
-				? __experimentalGetReusableBlockTitle( attributes.ref )
+			const isSynced =
+				isReusableBlock( blockType ) || isTemplatePart( blockType );
+			const syncedTitle = isSynced
+				? getBlockLabel( blockType, attributes )
 				: undefined;
-			const title = resusableTitle || blockType.title;
-			const isSynced = isReusable || isTemplatePart( blockType );
+			const title = syncedTitle || blockType.title;
 			const positionLabel = getPositionTypeLabel( attributes );
 			const blockTypeInfo = {
 				isSynced,
@@ -97,7 +123,9 @@ export default function useBlockDisplayInformation( clientId ) {
 				positionType: attributes?.style?.position?.type,
 				name: attributes?.metadata?.name,
 			};
-			if ( ! match ) return blockTypeInfo;
+			if ( ! match ) {
+				return blockTypeInfo;
+			}
 
 			return {
 				isSynced,

@@ -154,7 +154,6 @@ const renderWrappedItemInPanel = () => {
 const renderPanel = () => {
 	return render(
 		<ToolsPanel { ...defaultProps }>
-			{ false && <div>Hidden</div> }
 			<ToolsPanelItem { ...controlProps }>
 				<div>Example control</div>
 			</ToolsPanelItem>
@@ -222,10 +221,7 @@ describe( 'ToolsPanel', () => {
 					<ToolsPanelItem { ...controlProps }>
 						<div>Example control</div>
 					</ToolsPanelItem>
-					<ToolsPanelItem
-						{ ...altControlProps }
-						isShownByDefault={ true }
-					>
+					<ToolsPanelItem { ...altControlProps } isShownByDefault>
 						<div>Alt control</div>
 					</ToolsPanelItem>
 				</ToolsPanel>
@@ -239,22 +235,6 @@ describe( 'ToolsPanel', () => {
 		it( 'should not render panel menu when there are no panel items', () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
-					{ false && (
-						<ToolsPanelItem
-							label="Not rendered 1"
-							hasValue={ () => false }
-						>
-							Should not show
-						</ToolsPanelItem>
-					) }
-					{ false && (
-						<ToolsPanelItem
-							label="Not rendered 2"
-							hasValue={ () => false }
-						>
-							Not shown either
-						</ToolsPanelItem>
-					) }
 					<span>Visible but insignificant</span>
 				</ToolsPanel>
 			);
@@ -413,10 +393,7 @@ describe( 'ToolsPanel', () => {
 		it( 'should continue to render shown by default item after it is toggled off via menu item', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
-					<ToolsPanelItem
-						{ ...controlProps }
-						isShownByDefault={ true }
-					>
+					<ToolsPanelItem { ...controlProps } isShownByDefault>
 						<div>Default control</div>
 					</ToolsPanelItem>
 				</ToolsPanel>
@@ -440,10 +417,7 @@ describe( 'ToolsPanel', () => {
 		it( 'should render appropriate menu groups', async () => {
 			render(
 				<ToolsPanel { ...defaultProps }>
-					<ToolsPanelItem
-						{ ...controlProps }
-						isShownByDefault={ true }
-					>
+					<ToolsPanelItem { ...controlProps } isShownByDefault>
 						<div>Default control</div>
 					</ToolsPanelItem>
 					<ToolsPanelItem { ...altControlProps }>
@@ -455,16 +429,13 @@ describe( 'ToolsPanel', () => {
 
 			const menuGroups = screen.getAllByRole( 'group' );
 
-			// Groups should be: default controls, optional controls & reset all.
-			expect( menuGroups.length ).toEqual( 3 );
+			// There are now only two groups controls & reset all.
+			expect( menuGroups.length ).toEqual( 2 );
 		} );
 
 		it( 'should not render contents of items when in placeholder state', () => {
 			render(
-				<ToolsPanel
-					{ ...defaultProps }
-					shouldRenderPlaceholderItems={ true }
-				>
+				<ToolsPanel { ...defaultProps } shouldRenderPlaceholderItems>
 					<ToolsPanelItem { ...altControlProps }>
 						<div>Optional control</div>
 					</ToolsPanelItem>
@@ -493,10 +464,7 @@ describe( 'ToolsPanel', () => {
 
 			const TestPanel = () => (
 				<ToolsPanel { ...defaultProps }>
-					<ToolsPanelItem
-						{ ...altControlProps }
-						isShownByDefault={ true }
-					>
+					<ToolsPanelItem { ...altControlProps } isShownByDefault>
 						<div>Default control</div>
 					</ToolsPanelItem>
 					<ToolsPanelItem
@@ -517,15 +485,11 @@ describe( 'ToolsPanel', () => {
 
 			await openDropdownMenu();
 
-			// The linked control should initially appear in the optional controls
-			// menu group. There should be three menu groups: default controls,
-			// optional controls, and the group to reset all options.
 			let menuGroups = screen.getAllByRole( 'group' );
-			expect( menuGroups.length ).toEqual( 3 );
 
-			// The linked control should be in the second group, of optional controls.
+			// The linked control should be in the first group of controls.
 			expect(
-				within( menuGroups[ 1 ] ).getByText( 'Linked' )
+				within( menuGroups[ 0 ] ).getByText( 'Linked' )
 			).toBeInTheDocument();
 
 			// Simulate the main control having a value set which should
@@ -540,22 +504,18 @@ describe( 'ToolsPanel', () => {
 			linkedItem = screen.getByText( 'Linked control' );
 			expect( linkedItem ).toBeInTheDocument();
 
-			// The linked control should now appear in the default controls
-			// menu group and have been removed from the optional group.
+			// The linked control should still appear in the controls
+			// menu group but as a default control.
 			menuGroups = screen.getAllByRole( 'group' );
 
-			// There should now only be two groups. The default controls and
-			// and the group for the reset all option.
-			expect( menuGroups.length ).toEqual( 2 );
-
-			// The new default control item for the Linked control should be
-			// within the first menu group.
+			// The new default control item for the Linked control should still
+			// be within the first menu group.
 			const defaultItem = within( menuGroups[ 0 ] ).getByText( 'Linked' );
 			expect( defaultItem ).toBeInTheDocument();
 
 			// Optional controls have an additional aria-label. This can be used
-			// to confirm the conditional default control has been removed from
-			// the optional menu item group.
+			// to confirm the conditional default control is now being treated
+			// as default control.
 			expect(
 				screen.queryByRole( 'menuitemcheckbox', {
 					name: 'Show Linked',
@@ -576,16 +536,13 @@ describe( 'ToolsPanel', () => {
 
 			const TestPanel = () => (
 				<ToolsPanel { ...defaultProps }>
-					<ToolsPanelItem
-						{ ...altControlProps }
-						isShownByDefault={ true }
-					>
+					<ToolsPanelItem { ...altControlProps } isShownByDefault>
 						<div>Default control</div>
 					</ToolsPanelItem>
 					{ !! altControlValue && (
 						<ToolsPanelItem
 							{ ...conditionalControlProps }
-							isShownByDefault={ true }
+							isShownByDefault
 						>
 							<div>Conditional control</div>
 						</ToolsPanelItem>
@@ -599,7 +556,7 @@ describe( 'ToolsPanel', () => {
 			let conditionalItem = screen.queryByText( 'Conditional control' );
 			expect( conditionalItem ).not.toBeInTheDocument();
 
-			// The conditional control should not yet appear in the default controls
+			// The conditional control should not yet appear in the controls
 			// menu group.
 			await openDropdownMenu();
 			let menuGroups = screen.getAllByRole( 'group' );
@@ -619,7 +576,7 @@ describe( 'ToolsPanel', () => {
 			conditionalItem = screen.getByText( 'Conditional control' );
 			expect( conditionalItem ).toBeInTheDocument();
 
-			// The conditional control should now appear in the default controls
+			// The conditional control should now appear in the controls
 			// menu group.
 			menuGroups = screen.getAllByRole( 'group' );
 
@@ -1348,7 +1305,7 @@ describe( 'ToolsPanel', () => {
 							{ ...altControlProps }
 							label="Item 3"
 							data-testid="item-3"
-							isShownByDefault={ true }
+							isShownByDefault
 						>
 							<div>Item 3</div>
 						</ToolsPanelItem>
@@ -1360,8 +1317,8 @@ describe( 'ToolsPanel', () => {
 					</ToolsPanelItems>
 					<ToolsPanel
 						{ ...defaultProps }
-						hasInnerWrapper={ true }
-						shouldRenderPlaceholderItems={ true }
+						hasInnerWrapper
+						shouldRenderPlaceholderItems
 						__experimentalFirstVisibleItemClass="first"
 						__experimentalLastVisibleItemClass="last"
 					>

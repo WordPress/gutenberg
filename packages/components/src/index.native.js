@@ -106,13 +106,11 @@ export { default as LinkPickerScreen } from './mobile/link-picker/link-picker-sc
 export { default as LinkSettings } from './mobile/link-settings';
 export { default as LinkSettingsScreen } from './mobile/link-settings/link-settings-screen';
 export { default as LinkSettingsNavigation } from './mobile/link-settings/link-settings-navigation';
-export { default as ImageLinkDestinationsScreen } from './mobile/link-settings/image-link-destinations-screen';
 export { default as SegmentedControl } from './mobile/segmented-control';
-export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
+export { default as Image } from './mobile/image';
+export { IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image/constants';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
-export { default as InserterButton } from './mobile/inserter-button';
 export { setClipboard, getClipboard } from './mobile/clipboard';
-export { default as AudioPlayer } from './mobile/audio-player';
 export { default as Badge } from './mobile/badge';
 export { default as Gridicons } from './mobile/gridicons';
 
@@ -123,6 +121,7 @@ export {
 	ALIGNMENT_BREAKPOINTS,
 	alignmentHelpers,
 } from './mobile/utils/alignments';
+export { default as getPxFromCssUnit } from './mobile/utils/get-px-from-css-unit';
 
 // Hooks.
 export {
@@ -131,14 +130,5 @@ export {
 	getValueAndUnit,
 } from './mobile/utils/use-unit-converter-to-mobile';
 
-export {
-	default as GlobalStylesContext,
-	useGlobalStyles,
-	withGlobalStyles,
-	getMergedGlobalStyles,
-} from './mobile/global-styles-context';
-export {
-	getGlobalStyles,
-	getColorsAndGradients,
-	useMobileGlobalStylesColors,
-} from './mobile/global-styles-context/utils';
+// Private APIs.
+export { privateApis } from './private-apis';

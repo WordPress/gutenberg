@@ -14,6 +14,9 @@ import {
 	saving,
 	postSavingLock,
 	postAutosavingLock,
+	removedPanels,
+	blockInserterPanel,
+	listViewPanel,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -262,6 +265,79 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toEqual( {} );
+		} );
+	} );
+
+	describe( 'removedPanels', () => {
+		it( 'should remove panel', () => {
+			const original = deepFreeze( [] );
+			const state = removedPanels( original, {
+				type: 'REMOVE_PANEL',
+				panelName: 'post-status',
+			} );
+			expect( state ).toEqual( [ 'post-status' ] );
+		} );
+
+		it( 'should not remove already removed panel', () => {
+			const original = deepFreeze( [ 'post-status' ] );
+			const state = removedPanels( original, {
+				type: 'REMOVE_PANEL',
+				panelName: 'post-status',
+			} );
+			expect( state ).toBe( original );
+		} );
+	} );
+
+	describe( 'blockInserterPanel()', () => {
+		it( 'should apply default state', () => {
+			expect( blockInserterPanel( undefined, {} ) ).toEqual( false );
+		} );
+
+		it( 'should default to returning the same state', () => {
+			expect( blockInserterPanel( true, {} ) ).toBe( true );
+		} );
+
+		it( 'should close the inserter when opening the list view panel', () => {
+			expect(
+				blockInserterPanel( true, {
+					type: 'SET_IS_LIST_VIEW_OPENED',
+					isOpen: true,
+				} )
+			).toBe( false );
+		} );
+
+		it( 'should not change the state when closing the list view panel', () => {
+			expect(
+				blockInserterPanel( true, {
+					type: 'SET_IS_LIST_VIEW_OPENED',
+					isOpen: false,
+				} )
+			).toBe( true );
+		} );
+	} );
+
+	describe( 'listViewPanel()', () => {
+		it( 'should apply default state', () => {
+			expect( listViewPanel( undefined, {} ) ).toEqual( false );
+		} );
+
+		it( 'should default to returning the same state', () => {
+			expect( listViewPanel( true, {} ) ).toBe( true );
+		} );
+
+		it( 'should set the open state of the list view panel', () => {
+			expect(
+				listViewPanel( false, {
+					type: 'SET_IS_LIST_VIEW_OPENED',
+					isOpen: true,
+				} )
+			).toBe( true );
+			expect(
+				listViewPanel( true, {
+					type: 'SET_IS_LIST_VIEW_OPENED',
+					isOpen: false,
+				} )
+			).toBe( false );
 		} );
 	} );
 } );

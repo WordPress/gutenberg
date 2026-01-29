@@ -147,8 +147,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 						options={ options }
 						onChange={ ( value ) => setSelectedSidebar( value ) }
 						disabled={ ! options.length }
-						__next36pxDefaultSize
-						__nextHasNoMarginBottom
+						__next40pxDefaultSize
 					/>
 				</FlexBlock>
 				<FlexItem
@@ -158,6 +157,7 @@ export function TemplatePartImportControls( { area, setAttributes } ) {
 					} }
 				>
 					<Button
+						__next40pxDefaultSize
 						variant="primary"
 						type="submit"
 						isBusy={ isBusy }

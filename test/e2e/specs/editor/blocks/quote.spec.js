@@ -33,7 +33,9 @@ test.describe( 'Quote', () => {
 		page,
 	} ) => {
 		// Create a block with some text that will trigger a paragraph creation.
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '> A quote' );
 		// Create a second paragraph.
 		await page.keyboard.press( 'Enter' );
@@ -56,7 +58,9 @@ test.describe( 'Quote', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'test' );
 		await pageUtils.pressKeys( 'ArrowLeft', { times: 'test'.length } );
 		await page.keyboard.type( '> ' );
@@ -71,8 +75,13 @@ test.describe( 'Quote', () => {
 
 	test( 'can be created by typing "/quote"', async ( { editor, page } ) => {
 		// Create a list with the slash block shortcut.
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '/quote' );
+		await expect(
+			page.getByRole( 'option', { name: 'Quote', exact: true } )
+		).toBeVisible();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'I’m a quote' );
 		expect( await editor.getEditedPostContent() ).toBe(
@@ -88,7 +97,9 @@ test.describe( 'Quote', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'test' );
 		await editor.transformBlockTo( 'core/quote' );
 		expect( await editor.getEditedPostContent() ).toBe(
@@ -104,14 +115,16 @@ test.describe( 'Quote', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.down( 'Shift' );
-		await editor.canvas.click(
-			'role=document[name="Paragraph block"i] >> text=one'
-		);
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i] >> text=one' )
+			.click();
 		await page.keyboard.up( 'Shift' );
 		await editor.transformBlockTo( 'core/quote' );
 		expect( await editor.getEditedPostContent() ).toBe(
@@ -136,8 +149,9 @@ test.describe( 'Quote', () => {
 			await page.keyboard.type( 'one' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'two' );
-			// Navigate to the citation to select the block.
-			await page.keyboard.press( 'ArrowRight' );
+			await editor.clickBlockToolbarButton(
+				'Select parent block: Quote'
+			);
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe(
 				`<!-- wp:paragraph -->
@@ -158,7 +172,10 @@ test.describe( 'Quote', () => {
 			await page.keyboard.type( 'one' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'two' );
-			await page.keyboard.press( 'ArrowRight' );
+			await editor.clickBlockToolbarButton(
+				'Select parent block: Quote'
+			);
+			await editor.clickBlockToolbarButton( 'Add citation' );
 			await page.keyboard.type( 'cite' );
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe(
@@ -181,7 +198,8 @@ test.describe( 'Quote', () => {
 			page,
 		} ) => {
 			await editor.insertBlock( { name: 'core/quote' } );
-			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'ArrowUp' );
+			await editor.clickBlockToolbarButton( 'Add citation' );
 			await page.keyboard.type( 'cite' );
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe(
@@ -201,7 +219,7 @@ test.describe( 'Quote', () => {
 		} ) => {
 			await editor.insertBlock( { name: 'core/quote' } );
 			// Select the quote
-			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'ArrowUp' );
 			await editor.clickBlockOptionsMenuItem( 'Ungroup' );
 			expect( await editor.getEditedPostContent() ).toBe( '' );
 		} );
@@ -223,18 +241,27 @@ test.describe( 'Quote', () => {
 		);
 	} );
 
-	test( 'can be converted to a pullquote', async ( { editor, page } ) => {
-		await editor.insertBlock( { name: 'core/quote' } );
-		await page.keyboard.type( 'one' );
-		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( 'two' );
-		await page.keyboard.press( 'ArrowRight' );
-		await page.keyboard.type( 'cite' );
-		await editor.transformBlockTo( 'core/pullquote' );
+	test( 'can be converted to verse with mixed content', async ( {
+		editor,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/quote',
+			innerBlocks: [
+				{
+					name: 'core/paragraph',
+					attributes: { content: 'First paragraph' },
+				},
+				{
+					name: 'core/heading',
+					attributes: { content: 'A heading', level: 2 },
+				},
+			],
+		} );
+		await editor.transformBlockTo( 'core/verse' );
 		expect( await editor.getEditedPostContent() ).toBe(
-			`<!-- wp:pullquote -->
-<figure class="wp-block-pullquote"><blockquote><p>one<br>two</p><cite>cite</cite></blockquote></figure>
-<!-- /wp:pullquote -->`
+			`<!-- wp:verse -->
+<pre class="wp-block-verse">First paragraph<br>A heading</pre>
+<!-- /wp:verse -->`
 		);
 	} );
 
@@ -291,7 +318,8 @@ test.describe( 'Quote', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( '1' );
-		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowUp' );
+		await editor.clickBlockToolbarButton( 'Add citation' );
 		await page.keyboard.type( '2' );
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:quote -->
@@ -301,7 +329,7 @@ test.describe( 'Quote', () => {
 <!-- /wp:quote -->`
 		);
 		// Move the cursor to the start of the first paragraph of the quoted block.
-		await pageUtils.pressKeys( 'ArrowLeft', { times: 4 } );
+		await pageUtils.pressKeys( 'ArrowLeft', { times: 3 } );
 		await page.keyboard.press( 'Backspace' );
 		expect( await editor.getEditedPostContent() ).toBe(
 			`<!-- wp:paragraph -->
@@ -321,12 +349,15 @@ test.describe( 'Quote', () => {
 	} ) => {
 		await editor.insertBlock( { name: 'core/quote' } );
 		await page.keyboard.type( '1' );
-		await page.keyboard.press( 'ArrowRight' );
+		await page.keyboard.press( 'ArrowUp' );
+		await editor.clickBlockToolbarButton( 'Add citation' );
 		await page.keyboard.type( '2' );
 		await pageUtils.pressKeys( 'Shift+ArrowUp' );
 		let error;
 		page.on( 'console', ( msg ) => {
-			if ( msg.type() === 'error' ) error = msg.text();
+			if ( msg.type() === 'error' ) {
+				error = msg.text();
+			}
 		} );
 		await page.keyboard.press( 'Backspace' );
 		expect( error ).toBeUndefined();

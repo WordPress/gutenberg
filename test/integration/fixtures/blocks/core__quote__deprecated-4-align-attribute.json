@@ -1,0 +1,22 @@
+[
+	{
+		"name": "core/quote",
+		"isValid": true,
+		"attributes": {
+			"value": "",
+			"citation": "",
+			"textAlign": "right"
+		},
+		"innerBlocks": [
+			{
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "Quote with the align attribute. Example: {\"align\":\"right\"}",
+					"dropCap": false
+				},
+				"innerBlocks": []
+			}
+		]
+	}
+]

@@ -3,8 +3,10 @@
  */
 import * as globalStyles from './components/global-styles';
 import { ExperimentalBlockEditorProvider } from './components/provider';
-import { kebabCase } from './utils/object';
+import { getRichTextValues } from './components/rich-text/get-rich-text-values';
 import { lock } from './lock-unlock';
+import { PrivateRichText } from './components/rich-text/';
+import HTMLElementControl from './components/html-element-control';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -12,6 +14,8 @@ import { lock } from './lock-unlock';
 export const privateApis = {};
 lock( privateApis, {
 	...globalStyles,
-	kebabCase,
 	ExperimentalBlockEditorProvider,
+	getRichTextValues,
+	PrivateRichText,
+	HTMLElementControl,
 } );

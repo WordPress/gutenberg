@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
@@ -22,7 +22,7 @@ export function OptionGroup( {
 		<div
 			{ ...additionalProps }
 			role={ role }
-			className={ classnames(
+			className={ clsx(
 				'components-circular-option-picker__option-group',
 				'components-circular-option-picker__swatches',
 				className

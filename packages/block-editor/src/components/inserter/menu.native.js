@@ -177,7 +177,7 @@ function InserterMenu( {
 
 	return (
 		<BottomSheet
-			isVisible={ true }
+			isVisible
 			onClose={ onClose }
 			onKeyboardShow={ onKeyboardShow }
 			onKeyboardHide={ onKeyboardHide }
@@ -198,10 +198,10 @@ function InserterMenu( {
 				</>
 			}
 			hasNavigation
-			setMinHeightToMaxHeight={ true }
+			setMinHeightToMaxHeight
 			contentStyle={ styles[ 'inserter-menu__list' ] }
 			isFullScreen={ isFullScreen }
-			allowDragIndicator={ true }
+			allowDragIndicator
 		>
 			<BottomSheetConsumer>
 				{ ( { listProps } ) => (

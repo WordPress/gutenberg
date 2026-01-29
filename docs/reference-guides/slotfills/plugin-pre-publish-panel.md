@@ -6,7 +6,7 @@ This slot allows for injecting items into the bottom of the pre-publish panel th
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginPrePublishPanel } from '@wordpress/edit-post';
+import { PluginPrePublishPanel } from '@wordpress/editor';
 
 const PluginPrePublishPanelTest = () => (
 	<PluginPrePublishPanel>

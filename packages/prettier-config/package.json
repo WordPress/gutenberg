@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/prettier-config",
-	"version": "2.24.0",
+	"version": "4.39.0",
 	"description": "WordPress Prettier shared configuration.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,15 +20,23 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=14"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
 	"files": [
 		"lib/index.js"
 	],
 	"main": "lib/index.js",
+	"exports": {
+		".": "./lib/index.js",
+		"./package.json": "./package.json"
+	},
 	"types": "build-types",
+	"devDependencies": {
+		"@types/node": "^20.17.10"
+	},
 	"peerDependencies": {
-		"prettier": ">=2"
+		"prettier": ">=3"
 	},
 	"publishConfig": {
 		"access": "public"

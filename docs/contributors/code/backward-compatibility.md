@@ -10,7 +10,7 @@ Historically, WordPress has been known for preserving backward compatibility acr
 The Gutenberg code base is composed of two different types of packages:
 
 -   **production packages**: these are packages that are shipped as WordPress scripts (example: wp-components, wp-editor...).
--   **development packages**: these are made up of developer tools that can be used by third-party developers to lint, test, format and build their themes and plugins (example: @wordpress/scrips, @wordpress/env...). Typically, these are consumed as npm dependencies in third-party projects.
+-   **development packages**: these are made up of developer tools that can be used by third-party developers to lint, test, format and build their themes and plugins (example: @wordpress/scripts, @wordpress/env...). Typically, these are consumed as npm dependencies in third-party projects.
 
 Backward compatibility guarantees only apply to the production packages, as updates happen through WordPress upgrades.
 
@@ -21,7 +21,7 @@ Production packages use the `wp` global variable to provide APIs to third-party 
 -   The name of the function should not change.
 -   The order of the arguments of the function should not change.
 -   The function's returned value type should not change.
--   Changes to arguments (new arguments, modification of semantics) is possible if we guarantee that all previous calls are still possible.
+-   Changes to arguments (new arguments, modification of semantics) are possible if we guarantee that all previous calls are still possible.
 
 ### How to preserve backward compatibility for a React Component
 
@@ -61,7 +61,7 @@ deprecated( 'wp.components.ClipboardButton', {
 } );
 ```
 
-## Dev Notes
+## Dev notes
 
 Dev notes are [posts published on the make/core site](https://make.wordpress.org/core/tag/dev-notes/) prior to WordPress releases to inform third-party developers about important changes to the developer APIs, these changes can include:
 
@@ -70,7 +70,7 @@ Dev notes are [posts published on the make/core site](https://make.wordpress.org
 -   Unavoidable backward compatibility breakage, with reasoning and migration flows.
 -   Important deprecations (even without breakage), with reasoning and migration flows.
 
-### Dev Note Workflow
+### Dev note workflow
 
 -   When working on a pull request and the need for a dev note is discovered, add the **Needs Dev Note** label to the PR.
 -   If possible, add a comment to the PR explaining why the dev note is needed.

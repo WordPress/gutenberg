@@ -1,23 +1,15 @@
-.components-inline-color-popover {
+@use "@wordpress/base-styles/variables" as *;
 
-	.components-popover__content {
-		.components-tab-panel__tab-content {
-			padding: 16px;
-		}
+// Must equal $color-palette-circle-size from:
+// @wordpress/components/src/circular-option-picker/style.scss
+$swatch-size: 28px;
+$swatch-gap: 12px;
+$panelPadding: $grid-unit-20;
 
-		.components-color-palette {
-			margin-top: 0.6rem;
-		}
+.format-library__inline-color-popover {
 
-		.components-base-control__title {
-			display: block;
-			margin-bottom: 16px;
-			font-weight: 600;
-			color: #191e23;
-		}
-
-		.component-color-indicator {
-			vertical-align: text-bottom;
-		}
+	[role="tabpanel"] {
+		padding: $panelPadding;
+		width: ( $swatch-size * 6 ) + ( $swatch-gap * 5 ) + ( $panelPadding * 2 );
 	}
 }

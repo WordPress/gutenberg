@@ -2,58 +2,14 @@
  * WordPress dependencies
  */
 import { CustomSelectControl } from '@wordpress/components';
+import deprecated from '@wordpress/deprecated';
 import { useMemo } from '@wordpress/element';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
-const FONT_STYLES = [
-	{
-		name: _x( 'Regular', 'font style' ),
-		value: 'normal',
-	},
-	{
-		name: _x( 'Italic', 'font style' ),
-		value: 'italic',
-	},
-];
-
-const FONT_WEIGHTS = [
-	{
-		name: _x( 'Thin', 'font weight' ),
-		value: '100',
-	},
-	{
-		name: _x( 'Extra Light', 'font weight' ),
-		value: '200',
-	},
-	{
-		name: _x( 'Light', 'font weight' ),
-		value: '300',
-	},
-	{
-		name: _x( 'Regular', 'font weight' ),
-		value: '400',
-	},
-	{
-		name: _x( 'Medium', 'font weight' ),
-		value: '500',
-	},
-	{
-		name: _x( 'Semi Bold', 'font weight' ),
-		value: '600',
-	},
-	{
-		name: _x( 'Bold', 'font weight' ),
-		value: '700',
-	},
-	{
-		name: _x( 'Extra Bold', 'font weight' ),
-		value: '800',
-	},
-	{
-		name: _x( 'Black', 'font weight' ),
-		value: '900',
-	},
-];
+/**
+ * Internal dependencies
+ */
+import { getFontStylesAndWeights } from '../../utils/get-font-styles-and-weights';
 
 /**
  * Adjusts font appearance field label in case either font styles or weights
@@ -76,17 +32,20 @@ const getFontAppearanceLabel = ( hasFontStyles, hasFontWeights ) => {
 };
 
 /**
- * Control to display unified font style and weight options.
+ * Control to display font style and weight options of the active font.
  *
  * @param {Object} props Component props.
  *
- * @return {WPElement} Font appearance control.
+ * @return {Element} Font appearance control.
  */
 export default function FontAppearanceControl( props ) {
 	const {
+		/** Start opting into the larger default height that will become the default size in a future version. */
+		__next40pxDefaultSize = false,
 		onChange,
 		hasFontStyles = true,
 		hasFontWeights = true,
+		fontFamilyFaces,
 		value: { fontStyle, fontWeight },
 		...otherProps
 	} = props;
@@ -97,43 +56,22 @@ export default function FontAppearanceControl( props ) {
 		name: __( 'Default' ),
 		style: { fontStyle: undefined, fontWeight: undefined },
 	};
+	const { fontStyles, fontWeights, combinedStyleAndWeightOptions } =
+		getFontStylesAndWeights( fontFamilyFaces );
 
-	// Combines both font style and weight options into a single dropdown.
+	// Generates select options for combined font styles and weights.
 	const combineOptions = () => {
 		const combinedOptions = [ defaultOption ];
-
-		FONT_STYLES.forEach( ( { name: styleName, value: styleValue } ) => {
-			FONT_WEIGHTS.forEach(
-				( { name: weightName, value: weightValue } ) => {
-					const optionName =
-						styleValue === 'normal'
-							? weightName
-							: sprintf(
-									/* translators: 1: Font weight name. 2: Font style name. */
-									__( '%1$s %2$s' ),
-									weightName,
-									styleName
-							  );
-
-					combinedOptions.push( {
-						key: `${ styleValue }-${ weightValue }`,
-						name: optionName,
-						style: {
-							fontStyle: styleValue,
-							fontWeight: weightValue,
-						},
-					} );
-				}
-			);
-		} );
-
+		if ( combinedStyleAndWeightOptions ) {
+			combinedOptions.push( ...combinedStyleAndWeightOptions );
+		}
 		return combinedOptions;
 	};
 
 	// Generates select options for font styles only.
 	const styleOptions = () => {
 		const combinedOptions = [ defaultOption ];
-		FONT_STYLES.forEach( ( { name, value } ) => {
+		fontStyles.forEach( ( { name, value } ) => {
 			combinedOptions.push( {
 				key: value,
 				name,
@@ -146,7 +84,7 @@ export default function FontAppearanceControl( props ) {
 	// Generates select options for font weights only.
 	const weightOptions = () => {
 		const combinedOptions = [ defaultOption ];
-		FONT_WEIGHTS.forEach( ( { name, value } ) => {
+		fontWeights.forEach( ( { name, value } ) => {
 			combinedOptions.push( {
 				key: value,
 				name,
@@ -158,12 +96,19 @@ export default function FontAppearanceControl( props ) {
 
 	// Map font styles and weights to select options.
 	const selectOptions = useMemo( () => {
+		// Display combined available font style and weight options.
 		if ( hasFontStyles && hasFontWeights ) {
 			return combineOptions();
 		}
 
+		// Display only font style options or font weight options.
 		return hasFontStyles ? styleOptions() : weightOptions();
-	}, [ props.options ] );
+	}, [
+		props.options,
+		fontStyles,
+		fontWeights,
+		combinedStyleAndWeightOptions,
+	] );
 
 	// Find current selection by comparing font style & weight against options,
 	// and fall back to the Default option if there is no matching option.
@@ -203,11 +148,27 @@ export default function FontAppearanceControl( props ) {
 		);
 	};
 
+	if (
+		! __next40pxDefaultSize &&
+		( otherProps.size === undefined || otherProps.size === 'default' )
+	) {
+		deprecated(
+			`36px default size for wp.blockEditor.__experimentalFontAppearanceControl`,
+			{
+				since: '6.8',
+				version: '7.1',
+				hint: 'Set the `__next40pxDefaultSize` prop to true to start opting into the new default size, which will become the default in a future version.',
+			}
+		);
+	}
+
 	return (
 		hasStylesOrWeights && (
 			<CustomSelectControl
 				{ ...otherProps }
 				className="components-font-appearance-control"
+				__next40pxDefaultSize={ __next40pxDefaultSize }
+				__shouldNotWarnDeprecated36pxSize
 				label={ label }
 				describedBy={ getDescribedBy() }
 				options={ selectOptions }
@@ -215,7 +176,6 @@ export default function FontAppearanceControl( props ) {
 				onChange={ ( { selectedItem } ) =>
 					onChange( selectedItem.style )
 				}
-				__nextUnconstrainedWidth
 			/>
 		)
 	);

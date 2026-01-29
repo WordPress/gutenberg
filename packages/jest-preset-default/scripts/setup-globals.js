@@ -1,5 +1,6 @@
 // Run all tests with development tools enabled.
-global.SCRIPT_DEBUG = true;
+// eslint-disable-next-line @wordpress/wp-global-usage
+globalThis.SCRIPT_DEBUG = true;
 
 // These are necessary to load TinyMCE successfully.
 global.URL = window.URL;
@@ -16,7 +17,6 @@ global.window.setImmediate = function ( callback ) {
 global.window.requestAnimationFrame = function requestAnimationFrame(
 	callback
 ) {
-	// eslint-disable-next-line no-restricted-syntax
 	const randomDelay = Math.round( ( Math.random() * 1_000 ) / 60 );
 
 	return setTimeout( () => callback( Date.now() ), randomDelay );

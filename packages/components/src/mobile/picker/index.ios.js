@@ -9,13 +9,13 @@ import { ActionSheetIOS } from 'react-native';
 import { __ } from '@wordpress/i18n';
 import { Component, forwardRef, useContext } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { BottomSheetContext } from '@wordpress/components';
 import { usePreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import styles from './styles.scss';
+import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
 
 class Picker extends Component {
 	presentPicker() {

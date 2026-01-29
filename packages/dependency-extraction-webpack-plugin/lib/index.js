@@ -3,10 +3,7 @@
  */
 const path = require( 'path' );
 const webpack = require( 'webpack' );
-// In webpack 5 there is a `webpack.sources` field but for webpack 4 we have to fallback to the `webpack-sources` package.
-const { RawSource } = webpack.sources || require( 'webpack-sources' );
 const json2php = require( 'json2php' );
-const isWebpack4 = webpack.version.startsWith( '4.' );
 const { createHash } = webpack.util;
 
 /**
@@ -14,8 +11,12 @@ const { createHash } = webpack.util;
  */
 const {
 	defaultRequestToExternal,
+	defaultRequestToExternalModule,
 	defaultRequestToHandle,
 } = require( './util' );
+
+const { RawSource } = webpack.sources;
+const { AsyncDependenciesBlock } = webpack;
 
 const defaultExternalizedReportFileName = 'externalized-dependencies.json';
 
@@ -34,38 +35,65 @@ class DependencyExtractionWebpackPlugin {
 			options
 		);
 
-		/*
+		/**
 		 * Track requests that are externalized.
 		 *
 		 * Because we don't have a closed set of dependencies, we need to track what has
 		 * been externalized so we can recognize them in a later phase when the dependency
 		 * lists are generated.
+		 *
+		 * @type {Set<string>}
 		 */
 		this.externalizedDeps = new Set();
 
-		// Offload externalization work to the ExternalsPlugin.
-		this.externalsPlugin = new webpack.ExternalsPlugin(
-			'window',
-			isWebpack4
-				? this.externalizeWpDeps.bind( this )
-				: this.externalizeWpDepsV5.bind( this )
-		);
+		/**
+		 * Should we use modules. This will be set later to match webpack's
+		 * output.module option.
+		 *
+		 * @type {boolean}
+		 */
+		this.useModules = false;
 	}
 
-	externalizeWpDeps( _context, request, callback ) {
+	/**
+	 * @param {webpack.ExternalItemFunctionData}                             data
+	 * @param { ( err?: null | Error, result?: string | string[] ) => void } callback
+	 */
+	externalizeWpDeps( { request }, callback ) {
 		let externalRequest;
 
-		// Handle via options.requestToExternal first.
-		if ( typeof this.options.requestToExternal === 'function' ) {
-			externalRequest = this.options.requestToExternal( request );
-		}
+		try {
+			// Handle via options.requestToExternal(Module)  first.
+			if ( this.useModules ) {
+				if (
+					typeof this.options.requestToExternalModule === 'function'
+				) {
+					externalRequest =
+						this.options.requestToExternalModule( request );
 
-		// Cascade to default if unhandled and enabled.
-		if (
-			typeof externalRequest === 'undefined' &&
-			this.options.useDefaults
-		) {
-			externalRequest = defaultRequestToExternal( request );
+					// requestToExternalModule allows a boolean shorthand
+					if ( externalRequest === false ) {
+						externalRequest = undefined;
+					}
+					if ( externalRequest === true ) {
+						externalRequest = request;
+					}
+				}
+			} else if ( typeof this.options.requestToExternal === 'function' ) {
+				externalRequest = this.options.requestToExternal( request );
+			}
+
+			// Cascade to default if unhandled and enabled.
+			if (
+				typeof externalRequest === 'undefined' &&
+				this.options.useDefaults
+			) {
+				externalRequest = this.useModules
+					? defaultRequestToExternalModule( request )
+					: defaultRequestToExternal( request );
+			}
+		} catch ( err ) {
+			return callback( err );
 		}
 
 		if ( externalRequest ) {
@@ -77,10 +105,10 @@ class DependencyExtractionWebpackPlugin {
 		return callback();
 	}
 
-	externalizeWpDepsV5( { context, request }, callback ) {
-		return this.externalizeWpDeps( context, request, callback );
-	}
-
+	/**
+	 * @param {string} request
+	 * @return {string} Mapped dependency name
+	 */
 	mapRequestToDependency( request ) {
 		// Handle via options.requestToHandle first.
 		if ( typeof this.options.requestToHandle === 'function' ) {
@@ -102,6 +130,10 @@ class DependencyExtractionWebpackPlugin {
 		return request;
 	}
 
+	/**
+	 * @param {any} asset Asset Data
+	 * @return {string} Stringified asset data suitable for output
+	 */
 	stringify( asset ) {
 		if ( this.options.outputFormat === 'php' ) {
 			return `<?php return ${ json2php(
@@ -112,30 +144,99 @@ class DependencyExtractionWebpackPlugin {
 		return JSON.stringify( asset );
 	}
 
+	/** @type {webpack.WebpackPluginInstance['apply']} */
 	apply( compiler ) {
+		this.useModules = Boolean( compiler.options.output?.module );
+
+		/**
+		 * Offload externalization work to the ExternalsPlugin.
+		 * @type {webpack.ExternalsPlugin}
+		 */
+		this.externalsPlugin = new webpack.ExternalsPlugin(
+			this.useModules ? 'import' : 'window',
+			this.externalizeWpDeps.bind( this )
+		);
+
 		this.externalsPlugin.apply( compiler );
 
-		if ( isWebpack4 ) {
-			compiler.hooks.emit.tap( this.constructor.name, ( compilation ) =>
-				this.addAssets( compilation )
+		compiler.hooks.thisCompilation.tap(
+			this.constructor.name,
+			( compilation ) => {
+				compilation.hooks.processAssets.tap(
+					{
+						name: this.constructor.name,
+						stage: compiler.webpack.Compilation
+							.PROCESS_ASSETS_STAGE_OPTIMIZE_COMPATIBILITY,
+					},
+					() => this.checkForMagicComments( compilation )
+				);
+				compilation.hooks.processAssets.tap(
+					{
+						name: this.constructor.name,
+						stage: compiler.webpack.Compilation
+							.PROCESS_ASSETS_STAGE_ANALYSE,
+					},
+					() => this.addAssets( compilation )
+				);
+			}
+		);
+	}
+
+	/**
+	 * Check for magic comments before minification, so minification doesn't have to preserve them.
+	 * @param {webpack.Compilation} compilation
+	 */
+	checkForMagicComments( compilation ) {
+		// Accumulate all entrypoint chunks, some of them shared
+		const entrypointChunks = new Set();
+		for ( const entrypoint of compilation.entrypoints.values() ) {
+			for ( const chunk of entrypoint.chunks ) {
+				entrypointChunks.add( chunk );
+			}
+		}
+
+		// Process each entrypoint chunk independently
+		for ( const chunk of entrypointChunks ) {
+			const chunkFiles = Array.from( chunk.files );
+
+			const jsExtensionRegExp = this.useModules ? /\.m?js$/i : /\.js$/i;
+
+			const chunkJSFile = chunkFiles.find( ( f ) =>
+				jsExtensionRegExp.test( f )
 			);
-		} else {
-			compiler.hooks.thisCompilation.tap(
-				this.constructor.name,
-				( compilation ) => {
-					compilation.hooks.processAssets.tap(
-						{
-							name: this.constructor.name,
-							stage: compiler.webpack.Compilation
-								.PROCESS_ASSETS_STAGE_ANALYSE,
-						},
-						() => this.addAssets( compilation )
-					);
+			if ( ! chunkJSFile ) {
+				// There's no JS file in this chunk, no work for us. Typically a `style.css` from cache group.
+				continue;
+			}
+
+			// Prepare to look for magic comments, in order to decide whether
+			// `wp-polyfill` is needed.
+			const processContentsForMagicComments = ( content ) => {
+				const magicComments = [];
+
+				if ( content.includes( '/* wp:polyfill */' ) ) {
+					magicComments.push( 'wp-polyfill' );
 				}
-			);
+
+				return magicComments;
+			};
+
+			// Go through the assets to process the sources.
+			// This allows us to look for magic comments.
+			chunkFiles.sort().forEach( ( filename ) => {
+				const asset = compilation.getAsset( filename );
+				const content = asset.source.buffer();
+
+				const wpMagicComments =
+					processContentsForMagicComments( content );
+				compilation.updateAsset( filename, ( v ) => v, {
+					wpMagicComments,
+				} );
+			} );
 		}
 	}
 
+	/** @param {webpack.Compilation} compilation */
 	addAssets( compilation ) {
 		const {
 			combineAssets,
@@ -174,28 +275,53 @@ class DependencyExtractionWebpackPlugin {
 		for ( const chunk of entrypointChunks ) {
 			const chunkFiles = Array.from( chunk.files );
 
-			const chunkJSFile = chunkFiles.find( ( f ) => /\.js$/i.test( f ) );
+			const jsExtensionRegExp = this.useModules ? /\.m?js$/i : /\.js$/i;
+
+			const chunkJSFile = chunkFiles.find( ( f ) =>
+				jsExtensionRegExp.test( f )
+			);
 			if ( ! chunkJSFile ) {
 				// There's no JS file in this chunk, no work for us. Typically a `style.css` from cache group.
 				continue;
 			}
 
-			const chunkDeps = new Set();
+			/** @type {Set<string>} */
+			const chunkStaticDeps = new Set();
+			/** @type {Set<string>} */
+			const chunkDynamicDeps = new Set();
+
 			if ( injectPolyfill ) {
-				chunkDeps.add( 'wp-polyfill' );
+				chunkStaticDeps.add( 'wp-polyfill' );
 			}
 
-			const processModule = ( { userRequest } ) => {
+			/**
+			 * @param {webpack.Module} m
+			 */
+			const processModule = ( m ) => {
+				const { userRequest } = m;
 				if ( this.externalizedDeps.has( userRequest ) ) {
-					chunkDeps.add( this.mapRequestToDependency( userRequest ) );
+					if ( this.useModules ) {
+						const isStatic =
+							DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+								compilation,
+								m
+							);
+
+						( isStatic ? chunkStaticDeps : chunkDynamicDeps ).add(
+							m.request
+						);
+					} else {
+						chunkStaticDeps.add(
+							this.mapRequestToDependency( userRequest )
+						);
+					}
 				}
 			};
 
 			// Search for externalized modules in all chunks.
-			const modulesIterable = isWebpack4
-				? chunk.modulesIterable
-				: compilation.chunkGraph.getChunkModules( chunk );
-			for ( const chunkModule of modulesIterable ) {
+			for ( const chunkModule of compilation.chunkGraph.getChunkModulesIterable(
+				chunk
+			) ) {
 				processModule( chunkModule );
 				// Loop through submodules of ConcatenatedModule.
 				if ( chunkModule.modules ) {
@@ -205,7 +331,7 @@ class DependencyExtractionWebpackPlugin {
 				}
 			}
 
-			// Go through the assets and hash the sources. We can't just use
+			// Prepare to hash the sources. We can't just use
 			// `chunk.contentHash` because that's not updated when
 			// assets are minified. In practice the hash is updated by
 			// `RealContentHashPlugin` after minification, but it only modifies
@@ -214,20 +340,62 @@ class DependencyExtractionWebpackPlugin {
 			const { hashFunction, hashDigest, hashDigestLength } =
 				compilation.outputOptions;
 
-			const contentHash = chunkFiles
-				.sort()
-				.reduce( ( hash, filename ) => {
-					const asset = compilation.getAsset( filename );
-					return hash.update( asset.source.buffer() );
-				}, createHash( hashFunction ) )
+			const hashBuilder = createHash( hashFunction );
+
+			const processContentsForHash = ( content ) => {
+				hashBuilder.update( content );
+			};
+
+			// Prepare to look for magic comments, in order to decide whether
+			// `wp-polyfill` is needed.
+			const handleMagicComments = ( info ) => {
+				if ( ! info ) {
+					return;
+				}
+				if ( info.includes( 'wp-polyfill' ) ) {
+					chunkStaticDeps.add( 'wp-polyfill' );
+				}
+			};
+
+			// Go through the assets to process the sources.
+			// This allows us to generate hashes, as well as look for magic comments.
+			chunkFiles.sort().forEach( ( filename ) => {
+				const asset = compilation.getAsset( filename );
+				const content = asset.source.buffer();
+
+				processContentsForHash( content );
+				handleMagicComments( asset.info.wpMagicComments );
+			} );
+
+			// Finalise hash.
+			const contentHash = hashBuilder
 				.digest( hashDigest )
 				.slice( 0, hashDigestLength );
 
 			const assetData = {
-				// Get a sorted array so we can produce a stable, stringified representation.
-				dependencies: Array.from( chunkDeps ).sort(),
+				dependencies: [
+					// Sort these so we can produce a stable, stringified representation.
+					...Array.from( chunkStaticDeps ).sort(),
+					...Array.from( chunkDynamicDeps )
+						.sort()
+						.map( ( id ) => ( { id, import: 'dynamic' } ) ),
+				],
 				version: contentHash,
 			};
+
+			if ( this.useModules ) {
+				assetData.type = 'module';
+			}
+
+			if ( compilation.options?.optimization?.runtimeChunk !== false ) {
+				// Sets the script handle for the shared runtime file so WordPress registers it only once when using the asset file.
+				assetData.handle =
+					compilation.name +
+					'-' +
+					chunkJSFile
+						.replace( /\\/g, '/' )
+						.replace( jsExtensionRegExp, '' );
+			}
 
 			if ( combineAssets ) {
 				combinedAssetsData[ chunkJSFile ] = assetData;
@@ -246,14 +414,14 @@ class DependencyExtractionWebpackPlugin {
 					'.asset.' + ( outputFormat === 'php' ? 'php' : 'json' );
 				assetFilename = compilation
 					.getPath( '[file]', { filename: chunkJSFile } )
-					.replace( /\.js$/i, suffix );
+					.replace( /\.m?js$/i, suffix );
 			}
 
 			// Add source and file into compilation for webpack to output.
 			compilation.assets[ assetFilename ] = new RawSource(
 				this.stringify( assetData )
 			);
-			chunk.files[ isWebpack4 ? 'push' : 'add' ]( assetFilename );
+			chunk.files.add( assetFilename );
 		}
 
 		if ( combineAssets ) {
@@ -274,6 +442,94 @@ class DependencyExtractionWebpackPlugin {
 				this.stringify( combinedAssetsData )
 			);
 		}
+	}
+
+	static #staticDepsCurrent = new WeakSet();
+	static #staticDepsCache = new WeakMap();
+
+	/**
+	 * Can we trace a line of static dependencies from an entry to a module
+	 *
+	 * @param {webpack.Compilation}       compilation
+	 * @param {webpack.DependenciesBlock} block
+	 *
+	 * @return {boolean} True if there is a static import path to the root
+	 */
+	static hasStaticDependencyPathToRoot( compilation, block ) {
+		if ( DependencyExtractionWebpackPlugin.#staticDepsCache.has( block ) ) {
+			return DependencyExtractionWebpackPlugin.#staticDepsCache.get(
+				block
+			);
+		}
+
+		if (
+			DependencyExtractionWebpackPlugin.#staticDepsCurrent.has( block )
+		) {
+			return false;
+		}
+
+		DependencyExtractionWebpackPlugin.#staticDepsCurrent.add( block );
+
+		const incomingConnections = [
+			...compilation.moduleGraph.getIncomingConnections( block ),
+		].filter(
+			( connection ) =>
+				// Library connections don't have a dependency, this is a root
+				connection.dependency &&
+				// Entry dependencies are another root
+				connection.dependency.constructor.name !== 'EntryDependency'
+		);
+
+		// If we don't have non-entry, non-library incoming connections,
+		// we've reached a root of
+		if ( ! incomingConnections.length ) {
+			DependencyExtractionWebpackPlugin.#staticDepsCache.set(
+				block,
+				true
+			);
+			DependencyExtractionWebpackPlugin.#staticDepsCurrent.delete(
+				block
+			);
+			return true;
+		}
+
+		const staticDependentModules = incomingConnections.flatMap(
+			( connection ) => {
+				const { dependency } = connection;
+				const parentBlock =
+					compilation.moduleGraph.getParentBlock( dependency );
+
+				return parentBlock.constructor.name !==
+					AsyncDependenciesBlock.name
+					? [ compilation.moduleGraph.getParentModule( dependency ) ]
+					: [];
+			}
+		);
+
+		// All the dependencies were Async, the module was reached via a dynamic import
+		if ( ! staticDependentModules.length ) {
+			DependencyExtractionWebpackPlugin.#staticDepsCache.set(
+				block,
+				false
+			);
+			DependencyExtractionWebpackPlugin.#staticDepsCurrent.delete(
+				block
+			);
+			return false;
+		}
+
+		// Continue to explore any static dependencies
+		const result = staticDependentModules.some(
+			( parentStaticDependentModule ) =>
+				DependencyExtractionWebpackPlugin.hasStaticDependencyPathToRoot(
+					compilation,
+					parentStaticDependentModule
+				)
+		);
+
+		DependencyExtractionWebpackPlugin.#staticDepsCache.set( block, result );
+		DependencyExtractionWebpackPlugin.#staticDepsCurrent.delete( block );
+		return result;
 	}
 }
 

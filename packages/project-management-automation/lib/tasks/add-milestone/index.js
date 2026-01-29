@@ -6,7 +6,7 @@ const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
 
 /** @typedef {import('@octokit/request-error').RequestError} RequestError */
 /** @typedef {ReturnType<import('@actions/github').getOctokit>} GitHub */
-/** @typedef {import('@octokit/webhooks').WebhookPayloadPush} WebhookPayloadPush */
+/** @typedef {import('@octokit/webhooks-types').EventPayloadMap['push']} WebhookPayloadPush */
 
 /**
  * Number of expected days elapsed between releases.

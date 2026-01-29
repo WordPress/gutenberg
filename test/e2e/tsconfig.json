@@ -1,11 +1,13 @@
 {
+	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
+		"checkJs": false,
 		"noEmit": true,
-		"emitDeclarationOnly": false,
-		"allowJs": true,
-		"checkJs": false
+		"rootDir": ".",
+		"typeRoots": [ "../../typings", "../../node_modules/@types" ],
+		"types": [ "node" ]
 	},
-	"include": [ "**/*" ],
+	"include": [ "." ],
 	"exclude": []
 }

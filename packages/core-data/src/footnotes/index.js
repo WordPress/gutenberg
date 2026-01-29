@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
+
+/**
  * Internal dependencies
  */
 import getFootnotesOrder from './get-footnotes-order';
@@ -7,17 +12,23 @@ let oldFootnotes = {};
 
 export function updateFootnotesFromMeta( blocks, meta ) {
 	const output = { blocks };
-	if ( ! meta ) return output;
+	if ( ! meta ) {
+		return output;
+	}
 
 	// If meta.footnotes is empty, it means the meta is not registered.
-	if ( meta.footnotes === undefined ) return output;
+	if ( meta.footnotes === undefined ) {
+		return output;
+	}
 
 	const newOrder = getFootnotesOrder( blocks );
 
 	const footnotes = meta.footnotes ? JSON.parse( meta.footnotes ) : [];
 	const currentOrder = footnotes.map( ( fn ) => fn.id );
 
-	if ( currentOrder.join( '' ) === newOrder.join( '' ) ) return output;
+	if ( currentOrder.join( '' ) === newOrder.join( '' ) ) {
+		return output;
+	}
 
 	const newFootnotes = newOrder.map(
 		( fnId ) =>
@@ -48,38 +59,51 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 				continue;
 			}
 
-			if ( typeof value !== 'string' ) {
+			// To do, remove support for string values?
+			if (
+				typeof value !== 'string' &&
+				! ( value instanceof RichTextData )
+			) {
 				continue;
 			}
 
-			if ( value.indexOf( 'data-fn' ) === -1 ) {
-				continue;
+			const richTextValue =
+				typeof value === 'string'
+					? RichTextData.fromHTMLString( value )
+					: new RichTextData( value );
+
+			let hasFootnotes = false;
+
+			richTextValue.replacements.forEach( ( replacement ) => {
+				if ( replacement.type === 'core/footnote' ) {
+					const id = replacement.attributes[ 'data-fn' ];
+					const index = newOrder.indexOf( id );
+					// The innerHTML contains the count wrapped in a link.
+					const countValue = create( {
+						html: replacement.innerHTML,
+					} );
+					countValue.text = String( index + 1 );
+					countValue.formats = Array.from(
+						{ length: countValue.text.length },
+						() => countValue.formats[ 0 ]
+					);
+					countValue.replacements = Array.from(
+						{ length: countValue.text.length },
+						() => countValue.replacements[ 0 ]
+					);
+					replacement.innerHTML = toHTMLString( {
+						value: countValue,
+					} );
+					hasFootnotes = true;
+				}
+			} );
+
+			if ( hasFootnotes ) {
+				attributes[ key ] =
+					typeof value === 'string'
+						? richTextValue.toHTMLString()
+						: richTextValue;
 			}
-
-			// When we store rich text values, this would no longer
-			// require a regex.
-			const regex =
-				/(<sup[^>]+data-fn="([^"]+)"[^>]*><a[^>]*>)[\d*]*<\/a><\/sup>/g;
-
-			attributes[ key ] = value.replace(
-				regex,
-				( match, opening, fnId ) => {
-					const index = newOrder.indexOf( fnId );
-					return `${ opening }${ index + 1 }</a></sup>`;
-				}
-			);
-
-			const compatRegex = /<a[^>]+data-fn="([^"]+)"[^>]*>\*<\/a>/g;
-
-			attributes[ key ] = attributes[ key ].replace(
-				compatRegex,
-				( match, fnId ) => {
-					const index = newOrder.indexOf( fnId );
-					return `<sup data-fn="${ fnId }" class="fn"><a href="#${ fnId }" id="${ fnId }-link">${
-						index + 1
-					}</a></sup>`;
-				}
-			);
 		}
 
 		return attributes;

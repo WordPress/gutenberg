@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -17,8 +18,10 @@ import type { Color, Gradient } from '../types';
 const meta: Meta< typeof PaletteEdit > = {
 	title: 'Components/PaletteEdit',
 	component: PaletteEdit,
+	args: {
+		onChange: fn(),
+	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -56,6 +59,7 @@ Default.args = {
 	colors: [
 		{ color: '#1a4548', name: 'Primary', slug: 'primary' },
 		{ color: '#0000ff', name: 'Secondary', slug: 'secondary' },
+		{ color: '#fb326b', name: 'Tertiary', slug: 'tertiary' },
 	],
 	paletteLabel: 'Colors',
 	emptyMessage: 'Colors are empty',

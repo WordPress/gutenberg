@@ -1,0 +1,28 @@
+.offline {
+	background-color: $gray-lighten-30;
+	padding: $grid-unit;
+	justify-content: center;
+	align-items: center;
+	flex-direction: row;
+}
+
+.offline__dark {
+	background-color: $gray-70;
+}
+
+.offline--text {
+	color: $black;
+	padding-left: 3;
+}
+
+.offline--text__dark {
+	color: $white;
+}
+
+.offline--icon {
+	fill: $gray-70;
+}
+
+.offline--icon__dark {
+	fill: $gray-10;
+}

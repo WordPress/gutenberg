@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 // diff doesn't tree-shake correctly, so we import from the individual
 // module here, to avoid including too much of the library
 import { diffChars } from 'diff/lib/diff/character';
@@ -28,7 +28,7 @@ function BlockCompare( {
 		const difference = diffChars( originalContent, newContent );
 
 		return difference.map( ( item, pos ) => {
-			const classes = classnames( {
+			const classes = clsx( {
 				'block-editor-block-compare__added': item.added,
 				'block-editor-block-compare__removed': item.removed,
 			} );

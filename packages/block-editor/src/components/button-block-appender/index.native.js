@@ -9,6 +9,7 @@ import { View } from 'react-native';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
 import { Icon, plusCircleFilled } from '@wordpress/icons';
+import { useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,6 +24,20 @@ function ButtonBlockAppender( {
 	isFloating = false,
 	onAddBlock,
 } ) {
+	const onAppenderPress = useCallback(
+		( onToggle ) => () => {
+			if ( onAddBlock ) {
+				onAddBlock();
+				return;
+			}
+
+			if ( onToggle ) {
+				onToggle();
+			}
+		},
+		[ onAddBlock ]
+	);
+
 	const appenderStyle = {
 		...styles.appender,
 		...getStylesFromColorScheme(
@@ -44,7 +59,7 @@ function ButtonBlockAppender( {
 				renderToggle={ ( { onToggle, disabled, isOpen } ) => (
 					<Button
 						testID="appender-button"
-						onClick={ onAddBlock || onToggle }
+						onClick={ onAppenderPress( onToggle ) }
 						aria-expanded={ isOpen }
 						disabled={ disabled }
 						fixedRatio={ false }

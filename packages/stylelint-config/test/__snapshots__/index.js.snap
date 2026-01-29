@@ -4,10 +4,12 @@ exports[`flags warnings with invalid css snapshot matches warnings 1`] = `
 [
   {
     "column": 7,
+    "endColumn": 8,
+    "endLine": 2,
     "line": 2,
-    "rule": "number-leading-zero",
+    "rule": "@stylistic/number-leading-zero",
     "severity": "error",
-    "text": "Expected a leading zero (number-leading-zero)",
+    "text": "Expected a leading zero (@stylistic/number-leading-zero)",
   },
 ]
 `;

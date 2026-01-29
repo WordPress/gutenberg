@@ -31,12 +31,12 @@ describe( 'Type annotations', () => {
 		expect( result ).toBeFalsy();
 	} );
 
-	const paramTag = {
+	const paramTag = /** @type {const} */ ( {
 		tag: 'param',
 		type: '',
 		name: 'foo',
 		description: 'A foo parameter',
-	};
+	} );
 
 	describe( 'simple types', () => {
 		const keywordTypes = [
@@ -97,6 +97,26 @@ describe( 'Type annotations', () => {
 			expect( getTypeAnnotation( { tag: 'return' }, node ) ).toBe(
 				'MyType< string & number >[]'
 			);
+		} );
+	} );
+
+	describe( 'qualified types', () => {
+		const node = parse( `
+			function fn( foo: My.Foo< string >, bar: My.Bar ) {
+				return 0;
+			}
+		` );
+
+		it( 'should get the qualified param type with type parameters', () => {
+			expect(
+				getTypeAnnotation( { tag: 'param', name: 'foo' }, node, 0 )
+			).toBe( 'My.Foo< string >' );
+		} );
+
+		it( 'should get the qualified param type without type parameters', () => {
+			expect(
+				getTypeAnnotation( { tag: 'param', name: 'bar' }, node, 1 )
+			).toBe( 'My.Bar' );
 		} );
 	} );
 
@@ -442,5 +462,23 @@ describe( 'Type annotations', () => {
 			 `;
 			expect( getStateArgType( code ) ).toBe( 'number' );
 		} );
+	} );
+
+	it( 'should find types in a constant function expression assignment', () => {
+		const node = parse( `
+				export const __unstableAwaitPromise = function < T >( promise: Promise< T > ): {
+					type: 'AWAIT_PROMISE';
+					promise: Promise< T >;
+				} {
+					return {
+						type: 'AWAIT_PROMISE',
+						promise,
+					};
+				};
+			 ` );
+
+		expect(
+			getTypeAnnotation( { tag: 'param', name: 'promise' }, node, 0 )
+		).toBe( 'Promise< T >' );
 	} );
 } );

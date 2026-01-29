@@ -16,7 +16,9 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": true,
+		"html": false,
 		"color": {
 			"link": true,
 			"__experimentalSkipSerialization": [ "text", "background" ],
@@ -37,6 +39,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"style": "wp-block-calendar"

@@ -11,24 +11,34 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editWidgetsStore } from '../../store';
 
 function SaveButton() {
-	const { hasEditedWidgetAreaIds, isSaving } = useSelect( ( select ) => {
-		const { getEditedWidgetAreas, isSavingWidgetAreas } =
-			select( editWidgetsStore );
+	const { hasEditedWidgetAreaIds, isSaving, isWidgetSaveLocked } = useSelect(
+		( select ) => {
+			const {
+				getEditedWidgetAreas,
+				isSavingWidgetAreas,
+				isWidgetSavingLocked,
+			} = select( editWidgetsStore );
 
-		return {
-			hasEditedWidgetAreaIds: getEditedWidgetAreas()?.length > 0,
-			isSaving: isSavingWidgetAreas(),
-		};
-	}, [] );
+			return {
+				hasEditedWidgetAreaIds: getEditedWidgetAreas()?.length > 0,
+				isSaving: isSavingWidgetAreas(),
+				isWidgetSaveLocked: isWidgetSavingLocked(),
+			};
+		},
+		[]
+	);
 	const { saveEditedWidgetAreas } = useDispatch( editWidgetsStore );
+
+	const isDisabled =
+		isWidgetSaveLocked || isSaving || ! hasEditedWidgetAreaIds;
 
 	return (
 		<Button
 			variant="primary"
 			isBusy={ isSaving }
-			aria-disabled={ isSaving }
-			onClick={ isSaving ? undefined : saveEditedWidgetAreas }
-			disabled={ ! hasEditedWidgetAreaIds }
+			aria-disabled={ isDisabled }
+			onClick={ isDisabled ? undefined : saveEditedWidgetAreas }
+			size="compact"
 		>
 			{ isSaving ? __( 'Saving…' ) : __( 'Update' ) }
 		</Button>

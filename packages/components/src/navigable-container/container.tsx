@@ -79,7 +79,7 @@ class NavigableContainer extends Component< NavigableContainerProps > {
 
 		const { onlyBrowserTabstops } = this.props;
 		const finder = onlyBrowserTabstops ? focus.tabbable : focus.focusable;
-		const focusables = finder.find( this.container ) as HTMLElement[];
+		const focusables = finder.find( this.container );
 
 		const index = this.getFocusableIndex( focusables, target );
 		if ( index > -1 && target ) {

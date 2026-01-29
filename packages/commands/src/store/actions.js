@@ -11,6 +11,8 @@
  * @property {string=}     context     Command context.
  * @property {JSX.Element} icon        Command icon.
  * @property {Function}    callback    Command callback.
+ * @property {boolean}     disabled    Whether to disable the command.
+ * @property {string[]=}   keywords    Command keywords for search matching.
  */
 
 /**
@@ -22,9 +24,10 @@
  *
  * @typedef {Object} WPCommandLoaderConfig
  *
- * @property {string}              name    Command loader name.
- * @property {string=}             context Command loader context.
- * @property {WPCommandLoaderHook} hook    Command loader hook.
+ * @property {string}              name     Command loader name.
+ * @property {string=}             context  Command loader context.
+ * @property {WPCommandLoaderHook} hook     Command loader hook.
+ * @property {boolean}             disabled Whether to disable the command loader.
  */
 
 /**

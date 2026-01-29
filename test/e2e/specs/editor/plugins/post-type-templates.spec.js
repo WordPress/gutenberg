@@ -35,15 +35,12 @@ test.describe( 'Post type templates', () => {
 
 			// Remove a block from the template to verify that it's not
 			// re-added after saving and reloading the editor.
-			await editor.canvas.focus( 'role=textbox[name="Add title"i]' );
+			await editor.canvas
+				.locator( 'role=textbox[name="Add title"i]' )
+				.focus();
 			await page.keyboard.press( 'ArrowDown' );
 			await page.keyboard.press( 'Backspace' );
-			await page.click( 'role=button[name="Save draft"i]' );
-			await expect(
-				page.locator(
-					'role=button[name="Dismiss this notice"i] >> text=Draft saved'
-				)
-			).toBeVisible();
+			await editor.saveDraft();
 			await page.reload();
 
 			const expectedContent = await page.evaluate( ( content ) => {
@@ -64,19 +61,13 @@ test.describe( 'Post type templates', () => {
 		} ) => {
 			// Remove all blocks from the template to verify that they're not
 			// re-added after saving and reloading the editor.
-			await editor.canvas.fill(
-				'role=textbox[name="Add title"i]',
-				'My Empty Book'
-			);
+			await editor.canvas
+				.locator( 'role=textbox[name="Add title"i]' )
+				.fill( 'My Empty Book' );
 			await page.keyboard.press( 'ArrowDown' );
 			await pageUtils.pressKeys( 'primary+A' );
 			await page.keyboard.press( 'Backspace' );
-			await page.click( 'role=button[name="Save draft"i]' );
-			await expect(
-				page.locator(
-					'role=button[name="Dismiss this notice"i] >> text=Draft saved'
-				)
-			).toBeVisible();
+			await editor.saveDraft();
 			await page.reload();
 
 			await expect.poll( editor.getEditedPostContent ).toBe( '' );
@@ -125,18 +116,14 @@ test.describe( 'Post type templates', () => {
 
 			// Remove the default block template to verify that it's not
 			// re-added after saving and reloading the editor.
-			await editor.canvas.fill(
-				'role=textbox[name="Add title"i]',
-				'My Image Format'
-			);
-			await editor.canvas.focus( 'role=document[name="Block: Image"i]' );
+			await editor.canvas
+				.locator( 'role=textbox[name="Add title"i]' )
+				.fill( 'My Image Format' );
+			await editor.canvas
+				.locator( 'role=document[name="Block: Image"i]' )
+				.focus();
 			await page.keyboard.press( 'Backspace' );
-			await page.click( 'role=button[name="Save draft"i]' );
-			await expect(
-				page.locator(
-					'role=button[name="Dismiss this notice"i] >> text=Draft saved'
-				)
-			).toBeVisible();
+			await editor.saveDraft();
 			await page.reload();
 
 			await expect.poll( editor.getEditedPostContent ).toBe( '' );

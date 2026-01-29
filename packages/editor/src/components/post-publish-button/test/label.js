@@ -1,67 +1,90 @@
 /**
+ * WordPress dependencies
+ */
+import { useSelect } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
-import { PublishButtonLabel } from '../label';
+import PublishButtonLabel from '../label';
+
+jest.mock( '@wordpress/data/src/components/use-select', () => {
+	// This allows us to tweak the returned value on each test.
+	const mock = jest.fn();
+	return mock;
+} );
 
 describe( 'PublishButtonLabel', () => {
 	it( 'should show publishing if publishing in progress', () => {
-		const label = PublishButtonLabel( {
+		useSelect.mockImplementation( () => ( {
 			hasPublishAction: true,
 			isPublishing: true,
-		} );
+		} ) );
+		const label = PublishButtonLabel();
 		expect( label ).toBe( 'Publishing…' );
 	} );
 
-	it( 'should show updating if published and saving in progress', () => {
-		const label = PublishButtonLabel( {
+	it( 'should show saving if published and saving in progress', () => {
+		useSelect.mockImplementation( () => ( {
 			hasPublishAction: true,
 			isPublished: true,
 			isSaving: true,
-		} );
-		expect( label ).toBe( 'Updating…' );
+		} ) );
+		const label = PublishButtonLabel();
+		expect( label ).toBe( 'Saving…' );
 	} );
 
-	it( 'should show scheduling if scheduled and saving in progress', () => {
-		const label = PublishButtonLabel( {
+	it( 'should show saving if scheduled and saving in progress', () => {
+		useSelect.mockImplementation( () => ( {
 			hasPublishAction: true,
 			isBeingScheduled: true,
 			isSaving: true,
-		} );
-		expect( label ).toBe( 'Scheduling…' );
+		} ) );
+		const label = PublishButtonLabel();
+		expect( label ).toBe( 'Saving…' );
 	} );
 
 	it( 'should show publish if not published and saving in progress', () => {
-		const label = PublishButtonLabel( {
+		useSelect.mockImplementation( () => ( {
 			hasPublishAction: true,
 			isPublished: false,
 			isSaving: true,
-		} );
+		} ) );
+		const label = PublishButtonLabel();
 		expect( label ).toBe( 'Publish' );
 	} );
 
 	it( 'should show submit for review for contributor', () => {
-		const label = PublishButtonLabel( { hasPublishAction: false } );
+		useSelect.mockImplementation( () => ( {
+			hasPublishAction: false,
+		} ) );
+		const label = PublishButtonLabel();
 		expect( label ).toBe( 'Submit for Review' );
 	} );
 
-	it( 'should show update for already published', () => {
-		const label = PublishButtonLabel( {
+	it( 'should show save for already published', () => {
+		useSelect.mockImplementation( () => ( {
 			hasPublishAction: true,
 			isPublished: true,
-		} );
-		expect( label ).toBe( 'Update' );
+		} ) );
+		const label = PublishButtonLabel();
+		expect( label ).toBe( 'Save' );
 	} );
 
 	it( 'should show schedule for scheduled', () => {
-		const label = PublishButtonLabel( {
+		useSelect.mockImplementation( () => ( {
 			hasPublishAction: true,
 			isBeingScheduled: true,
-		} );
+		} ) );
+		const label = PublishButtonLabel();
 		expect( label ).toBe( 'Schedule' );
 	} );
 
 	it( 'should show publish otherwise', () => {
-		const label = PublishButtonLabel( { hasPublishAction: true } );
+		useSelect.mockImplementation( () => ( {
+			hasPublishAction: true,
+		} ) );
+		const label = PublishButtonLabel();
 		expect( label ).toBe( 'Publish' );
 	} );
 } );

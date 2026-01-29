@@ -1,0 +1,116 @@
+.error-boundary__scroll {
+	height: 100%;
+	width: 100%;
+}
+
+.error-boundary__scroll-container {
+	flex-grow: 1;
+	max-height: 580px;
+	align-items: center;
+	justify-content: center;
+}
+
+
+.error-boundary__container {
+	width: 100%;
+	max-width: 600px;
+	justify-content: center;
+	align-items: center;
+	padding: 0 24px;
+}
+
+.error-boundary__icon-container {
+	$size: 40px;
+
+	width: $size;
+	height: $size;
+	align-items: center;
+	justify-content: center;
+	margin-bottom: 8px;
+	background-color: rgba(60, 60, 67, 0.3);
+	border-radius: 20px;
+}
+
+.error-boundary__icon-container--dark {
+	background-color: rgba(235, 235, 245, 0.3);
+}
+
+.error-boundary__icon {
+	width: 24px;
+	height: 24px;
+	fill: $white;
+}
+
+.error-boundary__title {
+	font-size: 20px;
+	font-weight: 600;
+	line-height: 25px;
+	color: $black;
+	text-align: center;
+	margin-bottom: 8px;
+}
+
+.error-boundary__title--dark {
+	color: $white;
+}
+
+.error-boundary__message {
+	font-size: 16px;
+	font-weight: 400;
+	line-height: 21px;
+	color: rgba(60, 60, 67, 0.6);
+	text-align: center;
+	margin-bottom: 16px;
+}
+
+.error-boundary__message--dark {
+	color: rgba(235, 235, 245, 0.6);
+}
+
+.error-boundary__actions-container {
+	width: 100%;
+	max-width: 400px;
+	justify-content: center;
+	gap: 12px;
+	padding-top: 16px;
+}
+
+.copy-button__container {
+	border-radius: 5px;
+	padding: $grid-unit $grid-unit-20;
+	background-color: $light-primary;
+}
+
+.copy-button__container--dark {
+	background-color: $white;
+}
+
+.copy-button__container--secondary {
+	border: $border-width #c6c6c8;
+	background-color: $white;
+}
+
+.copy-button__container--secondary-dark {
+	border-color: rgba(255, 255, 255, 0.3);
+	background-color: $black;
+}
+
+.copy-button__text {
+	font-size: 17px;
+	font-weight: 400;
+	line-height: 22px;
+	text-align: center;
+	color: $white;
+}
+
+.copy-button__text--dark {
+	color: $background-dark-secondary;
+}
+
+.copy-button__text--secondary {
+	color: $black;
+}
+
+.copy-button__text--secondary-dark {
+	color: $white;
+}

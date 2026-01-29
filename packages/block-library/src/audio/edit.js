@@ -1,19 +1,19 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import { getBlobByURL, isBlobURL } from '@wordpress/blob';
+import { isBlobURL } from '@wordpress/blob';
 import {
 	Disabled,
-	PanelBody,
 	SelectControl,
 	Spinner,
 	ToggleControl,
-	ToolbarButton,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -21,23 +21,24 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
-	RichText,
 	useBlockProps,
-	store as blockEditorStore,
-	__experimentalGetElementClassName,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { useEffect, useState, useCallback } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { audio as icon, caption as captionIcon } from '@wordpress/icons';
-import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
+import { audio as icon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
-import { usePrevious } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
+import {
+	useUploadMediaFromBlobURL,
+	useToolsPanelDropdownMenuProps,
+} from '../utils/hooks';
+import { Caption } from '../utils/caption';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
@@ -46,56 +47,20 @@ function AudioEdit( {
 	className,
 	setAttributes,
 	onReplace,
-	isSelected,
+	isSelected: isSingleSelected,
 	insertBlocksAfter,
 } ) {
-	const { id, autoplay, caption, loop, preload, src } = attributes;
-	const prevCaption = usePrevious( caption );
-	const [ showCaption, setShowCaption ] = useState( !! caption );
-	const isTemporaryAudio = ! id && isBlobURL( src );
-	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings().mediaUpload;
-	}, [] );
+	const { id, autoplay, loop, preload, src } = attributes;
+	const [ temporaryURL, setTemporaryURL ] = useState( attributes.blob );
+	const blockEditingMode = useBlockEditingMode();
+	const hasNonContentControls = blockEditingMode === 'default';
 
-	useEffect( () => {
-		if ( ! id && isBlobURL( src ) ) {
-			const file = getBlobByURL( src );
-
-			if ( file ) {
-				mediaUpload( {
-					filesList: [ file ],
-					onFileChange: ( [ media ] ) => onSelectAudio( media ),
-					onError: ( e ) => onUploadError( e ),
-					allowedTypes: ALLOWED_MEDIA_TYPES,
-				} );
-			}
-		}
-	}, [] );
-
-	// We need to show the caption when changes come from
-	// history navigation(undo/redo).
-	useEffect( () => {
-		if ( caption && ! prevCaption ) {
-			setShowCaption( true );
-		}
-	}, [ caption, prevCaption ] );
-
-	// Focus the caption when we click to add one.
-	const captionRef = useCallback(
-		( node ) => {
-			if ( node && ! caption ) {
-				node.focus();
-			}
-		},
-		[ caption ]
-	);
-
-	useEffect( () => {
-		if ( ! isSelected && ! caption ) {
-			setShowCaption( false );
-		}
-	}, [ isSelected, caption ] );
+	useUploadMediaFromBlobURL( {
+		url: temporaryURL,
+		allowedTypes: ALLOWED_MEDIA_TYPES,
+		onChange: onSelectAudio,
+		onError: onUploadError,
+	} );
 
 	function toggleAttribute( attribute ) {
 		return ( newValue ) => {
@@ -115,7 +80,8 @@ function AudioEdit( {
 				onReplace( embedBlock );
 				return;
 			}
-			setAttributes( { src: newSrc, id: undefined } );
+			setAttributes( { src: newSrc, id: undefined, blob: undefined } );
+			setTemporaryURL();
 		}
 	}
 
@@ -138,27 +104,38 @@ function AudioEdit( {
 				src: undefined,
 				id: undefined,
 				caption: undefined,
+				blob: undefined,
 			} );
+			setTemporaryURL();
 			return;
 		}
+
+		if ( isBlobURL( media.url ) ) {
+			setTemporaryURL( media.url );
+			return;
+		}
+
 		// Sets the block's attribute and updates the edit component from the
 		// selected media, then switches off the editing UI.
 		setAttributes( {
+			blob: undefined,
 			src: media.url,
 			id: media.id,
 			caption: media.caption,
 		} );
+		setTemporaryURL();
 	}
 
-	const classes = classnames( className, {
-		'is-transient': isTemporaryAudio,
+	const classes = clsx( className, {
+		'is-transient': !! temporaryURL,
 	} );
 
 	const blockProps = useBlockProps( {
 		className: classes,
 	} );
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	if ( ! src ) {
+	if ( ! src && ! temporaryURL ) {
 		return (
 			<div { ...blockProps }>
 				<MediaPlaceholder
@@ -176,104 +153,122 @@ function AudioEdit( {
 
 	return (
 		<>
-			<BlockControls group="block">
-				<ToolbarButton
-					onClick={ () => {
-						setShowCaption( ! showCaption );
-						if ( showCaption && caption ) {
-							setAttributes( { caption: undefined } );
-						}
-					} }
-					icon={ captionIcon }
-					isPressed={ showCaption }
-					label={
-						showCaption
-							? __( 'Remove caption' )
-							: __( 'Add caption' )
-					}
-				/>
-			</BlockControls>
-			<BlockControls group="other">
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ src }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="audio/*"
-					onSelect={ onSelectAudio }
-					onSelectURL={ onSelectURL }
-					onError={ onUploadError }
-				/>
-			</BlockControls>
+			{ isSingleSelected && (
+				<BlockControls group="other">
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ src }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="audio/*"
+						onSelect={ onSelectAudio }
+						onSelectURL={ onSelectURL }
+						onError={ onUploadError }
+						onReset={ () => onSelectAudio( undefined ) }
+						variant="toolbar"
+					/>
+				</BlockControls>
+			) }
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						__nextHasNoMarginBottom
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							autoplay: false,
+							loop: false,
+							preload: undefined,
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
 						label={ __( 'Autoplay' ) }
-						onChange={ toggleAttribute( 'autoplay' ) }
-						checked={ autoplay }
-						help={ getAutoplayHelp }
-					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Loop' ) }
-						onChange={ toggleAttribute( 'loop' ) }
-						checked={ loop }
-					/>
-					<SelectControl
-						__nextHasNoMarginBottom
-						label={ _x( 'Preload', 'noun; Audio block parameter' ) }
-						value={ preload || '' }
-						// `undefined` is required for the preload attribute to be unset.
-						onChange={ ( value ) =>
+						isShownByDefault
+						hasValue={ () => !! autoplay }
+						onDeselect={ () =>
 							setAttributes( {
-								preload: value || undefined,
+								autoplay: false,
 							} )
 						}
-						options={ [
-							{ value: '', label: __( 'Browser default' ) },
-							{ value: 'auto', label: __( 'Auto' ) },
-							{ value: 'metadata', label: __( 'Metadata' ) },
-							{
-								value: 'none',
-								label: _x( 'None', 'Preload value' ),
-							},
-						] }
-					/>
-				</PanelBody>
+					>
+						<ToggleControl
+							label={ __( 'Autoplay' ) }
+							onChange={ toggleAttribute( 'autoplay' ) }
+							checked={ !! autoplay }
+							help={ getAutoplayHelp }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Loop' ) }
+						isShownByDefault
+						hasValue={ () => !! loop }
+						onDeselect={ () =>
+							setAttributes( {
+								loop: false,
+							} )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Loop' ) }
+							onChange={ toggleAttribute( 'loop' ) }
+							checked={ !! loop }
+						/>
+					</ToolsPanelItem>
+					<ToolsPanelItem
+						label={ __( 'Preload' ) }
+						isShownByDefault
+						hasValue={ () => !! preload }
+						onDeselect={ () =>
+							setAttributes( {
+								preload: undefined,
+							} )
+						}
+					>
+						<SelectControl
+							__next40pxDefaultSize
+							label={ _x(
+								'Preload',
+								'noun; Audio block parameter'
+							) }
+							value={ preload || '' }
+							// `undefined` is required for the preload attribute to be unset.
+							onChange={ ( value ) =>
+								setAttributes( {
+									preload: value || undefined,
+								} )
+							}
+							options={ [
+								{ value: '', label: __( 'Browser default' ) },
+								{ value: 'auto', label: __( 'Auto' ) },
+								{ value: 'metadata', label: __( 'Metadata' ) },
+								{
+									value: 'none',
+									label: _x( 'None', 'Preload value' ),
+								},
+							] }
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 			<figure { ...blockProps }>
 				{ /*
-					Disable the audio tag if the block is not selected
-					so the user clicking on it won't play the
-					file or change the position slider when the controls are enabled.
+				Disable the audio tag if the block is not selected
+				so the user clicking on it won't play the
+				file or change the position slider when the controls are enabled.
 				*/ }
-				<Disabled isDisabled={ ! isSelected }>
-					<audio controls="controls" src={ src } />
+				<Disabled isDisabled={ ! isSingleSelected }>
+					<audio controls="controls" src={ src ?? temporaryURL } />
 				</Disabled>
-				{ isTemporaryAudio && <Spinner /> }
-				{ showCaption &&
-					( ! RichText.isEmpty( caption ) || isSelected ) && (
-						<RichText
-							identifier="caption"
-							tagName="figcaption"
-							className={ __experimentalGetElementClassName(
-								'caption'
-							) }
-							ref={ captionRef }
-							aria-label={ __( 'Audio caption text' ) }
-							placeholder={ __( 'Add caption' ) }
-							value={ caption }
-							onChange={ ( value ) =>
-								setAttributes( { caption: value } )
-							}
-							inlineToolbar
-							__unstableOnSplitAtEnd={ () =>
-								insertBlocksAfter(
-									createBlock( getDefaultBlockName() )
-								)
-							}
-						/>
-					) }
+				{ !! temporaryURL && <Spinner /> }
+				<Caption
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					isSelected={ isSingleSelected }
+					insertBlocksAfter={ insertBlocksAfter }
+					label={ __( 'Audio caption text' ) }
+					showToolbarButton={
+						isSingleSelected && hasNonContentControls
+					}
+				/>
 			</figure>
 		</>
 	);

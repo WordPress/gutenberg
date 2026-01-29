@@ -32,10 +32,22 @@ function counterStore( initialCount = 0, step = 1 ) {
 	};
 }
 
+/* eslint-disable @wordpress/wp-global-usage */
 describe( 'useSelect', () => {
+	const initialScriptDebug = globalThis.SCRIPT_DEBUG;
 	let registry;
+
+	beforeAll( () => {
+		// Do not run hook in development mode; it will call `mapSelect` an extra time.
+		globalThis.SCRIPT_DEBUG = false;
+	} );
+
 	beforeEach( () => {
 		registry = createRegistry();
+	} );
+
+	afterAll( () => {
+		globalThis.SCRIPT_DEBUG = initialScriptDebug;
 	} );
 
 	it( 'passes the relevant data to the component', () => {
@@ -61,10 +73,7 @@ describe( 'useSelect', () => {
 			</RegistryProvider>
 		);
 
-		// 2 selectSpy calls expected
-		// - 1 for initial mount
-		// - 1 for the subscription effect checking if value has changed
-		expect( selectSpy ).toHaveBeenCalledTimes( 2 );
+		expect( selectSpy ).toHaveBeenCalledTimes( 1 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
 		// Ensure expected state was rendered.
@@ -89,11 +98,11 @@ describe( 'useSelect', () => {
 
 		const { rerender } = render(
 			<RegistryProvider value={ registry }>
-				<TestComponent keyName="foo" change={ true } />
+				<TestComponent keyName="foo" change />
 			</RegistryProvider>
 		);
 
-		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 1 );
 		expect( selectSpyBar ).toHaveBeenCalledTimes( 0 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -107,7 +116,7 @@ describe( 'useSelect', () => {
 			</RegistryProvider>
 		);
 
-		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 1 );
 		expect( selectSpyBar ).toHaveBeenCalledTimes( 0 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 
@@ -121,7 +130,7 @@ describe( 'useSelect', () => {
 			</RegistryProvider>
 		);
 
-		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 1 );
 		expect( selectSpyBar ).toHaveBeenCalledTimes( 1 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 3 );
 
@@ -163,7 +172,7 @@ describe( 'useSelect', () => {
 
 		// Initial render renders only parent and subscribes the parent to store.
 		expect( screen.getByText( 'none' ) ).toBeInTheDocument();
-		expect( mapSelectParent ).toHaveBeenCalledTimes( 2 );
+		expect( mapSelectParent ).toHaveBeenCalledTimes( 1 );
 		expect( mapSelectChild ).toHaveBeenCalledTimes( 0 );
 		expect( Parent ).toHaveBeenCalledTimes( 1 );
 		expect( Child ).toHaveBeenCalledTimes( 0 );
@@ -174,8 +183,8 @@ describe( 'useSelect', () => {
 
 		// Child was rendered and subscribed to the store, as the _second_ subscription.
 		expect( screen.getByText( 'yes' ) ).toBeInTheDocument();
-		expect( mapSelectParent ).toHaveBeenCalledTimes( 3 );
-		expect( mapSelectChild ).toHaveBeenCalledTimes( 2 );
+		expect( mapSelectParent ).toHaveBeenCalledTimes( 2 );
+		expect( mapSelectChild ).toHaveBeenCalledTimes( 1 );
 		expect( Parent ).toHaveBeenCalledTimes( 2 );
 		expect( Child ).toHaveBeenCalledTimes( 1 );
 
@@ -187,8 +196,8 @@ describe( 'useSelect', () => {
 		// I.e., `mapSelectChild` was called again, and state update was scheduled, we cannot
 		// avoid that, but the state update is never executed and doesn't do a rerender.
 		expect( screen.getByText( 'none' ) ).toBeInTheDocument();
-		expect( mapSelectParent ).toHaveBeenCalledTimes( 4 );
-		expect( mapSelectChild ).toHaveBeenCalledTimes( 3 );
+		expect( mapSelectParent ).toHaveBeenCalledTimes( 3 );
+		expect( mapSelectChild ).toHaveBeenCalledTimes( 2 );
 		expect( Parent ).toHaveBeenCalledTimes( 3 );
 		expect( Child ).toHaveBeenCalledTimes( 1 );
 	} );
@@ -217,7 +226,7 @@ describe( 'useSelect', () => {
 			</RegistryProvider>
 		);
 
-		expect( mapSelect ).toHaveBeenCalledTimes( 2 );
+		expect( mapSelect ).toHaveBeenCalledTimes( 1 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0:0' );
 
@@ -226,7 +235,7 @@ describe( 'useSelect', () => {
 			registry.dispatch( 'store-even' ).inc();
 		} );
 
-		expect( mapSelect ).toHaveBeenCalledTimes( 3 );
+		expect( mapSelect ).toHaveBeenCalledTimes( 2 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0:2' );
 
@@ -235,7 +244,7 @@ describe( 'useSelect', () => {
 			registry.dispatch( 'store-odd' ).inc();
 		} );
 
-		expect( mapSelect ).toHaveBeenCalledTimes( 3 );
+		expect( mapSelect ).toHaveBeenCalledTimes( 2 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0:2' );
 
@@ -244,7 +253,7 @@ describe( 'useSelect', () => {
 			registry.dispatch( 'store-main' ).inc();
 		} );
 
-		expect( mapSelect ).toHaveBeenCalledTimes( 4 );
+		expect( mapSelect ).toHaveBeenCalledTimes( 3 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 3 );
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1:3' );
 
@@ -253,7 +262,7 @@ describe( 'useSelect', () => {
 			registry.dispatch( 'store-odd' ).inc();
 		} );
 
-		expect( mapSelect ).toHaveBeenCalledTimes( 5 );
+		expect( mapSelect ).toHaveBeenCalledTimes( 4 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 4 );
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1:5' );
 
@@ -263,7 +272,7 @@ describe( 'useSelect', () => {
 			registry.dispatch( 'store-even' ).inc();
 		} );
 
-		expect( mapSelect ).toHaveBeenCalledTimes( 6 );
+		expect( mapSelect ).toHaveBeenCalledTimes( 5 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 4 );
 		expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1:5' );
 	} );
@@ -336,7 +345,7 @@ describe( 'useSelect', () => {
 				expect( screen.getByRole( 'status' ).dataset.d ).toBe(
 					JSON.stringify( valueB )
 				);
-				expect( mapSelectSpy ).toHaveBeenCalledTimes( 3 );
+				expect( mapSelectSpy ).toHaveBeenCalledTimes( 2 );
 			}
 		);
 	} );
@@ -368,8 +377,8 @@ describe( 'useSelect', () => {
 				</RegistryProvider>
 			);
 
-			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
-			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
+			expect( selectCount1 ).toHaveBeenCalledTimes( 1 );
+			expect( selectCount2 ).toHaveBeenCalledTimes( 1 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
@@ -377,8 +386,8 @@ describe( 'useSelect', () => {
 				registry.dispatch( 'store-2' ).inc();
 			} );
 
-			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
-			expect( selectCount2 ).toHaveBeenCalledTimes( 3 );
+			expect( selectCount1 ).toHaveBeenCalledTimes( 1 );
+			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
@@ -386,8 +395,8 @@ describe( 'useSelect', () => {
 				registry.dispatch( 'store-1' ).inc();
 			} );
 
-			expect( selectCount1 ).toHaveBeenCalledTimes( 3 );
-			expect( selectCount2 ).toHaveBeenCalledTimes( 3 );
+			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
+			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 3 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
 
@@ -425,21 +434,21 @@ describe( 'useSelect', () => {
 				</RegistryProvider>
 			);
 
-			expect( selectCount1And2 ).toHaveBeenCalledTimes( 2 );
+			expect( selectCount1And2 ).toHaveBeenCalledTimes( 1 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0,0' );
 
 			act( () => {
 				registry.dispatch( 'store-2' ).inc();
 			} );
 
-			expect( selectCount1And2 ).toHaveBeenCalledTimes( 3 );
+			expect( selectCount1And2 ).toHaveBeenCalledTimes( 2 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0,1' );
 
 			act( () => {
 				registry.dispatch( 'store-3' ).inc();
 			} );
 
-			expect( selectCount1And2 ).toHaveBeenCalledTimes( 3 );
+			expect( selectCount1And2 ).toHaveBeenCalledTimes( 2 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0,1' );
 		} );
 
@@ -475,7 +484,7 @@ describe( 'useSelect', () => {
 				</RegistryProvider>
 			);
 
-			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 2 );
+			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 1 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 				'count:0,dep:0'
 			);
@@ -484,7 +493,7 @@ describe( 'useSelect', () => {
 				setDep( 1 );
 			} );
 
-			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 3 );
+			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 2 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 				'count:0,dep:1'
 			);
@@ -493,7 +502,7 @@ describe( 'useSelect', () => {
 				registry.dispatch( 'store-1' ).inc();
 			} );
 
-			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 4 );
+			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 3 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 				'count:1,dep:1'
 			);
@@ -525,8 +534,8 @@ describe( 'useSelect', () => {
 				</RegistryProvider>
 			);
 
-			// One select on initial render, and one in `checkIfSnapshotChanged` after subscribing.
-			// There's a third selector call on the second render, but that one returns a memoized value.
+			// One select on initial render.
+			// There's a second selector call on the second render, but that one returns a memoized value.
 			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
 
 			// Initial render and second render after counter increment (which is expected to be detected).
@@ -636,7 +645,7 @@ describe( 'useSelect', () => {
 				</RegistryProvider>
 			);
 
-			expect( selectCount1And2 ).toHaveBeenCalledTimes( 2 );
+			expect( selectCount1And2 ).toHaveBeenCalledTimes( 1 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 				'count1:0,count2:0'
 			);
@@ -645,7 +654,7 @@ describe( 'useSelect', () => {
 				registry.dispatch( 'store-2' ).inc();
 			} );
 
-			expect( selectCount1And2 ).toHaveBeenCalledTimes( 3 );
+			expect( selectCount1And2 ).toHaveBeenCalledTimes( 2 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 				'count1:0,count2:1'
 			);
@@ -679,7 +688,7 @@ describe( 'useSelect', () => {
 				return (
 					<>
 						<div role="status">{ state }</div>
-						<button onClick={ toggle }>Toggle</button>
+						<button onClick={ toggle }>Open</button>
 					</>
 				);
 			} );
@@ -691,15 +700,15 @@ describe( 'useSelect', () => {
 			);
 
 			expect( selectCount1 ).toHaveBeenCalledTimes( 0 );
-			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
+			expect( selectCount2 ).toHaveBeenCalledTimes( 1 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 				'count2:0'
 			);
 
-			act( () => screen.getByText( 'Toggle' ).click() );
+			act( () => screen.getByText( 'Open' ).click() );
 
 			expect( selectCount1 ).toHaveBeenCalledTimes( 1 );
-			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
+			expect( selectCount2 ).toHaveBeenCalledTimes( 1 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 				'count1:0'
 			);
@@ -710,7 +719,7 @@ describe( 'useSelect', () => {
 			} );
 
 			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
-			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
+			expect( selectCount2 ).toHaveBeenCalledTimes( 1 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent(
 				'count1:1'
 			);
@@ -960,15 +969,15 @@ describe( 'useSelect', () => {
 			} );
 
 			render(
-				<AsyncModeProvider value={ true }>
+				<AsyncModeProvider value>
 					<RegistryProvider value={ registry }>
 						<TestComponent />
 					</RegistryProvider>
 				</AsyncModeProvider>
 			);
 
-			// initial render + missed update catcher in subscribing effect
-			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
+			// initial render
+			expect( selectSpy ).toHaveBeenCalledTimes( 1 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
 			// Ensure expected state was rendered.
@@ -979,12 +988,12 @@ describe( 'useSelect', () => {
 			} );
 
 			// still not called right after increment
-			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
+			expect( selectSpy ).toHaveBeenCalledTimes( 1 );
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
 
 			expect( await screen.findByText( 1 ) ).toBeInTheDocument();
 
-			expect( selectSpy ).toHaveBeenCalledTimes( 3 );
+			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		} );
 
@@ -1007,7 +1016,7 @@ describe( 'useSelect', () => {
 				</AsyncModeProvider>
 			);
 
-			const { rerender } = render( <App async={ true } /> );
+			const { rerender } = render( <App async /> );
 
 			// Ensure expected state was rendered.
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '0' );
@@ -1026,9 +1035,8 @@ describe( 'useSelect', () => {
 			// Ensure the async update was flushed during the rerender.
 			expect( screen.getByRole( 'status' ) ).toHaveTextContent( '1' );
 
-			// initial render + subscription check + rerender with isAsync=false
-			expect( selectSpy ).toHaveBeenCalledTimes( 3 );
 			// initial render + rerender with isAsync=false
+			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		} );
 
@@ -1048,7 +1056,7 @@ describe( 'useSelect', () => {
 			} );
 
 			const App = ( { variant } ) => (
-				<AsyncModeProvider value={ true }>
+				<AsyncModeProvider value>
 					<RegistryProvider value={ registry }>
 						<TestComponent variant={ variant } />
 					</RegistryProvider>
@@ -1077,7 +1085,7 @@ describe( 'useSelect', () => {
 			// Give the async update time to run in case it wasn't cancelled
 			await new Promise( setImmediate );
 
-			expect( selectA ).toHaveBeenCalledTimes( 2 );
+			expect( selectA ).toHaveBeenCalledTimes( 1 );
 			expect( selectB ).toHaveBeenCalledTimes( 2 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		} );
@@ -1093,7 +1101,7 @@ describe( 'useSelect', () => {
 			} );
 
 			const App = () => (
-				<AsyncModeProvider value={ true }>
+				<AsyncModeProvider value>
 					<RegistryProvider value={ registry }>
 						<TestComponent />
 					</RegistryProvider>
@@ -1120,7 +1128,7 @@ describe( 'useSelect', () => {
 			await new Promise( setImmediate );
 
 			// only the initial render, no state updates
-			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
+			expect( selectSpy ).toHaveBeenCalledTimes( 1 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 		} );
 
@@ -1138,7 +1146,7 @@ describe( 'useSelect', () => {
 			} );
 
 			const App = ( { reg } ) => (
-				<AsyncModeProvider value={ true }>
+				<AsyncModeProvider value>
 					<RegistryProvider value={ reg }>
 						<TestComponent />
 					</RegistryProvider>
@@ -1163,7 +1171,7 @@ describe( 'useSelect', () => {
 			await new Promise( setImmediate );
 
 			// initial render + registry change rerender, no state updates
-			expect( selectSpy ).toHaveBeenCalledTimes( 4 );
+			expect( selectSpy ).toHaveBeenCalledTimes( 2 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		} );
 	} );
@@ -1261,3 +1269,4 @@ describe( 'useSelect', () => {
 		} );
 	} );
 } );
+/* eslint-enable @wordpress/wp-global-usage */

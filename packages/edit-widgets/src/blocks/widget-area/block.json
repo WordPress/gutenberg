@@ -1,5 +1,8 @@
 {
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
 	"name": "core/widget-area",
+	"title": "Widget Area",
 	"category": "widgets",
 	"attributes": {
 		"id": {

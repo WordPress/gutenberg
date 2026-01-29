@@ -4,6 +4,9 @@
 		// Stop file block from collapsing when floated.
 		height: auto;
 	}
+	.wp-block[data-align="center"] > & {
+		text-align: center;
+	}
 
 	display: flex;
 	flex-wrap: wrap;

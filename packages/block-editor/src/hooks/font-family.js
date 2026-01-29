@@ -4,15 +4,17 @@
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import TokenList from '@wordpress/token-list';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { shouldSkipSerialization } from './utils';
 import { TYPOGRAPHY_SUPPORT_KEY } from './typography';
-import { kebabCase } from '../utils/object';
+import { unlock } from '../lock-unlock';
 
 export const FONT_FAMILY_SUPPORT_KEY = 'typography.__experimentalFontFamily';
+const { kebabCase } = unlock( componentsPrivateApis );
 
 /**
  * Filters registered block settings, extending attributes to include
@@ -74,30 +76,18 @@ function addSaveProps( props, blockType, attributes ) {
 	return props;
 }
 
-/**
- * Filters registered block settings to expand the block edit wrapper
- * by applying the desired styles and classnames.
- *
- * @param {Object} settings Original block settings.
- *
- * @return {Object} Filtered block settings.
- */
-function addEditProps( settings ) {
-	if ( ! hasBlockSupport( settings, FONT_FAMILY_SUPPORT_KEY ) ) {
-		return settings;
-	}
-
-	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
-		let props = {};
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
-		}
-		return addSaveProps( props, settings, attributes );
-	};
-
-	return settings;
+function useBlockProps( { name, fontFamily } ) {
+	return addSaveProps( {}, name, { fontFamily } );
 }
+
+export default {
+	useBlockProps,
+	addSaveProps,
+	attributeKeys: [ 'fontFamily' ],
+	hasSupport( name ) {
+		return hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY );
+	},
+};
 
 /**
  * Resets the font family block support attribute. This can be used when
@@ -115,16 +105,4 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/fontFamily/addAttribute',
 	addAttributes
-);
-
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/fontFamily/addSaveProps',
-	addSaveProps
-);
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/fontFamily/addEditProps',
-	addEditProps
 );

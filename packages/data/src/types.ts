@@ -18,7 +18,7 @@ export interface StoreInstance< Config extends AnyConfig > {
 	subscribe: ( listener: () => void ) => () => void;
 }
 
-export interface StoreDescriptor< Config extends AnyConfig > {
+export interface StoreDescriptor< Config extends AnyConfig = AnyConfig > {
 	/**
 	 * Store Name
 	 */
@@ -33,7 +33,7 @@ export interface StoreDescriptor< Config extends AnyConfig > {
 export interface ReduxStoreConfig<
 	State,
 	ActionCreators extends MapOf< ActionCreator >,
-	Selectors
+	Selectors,
 > {
 	initialState?: State;
 	reducer: ( state: any, action: any ) => any;
@@ -85,6 +85,41 @@ export type CurriedSelectorsOf< S > = S extends StoreDescriptor<
 	ReduxStoreConfig< any, any, infer Selectors >
 >
 	? { [ key in keyof Selectors ]: CurriedState< Selectors[ key ] > }
+	: never;
+
+/**
+ * Like CurriedState but wraps the return type in a Promise.
+ * Used for resolveSelect where selectors return promises.
+ *
+ * For generic selectors that define PromiseCurriedSignature, that signature
+ * is used directly to preserve generic type parameters (which would otherwise
+ * be lost when using `infer`).
+ */
+type CurriedStateWithPromise< F > =
+	F extends SelectorWithCustomCurrySignature & {
+		PromiseCurriedSignature: infer S;
+	}
+		? S
+		: F extends SelectorWithCustomCurrySignature & {
+				CurriedSignature: ( ...args: infer P ) => infer R;
+		  }
+		? ( ...args: P ) => Promise< R >
+		: F extends ( state: any, ...args: infer P ) => infer R
+		? ( ...args: P ) => Promise< R >
+		: F;
+
+/**
+ * Like CurriedSelectorsOf but each selector returns a Promise.
+ * Used for resolveSelect.
+ */
+export type CurriedSelectorsResolveOf< S > = S extends StoreDescriptor<
+	ReduxStoreConfig< any, any, infer Selectors >
+>
+	? {
+			[ key in keyof Selectors ]: CurriedStateWithPromise<
+				Selectors[ key ]
+			>;
+	  }
 	: never;
 
 /**
@@ -155,18 +190,14 @@ type CurriedState< F > = F extends SelectorWithCustomCurrySignature
  */
 export interface SelectorWithCustomCurrySignature {
 	CurriedSignature: Function;
+	PromiseCurriedSignature?: Function;
 }
 
 export interface DataRegistry {
 	register: ( store: StoreDescriptor< any > ) => void;
-}
-
-export interface DataEmitter {
-	emit: () => void;
-	subscribe: ( listener: () => void ) => () => void;
-	pause: () => void;
-	resume: () => void;
-	isPaused: boolean;
+	dispatch: < S extends StoreDescriptor< any > >(
+		store: S
+	) => ActionCreatorsOf< ConfigOf< S > >;
 }
 
 // Type Helpers.
@@ -182,7 +213,7 @@ export type ActionCreatorsOf< Config extends AnyConfig > =
 // return type of each action creator to account for internal registry details --
 // for example, dispatched actions are wrapped with a Promise.
 export type PromisifiedActionCreators<
-	ActionCreators extends MapOf< ActionCreator >
+	ActionCreators extends MapOf< ActionCreator >,
 > = {
 	[ Action in keyof ActionCreators ]: PromisifyActionCreator<
 		ActionCreators[ Action ]

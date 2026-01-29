@@ -2,55 +2,84 @@
  * WordPress dependencies
  */
 import { DropdownMenu } from '@wordpress/components';
-import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { plus, symbol, symbolFilled } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
+import { useState, useRef } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import { symbol, symbolFilled, upload } from '@wordpress/icons';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { privateApis as editPatternsPrivateApis } from '@wordpress/patterns';
+import {
+	privateApis as editPatternsPrivateApis,
+	store as patternsStore,
+} from '@wordpress/patterns';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import CreateTemplatePartModal from '../create-template-part-modal';
-import SidebarButton from '../sidebar-button';
 import { unlock } from '../../lock-unlock';
-import { store as editSiteStore } from '../../store';
+import {
+	PATTERN_TYPES,
+	PATTERN_DEFAULT_CATEGORY,
+	TEMPLATE_PART_POST_TYPE,
+} from '../../utils/constants';
 
-const { useHistory } = unlock( routerPrivateApis );
-const { CreatePatternModal } = unlock( editPatternsPrivateApis );
+const { useHistory, useLocation } = unlock( routerPrivateApis );
+const { CreatePatternModal, useAddPatternCategory } = unlock(
+	editPatternsPrivateApis
+);
+const { CreateTemplatePartModal } = unlock( editorPrivateApis );
 
 export default function AddNewPattern() {
 	const history = useHistory();
+	const location = useLocation();
 	const [ showPatternModal, setShowPatternModal ] = useState( false );
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
-	const isTemplatePartsMode = useSelect( ( select ) => {
-		const settings = select( editSiteStore ).getSettings();
-		return !! settings.supportsTemplatePartsMode;
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const { createPatternFromFile } = unlock( useDispatch( patternsStore ) );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+	const patternUploadInputRef = useRef();
+	const {
+		isBlockBasedTheme,
+		addNewPatternLabel,
+		addNewTemplatePartLabel,
+		canCreatePattern,
+		canCreateTemplatePart,
+	} = useSelect( ( select ) => {
+		const { getCurrentTheme, getPostType, canUser } = select( coreStore );
+		return {
+			isBlockBasedTheme: getCurrentTheme()?.is_block_theme,
+			addNewPatternLabel: getPostType( PATTERN_TYPES.user )?.labels
+				?.add_new_item,
+			addNewTemplatePartLabel: getPostType( TEMPLATE_PART_POST_TYPE )
+				?.labels?.add_new_item,
+			// Blocks refers to the wp_block post type, this checks the ability to create a post of that type.
+			canCreatePattern: canUser( 'create', {
+				kind: 'postType',
+				name: PATTERN_TYPES.user,
+			} ),
+			canCreateTemplatePart: canUser( 'create', {
+				kind: 'postType',
+				name: TEMPLATE_PART_POST_TYPE,
+			} ),
+		};
 	}, [] );
 
-	function handleCreatePattern( { pattern, categoryId } ) {
+	function handleCreatePattern( { pattern } ) {
 		setShowPatternModal( false );
-
-		history.push( {
-			postId: pattern.id,
-			postType: 'wp_block',
-			categoryType: 'wp_block',
-			categoryId,
-			canvas: 'edit',
-		} );
+		history.navigate(
+			`/${ PATTERN_TYPES.user }/${ pattern.id }?canvas=edit`
+		);
 	}
 
 	function handleCreateTemplatePart( templatePart ) {
 		setShowTemplatePartModal( false );
-
-		// Navigate to the created template part editor.
-		history.push( {
-			postId: templatePart.id,
-			postType: 'wp_template_part',
-			canvas: 'edit',
-		} );
+		history.navigate(
+			`/${ TEMPLATE_PART_POST_TYPE }/${ templatePart.id }?canvas=edit`
+		);
 	}
 
 	function handleError() {
@@ -58,34 +87,52 @@ export default function AddNewPattern() {
 		setShowTemplatePartModal( false );
 	}
 
-	const controls = [
-		{
+	const controls = [];
+	if ( canCreatePattern ) {
+		controls.push( {
 			icon: symbol,
 			onClick: () => setShowPatternModal( true ),
-			title: __( 'Create pattern' ),
-		},
-	];
-
-	// Remove condition when command palette issues are resolved.
-	// See: https://github.com/WordPress/gutenberg/issues/52154.
-	if ( ! isTemplatePartsMode ) {
-		controls.push( {
-			icon: symbolFilled,
-			onClick: () => setShowTemplatePartModal( true ),
-			title: __( 'Create template part' ),
+			title: addNewPatternLabel,
 		} );
 	}
 
+	if ( isBlockBasedTheme && canCreateTemplatePart ) {
+		controls.push( {
+			icon: symbolFilled,
+			onClick: () => setShowTemplatePartModal( true ),
+			title: addNewTemplatePartLabel,
+		} );
+	}
+
+	if ( canCreatePattern ) {
+		controls.push( {
+			icon: upload,
+			onClick: () => {
+				patternUploadInputRef.current.click();
+			},
+			title: __( 'Import pattern from JSON' ),
+		} );
+	}
+
+	const { categoryMap, findOrCreateTerm } = useAddPatternCategory();
+	if ( controls.length === 0 ) {
+		return null;
+	}
 	return (
 		<>
-			<DropdownMenu
-				controls={ controls }
-				toggleProps={ {
-					as: SidebarButton,
-				} }
-				icon={ plus }
-				label={ __( 'Create pattern' ) }
-			/>
+			{ addNewPatternLabel && (
+				<DropdownMenu
+					controls={ controls }
+					icon={ null }
+					toggleProps={ {
+						variant: 'primary',
+						showTooltip: false,
+						__next40pxDefaultSize: true,
+					} }
+					text={ addNewPatternLabel }
+					label={ addNewPatternLabel }
+				/>
+			) }
 			{ showPatternModal && (
 				<CreatePatternModal
 					onClose={ () => setShowPatternModal( false ) }
@@ -101,6 +148,83 @@ export default function AddNewPattern() {
 					onError={ handleError }
 				/>
 			) }
+
+			<input
+				type="file"
+				accept=".json"
+				hidden
+				ref={ patternUploadInputRef }
+				onChange={ async ( event ) => {
+					const file = event.target.files?.[ 0 ];
+					if ( ! file ) {
+						return;
+					}
+					try {
+						let currentCategoryId;
+						// When we're not handling template parts, we should
+						// add or create the proper pattern category.
+						if (
+							location.query.postType !== TEMPLATE_PART_POST_TYPE
+						) {
+							/*
+							 * categoryMap.values() returns an iterator.
+							 * Iterator.prototype.find() is not yet widely supported.
+							 * Convert to array to use the Array.prototype.find method.
+							 */
+							const currentCategory = Array.from(
+								categoryMap.values()
+							).find(
+								( term ) =>
+									term.name === location.query.categoryId
+							);
+							if ( currentCategory ) {
+								currentCategoryId =
+									currentCategory.id ||
+									( await findOrCreateTerm(
+										currentCategory.label
+									) );
+							}
+						}
+						const pattern = await createPatternFromFile(
+							file,
+							currentCategoryId
+								? [ currentCategoryId ]
+								: undefined
+						);
+
+						// Navigate to the All patterns category for the newly created pattern
+						// if we're not on that page already and if we're not in the `my-patterns`
+						// category.
+						if (
+							! currentCategoryId &&
+							location.query.categoryId !== 'my-patterns'
+						) {
+							history.navigate(
+								`/pattern?categoryId=${ PATTERN_DEFAULT_CATEGORY }`
+							);
+						}
+
+						createSuccessNotice(
+							sprintf(
+								// translators: %s: The imported pattern's title.
+								__( 'Imported "%s" from JSON.' ),
+								pattern.title.raw
+							),
+							{
+								type: 'snackbar',
+								id: 'import-pattern-success',
+							}
+						);
+					} catch ( err ) {
+						createErrorNotice( err.message, {
+							type: 'snackbar',
+							id: 'import-pattern-error',
+						} );
+					} finally {
+						event.target.value = '';
+					}
+				} }
+			/>
 		</>
 	);
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -41,17 +41,17 @@ const meta: Meta< typeof Toolbar > = {
 	title: 'Components/Toolbar',
 	component: Toolbar,
 	subcomponents: {
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		ToolbarButton,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		ToolbarGroup,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		ToolbarItem,
-		// @ts-expect-error - See https://github.com/storybookjs/storybook/issues/23170
 		ToolbarDropdownMenu,
 	},
 	argTypes: {
-		children: { control: { type: null } },
+		children: { control: false },
+		variant: {
+			options: [ undefined, 'unstyled' ],
+			control: { type: 'radio' },
+		},
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -180,4 +180,15 @@ WithoutGroup.args = {
 			<ToolbarButton icon={ link } label="Link" />
 		</>
 	),
+};
+
+/**
+ * Set the variant to `unstyled` to remove default border styles.
+ * Otherwise, leave it as `undefined` for default styles.
+ */
+
+export const Unstyled = Template.bind( {} );
+Unstyled.args = {
+	...Default.args,
+	variant: 'unstyled',
 };

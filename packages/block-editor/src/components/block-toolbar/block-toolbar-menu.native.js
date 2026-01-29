@@ -26,7 +26,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect, useSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { moreHorizontalMobile } from '@wordpress/icons';
+import { moreHorizontal } from '@wordpress/icons';
 import { useRef, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
@@ -212,10 +212,7 @@ const BlockActionsMenu = ( {
 		},
 		convertToRegularBlocks: {
 			id: 'convertToRegularBlocksOption',
-			label:
-				innerBlockCount > 1
-					? __( 'Detach patterns' )
-					: __( 'Detach pattern' ),
+			label: __( 'Detach' ),
 			value: 'convertToRegularBlocksOption',
 			onSelect: () => {
 				/* translators: %s: name of the synced block */
@@ -258,8 +255,8 @@ const BlockActionsMenu = ( {
 			<ToolbarGroup>
 				<ToolbarButton
 					title={ __( 'Open Block Actions Menu' ) }
-					icon={ moreHorizontalMobile }
-					disabled={ true }
+					icon={ moreHorizontal }
+					disabled
 				/>
 			</ToolbarGroup>
 		);
@@ -301,7 +298,7 @@ const BlockActionsMenu = ( {
 			<ToolbarButton
 				title={ __( 'Open Block Actions Menu' ) }
 				onClick={ onPickerPresent }
-				icon={ moreHorizontalMobile }
+				icon={ moreHorizontal }
 				extraProps={ {
 					hint: accessibilityHint,
 				} }
@@ -314,7 +311,7 @@ const BlockActionsMenu = ( {
 				destructiveButtonIndex={ options.length }
 				disabledButtonIndices={ disabledButtonIndices }
 				hideCancelButton={ Platform.OS !== 'ios' }
-				leftAlign={ true }
+				leftAlign
 				getAnchor={ getAnchor }
 				// translators: %s: block title e.g: "Paragraph".
 				title={ sprintf( __( '%s block options' ), blockTitle ) }

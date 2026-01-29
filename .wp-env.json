@@ -1,16 +1,21 @@
 {
+	"$schema": "./schemas/json/wp-env.json",
 	"core": "WordPress/WordPress",
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
 	"env": {
+		"development": {
+			"phpmyadminPort": 9000
+		},
 		"tests": {
 			"mappings": {
 				"wp-content/plugins/gutenberg": ".",
 				"wp-content/mu-plugins": "./packages/e2e-tests/mu-plugins",
 				"wp-content/plugins/gutenberg-test-plugins": "./packages/e2e-tests/plugins",
 				"wp-content/themes/gutenberg-test-themes": "./test/gutenberg-test-themes",
-				"wp-content/themes/gutenberg-test-themes/twentytwentyone": "https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip",
-				"wp-content/themes/gutenberg-test-themes/twentytwentythree": "https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip"
+				"wp-content/themes/gutenberg-test-themes/twentytwentyone": "https://downloads.wordpress.org/theme/twentytwentyone.2.1.zip",
+				"wp-content/themes/gutenberg-test-themes/twentytwentythree": "https://downloads.wordpress.org/theme/twentytwentythree.1.3.zip",
+				"wp-content/themes/gutenberg-test-themes/twentytwentyfour": "https://downloads.wordpress.org/theme/twentytwentyfour.1.0.zip"
 			}
 		}
 	}

@@ -15,8 +15,8 @@ Date pickers should:
 Render a DateTimePicker.
 
 ```jsx
+import { useState } from 'react';
 import { DateTimePicker } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const MyDateTimePicker = () => {
 	const [ date, setDate ] = useState( new Date() );
@@ -55,6 +55,14 @@ Whether we use a 12-hour clock. With a 12-hour clock, an AM/PM widget is display
 -   Type: `bool`
 -   Required: No
 -   Default: false
+
+### `dateOrder`: `'dmy' | 'mdy' | 'ymd'`
+
+The order of day, month, and year. This prop overrides the time format determined by `is12Hour` prop.
+
+-   Type: `string`
+-   Required: No
+-   Default: `'dmy'`
 
 ### `isInvalidDate`: `( date: Date ) => boolean`
 

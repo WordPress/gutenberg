@@ -19,14 +19,16 @@ import StylePreview from './preview';
 import containerStyles from './style.scss';
 import { store as blockEditorStore } from '../../store';
 
+const EMPTY_ARRAY = [];
+
 function BlockStyles( { clientId, url } ) {
 	const selector = ( select ) => {
 		const { getBlock } = select( blockEditorStore );
 		const { getBlockStyles } = select( blocksStore );
 		const block = getBlock( clientId );
 		return {
-			styles: getBlockStyles( block.name ),
-			className: block.attributes.className || '',
+			styles: getBlockStyles( block?.name ) || EMPTY_ARRAY,
+			className: block?.attributes?.className || '',
 		};
 	};
 

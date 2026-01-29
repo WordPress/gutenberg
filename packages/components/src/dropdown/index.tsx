@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -14,7 +14,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { contextConnect, useContextSystem } from '../ui/context';
+import { contextConnect, useContextSystem } from '../context';
 import { useControlledValue } from '../utils/hooks';
 import Popover from '../popover';
 import type { DropdownProps, DropdownInternalContext } from './types';
@@ -142,7 +142,7 @@ const UnconnectedDropdown = (
 					}
 					variant={ variant }
 					{ ...popoverProps }
-					className={ classnames(
+					className={ clsx(
 						'components-dropdown__content',
 						popoverProps?.className,
 						contentClassName

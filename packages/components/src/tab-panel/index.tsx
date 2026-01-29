@@ -2,7 +2,7 @@
  * External dependencies
  */
 import * as Ariakit from '@ariakit/react';
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -15,6 +15,7 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import { useInstanceId, usePrevious } from '@wordpress/compose';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,7 +23,7 @@ import { useInstanceId, usePrevious } from '@wordpress/compose';
 
 import Button from '../button';
 import type { TabPanelProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 
 // Separate the actual tab name from the instance ID. This is
 // necessary because Ariakit internally uses the element ID when
@@ -119,9 +120,12 @@ const UnforwardedTabPanel = (
 		orientation,
 		selectOnMove,
 		defaultSelectedId: prependInstanceId( initialTabName ),
+		rtl: isRTL(),
 	} );
 
-	const selectedTabName = extractTabName( tabStore.useState( 'selectedId' ) );
+	const selectedTabName = extractTabName(
+		Ariakit.useStoreState( tabStore, 'selectedId' )
+	);
 
 	const setTabStoreSelectedId = useCallback(
 		( tabName: string ) => {
@@ -201,7 +205,7 @@ const UnforwardedTabPanel = (
 						<Ariakit.Tab
 							key={ tab.name }
 							id={ prependInstanceId( tab.name ) }
-							className={ classnames(
+							className={ clsx(
 								'components-tab-panel__tabs-item',
 								tab.className,
 								{
@@ -215,6 +219,7 @@ const UnforwardedTabPanel = (
 							) }-view` }
 							render={
 								<Button
+									__next40pxDefaultSize
 									icon={ tab.icon }
 									label={ tab.icon && tab.title }
 									showTooltip={ !! tab.icon }
@@ -231,7 +236,7 @@ const UnforwardedTabPanel = (
 					id={ `${ prependInstanceId( selectedTab.name ) }-view` }
 					store={ tabStore }
 					tabId={ prependInstanceId( selectedTab.name ) }
-					className={ 'components-tab-panel__tab-content' }
+					className="components-tab-panel__tab-content"
 				>
 					{ children( selectedTab ) }
 				</Ariakit.TabPanel>
@@ -241,4 +246,5 @@ const UnforwardedTabPanel = (
 };
 
 export const TabPanel = forwardRef( UnforwardedTabPanel );
+TabPanel.displayName = 'TabPanel';
 export default TabPanel;

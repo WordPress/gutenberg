@@ -144,20 +144,20 @@ function useAutosavePurge() {
 			[]
 		);
 
-	const lastIsDirty = useRef( isDirty );
-	const lastIsAutosaving = useRef( isAutosaving );
+	const lastIsDirtyRef = useRef( isDirty );
+	const lastIsAutosavingRef = useRef( isAutosaving );
 
 	useEffect( () => {
 		if (
 			! didError &&
-			( ( lastIsAutosaving.current && ! isAutosaving ) ||
-				( lastIsDirty.current && ! isDirty ) )
+			( ( lastIsAutosavingRef.current && ! isAutosaving ) ||
+				( lastIsDirtyRef.current && ! isDirty ) )
 		) {
 			localAutosaveClear( postId, isEditedPostNew );
 		}
 
-		lastIsDirty.current = isDirty;
-		lastIsAutosaving.current = isAutosaving;
+		lastIsDirtyRef.current = isDirty;
+		lastIsAutosavingRef.current = isAutosaving;
 	}, [ isDirty, isAutosaving, didError ] );
 
 	// Once the isEditedPostNew changes from true to false, let's clear the auto-draft autosave.
@@ -192,4 +192,16 @@ function LocalAutosaveMonitor() {
 	);
 }
 
+/**
+ * Monitors local autosaves of a post in the editor.
+ * It uses several hooks and functions to manage autosave behavior:
+ * - `useAutosaveNotice` hook: Manages the creation of a notice prompting the user to restore a local autosave, if one exists.
+ * - `useAutosavePurge` hook: Ejects a local autosave after a successful save occurs.
+ * - `hasSessionStorageSupport` function: Checks if the current environment supports browser sessionStorage.
+ * - `LocalAutosaveMonitor` component: Uses the `AutosaveMonitor` component to perform autosaves at a specified interval.
+ *
+ * The module also checks for sessionStorage support and conditionally exports the `LocalAutosaveMonitor` component based on that.
+ *
+ * @module LocalAutosaveMonitor
+ */
 export default ifCondition( hasSessionStorageSupport )( LocalAutosaveMonitor );

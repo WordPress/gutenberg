@@ -6,7 +6,8 @@
 			"type": "next",
 			"showTitle": false,
 			"linkLabel": false,
-			"arrow": "none"
+			"arrow": "none",
+			"taxonomy": ""
 		},
 		"innerBlocks": []
 	}

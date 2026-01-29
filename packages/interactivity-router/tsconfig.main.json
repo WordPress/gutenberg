@@ -1,0 +1,21 @@
+{
+	"$schema": "https://json.schemastore.org/tsconfig.json",
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"allowJs": false,
+		"checkJs": false,
+		"strict": false
+	},
+	"references": [ { "path": "../a11y" }, { "path": "../interactivity" } ],
+	"exclude": [
+		"**/*.android.js",
+		"**/*.ios.js",
+		"**/*.native.js",
+		"**/benchmark",
+		"build-*/**",
+		"build/**",
+		"**/test/**",
+		"**/react-native-*/**",
+		"src/full-page.ts"
+	]
+}

@@ -21,30 +21,30 @@ type ValueProp = ToggleGroupControlProps[ 'value' ];
 export function useComputeControlledOrUncontrolledValue(
 	valueProp: ValueProp
 ): { value: ValueProp; defaultValue: ValueProp } {
-	const hasEverBeenUsedInControlledMode = useRef( false );
-	const previousValueProp = usePrevious( valueProp );
+	const isInitialRenderRef = useRef( true );
+	const prevValueProp = usePrevious( valueProp );
+	const prevIsControlledRef = useRef( false );
 
 	useEffect( () => {
-		if ( ! hasEverBeenUsedInControlledMode.current ) {
-			// Assume the component is being used in controlled mode if:
-			// - the `value` prop is not `undefined`
-			// - the `value` prop was not previously `undefined` and was given a new value
-			hasEverBeenUsedInControlledMode.current =
-				valueProp !== undefined &&
-				previousValueProp !== undefined &&
-				valueProp !== previousValueProp;
+		if ( isInitialRenderRef.current ) {
+			isInitialRenderRef.current = false;
 		}
-	}, [ valueProp, previousValueProp ] );
+	}, [] );
 
-	let value, defaultValue;
+	// Assume the component is being used in controlled mode on the first re-render
+	// that has a different `valueProp` from the previous render.
+	const isControlled =
+		prevIsControlledRef.current ||
+		( ! isInitialRenderRef.current && prevValueProp !== valueProp );
+	useEffect( () => {
+		prevIsControlledRef.current = isControlled;
+	}, [ isControlled ] );
 
-	if ( hasEverBeenUsedInControlledMode.current ) {
+	if ( isControlled ) {
 		// When in controlled mode, use `''` instead of `undefined`
-		value = valueProp ?? '';
-	} else {
-		// When in uncontrolled mode, the `value` should be intended as the initial value
-		defaultValue = valueProp;
+		return { value: valueProp ?? '', defaultValue: undefined };
 	}
 
-	return { value, defaultValue };
+	// When in uncontrolled mode, the `value` should be intended as the initial value
+	return { value: undefined, defaultValue: valueProp };
 }

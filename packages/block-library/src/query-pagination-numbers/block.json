@@ -5,7 +5,7 @@
 	"title": "Page Numbers",
 	"category": "theme",
 	"parent": [ "core/query-pagination" ],
-	"description": "Displays a list of page numbers for pagination",
+	"description": "Displays a list of page numbers for pagination.",
 	"textdomain": "default",
 	"attributes": {
 		"midSize": {
@@ -15,6 +15,7 @@
 	},
 	"usesContext": [ "queryId", "query", "enhancedPagination" ],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"color": {
@@ -36,6 +37,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-query-pagination-numbers-editor"

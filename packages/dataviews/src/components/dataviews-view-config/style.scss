@@ -1,0 +1,64 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.dataviews-view-config {
+	width: 320px;
+	/* stylelint-disable-next-line property-no-unknown -- the linter needs to be updated to accepted the container-type property */
+	container-type: inline-size;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+}
+
+.dataviews-config__popover.is-expanded .dataviews-config__popover-content-wrapper {
+	overflow-y: scroll;
+	height: 100%;
+	.dataviews-view-config {
+		width: auto;
+	}
+}
+
+.dataviews-view-config__sort-direction .components-toggle-group-control-option-base {
+	text-transform: uppercase;
+}
+
+.dataviews-settings-section__title.dataviews-settings-section__title {
+	line-height: $grid-unit-30;
+	font-size: 15px;
+}
+
+.dataviews-settings-section__sidebar {
+	grid-column: span 4;
+}
+
+.dataviews-settings-section__content,
+.dataviews-settings-section__content > * {
+	grid-column: span 8;
+}
+
+.dataviews-settings-section__content .is-divided-in-two {
+	display: contents;
+	& > * {
+		grid-column: span 4;
+	}
+}
+
+.dataviews-settings-section:has(.dataviews-settings-section__content:empty) {
+	display: none;
+}
+
+@container (max-width: 500px) {
+	.dataviews-settings-section.dataviews-settings-section {
+		grid-template-columns: repeat(2, 1fr);
+		.dataviews-settings-section__sidebar {
+			grid-column: span 2;
+		}
+
+		.dataviews-settings-section__content {
+			grid-column: span 2;
+		}
+	}
+}
+
+.dataviews-view-config__label {
+	text-wrap: nowrap;
+}

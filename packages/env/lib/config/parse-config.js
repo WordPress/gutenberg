@@ -46,13 +46,16 @@ const mergeConfigs = require( './merge-configs' );
  * The environment-specific configuration options. (development/tests/etc)
  *
  * @typedef WPEnvironmentConfig
- * @property {WPSource}                  coreSource    The WordPress installation to load in the environment.
- * @property {WPSource[]}                pluginSources Plugins to load in the environment.
- * @property {WPSource[]}                themeSources  Themes to load in the environment.
- * @property {number}                    port          The port to use.
- * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
- * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
- * @property {string|null}               phpVersion    Version of PHP to use in the environments, of the format 0.0.
+ * @property {WPSource}                  coreSource     The WordPress installation to load in the environment.
+ * @property {WPSource[]}                pluginSources  Plugins to load in the environment.
+ * @property {WPSource[]}                themeSources   Themes to load in the environment.
+ * @property {number}                    port           The port to use.
+ * @property {number}                    mysqlPort      The port to use for MySQL. Random if empty.
+ * @property {number}                    phpmyadminPort The port to use for phpMyAdmin. If empty, disabled phpMyAdmin.
+ * @property {boolean}                   multisite      Whether to set up a multisite installation.
+ * @property {Object}                    config         Mapping of wp-config.php constants to their desired values.
+ * @property {Object.<string, WPSource>} mappings       Mapping of WordPress directories to local directories which should be mounted.
+ * @property {string|null}               phpVersion     Version of PHP to use in the environments, of the format 0.0.
  */
 
 /**
@@ -85,6 +88,9 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	themes: [],
 	port: 8888,
 	testsPort: 8889,
+	mysqlPort: null,
+	phpmyadminPort: null,
+	multisite: false,
 	mappings: {},
 	config: {
 		FS_METHOD: 'direct',
@@ -108,7 +114,7 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
  * @param {string} configDirectoryPath A path to the directory we are parsing the config for.
  * @param {string} cacheDirectoryPath  Path to the work directory located in ~/.wp-env.
  *
- * @return {WPRootConfig} Parsed config.
+ * @return {Promise<WPRootConfig>} Parsed config.
  */
 async function parseConfig( configDirectoryPath, cacheDirectoryPath ) {
 	// The local config will be used to override any defaults.
@@ -138,7 +144,7 @@ async function parseConfig( configDirectoryPath, cacheDirectoryPath ) {
 	} );
 
 	// Users can provide overrides in environment
-	// variables that supercede all other options.
+	// variables that supersede all other options.
 	const environmentVarOverrides =
 		getEnvironmentVarOverrides( cacheDirectoryPath );
 
@@ -276,9 +282,22 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.env.development.port = overrides.port;
 	}
 
+	if ( overrides.mysqlPort ) {
+		overrideConfig.env.development.mysqlPort = overrides.mysqlPort;
+	}
+
+	if ( overrides.phpmyadminPort ) {
+		overrideConfig.env.development.phpmyadminPort =
+			overrides.phpmyadminPort;
+	}
+
 	if ( overrides.testsPort ) {
 		overrideConfig.testsPort = overrides.testsPort;
 		overrideConfig.env.tests.port = overrides.testsPort;
+	}
+
+	if ( overrides.testsMysqlPort ) {
+		overrideConfig.env.tests.mysqlPort = overrides.testsMysqlPort;
 	}
 
 	if ( overrides.coreSource ) {
@@ -407,6 +426,11 @@ async function parseEnvironmentConfig(
 			continue;
 		}
 
+		// The $schema key is a special key that is used to validate the configuration.
+		if ( key === '$schema' ) {
+			continue;
+		}
+
 		// We should also check root-only options for the root config
 		// because these aren't part of the above defaults but are
 		// configuration options that we will parse.
@@ -434,6 +458,18 @@ async function parseEnvironmentConfig(
 	if ( config.port !== undefined ) {
 		checkPort( configFile, `${ environmentPrefix }port`, config.port );
 		parsedConfig.port = config.port;
+	}
+
+	if ( config.mysqlPort !== undefined ) {
+		parsedConfig.mysqlPort = config.mysqlPort;
+	}
+
+	if ( config.phpmyadminPort !== undefined ) {
+		parsedConfig.phpmyadminPort = config.phpmyadminPort;
+	}
+
+	if ( config.multisite !== undefined ) {
+		parsedConfig.multisite = config.multisite;
 	}
 
 	if ( config.phpVersion !== undefined ) {
@@ -534,7 +570,7 @@ async function parseEnvironmentConfig(
 async function parseCoreSource( coreSource, options ) {
 	// An empty source means we should use the latest version of WordPress.
 	if ( ! coreSource ) {
-		const wpVersion = await getLatestWordPressVersion();
+		const wpVersion = await getLatestWordPressVersion( options );
 		if ( ! wpVersion ) {
 			throw new ValidationError(
 				'Could not find the latest WordPress version. There may be a network issue.'

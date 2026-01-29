@@ -38,8 +38,8 @@ export const useCommentQueryArgs = ( { postId } ) => {
 	} = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		const { __experimentalDiscussionSettings } = getSettings();
-		return __experimentalDiscussionSettings;
-	} );
+		return __experimentalDiscussionSettings ?? {};
+	}, [] );
 
 	// WP REST API doesn't allow fetching more than max items limit set per single page of data.
 	// As for the editor performance is more important than completeness of data and fetching only the
@@ -107,13 +107,21 @@ const useDefaultPageIndex = ( { defaultPage, postId, perPage, queryArgs } ) => {
 			} ),
 			method: 'HEAD',
 			parse: false,
-		} ).then( ( res ) => {
-			const pages = parseInt( res.headers.get( 'X-WP-TotalPages' ) );
-			setDefaultPages( {
-				...defaultPages,
-				[ key ]: pages <= 1 ? 1 : pages, // If there are 0 pages, it means that there are no comments, but there is no 0th page.
+		} )
+			.then( ( res ) => {
+				const pages = parseInt( res.headers.get( 'X-WP-TotalPages' ) );
+				setDefaultPages( {
+					...defaultPages,
+					[ key ]: pages <= 1 ? 1 : pages, // If there are 0 pages, it means that there are no comments, but there is no 0th page.
+				} );
+			} )
+			.catch( () => {
+				// There's no 0th page, but we can't know the number of pages, fallback to 1.
+				setDefaultPages( {
+					...defaultPages,
+					[ key ]: 1,
+				} );
 			} );
-		} );
 	}, [ defaultPage, postId, perPage, setDefaultPages ] );
 
 	// The oldest one is always the first one.

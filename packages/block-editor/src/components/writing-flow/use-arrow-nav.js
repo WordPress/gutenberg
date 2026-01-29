@@ -114,6 +114,10 @@ export function getClosestTabbable(
 	}
 
 	function isTabCandidate( node ) {
+		if ( node.closest( '[inert]' ) ) {
+			return;
+		}
+
 		// Skip if there's only one child that is content editable (and thus a
 		// better candidate).
 		if (
@@ -202,6 +206,11 @@ export default function useArrowNav() {
 			const { defaultView } = ownerDocument;
 
 			if ( ! isNav ) {
+				return;
+			}
+
+			// In preview mode, navigation is handled by useSelectableBlocksNav.
+			if ( getSettings().isPreviewMode ) {
 				return;
 			}
 

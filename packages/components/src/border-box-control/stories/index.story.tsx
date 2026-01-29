@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { ComponentProps } from 'react';
 
 /**
@@ -16,11 +16,11 @@ import Button from '../../button';
 import { BorderBoxControl } from '../';
 
 const meta: Meta< typeof BorderBoxControl > = {
-	title: 'Components (Experimental)/BorderBoxControl',
+	title: 'Components/BorderBoxControl',
 	component: BorderBoxControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -53,6 +53,7 @@ const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
 	return (
 		<>
 			<BorderBoxControl
+				__next40pxDefaultSize
 				{ ...otherProps }
 				onChange={ onChangeMerged }
 				value={ borders }
@@ -71,6 +72,7 @@ const Template: StoryFn< typeof BorderBoxControl > = ( props ) => {
 				convenience.
 			</p>
 			<Button
+				__next40pxDefaultSize
 				variant="primary"
 				onClick={ () => onChangeMerged( undefined ) }
 			>
@@ -83,4 +85,6 @@ export const Default = Template.bind( {} );
 Default.args = {
 	colors,
 	label: 'Borders',
+	enableStyle: true,
+	__next40pxDefaultSize: true,
 };

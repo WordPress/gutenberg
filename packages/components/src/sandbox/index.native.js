@@ -68,7 +68,7 @@ const observeAndResizeJS = `
 					style
 				) {
 					if (
-						/^\\d+(vmin|vmax|vh|vw)$/.test( ruleOrNode.style[ style ] )
+						/^\\d+(vw|vh|svw|lvw|dvw|svh|lvh|dvh|vi|svi|lvi|dvi|vb|svb|lvb|dvb|vmin|svmin|lvmin|dvmin|vmax|svmax|lvmax|dvmax)$/.test( ruleOrNode.style[ style ] )
 					) {
 						ruleOrNode.style[ style ] = '';
 					}
@@ -336,9 +336,7 @@ const Sandbox = forwardRef( function Sandbox(
 
 	useEffect( () => {
 		updateContentHtml();
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ html, title, type, styles, scripts ] );
 
 	useEffect( () => {

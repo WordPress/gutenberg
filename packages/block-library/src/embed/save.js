@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames/dedupe';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -19,7 +19,7 @@ export default function save( { attributes } ) {
 		return null;
 	}
 
-	const className = classnames( 'wp-block-embed', {
+	const className = clsx( 'wp-block-embed', {
 		[ `is-type-${ type }` ]: type,
 		[ `is-provider-${ providerNameSlug }` ]: providerNameSlug,
 		[ `wp-block-embed-${ providerNameSlug }` ]: providerNameSlug,

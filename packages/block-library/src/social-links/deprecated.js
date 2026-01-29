@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classNames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -96,7 +96,7 @@ const deprecated = [
 				},
 			} = props;
 
-			const className = classNames( size, {
+			const className = clsx( size, {
 				'has-icon-color': iconColorValue,
 				'has-icon-background-color': iconBackgroundColorValue,
 				[ `items-justified-${ itemsJustification }` ]:

@@ -3,6 +3,12 @@
  */
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import timezoneMock from 'timezone-mock';
+
+/**
+ * WordPress dependencies
+ */
+import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -281,12 +287,9 @@ describe( 'TimePicker', () => {
 		expect(
 			( screen.getByLabelText( 'Minutes' ) as HTMLInputElement ).value
 		).toBe( '00' );
-		/**
-		 * This is not ideal, but best of we can do for now until we refactor
-		 * AM/PM into accessible elements, like radio buttons.
-		 */
-		expect( screen.getByText( 'AM' ) ).not.toHaveClass( 'is-primary' );
-		expect( screen.getByText( 'PM' ) ).toHaveClass( 'is-primary' );
+
+		expect( screen.getByRole( 'radio', { name: 'AM' } ) ).not.toBeChecked();
+		expect( screen.getByRole( 'radio', { name: 'PM' } ) ).toBeChecked();
 	} );
 
 	it( 'should have different layouts/orders for 12/24 hour formats', () => {
@@ -333,6 +336,67 @@ describe( 'TimePicker', () => {
 		expect( monthInputIndex < dayInputIndex ).toBe( true );
 	} );
 
+	it( 'Should change layouts/orders when `dateOrder` prop is passed', () => {
+		const onChangeSpy = jest.fn();
+
+		render(
+			<form aria-label="form">
+				<TimePicker
+					currentTime="1986-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					dateOrder="ymd"
+				/>
+			</form>
+		);
+
+		const form = screen.getByRole( 'form' ) as HTMLFormElement;
+
+		const yearInputIndex = Array.from( form.elements ).indexOf(
+			screen.getByLabelText( 'Year' )
+		);
+
+		const monthInputIndex = Array.from( form.elements ).indexOf(
+			screen.getByLabelText( 'Month' )
+		);
+		const dayInputIndex = Array.from( form.elements ).indexOf(
+			screen.getByLabelText( 'Day' )
+		);
+
+		expect( monthInputIndex > yearInputIndex ).toBe( true );
+		expect( dayInputIndex > monthInputIndex ).toBe( true );
+	} );
+
+	it( 'Should ignore `is12Hour` prop setting when `dateOrder` prop is explicitly passed', () => {
+		const onChangeSpy = jest.fn();
+
+		render(
+			<form aria-label="form">
+				<TimePicker
+					currentTime="1986-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					dateOrder="ymd"
+					is12Hour
+				/>
+			</form>
+		);
+
+		const form = screen.getByRole( 'form' ) as HTMLFormElement;
+
+		const yearInputIndex = Array.from( form.elements ).indexOf(
+			screen.getByLabelText( 'Year' )
+		);
+
+		const monthInputIndex = Array.from( form.elements ).indexOf(
+			screen.getByLabelText( 'Month' )
+		);
+		const dayInputIndex = Array.from( form.elements ).indexOf(
+			screen.getByLabelText( 'Day' )
+		);
+
+		expect( monthInputIndex > yearInputIndex ).toBe( true );
+		expect( dayInputIndex > monthInputIndex ).toBe( true );
+	} );
+
 	it( 'Should set a time when passed a null currentTime', () => {
 		const onChangeSpy = jest.fn();
 
@@ -364,5 +428,167 @@ describe( 'TimePicker', () => {
 		expect( Number.isNaN( parseInt( yearInput, 10 ) ) ).toBe( false );
 		expect( Number.isNaN( parseInt( hoursInput, 10 ) ) ).toBe( false );
 		expect( Number.isNaN( parseInt( minutesInput, 10 ) ) ).toBe( false );
+	} );
+
+	describe( 'input types with timezone variations', () => {
+		let originalSettings: DateSettings;
+
+		beforeAll( () => {
+			originalSettings = getSettings();
+			setSettings( {
+				...originalSettings,
+				timezone: {
+					offset: -5,
+					offsetFormatted: '-5',
+					string: 'America/New_York',
+					abbr: 'EST',
+				},
+			} );
+		} );
+
+		afterEach( () => {
+			jest.useRealTimers();
+			timezoneMock.unregister();
+		} );
+
+		afterAll( () => {
+			setSettings( originalSettings );
+		} );
+
+		describe.each( [
+			{
+				direction: 'browser behind site',
+				timezone: 'US/Pacific' as const,
+			},
+			{
+				direction: 'browser matches UTC (zero offset)',
+				timezone: 'UTC' as const,
+			},
+			{
+				direction: 'browser ahead of site',
+				timezone: 'Australia/Adelaide' as const,
+			},
+		] )( '$direction', ( { timezone } ) => {
+			beforeEach( () => {
+				timezoneMock.register( timezone );
+			} );
+
+			function transformOnChangeToDate( nextValue: string ): Date {
+				// Timezoneless string represents site timezone. Convert to UTC
+				// instant in site timezone. In typical usage, consumers should
+				// align `@wordpress/date` settings to match their browser timezone
+				// when working with dates, to avoid having to manage this
+				// conversion themselves.
+				const settings = getSettings();
+				const offsetMs = settings.timezone.offset * 60 * 60 * 1000;
+				const asUTC = new Date( nextValue + 'Z' );
+				return new Date( asUTC.getTime() - offsetMs );
+			}
+
+			describe.each( [
+				{
+					type: 'timezoneless string',
+					initialTime: '2025-12-18T07:00:00',
+					transformOnChange: ( nextValue: string ) => nextValue,
+				},
+				{
+					type: 'string with timezone',
+					initialTime: '2025-12-18T12:00:00Z',
+					transformOnChange: ( nextValue: string ) =>
+						transformOnChangeToDate( nextValue ).toISOString(),
+				},
+				{
+					type: 'Date object',
+					initialTime: new Date( Date.UTC( 2025, 11, 18, 12, 0, 0 ) ),
+					transformOnChange: transformOnChangeToDate,
+				},
+				{
+					type: 'timestamp',
+					initialTime: Date.UTC( 2025, 11, 18, 12, 0, 0 ),
+					transformOnChange: ( nextValue: string ) =>
+						transformOnChangeToDate( nextValue ).getTime(),
+				},
+				{
+					type: 'undefined',
+					initialTime: undefined,
+					transformOnChange: ( nextValue: string ) => nextValue,
+				},
+			] )( 'with $type', ( { initialTime, transformOnChange } ) => {
+				it( 'should output timezoneless string matching displayed time', async () => {
+					// For undefined, set fake system time to get a known current time
+					let user: ReturnType< typeof userEvent.setup >;
+					if ( initialTime === undefined ) {
+						jest.useFakeTimers();
+						// Set system time to 12:00 UTC
+						jest.setSystemTime(
+							Date.UTC( 2025, 11, 18, 12, 0, 0 )
+						);
+						user = userEvent.setup( {
+							advanceTimers: jest.advanceTimersByTime,
+						} );
+					} else {
+						user = userEvent.setup();
+					}
+
+					const onChange = jest.fn();
+
+					const { rerender } = render(
+						<TimePicker
+							currentTime={ initialTime }
+							onChange={ onChange }
+						/>
+					);
+
+					// Should display the correct initial date and time assuming
+					// settings for the current site.
+					expect( screen.getByLabelText( 'Hours' ) ).toHaveValue( 7 );
+					expect( screen.getByLabelText( 'Minutes' ) ).toHaveValue(
+						0
+					);
+					expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 18 );
+
+					// Changing the hours by one should adjust just the hour.
+					await user.clear( screen.getByLabelText( 'Hours' ) );
+					await user.type( screen.getByLabelText( 'Hours' ), '08' );
+					await user.keyboard( '{Tab}' );
+					expect( onChange ).toHaveBeenCalledWith(
+						'2025-12-18T08:00:00'
+					);
+
+					// Test round-trip by passing onChange output back as input
+					let nextDate = onChange.mock.calls[ 0 ][ 0 ];
+					rerender(
+						<TimePicker
+							currentTime={ transformOnChange( nextDate ) }
+							onChange={ onChange }
+						/>
+					);
+					expect( screen.getByLabelText( 'Hours' ) ).toHaveValue( 8 );
+					expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 18 );
+					onChange.mockClear();
+
+					// Changing the minutes should adjust just the minutes.
+					await user.clear( screen.getByLabelText( 'Minutes' ) );
+					await user.type( screen.getByLabelText( 'Minutes' ), '30' );
+					await user.keyboard( '{Tab}' );
+					expect( onChange ).toHaveBeenCalledWith(
+						'2025-12-18T08:30:00'
+					);
+
+					// Test round-trip by passing onChange output back as input
+					nextDate = onChange.mock.calls[ 0 ][ 0 ];
+					rerender(
+						<TimePicker
+							currentTime={ transformOnChange( nextDate ) }
+							onChange={ onChange }
+						/>
+					);
+					expect( screen.getByLabelText( 'Minutes' ) ).toHaveValue(
+						30
+					);
+					expect( screen.getByLabelText( 'Day' ) ).toHaveValue( 18 );
+				} );
+			} );
+		} );
 	} );
 } );

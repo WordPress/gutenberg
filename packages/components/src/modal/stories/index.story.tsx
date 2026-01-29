@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import type { StoryFn, Meta } from '@storybook/react';
+import type { StoryFn, Meta } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { starEmpty, starFilled } from '@wordpress/icons';
+import { fullscreen } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -19,16 +19,18 @@ import type { ModalProps } from '../types';
 
 const meta: Meta< typeof Modal > = {
 	component: Modal,
-	title: 'Components/Modal',
+	title: 'Components/Overlays/Modal',
+	id: 'components-modal',
 	argTypes: {
 		children: {
-			control: { type: null },
+			control: false,
 		},
 		onKeyDown: {
-			control: { type: null },
+			control: false,
 		},
 		focusOnMount: {
-			control: { type: 'boolean' },
+			options: [ true, false, 'firstElement', 'firstContentElement' ],
+			control: { type: 'select' },
 		},
 		role: {
 			control: { type: 'text' },
@@ -56,15 +58,15 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
 
 	return (
 		<>
-			<Button variant="secondary" onClick={ openModal }>
+			<Button
+				__next40pxDefaultSize
+				variant="secondary"
+				onClick={ openModal }
+			>
 				Open Modal
 			</Button>
 			{ isOpen && (
-				<Modal
-					onRequestClose={ closeModal }
-					style={ { maxWidth: '600px' } }
-					{ ...args }
-				>
+				<Modal onRequestClose={ closeModal } { ...args }>
 					<p>
 						Lorem ipsum dolor sit amet, consectetur adipiscing elit,
 						sed do eiusmod tempor incididunt ut labore et magna
@@ -77,9 +79,16 @@ const Template: StoryFn< typeof Modal > = ( { onRequestClose, ...args } ) => {
 						anim id est laborum.
 					</p>
 
-					<InputControl style={ { marginBottom: '20px' } } />
+					<InputControl
+						__next40pxDefaultSize
+						style={ { marginBottom: '20px' } }
+					/>
 
-					<Button variant="secondary" onClick={ closeModal }>
+					<Button
+						__next40pxDefaultSize
+						variant="secondary"
+						onClick={ closeModal }
+					>
 						Close Modal
 					</Button>
 				</Modal>
@@ -100,22 +109,22 @@ Default.parameters = {
 	},
 };
 
-const LikeButton = () => {
-	const [ isLiked, setIsLiked ] = useState( false );
-	return (
-		<Button
-			icon={ isLiked ? starFilled : starEmpty }
-			label="Like"
-			onClick={ () => setIsLiked( ! isLiked ) }
-		/>
-	);
+export const WithsizeSmall: StoryFn< typeof Modal > = Template.bind( {} );
+WithsizeSmall.args = {
+	size: 'small',
 };
+WithsizeSmall.storyName = 'With size: small';
 
+/**
+ * The `headerActions` prop can be used to add auxiliary actions to the header, for example a fullscreen mode toggle.
+ */
 export const WithHeaderActions: StoryFn< typeof Modal > = Template.bind( {} );
 WithHeaderActions.args = {
 	...Default.args,
-	headerActions: <LikeButton />,
-	isDismissible: false,
+	headerActions: (
+		<Button icon={ fullscreen } label="Fullscreen mode" size="compact" />
+	),
+	children: <div style={ { height: '200px' } } />,
 };
 WithHeaderActions.parameters = {
 	...Default.parameters,

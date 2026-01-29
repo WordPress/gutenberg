@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -16,8 +16,8 @@ import { close } from '@wordpress/icons';
  */
 import Button from '../button';
 import type { NoticeAction, NoticeProps } from './types';
-import type { SyntheticEvent } from 'react';
 import type { DeprecatedButtonProps } from '../button/types';
+import { VisuallyHidden } from '../visually-hidden';
 
 const noop = () => {};
 
@@ -45,10 +45,23 @@ function getDefaultPoliteness( status: NoticeProps[ 'status' ] ) {
 		case 'warning':
 		case 'info':
 			return 'polite';
-
-		case 'error':
+		// The default will also catch the 'error' status.
 		default:
 			return 'assertive';
+	}
+}
+
+function getStatusLabel( status: NoticeProps[ 'status' ] ) {
+	switch ( status ) {
+		case 'warning':
+			return __( 'Warning notice' );
+		case 'info':
+			return __( 'Information notice' );
+		case 'error':
+			return __( 'Error notice' );
+		// The default will also catch the 'success' status.
+		default:
+			return __( 'Notice' );
 	}
 }
 
@@ -80,83 +93,89 @@ function Notice( {
 }: NoticeProps ) {
 	useSpokenMessage( spokenMessage, politeness );
 
-	const classes = classnames(
-		className,
-		'components-notice',
-		'is-' + status,
-		{
-			'is-dismissible': isDismissible,
-		}
-	);
+	const classes = clsx( className, 'components-notice', 'is-' + status, {
+		'is-dismissible': isDismissible,
+	} );
 
 	if ( __unstableHTML && typeof children === 'string' ) {
 		children = <RawHTML>{ children }</RawHTML>;
 	}
 
-	const onDismissNotice = ( event: SyntheticEvent ) => {
-		event?.preventDefault?.();
+	const onDismissNotice = () => {
 		onDismiss();
 		onRemove();
 	};
 
 	return (
 		<div className={ classes }>
+			<VisuallyHidden>{ getStatusLabel( status ) }</VisuallyHidden>
 			<div className="components-notice__content">
 				{ children }
-				<div className="components-notice__actions">
-					{ actions.map(
-						(
-							{
-								className: buttonCustomClasses,
-								label,
-								isPrimary,
-								variant,
-								noDefaultClasses = false,
-								onClick,
-								url,
-							}: NoticeAction &
-								// `isPrimary` is a legacy prop included for
-								// backcompat, but `variant` should be used
-								// instead.
-								Pick< DeprecatedButtonProps, 'isPrimary' >,
-							index
-						) => {
-							let computedVariant = variant;
-							if ( variant !== 'primary' && ! noDefaultClasses ) {
-								computedVariant = ! url ? 'secondary' : 'link';
-							}
-							if (
-								typeof computedVariant === 'undefined' &&
-								isPrimary
-							) {
-								computedVariant = 'primary';
-							}
+				{ actions.length > 0 && (
+					<div className="components-notice__actions">
+						{ actions.map(
+							(
+								{
+									className: buttonCustomClasses,
+									label,
+									isPrimary,
+									variant,
+									noDefaultClasses = false,
+									onClick,
+									url,
+									disabled,
+								}: NoticeAction &
+									// `isPrimary` is a legacy prop included for
+									// backcompat, but `variant` should be used
+									// instead.
+									Pick< DeprecatedButtonProps, 'isPrimary' >,
+								index
+							) => {
+								let computedVariant = variant;
+								if (
+									variant !== 'primary' &&
+									! noDefaultClasses
+								) {
+									computedVariant = ! url
+										? 'secondary'
+										: 'link';
+								}
+								if (
+									typeof computedVariant === 'undefined' &&
+									isPrimary
+								) {
+									computedVariant = 'primary';
+								}
 
-							return (
-								<Button
-									key={ index }
-									href={ url }
-									variant={ computedVariant }
-									onClick={ url ? undefined : onClick }
-									className={ classnames(
-										'components-notice__action',
-										buttonCustomClasses
-									) }
-								>
-									{ label }
-								</Button>
-							);
-						}
-					) }
-				</div>
+								return (
+									<Button
+										__next40pxDefaultSize
+										key={ index }
+										href={ url }
+										variant={ computedVariant }
+										onClick={ onClick }
+										disabled={ disabled }
+										accessibleWhenDisabled
+										className={ clsx(
+											'components-notice__action',
+											buttonCustomClasses
+										) }
+									>
+										{ label }
+									</Button>
+								);
+							}
+						) }
+					</div>
+				) }
 			</div>
 			{ isDismissible && (
 				<Button
+					size="small"
 					className="components-notice__dismiss"
 					icon={ close }
-					label={ __( 'Dismiss this notice' ) }
+					label={ __( 'Close' ) }
 					onClick={ onDismissNotice }
-					showTooltip={ false }
 				/>
 			) }
 		</div>

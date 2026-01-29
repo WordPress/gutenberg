@@ -11,16 +11,11 @@ In addition to presenting the structure of the blocks in the editor, the ListVie
 ![List view](https://make.wordpress.org/core/files/2020/08/block-navigation.png)
 ![View of a group list view](https://make.wordpress.org/core/files/2020/08/view-of-group-block-navigation.png)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage
 
-Renders a list view with default syles.
+Renders a list view with default styles.
 
 ```jsx
 import { ListView } from '@wordpress/block-editor';

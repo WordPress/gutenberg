@@ -15,13 +15,11 @@
 		"linkTarget": {
 			"type": "string",
 			"default": "_self"
-		},
-		"textAlign": {
-			"type": "string"
 		}
 	},
 	"usesContext": [ "commentId" ],
 	"supports": {
+		"anchor": true,
 		"html": false,
 		"spacing": {
 			"margin": true,
@@ -39,6 +37,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalFontWeight": true,
 			"__experimentalFontStyle": true,
@@ -48,6 +47,22 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
 		}
-	}
+	},
+	"style": "wp-block-comment-author-name"
 }

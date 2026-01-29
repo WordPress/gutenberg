@@ -1,8 +1,7 @@
 {
+	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"rootDir": "src",
-		"declarationDir": "build-types",
 		"types": [ "gutenberg-env" ],
 		"strictNullChecks": true
 	},
@@ -26,6 +25,9 @@
 		{ "path": "../html-entities" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../interactivity" },
+		{ "path": "../interactivity-router" },
+		{ "path": "../latex-to-mathml" },
 		{ "path": "../notices" },
 		{ "path": "../keycodes" },
 		{ "path": "../primitives" },

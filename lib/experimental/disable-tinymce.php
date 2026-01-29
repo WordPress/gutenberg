@@ -16,7 +16,7 @@ function gutenberg_declare_classic_block_necessary() {
 	}
 	echo '<script type="text/javascript">window.wp.needsClassicBlock = true;</script>';
 }
-add_action( 'admin_footer', 'gutenberg_declare_classic_block_necessary' );
+add_action( 'admin_print_footer_scripts', 'gutenberg_declare_classic_block_necessary', 20 );
 
 // If user has already requested TinyMCE, we're ending the experiment.
 if ( ! empty( $_GET['requiresTinymce'] ) || gutenberg_post_being_edited_requires_classic_block() ) {
@@ -44,6 +44,15 @@ function gutenberg_enqueue_tinymce_proxy() {
 add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_tinymce_proxy' );
 
 /**
+ * Dequeue the `mce-view` script as it was only necessary for the Classic block.
+ */
+function gutenberg_wp_enqueue_media() {
+	wp_dequeue_script( 'mce-view' );
+}
+
+add_action( 'wp_enqueue_media', 'gutenberg_wp_enqueue_media' );
+
+/**
  * Example TinyMCE usage used for testing.
  * Uncomment line 8 in this file to enable.
  */
@@ -54,7 +63,7 @@ function gutenberg_test_tinymce_access() {
 /**
  * Whether the current editor contains a classic block instance.
  *
- * @return bool True if the editor contains a classic block, false otherwse.
+ * @return bool True if the editor contains a classic block, false otherwise.
  */
 function gutenberg_post_being_edited_requires_classic_block() {
 	if ( ! is_admin() ) {

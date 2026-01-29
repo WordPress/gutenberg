@@ -49,8 +49,8 @@ function ImportForm( { instanceId, onUpload } ) {
 					case 'Invalid JSON file':
 						uiMessage = __( 'Invalid JSON file' );
 						break;
-					case 'Invalid Pattern JSON file':
-						uiMessage = __( 'Invalid Pattern JSON file' );
+					case 'Invalid pattern JSON file':
+						uiMessage = __( 'Invalid pattern JSON file' );
 						break;
 					default:
 						uiMessage = __( 'Unknown error' );
@@ -84,8 +84,10 @@ function ImportForm( { instanceId, onUpload } ) {
 			</label>
 			<input id={ inputId } type="file" onChange={ onChangeFile } />
 			<Button
+				__next40pxDefaultSize
 				type="submit"
 				isBusy={ isLoading }
+				accessibleWhenDisabled
 				disabled={ ! file || isLoading }
 				variant="secondary"
 				className="list-reusable-blocks-import-form__button"

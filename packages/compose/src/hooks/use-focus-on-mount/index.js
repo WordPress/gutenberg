@@ -1,13 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useCallback } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
+
+/**
+ * Internal dependencies
+ */
+import useRefEffect from '../use-ref-effect';
 
 /**
  * Hook used to focus the first tabbable element on mount.
  *
- * @param {boolean | 'firstElement'} focusOnMount Focus on mount mode.
+ * @param {boolean | 'firstElement' | 'firstInputElement'} focusOnMount Focus on mount mode.
  * @return {import('react').RefCallback<HTMLElement>} Ref callback.
  *
  * @example
@@ -44,21 +49,13 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 	};
 
 	/** @type {import('react').MutableRefObject<ReturnType<setTimeout> | undefined>} */
-	const timerId = useRef();
+	const timerIdRef = useRef();
 
 	useEffect( () => {
 		focusOnMountRef.current = focusOnMount;
 	}, [ focusOnMount ] );
 
-	useEffect( () => {
-		return () => {
-			if ( timerId.current ) {
-				clearTimeout( timerId.current );
-			}
-		};
-	}, [] );
-
-	return useCallback( ( node ) => {
+	return useRefEffect( ( node ) => {
 		if ( ! node || focusOnMountRef.current === false ) {
 			return;
 		}
@@ -67,18 +64,45 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 			return;
 		}
 
-		if ( focusOnMountRef.current === 'firstElement' ) {
-			timerId.current = setTimeout( () => {
-				const firstTabbable = focus.tabbable.find( node )[ 0 ];
-
-				if ( firstTabbable ) {
-					setFocus( /** @type {HTMLElement} */ ( firstTabbable ) );
-				}
-			}, 0 );
-
+		if (
+			focusOnMountRef.current !== 'firstElement' &&
+			focusOnMountRef.current !== 'firstInputElement'
+		) {
+			setFocus( node );
 			return;
 		}
 
-		setFocus( node );
+		timerIdRef.current = setTimeout( () => {
+			// For 'firstInputElement' mode, try to find a form input element first
+			if ( focusOnMountRef.current === 'firstInputElement' ) {
+				/** @type {HTMLElement | null} */
+				let formInput = null;
+				if (
+					typeof window !== 'undefined' &&
+					node instanceof window.Element
+				) {
+					formInput = node.querySelector(
+						'input:not([type="hidden"]):not([disabled]), select:not([disabled]), textarea:not([disabled])'
+					);
+				}
+
+				if ( formInput ) {
+					setFocus( formInput );
+					return;
+				}
+			}
+
+			// Fallback to the first tabbable element
+			const firstTabbable = focus.tabbable.find( node )[ 0 ];
+			if ( firstTabbable ) {
+				setFocus( firstTabbable );
+			}
+		}, 0 );
+
+		return () => {
+			if ( timerIdRef.current ) {
+				clearTimeout( timerIdRef.current );
+			}
+		};
 	}, [] );
 }

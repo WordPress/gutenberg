@@ -20,7 +20,9 @@ test.describe( 'undo', () => {
 		pageUtils,
 		undoUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'before pause' );
 		await editor.page.waitForTimeout( 1000 );
 		await page.keyboard.type( ' after pause' );
@@ -88,7 +90,9 @@ test.describe( 'undo', () => {
 		pageUtils,
 		undoUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 
 		await page.keyboard.type( 'before keyboard ' );
 		await pageUtils.pressKeys( 'primary+b' );
@@ -160,17 +164,13 @@ test.describe( 'undo', () => {
 	} );
 
 	test( 'should undo bold', async ( { page, pageUtils, editor } ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'test' );
-		await page.click( 'role=button[name="Save draft"i]' );
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text=Draft saved'
-			)
-		).toBeVisible();
+		await editor.saveDraft();
 		await page.reload();
-		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
-		await editor.canvas.click( '[data-type="core/paragraph"]' );
+		await editor.canvas.locator( '[data-type="core/paragraph"]' ).click();
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
 		await pageUtils.pressKeys( 'primary+z' );
@@ -190,7 +190,9 @@ test.describe( 'undo', () => {
 		pageUtils,
 		undoUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 
 		const firstBlock = await editor.getEditedPostContent();
 
@@ -333,20 +335,18 @@ test.describe( 'undo', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/14950
 
 		// Issue is demonstrated from an edited post: create, save, and reload.
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( 'original' );
-		await page.click( 'role=button[name="Save draft"i]' );
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text=Draft saved'
-			)
-		).toBeVisible();
+		await editor.saveDraft();
 		await page.reload();
-		await page.waitForSelector( 'iframe[name="editor-canvas"]' );
 
 		// Issue is demonstrated by forcing state merges (multiple inputs) on
 		// an existing text after a fresh reload.
-		await editor.canvas.click( '[data-type="core/paragraph"] >> nth=0' );
+		await editor.canvas
+			.locator( '[data-type="core/paragraph"] >> nth=0' )
+			.click();
 		await page.keyboard.type( 'modified' );
 
 		// The issue is demonstrated after the one second delay to trigger the
@@ -370,14 +370,11 @@ test.describe( 'undo', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '1' );
-		await page.click( 'role=button[name="Save draft"i]' );
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text=Draft saved'
-			)
-		).toBeVisible();
+		await editor.saveDraft();
 		await pageUtils.pressKeys( 'primary+z' );
 
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
@@ -388,7 +385,9 @@ test.describe( 'undo', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( '1' );
 		await editor.publishPost();
 		await pageUtils.pressKeys( 'primary+z' );
@@ -401,22 +400,19 @@ test.describe( 'undo', () => {
 		page,
 		pageUtils,
 	} ) => {
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 
 		await page.keyboard.type( '1' );
-		await page.click( 'role=button[name="Save draft"i]' );
-		await expect(
-			page.locator(
-				'role=button[name="Dismiss this notice"i] >> text=Draft saved'
-			)
-		).toBeVisible();
+		await editor.saveDraft();
 		await page.reload();
 
 		// Expect undo button to be disabled.
 		await expect(
 			page.locator( 'role=button[name="Undo"]' )
 		).toBeDisabled();
-		await editor.canvas.click( '[data-type="core/paragraph"]' );
+		await editor.canvas.locator( '[data-type="core/paragraph"]' ).click();
 
 		await page.keyboard.type( '2' );
 
@@ -446,14 +442,16 @@ test.describe( 'undo', () => {
 		// block attribute as in the previous action and results in transient edits
 		// and skipping `undo` history steps.
 		const text = 'tonis';
-		await editor.canvas.click( 'role=button[name="Add default block"i]' );
+		await editor.canvas
+			.locator( 'role=button[name="Add default block"i]' )
+			.click();
 		await page.keyboard.type( text );
 		await editor.publishPost();
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		await expect(
 			page.locator( 'role=button[name="Redo"]' )
-		).not.toBeDisabled();
+		).toBeEnabled();
 		await page.click( 'role=button[name="Redo"]' );
 
 		await expect.poll( editor.getBlocks ).toMatchObject( [

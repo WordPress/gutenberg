@@ -6,7 +6,6 @@ const chalk = require( 'chalk' );
 const ora = require( 'ora' );
 const yargs = require( 'yargs' );
 const terminalLink = require( 'terminal-link' );
-const { execSync } = require( 'child_process' );
 
 /**
  * Internal dependencies
@@ -14,10 +13,12 @@ const { execSync } = require( 'child_process' );
 const pkg = require( '../package.json' );
 const env = require( './env' );
 const parseXdebugMode = require( './parse-xdebug-mode' );
+const parseSpxMode = require( './parse-spx-mode' );
 const {
-	RUN_CONTAINERS,
-	validateRunContainer,
-} = require( './validate-run-container' );
+	getAvailableRuntimes,
+	getRuntime,
+	UnsupportedCommandError,
+} = require( './runtime' );
 
 // Colors.
 const boldWhite = chalk.bold.white;
@@ -44,7 +45,11 @@ const withSpinner =
 				process.exit( 0 );
 			},
 			( error ) => {
-				if (
+				if ( error instanceof UnsupportedCommandError ) {
+					// Error is an unsupported command in the current runtime.
+					spinner.fail( error.message );
+					process.exit( 1 );
+				} else if (
 					error instanceof env.ValidationError ||
 					error instanceof env.LifecycleScriptError
 				) {
@@ -58,10 +63,10 @@ const withSpinner =
 					'err' in error &&
 					'out' in error
 				) {
-					// Error is a docker-compose error. That means something docker-related failed.
+					// Error is a docker compose error. That means something docker-related failed.
 					// https://github.com/PDMLab/docker-compose/blob/HEAD/src/index.ts
 					spinner.fail(
-						'Error while running docker-compose command.'
+						'Error while running docker compose command.'
 					);
 					if ( error.out ) {
 						process.stdout.write( error.out );
@@ -75,7 +80,6 @@ const withSpinner =
 					spinner.fail(
 						typeof error === 'string' ? error : error.message
 					);
-					// Disable reason: Using console.error() means we get a stack trace.
 					console.error( error );
 					process.exit( 1 );
 				} else {
@@ -87,16 +91,6 @@ const withSpinner =
 	};
 
 module.exports = function cli() {
-	// Do nothing if Docker is unavailable.
-	try {
-		execSync( 'docker info', { stdio: 'ignore' } );
-	} catch {
-		console.error(
-			chalk.red( 'Could not connect to Docker. Is it running?' )
-		);
-		process.exit( 1 );
-	}
-
 	yargs.usage( wpPrimary( '$0 <command>' ) );
 	yargs.option( 'debug', {
 		type: 'boolean',
@@ -139,10 +133,23 @@ module.exports = function cli() {
 				coerce: parseXdebugMode,
 				type: 'string',
 			} );
+			args.option( 'spx', {
+				describe:
+					'Enables SPX profiling. If not passed, SPX is turned off. If no mode is set, uses "enabled". SPX is a simple profiling extension with a built-in web UI. See https://github.com/NoiseByNorthwest/php-spx for more information.',
+				coerce: parseSpxMode,
+				type: 'string',
+			} );
 			args.option( 'scripts', {
 				type: 'boolean',
 				describe: 'Execute any configured lifecycle scripts.',
 				default: true,
+			} );
+			args.option( 'runtime', {
+				type: 'string',
+				describe:
+					'The runtime environment to use. "docker" uses Docker containers, "playground" uses WordPress Playground (experimental).',
+				choices: getAvailableRuntimes(),
+				default: 'docker',
 			} );
 		},
 		withSpinner( env.start )
@@ -195,6 +202,10 @@ module.exports = function cli() {
 		'$0 logs --no-watch --environment=tests',
 		'Displays the latest logs for the e2e test environment without watching.'
 	);
+	// Get run containers from Docker runtime (run command is Docker-only for now)
+	const dockerRuntime = getRuntime( 'docker' );
+	const runContainers = dockerRuntime.getRunContainers();
+
 	yargs.command(
 		'run <container> [command...]',
 		'Runs an arbitrary command in one of the underlying Docker containers. A double dash can be used to pass arguments to the container without parsing them. This is necessary if you are using an option that is defined below. You can use `bash` to open a shell session and both `composer` and `phpunit` are available in all WordPress and CLI containers. WP-CLI is also available in the CLI containers.',
@@ -210,8 +221,7 @@ module.exports = function cli() {
 				type: 'string',
 				describe:
 					'The underlying Docker service to run the command on.',
-				choices: RUN_CONTAINERS,
-				coerce: validateRunContainer,
+				choices: runContainers,
 			} );
 			args.positional( 'command', {
 				type: 'array',
@@ -248,10 +258,16 @@ module.exports = function cli() {
 		withSpinner( env.destroy )
 	);
 	yargs.command(
-		'install-path',
-		'Get the path where all of the environment files are stored. This includes the Docker files, WordPress, PHPUnit files, and any sources that were downloaded.',
-		() => {},
-		withSpinner( env.installPath )
+		'status',
+		'Get the status of the wp-env environment including URLs, ports, and configuration.',
+		( args ) => {
+			args.option( 'json', {
+				type: 'boolean',
+				describe: 'Output status as JSON.',
+				default: false,
+			} );
+		},
+		withSpinner( env.status )
 	);
 
 	return yargs;

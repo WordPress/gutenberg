@@ -10,7 +10,7 @@ import { COLORS, CONFIG, rtl } from '../../utils';
 import NumberControl from '../../number-control';
 import { BackdropUI } from '../../input-control/styles/input-control-styles';
 import type { SelectSize } from '../types';
-import { space } from '../../ui/utils/space';
+import { space } from '../../utils/space';
 
 // Using `selectSize` instead of `size` to avoid a type conflict with the
 // `size` HTML attribute of the `select` element.
@@ -36,35 +36,43 @@ export const ValueInput = styled( NumberControl )`
 
 const baseUnitLabelStyles = ( { selectSize }: SelectProps ) => {
 	const sizes = {
-		default: css`
+		small: css`
 			box-sizing: border-box;
 			padding: 2px 1px;
 			width: 20px;
-			color: ${ COLORS.gray[ 800 ] };
 			font-size: 8px;
 			line-height: 1;
 			letter-spacing: -0.5px;
 			text-transform: uppercase;
 			text-align-last: center;
+
+			&:not( :disabled ) {
+				color: ${ COLORS.gray[ 800 ] };
+			}
 		`,
-		large: css`
+		default: css`
 			box-sizing: border-box;
 			min-width: 24px;
 			max-width: 48px;
 			height: 24px;
 			margin-inline-end: ${ space( 2 ) };
 			padding: ${ space( 1 ) };
-			color: ${ COLORS.theme.accent };
+
 			font-size: 13px;
 			line-height: 1;
 			text-align-last: center;
 			white-space: nowrap;
 			overflow: hidden;
 			text-overflow: ellipsis;
+			field-sizing: content;
+
+			&:not( :disabled ) {
+				color: ${ COLORS.theme.accent };
+			}
 		`,
 	};
 
-	return selectSize === '__unstable-large' ? sizes.large : sizes.default;
+	return sizes[ selectSize ];
 };
 
 export const UnitLabel = styled.div< SelectProps >`
@@ -79,10 +87,12 @@ export const UnitLabel = styled.div< SelectProps >`
 
 const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 	const sizes = {
-		default: css`
+		small: css`
 			height: 100%;
 			border: 1px solid transparent;
-			transition: box-shadow 0.1s linear, border 0.1s linear;
+			transition:
+				box-shadow 0.1s linear,
+				border 0.1s linear;
 
 			${ rtl( { borderTopLeftRadius: 0, borderBottomLeftRadius: 0 } )() }
 
@@ -99,14 +109,13 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 				z-index: 1;
 			}
 		`,
-		large: css`
+		default: css`
 			display: flex;
 			justify-content: center;
 			align-items: center;
 
-			&:hover {
-				color: ${ COLORS.ui.borderFocus };
-				box-shadow: inset 0 0 0
+			&:where( :not( :disabled ) ):hover {
+				box-shadow: 0 0 0
 					${ CONFIG.borderWidth + ' ' + COLORS.ui.borderFocus };
 				outline: ${ CONFIG.borderWidth } solid transparent; // For High Contrast Mode
 			}
@@ -119,7 +128,7 @@ const unitSelectSizes = ( { selectSize = 'default' }: SelectProps ) => {
 		`,
 	};
 
-	return selectSize === '__unstable-large' ? sizes.large : sizes.default;
+	return sizes[ selectSize ];
 };
 
 export const UnitSelect = styled.select< SelectProps >`
@@ -127,7 +136,7 @@ export const UnitSelect = styled.select< SelectProps >`
 	&&& {
 		appearance: none;
 		background: transparent;
-		border-radius: 2px;
+		border-radius: ${ CONFIG.radiusXSmall };
 		border: none;
 		display: block;
 		outline: none;

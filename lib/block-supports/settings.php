@@ -26,7 +26,7 @@ function _gutenberg_add_block_level_presets_class( $block_content, $block ) {
 	}
 
 	// return early if no settings are found on the block attributes.
-	$block_settings = _wp_array_get( $block, array( 'attrs', 'settings' ), null );
+	$block_settings = $block['attrs']['settings'] ?? null;
 	if ( empty( $block_settings ) ) {
 		return $block_content;
 	}
@@ -59,7 +59,7 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 	}
 
 	// return early if no settings are found on the block attributes.
-	$block_settings = _wp_array_get( $block, array( 'attrs', 'settings' ), null );
+	$block_settings = $block['attrs']['settings'] ?? null;
 	if ( empty( $block_settings ) ) {
 		return null;
 	}
@@ -128,7 +128,7 @@ function _gutenberg_add_block_level_preset_styles( $pre_render, $block ) {
 	return null;
 }
 // Remove WordPress core filter to avoid rendering duplicate settings style blocks.
-remove_filter( 'render_block', '_wp_add_block_level_presets_class', 10, 2 );
-remove_filter( 'pre_render_block', '_wp_add_block_level_preset_styles', 10, 2 );
+remove_filter( 'render_block', '_wp_add_block_level_presets_class', 10 );
+remove_filter( 'pre_render_block', '_wp_add_block_level_preset_styles', 10 );
 add_filter( 'render_block', '_gutenberg_add_block_level_presets_class', 10, 2 );
 add_filter( 'pre_render_block', '_gutenberg_add_block_level_preset_styles', 10, 2 );

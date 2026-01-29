@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { regexp } from '@wordpress/shortcode';
 import { renderToString } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 
@@ -42,8 +41,6 @@ export function getAllowedFormats( { allowedFormats, disableFormats } ) {
 }
 
 getAllowedFormats.EMPTY_ARRAY = [];
-
-export const isShortcode = ( text ) => regexp( '.*' ).test( text );
 
 /**
  * Creates a link from pasted URL.

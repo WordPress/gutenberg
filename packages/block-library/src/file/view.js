@@ -7,12 +7,14 @@ import { store } from '@wordpress/interactivity';
  */
 import { browserSupportsPdfs } from './utils';
 
-store( {
-	selectors: {
-		core: {
-			file: {
-				hasPdfPreview: browserSupportsPdfs() ? 'inherit' : 'none',
+store(
+	'core/file',
+	{
+		state: {
+			get hasPdfPreview() {
+				return browserSupportsPdfs();
 			},
 		},
 	},
-} );
+	{ lock: true }
+);

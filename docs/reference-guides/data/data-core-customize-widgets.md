@@ -50,11 +50,11 @@ Returns an action object used to open/close the inserter.
 _Usage_
 
 ```js
+import { useState } from 'react';
 import { store as customizeWidgetsStore } from '@wordpress/customize-widgets';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 const ExampleComponent = () => {
 	const { setIsInserterOpened } = useDispatch( customizeWidgetsStore );

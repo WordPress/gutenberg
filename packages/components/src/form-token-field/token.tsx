@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -34,7 +34,7 @@ export default function Token( {
 	termsCount,
 }: TokenProps ) {
 	const instanceId = useInstanceId( Token );
-	const tokenClasses = classnames( 'components-form-token-field__token', {
+	const tokenClasses = clsx( 'components-form-token-field__token', {
 		'is-error': 'error' === status,
 		'is-success': 'success' === status,
 		'is-validating': 'validating' === status,
@@ -47,7 +47,7 @@ export default function Token( {
 	const transformedValue = displayTransform( value );
 	const termPositionAndCount = sprintf(
 		/* translators: 1: term name, 2: term position in a set of terms, 3: total term set count. */
-		__( '%1$s (%2$s of %3$s)' ),
+		__( '%1$s (%2$d of %3$d)' ),
 		transformedValue,
 		termPosition,
 		termsCount
@@ -70,10 +70,14 @@ export default function Token( {
 				<span aria-hidden="true">{ transformedValue }</span>
 			</span>
 
+			{ /* Disable reason: Even when FormTokenField itself is accessibly disabled, token reset buttons shouldn't be in the tab sequence. */ }
+			{ /* eslint-disable-next-line @wordpress/components-no-unsafe-button-disabled */ }
 			<Button
 				className="components-form-token-field__remove-token"
+				size="small"
 				icon={ closeSmall }
 				onClick={ ! disabled ? onClick : undefined }
+				disabled={ disabled }
 				label={ messages.remove }
 				aria-describedby={ `components-form-token-field__token-text-${ instanceId }` }
 			/>

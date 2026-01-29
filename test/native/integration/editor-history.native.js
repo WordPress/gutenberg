@@ -110,7 +110,7 @@ describe( 'Editor History', () => {
 		const paragraphTextInput =
 			within( paragraphBlock ).getByPlaceholderText( 'Start writing…' );
 		typeInRichText( paragraphTextInput, 'A quick brown fox' );
-		// Artifical delay to create two history entries for typing
+		// Artificial delay to create two history entries for typing
 		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
 		typeInRichText( paragraphTextInput, ' jumps over the lazy dog.' );
 
@@ -177,7 +177,7 @@ describe( 'Editor History', () => {
 			'A quick brown fox jumps over the lazy dog.',
 			{ finalSelectionStart: 2, finalSelectionEnd: 7 }
 		);
-		// Artifical delay to create two history entries for typing and formatting.
+		// Artificial delay to create two history entries for typing and formatting.
 		await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
 		fireEvent.press( screen.getByLabelText( 'Bold' ) );
 		fireEvent.press( screen.getByLabelText( 'Italic' ) );

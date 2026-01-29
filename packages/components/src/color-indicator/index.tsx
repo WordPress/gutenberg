@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -12,7 +12,7 @@ import { forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { ColorIndicatorProps } from './types';
 
 function UnforwardedColorIndicator(
@@ -23,7 +23,7 @@ function UnforwardedColorIndicator(
 
 	return (
 		<span
-			className={ classnames( 'component-color-indicator', className ) }
+			className={ clsx( 'component-color-indicator', className ) }
 			style={ { background: colorValue } }
 			ref={ forwardedRef }
 			{ ...additionalProps }
@@ -43,5 +43,6 @@ function UnforwardedColorIndicator(
  * ```
  */
 export const ColorIndicator = forwardRef( UnforwardedColorIndicator );
+ColorIndicator.displayName = 'ColorIndicator';
 
 export default ColorIndicator;

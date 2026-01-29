@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -10,11 +10,12 @@ import { View } from '..';
 
 const meta: Meta< typeof View > = {
 	component: View,
-	title: 'Components (Experimental)/View',
+	title: 'Components/View',
 	argTypes: {
-		as: { control: { type: null } },
+		as: { control: false },
 		children: { control: { type: 'text' } },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },

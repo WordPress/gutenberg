@@ -16,13 +16,14 @@ import {
 /**
  * WordPress dependencies
  */
-import { BottomSheetContext } from '@wordpress/components';
+
 import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { BottomSheetNavigationContext } from './bottom-sheet-navigation-context';
+import { BottomSheetContext } from '../bottom-sheet-context';
 import styles from './styles.scss';
 
 const BottomSheetNavigationScreen = ( {
@@ -64,15 +65,15 @@ const BottomSheetNavigationScreen = ( {
 			 * passed to useCallback here is what prevents erroneous callback
 			 * replacements, but leveraging memoization to achieve this is brittle and
 			 * explicitly discouraged in the React documentation.
-			 * https://reactjs.org/docs/hooks-reference.html#usememo
+			 * https://react.dev/reference/react/useMemo
 			 *
 			 * Ideally, we refactor onHandleHardwareButtonPress to manage multiple
 			 * callbacks triggered based upon which screen is currently active.
 			 *
 			 * Related: https://github.com/WordPress/gutenberg/pull/36328#discussion_r768897546
+			 *
+			 * Also see https://github.com/WordPress/gutenberg/pull/41166.
 			 */
-			// see https://github.com/WordPress/gutenberg/pull/41166
-			// eslint-disable-next-line react-hooks/exhaustive-deps
 		}, [] )
 	);
 
@@ -129,9 +130,7 @@ const BottomSheetNavigationScreen = ( {
 				</TouchableHighlight>
 			</ScrollView>
 		);
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [
 		children,
 		isFocused,

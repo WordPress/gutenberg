@@ -3,6 +3,7 @@
  */
 import { __unstableGetInnerBlocksProps as getInnerBlocksProps } from '@wordpress/blocks';
 import { useRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -21,6 +22,9 @@ import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
 import { defaultLayout, LayoutProvider } from '../block-list/layout';
+import { store as blockEditorStore } from '../../store';
+import WarningMaxDepthExceeded from './warning-max-depth-exceeded';
+import { MAX_NESTING_DEPTH } from './constants';
 
 /**
  * This hook is used to lightly mark an element as an inner blocks wrapper
@@ -31,11 +35,11 @@ import { defaultLayout, LayoutProvider } from '../block-list/layout';
  * returns. Optionally, you can also pass any other props through this hook, and
  * they will be merged and returned.
  *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
+ *
  * @param {Object} props   Optional. Props to pass to the element. Must contain
  *                         the ref if one is defined.
  * @param {Object} options Optional. Inner blocks options.
- *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
  */
 export function useInnerBlocksProps( props = {}, options = {} ) {
 	const fallbackRef = useRef();
@@ -101,8 +105,21 @@ function UncontrolledInnerBlocks( props ) {
 
 	const context = useBlockContext( clientId );
 
+	const { nestingLevel, parentLock } = useSelect(
+		( select ) => {
+			const { getBlockParents, getTemplateLock, getBlockRootClientId } =
+				select( blockEditorStore );
+			return {
+				nestingLevel: getBlockParents( clientId )?.length,
+				parentLock: getTemplateLock( getBlockRootClientId( clientId ) ),
+			};
+		},
+		[ clientId ]
+	);
+
 	useNestedSettingsUpdate(
 		clientId,
+		parentLock,
 		allowedBlocks,
 		prioritizedInserterBlocks,
 		defaultBlock,
@@ -121,6 +138,10 @@ function UncontrolledInnerBlocks( props ) {
 		templateLock,
 		templateInsertUpdatesSelection
 	);
+
+	if ( nestingLevel >= MAX_NESTING_DEPTH ) {
+		return <WarningMaxDepthExceeded clientId={ clientId } />;
+	}
 
 	return (
 		<LayoutProvider value={ layout }>

@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+@use "@wordpress/base-styles/mixins" as *;
+
 // Apply max-width to floated items that have no intrinsic width
 .wp-block[data-align="left"] > [data-type="core/embed"],
 .wp-block[data-align="right"] > [data-type="core/embed"],
@@ -19,13 +22,19 @@
 	min-height: 240px;
 }
 
+// Allow embeds to grow and shrink inside flex group blocks (Stack/Row), preventing collapse while fitting available space.
+.wp-block-group.is-layout-flex .wp-block-embed {
+	flex: 1 1 0%;
+	min-width: 0;
+}
+
 .wp-block-embed {
 	overflow-wrap: break-word; // Break long strings of text without spaces so they don't overflow the block.
 
 	// Supply caption styles to embeds, even if the theme hasn't opted in.
 	// Reason being: the new markup, figcaptions, are not likely to be styled in the majority of existing themes,
 	// so we supply the styles so as to not appear broken or unstyled in those.
-	figcaption {
+	:where(figcaption) {
 		@include caption-style();
 	}
 

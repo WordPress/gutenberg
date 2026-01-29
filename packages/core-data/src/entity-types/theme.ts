@@ -7,6 +7,7 @@ import type { BaseEntityRecords as _BaseEntityRecords } from './base-entity-reco
 
 declare module './base-entity-records' {
 	export namespace BaseEntityRecords {
+		/* eslint-disable-next-line @typescript-eslint/no-unused-vars */
 		export interface Theme< C extends Context > {
 			/**
 			 * The theme's stylesheet. This uniquely identifies the theme.
@@ -130,6 +131,10 @@ declare module './base-entity-records' {
 			 */
 			'editor-font-sizes': boolean | FontSize[];
 			/**
+			 * Custom spacing sizes if defined by the theme.
+			 */
+			'editor-spacing-sizes': boolean | SpacingSize[];
+			/**
 			 * Custom gradient presets if defined by the theme.
 			 */
 			'editor-gradient-presets': boolean | GradientPreset[];
@@ -207,6 +212,12 @@ declare module './base-entity-records' {
 		}
 
 		export interface FontSize {
+			name: string;
+			size: number;
+			slug: string;
+		}
+
+		export interface SpacingSize {
 			name: string;
 			size: number;
 			slug: string;

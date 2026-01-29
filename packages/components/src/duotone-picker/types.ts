@@ -72,7 +72,7 @@ export type DuotonePickerProps = {
 			'aria-labelledby'?: string;
 			'aria-label'?: never;
 	  }
- );
+);
 
 type Color = {
 	color: string;

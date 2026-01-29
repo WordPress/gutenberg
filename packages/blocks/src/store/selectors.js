@@ -1,18 +1,20 @@
 /**
  * External dependencies
  */
-import createSelector from 'rememo';
 import removeAccents from 'remove-accents';
 
 /**
  * WordPress dependencies
  */
-import { pipe } from '@wordpress/compose';
+import { createSelector } from '@wordpress/data';
+import { RichTextData } from '@wordpress/rich-text';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import { getValueFromObjectPath } from './utils';
+import { getValueFromObjectPath, matchesAttributes } from './utils';
+import { hasContentRoleAttribute as privateHasContentRoleAttribute } from './private-selectors';
 
 /** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
 /** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
@@ -100,7 +102,7 @@ export const getBlockTypes = createSelector(
  * };
  * ```
  *
- * @return {Object?} Block Type.
+ * @return {?Object} Block Type.
  */
 export function getBlockType( state, name ) {
 	return state.blockTypes[ name ];
@@ -238,26 +240,72 @@ export const getBlockVariations = createSelector(
 export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 	const variations = getBlockVariations( state, blockName, scope );
 
-	const match = variations?.find( ( variation ) => {
+	if ( ! variations ) {
+		return variations;
+	}
+
+	const blockType = getBlockType( state, blockName );
+	const attributeKeys = Object.keys( blockType?.attributes || {} );
+	let match;
+	let maxMatchedAttributes = 0;
+
+	for ( const variation of variations ) {
 		if ( Array.isArray( variation.isActive ) ) {
-			const blockType = getBlockType( state, blockName );
-			const attributeKeys = Object.keys( blockType?.attributes || {} );
 			const definedAttributes = variation.isActive.filter(
-				( attribute ) => attributeKeys.includes( attribute )
+				( attribute ) => {
+					// We support nested attribute paths, e.g. `layout.type`.
+					// In this case, we need to check if the part before the
+					// first dot is a known attribute.
+					const topLevelAttribute = attribute.split( '.' )[ 0 ];
+					return attributeKeys.includes( topLevelAttribute );
+				}
 			);
-			if ( definedAttributes.length === 0 ) {
-				return false;
+			const definedAttributesLength = definedAttributes.length;
+			if ( definedAttributesLength === 0 ) {
+				continue;
 			}
-			return definedAttributes.every(
-				( attribute ) =>
-					attributes[ attribute ] ===
-					variation.attributes[ attribute ]
-			);
+			const isMatch = definedAttributes.every( ( attribute ) => {
+				const variationAttributeValue = getValueFromObjectPath(
+					variation.attributes,
+					attribute
+				);
+				if ( variationAttributeValue === undefined ) {
+					return false;
+				}
+				let blockAttributeValue = getValueFromObjectPath(
+					attributes,
+					attribute
+				);
+				if ( blockAttributeValue instanceof RichTextData ) {
+					blockAttributeValue = blockAttributeValue.toHTMLString();
+				}
+				return matchesAttributes(
+					blockAttributeValue,
+					variationAttributeValue
+				);
+			} );
+			if ( isMatch && definedAttributesLength > maxMatchedAttributes ) {
+				match = variation;
+				maxMatchedAttributes = definedAttributesLength;
+			}
+		} else if ( variation.isActive?.( attributes, variation.attributes ) ) {
+			// If isActive is a function, we cannot know how many attributes it matches.
+			// This means that we cannot compare the specificity of our matches,
+			// and simply return the best match we have found.
+			return match || variation;
 		}
+	}
 
-		return variation.isActive?.( attributes, variation.attributes );
-	} );
-
+	// If no variation matches the isActive condition, we return the default variation,
+	// but only if it doesn't have an isActive condition that wasn't matched.
+	// This fallback is only applied for the 'block' and 'transform' scopes but not to
+	// the 'inserter', to avoid affecting block name display there.
+	if ( ! match && [ 'block', 'transform' ].includes( scope ) ) {
+		match = variations.find(
+			( variation ) =>
+				variation?.isDefault && ! Object.hasOwn( variation, 'isActive' )
+		);
+	}
 	return match;
 }
 
@@ -400,7 +448,7 @@ export function getCollections( state ) {
  * };
  * ```
  *
- * @return {string?} Default block name.
+ * @return {?string} Default block name.
  */
 export function getDefaultBlockName( state ) {
 	return state.defaultBlockName;
@@ -436,7 +484,7 @@ export function getDefaultBlockName( state ) {
  * };
  * ```
  *
- * @return {string?} Name of the block for handling non-block content.
+ * @return {?string} Name of the block for handling non-block content.
  */
 export function getFreeformFallbackBlockName( state ) {
 	return state.freeformFallbackBlockName;
@@ -472,7 +520,7 @@ export function getFreeformFallbackBlockName( state ) {
  * };
  * ```
  *
- * @return {string?} Name of the block for handling unregistered blocks.
+ * @return {?string} Name of the block for handling unregistered blocks.
  */
 export function getUnregisteredFallbackBlockName( state ) {
 	return state.unregisteredFallbackBlockName;
@@ -508,7 +556,7 @@ export function getUnregisteredFallbackBlockName( state ) {
  * };
  * ```
  *
- * @return {string?} Name of the block for handling the grouping of blocks.
+ * @return {?string} Name of the block for handling the grouping of blocks.
  */
 export function getGroupingBlockName( state ) {
 	return state.groupingBlockName;
@@ -646,6 +694,18 @@ export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
 }
 
 /**
+ * Normalizes a search term string: removes accents, converts to lowercase, removes extra whitespace.
+ *
+ * @param {string|null|undefined} term Search term to normalize.
+ * @return {string} Normalized search term.
+ */
+function getNormalizedSearchTerm( term ) {
+	return removeAccents( term ?? '' )
+		.toLowerCase()
+		.trim();
+}
+
+/**
  * Returns true if the block type by the given name or object value matches a
  * search term, or false otherwise.
  *
@@ -684,30 +744,12 @@ export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
  *
  * @return {Object[]} Whether block type matches search term.
  */
-export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
+export function isMatchingSearchTerm( state, nameOrType, searchTerm = '' ) {
 	const blockType = getNormalizedBlockType( state, nameOrType );
-
-	const getNormalizedSearchTerm = pipe( [
-		// Disregard diacritics.
-		//  Input: "média"
-		( term ) => removeAccents( term ?? '' ),
-
-		// Lowercase.
-		//  Input: "MEDIA"
-		( term ) => term.toLowerCase(),
-
-		// Strip leading and trailing whitespace.
-		//  Input: " media "
-		( term ) => term.trim(),
-	] );
-
 	const normalizedSearchTerm = getNormalizedSearchTerm( searchTerm );
 
-	const isSearchMatch = pipe( [
-		getNormalizedSearchTerm,
-		( normalizedCandidate ) =>
-			normalizedCandidate.includes( normalizedSearchTerm ),
-	] );
+	const isSearchMatch = ( candidate ) =>
+		getNormalizedSearchTerm( candidate ).includes( normalizedSearchTerm );
 
 	return (
 		isSearchMatch( blockType.title ) ||
@@ -793,23 +835,11 @@ export const hasChildBlocksWithInserterSupport = ( state, blockName ) => {
 	} );
 };
 
-/**
- * DO-NOT-USE in production.
- * This selector is created for internal/experimental only usage and may be
- * removed anytime without any warning, causing breakage on any plugin or theme invoking it.
- */
-export const __experimentalHasContentRoleAttribute = createSelector(
-	( state, blockTypeName ) => {
-		const blockType = getBlockType( state, blockTypeName );
-		if ( ! blockType ) {
-			return false;
-		}
-
-		return Object.entries( blockType.attributes ).some(
-			( [ , { __experimentalRole } ] ) => __experimentalRole === 'content'
-		);
-	},
-	( state, blockTypeName ) => [
-		state.blockTypes[ blockTypeName ]?.attributes,
-	]
-);
+export const __experimentalHasContentRoleAttribute = ( ...args ) => {
+	deprecated( '__experimentalHasContentRoleAttribute', {
+		since: '6.7',
+		version: '6.8',
+		hint: 'This is a private selector.',
+	} );
+	return privateHasContentRoleAttribute( ...args );
+};

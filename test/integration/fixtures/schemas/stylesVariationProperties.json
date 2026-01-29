@@ -1,0 +1,11 @@
+{
+	"$schema": "../../../../schemas/json/theme.json",
+	"version": 3,
+	"styles": {
+		"variations": {
+			"custom-variation": {
+				"invalidAdditionalProperty": true
+			}
+		}
+	}
+}

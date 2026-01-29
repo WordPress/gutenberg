@@ -38,6 +38,32 @@
 				}
 			]
 		},
+		"dimensions": {
+			"aspectRatios": [
+				{
+					"name": "Aspect ratio name"
+				}
+			],
+			"dimensionSizes": [
+				{
+					"name": "Dimension size name"
+				}
+			]
+		},
+		"shadow": {
+			"presets": [
+				{
+					"name": "Shadow name"
+				}
+			]
+		},
+		"border": {
+			"radiusSizes": [
+				{
+					"name": "Border radius size name"
+				}
+			]
+		},
 		"blocks": {
 			"*": {
 				"typography": {
@@ -62,12 +88,36 @@
 						{
 							"name": "Gradient name"
 						}
+					],
+					"duotone": [
+						{
+							"name": "Duotone name"
+						}
+					]
+				},
+				"dimensions": {
+					"aspectRatios": [
+						{
+							"name": "Aspect ratio name"
+						}
+					],
+					"dimensionSizes": [
+						{
+							"name": "Dimension size name"
+						}
 					]
 				},
 				"spacing": {
 					"spacingSizes": [
 						{
 							"name": "Space size name"
+						}
+					]
+				},
+				"border": {
+					"radiusSizes": [
+						{
+							"name": "Border radius size name"
 						}
 					]
 				}

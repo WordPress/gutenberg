@@ -108,12 +108,12 @@ function processObjWithInnerKeys( obj ) {
  * not disabled. So adding { color: 'link' } support also brings along
  * background and text.
  *
- * @param {Object} supports - keys supported by blokc
+ * @param {Object} supports - keys supported by block
  * @return {Object} supports augmented with defaults
  */
 function augmentSupports( supports ) {
 	if ( 'color' in supports ) {
-		// If backgroud or text is not specified (true or false)
+		// If background or text is not specified (true or false)
 		// then add it as true.a
 		if ( ! ( 'background' in supports.color ) ) {
 			supports.color.background = true;
@@ -148,29 +148,58 @@ function getSourceFromFile( filename ) {
  */
 function readBlockJSON( filename ) {
 	const blockjson = require( filename );
-
+	const {
+		name,
+		category,
+		supports,
+		attributes,
+		parent,
+		ancestor,
+		__experimental,
+		allowedBlocks,
+	} = blockjson;
 	const sourcefile = getSourceFromFile( filename );
-	const supportsList =
-		blockjson.supports !== undefined
-			? processObjWithInnerKeys( augmentSupports( blockjson.supports ) )
-			: [];
-	const attributes = getTruthyKeys( blockjson.attributes );
-	const parent = blockjson.parent
-		? '\n' + `-	**Parent:** ${ blockjson.parent.join( ', ' ) }`
-		: '';
-	const experimental = blockjson.__experimental
-		? '\n' + `-	**Experimental:** ${ blockjson.__experimental }`
-		: '';
+	const blockInfoList = [ `-	**Name:** ${ name }` ];
+
+	if ( __experimental ) {
+		blockInfoList.push( `-	**Experimental:** ${ __experimental }` );
+	}
+	if ( category?.length > 0 ) {
+		blockInfoList.push( `-	**Category:** ${ category }` );
+	}
+	if ( parent?.length > 0 ) {
+		blockInfoList.push( `-	**Parent:** ${ parent.join( ', ' ) }` );
+	}
+	if ( ancestor?.length > 0 ) {
+		blockInfoList.push( `-	**Ancestor:** ${ ancestor.join( ', ' ) }` );
+	}
+	if ( allowedBlocks?.length > 0 ) {
+		blockInfoList.push(
+			`-	**Allowed Blocks:** ${ allowedBlocks.join( ', ' ) }`
+		);
+	}
+	if ( supports ) {
+		blockInfoList.push(
+			`-	**Supports:** ${ processObjWithInnerKeys(
+				augmentSupports( supports )
+			)
+				.sort()
+				.join( ', ' ) }`
+		);
+	}
+	const truthyAttributes = getTruthyKeys( attributes );
+	if ( truthyAttributes.length ) {
+		blockInfoList.push(
+			`-	**Attributes:** ${ truthyAttributes.sort().join( ', ' ) }`
+		);
+	}
 
 	return `
 ## ${ blockjson.title }
 
 ${ blockjson.description } ([Source](${ sourcefile }))
 
--	**Name:** ${ blockjson.name }${ experimental }
--	**Category:** ${ blockjson.category }${ parent }
--	**Supports:** ${ supportsList.sort().join( ', ' ) }
--	**Attributes:** ${ attributes.sort().join( ', ' ) }
+${ blockInfoList.join( '\n' ) }
 `;
 }
 

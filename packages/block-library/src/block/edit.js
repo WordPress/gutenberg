@@ -1,39 +1,46 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useRef, useMemo } from '@wordpress/element';
 import {
-	useEntityBlockEditor,
-	useEntityProp,
 	useEntityRecord,
+	store as coreStore,
+	useEntityBlockEditor,
 } from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner,
-	TextControl,
-	PanelBody,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
 	useInnerBlocksProps,
-	__experimentalRecursionProvider as RecursionProvider,
-	__experimentalUseHasRecursion as useHasRecursion,
-	InnerBlocks,
-	InspectorControls,
+	RecursionProvider,
+	useHasRecursion,
 	useBlockProps,
 	Warning,
 	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+	BlockControls,
+	InnerBlocks,
 } from '@wordpress/block-editor';
-import { useRef, useMemo } from '@wordpress/element';
+import { privateApis as patternsPrivateApis } from '@wordpress/patterns';
+import { getBlockBindingsSource } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
+
+const { useLayoutClasses } = unlock( blockEditorPrivateApis );
+const { isOverridableBlock } = unlock( patternsPrivateApis );
 
 const fullAlignments = [ 'full', 'wide', 'left', 'right' ];
 
@@ -66,38 +73,141 @@ const useInferredLayout = ( blocks, parentLayout ) => {
 	}, [ blocks, parentLayout ] );
 };
 
-export default function ReusableBlockEdit( {
-	name,
-	attributes: { ref },
-	__unstableParentLayout: parentLayout,
-} ) {
-	const { useLayoutClasses } = unlock( blockEditorPrivateApis );
+function RecursionWarning() {
+	const blockProps = useBlockProps();
+	return (
+		<div { ...blockProps }>
+			<Warning>
+				{ __( 'Block cannot be rendered inside itself.' ) }
+			</Warning>
+		</div>
+	);
+}
+
+const NOOP = () => {};
+
+// Wrap the main Edit function for the pattern block with a recursion wrapper
+// that allows short-circuiting rendering as early as possible, before any
+// of the other effects in the block edit have run.
+export default function ReusableBlockEditRecursionWrapper( props ) {
+	const { ref } = props.attributes;
 	const hasAlreadyRendered = useHasRecursion( ref );
+
+	if ( hasAlreadyRendered ) {
+		return <RecursionWarning />;
+	}
+
+	return (
+		<RecursionProvider uniqueId={ ref }>
+			<ReusableBlockEdit { ...props } />
+		</RecursionProvider>
+	);
+}
+
+function ReusableBlockControl( {
+	recordId,
+	canOverrideBlocks,
+	hasContent,
+	handleEditOriginal,
+	resetContent,
+} ) {
+	const canUserEdit = useSelect(
+		( select ) =>
+			!! select( coreStore ).canUser( 'update', {
+				kind: 'postType',
+				name: 'wp_block',
+				id: recordId,
+			} ),
+		[ recordId ]
+	);
+
+	return (
+		<>
+			{ canUserEdit && !! handleEditOriginal && (
+				<BlockControls group="other">
+					<ToolbarGroup>
+						<ToolbarButton onClick={ handleEditOriginal }>
+							{ __( 'Edit original' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+
+			{ canOverrideBlocks && (
+				<BlockControls group="other">
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ resetContent }
+							disabled={ ! hasContent }
+						>
+							{ __( 'Reset' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+		</>
+	);
+}
+
+const EMPTY_OBJECT = {};
+
+function ReusableBlockEdit( {
+	name,
+	attributes: { ref, content },
+	__unstableParentLayout: parentLayout,
+	setAttributes,
+} ) {
 	const { record, hasResolved } = useEntityRecord(
 		'postType',
 		'wp_block',
 		ref
 	);
+	const [ blocks ] = useEntityBlockEditor( 'postType', 'wp_block', {
+		id: ref,
+	} );
 	const isMissing = hasResolved && ! record;
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		'postType',
-		'wp_block',
-		{ id: ref }
-	);
+	const { __unstableMarkLastChangeAsPersistent } =
+		useDispatch( blockEditorStore );
 
-	const [ title, setTitle ] = useEntityProp(
-		'postType',
-		'wp_block',
-		'title',
-		ref
-	);
+	const {
+		onNavigateToEntityRecord,
+		hasPatternOverridesSource,
+		supportedBlockTypesRaw,
+	} = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		// For editing link to the site editor if the theme and user permissions support it.
+		return {
+			onNavigateToEntityRecord: getSettings().onNavigateToEntityRecord,
+			hasPatternOverridesSource: !! getBlockBindingsSource(
+				'core/pattern-overrides'
+			),
+			supportedBlockTypesRaw:
+				getSettings().__experimentalBlockBindingsSupportedAttributes ||
+				EMPTY_OBJECT,
+		};
+	}, [] );
+
+	const canOverrideBlocks = useMemo( () => {
+		const supportedBlockTypes = Object.keys( supportedBlockTypesRaw );
+		const hasOverridableBlocks = ( _blocks ) =>
+			_blocks.some( ( block ) => {
+				if (
+					supportedBlockTypes.includes( block.name ) &&
+					isOverridableBlock( block )
+				) {
+					return true;
+				}
+				return hasOverridableBlocks( block.innerBlocks );
+			} );
+		return hasPatternOverridesSource && hasOverridableBlocks( blocks );
+	}, [ hasPatternOverridesSource, blocks, supportedBlockTypesRaw ] );
 
 	const { alignment, layout } = useInferredLayout( blocks, parentLayout );
 	const layoutClasses = useLayoutClasses( { layout }, name );
 
 	const blockProps = useBlockProps( {
-		className: classnames(
+		className: clsx(
 			'block-library-block__reusable-block-container',
 			layout && layoutClasses,
 			{ [ `align${ alignment }` ]: alignment }
@@ -105,58 +215,69 @@ export default function ReusableBlockEdit( {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		value: blocks,
 		layout,
-		onInput,
-		onChange,
+		value: blocks,
+		onInput: NOOP,
+		onChange: NOOP,
 		renderAppender: blocks?.length
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,
 	} );
 
-	if ( hasAlreadyRendered ) {
-		return (
-			<div { ...blockProps }>
-				<Warning>
-					{ __( 'Block cannot be rendered inside itself.' ) }
-				</Warning>
-			</div>
-		);
-	}
+	const handleEditOriginal = () => {
+		onNavigateToEntityRecord( {
+			postId: ref,
+			postType: 'wp_block',
+		} );
+	};
+
+	const resetContent = () => {
+		if ( content ) {
+			// Make sure any previous changes are persisted before resetting.
+			__unstableMarkLastChangeAsPersistent();
+			setAttributes( { content: undefined } );
+		}
+	};
+
+	let children = null;
 
 	if ( isMissing ) {
-		return (
-			<div { ...blockProps }>
-				<Warning>
-					{ __( 'Block has been deleted or is unavailable.' ) }
-				</Warning>
-			</div>
+		children = (
+			<Warning>
+				{ __( 'Block has been deleted or is unavailable.' ) }
+			</Warning>
 		);
 	}
 
 	if ( ! hasResolved ) {
-		return (
-			<div { ...blockProps }>
-				<Placeholder>
-					<Spinner />
-				</Placeholder>
-			</div>
+		children = (
+			<Placeholder>
+				<Spinner />
+			</Placeholder>
 		);
 	}
 
 	return (
-		<RecursionProvider uniqueId={ ref }>
-			<InspectorControls>
-				<PanelBody>
-					<TextControl
-						__nextHasNoMarginBottom
-						label={ __( 'Name' ) }
-						value={ title }
-						onChange={ setTitle }
-					/>
-				</PanelBody>
-			</InspectorControls>
-			<div { ...innerBlocksProps } />
-		</RecursionProvider>
+		<>
+			{ hasResolved && ! isMissing && (
+				<ReusableBlockControl
+					recordId={ ref }
+					canOverrideBlocks={ canOverrideBlocks }
+					hasContent={ !! content }
+					handleEditOriginal={
+						onNavigateToEntityRecord
+							? handleEditOriginal
+							: undefined
+					}
+					resetContent={ resetContent }
+				/>
+			) }
+
+			{ children === null ? (
+				<div { ...innerBlocksProps } />
+			) : (
+				<div { ...blockProps }>{ children }</div>
+			) }
+		</>
 	);
 }

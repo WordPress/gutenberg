@@ -7,25 +7,42 @@ import { capitalCase, pascalCase } from 'change-case';
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { __unstableSerializeAndClean, parse } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { addEntities } from './actions';
-import { getSyncProvider } from './sync';
+import { PostEditorAwareness } from './awareness/post-editor-awareness';
+import { getSyncManager } from './sync';
+import {
+	applyPostChangesToCRDTDoc,
+	defaultSyncConfig,
+	getPostChangesFromCRDTDoc,
+} from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
-
 const POST_RAW_ATTRIBUTES = [ 'title', 'excerpt', 'content' ];
+
+const blocksTransientEdits = {
+	blocks: {
+		read: ( record ) => parse( record.content?.raw ?? '' ),
+		write: ( record ) => ( {
+			content: __unstableSerializeAndClean( record.blocks ),
+		} ),
+	},
+};
 
 export const rootEntitiesConfig = [
 	{
 		label: __( 'Base' ),
 		kind: 'root',
+		key: false,
 		name: '__unstableBase',
 		baseURL: '/',
 		baseURLParams: {
+			// Please also change the preload path when changing this.
+			// @see lib/compat/wordpress-6.8/preload.php
 			_fields: [
 				'description',
 				'gmt_offset',
@@ -36,53 +53,14 @@ export const rootEntitiesConfig = [
 				'site_logo',
 				'timezone_string',
 				'url',
+				'page_for_posts',
+				'page_on_front',
+				'show_on_front',
 			].join( ',' ),
 		},
-		syncConfig: {
-			fetch: async () => {
-				return apiFetch( { path: '/' } );
-			},
-			applyChangesToDoc: ( doc, changes ) => {
-				const document = doc.getMap( 'document' );
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( document.get( key ) !== value ) {
-						document.set( key, value );
-					}
-				} );
-			},
-			fromCRDTDoc: ( doc ) => {
-				return doc.getMap( 'document' ).toJSON();
-			},
-		},
-		syncObjectType: 'root/base',
-		getSyncObjectId: () => 'index',
-	},
-	{
-		label: __( 'Site' ),
-		name: 'site',
-		kind: 'root',
-		baseURL: '/wp/v2/settings',
-		getTitle: ( record ) => {
-			return record?.title ?? __( 'Site Title' );
-		},
-		syncConfig: {
-			fetch: async () => {
-				return apiFetch( { path: '/wp/v2/settings' } );
-			},
-			applyChangesToDoc: ( doc, changes ) => {
-				const document = doc.getMap( 'document' );
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( document.get( key ) !== value ) {
-						document.set( key, value );
-					}
-				} );
-			},
-			fromCRDTDoc: ( doc ) => {
-				return doc.getMap( 'document' ).toJSON();
-			},
-		},
-		syncObjectType: 'root/site',
-		getSyncObjectId: () => 'index',
+		// The entity doesn't support selecting multiple records.
+		// The property is maintained for backward compatibility.
+		plural: '__unstableBases',
 	},
 	{
 		label: __( 'Post Type' ),
@@ -91,26 +69,7 @@ export const rootEntitiesConfig = [
 		key: 'slug',
 		baseURL: '/wp/v2/types',
 		baseURLParams: { context: 'edit' },
-		syncConfig: {
-			fetch: async ( id ) => {
-				return apiFetch( {
-					path: `/wp/v2/types/${ id }?context=edit`,
-				} );
-			},
-			applyChangesToDoc: ( doc, changes ) => {
-				const document = doc.getMap( 'document' );
-				Object.entries( changes ).forEach( ( [ key, value ] ) => {
-					if ( document.get( key ) !== value ) {
-						document.set( key, value );
-					}
-				} );
-			},
-			fromCRDTDoc: ( doc ) => {
-				return doc.getMap( 'document' ).toJSON();
-			},
-		},
-		syncObjectType: 'root/postType',
-		getSyncObjectId: ( id ) => id,
+		plural: 'postTypes',
 	},
 	{
 		name: 'media',
@@ -120,6 +79,7 @@ export const rootEntitiesConfig = [
 		plural: 'mediaItems',
 		label: __( 'Media' ),
 		rawAttributes: [ 'caption', 'title', 'description' ],
+		supportsPagination: true,
 	},
 	{
 		name: 'taxonomy',
@@ -161,8 +121,10 @@ export const rootEntitiesConfig = [
 		name: 'user',
 		kind: 'root',
 		baseURL: '/wp/v2/users',
+		getTitle: ( record ) => record?.name || record?.slug,
 		baseURLParams: { context: 'edit' },
 		plural: 'users',
+		supportsPagination: true,
 	},
 	{
 		name: 'comment',
@@ -171,6 +133,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'comments',
 		label: __( 'Comment' ),
+		supportsPagination: true,
 	},
 	{
 		name: 'menu',
@@ -179,6 +142,7 @@ export const rootEntitiesConfig = [
 		baseURLParams: { context: 'edit' },
 		plural: 'menus',
 		label: __( 'Menu' ),
+		supportsPagination: true,
 	},
 	{
 		name: 'menuItem',
@@ -188,6 +152,7 @@ export const rootEntitiesConfig = [
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
 		rawAttributes: [ 'title' ],
+		supportsPagination: true,
 	},
 	{
 		name: 'menuLocation',
@@ -204,8 +169,13 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/global-styles',
 		baseURLParams: { context: 'edit' },
-		plural: 'globalStylesVariations', // Should be different than name.
-		getTitle: ( record ) => record?.title?.rendered || record?.title,
+		plural: 'globalStylesVariations', // Should be different from name.
+		getTitle: () => __( 'Custom Styles' ),
+		getRevisionsUrl: ( parentId, revisionId ) =>
+			`/wp/v2/global-styles/${ parentId }/revisions${
+				revisionId ? '/' + revisionId : ''
+			}`,
+		supportsPagination: true,
 	},
 	{
 		label: __( 'Themes' ),
@@ -213,6 +183,7 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/themes',
 		baseURLParams: { context: 'edit' },
+		plural: 'themes',
 		key: 'stylesheet',
 	},
 	{
@@ -221,26 +192,86 @@ export const rootEntitiesConfig = [
 		kind: 'root',
 		baseURL: '/wp/v2/plugins',
 		baseURLParams: { context: 'edit' },
+		plural: 'plugins',
 		key: 'plugin',
 	},
-];
+	{
+		label: __( 'Status' ),
+		name: 'status',
+		kind: 'root',
+		baseURL: '/wp/v2/statuses',
+		baseURLParams: { context: 'edit' },
+		plural: 'statuses',
+		key: 'slug',
+	},
+	{
+		label: __( 'Registered Templates' ),
+		name: 'registeredTemplate',
+		kind: 'root',
+		baseURL: '/wp/v2/registered-templates',
+		key: 'id',
+	},
+	{
+		label: __( 'Font Collections' ),
+		name: 'fontCollection',
+		kind: 'root',
+		baseURL: '/wp/v2/font-collections',
+		baseURLParams: { context: 'view' },
+		plural: 'fontCollections',
+		key: 'slug',
+	},
+].map( ( entity ) => {
+	const syncEnabledRootEntities = new Set( [ 'comment' ] );
+
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		if ( syncEnabledRootEntities.has( entity.name ) ) {
+			entity.syncConfig = defaultSyncConfig;
+		}
+	}
+	return entity;
+} );
+
+export const deprecatedEntities = {
+	root: {
+		media: {
+			since: '6.9',
+			alternative: {
+				kind: 'postType',
+				name: 'attachment',
+			},
+		},
+	},
+};
 
 export const additionalEntityConfigLoaders = [
 	{ kind: 'postType', loadEntities: loadPostTypeEntities },
 	{ kind: 'taxonomy', loadEntities: loadTaxonomyEntities },
+	{
+		kind: 'root',
+		name: 'site',
+		plural: 'sites',
+		loadEntities: loadSiteEntity,
+	},
 ];
 
 /**
- * Returns a function to be used to retrieve extra edits to apply before persisting a post type.
+ * Apply extra edits before persisting a post type.
  *
- * @param {Object} persistedRecord Already persisted Post
- * @param {Object} edits           Edits.
+ * @param {Object}  persistedRecord Already persisted Post
+ * @param {Object}  edits           Edits.
+ * @param {string}  name            Post type name.
+ * @param {boolean} isTemplate      Whether the post type is a template.
  * @return {Object} Updated edits.
  */
-export const prePersistPostType = ( persistedRecord, edits ) => {
+export const prePersistPostType = (
+	persistedRecord,
+	edits,
+	name,
+	isTemplate
+) => {
 	const newEdits = {};
 
-	if ( persistedRecord?.status === 'auto-draft' ) {
+	if ( ! isTemplate && persistedRecord?.status === 'auto-draft' ) {
 		// Saving an auto-draft should create a draft by default.
 		if ( ! edits.status && ! newEdits.status ) {
 			newEdits.status = 'draft';
@@ -254,6 +285,19 @@ export const prePersistPostType = ( persistedRecord, edits ) => {
 				persistedRecord?.title === 'Auto Draft' )
 		) {
 			newEdits.title = '';
+		}
+	}
+
+	// Add meta for persisted CRDT document.
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		if ( persistedRecord ) {
+			const objectType = `postType/${ name }`;
+			const objectId = persistedRecord.id;
+			const meta = getSyncManager()?.createMeta( objectType, objectId );
+			newEdits.meta = {
+				...edits.meta,
+				...meta,
+			};
 		}
 	}
 
@@ -274,14 +318,15 @@ async function loadPostTypeEntities() {
 			name
 		);
 		const namespace = postType?.rest_namespace ?? 'wp/v2';
-		return {
+
+		const entity = {
 			kind: 'postType',
 			baseURL: `/${ namespace }/${ postType.rest_base }`,
 			baseURLParams: { context: 'edit' },
 			name,
 			label: postType.name,
 			transientEdits: {
-				blocks: true,
+				...blocksTransientEdits,
 				selection: true,
 			},
 			mergedEdits: { meta: true },
@@ -292,32 +337,78 @@ async function loadPostTypeEntities() {
 				( isTemplate
 					? capitalCase( record.slug ?? '' )
 					: String( record.id ) ),
-			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
+			__unstablePrePersist: ( persistedRecord, edits ) =>
+				prePersistPostType( persistedRecord, edits, name, isTemplate ),
 			__unstable_rest_base: postType.rest_base,
-			syncConfig: {
-				fetch: async ( id ) => {
-					return apiFetch( {
-						path: `/${ namespace }/${ postType.rest_base }/${ id }?context=edit`,
-					} );
-				},
-				applyChangesToDoc: ( doc, changes ) => {
-					const document = doc.getMap( 'document' );
-					Object.entries( changes ).forEach( ( [ key, value ] ) => {
-						if (
-							document.get( key ) !== value &&
-							typeof value !== 'function'
-						) {
-							document.set( key, value );
-						}
-					} );
-				},
-				fromCRDTDoc: ( doc ) => {
-					return doc.getMap( 'document' ).toJSON();
-				},
-			},
-			syncObjectType: 'postType/' + postType.name,
-			getSyncObjectId: ( id ) => id,
+			supportsPagination: true,
+			getRevisionsUrl: ( parentId, revisionId ) =>
+				`/${ namespace }/${
+					postType.rest_base
+				}/${ parentId }/revisions${
+					revisionId ? '/' + revisionId : ''
+				}`,
+			revisionKey:
+				isTemplate && ! window?.__experimentalTemplateActivate
+					? 'wp_id'
+					: DEFAULT_ENTITY_KEY,
 		};
+
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			/**
+			 * @type {import('@wordpress/sync').SyncConfig}
+			 */
+			entity.syncConfig = {
+				/**
+				 * Apply changes from the local editor to the local CRDT document so
+				 * that those changes can be synced to other peers (via the provider).
+				 *
+				 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
+				 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
+				 * @return {void}
+				 */
+				applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
+					applyPostChangesToCRDTDoc( crdtDoc, changes, postType ),
+
+				/**
+				 * Create the awareness instance for the entity's CRDT document.
+				 *
+				 * @param {import('@wordpress/sync').CRDTDoc}  ydoc
+				 * @param {import('@wordpress/sync').ObjectID} objectId
+				 * @return {import('@wordpress/sync').AwarenessState} AwarenessState instance
+				 */
+				createAwareness: ( ydoc, objectId ) => {
+					const kind = 'postType';
+					const id = parseInt( objectId, 10 );
+					return new PostEditorAwareness( ydoc, kind, name, id );
+				},
+
+				/**
+				 * Extract changes from a CRDT document that can be used to update the
+				 * local editor state.
+				 *
+				 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
+				 * @param {import('@wordpress/sync').ObjectData} editedRecord
+				 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+				 */
+				getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
+					getPostChangesFromCRDTDoc(
+						crdtDoc,
+						editedRecord,
+						postType
+					),
+
+				/**
+				 * Sync features supported by the entity.
+				 *
+				 * @type {Record< string, boolean >}
+				 */
+				supports: {
+					crdtPersistence: true,
+				},
+			};
+		}
+
+		return entity;
 	} );
 }
 
@@ -332,88 +423,77 @@ async function loadTaxonomyEntities() {
 	} );
 	return Object.entries( taxonomies ?? {} ).map( ( [ name, taxonomy ] ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
-		return {
+		const entity = {
 			kind: 'taxonomy',
 			baseURL: `/${ namespace }/${ taxonomy.rest_base }`,
 			baseURLParams: { context: 'edit' },
 			name,
 			label: taxonomy.name,
+			getTitle: ( record ) => record?.name,
+			supportsPagination: true,
 		};
+
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			entity.syncConfig = defaultSyncConfig;
+		}
+
+		return entity;
 	} );
 }
 
 /**
- * Returns the entity's getter method name given its kind and name.
+ * Returns the Site entity.
+ *
+ * @return {Promise} Entity promise
+ */
+async function loadSiteEntity() {
+	const entity = {
+		label: __( 'Site' ),
+		name: 'site',
+		kind: 'root',
+		key: false,
+		baseURL: '/wp/v2/settings',
+		meta: {},
+	};
+
+	const site = await apiFetch( {
+		path: entity.baseURL,
+		method: 'OPTIONS',
+	} );
+
+	const labels = {};
+	Object.entries( site?.schema?.properties ?? {} ).forEach(
+		( [ key, value ] ) => {
+			// Ignore properties `title` and `type` keys.
+			if ( typeof value === 'object' && value.title ) {
+				labels[ key ] = value.title;
+			}
+		}
+	);
+
+	return [ { ...entity, meta: { labels } } ];
+}
+
+/**
+ * Returns the entity's getter method name given its kind and name or plural name.
  *
  * @example
  * ```js
  * const nameSingular = getMethodName( 'root', 'theme', 'get' );
  * // nameSingular is getRootTheme
  *
- * const namePlural = getMethodName( 'root', 'theme', 'set' );
+ * const namePlural = getMethodName( 'root', 'themes', 'set' );
  * // namePlural is setRootThemes
  * ```
  *
- * @param {string}  kind      Entity kind.
- * @param {string}  name      Entity name.
- * @param {string}  prefix    Function prefix.
- * @param {boolean} usePlural Whether to use the plural form or not.
+ * @param {string} kind   Entity kind.
+ * @param {string} name   Entity name or plural name.
+ * @param {string} prefix Function prefix.
  *
  * @return {string} Method name
  */
-export const getMethodName = (
-	kind,
-	name,
-	prefix = 'get',
-	usePlural = false
-) => {
-	const entityConfig = rootEntitiesConfig.find(
-		( config ) => config.kind === kind && config.name === name
-	);
+export const getMethodName = ( kind, name, prefix = 'get' ) => {
 	const kindPrefix = kind === 'root' ? '' : pascalCase( kind );
-	const nameSuffix = pascalCase( name ) + ( usePlural ? 's' : '' );
-	const suffix =
-		usePlural && 'plural' in entityConfig && entityConfig?.plural
-			? pascalCase( entityConfig.plural )
-			: nameSuffix;
+	const suffix = pascalCase( name );
 	return `${ prefix }${ kindPrefix }${ suffix }`;
 };
-
-function registerSyncConfigs( configs ) {
-	configs.forEach( ( { syncObjectType, syncConfig } ) => {
-		getSyncProvider().register( syncObjectType, syncConfig );
-		const editSyncConfig = { ...syncConfig };
-		delete editSyncConfig.fetch;
-		getSyncProvider().register( syncObjectType + '--edit', editSyncConfig );
-	} );
-}
-
-/**
- * Loads the kind entities into the store.
- *
- * @param {string} kind Kind
- *
- * @return {(thunkArgs: object) => Promise<Array>} Entities
- */
-export const getOrLoadEntitiesConfig =
-	( kind ) =>
-	async ( { select, dispatch } ) => {
-		let configs = select.getEntitiesConfig( kind );
-		if ( configs && configs.length !== 0 ) {
-			registerSyncConfigs( configs );
-			return configs;
-		}
-
-		const loader = additionalEntityConfigLoaders.find(
-			( l ) => l.kind === kind
-		);
-		if ( ! loader ) {
-			return [];
-		}
-
-		configs = await loader.loadEntities();
-		registerSyncConfigs( configs );
-		dispatch( addEntities( configs ) );
-
-		return configs;
-	};

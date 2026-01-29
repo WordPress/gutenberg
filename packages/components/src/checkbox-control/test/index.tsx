@@ -60,6 +60,13 @@ describe( 'CheckboxControl', () => {
 			expect( label ).toBeInTheDocument();
 		} );
 
+		it( 'should not render label element if label is not set', () => {
+			render( <CheckboxControl /> );
+
+			const label = screen.queryByRole( 'label' );
+			expect( label ).not.toBeInTheDocument();
+		} );
+
 		it( 'should render a checkbox in an indeterminate state', () => {
 			render( <CheckboxControl indeterminate /> );
 			expect( getInput() ).toHaveProperty( 'indeterminate', true );
@@ -78,6 +85,11 @@ describe( 'CheckboxControl', () => {
 			expect( containerDefault ).toMatchDiffSnapshot(
 				containerIndeterminate
 			);
+		} );
+
+		it( 'should associate the `help` text accessibly', () => {
+			render( <CheckboxControl help="Help text" /> );
+			expect( getInput() ).toHaveAccessibleDescription( 'Help text' );
 		} );
 	} );
 

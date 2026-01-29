@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * Internal dependencies
@@ -10,12 +11,15 @@ import SandBox from '..';
 
 const meta: Meta< typeof SandBox > = {
 	component: SandBox,
-	title: 'Components/SandBox',
+	title: 'Components/Utilities/SandBox',
+	id: 'components-sandbox',
 	argTypes: {
-		onFocus: { control: { type: null } },
+		onFocus: { control: false },
+	},
+	args: {
+		onFocus: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},

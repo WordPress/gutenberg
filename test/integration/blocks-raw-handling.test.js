@@ -29,6 +29,7 @@ describe( 'Blocks raw handling', () => {
 		require( '../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		registerBlockType( 'test/gallery', {
+			apiVersion: 3,
 			title: 'Test Gallery',
 			category: 'text',
 			attributes: {
@@ -62,6 +63,7 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		registerBlockType( 'test/non-inline-block', {
+			apiVersion: 3,
 			title: 'Test Non Inline Block',
 			category: 'text',
 			supports: {
@@ -88,6 +90,7 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		registerBlockType( 'test/transform-to-multiple-blocks', {
+			apiVersion: 3,
 			title: 'Test Transform to Multiple Blocks',
 			category: 'text',
 			transforms: {
@@ -177,7 +180,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toMatchInlineSnapshot( `
-		"<ul><!-- wp:list-item -->
+		"<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>one</li>
 		<!-- /wp:list-item -->
 
@@ -202,7 +205,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toMatchInlineSnapshot( `
-		"<ul><!-- wp:list-item -->
+		"<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>one</li>
 		<!-- /wp:list-item -->
 
@@ -291,11 +294,9 @@ describe( 'Blocks raw handling', () => {
 			HTML: '<h1>FOO</h1>',
 			plainText: 'FOO\n',
 			mode: 'AUTO',
-		} )
-			.map( getBlockContent )
-			.join( '' );
+		} );
 
-		expect( filtered ).toBe( '<h1 class="wp-block-heading">FOO</h1>' );
+		expect( filtered ).toBe( 'FOO' );
 		expect( console ).toHaveLogged();
 	} );
 
@@ -320,7 +321,7 @@ describe( 'Blocks raw handling', () => {
 			.join( '' );
 
 		expect( filtered ).toMatchInlineSnapshot( `
-		"<ul><!-- wp:list-item -->
+		"<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li>
 		<!-- /wp:list-item -->
 
@@ -371,6 +372,34 @@ describe( 'Blocks raw handling', () => {
 		expect( console ).toHaveLogged();
 	} );
 
+	it( 'should convert pre', () => {
+		const transformed = pasteHandler( {
+			HTML: '<pre>1\n2</pre>',
+			plainText: '1\n2',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( transformed ).toBe(
+			'<pre class="wp-block-preformatted">1\n2</pre>'
+		);
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should convert code', () => {
+		const transformed = pasteHandler( {
+			HTML: '<pre><code>1\n2</code></pre>',
+			plainText: '1\n2',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( transformed ).toBe(
+			'<pre class="wp-block-code"><code>1\n2</code></pre>'
+		);
+		expect( console ).toHaveLogged();
+	} );
+
 	describe( 'pasteHandler', () => {
 		[
 			'plain',
@@ -385,6 +414,7 @@ describe( 'Blocks raw handling', () => {
 			'google-docs-table-with-comments',
 			'google-docs-with-comments',
 			'ms-word',
+			'ms-word-list',
 			'ms-word-styled',
 			'ms-word-online',
 			'evernote',
@@ -392,11 +422,13 @@ describe( 'Blocks raw handling', () => {
 			'one-image',
 			'two-images',
 			'markdown',
+			'grok-markdown',
 			'wordpress',
 			'gutenberg',
 			'shortcode-matching',
 			'slack-quote',
 			'slack-paragraphs',
+			'mixed-content',
 		].forEach( ( type ) => {
 			// eslint-disable-next-line jest/valid-title
 			it( type, () => {
@@ -532,5 +564,45 @@ describe( 'rawHandler', () => {
 	it( 'should preserve alignment', () => {
 		const HTML = '<p style="text-align:center">center</p>';
 		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should preserve all paragraphs', () => {
+		const HTML = `<p></p>
+<p>&nbsp;&nbsp;</p>
+<p class="p"></p>
+<p style="border: 1px solid tomato;"></p>`;
+		expect( serialize( rawHandler( { HTML } ) ) ).toMatchSnapshot();
+	} );
+
+	it( 'should convert a gallery shortcode with size attribute', () => {
+		const HTML = '<p>[gallery ids="1,2,3" columns="2" size="medium"]</p>';
+		const blocks = rawHandler( { HTML } );
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].name ).toBe( 'core/gallery' );
+		expect( blocks[ 0 ].attributes.columns ).toBe( 2 );
+		expect( blocks[ 0 ].attributes.sizeSlug ).toBe( 'medium' );
+		// Check inner image blocks also have the size
+		expect( blocks[ 0 ].innerBlocks ).toHaveLength( 3 );
+		blocks[ 0 ].innerBlocks.forEach( ( innerBlock ) => {
+			expect( innerBlock.name ).toBe( 'core/image' );
+			expect( innerBlock.attributes.sizeSlug ).toBe( 'medium' );
+		} );
+	} );
+
+	it( 'should convert a gallery shortcode without size attribute', () => {
+		const HTML = '<p>[gallery ids="4,5,6" columns="3"]</p>';
+		const blocks = rawHandler( { HTML } );
+		expect( blocks ).toHaveLength( 1 );
+		expect( blocks[ 0 ].name ).toBe( 'core/gallery' );
+		expect( blocks[ 0 ].attributes.columns ).toBe( 3 );
+		// sizeSlug defaults to 'large' when not provided (per block.json)
+		expect( blocks[ 0 ].attributes.sizeSlug ).toBe( 'large' );
+		// Inner blocks should not have sizeSlug explicitly set
+		expect( blocks[ 0 ].innerBlocks ).toHaveLength( 3 );
+		blocks[ 0 ].innerBlocks.forEach( ( innerBlock ) => {
+			expect( innerBlock.name ).toBe( 'core/image' );
+			// Image blocks don't have a default sizeSlug, so when not provided it should be undefined
+			expect( innerBlock.attributes.sizeSlug ).toBeUndefined();
+		} );
 	} );
 } );

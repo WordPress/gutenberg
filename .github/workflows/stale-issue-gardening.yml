@@ -4,10 +4,17 @@ on:
     schedule:
         - cron: '0 0 * * *'
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
     issue-gardening:
         name: ${{ matrix.name }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            issues: write
+            pull-requests: write
         if: ${{ github.repository == 'WordPress/gutenberg' }}
         strategy:
             matrix:
@@ -27,8 +34,8 @@ jobs:
                       remove-stale-when-updated: true
                       stale-issue-label: '[Status] Stale'
                     - name: 'Flaky test issues without activity'
-                      message: 'This issue has gone 30 days without any activity.'
-                      days-before-stale: 30
+                      message: 'This issue has gone 15 days without any activity.'
+                      days-before-stale: 15
                       days-before-close: 1
                       only-labels: '[Type] Flaky Test'
                       remove-stale-when-updated: true
@@ -36,7 +43,7 @@ jobs:
 
         steps:
             - name: Update issues
-              uses: actions/stale@1160a2240286f5da8ec72b1c0816ce2481aabf84 # v8.0.0
+              uses: actions/stale@997185467fa4f803885201cee163a9f38240193d # v10.1.1
               with:
                   repo-token: ${{ secrets.GITHUB_TOKEN }}
                   stale-issue-message: ${{ matrix.message }}

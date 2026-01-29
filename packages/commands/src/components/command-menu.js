@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { Command, useCommandState } from 'cmdk';
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -20,6 +20,7 @@ import {
 	Modal,
 	TextHighlight,
 	__experimentalHStack as HStack,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
 	store as keyboardShortcutsStore,
@@ -31,6 +32,11 @@ import { Icon, search as inputIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import { store as commandsStore } from '../store';
+import { unlock } from '../lock-unlock';
+
+const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );
+
+const inputLabel = __( 'Search commands and settings' );
 
 function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 	const { isLoading, commands = [] } = hook( { search } ) ?? {};
@@ -44,34 +50,30 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 
 	return (
 		<>
-			<Command.List>
-				{ commands.map( ( command ) => (
-					<Command.Item
-						key={ command.name }
-						value={ command.searchLabel ?? command.label }
-						onSelect={ () => command.callback( { close } ) }
-						id={ command.name }
+			{ commands.map( ( command ) => (
+				<Command.Item
+					key={ command.name }
+					value={ command.searchLabel ?? command.label }
+					keywords={ command.keywords }
+					onSelect={ () => command.callback( { close } ) }
+					id={ command.name }
+				>
+					<HStack
+						alignment="left"
+						className={ clsx( 'commands-command-menu__item', {
+							'has-icon': command.icon,
+						} ) }
 					>
-						<HStack
-							alignment="left"
-							className={ classnames(
-								'commands-command-menu__item',
-								{
-									'has-icon': command.icon,
-								}
-							) }
-						>
-							{ command.icon && <Icon icon={ command.icon } /> }
-							<span>
-								<TextHighlight
-									text={ command.label }
-									highlight={ search }
-								/>
-							</span>
-						</HStack>
-					</Command.Item>
-				) ) }
-			</Command.List>
+						{ command.icon && <Icon icon={ command.icon } /> }
+						<span>
+							<TextHighlight
+								text={ command.label }
+								highlight={ search }
+							/>
+						</span>
+					</HStack>
+				</Command.Item>
+			) ) }
 		</>
 	);
 }
@@ -82,11 +84,11 @@ export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
 	// the CommandMenuLoaderWrapper component need to be
 	// remounted on each hook prop change
 	// We use the key state to make sure we do that properly.
-	const currentLoader = useRef( hook );
+	const currentLoaderRef = useRef( hook );
 	const [ key, setKey ] = useState( 0 );
 	useEffect( () => {
-		if ( currentLoader.current !== hook ) {
-			currentLoader.current = hook;
+		if ( currentLoaderRef.current !== hook ) {
+			currentLoaderRef.current = hook;
 			setKey( ( prevKey ) => prevKey + 1 );
 		}
 	}, [ hook ] );
@@ -94,7 +96,7 @@ export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
 	return (
 		<CommandMenuLoader
 			key={ key }
-			hook={ currentLoader.current }
+			hook={ currentLoaderRef.current }
 			search={ search }
 			setLoader={ setLoader }
 			close={ close }
@@ -124,12 +126,13 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 				<Command.Item
 					key={ command.name }
 					value={ command.searchLabel ?? command.label }
+					keywords={ command.keywords }
 					onSelect={ () => command.callback( { close } ) }
 					id={ command.name }
 				>
 					<HStack
 						alignment="left"
-						className={ classnames( 'commands-command-menu__item', {
+						className={ clsx( 'commands-command-menu__item', {
 							'has-icon': command.icon,
 						} ) }
 					>
@@ -176,9 +179,8 @@ function CommandInput( { isOpen, search, setSearch } ) {
 			ref={ commandMenuInput }
 			value={ search }
 			onValueChange={ setSearch }
-			placeholder={ __( 'Search for commands' ) }
+			placeholder={ inputLabel }
 			aria-activedescendant={ selectedItemId }
-			icon={ search }
 		/>
 	);
 }
@@ -211,9 +213,11 @@ export function CommandMenu() {
 	useShortcut(
 		'core/commands',
 		/** @type {import('react').KeyboardEventHandler} */
-		( event ) => {
+		withIgnoreIMEEvents( ( event ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
-			if ( event.defaultPrevented ) return;
+			if ( event.defaultPrevented ) {
+				return;
+			}
 
 			event.preventDefault();
 			if ( isOpen ) {
@@ -221,7 +225,7 @@ export function CommandMenu() {
 			} else {
 				open();
 			}
-		},
+		} ),
 		{
 			bindGlobal: true,
 		}
@@ -244,19 +248,6 @@ export function CommandMenu() {
 		return false;
 	}
 
-	const onKeyDown = ( event ) => {
-		if (
-			// Ignore keydowns from IMEs
-			event.nativeEvent.isComposing ||
-			// Workaround for Mac Safari where the final Enter/Backspace of an IME composition
-			// is `isComposing=false`, even though it's technically still part of the composition.
-			// These can only be detected by keyCode.
-			event.keyCode === 229
-		) {
-			event.preventDefault();
-		}
-	};
-
 	const isLoading = Object.values( loaders ).some( Boolean );
 
 	return (
@@ -265,21 +256,22 @@ export function CommandMenu() {
 			overlayClassName="commands-command-menu__overlay"
 			onRequestClose={ closeAndReset }
 			__experimentalHideHeader
+			contentLabel={ __( 'Command palette' ) }
 		>
 			<div className="commands-command-menu__container">
-				<Command
-					label={ __( 'Command palette' ) }
-					onKeyDown={ onKeyDown }
-				>
+				<Command label={ inputLabel }>
 					<div className="commands-command-menu__header">
-						<Icon icon={ inputIcon } />
+						<Icon
+							className="commands-command-menu__header-search-icon"
+							icon={ inputIcon }
+						/>
 						<CommandInput
 							search={ search }
 							setSearch={ setSearch }
 							isOpen={ isOpen }
 						/>
 					</div>
-					<Command.List>
+					<Command.List label={ __( 'Command suggestions' ) }>
 						{ search && ! isLoading && (
 							<Command.Empty>
 								{ __( 'No results found.' ) }

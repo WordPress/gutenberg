@@ -22,7 +22,7 @@ public struct FallbackJavascriptInjection {
     public let editorBehaviorScript: WKUserScript
 
     /// Init an instance of GutenbergWebJavascriptInjection or throws if any of the required sources doesn't exist.
-    /// This helps to cach early any possible error due to missing source files.
+    /// This helps to cache early any possible error due to missing source files.
     /// - Parameter blockHTML: The block HTML code to be injected.
     /// - Parameter userId: The id of the logged user.
     /// - Throws: Throws an error if any required source doesn't exist.

@@ -1,26 +1,30 @@
 /**
  * WordPress dependencies
  */
-import { __unstableUseCompositeState as useCompositeState } from '@wordpress/components';
+import { Composite } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import InserterListboxContext from './context';
 
 export { default as InserterListboxGroup } from './group';
 export { default as InserterListboxRow } from './row';
 export { default as InserterListboxItem } from './item';
 
+function InserterListBoxWrapper( { key, children } ) {
+	return <Fragment key={ key }>{ children }</Fragment>;
+}
+
 function InserterListbox( { children } ) {
-	const compositeState = useCompositeState( {
-		shift: true,
-		wrap: 'horizontal',
-	} );
 	return (
-		<InserterListboxContext.Provider value={ compositeState }>
+		<Composite
+			focusShift
+			focusWrap="horizontal"
+			render={ InserterListBoxWrapper }
+		>
 			{ children }
-		</InserterListboxContext.Provider>
+		</Composite>
 	);
 }
 

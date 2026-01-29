@@ -1,3 +1,0 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
-
-exports[`adding blocks from block directory Should be able to add (the first) block. 1`] = `"<!-- wp:block-directory-test-block/main-block /-->"`;

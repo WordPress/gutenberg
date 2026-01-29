@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -14,10 +14,12 @@ import { useState } from '@wordpress/element';
 import SearchControl from '..';
 
 const meta: Meta< typeof SearchControl > = {
-	title: 'Components/SearchControl',
+	title: 'Components/Selection & Input/Common/SearchControl',
+	id: 'components-searchcontrol',
 	component: SearchControl,
 	argTypes: {
 		onChange: { action: 'onChange' },
+		value: { control: false },
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -46,21 +48,5 @@ const Template: StoryFn< typeof SearchControl > = ( {
 
 export const Default = Template.bind( {} );
 Default.args = {
-	label: 'Label Text',
 	help: 'Help text to explain the input.',
-};
-
-/**
- * When an `onClose` callback is provided, the search control will render a close button
- * that will trigger the given callback.
- *
- * Use this if you want the button to trigger your own logic to close the search field entirely,
- * rather than just clearing the input value.
- */
-export const WithOnClose = Template.bind( {} );
-WithOnClose.args = {
-	...Default.args,
-};
-WithOnClose.argTypes = {
-	onClose: { action: 'onClose' },
 };

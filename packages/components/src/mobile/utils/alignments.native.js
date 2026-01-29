@@ -10,8 +10,10 @@ export const WIDE_ALIGNMENTS = {
 	},
 	excludeBlocks: [ 'core/heading' ],
 	notInnerContainers: [
+		'core/image',
 		'core/separator',
 		'core/media-text',
+		'core/quote',
 		'core/pullquote',
 	],
 };

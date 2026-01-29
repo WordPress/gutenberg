@@ -20,6 +20,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'color', 'link' ],
 		support: [ 'color', 'link' ],
 	},
+	aspectRatio: {
+		value: [ 'dimensions', 'aspectRatio' ],
+		support: [ 'dimensions', 'aspectRatio' ],
+		useEngine: true,
+	},
 	background: {
 		value: [ 'color', 'gradient' ],
 		support: [ 'color', 'gradients' ],
@@ -29,6 +34,26 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'color', 'background' ],
 		support: [ 'color', 'background' ],
 		requiresOptOut: true,
+		useEngine: true,
+	},
+	backgroundImage: {
+		value: [ 'background', 'backgroundImage' ],
+		support: [ 'background', 'backgroundImage' ],
+		useEngine: true,
+	},
+	backgroundRepeat: {
+		value: [ 'background', 'backgroundRepeat' ],
+		support: [ 'background', 'backgroundRepeat' ],
+		useEngine: true,
+	},
+	backgroundSize: {
+		value: [ 'background', 'backgroundSize' ],
+		support: [ 'background', 'backgroundSize' ],
+		useEngine: true,
+	},
+	backgroundPosition: {
+		value: [ 'background', 'backgroundPosition' ],
+		support: [ 'background', 'backgroundPosition' ],
 		useEngine: true,
 	},
 	borderColor: {
@@ -197,6 +222,16 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'dimensions', 'minHeight' ],
 		useEngine: true,
 	},
+	height: {
+		value: [ 'dimensions', 'height' ],
+		support: [ 'dimensions', 'height' ],
+		useEngine: true,
+	},
+	width: {
+		value: [ 'dimensions', 'width' ],
+		support: [ 'dimensions', 'width' ],
+		useEngine: true,
+	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],
@@ -207,6 +242,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 			paddingLeft: 'left',
 		},
 		useEngine: true,
+	},
+	textAlign: {
+		value: [ 'typography', 'textAlign' ],
+		support: [ 'typography', 'textAlign' ],
+		useEngine: false,
 	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],
@@ -242,7 +282,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 };
 
 export const __EXPERIMENTAL_ELEMENTS = {
-	link: 'a',
+	link: 'a:where(:not(.wp-element-button))',
 	heading: 'h1, h2, h3, h4, h5, h6',
 	h1: 'h1',
 	h2: 'h2',
@@ -254,13 +294,19 @@ export const __EXPERIMENTAL_ELEMENTS = {
 	caption:
 		'.wp-element-caption, .wp-block-audio figcaption, .wp-block-embed figcaption, .wp-block-gallery figcaption, .wp-block-image figcaption, .wp-block-table figcaption, .wp-block-video figcaption',
 	cite: 'cite',
+	select: 'select',
+	textInput:
+		'textarea, input:where([type=email],[type=number],[type=password],[type=search],[type=tel],[type=text],[type=url])',
 };
 
-export const __EXPERIMENTAL_PATHS_WITH_MERGE = {
+// These paths may have three origins, custom, theme, and default,
+// and are expected to override other origins with custom, theme,
+// and default priority.
+export const __EXPERIMENTAL_PATHS_WITH_OVERRIDE = {
 	'color.duotone': true,
 	'color.gradients': true,
 	'color.palette': true,
-	'typography.fontFamilies': true,
+	'dimensions.aspectRatios': true,
 	'typography.fontSizes': true,
 	'spacing.spacingSizes': true,
 };

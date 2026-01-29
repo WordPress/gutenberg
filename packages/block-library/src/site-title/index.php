@@ -8,14 +8,16 @@
 /**
  * Renders the `core/site-title` block on the server.
  *
+ * @since 5.8.0
+ *
  * @param array $attributes The block attributes.
  *
  * @return string The render.
  */
 function render_block_core_site_title( $attributes ) {
 	$site_title = get_bloginfo( 'name' );
-	if ( ! $site_title ) {
-		return;
+	if ( ! trim( $site_title ) ) {
+		return '';
 	}
 
 	$tag_name = 'h1';
@@ -29,7 +31,7 @@ function render_block_core_site_title( $attributes ) {
 	}
 
 	if ( $attributes['isLink'] ) {
-		$aria_current = is_home() || ( is_front_page() && 'page' === get_option( 'show_on_front' ) ) ? ' aria-current="page"' : '';
+		$aria_current = ! is_paged() && ( is_front_page() || is_home() && ( (int) get_option( 'page_for_posts' ) !== get_queried_object_id() ) ) ? ' aria-current="page"' : '';
 		$link_target  = ! empty( $attributes['linkTarget'] ) ? $attributes['linkTarget'] : '_self';
 
 		$site_title = sprintf(
@@ -53,6 +55,8 @@ function render_block_core_site_title( $attributes ) {
 
 /**
  * Registers the `core/site-title` block on the server.
+ *
+ * @since 5.8.0
  */
 function register_block_core_site_title() {
 	register_block_type_from_metadata(

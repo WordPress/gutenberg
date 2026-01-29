@@ -1,6 +1,6 @@
 # React Native mobile editor
 
-The Gutenberg repository includes the source for the [React Native](https://facebook.github.io/react-native/) based editor for mobile.
+The Gutenberg repository includes the source for the [React Native](https://reactnative.dev/) based editor for mobile.
 
 ## Mind the mobile
 
@@ -20,8 +20,8 @@ Also, the mobile client is packaged and released via the [official WordPress app
 
 If you encounter a failed Android/iOS test on your pull request, we recommend the following steps:
 
-1. Re-running the failed GitHub Action job ([guide for how to re-run](https://docs.github.com/en/actions/configuring-and-managing-workflows/managing-a-workflow-run#viewing-your-workflow-history)) - This should fix failed tests the majority of the time. Cases where you need to re-run tests for a pass should go down in the near future as flakiness in tests is actively being worked on. See the following GitHub issue for updated info on known failures: https://github.com/WordPress/gutenberg/issues/23949
-2. You can check if the test is failing locally by following the steps to run the E2E test on your machine from the [mobile getting started guide](/docs/contributors/code/react-native/getting-started-react-native.md#ui-tests), with even more relevant info in the [relevant directory README.md](https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-editor/__device-tests__#running-the-tests-locally)
+1. Re-running the failed GitHub Action job ([guide for how to re-run](https://docs.github.com/en/actions/configuring-and-managing-workflows/managing-a-workflow-run#viewing-your-workflow-history)) - This should fix failed tests the majority of the time.
+2. You can check if the test is failing locally by following the steps to run the E2E test on your machine from the [E2E testing documentation](/packages/react-native-editor/__device-tests__/README.md).
 3. In addition to reading the logs from the E2E test, you can download a video recording from the Artifacts section of the GitHub job that may have additional useful information.
 4. Check if any changes in your PR would require corresponding changes to `.native.js` versions of files.
 5. Lastly, if you're stuck on a failing mobile test, feel free to reach out to contributors on Slack in the #mobile or #core-editor chats in the WordPress Core Slack, [free to join](https://make.wordpress.org/chat/).

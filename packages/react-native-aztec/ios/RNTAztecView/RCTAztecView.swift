@@ -72,18 +72,18 @@ class RCTAztecView: Aztec.TextView {
         return label
     }()
 
-    // RCTScrollViews are flipped horizontally on RTL. This messes up competelly horizontal layout contraints
+    // RCTScrollViews are flipped horizontally on RTL. This messes up competelly horizontal layout constraints
     // on views inserted after the transformation.
-    var placeholderPreferedHorizontalAnchor: NSLayoutXAxisAnchor {
+    var placeholderPreferredHorizontalAnchor: NSLayoutXAxisAnchor {
         return hasRTLLayout ? placeholderLabel.rightAnchor : placeholderLabel.leftAnchor
     }
 
-    // This constraint is created from the prefered horizontal anchor (analog to "leading")
+    // This constraint is created from the preferred horizontal anchor (analog to "leading")
     // but appending it always to left of its super view (Aztec).
     // This partially fixes the position issue originated from fliping the scroll view.
     // fixLabelPositionForRTLLayout() fixes the rest.
     private lazy var placeholderHorizontalConstraint: NSLayoutConstraint = {
-        return placeholderPreferedHorizontalAnchor.constraint(
+        return placeholderPreferredHorizontalAnchor.constraint(
             equalTo: leftAnchor,
             constant: leftTextInset
         )
@@ -169,7 +169,7 @@ class RCTAztecView: Aztec.TextView {
     /**
      This handles a bug introduced by iOS 13.0 (tested up to 13.2) where link interactions don't respect what the documentation says.
 
-     The documenatation for textView(_:shouldInteractWith:in:interaction:) says:
+     The documentation for textView(_:shouldInteractWith:in:interaction:) says:
 
      > Links in text views are interactive only if the text view is selectable but noneditable.
 
@@ -245,12 +245,8 @@ class RCTAztecView: Aztec.TextView {
     }
 
     private func readHTML(from pasteboard: UIPasteboard) -> String? {
-
         if let data = pasteboard.data(forPasteboardType: kUTTypeHTML as String), let html = String(data: data, encoding: .utf8) {
-            // Make sure we are not getting a full HTML DOC. We only want inner content
-            if !html.hasPrefix("<!DOCTYPE html") {
-                return html
-            }
+            return html
         }
 
         if let flatRTFDString = read(from: pasteboard, uti: kUTTypeFlatRTFD, documentType: DocumentType.rtfd) {
@@ -346,24 +342,7 @@ class RCTAztecView: Aztec.TextView {
 
         super.deleteBackward()
         updatePlaceholderVisibility()
-    }
-
-    // MARK: - Dictation
-    
-    func removeUnicodeAndRestoreCursor(from textView: UITextView) {
-        // Capture current cursor position
-        let originalPosition = textView.offset(from: textView.beginningOfDocument, to: textView.selectedTextRange?.start ?? textView.beginningOfDocument)
-                
-        // Replace occurrences of the obj symbol ("\u{FFFC}")
-        textView.text = textView.text?.replacingOccurrences(of: "\u{FFFC}", with: "")
-        
-        // Detect if cursor is off-by-one and correct, if so
-        let newPositionOffset = originalPosition > 0 ? originalPosition - 1 : originalPosition
-        if let newPosition = textView.position(from: textView.beginningOfDocument, offset: newPositionOffset) {
-            // Move the cursor to the correct, new position following dictation
-            textView.selectedTextRange = textView.textRange(from: newPosition, to: newPosition)
-        }
-    }
+    }    
 
     // MARK: - Custom Edit Intercepts
 
@@ -434,7 +413,7 @@ class RCTAztecView: Aztec.TextView {
         return text.isStartOfParagraph(at: currentLocation) && !(text.endIndex == currentLocation)
     }
     override var keyCommands: [UIKeyCommand]? {
-        // Remove defautls Tab and Shift+Tab commands, leaving just Shift+Enter command.
+        // Remove defaults Tab and Shift+Tab commands, leaving just Shift+Enter command.
         return [carriageReturnKeyCommand]
     }
 
@@ -650,13 +629,9 @@ class RCTAztecView: Aztec.TextView {
     ///
     private func applyFontConstraints(to baseFont: UIFont) -> UIFont {
         let oldDescriptor = baseFont.fontDescriptor
-        let newFontSize: CGFloat
+        let fontMetrics = UIFontMetrics(forTextStyle: .body)
 
-        if let fontSize = fontSize {
-            newFontSize = fontSize
-        } else {
-            newFontSize = baseFont.pointSize
-        }
+        let newFontSize = fontMetrics.scaledValue(for: fontSize ?? baseFont.pointSize)
 
         var newTraits = oldDescriptor.symbolicTraits
 
@@ -698,7 +673,7 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
-    /// This method refreshes the font for the palceholder field and typing attributes.
+    /// This method refreshes the font for the placeholder field and typing attributes.
     /// This method should not be called directly.  Call `refreshFont()` instead.
     ///
     private func refreshTypingAttributesAndPlaceholderFont() {
@@ -738,7 +713,13 @@ class RCTAztecView: Aztec.TextView {
         case "bold": toggleBold(range: emptyRange)
         case "italic": toggleItalic(range: emptyRange)
         case "strikethrough": toggleStrikethrough(range: emptyRange)
-        case "mark": toggleMark(range: emptyRange)
+        case "mark":
+            // When there's a selection the formatting is applied from the RichText library.
+            // If not, it will toggle the active mark format if needed.
+            if selectedRange.length > 0 {
+                return
+            }
+            toggleMark(range: emptyRange, color: nil, resetColor: true)
         default: print("Format not recognized")
         }
     }
@@ -788,13 +769,6 @@ extension RCTAztecView: UITextViewDelegate {
     }
 
     func textViewDidChange(_ textView: UITextView) {
-        // Workaround for RN dictation bug that adds obj symbol.
-        // Ref: https://github.com/facebook/react-native/issues/36521
-        // TODO: Remove workaround when RN issue is fixed
-        if textView.text?.contains("\u{FFFC}") == true {
-            removeUnicodeAndRestoreCursor(from: textView)
-        }
-
         propagateContentChanges()
         updatePlaceholderVisibility()
         //Necessary to send height information to JS after pasting text.

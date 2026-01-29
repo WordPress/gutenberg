@@ -5,11 +5,17 @@
 	"title": "Custom Link",
 	"category": "design",
 	"parent": [ "core/navigation" ],
+	"allowedBlocks": [
+		"core/navigation-link",
+		"core/navigation-submenu",
+		"core/page-list"
+	],
 	"description": "Add a page, link, or another item to your navigation.",
 	"textdomain": "default",
 	"attributes": {
 		"label": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"type": {
 			"type": "string"
@@ -28,7 +34,8 @@
 			"default": false
 		},
 		"url": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"title": {
 			"type": "string"
@@ -56,6 +63,7 @@
 		"style"
 	],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"__experimentalSlashInserter": true,
@@ -71,6 +79,10 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"renaming": false,
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-navigation-link-editor",

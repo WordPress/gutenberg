@@ -1,16 +1,4 @@
 /**
- * External dependencies
- */
-import type {
-	AriaRole,
-	CSSProperties,
-	ReactNode,
-	KeyboardEventHandler,
-	KeyboardEvent,
-	SyntheticEvent,
-} from 'react';
-
-/**
  * WordPress dependencies
  */
 import type { useFocusOnMount } from '@wordpress/compose';
@@ -42,7 +30,7 @@ export type ModalProps = {
 	/**
 	 * The children elements.
 	 */
-	children: ReactNode;
+	children: React.ReactNode;
 	/**
 	 * If this property is added, it will an additional class name to the modal
 	 * content `div`.
@@ -68,14 +56,16 @@ export type ModalProps = {
 	 *
 	 * @default true
 	 */
-	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
+	focusOnMount?:
+		| Parameters< typeof useFocusOnMount >[ 0 ]
+		| 'firstContentElement';
 	/**
 	 * Elements that are injected into the modal header to the left of the close button (if rendered).
 	 * Hidden if `__experimentalHideHeader` is `true`.
 	 *
 	 * @default null
 	 */
-	headerActions?: ReactNode;
+	headerActions?: React.ReactNode;
 
 	/**
 	 * If this property is added, an icon will be added before the title.
@@ -95,14 +85,23 @@ export type ModalProps = {
 	 */
 	isFullScreen?: boolean;
 	/**
+	 * If this property is added it will cause the modal to render at a preset
+	 * width, or expand to fill the screen. This prop will be ignored if
+	 * `isFullScreen` is set to `true`.
+	 *
+	 * Note: `Modal`'s width can also be controlled by adjusting the width of the
+	 * modal's contents, or via CSS using the `style` prop.
+	 */
+	size?: 'small' | 'medium' | 'large' | 'fill';
+	/**
 	 *  Handle the key down on the modal frame `div`.
 	 */
-	onKeyDown?: KeyboardEventHandler< HTMLDivElement >;
+	onKeyDown?: React.KeyboardEventHandler< HTMLDivElement >;
 	/**
 	 * This function is called to indicate that the modal should be closed.
 	 */
 	onRequestClose: (
-		event?: KeyboardEvent< HTMLDivElement > | SyntheticEvent
+		event?: React.KeyboardEvent< HTMLDivElement > | React.SyntheticEvent
 	) => void;
 	/**
 	 * If this property is added, it will an additional class name to the modal
@@ -115,7 +114,7 @@ export type ModalProps = {
 	 *
 	 * @default 'dialog'
 	 */
-	role?: AriaRole;
+	role?: React.AriaRole;
 	/**
 	 * If this property is added, it will determine whether the modal requests
 	 * to close when a mouse click occurs outside of the modal content.
@@ -133,7 +132,7 @@ export type ModalProps = {
 	/**
 	 * If this property is added, it will be added to the modal frame `div`.
 	 */
-	style?: CSSProperties;
+	style?: React.CSSProperties;
 	/**
 	 * This property is used as the modal header's title.
 	 *

@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import {
-	__unstableCompositeItem as CompositeItem,
 	Tooltip,
 	DropdownMenu,
 	MenuGroup,
@@ -17,6 +16,7 @@ import {
 	Flex,
 	FlexItem,
 	Button,
+	Composite,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
@@ -26,6 +26,7 @@ import { moreVertical, external } from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { isBlobURL } from '@wordpress/blob';
+import { getFilename } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -35,9 +36,8 @@ import { getBlockAndPreviewFromMedia } from './utils';
 import { store as blockEditorStore } from '../../../store';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
-const MAXIMUM_TITLE_LENGTH = 25;
 const MEDIA_OPTIONS_POPOVER_PROPS = {
-	position: 'bottom left',
+	placement: 'bottom-end',
 	className:
 		'block-editor-inserter__media-list__item-preview-options__popover',
 };
@@ -99,12 +99,20 @@ function InsertExternalImageModal( { onClose, onSubmit } ) {
 				expanded={ false }
 			>
 				<FlexItem>
-					<Button variant="tertiary" onClick={ onClose }>
+					<Button
+						__next40pxDefaultSize
+						variant="tertiary"
+						onClick={ onClose }
+					>
 						{ __( 'Cancel' ) }
 					</Button>
 				</FlexItem>
 				<FlexItem>
-					<Button variant="primary" onClick={ onSubmit }>
+					<Button
+						__next40pxDefaultSize
+						variant="primary"
+						onClick={ onSubmit }
+					>
 						{ __( 'Insert' ) }
 					</Button>
 				</FlexItem>
@@ -113,7 +121,7 @@ function InsertExternalImageModal( { onClose, onSubmit } ) {
 	);
 }
 
-export function MediaPreview( { media, onClick, composite, category } ) {
+export function MediaPreview( { media, onClick, category } ) {
 	const [ showExternalUploadModal, setShowExternalUploadModal ] =
 		useState( false );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -124,23 +132,32 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 	);
 	const { createErrorNotice, createSuccessNotice } =
 		useDispatch( noticesStore );
-	const mediaUpload = useSelect(
-		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
-		[]
-	);
+	const { getSettings, getBlock } = useSelect( blockEditorStore );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
 	const onMediaInsert = useCallback(
 		( previewBlock ) => {
 			// Prevent multiple uploads when we're in the process of inserting.
 			if ( isInserting ) {
 				return;
 			}
+
+			const settings = getSettings();
 			const clonedBlock = cloneBlock( previewBlock );
 			const { id, url, caption } = clonedBlock.attributes;
+
+			// User has no permission to upload media.
+			if ( ! id && ! settings.mediaUpload ) {
+				setShowExternalUploadModal( true );
+				return;
+			}
+
 			// Media item already exists in library, so just insert it.
 			if ( !! id ) {
 				onClick( clonedBlock );
 				return;
 			}
+
 			setIsInserting( true );
 			// Media item does not exist in library, so try to upload it.
 			// Fist fetch the image data. This may fail if the image host
@@ -151,30 +168,51 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 				.fetch( url )
 				.then( ( response ) => response.blob() )
 				.then( ( blob ) => {
-					mediaUpload( {
-						filesList: [ blob ],
+					const fileName = getFilename( url ) || 'image.jpg';
+					const file = new File( [ blob ], fileName, {
+						type: blob.type,
+					} );
+
+					settings.mediaUpload( {
+						filesList: [ file ],
 						additionalData: { caption },
 						onFileChange( [ img ] ) {
 							if ( isBlobURL( img.url ) ) {
 								return;
 							}
-							onClick( {
-								...clonedBlock,
-								attributes: {
+
+							if ( ! getBlock( clonedBlock.clientId ) ) {
+								// Ensure the block is only inserted once.
+								onClick( {
+									...clonedBlock,
+									attributes: {
+										...clonedBlock.attributes,
+										id: img.id,
+										url: img.url,
+									},
+								} );
+
+								createSuccessNotice(
+									__( 'Image uploaded and inserted.' ),
+									{ type: 'snackbar', id: 'inserter-notice' }
+								);
+							} else {
+								// For subsequent calls, update the existing block.
+								updateBlockAttributes( clonedBlock.clientId, {
 									...clonedBlock.attributes,
 									id: img.id,
 									url: img.url,
-								},
-							} );
-							createSuccessNotice(
-								__( 'Image uploaded and inserted.' ),
-								{ type: 'snackbar' }
-							);
+								} );
+							}
+
 							setIsInserting( false );
 						},
 						allowedTypes: ALLOWED_MEDIA_TYPES,
 						onError( message ) {
-							createErrorNotice( message, { type: 'snackbar' } );
+							createErrorNotice( message, {
+								type: 'snackbar',
+								id: 'inserter-notice',
+							} );
 							setIsInserting( false );
 						},
 					} );
@@ -186,27 +224,28 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 		},
 		[
 			isInserting,
+			getSettings,
 			onClick,
-			mediaUpload,
-			createErrorNotice,
 			createSuccessNotice,
+			updateBlockAttributes,
+			createErrorNotice,
+			getBlock,
 		]
 	);
-	const title = media.title?.rendered || media.title;
-	let truncatedTitle;
-	if ( title.length > MAXIMUM_TITLE_LENGTH ) {
-		const omission = '...';
-		truncatedTitle =
-			title.slice( 0, MAXIMUM_TITLE_LENGTH - omission.length ) + omission;
-	}
+
+	const title =
+		typeof media.title === 'string'
+			? media.title
+			: media.title?.rendered || __( 'no title' );
+
 	const onMouseEnter = useCallback( () => setIsHovered( true ), [] );
 	const onMouseLeave = useCallback( () => setIsHovered( false ), [] );
 	return (
 		<>
-			<InserterDraggableBlocks isEnabled={ true } blocks={ [ block ] }>
+			<InserterDraggableBlocks isEnabled blocks={ [ block ] }>
 				{ ( { draggable, onDragStart, onDragEnd } ) => (
 					<div
-						className={ classnames(
+						className={ clsx(
 							'block-editor-inserter__media-list__list-item',
 							{
 								'is-hovered': isHovered,
@@ -216,20 +255,22 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 						onDragStart={ onDragStart }
 						onDragEnd={ onDragEnd }
 					>
-						<Tooltip text={ truncatedTitle || title }>
-							{ /* Adding `is-hovered` class to the wrapper element is needed
-							because the options Popover is rendered outside of this node. */ }
-							<div
-								onMouseEnter={ onMouseEnter }
-								onMouseLeave={ onMouseLeave }
-							>
-								<CompositeItem
-									role="option"
-									as="div"
-									{ ...composite }
-									className="block-editor-inserter__media-list__item"
+						{ /* Adding `is-hovered` class to the wrapper element is needed
+						because the options Popover is rendered outside of this node. */ }
+						<div
+							onMouseEnter={ onMouseEnter }
+							onMouseLeave={ onMouseLeave }
+						>
+							<Tooltip text={ title }>
+								<Composite.Item
+									render={
+										<div
+											aria-label={ title }
+											role="option"
+											className="block-editor-inserter__media-list__item"
+										/>
+									}
 									onClick={ () => onMediaInsert( block ) }
-									aria-label={ title }
 								>
 									<div className="block-editor-inserter__media-list__item-preview">
 										{ preview }
@@ -239,15 +280,15 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 											</div>
 										) }
 									</div>
-								</CompositeItem>
-								{ ! isInserting && (
-									<MediaPreviewOptions
-										category={ category }
-										media={ media }
-									/>
-								) }
-							</div>
-						</Tooltip>
+								</Composite.Item>
+							</Tooltip>
+							{ ! isInserting && (
+								<MediaPreviewOptions
+									category={ category }
+									media={ media }
+								/>
+							) }
+						</div>
 					</div>
 				) }
 			</InserterDraggableBlocks>
@@ -258,6 +299,7 @@ export function MediaPreview( { media, onClick, composite, category } ) {
 						onClick( cloneBlock( block ) );
 						createSuccessNotice( __( 'Image inserted.' ), {
 							type: 'snackbar',
+							id: 'inserter-notice',
 						} );
 						setShowExternalUploadModal( false );
 					} }

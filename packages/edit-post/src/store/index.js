@@ -23,5 +23,4 @@ export const store = createReduxStore( STORE_NAME, {
 	actions,
 	selectors,
 } );
-
 register( store );

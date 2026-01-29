@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "5.18.0",
+	"version": "6.39.0",
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -20,14 +20,36 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=12"
+		"node": ">=18.12.0",
+		"npm": ">=8.19.2"
 	},
-	"main": "build/index.js",
-	"module": "build-module/index.js",
+	"files": [
+		"src",
+		"build",
+		"build-module",
+		"build-style",
+		"build-types",
+		"*.md"
+	],
+	"main": "build/index.cjs",
+	"module": "build-module/index.mjs",
+	"exports": {
+		".": {
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
+		},
+		"./package.json": "./package.json"
+	},
 	"react-native": "src/index",
+	"wpScript": true,
+	"wpCopyFiles": {
+		"files": [
+			"src/blocks/*/block.json"
+		]
+	},
 	"dependencies": {
-		"@babel/runtime": "^7.16.0",
 		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
 		"@wordpress/blocks": "file:../blocks",
@@ -53,7 +75,10 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/url": "file:../url",
 		"@wordpress/widgets": "file:../widgets",
-		"classnames": "^2.3.1"
+		"clsx": "^2.1.1"
+	},
+	"devDependencies": {
+		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -15,12 +15,13 @@ import TextControl from '..';
 
 const meta: Meta< typeof TextControl > = {
 	component: TextControl,
-	title: 'Components/TextControl',
+	title: 'Components/Selection & Input/Common/TextControl',
+	id: 'components-textcontrol',
 	argTypes: {
 		help: { control: { type: 'text' } },
 		label: { control: { type: 'text' } },
 		onChange: { action: 'onChange' },
-		value: { control: { type: null } },
+		value: { control: false },
 	},
 	parameters: {
 		controls: {
@@ -39,6 +40,7 @@ const DefaultTemplate: StoryFn< typeof TextControl > = ( {
 
 	return (
 		<TextControl
+			__next40pxDefaultSize
 			{ ...args }
 			value={ value }
 			onChange={ ( v ) => {
@@ -52,7 +54,10 @@ const DefaultTemplate: StoryFn< typeof TextControl > = ( {
 export const Default: StoryFn< typeof TextControl > = DefaultTemplate.bind(
 	{}
 );
-Default.args = {};
+Default.args = {
+	__next40pxDefaultSize: true,
+	placeholder: 'Placeholder',
+};
 
 export const WithLabelAndHelpText: StoryFn< typeof TextControl > =
 	DefaultTemplate.bind( {} );

@@ -1,20 +1,20 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
 import { isRTL } from '@wordpress/i18n';
+import { useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { CircularOptionPickerContext } from './circular-option-picker-context';
-import { Composite, useCompositeState } from '../composite';
+import { Composite } from '../composite';
 import type {
 	CircularOptionPickerProps,
 	ListboxCircularOptionPickerProps,
@@ -51,7 +51,6 @@ import {
  * 						style={ { backgroundColor: color, color } }
  * 						isSelected={ index === currentColor }
  * 						onClick={ () => setCurrentColor( index ) }
- * 						aria-label={ name }
  * 					/>
  * 				);
  * 			} ) }
@@ -85,39 +84,31 @@ function ListboxCircularOptionPicker(
 		children,
 		...additionalProps
 	} = props;
-	const rtl = isRTL();
 
-	const compositeState = useCompositeState( { baseId, loop, rtl } );
-	const { setBaseId, setLoop, setRTL } = compositeState;
+	const [ activeId, setActiveId ] = useState< string | null | undefined >(
+		undefined
+	);
 
-	// These are necessary as `useCompositeState` is sealed after
-	// the first render, so although unlikely to happen, if a state
-	// property should change, we need to process it accordingly.
-
-	useEffect( () => {
-		setBaseId( baseId );
-	}, [ setBaseId, baseId ] );
-
-	useEffect( () => {
-		setLoop( loop );
-	}, [ setLoop, loop ] );
-
-	useEffect( () => {
-		setRTL( rtl );
-	}, [ setRTL, rtl ] );
-
-	const compositeContext = {
-		isComposite: true,
-		...compositeState,
-	};
+	const contextValue = useMemo(
+		() => ( {
+			baseId,
+			activeId,
+			setActiveId,
+		} ),
+		[ baseId, activeId, setActiveId ]
+	);
 
 	return (
 		<div className={ className }>
-			<CircularOptionPickerContext.Provider value={ compositeContext }>
+			<CircularOptionPickerContext.Provider value={ contextValue }>
 				<Composite
 					{ ...additionalProps }
-					{ ...compositeState }
-					role={ 'listbox' }
+					id={ baseId }
+					focusLoop={ loop }
+					rtl={ isRTL() }
+					role="listbox"
+					activeId={ activeId }
+					setActiveId={ setActiveId }
 				>
 					{ options }
 				</Composite>
@@ -133,11 +124,16 @@ function ButtonsCircularOptionPicker(
 ) {
 	const { actions, options, children, baseId, ...additionalProps } = props;
 
+	const contextValue = useMemo(
+		() => ( {
+			baseId,
+		} ),
+		[ baseId ]
+	);
+
 	return (
-		<div { ...additionalProps }>
-			<CircularOptionPickerContext.Provider
-				value={ { isComposite: false, baseId } }
-			>
+		<div { ...additionalProps } role="group" id={ baseId }>
+			<CircularOptionPickerContext.Provider value={ contextValue }>
 				{ options }
 				{ children }
 				{ actions }
@@ -173,7 +169,7 @@ function CircularOptionPicker( props: CircularOptionPickerProps ) {
 	) : undefined;
 
 	const options = (
-		<div className={ 'components-circular-option-picker__swatches' }>
+		<div className="components-circular-option-picker__swatches">
 			{ optionsProp }
 		</div>
 	);
@@ -182,10 +178,7 @@ function CircularOptionPicker( props: CircularOptionPickerProps ) {
 		<OptionPickerImplementation
 			{ ...additionalProps }
 			baseId={ baseId }
-			className={ classnames(
-				'components-circular-option-picker',
-				className
-			) }
+			className={ clsx( 'components-circular-option-picker', className ) }
 			actions={ actions }
 			options={ options }
 		>
@@ -198,5 +191,7 @@ CircularOptionPicker.Option = Option;
 CircularOptionPicker.OptionGroup = OptionGroup;
 CircularOptionPicker.ButtonAction = ButtonAction;
 CircularOptionPicker.DropdownLinkAction = DropdownLinkAction;
+
+CircularOptionPicker.displayName = 'CircularOptionPicker';
 
 export default CircularOptionPicker;

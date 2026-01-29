@@ -15,7 +15,7 @@ The content to be displayed for the pinned items. Most of the time, a button wit
 
 ### scope
 
-The scope of the pinned items area e.g: "core/edit-post", "core/edit-site", "myplugin/custom-screen-a",
+The scope of the pinned items area e.g: "core", "myplugin/custom-screen-a",
 
 -   Type: `String`
 -   Required: Yes
@@ -28,7 +28,7 @@ A slot that renders the pinned items.
 
 ### scope
 
-The scope of the pinned items area e.g: "core/edit-post", "core/edit-site", "myplugin/custom-screen-a",
+The scope of the pinned items area e.g: "core", "myplugin/custom-screen-a",
 
 -   Type: `String`
 -   Required: Yes

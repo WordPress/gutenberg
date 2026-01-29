@@ -95,7 +95,7 @@ export default function figureContentReducer( node, doc, schema ) {
 		) {
 			wrapFigureContent( nodeToInsert, wrapper );
 		}
-	} else if ( nodeToInsert.parentNode.nodeName === 'BODY' ) {
+	} else {
 		wrapFigureContent( nodeToInsert );
 	}
 }

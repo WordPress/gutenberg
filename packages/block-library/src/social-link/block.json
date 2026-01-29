@@ -5,17 +5,19 @@
 	"title": "Social Icon",
 	"category": "widgets",
 	"parent": [ "core/social-links" ],
-	"description": "Display an icon linking to a social media profile or site.",
+	"description": "Display an icon linking to a social profile or site.",
 	"textdomain": "default",
 	"attributes": {
 		"url": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"service": {
 			"type": "string"
 		},
 		"label": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"rel": {
 			"type": "string"
@@ -30,8 +32,12 @@
 		"iconBackgroundColorValue"
 	],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
-		"html": false
+		"html": false,
+		"interactivity": {
+			"clientNavigation": true
+		}
 	},
 	"editorStyle": "wp-block-social-link-editor"
 }

@@ -15,73 +15,34 @@ concurrency:
     group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.head_ref || github.sha }}
     cancel-in-progress: true
 
+# Disable permissions for all available scopes by default.
+# Any needed permissions should be configured at the job level.
+permissions: {}
+
 jobs:
-    e2e-puppeteer:
-        name: Puppeteer - ${{ matrix.part }}
-        runs-on: ubuntu-latest
-        if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
-        strategy:
-            fail-fast: false
-            matrix:
-                part: [1, 2, 3]
-                totalParts: [3]
-
-        steps:
-            - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
-              with:
-                  show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
-
-            - name: Setup Node.js and install dependencies
-              uses: ./.github/setup-node
-
-            - name: Npm build
-              run: npm run build
-
-            - name: Install WordPress
-              run: |
-                  npm run wp-env start
-
-            - name: Running the tests
-              run: |
-                  npx wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-                  npx wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % ${{ matrix.totalParts }} == ${{ matrix.part }} - 1' < ~/.jest-e2e-tests )
-
-            - name: Archive debug artifacts (screenshots, HTML snapshots)
-              uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
-              if: always()
-              with:
-                  name: failures-artifacts
-                  path: artifacts
-                  if-no-files-found: ignore
-
-            - name: Archive flaky tests report
-              uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
-              if: always()
-              with:
-                  name: flaky-tests-report
-                  path: flaky-tests
-                  if-no-files-found: ignore
-
     e2e-playwright:
         name: Playwright - ${{ matrix.part }}
-        runs-on: ubuntu-latest
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
         if: ${{ github.repository == 'WordPress/gutenberg' || github.event_name == 'pull_request' }}
         strategy:
             fail-fast: false
             matrix:
-                part: [1, 2, 3, 4]
-                totalParts: [4]
+                part: [1, 2, 3, 4, 5, 6, 7, 8]
+                totalParts: [8]
 
         steps:
-            - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+            - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
             - name: Setup Node.js and install dependencies
               uses: ./.github/setup-node
 
             - name: Npm build
-              run: npm run build
+              run: npm run build -- --skip-types
 
             - name: Install Playwright dependencies
               run: |
@@ -92,40 +53,76 @@ jobs:
                   npm run wp-env start
 
             - name: Run the tests
+              env:
+                  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
+                  SHARD_PART: ${{ matrix.part }}
+                  SHARD_TOTAL: ${{ matrix.totalParts }}
               run: |
-                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e:playwright -- --shard=${{ matrix.part }}/${{ matrix.totalParts }}
+                  xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test:e2e -- --shard="${SHARD_PART}/${SHARD_TOTAL}"
 
             - name: Archive debug artifacts (screenshots, traces)
-              uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
-              if: always()
+              uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+              if: ${{ !cancelled() }}
               with:
-                  name: failures-artifacts
+                  name: failures-artifacts--${{ matrix.part }}
                   path: artifacts/test-results
                   if-no-files-found: ignore
 
             - name: Archive flaky tests report
-              uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
-              if: always()
+              uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+              if: ${{ !cancelled() }}
               with:
-                  name: flaky-tests-report
+                  name: flaky-tests-report--${{ matrix.part }}
                   path: flaky-tests
                   if-no-files-found: ignore
 
+    merge-artifacts:
+        name: Merge Artifacts
+        if: ${{ !cancelled() }}
+        needs: [e2e-playwright]
+        runs-on: 'ubuntu-24.04'
+        permissions: {}
+        outputs:
+            has-flaky-test-report: ${{ !!steps.merge-flaky-tests-reports.outputs.artifact-id }}
+        steps:
+            - name: Merge failures artifacts
+              uses: actions/upload-artifact/merge@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+              # Don't fail the job if there aren't any artifacts to merge.
+              continue-on-error: true
+              with:
+                  name: failures-artifacts
+                  # Retain the merged artifacts in case of a rerun.
+                  pattern: failures-artifacts*
+                  delete-merged: true
+
+            - name: Merge flaky tests reports
+              id: merge-flaky-tests-reports
+              uses: actions/upload-artifact/merge@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
+              continue-on-error: true
+              with:
+                  name: flaky-tests-report
+                  pattern: flaky-tests-report*
+                  delete-merged: true
+
     report-to-issues:
         name: Report to GitHub
-        needs: [e2e-puppeteer, e2e-playwright]
-        if: ${{ always() }}
-        runs-on: ubuntu-latest
+        needs: [merge-artifacts]
+        if: ${{ needs.merge-artifacts.outputs.has-flaky-test-report == 'true' }}
+        runs-on: 'ubuntu-24.04'
+        permissions:
+            contents: read
+            issues: write
+            pull-requests: write
         steps:
             # Checkout defaults to using the branch which triggered the event, which
             # isn't necessarily `trunk` (e.g. in the case of a merge).
-            - uses: actions/checkout@3df4ab11eba7bda6032a0b82a6bb43b11571feac # v4.0.0
+            - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
               with:
                   ref: trunk
                   show-progress: ${{ runner.debug == '1' && 'true' || 'false' }}
+                  persist-credentials: false
 
-            - uses: actions/download-artifact@v3
-              id: download_artifact
+            - uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
               # Don't fail the job if there isn't any flaky tests report.
               continue-on-error: true
               with:
@@ -133,16 +130,12 @@ jobs:
                   path: flaky-tests
 
             - name: Setup Node.js and install dependencies
-              if: ${{ steps.download_artifact.outcome == 'success' }}
               uses: ./.github/setup-node
 
             - name: Npm build
-              if: ${{ steps.download_artifact.outcome == 'success' }}
-              # TODO: We don't have to build the entire project, just the action itself.
-              run: npm run build:packages
+              run: npm run build -- --skip-types
 
             - name: Report flaky tests
-              if: ${{ steps.download_artifact.outcome == 'success' }}
               uses: ./packages/report-flaky-tests
               with:
                   repo-token: '${{ secrets.GITHUB_TOKEN }}'

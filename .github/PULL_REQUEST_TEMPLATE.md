@@ -2,6 +2,9 @@
 https://github.com/WordPress/gutenberg/blob/trunk/CONTRIBUTING.md -->
 
 ## What?
+<!-- Link this PR to its associated issue with an appropriate keyword: Closes, See, Follow up to, etc. -->
+Closes <!-- #ISSUE-NUMBER or URL -->
+
 <!-- In a few words, what is the PR actually doing? -->
 
 ## Why?
@@ -20,3 +23,9 @@ https://github.com/WordPress/gutenberg/blob/trunk/CONTRIBUTING.md -->
 <!-- How can you test the changes by using the keyboard only? Please note, this is required for PRs that change the user interface (UI). This ensures the PR can be tested for any possible accessibility regressions. -->
 
 ## Screenshots or screencast <!-- if applicable -->
+
+<!-- If you would like to upload screenshots, feel free to use the table below when it is useful to show the difference between before and after the change. -->
+
+|Before|After|
+|-|-|
+|<!-- Before screenshot here -->|<!-- After screenshot here -->|

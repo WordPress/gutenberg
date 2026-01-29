@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-const { command } = require( 'execa' );
 const path = require( 'path' );
-const glob = require( 'fast-glob' );
 const fs = require( 'fs' );
-const { inc: semverInc } = require( 'semver' );
-const rimraf = require( 'rimraf' );
 const readline = require( 'readline' );
+const { join } = require( 'path' );
+const { command } = require( 'execa' );
+const glob = require( 'fast-glob' );
+const { inc: semverInc } = require( 'semver' );
+const { rimraf } = require( 'rimraf' );
 const SimpleGit = require( 'simple-git' );
 
 /**
@@ -24,7 +25,6 @@ const {
 	calculateVersionBumpFromChangelog,
 	findPluginReleaseBranchName,
 } = require( './common' );
-const { join } = require( 'path' );
 const pluginConfig = require( '../config' );
 
 /**
@@ -61,17 +61,6 @@ const pluginConfig = require( '../config' );
  */
 
 /**
- * Throws if given an error in the node.js callback style.
- *
- * @param {any|null} error If callback failed, this will hold a value.
- */
-const rethrow = ( error ) => {
-	if ( error ) {
-		throw error;
-	}
-};
-
-/**
  * Checks out the npm release branch.
  *
  * @param {WPPackagesConfig} options The config object.
@@ -83,24 +72,14 @@ async function checkoutNpmReleaseBranch( {
 	/*
 	 * Create the release branch.
 	 *
-	 * Note that we are grabbing an arbitrary depth of commits
-	 * during the fetch. When `lerna` attempts to determine if
-	 * a package needs an update, it looks at `git` history,
-	 * and if we have pruned that history it will pre-emptively
-	 * publish when it doesn't need to.
-	 *
-	 * We could set a different arbitrary depth if this isn't
-	 * long enough or if it's excessive. We could also try and
-	 * find a way to more specifically fetch what we expect to
-	 * change. For example, if we knew we'll be performing
-	 * updates every two weeks, we might be conservative and
-	 * use `--shallow-since=4.weeks.ago`.
-	 *
-	 * At the time of writing, a depth of 100 pulls in all
-	 * `trunk` commits from within the past week.
+	 * Note that we are grabbing an arbitrary depth of commits (999) during the fetch.
+	 * When Lerna attempts to determine if a package needs an update, it looks at
+	 * `git` history to find the commit created during the previous npm publishing.
+	 * Lerna assumes that all packages need publishing if it can't access
+	 * the necessary information.
 	 */
 	await SimpleGit( gitWorkingDirectoryPath )
-		.fetch( 'origin', npmReleaseBranch, [ '--depth=100' ] )
+		.fetch( 'origin', npmReleaseBranch, [ '--depth=999' ] )
 		.checkout( npmReleaseBranch );
 	log(
 		'>> The local npm release branch ' +
@@ -145,7 +124,7 @@ async function runNpmReleaseBranchSyncStep( pluginReleaseBranch, config ) {
 		/*
 		 * Replace content from remote branch.
 		 *
-		 * @TODO: What is our goal here? Could `git reset --hard origin/${pluginReleaseBranch}` work?
+		 * @todo What is our goal here? Could `git reset --hard origin/${pluginReleaseBranch}` work?
 		 *        Why are we manually removing and then adding files back in?
 		 */
 		await repo
@@ -198,10 +177,9 @@ async function updatePackages( config ) {
 	);
 	const changelogFilesPublicPackages = changelogFiles.filter(
 		( changelogPath ) => {
-			const pkg = require( path.join(
-				path.dirname( changelogPath ),
-				'package.json'
-			) );
+			const pkg = require(
+				path.join( path.dirname( changelogPath ), 'package.json' )
+			);
 			return pkg.private !== true;
 		}
 	);
@@ -218,9 +196,15 @@ async function updatePackages( config ) {
 				lines.push( line );
 			}
 
+			const packageJSONPath = changelogPath.replace(
+				'CHANGELOG.md',
+				'package.json'
+			);
+			const { version } = readJSONFile( packageJSONPath );
 			let versionBump = calculateVersionBumpFromChangelog(
 				lines,
-				minimumVersionBump
+				minimumVersionBump,
+				version
 			);
 			const packageName = `@wordpress/${
 				changelogPath.split( '/' ).reverse()[ 1 ]
@@ -234,11 +218,6 @@ async function updatePackages( config ) {
 			) {
 				versionBump = minimumVersionBump;
 			}
-			const packageJSONPath = changelogPath.replace(
-				'CHANGELOG.md',
-				'package.json'
-			);
-			const { version } = readJSONFile( packageJSONPath );
 			const nextVersion =
 				versionBump !== null ? semverInc( version, versionBump ) : null;
 
@@ -396,7 +375,7 @@ async function publishPackagesToNpm( {
 		);
 
 		await command(
-			`npx lerna version pre${ minimumVersionBump } --preid next.${ beforeCommitHash } --no-private ${ yesFlag }`,
+			`npx lerna version pre${ minimumVersionBump } --preid next.v --build-metadata ${ beforeCommitHash } --no-private ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
@@ -610,7 +589,7 @@ async function runPackagesRelease( config, customMessages ) {
 			await Promise.all(
 				temporaryFolders
 					.filter( ( tempDir ) => fs.existsSync( tempDir ) )
-					.map( ( tempDir ) => rimraf( tempDir, rethrow ) )
+					.map( ( tempDir ) => rimraf( tempDir ) )
 			)
 	);
 

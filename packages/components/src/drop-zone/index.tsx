@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -10,20 +10,13 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { upload, Icon } from '@wordpress/icons';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
-import {
-	__experimentalUseDropZone as useDropZone,
-	useReducedMotion,
-} from '@wordpress/compose';
+import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import {
-	__unstableMotion as motion,
-	__unstableAnimatePresence as AnimatePresence,
-} from '../animation';
-import type { DropType, DropZoneProps } from './types';
-import type { WordPressComponentProps } from '../ui/context';
+import type { DropZoneProps } from './types';
+import type { WordPressComponentProps } from '../context';
 
 /**
  * `DropZone` is a component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event.
@@ -50,27 +43,31 @@ import type { WordPressComponentProps } from '../ui/context';
  */
 export function DropZoneComponent( {
 	className,
+	icon = upload,
 	label,
 	onFilesDrop,
 	onHTMLDrop,
 	onDrop,
+	isEligible = () => true,
 	...restProps
 }: WordPressComponentProps< DropZoneProps, 'div', false > ) {
 	const [ isDraggingOverDocument, setIsDraggingOverDocument ] =
 		useState< boolean >();
 	const [ isDraggingOverElement, setIsDraggingOverElement ] =
 		useState< boolean >();
-	const [ type, setType ] = useState< DropType >();
+	const [ isActive, setIsActive ] = useState< boolean >();
 	const ref = useDropZone( {
 		onDrop( event ) {
-			const files = event.dataTransfer
-				? getFilesFromDataTransfer( event.dataTransfer )
-				: [];
-			const html = event.dataTransfer?.getData( 'text/html' );
+			if ( ! event.dataTransfer ) {
+				return;
+			}
+
+			const files = getFilesFromDataTransfer( event.dataTransfer );
+			const html = event.dataTransfer.getData( 'text/html' );
 
 			/**
 			 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
-			 * The order of the checks is important to recognise the HTML drop.
+			 * The order of the checks is important to recognize the HTML drop.
 			 */
 			if ( html && onHTMLDrop ) {
 				onHTMLDrop( html );
@@ -83,31 +80,31 @@ export function DropZoneComponent( {
 		onDragStart( event ) {
 			setIsDraggingOverDocument( true );
 
-			let _type: DropType = 'default';
+			if ( ! event.dataTransfer ) {
+				return;
+			}
 
 			/**
 			 * From Windows Chrome 96, the `event.dataTransfer` returns both file object and HTML.
-			 * The order of the checks is important to recognise the HTML drop.
+			 * The order of the checks is important to recognize the HTML drop.
 			 */
-			if ( event.dataTransfer?.types.includes( 'text/html' ) ) {
-				_type = 'html';
+			if ( event.dataTransfer.types.includes( 'text/html' ) ) {
+				setIsActive( !! onHTMLDrop );
 			} else if (
 				// Check for the types because sometimes the files themselves
 				// are only available on drop.
-				event.dataTransfer?.types.includes( 'Files' ) ||
-				( event.dataTransfer
-					? getFilesFromDataTransfer( event.dataTransfer )
-					: []
-				).length > 0
+				event.dataTransfer.types.includes( 'Files' ) ||
+				getFilesFromDataTransfer( event.dataTransfer ).length > 0
 			) {
-				_type = 'file';
+				setIsActive( !! onFilesDrop );
+			} else {
+				setIsActive( !! onDrop && isEligible( event.dataTransfer ) );
 			}
-
-			setType( _type );
 		},
 		onDragEnd() {
+			setIsDraggingOverElement( false );
 			setIsDraggingOverDocument( false );
-			setType( undefined );
+			setIsActive( undefined );
 		},
 		onDragEnter() {
 			setIsDraggingOverElement( true );
@@ -116,85 +113,26 @@ export function DropZoneComponent( {
 			setIsDraggingOverElement( false );
 		},
 	} );
-	const disableMotion = useReducedMotion();
 
-	let children;
-	const backdrop = {
-		hidden: { opacity: 0 },
-		show: {
-			opacity: 1,
-			transition: {
-				type: 'tween',
-				duration: 0.2,
-				delay: 0,
-				delayChildren: 0.1,
-			},
-		},
-		exit: {
-			opacity: 0,
-			transition: {
-				duration: 0.2,
-				delayChildren: 0,
-			},
-		},
-	};
+	const classes = clsx( 'components-drop-zone', className, {
+		'is-active': isActive,
+		'is-dragging-over-document': isDraggingOverDocument,
+		'is-dragging-over-element': isDraggingOverElement,
+	} );
 
-	const foreground = {
-		hidden: { opacity: 0, scale: 0.9 },
-		show: {
-			opacity: 1,
-			scale: 1,
-			transition: {
-				duration: 0.1,
-			},
-		},
-		exit: { opacity: 0, scale: 0.9 },
-	};
-
-	if ( isDraggingOverElement ) {
-		children = (
-			<motion.div
-				variants={ backdrop }
-				initial={ disableMotion ? 'show' : 'hidden' }
-				animate="show"
-				exit={ disableMotion ? 'show' : 'exit' }
-				className="components-drop-zone__content"
-				// Without this, when this div is shown,
-				// Safari calls a onDropZoneLeave causing a loop because of this bug
-				// https://bugs.webkit.org/show_bug.cgi?id=66547
-				style={ { pointerEvents: 'none' } }
-			>
-				<motion.div variants={ foreground }>
+	return (
+		<div { ...restProps } ref={ ref } className={ classes }>
+			<div className="components-drop-zone__content">
+				<div className="components-drop-zone__content-inner">
 					<Icon
-						icon={ upload }
+						icon={ icon }
 						className="components-drop-zone__content-icon"
 					/>
 					<span className="components-drop-zone__content-text">
 						{ label ? label : __( 'Drop files to upload' ) }
 					</span>
-				</motion.div>
-			</motion.div>
-		);
-	}
-
-	const classes = classnames( 'components-drop-zone', className, {
-		'is-active':
-			( isDraggingOverDocument || isDraggingOverElement ) &&
-			( ( type === 'file' && onFilesDrop ) ||
-				( type === 'html' && onHTMLDrop ) ||
-				( type === 'default' && onDrop ) ),
-		'is-dragging-over-document': isDraggingOverDocument,
-		'is-dragging-over-element': isDraggingOverElement,
-		[ `is-dragging-${ type }` ]: !! type,
-	} );
-
-	return (
-		<div { ...restProps } ref={ ref } className={ classes }>
-			{ disableMotion ? (
-				children
-			) : (
-				<AnimatePresence>{ children }</AnimatePresence>
-			) }
+				</div>
+			</div>
 		</div>
 	);
 }

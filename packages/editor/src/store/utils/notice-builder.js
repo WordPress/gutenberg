@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { SAVE_POST_NOTICE_ID, TRASH_POST_NOTICE_ID } from '../constants';
+import { ATTACHMENT_POST_TYPE } from '../constants';
 
 /**
  * Builds the arguments for a success notification dispatch.
@@ -23,21 +23,25 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 		return [];
 	}
 
-	// No notice is shown after trashing a post
-	if ( post.status === 'trash' && previousPost.status !== 'trash' ) {
-		return [];
-	}
-
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = publishStatus.includes( previousPost.status );
 	const willPublish = publishStatus.includes( post.status );
+	const willTrash =
+		post.status === 'trash' && previousPost.status !== 'trash';
 
 	let noticeMessage;
 	let shouldShowLink = postType?.viewable ?? false;
 	let isDraft;
 
 	// Always should a notice, which will be spoken for accessibility.
-	if ( ! isPublished && ! willPublish ) {
+	if ( willTrash ) {
+		noticeMessage = postType.labels.item_trashed;
+		shouldShowLink = false;
+	} else if ( post.type === ATTACHMENT_POST_TYPE ) {
+		// Attachments should always show a simple updated message because they don't have a draft state.
+		noticeMessage = __( 'Media updated.' );
+		shouldShowLink = false;
+	} else if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
 		noticeMessage = __( 'Draft saved.' );
 		isDraft = true;
@@ -63,12 +67,13 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 		actions.push( {
 			label: isDraft ? __( 'View Preview' ) : postType.labels.view_item,
 			url: post.link,
+			openInNewTab: true,
 		} );
 	}
 	return [
 		noticeMessage,
 		{
-			id: SAVE_POST_NOTICE_ID,
+			id: 'editor-save',
 			type: 'snackbar',
 			actions,
 		},
@@ -93,17 +98,42 @@ export function getNotificationArgumentsForSaveFail( data ) {
 
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = publishStatus.indexOf( post.status ) !== -1;
-	// If the post was being published, we show the corresponding publish error message
-	// Unless we publish an "updating failed" message.
+
+	if ( error.code === 'offline_error' ) {
+		const messages = {
+			publish: __(
+				'Publishing failed because you were offline. Please verify your connection and try again.'
+			),
+			private: __(
+				'Publishing failed because you were offline. Please verify your connection and try again.'
+			),
+			future: __(
+				'Scheduling failed because you were offline. Please verify your connection and try again.'
+			),
+			default: __(
+				'Updating failed because you were offline. Please verify your connection and try again.'
+			),
+		};
+
+		const noticeMessage =
+			! isPublished && edits.status in messages
+				? messages[ edits.status ]
+				: messages.default;
+
+		return [ noticeMessage, { id: 'editor-save' } ];
+	}
+
 	const messages = {
 		publish: __( 'Publishing failed.' ),
 		private: __( 'Publishing failed.' ),
 		future: __( 'Scheduling failed.' ),
+		default: __( 'Updating failed.' ),
 	};
+
 	let noticeMessage =
-		! isPublished && publishStatus.indexOf( edits.status ) !== -1
+		! isPublished && edits.status in messages
 			? messages[ edits.status ]
-			: __( 'Updating failed.' );
+			: messages.default;
 
 	// Check if message string contains HTML. Notice text is currently only
 	// supported as plaintext, and stripping the tags may muddle the meaning.
@@ -113,7 +143,7 @@ export function getNotificationArgumentsForSaveFail( data ) {
 	return [
 		noticeMessage,
 		{
-			id: SAVE_POST_NOTICE_ID,
+			id: 'editor-save',
 		},
 	];
 }
@@ -131,7 +161,7 @@ export function getNotificationArgumentsForTrashFail( data ) {
 			? data.error.message
 			: __( 'Trashing failed' ),
 		{
-			id: TRASH_POST_NOTICE_ID,
+			id: 'editor-trash-fail',
 		},
 	];
 }

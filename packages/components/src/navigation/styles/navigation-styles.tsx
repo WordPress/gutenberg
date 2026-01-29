@@ -15,9 +15,8 @@ import { COLORS } from '../../utils/colors-values';
 import Button from '../../button';
 import { Text } from '../../text';
 import { Heading } from '../../heading';
-import { reduceMotion, rtl } from '../../utils';
-import { space } from '../../ui/utils/space';
-import SearchControl from '../../search-control';
+import { rtl, CONFIG } from '../../utils';
+import { space } from '../../utils/space';
 
 export const NavigationUI = styled.div`
 	width: 100%;
@@ -69,6 +68,11 @@ export const MenuTitleUI = styled.div`
 	width: 100%;
 `;
 
+export const MenuTitleSearchControlWrapper = styled.div`
+	margin: 11px 0; // non-ideal hardcoding to maintain same height as Heading, could be improved
+	padding: 1px; // so the focus border doesn't get cut off by the overflow hidden on MenuTitleUI
+`;
+
 export const MenuTitleActionsUI = styled.span`
 	height: ${ space( 6 ) }; // 24px, same height as the buttons inside
 
@@ -91,32 +95,6 @@ export const MenuTitleActionsUI = styled.span`
 	}
 `;
 
-export const MenuTitleSearchUI = styled( SearchControl )`
-	input[type='search'].components-search-control__input {
-		margin: 0;
-		background: #303030;
-		color: #fff;
-
-		&:focus {
-			background: #434343;
-			color: #fff;
-		}
-
-		&::placeholder {
-			color: rgba( 255, 255, 255, 0.6 );
-		}
-	}
-
-	svg {
-		fill: white;
-	}
-
-	.components-button.has-icon {
-		padding: 0;
-		min-width: auto;
-	}
-`;
-
 export const GroupTitleUI = styled( Heading )`
 	min-height: ${ space( 12 ) };
 	align-items: center;
@@ -133,7 +111,7 @@ export const GroupTitleUI = styled( Heading )`
 `;
 
 export const ItemBaseUI = styled.li`
-	border-radius: 2px;
+	border-radius: ${ CONFIG.radiusSmall };
 	color: inherit;
 	margin-bottom: 0;
 
@@ -156,11 +134,12 @@ export const ItemBaseUI = styled.li`
 
 	&.is-active {
 		background-color: ${ COLORS.theme.accent };
-		color: ${ COLORS.white };
+		color: ${ COLORS.theme.accentInverted };
 
 		> button,
+		.components-button:hover,
 		> a {
-			color: ${ COLORS.white };
+			color: ${ COLORS.theme.accentInverted };
 			opacity: 1;
 		}
 	}
@@ -194,8 +173,7 @@ export const ItemBadgeUI = styled.span`
 	margin-right: ${ () => ( isRTL() ? space( 2 ) : '0' ) };
 	display: inline-flex;
 	padding: ${ space( 1 ) } ${ space( 3 ) };
-	border-radius: 2px;
-	animation: fade-in 250ms ease-out;
+	border-radius: ${ CONFIG.radiusSmall };
 
 	@keyframes fade-in {
 		from {
@@ -206,7 +184,9 @@ export const ItemBadgeUI = styled.span`
 		}
 	}
 
-	${ reduceMotion( 'animation' ) };
+	@media not ( prefers-reduced-motion ) {
+		animation: fade-in 250ms ease-out;
+	}
 `;
 
 export const ItemTitleUI = styled( Text )`

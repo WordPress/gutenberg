@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -10,7 +10,8 @@ import Shortcut from '../';
 
 const meta: Meta< typeof Shortcut > = {
 	component: Shortcut,
-	title: 'Components/Shortcut',
+	title: 'Components/Utilities/Shortcut',
+	id: 'components-shortcut',
 	parameters: {
 		controls: {
 			expanded: true,

@@ -9,6 +9,8 @@
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the pages markup in the front-end when it is a descendant of navigation.
  *
+ * @since 5.8.0
+ *
  * @param  array $attributes Block attributes.
  * @param  array $context    Navigation block context.
  * @return array Colors CSS classes and inline styles.
@@ -101,6 +103,8 @@ function block_core_page_list_build_css_colors( $attributes, $context ) {
  * Build an array with CSS classes and inline styles defining the font sizes
  * which will be applied to the pages markup in the front-end when it is a descendant of navigation.
  *
+ * @since 5.8.0
+ *
  * @param  array $context Navigation block context.
  * @return array Font size CSS classes and inline styles.
  */
@@ -134,6 +138,8 @@ function block_core_page_list_build_css_font_sizes( $context ) {
 
 /**
  * Outputs Page list markup from an array of pages with nested children.
+ *
+ * @since 5.8.0
  *
  * @param boolean $open_submenus_on_click Whether to open submenus on click instead of hover.
  * @param boolean $show_submenu_icons Whether to show submenu indicator icons.
@@ -186,7 +192,8 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 			$css_class .= ' menu-item-home';
 		}
 
-		$title      = wp_kses_post( $page['title'] );
+		$title = $page['title'] ? $page['title'] : __( '(no title)' );
+
 		$aria_label = sprintf(
 			/* translators: Accessibility text. %s: Parent page title. */
 			__( '%s submenu' ),
@@ -196,10 +203,10 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 		$markup .= '<li class="wp-block-pages-list__item' . esc_attr( $css_class ) . '"' . $style_attribute . '>';
 
 		if ( isset( $page['children'] ) && $is_navigation_child && $open_submenus_on_click ) {
-			$markup .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="' . esc_attr( $navigation_child_content_class ) . ' wp-block-navigation-submenu__toggle" aria-expanded="false">' . esc_html( $title ) .
+			$markup .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="' . esc_attr( $navigation_child_content_class ) . ' wp-block-navigation-submenu__toggle" aria-expanded="false">' . wp_kses_post( $title ) .
 			'</button><span class="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>';
 		} else {
-			$markup .= '<a class="wp-block-pages-list__item__link' . esc_attr( $navigation_child_content_class ) . '" href="' . esc_url( $page['link'] ) . '"' . $aria_current . '>' . $title . '</a>';
+			$markup .= '<a class="wp-block-pages-list__item__link' . esc_attr( $navigation_child_content_class ) . '" href="' . esc_url( $page['link'] ) . '"' . $aria_current . '>' . wp_kses_post( $title ) . '</a>';
 		}
 
 		if ( isset( $page['children'] ) ) {
@@ -220,6 +227,8 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 /**
  * Outputs nested array of pages
  *
+ * @since 5.8.0
+ *
  * @param array $current_level The level being iterated through.
  * @param array $children The children grouped by parent post ID.
  *
@@ -239,6 +248,8 @@ function block_core_page_list_nest_pages( $current_level, $children ) {
 
 /**
  * Renders the `core/page-list` block on server.
+ *
+ * @since 5.8.0
  *
  * @param array    $attributes The block attributes.
  * @param string   $content    The saved content.
@@ -345,6 +356,8 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 /**
  * Registers the `core/pages` block on server.
+ *
+ * @since 5.8.0
  */
 function register_block_core_page_list() {
 	register_block_type_from_metadata(

@@ -6,7 +6,6 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { TextControl } from '@wordpress/components';
 import { withPreferredColorScheme } from '@wordpress/compose';
 import { useMemo } from '@wordpress/element';
 
@@ -15,6 +14,7 @@ import { useMemo } from '@wordpress/element';
  */
 import styles from './actions.scss';
 import BottomSeparatorCover from './bottom-separator-cover';
+import TextControl from '../text-control';
 
 function PanelActions( { actions, getStylesFromColorScheme } ) {
 	const mappedActions = useMemo( () => {

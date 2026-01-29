@@ -10,8 +10,8 @@ import ToolsPanelHeader from '../tools-panel-header';
 import { ToolsPanelContext } from '../context';
 import { useToolsPanel } from './hook';
 import { Grid } from '../../grid';
-import type { WordPressComponentProps } from '../../ui/context';
-import { contextConnect } from '../../ui/context';
+import type { WordPressComponentProps } from '../../context';
+import { contextConnect } from '../../context';
 import type { ToolsPanelProps } from '../types';
 
 const UnconnectedToolsPanel = (
@@ -25,6 +25,7 @@ const UnconnectedToolsPanel = (
 		resetAllItems,
 		toggleItem,
 		headingLevel,
+		dropdownMenuProps,
 		...toolsPanelProps
 	} = useToolsPanel( props );
 
@@ -36,6 +37,7 @@ const UnconnectedToolsPanel = (
 					resetAll={ resetAllItems }
 					toggleItem={ toggleItem }
 					headingLevel={ headingLevel }
+					dropdownMenuProps={ dropdownMenuProps }
 				/>
 				{ children }
 			</ToolsPanelContext.Provider>
@@ -73,6 +75,7 @@ const UnconnectedToolsPanel = (
  *         onDeselect={ () => setHeight() }
  *       >
  *         <UnitControl
+ *           __next40pxDefaultSize
  *           label={ __( 'Height' ) }
  *           onChange={ setHeight }
  *           value={ height }
@@ -84,6 +87,7 @@ const UnconnectedToolsPanel = (
  *         onDeselect={ () => setWidth() }
  *       >
  *         <UnitControl
+ *           __next40pxDefaultSize
  *           label={ __( 'Width' ) }
  *           onChange={ setWidth }
  *           value={ width }

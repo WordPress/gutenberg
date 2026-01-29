@@ -19,7 +19,7 @@ class MyComponent extends Component {
 	}
 }
 
-class MyComponent extends wp.element.Component {
+class MyComponent extends React.Component {
 	componentDidMount() {
 		setTimeout( fn );
 	}
@@ -48,7 +48,7 @@ class MyNotComponent {
 	}
 }
 
-class MyComponent extends wp.element.Component {
+class MyComponent extends React.Component {
 	componentDidMount() {
 		const { setTimeout } = this.props;
 		setTimeout( fn );

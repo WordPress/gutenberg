@@ -29,6 +29,7 @@ import {
 	VIDEO_ASPECT_RATIO,
 	VideoPlayer,
 	InspectorControls,
+	RichText,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
@@ -71,7 +72,7 @@ class VideoEdit extends Component {
 			this.finishMediaUploadWithFailure.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.onVideoPressed = this.onVideoPressed.bind( this );
-		this.onVideoContanerLayout = this.onVideoContanerLayout.bind( this );
+		this.onVideoContainerLayout = this.onVideoContainerLayout.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 	}
 
@@ -162,7 +163,7 @@ class VideoEdit extends Component {
 	onSelectURL( url ) {
 		const { createErrorNotice, onReplace, setAttributes } = this.props;
 
-		if ( isURL( url ) ) {
+		if ( isURL( url ) && /^https?:/.test( getProtocol( url ) ) ) {
 			// Check if there's an embed block that handles this URL.
 			const embedBlock = createUpgradedEmbedBlock( {
 				attributes: { url },
@@ -178,7 +179,7 @@ class VideoEdit extends Component {
 		}
 	}
 
-	onVideoContanerLayout( event ) {
+	onVideoContainerLayout( event ) {
 		const { width } = event.nativeEvent.layout;
 		const height = width / VIDEO_ASPECT_RATIO;
 		if ( height !== this.state.videoContainerHeight ) {
@@ -217,7 +218,7 @@ class VideoEdit extends Component {
 		const toolbarEditButton = (
 			<MediaUpload
 				allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
-				isReplacingMedia={ true }
+				isReplacingMedia
 				onSelect={ this.onSelectMediaUploadOption }
 				onSelectURL={ this.onSelectURL }
 				render={ ( { open, getMediaOptions } ) => {
@@ -289,8 +290,10 @@ class VideoEdit extends Component {
 						} ) => {
 							const showVideo =
 								isURL( src ) &&
+								getProtocol( attributes.src ) !== 'file:' &&
 								! isUploadInProgress &&
 								! isUploadFailed;
+
 							const icon = this.getIcon(
 								isUploadFailed
 									? ICON_TYPE.RETRY
@@ -318,7 +321,7 @@ class VideoEdit extends Component {
 
 							return (
 								<View
-									onLayout={ this.onVideoContanerLayout }
+									onLayout={ this.onVideoContainerLayout }
 									style={ containerStyle }
 								>
 									{ showVideo && (
@@ -331,7 +334,7 @@ class VideoEdit extends Component {
 												}
 												style={ videoStyle }
 												source={ { uri: src } }
-												paused={ true }
+												paused
 											/>
 										</View>
 									) }
@@ -364,9 +367,9 @@ class VideoEdit extends Component {
 						} }
 					/>
 					<BlockCaption
-						accessible={ true }
+						accessible
 						accessibilityLabelCreator={ ( caption ) =>
-							! caption
+							RichText.isEmpty( caption )
 								? /* translators: accessibility text. Empty video caption. */
 								  __( 'Video caption. Empty' )
 								: sprintf(

@@ -58,7 +58,9 @@ describe( 'withDispatch', () => {
 					} );
 				},
 			};
-		} )( ( props ) => <Button onClick={ props.increment } /> );
+		} )( ( props ) => (
+			<Button __next40pxDefaultSize onClick={ props.increment } />
+		) );
 
 		const { rerender } = render(
 			<RegistryProvider value={ registry }>
@@ -75,7 +77,7 @@ describe( 'withDispatch', () => {
 		);
 
 		// Function value reference should not have changed in props update.
-		// The spy method is only called during inital render.
+		// The spy method is only called during initial render.
 		expect( ButtonSpy ).toHaveBeenCalledTimes( 1 );
 
 		await user.click( screen.getByRole( 'button' ) );

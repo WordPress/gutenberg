@@ -52,9 +52,9 @@
 				]
 			}
 		],
-		"innerHTML": "\n<ul>\n\n\n\n\n\n\n\n\n\n</ul>\n",
+		"innerHTML": "\n<ul class=\"wp-block-list\">\n\n\n\n\n\n\n\n\n\n</ul>\n",
 		"innerContent": [
-			"\n<ul>",
+			"\n<ul class=\"wp-block-list\">",
 			null,
 			"\n\n",
 			null,

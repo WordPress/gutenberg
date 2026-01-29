@@ -6,7 +6,7 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import '../anchor';
+import anchor from '../anchor';
 
 const noop = () => {};
 
@@ -62,14 +62,9 @@ describe( 'anchor', () => {
 	} );
 
 	describe( 'addSaveProps', () => {
-		const getSaveContentExtraProps = applyFilters.bind(
-			null,
-			'blocks.getSaveContent.extraProps'
-		);
-
 		it( 'should do nothing if the block settings do not define anchor support', () => {
 			const attributes = { anchor: 'foo' };
-			const extraProps = getSaveContentExtraProps(
+			const extraProps = anchor.addSaveProps(
 				{},
 				blockSettings,
 				attributes
@@ -80,7 +75,7 @@ describe( 'anchor', () => {
 
 		it( 'should inject anchor attribute ID', () => {
 			const attributes = { anchor: 'foo' };
-			const extraProps = getSaveContentExtraProps(
+			const extraProps = anchor.addSaveProps(
 				{},
 				{
 					...blockSettings,
@@ -96,7 +91,7 @@ describe( 'anchor', () => {
 
 		it( 'should remove an anchor attribute ID when field is cleared', () => {
 			const attributes = { anchor: '' };
-			const extraProps = getSaveContentExtraProps(
+			const extraProps = anchor.addSaveProps(
 				{},
 				{
 					...blockSettings,

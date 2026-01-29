@@ -44,8 +44,6 @@ const ICON_TYPE = {
 	RETRY: 'retry',
 };
 
-export { imageFillStyles } from './media-container.js';
-
 class MediaContainer extends Component {
 	constructor() {
 		super( ...arguments );
@@ -130,9 +128,22 @@ class MediaContainer extends Component {
 		return <Icon icon={ icon } { ...iconStyle } />;
 	}
 
-	updateMediaProgress() {
-		if ( ! this.state.isUploadInProgress ) {
+	updateMediaProgress( payload ) {
+		const { isUploadInProgress } = this.state;
+		const { mediaUrl, state } = payload;
+		const { mediaType, onMediaThumbnailUpdate } = this.props;
+
+		if ( ! isUploadInProgress ) {
 			this.setState( { isUploadInProgress: true } );
+		}
+
+		if (
+			isUploadInProgress &&
+			mediaType === MEDIA_TYPE_IMAGE &&
+			mediaUrl &&
+			! state
+		) {
+			onMediaThumbnailUpdate( mediaUrl );
 		}
 	}
 
@@ -160,7 +171,7 @@ class MediaContainer extends Component {
 	renderImage( params, openMediaOptions ) {
 		const { isUploadInProgress } = this.state;
 		const {
-			aligmentStyles,
+			alignmentStyles,
 			focalPoint,
 			imageFill,
 			isMediaSelected,
@@ -170,7 +181,7 @@ class MediaContainer extends Component {
 			mediaWidth,
 			shouldStack,
 		} = this.props;
-		const { isUploadFailed, retryMessage } = params;
+		const { isUploadFailed, isUploadPaused, retryMessage } = params;
 		const focalPointValues = ! focalPoint
 			? IMAGE_DEFAULT_FOCAL_POINT
 			: focalPoint;
@@ -194,7 +205,7 @@ class MediaContainer extends Component {
 						style={ [
 							imageFill && styles.imageCropped,
 							styles.mediaImageContainer,
-							! isUploadInProgress && aligmentStyles,
+							! isUploadInProgress && alignmentStyles,
 						] }
 					>
 						<Image
@@ -203,6 +214,7 @@ class MediaContainer extends Component {
 							focalPoint={ imageFill && focalPointValues }
 							isSelected={ isMediaSelected }
 							isUploadFailed={ isUploadFailed }
+							isUploadPaused={ isUploadPaused }
 							isUploadInProgress={ isUploadInProgress }
 							onSelectMediaUploadOption={
 								this.onSelectMediaUploadOption
@@ -220,7 +232,7 @@ class MediaContainer extends Component {
 
 	renderVideo( params ) {
 		const {
-			aligmentStyles,
+			alignmentStyles,
 			mediaUrl,
 			isSelected,
 			getStylesFromColorScheme,
@@ -249,7 +261,7 @@ class MediaContainer extends Component {
 					onPress={ this.onMediaPressed }
 					disabled={ ! isSelected }
 				>
-					<View style={ [ styles.videoContainer, aligmentStyles ] }>
+					<View style={ [ styles.videoContainer, alignmentStyles ] }>
 						<View
 							style={ [
 								styles.videoContent,
@@ -264,7 +276,7 @@ class MediaContainer extends Component {
 										isSelected={ isSelected }
 										style={ styles.video }
 										source={ { uri: mediaUrl } }
-										paused={ true }
+										paused
 									/>
 								</View>
 							) }
@@ -316,7 +328,7 @@ class MediaContainer extends Component {
 				onSelect={ this.onSelectMediaUploadOption }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onFocus={ this.props.onFocus }
-				className={ 'no-block-outline' }
+				className="no-block-outline"
 			/>
 		);
 	}
@@ -328,7 +340,7 @@ class MediaContainer extends Component {
 		if ( mediaUrl ) {
 			return (
 				<MediaUpload
-					isReplacingMedia={ true }
+					isReplacingMedia
 					onSelect={ this.onSelectMediaUploadOption }
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ mediaId }
@@ -340,6 +352,9 @@ class MediaContainer extends Component {
 								{ getMediaOptions() }
 
 								<MediaUploadProgress
+									enablePausedUploads={
+										mediaType === MEDIA_TYPE_IMAGE
+									}
 									coverUrl={ coverUrl }
 									mediaId={ mediaId }
 									onUpdateMediaProgress={

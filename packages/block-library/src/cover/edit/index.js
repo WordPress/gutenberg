@@ -1,9 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
-import { extend } from 'colord';
-import namesPlugin from 'colord/plugins/names';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -16,10 +14,11 @@ import {
 	withColors,
 	ColorPalette,
 	useBlockProps,
-	useSetting,
+	useSettings,
 	useInnerBlocksProps,
 	__experimentalUseGradient,
 	store as blockEditorStore,
+	useBlockEditingMode,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -33,25 +32,35 @@ import {
 	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	EMBED_VIDEO_BACKGROUND_TYPE,
 	dimRatioToClass,
 	isContentPositionCenter,
 	getPositionClassName,
 	mediaPosition,
-	getCoverIsDark,
 } from '../shared';
 import CoverInspectorControls from './inspector-controls';
 import CoverBlockControls from './block-controls';
 import CoverPlaceholder from './cover-placeholder';
 import ResizableCoverPopover from './resizable-cover-popover';
-
-extend( [ namesPlugin ] );
+import {
+	getMediaColor,
+	compositeIsDark,
+	DEFAULT_BACKGROUND_COLOR,
+	DEFAULT_OVERLAY_COLOR,
+} from './color-utils';
+import { DEFAULT_MEDIA_SIZE_SLUG } from '../constants';
+import { getIframeSrc, getBackgroundVideoSrc } from '../embed-video-utils';
 
 function getInnerBlocksTemplate( attributes ) {
 	return [
 		[
 			'core/paragraph',
 			{
-				align: 'center',
+				style: {
+					typography: {
+						textAlign: 'center',
+					},
+				},
 				placeholder: __( 'Write title…' ),
 				...attributes,
 			},
@@ -83,6 +92,8 @@ function CoverEdit( {
 	const {
 		contentPosition,
 		id,
+		url: originalUrl,
+		backgroundType: originalBackgroundType,
 		useFeaturedImage,
 		dimRatio,
 		focalPoint,
@@ -95,6 +106,9 @@ function CoverEdit( {
 		allowedBlocks,
 		templateLock,
 		tagName: TagName = 'div',
+		isUserOverlayColor,
+		sizeSlug,
+		poster,
 	} = attributes;
 
 	const [ featuredImage ] = useEntityProp(
@@ -103,35 +117,63 @@ function CoverEdit( {
 		'featured_media',
 		postId
 	);
+	const { getSettings } = useSelect( blockEditorStore );
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-	const media = useSelect(
-		( select ) =>
-			featuredImage &&
-			select( coreStore ).getMedia( featuredImage, { context: 'view' } ),
-		[ featuredImage ]
+	const { media } = useSelect(
+		( select ) => {
+			return {
+				media:
+					featuredImage && useFeaturedImage
+						? select( coreStore ).getEntityRecord(
+								'postType',
+								'attachment',
+								featuredImage,
+								{
+									context: 'view',
+								}
+						  )
+						: undefined,
+			};
+		},
+		[ featuredImage, useFeaturedImage ]
 	);
-	const mediaUrl = media?.source_url;
+	const mediaUrl =
+		media?.media_details?.sizes?.[ sizeSlug ]?.source_url ??
+		media?.source_url;
 
+	// User can change the featured image outside of the block, but we still
+	// need to update the block when that happens. This effect should only
+	// run when the featured image changes in that case. All other cases are
+	// handled in their respective callbacks.
 	useEffect( () => {
-		async function setIsDark() {
-			__unstableMarkNextChangeAsNotPersistent();
-			const isDarkSetting = await getCoverIsDark(
-				mediaUrl,
+		( async () => {
+			if ( ! useFeaturedImage ) {
+				return;
+			}
+
+			const averageBackgroundColor = await getMediaColor( mediaUrl );
+
+			let newOverlayColor = overlayColor.color;
+			if ( ! isUserOverlayColor ) {
+				newOverlayColor = averageBackgroundColor;
+				__unstableMarkNextChangeAsNotPersistent();
+				setOverlayColor( newOverlayColor );
+			}
+
+			const newIsDark = compositeIsDark(
 				dimRatio,
-				overlayColor.color
+				newOverlayColor,
+				averageBackgroundColor
 			);
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
-				isDark: isDarkSetting,
+				isDark: newIsDark,
+				isUserOverlayColor: isUserOverlayColor || false,
 			} );
-		}
-		if ( useFeaturedImage ) {
-			setIsDark();
-		}
-		// We only ever want to run this effect if the mediaUrl changes.
-		// All other changes to the isDark state are handled in the appropriate event handlers.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		} )();
+		// Update the block only when the featured image changes.
 	}, [ mediaUrl ] );
 
 	// instead of destructuring the attributes
@@ -141,32 +183,99 @@ function CoverEdit( {
 	const url = useFeaturedImage
 		? mediaUrl
 		: // Ensure the url is not malformed due to sanitization through `wp_kses`.
-		  attributes.url?.replaceAll( '&amp;', '&' );
+		  originalUrl?.replaceAll( '&amp;', '&' );
 	const backgroundType = useFeaturedImage
 		? IMAGE_BACKGROUND_TYPE
-		: attributes.backgroundType;
+		: originalBackgroundType;
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { gradientClass, gradientValue } = __experimentalUseGradient();
-	const setMedia = attributesFromMedia( setAttributes, dimRatio );
 
 	const onSelectMedia = async ( newMedia ) => {
-		// Only pass the url to getCoverIsDark if the media is an image as video is not handled.
-		const newUrl = newMedia?.type === 'image' ? newMedia.url : undefined;
-		const isDarkSetting = await getCoverIsDark(
-			newUrl,
-			dimRatio,
-			overlayColor.color
+		const mediaAttributes = attributesFromMedia( newMedia );
+		const isImage = [ newMedia?.type, newMedia?.media_type ].includes(
+			IMAGE_BACKGROUND_TYPE
 		);
-		setMedia( newMedia, isDarkSetting );
+
+		const averageBackgroundColor = await getMediaColor(
+			isImage ? newMedia?.url : undefined
+		);
+
+		let newOverlayColor = overlayColor.color;
+		if ( ! isUserOverlayColor ) {
+			newOverlayColor = averageBackgroundColor;
+			setOverlayColor( newOverlayColor );
+
+			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			__unstableMarkNextChangeAsNotPersistent();
+		}
+
+		// Only set a new dimRatio if there was no previous media selected
+		// to avoid resetting to 50 if it has been explicitly set to 100.
+		// See issue #52835 for context.
+		const newDimRatio =
+			originalUrl === undefined && dimRatio === 100 ? 50 : dimRatio;
+
+		const newIsDark = compositeIsDark(
+			newDimRatio,
+			newOverlayColor,
+			averageBackgroundColor
+		);
+
+		if ( backgroundType === IMAGE_BACKGROUND_TYPE && mediaAttributes?.id ) {
+			const { imageDefaultSize } = getSettings();
+
+			// Try to use the previous selected image size if it's available
+			// otherwise try the default image size or fallback to full size.
+			if (
+				sizeSlug &&
+				( newMedia?.sizes?.[ sizeSlug ] ||
+					newMedia?.media_details?.sizes?.[ sizeSlug ] )
+			) {
+				mediaAttributes.sizeSlug = sizeSlug;
+				mediaAttributes.url =
+					newMedia?.sizes?.[ sizeSlug ]?.url ||
+					newMedia?.media_details?.sizes?.[ sizeSlug ]?.source_url;
+			} else if (
+				newMedia?.sizes?.[ imageDefaultSize ] ||
+				newMedia?.media_details?.sizes?.[ imageDefaultSize ]
+			) {
+				mediaAttributes.sizeSlug = imageDefaultSize;
+				mediaAttributes.url =
+					newMedia?.sizes?.[ imageDefaultSize ]?.url ||
+					newMedia?.media_details?.sizes?.[ imageDefaultSize ]
+						?.source_url;
+			} else {
+				mediaAttributes.sizeSlug = DEFAULT_MEDIA_SIZE_SLUG;
+			}
+		}
+
+		setAttributes( {
+			...mediaAttributes,
+			focalPoint: undefined,
+			useFeaturedImage: undefined,
+			dimRatio: newDimRatio,
+			isDark: newIsDark,
+			isUserOverlayColor: isUserOverlayColor || false,
+		} );
 	};
 
-	const onClearMedia = async () => {
-		const isDarkSetting = await getCoverIsDark(
-			undefined,
+	const onClearMedia = () => {
+		let newOverlayColor = overlayColor.color;
+		if ( ! isUserOverlayColor ) {
+			newOverlayColor = DEFAULT_OVERLAY_COLOR;
+			setOverlayColor( undefined );
+
+			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			__unstableMarkNextChangeAsNotPersistent();
+		}
+
+		const newIsDark = compositeIsDark(
 			dimRatio,
-			overlayColor.color
+			newOverlayColor,
+			DEFAULT_BACKGROUND_COLOR
 		);
+
 		setAttributes( {
 			url: undefined,
 			id: undefined,
@@ -174,46 +283,121 @@ function CoverEdit( {
 			focalPoint: undefined,
 			hasParallax: undefined,
 			isRepeated: undefined,
-			useFeaturedImage: false,
-			isDark: isDarkSetting,
+			useFeaturedImage: undefined,
+			isDark: newIsDark,
 		} );
 	};
 
-	const onSetOverlayColor = async ( colorValue ) => {
-		const isDarkSetting = await getCoverIsDark( url, dimRatio, colorValue );
-		setOverlayColor( colorValue );
+	const onSetOverlayColor = async ( newOverlayColor ) => {
+		const averageBackgroundColor = await getMediaColor( url );
+		const newIsDark = compositeIsDark(
+			dimRatio,
+			newOverlayColor,
+			averageBackgroundColor
+		);
+
+		setOverlayColor( newOverlayColor );
+
+		// Make undo revert the next setAttributes and the previous setOverlayColor.
 		__unstableMarkNextChangeAsNotPersistent();
+
 		setAttributes( {
-			isDark: isDarkSetting,
+			isUserOverlayColor: true,
+			isDark: newIsDark,
 		} );
 	};
 
 	const onUpdateDimRatio = async ( newDimRatio ) => {
-		const isDarkSetting = await getCoverIsDark(
-			url,
+		const averageBackgroundColor = await getMediaColor( url );
+		const newIsDark = compositeIsDark(
 			newDimRatio,
-			overlayColor.color
+			overlayColor.color,
+			averageBackgroundColor
 		);
 
 		setAttributes( {
 			dimRatio: newDimRatio,
-			isDark: isDarkSetting,
+			isDark: newIsDark,
 		} );
 	};
-
-	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const onUploadError = ( message ) => {
 		createErrorNotice( message, { type: 'snackbar' } );
 	};
 
+	const onSelectEmbedUrl = ( embedUrl ) => {
+		// Only set a new dimRatio if there was no previous media selected
+		// to avoid resetting to 50 if it has been explicitly set to 100.
+		const newDimRatio =
+			originalUrl === undefined && dimRatio === 100 ? 50 : dimRatio;
+
+		// Set initial attributes with URL
+		setAttributes( {
+			url: embedUrl,
+			backgroundType: EMBED_VIDEO_BACKGROUND_TYPE,
+			dimRatio: newDimRatio,
+			id: undefined,
+			focalPoint: undefined,
+			hasParallax: undefined,
+			isRepeated: undefined,
+			useFeaturedImage: undefined,
+		} );
+	};
+
+	// Fetch embed preview for embed videos
+	const { embedPreview, isFetchingEmbed } = useSelect(
+		( select ) => {
+			if ( backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE || ! url ) {
+				return {
+					embedPreview: undefined,
+					isFetchingEmbed: false,
+				};
+			}
+
+			const { getEmbedPreview, isRequestingEmbedPreview } =
+				select( coreStore );
+
+			return {
+				embedPreview: getEmbedPreview( url ),
+				isFetchingEmbed: isRequestingEmbedPreview( url ),
+			};
+		},
+		[ url, backgroundType ]
+	);
+
+	// Compute embedSrc on-the-fly from embed preview for editor display
+	const embedSrc = useMemo( () => {
+		if (
+			backgroundType !== EMBED_VIDEO_BACKGROUND_TYPE ||
+			! embedPreview?.html
+		) {
+			return null;
+		}
+
+		// Extract iframe src from embed HTML
+		const iframeSrc = getIframeSrc( embedPreview.html );
+		if ( ! iframeSrc ) {
+			return null;
+		}
+
+		// Modify the src to add background video parameters (provider auto-detected)
+		return getBackgroundVideoSrc( iframeSrc );
+	}, [ embedPreview, backgroundType ] );
+
+	const isUploadingMedia = isTemporaryMedia( id, url );
+
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+	const isEmbedVideoBackground =
+		EMBED_VIDEO_BACKGROUND_TYPE === backgroundType;
+
+	const blockEditingMode = useBlockEditingMode();
+	const hasNonContentControls = blockEditingMode === 'default';
 
 	const [ resizeListener, { height, width } ] = useResizeObserver();
 	const resizableBoxDimensions = useMemo( () => {
 		return {
-			height: minHeightUnit === 'px' ? minHeight : 'auto',
+			height: minHeightUnit === 'px' && minHeight ? minHeight : 'auto',
 			width: 'auto',
 		};
 	}, [ minHeight, minHeightUnit ] );
@@ -254,7 +438,8 @@ function CoverEdit( {
 	const blockProps = useBlockProps( { ref } );
 
 	// Check for fontSize support before we pass a fontSize attribute to the innerBlocks.
-	const hasFontSizes = !! useSetting( 'typography.fontSizes' )?.length;
+	const [ fontSizes ] = useSettings( 'typography.fontSizes' );
+	const hasFontSizes = fontSizes?.length > 0;
 	const innerBlocksTemplate = getInnerBlocksTemplate( {
 		fontSize: hasFontSizes ? 'large' : undefined,
 	} );
@@ -270,6 +455,7 @@ function CoverEdit( {
 			templateInsertUpdatesSelection: true,
 			allowedBlocks,
 			templateLock,
+			dropZoneElement: ref.current,
 		}
 	);
 
@@ -285,18 +471,43 @@ function CoverEdit( {
 	};
 
 	const toggleUseFeaturedImage = async () => {
-		const isDarkSetting = await ( useFeaturedImage
-			? getCoverIsDark( undefined, dimRatio, overlayColor.color )
-			: getCoverIsDark( mediaUrl, dimRatio, overlayColor.color ) );
+		const newUseFeaturedImage = ! useFeaturedImage;
+
+		const averageBackgroundColor = newUseFeaturedImage
+			? await getMediaColor( mediaUrl )
+			: DEFAULT_BACKGROUND_COLOR;
+
+		const newOverlayColor = ! isUserOverlayColor
+			? averageBackgroundColor
+			: overlayColor.color;
+
+		if ( ! isUserOverlayColor ) {
+			if ( newUseFeaturedImage ) {
+				setOverlayColor( newOverlayColor );
+			} else {
+				setOverlayColor( undefined );
+			}
+
+			// Make undo revert the next setAttributes and the previous setOverlayColor.
+			__unstableMarkNextChangeAsNotPersistent();
+		}
+
+		const newDimRatio = dimRatio === 100 ? 50 : dimRatio;
+		const newIsDark = compositeIsDark(
+			newDimRatio,
+			newOverlayColor,
+			averageBackgroundColor
+		);
+
 		setAttributes( {
 			id: undefined,
 			url: undefined,
-			useFeaturedImage: ! useFeaturedImage,
-			dimRatio: dimRatio === 100 ? 50 : dimRatio,
+			useFeaturedImage: newUseFeaturedImage,
+			dimRatio: newDimRatio,
 			backgroundType: useFeaturedImage
 				? IMAGE_BACKGROUND_TYPE
 				: undefined,
-			isDark: isDarkSetting,
+			isDark: newIsDark,
 		} );
 	};
 
@@ -305,8 +516,11 @@ function CoverEdit( {
 			attributes={ attributes }
 			setAttributes={ setAttributes }
 			onSelectMedia={ onSelectMedia }
+			onSelectEmbedUrl={ onSelectEmbedUrl }
 			currentSettings={ currentSettings }
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
+			onClearMedia={ onClearMedia }
+			blockEditingMode={ blockEditingMode }
 		/>
 	);
 
@@ -321,6 +535,7 @@ function CoverEdit( {
 			toggleUseFeaturedImage={ toggleUseFeaturedImage }
 			updateDimRatio={ onUpdateDimRatio }
 			onClearMedia={ onClearMedia }
+			featuredImage={ media }
 		/>
 	);
 
@@ -340,7 +555,8 @@ function CoverEdit( {
 			toggleSelection( true );
 			setAttributes( { minHeight: newMinHeight } );
 		},
-		showHandle: true,
+		// Hide the resize handle if an aspect ratio is set, as the aspect ratio takes precedence.
+		showHandle: ! attributes.style?.dimensions?.aspectRatio,
 		size: resizableBoxDimensions,
 		width,
 	};
@@ -350,15 +566,12 @@ function CoverEdit( {
 			<>
 				{ blockControls }
 				{ inspectorControls }
-				{ isSelected && (
+				{ hasNonContentControls && isSelected && (
 					<ResizableCoverPopover { ...resizableCoverProps } />
 				) }
 				<TagName
 					{ ...blockProps }
-					className={ classnames(
-						'is-placeholder',
-						blockProps.className
-					) }
+					className={ clsx( 'is-placeholder', blockProps.className ) }
 					style={ {
 						...blockProps.style,
 						minHeight: minHeightWithUnit || undefined,
@@ -372,10 +585,12 @@ function CoverEdit( {
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
-								disableCustomColors={ true }
+								disableCustomColors
 								value={ overlayColor.color }
 								onChange={ onSetOverlayColor }
 								clearable={ false }
+								asButtons
+								aria-label={ __( 'Overlay color' ) }
 							/>
 						</div>
 					</CoverPlaceholder>
@@ -384,7 +599,7 @@ function CoverEdit( {
 		);
 	}
 
-	const classes = classnames(
+	const classes = clsx(
 		{
 			'is-dark-theme': isDark,
 			'is-light': ! isDark,
@@ -397,21 +612,84 @@ function CoverEdit( {
 		getPositionClassName( contentPosition )
 	);
 
+	const showOverlay =
+		url || ! useFeaturedImage || ( useFeaturedImage && ! url );
+
 	return (
 		<>
 			{ blockControls }
 			{ inspectorControls }
 			<TagName
 				{ ...blockProps }
-				className={ classnames( classes, blockProps.className ) }
+				className={ clsx( classes, blockProps.className ) }
 				style={ { ...style, ...blockProps.style } }
 				data-url={ url }
 			>
 				{ resizeListener }
-				{ ( ! useFeaturedImage || url ) && (
+
+				{ ! url && useFeaturedImage && (
+					<Placeholder
+						className="wp-block-cover__image--placeholder-image"
+						withIllustration
+					/>
+				) }
+
+				{ url &&
+					isImageBackground &&
+					( isImgElement ? (
+						<img
+							ref={ mediaElement }
+							className="wp-block-cover__image-background"
+							alt={ alt }
+							src={ url }
+							style={ mediaStyle }
+						/>
+					) : (
+						<div
+							ref={ mediaElement }
+							role={ alt ? 'img' : undefined }
+							aria-label={ alt ? alt : undefined }
+							className={ clsx(
+								classes,
+								'wp-block-cover__image-background'
+							) }
+							style={ { backgroundImage, backgroundPosition } }
+						/>
+					) ) }
+				{ url && isVideoBackground && (
+					<video
+						ref={ mediaElement }
+						className="wp-block-cover__video-background"
+						autoPlay
+						muted
+						loop
+						src={ url }
+						poster={ poster }
+						style={ mediaStyle }
+					/>
+				) }
+				{ isEmbedVideoBackground && embedSrc && (
+					<div
+						ref={ mediaElement }
+						className="wp-block-cover__video-background wp-block-cover__embed-background"
+						style={ mediaStyle }
+					>
+						<iframe
+							src={ embedSrc }
+							title="Background video"
+							frameBorder="0"
+							allow="autoplay; fullscreen"
+						/>
+					</div>
+				) }
+				{ isEmbedVideoBackground && ! embedSrc && isFetchingEmbed && (
+					<Spinner />
+				) }
+
+				{ showOverlay && (
 					<span
 						aria-hidden="true"
-						className={ classnames(
+						className={ clsx(
 							'wp-block-cover__background',
 							dimRatioToClass( dimRatio ),
 							{
@@ -430,46 +708,8 @@ function CoverEdit( {
 					/>
 				) }
 
-				{ ! url && useFeaturedImage && (
-					<Placeholder
-						className="wp-block-cover__image--placeholder-image"
-						withIllustration={ true }
-					/>
-				) }
-
-				{ url &&
-					isImageBackground &&
-					( isImgElement ? (
-						<img
-							ref={ mediaElement }
-							className="wp-block-cover__image-background"
-							alt={ alt }
-							src={ url }
-							style={ mediaStyle }
-						/>
-					) : (
-						<div
-							ref={ mediaElement }
-							role="img"
-							className={ classnames(
-								classes,
-								'wp-block-cover__image-background'
-							) }
-							style={ { backgroundImage, backgroundPosition } }
-						/>
-					) ) }
-				{ url && isVideoBackground && (
-					<video
-						ref={ mediaElement }
-						className="wp-block-cover__video-background"
-						autoPlay
-						muted
-						loop
-						src={ url }
-						style={ mediaStyle }
-					/>
-				) }
 				{ isUploadingMedia && <Spinner /> }
+
 				<CoverPlaceholder
 					disableMediaButtons
 					onSelectMedia={ onSelectMedia }
@@ -478,7 +718,7 @@ function CoverEdit( {
 				/>
 				<div { ...innerBlocksProps } />
 			</TagName>
-			{ isSelected && (
+			{ hasNonContentControls && isSelected && (
 				<ResizableCoverPopover { ...resizableCoverProps } />
 			) }
 		</>

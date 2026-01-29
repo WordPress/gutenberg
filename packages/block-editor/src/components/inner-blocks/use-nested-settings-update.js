@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useMemo, useState } from '@wordpress/element';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useLayoutEffect, useState } from '@wordpress/element';
+import { useRegistry } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isShallowEqual } from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -16,12 +16,21 @@ import { getLayoutType } from '../../layouts';
 
 const pendingSettingsUpdates = new WeakMap();
 
+// Creates a memoizing caching function that remembers the last value and keeps returning it
+// as long as the new values are shallowly equal. Helps keep dependencies stable.
+function createShallowMemo() {
+	let value;
+	return ( newValue ) => {
+		if ( value === undefined || ! isShallowEqual( value, newValue ) ) {
+			value = newValue;
+		}
+		return value;
+	};
+}
+
 function useShallowMemo( value ) {
-	const [ prevValue, setPrevValue ] = useState( value );
-	if ( ! isShallowEqual( prevValue, value ) ) {
-		setPrevValue( value );
-	}
-	return prevValue;
+	const [ memo ] = useState( createShallowMemo );
+	return memo( value );
 }
 
 /**
@@ -32,15 +41,16 @@ function useShallowMemo( value ) {
  * came from props.
  *
  * @param {string}               clientId                   The client ID of the block to update.
+ * @param {string}               parentLock
  * @param {string[]}             allowedBlocks              An array of block names which are permitted
  *                                                          in inner blocks.
  * @param {string[]}             prioritizedInserterBlocks  Block names and/or block variations to be prioritized in the inserter, in the format {blockName}/{variationName}.
  * @param {?WPDirectInsertBlock} defaultBlock               The default block to insert: [ blockName, { blockAttributes } ].
- * @param {?Function|boolean}    directInsert               If a default block should be inserted directly by the appender.
+ * @param {?boolean}             directInsert               If a default block should be inserted directly by the appender.
  *
  * @param {?WPDirectInsertBlock} __experimentalDefaultBlock A deprecated prop for the default block to insert: [ blockName, { blockAttributes } ]. Use `defaultBlock` instead.
  *
- * @param {?Function|boolean}    __experimentalDirectInsert A deprecated prop for whether a default block should be inserted directly by the appender. Use `directInsert` instead.
+ * @param {?boolean}             __experimentalDirectInsert A deprecated prop for whether a default block should be inserted directly by the appender. Use `directInsert` instead.
  *
  * @param {string}               [templateLock]             The template lock specified for the inner
  *                                                          blocks component. (e.g. "all")
@@ -53,6 +63,7 @@ function useShallowMemo( value ) {
  */
 export default function useNestedSettingsUpdate(
 	clientId,
+	parentLock,
 	allowedBlocks,
 	prioritizedInserterBlocks,
 	defaultBlock,
@@ -64,20 +75,10 @@ export default function useNestedSettingsUpdate(
 	orientation,
 	layout
 ) {
-	const { updateBlockListSettings } = useDispatch( blockEditorStore );
-	const registry = useRegistry();
+	// Instead of adding a useSelect mapping here, please add to the useSelect
+	// mapping in InnerBlocks! Every subscription impacts performance.
 
-	const { parentLock } = useSelect(
-		( select ) => {
-			const rootClientId =
-				select( blockEditorStore ).getBlockRootClientId( clientId );
-			return {
-				parentLock:
-					select( blockEditorStore ).getTemplateLock( rootClientId ),
-			};
-		},
-		[ clientId ]
-	);
+	const registry = useRegistry();
 
 	// Implementors often pass a new array on every render,
 	// and the contents of the arrays are just strings, so the entire array
@@ -85,10 +86,7 @@ export default function useNestedSettingsUpdate(
 	// otherwise if the arrays change length but the first elements are equal the comparison,
 	// does not works as expected.
 	const _allowedBlocks = useShallowMemo( allowedBlocks );
-
-	const _prioritizedInserterBlocks = useMemo(
-		() => prioritizedInserterBlocks,
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+	const _prioritizedInserterBlocks = useShallowMemo(
 		prioritizedInserterBlocks
 	);
 
@@ -145,6 +143,16 @@ export default function useNestedSettingsUpdate(
 			newSettings.directInsert = directInsert;
 		}
 
+		if (
+			newSettings.directInsert !== undefined &&
+			typeof newSettings.directInsert !== 'boolean'
+		) {
+			deprecated( 'Using `Function` as a `directInsert` argument', {
+				alternative: '`boolean` values',
+				since: '6.5',
+			} );
+		}
+
 		// Batch updates to block list settings to avoid triggering cascading renders
 		// for each container block included in a tree and optimize initial render.
 		// To avoid triggering updateBlockListSettings for each container block
@@ -152,21 +160,16 @@ export default function useNestedSettingsUpdate(
 		// we batch all the updatedBlockListSettings in a single "data" batch
 		// which results in a single re-render.
 		if ( ! pendingSettingsUpdates.get( registry ) ) {
-			pendingSettingsUpdates.set( registry, [] );
+			pendingSettingsUpdates.set( registry, {} );
 		}
-		pendingSettingsUpdates
-			.get( registry )
-			.push( [ clientId, newSettings ] );
+		pendingSettingsUpdates.get( registry )[ clientId ] = newSettings;
 		window.queueMicrotask( () => {
-			if ( pendingSettingsUpdates.get( registry )?.length ) {
-				registry.batch( () => {
-					pendingSettingsUpdates
-						.get( registry )
-						.forEach( ( args ) => {
-							updateBlockListSettings( ...args );
-						} );
-					pendingSettingsUpdates.set( registry, [] );
-				} );
+			const settings = pendingSettingsUpdates.get( registry );
+			if ( Object.keys( settings ).length ) {
+				const { updateBlockListSettings } =
+					registry.dispatch( blockEditorStore );
+				updateBlockListSettings( settings );
+				pendingSettingsUpdates.set( registry, {} );
 			}
 		} );
 	}, [
@@ -180,7 +183,6 @@ export default function useNestedSettingsUpdate(
 		__experimentalDirectInsert,
 		captureToolbars,
 		orientation,
-		updateBlockListSettings,
 		layout,
 		registry,
 	] );

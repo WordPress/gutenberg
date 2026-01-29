@@ -2,13 +2,16 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useContext, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { BlockListBlockContext } from '../block-list/block-list-block-context';
+import {
+	useBlockEditContext,
+	blockEditingModeKey,
+} from '../block-edit/context';
 
 /**
  * @typedef {'disabled'|'contentOnly'|'default'} BlockEditingMode
@@ -45,14 +48,16 @@ import { BlockListBlockContext } from '../block-list/block-list-block-context';
  * @return {BlockEditingMode} The current editing mode.
  */
 export function useBlockEditingMode( mode ) {
-	const { clientId = '' } = useContext( BlockListBlockContext ) ?? {};
-	const blockEditingMode = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlockEditingMode( clientId ),
-		[ clientId ]
-	);
+	const context = useBlockEditContext();
+	const { clientId = '' } = context;
 	const { setBlockEditingMode, unsetBlockEditingMode } =
 		useDispatch( blockEditorStore );
+	const globalBlockEditingMode = useSelect(
+		( select ) =>
+			// Avoid adding the subscription if not needed!
+			clientId ? null : select( blockEditorStore ).getBlockEditingMode(),
+		[ clientId ]
+	);
 	useEffect( () => {
 		if ( mode ) {
 			setBlockEditingMode( clientId, mode );
@@ -63,5 +68,5 @@ export function useBlockEditingMode( mode ) {
 			}
 		};
 	}, [ clientId, mode, setBlockEditingMode, unsetBlockEditingMode ] );
-	return blockEditingMode;
+	return clientId ? context[ blockEditingModeKey ] : globalBlockEditingMode;
 }

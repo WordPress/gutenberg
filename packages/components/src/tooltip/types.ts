@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import type { Placement } from '@floating-ui/react-dom';
+
+/**
  * Internal dependencies
  */
 import type { PopoverProps } from '../popover/types';
@@ -12,6 +17,10 @@ export type TooltipProps = {
 	 */
 	children: React.ReactElement;
 	/**
+	 * Custom class name for the tooltip.
+	 */
+	className?: string;
+	/**
 	 * Option to hide the tooltip when the anchor is clicked.
 	 *
 	 * @default true
@@ -24,10 +33,20 @@ export type TooltipProps = {
 	 */
 	delay?: number;
 	/**
-	 * The direction in which the tooltip should open relative to its parent node.
+	 * Where the tooltip should be positioned relative to its parent.
+	 *
+	 * @default bottom
+	 */
+	placement?: Placement;
+	/**
+	 * _Note: this prop is deprecated. Please use the `placement` prop instead._
+	 *
+	 * Legacy way of specifying the tooltip's position relative to its parent.
+	 *
 	 * Specify y- and x-axis as a space-separated string. Supports `"top"`,
 	 * `"bottom"` y axis, and `"left"`, `"center"`, `"right"` x axis.
 	 *
+	 * @deprecated
 	 * @default bottom
 	 */
 	position?: PopoverProps[ 'position' ];
@@ -43,4 +62,8 @@ export type TooltipProps = {
 	 * The text shown in the tooltip when anchor element is focused or hovered.
 	 */
 	text?: string;
+};
+
+export type TooltipInternalContext = {
+	isNestedInTooltip: boolean;
 };

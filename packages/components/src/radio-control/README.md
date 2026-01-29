@@ -5,12 +5,6 @@ Use radio buttons when you want users to select one option from a set, and you w
 ![](https://make.wordpress.org/design/files/2018/11/radio.png)
 Selected and unselected radio buttons
 
-## Table of contents
-
-1. [Design guidelines](#design-guidelines)
-2. [Development guidelines](#development-guidelines)
-3. [Related components](#related-components)
-
 ## Design guidelines
 
 ### Usage
@@ -26,12 +20,12 @@ If you have a list of available options that can be collapsed, consider using a 
 
 #### Do
 
-![](https://make.wordpress.org/design/files/2018/11/radio-usage-do.png)
+![Right: A screenshot showing two radio buttons for "Author" and "Editor", one checked](https://github.com/WordPress/gutenberg/assets/10128264/77da4e95-b038-43e7-bd29-11282cc2bac7)
 Use radio buttons when only one item can be selected from a list.
 
 #### Don’t
 
-![](https://make.wordpress.org/design/files/2018/11/radio-usage-dont.png)
+![Wrong: A screenshot showing two checkboxes for "Author" and "Editor", one checked](https://github.com/WordPress/gutenberg/assets/10128264/214f37a8-2080-4c10-a4b5-b011e0875f18)
 Don’t use checkboxes when only one item can be selected from a list. Use radio buttons instead.
 
 #### Defaults
@@ -58,7 +52,7 @@ Render a user interface to select the user type using radio inputs.
 
 ```jsx
 import { RadioControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useState } from 'react';
 
 const MyRadioControl = () => {
 	const [ option, setOption ] = useState( 'a' );
@@ -82,7 +76,7 @@ const MyRadioControl = () => {
 
 The component accepts the following props:
 
-#### `help`: `string | WPElement`
+#### `help`: `string | Element`
 
 If this property is added, a help text will be generated using help property as the content.
 
@@ -125,4 +119,4 @@ The value property of the currently selected option.
 
 -   To select one or more items from a set, use the `CheckboxControl` component.
 -   To toggle a single setting on or off, use the `ToggleControl` component.
--   To format as a button group, use the `RadioGroup` component.
+-   To format as a segmented button group, use the `ToggleGroupControl` component.

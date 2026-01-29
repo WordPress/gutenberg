@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 import type { ForwardedRef } from 'react';
 
 /**
@@ -16,25 +16,28 @@ import { Icon, check } from '@wordpress/icons';
  */
 import { CircularOptionPickerContext } from './circular-option-picker-context';
 import Button from '../button';
-import { CompositeItem } from '../composite';
-import Tooltip from '../tooltip';
-import type {
-	OptionProps,
-	CircularOptionPickerCompositeState,
-	CircularOptionPickerContextProps,
-} from './types';
-
-const hasSelectedOption = new Map();
+import { Composite } from '../composite';
+import type { OptionProps } from './types';
 
 function UnforwardedOptionAsButton(
 	props: {
 		id?: string;
 		className?: string;
 		isPressed?: boolean;
+		label?: string;
 	},
 	forwardedRef: ForwardedRef< any >
 ) {
-	return <Button { ...props } ref={ forwardedRef }></Button>;
+	const { isPressed, label, ...additionalProps } = props;
+	return (
+		<Button
+			__next40pxDefaultSize
+			{ ...additionalProps }
+			aria-pressed={ isPressed }
+			ref={ forwardedRef }
+			label={ label }
+		/>
+	);
 }
 
 const OptionAsButton = forwardRef( UnforwardedOptionAsButton );
@@ -44,47 +47,36 @@ function UnforwardedOptionAsOption(
 		id: string;
 		className?: string;
 		isSelected?: boolean;
-		context: CircularOptionPickerContextProps;
+		label?: string;
 	},
 	forwardedRef: ForwardedRef< any >
 ) {
-	const { id, className, isSelected, context, ...additionalProps } = props;
-	const { isComposite, ..._compositeState } = context;
-	const compositeState =
-		_compositeState as CircularOptionPickerCompositeState;
-	const { baseId, currentId, setCurrentId } = compositeState;
+	const { id, isSelected, label, ...additionalProps } = props;
+
+	const { setActiveId, activeId } = useContext( CircularOptionPickerContext );
 
 	useEffect( () => {
-		// If we call `setCurrentId` here, it doesn't update for other
-		// Option renders in the same pass. So we have to store our own
-		// map to make sure that we only set the first selected option.
-		// We still need to check `currentId` because the control will
-		// update this as the user moves around, and that state should
-		// be maintained as the group gains and loses focus.
-		if ( isSelected && ! currentId && ! hasSelectedOption.get( baseId ) ) {
-			hasSelectedOption.set( baseId, true );
-			setCurrentId( id );
+		if ( isSelected && ! activeId ) {
+			// The setTimeout call is necessary to make sure that this update
+			// doesn't get overridden by `Composite`'s internal logic, which picks
+			// an initial active item if one is not specifically set.
+			window.setTimeout( () => setActiveId?.( id ), 0 );
 		}
-	}, [ baseId, currentId, id, isSelected, setCurrentId ] );
+	}, [ isSelected, setActiveId, activeId, id ] );
 
 	return (
-		<CompositeItem
-			{ ...additionalProps }
-			{ ...compositeState }
-			as={ Button }
+		<Composite.Item
+			render={
+				<Button
+					__next40pxDefaultSize
+					{ ...additionalProps }
+					role="option"
+					aria-selected={ !! isSelected }
+					ref={ forwardedRef }
+					label={ label }
+				/>
+			}
 			id={ id }
-			// Ideally we'd let the underlying `Button` component
-			// handle this by passing `isPressed` as a prop.
-			// Unfortunately doing so also sets `aria-pressed` as
-			// an attribute on the element, which is incompatible
-			// with `role="option"`, and there is no way at this
-			// point to override that behaviour.
-			className={ classnames( className, {
-				'is-pressed': isSelected,
-			} ) }
-			role="option"
-			aria-selected={ !! isSelected }
-			ref={ forwardedRef }
 		/>
 	);
 }
@@ -98,8 +90,7 @@ export function Option( {
 	tooltipText,
 	...additionalProps
 }: OptionProps ) {
-	const compositeContext = useContext( CircularOptionPickerContext );
-	const { isComposite, baseId } = compositeContext;
+	const { baseId, setActiveId } = useContext( CircularOptionPickerContext );
 	const id = useInstanceId(
 		Option,
 		baseId || 'components-circular-option-picker__option'
@@ -111,28 +102,29 @@ export function Option( {
 		...additionalProps,
 	};
 
-	const optionControl = isComposite ? (
+	const isListbox = setActiveId !== undefined;
+	const optionControl = isListbox ? (
 		<OptionAsOption
 			{ ...commonProps }
-			context={ compositeContext }
+			label={ tooltipText }
 			isSelected={ isSelected }
 		/>
 	) : (
-		<OptionAsButton { ...commonProps } isPressed={ isSelected } />
+		<OptionAsButton
+			{ ...commonProps }
+			label={ tooltipText }
+			isPressed={ isSelected }
+		/>
 	);
 
 	return (
 		<div
-			className={ classnames(
+			className={ clsx(
 				className,
 				'components-circular-option-picker__option-wrapper'
 			) }
 		>
-			{ tooltipText ? (
-				<Tooltip text={ tooltipText }>{ optionControl }</Tooltip>
-			) : (
-				optionControl
-			) }
+			{ optionControl }
 			{ isSelected && <Icon icon={ check } { ...selectedIconProps } /> }
 		</div>
 	);

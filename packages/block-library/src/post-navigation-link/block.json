@@ -15,7 +15,8 @@
 			"default": "next"
 		},
 		"label": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"showTitle": {
 			"type": "boolean",
@@ -28,9 +29,15 @@
 		"arrow": {
 			"type": "string",
 			"default": "none"
+		},
+		"taxonomy": {
+			"type": "string",
+			"default": ""
 		}
 	},
+	"usesContext": [ "postType" ],
 	"supports": {
+		"anchor": true,
 		"reusable": false,
 		"html": false,
 		"color": {
@@ -49,6 +56,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"style": "wp-block-post-navigation-link"

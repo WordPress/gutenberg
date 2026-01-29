@@ -52,13 +52,12 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-compose',
-			( FilteredComponent ) => () =>
-				(
-					<div>
-						<FilteredComponent />
-						<ComposedComponent />
-					</div>
-				)
+			( FilteredComponent ) => () => (
+				<div>
+					<FilteredComponent />
+					<ComposedComponent />
+				</div>
+			)
 		);
 		const EnhancedComponent = withFilters( hookName )( MyComponent );
 
@@ -72,12 +71,11 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-1',
-			( FilteredComponent ) => () =>
-				(
-					<blockquote>
-						<FilteredComponent />
-					</blockquote>
-				)
+			( FilteredComponent ) => () => (
+				<blockquote>
+					<FilteredComponent />
+				</blockquote>
+			)
 		);
 		const EnhancedComponent = withFilters( hookName )( SpiedComponent );
 
@@ -100,12 +98,11 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-1',
-			( FilteredComponent ) => () =>
-				(
-					<blockquote>
-						<FilteredComponent />
-					</blockquote>
-				)
+			( FilteredComponent ) => () => (
+				<blockquote>
+					<FilteredComponent />
+				</blockquote>
+			)
 		);
 
 		await waitFor( () =>
@@ -125,22 +122,20 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-1',
-			( FilteredComponent ) => () =>
-				(
-					<blockquote>
-						<FilteredComponent />
-					</blockquote>
-				)
+			( FilteredComponent ) => () => (
+				<blockquote>
+					<FilteredComponent />
+				</blockquote>
+			)
 		);
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-2',
-			( FilteredComponent ) => () =>
-				(
-					<section>
-						<FilteredComponent />
-					</section>
-				)
+			( FilteredComponent ) => () => (
+				<section>
+					<FilteredComponent />
+				</section>
+			)
 		);
 
 		await waitFor( () =>
@@ -159,12 +154,11 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy',
-			( FilteredComponent ) => () =>
-				(
-					<div>
-						<FilteredComponent />
-					</div>
-				)
+			( FilteredComponent ) => () => (
+				<div>
+					<FilteredComponent />
+				</div>
+			)
 		);
 
 		await waitFor( () =>
@@ -196,12 +190,11 @@ describe( 'withFilters', () => {
 		addFilter(
 			hookName,
 			'test/enhanced-component-spy-1',
-			( FilteredComponent ) => () =>
-				(
-					<blockquote>
-						<FilteredComponent />
-					</blockquote>
-				)
+			( FilteredComponent ) => () => (
+				<blockquote>
+					<FilteredComponent />
+				</blockquote>
+			)
 		);
 
 		await waitFor( () =>

@@ -56,11 +56,24 @@ if [ "$expected" -ne "$actual" ]; then
     exit 1
 fi
 expected=7
-actual=$( find src -maxdepth 1 -type f | wc -l )
+actual=$( find src -maxdepth 2 -type f | wc -l )
 if [ "$expected" -ne "$actual" ]; then
 	error "Expected $expected files in the \`src\` directory, but found $actual."
     exit 1
 fi
+
+# Create an ESLint config that extends wp-scripts' default config but uses the
+# monorepo's custom import resolver. This is needed because local @wordpress/*
+# packages export paths pointing to built files (build-module/), but we haven't
+# run a build. The custom resolver maps these to source files (src/) instead.
+cat > .eslintrc.js << 'EOF'
+module.exports = {
+	extends: [ require.resolve( '@wordpress/scripts/config/.eslintrc' ) ],
+	settings: {
+		'import/resolver': require.resolve( '../tools/eslint/import-resolver' ),
+	},
+};
+EOF
 
 status "Formatting files..."
 ../node_modules/.bin/wp-scripts format
@@ -69,8 +82,8 @@ status "Building block..."
 ../node_modules/.bin/wp-scripts build
 
 status "Verifying build..."
-expected=7
-actual=$( find build -maxdepth 1 -type f | wc -l )
+expected=9
+actual=$( find build -maxdepth 2 -type f | wc -l )
 if [ "$expected" -ne "$actual" ]; then
 	error "Expected $expected files in the \`build\` directory, but found $actual."
     exit 1
@@ -78,6 +91,10 @@ fi
 
 status "Linting CSS files..."
 ../node_modules/.bin/wp-scripts lint-style
+
+# Ensure monorepo prelint:js scripts have run (e.g., to build design tokens for ESLint).
+status "Running prelint:js..."
+( cd .. && npm run prelint:js )
 
 status "Linting JavaScript files..."
 ../node_modules/.bin/wp-scripts lint-js

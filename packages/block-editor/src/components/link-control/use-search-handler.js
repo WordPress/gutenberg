@@ -52,7 +52,8 @@ const handleEntitySearch = async (
 	suggestionsQuery,
 	fetchSearchSuggestions,
 	withCreateSuggestion,
-	pageOnFront
+	pageOnFront,
+	pageForPosts
 ) => {
 	const { isInitialSuggestions } = suggestionsQuery;
 
@@ -62,6 +63,9 @@ const handleEntitySearch = async (
 	results.map( ( result ) => {
 		if ( Number( result.id ) === pageOnFront ) {
 			result.isFrontPage = true;
+			return result;
+		} else if ( Number( result.id ) === pageForPosts ) {
+			result.isBlogHome = true;
 			return result;
 		}
 
@@ -90,7 +94,7 @@ const handleEntitySearch = async (
 	return isURLLike( val ) || ! withCreateSuggestion
 		? results
 		: results.concat( {
-				// the `id` prop is intentionally ommitted here because it
+				// the `id` prop is intentionally omitted here because it
 				// is never exposed as part of the component's public API.
 				// see: https://github.com/WordPress/gutenberg/pull/19775#discussion_r378931316.
 				title: val, // Must match the existing `<input>`s text value.
@@ -102,18 +106,21 @@ const handleEntitySearch = async (
 export default function useSearchHandler(
 	suggestionsQuery,
 	allowDirectEntry,
-	withCreateSuggestion,
-	withURLSuggestion
+	withCreateSuggestion
 ) {
-	const { fetchSearchSuggestions, pageOnFront } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
+	const { fetchSearchSuggestions, pageOnFront, pageForPosts } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
 
-		return {
-			pageOnFront: getSettings().pageOnFront,
-			fetchSearchSuggestions:
-				getSettings().__experimentalFetchLinkSuggestions,
-		};
-	}, [] );
+			return {
+				pageOnFront: getSettings().pageOnFront,
+				pageForPosts: getSettings().pageForPosts,
+				fetchSearchSuggestions:
+					getSettings().__experimentalFetchLinkSuggestions,
+			};
+		},
+		[]
+	);
 
 	const directEntryHandler = allowDirectEntry
 		? handleDirectEntry
@@ -128,17 +135,17 @@ export default function useSearchHandler(
 						{ ...suggestionsQuery, isInitialSuggestions },
 						fetchSearchSuggestions,
 						withCreateSuggestion,
-						withURLSuggestion,
-						pageOnFront
+						pageOnFront,
+						pageForPosts
 				  );
 		},
 		[
 			directEntryHandler,
 			fetchSearchSuggestions,
 			pageOnFront,
+			pageForPosts,
 			suggestionsQuery,
 			withCreateSuggestion,
-			withURLSuggestion,
 		]
 	);
 }

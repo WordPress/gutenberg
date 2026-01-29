@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -44,7 +44,7 @@ const CommentsFormPlaceholder = () => {
 					<input
 						name="submit"
 						type="submit"
-						className={ classnames(
+						className={ clsx(
 							'wp-block-button__link',
 							__experimentalGetElementClassName( 'button' )
 						) }
@@ -68,10 +68,11 @@ const CommentsForm = ( { postId, postType } ) => {
 
 	const isSiteEditor = postType === undefined || postId === undefined;
 
-	const { defaultCommentStatus } = useSelect(
+	const defaultCommentStatus = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings()
-				.__experimentalDiscussionSettings
+				.__experimentalDiscussionSettings?.defaultCommentStatus,
+		[]
 	);
 
 	const postTypeSupportsComments = useSelect( ( select ) =>
@@ -84,6 +85,7 @@ const CommentsForm = ( { postId, postType } ) => {
 		if ( 'closed' === commentStatus ) {
 			const actions = [
 				<Button
+					__next40pxDefaultSize
 					key="enableComments"
 					onClick={ () => setCommentStatus( 'open' ) }
 					variant="primary"
@@ -105,7 +107,7 @@ const CommentsForm = ( { postId, postType } ) => {
 			return (
 				<Warning>
 					{ sprintf(
-						/* translators: 1: Post type (i.e. "post", "page") */
+						/* translators: %s: Post type (i.e. "post", "page") */
 						__(
 							'Post Comments Form block: Comments are not enabled for this post type (%s).'
 						),

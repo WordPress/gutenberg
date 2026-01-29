@@ -6,18 +6,54 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { parseQuantityAndUnitFromRawValue } from '../unit-control/utils';
-import type { BoxControlProps, BoxControlValue } from './types';
+import type {
+	BoxControlInputControlProps,
+	BoxControlProps,
+	BoxControlValue,
+	CustomValueUnits,
+	Preset,
+} from './types';
+import deprecated from '@wordpress/deprecated';
+
+export const CUSTOM_VALUE_SETTINGS: CustomValueUnits = {
+	px: { max: 300, step: 1 },
+	'%': { max: 100, step: 1 },
+	vw: { max: 100, step: 1 },
+	vh: { max: 100, step: 1 },
+	em: { max: 10, step: 0.1 },
+	rm: { max: 10, step: 0.1 },
+	svw: { max: 100, step: 1 },
+	lvw: { max: 100, step: 1 },
+	dvw: { max: 100, step: 1 },
+	svh: { max: 100, step: 1 },
+	lvh: { max: 100, step: 1 },
+	dvh: { max: 100, step: 1 },
+	vi: { max: 100, step: 1 },
+	svi: { max: 100, step: 1 },
+	lvi: { max: 100, step: 1 },
+	dvi: { max: 100, step: 1 },
+	vb: { max: 100, step: 1 },
+	svb: { max: 100, step: 1 },
+	lvb: { max: 100, step: 1 },
+	dvb: { max: 100, step: 1 },
+	vmin: { max: 100, step: 1 },
+	svmin: { max: 100, step: 1 },
+	lvmin: { max: 100, step: 1 },
+	dvmin: { max: 100, step: 1 },
+	vmax: { max: 100, step: 1 },
+	svmax: { max: 100, step: 1 },
+	lvmax: { max: 100, step: 1 },
+	dvmax: { max: 100, step: 1 },
+};
 
 export const LABELS = {
-	all: __( 'All' ),
-	top: __( 'Top' ),
-	bottom: __( 'Bottom' ),
-	left: __( 'Left' ),
-	right: __( 'Right' ),
-	mixed: __( 'Mixed' ),
-	vertical: __( 'Vertical' ),
-	horizontal: __( 'Horizontal' ),
+	all: __( 'All sides' ),
+	top: __( 'Top side' ),
+	bottom: __( 'Bottom side' ),
+	left: __( 'Left side' ),
+	right: __( 'Right side' ),
+	vertical: __( 'Top and bottom sides' ),
+	horizontal: __( 'Left and right sides' ),
 };
 
 export const DEFAULT_VALUES = {
@@ -47,56 +83,46 @@ function mode< T >( arr: T[] ) {
 }
 
 /**
- * Gets the 'all' input value and unit from values data.
+ * Gets the merged input value and unit from values data.
  *
  * @param values         Box values.
- * @param selectedUnits  Box units.
  * @param availableSides Available box sides to evaluate.
  *
  * @return A value + unit for the 'all' input.
  */
-export function getAllValue(
+export function getMergedValue(
 	values: BoxControlValue = {},
-	selectedUnits?: BoxControlValue,
 	availableSides: BoxControlProps[ 'sides' ] = ALL_SIDES
 ) {
 	const sides = normalizeSides( availableSides );
-	const parsedQuantitiesAndUnits = sides.map( ( side ) =>
-		parseQuantityAndUnitFromRawValue( values[ side ] )
-	);
-	const allParsedQuantities = parsedQuantitiesAndUnits.map(
-		( value ) => value[ 0 ] ?? ''
-	);
-	const allParsedUnits = parsedQuantitiesAndUnits.map(
-		( value ) => value[ 1 ]
-	);
-
-	const commonQuantity = allParsedQuantities.every(
-		( v ) => v === allParsedQuantities[ 0 ]
-	)
-		? allParsedQuantities[ 0 ]
-		: '';
-
-	/**
-	 * The typeof === 'number' check is important. On reset actions, the incoming value
-	 * may be null or an empty string.
-	 *
-	 * Also, the value may also be zero (0), which is considered a valid unit value.
-	 *
-	 * typeof === 'number' is more specific for these cases, rather than relying on a
-	 * simple truthy check.
-	 */
-	let commonUnit;
-	if ( typeof commonQuantity === 'number' ) {
-		commonUnit = mode( allParsedUnits );
-	} else {
-		// Set meaningful unit selection if no commonQuantity and user has previously
-		// selected units without assigning values while controls were unlinked.
-		commonUnit =
-			getAllUnitFallback( selectedUnits ) ?? mode( allParsedUnits );
+	if (
+		sides.every(
+			( side: keyof BoxControlValue ) =>
+				values[ side ] === values[ sides[ 0 ] ]
+		)
+	) {
+		return values[ sides[ 0 ] ];
 	}
 
-	return [ commonQuantity, commonUnit ].join( '' );
+	return undefined;
+}
+
+/**
+ * Checks if the values are mixed.
+ *
+ * @param values         Box values.
+ * @param availableSides Available box sides to evaluate.
+ * @return Whether the values are mixed.
+ */
+export function isValueMixed(
+	values: BoxControlValue = {},
+	availableSides: BoxControlProps[ 'sides' ] = ALL_SIDES
+) {
+	const sides = normalizeSides( availableSides );
+	return sides.some(
+		( side: keyof BoxControlValue ) =>
+			values[ side ] !== values[ sides[ 0 ] ]
+	);
 }
 
 /**
@@ -116,26 +142,6 @@ export function getAllUnitFallback( selectedUnits?: BoxControlValue ) {
 }
 
 /**
- * Checks to determine if values are mixed.
- *
- * @param values        Box values.
- * @param selectedUnits Box units.
- * @param sides         Available box sides to evaluate.
- *
- * @return Whether values are mixed.
- */
-export function isValuesMixed(
-	values: BoxControlValue = {},
-	selectedUnits?: BoxControlValue,
-	sides: BoxControlProps[ 'sides' ] = ALL_SIDES
-) {
-	const allValue = getAllValue( values, selectedUnits, sides );
-	const isMixed = isNaN( parseFloat( allValue ) );
-
-	return isMixed;
-}
-
-/**
  * Checks to determine if values are defined.
  *
  * @param values Box values.
@@ -144,7 +150,7 @@ export function isValuesMixed(
  */
 export function isValuesDefined( values?: BoxControlValue ) {
 	return (
-		values !== undefined &&
+		values &&
 		Object.values( values ).filter(
 			// Switching units when input is empty causes values only
 			// containing units. This gives false positive on mixed values
@@ -204,6 +210,8 @@ export function normalizeSides( sides: BoxControlProps[ 'sides' ] ) {
  * Applies a value to an object representing top, right, bottom and left sides
  * while taking into account any custom side configuration.
  *
+ * @deprecated
+ *
  * @param currentValues The current values for each side.
  * @param newValue      The value to apply to the sides object.
  * @param sides         Array defining valid sides.
@@ -215,6 +223,10 @@ export function applyValueToSides(
 	newValue?: string,
 	sides?: BoxControlProps[ 'sides' ]
 ): BoxControlValue {
+	deprecated( 'applyValueToSides', {
+		since: '6.8',
+		version: '7.0',
+	} );
 	const newValues = { ...currentValues };
 
 	if ( sides?.length ) {
@@ -234,4 +246,89 @@ export function applyValueToSides(
 	}
 
 	return newValues;
+}
+
+/**
+ * Return the allowed sides based on the sides configuration.
+ *
+ * @param sides Sides configuration.
+ * @return Allowed sides.
+ */
+export function getAllowedSides(
+	sides: BoxControlInputControlProps[ 'sides' ]
+) {
+	const allowedSides: Set< keyof BoxControlValue > = new Set(
+		! sides ? ALL_SIDES : []
+	);
+	sides?.forEach( ( allowedSide ) => {
+		if ( allowedSide === 'vertical' ) {
+			allowedSides.add( 'top' );
+			allowedSides.add( 'bottom' );
+		} else if ( allowedSide === 'horizontal' ) {
+			allowedSides.add( 'right' );
+			allowedSides.add( 'left' );
+		} else {
+			allowedSides.add( allowedSide );
+		}
+	} );
+	return allowedSides;
+}
+
+/**
+ * Checks if a value is a preset value.
+ *
+ * @param value     The value to check.
+ * @param presetKey The preset key to check against.
+ * @return Whether the value is a preset value.
+ */
+export function isValuePreset( value: string, presetKey: string ) {
+	return value.startsWith( `var:preset|${ presetKey }|` );
+}
+
+/**
+ * Returns the index of the preset value in the presets array.
+ *
+ * @param value     The value to check.
+ * @param presetKey The preset key to check against.
+ * @param presets   The array of presets to search.
+ * @return The index of the preset value in the presets array.
+ */
+export function getPresetIndexFromValue(
+	value: string,
+	presetKey: string,
+	presets: Preset[]
+) {
+	if ( ! isValuePreset( value, presetKey ) ) {
+		return undefined;
+	}
+
+	const match = value.match(
+		new RegExp( `^var:preset\\|${ presetKey }\\|(.+)$` )
+	);
+	if ( ! match ) {
+		return undefined;
+	}
+	const slug = match[ 1 ];
+	const index = presets.findIndex( ( preset ) => {
+		return preset.slug === slug;
+	} );
+
+	return index !== -1 ? index : undefined;
+}
+
+/**
+ * Returns the preset value from the index.
+ *
+ * @param index     The index of the preset value in the presets array.
+ * @param presetKey The preset key to check against.
+ * @param presets   The array of presets to search.
+ * @return The preset value from the index.
+ */
+export function getPresetValueFromIndex(
+	index: number,
+	presetKey: string,
+	presets: Preset[]
+) {
+	const preset = presets[ index ];
+	return `var:preset|${ presetKey }|${ preset.slug }`;
 }

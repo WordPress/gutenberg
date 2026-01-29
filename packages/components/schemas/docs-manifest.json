@@ -1,0 +1,38 @@
+{
+	"title": "JSON schema for @wordpress/components README manifests",
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"type": "object",
+	"properties": {
+		"displayName": {
+			"type": "string",
+			"description": "The `displayName` of the component, as determined in code. Used to identify the component in the specified source file."
+		},
+		"filePath": {
+			"type": "string",
+			"description": "The file path where the component is located."
+		},
+		"subcomponents": {
+			"type": "array",
+			"description": "List of subcomponents related to the component.",
+			"items": {
+				"type": "object",
+				"properties": {
+					"displayName": {
+						"type": "string",
+						"description": "The `displayName` of the subcomponent, as determined in code. Used to identify the component in the specified source file."
+					},
+					"preferredDisplayName": {
+						"type": "string",
+						"description": "The display name to use in the README, if it is different from the `displayName` as determined in code."
+					},
+					"filePath": {
+						"type": "string",
+						"description": "The file path where the subcomponent is located."
+					}
+				},
+				"required": [ "displayName", "filePath" ]
+			}
+		}
+	},
+	"required": [ "displayName", "filePath" ]
+}

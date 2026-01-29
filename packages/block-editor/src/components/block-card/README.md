@@ -6,11 +6,6 @@ In the editor, this component is displayed in two different places: in the block
 
 ![Heading block card in the block inspector](https://make.wordpress.org/core/files/2020/09/screenshot-wordpress.org-2020.09.08-14_19_21.png)
 
-## Table of contents
-
-1. [Development guidelines](#development-guidelines)
-2. [Related components](#related-components)
-
 ## Development guidelines
 
 ### Usage
@@ -26,6 +21,7 @@ const MyBlockCard = () => (
 		icon={ paragraph }
 		title="Paragraph"
 		description="Start with the basic building block of all narrative."
+		name="Custom Block"
 	/>
 );
 ```
@@ -49,6 +45,12 @@ The title of the block.
 -   **Type:** `String`
 
 The description of the block.
+
+#### name
+
+-   **Type:** `String`
+
+The custom name of the block.
 
 ## Related components
 

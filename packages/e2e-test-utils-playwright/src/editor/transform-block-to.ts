@@ -10,6 +10,10 @@ import type { Editor } from './index';
  * @param name Block name.
  */
 export async function transformBlockTo( this: Editor, name: string ) {
+	await this.page.waitForFunction(
+		() => window?.wp?.blocks && window?.wp?.data
+	);
+
 	await this.page.evaluate(
 		( [ blockName ] ) => {
 			const clientIds = window.wp.data

@@ -1,28 +1,17 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
  */
-import {
-	useBlockProps,
-	useInnerBlocksProps,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
+import { useBlockProps, useInnerBlocksProps } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as blocksStore } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import { name as buttonBlockName } from '../button';
-
-const ALLOWED_BLOCKS = [ buttonBlockName ];
-
 const DEFAULT_BLOCK = {
-	name: buttonBlockName,
+	name: 'core/button',
 	attributesToCopy: [
 		'backgroundColor',
 		'border',
@@ -39,36 +28,25 @@ const DEFAULT_BLOCK = {
 function ButtonsEdit( { attributes, className } ) {
 	const { fontSize, layout, style } = attributes;
 	const blockProps = useBlockProps( {
-		className: classnames( className, {
+		className: clsx( className, {
 			'has-custom-font-size': fontSize || style?.typography?.fontSize,
 		} ),
 	} );
-	const { preferredStyle, hasButtonVariations } = useSelect( ( select ) => {
-		const preferredStyleVariations =
-			select( blockEditorStore ).getSettings()
-				.__experimentalPreferredStyleVariations;
+	const { hasButtonVariations } = useSelect( ( select ) => {
 		const buttonVariations = select( blocksStore ).getBlockVariations(
-			buttonBlockName,
+			'core/button',
 			'inserter'
 		);
 		return {
-			preferredStyle:
-				preferredStyleVariations?.value?.[ buttonBlockName ],
 			hasButtonVariations: buttonVariations.length > 0,
 		};
 	}, [] );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
 		defaultBlock: DEFAULT_BLOCK,
 		// This check should be handled by the `Inserter` internally to be consistent across all blocks that use it.
 		directInsert: ! hasButtonVariations,
-		template: [
-			[
-				buttonBlockName,
-				{ className: preferredStyle && `is-style-${ preferredStyle }` },
-			],
-		],
+		template: [ [ 'core/button' ] ],
 		templateInsertUpdatesSelection: true,
 		orientation: layout?.orientation ?? 'horizontal',
 	} );

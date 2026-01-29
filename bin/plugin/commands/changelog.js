@@ -75,7 +75,7 @@ const LABEL_TYPE_MAPPING = {
 	'[Type] Automated Testing': 'Tools',
 	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
 	'[Type] Code Quality': 'Code Quality',
-	'[Type] Accessibility (a11y)': 'Accessibility',
+	'[Focus] Accessibility (a11y)': 'Accessibility',
 	'[Type] Performance': 'Performance',
 	'[Type] Security': 'Security',
 	'[Feature] Navigation Screen': 'Experiments',
@@ -88,7 +88,7 @@ const LABEL_TYPE_MAPPING = {
 };
 
 /**
- * Mapping of label names to arbitary features in the release notes.
+ * Mapping of label names to arbitrary features in the release notes.
  *
  * Mapping a given label to a feature will guarantee it will be categorised
  * under that feature name in the changelog within each section.
@@ -96,6 +96,8 @@ const LABEL_TYPE_MAPPING = {
  * @type {Record<string,string>}
  */
 const LABEL_FEATURE_MAPPING = {
+	'[Feature] Real-time Collaboration': 'Collaboration',
+	'[Feature] Notes': 'Collaboration',
 	'[Feature] Widgets Screen': 'Widgets Editor',
 	'[Feature] Widgets Customizer': 'Widgets Editor',
 	'[Feature] Design Tools': 'Design Tools',
@@ -108,21 +110,24 @@ const LABEL_FEATURE_MAPPING = {
 	'[Feature] Patterns': 'Patterns',
 	'[Feature] Blocks': 'Block Library',
 	'[Feature] Inserter': 'Block Editor',
+	'[Feature] Interactivity API': 'Interactivity API',
 	'[Feature] Drag and Drop': 'Block Editor',
 	'[Feature] Block Multi Selection': 'Block Editor',
 	'[Feature] Link Editing': 'Block Editor',
 	'[Feature] Raw Handling': 'Block Editor',
 	'[Package] Edit Post': 'Post Editor',
 	'[Package] Icons': 'Icons',
-	'[Package] Block Editor': 'Block Editor',
+	'[Package] Block editor': 'Block Editor',
 	'[Package] Block library': 'Block Library',
 	'[Package] Editor': 'Post Editor',
+	'[Package] Edit Site': 'Site Editor',
 	'[Package] Edit Widgets': 'Widgets Editor',
 	'[Package] Widgets Customizer': 'Widgets Editor',
 	'[Package] Components': 'Components',
 	'[Package] Block Library': 'Block Library',
 	'[Package] Rich text': 'Block Editor',
 	'[Package] Data': 'Data Layer',
+	'[Package] Commands': 'Commands',
 	'[Block] Legacy Widget': 'Widgets Editor',
 	'REST API Interaction': 'REST API',
 	'New Block': 'Block Library',
@@ -220,9 +225,18 @@ function getTypesByLabels( labels ) {
 		...new Set(
 			labels
 				.filter( ( label ) =>
-					Object.keys( LABEL_TYPE_MAPPING ).includes( label )
+					Object.keys( LABEL_TYPE_MAPPING )
+						.map( ( currentLabel ) => currentLabel.toLowerCase() )
+						.includes( label.toLowerCase() )
 				)
-				.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
+				.map( ( label ) => {
+					const lowerCaseLabel =
+						Object.keys( LABEL_TYPE_MAPPING ).find(
+							( key ) => key.toLowerCase() === label.toLowerCase()
+						) || label;
+
+					return LABEL_TYPE_MAPPING[ lowerCaseLabel ];
+				} )
 		),
 	];
 }
@@ -236,11 +250,24 @@ function getTypesByLabels( labels ) {
  * @return {string[]} Feature candidates.
  */
 function mapLabelsToFeatures( labels ) {
-	return labels
-		.filter( ( label ) =>
-			Object.keys( LABEL_FEATURE_MAPPING ).includes( label )
-		)
-		.map( ( label ) => LABEL_FEATURE_MAPPING[ label ] );
+	return [
+		...new Set(
+			labels
+				.filter( ( label ) =>
+					Object.keys( LABEL_FEATURE_MAPPING )
+						.map( ( currentLabel ) => currentLabel.toLowerCase() )
+						.includes( label.toLowerCase() )
+				)
+				.map( ( label ) => {
+					const lowerCaseLabel =
+						Object.keys( LABEL_FEATURE_MAPPING ).find(
+							( key ) => key.toLowerCase() === label.toLowerCase()
+						) || label;
+
+					return LABEL_FEATURE_MAPPING[ lowerCaseLabel ];
+				} )
+		),
+	];
 }
 
 /**
@@ -249,7 +276,7 @@ function mapLabelsToFeatures( labels ) {
  *
  * @param {string[]} labels Label names.
  *
- * @return {boolean} whether or not the issue's is labbeled as block specific
+ * @return {boolean} whether or not the issue's is labeled as block specific
  */
 function getIsBlockSpecificIssue( labels ) {
 	return !! labels.find( ( label ) => label.startsWith( '[Block] ' ) );
@@ -318,7 +345,7 @@ function getIssueFeature( issue ) {
 
 	// 1. Prefer explicit mapping of label to feature.
 	if ( featureCandidates.length ) {
-		// Get occurances of the feature labels.
+		// Get occurrences of the feature labels.
 		const featureCounts = featureCandidates.reduce(
 			/**
 			 * @param {Record<string,number>} acc     Accumulator
@@ -581,11 +608,11 @@ function getEntry( issue ) {
 
 /**
  * Builds a formatted string of the Issue/PR title with a link
- * to the Github URL for that item.
+ * to the GitHub URL for that item.
  *
  * @param {string} title  the title of the Issue/PR.
  * @param {number} number the ID/number of the Issue/PR.
- * @param {string} url    the URL of the Github Issue/PR.
+ * @param {string} url    the URL of the GitHub Issue/PR.
  * @return {string} the formatted item
  */
 function getFormattedItemDescription( title, number, url ) {
@@ -831,7 +858,7 @@ function sortFeatureGroups( featureGroups ) {
 }
 
 /**
- * Returns a list of PRs created by first time contributors based on the Github
+ * Returns a list of PRs created by first time contributors based on the GitHub
  * label associated with the PR. Also filters out any "bots".
  *
  * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
@@ -916,7 +943,7 @@ function skipCreatedByBots( pullRequests ) {
 }
 
 /**
- * Produces the formatted markdown for the contributor props seciton.
+ * Produces the formatted markdown for the contributor props section.
  *
  * @param {IssuesListForRepoResponseItem[]} pullRequests List of pull requests.
  *
@@ -936,9 +963,9 @@ function getContributorProps( pullRequests ) {
 	}
 
 	return (
-		'## First time contributors' +
+		'## First-time contributors' +
 		'\n\n' +
-		'The following PRs were merged by first time contributors:' +
+		'The following PRs were merged by first-time contributors:' +
 		'\n\n' +
 		contributorsList
 	);
@@ -1070,4 +1097,5 @@ async function getReleaseChangelog( options ) {
 	getChangelog,
 	getUniqueByUsername,
 	skipCreatedByBots,
+	mapLabelsToFeatures,
 };

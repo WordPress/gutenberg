@@ -39,10 +39,12 @@ function PageAttributesOrder() {
 		<Flex>
 			<FlexBlock>
 				<NumberControl
+					__next40pxDefaultSize
 					label={ __( 'Order' ) }
+					help={ __( 'Set the page order.' ) }
 					value={ value }
 					onChange={ setUpdatedOrder }
-					labelPosition="side"
+					hideLabelFromVision
 					onBlur={ () => {
 						setOrderInput( null );
 					} }
@@ -52,6 +54,13 @@ function PageAttributesOrder() {
 	);
 }
 
+/**
+ * Renders the Page Attributes Order component. A number input in an editor interface
+ * for setting the order of a given page.
+ * The component is now not used in core but was kept for backward compatibility.
+ *
+ * @return {React.ReactNode} The rendered component.
+ */
 export default function PageAttributesOrderWithChecks() {
 	return (
 		<PostTypeSupportCheck supportKeys="page-attributes">

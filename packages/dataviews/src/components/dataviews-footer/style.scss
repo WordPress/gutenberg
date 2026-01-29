@@ -1,0 +1,38 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.dataviews-footer {
+	position: sticky;
+	bottom: 0;
+	left: 0;
+	background-color: inherit;
+	padding: $grid-unit-15 $grid-unit-30;
+	border-top: $border-width solid $gray-100;
+	flex-shrink: 0;
+
+	@media not (prefers-reduced-motion) {
+		transition: padding ease-out 0.1s;
+	}
+
+	z-index: z-index(".dataviews-footer");
+}
+
+@container (max-width: 560px) {
+	.dataviews-footer {
+		flex-direction: column !important;
+
+		.dataviews-bulk-actions-footer__container {
+			width: 100%;
+		}
+
+		.dataviews-bulk-actions-footer__item-count {
+			flex-grow: 1;
+		}
+
+		.dataviews-pagination {
+			width: 100%;
+			justify-content: space-between;
+		}
+	}
+}

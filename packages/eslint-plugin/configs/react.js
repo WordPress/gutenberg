@@ -37,7 +37,7 @@ module.exports = {
 		'react-hooks/exhaustive-deps': [
 			'warn',
 			{
-				additionalHooks: '(useSelect|useSuspenseSelect)',
+				additionalHooks: '^(useSelect|useSuspenseSelect)$',
 			},
 		],
 		'react-hooks/rules-of-hooks': 'error',

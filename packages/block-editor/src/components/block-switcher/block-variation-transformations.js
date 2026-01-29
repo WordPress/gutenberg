@@ -22,17 +22,12 @@ const EMPTY_OBJECT = {};
 export function useBlockVariationTransforms( { clientIds, blocks } ) {
 	const { activeBlockVariation, blockVariationTransformations } = useSelect(
 		( select ) => {
-			const {
-				getBlockRootClientId,
-				getBlockAttributes,
-				canRemoveBlocks,
-			} = select( blockEditorStore );
+			const { getBlockAttributes, canRemoveBlocks } =
+				select( blockEditorStore );
 			const { getActiveBlockVariation, getBlockVariations } =
 				select( blocksStore );
-			const rootClientId = getBlockRootClientId(
-				Array.isArray( clientIds ) ? clientIds[ 0 ] : clientIds
-			);
-			const canRemove = canRemoveBlocks( clientIds, rootClientId );
+
+			const canRemove = canRemoveBlocks( clientIds );
 			// Only handle single selected blocks for now.
 			if ( blocks.length !== 1 || ! canRemove ) {
 				return EMPTY_OBJECT;
@@ -79,7 +74,7 @@ const BlockVariationTransformations = ( {
 				/>
 			) }
 			{ transformations?.map( ( item ) => (
-				<BlockVariationTranformationItem
+				<BlockVariationTransformationItem
 					key={ item.name }
 					item={ item }
 					onSelect={ onSelect }
@@ -90,7 +85,7 @@ const BlockVariationTransformations = ( {
 	);
 };
 
-function BlockVariationTranformationItem( {
+function BlockVariationTransformationItem( {
 	item,
 	onSelect,
 	setHoveredTransformItemName,

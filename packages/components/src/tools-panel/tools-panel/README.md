@@ -60,7 +60,7 @@ import styled from '@emotion/styled';
  * WordPress dependencies
  */
 import {
-	__experimentalBoxControl as BoxControl,
+	BoxControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	__experimentalUnitControl as UnitControl,
@@ -91,8 +91,8 @@ export function DimensionPanel() {
 	return (
 		<ToolsPanel label={ __( 'Dimensions' ) } resetAll={ resetAll }>
 			<PanelDescription>
-				Select dimensions or spacing related settings from the
-				menu for additional controls.
+				Select dimensions or spacing related settings from the menu for
+				additional controls.
 			</PanelDescription>
 			<SingleColumnItem
 				hasValue={ () => !! height }
@@ -101,6 +101,7 @@ export function DimensionPanel() {
 				isShownByDefault
 			>
 				<UnitControl
+					__next40pxDefaultSize
 					label={ __( 'Height' ) }
 					onChange={ setHeight }
 					value={ height }
@@ -113,6 +114,7 @@ export function DimensionPanel() {
 				isShownByDefault
 			>
 				<UnitControl
+					__next40pxDefaultSize
 					label={ __( 'Width' ) }
 					onChange={ setWidth }
 					value={ width }
@@ -124,6 +126,7 @@ export function DimensionPanel() {
 				onDeselect={ () => setPadding( undefined ) }
 			>
 				<BoxControl
+					__next40pxDefaultSize
 					label={ __( 'Padding' ) }
 					onChange={ setPadding }
 					values={ padding }
@@ -136,6 +139,7 @@ export function DimensionPanel() {
 				onDeselect={ () => setMargin( undefined ) }
 			>
 				<BoxControl
+					__next40pxDefaultSize
 					label={ __( 'Margin' ) }
 					onChange={ setMargin }
 					values={ margin }
@@ -154,8 +158,15 @@ export function DimensionPanel() {
 Flags that the items in this ToolsPanel will be contained within an inner
 wrapper element allowing the panel to lay them out accordingly.
 
-- Required: No
-- Default: `false`
+-   Required: No
+-   Default: `false`
+
+### `dropdownMenuProps`: `{}`
+
+The popover props to configure panel's `DropdownMenu`.
+
+-   Type: `DropdownMenuProps`
+-   Required: No
 
 ### `headingLevel`: `1 | 2 | 3 | 4 | 5 | 6 | '1' | '2' | '3' | '4' | '5' | '6'`
 
@@ -169,7 +180,7 @@ The heading level of the panel's header.
 Text to be displayed within the panel's header and as the `aria-label` for the
 panel's dropdown menu.
 
-- Required: Yes
+-   Required: Yes
 
 ### `panelId`: `string | null`
 
@@ -178,18 +189,21 @@ to restrict panel items. When a `panelId` is set, items can only register
 themselves if the `panelId` is explicitly `null` or the item's `panelId` matches
 exactly.
 
-- Required: No
+-   Required: No
 
 ### `resetAll`: `( filters?: ResetAllFilter[] ) => void`
 
 A function to call when the `Reset all` menu option is selected. As an argument, it receives an array containing the `resetAllFilter` callbacks of all the valid registered `ToolsPanelItems`.
 
-- Required: Yes
+-   Required: Yes
 
 ### `shouldRenderPlaceholderItems`: `boolean`
 
 Advises the `ToolsPanel` that all of its `ToolsPanelItem` children should render
 placeholder content (instead of `null`) when they are toggled off and hidden.
 
-- Required: No
-- Default: `false`
+Note that placeholder items won't apply the `className` that would be
+normally applied to a visible `ToolsPanelItem` via the `className` prop.
+
+-   Required: No
+-   Default: `false`

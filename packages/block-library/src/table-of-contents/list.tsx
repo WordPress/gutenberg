@@ -1,7 +1,7 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
-import type { WPElement } from '@wordpress/element';
+import type { MouseEvent, ReactElement } from 'react';
 
 /**
  * Internal dependencies
@@ -12,31 +12,59 @@ const ENTRY_CLASS_NAME = 'wp-block-table-of-contents__entry';
 
 export default function TableOfContentsList( {
 	nestedHeadingList,
+	disableLinkActivation,
+	onClick,
+	ordered = true,
 }: {
 	nestedHeadingList: NestedHeadingData[];
-} ): WPElement {
+	disableLinkActivation?: boolean;
+	onClick?: ( event: MouseEvent< HTMLAnchorElement > ) => void;
+	ordered?: boolean;
+} ): ReactElement {
 	return (
 		<>
 			{ nestedHeadingList.map( ( node, index ) => {
 				const { content, link } = node.heading;
 
 				const entry = link ? (
-					<a className={ ENTRY_CLASS_NAME } href={ link }>
+					<a
+						className={ ENTRY_CLASS_NAME }
+						href={ link }
+						aria-disabled={ disableLinkActivation || undefined }
+						onClick={
+							disableLinkActivation &&
+							'function' === typeof onClick
+								? onClick
+								: undefined
+						}
+					>
 						{ content }
 					</a>
 				) : (
 					<span className={ ENTRY_CLASS_NAME }>{ content }</span>
 				);
 
+				const NestedListTag = ordered ? 'ol' : 'ul';
+
 				return (
 					<li key={ index }>
 						{ entry }
 						{ node.children ? (
-							<ol>
+							<NestedListTag>
 								<TableOfContentsList
 									nestedHeadingList={ node.children }
+									disableLinkActivation={
+										disableLinkActivation
+									}
+									onClick={
+										disableLinkActivation &&
+										'function' === typeof onClick
+											? onClick
+											: undefined
+									}
+									ordered={ ordered }
 								/>
-							</ol>
+							</NestedListTag>
 						) : null }
 					</li>
 				);

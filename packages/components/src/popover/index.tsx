@@ -2,7 +2,7 @@
  * External dependencies
  */
 import type { ForwardedRef, SyntheticEvent, RefCallback } from 'react';
-import classnames from 'classnames';
+import clsx from 'clsx';
 import {
 	useFloating,
 	flip as flipMiddleware,
@@ -13,10 +13,8 @@ import {
 	offset as offsetMiddleware,
 	size,
 } from '@floating-ui/react-dom';
-// eslint-disable-next-line no-restricted-imports
 import type { HTMLMotionProps, MotionProps } from 'framer-motion';
-// eslint-disable-next-line no-restricted-imports
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -33,6 +31,7 @@ import {
 	createPortal,
 } from '@wordpress/element';
 import {
+	useReducedMotion,
 	useViewportMatch,
 	useMergeRefs,
 	__experimentalUseDialog as useDialog,
@@ -40,6 +39,7 @@ import {
 import { close } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
 import { Path, SVG } from '@wordpress/primitives';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -53,13 +53,16 @@ import {
 	placementToMotionAnimationProps,
 	getReferenceElement,
 } from './utils';
-import type { WordPressComponentProps } from '../ui/context';
+import { contextConnect, useContextSystem } from '../context';
+import type { WordPressComponentProps } from '../context';
 import type {
 	PopoverProps,
 	PopoverAnchorRefReference,
 	PopoverAnchorRefTopBottom,
+	PopoverSlotProps,
 } from './types';
 import { overlayMiddlewares } from './overlay-middlewares';
+import { StyleProvider } from '../style-provider';
 
 /**
  * Name of slot in which popover should fill.
@@ -68,6 +71,13 @@ import { overlayMiddlewares } from './overlay-middlewares';
  */
 export const SLOT_NAME = 'Popover';
 
+/**
+ * Virtual padding to account for overflow boundaries.
+ *
+ * @type {number}
+ */
+const OVERFLOW_PADDING = 8;
+
 // An SVG displaying a triangle facing down, filled with a solid
 // color and bordered in such a way to create an arrow-like effect.
 // Keeping the SVG's viewbox squared simplify the arrow positioning
@@ -75,7 +85,7 @@ export const SLOT_NAME = 'Popover';
 const ArrowTriangle = () => (
 	<SVG
 		xmlns="http://www.w3.org/2000/svg"
-		viewBox={ `0 0 100 100` }
+		viewBox="0 0 100 100"
 		className="components-popover__triangle"
 		role="presentation"
 	>
@@ -92,6 +102,7 @@ const ArrowTriangle = () => (
 );
 
 const slotNameContext = createContext< string | undefined >( undefined );
+slotNameContext.displayName = '__unstableSlotNameContext';
 
 const fallbackContainerClassname = 'components-popover__fallback-container';
 const getPopoverFallbackContainer = () => {
@@ -112,14 +123,16 @@ const UnforwardedPopover = (
 		WordPressComponentProps< PopoverProps, 'div', false >,
 		// To avoid overlaps between the standard HTML attributes and the props
 		// expected by `framer-motion`, omit all framer motion props from popover
-		// props (except for `animate` and `children`, which are re-defined in `PopoverProps`).
-		keyof Omit< MotionProps, 'animate' | 'children' >
+		// props (except for `animate` and `children` which are re-defined in
+		// `PopoverProps`, and `style` which is merged safely).
+		keyof Omit< MotionProps, 'animate' | 'children' | 'style' >
 	>,
 	forwardedRef: ForwardedRef< any >
 ) => {
 	const {
 		animate = true,
 		headerTitle,
+		constrainTabbing,
 		onClose,
 		children,
 		className,
@@ -137,6 +150,7 @@ const UnforwardedPopover = (
 		shift = false,
 		inline = false,
 		variant,
+		style: contentStyle,
 
 		// Deprecated props
 		__unstableForcePosition,
@@ -147,7 +161,7 @@ const UnforwardedPopover = (
 
 		// Rest
 		...contentProps
-	} = props;
+	} = useContextSystem( props, 'Popover' );
 
 	let computedFlipProp = flip;
 	let computedResizeProp = resize;
@@ -218,16 +232,21 @@ const UnforwardedPopover = (
 		computedFlipProp && flipMiddleware(),
 		computedResizeProp &&
 			size( {
+				padding: OVERFLOW_PADDING,
 				apply( sizeProps ) {
 					const { firstElementChild } = refs.floating.current ?? {};
 
 					// Only HTMLElement instances have the `style` property.
-					if ( ! ( firstElementChild instanceof HTMLElement ) )
+					if ( ! ( firstElementChild instanceof HTMLElement ) ) {
 						return;
+					}
 
 					// Reduce the height of the popover to the available space.
 					Object.assign( firstElementChild.style, {
-						maxHeight: `${ sizeProps.availableHeight }px`,
+						maxHeight: `${ Math.max(
+							0,
+							sizeProps.availableHeight
+						) }px`,
 						overflow: 'auto',
 					} );
 				},
@@ -249,15 +268,45 @@ const UnforwardedPopover = (
 		onDialogClose = ( type: string | undefined, event: SyntheticEvent ) => {
 			// Ideally the popover should have just a single onClose prop and
 			// not three props that potentially do the same thing.
-			if ( type === 'focus-outside' && onFocusOutside ) {
-				onFocusOutside( event );
+			if ( type === 'focus-outside' ) {
+				// Check if this blur event is actually relevant to this popover
+				const blurTarget = event?.target as Element;
+				const referenceElement = refs.reference.current;
+				const floatingElement = refs.floating.current;
+
+				// Check if blur is from this popover's reference element or its floating content
+				const isBlurFromThisPopover =
+					( referenceElement &&
+						'contains' in referenceElement &&
+						referenceElement.contains( blurTarget ) ) ||
+					floatingElement?.contains( blurTarget );
+				// Ignore blur events that don't originate from this popover when there's no
+				// relatedTarget (next focus target) and focus moves to document.body.
+				// This prevents incorrectly closing the popover when clicking on elements
+				// that don't accept focus (like clicking outside to empty space).
+				const ownerDocument = floatingElement?.ownerDocument;
+				if (
+					! isBlurFromThisPopover &&
+					! ( 'relatedTarget' in event && event.relatedTarget ) &&
+					ownerDocument?.activeElement === ownerDocument?.body
+				) {
+					return;
+				}
+				// Call onFocusOutside if defined or call onClose.
+				if ( onFocusOutside ) {
+					onFocusOutside( event );
+				} else if ( onClose ) {
+					onClose();
+				}
 			} else if ( onClose ) {
+				// onClose should be called for other event types if it exists.
 				onClose();
 			}
 		};
 	}
 
 	const [ dialogRef, dialogProps ] = useDialog( {
+		constrainTabbing,
 		focusOnMount,
 		__unstableOnClose: onDialogClose,
 		// @ts-expect-error The __unstableOnClose property needs to be deprecated first (see https://github.com/WordPress/gutenberg/pull/27675)
@@ -366,6 +415,7 @@ const UnforwardedPopover = (
 	const animationProps: HTMLMotionProps< 'div' > = shouldAnimate
 		? {
 				style: {
+					...contentStyle,
 					...motionInlineStyles,
 					...style,
 				},
@@ -374,7 +424,10 @@ const UnforwardedPopover = (
 		  }
 		: {
 				animate: false,
-				style,
+				style: {
+					...contentStyle,
+					...style,
+				},
 		  };
 
 	// When Floating UI has finished positioning and Framer Motion has finished animating
@@ -384,7 +437,7 @@ const UnforwardedPopover = (
 
 	let content = (
 		<motion.div
-			className={ classnames( 'components-popover', className, {
+			className={ clsx( className, {
 				'is-expanded': isExpanded,
 				'is-positioned': isPositioned,
 				// Use the 'alternate' classname for 'toolbar' variant for back compat.
@@ -409,8 +462,10 @@ const UnforwardedPopover = (
 					</span>
 					<Button
 						className="components-popover__close"
+						size="small"
 						icon={ close }
 						onClick={ onClose }
+						label={ __( 'Close' ) }
 					/>
 				</div>
 			) }
@@ -447,7 +502,10 @@ const UnforwardedPopover = (
 	if ( shouldRenderWithinSlot ) {
 		content = <Fill name={ slotName }>{ content }</Fill>;
 	} else if ( ! inline ) {
-		content = createPortal( content, getPopoverFallbackContainer() );
+		content = createPortal(
+			<StyleProvider document={ document }>{ content }</StyleProvider>,
+			getPopoverFallbackContainer()
+		);
 	}
 
 	if ( hasAnchor ) {
@@ -461,6 +519,20 @@ const UnforwardedPopover = (
 		</>
 	);
 };
+
+// Export the PopoverSlot individually to allow typescript to pick the types up.
+export const PopoverSlot = forwardRef< HTMLDivElement, PopoverSlotProps >(
+	( { name = SLOT_NAME }, ref ) => {
+		return (
+			<Slot
+				bubblesVirtually
+				name={ name }
+				className="popover-slot"
+				ref={ ref }
+			/>
+		);
+	}
+);
 
 /**
  * `Popover` renders its content in a floating modal. If no explicit anchor is passed via props, it anchors to its parent element by default.
@@ -485,26 +557,24 @@ const UnforwardedPopover = (
  * ```
  *
  */
-export const Popover = forwardRef( UnforwardedPopover );
-
-function PopoverSlot(
-	{ name = SLOT_NAME }: { name?: string },
-	ref: ForwardedRef< any >
-) {
-	return (
-		<Slot
-			// @ts-expect-error Need to type `SlotFill`
-			bubblesVirtually
-			name={ name }
-			className="popover-slot"
-			ref={ ref }
-		/>
-	);
-}
-
-// @ts-expect-error For Legacy Reasons
-Popover.Slot = forwardRef( PopoverSlot );
-// @ts-expect-error For Legacy Reasons
-Popover.__unstableSlotNameProvider = slotNameContext.Provider;
+export const Popover = Object.assign(
+	contextConnect( UnforwardedPopover, 'Popover' ),
+	{
+		/**
+		 * Renders a slot that is used internally by Popover for rendering content.
+		 */
+		Slot: Object.assign( PopoverSlot, {
+			displayName: 'Popover.Slot',
+		} ),
+		/**
+		 * Provides a context to manage popover slot names.
+		 *
+		 * This is marked as unstable and should not be used directly.
+		 */
+		__unstableSlotNameProvider: Object.assign( slotNameContext.Provider, {
+			displayName: 'Popover.__unstableSlotNameProvider',
+		} ),
+	}
+);
 
 export default Popover;

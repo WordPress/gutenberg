@@ -8,7 +8,8 @@
 	"textdomain": "default",
 	"attributes": {
 		"url": {
-			"type": "string"
+			"type": "string",
+			"role": "content"
 		},
 		"useFeaturedImage": {
 			"type": "boolean",
@@ -19,9 +20,6 @@
 		},
 		"alt": {
 			"type": "string",
-			"source": "attribute",
-			"selector": "img",
-			"attribute": "alt",
 			"default": ""
 		},
 		"hasParallax": {
@@ -41,6 +39,9 @@
 		},
 		"customOverlayColor": {
 			"type": "string"
+		},
+		"isUserOverlayColor": {
+			"type": "boolean"
 		},
 		"backgroundType": {
 			"type": "string",
@@ -68,9 +69,6 @@
 			"type": "boolean",
 			"default": true
 		},
-		"allowedBlocks": {
-			"type": "array"
-		},
 		"templateLock": {
 			"type": [ "string", "boolean" ],
 			"enum": [ "all", "insert", "contentOnly", false ]
@@ -78,6 +76,15 @@
 		"tagName": {
 			"type": "string",
 			"default": "div"
+		},
+		"sizeSlug": {
+			"type": "string"
+		},
+		"poster": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "video",
+			"attribute": "poster"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],
@@ -85,6 +92,7 @@
 		"anchor": true,
 		"align": true,
 		"html": false,
+		"shadow": true,
 		"spacing": {
 			"padding": true,
 			"margin": [ "top", "bottom" ],
@@ -107,12 +115,14 @@
 			}
 		},
 		"color": {
-			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background",
 			"heading": true,
 			"text": true,
 			"background": false,
 			"__experimentalSkipSerialization": [ "gradients" ],
 			"enableContrastChecker": false
+		},
+		"dimensions": {
+			"aspectRatio": true
 		},
 		"typography": {
 			"fontSize": true,
@@ -129,6 +139,18 @@
 		},
 		"layout": {
 			"allowJustification": false
+		},
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"filter": {
+			"duotone": true
+		},
+		"allowedBlocks": true
+	},
+	"selectors": {
+		"filter": {
+			"duotone": ".wp-block-cover > .wp-block-cover__image-background, .wp-block-cover > .wp-block-cover__video-background"
 		}
 	},
 	"editorStyle": "wp-block-cover-editor",

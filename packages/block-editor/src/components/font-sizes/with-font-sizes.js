@@ -8,7 +8,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import { getFontSize, getFontSizeClass } from './utils';
-import useSetting from '../use-setting';
+import { useSettings } from '../use-settings';
 
 const DEFAULT_FONT_SIZES = [];
 
@@ -51,21 +51,22 @@ export default ( ...fontSizeNames ) => {
 	return createHigherOrderComponent(
 		compose( [
 			createHigherOrderComponent(
-				( WrappedComponent ) => ( props ) => {
-					const fontSizes =
-						useSetting( 'typography.fontSizes' ) ||
-						DEFAULT_FONT_SIZES;
-					return (
-						<WrappedComponent
-							{ ...props }
-							fontSizes={ fontSizes }
-						/>
-					);
-				},
+				( WrappedComponent ) =>
+					function WithFontSizesInner( props ) {
+						const [ fontSizes ] = useSettings(
+							'typography.fontSizes'
+						);
+						return (
+							<WrappedComponent
+								{ ...props }
+								fontSizes={ fontSizes || DEFAULT_FONT_SIZES }
+							/>
+						);
+					},
 				'withFontSizes'
 			),
 			( WrappedComponent ) => {
-				return class extends Component {
+				return class WithFontSizes extends Component {
 					constructor( props ) {
 						super( props );
 

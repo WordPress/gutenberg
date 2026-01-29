@@ -1,6 +1,6 @@
 <?php
 /**
- * REST API: Try: bundle WP_Theme_JSON class instead of inheriting per WordPress version class
+ * REST API: Bundle WP_Theme_JSON class instead of inheriting per WordPress version class
  *
  * Changes to this class should be synced to the corresponding class
  * in WordPress core: src/wp-includes/rest-api/endpoints/class-wp-rest-global-styles-controller.php.
@@ -10,32 +10,33 @@
  * @since 5.9.0
  */
 
-if ( class_exists( 'WP_REST_Global_Styles_Controller_Gutenberg' ) ) {
-	return;
-}
-
 /**
  * Base Global Styles REST API Controller.
  */
-class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
+class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controller {
 
 	/**
-	 * Post type.
+	 * Whether the controller supports batching.
 	 *
-	 * @since 5.9.0
-	 * @var string
+	 * @since 6.6.0
+	 * @var array
 	 */
-	protected $post_type;
+	protected $allow_batch = array( 'v1' => false );
 
 	/**
 	 * Constructor.
 	 *
 	 * @since 5.9.0
 	 */
-	public function __construct() {
-		$this->namespace = 'wp/v2';
-		$this->rest_base = 'global-styles';
-		$this->post_type = 'wp_global_styles';
+	/**
+	 * Constructor.
+	 *
+	 * @since 6.6.0
+	 *
+	 * @param string $post_type Post type.
+	 */
+	public function __construct( $post_type = 'wp_global_styles' ) {
+		parent::__construct( $post_type );
 	}
 
 	/**
@@ -58,8 +59,14 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 							'type'        => 'string',
 						),
 					),
+					'allow_batch'         => $this->allow_batch,
 				),
-			)
+			),
+			/*
+			 * $override is set to true to avoid conflicts with the core endpoint.
+			 * Do not sync to WordPress core.
+			 */
+			true
 		);
 
 		// List themes global styles.
@@ -69,8 +76,10 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			sprintf(
 				'/%s/themes/(?P<stylesheet>%s)',
 				$this->rest_base,
-				// Matches theme's directory: `/themes/<subdirectory>/<theme>/` or `/themes/<theme>/`.
-				// Excludes invalid directory name characters: `/:<>*?"|`.
+				/*
+				 * Matches theme's directory: `/themes/<subdirectory>/<theme>/` or `/themes/<theme>/`.
+				 * Excludes invalid directory name characters: `/:<>*?"|`.
+				 */
 				'[^\/:<>\*\?"\|]+(?:\/[^\/:<>\*\?"\|]+)?'
 			),
 			array(
@@ -85,8 +94,14 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 							'sanitize_callback' => array( $this, '_sanitize_global_styles_callback' ),
 						),
 					),
+					'allow_batch'         => $this->allow_batch,
 				),
-			)
+			),
+			/*
+			 * $override is set to true to avoid conflicts with the core endpoint.
+			 * Do not sync to WordPress core.
+			 */
+			true
 		);
 
 		// Lists/updates a single global style variation based on the given id.
@@ -112,8 +127,14 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'update_item_permissions_check' ),
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
 				),
-				'schema' => array( $this, 'get_public_item_schema' ),
-			)
+				'schema'      => array( $this, 'get_public_item_schema' ),
+				'allow_batch' => $this->allow_batch,
+			),
+			/*
+			 * $override is set to true to avoid conflicts with the core endpoint.
+			 * Do not sync to WordPress core.
+			 */
+			true
 		);
 	}
 
@@ -200,26 +221,8 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	 * @param WP_Post $post Post object.
 	 * @return bool Whether the post can be read.
 	 */
-	protected function check_read_permission( $post ) {
+	public function check_read_permission( $post ) {
 		return current_user_can( 'read_post', $post->ID );
-	}
-
-	/**
-	 * Returns the given global styles config.
-	 *
-	 * @since 5.9.0
-	 *
-	 * @param WP_REST_Request $request The request instance.
-	 *
-	 * @return WP_REST_Response|WP_Error
-	 */
-	public function get_item( $request ) {
-		$post = $this->get_post( $request['id'] );
-		if ( is_wp_error( $post ) ) {
-			return $post;
-		}
-
-		return $this->prepare_item_for_response( $post, $request );
 	}
 
 	/**
@@ -248,60 +251,11 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	}
 
 	/**
-	 * Checks if a global style can be edited.
-	 *
-	 * @since 5.9.0
-	 *
-	 * @param WP_Post $post Post object.
-	 * @return bool Whether the post can be edited.
-	 */
-	protected function check_update_permission( $post ) {
-		return current_user_can( 'edit_post', $post->ID );
-	}
-
-	/**
-	 * Updates a single global style config.
-	 *
-	 * @since 5.9.0
-	 * @since 6.2.0 Added validation of styles.css property.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
-	 */
-	public function update_item( $request ) {
-		$post_before = $this->get_post( $request['id'] );
-		if ( is_wp_error( $post_before ) ) {
-			return $post_before;
-		}
-
-		$changes = $this->prepare_item_for_database( $request );
-		if ( is_wp_error( $changes ) ) {
-			return $changes;
-		}
-
-		$result = wp_update_post( wp_slash( (array) $changes ), true, false );
-		if ( is_wp_error( $result ) ) {
-			return $result;
-		}
-
-		$post          = get_post( $request['id'] );
-		$fields_update = $this->update_additional_fields_for_object( $post, $request );
-		if ( is_wp_error( $fields_update ) ) {
-			return $fields_update;
-		}
-
-		wp_after_insert_post( $post, true, $post_before );
-
-		$response = $this->prepare_item_for_response( $post, $request );
-
-		return rest_ensure_response( $response );
-	}
-
-	/**
 	 * Prepares a single global styles config for update.
 	 *
 	 * @since 5.9.0
 	 * @since 6.2.0 Added validation of styles.css property.
+	 * @since 6.6.0 Added registration of block style variations from theme.json sources (theme.json, user theme.json, partials).
 	 *
 	 * @param WP_REST_Request $request Request object.
 	 * @return stdClass|WP_Error Prepared item on success. WP_Error on when the custom CSS is not valid.
@@ -334,6 +288,11 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			} elseif ( isset( $existing_config['styles'] ) ) {
 				$config['styles'] = $existing_config['styles'];
 			}
+
+			// Register theme-defined variations e.g. from block style variation partials under `/styles`.
+			$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( 'block' );
+			gutenberg_register_block_style_variations_from_theme_json_partials( $variations );
+
 			if ( isset( $request['settings'] ) ) {
 				$config['settings'] = $request['settings'];
 			} elseif ( isset( $existing_config['settings'] ) ) {
@@ -341,7 +300,14 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			}
 			$config['isGlobalStylesUserThemeJSON'] = true;
 			$config['version']                     = WP_Theme_JSON_Gutenberg::LATEST_SCHEMA;
-			$changes->post_content                 = wp_json_encode( $config );
+			/**
+			 * JSON encode the data stored in post content.
+			 * Escape characters that are likely to be mangled by HTML filters: "<>&".
+			 *
+			 * This data is later re-encoded by {@see gutenberg_filter_global_styles_post()}.
+			 * The escaping is also applied here as a precaution.
+			 */
+			$changes->post_content = wp_json_encode( $config, JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP );
 		}
 
 		// Post title.
@@ -361,6 +327,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	 *
 	 * @since 5.9.0
 	 * @since 6.2.0 Handling of style.css was added to WP_Theme_JSON.
+	 * @since 6.6.0 Added custom relative theme file URIs to `_links`.
 	 *
 	 * @param WP_Post         $post    Global Styles post object.
 	 * @param WP_REST_Request $request Request object.
@@ -370,8 +337,10 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 		$raw_config                       = json_decode( $post->post_content, true );
 		$is_global_styles_user_theme_json = isset( $raw_config['isGlobalStylesUserThemeJSON'] ) && true === $raw_config['isGlobalStylesUserThemeJSON'];
 		$config                           = array();
+		$theme_json                       = null;
 		if ( $is_global_styles_user_theme_json ) {
-			$config = ( new WP_Theme_JSON_Gutenberg( $raw_config, 'custom' ) )->get_raw_data();
+			$theme_json = new WP_Theme_JSON_Gutenberg( $raw_config, 'custom' );
+			$config     = $theme_json->get_raw_data();
 		}
 
 		// Base fields for every post.
@@ -390,10 +359,12 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 		}
 		if ( rest_is_field_included( 'title.rendered', $fields ) ) {
 			add_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
+			add_filter( 'private_title_format', array( $this, 'protected_title_format' ) );
 
 			$data['title']['rendered'] = get_the_title( $post->ID );
 
 			remove_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
+			remove_filter( 'private_title_format', array( $this, 'protected_title_format' ) );
 		}
 
 		if ( rest_is_field_included( 'settings', $fields ) ) {
@@ -413,9 +384,16 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 
 		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
 			$links = $this->prepare_links( $post->ID );
+			// Only return resolved URIs for get requests to user theme JSON.
+			if ( $theme_json ) {
+				$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme_json );
+				if ( ! empty( $resolved_theme_uris ) ) {
+					$links['https://api.w.org/theme-file'] = $resolved_theme_uris;
+				}
+			}
 			$response->add_links( $links );
 			if ( ! empty( $links['self']['href'] ) ) {
-				$actions = $this->get_available_actions();
+				$actions = $this->get_available_actions( $post, $request );
 				$self    = $links['self']['href'];
 				foreach ( $actions as $rel ) {
 					$response->add_link( $rel, $self );
@@ -439,8 +417,11 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 		$base = sprintf( '%s/%s', $this->namespace, $this->rest_base );
 
 		$links = array(
-			'self' => array(
+			'self'  => array(
 				'href' => rest_url( trailingslashit( $base ) . $id ),
+			),
+			'about' => array(
+				'href' => rest_url( 'wp/v2/types/' . $this->post_type ),
 			),
 		);
 
@@ -462,13 +443,16 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	 *
 	 * @since 5.9.0
 	 * @since 6.2.0 Added 'edit-css' action.
+	 * @since 6.6.0 Added $post and $request parameters.
 	 *
+	 * @param WP_Post         $post    Post object.
+	 * @param WP_REST_Request $request Request object.
 	 * @return array List of link relations.
 	 */
-	protected function get_available_actions() {
+	protected function get_available_actions( $post, $request ) {  // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$rels = array();
 
-		$post_type = get_post_type_object( $this->post_type );
+		$post_type = get_post_type_object( $post->post_type );
 		if ( current_user_can( $post_type->cap->publish_posts ) ) {
 			$rels[] = 'https://api.w.org/action-publish';
 		}
@@ -478,21 +462,6 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 		}
 
 		return $rels;
-	}
-
-	/**
-	 * Overwrites the default protected title format.
-	 *
-	 * By default, WordPress will show password protected posts with a title of
-	 * "Protected: %s", as the REST API communicates the protected status of a post
-	 * in a machine readable format, we remove the "Protected: " prefix.
-	 *
-	 * @since 5.9.0
-	 *
-	 * @return string Protected title format.
-	 */
-	public function protected_title_format() {
-		return '%s';
 	}
 
 	/**
@@ -570,27 +539,39 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	 * Checks if a given request has access to read a single theme global styles config.
 	 *
 	 * @since 5.9.0
+	 * @since 6.7.0 Allow users with edit post capabilities to view theme global styles.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
 	public function get_theme_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		/*
+		 * Verify if the current user has edit_posts capability.
+		 */
+		if ( current_user_can( 'edit_posts' ) ) {
+			return true;
+		}
+
+		foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+			if ( current_user_can( $post_type->cap->edit_posts ) ) {
+				return true;
+			}
+		}
 
 		/*
 		 * Verify if the current user has edit_theme_options capability.
-		 * This capability is required to edit/view/delete templates.
 		 */
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			return new WP_Error(
-				'rest_cannot_manage_global_styles',
-				__( 'Sorry, you are not allowed to access the global styles on this site.', 'gutenberg' ),
-				array(
-					'status' => rest_authorization_required_code(),
-				)
-			);
+		if ( current_user_can( 'edit_theme_options' ) ) {
+			return true;
 		}
 
-		return true;
+		return new WP_Error(
+			'rest_cannot_read_global_styles',
+			__( 'Sorry, you are not allowed to access the global styles on this site.', 'gutenberg' ),
+			array(
+				'status' => rest_authorization_required_code(),
+			)
+		);
 	}
 
 	/**
@@ -612,8 +593,8 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 		}
 
 		$theme  = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data( 'theme' );
-		$data   = array();
 		$fields = $this->get_fields_for_response( $request );
+		$data   = array();
 
 		if ( rest_is_field_included( 'settings', $fields ) ) {
 			$data['settings'] = $theme->get_settings();
@@ -621,21 +602,25 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 
 		if ( rest_is_field_included( 'styles', $fields ) ) {
 			$raw_data       = $theme->get_raw_data();
-			$data['styles'] = isset( $raw_data['styles'] ) ? $raw_data['styles'] : array();
+			$data['styles'] = $raw_data['styles'] ?? array();
 		}
 
-		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
-		$data    = $this->add_additional_fields_to_object( $data, $request );
-		$data    = $this->filter_response_by_context( $data, $context );
-
+		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data     = $this->add_additional_fields_to_object( $data, $request );
+		$data     = $this->filter_response_by_context( $data, $context );
 		$response = rest_ensure_response( $data );
 
 		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
-			$links = array(
+			$links               = array(
 				'self' => array(
 					'href' => rest_url( sprintf( '%s/%s/themes/%s', $this->namespace, $this->rest_base, $request['stylesheet'] ) ),
 				),
 			);
+			$resolved_theme_uris = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $theme );
+			if ( ! empty( $resolved_theme_uris ) ) {
+				$links['https://api.w.org/theme-file'] = $resolved_theme_uris;
+			}
+
 			$response->add_links( $links );
 		}
 
@@ -650,23 +635,8 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
 	 */
-	public function get_theme_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-
-		/*
-		 * Verify if the current user has edit_theme_options capability.
-		 * This capability is required to edit/view/delete templates.
-		 */
-		if ( ! current_user_can( 'edit_theme_options' ) ) {
-			return new WP_Error(
-				'rest_cannot_manage_global_styles',
-				__( 'Sorry, you are not allowed to access the global styles on this site.', 'gutenberg' ),
-				array(
-					'status' => rest_authorization_required_code(),
-				)
-			);
-		}
-
-		return true;
+	public function get_theme_items_permissions_check( $request ) {
+		return $this->get_theme_item_permissions_check( $request );
 	}
 
 	/**
@@ -675,6 +645,7 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 	 * @since 6.0.0
 	 * @since 6.2.0 Returns parent theme variations, if they exist.
 	 * @since 6.4.0 Removed unnecessary local variable.
+	 * @since 6.6.0 Added custom relative theme file URIs to `_links` for each item.
 	 *
 	 * @param WP_REST_Request $request The request instance.
 	 *
@@ -690,30 +661,116 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Controller {
 			);
 		}
 
+		$response = array();
+
+		// Register theme-defined variations e.g. from block style variation partials under `/styles`.
+		$partials = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations( 'block' );
+		gutenberg_register_block_style_variations_from_theme_json_partials( $partials );
+
 		$variations = WP_Theme_JSON_Resolver_Gutenberg::get_style_variations();
 
-		return rest_ensure_response( $variations );
+		// Add resolved theme asset links.
+		foreach ( $variations as $variation ) {
+			$variation_theme_json = new WP_Theme_JSON_Gutenberg( $variation );
+			$resolved_theme_uris  = WP_Theme_JSON_Resolver_Gutenberg::get_resolved_theme_uris( $variation_theme_json );
+			$data                 = rest_ensure_response( $variation );
+			if ( ! empty( $resolved_theme_uris ) ) {
+				$data->add_links(
+					array(
+						'https://api.w.org/theme-file' => $resolved_theme_uris,
+					)
+				);
+			}
+			$response[] = $this->prepare_response_for_collection( $data );
+		}
+
+		return rest_ensure_response( $response );
 	}
 
 	/**
 	 * Validate style.css as valid CSS.
 	 *
-	 * Currently just checks for invalid markup.
+	 * Currently just checks that CSS will not break an HTML STYLE tag.
 	 *
 	 * @since 6.2.0
 	 * @since 6.4.0 Changed method visibility to protected.
+	 * @since 7.0.0 Only restricts contents which risk prematurely closing the STYLE element,
+	 *              either through a STYLE end tag or a prefix of one which might become a
+	 *              full end tag when combined with the contents of other styles.
 	 *
 	 * @param string $css CSS to validate.
 	 * @return true|WP_Error True if the input was validated, otherwise WP_Error.
 	 */
 	protected function validate_custom_css( $css ) {
-		if ( preg_match( '#</?\w+#', $css ) ) {
-			return new WP_Error(
-				'rest_custom_css_illegal_markup',
-				__( 'Markup is not allowed in CSS.', 'gutenberg' ),
-				array( 'status' => 400 )
+		$length = strlen( $css );
+		for (
+			$at = strcspn( $css, '<' );
+			$at < $length;
+			$at += strcspn( $css, '<', ++$at )
+		) {
+			$remaining_strlen = $length - $at;
+			/**
+			 * Custom CSS text is expected to render inside an HTML STYLE element.
+			 * A STYLE closing tag must not appear within the CSS text because it
+			 * would close the element prematurely.
+			 *
+			 * The text must also *not* end with a partial closing tag (e.g., `<`,
+			 * `</`, … `</style`) because subsequent styles which are concatenated
+			 * could complete it, forming a valid `</style>` tag.
+			 *
+			 * Example:
+			 *
+			 *     $style_a = 'p { font-weight: bold; </sty';
+			 *     $style_b = 'le> gotcha!';
+			 *     $combined = "{$style_a}{$style_b}";
+			 *
+			 *     $style_a = 'p { font-weight: bold; </style';
+			 *     $style_b = 'p > b { color: red; }';
+			 *     $combined = "{$style_a}\n{$style_b}";
+			 *
+			 * Note how in the second example, both of the style contents are benign
+			 * when analyzed on their own. The first style was likely the result of
+			 * improper truncation, while the second is perfectly sound. It was only
+			 * through concatenation that these two scripts combined to form content
+			 * that would have broken out of the containing STYLE element, thus
+			 * corrupting the page and potentially introducing security issues.
+			 *
+			 * @link https://html.spec.whatwg.org/multipage/parsing.html#rawtext-end-tag-name-state
+			 */
+			$possible_style_close_tag = 0 === substr_compare(
+				$css,
+				'</style',
+				$at,
+				min( 7, $remaining_strlen ),
+				true
 			);
+			if ( $possible_style_close_tag ) {
+				if ( $remaining_strlen < 8 ) {
+					return new WP_Error(
+						'rest_custom_css_illegal_markup',
+						sprintf(
+							/* translators: %s is the CSS that was provided. */
+							__( 'The CSS must not end in "%s".', 'gutenberg' ),
+							esc_html( substr( $css, $at ) )
+						),
+						array( 'status' => 400 )
+					);
+				}
+
+				if ( 1 === strspn( $css, " \t\f\r\n/>", $at + 7, 1 ) ) {
+					return new WP_Error(
+						'rest_custom_css_illegal_markup',
+						sprintf(
+							/* translators: %s is the CSS that was provided. */
+							__( 'The CSS must not contain "%s".', 'gutenberg' ),
+							esc_html( substr( $css, $at, 8 ) )
+						),
+						array( 'status' => 400 )
+					);
+				}
+			}
 		}
+
 		return true;
 	}
 }

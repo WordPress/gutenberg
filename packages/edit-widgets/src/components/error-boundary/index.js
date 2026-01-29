@@ -11,7 +11,7 @@ import { doAction } from '@wordpress/hooks';
 function CopyButton( { text, children } ) {
 	const ref = useCopyToClipboard( text );
 	return (
-		<Button variant="secondary" ref={ ref }>
+		<Button __next40pxDefaultSize variant="secondary" ref={ ref }>
 			{ children }
 		</Button>
 	);

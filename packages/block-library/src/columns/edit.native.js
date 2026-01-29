@@ -13,7 +13,6 @@ import {
 	FooterMessageControl,
 	UnitControl,
 	getValueAndUnit,
-	GlobalStylesContext,
 	alignmentHelpers,
 	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
@@ -23,14 +22,14 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	BlockVariationPicker,
-	useSetting,
+	useSettings,
 	store as blockEditorStore,
+	useGlobalStyles,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
 import {
 	useEffect,
 	useState,
-	useContext,
 	useMemo,
 	useCallback,
 	memo,
@@ -58,17 +57,6 @@ import {
 	getContentWidths,
 } from './columnCalculations.native';
 import ColumnsPreview from '../column/column-preview';
-
-/**
- * Allowed blocks constant is passed to InnerBlocks precisely as specified here.
- * The contents of the array should never change.
- * The array should contain the name of each block that is allowed.
- * In columns block, the only block we allow is 'core/column'.
- *
- * @constant
- * @type {string[]}
- */
-const ALLOWED_BLOCKS = [ 'core/column' ];
 
 /**
  * Number of columns to assume for template in case the user opts to skip
@@ -101,19 +89,14 @@ function ColumnsEditContainer( {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUM );
 	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
-	const globalStyles = useContext( GlobalStylesContext );
+	const globalStyles = useGlobalStyles();
 
 	const { verticalAlignment, align } = attributes;
 	const { width } = sizes || {};
 
+	const [ availableUnits ] = useSettings( 'spacing.units' );
 	const units = useCustomUnits( {
-		availableUnits: useSetting( 'spacing.units' ) || [
-			'%',
-			'px',
-			'em',
-			'rem',
-			'vw',
-		],
+		availableUnits: availableUnits || [ '%', 'px', 'em', 'rem', 'vw' ],
 	} );
 
 	useEffect( () => {
@@ -280,7 +263,6 @@ function ColumnsEditContainer( {
 							columnsInRow > 1 ? 'horizontal' : undefined
 						}
 						horizontal={ columnsInRow > 1 }
-						allowedBlocks={ ALLOWED_BLOCKS }
 						contentResizeMode="stretch"
 						onAddBlock={ onAddBlock }
 						onDeleteBlock={
@@ -305,7 +287,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 		/**
 		 * Update all child Column blocks with a new vertical alignment setting
 		 * based on whatever alignment is passed in. This allows change to parent
-		 * to overide anything set on a individual column basis.
+		 * to override anything set on a individual column basis.
 		 *
 		 * @param {string} verticalAlignment the vertical alignment setting
 		 */

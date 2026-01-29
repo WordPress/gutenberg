@@ -10,7 +10,6 @@ import userEvent from '@testing-library/user-event';
 import { useState, useEffect } from '@wordpress/element';
 import {
 	BlockEditorProvider,
-	BlockTools,
 	BlockInspector,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
@@ -21,6 +20,11 @@ import {
 	unregisterBlockType,
 	getBlockTypes,
 } from '@wordpress/blocks';
+import {
+	store as richTextStore,
+	unregisterFormatType,
+} from '@wordpress/rich-text';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -32,7 +36,7 @@ const { ExperimentalBlockCanvas: BlockCanvas } = unlock(
 	blockEditorPrivateApis
 );
 
-// Polyfill for String.prototype.replaceAll until CI is runnig Node 15 or higher.
+// Polyfill for String.prototype.replaceAll until CI is running Node 15 or higher.
 if ( ! String.prototype.replaceAll ) {
 	String.prototype.replaceAll = function ( str, newStr ) {
 		// If a regex pattern
@@ -59,14 +63,18 @@ export async function selectBlock( name ) {
 
 export function Editor( { testBlocks, settings = {} } ) {
 	const [ currentBlocks, updateBlocks ] = useState( testBlocks );
+	const { getFormatTypes } = useSelect( richTextStore );
 
 	useEffect( () => {
 		return () => {
 			getBlockTypes().forEach( ( { name } ) =>
 				unregisterBlockType( name )
 			);
+			getFormatTypes().forEach( ( { name } ) =>
+				unregisterFormatType( name )
+			);
 		};
-	}, [] );
+	}, [ getFormatTypes ] );
 
 	return (
 		<BlockEditorProvider
@@ -76,9 +84,7 @@ export function Editor( { testBlocks, settings = {} } ) {
 			settings={ settings }
 		>
 			<BlockInspector />
-			<BlockTools>
-				<BlockCanvas height="100%" shouldIframe={ false } />
-			</BlockTools>
+			<BlockCanvas height="100%" shouldIframe={ false } />
 		</BlockEditorProvider>
 	);
 }

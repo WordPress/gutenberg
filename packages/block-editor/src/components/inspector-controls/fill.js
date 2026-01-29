@@ -12,8 +12,15 @@ import { useEffect, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import useDisplayBlockControls from '../use-display-block-controls';
+import {
+	useBlockEditContext,
+	mayDisplayControlsKey,
+	mayDisplayPatternEditingControlsKey,
+} from '../block-edit/context';
 import groups from './groups';
+
+const PATTERN_EDITING_GROUPS = [ 'content', 'list' ];
+const TEMPLATE_PART_GROUPS = [ 'default', 'settings', 'advanced' ];
 
 export default function InspectorControlsFill( {
 	children,
@@ -33,13 +40,37 @@ export default function InspectorControlsFill( {
 		group = __experimentalGroup;
 	}
 
-	const isDisplayed = useDisplayBlockControls();
+	const context = useBlockEditContext();
 	const Fill = groups[ group ]?.Fill;
 	if ( ! Fill ) {
 		warning( `Unknown InspectorControls group "${ group }" provided.` );
 		return null;
 	}
-	if ( ! isDisplayed ) {
+
+	// During pattern editing:
+	// - All blocks can show pattern editing groups (content, list).
+	// - Template parts can show a settings tab (default, settings, advanced groups).
+	// - Other blocks cannot show a settings tab.
+	if ( context[ mayDisplayPatternEditingControlsKey ] ) {
+		// Template parts are allowed to show a settings tab to allow access to the
+		// 'Design' and 'Advanced' panels.
+		const isTemplatePart = context.name === 'core/template-part';
+		const isTemplatePartGroup = TEMPLATE_PART_GROUPS.includes( group );
+		const isPatternEditingGroup = PATTERN_EDITING_GROUPS.includes( group );
+
+		const canShowGroup =
+			( isTemplatePart && isTemplatePartGroup ) || isPatternEditingGroup;
+
+		if ( ! canShowGroup ) {
+			return null;
+		}
+	}
+
+	// Outside pattern editing, use the standard rules for displaying controls.
+	if (
+		! context[ mayDisplayPatternEditingControlsKey ] &&
+		! context[ mayDisplayControlsKey ]
+	) {
 		return null;
 	}
 

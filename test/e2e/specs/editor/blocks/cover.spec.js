@@ -26,7 +26,6 @@ test.describe( 'Cover', () => {
 
 	test( 'can set overlay color using color picker on block placeholder', async ( {
 		editor,
-		coverBlockUtils,
 	} ) => {
 		await editor.insertBlock( { name: 'core/cover' } );
 		const coverBlock = editor.canvas.getByRole( 'document', {
@@ -34,24 +33,19 @@ test.describe( 'Cover', () => {
 		} );
 
 		// Locate the Black color swatch.
-		const blackColorSwatch = coverBlock.getByRole( 'option', {
-			name: 'Color: Black',
+		const blackColorSwatch = coverBlock.getByRole( 'button', {
+			name: 'Black',
 		} );
 		await expect( blackColorSwatch ).toBeVisible();
-
-		// Get the RGB value of Black.
-		const [ blackRGB ] = await coverBlockUtils.getBackgroundColorAndOpacity(
-			coverBlock
-		);
 
 		// Create the block by clicking selected color button.
 		await blackColorSwatch.click();
 
-		// Get the RGB value of the background dim.
-		const [ actualRGB ] =
-			await coverBlockUtils.getBackgroundColorAndOpacity( coverBlock );
-
-		expect( blackRGB ).toEqual( actualRGB );
+		// Assert that after clicking black, the background color is black.
+		await expect( coverBlock ).toHaveCSS(
+			'background-color',
+			'rgb(0, 0, 0)'
+		);
 	} );
 
 	test( 'can set background image using image upload on block placeholder', async ( {
@@ -63,10 +57,10 @@ test.describe( 'Cover', () => {
 			name: 'Block: Cover',
 		} );
 
-		const filename = await coverBlockUtils.upload(
+		const fileName = await coverBlockUtils.upload(
 			coverBlock.getByTestId( 'form-file-upload-input' )
 		);
-		const fileBasename = path.basename( filename );
+		const fileBasename = path.basename( fileName );
 
 		// Wait for the img's src attribute to be prefixed with http.
 		// Otherwise, the URL for the img src attribute starts is a placeholder
@@ -77,7 +71,7 @@ test.describe( 'Cover', () => {
 		} ).toPass();
 	} );
 
-	test( 'dims background image down by 50% by default', async ( {
+	test( 'dims background image down by 50% with the average image color when an image is uploaded', async ( {
 		editor,
 		coverBlockUtils,
 	} ) => {
@@ -90,15 +84,14 @@ test.describe( 'Cover', () => {
 			coverBlock.getByTestId( 'form-file-upload-input' )
 		);
 
-		// The hidden span must be used as the target for opacity and color value.
-		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
-		// The hidden span value returns the correct opacity at 0.5.
-		const [ backgroundDimColor, backgroundDimOpacity ] =
-			await coverBlockUtils.getBackgroundColorAndOpacity(
-				coverBlock.locator( 'span[aria-hidden="true"]' )
-			);
-		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
-		expect( backgroundDimOpacity ).toBe( '0.5' );
+		// The overlay is a separate aria-hidden span before the image.
+		const overlay = coverBlock.locator( '.wp-block-cover__background' );
+
+		await expect( overlay ).toHaveCSS(
+			'background-color',
+			'rgb(179, 179, 179)'
+		);
+		await expect( overlay ).toHaveCSS( 'opacity', '0.5' );
 	} );
 
 	test( 'can have the title edited', async ( { editor } ) => {
@@ -112,15 +105,15 @@ test.describe( 'Cover', () => {
 		// Choose a color swatch to transform the placeholder block into
 		// a functioning block.
 		await coverBlock
-			.getByRole( 'option', {
-				name: 'Color: Black',
+			.getByRole( 'button', {
+				name: 'Black',
 			} )
 			.click();
 
 		// Activate the paragraph block inside the Cover block.
 		// The name of the block differs depending on whether text has been entered or not.
 		const coverBlockParagraph = coverBlock.getByRole( 'document', {
-			name: /Paragraph block|Empty block; start writing or type forward slash to choose a block/,
+			name: /Block: Paragraph|Empty block; start writing or type forward slash to choose a block/,
 		} );
 		await expect( coverBlockParagraph ).toBeEditable();
 
@@ -135,8 +128,8 @@ test.describe( 'Cover', () => {
 			name: 'Block: Cover',
 		} );
 		await coverBlock
-			.getByRole( 'option', {
-				name: 'Color: Black',
+			.getByRole( 'button', {
+				name: 'Black',
 			} )
 			.click();
 
@@ -165,7 +158,7 @@ test.describe( 'Cover', () => {
 
 		// Ensure there the default value for the minimum height of cover is undefined.
 		const defaultHeightValue = await coverBlockEditorSettings
-			.getByLabel( 'Minimum height of cover' )
+			.getByLabel( 'Minimum height' )
 			.inputValue();
 		expect( defaultHeightValue ).toBeFalsy();
 
@@ -184,7 +177,7 @@ test.describe( 'Cover', () => {
 		expect( coverBlockBox.height ).toBeTruthy();
 		expect( coverBlockResizeHandleBox.height ).toBeTruthy();
 
-		// Increse the Cover block height by 100px.
+		// Increase the Cover block height by 100px.
 		await coverBlockResizeHandle.hover();
 		await page.mouse.down();
 
@@ -201,7 +194,7 @@ test.describe( 'Cover', () => {
 		expect( newCoverBlockBox.height ).toBe( coverBlockBox.height + 100 );
 	} );
 
-	test( 'dims the background image down by 50% when transformed from the Image block', async ( {
+	test( 'dims the background image down by 50% black when transformed from the Image block', async ( {
 		editor,
 		coverBlockUtils,
 	} ) => {
@@ -227,19 +220,128 @@ test.describe( 'Cover', () => {
 			name: 'Block: Cover',
 		} );
 
-		// The hidden span must be used as the target for opacity and color value.
-		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
-		// The hidden span value returns the correct opacity at 0.5.
-		const [ backgroundDimColor, backgroundDimOpacity ] =
-			await coverBlockUtils.getBackgroundColorAndOpacity(
-				coverBlock.locator( 'span[aria-hidden="true"]' )
-			);
+		// The overlay is a separate aria-hidden span before the image.
+		const overlay = coverBlock.locator( '.wp-block-cover__background' );
 
-		// The hidden span must be used as the target for opacity and color value.
-		// Using the Cover block to calculate the opacity results in an incorrect value of 1.
-		// The hidden span value returns the correct opacity at 0.5.
-		expect( backgroundDimColor ).toBe( 'rgb(0, 0, 0)' );
-		expect( backgroundDimOpacity ).toBe( '0.5' );
+		await expect( overlay ).toHaveCSS( 'background-color', 'rgb(0, 0, 0)' );
+		await expect( overlay ).toHaveCSS( 'opacity', '0.5' );
+	} );
+
+	test( 'other cover blocks are not over the navigation block when the menu is open', async ( {
+		editor,
+		page,
+	} ) => {
+		// Insert a Cover block
+		await editor.insertBlock( { name: 'core/cover' } );
+		const coverBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
+
+		// Choose a color swatch to transform the placeholder block into
+		// a functioning block.
+		await coverBlock
+			.getByRole( 'button', {
+				name: 'Black',
+			} )
+			.click();
+
+		// Insert a Navigation block inside the Cover block
+		await editor.selectBlocks( coverBlock );
+		await coverBlock.getByRole( 'button', { name: 'Add block' } ).click();
+		await page.keyboard.type( 'Navigation' );
+		const blockResults = page.getByRole( 'listbox', {
+			name: 'Blocks',
+		} );
+		const blockResultOptions = blockResults.getByRole( 'option' );
+		await blockResultOptions.nth( 0 ).click();
+
+		// Insert a second Cover block.
+		await editor.insertBlock( { name: 'core/cover' } );
+		const secondCoverBlock = editor.canvas
+			.getByRole( 'document', {
+				name: 'Block: Cover',
+			} )
+			.last();
+
+		// Choose a color swatch to transform the placeholder block into
+		// a functioning block.
+		await secondCoverBlock
+			.getByRole( 'button', {
+				name: 'Black',
+			} )
+			.click();
+
+		// Set the viewport to a small screen and open menu.
+		await page.setViewportSize( { width: 375, height: 1000 } );
+		const navigationBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Navigation',
+		} );
+		await editor.selectBlocks( navigationBlock );
+		await editor.canvas
+			.getByRole( 'button', { name: 'Open menu' } )
+			.click();
+
+		// Check if inner container of the second cover is clickable.
+		const secondInnerContainer = secondCoverBlock.locator(
+			'.wp-block-cover__inner-container'
+		);
+		let isClickable;
+		try {
+			isClickable = await secondInnerContainer.click( {
+				trial: true,
+				timeout: 1000, // This test will always take 1 second to run.
+			} );
+		} catch ( error ) {
+			isClickable = false;
+		}
+
+		expect( isClickable ).toBe( false );
+	} );
+
+	test( 'can use focal point picker to set the focal point of the cover image', async ( {
+		editor,
+		coverBlockUtils,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/cover' } );
+		const coverBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Cover',
+		} );
+
+		await coverBlockUtils.upload(
+			coverBlock.getByTestId( 'form-file-upload-input' )
+		);
+
+		await editor.selectBlocks( coverBlock );
+
+		const focalPointLeft = page.getByRole( 'spinbutton', {
+			name: 'Focal point left position',
+		} );
+
+		const focalPointTop = page.getByRole( 'spinbutton', {
+			name: 'Focal point top position',
+		} );
+
+		await focalPointLeft.fill( '20' );
+		await focalPointTop.fill( '30' );
+
+		await expect( focalPointLeft ).toHaveValue( '20' );
+		await expect( focalPointTop ).toHaveValue( '30' );
+
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/cover',
+				attributes: {
+					focalPoint: { x: 0.2, y: 0.3 },
+				},
+			},
+		] );
+
+		const coverImage = coverBlock.locator(
+			'img.wp-block-cover__image-background'
+		);
+
+		await expect( coverImage ).toHaveCSS( 'object-position', '20% 30%' );
 	} );
 } );
 
@@ -262,19 +364,12 @@ class CoverBlockUtils {
 		const tmpDirectory = await fs.mkdtemp(
 			path.join( os.tmpdir(), 'gutenberg-test-image-' )
 		);
-		const filename = uuid();
-		const tmpFileName = path.join( tmpDirectory, filename + '.png' );
+		const fileName = uuid();
+		const tmpFileName = path.join( tmpDirectory, fileName + '.png' );
 		await fs.copyFile( this.TEST_IMAGE_FILE_PATH, tmpFileName );
 
 		await locator.setInputFiles( tmpFileName );
 
-		return filename;
-	}
-
-	async getBackgroundColorAndOpacity( locator ) {
-		return await locator.evaluate( ( el ) => {
-			const computedStyle = window.getComputedStyle( el );
-			return [ computedStyle.backgroundColor, computedStyle.opacity ];
-		} );
+		return fileName;
 	}
 }

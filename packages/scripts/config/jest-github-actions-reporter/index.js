@@ -35,7 +35,9 @@ class GithubActionsReporter {
 }
 
 function getMessages( results ) {
-	if ( ! results ) return [];
+	if ( ! results ) {
+		return [];
+	}
 
 	return results.reduce(
 		flatMap( ( { testFilePath, testResults } ) =>

@@ -32,10 +32,6 @@
  * @since 6.3.0
  */
 
-if ( class_exists( 'WP_Duotone_Gutenberg' ) ) {
-	return;
-}
-
 /**
  * Manages duotone block supports and global styles.
  *
@@ -136,7 +132,7 @@ class WP_Duotone_Gutenberg {
 	 * Direct port of colord's clamp function. Using min/max instead of
 	 * nested ternaries.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L23
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L23
 	 *
 	 * @param float $number The number to clamp.
 	 * @param float $min   The minimum value.
@@ -150,7 +146,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's clampHue function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L32
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L32
 	 *
 	 * @param float $degrees The hue to clamp.
 	 * @return float The clamped hue.
@@ -163,7 +159,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's parseHue function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L40
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/helpers.ts#L40
 	 *
 	 * @param float  $value The hue value to parse.
 	 * @param string $unit  The unit of the hue value.
@@ -187,7 +183,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's parseHex function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hex.ts#L8
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hex.ts#L8
 	 *
 	 * @param string $hex The hex string to parse.
 	 * @return array|null An array of RGBA values or null if the hex string is invalid.
@@ -229,7 +225,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's clampRgba function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/rgb.ts#L5
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/rgb.ts#L5
 	 *
 	 * @param array $rgba The RGBA array to clamp.
 	 * @return array The clamped RGBA array.
@@ -246,7 +242,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's parseRgbaString function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/rgbString.ts#L18
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/rgbString.ts#L18
 	 *
 	 * @param string $input The RGBA string to parse.
 	 * @return array|null An array of RGBA values or null if the RGB string is invalid.
@@ -297,7 +293,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's clampHsla function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L6
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L6
 	 *
 	 * @param array $hsla The HSLA array to clamp.
 	 * @return array The clamped HSLA array.
@@ -314,7 +310,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's hsvaToRgba function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsv.ts#L52
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsv.ts#L52
 	 *
 	 * @param array $hsva The HSVA array to convert.
 	 * @return array The RGBA array.
@@ -342,7 +338,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's hslaToHsva function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L33
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L33
 	 *
 	 * @param array $hsla The HSLA array to convert.
 	 * @return array The HSVA array.
@@ -366,7 +362,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's hslaToRgba function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L55
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hsl.ts#L55
 	 *
 	 * @param array $hsla The HSLA array to convert.
 	 * @return array The RGBA array.
@@ -378,7 +374,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Direct port of colord's parseHslaString function.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hslString.ts#L17
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/colorModels/hslString.ts#L17
 	 *
 	 * @param string $input The HSLA string to parse.
 	 * @return array|null An array of RGBA values or null if the RGB string is invalid.
@@ -428,7 +424,7 @@ class WP_Duotone_Gutenberg {
 	 * Direct port of colord's parse function simplified for our use case. This
 	 * version only supports string parsing and only returns RGBA values.
 	 *
-	 * @see https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/parse.ts#L37
+	 * @link https://github.com/omgovich/colord/blob/3f859e03b0ca622eb15480f611371a0f15c9427f/src/parse.ts#L37
 	 *
 	 * @param string $input The string to parse.
 	 * @return array|null An array of RGBA values or null if the string is invalid.
@@ -627,7 +623,7 @@ class WP_Duotone_Gutenberg {
 	 * @return string The CSS for global styles.
 	 */
 	private static function get_global_styles_presets( $sources ) {
-		$css = 'body{';
+		$css = WP_Theme_JSON_Gutenberg::ROOT_CSS_PROPERTIES_SELECTOR . '{';
 		foreach ( $sources as $filter_id => $filter_data ) {
 			$slug              = $filter_data['slug'];
 			$colors            = $filter_data['colors'];
@@ -644,25 +640,25 @@ class WP_Duotone_Gutenberg {
 	 *
 	 * @param string $block_name The block name.
 	 *
-	 * @return string The CSS selector or null if there is no support.
+	 * @return ?string The CSS selector or null if there is no support.
 	 */
 	private static function get_selector( $block_name ) {
 		$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block_name );
 
-		if ( $block_type && property_exists( $block_type, 'supports' ) ) {
+		if ( $block_type && $block_type instanceof WP_Block_Type ) {
 			// Backwards compatibility with `supports.color.__experimentalDuotone`
 			// is provided via the `block_type_metadata_settings` filter. If
 			// `supports.filter.duotone` has not been set and the experimental
 			// property has been, the experimental property value is copied into
 			// `supports.filter.duotone`.
-			$duotone_support = _wp_array_get( $block_type->supports, array( 'filter', 'duotone' ), false );
+			$duotone_support = $block_type->supports['filter']['duotone'] ?? false;
 			if ( ! $duotone_support ) {
 				return null;
 			}
 
 			// If the experimental duotone support was set, that value is to be
 			// treated as a selector and requires scoping.
-			$experimental_duotone = _wp_array_get( $block_type->supports, array( 'color', '__experimentalDuotone' ), false );
+			$experimental_duotone = $block_type->supports['color']['__experimentalDuotone'] ?? false;
 			if ( $experimental_duotone ) {
 				$root_selector = wp_get_block_css_selector( $block_type );
 				return is_string( $experimental_duotone )
@@ -673,6 +669,8 @@ class WP_Duotone_Gutenberg {
 			// Regular filter.duotone support uses filter.duotone selectors with fallbacks.
 			return wp_get_block_css_selector( $block_type, array( 'filter', 'duotone' ), true );
 		}
+
+		return null;
 	}
 
 	/**
@@ -747,10 +745,10 @@ class WP_Duotone_Gutenberg {
 	 */
 	public static function register_duotone_support( $block_type ) {
 		$has_duotone_support = false;
-		if ( property_exists( $block_type, 'supports' ) ) {
+		if ( $block_type instanceof WP_Block_Type ) {
 			// Previous `color.__experimentalDuotone` support flag is migrated
 			// to `filter.duotone` via `block_type_metadata_settings` filter.
-			$has_duotone_support = _wp_array_get( $block_type->supports, array( 'filter', 'duotone' ), null );
+			$has_duotone_support = $block_type->supports['filter']['duotone'] ?? null;
 		}
 
 		if ( $has_duotone_support ) {
@@ -775,7 +773,7 @@ class WP_Duotone_Gutenberg {
 	public static function set_global_styles_presets() {
 		// Get the per block settings from the theme.json.
 		$tree              = gutenberg_get_global_settings();
-		$presets_by_origin = _wp_array_get( $tree, array( 'color', 'duotone' ), array() );
+		$presets_by_origin = $tree['color']['duotone'] ?? array();
 
 		foreach ( $presets_by_origin as $presets ) {
 			foreach ( $presets as $preset ) {
@@ -829,6 +827,10 @@ class WP_Duotone_Gutenberg {
 	 * @return string                Filtered block content.
 	 */
 	public static function render_duotone_support( $block_content, $block ) {
+		if ( null === $block['blockName'] ) {
+			return $block_content;
+		}
+
 		$duotone_selector = self::get_selector( $block['blockName'] );
 
 		// The block should have a duotone attribute or have duotone defined in its theme.json to be processed.
@@ -836,7 +838,6 @@ class WP_Duotone_Gutenberg {
 		$has_global_styles_duotone = array_key_exists( $block['blockName'], self::$global_styles_block_names );
 
 		if (
-			empty( $block_content ) ||
 			! $duotone_selector ||
 			( ! $has_duotone_attribute && ! $has_global_styles_duotone )
 		) {
@@ -902,6 +903,45 @@ class WP_Duotone_Gutenberg {
 	}
 
 	/**
+	 * Fixes the issue with our generated class name not being added to the block's outer container
+	 * in classic themes due to gutenberg_restore_image_outer_container from layout block supports.
+	 *
+	 * @since 6.5.0
+	 *
+	 * @param  string $block_content Rendered block content.
+	 * @return string                Filtered block content.
+	 */
+	public static function restore_image_outer_container( $block_content ) {
+		if ( wp_theme_has_theme_json() ) {
+			return $block_content;
+		}
+
+		$tags          = new WP_HTML_Tag_Processor( $block_content );
+		$wrapper_query = array(
+			'tag_name'   => 'div',
+			'class_name' => 'wp-block-image',
+		);
+		if ( ! $tags->next_tag( $wrapper_query ) ) {
+			return $block_content;
+		}
+
+		$tags->set_bookmark( 'wrapper-div' );
+		$tags->next_tag();
+
+		$inner_classnames = explode( ' ', $tags->get_attribute( 'class' ) );
+		foreach ( $inner_classnames as $classname ) {
+			if ( 0 === strpos( $classname, 'wp-duotone' ) ) {
+				$tags->remove_class( $classname );
+				$tags->seek( 'wrapper-div' );
+				$tags->add_class( $classname );
+				break;
+			}
+		}
+
+		return $tags->get_updated_html();
+	}
+
+	/**
 	 * Appends the used block duotone filter declarations to the inline block supports CSS.
 	 *
 	 * @since 6.3.0
@@ -939,9 +979,17 @@ class WP_Duotone_Gutenberg {
 			echo self::get_svg_definitions( self::$used_svg_filter_data );
 		}
 
-		// This is for classic themes - in block themes, the CSS is added in the head via wp_add_inline_style in the wp_enqueue_scripts action.
-		if ( ! wp_is_block_theme() && ! empty( self::$used_global_styles_presets ) ) {
-			wp_add_inline_style( 'core-block-supports', self::get_global_styles_presets( self::$used_global_styles_presets ) );
+		// In block themes, the CSS is added in the head via wp_add_inline_style in the wp_enqueue_scripts action.
+		if ( ! wp_is_block_theme() ) {
+			$style_tag_id = 'core-block-supports-duotone';
+			wp_register_style( $style_tag_id, false );
+			if ( ! empty( self::$used_global_styles_presets ) ) {
+				wp_add_inline_style( $style_tag_id, self::get_global_styles_presets( self::$used_global_styles_presets ) );
+			}
+			if ( ! empty( self::$block_css_declarations ) ) {
+				wp_add_inline_style( $style_tag_id, gutenberg_style_engine_get_stylesheet_from_css_rules( self::$block_css_declarations ) );
+			}
+			wp_enqueue_style( $style_tag_id );
 		}
 	}
 
@@ -995,7 +1043,7 @@ class WP_Duotone_Gutenberg {
 	 * @return array Filtered block type settings.
 	 */
 	public static function migrate_experimental_duotone_support_flag( $settings, $metadata ) {
-		$duotone_support = _wp_array_get( $metadata, array( 'supports', 'color', '__experimentalDuotone' ), null );
+		$duotone_support = $metadata['supports']['color']['__experimentalDuotone'] ?? null;
 
 		if ( ! isset( $settings['supports']['filter']['duotone'] ) && null !== $duotone_support ) {
 			_wp_array_set( $settings, array( 'supports', 'filter', 'duotone' ), (bool) $duotone_support );

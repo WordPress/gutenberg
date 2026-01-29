@@ -13,7 +13,7 @@ type AsyncListConfig = {
  *
  * @param list  New array.
  * @param state Current state.
- * @return First items present iin state.
+ * @return First items present in state.
  */
 function getFirstItemsPresentInState< T >( list: T[], state: T[] ): T[] {
 	const firstItems = [];

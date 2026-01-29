@@ -22,11 +22,13 @@ test.describe( 'Site editor title', () => {
 			postType: 'wp_template',
 			canvas: 'edit',
 		} );
-		const title = page.locator(
-			'role=region[name="Editor top bar"i] >> role=heading[level=1]'
-		);
+		const title = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'heading', {
+				name: 'Index',
+			} );
 
-		await expect( title ).toHaveText( 'Editing template:Index' );
+		await expect( title ).toBeVisible();
 	} );
 
 	test( 'displays the selected template name in the title for the header template', async ( {
@@ -39,10 +41,12 @@ test.describe( 'Site editor title', () => {
 			postType: 'wp_template_part',
 			canvas: 'edit',
 		} );
-		const title = page.locator(
-			'role=region[name="Editor top bar"i] >> role=heading[level=1]'
-		);
+		const title = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'heading', {
+				name: 'header',
+			} );
 
-		await expect( title ).toHaveText( 'Editing template part:header' );
+		await expect( title ).toBeVisible();
 	} );
 } );

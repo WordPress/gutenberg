@@ -4,6 +4,8 @@ export type AnglePickerControlProps = {
 	 * in a future version.
 	 *
 	 * @default false
+	 * @deprecated Default behavior since WP 6.5. Prop can be safely removed.
+	 * @ignore
 	 */
 	__nextHasNoMarginBottom?: boolean;
 	/**

@@ -11,16 +11,17 @@ import HeadingLevelIcon from './heading-level-icon';
 
 const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
 
-/** @typedef {import('@wordpress/element').WPComponent} WPComponent */
+/** @typedef {import('react').ComponentType} ComponentType */
 
 /**
  * HeadingLevelDropdown props.
  *
  * @typedef WPHeadingLevelDropdownProps
  *
- * @property {number}                 selectedLevel The chosen heading level.
- * @property {(newValue:number)=>any} onChange      Callback to run when
- *                                                  toolbar value is changed.
+ * @property {number}     value    The chosen heading level.
+ * @property {number[]}   options  An array of supported heading levels.
+ * @property {()=>number} onChange Function called with
+ *                                 the selected value changes.
  */
 
 /**
@@ -28,7 +29,7 @@ const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
  *
  * @param {WPHeadingLevelDropdownProps} props Component props.
  *
- * @return {WPComponent} The toolbar.
+ * @return {ComponentType} The toolbar.
  */
 export default function HeadingLevelDropdown( {
 	options = HEADING_LEVELS,
@@ -48,7 +49,7 @@ export default function HeadingLevelDropdown( {
 					isPressed={ isActive }
 				/>
 			),
-			// translators: %s: heading level e.g: "1", "2", "3"
+			// translators: %d: heading level e.g: "1", "2", "3"
 			title: sprintf( __( 'Heading %d' ), targetLevel ),
 			isActive,
 			onClick: () => onChangeCallback( targetLevel ),

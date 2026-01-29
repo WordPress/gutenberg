@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -10,9 +10,9 @@ import { Heading } from '..';
 
 const meta: Meta< typeof Heading > = {
 	component: Heading,
-	title: 'Components (Experimental)/Heading',
+	title: 'Components/Typography/Heading',
+	id: 'components-heading',
 	argTypes: {
-		adjustLineHeightForInnerControls: { control: { type: 'text' } },
 		as: { control: { type: 'text' } },
 		color: { control: { type: 'color' } },
 		display: { control: { type: 'text' } },
@@ -20,12 +20,12 @@ const meta: Meta< typeof Heading > = {
 		lineHeight: { control: { type: 'text' } },
 		optimizeReadabilityFor: { control: { type: 'color' } },
 		variant: {
-			control: { type: 'radio' },
-			options: [ 'undefined', 'muted' ],
-			mapping: { undefined, muted: 'muted' },
+			control: { type: 'select' },
+			options: [ undefined, 'muted' ],
 		},
 		weight: { control: { type: 'text' } },
 	},
+	tags: [ 'status-experimental' ],
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },

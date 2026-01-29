@@ -1,3 +1,6 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
 .components-toolbar__control.components-button {
 	position: relative;
 
@@ -15,11 +18,6 @@
 		position: absolute;
 		right: 8px;
 		bottom: 10px;
-	}
-
-	// Hide focus rectangle on click.
-	&:active::before {
-		display: none;
 	}
 
 	&:not(:disabled).is-pressed[data-subscript]::after {

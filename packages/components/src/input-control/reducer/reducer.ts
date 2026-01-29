@@ -192,25 +192,28 @@ export function useInputControlStateReducer(
 	const pressDown = createKeyEvent( actions.PRESS_DOWN );
 	const pressEnter = createKeyEvent( actions.PRESS_ENTER );
 
-	const currentState = useRef( state );
-	const refProps = useRef( { value: initialState.value, onChangeHandler } );
+	const currentStateRef = useRef( state );
+	const refPropsRef = useRef( {
+		value: initialState.value,
+		onChangeHandler,
+	} );
 
 	// Freshens refs to props and state so that subsequent effects have access
 	// to their latest values without their changes causing effect runs.
 	useLayoutEffect( () => {
-		currentState.current = state;
-		refProps.current = { value: initialState.value, onChangeHandler };
+		currentStateRef.current = state;
+		refPropsRef.current = { value: initialState.value, onChangeHandler };
 	} );
 
 	// Propagates the latest state through onChange.
 	useLayoutEffect( () => {
 		if (
-			currentState.current._event !== undefined &&
-			state.value !== refProps.current.value &&
+			currentStateRef.current._event !== undefined &&
+			state.value !== refPropsRef.current.value &&
 			! state.isDirty
 		) {
-			refProps.current.onChangeHandler( state.value ?? '', {
-				event: currentState.current._event as
+			refPropsRef.current.onChangeHandler( state.value ?? '', {
+				event: currentStateRef.current._event as
 					| ChangeEvent< HTMLInputElement >
 					| PointerEvent< HTMLInputElement >,
 			} );
@@ -220,8 +223,8 @@ export function useInputControlStateReducer(
 	// Updates the state from props.
 	useLayoutEffect( () => {
 		if (
-			initialState.value !== currentState.current.value &&
-			! currentState.current.isDirty
+			initialState.value !== currentStateRef.current.value &&
+			! currentStateRef.current.isDirty
 		) {
 			dispatch( {
 				type: actions.CONTROL,

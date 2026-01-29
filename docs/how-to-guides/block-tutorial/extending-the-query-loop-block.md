@@ -12,9 +12,14 @@ By registering your own block variation with some specific Query Loop block sett
 
 With the block variations API you can provide the default settings that make the most sense for your use-case.
 
+In order to have a Query Loop variation properly working, we'll need to:
+- Register the block variation for the `core/query` block with some default values
+- Define a layout for the block variation
+- Use the `namespace` attribute in the `isActive` block variation property
+
 Let's go on a journey, for example, of setting up a variation for a plugin which registers a `book` [custom post type](https://developer.wordpress.org/plugins/post-types/).
 
-### Offer sensible defaults
+### 1. Offer sensible defaults
 
 Your first step would be to create a variation which will be set up in such a way to provide a block variation which will display by default a list of books instead of blog posts. The full variation code will look something like this:
 
@@ -91,7 +96,9 @@ In this way, your block will show up just like any other block while the user is
 
 At this point, your custom variation will be virtually indistinguishable from a stand-alone block. Completely branded to your plugin, easy to discover and directly available to the user as a drop in.
 
-### Customize your variation layout
+However, your query loop variation won't work just yet — we still need to define a layout so that it can render properly.
+
+### 2. Customize your variation layout
 
 Please note that the Query Loop block supports `'block'` as a string in the `scope` property. In theory, that's to allow the variation to be picked up after inserting the block itself. Read more about the Block Variation Picker [here](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-variation-picker/README.md).
 
@@ -125,7 +132,7 @@ In order for a variation to be connected to another Query Loop variation we need
 
 For example, if we have a Query Loop variation exposed to the inserter(`scope: ['inserter']`) with the name `products`, we can connect a scoped `block` variation by setting its `namespace` attribute to `['products']`. If the user selects this variation after having clicked `Start blank`, the namespace attribute will be overridden by the main inserter variation.
 
-### Making Gutenberg recognize your variation
+### 3. Making Gutenberg recognize your variation
 
 There is one slight problem you might have realized after implementing this variation: while it is transparent to the user as they are inserting it, Gutenberg will still recognize the variation as a Query Loop block at its core and so, after its insertion, it will show up as a Query Loop block in the tree view of the editor, for instance.
 
@@ -176,9 +183,11 @@ As of Gutenberg version 14.2, the following controls are available:
 -   `postType` - Shows a dropdown of available post types.
 -   `order` - Shows a dropdown to select the order of the query.
 -   `sticky` - Shows a dropdown to select how to handle sticky posts.
--   `taxQuery` - Shows available taxonomies filters for the currently selected post type.
+-   `taxQuery` - Shows available taxonomies filters for the currently selected post type, including both inclusion and exclusion controls for each taxonomy.
 -   `author` - Shows an input field to filter the query by author.
--   `search` - Shows an input filed to filter the query by keywords.
+-   `search` - Shows an input field to filter the query by keywords.
+-   `format` - Shows an input field to filter the query by array/collection of [formats](https://developer.wordpress.org/advanced-administration/wordpress/post-formats/#supported-formats).
+-   `parents` - Shows an input field to filter the query using parent(s) entity.
 
 In our case, the property would look like this:
 
@@ -193,6 +202,29 @@ If you want to hide all the above available controls, you can set an empty array
 
 Notice that we have also disabled the `postType` control. When the user selects our variation, why show them a confusing dropdown to change the post type? On top of that it might break the block as we can implement custom controls, as we'll see shortly.
 
+### Understanding the `taxQuery` structure
+
+The `taxQuery` attribute supports both inclusion and exclusion of taxonomy terms. The structure looks like this:
+
+```js
+{
+	query: {
+		taxQuery: {
+			include: {
+				category: [1, 2, 3], // Include posts with these category IDs.
+				post_tag: [10, 20] // Include posts with these tag IDs.
+			},
+			exclude: {
+				category: [5, 6], // Exclude posts with these category IDs.
+				post_tag: [15] // Exclude posts with these tag IDs.
+			}
+		}
+	}
+}
+```
+
+When you use the `taxQuery` control in your variation, users will see both "[Taxonomy]" (inclusion) and "Exclude: [Taxonomy]" controls for each applicable taxonomy. The inclusion and exclusion are mutually exclusive in the UI - terms selected in one won't appear as suggestions in the other.
+
 ### Adding additional controls
 
 Because our plugin uses custom attributes that we need to query, we want to add our own controls to allow the users to select those instead of the ones we have just disabled from the core inspector controls. We can do this via a [React HOC](https://reactjs.org/docs/higher-order-components.html) hooked into a [block filter](https://developer.wordpress.org/block-editor/reference-guides/filters/block-filters/), like so:
@@ -202,19 +234,19 @@ import { InspectorControls } from '@wordpress/block-editor';
 
 export const withBookQueryControls = ( BlockEdit ) => ( props ) => {
 	// We only want to add these controls if it is our variation,
-	// so here we can implement a custom logic to check for that, similiar
+	// so here we can implement a custom logic to check for that, similar
 	// to the `isActive` function described above.
 	// The following assumes that you wrote a custom `isMyBooksVariation`
 	// function to handle that.
 	return isMyBooksVariation( props ) ? (
 		<>
-			<BlockEdit { ...props } />
+			<BlockEdit key="edit" { ...props } />
 			<InspectorControls>
 				<BookAuthorSelector /> { /** Our custom component */ }
 			</InspectorControls>
 		</>
 	) : (
-		<BlockEdit { ...props } />
+		<BlockEdit key="edit" { ...props } />
 	);
 };
 

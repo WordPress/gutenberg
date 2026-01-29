@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 import { v4 as uuid } from 'uuid';
 
 /**
@@ -16,10 +16,11 @@ import deprecated from '@wordpress/deprecated';
  */
 import { getNestedValue, setNestedValue } from './utils';
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
-import { getOrLoadEntitiesConfig, DEFAULT_ENTITY_KEY } from './entities';
+import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
-import { getSyncProvider } from './sync';
+import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
+import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -80,15 +81,17 @@ export function addEntities( entities ) {
  * @param {?Object}      query           Query Object.
  * @param {?boolean}     invalidateCache Should invalidate query caches.
  * @param {?Object}      edits           Edits to reset.
+ * @param {?Object}      meta            Meta information about pagination.
  * @return {Object} Action object.
  */
 export function receiveEntityRecords(
 	kind,
 	name,
 	records,
-	query,
+	query = undefined,
 	invalidateCache = false,
-	edits
+	edits = undefined,
+	meta = undefined
 ) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
@@ -102,9 +105,9 @@ export function receiveEntityRecords(
 	}
 	let action;
 	if ( query ) {
-		action = receiveQueriedItems( records, query, edits );
+		action = receiveQueriedItems( records, query, edits, meta );
 	} else {
-		action = receiveItems( records, edits );
+		action = receiveItems( records, edits, meta );
 	}
 
 	return {
@@ -198,7 +201,7 @@ export function __experimentalReceiveThemeGlobalStyleVariations(
 /**
  * Returns an action object used in signalling that the index has been received.
  *
- * @deprecated since WP 5.9, this is not useful anymore, use the selector direclty.
+ * @deprecated since WP 5.9, this is not useful anymore, use the selector directly.
  *
  * @return {Object} Action object.
  */
@@ -216,6 +219,8 @@ export function receiveThemeSupports() {
  * Returns an action object used in signalling that the theme global styles CPT post revisions have been received.
  * Ignored from documentation as it's internal to the data store.
  *
+ * @deprecated since WordPress 6.5.0. Callers should use `dispatch( 'core' ).receiveRevision` instead.
+ *
  * @ignore
  *
  * @param {number} currentId The post id.
@@ -224,6 +229,13 @@ export function receiveThemeSupports() {
  * @return {Object} Action object.
  */
 export function receiveThemeGlobalStyleRevisions( currentId, revisions ) {
+	deprecated(
+		"wp.data.dispatch( 'core' ).receiveThemeGlobalStyleRevisions()",
+		{
+			since: '6.5.0',
+			alternative: "wp.data.dispatch( 'core' ).receiveRevisions",
+		}
+	);
 	return {
 		type: 'RECEIVE_THEME_GLOBAL_STYLE_REVISIONS',
 		currentId,
@@ -254,17 +266,17 @@ export function receiveEmbedPreview( url, preview ) {
 /**
  * Action triggered to delete an entity record.
  *
- * @param {string}   kind                         Kind of the deleted entity.
- * @param {string}   name                         Name of the deleted entity.
- * @param {string}   recordId                     Record ID of the deleted entity.
- * @param {?Object}  query                        Special query parameters for the
- *                                                DELETE API call.
- * @param {Object}   [options]                    Delete options.
- * @param {Function} [options.__unstableFetch]    Internal use only. Function to
- *                                                call instead of `apiFetch()`.
- *                                                Must return a promise.
- * @param {boolean}  [options.throwOnError=false] If false, this action suppresses all
- *                                                the exceptions. Defaults to false.
+ * @param {string}        kind                         Kind of the deleted entity.
+ * @param {string}        name                         Name of the deleted entity.
+ * @param {number|string} recordId                     Record ID of the deleted entity.
+ * @param {?Object}       query                        Special query parameters for the
+ *                                                     DELETE API call.
+ * @param {Object}        [options]                    Delete options.
+ * @param {Function}      [options.__unstableFetch]    Internal use only. Function to
+ *                                                     call instead of `apiFetch()`.
+ *                                                     Must return a promise.
+ * @param {boolean}       [options.throwOnError=false] If false, this action suppresses all
+ *                                                     the exceptions. Defaults to false.
  */
 export const deleteEntityRecord =
 	(
@@ -274,14 +286,15 @@ export const deleteEntityRecord =
 		query,
 		{ __unstableFetch = apiFetch, throwOnError = false } = {}
 	) =>
-	async ( { dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+	async ( { dispatch, resolveSelect } ) => {
+		logEntityDeprecation( kind, name, 'deleteEntityRecord' );
+		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
 		let error;
 		let deletedRecord = false;
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
 
@@ -300,8 +313,21 @@ export const deleteEntityRecord =
 			} );
 
 			let hasError = false;
+			let { baseURL } = entityConfig;
+			if (
+				kind === 'postType' &&
+				name === 'wp_template' &&
+				( ( recordId &&
+					typeof recordId === 'string' &&
+					! /^\d+$/.test( recordId ) ) ||
+					! window?.__experimentalTemplateActivate )
+			) {
+				baseURL =
+					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
+					'/templates';
+			}
 			try {
-				let path = `${ entityConfig.baseURL }/${ recordId }`;
+				let path = `${ baseURL }/${ recordId }`;
 
 				if ( query ) {
 					path = addQueryArgs( path, query );
@@ -313,6 +339,15 @@ export const deleteEntityRecord =
 				} );
 
 				await dispatch( removeItems( kind, name, recordId, true ) );
+
+				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+					if ( entityConfig.syncConfig ) {
+						const objectType = `${ kind }/${ name }`;
+						const objectId = recordId;
+
+						getSyncManager()?.unload( objectType, objectId );
+					}
+				}
 			} catch ( _error ) {
 				hasError = true;
 				error = _error;
@@ -352,6 +387,7 @@ export const deleteEntityRecord =
 export const editEntityRecord =
 	( kind, name, recordId, edits, options = {} ) =>
 	( { select, dispatch } ) => {
+		logEntityDeprecation( kind, name, 'editEntityRecord' );
 		const entityConfig = select.getEntityConfig( kind, name );
 		if ( ! entityConfig ) {
 			throw new Error(
@@ -366,6 +402,16 @@ export const editEntityRecord =
 			recordId
 		);
 
+		// Some fields are merged with the existing value instead of replaced.
+		// See `mergedEdits` definition on the entity config.
+		const editsWithMerges = Object.keys( edits ).reduce( ( acc, key ) => {
+			acc[ key ] = mergedEdits[ key ]
+				? { ...editedRecord[ key ], ...edits[ key ] }
+				: edits[ key ];
+
+			return acc;
+		}, {} );
+
 		const edit = {
 			kind,
 			name,
@@ -374,49 +420,64 @@ export const editEntityRecord =
 			// so that the property is not considered dirty.
 			edits: Object.keys( edits ).reduce( ( acc, key ) => {
 				const recordValue = record[ key ];
-				const editedRecordValue = editedRecord[ key ];
-				const value = mergedEdits[ key ]
-					? { ...editedRecordValue, ...edits[ key ] }
-					: edits[ key ];
+				const value = editsWithMerges[ key ];
 				acc[ key ] = fastDeepEqual( recordValue, value )
 					? undefined
 					: value;
 				return acc;
 			}, {} ),
 		};
-		if ( window.__experimentalEnableSync && entityConfig.syncConfig ) {
-			const objectId = entityConfig.getSyncObjectId( recordId );
-			getSyncProvider().update(
-				entityConfig.syncObjectType + '--edit',
-				objectId,
-				edit.edits
-			);
-		} else {
-			if ( ! options.undoIgnore ) {
-				select.getUndoManager().addRecord(
-					[
-						{
-							id: { kind, name, recordId },
-							changes: Object.keys( edits ).reduce(
-								( acc, key ) => {
-									acc[ key ] = {
-										from: editedRecord[ key ],
-										to: edits[ key ],
-									};
-									return acc;
-								},
-								{}
-							),
-						},
-					],
-					options.isCached
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			if ( entityConfig.syncConfig ) {
+				const objectType = `${ kind }/${ name }`;
+				const objectId = recordId;
+
+				// Determine whether this edit should create a new undo level.
+				//
+				// In Gutenberg, block changes flow through two callbacks:
+				// - `onInput`: For transient/in-progress changes (e.g., typing each
+				//   character). These use `isCached: true` and get merged into
+				//   the current undo item.
+				// - `onChange`: For persistent/completed changes (e.g., formatting
+				//   transforms, block insertions). These use `isCached: false` and
+				//   should create a new undo level.
+				//
+				// Additionally, `undoIgnore: true` means the change should not
+				// affect the undo history at all (e.g., selection-only changes).
+				const isNewUndoLevel = options.undoIgnore
+					? false
+					: ! options.isCached;
+
+				getSyncManager()?.update(
+					objectType,
+					objectId,
+					editsWithMerges,
+					LOCAL_EDITOR_ORIGIN,
+					{ isNewUndoLevel }
 				);
 			}
-			dispatch( {
-				type: 'EDIT_ENTITY_RECORD',
-				...edit,
-			} );
 		}
+		if ( ! options.undoIgnore ) {
+			select.getUndoManager().addRecord(
+				[
+					{
+						id: { kind, name, recordId },
+						changes: Object.keys( edits ).reduce( ( acc, key ) => {
+							acc[ key ] = {
+								from: editedRecord[ key ],
+								to: edits[ key ],
+							};
+							return acc;
+						}, {} ),
+					},
+				],
+				options.isCached
+			);
+		}
+		dispatch( {
+			type: 'EDIT_ENTITY_RECORD',
+			...edit,
+		} );
 	};
 
 /**
@@ -437,7 +498,7 @@ export const undo =
 	};
 
 /**
- * Action triggered to redo the last undoed
+ * Action triggered to redo the last undone
  * edit to an entity record, if any.
  */
 export const redo =
@@ -490,15 +551,17 @@ export const saveEntityRecord =
 		} = {}
 	) =>
 	async ( { select, resolveSelect, dispatch } ) => {
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		logEntityDeprecation( kind, name, 'saveEntityRecord' );
+		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
-		if ( ! entityConfig || entityConfig?.__experimentalNoFetch ) {
+		if ( ! entityConfig ) {
 			return;
 		}
-		const entityIdKey = entityConfig.key || DEFAULT_ENTITY_KEY;
+		const entityIdKey = entityConfig.key ?? DEFAULT_ENTITY_KEY;
 		const recordId = record[ entityIdKey ];
+		const isNewRecord = !! entityIdKey && ! recordId;
 
 		const lock = await dispatch.__unstableAcquireStoreLock(
 			STORE_NAME,
@@ -537,15 +600,26 @@ export const saveEntityRecord =
 			let updatedRecord;
 			let error;
 			let hasError = false;
+			let { baseURL } = entityConfig;
+			// For "string" IDs, use the old templates endpoint.
+			if (
+				kind === 'postType' &&
+				name === 'wp_template' &&
+				( ( recordId &&
+					typeof recordId === 'string' &&
+					! /^\d+$/.test( recordId ) ) ||
+					! window?.__experimentalTemplateActivate )
+			) {
+				baseURL =
+					baseURL.slice( 0, baseURL.lastIndexOf( '/' ) ) +
+					'/templates';
+			}
 			try {
-				const path = `${ entityConfig.baseURL }${
-					recordId ? '/' + recordId : ''
-				}`;
-				const persistedRecord = select.getRawEntityRecord(
-					kind,
-					name,
-					recordId
-				);
+				const path = `${ baseURL }${ recordId ? '/' + recordId : '' }`;
+				// Skip the raw values check when creating a new record; they don't exist yet.
+				const persistedRecord = ! isNewRecord
+					? select.getRawEntityRecord( kind, name, recordId )
+					: {};
 
 				if ( isAutosave ) {
 					// Most of this autosave logic is very specific to posts.
@@ -585,10 +659,14 @@ export const saveEntityRecord =
 							return acc;
 						},
 						{
+							// Do not update the `status` if we have edited it when auto saving.
+							// It's very important to let the user explicitly save this change,
+							// because it can lead to unexpected results. An example would be to
+							// have a draft post and change the status to publish.
 							status:
 								data.status === 'auto-draft'
 									? 'draft'
-									: data.status,
+									: undefined,
 						}
 					);
 					updatedRecord = await __unstableFetch( {
@@ -669,6 +747,17 @@ export const saveEntityRecord =
 						true,
 						edits
 					);
+					if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+						if ( entityConfig.syncConfig ) {
+							getSyncManager()?.update(
+								`${ kind }/${ name }`,
+								recordId,
+								updatedRecord,
+								LOCAL_EDITOR_ORIGIN,
+								{ isSave: true }
+							);
+						}
+					}
 				}
 			} catch ( _error ) {
 				hasError = true;
@@ -756,18 +845,19 @@ export const __experimentalBatch =
 /**
  * Action triggered to save an entity record's edits.
  *
- * @param {string} kind     Kind of the entity.
- * @param {string} name     Name of the entity.
- * @param {Object} recordId ID of the record.
- * @param {Object} options  Saving options.
+ * @param {string}  kind     Kind of the entity.
+ * @param {string}  name     Name of the entity.
+ * @param {Object}  recordId ID of the record.
+ * @param {Object=} options  Saving options.
  */
 export const saveEditedEntityRecord =
 	( kind, name, recordId, options ) =>
-	async ( { select, dispatch } ) => {
+	async ( { select, dispatch, resolveSelect } ) => {
+		logEntityDeprecation( kind, name, 'saveEditedEntityRecord' );
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
@@ -788,15 +878,20 @@ export const saveEditedEntityRecord =
 /**
  * Action triggered to save only specified properties for the entity.
  *
- * @param {string} kind        Kind of the entity.
- * @param {string} name        Name of the entity.
- * @param {Object} recordId    ID of the record.
- * @param {Array}  itemsToSave List of entity properties or property paths to save.
- * @param {Object} options     Saving options.
+ * @param {string}        kind        Kind of the entity.
+ * @param {string}        name        Name of the entity.
+ * @param {number|string} recordId    ID of the record.
+ * @param {Array}         itemsToSave List of entity properties or property paths to save.
+ * @param {Object}        options     Saving options.
  */
 export const __experimentalSaveSpecifiedEntityEdits =
 	( kind, name, recordId, itemsToSave, options ) =>
-	async ( { select, dispatch } ) => {
+	async ( { select, dispatch, resolveSelect } ) => {
+		logEntityDeprecation(
+			kind,
+			name,
+			'__experimentalSaveSpecifiedEntityEdits'
+		);
 		if ( ! select.hasEditsForEntityRecord( kind, name, recordId ) ) {
 			return;
 		}
@@ -811,7 +906,7 @@ export const __experimentalSaveSpecifiedEntityEdits =
 			setNestedValue( editsToSave, item, getNestedValue( edits, item ) );
 		}
 
-		const configs = await dispatch( getOrLoadEntitiesConfig( kind ) );
+		const configs = await resolveSelect.getEntitiesConfig( kind );
 		const entityConfig = configs.find(
 			( config ) => config.kind === kind && config.name === name
 		);
@@ -872,6 +967,28 @@ export function receiveUserPermission( key, isAllowed ) {
 }
 
 /**
+ * Returns an action object used in signalling that the current user has
+ * permission to perform an action on a REST resource. Ignored from
+ * documentation as it's internal to the data store.
+ *
+ * @ignore
+ *
+ * @param {Object<string, boolean>} permissions An object where keys represent
+ *                                              actions and REST resources, and
+ *                                              values indicate whether the user
+ *                                              is allowed to perform the
+ *                                              action.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveUserPermissions( permissions ) {
+	return {
+		type: 'RECEIVE_USER_PERMISSIONS',
+		permissions,
+	};
+}
+
+/**
  * Returns an action object used in signalling that the autosaves for a
  * post have been received.
  * Ignored from documentation as it's internal to the data store.
@@ -904,3 +1021,56 @@ export function receiveNavigationFallbackId( fallbackId ) {
 		fallbackId,
 	};
 }
+
+/**
+ * Returns an action object used to set the template for a given query.
+ *
+ * @param {Object} query      The lookup query.
+ * @param {string} templateId The resolved template id.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveDefaultTemplateId( query, templateId ) {
+	return {
+		type: 'RECEIVE_DEFAULT_TEMPLATE',
+		query,
+		templateId,
+	};
+}
+
+/**
+ * Action triggered to receive revision items.
+ *
+ * @param {string}        kind            Kind of the received entity record revisions.
+ * @param {string}        name            Name of the received entity record revisions.
+ * @param {number|string} recordKey       The key of the entity record whose revisions you want to fetch.
+ * @param {Array|Object}  records         Revisions received.
+ * @param {?Object}       query           Query Object.
+ * @param {?boolean}      invalidateCache Should invalidate query caches.
+ * @param {?Object}       meta            Meta information about pagination.
+ */
+export const receiveRevisions =
+	( kind, name, recordKey, records, query, invalidateCache = false, meta ) =>
+	async ( { dispatch, resolveSelect } ) => {
+		logEntityDeprecation( kind, name, 'receiveRevisions' );
+		const configs = await resolveSelect.getEntitiesConfig( kind );
+		const entityConfig = configs.find(
+			( config ) => config.kind === kind && config.name === name
+		);
+		const key =
+			entityConfig && entityConfig?.revisionKey
+				? entityConfig.revisionKey
+				: DEFAULT_ENTITY_KEY;
+
+		dispatch( {
+			type: 'RECEIVE_ITEM_REVISIONS',
+			key,
+			items: Array.isArray( records ) ? records : [ records ],
+			recordKey,
+			meta,
+			query,
+			kind,
+			name,
+			invalidateCache,
+		} );
+	};

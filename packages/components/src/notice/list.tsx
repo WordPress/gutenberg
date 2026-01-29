@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * Internal dependencies
  */
 import Notice from '.';
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import type { NoticeListProps } from './types';
 
 const noop = () => {};
@@ -48,7 +48,7 @@ function NoticeList( {
 		( id: NoticeListProps[ 'notices' ][ number ][ 'id' ] ) => () =>
 			onRemove( id );
 
-	className = classnames( 'components-notice-list', className );
+	className = clsx( 'components-notice-list', className );
 
 	return (
 		<div className={ className }>

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -12,10 +12,11 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import {
-	PanelBody,
 	RangeControl,
 	ResizableBox,
 	ToggleControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { __, isRTL } from '@wordpress/i18n';
 import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
@@ -23,7 +24,8 @@ import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { useUserAvatar, useCommentAvatar } from './hooks';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { useCommentAvatar, useUserAvatar } from './hooks';
 import UserControl from './user-control';
 
 const AvatarInspectorControls = ( {
@@ -31,55 +33,112 @@ const AvatarInspectorControls = ( {
 	avatar,
 	attributes,
 	selectUser,
-} ) => (
-	<InspectorControls>
-		<PanelBody title={ __( 'Settings' ) }>
-			<RangeControl
-				__nextHasNoMarginBottom
-				__next40pxDefaultSize
-				label={ __( 'Image size' ) }
-				onChange={ ( newSize ) =>
+} ) => {
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+	return (
+		<InspectorControls>
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () => {
 					setAttributes( {
-						size: newSize,
-					} )
-				}
-				min={ avatar.minSize }
-				max={ avatar.maxSize }
-				initialPosition={ attributes?.size }
-				value={ attributes?.size }
-			/>
-			<ToggleControl
-				__nextHasNoMarginBottom
-				label={ __( 'Link to user profile' ) }
-				onChange={ () =>
-					setAttributes( { isLink: ! attributes.isLink } )
-				}
-				checked={ attributes.isLink }
-			/>
-			{ attributes.isLink && (
-				<ToggleControl
-					label={ __( 'Open in new tab' ) }
-					onChange={ ( value ) =>
-						setAttributes( {
-							linkTarget: value ? '_blank' : '_self',
-						} )
-					}
-					checked={ attributes.linkTarget === '_blank' }
-				/>
-			) }
-			{ selectUser && (
-				<UserControl
-					value={ attributes?.userId }
-					onChange={ ( value ) => {
-						setAttributes( {
-							userId: value,
-						} );
-					} }
-				/>
-			) }
-		</PanelBody>
-	</InspectorControls>
-);
+						size: 96,
+						isLink: false,
+						linkTarget: '_self',
+						userId: undefined,
+					} );
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				<ToolsPanelItem
+					label={ __( 'Image size' ) }
+					isShownByDefault
+					hasValue={ () => attributes?.size !== 96 }
+					onDeselect={ () => setAttributes( { size: 96 } ) }
+				>
+					<RangeControl
+						__next40pxDefaultSize
+						label={ __( 'Image size' ) }
+						onChange={ ( newSize ) =>
+							setAttributes( {
+								size: newSize,
+							} )
+						}
+						min={ avatar.minSize }
+						max={ avatar.maxSize }
+						initialPosition={ attributes?.size }
+						value={ attributes?.size }
+					/>
+				</ToolsPanelItem>
+				<ToolsPanelItem
+					label={ __( 'Link to user profile' ) }
+					isShownByDefault
+					hasValue={ () => attributes?.isLink }
+					onDeselect={ () => setAttributes( { isLink: false } ) }
+				>
+					<ToggleControl
+						label={ __( 'Link to user profile' ) }
+						onChange={ () =>
+							setAttributes( { isLink: ! attributes.isLink } )
+						}
+						checked={ attributes.isLink }
+					/>
+				</ToolsPanelItem>
+				{ attributes.isLink && (
+					<ToolsPanelItem
+						label={ __( 'Open in new tab' ) }
+						isShownByDefault
+						hasValue={ () => attributes?.linkTarget !== '_self' }
+						onDeselect={ () =>
+							setAttributes( { linkTarget: '_self' } )
+						}
+					>
+						<ToggleControl
+							label={ __( 'Open in new tab' ) }
+							onChange={ ( value ) =>
+								setAttributes( {
+									linkTarget: value ? '_blank' : '_self',
+								} )
+							}
+							checked={ attributes.linkTarget === '_blank' }
+						/>
+					</ToolsPanelItem>
+				) }
+				{ selectUser && (
+					<ToolsPanelItem
+						label={ __( 'User' ) }
+						isShownByDefault
+						hasValue={ () => !! attributes?.userId }
+						onDeselect={ () =>
+							setAttributes( { userId: undefined } )
+						}
+					>
+						<UserControl
+							value={ attributes?.userId }
+							onChange={ ( value ) => {
+								setAttributes( {
+									userId: value,
+								} );
+							} }
+						/>
+					</ToolsPanelItem>
+				) }
+			</ToolsPanel>
+		</InspectorControls>
+	);
+};
+
+const AvatarLinkWrapper = ( { children, isLink } ) =>
+	isLink ? (
+		<a
+			href="#avatar-pseudo-link"
+			className="wp-block-avatar__link"
+			onClick={ ( event ) => event.preventDefault() }
+		>
+			{ children }
+		</a>
+	) : (
+		children
+	);
 
 const ResizableAvatar = ( {
 	setAttributes,
@@ -97,43 +156,46 @@ const ResizableAvatar = ( {
 	);
 	return (
 		<div { ...blockProps }>
-			<ResizableBox
-				size={ {
-					width: attributes.size,
-					height: attributes.size,
-				} }
-				showHandle={ isSelected }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					setAttributes( {
-						size: parseInt(
-							attributes.size + ( delta.height || delta.width ),
-							10
-						),
-					} );
-				} }
-				lockAspectRatio
-				enable={ {
-					top: false,
-					right: ! isRTL(),
-					bottom: true,
-					left: isRTL(),
-				} }
-				minWidth={ avatar.minSize }
-				maxWidth={ avatar.maxSize }
-			>
-				<img
-					src={ doubledSizedSrc }
-					alt={ avatar.alt }
-					className={ classnames(
-						'avatar',
-						'avatar-' + attributes.size,
-						'photo',
-						'wp-block-avatar__image',
-						borderProps.className
-					) }
-					style={ borderProps.style }
-				/>
-			</ResizableBox>
+			<AvatarLinkWrapper isLink={ attributes.isLink }>
+				<ResizableBox
+					size={ {
+						width: attributes.size,
+						height: attributes.size,
+					} }
+					showHandle={ isSelected }
+					onResizeStop={ ( event, direction, elt, delta ) => {
+						setAttributes( {
+							size: parseInt(
+								attributes.size +
+									( delta.height || delta.width ),
+								10
+							),
+						} );
+					} }
+					lockAspectRatio
+					enable={ {
+						top: false,
+						right: ! isRTL(),
+						bottom: true,
+						left: isRTL(),
+					} }
+					minWidth={ avatar.minSize }
+					maxWidth={ avatar.maxSize }
+				>
+					<img
+						src={ doubledSizedSrc }
+						alt={ avatar.alt }
+						className={ clsx(
+							'avatar',
+							'avatar-' + attributes.size,
+							'photo',
+							'wp-block-avatar__image',
+							borderProps.className
+						) }
+						style={ borderProps.style }
+					/>
+				</ResizableBox>
+			</AvatarLinkWrapper>
 		</div>
 	);
 };
@@ -149,29 +211,13 @@ const CommentEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 				attributes={ attributes }
 				selectUser={ false }
 			/>
-			{ attributes.isLink ? (
-				<a
-					href="#avatar-pseudo-link"
-					className="wp-block-avatar__link"
-					onClick={ ( event ) => event.preventDefault() }
-				>
-					<ResizableAvatar
-						attributes={ attributes }
-						avatar={ avatar }
-						blockProps={ blockProps }
-						isSelected={ isSelected }
-						setAttributes={ setAttributes }
-					/>
-				</a>
-			) : (
-				<ResizableAvatar
-					attributes={ attributes }
-					avatar={ avatar }
-					blockProps={ blockProps }
-					isSelected={ isSelected }
-					setAttributes={ setAttributes }
-				/>
-			) }
+			<ResizableAvatar
+				attributes={ attributes }
+				avatar={ avatar }
+				blockProps={ blockProps }
+				isSelected={ isSelected }
+				setAttributes={ setAttributes }
+			/>
 		</>
 	);
 };
@@ -187,36 +233,19 @@ const UserEdit = ( { attributes, context, setAttributes, isSelected } ) => {
 	return (
 		<>
 			<AvatarInspectorControls
-				selectUser={ true }
+				selectUser
 				attributes={ attributes }
 				avatar={ avatar }
 				setAttributes={ setAttributes }
 			/>
-			<div>
-				{ attributes.isLink ? (
-					<a
-						href="#avatar-pseudo-link"
-						className="wp-block-avatar__link"
-						onClick={ ( event ) => event.preventDefault() }
-					>
-						<ResizableAvatar
-							attributes={ attributes }
-							avatar={ avatar }
-							blockProps={ blockProps }
-							isSelected={ isSelected }
-							setAttributes={ setAttributes }
-						/>
-					</a>
-				) : (
-					<ResizableAvatar
-						attributes={ attributes }
-						avatar={ avatar }
-						blockProps={ blockProps }
-						isSelected={ isSelected }
-						setAttributes={ setAttributes }
-					/>
-				) }
-			</div>
+
+			<ResizableAvatar
+				attributes={ attributes }
+				avatar={ avatar }
+				blockProps={ blockProps }
+				isSelected={ isSelected }
+				setAttributes={ setAttributes }
+			/>
 		</>
 	);
 };

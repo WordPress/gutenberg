@@ -12,42 +12,41 @@ import {
 	isFocused,
 	focus,
 	blur,
-	notifyInputChange,
+	blurOnUnmount,
 	removeFocusChangeListener,
 } from '../AztecInputState';
 
-jest.mock(
-	'react-native/Libraries/Components/TextInput/TextInputState',
-	() => ( {
-		focusTextInput: jest.fn(),
-		blurTextInput: jest.fn(),
-		currentlyFocusedInput: jest.fn(),
-	} )
-);
+// Recreate internal state of TextInput
+let currentInput = null;
+TextInputState.focusTextInput = jest.fn( ( value ) => {
+	currentInput = value;
+} );
+TextInputState.blurTextInput = jest.fn( ( value ) => {
+	if ( currentInput === value ) {
+		currentInput = null;
+	}
+} );
+TextInputState.currentlyFocusedInput = jest.fn( () => currentInput );
 
 const ref = { current: null };
+const anotherRef = { current: null };
 
-const updateCurrentFocusedInput = ( value ) => {
-	TextInputState.currentlyFocusedInput.mockReturnValue( value );
-	notifyInputChange();
-};
+jest.useFakeTimers();
 
 describe( 'Aztec Input State', () => {
 	it( 'listens to focus change event', () => {
 		const listener = jest.fn();
-		const anotherRef = { current: null };
 		addFocusChangeListener( listener );
 
-		updateCurrentFocusedInput( ref );
-
+		focus( ref );
 		expect( listener ).toHaveBeenCalledWith( { isFocused: true } );
 
-		updateCurrentFocusedInput( anotherRef );
+		listener.mockClear();
+		focus( anotherRef );
+		expect( listener ).not.toHaveBeenCalled();
 
-		expect( listener ).toHaveBeenCalledTimes( 1 );
-
-		updateCurrentFocusedInput( null );
-
+		blur( anotherRef );
+		jest.runAllTimers();
 		expect( listener ).toHaveBeenCalledWith( { isFocused: false } );
 	} );
 
@@ -56,36 +55,35 @@ describe( 'Aztec Input State', () => {
 		addFocusChangeListener( listener );
 		removeFocusChangeListener( listener );
 
-		updateCurrentFocusedInput( ref );
+		focus( ref );
+		expect( listener ).not.toHaveBeenCalled();
 
-		expect( listener ).not.toHaveBeenCalledWith( { isFocused: true } );
-
-		updateCurrentFocusedInput( null );
-
-		expect( listener ).not.toHaveBeenCalledWith( { isFocused: false } );
+		blur( ref );
+		jest.runAllTimers();
+		expect( listener ).not.toHaveBeenCalled();
 	} );
 
-	it( 'returns true if an element is focused', () => {
-		updateCurrentFocusedInput( ref );
+	it( 'returns the focus state', () => {
+		focus( ref );
 		expect( isFocused() ).toBeTruthy();
-	} );
 
-	it( 'returns false if an element is unfocused', () => {
-		updateCurrentFocusedInput( null );
+		blur( ref );
+		jest.runAllTimers();
 		expect( isFocused() ).toBeFalsy();
 	} );
 
 	it( 'returns current focused element', () => {
-		const anotherRef = { current: null };
-		updateCurrentFocusedInput( ref );
+		focus( ref );
 		expect( getCurrentFocusedElement() ).toBe( ref );
 
-		updateCurrentFocusedInput( anotherRef );
+		focus( anotherRef );
 		expect( getCurrentFocusedElement() ).toBe( anotherRef );
 	} );
 
 	it( 'returns null if focused element is unfocused', () => {
-		updateCurrentFocusedInput( null );
+		focus( ref );
+		blur( ref );
+		jest.runAllTimers();
 		expect( getCurrentFocusedElement() ).toBe( null );
 	} );
 
@@ -96,6 +94,52 @@ describe( 'Aztec Input State', () => {
 
 	it( 'unfocuses an element', () => {
 		blur( ref );
+		jest.runAllTimers();
 		expect( TextInputState.blurTextInput ).toHaveBeenCalledWith( ref );
+	} );
+
+	it( 'unfocuses an element when unmounted', () => {
+		const listener = jest.fn();
+
+		focus( ref );
+
+		addFocusChangeListener( listener );
+		blurOnUnmount( ref );
+		jest.runAllTimers();
+
+		// TextInputState will update its state internally when the text
+		// input is removed. For this reason and to avoid triggering an
+		// event on an removed element, we don't call blurTextInput.
+		expect( TextInputState.blurTextInput ).not.toHaveBeenCalled();
+		expect( listener ).toHaveBeenCalledWith( { isFocused: false } );
+		expect( listener ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'cancels blur event when unfocusing an element that will be unmounted', () => {
+		const listener = jest.fn();
+
+		focus( ref );
+
+		addFocusChangeListener( listener );
+		blur( ref );
+		blurOnUnmount( ref );
+		jest.runAllTimers();
+
+		// TextInputState will update its state internally when the text
+		// input is removed. For this reason and to avoid triggering an
+		// event on an removed element, we don't call blurTextInput.
+		expect( TextInputState.blurTextInput ).not.toHaveBeenCalled();
+		expect( listener ).toHaveBeenCalledWith( { isFocused: false } );
+		expect( listener ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'cancels blur event when focusing an element', () => {
+		focus( ref );
+		blur( ref );
+		focus( anotherRef );
+		jest.runAllTimers();
+
+		expect( TextInputState.focusTextInput ).toHaveBeenCalledTimes( 2 );
+		expect( TextInputState.blurTextInput ).not.toHaveBeenCalled();
 	} );
 } );

@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__unstableComposite as Composite,
-	__unstableUseCompositeState as useCompositeState,
-} from '@wordpress/components';
+import { Composite } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -18,10 +15,8 @@ function MediaList( {
 	onClick,
 	label = __( 'Media List' ),
 } ) {
-	const composite = useCompositeState();
 	return (
 		<Composite
-			{ ...composite }
 			role="listbox"
 			className="block-editor-inserter__media-list"
 			aria-label={ label }
@@ -32,7 +27,6 @@ function MediaList( {
 					media={ media }
 					category={ category }
 					onClick={ onClick }
-					composite={ composite }
 				/>
 			) ) }
 		</Composite>

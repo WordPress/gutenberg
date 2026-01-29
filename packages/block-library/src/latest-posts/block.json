@@ -83,6 +83,7 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": true,
 		"html": false,
 		"color": {
@@ -110,6 +111,21 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true
 			}
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true,
+			"__experimentalDefaultControls": {
+				"radius": true,
+				"color": true,
+				"width": true,
+				"style": true
+			}
+		},
+		"interactivity": {
+			"clientNavigation": true
 		}
 	},
 	"editorStyle": "wp-block-latest-posts-editor",

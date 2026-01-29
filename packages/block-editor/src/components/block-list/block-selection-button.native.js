@@ -40,9 +40,7 @@ const BlockSelectionButton = ( {
 				onPress={ () => {
 					/* Open BottomSheet with markup. */
 				} }
-				disabled={
-					true
-				} /* Disable temporarily since onPress function is empty. */
+				disabled /* Disable temporarily since onPress function is empty. */
 			>
 				{ rootClientId &&
 					rootBlockIcon && [

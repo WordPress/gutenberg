@@ -9,10 +9,12 @@
 			"columns": 1,
 			"caption": "",
 			"imageCrop": true,
+			"randomOrder": false,
 			"fixedHeight": true,
 			"linkTo": "none",
 			"sizeSlug": "large",
-			"allowResize": false
+			"allowResize": false,
+			"aspectRatio": "auto"
 		},
 		"innerBlocks": [
 			{

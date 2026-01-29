@@ -1,0 +1,15 @@
+diff --git a/node_modules/wasm-vips/package.json b/node_modules/wasm-vips/package.json
+index c20f052..b26a38a 100644
+--- a/node_modules/wasm-vips/package.json
++++ b/node_modules/wasm-vips/package.json
+@@ -15,10 +15,6 @@
+   "type": "commonjs",
+   "exports": {
+     ".": {
+-      "browser": {
+-        "import": "./lib/vips-es6.js",
+-        "require": "./lib/vips.js"
+-      },
+       "node": {
+         "import": "./lib/vips-node.mjs",
+         "require": "./lib/vips-node.js"

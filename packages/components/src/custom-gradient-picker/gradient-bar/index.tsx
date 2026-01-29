@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -133,7 +133,7 @@ export default function CustomGradientBar( {
 
 	return (
 		<div
-			className={ classnames(
+			className={ clsx(
 				'components-custom-gradient-picker__gradient-bar',
 				{ 'has-gradient': hasGradient }
 			) }

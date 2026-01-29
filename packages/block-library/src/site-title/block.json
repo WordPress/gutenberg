@@ -11,22 +11,29 @@
 			"type": "number",
 			"default": 1
 		},
+		"levelOptions": {
+			"type": "array",
+			"default": [ 0, 1, 2, 3, 4, 5, 6 ]
+		},
 		"textAlign": {
 			"type": "string"
 		},
 		"isLink": {
 			"type": "boolean",
-			"default": true
+			"default": true,
+			"role": "content"
 		},
 		"linkTarget": {
 			"type": "string",
-			"default": "_self"
+			"default": "_self",
+			"role": "content"
 		}
 	},
 	"example": {
 		"viewportWidth": 500
 	},
 	"supports": {
+		"anchor": true,
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
@@ -55,13 +62,19 @@
 			"__experimentalFontStyle": true,
 			"__experimentalFontWeight": true,
 			"__experimentalLetterSpacing": true,
+			"__experimentalWritingMode": true,
 			"__experimentalDefaultControls": {
-				"fontSize": true,
-				"lineHeight": true,
-				"fontAppearance": true,
-				"letterSpacing": true,
-				"textTransform": true
+				"fontSize": true
 			}
+		},
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
 		}
 	},
 	"editorStyle": "wp-block-site-title-editor",

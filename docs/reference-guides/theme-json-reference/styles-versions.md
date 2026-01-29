@@ -2,7 +2,7 @@
 
 New styles options are integrated into theme.json on a regular basis. Knowing the style options available through theme.json or the styles editor at any given time can be challenging. To clarify, the table below indicates the WordPress version when each theme.json styles option became available and when a corresponding control was added to the user interface to allow management of the style from the Styles editor.
 
-## Styles Keys
+## Styles keys
 
 | Key | theme.json Since| Style Editor Since |
 | --- | :---: | :---: |
@@ -48,7 +48,9 @@ New styles options are integrated into theme.json on a regular basis. Knowing th
 | `spacing.margin.left`         | 5.8 | 5.9 |
 | `spacing.margin.bottom`       | 5.8 | 5.9 |
 | `spacing.blockGap`            | 5.9 | 5.9 |
+| `dimensions.height`           | 7.0 | N/A |
 | `dimensions.minHeight`        | 6.2 | N/A |
+| `dimensions.width`            | 7.0 | N/A |
 | `outline.color`               | 6.2 | N/A |
 | `outline.offset`              | 6.2 | N/A |
 | `outline.style`               | 6.2 | N/A |

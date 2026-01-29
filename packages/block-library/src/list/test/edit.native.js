@@ -50,7 +50,7 @@ describe( 'List block', () => {
 		await triggerBlockListLayout( listBlock );
 
 		// Get List item
-		const listItemBlock = await getBlock( screen, 'List item' );
+		const listItemBlock = await getBlock( screen, 'List Item' );
 		fireEvent.press( listItemBlock );
 
 		expect( listItemBlock ).toBeVisible();
@@ -60,7 +60,7 @@ describe( 'List block', () => {
 
 	it( 'adds one item to the list', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li></li><!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
 
@@ -75,7 +75,7 @@ describe( 'List block', () => {
 
 		// Select List Item block
 		const [ listItemBlock ] = screen.getAllByLabelText(
-			/List item Block\. Row 1/
+			/List Item Block\. Row 1/
 		);
 		fireEvent.press( listItemBlock );
 
@@ -88,17 +88,17 @@ describe( 'List block', () => {
 
 	it( 'shows different indentation levels', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>List item 1</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
 		<li>List item 2<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>List item nested 1</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
 		<li>List item nested 2<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Extra item 1</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
@@ -124,7 +124,7 @@ describe( 'List block', () => {
 
 		// Select List Item block
 		const [ firstNestedLevelBlock ] = within( listBlock ).getAllByLabelText(
-			/List item Block\. Row 2/
+			/List Item Block\. Row 2/
 		);
 		fireEvent.press( firstNestedLevelBlock );
 		await triggerBlockListLayout( firstNestedLevelBlock );
@@ -140,7 +140,7 @@ describe( 'List block', () => {
 
 	it( 'changes the indentation level', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Item 1</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
@@ -157,9 +157,9 @@ describe( 'List block', () => {
 		fireEvent.press( listBlock );
 		await triggerBlockListLayout( listBlock );
 
-		// Select Secont List Item block
+		// Select Second List Item block
 		const [ listItemBlock ] = screen.getAllByLabelText(
-			/List item Block\. Row 2/
+			/List Item Block\. Row 2/
 		);
 		fireEvent.press( listItemBlock );
 
@@ -169,7 +169,7 @@ describe( 'List block', () => {
 
 		// Await recently indented list item layout
 		const [ listItemBlock1 ] = screen.getAllByLabelText(
-			/List item Block\. Row 1/
+			/List Item Block\. Row 1/
 		);
 		await triggerBlockListLayout( listItemBlock1 );
 
@@ -183,9 +183,9 @@ describe( 'List block', () => {
 
 	it( 'removes the indentation level', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Item 1<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Item 2</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list --></li>
@@ -203,7 +203,7 @@ describe( 'List block', () => {
 
 		// Select List Item block
 		const [ firstNestedLevelBlock ] = within( listBlock ).getAllByLabelText(
-			/List item Block\. Row 1/
+			/List Item Block\. Row 1/
 		);
 		fireEvent.press( firstNestedLevelBlock );
 		await triggerBlockListLayout( firstNestedLevelBlock );
@@ -217,7 +217,7 @@ describe( 'List block', () => {
 
 		// Select nested List Item block
 		const [ listItemBlock ] = within( innerBlockList ).getAllByLabelText(
-			/List item Block\. Row 1/
+			/List Item Block\. Row 1/
 		);
 		fireEvent.press( listItemBlock );
 
@@ -230,7 +230,7 @@ describe( 'List block', () => {
 
 	it( 'changes to ordered list', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Item 1</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
@@ -258,7 +258,7 @@ describe( 'List block', () => {
 
 	it( 'changes to reverse ordered list', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Item 1</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
@@ -289,9 +289,7 @@ describe( 'List block', () => {
 			() => screen.getByTestId( 'block-settings-modal' ).props.isVisible
 		);
 
-		const reverseButton = screen.getByLabelText(
-			/Reverse list numbering\. Off/
-		);
+		const reverseButton = screen.getByLabelText( /Reverse order\. Off/ );
 		fireEvent.press( reverseButton );
 
 		expect( getEditorHtml() ).toMatchSnapshot();
@@ -299,7 +297,7 @@ describe( 'List block', () => {
 
 	it( 'sets a start value to an ordered list', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Item 1</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
@@ -342,7 +340,7 @@ describe( 'List block', () => {
 	it( 'splits empty list items into paragraphs', async () => {
 		// Arrange
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li><!-- /wp:list-item -->
 		<!-- wp:list-item -->
 		<li>Two</li><!-- /wp:list-item --></ul>
@@ -370,7 +368,7 @@ describe( 'List block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->
@@ -380,7 +378,7 @@ describe( 'List block', () => {
 		<!-- /wp:paragraph -->
 
 		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Two</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->"
@@ -389,7 +387,7 @@ describe( 'List block', () => {
 
 	it( 'merges paragraphs into list items', async () => {
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->
@@ -399,7 +397,7 @@ describe( 'List block', () => {
 		<!-- /wp:paragraph -->
 
 		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Three</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
@@ -417,7 +415,7 @@ describe( 'List block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li>
 		<!-- /wp:list-item -->
 
@@ -435,7 +433,7 @@ describe( 'List block', () => {
 	it( 'merges lists into lists', async () => {
 		// Arrange
 		const initialHtml = `<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li>
 		<!-- /wp:list-item -->
 
@@ -445,7 +443,7 @@ describe( 'List block', () => {
 		<!-- /wp:list -->
 
 		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Three</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
@@ -466,7 +464,7 @@ describe( 'List block', () => {
 		// Assert
 		expect( getEditorHtml() ).toMatchInlineSnapshot( `
 		"<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li>
 		<!-- /wp:list-item -->
 
@@ -486,7 +484,7 @@ describe( 'List block', () => {
 		<p>A quick brown fox.</p>
 		<!-- /wp:paragraph -->
 		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One</li><!-- /wp:list-item --><!-- wp:list-item -->
 		<li>Two</li><!-- /wp:list-item --></ul>
 		<!-- /wp:list -->`;
@@ -502,7 +500,7 @@ describe( 'List block', () => {
 
 		// Select List Item block
 		const [ listItemBlock ] = within( listBlock ).getAllByLabelText(
-			/List item Block\. Row 1/
+			/List Item Block\. Row 1/
 		);
 		fireEvent.press( listItemBlock );
 
@@ -527,7 +525,7 @@ describe( 'List block', () => {
 		<!-- /wp:paragraph -->
 
 		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Two</li>
 		<!-- /wp:list-item --></ul>
 		<!-- /wp:list -->"
@@ -539,9 +537,9 @@ describe( 'List block', () => {
 		<p>A quick brown fox.</p>
 		<!-- /wp:paragraph -->
 		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>One<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Two</li>
 		<!-- /wp:list-item -->
 		<!-- wp:list-item -->
@@ -562,7 +560,7 @@ describe( 'List block', () => {
 
 		// Select List Item block
 		const [ listItemBlock ] = within( listBlock ).getAllByLabelText(
-			/List item Block\. Row 1/
+			/List Item Block\. Row 1/
 		);
 		fireEvent.press( listItemBlock );
 
@@ -591,7 +589,7 @@ describe( 'List block', () => {
 		<!-- /wp:paragraph -->
 
 		<!-- wp:list -->
-		<ul><!-- wp:list-item -->
+		<ul class="wp-block-list"><!-- wp:list-item -->
 		<li>Two</li>
 		<!-- /wp:list-item -->
 

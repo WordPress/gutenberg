@@ -72,7 +72,7 @@ export type ToolbarGroupProps = ToolbarGroupPropsBase &
 				 */
 				title: string;
 		  }
-	 );
+	);
 
 export type ToolbarGroupCollapsedProps = DropdownMenuProps;
 

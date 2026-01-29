@@ -81,13 +81,11 @@ describe( 'PostPublishButton', () => {
 	describe( 'publish status', () => {
 		it( 'should be pending for contributor', async () => {
 			const user = userEvent.setup();
-			const onStatusChange = jest.fn();
-			const onSave = jest.fn();
+			const savePostStatus = jest.fn();
 			render(
 				<PostPublishButton
 					hasPublishAction={ false }
-					onStatusChange={ onStatusChange }
-					onSave={ onSave }
+					savePostStatus={ savePostStatus }
 					isSaveable
 					isPublishable
 				/>
@@ -97,18 +95,16 @@ describe( 'PostPublishButton', () => {
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
 			);
 
-			expect( onStatusChange ).toHaveBeenCalledWith( 'pending' );
+			expect( savePostStatus ).toHaveBeenCalledWith( 'pending' );
 		} );
 
 		it( 'should be future for scheduled post', async () => {
 			const user = userEvent.setup();
-			const onStatusChange = jest.fn();
-			const onSave = jest.fn();
+			const savePostStatus = jest.fn();
 			render(
 				<PostPublishButton
 					hasPublishAction
-					onStatusChange={ onStatusChange }
-					onSave={ onSave }
+					savePostStatus={ savePostStatus }
 					isBeingScheduled
 					isSaveable
 					isPublishable
@@ -119,18 +115,16 @@ describe( 'PostPublishButton', () => {
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
 			);
 
-			expect( onStatusChange ).toHaveBeenCalledWith( 'future' );
+			expect( savePostStatus ).toHaveBeenCalledWith( 'future' );
 		} );
 
 		it( 'should be private for private visibility', async () => {
 			const user = userEvent.setup();
-			const onStatusChange = jest.fn();
-			const onSave = jest.fn();
+			const savePostStatus = jest.fn();
 			render(
 				<PostPublishButton
 					hasPublishAction
-					onStatusChange={ onStatusChange }
-					onSave={ onSave }
+					savePostStatus={ savePostStatus }
 					visibility="private"
 					isSaveable
 					isPublishable
@@ -141,18 +135,16 @@ describe( 'PostPublishButton', () => {
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
 			);
 
-			expect( onStatusChange ).toHaveBeenCalledWith( 'private' );
+			expect( savePostStatus ).toHaveBeenCalledWith( 'private' );
 		} );
 
 		it( 'should be publish otherwise', async () => {
 			const user = userEvent.setup();
-			const onStatusChange = jest.fn();
-			const onSave = jest.fn();
+			const savePostStatus = jest.fn();
 			render(
 				<PostPublishButton
 					hasPublishAction
-					onStatusChange={ onStatusChange }
-					onSave={ onSave }
+					savePostStatus={ savePostStatus }
 					isSaveable
 					isPublishable
 				/>
@@ -162,20 +154,18 @@ describe( 'PostPublishButton', () => {
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
 			);
 
-			expect( onStatusChange ).toHaveBeenCalledWith( 'publish' );
+			expect( savePostStatus ).toHaveBeenCalledWith( 'publish' );
 		} );
 	} );
 
 	describe( 'click', () => {
 		it( 'should save with status', async () => {
 			const user = userEvent.setup();
-			const onStatusChange = jest.fn();
-			const onSave = jest.fn();
+			const savePostStatus = jest.fn();
 			render(
 				<PostPublishButton
 					hasPublishAction
-					onStatusChange={ onStatusChange }
-					onSave={ onSave }
+					savePostStatus={ savePostStatus }
 					isSaveable
 					isPublishable
 				/>
@@ -185,8 +175,7 @@ describe( 'PostPublishButton', () => {
 				screen.getByRole( 'button', { name: 'Submit for Review' } )
 			);
 
-			expect( onStatusChange ).toHaveBeenCalledWith( 'publish' );
-			expect( onSave ).toHaveBeenCalled();
+			expect( savePostStatus ).toHaveBeenCalledWith( 'publish' );
 		} );
 	} );
 

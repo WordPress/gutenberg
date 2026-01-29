@@ -6,7 +6,7 @@
  * @return {*} The result of the function call.
  */
 export async function withFakeTimers( fn ) {
-	const usingFakeTimers = jest.isMockFunction( setTimeout );
+	const usingFakeTimers = getJestFakeTimersType() !== null;
 
 	// Portions of the React Native Animation API rely upon these APIs. However,
 	// Jest's 'legacy' fake timers mutate these globals, which breaks the Animated
@@ -15,7 +15,7 @@ export async function withFakeTimers( fn ) {
 	const cancelAnimationFrameCopy = global.cancelAnimationFrame;
 
 	if ( ! usingFakeTimers ) {
-		jest.useFakeTimers( { legacyFakeTimers: true } );
+		jest.useFakeTimers();
 	}
 
 	// `Date.now` returns the real-time even when using fake timers.
@@ -48,3 +48,44 @@ export async function withFakeTimers( fn ) {
 	}
 	return result;
 }
+
+/**
+ * Get the type of Jest fake timers being used.
+ *
+ * @return {string | null} The type of Jest fake timers being used, or null if fake timers are not being used.
+ *
+ * @see https://github.com/callstack/react-native-testing-library/blob/a670b2d4c1fb4df5326a63cb2852f4d6e37756da/src/helpers/timers.ts#L24-L58
+ */
+function getJestFakeTimersType() {
+	if (
+		typeof jest === 'undefined' ||
+		typeof globalObj.setTimeout === 'undefined' ||
+		process.env.RNTL_SKIP_AUTO_DETECT_FAKE_TIMERS
+	) {
+		return null;
+	}
+
+	if (
+		typeof globalObj.setTimeout._isMockFunction !== 'undefined' &&
+		globalObj.setTimeout._isMockFunction
+	) {
+		return 'legacy';
+	}
+
+	if (
+		typeof globalObj.setTimeout.clock !== 'undefined' &&
+		typeof jest.getRealSystemTime !== 'undefined'
+	) {
+		try {
+			// jest.getRealSystemTime is only supported for Jest's `modern` fake timers and otherwise throws
+			jest.getRealSystemTime();
+			return 'modern';
+		} catch {
+			// not using Jest's modern fake timers
+		}
+	}
+
+	return null;
+}
+
+const globalObj = typeof window === 'undefined' ? global : window;

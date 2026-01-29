@@ -22,7 +22,6 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, Gridicons } from '@wordpress/components';
 import {
 	Icon,
 	cancelCircleFilled as cancelCircleFilledIcon,
@@ -35,6 +34,8 @@ import {
  */
 import allStyles from './style.scss';
 import platformStyles from './platform-style.scss';
+import Button from '../button';
+import Gridicons from '../mobile/gridicons';
 
 // Merge platform specific styles with the default styles.
 const baseStyles = { ...allStyles };
@@ -121,9 +122,7 @@ function SearchControl( {
 		mergeFutureStyles( activeDarkStyles, [ isActive, isDark ] );
 
 		setCurrentStyles( futureStyles );
-		// Disable reason: deferring this refactor to the native team.
-		// see https://github.com/WordPress/gutenberg/pull/41166
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// See https://github.com/WordPress/gutenberg/pull/41166
 	}, [ isActive, isDark ] );
 
 	const clearInput = useCallback( () => {
@@ -235,8 +234,8 @@ function SearchControl( {
 				<Text
 					onPress={ onCancel }
 					style={ cancelButtonTextStyle }
-					accessible={ true }
-					accessibilityRole={ 'button' }
+					accessible
+					accessibilityRole="button"
 					accessibilityLabel={ __( 'Cancel search' ) }
 					accessibilityHint={ __( 'Cancel search' ) }
 				>

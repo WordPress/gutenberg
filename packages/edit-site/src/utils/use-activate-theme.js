@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
+import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -21,7 +24,8 @@ const { useHistory, useLocation } = unlock( routerPrivateApis );
  */
 export function useActivateTheme() {
 	const history = useHistory();
-	const location = useLocation();
+	const { path } = useLocation();
+	const { startResolution, finishResolution } = useDispatch( coreStore );
 
 	return async () => {
 		if ( isPreviewingTheme() ) {
@@ -30,10 +34,12 @@ export function useActivateTheme() {
 				currentlyPreviewingTheme() +
 				'&_wpnonce=' +
 				window.WP_BLOCK_THEME_ACTIVATE_NONCE;
+			startResolution( 'activateTheme' );
 			await window.fetch( activationURL );
-			const { wp_theme_preview: themePreview, ...params } =
-				location.params;
-			history.replace( params );
+			finishResolution( 'activateTheme' );
+			// Remove the wp_theme_preview query param: we've finished activating
+			// the queue and are switching to normal Site Editor.
+			history.navigate( addQueryArgs( path, { wp_theme_preview: '' } ) );
 		}
 	};
 }

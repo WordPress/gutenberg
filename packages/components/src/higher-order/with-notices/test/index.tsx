@@ -27,7 +27,7 @@ import withNotices from '..';
 import type { WithNoticeProps } from '../types';
 
 // Implementation detail of Notice component used to query the dismissal button.
-const stockDismissText = 'Dismiss this notice';
+const stockDismissText = 'Close';
 
 function noticesFrom( list: string[] ) {
 	return list.map( ( item ) => ( { id: item, content: item } ) );
@@ -66,9 +66,17 @@ const BaseComponent = ( {
 const TestComponent = withNotices( BaseComponent );
 
 const TestNoticeOperations = withNotices(
-	forwardRef( ( props, ref ) => {
+	forwardRef<
+		unknown,
+		WithNoticeProps & { notifications?: ReturnType< typeof noticesFrom > }
+	>( ( props, ref ) => {
 		useImperativeHandle( ref, () => ( { ...props.noticeOperations } ) );
-		return <BaseComponent { ...props } />;
+		return (
+			<BaseComponent
+				{ ...props }
+				notifications={ props.notifications ?? [] }
+			/>
+		);
 	} )
 );
 

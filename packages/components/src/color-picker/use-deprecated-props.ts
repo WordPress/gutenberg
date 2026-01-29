@@ -25,11 +25,17 @@ function isLegacyProps( props: any ): props is LegacyProps {
 function getColorFromLegacyProps(
 	color: LegacyProps[ 'color' ]
 ): string | undefined {
-	if ( color === undefined ) return;
+	if ( color === undefined ) {
+		return;
+	}
 
-	if ( typeof color === 'string' ) return color;
+	if ( typeof color === 'string' ) {
+		return color;
+	}
 
-	if ( color.hex ) return color.hex;
+	if ( color.hex ) {
+		return color.hex;
+	}
 
 	return undefined;
 }

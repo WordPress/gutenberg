@@ -28,23 +28,23 @@ const MyHeadingLevelToolbar = () => (
 
 #### options
 
-The list of available HTML tags, passed from the block.
+The list of available heading levels, passed from the block.
 
 -   Type: `Object`
 -   Required: no
 
 #### value
 
-The chosen HTML tag.
+The chosen heading level.
 
--   Type: `string`
+-   Type: `number`
 -   Required: no
 
 #### onChange
 
-Callback to run when toolbar value is changed.
+Function called with the selected value changes.
 
--   Type: `string`
+-   Type: `() => number`
 -   Required: yes
 
 ## Related components

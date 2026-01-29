@@ -47,8 +47,9 @@ const FloatingToolbar = ( {
 	}, [ showFloatingToolbar ] );
 
 	useEffect( () => {
-		if ( showFloatingToolbar )
+		if ( showFloatingToolbar ) {
 			setPreviousSelection( { clientId: selectedClientId, parentId } );
+		}
 	}, [ selectedClientId ] );
 
 	const translationRange =
@@ -115,7 +116,9 @@ export default compose( [
 
 		const selectedClientId = getSelectedBlockClientId();
 
-		if ( ! selectedClientId ) return;
+		if ( ! selectedClientId ) {
+			return;
+		}
 
 		const rootBlockId = getBlockHierarchyRootClientId( selectedClientId );
 

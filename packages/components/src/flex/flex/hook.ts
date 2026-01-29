@@ -12,17 +12,17 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../../ui/context';
-import { useContextSystem } from '../../ui/context';
-import { useResponsiveValue } from '../../ui/utils/use-responsive-value';
-import { space } from '../../ui/utils/space';
+import type { WordPressComponentProps } from '../../context';
+import { useContextSystem } from '../../context';
+import { useResponsiveValue } from '../../utils/use-responsive-value';
+import { space } from '../../utils/space';
 import * as styles from '../styles';
 import { useCx } from '../../utils';
 import type { FlexProps } from '../types';
 
 function useDeprecatedProps(
 	props: WordPressComponentProps< FlexProps, 'div' >
-): WordPressComponentProps< FlexProps, 'div' > {
+): Omit< typeof props, 'isReversed' > {
 	const { isReversed, ...otherProps } = props;
 
 	if ( typeof isReversed !== 'undefined' ) {

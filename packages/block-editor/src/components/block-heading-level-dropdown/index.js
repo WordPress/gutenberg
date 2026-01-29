@@ -15,17 +15,17 @@ const POPOVER_PROPS = {
 	className: 'block-library-heading-level-dropdown',
 };
 
-/** @typedef {import('@wordpress/element').WPComponent} WPComponent */
+/** @typedef {import('react').ComponentType} ComponentType */
 
 /**
  * HeadingLevelDropdown props.
  *
  * @typedef WPHeadingLevelDropdownProps
  *
- * @property {number}                 value    The chosen heading level.
- * @property {number[]}               options  An array of supported heading levels.
- * @property {(newValue:number)=>any} onChange Callback to run when
- *                                             toolbar value is changed.
+ * @property {number}     value    The chosen heading level.
+ * @property {number[]}   options  An array of supported heading levels.
+ * @property {()=>number} onChange Function called with
+ *                                 the selected value changes.
  */
 
 /**
@@ -33,44 +33,42 @@ const POPOVER_PROPS = {
  *
  * @param {WPHeadingLevelDropdownProps} props Component props.
  *
- * @return {WPComponent} The toolbar.
+ * @return {ComponentType} The toolbar.
  */
 export default function HeadingLevelDropdown( {
 	options = HEADING_LEVELS,
 	value,
 	onChange,
 } ) {
+	const validOptions = options
+		.filter(
+			( option ) => option === 0 || HEADING_LEVELS.includes( option )
+		)
+		.sort( ( a, b ) => a - b ); // Sorts numerically in ascending order;
+
 	return (
 		<ToolbarDropdownMenu
 			popoverProps={ POPOVER_PROPS }
 			icon={ <HeadingLevelIcon level={ value } /> }
 			label={ __( 'Change level' ) }
-			controls={ options.map( ( targetLevel ) => {
-				{
-					const isActive = targetLevel === value;
-
-					return {
-						icon: (
-							<HeadingLevelIcon
-								level={ targetLevel }
-								isPressed={ isActive }
-							/>
-						),
-						label:
-							targetLevel === 0
-								? __( 'Paragraph' )
-								: sprintf(
-										// translators: %s: heading level e.g: "1", "2", "3"
-										__( 'Heading %d' ),
-										targetLevel
-								  ),
-						isActive,
-						onClick() {
-							onChange( targetLevel );
-						},
-						role: 'menuitemradio',
-					};
-				}
+			controls={ validOptions.map( ( targetLevel ) => {
+				const isActive = targetLevel === value;
+				return {
+					icon: <HeadingLevelIcon level={ targetLevel } />,
+					title:
+						targetLevel === 0
+							? __( 'Paragraph' )
+							: sprintf(
+									// translators: %d: heading level e.g: "1", "2", "3"
+									__( 'Heading %d' ),
+									targetLevel
+							  ),
+					isActive,
+					onClick() {
+						onChange( targetLevel );
+					},
+					role: 'menuitemradio',
+				};
 			} ) }
 		/>
 	);

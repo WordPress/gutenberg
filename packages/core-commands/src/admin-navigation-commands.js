@@ -1,63 +1,70 @@
 /**
  * WordPress dependencies
  */
-import { useCommand } from '@wordpress/commands';
-import { __ } from '@wordpress/i18n';
-import { plus, symbol } from '@wordpress/icons';
-import { addQueryArgs, getPath } from '@wordpress/url';
-import { privateApis as routerPrivateApis } from '@wordpress/router';
+import { useCommandLoader, useCommands } from '@wordpress/commands';
+import { __, sprintf } from '@wordpress/i18n';
+import { external } from '@wordpress/icons';
+import { useMemo } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 
-/**
- * Internal dependencies
- */
-import { useIsTemplatesAccessible, useIsBlockBasedTheme } from './hooks';
-import { unlock } from './lock-unlock';
+const getViewSiteCommand = () =>
+	function useViewSiteCommand() {
+		const homeUrl = useSelect( ( select ) => {
+			// Site index.
+			return select( coreStore ).getEntityRecord(
+				'root',
+				'__unstableBase'
+			)?.home;
+		}, [] );
 
-const { useHistory } = unlock( routerPrivateApis );
-
-export function useAdminNavigationCommands() {
-	const history = useHistory();
-	const isTemplatesAccessible = useIsTemplatesAccessible();
-	const isBlockBasedTheme = useIsBlockBasedTheme();
-
-	const isSiteEditor = getPath( window.location.href )?.includes(
-		'site-editor.php'
-	);
-
-	useCommand( {
-		name: 'core/add-new-post',
-		label: __( 'Add new post' ),
-		icon: plus,
-		callback: () => {
-			document.location.href = 'post-new.php';
-		},
-	} );
-	useCommand( {
-		name: 'core/add-new-page',
-		label: __( 'Add new page' ),
-		icon: plus,
-		callback: () => {
-			document.location.href = 'post-new.php?post_type=page';
-		},
-	} );
-	useCommand( {
-		name: 'core/manage-reusable-blocks',
-		label: __( 'Patterns' ),
-		icon: symbol,
-		callback: ( { close } ) => {
-			if ( isTemplatesAccessible && isBlockBasedTheme ) {
-				const args = {
-					path: '/patterns',
-				};
-				if ( isSiteEditor ) {
-					history.push( args );
-				} else {
-					document.location = addQueryArgs( 'site-editor.php', args );
-				}
-				close();
-			} else {
-				document.location.href = 'edit.php?post_type=wp_block';
+		const commands = useMemo( () => {
+			if ( ! homeUrl ) {
+				return [];
 			}
-		},
+
+			return [
+				{
+					name: 'core/view-site',
+					label: __( 'View site' ),
+					icon: external,
+					callback: ( { close } ) => {
+						close();
+						window.open( homeUrl, '_blank' );
+					},
+				},
+			];
+		}, [ homeUrl ] );
+
+		return {
+			isLoading: false,
+			commands,
+		};
+	};
+
+export function useAdminNavigationCommands( menuCommands ) {
+	const commands = useMemo( () => {
+		return ( menuCommands ?? [] ).map( ( menuCommand ) => {
+			const label = sprintf(
+				/* translators: %s: menu label */
+				__( 'Go to: %s' ),
+				menuCommand.label
+			);
+			return {
+				name: menuCommand.name,
+				label,
+				searchLabel: label,
+				callback: ( { close } ) => {
+					document.location = menuCommand.url;
+					close();
+				},
+			};
+		} );
+	}, [ menuCommands ] );
+	useCommands( commands );
+
+	useCommandLoader( {
+		name: 'core/view-site',
+		hook: getViewSiteCommand(),
 	} );
 }

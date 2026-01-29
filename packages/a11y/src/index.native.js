@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import filterMessage from './filter-message';
+import filterMessage from './shared/filter-message';
 
 /**
  * Update the ARIA live notification area text node.

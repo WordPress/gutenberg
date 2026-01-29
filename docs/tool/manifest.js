@@ -1,3 +1,5 @@
+/* eslint no-console: [ 'error', { allow: [ 'error' ] } ] */
+
 /**
  * External dependencies
  */
@@ -8,14 +10,15 @@ const { join } = require( 'path' );
 
 const baseRepoUrl = '..';
 const componentPaths = glob( 'packages/components/src/*/**/README.md', {
-	// Don't expose documentation for mobile only and G2 components just yet.
+	// Don't expose documentation for mobile only and private components just yet.
 	ignore: [
 		'**/src/mobile/**/README.md',
-		'**/src/ui/**/README.md',
 		'packages/components/src/theme/README.md',
 		'packages/components/src/view/README.md',
-		'packages/components/src/dropdown-menu-v2/README.md',
-		'packages/components/src/progress-bar/README.md',
+		'packages/components/src/menu/README.md',
+		'packages/components/src/tabs/README.md',
+		'packages/components/src/custom-select-control-v2/README.md',
+		'packages/components/src/badge/README.md',
 	],
 } );
 const packagePaths = glob( 'packages/*/package.json' )
@@ -37,10 +40,20 @@ function getPackageManifest( packageFolderNames ) {
 	return packageFolderNames.reduce( ( manifest, folderName ) => {
 		const path = `${ baseRepoUrl }/packages/${ folderName }/README.md`;
 		const tocPath = `${ baseRepoUrl }/packages/${ folderName }/docs/toc.json`;
+		const packageJson = require(
+			join(
+				__dirname,
+				'..',
+				'..',
+				'packages',
+				folderName,
+				'package.json'
+			)
+		);
 
 		// First add any README files to the TOC
 		manifest.push( {
-			title: `@wordpress/${ folderName }`,
+			title: packageJson.name,
 			slug: `packages-${ folderName }`,
 			markdown_source: path,
 			parent: 'packages',
@@ -123,6 +136,29 @@ function generateRootManifestFromTOCItems( items, parent = null ) {
 			pageItems = pageItems.concat( getPackageManifest( packagePaths ) );
 		}
 	} );
+
+	const slugs = pageItems.map( ( { slug } ) => slug );
+	const duplicatedSlugs = slugs.filter(
+		( item, idx ) => idx !== slugs.indexOf( item )
+	);
+
+	const FgRed = '\x1b[31m';
+	const Reset = '\x1b[0m';
+
+	if ( duplicatedSlugs.length > 0 ) {
+		console.error(
+			`${ FgRed } The handbook generation setup creates pages based on their slug, so each slug has to be unique. ${ Reset }`
+		);
+		console.error(
+			`${ FgRed } More info at https://github.com/WordPress/gutenberg/issues/61206#issuecomment-2085361154 ${ Reset }\n`
+		);
+		throw new Error(
+			`${ FgRed } Duplicate slugs found in the TOC: ${ duplicatedSlugs.join(
+				', '
+			) } ${ Reset }`
+		);
+	}
+
 	return pageItems;
 }
 

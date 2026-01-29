@@ -1,26 +1,30 @@
-{{#isBasicVariant}}
-
+{{#isDefaultVariant}}
 /**
  * WordPress dependencies
  */
-import { store } from "@wordpress/interactivity";
+import { store, getContext } from '@wordpress/interactivity';
 
-store( {
-	actions: {
-		'{{namespace}}': {
-			toggle: ( { context } ) => {
-				context[ '{{namespace}}' ].isOpen = !context[ '{{namespace}}' ].isOpen;
-			},
-		},
+const { state } = store( '{{namespace}}', {
+	state: {
+		get themeText() {
+			return state.isDark ? state.darkText : state.lightText;
+		}
 	},
-	effects: {
-		'{{namespace}}': {
-			logIsOpen: ( { context } ) => {
-				// Log the value of `isOpen` each time it changes.
-				console.log( `Is open: ${ context[ '{{namespace}}' ].isOpen }` );
-			},
+	actions: {
+		toggleOpen() {
+			const context = getContext();
+			context.isOpen = ! context.isOpen;
+		},
+		toggleTheme() {
+			state.isDark = ! state.isDark;
+		}
+	},
+	callbacks: {
+		logIsOpen: () => {
+			const { isOpen } = getContext();
+			// Log the value of `isOpen` each time it changes.
+			console.log( `Is open: ${ isOpen }` );
 		},
 	},
 } );
-
-{{/isBasicVariant}}
+{{/isDefaultVariant}}

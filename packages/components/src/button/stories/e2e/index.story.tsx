@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { StoryFn, Meta } from '@storybook/react';
+import type { StoryFn, Meta } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -31,21 +31,111 @@ export const VariantStates: StoryFn< typeof Button > = (
 		'link',
 	];
 
-	return (
-		<div style={ { display: 'flex', flexDirection: 'column', gap: 24 } }>
-			{ variants.map( ( variant ) => (
-				<div
-					style={ { display: 'flex', gap: 8 } }
-					key={ variant ?? 'undefined' }
+	const VariantsRow = ( {
+		buttonProps,
+		name,
+	}: {
+		buttonProps?: ButtonAsButtonProps;
+		name: string;
+	} ) => {
+		return (
+			<tr>
+				<th
+					style={ {
+						fontSize: 13,
+						fontWeight: 'normal',
+						padding: 8,
+						background: '#f3f4f5',
+					} }
 				>
-					<Button { ...props } variant={ variant } />
-					<Button { ...props } variant={ variant } disabled />
-					<Button { ...props } variant={ variant } isBusy />
-					<Button { ...props } variant={ variant } isDestructive />
-					<Button { ...props } variant={ variant } isPressed />
-				</div>
-			) ) }
-		</div>
+					{ name }
+				</th>
+				{ variants.map( ( variant ) => (
+					<td key={ variant ?? 'undefined' } style={ { padding: 4 } }>
+						<Button
+							__next40pxDefaultSize
+							{ ...props }
+							variant={ variant }
+							{ ...buttonProps }
+						/>
+					</td>
+				) ) }
+			</tr>
+		);
+	};
+
+	return (
+		<table>
+			<thead>
+				<tr style={ { background: '#f3f4f5' } }>
+					<th />
+					{ variants.map( ( variant ) => (
+						<th
+							key={ variant ?? 'undefined' }
+							style={ { padding: 8 } }
+						>
+							{ variant ?? '(default)' }
+						</th>
+					) ) }
+				</tr>
+			</thead>
+			<tbody>
+				<VariantsRow name="(default)" />
+				<VariantsRow
+					name="disabled"
+					buttonProps={ { disabled: true } }
+				/>
+				<VariantsRow
+					name="focusable disabled"
+					buttonProps={ {
+						accessibleWhenDisabled: true,
+						disabled: true,
+					} }
+				/>
+				<VariantsRow
+					name="isBusy"
+					buttonProps={ {
+						isBusy: true,
+					} }
+				/>
+				<VariantsRow
+					name="isBusy disabled"
+					buttonProps={ {
+						isBusy: true,
+						accessibleWhenDisabled: true,
+						disabled: true,
+					} }
+				/>
+				<VariantsRow
+					name="isDestructive"
+					buttonProps={ {
+						isDestructive: true,
+					} }
+				/>
+				<VariantsRow
+					name="isDestructive disabled"
+					buttonProps={ {
+						isDestructive: true,
+						accessibleWhenDisabled: true,
+						disabled: true,
+					} }
+				/>
+				<VariantsRow
+					name="isPressed"
+					buttonProps={ {
+						isPressed: true,
+					} }
+				/>
+				<VariantsRow
+					name="isPressed disabled"
+					buttonProps={ {
+						isPressed: true,
+						accessibleWhenDisabled: true,
+						disabled: true,
+					} }
+				/>
+			</tbody>
+		</table>
 	);
 };
 VariantStates.args = {
@@ -60,13 +150,16 @@ Icon.args = {
 export const Dashicons: StoryFn< typeof Button > = ( props ) => {
 	return (
 		<div style={ { display: 'flex', gap: 8 } }>
-			<Button { ...props } />
-			<Button { ...props }>Children</Button>
-			<Button { ...props } iconPosition="right">
+			<Button __next40pxDefaultSize { ...props } />
+			<Button __next40pxDefaultSize { ...props }>
+				Children
+			</Button>
+			<Button __next40pxDefaultSize { ...props } iconPosition="right">
 				Children (icon right)
 			</Button>
-			<Button { ...props } text="Text" />
+			<Button __next40pxDefaultSize { ...props } text="Text" />
 			<Button
+				__next40pxDefaultSize
 				{ ...props }
 				text="Text (icon right)"
 				iconPosition="right"

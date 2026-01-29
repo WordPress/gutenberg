@@ -22,7 +22,11 @@ jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
 function setupDataMock( order = 0 ) {
 	useSelect.mockImplementation( ( mapSelect ) =>
 		mapSelect( () => ( {
-			getPostType: () => null,
+			getPostType: () => ( {
+				supports: {
+					'page-attributes': true,
+				},
+			} ),
 			getEditedPostAttribute: ( attr ) => {
 				switch ( attr ) {
 					case 'menu_order':

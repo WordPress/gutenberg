@@ -10,10 +10,11 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import withSpokenMessages from '../../higher-order/with-spoken-messages';
 import { useNavigationMenuContext } from './context';
 import { useNavigationContext } from '../context';
-import { MenuTitleSearchUI } from '../styles/navigation-styles';
 import { SEARCH_FOCUS_DELAY } from '../constants';
 
 import type { NavigationMenuTitleSearchProps } from '../types';
+import SearchControl from '../../search-control';
+import { MenuTitleSearchControlWrapper } from '../styles/navigation-styles';
 
 function MenuTitleSearch( {
 	debouncedSpeak,
@@ -54,8 +55,8 @@ function MenuTitleSearch( {
 			count
 		);
 		debouncedSpeak( resultsFoundMessage );
-		// Ignore exhaustive-deps rule for now. See https://github.com/WordPress/gutenberg/pull/44090
-		// eslint-disable-next-line react-hooks/exhaustive-deps
+		// Not adding deps for now, as it would require either a larger refactor.
+		// See https://github.com/WordPress/gutenberg/pull/44090
 	}, [ items, search ] );
 
 	const onClose = () => {
@@ -76,13 +77,12 @@ function MenuTitleSearch( {
 	const placeholder = sprintf(
 		/* translators: placeholder for menu search box. %s: menu title */
 		__( 'Search %s' ),
-		title?.toLowerCase()
+		title?.toLowerCase() || ''
 	).trim();
 
 	return (
-		<div className="components-navigation__menu-title-search">
-			<MenuTitleSearchUI
-				autoComplete="off"
+		<MenuTitleSearchControlWrapper>
+			<SearchControl
 				className="components-navigation__menu-search-input"
 				id={ inputId }
 				onChange={ ( value ) => onSearch?.( value ) }
@@ -90,10 +90,9 @@ function MenuTitleSearch( {
 				placeholder={ placeholder }
 				onClose={ onClose }
 				ref={ inputRef }
-				type="search"
 				value={ search }
 			/>
-		</div>
+		</MenuTitleSearchControlWrapper>
 	);
 }
 

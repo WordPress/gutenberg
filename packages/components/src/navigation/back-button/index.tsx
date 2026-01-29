@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
@@ -29,10 +29,7 @@ function UnforwardedNavigationBackButton(
 ) {
 	const { setActiveMenu, navigationTree } = useNavigationContext();
 
-	const classes = classnames(
-		'components-navigation__back-button',
-		className
-	);
+	const classes = clsx( 'components-navigation__back-button', className );
 
 	const parentMenuTitle =
 		parentMenu !== undefined
@@ -52,6 +49,7 @@ function UnforwardedNavigationBackButton(
 	const icon = isRTL() ? chevronRight : chevronLeft;
 	return (
 		<MenuBackButtonUI
+			__next40pxDefaultSize
 			className={ classes }
 			href={ href }
 			variant="tertiary"
@@ -64,8 +62,12 @@ function UnforwardedNavigationBackButton(
 	);
 }
 
+/**
+ * @deprecated Use `Navigator` instead.
+ */
 export const NavigationBackButton = forwardRef(
 	UnforwardedNavigationBackButton
 );
+NavigationBackButton.displayName = 'NavigationBackButton';
 
 export default NavigationBackButton;

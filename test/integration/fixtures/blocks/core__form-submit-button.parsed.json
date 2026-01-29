@@ -1,0 +1,38 @@
+[
+	{
+		"blockName": "core/form-submit-button",
+		"attrs": {},
+		"innerBlocks": [
+			{
+				"blockName": "core/buttons",
+				"attrs": {},
+				"innerBlocks": [
+					{
+						"blockName": "core/button",
+						"attrs": {
+							"tagName": "button",
+							"type": "submit"
+						},
+						"innerBlocks": [],
+						"innerHTML": "\n<div class=\"wp-block-button\"><button type=\"submit\" class=\"wp-block-button__link wp-element-button\">Submit</button></div>\n",
+						"innerContent": [
+							"\n<div class=\"wp-block-button\"><button type=\"submit\" class=\"wp-block-button__link wp-element-button\">Submit</button></div>\n"
+						]
+					}
+				],
+				"innerHTML": "\n<div class=\"wp-block-buttons\"></div>\n",
+				"innerContent": [
+					"\n<div class=\"wp-block-buttons\">",
+					null,
+					"</div>\n"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-form-submit-button\"></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-form-submit-button\">",
+			null,
+			"</div>\n"
+		]
+	}
+]

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -10,13 +10,14 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { isRTL } from '@wordpress/i18n';
 
 export default function save( { attributes } ) {
-	const { align, content, dropCap, direction } = attributes;
-	const className = classnames( {
+	const { content, dropCap, direction, style } = attributes;
+	const textAlign = style?.typography?.textAlign;
+	const className = clsx( {
 		'has-drop-cap':
-			align === ( isRTL() ? 'left' : 'right' ) || align === 'center'
+			textAlign === ( isRTL() ? 'left' : 'right' ) ||
+			textAlign === 'center'
 				? false
 				: dropCap,
-		[ `has-text-align-${ align }` ]: align,
 	} );
 
 	return (

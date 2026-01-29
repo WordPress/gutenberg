@@ -5,32 +5,21 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { Guide } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as preferencesStore } from '@wordpress/preferences';
-
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../store';
+import { store as editorStore } from '@wordpress/editor';
 
 export default function WelcomeGuideTemplate() {
 	const { toggle } = useDispatch( preferencesStore );
 
-	const isVisible = useSelect( ( select ) => {
-		const isTemplateActive = !! select( preferencesStore ).get(
-			'core/edit-site',
-			'welcomeGuideTemplate'
-		);
-		const isEditorActive = !! select( preferencesStore ).get(
-			'core/edit-site',
-			'welcomeGuide'
-		);
-		const { isPage, hasPageContentFocus } = select( editSiteStore );
-		return (
-			isTemplateActive &&
-			! isEditorActive &&
-			isPage() &&
-			! hasPageContentFocus()
-		);
+	const { isActive, hasPreviousEntity } = useSelect( ( select ) => {
+		const { getEditorSettings } = select( editorStore );
+		const { get } = select( preferencesStore );
+		return {
+			isActive: get( 'core/edit-site', 'welcomeGuideTemplate' ),
+			hasPreviousEntity:
+				!! getEditorSettings().onNavigateToPreviousEntityRecord,
+		};
 	}, [] );
+	const isVisible = isActive && hasPreviousEntity;
 
 	if ( ! isVisible ) {
 		return null;

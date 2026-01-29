@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -14,13 +14,14 @@ import { useState } from '@wordpress/element';
 import SnackbarList from '../list';
 
 const meta: Meta< typeof SnackbarList > = {
-	title: 'Components/SnackbarList',
+	title: 'Components/Feedback/SnackbarList',
+	id: 'components-snackbarlist',
 	component: SnackbarList,
 	argTypes: {
-		as: { control: { type: null } },
+		as: { control: false },
 		onRemove: {
 			action: 'onRemove',
-			control: { type: null },
+			control: false,
 		},
 	},
 	parameters: {
@@ -70,7 +71,6 @@ Default.args = {
 				},
 			],
 			content: 'Post published.',
-			isDismissible: true,
 			explicitDismiss: false,
 		},
 		{
@@ -83,7 +83,6 @@ Default.args = {
 				},
 			],
 			content: 'Post updated.',
-			isDismissible: true,
 			explicitDismiss: false,
 		},
 		{
@@ -91,7 +90,6 @@ Default.args = {
 			spokenMessage: 'All content copied.',
 			actions: [],
 			content: 'All content copied.',
-			isDismissible: true,
 			explicitDismiss: false,
 		},
 	],

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -10,7 +10,8 @@ import Tip from '..';
 
 const meta: Meta< typeof Tip > = {
 	component: Tip,
-	title: 'Components/Tip',
+	title: 'Components/Feedback/Tip',
+	id: 'components-tip',
 	argTypes: {
 		children: { control: { type: 'text' } },
 	},

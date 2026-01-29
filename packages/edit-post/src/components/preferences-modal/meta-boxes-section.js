@@ -4,13 +4,17 @@
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-import { PreferencesModalSection } from '@wordpress/interface';
+import { privateApis as preferencesPrivateApis } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
  */
-import { EnableCustomFieldsOption, EnablePanelOption } from './options';
+import EnableCustomFieldsOption from './enable-custom-fields';
+import EnablePanelOption from './enable-panel';
 import { store as editPostStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { PreferencesModalSection } = unlock( preferencesPrivateApis );
 
 export function MetaBoxesSection( {
 	areCustomFieldsRegistered,

@@ -4,7 +4,9 @@ exports.local = {
 };
 
 exports.sauce = {
-	host: 'ondemand.saucelabs.com',
-	port: 80,
-	auth: process.env.SAUCE_USERNAME + ':' + process.env.SAUCE_ACCESS_KEY,
+	user: process.env.SAUCE_USERNAME,
+	key: process.env.SAUCE_ACCESS_KEY,
+	hostname: 'ondemand.us-west-1.saucelabs.com',
+	port: 443,
+	baseUrl: 'wd/hub',
 };

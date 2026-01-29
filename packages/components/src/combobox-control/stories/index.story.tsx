@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 /**
  * WordPress dependencies
@@ -20,16 +21,31 @@ const countries = [
 	{ name: 'Albania', code: 'AL' },
 	{ name: 'Algeria', code: 'DZ' },
 	{ name: 'American Samoa', code: 'AS' },
+	{ name: 'Andorra', code: 'AD' },
+	{ name: 'Angola', code: 'AO' },
+	{ name: 'Anguilla', code: 'AI' },
+	{ name: 'Antarctica', code: 'AQ' },
+	{ name: 'Antigua and Barbuda', code: 'AG' },
+	{ name: 'Argentina', code: 'AR' },
+	{ name: 'Armenia', code: 'AM' },
+	{ name: 'Aruba', code: 'AW' },
+	{ name: 'Australia', code: 'AU' },
+	{ name: 'Austria', code: 'AT' },
+	{ name: 'Azerbaijan', code: 'AZ' },
 ];
 
 const meta: Meta< typeof ComboboxControl > = {
-	title: 'Components/ComboboxControl',
+	title: 'Components/Selection & Input/Common/ComboboxControl',
+	id: 'components-comboboxcontrol',
 	component: ComboboxControl,
 	argTypes: {
-		value: { control: { type: null } },
+		value: { control: false },
+	},
+	args: {
+		onChange: fn(),
+		onFilterValueChange: fn(),
 	},
 	parameters: {
-		actions: { argTypesRegex: '^on.*' },
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
 	},
@@ -53,6 +69,7 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 	return (
 		<>
 			<ComboboxControl
+				__next40pxDefaultSize
 				{ ...args }
 				value={ value }
 				onChange={ ( ...changeArgs ) => {
@@ -65,7 +82,7 @@ const Template: StoryFn< typeof ComboboxControl > = ( {
 };
 export const Default = Template.bind( {} );
 Default.args = {
-	allowReset: false,
+	__next40pxDefaultSize: true,
 	label: 'Select a country',
 	options: countryOptions,
 };
@@ -110,4 +127,33 @@ WithCustomRenderItem.args = {
 			</div>
 		);
 	},
+};
+
+/**
+ * You can disable options in the list
+ * by setting the `disabled` property to true
+ * for individual items in the option object.
+ */
+export const WithDisabledOptions = Template.bind( {} );
+const optionsWithDisabledOptions = countryOptions.map( ( option, index ) => ( {
+	...option,
+	disabled: index % 3 === 0, // Disable options at index 0, 3, 6, etc.
+} ) );
+
+WithDisabledOptions.args = {
+	...Default.args,
+	options: optionsWithDisabledOptions,
+};
+
+/**
+ * By default, the combobox expands when focused.
+ * You can disable this behavior by setting the `expandOnFocus` prop to `false`.
+ * This is useful when you want to show the suggestions only when the user interacts with the input.
+ */
+export const NotExpandOnFocus = Template.bind( {} );
+
+NotExpandOnFocus.args = {
+	...Default.args,
+	options: countryOptions,
+	expandOnFocus: false,
 };

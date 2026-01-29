@@ -8,7 +8,7 @@ import { createPortal, useState } from '@wordpress/element';
  */
 import Popover from '../..';
 import { Provider as SlotFillProvider } from '../../../slot-fill';
-import type { WordPressComponentProps } from '../../../ui/context';
+import type { WordPressComponentProps } from '../../../context';
 
 const GenericIframe = ( {
 	children,
@@ -46,7 +46,6 @@ export const PopoverInsideIframeRenderedInExternalSlot = (
 
 	return (
 		<SlotFillProvider>
-			{ /* @ts-expect-error Slot is not currently typed on Popover */ }
 			<Popover.Slot name={ SLOT_NAME } />
 			<GenericIframe
 				style={ {

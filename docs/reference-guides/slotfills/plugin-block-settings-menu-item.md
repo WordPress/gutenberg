@@ -7,7 +7,7 @@ This will either appear in the controls for each block or at the Top Toolbar dep
 
 ```js
 import { registerPlugin } from '@wordpress/plugins';
-import { PluginBlockSettingsMenuItem } from '@wordpress/edit-post';
+import { PluginBlockSettingsMenuItem } from '@wordpress/editor';
 
 const PluginBlockSettingsMenuGroupTest = () => (
 	<PluginBlockSettingsMenuItem

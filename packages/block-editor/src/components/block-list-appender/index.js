@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import clsx from 'clsx';
 
 /**
  * WordPress dependencies
@@ -39,61 +39,12 @@ function DefaultAppender( { rootClientId } ) {
 	);
 }
 
-function useAppender( rootClientId, CustomAppender ) {
-	const isVisible = useSelect(
-		( select ) => {
-			const {
-				getTemplateLock,
-				getSelectedBlockClientId,
-				__unstableGetEditorMode,
-				getBlockEditingMode,
-			} = select( blockEditorStore );
-
-			if ( CustomAppender === false ) {
-				return false;
-			}
-
-			if ( ! CustomAppender ) {
-				const selectedBlockClientId = getSelectedBlockClientId();
-				const isParentSelected =
-					rootClientId === selectedBlockClientId ||
-					( ! rootClientId && ! selectedBlockClientId );
-				if ( ! isParentSelected ) {
-					return false;
-				}
-			}
-
-			if (
-				getTemplateLock( rootClientId ) ||
-				getBlockEditingMode( rootClientId ) === 'disabled' ||
-				__unstableGetEditorMode() === 'zoom-out'
-			) {
-				return false;
-			}
-
-			return true;
-		},
-		[ rootClientId, CustomAppender ]
-	);
-
-	if ( ! isVisible ) {
-		return null;
-	}
-
-	return CustomAppender ? (
-		<CustomAppender />
-	) : (
-		<DefaultAppender rootClientId={ rootClientId } />
-	);
-}
-
-function BlockListAppender( {
+export default function BlockListAppender( {
 	rootClientId,
-	renderAppender,
+	CustomAppender,
 	className,
 	tagName: TagName = 'div',
 } ) {
-	const appender = useAppender( rootClientId, renderAppender );
 	const isDragOver = useSelect(
 		( select ) => {
 			const {
@@ -114,10 +65,6 @@ function BlockListAppender( {
 		[ rootClientId ]
 	);
 
-	if ( ! appender ) {
-		return null;
-	}
-
 	return (
 		<TagName
 			// A `tabIndex` is used on the wrapping `div` element in order to
@@ -129,7 +76,7 @@ function BlockListAppender( {
 			//
 			// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 			tabIndex={ -1 }
-			className={ classnames( 'block-list-appender wp-block', className, {
+			className={ clsx( 'block-list-appender wp-block', className, {
 				'is-drag-over': isDragOver,
 			} ) }
 			// Needed in case the whole editor is content editable (for multi
@@ -146,9 +93,11 @@ function BlockListAppender( {
 			// have commonly targeted that attribute for margins.
 			data-block
 		>
-			{ appender }
+			{ CustomAppender ? (
+				<CustomAppender />
+			) : (
+				<DefaultAppender rootClientId={ rootClientId } />
+			) }
 		</TagName>
 	);
 }
-
-export default BlockListAppender;

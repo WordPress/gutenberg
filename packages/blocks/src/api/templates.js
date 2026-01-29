@@ -31,6 +31,42 @@ export function doBlocksMatchTemplate( blocks = [], template = [] ) {
 	);
 }
 
+const isHTMLAttribute = ( attributeDefinition ) =>
+	attributeDefinition?.source === 'html';
+
+const isQueryAttribute = ( attributeDefinition ) =>
+	attributeDefinition?.source === 'query';
+
+function normalizeAttributes( schema, values ) {
+	if ( ! values ) {
+		return {};
+	}
+
+	return Object.fromEntries(
+		Object.entries( values ).map( ( [ key, value ] ) => [
+			key,
+			normalizeAttribute( schema[ key ], value ),
+		] )
+	);
+}
+
+function normalizeAttribute( definition, value ) {
+	if ( isHTMLAttribute( definition ) && Array.isArray( value ) ) {
+		// Introduce a deprecated call at this point
+		// When we're confident that "children" format should be removed from the templates.
+
+		return renderToString( value );
+	}
+
+	if ( isQueryAttribute( definition ) && value ) {
+		return value.map( ( subValues ) => {
+			return normalizeAttributes( definition.query, subValues );
+		} );
+	}
+
+	return value;
+}
+
 /**
  * Synchronize a block list with a block template.
  *
@@ -67,64 +103,17 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 			// before creating the blocks.
 
 			const blockType = getBlockType( name );
-			const isHTMLAttribute = ( attributeDefinition ) =>
-				attributeDefinition?.source === 'html';
-			const isQueryAttribute = ( attributeDefinition ) =>
-				attributeDefinition?.source === 'query';
-
-			const normalizeAttributes = ( schema, values ) => {
-				if ( ! values ) {
-					return {};
-				}
-
-				return Object.fromEntries(
-					Object.entries( values ).map( ( [ key, value ] ) => [
-						key,
-						normalizeAttribute( schema[ key ], value ),
-					] )
-				);
-			};
-			const normalizeAttribute = ( definition, value ) => {
-				if ( isHTMLAttribute( definition ) && Array.isArray( value ) ) {
-					// Introduce a deprecated call at this point
-					// When we're confident that "children" format should be removed from the templates.
-
-					return renderToString( value );
-				}
-
-				if ( isQueryAttribute( definition ) && value ) {
-					return value.map( ( subValues ) => {
-						return normalizeAttributes(
-							definition.query,
-							subValues
-						);
-					} );
-				}
-
-				return value;
-			};
 
 			const normalizedAttributes = normalizeAttributes(
 				blockType?.attributes ?? {},
 				attributes
 			);
 
-			let [ blockName, blockAttributes ] =
+			const [ blockName, blockAttributes ] =
 				convertLegacyBlockNameAndAttributes(
 					name,
 					normalizedAttributes
 				);
-
-			// If a Block is undefined at this point, use the core/missing block as
-			// a placeholder for a better user experience.
-			if ( undefined === getBlockType( blockName ) ) {
-				blockAttributes = {
-					originalName: name,
-					originalContent: '',
-					originalUndelimitedContent: '',
-				};
-				blockName = 'core/missing';
-			}
 
 			return createBlock(
 				blockName,

@@ -1,0 +1,63 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/mixins" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/z-index" as *;
+
+.editor-post-template__swap-template-modal {
+	z-index: z-index(".editor-post-template__swap-template-modal");
+
+	.editor-post-template__swap-template-search {
+		background: $white;
+		position: sticky;
+		top: 0;
+		padding: $grid-unit-20 0;
+		transform: translateY(- $grid-unit-05); // Offsets the top padding on the modal content container
+		margin-bottom: - $grid-unit-05;
+		z-index: z-index(".editor-post-template__swap-template-search");
+	}
+}
+
+.editor-post-template__create-template-modal {
+	z-index: z-index(".editor-post-template__create-template-modal");
+}
+
+.editor-post-template__swap-template-modal-content .block-editor-block-patterns-list {
+	column-count: 2;
+	column-gap: $grid-unit-30;
+
+	// Small top padding required to avoid cutting off the visible outline when hovering items
+	padding-top: $border-width-focus-fallback;
+
+	@include break-medium() {
+		column-count: 3;
+	}
+
+	@include break-wide() {
+		column-count: 4;
+	}
+
+	.block-editor-block-patterns-list__list-item {
+		break-inside: avoid-column;
+	}
+}
+
+.editor-post-template__dropdown {
+	.components-popover__content {
+		min-width: 240px;
+	}
+	.components-button.is-pressed,
+	.components-button.is-pressed:hover {
+		background: inherit;
+		color: inherit;
+	}
+}
+
+.editor-post-template__create-form {
+	@include break-medium() {
+		width: $grid-unit * 40;
+	}
+}
+
+.editor-post-template__classic-theme-dropdown {
+	padding: $grid-unit-10;
+}

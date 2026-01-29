@@ -66,23 +66,23 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers :: gutengberg_block_core_navigation_block_contains_core_navigation
+	 * @covers :: block_core_navigation_block_contains_core_navigation
 	 */
-	public function test_gutenberg_block_core_navigation_block_contains_core_navigation() {
+	public function test_block_core_navigation_block_contains_core_navigation() {
 		$parsed_blocks = parse_blocks( '<!-- wp:navigation /-->' );
 		$inner_blocks  = new WP_Block_List( $parsed_blocks );
-		$this->assertTrue( gutenberg_block_core_navigation_block_contains_core_navigation( $inner_blocks ) );
+		$this->assertTrue( block_core_navigation_block_contains_core_navigation( $inner_blocks ) );
 	}
 
-	public function test_gutenberg_block_core_navigation_block_contains_core_navigation_deep() {
+	public function test_block_core_navigation_block_contains_core_navigation_deep() {
 		$parsed_blocks = parse_blocks( '<!-- wp:group --><!-- /wp:group --><!-- wp:group --><!-- wp:group --><!-- wp:navigation /--><!-- /wp:group --><!-- /wp:group -->' );
 		$inner_blocks  = new WP_Block_List( $parsed_blocks );
-		$this->assertTrue( gutenberg_block_core_navigation_block_contains_core_navigation( $inner_blocks ) );
+		$this->assertTrue( block_core_navigation_block_contains_core_navigation( $inner_blocks ) );
 	}
 
-	public function test_gutenberg_block_core_navigation_block_contains_core_navigation_no_navigation() {
+	public function test_block_core_navigation_block_contains_core_navigation_no_navigation() {
 		$parsed_blocks = parse_blocks( '<!-- wp:group --><!-- wp:group --><!-- /wp:group --><!-- /wp:group -->' );
 		$inner_blocks  = new WP_Block_List( $parsed_blocks );
-		$this->assertFalse( gutenberg_block_core_navigation_block_contains_core_navigation( $inner_blocks ) );
+		$this->assertFalse( block_core_navigation_block_contains_core_navigation( $inner_blocks ) );
 	}
 }

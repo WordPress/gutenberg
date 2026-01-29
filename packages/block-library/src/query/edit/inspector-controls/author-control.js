@@ -30,7 +30,7 @@ function AuthorControl( { value, onChange } ) {
 	const authorsInfo = getEntitiesInfo( authorsList );
 	/**
 	 * We need to normalize the value because the block operates on a
-	 * comma(`,`) separated string value and `FormTokenFiels` needs an
+	 * comma(`,`) separated string value and `FormTokenField` needs an
 	 * array.
 	 */
 	const normalizedValue = ! value ? [] : value.toString().split( ',' );
@@ -52,14 +52,18 @@ function AuthorControl( { value, onChange } ) {
 
 	const getIdByValue = ( entitiesMappedByName, authorValue ) => {
 		const id = authorValue?.id || entitiesMappedByName[ authorValue ]?.id;
-		if ( id ) return id;
+		if ( id ) {
+			return id;
+		}
 	};
 	const onAuthorChange = ( newValue ) => {
 		const ids = Array.from(
 			newValue.reduce( ( accumulator, author ) => {
 				// Verify that new values point to existing entities.
 				const id = getIdByValue( authorsInfo.mapByName, author );
-				if ( id ) accumulator.add( id );
+				if ( id ) {
+					accumulator.add( id );
+				}
 				return accumulator;
 			}, new Set() )
 		);
@@ -72,6 +76,7 @@ function AuthorControl( { value, onChange } ) {
 			suggestions={ authorsInfo.names }
 			onChange={ onAuthorChange }
 			__experimentalShowHowTo={ false }
+			__next40pxDefaultSize
 		/>
 	);
 }

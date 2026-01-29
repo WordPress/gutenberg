@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { Platform } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
+import { speak } from '@wordpress/a11y';
+import { __ } from '@wordpress/i18n';
 
 const castArray = ( maybeArray ) =>
 	Array.isArray( maybeArray ) ? maybeArray : [ maybeArray ];
@@ -17,6 +20,7 @@ const castArray = ( maybeArray ) =>
 const privateSettings = [
 	'inserterMediaCategories',
 	'blockInspectorAnimation',
+	'mediaSideload',
 ];
 
 /**
@@ -33,14 +37,32 @@ export function __experimentalUpdateSettings(
 	settings,
 	{ stripExperimentalSettings = false, reset = false } = {}
 ) {
-	let cleanSettings = settings;
+	let incomingSettings = settings;
+
+	if ( Object.hasOwn( incomingSettings, '__unstableIsPreviewMode' ) ) {
+		deprecated(
+			"__unstableIsPreviewMode argument in wp.data.dispatch('core/block-editor').updateSettings",
+			{
+				since: '6.8',
+				alternative: 'isPreviewMode',
+			}
+		);
+
+		incomingSettings = { ...incomingSettings };
+		incomingSettings.isPreviewMode =
+			incomingSettings.__unstableIsPreviewMode;
+		delete incomingSettings.__unstableIsPreviewMode;
+	}
+
+	let cleanSettings = incomingSettings;
+
 	// There are no plugins in the mobile apps, so there is no
 	// need to strip the experimental settings:
 	if ( stripExperimentalSettings && Platform.OS === 'web' ) {
 		cleanSettings = {};
-		for ( const key in settings ) {
+		for ( const key in incomingSettings ) {
 			if ( ! privateSettings.includes( key ) ) {
-				cleanSettings[ key ] = settings[ key ];
+				cleanSettings[ key ] = incomingSettings[ key ];
 			}
 		}
 	}
@@ -98,11 +120,7 @@ export const privateRemoveBlocks =
 		}
 
 		clientIds = castArray( clientIds );
-		const rootClientId = select.getBlockRootClientId( clientIds[ 0 ] );
-		const canRemoveBlocks = select.canRemoveBlocks(
-			clientIds,
-			rootClientId
-		);
+		const canRemoveBlocks = select.canRemoveBlocks( clientIds );
 
 		if ( ! canRemoveBlocks ) {
 			return;
@@ -118,35 +136,36 @@ export const privateRemoveBlocks =
 		//
 		// @see https://github.com/WordPress/gutenberg/pull/51145
 		const rules = ! forceRemove && select.getBlockRemovalRules();
-		if ( rules ) {
-			const blockNamesForPrompt = new Set();
 
-			// Given a list of client IDs of blocks that the user intended to
-			// remove, perform a tree search (BFS) to find all block names
-			// corresponding to "important" blocks, i.e. blocks that require a
-			// removal prompt.
-			const queue = [ ...clientIds ];
-			while ( queue.length ) {
-				const clientId = queue.shift();
-				const blockName = select.getBlockName( clientId );
-				if ( rules[ blockName ] ) {
-					blockNamesForPrompt.add( blockName );
+		if ( rules ) {
+			function flattenBlocks( blocks ) {
+				const result = [];
+				const stack = [ ...blocks ];
+				while ( stack.length ) {
+					const { innerBlocks, ...block } = stack.shift();
+					stack.push( ...innerBlocks );
+					result.push( block );
 				}
-				const innerBlocks = select.getBlockOrder( clientId );
-				queue.push( ...innerBlocks );
+				return result;
 			}
 
-			// If any such blocks were found, trigger the removal prompt and
-			// skip any other steps (thus postponing actual removal).
-			if ( blockNamesForPrompt.size ) {
-				dispatch(
-					displayBlockRemovalPrompt(
-						clientIds,
-						selectPrevious,
-						Array.from( blockNamesForPrompt )
-					)
-				);
-				return;
+			const blockList = clientIds.map( select.getBlock );
+			const flattenedBlocks = flattenBlocks( blockList );
+
+			// Find the first message and use it.
+			let message;
+			for ( const rule of rules ) {
+				message = rule.callback( flattenedBlocks );
+				if ( message ) {
+					dispatch(
+						displayBlockRemovalPrompt(
+							clientIds,
+							selectPrevious,
+							message
+						)
+					);
+					return;
+				}
 			}
 		}
 
@@ -197,28 +216,21 @@ export const ensureDefaultBlock =
  *
  * Contrast with `setBlockRemovalRules`.
  *
- * @param {string|string[]} clientIds           Client IDs of blocks to remove.
- * @param {boolean}         selectPrevious      True if the previous block
- *                                              or the immediate parent
- *                                              (if no previous block exists)
- *                                              should be selected
- *                                              when a block is removed.
- * @param {string[]}        blockNamesForPrompt Names of the blocks that
- *                                              triggered the need for
- *                                              confirmation before removal.
+ * @param {string|string[]} clientIds      Client IDs of blocks to remove.
+ * @param {boolean}         selectPrevious True if the previous block or the
+ *                                         immediate parent (if no previous
+ *                                         block exists) should be selected
+ *                                         when a block is removed.
+ * @param {string}          message        Message to display in the prompt.
  *
  * @return {Object} Action object.
  */
-function displayBlockRemovalPrompt(
-	clientIds,
-	selectPrevious,
-	blockNamesForPrompt
-) {
+function displayBlockRemovalPrompt( clientIds, selectPrevious, message ) {
 	return {
 		type: 'DISPLAY_BLOCK_REMOVAL_PROMPT',
 		clientIds,
 		selectPrevious,
-		blockNamesForPrompt,
+		message,
 	};
 }
 
@@ -263,19 +275,6 @@ export function setBlockRemovalRules( rules = false ) {
 	};
 }
 
-/**
- * Sets the client ID of the block settings menu that is currently open.
- *
- * @param {?string} clientId The block client ID.
- * @return {Object} Action object.
- */
-export function setOpenedBlockSettingsMenu( clientId ) {
-	return {
-		type: 'SET_OPENED_BLOCK_SETTINGS_MENU',
-		clientId,
-	};
-}
-
 export function setStyleOverride( id, style ) {
 	return {
 		type: 'SET_STYLE_OVERRIDE',
@@ -288,5 +287,169 @@ export function deleteStyleOverride( id ) {
 	return {
 		type: 'DELETE_STYLE_OVERRIDE',
 		id,
+	};
+}
+
+/**
+ * Action that sets the element that had focus when focus leaves the editor canvas.
+ *
+ * @param {Object} lastFocus The last focused element.
+ *
+ *
+ * @return {Object} Action object.
+ */
+export function setLastFocus( lastFocus = null ) {
+	return {
+		type: 'LAST_FOCUS',
+		lastFocus,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has begun to drag.
+ *
+ * @return {Object} Action object.
+ */
+export function startDragging() {
+	return {
+		type: 'START_DRAGGING',
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the user has stopped dragging.
+ *
+ * @return {Object} Action object.
+ */
+export function stopDragging() {
+	return {
+		type: 'STOP_DRAGGING',
+	};
+}
+
+/**
+ * @param {string|null} clientId The block's clientId, or `null` to clear.
+ *
+ * @return  {Object} Action object.
+ */
+export function expandBlock( clientId ) {
+	return {
+		type: 'SET_BLOCK_EXPANDED_IN_LIST_VIEW',
+		clientId,
+	};
+}
+
+/**
+ * @param {Object} value
+ * @param {string} value.rootClientId The root client ID to insert at.
+ * @param {number} value.index        The index to insert at.
+ *
+ * @return {Object} Action object.
+ */
+export function setInsertionPoint( value ) {
+	return {
+		type: 'SET_INSERTION_POINT',
+		value,
+	};
+}
+
+/**
+ * Mark a contentOnly section as being edited.
+ *
+ * @param {string} clientId The client id of the block.
+ */
+export function editContentOnlySection( clientId ) {
+	return {
+		type: 'EDIT_CONTENT_ONLY_SECTION',
+		clientId,
+	};
+}
+
+/**
+ * Action that stops editing a contentOnly section.
+ */
+export function stopEditingContentOnlySection() {
+	return {
+		type: 'EDIT_CONTENT_ONLY_SECTION',
+	};
+}
+
+/**
+ * Sets the zoom level.
+ *
+ * @param {number} zoom the new zoom level
+ * @return {Object} Action object.
+ */
+export const setZoomLevel =
+	( zoom = 100 ) =>
+	( { select, dispatch } ) => {
+		// When switching to zoom-out mode, we need to select the parent section
+		if ( zoom !== 100 ) {
+			const firstSelectedClientId = select.getBlockSelectionStart();
+			const sectionRootClientId = select.getSectionRootClientId();
+
+			if ( firstSelectedClientId ) {
+				let sectionClientId;
+
+				if ( sectionRootClientId ) {
+					const sectionClientIds =
+						select.getBlockOrder( sectionRootClientId );
+
+					// If the selected block is a section block, use it.
+					if ( sectionClientIds?.includes( firstSelectedClientId ) ) {
+						sectionClientId = firstSelectedClientId;
+					} else {
+						// If the selected block is not a section block, find
+						// the parent section that contains the selected block.
+						sectionClientId = select
+							.getBlockParents( firstSelectedClientId )
+							.find( ( parent ) =>
+								sectionClientIds.includes( parent )
+							);
+					}
+				} else {
+					sectionClientId = select.getBlockHierarchyRootClientId(
+						firstSelectedClientId
+					);
+				}
+
+				if ( sectionClientId ) {
+					dispatch.selectBlock( sectionClientId );
+				} else {
+					dispatch.clearSelectedBlock();
+				}
+
+				speak( __( 'You are currently in zoom-out mode.' ) );
+			}
+		}
+
+		dispatch( {
+			type: 'SET_ZOOM_LEVEL',
+			zoom,
+		} );
+	};
+
+/**
+ * Resets the Zoom state.
+ * @return {Object} Action object.
+ */
+export function resetZoomLevel() {
+	return {
+		type: 'RESET_ZOOM_LEVEL',
+	};
+}
+
+/**
+ * Action that toggles the spotlighted block state.
+ *
+ * @param {string}  clientId          The block's clientId.
+ * @param {boolean} hasBlockSpotlight The spotlight state.
+ * @return {Object} Action object.
+ */
+export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {
+	return {
+		type: 'TOGGLE_BLOCK_SPOTLIGHT',
+		clientId,
+		hasBlockSpotlight,
 	};
 }

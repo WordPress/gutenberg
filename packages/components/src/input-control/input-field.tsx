@@ -9,7 +9,6 @@ import type {
 	PointerEvent,
 	FocusEvent,
 	ForwardedRef,
-	MouseEvent,
 } from 'react';
 
 /**
@@ -19,11 +18,12 @@ import { forwardRef, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { WordPressComponentProps } from '../ui/context';
+import type { WordPressComponentProps } from '../context';
 import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './reducer/reducer';
 import type { InputFieldProps } from './types';
+import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 
 const noop = () => {};
 
@@ -34,18 +34,15 @@ function InputField(
 		dragThreshold = 10,
 		id,
 		isDragEnabled = false,
-		isFocused,
 		isPressEnterToChange = false,
 		onBlur = noop,
 		onChange = noop,
 		onDrag = noop,
 		onDragEnd = noop,
 		onDragStart = noop,
-		onFocus = noop,
 		onKeyDown = noop,
 		onValidate = noop,
 		size = 'default',
-		setIsFocused,
 		stateReducer = ( state: any ) => state,
 		value: valueProp,
 		type,
@@ -84,7 +81,6 @@ function InputField(
 
 	const handleOnBlur = ( event: FocusEvent< HTMLInputElement > ) => {
 		onBlur( event );
-		setIsFocused?.( false );
 
 		/**
 		 * If isPressEnterToChange is set, this commits the value to
@@ -94,11 +90,6 @@ function InputField(
 			wasDirtyOnBlur.current = true;
 			handleOnCommit( event );
 		}
-	};
-
-	const handleOnFocus = ( event: FocusEvent< HTMLInputElement > ) => {
-		onFocus( event );
-		setIsFocused?.( true );
 	};
 
 	const handleOnChange = ( event: ChangeEvent< HTMLInputElement > ) => {
@@ -163,7 +154,9 @@ function InputField(
 				target,
 			};
 
-			if ( ! distance ) return;
+			if ( ! distance ) {
+				return;
+			}
 			event.stopPropagation();
 
 			/**
@@ -193,22 +186,6 @@ function InputField(
 	);
 
 	const dragProps = isDragEnabled ? dragGestureProps() : {};
-	/*
-	 * Works around the odd UA (e.g. Firefox) that does not focus inputs of
-	 * type=number when their spinner arrows are pressed.
-	 */
-	let handleOnMouseDown;
-	if ( type === 'number' ) {
-		handleOnMouseDown = ( event: MouseEvent< HTMLInputElement > ) => {
-			props.onMouseDown?.( event );
-			if (
-				event.currentTarget !==
-				event.currentTarget.ownerDocument.activeElement
-			) {
-				event.currentTarget.focus();
-			}
-		};
-	}
 
 	return (
 		<Input
@@ -221,9 +198,7 @@ function InputField(
 			id={ id }
 			onBlur={ handleOnBlur }
 			onChange={ handleOnChange }
-			onFocus={ handleOnFocus }
-			onKeyDown={ handleOnKeyDown }
-			onMouseDown={ handleOnMouseDown }
+			onKeyDown={ withIgnoreIMEEvents( handleOnKeyDown ) }
 			ref={ ref }
 			inputSize={ size }
 			// Fallback to `''` to avoid "uncontrolled to controlled" warning.

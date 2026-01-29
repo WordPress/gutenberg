@@ -4,6 +4,47 @@
 import { __, _x } from '@wordpress/i18n';
 import { group, row, stack, grid } from '@wordpress/icons';
 
+const example = {
+	innerBlocks: [
+		{
+			name: 'core/paragraph',
+			attributes: {
+				content: __( 'One.' ),
+			},
+		},
+		{
+			name: 'core/paragraph',
+			attributes: {
+				content: __( 'Two.' ),
+			},
+		},
+		{
+			name: 'core/paragraph',
+			attributes: {
+				content: __( 'Three.' ),
+			},
+		},
+		{
+			name: 'core/paragraph',
+			attributes: {
+				content: __( 'Four.' ),
+			},
+		},
+		{
+			name: 'core/paragraph',
+			attributes: {
+				content: __( 'Five.' ),
+			},
+		},
+		{
+			name: 'core/paragraph',
+			attributes: {
+				content: __( 'Six.' ),
+			},
+		},
+	],
+};
+
 const variations = [
 	{
 		name: 'group',
@@ -12,11 +53,6 @@ const variations = [
 		attributes: { layout: { type: 'constrained' } },
 		isDefault: true,
 		scope: [ 'block', 'inserter', 'transform' ],
-		isActive: ( blockAttributes ) =>
-			! blockAttributes.layout ||
-			! blockAttributes.layout?.type ||
-			blockAttributes.layout?.type === 'default' ||
-			blockAttributes.layout?.type === 'constrained',
 		icon: group,
 	},
 	{
@@ -25,11 +61,9 @@ const variations = [
 		description: __( 'Arrange blocks horizontally.' ),
 		attributes: { layout: { type: 'flex', flexWrap: 'nowrap' } },
 		scope: [ 'block', 'inserter', 'transform' ],
-		isActive: ( blockAttributes ) =>
-			blockAttributes.layout?.type === 'flex' &&
-			( ! blockAttributes.layout?.orientation ||
-				blockAttributes.layout?.orientation === 'horizontal' ),
+		isActive: [ 'layout.type' ],
 		icon: row,
+		example,
 	},
 	{
 		name: 'group-stack',
@@ -37,24 +71,20 @@ const variations = [
 		description: __( 'Arrange blocks vertically.' ),
 		attributes: { layout: { type: 'flex', orientation: 'vertical' } },
 		scope: [ 'block', 'inserter', 'transform' ],
-		isActive: ( blockAttributes ) =>
-			blockAttributes.layout?.type === 'flex' &&
-			blockAttributes.layout?.orientation === 'vertical',
+		isActive: [ 'layout.type', 'layout.orientation' ],
 		icon: stack,
+		example,
 	},
-];
-
-if ( window?.__experimentalEnableGroupGridVariation ) {
-	variations.push( {
+	{
 		name: 'group-grid',
 		title: __( 'Grid' ),
 		description: __( 'Arrange blocks in a grid.' ),
 		attributes: { layout: { type: 'grid' } },
 		scope: [ 'block', 'inserter', 'transform' ],
-		isActive: ( blockAttributes ) =>
-			blockAttributes.layout?.type === 'grid',
+		isActive: [ 'layout.type' ],
 		icon: grid,
-	} );
-}
+		example,
+	},
+];
 
 export default variations;

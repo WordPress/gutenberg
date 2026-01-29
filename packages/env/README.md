@@ -20,9 +20,38 @@ The database credentials are: user `root`, password `password`. For a comprehens
 
 `wp-env` relies on a few commonly used developer tools:
 
--   **Docker**. `wp-env` is powered by Docker. There are instructions available for installing Docker on [Windows](https://docs.docker.com/desktop/install/windows-install/) (we recommend the WSL2 backend), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/desktop/install/linux-install/).
+-   **Docker**. `wp-env` is powered by Docker by default. There are instructions available for installing Docker on [Windows](https://docs.docker.com/desktop/install/windows-install/) (we recommend the WSL2 backend), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/desktop/install/linux-install/).
 -   **Node.js**. `wp-env` is written as a Node script. We recommend using a Node version manager like [nvm](https://github.com/nvm-sh/nvm) to install the latest LTS version. Alternatively, you can [download it directly here](https://nodejs.org/en/download).
 -   **git**. Git is used for downloading software from source control, such as WordPress, plugins, and themes. [You can find the installation instructions here.](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+
+## Experimental: WordPress Playground Runtime
+
+`wp-env` now supports an experimental alternative runtime using [WordPress Playground](https://wordpress.github.io/wordpress-playground/). Playground runs WordPress entirely in WebAssembly, eliminating the need for Docker.
+
+To use the Playground runtime:
+
+```sh
+$ wp-env start --runtime=playground
+```
+
+### Playground vs Docker
+
+| Feature | Docker | Playground |
+|---------|--------|------------|
+| Requires Docker | Yes | No |
+| Test environment | Yes | No |
+| Xdebug | Yes | Yes |
+| SPX profiling | Yes | No |
+| phpMyAdmin | Yes | No |
+| MySQL database | Yes | No (SQLite) |
+| Multisite | Yes | Yes |
+| Custom PHP version | Yes | Yes |
+| Plugin/theme mounting | Yes | Yes |
+| `wp-env run` command | Yes | No |
+
+The Playground runtime is ideal for quick testing or environments where Docker is unavailable. However, it lacks some features available in the Docker runtime, such as the tests environment and the `run` command for executing arbitrary commands.
+
+Once started with a runtime, wp-env will automatically detect and use the same runtime for subsequent commands (`stop`, `destroy`, etc.) until the environment is destroyed.
 
 ## Installation
 
@@ -284,11 +313,19 @@ Options:
   --debug    Enable debug output.                     [boolean] [default: false]
   --update   Download source updates and apply WordPress configuration.
                                                       [boolean] [default: false]
+  --runtime  Select the runtime to use. "docker" uses Docker containers,
+             "playground" uses WordPress Playground (experimental).
+                                  [string] [choices: "docker", "playground"]
   --xdebug   Enables Xdebug. If not passed, Xdebug is turned off. If no modes
              are set, uses "debug". You may set multiple Xdebug modes by passing
              them in a comma-separated list: `--xdebug=develop,coverage`. See
              https://xdebug.org/docs/all_settings#mode for information about
              Xdebug modes.                                              [string]
+  --spx      Enables SPX profiling. If not passed, SPX is turned off. If no
+             mode is set, uses "enabled". SPX is a simple profiling extension
+             with a built-in web UI. See
+             https://github.com/NoiseByNorthwest/php-spx for more information.
+                                                                        [string]
   --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
 ```
 
@@ -349,7 +386,7 @@ containers.
 Positionals:
   container  The Docker service to run the command on.
               [string] [required] [choices: "mysql", "tests-mysql", "wordpress",
-                   "tests-wordpress", "cli", "tests-cli", "composer", "phpunit"]
+                   "tests-wordpress", "cli", "tests-cli", "composer", "phpmyadmin"]
   command    The command to run.                                      [required]
 
 Options:
@@ -461,16 +498,36 @@ Options:
   --watch    Watch for logs as they happen.            [boolean] [default: true]
 ```
 
-### `wp-env install-path`
+### `wp-env status`
 
-Get the path where all of the environment files are stored. This includes the Docker files, WordPress, PHPUnit files, and any sources that were downloaded.
+Get the status of the wp-env environment including whether it's running, URLs, ports, and configuration.
 
 Example:
 
 ```sh
-$ wp-env install-path
+$ wp-env status
 
-/home/user/.wp-env/63263e6506becb7b8613b02d42280a49
+status: running
+    - runtime: docker
+    - install path: /home/user/.wp-env/63263e6506becb7b8613b02d42280a49
+    - config: /home/user/my-plugin
+
+environment:
+        - url: http://localhost:8888
+        - multisite: no
+        - xdebug: off
+        - http port: 8888
+        - mysql port: 13306
+        - test http port: 8889
+```
+
+```sh
+$ wp-env status --help
+Get the status of the wp-env environment including URLs, ports, and configuration.
+
+Options:
+  --debug    Enable debug output.                      [boolean] [default: false]
+  --json     Output status as JSON.                    [boolean] [default: false]
 ```
 
 ## .wp-env.json
@@ -479,16 +536,20 @@ You can customize the WordPress installation, plugins and themes that the develo
 
 `.wp-env.json` supports fields for options applicable to both the tests and development instances.
 
-| Field          | Type           | Default                                | Description                                                                                                                      |
-| -------------- | -------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| `"core"`       | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.         |
-| `"phpVersion"` | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
-| `"plugins"`    | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
-| `"themes"`     | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
-| `"port"`       | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
-| `"testsPort"`  | `integer`      | `8889`                                 | The port number for the test site. You'll access the instance through the port: 'http://localhost:8889'.                         |
-| `"config"`     | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
-| `"mappings"`   | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
+| Field                | Type           | Default                                | Description                                                                                                                      |
+|----------------------|----------------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
+| `"core"`             | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.         |
+| `"phpVersion"`       | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
+| `"plugins"`          | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
+| `"themes"`           | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
+| `"port"`             | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
+| `"testsPort"`        | `integer`      | `8889`                                 | The port number for the test site. You'll access the instance through the port: 'http://localhost:8889'.                         |
+| `"config"`           | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
+| `"mappings"`         | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
+| `"mysqlPort"`        | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose. The setting is only available in the `env.development` and `env.tests` objects.                 |
+| `"phpmyadminPort"`   | `integer`      | `null`                                 | The port number for phpMyAdmin. If provided, you'll access phpMyAdmin through: http://localhost:<port>                           |
+| `"multisite"`        | `boolean`      | `false`                                | Whether to set up a multisite installation.                                                                                      |
+| `"lifecycleScripts"` | `Object`       | `"{}"`                                 | Mapping of commands that should be executed at certain points in the lifecycle.                                                   |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
@@ -498,7 +559,7 @@ Several types of strings can be passed into the `core`, `plugins`, `themes`, and
 | ----------------- | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
 | Relative path     | `.<path>\|~<path>`                           | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"`                                                                           |
 | Absolute path     | `/<path>\|<letter>:\<path>`                  | `"/a/directory"`, `"C:\\a\\directory"`                                                                                             |
-| GitHub repository | `<owner>/<repo>[#<ref>]`                     | `"WordPress/WordPress"`, `"WordPress/gutenberg#trunk"`, if no branch is provided wp-env will fall back to the repos default branch |
+| GitHub repository | `<owner>/<repo>[/<path>][#<ref>]`                     | `"WordPress/WordPress"`, `"WordPress/gutenberg#trunk"`, `WordPress/themes/my-theme#my-branch`; if no branch is provided wp-env will fall back to the repo's default branch |
 | SSH repository    | `ssh://user@host/<owner>/<repo>.git[#<ref>]` | `"ssh://git@github.com/WordPress/WordPress.git"`                                                                                   |
 | ZIP File          | `http[s]://<host>/<path>.zip`                | `"https://wordpress.org/wordpress-5.4-beta2.zip"`                                                                                  |
 
@@ -521,7 +582,9 @@ Additionally, the key `env` is available to override any of the above options on
 			"config": {
 				"KEY_1": false
 			},
-			"port": 3000
+			"port": 3000,
+			"mysqlPort": 13306,
+			"phpmyadminPort": 9001
 		}
 	}
 }
@@ -686,6 +749,13 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 }
 ```
 
+These can also be set via environment variables:
+
+- `WP_ENV_PORT` to override the development environment's web server's port.
+- `WP_ENV_TESTS_PORT` to override the testing environment's web server's port.
+- phpMyAdmin is not enabled by default, but its port can also be overridden for the development and testing environments via `WP_ENV_PHPMYADMIN_PORT` and `WP_ENV_TESTS_PHPMYADMIN_PORT`, respectively.
+- By default, MySQL aren't exposed to the host, which means no chance of port conflicts. But these can also be overridden for the development and testing environments via `WP_ENV_MYSQL_PORT` and `WP_ENV_TESTS_MYSQL_PORT`, respectively.
+
 ### Specific PHP Version
 
 You can tell `wp-env` to use a specific PHP version for compatibility and testing. This can also be set via the environment variable `WP_ENV_PHP_VERSION`.
@@ -693,6 +763,17 @@ You can tell `wp-env` to use a specific PHP version for compatibility and testin
 ```json
 {
 	"phpVersion": "7.2",
+	"plugins": [ "." ]
+}
+```
+
+### Multisite support
+
+You can tell `wp-env`  if the site should be multisite enabled. This can also be set via the environment variable `WP_ENV_MULTISITE`.
+
+```json
+{
+	"multisite": true,
 	"plugins": [ "." ]
 }
 ```
@@ -731,6 +812,29 @@ php_value memory_limit 2G
 ```
 
 This is useful if there are options you'd like to add to `php.ini`, which is difficult to access in this environment.
+
+### Using SPX Profiling
+
+SPX is a simple profiling extension for PHP that provides low-overhead profiling with a built-in web UI. When enabled with `--spx`, you can access the SPX profiling interface to analyze your application's performance.
+
+To enable SPX profiling:
+
+```sh
+wp-env start --spx
+```
+
+Once enabled, you can access the SPX web UI by visiting any page in your WordPress environment with the query parameters `?SPX_KEY=dev&SPX_UI_URI=/`. For example:
+
+- Development site: `http://localhost:8888/?SPX_KEY=dev&SPX_UI_URI=/`
+- Test site: `http://localhost:8889/?SPX_KEY=dev&SPX_UI_URI=/`
+
+From the SPX interface, you can:
+- Enable profiling for subsequent requests
+- View flame graphs and performance metrics
+- Analyze function call timelines
+- Examine memory usage and other performance data
+
+SPX provides a more lightweight alternative to Xdebug for profiling, with minimal performance overhead and an intuitive web-based interface.
 
 ## Contributing to this package
 

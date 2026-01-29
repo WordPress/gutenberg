@@ -10,6 +10,7 @@
 			"isRepeated": false,
 			"dimRatio": 10,
 			"customOverlayColor": "#3615d9",
+			"isUserOverlayColor": true,
 			"backgroundType": "video",
 			"isDark": true,
 			"tagName": "div"
@@ -19,11 +20,15 @@
 				"name": "core/paragraph",
 				"isValid": true,
 				"attributes": {
-					"align": "center",
 					"content": "\n\t\t\tGuten Berg!\n\t\t",
 					"dropCap": false,
 					"placeholder": "Write title…",
-					"fontSize": "large"
+					"fontSize": "large",
+					"style": {
+						"typography": {
+							"textAlign": "center"
+						}
+					}
 				},
 				"innerBlocks": []
 			}

@@ -33,7 +33,7 @@ let scrollPosition = 0;
 let customIndicatorWidth = 0;
 
 function ColorPalette( {
-	enableCustomColor = true,
+	enableCustomColor = false,
 	setColor,
 	activeColor,
 	isGradientColor,
@@ -61,25 +61,37 @@ function ColorPalette( {
 
 	const scale = useRef( new Animated.Value( 1 ) ).current;
 	const opacity = useRef( new Animated.Value( 1 ) ).current;
+	const delayedScrollRef = useRef();
 
-	const defaultColors = [
+	const mergedColors = [
 		...new Set(
 			( defaultSettings.colors ?? [] ).map( ( { color } ) => color )
 		),
 	];
-	const mergedColors = [
-		...new Set(
-			( defaultSettings.allColors ?? [] ).map( ( { color } ) => color )
-		),
-	];
-	const defaultGradientColors = [
+	const mergedGradients = [
 		...new Set(
 			( defaultSettings.gradients ?? [] ).map(
 				( { gradient } ) => gradient
 			)
 		),
 	];
-	const colors = isGradientSegment ? defaultGradientColors : defaultColors;
+	const allAvailableColors = [
+		...new Set(
+			( defaultSettings.allColors ?? [] ).map( ( { color } ) => color )
+		),
+	];
+	const allAvailableGradients = [
+		...new Set(
+			( defaultSettings.allGradients ?? [] ).map(
+				( { gradient } ) => gradient
+			)
+		),
+	];
+
+	const colors = isGradientSegment ? mergedGradients : mergedColors;
+	const allColors = isGradientSegment
+		? allAvailableGradients
+		: allAvailableColors;
 
 	const customIndicatorColor = isGradientSegment
 		? activeColor
@@ -103,14 +115,13 @@ function ColorPalette( {
 				scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
 			}
 		}
-		// Temporarily disabling exhuastive-deps until the component can be refactored and updated safely.
+		// Not adding additional dependencies until the component can be refactored and updated safely.
 		// Please see https://github.com/WordPress/gutenberg/pull/41253 for discussion and details.
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ currentSegment ] );
 
 	function isSelectedCustom() {
 		const isWithinColors =
-			activeColor && mergedColors && mergedColors.includes( activeColor );
+			activeColor && allColors?.includes( activeColor );
 		if ( enableCustomColor && activeColor ) {
 			if ( isGradientSegment ) {
 				return isGradientColor && ! isWithinColors;
@@ -205,11 +216,11 @@ function ColorPalette( {
 	}
 
 	function scrollToEndWithDelay() {
-		const delayedScroll = setTimeout( () => {
-			scrollViewRef.current.scrollToEnd();
+		delayedScrollRef.current = setTimeout( () => {
+			scrollViewRef?.current.scrollToEnd();
 		}, ANIMATION_DURATION );
 		return () => {
-			clearTimeout( delayedScroll );
+			clearTimeout( delayedScrollRef.current );
 		};
 	}
 
@@ -273,7 +284,7 @@ function ColorPalette( {
 						<View key={ `${ color }-${ isSelected( color ) }` }>
 							<TouchableWithoutFeedback
 								onPress={ () => onColorPress( color ) }
-								accessibilityRole={ 'button' }
+								accessibilityRole="button"
 								accessibilityState={ {
 									selected: isSelected( color ),
 								} }
@@ -314,7 +325,7 @@ function ColorPalette( {
 						) }
 						<TouchableWithoutFeedback
 							onPress={ onCustomPress }
-							accessibilityRole={ 'button' }
+							accessibilityRole="button"
 							accessibilityState={ {
 								selected: isSelectedCustom(),
 							} }

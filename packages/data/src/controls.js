@@ -95,7 +95,7 @@ function resolveSelect( storeNameOrDescriptor, selectorName, ...args ) {
  *
  * // Action generator using dispatch
  * export function* myAction() {
- *   yield controls.dispatch( 'core/edit-post', 'togglePublishSidebar' );
+ *   yield controls.dispatch( 'core/editor', 'togglePublishSidebar' );
  *   // do some other things.
  * }
  * ```

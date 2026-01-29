@@ -37,7 +37,7 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 		return container.value.length === container.selectionStart;
 	}
 
-	if ( ! ( /** @type {HTMLElement} */ ( container ).isContentEditable ) ) {
+	if ( ! container.isContentEditable ) {
 		return true;
 	}
 

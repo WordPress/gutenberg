@@ -1,4 +1,4 @@
-# Part 4: Building a Create page form
+# Building a Create page form
 
 In the [previous part](/docs/how-to-guides/data-basics/3-building-an-edit-form.md) we created an *Edit page* feature, and in this part we will add a *Create page* feature. Here's a glimpse of what we're going to build:
 
@@ -87,6 +87,7 @@ function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCanc
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
+				__next40pxDefaultSize
 				label="Page title:"
 				value={ title }
 				onChange={ onChangeTitle }
@@ -346,6 +347,7 @@ function PageForm( { title, onChangeTitle, hasEdits, lastError, isSaving, onCanc
 	return (
 		<div className="my-gutenberg-form">
 			<TextControl
+				__next40pxDefaultSize
 				label="Page title:"
 				value={ title }
 				onChange={ onChangeTitle }
@@ -389,4 +391,4 @@ All that’s left is to refresh the page and enjoy the form:
 
 * **Next part:** [Adding a delete button](/docs/how-to-guides/data-basics/5-adding-a-delete-button.md)
 * **Previous part:** [Building an edit form](/docs/how-to-guides/data-basics/3-building-an-edit-form.md)
-* (optional) Review the [finished app](https://github.com/WordPress/gutenberg-examples/tree/trunk/non-block-examples/09-code-data-basics-esnext) in the gutenberg-examples repository
+* (optional) Review the [finished app](https://github.com/WordPress/block-development-examples/tree/trunk/plugins/data-basics-59c8f8) in the block-development-examples repository
