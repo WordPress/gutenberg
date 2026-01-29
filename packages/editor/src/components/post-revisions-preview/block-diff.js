@@ -28,7 +28,7 @@ import { unlock } from '../../lock-unlock';
 const { parseRawBlock } = unlock( blocksPrivateApis );
 
 /**
- * Inject diff status into raw block as special attribute.
+ * Inject diff status into raw block at top level.
  * Does NOT mark inner blocks - parent styling is sufficient for added/removed.
  *
  * @param {Object} rawBlock Raw block to inject status into.
@@ -42,10 +42,7 @@ function injectDiffStatus( rawBlock, status ) {
 
 	return {
 		...rawBlock,
-		attrs: {
-			...rawBlock.attrs,
-			__revisionDiffStatus: status,
-		},
+		__revisionDiffStatus: status,
 	};
 }
 
@@ -86,7 +83,7 @@ function pairSimilarBlocks( blocks ) {
 
 	// Separate blocks by status, tracking original indices.
 	blocks.forEach( ( block, index ) => {
-		const status = block.attrs?.__revisionDiffStatus;
+		const status = block.__revisionDiffStatus;
 		if ( status === 'removed' ) {
 			removed.push( { block, index } );
 		} else if ( status === 'added' ) {
@@ -137,10 +134,7 @@ function pairSimilarBlocks( blocks ) {
 			// Create modified block with previous content stored.
 			modifications.set( bestMatch.index, {
 				...bestMatch.block,
-				attrs: {
-					...bestMatch.block.attrs,
-					__revisionDiffStatus: 'modified',
-				},
+				__revisionDiffStatus: 'modified',
 				__previousRawBlock: rem.block,
 			} );
 		}
@@ -224,10 +218,7 @@ function diffRawBlocks( currentRaw, previousRaw ) {
 				// Don't modify innerHTML here - apply diff after parsing.
 				result.push( {
 					...currBlock,
-					attrs: {
-						...currBlock.attrs,
-						__revisionDiffStatus: 'modified',
-					},
+					__revisionDiffStatus: 'modified',
 					innerBlocks: diffedInnerBlocks,
 					__previousRawBlock: prevBlock,
 				} );
@@ -263,43 +254,6 @@ function diffRawBlocks( currentRaw, previousRaw ) {
 
 	// Post-process to pair similar removed/added blocks as modifications.
 	return pairSimilarBlocks( result );
-}
-
-/**
- * Collect diff statuses from raw block tree into a flat array.
- * The array order matches the order parseRawBlock will produce blocks
- * (depth-first traversal).
- *
- * @param {Object} rawBlock   Raw block to collect from.
- * @param {Array}  statusList Array to collect statuses into.
- */
-function collectDiffStatuses( rawBlock, statusList ) {
-	statusList.push( rawBlock.attrs?.__revisionDiffStatus || null );
-
-	if ( rawBlock.innerBlocks ) {
-		for ( const inner of rawBlock.innerBlocks ) {
-			collectDiffStatuses( inner, statusList );
-		}
-	}
-}
-
-/**
- * Apply diff statuses to parsed block tree from a flat array.
- *
- * @param {Object} block      Parsed block to apply statuses to.
- * @param {Array}  statusList Array of statuses (will be shifted/consumed).
- */
-function applyDiffStatuses( block, statusList ) {
-	const status = statusList.shift();
-	if ( status ) {
-		block.attributes.__revisionDiffStatus = status;
-	}
-
-	if ( block.innerBlocks ) {
-		for ( const inner of block.innerBlocks ) {
-			applyDiffStatuses( inner, statusList );
-		}
-	}
 }
 
 /**
@@ -585,17 +539,23 @@ function applyRichTextDiffToBlock( currentBlock, previousBlock ) {
 }
 
 /**
- * Recursively apply rich text diff to modified blocks in the tree.
- * Matches parsed blocks with their corresponding raw blocks to find
- * __previousRawBlock references and apply diffs.
+ * Recursively apply diff status and rich text diff to blocks in the tree.
+ * Copies __revisionDiffStatus from raw blocks to parsed blocks and applies
+ * rich text diffs to modified blocks.
  *
  * @param {Object} parsedBlock Parsed block (with inner blocks).
- * @param {Object} rawBlock    Raw block (with __previousRawBlock references).
+ * @param {Object} rawBlock    Raw block (with __revisionDiffStatus and __previousRawBlock).
  */
-function applyRichTextDiffRecursively( parsedBlock, rawBlock ) {
-	// Apply diff to this block if it's modified and has a previous raw block.
+function applyDiffRecursively( parsedBlock, rawBlock ) {
+	// Copy diff status from raw block to parsed block attributes.
+	if ( rawBlock.__revisionDiffStatus ) {
+		parsedBlock.attributes.__revisionDiffStatus =
+			rawBlock.__revisionDiffStatus;
+	}
+
+	// Apply rich text diff if this block is modified and has a previous raw block.
 	if (
-		parsedBlock.attributes.__revisionDiffStatus === 'modified' &&
+		rawBlock.__revisionDiffStatus === 'modified' &&
 		rawBlock.__previousRawBlock
 	) {
 		const previousParsed = parseRawBlock( rawBlock.__previousRawBlock );
@@ -610,26 +570,21 @@ function applyRichTextDiffRecursively( parsedBlock, rawBlock ) {
 			const parsedInner = parsedBlock.innerBlocks[ i ];
 			const rawInner = rawBlock.innerBlocks[ i ];
 			if ( parsedInner && rawInner ) {
-				applyRichTextDiffRecursively( parsedInner, rawInner );
+				applyDiffRecursively( parsedInner, rawInner );
 			}
 		}
 	}
 }
 
 /**
- * Parse a raw block and preserve diff status attributes.
- * The __revisionDiffStatus attribute gets filtered out by parseRawBlock
- * since it's not a registered block attribute, so we collect them before
- * parsing and restore them afterward.
+ * Parse a raw block and apply diff status and rich text diffs.
+ * Diff status is stored at the top level of raw blocks (not in attrs)
+ * so it survives parseRawBlock's attribute filtering.
  *
  * @param {Object} rawBlock Raw block with potential diff status.
- * @return {Object|undefined} Parsed block with preserved diff status.
+ * @return {Object|undefined} Parsed block with diff status applied.
  */
 function parseRawBlockWithDiffStatus( rawBlock ) {
-	// Collect all diff statuses from the raw block tree (depth-first).
-	const statusList = [];
-	collectDiffStatuses( rawBlock, statusList );
-
 	// Parse the raw block (this recursively parses inner blocks too).
 	const parsed = parseRawBlock( rawBlock );
 
@@ -637,11 +592,8 @@ function parseRawBlockWithDiffStatus( rawBlock ) {
 		return undefined;
 	}
 
-	// Restore diff statuses to the parsed block tree.
-	applyDiffStatuses( parsed, statusList );
-
-	// Apply rich text diff to all modified blocks in the tree.
-	applyRichTextDiffRecursively( parsed, rawBlock );
+	// Apply diff status and rich text diffs to the parsed block tree.
+	applyDiffRecursively( parsed, rawBlock );
 
 	return parsed;
 }
