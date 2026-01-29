@@ -15,12 +15,13 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 		{
 			label,
 			className,
+			// Prevent accidental forwarding of `children`
 			children: _children,
 			icon,
 			size,
 			shortcut,
 			...restProps
-		},
+		}: IconButtonProps & { children?: unknown },
 		ref
 	) {
 		const classes = clsx( styles[ 'icon-button' ], className );
