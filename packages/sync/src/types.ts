@@ -12,7 +12,9 @@ import type { Awareness } from 'y-protocols/awareness';
 /**
  * Internal dependencies
  */
+import type { AwarenessState } from './awareness/awareness-state';
 import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
+import type { SyncManagerUpdateOptions } from './manager';
 
 /* globalThis */
 declare global {
@@ -29,6 +31,7 @@ declare global {
 }
 
 export type CRDTDoc = Y.Doc;
+export type AwarenessID = string;
 export type EntityID = string;
 export type ObjectID = string;
 export type ObjectType = string;
@@ -53,25 +56,42 @@ export interface ProviderCreatorResult {
 	destroy: () => void;
 }
 
+export interface ProviderCreatorOptions {
+	objectType: ObjectType;
+	objectId: ObjectID | null;
+	ydoc: Y.Doc;
+	awareness?: Awareness;
+}
+
 export type ProviderCreator = (
-	objectType: ObjectType,
-	objectId: ObjectID,
-	ydoc: Y.Doc,
-	awareness?: Awareness
+	options: ProviderCreatorOptions
 ) => Promise< ProviderCreatorResult >;
 
+export interface CollectionHandlers {
+	refetchRecords: () => Promise< void >;
+}
+
 export interface RecordHandlers {
-	editRecord: ( data: Partial< ObjectData > ) => void;
+	addUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
+	editRecord: (
+		data: Partial< ObjectData >,
+		options?: { undoIgnore?: boolean }
+	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
 	refetchRecord: () => Promise< void >;
+	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	saveRecord: () => Promise< void >;
 }
 
-export interface SyncConfig {
+export interface SyncConfig< State extends object = {} > {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >
 	) => void;
+	createAwareness?: (
+		ydoc: Y.Doc,
+		objectId?: ObjectID
+	) => AwarenessState< State > | undefined;
 	getChangesFromCRDTDoc: (
 		ydoc: Y.Doc,
 		editedRecord: ObjectData
@@ -84,6 +104,10 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => Record< string, string >;
+	getAwareness: (
+		objectType: ObjectType,
+		objectId: ObjectID
+	) => AwarenessState | undefined;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,
@@ -91,18 +115,27 @@ export interface SyncManager {
 		record: ObjectData,
 		handlers: RecordHandlers
 	) => Promise< void >;
+	loadCollection: (
+		syncConfig: SyncConfig,
+		objectType: ObjectType,
+		handlers: CollectionHandlers
+	) => Promise< void >;
 	// undoManager is undefined until the first entity is loaded.
 	undoManager: SyncUndoManager | undefined;
 	unload: ( objectType: ObjectType, objectId: ObjectID ) => void;
 	update: (
 		objectType: ObjectType,
-		objectId: ObjectID,
+		objectId: ObjectID | null,
 		changes: Partial< ObjectData >,
 		origin: string,
-		isSave?: boolean
+		options?: SyncManagerUpdateOptions
 	) => void;
 }
 
 export interface SyncUndoManager extends WPUndoManager< ObjectData > {
-	addToScope: ( ymap: Y.Map< any > ) => void;
+	addToScope: (
+		ymap: Y.Map< any >,
+		handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
+	) => void;
+	stopCapturing: () => void;
 }

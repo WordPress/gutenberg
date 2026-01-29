@@ -9,17 +9,17 @@ Do not edit directly.
 
 ### Border
 
-| Variable name                           | Description                     |
-| --------------------------------------- | ------------------------------- |
-| `--wpds-border-radius-surface-xs`       | Extra small radius for surfaces |
-| `--wpds-border-radius-surface-sm`       | Small radius for surfaces       |
-| `--wpds-border-radius-surface-md`       | Medium radius for surfaces      |
-| `--wpds-border-radius-surface-lg`       | Large radius for surfaces       |
-| `--wpds-border-width-surface-xs`        | Extra small width for surfaces  |
-| `--wpds-border-width-surface-sm`        | Small width for surfaces        |
-| `--wpds-border-width-surface-md`        | Medium width for surfaces       |
-| `--wpds-border-width-surface-lg`        | Large width for surfaces        |
-| `--wpds-border-width-interactive-focus` | Border width for focus ring     |
+| Variable name               | Description                 |
+| --------------------------- | --------------------------- |
+| `--wpds-border-radius-xs`   | Extra small radius          |
+| `--wpds-border-radius-sm`   | Small radius                |
+| `--wpds-border-radius-md`   | Medium radius               |
+| `--wpds-border-radius-lg`   | Large radius                |
+| `--wpds-border-width-xs`    | Extra small width           |
+| `--wpds-border-width-sm`    | Small width                 |
+| `--wpds-border-width-md`    | Medium width                |
+| `--wpds-border-width-lg`    | Large width                 |
+| `--wpds-border-width-focus` | Border width for focus ring |
 
 ### Color
 

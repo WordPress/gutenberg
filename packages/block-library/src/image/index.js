@@ -35,7 +35,10 @@ export const settings = {
 	__experimentalLabel( attributes, { context } ) {
 		const customName = attributes?.metadata?.name;
 
-		if ( context === 'list-view' && customName ) {
+		if (
+			( context === 'list-view' || context === 'breadcrumb' ) &&
+			customName
+		) {
 			return customName;
 		}
 

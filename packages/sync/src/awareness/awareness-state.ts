@@ -3,7 +3,6 @@
  */
 import {
 	TypedAwareness,
-	type BaseState,
 	type EnhancedState,
 	type EqualityFieldCheck,
 } from './awareness-types';
@@ -19,7 +18,7 @@ interface AwarenessStateChange {
 }
 
 abstract class AwarenessWithEqualityChecks<
-	State extends BaseState = BaseState,
+	State extends object,
 > extends TypedAwareness< State > {
 	/** OVERRIDDEN METHODS */
 
@@ -28,8 +27,8 @@ abstract class AwarenessWithEqualityChecks<
 	 * trigger rerenders of any subscribed components.
 	 *
 	 * Equality checks are provided by the abstract `equalityFieldChecks` property.
-	 * @param field
-	 * @param value
+	 * @param field - The field to set.
+	 * @param value - The value to set.
 	 */
 	public setLocalStateField< FieldName extends string & keyof State >(
 		field: FieldName,
@@ -62,9 +61,9 @@ abstract class AwarenessWithEqualityChecks<
 
 	/**
 	 * Determine if a field value has changed using the provided equality checks.
-	 * @param field
-	 * @param value1
-	 * @param value2
+	 * @param field  - The field to check.
+	 * @param value1 - The first value to compare.
+	 * @param value2 - The second value to compare.
 	 */
 	protected isFieldEqual< FieldName extends keyof State >(
 		field: FieldName,
@@ -90,8 +89,8 @@ abstract class AwarenessWithEqualityChecks<
 	/**
 	 * Determine if two states are equal by comparing each field using the
 	 * provided equality checks.
-	 * @param state1
-	 * @param state2
+	 * @param state1 - The first state to compare.
+	 * @param state2 - The second state to compare.
 	 */
 	protected isStateEqual( state1: State, state2: State ): boolean {
 		return [
@@ -113,7 +112,7 @@ abstract class AwarenessWithEqualityChecks<
  * state updates.
  */
 export abstract class AwarenessState<
-	State extends BaseState = BaseState,
+	State extends object = {},
 > extends AwarenessWithEqualityChecks< State > {
 	/** CUSTOM PROPERTIES */
 
@@ -144,11 +143,12 @@ export abstract class AwarenessState<
 	 * value -- even if it hasn't yet been set on the awareness instance.
 	 */
 	private myThrottledState: Partial< State > = {};
+	private throttleTimeouts: Map< string, NodeJS.Timeout > = new Map();
 
 	/** CUSTOM METHODS */
 
 	/**
-	 * Set up.
+	 * Set up the awareness state.
 	 */
 	public setUp(): void {
 		this.on(
@@ -183,7 +183,7 @@ export abstract class AwarenessState<
 
 	/**
 	 * Allow external code to subscribe to awareness state changes.
-	 * @param callback
+	 * @param callback - The callback to subscribe to.
 	 */
 	public onStateChange(
 		callback: ( newState: EnhancedState< State >[] ) => void
@@ -198,8 +198,36 @@ export abstract class AwarenessState<
 	}
 
 	/**
+	 * Set a local state field on an awareness document with throttle. See caveats
+	 * of this.setLocalStateField.
+	 * @param field - The field to set.
+	 * @param value - The value to set.
+	 * @param wait  - The wait time in milliseconds.
+	 */
+	public setThrottledLocalStateField<
+		FieldName extends string & keyof State,
+	>( field: FieldName, value: State[ FieldName ], wait: number ): void {
+		this.setLocalStateField( field, value );
+
+		this.throttleTimeouts.set(
+			field,
+			setTimeout( () => {
+				this.throttleTimeouts.delete( field );
+				if ( this.myThrottledState[ field ] ) {
+					this.setLocalStateField(
+						field,
+						this.myThrottledState[ field ]
+					);
+
+					delete this.myThrottledState[ field ];
+				}
+			}, wait )
+		);
+	}
+
+	/**
 	 * Set the current user's connection status as awareness state.
-	 * @param isConnected
+	 * @param isConnected - The connection status.
 	 */
 	public setConnectionStatus( isConnected: boolean ): void {
 		if ( isConnected ) {
@@ -213,7 +241,7 @@ export abstract class AwarenessState<
 
 	/**
 	 * Update all subscribed listeners with the latest awareness state.
-	 * @param forceUpdate
+	 * @param forceUpdate - Whether to force an update.
 	 */
 	protected updateSubscribers( forceUpdate = false ): void {
 		if ( ! this.stateSubscriptions.length ) {
@@ -228,8 +256,17 @@ export abstract class AwarenessState<
 		] );
 
 		const updatedStates = new Map< number, EnhancedState< State > >(
-			[ ...this.disconnectedUsers, ...states.keys() ].map(
-				( clientId ) => {
+			[ ...this.disconnectedUsers, ...states.keys() ]
+				.filter( ( clientId ) => {
+					// Exclude any users with empty awareness state. This can happen from
+					// the Yjs inspector.
+					return (
+						Object.keys( this.seenStates.get( clientId ) ?? {} )
+							.length > 0
+					);
+				} )
+				.map( ( clientId ) => {
+					// The filter above ensures that seenStates has the clientId.
 					const rawState: State = this.seenStates.get( clientId )!;
 
 					const isConnected =
@@ -247,8 +284,7 @@ export abstract class AwarenessState<
 					};
 
 					return [ clientId, state ];
-				}
-			)
+				} )
 		);
 
 		if ( ! forceUpdate ) {

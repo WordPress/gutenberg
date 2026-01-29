@@ -39,6 +39,7 @@ const TestWrapper = withRegistryProvider( ( props ) => {
 describe( 'useBlockSync hook', () => {
 	beforeAll( () => {
 		registerBlockType( 'test/test-block', {
+			apiVersion: 3,
 			title: 'Test block',
 			attributes: {
 				foo: { type: 'number' },

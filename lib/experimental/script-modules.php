@@ -7,6 +7,7 @@
  *
  * @param array $settings Array of determined settings for registering a block type.
  * @param array $metadata Metadata provided for registering a block type.
+ * @return array The filtered block settings.
  */
 function gutenberg_filter_block_type_metadata_settings_register_view_module( $settings, $metadata = null ) {
 	$module_fields = array(

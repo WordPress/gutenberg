@@ -2,21 +2,16 @@
 /**
  * External dependencies
  */
-const { v2: dockerCompose } = require( 'docker-compose' );
 const fs = require( 'fs' ).promises;
 const path = require( 'path' );
 const { confirm } = require( '@inquirer/prompts' );
-
-/**
- * Promisified dependencies
- */
-const { rimraf } = require( 'rimraf' );
 
 /**
  * Internal dependencies
  */
 const { loadConfig } = require( '../config' );
 const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
+const { getRuntime, detectRuntime } = require( '../runtime' );
 
 /**
  * Destroy the development server.
@@ -36,9 +31,9 @@ module.exports = async function destroy( { spinner, scripts, debug } ) {
 		return;
 	}
 
-	spinner.info(
-		'WARNING! This will remove Docker containers, volumes, networks, and images associated with the WordPress instance.'
-	);
+	const runtime = getRuntime( detectRuntime( config.workDirectoryPath ) );
+
+	spinner.info( runtime.getDestroyWarningMessage() );
 
 	let yesDelete = false;
 	try {
@@ -61,24 +56,9 @@ module.exports = async function destroy( { spinner, scripts, debug } ) {
 		return;
 	}
 
-	spinner.text = 'Removing docker images, volumes, and networks.';
-
-	await dockerCompose.down( {
-		config: config.dockerComposeConfigPath,
-		commandOptions: [ '--volumes', '--remove-orphans', '--rmi', 'all' ],
-		log: debug,
-	} );
-
-	spinner.text = 'Removing local files.';
-	// Note: there is a race condition where docker compose actually hasn't finished
-	// by this point, which causes rimraf to fail. We need to wait at least 2.5-5s,
-	// but using 10s in case it's dependant on the machine.
-	await new Promise( ( resolve ) => setTimeout( resolve, 10000 ) );
-	await rimraf( config.workDirectoryPath );
+	await runtime.destroy( config, { spinner, debug } );
 
 	if ( scripts ) {
 		await executeLifecycleScript( 'afterDestroy', config, spinner );
 	}
-
-	spinner.text = 'Removed WordPress environment.';
 };

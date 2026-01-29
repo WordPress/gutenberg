@@ -13,7 +13,12 @@ import { useMemo, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import DataViews from '../index';
-import { LAYOUT_GRID, LAYOUT_LIST, LAYOUT_TABLE } from '../../constants';
+import {
+	LAYOUT_ACTIVITY,
+	LAYOUT_GRID,
+	LAYOUT_LIST,
+	LAYOUT_TABLE,
+} from '../../constants';
 import type { Action, View } from '../../types';
 import filterSortAndPaginate from '../../utils/filter-sort-and-paginate';
 
@@ -37,6 +42,7 @@ const defaultLayouts = {
 	[ LAYOUT_TABLE ]: {},
 	[ LAYOUT_GRID ]: {},
 	[ LAYOUT_LIST ]: {},
+	[ LAYOUT_ACTIVITY ]: {},
 };
 
 const fields = [
@@ -147,6 +153,10 @@ function DataViewWrapper( {
 // jest.useFakeTimers();
 
 // Tests run against a DataView which is 500px wide.
+const mockUseViewportMatch = jest.fn(
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	( _viewport: string, _operator: string ) => false
+);
 jest.mock( '@wordpress/compose', () => {
 	return {
 		...jest.requireActual( '@wordpress/compose' ),
@@ -160,6 +170,8 @@ jest.mock( '@wordpress/compose', () => {
 			}, 0 );
 			return () => {};
 		} ),
+		useViewportMatch: ( viewport: string, operator: string ): boolean =>
+			mockUseViewportMatch( viewport, operator ),
 	};
 } );
 
@@ -614,6 +626,59 @@ describe( 'DataViews component', () => {
 					actions={ actions }
 				/>
 			);
+			expect(
+				screen.getAllByRole( 'button', { name: 'Actions' } ).length
+			).toEqual( 3 );
+		} );
+	} );
+
+	describe( 'actions on mobile viewport', () => {
+		const testActions: Action< Data >[] = [
+			{
+				id: 'edit',
+				label: 'Edit',
+				isPrimary: true,
+				callback: () => {},
+			},
+		];
+
+		beforeEach( () => {
+			// Simulate mobile viewport
+			mockUseViewportMatch.mockImplementation(
+				( viewport: string, operator: string ) =>
+					viewport === 'medium' && operator === '<'
+			);
+		} );
+
+		afterEach( () => {
+			mockUseViewportMatch.mockImplementation( () => false );
+		} );
+
+		it( 'should show actions dropdown on mobile even when there is only one action in table layout', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: LAYOUT_TABLE,
+					} }
+					actions={ testActions }
+				/>
+			);
+			// On mobile, the dropdown should be visible even with only primary actions
+			expect(
+				screen.getAllByRole( 'button', { name: 'Actions' } ).length
+			).toEqual( 3 );
+		} );
+
+		it( 'should show actions dropdown on mobile even when there is only one action in activity layout', () => {
+			render(
+				<DataViewWrapper
+					view={ {
+						type: LAYOUT_ACTIVITY,
+					} }
+					actions={ testActions }
+				/>
+			);
+			// On mobile, the dropdown should be visible even with only primary actions
 			expect(
 				screen.getAllByRole( 'button', { name: 'Actions' } ).length
 			).toEqual( 3 );

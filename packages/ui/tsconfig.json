@@ -10,6 +10,7 @@
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../primitives" },
+		{ "path": "../private-apis" },
 		{ "path": "../theme" }
 	],
 	"files": [ "global.d.ts" ],

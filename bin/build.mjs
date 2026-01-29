@@ -133,6 +133,34 @@ async function build() {
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );
 
+		// Step 7.5: Build blocks manifests
+		console.log( '\n📦 Building blocks manifests...' );
+		const blocksDirs = [
+			{
+				input: 'build/scripts/block-library',
+				output: 'build/scripts/block-library/blocks-manifest.php',
+			},
+			{
+				input: 'build/scripts/edit-widgets/blocks',
+				output: 'build/scripts/edit-widgets/blocks/blocks-manifest.php',
+			},
+			{
+				input: 'build/scripts/widgets/blocks',
+				output: 'build/scripts/widgets/blocks/blocks-manifest.php',
+			},
+		];
+		for ( const { input, output } of blocksDirs ) {
+			await exec(
+				'wp-scripts',
+				[
+					'build-blocks-manifest',
+					`--input=${ input }`,
+					`--output=${ output }`,
+				],
+				{ silent: true }
+			);
+		}
+
 		// Step 8: Build workspace :wp targets
 		console.log( '\n📦 Building workspace :wp targets...' );
 		await exec(

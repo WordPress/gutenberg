@@ -377,9 +377,7 @@ export const fields: Field< SpaceObject >[] = [
 			</Stack>
 		),
 		render: ( { item } ) => {
-			return (
-				<img src={ item.image } alt="" style={ { width: '100%' } } />
-			);
+			return <img src={ item.image } alt="" />;
 		},
 	},
 	{

@@ -44,13 +44,11 @@ test.describe( 'Block with a meta attribute', () => {
 				await editor.saveDraft();
 				await page.reload();
 
-				const block = page.getByRole( 'document', {
+				const block = editor.canvas.getByRole( 'document', {
 					name: `Block: Test Meta Attribute Block (${ title })`,
 				} );
 				await expect( block ).toBeVisible();
-				await expect( block.locator( '.my-meta-input' ) ).toHaveValue(
-					'Meta Value'
-				);
+				await expect( block ).toHaveValue( 'Meta Value' );
 			} );
 
 			test( 'Should use the same value in all the blocks', async ( {
@@ -64,9 +62,13 @@ test.describe( 'Block with a meta attribute', () => {
 				await editor.insertBlock( { name: blockName } );
 				await page.keyboard.type( 'Meta Value' );
 
-				const inputs = await page.locator( '.my-meta-input' ).all();
-				for ( const input of inputs ) {
-					await expect( input ).toHaveValue( 'Meta Value' );
+				const blocks = await editor.canvas
+					.getByRole( 'document', {
+						name: `Block: Test Meta Attribute Block (${ title })`,
+					} )
+					.all();
+				for ( const block of blocks ) {
+					await expect( block ).toHaveValue( 'Meta Value' );
 				}
 			} );
 
@@ -91,13 +93,11 @@ test.describe( 'Block with a meta attribute', () => {
 				await editor.saveDraft();
 				await page.reload();
 
-				const block = page.getByRole( 'document', {
+				const block = editor.canvas.getByRole( 'document', {
 					name: `Block: Test Meta Attribute Block (${ title })`,
 				} );
 				await expect( block ).toBeVisible();
-				await expect( block.locator( '.my-meta-input' ) ).toHaveValue(
-					'Meta Value'
-				);
+				await expect( block ).toHaveValue( 'Meta Value' );
 			} );
 		} );
 	}
