@@ -10,7 +10,6 @@ import {
 	wordpress,
 } from '@wordpress/icons';
 import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
-import { useState } from '@wordpress/element';
 import { IconButton } from '../index';
 
 const meta: Meta< typeof IconButton > = {
@@ -100,8 +99,7 @@ export const WithDifferentIcons: Story = {
 
 /**
  * The pressed state is only available for buttons with `tone="neutral"` and
- * `variant="minimal"`. This represents a toggle button that is currently in an
- * active/pressed state.
+ * `variant="minimal"` and can be toggled via the `aria-pressed` HTML attribute.
  */
 export const Pressed: Story = {
 	...Default,
@@ -110,18 +108,8 @@ export const Pressed: Story = {
 		tone: 'neutral',
 		variant: 'minimal',
 		label: 'Toggle Settings',
-	},
-	render: ( args ) => {
-		const [ isPressed, setIsPressed ] = useState( false );
-
-		return (
-			<IconButton
-				{ ...args }
-				aria-pressed={ isPressed }
-				onClick={ () => setIsPressed( ! isPressed ) }
-			/>
-		);
-	},
+		'aria-pressed': true,
+	}
 };
 
 const EXAMPLE_SHORTCUT_OBJECT = {
