@@ -608,6 +608,9 @@ class DockerRuntime {
 				3306,
 				dockerComposeConfig
 			);
+			// The development environment is considered running if the main MySQL
+			// container is accessible. Subsequent checks for tests-mysql and
+			// phpMyAdmin are optional services.
 			isRunning = true;
 
 			testsMySQLPort = await this._getPublicDockerPort(
