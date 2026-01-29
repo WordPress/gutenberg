@@ -31,6 +31,7 @@ import OverlayPreview from './overlay-preview';
  * @param {string}   props.overlayMenuPreviewId      ID for overlay menu preview.
  * @param {boolean}  props.isResponsive              Whether overlay menu is responsive.
  * @param {string}   props.currentTheme              Current theme stylesheet name.
+ * @param {boolean}  props.hasOverlays               Whether any overlay template parts exist.
  * @return {JSX.Element|null}                       The overlay panel component or null if overlay is disabled.
  */
 export default function OverlayPanel( {
@@ -46,6 +47,7 @@ export default function OverlayPanel( {
 	overlayMenuPreviewId,
 	isResponsive,
 	currentTheme,
+	hasOverlays,
 } ) {
 	return (
 		<PanelBody title={ __( 'Overlay' ) } initialOpen>
@@ -76,7 +78,7 @@ export default function OverlayPanel( {
 					/>
 				) }
 
-				{ overlayMenu !== 'never' && overlay && (
+				{ overlayMenu !== 'never' && overlay && hasOverlays && (
 					<OverlayPreview
 						overlay={ overlay }
 						currentTheme={ currentTheme }
