@@ -43,7 +43,6 @@
     - `--wpds-color-bg-interactive-neutral-strong-disabled` from `#d2d2d2` to `#e2e2e2`.
     - `--wpds-color-bg-interactive-neutral-weak-disabled` from `#e2e2e2` to `#00000000`.
 		- `--wpds-color-fg-interactive-neutral-strong-disabled` from `#6d6d6d` to `#8a8a8a`.
--   Tweaked the value of `--wpds-color-stroke-interactive-neutral-strong` from `#6c6c6c` to `#2d2d2d` ([#74652](https://github.com/WordPress/gutenberg/pull/74652)).
 
 ### New Features
 
