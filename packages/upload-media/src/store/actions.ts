@@ -258,23 +258,24 @@ export function scheduleRetry( id: QueueItemId, error: Error ) {
 			return;
 		}
 
-		const retryCount = ( item.retryCount ?? 0 ) + 1;
+		const currentRetryCount = item.retryCount ?? 0;
+		const nextRetryCount = currentRetryCount + 1;
 
 		const delay = calculateRetryDelay( {
-			attempt: retryCount,
+			attempt: nextRetryCount,
 			initialDelay: retrySettings.initialRetryDelayMs,
 			maxDelay: retrySettings.maxRetryDelayMs,
 			multiplier: retrySettings.backoffMultiplier,
 			jitter: retrySettings.retryJitter,
 		} );
 
-		logRetryScheduled( id, item.file.name, retryCount, delay );
+		logRetryScheduled( id, item.file.name, nextRetryCount, delay );
 
 		dispatch< ScheduleRetryAction >( {
 			type: Type.ScheduleRetry,
 			id,
 			error,
-			retryCount,
+			retryCount: currentRetryCount,
 			nextRetryTimestamp: Date.now() + delay,
 		} );
 
