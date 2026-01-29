@@ -1,8 +1,7 @@
 import { type ButtonProps } from '../button/types';
 import { type IconProps } from '../icon/types';
-import { type DistributiveOmit } from '../utils/types';
 
-export type IconButtonProps = DistributiveOmit< ButtonProps, 'children' > & {
+export type IconButtonProps = Omit< ButtonProps, 'children' > & {
 	/**
 	 * A label describing the button's action, shown as a tooltip and to
 	 * assistive technology.
