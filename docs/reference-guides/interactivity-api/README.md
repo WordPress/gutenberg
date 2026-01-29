@@ -1,3 +1,7 @@
+---
+sidebar_label: Interactivity API
+---
+
 # Interactivity API Reference
 
 The Interactivity API, [introduced in WordPress 6.5](https://make.wordpress.org/core/2024/02/19/merge-announcement-interactivity-api/), provides a standard way for developers to add interactions to the front end of their blocks. The API is also used in many Core WordPress blocks, including Search, Query, Navigation, and File.
