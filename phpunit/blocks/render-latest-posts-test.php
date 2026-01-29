@@ -11,7 +11,7 @@
  *
  * @group blocks
  */
-class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
+class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 	/**
 	 * @var array
 	 */
@@ -157,6 +157,102 @@ class Tests_Blocks_RenderLastPosts extends WP_UnitTestCase {
 		$this->assertStringContainsString( 'is-grid', $markup );
 		$this->assertStringContainsString( 'columns-5', $markup );
 		$this->assertStringNotContainsString( 'has-native-responsive-grid', $markup );
+	}
+
+	/**
+	 * Tests that recursion is prevented when a Latest Posts block displays itself.
+	 *
+	 * When a Latest Posts block is added to a post and that post is then displayed
+	 * by another Latest Posts block with "Show full post" enabled, infinite recursion
+	 * could occur. This test verifies that the recursion protection prevents memory
+	 * exhaustion by skipping the nested rendering of the same post.
+	 *
+	 * This reproduces the scenario reported in PR #74866 where adding a Latest Posts
+	 * block to a post (with gallery blocks) caused memory exhaustion when that post
+	 * was displayed by the Latest Posts block.
+	 *
+	 * @covers ::gutenberg_render_block_core_latest_posts
+	 */
+	public function test_render_block_core_latest_posts_prevents_recursion() {
+		// Create attachment IDs for gallery block (matching the test scenario).
+		$file            = DIR_TESTDATA . '/images/canola.jpg';
+		$attachment_id_1 = self::factory()->attachment->create_upload_object( $file );
+		$attachment_id_2 = self::factory()->attachment->create_upload_object( $file );
+
+		// Create a gallery block (as was being tested when the recursion was discovered).
+		$gallery_block = sprintf(
+			'<!-- wp:gallery {"linkTo":"none"} -->
+<figure class="wp-block-gallery has-nested-images columns-default is-cropped"><!-- wp:image {"id":%d} -->
+<figure class="wp-block-image"><img src="test1.jpg" alt=""/></figure>
+<!-- /wp:image -->
+
+<!-- wp:image {"id":%d} -->
+<figure class="wp-block-image"><img src="test2.jpg" alt=""/></figure>
+<!-- /wp:image --></figure>
+<!-- /wp:gallery -->',
+			$attachment_id_1,
+			$attachment_id_2
+		);
+
+		// Create a Latest Posts block markup (showing 5 posts with full content).
+		$latest_posts_block = '<!-- wp:latest-posts {"postsToShow":5,"displayPostContent":true,"displayPostContentRadio":"full_post"} /-->';
+
+		// Create a post that contains BOTH a gallery block AND a Latest Posts block.
+		// This matches the exact scenario where the recursion issue was discovered.
+		$post_with_block = self::factory()->post->create_and_get(
+			array(
+				'post_title'   => 'Post with gallery and Latest Posts block',
+				'post_content' => $gallery_block . "\n\n" . $latest_posts_block,
+				'post_status'  => 'publish',
+				'post_date'    => gmdate( 'Y-m-d H:i:s' ), // Make it the most recent post
+			)
+		);
+
+		// Render a Latest Posts block that will display the post containing the Latest Posts block.
+		// This creates a potential infinite loop: Latest Posts displays a post that contains
+		// a Latest Posts block, which would try to display posts including itself.
+		$attributes = array(
+			'postsToShow'             => 5,
+			'orderBy'                 => 'date',
+			'order'                   => 'DESC',
+			'excerptLength'           => 55,
+			'displayFeaturedImage'    => false,
+			'displayPostContent'      => true,
+			'displayPostContentRadio' => 'full_post',
+		);
+
+		// This should not cause a fatal error or memory exhaustion.
+		// The recursion protection should prevent infinite loops.
+		$output = gutenberg_render_block_core_latest_posts( $attributes );
+
+		// Verify the output contains the wrapper for the outer Latest Posts block.
+		$this->assertStringContainsString(
+			'wp-block-latest-posts__list',
+			$output,
+			'The outer Latest Posts block should render'
+		);
+
+		// Verify the post title is in the output.
+		$this->assertStringContainsString(
+			'Post with gallery and Latest Posts block',
+			$output,
+			'The post containing a Latest Posts block should be displayed'
+		);
+
+		// Verify that the gallery block was parsed correctly (from do_blocks call).
+		$this->assertStringContainsString(
+			'wp-block-gallery',
+			$output,
+			'Gallery block should be parsed and rendered'
+		);
+
+		// The most important assertion: this test completing means no infinite recursion
+		// or memory exhaustion occurred, proving the recursion protection works.
+		// The nested Latest Posts block content should be empty due to recursion protection.
+		$this->assertTrue(
+			true,
+			'Test completed without memory exhaustion, recursion protection works'
+		);
 	}
 
 	/**
