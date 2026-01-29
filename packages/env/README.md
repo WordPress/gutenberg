@@ -500,41 +500,34 @@ Options:
 
 ### `wp-env status`
 
-Get the status of the wp-env environment including whether it's running, URLs, ports, configuration, and file paths.
+Get the status of the wp-env environment including whether it's running, URLs, ports, and configuration.
 
 Example:
 
 ```sh
 $ wp-env status
 
-wp-env Status
-────────────────────────────────────────
+status: running
+    - runtime: docker
+    - install path: /home/user/.wp-env/63263e6506becb7b8613b02d42280a49
+    - config: /home/user/my-plugin
 
-Status: Running
-Runtime: docker
+environment:
+        - url: http://localhost:8888
+        - multisite: no
+        - xdebug: off
+        - http port: 8888
+        - mysql port: 13306
+        - test http port: 8889
+```
 
-URLs
-────────────────────────────────────────
-Development Site: http://localhost:8888
-Tests Site: http://localhost:8889
+```sh
+$ wp-env status --help
+Get the status of the wp-env environment including URLs, ports, and configuration.
 
-Ports
-────────────────────────────────────────
-Development: 8888
-Tests: 8889
-MySQL: 13306
-Tests MySQL: 13307
-
-Configuration
-────────────────────────────────────────
-PHP Version: 8.2
-Multisite: No
-Plugins: my-plugin
-
-Paths
-────────────────────────────────────────
-Config Directory: /home/user/my-plugin
-Work Directory: /home/user/.wp-env/63263e6506becb7b8613b02d42280a49
+Options:
+  --debug    Enable debug output.                      [boolean] [default: false]
+  --json     Output status as JSON.                    [boolean] [default: false]
 ```
 
 ## .wp-env.json
