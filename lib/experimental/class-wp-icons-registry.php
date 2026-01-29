@@ -88,7 +88,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 				return false;
 			}
 
-			$allowed_keys = array_flip( array( 'label', 'content', 'filePath' ) );
+			$allowed_keys = array_fill_keys( array( 'label', 'content', 'filePath' ), 1 );
 			foreach ( array_keys( $icon_properties ) as $key ) {
 				if ( ! array_key_exists( $key, $allowed_keys ) ) {
 					_doing_it_wrong(
