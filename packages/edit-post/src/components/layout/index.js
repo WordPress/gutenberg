@@ -228,11 +228,6 @@ function MetaBoxesMain( { isLegacy } ) {
 		}
 	};
 
-	const getContextualHeight = () => {
-		const usedOpenHeight = isShort ? 'auto' : openHeight;
-		return isOpen ? usedOpenHeight : min;
-	};
-
 	// useDrag includes keyboard support with arrow keys emulating a drag.
 	// TODO: Support more/all keyboard interactions from the window splitter pattern:
 	// https://www.w3.org/WAI/ARIA/apg/patterns/windowsplitter/
@@ -297,13 +292,13 @@ function MetaBoxesMain( { isLegacy } ) {
 	}
 
 	const isAutoHeight = openHeight === undefined;
+	const usedOpenHeight = isShort ? 'auto' : openHeight;
+	const usedHeight = isOpen ? usedOpenHeight : min;
 
 	const getAriaValueNow = ( height ) =>
 		Math.round( ( ( height - min ) / ( max - min ) ) * 100 );
 	const usedAriaValueNow =
-		max === undefined || isAutoHeight
-			? 50
-			: getAriaValueNow( getContextualHeight() );
+		max === undefined || isAutoHeight ? 50 : getAriaValueNow( usedHeight );
 
 	const persistIsOpen = ( to = ! isOpen ) =>
 		setPreference( 'core/edit-post', 'metaBoxesMainIsOpen', to );
@@ -360,7 +355,7 @@ function MetaBoxesMain( { isLegacy } ) {
 				'edit-post-meta-boxes-main',
 				! isShort && 'is-resizable'
 			) }
-			style={ { height: getContextualHeight() } }
+			style={ { height: usedHeight } }
 		>
 			<div className="edit-post-meta-boxes-main__presenter">
 				{ toggle }
