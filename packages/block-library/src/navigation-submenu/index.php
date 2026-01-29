@@ -33,11 +33,13 @@ function block_core_navigation_submenu_get_submenu_visibility( $attributes ) {
 	return ! empty( $open_submenus_on_click ) ? 'click' : 'hover';
 }
 
-// Path differs between source and build: '../navigation-link/shared/helpers.php' in source, './navigation-link/shared/helpers.php' in build.
-if ( file_exists( __DIR__ . '/../navigation-link/shared/helpers.php' ) ) {
-	require_once __DIR__ . '/../navigation-link/shared/helpers.php';
+// Path differs between source and build: '../navigation-link/shared/' in source, './navigation-link/shared/' in build.
+if ( file_exists( __DIR__ . '/../navigation-link/shared/item-should-render.php' ) ) {
+	require_once __DIR__ . '/../navigation-link/shared/item-should-render.php';
+	require_once __DIR__ . '/../navigation-link/shared/render-submenu-icon.php';
 } else {
-	require_once __DIR__ . '/navigation-link/shared/helpers.php';
+	require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
+	require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
 }
 
 /**
