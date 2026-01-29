@@ -1,8 +1,8 @@
-/**
- * External dependencies
- */
+const { existsSync, readFileSync, realpathSync } = require( 'node:fs' );
+const path = require( 'node:path' );
+const { createRequire, findPackageJSON } = require( 'node:module' );
+const { pathToFileURL } = require( 'node:url' );
 const chalk = require( 'chalk' );
-const { existsSync, readFileSync } = require( 'node:fs' );
 
 const ERROR_TEXT = chalk.reset.inverse.bold.red( ' ERROR ' );
 const WARNING_TEXT = chalk.reset.inverse.bold.yellow( ' WARNING ' );
@@ -208,18 +208,20 @@ function detectTypeFromLicenseText( licenseText ) {
 const reportedPackages = new Set();
 
 /**
- * @param {string}   path
+ * @param {string}   depPath
  * @param {Licenses} licenses
  * @return {void}
  */
-function checkDepLicense( path, licenses ) {
-	if ( ! path ) {
+function checkDepLicense( depPath, licenses ) {
+	if ( ! depPath ) {
 		return;
 	}
 
-	const filename = path + '/package.json';
+	const filename = depPath + '/package.json';
 	if ( ! existsSync( filename ) ) {
-		process.stdout.write( `Unable to locate package.json in ${ path }.` );
+		process.stdout.write(
+			`Unable to locate package.json in ${ depPath }.`
+		);
 		process.exit( 1 );
 	}
 
@@ -349,17 +351,17 @@ function checkDeps( deps, options ) {
 }
 
 /**
- * @param {string} path The path to the package.
+ * @param {string} depPath The path to the package.
  * @return {boolean} true if the package has a license, false if it
  */
-function detectTypeFromLicenseFiles( path ) {
+function detectTypeFromLicenseFiles( depPath ) {
 	return licenseFiles.reduce( ( detectedType, licenseFile ) => {
 		// If another LICENSE file already had licenses in it, use those.
 		if ( detectedType ) {
 			return detectedType;
 		}
 
-		const licensePath = path + '/' + licenseFile;
+		const licensePath = depPath + '/' + licenseFile;
 
 		if ( existsSync( licensePath ) ) {
 			const licenseText = readFileSync( licensePath ).toString();
@@ -370,9 +372,83 @@ function detectTypeFromLicenseFiles( path ) {
 	}, false );
 }
 
+/**
+ * Resolve a package's path using Node's resolution algorithm.
+ * Works regardless of package manager (npm, pnpm, yarn, etc.).
+ *
+ * Uses `findPackageJSON` from node:module (Node.js 22.14.0+) when available,
+ * with a fallback for older versions.
+ *
+ * @param {string} packageName - Name of the package to resolve
+ * @param {string} fromDir     - Directory to resolve from
+ * @return {string|null} Path to the package directory, or null if not found
+ */
+function resolvePackagePath( packageName, fromDir ) {
+	// Use findPackageJSON when available (Node.js 22.14.0+)
+	if ( findPackageJSON ) {
+		try {
+			const parentURL = pathToFileURL(
+				path.join( fromDir, 'package.json' )
+			);
+			const pkgJsonPath = findPackageJSON( packageName, parentURL );
+			if ( pkgJsonPath ) {
+				// Use realpathSync to resolve symlinks. Without this, transitive dep resolution fails
+				// because Node resolves from the symlink path, not the real store path where sibling deps are located.
+				return realpathSync( path.dirname( pkgJsonPath ) );
+			}
+		} catch {
+			// Package not found
+		}
+		return null;
+	}
+
+	// Fallback for older Node.js versions
+	const localRequire = createRequire( path.join( fromDir, 'package.json' ) );
+	try {
+		const resolved = localRequire.resolve(
+			`${ packageName }/package.json`
+		);
+		return realpathSync( path.dirname( resolved ) );
+	} catch {
+		try {
+			const mainResolved = localRequire.resolve( packageName );
+			let dir = path.dirname( mainResolved );
+			while ( dir !== path.parse( dir ).root ) {
+				if ( existsSync( path.join( dir, 'package.json' ) ) ) {
+					return realpathSync( dir );
+				}
+				dir = path.dirname( dir );
+			}
+		} catch {
+			// Package not found
+		}
+		return null;
+	}
+}
+
+/**
+ * Read package.json from a directory.
+ *
+ * @param {string} dir - Directory containing package.json
+ * @return {Object|null} Parsed package.json or null if not found
+ */
+function readPackageJson( dir ) {
+	const pkgJsonPath = path.join( dir, 'package.json' );
+	if ( existsSync( pkgJsonPath ) ) {
+		try {
+			return JSON.parse( readFileSync( pkgJsonPath, 'utf8' ) );
+		} catch {
+			return null;
+		}
+	}
+	return null;
+}
+
 module.exports = {
 	detectTypeFromLicenseText,
 	checkAllCompatible,
 	checkDeps,
 	getLicenses,
+	resolvePackagePath,
+	readPackageJson,
 };

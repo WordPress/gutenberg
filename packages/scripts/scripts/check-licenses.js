@@ -1,13 +1,13 @@
 /**
- * External dependencies
- */
-const spawn = require( 'cross-spawn' );
-
-/**
  * Internal dependencies
  */
 const { getArgFromCLI, hasArgInCLI } = require( '../utils' );
-const { checkDeps, getLicenses } = require( '../utils/license' );
+const {
+	checkDeps,
+	getLicenses,
+	resolvePackagePath,
+	readPackageJson,
+} = require( '../utils/license' );
 
 /*
  * WARNING: Changes to this file may inadvertently cause us to distribute code that
@@ -29,22 +29,92 @@ const ignored = hasArgInCLI( '--ignore' )
 			.map( ( moduleName ) => moduleName.trim() )
 	: [];
 
-let query = '';
-if ( prod ) {
-	query += '.prod';
-} else if ( dev ) {
-	query += '.dev';
-} else {
-	query += '*';
+/**
+ * Get dependencies to check based on the current package.json.
+ * Uses Node's module resolution which works with any package manager.
+ *
+ * @return {Array} Array of dependency objects with name, version, path, and license
+ */
+function getDependenciesToCheck() {
+	const cwd = process.cwd();
+	const pkgJson = readPackageJson( cwd );
+
+	if ( ! pkgJson ) {
+		process.stdout.write(
+			'Unable to find package.json in current directory.\n'
+		);
+		process.exit( 1 );
+	}
+
+	let depsToCheck = {};
+	if ( prod ) {
+		depsToCheck = pkgJson.dependencies || {};
+	} else if ( dev ) {
+		depsToCheck = pkgJson.devDependencies || {};
+	} else {
+		depsToCheck = {
+			...( pkgJson.dependencies || {} ),
+			...( pkgJson.devDependencies || {} ),
+		};
+	}
+
+	const licenses = getLicenses( gpl2 );
+	const depsMap = new Map();
+	const visited = new Set();
+
+	/**
+	 * Recursively collect dependencies.
+	 *
+	 * @param {Object} deps    - Dependencies object from package.json
+	 * @param {string} fromDir - Directory to resolve from
+	 */
+	function collectDeps( deps, fromDir ) {
+		if ( ! deps ) {
+			return;
+		}
+
+		for ( const depName of Object.keys( deps ) ) {
+			const depPath = resolvePackagePath( depName, fromDir );
+			if ( ! depPath ) {
+				continue;
+			}
+
+			// Avoid infinite loops
+			if ( visited.has( depPath ) ) {
+				continue;
+			}
+			visited.add( depPath );
+
+			const depPkgJson = readPackageJson( depPath );
+			if ( ! depPkgJson ) {
+				continue;
+			}
+
+			const key = `${ depName }@${ depPkgJson.version }`;
+			if ( ! depsMap.has( key ) ) {
+				const license = depPkgJson.license;
+
+				// Skip if license is in the allowed list
+				if ( ! license || ! licenses.includes( license ) ) {
+					depsMap.set( key, {
+						name: depName,
+						version: depPkgJson.version,
+						path: depPath,
+						license,
+					} );
+				}
+			}
+
+			// Recursively check this package's dependencies
+			collectDeps( depPkgJson.dependencies, depPath );
+		}
+	}
+
+	collectDeps( depsToCheck, cwd );
+
+	return Array.from( depsMap.values() );
 }
 
-query += `:not(${ getLicenses( gpl2 )
-	.map( ( license ) => `[license=${ JSON.stringify( license ) }]` )
-	.join( ',' ) })`;
-
-// Use `npm query` to grab a list of all the packages.
-const child = spawn.sync( 'npm', [ 'query', query ] );
-
-const packages = JSON.parse( child.stdout.toString() );
+const packages = getDependenciesToCheck();
 
 checkDeps( packages, { ignored, gpl2 } );
