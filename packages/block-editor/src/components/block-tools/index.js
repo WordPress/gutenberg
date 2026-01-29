@@ -240,6 +240,22 @@ export default function BlockTools( {
 				stopEditingContentOnlySection();
 			}
 		}
+
+		// Handle add-note shortcut. Call the global callback registered by NotesSidebar.
+		// Use window.top to access the parent window's global scope if we're in an iframe.
+		if ( isMatch( 'core/editor/add-note', event ) ) {
+			const clientIds = getSelectedBlockClientIds();
+			if ( clientIds.length ) {
+				event.preventDefault();
+				const targetWindow = window.top || window;
+				if (
+					typeof targetWindow.__gutenbergOpenNotesSidebar ===
+					'function'
+				) {
+					targetWindow.__gutenbergOpenNotesSidebar();
+				}
+			}
+		}
 	}
 	const blockToolbarRef = usePopoverScroll( __unstableContentRef );
 	const blockToolbarAfterRef = usePopoverScroll( __unstableContentRef );

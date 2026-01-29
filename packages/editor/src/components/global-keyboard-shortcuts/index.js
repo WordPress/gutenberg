@@ -118,5 +118,15 @@ export default function EditorKeyboardShortcuts() {
 		}
 	} );
 
+	// Handle add-note shortcut: Call the global callback for NotesSidebar.
+	// This is a backup for when focus is outside the editor canvas (iframe).
+	// The primary handler is in BlockTools which captures events from within the iframe.
+	useShortcut( 'core/editor/add-note', ( event ) => {
+		event.preventDefault();
+		if ( typeof globalThis.__gutenbergOpenNotesSidebar === 'function' ) {
+			globalThis.__gutenbergOpenNotesSidebar();
+		}
+	} );
+
 	return null;
 }

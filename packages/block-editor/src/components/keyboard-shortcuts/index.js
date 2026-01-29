@@ -217,6 +217,18 @@ function KeyboardShortcutsRegister() {
 				character: 'h',
 			},
 		} );
+
+		// Register the add-note shortcut here so it's available in the block-editor context.
+		// This shortcut is also registered in the editor package for the keyboard shortcuts modal.
+		registerShortcut( {
+			name: 'core/editor/add-note',
+			category: 'block',
+			description: __( 'Add a note to the selected block.' ),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'm',
+			},
+		} );
 	}, [ registerShortcut ] );
 
 	return null;

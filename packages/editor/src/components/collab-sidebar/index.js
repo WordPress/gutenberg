@@ -4,12 +4,11 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useState, useRef } from '@wordpress/element';
-import { useViewportMatch, useKeyboardShortcut } from '@wordpress/compose';
+import { useState, useRef, useEffect } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
-import { rawShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -92,31 +91,24 @@ function NotesSidebar( { postId } ) {
 
 	const showFloatingSidebar = isLargeViewport;
 
-	const {
-		clientId,
-		blockCommentId,
-		isDistractionFree,
-		blockName,
-		isValidBlock,
-	} = useSelect( ( select ) => {
-		const {
-			getBlock,
-			getBlockAttributes,
-			getSelectedBlockClientId,
-			getSettings,
-		} = select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-		const block = _clientId ? getBlock( _clientId ) : null;
-		return {
-			clientId: _clientId,
-			blockCommentId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
-			isDistractionFree: getSettings().isDistractionFree,
-			blockName: block?.name,
-			isValidBlock: block?.isValid,
-		};
-	}, [] );
+	const { clientId, blockCommentId, isDistractionFree } = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getSelectedBlockClientId,
+				getSettings,
+			} = select( blockEditorStore );
+			const _clientId = getSelectedBlockClientId();
+			return {
+				clientId: _clientId,
+				blockCommentId: _clientId
+					? getBlockAttributes( _clientId )?.metadata?.noteId
+					: null,
+				isDistractionFree: getSettings().isDistractionFree,
+			};
+		},
+		[]
+	);
 
 	const {
 		resultComments,
@@ -139,24 +131,6 @@ function NotesSidebar( { postId } ) {
 		? resultComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
 	const showAllNotesSidebar = resultComments.length > 0;
-
-	// Handle keyboard shortcut for adding a note (Cmd+Option+M on Mac, Ctrl+Alt+M on Windows).
-	useKeyboardShortcut(
-		rawShortcut.primaryAlt( 'm' ),
-		( event ) => {
-			event.preventDefault();
-			// Only trigger if we have a valid, non-freeform block selected.
-			if (
-				clientId &&
-				isValidBlock &&
-				blockName !== 'core/freeform' &&
-				! isDistractionFree
-			) {
-				openTheSidebar();
-			}
-		},
-		{ bindGlobal: true }
-	);
 
 	async function openTheSidebar() {
 		const prevArea = await getActiveComplementaryArea( 'core' );
@@ -188,6 +162,16 @@ function NotesSidebar( { postId } ) {
 		);
 		toggleBlockSpotlight( clientId, true );
 	}
+
+	// Register global callback for keyboard shortcut.
+	// This allows BlockTools (in iframe) and EditorKeyboardShortcuts to trigger the sidebar.
+	useEffect( () => {
+		// Use a function on globalThis that can be called from anywhere.
+		globalThis.__gutenbergOpenNotesSidebar = openTheSidebar;
+		return () => {
+			delete globalThis.__gutenbergOpenNotesSidebar;
+		};
+	} );
 
 	if ( isDistractionFree ) {
 		return <AddCommentMenuItem isDistractionFree />;
