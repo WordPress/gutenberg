@@ -9,7 +9,7 @@ import {
 	upload,
 	wordpress,
 } from '@wordpress/icons';
-import { displayShortcut, rawShortcut } from '@wordpress/keycodes';
+import { displayShortcut, ariaKeyShortcut } from '@wordpress/keycodes';
 import { IconButton } from '../index';
 
 const meta: Meta< typeof IconButton > = {
@@ -114,7 +114,7 @@ export const Pressed: Story = {
 
 const EXAMPLE_SHORTCUT_OBJECT = {
 	displayShortcut: displayShortcut.primary( 'c' ),
-	ariaKeyShortcut: rawShortcut.primary( 'c' ),
+	ariaKeyShortcut: ariaKeyShortcut.primary( 'c' ),
 };
 
 export const WithShortcut: Story = {
