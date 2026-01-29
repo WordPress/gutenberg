@@ -122,6 +122,8 @@ function render_block_core_breadcrumbs( $attributes, $content, $block ) {
 			$label = $post_type_object->labels->archives;
 			if ( 'post' === $post_type && $page_for_posts ) {
 				$label = block_core_breadcrumbs_get_post_title( $page_for_posts );
+			} else {
+				$label = apply_filters( 'post_type_archive_title', $label, $post_type );
 			}
 			$breadcrumb_items[] = array(
 				'label' => $label,
