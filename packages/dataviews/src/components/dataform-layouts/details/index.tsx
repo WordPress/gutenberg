@@ -10,6 +10,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -105,10 +106,15 @@ export default function FormDetailsField< Item >( {
 			className="dataforms-layouts-details__details"
 		>
 			<summary className="dataforms-layouts-details__summary">
-				<span className="dataforms-layouts-details__summary-content">
+				<Stack
+					direction="row"
+					align="center"
+					gap="sm"
+					className="dataforms-layouts-details__summary-content"
+				>
 					{ summaryContent }
 					{ touched && <ValidationBadge validity={ validity } /> }
-				</span>
+				</Stack>
 			</summary>
 			<div
 				ref={ contentRef }
