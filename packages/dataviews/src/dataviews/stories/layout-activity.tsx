@@ -484,7 +484,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		label: 'Categories',
 		id: 'categories',
 		header: (
-			<Stack direction="row" gap="2xs" justify="start" align="center">
+			<Stack direction="row" gap="xs" justify="start" align="center">
 				<Icon icon={ category } />
 				<span style={ { minWidth: 0 } }>Categories</span>
 			</Stack>

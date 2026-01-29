@@ -211,7 +211,7 @@ const GridItem = forwardRef( function GridItem< Item >(
 					) }
 				</Stack>
 			) }
-			<Stack direction="column" gap="2xs">
+			<Stack direction="column" gap="xs">
 				{ showDescription && descriptionField?.render && (
 					<descriptionField.render
 						item={ item }
@@ -246,7 +246,7 @@ const GridItem = forwardRef( function GridItem< Item >(
 					<Stack
 						direction="column"
 						className="dataviews-view-grid__fields"
-						gap="2xs"
+						gap="xs"
 					>
 						{ regularFields.map( ( field ) => {
 							return (

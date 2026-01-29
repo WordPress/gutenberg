@@ -1202,7 +1202,7 @@ Example:
 	id: 'title',
 	type: 'text',
 	header: (
-		<Stack direction="row" gap="2xs" justify="start">
+		<Stack direction="row" gap="xs" justify="start">
 			<Icon icon={ icon } />
 			<span>Title</span>
 		</Stack>

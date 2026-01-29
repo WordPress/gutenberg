@@ -277,7 +277,7 @@ function renderFooterContent< Item >(
 			<Stack
 				direction="row"
 				className="dataviews-bulk-actions-footer__action-buttons"
-				gap="2xs"
+				gap="xs"
 			>
 				{ actionsToShow.map( ( action ) => {
 					return (
