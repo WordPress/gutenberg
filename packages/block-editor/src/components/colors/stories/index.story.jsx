@@ -26,7 +26,7 @@ export default {
 /**
  * A simple component to demonstrate withColors HOC.
  */
-function SimpleBox( { backgroundColor, setBackgroundColor } ) {
+function SimpleBox( { backgroundColor, setBackgroundColor, demoColors = [] } ) {
 	return (
 		<div
 			style={ {
@@ -37,21 +37,31 @@ function SimpleBox( { backgroundColor, setBackgroundColor } ) {
 			} }
 		>
 			<p>
-				<strong>Current Slug: </strong>
-				{ backgroundColor?.slug || 'none' }
+				<strong>Current Color: </strong>
+				{ backgroundColor?.color || 'none' }
 			</p>
-			<button onClick={ () => setBackgroundColor( 'red' ) }>
-				Set Red
-			</button>
-			<button onClick={ () => setBackgroundColor( 'blue' ) }>
-				Set Blue
-			</button>
-			<button onClick={ () => setBackgroundColor( undefined ) }>
-				Clear
-			</button>
+
+			<div>
+				{ demoColors.map( ( color ) => (
+					<button
+						key={ color.slug }
+						onClick={ () => setBackgroundColor( color.color ) }
+					>
+						Set { color.name }
+					</button>
+				) ) }
+				<button onClick={ () => setBackgroundColor( undefined ) }>
+					Clear
+				</button>
+			</div>
 		</div>
 	);
 }
+
+const GLOBAL_COLORS = [
+	{ name: 'Red', slug: 'red', color: 'red' },
+	{ name: 'Blue', slug: 'blue', color: 'blue' },
+];
 
 const WrappedBox = withColors( 'backgroundColor' )( SimpleBox );
 
@@ -62,10 +72,7 @@ export const Default = {
 		return (
 			<BlockEditorProvider
 				settings={ {
-					colors: [
-						{ name: 'Red', slug: 'red', color: 'red' },
-						{ name: 'Blue', slug: 'blue', color: 'blue' },
-					],
+					colors: GLOBAL_COLORS,
 				} }
 			>
 				<WrappedBox
@@ -76,41 +83,12 @@ export const Default = {
 							...newAttrs,
 						} ) )
 					}
+					demoColors={ GLOBAL_COLORS }
 				/>
 			</BlockEditorProvider>
 		);
 	},
 };
-
-/**
- * A custom component to demonstrate createCustomColorsHOC.
- */
-function CustomBox( { backgroundColor, setBackgroundColor } ) {
-	return (
-		<div
-			style={ {
-				backgroundColor: backgroundColor?.color,
-				padding: '20px',
-				border: '1px solid #ccc',
-				textAlign: 'center',
-			} }
-		>
-			<p>
-				<strong>Current Slug: </strong>
-				{ backgroundColor?.slug || 'none' }
-			</p>
-			<button onClick={ () => setBackgroundColor( 'cyan' ) }>
-				Set Cyan
-			</button>
-			<button onClick={ () => setBackgroundColor( 'magenta' ) }>
-				Set Magenta
-			</button>
-			<button onClick={ () => setBackgroundColor( undefined ) }>
-				Clear
-			</button>
-		</div>
-	);
-}
 
 const CUSTOM_PALETTE = [
 	{ name: 'Cyan', slug: 'cyan', color: '#00ffff' },
@@ -118,7 +96,7 @@ const CUSTOM_PALETTE = [
 ];
 
 const WrappedCustomBox =
-	createCustomColorsHOC( CUSTOM_PALETTE )( 'backgroundColor' )( CustomBox );
+	createCustomColorsHOC( CUSTOM_PALETTE )( 'backgroundColor' )( SimpleBox );
 
 export const CustomPalette = {
 	parameters: {
@@ -141,6 +119,7 @@ export const CustomPalette = {
 							...newAttrs,
 						} ) )
 					}
+					demoColors={ CUSTOM_PALETTE }
 				/>
 			</div>
 		);
