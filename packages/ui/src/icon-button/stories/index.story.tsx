@@ -109,7 +109,7 @@ export const Pressed: Story = {
 		variant: 'minimal',
 		label: 'Toggle Settings',
 		'aria-pressed': true,
-	}
+	},
 };
 
 const EXAMPLE_SHORTCUT_OBJECT = {

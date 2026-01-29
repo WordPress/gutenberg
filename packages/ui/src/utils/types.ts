@@ -9,9 +9,7 @@ import type {
 type HTMLAttributesWithRef< T extends ElementType = any > =
 	HTMLAttributes< T > & { ref?: Ref< T > | undefined };
 
-type ComponentRenderFn< Props > = (
-	props: Props
-) => ReactElement< unknown >;
+type ComponentRenderFn< Props > = ( props: Props ) => ReactElement< unknown >;
 
 export type ComponentProps< E extends ElementType > = Omit<
 	ComponentPropsWithoutRef< E >,
