@@ -63,10 +63,10 @@ export function CollaboratorsPresence( {
 		.join( ', ' );
 
 	return visibleUsers.length > 0 ? (
-		<>
+		<div className="editor-collaborators-presence">
 			<Button
 				__next40pxDefaultSize
-				className="vip-real-time-collaboration-avatars-container"
+				className="editor-collaborators-presence__button"
 				onClick={ () => setIsPopoverVisible( ! isPopoverVisible ) }
 				isPressed={ isPopoverVisible }
 				ref={ setPopoverAnchor }
@@ -83,7 +83,7 @@ export function CollaboratorsPresence( {
 
 				{ remainingUsers.length > 0 && (
 					<div
-						className="vip-real-time-collaboration-avatar-remaining"
+						className="editor-collaborators-presence__remaining"
 						title={ remainingUsersText }
 					>
 						+{ remainingUsers.length }
@@ -102,6 +102,6 @@ export function CollaboratorsPresence( {
 					setIsPopoverVisible={ setIsPopoverVisible }
 				/>
 			) }
-		</>
+		</div>
 	) : null;
 }

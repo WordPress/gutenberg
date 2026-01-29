@@ -26,10 +26,10 @@ export function Avatar( {
 	size?: AvatarSize;
 } ) {
 	const className = [
-		'vip-real-time-collaboration-avatar',
-		`vip-real-time-collaboration-avatar--${ size }`,
+		'editor-collaborators-presence__avatar',
+		`editor-collaborators-presence__avatar--${ size }`,
 		showUserColorBorder &&
-			'vip-real-time-collaboration-avatar--with-color-border',
+			'editor-collaborators-presence__avatar--with-color-border',
 	]
 		.filter( Boolean )
 		.join( ' ' );

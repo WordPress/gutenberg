@@ -1,60 +1,59 @@
-.vip-real-time-collaboration-collaborators-list.components-popover {
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-collaborators-presence__list.components-popover {
 	// Popover wrapper styles
 	.components-popover__content {
-		border: 1px solid #ddd;
+		border: 1px solid $gray-300;
 		border-width: 1px 0 0 1px;
-		border-radius: 8px;
-		background: #fff;
-		box-shadow:
-			0 1px 2px rgba(0, 0, 0, 0.05),
-			0 1px 2px rgba(0, 0, 0, 0.05),
-			0 1px 2px rgba(0, 0, 0, 0.05),
-			0 8px 8px rgba(0, 0, 0, 0.02);
+		border-radius: $radius-large;
+		background: $white;
+		box-shadow: $elevation-small;
 	}
 
-	.vip-real-time-collaboration-collaborators-list-content {
+	.editor-collaborators-presence__list-content {
 		min-width: 280px;
 	}
 
 	// Header with title and action button
-	.vip-real-time-collaboration-collaborators-list-header {
+	.editor-collaborators-presence__list-header {
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		padding: 0 16px;
+		padding: 0 $grid-unit-20;
 
 		&-title {
-			font-size: 13px;
-			font-weight: 500;
+			font-size: $font-size-medium;
+			font-weight: $font-weight-medium;
 			text-transform: uppercase;
-			line-height: 20px;
+			line-height: $font-line-height-small;
 			padding: 14px 0;
 
 			span {
-				color: var(--Gutenberg-Gray-700, #757575);
+				color: $gray-700;
 			}
 		}
 
 		&-action {
-			padding: 8px 0;
+			padding: $grid-unit-10 0;
 
 			button {
-				color: #1e1e1e;
-				height: 24px;
-				width: 24px;
+				color: $gray-900;
+				height: $button-size-small;
+				width: $button-size-small;
 				padding: 0;
 			}
 		}
 	}
 
 	// List of collaborators
-	.vip-real-time-collaboration-collaborators-list-items {
+	.editor-collaborators-presence__list-items {
 		display: flex;
 		flex-direction: column;
-		padding: 0 10px 16px;
+		padding: 0 10px $grid-unit-20;
 	}
 
-	.vip-real-time-collaboration-collaborators-list-item {
+	.editor-collaborators-presence__list-item {
 		// Reset button styles
 		all: unset;
 		box-sizing: border-box;
@@ -62,19 +61,19 @@
 		// Layout styles
 		display: flex;
 		align-items: center;
-		padding: 6px;
-		gap: 8px;
-		border-radius: 12px;
+		padding: $grid-unit-05 + 2;
+		gap: $grid-unit-10;
+		border-radius: $radius-large + $grid-unit-05;
 		width: 100%;
 		cursor: pointer;
 		transition: background-color 0.2s ease;
 
 		&:hover:not(:disabled) {
-			background-color: rgba(0, 0, 0, 0.05);
+			background-color: rgba($black, 0.05);
 		}
 
 		&:active:not(:disabled) {
-			background-color: rgba(0, 0, 0, 0.08);
+			background-color: rgba($black, 0.08);
 		}
 
 		&:focus-visible {
@@ -90,8 +89,8 @@
 			display: flex;
 			flex-direction: column;
 			flex: 1;
-			line-height: 16px;
-			font-size: 12px;
+			line-height: $font-line-height-x-small;
+			font-size: $font-size-small;
 		}
 	}
 }

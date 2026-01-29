@@ -60,15 +60,15 @@ export function CollaboratorsList( {
 			anchor={ popoverAnchor }
 			placement="bottom"
 			offset={ 8 }
-			className="vip-real-time-collaboration-collaborators-list"
+			className="editor-collaborators-presence__list"
 		>
-			<div className="vip-real-time-collaboration-collaborators-list-content">
-				<div className="vip-real-time-collaboration-collaborators-list-header">
-					<div className="vip-real-time-collaboration-collaborators-list-header-title">
+			<div className="editor-collaborators-presence__list-content">
+				<div className="editor-collaborators-presence__list-header">
+					<div className="editor-collaborators-presence__list-header-title">
 						Collaborators
 						<span> { activeUsers.length } </span>
 					</div>
-					<div className="vip-real-time-collaboration-collaborators-list-header-action">
+					<div className="editor-collaborators-presence__list-header-action">
 						<Button
 							__next40pxDefaultSize
 							icon={ close }
@@ -78,11 +78,11 @@ export function CollaboratorsList( {
 						/>
 					</div>
 				</div>
-				<div className="vip-real-time-collaboration-collaborators-list-items">
+				<div className="editor-collaborators-presence__list-items">
 					{ activeUsers.map( ( userState ) => (
 						<button
 							key={ userState.clientId }
-							className="vip-real-time-collaboration-collaborators-list-item"
+							className="editor-collaborators-presence__list-item"
 							onClick={ () => {} }
 							disabled={ ! userState.isConnected }
 							aria-label="Clicking scrolls to cursor position in the editor"
@@ -95,8 +95,8 @@ export function CollaboratorsList( {
 								showUserColorBorder
 								size="medium"
 							/>
-							<div className="vip-real-time-collaboration-collaborators-list-item-info">
-								<div className="vip-real-time-collaboration-collaborators-list-item-name">
+							<div className="editor-collaborators-presence__list-item-info">
+								<div className="editor-collaborators-presence__list-item-name">
 									{ userState.userInfo.name }
 								</div>
 							</div>
