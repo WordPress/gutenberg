@@ -268,7 +268,9 @@ describe( 'Tabs', () => {
 						<Tabs.Panel
 							key={ `${ tabObj.title }-${ index }` }
 							value={ tabObj.value }
-							tabIndex={ tabObj.tabpanel?.tabIndex }
+							{ ...( tabObj.tabpanel?.tabIndex !== undefined && {
+								tabIndex: tabObj.tabpanel.tabIndex,
+							} ) }
 						>
 							{ tabObj.content }
 						</Tabs.Panel>
