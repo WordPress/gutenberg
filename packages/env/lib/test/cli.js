@@ -19,6 +19,7 @@ jest.mock( '../env', () => {
 	return {
 		start: jest.fn( Promise.resolve.bind( Promise ) ),
 		stop: jest.fn( Promise.resolve.bind( Promise ) ),
+		reset: jest.fn( Promise.resolve.bind( Promise ) ),
 		clean: jest.fn( Promise.resolve.bind( Promise ) ),
 		run: jest.fn( Promise.resolve.bind( Promise ) ),
 		destroy: jest.fn( Promise.resolve.bind( Promise ) ),
@@ -43,26 +44,33 @@ describe( 'env cli', () => {
 		expect( spinner.text ).toBe( '' );
 	} );
 
-	it( 'parses clean commands for the default environment.', () => {
-		cli().parse( [ 'clean' ] );
-		const { environment, spinner } = env.clean.mock.calls[ 0 ][ 0 ];
+	it( 'parses reset commands for the default environment.', () => {
+		cli().parse( [ 'reset' ] );
+		const { environment, spinner } = env.reset.mock.calls[ 0 ][ 0 ];
 		expect( environment ).toBe( 'tests' );
 		expect( spinner.text ).toBe( '' );
 	} );
-	it( 'parses clean commands for all environments.', () => {
-		cli().parse( [ 'clean', 'all' ] );
-		const { environment, spinner } = env.clean.mock.calls[ 0 ][ 0 ];
+	it( 'parses reset commands for all environments.', () => {
+		cli().parse( [ 'reset', 'all' ] );
+		const { environment, spinner } = env.reset.mock.calls[ 0 ][ 0 ];
 		expect( environment ).toBe( 'all' );
 		expect( spinner.text ).toBe( '' );
 	} );
-	it( 'parses clean commands for the development environment.', () => {
-		cli().parse( [ 'clean', 'development' ] );
-		const { environment, spinner } = env.clean.mock.calls[ 0 ][ 0 ];
+	it( 'parses reset commands for the development environment.', () => {
+		cli().parse( [ 'reset', 'development' ] );
+		const { environment, spinner } = env.reset.mock.calls[ 0 ][ 0 ];
 		expect( environment ).toBe( 'development' );
 		expect( spinner.text ).toBe( '' );
 	} );
-	it( 'parses clean commands for the tests environment.', () => {
-		cli().parse( [ 'clean', 'tests' ] );
+	it( 'parses reset commands for the tests environment.', () => {
+		cli().parse( [ 'reset', 'tests' ] );
+		const { environment, spinner } = env.reset.mock.calls[ 0 ][ 0 ];
+		expect( environment ).toBe( 'tests' );
+		expect( spinner.text ).toBe( '' );
+	} );
+
+	it( 'parses clean (deprecated) commands for the default environment.', () => {
+		cli().parse( [ 'clean' ] );
 		const { environment, spinner } = env.clean.mock.calls[ 0 ][ 0 ];
 		expect( environment ).toBe( 'tests' );
 		expect( spinner.text ).toBe( '' );

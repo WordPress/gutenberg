@@ -457,11 +457,11 @@ class DockerRuntime {
 	}
 
 	/**
-	 * Clean/reset the WordPress database.
+	 * Reset the WordPress database.
 	 *
 	 * @param {WPConfig} config              The wp-env config object.
-	 * @param {Object}   options             Clean options.
-	 * @param {string}   options.environment The environment to clean.
+	 * @param {Object}   options             Reset options.
+	 * @param {string}   options.environment The environment to reset.
 	 * @param {Object}   options.spinner     A CLI spinner which indicates progress.
 	 * @param {boolean}  options.debug       True if debug mode is enabled.
 	 */
@@ -471,7 +471,7 @@ class DockerRuntime {
 		const description = `${ environment } environment${
 			environment === 'all' ? 's' : ''
 		}`;
-		spinner.text = `Cleaning ${ description }.`;
+		spinner.text = `Resetting ${ description }.`;
 
 		const tasks = [];
 
@@ -502,7 +502,7 @@ class DockerRuntime {
 
 		await Promise.all( tasks );
 
-		spinner.text = `Cleaned ${ description }.`;
+		spinner.text = `Reset ${ description }.`;
 	}
 
 	/**

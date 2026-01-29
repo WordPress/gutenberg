@@ -163,12 +163,30 @@ module.exports = function cli() {
 		withSpinner( env.stop )
 	);
 	yargs.command(
-		'clean [environment]',
-		wpYellow( 'Cleans the WordPress databases.' ),
+		'reset [environment]',
+		wpYellow( 'Resets the WordPress databases.' ),
 		( args ) => {
 			args.positional( 'environment', {
 				type: 'string',
-				describe: "Which environments' databases to clean.",
+				describe: "Which environments' databases to reset.",
+				choices: [ 'all', 'development', 'tests' ],
+				default: 'tests',
+			} );
+			args.option( 'scripts', {
+				type: 'boolean',
+				describe: 'Execute any configured lifecycle scripts.',
+				default: true,
+			} );
+		},
+		withSpinner( env.reset )
+	);
+	yargs.command(
+		'clean [environment]',
+		chalk.gray( '[Deprecated: use reset] Resets the WordPress databases.' ),
+		( args ) => {
+			args.positional( 'environment', {
+				type: 'string',
+				describe: "Which environments' databases to reset.",
 				choices: [ 'all', 'development', 'tests' ],
 				default: 'tests',
 			} );

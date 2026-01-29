@@ -186,7 +186,7 @@ To reset the database:
 **⚠️ WARNING: This will permanently delete any posts, pages, media, etc. in the local WordPress installation.**
 
 ```sh
-$ wp-env clean all
+$ wp-env reset all
 $ wp-env start
 ```
 
@@ -340,15 +340,15 @@ Options:
   --debug            Enable debug output.             [boolean] [default: false]
 ```
 
-### `wp-env clean [environment]`
+### `wp-env reset [environment]`
 
 ```sh
-wp-env clean [environment]
+wp-env reset [environment]
 
-Cleans the WordPress databases.
+Resets the WordPress databases.
 
 Positionals:
-  environment  Which environments' databases to clean.
+  environment  Which environments' databases to reset.
             [string] [choices: "all", "development", "tests"] [default: "tests"]
 
 Options:
@@ -644,7 +644,7 @@ example, `WP_ENV_LIFECYCLE_SCRIPT_AFTER_START`. Keep in mind that these will be 
 build won't break on subsequent executions.
 
 * `afterStart`: Runs after `wp-env start` has finished setting up the environment.
-* `afterClean`: Runs after `wp-env clean` has finished cleaning the environment.
+* `afterReset`: Runs after `wp-env reset` has finished resetting the environment.
 * `afterCleanup`: Runs after `wp-env cleanup` has cleaned up the environment.
 * `afterDestroy`: Runs after `wp-env destroy` has destroyed the environment.
 
