@@ -59,7 +59,7 @@
 		grid-template-columns: 24px 1fr;
 		align-items: center;
 		justify-content: flex-start;
-		gap: var(--wpds-dimension-gap-2xs);
+		gap: var(--wpds-dimension-gap-xs);
 		min-height: var(--wp-ui-popup-item-height);
 		border-radius: var(--wpds-border-radius-sm);
 		user-select: none;

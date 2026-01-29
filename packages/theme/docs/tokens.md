@@ -126,12 +126,12 @@ Do not edit directly.
 | `--wpds-dimension-padding-xl`  | Extra large padding    |
 | `--wpds-dimension-padding-2xl` | 2x extra large padding |
 | `--wpds-dimension-padding-3xl` | 3x extra large padding |
-| `--wpds-dimension-gap-2xs`     | 2x extra small gap     |
 | `--wpds-dimension-gap-xs`      | Extra small gap        |
 | `--wpds-dimension-gap-sm`      | Small gap              |
 | `--wpds-dimension-gap-md`      | Medium gap             |
 | `--wpds-dimension-gap-lg`      | Large gap              |
 | `--wpds-dimension-gap-xl`      | Extra large gap        |
+| `--wpds-dimension-gap-2xl`     | 2x extra large gap     |
 
 ### Elevation
 
