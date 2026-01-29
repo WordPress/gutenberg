@@ -1431,7 +1431,6 @@ class WP_Theme_JSON_Gutenberg {
 		$style_nodes     = static::get_style_nodes( $this->theme_json, $blocks_metadata, $options );
 		$setting_nodes   = static::get_setting_nodes( $this->theme_json, $blocks_metadata );
 
-
 		$root_style_key    = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $style_nodes, 'selector' ), true );
 		$root_settings_key = array_search( static::ROOT_BLOCK_SELECTOR, array_column( $setting_nodes, 'selector' ), true );
 
