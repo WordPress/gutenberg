@@ -61,6 +61,7 @@ export function CollaboratorsList( {
 			placement="bottom"
 			offset={ 8 }
 			className="editor-collaborators-presence__list"
+			onClose={ () => setIsPopoverVisible( false ) }
 		>
 			<div className="editor-collaborators-presence__list-content">
 				<div className="editor-collaborators-presence__list-header">
