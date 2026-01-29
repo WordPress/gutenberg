@@ -181,6 +181,20 @@ module.exports = function buildDockerComposeConfig( config ) {
 		config.env.tests.phpmyadminPort ?? ''
 	}}:80`;
 
+	// MySQL healthcheck using mariadb-admin ping.
+	// Uses root credentials to avoid requiring special healthcheck user,
+	// which would break existing wp-env installations.
+	const mysqlHealthcheck = {
+		test: [
+			'CMD-SHELL',
+			'mariadb-admin ping -h localhost -u root -p$MYSQL_ROOT_PASSWORD',
+		],
+		interval: '5s',
+		timeout: '5s',
+		retries: 10,
+		start_period: '30s',
+	};
+
 	return {
 		services: {
 			mysql: {
@@ -193,6 +207,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 					MYSQL_DATABASE: dbEnv.development.WORDPRESS_DB_NAME,
 				},
 				volumes: [ 'mysql:/var/lib/mysql' ],
+				healthcheck: mysqlHealthcheck,
 			},
 			'tests-mysql': {
 				image: 'mariadb:lts',
@@ -204,9 +219,14 @@ module.exports = function buildDockerComposeConfig( config ) {
 					MYSQL_DATABASE: dbEnv.tests.WORDPRESS_DB_NAME,
 				},
 				volumes: [ 'mysql-test:/var/lib/mysql' ],
+				healthcheck: mysqlHealthcheck,
 			},
 			wordpress: {
-				depends_on: [ 'mysql' ],
+				depends_on: {
+					mysql: {
+						condition: 'service_healthy',
+					},
+				},
 				build: {
 					context: '.',
 					dockerfile: 'WordPress.Dockerfile',
@@ -224,7 +244,11 @@ module.exports = function buildDockerComposeConfig( config ) {
 				extra_hosts: [ 'host.docker.internal:host-gateway' ],
 			},
 			'tests-wordpress': {
-				depends_on: [ 'tests-mysql' ],
+				depends_on: {
+					'tests-mysql': {
+						condition: 'service_healthy',
+					},
+				},
 				build: {
 					context: '.',
 					dockerfile: 'Tests-WordPress.Dockerfile',

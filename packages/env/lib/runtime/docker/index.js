@@ -11,7 +11,6 @@ const { rimraf } = require( 'rimraf' );
 /**
  * Promisified dependencies
  */
-const sleep = util.promisify( setTimeout );
 const exec = util.promisify( require( 'child_process' ).exec );
 
 /**
@@ -26,7 +25,6 @@ const {
 	validateRunContainer,
 } = require( './validate-run-container' );
 const {
-	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,
 	setupWordPressDirectories,
@@ -174,7 +172,7 @@ class DockerRuntime {
 		}
 
 		await Promise.all( [
-			dockerCompose.upOne( 'mysql', {
+			dockerCompose.upMany( [ 'mysql', 'tests-mysql' ], {
 				...dockerComposeConfig,
 				commandOptions: shouldConfigureWp
 					? [ '--build', '--force-recreate' ]
@@ -249,19 +247,6 @@ class DockerRuntime {
 		// Only run WordPress install/configuration when config has changed.
 		if ( shouldConfigureWp ) {
 			spinner.text = 'Configuring WordPress.';
-
-			try {
-				await checkDatabaseConnection( fullConfig );
-			} catch ( error ) {
-				// Wait 30 seconds for MySQL to accept connections.
-				await retry( () => checkDatabaseConnection( fullConfig ), {
-					times: 30,
-					delay: 1000,
-				} );
-
-				// It takes 3-4 seconds for MySQL to be ready after it starts accepting connections.
-				await sleep( 4000 );
-			}
 
 			// Retry WordPress installation in case MySQL *still* wasn't ready.
 			await Promise.all( [

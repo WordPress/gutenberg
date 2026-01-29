@@ -131,4 +131,71 @@ describe( 'buildDockerComposeConfig', () => {
 		expect( dockerConfig.volumes.wordpress ).toBe( undefined );
 		expect( dockerConfig.volumes[ 'tests-wordpress' ] ).toBe( undefined );
 	} );
+
+	it( 'should add healthcheck to mysql services', () => {
+		const config = buildDockerComposeConfig( {
+			workDirectoryPath: '/some/path',
+			env: {
+				development: {
+					port: 8888,
+					mysqlPort: 3306,
+					coreSource: null,
+					pluginSources: [],
+					themeSources: [],
+					mappings: {},
+				},
+				tests: {
+					port: 8889,
+					mysqlPort: 3307,
+					coreSource: null,
+					pluginSources: [],
+					themeSources: [],
+					mappings: {},
+				},
+			},
+		} );
+
+		expect( config.services.mysql.healthcheck ).toBeDefined();
+		expect( config.services.mysql.healthcheck.test ).toContain(
+			'CMD-SHELL'
+		);
+		expect( config.services.mysql.healthcheck.interval ).toBe( '5s' );
+		expect( config.services.mysql.healthcheck.start_period ).toBe( '30s' );
+
+		expect( config.services[ 'tests-mysql' ].healthcheck ).toBeDefined();
+		expect( config.services[ 'tests-mysql' ].healthcheck.test ).toContain(
+			'CMD-SHELL'
+		);
+	} );
+
+	it( 'should use service_healthy condition for WordPress depends_on', () => {
+		const config = buildDockerComposeConfig( {
+			workDirectoryPath: '/some/path',
+			env: {
+				development: {
+					port: 8888,
+					mysqlPort: 3306,
+					coreSource: null,
+					pluginSources: [],
+					themeSources: [],
+					mappings: {},
+				},
+				tests: {
+					port: 8889,
+					mysqlPort: 3307,
+					coreSource: null,
+					pluginSources: [],
+					themeSources: [],
+					mappings: {},
+				},
+			},
+		} );
+
+		expect( config.services.wordpress.depends_on ).toEqual( {
+			mysql: { condition: 'service_healthy' },
+		} );
+		expect( config.services[ 'tests-wordpress' ].depends_on ).toEqual( {
+			'tests-mysql': { condition: 'service_healthy' },
+		} );
+	} );
 } );

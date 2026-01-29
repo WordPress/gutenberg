@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is ready to accept connections.
+
 ## 10.39.0 (2026-01-29)
 
 ### New Features
