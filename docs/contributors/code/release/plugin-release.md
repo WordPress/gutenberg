@@ -46,9 +46,9 @@ For urgent fixes after RC1 or critical bug fixes between major releases:
 
 -   For new RCs: Use PRs labeled `Backport to Gutenberg RC`
 -   For minor releases: Use PRs labeled `Backport to Gutenberg Minor Release`
--   **Note:** You must be a Core Committer or work with one to cherry-pick to release branches
+-   **Note:** You must be a member of the [Gutenberg Core Team](https://github.com/orgs/WordPress/teams/gutenberg-core) or work with one to cherry-pick to release branches
 -   Checkout the appropriate release branch: `git checkout release/X.Y`
--   Run: `npm run other:cherry-pick "[Label Name]"` (or request a Core Committer to run it)
+-   Run: `npm run other:cherry-pick "[Label Name]"` (or request a member of the [Gutenberg Core Team](https://github.com/orgs/WordPress/teams/gutenberg-core) to run it)
 -   Reassign PRs to correct milestone (e.g., from `12.6` to `12.5`) **before** running the workflow
 
 #### Run Release Workflow
@@ -205,9 +205,9 @@ There are a couple of ways you might be made aware of these bugs as a release ma
 The cherry-picking process can be automated with the `npm run other:cherry-pick "[Insert Label]"` script, which is included in Gutenberg. You will need to use the label `Backport to Gutenberg RC` when running the command and ensure all PRs that need cherry-picking have the label assigned.
 
 <div class="callout callout-warning">
-To cherry-pick PRs, you must clone (not fork) the Gutenberg repository and have write access. Only members of the <a href="https://developer.wordpress.org/block-editor/contributors/repository-management/#teams">Gutenberg development team</a> (Core Committers in the <code>gutenberg-core</code> team) have the necessary permissions to push directly to release branches.</div>
+To cherry-pick PRs, you must clone (not fork) the Gutenberg repository and have write access. Only members of the <a href="https://developer.wordpress.org/block-editor/contributors/repository-management/#teams"><strong>Gutenberg Core</strong> team</a> have the necessary permissions to push directly to release branches.</div>
 
-#### For Core Committers with push access
+#### For "Gutenberg Core" members with push access
 
 Once you have cloned the Gutenberg repository to your local development environment, begin by switching to the release branch:
 
@@ -233,7 +233,7 @@ Here is a screenshot of the process:
 
 ![Automated cherry-picking](https://developer.wordpress.org/files/2023/07/image-7.png)
 
-#### Alternative process for contributors without push access
+#### Alternative process for contributors who are not members of the "Gutenberg Core" team
 
 If you don't have write access to push directly to release branches, you can use this alternative approach **from your fork**:
 
@@ -259,11 +259,11 @@ If you don't have write access to push directly to release branches, you can use
    git push origin backport-fixes-X.Y.Z
    ```
 
-5. Create a pull request from your fork targeting the `release/X.Y` branch in the main repository and request review from a Core Committer
+5. Create a pull request from your fork targeting the `release/X.Y` branch in the main repository and request review from a member of the [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core) team
 
-6. Once approved and merged, coordinate with the Core Committer or release lead to continue the release process
+6. Once approved and merged, coordinate with a member of the [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core) team or release lead to continue the release process
 
-Alternatively, you can ask a Core Committer to run the cherry-pick command for you in the [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) Slack channel.
+Alternatively, you can ask a member of the [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core) team to run the cherry-pick command for you in the [#core-editor](https://wordpress.slack.com/messages/C02QB2JS7) Slack channel.
 
 #### Manual cherry-picking
 
