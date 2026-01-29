@@ -26,11 +26,15 @@ const { fieldsKey, formKey } = unlock( blocksPrivateApis );
 import FieldsDropdownMenu from './fields-dropdown-menu';
 import { PrivateBlockContext } from '../../components/block-list/private-block-context';
 import InspectorControls from '../../components/inspector-controls/fill';
+import BlockContext from '../../components/block-context';
 
 // controls
 import RichText from './rich-text';
 import Media from './media';
 import Link from './link';
+
+// bindings
+import { withBindingBadge, isFieldBindable } from './bindings';
 
 /**
  * Creates a configured control component that wraps a custom control
@@ -77,6 +81,12 @@ function BlockFields( {
 		[ clientId ]
 	);
 
+	// Get block context for bindings integration
+	const blockContext = useContext( BlockContext );
+
+	// Check if bindings integration is enabled
+	const bindingsEnabled = window?.__experimentalBlockFieldsBindings;
+
 	const computedForm = useMemo( () => {
 		if ( ! isCollapsed ) {
 			return blockType?.[ formKey ];
@@ -111,9 +121,25 @@ function BlockFields( {
 				'string' === typeof fieldDef.Edit &&
 				fieldDef.Edit === 'rich-text'
 			) {
-				field.Edit = createConfiguredControl( RichText, {
+				const configuredControl = createConfiguredControl( RichText, {
 					clientId,
 				} );
+
+				// Wrap with binding badge for bindable fields
+				if (
+					bindingsEnabled &&
+					isFieldBindable( blockType.name, field.id )
+				) {
+					field.Edit = withBindingBadge(
+						configuredControl,
+						field.id,
+						blockType.name,
+						clientId,
+						blockContext
+					);
+				} else {
+					field.Edit = configuredControl;
+				}
 			} else if (
 				'string' === typeof fieldDef.Edit &&
 				fieldDef.Edit === 'link'
@@ -130,7 +156,13 @@ function BlockFields( {
 
 			return field;
 		} );
-	}, [ blockTypeFields, clientId ] );
+	}, [
+		blockTypeFields,
+		clientId,
+		blockType,
+		bindingsEnabled,
+		blockContext,
+	] );
 
 	if ( ! blockTypeFields?.length ) {
 		// TODO - we might still want to show a placeholder for blocks with no fields.

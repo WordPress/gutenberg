@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { store as blocksStore } from '@wordpress/blocks';
+import {
+	store as blocksStore,
+	privateApis as blocksPrivateApis,
+} from '@wordpress/blocks';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalText as Text,
@@ -42,31 +45,47 @@ export const BlockBindingsPanel = ( { name: blockName, metadata } ) => {
 	const { removeAllBlockBindings } = useBlockBindingsUtils();
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
-	const { bindableAttributes, hasCompatibleFields } = useSelect(
-		( select ) => {
-			const { __experimentalBlockBindingsSupportedAttributes } =
-				select( blockEditorStore ).getSettings();
-			const {
-				getAllBlockBindingsSources,
-				getBlockBindingsSourceFieldsList,
-			} = unlock( select( blocksStore ) );
+	const { bindableAttributes, hasCompatibleFields, hasBlockFields } =
+		useSelect(
+			( select ) => {
+				const { __experimentalBlockBindingsSupportedAttributes } =
+					select( blockEditorStore ).getSettings();
+				const {
+					getAllBlockBindingsSources,
+					getBlockBindingsSourceFieldsList,
+				} = unlock( select( blocksStore ) );
 
-			return {
-				bindableAttributes:
-					__experimentalBlockBindingsSupportedAttributes?.[
-						blockName
-					],
-				hasCompatibleFields: Object.values(
-					getAllBlockBindingsSources()
-				).some(
-					( source ) =>
-						getBlockBindingsSourceFieldsList( source, blockContext )
-							?.length > 0
-				),
-			};
-		},
-		[ blockName, blockContext ]
-	);
+				const blockType =
+					select( blocksStore ).getBlockType( blockName );
+				const { fieldsKey } = unlock( blocksPrivateApis );
+
+				return {
+					bindableAttributes:
+						__experimentalBlockBindingsSupportedAttributes?.[
+							blockName
+						],
+					hasCompatibleFields: Object.values(
+						getAllBlockBindingsSources()
+					).some(
+						( source ) =>
+							getBlockBindingsSourceFieldsList(
+								source,
+								blockContext
+							)?.length > 0
+					),
+					hasBlockFields: !! (
+						window?.__experimentalContentOnlyInspectorFields &&
+						blockType?.[ fieldsKey ]
+					),
+				};
+			},
+			[ blockName, blockContext ]
+		);
+
+	// Hide if Block Fields handle bindings
+	if ( hasBlockFields && window?.__experimentalBlockFieldsBindings ) {
+		return null;
+	}
 
 	// Return early if there are no bindable attributes.
 	if ( ! bindableAttributes || bindableAttributes.length === 0 ) {

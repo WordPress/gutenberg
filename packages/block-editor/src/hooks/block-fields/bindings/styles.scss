@@ -1,0 +1,43 @@
+// HOC wrapper - layout field + badge
+.block-fields__field-with-binding {
+	display: flex;
+	align-items: center;
+	gap: $grid-unit-10;
+}
+
+// Badge positioning and base styles
+.binding-field-badge {
+	flex-shrink: 0;
+
+	// Connected state - use purple icon
+	&.is-connected .components-button {
+		color: var(--wp-block-synced-color);
+
+		// Light purple background on hover (matches block toolbar pattern)
+		&:hover::before {
+			background: color-mix(in srgb, var(--wp-block-synced-color) 10%, transparent);
+		}
+	}
+
+	// Unconnected state - subtle, visible on hover
+	&__connect {
+		opacity: 0.6;
+
+		&:hover {
+			opacity: 1;
+			color: var(--wp-block-synced-color);
+		}
+	}
+
+	// Invalid binding error state
+	&.is-invalid .components-button {
+		color: var(--wp-admin-theme-color-error, #cc1818);
+	}
+}
+
+// Optional: Add subtle background to bound fields (matches list view pattern)
+.block-fields__field-with-binding.is-bound {
+	background: rgba(var(--wp-block-synced-color--rgb), 0.04);
+	padding: $grid-unit-05;
+	border-radius: $radius-small;
+}

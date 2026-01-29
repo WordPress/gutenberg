@@ -3,6 +3,7 @@
 @use "./link/styles.scss" as *;
 @use "./media/styles.scss" as *;
 @use "./rich-text/styles.scss" as *;
+@use "./bindings/styles.scss" as *;
 
 .block-editor-block-fields__container {
 	padding: 0 $grid-unit-20;
