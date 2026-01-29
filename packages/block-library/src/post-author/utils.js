@@ -35,9 +35,9 @@ export function recreateWithRecommendedBlocks( attributes, blockTypes ) {
 	const shouldInsertAvatarBlock =
 		showAvatar &&
 		blockTypes.some( ( blockType ) => blockType.name === 'core/avatar' );
-	const shouldInsertParagraphBlock = blockTypes.some(
-		( blockType ) => blockType.name === 'core/paragraph'
-	);
+	const shouldInsertParagraphBlock =
+		byline &&
+		blockTypes.some( ( blockType ) => blockType.name === 'core/paragraph' );
 	const shouldInsertPostAuthorNameBlock = blockTypes.some(
 		( blockType ) => blockType.name === 'core/post-author-name'
 	);
