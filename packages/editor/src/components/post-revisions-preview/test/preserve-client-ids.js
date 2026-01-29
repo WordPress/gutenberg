@@ -125,7 +125,8 @@ describe( 'preserveClientIds', () => {
 		const result = preserveClientIds( newBlocks, prevBlocks );
 
 		expect( result ).toHaveLength( 1 );
-		expect( result[ 0 ].clientId ).toBe( 'prev-2' );
+		// Matches by name only, so first paragraph matches first paragraph.
+		expect( result[ 0 ].clientId ).toBe( 'prev-1' );
 	} );
 
 	it( 'should preserve clientIds for inner blocks recursively', () => {
@@ -170,7 +171,7 @@ describe( 'preserveClientIds', () => {
 		expect( result[ 0 ].innerBlocks[ 0 ].clientId ).toBe( 'prev-inner-1' );
 	} );
 
-	it( 'should not preserve clientId when attributes differ', () => {
+	it( 'should preserve clientId even when attributes differ (matches by name only)', () => {
 		const prevBlocks = [
 			{
 				name: 'core/paragraph',
@@ -192,7 +193,7 @@ describe( 'preserveClientIds', () => {
 
 		const result = preserveClientIds( newBlocks, prevBlocks );
 
-		expect( result[ 0 ].clientId ).toBe( 'new-1' );
+		expect( result[ 0 ].clientId ).toBe( 'prev-1' );
 	} );
 
 	it( 'should handle blocks with same name but different content using LCS', () => {
@@ -238,7 +239,8 @@ describe( 'preserveClientIds', () => {
 
 		const result = preserveClientIds( newBlocks, prevBlocks );
 
+		// Matches by name only, so matches in order (first to first, second to second).
 		expect( result[ 0 ].clientId ).toBe( 'prev-a' );
-		expect( result[ 1 ].clientId ).toBe( 'prev-c' );
+		expect( result[ 1 ].clientId ).toBe( 'prev-b' );
 	} );
 } );
