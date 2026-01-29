@@ -110,7 +110,6 @@ ${ chalk.dim( 'Run `wp-env start` to initialize the environment.' ) }
 function formatStatus( status ) {
 	const statusColor = status.status === 'running' ? chalk.green : chalk.red;
 	const indent = '    - ';
-	const envIndent = '        - ';
 
 	let output = `
 ${ chalk.bold( 'status' ) }: ${ statusColor( status.status ) }
@@ -122,33 +121,31 @@ ${ indent }config: ${ chalk.dim( status.configDirectoryPath ) }
 	// Environment section.
 	output += `\n${ chalk.bold( 'environment' ) }:\n`;
 	if ( status.urls?.development ) {
-		output += `${ envIndent }url: ${ chalk.dim(
-			status.urls.development
-		) }\n`;
+		output += `${ indent }url: ${ chalk.dim( status.urls.development ) }\n`;
 	}
-	output += `${ envIndent }multisite: ${ chalk.dim(
+	output += `${ indent }multisite: ${ chalk.dim(
 		status.config?.multisite ? 'yes' : 'no'
 	) }\n`;
-	output += `${ envIndent }xdebug: ${ chalk.dim(
+	output += `${ indent }xdebug: ${ chalk.dim(
 		status.config?.xdebug || 'off'
 	) }\n`;
 	if ( status.ports?.development ) {
-		output += `${ envIndent }http port: ${ chalk.dim(
+		output += `${ indent }http port: ${ chalk.dim(
 			status.ports.development
 		) }\n`;
 	}
 	if ( status.urls?.phpmyadmin ) {
-		output += `${ envIndent }phpmyadmin url: ${ chalk.dim(
+		output += `${ indent }phpmyadmin url: ${ chalk.dim(
 			status.urls.phpmyadmin
 		) }\n`;
 	}
 	if ( status.ports?.mysql ) {
-		output += `${ envIndent }mysql port: ${ chalk.dim(
+		output += `${ indent }mysql port: ${ chalk.dim(
 			status.ports.mysql
 		) }\n`;
 	}
 	if ( status.ports?.tests ) {
-		output += `${ envIndent }test http port: ${ chalk.dim(
+		output += `${ indent }test http port: ${ chalk.dim(
 			status.ports.tests
 		) }\n`;
 	}
