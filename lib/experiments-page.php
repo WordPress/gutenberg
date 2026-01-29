@@ -186,6 +186,18 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
+		'gutenberg-block-fields-bindings',
+		__( 'Block fields: Integrate Block Bindings with Block Fields', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables Block Bindings integration directly in Block Fields UI, allowing you to connect block attributes to data sources alongside field controls.', 'gutenberg' ),
+			'id'    => 'gutenberg-block-fields-bindings',
+		)
+	);
+
+	add_settings_field(
 		'gutenberg-workflow-palette',
 		__( 'Workflow Palette', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
