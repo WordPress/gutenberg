@@ -117,6 +117,12 @@ export abstract class AwarenessState<
 	/** CUSTOM PROPERTIES */
 
 	/**
+	 * Whether the setUp method has been called, to avoid running it multiple
+	 * times.
+	 */
+	private hasSetupRun = false;
+
+	/**
 	 * We keep track of all seen states during the current session for two reasons:
 	 *
 	 * 1. So that we can represent recently disconnected users in our UI, even
@@ -148,9 +154,17 @@ export abstract class AwarenessState<
 	/** CUSTOM METHODS */
 
 	/**
-	 * Set up the awareness state.
+	 * Set up the awareness state. This method is idempotent and will only run
+	 * once. Subclasses should override `onSetUp()` instead of this method to
+	 * add their own setup logic.
 	 */
 	public setUp(): void {
+		if ( this.hasSetupRun ) {
+			return;
+		}
+
+		this.hasSetupRun = true;
+
 		this.on(
 			'change',
 			( { added, removed, updated }: AwarenessStateChange ) => {
@@ -172,6 +186,17 @@ export abstract class AwarenessState<
 				this.updateSubscribers();
 			}
 		);
+
+		this.onSetUp();
+	}
+
+	/**
+	 * Hook method for subclasses to add their own setup logic. This is called
+	 * once after the base class setup completes. Subclasses should override
+	 * this method and call `super.onSetUp()` to ensure parent setup runs.
+	 */
+	protected onSetUp(): void {
+		// Default empty implementation for subclasses to override.
 	}
 
 	/**

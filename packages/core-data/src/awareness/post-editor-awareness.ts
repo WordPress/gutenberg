@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { dispatch, select, subscribe } from '@wordpress/data';
+import { Y } from '@wordpress/sync';
 // @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -43,8 +44,8 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		super( doc );
 	}
 
-	public setUp(): void {
-		super.setUp();
+	protected onSetUp(): void {
+		super.onSetUp();
 
 		this.subscribeToUserSelectionChanges();
 	}

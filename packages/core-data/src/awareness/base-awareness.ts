@@ -15,8 +15,8 @@ import type { BaseState } from './types';
 export abstract class BaseAwarenessState<
 	State extends BaseState,
 > extends AwarenessState< State > {
-	public setUp(): void {
-		super.setUp();
+	protected onSetUp(): void {
+		super.onSetUp();
 
 		void this.setCurrentUserInfo();
 	}
