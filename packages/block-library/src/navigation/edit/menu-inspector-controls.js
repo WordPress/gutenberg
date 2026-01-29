@@ -11,9 +11,12 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
 	Spinner,
+	Button,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
+import { arrowLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -27,6 +30,7 @@ import {
 	LinkUI,
 	updateAttributes,
 	useEntityBinding,
+	Controls as NavigationLinkControls,
 } from '../../navigation-link/shared';
 
 const actionLabel =
@@ -140,6 +144,10 @@ const MainContent = ( {
 	isNavigationMenuMissing,
 	onCreateNew,
 } ) => {
+	const [ selectedItemClientId, setSelectedItemClientId ] = useState( null );
+	const { selectBlock } = useDispatch( blockEditorStore );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
 	const hasChildren = useSelect(
 		( select ) => {
 			return !! select( blockEditorStore ).getBlockCount( clientId );
@@ -147,7 +155,39 @@ const MainContent = ( {
 		[ clientId ]
 	);
 
+	// Get selected block details
+	const selectedBlock = useSelect(
+		( select ) => {
+			if ( ! selectedItemClientId ) {
+				return null;
+			}
+			const { getBlock } = select( blockEditorStore );
+			return getBlock( selectedItemClientId );
+		},
+		[ selectedItemClientId ]
+	);
+
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
+
+	// Handler to select navigation item when clicked in list view
+	const handleSelectBlock = ( block ) => {
+		if ( block ) {
+			selectBlock( block.clientId );
+			setSelectedItemClientId( block.clientId );
+		}
+	};
+
+	// Handler to close the inspector panel
+	const handleCloseInspector = () => {
+		setSelectedItemClientId( null );
+	};
+
+	// Handler to update block attributes
+	const handleSetAttributes = ( attributes ) => {
+		if ( selectedItemClientId ) {
+			updateBlockAttributes( selectedItemClientId, attributes );
+		}
+	};
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
 		return (
@@ -169,23 +209,46 @@ const MainContent = ( {
 				'You have not yet created any menus. Displaying a list of your Pages'
 		  );
 
-	return (
-		<div className="wp-block-navigation__menu-inspector-controls">
-			{ ! hasChildren && (
-				<p className="wp-block-navigation__menu-inspector-controls__empty-message">
-					{ __( 'This Navigation Menu is empty.' ) }
-				</p>
-			) }
-			<PrivateListView
-				rootClientId={ clientId }
-				isExpanded
-				description={ description }
-				showAppender
-				blockSettingsMenu={ LeafMoreMenu }
-				additionalBlockContent={ AdditionalBlockContent }
-			/>
-		</div>
-	);
+	// Show inspector controls if an item is selected, otherwise show List View
+	const showInspector =
+		selectedBlock &&
+		BLOCKS_WITH_LINK_UI_SUPPORT.includes( selectedBlock.name );
+
+	return {
+		showInspector,
+		selectedBlock,
+		handleCloseInspector,
+		content: (
+			<div className="wp-block-navigation__menu-inspector-controls">
+				{ showInspector ? (
+					<div className="wp-block-navigation__menu-item-inspector">
+						<NavigationLinkControls
+							attributes={ selectedBlock.attributes }
+							setAttributes={ handleSetAttributes }
+							clientId={ selectedItemClientId }
+						/>
+					</div>
+				) : (
+					<>
+						{ ! hasChildren && (
+							<p className="wp-block-navigation__menu-inspector-controls__empty-message">
+								{ __( 'This Navigation Menu is empty.' ) }
+							</p>
+						) }
+						<PrivateListView
+							rootClientId={ clientId }
+							isExpanded
+							description={ description }
+							showAppender
+							blockSettingsMenu={ LeafMoreMenu }
+							additionalBlockContent={ AdditionalBlockContent }
+							onSelect={ handleSelectBlock }
+						/>
+					</>
+				) }
+			</div>
+		),
+	};
 };
 
 const MenuInspectorControls = ( props ) => {
@@ -200,17 +263,41 @@ const MenuInspectorControls = ( props ) => {
 		blockEditingMode,
 	} = props;
 
+	const { showInspector, selectedBlock, handleCloseInspector, content } =
+		MainContent( props );
+
+	// Determine the heading text based on whether an item is selected
+	let headingText = __( 'Menu' );
+	if ( showInspector ) {
+		headingText =
+			selectedBlock.name === 'core/navigation-submenu'
+				? __( 'Submenu settings' )
+				: __( 'Link settings' );
+	}
+
 	return (
 		<InspectorControls group="list">
 			<PanelBody title={ null }>
-				<HStack className="wp-block-navigation-off-canvas-editor__header">
+				<HStack
+					className="wp-block-navigation-off-canvas-editor__header"
+					justify="flex-start"
+					spacing={ 2 }
+				>
+					{ showInspector && (
+						<Button
+							icon={ arrowLeft }
+							label={ __( 'Back' ) }
+							onClick={ handleCloseInspector }
+							size="small"
+						/>
+					) }
 					<Heading
 						className="wp-block-navigation-off-canvas-editor__title"
 						level={ 2 }
 					>
-						{ __( 'Menu' ) }
+						{ headingText }
 					</Heading>
-					{ blockEditingMode === 'default' && (
+					{ ! showInspector && blockEditingMode === 'default' && (
 						<NavigationMenuSelector
 							currentMenuId={ currentMenuId }
 							onSelectClassicMenu={ onSelectClassicMenu }
@@ -229,7 +316,7 @@ const MenuInspectorControls = ( props ) => {
 						/>
 					) }
 				</HStack>
-				<MainContent { ...props } />
+				{ content }
 			</PanelBody>
 		</InspectorControls>
 	);

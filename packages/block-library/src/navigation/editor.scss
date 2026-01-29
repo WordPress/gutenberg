@@ -635,6 +635,11 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	overflow-x: auto;
 
 	@include custom-scrollbars-on-hover(transparent, $gray-600);
+
+	// Add top padding when showing inspector to account for border
+	&:has(.wp-block-navigation__menu-item-inspector) {
+		padding-top: $grid-unit-20;
+	}
 }
 
 .wp-block-navigation__menu-inspector-controls__empty-message {
@@ -719,4 +724,19 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 
 .wp-block-navigation__deleted-overlay-warning {
 	margin-top: $grid-unit-15;
+}
+
+// Menu item inspector controls styles
+.wp-block-navigation__menu-item-inspector {
+	.components-tools-panel {
+		padding: 0;
+		margin: 0 (-$grid-unit-20);
+		border-top: none;
+	}
+
+	.components-tools-panel-header,
+	.components-tools-panel-item {
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
+	}
 }
