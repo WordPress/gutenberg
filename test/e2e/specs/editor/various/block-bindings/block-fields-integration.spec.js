@@ -6,30 +6,18 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Block Fields Bindings Integration', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
-		// Enable feature flags via REST API
-		await requestUtils.rest( {
-			method: 'POST',
-			path: '/wp/v2/settings',
-			data: {
-				'gutenberg-experiments': {
-					'gutenberg-content-only-inspector-fields': true,
-					'gutenberg-block-fields-bindings': true,
-				},
-			},
-		} );
+		// Enable feature flags
+		await requestUtils.setGutenbergExperiments( [
+			'gutenberg-content-only-inspector-fields',
+			'gutenberg-block-fields-bindings',
+		] );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllPosts();
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
 		// Disable feature flags
-		await requestUtils.rest( {
-			method: 'POST',
-			path: '/wp/v2/settings',
-			data: {
-				'gutenberg-experiments': {},
-			},
-		} );
+		await requestUtils.setGutenbergExperiments( [] );
 	} );
 
 	test.beforeEach( async ( { admin } ) => {

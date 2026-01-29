@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { getBlockBindingsSource, getBlockType } from '@wordpress/blocks';
+import { getBlockBindingsSource } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -32,11 +32,11 @@ export default function useBindingState( {
 				select( blockEditorStore ).getBlockAttributes( clientId );
 			const binding = attributes?.metadata?.bindings?.[ fieldId ];
 
-			// Check if field is bindable
-			const blockType = getBlockType( blockName );
+			// Check if field is bindable (from editor settings, not block.supports)
+			const { __experimentalBlockBindingsSupportedAttributes } =
+				select( blockEditorStore ).getSettings();
 			const supportedAttrs =
-				blockType?.supports
-					?.__experimentalBlockBindingsSupportedAttributes;
+				__experimentalBlockBindingsSupportedAttributes?.[ blockName ];
 			const isBindable =
 				Array.isArray( supportedAttrs ) &&
 				supportedAttrs.includes( fieldId );
