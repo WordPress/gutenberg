@@ -58,13 +58,23 @@ export default function useNavigateToEntityRecord() {
 				}
 			}
 
+			// Build query args for destination URL
+			const queryArgs = {
+				canvas: 'edit',
+				focusMode: true,
+			};
+
+			// Add selectedBlock to destination if provided (for deep linking to a specific block)
+			if ( params.destinationBlockPath ) {
+				queryArgs.selectedBlock = encodeURIComponent(
+					JSON.stringify( params.destinationBlockPath )
+				);
+			}
+
 			// Then navigate to the new entity record
 			const url = addQueryArgs(
 				`/${ params.postType }/${ params.postId }`,
-				{
-					canvas: 'edit',
-					focusMode: true,
-				}
+				queryArgs
 			);
 
 			history.navigate( url );

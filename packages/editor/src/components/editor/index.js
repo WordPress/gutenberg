@@ -101,28 +101,23 @@ function Editor( {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const restoreBlockFromPath = useRestoreBlockFromPath();
 
-	// Restore initial block selection if provided (e.g., from navigation)
-	useEffect( () => {
+	// Try to resolve the initial selection path to a clientId
+	// This will return null if the blocks aren't loaded yet or path can't be resolved
+	const restoredClientId = useSelect( () => {
 		if ( ! initialSelection || ! hasLoadedPost || ! post ) {
-			return;
+			return null;
 		}
+		// Attempt to restore the block from the path
+		// This will only succeed once the blocks are actually loaded
+		return restoreBlockFromPath( initialSelection );
+	}, [ initialSelection, hasLoadedPost, post, restoreBlockFromPath ] );
 
-		// Use setTimeout to ensure blocks are fully rendered before selecting
-		const timeoutId = setTimeout( () => {
-			const clientId = restoreBlockFromPath( initialSelection );
-			if ( clientId ) {
-				selectBlock( clientId );
-			}
-		}, 0 );
-
-		return () => clearTimeout( timeoutId );
-	}, [
-		initialSelection,
-		hasLoadedPost,
-		post,
-		selectBlock,
-		restoreBlockFromPath,
-	] );
+	// Select the restored block once we have a valid clientId
+	useEffect( () => {
+		if ( restoredClientId ) {
+			selectBlock( restoredClientId );
+		}
+	}, [ restoredClientId, selectBlock ] );
 
 	return (
 		<>

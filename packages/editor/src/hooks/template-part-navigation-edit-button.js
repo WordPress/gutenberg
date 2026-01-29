@@ -13,6 +13,11 @@ import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 
+/**
+ * Internal dependencies
+ */
+import { useGenerateBlockPath } from '../utils/block-selection-path';
+
 // Block name constants
 const NAVIGATION_BLOCK_NAME = 'core/navigation';
 const TEMPLATE_PART_BLOCK_NAME = 'core/template-part';
@@ -31,17 +36,23 @@ const BLOCK_INSPECTOR_AREA = 'edit-post/block';
 function TemplatePartNavigationEditButton( { clientId } ) {
 	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const generateBlockPath = useGenerateBlockPath();
 
 	const {
 		hasNavigationBlocks,
 		firstNavigationBlockId,
 		isNavigationEditable,
+		templatePartSlug,
+		templatePartTheme,
+		onNavigateToEntityRecord,
 	} = useSelect(
 		( select ) => {
 			const {
 				getClientIdsOfDescendants,
 				getBlockName,
 				getBlockEditingMode,
+				getBlockAttributes,
+				getSettings,
 			} = select( blockEditorStore );
 
 			const descendants = getClientIdsOfDescendants( clientId );
@@ -55,6 +66,9 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 				? navigationBlocksInTemplatePart[ 0 ]
 				: null;
 
+			// Get template part attributes (slug and theme) for building the site editor URL
+			const templatePartAttributes = getBlockAttributes( clientId );
+
 			return {
 				hasNavigationBlocks: _hasNavigationBlocks,
 				firstNavigationBlockId: _firstNavigationBlockId,
@@ -63,13 +77,61 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 				isNavigationEditable:
 					getBlockEditingMode( _firstNavigationBlockId ) !==
 					'disabled',
+				templatePartSlug: templatePartAttributes?.slug,
+				templatePartTheme: templatePartAttributes?.theme,
+				onNavigateToEntityRecord:
+					getSettings().onNavigateToEntityRecord,
 			};
 		},
 		[ clientId ]
 	);
 
 	const onEditNavigation = useCallback( () => {
-		if ( firstNavigationBlockId ) {
+		if ( ! firstNavigationBlockId ) {
+			return;
+		}
+		if ( ! isNavigationEditable ) {
+			// Transfer the user to the isolated section editor and select the first Navigation block
+			if (
+				! templatePartSlug ||
+				! templatePartTheme ||
+				! onNavigateToEntityRecord
+			) {
+				return;
+			}
+
+			// Generate the block path to the first navigation block
+			const fullPath = generateBlockPath( firstNavigationBlockId );
+			if ( ! fullPath ) {
+				return;
+			}
+
+			// The path needs to be relative to the template part's content, not the page root
+			// Find the template part in the path and remove everything up to and including it
+			const templatePartIndex = fullPath.findIndex(
+				( step ) => step.blockName === TEMPLATE_PART_BLOCK_NAME
+			);
+
+			// Get the path starting from inside the template part
+			const destinationBlockPath =
+				templatePartIndex !== -1
+					? fullPath.slice( templatePartIndex + 1 )
+					: fullPath;
+
+			// Don't navigate if we don't have a valid relative path
+			if ( ! destinationBlockPath || destinationBlockPath.length === 0 ) {
+				return;
+			}
+
+			// Navigate to the site editor with the template part and select the navigation block
+			const templatePartId = `${ templatePartTheme }//${ templatePartSlug }`;
+			onNavigateToEntityRecord( {
+				postId: templatePartId,
+				postType: 'wp_template_part',
+				selectedBlockClientId: clientId, // Save current template part block for back button
+				destinationBlockPath, // Select the navigation block at destination
+			} );
+		} else {
 			// Select the first Navigation block
 			selectBlock( firstNavigationBlockId );
 
@@ -81,13 +143,19 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 		}
 	}, [
 		firstNavigationBlockId,
+		isNavigationEditable,
+		templatePartSlug,
+		templatePartTheme,
+		onNavigateToEntityRecord,
+		generateBlockPath,
+		clientId,
 		selectBlock,
 		flashBlock,
 		enableComplementaryArea,
 	] );
 
 	// Only show if template part contains navigation blocks and they are editable
-	if ( ! hasNavigationBlocks || ! isNavigationEditable ) {
+	if ( ! hasNavigationBlocks ) {
 		return null;
 	}
 

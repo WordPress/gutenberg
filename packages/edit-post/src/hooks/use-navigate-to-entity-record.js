@@ -36,7 +36,13 @@ export default function useNavigateToEntityRecord(
 	const [ postHistory, dispatch ] = useReducer(
 		(
 			historyState,
-			{ type, post, previousRenderingMode, selectedBlockPath }
+			{
+				type,
+				post,
+				previousRenderingMode,
+				selectedBlockPath,
+				destinationBlockPath,
+			}
 		) => {
 			if ( type === 'push' ) {
 				// Update the current item with the selected block path before pushing new item
@@ -46,7 +52,10 @@ export default function useNavigateToEntityRecord(
 					...updatedHistory[ currentIndex ],
 					selectedBlockPath,
 				};
-				return [ ...updatedHistory, { post, previousRenderingMode } ];
+				return [
+					...updatedHistory,
+					{ post, previousRenderingMode, destinationBlockPath },
+				];
 			}
 			if ( type === 'pop' ) {
 				// Remove the current item from history
@@ -62,8 +71,12 @@ export default function useNavigateToEntityRecord(
 			},
 		]
 	);
-	const { post, previousRenderingMode, selectedBlockPath } =
-		postHistory[ postHistory.length - 1 ];
+	const {
+		post,
+		previousRenderingMode,
+		selectedBlockPath,
+		destinationBlockPath,
+	} = postHistory[ postHistory.length - 1 ];
 
 	const { getRenderingMode } = useSelect( editorStore );
 	const { setRenderingMode } = useDispatch( editorStore );
@@ -81,6 +94,8 @@ export default function useNavigateToEntityRecord(
 				// Save the current rendering mode so we can restore it when navigating back.
 				previousRenderingMode: getRenderingMode(),
 				selectedBlockPath: blockPath,
+				// Pass through destination block path if provided (for selecting a specific block at destination)
+				destinationBlockPath: params.destinationBlockPath,
 			} );
 			setRenderingMode( defaultRenderingMode );
 		},
@@ -108,7 +123,9 @@ export default function useNavigateToEntityRecord(
 			postHistory.length > 1
 				? onNavigateToPreviousEntityRecord
 				: undefined,
-		// Return the selected block path from the current history item
+		// Return the selected block path from the current history item (for back button)
 		previousSelectedBlockPath: selectedBlockPath,
+		// Return the destination block path to select at the current entity
+		initialBlockSelection: destinationBlockPath,
 	};
 }
