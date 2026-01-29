@@ -795,6 +795,84 @@ test.describe( 'Block Comments', () => {
 			).toBeFocused();
 		} );
 
+		test( 'can open add note form using keyboard shortcut', async ( {
+			editor,
+			page,
+			pageUtils,
+			blockCommentUtils,
+		} ) => {
+			// First add a block with a comment so the notes sidebar is available.
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Howdy!' },
+				comment: 'Test comment',
+			} );
+			// Add a second block without a comment.
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Testing keyboard shortcut for notes' },
+			} );
+			const form = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+
+			// Press the keyboard shortcut to open the add note form.
+			await pageUtils.pressKeys( 'primaryAlt+m' );
+			await expect( form ).toBeFocused();
+		} );
+
+		test( 'keyboard shortcut does nothing when no block is selected', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Testing keyboard shortcut for notes' },
+			} );
+
+			// Deselect block by clicking on the title.
+			await editor.canvas
+				.getByRole( 'textbox', { name: 'Add title' } )
+				.focus();
+
+			const form = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+
+			// Press the keyboard shortcut.
+			await pageUtils.pressKeys( 'primaryAlt+m' );
+
+			// The form should not be visible/focused since no block is selected.
+			await expect( form ).not.toBeVisible();
+		} );
+
+		test( 'keyboard shortcut focuses existing note when block has one', async ( {
+			page,
+			pageUtils,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing block with existing note' },
+				comment: 'Existing note',
+			} );
+
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', {
+					name: 'Note: Existing note',
+				} );
+
+			// Press the keyboard shortcut.
+			await pageUtils.pressKeys( 'primaryAlt+m' );
+
+			// The existing thread should be expanded and focused.
+			await expect( thread ).toHaveAttribute( 'aria-expanded', 'true' );
+		} );
+
 		test( 'can add a note using form shortcut', async ( {
 			editor,
 			page,

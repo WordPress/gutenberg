@@ -147,7 +147,7 @@ function EditorKeyboardShortcutsRegister() {
 
 		registerShortcut( {
 			name: 'core/editor/add-note',
-			category: 'block',
+			category: 'global',
 			description: __( 'Add a note to the selected block.' ),
 			keyCombination: {
 				modifier: 'primaryAlt',
