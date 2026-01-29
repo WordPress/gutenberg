@@ -342,7 +342,7 @@ export const WithNonFocusablePanels: StoryObj< typeof Tabs.Root > = {
 					<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
 					<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
 				</Tabs.List>
-				<Tabs.Panel value="tab1" focusable={ false }>
+				<Tabs.Panel value="tab1" tabIndex={ -1 }>
 					<ThemedParagraph>Selected tab: Tab 1</ThemedParagraph>
 					<ThemedParagraph>
 						This tabpanel is not focusable, therefore tabbing into
@@ -350,7 +350,7 @@ export const WithNonFocusablePanels: StoryObj< typeof Tabs.Root > = {
 					</ThemedParagraph>
 					<button>Focus me</button>
 				</Tabs.Panel>
-				<Tabs.Panel value="tab2" focusable={ false }>
+				<Tabs.Panel value="tab2" tabIndex={ -1 }>
 					<ThemedParagraph>Selected tab: Tab 2</ThemedParagraph>
 					<ThemedParagraph>
 						This tabpanel is not focusable, therefore tabbing into
@@ -358,7 +358,7 @@ export const WithNonFocusablePanels: StoryObj< typeof Tabs.Root > = {
 					</ThemedParagraph>
 					<button>Focus me</button>
 				</Tabs.Panel>
-				<Tabs.Panel value="tab3" focusable={ false }>
+				<Tabs.Panel value="tab3" tabIndex={ -1 }>
 					<ThemedParagraph>Selected tab: Tab 3</ThemedParagraph>
 					<ThemedParagraph>
 						This tabpanel is not focusable, therefore tabbing into
