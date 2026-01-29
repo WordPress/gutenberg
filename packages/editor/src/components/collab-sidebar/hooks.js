@@ -371,6 +371,7 @@ export function useFloatingThread( {
 	selectedThread,
 	setBlockRef,
 	commentLastUpdated,
+	variant,
 } ) {
 	const blockElement = useBlockElement( thread.blockClientId );
 	const updateHeight = useCallback(
@@ -410,7 +411,7 @@ export function useFloatingThread( {
 		}
 	}, [ blockElement, thread.id, refs.floating, setBlockRef ] );
 
-	// When the selected thread changes, update heights, triggering offset recalculation.
+	// When the selected thread or variant changes, update heights, triggering offset recalculation.
 	useEffect( () => {
 		if ( refs.floating?.current ) {
 			const newHeight = refs.floating.current.scrollHeight;
@@ -422,6 +423,7 @@ export function useFloatingThread( {
 		refs.floating,
 		selectedThread,
 		commentLastUpdated,
+		variant,
 	] );
 
 	return {

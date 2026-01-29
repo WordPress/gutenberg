@@ -107,18 +107,6 @@ export default function MoreMenu() {
 									'Spotlight mode deactivated.'
 								) }
 							/>
-							<PreferenceToggleMenuItem
-								scope="core"
-								name="compactNotes"
-								label={ __( 'Compact notes' ) }
-								info={ __( 'Show notes as small indicators' ) }
-								messageActivated={ __(
-									'Compact notes activated.'
-								) }
-								messageDeactivated={ __(
-									'Compact notes deactivated.'
-								) }
-							/>
 							<ViewMoreMenuGroup.Slot fillProps={ { onClose } } />
 						</MenuGroup>
 						<ModeSwitcher />

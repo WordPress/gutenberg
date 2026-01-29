@@ -3,12 +3,17 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	__experimentalVStack as VStack,
+	DropdownMenu,
+	MenuGroup,
+	MenuItemsChoice,
+} from '@wordpress/components';
 import { useState, useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { store as interfaceStore } from '@wordpress/interface';
+import { store as interfaceStore, PinnedItems } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
@@ -87,33 +92,41 @@ function NotesSidebar( { postId } ) {
 	// Enum: 'closed' | 'creating' | 'open'
 	const [ newNoteFormState, setNewNoteFormState ] = useState( 'closed' );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	const { enableComplementaryArea, disableComplementaryArea } =
+		useDispatch( interfaceStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
 	const showFloatingSidebar = isLargeViewport;
 
-	const { clientId, blockCommentId, isDistractionFree, isCompactNotes } =
-		useSelect( ( select ) => {
-			const {
-				getBlockAttributes,
-				getSelectedBlockClientId,
-				getSettings,
-			} = select( blockEditorStore );
-			const _clientId = getSelectedBlockClientId();
-			return {
-				clientId: _clientId,
-				blockCommentId: _clientId
-					? getBlockAttributes( _clientId )?.metadata?.noteId
-					: null,
-				isDistractionFree: getSettings().isDistractionFree,
-				isCompactNotes: !! select( preferencesStore ).get(
-					'core',
-					'compactNotes'
-				),
-			};
-		}, [] );
+	const {
+		clientId,
+		blockCommentId,
+		isDistractionFree,
+		isCompactNotes,
+		isAllNotesSidebarActive,
+	} = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId, getSettings } =
+			select( blockEditorStore );
+		const _clientId = getSelectedBlockClientId();
+		return {
+			clientId: _clientId,
+			blockCommentId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.noteId
+				: null,
+			isDistractionFree: getSettings().isDistractionFree,
+			isCompactNotes: !! select( preferencesStore ).get(
+				'core',
+				'compactNotes'
+			),
+			isAllNotesSidebarActive:
+				select( interfaceStore ).getActiveComplementaryArea(
+					'core'
+				) === collabHistorySidebarName,
+		};
+	}, [] );
 
 	const {
 		resultComments,
@@ -168,6 +181,13 @@ function NotesSidebar( { postId } ) {
 		toggleBlockSpotlight( clientId, true );
 	}
 
+	let notesDropdownValue = 'expand';
+	if ( isAllNotesSidebarActive ) {
+		notesDropdownValue = 'show-all';
+	} else if ( isCompactNotes ) {
+		notesDropdownValue = 'minimize';
+	}
+
 	if ( isDistractionFree ) {
 		return <AddCommentMenuItem isDistractionFree />;
 	}
@@ -182,7 +202,60 @@ function NotesSidebar( { postId } ) {
 			) }
 			<AddCommentMenuItem onClick={ openTheSidebar } />
 			{ showAllNotesSidebar && (
+				<PinnedItems scope="core">
+					<DropdownMenu
+						icon={ commentIcon }
+						label={ __( 'Notes' ) }
+						toggleProps={ {
+							size: 'compact',
+						} }
+					>
+						{ () => (
+							<MenuGroup>
+								<MenuItemsChoice
+									choices={ [
+										{
+											value: 'show-all',
+											label: __( 'Show all notes' ),
+										},
+										{
+											value: 'minimize',
+											label: __( 'Minimize notes' ),
+										},
+										{
+											value: 'expand',
+											label: __( 'Expand notes' ),
+										},
+									] }
+									value={ notesDropdownValue }
+									onSelect={ ( value ) => {
+										if ( value === 'show-all' ) {
+											enableComplementaryArea(
+												'core',
+												collabHistorySidebarName
+											);
+										} else {
+											if ( isAllNotesSidebarActive ) {
+												disableComplementaryArea(
+													'core'
+												);
+											}
+											setPreference(
+												'core',
+												'compactNotes',
+												value === 'minimize'
+											);
+										}
+									} }
+								/>
+							</MenuGroup>
+						) }
+					</DropdownMenu>
+				</PinnedItems>
+			) }
+			{ showAllNotesSidebar && (
 				<PluginSidebar
+					isPinnable={ false }
 					identifier={ collabHistorySidebarName }
 					name={ collabHistorySidebarName }
 					title={ __( 'All notes' ) }

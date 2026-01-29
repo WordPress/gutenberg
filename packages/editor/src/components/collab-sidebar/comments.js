@@ -318,6 +318,7 @@ export function Comments( {
 		threads,
 		selectedThread,
 		setCanvasMinHeight,
+		isCompactNotes,
 	] );
 
 	const handleThreadNavigation = ( event, thread, isSelected ) => {
@@ -484,6 +485,7 @@ function Thread( {
 		setBlockRef,
 		selectedThread,
 		commentLastUpdated,
+		variant,
 	} );
 	const isKeyboardTabbingRef = useRef( false );
 
