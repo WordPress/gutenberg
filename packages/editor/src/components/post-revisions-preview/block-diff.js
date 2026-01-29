@@ -28,34 +28,6 @@ import { unlock } from '../../lock-unlock';
 const { parseRawBlock } = unlock( blocksPrivateApis );
 
 /**
- * Create a signature for block comparison.
- * Uses blockName + attrs for container matching, innerHTML for leaf content.
- *
- * @param {Object} rawBlock Raw block from grammar parse.
- * @return {string} JSON signature for comparison.
- */
-function createBlockSignature( rawBlock ) {
-	const hasInnerBlocks =
-		rawBlock.innerBlocks && rawBlock.innerBlocks.length > 0;
-
-	// For container blocks, match by structure (name + attrs).
-	// innerHTML for containers includes serialized inner blocks, which we diff separately.
-	if ( hasInnerBlocks ) {
-		return JSON.stringify( {
-			name: rawBlock.blockName,
-			attrs: rawBlock.attrs,
-		} );
-	}
-
-	// For leaf blocks, include innerHTML in signature.
-	return JSON.stringify( {
-		name: rawBlock.blockName,
-		attrs: rawBlock.attrs,
-		html: rawBlock.innerHTML,
-	} );
-}
-
-/**
  * Inject diff status into raw block as special attribute.
  * Does NOT mark inner blocks - parent styling is sufficient for added/removed.
  *
@@ -200,6 +172,16 @@ function pairSimilarBlocks( blocks ) {
  * @return {Array} Merged raw blocks with diff status injected.
  */
 function diffRawBlocks( currentRaw, previousRaw ) {
+	const createBlockSignature = ( rawBlock ) =>
+		JSON.stringify( {
+			name: rawBlock.blockName,
+			attrs: rawBlock.attrs,
+			// Use innerContent filtered to non-null and non-whitespace-only strings.
+			// This excludes whitespace between inner blocks which changes based on count.
+			html: ( rawBlock.innerContent || [] ).filter(
+				( c ) => c !== null && c.trim() !== ''
+			),
+		} );
 	const currentSigs = currentRaw.map( createBlockSignature );
 	const previousSigs = previousRaw.map( createBlockSignature );
 
