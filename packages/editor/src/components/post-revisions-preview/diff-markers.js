@@ -1,8 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useMemo } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import { useState, useMemo, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -32,13 +31,14 @@ function collectDiffBlocks( blocks ) {
 /**
  * Component that renders diff markers in a scrollbar-style strip.
  * Shows colored ticks for added/removed/modified blocks.
- * Must be rendered inside the editor iframe.
+ * Rendered outside the iframe, receives the iframe body element.
  *
+ * @param {Object}  props                Component props.
+ * @param {Element} props.contentElement The iframe body element.
  * @return {JSX.Element} The diff markers component.
  */
-export default function DiffMarkers() {
+export default function DiffMarkers( { contentElement } ) {
 	const [ positions, setPositions ] = useState( {} );
-	const [ ownerDoc, setOwnerDoc ] = useState( null );
 	const blocks = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks(),
 		[]
@@ -46,60 +46,56 @@ export default function DiffMarkers() {
 
 	const diffBlocks = useMemo( () => collectDiffBlocks( blocks ), [ blocks ] );
 
-	// Calculate positions from DOM
-	const updatePositions = useCallback( () => {
-		if ( ! ownerDoc ) {
+	// Set up ResizeObserver and calculate positions when content element is available
+	useEffect( () => {
+		if ( ! contentElement ) {
 			return;
 		}
 
-		const scrollHeight = ownerDoc.documentElement.scrollHeight;
-		if ( scrollHeight === 0 ) {
-			return;
-		}
+		const doc = contentElement.ownerDocument;
 
-		const newPositions = {};
-		for ( const { clientId } of diffBlocks ) {
-			const el = ownerDoc.querySelector( `[data-block="${ clientId }"]` );
-			if ( el ) {
-				const rect = el.getBoundingClientRect();
-				const scrollTop = ownerDoc.documentElement.scrollTop;
-				const top = rect.top + scrollTop;
-				newPositions[ clientId ] = {
-					top: ( top / scrollHeight ) * 100,
-					height: ( rect.height / scrollHeight ) * 100,
-				};
+		const updatePositions = () => {
+			const scrollHeight = doc.documentElement.scrollHeight;
+			if ( scrollHeight === 0 ) {
+				return;
 			}
-		}
 
-		setPositions( newPositions );
-	}, [ diffBlocks, ownerDoc ] );
+			const newPositions = {};
+			for ( const { clientId } of diffBlocks ) {
+				const el = doc.querySelector( `[data-block="${ clientId }"]` );
+				if ( el ) {
+					const rect = el.getBoundingClientRect();
+					const scrollTop = doc.documentElement.scrollTop;
+					const top = rect.top + scrollTop;
+					newPositions[ clientId ] = {
+						top: ( top / scrollHeight ) * 100,
+						height: ( rect.height / scrollHeight ) * 100,
+					};
+				}
+			}
 
-	// Get ownerDocument and set up observers
-	const containerRef = useRefEffect(
-		( element ) => {
-			const doc = element.ownerDocument;
-			setOwnerDoc( doc );
+			setPositions( newPositions );
+		};
 
-			// Initial calculation after blocks render
-			const timeoutId = setTimeout( updatePositions, 100 );
+		// Initial calculation
+		updatePositions();
 
-			// ResizeObserver for content size changes
-			const resizeObserver = new window.ResizeObserver( updatePositions );
-			resizeObserver.observe( doc.body );
+		// ResizeObserver for content size changes
+		const { ResizeObserver } = doc.defaultView;
+		const resizeObserver = new ResizeObserver( updatePositions );
+		resizeObserver.observe( doc.body );
 
-			return () => {
-				clearTimeout( timeoutId );
-				resizeObserver.disconnect();
-			};
-		},
-		[ updatePositions ]
-	);
+		return () => {
+			resizeObserver.disconnect();
+		};
+	}, [ contentElement, diffBlocks ] );
 
 	const scrollToBlock = ( clientId ) => {
-		if ( ! ownerDoc ) {
+		const doc = contentElement?.ownerDocument;
+		if ( ! doc ) {
 			return;
 		}
-		const block = ownerDoc.querySelector( `[data-block="${ clientId }"]` );
+		const block = doc.querySelector( `[data-block="${ clientId }"]` );
 		block?.scrollIntoView( { behavior: 'smooth', block: 'center' } );
 	};
 
@@ -110,7 +106,11 @@ export default function DiffMarkers() {
 	};
 
 	return (
-		<div ref={ containerRef } className="revision-diff-markers">
+		<div
+			className="revision-diff-markers"
+			role="navigation"
+			aria-label={ __( 'Diff markers' ) }
+		>
 			{ diffBlocks.map( ( { clientId, status } ) => {
 				const pos = positions[ clientId ];
 				if ( ! pos ) {

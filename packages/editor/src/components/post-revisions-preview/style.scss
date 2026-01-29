@@ -21,6 +21,16 @@
 	height: 100%;
 }
 
+.editor-revisions-canvas__content {
+	display: flex;
+	height: 100%;
+
+	.editor-visual-editor {
+		flex: 1;
+		min-width: 0;
+	}
+}
+
 // Block-level diff indicators for revisions preview (fallback for non-iframe contexts)
 .is-revision-added {
 	outline: 2px solid #00a32a !important;
@@ -52,13 +62,10 @@
 
 // Diff markers minimap
 .revision-diff-markers {
-	position: absolute;
-	right: 0;
-	top: 0;
-	bottom: 0;
+	position: relative;
+	flex-shrink: 0;
 	width: 12px;
 	background: rgba(0, 0, 0, 0.05);
-	z-index: 1;
 
 	.revision-diff-marker {
 		position: absolute;

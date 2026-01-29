@@ -13,7 +13,7 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock, parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useRef } from '@wordpress/element';
+import { useMemo, useRef, useState } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { registerFormatType } from '@wordpress/rich-text';
@@ -94,35 +94,6 @@ const REVISION_DIFF_STYLES = `
 	.revision-diff-format-changed {
 		text-decoration: underline wavy color-mix(in srgb, currentColor 30%, #dba617 70%);
 		text-decoration-thickness: 2px;
-	}
-	.revision-diff-markers {
-		position: fixed;
-		right: 0;
-		top: 0;
-		bottom: 0;
-		width: 12px;
-		background: rgba(0, 0, 0, 0.05);
-		z-index: 1000;
-	}
-	.revision-diff-marker {
-		position: absolute;
-		width: 100%;
-		min-height: 4px;
-		border: none;
-		padding: 0;
-		cursor: pointer;
-	}
-	.revision-diff-marker.is-added {
-		background: #00a32a;
-	}
-	.revision-diff-marker.is-removed {
-		background: #d63638;
-	}
-	.revision-diff-marker.is-modified {
-		background: #dba617;
-	}
-	.revision-diff-marker:hover {
-		opacity: 0.7;
 	}
 `;
 
@@ -241,6 +212,8 @@ export default function RevisionsCanvas( { showDiff } ) {
 
 	// Track previously rendered blocks to preserve clientIds between renders.
 	const previousBlocksRef = useRef( [] );
+	// State to hold the iframe body element for diff markers.
+	const [ contentElement, setContentElement ] = useState( null );
 
 	const blocks = useMemo( () => {
 		const currentContent = revision?.content?.raw ?? '';
@@ -297,9 +270,12 @@ export default function RevisionsCanvas( { showDiff } ) {
 	return revision ? (
 		<ExperimentalBlockEditorProvider value={ blocks } settings={ settings }>
 			<DiffStyleOverrides showDiff={ showDiff } />
-			<VisualEditor
-				canvasOverlay={ showDiff ? <DiffMarkers /> : undefined }
-			/>
+			<div className="editor-revisions-canvas__content">
+				<VisualEditor contentRef={ setContentElement } />
+				{ showDiff && (
+					<DiffMarkers contentElement={ contentElement } />
+				) }
+			</div>
 		</ExperimentalBlockEditorProvider>
 	) : (
 		<div className="editor-revisions-canvas__loading">
