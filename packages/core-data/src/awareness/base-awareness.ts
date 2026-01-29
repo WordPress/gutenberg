@@ -16,8 +16,6 @@ export abstract class BaseAwarenessState<
 	State extends BaseState,
 > extends AwarenessState< State > {
 	protected onSetUp(): void {
-		super.onSetUp();
-
 		void this.setCurrentUserInfo();
 	}
 

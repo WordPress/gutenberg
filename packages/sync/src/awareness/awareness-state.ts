@@ -157,8 +157,11 @@ export abstract class AwarenessState<
 	 * Set up the awareness state. This method is idempotent and will only run
 	 * once. Subclasses should override `onSetUp()` instead of this method to
 	 * add their own setup logic.
+	 *
+	 * This is defined as a readonly arrow function property to prevent
+	 * subclasses from overriding it.
 	 */
-	public setUp(): void {
+	public readonly setUp = (): void => {
 		if ( this.hasSetupRun ) {
 			return;
 		}
@@ -188,16 +191,15 @@ export abstract class AwarenessState<
 		);
 
 		this.onSetUp();
-	}
+	};
 
 	/**
 	 * Hook method for subclasses to add their own setup logic. This is called
-	 * once after the base class setup completes. Subclasses should override
-	 * this method and call `super.onSetUp()` to ensure parent setup runs.
+	 * once after the base class setup completes. All subclasses must implement
+	 * this method. If extending a class that already implements `onSetUp()`,
+	 * call `super.onSetUp()` to ensure parent setup runs.
 	 */
-	protected onSetUp(): void {
-		// Default empty implementation for subclasses to override.
-	}
+	protected abstract onSetUp(): void;
 
 	/**
 	 * Get the most recent state from the last processed change event.
