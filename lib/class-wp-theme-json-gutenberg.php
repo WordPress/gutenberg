@@ -242,7 +242,6 @@ class WP_Theme_JSON_Gutenberg {
 	 * @since 6.3.0 Added `writing-mode` property.
 	 * @since 6.6.0 Added `background-[image|position|repeat|size]` properties.
 	 * @since 7.0.0 Added `dimensions.width` and `dimensions.height`.
-	 * @since 7.0.0 Added `gap` property.
 	 *
 	 * @var array
 	 */
@@ -1483,7 +1482,7 @@ class WP_Theme_JSON_Gutenberg {
 	 * @param string $selector The selector to nest.
 	 * @return string The processed CSS.
 	 */
-	protected function process_blocks_custom_css( $css, $selector ) {
+	public static function process_blocks_custom_css( $css, $selector ) {
 		$processed_css = '';
 
 		if ( empty( $css ) ) {

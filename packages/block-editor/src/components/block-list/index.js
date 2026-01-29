@@ -48,23 +48,30 @@ const delayedBlockVisibilityDebounceOptions = {
 };
 
 function Root( { className, ...settings } ) {
-	const { isOutlineMode, isFocusMode, editedContentOnlySection } = useSelect(
-		( select ) => {
-			const {
-				getSettings,
-				isTyping,
-				hasBlockSpotlight,
-				getEditedContentOnlySection,
-			} = unlock( select( blockEditorStore ) );
-			const { outlineMode, focusMode } = getSettings();
-			return {
-				isOutlineMode: outlineMode && ! isTyping(),
-				isFocusMode: focusMode || hasBlockSpotlight(),
-				editedContentOnlySection: getEditedContentOnlySection(),
-			};
-		},
-		[]
-	);
+	const {
+		isOutlineMode,
+		isFocusMode,
+		isPreviewMode,
+		editedContentOnlySection,
+	} = useSelect( ( select ) => {
+		const {
+			getSettings,
+			isTyping,
+			hasBlockSpotlight,
+			getEditedContentOnlySection,
+		} = unlock( select( blockEditorStore ) );
+		const {
+			outlineMode,
+			focusMode,
+			isPreviewMode: _isPreviewMode,
+		} = getSettings();
+		return {
+			isOutlineMode: outlineMode && ! isTyping(),
+			isFocusMode: focusMode || hasBlockSpotlight(),
+			isPreviewMode: _isPreviewMode,
+			editedContentOnlySection: getEditedContentOnlySection(),
+		};
+	}, [] );
 	const registry = useRegistry();
 	const { setBlockVisibility } = useDispatch( blockEditorStore );
 
@@ -111,6 +118,7 @@ function Root( { className, ...settings } ) {
 			className: clsx( 'is-root-container', className, {
 				'is-outline-mode': isOutlineMode,
 				'is-focus-mode': isFocusMode,
+				'is-preview-mode': isPreviewMode,
 			} ),
 		},
 		settings

@@ -27,7 +27,7 @@ import BlockControls from '../block-controls';
 import __unstableBlockToolbarLastItem from './block-toolbar-last-item';
 import BlockSettingsMenu from '../block-settings-menu';
 import { BlockLockToolbar } from '../block-lock';
-import { BlockVisibilityToolbar } from '../block-visibility';
+import { ViewportVisibilityToolbar } from '../block-visibility';
 import { BlockGroupToolbar } from '../convert-to-group-buttons';
 import BlockEditVisuallyButton from '../block-edit-visually-button';
 import { useShowHoveredOrFocusedGestures } from './utils';
@@ -116,14 +116,8 @@ export function PrivateBlockToolbar( {
 		);
 
 		const _isZoomOut = isZoomOut();
-
 		const _isSectionBlock = isSectionBlock( selectedBlockClientId );
-
-		// The switch style button appears more prominently with the
-		// content only pattern experiment.
-		const _showSwitchSectionStyleButton =
-			window?.__experimentalContentOnlyPatternInsertion &&
-			( _isZoomOut || _isSectionBlock );
+		const _showSwitchSectionStyleButton = _isZoomOut || _isSectionBlock;
 
 		return {
 			blockClientId: selectedBlockClientId,
@@ -213,7 +207,7 @@ export function PrivateBlockToolbar( {
 							/>
 							{ isDefaultEditingMode &&
 								showBlockVisibilityButton && (
-									<BlockVisibilityToolbar
+									<ViewportVisibilityToolbar
 										clientIds={ blockClientIds }
 									/>
 								) }

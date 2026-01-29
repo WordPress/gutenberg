@@ -13,6 +13,7 @@ import { __ } from '@wordpress/i18n';
 import OverlayTemplatePartSelector from './overlay-template-part-selector';
 import OverlayVisibilityControl from './overlay-visibility-control';
 import OverlayMenuPreviewButton from './overlay-menu-preview-button';
+import OverlayPreview from './overlay-preview';
 
 /**
  * Overlay Panel component for Navigation block.
@@ -29,6 +30,7 @@ import OverlayMenuPreviewButton from './overlay-menu-preview-button';
  * @param {string}   props.overlayMenuPreviewClasses CSS classes for overlay menu preview button.
  * @param {string}   props.overlayMenuPreviewId      ID for overlay menu preview.
  * @param {boolean}  props.isResponsive              Whether overlay menu is responsive.
+ * @param {string}   props.currentTheme              Current theme stylesheet name.
  * @return {JSX.Element|null}                       The overlay panel component or null if overlay is disabled.
  */
 export default function OverlayPanel( {
@@ -43,6 +45,7 @@ export default function OverlayPanel( {
 	overlayMenuPreviewClasses,
 	overlayMenuPreviewId,
 	isResponsive,
+	currentTheme,
 } ) {
 	return (
 		<PanelBody title={ __( 'Overlay' ) } initialOpen>
@@ -70,6 +73,13 @@ export default function OverlayPanel( {
 						overlay={ overlay }
 						setAttributes={ setAttributes }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
+					/>
+				) }
+
+				{ overlayMenu !== 'never' && overlay && (
+					<OverlayPreview
+						overlay={ overlay }
+						currentTheme={ currentTheme }
 					/>
 				) }
 			</VStack>

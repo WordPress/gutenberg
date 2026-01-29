@@ -310,7 +310,12 @@
 					}
 				},
 				"customClassName": {
-					"description": "This property adds a field to define a custom className for the block’s wrapper.",
+					"description": "This property adds a field to define a custom className for the block's wrapper.",
+					"type": "boolean",
+					"default": true
+				},
+				"customCSS": {
+					"description": "This property adds a field to define custom CSS for the block instance.",
 					"type": "boolean",
 					"default": true
 				},

@@ -2,16 +2,25 @@
 
 ## Unreleased
 
+### Enhancements
+
+- DataViews: Add card form layout validation. [#74547](https://github.com/WordPress/gutenberg/pull/74547)
+- DataViews: Show validation errors when a panel closes. [#74995](https://github.com/WordPress/gutenberg/pull/74995)
+
 ### Bug Fixes
 
+- DataForm: Sync React-level validation to native inputs on date fields. [#74994](https://github.com/WordPress/gutenberg/pull/74994)
+- Fix primary action visibility in table layout when the action doesn't support bulk operations, and fix compact action menu not visible on mobile when there is only one action. [#74836](https://github.com/WordPress/gutenberg/pull/74836)
 - DataViews: Use regular casing for bulk selection count. [#74573](https://github.com/WordPress/gutenberg/pull/74573)
 
 ### Code Quality
 
 - DataViews: Move filtering logic in field types. [#74733](https://github.com/WordPress/gutenberg/pull/74733)
+- DataViews: Adjust table primary media field styles. [#74813](https://github.com/WordPress/gutenberg/pull/74813)
 
 ### Enhancements
 
+- Add new `combobox` DataForm control. [#74891](https://github.com/WordPress/gutenberg/pull/74891)
 - Include total items count in footer. [#73491](https://github.com/WordPress/gutenberg/pull/73491)
 
 ## 11.2.0 (2026-01-16)

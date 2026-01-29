@@ -34,6 +34,8 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Spinner,
 	Notice,
 	ToolbarButton,
@@ -78,6 +80,7 @@ import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
 import { DEFAULT_BLOCK } from '../constants';
+import { getSubmenuVisibility } from '../utils/get-submenu-visibility';
 
 /**
  * Component that renders the Add page button for the Navigation block.
@@ -203,31 +206,31 @@ function ColorTools( {
 		},
 	];
 
-	// Only show overlay controls when using the default overlay.
-	if ( ! hasCustomOverlay ) {
-		colorSettings.push(
-			{
-				colorValue: overlayTextColor.color,
-				label: isWithinOverlay
+	// Only show overlay controls when not in an overlay template.
+	colorSettings.push(
+		{
+			colorValue: overlayTextColor.color,
+			label:
+				hasCustomOverlay || isWithinOverlay
 					? __( 'Submenu text' )
 					: __( 'Submenu & overlay text' ),
-				onColorChange: setOverlayTextColor,
-				resetAllFilter: () => setOverlayTextColor(),
-				clearable: true,
-				enableAlpha: true,
-			},
-			{
-				colorValue: overlayBackgroundColor.color,
-				label: isWithinOverlay
+			onColorChange: setOverlayTextColor,
+			resetAllFilter: () => setOverlayTextColor(),
+			clearable: true,
+			enableAlpha: true,
+		},
+		{
+			colorValue: overlayBackgroundColor.color,
+			label:
+				hasCustomOverlay || isWithinOverlay
 					? __( 'Submenu background' )
 					: __( 'Submenu & overlay background' ),
-				onColorChange: setOverlayBackgroundColor,
-				resetAllFilter: () => setOverlayBackgroundColor(),
-				clearable: true,
-				enableAlpha: true,
-			}
-		);
-	}
+			onColorChange: setOverlayBackgroundColor,
+			resetAllFilter: () => setOverlayBackgroundColor(),
+			clearable: true,
+			enableAlpha: true,
+		}
+	);
 
 	return (
 		<>
@@ -276,7 +279,7 @@ function Navigation( {
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const {
-		openSubmenusOnClick,
+		submenuVisibility,
 		overlayMenu,
 		overlay,
 		showSubmenuIcon,
@@ -299,18 +302,36 @@ function Navigation( {
 		[ setAttributes ]
 	);
 
+	// Reset submenuVisibility to default if orientation changes to horizontal while "always" is selected
+	useEffect( () => {
+		if ( orientation === 'horizontal' && submenuVisibility === 'always' ) {
+			setAttributes( {
+				submenuVisibility: 'hover',
+				showSubmenuIcon: true,
+			} );
+		}
+	}, [ orientation, submenuVisibility, setAttributes ] );
+
 	const recursionId = `navigationMenu/${ ref }`;
-	const hasAlreadyRendered = useHasRecursion( recursionId );
+
+	// Skip recursion check when in preview mode.
+	const recursionDetected = useHasRecursion( recursionId );
+	const { isPreviewMode, onNavigateToEntityRecord, currentTheme } = useSelect(
+		( select ) => {
+			const { getSettings } = select( blockEditorStore );
+			const settings = getSettings();
+			return {
+				isPreviewMode: settings.isPreviewMode,
+				onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
+				// Needed to construct the template part ID for the overlay preview.
+				currentTheme: select( coreStore ).getCurrentTheme()?.stylesheet,
+			};
+		},
+		[]
+	);
+	const hasAlreadyRendered = isPreviewMode ? false : recursionDetected;
 
 	const blockEditingMode = useBlockEditingMode();
-
-	const { onNavigateToEntityRecord } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
-		return {
-			onNavigateToEntityRecord: settings?.onNavigateToEntityRecord,
-		};
-	}, [] );
 
 	const isOverlayExperimentEnabled =
 		typeof window !== 'undefined' &&
@@ -495,13 +516,37 @@ function Navigation( {
 		[ clientId ]
 	);
 
-	// Force overlayMenu to 'never' if within an overlay template part
-	// to prevent overlays within overlays.
+	// Configure navigation blocks in overlay templates.
+	const hasSetOverlayDefault = useRef( false );
 	useEffect( () => {
-		if ( isWithinOverlay && overlayMenu !== 'never' ) {
+		if ( ! isWithinOverlay ) {
+			return;
+		}
+
+		// Prevent nested overlays.
+		if ( overlayMenu !== 'never' ) {
 			setAttributes( { overlayMenu: 'never' } );
 		}
-	}, [ isWithinOverlay, overlayMenu, setAttributes ] );
+
+		// Set vertical orientation and always-open submenus for new blocks.
+		if ( ! hasSetOverlayDefault.current && ! ref ) {
+			hasSetOverlayDefault.current = true;
+			setAttributes( {
+				submenuVisibility: 'always',
+				layout: {
+					...attributes.layout,
+					orientation: 'vertical',
+				},
+				showSubmenuIcon: false,
+			} );
+		}
+	}, [
+		attributes.layout,
+		isWithinOverlay,
+		overlayMenu,
+		ref,
+		setAttributes,
+	] );
 
 	const isResponsive = 'never' !== overlayMenu;
 	const blockProps = useBlockProps( {
@@ -660,8 +705,12 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
+	const computedSubmenuVisibility = getSubmenuVisibility( attributes );
+
 	const submenuAccessibilityNotice =
-		! showSubmenuIcon && ! openSubmenusOnClick
+		! showSubmenuIcon &&
+		computedSubmenuVisibility !== 'click' &&
+		computedSubmenuVisibility !== 'always'
 			? __(
 					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
 			  )
@@ -691,7 +740,7 @@ function Navigation( {
 						resetAll={ () => {
 							setAttributes( {
 								showSubmenuIcon: true,
-								openSubmenusOnClick: false,
+								submenuVisibility: 'hover',
 								overlayMenu: 'mobile',
 								hasIcon: true,
 								icon: 'handle',
@@ -749,28 +798,59 @@ function Navigation( {
 									{ __( 'Submenus' ) }
 								</h3>
 								<ToolsPanelItem
-									hasValue={ () => openSubmenusOnClick }
-									label={ __( 'Open on click' ) }
+									hasValue={ () =>
+										submenuVisibility !== 'hover'
+									}
+									label={ __( 'Submenu Visibility' ) }
 									onDeselect={ () =>
 										setAttributes( {
-											openSubmenusOnClick: false,
-											showSubmenuIcon: true,
+											submenuVisibility: 'hover',
 										} )
 									}
 									isShownByDefault
 								>
-									<ToggleControl
-										checked={ openSubmenusOnClick }
+									<ToggleGroupControl
+										__nextHasNoMarginBottom
+										__next40pxDefaultSize
+										label={ __( 'Submenu Visibility' ) }
+										value={ submenuVisibility }
 										onChange={ ( value ) => {
-											setAttributes( {
-												openSubmenusOnClick: value,
-												...( value && {
-													showSubmenuIcon: true,
-												} ), // Make sure arrows are shown when we toggle this on.
-											} );
+											const newAttributes = {
+												submenuVisibility: value,
+											};
+											const prevSubmenuVisibility =
+												submenuVisibility;
+											// If "always" is selected, hide the arrow because the formatting is broken for it when using center alignment.
+											if ( value === 'always' ) {
+												newAttributes.showSubmenuIcon = false;
+											} else if (
+												value === 'click' ||
+												prevSubmenuVisibility ===
+													'always'
+											) {
+												// When switching to "click" or away from "always", show the arrow
+												newAttributes.showSubmenuIcon = true;
+											}
+
+											setAttributes( newAttributes );
 										} }
-										label={ __( 'Open on click' ) }
-									/>
+										isBlock
+									>
+										<ToggleGroupControlOption
+											value="hover"
+											label={ __( 'Hover' ) }
+										/>
+										<ToggleGroupControlOption
+											value="click"
+											label={ __( 'Click' ) }
+										/>
+										{ orientation === 'vertical' && (
+											<ToggleGroupControlOption
+												value="always"
+												label={ __( 'Always' ) }
+											/>
+										) }
+									</ToggleGroupControl>
 								</ToolsPanelItem>
 
 								<ToolsPanelItem
@@ -782,7 +862,8 @@ function Navigation( {
 										} )
 									}
 									isDisabled={
-										attributes.openSubmenusOnClick
+										computedSubmenuVisibility === 'click' ||
+										computedSubmenuVisibility === 'always'
 									}
 									isShownByDefault
 								>
@@ -794,7 +875,10 @@ function Navigation( {
 											} );
 										} }
 										disabled={
-											attributes.openSubmenusOnClick
+											computedSubmenuVisibility ===
+												'click' ||
+											computedSubmenuVisibility ===
+												'always'
 										}
 										label={ __( 'Show arrow' ) }
 									/>
@@ -829,6 +913,7 @@ function Navigation( {
 						overlayMenuPreviewClasses={ overlayMenuPreviewClasses }
 						overlayMenuPreviewId={ overlayMenuPreviewId }
 						isResponsive={ isResponsive }
+						currentTheme={ currentTheme }
 					/>
 				</InspectorControls>
 			) }

@@ -1,4 +1,9 @@
-import { type InlineConfig, mergeConfig, transformWithEsbuild } from 'vite';
+import {
+	type InlineConfig,
+	type PluginOption,
+	mergeConfig,
+	transformWithEsbuild,
+} from 'vite';
 import react from '@vitejs/plugin-react';
 import type { StorybookConfig } from '@storybook/react-vite';
 
@@ -26,7 +31,7 @@ const stories = [
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 ].filter( Boolean );
 
-export default {
+const config: StorybookConfig = {
 	core: {
 		disableTelemetry: true,
 	},
@@ -68,15 +73,15 @@ export default {
 			savePropValueAsString: true,
 		},
 	},
-	viteFinal: async ( config ) => {
-		return mergeConfig( config, {
+	viteFinal: async ( viteConfig ) => {
+		return mergeConfig( viteConfig, {
 			plugins: [
 				react( {
 					jsxImportSource: '@emotion/react',
 					babel: {
 						plugins: [ '@emotion/babel-plugin' ],
 					},
-				} ),
+				} ) as PluginOption,
 				{
 					name: 'load-js-files-as-jsx',
 					async transform( code: string, id: string ) {
@@ -121,4 +126,6 @@ export default {
 			},
 		} satisfies InlineConfig );
 	},
-} satisfies StorybookConfig;
+};
+
+export default config;

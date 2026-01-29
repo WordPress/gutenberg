@@ -30,7 +30,6 @@ function PatternsManageButton( { clientId } ) {
 			const block = getBlock( clientId );
 
 			const _isUnsyncedPattern =
-				window?.__experimentalContentOnlyPatternInsertion &&
 				!! block?.attributes?.metadata?.patternName;
 
 			const _isSyncedPattern =

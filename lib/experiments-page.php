@@ -174,18 +174,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-content-only-pattern-insertion',
-		__( 'Pattern Editing: Make patterns contentOnly by default upon insertion', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'When patterns are inserted, default to a simplified content only mode for editing pattern content.', 'gutenberg' ),
-			'id'    => 'gutenberg-content-only-pattern-insertion',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-content-only-inspector-fields',
 		__( 'Block fields: Show dataform driven inspector fields on blocks that support them', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -218,19 +206,6 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables custom mobile overlay design and content control for Navigation blocks, allowing you to create flexible, professional menu experiences.', 'gutenberg' ),
 			'id'    => 'gutenberg-customizable-navigation-overlays',
-		)
-	);
-
-	// create a new experiment for hiding blocks based on screen size
-	add_settings_field(
-		'gutenberg-hide-blocks-based-on-screen-size',
-		__( 'Hide blocks based on screen size', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Extends block visibility block supports with responsive design controls for hiding blocks based on screen size.', 'gutenberg' ),
-			'id'    => 'gutenberg-hide-blocks-based-on-screen-size',
 		)
 	);
 
