@@ -1,13 +1,10 @@
-import { cloneElement, forwardRef } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as BaseUITabs } from '@base-ui/react/tabs';
 import { chevronRight } from '@wordpress/icons';
+import { Icon } from '../icon';
 import styles from './style.module.css';
 import type { TabProps } from './types';
-
-const ChevronRight = ( props: React.SVGProps< SVGSVGElement > ) => {
-	return cloneElement( chevronRight, props );
-};
 
 /**
  * An individual interactive tab button that toggles the corresponding panel.
@@ -26,7 +23,7 @@ export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
 			{ ...otherProps }
 		>
 			<span className={ styles.tab__children }>{ children }</span>
-			<ChevronRight className={ styles.tab__chevron } />
+			<Icon icon={ chevronRight } className={ styles.tab__chevron } />
 		</BaseUITabs.Tab>
 	);
 } );
