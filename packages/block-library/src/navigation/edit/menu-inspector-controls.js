@@ -15,7 +15,7 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { arrowLeft } from '@wordpress/icons';
 
 /**
@@ -154,6 +154,43 @@ const MainContent = ( {
 		},
 		[ clientId ]
 	);
+
+	// Get the globally selected block
+	const globallySelectedBlock = useSelect(
+		( select ) => {
+			const { getSelectedBlock, getBlockParents } =
+				select( blockEditorStore );
+			const selected = getSelectedBlock();
+
+			// Check if the selected block is a child of this navigation block
+			if ( selected ) {
+				const parents = getBlockParents( selected.clientId );
+				const isChildOfNavigation = parents.includes( clientId );
+
+				if (
+					isChildOfNavigation &&
+					BLOCKS_WITH_LINK_UI_SUPPORT.includes( selected.name )
+				) {
+					return selected;
+				}
+			}
+
+			return null;
+		},
+		[ clientId ]
+	);
+
+	// When a different block is selected from the canvas, go back to list view
+	useEffect( () => {
+		if ( selectedItemClientId ) {
+			if (
+				! globallySelectedBlock ||
+				globallySelectedBlock.clientId !== selectedItemClientId
+			) {
+				setSelectedItemClientId( null );
+			}
+		}
+	}, [ globallySelectedBlock, selectedItemClientId ] );
 
 	// Get selected block details
 	const selectedBlock = useSelect(
