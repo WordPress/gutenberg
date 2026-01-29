@@ -199,7 +199,8 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 
 		// Create a post that contains BOTH a gallery block AND a Latest Posts block.
 		// This matches the exact scenario where the recursion issue was discovered.
-		$post_with_block = self::factory()->post->create_and_get(
+		// The post will be picked up by the Latest Posts query since it's the most recent.
+		self::factory()->post->create_and_get(
 			array(
 				'post_title'   => 'Post with gallery and Latest Posts block',
 				'post_content' => $gallery_block . "\n\n" . $latest_posts_block,
