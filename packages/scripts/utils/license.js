@@ -71,6 +71,7 @@ const gpl2CompatibleLicenses = [
 	'ISC',
 	'LGPL-2.1',
 	'MIT',
+	'MIT-0',
 	'MIT/X11',
 	'MPL-2.0',
 	'ODC-By-1.0',
