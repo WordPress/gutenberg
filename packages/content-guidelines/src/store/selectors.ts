@@ -123,3 +123,33 @@ export const getRestoringRevisionId = ( state: State ): number | null =>
  */
 export const getRevisionPagination = ( state: State ): RevisionPagination =>
 	state.revisionPagination;
+
+/**
+ * Get guidelines for specific block types.
+ *
+ * @param state      Store state.
+ * @param blockNames Array of block names (e.g., ['core/button', 'core/heading']).
+ * @return Object with block names as keys and their guidelines as values.
+ */
+export const getGuidelinesForBlocks = (
+	state: State,
+	blockNames: string[]
+): Record< string, { guidelines: string } | null > => {
+	if ( ! state.guidelines?.guideline_categories?.blocks ) {
+		return {};
+	}
+
+	const blocks = state.guidelines.guideline_categories.blocks;
+	return blockNames.reduce(
+		( result, blockName ) => {
+			result[ blockName ] = blocks[ blockName ] || null;
+			return result;
+		},
+		{} as Record< string, { guidelines: string } | null >
+	);
+};
+
+// Aliases for naming consistency.
+export const getGuidelinesByCategory = getCategory;
+export const isGuidelinesLoading = isLoading;
+export const getGuidelinesError = getError;
