@@ -6,7 +6,7 @@
 /**
  * Size scale for padding tokens.
  */
-export type PaddingSize = '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+export type PaddingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 
 /**
  * Size scale for gap tokens.

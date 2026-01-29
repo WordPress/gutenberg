@@ -4,12 +4,12 @@
 
 ### Breaking changes
 
--   Renamed padding tokens to remove the `surface` segment and updated the scale from `2xs`–`lg` to `2xs`–`2xl`. To preserve the same values:
-		- `--wpds-dimension-padding-surface-2xs`: use `--wpds-dimension-padding-2xs` instead.
-		- `--wpds-dimension-padding-surface-xs`: use `--wpds-dimension-padding-xs` instead.
-		- `--wpds-dimension-padding-surface-sm`: use `--wpds-dimension-padding-md` instead.
-		- `--wpds-dimension-padding-surface-md`: use `--wpds-dimension-padding-xl` instead.
-		- `--wpds-dimension-padding-surface-lg`: use `--wpds-dimension-padding-2xl` instead.
+-   Renamed padding tokens to remove the `surface` segment and updated the scale from `2xs`–`lg` to `xs`–`3xl`. To preserve the same values:
+		- `--wpds-dimension-padding-surface-2xs`: use `--wpds-dimension-padding-xs` instead.
+		- `--wpds-dimension-padding-surface-xs`: use `--wpds-dimension-padding-sm` instead.
+		- `--wpds-dimension-padding-surface-sm`: use `--wpds-dimension-padding-lg` instead.
+		- `--wpds-dimension-padding-surface-md`: use `--wpds-dimension-padding-2xl` instead.
+		- `--wpds-dimension-padding-surface-lg`: use `--wpds-dimension-padding-3xl` instead.
 
 ## 0.6.0 (2026-01-29)
 
