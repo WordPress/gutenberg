@@ -39,22 +39,29 @@ const ERROR_CODE_DEFAULTS = {
  * @return {Object} Object with title and description strings.
  */
 export function getSyncErrorMessages( error ) {
+	// Default messages for generic disconnection without specific error
+	const genericDisconnectMessages = {
+		title: __( 'Disconnected' ),
+		description: __(
+			'You are currently disconnected from the collaborative editing server. ' +
+				'Editing is temporarily disabled to prevent conflicts.'
+		),
+	};
+
 	if ( ! error ) {
-		return { title: '', description: '' };
+		return genericDisconnectMessages;
 	}
 
 	// Look up defaults based on code
 	const defaults = ERROR_CODE_DEFAULTS[ error.code ];
 
-	// Use explicit message/description if provided, otherwise fall back to defaults
+	// Use explicit message/description if provided, otherwise fall back to defaults or generic messages
 	return {
-		title: error.message || defaults?.title || __( 'Disconnected' ),
+		title:
+			error.message || defaults?.title || genericDisconnectMessages.title,
 		description:
 			error.description ||
 			defaults?.description ||
-			__(
-				'You are currently disconnected from the collaborative editing server. ' +
-					'Editing is temporarily disabled to prevent conflicts.'
-			),
+			genericDisconnectMessages.description,
 	};
 }

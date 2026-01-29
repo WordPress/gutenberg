@@ -237,7 +237,7 @@ export function createSyncManager( debug = false ): SyncManager {
 				} );
 
 				// Attach status listener after provider creation.
-				provider.on( 'status', handlers.onStateChange );
+				provider.on( 'sync-connection-status', handlers.onStateChange );
 
 				return provider;
 			} )
@@ -331,7 +331,7 @@ export function createSyncManager( debug = false ): SyncManager {
 				} );
 
 				// Attach status listener after provider creation.
-				provider.on( 'status', handlers.onStateChange );
+				provider.on( 'sync-connection-status', handlers.onStateChange );
 
 				return provider;
 			} )
