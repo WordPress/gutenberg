@@ -79,7 +79,9 @@
 			width: inherit;
 			height: $grid-unit-05;
 			border-radius: $radius-small;
-			transition: width 0.3s ease-out;
+			@media not (prefers-reduced-motion) {
+				transition: width 0.3s ease-out;
+			}
 		}
 
 		&:is(:hover, :focus)::before {
