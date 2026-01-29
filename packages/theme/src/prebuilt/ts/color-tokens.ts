@@ -96,6 +96,7 @@ export default {
 	'bg-stroke4': [
 		'bg-thumb-neutral-weak-active',
 		'stroke-interactive-neutral-active',
+		'stroke-interactive-neutral-strong',
 	],
 	'bg-stroke2': [
 		'bg-thumb-neutral-disabled',
@@ -105,10 +106,7 @@ export default {
 	],
 	'bg-stroke1': [ 'bg-track-neutral-weak', 'stroke-surface-neutral-weak' ],
 	'bg-bgFillInverted2': [ 'bg-interactive-neutral-strong-active' ],
-	'bg-bgFillInverted1': [
-		'bg-interactive-neutral-strong',
-		'stroke-interactive-neutral-strong',
-	],
+	'bg-bgFillInverted1': [ 'bg-interactive-neutral-strong' ],
 	'bg-fgFillInverted': [
 		'fg-interactive-neutral-strong',
 		'fg-interactive-neutral-strong-active',

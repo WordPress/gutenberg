@@ -1466,7 +1466,7 @@
 					"$description": "Accessible stroke color used for interactive elements with normal emphasis, in their disabled state, regardless of the tone."
 				},
 				"neutral-strong": {
-					"$value": "{wpds-color.primitive.bg.bgFillInverted1}",
+					"$value": "{wpds-color.primitive.bg.stroke4}",
 					"$description": "Accessible stroke color used for interactive neutrally-toned elements with strong emphasis."
 				},
 				"brand": {
