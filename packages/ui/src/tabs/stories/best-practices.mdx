@@ -42,7 +42,7 @@ const MyUncontrolledTabs = () => (
 Tabs can also be used in a controlled mode, where the parent component uses the `value` and `onValueChange` props to control tab selection. In this mode, the `defaultValue` prop will be ignored if it is provided. To indicate that no tabs are selected, pass `null` to the `value`.
 
 ```tsx
-import { Tabs } from '@automattic/design-system';
+import { Tabs } from '@wordpress/ui';
 
 const [ selectedTabId, setSelectedTabId ] = useState<
 	string | undefined | null
