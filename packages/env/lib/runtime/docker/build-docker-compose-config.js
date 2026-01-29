@@ -181,18 +181,16 @@ module.exports = function buildDockerComposeConfig( config ) {
 		config.env.tests.phpmyadminPort ?? ''
 	}}:80`;
 
-	// MySQL healthcheck using mariadb-admin ping.
-	// Uses root credentials to avoid requiring special healthcheck user,
-	// which would break existing wp-env installations.
+	// MySQL healthcheck using MariaDB's official healthcheck script.
+	// --connect: verifies TCP connection and that entrypoint has finished
+	// --innodb_initialized: ensures InnoDB storage engine is fully initialized
+	// Timing is generous to support slow CI environments.
 	const mysqlHealthcheck = {
-		test: [
-			'CMD-SHELL',
-			'mariadb-admin ping -h localhost -u root -p$MYSQL_ROOT_PASSWORD',
-		],
+		test: [ 'CMD', 'healthcheck.sh', '--connect', '--innodb_initialized' ],
 		interval: '5s',
-		timeout: '5s',
-		retries: 10,
-		start_period: '30s',
+		timeout: '10s',
+		retries: 12,
+		start_period: '60s',
 	};
 
 	return {

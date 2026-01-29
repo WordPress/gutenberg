@@ -48,20 +48,6 @@ function isWPMajorMinorVersionLower( version, compareVersion ) {
 }
 
 /**
- * Checks a WordPress database connection. An error is thrown if the test is
- * unsuccessful.
- *
- * @param {WPConfig} config The wp-env config object.
- */
-async function checkDatabaseConnection( { dockerComposeConfigPath, debug } ) {
-	await dockerCompose.run( 'cli', 'wp db check', {
-		config: dockerComposeConfigPath,
-		commandOptions: [ '--rm' ],
-		log: debug,
-	} );
-}
-
-/**
  * Configures WordPress for the given environment by installing WordPress,
  * activating all plugins, and activating the first theme. These steps are
  * performed sequentially so as to not overload the WordPress instance.
@@ -316,7 +302,6 @@ async function copyCoreFiles( fromPath, toPath ) {
 }
 
 module.exports = {
-	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,
 	setupWordPressDirectories,

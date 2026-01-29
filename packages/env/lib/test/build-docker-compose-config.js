@@ -156,16 +156,24 @@ describe( 'buildDockerComposeConfig', () => {
 		} );
 
 		expect( config.services.mysql.healthcheck ).toBeDefined();
-		expect( config.services.mysql.healthcheck.test ).toContain(
-			'CMD-SHELL'
-		);
+		expect( config.services.mysql.healthcheck.test ).toEqual( [
+			'CMD',
+			'healthcheck.sh',
+			'--connect',
+			'--innodb_initialized',
+		] );
 		expect( config.services.mysql.healthcheck.interval ).toBe( '5s' );
-		expect( config.services.mysql.healthcheck.start_period ).toBe( '30s' );
+		expect( config.services.mysql.healthcheck.timeout ).toBe( '10s' );
+		expect( config.services.mysql.healthcheck.retries ).toBe( 12 );
+		expect( config.services.mysql.healthcheck.start_period ).toBe( '60s' );
 
 		expect( config.services[ 'tests-mysql' ].healthcheck ).toBeDefined();
-		expect( config.services[ 'tests-mysql' ].healthcheck.test ).toContain(
-			'CMD-SHELL'
-		);
+		expect( config.services[ 'tests-mysql' ].healthcheck.test ).toEqual( [
+			'CMD',
+			'healthcheck.sh',
+			'--connect',
+			'--innodb_initialized',
+		] );
 	} );
 
 	it( 'should use service_healthy condition for WordPress depends_on', () => {
