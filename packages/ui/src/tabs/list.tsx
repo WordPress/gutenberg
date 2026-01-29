@@ -46,20 +46,8 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 				return;
 			}
 
-			// Grab a local reference to the list element to ensure it remains stable
-			// during the effect and the event listeners.
-			const localListEl = listEl;
-
-			function measureOverflow() {
-				if ( ! localListEl ) {
-					setOverflow( {
-						first: false,
-						last: false,
-					} );
-					return;
-				}
-
-				const { scrollWidth, clientWidth, scrollLeft } = localListEl;
+			const measureOverflow = () => {
+				const { scrollWidth, clientWidth, scrollLeft } = listEl;
 
 				setOverflow( {
 					first: scrollLeft > DEFAULT_SCROLL_MARGIN,
@@ -67,12 +55,13 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 						scrollLeft + clientWidth <
 						scrollWidth - DEFAULT_SCROLL_MARGIN,
 				} );
-			}
+			};
 
 			const resizeObserver = new ResizeObserver( measureOverflow );
-			resizeObserver.observe( localListEl );
+			resizeObserver.observe( listEl );
+
 			let scrollTick = false;
-			function throttleMeasureOverflowOnScroll() {
+			const throttleMeasureOverflowOnScroll = () => {
 				if ( ! scrollTick ) {
 					requestAnimationFrame( () => {
 						measureOverflow();
@@ -80,8 +69,8 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 					} );
 					scrollTick = true;
 				}
-			}
-			localListEl.addEventListener(
+			};
+			listEl.addEventListener(
 				'scroll',
 				throttleMeasureOverflowOnScroll,
 				{ passive: true }
@@ -91,7 +80,7 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 			measureOverflow();
 
 			return () => {
-				localListEl.removeEventListener(
+				listEl.removeEventListener(
 					'scroll',
 					throttleMeasureOverflowOnScroll
 				);
