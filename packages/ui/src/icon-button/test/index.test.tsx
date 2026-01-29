@@ -19,7 +19,7 @@ describe( 'IconButton', () => {
 				icon={ <svg /> }
 				variant="outline"
 				disabled
-				accessibleWhenDisabled
+				focusableWhenDisabled
 				render={ <button data-testid="button" /> }
 			/>
 		);
