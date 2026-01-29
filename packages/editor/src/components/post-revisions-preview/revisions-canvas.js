@@ -13,7 +13,7 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock, parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useRef, useState } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 import { registerFormatType } from '@wordpress/rich-text';
@@ -24,7 +24,7 @@ import { registerFormatType } from '@wordpress/rich-text';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import VisualEditor from '../visual-editor';
-import DiffMarkers from './diff-markers';
+import { useDiffMarkers } from './diff-markers';
 import { preserveClientIds } from './preserve-client-ids';
 import { diffRevisionContent } from './block-diff';
 
@@ -187,6 +187,16 @@ function DiffStyleOverrides( { showDiff } ) {
 	return null;
 }
 
+function CanvasContent( { showDiff } ) {
+	const [ contentRef, diffMarkers ] = useDiffMarkers();
+	return (
+		<>
+			<VisualEditor contentRef={ contentRef } />
+			{ showDiff && diffMarkers }
+		</>
+	);
+}
+
 /**
  * Canvas component that renders a post revision in read-only mode.
  *
@@ -212,8 +222,6 @@ export default function RevisionsCanvas( { showDiff } ) {
 
 	// Track previously rendered blocks to preserve clientIds between renders.
 	const previousBlocksRef = useRef( [] );
-	// State to hold the iframe body element for diff markers.
-	const [ contentElement, setContentElement ] = useState( null );
 
 	const blocks = useMemo( () => {
 		const currentContent = revision?.content?.raw ?? '';
@@ -271,10 +279,7 @@ export default function RevisionsCanvas( { showDiff } ) {
 		<ExperimentalBlockEditorProvider value={ blocks } settings={ settings }>
 			<DiffStyleOverrides showDiff={ showDiff } />
 			<div className="editor-revisions-canvas__content">
-				<VisualEditor contentRef={ setContentElement } />
-				{ showDiff && (
-					<DiffMarkers contentElement={ contentElement } />
-				) }
+				<CanvasContent showDiff={ showDiff } />
 			</div>
 		</ExperimentalBlockEditorProvider>
 	) : (

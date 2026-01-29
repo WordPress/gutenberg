@@ -1,10 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, useEffect } from '@wordpress/element';
+import { useState, useMemo, useRef } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { useBlockElementRef } = unlock( blockEditorPrivateApis );
 
 /**
  * Recursively collect blocks with diff status.
@@ -28,83 +39,48 @@ function collectDiffBlocks( blocks ) {
 	return result;
 }
 
+const STATUS_LABELS = {
+	added: __( 'Go to added block' ),
+	removed: __( 'Go to removed block' ),
+	modified: __( 'Go to modified block' ),
+};
+
+/**
+ * Button component for a single diff marker.
+ * Uses useBlockElementRef to focus the block element on click.
+ *
+ * @param {Object} props          Component props.
+ * @param {string} props.clientId The block client ID.
+ * @param {string} props.status   The diff status (added/removed/modified).
+ * @param {Object} props.position Position data with top and height percentages.
+ * @return {JSX.Element} The diff marker button.
+ */
+function DiffMarkerButton( { clientId, status, position } ) {
+	const ref = useRef();
+	useBlockElementRef( clientId, ref );
+
+	return (
+		<button
+			className={ `revision-diff-marker is-${ status }` }
+			style={ {
+				top: `${ position.top }%`,
+				height: `${ Math.max( position.height, 0.5 ) }%`,
+			} }
+			onClick={ () => ref.current?.focus() }
+			aria-label={ STATUS_LABELS[ status ] }
+		/>
+	);
+}
+
 /**
  * Component that renders diff markers in a scrollbar-style strip.
- * Shows colored ticks for added/removed/modified blocks.
- * Rendered outside the iframe, receives the iframe body element.
  *
- * @param {Object}  props                Component props.
- * @param {Element} props.contentElement The iframe body element.
+ * @param {Object} props            Component props.
+ * @param {Object} props.positions  Map of clientId to position data.
+ * @param {Array}  props.diffBlocks Blocks with diff status.
  * @return {JSX.Element} The diff markers component.
  */
-export default function DiffMarkers( { contentElement } ) {
-	const [ positions, setPositions ] = useState( {} );
-	const blocks = useSelect(
-		( select ) => select( blockEditorStore ).getBlocks(),
-		[]
-	);
-
-	const diffBlocks = useMemo( () => collectDiffBlocks( blocks ), [ blocks ] );
-
-	// Set up ResizeObserver and calculate positions when content element is available
-	useEffect( () => {
-		if ( ! contentElement ) {
-			return;
-		}
-
-		const doc = contentElement.ownerDocument;
-
-		const updatePositions = () => {
-			const scrollHeight = doc.documentElement.scrollHeight;
-			if ( scrollHeight === 0 ) {
-				return;
-			}
-
-			const newPositions = {};
-			for ( const { clientId } of diffBlocks ) {
-				const el = doc.querySelector( `[data-block="${ clientId }"]` );
-				if ( el ) {
-					const rect = el.getBoundingClientRect();
-					const scrollTop = doc.documentElement.scrollTop;
-					const top = rect.top + scrollTop;
-					newPositions[ clientId ] = {
-						top: ( top / scrollHeight ) * 100,
-						height: ( rect.height / scrollHeight ) * 100,
-					};
-				}
-			}
-
-			setPositions( newPositions );
-		};
-
-		// Initial calculation
-		updatePositions();
-
-		// ResizeObserver for content size changes
-		const { ResizeObserver } = doc.defaultView;
-		const resizeObserver = new ResizeObserver( updatePositions );
-		resizeObserver.observe( doc.body );
-
-		return () => {
-			resizeObserver.disconnect();
-		};
-	}, [ contentElement, diffBlocks ] );
-
-	const scrollToBlock = ( clientId ) => {
-		const doc = contentElement?.ownerDocument;
-		if ( ! doc ) {
-			return;
-		}
-		const block = doc.querySelector( `[data-block="${ clientId }"]` );
-		block?.scrollIntoView( { behavior: 'smooth', block: 'center' } );
-	};
-
-	const statusLabels = {
-		added: __( 'Scroll to added block' ),
-		removed: __( 'Scroll to removed block' ),
-		modified: __( 'Scroll to modified block' ),
-	};
-
+function DiffMarkers( { positions, diffBlocks } ) {
 	return (
 		<div
 			className="revision-diff-markers"
@@ -117,18 +93,85 @@ export default function DiffMarkers( { contentElement } ) {
 					return null;
 				}
 				return (
-					<button
+					<DiffMarkerButton
 						key={ clientId }
-						className={ `revision-diff-marker is-${ status }` }
-						style={ {
-							top: `${ pos.top }%`,
-							height: `${ Math.max( pos.height, 0.5 ) }%`,
-						} }
-						onClick={ () => scrollToBlock( clientId ) }
-						aria-label={ statusLabels[ status ] }
+						clientId={ clientId }
+						status={ status }
+						position={ pos }
 					/>
 				);
 			} ) }
 		</div>
 	);
+}
+
+/**
+ * Hook that provides diff markers functionality.
+ * Returns a ref callback for the content element and a DiffMarkers component.
+ * Must be used inside a BlockEditorProvider context.
+ *
+ * @return {Array} Tuple of [contentRef, DiffMarkersComponent].
+ */
+export function useDiffMarkers() {
+	const [ positions, setPositions ] = useState( {} );
+	const blocks = useSelect(
+		( select ) => select( blockEditorStore ).getBlocks(),
+		[]
+	);
+
+	const diffBlocks = useMemo( () => collectDiffBlocks( blocks ), [ blocks ] );
+
+	// Ref effect to set up ResizeObserver when content element is available
+	const contentRef = useRefEffect(
+		( element ) => {
+			const doc = element.ownerDocument;
+
+			const updatePositions = () => {
+				const scrollHeight = doc.documentElement.scrollHeight;
+				if ( scrollHeight === 0 ) {
+					return;
+				}
+
+				const newPositions = {};
+				for ( const { clientId } of diffBlocks ) {
+					const el = doc.querySelector(
+						`[data-block="${ clientId }"]`
+					);
+					if ( el ) {
+						const rect = el.getBoundingClientRect();
+						const scrollTop = doc.documentElement.scrollTop;
+						const top = rect.top + scrollTop;
+						newPositions[ clientId ] = {
+							top: ( top / scrollHeight ) * 100,
+							height: ( rect.height / scrollHeight ) * 100,
+						};
+					}
+				}
+
+				setPositions( newPositions );
+			};
+
+			// Initial calculation
+			updatePositions();
+
+			// ResizeObserver for content size changes
+			const { ResizeObserver } = doc.defaultView;
+			const resizeObserver = new ResizeObserver( updatePositions );
+			resizeObserver.observe( doc.body );
+
+			return () => {
+				resizeObserver.disconnect();
+			};
+		},
+		[ diffBlocks ]
+	);
+
+	return [
+		contentRef,
+		<DiffMarkers
+			key="diff-markers"
+			positions={ positions }
+			diffBlocks={ diffBlocks }
+		/>,
+	];
 }
