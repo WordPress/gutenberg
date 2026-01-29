@@ -1,6 +1,6 @@
 import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
-import { Tabs as BaseUITabs } from '@base-ui/react/tabs';
+import { Tabs as _Tabs } from '@base-ui/react/tabs';
 import { chevronRight } from '@wordpress/icons';
 import { Icon } from '../icon';
 import styles from './style.module.css';
@@ -17,13 +17,13 @@ export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
 	forwardedRef
 ) {
 	return (
-		<BaseUITabs.Tab
+		<_Tabs.Tab
 			ref={ forwardedRef }
 			className={ clsx( styles.tab, className ) }
 			{ ...otherProps }
 		>
 			<span className={ styles.tab__children }>{ children }</span>
 			<Icon icon={ chevronRight } className={ styles.tab__chevron } />
-		</BaseUITabs.Tab>
+		</_Tabs.Tab>
 	);
 } );

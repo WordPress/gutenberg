@@ -6,7 +6,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import clsx from 'clsx';
-import { Tabs as BaseUITabs } from '@base-ui/react/tabs';
+import { Tabs as _Tabs } from '@base-ui/react/tabs';
 import { useMergeRefs } from '@wordpress/compose';
 import styles from './style.module.css';
 import type { TabListProps } from './types';
@@ -105,7 +105,7 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 		] );
 
 		return (
-			<BaseUITabs.List
+			<_Tabs.List
 				ref={ mergedListRef }
 				activateOnFocus={ activateOnFocus }
 				data-select-on-move={ activateOnFocus ? 'true' : 'false' }
@@ -134,8 +134,8 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 				{ ...otherProps }
 			>
 				{ children }
-				<BaseUITabs.Indicator className={ styles.indicator } />
-			</BaseUITabs.List>
+				<_Tabs.Indicator className={ styles.indicator } />
+			</_Tabs.List>
 		);
 	}
 );
