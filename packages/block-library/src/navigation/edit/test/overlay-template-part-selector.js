@@ -119,7 +119,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay Template',
+				name: 'Overlay template',
 			} );
 			expect( select ).toBeDisabled();
 		} );
@@ -165,7 +165,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			expect(
-				screen.getByRole( 'combobox', { name: 'Overlay Template' } )
+				screen.getByRole( 'combobox', { name: 'Overlay template' } )
 			).toBeInTheDocument();
 			expect(
 				screen.getByRole( 'button', {
@@ -188,7 +188,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay Template',
+				name: 'Overlay template',
 			} );
 			expect( select ).toBeInTheDocument();
 
@@ -243,7 +243,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			render( <OverlayTemplatePartSelector { ...defaultProps } /> );
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay Template',
+				name: 'Overlay template',
 			} );
 
 			await user.selectOptions( select, 'my-overlay' );
@@ -270,7 +270,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay Template',
+				name: 'Overlay template',
 			} );
 
 			await user.selectOptions( select, '' );
@@ -295,7 +295,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 			);
 
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay Template',
+				name: 'Overlay template',
 			} );
 
 			expect( select ).toHaveValue( 'my-overlay' );
@@ -335,7 +335,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			// Component shows disabled select and disabled button when loading
 			const select = screen.getByRole( 'combobox', {
-				name: 'Overlay Template',
+				name: 'Overlay template',
 			} );
 			expect( select ).toBeDisabled();
 
@@ -493,7 +493,7 @@ describe( 'OverlayTemplatePartSelector', () => {
 
 			// Should show dropdown selector
 			expect(
-				screen.getByRole( 'combobox', { name: 'Overlay Template' } )
+				screen.getByRole( 'combobox', { name: 'Overlay template' } )
 			).toBeInTheDocument();
 
 			// Should show default help text

@@ -261,7 +261,7 @@ export default function OverlayTemplatePartSelector( {
 				id={ headingId }
 				className="wp-block-navigation__overlay-selector-header"
 			>
-				{ __( 'Overlay Template' ) }
+				{ __( 'Overlay template' ) }
 			</h3>
 			{ hasResolved &&
 			( overlayTemplateParts.length === 0 ||
