@@ -75,12 +75,10 @@ export function Comments( {
 		useDispatch( blockEditorStore )
 	);
 
-	// Helper functions to manage open reply forms
 	const openReplyForm = ( threadId ) => {
 		setOpenReplyFormsSet( ( prev ) => new Set( prev ).add( threadId ) );
 	};
 
-	// Helper functions to close reply forms
 	const closeReplyForm = ( threadId ) => {
 		setOpenReplyFormsSet( ( prev ) => {
 			const next = new Set( prev );
