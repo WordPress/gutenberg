@@ -76,15 +76,13 @@ module.exports = async function status( { spinner, debug } ) {
  * @return {string} Formatted output.
  */
 function formatNotInitialized( config ) {
+	const indent = '    - ';
 	return `
-${ chalk.bold( 'wp-env Status' ) }
-${ chalk.dim( '─'.repeat( 40 ) ) }
+${ chalk.bold( 'status' ) }: ${ chalk.red( 'uninitialized' ) }
+${ indent }install path: ${ chalk.dim( config.workDirectoryPath ) }
+${ indent }config: ${ chalk.dim( config.configDirectoryPath ) }
 
-Status: ${ chalk.red( 'Uninitialized' ) }
 ${ chalk.dim( 'Run `wp-env start` to initialize the environment.' ) }
-
-Config Directory: ${ chalk.dim( config.configDirectoryPath ) }
-Work Directory: ${ chalk.dim( config.workDirectoryPath ) }
 `;
 }
 
@@ -96,107 +94,49 @@ Work Directory: ${ chalk.dim( config.workDirectoryPath ) }
  */
 function formatStatus( status ) {
 	const statusColor = status.status === 'running' ? chalk.green : chalk.red;
-	const statusText =
-		status.status.charAt( 0 ).toUpperCase() + status.status.slice( 1 );
+	const indent = '    - ';
+	const envIndent = '        - ';
 
 	let output = `
-${ chalk.bold( 'wp-env Status' ) }
-${ chalk.dim( '─'.repeat( 40 ) ) }
-
-Status: ${ statusColor( statusText ) }
-Runtime: ${ chalk.dim( status.runtime ) }
+${ chalk.bold( 'status' ) }: ${ statusColor( status.status ) }
+${ indent }runtime: ${ chalk.dim( status.runtime ) }
+${ indent }install path: ${ chalk.dim( status.workDirectoryPath ) }
+${ indent }config: ${ chalk.dim( status.configDirectoryPath ) }
 `;
 
-	// URLs section.
-	if ( status.urls ) {
-		output += `
-${ chalk.bold( 'URLs' ) }
-${ chalk.dim( '─'.repeat( 40 ) ) }
-`;
-		if ( status.urls.development ) {
-			output += `Development Site: ${ chalk.dim(
-				status.urls.development
-			) }\n`;
-		}
-		if ( status.urls.tests ) {
-			output += `Tests Site: ${ chalk.dim( status.urls.tests ) }\n`;
-		}
-		if ( status.urls.phpmyadmin ) {
-			output += `phpMyAdmin: ${ chalk.dim( status.urls.phpmyadmin ) }\n`;
-		}
-		if ( status.urls.testsPhpmyadmin ) {
-			output += `Tests phpMyAdmin: ${ chalk.dim(
-				status.urls.testsPhpmyadmin
-			) }\n`;
-		}
-	}
-
-	// Ports section.
-	if ( status.ports ) {
-		output += `
-${ chalk.bold( 'Ports' ) }
-${ chalk.dim( '─'.repeat( 40 ) ) }
-`;
-		if ( status.ports.development ) {
-			output += `Development: ${ chalk.dim(
-				status.ports.development
-			) }\n`;
-		}
-		if ( status.ports.tests ) {
-			output += `Tests: ${ chalk.dim( status.ports.tests ) }\n`;
-		}
-		if ( status.ports.mysql ) {
-			output += `MySQL: ${ chalk.dim( status.ports.mysql ) }\n`;
-		}
-		if ( status.ports.testsMysql ) {
-			output += `Tests MySQL: ${ chalk.dim(
-				status.ports.testsMysql
-			) }\n`;
-		}
-	}
-
-	// Configuration section.
-	if ( status.config ) {
-		output += `
-${ chalk.bold( 'Configuration' ) }
-${ chalk.dim( '─'.repeat( 40 ) ) }
-`;
-		if ( status.config.wpVersion ) {
-			output += `WordPress: ${ chalk.dim( status.config.wpVersion ) }\n`;
-		}
-		if ( status.config.phpVersion ) {
-			output += `PHP Version: ${ chalk.dim(
-				status.config.phpVersion
-			) }\n`;
-		}
-		output += `Multisite: ${ chalk.dim(
-			status.config.multisite ? 'Yes' : 'No'
+	// Environment section.
+	output += `\n${ chalk.bold( 'environment' ) }:\n`;
+	if ( status.urls?.development ) {
+		output += `${ envIndent }url: ${ chalk.dim(
+			status.urls.development
 		) }\n`;
-
-		if ( status.config.plugins && status.config.plugins.length > 0 ) {
-			output += `Plugins: ${ chalk.dim(
-				status.config.plugins.join( ', ' )
-			) }\n`;
-		}
-		if ( status.config.themes && status.config.themes.length > 0 ) {
-			output += `Themes: ${ chalk.dim(
-				status.config.themes.join( ', ' )
-			) }\n`;
-		}
-		if ( status.config.mappings && status.config.mappings.length > 0 ) {
-			output += `Mappings: ${ chalk.dim(
-				status.config.mappings.join( ', ' )
-			) }\n`;
-		}
 	}
-
-	// Paths section.
-	output += `
-${ chalk.bold( 'Paths' ) }
-${ chalk.dim( '─'.repeat( 40 ) ) }
-Config Directory: ${ chalk.dim( status.configDirectoryPath ) }
-Work Directory: ${ chalk.dim( status.workDirectoryPath ) }
-`;
+	output += `${ envIndent }multisite: ${ chalk.dim(
+		status.config?.multisite ? 'yes' : 'no'
+	) }\n`;
+	output += `${ envIndent }xdebug: ${ chalk.dim(
+		status.config?.xdebug || 'off'
+	) }\n`;
+	if ( status.ports?.development ) {
+		output += `${ envIndent }http port: ${ chalk.dim(
+			status.ports.development
+		) }\n`;
+	}
+	if ( status.urls?.phpmyadmin ) {
+		output += `${ envIndent }phpmyadmin url: ${ chalk.dim(
+			status.urls.phpmyadmin
+		) }\n`;
+	}
+	if ( status.ports?.mysql ) {
+		output += `${ envIndent }mysql port: ${ chalk.dim(
+			status.ports.mysql
+		) }\n`;
+	}
+	if ( status.ports?.tests ) {
+		output += `${ envIndent }test http port: ${ chalk.dim(
+			status.ports.tests
+		) }\n`;
+	}
 
 	return output;
 }

@@ -421,19 +421,13 @@ class PlaygroundRuntime {
 			runtime: 'playground',
 			urls: {
 				development: isRunning ? `http://localhost:${ port }` : null,
-				tests: null, // Playground doesn't support tests environment.
 			},
 			ports: {
 				development: port,
-				tests: null,
 			},
 			config: {
-				wpVersion: null,
-				phpVersion: envConfig.phpVersion || null,
 				multisite: envConfig.multisite,
-				plugins: envConfig.pluginSources.map( ( s ) => s.basename ),
-				themes: envConfig.themeSources.map( ( s ) => s.basename ),
-				mappings: Object.keys( envConfig.mappings ),
+				xdebug: 'off',
 			},
 			configDirectoryPath: config.configDirectoryPath,
 			workDirectoryPath: config.workDirectoryPath,
