@@ -78,7 +78,7 @@ export const fetchGuidelines =
 
 		try {
 			const response = await apiFetch< Guidelines >( {
-				path: '/__experimental/content-guidelines',
+				path: '/wp/v2/content-guidelines',
 			} );
 
 			dispatch( {
@@ -108,8 +108,8 @@ export const saveGuidelines =
 		try {
 			const method = data.id ? 'PATCH' : 'POST';
 			const path = data.id
-				? `/__experimental/content-guidelines/${ data.id }`
-				: '/__experimental/content-guidelines';
+				? `/wp/v2/content-guidelines/${ data.id }`
+				: '/wp/v2/content-guidelines';
 
 			const response = await apiFetch< Guidelines >( {
 				path,
@@ -186,7 +186,7 @@ export const fetchRevisions =
 
 		try {
 			const response = ( await apiFetch( {
-				path: `/__experimental/content-guidelines/${ postId }/revisions?page=${ page }&per_page=${ perPage }`,
+				path: `/wp/v2/content-guidelines/${ postId }/revisions?page=${ page }&per_page=${ perPage }`,
 				parse: false,
 			} ) ) as Response;
 
@@ -235,7 +235,7 @@ export const restoreRevision =
 
 		try {
 			const response = await apiFetch< Guidelines >( {
-				path: `/__experimental/content-guidelines/${ postId }/revisions/${ revisionId }/restore`,
+				path: `/wp/v2/content-guidelines/${ postId }/revisions/${ revisionId }/restore`,
 				method: 'POST',
 			} );
 

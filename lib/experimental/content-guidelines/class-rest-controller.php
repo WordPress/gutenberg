@@ -36,7 +36,8 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		// TODO: Change back to '__experimental' when WPCOM supports it.
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'content-guidelines';
 	}
 
