@@ -34,7 +34,7 @@ import Media from './media';
 import Link from './link';
 
 // bindings
-import { withBindingBadge, isFieldBindable } from './bindings';
+import { withBindingBadge } from './bindings';
 
 /**
  * Creates a configured control component that wraps a custom control
@@ -87,6 +87,23 @@ function BlockFields( {
 	// Check if bindings integration is enabled
 	const bindingsEnabled = window?.__experimentalBlockFieldsBindings;
 
+	// Get bindable attributes for this block type
+	const bindableAttributes = useSelect(
+		( select ) => {
+			if ( ! bindingsEnabled ) {
+				return [];
+			}
+			const { __experimentalBlockBindingsSupportedAttributes } =
+				select( blockEditorStore ).getSettings();
+			return (
+				__experimentalBlockBindingsSupportedAttributes?.[
+					blockType.name
+				] || []
+			);
+		},
+		[ bindingsEnabled, blockType.name ]
+	);
+
 	const computedForm = useMemo( () => {
 		if ( ! isCollapsed ) {
 			return blockType?.[ formKey ];
@@ -128,7 +145,7 @@ function BlockFields( {
 				// Wrap with binding badge for bindable fields
 				if (
 					bindingsEnabled &&
-					isFieldBindable( blockType.name, field.id )
+					bindableAttributes.includes( field.id )
 				) {
 					field.Edit = withBindingBadge(
 						configuredControl,
@@ -162,6 +179,7 @@ function BlockFields( {
 		blockType,
 		bindingsEnabled,
 		blockContext,
+		bindableAttributes,
 	] );
 
 	if ( ! blockTypeFields?.length ) {

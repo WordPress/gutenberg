@@ -72,7 +72,6 @@
 		},
 		"__experimentalSelector": "p",
 		"__unstablePasteTextInline": true,
-		"__experimentalBlockBindingsSupportedAttributes": [ "content" ],
 		"interactivity": {
 			"clientNavigation": true
 		}
