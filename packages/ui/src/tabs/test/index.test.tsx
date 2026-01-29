@@ -100,7 +100,9 @@ const UncontrolledTabs = ( {
 				<Tabs.Panel
 					key={ `${ tabObj.title }-${ index }` }
 					value={ tabObj.value }
-					tabIndex={ tabObj.tabpanel?.tabIndex ?? 0 }
+					{ ...( tabObj.tabpanel?.tabIndex !== undefined && {
+						tabIndex: tabObj.tabpanel.tabIndex,
+					} ) }
 				>
 					{ tabObj.content }
 				</Tabs.Panel>
@@ -148,7 +150,9 @@ const ControlledTabs = ( {
 				<Tabs.Panel
 					key={ `${ tabObj.title }-${ index }` }
 					value={ tabObj.value }
-					tabIndex={ tabObj.tabpanel?.tabIndex ?? 0 }
+					{ ...( tabObj.tabpanel?.tabIndex !== undefined && {
+						tabIndex: tabObj.tabpanel.tabIndex,
+					} ) }
 				>
 					{ tabObj.content }
 				</Tabs.Panel>
