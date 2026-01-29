@@ -4,7 +4,7 @@
 import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { link, lockSmall, warning, linkOff } from '@wordpress/icons';
+import { link, lockSmall, error, linkOff } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -57,7 +57,7 @@ export default function BindingFieldBadge( {
 
 	if ( isBound ) {
 		if ( ! isValid ) {
-			icon = warning;
+			icon = error;
 			label = __( 'Source not registered' );
 			className += ' is-invalid';
 		} else if ( isEditable ) {

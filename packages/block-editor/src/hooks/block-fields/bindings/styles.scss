@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/variables" as *;
+
 // HOC wrapper - layout field + badge
 .block-fields__field-with-binding {
 	display: flex;

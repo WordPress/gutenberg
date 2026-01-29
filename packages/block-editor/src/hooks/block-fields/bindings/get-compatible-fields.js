@@ -1,18 +1,12 @@
 /**
  * WordPress dependencies
  */
-import {
-	getBlockType,
-	privateApis as blocksPrivateApis,
-} from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../../lock-unlock';
-
-const { getAllBlockBindingsSources, getBlockBindingsSourceFieldsList } =
-	unlock( blocksPrivateApis );
 
 /**
  * Get compatible binding sources/fields for a specific Block Field.
@@ -29,7 +23,11 @@ export function getCompatibleFields(
 	blockContext,
 	select
 ) {
-	const blockType = getBlockType( blockName );
+	// Unlock selectors from the blocks store
+	const { getAllBlockBindingsSources, getBlockBindingsSourceFieldsList } =
+		unlock( select( blocksStore ) );
+
+	const blockType = select( blocksStore ).getBlockType( blockName );
 	const attributeType = blockType?.attributes?.[ fieldId ]?.type;
 
 	if ( ! attributeType ) {
