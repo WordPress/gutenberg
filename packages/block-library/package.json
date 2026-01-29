@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "9.38.1-next.v.0+b8934fcf9",
+	"version": "9.39.0",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -51,6 +51,7 @@
 		"./form/view": "./build-module/form/view.mjs",
 		"./image/view": "./build-module/image/view.mjs",
 		"./navigation/view": "./build-module/navigation/view.mjs",
+		"./playlist/view": "./build-module/playlist/view.mjs",
 		"./query/view": "./build-module/query/view.mjs",
 		"./search/view": "./build-module/search/view.mjs",
 		"./tabs/view": "./build-module/tabs/view.mjs"

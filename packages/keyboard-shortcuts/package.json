@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/keyboard-shortcuts",
-	"version": "5.38.1-next.v.0+b8934fcf9",
+	"version": "5.39.0",
 	"description": "Handling keyboard shortcuts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

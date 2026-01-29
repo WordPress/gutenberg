@@ -12,6 +12,7 @@ import { useInstanceId, useReducedMotion } from '@wordpress/compose';
 import {
 	EditorKeyboardShortcutsRegister,
 	privateApis as editorPrivateApis,
+	store as editorStore,
 } from '@wordpress/editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
@@ -145,6 +146,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 	const settings = useSpecificEditorSettings();
 	const { initialBlockSelection, ...editorSettings } = settings;
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
+	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const history = useHistory();
 	const onActionPerformed = useCallback(
@@ -257,6 +259,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 											tooltipPosition="middle right"
 											onClick={ () => {
 												resetZoomLevel();
+												setCurrentRevisionId( null );
 												history.navigate(
 													getNavigationPath(
 														location,

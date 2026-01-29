@@ -284,8 +284,8 @@ Displays a title with the number of comments. ([Source](https://github.com/WordP
 -	**Name:** core/comments-title
 -	**Category:** theme
 -	**Ancestor:** core/comments
--	**Supports:** align, anchor, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** level, levelOptions, showCommentsCount, showPostTitle, textAlign
+-	**Supports:** align, anchor, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** level, levelOptions, showCommentsCount, showPostTitle
 
 ## Cover
 
@@ -610,13 +610,35 @@ Show a block pattern. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 -	**Supports:** interactivity (clientNavigation), ~~html~~, ~~inserter~~, ~~renaming~~, ~~visibility~~
 -	**Attributes:** slug
 
-## Author
+## Playlist
 
-Display post author details such as name, avatar, and bio. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author))
+Embed a simple playlist. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/playlist))
+
+-	**Name:** core/playlist
+-	**Experimental:** true
+-	**Category:** media
+-	**Allowed Blocks:** core/playlist-track
+-	**Supports:** align, anchor, color (background, gradients, link, text), interactivity, spacing (margin, padding)
+-	**Attributes:** caption, currentTrack, order, showArtists, showImages, showNumbers, showTracklist, type
+
+## Playlist track
+
+Playlist track. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/playlist-track))
+
+-	**Name:** core/playlist-track
+-	**Experimental:** true
+-	**Category:** media
+-	**Parent:** core/playlist
+-	**Supports:** interactivity (clientNavigation), ~~html~~, ~~reusable~~
+-	**Attributes:** album, artist, blob, id, image, length, src, title, type, uniqueId
+
+## Author (deprecated)
+
+This block is deprecated. Please use the Avatar block, the Author Name block, and the Author Biography block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/post-author))
 
 -	**Name:** core/post-author
 -	**Category:** theme
--	**Supports:** anchor, color (background, gradients, link, text), filter (duotone), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** anchor, color (background, gradients, link, text), filter (duotone), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~, ~~inserter~~
 -	**Attributes:** avatarSize, byline, isLink, linkTarget, showAvatar, showBio, textAlign
 
 ## Author Biography
@@ -625,8 +647,7 @@ The author biography. ([Source](https://github.com/WordPress/gutenberg/tree/trun
 
 -	**Name:** core/post-author-biography
 -	**Category:** theme
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
--	**Attributes:** textAlign
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign)
 
 ## Author Name
 
@@ -969,9 +990,20 @@ Content for a tab in a tabbed interface. ([Source](https://github.com/WordPress/
 -	**Name:** core/tab
 -	**Experimental:** true
 -	**Category:** design
--	**Parent:** core/tabs
--	**Supports:** anchor, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowSwitching, allowVerticalAlignment, ~~allowInheriting~~), spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~
+-	**Parent:** core/tab-panels
+-	**Supports:** anchor, color (background, text), layout (allowJustification, allowOrientation, allowSizingOnChildren, allowSwitching, allowVerticalAlignment, ~~allowInheriting~~), renaming, spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~
 -	**Attributes:** label
+
+## Tab Panels
+
+Container for tab panel content in a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panels))
+
+-	**Name:** core/tab-panels
+-	**Experimental:** true
+-	**Category:** design
+-	**Parent:** core/tabs
+-	**Allowed Blocks:** core/tab
+-	**Supports:** color (background, heading, link, text), dimensions (~~aspectRatio~~, ~~height~~, ~~minHeight~~, ~~width~~), layout (allowJustification, default, ~~allowOrientation~~, ~~allowSizingOnChildren~~, ~~allowSwitching~~, ~~allowVerticalAlignment~~), spacing (margin, padding, ~~blockGap~~), typography (fontSize), ~~anchor~~, ~~html~~, ~~lock~~, ~~reusable~~
 
 ## Table
 
@@ -999,9 +1031,31 @@ Display content in a tabbed interface to help users navigate detailed content wi
 -	**Name:** core/tabs
 -	**Experimental:** true
 -	**Category:** design
--	**Allowed Blocks:** core/tab
--	**Supports:** align, color (~~background~~, ~~text~~), interactivity, spacing (blockGap, margin, ~~padding~~), typography (fontSize), ~~html~~
--	**Attributes:** activeTabIndex, customTabActiveColor, customTabActiveTextColor, customTabHoverColor, customTabHoverTextColor, customTabInactiveColor, customTabTextColor, orientation, tabActiveColor, tabActiveTextColor, tabHoverColor, tabHoverTextColor, tabInactiveColor, tabTextColor, tabsId
+-	**Allowed Blocks:** core/tabs-menu, core/tab-panels
+-	**Supports:** align, anchor, color (~~background~~, ~~text~~), interactivity, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowVerticalAlignment, default, ~~allowSwitching~~), renaming, spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
+-	**Attributes:** activeTabIndex, editorActiveTabIndex
+
+## Tabs Menu
+
+Display the tab buttons for a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs-menu))
+
+-	**Name:** core/tabs-menu
+-	**Experimental:** true
+-	**Category:** design
+-	**Parent:** core/tabs
+-	**Allowed Blocks:** core/tabs-menu-item
+-	**Supports:** color (background, text), dimensions (~~aspectRatio~~, ~~height~~, ~~minHeight~~, ~~width~~), layout (allowJustification, allowOrientation, allowVerticalAlignment, default, ~~allowSwitching~~), spacing (blockGap, margin, padding), typography (fontSize), ~~html~~, ~~lock~~, ~~reusable~~
+
+## Tab Menu Item
+
+A single tab button in the tabs menu. Used as a template for styling all tab buttons. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs-menu-item))
+
+-	**Name:** core/tabs-menu-item
+-	**Experimental:** true
+-	**Category:** design
+-	**Parent:** core/tabs-menu
+-	**Supports:** color (background, text), layout (allowJustification, allowVerticalAlignment, default, ~~allowOrientation~~, ~~allowSwitching~~, ~~allowWrap~~), shadow, spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~
+-	**Attributes:** activeBackgroundColor, activeTextColor, customActiveBackgroundColor, customActiveTextColor, customHoverBackgroundColor, customHoverTextColor, hoverBackgroundColor, hoverTextColor
 
 ## Tag Cloud
 

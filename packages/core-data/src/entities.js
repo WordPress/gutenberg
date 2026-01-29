@@ -17,6 +17,7 @@ import { PostEditorAwareness } from './awareness/post-editor-awareness';
 import { getSyncManager } from './sync';
 import {
 	applyPostChangesToCRDTDoc,
+	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
 } from './utils/crdt';
 
@@ -219,7 +220,16 @@ export const rootEntitiesConfig = [
 		plural: 'fontCollections',
 		key: 'slug',
 	},
-];
+].map( ( entity ) => {
+	const syncEnabledRootEntities = new Set( [ 'comment' ] );
+
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		if ( syncEnabledRootEntities.has( entity.name ) ) {
+			entity.syncConfig = defaultSyncConfig;
+		}
+	}
+	return entity;
+} );
 
 export const deprecatedEntities = {
 	root: {
@@ -413,7 +423,7 @@ async function loadTaxonomyEntities() {
 	} );
 	return Object.entries( taxonomies ?? {} ).map( ( [ name, taxonomy ] ) => {
 		const namespace = taxonomy?.rest_namespace ?? 'wp/v2';
-		return {
+		const entity = {
 			kind: 'taxonomy',
 			baseURL: `/${ namespace }/${ taxonomy.rest_base }`,
 			baseURLParams: { context: 'edit' },
@@ -422,6 +432,12 @@ async function loadTaxonomyEntities() {
 			getTitle: ( record ) => record?.name,
 			supportsPagination: true,
 		};
+
+		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+			entity.syncConfig = defaultSyncConfig;
+		}
+
+		return entity;
 	} );
 }
 

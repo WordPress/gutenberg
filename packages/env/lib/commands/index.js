@@ -8,7 +8,7 @@ const clean = require( './clean' );
 const run = require( './run' );
 const destroy = require( './destroy' );
 const logs = require( './logs' );
-const installPath = require( './install-path' );
+const status = require( './status' );
 
 module.exports = {
 	start,
@@ -17,5 +17,5 @@ module.exports = {
 	run,
 	destroy,
 	logs,
-	installPath,
+	status,
 };

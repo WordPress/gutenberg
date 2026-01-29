@@ -2,31 +2,37 @@
  * WordPress dependencies
  */
 import { dispatch, select, subscribe } from '@wordpress/data';
-import { AwarenessState, type Y } from '@wordpress/sync';
+import { Y } from '@wordpress/sync';
 // @ts-ignore No exported types for block editor store selectors.
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
 import {
 	AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS,
 	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
 } from './config';
 import { STORE_NAME as coreStore } from '../name';
-import { generateUserInfo, areUserInfosEqual } from './utils';
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,
 } from '../utils/crdt-user-selections';
 
-import type { WPBlockSelection } from '../types';
-import type { EditorState, PostEditorState } from './types';
+import type { SelectionCursor, WPBlockSelection } from '../types';
+import type {
+	DebugUserData,
+	EditorState,
+	PostEditorState,
+	SerializableYItem,
+	YDocDebugData,
+} from './types';
 
-export class PostEditorAwareness extends AwarenessState< PostEditorState > {
+export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	protected equalityFieldChecks = {
+		...baseEqualityFieldChecks,
 		editorState: this.areEditorStatesEqual,
-		userInfo: areUserInfosEqual,
 	};
 
 	public constructor(
@@ -38,30 +44,10 @@ export class PostEditorAwareness extends AwarenessState< PostEditorState > {
 		super( doc );
 	}
 
-	public setUp(): void {
-		super.setUp();
+	protected onSetUp(): void {
+		super.onSetUp();
 
-		this.setCurrentUserInfo();
 		this.subscribeToUserSelectionChanges();
-	}
-
-	/**
-	 * Set the current user info in the local state.
-	 */
-	private setCurrentUserInfo(): void {
-		const states = this.getStates();
-		const otherUserColors = Array.from( states.entries() )
-			.filter(
-				( [ clientId, state ] ) =>
-					state.userInfo && clientId !== this.clientID
-			)
-			.map( ( [ , state ] ) => state.userInfo.color )
-			.filter( Boolean );
-
-		// Get current user info and set it in local state.
-		const currentUser = select( coreStore ).getCurrentUser();
-		const userInfo = generateUserInfo( currentUser, otherUserColors );
-		this.setLocalStateField( 'userInfo', userInfo );
 	}
 
 	/**
@@ -183,5 +169,102 @@ export class PostEditorAwareness extends AwarenessState< PostEditorState > {
 		}
 
 		return areSelectionsStatesEqual( state1.selection, state2.selection );
+	}
+
+	/**
+	 * Get the absolute position index from a selection cursor.
+	 *
+	 * @param selection - The selection cursor.
+	 * @return The absolute position index, or null if not found.
+	 */
+	public getAbsolutePositionIndex(
+		selection: SelectionCursor
+	): number | null {
+		return (
+			Y.createAbsolutePositionFromRelativePosition(
+				selection.cursorPosition.relativePosition,
+				this.doc
+			)?.index ?? null
+		);
+	}
+
+	/**
+	 * Type guard to check if a struct is a Y.Item (not Y.GC)
+	 * @param struct - The struct to check.
+	 * @return True if the struct is a Y.Item, false otherwise.
+	 */
+	private isYItem( struct: Y.Item | Y.GC ): struct is Y.Item {
+		return 'content' in struct;
+	}
+
+	/**
+	 * Get data for debugging, using the awareness state.
+	 *
+	 * @return {YDocDebugData} The debug data.
+	 */
+	public getDebugData(): YDocDebugData {
+		const ydoc = this.doc;
+
+		// Manually extract doc data to avoid deprecated toJSON method
+		const docData: Record< string, unknown > = Object.fromEntries(
+			Array.from( ydoc.share, ( [ key, value ] ) => [
+				key,
+				value.toJSON(),
+			] )
+		);
+
+		// Build userMap from awareness store (all users seen this session)
+		const userMapData = new Map< string, DebugUserData >(
+			Array.from( this.getSeenStates().entries() ).map(
+				( [ clientId, userState ] ) => [
+					String( clientId ),
+					{
+						name: userState.userInfo.name,
+						wpUserId: userState.userInfo.id,
+					},
+				]
+			)
+		);
+
+		// Serialize Yjs client items to avoid deep nesting
+		const serializableClientItems: Record<
+			number,
+			Array< SerializableYItem >
+		> = {};
+
+		ydoc.store.clients.forEach( ( structs, clientId ) => {
+			// Filter for Y.Item only (skip Y.GC garbage collection structs)
+			const items = structs.filter( this.isYItem );
+
+			serializableClientItems[ clientId ] = items.map( ( item ) => {
+				const { left, right, ...rest } = item;
+
+				return {
+					...rest,
+					left: left
+						? {
+								id: left.id,
+								length: left.length,
+								origin: left.origin,
+								content: left.content,
+						  }
+						: null,
+					right: right
+						? {
+								id: right.id,
+								length: right.length,
+								origin: right.origin,
+								content: right.content,
+						  }
+						: null,
+				};
+			} );
+		} );
+
+		return {
+			doc: docData,
+			clients: serializableClientItems,
+			userMap: Object.fromEntries( userMapData ),
+		};
 	}
 }

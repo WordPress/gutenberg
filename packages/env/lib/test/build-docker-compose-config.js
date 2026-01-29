@@ -2,8 +2,8 @@
 /**
  * Internal dependencies
  */
-const buildDockerComposeConfig = require( '../build-docker-compose-config' );
-const getHostUser = require( '../get-host-user' );
+const buildDockerComposeConfig = require( '../runtime/docker/build-docker-compose-config' );
+const getHostUser = require( '../runtime/docker/get-host-user' );
 
 // The basic config keys which build docker compose config requires.
 const CONFIG = {
@@ -14,7 +14,7 @@ const CONFIG = {
 	configDirectoryPath: '/path/to/config',
 };
 
-jest.mock( '../get-host-user', () => jest.fn() );
+jest.mock( '../runtime/docker/get-host-user', () => jest.fn() );
 getHostUser.mockImplementation( () => {
 	return {
 		name: 'test',

@@ -10,19 +10,24 @@ import { useSelect } from '@wordpress/data';
  */
 import { GridVisualizer, useGridLayoutSync } from '../components/grid';
 import { store as blockEditorStore } from '../store';
+import useBlockVisibility from '../components/block-visibility/use-block-visibility';
+import { deviceTypeKey } from '../store/private-keys';
+import { BLOCK_VISIBILITY_VIEWPORTS } from '../components/block-visibility/constants';
 
 function GridLayoutSync( props ) {
 	useGridLayoutSync( props );
 }
 
 function GridTools( { clientId, layout } ) {
-	const isVisible = useSelect(
+	const { isVisible, blockVisibility, deviceType } = useSelect(
 		( select ) => {
 			const {
 				isBlockSelected,
 				isDraggingBlocks,
 				getTemplateLock,
 				getBlockEditingMode,
+				getBlockAttributes,
+				getSettings,
 			} = select( blockEditorStore );
 
 			// These calls are purposely ordered from least expensive to most expensive.
@@ -32,18 +37,32 @@ function GridTools( { clientId, layout } ) {
 				getTemplateLock( clientId ) ||
 				getBlockEditingMode( clientId ) !== 'default'
 			) {
-				return false;
+				return { isVisible: false };
 			}
 
-			return true;
+			const attributes = getBlockAttributes( clientId );
+			const settings = getSettings();
+
+			return {
+				isVisible: true,
+				blockVisibility: attributes?.metadata?.blockVisibility,
+				deviceType:
+					settings?.[ deviceTypeKey ]?.toLowerCase() ||
+					BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
+			};
 		},
 		[ clientId ]
 	);
 
+	const { isBlockCurrentlyHidden } = useBlockVisibility( {
+		blockVisibility,
+		deviceType,
+	} );
+
 	return (
 		<>
 			<GridLayoutSync clientId={ clientId } />
-			{ isVisible && (
+			{ isVisible && ! isBlockCurrentlyHidden && (
 				<GridVisualizer clientId={ clientId } parentLayout={ layout } />
 			) }
 		</>
