@@ -125,8 +125,10 @@ function NotesSidebar( { postId } ) {
 		} ) );
 	};
 
+	// Helper functions to get draft notes
 	const getDraftNote = ( key ) => draftNotes[ key ] || '';
 
+	// Helper functions to clear draft notes
 	const clearDraftNote = ( key ) => {
 		setDraftNotes( ( prev ) => {
 			const { [ key ]: _, ...rest } = prev;

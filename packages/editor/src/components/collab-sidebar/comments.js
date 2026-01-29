@@ -80,6 +80,7 @@ export function Comments( {
 		setOpenReplyFormsSet( ( prev ) => new Set( prev ).add( threadId ) );
 	};
 
+	// Helper functions to close reply forms
 	const closeReplyForm = ( threadId ) => {
 		setOpenReplyFormsSet( ( prev ) => {
 			const next = new Set( prev );
@@ -88,6 +89,7 @@ export function Comments( {
 		} );
 	};
 
+	// Helper functions to check if a reply form is open
 	const isReplyFormOpen = ( threadId ) => openReplyFormsSet.has( threadId );
 
 	const { blockCommentId, selectedBlockClientId, orderedBlockIds } =
