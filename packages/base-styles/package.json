@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/base-styles",
-	"version": "6.15.0",
+	"version": "6.15.1-next.v.0+5aba098fc",
 	"description": "Base SCSS utilities and variables for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
