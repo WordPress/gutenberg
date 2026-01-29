@@ -181,9 +181,10 @@ module.exports = function buildDockerComposeConfig( config ) {
 		config.env.tests.phpmyadminPort ?? ''
 	}}:80`;
 
-	// MySQL healthcheck using MariaDB's official healthcheck script.
+	// MySQL healthcheck using MariaDB's official healthcheck.sh script.
 	// --connect: verifies TCP connection and that entrypoint has finished
 	// --innodb_initialized: ensures InnoDB storage engine is fully initialized
+	// MARIADB_AUTO_UPGRADE env var ensures healthcheck user exists for existing installations.
 	// Timing is generous to support slow CI environments.
 	const mysqlHealthcheck = {
 		test: [ 'CMD', 'healthcheck.sh', '--connect', '--innodb_initialized' ],
@@ -203,6 +204,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 					MYSQL_ROOT_PASSWORD:
 						dbEnv.credentials.WORDPRESS_DB_PASSWORD,
 					MYSQL_DATABASE: dbEnv.development.WORDPRESS_DB_NAME,
+					// Ensures healthcheck user is created for existing installations.
+					MARIADB_AUTO_UPGRADE: '1',
 				},
 				volumes: [ 'mysql:/var/lib/mysql' ],
 				healthcheck: mysqlHealthcheck,
@@ -215,6 +218,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 					MYSQL_ROOT_PASSWORD:
 						dbEnv.credentials.WORDPRESS_DB_PASSWORD,
 					MYSQL_DATABASE: dbEnv.tests.WORDPRESS_DB_NAME,
+					// Ensures healthcheck user is created for existing installations.
+					MARIADB_AUTO_UPGRADE: '1',
 				},
 				volumes: [ 'mysql-test:/var/lib/mysql' ],
 				healthcheck: mysqlHealthcheck,

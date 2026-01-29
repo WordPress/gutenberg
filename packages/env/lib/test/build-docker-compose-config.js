@@ -167,6 +167,11 @@ describe( 'buildDockerComposeConfig', () => {
 		expect( config.services.mysql.healthcheck.retries ).toBe( 12 );
 		expect( config.services.mysql.healthcheck.start_period ).toBe( '60s' );
 
+		// Verify MARIADB_AUTO_UPGRADE is set for existing installations
+		expect( config.services.mysql.environment.MARIADB_AUTO_UPGRADE ).toBe(
+			'1'
+		);
+
 		expect( config.services[ 'tests-mysql' ].healthcheck ).toBeDefined();
 		expect( config.services[ 'tests-mysql' ].healthcheck.test ).toEqual( [
 			'CMD',
@@ -174,6 +179,9 @@ describe( 'buildDockerComposeConfig', () => {
 			'--connect',
 			'--innodb_initialized',
 		] );
+		expect(
+			config.services[ 'tests-mysql' ].environment.MARIADB_AUTO_UPGRADE
+		).toBe( '1' );
 	} );
 
 	it( 'should use service_healthy condition for WordPress depends_on', () => {

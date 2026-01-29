@@ -4,7 +4,7 @@
 
 ### Bug Fixes
 
--   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with generous timeouts to support slow CI environments.
+-   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with `MARIADB_AUTO_UPGRADE` to support both new and existing installations.
 
 ## 10.39.0 (2026-01-29)
 
