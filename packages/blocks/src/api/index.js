@@ -39,7 +39,7 @@ export {
 // block. For composition, it also means inner blocks can effectively be child
 // components whose mechanisms can be shielded from the `edit` implementation
 // and just passed along.
-export { default as parse, parseRawBlock } from './parser';
+export { default as parse } from './parser';
 export { serializeRawBlock } from './parser/serialize-raw-block';
 export {
 	getBlockAttributes,

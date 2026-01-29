@@ -476,19 +476,6 @@ _Returns_
 
 -   `Array`: Block list.
 
-### parseRawBlock
-
-Given a raw block returned by grammar parsing, returns a fully parsed block.
-
-_Parameters_
-
--   _rawBlock_ `WPRawBlock`: The raw block object.
--   _options_ `ParseOptions`: Extra options for handling block parsing.
-
-_Returns_
-
--   `WPBlock | undefined`: Fully parsed block.
-
 ### parseWithAttributeSchema
 
 Given a block's raw content and an attribute's schema returns the attribute's value depending on its source.
