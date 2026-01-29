@@ -101,23 +101,45 @@ function Editor( {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const restoreBlockFromPath = useRestoreBlockFromPath();
 
-	// Try to resolve the initial selection path to a clientId
-	// This will return null if the blocks aren't loaded yet or path can't be resolved
-	const restoredClientId = useSelect( () => {
-		if ( ! initialSelection || ! hasLoadedPost || ! post ) {
-			return null;
-		}
-		// Attempt to restore the block from the path
-		// This will only succeed once the blocks are actually loaded
-		return restoreBlockFromPath( initialSelection );
-	}, [ initialSelection, hasLoadedPost, post, restoreBlockFromPath ] );
+	// Check if the first step of the path is available (indicates blocks are loaded)
+	const canRestorePath = useSelect(
+		( select ) => {
+			if (
+				! initialSelection ||
+				! hasLoadedPost ||
+				! post ||
+				! Array.isArray( initialSelection ) ||
+				initialSelection.length === 0
+			) {
+				return false;
+			}
 
-	// Select the restored block once we have a valid clientId
+			const { getBlockOrder } = select( blockEditorStore );
+			const rootBlocks = getBlockOrder( '' );
+			const firstStep = initialSelection[ 0 ];
+
+			// Check if the first block in the path exists
+			return firstStep.index < rootBlocks.length;
+		},
+		[ initialSelection, hasLoadedPost, post ]
+	);
+
+	// Restore initial block selection once the path can be resolved
 	useEffect( () => {
-		if ( restoredClientId ) {
-			selectBlock( restoredClientId );
+		if ( ! canRestorePath ) {
+			return;
 		}
-	}, [ restoredClientId, selectBlock ] );
+
+		const clientId = restoreBlockFromPath( initialSelection );
+		if ( clientId ) {
+			selectBlock( clientId );
+		}
+	}, [
+		canRestorePath,
+		initialSelection,
+		restoreBlockFromPath,
+		selectBlock,
+	] );
 
 	return (
 		<>
