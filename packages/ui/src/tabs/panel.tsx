@@ -11,14 +11,10 @@ import type { TabPanelProps } from './types';
  * an [ARIA-compliant tabs pattern](https://www.w3.org/WAI/ARIA/apg/patterns/tabs/).
  */
 export const Panel = forwardRef< HTMLDivElement, TabPanelProps >(
-	function TabPanel(
-		{ className, focusable = true, tabIndex, ...otherProps },
-		forwardedRef
-	) {
+	function TabPanel( { className, ...otherProps }, forwardedRef ) {
 		return (
 			<BaseUITabs.Panel
 				ref={ forwardedRef }
-				tabIndex={ tabIndex ?? ( focusable ? 0 : -1 ) }
 				className={ clsx( styles.tabpanel, className ) }
 				{ ...otherProps }
 			/>

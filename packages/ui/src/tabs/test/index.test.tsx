@@ -15,7 +15,7 @@ type Tab = {
 		disabled?: boolean;
 	};
 	tabpanel?: {
-		focusable?: boolean;
+		tabIndex?: number;
 	};
 };
 
@@ -100,7 +100,7 @@ const UncontrolledTabs = ( {
 				<Tabs.Panel
 					key={ `${ tabObj.title }-${ index }` }
 					value={ tabObj.value }
-					focusable={ tabObj.tabpanel?.focusable }
+					tabIndex={ tabObj.tabpanel?.tabIndex }
 				>
 					{ tabObj.content }
 				</Tabs.Panel>
@@ -148,7 +148,7 @@ const ControlledTabs = ( {
 				<Tabs.Panel
 					key={ `${ tabObj.title }-${ index }` }
 					value={ tabObj.value }
-					focusable={ tabObj.tabpanel?.focusable }
+					tabIndex={ tabObj.tabpanel?.tabIndex }
 				>
 					{ tabObj.content }
 				</Tabs.Panel>
@@ -287,7 +287,7 @@ describe( 'Tabs', () => {
 						<Tabs.Panel
 							key={ `${ tabObj.title }-${ index }` }
 							value={ tabObj.value }
-							focusable={ tabObj.tabpanel?.focusable }
+							tabIndex={ tabObj.tabpanel?.tabIndex }
 						>
 							{ tabObj.content }
 						</Tabs.Panel>
@@ -952,7 +952,7 @@ describe( 'Tabs', () => {
 												<button>Alpha Button</button>
 											</>
 										),
-										tabpanel: { focusable: false },
+										tabpanel: { tabIndex: -1 },
 								  }
 								: tabObj
 						) }
