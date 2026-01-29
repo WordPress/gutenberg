@@ -1,8 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, useRef } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
+import {
+	useState,
+	useMemo,
+	useRef,
+	useCallback,
+	useEffect,
+} from '@wordpress/element';
+import { useRefEffect, useMergeRefs } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import {
 	privateApis as blockEditorPrivateApis,
@@ -45,19 +51,50 @@ const STATUS_LABELS = {
 	modified: __( 'Go to modified block' ),
 };
 
+function calculatePosition( el ) {
+	if ( ! el ) {
+		return null;
+	}
+	const doc = el.ownerDocument;
+	const scrollHeight = doc.documentElement.scrollHeight;
+	const rect = el.getBoundingClientRect();
+	const scrollTop = doc.documentElement.scrollTop;
+	const top = rect.top + scrollTop;
+	return {
+		top: ( top / scrollHeight ) * 100,
+		height: ( rect.height / scrollHeight ) * 100,
+	};
+}
+
 /**
  * Button component for a single diff marker.
- * Uses useBlockElementRef to focus the block element on click.
  *
- * @param {Object} props          Component props.
- * @param {string} props.clientId The block client ID.
- * @param {string} props.status   The diff status (added/removed/modified).
- * @param {Object} props.position Position data with top and height percentages.
- * @return {JSX.Element} The diff marker button.
+ * @param {Object}   props           Component props.
+ * @param {string}   props.clientId  The block client ID.
+ * @param {string}   props.status    The diff status (added/removed/modified).
+ * @param {Function} props.subscribe Function to subscribe to position updates.
+ * @return {JSX.Element|null} The diff marker button or null if position not calculated.
  */
-function DiffMarkerButton( { clientId, status, position } ) {
-	const ref = useRef();
-	useBlockElementRef( clientId, ref );
+function DiffMarkerButton( { clientId, status, subscribe } ) {
+	const blockRef = useRef();
+	useBlockElementRef( clientId, blockRef );
+	const [ position, setPosition ] = useState( () =>
+		calculatePosition( blockRef.current )
+	);
+
+	useEffect( () => {
+		return subscribe( () => {
+			setPosition( calculatePosition( blockRef.current ) );
+		} );
+	}, [ subscribe ] );
+
+	useEffect( () => {
+		setPosition( calculatePosition( blockRef.current ) );
+	}, [ status ] );
+
+	if ( ! position ) {
+		return null;
+	}
 
 	return (
 		<button
@@ -66,42 +103,9 @@ function DiffMarkerButton( { clientId, status, position } ) {
 				top: `${ position.top }%`,
 				height: `${ Math.max( position.height, 0.5 ) }%`,
 			} }
-			onClick={ () => ref.current?.focus() }
+			onClick={ () => blockRef.current?.focus() }
 			aria-label={ STATUS_LABELS[ status ] }
 		/>
-	);
-}
-
-/**
- * Component that renders diff markers in a scrollbar-style strip.
- *
- * @param {Object} props            Component props.
- * @param {Object} props.positions  Map of clientId to position data.
- * @param {Array}  props.diffBlocks Blocks with diff status.
- * @return {JSX.Element} The diff markers component.
- */
-function DiffMarkers( { positions, diffBlocks } ) {
-	return (
-		<div
-			className="revision-diff-markers"
-			role="navigation"
-			aria-label={ __( 'Diff markers' ) }
-		>
-			{ diffBlocks.map( ( { clientId, status } ) => {
-				const pos = positions[ clientId ];
-				if ( ! pos ) {
-					return null;
-				}
-				return (
-					<DiffMarkerButton
-						key={ clientId }
-						clientId={ clientId }
-						status={ status }
-						position={ pos }
-					/>
-				);
-			} ) }
-		</div>
 	);
 }
 
@@ -113,65 +117,45 @@ function DiffMarkers( { positions, diffBlocks } ) {
  * @return {Array} Tuple of [contentRef, DiffMarkersComponent].
  */
 export function useDiffMarkers() {
-	const [ positions, setPositions ] = useState( {} );
+	const [ isMounted, setIsMounted ] = useState( false );
+	const subscribersRef = useRef( new Set() );
 	const blocks = useSelect(
 		( select ) => select( blockEditorStore ).getBlocks(),
 		[]
 	);
-
 	const diffBlocks = useMemo( () => collectDiffBlocks( blocks ), [ blocks ] );
-
-	// Ref effect to set up ResizeObserver when content element is available
-	const contentRef = useRefEffect(
-		( element ) => {
-			const doc = element.ownerDocument;
-
-			const updatePositions = () => {
-				const scrollHeight = doc.documentElement.scrollHeight;
-				if ( scrollHeight === 0 ) {
-					return;
-				}
-
-				const newPositions = {};
-				for ( const { clientId } of diffBlocks ) {
-					const el = doc.querySelector(
-						`[data-block="${ clientId }"]`
-					);
-					if ( el ) {
-						const rect = el.getBoundingClientRect();
-						const scrollTop = doc.documentElement.scrollTop;
-						const top = rect.top + scrollTop;
-						newPositions[ clientId ] = {
-							top: ( top / scrollHeight ) * 100,
-							height: ( rect.height / scrollHeight ) * 100,
-						};
-					}
-				}
-
-				setPositions( newPositions );
-			};
-
-			// Initial calculation
-			updatePositions();
-
-			// ResizeObserver for content size changes
-			const { ResizeObserver } = doc.defaultView;
-			const resizeObserver = new ResizeObserver( updatePositions );
-			resizeObserver.observe( doc.body );
-
-			return () => {
-				resizeObserver.disconnect();
-			};
-		},
-		[ diffBlocks ]
-	);
-
+	const subscribe = useCallback( ( callback ) => {
+		subscribersRef.current.add( callback );
+		return () => subscribersRef.current.delete( callback );
+	}, [] );
+	const contentRef = useRefEffect( ( element ) => {
+		const { ownerDocument } = element;
+		const { defaultView } = ownerDocument;
+		const resizeObserver = new defaultView.ResizeObserver( () => {
+			subscribersRef.current.forEach( ( cb ) => cb() );
+		} );
+		resizeObserver.observe( ownerDocument.body );
+		return () => {
+			resizeObserver.disconnect();
+		};
+	}, [] );
 	return [
-		contentRef,
-		<DiffMarkers
+		useMergeRefs( [ contentRef, setIsMounted ] ),
+		<div
 			key="diff-markers"
-			positions={ positions }
-			diffBlocks={ diffBlocks }
-		/>,
+			className="revision-diff-markers"
+			role="navigation"
+			aria-label={ __( 'Diff markers' ) }
+		>
+			{ isMounted &&
+				diffBlocks.map( ( { clientId, status } ) => (
+					<DiffMarkerButton
+						key={ clientId }
+						clientId={ clientId }
+						status={ status }
+						subscribe={ subscribe }
+					/>
+				) ) }
+		</div>,
 	];
 }
