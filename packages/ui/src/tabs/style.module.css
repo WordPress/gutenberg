@@ -73,7 +73,7 @@
 			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical properties are necessary for the indicator to work as expected. */
 			left: 0;
 			bottom: 0;
-			height: var(--wpds-border-width-interactive-focus);
+			height: var(--wpds-border-width-focus);
 
 			width: var(--active-tab-width);
 			translate: var(--active-tab-left) 0;
@@ -82,7 +82,7 @@
 
 		&[data-orientation="vertical"] {
 			z-index: 0;
-			border-radius: var(--wpds-border-radius-surface-sm);
+			border-radius: var(--wpds-border-radius-sm);
 			top: 0;
 			/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical properties are necessary for the indicator to work as expected. */
 			left: 50%;
@@ -96,7 +96,7 @@
 		&[data-orientation="vertical"] {
 			box-sizing: border-box;
 			border:
-				var(--wpds-border-width-interactive-focus) solid
+				var(--wpds-border-width-focus) solid
 				var(--wpds-color-stroke-focus-brand);
 		}
 	}
@@ -152,9 +152,9 @@
 
 			/* Outline works for Windows high contrast mode as well. */
 			outline:
-				var(--wpds-border-width-interactive-focus) solid
+				var(--wpds-border-width-focus) solid
 				var(--wpds-color-stroke-focus-brand);
-			border-radius: var(--wpds-border-radius-surface-sm);
+			border-radius: var(--wpds-border-radius-sm);
 
 			/* Animation */
 			opacity: 0;
@@ -200,7 +200,7 @@
 
 		[data-orientation="vertical"][data-select-on-move="false"] &::after {
 			content: "";
-			inset: var(--wpds-border-width-interactive-focus); /* TODO: Use or create new control/interactive padding token */
+			inset: var(--wpds-border-width-focus); /* TODO: Use or create new control/interactive padding token */
 		}
 	}
 
@@ -220,8 +220,6 @@
 	}
 
 	.tab__chevron {
-		fill: currentColor;
-		height: 24px;
 		flex-shrink: 0;
 		margin-inline-end: calc(var(--wpds-dimension-base) * -1); /* TODO: Use or create new control/interactive padding token */
 
@@ -260,7 +258,7 @@
 
 		&:focus-visible {
 			box-shadow:
-				0 0 0 var(--wpds-border-width-interactive-focus)
+				0 0 0 var(--wpds-border-width-focus)
 				var(--wpds-color-stroke-focus-brand);
 
 			/* Windows high contrast mode. */
