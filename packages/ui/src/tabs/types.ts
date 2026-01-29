@@ -1,17 +1,19 @@
+import type { ReactNode } from 'react';
 import type { Tabs } from '@base-ui/react/tabs';
+import type { ComponentProps } from '../utils/types';
 
-export type TabRootProps = Omit< Tabs.Root.Props, 'className' > & {
+export type TabRootProps = ComponentProps< typeof Tabs.Root > & {
 	/**
-	 * The CSS class to apply.
+	 * The content to be rendered inside the component.
 	 */
-	className?: Tabs.Root.Props[ 'className' ];
+	children?: ReactNode;
 };
 
-export type TabListProps = Omit< Tabs.List.Props, 'className' > & {
+export type TabListProps = ComponentProps< typeof Tabs.List > & {
 	/**
-	 * The CSS class to apply.
+	 * The content to be rendered inside the component.
 	 */
-	className?: Tabs.List.Props[ 'className' ];
+	children?: ReactNode;
 	/**
 	 * The visual density of the tab list.
 	 * @default "default"
@@ -19,21 +21,16 @@ export type TabListProps = Omit< Tabs.List.Props, 'className' > & {
 	density?: 'compact' | 'default';
 };
 
-export type TabProps = Omit< Tabs.Tab.Props, 'className' > & {
+export type TabProps = ComponentProps< typeof Tabs.Tab > & {
 	/**
-	 * The CSS class to apply.
+	 * The content to be rendered inside the component.
 	 */
-	className?: Tabs.Tab.Props[ 'className' ];
+	children?: ReactNode;
 };
 
-export type TabPanelProps = Omit< Tabs.Panel.Props, 'className' > & {
+export type TabPanelProps = ComponentProps< typeof Tabs.Panel > & {
 	/**
-	 * The CSS class to apply.
+	 * The content to be rendered inside the component.
 	 */
-	className?: Tabs.Panel.Props[ 'className' ];
-	/**
-	 * Whether the tab panel should be included in the tab order.
-	 * @default true
-	 */
-	focusable?: boolean;
+	children?: ReactNode;
 };
