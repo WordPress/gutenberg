@@ -271,18 +271,19 @@ export function scheduleRetry( id: QueueItemId, error: Error ) {
 
 		logRetryScheduled( id, item.file.name, nextRetryCount, delay );
 
+		// Schedule the retry execution and capture timer ID for cleanup.
+		const retryTimerId = setTimeout( () => {
+			dispatch.executeRetry( id );
+		}, delay );
+
 		dispatch< ScheduleRetryAction >( {
 			type: Type.ScheduleRetry,
 			id,
 			error,
 			retryCount: currentRetryCount,
 			nextRetryTimestamp: Date.now() + delay,
+			retryTimerId,
 		} );
-
-		// Schedule the retry execution
-		setTimeout( () => {
-			dispatch.executeRetry( id );
-		}, delay );
 	};
 }
 

@@ -139,6 +139,7 @@ function reducer(
 									status: ItemStatus.Processing,
 									error: undefined,
 									retryCount: ( item.retryCount ?? 0 ) + 1,
+									retryTimerId: undefined,
 							  }
 							: item
 				),
@@ -157,6 +158,7 @@ function reducer(
 									retryCount: action.retryCount,
 									nextRetryTimestamp:
 										action.nextRetryTimestamp,
+									retryTimerId: action.retryTimerId,
 							  }
 							: item
 				),
