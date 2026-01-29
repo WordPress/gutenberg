@@ -333,9 +333,9 @@ export const actions: Action< SpaceObject >[] = [
 					? `Are you sure you want to delete ${ items.length } items?`
 					: `Are you sure you want to delete "${ items[ 0 ].name.title }"?`;
 			return (
-				<Stack direction="column" gap="lg">
+				<Stack direction="column" gap="xl">
 					<Text>{ label }</Text>
-					<Stack direction="row" gap="xs" justify="right">
+					<Stack direction="row" gap="sm" justify="right">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"

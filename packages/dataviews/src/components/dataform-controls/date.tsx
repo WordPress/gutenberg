@@ -386,11 +386,11 @@ function CalendarDateControl< Item >( {
 				label={ displayLabel }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
-				<Stack direction="column" gap="md">
+				<Stack direction="column" gap="lg">
 					{ /* Preset buttons */ }
 					<Stack
 						direction="row"
-						gap="xs"
+						gap="sm"
 						wrap="wrap"
 						justify="flex-start"
 					>
@@ -594,11 +594,11 @@ function CalendarDateRangeControl< Item >( {
 				label={ displayLabel }
 				hideLabelFromVision={ hideLabelFromVision }
 			>
-				<Stack direction="column" gap="md">
+				<Stack direction="column" gap="lg">
 					{ /* Preset buttons */ }
 					<Stack
 						direction="row"
-						gap="xs"
+						gap="sm"
 						wrap="wrap"
 						justify="flex-start"
 					>
@@ -634,7 +634,7 @@ function CalendarDateRangeControl< Item >( {
 					{ /* Manual date range inputs */ }
 					<Stack
 						direction="row"
-						gap="xs"
+						gap="sm"
 						justify="space-between"
 						className="dataviews-controls__date-range-inputs"
 					>

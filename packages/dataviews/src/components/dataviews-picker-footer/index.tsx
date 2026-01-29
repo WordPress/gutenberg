@@ -158,12 +158,12 @@ export function DataViewsPickerFooter() {
 			justify="space-between"
 			align="center"
 			className="dataviews-footer"
-			gap="xs"
+			gap="sm"
 		>
 			<Stack
 				direction="row"
 				className="dataviews-picker-footer__bulk-selection"
-				gap="sm"
+				gap="md"
 				align="center"
 			>
 				{ isMultiselect && (

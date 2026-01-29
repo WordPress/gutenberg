@@ -156,7 +156,7 @@ function GridItem< Item >( {
 					<Stack
 						direction="row"
 						className="dataviews-view-picker-grid__badge-fields"
-						gap="xs"
+						gap="sm"
 						wrap="wrap"
 						align="top"
 						justify="flex-start"
@@ -236,7 +236,7 @@ function GridGroup< Item >( {
 		<Stack
 			direction="column"
 			key={ groupName }
-			gap="xs"
+			gap="sm"
 			role="group"
 			aria-labelledby={ headerId }
 		>
@@ -342,7 +342,7 @@ function ViewPickerGrid< Item >( {
 						render={ ( { children, ...props } ) => (
 							<Stack
 								direction="column"
-								gap="md"
+								gap="lg"
 								children={ children }
 								{ ...props }
 							/>

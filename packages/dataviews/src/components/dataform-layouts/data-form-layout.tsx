@@ -17,7 +17,7 @@ import { getFormFieldLayout } from './index';
 import DataFormContext from '../dataform-context';
 
 const DEFAULT_WRAPPER = ( { children }: { children: React.ReactNode } ) => (
-	<Stack direction="column" className="dataforms-layouts__wrapper" gap="md">
+	<Stack direction="column" className="dataforms-layouts__wrapper" gap="lg">
 		{ children }
 	</Stack>
 );

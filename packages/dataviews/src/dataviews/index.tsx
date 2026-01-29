@@ -100,7 +100,7 @@ function DefaultUI( {
 				<Stack
 					direction="row"
 					justify="start"
-					gap="xs"
+					gap="sm"
 					className="dataviews__search"
 				>
 					{ search && <DataViewsSearch label={ searchLabel } /> }
