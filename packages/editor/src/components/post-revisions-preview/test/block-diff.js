@@ -817,7 +817,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <strong><span title="Format added" class="revision-diff-format-added">world</span></strong>',
+							'Hello <strong><span title="1 format added" class="revision-diff-format-added">world</span></strong>',
 						__revisionDiffStatus: 'modified',
 					},
 				},
@@ -893,7 +893,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Visit <a href="https://new-site.com"><span title="Format changed" class="revision-diff-format-changed">our site</span></a> today',
+							'Visit <a href="https://new-site.com"><span title="1 format changed" class="revision-diff-format-changed">our site</span></a> today',
 						__revisionDiffStatus: 'modified',
 					},
 				},
@@ -969,7 +969,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'<span title="Format removed" class="revision-diff-format-removed">Bold</span> and <span title="Format removed" class="revision-diff-format-removed">italic</span> text',
+							'<span title="1 format removed" class="revision-diff-format-removed">Bold</span> and <span title="1 format removed" class="revision-diff-format-removed">italic</span> text',
 						__revisionDiffStatus: 'modified',
 					},
 				},
@@ -995,7 +995,7 @@ describe( 'diffRevisionContent', () => {
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'Hello <em><span title="Format added, Format removed" class="revision-diff-format-changed">world</span></em>',
+							'Hello <em><span title="1 format added, 1 format removed" class="revision-diff-format-changed">world</span></em>',
 						__revisionDiffStatus: 'modified',
 					},
 				},

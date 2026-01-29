@@ -341,26 +341,6 @@ function hasFormatChangedAtIndex(
 }
 
 /**
- * Get a human-readable label for a format type.
- *
- * @param {string} formatType The format type (e.g., 'core/bold').
- * @return {string} Human-readable label.
- */
-function getFormatLabel( formatType ) {
-	const labels = {
-		'core/bold': 'Bold',
-		'core/italic': 'Italic',
-		'core/link': 'Link',
-		'core/code': 'Code',
-		'core/strikethrough': 'Strikethrough',
-		'core/underline': 'Underline',
-		'core/subscript': 'Subscript',
-		'core/superscript': 'Superscript',
-	};
-	return labels[ formatType ] || formatType?.split( '/' )[ 1 ] || 'Format';
-}
-
-/**
  * Analyze what formatting changed between two character positions.
  * Returns both the change type (for styling) and a description (for tooltip).
  *
@@ -379,20 +359,20 @@ function describeFormatChange(
 	const currFmts = currentFormats[ currIdx ] || [];
 	const prevFmts = previousFormats[ prevIdx ] || [];
 
-	const added = [];
-	const removed = [];
-	const changed = [];
+	let addedCount = 0;
+	let removedCount = 0;
+	let changedCount = 0;
 
 	// Find added formats and attribute changes
 	for ( const fmt of currFmts ) {
 		const match = prevFmts.find( ( pf ) => pf.type === fmt.type );
 		if ( ! match ) {
-			added.push( getFormatLabel( fmt.type ) );
+			addedCount++;
 		} else if (
 			JSON.stringify( fmt.attributes ) !==
 			JSON.stringify( match.attributes )
 		) {
-			changed.push( getFormatLabel( fmt.type ) );
+			changedCount++;
 		}
 	}
 
@@ -400,30 +380,39 @@ function describeFormatChange(
 	for ( const fmt of prevFmts ) {
 		const match = currFmts.find( ( cf ) => cf.type === fmt.type );
 		if ( ! match ) {
-			removed.push( getFormatLabel( fmt.type ) );
+			removedCount++;
 		}
 	}
 
+	// Helper to pluralize "format"
+	const pluralize = ( count ) =>
+		count === 1 ? '1 format' : `${ count } formats`;
+
 	// Determine primary change type for styling
-	if ( added.length > 0 && removed.length === 0 && changed.length === 0 ) {
+	if ( addedCount > 0 && removedCount === 0 && changedCount === 0 ) {
 		return {
 			type: 'added',
-			description: added.join( ', ' ) + ' added',
+			description: `${ pluralize( addedCount ) } added`,
 		};
 	}
-	if ( removed.length > 0 && added.length === 0 && changed.length === 0 ) {
+	if ( removedCount > 0 && addedCount === 0 && changedCount === 0 ) {
 		return {
 			type: 'removed',
-			description: removed.join( ', ' ) + ' removed',
+			description: `${ pluralize( removedCount ) } removed`,
 		};
 	}
 
 	// Mixed or attribute-only changes
-	const parts = [
-		...added.map( ( f ) => f + ' added' ),
-		...removed.map( ( f ) => f + ' removed' ),
-		...changed.map( ( f ) => f + ' changed' ),
-	];
+	const parts = [];
+	if ( addedCount > 0 ) {
+		parts.push( `${ pluralize( addedCount ) } added` );
+	}
+	if ( removedCount > 0 ) {
+		parts.push( `${ pluralize( removedCount ) } removed` );
+	}
+	if ( changedCount > 0 ) {
+		parts.push( `${ pluralize( changedCount ) } changed` );
+	}
 	return {
 		type: 'changed',
 		description: parts.join( ', ' ) || 'Formatting changed',
