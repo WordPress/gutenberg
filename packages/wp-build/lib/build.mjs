@@ -9,7 +9,6 @@ import {
 	copyFile,
 	mkdir,
 	unlink,
-	access,
 } from 'fs/promises';
 import path from 'path';
 import { parseArgs } from 'node:util';
@@ -47,6 +46,11 @@ import {
 	getRouteMetadata,
 	generateContentEntryPoint,
 } from './route-utils.mjs';
+import {
+	generateWorkerPlaceholder,
+	buildWorkers,
+	generateWorkerCode,
+} from './worker-build.mjs';
 
 const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
@@ -1113,27 +1117,7 @@ async function transpilePackage( packageName ) {
 	// Generate placeholder worker-code.ts if this package has wpWorkers defined
 	// and the file doesn't exist yet. This is needed because transpilation happens
 	// before worker bundling, but vips-worker.ts imports from worker-code.ts.
-	if ( packageJson.wpWorkers ) {
-		const workerCodeFile = path.join( packageDir, 'src', 'worker-code.ts' );
-		try {
-			await access( workerCodeFile );
-		} catch {
-			// File doesn't exist, create placeholder
-			const placeholderContent = `/**
- * Worker code for inline Blob URL creation.
- *
- * This file is a placeholder that gets overwritten by the build process.
- * If you see this placeholder content at runtime, run \`npm run build\` first.
- *
- * @package gutenberg
- */
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const workerCode = '/* Placeholder - run npm run build to generate actual worker code */';
-`;
-			await writeFile( workerCodeFile, placeholderContent );
-		}
-	}
+	await generateWorkerPlaceholder( packageDir, packageJson );
 
 	// Check if this is the components package that needs emotion babel plugin.
 	// Ideally we should remove this exception and move away from emotion.
@@ -1280,120 +1264,21 @@ export const workerCode = '/* Placeholder - run npm run build to generate actual
 
 	// Build workers if wpWorkers is defined in package.json.
 	// Workers are bundled as self-contained files with all dependencies included.
-	if ( packageJson.wpWorkers ) {
-		const workerBuilds = [];
-		const workerEntries =
-			typeof packageJson.wpWorkers === 'object' &&
-			packageJson.wpWorkers !== null
-				? Object.entries( packageJson.wpWorkers )
-				: [];
-		for ( const [ outputName, entryPath ] of workerEntries ) {
-			const workerEntryPoint = path.join( packageDir, entryPath );
-			const workerOutputName = outputName.replace( /^\.\//, '' );
+	await buildWorkers( packageDir, packageJson, {
+		buildDir,
+		buildModuleDir,
+		target,
+		wasmInlinePlugin,
+	} );
 
-			// Build ESM worker for build-module (primary for browser use).
-			if ( packageJson.module ) {
-				workerBuilds.push(
-					esbuild.build( {
-						entryPoints: [ workerEntryPoint ],
-						outfile: path.join(
-							buildModuleDir,
-							`${ workerOutputName }.mjs`
-						),
-						bundle: true,
-						format: 'esm',
-						platform: 'browser',
-						target,
-						sourcemap: true,
-						// Bundle everything - workers need to be self-contained.
-						external: [],
-						plugins: [ wasmInlinePlugin ],
-						define: {
-							'process.env.NODE_ENV': JSON.stringify(
-								process.env.NODE_ENV || 'production'
-							),
-						},
-					} )
-				);
-			}
-
-			// Build CJS worker for the `build` directory (Node.js compatibility).
-			//
-			// Note: We only generate CJS worker bundles when the package exposes a
-			// CommonJS entry point via `packageJson.main`. Packages that are ESM-only
-			// or browser-focused (for example, packages that have removed their
-			// `main` field like `@wordpress/vips`) will not produce CJS worker
-			// outputs, and will instead rely solely on the ESM worker built into
-			// `build-module`. This conditional is intentional to avoid creating
-			// unused or misleading CJS artifacts.
-			if ( packageJson.main ) {
-				workerBuilds.push(
-					esbuild.build( {
-						entryPoints: [ workerEntryPoint ],
-						outfile: path.join(
-							buildDir,
-							`${ workerOutputName }.cjs`
-						),
-						bundle: true,
-						format: 'cjs',
-						platform: 'node',
-						target,
-						sourcemap: true,
-						external: [],
-						plugins: [ wasmInlinePlugin ],
-						define: {
-							'process.env.NODE_ENV': JSON.stringify(
-								process.env.NODE_ENV || 'production'
-							),
-						},
-					} )
-				);
-			}
-		}
-
-		await Promise.all( workerBuilds );
-
-		// Generate inline worker code exports for each worker.
-		// This allows the worker code to be bundled inline and loaded via Blob URL,
-		// which works even when import.meta.url is not available (e.g., webpack bundles).
-		for ( const [ outputName ] of workerEntries ) {
-			const workerOutputName = outputName.replace( /^\.\//, '' );
-			const workerOutputPath = path.join(
-				buildModuleDir,
-				`${ workerOutputName }.mjs`
-			);
-
-			try {
-				const workerContent = await readFile(
-					workerOutputPath,
-					'utf8'
-				);
-				const workerCodeFile = path.join(
-					packageDir,
-					'src',
-					'worker-code.ts'
-				);
-				const workerCodeContent = `/**
- * Worker code for inline Blob URL creation.
- *
- * This file is auto-generated by the build process.
- * Do not edit manually - run \`npm run build\` to regenerate.
- *
- * @package gutenberg
- */
-
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const workerCode = ${ JSON.stringify( workerContent ) };
-`;
-				await writeFile( workerCodeFile, workerCodeContent );
-			} catch ( error ) {
-				console.warn(
-					`Warning: Could not generate worker-code.ts for ${ packageName }:`,
-					error.message
-				);
-			}
-		}
-	}
+	// Generate inline worker code exports and re-transpile worker-code.ts.
+	await generateWorkerCode( packageDir, packageName, packageJson, {
+		srcDir,
+		buildDir,
+		buildModuleDir,
+		target,
+		plugins,
+	} );
 
 	await compileStyles( packageName );
 
