@@ -19,6 +19,7 @@ import {
 	concat,
 	applyFormat,
 } from '@wordpress/rich-text';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -321,38 +322,60 @@ function describeFormatChange(
 		}
 	}
 
-	// Helper to pluralize "format"
-	const pluralize = ( count ) =>
-		count === 1 ? '1 format' : `${ count } formats`;
-
 	// Determine primary change type for styling
 	if ( addedCount > 0 && removedCount === 0 && changedCount === 0 ) {
 		return {
 			type: 'added',
-			description: `${ pluralize( addedCount ) } added`,
+			description: sprintf(
+				/* translators: %d: number of formats added */
+				_n( '%d format added', '%d formats added', addedCount ),
+				addedCount
+			),
 		};
 	}
 	if ( removedCount > 0 && addedCount === 0 && changedCount === 0 ) {
 		return {
 			type: 'removed',
-			description: `${ pluralize( removedCount ) } removed`,
+			description: sprintf(
+				/* translators: %d: number of formats removed */
+				_n( '%d format removed', '%d formats removed', removedCount ),
+				removedCount
+			),
 		};
 	}
 
 	// Mixed or attribute-only changes
 	const parts = [];
 	if ( addedCount > 0 ) {
-		parts.push( `${ pluralize( addedCount ) } added` );
+		parts.push(
+			sprintf(
+				/* translators: %d: number of formats added */
+				_n( '%d format added', '%d formats added', addedCount ),
+				addedCount
+			)
+		);
 	}
 	if ( removedCount > 0 ) {
-		parts.push( `${ pluralize( removedCount ) } removed` );
+		parts.push(
+			sprintf(
+				/* translators: %d: number of formats removed */
+				_n( '%d format removed', '%d formats removed', removedCount ),
+				removedCount
+			)
+		);
 	}
 	if ( changedCount > 0 ) {
-		parts.push( `${ pluralize( changedCount ) } changed` );
+		parts.push(
+			sprintf(
+				/* translators: %d: number of formats changed */
+				_n( '%d format changed', '%d formats changed', changedCount ),
+				changedCount
+			)
+		);
 	}
 	return {
 		type: 'changed',
-		description: parts.join( ', ' ) || 'Formatting changed',
+		description: parts.join( ', ' ) || __( 'Formatting changed' ),
 	};
 }
 
@@ -388,7 +411,7 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 				removedSlice,
 				{
 					type: 'revision/diff-removed',
-					attributes: { title: 'Removed' },
+					attributes: { title: __( 'Removed' ) },
 				},
 				0,
 				part.value.length
@@ -406,7 +429,7 @@ function applyRichTextDiff( currentRichText, previousRichText ) {
 				addedSlice,
 				{
 					type: 'revision/diff-added',
-					attributes: { title: 'Added' },
+					attributes: { title: __( 'Added' ) },
 				},
 				0,
 				part.value.length

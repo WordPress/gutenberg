@@ -15,6 +15,7 @@ import { createBlock, parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import { useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
+import { __ } from '@wordpress/i18n';
 import { registerFormatType } from '@wordpress/rich-text';
 
 /**
@@ -128,7 +129,7 @@ const REVISION_DIFF_STYLES = `
 // Register custom format types for revision diff at module level.
 registerFormatType( 'revision/diff-removed', {
 	name: 'revision/diff-removed',
-	title: 'Removed',
+	title: __( 'Removed' ),
 	tagName: 'del',
 	className: 'revision-diff-removed',
 	attributes: { title: 'title' },
@@ -137,7 +138,7 @@ registerFormatType( 'revision/diff-removed', {
 
 registerFormatType( 'revision/diff-added', {
 	name: 'revision/diff-added',
-	title: 'Added',
+	title: __( 'Added' ),
 	tagName: 'ins',
 	className: 'revision-diff-added',
 	attributes: { title: 'title' },
@@ -146,7 +147,7 @@ registerFormatType( 'revision/diff-added', {
 
 registerFormatType( 'revision/diff-format-added', {
 	name: 'revision/diff-format-added',
-	title: 'Format Added',
+	title: __( 'Format added' ),
 	tagName: 'span',
 	className: 'revision-diff-format-added',
 	attributes: { title: 'title' },
@@ -155,7 +156,7 @@ registerFormatType( 'revision/diff-format-added', {
 
 registerFormatType( 'revision/diff-format-removed', {
 	name: 'revision/diff-format-removed',
-	title: 'Format Removed',
+	title: __( 'Format removed' ),
 	tagName: 'span',
 	className: 'revision-diff-format-removed',
 	attributes: { title: 'title' },
@@ -164,7 +165,7 @@ registerFormatType( 'revision/diff-format-removed', {
 
 registerFormatType( 'revision/diff-format-changed', {
 	name: 'revision/diff-format-changed',
-	title: 'Format Changed',
+	title: __( 'Format changed' ),
 	tagName: 'span',
 	className: 'revision-diff-format-changed',
 	attributes: { title: 'title' },

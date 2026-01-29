@@ -5,6 +5,7 @@ import { useState, useCallback, useMemo } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Recursively collect blocks with diff status.
@@ -102,6 +103,12 @@ export default function DiffMarkers() {
 		block?.scrollIntoView( { behavior: 'smooth', block: 'center' } );
 	};
 
+	const statusLabels = {
+		added: __( 'Scroll to added block' ),
+		removed: __( 'Scroll to removed block' ),
+		modified: __( 'Scroll to modified block' ),
+	};
+
 	return (
 		<div ref={ containerRef } className="revision-diff-markers">
 			{ diffBlocks.map( ( { clientId, status } ) => {
@@ -118,7 +125,7 @@ export default function DiffMarkers() {
 							height: `${ Math.max( pos.height, 0.5 ) }%`,
 						} }
 						onClick={ () => scrollToBlock( clientId ) }
-						aria-label={ `Scroll to ${ status } block` }
+						aria-label={ statusLabels[ status ] }
 					/>
 				);
 			} ) }
