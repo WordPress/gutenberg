@@ -3,7 +3,7 @@
 /**
  * External dependencies
  */
-import { createRequire, findPackageJSON } from 'module';
+import nodeModule from 'module';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath, pathToFileURL } from 'url';
@@ -12,6 +12,10 @@ import { fileURLToPath, pathToFileURL } from 'url';
  * Internal dependencies
  */
 import { checkDeps, getLicenses } from '../packages/scripts/utils/license.js';
+
+// Access these dynamically - findPackageJSON only exists in Node.js 22.14.0+
+const { createRequire } = nodeModule;
+const findPackageJSON = nodeModule.findPackageJSON;
 
 const require = createRequire( import.meta.url );
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
