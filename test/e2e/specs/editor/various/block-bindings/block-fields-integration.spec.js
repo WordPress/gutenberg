@@ -107,7 +107,13 @@ test.describe( 'Block Fields Bindings Integration', () => {
 				.filter( { hasText: 'Text Field Label' } )
 				.click();
 
-			// Paragraph should now show the bound value
+			// Block Field input should update to show the bound value
+			const contentField = page.getByRole( 'textbox', {
+				name: 'content',
+			} );
+			await expect( contentField ).toHaveValue( 'Text Field Value' );
+
+			// Paragraph should also show the bound value in canvas
 			const paragraphBlock = editor.canvas.getByRole( 'document', {
 				name: 'Block: Paragraph',
 			} );

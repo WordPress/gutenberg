@@ -56,6 +56,7 @@ function createConfiguredControl( ControlComponent, config = {} ) {
  * @param {Object}   props
  * @param {string}   props.clientId      The clientId of the block.
  * @param {Object}   props.blockType     The blockType definition.
+ * @param {Object}   props.attributes    The block's attributes (with computed values for bindings).
  * @param {Function} props.setAttributes Action to set the block's attributes.
  * @param {boolean}  props.isCollapsed   Whether the DataForm is rendered as 'collapsed' with only the first field
  *                                       displayed by default. When collapsed a dropdown is displayed to allow
@@ -65,6 +66,7 @@ function createConfiguredControl( ControlComponent, config = {} ) {
 function BlockFields( {
 	clientId,
 	blockType,
+	attributes: attributesProp,
 	setAttributes,
 	isCollapsed = false,
 } ) {
@@ -76,10 +78,13 @@ function BlockFields( {
 
 	const blockTypeFields = blockType?.[ fieldsKey ];
 
-	const attributes = useSelect(
+	// Use attributes from props (which include computed bound values) if provided,
+	// otherwise fall back to fetching from store
+	const attributesFromStore = useSelect(
 		( select ) => select( blockEditorStore ).getBlockAttributes( clientId ),
 		[ clientId ]
 	);
+	const attributes = attributesProp || attributesFromStore;
 
 	// Get block context for bindings integration
 	const blockContext = useContext( BlockContext );
