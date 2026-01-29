@@ -366,6 +366,8 @@ export default function NavigationLinkEdit( {
 	} );
 
 	const missingText = getMissingText( type );
+	const hasDataFormBlockFields =
+		window?.__experimentalContentOnlyInspectorFields;
 
 	return (
 		<>
@@ -390,13 +392,15 @@ export default function NavigationLinkEdit( {
 					) }
 				</ToolbarGroup>
 			</BlockControls>
-			<InspectorControls>
-				<Controls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					clientId={ clientId }
-				/>
-			</InspectorControls>
+			{ ! hasDataFormBlockFields && isSelected && (
+				<InspectorControls group="content">
+					<Controls
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						clientId={ clientId }
+					/>
+				</InspectorControls>
+			) }
 			<div { ...blockProps }>
 				{ hasMissingEntity && (
 					<VisuallyHidden id={ missingEntityDescriptionId }>

@@ -306,6 +306,8 @@ export default function NavigationSubmenuEdit( {
 
 	const canConvertToLink =
 		! selectedBlockHasChildren || onlyDescendantIsEmptyLink;
+	const hasDataFormBlockFields =
+		window?.__experimentalContentOnlyInspectorFields;
 
 	return (
 		<>
@@ -333,13 +335,15 @@ export default function NavigationSubmenuEdit( {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			<InspectorControls>
-				<Controls
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					clientId={ clientId }
-				/>
-			</InspectorControls>
+			{ ! hasDataFormBlockFields && isSelected && (
+				<InspectorControls group="content">
+					<Controls
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						clientId={ clientId }
+					/>
+				</InspectorControls>
+			) }
 			<div { ...blockProps }>
 				<ParentElement className="wp-block-navigation-item__content">
 					{ ! isInvalid && ! isDraft && (
