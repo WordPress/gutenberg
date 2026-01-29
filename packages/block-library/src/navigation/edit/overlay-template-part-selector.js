@@ -33,12 +33,16 @@ import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
  * @param {string}   props.overlay                  Currently selected overlay template part ID.
  * @param {Function} props.setAttributes            Function to update block attributes.
  * @param {Function} props.onNavigateToEntityRecord Function to navigate to template part editor.
+ * @param {boolean}  props.isCreatingOverlay        Whether an overlay is being created (lifted state).
+ * @param {Function} props.setIsCreatingOverlay     Function to set creating overlay state (lifted state).
  * @return {JSX.Element} The overlay template part selector component.
  */
 export default function OverlayTemplatePartSelector( {
 	overlay,
 	setAttributes,
 	onNavigateToEntityRecord,
+	isCreatingOverlay,
+	setIsCreatingOverlay,
 } ) {
 	const headingId = useInstanceId(
 		OverlayTemplatePartSelector,
@@ -60,8 +64,14 @@ export default function OverlayTemplatePartSelector( {
 		[]
 	);
 
-	// Track if we're currently creating a new overlay
-	const [ isCreating, setIsCreating ] = useState( false );
+	// Check state for creating status if provided, otherwise use local state
+	const [ localIsCreating, setLocalIsCreating ] = useState( false );
+	const isCreating =
+		isCreatingOverlay !== undefined ? isCreatingOverlay : localIsCreating;
+	const setIsCreating =
+		setIsCreatingOverlay !== undefined
+			? setIsCreatingOverlay
+			: setLocalIsCreating;
 
 	// Filter template parts by overlay area
 	const overlayTemplateParts = useMemo( () => {
@@ -183,6 +193,8 @@ export default function OverlayTemplatePartSelector( {
 					postId: templatePartId,
 					postType: 'wp_template_part',
 				} );
+			} else {
+				setIsCreating( false );
 			}
 		} catch ( error ) {
 			// Error handling pattern matches CreateTemplatePartModalContents.
@@ -198,7 +210,6 @@ export default function OverlayTemplatePartSelector( {
 					: __( 'An error occurred while creating the overlay.' );
 
 			createErrorNotice( errorMessage, { type: 'snackbar' } );
-		} finally {
 			setIsCreating( false );
 		}
 	}, [
@@ -207,6 +218,7 @@ export default function OverlayTemplatePartSelector( {
 		onNavigateToEntityRecord,
 		createErrorNotice,
 		currentTheme,
+		setIsCreating,
 	] );
 
 	const handleClearOverlay = useCallback( () => {
@@ -251,7 +263,9 @@ export default function OverlayTemplatePartSelector( {
 			>
 				{ __( 'Overlay Template' ) }
 			</h3>
-			{ hasResolved && overlayTemplateParts.length === 0 ? (
+			{ hasResolved &&
+			( overlayTemplateParts.length === 0 ||
+				( isCreating && overlayTemplateParts.length === 1 ) ) ? (
 				<>
 					<Button
 						__next40pxDefaultSize

@@ -6,6 +6,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -49,6 +50,8 @@ export default function OverlayPanel( {
 	currentTheme,
 	hasOverlays,
 } ) {
+	const [ isCreatingOverlay, setIsCreatingOverlay ] = useState( false );
+
 	return (
 		<PanelBody title={ __( 'Overlay' ) } initialOpen>
 			<VStack spacing={ 4 }>
@@ -75,15 +78,20 @@ export default function OverlayPanel( {
 						overlay={ overlay }
 						setAttributes={ setAttributes }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
+						isCreatingOverlay={ isCreatingOverlay }
+						setIsCreatingOverlay={ setIsCreatingOverlay }
 					/>
 				) }
 
-				{ overlayMenu !== 'never' && overlay && hasOverlays && (
-					<OverlayPreview
-						overlay={ overlay }
-						currentTheme={ currentTheme }
-					/>
-				) }
+				{ overlayMenu !== 'never' &&
+					overlay &&
+					hasOverlays &&
+					! isCreatingOverlay && (
+						<OverlayPreview
+							overlay={ overlay }
+							currentTheme={ currentTheme }
+						/>
+					) }
 			</VStack>
 		</PanelBody>
 	);
