@@ -1,6 +1,6 @@
 import { forwardRef } from '@wordpress/element';
 import clsx from 'clsx';
-import { Tabs as BaseUITabs } from '@base-ui/react/tabs';
+import { Tabs as _Tabs } from '@base-ui/react/tabs';
 import styles from './style.module.css';
 import type { TabPanelProps } from './types';
 
@@ -13,7 +13,7 @@ import type { TabPanelProps } from './types';
 export const Panel = forwardRef< HTMLDivElement, TabPanelProps >(
 	function TabPanel( { className, ...otherProps }, forwardedRef ) {
 		return (
-			<BaseUITabs.Panel
+			<_Tabs.Panel
 				ref={ forwardedRef }
 				className={ clsx( styles.tabpanel, className ) }
 				{ ...otherProps }
