@@ -51,7 +51,7 @@ export function WithDesignSystemTheme(
 								background:
 									'var(--wpds-color-bg-surface-neutral-strong)',
 								padding:
-									'var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-md) var(--wpds-dimension-padding-xs)',
+									'var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-sm)',
 								outline:
 									'1px dashed var(--wpds-color-stroke-surface-neutral)',
 								outlineOffset: '2px',

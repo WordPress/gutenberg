@@ -50,9 +50,9 @@
 			"$description": "Base dimension unit"
 		},
 		"padding": {
-			"2xs": {
+			"xs": {
 				"$value": "{wpds-dimension.primitive.space.10}",
-				"$description": "2x extra small padding",
+				"$description": "Extra small padding",
 				"$extensions": {
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.10}",
@@ -61,9 +61,9 @@
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
-			"xs": {
+			"sm": {
 				"$value": "{wpds-dimension.primitive.space.20}",
-				"$description": "Extra small padding",
+				"$description": "Small padding",
 				"$extensions": {
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.10}",
@@ -72,9 +72,9 @@
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
-			"sm": {
+			"md": {
 				"$value": "{wpds-dimension.primitive.space.30}",
-				"$description": "Small padding",
+				"$description": "Medium padding",
 				"$extensions": {
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.20}",
@@ -83,9 +83,9 @@
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
-			"md": {
+			"lg": {
 				"$value": "{wpds-dimension.primitive.space.40}",
-				"$description": "Medium padding",
+				"$description": "Large padding",
 				"$extensions": {
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.30}",
@@ -94,9 +94,9 @@
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
-			"lg": {
+			"xl": {
 				"$value": "{wpds-dimension.primitive.space.50}",
-				"$description": "Large padding",
+				"$description": "Extra large padding",
 				"$extensions": {
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.40}",
@@ -105,9 +105,9 @@
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
-			"xl": {
+			"2xl": {
 				"$value": "{wpds-dimension.primitive.space.60}",
-				"$description": "Extra large padding",
+				"$description": "2x extra large padding",
 				"$extensions": {
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.50}",
@@ -116,9 +116,9 @@
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
-			"2xl": {
+			"3xl": {
 				"$value": "{wpds-dimension.primitive.space.70}",
-				"$description": "2x extra large padding",
+				"$description": "3x extra large padding",
 				"$extensions": {
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.60}",

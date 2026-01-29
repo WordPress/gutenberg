@@ -119,13 +119,13 @@ Do not edit directly.
 | Variable name                  | Description            |
 | ------------------------------ | ---------------------- |
 | `--wpds-dimension-base`        | Base dimension unit    |
-| `--wpds-dimension-padding-2xs` | 2x extra small padding |
 | `--wpds-dimension-padding-xs`  | Extra small padding    |
 | `--wpds-dimension-padding-sm`  | Small padding          |
 | `--wpds-dimension-padding-md`  | Medium padding         |
 | `--wpds-dimension-padding-lg`  | Large padding          |
 | `--wpds-dimension-padding-xl`  | Extra large padding    |
 | `--wpds-dimension-padding-2xl` | 2x extra large padding |
+| `--wpds-dimension-padding-3xl` | 3x extra large padding |
 | `--wpds-dimension-gap-2xs`     | 2x extra small gap     |
 | `--wpds-dimension-gap-xs`      | Extra small gap        |
 | `--wpds-dimension-gap-sm`      | Small gap              |

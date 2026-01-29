@@ -1,31 +1,31 @@
 {
 	"wpds-dimension": {
 		"padding": {
-			"2xs": {
+			"xs": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.20}"
 			},
-			"xs": {
+			"sm": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.30}"
 			},
-			"sm": {
+			"md": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.40}"
 			},
-			"md": {
+			"lg": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.50}"
 			},
-			"lg": {
+			"xl": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.60}"
 			},
-			"xl": {
+			"2xl": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.70}"
 			},
-			"2xl": {
+			"3xl": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.80}"
 			}
