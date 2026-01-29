@@ -402,6 +402,31 @@ describe( 'diffRevisionContent', () => {
 		] );
 	} );
 
+	it( 'pairs blocks as modified when attrs differ but content is identical', () => {
+		const previous = serialize( [
+			createBlock( 'core/paragraph', { content: 'Same content' } ),
+		] );
+		const current = serialize( [
+			createBlock( 'core/paragraph', {
+				content: 'Same content',
+				className: 'new-class',
+			} ),
+		] );
+		const blocks = diffRevisionContent( current, previous );
+
+		// Content is identical but attrs changed - should be marked as modified.
+		expect( normalizeBlockTree( blocks ) ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Same content',
+					className: 'new-class',
+					__revisionDiffStatus: 'modified',
+				},
+			},
+		] );
+	} );
+
 	it( 'handles block move with a tiny change', () => {
 		const previous = serialize( [
 			createBlock( 'core/paragraph', { content: 'First block content' } ),

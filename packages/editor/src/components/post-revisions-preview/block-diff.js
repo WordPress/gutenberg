@@ -99,11 +99,15 @@ function pairSimilarBlocks( blocks ) {
 				rem.block.innerHTML || '',
 				add.block.innerHTML || ''
 			);
-			// Only pair if similar but not identical - identical blocks are just moved.
+			// If content is identical (score=1), only pair if attrs differ.
+			// Otherwise identical blocks are just position swaps, not modifications.
+			const attrsMatch =
+				JSON.stringify( rem.block.attrs ) ===
+				JSON.stringify( add.block.attrs );
 			if (
 				score > bestScore &&
 				score > SIMILARITY_THRESHOLD &&
-				score < 1
+				( score < 1 || ! attrsMatch )
 			) {
 				bestScore = score;
 				bestMatch = add;
@@ -167,10 +171,7 @@ function diffRawBlocks( currentRaw, previousRaw ) {
 	let currIdx = 0;
 	let prevIdx = 0;
 
-	for ( let partIdx = 0; partIdx < diff.length; partIdx++ ) {
-		const part = diff[ partIdx ];
-		const nextPart = diff[ partIdx + 1 ];
-
+	for ( const part of diff ) {
 		if ( part.added ) {
 			for ( let i = 0; i < part.count; i++ ) {
 				result.push( {
@@ -179,42 +180,11 @@ function diffRawBlocks( currentRaw, previousRaw ) {
 				} );
 			}
 		} else if ( part.removed ) {
-			// Check for 1:1 modification pattern: exactly 1 removed followed by exactly 1 added.
-			if (
-				part.count === 1 &&
-				nextPart?.added &&
-				nextPart.count === 1 &&
-				previousRaw[ prevIdx ].blockName ===
-					currentRaw[ currIdx ].blockName
-			) {
-				// Single block modification - merge into modified.
-				const prevBlock = previousRaw[ prevIdx++ ];
-				const currBlock = currentRaw[ currIdx++ ];
-
-				// Recursively diff inner blocks.
-				const diffedInnerBlocks = diffRawBlocks(
-					currBlock.innerBlocks || [],
-					prevBlock.innerBlocks || []
-				);
-
-				// Store previous raw block for rich text diff after parsing.
-				// Don't modify innerHTML here - apply diff after parsing.
+			for ( let i = 0; i < part.count; i++ ) {
 				result.push( {
-					...currBlock,
-					__revisionDiffStatus: 'modified',
-					innerBlocks: diffedInnerBlocks,
-					__previousRawBlock: prevBlock,
+					...previousRaw[ prevIdx++ ],
+					__revisionDiffStatus: 'removed',
 				} );
-
-				partIdx++; // Skip the next 'added' part.
-			} else {
-				// Multiple removals or no matching addition - mark all as removed.
-				for ( let i = 0; i < part.count; i++ ) {
-					result.push( {
-						...previousRaw[ prevIdx++ ],
-						__revisionDiffStatus: 'removed',
-					} );
-				}
 			}
 		} else {
 			// Matched blocks - recursively diff their innerBlocks.
