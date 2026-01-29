@@ -5,7 +5,6 @@ import { privateApis } from '@wordpress/core-data';
 import { Avatar } from './avatar';
 import { CollaboratorsList } from './list';
 import { unlock } from '../../lock-unlock';
-// import { type CursorRegistry } from '@/utilities/cursor-registry';
 
 import './styles/collaborators-presence.scss';
 
@@ -24,7 +23,6 @@ interface UserState {
 }
 
 interface AvatarsProps {
-	// cursorRegistry: CursorRegistry;
 	postId: number | null;
 	postType: string | null;
 }
@@ -36,11 +34,7 @@ interface AvatarsProps {
  * @param root0.postId
  * @param root0.postType
  */
-export function CollaboratorsPresence( {
-	// cursorRegistry,
-	postId,
-	postType,
-}: AvatarsProps ) {
+export function CollaboratorsPresence( { postId, postType }: AvatarsProps ) {
 	const activeUsers = useActiveUsers( postId, postType ) as UserState[];
 
 	// Filter out current user - we never show ourselves in the list
@@ -97,7 +91,6 @@ export function CollaboratorsPresence( {
 						isConnected: true,
 						userInfo: user.userInfo,
 					} ) ) }
-					// cursorRegistry={ cursorRegistry }
 					popoverAnchor={ popoverAnchor }
 					setIsPopoverVisible={ setIsPopoverVisible }
 				/>

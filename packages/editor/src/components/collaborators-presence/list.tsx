@@ -33,28 +33,6 @@ export function CollaboratorsList( {
 	popoverAnchor,
 	setIsPopoverVisible,
 }: CollaboratorsListProps ) {
-	// const handleCollaboratorClick = ( clientId: number ) => {
-	// const userName = activeUsers.find(
-	// 	( user ) => user.clientId === clientId
-	// )?.userInfo.name;
-
-	// const success = cursorRegistry.scrollToCursor( clientId, {
-	// 	behavior: 'smooth',
-	// 	block: 'center',
-	// 	highlightDuration: 2000,
-	// } );
-
-	// Announce the action to screen readers
-	// if ( success && userName ) {
-	// 	speak( `Scrolled to ${ userName }'s cursor`, 'polite' );
-	// }
-
-	// // Close the popover after successful scroll
-	// if ( success ) {
-	// 	setIsPopoverVisible( false );
-	// }
-	// };
-
 	return (
 		<Popover
 			anchor={ popoverAnchor }
