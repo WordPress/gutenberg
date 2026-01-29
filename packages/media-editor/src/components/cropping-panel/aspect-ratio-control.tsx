@@ -9,15 +9,13 @@ import { useImageCropper } from '@wordpress/image-cropper';
  * Internal dependencies
  */
 import { getCommonAspectRatios } from '../../utils/aspect-ratio';
-import { useMediaEditorContext } from '../media-editor-provider';
 
 /**
  * AspectRatioControl component provides a dropdown to select aspect ratio presets.
  * Includes Original, 1:1, 16:9, 4:3, 3:2, 3:4, 2:3
  */
 export default function AspectRatioControl() {
-	const { media } = useMediaEditorContext();
-	const { cropperState, setCropperState } = useImageCropper();
+	const { cropperState, setCropperState, resetState } = useImageCropper();
 	const aspectRatio = cropperState.aspectRatio;
 
 	const aspectRatios = getCommonAspectRatios();
@@ -25,17 +23,27 @@ export default function AspectRatioControl() {
 	const handleAspectRatioChange = ( value: string ) => {
 		const numValue = parseFloat( value );
 		if ( ! isNaN( numValue ) ) {
-			// If "Original" (value 0), calculate from media dimensions
-			if ( numValue === 0 && media?.source_url ) {
-				// Use natural aspect ratio from media
-				// For now, set to free aspect (aspectRatio: 1)
-				// TODO: Calculate actual media aspect ratio
-				setCropperState( { aspectRatio: 1 } );
-			} else {
+			// If "Original" (value 0), use the natural aspect ratio from reset state
+			if ( numValue === 0 && resetState?.aspectRatio ) {
+				setCropperState( { aspectRatio: resetState.aspectRatio } );
+			} else if ( numValue !== 0 ) {
 				setCropperState( { aspectRatio: numValue } );
 			}
 		}
 	};
+
+	// Determine which option to show as selected
+	// If current aspect ratio matches the natural ratio (original OR rotated), show "Original"
+	const tolerance = 0.01;
+	const naturalRatio = resetState?.aspectRatio || 0;
+	const rotatedNaturalRatio = naturalRatio ? 1 / naturalRatio : 0;
+	const matchesOriginal =
+		naturalRatio && Math.abs( aspectRatio - naturalRatio ) < tolerance;
+	const matchesRotated =
+		rotatedNaturalRatio &&
+		Math.abs( aspectRatio - rotatedNaturalRatio ) < tolerance;
+	const displayValue =
+		matchesOriginal || matchesRotated ? '0' : String( aspectRatio );
 
 	const options = aspectRatios.map( ( ratio ) => ( {
 		label: ratio.label,
@@ -47,7 +55,7 @@ export default function AspectRatioControl() {
 			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			label={ __( 'Aspect Ratio' ) }
-			value={ String( aspectRatio ) }
+			value={ displayValue }
 			options={ options }
 			onChange={ handleAspectRatioChange }
 		/>

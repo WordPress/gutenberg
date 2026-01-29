@@ -6,8 +6,11 @@
 	},
 	"references": [
 		{ "path": "../components" },
+		{ "path": "../compose" },
 		{ "path": "../dataviews" },
 		{ "path": "../element" },
-		{ "path": "../i18n" }
+		{ "path": "../i18n" },
+		{ "path": "../icons" },
+		{ "path": "../image-cropper" }
 	]
 }

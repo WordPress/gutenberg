@@ -2,15 +2,13 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .media-editor-canvas {
-	position: relative;
-	width: 100%;
-	min-height: 400px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	background: #f0f0f0;
-	padding: $grid-unit-40;
 	box-sizing: border-box;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	min-height: 100%;
+	padding: $grid-unit-40;
+	position: relative;
 
 	&.is-loading {
 		min-height: 300px;
@@ -26,6 +24,7 @@
 
 .media-editor-canvas__crop-area {
 	position: relative;
-	max-width: 100%;
-	margin: 0 auto;
+	display: flex;
+	align-items: center;
+	box-sizing: border-box;
 }

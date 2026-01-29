@@ -10,6 +10,18 @@ import { useImageCropper } from '@wordpress/image-cropper';
 import { useMediaEditorContext } from '../components/media-editor-provider';
 
 /**
+ * Checks if a rotation is a quarter turn (90° or 270°).
+ *
+ * @param rotation - The rotation value to check
+ * @return True if the rotation is 90° or 270°
+ */
+function isQuarterTurn( rotation: number ): boolean {
+	// Normalize rotation to 0-360 range
+	const normalized = ( ( rotation % 360 ) + 360 ) % 360;
+	return normalized % 180 === 90;
+}
+
+/**
  * Hook for managing image editing state and actions.
  * Combines MediaEditorContext and ImageCropperContext to provide a unified API.
  *
@@ -25,6 +37,7 @@ export default function useImageEditing() {
 		isDirty,
 		reset: resetCropper,
 		getCroppedImage,
+		resetState,
 	} = useImageCropper();
 
 	/**
@@ -109,17 +122,75 @@ export default function useImageEditing() {
 	);
 
 	/**
+	 * Checks if the aspect ratio should be flipped during rotation.
+	 * If the user is using the natural aspect ratio and hasn't zoomed,
+	 * flip the aspect ratio to match the rotated image orientation.
+	 *
+	 * @param updatedRotation - The new rotation value
+	 */
+	const maybeFlipAspectRatio = useCallback(
+		( updatedRotation: number ) => {
+			// Need resetState to get the natural aspect ratio
+			if ( ! resetState?.aspectRatio || ! cropperState.mediaSize ) {
+				return;
+			}
+
+			const original = resetState.aspectRatio;
+			const rotated = 1 / original;
+			const tolerance = 0.01;
+
+			/*
+			 * Only flip the aspect ratio if:
+			 * 1. Zoom is still at default (1)
+			 * 2. Current aspect ratio matches either the original or rotated natural ratio
+			 *    (meaning the user hasn't explicitly chosen a different preset)
+			 */
+			const matchesOriginal =
+				Math.abs( cropperState.aspectRatio - original ) < tolerance;
+			const matchesRotated =
+				Math.abs( cropperState.aspectRatio - rotated ) < tolerance;
+
+			if (
+				cropperState.zoom === 1 &&
+				( matchesOriginal || matchesRotated )
+			) {
+				/*
+				 * If rotating to 90° or 270°, use the rotated aspect ratio.
+				 * If rotating to 0° or 180°, use the original aspect ratio.
+				 * This makes the crop area rotate with the image.
+				 */
+				const newAspectRatio = isQuarterTurn( updatedRotation )
+					? rotated
+					: original;
+
+				if (
+					Math.abs( newAspectRatio - cropperState.aspectRatio ) >
+					tolerance
+				) {
+					// Reset crop position to center when flipping aspect ratio
+					// This prevents unwanted zooming/cropping during rotation
+					setCropperState( {
+						aspectRatio: newAspectRatio,
+						crop: { x: 0, y: 0 },
+					} );
+				}
+			}
+		},
+		[ cropperState, resetState, setCropperState ]
+	);
+
+	/**
 	 * Rotates the image by the specified angle.
 	 *
 	 * @param angle - Rotation angle in degrees
 	 */
 	const rotate = useCallback(
 		( angle: number ) => {
-			setCropperState( ( prev ) => ( {
-				rotation: prev.rotation + angle,
-			} ) );
+			const newRotation = cropperState.rotation + angle;
+			setCropperState( { rotation: newRotation } );
+			maybeFlipAspectRatio( newRotation );
 		},
-		[ setCropperState ]
+		[ cropperState.rotation, setCropperState, maybeFlipAspectRatio ]
 	);
 
 	/**
