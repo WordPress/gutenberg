@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- DataViews: Fix title truncation in list layout. [#75063](https://github.com/WordPress/gutenberg/pull/75063)
+
 ### Enhancements
 - DataViews: Add details form layout validation. [#74996](https://github.com/WordPress/gutenberg/pull/74996)
 
