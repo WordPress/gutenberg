@@ -1,16 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { link, lockSmall, error, linkOff } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import { unlock } from '../../../lock-unlock';
 import useBindingState from './use-binding-state';
 import BindingMenu from './binding-menu';
+
+const { Menu } = unlock( componentsPrivateApis );
 
 /**
  * Badge component that shows binding status and provides access to binding menu.
@@ -28,8 +30,6 @@ export default function BindingFieldBadge( {
 	clientId,
 	blockContext,
 } ) {
-	const [ isMenuOpen, setIsMenuOpen ] = useState( false );
-
 	const {
 		isBound,
 		binding,
@@ -77,23 +77,22 @@ export default function BindingFieldBadge( {
 
 	return (
 		<div className={ className }>
-			<Button
-				icon={ icon }
-				label={ label }
-				onClick={ () => setIsMenuOpen( ! isMenuOpen ) }
-				size="compact"
-				variant="tertiary"
-			/>
-			{ isMenuOpen && (
+			<Menu placement="left-start">
+				<Menu.TriggerButton
+					icon={ icon }
+					label={ label }
+					size="compact"
+					variant="tertiary"
+				/>
 				<BindingMenu
 					fieldId={ fieldId }
 					blockName={ blockName }
 					clientId={ clientId }
 					blockContext={ blockContext }
 					binding={ binding }
-					onClose={ () => setIsMenuOpen( false ) }
+					placement="left-start"
 				/>
-			) }
+			</Menu>
 		</div>
 	);
 }

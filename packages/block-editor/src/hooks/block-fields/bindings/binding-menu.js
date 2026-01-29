@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	Popover,
-	privateApis as componentsPrivateApis,
-} from '@wordpress/components';
+import { privateApis as componentsPrivateApis } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -19,15 +16,15 @@ import { getCompatibleFields } from './get-compatible-fields';
 const { Menu } = unlock( componentsPrivateApis );
 
 /**
- * Popover menu for managing bindings.
+ * Menu content for managing bindings.
  *
- * @param {Object}   props              Component props.
- * @param {string}   props.fieldId      The field/attribute identifier.
- * @param {string}   props.blockName    The block type name.
- * @param {string}   props.clientId     The block client ID.
- * @param {Object}   props.blockContext The block context.
- * @param {Object}   props.binding      Current binding (if any).
- * @param {Function} props.onClose      Close handler.
+ * @param {Object} props              Component props.
+ * @param {string} props.fieldId      The field/attribute identifier.
+ * @param {string} props.blockName    The block type name.
+ * @param {string} props.clientId     The block client ID.
+ * @param {Object} props.blockContext The block context.
+ * @param {Object} props.binding      Current binding (if any).
+ * @param {string} props.placement    Popover placement.
  * @return {Element} The binding menu component.
  */
 export default function BindingMenu( {
@@ -36,7 +33,7 @@ export default function BindingMenu( {
 	clientId,
 	blockContext,
 	binding,
-	onClose,
+	placement = 'left-start',
 } ) {
 	const compatibleFields = useSelect(
 		( select ) =>
@@ -53,44 +50,47 @@ export default function BindingMenu( {
 		updateBlockBindings( {
 			[ fieldId ]: undefined,
 		} );
-		onClose();
 	};
 
 	return (
-		<Popover onClose={ onClose } placement="left-start" offset={ 10 }>
+		<Menu.Popover placement={ placement } gutter={ 8 }>
 			<Menu>
-				{ ! hasCompatibleFields && ! isBound && (
-					<Menu.Item>
-						<Menu.ItemLabel>
-							{ __( 'No sources available' ) }
-						</Menu.ItemLabel>
-					</Menu.Item>
-				) }
-
-				{ hasCompatibleFields &&
-					Object.entries( compatibleFields ).map(
-						( [ sourceKey, fields ] ) => (
-							<BlockBindingsSourceFieldsList
-								key={ sourceKey }
-								sourceKey={ sourceKey }
-								fields={ fields }
-								attribute={ fieldId }
-								args={ binding?.args }
-							/>
-						)
+				<Menu.Group>
+					{ ! hasCompatibleFields && ! isBound && (
+						<Menu.Item disabled>
+							<Menu.ItemLabel>
+								{ __( 'No sources available' ) }
+							</Menu.ItemLabel>
+						</Menu.Item>
 					) }
+
+					{ hasCompatibleFields &&
+						Object.entries( compatibleFields ).map(
+							( [ sourceKey, fields ] ) => (
+								<BlockBindingsSourceFieldsList
+									key={ sourceKey }
+									sourceKey={ sourceKey }
+									fields={ fields }
+									attribute={ fieldId }
+									args={ binding?.args }
+								/>
+							)
+						) }
+				</Menu.Group>
 
 				{ isBound && (
 					<>
 						<Menu.Separator />
-						<Menu.Item onClick={ handleDisconnect }>
-							<Menu.ItemLabel>
-								{ __( 'Disconnect' ) }
-							</Menu.ItemLabel>
-						</Menu.Item>
+						<Menu.Group>
+							<Menu.Item onClick={ handleDisconnect }>
+								<Menu.ItemLabel>
+									{ __( 'Disconnect' ) }
+								</Menu.ItemLabel>
+							</Menu.Item>
+						</Menu.Group>
 					</>
 				) }
 			</Menu>
-		</Popover>
+		</Menu.Popover>
 	);
 }
