@@ -7,7 +7,6 @@ import {
 	CardBody,
 	CardHeader as OriginalCardHeader,
 } from '@wordpress/components';
-import { Badge } from '@wordpress/ui';
 import {
 	useCallback,
 	useContext,
@@ -17,7 +16,6 @@ import {
 	useState,
 } from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
-import { sprintf, _n } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -35,7 +33,7 @@ import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import { getSummaryFields } from '../get-summary-fields';
 import useReportValidity from '../../../hooks/use-report-validity';
-import countInvalidFields from '../count-invalid-fields';
+import ValidationBadge from '../validation-badge';
 
 const NonCollapsibleCardHeader = ( {
 	children,
@@ -217,24 +215,10 @@ export default function FormCardField< Item >( {
 		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
 	);
 
-	// Count invalid fields for validation badge
-	const invalidCount = countInvalidFields( validity );
-	const showValidationBadge =
-		touched && invalidCount > 0 && layout.isCollapsible;
-
-	const validationBadge = showValidationBadge ? (
-		<Badge intent="high">
-			{ sprintf(
-				/* translators: %d: Number of fields that need attention */
-				_n(
-					'%d field needs attention',
-					'%d fields need attention',
-					invalidCount
-				),
-				invalidCount
-			) }
-		</Badge>
-	) : null;
+	const validationBadge =
+		touched && layout.isCollapsible ? (
+			<ValidationBadge validity={ validity } />
+		) : null;
 
 	const sizeCard = {
 		blockStart: 'medium' as const,

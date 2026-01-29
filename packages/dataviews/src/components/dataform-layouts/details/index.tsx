@@ -9,8 +9,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { Badge } from '@wordpress/ui';
-import { sprintf, _n, __ } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,7 +23,7 @@ import DataFormContext from '../../dataform-context';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import useReportValidity from '../../../hooks/use-report-validity';
-import countInvalidFields from '../count-invalid-fields';
+import ValidationBadge from '../validation-badge';
 
 export default function FormDetailsField< Item >( {
 	data,
@@ -88,24 +87,6 @@ export default function FormDetailsField< Item >( {
 		? fields.find( ( fieldDef ) => fieldDef.id === summaryFieldId )
 		: undefined;
 
-	// Count invalid fields for validation badge
-	const invalidCount = countInvalidFields( validity );
-	const showValidationBadge = touched && invalidCount > 0;
-
-	const validationBadge = showValidationBadge ? (
-		<Badge intent="high">
-			{ sprintf(
-				/* translators: %d: Number of fields that need attention */
-				_n(
-					'%d field needs attention',
-					'%d fields need attention',
-					invalidCount
-				),
-				invalidCount
-			) }
-		</Badge>
-	) : null;
-
 	// Render the summary content
 	let summaryContent;
 	if ( summaryField && summaryField.render ) {
@@ -126,7 +107,7 @@ export default function FormDetailsField< Item >( {
 			<summary className="dataforms-layouts-details__summary">
 				<span className="dataforms-layouts-details__summary-content">
 					{ summaryContent }
-					{ validationBadge }
+					{ touched && <ValidationBadge validity={ validity } /> }
 				</span>
 			</summary>
 			<div
