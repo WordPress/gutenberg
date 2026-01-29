@@ -12,7 +12,7 @@ const { rimraf } = require( 'rimraf' );
  */
 const { loadConfig } = require( '../config' );
 const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
-const { getRuntime } = require( '../runtime' );
+const { getRuntime, getSavedRuntime, saveRuntime } = require( '../runtime' );
 
 /**
  * @typedef {import('../config').WPConfig} WPConfig
@@ -51,6 +51,38 @@ module.exports = async function start( {
 	const config = await loadConfig( path.resolve( '.' ) );
 	config.debug = debug;
 
+	// Check if switching runtimes and prompt user to destroy old environment first.
+	const savedRuntime = await getSavedRuntime( config.workDirectoryPath );
+	if ( savedRuntime && savedRuntime !== runtimeName ) {
+		spinner.stop();
+		let shouldDestroy = false;
+		try {
+			shouldDestroy = await confirm( {
+				message: `Environment was previously started with '${ savedRuntime }' runtime. Destroy it and start with '${ runtimeName }'?`,
+				default: true,
+			} );
+		} catch ( error ) {
+			if ( error.name === 'ExitPromptError' ) {
+				console.log( 'Cancelled.' );
+				process.exit( 1 );
+			}
+			throw error;
+		}
+
+		if ( ! shouldDestroy ) {
+			spinner.fail(
+				`Aborted. Run 'wp-env destroy' manually or start with '--runtime=${ savedRuntime }'.`
+			);
+			process.exit( 1 );
+		}
+
+		// User confirmed - destroy old runtime first.
+		spinner.start();
+		spinner.text = `Destroying previous ${ savedRuntime } environment.`;
+		const oldRuntime = getRuntime( savedRuntime );
+		await oldRuntime.destroy( config, { spinner } );
+	}
+
 	if ( ! config.detectedLocalConfig ) {
 		const { configDirectoryPath } = config;
 		spinner.warn(
@@ -76,6 +108,9 @@ module.exports = async function start( {
 			spx,
 			debug,
 		} );
+
+		// Save the runtime type after successful start.
+		await saveRuntime( runtimeName, config.workDirectoryPath );
 	} catch ( error ) {
 		// Attempt to stop any partially-started environment so that
 		// processes do not linger after a failed start.

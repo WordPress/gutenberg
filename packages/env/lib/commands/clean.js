@@ -32,7 +32,9 @@ module.exports = async function clean( {
 	debug,
 } ) {
 	const config = await loadConfig( path.resolve( '.' ) );
-	const runtime = getRuntime( detectRuntime( config.workDirectoryPath ) );
+	const runtime = getRuntime(
+		await detectRuntime( config.workDirectoryPath )
+	);
 
 	await runtime.clean( config, { environment, spinner, debug } );
 
