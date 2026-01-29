@@ -24,7 +24,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { keyboardReturn, linkOff } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
-import { isURL, prependHTTP } from '@wordpress/url';
+import { isURL, prependHTTPS } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -337,7 +337,7 @@ function LinkControl( {
 		// Note: We rely on the native URL constructor rather than implementing custom TLD
 		// validation to avoid blocking valid URLs. If a URL passes the native constructor,
 		// it's technically valid according to web standards.
-		const urlToCheck = prependHTTP( trimmedValue );
+		const urlToCheck = prependHTTPS( trimmedValue );
 		return isURL( urlToCheck ) ? validResult : invalidResult;
 	};
 
