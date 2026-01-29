@@ -97,6 +97,7 @@ function VisualEditor( {
 	iframeProps,
 	contentRef,
 	className,
+	canvasOverlay,
 } ) {
 	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const {
@@ -507,6 +508,7 @@ function VisualEditor( {
 							/>
 						) }
 					</RecursionProvider>
+					{ canvasOverlay }
 				</BlockCanvas>
 			</ResizableEditor>
 		</div>
