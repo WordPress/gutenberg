@@ -21,6 +21,8 @@ jest.mock( '../env', () => {
 		stop: jest.fn( Promise.resolve.bind( Promise ) ),
 		clean: jest.fn( Promise.resolve.bind( Promise ) ),
 		run: jest.fn( Promise.resolve.bind( Promise ) ),
+		destroy: jest.fn( Promise.resolve.bind( Promise ) ),
+		cleanup: jest.fn( Promise.resolve.bind( Promise ) ),
 		ValidationError: actual.ValidationError,
 		LifecycleScriptError: actual.LifecycleScriptError,
 	};
@@ -79,6 +81,32 @@ describe( 'env cli', () => {
 		expect( container ).toBe( 'tests-wordpress' );
 		expect( command ).toStrictEqual( [ 'test', 'test1', '--test2' ] );
 		expect( spinner.text ).toBe( '' );
+	} );
+
+	it( 'parses destroy commands.', () => {
+		cli().parse( [ 'destroy' ] );
+		const { spinner, scripts, force } = env.destroy.mock.calls[ 0 ][ 0 ];
+		expect( spinner.text ).toBe( '' );
+		expect( scripts ).toBe( true );
+		expect( force ).toBe( false );
+	} );
+	it( 'parses destroy commands with --force flag.', () => {
+		cli().parse( [ 'destroy', '--force' ] );
+		const { force } = env.destroy.mock.calls[ 0 ][ 0 ];
+		expect( force ).toBe( true );
+	} );
+
+	it( 'parses cleanup commands.', () => {
+		cli().parse( [ 'cleanup' ] );
+		const { spinner, scripts, force } = env.cleanup.mock.calls[ 0 ][ 0 ];
+		expect( spinner.text ).toBe( '' );
+		expect( scripts ).toBe( true );
+		expect( force ).toBe( false );
+	} );
+	it( 'parses cleanup commands with --force flag.', () => {
+		cli().parse( [ 'cleanup', '--force' ] );
+		const { force } = env.cleanup.mock.calls[ 0 ][ 0 ];
+		expect( force ).toBe( true );
 	} );
 
 	it( 'handles successful commands with messages.', async () => {

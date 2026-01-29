@@ -76,6 +76,15 @@ class PlaygroundRuntime {
 	}
 
 	/**
+	 * Get the warning message for cleanup confirmation.
+	 *
+	 * @return {string} Warning message.
+	 */
+	getCleanupWarningMessage() {
+		return 'WARNING! This will remove the WordPress Playground environment and all local files.';
+	}
+
+	/**
 	 * Start the WordPress Playground environment.
 	 *
 	 * @param {Object}  config          The wp-env config object.
@@ -348,6 +357,25 @@ class PlaygroundRuntime {
 		await rimraf( config.workDirectoryPath );
 
 		spinner.text = 'Removed WordPress Playground environment.';
+	}
+
+	/**
+	 * Cleanup the WordPress Playground environment.
+	 *
+	 * For Playground, cleanup is the same as destroy since there are no
+	 * shared resources like Docker images to preserve.
+	 *
+	 * @param {Object} config          The wp-env config object.
+	 * @param {Object} options         Cleanup options.
+	 * @param {Object} options.spinner A CLI spinner which indicates progress.
+	 */
+	async cleanup( config, { spinner } ) {
+		await this.stop( config, { spinner } );
+
+		spinner.text = 'Removing local files.';
+		await rimraf( config.workDirectoryPath );
+
+		spinner.text = 'Cleaned up WordPress Playground environment.';
 	}
 
 	/**

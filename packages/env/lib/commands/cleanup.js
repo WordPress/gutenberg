@@ -14,7 +14,10 @@ const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 const { getRuntime, detectRuntime } = require( '../runtime' );
 
 /**
- * Destroy the development server.
+ * Cleanup the development server.
+ *
+ * Removes Docker containers, volumes, networks, and local files,
+ * but preserves Docker images for faster re-starts.
  *
  * @param {Object}  options
  * @param {Object}  options.spinner A CLI spinner which indicates progress.
@@ -22,7 +25,7 @@ const { getRuntime, detectRuntime } = require( '../runtime' );
  * @param {boolean} options.force   If true, skips the confirmation prompt.
  * @param {boolean} options.debug   True if debug mode is enabled.
  */
-module.exports = async function destroy( { spinner, scripts, force, debug } ) {
+module.exports = async function cleanup( { spinner, scripts, force, debug } ) {
 	const config = await loadConfig( path.resolve( '.' ) );
 
 	try {
@@ -34,7 +37,7 @@ module.exports = async function destroy( { spinner, scripts, force, debug } ) {
 
 	const runtime = getRuntime( detectRuntime( config.workDirectoryPath ) );
 
-	spinner.info( runtime.getDestroyWarningMessage() );
+	spinner.info( runtime.getCleanupWarningMessage() );
 
 	let yesDelete = force;
 	if ( ! force ) {
@@ -59,9 +62,9 @@ module.exports = async function destroy( { spinner, scripts, force, debug } ) {
 		return;
 	}
 
-	await runtime.destroy( config, { spinner, debug } );
+	await runtime.cleanup( config, { spinner, debug } );
 
 	if ( scripts ) {
-		await executeLifecycleScript( 'afterDestroy', config, spinner );
+		await executeLifecycleScript( 'afterCleanup', config, spinner );
 	}
 };

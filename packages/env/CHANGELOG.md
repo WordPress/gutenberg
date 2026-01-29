@@ -15,6 +15,8 @@
 ### New Features
 
 -   Add experimental WordPress Playground runtime support. Use `--runtime=playground` flag to start wp-env with Playground instead of Docker.
+-   Add `cleanup` command to remove environment-specific resources (containers, volumes, networks, and local files) while preserving Docker images for faster re-starts.
+-   Add `--force` flag to both `destroy` and `cleanup` commands to skip the confirmation prompt.
 
 ## 10.38.0 (2026-01-16)
 

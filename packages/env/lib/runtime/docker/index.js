@@ -370,6 +370,15 @@ class DockerRuntime {
 	}
 
 	/**
+	 * Get the warning message for cleanup confirmation.
+	 *
+	 * @return {string} Warning message.
+	 */
+	getCleanupWarningMessage() {
+		return 'WARNING! This will remove Docker containers, volumes, networks, and local files associated with the WordPress instance. Docker images will be preserved.';
+	}
+
+	/**
 	 * Stop the Docker containers.
 	 *
 	 * @param {WPConfig} config          The wp-env config object.
@@ -418,6 +427,33 @@ class DockerRuntime {
 		await rimraf( config.workDirectoryPath );
 
 		spinner.text = 'Removed WordPress environment.';
+	}
+
+	/**
+	 * Cleanup the Docker containers and remove local files, but preserve images.
+	 *
+	 * @param {WPConfig} config          The wp-env config object.
+	 * @param {Object}   options         Cleanup options.
+	 * @param {Object}   options.spinner A CLI spinner which indicates progress.
+	 * @param {boolean}  options.debug   True if debug mode is enabled.
+	 */
+	async cleanup( config, { spinner, debug } ) {
+		spinner.text = 'Removing docker containers, volumes, and networks.';
+
+		await dockerCompose.down( {
+			config: config.dockerComposeConfigPath,
+			commandOptions: [ '--volumes', '--remove-orphans' ],
+			log: debug,
+		} );
+
+		spinner.text = 'Removing local files.';
+		// Note: there is a race condition where docker compose actually hasn't finished
+		// by this point, which causes rimraf to fail. We need to wait at least 2.5-5s,
+		// but using 10s in case it's dependant on the machine.
+		await new Promise( ( resolve ) => setTimeout( resolve, 10000 ) );
+		await rimraf( config.workDirectoryPath );
+
+		spinner.text = 'Cleaned up WordPress environment.';
 	}
 
 	/**

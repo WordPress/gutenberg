@@ -7,6 +7,7 @@ const stop = require( './stop' );
 const clean = require( './clean' );
 const run = require( './run' );
 const destroy = require( './destroy' );
+const cleanup = require( './cleanup' );
 const logs = require( './logs' );
 const status = require( './status' );
 
@@ -16,6 +17,7 @@ module.exports = {
 	clean,
 	run,
 	destroy,
+	cleanup,
 	logs,
 	status,
 };

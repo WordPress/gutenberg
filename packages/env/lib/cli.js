@@ -246,7 +246,7 @@ module.exports = function cli() {
 	yargs.command(
 		'destroy',
 		wpRed(
-			'Destroy the WordPress environment. Deletes docker containers, volumes, and networks associated with the WordPress environment and removes local files.'
+			'Destroy the WordPress environment. Deletes docker containers, volumes, networks, and images associated with the WordPress environment and removes local files.'
 		),
 		( args ) => {
 			args.option( 'scripts', {
@@ -254,8 +254,32 @@ module.exports = function cli() {
 				describe: 'Execute any configured lifecycle scripts.',
 				default: true,
 			} );
+			args.option( 'force', {
+				type: 'boolean',
+				describe: 'Skip the confirmation prompt.',
+				default: false,
+			} );
 		},
 		withSpinner( env.destroy )
+	);
+	yargs.command(
+		'cleanup',
+		wpYellow(
+			'Cleanup the WordPress environment. Removes docker containers, volumes, networks, and local files, but preserves docker images for faster re-starts.'
+		),
+		( args ) => {
+			args.option( 'scripts', {
+				type: 'boolean',
+				describe: 'Execute any configured lifecycle scripts.',
+				default: true,
+			} );
+			args.option( 'force', {
+				type: 'boolean',
+				describe: 'Skip the confirmation prompt.',
+				default: false,
+			} );
+		},
+		withSpinner( env.cleanup )
 	);
 	yargs.command(
 		'status',
@@ -268,6 +292,12 @@ module.exports = function cli() {
 			} );
 		},
 		withSpinner( env.status )
+	);
+	yargs.command(
+		'install-path',
+		'Get the path where all of the environment files are stored. This includes the Docker files, WordPress, PHPUnit files, and any sources that were downloaded.',
+		() => {},
+		withSpinner( env.installPath )
 	);
 
 	return yargs;

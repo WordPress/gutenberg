@@ -469,17 +469,32 @@ To set the permalink to the year, month, and post name:
 wp-env run cli "wp rewrite structure /%year%/%monthnum%/%postname%/"
 ```
 
+### `wp-env cleanup`
+
+```sh
+wp-env cleanup
+
+Cleanup the WordPress environment. Removes docker containers, volumes, networks,
+and local files, but preserves docker images for faster re-starts.
+
+Options:
+  --debug    Enable debug output.                     [boolean] [default: false]
+  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
+  --force    Skip the confirmation prompt.            [boolean] [default: false]
+```
+
 ### `wp-env destroy`
 
 ```sh
 wp-env destroy
 
-Destroy the WordPress environment. Deletes docker containers, volumes, and
-networks associated with the WordPress environment and removes local files.
+Destroy the WordPress environment. Deletes docker containers, volumes, networks,
+and images associated with the WordPress environment and removes local files.
 
 Options:
   --debug    Enable debug output.                     [boolean] [default: false]
   --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
+  --force    Skip the confirmation prompt.            [boolean] [default: false]
 ```
 
 ### `wp-env logs [environment]`
@@ -630,6 +645,7 @@ build won't break on subsequent executions.
 
 * `afterStart`: Runs after `wp-env start` has finished setting up the environment.
 * `afterClean`: Runs after `wp-env clean` has finished cleaning the environment.
+* `afterCleanup`: Runs after `wp-env cleanup` has cleaned up the environment.
 * `afterDestroy`: Runs after `wp-env destroy` has destroyed the environment.
 
 ## Examples
