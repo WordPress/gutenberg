@@ -83,7 +83,7 @@ export function BlockRemovalWarningModal( { rules } ) {
 					{ ( warning || subtext ) && (
 						<p>
 							{ warning && <strong>{ warning }</strong> }
-							{ warning && subtext && <br /> }
+							{ warning && subtext && ' ' }
 							{ subtext }
 						</p>
 					) }

@@ -33,17 +33,17 @@ const BLOCK_REMOVAL_RULES = [
 			);
 			if ( removedPostContentBlocks.length ) {
 				return {
-					title: __( 'Remove content block?' ),
+					title: __( 'Be careful!' ),
 					description: __(
 						'This block displays the content of posts and pages using this template.'
 					),
 					warning: __(
-						'If you delete it, content using this template will not display.'
+						'If you delete it, posts or pages using this template will not display any content.'
 					),
 					subtext: __( 'Visitors will see blank pages.' ),
 					requireConfirmation: true,
 					confirmLabel: __( 'I understand the consequences' ),
-					removeLabel: __( 'Remove' ),
+					removeLabel: __( 'Delete' ),
 				};
 			}
 
