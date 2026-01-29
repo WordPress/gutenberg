@@ -270,24 +270,11 @@ function LinkControl( {
 		};
 	}, [] );
 
-	const hasLinkValue = value?.url?.trim()?.length > 0;
-
-	/**
-	 * Cancels editing state.
-	 */
-	const stopEditing = () => {
-		setIsEditingLink( false );
-	};
-
-	/**
-	 * Triggers the invalid event on the search input to force display of
-	 * validation errors, even if the field hasn't been blurred.
-	 * This is useful when validation needs to be shown immediately (e.g., on submit).
-	 */
-	const triggerValidationDisplay = () => {
-		// Use requestAnimationFrame to ensure the custom validity has been
-		// set on the input element by React before calling reportValidity().
-		window.requestAnimationFrame( () => {
+	// Trigger validation display when customValidity becomes invalid.
+	// This effect runs after React has applied the customValidity state update
+	// and ControlWithError's useEffect has set the native validity on the input.
+	useEffect( () => {
+		if ( customValidity?.type === 'invalid' ) {
 			const inputElement = searchInputRef.current;
 			if (
 				inputElement &&
@@ -295,7 +282,16 @@ function LinkControl( {
 			) {
 				inputElement.reportValidity();
 			}
-		} );
+		}
+	}, [ customValidity ] );
+
+	const hasLinkValue = value?.url?.trim()?.length > 0;
+
+	/**
+	 * Cancels editing state.
+	 */
+	const stopEditing = () => {
+		setIsEditingLink( false );
 	};
 
 	/**
@@ -365,7 +361,6 @@ function LinkControl( {
 			const validation = validateUrl( urlToValidate );
 			if ( validation.type === 'invalid' ) {
 				setCustomValidity( validation );
-				triggerValidationDisplay();
 				return;
 			}
 		}
@@ -433,7 +428,6 @@ function LinkControl( {
 
 		if ( validation.type === 'invalid' ) {
 			setCustomValidity( validation );
-			triggerValidationDisplay();
 			return false;
 		}
 
