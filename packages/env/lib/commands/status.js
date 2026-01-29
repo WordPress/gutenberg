@@ -3,38 +3,17 @@
  * External dependencies
  */
 const path = require( 'path' );
-const { existsSync } = require( 'fs' );
 const chalk = require( 'chalk' );
 
 /**
  * Internal dependencies
  */
 const { loadConfig } = require( '../config' );
-const { getRuntime, detectRuntime } = require( '../runtime' );
-
-/**
- * Check if an environment has been initialized by looking for runtime-specific files.
- *
- * @param {Object} config The wp-env configuration object.
- * @return {boolean} True if the environment has been initialized.
- */
-function isEnvironmentInitialized( config ) {
-	// Check for Docker's docker-compose.yml
-	if ( existsSync( config.dockerComposeConfigPath ) ) {
-		return true;
-	}
-
-	// Check for Playground's blueprint file
-	const playgroundBlueprintPath = path.join(
-		config.workDirectoryPath,
-		'playground-blueprint.json'
-	);
-	if ( existsSync( playgroundBlueprintPath ) ) {
-		return true;
-	}
-
-	return false;
-}
+const {
+	getRuntime,
+	detectRuntime,
+	EnvironmentNotInitializedError,
+} = require( '../runtime' );
 
 /**
  * Outputs the status of the wp-env environment.
@@ -49,42 +28,27 @@ module.exports = async function status( { spinner, debug, json } ) {
 
 	const config = await loadConfig( path.resolve( '.' ) );
 
-	// Check if environment is initialized by looking for runtime-specific files.
-	// We check for these files specifically because the work directory may exist
-	// just from caching the WordPress version, but these files are only created
-	// when `wp-env start` is actually run.
-	if ( ! isEnvironmentInitialized( config ) ) {
-		spinner.stop();
-		if ( json ) {
-			console.log(
-				JSON.stringify( {
-					status: 'uninitialized',
-					workDirectoryPath: config.workDirectoryPath,
-					configDirectoryPath: config.configDirectoryPath,
-				} )
-			);
-		} else {
-			console.log( formatNotInitialized( config ) );
-		}
-		return;
-	}
-
 	// Detect and get runtime.
-	const runtimeName = await detectRuntime( config.workDirectoryPath );
-	if ( ! runtimeName ) {
-		spinner.stop();
-		if ( json ) {
-			console.log(
-				JSON.stringify( {
-					status: 'uninitialized',
-					workDirectoryPath: config.workDirectoryPath,
-					configDirectoryPath: config.configDirectoryPath,
-				} )
-			);
-		} else {
-			console.log( formatNotInitialized( config ) );
+	let runtimeName;
+	try {
+		runtimeName = await detectRuntime( config.workDirectoryPath );
+	} catch ( error ) {
+		if ( error instanceof EnvironmentNotInitializedError ) {
+			spinner.stop();
+			if ( json ) {
+				console.log(
+					JSON.stringify( {
+						status: 'uninitialized',
+						workDirectoryPath: config.workDirectoryPath,
+						configDirectoryPath: config.configDirectoryPath,
+					} )
+				);
+			} else {
+				console.log( formatNotInitialized( config ) );
+			}
+			return;
 		}
-		return;
+		throw error;
 	}
 	const runtime = getRuntime( runtimeName );
 

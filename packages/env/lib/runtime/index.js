@@ -5,7 +5,10 @@
  */
 const DockerRuntime = require( './docker' );
 const PlaygroundRuntime = require( './playground' );
-const { UnsupportedCommandError } = require( './errors' );
+const {
+	UnsupportedCommandError,
+	EnvironmentNotInitializedError,
+} = require( './errors' );
 const { setCache, getCache } = require( '../cache' );
 
 const RUNTIME_CACHE_KEY = 'runtime';
@@ -61,14 +64,18 @@ async function getSavedRuntime( workDirectoryPath ) {
 
 /**
  * Detect which runtime was used by reading from the cache.
- * Returns null if no runtime has been saved (environment not initialized).
+ * Throws EnvironmentNotInitializedError if no runtime has been saved.
  *
  * @param {string} workDirectoryPath Path to the wp-env work directory.
- * @return {Promise<string|null>} Runtime name ('docker' or 'playground'), or null if not initialized.
+ * @return {Promise<string>} Runtime name ('docker' or 'playground').
+ * @throws {EnvironmentNotInitializedError} If environment not initialized.
  */
 async function detectRuntime( workDirectoryPath ) {
 	const savedRuntime = await getSavedRuntime( workDirectoryPath );
-	return savedRuntime || null;
+	if ( ! savedRuntime ) {
+		throw new EnvironmentNotInitializedError();
+	}
+	return savedRuntime;
 }
 
 module.exports = {
@@ -80,4 +87,5 @@ module.exports = {
 	DockerRuntime,
 	PlaygroundRuntime,
 	UnsupportedCommandError,
+	EnvironmentNotInitializedError,
 };

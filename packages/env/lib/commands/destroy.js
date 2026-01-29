@@ -31,14 +31,9 @@ module.exports = async function destroy( { spinner, scripts, debug } ) {
 		return;
 	}
 
-	const runtimeName = await detectRuntime( config.workDirectoryPath );
-	if ( ! runtimeName ) {
-		spinner.fail(
-			'Environment not initialized. Run `wp-env start` first.'
-		);
-		process.exit( 1 );
-	}
-	const runtime = getRuntime( runtimeName );
+	const runtime = getRuntime(
+		await detectRuntime( config.workDirectoryPath )
+	);
 
 	spinner.info( runtime.getDestroyWarningMessage() );
 

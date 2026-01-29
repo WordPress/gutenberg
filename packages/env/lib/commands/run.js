@@ -30,14 +30,9 @@ module.exports = async function run( {
 	debug,
 } ) {
 	const config = await loadConfig( path.resolve( '.' ) );
-	const runtimeName = await detectRuntime( config.workDirectoryPath );
-	if ( ! runtimeName ) {
-		spinner.fail(
-			'Environment not initialized. Run `wp-env start` first.'
-		);
-		process.exit( 1 );
-	}
-	const runtime = getRuntime( runtimeName );
+	const runtime = getRuntime(
+		await detectRuntime( config.workDirectoryPath )
+	);
 
 	// Include any double dashed arguments in the command so that we can pass them to Docker.
 	// This lets users pass options that the command defines without them being parsed.
