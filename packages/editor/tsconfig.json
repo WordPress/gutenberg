@@ -9,6 +9,7 @@
 		{ "path": "../api-fetch" },
 		{ "path": "../blob" },
 		{ "path": "../block-editor" },
+		{ "path": "../block-serialization-default-parser" },
 		{ "path": "../components" },
 		{ "path": "../compose" },
 		{ "path": "../core-data" },

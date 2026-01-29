@@ -179,8 +179,8 @@ registerFormatType( 'revision/diff-format-changed', {
  */
 function withRevisionDiffClasses( BlockListBlock ) {
 	return ( props ) => {
-		const { attributes, className } = props;
-		const diffStatus = attributes?.__revisionDiffStatus;
+		const { block, className } = props;
+		const diffStatus = block?.__revisionDiffStatus;
 
 		const enhancedClassName = clsx( className, {
 			'is-revision-added': diffStatus === 'added',

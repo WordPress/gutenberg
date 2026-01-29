@@ -43,7 +43,7 @@ function normalizeBlockTree( blocks ) {
 			name: block.name,
 			attributes: {
 				...attributes,
-				__revisionDiffStatus: block.attributes.__revisionDiffStatus,
+				__revisionDiffStatus: block.__revisionDiffStatus,
 			},
 			innerBlocks: normalizeBlockTree( block.innerBlocks ),
 		};

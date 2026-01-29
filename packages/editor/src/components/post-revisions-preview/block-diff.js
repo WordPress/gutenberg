@@ -547,10 +547,9 @@ function applyRichTextDiffToBlock( currentBlock, previousBlock ) {
  * @param {Object} rawBlock    Raw block (with __revisionDiffStatus and __previousRawBlock).
  */
 function applyDiffRecursively( parsedBlock, rawBlock ) {
-	// Copy diff status from raw block to parsed block attributes.
+	// Copy diff status from raw block to parsed block.
 	if ( rawBlock.__revisionDiffStatus ) {
-		parsedBlock.attributes.__revisionDiffStatus =
-			rawBlock.__revisionDiffStatus;
+		parsedBlock.__revisionDiffStatus = rawBlock.__revisionDiffStatus;
 	}
 
 	// Apply rich text diff if this block is modified and has a previous raw block.
