@@ -6,37 +6,33 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Block Fields Bindings Integration', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-bindings' );
+		// Enable feature flags via REST API
+		await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/settings',
+			data: {
+				'gutenberg-experiments': {
+					'gutenberg-content-only-inspector-fields': true,
+					'gutenberg-block-fields-bindings': true,
+				},
+			},
+		} );
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllPosts();
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-bindings' );
+		// Disable feature flags
+		await requestUtils.rest( {
+			method: 'POST',
+			path: '/wp/v2/settings',
+			data: {
+				'gutenberg-experiments': {},
+			},
+		} );
 	} );
 
-	test.beforeEach( async ( { admin, page } ) => {
-		// Enable both feature flags via localStorage
-		await admin.visitAdminPage( 'admin.php', 'page=gutenberg-experiments' );
-
-		// Enable Block Fields
-		const blockFieldsCheckbox = page.locator(
-			'#gutenberg-content-only-inspector-fields'
-		);
-		if ( ! ( await blockFieldsCheckbox.isChecked() ) ) {
-			await blockFieldsCheckbox.check();
-		}
-
-		// Enable Block Fields Bindings integration
-		const bindingsIntegrationCheckbox = page.locator(
-			'#gutenberg-block-fields-bindings'
-		);
-		if ( ! ( await bindingsIntegrationCheckbox.isChecked() ) ) {
-			await bindingsIntegrationCheckbox.check();
-		}
-
-		// Save settings
-		await page.getByRole( 'button', { name: 'Save Changes' } ).click();
-		await page.waitForSelector( '.notice-success', { timeout: 10000 } );
-
+	test.beforeEach( async ( { admin } ) => {
 		// Create a new post
 		await admin.createNewPost( { title: 'Test Block Fields Bindings' } );
 	} );
