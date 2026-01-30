@@ -453,3 +453,19 @@ export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {
 		hasBlockSpotlight,
 	};
 }
+
+/**
+ * Action that sets the active block attribute group in the inspector controls tabs.
+ *
+ * This can be used to programmatically switch between tabs in the block inspector.
+ * The value is cleared after it is applied or when the selected block changes.
+ *
+ * @param {string|null} group The group to show. One of 'settings', 'styles', 'content', or 'list'. Pass null to reset.
+ * @return {Object} Action object.
+ */
+export function showBlockAttributeGroup( group ) {
+	return {
+		type: 'SHOW_BLOCK_ATTRIBUTE_GROUP',
+		group,
+	};
+}

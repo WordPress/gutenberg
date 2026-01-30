@@ -2084,6 +2084,23 @@ export function zoomLevel( state = 100, action ) {
 }
 
 /**
+ * Reducer for the block attribute group visibility in the inspector.
+ *
+ * @param {string|null} state  Current state.
+ * @param {Object}      action Dispatched action.
+ *
+ * @return {string|null} Updated state.
+ */
+export function blockAttributeGroup( state = null, action ) {
+	switch ( action.type ) {
+		case 'SHOW_BLOCK_ATTRIBUTE_GROUP':
+			return action.group;
+	}
+
+	return state;
+}
+
+/**
  * Reducer setting the insertion point
  *
  * @param {boolean} state  Current state.
@@ -2123,6 +2140,7 @@ const combinedReducers = combineReducers( {
 	lastFocus,
 	expandedBlock,
 	highlightedBlock,
+	blockAttributeGroup,
 	lastBlockInserted,
 	editedContentOnlySection,
 	blockVisibility,

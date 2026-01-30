@@ -950,3 +950,14 @@ export function isLockedBlock( state, clientId ) {
 		isRemoveLockedBlock( state, clientId )
 	);
 }
+
+/**
+ * Returns the currently active block attribute group in the inspector controls.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string|null} The active group ('settings', 'styles', 'content', 'list') or null.
+ */
+export function getBlockAttributeGroup( state ) {
+	return state.blockAttributeGroup;
+}

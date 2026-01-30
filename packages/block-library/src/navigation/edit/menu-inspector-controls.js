@@ -147,6 +147,10 @@ const MainContent = ( {
 		[ clientId ]
 	);
 
+	const { showBlockAttributeGroup } = unlock(
+		useDispatch( blockEditorStore )
+	);
+
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
@@ -183,6 +187,16 @@ const MainContent = ( {
 				showAppender
 				blockSettingsMenu={ LeafMoreMenu }
 				additionalBlockContent={ AdditionalBlockContent }
+				onSelect={ ( block ) => {
+					if (
+						[
+							'core/navigation-link',
+							'core/navigation-submenu',
+						].includes( block.name )
+					) {
+						showBlockAttributeGroup( 'content' );
+					}
+				} }
 			/>
 		</div>
 	);

@@ -8,7 +8,7 @@ import {
 } from '@wordpress/components';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -19,6 +19,7 @@ import StylesTab from './styles-tab';
 import ContentTab from './content-tab';
 import InspectorControls from '../inspector-controls';
 import { unlock } from '../../lock-unlock';
+import { store as blockEditorStore } from '../../store';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -30,9 +31,20 @@ export default function InspectorControlsTabs( {
 	isSectionBlock,
 	contentClientIds,
 } ) {
-	const showIconLabels = useSelect( ( select ) => {
-		return select( preferencesStore ).get( 'core', 'showIconLabels' );
+	const { showIconLabels, blockAttributeGroup } = useSelect( ( select ) => {
+		const { getBlockAttributeGroup } = unlock( select( blockEditorStore ) );
+		return {
+			showIconLabels: select( preferencesStore ).get(
+				'core',
+				'showIconLabels'
+			),
+			blockAttributeGroup: getBlockAttributeGroup(),
+		};
 	}, [] );
+
+	const { showBlockAttributeGroup } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	const [ selectedTabId, setSelectedTabId ] = useState( tabs[ 0 ]?.name );
 	const hasUserSelectionRef = useRef( false );
@@ -40,7 +52,21 @@ export default function InspectorControlsTabs( {
 	// Reset when switching blocks
 	useEffect( () => {
 		hasUserSelectionRef.current = false;
-	}, [ clientId ] );
+		// Clear any programmatic tab selection when switching blocks.
+		showBlockAttributeGroup( null );
+	}, [ clientId, showBlockAttributeGroup ] );
+
+	// Handle programmatic tab selection from the store.
+	useEffect( () => {
+		if (
+			blockAttributeGroup &&
+			tabs.some( ( tab ) => tab.name === blockAttributeGroup )
+		) {
+			setSelectedTabId( blockAttributeGroup );
+			// Clear the store value after applying it.
+			showBlockAttributeGroup( null );
+		}
+	}, [ blockAttributeGroup, tabs, showBlockAttributeGroup ] );
 
 	// Auto-select first available tab unless user has made a selection
 	useEffect( () => {
