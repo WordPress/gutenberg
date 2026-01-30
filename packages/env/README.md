@@ -302,7 +302,6 @@ These options apply to all `wp-env` commands:
 ```
 --debug    Enable debug output.                      [boolean] [default: false]
 --config   Path to a custom .wp-env.json configuration file.           [string]
-           Alias: -c
 ```
 
 The `--config` option allows you to use a custom configuration file instead of the default `.wp-env.json`. This is useful for running multiple parallel environments from the same directory.

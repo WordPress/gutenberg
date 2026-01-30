@@ -102,7 +102,6 @@ module.exports = function cli() {
 		default: false,
 	} );
 	yargs.option( 'config', {
-		alias: 'c',
 		type: 'string',
 		describe: 'Path to a custom .wp-env.json configuration file.',
 		requiresArg: true,
