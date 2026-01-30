@@ -207,6 +207,9 @@ const prepareStylePromise = (
  * make them effectively disabled until they are applied with the
  * {@link applyStyles|`applyStyles`} function.
  *
+ * Note that this function alters the passed document, as it can transfer
+ * nodes from it to the global document.
+ *
  * @param doc Document instance.
  * @return A list of promises for each style element in the passed document.
  */
