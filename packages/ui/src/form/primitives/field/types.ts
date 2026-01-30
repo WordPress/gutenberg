@@ -2,7 +2,7 @@ import type { Field } from '@base-ui/react/field';
 import type { ComponentProps } from '../../../utils/types';
 
 export type FieldRootProps = Omit<
-	ComponentProps< typeof Field.Root, Field.Root.State >,
+	ComponentProps< typeof Field.Root >,
 	| 'disabled'
 	// TODO: Maybe allow these when we have validation support ready.
 	| 'dirty'
@@ -21,17 +21,11 @@ export type FieldRootProps = Omit<
 	disabled?: Field.Root.Props[ 'disabled' ];
 };
 
-export type FieldItemProps = ComponentProps<
-	typeof Field.Item,
-	Field.Item.State
-> & {
+export type FieldItemProps = ComponentProps< typeof Field.Item > & {
 	children?: React.ReactNode;
 };
 
-export type FieldLabelProps = ComponentProps<
-	typeof Field.Label,
-	Field.Label.State
-> & {
+export type FieldLabelProps = ComponentProps< typeof Field.Label > & {
 	/**
 	 * The label string, or the string and the element to associate it with.
 	 *
@@ -50,7 +44,7 @@ export type FieldLabelProps = ComponentProps<
 };
 
 export type FieldControlProps = Omit<
-	ComponentProps< typeof Field.Control, Field.Control.State >,
+	ComponentProps< typeof Field.Control >,
 	'defaultValue'
 > & {
 	children?: Field.Control.Props[ 'children' ];
@@ -61,8 +55,7 @@ export type FieldControlProps = Omit<
 };
 
 export type FieldDescriptionProps = ComponentProps<
-	typeof Field.Description,
-	Field.Description.State
+	typeof Field.Description
 > & {
 	/**
 	 * The accessible description, associated using `aria-describedby`.

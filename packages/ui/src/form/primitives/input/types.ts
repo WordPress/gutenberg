@@ -3,7 +3,7 @@ import type { InputLayoutProps } from '../input-layout/types';
 import type { ComponentProps } from '../../../utils/types';
 
 export type InputProps = Omit<
-	ComponentProps< typeof Input, Input.State >,
+	ComponentProps< typeof Input >,
 	'value' | 'defaultValue' | 'type' | 'disabled' | 'prefix' | 'size'
 > &
 	Pick< InputLayoutProps, 'prefix' | 'suffix' > & {
