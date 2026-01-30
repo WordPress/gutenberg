@@ -199,6 +199,12 @@ const GridItem = forwardRef( function GridItem< Item >(
 						renderItemLink={ renderItemLink }
 						className="dataviews-view-grid__title-field dataviews-title-field"
 						{ ...titleA11yProps }
+						title={
+							titleField?.getValueFormatted( {
+								item,
+								field: titleField,
+							} ) || undefined
+						}
 					>
 						{ renderedTitleField }
 					</ItemClickWrapper>
