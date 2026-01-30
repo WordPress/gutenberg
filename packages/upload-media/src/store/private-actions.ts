@@ -23,33 +23,6 @@ import {
 	vipsConvertImageFormat,
 	vipsHasTransparency,
 } from './utils';
-import {
-	logQueueAdd,
-	logSideloadAdd,
-	logProcessStart,
-	logOperationStart,
-	logOperationComplete,
-	logPrepareOperations,
-	logResizeCrop,
-	logResizeComplete,
-	logRotation,
-	logRotationComplete,
-	logTranscode,
-	logTranscodeComplete,
-	logUploadStart,
-	logUploadComplete,
-	logSideloadStart,
-	logSideloadComplete,
-	logThumbnailGenerationStart,
-	logThumbnailCreate,
-	logQueueRemove,
-	logError,
-	logItemPause,
-	logItemResume,
-	logConcurrencyLimit,
-	logBatchComplete,
-	createTimer,
-} from './utils/debug-logger';
 import type {
 	AddAction,
 	AdditionalData,
@@ -194,8 +167,6 @@ export function addItem( {
 		// See https://github.com/WordPress/gutenberg/pull/65693 for an example.
 		const file = convertBlobToFile( fileOrBlob );
 
-		logQueueAdd( itemId, file.name, file.size, file.type, batchId );
-
 		let blobUrl;
 
 		// StubFile could be coming from addItemFromUrl().
@@ -273,11 +244,6 @@ export function addSideloadItem( {
 	return ( { dispatch }: ThunkArgs ) => {
 		const itemId = uuidv4();
 
-		const imageSize =
-			( additionalData as SideloadAdditionalData )?.image_size ||
-			'unknown';
-		logSideloadAdd( itemId, file.name, parentId || 'none', imageSize );
-
 		dispatch< AddAction >( {
 			type: Type.Add,
 			item: {
@@ -320,8 +286,6 @@ export function processItem( id: QueueItemId ) {
 			return;
 		}
 
-		logProcessStart( id, item.file.name );
-
 		const {
 			attachment,
 			onChange,
@@ -341,10 +305,6 @@ export function processItem( id: QueueItemId ) {
 		// If we're sideloading a thumbnail, pause upload to avoid race conditions.
 		// It will be resumed after the previous upload finishes.
 		if ( shouldPauseForSideload( item, operation, select ) ) {
-			logItemPause(
-				id,
-				'Waiting for previous upload to same post to complete'
-			);
 			dispatch< PauseItemAction >( {
 				type: Type.PauseItem,
 				id,
@@ -361,11 +321,6 @@ export function processItem( id: QueueItemId ) {
 			const settings = select.getSettings();
 			const activeCount = select.getActiveUploadCount();
 			if ( activeCount >= settings.maxConcurrentUploads ) {
-				logConcurrencyLimit(
-					id,
-					activeCount,
-					settings.maxConcurrentUploads
-				);
 				return;
 			}
 		}
@@ -393,7 +348,6 @@ export function processItem( id: QueueItemId ) {
 				dispatch.revokeBlobUrls( id );
 
 				if ( batchId && select.isBatchUploaded( batchId ) ) {
-					logBatchComplete( batchId );
 					onBatchSuccess?.();
 				}
 			}
@@ -433,8 +387,6 @@ export function processItem( id: QueueItemId ) {
 			id,
 			operation,
 		} );
-
-		logOperationStart( id, operation, item.file.name );
 
 		switch ( operation ) {
 			case OperationType.Prepare:
@@ -535,7 +487,6 @@ export function resumeItemByPostId( postOrAttachmentId: number ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
 		const item = select.getPausedUploadForPost( postOrAttachmentId );
 		if ( item ) {
-			logItemResume( item.id );
 			dispatch< ResumeItemAction >( {
 				type: Type.ResumeItem,
 				id: item.id,
@@ -557,8 +508,6 @@ export function removeItem( id: QueueItemId ) {
 			return;
 		}
 
-		logQueueRemove( id, item.file.name );
-
 		dispatch( {
 			type: Type.Remove,
 			id,
@@ -579,10 +528,6 @@ export function finishOperation(
 	return async ( { select, dispatch }: ThunkArgs ) => {
 		const item = select.getItem( id );
 		const previousOperation = item?.currentOperation;
-
-		if ( previousOperation && item ) {
-			logOperationComplete( id, previousOperation, item.file.name );
-		}
 
 		dispatch< OperationFinishAction >( {
 			type: Type.OperationFinish,
@@ -742,12 +687,6 @@ export function prepareItem( id: QueueItemId ) {
 			operations.push( OperationType.Upload );
 		}
 
-		// Log the prepared operations list
-		const operationNames = operations.map( ( op ) =>
-			Array.isArray( op ) ? op[ 0 ] : op
-		);
-		logPrepareOperations( id, file.name, operationNames );
-
 		dispatch< AddOperationsAction >( {
 			type: Type.AddOperations,
 			id,
@@ -770,38 +709,23 @@ export function uploadItem( id: QueueItemId ) {
 			return;
 		}
 
-		logUploadStart( id, item.file.name, item.file.size );
-
 		select.getSettings().mediaUpload( {
 			filesList: [ item.file ],
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
 			onFileChange: ( [ attachment ] ) => {
 				if ( ! isBlobURL( attachment.url ) ) {
-					logUploadComplete(
-						id,
-						item.file.name,
-						attachment.id,
-						attachment.url
-					);
 					dispatch.finishOperation( id, {
 						attachment,
 					} );
 				}
 			},
 			onSuccess: ( [ attachment ] ) => {
-				logUploadComplete(
-					id,
-					item.file.name,
-					attachment.id,
-					attachment.url
-				);
 				dispatch.finishOperation( id, {
 					attachment,
 				} );
 			},
 			onError: ( error ) => {
-				logError( 'uploadItem', error, id );
 				dispatch.cancelItem( id, error );
 			},
 		} );
@@ -833,29 +757,16 @@ export function sideloadItem( id: QueueItemId ) {
 			return;
 		}
 
-		logSideloadStart(
-			id,
-			item.file.name,
-			post as number,
-			imageSize || 'unknown'
-		);
-
 		mediaSideload( {
 			file: item.file,
 			attachmentId: post as number,
 			additionalData: { image_size: imageSize, ...additionalData },
 			signal: item.abortController?.signal,
 			onFileChange: ( [ attachment ] ) => {
-				logSideloadComplete(
-					id,
-					item.file.name,
-					imageSize || 'unknown'
-				);
 				dispatch.finishOperation( id, { attachment } );
 				dispatch.resumeItemByPostId( post as number );
 			},
 			onError: ( error ) => {
-				logError( 'sideloadItem', error, id );
 				dispatch.cancelItem( id, error );
 				dispatch.resumeItemByPostId( post as number );
 			},
@@ -890,16 +801,7 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		// Add '-scaled' suffix for big image threshold resizing.
 		const scaledSuffix = Boolean( args.isThresholdResize );
 
-		logResizeCrop(
-			id,
-			item.file.name,
-			args.resize,
-			Boolean( args.isThresholdResize ),
-			addSuffix
-		);
-
 		try {
-			const timer = createTimer();
 			const file = await vipsResizeImage(
 				item.id,
 				item.file,
@@ -909,26 +811,6 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				item.abortController?.signal,
 				scaledSuffix
 			);
-			const duration = timer.stop();
-
-			// Log resize completion with dimensions
-			const imageFile = file as {
-				width?: number;
-				height?: number;
-				originalWidth?: number;
-				originalHeight?: number;
-			};
-			logResizeComplete(
-				id,
-				file.name,
-				imageFile.originalWidth || 0,
-				imageFile.originalHeight || 0,
-				imageFile.width || 0,
-				imageFile.height || 0,
-				file.size
-			);
-
-			logOperationComplete( id, 'ResizeCrop', file.name, duration );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -944,11 +826,6 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				},
 			} );
 		} catch ( error ) {
-			logError(
-				'resizeCropItem',
-				error instanceof Error ? error : String( error ),
-				id
-			);
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
@@ -989,28 +866,13 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 			return;
 		}
 
-		logRotation( id, item.file.name, args.orientation );
-
 		try {
-			const timer = createTimer();
 			const file = await vipsRotateImage(
 				item.id,
 				item.file,
 				args.orientation,
 				item.abortController?.signal
 			);
-			const duration = timer.stop();
-
-			// Log rotation completion with new dimensions
-			const imageFile = file as { width?: number; height?: number };
-			logRotationComplete(
-				id,
-				file.name,
-				imageFile.width || 0,
-				imageFile.height || 0
-			);
-
-			logOperationComplete( id, 'Rotate', file.name, duration );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -1026,11 +888,6 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 				},
 			} );
 		} catch ( error ) {
-			logError(
-				'rotateItem',
-				error instanceof Error ? error : String( error ),
-				id
-			);
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
@@ -1082,18 +939,7 @@ export function transcodeImageItem(
 		const quality = args.outputQuality ?? 0.82;
 		const interlaced = args.interlaced ?? false;
 
-		logTranscode(
-			id,
-			item.file.name,
-			item.file.type,
-			outputMimeType,
-			quality
-		);
-
 		try {
-			const timer = createTimer();
-			const originalSize = item.file.size;
-
 			const file = await vipsConvertImageFormat(
 				item.id,
 				item.file,
@@ -1101,18 +947,6 @@ export function transcodeImageItem(
 				quality,
 				interlaced
 			);
-
-			const duration = timer.stop();
-
-			logTranscodeComplete(
-				id,
-				file.name,
-				outputMimeType,
-				originalSize,
-				file.size
-			);
-
-			logOperationComplete( id, 'TranscodeImage', file.name, duration );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -1128,11 +962,6 @@ export function transcodeImageItem(
 				},
 			} );
 		} catch ( error ) {
-			logError(
-				'transcodeImageItem',
-				error instanceof Error ? error : String( error ),
-				id
-			);
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
@@ -1216,12 +1045,6 @@ export function generateThumbnails( id: QueueItemId ) {
 			attachment.missing_image_sizes &&
 			attachment.missing_image_sizes.length > 0
 		) {
-			logThumbnailGenerationStart(
-				id,
-				item.file.name,
-				attachment.missing_image_sizes
-			);
-
 			// Use sourceFile for thumbnail generation to preserve quality.
 			// WordPress core generates thumbnails from the original (unscaled) image.
 			// Vips will auto-rotate based on EXIF orientation during thumbnail generation.
@@ -1249,14 +1072,6 @@ export function generateThumbnails( id: QueueItemId ) {
 					);
 					continue;
 				}
-
-				logThumbnailCreate(
-					id,
-					name,
-					imageSize.width,
-					imageSize.height,
-					imageSize.crop
-				);
 
 				// Build operations list for this thumbnail.
 				const thumbnailOperations: Operation[] = [
