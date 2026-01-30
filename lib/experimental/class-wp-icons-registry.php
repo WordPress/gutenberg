@@ -17,7 +17,12 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 */
 		private static $instance = null;
 
-		public function __construct() {
+		/**
+		 * Constructor.
+		 *
+		 * WP_Icons_Registry is a singleton class, so keep this private.
+		 */
+		private function __construct() {
 			$icons_directory = __DIR__ . '/../../packages/icons/src/';
 			$icons_directory = trailingslashit( $icons_directory );
 			$manifest_path   = $icons_directory . 'manifest.php';
@@ -268,24 +273,6 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 */
 		public function is_registered( $icon_name ) {
 			return isset( $this->registered_icons[ $icon_name ] );
-		}
-
-		/**
-		 * Magic method for object serialization.
-		 *
-		 */
-		public function __wakeup() {
-			if ( ! $this->registered_icons ) {
-				return;
-			}
-			if ( ! is_array( $this->registered_icons ) ) {
-				throw new UnexpectedValueException();
-			}
-			foreach ( $this->registered_icons as $value ) {
-				if ( ! is_array( $value ) ) {
-					throw new UnexpectedValueException();
-				}
-			}
 		}
 
 		/**
