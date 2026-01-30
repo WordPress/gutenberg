@@ -123,7 +123,7 @@ const GridVisualizerGrid = forwardRef(
 							childGridRect={ childGridRect }
 						/>
 					) : (
-						<NonManualGridVisualizer
+						<AutoGridVisualizer
 							gridInfo={ gridInfo }
 							childGridRect={ childGridRect }
 						/>
@@ -134,7 +134,7 @@ const GridVisualizerGrid = forwardRef(
 	}
 );
 
-function NonManualGridVisualizer( { gridInfo, childGridRect } ) {
+function AutoGridVisualizer( { gridInfo, childGridRect } ) {
 	return range( 1, gridInfo.numRows ).map( ( row ) =>
 		range( 1, gridInfo.numColumns ).map( ( column ) => {
 			// Don't render visualizer cells for a selected child block
