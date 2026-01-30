@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import { Popover, Button } from '@wordpress/components';
 import { close } from '@wordpress/icons';
 
@@ -15,10 +16,10 @@ interface CollaboratorsListProps {
 /**
  * Renders a list showing all active collaborators with their details.
  * Note: activeUsers should already exclude the current user (filtered by parent component).
- * @param root0                     Component props
- * @param root0.activeUsers         List of active users
- * @param root0.popoverAnchor       Anchor element for the popover
- * @param root0.setIsPopoverVisible Callback to set the visibility of the popover
+ * @param props                     Component props
+ * @param props.activeUsers         List of active users
+ * @param props.popoverAnchor       Anchor element for the popover
+ * @param props.setIsPopoverVisible Callback to set the visibility of the popover
  */
 export const CollaboratorsList: React.FC< CollaboratorsListProps > = ( {
 	activeUsers,
@@ -35,7 +36,7 @@ export const CollaboratorsList: React.FC< CollaboratorsListProps > = ( {
 		<div className="editor-collaborators-presence__list-content">
 			<div className="editor-collaborators-presence__list-header">
 				<div className="editor-collaborators-presence__list-header-title">
-					Collaborators
+					{ __( 'Collaborators' ) }
 					<span> { activeUsers.length } </span>
 				</div>
 				<div className="editor-collaborators-presence__list-header-action">
@@ -43,7 +44,7 @@ export const CollaboratorsList: React.FC< CollaboratorsListProps > = ( {
 						__next40pxDefaultSize
 						icon={ close }
 						iconSize={ 16 }
-						label="Close Collaborators List"
+						label={ __( 'Close Collaborators List' ) }
 						onClick={ () => setIsPopoverVisible( false ) }
 					/>
 				</div>
