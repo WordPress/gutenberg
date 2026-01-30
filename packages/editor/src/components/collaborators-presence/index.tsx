@@ -24,10 +24,10 @@ interface CollaboratorsPresenceProps {
  * @param {number} props.postId   ID of the post
  * @param {string} props.postType Type of the post
  */
-export const CollaboratorsPresence: React.FC< CollaboratorsPresenceProps > = ( {
+export function CollaboratorsPresence( {
 	postId,
 	postType,
-} ) => {
+}: CollaboratorsPresenceProps ) {
 	const activeUsers = useActiveUsers(
 		postId,
 		postType
@@ -91,4 +91,4 @@ export const CollaboratorsPresence: React.FC< CollaboratorsPresenceProps > = ( {
 			) }
 		</div>
 	) : null;
-};
+}

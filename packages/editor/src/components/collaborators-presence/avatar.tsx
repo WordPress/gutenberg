@@ -18,11 +18,11 @@ interface AvatarProps {
  * @param {boolean} props.showUserColorBorder Whether to show the user color border.
  * @param {string}  props.size                Size of the avatar.
  */
-export const Avatar: React.FC< AvatarProps > = ( {
+export function Avatar( {
 	userInfo,
 	showUserColorBorder,
 	size = 'small',
-} ) => {
+}: AvatarProps ) {
 	const className = clsx(
 		'editor-collaborators-presence__avatar',
 		`editor-collaborators-presence__avatar--${ size }`,
@@ -47,4 +47,4 @@ export const Avatar: React.FC< AvatarProps > = ( {
 			aria-hidden="true"
 		/>
 	);
-};
+}
