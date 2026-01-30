@@ -45,8 +45,10 @@ export function CollaboratorsPresence( { postId, postType }: AvatarsProps ) {
 		null
 	);
 
+	// When there are no other collaborators, this component should not render
+	// at all. This will always be the case when collaboration is not enabled, but
+	// also when the current user is the only editor with the post open.
 	if ( otherActiveUsers.length === 0 ) {
-		// Hide avatars when there are no other users
 		return null;
 	}
 
