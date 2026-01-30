@@ -6,7 +6,6 @@ import {
 	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useEffect, useState, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -46,50 +45,15 @@ export default function InspectorControlsTabs( {
 		useDispatch( blockEditorStore )
 	);
 
-	const [ selectedTabId, setSelectedTabId ] = useState( tabs[ 0 ]?.name );
-	const hasUserSelectionRef = useRef( false );
-
-	// Reset when switching blocks
-	useEffect( () => {
-		hasUserSelectionRef.current = false;
-		// Clear any programmatic tab selection when switching blocks.
-		showBlockAttributeGroup( null );
-	}, [ clientId, showBlockAttributeGroup ] );
-
-	// Handle programmatic tab selection from the store.
-	useEffect( () => {
-		if (
-			blockAttributeGroup &&
-			tabs.some( ( tab ) => tab.name === blockAttributeGroup )
-		) {
-			setSelectedTabId( blockAttributeGroup );
-			// Clear the store value after applying it.
-			showBlockAttributeGroup( null );
-			// Consider this a user selection, seeing as it
-			// is usually triggered by another user action.
-			hasUserSelectionRef.current = true;
-		}
-	}, [ blockAttributeGroup, tabs, showBlockAttributeGroup ] );
-
-	// Auto-select first available tab unless user has made a selection
-	useEffect( () => {
-		if (
-			! tabs?.length ||
-			( hasUserSelectionRef.current &&
-				tabs.some( ( tab ) => tab.name === selectedTabId ) )
-		) {
-			return;
-		}
-
-		const firstTabName = tabs[ 0 ]?.name;
-		if ( selectedTabId !== firstTabName ) {
-			setSelectedTabId( firstTabName );
-		}
-	}, [ tabs, selectedTabId ] );
+	// Determine the selected tab from store state, or fall back to the first available tab.
+	const selectedTabId =
+		blockAttributeGroup &&
+		tabs.some( ( tab ) => tab.name === blockAttributeGroup )
+			? blockAttributeGroup
+			: tabs[ 0 ]?.name;
 
 	const handleTabSelect = ( tabId ) => {
-		setSelectedTabId( tabId );
-		hasUserSelectionRef.current = true;
+		showBlockAttributeGroup( tabId );
 	};
 
 	return (
