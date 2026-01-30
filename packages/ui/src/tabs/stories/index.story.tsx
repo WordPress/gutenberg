@@ -1,4 +1,3 @@
-import { fn } from 'storybook/test';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState, cloneElement } from '@wordpress/element';
 import { link, more, wordpress } from '@wordpress/icons';
@@ -11,14 +10,6 @@ const meta: Meta< typeof Tabs.Root > = {
 		'Tabs.List': Tabs.List,
 		'Tabs.Tab': Tabs.Tab,
 		'Tabs.Panel': Tabs.Panel,
-	},
-	parameters: {
-		actions: { argTypesRegex: '^on.*' },
-		controls: { expanded: true },
-		docs: { canvas: { sourceState: 'shown' } },
-	},
-	args: {
-		onValueChange: fn(),
 	},
 };
 export default meta;
