@@ -4,6 +4,7 @@
 
 ### Bug Fixes
 
+- DataViews: Add title attribute in grid item title field. [#75085](https://github.com/WordPress/gutenberg/pull/75085)
 - DataViews: Fix title truncation in list layout. [#75063](https://github.com/WordPress/gutenberg/pull/75063)
 
 ### Enhancements
