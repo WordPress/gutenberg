@@ -3,22 +3,25 @@ import './styles/avatar.scss';
 
 type AvatarSize = 'small' | 'medium';
 
-/**
- * Renders a circular avatar bubble for a user with an optional border.
- * @param root0
- * @param root0.userInfo
- * @param root0.showUserColorBorder
- * @param root0.size
- */
-export function Avatar( {
-	userInfo,
-	showUserColorBorder,
-	size = 'small',
-}: {
+interface AvatarProps {
 	userInfo: PostEditorAwarenessState[ 'userInfo' ];
 	showUserColorBorder?: boolean;
 	size?: AvatarSize;
-} ) {
+}
+
+/**
+ * Renders a circular avatar bubble for a user with an optional border.
+ *
+ * @param {Object}  props                     Component props.
+ * @param {Object}  props.userInfo            User information.
+ * @param {boolean} props.showUserColorBorder Whether to show the user color border.
+ * @param {string}  props.size                Size of the avatar.
+ */
+export const Avatar: React.FC< AvatarProps > = ( {
+	userInfo,
+	showUserColorBorder,
+	size = 'small',
+} ) => {
 	const className = [
 		'editor-collaborators-presence__avatar',
 		`editor-collaborators-presence__avatar--${ size }`,
@@ -46,4 +49,4 @@ export function Avatar( {
 			aria-hidden="true"
 		/>
 	);
-}
+};
