@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef, useRef, useEffect } from '@wordpress/element';
+import { forwardRef, useRef, useCallback } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -22,16 +22,21 @@ const UnforwardedValidatedToggleControl = (
 	}: React.ComponentProps< typeof ToggleControl > & ValidatedControlProps,
 	forwardedRef: React.ForwardedRef< HTMLInputElement >
 ) => {
-	const validityTargetRef = useRef< HTMLInputElement >( null );
-	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
-
+	const validityTargetRef = useRef< HTMLInputElement | null >( null );
 	// TODO: Upstream limitation - The `required` attribute is not passed down to the input,
-	// so we need to set it manually.
-	useEffect( () => {
-		if ( validityTargetRef.current ) {
-			validityTargetRef.current.required = required ?? false;
-		}
-	}, [ required ] );
+	// so we need to set it manually. Using a callback ref ensures `required` is set
+	// synchronously when the element mounts, before any validation effects run.
+	const setRequiredRef = useCallback(
+		( element: HTMLInputElement | null ) => {
+			validityTargetRef.current = element;
+			if ( element ) {
+				element.required = required ?? false;
+			}
+		},
+		[ required ]
+	);
+
+	const mergedRefs = useMergeRefs( [ forwardedRef, setRequiredRef ] );
 
 	return (
 		<ControlWithError
