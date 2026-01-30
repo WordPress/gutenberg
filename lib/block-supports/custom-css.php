@@ -98,3 +98,36 @@ function gutenberg_render_custom_css_class_name( $block_content, $block ) {
 add_filter( 'render_block', 'gutenberg_render_custom_css_class_name', 10, 2 );
 add_filter( 'render_block_data', 'gutenberg_render_custom_css_support_styles', 10, 1 );
 add_action( 'wp_enqueue_scripts', 'gutenberg_enqueue_block_custom_css', 1 );
+
+/**
+ * Registers the style block attribute for block types that support it.
+ *
+ * @param WP_Block_Type $block_type Block Type.
+ */
+function gutenberg_register_custom_css_support( $block_type ) {
+	// Setup attributes and styles within that if needed.
+	if ( ! $block_type->attributes ) {
+		$block_type->attributes = array();
+	}
+
+	// Check for existing style attribute definition e.g. from block.json.
+	if ( array_key_exists( 'style', $block_type->attributes ) ) {
+		return;
+	}
+
+	$has_custom_css_support = block_has_support( $block_type, array( 'customCSS' ), true );
+
+	if ( $has_custom_css_support ) {
+		$block_type->attributes['style'] = array(
+			'type' => 'object',
+		);
+	}
+}
+
+// Register the block support.
+WP_Block_Supports::get_instance()->register(
+	'custom-css',
+	array(
+		'register_attribute' => 'gutenberg_register_custom_css_support',
+	)
+);

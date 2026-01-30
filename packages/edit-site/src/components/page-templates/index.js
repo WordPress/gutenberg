@@ -37,7 +37,11 @@ import {
 	slugField,
 	useThemeField,
 } from './fields';
-import { defaultLayouts, getDefaultView } from './view-utils';
+import {
+	defaultLayouts,
+	DEFAULT_VIEW,
+	getActiveFiltersForTab,
+} from './view-utils';
 
 const { usePostActions, usePostFields, templateTitleField } =
 	unlock( editorPrivateApis );
@@ -50,14 +54,17 @@ export default function PageTemplates() {
 	const [ selection, setSelection ] = useState( [ postId ] );
 	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
 		useState( false );
-	const defaultView = useMemo( () => {
-		return getDefaultView( activeView );
-	}, [ activeView ] );
+	const defaultView = DEFAULT_VIEW;
+	const activeFilters = useMemo(
+		() => getActiveFiltersForTab( activeView ),
+		[ activeView ]
+	);
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: TEMPLATE_POST_TYPE,
-		slug: activeView,
+		slug: 'default',
 		defaultView,
+		activeFilters,
 		queryParams: {
 			page: query.pageNumber,
 			search: query.search,
@@ -303,11 +310,11 @@ export default function PageTemplates() {
 	);
 
 	const onChangeView = useEvent( ( newView ) => {
+		updateView( newView );
 		if ( newView.type !== view.type ) {
 			// Retrigger the routing areas resolution.
 			history.invalidate();
 		}
-		updateView( newView );
 	} );
 
 	const duplicateAction = actions.find(

@@ -24,7 +24,7 @@ export const defaultLayouts = {
 	list: {},
 };
 
-const DEFAULT_POST_BASE = {
+export const DEFAULT_VIEW = {
 	type: 'list',
 	filters: [],
 	perPage: 20,
@@ -45,14 +45,14 @@ export function getDefaultViews( postType ) {
 			title: postType?.labels?.all_items || __( 'All items' ),
 			slug: 'all',
 			icon: pages,
-			view: DEFAULT_POST_BASE,
+			view: DEFAULT_VIEW,
 		},
 		{
 			title: __( 'Published' ),
 			slug: 'published',
 			icon: published,
 			view: {
-				...DEFAULT_POST_BASE,
+				...DEFAULT_VIEW,
 				filters: [
 					{
 						field: 'status',
@@ -68,7 +68,7 @@ export function getDefaultViews( postType ) {
 			slug: 'future',
 			icon: scheduled,
 			view: {
-				...DEFAULT_POST_BASE,
+				...DEFAULT_VIEW,
 				filters: [
 					{
 						field: 'status',
@@ -84,7 +84,7 @@ export function getDefaultViews( postType ) {
 			slug: 'drafts',
 			icon: drafts,
 			view: {
-				...DEFAULT_POST_BASE,
+				...DEFAULT_VIEW,
 				filters: [
 					{
 						field: 'status',
@@ -100,7 +100,7 @@ export function getDefaultViews( postType ) {
 			slug: 'pending',
 			icon: pending,
 			view: {
-				...DEFAULT_POST_BASE,
+				...DEFAULT_VIEW,
 				filters: [
 					{
 						field: 'status',
@@ -116,7 +116,7 @@ export function getDefaultViews( postType ) {
 			slug: 'private',
 			icon: notAllowed,
 			view: {
-				...DEFAULT_POST_BASE,
+				...DEFAULT_VIEW,
 				filters: [
 					{
 						field: 'status',
@@ -132,7 +132,7 @@ export function getDefaultViews( postType ) {
 			slug: 'trash',
 			icon: trash,
 			view: {
-				...DEFAULT_POST_BASE,
+				...DEFAULT_VIEW,
 				type: 'table',
 				layout: defaultLayouts.table.layout,
 				filters: [
@@ -148,8 +148,26 @@ export function getDefaultViews( postType ) {
 	];
 }
 
-export const getDefaultView = ( postType, activeView ) => {
-	return getDefaultViews( postType ).find(
-		( { slug } ) => slug === activeView
-	)?.view;
+const SLUG_TO_STATUS = {
+	published: 'publish',
+	future: 'future',
+	drafts: 'draft',
+	pending: 'pending',
+	private: 'private',
+	trash: 'trash',
 };
+
+export function getActiveFiltersForTab( activeView ) {
+	const status = SLUG_TO_STATUS[ activeView ];
+	if ( ! status ) {
+		return [];
+	}
+	return [
+		{
+			field: 'status',
+			operator: OPERATOR_IS_ANY,
+			value: status,
+			isLocked: true,
+		},
+	];
+}

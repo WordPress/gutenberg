@@ -208,6 +208,7 @@ function GridTools( {
 		parentBlockVisibility,
 		blockBlockVisibility,
 		deviceType,
+		isChildBlockAGrid,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -244,6 +245,8 @@ function GridTools( {
 				deviceType:
 					settings?.[ deviceTypeKey ]?.toLowerCase() ||
 					BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
+				// Check if the selected child block is itself a grid.
+				isChildBlockAGrid: blockAttributes?.layout?.type === 'grid',
 			};
 		},
 		[ clientId ]
@@ -263,6 +266,8 @@ function GridTools( {
 
 	// Use useState() instead of useRef() so that GridItemResizer updates when ref is set.
 	const [ resizerBounds, setResizerBounds ] = useState();
+
+	const childGridClientId = isChildBlockAGrid ? clientId : undefined;
 
 	if ( ! isVisible || isParentBlockCurrentlyHidden ) {
 		return null;
@@ -288,6 +293,7 @@ function GridTools( {
 				clientId={ rootClientId }
 				contentRef={ setResizerBounds }
 				parentLayout={ parentLayout }
+				childGridClientId={ childGridClientId }
 			/>
 			{ showResizer && (
 				<GridItemResizer

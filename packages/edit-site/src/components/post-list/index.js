@@ -32,7 +32,11 @@ import {
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
-import { defaultLayouts, getDefaultView } from './view-utils';
+import {
+	defaultLayouts,
+	DEFAULT_VIEW,
+	getActiveFiltersForTab,
+} from './view-utils';
 import useNotesCount from './use-notes-count';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
@@ -54,17 +58,17 @@ export default function PostList( { postType } ) {
 	const { path, query } = useLocation();
 	const { activeView = 'all', postId, quickEdit = false } = query;
 	const history = useHistory();
-	const postTypeObject = useSelect(
-		( select ) => {
-			const { getPostType } = select( coreStore );
-			return getPostType( postType );
-		},
-		[ postType ]
+	const defaultView = DEFAULT_VIEW;
+	const activeFilters = useMemo(
+		() => getActiveFiltersForTab( activeView ),
+		[ activeView ]
 	);
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: postType,
-		slug: activeView,
+		slug: 'default',
+		defaultView,
+		activeFilters,
 		queryParams: {
 			page: query.pageNumber,
 			search: query.search,
@@ -78,15 +82,14 @@ export default function PostList( { postType } ) {
 				} )
 			);
 		},
-		defaultView: getDefaultView( postTypeObject, activeView ),
 	} );
 
 	const onChangeView = useEvent( ( newView ) => {
+		updateView( newView );
 		if ( newView.type !== view.type ) {
 			// Retrigger the routing areas resolution.
 			history.invalidate();
 		}
-		updateView( newView );
 	} );
 
 	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );

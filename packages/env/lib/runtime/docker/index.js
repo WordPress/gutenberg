@@ -11,7 +11,6 @@ const { rimraf } = require( 'rimraf' );
 /**
  * Promisified dependencies
  */
-const sleep = util.promisify( setTimeout );
 const exec = util.promisify( require( 'child_process' ).exec );
 
 /**
@@ -26,7 +25,6 @@ const {
 	validateRunContainer,
 } = require( './validate-run-container' );
 const {
-	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,
 	setupWordPressDirectories,
@@ -174,7 +172,7 @@ class DockerRuntime {
 		}
 
 		await Promise.all( [
-			dockerCompose.upOne( 'mysql', {
+			dockerCompose.upMany( [ 'mysql', 'tests-mysql' ], {
 				...dockerComposeConfig,
 				commandOptions: shouldConfigureWp
 					? [ '--build', '--force-recreate' ]
@@ -249,19 +247,6 @@ class DockerRuntime {
 		// Only run WordPress install/configuration when config has changed.
 		if ( shouldConfigureWp ) {
 			spinner.text = 'Configuring WordPress.';
-
-			try {
-				await checkDatabaseConnection( fullConfig );
-			} catch ( error ) {
-				// Wait 30 seconds for MySQL to accept connections.
-				await retry( () => checkDatabaseConnection( fullConfig ), {
-					times: 30,
-					delay: 1000,
-				} );
-
-				// It takes 3-4 seconds for MySQL to be ready after it starts accepting connections.
-				await sleep( 4000 );
-			}
 
 			// Retry WordPress installation in case MySQL *still* wasn't ready.
 			await Promise.all( [
@@ -439,9 +424,19 @@ class DockerRuntime {
 
 		const tasks = [];
 
-		// Start the database first to avoid race conditions where all tasks create
-		// different docker networks with the same name.
-		await dockerCompose.upOne( 'mysql', {
+		// Start the appropriate MySQL service(s) first to avoid race conditions
+		// where parallel tasks try to create docker networks with the same name.
+		// The dependency chain (cli -> wordpress -> mysql with service_healthy)
+		// ensures MySQL is ready before database operations run.
+		const mysqlServices = [];
+		if ( environment === 'all' || environment === 'development' ) {
+			mysqlServices.push( 'mysql' );
+		}
+		if ( environment === 'all' || environment === 'tests' ) {
+			mysqlServices.push( 'tests-mysql' );
+		}
+
+		await dockerCompose.upMany( mysqlServices, {
 			config: fullConfig.dockerComposeConfigPath,
 			log: fullConfig.debug,
 		} );

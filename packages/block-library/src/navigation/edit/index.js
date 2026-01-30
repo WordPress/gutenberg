@@ -28,7 +28,11 @@ import {
 	useBlockEditingMode,
 	BlockControls,
 } from '@wordpress/block-editor';
-import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import {
+	EntityProvider,
+	store as coreStore,
+	useEntityRecords,
+} from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	__experimentalToolsPanel as ToolsPanel,
@@ -79,7 +83,10 @@ import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
-import { DEFAULT_BLOCK } from '../constants';
+import {
+	DEFAULT_BLOCK,
+	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
+} from '../constants';
 import { getSubmenuVisibility } from '../utils/get-submenu-visibility';
 
 /**
@@ -382,6 +389,20 @@ function Navigation( {
 	const hasSubmenus = !! innerBlocks.find(
 		( block ) => block.name === 'core/navigation-submenu'
 	);
+
+	// Check if any overlay template parts exist
+	const { records: overlayTemplateParts } = useEntityRecords(
+		'postType',
+		'wp_template_part',
+		{
+			per_page: -1,
+		}
+	);
+	const hasOverlays =
+		overlayTemplateParts?.some(
+			( templatePart ) =>
+				templatePart.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
+		) ?? false;
 
 	const {
 		replaceInnerBlocks,
@@ -914,6 +935,7 @@ function Navigation( {
 						overlayMenuPreviewId={ overlayMenuPreviewId }
 						isResponsive={ isResponsive }
 						currentTheme={ currentTheme }
+						hasOverlays={ hasOverlays }
 					/>
 				</InspectorControls>
 			) }
