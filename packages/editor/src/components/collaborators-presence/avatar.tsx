@@ -1,3 +1,4 @@
+import { type PostEditorAwarenessState } from '../../../../core-data/src/awareness/types';
 import './styles/avatar.scss';
 
 type AvatarSize = 'small' | 'medium';
@@ -6,9 +7,6 @@ type AvatarSize = 'small' | 'medium';
  * Renders a circular avatar bubble for a user with an optional border.
  * @param root0
  * @param root0.userInfo
- * @param root0.userInfo.name
- * @param root0.userInfo.color
- * @param root0.userInfo.avatar_urls
  * @param root0.showUserColorBorder
  * @param root0.size
  */
@@ -17,11 +15,7 @@ export function Avatar( {
 	showUserColorBorder,
 	size = 'small',
 }: {
-	userInfo: {
-		name: string;
-		color: string;
-		avatar_urls?: Record< string, string >;
-	};
+	userInfo: PostEditorAwarenessState[ 'userInfo' ];
 	showUserColorBorder?: boolean;
 	size?: AvatarSize;
 } ) {

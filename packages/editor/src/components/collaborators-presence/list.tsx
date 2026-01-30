@@ -4,14 +4,10 @@ import { close } from '@wordpress/icons';
 import { Avatar } from './avatar';
 
 import './styles/collaborators-list.scss';
-import { type UserInfo } from '../../../../core-data/src/awareness/types';
+import { type PostEditorAwarenessState } from '../../../../core-data/src/awareness/types';
 
 interface CollaboratorsListProps {
-	activeUsers: {
-		clientId: string;
-		isConnected: boolean;
-		userInfo: UserInfo;
-	}[];
+	activeUsers: PostEditorAwarenessState[];
 	popoverAnchor?: HTMLElement | null;
 	setIsPopoverVisible: ( isVisible: boolean ) => void;
 }
@@ -57,12 +53,8 @@ export const CollaboratorsList: React.FC< CollaboratorsListProps > = ( {
 					<button
 						key={ userState.clientId }
 						className="editor-collaborators-presence__list-item"
-						onClick={ () => {} }
-						disabled={ ! userState.isConnected }
-						aria-label="Clicking scrolls to cursor position in the editor"
-						style={ {
-							opacity: userState.isConnected ? 1 : 0.5,
-						} }
+						disabled
+						style={ { opacity: userState.isConnected ? 1 : 0.5 } }
 					>
 						<Avatar
 							userInfo={ userState.userInfo }
