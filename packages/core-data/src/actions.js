@@ -644,6 +644,19 @@ export const saveEntityRecord =
 						...autosavePost,
 						...record,
 					};
+					// Additionally call the entity-specific pre-persist handler, since
+					// autosaves can target the actual persisted entity in some cases.
+					if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+						if ( entityConfig.__unstablePrePersist ) {
+							data = {
+								...data,
+								...entityConfig.__unstablePrePersist(
+									persistedRecord,
+									data
+								),
+							};
+						}
+					}
 					data = Object.keys( data ).reduce(
 						( acc, key ) => {
 							if (

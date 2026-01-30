@@ -46,7 +46,7 @@ function gutenberg_rest_api_crdt_post_meta() {
 		)
 	);
 }
-add_action( 'init', 'gutenberg_rest_api_crdt_post_meta' );
+add_action( 'init', 'gutenberg_rest_api_crdt_post_meta', 999, 0 );
 
 /**
  * Registers the real-time collaboration setting.
@@ -74,7 +74,7 @@ function gutenberg_register_real_time_collaboration_setting() {
 
 			?>
 			<label for="gutenberg_enable_real_time_collaboration">
-				<input name="gutenberg_enable_real_time_collaboration" type="checkbox" id="gutenberg_enable_real_time_collaboration" value="1" <?php checked( '1', $option_value ); ?>/>
+			<input name="gutenberg_enable_real_time_collaboration" type="checkbox" id="gutenberg_enable_real_time_collaboration" value="1" <?php checked( '1', $option_value ); ?>/>
 				<?php _e( 'Enable real-time collaboration', 'gutenberg' ); ?>
 			</label>
 			<?php
@@ -97,3 +97,43 @@ function gutenberg_inject_real_time_collaboration_setting() {
 	}
 }
 add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
+
+/**
+ * Saves CRDT post meta on autosave requests. Autosaves are sometimes applied to
+ * the post itself instead of a revision:
+ *
+ * https://github.com/WordPress/wordpress-develop/blob/dc62ecbc345ca1b8d1801eca794d71755b7568f1/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L235-L244
+ *
+ * When this happens, the special post meta handling in `create_post_autosave` is
+ * not called. We do it manually in this filter before the response is returned.
+ *
+ * @param WP_REST_Response $response The response object.
+ * @param WP_Post          $post     The post object.
+ * @param WP_REST_Request  $request  The request object.
+ * @return WP_REST_Response Modified response object.
+ */
+function gutenberg_add_crdt_meta_on_autosave( WP_REST_Response $response, WP_Post $post, WP_REST_Request $request ) {
+	// Ensure that this is an autosave request.
+	if ( ! defined( 'DOING_AUTOSAVE' ) || true !== constant( 'DOING_AUTOSAVE' ) ) {
+		return $response;
+	}
+
+	// Get the persisted CRDT meta from the request.
+	$meta  = $request->get_param( 'meta' );
+	$key   = '_crdt_document'; // Must match the key registered in gutenberg_rest_api_crdt_post_meta().
+	$value = $meta[ $key ] ?? '';
+
+	if ( empty( $value ) ) {
+		return $response;
+	}
+
+	update_post_meta( $post->ID, $key, $value );
+
+	// Update the response.
+	$data         = $response->get_data();
+	$data['meta'] = array_merge( $data['meta'] ?? array(), array( $key => $value ) );
+	$response->set_data( $data );
+
+	return $response;
+}
+add_filter( 'rest_prepare_autosave', 'gutenberg_add_crdt_meta_on_autosave', 10, 3 );
