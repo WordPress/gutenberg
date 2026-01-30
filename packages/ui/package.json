@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/ui",
-	"version": "0.5.0",
+	"version": "0.6.0",
 	"description": "Themeable React UI components for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -48,6 +48,7 @@
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/theme": "file:../theme",

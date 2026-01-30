@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.7.0 (2026-01-29)
+
 - Update documentation to describe `wpPlugin.name`
 
 ## 0.6.0 (2026-01-16)

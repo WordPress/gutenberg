@@ -48,6 +48,10 @@ export const settings = {
 			return customName || content;
 		}
 
+		if ( context === 'breadcrumb' && customName ) {
+			return customName;
+		}
+
 		if ( context === 'accessibility' ) {
 			return ! hasContent
 				? sprintf(

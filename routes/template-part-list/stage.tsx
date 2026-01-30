@@ -32,7 +32,8 @@ import { CreateTemplatePartModal } from '@wordpress/fields';
  */
 import { unlock } from '../lock-unlock';
 import {
-	getDefaultView,
+	DEFAULT_VIEW,
+	getActiveFiltersForTab,
 	DEFAULT_VIEWS,
 	DEFAULT_LAYOUTS,
 	viewToQuery,
@@ -78,9 +79,12 @@ function TemplatePartList() {
 	const [ showTemplatePartModal, setShowTemplatePartModal ] =
 		useState( false );
 
-	const defaultView: View = useMemo( () => {
-		return getDefaultView( postTypeObject, area );
-	}, [ postTypeObject, area ] );
+	const defaultView = DEFAULT_VIEW;
+
+	const activeFilters = useMemo(
+		() => getActiveFiltersForTab( area ),
+		[ area ]
+	);
 
 	// Callback to handle URL query parameter changes
 	const handleQueryParamsChange = useCallback(
@@ -99,8 +103,9 @@ function TemplatePartList() {
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
 		name: 'wp_template_part',
-		slug: area,
+		slug: 'default-new',
 		defaultView,
+		activeFilters,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );

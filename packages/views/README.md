@@ -45,6 +45,7 @@ _Parameters_
 -   _config.name_ `ViewConfig`: Specific entity name.
 -   _config.slug_ `ViewConfig`: View identifier.
 -   _config.defaultView_ `ViewConfig`: Default view configuration.
+-   _config.activeFilters_ `ViewConfig`: Filters applied on top but never persisted.
 -   _config.queryParams_ `ViewConfig`: Object with `page` and/or `search` from URL.
 
 _Returns_
@@ -62,6 +63,7 @@ _Parameters_
 -   _config.name_ `ViewConfig`: Specific entity name.
 -   _config.slug_ `ViewConfig`: View identifier.
 -   _config.defaultView_ `ViewConfig`: Default view configuration.
+-   _config.activeFilters_ `ViewConfig`: Filters applied on top of the view but never persisted.
 -   _config.queryParams_ `ViewConfig`: Object with `page` and/or `search` from URL.
 -   _config.onChangeQueryParams_ `ViewConfig`: Optional callback to update URL parameters.
 

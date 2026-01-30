@@ -27,7 +27,11 @@ import { published, commentAuthorAvatar } from '@wordpress/icons';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
-import { getDefaultView, DEFAULT_LAYOUTS } from './view-utils';
+import {
+	DEFAULT_VIEW,
+	getActiveFiltersForTab,
+	DEFAULT_LAYOUTS,
+} from './view-utils';
 import { previewField } from './fields/preview';
 import { authorField } from './fields/author';
 import { descriptionField } from './fields/description';
@@ -65,9 +69,11 @@ function TemplateListActivation() {
 	);
 	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
 		useState< Template | null >( null );
-	const defaultView: View = useMemo( () => {
-		return getDefaultView( activeView );
-	}, [ activeView ] );
+	const defaultView = DEFAULT_VIEW;
+	const activeFilters = useMemo(
+		() => getActiveFiltersForTab( activeView ),
+		[ activeView ]
+	);
 
 	// Callback to handle URL query parameter changes
 	const handleQueryParamsChange = useCallback(
@@ -86,8 +92,9 @@ function TemplateListActivation() {
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
 		name: 'wp_template',
-		slug: activeView,
+		slug: 'default-new',
 		defaultView,
+		activeFilters,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );

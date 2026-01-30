@@ -14,11 +14,25 @@
 			"default": ""
 		}
 	},
-	"parent": [ "core/tabs" ],
+	"parent": [
+		"core/tab-panels"
+	],
+	"usesContext": [
+		"core/tabs-activeTabIndex",
+		"core/tabs-editorActiveTabIndex"
+	],
 	"supports": {
 		"anchor": true,
 		"html": false,
 		"reusable": false,
+		"color": {
+			"background": true,
+			"text": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
 		"layout": {
 			"allowSwitching": true,
 			"allowInheriting": false,
@@ -38,9 +52,9 @@
 			"__experimentalDefaultControls": {
 				"fontSize": true,
 				"__experimentalFontFamily": true
-			},
-			"__experimentalSkipSerialization": true
-		}
+			}
+		},
+		"renaming": true
 	},
 	"providesContext": {
 		"core/tab-label": "label"

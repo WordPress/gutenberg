@@ -634,7 +634,7 @@ test.describe( 'Image', () => {
 		await expect( linkDom ).toHaveAttribute( 'href', url );
 	} );
 
-	test( 'appends http protocol to links added which are missing a protocol', async ( {
+	test( 'appends https protocol to links added which are missing a protocol', async ( {
 		editor,
 		page,
 		imageBlockUtils,
@@ -663,8 +663,8 @@ test.describe( 'Image', () => {
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
 
-		// Check the value of the URL input has had http:// prepended.
-		await expect( urlInput ).toHaveValue( 'http://example.com' );
+		// Check the value of the URL input has had https:// prepended.
+		await expect( urlInput ).toHaveValue( 'https://example.com' );
 	} );
 
 	test( 'should upload external image to media library', async ( {

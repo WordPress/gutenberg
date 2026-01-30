@@ -27,11 +27,11 @@ import fontSize from './font-size';
 import textAlign from './text-align';
 import fitText from './fit-text';
 import border from './border';
+import customCSS from './custom-css';
 import position from './position';
 import blockStyleVariation from './block-style-variation';
 import layout from './layout';
 import childLayout from './layout-child';
-import contentLockUI from './content-lock-ui';
 import './metadata';
 import blockHooks from './block-hooks';
 import blockBindingsPanel from './block-bindings';
@@ -47,11 +47,11 @@ createBlockEditFilter(
 		anchor,
 		customClassName,
 		style,
+		customCSS,
 		duotone,
 		fitText,
 		position,
 		layout,
-		contentLockUI,
 		blockHooks,
 		blockBindingsPanel,
 		childLayout,
@@ -73,6 +73,7 @@ createBlockListBlockFilter( [
 	fontSize,
 	fitText,
 	border,
+	customCSS,
 	position,
 	blockStyleVariation,
 	childLayout,
@@ -84,6 +85,7 @@ createBlockSaveFilter( [
 	ariaLabel,
 	customClassName,
 	border,
+	customCSS,
 	fitText,
 	color,
 	style,

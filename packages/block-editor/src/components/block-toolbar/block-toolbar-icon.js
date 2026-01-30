@@ -27,6 +27,7 @@ function getBlockIconVariant( { select, clientIds } ) {
 		canRemoveBlocks,
 		getTemplateLock,
 		getBlockEditingMode,
+		canEditBlock,
 	} = unlock( select( blockEditorStore ) );
 	const { getBlockStyles } = select( blocksStore );
 
@@ -53,17 +54,16 @@ function getBlockIconVariant( { select, clientIds } ) {
 			0
 	);
 	const canRemove = canRemoveBlocks( clientIds );
-
+	const canEdit = clientIds.every( ( clientId ) => canEditBlock( clientId ) );
 	const isDefaultEditingMode =
 		getBlockEditingMode( clientIds[ 0 ] ) === 'default';
-	const _hideTransformsForSections =
-		window?.__experimentalContentOnlyPatternInsertion &&
-		hasPatternNameInSelection;
+	const _hideTransformsForSections = hasPatternNameInSelection;
 	const _showBlockSwitcher =
 		! _hideTransformsForSections &&
 		isDefaultEditingMode &&
 		( hasBlockStyles || canRemove ) &&
-		! hasTemplateLock;
+		! hasTemplateLock &&
+		canEdit;
 
 	const _showPatternOverrides = hasPatternOverrides && hasParentPattern;
 
@@ -84,11 +84,7 @@ function getBlockIcon( { select, clientIds } ) {
 	const _isSingleBlock = clientIds.length === 1;
 	const firstClientId = clientIds[ 0 ];
 	const blockAttributes = getBlockAttributes( firstClientId );
-	if (
-		_isSingleBlock &&
-		blockAttributes?.metadata?.patternName &&
-		window?.__experimentalContentOnlyPatternInsertion
-	) {
+	if ( _isSingleBlock && blockAttributes?.metadata?.patternName ) {
 		return symbol;
 	}
 

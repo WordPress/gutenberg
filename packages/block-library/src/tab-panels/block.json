@@ -1,0 +1,70 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"__experimental": true,
+	"apiVersion": 3,
+	"name": "core/tab-panels",
+	"title": "Tab Panels",
+	"description": "Container for tab panel content in a tabbed interface.",
+	"version": "1.0.0",
+	"category": "design",
+	"textdomain": "default",
+	"parent": [
+		"core/tabs"
+	],
+	"allowedBlocks": [
+		"core/tab"
+	],
+	"attributes": {},
+	"supports": {
+		"anchor": false,
+		"html": false,
+		"reusable": false,
+		"lock": false,
+		"dimensions": {
+			"aspectRatio": false,
+			"height": false,
+			"minHeight": false,
+			"width": false
+		},
+		"color": {
+			"background": true,
+			"text": true,
+			"heading": true,
+			"link": true,
+			"__experimentalDefaultControls": {
+				"background": true,
+				"text": true
+			}
+		},
+		"spacing": {
+			"blockGap": false,
+			"padding": true,
+			"margin": true
+		},
+		"typography": {
+			"fontSize": true,
+			"__experimentalFontFamily": true
+		},
+		"layout": {
+			"default": {
+				"type": "flex",
+				"flexWrap": "nowrap",
+				"justifyContent": "stretch",
+				"orientation": "vertical"
+			},
+			"allowSwitching": false,
+			"allowVerticalAlignment": false,
+			"allowOrientation": false,
+			"allowJustification": true,
+			"allowSizingOnChildren": false
+		},
+		"__experimentalBorder": {
+			"radius": true,
+			"color": true,
+			"width": true,
+			"style": true
+		}
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style-index.css"
+}

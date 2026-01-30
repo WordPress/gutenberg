@@ -33,6 +33,18 @@ import type {
 	RecordHandlers,
 	SyncConfig,
 } from '../types';
+import { AwarenessState } from '../awareness/awareness-state';
+
+/**
+ * A minimal mock awareness class for testing.
+ */
+class MockAwarenessState extends AwarenessState {
+	protected equalityFieldChecks = {};
+
+	protected onSetUp(): void {
+		// No-op for testing.
+	}
+}
 
 // Mock dependencies.
 jest.mock( '../providers', () => ( {
@@ -83,14 +95,19 @@ describe( 'SyncManager', () => {
 				}
 			),
 			supports: {},
+			createAwareness: jest.fn(
+				( ydoc: Y.Doc ) => new MockAwarenessState( ydoc )
+			),
 		};
 
 		mockHandlers = {
+			addUndoMeta: jest.fn(),
 			editRecord: jest.fn(),
 			getEditedRecord: jest.fn( async () =>
 				Promise.resolve( mockRecord )
 			),
 			refetchRecord: jest.fn( async () => Promise.resolve() ),
+			restoreUndoMeta: jest.fn(),
 			saveRecord: jest.fn( async () => Promise.resolve() ),
 		};
 	} );
@@ -137,12 +154,12 @@ describe( 'SyncManager', () => {
 			);
 
 			expect( mockProviderCreator ).toHaveBeenCalledTimes( 1 );
-			expect( mockProviderCreator ).toHaveBeenCalledWith(
-				'postType/post',
-				'123',
-				expect.any( Y.Doc ),
-				expect.any( Awareness )
-			);
+			expect( mockProviderCreator ).toHaveBeenCalledWith( {
+				objectType: 'postType/post',
+				objectId: '123',
+				ydoc: expect.any( Y.Doc ),
+				awareness: expect.any( Awareness ),
+			} );
 		} );
 
 		it( 'does not load entity when no providers are available', async () => {
@@ -483,16 +500,10 @@ describe( 'SyncManager', () => {
 		it( 'updates CRDT document with local changes', async () => {
 			// Capture the Y.Doc from provider creator
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
 
 			const manager = createSyncManager();
 
@@ -536,16 +547,10 @@ describe( 'SyncManager', () => {
 		it( 'applies changes with specified origin', async () => {
 			// Capture the Y.Doc from provider creator
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
 
 			const manager = createSyncManager();
 
@@ -580,16 +585,10 @@ describe( 'SyncManager', () => {
 		it( 'updates the record metadata when the update is associated with a save', async () => {
 			// Capture the Y.Doc from provider creator.
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
 
 			const manager = createSyncManager();
 
@@ -606,7 +605,9 @@ describe( 'SyncManager', () => {
 			const changes = { title: 'Updated Title' };
 			const now = Date.now();
 
-			manager.update( 'post', '123', changes, 'local-editor', true );
+			manager.update( 'post', '123', changes, 'local-editor', {
+				isSave: true,
+			} );
 
 			// Verify that applyChangesToCRDTDoc was called with the changes.
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
@@ -628,16 +629,10 @@ describe( 'SyncManager', () => {
 		it( 'edits the local entity record when remote updates arrive', async () => {
 			// Capture the Y.Doc from provider creator.
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
 
 			const manager = createSyncManager();
 
@@ -677,16 +672,10 @@ describe( 'SyncManager', () => {
 		it( 'does not edit the local record for local transactions', async () => {
 			// Capture the Y.Doc from provider creator.
 			let capturedDoc: Y.Doc | null = null;
-			mockProviderCreator.mockImplementation(
-				async (
-					_objectType: string,
-					_objectId: string,
-					ydoc: Y.Doc
-				) => {
-					capturedDoc = ydoc;
-					return mockProviderResult;
-				}
-			);
+			mockProviderCreator.mockImplementation( async ( { ydoc } ) => {
+				capturedDoc = ydoc;
+				return mockProviderResult;
+			} );
 
 			const manager = createSyncManager();
 
