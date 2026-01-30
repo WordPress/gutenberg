@@ -193,7 +193,6 @@ const getAllBlocks = () => {
 		file,
 		group,
 		html,
-		icon,
 		math,
 		latestComments,
 		latestPosts,
@@ -300,6 +299,10 @@ const getAllBlocks = () => {
 	if ( window?.__experimentalEnableBlockExperiments ) {
 		blocks.push( playlist );
 		blocks.push( playlistTrack );
+	}
+
+	if ( window?.experimentalEnableIconBlock ) {
+		blocks.push( icon );
 	}
 
 	// When in a WordPress context, conditionally
