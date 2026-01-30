@@ -5,6 +5,7 @@
 ### Internal
 
 -   Expose `useDrag` from `@use-gesture/react` package via private API's ([#66735](https://github.com/WordPress/gutenberg/pull/66735)).
+-   ValidatedToggleControl: Fix validation timing with callback ref. ([#75095](https://github.com/WordPress/gutenberg/pull/75095)).
 
 ## 32.1.0 (2026-01-29)
 
