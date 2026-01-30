@@ -11,7 +11,7 @@ import './styles/collaborators-presence.scss';
 
 const { useActiveUsers } = unlock( privateApis );
 
-interface AvatarsProps {
+interface CollaboratorsPresenceProps {
 	postId: number | null;
 	postType: string | null;
 }
@@ -19,11 +19,15 @@ interface AvatarsProps {
 /**
  * Renders a list of avatars for the active users, with a maximum of 3 visible avatars.
  * Shows a popover with all users on hover.
- * @param root0          Component props
- * @param root0.postId   The ID of the post
- * @param root0.postType The type of the post
+ *
+ * @param {Object} props          CollaboratorsPresence component props
+ * @param {number} props.postId   ID of the post
+ * @param {string} props.postType Type of the post
  */
-export function CollaboratorsPresence( { postId, postType }: AvatarsProps ) {
+export const CollaboratorsPresence: React.FC< CollaboratorsPresenceProps > = ( {
+	postId,
+	postType,
+} ) => {
 	const activeUsers = useActiveUsers(
 		postId,
 		postType
@@ -87,4 +91,4 @@ export function CollaboratorsPresence( { postId, postType }: AvatarsProps ) {
 			) }
 		</div>
 	) : null;
-}
+};
