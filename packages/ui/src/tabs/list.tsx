@@ -23,7 +23,7 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 	function TabList(
 		{
 			children,
-			density = 'default',
+			variant = 'default',
 			className,
 			activateOnFocus,
 			render,
@@ -102,7 +102,7 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 					styles.tablist,
 					overflow.first && styles[ 'is-overflowing-first' ],
 					overflow.last && styles[ 'is-overflowing-last' ],
-					styles[ `has-${ density }-density` ],
+					styles[ `is-${ variant }-variant` ],
 					className
 				) }
 				render={ ( props ) => {

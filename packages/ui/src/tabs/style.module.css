@@ -39,7 +39,7 @@
 					linear-gradient(to left, var(--fade-gradient-composed));
 			}
 
-			&.has-compact-density {
+			&.is-minimal-variant {
 				gap: 1rem;
 			}
 		}
@@ -179,7 +179,7 @@
 			}
 		}
 
-		.has-compact-density[data-orientation="horizontal"] & {
+		.is-minimal-variant[data-orientation="horizontal"] & {
 			padding-inline: 0;
 
 			&::after {

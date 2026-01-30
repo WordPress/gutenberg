@@ -15,10 +15,10 @@ export type TabListProps = ComponentProps< typeof Tabs.List > & {
 	 */
 	children?: ReactNode;
 	/**
-	 * The visual density of the tab list.
+	 * The visual variant of the tab list.
 	 * @default "default"
 	 */
-	density?: 'compact' | 'default';
+	variant?: 'minimal' | 'default';
 };
 
 export type TabProps = ComponentProps< typeof Tabs.Tab > & {

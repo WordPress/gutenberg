@@ -55,12 +55,12 @@ export const Default: StoryObj< typeof Tabs.Root > = {
 	},
 };
 
-export const Compact: StoryObj< typeof Tabs.Root > = {
+export const Minimal: StoryObj< typeof Tabs.Root > = {
 	args: {
 		...Default.args,
 		children: (
 			<>
-				<Tabs.List density="compact">
+				<Tabs.List variant="minimal">
 					<Tabs.Tab value="tab1">Tab 1</Tabs.Tab>
 					<Tabs.Tab value="tab2">Tab 2</Tabs.Tab>
 					<Tabs.Tab value="tab3">Tab 3</Tabs.Tab>
