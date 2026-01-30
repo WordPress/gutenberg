@@ -4,6 +4,8 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Template Part Navigation Edit Button', () => {
+	let testPostId;
+
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyfive' );
 		// Create some pages so the header template part has a page list
@@ -15,12 +17,20 @@ test.describe( 'Template Part Navigation Edit Button', () => {
 			title: 'Test Page 2',
 			status: 'publish',
 		} );
+		// Create a test post with content (posts don't have the pattern chooser modal)
+		const testPost = await requestUtils.createPost( {
+			title: 'Template Part Navigation Test Post',
+			content:
+				'<!-- wp:paragraph --><p>Test content</p><!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+		testPostId = testPost.id;
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
-		// Delete all the pages we created
 		await requestUtils.deleteAllPages();
+		await requestUtils.deleteAllPosts();
 	} );
 
 	test( 'should select navigation block in isolated editor when clicking Edit navigation button on a page ', async ( {
@@ -36,20 +46,8 @@ test.describe( 'Template Part Navigation Edit Button', () => {
 		);
 
 		await test.step( 'test setup', async () => {
-			// Create and visit a page (not a template)
-			await admin.createNewPost( { postType: 'page' } );
-
-			// Close pattern chooser dialog
-			const patternDialog = page.getByRole( 'dialog', {
-				name: 'Choose a pattern',
-			} );
-			await expect( patternDialog ).toBeVisible();
-			await patternDialog
-				.getByRole( 'button', { name: 'Close' } )
-				.click();
-
-			// Enter some content into the page to avoid the new page dialog
-			await page.keyboard.type( 'Test content' );
+			// Visit the existing post
+			await admin.editPost( testPostId );
 
 			// Turn on the "Show template parts" to view the header template part
 			const viewButton = page.getByRole( 'button', {

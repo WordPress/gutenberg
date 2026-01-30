@@ -5,7 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -101,15 +101,24 @@ function Editor( {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const restoreBlockFromPath = useRestoreBlockFromPath();
 
+	// Track if we've already restored to prevent continuous subscription
+	const hasRestoredRef = useRef( false );
+
+	// Reset when initialSelection changes (new navigation)
+	useEffect( () => {
+		hasRestoredRef.current = false;
+	}, [ initialSelection ] );
+
 	// Check if the first step of the path is available (indicates blocks are loaded)
 	const canRestorePath = useSelect(
 		( select ) => {
+			// Don't create a subscription if we don't have an initialSelection value
 			if (
+				hasRestoredRef.current ||
 				! initialSelection ||
-				! hasLoadedPost ||
-				! post ||
 				! Array.isArray( initialSelection ) ||
-				initialSelection.length === 0
+				initialSelection.length === 0 ||
+				! hasLoadedPost
 			) {
 				return false;
 			}
@@ -121,7 +130,7 @@ function Editor( {
 			// Check if the first block in the path exists
 			return firstStep.index < rootBlocks.length;
 		},
-		[ initialSelection, hasLoadedPost, post ]
+		[ initialSelection, hasLoadedPost ]
 	);
 
 	// Restore initial block selection once the path can be resolved
@@ -133,6 +142,7 @@ function Editor( {
 		const clientId = restoreBlockFromPath( initialSelection );
 		if ( clientId ) {
 			selectBlock( clientId );
+			hasRestoredRef.current = true;
 		}
 	}, [
 		canRestorePath,
