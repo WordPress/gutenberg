@@ -150,6 +150,7 @@ function setValidityAtPath(
 			current[ segment ] = {};
 		}
 
+		current[ segment ] = { ...current[ segment ] };
 		current = current[ segment ];
 	}
 
