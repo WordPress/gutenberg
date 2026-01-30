@@ -80,11 +80,7 @@ export function CollaboratorsPresence( { postId, postType }: AvatarsProps ) {
 			</Button>
 			{ isPopoverVisible && (
 				<CollaboratorsList
-					activeUsers={ otherActiveUsers.map( ( user ) => ( {
-						clientId: user.clientId,
-						isConnected: true,
-						userInfo: user.userInfo,
-					} ) ) }
+					activeUsers={ otherActiveUsers }
 					popoverAnchor={ popoverAnchor }
 					setIsPopoverVisible={ setIsPopoverVisible }
 				/>
