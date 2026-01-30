@@ -10,19 +10,21 @@
  *
  * @since 6.0.0
  *
- * @param array  $attributes The block attributes.
- * @param string $content    The block rendered content.
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The block rendered content.
+ * @param WP_Block $block      The block instance.
  *
  * @return string Returns the cover block markup, if useFeaturedImage is true.
  */
-function render_block_core_cover( $attributes, $content ) {
+function render_block_core_cover( $attributes, $content, $block ) {
 	// Handle embed video background.
 	if (
 		isset( $attributes['backgroundType'] ) &&
 		'embed-video' === $attributes['backgroundType'] &&
 		isset( $attributes['url'] ) &&
 		! empty( $attributes['url'] ) &&
-		is_string( $attributes['url'] )
+		is_string( $attributes['url'] ) &&
+		block_has_support( $block->block_type, 'backgroundVideoFromURL', true )
 	) {
 		$url = $attributes['url'];
 

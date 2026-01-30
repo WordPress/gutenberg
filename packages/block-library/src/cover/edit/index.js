@@ -24,6 +24,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { isBlobURL } from '@wordpress/blob';
 import { store as noticesStore } from '@wordpress/notices';
+import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -389,7 +390,8 @@ function CoverEdit( {
 	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 	const isEmbedVideoBackground =
-		EMBED_VIDEO_BACKGROUND_TYPE === backgroundType;
+		EMBED_VIDEO_BACKGROUND_TYPE === backgroundType &&
+		hasBlockSupport( 'core/cover', 'backgroundVideoFromURL', true );
 
 	const blockEditingMode = useBlockEditingMode();
 	const hasNonContentControls = blockEditingMode === 'default';

@@ -10,6 +10,7 @@ import {
 	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import { link } from '@wordpress/icons';
@@ -46,6 +47,12 @@ export default function CoverBlockControls( {
 		minHeight === 100 &&
 		! attributes?.style?.dimensions?.aspectRatio;
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
+
+	const isEmbedUrlAllowed = hasBlockSupport(
+		'core/cover',
+		'backgroundVideoFromURL',
+		true
+	);
 
 	const toggleMinFullHeight = () => {
 		if ( isMinFullHeight ) {
@@ -115,19 +122,23 @@ export default function CoverBlockControls( {
 					variant="toolbar"
 				>
 					{ ( { onClose } ) => (
-						<MenuItem
-							icon={ link }
-							onClick={ () => {
-								setIsEmbedUrlInputOpen( true );
-								onClose();
-							} }
-						>
-							{ __( 'Embed video from URL' ) }
-						</MenuItem>
+						<>
+							{ isEmbedUrlAllowed && (
+								<MenuItem
+									icon={ link }
+									onClick={ () => {
+										setIsEmbedUrlInputOpen( true );
+										onClose();
+									} }
+								>
+									{ __( 'Embed video from URL' ) }
+								</MenuItem>
+							) }
+						</>
 					) }
 				</MediaReplaceFlow>
 			</BlockControls>
-			{ isEmbedUrlInputOpen && (
+			{ isEmbedUrlAllowed && isEmbedUrlInputOpen && (
 				<EmbedVideoUrlInput
 					onSubmit={ ( embedUrl ) => {
 						onSelectEmbedUrl( embedUrl );

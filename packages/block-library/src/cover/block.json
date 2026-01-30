@@ -146,6 +146,7 @@
 		"filter": {
 			"duotone": true
 		},
+		"backgroundVideoFromURL": true,
 		"allowedBlocks": true
 	},
 	"selectors": {
