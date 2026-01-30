@@ -33,7 +33,7 @@ import { CreateTemplatePartModal } from '@wordpress/fields';
 import { unlock } from '../lock-unlock';
 import {
 	DEFAULT_VIEW,
-	getActiveFiltersForTab,
+	getActiveViewOverridesForTab,
 	DEFAULT_VIEWS,
 	DEFAULT_LAYOUTS,
 	viewToQuery,
@@ -81,8 +81,8 @@ function TemplatePartList() {
 
 	const defaultView = DEFAULT_VIEW;
 
-	const activeFilters = useMemo(
-		() => getActiveFiltersForTab( area ),
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTab( area ),
 		[ area ]
 	);
 
@@ -105,7 +105,7 @@ function TemplatePartList() {
 		name: 'wp_template_part',
 		slug: 'default-new',
 		defaultView,
-		activeFilters,
+		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );
