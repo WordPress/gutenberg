@@ -48,21 +48,17 @@ export function BlockRemovalWarningModal( { rules } ) {
 		return;
 	}
 
-	// Support both string messages (backward compatibility) and structured message objects.
-	const isStructuredMessage = typeof message === 'object' && message !== null;
-	const title = isStructuredMessage ? message.title : __( 'Be careful!' );
-	const description = isStructuredMessage ? message.description : message;
-	const warning = isStructuredMessage ? message.warning : null;
-	const subtext = isStructuredMessage ? message.subtext : null;
-	const requireConfirmation = isStructuredMessage
-		? message.requireConfirmation
-		: false;
-	const confirmLabel = isStructuredMessage
-		? message.confirmLabel
-		: __( 'I understand the consequences' );
-	const removeLabel = isStructuredMessage
-		? message.removeLabel
-		: __( 'Delete' );
+	// Normalize message to a structured object. String messages (backward
+	// compatibility) are converted to the structured format with defaults.
+	const {
+		title = __( 'Confirm deletion' ),
+		description = message,
+		warning,
+		subtext,
+		requireConfirmation = false,
+		confirmLabel = __( 'I understand the consequences' ),
+		removeLabel = __( 'Delete' ),
+	} = typeof message === 'object' && message !== null ? message : {};
 
 	const isRemoveDisabled = requireConfirmation && ! confirmed;
 
