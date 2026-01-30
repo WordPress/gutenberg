@@ -5,6 +5,7 @@ import { useState, useMemo, useEffect } from '@wordpress/element';
 import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -16,17 +17,8 @@ import { parseIcon } from '../../utils';
  * @return {Promise<Array>} A promise that resolves to an array of icon data.
  */
 const getIcons = async () => {
-	// Dynamically import the icon data
-	const { default: allIcons } = await import(
-		'../../icons/icon-api-results.json'
-	);
-
-	// Return a new Promise that resolves after a delay
-	return new Promise( ( resolve ) => {
-		setTimeout( () => {
-			resolve( allIcons ); // Resolve with the mock data
-		}, 1000 ); // Simulate a 1-second network delay
-	} );
+	const icons = await apiFetch( { path: '/wp/v2/icons' } );
+	return icons;
 };
 
 const fields = [
@@ -35,23 +27,19 @@ const fields = [
 		label: 'Icon',
 		render: ( { item } ) => <>{ parseIcon( item.content ) }</>,
 		type: 'media',
+		enableHiding: false,
 	},
 	{
-		id: 'name',
-		label: 'Name',
+		id: 'label',
+		label: 'Label',
 		enableGlobalSearch: true,
 		enableHiding: false,
-		enableSorting: false,
+		enableSorting: true,
 		filterBy: false,
 		isValid: {
 			required: true,
 		},
 		type: 'text',
-		render: ( { item } ) =>
-			item.name
-				.split( '/' )[ 1 ]
-				.replaceAll( '-', ' ' )
-				.replace( /^./, ( char ) => char.toUpperCase() ),
 	},
 ];
 
@@ -61,16 +49,16 @@ const InserterModal = ( {
 	setAttributes,
 } ) => {
 	const [ view, setView ] = useState( {
-		fields: [],
+		fields: [ 'slug' ],
 		filters: [],
 		groupByField: undefined,
 		infiniteScrollEnabled: undefined,
 		mediaField: 'icon',
+		titleField: 'label',
+		descriptionField: '',
 		page: 1,
 		perPage: 50,
 		search: '',
-		titleField: 'name',
-		descriptionField: '',
 		type: 'pickerGrid',
 		layout: {
 			previewSize: 100,
@@ -138,6 +126,7 @@ const InserterModal = ( {
 			isFullScreen
 		>
 			<DataViewsPicker
+				searchLabel={ __( 'Search icons' ) }
 				actions={ actions }
 				config={ {
 					perPageSizes: [ 10, 25, 50, 100 ],
