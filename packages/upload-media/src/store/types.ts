@@ -167,18 +167,40 @@ export interface Settings {
 	maxUploadFileSize?: number;
 	// Maximum number of concurrent uploads.
 	maxConcurrentUploads: number;
-	// Big image size threshold in pixels.
-	// Images larger than this will be scaled down before upload.
-	// Default is 2560 (matching WordPress core).
+	/**
+	 * Big image size threshold in pixels.
+	 * Images larger than this will be scaled down before upload.
+	 * Default is 2560 (matching WordPress core).
+	 */
 	bigImageSizeThreshold?: number;
-	// Output format mapping from WordPress image_editor_output_format filter.
-	// Maps input mime types to output mime types (e.g., 'image/png' -> 'image/webp').
+	/**
+	 * Output format mapping from WordPress image_editor_output_format filter.
+	 * Maps input MIME types to output MIME types for format conversion.
+	 *
+	 * @example
+	 * ```js
+	 * // Convert PNG to WebP, JPEG to AVIF
+	 * { 'image/png': 'image/webp', 'image/jpeg': 'image/avif' }
+	 * ```
+	 */
 	imageOutputFormats?: Record< string, string >;
-	// Whether to use interlaced/progressive encoding for JPEG images.
+	/**
+	 * Whether to use interlaced/progressive encoding for JPEG images.
+	 * Progressive JPEGs load gradually, showing a low-quality preview first.
+	 * Controlled by WordPress image_save_progressive filter.
+	 */
 	jpegInterlaced?: boolean;
-	// Whether to use interlaced encoding for PNG images.
+	/**
+	 * Whether to use interlaced encoding for PNG images.
+	 * Interlaced PNGs display progressively during loading.
+	 * Controlled by WordPress image_save_progressive filter.
+	 */
 	pngInterlaced?: boolean;
-	// Whether to use interlaced encoding for GIF images.
+	/**
+	 * Whether to use interlaced encoding for GIF images.
+	 * Interlaced GIFs display progressively during loading.
+	 * Controlled by WordPress image_save_progressive filter.
+	 */
 	gifInterlaced?: boolean;
 }
 
