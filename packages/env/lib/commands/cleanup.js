@@ -19,14 +19,21 @@ const { getRuntime, detectRuntime } = require( '../runtime' );
  * Removes Docker containers, volumes, networks, and local files,
  * but preserves Docker images for faster re-starts.
  *
- * @param {Object}  options
- * @param {Object}  options.spinner A CLI spinner which indicates progress.
- * @param {boolean} options.scripts Indicates whether or not lifecycle scripts should be executed.
- * @param {boolean} options.force   If true, skips the confirmation prompt.
- * @param {boolean} options.debug   True if debug mode is enabled.
+ * @param {Object}      options
+ * @param {Object}      options.spinner A CLI spinner which indicates progress.
+ * @param {boolean}     options.scripts Indicates whether or not lifecycle scripts should be executed.
+ * @param {boolean}     options.force   If true, skips the confirmation prompt.
+ * @param {boolean}     options.debug   True if debug mode is enabled.
+ * @param {string|null} options.config  Path to a custom .wp-env.json configuration file.
  */
-module.exports = async function cleanup( { spinner, scripts, force, debug } ) {
-	const config = await loadConfig( path.resolve( '.' ) );
+module.exports = async function cleanup( {
+	spinner,
+	scripts,
+	force,
+	debug,
+	config: customConfigPath,
+} ) {
+	const config = await loadConfig( path.resolve( '.' ), customConfigPath );
 
 	try {
 		await fs.readdir( config.workDirectoryPath );
@@ -35,7 +42,9 @@ module.exports = async function cleanup( { spinner, scripts, force, debug } ) {
 		return;
 	}
 
-	const runtime = getRuntime( detectRuntime( config.workDirectoryPath ) );
+	const runtime = getRuntime(
+		await detectRuntime( config.workDirectoryPath )
+	);
 
 	spinner.info( runtime.getCleanupWarningMessage() );
 
