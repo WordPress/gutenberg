@@ -641,7 +641,6 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		if ( $has_custom_overlay ) {
-			// Only add the disable-default-overlay class if experiment is enabled AND overlay blocks actually rendered.
 			$responsive_container_classes[] = 'disable-default-overlay';
 		} else {
 			// Don't apply overlay color classes if using a custom overlay template part.
