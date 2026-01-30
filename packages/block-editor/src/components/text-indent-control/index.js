@@ -59,7 +59,8 @@ export default function TextIndentControl( {
 		units
 	);
 	const isValueUnitRelative =
-		!! valueUnit && [ 'em', 'rem', 'ch', 'vw', 'vh' ].includes( valueUnit );
+		!! valueUnit &&
+		[ 'em', 'rem', '%', 'ch', 'vw', 'vh' ].includes( valueUnit );
 
 	if ( ! withSlider ) {
 		return (

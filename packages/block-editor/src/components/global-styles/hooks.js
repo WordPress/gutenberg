@@ -115,7 +115,8 @@ export function useSettingsForBlockElement(
 		if ( supportedStyles.includes( 'textIndent' ) ) {
 			updatedSettings.typography = {
 				...updatedSettings.typography,
-				textIndent: updatedSettings.typography?.textIndent ?? true,
+				textIndent:
+					updatedSettings.typography?.textIndent ?? 'subsequent',
 			};
 		}
 

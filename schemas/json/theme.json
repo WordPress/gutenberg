@@ -639,8 +639,17 @@
 						},
 						"textIndent": {
 							"description": "Allow users to set custom line indent.",
-							"type": "boolean",
-							"default": false
+							"oneOf": [
+								{
+									"type": "boolean",
+									"enum": [ false ]
+								},
+								{
+									"type": "string",
+									"enum": [ "subsequent", "all" ]
+								}
+							],
+							"default": "subsequent"
 						},
 						"textAlign": {
 							"description": "Allow users to set the text align.",
