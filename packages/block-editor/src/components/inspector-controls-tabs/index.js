@@ -65,6 +65,9 @@ export default function InspectorControlsTabs( {
 			setSelectedTabId( blockAttributeGroup );
 			// Clear the store value after applying it.
 			showBlockAttributeGroup( null );
+			// Consider this a user selection, seeing as it
+			// is usually triggered by another user action.
+			hasUserSelectionRef.current = true;
 		}
 	}, [ blockAttributeGroup, tabs, showBlockAttributeGroup ] );
 
