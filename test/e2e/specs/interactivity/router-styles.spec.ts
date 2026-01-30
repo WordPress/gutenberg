@@ -481,18 +481,13 @@ test.describe( 'Router styles', () => {
 		} );
 
 		// Force-navigate to "red". The response now contains all
-		// three color blocks with their styles, but the internal
-		// style cache still holds the old "red" entry, so the new
-		// green and blue styles are never processed.
+		// three color blocks with their styles.
 		await page.getByTestId( 'force link red' ).click();
 		await expect( csn ).toBeHidden();
 		await expect( csn ).toBeVisible();
 
-		// Red styles should be present (already in the style cache).
+		// Red and green styles should be present.
 		await expect( red ).toHaveCSS( 'color', COLOR_RED );
-		// Green styles from the new response should also be applied.
-		// This fails because the style cache is not invalidated on
-		// force navigations, so the fresh green styles are ignored.
 		await expect( green ).toHaveCSS( 'color', COLOR_GREEN );
 
 		// Unroute previous route handler for "red".
