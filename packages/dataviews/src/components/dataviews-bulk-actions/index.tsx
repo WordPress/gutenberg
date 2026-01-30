@@ -104,6 +104,7 @@ export function BulkSelectionCheckbox< Item >( {
 	actions,
 	getItemId,
 }: BulkSelectionCheckboxProps< Item > ) {
+	const { view } = useContext( DataViewsContext );
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
 			return actions.some(
@@ -119,11 +120,16 @@ export function BulkSelectionCheckbox< Item >( {
 			selectableItems.includes( item )
 	);
 	const areAllSelected = selectedItems.length === selectableItems.length;
+	// For infinite scroll, use selection.length to determine indeterminate state
+	// since selected items may have scrolled out of view.
+	const hasSelection = view.infiniteScrollEnabled
+		? selection.length > 0
+		: selectedItems.length > 0;
 	return (
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
 			checked={ areAllSelected }
-			indeterminate={ ! areAllSelected && !! selectedItems.length }
+			indeterminate={ ! areAllSelected && hasSelection }
 			onChange={ () => {
 				if ( areAllSelected ) {
 					onChangeSelection( [] );
@@ -326,6 +332,10 @@ function FooterContent< Item >( {
 	const footerContentRef = useRef< React.JSX.Element >( undefined );
 	const isMobile = useViewportMatch( 'medium', '<' );
 
+	// Cache for selected items when using infinite scroll.
+	// This preserves item objects even when they scroll out of view.
+	const selectedItemsCacheRef = useRef< Map< string, Item > >( new Map() );
+
 	const bulkActions = useMemo(
 		() => actions.filter( ( action ) => action.supportsBulk ),
 		[ actions ]
@@ -339,12 +349,38 @@ function FooterContent< Item >( {
 	}, [ data, bulkActions ] );
 
 	const selectedItems = useMemo( () => {
+		if ( view.infiniteScrollEnabled ) {
+			// Update cache with any newly visible selected items
+			data.forEach( ( item ) => {
+				const id = getItemId( item );
+				if ( selection.includes( id ) ) {
+					selectedItemsCacheRef.current.set( id, item );
+				}
+			} );
+
+			// Remove items from cache that are no longer selected
+			selectedItemsCacheRef.current.forEach( ( _, id ) => {
+				if ( ! selection.includes( id ) ) {
+					selectedItemsCacheRef.current.delete( id );
+				}
+			} );
+
+			// Return all cached selected items
+			return Array.from( selectedItemsCacheRef.current.values() );
+		}
+
 		return data.filter(
 			( item ) =>
 				selection.includes( getItemId( item ) ) &&
 				selectableItems.includes( item )
 		);
-	}, [ selection, data, getItemId, selectableItems ] );
+	}, [
+		selection,
+		data,
+		getItemId,
+		selectableItems,
+		view.infiniteScrollEnabled,
+	] );
 
 	const actionsToShow = useMemo(
 		() =>

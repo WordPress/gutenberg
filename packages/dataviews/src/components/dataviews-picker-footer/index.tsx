@@ -3,7 +3,7 @@
  */
 import { Button, CheckboxControl } from '@wordpress/components';
 import { useRegistry } from '@wordpress/data';
-import { useContext, useMemo, useState } from '@wordpress/element';
+import { useContext, useMemo, useRef, useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 
@@ -32,20 +32,27 @@ function BulkSelectionCheckbox< Item >( {
 	onChangeSelection,
 	data,
 	getItemId,
+	infiniteScrollEnabled,
 }: {
 	selection: string[];
 	selectedItems: Item[];
 	onChangeSelection: SetSelection;
 	data: Item[];
 	getItemId: ( item: Item ) => string;
+	infiniteScrollEnabled?: boolean;
 } ) {
 	const areAllSelected = selectedItems.length === data.length;
+	// For infinite scroll, use selection.length to determine indeterminate state
+	// since selected items may have scrolled out of view.
+	const hasSelection = infiniteScrollEnabled
+		? selection.length > 0
+		: selectedItems.length > 0;
 
 	return (
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
 			checked={ areAllSelected }
-			indeterminate={ ! areAllSelected && !! selectedItems.length }
+			indeterminate={ ! areAllSelected && hasSelection }
 			onChange={ () => {
 				if ( areAllSelected ) {
 					// Deselect all - remove the current page from the total selection.
@@ -141,6 +148,10 @@ export function DataViewsPickerFooter() {
 
 	const isMultiselect = useIsMultiselectPicker( actions );
 
+	// Cache for selected items when using infinite scroll.
+	// This preserves item objects even when they scroll out of view.
+	const selectedItemsCacheRef = useRef< Map< string, unknown > >( new Map() );
+
 	const message = getFooterMessage(
 		selection.length,
 		data.length,
@@ -148,11 +159,31 @@ export function DataViewsPickerFooter() {
 		view.infiniteScrollEnabled
 	);
 
-	const selectedItems = useMemo(
-		() =>
-			data.filter( ( item ) => selection.includes( getItemId( item ) ) ),
-		[ selection, getItemId, data ]
-	);
+	const selectedItems = useMemo( () => {
+		if ( view.infiniteScrollEnabled ) {
+			// Update cache with any newly visible selected items
+			data.forEach( ( item ) => {
+				const id = getItemId( item );
+				if ( selection.includes( id ) ) {
+					selectedItemsCacheRef.current.set( id, item );
+				}
+			} );
+
+			// Remove items from cache that are no longer selected
+			selectedItemsCacheRef.current.forEach( ( _, id ) => {
+				if ( ! selection.includes( id ) ) {
+					selectedItemsCacheRef.current.delete( id );
+				}
+			} );
+
+			// Return all cached selected items
+			return Array.from( selectedItemsCacheRef.current.values() );
+		}
+
+		return data.filter( ( item ) =>
+			selection.includes( getItemId( item ) )
+		);
+	}, [ selection, getItemId, data, view.infiniteScrollEnabled ] );
 
 	return (
 		<Stack
@@ -175,6 +206,7 @@ export function DataViewsPickerFooter() {
 						onChangeSelection={ onChangeSelection }
 						data={ data }
 						getItemId={ getItemId }
+						infiniteScrollEnabled={ view.infiniteScrollEnabled }
 					/>
 				) }
 				<span className="dataviews-bulk-actions-footer__item-count">

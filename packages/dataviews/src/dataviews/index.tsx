@@ -203,11 +203,16 @@ function DataViews< Item >( {
 		}
 	}
 	const _fields = useMemo( () => normalizeFields( fields ), [ fields ] );
+	// When infinite scroll is enabled, don't filter selection by current data
+	// because items may be scrolled out of view but still selected.
 	const _selection = useMemo( () => {
+		if ( view.infiniteScrollEnabled ) {
+			return selection;
+		}
 		return selection.filter( ( id ) =>
 			data.some( ( item ) => getItemId( item ) === id )
 		);
-	}, [ selection, data, getItemId ] );
+	}, [ selection, data, getItemId, view.infiniteScrollEnabled ] );
 
 	const filters = useFilters( _fields, view );
 	const hasPrimaryOrLockedFilters = useMemo(
