@@ -40,7 +40,10 @@ function isFormValid( formValidity: FormValidity | undefined ): boolean {
 					// Recursively check children validations
 					return isFormValid( validation as FormValidity );
 				}
-				return validation.type === 'valid';
+				return (
+					validation.type !== 'invalid' &&
+					validation.type !== 'validating'
+				);
 			}
 		);
 	} );

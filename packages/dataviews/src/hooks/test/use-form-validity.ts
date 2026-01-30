@@ -1689,7 +1689,7 @@ describe( 'useFormValidity', () => {
 		} );
 	} );
 	describe( 'async', () => {
-		it( 'is valid when validity object only contains type:valid messages', async () => {
+		it( 'is valid when async custom validations pass (return null)', async () => {
 			const item = {
 				id: 1,
 				title: 'Valid Title',

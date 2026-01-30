@@ -265,9 +265,6 @@ function ValidatedDateControl< Item >( {
 							'components-validated-control__indicator',
 							customValidity.type === 'invalid'
 								? 'is-invalid'
-								: undefined,
-							customValidity.type === 'valid'
-								? 'is-valid'
 								: undefined
 						) }
 					>
