@@ -39,7 +39,7 @@
 		border-style: solid;
 		border-width: 1px;
 		border-color: var(--wp-ui-button-border-color);
-		border-radius: var(--wpds-border-radius-surface-sm);
+		border-radius: var(--wpds-border-radius-sm);
 		background-color: var(--wp-ui-button-background-color);
 		background-clip: padding-box;
 		font-family: var(--wpds-font-family-body);
@@ -102,7 +102,7 @@
 			height: var(--wp-ui-button-font-size);
 			aspect-ratio: 1;
 
-			border: var(--wpds-border-width-interactive-focus) solid;
+			border: var(--wpds-border-width-focus) solid;
 			border-block-start-color: var(--wp-ui-button-foreground-color);
 			border-inline-end-color: var(--wp-ui-button-foreground-color);
 			border-block-end-color: transparent;

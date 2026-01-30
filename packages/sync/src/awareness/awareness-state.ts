@@ -117,6 +117,12 @@ export abstract class AwarenessState<
 	/** CUSTOM PROPERTIES */
 
 	/**
+	 * Whether the setUp method has been called, to avoid running it multiple
+	 * times.
+	 */
+	private hasSetupRun = false;
+
+	/**
 	 * We keep track of all seen states during the current session for two reasons:
 	 *
 	 * 1. So that we can represent recently disconnected users in our UI, even
@@ -131,7 +137,7 @@ export abstract class AwarenessState<
 	 * Hold a snapshot of the previous awareness state allows us to compare the
 	 * state values and avoid unnecessary updates to subscribers.
 	 */
-	private previousSnapshot = new Map< number, State >();
+	private previousSnapshot = new Map< number, EnhancedState< State > >();
 	private stateSubscriptions: Array<
 		( newState: EnhancedState< State >[] ) => void
 	> = [];
@@ -148,9 +154,20 @@ export abstract class AwarenessState<
 	/** CUSTOM METHODS */
 
 	/**
-	 * Set up the awareness state.
+	 * Set up the awareness state. This method is idempotent and will only run
+	 * once. Subclasses should override `onSetUp()` instead of this method to
+	 * add their own setup logic.
+	 *
+	 * This is defined as a readonly arrow function property to prevent
+	 * subclasses from overriding it.
 	 */
-	public setUp(): void {
+	public readonly setUp = (): void => {
+		if ( this.hasSetupRun ) {
+			return;
+		}
+
+		this.hasSetupRun = true;
+
 		this.on(
 			'change',
 			( { added, removed, updated }: AwarenessStateChange ) => {
@@ -172,6 +189,25 @@ export abstract class AwarenessState<
 				this.updateSubscribers();
 			}
 		);
+
+		this.onSetUp();
+	};
+
+	/**
+	 * Hook method for subclasses to add their own setup logic. This is called
+	 * once after the base class setup completes. All subclasses must implement
+	 * this method. If extending a class that already implements `onSetUp()`,
+	 * call `super.onSetUp()` to ensure parent setup runs.
+	 */
+	protected abstract onSetUp(): void;
+
+	/**
+	 * Get the most recent state from the last processed change event.
+	 *
+	 * @return An array of EnhancedState< State >.
+	 */
+	public getCurrentState(): EnhancedState< State >[] {
+		return Array.from( this.previousSnapshot.values() );
 	}
 
 	/**

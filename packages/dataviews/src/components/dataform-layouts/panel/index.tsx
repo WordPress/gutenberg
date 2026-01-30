@@ -147,9 +147,9 @@ export default function FormPanelField< Item >( {
 		null
 	);
 
-	// Track if the panel has been opened (touched) to only show errors after interaction.
+	// Track if the panel has been closed (touched) to only show errors after interaction.
 	const [ touched, setTouched ] = useState( false );
-	const handleOpen = () => setTouched( true );
+	const handleClose = () => setTouched( true );
 
 	const { fieldDefinition, summaryFields } =
 		getFieldDefinitionAndSummaryFields( layout, field, fields );
@@ -193,7 +193,8 @@ export default function FormPanelField< Item >( {
 				labelPosition={ labelPosition }
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
-				onOpen={ handleOpen }
+				onClose={ handleClose }
+				touched={ touched }
 			/>
 		) : (
 			<PanelDropdown
@@ -205,7 +206,8 @@ export default function FormPanelField< Item >( {
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
 				popoverAnchor={ popoverAnchor }
-				onOpen={ handleOpen }
+				onClose={ handleClose }
+				touched={ touched }
 			/>
 		);
 

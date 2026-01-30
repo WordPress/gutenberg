@@ -118,10 +118,10 @@ One of the key strengths of the Interactivity API is how it bridges the gap betw
 Let's extend this example to include a button that the user can click to add a new fruit to the list:
 
 ```html
-<button data-wp-on-async--click="actions.addMango">Add Mango</button>
+<button data-wp-on--click="actions.addMango">Add Mango</button>
 ```
 
-This new button has a `data-wp-on-async--click` directive that references `actions.addMango`, which is defined in our JavaScript store:
+This new button has a `data-wp-on--click` directive that references `actions.addMango`, which is defined in our JavaScript store:
 
 ```javascript
 const { state } = store( 'myFruitPlugin', {
@@ -182,7 +182,7 @@ _Please, visit the [Understanding global state, local context and derived state]
 Let's imagine adding a button that can delete all fruits:
 
 ```html
-<button data-wp-on-async--click="actions.deleteFruits">
+<button data-wp-on--click="actions.deleteFruits">
 	Delete all fruits
 </button>
 ```
@@ -325,10 +325,10 @@ wp_interactivity_state( 'myFruitPlugin', array(
 ?>
 
 <div data-wp-interactive="myFruitPlugin">
-  <button data-wp-on-async--click="actions.deleteFruits">
+  <button data-wp-on--click="actions.deleteFruits">
     <?php echo __( 'Delete all fruits' ); ?>
   </button>
-  <button data-wp-on-async--click="actions.addMango">
+  <button data-wp-on--click="actions.addMango">
     <?php echo __( 'Add Mango' ); ?>
   </button>
   <ul data-wp-bind--hidden="!state.hasFruits">

@@ -79,9 +79,12 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			testInfo.project.name === 'firefox',
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
+		);
 
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -89,7 +92,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Dummy text' },
 		} );
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -139,9 +142,17 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		page,
 		editor,
 		insertingBlocksUtils,
-	} ) => {
+	}, testInfo ) => {
+		testInfo.skip(
+			testInfo.project.name === 'firefox',
+			'Firefox does not dispatch drag events to the iframe content when dragging from outside the iframe.'
+		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
+		);
+
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -152,7 +163,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -179,6 +190,12 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		await page.keyboard.press( 'Escape' );
 
+		// Move mouse 1px to trigger drag end in some browsers.
+		await page.mouse.move(
+			paragraphBoundingBox.x + 1,
+			paragraphBoundingBox.y + 1
+		);
+
 		await expect( insertingBlocksUtils.indicator ).toBeHidden();
 		await expect( insertingBlocksUtils.draggableChip ).toBeHidden();
 
@@ -197,9 +214,12 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			testInfo.project.name === 'firefox',
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
+		);
 
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -208,7 +228,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			attributes: { content: 'Dummy text' },
 		} );
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -259,10 +279,13 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			testInfo.project.name === 'firefox',
 			'The clientX value is always 0 in firefox, see https://github.com/microsoft/playwright/issues/17761 for more info.'
 		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
+		);
 		const PATTERN_NAME = 'My synced pattern';
 
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -271,7 +294,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 			attributes: { content: 'Dummy text' },
 		} );
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -298,10 +321,13 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await createPatternDialog
 			.getByRole( 'button', { name: 'Add' } )
 			.click();
-		const patternBlock = page.getByRole( 'document', {
+		const patternBlock = editor.canvas.getByRole( 'document', {
 			name: 'Block: Pattern',
 		} );
 		await expect( patternBlock ).toBeFocused();
+
+		// Select the Paragraph block (the drop target) so it's selected when we drag over it.
+		await page.keyboard.press( 'ArrowUp' );
 
 		// Insert a synced pattern.
 		await page.click(
@@ -351,9 +377,17 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		page,
 		editor,
 		insertingBlocksUtils,
-	} ) => {
+	}, testInfo ) => {
+		testInfo.skip(
+			testInfo.project.name === 'firefox',
+			'Firefox does not dispatch drag events to the iframe content when dragging from outside the iframe.'
+		);
+		testInfo.skip(
+			testInfo.project.name === 'webkit',
+			'WebKit in CI does not reliably trigger drag events when dragging from outside the iframe.'
+		);
+
 		await admin.createNewPost();
-		await editor.switchToLegacyCanvas();
 
 		// We need a dummy block in place to display the drop indicator due to a bug.
 		// @see https://github.com/WordPress/gutenberg/issues/44064
@@ -364,7 +398,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 
 		const beforeContent = await editor.getEditedPostContent();
 
-		const paragraphBlock = page.locator(
+		const paragraphBlock = editor.canvas.locator(
 			'[data-type="core/paragraph"] >> text=Dummy text'
 		);
 
@@ -393,6 +427,12 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 		await expect( insertingBlocksUtils.draggableChip ).toBeVisible();
 
 		await page.keyboard.press( 'Escape' );
+
+		// Move mouse 1px to trigger drag end in some browsers.
+		await page.mouse.move(
+			paragraphBoundingBox.x + 1,
+			paragraphBoundingBox.y + 1
+		);
 
 		await expect( insertingBlocksUtils.indicator ).toBeHidden();
 		await expect( insertingBlocksUtils.draggableChip ).toBeHidden();
