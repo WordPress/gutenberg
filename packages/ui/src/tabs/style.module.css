@@ -205,7 +205,7 @@
 		}
 	}
 
-	.tab__children {
+	.tab-children {
 		flex-grow: 1;
 
 		display: flex;
@@ -220,7 +220,7 @@
 		}
 	}
 
-	.tab__chevron {
+	.tab-chevron {
 		flex-shrink: 0;
 		margin-inline-end: calc(var(--wpds-dimension-base) * -1); /* TODO: Use or create new control/interactive padding token */
 

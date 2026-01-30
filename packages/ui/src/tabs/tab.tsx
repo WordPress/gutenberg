@@ -22,8 +22,8 @@ export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
 			className={ clsx( styles.tab, className ) }
 			{ ...otherProps }
 		>
-			<span className={ styles.tab__children }>{ children }</span>
-			<Icon icon={ chevronRight } className={ styles.tab__chevron } />
+			<span className={ styles[ 'tab-children' ] }>{ children }</span>
+			<Icon icon={ chevronRight } className={ styles[ 'tab-chevron' ] } />
 		</_Tabs.Tab>
 	);
 } );
