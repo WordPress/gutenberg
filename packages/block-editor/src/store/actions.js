@@ -248,6 +248,13 @@ export const selectPreviousBlock =
 			const firstParentClientId = select.getBlockRootClientId( clientId );
 			if ( firstParentClientId ) {
 				dispatch.selectBlock( firstParentClientId, -1 );
+			} else {
+				// Fallback to next block when no previous block and no parent
+				const nextBlockClientId =
+					select.getNextBlockClientId( clientId );
+				if ( nextBlockClientId ) {
+					dispatch.selectBlock( nextBlockClientId, 0 );
+				}
 			}
 		}
 	};

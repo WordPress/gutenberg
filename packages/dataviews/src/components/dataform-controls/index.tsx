@@ -8,6 +8,7 @@ import type { ComponentType } from 'react';
  */
 import type { DataFormControlProps, Field, EditConfig } from '../../types';
 import checkbox from './checkbox';
+import combobox from './combobox';
 import datetime from './datetime';
 import date from './date';
 import email from './email';
@@ -34,6 +35,7 @@ const FORM_CONTROLS: FormControls = {
 	array,
 	checkbox,
 	color,
+	combobox,
 	datetime,
 	date,
 	email,

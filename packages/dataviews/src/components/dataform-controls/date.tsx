@@ -191,18 +191,53 @@ function ValidatedDateControl< Item >( {
 		setCustomValidity( undefined );
 	}, [ inputRefs ] );
 
+	// Sync React-level validation to native inputs.
 	useEffect( () => {
-		if ( isTouched ) {
-			const timeoutId = setTimeout( () => {
-				if ( validity ) {
-					setCustomValidity( getCustomValidity( isValid, validity ) );
-				} else {
-					validateRefs();
-				}
-			}, 0 );
-			return () => clearTimeout( timeoutId );
+		const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
+		const result = validity
+			? getCustomValidity( isValid, validity )
+			: undefined;
+		for ( const ref of refs ) {
+			const input = ref.current;
+			if ( input ) {
+				input.setCustomValidity(
+					result?.type === 'invalid' && result.message
+						? result.message
+						: ''
+				);
+			}
 		}
-		return undefined;
+	}, [ inputRefs, isValid, validity ] );
+
+	// Listen for 'invalid' events (e.g., from reportValidity() on card re-expand).
+	useEffect( () => {
+		const refs = Array.isArray( inputRefs ) ? inputRefs : [ inputRefs ];
+		const handleInvalid = ( event: Event ) => {
+			event.preventDefault();
+			setIsTouched( true );
+		};
+		for ( const ref of refs ) {
+			ref.current?.addEventListener( 'invalid', handleInvalid );
+		}
+		return () => {
+			for ( const ref of refs ) {
+				ref.current?.removeEventListener( 'invalid', handleInvalid );
+			}
+		};
+	}, [ inputRefs, setIsTouched ] );
+
+	useEffect( () => {
+		if ( ! isTouched ) {
+			return;
+		}
+		const result = validity
+			? getCustomValidity( isValid, validity )
+			: undefined;
+		if ( result ) {
+			setCustomValidity( result );
+		} else {
+			validateRefs();
+		}
 	}, [ isTouched, isValid, validity, validateRefs ] );
 
 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {

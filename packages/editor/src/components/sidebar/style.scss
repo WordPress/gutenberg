@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
 
@@ -20,4 +21,10 @@
 
 .editor-sidebar {
 	@include reset;
+
+	&__revisions-block-message {
+		padding: $grid-unit-20;
+		color: $gray-700;
+		font-size: $default-font-size;
+	}
 }

@@ -3,8 +3,12 @@ name: Compressed Size
 on:
     pull_request:
         paths:
-            # Any change to a CSS, Sass, or JavaScript file should run checks.
+            # Any change to a CSS, Sass, or JavaScript/TypeScript file should run checks.
             - '**.js'
+            - '**.ts'
+            - '**.tsx'
+            - '**.cjs'
+            - '**.mjs'
             - '**.css'
             - '**.scss'
             # Changes to any NPM related files could affect the outcome.
