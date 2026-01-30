@@ -288,6 +288,50 @@ export function logRotationComplete(
 }
 
 /**
+ * Log format transcoding operation.
+ */
+export function logTranscode(
+	itemId: string,
+	fileName: string,
+	inputFormat: string,
+	outputFormat: string,
+	quality: number
+): void {
+	log( `Transcoding: ${ fileName } (${ inputFormat } → ${ outputFormat })`, {
+		category: 'vips',
+		data: {
+			itemId,
+			inputFormat,
+			outputFormat,
+			quality: Math.round( quality * 100 ) + '%',
+		},
+	} );
+}
+
+/**
+ * Log format transcoding completion.
+ */
+export function logTranscodeComplete(
+	itemId: string,
+	fileName: string,
+	outputFormat: string,
+	inputSize: number,
+	outputSize: number
+): void {
+	const savings = Math.round( ( 1 - outputSize / inputSize ) * 100 );
+	log( `Transcoding completed: ${ fileName }`, {
+		category: 'vips',
+		data: {
+			itemId,
+			outputFormat,
+			inputSize: formatBytes( inputSize ),
+			outputSize: formatBytes( outputSize ),
+			savings: savings > 0 ? `${ savings }%` : 'none',
+		},
+	} );
+}
+
+/**
  * Log upload start.
  */
 export function logUploadStart(

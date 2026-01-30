@@ -17,7 +17,12 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 import { cloneFile, convertBlobToFile, renameFile } from '../utils';
 import { StubFile } from '../stub-file';
 import { UploadError } from '../upload-error';
-import { vipsResizeImage, vipsRotateImage } from './utils';
+import {
+	vipsResizeImage,
+	vipsRotateImage,
+	vipsConvertImageFormat,
+	vipsHasTransparency,
+} from './utils';
 import {
 	logQueueAdd,
 	logSideloadAdd,
@@ -29,6 +34,8 @@ import {
 	logResizeComplete,
 	logRotation,
 	logRotationComplete,
+	logTranscode,
+	logTranscodeComplete,
 	logUploadStart,
 	logUploadComplete,
 	logSideloadStart,
@@ -49,6 +56,7 @@ import type {
 	AddOperationsAction,
 	BatchId,
 	CacheBlobUrlAction,
+	ImageFormat,
 	OnBatchSuccessHandler,
 	OnChangeHandler,
 	OnErrorHandler,
@@ -87,6 +95,7 @@ type ActionCreators = {
 	sideloadItem: typeof sideloadItem;
 	resizeCropItem: typeof resizeCropItem;
 	rotateItem: typeof rotateItem;
+	transcodeImageItem: typeof transcodeImageItem;
 	generateThumbnails: typeof generateThumbnails;
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
@@ -446,6 +455,13 @@ export function processItem( id: QueueItemId ) {
 				);
 				break;
 
+			case OperationType.TranscodeImage:
+				dispatch.transcodeImageItem(
+					item.id,
+					operationArgs as OperationArgs[ OperationType.TranscodeImage ]
+				);
+				break;
+
 			case OperationType.Upload:
 				if ( item.parentId ) {
 					dispatch.sideloadItem( id );
@@ -590,6 +606,29 @@ export function finishOperation(
 }
 
 /**
+ * Gets the appropriate interlace setting for the given output format.
+ *
+ * @param outputMimeType The output mime type.
+ * @param settings       The upload settings.
+ * @return Whether to use interlaced encoding.
+ */
+function getInterlacedSetting(
+	outputMimeType: string,
+	settings: Settings
+): boolean {
+	switch ( outputMimeType ) {
+		case 'image/jpeg':
+			return settings.jpegInterlaced ?? false;
+		case 'image/png':
+			return settings.pngInterlaced ?? false;
+		case 'image/gif':
+			return settings.gifInterlaced ?? false;
+		default:
+			return false;
+	}
+}
+
+/**
  * Prepares an item for initial processing.
  *
  * Determines the list of operations to perform for a given image,
@@ -612,13 +651,13 @@ export function prepareItem( id: QueueItemId ) {
 		const { file } = item;
 
 		const operations: Operation[] = [];
+		const settings = select.getSettings();
 
 		const isImage = file.type.startsWith( 'image/' );
 
 		// For images, check if we need to scale down based on threshold.
 		if ( isImage ) {
-			const bigImageSizeThreshold =
-				select.getSettings().bigImageSizeThreshold;
+			const { bigImageSizeThreshold, imageOutputFormats } = settings;
 
 			// If a threshold is set, add a resize operation to scale down large images.
 			// This matches WordPress core's behavior in wp_create_image_subsizes().
@@ -633,6 +672,51 @@ export function prepareItem( id: QueueItemId ) {
 						isThresholdResize: true,
 					},
 				] );
+			}
+
+			// Check if we need to transcode to a different format.
+			// Uses WordPress image_editor_output_format filter settings.
+			const outputMimeType = imageOutputFormats?.[ file.type ];
+			if ( outputMimeType && outputMimeType !== file.type ) {
+				// For PNG -> JPEG conversion, check if the image has transparency.
+				// If it does, skip transcoding to preserve the alpha channel.
+				let shouldTranscode = true;
+
+				if (
+					file.type === 'image/png' &&
+					outputMimeType === 'image/jpeg'
+				) {
+					try {
+						const blobUrl = createBlobURL( file );
+						const hasAlpha = await vipsHasTransparency( blobUrl );
+						revokeBlobURL( blobUrl );
+
+						if ( hasAlpha ) {
+							// Image has transparency, skip conversion to JPEG.
+							shouldTranscode = false;
+						}
+					} catch {
+						// If transparency check fails, err on the side of caution.
+						shouldTranscode = false;
+					}
+				}
+
+				if ( shouldTranscode ) {
+					const outputFormat = outputMimeType.split(
+						'/'
+					)[ 1 ] as ImageFormat;
+					operations.push( [
+						OperationType.TranscodeImage,
+						{
+							outputFormat,
+							outputQuality: 0.82,
+							interlaced: getInterlacedSetting(
+								outputMimeType,
+								settings
+							),
+						},
+					] );
+				}
 			}
 
 			operations.push(
@@ -945,6 +1029,109 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 	};
 }
 
+type TranscodeImageItemArgs = OperationArgs[ OperationType.TranscodeImage ];
+
+/**
+ * Transcodes an image to a different format.
+ *
+ * This operation converts images between formats (e.g., PNG to WebP, JPEG to AVIF)
+ * based on the WordPress image_editor_output_format filter settings.
+ *
+ * @param id     Item ID.
+ * @param [args] Transcode arguments including output format, quality, and interlace settings.
+ */
+export function transcodeImageItem(
+	id: QueueItemId,
+	args?: TranscodeImageItemArgs
+) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		// If no output format specified, skip transcoding.
+		if ( ! args?.outputFormat ) {
+			dispatch.finishOperation( id, {
+				file: item.file,
+			} );
+			return;
+		}
+
+		const outputMimeType = `image/${ args.outputFormat }` as
+			| 'image/jpeg'
+			| 'image/png'
+			| 'image/webp'
+			| 'image/avif'
+			| 'image/gif';
+		const quality = args.outputQuality ?? 0.82;
+		const interlaced = args.interlaced ?? false;
+
+		logTranscode(
+			id,
+			item.file.name,
+			item.file.type,
+			outputMimeType,
+			quality
+		);
+
+		try {
+			const timer = createTimer();
+			const originalSize = item.file.size;
+
+			const file = await vipsConvertImageFormat(
+				item.id,
+				item.file,
+				outputMimeType,
+				quality,
+				interlaced
+			);
+
+			const duration = timer.stop();
+
+			logTranscodeComplete(
+				id,
+				file.name,
+				outputMimeType,
+				originalSize,
+				file.size
+			);
+
+			logOperationComplete( id, 'TranscodeImage', file.name, duration );
+
+			const blobUrl = createBlobURL( file );
+			dispatch< CacheBlobUrlAction >( {
+				type: Type.CacheBlobUrl,
+				id,
+				blobUrl,
+			} );
+
+			dispatch.finishOperation( id, {
+				file,
+				attachment: {
+					url: blobUrl,
+				},
+			} );
+		} catch ( error ) {
+			logError(
+				'transcodeImageItem',
+				error instanceof Error ? error : String( error ),
+				id
+			);
+			dispatch.cancelItem(
+				id,
+				new UploadError( {
+					code: 'MEDIA_TRANSCODING_ERROR',
+					message:
+						'Image could not be transcoded to the target format',
+					file: item.file,
+					cause: error instanceof Error ? error : undefined,
+				} )
+			);
+		}
+	};
+}
+
 /**
  * Adds thumbnail versions to the queue for sideloading.
  *
@@ -1028,7 +1215,15 @@ export function generateThumbnails( id: QueueItemId ) {
 				: item.sourceFile;
 			const batchId = uuidv4();
 
-			const allImageSizes = select.getSettings().allImageSizes || {};
+			const settings = select.getSettings();
+			const allImageSizes = settings.allImageSizes || {};
+			const { imageOutputFormats } = settings;
+
+			// Check if thumbnails should be transcoded to a different format.
+			const sourceType = item.sourceFile.type;
+			const outputMimeType = imageOutputFormats?.[ sourceType ];
+			const shouldTranscodeThumbnails =
+				outputMimeType && outputMimeType !== sourceType;
 
 			for ( const name of attachment.missing_image_sizes ) {
 				const imageSize = allImageSizes[ name ];
@@ -1047,6 +1242,35 @@ export function generateThumbnails( id: QueueItemId ) {
 					imageSize.height,
 					imageSize.crop
 				);
+
+				// Build operations list for this thumbnail.
+				const thumbnailOperations: Operation[] = [
+					[ OperationType.ResizeCrop, { resize: imageSize } ],
+				];
+
+				// Add transcoding if format conversion is configured.
+				// Note: For PNG->JPEG thumbnails, we rely on the main image
+				// transparency check. If the main image was not transcoded
+				// (due to having transparency), thumbnails won't be either.
+				// This matches the server behavior.
+				if ( shouldTranscodeThumbnails ) {
+					const outputFormat = outputMimeType.split(
+						'/'
+					)[ 1 ] as ImageFormat;
+					thumbnailOperations.push( [
+						OperationType.TranscodeImage,
+						{
+							outputFormat,
+							outputQuality: 0.82,
+							interlaced: getInterlacedSetting(
+								outputMimeType,
+								settings
+							),
+						},
+					] );
+				}
+
+				thumbnailOperations.push( OperationType.Upload );
 
 				dispatch.addSideloadItem( {
 					file,
@@ -1071,10 +1295,7 @@ export function generateThumbnails( id: QueueItemId ) {
 						image_size: name,
 						convert_format: false,
 					},
-					operations: [
-						[ OperationType.ResizeCrop, { resize: imageSize } ],
-						OperationType.Upload,
-					],
+					operations: thumbnailOperations,
 				} );
 			}
 		}

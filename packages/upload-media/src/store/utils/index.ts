@@ -6,3 +6,5 @@ export {
 	vipsRotateImage,
 	vipsCancelOperations,
 } from './vips';
+
+export { logTranscode, logTranscodeComplete } from './debug-logger';

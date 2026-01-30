@@ -171,6 +171,15 @@ export interface Settings {
 	// Images larger than this will be scaled down before upload.
 	// Default is 2560 (matching WordPress core).
 	bigImageSizeThreshold?: number;
+	// Output format mapping from WordPress image_editor_output_format filter.
+	// Maps input mime types to output mime types (e.g., 'image/png' -> 'image/webp').
+	imageOutputFormats?: Record< string, string >;
+	// Whether to use interlaced/progressive encoding for JPEG images.
+	jpegInterlaced?: boolean;
+	// Whether to use interlaced encoding for PNG images.
+	pngInterlaced?: boolean;
+	// Whether to use interlaced encoding for GIF images.
+	gifInterlaced?: boolean;
 }
 
 // Must match the Attachment type from the media-utils package.
@@ -224,6 +233,7 @@ export enum OperationType {
 	Upload = 'UPLOAD',
 	ResizeCrop = 'RESIZE_CROP',
 	Rotate = 'ROTATE',
+	TranscodeImage = 'TRANSCODE_IMAGE',
 	ThumbnailGeneration = 'THUMBNAIL_GENERATION',
 }
 
@@ -263,6 +273,20 @@ export interface OperationArgs {
 		 * Used to apply the correct rotation/flip transformation.
 		 */
 		orientation: number;
+	};
+	[ OperationType.TranscodeImage ]: {
+		/**
+		 * Output image format (e.g., 'jpeg', 'webp', 'avif', 'png').
+		 */
+		outputFormat: ImageFormat;
+		/**
+		 * Output quality (0-1). Defaults to 0.82 (82%).
+		 */
+		outputQuality?: number;
+		/**
+		 * Whether to use interlaced/progressive encoding.
+		 */
+		interlaced?: boolean;
 	};
 }
 
