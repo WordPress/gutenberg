@@ -133,7 +133,6 @@ add_filter( 'comments_list_table_query_args', 'gutenberg_hide_note_from_comment_
 /**
  * Override comment_count to exclude notes from the comment count.
  *
- * @global wpdb $wpdb WordPress database abstraction object.
  * @param int|null $new     The new comment count. Default null.
  * @param int      $old     The old comment count.
  * @param int      $post_id Post ID.
