@@ -69,6 +69,11 @@ function gutenberg_get_default_image_output_formats() {
 	$output_formats = array();
 
 	foreach ( $input_formats as $mime_type ) {
+		/*
+		 * The filename parameter is empty because we're querying default format
+		 * mappings, not processing a specific file. The filter returns mappings
+		 * for each input type based on the mime type.
+		 */
 		/** This filter is documented in wp-includes/media.php */
 		$output_formats = apply_filters(
 			'image_editor_output_format', // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound

@@ -605,6 +605,18 @@ export function finishOperation(
 	};
 }
 
+const VALID_IMAGE_FORMATS = [ 'jpeg', 'webp', 'avif', 'png', 'gif' ] as const;
+
+/**
+ * Checks if a format string is a valid ImageFormat.
+ *
+ * @param format The format string to validate.
+ * @return Whether the format is valid.
+ */
+function isValidImageFormat( format: string ): format is ImageFormat {
+	return VALID_IMAGE_FORMATS.includes( format as ImageFormat );
+}
+
 /**
  * Gets the appropriate interlace setting for the given output format.
  *
@@ -686,11 +698,9 @@ export function prepareItem( id: QueueItemId ) {
 					file.type === 'image/png' &&
 					outputMimeType === 'image/jpeg'
 				) {
+					const blobUrl = createBlobURL( file );
 					try {
-						const blobUrl = createBlobURL( file );
 						const hasAlpha = await vipsHasTransparency( blobUrl );
-						revokeBlobURL( blobUrl );
-
 						if ( hasAlpha ) {
 							// Image has transparency, skip conversion to JPEG.
 							shouldTranscode = false;
@@ -698,24 +708,29 @@ export function prepareItem( id: QueueItemId ) {
 					} catch {
 						// If transparency check fails, err on the side of caution.
 						shouldTranscode = false;
+					} finally {
+						revokeBlobURL( blobUrl );
 					}
 				}
 
 				if ( shouldTranscode ) {
-					const outputFormat = outputMimeType.split(
-						'/'
-					)[ 1 ] as ImageFormat;
-					operations.push( [
-						OperationType.TranscodeImage,
-						{
-							outputFormat,
-							outputQuality: 0.82,
-							interlaced: getInterlacedSetting(
-								outputMimeType,
-								settings
-							),
-						},
-					] );
+					const formatPart = outputMimeType.split( '/' )[ 1 ];
+					if ( ! isValidImageFormat( formatPart ) ) {
+						// Unknown format, skip transcoding.
+						shouldTranscode = false;
+					} else {
+						operations.push( [
+							OperationType.TranscodeImage,
+							{
+								outputFormat: formatPart,
+								outputQuality: 0.82,
+								interlaced: getInterlacedSetting(
+									outputMimeType,
+									settings
+								),
+							},
+						] );
+					}
 				}
 			}
 
@@ -1254,20 +1269,20 @@ export function generateThumbnails( id: QueueItemId ) {
 				// (due to having transparency), thumbnails won't be either.
 				// This matches the server behavior.
 				if ( shouldTranscodeThumbnails ) {
-					const outputFormat = outputMimeType.split(
-						'/'
-					)[ 1 ] as ImageFormat;
-					thumbnailOperations.push( [
-						OperationType.TranscodeImage,
-						{
-							outputFormat,
-							outputQuality: 0.82,
-							interlaced: getInterlacedSetting(
-								outputMimeType,
-								settings
-							),
-						},
-					] );
+					const formatPart = outputMimeType.split( '/' )[ 1 ];
+					if ( isValidImageFormat( formatPart ) ) {
+						thumbnailOperations.push( [
+							OperationType.TranscodeImage,
+							{
+								outputFormat: formatPart,
+								outputQuality: 0.82,
+								interlaced: getInterlacedSetting(
+									outputMimeType,
+									settings
+								),
+							},
+						] );
+					}
 				}
 
 				thumbnailOperations.push( OperationType.Upload );
