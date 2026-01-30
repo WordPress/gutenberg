@@ -491,26 +491,6 @@ function validateFormField< Item >(
 		};
 	}
 
-	// Aggregate async validations (`elements` and `custom`).
-	const fieldValidity: FieldValidity = {};
-	// Validate the field: isValid.elements (async)
-	if (
-		!! formField.field &&
-		formField.field.isValid.elements &&
-		formField.field.hasElements &&
-		typeof formField.field.getElements === 'function'
-	) {
-		handleElementsValidationAsync(
-			formField.field.getElements(),
-			formField,
-			promiseHandler
-		);
-		fieldValidity.elements = {
-			type: 'validating',
-			message: __( 'Validating…' ),
-		};
-	}
-
 	// Validate the field: isValid.custom (sync)
 	let customError;
 	if ( !! formField.field && formField.field.isValid.custom ) {
@@ -536,17 +516,41 @@ function validateFormField< Item >(
 					__( 'Unknown error when running custom validation.' );
 			}
 
-			fieldValidity.custom = {
-				type: 'invalid',
-				message: errorMessage,
+			return {
+				custom: {
+					type: 'invalid',
+					message: errorMessage,
+				},
 			};
 		}
 	}
 
 	if ( typeof customError === 'string' ) {
-		fieldValidity.custom = {
-			type: 'invalid',
-			message: customError,
+		return {
+			custom: {
+				type: 'invalid',
+				message: customError,
+			},
+		};
+	}
+
+	// Aggregate async validations (`elements` and `custom`).
+	const fieldValidity: FieldValidity = {};
+	// Validate the field: isValid.elements (async)
+	if (
+		!! formField.field &&
+		formField.field.isValid.elements &&
+		formField.field.hasElements &&
+		typeof formField.field.getElements === 'function'
+	) {
+		handleElementsValidationAsync(
+			formField.field.getElements(),
+			formField,
+			promiseHandler
+		);
+		fieldValidity.elements = {
+			type: 'validating',
+			message: __( 'Validating…' ),
 		};
 	}
 
