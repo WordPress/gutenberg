@@ -3,6 +3,8 @@
 ## Unreleased
 
 - Update documentation to describe `wpPlugin.name`
+- Add `wpWorkers` field support for automatic worker bundling ([#74785](https://github.com/WordPress/gutenberg/pull/74785)).
+- Add WASM inlining plugin for bundling WebAssembly modules.
 
 ## 0.6.0 (2026-01-16)
 
