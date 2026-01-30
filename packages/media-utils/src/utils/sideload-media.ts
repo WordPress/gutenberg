@@ -30,6 +30,8 @@ interface SideloadMediaArgs {
 	onFileChange?: OnChangeHandler;
 	// Abort signal.
 	signal?: AbortSignal;
+	// Function called with upload progress (0-100).
+	onProgress?: ( progress: number ) => void;
 }
 
 /**
@@ -42,6 +44,7 @@ interface SideloadMediaArgs {
  * @param $0.signal         Abort signal.
  * @param $0.onFileChange   Function called each time a file or a temporary representation of the file is available.
  * @param $0.onError        Function called when an error happens.
+ * @param $0.onProgress     Function called with upload progress (0-100).
  */
 export async function sideloadMedia( {
 	file,
@@ -50,13 +53,15 @@ export async function sideloadMedia( {
 	signal,
 	onFileChange,
 	onError = noop,
+	onProgress,
 }: SideloadMediaArgs ) {
 	try {
 		const attachment = await sideloadToServer(
 			file,
 			attachmentId,
 			additionalData,
-			signal
+			signal,
+			onProgress
 		);
 		onFileChange?.( [ attachment ] );
 	} catch ( error ) {

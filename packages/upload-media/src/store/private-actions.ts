@@ -30,6 +30,7 @@ import {
 	logRotation,
 	logRotationComplete,
 	logUploadStart,
+	logUploadProgress,
 	logUploadComplete,
 	logSideloadStart,
 	logSideloadComplete,
@@ -677,6 +678,10 @@ export function uploadItem( id: QueueItemId ) {
 			filesList: [ item.file ],
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
+			onProgress: ( progress: number ) => {
+				logUploadProgress( id, item.file.name, progress );
+				dispatch.updateItemProgress( id, progress );
+			},
 			onFileChange: ( [ attachment ] ) => {
 				if ( ! isBlobURL( attachment.url ) ) {
 					logUploadComplete(
@@ -746,6 +751,10 @@ export function sideloadItem( id: QueueItemId ) {
 			attachmentId: post as number,
 			additionalData: { image_size: imageSize, ...additionalData },
 			signal: item.abortController?.signal,
+			onProgress: ( progress: number ) => {
+				logUploadProgress( id, item.file.name, progress );
+				dispatch.updateItemProgress( id, progress );
+			},
 			onFileChange: ( [ attachment ] ) => {
 				logSideloadComplete(
 					id,

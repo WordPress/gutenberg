@@ -305,6 +305,20 @@ export function logUploadStart(
 }
 
 /**
+ * Log upload progress.
+ */
+export function logUploadProgress(
+	itemId: string,
+	fileName: string,
+	progress: number
+): void {
+	log( `Upload progress: ${ progress }% - ${ fileName }`, {
+		category: 'upload',
+		data: { itemId, progress },
+	} );
+}
+
+/**
  * Log upload completion.
  */
 export function logUploadComplete(
