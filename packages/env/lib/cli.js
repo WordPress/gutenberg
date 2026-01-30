@@ -311,12 +311,6 @@ module.exports = function cli() {
 		},
 		withSpinner( env.status )
 	);
-	yargs.command(
-		'install-path',
-		'Get the path where all of the environment files are stored. This includes the Docker files, WordPress, PHPUnit files, and any sources that were downloaded.',
-		() => {},
-		withSpinner( env.installPath )
-	);
 
 	return yargs;
 };

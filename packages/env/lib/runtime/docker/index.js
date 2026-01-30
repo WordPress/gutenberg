@@ -422,7 +422,8 @@ class DockerRuntime {
 		spinner.text = 'Removing local files.';
 		// Note: there is a race condition where docker compose actually hasn't finished
 		// by this point, which causes rimraf to fail. We need to wait at least 2.5-5s,
-		// but using 10s in case it's dependant on the machine.
+		// but using 10s in case it's dependent on the machine. Removing images takes
+		// longer so we use a longer wait time here.
 		await new Promise( ( resolve ) => setTimeout( resolve, 10000 ) );
 		await rimraf( config.workDirectoryPath );
 
@@ -449,8 +450,8 @@ class DockerRuntime {
 		spinner.text = 'Removing local files.';
 		// Note: there is a race condition where docker compose actually hasn't finished
 		// by this point, which causes rimraf to fail. We need to wait at least 2.5-5s,
-		// but using 10s in case it's dependant on the machine.
-		await new Promise( ( resolve ) => setTimeout( resolve, 10000 ) );
+		// but since we're not removing images, the wait can be shorter.
+		await new Promise( ( resolve ) => setTimeout( resolve, 3000 ) );
 		await rimraf( config.workDirectoryPath );
 
 		spinner.text = 'Cleaned up WordPress environment.';
