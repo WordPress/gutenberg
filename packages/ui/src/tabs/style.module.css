@@ -5,6 +5,7 @@
 		display: flex;
 		align-items: stretch;
 		overflow-inline: auto;
+		overscroll-behavior-inline: none;
 
 		--direction-factor: 1;
 		--direction-start: left;

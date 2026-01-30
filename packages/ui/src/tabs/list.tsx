@@ -11,7 +11,8 @@ import { useMergeRefs } from '@wordpress/compose';
 import styles from './style.module.css';
 import type { TabListProps } from './types';
 
-const DEFAULT_SCROLL_MARGIN = 0;
+// Account for sub-pixel rounding errors.
+const SCROLL_EPSILON = 1;
 
 /**
  * Groups the individual tab buttons.
@@ -48,12 +49,25 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 
 			const measureOverflow = () => {
 				const { scrollWidth, clientWidth, scrollLeft } = listEl;
+				const maxScroll = Math.max( scrollWidth - clientWidth, 0 );
+				const direction =
+					listEl.dir ||
+					( typeof window !== 'undefined'
+						? window.getComputedStyle( listEl ).direction
+						: 'ltr' );
 
+				const scrollFromStart =
+					direction === 'rtl' && scrollLeft < 0
+						? // In RTL layouts, scrollLeft is typically 0 at the visual "start"
+						  // (right edge) and becomes negative toward the "end" (left edge).
+						  // Normalize value for correct first/last detection logic.
+						  -scrollLeft
+						: scrollLeft;
+
+				// Use SCROLL_EPSILON to handle subpixel rendering differences.
 				setOverflow( {
-					first: scrollLeft > DEFAULT_SCROLL_MARGIN,
-					last:
-						scrollLeft + clientWidth <
-						scrollWidth - DEFAULT_SCROLL_MARGIN,
+					first: scrollFromStart > SCROLL_EPSILON,
+					last: scrollFromStart < maxScroll - SCROLL_EPSILON,
 				} );
 			};
 
