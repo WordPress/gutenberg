@@ -213,7 +213,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
-			{ isEditMode && (
+			{ isEditMode && isReady && (
 				<WelcomeGuide
 					postType={ postWithTemplate ? context.postType : postType }
 				/>
