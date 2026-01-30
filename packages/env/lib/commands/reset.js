@@ -17,8 +17,6 @@ const { getRuntime, detectRuntime } = require( '../runtime' );
  */
 
 /**
- * @deprecated Use `reset` instead.
- *
  * Resets the development server's database, the tests server's database, or both.
  *
  * @param {Object}                 options
@@ -27,21 +25,18 @@ const { getRuntime, detectRuntime } = require( '../runtime' );
  * @param {boolean}                options.scripts     Indicates whether or not lifecycle scripts should be executed.
  * @param {boolean}                options.debug       True if debug mode is enabled.
  */
-module.exports = async function clean( {
+module.exports = async function reset( {
 	environment,
 	spinner,
 	scripts,
 	debug,
 } ) {
-	spinner.warn( 'The `clean` command is deprecated. Use `reset` instead.' );
-
 	const config = await loadConfig( path.resolve( '.' ) );
 	const runtime = getRuntime( detectRuntime( config.workDirectoryPath ) );
 
 	await runtime.clean( config, { environment, spinner, debug } );
 
-	// Execute afterClean for backwards compatibility.
 	if ( scripts ) {
-		await executeLifecycleScript( 'afterClean', config, spinner );
+		await executeLifecycleScript( 'afterReset', config, spinner );
 	}
 };

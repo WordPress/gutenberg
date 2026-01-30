@@ -163,12 +163,30 @@ module.exports = function cli() {
 		withSpinner( env.stop )
 	);
 	yargs.command(
-		'clean [environment]',
-		wpYellow( 'Cleans the WordPress databases.' ),
+		'reset [environment]',
+		wpYellow( 'Resets the WordPress databases.' ),
 		( args ) => {
 			args.positional( 'environment', {
 				type: 'string',
-				describe: "Which environments' databases to clean.",
+				describe: "Which environments' databases to reset.",
+				choices: [ 'all', 'development', 'tests' ],
+				default: 'tests',
+			} );
+			args.option( 'scripts', {
+				type: 'boolean',
+				describe: 'Execute any configured lifecycle scripts.',
+				default: true,
+			} );
+		},
+		withSpinner( env.reset )
+	);
+	yargs.command(
+		'clean [environment]',
+		chalk.gray( '[Deprecated: use reset] Resets the WordPress databases.' ),
+		( args ) => {
+			args.positional( 'environment', {
+				type: 'string',
+				describe: "Which environments' databases to reset.",
 				choices: [ 'all', 'development', 'tests' ],
 				default: 'tests',
 			} );
@@ -246,7 +264,7 @@ module.exports = function cli() {
 	yargs.command(
 		'destroy',
 		wpRed(
-			'Destroy the WordPress environment. Deletes docker containers, volumes, and networks associated with the WordPress environment and removes local files.'
+			'Destroy the WordPress environment. Deletes docker containers, volumes, networks, and images associated with the WordPress environment and removes local files.'
 		),
 		( args ) => {
 			args.option( 'scripts', {
@@ -254,8 +272,32 @@ module.exports = function cli() {
 				describe: 'Execute any configured lifecycle scripts.',
 				default: true,
 			} );
+			args.option( 'force', {
+				type: 'boolean',
+				describe: 'Skip the confirmation prompt.',
+				default: false,
+			} );
 		},
 		withSpinner( env.destroy )
+	);
+	yargs.command(
+		'cleanup',
+		wpYellow(
+			'Cleanup the WordPress environment. Removes docker containers, volumes, networks, and local files, but preserves docker images for faster re-starts.'
+		),
+		( args ) => {
+			args.option( 'scripts', {
+				type: 'boolean',
+				describe: 'Execute any configured lifecycle scripts.',
+				default: true,
+			} );
+			args.option( 'force', {
+				type: 'boolean',
+				describe: 'Skip the confirmation prompt.',
+				default: false,
+			} );
+		},
+		withSpinner( env.cleanup )
 	);
 	yargs.command(
 		'status',

@@ -1,20 +1,22 @@
 {
-	"name": "@wordpress/vips",
+	"name": "@wordpress/worker-threads",
 	"version": "1.0.0-prerelease",
 	"private": true,
-	"description": "Utils for working with libvips.",
+	"description": "Utilities for type-safe Web Worker communication with RPC.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"media",
-		"libvips"
+		"worker",
+		"web-worker",
+		"rpc",
+		"threads"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/vips/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/worker-threads/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
-		"directory": "packages/vips"
+		"directory": "packages/worker-threads"
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
@@ -25,30 +27,30 @@
 	},
 	"files": [
 		"src",
+		"build",
 		"build-module",
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
+	"main": "build/index.cjs",
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.mjs"
+			"import": "./build-module/index.mjs",
+			"default": "./build/index.cjs"
 		},
 		"./worker": {
-			"types": "./build-types/vips-worker.d.ts",
-			"import": "./build-module/vips-worker.mjs"
+			"types": "./build-types/worker-thread.d.ts",
+			"import": "./build-module/worker-thread.mjs",
+			"default": "./build/worker-thread.cjs"
 		},
 		"./package.json": "./package.json"
 	},
 	"types": "build-types",
-	"wpWorkers": {
-		"./worker": "./src/worker.ts"
-	},
+	"sideEffects": false,
 	"dependencies": {
-		"@wordpress/worker-threads": "file:../worker-threads",
-		"wasm-vips": "^0.0.10"
+		"comctx": "^1.4.3"
 	},
 	"publishConfig": {
 		"access": "public"
