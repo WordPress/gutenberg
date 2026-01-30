@@ -49,7 +49,7 @@ You should use global state when:
         	<div data-wp-bind--hidden="!state.show">
         		Hello <span data-wp-text="state.helloText"></span>
         	</div>
-        	<button data-wp-on-async--click="actions.toggle">Toggle</button>
+        	<button data-wp-on--click="actions.toggle">Toggle</button>
         </div>
         ```
 
@@ -64,7 +64,7 @@ You should use global state when:
         	<div hidden data-wp-bind--hidden="!state.show">
         		Hello <span data-wp-text="state.helloText">world</span>
         	</div>
-        	<button data-wp-on-async--click="actions.toggle">Toggle</button>
+        	<button data-wp-on--click="actions.toggle">Toggle</button>
         </div>
         ```
 
@@ -219,7 +219,7 @@ In this example, there are two independent interactive blocks. One displays a co
       data-wp-interactive="myCounterPlugin"
       <?php echo get_block_wrapper_attributes(); ?>
     >
-      <button data-wp-on-async--click="actions.increment">
+      <button data-wp-on--click="actions.increment">
         Increment
       </button>
     </div>
@@ -239,7 +239,7 @@ In this example:
 
 1. The global state is initialized on the server using `wp_interactivity_state`, setting an initial `counter` of 0.
 2. The Counter Block displays the current counter using `data-wp-text="state.counter"`, which reads from the global state.
-3. The Increment Block contains a button that triggers the `increment` action when clicked, using `data-wp-on-async--click="actions.increment"`.
+3. The Increment Block contains a button that triggers the `increment` action when clicked, using `data-wp-on--click="actions.increment"`.
 4. In JavaScript, the `increment` action directly modifies the global state by incrementing `state.counter`.
 
 Both blocks are independent and can be placed anywhere on the page. They don't need to be nested or directly related in the DOM structure. Multiple instances of these interactive blocks can be added to the page, and they will all share and update the same global counter value.
@@ -363,7 +363,7 @@ In this example, there is a single interactive block that shows a counter and ca
   data-wp-context='{ "counter": 0 }'
 >
   <p>Counter: <span data-wp-text="context.counter"></span></p>
-  <button data-wp-on-async--click="actions.increment">Increment</button>
+  <button data-wp-on--click="actions.increment">Increment</button>
 </div>
 ```
 
@@ -382,7 +382,7 @@ In this example:
 
 1. A local context with an initial `counter` value of `0` is defined using the `data-wp-context` directive.
 2. The counter is displayed using `data-wp-text="context.counter"`, which reads from the local context.
-3. The increment button uses `data-wp-on-async--click="actions.increment"` to trigger the increment action.
+3. The increment button uses `data-wp-on--click="actions.increment"` to trigger the increment action.
 4. In JavaScript, the `getContext` function is used to access and modify the local context for each block instance.
 
 A user will be able to add multiple instances of this block to a page, and each will maintain its own independent counter. Clicking the "Increment" button on one block will only affect that specific block's counter and not the others.
@@ -675,7 +675,7 @@ store( 'myCounterPlugin', {
 		Double: <span data-wp-text="state.double"></span>
 
 		<!-- This button will increment the local counter. -->
-		<button data-wp-on-async--click="actions.increment">Increment</button>
+		<button data-wp-on--click="actions.increment">Increment</button>
 	</div>
 
 	<!-- This will render "Double: 4" -->
@@ -683,7 +683,7 @@ store( 'myCounterPlugin', {
 		Double: <span data-wp-text="state.double"></span>
 
 		<!-- This button will increment the local counter. -->
-		<button data-wp-on-async--click="actions.increment">Increment</button>
+		<button data-wp-on--click="actions.increment">Increment</button>
 	</div>
 </div>
 ```
@@ -757,19 +757,19 @@ Let's consider a quiz that has multiple questions. Each question is a separate p
 ```
 
 ```javascript
-import { store, getServerState } from '@wordpress/interactivity';
+import { store, getServerState, withSyncEvent } from '@wordpress/interactivity';
 
-store( 'myPlugin', {
+const { state } = store( 'myPlugin', {
 	actions: {
 		// This action would be triggered by a directive, like:
-		// <button data-wp-on-click="actions.nextQuestion">Next Question</button>
-		*nextQuestion() {
-			event.preventDefault( event );
+		// <button data-wp-on--click="actions.nextQuestion">Next Question</button>
+		nextQuestion: withSyncEvent( function* ( event ) {
+			event.preventDefault();
 			const { actions } = yield import(
 				'@wordpress/interactivity-router'
 			);
 			actions.navigate( '/question-2' );
-		},
+		} ),
 	},
 	callbacks: {
 		// This callback would be triggered by a directive, like:
@@ -784,6 +784,8 @@ store( 'myPlugin', {
 	},
 } );
 ```
+
+_Note: Actions that need to call synchronous event methods like `event.preventDefault()` must wrap the handler with `withSyncEvent()`. See the [withSyncEvent() documentation](/docs/reference-guides/interactivity-api/api-reference.md#withsyncevent) for details._
 
 ### `getServerContext()`
 
@@ -800,19 +802,19 @@ Consider a quiz that has multiple questions. Each question is a separate page. W
 ```
 
 ```javascript
-import { store, getServerContext } from '@wordpress/interactivity';
+import { store, getContext, getServerContext, withSyncEvent } from '@wordpress/interactivity';
 
 store( 'myPlugin', {
 	actions: {
 		// This action would be triggered by a directive, like:
-		// <button data-wp-on-click="actions.nextQuestion">Next Question</button>
-		*nextQuestion() {
-			event.preventDefault( event );
+		// <button data-wp-on--click="actions.nextQuestion">Next Question</button>
+		nextQuestion: withSyncEvent( function* ( event ) {
+			event.preventDefault();
 			const { actions } = yield import(
 				'@wordpress/interactivity-router'
 			);
 			actions.navigate( '/question-2' );
-		},
+		} ),
 	},
 	callbacks: {
 		// This callback would be triggered by a directive, like:
@@ -837,6 +839,68 @@ Whenever you have interactive blocks that rely on global state or local context 
 -   **Read-Only References:** Both `getServerState()` and `getServerContext()` return read-only objects. You can use those objects to update the global state or local context.
 -   **Callback Integration:** Incorporate these functions within your store [callbacks](/docs/reference-guides/interactivity-api/api-reference.md#accessing-data-in-callbacks) to react to state and context changes. Both `getServerState()` and `getServerContext()` return reactive objects. This means that their watch callbacks will only trigger when the value of a property changes. If the value remains the same, the callback will not re-trigger.
 
+## Config
+
+**Config** in the Interactivity API refers to static configuration data that is serialized from the server to the client. Unlike global state or local context, config values are **not reactive** - they don't trigger UI updates and remain constant throughout the client-side lifecycle.
+
+Config is ideal for sending non-reactive data from PHP to JavaScript, such as API endpoints, nonces, feature flags, or translations that won't change during user interaction.
+
+You should use config when:
+
+-   You need to pass static configuration data from the server to the client
+-   The data doesn't need to be reactive (won't change during user interactions)
+-   You want to send API URLs, authentication tokens, or feature toggles
+-   You need to provide translations or other static content
+
+### Working with config
+
+-   **Setting config on the server**
+
+    Use the `wp_interactivity_config()` function in PHP to define configuration values:
+
+    ```php
+    // Setting config values
+    wp_interactivity_config( 'myPlugin', array(
+        'restApiUrl'     => get_rest_url( null, 'my-plugin/v1/' ),
+        'nonce'          => wp_create_nonce( 'my_plugin_action' ),
+        'isUserLoggedIn' => is_user_logged_in(),
+        'translations'   => array(
+            'loading'    => __( 'Loading...', 'my-plugin' ),
+            'error'      => __( 'An error occurred', 'my-plugin' ),
+        ),
+    ) );
+    ```
+
+-   **Accessing config on the client**
+
+    Use the `getConfig()` function in JavaScript to retrieve configuration values:
+
+    ```js
+    import { store, getConfig } from '@wordpress/interactivity';
+
+    const { state } = store( 'myPlugin', {
+    	actions: {
+    		*fetchData() {
+    			const { restApiUrl, nonce } = getConfig();
+
+    			try {
+    				const response = yield fetch( `${ restApiUrl }data`, {
+    					method: 'POST',
+    					headers: {
+    						'X-WP-Nonce': nonce,
+    					},
+    				} );
+    				const data = yield response.json();
+    				state.data = data;
+    			} catch ( error ) {
+    				const { translations } = getConfig();
+    				state.errorMessage = translations.error;
+    			}
+    		},
+    	},
+    } );
+    ```
+
 ## Conclusion
 
-Remember, the key to effective state management is to keep your state minimal and avoid redundancy. Use derived state to compute values dynamically, and choose between global state and local context based on the scope and requirements of your data. This will lead to a cleaner, more robust architecture that is easier to debug and maintain. Finally, if you need to synchronize the state or context with the server, you can use `getServerState()` and `getServerContext()` to achieve this.
+Remember, the key to effective state management is to keep your state minimal and avoid redundancy. Use derived state to compute values dynamically, choose between global state and local context based on the scope and requirements of your data, and use config for static server-to-client data. This will lead to a cleaner, more robust architecture that is easier to debug and maintain. Finally, if you need to synchronize the state or context with the server, you can use `getServerState()` and `getServerContext()` to achieve this.

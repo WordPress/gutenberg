@@ -350,7 +350,7 @@ The returned value is used to change the inner content of the element: `<div>val
 ### `wp-on`
 
 <div class="callout callout-info">
-  Consider using the more performant <a href="#wp-on-async"><code>wp-on-async</code></a> instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an <a href="#async-actions"><code>async action</code></a> which yields to the main thread after calling the synchronous API.
+  This directive runs asynchronously by default to improve performance. If you need synchronous access to the <code>event</code> object, use <a href="#withsyncevent"><code>withSyncEvent()</code></a> to wrap your action. For async actions that also need synchronous event access, you can combine <code>withSyncEvent()</code> with a <a href="#async-actions">generator function</a> that yields to the main thread after calling the synchronous API.
 </div>
 
 This directive runs code on dispatched DOM events like `click` or `keyup`. The syntax is `data-wp-on--[event]` (like `data-wp-on--click` or `data-wp-on--keyup`).
@@ -380,14 +380,10 @@ The `wp-on` directive is executed each time the associated event is triggered.
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored.
 
-### `wp-on-async`
-
-This directive is a more performant approach for `wp-on`. It immediately yields to main to avoid contributing to a long task, allowing other interactions that otherwise would be waiting on the main thread to run sooner. Use this async version whenever there is no need for synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`.
-
 ### `wp-on-window`
 
 <div class="callout callout-info">
-  Consider using the more performant <a href="#wp-on-async-window"><code>wp-on-async-window</code></a> instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an <a href="#async-actions"><code>async action</code></a> which yields to the main thread after calling the synchronous API.
+  This directive runs asynchronously by default to improve performance. If you need synchronous access to the <code>event</code> object, use <a href="#withsyncevent"><code>withSyncEvent()</code></a> to wrap your action. For async actions that also need synchronous event access, you can combine <code>withSyncEvent()</code> with a <a href="#async-actions">generator function</a> that yields to the main thread after calling the synchronous API.
 </div>
 
 This directive allows you to attach global window events like `resize`, `copy`, and `focus` and then execute a defined callback when those happen.
@@ -417,14 +413,10 @@ store( 'myPlugin', {
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
 
-### `wp-on-async-window`
-
-Similar to `wp-on-async`, this is an optimized version of `wp-on-window` that immediately yields to main to avoid contributing to a long task. Use this async version whenever there is no need for synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`. This event listener is also added as [`passive`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive).
-
 ### `wp-on-document`
 
 <div class="callout callout-info">
-  Consider using the more performant <a href="#wp-on-async-document"><code>wp-on-async-document</code></a> instead if your directive code does not need synchronous access to the event object. If synchronous access is required, consider implementing an <a href="#async-actions"><code>async action</code></a> which yields to the main thread after calling the synchronous API.
+  This directive runs asynchronously by default to improve performance. If you need synchronous access to the <code>event</code> object, use <a href="#withsyncevent"><code>withSyncEvent()</code></a> to wrap your action. For async actions that also need synchronous event access, you can combine <code>withSyncEvent()</code> with a <a href="#async-actions">generator function</a> that yields to the main thread after calling the synchronous API.
 </div>
 
 This directive allows you to attach global document events like `scroll`, `mousemove`, and `keydown` and then execute a defined callback when those happen.
@@ -453,10 +445,6 @@ store( 'myPlugin', {
 </details>
 
 The callback passed as the reference receives [the event](https://developer.mozilla.org/en-US/docs/Web/API/Event) (`event`), and the returned value by this callback is ignored. When the element is removed from the DOM, the event listener is also removed.
-
-### `wp-on-async-document`
-
-Similar to `wp-on-async`, this is an optimized version of `wp-on-document` that immediately yields to main to avoid contributing to a long task. Use this async version whenever there is no need for synchronous access to the `event` object, in particular the methods `event.preventDefault()`, `event.stopPropagation()`, and `event.stopImmediatePropagation()`. This event listener is also added as [`passive`](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener#passive).
 
 ### `wp-watch`
 
@@ -1290,6 +1278,23 @@ store( 'myPlugin', {
 		logSomething: () => {
 			console.log( 'something' );
 		},
+	},
+} );
+```
+
+You can also use `withSyncEvent()` with generator functions (async actions). This is useful when you need both synchronous event access and asynchronous operations:
+
+```js
+import { store, withSyncEvent } from '@wordpress/interactivity';
+
+store( 'myPlugin', {
+	actions: {
+		// Combining withSyncEvent with a generator function for async operations.
+		navigate: withSyncEvent( function* ( event ) {
+			event.preventDefault();
+			const { actions } = yield import( '@wordpress/interactivity-router' );
+			yield actions.navigate( event.target.href );
+		} ),
 	},
 } );
 ```

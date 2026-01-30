@@ -4,8 +4,22 @@
 const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Block Hiding', () => {
-	test.beforeEach( async ( { admin } ) => {
+	test.beforeEach( async ( { admin, page } ) => {
 		await admin.createNewPost();
+
+		// Run the test with the sidebar closed
+		const toggleSidebarButton = page
+			.getByRole( 'region', { name: 'Editor top bar' } )
+			.getByRole( 'button', {
+				name: 'Settings',
+				disabled: false,
+			} );
+		const isClosed =
+			( await toggleSidebarButton.getAttribute( 'aria-expanded' ) ) ===
+			'false';
+		if ( ! isClosed ) {
+			await toggleSidebarButton.click();
+		}
 	} );
 
 	test( 'should hide a block completely by selecting "Omit from published content"', async ( {
@@ -46,6 +60,7 @@ test.describe( 'Block Hiding', () => {
 		).toBeVisible();
 
 		// Verify the Options menu now shows "Show" instead of "Hide".
+		await editor.clickBlockToolbarButton( 'Options' );
 		await expect(
 			page
 				.getByRole( 'menu', { name: 'Options' } )

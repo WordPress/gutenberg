@@ -96,11 +96,11 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 	}
 
 	if ( borderRadius ) {
-		style.borderRadius = `var(--wpds-border-radius-${ target }-${ borderRadius }, var(--wpds-border-radius-surface-${ borderRadius }))`;
+		style.borderRadius = `var(--wpds-border-radius-${ target }-${ borderRadius }, var(--wpds-border-radius-${ borderRadius }))`;
 	}
 
 	if ( borderWidth ) {
-		style.borderWidth = `var(--wpds-border-width-${ target }-${ borderWidth }, var(--wpds-border-width-surface-${ borderWidth }))`;
+		style.borderWidth = `var(--wpds-border-width-${ target }-${ borderWidth }, var(--wpds-border-width-${ borderWidth }))`;
 		style.borderStyle = 'solid';
 	}
 

@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Replaced `install-path` command with `status` command. The work directory path is now available as part of the status output.
+
+### New Features
+
+-   Added `status` command that shows comprehensive environment information including running state, URLs, ports, configuration, and paths.
+
+## 10.39.0 (2026-01-29)
+
+### New Features
+
+-   Add experimental WordPress Playground runtime support. Use `--runtime=playground` flag to start wp-env with Playground instead of Docker.
+
 ## 10.38.0 (2026-01-16)
 
 ## 10.36.0 (2025-11-26)

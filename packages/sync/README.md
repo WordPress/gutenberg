@@ -50,6 +50,10 @@ The sync manager orchestrates the lifecycle of syncing entity records. It create
 
 Deltas are used to calculate incremental Y.Text updates.
 
+### EnhancedState
+
+An enhanced state includes additional metadata about the user's connection.
+
 ### LOCAL_EDITOR_ORIGIN
 
 Origin string for CRDT document changes originating from the local editor.

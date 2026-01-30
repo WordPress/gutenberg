@@ -264,9 +264,7 @@ export default function TemplatePartEdit( {
 									} );
 								} }
 							>
-								{ window?.__experimentalContentOnlyPatternInsertion
-									? __( 'Edit section' )
-									: __( 'Edit' ) }
+								{ __( 'Edit section' ) }
 							</ToolbarButton>
 						</BlockControls>
 					) }

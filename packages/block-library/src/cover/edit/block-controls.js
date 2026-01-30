@@ -18,7 +18,7 @@ import { link } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { ALLOWED_MEDIA_TYPES } from '../shared';
+import { ALLOWED_MEDIA_TYPES, EMBED_VIDEO_BACKGROUND_TYPE } from '../shared';
 import { unlock } from '../../lock-unlock';
 import EmbedVideoUrlInput from './embed-video-url-input';
 
@@ -34,8 +34,14 @@ export default function CoverBlockControls( {
 	onSelectEmbedUrl,
 	blockEditingMode,
 } ) {
-	const { contentPosition, id, useFeaturedImage, minHeight, minHeightUnit } =
-		attributes;
+	const {
+		contentPosition,
+		id,
+		useFeaturedImage,
+		minHeight,
+		minHeightUnit,
+		backgroundType,
+	} = attributes;
 	const { hasInnerBlocks, url } = currentSettings;
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
@@ -144,6 +150,11 @@ export default function CoverBlockControls( {
 						onSelectEmbedUrl( embedUrl );
 					} }
 					onClose={ () => setIsEmbedUrlInputOpen( false ) }
+					initialUrl={
+						backgroundType === EMBED_VIDEO_BACKGROUND_TYPE
+							? url
+							: ''
+					}
 				/>
 			) }
 		</>
