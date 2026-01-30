@@ -281,17 +281,6 @@ export default function PostList( { postType } ) {
 			title={ labels?.name }
 			actions={
 				<>
-					{ isModified && (
-						<Button
-							__next40pxDefaultSize
-							onClick={ () => {
-								resetToDefault();
-								history.invalidate();
-							} }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
 					{ labels?.add_new_item && canCreateRecord && (
 						<>
 							<Button
@@ -331,6 +320,14 @@ export default function PostList( { postType } ) {
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
 				defaultLayouts={ defaultLayouts }
+				onReset={
+					isModified
+						? () => {
+								resetToDefault();
+								history.invalidate();
+						  }
+						: false
+				}
 			/>
 			{ quickEdit &&
 				! isLoadingData &&
