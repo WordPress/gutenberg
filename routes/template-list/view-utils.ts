@@ -74,7 +74,9 @@ export async function ensureView(
 		name: 'wp_template',
 		slug: 'default-new',
 		defaultView: DEFAULT_VIEW,
-		activeViewOverrides: getActiveViewOverridesForTab( activeView ?? 'active' ),
+		activeViewOverrides: getActiveViewOverridesForTab(
+			activeView ?? 'active'
+		),
 		queryParams: search,
 	} );
 }
@@ -106,7 +108,9 @@ export async function ensureViewLegacy(
 		name: 'wp_template',
 		slug: 'default-new',
 		defaultView: DEFAULT_VIEW_LEGACY,
-		activeViewOverrides: getActiveViewOverridesForTabLegacy( activeView ?? 'all' ),
+		activeViewOverrides: getActiveViewOverridesForTabLegacy(
+			activeView ?? 'all'
+		),
 		queryParams: search,
 	} );
 }

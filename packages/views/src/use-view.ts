@@ -43,14 +43,7 @@ function omit< T extends object, K extends keyof T >(
 /**
  * Hook for managing DataViews view state with local persistence.
  *
- * @param config                      Configuration object for loading the view.
- * @param config.kind                 Entity kind (e.g., 'postType', 'taxonomy', 'root').
- * @param config.name                 Specific entity name.
- * @param config.slug                 View identifier.
- * @param config.defaultView          Default view configuration.
- * @param config.activeViewOverrides  View overrides applied on top but never persisted.
- * @param config.queryParams          Object with `page` and/or `search` from URL.
- * @param config.onChangeQueryParams  Optional callback to update URL parameters.
+ * @param config Configuration object for loading the view.
  *
  * @return Object with current view, modification state, and update functions.
  */

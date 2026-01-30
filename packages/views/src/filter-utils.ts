@@ -10,14 +10,12 @@ type ActiveViewOverrides = {
 
 /**
  * Merges activeViewOverrides into a view.
- * - Filters: Active filters take precedence; any existing filter on the same
- *   field is removed and replaced by the active filter.
- * - Sort: Active sort is applied only if no persisted sort exists (i.e., the
- *   view uses the default sort).
+ * Filters: Active filters take precedence; same-field filters are replaced.
+ * Sort: Active sort is applied only if current sort matches the default.
  *
- * @param view                 The view to merge overrides into.
- * @param activeViewOverrides  The tab-specific overrides to apply.
- * @param defaultView          The default view configuration (used to detect if sort is customized).
+ * @param view                The view to merge overrides into.
+ * @param activeViewOverrides The tab-specific overrides to apply.
+ * @param defaultView         The default view configuration.
  * @return A new view with merged overrides, or the original view if no overrides.
  */
 export function mergeActiveViewOverrides(
@@ -32,7 +30,10 @@ export function mergeActiveViewOverrides(
 	let result = view;
 
 	// Merge filters
-	if ( activeViewOverrides.filters && activeViewOverrides.filters.length > 0 ) {
+	if (
+		activeViewOverrides.filters &&
+		activeViewOverrides.filters.length > 0
+	) {
 		const activeFields = new Set(
 			activeViewOverrides.filters.map( ( f ) => f.field )
 		);
@@ -65,12 +66,12 @@ export function mergeActiveViewOverrides(
 
 /**
  * Strips overrides before persisting.
- * - Filters: Removes filters on fields managed by activeViewOverrides.
- * - Sort: If the sort matches the activeViewOverrides sort, restores the default sort.
+ * Filters: Removes filters on fields managed by activeViewOverrides.
+ * Sort: If sort matches the override, restores the default sort.
  *
- * @param view                 The view to strip overrides from.
- * @param activeViewOverrides  The tab-specific override definitions.
- * @param defaultView          The default view configuration.
+ * @param view                The view to strip overrides from.
+ * @param activeViewOverrides The tab-specific override definitions.
+ * @param defaultView         The default view configuration.
  * @return A new view with overrides stripped, or the original view if no overrides.
  */
 export function stripActiveViewOverrides(
@@ -85,7 +86,10 @@ export function stripActiveViewOverrides(
 	let result = view;
 
 	// Strip managed filters
-	if ( activeViewOverrides.filters && activeViewOverrides.filters.length > 0 ) {
+	if (
+		activeViewOverrides.filters &&
+		activeViewOverrides.filters.length > 0
+	) {
 		const activeFields = new Set(
 			activeViewOverrides.filters.map( ( f ) => f.field )
 		);
