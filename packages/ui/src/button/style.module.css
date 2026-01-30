@@ -9,16 +9,14 @@
 
 	.button {
 		/* Internal variables */
-		--wp-ui-button-font-weight: 499;
-
 		--wp-ui-button-background-color: var(--wpds-color-bg-interactive-brand-strong);
 		--wp-ui-button-background-color-active: var(--wpds-color-bg-interactive-brand-strong-active);
 		--wp-ui-button-background-color-disabled: var(--wpds-color-bg-interactive-neutral-strong-disabled);
 		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand-strong);
 		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-strong-active);
 		--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
+		--wp-ui-button-min-height: var(--wpds-dimension-control-height-default);
 		--wp-ui-button-padding-inline: calc(3 * var(--wpds-dimension-base)); /* TODO: Create new interactive padding tokens */
-		--wp-ui-button-height: 40px;
 		--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
 		--wp-ui-button-font-size: var(--wpds-font-size-md);
 
@@ -34,7 +32,7 @@
 		align-items: center;
 		gap: calc(2 * var(--wpds-dimension-base)); /* TODO: Consider new interactive/control gap tokens */
 		aspect-ratio: var(--wp-ui-button-aspect-ratio);
-		height: var(--wp-ui-button-height);
+		min-height: var(--wp-ui-button-min-height);
 		padding-inline: var(--wp-ui-button-padding-inline);
 		border-style: solid;
 		border-width: 1px;
@@ -44,7 +42,7 @@
 		background-clip: padding-box;
 		font-family: var(--wpds-font-family-body);
 		font-size: var(--wp-ui-button-font-size);
-		font-weight: var(--wp-ui-button-font-weight);
+		font-weight: var(--wpds-font-weight-medium);
 		line-height: var(--wpds-font-line-height-sm);
 		text-decoration: none;
 		color: var(--wp-ui-button-foreground-color);
@@ -119,8 +117,8 @@
 	}
 
 	.is-small {
+		--wp-ui-button-min-height: var(--wpds-dimension-control-height-small);
 		--wp-ui-button-padding-inline: calc(2 * var(--wpds-dimension-base)); /* TODO: Create new interactive padding tokens */
-		--wp-ui-button-height: 24px;
 	}
 
 	/* Variants (`tone` + `variant`) overrides compared to default styles */
@@ -193,7 +191,7 @@
 	}
 
 	.is-compact {
-		--wp-ui-button-height: 32px;
+		--wp-ui-button-min-height: var(--wpds-dimension-control-height-compact);
 	}
 
 	.is-loading {

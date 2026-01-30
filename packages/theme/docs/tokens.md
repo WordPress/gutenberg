@@ -116,23 +116,26 @@ Do not edit directly.
 
 ### Dimension
 
-| Variable name                  | Description            |
-| ------------------------------ | ---------------------- |
-| `--wpds-dimension-base`        | Base dimension unit    |
-| `--wpds-dimension-padding-xs`  | Extra small padding    |
-| `--wpds-dimension-padding-sm`  | Small padding          |
-| `--wpds-dimension-padding-md`  | Medium padding         |
-| `--wpds-dimension-padding-lg`  | Large padding          |
-| `--wpds-dimension-padding-xl`  | Extra large padding    |
-| `--wpds-dimension-padding-2xl` | 2x extra large padding |
-| `--wpds-dimension-padding-3xl` | 3x extra large padding |
-| `--wpds-dimension-gap-xs`      | Extra small gap        |
-| `--wpds-dimension-gap-sm`      | Small gap              |
-| `--wpds-dimension-gap-md`      | Medium gap             |
-| `--wpds-dimension-gap-lg`      | Large gap              |
-| `--wpds-dimension-gap-xl`      | Extra large gap        |
-| `--wpds-dimension-gap-2xl`     | 2x extra large gap     |
-| `--wpds-dimension-gap-3xl`     | 3x extra large gap     |
+| Variable name                             | Description                                             |
+| ----------------------------------------- | ------------------------------------------------------- |
+| `--wpds-dimension-base`                   | Base dimension unit                                     |
+| `--wpds-dimension-padding-xs`             | Extra small padding                                     |
+| `--wpds-dimension-padding-sm`             | Small padding                                           |
+| `--wpds-dimension-padding-md`             | Medium padding                                          |
+| `--wpds-dimension-padding-lg`             | Large padding                                           |
+| `--wpds-dimension-padding-xl`             | Extra large padding                                     |
+| `--wpds-dimension-padding-2xl`            | 2x extra large padding                                  |
+| `--wpds-dimension-padding-3xl`            | 3x extra large padding                                  |
+| `--wpds-dimension-control-height-default` | Default control height for standard text-label buttons  |
+| `--wpds-dimension-control-height-compact` | Compact control height for toggle buttons, icon buttons |
+| `--wpds-dimension-control-height-small`   | Small control height for auxiliary icon buttons         |
+| `--wpds-dimension-gap-xs`                 | Extra small gap                                         |
+| `--wpds-dimension-gap-sm`                 | Small gap                                               |
+| `--wpds-dimension-gap-md`                 | Medium gap                                              |
+| `--wpds-dimension-gap-lg`                 | Large gap                                               |
+| `--wpds-dimension-gap-xl`                 | Extra large gap                                         |
+| `--wpds-dimension-gap-2xl`                | 2x extra large gap                                      |
+| `--wpds-dimension-gap-3xl`                | 3x extra large gap                                      |
 
 ### Elevation
 

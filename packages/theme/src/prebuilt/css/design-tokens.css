@@ -101,6 +101,9 @@
 	--wpds-color-stroke-surface-warning: #d0b381; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-warning-strong: #926300; /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
 	--wpds-dimension-base: 4px; /* Base dimension unit */
+	--wpds-dimension-control-height-compact: 32px; /* Compact control height for toggle buttons, icon buttons */
+	--wpds-dimension-control-height-default: 40px; /* Default control height for standard text-label buttons */
+	--wpds-dimension-control-height-small: 24px; /* Small control height for auxiliary icon buttons */
 	--wpds-dimension-gap-2xl: 32px; /* 2x extra large gap */
 	--wpds-dimension-gap-3xl: 40px; /* 3x extra large gap */
 	--wpds-dimension-gap-lg: 16px; /* Large gap */
@@ -146,6 +149,9 @@
 
 [data-wpds-theme-provider-id][data-wpds-density='default'] {
 	--wpds-dimension-base: 4px; /* Base dimension unit */
+	--wpds-dimension-control-height-compact: 32px; /* Compact control height for toggle buttons, icon buttons */
+	--wpds-dimension-control-height-default: 40px; /* Default control height for standard text-label buttons */
+	--wpds-dimension-control-height-small: 24px; /* Small control height for auxiliary icon buttons */
 	--wpds-dimension-gap-2xl: 32px; /* 2x extra large gap */
 	--wpds-dimension-gap-3xl: 40px; /* 3x extra large gap */
 	--wpds-dimension-gap-lg: 16px; /* Large gap */
@@ -163,6 +169,9 @@
 }
 
 [data-wpds-theme-provider-id][data-wpds-density='compact'] {
+	--wpds-dimension-control-height-compact: 28px; /* Compact control height for toggle buttons, icon buttons */
+	--wpds-dimension-control-height-default: 36px; /* Default control height for standard text-label buttons */
+	--wpds-dimension-control-height-small: 20px; /* Small control height for auxiliary icon buttons */
 	--wpds-dimension-gap-2xl: 24px; /* 2x extra large gap */
 	--wpds-dimension-gap-3xl: 32px; /* 3x extra large gap */
 	--wpds-dimension-gap-lg: 12px; /* Large gap */
@@ -180,6 +189,9 @@
 }
 
 [data-wpds-theme-provider-id][data-wpds-density='comfortable'] {
+	--wpds-dimension-control-height-compact: 36px; /* Compact control height for toggle buttons, icon buttons */
+	--wpds-dimension-control-height-default: 44px; /* Default control height for standard text-label buttons */
+	--wpds-dimension-control-height-small: 28px; /* Small control height for auxiliary icon buttons */
 	--wpds-dimension-gap-2xl: 40px; /* 2x extra large gap */
 	--wpds-dimension-gap-3xl: 48px; /* 3x extra large gap */
 	--wpds-dimension-gap-lg: 20px; /* Large gap */

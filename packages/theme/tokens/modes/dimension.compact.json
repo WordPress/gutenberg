@@ -30,6 +30,29 @@
 				"$value": "{wpds-dimension.primitive.space.60}"
 			}
 		},
+		"control-height": {
+			"default": {
+				"$type": "dimension",
+				"$value": {
+					"value": 36,
+					"unit": "px"
+				}
+			},
+			"compact": {
+				"$type": "dimension",
+				"$value": {
+					"value": 28,
+					"unit": "px"
+				}
+			},
+			"small": {
+				"$type": "dimension",
+				"$value": {
+					"value": 20,
+					"unit": "px"
+				}
+			}
+		},
 		"gap": {
 			"xs": {
 				"$type": "dimension",

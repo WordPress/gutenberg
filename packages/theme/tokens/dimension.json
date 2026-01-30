@@ -128,6 +128,38 @@
 				}
 			}
 		},
+		"control-height": {
+			"default": {
+				"$value": { "value": 40, "unit": "px" },
+				"$description": "Default control height for standard text-label buttons",
+				"$extensions": {
+					"mode": {
+						"compact": { "value": 36, "unit": "px" },
+						"comfortable": { "value": 44, "unit": "px" }
+					}
+				}
+			},
+			"compact": {
+				"$value": { "value": 32, "unit": "px" },
+				"$description": "Compact control height for toggle buttons, icon buttons",
+				"$extensions": {
+					"mode": {
+						"compact": { "value": 28, "unit": "px" },
+						"comfortable": { "value": 36, "unit": "px" }
+					}
+				}
+			},
+			"small": {
+				"$value": { "value": 24, "unit": "px" },
+				"$description": "Small control height for auxiliary icon buttons",
+				"$extensions": {
+					"mode": {
+						"compact": { "value": 20, "unit": "px" },
+						"comfortable": { "value": 28, "unit": "px" }
+					}
+				}
+			}
+		},
 		"gap": {
 			"xs": {
 				"$value": "{wpds-dimension.primitive.space.10}",
