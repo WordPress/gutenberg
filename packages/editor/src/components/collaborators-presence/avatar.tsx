@@ -1,3 +1,4 @@
+import { clsx } from 'clsx';
 import { type PostEditorAwarenessState } from '../../../../core-data/src/awareness/types';
 import './styles/avatar.scss';
 
@@ -22,25 +23,22 @@ export const Avatar: React.FC< AvatarProps > = ( {
 	showUserColorBorder,
 	size = 'small',
 } ) => {
-	const className = [
+	const className = clsx(
 		'editor-collaborators-presence__avatar',
 		`editor-collaborators-presence__avatar--${ size }`,
 		showUserColorBorder &&
-			'editor-collaborators-presence__avatar--with-color-border',
-	]
-		.filter( Boolean )
-		.join( ' ' );
+			'editor-collaborators-presence__avatar--with-color-border'
+	);
 
 	const avatarUrl =
 		userInfo.avatar_urls?.[ 48 ] ||
 		userInfo.avatar_urls?.[ 96 ] ||
 		userInfo.avatar_urls?.[ 24 ];
 
-	const avatarStyles: React.CSSProperties &
-		Record< `--${ string }`, string > = {
+	const avatarStyles = {
 		'--avatar-url': `url(${ avatarUrl })`,
 		'--user-color': userInfo.color,
-	};
+	} as React.CSSProperties;
 
 	return (
 		<div
