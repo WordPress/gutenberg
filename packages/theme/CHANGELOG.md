@@ -11,13 +11,14 @@
 		- `--wpds-dimension-padding-surface-md`: use `--wpds-dimension-padding-2xl` instead.
 		- `--wpds-dimension-padding-surface-lg`: use `--wpds-dimension-padding-3xl` instead.
 
--   Updated gap token scale from `2xs`–`xl` to `xs`–`2xl`. To preserve the same values:
+-   Updated gap token scale from `2xs`–`xl` to `xs`–`3xl`. To preserve the same values:
 		- `--wpds-dimension-gap-2xs`: use `--wpds-dimension-gap-xs` instead.
 		- `--wpds-dimension-gap-xs`: use `--wpds-dimension-gap-sm` instead.
 		- `--wpds-dimension-gap-sm`: use `--wpds-dimension-gap-md` instead.
 		- `--wpds-dimension-gap-md`: use `--wpds-dimension-gap-lg` instead.
 		- `--wpds-dimension-gap-lg`: use `--wpds-dimension-gap-xl` instead.
 		- `--wpds-dimension-gap-xl`: use `--wpds-dimension-gap-2xl` instead.
+		- `--wpds-dimension-gap-2xl`: use `--wpds-dimension-gap-3xl` instead.
 
 ## 0.6.0 (2026-01-29)
 

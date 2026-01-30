@@ -53,6 +53,10 @@
 			},
 			"2xl": {
 				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.80}"
+			},
+			"3xl": {
+				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.90}"
 			}
 		}

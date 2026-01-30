@@ -185,8 +185,19 @@
 				}
 			},
 			"2xl": {
-				"$value": "{wpds-dimension.primitive.space.80}",
+				"$value": "{wpds-dimension.primitive.space.70}",
 				"$description": "2x extra large gap",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.60}",
+						"comfortable": "{wpds-dimension.primitive.space.80}"
+					},
+					"com.figma.scopes": [ "GAP" ]
+				}
+			},
+			"3xl": {
+				"$value": "{wpds-dimension.primitive.space.80}",
+				"$description": "3x extra large gap",
 				"$extensions": {
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.70}",
