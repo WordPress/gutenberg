@@ -13,6 +13,11 @@ import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
 // Block name constants
 const NAVIGATION_BLOCK_NAME = 'core/navigation';
 const TEMPLATE_PART_BLOCK_NAME = 'core/template-part';
@@ -30,6 +35,9 @@ const BLOCK_INSPECTOR_AREA = 'edit-post/block';
  */
 function TemplatePartNavigationEditButton( { clientId } ) {
 	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );
+	const { showBlockAttributeGroup } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const {
@@ -78,12 +86,16 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 
 			// Enable the complementary area (inspector)
 			enableComplementaryArea( 'core', BLOCK_INSPECTOR_AREA );
+
+			// Show the list view tab in the inspector
+			showBlockAttributeGroup( 'list' );
 		}
 	}, [
 		firstNavigationBlockId,
 		selectBlock,
 		flashBlock,
 		enableComplementaryArea,
+		showBlockAttributeGroup,
 	] );
 
 	// Only show if template part contains navigation blocks and they are editable
