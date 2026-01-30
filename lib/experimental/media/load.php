@@ -418,22 +418,21 @@ add_action( 'wp_enqueue_media', 'gutenberg_override_media_templates' );
 /**
  * Filters the block editor preload paths to include media processing fields.
  *
- * Adds image_sizes, image_size_threshold, image_output_formats, and interlace
- * settings to the root endpoint preload to avoid extra API requests.
+ * Replaces the root endpoint fields with the complete list expected by
+ * packages/core-data/src/entities.js to ensure an exact URL match for preloading.
  *
- * @param array                   $paths   REST API paths to preload.
+ * @param array $paths REST API paths to preload.
  * @return array Filtered preload paths.
  */
 function gutenberg_media_processing_preload_paths( $paths ) {
+	// Complete list of fields expected by packages/core-data/src/entities.js.
+	// This must match exactly for preloading to work (same fields, same order).
+	$root_fields = 'description,gmt_offset,home,image_sizes,image_size_threshold,image_output_formats,jpeg_interlaced,png_interlaced,gif_interlaced,name,site_icon,site_icon_url,site_logo,timezone_string,url,page_for_posts,page_on_front,show_on_front';
+
 	foreach ( $paths as $key => $path ) {
 		if ( is_string( $path ) && str_starts_with( $path, '/?_fields=' ) ) {
-			// Add media processing fields after "home," to match
-			// the field order in packages/core-data/src/entities.js.
-			$paths[ $key ] = str_replace(
-				',home,',
-				',home,image_sizes,image_size_threshold,image_output_formats,jpeg_interlaced,png_interlaced,gif_interlaced,',
-				$path
-			);
+			// Replace with the complete fields list to ensure exact match.
+			$paths[ $key ] = '/?_fields=' . $root_fields;
 			break;
 		}
 	}
