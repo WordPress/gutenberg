@@ -406,12 +406,9 @@ export default function TypographyPanel( {
 			setImmutably( value, [ 'typography', 'textIndent' ], undefined )
 		);
 	};
-	const textIndentGlobalStylesHelp = isTextIndentAll
+	const textIndentHelp = isTextIndentAll
 		? __( 'Indents the first line of all paragraphs.' )
 		: __( 'Indents the first line of each paragraph after the first one.' );
-	const textIndentHelp = isGlobalStyles
-		? textIndentGlobalStylesHelp
-		: undefined;
 
 	// Text Columns
 	const hasTextColumnsControl = useHasTextColumnsControl( settings );
@@ -612,7 +609,7 @@ export default function TypographyPanel( {
 						size="__unstable-large"
 						__unstableInputWidth="auto"
 						withSlider
-						help={ textIndentHelp }
+						hasBottomMargin={ isGlobalStyles }
 					/>
 					{ isGlobalStyles && (
 						<ToggleControl
@@ -620,6 +617,7 @@ export default function TypographyPanel( {
 							label={ __( 'Indent all paragraphs' ) }
 							checked={ isTextIndentAll }
 							onChange={ onToggleTextIndentAll }
+							help={ textIndentHelp }
 						/>
 					) }
 				</ToolsPanelItem>
