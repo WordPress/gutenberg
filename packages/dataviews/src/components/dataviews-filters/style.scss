@@ -1,6 +1,6 @@
 @use "sass:math";
 @use "@wordpress/base-styles/colors" as *;
-@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/variables" as vars;
 @use "@wordpress/base-styles/mixins" as *;
 
 .dataviews-filters__button {
@@ -23,14 +23,14 @@
 }
 
 .dataviews-filters__summary-popover {
-	font-size: $default-font-size;
-	line-height: $default-line-height;
+	font-size: var(--wpds-font-size-md);
+	line-height: 1.4;
 
 	.components-popover__content {
 		width: 100%;
 		min-width: 230px;
 		max-width: 250px;
-		border-radius: $grid-unit-05;
+		border-radius: var(--wpds-border-radius-sm);
 	}
 
 	&.components-dropdown__content {
@@ -41,12 +41,12 @@
 }
 
 .dataviews-filters__summary-operators-container {
-	padding: $grid-unit-10 $grid-unit-20;
+	padding: var(--wpds-dimension-padding-surface-xs) var(--wpds-dimension-padding-surface-sm);
 
 	&:has(+ .dataviews-filters__search-widget-listbox),
 	&:has(+ .dataviews-filters__search-widget-no-elements),
 	&:has(+ .dataviews-filters__user-input-widget) {
-		border-bottom: 1px solid $gray-200;
+		border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral);
 	}
 
 	&:empty {
@@ -54,7 +54,7 @@
 	}
 
 	.dataviews-filters__summary-operators-filter-name {
-		color: $gray-700;
+		color: var(--wpds-color-fg-content-neutral-weak);
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -74,13 +74,13 @@
 	white-space: pre-wrap;
 
 	.dataviews-filters__summary-chip {
-		border-radius: $grid-unit-20;
-		border: $border-width solid transparent;
+		border-radius: var(--wpds-border-radius-lg);
+		border: var(--wpds-border-width-xs) solid transparent;
 		cursor: pointer;
-		padding: $grid-unit-05 $grid-unit-15;
-		min-height: $grid-unit-40;
-		background: $gray-100;
-		color: $gray-800;
+		padding: var(--wpds-dimension-padding-surface-2xs) calc(var(--wpds-dimension-base) * 3);
+		min-height: calc(var(--wpds-dimension-base) * 8);
+		background: var(--wpds-color-bg-surface-neutral);
+		color: var(--wpds-color-fg-content-neutral);
 		position: relative;
 		display: flex;
 		align-items: center;
@@ -91,18 +91,18 @@
 		}
 
 		&.has-reset {
-			padding-inline-end: $button-size-small + $grid-unit-05;
+			padding-inline-end: calc(24px + var(--wpds-dimension-padding-surface-2xs));
 		}
 
 		&:hover:not(&.is-not-clickable),
 		&:focus-visible,
 		&[aria-expanded="true"] {
-			background: $gray-200;
-			color: $gray-900;
+			background: var(--wpds-color-bg-surface-neutral-weak);
+			color: var(--wpds-color-fg-interactive-neutral);
 		}
 
 		&.has-values {
-			color: var(--wp-admin-theme-color);
+			color: var(--wpds-color-fg-interactive-brand);
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.04);
 
 			&:hover,
@@ -119,18 +119,18 @@
 		}
 
 		.dataviews-filters-__summary-filter-text-name {
-			font-weight: $font-weight-medium;
+			font-weight: var(--wpds-font-weight-medium);
 		}
 	}
 
 	.dataviews-filters__summary-chip-remove {
-		width: $icon-size;
-		height: $icon-size;
+		width: vars.$icon-size;
+		height: vars.$icon-size;
 		border-radius: 50%;
 		border: 0;
 		padding: 0;
 		position: absolute;
-		right: $grid-unit-05;
+		right: var(--wpds-dimension-padding-surface-2xs);
 		top: 50%;
 		transform: translateY(-50%);
 		display: flex;
@@ -140,14 +140,14 @@
 		cursor: pointer;
 
 		svg {
-			fill: $gray-700;
+			fill: var(--wpds-color-fg-content-neutral-weak);
 		}
 
 		&:hover,
 		&:focus {
-			background: $gray-200;
+			background: var(--wpds-color-bg-surface-neutral-weak);
 			svg {
-				fill: $gray-900;
+				fill: var(--wpds-color-fg-content-neutral);
 			}
 		}
 
@@ -170,10 +170,10 @@
 }
 
 .dataviews-filters__search-widget-filter-combobox-list {
-	max-height: $grid-unit * 23;
-	padding: $grid-unit-05;
+	max-height: calc(var(--wpds-dimension-base) * 46);
+	padding: var(--wpds-dimension-padding-surface-2xs);
 	overflow: auto;
-	border-top: 1px solid $gray-200;
+	border-top: 1px solid var(--wpds-color-stroke-surface-neutral);
 
 	.dataviews-filters__search-widget-filter-combobox-item-value {
 		[data-user-value] {
@@ -183,19 +183,19 @@
 }
 
 .dataviews-filters__search-widget-listbox {
-	padding: $grid-unit-05;
+	padding: var(--wpds-dimension-padding-surface-2xs);
 	overflow: auto;
 }
 
 .dataviews-filters__search-widget-listitem {
 	display: flex;
 	align-items: center;
-	gap: $grid-unit-10;
-	border-radius: $radius-small;
+	gap: var(--wpds-dimension-gap-xs);
+	border-radius: var(--wpds-border-radius-sm);
 	box-sizing: border-box;
-	padding: $grid-unit-05 $grid-unit-15;
+	padding: var(--wpds-dimension-padding-surface-2xs) calc(var(--wpds-dimension-base) * 3);
 	cursor: default;
-	min-height: $grid-unit-40;
+	min-height: calc(var(--wpds-dimension-base) * 8);
 	@include body-medium();
 
 	&:last-child {
@@ -205,16 +205,11 @@
 	&:hover,
 	&[data-active-item],
 	&:focus {
-		background-color: var(--wp-admin-theme-color);
-		color: $white;
-
-		.dataviews-filters__search-widget-listitem-description {
-			color: $white;
-		}
+		background-color: var(--wpds-color-bg-interactive-neutral-weak-active);
 
 		.dataviews-filters__search-widget-listitem-single-selection {
 			border-color: var(--wp-admin-theme-color-darker-20, #183ad6);
-			background: $white;
+			background: var(--wpds-color-bg-surface-neutral-strong);
 			&.is-selected {
 				border-color: var(--wp-admin-theme-color-darker-20, #183ad6);
 				background: var(--wp-admin-theme-color-darker-20, #183ad6);
@@ -222,8 +217,6 @@
 		}
 
 		.dataviews-filters__search-widget-listitem-multi-selection {
-			border-color: var(--wp-admin-theme-color-darker-20, #183ad6);
-
 			&.is-selected {
 				border-color: var(--wp-admin-theme-color-darker-20, #183ad6);
 				background: var(--wp-admin-theme-color-darker-20, #183ad6);
@@ -235,9 +228,9 @@
 		display: block;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		font-size: $helptext-font-size;
+		font-size: var(--wpds-font-size-sm);
 		line-height: 16px;
-		color: $gray-700;
+		color: var(--wpds-color-fg-content-neutral-weak);
 	}
 
 	.dataviews-filters__search-widget-listitem-single-selection {
@@ -251,23 +244,23 @@
 
 			&::before {
 				content: "";
-				border-radius: $radius-round;
+				border-radius: 50%;
 				box-sizing: inherit;
-				width: math.div($radio-input-size-sm, 2);
-				height: math.div($radio-input-size-sm, 2);
+				width: math.div(vars.$radio-input-size-sm, 2);
+				height: math.div(vars.$radio-input-size-sm, 2);
 				position: absolute;
 				top: 50%;
 				left: 50%;
 				transform: translate(-50%, -50%);
 				margin: 0;
-				background-color: $white;
+				background-color: var(--wpds-color-bg-surface-neutral-strong);
 
 				// This border serves as a background color in Windows High Contrast mode.
 				border: 4px solid $white;
 
 				@include break-small() {
-					width: math.div($radio-input-size, 2);
-					height: math.div($radio-input-size, 2);
+					width: math.div(vars.$radio-input-size, 2);
+					height: math.div(vars.$radio-input-size, 2);
 				}
 			}
 		}
@@ -278,8 +271,8 @@
 
 		@include checkbox-control;
 		position: relative;
-		background: $white;
-		color: $gray-900;
+		background: var(--wpds-color-bg-interactive-neutral-weak);
+		color: var(--wpds-color-fg-content-neutral);
 		margin: 0;
 		padding: 0;
 		width: var(--checkbox-size);
@@ -300,7 +293,7 @@
 			svg {
 				--checkmark-size: var(--checkbox-size);
 
-				fill: $white;
+				fill: var(--wpds-color-fg-interactive-neutral-strong);
 				position: absolute;
 				left: 50%;
 				top: 50%;
@@ -318,34 +311,34 @@
 
 .dataviews-filters__search-widget-filter-combobox__wrapper {
 	position: relative;
-	padding: $grid-unit-10;
+	padding: var(--wpds-dimension-padding-surface-xs);
 
 	.dataviews-filters__search-widget-filter-combobox__input {
 		@include input-control;
 		display: block;
-		padding: 0 $grid-unit-10 0 $grid-unit-40;
+		padding: 0 var(--wpds-dimension-padding-surface-xs) 0 calc(var(--wpds-dimension-base) * 8);
 		width: 100%;
-		height: $grid-unit-40;
+		height: calc(var(--wpds-dimension-base) * 8);
 
 		// Unset inherited values.
 		margin-left: 0;
 		margin-right: 0;
 
 		/* Fonts smaller than 16px causes mobile safari to zoom. */
-		font-size: $mobile-text-min-font-size;
+		font-size: vars.$mobile-text-min-font-size;
 		@include break-small {
-			font-size: $default-font-size;
+			font-size: var(--wpds-font-size-md);
 		}
 
 		&:focus {
-			background: $white;
+			background: var(--wpds-color-bg-surface-neutral-strong);
 			box-shadow:
 				inset 0 0 0 var(--wp-admin-border-width-focus)
 				var(--wp-admin-theme-color);
 		}
 
 		&::placeholder {
-			color: $gray-700;
+			color: var(--wpds-color-fg-content-neutral-weak);
 		}
 
 		&::-webkit-search-decoration,
@@ -358,13 +351,13 @@
 
 	.dataviews-filters__search-widget-filter-combobox__icon {
 		position: absolute;
-		inset-inline-start: $grid-unit-15;
+		inset-inline-start: var(--wpds-dimension-gap-sm);
 		top: 0;
 		bottom: 0;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		width: $icon-size;
+		width: 24px;
 
 		&:dir(ltr) {
 			transform: scaleX(-1);
@@ -383,15 +376,15 @@
 	right: 0;
 	transform: translate(50%, -50%);
 	background: var(--wp-admin-theme-color, #3858e9);
-	height: $grid-unit-20;
-	min-width: $grid-unit-20;
-	line-height: $grid-unit-20;
-	padding: 0 $grid-unit-05;
+	height: calc(var(--wpds-dimension-base) * 4);
+	min-width: calc(var(--wpds-dimension-base) * 4);
+	line-height: var(--wpds-font-line-height-xs);
+	padding: 0 var(--wpds-dimension-padding-surface-2xs);
 	text-align: center;
-	border-radius: $grid-unit-10;
+	border-radius: var(--wpds-border-radius-lg);
 	font-size: 11px;
-	outline: var(--wp-admin-border-width-focus) solid $white;
-	color: $white;
+	outline: var(--wp-admin-border-width-focus) solid var(--wpds-color-bg-surface-neutral-strong);
+	color: var(--wpds-color-fg-interactive-neutral-strong);
 	box-sizing: border-box;
 }
 
@@ -400,10 +393,10 @@
 }
 
 .dataviews-filters__user-input-widget {
-	padding: $grid-unit-20;
+	padding: var(--wpds-dimension-padding-surface-sm);
 
 	.components-input-control__prefix {
-		padding-left: $grid-unit-10;
+		padding-left: var(--wpds-dimension-padding-surface-xs);
 	}
 }
 
@@ -411,5 +404,5 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: $grid-unit-20;
+	padding: var(--wpds-dimension-padding-surface-sm);
 }

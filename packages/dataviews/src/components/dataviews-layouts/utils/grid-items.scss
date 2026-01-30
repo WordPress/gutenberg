@@ -1,12 +1,10 @@
-@use "@wordpress/base-styles/variables" as *;
-
 .dataviews-view-grid-items {
 	margin-bottom: auto;
 	display: grid;
-	gap: $grid-unit-40;
+	gap: calc(var(--wpds-dimension-base) * 8);
 	grid-template-rows: max-content;
 	grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-	padding: 0 $grid-unit-30 $grid-unit-30;
+	padding: 0 var(--wpds-dimension-padding-surface-md) var(--wpds-dimension-padding-surface-md);
 	container-type: inline-size;
 
 	@media not (prefers-reduced-motion) {
