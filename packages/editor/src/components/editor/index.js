@@ -10,10 +10,14 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { TEMPLATE_POST_TYPE } from '../../store/constants';
+import {
+	TEMPLATE_POST_TYPE,
+	ATTACHMENT_POST_TYPE,
+} from '../../store/constants';
 import EditorInterface from '../editor-interface';
 import { ExperimentalEditorProvider } from '../provider';
 import AttachmentEditorProvider from '../attachment-editor-provider';
+import AttachmentSaveButton from '../attachment-save-button';
 import Sidebar from '../sidebar';
 import NotesSidebar from '../collab-sidebar';
 import GlobalStylesSidebar from '../global-styles-sidebar';
@@ -43,6 +47,7 @@ function Editor( {
 		error,
 		isBlockTheme,
 		showGlobalStyles,
+		isAttachment,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -90,6 +95,9 @@ function Editor( {
 					userCanEditGlobalStyles &&
 					( currentPostType === 'wp_template' ||
 						renderingMode === 'template-locked' ),
+				isAttachment:
+					currentPostType === ATTACHMENT_POST_TYPE &&
+					window?.__experimentalMediaEditor,
 			};
 		},
 		[ postType, postId, templateId ]
@@ -118,7 +126,16 @@ function Editor( {
 					useSubRegistry={ false }
 				>
 					<AttachmentEditorProvider>
-						<EditorInterface { ...props }>
+						<EditorInterface
+							{ ...props }
+							customSaveButton={
+								isAttachment ? (
+									<AttachmentSaveButton />
+								) : (
+									props.customSaveButton
+								)
+							}
+						>
 							{ extraContent }
 						</EditorInterface>
 						{ children }

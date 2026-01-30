@@ -3,14 +3,11 @@
  */
 import { MediaEditForm, useMediaEditorContext } from '@wordpress/media-editor';
 import { useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
-import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
  */
 import PostPanelSection from '../post-panel-section';
-import { sidebars } from '../sidebar/constants';
 
 /**
  * Media crop panel for the editor sidebar.
@@ -29,27 +26,19 @@ export default function MediaCropPanel() {
 
 /**
  * Internal component that has access to MediaEditorContext.
- * Sets editing mode when the panel is mounted and clears it when unmounted.
+ * Sets editing mode when the panel is mounted.
+ * Crop edits persist across tab switches and are ephemeral until the attachment is saved.
  */
 function MediaCropPanelContent() {
 	const { setIsEditingImage } = useMediaEditorContext();
-	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	// Engage editing mode when this panel is shown
 	useEffect( () => {
 		setIsEditingImage( true );
-
-		// Clean up: exit editing mode when unmounting
-		return () => {
-			setIsEditingImage( false );
-		};
+		// Intentionally no cleanup - preserves crop state when switching tabs
+		// Crop edits remain ephemeral until the attachment is saved
 	}, [ setIsEditingImage ] );
 
-	const handleCancel = () => {
-		// Switch back to the Document tab
-		enableComplementaryArea( 'core', sidebars.document );
-	};
-
 	// Only render the controls panel - the canvas is rendered in MediaPreview
-	return <MediaEditForm onCancel={ handleCancel } />;
+	return <MediaEditForm />;
 }

@@ -6,11 +6,18 @@ import {
 	MediaEditorCanvas,
 	useMediaEditorContext,
 } from '@wordpress/media-editor';
+import { useSelect } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
+
+/**
+ * Internal dependencies
+ */
+import { sidebars } from '../sidebar/constants';
 
 /**
  * Media preview component for the editor.
- * Conditionally renders MediaEditorCanvas when in editing mode,
- * otherwise shows the normal preview.
+ * Conditionally renders MediaEditorCanvas when in editing mode AND the Crop tab is active.
+ * This allows crop edits to persist when switching between tabs.
  *
  * Uses MediaEditorContext from AttachmentEditorProvider.
  *
@@ -20,11 +27,17 @@ import {
 export default function MediaPreview( props ) {
 	const { isEditingImage } = useMediaEditorContext();
 
-	// If in editing mode, show the cropper canvas
-	if ( isEditingImage ) {
+	const isCropTabActive = useSelect( ( select ) => {
+		const activeComplementaryArea =
+			select( interfaceStore ).getActiveComplementaryArea( 'core' );
+		return activeComplementaryArea === sidebars.crop;
+	}, [] );
+
+	// Show canvas only when editing AND Crop tab is active
+	// This preserves crop state when switching to other tabs
+	if ( isEditingImage && isCropTabActive ) {
 		return <MediaEditorCanvas />;
 	}
 
-	// Otherwise show the normal preview
 	return <BaseMediaPreview { ...props } />;
 }

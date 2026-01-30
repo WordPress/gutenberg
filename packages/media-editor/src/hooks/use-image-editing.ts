@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useCallback } from '@wordpress/element';
-import { useImageCropper } from '@wordpress/image-cropper';
+import { useImageCropper, normalizeRotation } from '@wordpress/image-cropper';
 
 /**
  * Internal dependencies
@@ -222,6 +222,72 @@ export default function useImageEditing() {
 		resetCropper();
 	}, [ resetCropper ] );
 
+	/**
+	 * Gets the modifiers array for server-side image processing.
+	 * Builds the modifiers from the current cropper state in the format
+	 * expected by the WordPress REST API's editMediaEntity endpoint.
+	 *
+	 * @return Array of modifier objects for editMediaEntity
+	 */
+	const getModifiers = useCallback( () => {
+		if ( ! cropperState ) {
+			return [];
+		}
+
+		const modifiers = [];
+
+		// Add flip modifier if needed
+		if (
+			cropperState.flip &&
+			( cropperState.flip.horizontal || cropperState.flip.vertical )
+		) {
+			modifiers.push( {
+				type: 'flip',
+				args: {
+					flip: {
+						horizontal: Number( cropperState.flip.horizontal ),
+						vertical: Number( cropperState.flip.vertical ),
+					},
+				},
+			} );
+		}
+
+		// Add rotation modifier if needed
+		const normalizedRotation = normalizeRotation(
+			cropperState.rotation || 0
+		);
+		if ( normalizedRotation > 0 ) {
+			modifiers.push( {
+				type: 'rotate',
+				args: {
+					angle: normalizedRotation,
+				},
+			} );
+		}
+
+		// Add crop modifier if needed
+		// The crop script may return some very small, sub-pixel values when the image was not cropped.
+		// Crop only when the new size has changed by more than 0.1%.
+		if (
+			cropperState.croppedArea?.width &&
+			cropperState.croppedArea?.height &&
+			( cropperState.croppedArea.width < 99.9 ||
+				cropperState.croppedArea.height < 99.9 )
+		) {
+			modifiers.push( {
+				type: 'crop',
+				args: {
+					left: cropperState.croppedArea.x, // Horizontal position from the left as a percentage
+					top: cropperState.croppedArea.y, // Vertical position from the top as a percentage
+					width: cropperState.croppedArea.width, // Width as a percentage
+					height: cropperState.croppedArea.height, // Height as a percentage
+				},
+			} );
+		}
+
+		return modifiers;
+	}, [ cropperState ] );
+
 	return {
 		// State
 		isEditingImage,
@@ -232,6 +298,7 @@ export default function useImageEditing() {
 		startEditing,
 		saveEdits,
 		cancelEdits,
+		getModifiers,
 
 		// Transform controls
 		setZoom,
