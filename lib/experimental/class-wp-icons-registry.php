@@ -233,8 +233,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 			}
 
 			$icon            = $this->registered_icons[ $icon_name ];
-			$content         = $this->get_content( $icon_name );
-			$icon['content'] = $content;
+			$icon['content'] = $icon['content'] ?? $this->get_content( $icon_name );
 
 			return $icon;
 		}
@@ -253,7 +252,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 					continue;
 				}
 
-				$icon['content'] = $this->get_content( $icon['name'] );
+				$icon['content'] = $icon['content'] ?? $this->get_content( $icon['name'] );
 				$icons[]         = $icon;
 			}
 
