@@ -37,6 +37,7 @@ const meta = {
 				'array',
 				'checkbox',
 				'color',
+				'combobox',
 				'date',
 				'datetime',
 				'email',
@@ -530,6 +531,7 @@ type ControlTypes =
 	| 'array'
 	| 'checkbox'
 	| 'color'
+	| 'combobox'
 	| 'date'
 	| 'datetime'
 	| 'email'

@@ -82,6 +82,13 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 }
 
+// Experimental HTTP polling sync server.
+if ( ! class_exists( 'Gutenberg_HTTP_Polling_Sync_Server' ) ) {
+	require_once __DIR__ . '/experimental/sync/interface-gutenberg-sync-storage.php';
+	require_once __DIR__ . '/experimental/sync/class-gutenberg-sync-post-meta-storage.php';
+	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-polling-sync-server.php';
+}
+
 require_once __DIR__ . '/remove-core-enqueue-scripts.php';
 require_once __DIR__ . '/experimental/editor-settings.php';
 require_once __DIR__ . '/experimental/rest-api-overrides.php';

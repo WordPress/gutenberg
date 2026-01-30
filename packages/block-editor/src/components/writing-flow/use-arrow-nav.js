@@ -209,6 +209,11 @@ export default function useArrowNav() {
 				return;
 			}
 
+			// In preview mode, navigation is handled by useSelectableBlocksNav.
+			if ( getSettings().isPreviewMode ) {
+				return;
+			}
+
 			// If there is a multi-selection, the arrow keys should collapse the
 			// selection to the start or end of the selection.
 			if ( hasMultiSelection() ) {

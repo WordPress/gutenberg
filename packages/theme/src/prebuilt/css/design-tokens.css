@@ -3,15 +3,15 @@
  * ------------------------------------------- */
 
 :root {
-	--wpds-border-radius-surface-lg: 8px; /* Large radius for surfaces */
-	--wpds-border-radius-surface-md: 4px; /* Medium radius for surfaces */
-	--wpds-border-radius-surface-sm: 2px; /* Small radius for surfaces */
-	--wpds-border-radius-surface-xs: 1px; /* Extra small radius for surfaces */
-	--wpds-border-width-interactive-focus: 2px; /* Border width for focus ring */
-	--wpds-border-width-surface-lg: 8px; /* Large width for surfaces */
-	--wpds-border-width-surface-md: 4px; /* Medium width for surfaces */
-	--wpds-border-width-surface-sm: 2px; /* Small width for surfaces */
-	--wpds-border-width-surface-xs: 1px; /* Extra small width for surfaces */
+	--wpds-border-radius-lg: 8px; /* Large radius */
+	--wpds-border-radius-md: 4px; /* Medium radius */
+	--wpds-border-radius-sm: 2px; /* Small radius */
+	--wpds-border-radius-xs: 1px; /* Extra small radius */
+	--wpds-border-width-focus: 2px; /* Border width for focus ring */
+	--wpds-border-width-lg: 8px; /* Large width */
+	--wpds-border-width-md: 4px; /* Medium width */
+	--wpds-border-width-sm: 2px; /* Small width */
+	--wpds-border-width-xs: 1px; /* Extra small width */
 	--wpds-color-bg-interactive-brand-strong: #3858e9; /* Background color for interactive elements with brand tone and strong emphasis. */
 	--wpds-color-bg-interactive-brand-strong-active: #2e49d9; /* Background color for interactive elements with brand tone and strong emphasis that are hovered, focused, or active. */
 	--wpds-color-bg-interactive-brand-weak: #00000000; /* Background color for interactive elements with brand tone and weak emphasis. */
@@ -186,6 +186,6 @@
 
 @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {
 	:root {
-		--wpds-border-width-interactive-focus: 1.5px; /* Border width for focus ring */
+		--wpds-border-width-focus: 1.5px; /* Border width for focus ring */
 	}
 }

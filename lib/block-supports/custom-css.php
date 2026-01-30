@@ -88,6 +88,7 @@ function gutenberg_render_custom_css_class_name( $block_content, $block ) {
 	$tags = new WP_HTML_Tag_Processor( $block_content );
 
 	if ( $tags->next_tag() ) {
+		$tags->add_class( 'has-custom-css' );
 		$tags->add_class( $matches[0] );
 	}
 

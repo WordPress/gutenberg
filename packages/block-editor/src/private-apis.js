@@ -13,6 +13,7 @@ import {
 	normalizeString,
 } from './components/inserter/search-items';
 import { PrivateListView } from './components/list-view';
+import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
 import { cleanEmptyObject } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
@@ -79,6 +80,7 @@ lock( privateApis, {
 	normalizeString,
 	PrivateListView,
 	ResizableBoxPopover,
+	InspectorControlsLastItem,
 	useHasBlockToolbar,
 	cleanEmptyObject,
 	BlockQuickNavigation,

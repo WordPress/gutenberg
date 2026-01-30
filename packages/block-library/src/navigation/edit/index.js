@@ -28,12 +28,18 @@ import {
 	useBlockEditingMode,
 	BlockControls,
 } from '@wordpress/block-editor';
-import { EntityProvider, store as coreStore } from '@wordpress/core-data';
+import {
+	EntityProvider,
+	store as coreStore,
+	useEntityRecords,
+} from '@wordpress/core-data';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	ToggleControl,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	Spinner,
 	Notice,
 	ToolbarButton,
@@ -77,7 +83,11 @@ import AccessibleMenuDescription from './accessible-menu-description';
 import { unlock } from '../../lock-unlock';
 import { useToolsPanelDropdownMenuProps } from '../../utils/hooks';
 import { isWithinNavigationOverlay } from '../../utils/is-within-overlay';
-import { DEFAULT_BLOCK } from '../constants';
+import {
+	DEFAULT_BLOCK,
+	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
+} from '../constants';
+import { getSubmenuVisibility } from '../utils/get-submenu-visibility';
 
 /**
  * Component that renders the Add page button for the Navigation block.
@@ -276,7 +286,7 @@ function Navigation( {
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const {
-		openSubmenusOnClick,
+		submenuVisibility,
 		overlayMenu,
 		overlay,
 		showSubmenuIcon,
@@ -298,6 +308,16 @@ function Navigation( {
 		},
 		[ setAttributes ]
 	);
+
+	// Reset submenuVisibility to default if orientation changes to horizontal while "always" is selected
+	useEffect( () => {
+		if ( orientation === 'horizontal' && submenuVisibility === 'always' ) {
+			setAttributes( {
+				submenuVisibility: 'hover',
+				showSubmenuIcon: true,
+			} );
+		}
+	}, [ orientation, submenuVisibility, setAttributes ] );
 
 	const recursionId = `navigationMenu/${ ref }`;
 
@@ -369,6 +389,20 @@ function Navigation( {
 	const hasSubmenus = !! innerBlocks.find(
 		( block ) => block.name === 'core/navigation-submenu'
 	);
+
+	// Check if any overlay template parts exist
+	const { records: overlayTemplateParts } = useEntityRecords(
+		'postType',
+		'wp_template_part',
+		{
+			per_page: -1,
+		}
+	);
+	const hasOverlays =
+		overlayTemplateParts?.some(
+			( templatePart ) =>
+				templatePart.area === NAVIGATION_OVERLAY_TEMPLATE_PART_AREA
+		) ?? false;
 
 	const {
 		replaceInnerBlocks,
@@ -503,13 +537,37 @@ function Navigation( {
 		[ clientId ]
 	);
 
-	// Force overlayMenu to 'never' if within an overlay template part
-	// to prevent overlays within overlays.
+	// Configure navigation blocks in overlay templates.
+	const hasSetOverlayDefault = useRef( false );
 	useEffect( () => {
-		if ( isWithinOverlay && overlayMenu !== 'never' ) {
+		if ( ! isWithinOverlay ) {
+			return;
+		}
+
+		// Prevent nested overlays.
+		if ( overlayMenu !== 'never' ) {
 			setAttributes( { overlayMenu: 'never' } );
 		}
-	}, [ isWithinOverlay, overlayMenu, setAttributes ] );
+
+		// Set vertical orientation and always-open submenus for new blocks.
+		if ( ! hasSetOverlayDefault.current && ! ref ) {
+			hasSetOverlayDefault.current = true;
+			setAttributes( {
+				submenuVisibility: 'always',
+				layout: {
+					...attributes.layout,
+					orientation: 'vertical',
+				},
+				showSubmenuIcon: false,
+			} );
+		}
+	}, [
+		attributes.layout,
+		isWithinOverlay,
+		overlayMenu,
+		ref,
+		setAttributes,
+	] );
 
 	const isResponsive = 'never' !== overlayMenu;
 	const blockProps = useBlockProps( {
@@ -668,8 +726,12 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
+	const computedSubmenuVisibility = getSubmenuVisibility( attributes );
+
 	const submenuAccessibilityNotice =
-		! showSubmenuIcon && ! openSubmenusOnClick
+		! showSubmenuIcon &&
+		computedSubmenuVisibility !== 'click' &&
+		computedSubmenuVisibility !== 'always'
 			? __(
 					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
 			  )
@@ -699,7 +761,7 @@ function Navigation( {
 						resetAll={ () => {
 							setAttributes( {
 								showSubmenuIcon: true,
-								openSubmenusOnClick: false,
+								submenuVisibility: 'hover',
 								overlayMenu: 'mobile',
 								hasIcon: true,
 								icon: 'handle',
@@ -757,28 +819,59 @@ function Navigation( {
 									{ __( 'Submenus' ) }
 								</h3>
 								<ToolsPanelItem
-									hasValue={ () => openSubmenusOnClick }
-									label={ __( 'Open on click' ) }
+									hasValue={ () =>
+										submenuVisibility !== 'hover'
+									}
+									label={ __( 'Submenu Visibility' ) }
 									onDeselect={ () =>
 										setAttributes( {
-											openSubmenusOnClick: false,
-											showSubmenuIcon: true,
+											submenuVisibility: 'hover',
 										} )
 									}
 									isShownByDefault
 								>
-									<ToggleControl
-										checked={ openSubmenusOnClick }
+									<ToggleGroupControl
+										__nextHasNoMarginBottom
+										__next40pxDefaultSize
+										label={ __( 'Submenu Visibility' ) }
+										value={ submenuVisibility }
 										onChange={ ( value ) => {
-											setAttributes( {
-												openSubmenusOnClick: value,
-												...( value && {
-													showSubmenuIcon: true,
-												} ), // Make sure arrows are shown when we toggle this on.
-											} );
+											const newAttributes = {
+												submenuVisibility: value,
+											};
+											const prevSubmenuVisibility =
+												submenuVisibility;
+											// If "always" is selected, hide the arrow because the formatting is broken for it when using center alignment.
+											if ( value === 'always' ) {
+												newAttributes.showSubmenuIcon = false;
+											} else if (
+												value === 'click' ||
+												prevSubmenuVisibility ===
+													'always'
+											) {
+												// When switching to "click" or away from "always", show the arrow
+												newAttributes.showSubmenuIcon = true;
+											}
+
+											setAttributes( newAttributes );
 										} }
-										label={ __( 'Open on click' ) }
-									/>
+										isBlock
+									>
+										<ToggleGroupControlOption
+											value="hover"
+											label={ __( 'Hover' ) }
+										/>
+										<ToggleGroupControlOption
+											value="click"
+											label={ __( 'Click' ) }
+										/>
+										{ orientation === 'vertical' && (
+											<ToggleGroupControlOption
+												value="always"
+												label={ __( 'Always' ) }
+											/>
+										) }
+									</ToggleGroupControl>
 								</ToolsPanelItem>
 
 								<ToolsPanelItem
@@ -790,7 +883,8 @@ function Navigation( {
 										} )
 									}
 									isDisabled={
-										attributes.openSubmenusOnClick
+										computedSubmenuVisibility === 'click' ||
+										computedSubmenuVisibility === 'always'
 									}
 									isShownByDefault
 								>
@@ -802,7 +896,10 @@ function Navigation( {
 											} );
 										} }
 										disabled={
-											attributes.openSubmenusOnClick
+											computedSubmenuVisibility ===
+												'click' ||
+											computedSubmenuVisibility ===
+												'always'
 										}
 										label={ __( 'Show arrow' ) }
 									/>
@@ -838,6 +935,7 @@ function Navigation( {
 						overlayMenuPreviewId={ overlayMenuPreviewId }
 						isResponsive={ isResponsive }
 						currentTheme={ currentTheme }
+						hasOverlays={ hasOverlays }
 					/>
 				</InspectorControls>
 			) }

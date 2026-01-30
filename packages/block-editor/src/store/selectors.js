@@ -1681,6 +1681,11 @@ const canInsertBlockTypeUnmemoized = (
 	blockName,
 	rootClientId = null
 ) => {
+	// Disable insertion in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	if ( ! isBlockVisibleInTheInserter( state, blockName, rootClientId ) ) {
 		return false;
 	}
@@ -1868,6 +1873,11 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
  * @return {boolean} Whether the given block is allowed to be removed.
  */
 export function canRemoveBlock( state, clientId ) {
+	// Disable removal in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -1930,6 +1940,11 @@ export function canRemoveBlocks( state, clientIds ) {
  * @return {boolean} Whether the given block is allowed to be moved.
  */
 export function canMoveBlock( state, clientId ) {
+	// Disable moving in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -1991,6 +2006,11 @@ export function canMoveBlocks( state, clientIds ) {
  * @return {boolean} Whether the given block is allowed to be edited.
  */
 export function canEditBlock( state, clientId ) {
+	// Disable editing in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	const attributes = getBlockAttributes( state, clientId );
 	if ( attributes === null ) {
 		return true;
@@ -2011,6 +2031,11 @@ export function canEditBlock( state, clientId ) {
  * @return {boolean} Whether a given block type can be locked/unlocked.
  */
 export function canLockBlockType( state, nameOrType ) {
+	// Disable locking in preview mode.
+	if ( state.settings.isPreviewMode ) {
+		return false;
+	}
+
 	if ( ! hasBlockSupport( nameOrType, 'lock', true ) ) {
 		return false;
 	}
