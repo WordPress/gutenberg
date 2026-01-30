@@ -200,6 +200,15 @@ export async function convertImageFormat(
 		saveOptions.effort = 2;
 	}
 
+	// Apply MozJPEG optimizations for JPEG output.
+	// optimize_coding enables optimal Huffman coding tables.
+	// quant_table 3 uses improved quantization tables similar to MozJPEG.
+	// These settings typically provide 10-15% smaller file sizes.
+	if ( 'image/jpeg' === outputType ) {
+		( saveOptions as SaveOptions< 'image/jpeg' > ).optimize_coding = true;
+		( saveOptions as SaveOptions< 'image/jpeg' > ).quant_table = 3;
+	}
+
 	const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 	const result = outBuffer.buffer;
 

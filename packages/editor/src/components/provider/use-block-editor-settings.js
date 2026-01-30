@@ -118,6 +118,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const {
 		allImageSizes,
 		bigImageSizeThreshold,
+		imageOutputFormats,
+		jpegInterlaced,
+		pngInterlaced,
+		gifInterlaced,
 		allowRightClickOverrides,
 		blockTypes,
 		focusMode,
@@ -174,6 +178,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			return {
 				allImageSizes: baseData?.image_sizes,
 				bigImageSizeThreshold: baseData?.image_size_threshold,
+				imageOutputFormats: baseData?.image_output_formats,
+				jpegInterlaced: baseData?.jpeg_interlaced,
+				pngInterlaced: baseData?.png_interlaced,
+				gifInterlaced: baseData?.gif_interlaced,
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
@@ -328,6 +336,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
 			allImageSizes,
 			bigImageSizeThreshold,
+			imageOutputFormats,
+			jpegInterlaced,
+			pngInterlaced,
+			gifInterlaced,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
@@ -432,6 +444,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		deviceType,
 		allImageSizes,
 		bigImageSizeThreshold,
+		imageOutputFormats,
+		jpegInterlaced,
+		pngInterlaced,
+		gifInterlaced,
 	] );
 }
 
