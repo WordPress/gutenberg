@@ -105,7 +105,7 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 					styles[ `has-${ density }-density` ],
 					className
 				) }
-				render={ ( props, state ) => {
+				render={ ( props ) => {
 					// Fallback to -1 to prevent browsers from making the tablist
 					// tabbable when it is a scrolling container.
 					const newProps = {
@@ -116,7 +116,7 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 					if ( isValidElement( render ) ) {
 						return cloneElement( render, newProps );
 					} else if ( typeof render === 'function' ) {
-						return render( newProps, state );
+						return render( newProps );
 					}
 					return <div { ...newProps } />;
 				} }
