@@ -6,7 +6,8 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * Internal dependencies
  */
-import { flattenFormData } from './flatten-form-data';
+import { buildRestUrl } from './build-rest-url';
+import { createUploadFormData } from './create-upload-form-data';
 import { transformAttachment } from './transform-attachment';
 import type { Attachment, CreateRestAttachment, RestAttachment } from './types';
 
@@ -26,24 +27,16 @@ function uploadWithProgress(
 	onProgress?: ( progress: number ) => void
 ): Promise< Attachment > {
 	return new Promise( ( resolve, reject ) => {
-		const data = new FormData();
-		data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
-		for ( const [ key, value ] of Object.entries( additionalData ) ) {
-			flattenFormData(
-				data,
-				key,
-				value as string | Record< string, string > | undefined
-			);
+		// Handle abort signal - check early before creating resources.
+		if ( signal?.aborted ) {
+			reject( new DOMException( 'Aborted', 'AbortError' ) );
+			return;
 		}
 
+		const data = createUploadFormData( file, additionalData );
 		const xhr = new XMLHttpRequest();
 
-		// Handle abort signal
 		if ( signal ) {
-			if ( signal.aborted ) {
-				reject( new DOMException( 'Aborted', 'AbortError' ) );
-				return;
-			}
 			signal.addEventListener( 'abort', () => {
 				xhr.abort();
 			} );
@@ -90,24 +83,8 @@ function uploadWithProgress(
 			reject( new DOMException( 'Aborted', 'AbortError' ) );
 		};
 
-		// Build the URL - use the same path as apiFetch
-		const path = '/wp/v2/media?_embed=wp:featuredmedia';
-
-		// Get root URL from window location or use relative path
-		// apiFetch middlewares handle this, but for XHR we need to build it manually
-		let url = path;
-
-		// Check if we're in a WordPress environment with REST API root
-		if (
-			typeof window !== 'undefined' &&
-			( window as Window & { wpApiSettings?: { root?: string } } )
-				.wpApiSettings?.root
-		) {
-			const apiRoot = (
-				window as Window & { wpApiSettings?: { root?: string } }
-			 ).wpApiSettings!.root!;
-			url = apiRoot + ( path.startsWith( '/' ) ? path.slice( 1 ) : path );
-		}
+		// Build the URL using the helper that handles plain permalinks and _locale.
+		const url = buildRestUrl( '/wp/v2/media?_embed=wp:featuredmedia' );
 
 		xhr.open( 'POST', url );
 
@@ -140,16 +117,8 @@ export async function uploadToServer(
 		return uploadWithProgress( file, additionalData, signal, onProgress );
 	}
 
-	// Create upload payload.
-	const data = new FormData();
-	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
-	for ( const [ key, value ] of Object.entries( additionalData ) ) {
-		flattenFormData(
-			data,
-			key,
-			value as string | Record< string, string > | undefined
-		);
-	}
+	// Create upload payload using the shared helper.
+	const data = createUploadFormData( file, additionalData );
 
 	return transformAttachment(
 		await apiFetch< RestAttachment >( {
