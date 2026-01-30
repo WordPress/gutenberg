@@ -51,6 +51,7 @@
 		"./form/view": "./build-module/form/view.mjs",
 		"./image/view": "./build-module/image/view.mjs",
 		"./navigation/view": "./build-module/navigation/view.mjs",
+		"./playlist/view": "./build-module/playlist/view.mjs",
 		"./query/view": "./build-module/query/view.mjs",
 		"./search/view": "./build-module/search/view.mjs",
 		"./tabs/view": "./build-module/tabs/view.mjs"

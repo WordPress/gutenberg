@@ -385,6 +385,56 @@ class PlaygroundRuntime {
 	}
 
 	/**
+	 * Get the status of the Playground environment.
+	 *
+	 * @param {Object} config          The wp-env config object.
+	 * @param {Object} options         Status options.
+	 * @param {Object} options.spinner A CLI spinner which indicates progress.
+	 * @return {Promise<Object>} Status object with environment information.
+	 */
+	async getStatus( config, { spinner } ) {
+		spinner.text = 'Getting environment status.';
+
+		const envConfig = config.env.development;
+		const port = envConfig.port || 8888;
+		const pidFile = path.join( config.workDirectoryPath, 'playground.pid' );
+
+		// Check if server is running.
+		let isRunning = false;
+
+		try {
+			const pidContent = await fs.readFile( pidFile, 'utf8' );
+			const pid = parseInt( pidContent.trim(), 10 );
+
+			// Check if process is still alive.
+			process.kill( pid, 0 );
+
+			// Check if server is responding.
+			await this._checkServer( port );
+			isRunning = true;
+		} catch {
+			// Process not running or server not responding.
+		}
+
+		return {
+			status: isRunning ? 'running' : 'stopped',
+			runtime: 'playground',
+			urls: {
+				development: isRunning ? `http://localhost:${ port }` : null,
+			},
+			ports: {
+				development: port,
+			},
+			config: {
+				multisite: envConfig.multisite,
+				xdebug: 'off',
+			},
+			configPath: config.configDirectoryPath,
+			installPath: config.workDirectoryPath,
+		};
+	}
+
+	/**
 	 * Show logs from the Playground environment.
 	 *
 	 * @param {Object}  config              The wp-env config object.

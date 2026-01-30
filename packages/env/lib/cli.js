@@ -258,10 +258,16 @@ module.exports = function cli() {
 		withSpinner( env.destroy )
 	);
 	yargs.command(
-		'install-path',
-		'Get the path where all of the environment files are stored. This includes the Docker files, WordPress, PHPUnit files, and any sources that were downloaded.',
-		() => {},
-		withSpinner( env.installPath )
+		'status',
+		'Get the status of the wp-env environment including URLs, ports, and configuration.',
+		( args ) => {
+			args.option( 'json', {
+				type: 'boolean',
+				describe: 'Output status as JSON.',
+				default: false,
+			} );
+		},
+		withSpinner( env.status )
 	);
 
 	return yargs;

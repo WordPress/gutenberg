@@ -9,6 +9,7 @@
 		{ "path": "../element" },
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
+		{ "path": "../keycodes" },
 		{ "path": "../primitives" },
 		{ "path": "../private-apis" },
 		{ "path": "../theme" }

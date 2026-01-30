@@ -573,6 +573,74 @@ class DockerRuntime {
 	}
 
 	/**
+	 * Get the status of the Docker environment.
+	 *
+	 * @param {WPConfig} config          The wp-env config object.
+	 * @param {Object}   options         Status options.
+	 * @param {Object}   options.spinner A CLI spinner which indicates progress.
+	 * @param {boolean}  options.debug   True if debug mode is enabled.
+	 * @return {Promise<Object>} Status object with environment information.
+	 */
+	async getStatus( config, { spinner, debug } ) {
+		spinner.text = 'Getting environment status.';
+
+		const fullConfig = await initConfig( { spinner, debug } );
+		const dockerComposeConfig = {
+			config: fullConfig.dockerComposeConfigPath,
+			log: debug,
+		};
+
+		// Check if containers are running by trying to get a port.
+		let isRunning = false;
+		let mySQLPort = null;
+		let phpmyadminPort = null;
+
+		try {
+			mySQLPort = await this._getPublicDockerPort(
+				'mysql',
+				3306,
+				dockerComposeConfig
+			);
+			isRunning = true;
+
+			if ( fullConfig.env.development.phpmyadminPort ) {
+				phpmyadminPort = await this._getPublicDockerPort(
+					'phpmyadmin',
+					80,
+					dockerComposeConfig
+				);
+			}
+		} catch {
+			// Containers are not running.
+		}
+
+		const siteUrl = fullConfig.env.development.config.WP_SITEURL;
+
+		return {
+			status: isRunning ? 'running' : 'stopped',
+			runtime: 'docker',
+			urls: {
+				development: isRunning ? siteUrl : null,
+				phpmyadmin:
+					isRunning && phpmyadminPort
+						? `http://localhost:${ phpmyadminPort }`
+						: null,
+			},
+			ports: {
+				development: fullConfig.env.development.port,
+				tests: fullConfig.env.tests.port,
+				mysql: mySQLPort,
+			},
+			config: {
+				multisite: fullConfig.env.development.multisite,
+				xdebug: fullConfig.xdebug || 'off',
+			},
+			configPath: fullConfig.configDirectoryPath,
+			installPath: fullConfig.workDirectoryPath,
+		};
+	}
+
+	/**
 	 * Runs an arbitrary command on the given Docker container.
 	 *
 	 * @param {WPConfig} config    The wp-env configuration.

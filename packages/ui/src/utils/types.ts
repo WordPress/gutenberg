@@ -1,16 +1,15 @@
-import {
-	type ElementType,
-	type ComponentPropsWithoutRef,
-	type HTMLAttributes,
-	type Ref,
+import type {
+	ElementType,
+	ComponentPropsWithoutRef,
+	HTMLAttributes,
+	ReactElement,
+	Ref,
 } from 'react';
 
 type HTMLAttributesWithRef< T extends ElementType = any > =
 	HTMLAttributes< T > & { ref?: Ref< T > | undefined };
 
-type ComponentRenderFn< Props > = (
-	props: Props
-) => React.ReactElement< unknown >;
+type ComponentRenderFn< Props > = ( props: Props ) => ReactElement< unknown >;
 
 export type ComponentProps< E extends ElementType > = Omit<
 	ComponentPropsWithoutRef< E >,
@@ -27,5 +26,5 @@ export type ComponentProps< E extends ElementType > = Omit<
 	 */
 	render?:
 		| ComponentRenderFn< HTMLAttributesWithRef >
-		| React.ReactElement< Record< string, unknown > >;
+		| ReactElement< Record< string, unknown > >;
 };

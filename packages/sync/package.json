@@ -45,16 +45,17 @@
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/hooks": "file:../hooks",
-		"diff": "4.0.2",
-		"fast-deep-equal": "3.1.3",
-		"lib0": "0.2.85",
+		"@wordpress/undo-manager": "file:../undo-manager",
+		"diff": "^4.0.2",
+		"fast-deep-equal": "^3.1.3",
+		"lib0": "0.2.99",
 		"y-protocols": "^1.0.5",
-		"yjs": "~13.6.6"
+		"yjs": "13.6.29"
 	},
 	"devDependencies": {
-		"@types/diff": "7.0.2",
-		"@types/node": "^20.17.10",
-		"@wordpress/undo-manager": "file:../undo-manager"
+		"@jest/globals": "^30.2.0",
+		"@types/diff": "^7.0.2",
+		"@types/node": "^20.17.10"
 	},
 	"publishConfig": {
 		"access": "public"
