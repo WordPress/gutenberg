@@ -1,10 +1,4 @@
-import {
-	cloneElement,
-	forwardRef,
-	isValidElement,
-	useEffect,
-	useState,
-} from '@wordpress/element';
+import { forwardRef, useEffect, useState } from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
 import { useMergeRefs } from '@wordpress/compose';
@@ -36,9 +30,11 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 		const [ overflow, setOverflow ] = useState< {
 			first: boolean;
 			last: boolean;
+			isScrolling: boolean;
 		} >( {
 			first: false,
 			last: false,
+			isScrolling: false,
 		} );
 
 		// Check if list is overflowing when it scrolls or resizes.
@@ -68,6 +64,7 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 				setOverflow( {
 					first: scrollFromStart > SCROLL_EPSILON,
 					last: scrollFromStart < maxScroll - SCROLL_EPSILON,
+					isScrolling: scrollWidth > clientWidth,
 				} );
 			};
 
@@ -119,22 +116,11 @@ export const List = forwardRef< HTMLDivElement, TabListProps >(
 					styles[ `is-${ variant }-variant` ],
 					className
 				) }
-				render={ ( props ) => {
-					// Fallback to -1 to prevent browsers from making the tablist
-					// tabbable when it is a scrolling container.
-					const newProps = {
-						...props,
-						tabIndex: props.tabIndex ?? -1,
-					};
-
-					if ( isValidElement( render ) ) {
-						return cloneElement( render, newProps );
-					} else if ( typeof render === 'function' ) {
-						return render( newProps );
-					}
-					return <div { ...newProps } />;
-				} }
 				{ ...otherProps }
+				tabIndex={
+					otherProps.tabIndex ??
+					( overflow.isScrolling ? -1 : undefined )
+				}
 			>
 				{ children }
 				<_Tabs.Indicator className={ styles.indicator } />
