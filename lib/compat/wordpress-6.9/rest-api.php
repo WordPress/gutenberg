@@ -42,7 +42,10 @@ add_filter( 'rest_prepare_theme', 'gutenberg_rest_theme_export_link_rel', 10, 2 
  * @return array Modified array of arguments.
  */
 function gutenberg_override_attachments_rest_controller( $args, $post_type ) {
-	if ( 'attachment' === $post_type && ! gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
+	/** This filter is documented in lib/experimental/editor-settings.php */
+	$client_side_media_enabled = apply_filters( 'gutenberg_client_side_media_processing_enabled', true );
+
+	if ( 'attachment' === $post_type && ! $client_side_media_enabled ) {
 		$args['rest_controller_class'] = 'Gutenberg_REST_Attachments_Controller_6_9';
 	}
 	return $args;
