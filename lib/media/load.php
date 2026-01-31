@@ -1,9 +1,53 @@
 <?php
 /**
- * Adds media-related experimental functionality.
+ * Adds media-related functionality for client-side media processing.
  *
  * @package gutenberg
  */
+
+/**
+ * Filters whether client-side media processing is enabled.
+ *
+ * Client-side media processing uses the browser's capabilities to handle
+ * tasks like image resizing and compression before uploading to the server.
+ *
+ * @since 20.8.0
+ *
+ * @param bool $enabled Whether client-side media processing is enabled. Default true.
+ */
+$client_side_media_enabled = apply_filters( 'gutenberg_client_side_media_processing_enabled', true );
+
+if ( ! $client_side_media_enabled ) {
+	return;
+}
+
+/**
+ * Debug logging for client-side media processing (load.php).
+ * Set $debug_enabled to true to enable logging.
+ *
+ * @param string $message Log message.
+ * @param array  $data    Optional data to include in log.
+ */
+function gutenberg_media_load_debug_log( $message, $data = array() ) {
+	// Set to true to enable debug logging.
+	$debug_enabled = false;
+
+	if ( ! $debug_enabled ) {
+		return;
+	}
+
+	$timestamp = gmdate( 'H:i:s.v' );
+	$prefix    = "[MEDIA:PHP:LOAD] $timestamp";
+
+	if ( ! empty( $data ) ) {
+		$data_str = wp_json_encode( $data, JSON_PRETTY_PRINT );
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( "$prefix $message\n  └─ Details: $data_str" );
+	} else {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( "$prefix $message" );
+	}
+}
 
 /**
  * Returns a list of all available image sizes.
@@ -195,9 +239,9 @@ function gutenberg_rest_get_attachment_filesize( array $post ): ?int {
  * @return string Filtered rewrite rules.
  */
 function gutenberg_filter_mod_rewrite_rules( string $rules ): string {
-	$rules .= "\n# BEGIN Gutenberg client-side media processing experiment\n" .
+	$rules .= "\n# BEGIN Gutenberg client-side media processing\n" .
 				"AddType application/wasm wasm\n" .
-				"# END Gutenberg client-side media processing experiment\n";
+				"# END Gutenberg client-side media processing\n";
 
 	return $rules;
 }
