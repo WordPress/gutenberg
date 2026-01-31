@@ -1,7 +1,12 @@
 <?php
 
 /**
- * Tests for experimental client-side media processing.
+ * Tests for client-side media processing.
+ *
+ * Client-side media processing is a core feature that uses the browser's
+ * capabilities to handle tasks like image resizing and compression before
+ * uploading to the server. It can be disabled via the
+ * 'gutenberg_client_side_media_processing_enabled' filter.
  */
 class Media_Processing_Test extends WP_UnitTestCase {
 	/**
@@ -193,5 +198,57 @@ HTML;
 		$this->assertStringContainsString( '<audio crossorigin="anonymous"', $output );
 		$this->assertStringContainsString( '<img crossorigin="anonymous"', $output );
 		$this->assertStringContainsString( '<video crossorigin="anonymous"', $output );
+	}
+
+	/**
+	 * Tests that the client-side media processing filter defaults to true.
+	 *
+	 * @covers gutenberg_client_side_media_processing_enabled
+	 */
+	public function test_client_side_media_processing_filter_defaults_to_true() {
+		$enabled = apply_filters( 'gutenberg_client_side_media_processing_enabled', true );
+		$this->assertTrue( $enabled );
+	}
+
+	/**
+	 * Tests that the client-side media processing filter can be disabled.
+	 *
+	 * @covers gutenberg_client_side_media_processing_enabled
+	 */
+	public function test_client_side_media_processing_filter_can_be_disabled() {
+		add_filter( 'gutenberg_client_side_media_processing_enabled', '__return_false' );
+		$enabled = apply_filters( 'gutenberg_client_side_media_processing_enabled', true );
+		remove_filter( 'gutenberg_client_side_media_processing_enabled', '__return_false' );
+
+		$this->assertFalse( $enabled );
+	}
+
+	/**
+	 * Tests that the 6.9 compat REST controller is used when filter disables client-side media.
+	 *
+	 * @covers ::gutenberg_override_attachments_rest_controller
+	 */
+	public function test_compat_rest_controller_used_when_filter_disabled() {
+		add_filter( 'gutenberg_client_side_media_processing_enabled', '__return_false' );
+
+		$result = gutenberg_override_attachments_rest_controller( array(), 'attachment' );
+
+		remove_filter( 'gutenberg_client_side_media_processing_enabled', '__return_false' );
+
+		$this->assertSame(
+			array( 'rest_controller_class' => 'Gutenberg_REST_Attachments_Controller_6_9' ),
+			$result
+		);
+	}
+
+	/**
+	 * Tests that the 6.9 compat REST controller is not used when filter is enabled (default).
+	 *
+	 * @covers ::gutenberg_override_attachments_rest_controller
+	 */
+	public function test_compat_rest_controller_not_used_when_filter_enabled() {
+		$result = gutenberg_override_attachments_rest_controller( array(), 'attachment' );
+
+		$this->assertSame( array(), $result );
 	}
 }
