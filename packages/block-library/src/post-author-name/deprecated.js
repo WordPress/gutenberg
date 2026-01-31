@@ -8,12 +8,12 @@ const v1 = {
 		isLink: {
 			type: 'boolean',
 			default: false,
-			role: 'content'
+			role: 'content',
 		},
 		linkTarget: {
 			type: 'string',
 			default: '_self',
-			role: 'content'
+			role: 'content',
 		},
 		textAlign: {
 			type: 'string',
