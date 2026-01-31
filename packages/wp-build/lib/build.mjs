@@ -1145,6 +1145,7 @@ async function transpilePackage( packageName ) {
 		),
 		{
 			ignore: IGNORE_PATTERNS,
+			dot: true,
 		}
 	);
 
@@ -1154,6 +1155,7 @@ async function transpilePackage( packageName ) {
 		),
 		{
 			ignore: IGNORE_PATTERNS,
+			dot: true,
 		}
 	);
 
