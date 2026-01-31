@@ -24,6 +24,8 @@ import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
 function PostAuthorNameEdit( props ) {
 	useDeprecatedTextAlign( props );
 	const {
+		attributes: { isLink, linkTarget },
+		setAttributes,
 		context: { postType, postId },
 	} = props;
 	const { authorName, supportsAuthor } = useSelect(
