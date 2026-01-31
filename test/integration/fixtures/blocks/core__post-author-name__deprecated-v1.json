@@ -3,6 +3,8 @@
 		"name": "core/post-author-name",
 		"isValid": true,
 		"attributes": {
+			"isLink": false,
+			"linkTarget": "_self",
 			"style": {
 				"typography": {
 					"textAlign": "left"
@@ -15,6 +17,8 @@
 		"name": "core/post-author-name",
 		"isValid": true,
 		"attributes": {
+			"isLink": false,
+			"linkTarget": "_self",
 			"style": {
 				"typography": {
 					"textAlign": "center"
@@ -27,6 +31,8 @@
 		"name": "core/post-author-name",
 		"isValid": true,
 		"attributes": {
+			"isLink": false,
+			"linkTarget": "_self",
 			"style": {
 				"typography": {
 					"textAlign": "right"
