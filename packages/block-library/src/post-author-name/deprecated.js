@@ -5,7 +5,7 @@ import migrateTextAlign from '../utils/migrate-text-align';
 
 const v1 = {
 	attributes: {
-		"isLink": {
+		isLink: {
 			type: 'boolean',
 			default: false,
 			role: 'content'
