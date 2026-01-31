@@ -6,7 +6,8 @@
  * Client-side media processing is a core feature that uses the browser's
  * capabilities to handle tasks like image resizing and compression before
  * uploading to the server. It can be disabled via the
- * 'gutenberg_client_side_media_processing_enabled' filter.
+ * 'gutenberg_client_side_media_processing_enabled' filter or checked using
+ * the gutenberg_is_client_side_media_processing_enabled() helper function.
  */
 class Media_Processing_Test extends WP_UnitTestCase {
 	/**
@@ -201,23 +202,22 @@ HTML;
 	}
 
 	/**
-	 * Tests that the client-side media processing filter defaults to true.
+	 * Tests that client-side media processing is enabled by default.
 	 *
-	 * @covers gutenberg_client_side_media_processing_enabled
+	 * @covers ::gutenberg_is_client_side_media_processing_enabled
 	 */
-	public function test_client_side_media_processing_filter_defaults_to_true() {
-		$enabled = apply_filters( 'gutenberg_client_side_media_processing_enabled', true );
-		$this->assertTrue( $enabled );
+	public function test_client_side_media_processing_enabled_by_default() {
+		$this->assertTrue( gutenberg_is_client_side_media_processing_enabled() );
 	}
 
 	/**
-	 * Tests that the client-side media processing filter can be disabled.
+	 * Tests that client-side media processing can be disabled via filter.
 	 *
-	 * @covers gutenberg_client_side_media_processing_enabled
+	 * @covers ::gutenberg_is_client_side_media_processing_enabled
 	 */
-	public function test_client_side_media_processing_filter_can_be_disabled() {
+	public function test_client_side_media_processing_can_be_disabled() {
 		add_filter( 'gutenberg_client_side_media_processing_enabled', '__return_false' );
-		$enabled = apply_filters( 'gutenberg_client_side_media_processing_enabled', true );
+		$enabled = gutenberg_is_client_side_media_processing_enabled();
 		remove_filter( 'gutenberg_client_side_media_processing_enabled', '__return_false' );
 
 		$this->assertFalse( $enabled );
