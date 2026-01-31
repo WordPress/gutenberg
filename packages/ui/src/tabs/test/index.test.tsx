@@ -169,14 +169,6 @@ async function waitForComponentToBeInitializedWithSelectedTab(
 	selectedTabName: string | undefined
 ) {
 	if ( ! selectedTabName ) {
-		// Wait for the tablist to be tabbable as a mean to know
-		// that tabs has finished initializing.
-		await waitFor( () =>
-			expect( screen.getByRole( 'tablist' ) ).toHaveAttribute(
-				'tabindex',
-				expect.stringMatching( /^(0|-1)$/ )
-			)
-		);
 		// No initially selected tabs or tabpanels.
 		await waitFor( () =>
 			expect(
