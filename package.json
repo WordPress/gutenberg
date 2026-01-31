@@ -247,5 +247,8 @@
 		"packages/*",
 		"routes/*",
 		"storybook"
-	]
+	],
+	"dependencies": {
+		"@wordpress/vips": "1.0.0-prerelease"
+	}
 }
