@@ -22,19 +22,7 @@ function gutenberg_enable_experiments() {
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-dataviews-media-modal', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDataViewsMediaModal = true', 'before' );
 	}
-	/**
-	 * Filters whether client-side media processing is enabled.
-	 *
-	 * Client-side media processing uses the browser's capabilities to handle
-	 * tasks like image resizing and compression before uploading to the server.
-	 *
-	 * @since 20.8.0
-	 *
-	 * @param bool $enabled Whether client-side media processing is enabled. Default true.
-	 */
-	$client_side_media_enabled = apply_filters( 'gutenberg_client_side_media_processing_enabled', true );
-
-	if ( $client_side_media_enabled ) {
+	if ( gutenberg_is_client_side_media_processing_enabled() ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
 	}
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-content-only-inspector-fields', $gutenberg_experiments ) ) {
