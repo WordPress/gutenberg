@@ -48,18 +48,9 @@ export function BlockRemovalWarningModal( { rules } ) {
 		return;
 	}
 
-	// Normalize message to a structured object. String messages (backward
-	// compatibility) are converted to the structured format with defaults.
-	const {
-		title = __( 'Confirm deletion' ),
-		description = message,
-		warning,
-		subtext,
-		requireConfirmation = false,
-		confirmLabel = __( 'I understand the consequences' ),
-		removeLabel = __( 'Delete' ),
-	} = typeof message === 'object' && message !== null ? message : {};
-
+	const isStructured = typeof message === 'object' && message !== null;
+	const description = isStructured ? message.description : message;
+	const requireConfirmation = isStructured && message.requireConfirmation;
 	const isRemoveDisabled = requireConfirmation && ! confirmed;
 
 	const onConfirmRemoval = () => {
@@ -69,25 +60,28 @@ export function BlockRemovalWarningModal( { rules } ) {
 
 	return (
 		<Modal
-			title={ title }
+			title={ __( 'Confirm deletion' ) }
 			onRequestClose={ clearBlockRemovalPrompt }
 			size="medium"
 		>
 			<VStack spacing={ 4 }>
 				<div>
 					<p>{ description }</p>
-					{ ( warning || subtext ) && (
-						<p>
-							{ warning && <strong>{ warning }</strong> }
-							{ warning && subtext && ' ' }
-							{ subtext }
-						</p>
-					) }
+					{ isStructured &&
+						( message.warning || message.subtext ) && (
+							<p>
+								{ message.warning && (
+									<strong>{ message.warning }</strong>
+								) }
+								{ message.warning && message.subtext && ' ' }
+								{ message.subtext }
+							</p>
+						) }
 				</div>
 				{ requireConfirmation && (
 					<CheckboxControl
 						__nextHasNoMarginBottom
-						label={ confirmLabel }
+						label={ __( 'I understand the consequences' ) }
 						checked={ confirmed }
 						onChange={ setConfirmed }
 					/>
@@ -107,7 +101,7 @@ export function BlockRemovalWarningModal( { rules } ) {
 						accessibleWhenDisabled
 						__next40pxDefaultSize
 					>
-						{ removeLabel }
+						{ __( 'Delete' ) }
 					</Button>
 				</HStack>
 			</VStack>
