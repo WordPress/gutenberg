@@ -89,13 +89,13 @@ function render_block_core_block( $attributes, $content, $block_instance ) {
 	} else {
 		// This branch can be removed once Gutenberg requires WordPress 6.8 or later.
 		if ( ! class_exists( 'WP_Block_Cloner' ) ) {
-		// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingClassSinceTag
-		/**
-		 * Helper class used to clone a block instance.
-		 *
-		 * @since 6.5.0
-		 */
-		class WP_Block_Cloner extends WP_Block {
+			// phpcs:ignore Gutenberg.Commenting.SinceTag.MissingClassSinceTag
+			/**
+			 * Helper class used to clone a block instance.
+			 *
+			 * @since 6.5.0
+			 */
+			class WP_Block_Cloner extends WP_Block {
 				/**
 				 * Static methods of subclasses have access to protected properties
 				 * of instances of the parent class.
