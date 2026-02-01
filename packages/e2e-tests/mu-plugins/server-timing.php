@@ -14,6 +14,15 @@
 
 add_filter(
 	'template_include',
+	/**
+	 * Adds server timing headers for front-end requests.
+	 *
+	 * @global float $timestart
+	 * @global wpdb  $wpdb
+	 *
+	 * @param string $template The path of the template to include.
+	 * @return string The path of the template to include.
+	 */
 	static function ( $template ) {
 
 		global $timestart, $wpdb;
@@ -57,6 +66,12 @@ add_filter(
 
 add_action(
 	'admin_init',
+	/**
+	 * Adds server timing headers for admin requests.
+	 *
+	 * @global float $timestart
+	 * @global wpdb  $wpdb
+	 */
 	static function () {
 		global $timestart, $wpdb;
 
