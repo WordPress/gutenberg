@@ -277,23 +277,6 @@ export function renderingMode( state = 'post-only', action ) {
 }
 
 /**
- * Reducer returning the editing canvas device type.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function deviceType( state = 'Desktop', action ) {
-	switch ( action.type ) {
-		case 'SET_DEVICE_TYPE':
-			return action.deviceType;
-	}
-
-	return state;
-}
-
-/**
  * Reducer storing the list of all programmatically removed panels.
  *
  * @param {Array}  state  Current state.
@@ -419,6 +402,21 @@ export function showStylebook( state = false, action ) {
 }
 
 /**
+ * Reducer for the canvas width.
+ *
+ * @param {number} state  Current state.
+ * @param {Object} action Dispatched action.
+ * @return {number} Updated state.
+ */
+export function canvasWidth( state = undefined, action ) {
+	switch ( action.type ) {
+		case 'SET_CANVAS_WIDTH':
+			return action.width;
+	}
+	return state;
+}
+
+/**
  * Reducer for the canvas minimum height.
  *
  * @param {number} state  Current state.
@@ -461,7 +459,6 @@ export default combineReducers( {
 	editorSettings,
 	postAutosavingLock,
 	renderingMode,
-	deviceType,
 	removedPanels,
 	blockInserterPanel,
 	inserterSidebarToggleRef,
@@ -470,6 +467,7 @@ export default combineReducers( {
 	publishSidebarActive,
 	stylesPath,
 	showStylebook,
+	canvasWidth,
 	canvasMinHeight,
 	revisionId,
 	dataviews: dataviewsReducer,

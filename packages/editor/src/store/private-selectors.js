@@ -292,6 +292,16 @@ export function getShowStylebook( state ) {
 }
 
 /**
+ * Get the canvas width.
+ *
+ * @param {Object} state Global application state.
+ * @return {number} The canvas width in pixels.
+ */
+export function getCanvasWidth( state ) {
+	return state.canvasWidth;
+}
+
+/**
  * Get the canvas minimum height.
  *
  * @param {Object} state Global application state.

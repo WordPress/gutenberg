@@ -397,7 +397,6 @@ function Layout( {
 		showMetaBoxes,
 		isWelcomeGuideVisible,
 		templateId,
-		isDevicePreview,
 	} = useSelect(
 		( select ) => {
 			const { get } = select( preferencesStore );
@@ -416,8 +415,9 @@ function Layout( {
 			const { getBlockSelectionStart, isZoomOut } = unlock(
 				select( blockEditorStore )
 			);
-			const { getEditorMode, getDefaultRenderingMode, getDeviceType } =
-				unlock( select( editorStore ) );
+			const { getEditorMode, getDefaultRenderingMode } = unlock(
+				select( editorStore )
+			);
 			const isNotDesignPostType =
 				! DESIGN_POST_TYPES.includes( currentPostType );
 			const isDirectlyEditingPattern =
@@ -448,7 +448,6 @@ function Layout( {
 					! isEditingTemplate
 						? _templateId
 						: null,
-				isDevicePreview: getDeviceType() !== 'Desktop',
 			};
 		},
 		[
@@ -602,11 +601,7 @@ function Layout( {
 						extraContent={
 							! isDistractionFree &&
 							showMetaBoxes && (
-								<MetaBoxesMain
-									isLegacy={
-										! shouldIframe || isDevicePreview
-									}
-								/>
+								<MetaBoxesMain isLegacy={ ! shouldIframe } />
 							)
 						}
 					>

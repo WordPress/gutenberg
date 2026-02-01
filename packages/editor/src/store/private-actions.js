@@ -565,6 +565,19 @@ export function resetStylesNavigation() {
 }
 
 /**
+ * Set the width of the canvas.
+ *
+ * @param {number} width The width of the canvas in pixels.
+ * @return {Object} Action object.
+ */
+export function setCanvasWidth( width ) {
+	return {
+		type: 'SET_CANVAS_WIDTH',
+		width,
+	};
+}
+
+/**
  * Set the minimum height of the canvas.
  *
  * @param {number} minHeight
