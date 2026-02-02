@@ -204,7 +204,7 @@ export default function Controls( {
 				<ColorGradientSettingsDropdown
 					settings={ [
 						{
-							label: __( 'Active Background' ),
+							label: __( 'Active background' ),
 							colorValue:
 								activeBackgroundColor?.color ??
 								customActiveBackgroundColor,
@@ -216,7 +216,7 @@ export default function Controls( {
 							},
 						},
 						{
-							label: __( 'Active Text' ),
+							label: __( 'Active text' ),
 							colorValue:
 								activeTextColor?.color ?? customActiveTextColor,
 							onColorChange: ( value ) => {
@@ -227,7 +227,7 @@ export default function Controls( {
 							},
 						},
 						{
-							label: __( 'Hover Background' ),
+							label: __( 'Hover background' ),
 							colorValue:
 								hoverBackgroundColor?.color ??
 								customHoverBackgroundColor,
@@ -239,7 +239,7 @@ export default function Controls( {
 							},
 						},
 						{
-							label: __( 'Hover Text' ),
+							label: __( 'Hover text' ),
 							colorValue:
 								hoverTextColor?.color ?? customHoverTextColor,
 							onColorChange: ( value ) => {

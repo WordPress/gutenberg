@@ -94,7 +94,7 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 					label={ __( 'Remove the current tab' ) }
 					onClick={ removeTab }
 					showTooltip
-					text={ __( 'Remove Tab' ) }
+					text={ __( 'Remove tab' ) }
 					disabled={ isDisabled }
 				/>
 			</ToolbarGroup>

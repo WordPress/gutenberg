@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -39,14 +38,7 @@ const TABS_TEMPLATE = [
 					anchor: 'tab-1',
 					label: 'Tab 1',
 				},
-				[
-					[
-						'core/paragraph',
-						{
-							placeholder: __( 'Type / to add a block to tab' ),
-						},
-					],
-				],
+				[ [ 'core/paragraph' ] ],
 			],
 		],
 	],

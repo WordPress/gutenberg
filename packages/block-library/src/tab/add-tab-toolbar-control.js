@@ -11,7 +11,7 @@ import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
- * "Add Tab" button in the block toolbar for the tab block.
+ * "Add tab" button in the block toolbar for the tab block.
  * Inserts new tabs into the tab-panels block.
  *
  * @param {Object} props
@@ -61,10 +61,9 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 			<ToolbarGroup>
 				<ToolbarButton
 					className="components-toolbar__control"
-					label={ __( 'Add a new tab' ) }
 					onClick={ addTab }
 					showTooltip
-					text={ __( 'Add Tab' ) }
+					text={ __( 'Add tab' ) }
 				/>
 			</ToolbarGroup>
 		</BlockControls>
