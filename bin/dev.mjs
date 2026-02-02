@@ -218,7 +218,6 @@ async function dev() {
 				isReady = true;
 
 				// Build blocks manifests after initial build completes
-				console.log( '\n📦 Building blocks manifests...' );
 				const blocksDirs = [
 					{
 						input: 'build/scripts/block-library',
