@@ -76,6 +76,7 @@ module.exports = async function loadConfig(
 		),
 		configDirectoryPath,
 		workDirectoryPath: cacheDirectoryPath,
+		customConfigPath,
 		detectedLocalConfig: await hasLocalConfig( [
 			configFilePath,
 			getConfigFilePath(
