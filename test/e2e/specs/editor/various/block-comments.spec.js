@@ -830,6 +830,167 @@ test.describe( 'Block Comments', () => {
 			await expect( thread ).toBeFocused();
 		} );
 	} );
+
+	test.describe( 'Emoji Reactions', () => {
+		test( 'can add an emoji reaction to a note', async ( {
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing emoji reactions' },
+				comment: 'Test comment for reactions',
+			} );
+
+			await blockCommentUtils.addReactionToComment( 'Thumbs up' );
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reaction added.' } )
+			).toBeVisible();
+
+			// Verify the reaction button appears with count.
+			const reactionButton = page.locator(
+				'.editor-collab-sidebar-panel__reaction-button'
+			);
+			await expect( reactionButton ).toBeVisible();
+			await expect( reactionButton ).toContainText( '1' );
+		} );
+
+		test( 'can remove own emoji reaction by clicking it', async ( {
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing reaction removal' },
+				comment: 'Test comment for removing reactions',
+			} );
+
+			// Add a reaction.
+			await blockCommentUtils.addReactionToComment( 'Heart' );
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reaction added.' } )
+			).toBeVisible();
+
+			// Click the reaction to remove it.
+			const reactionButton = page.locator(
+				'.editor-collab-sidebar-panel__reaction-button'
+			);
+			await reactionButton.click();
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reaction removed.' } )
+			).toBeVisible();
+
+			// Verify the reaction button is no longer visible.
+			await expect( reactionButton ).toBeHidden();
+		} );
+
+		test( 'can see emoji reaction details', async ( {
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing reaction details' },
+				comment: 'Test comment for reaction details',
+			} );
+
+			// Add a reaction.
+			await blockCommentUtils.addReactionToComment( 'Celebration' );
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reaction added.' } )
+			).toBeVisible();
+
+			// Open the reaction details via menu.
+			await blockCommentUtils.clickBlockCommentActionMenuItem(
+				'See emoji reaction details'
+			);
+
+			// Verify the popover is visible with user info.
+			const popover = page.locator(
+				'.editor-collab-sidebar-panel__reaction-details'
+			);
+			await expect( popover ).toBeVisible();
+		} );
+
+		test( 'reaction buttons are keyboard accessible', async ( {
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing keyboard accessibility' },
+				comment: 'Test comment for keyboard access',
+			} );
+
+			// Open the emoji picker with keyboard.
+			const addReactionButton = page.getByRole( 'button', {
+				name: 'Add reaction',
+			} );
+			await addReactionButton.focus();
+			await page.keyboard.press( 'Enter' );
+
+			// Verify the picker is visible.
+			const emojiPicker = page.locator(
+				'.editor-collab-sidebar-panel__emoji-picker'
+			);
+			await expect( emojiPicker ).toBeVisible();
+
+			// Navigate with arrow keys and select.
+			const firstEmoji = emojiPicker.getByRole( 'option' ).first();
+			await firstEmoji.focus();
+			await page.keyboard.press( 'ArrowRight' );
+			await page.keyboard.press( 'Enter' );
+
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reaction added.' } )
+			).toBeVisible();
+		} );
+
+		test( 'can add multiple different reactions to same note', async ( {
+			page,
+			blockCommentUtils,
+		} ) => {
+			await blockCommentUtils.addBlockWithComment( {
+				type: 'core/paragraph',
+				attributes: { content: 'Testing multiple reactions' },
+				comment: 'Test comment for multiple reactions',
+			} );
+
+			// Add first reaction.
+			await blockCommentUtils.addReactionToComment( 'Thumbs up' );
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reaction added.' } )
+			).toBeVisible();
+
+			// Add second reaction.
+			await blockCommentUtils.addReactionToComment( 'Rocket' );
+			await expect(
+				page
+					.getByRole( 'button', { name: 'Dismiss this notice' } )
+					.filter( { hasText: 'Reaction added.' } )
+			).toBeVisible();
+
+			// Verify both reactions are visible.
+			const reactionButtons = page.locator(
+				'.editor-collab-sidebar-panel__reaction-button'
+			);
+			await expect( reactionButtons ).toHaveCount( 2 );
+		} );
+	} );
 } );
 
 class BlockCommentUtils {
@@ -897,5 +1058,14 @@ class BlockCommentUtils {
 			.nth( index )
 			.click();
 		await this.#page.getByRole( 'menuitem', { name: actionName } ).click();
+	}
+
+	async addReactionToComment( emoji ) {
+		await this.#page
+			.getByRole( 'button', { name: 'Add reaction' } )
+			.click();
+		await this.#page
+			.getByRole( 'option', { name: new RegExp( emoji, 'i' ) } )
+			.click();
 	}
 }
