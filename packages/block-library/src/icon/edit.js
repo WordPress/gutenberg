@@ -180,10 +180,10 @@ export function Edit( props ) {
 						<>
 							{ __(
 								'Describe the role of this icon on the page.'
-							) }
+							) }{ ' ' }
 							<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
 								{ __(
-									'Note: many devices and browsers do not display this text'
+									'Note: many devices and browsers do not display this text.'
 								) }
 							</ExternalLink>
 						</>
