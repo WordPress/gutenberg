@@ -558,6 +558,107 @@ export async function rotateImage(
 }
 
 /**
+ * Rotates an image based on EXIF orientation value.
+ *
+ * EXIF orientation values:
+ * 1 = Normal (no rotation needed)
+ * 2 = Flipped horizontally
+ * 3 = Rotated 180°
+ * 4 = Flipped vertically
+ * 5 = Rotated 90° CCW and flipped horizontally
+ * 6 = Rotated 90° CW
+ * 7 = Rotated 90° CW and flipped horizontally
+ * 8 = Rotated 90° CCW
+ *
+ * @param id          Item ID.
+ * @param buffer      Original file buffer.
+ * @param type        Mime type.
+ * @param orientation EXIF orientation value (1-8).
+ * @return Rotated file data plus the new dimensions.
+ */
+export async function rotateImage(
+	id: ItemId,
+	buffer: ArrayBuffer,
+	type: string,
+	orientation: number
+): Promise< {
+	buffer: ArrayBuffer | ArrayBufferLike;
+	width: number;
+	height: number;
+} > {
+	const ext = type.split( '/' )[ 1 ];
+
+	inProgressOperations.add( id );
+
+	const vips = await getVips();
+
+	let strOptions = '';
+	const loadOptions: LoadOptions< typeof type > = {};
+
+	// To ensure all frames are loaded in case the image is animated.
+	if ( supportsAnimation( type ) ) {
+		strOptions = '[n=-1]';
+		( loadOptions as LoadOptions< typeof type > ).n = -1;
+	}
+
+	let image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
+
+	image.onProgress = () => {
+		if ( ! inProgressOperations.has( id ) ) {
+			image.kill = true;
+		}
+	};
+
+	// Apply transformation based on EXIF orientation.
+	// See: https://exiftool.org/TagNames/EXIF.html#:~:text=0x0112,Orientation
+	switch ( orientation ) {
+		case 2:
+			// Flipped horizontally
+			image = image.flipHor();
+			break;
+		case 3:
+			// Rotated 180°
+			image = image.rot180();
+			break;
+		case 4:
+			// Flipped vertically
+			image = image.flipVer();
+			break;
+		case 5:
+			// Rotated 90° CCW and flipped horizontally
+			image = image.rot270().flipHor();
+			break;
+		case 6:
+			// Rotated 90° CW
+			image = image.rot90();
+			break;
+		case 7:
+			// Rotated 90° CW and flipped horizontally
+			image = image.rot90().flipHor();
+			break;
+		case 8:
+			// Rotated 90° CCW
+			image = image.rot270();
+			break;
+		// case 1 and default: no transformation needed
+	}
+
+	const saveOptions: SaveOptions< typeof type > = {};
+	const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
+
+	const result = {
+		buffer: outBuffer.buffer,
+		width: image.width,
+		height: image.pageHeight,
+	};
+
+	// Only call after `image` is no longer being used.
+	cleanup?.();
+
+	return result;
+}
+
+/**
  * Determines whether an image has an alpha channel.
  *
  * @param buffer Original file object.

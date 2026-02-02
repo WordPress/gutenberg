@@ -670,6 +670,7 @@ export function prepareItem( id: QueueItemId ) {
 		// For images, check if we need to scale down based on threshold.
 		if ( isImage ) {
 			const { bigImageSizeThreshold, imageOutputFormats } = settings;
+				select.getSettings().bigImageSizeThreshold;
 
 			// If a threshold is set, add a resize operation to scale down large images.
 			// This matches WordPress core's behavior in wp_create_image_subsizes().
@@ -1311,6 +1312,9 @@ export function generateThumbnails( id: QueueItemId ) {
 						convert_format: false,
 					},
 					operations: thumbnailOperations,
+						[ OperationType.ResizeCrop, { resize: imageSize } ],
+						OperationType.Upload,
+					],
 				} );
 			}
 		}
