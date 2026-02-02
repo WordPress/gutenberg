@@ -37,7 +37,7 @@ import useCreatePage from './use-create-page';
 import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS, LINK_ENTRY_TYPES } from './constants';
-import isURLLike, { isHashLink, isRelativePath } from './is-url-like';
+import { isHashLink, isRelativePath } from './is-url-like';
 
 /**
  * Default properties associated with a link control value.
@@ -311,19 +311,17 @@ function LinkControl( {
 			type: 'valid',
 		};
 
-		const trimmedValue = urlToValidate?.trim();
-
-		// If empty or not URL-like, return invalid
-		if ( ! trimmedValue?.length || ! isURLLike( trimmedValue ) ) {
-			return invalidResult;
-		}
+		let urlToCheck = urlToValidate?.trim();
 
 		// Hash links (internal anchor links) and relative paths (/, ./, ../) are
 		// valid href values but cannot be validated by the native URL constructor
 		// (which requires absolute URLs). These are already validated by isURLLike.
 		// Skip URL constructor validation for these cases.
-		if ( isHashLink( trimmedValue ) || isRelativePath( trimmedValue ) ) {
-			return validResult;
+		if ( isHashLink( urlToCheck ) || isRelativePath( urlToCheck ) ) {
+			// Prepend a protocol to the URL if it doesn't have one so we can validate it with the native URL constructor.
+			urlToCheck = 'https://wordpress.org/' + urlToCheck;
+		} else {
+			urlToCheck = prependHTTPS( urlToCheck );
 		}
 
 		// Perform URL validation using the native URL constructor as the authoritative source.
@@ -337,7 +335,6 @@ function LinkControl( {
 		// Note: We rely on the native URL constructor rather than implementing custom TLD
 		// validation to avoid blocking valid URLs. If a URL passes the native constructor,
 		// it's technically valid according to web standards.
-		const urlToCheck = prependHTTPS( trimmedValue );
 		return isURL( urlToCheck ) ? validResult : invalidResult;
 	};
 
