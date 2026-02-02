@@ -21,7 +21,6 @@ import {
 	vipsResizeImage,
 	vipsRotateImage,
 	vipsConvertImageFormat,
-	vipsHasTransparency,
 } from './utils';
 import {
 	logQueueAdd,
@@ -29,7 +28,6 @@ import {
 	logProcessStart,
 	logOperationStart,
 	logOperationComplete,
-	logPrepareOperations,
 	logResizeCrop,
 	logResizeComplete,
 	logRotation,
@@ -663,7 +661,6 @@ export function prepareItem( id: QueueItemId ) {
 		const { file } = item;
 
 		const operations: Operation[] = [];
-		const settings = select.getSettings();
 
 		const isImage = file.type.startsWith( 'image/' );
 
@@ -687,54 +684,6 @@ export function prepareItem( id: QueueItemId ) {
 				] );
 			}
 
-			// Check if we need to transcode to a different format.
-			// Uses WordPress image_editor_output_format filter settings.
-			const outputMimeType = imageOutputFormats?.[ file.type ];
-			if ( outputMimeType && outputMimeType !== file.type ) {
-				// For PNG -> JPEG conversion, check if the image has transparency.
-				// If it does, skip transcoding to preserve the alpha channel.
-				let shouldTranscode = true;
-
-				if (
-					file.type === 'image/png' &&
-					outputMimeType === 'image/jpeg'
-				) {
-					const blobUrl = createBlobURL( file );
-					try {
-						const hasAlpha = await vipsHasTransparency( blobUrl );
-						if ( hasAlpha ) {
-							// Image has transparency, skip conversion to JPEG.
-							shouldTranscode = false;
-						}
-					} catch {
-						// If transparency check fails, err on the side of caution.
-						shouldTranscode = false;
-					} finally {
-						revokeBlobURL( blobUrl );
-					}
-				}
-
-				if ( shouldTranscode ) {
-					const formatPart = outputMimeType.split( '/' )[ 1 ];
-					if ( ! isValidImageFormat( formatPart ) ) {
-						// Unknown format, skip transcoding.
-						shouldTranscode = false;
-					} else {
-						operations.push( [
-							OperationType.TranscodeImage,
-							{
-								outputFormat: formatPart,
-								outputQuality: 0.82,
-								interlaced: getInterlacedSetting(
-									outputMimeType,
-									settings
-								),
-							},
-						] );
-					}
-				}
-			}
-
 			operations.push(
 				OperationType.Upload,
 				OperationType.ThumbnailGeneration
@@ -742,12 +691,6 @@ export function prepareItem( id: QueueItemId ) {
 		} else {
 			operations.push( OperationType.Upload );
 		}
-
-		// Log the prepared operations list
-		const operationNames = operations.map( ( op ) =>
-			Array.isArray( op ) ? op[ 0 ] : op
-		);
-		logPrepareOperations( id, file.name, operationNames );
 
 		dispatch< AddOperationsAction >( {
 			type: Type.AddOperations,
