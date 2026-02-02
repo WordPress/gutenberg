@@ -70,14 +70,12 @@
 
 .dataviews-view-config__modified-indicator {
 	position: absolute;
-	top: 0;
-	right: 0;
-	transform: translate(25%, -25%);
-	width: $grid-unit-10;
-	height: $grid-unit-10;
+	top: $grid-unit-05;
+	right: $grid-unit-05;
+	width: $grid-unit-05;
+	height: $grid-unit-05;
 	background: var(--wp-admin-theme-color, #3858e9);
 	border-radius: 50%;
-	outline: var(--wp-admin-border-width-focus) solid $white;
 	pointer-events: none;
 }
 
