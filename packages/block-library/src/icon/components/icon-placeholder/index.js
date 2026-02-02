@@ -7,7 +7,7 @@ import { Button, Placeholder } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import { bolt } from './../../icons/bolt';
+import { bolt } from './../../icons/';
 
 export default function IconPlaceholder( { setInserterOpen } ) {
 	return (
