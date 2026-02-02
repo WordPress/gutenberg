@@ -474,9 +474,7 @@ module.exports = {
 						paths: restrictedImports.filter(
 							( { name } ) =>
 								! [
-									'@ariakit/react',
 									'@base-ui/react',
-									'framer-motion',
 								].includes( name )
 						),
 					},
