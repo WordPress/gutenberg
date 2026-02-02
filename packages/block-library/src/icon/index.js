@@ -4,7 +4,6 @@
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
-import save from './save';
 import { bolt as icon } from './icons/bolt';
 
 const { name } = metadata;
@@ -34,7 +33,6 @@ export const settings = {
 		},
 	},
 	edit,
-	save,
 };
 
 export const init = () => initBlock( { name, metadata, settings } );

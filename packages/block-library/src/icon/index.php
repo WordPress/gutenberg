@@ -1,0 +1,57 @@
+<?php
+/**
+ * Server-side rendering of the `core/icon` block.
+ *
+ * @package WordPress
+ */
+
+/**
+ * Renders the `core/icon` block on server.
+ *
+ * @since 7.0.0
+ *
+ * @param array    $attributes The block attributes.
+ * @param string   $content    The block content.
+ * @param WP_Block $block      The block instance.
+ *
+ * @return string Returns the Icon.
+ */
+function render_block_core_icon( $attributes, $content, $block ) {
+	if ( empty( $attributes['icon'] ) ) {
+		return;
+	}
+
+	// Get the SVG content from the API.
+	$registry = \WP_Icons_Registry::get_instance();
+	$icon     = $registry->get_registered_icon( $attributes['icon'] );
+
+	if ( is_null( $icon ) )  {
+		return;
+	} 
+	
+	$processor = new \WP_HTML_Tag_Processor( $icon['content'] );
+	$processor->next_tag( 'svg' );
+	$processor->set_attribute( 'class', 'wp-block-icon' );
+
+	// Check for width and set default to 25px.
+	$width = ( isset( $attributes['style'] ) && isset( $attributes['style']['dimensions'] ) && isset( $attributes['style']['dimensions']['width'] ) ) ? $attributes['style']['dimensions']['width'] : '24px';
+	$processor->set_attribute( 'width', $width );
+
+	return $processor->get_updated_html();
+}
+
+
+/**
+ * Registers the `core/icon` block on server.
+ *
+ * @since 6.9.0
+ */
+function register_block_core_icon() {
+	register_block_type_from_metadata(
+		__DIR__ . '/icon',
+		array(
+			'render_callback' => 'render_block_core_icon',
+		)
+	);
+}
+add_action( 'init', 'register_block_core_icon' );
