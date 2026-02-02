@@ -21,6 +21,7 @@
 		--wp-ui-button-height: 40px;
 		--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
 		--wp-ui-button-font-size: var(--wpds-font-size-md);
+		--wp-ui-button-min-width: calc(4ch + 2 * var(--wp-ui-button-padding-inline));
 
 		/* by default, borders have the same color as the background */
 		--wp-ui-button-border-color: var(--wp-ui-button-background-color);
@@ -34,6 +35,7 @@
 		align-items: center;
 		gap: calc(2 * var(--wpds-dimension-base)); /* TODO: Consider new interactive/control gap tokens */
 		aspect-ratio: var(--wp-ui-button-aspect-ratio);
+		min-width: var(--wp-ui-button-min-width);
 		height: var(--wp-ui-button-height);
 		padding-inline: var(--wp-ui-button-padding-inline);
 		border-style: solid;
@@ -188,6 +190,7 @@
 	}
 
 	.is-unstyled {
+		min-width: unset;
 		border: none;
 		background: none;
 	}
