@@ -83,8 +83,6 @@
 	overflow-y: auto;
 	background: var(--wpds-color-bg-surface-neutral, #fff);
 	color: var(--wpds-color-fg-content-neutral, #1e1e1e);
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-	border: 1px solid var(--wpds-color-stroke-surface-neutral-weak, #ddd);
 	position: relative;
 
 	// Mobile-first: surfaces take full screen with fixed positioning

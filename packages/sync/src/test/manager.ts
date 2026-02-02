@@ -40,6 +40,10 @@ import { AwarenessState } from '../awareness/awareness-state';
  */
 class MockAwarenessState extends AwarenessState {
 	protected equalityFieldChecks = {};
+
+	protected onSetUp(): void {
+		// No-op for testing.
+	}
 }
 
 // Mock dependencies.

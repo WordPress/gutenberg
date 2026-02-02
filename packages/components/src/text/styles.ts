@@ -12,7 +12,6 @@ export const Text = css`
 	color: ${ COLORS.theme.foreground };
 	line-height: ${ CONFIG.fontLineHeightBase };
 	margin: 0;
-	text-wrap: balance; /* Fallback for Safari. */
 	text-wrap: pretty;
 `;
 

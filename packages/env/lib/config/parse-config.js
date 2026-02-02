@@ -235,6 +235,8 @@ async function getDefaultConfig(
 		lifecycleScripts: {
 			afterStart: null,
 			afterClean: null,
+			afterReset: null,
+			afterCleanup: null,
 			afterDestroy: null,
 		},
 		env: {

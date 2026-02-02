@@ -1,0 +1,8 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-compositions {
+	.icon-button {
+		--wp-ui-button-aspect-ratio: 1;
+		--wp-ui-button-padding-inline: 0;
+	}
+}

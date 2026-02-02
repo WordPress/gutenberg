@@ -86,7 +86,7 @@ function PatternList() {
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
 		name: 'wp_block',
-		slug: type,
+		slug: 'default-new',
 		defaultView: DEFAULT_VIEW,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,

@@ -838,7 +838,7 @@ button.wp-block-navigation-item__content {
 // Adjust open dialog top margin when admin-bar is visible.
 // Needs to be scoped to .is-menu-open, or it will shift the position of any other navigations that may be present.
 // Don't apply margin when custom overlay is present.
-.has-modal-open .admin-bar .is-menu-open:not(.disable-default-overlay) .wp-block-navigation__responsive-dialog {
+.has-modal-open .admin-bar .is-menu-open:where(:not(.disable-default-overlay)) .wp-block-navigation__responsive-dialog {
 	margin-top: $admin-bar-height-big;
 
 	// Handle smaller admin-bar.

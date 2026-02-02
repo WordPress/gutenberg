@@ -9,7 +9,16 @@ import { Y, CRDT_RECORD_MAP_KEY } from '@wordpress/sync';
 import type { YPostRecord } from './crdt';
 import type { YBlock, YBlocks } from './crdt-blocks';
 import { getRootMap } from './crdt-utils';
-import type { WPBlockSelection } from '../types';
+import type {
+	WPBlockSelection,
+	SelectionState,
+	SelectionNone,
+	SelectionCursor,
+	SelectionInOneBlock,
+	SelectionInMultipleBlocks,
+	SelectionWholeBlock,
+	CursorPosition,
+} from '../types';
 
 /**
  * The type of selection.
@@ -21,67 +30,6 @@ export enum SelectionType {
 	SelectionInMultipleBlocks = 'selection-in-multiple-blocks',
 	WholeBlock = 'whole-block',
 }
-
-/**
- * The position of the cursor.
- */
-export type CursorPosition = {
-	relativePosition: Y.RelativePosition;
-
-	// Also store the absolute offset index of the cursor from the perspective
-	// of the user who is updating the selection.
-	//
-	// Do not use this value directly, instead use `createAbsolutePositionFromRelativePosition()`
-	// on relativePosition for the most up-to-date positioning.
-	//
-	// This is used because local Y.Text changes (e.g. adding or deleting a character)
-	// can result in the same relative position if it is pinned to an unchanged
-	// character. With both of these values as editor state, a change in perceived
-	// position will always result in a redraw.
-	absoluteOffset: number;
-};
-
-export type SelectionNone = {
-	// The user has not made a selection.
-	type: SelectionType.None;
-};
-
-export type SelectionCursor = {
-	// The user has a cursor position in a block with no text highlighted.
-	type: SelectionType.Cursor;
-	blockId: string;
-	cursorPosition: CursorPosition;
-};
-
-export type SelectionInOneBlock = {
-	// The user has highlighted text in a single block.
-	type: SelectionType.SelectionInOneBlock;
-	blockId: string;
-	cursorStartPosition: CursorPosition;
-	cursorEndPosition: CursorPosition;
-};
-
-export type SelectionInMultipleBlocks = {
-	// The user has highlighted text over multiple blocks.
-	type: SelectionType.SelectionInMultipleBlocks;
-	blockStartId: string;
-	blockEndId: string;
-	cursorStartPosition: CursorPosition;
-	cursorEndPosition: CursorPosition;
-};
-
-export type SelectionWholeBlock = {
-	// The user has a non-text block selected, like an image block.
-	type: SelectionType.WholeBlock;
-	blockId: string;
-};
-
-export type SelectionState =
-	| SelectionNone
-	| SelectionCursor
-	| SelectionInOneBlock
-	| SelectionInMultipleBlocks
-	| SelectionWholeBlock;
 
 /**
  * Converts WordPress block editor selection to a SelectionState.

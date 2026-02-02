@@ -476,3 +476,14 @@ _::-webkit-full-page-media, _:future, :root [data-has-multi-selection="true"] .b
 	cursor: grabbing;
 }
 
+.is-preview-mode {
+	pointer-events: none;
+
+	.block-editor-block-list__block {
+		pointer-events: auto;
+
+		> *:not(.block-editor-block-list__block) {
+			pointer-events: none;
+		}
+	}
+}

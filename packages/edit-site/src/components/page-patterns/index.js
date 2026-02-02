@@ -103,7 +103,7 @@ export default function DataviewsPatterns() {
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: postType,
-		slug: categoryId,
+		slug: 'default',
 		defaultView: DEFAULT_VIEW,
 		queryParams: {
 			page: query.pageNumber,
