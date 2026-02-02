@@ -19,6 +19,7 @@ import {
 import { BlockLockMenuItem, useBlockLock } from '../block-lock';
 import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
+import { ModifyContentOnlySectionMenuItem } from '../content-lock';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
 import { BlockVisibilityViewportMenuItem } from '../block-visibility';
 import { EditSectionMenuItem } from './edit-section-menu-item';
@@ -123,6 +124,12 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 							/>
 						) }
 						{ fills }
+						{ selectedClientIds.length === 1 && (
+							<ModifyContentOnlySectionMenuItem
+								clientId={ selectedClientIds[ 0 ] }
+								onClose={ fillProps?.onClose }
+							/>
+						) }
 						{ canEdit &&
 							fillProps?.count === 1 &&
 							! isContentOnly && (
