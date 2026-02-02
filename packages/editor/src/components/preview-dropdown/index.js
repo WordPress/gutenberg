@@ -44,9 +44,12 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		isTemplateHidden,
 		templateId,
 	} = useSelect( ( select ) => {
-		const { getCurrentPostType, getCurrentTemplateId, getRenderingMode } =
-			select( editorStore );
-		const { getCanvasWidth } = unlock( select( editorStore ) );
+		const {
+			getCurrentPostType,
+			getCurrentTemplateId,
+			getRenderingMode,
+			getCanvasWidth,
+		} = unlock( select( editorStore ) );
 		const { getEntityRecord, getPostType } = select( coreStore );
 		const { get } = select( preferencesStore );
 		const _currentPostType = getCurrentPostType();
