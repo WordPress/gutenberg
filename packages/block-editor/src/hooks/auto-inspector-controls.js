@@ -110,7 +110,7 @@ function AutoRegisterControls( { name, clientId, setAttributes } ) {
 					>
 						<DataForm
 							data={ attributes }
-							fields={ [ field ] }
+							fields={ fields }
 							form={ { fields: [ field.id ] } }
 							onChange={ setAttributes }
 						/>
