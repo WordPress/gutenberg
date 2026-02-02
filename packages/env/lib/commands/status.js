@@ -11,6 +11,7 @@ const chalk = require( 'chalk' );
  */
 const { loadConfig } = require( '../config' );
 const { getRuntime, detectRuntime } = require( '../runtime' );
+const { getNgrokState } = require( './ngrok' );
 
 /**
  * Check if an environment has been initialized by looking for runtime-specific files.
@@ -75,6 +76,26 @@ module.exports = async function status( { spinner, debug, json } ) {
 
 	// Get status from runtime.
 	const statusData = await runtime.getStatus( config, { spinner, debug } );
+
+	// Check for ngrok state.
+	const ngrokState = await getNgrokState( config.workDirectoryPath );
+	if ( ngrokState && ngrokState.pid ) {
+		try {
+			// Check if the process is still running.
+			process.kill( ngrokState.pid, 0 );
+			statusData.ngrok = {
+				running: true,
+				url: ngrokState.url,
+				originalUrl: ngrokState.originalSiteUrl,
+				startedAt: ngrokState.startedAt,
+			};
+		} catch {
+			// Process not running.
+			statusData.ngrok = { running: false };
+		}
+	} else {
+		statusData.ngrok = { running: false };
+	}
 
 	spinner.stop();
 	if ( json ) {
@@ -147,6 +168,18 @@ ${ indent }config: ${ chalk.dim( status.configPath ) }
 	if ( status.ports?.tests ) {
 		output += `${ indent }test http port: ${ chalk.dim(
 			status.ports.tests
+		) }\n`;
+	}
+
+	// ngrok section.
+	if ( status.ngrok?.running ) {
+		output += `\n${ chalk.bold( 'ngrok' ) }: ${ chalk.green( 'running' ) }\n`;
+		output += `${ indent }public url: ${ chalk.cyan( status.ngrok.url ) }\n`;
+		output += `${ indent }original url: ${ chalk.dim(
+			status.ngrok.originalUrl
+		) }\n`;
+		output += `${ indent }started: ${ chalk.dim(
+			status.ngrok.startedAt
 		) }\n`;
 	}
 

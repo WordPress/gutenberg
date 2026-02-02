@@ -545,6 +545,83 @@ Options:
   --json     Output status as JSON.                    [boolean] [default: false]
 ```
 
+### `wp-env ngrok [action]`
+
+The ngrok command allows you to expose your local WordPress environment to the internet using [ngrok](https://ngrok.com/). This is useful for sharing your local development site with others, testing on mobile devices, or testing webhooks and integrations that require a public URL.
+
+**Prerequisites**: You must have ngrok installed on your system. Download it from https://ngrok.com/download and ensure it's available in your PATH.
+
+```sh
+wp-env ngrok [action]
+
+Manage ngrok tunnels to expose your local WordPress environment to the internet.
+
+Positionals:
+  action  The action to perform.
+          [string] [choices: "start", "stop", "status"] [default: "start"]
+
+Options:
+  --debug    Enable debug output.                      [boolean] [default: false]
+  --json     Output status as JSON (only for status action).
+                                                       [boolean] [default: false]
+```
+
+#### Starting an ngrok tunnel
+
+```sh
+$ wp-env ngrok
+# or
+$ wp-env ngrok start
+
+✔ ngrok tunnel started successfully!
+
+  Public URL: https://abc123.ngrok.io
+  Local URL:  http://localhost:8888
+
+  WordPress admin: https://abc123.ngrok.io/wp-admin/
+  Username: admin
+  Password: password
+
+  Run `wp-env ngrok stop` to stop the tunnel and restore the original URL.
+```
+
+When you start an ngrok tunnel, wp-env will:
+1. Start ngrok pointing to your development environment's port
+2. Update WordPress's `home` and `siteurl` options to use the ngrok URL
+3. Save the tunnel state so it can be properly stopped later
+
+#### Stopping an ngrok tunnel
+
+```sh
+$ wp-env ngrok stop
+
+✔ ngrok tunnel stopped. WordPress URL restored to http://localhost:8888
+```
+
+When you stop the tunnel, wp-env will:
+1. Terminate the ngrok process
+2. Restore WordPress's `home` and `siteurl` options to the original local URL
+
+#### Checking ngrok status
+
+```sh
+$ wp-env ngrok status
+
+ngrok tunnel is running
+  URL: https://abc123.ngrok.io
+  Original URL: http://localhost:8888
+  Started: 2024-01-15T10:30:00.000Z
+```
+
+You can also get status in JSON format:
+
+```sh
+$ wp-env ngrok status --json
+{"running":true,"url":"https://abc123.ngrok.io","originalUrl":"http://localhost:8888","startedAt":"2024-01-15T10:30:00.000Z"}
+```
+
+The ngrok status is also included in the `wp-env status` output when a tunnel is active.
+
 ## .wp-env.json
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.

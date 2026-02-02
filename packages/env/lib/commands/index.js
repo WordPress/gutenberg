@@ -11,6 +11,7 @@ const destroy = require( './destroy' );
 const cleanup = require( './cleanup' );
 const logs = require( './logs' );
 const status = require( './status' );
+const ngrok = require( './ngrok' );
 
 module.exports = {
 	start,
@@ -22,4 +23,5 @@ module.exports = {
 	cleanup,
 	logs,
 	status,
+	ngrok,
 };

@@ -315,6 +315,38 @@ module.exports = function cli() {
 		},
 		withSpinner( env.status )
 	);
+	yargs.command(
+		'ngrok [action]',
+		wpGreen(
+			'Manage ngrok tunnels to expose your local WordPress environment to the internet. Requires ngrok to be installed (https://ngrok.com/download).'
+		),
+		( args ) => {
+			args.positional( 'action', {
+				type: 'string',
+				describe: 'The action to perform.',
+				choices: [ 'start', 'stop', 'status' ],
+				default: 'start',
+			} );
+			args.option( 'json', {
+				type: 'boolean',
+				describe: 'Output status as JSON (only for status action).',
+				default: false,
+			} );
+		},
+		withSpinner( env.ngrok )
+	);
+	yargs.example(
+		'$0 ngrok',
+		'Start an ngrok tunnel to expose your WordPress site to the internet.'
+	);
+	yargs.example(
+		'$0 ngrok stop',
+		'Stop the ngrok tunnel and restore the original WordPress URL.'
+	);
+	yargs.example(
+		'$0 ngrok status',
+		'Check if an ngrok tunnel is currently running.'
+	);
 
 	return yargs;
 };
