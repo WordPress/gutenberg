@@ -269,7 +269,8 @@ function clearInlineNoteMarker(
 	}
 }
 
-export function useNoteActions() {
+export function useNoteActions( reflowComments = () => {} ) {
+	const registry = useRegistry();
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
@@ -491,7 +492,188 @@ export function useNoteActions() {
 		}
 	};
 
-	return { onCreate, onEdit, onDelete };
+	const onAddReaction = async ( { commentId, emoji } ) => {
+		try {
+			// Get current user from the store.
+			const currentUser =
+				registry.select( coreStore ).getCurrentUser() || {};
+			const userId = currentUser.id;
+
+			if ( ! userId ) {
+				throw new Error(
+					__( 'You must be logged in to add reactions.' )
+				);
+			}
+
+			// Get current comment data.
+			const comment = registry
+				.select( coreStore )
+				.getEntityRecord( 'root', 'comment', commentId );
+
+			if ( ! comment ) {
+				throw new Error( __( 'Comment not found.' ) );
+			}
+
+			// Get existing reactions or initialize empty object.
+			const existingReactions = comment.meta?._wp_reactions || {};
+
+			// Check if user already reacted with this emoji.
+			const emojiReactions = existingReactions[ emoji ] || [];
+			const alreadyReacted = emojiReactions.some(
+				( reaction ) => reaction.userId === userId
+			);
+
+			if ( alreadyReacted ) {
+				return;
+			}
+
+			// Add new reaction.
+			const newReaction = {
+				userId,
+				timestamp: new Date().toISOString(),
+			};
+
+			const updatedReactions = {
+				...existingReactions,
+				[ emoji ]: [ ...emojiReactions, newReaction ],
+			};
+
+			await saveEntityRecord(
+				'root',
+				'comment',
+				{
+					id: commentId,
+					meta: {
+						...comment.meta,
+						_wp_reactions: updatedReactions,
+					},
+				},
+				{ throwOnError: true }
+			);
+
+			createNotice( 'snackbar', __( 'Reaction added.' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+			reflowComments();
+		} catch ( error ) {
+			reflowComments();
+			onError( error );
+		}
+	};
+
+	const onRemoveReaction = async ( { commentId, emoji } ) => {
+		try {
+			// Get current user from the store.
+			const currentUser =
+				registry.select( coreStore ).getCurrentUser() || {};
+			const userId = currentUser.id;
+
+			if ( ! userId ) {
+				throw new Error(
+					__( 'You must be logged in to remove reactions.' )
+				);
+			}
+
+			// Get current comment data.
+			const comment = registry
+				.select( coreStore )
+				.getEntityRecord( 'root', 'comment', commentId );
+
+			if ( ! comment ) {
+				throw new Error( __( 'Comment not found.' ) );
+			}
+
+			// Get existing reactions.
+			const existingReactions = comment.meta?._wp_reactions || {};
+			const emojiReactions = existingReactions[ emoji ] || [];
+
+			// Filter out current user's reaction.
+			const updatedEmojiReactions = emojiReactions.filter(
+				( reaction ) => reaction.userId !== userId
+			);
+
+			// Build updated reactions object, removing empty arrays.
+			const updatedReactions = { ...existingReactions };
+			if ( updatedEmojiReactions.length > 0 ) {
+				updatedReactions[ emoji ] = updatedEmojiReactions;
+			} else {
+				delete updatedReactions[ emoji ];
+			}
+
+			await saveEntityRecord(
+				'root',
+				'comment',
+				{
+					id: commentId,
+					meta: {
+						...comment.meta,
+						_wp_reactions:
+							Object.keys( updatedReactions ).length > 0
+								? updatedReactions
+								: undefined,
+					},
+				},
+				{ throwOnError: true }
+			);
+
+			createNotice( 'snackbar', __( 'Reaction removed.' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+			reflowComments();
+		} catch ( error ) {
+			reflowComments();
+			onError( error );
+		}
+	};
+
+	const onToggleReaction = async ( { commentId, emoji } ) => {
+		try {
+			// Get current user from the store.
+			const currentUser =
+				registry.select( coreStore ).getCurrentUser() || {};
+			const userId = currentUser.id;
+
+			if ( ! userId ) {
+				throw new Error( __( 'You must be logged in to react.' ) );
+			}
+
+			// Get current comment data.
+			const comment = registry
+				.select( coreStore )
+				.getEntityRecord( 'root', 'comment', commentId );
+
+			if ( ! comment ) {
+				throw new Error( __( 'Comment not found.' ) );
+			}
+
+			// Check if user already reacted with this emoji.
+			const existingReactions = comment.meta?._wp_reactions || {};
+			const emojiReactions = existingReactions[ emoji ] || [];
+			const alreadyReacted = emojiReactions.some(
+				( reaction ) => reaction.userId === userId
+			);
+
+			if ( alreadyReacted ) {
+				await onRemoveReaction( { commentId, emoji } );
+			} else {
+				await onAddReaction( { commentId, emoji } );
+			}
+		} catch ( error ) {
+			reflowComments();
+			onError( error );
+		}
+	};
+
+	return {
+		onCreate,
+		onEdit,
+		onDelete,
+		onAddReaction,
+		onRemoveReaction,
+		onToggleReaction,
+	};
 }
 
 export function useEnableFloatingSidebar( enabled = false ) {
