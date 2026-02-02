@@ -110,7 +110,7 @@ function VisualEditor( {
 		postType,
 		isPreview,
 		styles,
-		canvasWidth,
+		hasCanvasWidth,
 		canvasMinHeight,
 	} = useSelect( ( select ) => {
 		const {
@@ -163,7 +163,7 @@ function VisualEditor( {
 			postType: postTypeSlug,
 			isPreview: editorSettings.isPreviewMode,
 			styles: editorSettings.styles,
-			canvasWidth: getCanvasWidth(),
+			hasCanvasWidth: getCanvasWidth() !== undefined,
 			canvasMinHeight: getCanvasMinHeight(),
 		};
 	}, [] );
@@ -333,8 +333,8 @@ function VisualEditor( {
 			! isMobileViewport &&
 			// Disable resizing in zoomed-out mode.
 			! isZoomedOut ) ||
-		// When canvasWidth is truthy, always allow resizing.
-		canvasWidth !== undefined;
+		// When the canvas has an explicit width, always allow resizing.
+		hasCanvasWidth;
 
 	// Calculate the minimum height including scroll offset to fit all notes.
 	const calculatedMinHeight = useMemo( () => {
@@ -406,8 +406,7 @@ function VisualEditor( {
 				'edit-post-visual-editor',
 				className,
 				{
-					'has-vertical-padding':
-						isFocusedEntity || canvasWidth !== undefined,
+					'has-vertical-padding': isFocusedEntity || hasCanvasWidth,
 					'has-horizontal-padding': isFocusedEntity || enableResizing,
 					'is-iframed': ! disableIframe,
 				}
