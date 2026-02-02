@@ -46,6 +46,7 @@ const fields = [
 const InserterModal = ( {
 	isInserterOpen,
 	setInserterOpen,
+	attributes,
 	setAttributes,
 } ) => {
 	const [ view, setView ] = useState( {
@@ -80,7 +81,9 @@ const InserterModal = ( {
 		}
 	}, [ isInserterOpen ] );
 
-	const [ selection, setSelection ] = useState( [] );
+	const [ selection, setSelection ] = useState(
+		[ attributes.iconName ].filter( Boolean )
+	);
 
 	const { data: processedData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( icons, view, fields );
