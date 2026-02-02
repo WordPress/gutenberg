@@ -268,7 +268,7 @@ function ResetViewButton() {
 				}
 			} }
 		>
-			{ __( 'Reset' ) }
+			{ __( 'Reset view' ) }
 		</Button>
 	);
 }
