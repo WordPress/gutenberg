@@ -301,7 +301,7 @@ const getAllBlocks = () => {
 		blocks.push( playlistTrack );
 	}
 
-	if ( window?.experimentalEnableIconBlock ) {
+	if ( window?.__experimentalEnableIconBlock ) {
 		blocks.push( icon );
 	}
 
