@@ -334,7 +334,7 @@ export function DataviewsViewConfigDropdown() {
 							</Heading>
 							<ResetViewButton />
 						</Stack>
-						<Stack direction="column" gap={ 4 }>
+						<Stack direction="column" gap="lg">
 							<Stack
 								direction="row"
 								gap="sm"
