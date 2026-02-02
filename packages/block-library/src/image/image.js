@@ -233,7 +233,7 @@ function ContentOnlyControls( {
 									<>
 										{ __(
 											'Describe the role of this image on the page.'
-										) }
+										) }{ ' ' }
 										<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
 											{ __(
 												'(Note: many devices and browsers do not display this text.)'
@@ -984,7 +984,7 @@ export default function Image( {
 							<>
 								{ __(
 									'Describe the role of this image on the page.'
-								) }
+								) }{ ' ' }
 								<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
 									{ __(
 										'(Note: many devices and browsers do not display this text.)'
