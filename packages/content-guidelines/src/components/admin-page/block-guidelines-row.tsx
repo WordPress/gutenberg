@@ -63,12 +63,15 @@ export default function BlockGuidelinesRow( {
 	const [ selectedBlock, setSelectedBlock ] = useState( '' );
 	const [ blockTypes, setBlockTypes ] = useState< BlockType[] >( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
+	const [ isAddingBlock, setIsAddingBlock ] = useState( false );
+	const [ draftGuidelines, setDraftGuidelines ] = useState( '' );
 	const wasSaving = useRef( false );
 
 	// Reset selection when save completes
 	useEffect( () => {
 		if ( wasSaving.current && ! isSaving ) {
 			setSelectedBlock( '' );
+			setIsAddingBlock( false );
 		}
 		wasSaving.current = isSaving;
 	}, [ isSaving ] );
@@ -107,16 +110,6 @@ export default function BlockGuidelinesRow( {
 		value: block.name,
 	} ) );
 
-	const handleBlockGuidelineChange = (
-		blockName: string,
-		guidelines: string
-	) => {
-		onChange( {
-			...value,
-			[ blockName ]: { guidelines },
-		} );
-	};
-
 	const handleRemoveBlockGuideline = ( blockName: string ) => {
 		const newValue = { ...value };
 		delete newValue[ blockName ];
@@ -136,62 +129,40 @@ export default function BlockGuidelinesRow( {
 		( [ , data ] ) => data.guidelines && data.guidelines.trim() !== ''
 	);
 
+	const handleEditBlock = ( blockName: string ) => {
+		setSelectedBlock( blockName );
+		setDraftGuidelines( value[ blockName ]?.guidelines || '' );
+		setIsAddingBlock( true );
+	};
+
+	const handleCancelAdd = () => {
+		setSelectedBlock( '' );
+		setDraftGuidelines( '' );
+		setIsAddingBlock( false );
+	};
+
+	const handleAddBlockGuideline = () => {
+		if ( selectedBlock && draftGuidelines.trim() ) {
+			onChange( {
+				...value,
+				[ selectedBlock ]: { guidelines: draftGuidelines },
+			} );
+			setSelectedBlock( '' );
+			setDraftGuidelines( '' );
+			setIsAddingBlock( false );
+		}
+	};
+
 	return (
 		<tr>
 			<th scope="row">{ __( 'Block-Specific' ) }</th>
 			<td>
-				{ isLoading ? (
-					<div className="block-guidelines-loading">
-						<Spinner />
-						<span>{ __( 'Loading block types…' ) }</span>
-					</div>
-				) : (
-					<SelectControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						label={ __( 'Select Block Type' ) }
-						value={ selectedBlock }
-						options={ [
-							{
-								label: __( 'Select a block…' ),
-								value: '',
-							},
-							...blockOptions,
-						] }
-						onChange={ setSelectedBlock }
-					/>
-				) }
-
-				{ selectedBlock && (
-					<div className="block-guidelines-editor">
-						<label htmlFor={ `block-guideline-${ selectedBlock }` }>
-							<strong>{ getBlockTitle( selectedBlock ) }</strong>
-						</label>
-						<textarea
-							id={ `block-guideline-${ selectedBlock }` }
-							className="large-text"
-							value={ value[ selectedBlock ]?.guidelines || '' }
-							onChange={ ( e ) =>
-								handleBlockGuidelineChange(
-									selectedBlock,
-									e.target.value
-								)
-							}
-							rows={ 4 }
-						/>
-						<p className="description">
-							{ __(
-								'Enter guidelines specific to this block type.'
-							) }
-						</p>
-					</div>
-				) }
+				<p className="description block-guidelines-description">
+					{ description }
+				</p>
 
 				{ configuredBlocks.length > 0 && (
 					<div className="block-guidelines-list">
-						<h4 className="block-guidelines-list__title">
-							{ __( 'Configured Blocks' ) }
-						</h4>
 						<div className="block-guidelines-list__items">
 							{ configuredBlocks.map( ( [ blockName, data ] ) => (
 								<div
@@ -207,9 +178,7 @@ export default function BlockGuidelinesRow( {
 												type="button"
 												className="button-link"
 												onClick={ () =>
-													setSelectedBlock(
-														blockName
-													)
+													handleEditBlock( blockName )
 												}
 											>
 												{ __( 'Edit' ) }
@@ -239,7 +208,78 @@ export default function BlockGuidelinesRow( {
 					</div>
 				) }
 
-				<p className="description">{ description }</p>
+				{ isAddingBlock ? (
+					<div className="block-guidelines-add-form">
+						{ isLoading ? (
+							<div className="block-guidelines-loading">
+								<Spinner />
+								<span>{ __( 'Loading block types…' ) }</span>
+							</div>
+						) : (
+							<SelectControl
+								__nextHasNoMarginBottom
+								__next40pxDefaultSize
+								label={ __( 'Select Block Type' ) }
+								value={ selectedBlock }
+								options={ [
+									{
+										label: __( 'Select a block…' ),
+										value: '',
+									},
+									...blockOptions,
+								] }
+								onChange={ setSelectedBlock }
+							/>
+						) }
+
+						{ selectedBlock && (
+							<div className="block-guidelines-editor">
+								<textarea
+									id={ `block-guideline-${ selectedBlock }` }
+									className="large-text"
+									value={ draftGuidelines }
+									onChange={ ( e ) =>
+										setDraftGuidelines( e.target.value )
+									}
+									rows={ 4 }
+								/>
+								<p className="description">
+									{ __(
+										'Enter guidelines specific to this block type.'
+									) }
+								</p>
+							</div>
+						) }
+
+						<div className="block-guidelines-form-actions">
+							<button
+								type="button"
+								className="button button-primary"
+								onClick={ handleAddBlockGuideline }
+								disabled={
+									! selectedBlock || ! draftGuidelines.trim()
+								}
+							>
+								{ __( 'Add' ) }
+							</button>
+							<button
+								type="button"
+								className="button button-link"
+								onClick={ handleCancelAdd }
+							>
+								{ __( 'Cancel' ) }
+							</button>
+						</div>
+					</div>
+				) : (
+					<button
+						type="button"
+						className="button"
+						onClick={ () => setIsAddingBlock( true ) }
+					>
+						{ __( '+ Add Block Guidelines' ) }
+					</button>
+				) }
 			</td>
 		</tr>
 	);

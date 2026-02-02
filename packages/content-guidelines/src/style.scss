@@ -71,6 +71,24 @@
 	}
 }
 
+.block-guidelines-description {
+	display: block;
+	margin: 0 0 16px !important;
+}
+
+.block-guidelines-add-form {
+	margin-top: 16px;
+	padding: 16px;
+	background: colors.$gray-100;
+	border: 1px solid colors.$gray-300;
+}
+
+.block-guidelines-form-actions {
+	display: flex;
+	gap: 8px;
+	margin-top: 12px;
+}
+
 .block-guidelines-editor {
 	margin-top: 16px;
 
@@ -81,7 +99,7 @@
 }
 
 .block-guidelines-list {
-	margin-top: 16px;
+	margin: 16px 0;
 
 	&__title {
 		font-size: 13px;
@@ -100,20 +118,6 @@
 
 	&:last-child {
 		border-bottom: none;
-	}
-
-	// Striped rows
-	&:nth-child(odd) {
-		background: colors.$gray-100;
-	}
-
-	&:nth-child(even) {
-		background: colors.$white;
-	}
-
-	// Hover effect
-	&:hover {
-		background: colors.$gray-200;
 	}
 
 	&__header {
