@@ -20,6 +20,7 @@ import {
 import { useResourcePermissions } from '@wordpress/core-data';
 import { plus } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -27,21 +28,6 @@ import { useInstanceId } from '@wordpress/compose';
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
 import { useEntityBinding } from '../shared/use-entity-binding';
-
-/**
- * Checks if a string is a valid URL with a protocol.
- *
- * @param {string} string - The string to check.
- * @return {boolean} True if the string is a valid URL with protocol.
- */
-function isValidURL( string ) {
-	try {
-		new URL( string );
-		return true;
-	} catch {
-		return false;
-	}
-}
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -254,7 +240,7 @@ function UnforwardedLinkUI( props, ref ) {
 					} }
 					onPageCreated={ handlePageCreated }
 					initialTitle={
-						searchInputValue && ! isValidURL( searchInputValue )
+						searchInputValue && ! isURL( searchInputValue )
 							? searchInputValue
 							: ''
 					}
