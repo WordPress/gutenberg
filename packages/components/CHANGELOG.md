@@ -6,6 +6,10 @@
 
 -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used.
 
+### Enhancements
+
+-   Improve visual emphasis of the selected item in the ToggleGroupControl component ([#75138](https://github.com/WordPress/gutenberg/pull/75138)).
+
 ### Internal
 
 -   Expose `useDrag` from `@use-gesture/react` package via private API's ([#66735](https://github.com/WordPress/gutenberg/pull/66735)).
