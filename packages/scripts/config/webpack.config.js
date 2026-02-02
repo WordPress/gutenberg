@@ -1,17 +1,17 @@
 /**
  * External dependencies
  */
+const { exec } = require( 'child_process' );
+const { realpathSync } = require( 'fs' );
+const { basename, dirname, relative, resolve, sep } = require( 'path' );
 const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const webpack = require( 'webpack' );
 const browserslist = require( 'browserslist' );
 const MiniCSSExtractPlugin = require( 'mini-css-extract-plugin' );
-const { basename, dirname, relative, resolve, sep } = require( 'path' );
 const ReactRefreshWebpackPlugin = require( '@pmmmwh/react-refresh-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
-const { realpathSync } = require( 'fs' );
 const { sync: glob } = require( 'fast-glob' );
-const { exec } = require( 'child_process' );
 
 /**
  * WordPress dependencies
@@ -119,6 +119,9 @@ const baseConfig = {
 	resolve: {
 		alias: {
 			'lodash-es': 'lodash',
+			// Force CommonJS version of wasm-vips to avoid import.meta usage
+			// which is not supported in non-module scripts.
+			'wasm-vips$': require.resolve( 'wasm-vips/lib/vips.js' ),
 		},
 		extensions: [ '.jsx', '.ts', '.tsx', '...' ],
 	},
