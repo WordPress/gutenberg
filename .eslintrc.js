@@ -67,7 +67,7 @@ const restrictedImports = [
 	},
 	{
 		name: '@base-ui/react',
-		message: 'Please use Base UI API through `@wordpress/ui` instead.',
+		message: 'Avoid using Base UI directly. Consider a new `@wordpress/ui` component instead.',
 	},
 ];
 
