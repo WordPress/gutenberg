@@ -669,7 +669,7 @@ export function prepareItem( id: QueueItemId ) {
 
 		// For images, check if we need to scale down based on threshold.
 		if ( isImage ) {
-			const { bigImageSizeThreshold, imageOutputFormats } = settings;
+			const bigImageSizeThreshold =
 				select.getSettings().bigImageSizeThreshold;
 
 			// If a threshold is set, add a resize operation to scale down large images.
@@ -1311,7 +1311,7 @@ export function generateThumbnails( id: QueueItemId ) {
 						image_size: name,
 						convert_format: false,
 					},
-					operations: thumbnailOperations,
+					operations: [
 						[ OperationType.ResizeCrop, { resize: imageSize } ],
 						OperationType.Upload,
 					],
