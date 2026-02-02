@@ -22,7 +22,7 @@
 			"type": "object",
 			"default": {
 				"dimensions": {
-					"width": "24px"
+					"width": "48px"
 				}
 			}
 		}

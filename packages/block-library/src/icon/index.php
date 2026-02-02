@@ -34,7 +34,7 @@ function render_block_core_icon( $attributes, $content, $block ) {
 	$processor->set_attribute( 'class', 'wp-block-icon' );
 
 	// Check for width and set default to 25px.
-	$width = ( isset( $attributes['style'] ) && isset( $attributes['style']['dimensions'] ) && isset( $attributes['style']['dimensions']['width'] ) ) ? $attributes['style']['dimensions']['width'] : '24px';
+	$width = ( isset( $attributes['style'] ) && isset( $attributes['style']['dimensions'] ) && isset( $attributes['style']['dimensions']['width'] ) ) ? $attributes['style']['dimensions']['width'] : '48px';
 	$processor->set_attribute( 'width', $width );
 
 	return $processor->get_updated_html();
