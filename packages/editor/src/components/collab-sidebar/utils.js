@@ -92,6 +92,60 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
 }
 
 /**
+ * Normalizes noteId metadata to always return an array.
+ * Handles both scalar (legacy) and array (new) noteId values.
+ *
+ * @param {Object} metadata Block metadata object
+ * @return {number[]} Array of note IDs (may be empty)
+ */
+export function getNoteIdsFromMetadata( metadata ) {
+	if ( ! metadata || metadata.noteId === undefined ) {
+		return [];
+	}
+	// New format: noteId is an array
+	if ( Array.isArray( metadata.noteId ) ) {
+		return metadata.noteId.filter( Boolean );
+	}
+	// Legacy format: noteId is a scalar
+	return [ metadata.noteId ];
+}
+
+/**
+ * Adds a note ID to the metadata.
+ * Converts scalar to array if needed, otherwise appends.
+ *
+ * @param {Object} metadata Existing block metadata
+ * @param {number} noteId   Note ID to add
+ * @return {Object} Updated metadata object
+ */
+export function addNoteIdToMetadata( metadata, noteId ) {
+	const existingIds = getNoteIdsFromMetadata( metadata );
+	if ( existingIds.includes( noteId ) ) {
+		return metadata;
+	}
+	return {
+		...metadata,
+		noteId: [ ...existingIds, noteId ],
+	};
+}
+
+/**
+ * Removes a note ID from the metadata.
+ *
+ * @param {Object} metadata Existing block metadata
+ * @param {number} noteId   Note ID to remove
+ * @return {Object} Updated metadata object
+ */
+export function removeNoteIdFromMetadata( metadata, noteId ) {
+	const existingIds = getNoteIdsFromMetadata( metadata );
+	const newIds = existingIds.filter( ( id ) => id !== noteId );
+	return {
+		...metadata,
+		noteId: newIds.length > 0 ? newIds : undefined,
+	};
+}
+
+/**
  * Shift focus to the comment thread associated with a particular comment ID.
  * If an additional selector is provided, the focus will be shifted to the element matching the selector.
  *

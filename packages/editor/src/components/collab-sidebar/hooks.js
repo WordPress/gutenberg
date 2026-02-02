@@ -33,7 +33,12 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { store as editorStore } from '../../store';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
-import { noop } from './utils';
+import {
+	noop,
+	getNoteIdsFromMetadata,
+	addNoteIdToMetadata,
+	removeNoteIdFromMetadata,
+} from './utils';
 
 const { useBlockElement, cleanEmptyObject } = unlock( blockEditorPrivateApis );
 
@@ -72,9 +77,10 @@ export function useBlockComments( postId ) {
 		}
 
 		const blocksWithComments = clientIds.reduce( ( results, clientId ) => {
-			const commentId = getBlockAttributes( clientId )?.metadata?.noteId;
-			if ( commentId ) {
-				results[ clientId ] = commentId;
+			const metadata = getBlockAttributes( clientId )?.metadata;
+			const noteIds = getNoteIdsFromMetadata( metadata );
+			if ( noteIds.length > 0 ) {
+				results[ clientId ] = noteIds;
 			}
 			return results;
 		}, {} );
@@ -87,7 +93,10 @@ export function useBlockComments( postId ) {
 		const commentIdToBlockClientId = Object.keys(
 			blocksWithComments
 		).reduce( ( mapping, clientId ) => {
-			mapping[ blocksWithComments[ clientId ] ] = clientId;
+			const noteIds = blocksWithComments[ clientId ];
+			noteIds.forEach( ( noteId ) => {
+				mapping[ noteId ] = clientId;
+			} );
 			return mapping;
 		}, {} );
 
@@ -128,17 +137,21 @@ export function useBlockComments( postId ) {
 
 		// Prepare sets to determine which threads are linked to existing blocks.
 		const mappedIds = new Set(
-			Object.values( blocksWithComments ).map( ( id ) => String( id ) )
+			Object.values( blocksWithComments )
+				.flat()
+				.map( ( id ) => String( id ) )
 		);
 
 		// Get comments by block order, first unresolved, then resolved.
 		const unresolvedSortedComments = Object.values( blocksWithComments )
+			.flat()
 			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
 			.filter(
 				( thread ) => thread !== undefined && thread.status === 'hold'
 			);
 
 		const resolvedSortedComments = Object.values( blocksWithComments )
+			.flat()
 			.map( ( commentId ) => threadIdMap.get( String( commentId ) ) )
 			.filter(
 				( thread ) =>
@@ -208,11 +221,12 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 			if ( ! parent && savedRecord?.id ) {
 				const clientId = getSelectedBlockClientId();
 				const metadata = getBlockAttributes( clientId )?.metadata;
+				const updatedMetadata = addNoteIdToMetadata(
+					metadata,
+					savedRecord.id
+				);
 				updateBlockAttributes( clientId, {
-					metadata: {
-						...metadata,
-						noteId: savedRecord.id,
-					},
+					metadata: cleanEmptyObject( updatedMetadata ),
 				} );
 			}
 
@@ -312,13 +326,16 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 			);
 
 			if ( ! comment.parent ) {
-				const clientId = getSelectedBlockClientId();
+				// Use blockClientId if available, otherwise fall back to selected block
+				const clientId =
+					comment.blockClientId || getSelectedBlockClientId();
 				const metadata = getBlockAttributes( clientId )?.metadata;
+				const updatedMetadata = removeNoteIdFromMetadata(
+					metadata,
+					comment.id
+				);
 				updateBlockAttributes( clientId, {
-					metadata: cleanEmptyObject( {
-						...metadata,
-						noteId: undefined,
-					} ),
+					metadata: cleanEmptyObject( updatedMetadata ),
 				} );
 			}
 

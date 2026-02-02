@@ -31,6 +31,7 @@ import {
 	useBlockCommentsActions,
 	useEnableFloatingSidebar,
 } from './hooks';
+import { focusCommentThread, getNoteIdsFromMetadata } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
@@ -80,14 +81,12 @@ function NotesSidebarContent( {
 function NotesSidebar( { postId } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const { toggleBlockSpotlight, selectBlock } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
-	const { clientId, blockCommentId, isClassicBlock } = useSelect(
+	const { clientId, blockNoteIds, isClassicBlock } = useSelect(
 		( select ) => {
 			const {
 				getBlockAttributes,
@@ -95,11 +94,12 @@ function NotesSidebar( { postId } ) {
 				getBlockName,
 			} = select( blockEditorStore );
 			const _clientId = getSelectedBlockClientId();
+			const metadata = _clientId
+				? getBlockAttributes( _clientId )?.metadata
+				: null;
 			return {
 				clientId: _clientId,
-				blockCommentId: _clientId
-					? getBlockAttributes( _clientId )?.metadata?.noteId
-					: null,
+				blockNoteIds: getNoteIdsFromMetadata( metadata ),
 				isClassicBlock: _clientId
 					? getBlockName( _clientId ) === 'core/freeform'
 					: false,
@@ -142,13 +142,8 @@ function NotesSidebar( { postId } ) {
 			openTheSidebar();
 		},
 		{
-			// When multiple notes per block are supported. Remove note ID check.
-			// See: https://github.com/WordPress/gutenberg/pull/75147.
 			isDisabled:
-				isDistractionFree ||
-				isClassicBlock ||
-				! clientId ||
-				!! blockCommentId,
+				isDistractionFree || isClassicBlock || ! clientId,
 		}
 	);
 
@@ -156,23 +151,24 @@ function NotesSidebar( { postId } ) {
 	const { merged: GlobalStyles } = useGlobalStylesContext();
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
 
-	// Find the current thread for the selected block.
-	const currentThread = blockCommentId
-		? resultComments.find( ( thread ) => thread.id === blockCommentId )
-		: null;
+	// Find threads for the selected block.
+	const currentThreads =
+		blockNoteIds.length > 0
+			? resultComments.filter( ( thread ) =>
+					blockNoteIds.includes( thread.id )
+			  )
+			: [];
+	// Use first unresolved thread, or first thread overall, for UI interactions.
+	const currentThread =
+		currentThreads.find( ( thread ) => thread.status === 'hold' ) ??
+		currentThreads[ 0 ] ??
+		null;
 
-	async function openTheSidebar( selectedClientId ) {
+	async function openTheSidebar( { addNewNote = false } = {} ) {
 		const prevArea = await getActiveComplementaryArea( 'core' );
 		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
-		const targetClientId =
-			selectedClientId && selectedClientId !== clientId
-				? selectedClientId
-				: clientId;
-		const targetNote = resultComments.find(
-			( note ) => note.blockClientId === targetClientId
-		);
 
-		if ( targetNote?.status === 'approved' ) {
+		if ( currentThread?.status === 'approved' && ! addNewNote ) {
 			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
 		} else if ( ! activeNotesArea || ! showAllNotesSidebar ) {
 			enableComplementaryArea(
@@ -187,11 +183,16 @@ function NotesSidebar( { postId } ) {
 			return;
 		}
 
-		// A special case for the List View, where block selection isn't required to trigger an action.
-		// The action won't do anything if the block is already selected.
-		selectBlock( targetClientId, null );
-		toggleBlockSpotlight( targetClientId, true );
-		selectNote( targetNote ? targetNote.id : 'new', { focus: true } );
+		// When addNewNote is true, always open the new note form.
+		// Otherwise, select the existing thread or open new.
+		const shouldAddNew = addNewNote || ! currentThread;
+		selectNote( shouldAddNew ? 'new' : currentThread.id );
+		focusCommentThread(
+			shouldAddNew ? undefined : currentThread?.id,
+			commentSidebarRef.current,
+			shouldAddNew ? 'textarea' : undefined
+		);
+		toggleBlockSpotlight( clientId, true );
 	}
 
 	if ( isDistractionFree ) {
@@ -206,7 +207,9 @@ function NotesSidebar( { postId } ) {
 					onClick={ openTheSidebar }
 				/>
 			) }
-			<AddCommentMenuItem onClick={ openTheSidebar } />
+			<AddCommentMenuItem
+				onClick={ () => openTheSidebar( { addNewNote: true } ) }
+			/>
 			{ showAllNotesSidebar && (
 				<PluginSidebar
 					identifier={ ALL_NOTES_SIDEBAR }
