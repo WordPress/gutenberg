@@ -23,16 +23,14 @@ import {
 	useBlockEditingMode,
 	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 } from '@wordpress/block-editor';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { IconPlaceholder, InserterModal } from './components';
-import { flattenIconsArray, parseIcon } from './utils';
-import { bolt as defaultIcon } from './icons/bolt';
+import { parseIcon, useToolsPanelDropdownMenuProps } from './utils';
 import getIcons from './icons';
-import { useToolsPanelDropdownMenuProps } from './utils/hooks';
 
 /**
  * The edit function for the Icon Block.
@@ -44,36 +42,20 @@ export function Edit( props ) {
 	const { icon, iconName, label, title } = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
-	const [ isQuickInserterOpen, setQuickInserterOpen ] = useState( false );
+	const [ iconToDisplay, setIconToDisplay ] = useState();
 
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 
-	const iconsAll = flattenIconsArray( getIcons() );
-	const namedIcon = iconsAll.filter( ( i ) => i.name === iconName );
-	const customIcon = defaultIcon;
-	let printedIcon = '';
-	if ( icon && namedIcon.length === 0 ) {
-		printedIcon = parseIcon( icon );
-
-		if (
-			customIcon.props &&
-			Object.keys( customIcon?.props ).length === 0
-		) {
-			printedIcon = defaultIcon;
-		}
-	} else {
-		// Icon chosen from library.
-		if ( icon.length === 0 && namedIcon.length > 0 ) {
-			printedIcon = namedIcon[ 0 ]?.icon;
-		} else {
-			printedIcon = icon;
-		}
-
-		// Icons provided by third-parties are generally strings.
-		if ( typeof printedIcon === 'string' ) {
-			printedIcon = parseIcon( printedIcon );
-		}
-	}
+	useEffect( () => {
+		const requestIcons = async () => {
+			const iconList = await getIcons();
+			const selectedIcon = iconList.find(
+				( { name } ) => name === attributes.icon
+			);
+			setIconToDisplay( parseIcon( selectedIcon?.content ) );
+		};
+		requestIcons();
+	}, [ attributes.icon ] );
 
 	function resetAll() {
 		setAttributes( {
@@ -198,16 +180,14 @@ export function Edit( props ) {
 
 	const iconMarkup = (
 		<>
-			{ ! icon && ! iconName ? (
+			{ ! icon ? (
 				<IconPlaceholder
 					setInserterOpen={ setInserterOpen }
-					isQuickInserterOpen={ isQuickInserterOpen }
-					setQuickInserterOpen={ setQuickInserterOpen }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 				/>
 			) : (
-				<>{ printedIcon }</>
+				<>{ iconToDisplay }</>
 			) }
 		</>
 	);

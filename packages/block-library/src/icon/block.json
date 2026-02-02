@@ -10,13 +10,6 @@
 	"attributes": {
 		"icon": {
 			"type": "string",
-			"source": "html",
-			"selector": ".wp-block-icon",
-			"default": "",
-			"role": "content"
-		},
-		"iconName": {
-			"type": "string",
 			"role": "content"
 		},
 		"label": {
@@ -24,6 +17,14 @@
 		},
 		"title": {
 			"type": "string"
+		},
+		"style": {
+			"type": "object",
+			"default": {
+				"dimensions": {
+					"width": "24px"
+				}
+			}
 		}
 	},
 	"supports": {

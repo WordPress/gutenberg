@@ -5,21 +5,12 @@ import { useState, useMemo, useEffect } from '@wordpress/element';
 import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
  */
 import { parseIcon } from '../../utils';
-
-/**
- * Mock function to simulate fetching icons from an API.
- * @return {Promise<Array>} A promise that resolves to an array of icon data.
- */
-const getIcons = async () => {
-	const icons = await apiFetch( { path: '/wp/v2/icons' } );
-	return icons;
-};
+import getIcons from '../../icons';
 
 const fields = [
 	{
@@ -82,7 +73,7 @@ const InserterModal = ( {
 	}, [ isInserterOpen ] );
 
 	const [ selection, setSelection ] = useState(
-		[ attributes.iconName ].filter( Boolean )
+		[ attributes.icon ].filter( Boolean )
 	);
 
 	const { data: processedData, paginationInfo } = useMemo( () => {
@@ -104,8 +95,7 @@ const InserterModal = ( {
 					? items
 					: [ items ];
 				setAttributes( {
-					icon: selectedItems[ 0 ]?.content || '',
-					iconName: selectedItems[ 0 ]?.name || '',
+					icon: selectedItems[ 0 ]?.name || '',
 				} );
 				setInserterOpen( false );
 			},
