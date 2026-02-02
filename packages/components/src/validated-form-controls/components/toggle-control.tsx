@@ -28,10 +28,11 @@ const UnforwardedValidatedToggleControl = (
 	// synchronously when the element mounts, before any validation effects run.
 	const setRequiredRef = useCallback(
 		( element: HTMLInputElement | null ) => {
-			validityTargetRef.current = element;
-			if ( element ) {
-				element.required = required ?? false;
+			if ( ! element ) {
+				return;
 			}
+			validityTargetRef.current = element;
+			element.required = required ?? false;
 		},
 		[ required ]
 	);
