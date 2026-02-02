@@ -129,6 +129,7 @@ function LinkControl( {
 	value,
 	settings = DEFAULT_LINK_SETTINGS,
 	onChange = noop,
+	onInputChange,
 	onRemove,
 	onCancel,
 	noDirectEntry = false,
@@ -212,6 +213,12 @@ function LinkControl( {
 		setInternalTextInputValue,
 		createSetInternalSettingValueHandler,
 	] = useInternalValue( value );
+
+	// Wrapper for input changes that calls both internal and external handlers
+	const handleInputChange = ( newValue ) => {
+		setInternalURLInputValue( newValue );
+		onInputChange?.( newValue );
+	};
 
 	// Compute isEntity internally based on handleEntities prop and presence of ID
 	const isEntity = handleEntities && !! internalControlValue?.id;
@@ -616,7 +623,7 @@ function LinkControl( {
 							value={ currentUrlInputValue }
 							withCreateSuggestion={ withCreateSuggestion }
 							onCreateSuggestion={ createPage }
-							onChange={ setInternalURLInputValue }
+							onChange={ handleInputChange }
 							onSelect={ handleSelectSuggestion }
 							showInitialSuggestions={ showInitialSuggestions }
 							allowDirectEntry={ ! noDirectEntry }

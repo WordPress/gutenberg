@@ -29,6 +29,21 @@ import LinkUIBlockInserter from './block-inserter';
 import { useEntityBinding } from '../shared/use-entity-binding';
 
 /**
+ * Checks if a string is a valid URL with a protocol.
+ *
+ * @param {string} string - The string to check.
+ * @return {boolean} True if the string is a valid URL with protocol.
+ */
+function isValidURL( string ) {
+	try {
+		new URL( string );
+		return true;
+	} catch {
+		return false;
+	}
+}
+
+/**
  * Given the Link block's type attribute, return the query params to give to
  * /wp/v2/search.
  *
@@ -77,6 +92,7 @@ function UnforwardedLinkUI( props, ref ) {
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ addingPage, setAddingPage ] = useState( false );
 	const [ shouldFocusPane, setShouldFocusPane ] = useState( null );
+	const [ searchInputValue, setSearchInputValue ] = useState( '' );
 	const linkControlWrapperRef = useRef();
 	const addPageButtonRef = useRef();
 	const addBlockButtonRef = useRef();
@@ -111,6 +127,8 @@ function UnforwardedLinkUI( props, ref ) {
 		// Return to main Link UI and focus the first focusable element
 		setAddingPage( false );
 		setShouldFocusPane( true );
+		// Clear search input value
+		setSearchInputValue( '' );
 	};
 
 	const dialogTitleId = useInstanceId(
@@ -180,6 +198,8 @@ function UnforwardedLinkUI( props, ref ) {
 						noURLSuggestion={ !! type }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 						onChange={ props.onChange }
+						onInputChange={ setSearchInputValue }
+						inputValue={ searchInputValue }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
 						handleEntities={ isBoundEntityAvailable }
@@ -233,7 +253,11 @@ function UnforwardedLinkUI( props, ref ) {
 						setShouldFocusPane( addPageButtonRef );
 					} }
 					onPageCreated={ handlePageCreated }
-					initialTitle={ link?.url || '' }
+					initialTitle={
+						searchInputValue && ! isValidURL( searchInputValue )
+							? searchInputValue
+							: ''
+					}
 				/>
 			) }
 		</Popover>
