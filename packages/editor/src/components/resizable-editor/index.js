@@ -45,10 +45,16 @@ function isAtMaxWidth( currentWidth, containerWidth, tolerance = 0 ) {
 function ResizableEditor( { className, enableResizing, height, children } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
 	const { setCanvasWidth } = unlock( useDispatch( editorStore ) );
-	const canvasWidth = useSelect( ( select ) => {
-		const { getCanvasWidth } = unlock( select( editorStore ) );
-		return getCanvasWidth();
-	}, [] );
+	const canvasWidth = useSelect(
+		( select ) => {
+			if ( ! enableResizing ) {
+				return undefined;
+			}
+			const { getCanvasWidth } = unlock( select( editorStore ) );
+			return getCanvasWidth();
+		},
+		[ enableResizing ]
+	);
 
 	const resizableRef = useRef();
 	const resizeWidthBy = useCallback(
