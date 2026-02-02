@@ -16,7 +16,7 @@ import { unlock } from '../../lock-unlock';
 
 export default function BlockVisibilityViewportMenuItem( { clientIds } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const areBlocksHiddenAnywhere = useSelect(
+	const { areBlocksHiddenAnywhere } = useSelect(
 		( select ) => {
 			const { isBlockHiddenAnywhere } = unlock(
 				select( blockEditorStore )

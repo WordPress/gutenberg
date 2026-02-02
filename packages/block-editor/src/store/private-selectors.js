@@ -523,7 +523,6 @@ export function isSectionBlock( state, clientId ) {
 
 	if (
 		( attributes?.metadata?.patternName || isTemplatePart ) &&
-		!! window?.__experimentalContentOnlyPatternInsertion &&
 		! isIsolatedEditor
 	) {
 		return true;
@@ -727,7 +726,6 @@ export const isBlockHiddenAnywhere = ( state, clientId ) => {
 	}
 
 	if (
-		window.__experimentalHideBlocksBasedOnScreenSize &&
 		typeof blockVisibility?.viewport === 'object' &&
 		blockVisibility?.viewport !== null
 	) {

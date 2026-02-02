@@ -1236,18 +1236,6 @@ describe( 'private selectors', () => {
 	} );
 
 	describe( 'isBlockHiddenAnywhere in different devices', () => {
-		const originalExperimentalFlag =
-			window.__experimentalHideBlocksBasedOnScreenSize;
-
-		beforeEach( () => {
-			window.__experimentalHideBlocksBasedOnScreenSize = true;
-		} );
-
-		afterEach( () => {
-			window.__experimentalHideBlocksBasedOnScreenSize =
-				originalExperimentalFlag;
-		} );
-
 		const createState = ( blockVisibility, deviceType = 'Desktop' ) => ( {
 			settings: {
 				[ deviceTypeKey ]: deviceType,
@@ -1277,15 +1265,6 @@ describe( 'private selectors', () => {
 					],
 				] ),
 			},
-		} );
-
-		it( 'returns false when experimental flag is disabled and block has breakpoint visibility', () => {
-			window.__experimentalHideBlocksBasedOnScreenSize = false;
-			const state = createState( {
-				viewport: { mobile: false, tablet: true },
-			} );
-			const result = isBlockHiddenAnywhere( state, 'test-block' );
-			expect( result ).toBe( false );
 		} );
 
 		it( 'returns true when block is hidden at any viewport (mobile)', () => {

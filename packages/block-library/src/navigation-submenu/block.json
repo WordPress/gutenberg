@@ -55,7 +55,7 @@
 		"customFontSize",
 		"showSubmenuIcon",
 		"maxNestingLevel",
-		"openSubmenusOnClick",
+		"submenuVisibility",
 		"style"
 	],
 	"supports": {

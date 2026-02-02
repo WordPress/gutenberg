@@ -100,7 +100,7 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 				currentViewport;
 			label = sprintf(
 				/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
-				__( 'Block is hidden in %s' ),
+				__( 'Block is hidden on %s' ),
 				viewportLabel
 			);
 		}
@@ -115,7 +115,7 @@ export default function ViewportVisibilityInfo( { clientId } ) {
 			currentViewport;
 		label = sprintf(
 			/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
-			__( 'Parent block is hidden in %s' ),
+			__( 'Parent block is hidden on %s' ),
 			viewportLabel
 		);
 	}

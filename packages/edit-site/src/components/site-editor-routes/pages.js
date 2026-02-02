@@ -4,8 +4,6 @@
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { __ } from '@wordpress/i18n';
 import { loadView } from '@wordpress/views';
-import { resolveSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -17,19 +15,18 @@ import DataViewsSidebarContent from '../sidebar-dataviews';
 import PostList from '../post-list';
 import { unlock } from '../../lock-unlock';
 import { PostEdit } from '../post-edit';
-import { getDefaultView } from '../post-list/view-utils';
+import { DEFAULT_VIEW, getActiveFiltersForTab } from '../post-list/view-utils';
 
 const { useLocation } = unlock( routerPrivateApis );
 
 async function isListView( query ) {
 	const { activeView = 'all' } = query;
-	const postTypeObject =
-		await resolveSelect( coreStore ).getPostType( 'page' );
 	const view = await loadView( {
 		kind: 'postType',
 		name: 'page',
-		slug: activeView,
-		defaultView: getDefaultView( postTypeObject, activeView ),
+		slug: 'default',
+		defaultView: DEFAULT_VIEW,
+		activeFilters: getActiveFiltersForTab( activeView ),
 	} );
 	return view.type === 'list';
 }

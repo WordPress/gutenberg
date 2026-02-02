@@ -11,15 +11,19 @@ import SidebarNavigationScreenTemplatesBrowse from '../sidebar-navigation-screen
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
 import PageTemplates from '../page-templates';
 import PageTemplatesLegacy from '../page-templates/index-legacy';
-import { getDefaultView } from '../page-templates/view-utils';
+import {
+	DEFAULT_VIEW,
+	getActiveFiltersForTab,
+} from '../page-templates/view-utils';
 
 async function isTemplateListView( query ) {
 	const { activeView = 'active' } = query;
 	const view = await loadView( {
 		kind: 'postType',
 		name: 'wp_template',
-		slug: activeView,
-		defaultView: getDefaultView( activeView ),
+		slug: 'default',
+		defaultView: DEFAULT_VIEW,
+		activeFilters: getActiveFiltersForTab( activeView ),
 	} );
 	return view.type === 'list';
 }

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { useDrag } from '@use-gesture/react';
+
+/**
  * Internal dependencies
  */
 import { positionToPlacement as __experimentalPopoverLegacyPositionToPlacement } from './popover/utils';
@@ -14,6 +19,7 @@ import Badge from './badge';
 import { DateCalendar, DateRangeCalendar, TZDate } from './calendar';
 import {
 	ValidatedCheckboxControl,
+	ValidatedComboboxControl,
 	ValidatedInputControl,
 	ValidatedNumberControl,
 	ValidatedSelectControl,
@@ -41,8 +47,10 @@ lock( privateApis, {
 	DateRangeCalendar,
 	TZDate,
 	Picker,
+	useDrag,
 	ValidatedInputControl,
 	ValidatedCheckboxControl,
+	ValidatedComboboxControl,
 	ValidatedNumberControl,
 	ValidatedSelectControl,
 	ValidatedRadioControl,

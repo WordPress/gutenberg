@@ -1,0 +1,77 @@
+@use "@wordpress/base-styles/variables" as *;
+
+.wp-block-playlist {
+	border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+	border-radius: 2px;
+	padding: $grid-unit-20;
+
+	.wp-block-playlist__current-item {
+		display: flex;
+		align-items: center;
+		gap: var(--Spacing-6, 24px);
+		align-self: stretch;
+		padding-bottom: $grid-unit-20;
+		border-bottom: 1px solid color-mix(in srgb, currentColor 20%, transparent);
+		margin-bottom: $grid-unit-20;
+
+		img {
+			border-radius: 2px;
+		}
+
+		div {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			gap: 8px;
+		}
+
+		& .wp-block-playlist__current-item-artist-album {
+			flex-direction: row;
+			font-weight: 400;
+			font-size: 16px;
+		}
+
+		.wp-block-playlist__item-title {
+			font-weight: 600;
+			word-break: break-all;
+		}
+
+		.wp-block-playlist__item-album {
+			font-style: italic;
+		}
+	}
+
+	audio {
+		width: 100%;
+		margin-top: 10px;
+	}
+
+	.wp-block-playlist__tracklist {
+		font-size: 14px;
+
+		&.wp-block-playlist__tracklist-is-hidden {
+			display: none;
+		}
+
+		&.wp-block-playlist__tracklist-artist-is-hidden {
+			// Hide the artist name, which is in the playlist-track block.
+			.wp-block-playlist-track__artist {
+				display: none;
+			}
+		}
+	}
+
+	ul.wp-block-playlist__tracklist {
+		padding-left: 0;
+		list-style: none;
+	}
+
+	ol.wp-block-playlist__tracklist {
+		padding-left: $grid-unit-20;
+	}
+
+	li.block-list-appender.block-list-appender {
+		position: initial;
+		margin-top: $grid-unit-20;
+	}
+}

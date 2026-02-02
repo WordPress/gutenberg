@@ -32,6 +32,7 @@ import { __ } from '@wordpress/i18n';
 import { unlock } from '../lock-unlock';
 import {
 	getDefaultView,
+	getActiveFiltersForTab,
 	DEFAULT_VIEWS,
 	DEFAULT_LAYOUTS,
 	viewToQuery,
@@ -78,8 +79,13 @@ function PostList() {
 	);
 
 	const defaultView: View = useMemo( () => {
-		return getDefaultView( postTypeObject, slug );
-	}, [ postTypeObject, slug ] );
+		return getDefaultView( postTypeObject );
+	}, [ postTypeObject ] );
+
+	const activeFilters = useMemo(
+		() => getActiveFiltersForTab( slug ),
+		[ slug ]
+	);
 
 	// Callback to handle URL query parameter changes
 	const handleQueryParamsChange = useCallback(
@@ -98,8 +104,9 @@ function PostList() {
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
 		name: postType,
-		slug,
+		slug: 'default-new',
 		defaultView,
+		activeFilters,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );

@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
+	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { __unstableMotion as motion } from '@wordpress/components';
@@ -24,12 +25,13 @@ import BlockStyles from '../block-styles';
 import { default as InspectorControls } from '../inspector-controls';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
+import InspectorControlsLastItem from '../inspector-controls/last-item';
 import AdvancedControls from '../inspector-controls-tabs/advanced-controls-panel';
 import PositionControls from '../inspector-controls-tabs/position-controls-panel';
 import useBlockInspectorAnimationSettings from './useBlockInspectorAnimationSettings';
 import { useBorderPanelLabel } from '../../hooks/border';
 import ContentTab from '../inspector-controls-tabs/content-tab';
-import BlockVisibilityInfo from '../block-visibility/block-visibility-info';
+import ViewportVisibilityInfo from '../block-visibility/viewport-visibility-info';
 import { unlock } from '../../lock-unlock';
 
 function StyleInspectorSlots( {
@@ -145,30 +147,29 @@ function BlockInspector() {
 				renderedBlockClientId
 			);
 
-			// Temporary workaround for issue #71991
-			// Exclude Navigation block children from Content sidebar until proper
-			// drill-down experience is implemented (see #65699)
-			// This prevents a poor UX where all Nav block sub-items are shown
-			// when the parent block is in contentOnly mode.
-			// Build a Set of all navigation block descendants for efficient lookup
-			const navigationDescendants = new Set();
+			// Exclude items from the content tab that are already present in the
+			// List View tab.
+			const listViewDescendants = new Set();
 			descendants.forEach( ( clientId ) => {
-				if ( getBlockName( clientId ) === 'core/navigation' ) {
-					const navChildren = getClientIdsOfDescendants( clientId );
-					navChildren.forEach( ( childId ) =>
-						navigationDescendants.add( childId )
+				const blockName = getBlockName( clientId );
+				// Navigation block doesn't have List View block support, but
+				// it does have a custom implementation that is shown within
+				// patterns, so it's included in this condition.
+				if (
+					blockName === 'core/navigation' ||
+					hasBlockSupport( blockName, 'listView' )
+				) {
+					const listViewChildren =
+						getClientIdsOfDescendants( clientId );
+					listViewChildren.forEach( ( childId ) =>
+						listViewDescendants.add( childId )
 					);
 				}
 			} );
 
 			return descendants.filter( ( current ) => {
-				// Exclude navigation block children
-				if ( navigationDescendants.has( current ) ) {
-					return false;
-				}
-
 				return (
-					getBlockName( current ) !== 'core/list-item' &&
+					! listViewDescendants.has( current ) &&
 					getBlockEditingMode( current ) === 'contentOnly'
 				);
 			} );
@@ -315,7 +316,6 @@ const BlockInspectorSingleBlock = ( {
 } ) => {
 	const hasMultipleTabs = availableTabs?.length > 1;
 	const hasParentChildBlockCards =
-		window?.__experimentalContentOnlyPatternInsertion &&
 		editedContentOnlySection &&
 		editedContentOnlySection !== renderedBlockClientId;
 	const parentBlockInformation = useBlockDisplayInformation(
@@ -342,10 +342,8 @@ const BlockInspectorSingleBlock = ( {
 				isChild={ hasParentChildBlockCards }
 				clientId={ renderedBlockClientId }
 			/>
-			<BlockVisibilityInfo clientId={ renderedBlockClientId } />
-			{ window?.__experimentalContentOnlyPatternInsertion && (
-				<EditContents clientId={ renderedBlockClientId } />
-			) }
+			<ViewportVisibilityInfo clientId={ renderedBlockClientId } />
+			<EditContents clientId={ renderedBlockClientId } />
 			<BlockVariationTransforms blockClientId={ renderedBlockClientId } />
 			{ hasMultipleTabs && (
 				<>
@@ -372,6 +370,7 @@ const BlockInspectorSingleBlock = ( {
 					) }
 				</>
 			) }
+			<InspectorControlsLastItem.Slot />
 			<SkipToSelectedBlock key="back" />
 		</div>
 	);

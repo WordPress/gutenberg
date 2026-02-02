@@ -53,7 +53,6 @@ import { useBlockLock } from '../block-lock';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
-import { cleanEmptyObject } from '../../hooks/utils';
 import { useBlockVisibility, BlockVisibilityModal } from '../block-visibility';
 import { deviceTypeKey } from '../../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../block-visibility/constants';
@@ -100,7 +99,6 @@ function ListViewBlock( {
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-		updateBlockAttributes,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	const debouncedToggleBlockHighlight = useDebounce(
@@ -161,7 +159,7 @@ function ListViewBlock( {
 			}
 			return sprintf(
 				/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
-				__( 'Block is hidden in %s' ),
+				__( 'Block is hidden on %s' ),
 				BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ]?.label ||
 					currentViewport
 			);
@@ -412,32 +410,8 @@ function ListViewBlock( {
 				return;
 			}
 
-			if ( window.__experimentalHideBlocksBasedOnScreenSize ) {
-				// Open the visibility breakpoints modal.
-				setVisibilityModalClientIds( blocksToUpdate );
-			} else {
-				const hasHiddenBlock = blocks.some(
-					( blockToUpdate ) =>
-						blockToUpdate.attributes.metadata?.blockVisibility ===
-						false
-				);
-				const attributesByClientId = Object.fromEntries(
-					blocks.map( ( { clientId: mapClientId, attributes } ) => [
-						mapClientId,
-						{
-							metadata: cleanEmptyObject( {
-								...attributes?.metadata,
-								blockVisibility: hasHiddenBlock
-									? undefined
-									: false,
-							} ),
-						},
-					] )
-				);
-				updateBlockAttributes( blocksToUpdate, attributesByClientId, {
-					uniqueByBlock: true,
-				} );
-			}
+			// Open the visibility breakpoints modal.
+			setVisibilityModalClientIds( blocksToUpdate );
 		}
 	}
 

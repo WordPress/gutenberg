@@ -2,9 +2,19 @@
 
 ## Unreleased
 
+### Internal
+
+-   Expose `useDrag` from `@use-gesture/react` package via private API's ([#66735](https://github.com/WordPress/gutenberg/pull/66735)).
+
+## 32.1.0 (2026-01-29)
+
 ### Code Quality
 
 -   Add `displayName` to components to improve debugging and fix Storybook source code. [#74716](https://github.com/WordPress/gutenberg/pull/74716)
+
+### Internal
+
+-   `ValidatedComboboxControl`: Expose the component under private API's. [#74891](https://github.com/WordPress/gutenberg/pull/74891)
 
 ## 32.0.0 (2026-01-16)
 

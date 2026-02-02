@@ -104,11 +104,10 @@ function NotesSidebar( { postId } ) {
 	const {
 		clientId,
 		blockCommentId,
-		isDistractionFree,
 		isCompactNotes,
 		isAllNotesSidebarActive,
 	} = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId, getSettings } =
+		const { getBlockAttributes, getSelectedBlockClientId } =
 			select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
 		return {
@@ -116,7 +115,6 @@ function NotesSidebar( { postId } ) {
 			blockCommentId: _clientId
 				? getBlockAttributes( _clientId )?.metadata?.noteId
 				: null,
-			isDistractionFree: getSettings().isDistractionFree,
 			isCompactNotes: !! select( preferencesStore ).get(
 				'core',
 				'compactNotes'
@@ -125,6 +123,13 @@ function NotesSidebar( { postId } ) {
 				select( interfaceStore ).getActiveComplementaryArea(
 					'core'
 				) === collabHistorySidebarName,
+		};
+	}, [] );
+
+	const { isDistractionFree } = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
+		return {
+			isDistractionFree: get( 'core', 'distractionFree' ),
 		};
 	}, [] );
 
@@ -272,8 +277,6 @@ function NotesSidebar( { postId } ) {
 						newNoteFormState={ newNoteFormState }
 						setNewNoteFormState={ setNewNoteFormState }
 						commentSidebarRef={ commentSidebarRef }
-						reflowComments={ reflowComments }
-						commentLastUpdated={ commentLastUpdated }
 					/>
 				</PluginSidebar>
 			) }
