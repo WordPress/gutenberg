@@ -44,7 +44,7 @@ function NotesSidebarContent( {
 	commentLastUpdated,
 	isFloating = false,
 } ) {
-	const { onCreate, onEdit, onDelete } =
+	const { onCreate, onEdit, onDelete, onToggleReaction } =
 		useBlockCommentsActions( reflowComments );
 
 	return (
@@ -70,6 +70,7 @@ function NotesSidebarContent( {
 				onEditComment={ onEdit }
 				onAddReply={ onCreate }
 				onCommentDelete={ onDelete }
+				onToggleReaction={ onToggleReaction }
 				newNoteFormState={ newNoteFormState }
 				setNewNoteFormState={ setNewNoteFormState }
 				commentSidebarRef={ commentSidebarRef }
