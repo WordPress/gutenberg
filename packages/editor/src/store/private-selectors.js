@@ -354,3 +354,14 @@ export const getCurrentRevision = createRegistrySelector(
 		return revisions.find( ( r ) => r.id === revisionId ) ?? null;
 	}
 );
+
+/**
+ * Returns the currently selected note ID.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {undefined|number|'new'} The selected note ID, 'new' for the new note form, or undefined if none.
+ */
+export function getSelectedNote( state ) {
+	return state.selectedNote;
+}

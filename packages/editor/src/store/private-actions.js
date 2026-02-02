@@ -646,3 +646,16 @@ export const restoreRevision =
 				id: 'editor-revision-restored',
 			} );
 	};
+
+/**
+ * Select a note by its ID, or clear the selection.
+ *
+ * @param {undefined|number|'new'} noteId The note ID to select, 'new' to open the new note form, or undefined to clear.
+ * @return {Object} Action object.
+ */
+export function selectNote( noteId ) {
+	return {
+		type: 'SELECT_NOTE',
+		noteId,
+	};
+}
