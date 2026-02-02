@@ -1,11 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { SelectControl, Button, Spinner } from '@wordpress/components';
+import { SelectControl, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { trash } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -26,6 +25,7 @@ interface BlockGuidelinesRowProps {
 	value: BlockGuidelines;
 	onChange: ( value: BlockGuidelines ) => void;
 	description: string;
+	isSaving?: boolean;
 }
 
 /**
@@ -45,36 +45,33 @@ function extractBlockTitle( block: BlockTypeResponse ): string {
 }
 
 /**
- * Truncates text to a maximum length with ellipsis.
- *
- * @param text      Text to truncate.
- * @param maxLength Maximum length before truncation.
- * @return Truncated text with ellipsis if needed.
- */
-function truncateText( text: string, maxLength: number ): string {
-	if ( text.length <= maxLength ) {
-		return text;
-	}
-	return `${ text.substring( 0, maxLength ) }...`;
-}
-
-/**
  * Block guidelines row component for managing per-block guidelines.
  *
  * @param props             Component props.
  * @param props.value       Current block guidelines object.
  * @param props.onChange    Callback when block guidelines change.
  * @param props.description Help text for the block guidelines.
+ * @param props.isSaving    Whether the block guidelines are currently being saved.
  * @return BlockGuidelinesRow component.
  */
 export default function BlockGuidelinesRow( {
 	value,
 	onChange,
 	description,
+	isSaving = false,
 }: BlockGuidelinesRowProps ) {
 	const [ selectedBlock, setSelectedBlock ] = useState( '' );
 	const [ blockTypes, setBlockTypes ] = useState< BlockType[] >( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
+	const wasSaving = useRef( false );
+
+	// Reset selection when save completes
+	useEffect( () => {
+		if ( wasSaving.current && ! isSaving ) {
+			setSelectedBlock( '' );
+		}
+		wasSaving.current = isSaving;
+	}, [ isSaving ] );
 
 	useEffect( () => {
 		async function fetchBlockTypes(): Promise< void > {
@@ -195,37 +192,50 @@ export default function BlockGuidelinesRow( {
 						<h4 className="block-guidelines-list__title">
 							{ __( 'Configured Blocks' ) }
 						</h4>
-						<ul className="block-guidelines-list__items">
+						<div className="block-guidelines-list__items">
 							{ configuredBlocks.map( ( [ blockName, data ] ) => (
-								<li
+								<div
 									key={ blockName }
 									className="block-guideline-item"
 								>
-									<div className="block-guideline-item__content">
+									<div className="block-guideline-item__header">
 										<strong className="block-guideline-item__title">
 											{ getBlockTitle( blockName ) }
 										</strong>
-										<p className="block-guideline-item__preview">
-											{ truncateText(
-												data.guidelines,
-												100
-											) }
-										</p>
+										<span className="block-guideline-item__actions">
+											<button
+												type="button"
+												className="button-link"
+												onClick={ () =>
+													setSelectedBlock(
+														blockName
+													)
+												}
+											>
+												{ __( 'Edit' ) }
+											</button>
+											<span className="block-guideline-item__separator">
+												|
+											</span>
+											<button
+												type="button"
+												className="button-link button-link-delete"
+												onClick={ () =>
+													handleRemoveBlockGuideline(
+														blockName
+													)
+												}
+											>
+												{ __( 'Remove' ) }
+											</button>
+										</span>
 									</div>
-									<Button
-										icon={ trash }
-										label={ __( 'Remove' ) }
-										onClick={ () =>
-											handleRemoveBlockGuideline(
-												blockName
-											)
-										}
-										isDestructive
-										size="small"
-									/>
-								</li>
+									<p className="block-guideline-item__content">
+										{ data.guidelines }
+									</p>
+								</div>
 							) ) }
-						</ul>
+						</div>
 					</div>
 				) }
 

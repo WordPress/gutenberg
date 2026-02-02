@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/colors";
+
 .content-guidelines-admin {
 	margin: 20px 20px 20px 2px;
 
@@ -79,52 +81,90 @@
 }
 
 .block-guidelines-list {
-	padding-top: 8px;
-	border-top: 1px solid #e0e0e0;
+	margin-top: 16px;
 
 	&__title {
 		font-size: 13px;
 		font-weight: 600;
-		margin: 0 0 12px;
+		margin: 0 0 8px;
 	}
 
 	&__items {
-		list-style: none;
-		margin: 0;
-		padding: 0;
+		border: 1px solid colors.$gray-300;
 	}
 }
 
 .block-guideline-item {
-	display: flex;
-	align-items: flex-start;
-	justify-content: space-between;
 	padding: 12px;
-	background: #fff;
-	border-radius: 2px;
-	margin-bottom: 8px;
-	gap: 12px;
+	border-bottom: 1px solid colors.$gray-300;
 
 	&:last-child {
-		margin-bottom: 0;
+		border-bottom: none;
 	}
 
-	&__content {
-		flex: 1;
-		min-width: 0;
+	// Striped rows
+	&:nth-child(odd) {
+		background: colors.$gray-100;
 	}
 
-	&__title {
-		display: block;
-		font-size: 13px;
+	&:nth-child(even) {
+		background: colors.$white;
+	}
+
+	// Hover effect
+	&:hover {
+		background: colors.$gray-200;
+	}
+
+	&__header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 		margin-bottom: 4px;
 	}
 
-	&__preview {
-		font-size: 12px;
-		color: #646970;
+	&__title {
+		font-size: 13px;
+		font-weight: 600;
+	}
+
+	&__content {
+		font-size: 13px;
+		color: colors.$gray-700;
 		margin: 0;
 		word-break: break-word;
+	}
+
+	&__actions {
+		font-size: 13px;
+		white-space: nowrap;
+
+		.button-link {
+			padding: 0;
+			font-size: 13px;
+			text-decoration: none;
+			color: var(--wp-admin-theme-color, #2271b1);
+			background: none;
+			border: none;
+			cursor: pointer;
+
+			&:hover {
+				color: var(--wp-admin-theme-color-darker-10, #135e96);
+			}
+		}
+
+		.button-link-delete {
+			color: colors.$alert-red;
+
+			&:hover {
+				color: darken(colors.$alert-red, 10%);
+			}
+		}
+	}
+
+	&__separator {
+		color: colors.$gray-400;
+		margin: 0 4px;
 	}
 }
 
@@ -193,7 +233,7 @@
 
 	&__time-line {
 		display: block;
-		color: #757575;
+		color: colors.$gray-700;
 	}
 
 	&__author {

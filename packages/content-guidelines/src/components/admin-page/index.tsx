@@ -198,6 +198,7 @@ export default function AdminPage() {
 												)
 											}
 											description={ category.description }
+											isSaving={ isSavingData }
 										/>
 									);
 								}
