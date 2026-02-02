@@ -6,6 +6,10 @@
 
 -   Add `Tabs` primitive ([#74652](https://github.com/WordPress/gutenberg/pull/74652)).
 
+### Enhancements
+
+-   `Button`: Add minimum content width (`6ch` + padding) to prevent overly narrow buttons with short labels ([#75133](https://github.com/WordPress/gutenberg/pull/75133)).
+
 ## 0.6.0 (2026-01-29)
 
 ### New Features
