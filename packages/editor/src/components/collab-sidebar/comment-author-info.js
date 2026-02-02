@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { Tooltip, __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	Tooltip,
+	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import {
 	dateI18n,
@@ -18,7 +22,14 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  */
 import { getAvatarBorderColor } from './utils';
 
-function CommentAuthorInfo( { avatar, name, date, userId } ) {
+function CommentAuthorInfo( {
+	avatar,
+	name,
+	date,
+	userId,
+	showUserInfo = true,
+	variant = 'default',
+} ) {
 	const hasAvatar = !! avatar;
 	const dateSettings = getDateSettings();
 	const {
@@ -74,6 +85,8 @@ function CommentAuthorInfo( { avatar, name, date, userId } ) {
 		date
 	);
 
+	const avatarSize = variant === 'compact' ? 24 : 32;
+
 	return (
 		<>
 			<img
@@ -81,29 +94,46 @@ function CommentAuthorInfo( { avatar, name, date, userId } ) {
 				className="editor-collab-sidebar-panel__user-avatar"
 				// translators: alt text for user avatar image
 				alt={ __( 'User avatar' ) }
-				width={ 32 }
-				height={ 32 }
+				width={ avatarSize }
+				height={ avatarSize }
 				style={ {
 					borderColor: getAvatarBorderColor(
 						userId ?? currentUserId
 					),
 				} }
 			/>
-			<VStack spacing="0">
-				<span className="editor-collab-sidebar-panel__user-name">
-					{ name ?? currentUserName }
-				</span>
-				{ date && (
-					<Tooltip text={ tooltipText }>
+			{ showUserInfo && variant === 'default' && (
+				<VStack spacing="0">
+					<span className="editor-collab-sidebar-panel__user-name">
+						{ name ?? currentUserName }
+					</span>
+					{ date && (
+						<Tooltip text={ tooltipText }>
+							<time
+								dateTime={ commentDateTime }
+								className="editor-collab-sidebar-panel__user-time"
+							>
+								{ commentDateText }
+							</time>
+						</Tooltip>
+					) }
+				</VStack>
+			) }
+			{ showUserInfo && variant === 'compact' && (
+				<HStack spacing="2" alignment="left">
+					<span className="editor-collab-sidebar-panel__user-name">
+						{ name ?? currentUserName }
+					</span>
+					{ date && (
 						<time
 							dateTime={ commentDateTime }
 							className="editor-collab-sidebar-panel__user-time"
 						>
 							{ commentDateText }
 						</time>
-					</Tooltip>
-				) }
-			</VStack>
+					) }
+				</HStack>
+			) }
 		</>
 	);
 }

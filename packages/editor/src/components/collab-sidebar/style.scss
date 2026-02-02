@@ -47,6 +47,10 @@
 		position: absolute;
 		margin-top: $grid-unit-20;
 	}
+
+	&.is-compact-width {
+		left: auto;
+	}
 }
 
 .editor-collab-sidebar-panel__user-name {

@@ -48,7 +48,7 @@ function NotesSidebarContent( {
 	reflowComments,
 	commentLastUpdated,
 	isFloating = false,
-	isCompactNotes = false,
+	isCompactNote = false,
 } ) {
 	const { onCreate, onEdit, onDelete } =
 		useBlockCommentsActions( reflowComments );
@@ -82,7 +82,7 @@ function NotesSidebarContent( {
 				reflowComments={ reflowComments }
 				commentLastUpdated={ commentLastUpdated }
 				isFloating={ isFloating }
-				isCompactNotes={ isCompactNotes }
+				isCompactNote={ isCompactNote }
 			/>
 		</VStack>
 	);
@@ -101,30 +101,26 @@ function NotesSidebar( { postId } ) {
 
 	const showFloatingSidebar = isLargeViewport;
 
-	const {
-		clientId,
-		blockCommentId,
-		isCompactNotes,
-		isAllNotesSidebarActive,
-	} = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } =
-			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-		return {
-			clientId: _clientId,
-			blockCommentId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
-			isCompactNotes: !! select( preferencesStore ).get(
-				'core',
-				'compactNotes'
-			),
-			isAllNotesSidebarActive:
-				select( interfaceStore ).getActiveComplementaryArea(
-					'core'
-				) === collabHistorySidebarName,
-		};
-	}, [] );
+	const { clientId, blockCommentId, isCompactNote, isAllNotesSidebarActive } =
+		useSelect( ( select ) => {
+			const { getBlockAttributes, getSelectedBlockClientId } =
+				select( blockEditorStore );
+			const _clientId = getSelectedBlockClientId();
+			return {
+				clientId: _clientId,
+				blockCommentId: _clientId
+					? getBlockAttributes( _clientId )?.metadata?.noteId
+					: null,
+				isCompactNote: !! select( preferencesStore ).get(
+					'core',
+					'compactNotes'
+				),
+				isAllNotesSidebarActive:
+					select( interfaceStore ).getActiveComplementaryArea(
+						'core'
+					) === collabHistorySidebarName,
+			};
+		}, [] );
 
 	const { isDistractionFree } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
@@ -189,7 +185,7 @@ function NotesSidebar( { postId } ) {
 	let notesDropdownValue = 'expand';
 	if ( isAllNotesSidebarActive ) {
 		notesDropdownValue = 'show-all';
-	} else if ( isCompactNotes ) {
+	} else if ( isCompactNote ) {
 		notesDropdownValue = 'minimize';
 	}
 
@@ -300,7 +296,7 @@ function NotesSidebar( { postId } ) {
 							backgroundColor,
 						} }
 						isFloating
-						isCompactNotes={ isCompactNotes }
+						isCompactNote={ isCompactNote }
 					/>
 				</PluginSidebar>
 			) }

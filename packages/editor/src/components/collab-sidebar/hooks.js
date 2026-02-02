@@ -371,7 +371,7 @@ export function useFloatingThread( {
 	selectedThread,
 	setBlockRef,
 	commentLastUpdated,
-	variant,
+	variant = 'default',
 } ) {
 	const blockElement = useBlockElement( thread.blockClientId );
 	const updateHeight = useCallback(

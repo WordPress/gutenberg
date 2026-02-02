@@ -33,7 +33,6 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { getDate, humanTimeDiff } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -41,11 +40,7 @@ import { getDate, humanTimeDiff } from '@wordpress/date';
 import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
-import {
-	focusCommentThread,
-	getCommentExcerpt,
-	getAvatarBorderColor,
-} from './utils';
+import { focusCommentThread, getCommentExcerpt } from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
@@ -64,7 +59,7 @@ export function Comments( {
 	reflowComments,
 	isFloating = false,
 	commentLastUpdated,
-	isCompactNotes = false,
+	isCompactNote = false,
 } ) {
 	const [ heights, setHeights ] = useState( {} );
 	const [ selectedThread, setSelectedThread ] = useState( null );
@@ -318,7 +313,7 @@ export function Comments( {
 		threads,
 		selectedThread,
 		setCanvasMinHeight,
-		isCompactNotes,
+		isCompactNote,
 	] );
 
 	const handleThreadNavigation = ( event, thread, isSelected ) => {
@@ -411,40 +406,35 @@ export function Comments( {
 					commentSidebarRef={ commentSidebarRef }
 				/>
 			) }
-			{ threads.map( ( thread ) => {
-				const isSelected = selectedThread === thread.id;
-				const shouldShowMinified =
-					isCompactNotes &&
-					isFloating &&
-					! isSelected &&
-					thread.id !== 'new-note-thread';
-
-				return (
-					<Thread
-						key={ thread.id }
-						thread={ thread }
-						onAddReply={ onAddReply }
-						onCommentDelete={ handleDelete }
-						onEditComment={ onEditComment }
-						isSelected={ isSelected }
-						setSelectedThread={ setSelectedThread }
-						setNewNoteFormState={ setNewNoteFormState }
-						commentSidebarRef={ commentSidebarRef }
-						reflowComments={ reflowComments }
-						isFloating={ isFloating }
-						calculatedOffset={ boardOffsets[ thread.id ] ?? 0 }
-						setHeights={ setHeights }
-						setBlockRef={ setBlockRef }
-						selectedThread={ selectedThread }
-						commentLastUpdated={ commentLastUpdated }
-						newNoteFormState={ newNoteFormState }
-						onKeyDown={ ( event ) =>
-							handleThreadNavigation( event, thread, isSelected )
-						}
-						variant={ shouldShowMinified ? 'compact' : 'full' }
-					/>
-				);
-			} ) }
+			{ threads.map( ( thread ) => (
+				<Thread
+					key={ thread.id }
+					thread={ thread }
+					onAddReply={ onAddReply }
+					onCommentDelete={ handleDelete }
+					onEditComment={ onEditComment }
+					isSelected={ selectedThread === thread.id }
+					setSelectedThread={ setSelectedThread }
+					setNewNoteFormState={ setNewNoteFormState }
+					commentSidebarRef={ commentSidebarRef }
+					reflowComments={ reflowComments }
+					isFloating={ isFloating }
+					calculatedOffset={ boardOffsets[ thread.id ] ?? 0 }
+					setHeights={ setHeights }
+					setBlockRef={ setBlockRef }
+					selectedThread={ selectedThread }
+					commentLastUpdated={ commentLastUpdated }
+					newNoteFormState={ newNoteFormState }
+					onKeyDown={ ( event ) =>
+						handleThreadNavigation(
+							event,
+							thread,
+							selectedThread === thread.id
+						)
+					}
+					isCompactNote={ isCompactNote }
+				/>
+			) ) }
 		</>
 	);
 }
@@ -467,9 +457,10 @@ function Thread( {
 	commentLastUpdated,
 	newNoteFormState,
 	onKeyDown,
-	variant = 'full',
+	isCompactNote = false,
 } ) {
 	const [ isHovered, setIsHovered ] = useState( false );
+	const [ isFocused, setIsFocused ] = useState( false );
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
 		useDispatch( blockEditorStore )
 	);
@@ -485,23 +476,27 @@ function Thread( {
 		setBlockRef,
 		selectedThread,
 		commentLastUpdated,
-		variant,
+		isCompactNote,
 	} );
 	const isKeyboardTabbingRef = useRef( false );
 
 	const onMouseEnter = () => {
+		setIsHovered( true );
 		debouncedToggleBlockHighlight( thread.blockClientId, true );
 	};
 
 	const onMouseLeave = () => {
+		setIsHovered( false );
 		debouncedToggleBlockHighlight( thread.blockClientId, false );
 	};
 
 	const onFocus = () => {
+		setIsFocused( true );
 		toggleBlockHighlight( thread.blockClientId, true );
 	};
 
 	const onBlur = ( event ) => {
+		setIsFocused( false );
 		const isNoteFocused = event.relatedTarget?.closest(
 			'.editor-collab-sidebar-panel__thread'
 		);
@@ -570,81 +565,6 @@ function Thread( {
 				commentExcerpt
 		  );
 
-	// Compact variant: minimal avatar display that expands on hover.
-	if ( variant === 'compact' ) {
-		// Get the last comment (most recent reply, or the thread itself if no replies).
-		const lastComment =
-			allReplies.length > 0
-				? allReplies[ allReplies.length - 1 ]
-				: thread;
-
-		// Format the time for display using human-readable relative time (e.g., "3 days ago").
-		const commentDate = lastComment?.date
-			? getDate( lastComment.date )
-			: null;
-		const formattedTime = commentDate ? humanTimeDiff( commentDate ) : '';
-
-		if ( ! lastComment?.author_avatar_urls ) {
-			return null;
-		}
-
-		return (
-			<div
-				className={ clsx(
-					'editor-collab-sidebar-panel__minified-indicator',
-					{
-						'is-expanded': isHovered,
-					}
-				) }
-				id={ `comment-thread-${ thread.id }` }
-				onClick={ handleCommentSelect }
-				onKeyUp={ ( event ) => {
-					if ( event.key === 'Tab' ) {
-						isKeyboardTabbingRef.current = false;
-					}
-				} }
-				onKeyDown={ ( event ) => {
-					if ( event.key === 'Tab' ) {
-						isKeyboardTabbingRef.current = true;
-					} else {
-						onKeyDown( event );
-					}
-				} }
-				onMouseEnter={ () => setIsHovered( true ) }
-				onMouseLeave={ () => setIsHovered( false ) }
-				onFocus={ () => setIsHovered( true ) }
-				onBlur={ () => setIsHovered( false ) }
-				tabIndex={ 0 }
-				role="treeitem"
-				aria-label={ ariaLabel }
-				aria-expanded={ isHovered }
-				ref={ isFloating ? refs.setFloating : undefined }
-				style={ isFloating ? { top: y } : undefined }
-			>
-				<img
-					src={ lastComment?.author_avatar_urls?.[ 48 ] }
-					alt={ lastComment?.author_name }
-					className="editor-collab-sidebar-panel__minified-avatar"
-					style={ {
-						borderColor: getAvatarBorderColor(
-							lastComment?.author
-						),
-					} }
-				/>
-				{ isHovered && (
-					<>
-						<span className="editor-collab-sidebar-panel__minified-author-name">
-							{ lastComment?.author_name }
-						</span>
-						<span className="editor-collab-sidebar-panel__minified-time">
-							{ formattedTime }
-						</span>
-					</>
-				) }
-			</div>
-		);
-	}
-
 	if (
 		thread.id === 'new-note-thread' &&
 		newNoteFormState === 'open' &&
@@ -664,11 +584,15 @@ function Thread( {
 		);
 	}
 
+	const isCompactWidth =
+		! isSelected && isCompactNote && ! isHovered && ! isFocused;
+
 	return (
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
 				'is-floating': isFloating,
+				'is-compact-width': isCompactWidth,
 			} ) }
 			id={ `comment-thread-${ thread.id }` }
 			spacing="3"
@@ -715,26 +639,34 @@ function Thread( {
 					{ __( 'Original block deleted.' ) }
 				</Text>
 			) }
-			<CommentBoard
-				thread={ thread }
-				isExpanded={ isSelected }
-				onEdit={ ( params = {} ) => {
-					onEditComment( params );
-					if ( params.status === 'approved' ) {
-						unselectThread();
-						if ( isFloating ) {
-							relatedBlockElement?.focus();
-						} else {
-							focusCommentThread(
-								thread.id,
-								commentSidebarRef.current
-							);
+			{ ( isSelected || ! isCompactNote ) && (
+				<CommentBoard
+					thread={ thread }
+					isExpanded={ isSelected }
+					onEdit={ ( params = {} ) => {
+						onEditComment( params );
+						if ( params.status === 'approved' ) {
+							unselectThread();
+							if ( isFloating ) {
+								relatedBlockElement?.focus();
+							} else {
+								focusCommentThread(
+									thread.id,
+									commentSidebarRef.current
+								);
+							}
 						}
-					}
-				} }
-				onDelete={ onCommentDelete }
-				reflowComments={ reflowComments }
-			/>
+					} }
+					onDelete={ onCommentDelete }
+					reflowComments={ reflowComments }
+				/>
+			) }
+			{ isCompactNote && ! isSelected && (
+				<CommentBoardCompact
+					thread={ thread }
+					showUserInfo={ isHovered || isFocused }
+				/>
+			) }
 			{ isSelected &&
 				allReplies.map( ( reply ) => (
 					<CommentBoard
@@ -747,7 +679,7 @@ function Thread( {
 						reflowComments={ reflowComments }
 					/>
 				) ) }
-			{ ! isSelected && restReplies.length > 0 && (
+			{ ! isSelected && restReplies.length > 0 && ! isCompactNote && (
 				<HStack className="editor-collab-sidebar-panel__more-reply-separator">
 					<Button
 						size="compact"
@@ -773,7 +705,7 @@ function Thread( {
 					</Button>
 				</HStack>
 			) }
-			{ ! isSelected && lastReply && (
+			{ ! isSelected && lastReply && ! isCompactNote && (
 				<CommentBoard
 					thread={ lastReply }
 					parent={ thread }
@@ -922,138 +854,148 @@ const CommentBoard = ( {
 			: __( 'Are you sure you want to delete this reply?' );
 
 	return (
-		<VStack
-			spacing="2"
-			role={ thread.parent !== 0 ? 'treeitem' : undefined }
-		>
-			<HStack alignment="left" spacing="3" justify="flex-start">
-				<CommentAuthorInfo
-					avatar={ thread?.author_avatar_urls?.[ 48 ] }
-					name={ thread?.author_name }
-					date={ thread?.date }
-					userId={ thread?.author }
-				/>
-				{ isExpanded && (
-					<FlexItem
-						className="editor-collab-sidebar-panel__comment-status"
-						onClick={ ( event ) => {
-							// Prevent the thread from being selected.
-							event.stopPropagation();
+		<>
+			<VStack
+				spacing="2"
+				role={ thread.parent !== 0 ? 'treeitem' : undefined }
+			>
+				<HStack alignment="left" spacing="3" justify="flex-start">
+					<CommentAuthorInfo
+						avatar={ thread?.author_avatar_urls?.[ 48 ] }
+						name={ thread?.author_name }
+						date={ thread?.date }
+						userId={ thread?.author }
+					/>
+					{ isExpanded && (
+						<FlexItem
+							className="editor-collab-sidebar-panel__comment-status"
+							onClick={ ( event ) => {
+								// Prevent the thread from being selected.
+								event.stopPropagation();
+							} }
+						>
+							<HStack spacing="0">
+								{ canResolve && (
+									<Button
+										label={ _x(
+											'Resolve',
+											'Mark note as resolved'
+										) }
+										size="small"
+										icon={ published }
+										disabled={
+											thread.status === 'approved'
+										}
+										accessibleWhenDisabled={
+											thread.status === 'approved'
+										}
+										onClick={ () => {
+											onEdit( {
+												id: thread.id,
+												status: 'approved',
+											} );
+										} }
+									/>
+								) }
+								<Menu placement="bottom-end">
+									<Menu.TriggerButton
+										render={
+											<Button
+												ref={ actionButtonRef }
+												size="small"
+												icon={ moreVertical }
+												label={ __( 'Actions' ) }
+												disabled={
+													! moreActions.length
+												}
+												accessibleWhenDisabled
+											/>
+										}
+									/>
+									<Menu.Popover
+										// The menu popover is rendered in a portal, which causes focus to be
+										// lost and the note to be collapsed unintentionally. To prevent this,
+										// the popover should be rendered as an inline.
+										modal={ false }
+									>
+										{ moreActions.map( ( action ) => (
+											<Menu.Item
+												key={ action.id }
+												onClick={ () =>
+													action.onClick()
+												}
+											>
+												<Menu.ItemLabel>
+													{ action.title }
+												</Menu.ItemLabel>
+											</Menu.Item>
+										) ) }
+									</Menu.Popover>
+								</Menu>
+							</HStack>
+						</FlexItem>
+					) }
+				</HStack>
+				{ 'edit' === actionState && (
+					<CommentForm
+						onSubmit={ ( value ) => {
+							onEdit( {
+								id: thread.id,
+								content: value,
+							} );
+							setActionState( false );
+							actionButtonRef.current?.focus();
 						} }
-					>
-						<HStack spacing="0">
-							{ canResolve && (
-								<Button
-									label={ _x(
-										'Resolve',
-										'Mark note as resolved'
-									) }
-									size="small"
-									icon={ published }
-									disabled={ thread.status === 'approved' }
-									accessibleWhenDisabled={
-										thread.status === 'approved'
-									}
-									onClick={ () => {
-										onEdit( {
-											id: thread.id,
-											status: 'approved',
-										} );
-									} }
-								/>
-							) }
-							<Menu placement="bottom-end">
-								<Menu.TriggerButton
-									render={
-										<Button
-											ref={ actionButtonRef }
-											size="small"
-											icon={ moreVertical }
-											label={ __( 'Actions' ) }
-											disabled={ ! moreActions.length }
-											accessibleWhenDisabled
-										/>
-									}
-								/>
-								<Menu.Popover
-									// The menu popover is rendered in a portal, which causes focus to be
-									// lost and the note to be collapsed unintentionally. To prevent this,
-									// the popover should be rendered as an inline.
-									modal={ false }
-								>
-									{ moreActions.map( ( action ) => (
-										<Menu.Item
-											key={ action.id }
-											onClick={ () => action.onClick() }
-										>
-											<Menu.ItemLabel>
-												{ action.title }
-											</Menu.ItemLabel>
-										</Menu.Item>
-									) ) }
-								</Menu.Popover>
-							</Menu>
-						</HStack>
-					</FlexItem>
+						onCancel={ () => handleCancel() }
+						thread={ thread }
+						submitButtonText={ _x( 'Update', 'verb' ) }
+						labelText={ sprintf(
+							// translators: %1$s: note identifier, %2$s: author name.
+							__( 'Edit note %1$s by %2$s' ),
+							thread.id,
+							thread.author_name
+						) }
+						reflowComments={ reflowComments }
+					/>
 				) }
-			</HStack>
-			{ 'edit' === actionState ? (
-				<CommentForm
-					onSubmit={ ( value ) => {
-						onEdit( {
-							id: thread.id,
-							content: value,
-						} );
-						setActionState( false );
-						actionButtonRef.current?.focus();
-					} }
-					onCancel={ () => handleCancel() }
-					thread={ thread }
-					submitButtonText={ _x( 'Update', 'verb' ) }
-					labelText={ sprintf(
-						// translators: %1$s: note identifier, %2$s: author name.
-						__( 'Edit note %1$s by %2$s' ),
-						thread.id,
-						thread.author_name
-					) }
-					reflowComments={ reflowComments }
-				/>
-			) : (
-				<RawHTML
-					className={ clsx(
-						'editor-collab-sidebar-panel__user-comment',
-						{
-							'editor-collab-sidebar-panel__resolution-text':
-								isResolutionComment,
-						}
-					) }
-				>
-					{ isResolutionComment
-						? ( () => {
-								const actionText =
-									thread.meta._wp_note_status === 'resolved'
-										? __( 'Marked as resolved' )
-										: __( 'Reopened' );
-								const content = thread?.content?.raw;
+				{ 'edit' !== actionState && (
+					<RawHTML
+						className={ clsx(
+							'editor-collab-sidebar-panel__user-comment',
+							{
+								'editor-collab-sidebar-panel__resolution-text':
+									isResolutionComment,
+							}
+						) }
+					>
+						{ isResolutionComment
+							? ( () => {
+									const actionText =
+										thread.meta._wp_note_status ===
+										'resolved'
+											? __( 'Marked as resolved' )
+											: __( 'Reopened' );
+									const content = thread?.content?.raw;
 
-								if (
-									content &&
-									typeof content === 'string' &&
-									content.trim() !== ''
-								) {
-									return sprintf(
-										// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
-										__( '%1$s: %2$s' ),
-										actionText,
-										content
-									);
-								}
-								// If no content, just show the action.
-								return actionText;
-						  } )()
-						: thread?.content?.rendered }
-				</RawHTML>
-			) }
+									if (
+										content &&
+										typeof content === 'string' &&
+										content.trim() !== ''
+									) {
+										return sprintf(
+											// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
+											__( '%1$s: %2$s' ),
+											actionText,
+											content
+										);
+									}
+									// If no content, just show the action.
+									return actionText;
+							  } )()
+							: thread?.content?.rendered }
+					</RawHTML>
+				) }
+			</VStack>
 			{ 'delete' === actionState && (
 				<ConfirmDialog
 					isOpen={ showConfirmDialog }
@@ -1064,7 +1006,22 @@ const CommentBoard = ( {
 					{ deleteConfirmMessage }
 				</ConfirmDialog>
 			) }
-		</VStack>
+		</>
+	);
+};
+
+const CommentBoardCompact = ( { thread, showUserInfo = false } ) => {
+	return (
+		<HStack role={ thread.parent !== 0 ? 'treeitem' : undefined }>
+			<CommentAuthorInfo
+				avatar={ thread?.author_avatar_urls?.[ 48 ] }
+				name={ thread?.author_name }
+				date={ thread?.date }
+				userId={ thread?.author }
+				showUserInfo={ showUserInfo }
+				variant="compact"
+			/>
+		</HStack>
 	);
 };
 
