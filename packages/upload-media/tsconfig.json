@@ -13,6 +13,7 @@
 		{ "path": "../i18n" },
 		{ "path": "../preferences" },
 		{ "path": "../private-apis" },
+		{ "path": "../ultrahdr" },
 		{ "path": "../url" }
 	]
 }
