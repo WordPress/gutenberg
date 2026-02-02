@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
-import { PanelBody } from '@wordpress/components';
+import {
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { DataForm } from '@wordpress/dataviews';
 import { useMemo } from '@wordpress/element';
@@ -15,6 +18,7 @@ import InspectorControls from '../components/inspector-controls';
 import { useBlockEditingMode } from '../components/block-editing-mode';
 import { store as blockEditorStore } from '../store';
 import { generateFieldsFromAttributes } from './generate-fields-from-attributes';
+import { useToolsPanelDropdownMenuProps } from '../components/global-styles/utils';
 
 /**
  * Checks if a block has any attributes marked for auto-generated inspector controls.
@@ -44,6 +48,7 @@ function hasAutoInspectorControlAttributes( blockTypeAttributes ) {
  */
 function AutoRegisterControls( { name, clientId, setAttributes } ) {
 	const blockEditingMode = useBlockEditingMode();
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const attributes = useSelect(
 		( select ) => select( blockEditorStore ).getBlockAttributes( clientId ),
@@ -56,11 +61,11 @@ function AutoRegisterControls( { name, clientId, setAttributes } ) {
 	// The __experimentalAutoInspectorControl marker excludes block support attributes
 	// (which have their own UI) and internal state (role: 'local').
 	// Memoized since blockType.attributes don't change after registration.
-	const { fields, form } = useMemo( () => {
+	const fields = useMemo( () => {
 		if ( ! blockType?.attributes ) {
-			return { fields: [], form: { fields: [] } };
+			return [];
 		}
-		return generateFieldsFromAttributes( blockType.attributes );
+		return generateFieldsFromAttributes( blockType.attributes ).fields;
 	}, [ blockType?.attributes ] );
 
 	if ( blockEditingMode !== 'default' ) {
@@ -73,14 +78,45 @@ function AutoRegisterControls( { name, clientId, setAttributes } ) {
 
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Settings' ) }>
-				<DataForm
-					data={ attributes }
-					fields={ fields }
-					form={ form }
-					onChange={ setAttributes }
-				/>
-			</PanelBody>
+			<ToolsPanel
+				label={ __( 'Settings' ) }
+				resetAll={ () => {
+					setAttributes(
+						Object.fromEntries(
+							Object.entries( blockType?.attributes ).map(
+								( [ key, value ] ) => [ key, value.default ]
+							)
+						)
+					);
+				} }
+				dropdownMenuProps={ dropdownMenuProps }
+			>
+				{ fields.map( ( field ) => (
+					<ToolsPanelItem
+						key={ field.id }
+						label={ field.label }
+						hasValue={ () =>
+							attributes[ field.id ] !==
+							blockType?.attributes?.[ field.id ]?.default
+						}
+						isShownByDefault
+						onDeselect={ () =>
+							setAttributes( {
+								[ field.id ]:
+									blockType?.attributes?.[ field.id ]
+										?.default,
+							} )
+						}
+					>
+						<DataForm
+							data={ attributes }
+							fields={ [ field ] }
+							form={ { fields: [ field.id ] } }
+							onChange={ setAttributes }
+						/>
+					</ToolsPanelItem>
+				) ) }
+			</ToolsPanel>
 		</InspectorControls>
 	);
 }
