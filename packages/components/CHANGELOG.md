@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Breaking Changes
+### Bug Fixes
 
 -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used.
 
