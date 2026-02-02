@@ -21,7 +21,6 @@ import {
 	InspectorControls,
 	useBlockProps,
 	useBlockEditingMode,
-	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
 } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 
@@ -39,23 +38,28 @@ import getIcons from './icons';
  */
 export function Edit( props ) {
 	const { attributes, setAttributes } = props;
-	const { icon, iconName, label, title } = attributes;
+	const { icon, label, title } = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 	const [ iconToDisplay, setIconToDisplay ] = useState();
+	const [ allIcons, setAllIcons ] = useState();
 
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 
 	useEffect( () => {
 		const requestIcons = async () => {
 			const iconList = await getIcons();
-			const selectedIcon = iconList.find(
-				( { name } ) => name === attributes.icon
-			);
-			setIconToDisplay( parseIcon( selectedIcon?.content ) );
+			setAllIcons( iconList );
 		};
 		requestIcons();
-	}, [ attributes.icon ] );
+	}, [] );
+
+	useEffect( () => {
+		if ( icon && allIcons ) {
+			const selectedIcon = allIcons.find( ( { name } ) => name === icon );
+			setIconToDisplay( parseIcon( selectedIcon?.content ) );
+		}
+	}, [ allIcons, icon ] );
 
 	function resetAll() {
 		setAttributes( {
@@ -63,11 +67,9 @@ export function Edit( props ) {
 		} );
 	}
 
-	const replaceText = icon || iconName ? __( 'Replace' ) : __( 'Add icon' );
-
 	const blockControls = (
 		<>
-			{ ( icon || iconName ) && (
+			{ icon && (
 				<BlockControls group="block">
 					<ToolbarGroup
 						className={ clsx( 'components-toolbar-group', {
@@ -83,10 +85,10 @@ export function Edit( props ) {
 						setInserterOpen( true );
 					} }
 				>
-					{ replaceText }
+					{ icon ? __( 'Replace' ) : __( 'Add icon' ) }
 				</ToolbarButton>
 			</BlockControls>
-			{ isContentOnlyMode && ( icon || iconName ) && (
+			{ isContentOnlyMode && icon && (
 				// Add some extra controls for content attributes when content only mode is active.
 				// With content only mode active, the inspector is hidden, so users need another way
 				// to edit these attributes.
@@ -121,7 +123,7 @@ export function Edit( props ) {
 		</>
 	);
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
-	const inspectorControls = ( icon || iconName ) && (
+	const inspectorControls = icon && (
 		<>
 			<InspectorControls group="settings">
 				<ToolsPanel
@@ -176,33 +178,19 @@ export function Edit( props ) {
 		</>
 	);
 
-	const borderProps = getBorderClassesAndStyles( attributes );
-
-	const iconMarkup = (
+	return (
 		<>
-			{ ! icon ? (
+			{ blockControls }
+			{ inspectorControls }
+			{ ! icon && (
 				<IconPlaceholder
 					setInserterOpen={ setInserterOpen }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 				/>
-			) : (
-				<>{ iconToDisplay }</>
 			) }
-		</>
-	);
-
-	return (
-		<>
-			{ blockControls }
-			{ inspectorControls }
-			<div
-				{ ...useBlockProps( {
-					className: borderProps?.className,
-					style: { ...borderProps.style },
-				} ) }
-			>
-				{ iconMarkup }
+			<div { ...useBlockProps() }>
+				<>{ iconToDisplay }</>
 			</div>
 			<InserterModal
 				isInserterOpen={ isInserterOpen }
