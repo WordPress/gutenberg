@@ -69,20 +69,13 @@
 	}
 }
 
-.content-guidelines-category-row {
-	padding: 16px 0;
-
-	&__label {
-		width: 180px;
-		min-width: 180px;
-		max-width: 180px;
-		flex-shrink: 0 !important;
-		flex-grow: 0 !important;
-	}
-}
-
 .block-guidelines-editor {
-	// Inherits spacing from parent VStack
+	margin-top: 16px;
+
+	label {
+		display: block;
+		margin-bottom: 8px;
+	}
 }
 
 .block-guidelines-list {
@@ -166,10 +159,26 @@
 				text-align: right;
 			}
 		}
+
+		&.is-loading {
+			opacity: 0.5;
+			pointer-events: none;
+		}
 	}
 
 	&__pagination {
 		margin-top: 12px;
+		text-align: right;
+
+		.pagination-links {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.paging-input {
+			font-size: 13px;
+		}
 	}
 }
 

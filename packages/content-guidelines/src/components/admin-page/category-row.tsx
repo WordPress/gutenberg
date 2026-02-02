@@ -1,14 +1,3 @@
-/**
- * WordPress dependencies
- */
-import {
-	Flex,
-	FlexItem,
-	FlexBlock,
-	__experimentalVStack as VStack,
-	__experimentalText as Text,
-} from '@wordpress/components';
-
 interface CategoryRowProps {
 	label: string;
 	description: string;
@@ -33,25 +22,17 @@ export default function CategoryRow( {
 	onChange,
 }: CategoryRowProps ) {
 	return (
-		<Flex
-			gap={ 4 }
-			align="flex-start"
-			className="content-guidelines-category-row"
-		>
-			<FlexItem className="content-guidelines-category-row__label">
-				<Text weight={ 600 }>{ label }</Text>
-			</FlexItem>
-			<FlexBlock>
-				<VStack spacing={ 2 }>
-					<textarea
-						className="large-text"
-						value={ value }
-						onChange={ ( e ) => onChange( e.target.value ) }
-						rows={ 6 }
-					/>
-					<p className="description">{ description }</p>
-				</VStack>
-			</FlexBlock>
-		</Flex>
+		<tr>
+			<th scope="row">{ label }</th>
+			<td>
+				<textarea
+					className="large-text"
+					value={ value }
+					onChange={ ( e ) => onChange( e.target.value ) }
+					rows={ 6 }
+				/>
+				<p className="description">{ description }</p>
+			</td>
+		</tr>
 	);
 }

@@ -3,16 +3,7 @@
  */
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import {
-	Flex,
-	FlexItem,
-	FlexBlock,
-	__experimentalVStack as VStack,
-	__experimentalText as Text,
-	SelectControl,
-	Button,
-	Spinner,
-} from '@wordpress/components';
+import { SelectControl, Button, Spinner } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { trash } from '@wordpress/icons';
 
@@ -149,112 +140,97 @@ export default function BlockGuidelinesRow( {
 	);
 
 	return (
-		<Flex
-			gap={ 4 }
-			align="flex-start"
-			className="content-guidelines-category-row"
-		>
-			<FlexItem className="content-guidelines-category-row__label">
-				<Text weight={ 600 }>{ __( 'Block-Specific' ) }</Text>
-			</FlexItem>
-			<FlexBlock>
-				<VStack spacing={ 4 }>
-					{ isLoading ? (
-						<div className="block-guidelines-loading">
-							<Spinner />
-							<span>{ __( 'Loading block types…' ) }</span>
-						</div>
-					) : (
-						<SelectControl
-							__nextHasNoMarginBottom
-							__next40pxDefaultSize
-							label={ __( 'Select Block Type' ) }
-							value={ selectedBlock }
-							options={ [
-								{
-									label: __( 'Select a block…' ),
-									value: '',
-								},
-								...blockOptions,
-							] }
-							onChange={ setSelectedBlock }
+		<tr>
+			<th scope="row">{ __( 'Block-Specific' ) }</th>
+			<td>
+				{ isLoading ? (
+					<div className="block-guidelines-loading">
+						<Spinner />
+						<span>{ __( 'Loading block types…' ) }</span>
+					</div>
+				) : (
+					<SelectControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Select Block Type' ) }
+						value={ selectedBlock }
+						options={ [
+							{
+								label: __( 'Select a block…' ),
+								value: '',
+							},
+							...blockOptions,
+						] }
+						onChange={ setSelectedBlock }
+					/>
+				) }
+
+				{ selectedBlock && (
+					<div className="block-guidelines-editor">
+						<label htmlFor={ `block-guideline-${ selectedBlock }` }>
+							<strong>{ getBlockTitle( selectedBlock ) }</strong>
+						</label>
+						<textarea
+							id={ `block-guideline-${ selectedBlock }` }
+							className="large-text"
+							value={ value[ selectedBlock ]?.guidelines || '' }
+							onChange={ ( e ) =>
+								handleBlockGuidelineChange(
+									selectedBlock,
+									e.target.value
+								)
+							}
+							rows={ 4 }
 						/>
-					) }
+						<p className="description">
+							{ __(
+								'Enter guidelines specific to this block type.'
+							) }
+						</p>
+					</div>
+				) }
 
-					{ selectedBlock && (
-						<div className="block-guidelines-editor">
-							<VStack spacing={ 2 }>
-								<Text weight={ 600 }>
-									{ getBlockTitle( selectedBlock ) }
-								</Text>
-								<textarea
-									className="large-text"
-									value={
-										value[ selectedBlock ]?.guidelines || ''
-									}
-									onChange={ ( e ) =>
-										handleBlockGuidelineChange(
-											selectedBlock,
-											e.target.value
-										)
-									}
-									rows={ 4 }
-								/>
-								<p className="description">
-									{ __(
-										'Enter guidelines specific to this block type.'
-									) }
-								</p>
-							</VStack>
-						</div>
-					) }
+				{ configuredBlocks.length > 0 && (
+					<div className="block-guidelines-list">
+						<h4 className="block-guidelines-list__title">
+							{ __( 'Configured Blocks' ) }
+						</h4>
+						<ul className="block-guidelines-list__items">
+							{ configuredBlocks.map( ( [ blockName, data ] ) => (
+								<li
+									key={ blockName }
+									className="block-guideline-item"
+								>
+									<div className="block-guideline-item__content">
+										<strong className="block-guideline-item__title">
+											{ getBlockTitle( blockName ) }
+										</strong>
+										<p className="block-guideline-item__preview">
+											{ truncateText(
+												data.guidelines,
+												100
+											) }
+										</p>
+									</div>
+									<Button
+										icon={ trash }
+										label={ __( 'Remove' ) }
+										onClick={ () =>
+											handleRemoveBlockGuideline(
+												blockName
+											)
+										}
+										isDestructive
+										size="small"
+									/>
+								</li>
+							) ) }
+						</ul>
+					</div>
+				) }
 
-					{ configuredBlocks.length > 0 && (
-						<div className="block-guidelines-list">
-							<h4 className="block-guidelines-list__title">
-								{ __( 'Configured Blocks' ) }
-							</h4>
-							<ul className="block-guidelines-list__items">
-								{ configuredBlocks.map(
-									( [ blockName, data ] ) => (
-										<li
-											key={ blockName }
-											className="block-guideline-item"
-										>
-											<div className="block-guideline-item__content">
-												<strong className="block-guideline-item__title">
-													{ getBlockTitle(
-														blockName
-													) }
-												</strong>
-												<p className="block-guideline-item__preview">
-													{ truncateText(
-														data.guidelines,
-														100
-													) }
-												</p>
-											</div>
-											<Button
-												icon={ trash }
-												label={ __( 'Remove' ) }
-												onClick={ () =>
-													handleRemoveBlockGuideline(
-														blockName
-													)
-												}
-												isDestructive
-												size="small"
-											/>
-										</li>
-									)
-								) }
-							</ul>
-						</div>
-					) }
-
-					<p className="description">{ description }</p>
-				</VStack>
-			</FlexBlock>
-		</Flex>
+				<p className="description">{ description }</p>
+			</td>
+		</tr>
 	);
 }

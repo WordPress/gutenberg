@@ -3,12 +3,7 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	Spinner,
-	Notice,
-	Button,
-	__experimentalVStack as VStack,
-} from '@wordpress/components';
+import { Spinner, Notice, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -185,48 +180,50 @@ export default function AdminPage() {
 
 			<div className="content-guidelines-admin__layout">
 				<main className="content-guidelines-admin__main">
-					<VStack spacing={ 0 }>
-						{ CATEGORIES.map( ( category ) => {
-							if ( category.slug === 'blocks' ) {
+					<table className="form-table">
+						<tbody>
+							{ CATEGORIES.map( ( category ) => {
+								if ( category.slug === 'blocks' ) {
+									return (
+										<BlockGuidelinesRow
+											key={ category.slug }
+											value={
+												guidelines?.guideline_categories
+													?.blocks || {}
+											}
+											onChange={ ( blocksValue ) =>
+												handleCategoryChange(
+													'blocks',
+													blocksValue
+												)
+											}
+											description={ category.description }
+										/>
+									);
+								}
+
+								const categoryData = guidelines
+									?.guideline_categories?.[
+									category.slug
+								] as { guidelines?: string } | undefined;
+
 								return (
-									<BlockGuidelinesRow
+									<CategoryRow
 										key={ category.slug }
-										value={
-											guidelines?.guideline_categories
-												?.blocks || {}
-										}
-										onChange={ ( blocksValue ) =>
+										label={ category.label }
+										description={ category.description }
+										value={ categoryData?.guidelines || '' }
+										onChange={ ( categoryValue ) =>
 											handleCategoryChange(
-												'blocks',
-												blocksValue
+												category.slug,
+												categoryValue
 											)
 										}
-										description={ category.description }
 									/>
 								);
-							}
-
-							const categoryData = guidelines
-								?.guideline_categories?.[ category.slug ] as
-								| { guidelines?: string }
-								| undefined;
-
-							return (
-								<CategoryRow
-									key={ category.slug }
-									label={ category.label }
-									description={ category.description }
-									value={ categoryData?.guidelines || '' }
-									onChange={ ( categoryValue ) =>
-										handleCategoryChange(
-											category.slug,
-											categoryValue
-										)
-									}
-								/>
-							);
-						} ) }
-					</VStack>
+							} ) }
+						</tbody>
+					</table>
 					<p className="submit">
 						<Button
 							variant="primary"

@@ -4,14 +4,8 @@
 import { useEffect, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { dateI18n } from '@wordpress/date';
-import {
-	Spinner,
-	Button,
-	__experimentalHStack as HStack,
-	__experimentalText as Text,
-} from '@wordpress/components';
+import { Spinner, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { chevronLeft, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -92,7 +86,8 @@ export default function RevisionList( {
 		return null;
 	}
 
-	if ( isLoading ) {
+	// Show full loading state only on initial load
+	if ( isLoading && ! revisions.length ) {
 		return (
 			<div className="content-guidelines-revisions content-guidelines-revisions--loading">
 				<Spinner />
@@ -112,7 +107,7 @@ export default function RevisionList( {
 	if ( ! revisions.length ) {
 		return (
 			<div className="content-guidelines-revisions">
-				<h3>{ __( 'Revision History' ) }</h3>
+				<h3>{ __( 'Revision history' ) }</h3>
 				<p className="content-guidelines-revisions__empty">
 					{ __( 'No revisions yet.' ) }
 				</p>
@@ -122,10 +117,16 @@ export default function RevisionList( {
 
 	const isCurrent = ( index: number ) => currentPage === 1 && index === 0;
 
+	const isPageLoading = isLoading && revisions.length > 0;
+
 	return (
 		<div className="content-guidelines-revisions">
 			<h3>{ __( 'Revision history' ) }</h3>
-			<table className="wp-list-table widefat striped">
+			<table
+				className={ `wp-list-table widefat striped${
+					isPageLoading ? ' is-loading' : ''
+				}` }
+			>
 				<thead>
 					<tr>
 						<th>{ __( 'Date' ) }</th>
@@ -171,31 +172,33 @@ export default function RevisionList( {
 			</table>
 			{ totalPages > 1 && (
 				<div className="content-guidelines-revisions__pagination">
-					<HStack spacing={ 2 } justify="center">
-						<Button
-							icon={ chevronLeft }
-							label={ __( 'Previous page' ) }
+					<span className="pagination-links">
+						<button
+							className="button prev-page"
 							onClick={ () =>
 								handlePageChange( currentPage - 1 )
 							}
-							disabled={ currentPage === 1 }
-							accessibleWhenDisabled
-							__next40pxDefaultSize
-						/>
-						<Text>
+							disabled={ currentPage === 1 || isPageLoading }
+							aria-label={ __( 'Previous page' ) }
+						>
+							‹
+						</button>
+						<span className="paging-input">
 							{ currentPage } { __( 'of' ) } { totalPages }
-						</Text>
-						<Button
-							icon={ chevronRight }
-							label={ __( 'Next page' ) }
+						</span>
+						<button
+							className="button next-page"
 							onClick={ () =>
 								handlePageChange( currentPage + 1 )
 							}
-							disabled={ currentPage === totalPages }
-							accessibleWhenDisabled
-							__next40pxDefaultSize
-						/>
-					</HStack>
+							disabled={
+								currentPage === totalPages || isPageLoading
+							}
+							aria-label={ __( 'Next page' ) }
+						>
+							›
+						</button>
+					</span>
 				</div>
 			) }
 		</div>
