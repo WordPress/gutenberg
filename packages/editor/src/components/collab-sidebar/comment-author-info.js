@@ -85,8 +85,6 @@ function CommentAuthorInfo( {
 		date
 	);
 
-	const avatarSize = variant === 'compact' ? 24 : 32;
-
 	return (
 		<>
 			<img
@@ -94,8 +92,8 @@ function CommentAuthorInfo( {
 				className="editor-collab-sidebar-panel__user-avatar"
 				// translators: alt text for user avatar image
 				alt={ __( 'User avatar' ) }
-				width={ avatarSize }
-				height={ avatarSize }
+				width={ variant === 'compact' ? 24 : 32 }
+				height={ variant === 'compact' ? 24 : 32 }
 				style={ {
 					borderColor: getAvatarBorderColor(
 						userId ?? currentUserId

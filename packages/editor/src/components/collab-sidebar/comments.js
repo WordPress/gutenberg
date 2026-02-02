@@ -584,15 +584,13 @@ function Thread( {
 		);
 	}
 
-	const isCompactWidth =
-		! isSelected && isCompactNote && ! isHovered && ! isFocused;
-
 	return (
 		<VStack
 			className={ clsx( 'editor-collab-sidebar-panel__thread', {
 				'is-selected': isSelected,
 				'is-floating': isFloating,
-				'is-compact-width': isCompactWidth,
+				'is-compact-width':
+					! isSelected && isCompactNote && ! isHovered && ! isFocused,
 			} ) }
 			id={ `comment-thread-${ thread.id }` }
 			spacing="3"
@@ -661,7 +659,7 @@ function Thread( {
 					reflowComments={ reflowComments }
 				/>
 			) }
-			{ isCompactNote && ! isSelected && (
+			{ ! isSelected && isCompactNote && (
 				<CommentBoardCompact
 					thread={ thread }
 					showUserInfo={ isHovered || isFocused }
@@ -854,148 +852,139 @@ const CommentBoard = ( {
 			: __( 'Are you sure you want to delete this reply?' );
 
 	return (
-		<>
-			<VStack
-				spacing="2"
-				role={ thread.parent !== 0 ? 'treeitem' : undefined }
-			>
-				<HStack alignment="left" spacing="3" justify="flex-start">
-					<CommentAuthorInfo
-						avatar={ thread?.author_avatar_urls?.[ 48 ] }
-						name={ thread?.author_name }
-						date={ thread?.date }
-						userId={ thread?.author }
-					/>
-					{ isExpanded && (
-						<FlexItem
-							className="editor-collab-sidebar-panel__comment-status"
-							onClick={ ( event ) => {
-								// Prevent the thread from being selected.
-								event.stopPropagation();
-							} }
-						>
-							<HStack spacing="0">
-								{ canResolve && (
-									<Button
-										label={ _x(
-											'Resolve',
-											'Mark note as resolved'
-										) }
-										size="small"
-										icon={ published }
-										disabled={
-											thread.status === 'approved'
-										}
-										accessibleWhenDisabled={
-											thread.status === 'approved'
-										}
-										onClick={ () => {
-											onEdit( {
-												id: thread.id,
-												status: 'approved',
-											} );
-										} }
-									/>
-								) }
-								<Menu placement="bottom-end">
-									<Menu.TriggerButton
-										render={
-											<Button
-												ref={ actionButtonRef }
-												size="small"
-												icon={ moreVertical }
-												label={ __( 'Actions' ) }
-												disabled={
-													! moreActions.length
-												}
-												accessibleWhenDisabled
-											/>
-										}
-									/>
-									<Menu.Popover
-										// The menu popover is rendered in a portal, which causes focus to be
-										// lost and the note to be collapsed unintentionally. To prevent this,
-										// the popover should be rendered as an inline.
-										modal={ false }
-									>
-										{ moreActions.map( ( action ) => (
-											<Menu.Item
-												key={ action.id }
-												onClick={ () =>
-													action.onClick()
-												}
-											>
-												<Menu.ItemLabel>
-													{ action.title }
-												</Menu.ItemLabel>
-											</Menu.Item>
-										) ) }
-									</Menu.Popover>
-								</Menu>
-							</HStack>
-						</FlexItem>
-					) }
-				</HStack>
-				{ 'edit' === actionState && (
-					<CommentForm
-						onSubmit={ ( value ) => {
-							onEdit( {
-								id: thread.id,
-								content: value,
-							} );
-							setActionState( false );
-							actionButtonRef.current?.focus();
+		<VStack
+			spacing="2"
+			role={ thread.parent !== 0 ? 'treeitem' : undefined }
+		>
+			<HStack alignment="left" spacing="3" justify="flex-start">
+				<CommentAuthorInfo
+					avatar={ thread?.author_avatar_urls?.[ 48 ] }
+					name={ thread?.author_name }
+					date={ thread?.date }
+					userId={ thread?.author }
+				/>
+				{ isExpanded && (
+					<FlexItem
+						className="editor-collab-sidebar-panel__comment-status"
+						onClick={ ( event ) => {
+							// Prevent the thread from being selected.
+							event.stopPropagation();
 						} }
-						onCancel={ () => handleCancel() }
-						thread={ thread }
-						submitButtonText={ _x( 'Update', 'verb' ) }
-						labelText={ sprintf(
-							// translators: %1$s: note identifier, %2$s: author name.
-							__( 'Edit note %1$s by %2$s' ),
-							thread.id,
-							thread.author_name
-						) }
-						reflowComments={ reflowComments }
-					/>
-				) }
-				{ 'edit' !== actionState && (
-					<RawHTML
-						className={ clsx(
-							'editor-collab-sidebar-panel__user-comment',
-							{
-								'editor-collab-sidebar-panel__resolution-text':
-									isResolutionComment,
-							}
-						) }
 					>
-						{ isResolutionComment
-							? ( () => {
-									const actionText =
-										thread.meta._wp_note_status ===
-										'resolved'
-											? __( 'Marked as resolved' )
-											: __( 'Reopened' );
-									const content = thread?.content?.raw;
-
-									if (
-										content &&
-										typeof content === 'string' &&
-										content.trim() !== ''
-									) {
-										return sprintf(
-											// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
-											__( '%1$s: %2$s' ),
-											actionText,
-											content
-										);
+						<HStack spacing="0">
+							{ canResolve && (
+								<Button
+									label={ _x(
+										'Resolve',
+										'Mark note as resolved'
+									) }
+									size="small"
+									icon={ published }
+									disabled={ thread.status === 'approved' }
+									accessibleWhenDisabled={
+										thread.status === 'approved'
 									}
-									// If no content, just show the action.
-									return actionText;
-							  } )()
-							: thread?.content?.rendered }
-					</RawHTML>
+									onClick={ () => {
+										onEdit( {
+											id: thread.id,
+											status: 'approved',
+										} );
+									} }
+								/>
+							) }
+							<Menu placement="bottom-end">
+								<Menu.TriggerButton
+									render={
+										<Button
+											ref={ actionButtonRef }
+											size="small"
+											icon={ moreVertical }
+											label={ __( 'Actions' ) }
+											disabled={ ! moreActions.length }
+											accessibleWhenDisabled
+										/>
+									}
+								/>
+								<Menu.Popover
+									// The menu popover is rendered in a portal, which causes focus to be
+									// lost and the note to be collapsed unintentionally. To prevent this,
+									// the popover should be rendered as an inline.
+									modal={ false }
+								>
+									{ moreActions.map( ( action ) => (
+										<Menu.Item
+											key={ action.id }
+											onClick={ () => action.onClick() }
+										>
+											<Menu.ItemLabel>
+												{ action.title }
+											</Menu.ItemLabel>
+										</Menu.Item>
+									) ) }
+								</Menu.Popover>
+							</Menu>
+						</HStack>
+					</FlexItem>
 				) }
-			</VStack>
+			</HStack>
+			{ 'edit' === actionState && (
+				<CommentForm
+					onSubmit={ ( value ) => {
+						onEdit( {
+							id: thread.id,
+							content: value,
+						} );
+						setActionState( false );
+						actionButtonRef.current?.focus();
+					} }
+					onCancel={ () => handleCancel() }
+					thread={ thread }
+					submitButtonText={ _x( 'Update', 'verb' ) }
+					labelText={ sprintf(
+						// translators: %1$s: note identifier, %2$s: author name.
+						__( 'Edit note %1$s by %2$s' ),
+						thread.id,
+						thread.author_name
+					) }
+					reflowComments={ reflowComments }
+				/>
+			) }
+			{ 'edit' !== actionState && (
+				<RawHTML
+					className={ clsx(
+						'editor-collab-sidebar-panel__user-comment',
+						{
+							'editor-collab-sidebar-panel__resolution-text':
+								isResolutionComment,
+						}
+					) }
+				>
+					{ isResolutionComment
+						? ( () => {
+								const actionText =
+									thread.meta._wp_note_status === 'resolved'
+										? __( 'Marked as resolved' )
+										: __( 'Reopened' );
+								const content = thread?.content?.raw;
+
+								if (
+									content &&
+									typeof content === 'string' &&
+									content.trim() !== ''
+								) {
+									return sprintf(
+										// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
+										__( '%1$s: %2$s' ),
+										actionText,
+										content
+									);
+								}
+								// If no content, just show the action.
+								return actionText;
+						  } )()
+						: thread?.content?.rendered }
+				</RawHTML>
+			) }
 			{ 'delete' === actionState && (
 				<ConfirmDialog
 					isOpen={ showConfirmDialog }
@@ -1006,7 +995,7 @@ const CommentBoard = ( {
 					{ deleteConfirmMessage }
 				</ConfirmDialog>
 			) }
-		</>
+		</VStack>
 	);
 };
 
