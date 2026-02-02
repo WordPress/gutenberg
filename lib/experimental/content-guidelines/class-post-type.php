@@ -56,6 +56,7 @@ class Gutenberg_Content_Guidelines_Post_Type {
 			'has_archive'           => false,
 			'rewrite'               => false,
 			'query_var'             => false,
+			'can_export'            => true,
 		);
 
 		register_post_type( self::POST_TYPE, $args );
