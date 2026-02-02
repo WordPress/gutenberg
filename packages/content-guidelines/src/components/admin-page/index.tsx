@@ -3,7 +3,12 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Panel, Spinner, Notice } from '@wordpress/components';
+import {
+	Spinner,
+	Notice,
+	Button,
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -15,9 +20,8 @@ import type {
 	BlockGuidelines,
 	GuidelineCategories,
 } from '../../store/constants';
-import CategoryPanel from './category-panel';
-import BlockGuidelinesPanel from './block-guidelines-panel';
-import PublishControls from './publish-controls';
+import CategoryRow from './category-row';
+import BlockGuidelinesRow from './block-guidelines-row';
 import RevisionList from './revision-list';
 import ImportExportControls from './import-export-controls';
 
@@ -32,33 +36,35 @@ const CATEGORIES: Category[] = [
 		slug: 'site',
 		label: __( 'Site Context' ),
 		description: __(
-			'Describe your site goals, target audience, and overall content strategy.'
+			"Describe your site's purpose, goals, and primary audience. This helps creators develop content that resonates with your readers."
 		),
 	},
 	{
 		slug: 'copy',
 		label: __( 'Copy Guidelines' ),
 		description: __(
-			'Describe your tone, voice, brand personality, and writing style preferences.'
+			'Set your writing standards for tone, voice, style, and formatting. Include brand terminology and content to avoid so all writing stays consistent.'
 		),
 	},
 	{
 		slug: 'images',
 		label: __( 'Image Guidelines' ),
 		description: __(
-			'Describe preferred image styles, colors, compositions, and visual aesthetics.'
+			'Outline your style, subject matter, technical requirements (dimensions, formats), mood and aesthetic preferences, and images to avoid. This ensures consistent, accessible imagery.'
 		),
 	},
 	{
 		slug: 'blocks',
 		label: __( 'Block-Specific Guidelines' ),
-		description: __( 'Per-block rules for specific content types.' ),
+		description: __(
+			'Create tailored guidelines for specific block types (headings, images, quotes, etc.). This allows you to set unique standards for how different blocks are treated.'
+		),
 	},
 	{
 		slug: 'other',
-		label: __( 'Other Guidelines' ),
+		label: __( 'Additional Guidelines' ),
 		description: __(
-			'Any other AI content preferences or special instructions.'
+			'Include any additional standards such as SEO preferences, legal requirements, citation styles, or other content considerations.'
 		),
 	},
 ];
@@ -160,10 +166,12 @@ export default function AdminPage() {
 		<div className="content-guidelines-admin">
 			<header className="content-guidelines-admin__header">
 				<div className="content-guidelines-admin__title-section">
-					<h1>{ __( 'Content Guidelines' ) }</h1>
-					<p className="content-guidelines-admin__description">
+					<h1 className="wp-heading-inline">
+						{ __( 'Content Guidelines' ) }
+					</h1>
+					<p className="description">
 						{ __(
-							'Define editorial guidelines that inform AI-generated content across your site.'
+							"Set content standards that guide your team, inform plugins, and help AI tools generate content that matches your site's voice and requirements."
 						) }
 					</p>
 				</div>
@@ -175,20 +183,13 @@ export default function AdminPage() {
 				</Notice>
 			) }
 
-			<PublishControls
-				status={ guidelines?.status || 'draft' }
-				isDirty={ isDirtyData }
-				isSaving={ isSavingData }
-				onSave={ handleSave }
-			/>
-
 			<div className="content-guidelines-admin__layout">
 				<main className="content-guidelines-admin__main">
-					<Panel className="content-guidelines-admin__panel">
-						{ CATEGORIES.map( ( category, index ) => {
+					<VStack spacing={ 0 }>
+						{ CATEGORIES.map( ( category ) => {
 							if ( category.slug === 'blocks' ) {
 								return (
-									<BlockGuidelinesPanel
+									<BlockGuidelinesRow
 										key={ category.slug }
 										value={
 											guidelines?.guideline_categories
@@ -200,6 +201,7 @@ export default function AdminPage() {
 												blocksValue
 											)
 										}
+										description={ category.description }
 									/>
 								);
 							}
@@ -210,7 +212,7 @@ export default function AdminPage() {
 								| undefined;
 
 							return (
-								<CategoryPanel
+								<CategoryRow
 									key={ category.slug }
 									label={ category.label }
 									description={ category.description }
@@ -221,11 +223,24 @@ export default function AdminPage() {
 											categoryValue
 										)
 									}
-									initialOpen={ index === 0 }
 								/>
 							);
 						} ) }
-					</Panel>
+					</VStack>
+					<p className="submit">
+						<Button
+							variant="primary"
+							onClick={ () => handleSave() }
+							isBusy={ isSavingData }
+							disabled={ ! isDirtyData || isSavingData }
+							accessibleWhenDisabled
+							__next40pxDefaultSize
+						>
+							{ isSavingData
+								? __( 'Saving…' )
+								: __( 'Save Changes' ) }
+						</Button>
+					</p>
 				</main>
 				<aside className="content-guidelines-admin__sidebar">
 					<RevisionList

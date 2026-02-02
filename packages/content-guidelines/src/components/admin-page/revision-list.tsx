@@ -3,7 +3,7 @@
  */
 import { useEffect, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { dateI18n, getSettings } from '@wordpress/date';
+import { dateI18n } from '@wordpress/date';
 import {
 	Spinner,
 	Button,
@@ -43,8 +43,6 @@ export default function RevisionList( {
 		error,
 		currentPage,
 		totalPages,
-		totalItems,
-		perPage,
 	} = useSelect( ( select ) => {
 		const selectors = select( store );
 		const pagination = selectors.getRevisionPagination();
@@ -55,8 +53,6 @@ export default function RevisionList( {
 			error: selectors.getError(),
 			currentPage: pagination.currentPage,
 			totalPages: pagination.totalPages,
-			totalItems: pagination.totalItems,
-			perPage: pagination.perPage,
 		};
 	}, [] );
 
@@ -124,30 +120,30 @@ export default function RevisionList( {
 		);
 	}
 
-	const dateFormat = getSettings().formats.datetime;
-
 	const isCurrent = ( index: number ) => currentPage === 1 && index === 0;
-
-	// Calculate revision number based on pagination
-	const getRevisionNumber = ( index: number ) => {
-		const offset = ( currentPage - 1 ) * perPage;
-		return totalItems - offset - index;
-	};
 
 	return (
 		<div className="content-guidelines-revisions">
-			<h3>{ __( 'Revision History' ) }</h3>
-			<table className="content-guidelines-revisions__table">
+			<h3>{ __( 'Revision history' ) }</h3>
+			<table className="wp-list-table widefat striped">
+				<thead>
+					<tr>
+						<th>{ __( 'Date' ) }</th>
+						<th>{ __( 'User' ) }</th>
+						<th></th>
+					</tr>
+				</thead>
 				<tbody>
 					{ revisions.map( ( revision, index ) => (
 						<tr key={ revision.id }>
-							<td className="revision-item__number">
-								{ isCurrent( index )
-									? __( 'Current' )
-									: `#${ getRevisionNumber( index ) }` }
-							</td>
 							<td className="revision-item__date">
-								{ dateI18n( dateFormat, revision.date ) }
+								<span className="revision-item__date-line">
+									{ dateI18n( 'F j, Y', revision.date ) }
+								</span>
+								<span className="revision-item__time-line">
+									{ __( 'at' ) }{ ' ' }
+									{ dateI18n( 'g:i a', revision.date ) }
+								</span>
 							</td>
 							<td className="revision-item__author">
 								{ revision.author_name || __( 'Unknown' ) }
@@ -155,8 +151,7 @@ export default function RevisionList( {
 							<td className="revision-item__action">
 								{ ! isCurrent( index ) && onRestore && (
 									<Button
-										variant="tertiary"
-										size="small"
+										variant="link"
 										onClick={ () =>
 											handleRestore( revision.id )
 										}

@@ -7,11 +7,8 @@ import {
 	Button,
 	Notice,
 	__experimentalVStack as VStack,
-	__experimentalHStack as HStack,
 	__experimentalText as Text,
-	__experimentalSpacer as Spacer,
 } from '@wordpress/components';
-import { download, upload } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
@@ -128,13 +125,8 @@ export default function ImportExportControls( {
 
 	return (
 		<div className="content-guidelines-import-export">
-			<VStack spacing={ 3 }>
-				<Text weight="600">{ __( 'Export / Import' ) }</Text>
-				<Text variant="muted">
-					{ __(
-						'Export your guidelines as JSON or import from a file.'
-					) }
-				</Text>
+			<VStack spacing={ 4 }>
+				<Text weight="600">{ __( 'Import / Export' ) }</Text>
 
 				{ importError && (
 					<Notice
@@ -158,36 +150,50 @@ export default function ImportExportControls( {
 					</Notice>
 				) }
 
-				<Spacer margin={ 1 } />
+				<VStack spacing={ 2 } alignment="left">
+					<Text weight="600">{ __( 'Import' ) }</Text>
+					<Text variant="muted">
+						{ __(
+							'Upload a JSON file to import your content guidelines.'
+						) }
+					</Text>
+					<input
+						ref={ fileInputRef }
+						type="file"
+						accept=".json,application/json"
+						onChange={ handleFileSelect }
+						style={ { display: 'none' } }
+					/>
+					<div>
+						<Button
+							variant="secondary"
+							onClick={ () => fileInputRef.current?.click() }
+							__next40pxDefaultSize
+						>
+							{ __( 'Upload JSON file' ) }
+						</Button>
+					</div>
+				</VStack>
 
-				<input
-					ref={ fileInputRef }
-					type="file"
-					accept=".json,application/json"
-					onChange={ handleFileSelect }
-					style={ { display: 'none' } }
-				/>
-
-				<HStack spacing={ 3 } wrap>
-					<Button
-						variant="secondary"
-						icon={ download }
-						onClick={ handleExport }
-						disabled={ ! guidelines }
-						__next40pxDefaultSize
-						accessibleWhenDisabled
-					>
-						{ __( 'Export' ) }
-					</Button>
-					<Button
-						variant="secondary"
-						icon={ upload }
-						onClick={ () => fileInputRef.current?.click() }
-						__next40pxDefaultSize
-					>
-						{ __( 'Import' ) }
-					</Button>
-				</HStack>
+				<VStack spacing={ 2 } alignment="left">
+					<Text weight="600">{ __( 'Export' ) }</Text>
+					<Text variant="muted">
+						{ __(
+							'Export your content guidelines to a JSON file.'
+						) }
+					</Text>
+					<div>
+						<Button
+							variant="secondary"
+							onClick={ handleExport }
+							disabled={ ! guidelines }
+							__next40pxDefaultSize
+							accessibleWhenDisabled
+						>
+							{ __( 'Export Guidelines' ) }
+						</Button>
+					</div>
+				</VStack>
 			</VStack>
 		</div>
 	);
