@@ -87,6 +87,10 @@
 		overflow: hidden;
 		position: relative;
 
+		&.dataviews-view-grid__media--placeholder {
+			aspect-ratio: 3/1;
+		}
+
 		img {
 			object-fit: cover;
 			width: 100%;

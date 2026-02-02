@@ -104,16 +104,16 @@ const GridItem = forwardRef( function GridItem< Item >(
 	const mediaPlaceholder = (
 		<span className="dataviews-view-grid__media-placeholder" />
 	);
-	const renderedMediaField =
-		showMedia && mediaField?.render ? (
-			<mediaField.render
-				item={ item }
-				field={ mediaField }
-				config={ config }
-			/>
-		) : (
-			mediaPlaceholder
-		);
+	const rendersMediaField = showMedia && mediaField?.render;
+	const renderedMediaField = rendersMediaField ? (
+		<mediaField.render
+			item={ item }
+			field={ mediaField }
+			config={ config }
+		/>
+	) : (
+		mediaPlaceholder
+	);
 	const renderedTitleField =
 		showTitle && titleField?.render ? (
 			<titleField.render item={ item } field={ titleField } />
@@ -168,7 +168,10 @@ const GridItem = forwardRef( function GridItem< Item >(
 				isItemClickable={ isItemClickable }
 				onClickItem={ onClickItem }
 				renderItemLink={ renderItemLink }
-				className="dataviews-view-grid__media"
+				className={ clsx( 'dataviews-view-grid__media', {
+					'dataviews-view-grid__media--placeholder':
+						! rendersMediaField,
+				} ) }
 				{ ...mediaA11yProps }
 			>
 				{ renderedMediaField }
