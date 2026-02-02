@@ -224,6 +224,7 @@
 		gap: 8px;
 		align-items: center;
 		justify-content: center;
+		line-height: 1;
 
 		&:hover,
 		&:focus,
@@ -239,7 +240,7 @@
 	}
 
 	.wp-lightbox-close-icon svg {
-		vertical-align: middle;
+		display: block;
 	}
 
 	.wp-lightbox-navigation-button-prev,
@@ -256,6 +257,7 @@
 		align-items: center;
 		justify-content: center;
 		bottom: 16px;
+		line-height: 1;
 
 		&[hidden] {
 			display: none;
@@ -277,6 +279,7 @@
 		&:has(.wp-lightbox-navigation-text:not([hidden])) .wp-lightbox-navigation-icon svg {
 			width: 1.5em;
 			height: 1.5em;
+			display: block;
 		}
 	}
 
