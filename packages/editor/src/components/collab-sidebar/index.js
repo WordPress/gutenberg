@@ -260,6 +260,7 @@ function NotesSidebar( { postId } ) {
 			) }
 			{ showAllNotesSidebar && (
 				<PluginSidebar
+					isPinnable={ ! isLargeViewport }
 					identifier={ collabHistorySidebarName }
 					name={ collabHistorySidebarName }
 					title={ __( 'All notes' ) }
