@@ -11,6 +11,7 @@ const fs = require( 'fs' ).promises;
 const getCacheDirectory = require( './get-cache-directory' );
 const md5 = require( '../md5' );
 const { parseConfig, getConfigFilePath } = require( './parse-config' );
+const { ValidationError } = require( './validate-config' );
 const postProcessConfig = require( './post-process-config' );
 
 /**
@@ -49,6 +50,17 @@ module.exports = async function loadConfig(
 		'local',
 		customConfigPath
 	);
+
+	// If a custom config path was provided, verify the file exists.
+	if ( customConfigPath ) {
+		try {
+			await fs.stat( configFilePath );
+		} catch ( error ) {
+			throw new ValidationError(
+				`Config file not found: ${ configFilePath }`
+			);
+		}
+	}
 
 	const cacheDirectoryPath = path.resolve(
 		await getCacheDirectory(),
