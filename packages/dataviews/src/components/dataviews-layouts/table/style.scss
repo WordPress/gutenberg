@@ -337,7 +337,7 @@
 			inset: 0;
 			height: $grid-unit-10;
 			margin: auto 0;
-			border-radius: var(--wpds-border-radius-surface-sm);
+			border-radius: var(--wpds-border-radius-sm);
 			pointer-events: none;
 			visibility: visible;
 			@include skeleton();
