@@ -3,9 +3,9 @@
 		"blockName": "core/pullquote",
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\n<figure class=\"wp-block-pullquote\" id=\"test-anchor\"><blockquote><p>Testing pullquote block...</p><cite>...with a caption</cite></blockquote></figure>\n",
+		"innerHTML": "\n<figure class=\"wp-block-pullquote\" id=\"test-anchor\"><blockquote><p>One</p><p>Two</p><cite>...with a caption</cite></blockquote></figure>\n",
 		"innerContent": [
-			"\n<figure class=\"wp-block-pullquote\" id=\"test-anchor\"><blockquote><p>Testing pullquote block...</p><cite>...with a caption</cite></blockquote></figure>\n"
+			"\n<figure class=\"wp-block-pullquote\" id=\"test-anchor\"><blockquote><p>One</p><p>Two</p><cite>...with a caption</cite></blockquote></figure>\n"
 		]
 	}
 ]
