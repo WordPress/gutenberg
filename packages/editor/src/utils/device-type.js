@@ -26,10 +26,10 @@ export function getDeviceTypeByCanvasWidth( canvasWidth ) {
  * Get the canvas width by device type.
  *
  * @param {string} deviceType The device type.
- * @return {number} The canvas width in pixels.
+ * @return {number|undefined} The canvas width in pixels.
  */
 export function getCanvasWidthByDeviceType( deviceType ) {
-	return DEVICE_TYPES[ deviceType ]?.canvasWidth ?? undefined;
+	return DEVICE_TYPES[ deviceType ]?.canvasWidth;
 }
 
 /**
