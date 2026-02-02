@@ -360,4 +360,3 @@ function gutenberg_override_media_templates(): void {
 }
 
 add_action( 'wp_enqueue_media', 'gutenberg_override_media_templates' );
-
