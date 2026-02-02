@@ -5,6 +5,7 @@ export { TypographyVariations } from './typography-variations';
 
 // Ideally this should just be a core-data selector.
 export { default as useGlobalStylesRevisions } from './screen-revisions/use-global-styles-revisions';
+export { default as ScreenHeadCode } from './screen-head-code';
 
 // Font Library exports
 export { FontLibrary } from './font-library/font-library';

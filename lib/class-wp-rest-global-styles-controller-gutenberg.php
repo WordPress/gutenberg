@@ -284,6 +284,12 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 						return $css_validation_result;
 					}
 				}
+			if ( isset( $request['styles']['headCode'] ) ) {
+				$head_code_validation_result = $this->validate_custom_head_code( $request['styles']['headCode'] );
+				if ( is_wp_error( $head_code_validation_result ) ) {
+					return $head_code_validation_result;
+				}
+			}
 				$config['styles'] = $request['styles'];
 			} elseif ( isset( $existing_config['styles'] ) ) {
 				$config['styles'] = $existing_config['styles'];
@@ -339,8 +345,19 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 		$config                           = array();
 		$theme_json                       = null;
 		if ( $is_global_styles_user_theme_json ) {
+			// Store headCode separately before WP_Theme_JSON processes it
+			$head_code_backup = $raw_config['styles']['headCode'] ?? null;
+			
 			$theme_json = new WP_Theme_JSON_Gutenberg( $raw_config, 'custom' );
 			$config     = $theme_json->get_raw_data();
+			
+			// Restore headCode if it was present
+			if ( $head_code_backup !== null ) {
+				if ( ! isset( $config['styles'] ) ) {
+					$config['styles'] = array();
+				}
+				$config['styles']['headCode'] = $head_code_backup;
+			}
 		}
 
 		// Base fields for every post.
@@ -459,6 +476,10 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 
 		if ( current_user_can( 'edit_css' ) ) {
 			$rels[] = 'https://api.w.org/action-edit-css';
+		}
+
+		if ( current_user_can( 'unfiltered_html' ) ) {
+			$rels[] = 'https://api.w.org/action-edit-head-code';
 		}
 
 		return $rels;
@@ -769,6 +790,39 @@ class WP_REST_Global_Styles_Controller_Gutenberg extends WP_REST_Posts_Controlle
 					);
 				}
 			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Validate custom head code.
+	 *
+	 * Checks capability and sanitizes the input. Unlike CSS, head code can contain
+	 * HTML markup, but only for users with unfiltered_html capability.
+	 *
+	 * @since 6.9.0
+	 *
+	 * @param string $head_code Head code to validate.
+	 * @return true|WP_Error True if the input was validated, otherwise WP_Error.
+	 */
+	protected function validate_custom_head_code( $head_code ) {
+		// Check if user has permission to edit unfiltered HTML.
+		if ( ! current_user_can( 'unfiltered_html' ) ) {
+			return new WP_Error(
+				'rest_custom_head_code_unauthorized',
+				__( 'You do not have permission to edit custom head code.', 'gutenberg' ),
+				array( 'status' => 403 )
+			);
+		}
+
+		// On multisite, only Super Admins can edit custom head code.
+		if ( is_multisite() && ! is_super_admin() ) {
+			return new WP_Error(
+				'rest_custom_head_code_unauthorized',
+				__( 'Only Super Admins can edit custom head code on multisite.', 'gutenberg' ),
+				array( 'status' => 403 )
+			);
 		}
 
 		return true;

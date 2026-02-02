@@ -34,6 +34,7 @@ import { ScreenShadows, ScreenShadowsEdit } from './screen-shadows';
 import ScreenLayout from './screen-layout';
 import ScreenStyleVariations from './screen-style-variations';
 import ScreenCSS from './screen-css';
+import ScreenHeadCode from './screen-head-code';
 import ScreenRevisions from './screen-revisions';
 import FontSizes from './font-sizes/font-sizes';
 import FontSize from './font-sizes/font-size';
@@ -197,6 +198,9 @@ export function GlobalStylesUI( {
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/css">
 						<ScreenCSS />
+					</GlobalStylesNavigationScreen>
+					<GlobalStylesNavigationScreen path="/head-code">
+						<ScreenHeadCode />
 					</GlobalStylesNavigationScreen>
 					<GlobalStylesNavigationScreen path="/revisions/:revisionId?">
 						<ScreenRevisions />
