@@ -7,6 +7,7 @@ import {
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 	Notice,
+	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo } from '@wordpress/element';
@@ -22,6 +23,7 @@ import LetterSpacingControl from '../letter-spacing-control';
 import TextAlignmentControl from '../text-alignment-control';
 import TextTransformControl from '../text-transform-control';
 import TextDecorationControl from '../text-decoration-control';
+import TextIndentControl from '../text-indent-control';
 import WritingModeControl from '../writing-mode-control';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
@@ -42,6 +44,7 @@ export function useHasTypographyPanel( settings ) {
 	const hasTextAlign = useHasTextAlignmentControl( settings );
 	const hasTextTransform = useHasTextTransformControl( settings );
 	const hasTextDecoration = useHasTextDecorationControl( settings );
+	const hasTextIndent = useHasTextIndentControl( settings );
 	const hasWritingMode = useHasWritingModeControl( settings );
 	const hasTextColumns = useHasTextColumnsControl( settings );
 	const hasFontSize = useHasFontSizeControl( settings );
@@ -55,6 +58,7 @@ export function useHasTypographyPanel( settings ) {
 		hasTextTransform ||
 		hasFontSize ||
 		hasTextDecoration ||
+		hasTextIndent ||
 		hasWritingMode ||
 		hasTextColumns
 	);
@@ -118,6 +122,10 @@ function useHasTextColumnsControl( settings ) {
 	return settings?.typography?.textColumns;
 }
 
+function useHasTextIndentControl( settings ) {
+	return settings?.typography?.textIndent;
+}
+
 /**
  * Concatenate all the font sizes into a single list for the font size picker.
  *
@@ -169,6 +177,7 @@ const DEFAULT_CONTROLS = {
 	textAlign: true,
 	textTransform: true,
 	textDecoration: true,
+	textIndent: true,
 	writingMode: true,
 	textColumns: true,
 };
@@ -181,6 +190,7 @@ export default function TypographyPanel( {
 	settings,
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
+	isGlobalStyles = false,
 } ) {
 	const decodeValue = ( rawValue ) =>
 		getValueFromVariable( { settings }, '', rawValue );
@@ -358,6 +368,48 @@ export default function TypographyPanel( {
 	const hasLetterSpacing = () => !! value?.typography?.letterSpacing;
 	const resetLetterSpacing = () => setLetterSpacing( undefined );
 
+	// Text Indent
+	const hasTextIndentControl = useHasTextIndentControl( settings );
+	const textIndent = decodeValue( inheritedValue?.typography?.textIndent );
+
+	// Get the setting value - can be 'subsequent' (default), 'all', or false.
+	// The setting determines which CSS selector is used for the text-indent style.
+	const textIndentSetting = settings?.typography?.textIndent ?? 'subsequent';
+	const isTextIndentAll = textIndentSetting === 'all';
+
+	const setTextIndentValue = ( newValue ) => {
+		onChange(
+			setImmutably(
+				value,
+				[ 'typography', 'textIndent' ],
+				newValue || undefined
+			)
+		);
+	};
+
+	const onToggleTextIndentAll = ( newValue ) => {
+		// Toggle between 'all' and 'subsequent' for the setting.
+		// Include the settings change so it can be handled atomically by the parent.
+		onChange( {
+			...value,
+			settings: {
+				typography: {
+					textIndent: newValue ? 'all' : 'subsequent',
+				},
+			},
+		} );
+	};
+
+	const hasTextIndent = () => !! value?.typography?.textIndent;
+	const resetTextIndent = () => {
+		onChange(
+			setImmutably( value, [ 'typography', 'textIndent' ], undefined )
+		);
+	};
+	const textIndentHelp = isTextIndentAll
+		? __( 'Indents the first line of all paragraphs.' )
+		: __( 'Indents the first line of each paragraph after the first one.' );
+
 	// Text Columns
 	const hasTextColumnsControl = useHasTextColumnsControl( settings );
 	const textColumns = decodeValue( inheritedValue?.typography?.textColumns );
@@ -490,7 +542,6 @@ export default function TypographyPanel( {
 			) }
 			{ hasAppearanceControl && (
 				<ToolsPanelItem
-					className="single-column"
 					label={ appearanceControlLabel }
 					hasValue={ hasFontAppearance }
 					onDeselect={ resetFontAppearance }
@@ -542,6 +593,33 @@ export default function TypographyPanel( {
 						size="__unstable-large"
 						__unstableInputWidth="auto"
 					/>
+				</ToolsPanelItem>
+			) }
+			{ hasTextIndentControl && (
+				<ToolsPanelItem
+					label={ __( 'Line indent' ) }
+					hasValue={ hasTextIndent }
+					onDeselect={ resetTextIndent }
+					isShownByDefault={ defaultControls.textIndent }
+					panelId={ panelId }
+				>
+					<TextIndentControl
+						value={ textIndent }
+						onChange={ setTextIndentValue }
+						size="__unstable-large"
+						__unstableInputWidth="auto"
+						withSlider
+						hasBottomMargin={ isGlobalStyles }
+					/>
+					{ isGlobalStyles && (
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={ __( 'Indent all paragraphs' ) }
+							checked={ isTextIndentAll }
+							onChange={ onToggleTextIndentAll }
+							help={ textIndentHelp }
+						/>
+					) }
 				</ToolsPanelItem>
 			) }
 			{ hasTextColumnsControl && (

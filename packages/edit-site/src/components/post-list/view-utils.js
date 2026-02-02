@@ -157,17 +157,19 @@ const SLUG_TO_STATUS = {
 	trash: 'trash',
 };
 
-export function getActiveFiltersForTab( activeView ) {
+export function getActiveViewOverridesForTab( activeView ) {
 	const status = SLUG_TO_STATUS[ activeView ];
 	if ( ! status ) {
-		return [];
+		return {};
 	}
-	return [
-		{
-			field: 'status',
-			operator: OPERATOR_IS_ANY,
-			value: status,
-			isLocked: true,
-		},
-	];
+	return {
+		filters: [
+			{
+				field: 'status',
+				operator: OPERATOR_IS_ANY,
+				value: status,
+				isLocked: true,
+			},
+		],
+	};
 }

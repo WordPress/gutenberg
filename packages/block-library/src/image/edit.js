@@ -24,6 +24,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { useResizeObserver } from '@wordpress/compose';
+import { getProtocol, prependHTTPS } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -319,10 +320,14 @@ export function ImageEdit( {
 	}
 
 	function onSelectURL( newURL ) {
-		if ( newURL !== url ) {
+		// Handle URLs without protocol.
+		const normalizedNewURL = getProtocol( newURL )
+			? newURL
+			: prependHTTPS( newURL );
+		if ( normalizedNewURL !== url ) {
 			setAttributes( {
 				blob: undefined,
-				url: newURL,
+				url: normalizedNewURL,
 				id: undefined,
 				sizeSlug: getSettings().imageDefaultSize,
 			} );

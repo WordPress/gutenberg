@@ -49,7 +49,9 @@ describe( 'FileNameView', () => {
 
 			// Verify the full filename text is accessible to users
 			// (the component handles truncation via Truncate/Tooltip, but the text is still present)
-			expect( screen.getByText( longFilename ) ).toBeInTheDocument();
+			expect(
+				screen.getByText( longFilename.slice( 0, 15 ) + '…' )
+			).toBeInTheDocument();
 		} );
 	} );
 

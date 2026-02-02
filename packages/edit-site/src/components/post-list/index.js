@@ -35,7 +35,7 @@ import { useEditPostAction } from '../dataviews-actions';
 import {
 	defaultLayouts,
 	DEFAULT_VIEW,
-	getActiveFiltersForTab,
+	getActiveViewOverridesForTab,
 } from './view-utils';
 import useNotesCount from './use-notes-count';
 
@@ -59,8 +59,8 @@ export default function PostList( { postType } ) {
 	const { activeView = 'all', postId, quickEdit = false } = query;
 	const history = useHistory();
 	const defaultView = DEFAULT_VIEW;
-	const activeFilters = useMemo(
-		() => getActiveFiltersForTab( activeView ),
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTab( activeView ),
 		[ activeView ]
 	);
 	const { view, updateView, isModified, resetToDefault } = useView( {
@@ -68,7 +68,7 @@ export default function PostList( { postType } ) {
 		name: postType,
 		slug: 'default',
 		defaultView,
-		activeFilters,
+		activeViewOverrides,
 		queryParams: {
 			page: query.pageNumber,
 			search: query.search,

@@ -18,6 +18,7 @@ const {
 	getAvailableRuntimes,
 	getRuntime,
 	UnsupportedCommandError,
+	EnvironmentNotInitializedError,
 } = require( './runtime' );
 
 // Colors.
@@ -45,8 +46,11 @@ const withSpinner =
 				process.exit( 0 );
 			},
 			( error ) => {
-				if ( error instanceof UnsupportedCommandError ) {
-					// Error is an unsupported command in the current runtime.
+				if (
+					error instanceof UnsupportedCommandError ||
+					error instanceof EnvironmentNotInitializedError
+				) {
+					// Error is a known user-facing error.
 					spinner.fail( error.message );
 					process.exit( 1 );
 				} else if (

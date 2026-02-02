@@ -608,7 +608,7 @@ Start with the basic building block of all narrative. ([Source](https://github.c
 
 -	**Name:** core/paragraph
 -	**Category:** text
--	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns), ~~className~~
+-	**Supports:** __unstablePasteTextInline, align (full, wide), anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), splitting, typography (fitText, fontSize, lineHeight, textAlign, textColumns, textIndent), ~~className~~
 -	**Attributes:** content, direction, dropCap, placeholder
 
 ## Pattern Placeholder
@@ -665,8 +665,8 @@ The author name. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/pac
 
 -	**Name:** core/post-author-name
 -	**Category:** theme
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** isLink, linkTarget, textAlign
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** isLink, linkTarget
 
 ## Comment (deprecated)
 
@@ -796,13 +796,13 @@ Add text that respects your spacing and tabs, and also allows styling. ([Source]
 -	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** content
 
-## Pullquote (deprecated)
+## Pullquote
 
-This block is deprecated. Please use the Quote block instead. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pullquote))
+Give special visual emphasis to a quote from your text. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/pullquote))
 
 -	**Name:** core/pullquote
 -	**Category:** text
--	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize), color (background, gradients, link, text), dimensions (minHeight), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~inserter~~
+-	**Supports:** align (full, left, right, wide), anchor, background (backgroundImage, backgroundSize), color (background, gradients, link, text), dimensions (minHeight), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight)
 -	**Attributes:** citation, textAlign, value
 
 ## Query Loop

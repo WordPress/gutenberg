@@ -32,7 +32,7 @@ import { __ } from '@wordpress/i18n';
 import { unlock } from '../lock-unlock';
 import {
 	getDefaultView,
-	getActiveFiltersForTab,
+	getActiveViewOverridesForTab,
 	DEFAULT_VIEWS,
 	DEFAULT_LAYOUTS,
 	viewToQuery,
@@ -82,8 +82,8 @@ function PostList() {
 		return getDefaultView( postTypeObject );
 	}, [ postTypeObject ] );
 
-	const activeFilters = useMemo(
-		() => getActiveFiltersForTab( slug ),
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTab( slug ),
 		[ slug ]
 	);
 
@@ -106,7 +106,7 @@ function PostList() {
 		name: postType,
 		slug: 'default-new',
 		defaultView,
-		activeFilters,
+		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );

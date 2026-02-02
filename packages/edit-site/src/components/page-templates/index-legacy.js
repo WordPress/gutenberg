@@ -24,7 +24,7 @@ import { authorField, descriptionField, previewField } from './fields';
 import {
 	defaultLayouts,
 	DEFAULT_VIEW,
-	getActiveFiltersForTab,
+	getActiveViewOverridesForTab,
 } from './view-utils';
 
 const { usePostActions, templateTitleField } = unlock( editorPrivateApis );
@@ -37,8 +37,8 @@ export default function PageTemplates() {
 	const [ selection, setSelection ] = useState( [ postId ] );
 
 	const defaultView = DEFAULT_VIEW;
-	const activeFilters = useMemo(
-		() => getActiveFiltersForTab( activeView ),
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTab( activeView ),
 		[ activeView ]
 	);
 	const { view, updateView, isModified, resetToDefault } = useView( {
@@ -46,7 +46,7 @@ export default function PageTemplates() {
 		name: TEMPLATE_POST_TYPE,
 		slug: 'default',
 		defaultView,
-		activeFilters,
+		activeViewOverrides,
 		queryParams: {
 			page: query.pageNumber,
 			search: query.search,

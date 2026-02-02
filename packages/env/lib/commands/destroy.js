@@ -32,7 +32,9 @@ module.exports = async function destroy( { spinner, scripts, force, debug } ) {
 		return;
 	}
 
-	const runtime = getRuntime( detectRuntime( config.workDirectoryPath ) );
+	const runtime = getRuntime(
+		await detectRuntime( config.workDirectoryPath )
+	);
 
 	spinner.info( runtime.getDestroyWarningMessage() );
 
