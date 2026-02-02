@@ -177,4 +177,106 @@ class WP_Navigation_Block_Renderer_Test extends WP_UnitTestCase {
 		$this->assertEquals( $actual, $expected );
 		$this->assertCount( 0, $actual );
 	}
+
+	/**
+	 * Test that gutenberg_block_core_navigation_block_tree_has_block_type finds a block at the top level.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::gutenberg_block_core_navigation_block_tree_has_block_type
+	 */
+	public function test_gutenberg_block_core_navigation_block_tree_has_block_type_finds_top_level_block() {
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:paragraph --><p>Test</p><!-- /wp:paragraph --><!-- wp:navigation-overlay-close /-->'
+		);
+		$blocks        = new WP_Block_List( $parsed_blocks, array() );
+
+		$result = gutenberg_block_core_navigation_block_tree_has_block_type(
+			$blocks,
+			'core/navigation-overlay-close'
+		);
+
+		$this->assertTrue( $result );
+	}
+
+	/**
+	 * Test that gutenberg_block_core_navigation_block_tree_has_block_type finds a deeply nested block.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::gutenberg_block_core_navigation_block_tree_has_block_type
+	 */
+	public function test_gutenberg_block_core_navigation_block_tree_has_block_type_finds_nested_block() {
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:group -->
+			<div class="wp-block-group">
+				<!-- wp:columns -->
+				<div class="wp-block-columns">
+					<!-- wp:column -->
+					<div class="wp-block-column">
+						<!-- wp:navigation-overlay-close /-->
+					</div>
+					<!-- /wp:column -->
+				</div>
+				<!-- /wp:columns -->
+			</div>
+			<!-- /wp:group -->'
+		);
+		$blocks        = new WP_Block_List( $parsed_blocks, array() );
+
+		$result = gutenberg_block_core_navigation_block_tree_has_block_type(
+			$blocks,
+			'core/navigation-overlay-close'
+		);
+
+		$this->assertTrue( $result );
+	}
+
+	/**
+	 * Test that gutenberg_block_core_navigation_block_tree_has_block_type returns false when block is not found.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::gutenberg_block_core_navigation_block_tree_has_block_type
+	 */
+	public function test_gutenberg_block_core_navigation_block_tree_has_block_type_returns_false_when_not_found() {
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:paragraph --><p>Test</p><!-- /wp:paragraph --><!-- wp:heading --><h2>Title</h2><!-- /wp:heading -->'
+		);
+		$blocks        = new WP_Block_List( $parsed_blocks, array() );
+
+		$result = gutenberg_block_core_navigation_block_tree_has_block_type(
+			$blocks,
+			'core/navigation-overlay-close'
+		);
+
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Test that gutenberg_block_core_navigation_block_tree_has_block_type skips searching inside specified block types.
+	 *
+	 * @group navigation-renderer
+	 *
+	 * @covers ::gutenberg_block_core_navigation_block_tree_has_block_type
+	 */
+	public function test_gutenberg_block_core_navigation_block_tree_has_block_type_skips_specified_blocks() {
+		$parsed_blocks = parse_blocks(
+			'<!-- wp:navigation -->
+			<nav class="wp-block-navigation">
+				<!-- wp:navigation-link /-->
+			</nav>
+			<!-- /wp:navigation -->'
+		);
+		$blocks        = new WP_Block_List( $parsed_blocks, array() );
+
+		// Should NOT find the block because it's inside a navigation block which we're skipping
+		$result = gutenberg_block_core_navigation_block_tree_has_block_type(
+			$blocks,
+			'core/navigation-link',
+			array( 'core/navigation' )
+		);
+
+		$this->assertFalse( $result );
+	}
 }

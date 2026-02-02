@@ -2,19 +2,29 @@
  * WordPress dependencies
  */
 import { useState, useCallback, useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	privateApis as coreDataPrivateApis,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { resolveSelect } from '@wordpress/data';
-import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
+import { resolveSelect, useDispatch, useSelect } from '@wordpress/data';
+import {
+	Modal,
+	DropZone,
+	FormFileUpload,
+	Button,
+	SnackbarList,
+} from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
 import type { View, Field, ActionButton } from '@wordpress/dataviews';
 import {
 	altTextField,
+	attachedToField,
+	authorField,
 	captionField,
+	dateAddedField,
+	dateModifiedField,
 	descriptionField,
 	filenameField,
 	filesizeField,
@@ -22,6 +32,8 @@ import {
 	mediaThumbnailField,
 	mimeTypeField,
 } from '@wordpress/media-fields';
+import { store as noticesStore } from '@wordpress/notices';
+import { isBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -36,6 +48,12 @@ const { useEntityRecordsWithPermissions } = unlock( coreDataPrivateApis );
 // Layout constants - matching the picker layout types
 const LAYOUT_PICKER_GRID = 'pickerGrid';
 const LAYOUT_PICKER_TABLE = 'pickerTable';
+
+// Custom notices context for the media modal
+const NOTICES_CONTEXT = 'media-modal';
+
+// Notice ID - reused for all upload-related notices to prevent flooding
+const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
 
 interface MediaUploadModalProps {
 	/**
@@ -157,6 +175,21 @@ export function MediaUploadModal( {
 			: [ String( value ) ];
 	} );
 
+	const {
+		createSuccessNotice,
+		createErrorNotice,
+		createInfoNotice,
+		removeNotice,
+	} = useDispatch( noticesStore );
+	// @ts-expect-error - invalidateResolution is not in the typed actions but is available at runtime
+	const { invalidateResolution } = useDispatch( coreStore );
+
+	// Get notices for this modal context
+	const notices = useSelect(
+		( select ) => select( noticesStore ).getNotices( NOTICES_CONTEXT ),
+		[]
+	);
+
 	// DataViews configuration - allow view updates
 	const [ view, setView ] = useState< View >( () => ( {
 		type: LAYOUT_PICKER_GRID,
@@ -181,12 +214,19 @@ export function MediaUploadModal( {
 			}
 			// Handle author filters
 			if ( filter.field === 'author' ) {
-				filters.author = filter.value;
+				if ( filter.operator === 'isAny' ) {
+					filters.author = filter.value;
+				} else if ( filter.operator === 'isNone' ) {
+					filters.author_exclude = filter.value;
+				}
 			}
 			// Handle date filters
-			if ( filter.field === 'date' ) {
-				filters.after = filter.value?.after;
-				filters.before = filter.value?.before;
+			if ( filter.field === 'date' || filter.field === 'modified' ) {
+				if ( filter.operator === 'before' ) {
+					filters.before = filter.value;
+				} else if ( filter.operator === 'after' ) {
+					filters.after = filter.value;
+				}
 			}
 			// Handle mime type filters
 			if ( filter.field === 'mime_type' ) {
@@ -208,6 +248,7 @@ export function MediaUploadModal( {
 			order: view.sort?.direction,
 			orderby: view.sort?.field,
 			search: view.search,
+			_embed: 'author,wp:attached-to',
 			...filters,
 		};
 	}, [ view, allowedTypes ] );
@@ -240,10 +281,14 @@ export function MediaUploadModal( {
 			altTextField as Field< RestAttachment >,
 			captionField as Field< RestAttachment >,
 			descriptionField as Field< RestAttachment >,
+			dateAddedField as Field< RestAttachment >,
+			dateModifiedField as Field< RestAttachment >,
+			authorField as Field< RestAttachment >,
 			filenameField as Field< RestAttachment >,
 			filesizeField as Field< RestAttachment >,
 			mediaDimensionsField as Field< RestAttachment >,
 			mimeTypeField as Field< RestAttachment >,
+			attachedToField as Field< RestAttachment >,
 		],
 		[]
 	);
@@ -296,18 +341,100 @@ export function MediaUploadModal( {
 	// Use onUpload if provided, otherwise fall back to uploadMedia
 	const handleUpload = onUpload || uploadMedia;
 
+	// Shared upload success handler
+	const handleUploadComplete = useCallback(
+		( attachments: Partial< Attachment >[] ) => {
+			// Check if all uploads are complete (no blob URLs)
+			const allComplete = attachments.every(
+				( attachment ) =>
+					attachment.id &&
+					attachment.url &&
+					! isBlobURL( attachment.url )
+			);
+
+			if ( allComplete && attachments.length > 0 ) {
+				// Show success notice (replaces progress notice via ID)
+				createSuccessNotice(
+					sprintf(
+						// translators: %s: number of files
+						_n(
+							'Uploaded %s file',
+							'Uploaded %s files',
+							attachments.length
+						),
+						attachments.length.toLocaleString()
+					),
+					{
+						type: 'snackbar',
+						context: NOTICES_CONTEXT,
+						id: NOTICE_ID_UPLOAD_PROGRESS,
+					}
+				);
+
+				// Invalidate the entity records resolution to refresh the view
+				invalidateResolution( 'getEntityRecords', [
+					'postType',
+					'attachment',
+					queryArgs,
+				] );
+			}
+		},
+		[ createSuccessNotice, invalidateResolution, queryArgs ]
+	);
+
+	// Shared upload error handler
+	const handleUploadError = useCallback(
+		( error: Error ) => {
+			// Show error notice (replaces progress notice via ID)
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+				context: NOTICES_CONTEXT,
+				id: NOTICE_ID_UPLOAD_PROGRESS,
+			} );
+		},
+		[ createErrorNotice ]
+	);
+
 	const handleFileSelect = useCallback(
 		( event: React.ChangeEvent< HTMLInputElement > ) => {
 			const files = event.target.files;
 			if ( files && files.length > 0 ) {
 				const filesArray = Array.from( files );
+
+				// Show upload start notice
+				createInfoNotice(
+					sprintf(
+						// translators: %s: number of files
+						_n(
+							'Uploading %s file',
+							'Uploading %s files',
+							filesArray.length
+						),
+						filesArray.length.toLocaleString()
+					),
+					{
+						type: 'snackbar',
+						context: NOTICES_CONTEXT,
+						id: NOTICE_ID_UPLOAD_PROGRESS,
+						explicitDismiss: true,
+					}
+				);
+
 				handleUpload( {
 					allowedTypes,
 					filesList: filesArray,
+					onFileChange: handleUploadComplete,
+					onError: handleUploadError,
 				} );
 			}
 		},
-		[ allowedTypes, handleUpload ]
+		[
+			allowedTypes,
+			handleUpload,
+			createInfoNotice,
+			handleUploadComplete,
+			handleUploadError,
+		]
 	);
 
 	const paginationInfo = useMemo(
@@ -325,7 +452,13 @@ export function MediaUploadModal( {
 				showTitle: false,
 			},
 			[ LAYOUT_PICKER_TABLE ]: {
-				fields: [ 'filename', 'filesize', 'media_dimensions' ],
+				fields: [
+					'filename',
+					'filesize',
+					'media_dimensions',
+					'author',
+					'date',
+				],
 				showTitle: true,
 			},
 		} ),
@@ -388,9 +521,30 @@ export function MediaUploadModal( {
 						);
 					}
 					if ( filteredFiles.length > 0 ) {
+						// Show upload start notice
+						createInfoNotice(
+							sprintf(
+								// translators: %s: number of files
+								_n(
+									'Uploading %s file',
+									'Uploading %s files',
+									filteredFiles.length
+								),
+								filteredFiles.length.toLocaleString()
+							),
+							{
+								type: 'snackbar',
+								context: NOTICES_CONTEXT,
+								id: NOTICE_ID_UPLOAD_PROGRESS,
+								explicitDismiss: true,
+							}
+						);
+
 						handleUpload( {
 							allowedTypes,
 							filesList: filteredFiles,
+							onFileChange: handleUploadComplete,
+							onError: handleUploadError,
 						} );
 					}
 				} }
@@ -411,6 +565,13 @@ export function MediaUploadModal( {
 				search={ search }
 				searchLabel={ searchLabel }
 				itemListLabel={ __( 'Media items' ) }
+			/>
+			<SnackbarList
+				notices={ notices.filter(
+					( { type } ) => type === 'snackbar'
+				) }
+				className="media-upload-modal__snackbar"
+				onRemove={ ( id ) => removeNotice( id, NOTICES_CONTEXT ) }
 			/>
 		</Modal>
 	);

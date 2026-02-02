@@ -1,11 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { Stack } from '../index';
 import { Box } from '../../box';
 
 const meta: Meta< typeof Stack > = {
 	title: 'Design System/Components/Stack',
 	component: Stack,
-	tags: [ 'status-experimental' ],
 };
 export default meta;
 

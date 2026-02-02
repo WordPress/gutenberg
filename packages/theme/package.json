@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "0.3.0",
+	"version": "0.6.0",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,29 +29,28 @@
 		"build-types",
 		"*.md"
 	],
-	"type": "module",
 	"main": "build/index.cjs",
-	"module": "build-module/index.js",
+	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.js",
+			"import": "./build-module/index.mjs",
 			"default": "./build/index.cjs"
 		},
 		"./design-tokens.css": "./src/prebuilt/css/design-tokens.css",
 		"./design-tokens.js": {
 			"types": "./build-types/prebuilt/js/design-tokens.d.ts",
-			"import": "./build-module/prebuilt/js/design-tokens.js",
+			"import": "./build-module/prebuilt/js/design-tokens.mjs",
 			"default": "./build/prebuilt/js/design-tokens.cjs"
 		},
 		"./stylelint-plugins/no-unknown-ds-tokens": {
 			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.ts",
-			"import": "./src/stylelint-plugins/no-unknown-ds-tokens.js",
+			"import": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs",
 			"default": "./build/stylelint-plugins/no-unknown-ds-tokens.cjs"
 		},
 		"./stylelint-plugins/no-setting-wpds-custom-properties": {
 			"types": "./build-types/stylelint-plugins/no-setting-wpds-custom-properties.d.ts",
-			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.js",
+			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
 			"default": "./build/stylelint-plugins/no-setting-wpds-custom-properties.cjs"
 		},
 		"./package.json": "./package.json"
@@ -62,7 +61,7 @@
 	"sideEffects": [
 		"src/color-ramps/lib/register-color-spaces.ts",
 		"build/color-ramps/lib/register-color-spaces.js",
-		"build-module/color-ramps/lib/register-color-spaces.js"
+		"build-module/color-ramps/lib/register-color-spaces.mjs"
 	],
 	"dependencies": {
 		"@wordpress/element": "file:../element",
@@ -71,10 +70,16 @@
 		"memize": "^2.1.0"
 	},
 	"devDependencies": {
+		"@storybook/react-vite": "^10.1.11",
 		"@terrazzo/cli": "^0.10.2",
 		"@terrazzo/plugin-css": "^0.10.2",
 		"@terrazzo/token-tools": "^0.10.2",
-		"esbuild-esm-loader": "0.3.3"
+		"@testing-library/jest-dom": "^6.6.3",
+		"@types/jest": "^29.5.14",
+		"@types/node": "^20.17.10",
+		"esbuild": "^0.27.2",
+		"esbuild-esm-loader": "^0.3.3",
+		"storybook": "^10.1.11"
 	},
 	"peerDependencies": {
 		"react": "^18.0.0",
@@ -90,9 +95,10 @@
 		"access": "public"
 	},
 	"scripts": {
+		"prelint:js": "npx esbuild src/prebuilt/js/design-tokens.mjs --format=cjs --outfile=build/prebuilt/js/design-tokens.cjs && node -e \"\"",
 		"build:default-ramps": "node --import=esbuild-esm-loader/register bin/generate-default-ramps/index.ts",
 		"build:tokens": "node --import=esbuild-esm-loader/register bin/generate-primitive-tokens/index.ts && cross-env NODE_OPTIONS=--import=esbuild-esm-loader/register tz build --config terrazzo.config.ts",
-		"build": "npm run build:tokens && npm run build:default-ramps",
+		"build": "npm run build:tokens && npm run build:default-ramps && npm run prelint:js",
 		"postbuild": "prettier --write tokens/color.json tokens/modes src/prebuilt src/color-ramps/lib/default-ramps.ts docs"
 	}
 }

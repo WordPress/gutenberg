@@ -126,18 +126,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-sync-collaboration',
-		__( 'Collaboration: add real time editing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables live collaboration and offline persistence between peers.', 'gutenberg' ),
-			'id'    => 'gutenberg-sync-collaboration',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-color-randomizer',
 		__( 'Color randomizer', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -186,27 +174,14 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-content-only-pattern-insertion',
-		__( 'contentOnly: Make patterns contentOnly by default upon insertion', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'When patterns are inserted, default to a simplified content only mode for editing pattern content.', 'gutenberg' ),
-			'id'    => 'gutenberg-content-only-pattern-insertion',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-content-only-inspector-fields',
-		__( 'contentOnly: Enable editable inspector fields', 'gutenberg' ),
+		__( 'Block fields: Show dataform driven inspector fields on blocks that support them', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label'    => __( 'Enables editable inspector fields (media, links, alt text, etc.) in the content-only pattern editing interface. Requires "contentOnly: Make patterns contentOnly by default upon insertion" to be enabled.', 'gutenberg' ),
-			'id'       => 'gutenberg-content-only-inspector-fields',
-			'requires' => 'gutenberg-content-only-pattern-insertion',
+			'label' => __( 'Enables editable block inspector fields that are generated using a dataform.', 'gutenberg' ),
+			'id'    => 'gutenberg-content-only-inspector-fields',
 		)
 	);
 
@@ -234,19 +209,6 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
-	// create a new experiment for hiding blocks based on screen size
-	add_settings_field(
-		'gutenberg-hide-blocks-based-on-screen-size',
-		__( 'Hide blocks based on screen size', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Extends block visibility block supports with responsive design controls for hiding blocks based on screen size.', 'gutenberg' ),
-			'id'    => 'gutenberg-hide-blocks-based-on-screen-size',
-		)
-	);
-
 	add_settings_field(
 		'gutenberg-extensible-site-editor',
 		__( 'Extensible Site Editor', 'gutenberg' ),
@@ -256,6 +218,30 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Redirects the default site editor (Appearance > Design) to use the extensible site editor page.', 'gutenberg' ),
 			'id'    => 'gutenberg-extensible-site-editor',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-media-editor',
+		__( 'Media Editor', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables editing media items (attachments) directly in the block editor with a dedicated media preview and metadata panel.', 'gutenberg' ),
+			'id'    => 'gutenberg-media-editor',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-svg-icon-registry',
+		__( 'SVG Icon Registration API', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables a REST API endpoint for accessing SVG icons.', 'gutenberg' ),
+			'id'    => 'gutenberg-svg-icon-registry',
 		)
 	);
 

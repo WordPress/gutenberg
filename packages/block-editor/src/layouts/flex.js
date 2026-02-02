@@ -71,8 +71,11 @@ export default {
 		onChange,
 		layoutBlockSupport = {},
 	} ) {
-		const { allowOrientation = true, allowJustification = true } =
-			layoutBlockSupport;
+		const {
+			allowOrientation = true,
+			allowJustification = true,
+			allowWrap = true,
+		} = layoutBlockSupport;
 		return (
 			<>
 				<Flex>
@@ -93,7 +96,9 @@ export default {
 						</FlexItem>
 					) }
 				</Flex>
-				<FlexWrapControl layout={ layout } onChange={ onChange } />
+				{ allowWrap && (
+					<FlexWrapControl layout={ layout } onChange={ onChange } />
+				) }
 			</>
 		);
 	},

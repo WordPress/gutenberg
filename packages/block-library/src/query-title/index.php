@@ -48,7 +48,7 @@ function render_block_core_query_title( $attributes, $content, $block ) {
 		if ( isset( $attributes['showSearchTerm'] ) && $attributes['showSearchTerm'] ) {
 			$title = sprintf(
 				/* translators: %s is the search term. */
-				__( 'Search results for: "%s"' ),
+				__( 'Search results for: &#8220;%s&#8221;' ),
 				get_search_query()
 			);
 		}
@@ -66,7 +66,7 @@ function render_block_core_query_title( $attributes, $content, $block ) {
 		if ( $show_prefix ) {
 			$title = sprintf(
 				/* translators: %s is the post type name. */
-				__( 'Post Type: "%s"' ),
+				__( 'Post Type: &#8220;%s&#8221;' ),
 				$post_type_name
 			);
 		} else {

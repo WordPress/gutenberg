@@ -49,7 +49,7 @@ if ( ! function_exists( '{{PREFIX}}_register_package_styles' ) ) {
 		$suffix          = SCRIPT_DEBUG ? '' : '.min';
 
 		$styles_dir  = __DIR__ . '/styles';
-		$styles_file = $styles_dir . '/index.php';
+		$styles_file = $styles_dir . '/registry.php';
 
 		if ( ! file_exists( $styles_file ) ) {
 			return;

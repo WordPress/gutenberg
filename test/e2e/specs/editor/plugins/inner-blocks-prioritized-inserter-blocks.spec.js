@@ -29,7 +29,7 @@ test.describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 				name: 'test/prioritized-inserter-blocks-unset',
 			} );
 
-			const block = page.getByRole( 'document', {
+			const block = editor.canvas.getByRole( 'document', {
 				name: 'Block: Prioritized Inserter Blocks Unset',
 			} );
 
@@ -54,7 +54,7 @@ test.describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 				name: 'test/prioritized-inserter-blocks-set',
 			} );
 
-			const block = page.getByRole( 'document', {
+			const block = editor.canvas.getByRole( 'document', {
 				name: 'Block: Prioritized Inserter Blocks Set',
 			} );
 
@@ -86,7 +86,7 @@ test.describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 				name: 'test/prioritized-inserter-blocks-set-with-conflicting-allowed-blocks',
 			} );
 
-			const block = page.getByRole( 'document', {
+			const block = editor.canvas.getByRole( 'document', {
 				name: 'Prioritized Inserter Blocks Set With Conflicting Allowed Blocks',
 			} );
 
@@ -121,7 +121,7 @@ test.describe( 'Prioritized Inserter Blocks Setting on InnerBlocks', () => {
 				name: 'test/prioritized-inserter-blocks-set',
 			} );
 
-			const imageBlock = page
+			const imageBlock = editor.canvas
 				.getByRole( 'document', {
 					name: 'Block: Prioritized Inserter Blocks Set',
 				} )

@@ -26,7 +26,11 @@ import { layout } from '@wordpress/icons';
  * Internal dependencies
  */
 import { unlock } from '../lock-unlock';
-import { getDefaultViewLegacy, DEFAULT_LAYOUTS } from './view-utils';
+import {
+	DEFAULT_VIEW_LEGACY,
+	getActiveFiltersForTabLegacy,
+	DEFAULT_LAYOUTS,
+} from './view-utils';
 import { previewField } from './fields/preview';
 import { authorField } from './fields/author';
 import { descriptionField } from './fields/description';
@@ -59,9 +63,11 @@ function TemplateListLegacy() {
 		( select ) => select( coreStore ).getPostType( 'wp_template' ),
 		[]
 	);
-	const defaultView: View = useMemo( () => {
-		return getDefaultViewLegacy( activeView );
-	}, [ activeView ] );
+	const defaultView = DEFAULT_VIEW_LEGACY;
+	const activeFilters = useMemo(
+		() => getActiveFiltersForTabLegacy( activeView ),
+		[ activeView ]
+	);
 
 	// Callback to handle URL query parameter changes
 	const handleQueryParamsChange = useCallback(
@@ -80,8 +86,9 @@ function TemplateListLegacy() {
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
 		name: 'wp_template',
-		slug: activeView,
+		slug: 'default-new',
 		defaultView,
+		activeFilters,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );

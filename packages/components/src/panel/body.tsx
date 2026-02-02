@@ -147,5 +147,6 @@ const PanelBodyTitle = forwardRef(
 );
 
 export const PanelBody = forwardRef( UnforwardedPanelBody );
+PanelBody.displayName = 'PanelBody';
 
 export default PanelBody;

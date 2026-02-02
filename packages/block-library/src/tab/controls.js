@@ -14,6 +14,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import AddTabToolbarControl from './add-tab-toolbar-control';
+import RemoveTabToolbarControl from './remove-tab-toolbar-control';
 import slugFromLabel from './slug-from-label';
 
 export default function Controls( {
@@ -29,12 +30,10 @@ export default function Controls( {
 
 	return (
 		<>
-			<AddTabToolbarControl
-				tabsClientId={ tabsClientId }
-				attributes={ attributes }
-			/>
+			<AddTabToolbarControl tabsClientId={ tabsClientId } />
+			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
 			<InspectorControls>
-				<PanelBody title={ __( 'Tab Settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
 						label={ __( 'Tab Label' ) }
 						value={ decodeEntities( label ) }

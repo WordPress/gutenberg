@@ -315,7 +315,7 @@ function ListItem< Item >( {
 					gap="sm"
 					justify="start"
 					align="flex-start"
-					style={ { flex: 1 } }
+					style={ { flex: 1, minWidth: 0 } }
 				>
 					{ renderedMediaField }
 					<Stack
@@ -325,9 +325,8 @@ function ListItem< Item >( {
 					>
 						<Stack direction="row" align="center">
 							<div
-								className="dataviews-title-field"
+								className="dataviews-title-field dataviews-view-list__title-field"
 								id={ labelId }
-								style={ { flex: 1 } }
 							>
 								{ renderedTitleField }
 							</div>
@@ -609,7 +608,13 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			<Composite
 				id={ baseId }
 				render={ <div /> }
-				className={ clsx( 'dataviews-view-list', className ) }
+				className={ clsx( 'dataviews-view-list', className, {
+					[ `has-${ view.layout?.density }-density` ]:
+						view.layout?.density &&
+						[ 'compact', 'comfortable' ].includes(
+							view.layout.density
+						),
+				} ) }
 				role={ view.infiniteScrollEnabled ? 'feed' : 'grid' }
 				activeId={ activeCompositeId }
 				setActiveId={ setActiveCompositeId }

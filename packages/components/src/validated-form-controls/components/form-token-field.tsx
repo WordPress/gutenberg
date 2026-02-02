@@ -65,3 +65,4 @@ const UnforwardedValidatedFormTokenField = (
 export const ValidatedFormTokenField = forwardRef(
 	UnforwardedValidatedFormTokenField
 );
+ValidatedFormTokenField.displayName = 'ValidatedFormTokenField';
