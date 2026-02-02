@@ -220,6 +220,9 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 			// If it's a main comment, update the block attributes with the comment id.
 			if ( ! parent && savedRecord?.id ) {
 				const clientId = getSelectedBlockClientId();
+				if ( ! clientId ) {
+					return savedRecord;
+				}
 				const metadata = getBlockAttributes( clientId )?.metadata;
 				const updatedMetadata = addNoteIdToMetadata(
 					metadata,
@@ -329,6 +332,9 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				// Use blockClientId if available, otherwise fall back to selected block
 				const clientId =
 					comment.blockClientId || getSelectedBlockClientId();
+				if ( ! clientId ) {
+					return;
+				}
 				const metadata = getBlockAttributes( clientId )?.metadata;
 				const updatedMetadata = removeNoteIdFromMetadata(
 					metadata,

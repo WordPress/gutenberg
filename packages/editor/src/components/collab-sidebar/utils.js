@@ -99,7 +99,7 @@ export function getCommentExcerpt( text, excerptLength = 10 ) {
  * @return {number[]} Array of note IDs (may be empty)
  */
 export function getNoteIdsFromMetadata( metadata ) {
-	if ( ! metadata || metadata.noteId === undefined ) {
+	if ( ! metadata || metadata.noteId === null ) {
 		return [];
 	}
 	// New format: noteId is an array
@@ -107,7 +107,7 @@ export function getNoteIdsFromMetadata( metadata ) {
 		return metadata.noteId.filter( Boolean );
 	}
 	// Legacy format: noteId is a scalar
-	return [ metadata.noteId ];
+	return metadata.noteId ? [ metadata.noteId ] : [];
 }
 
 /**
