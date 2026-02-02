@@ -88,6 +88,9 @@ const v5 = {
 			type: 'string',
 		},
 	},
+	supports: {
+		anchor: true,
+	},
 	save( { attributes } ) {
 		const { textAlign, citation, value } = attributes;
 		const shouldShowCitation = ! RichText.isEmpty( citation );
@@ -122,6 +125,9 @@ const v5 = {
 const v4 = {
 	attributes: {
 		...blockAttributes,
+	},
+	supports: {
+		anchor: true,
 	},
 	save( { attributes } ) {
 		const {
