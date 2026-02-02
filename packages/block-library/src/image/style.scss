@@ -284,21 +284,11 @@
 	}
 
 	.wp-lightbox-navigation-button-prev {
-		right: calc(50% + 8px);
-
-		@include break-large() {
-			right: auto;
-			left: calc(env(safe-area-inset-left) + 16px);
-		}
+		left: calc(env(safe-area-inset-left) + 16px);
 	}
 
 	.wp-lightbox-navigation-button-next {
-		left: calc(50% + 8px);
-
-		@include break-large() {
-			left: auto;
-			right: calc(env(safe-area-inset-right) + 16px);
-		}
+		right: calc(env(safe-area-inset-right) + 16px);
 	}
 
 	.wp-lightbox-navigation-icon svg {
