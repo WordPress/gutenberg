@@ -784,7 +784,6 @@ function BlockListBlockProvider( props ) {
 		bindableAttributes,
 		blockVisibility,
 		deviceType,
-		canvasWidth,
 	} = selectedProps;
 
 	// Use block visibility hook with data from existing useSelect to avoid extra subscription
