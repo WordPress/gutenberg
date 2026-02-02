@@ -32,29 +32,33 @@ import { useEntityBinding } from '../shared/use-entity-binding';
  * Given the Link block's type attribute, return the query params to give to
  * /wp/v2/search.
  *
- * @param {string} type Link block's type attribute.
- * @param {string} kind Link block's entity of kind (post-type|taxonomy)
- * @return {{ type?: string, subtype?: string }} Search query params.
+ * @param {string}  type           Link block's type attribute.
+ * @param {string}  kind           Link block's entity of kind (post-type|taxonomy)
+ * @param {boolean} noEntitySearch Whether to disable entity search.
+ * @return {{ type?: string, subtype?: string, noEntitySearch?: boolean }} Search query params.
  */
-export function getSuggestionsQuery( type, kind ) {
+export function getSuggestionsQuery( type, kind, noEntitySearch = false ) {
+	const baseQuery = noEntitySearch ? { noEntitySearch: true } : {};
+
 	switch ( type ) {
 		case 'post':
 		case 'page':
-			return { type: 'post', subtype: type };
+			return { ...baseQuery, type: 'post', subtype: type };
 		case 'category':
-			return { type: 'term', subtype: 'category' };
+			return { ...baseQuery, type: 'term', subtype: 'category' };
 		case 'tag':
-			return { type: 'term', subtype: 'post_tag' };
+			return { ...baseQuery, type: 'term', subtype: 'post_tag' };
 		case 'post_format':
-			return { type: 'post-format' };
+			return { ...baseQuery, type: 'post-format' };
 		default:
 			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type };
+				return { ...baseQuery, type: 'term', subtype: type };
 			}
 			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type };
+				return { ...baseQuery, type: 'post', subtype: type };
 			}
 			return {
+				...baseQuery,
 				// for custom link which has no type
 				// always show pages as initial suggestions
 				initialSuggestionsSearchOptions: {
@@ -143,6 +147,10 @@ function UnforwardedLinkUI( props, ref ) {
 
 	const blockEditingMode = useBlockEditingMode();
 
+	// Custom Link variation is identified by having no type.
+	// When true, disable entity search but keep URL suggestions.
+	const isCustomLinkVariation = ! type;
+
 	return (
 		<Popover
 			ref={ ref }
@@ -171,11 +179,15 @@ function UnforwardedLinkUI( props, ref ) {
 						hasTextControl
 						hasRichPreviews
 						value={ link }
-						showInitialSuggestions
+						showInitialSuggestions={ ! isCustomLinkVariation }
 						withCreateSuggestion={ false }
 						noDirectEntry={ !! type }
 						noURLSuggestion={ !! type }
-						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
+						suggestionsQuery={ getSuggestionsQuery(
+							type,
+							kind,
+							isCustomLinkVariation
+						) }
 						onChange={ props.onChange }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }

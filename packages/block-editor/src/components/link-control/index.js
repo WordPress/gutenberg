@@ -104,6 +104,7 @@ import { DEFAULT_LINK_SETTINGS } from './constants';
  * @property {boolean=}                   withCreateSuggestion       Whether to allow creation of link value from suggestion.
  * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
  * @property {boolean=}                   noURLSuggestion            Whether to add a fallback suggestion which treats the search query as a URL.
+ * @property {boolean=}                   noEntitySearch             Whether to disable entity-based search (posts, pages, terms). When true, only URL-like suggestions will be shown.
  * @property {boolean=}                   hasTextControl             Whether to add a text field to the UI to update the value.title.
  * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
  * @property {Function}                   renderControlBottom        Optional controls to be rendered at the bottom of the component.
@@ -138,6 +139,7 @@ function LinkControl( {
 	inputValue: propInputValue = '',
 	suggestionsQuery = {},
 	noURLSuggestion = false,
+	noEntitySearch = false,
 	createSuggestionButtonText,
 	hasRichPreviews = false,
 	hasTextControl = false,
@@ -467,6 +469,7 @@ function LinkControl( {
 							showSuggestions={ showSuggestions }
 							suggestionsQuery={ suggestionsQuery }
 							withURLSuggestion={ ! noURLSuggestion }
+							noEntitySearch={ noEntitySearch }
 							createSuggestionButtonText={
 								createSuggestionButtonText
 							}

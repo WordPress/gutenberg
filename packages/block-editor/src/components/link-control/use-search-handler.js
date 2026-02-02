@@ -126,9 +126,23 @@ export default function useSearchHandler(
 		? handleDirectEntry
 		: handleNoop;
 
+	// Extract noEntitySearch from suggestionsQuery if provided.
+	// This allows disabling entity search without changing the function signature.
+	const noEntitySearch = suggestionsQuery?.noEntitySearch ?? false;
+
 	return useCallback(
 		( val, { isInitialSuggestions } ) => {
-			return isURLLike( val )
+			const isUrlLike = isURLLike( val );
+
+			// When noEntitySearch is true, only show suggestions for URL-like input.
+			// For non-URL input, return empty results instead of searching entities.
+			if ( noEntitySearch ) {
+				return isUrlLike
+					? directEntryHandler( val, { isInitialSuggestions } )
+					: Promise.resolve( [] );
+			}
+
+			return isUrlLike
 				? directEntryHandler( val, { isInitialSuggestions } )
 				: handleEntitySearch(
 						val,
@@ -142,6 +156,7 @@ export default function useSearchHandler(
 		[
 			directEntryHandler,
 			fetchSearchSuggestions,
+			noEntitySearch,
 			pageOnFront,
 			pageForPosts,
 			suggestionsQuery,
