@@ -244,32 +244,9 @@
 
 	.wp-lightbox-navigation-button-prev,
 	.wp-lightbox-navigation-button-next {
-		display: none;
 		position: absolute;
-		top: 50%;
-		transform: translateY(-50%);
 		padding: 0 8px;
-		cursor: pointer;
 		z-index: 2000002;
-
-		&[hidden] {
-			display: none;
-		}
-
-		@include break-mobile() {
-			display: flex;
-		}
-	}
-
-	.wp-lightbox-navigation-button-prev {
-		left: calc(env(safe-area-inset-left) + 16px);
-	}
-
-	.wp-lightbox-navigation-button-next {
-		right: calc(env(safe-area-inset-right) + 16px);
-	}
-
-	.wp-lightbox-navigation-button {
 		font-family: inherit;
 		min-width: 40px; // equivalent to $button-size-next-default-40px
 		min-height: 40px; // equivalent to $button-size-next-default-40px;
@@ -278,6 +255,16 @@
 		cursor: pointer;
 		align-items: center;
 		justify-content: center;
+		bottom: 16px;
+
+		&[hidden] {
+			display: none;
+		}
+
+		@include break-large() {
+			bottom: 50%;
+			transform: translateY(-50%);
+		}
 
 		&:hover,
 		&:focus,
@@ -290,6 +277,24 @@
 		&:has(.wp-lightbox-navigation-text:not([hidden])) .wp-lightbox-navigation-icon svg {
 			width: 1.5em;
 			height: 1.5em;
+		}
+	}
+
+	.wp-lightbox-navigation-button-prev {
+		right: calc(50% + 8px);
+
+		@include break-large() {
+			right: auto;
+			left: calc(env(safe-area-inset-left) + 16px);
+		}
+	}
+
+	.wp-lightbox-navigation-button-next {
+		left: calc(50% + 8px);
+
+		@include break-large() {
+			left: auto;
+			right: calc(env(safe-area-inset-right) + 16px);
 		}
 	}
 

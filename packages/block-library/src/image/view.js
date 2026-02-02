@@ -535,13 +535,20 @@ const { state, actions, callbacks } = store(
 				// Calculates the final lightbox image size and the scale factor.
 				// MaxWidth is either the window container (accounting for padding) or
 				// the image resolution.
+
+				// 480px width or less
 				let horizontalPadding = 0;
-				if ( window.innerWidth > 480 ) {
-					horizontalPadding = state.hasNavigation ? 140 : 80;
-				} else if ( window.innerWidth > 1920 ) {
-					horizontalPadding = 160;
+				let verticalPadding = 160;
+				// Greater than 480px wide and less than or equal to 960px
+				if ( 480 < window.innerWidth ) {
+					horizontalPadding = 80;
+					verticalPadding = 160;
 				}
-				const verticalPadding = 80;
+				// Greater than 960px wide
+				if ( 960 < window.innerWidth ) {
+					horizontalPadding = state.hasNavigation ? 320 : 80;
+					verticalPadding = 80;
+				}
 
 				const targetMaxWidth = Math.min(
 					window.innerWidth - horizontalPadding,
