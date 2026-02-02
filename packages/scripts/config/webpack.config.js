@@ -119,9 +119,6 @@ const baseConfig = {
 	resolve: {
 		alias: {
 			'lodash-es': 'lodash',
-			// Force CommonJS version of wasm-vips to avoid import.meta usage
-			// which is not supported in non-module scripts.
-			'wasm-vips$': require.resolve( 'wasm-vips/lib/vips.js' ),
 		},
 		extensions: [ '.jsx', '.ts', '.tsx', '...' ],
 	},
