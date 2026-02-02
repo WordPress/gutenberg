@@ -106,6 +106,35 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		] );
 	} );
 
+	test( 'should not select list wrapper when pressing arrow up from list', async ( {
+		editor,
+		page,
+		writingFlowUtils,
+	} ) => {
+		// Insert a paragraph block first.
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: 'First paragraph' },
+		} );
+
+		// Insert a list block.
+		await editor.insertBlock( { name: 'core/list' } );
+		await page.keyboard.type( 'List item' );
+
+		// The caret is now inside the list item.
+		// Press ArrowUp - should skip the list wrapper and go to the paragraph.
+		await page.keyboard.press( 'ArrowUp' );
+
+		// Verify we're in the paragraph, NOT the list wrapper.
+		await expect
+			.poll( writingFlowUtils.getActiveBlockName )
+			.toBe( 'core/paragraph' );
+
+		// Verify the focused element has the paragraph content.
+		const activeElementLocator = editor.canvas.locator( ':focus' );
+		await expect( activeElementLocator ).toHaveText( 'First paragraph' );
+	} );
+
 	test( 'should navigate around inline boundaries', async ( {
 		editor,
 		page,

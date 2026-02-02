@@ -17,7 +17,7 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getBlockClientId, isInSameBlock } from '../../utils/dom';
+import { getBlockClientId } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -114,14 +114,13 @@ export function getClosestTabbable(
 	}
 
 	function isTabCandidate( node ) {
-		// Skip if there's only one child that is content editable (and thus a
-		// better candidate).
+		// If it's a block and there are nested focusable nodes, skip because
+		// there are better candidates.
 		if (
-			node.children.length === 1 &&
-			isInSameBlock( node, node.firstElementChild ) &&
-			node.firstElementChild.getAttribute( 'contenteditable' ) === 'true'
+			getBlockClientId( node ) &&
+			focus.focusable.find( node ).length !== 0
 		) {
-			return;
+			return false;
 		}
 
 		// Not a candidate if the node is not tabbable.
