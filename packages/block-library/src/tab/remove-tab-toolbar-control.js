@@ -91,7 +91,6 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 			<ToolbarGroup>
 				<ToolbarButton
 					className="components-toolbar__control"
-					label={ __( 'Remove the current tab' ) }
 					onClick={ removeTab }
 					showTooltip
 					text={ __( 'Remove tab' ) }
