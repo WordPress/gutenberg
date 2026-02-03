@@ -33,6 +33,20 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	protected $json_encode_flags = JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP;
 
 	/**
+	 * Maximum length for guideline text strings.
+	 *
+	 * @var int
+	 */
+	const MAX_GUIDELINE_LENGTH = 5000;
+
+	/**
+	 * Maximum length for category label strings.
+	 *
+	 * @var int
+	 */
+	const MAX_LABEL_LENGTH = 200;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -644,10 +658,91 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 		}
 
 		if ( isset( $request['guideline_categories'] ) ) {
-			$prepared['content']['guideline_categories'] = $request['guideline_categories'];
+			$prepared['content']['guideline_categories'] = $this->sanitize_guideline_categories( $request['guideline_categories'] );
 		}
 
 		return $prepared;
+	}
+
+	/**
+	 * Sanitizes guideline categories data.
+	 *
+	 * Strips unknown category and property keys, validates block name format,
+	 * and runs wp_kses_post() on all string values.
+	 *
+	 * @param mixed $categories Raw guideline categories from the request.
+	 * @return array Sanitized guideline categories.
+	 */
+	protected function sanitize_guideline_categories( $categories ) {
+		if ( ! is_array( $categories ) ) {
+			return array();
+		}
+
+		$valid_categories = array( 'copy', 'images', 'site', 'blocks', 'other' );
+		$sanitized        = array_intersect_key( $categories, array_flip( $valid_categories ) );
+
+		foreach ( $sanitized as $key => &$category ) {
+			if ( ! is_array( $category ) ) {
+				unset( $sanitized[ $key ] );
+				continue;
+			}
+
+			if ( 'blocks' === $key ) {
+				$category = $this->sanitize_blocks_category( $category );
+			} else {
+				$category = $this->sanitize_standard_category( $category );
+			}
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Sanitizes a standard (non-blocks) guideline category.
+	 *
+	 * @param array $category Raw category data.
+	 * @return array Sanitized category data.
+	 */
+	private function sanitize_standard_category( $category ) {
+		$sanitized = array_intersect_key( $category, array_flip( array( 'label', 'guidelines' ) ) );
+
+		foreach ( $sanitized as $prop => &$value ) {
+			$value = is_string( $value ) ? wp_kses_post( $value ) : '';
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Sanitizes the blocks guideline category.
+	 *
+	 * @param array $blocks Raw blocks category data.
+	 * @return array Sanitized blocks category data.
+	 */
+	private function sanitize_blocks_category( $blocks ) {
+		$sanitized = array();
+
+		foreach ( $blocks as $block_name => $block_data ) {
+			if ( ! is_string( $block_name ) || ! preg_match( '/^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/', $block_name ) ) {
+				continue;
+			}
+
+			if ( ! is_array( $block_data ) ) {
+				continue;
+			}
+
+			$sanitized_block = array_intersect_key( $block_data, array_flip( array( 'guidelines' ) ) );
+
+			if ( isset( $sanitized_block['guidelines'] ) ) {
+				$sanitized_block['guidelines'] = is_string( $sanitized_block['guidelines'] )
+					? wp_kses_post( $sanitized_block['guidelines'] )
+					: '';
+			}
+
+			$sanitized[ $block_name ] = $sanitized_block;
+		}
+
+		return $sanitized;
 	}
 
 	/**
@@ -751,26 +846,59 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 					'description' => __( 'The guideline categories and their content.', 'gutenberg' ),
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit' ),
+					'arg_options' => array(
+						'validate_callback' => static function ( $value ) {
+							if ( ! is_array( $value ) && ! is_object( $value ) ) {
+								return new WP_Error(
+									'rest_invalid_param',
+									__( 'guideline_categories must be a JSON object.', 'gutenberg' ),
+									array( 'status' => 400 )
+								);
+							}
+							return true;
+						},
+						'sanitize_callback' => static function ( $value ) {
+							return (array) $value;
+						},
+					),
 					'properties'  => array(
 						'copy'   => array(
 							'type'       => 'object',
 							'properties' => array(
-								'label'      => array( 'type' => 'string' ),
-								'guidelines' => array( 'type' => 'string' ),
+								'label'      => array(
+									'type'      => 'string',
+									'maxLength' => self::MAX_LABEL_LENGTH,
+								),
+								'guidelines' => array(
+									'type'      => 'string',
+									'maxLength' => self::MAX_GUIDELINE_LENGTH,
+								),
 							),
 						),
 						'images' => array(
 							'type'       => 'object',
 							'properties' => array(
-								'label'      => array( 'type' => 'string' ),
-								'guidelines' => array( 'type' => 'string' ),
+								'label'      => array(
+									'type'      => 'string',
+									'maxLength' => self::MAX_LABEL_LENGTH,
+								),
+								'guidelines' => array(
+									'type'      => 'string',
+									'maxLength' => self::MAX_GUIDELINE_LENGTH,
+								),
 							),
 						),
 						'site'   => array(
 							'type'       => 'object',
 							'properties' => array(
-								'label'      => array( 'type' => 'string' ),
-								'guidelines' => array( 'type' => 'string' ),
+								'label'      => array(
+									'type'      => 'string',
+									'maxLength' => self::MAX_LABEL_LENGTH,
+								),
+								'guidelines' => array(
+									'type'      => 'string',
+									'maxLength' => self::MAX_GUIDELINE_LENGTH,
+								),
 							),
 						),
 						'blocks' => array(
@@ -778,15 +906,24 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 							'additionalProperties' => array(
 								'type'       => 'object',
 								'properties' => array(
-									'guidelines' => array( 'type' => 'string' ),
+									'guidelines' => array(
+										'type'      => 'string',
+										'maxLength' => self::MAX_GUIDELINE_LENGTH,
+									),
 								),
 							),
 						),
 						'other'  => array(
 							'type'       => 'object',
 							'properties' => array(
-								'label'      => array( 'type' => 'string' ),
-								'guidelines' => array( 'type' => 'string' ),
+								'label'      => array(
+									'type'      => 'string',
+									'maxLength' => self::MAX_LABEL_LENGTH,
+								),
+								'guidelines' => array(
+									'type'      => 'string',
+									'maxLength' => self::MAX_GUIDELINE_LENGTH,
+								),
 							),
 						),
 					),
