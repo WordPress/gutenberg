@@ -685,11 +685,12 @@ button.wp-block-navigation-item__content {
 			max-width: none;
 		}
 
-		// When menu is open with custom overlay, hide default navigation and show overlay.
+		// When menu is open with custom overlay, hide all default content (nav + any sibling
+		// blocks e.g. buttons) and show overlay. Using .wp-block-navigation__default-content
+		// ensures the entire default block is hidden, not just the ul container.
 		&.is-menu-open {
 			.wp-block-navigation__responsive-container-content {
-				// Hides the content of the non-overlay navigation.
-				> .wp-block-navigation__container {
+				.wp-block-navigation__default-content {
 					display: none;
 				}
 

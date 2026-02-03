@@ -799,6 +799,14 @@ class WP_Navigation_Block_Renderer {
 			);
 		}
 
+		// When using a custom overlay, wrap the default nav content so it can be hidden
+		// when the overlay is open (avoiding duplicate menu + e.g. buttons). Unwrapped
+		// content is shown on desktop; overlay is shown when menu is open.
+		$responsive_container_inner_content = $inner_blocks_html;
+		if ( $has_custom_overlay && ! empty( $inner_blocks_html ) ) {
+			$responsive_container_inner_content = '<div class="wp-block-navigation__default-content">' . $inner_blocks_html . '</div>';
+		}
+
 		return sprintf(
 			'<button aria-haspopup="dialog" %3$s class="%6$s" %10$s>%8$s</button>
 				<div class="%5$s" %7$s id="%1$s" %11$s>
@@ -813,7 +821,7 @@ class WP_Navigation_Block_Renderer {
 					</div>
 				</div>',
 			esc_attr( $modal_unique_id ),
-			$inner_blocks_html,
+			$responsive_container_inner_content,
 			$toggle_aria_label_open,
 			$toggle_aria_label_close,
 			esc_attr( trim( implode( ' ', $responsive_container_classes ) ) ),
