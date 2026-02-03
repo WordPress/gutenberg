@@ -46,7 +46,7 @@ function render_block_core_icon( $attributes ) {
 	if ( ! $label ) {
 		$processor->set_attribute( 'title', esc_html( $label ) );
 	}
-	
+
 	// Return the updated SVG markup.
 	$svg = $processor->get_updated_html();
 	return '<div ' . get_block_wrapper_attributes() . '>' . $svg . '</div>';
