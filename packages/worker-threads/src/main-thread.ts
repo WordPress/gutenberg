@@ -17,7 +17,7 @@ import { WORKER_SYMBOL, type Remote, type WithWorker } from './types';
  * Debug logging for client side media.
  * Set to true to enable debug logging.
  */
-const DEBUG_ENABLED = true;
+const DEBUG_ENABLED = false;
 
 function workerLog( message: string, data?: Record< string, unknown > ): void {
 	if ( ! DEBUG_ENABLED ) {
