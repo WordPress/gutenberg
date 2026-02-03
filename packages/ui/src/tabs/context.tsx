@@ -113,7 +113,7 @@ export function TabsValidationProvider( {
 					`Tabs: Found Tab(s) without matching Panel(s). ` +
 						`Each Tab should have a corresponding Panel with the same \`value\` prop. ` +
 						`Tab value(s) without panels: ${ tabsWithoutPanels
-							.map( ( v ) => JSON.stringify( v ) )
+							.map( String )
 							.join( ', ' ) }`
 				);
 			}
@@ -124,7 +124,7 @@ export function TabsValidationProvider( {
 					`Tabs: Found Panel(s) without matching Tab(s). ` +
 						`Each Panel should have a corresponding Tab with the same \`value\` prop. ` +
 						`Panel value(s) without tabs: ${ panelsWithoutTabs
-							.map( ( v ) => JSON.stringify( v ) )
+							.map( String )
 							.join( ', ' ) }`
 				);
 			}

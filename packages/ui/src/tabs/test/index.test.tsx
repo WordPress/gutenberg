@@ -2329,7 +2329,7 @@ describe( 'Tabs', () => {
 			} );
 
 			expect( consoleWarnSpy ).toHaveBeenCalledWith(
-				expect.stringContaining( '"three"' )
+				expect.stringContaining( 'three' )
 			);
 
 			consoleWarnSpy.mockRestore();
@@ -2364,7 +2364,7 @@ describe( 'Tabs', () => {
 			} );
 
 			expect( consoleWarnSpy ).toHaveBeenCalledWith(
-				expect.stringContaining( '"orphan"' )
+				expect.stringContaining( 'orphan' )
 			);
 
 			consoleWarnSpy.mockRestore();
@@ -2422,15 +2422,15 @@ describe( 'Tabs', () => {
 
 			// Check for tabs without panels warning
 			expect( consoleWarnSpy ).toHaveBeenCalledWith(
-				expect.stringContaining( '"orphan-tab-1"' )
+				expect.stringContaining( 'orphan-tab-1' )
 			);
 			expect( consoleWarnSpy ).toHaveBeenCalledWith(
-				expect.stringContaining( '"orphan-tab-2"' )
+				expect.stringContaining( 'orphan-tab-2' )
 			);
 
 			// Check for panels without tabs warning
 			expect( consoleWarnSpy ).toHaveBeenCalledWith(
-				expect.stringContaining( '"orphan-panel"' )
+				expect.stringContaining( 'orphan-panel' )
 			);
 
 			consoleWarnSpy.mockRestore();
