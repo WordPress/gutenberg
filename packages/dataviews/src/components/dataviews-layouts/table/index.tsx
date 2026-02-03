@@ -405,281 +405,335 @@ function ViewTable< Item >( {
 	// If new data are loading but previous loaded data were empty,
 	// keep showing just the spinner.
 	const isRefreshing = ! isInfiniteScroll && isLoading && hasData;
+	const noResults = ! hasData && ! isLoading;
+	// Determine if we should show loading spinner. Infinite scroll has
+	// different logic and spinner.
+	const showLoadingSpinner = ! hasData && isLoading;
 	return (
 		<>
-			<table
-				className={ clsx( 'dataviews-view-table', className, {
-					[ `has-${ view.layout?.density }-density` ]:
-						view.layout?.density &&
-						[ 'compact', 'comfortable' ].includes(
-							view.layout.density
-						),
-					'has-bulk-actions': hasBulkActions,
-					'is-refreshing': isRefreshing,
-				} ) }
-				aria-busy={ isLoading }
-				aria-describedby={ tableNoticeId }
-				role={ isInfiniteScroll ? 'feed' : undefined }
-				// @ts-ignore Reason: inert is a recent HTML attribute
-				inert={ isRefreshing ? 'true' : undefined }
-			>
-				<colgroup>
-					{ hasBulkActions && (
-						<col className="dataviews-view-table__col-checkbox" />
-					) }
-					{ hasPrimaryColumn && (
-						<col className="dataviews-view-table__col-first-data" />
-					) }
-					{ columns.map( ( column, index ) => (
-						<col
-							key={ `col-${ column }` }
-							className={ clsx(
-								`dataviews-view-table__col-${ column }`,
-								{
-									'dataviews-view-table__col-expand':
-										! hasPrimaryColumn &&
-										index === columns.length - 1,
-								}
-							) }
-						/>
-					) ) }
-					{ !! actions?.length && (
-						<col className="dataviews-view-table__col-actions" />
-					) }
-				</colgroup>
-				{ contextMenuAnchor && (
-					<Popover
-						anchor={ contextMenuAnchor }
-						onClose={ () => setContextMenuAnchor( null ) }
-						placement="bottom-start"
-					>
-						<PropertiesSection showLabel={ false } />
-					</Popover>
-				) }
-				<thead onContextMenu={ handleHeaderContextMenu }>
-					<tr className="dataviews-view-table__row">
-						{ hasBulkActions && (
-							<th
-								className="dataviews-view-table__checkbox-column"
-								scope="col"
-								onContextMenu={ handleHeaderContextMenu }
-							>
-								<BulkSelectionCheckbox
-									selection={ selection }
-									onChangeSelection={ onChangeSelection }
-									data={ displayData }
-									actions={ actions }
-									getItemId={ getItemId }
-								/>
-							</th>
-						) }
-						{ hasPrimaryColumn && (
-							<th scope="col">
-								{ titleField && (
-									<ColumnHeaderMenu
-										ref={ headerMenuRef(
-											titleField.id,
-											0
-										) }
-										fieldId={ titleField.id }
-										view={ view }
-										fields={ fields }
-										onChangeView={ onChangeView }
-										onHide={ onHide }
-										setOpenedFilter={ setOpenedFilter }
-										canMove={ false }
-										canInsertLeft={
-											isRtl
-												? view.layout?.enableMoving ??
-												  true
-												: false
-										}
-										canInsertRight={
-											isRtl
-												? false
-												: view.layout?.enableMoving ??
-												  true
-										}
-									/>
-								) }
-							</th>
-						) }
-						{ columns.map( ( column, index ) => {
-							// Explicit picks the supported styles.
-							const { width, maxWidth, minWidth, align } =
-								view.layout?.styles?.[ column ] ?? {};
-							const canInsertOrMove =
-								view.layout?.enableMoving ?? true;
-							return (
-								<th
-									key={ column }
-									style={ {
-										width,
-										maxWidth,
-										minWidth,
-										textAlign: align,
-									} }
-									aria-sort={
-										view.sort?.direction &&
-										view.sort?.field === column
-											? sortValues[ view.sort.direction ]
-											: undefined
-									}
-									scope="col"
-								>
-									<ColumnHeaderMenu
-										ref={ headerMenuRef( column, index ) }
-										fieldId={ column }
-										view={ view }
-										fields={ fields }
-										onChangeView={ onChangeView }
-										onHide={ onHide }
-										setOpenedFilter={ setOpenedFilter }
-										canMove={ canInsertOrMove }
-										canInsertLeft={ canInsertOrMove }
-										canInsertRight={ canInsertOrMove }
-									/>
-								</th>
-							);
+			{ ! noResults && ! showLoadingSpinner && (
+				<>
+					<table
+						className={ clsx( 'dataviews-view-table', className, {
+							[ `has-${ view.layout?.density }-density` ]:
+								view.layout?.density &&
+								[ 'compact', 'comfortable' ].includes(
+									view.layout.density
+								),
+							'has-bulk-actions': hasBulkActions,
+							'is-refreshing': isRefreshing,
 						} ) }
-						{ !! actions?.length && (
-							<th
-								className={ clsx(
-									'dataviews-view-table__actions-column',
-									{
-										'dataviews-view-table__actions-column--sticky':
-											true,
-										'dataviews-view-table__actions-column--stuck':
-											! isHorizontalScrollEnd,
-									}
-								) }
-							>
-								<span className="dataviews-view-table-header">
-									{ __( 'Actions' ) }
-								</span>
-							</th>
-						) }
-					</tr>
-				</thead>
-				{ /* Render grouped data if groupBy is specified */ }
-				{ hasData && groupField && dataByGroup ? (
-					Array.from( dataByGroup.entries() ).map(
-						( [ groupName, groupItems ] ) => (
-							<tbody key={ `group-${ groupName }` }>
-								<tr className="dataviews-view-table__group-header-row">
-									<td
-										colSpan={
-											columns.length +
-											( hasPrimaryColumn ? 1 : 0 ) +
-											( hasBulkActions ? 1 : 0 ) +
-											( actions?.length ? 1 : 0 )
+						aria-busy={ isLoading }
+						aria-describedby={ tableNoticeId }
+						role={ isInfiniteScroll ? 'feed' : undefined }
+						// @ts-ignore Reason: inert is a recent HTML attribute
+						inert={ isRefreshing ? 'true' : undefined }
+					>
+						<colgroup>
+							{ hasBulkActions && (
+								<col className="dataviews-view-table__col-checkbox" />
+							) }
+							{ hasPrimaryColumn && (
+								<col className="dataviews-view-table__col-first-data" />
+							) }
+							{ columns.map( ( column, index ) => (
+								<col
+									key={ `col-${ column }` }
+									className={ clsx(
+										`dataviews-view-table__col-${ column }`,
+										{
+											'dataviews-view-table__col-first-data':
+												! hasPrimaryColumn &&
+												index === columns.length - 1,
 										}
-										className="dataviews-view-table__group-header-cell"
-									>
-										{ view.groupBy?.showLabel === false
-											? groupName
-											: sprintf(
-													// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
-													__( '%1$s: %2$s' ),
-													groupField.label,
-													groupName
-											  ) }
-									</td>
-								</tr>
-								{ groupItems.map( ( item, index ) => (
-									<TableRow
-										key={ getItemId( item ) }
-										item={ item }
-										level={
-											view.showLevels &&
-											typeof getItemLevel === 'function'
-												? getItemLevel( item )
-												: undefined
-										}
-										hasBulkActions={ hasBulkActions }
-										actions={ actions }
-										fields={ fields }
-										id={
-											getItemId( item ) ||
-											index.toString()
-										}
-										view={ view }
-										titleField={ titleField }
-										mediaField={ mediaField }
-										descriptionField={ descriptionField }
-										selection={ selection }
-										getItemId={ getItemId }
-										onChangeSelection={ onChangeSelection }
-										onClickItem={ onClickItem }
-										renderItemLink={ renderItemLink }
-										isItemClickable={ isItemClickable }
-										isActionsColumnSticky={
-											! isHorizontalScrollEnd
-										}
-									/>
-								) ) }
-							</tbody>
-						)
-					)
-				) : (
-					<tbody>
-						{ hasData &&
-							displayData.map( ( item, index ) => (
-								<TableRow
-									key={ getItemId( item ) }
-									item={ item }
-									level={
-										view.showLevels &&
-										typeof getItemLevel === 'function'
-											? getItemLevel( item )
-											: undefined
-									}
-									hasBulkActions={ hasBulkActions }
-									actions={ actions }
-									fields={ fields }
-									id={ getItemId( item ) || index.toString() }
-									view={ view }
-									titleField={ titleField }
-									mediaField={ mediaField }
-									descriptionField={ descriptionField }
-									selection={ selection }
-									getItemId={ getItemId }
-									onChangeSelection={ onChangeSelection }
-									onClickItem={ onClickItem }
-									renderItemLink={ renderItemLink }
-									isItemClickable={ isItemClickable }
-									isActionsColumnSticky={
-										! isHorizontalScrollEnd
-									}
-									posinset={
-										isInfiniteScroll ? index + 1 : undefined
-									}
+									) }
 								/>
 							) ) }
-					</tbody>
-				) }
-			</table>
-			<div
-				className={ clsx( {
-					'dataviews-loading': isLoading,
-					'dataviews-no-results': ! hasData && ! isLoading,
-				} ) }
-				id={ tableNoticeId }
-			>
-				{ ! hasData &&
-					( isLoading ? (
+							{ !! actions?.length && (
+								<col className="dataviews-view-table__col-actions" />
+							) }
+						</colgroup>
+						{ contextMenuAnchor && (
+							<Popover
+								anchor={ contextMenuAnchor }
+								onClose={ () => setContextMenuAnchor( null ) }
+								placement="bottom-start"
+							>
+								<PropertiesSection showLabel={ false } />
+							</Popover>
+						) }
+						<thead onContextMenu={ handleHeaderContextMenu }>
+							<tr className="dataviews-view-table__row">
+								{ hasBulkActions && (
+									<th
+										className="dataviews-view-table__checkbox-column"
+										scope="col"
+										onContextMenu={
+											handleHeaderContextMenu
+										}
+									>
+										<BulkSelectionCheckbox
+											selection={ selection }
+											onChangeSelection={
+												onChangeSelection
+											}
+											data={ displayData }
+											actions={ actions }
+											getItemId={ getItemId }
+										/>
+									</th>
+								) }
+								{ hasPrimaryColumn && (
+									<th scope="col">
+										{ titleField && (
+											<ColumnHeaderMenu
+												ref={ headerMenuRef(
+													titleField.id,
+													0
+												) }
+												fieldId={ titleField.id }
+												view={ view }
+												fields={ fields }
+												onChangeView={ onChangeView }
+												onHide={ onHide }
+												setOpenedFilter={
+													setOpenedFilter
+												}
+												canMove={ false }
+												canInsertLeft={
+													isRtl
+														? view.layout
+																?.enableMoving ??
+														  true
+														: false
+												}
+												canInsertRight={
+													isRtl
+														? false
+														: view.layout
+																?.enableMoving ??
+														  true
+												}
+											/>
+										) }
+									</th>
+								) }
+								{ columns.map( ( column, index ) => {
+									// Explicit picks the supported styles.
+									const { width, maxWidth, minWidth, align } =
+										view.layout?.styles?.[ column ] ?? {};
+									const canInsertOrMove =
+										view.layout?.enableMoving ?? true;
+									return (
+										<th
+											key={ column }
+											style={ {
+												width,
+												maxWidth,
+												minWidth,
+												textAlign: align,
+											} }
+											aria-sort={
+												view.sort?.direction &&
+												view.sort?.field === column
+													? sortValues[
+															view.sort.direction
+													  ]
+													: undefined
+											}
+											scope="col"
+										>
+											<ColumnHeaderMenu
+												ref={ headerMenuRef(
+													column,
+													index
+												) }
+												fieldId={ column }
+												view={ view }
+												fields={ fields }
+												onChangeView={ onChangeView }
+												onHide={ onHide }
+												setOpenedFilter={
+													setOpenedFilter
+												}
+												canMove={ canInsertOrMove }
+												canInsertLeft={
+													canInsertOrMove
+												}
+												canInsertRight={
+													canInsertOrMove
+												}
+											/>
+										</th>
+									);
+								} ) }
+								{ !! actions?.length && (
+									<th
+										className={ clsx(
+											'dataviews-view-table__actions-column',
+											{
+												'dataviews-view-table__actions-column--sticky':
+													true,
+												'dataviews-view-table__actions-column--stuck':
+													! isHorizontalScrollEnd,
+											}
+										) }
+									>
+										<span className="dataviews-view-table-header">
+											{ __( 'Actions' ) }
+										</span>
+									</th>
+								) }
+							</tr>
+						</thead>
+						{ /* Render grouped data if groupBy is specified */ }
+						{ hasData && groupField && dataByGroup ? (
+							Array.from( dataByGroup.entries() ).map(
+								( [ groupName, groupItems ] ) => (
+									<tbody key={ `group-${ groupName }` }>
+										<tr className="dataviews-view-table__group-header-row">
+											<td
+												colSpan={
+													columns.length +
+													( hasPrimaryColumn
+														? 1
+														: 0 ) +
+													( hasBulkActions ? 1 : 0 ) +
+													( actions?.length ? 1 : 0 )
+												}
+												className="dataviews-view-table__group-header-cell"
+											>
+												{ view.groupBy?.showLabel ===
+												false
+													? groupName
+													: sprintf(
+															// translators: 1: The label of the field e.g. "Date". 2: The value of the field, e.g.: "May 2022".
+															__( '%1$s: %2$s' ),
+															groupField.label,
+															groupName
+													  ) }
+											</td>
+										</tr>
+										{ groupItems.map( ( item, index ) => (
+											<TableRow
+												key={ getItemId( item ) }
+												item={ item }
+												level={
+													view.showLevels &&
+													typeof getItemLevel ===
+														'function'
+														? getItemLevel( item )
+														: undefined
+												}
+												hasBulkActions={
+													hasBulkActions
+												}
+												actions={ actions }
+												fields={ fields }
+												id={
+													getItemId( item ) ||
+													index.toString()
+												}
+												view={ view }
+												titleField={ titleField }
+												mediaField={ mediaField }
+												descriptionField={
+													descriptionField
+												}
+												selection={ selection }
+												getItemId={ getItemId }
+												onChangeSelection={
+													onChangeSelection
+												}
+												onClickItem={ onClickItem }
+												renderItemLink={
+													renderItemLink
+												}
+												isItemClickable={
+													isItemClickable
+												}
+												isActionsColumnSticky={
+													! isHorizontalScrollEnd
+												}
+											/>
+										) ) }
+									</tbody>
+								)
+							)
+						) : (
+							<tbody>
+								{ hasData &&
+									displayData.map( ( item, index ) => (
+										<TableRow
+											key={ getItemId( item ) }
+											item={ item }
+											level={
+												view.showLevels &&
+												typeof getItemLevel ===
+													'function'
+													? getItemLevel( item )
+													: undefined
+											}
+											hasBulkActions={ hasBulkActions }
+											actions={ actions }
+											fields={ fields }
+											id={
+												getItemId( item ) ||
+												index.toString()
+											}
+											view={ view }
+											titleField={ titleField }
+											mediaField={ mediaField }
+											descriptionField={
+												descriptionField
+											}
+											selection={ selection }
+											getItemId={ getItemId }
+											onChangeSelection={
+												onChangeSelection
+											}
+											onClickItem={ onClickItem }
+											renderItemLink={ renderItemLink }
+											isItemClickable={ isItemClickable }
+											isActionsColumnSticky={
+												! isHorizontalScrollEnd
+											}
+											posinset={
+												isInfiniteScroll
+													? index + 1
+													: undefined
+											}
+										/>
+									) ) }
+							</tbody>
+						) }
+					</table>
+					{ isInfiniteScroll && hasData && isLoading && (
+						<div className="dataviews-loading" id={ tableNoticeId }>
+							<p className="dataviews-loading-more">
+								<Spinner />
+							</p>
+						</div>
+					) }
+				</>
+			) }
+			{ ( showLoadingSpinner || noResults ) && (
+				<div
+					className={ clsx( {
+						'dataviews-loading': showLoadingSpinner,
+						'dataviews-no-results': noResults,
+					} ) }
+					id={ tableNoticeId }
+				>
+					{ showLoadingSpinner ? (
 						<p>
 							<Spinner />
 						</p>
 					) : (
 						empty
-					) ) }
-				{ isInfiniteScroll && hasData && isLoading && (
-					<p className="dataviews-loading-more">
-						<Spinner />
-					</p>
-				) }
-			</div>
+					) }
+				</div>
+			) }
 		</>
 	);
 }
