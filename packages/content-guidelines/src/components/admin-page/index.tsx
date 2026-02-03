@@ -228,7 +228,7 @@ export default function AdminPage() {
 					<p className="submit">
 						<Button
 							variant="primary"
-							onClick={ () => handleSave() }
+							onClick={ () => handleSave( 'published' ) }
 							isBusy={ isSavingData }
 							disabled={ ! isDirtyData || isSavingData }
 							accessibleWhenDisabled

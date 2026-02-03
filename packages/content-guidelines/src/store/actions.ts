@@ -118,7 +118,7 @@ export const saveGuidelines =
 				path,
 				method,
 				data: {
-					status: data.status,
+					status: 'published',
 					guideline_categories: data.guideline_categories,
 				},
 			} );
