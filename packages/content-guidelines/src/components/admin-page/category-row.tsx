@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import { TextareaControl } from '@wordpress/components';
+
 interface CategoryRowProps {
 	label: string;
 	description: string;
@@ -25,13 +30,15 @@ export default function CategoryRow( {
 		<tr>
 			<th scope="row">{ label }</th>
 			<td>
-				<textarea
-					className="large-text"
+				<TextareaControl
+					__nextHasNoMarginBottom
+					label={ label }
+					hideLabelFromVision
 					value={ value }
-					onChange={ ( e ) => onChange( e.target.value ) }
+					onChange={ onChange }
 					rows={ 6 }
+					help={ description }
 				/>
-				<p className="description">{ description }</p>
 			</td>
 		</tr>
 	);

@@ -3,7 +3,12 @@
  */
 import { useState, useEffect, useRef } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { SelectControl, Spinner } from '@wordpress/components';
+import {
+	Button,
+	SelectControl,
+	Spinner,
+	TextareaControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -174,21 +179,20 @@ export default function BlockGuidelinesRow( {
 											{ getBlockTitle( blockName ) }
 										</strong>
 										<span className="block-guideline-item__actions">
-											<button
-												type="button"
-												className="button-link"
+											<Button
+												variant="link"
 												onClick={ () =>
 													handleEditBlock( blockName )
 												}
 											>
 												{ __( 'Edit' ) }
-											</button>
+											</Button>
 											<span className="block-guideline-item__separator">
 												|
 											</span>
-											<button
-												type="button"
-												className="button-link button-link-delete"
+											<Button
+												variant="link"
+												isDestructive
 												onClick={ () =>
 													handleRemoveBlockGuideline(
 														blockName
@@ -196,7 +200,7 @@ export default function BlockGuidelinesRow( {
 												}
 											>
 												{ __( 'Remove' ) }
-											</button>
+											</Button>
 										</span>
 									</div>
 									<p className="block-guideline-item__content">
@@ -234,51 +238,47 @@ export default function BlockGuidelinesRow( {
 
 						{ selectedBlock && (
 							<div className="block-guidelines-editor">
-								<textarea
-									id={ `block-guideline-${ selectedBlock }` }
-									className="large-text"
-									value={ draftGuidelines }
-									onChange={ ( e ) =>
-										setDraftGuidelines( e.target.value )
-									}
-									rows={ 4 }
-								/>
-								<p className="description">
-									{ __(
+								<TextareaControl
+									__nextHasNoMarginBottom
+									label={ __(
 										'Enter guidelines specific to this block type.'
 									) }
-								</p>
+									hideLabelFromVision
+									value={ draftGuidelines }
+									onChange={ setDraftGuidelines }
+									rows={ 4 }
+									help={ __(
+										'Enter guidelines specific to this block type.'
+									) }
+								/>
 							</div>
 						) }
 
 						<div className="block-guidelines-form-actions">
-							<button
-								type="button"
-								className="button button-primary"
+							<Button
+								variant="primary"
 								onClick={ handleAddBlockGuideline }
 								disabled={
 									! selectedBlock || ! draftGuidelines.trim()
 								}
+								accessibleWhenDisabled
+								__next40pxDefaultSize
 							>
 								{ __( 'Add' ) }
-							</button>
-							<button
-								type="button"
-								className="button button-link"
-								onClick={ handleCancelAdd }
-							>
+							</Button>
+							<Button variant="link" onClick={ handleCancelAdd }>
 								{ __( 'Cancel' ) }
-							</button>
+							</Button>
 						</div>
 					</div>
 				) : (
-					<button
-						type="button"
-						className="button"
+					<Button
+						variant="secondary"
 						onClick={ () => setIsAddingBlock( true ) }
+						__next40pxDefaultSize
 					>
 						{ __( '+ Add Block Guidelines' ) }
-					</button>
+					</Button>
 				) }
 			</td>
 		</tr>

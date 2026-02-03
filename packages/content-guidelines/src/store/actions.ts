@@ -63,7 +63,10 @@ export type Action =
 	| { type: typeof RESTORE_REVISION_ERROR; payload: string };
 
 export interface ThunkArgs {
-	dispatch: ( action: Action ) => void;
+	dispatch: {
+		( action: Action ): void;
+		[ key: string ]: ( ...args: any[] ) => any;
+	};
 }
 
 /**
@@ -245,7 +248,7 @@ export const restoreRevision =
 			} );
 
 			// Refresh revisions after restore.
-			dispatch( fetchRevisions( postId ) as unknown as Action );
+			dispatch.fetchRevisions( postId );
 
 			return response;
 		} catch ( error ) {

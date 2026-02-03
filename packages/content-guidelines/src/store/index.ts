@@ -18,6 +18,7 @@ import {
 } from './actions';
 import * as selectors from './selectors';
 import { STORE_NAME } from './constants';
+import type { State } from './constants';
 
 /**
  * Action creators for the store (excluding action type constants).
@@ -35,7 +36,11 @@ const actions = {
 /**
  * Store definition for the content guidelines namespace.
  */
-export const store = createReduxStore( STORE_NAME, {
+export const store = createReduxStore<
+	State,
+	typeof actions,
+	typeof selectors
+>( STORE_NAME, {
 	reducer,
 	actions,
 	selectors,

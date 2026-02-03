@@ -35,7 +35,7 @@ class Gutenberg_Content_Guidelines_Post_Type {
 			'show_ui'               => false,
 			'show_in_menu'          => false,
 			'show_in_rest'          => true,
-			'rest_namespace'        => '__experimental',
+			'rest_namespace'        => 'wp/v2',
 			'rest_base'             => 'content-guidelines',
 			'rest_controller_class' => 'Gutenberg_Content_Guidelines_REST_Controller',
 			'capability_type'       => 'post',

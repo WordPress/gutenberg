@@ -36,7 +36,6 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	 * Constructor.
 	 */
 	public function __construct() {
-		// TODO: Change back to '__experimental' when WPCOM supports it.
 		$this->namespace = 'wp/v2';
 		$this->rest_base = 'content-guidelines';
 	}
@@ -56,14 +55,16 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'args'                => array(
 						'category' => array(
-							'description' => __( 'Limit response to a specific guideline category.', 'gutenberg' ),
-							'type'        => 'string',
-							'enum'        => array( 'copy', 'images', 'site', 'blocks', 'other' ),
+							'description'       => __( 'Limit response to a specific guideline category.', 'gutenberg' ),
+							'type'              => 'string',
+							'enum'              => array( 'copy', 'images', 'site', 'blocks', 'other' ),
+							'sanitize_callback' => 'sanitize_text_field',
 						),
 						'status'   => array(
-							'description' => __( 'Limit response to guidelines with a specific status.', 'gutenberg' ),
-							'type'        => 'string',
-							'enum'        => array( 'draft', 'published' ),
+							'description'       => __( 'Limit response to guidelines with a specific status.', 'gutenberg' ),
+							'type'              => 'string',
+							'enum'              => array( 'draft', 'published' ),
+							'sanitize_callback' => 'sanitize_text_field',
 						),
 					),
 				),
@@ -459,6 +460,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 				'offset'         => $offset,
 				'orderby'        => 'date',
 				'order'          => 'DESC',
+				'no_found_rows'  => true,
 			)
 		);
 
@@ -711,6 +713,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 				'posts_per_page' => 1,
 				'orderby'        => 'date',
 				'order'          => 'DESC',
+				'no_found_rows'  => true,
 			)
 		);
 

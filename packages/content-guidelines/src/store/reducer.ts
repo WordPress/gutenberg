@@ -39,13 +39,13 @@ function normalizeGuidelines( payload: Guidelines ): Guidelines {
 }
 
 /**
- * Creates a deep clone of an object using JSON serialization.
+ * Creates a deep clone of an object.
  *
  * @param obj Object to clone.
  * @return Deep cloned object.
  */
 function deepClone< T >( obj: T ): T {
-	return JSON.parse( JSON.stringify( obj ) );
+	return structuredClone( obj );
 }
 
 /**

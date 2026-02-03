@@ -173,31 +173,35 @@ export default function RevisionList( {
 			{ totalPages > 1 && (
 				<div className="content-guidelines-revisions__pagination">
 					<span className="pagination-links">
-						<button
-							className="button prev-page"
+						<Button
+							variant="secondary"
+							size="compact"
 							onClick={ () =>
 								handlePageChange( currentPage - 1 )
 							}
 							disabled={ currentPage === 1 || isPageLoading }
+							accessibleWhenDisabled
 							aria-label={ __( 'Previous page' ) }
 						>
 							‹
-						</button>
+						</Button>
 						<span className="paging-input">
 							{ currentPage } { __( 'of' ) } { totalPages }
 						</span>
-						<button
-							className="button next-page"
+						<Button
+							variant="secondary"
+							size="compact"
 							onClick={ () =>
 								handlePageChange( currentPage + 1 )
 							}
 							disabled={
 								currentPage === totalPages || isPageLoading
 							}
+							accessibleWhenDisabled
 							aria-label={ __( 'Next page' ) }
 						>
 							›
-						</button>
+						</Button>
 					</span>
 				</div>
 			) }

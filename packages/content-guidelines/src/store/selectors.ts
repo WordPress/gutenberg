@@ -148,8 +148,3 @@ export const getGuidelinesForBlocks = (
 		{} as Record< string, { guidelines: string } | null >
 	);
 };
-
-// Aliases for naming consistency.
-export const getGuidelinesByCategory = getCategory;
-export const isGuidelinesLoading = isLoading;
-export const getGuidelinesError = getError;

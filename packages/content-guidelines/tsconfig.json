@@ -9,7 +9,6 @@
 		{ "path": "../dom-ready" },
 		{ "path": "../element" },
 		{ "path": "../i18n" },
-		{ "path": "../icons" },
 		{ "path": "../notices" }
 	]
 }

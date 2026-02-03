@@ -82,15 +82,5 @@ class Gutenberg_Content_Guidelines_Admin_Page {
 				$asset['version']
 			);
 		}
-
-		// Add inline script data for REST API.
-		wp_localize_script(
-			'gutenberg-content-guidelines',
-			'contentGuidelinesSettings',
-			array(
-				'restUrl' => rest_url( '__experimental/content-guidelines' ),
-				'nonce'   => wp_create_nonce( 'wp_rest' ),
-			)
-		);
 	}
 }
