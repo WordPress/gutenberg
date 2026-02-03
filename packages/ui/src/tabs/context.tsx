@@ -1,6 +1,3 @@
-/**
- * WordPress dependencies
- */
 import {
 	createContext,
 	useContext,
@@ -23,20 +20,53 @@ type TabsValidationContextType = {
  */
 const VALIDATION_ENABLED = process.env.NODE_ENV !== 'production';
 
-// Only create the context in development mode
+// Context is only created in development mode.
+// When VALIDATION_ENABLED is true, this is guaranteed to be a valid Context.
 const TabsValidationContext = VALIDATION_ENABLED
 	? createContext< TabsValidationContextType | null >( null )
-	: null;
+	: ( null as unknown as React.Context< TabsValidationContextType | null > );
+
+/**
+ * Development-only hook to access the tabs validation context.
+ */
+function useTabsValidationContextDev() {
+	return useContext( TabsValidationContext );
+}
+
+/**
+ * Production no-op hook.
+ */
+function useTabsValidationContextProd() {
+	return null;
+}
 
 /**
  * Hook to access the tabs validation context.
  * Returns null in production or if not within a Tabs.Root.
  */
-export function useTabsValidationContext() {
-	// This condition uses a build-time constant, so the else branch
-	// is completely removed in production builds via dead code elimination.
-	// eslint-disable-next-line react-hooks/rules-of-hooks -- build-time conditional
-	return VALIDATION_ENABLED ? useContext( TabsValidationContext! ) : null;
+export const useTabsValidationContext = VALIDATION_ENABLED
+	? useTabsValidationContextDev
+	: useTabsValidationContextProd;
+
+/**
+ * Development-only hook that throws if not within Tabs.Root.
+ */
+function useRequireTabsRootDev( componentName: string ) {
+	const context = useTabsValidationContextDev();
+
+	if ( context === null ) {
+		throw new Error(
+			`\`${ componentName }\` must be used within a \`Tabs.Root\` component.`
+		);
+	}
+}
+
+/**
+ * Production no-op hook.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function useRequireTabsRootProd( componentName: string ) {
+	// No-op in production
 }
 
 /**
@@ -45,34 +75,19 @@ export function useTabsValidationContext() {
  *
  * @param componentName The name of the component (for the error message).
  */
-export function useRequireTabsRoot( componentName: string ) {
-	const context = useTabsValidationContext();
-
-	if ( VALIDATION_ENABLED && context === null ) {
-		throw new Error(
-			`\`${ componentName }\` must be used within a \`Tabs.Root\` component.`
-		);
-	}
-}
+export const useRequireTabsRoot = VALIDATION_ENABLED
+	? useRequireTabsRootDev
+	: useRequireTabsRootProd;
 
 /**
- * Provider component that tracks registered tabs and panels,
- * and validates that they match in development mode.
- *
- * In production, this component is a no-op and just renders children.
+ * Development-only provider that tracks registered tabs and panels,
+ * and validates that they match.
  */
-export function TabsValidationProvider( {
+function TabsValidationProviderDev( {
 	children,
 }: {
 	children: React.ReactNode;
 } ) {
-	// This condition uses a build-time constant, so all validation logic
-	// is completely removed in production builds via dead code elimination.
-	if ( ! VALIDATION_ENABLED ) {
-		return children;
-	}
-
-	/* eslint-disable react-hooks/rules-of-hooks -- build-time conditional above ensures consistent hook calls */
 	const tabsRef = useRef< Set< TabValue > >( new Set() );
 	const panelsRef = useRef< Set< TabValue > >( new Set() );
 	const validationScheduledRef = useRef< ReturnType<
@@ -177,7 +192,6 @@ export function TabsValidationProvider( {
 		} ),
 		[ registerTab, registerPanel ]
 	);
-	/* eslint-enable react-hooks/rules-of-hooks */
 
 	return (
 		<TabsValidationContext.Provider value={ contextValue }>
@@ -185,3 +199,24 @@ export function TabsValidationProvider( {
 		</TabsValidationContext.Provider>
 	);
 }
+
+/**
+ * Production no-op provider that just renders children.
+ */
+function TabsValidationProviderProd( {
+	children,
+}: {
+	children: React.ReactNode;
+} ) {
+	return <>{ children }</>;
+}
+
+/**
+ * Provider component that tracks registered tabs and panels,
+ * and validates that they match in development mode.
+ *
+ * In production, this component is a no-op and just renders children.
+ */
+export const TabsValidationProvider = VALIDATION_ENABLED
+	? TabsValidationProviderDev
+	: TabsValidationProviderProd;
