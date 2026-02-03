@@ -46,10 +46,7 @@ function render_block_core_icon( $attributes ) {
 	if ( ! $label ) {
 		$processor->set_attribute( 'title', esc_html( $label ) );
 	}
-
-	// Check for width and set default.
-	// $processor->set_attribute( 'width', $attributes['style']['dimensions']['width'] ?? '48px' );
-
+	
 	// Return the updated SVG markup.
 	$svg = $processor->get_updated_html();
 	return '<div ' . get_block_wrapper_attributes() . '>' . $svg . '</div>';
