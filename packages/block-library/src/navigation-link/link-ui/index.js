@@ -40,19 +40,19 @@ export function getSuggestionsQuery( type, kind ) {
 	switch ( type ) {
 		case 'post':
 		case 'page':
-			return { type: 'post', subtype: type };
+			return { type: 'post', subtype: type, perPage: 20 };
 		case 'category':
-			return { type: 'term', subtype: 'category' };
+			return { type: 'term', subtype: 'category', perPage: 20 };
 		case 'tag':
-			return { type: 'term', subtype: 'post_tag' };
+			return { type: 'term', subtype: 'post_tag', perPage: 20 };
 		case 'post_format':
-			return { type: 'post-format' };
+			return { type: 'post-format', perPage: 20 };
 		default:
 			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type };
+				return { type: 'term', subtype: type, perPage: 20 };
 			}
 			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type };
+				return { type: 'post', subtype: type, perPage: 20 };
 			}
 			return {
 				// for custom link which has no type
