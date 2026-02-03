@@ -25,25 +25,12 @@ export default function DataForm< Item >( {
 		[ fields ]
 	);
 
-	// Auto-compute: mark the minority of fields
-	// When counts are equal, mark optional fields (arbitrary but consistent)
-	const markWhenOptional = useMemo( () => {
-		const requiredCount = normalizedFields.filter(
-			( f ) => !! f.isValid?.required
-		).length;
-		const optionalCount = normalizedFields.length - requiredCount;
-		return requiredCount >= optionalCount;
-	}, [ normalizedFields ] );
-
 	if ( ! form.fields ) {
 		return null;
 	}
 
 	return (
-		<DataFormProvider
-			fields={ normalizedFields }
-			markWhenOptional={ markWhenOptional }
-		>
+		<DataFormProvider fields={ normalizedFields }>
 			<DataFormLayout
 				data={ data }
 				form={ normalizedForm }

@@ -159,7 +159,8 @@ function PanelDropdown< Item >( {
 							{ (
 								FieldLayout,
 								childField,
-								childFieldValidity
+								childFieldValidity,
+								markWhenOptional
 							) => (
 								<FieldLayout
 									key={ childField.id }
@@ -169,6 +170,7 @@ function PanelDropdown< Item >( {
 									hideLabelFromVision={
 										( form?.fields ?? [] ).length < 2
 									}
+									markWhenOptional={ markWhenOptional }
 									validity={ childFieldValidity }
 								/>
 							) }

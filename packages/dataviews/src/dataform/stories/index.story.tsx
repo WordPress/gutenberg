@@ -100,12 +100,18 @@ export const Validation = {
 		layout: {
 			control: { type: 'select' },
 			description: 'Choose the form layout type.',
-			options: [ 'regular', 'panel', 'card', 'details' ],
+			options: [ 'regular', 'panel', 'card' ],
+		},
+		fieldDistribution: {
+			control: { type: 'select' },
+			description:
+				'Field distribution for demonstrating markWhenOptional behavior. Use this to see how the minority of fields gets labeled.',
+			options: [ 'allSame', 'mostlyRequired', 'mostlyOptional' ],
 		},
 		required: {
 			control: { type: 'boolean' },
 			description:
-				'Whether or not the required validation rule is active.',
+				'Whether or not the required validation rule is active (only applies when fieldDistribution is allSame).',
 		},
 		elements: {
 			control: { type: 'select' },
@@ -131,6 +137,7 @@ export const Validation = {
 	},
 	args: {
 		layout: 'regular',
+		fieldDistribution: 'allSame',
 		required: true,
 		elements: 'sync',
 		custom: 'sync',

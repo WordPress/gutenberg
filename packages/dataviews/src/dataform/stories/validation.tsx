@@ -21,6 +21,11 @@ import { unlock } from '../../lock-unlock';
 
 const { ValidatedTextControl } = unlock( privateApis );
 
+// Module-level constants for field distribution demo
+// These define which fields are optional/required in the demo scenarios
+const OPTIONAL_FIELDS = [ 'color', 'toggle', 'toggleGroup' ];
+const REQUIRED_ONLY_FIELDS = [ 'text', 'email', 'password' ];
+
 function getCustomValidity< Item >(
 	isValid: NormalizedRules< Item >,
 	validity: FieldValidity | undefined
@@ -75,6 +80,7 @@ function CustomEditControl< Item >( {
 
 const ValidationComponent = ( {
 	required,
+	fieldDistribution,
 	elements,
 	custom,
 	pattern,
@@ -82,11 +88,12 @@ const ValidationComponent = ( {
 	layout,
 }: {
 	required: boolean;
+	fieldDistribution: 'allSame' | 'mostlyRequired' | 'mostlyOptional';
 	elements: 'sync' | 'async' | 'none';
 	custom: 'sync' | 'async' | 'none';
 	pattern: boolean;
 	minMax: boolean;
-	layout: 'regular' | 'panel' | 'card' | 'details';
+	layout: 'regular' | 'panel' | 'card';
 } ) => {
 	type ValidatedItem = {
 		text: string;
@@ -133,6 +140,23 @@ const ValidationComponent = ( {
 		dateRange: undefined,
 		datetime: undefined,
 	} );
+
+	// Helper to determine if a field should be required based on fieldDistribution
+	// Uses module-level OPTIONAL_FIELDS and REQUIRED_ONLY_FIELDS constants
+	const getIsRequired = useCallback(
+		( fieldId: string ): boolean => {
+			switch ( fieldDistribution ) {
+				case 'mostlyRequired':
+					return ! OPTIONAL_FIELDS.includes( fieldId );
+				case 'mostlyOptional':
+					return REQUIRED_ONLY_FIELDS.includes( fieldId );
+				case 'allSame':
+				default:
+					return required;
+			}
+		},
+		[ fieldDistribution, required ]
+	);
 
 	// Cache for getElements functions - ensures promises are only created once
 	const getElements = useMemo( () => {
@@ -488,7 +512,7 @@ const ValidationComponent = ( {
 					'Letters, numbers, underscores only AND 5-20 characters'
 				),
 				isValid: {
-					required,
+					required: getIsRequired( 'text' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTextRule ),
 					pattern: pattern ? '^[a-zA-Z0-9_]+$' : undefined,
@@ -510,7 +534,7 @@ const ValidationComponent = ( {
 				getElements:
 					elements === 'async' ? getElements( 'select' ) : undefined,
 				isValid: {
-					required,
+					required: getIsRequired( 'select' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customSelectRule ),
 				},
@@ -532,7 +556,7 @@ const ValidationComponent = ( {
 						? getElements( 'textWithRadio' )
 						: undefined,
 				isValid: {
-					required,
+					required: getIsRequired( 'textWithRadio' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTextRadioRule ),
 				},
@@ -547,7 +571,7 @@ const ValidationComponent = ( {
 					? 'Must be between 10 and 200 characters'
 					: undefined,
 				isValid: {
-					required,
+					required: getIsRequired( 'textarea' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTextareaRule ),
 					minLength: minMax ? 10 : undefined,
@@ -569,7 +593,7 @@ const ValidationComponent = ( {
 					'Must be @company.com domain AND 15-100 characters'
 				),
 				isValid: {
-					required,
+					required: getIsRequired( 'email' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customEmailRule ),
 					pattern: pattern
@@ -594,7 +618,7 @@ const ValidationComponent = ( {
 					'US format +1-XXX... AND 10-20 characters'
 				),
 				isValid: {
-					required,
+					required: getIsRequired( 'telephone' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customTelephoneRule ),
 					pattern: pattern ? '^\\+1-\\d{3}-[0-9-]*$' : undefined,
@@ -617,7 +641,7 @@ const ValidationComponent = ( {
 					'GitHub repository URL AND 25-255 characters'
 				),
 				isValid: {
-					required,
+					required: getIsRequired( 'url' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customUrlRule ),
 					pattern: pattern
@@ -632,7 +656,7 @@ const ValidationComponent = ( {
 				type: 'color',
 				label: 'Color',
 				isValid: {
-					required,
+					required: getIsRequired( 'color' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customColorRule ),
 				},
@@ -644,7 +668,7 @@ const ValidationComponent = ( {
 				placeholder: minMax ? 'Min 10, max 100' : undefined,
 				description: minMax ? 'Must be between 10 and 100' : undefined,
 				isValid: {
-					required,
+					required: getIsRequired( 'integer' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customIntegerRule ),
 					min: minMax ? 10 : undefined,
@@ -658,7 +682,7 @@ const ValidationComponent = ( {
 				placeholder: minMax ? 'Min 10, max 100' : undefined,
 				description: minMax ? 'Must be between 0 and 100' : undefined,
 				isValid: {
-					required,
+					required: getIsRequired( 'number' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customNumberRule ),
 					min: minMax ? 10 : undefined,
@@ -670,7 +694,7 @@ const ValidationComponent = ( {
 				type: 'boolean',
 				label: 'Boolean',
 				isValid: {
-					required,
+					required: getIsRequired( 'boolean' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customBooleanRule ),
 				},
@@ -682,7 +706,7 @@ const ValidationComponent = ( {
 				placeholder: 'Select countries',
 				description: 'Countries you have visited',
 				isValid: {
-					required,
+					required: getIsRequired( 'array' ),
 					elements: elements !== 'none' ? true : false,
 				},
 				elements:
@@ -707,7 +731,7 @@ const ValidationComponent = ( {
 				label: 'Custom Control',
 				Edit: CustomEditControl,
 				isValid: {
-					required,
+					required: getIsRequired( 'customEdit' ),
 					elements: elements !== 'none' ? true : false,
 				},
 			},
@@ -726,7 +750,7 @@ const ValidationComponent = ( {
 					'alphanumeric chars AND 10-20 characters'
 				),
 				isValid: {
-					required,
+					required: getIsRequired( 'password' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customPasswordRule ),
 					pattern: pattern ? '^[a-zA-Z0-9]{8,}$' : undefined,
@@ -740,7 +764,7 @@ const ValidationComponent = ( {
 				label: 'Toggle',
 				Edit: 'toggle',
 				isValid: {
-					required,
+					required: getIsRequired( 'toggle' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customToggleRule ),
 				},
@@ -763,7 +787,7 @@ const ValidationComponent = ( {
 						? getElements( 'toggleGroup' )
 						: undefined,
 				isValid: {
-					required,
+					required: getIsRequired( 'toggleGroup' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customToggleGroupRule ),
 				},
@@ -773,7 +797,7 @@ const ValidationComponent = ( {
 				type: 'date',
 				label: 'Date',
 				isValid: {
-					required,
+					required: getIsRequired( 'date' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customDateRule ),
 				},
@@ -784,7 +808,7 @@ const ValidationComponent = ( {
 				label: 'Date Range',
 				Edit: DateRangeEdit,
 				isValid: {
-					required,
+					required: getIsRequired( 'dateRange' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customDateRangeRule ),
 				},
@@ -794,13 +818,13 @@ const ValidationComponent = ( {
 				type: 'datetime',
 				label: 'Date Time',
 				isValid: {
-					required,
+					required: getIsRequired( 'datetime' ),
 					elements: elements !== 'none' ? true : false,
 					custom: maybeCustomRule( customDateTimeRule ),
 				},
 			},
 		];
-	}, [ elements, custom, required, pattern, minMax, getElements ] );
+	}, [ elements, custom, pattern, minMax, getElements, getIsRequired ] );
 
 	const form = useMemo( () => {
 		if ( layout === 'regular' ) {
@@ -904,13 +928,6 @@ const ValidationComponent = ( {
 		if ( layout === 'panel' ) {
 			return {
 				layout: { type: 'panel' as const },
-				fields: groupedFields,
-			};
-		}
-
-		if ( layout === 'details' ) {
-			return {
-				layout: { type: 'details' as const },
 				fields: groupedFields,
 			};
 		}
