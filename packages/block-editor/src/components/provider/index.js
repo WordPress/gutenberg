@@ -59,7 +59,7 @@ function mediaUpload(
 		onBatchSuccess,
 	}
 ) {
-// Split files into those that can be processed client-side and those that cannot.
+	// Split files into those that can be processed client-side and those that cannot.
 	const clientSideFiles = [];
 	const serverSideFiles = [];
 
