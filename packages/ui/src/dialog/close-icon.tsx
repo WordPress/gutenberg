@@ -21,7 +21,7 @@ const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
 						tone="neutral"
 						{ ...props }
 						icon={ close }
-						label={ __( 'Close', 'wpds' ) }
+						label={ __( 'Close' ) }
 					/>
 				}
 			/>
