@@ -74,13 +74,18 @@
 		bottom: 0;
 		left: 0;
 	}
-
 }
 
 [data-align="left"] > .wp-block-cover,
 [data-align="right"] > .wp-block-cover {
 	max-width: $content-width * 0.5;
 	width: 100%;
+}
+
+.wp-block-cover__embed-video-url-input input {
+	// Targeting input as we're using text instead of URLs for relative paths.
+	/* rtl:ignore */
+	direction: ltr;
 }
 
 .block-library-cover__reset-button {
