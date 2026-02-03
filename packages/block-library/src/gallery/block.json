@@ -64,7 +64,7 @@
 		"navigationButtonType": {
 			"type": "string",
 			"default": "icon",
-			"enum": [ "icon", "text", "icon-and-text" ]
+			"enum": [ "icon", "text", "both" ]
 		},
 		"shortCodeTransforms": {
 			"type": "array",

@@ -103,14 +103,14 @@ const { state, actions, callbacks } = store(
 				const { navigationButtonType } = state.selectedImage;
 				return (
 					navigationButtonType === 'icon' ||
-					navigationButtonType === 'icon-and-text'
+					navigationButtonType === 'both'
 				);
 			},
 			get hasNavigationText() {
 				const { navigationButtonType } = state.selectedImage;
 				return (
 					navigationButtonType === 'text' ||
-					navigationButtonType === 'icon-and-text'
+					navigationButtonType === 'both'
 				);
 			},
 			get thisImage() {

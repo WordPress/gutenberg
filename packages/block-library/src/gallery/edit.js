@@ -14,6 +14,8 @@ import {
 	MenuItem,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalToggleGroupControl as ToggleGroupControl,
+	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	ToolbarDropdownMenu,
 	PanelBody,
 } from '@wordpress/components';
@@ -96,16 +98,16 @@ const LINK_OPTIONS = [
 ];
 const NAVIGATION_BUTTON_TYPE_OPTIONS = [
 	{
-		label: __( 'Icon only' ),
+		label: __( 'Icon' ),
 		value: 'icon',
 	},
 	{
-		label: __( 'Text only' ),
+		label: __( 'Text' ),
 		value: 'text',
 	},
 	{
-		label: __( 'Icon and text' ),
-		value: 'icon-and-text',
+		label: __( 'Both' ),
+		value: 'both',
 	},
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -815,28 +817,32 @@ export default function GalleryEdit( props ) {
 								} )
 							}
 						>
-							<SelectControl
-								__nextHasNoMarginBottom
-								label={ __( 'Navigation button type' ) }
-								value={ navigationButtonType }
-								onChange={ ( value ) =>
-									setAttributes( {
-										navigationButtonType: value,
-									} )
-								}
-								options={ NAVIGATION_BUTTON_TYPE_OPTIONS }
-								size="__unstable-large"
-								disabled={ ! hasLightboxImages }
-								help={
-									hasLightboxImages
-										? __(
-												'Adjust the appearance of buttons in the lightbox.'
-										  )
-										: __(
-												'Enable lightbox to adjust the appearance of buttons.'
-										  )
-								}
-							/>
+							{ hasLightboxImages && (
+								<ToggleGroupControl
+									label={ __( 'Navigation button type' ) }
+									value={ navigationButtonType }
+									onChange={ ( value ) =>
+										setAttributes( {
+											navigationButtonType: value,
+										} )
+									}
+									isBlock
+									__next40pxDefaultSize
+									help={ __(
+										'Adjust the appearance of buttons in the lightbox.'
+									) }
+								>
+									{ NAVIGATION_BUTTON_TYPE_OPTIONS.map(
+										( option ) => (
+											<ToggleGroupControlOption
+												key={ option.value }
+												value={ option.value }
+												label={ option.label }
+											/>
+										)
+									) }
+								</ToggleGroupControl>
+							) }
 						</ToolsPanelItem>
 					</ToolsPanel>
 				) }
