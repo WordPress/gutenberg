@@ -13,7 +13,6 @@ import { useSelect } from '@wordpress/data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
-import { drawerRight } from '@wordpress/icons';
 import { useEvent, usePrevious } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
 import { useView } from '@wordpress/views';
@@ -26,7 +25,6 @@ import {
 	OPERATOR_IS_NONE,
 	OPERATOR_BEFORE,
 	OPERATOR_AFTER,
-	LAYOUT_LIST,
 } from '../../utils/constants';
 
 import AddNewPostModal from '../add-new-post';
@@ -59,7 +57,7 @@ function getItemLevel( item ) {
 
 export default function PostList( { postType } ) {
 	const { path, query } = useLocation();
-	const { activeView = 'all', postId, quickEdit = false } = query;
+	const { activeView = 'all', postId } = query;
 	const history = useHistory();
 	const defaultView = DEFAULT_VIEW;
 	const activeViewOverrides = useMemo(
@@ -310,25 +308,6 @@ export default function PostList( { postType } ) {
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
 				defaultLayouts={ defaultLayouts }
-				header={
-					window.__experimentalQuickEditDataViews &&
-					view.type !== LAYOUT_LIST &&
-					postType === 'page' && (
-						<Button
-							size="compact"
-							isPressed={ quickEdit }
-							icon={ drawerRight }
-							label={ __( 'Details' ) }
-							onClick={ () => {
-								history.navigate(
-									addQueryArgs( path, {
-										quickEdit: quickEdit ? undefined : true,
-									} )
-								);
-							} }
-						/>
-					)
-				}
 			/>
 		</Page>
 	);
