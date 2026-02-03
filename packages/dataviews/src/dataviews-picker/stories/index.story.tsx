@@ -70,31 +70,71 @@ const DataViewsPickerContent = ( {
 	actions: customActions,
 	selection: customSelection,
 }: PickerContentProps ) => {
-	const [ view, setView ] = useState< View >( {
-		fields: [],
-		titleField: 'title',
-		mediaField: 'image',
-		search: '',
-		page: 1,
-		perPage: 10,
-		filters: [],
-		type: LAYOUT_PICKER_GRID,
-		groupBy: isGrouped ? { field: 'type', direction: 'asc' } : undefined,
-		infiniteScrollEnabled,
+	const [ view, setView ] = useState< View >( () => {
+		const baseView: View = {
+			fields: [],
+			titleField: 'title',
+			mediaField: 'image',
+			search: '',
+			filters: [],
+			type: LAYOUT_PICKER_GRID,
+			groupBy: isGrouped
+				? { field: 'type', direction: 'asc' as const }
+				: undefined,
+			infiniteScrollEnabled,
+		};
+
+		if ( infiniteScrollEnabled ) {
+			return {
+				...baseView,
+				startPosition: 1,
+				endPosition: 10,
+			};
+		}
+
+		return {
+			...baseView,
+			page: 1,
+			perPage: 10,
+		};
 	} );
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
 
 	useEffect( () => {
-		setView( ( prevView ) => ( {
-			...prevView,
-			groupBy:
-				isGrouped && ! infiniteScrollEnabled
-					? { field: 'type', direction: 'asc' }
-					: undefined,
-			infiniteScrollEnabled,
-		} ) );
+		setView( ( prevView ) => {
+			const baseUpdates = {
+				groupBy:
+					isGrouped && ! infiniteScrollEnabled
+						? { field: 'type', direction: 'asc' as const }
+						: undefined,
+				infiniteScrollEnabled,
+			};
+
+			if ( infiniteScrollEnabled ) {
+				// Use 15 items for table layout, 10 for others
+				const itemCount =
+					prevView.type === LAYOUT_PICKER_TABLE ? 15 : 10;
+				return {
+					...prevView,
+					...baseUpdates,
+					startPosition: 1,
+					endPosition: itemCount,
+					page: undefined,
+					perPage: undefined,
+				} as View;
+			}
+
+			return {
+				...prevView,
+				...baseUpdates,
+				page: prevView.page ?? 1,
+				perPage: prevView.perPage ?? 10,
+				startPosition: undefined,
+				endPosition: undefined,
+			} as View;
+		} );
 	}, [ isGrouped, infiniteScrollEnabled ] );
 
 	const [ selection, setSelection ] = useState< string[] >(
