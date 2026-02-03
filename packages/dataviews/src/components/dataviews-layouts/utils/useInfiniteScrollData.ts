@@ -144,7 +144,7 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 					const visibleMax = Math.max( ...visibleEntries );
 					// Buffer size balances allowing new items to render (when prepended
 					// during scroll up) while unloading items no longer on screen
-					const buffer = 5;
+					const buffer = 10;
 
 					const filtered = allRecords.filter( ( record ) => {
 						const itemPosition = (
