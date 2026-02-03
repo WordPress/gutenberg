@@ -43,8 +43,6 @@ export const rootEntitiesConfig = [
 		baseURLParams: {
 			// Please also change the preload path when changing this.
 			// @see lib/compat/wordpress-7.0/preload.php
-			// @see packages/wp-build/templates/page.php.template
-			// @see packages/wp-build/templates/page-wp-admin.php.template
 			_fields: [
 				'description',
 				'gmt_offset',
