@@ -184,15 +184,16 @@ export function Edit( props ) {
 		<>
 			{ blockControls }
 			{ inspectorControls }
-			{ ! icon && (
-				<IconPlaceholder
-					setInserterOpen={ setInserterOpen }
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-				/>
-			) }
 			<div { ...useBlockProps() }>
-				<>{ iconToDisplay }</>
+				{ icon ? (
+					iconToDisplay
+				) : (
+					<IconPlaceholder
+						setInserterOpen={ setInserterOpen }
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+					/>
+				) }
 			</div>
 			<InserterModal
 				isInserterOpen={ isInserterOpen }
