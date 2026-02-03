@@ -90,11 +90,19 @@ const BLOCK_REMOVAL_RULES = [
 			'wp_block',
 		],
 		callback( removedBlocks ) {
+			// Check if the parent dialog block is being removed
+			const isDialogBeingRemoved = removedBlocks.some(
+				( { name } ) => name === 'core/dialog'
+			);
+
 			// Check for dialog-trigger removal
 			const removedDialogTriggers = removedBlocks.filter(
 				( { name } ) => name === 'core/dialog-trigger'
 			);
-			if ( removedDialogTriggers.length ) {
+
+			// Only warn if dialog-trigger is removed but its parent dialog is not.
+			// If the entire dialog is being removed, no warning is needed.
+			if ( removedDialogTriggers.length && ! isDialogBeingRemoved ) {
 				return {
 					description: __(
 						'The Dialog Trigger block provides the clickable element that opens the dialog.'
@@ -103,7 +111,7 @@ const BLOCK_REMOVAL_RULES = [
 						'Without it, visitors will have no way to open the dialog.'
 					),
 					subtext: __(
-						'If you still want the dialog to appear, consider using the Auto Activation Timer feature in the Dialog Element settings.'
+						'If you still want the dialog to appear, consider using the Auto Activation Timer feature in the Dialog settings.'
 					),
 					requireConfirmation: true,
 				};
