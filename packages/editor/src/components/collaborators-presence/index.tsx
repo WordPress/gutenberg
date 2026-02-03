@@ -9,7 +9,7 @@ import { type PostEditorAwarenessState } from '../../../../core-data/src/awarene
 
 import './styles/collaborators-presence.scss';
 
-const { useActiveUsers } = unlock( privateApis );
+const { useActiveCollaborators } = unlock( privateApis );
 
 interface CollaboratorsPresenceProps {
 	postId: number | null;
@@ -28,7 +28,7 @@ export function CollaboratorsPresence( {
 	postId,
 	postType,
 }: CollaboratorsPresenceProps ) {
-	const activeUsers = useActiveUsers(
+	const activeUsers = useActiveCollaborators(
 		postId,
 		postType
 	) as PostEditorAwarenessState[];
