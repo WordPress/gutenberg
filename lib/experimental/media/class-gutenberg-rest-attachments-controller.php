@@ -136,8 +136,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			}
 		}
 
-		// Handle missing image sizes for PDFs.
-
 		if (
 			rest_is_field_included( 'missing_image_sizes', $fields ) &&
 			empty( $data['missing_image_sizes'] )
