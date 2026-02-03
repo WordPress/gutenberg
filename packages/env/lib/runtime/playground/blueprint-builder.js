@@ -107,21 +107,13 @@ function getMountArgs( config ) {
 	}
 
 	// Mount themes
+	// All theme types (local, git, zip) can be mounted after downloading/extraction
 	for ( const theme of envConfig.themeSources || [] ) {
-		if ( theme.type === 'local' || theme.type === 'git' ) {
-			args.push(
-				'--mount-dir',
-				theme.path,
-				`/wordpress/wp-content/themes/${ theme.basename }`
-			);
-		} else {
-			throw new Error(
-				`Theme source "${ theme.basename || theme.path }" of type "${
-					theme.type
-				}" ` +
-					`is not supported with Playground runtime. Only local and git themes are supported.`
-			);
-		}
+		args.push(
+			'--mount-dir',
+			theme.path,
+			`/wordpress/wp-content/themes/${ theme.basename }`
+		);
 	}
 
 	// Mount custom mappings

@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -49,11 +48,5 @@ export default function useBlockVisibility( options = {} ) {
 		blockVisibility === false ||
 		blockVisibility?.viewport?.[ currentViewport ] === false;
 
-	return useMemo(
-		() => ( {
-			isBlockCurrentlyHidden,
-			currentViewport,
-		} ),
-		[ isBlockCurrentlyHidden, currentViewport ]
-	);
+	return { isBlockCurrentlyHidden, currentViewport };
 }

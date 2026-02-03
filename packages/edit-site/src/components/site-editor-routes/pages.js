@@ -15,7 +15,10 @@ import DataViewsSidebarContent from '../sidebar-dataviews';
 import PostList from '../post-list';
 import { unlock } from '../../lock-unlock';
 import { PostEdit } from '../post-edit';
-import { DEFAULT_VIEW, getActiveFiltersForTab } from '../post-list/view-utils';
+import {
+	DEFAULT_VIEW,
+	getActiveViewOverridesForTab,
+} from '../post-list/view-utils';
 
 const { useLocation } = unlock( routerPrivateApis );
 
@@ -26,7 +29,7 @@ async function isListView( query ) {
 		name: 'page',
 		slug: 'default',
 		defaultView: DEFAULT_VIEW,
-		activeFilters: getActiveFiltersForTab( activeView ),
+		activeViewOverrides: getActiveViewOverridesForTab( activeView ),
 	} );
 	return view.type === 'list';
 }

@@ -58,7 +58,6 @@ const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
 interface MediaUploadModalProps {
 	/**
 	 * Array of allowed media types.
-	 * @default ['image']
 	 */
 	allowedTypes?: string[];
 
@@ -153,7 +152,7 @@ interface MediaUploadModalProps {
  * @return JSX element or null
  */
 export function MediaUploadModal( {
-	allowedTypes = [ 'image' ],
+	allowedTypes,
 	multiple = false,
 	value,
 	onSelect,
@@ -236,7 +235,7 @@ export function MediaUploadModal( {
 
 		// Base media type on allowedTypes if no filter is set
 		if ( ! filters.media_type ) {
-			filters.media_type = allowedTypes.includes( '*' )
+			filters.media_type = allowedTypes?.includes( '*' )
 				? undefined
 				: allowedTypes;
 		}
@@ -467,10 +466,10 @@ export function MediaUploadModal( {
 
 	// Build accept attribute from allowedTypes
 	const acceptTypes = useMemo( () => {
-		if ( allowedTypes.includes( '*' ) ) {
+		if ( allowedTypes?.includes( '*' ) ) {
 			return undefined;
 		}
-		return allowedTypes.join( ',' );
+		return allowedTypes?.join( ',' );
 	}, [ allowedTypes ] );
 
 	if ( ! isOpen ) {

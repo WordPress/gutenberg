@@ -12,10 +12,10 @@ import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import {
 	BaseControl,
 	Button,
-	__experimentalInputControl as InputControl,
 	Spinner,
 	withSpokenMessages,
 	Popover,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
 	compose,
@@ -30,6 +30,9 @@ import { isURL } from '@wordpress/url';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
+
+const { ValidatedInputControl } = unlock( componentsPrivateApis );
 
 /**
  * Whether the argument is a function.
@@ -426,6 +429,8 @@ class URLInput extends Component {
 			hideLabelFromVision = false,
 			help = null,
 			disabled = false,
+			customValidity,
+			markWhenOptional,
 		} = this.props;
 
 		const {
@@ -473,13 +478,27 @@ class URLInput extends Component {
 			help,
 		};
 
+		const validationProps = {
+			customValidity,
+			// Suppress the "(Required)" indicator in the label.
+			// The field is still required for validation, but the indicator
+			// can be hidden when markWhenOptional is set to true.
+			...( markWhenOptional !== undefined && {
+				markWhenOptional,
+			} ),
+		};
+
 		if ( renderControl ) {
 			return renderControl( controlProps, inputProps, loading );
 		}
 
 		return (
-			<BaseControl { ...controlProps }>
-				<InputControl { ...inputProps } __next40pxDefaultSize />
+			<BaseControl __nextHasNoMarginBottom { ...controlProps }>
+				<ValidatedInputControl
+					{ ...inputProps }
+					{ ...validationProps }
+					__next40pxDefaultSize
+				/>
 				{ loading && <Spinner /> }
 			</BaseControl>
 		);

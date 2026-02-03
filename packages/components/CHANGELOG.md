@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used.
+
 ### Internal
 
 -   Expose `useDrag` from `@use-gesture/react` package via private API's ([#66735](https://github.com/WordPress/gutenberg/pull/66735)).

@@ -101,19 +101,23 @@ const GridItem = forwardRef( function GridItem< Item >(
 	const id = getItemId( item );
 	const instanceId = useInstanceId( GridItem );
 	const isSelected = selection.includes( id );
-	const renderedMediaField = mediaField?.render ? (
+	const mediaPlaceholder = (
+		<span className="dataviews-view-grid__media-placeholder" />
+	);
+	const rendersMediaField = showMedia && mediaField?.render;
+	const renderedMediaField = rendersMediaField ? (
 		<mediaField.render
 			item={ item }
 			field={ mediaField }
 			config={ config }
 		/>
-	) : null;
+	) : (
+		mediaPlaceholder
+	);
 	const renderedTitleField =
 		showTitle && titleField?.render ? (
 			<titleField.render item={ item } field={ titleField } />
 		) : null;
-	const shouldRenderMedia = showMedia && renderedMediaField;
-
 	let mediaA11yProps;
 	let titleA11yProps;
 	if ( isItemClickable( item ) && onClickItem ) {
@@ -159,19 +163,20 @@ const GridItem = forwardRef( function GridItem< Item >(
 				}
 			} }
 		>
-			{ shouldRenderMedia && (
-				<ItemClickWrapper
-					item={ item }
-					isItemClickable={ isItemClickable }
-					onClickItem={ onClickItem }
-					renderItemLink={ renderItemLink }
-					className="dataviews-view-grid__media"
-					{ ...mediaA11yProps }
-				>
-					{ renderedMediaField }
-				</ItemClickWrapper>
-			) }
-			{ hasBulkActions && shouldRenderMedia && (
+			<ItemClickWrapper
+				item={ item }
+				isItemClickable={ isItemClickable }
+				onClickItem={ onClickItem }
+				renderItemLink={ renderItemLink }
+				className={ clsx( 'dataviews-view-grid__media', {
+					'dataviews-view-grid__media--placeholder':
+						! rendersMediaField,
+				} ) }
+				{ ...mediaA11yProps }
+			>
+				{ renderedMediaField }
+			</ItemClickWrapper>
+			{ hasBulkActions && (
 				<DataViewsSelectionCheckbox
 					item={ item }
 					selection={ selection }
@@ -181,17 +186,13 @@ const GridItem = forwardRef( function GridItem< Item >(
 					disabled={ ! hasBulkAction }
 				/>
 			) }
-			{ ! showTitle && shouldRenderMedia && !! actions?.length && (
+			{ !! actions?.length && (
 				<div className="dataviews-view-grid__media-actions">
 					<ItemActions item={ item } actions={ actions } isCompact />
 				</div>
 			) }
 			{ showTitle && (
-				<Stack
-					direction="row"
-					gap="xs"
-					className="dataviews-view-grid__title-actions"
-				>
+				<div className="dataviews-view-grid__title">
 					<ItemClickWrapper
 						item={ item }
 						isItemClickable={ isItemClickable }
@@ -208,14 +209,7 @@ const GridItem = forwardRef( function GridItem< Item >(
 					>
 						{ renderedTitleField }
 					</ItemClickWrapper>
-					{ !! actions?.length && (
-						<ItemActions
-							item={ item }
-							actions={ actions }
-							isCompact
-						/>
-					) }
-				</Stack>
+				</div>
 			) }
 			<Stack direction="column" gap="2xs">
 				{ showDescription && descriptionField?.render && (

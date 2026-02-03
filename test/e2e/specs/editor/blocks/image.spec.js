@@ -596,6 +596,48 @@ test.describe( 'Image', () => {
 		await expect( imageDom ).toHaveAttribute( 'src', imgUrl );
 	} );
 
+	test( 'Insert from URL prepends https when URL has no protocol', async ( {
+		editor,
+		page,
+	} ) => {
+		await editor.insertBlock( { name: 'core/image' } );
+		const imageBlock = editor.canvas.locator(
+			'role=document[name="Block: Image"i]'
+		);
+		await expect( imageBlock ).toBeVisible();
+
+		await imageBlock
+			.getByRole( 'button' )
+			.filter( { hasText: 'Insert from URL' } )
+			.click();
+
+		const form = page.locator(
+			'form.block-editor-media-placeholder__url-input-form'
+		);
+
+		const imgUrlWithoutProtocol =
+			'wp20.wordpress.net/wp-content/themes/twentyseventeen-wp20/images/wp20-logo-white.svg';
+		const imgUrlWithHttps =
+			'https://wp20.wordpress.net/wp-content/themes/twentyseventeen-wp20/images/wp20-logo-white.svg';
+
+		await form.getByLabel( 'URL' ).fill( imgUrlWithoutProtocol );
+		await form.getByRole( 'button', { name: 'Apply' } ).click();
+
+		const imageInEditor = imageBlock.locator( 'role=img' );
+		await expect( imageInEditor ).toBeVisible();
+		await expect( imageInEditor ).toHaveAttribute( 'src', imgUrlWithHttps );
+
+		const postId = await editor.publishPost();
+		await page.goto( `/?p=${ postId }` );
+
+		const figureDom = page.getByRole( 'figure' );
+		await expect( figureDom ).toBeVisible();
+
+		const imageDom = figureDom.locator( 'img' );
+		await expect( imageDom ).toBeVisible();
+		await expect( imageDom ).toHaveAttribute( 'src', imgUrlWithHttps );
+	} );
+
 	test( 'adding a link should reflect configuration in published post content', async ( {
 		editor,
 		page,
