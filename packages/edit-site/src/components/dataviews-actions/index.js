@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { pencil } from '@wordpress/icons';
+import { __, sprintf } from '@wordpress/i18n';
+import { pencil, drawerRight } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -13,6 +13,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { PATTERN_TYPES } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
+import { QuickEditModal } from '../post-list/quick-edit-modal';
 
 const { useHistory } = unlock( routerPrivateApis );
 
@@ -96,5 +97,43 @@ export const useEditPostAction = () => {
 			},
 		} ),
 		[ history ]
+	);
+};
+
+export const useQuickEditPostAction = () => {
+	return useMemo(
+		() => ( {
+			id: 'quick-edit',
+			label: __( 'Quick Edit' ),
+			icon: drawerRight,
+			isEligible( post ) {
+				if ( post.status === 'trash' ) {
+					return false;
+				}
+				// It's eligible for all post types except theme patterns.
+				return post.type !== PATTERN_TYPES.theme;
+			},
+			modalHeader( items ) {
+				return sprintf(
+					/* translators: %s: post title */
+					__( 'Quick edit "%s"' ),
+					items[ 0 ]?.title?.rendered ||
+						items[ 0 ]?.title?.raw ||
+						items[ 0 ]?.title ||
+						''
+				);
+			},
+			RenderModal( { items, closeModal } ) {
+				const post = items[ 0 ];
+				return (
+					<QuickEditModal
+						postType={ post.type }
+						postId={ post.id }
+						closeModal={ closeModal }
+					/>
+				);
+			},
+		} ),
+		[]
 	);
 };
