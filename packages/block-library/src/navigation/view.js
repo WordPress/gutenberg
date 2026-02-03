@@ -49,20 +49,53 @@ const { state, actions } = store(
 	'core/navigation',
 	{
 		state: {
+			/**
+			 * Global map of overlay states, keyed by overlay ID.
+			 * Each overlay has: { isOpen, previousFocus, modal, firstFocusableElement, lastFocusableElement }
+			 */
+			overlays: {},
+
+			/**
+			 * Returns whether the current overlay (from context) is open.
+			 * Used by footer-rendered overlays.
+			 */
+			get isOverlayOpen() {
+				const ctx = getContext();
+				if ( ctx.overlayId ) {
+					return state.overlays[ ctx.overlayId ]?.isOpen || false;
+				}
+				return false;
+			},
+
 			get roleAttribute() {
 				const ctx = getContext();
+				// For footer overlays, use isOverlayOpen.
+				if ( ctx.overlayId ) {
+					return state.isOverlayOpen ? 'dialog' : null;
+				}
+				// Legacy: for inline overlays/submenus.
 				return ctx.type === 'overlay' && state.isMenuOpen
 					? 'dialog'
 					: null;
 			},
 			get ariaModal() {
 				const ctx = getContext();
+				// For footer overlays, use isOverlayOpen.
+				if ( ctx.overlayId ) {
+					return state.isOverlayOpen ? 'true' : null;
+				}
+				// Legacy: for inline overlays/submenus.
 				return ctx.type === 'overlay' && state.isMenuOpen
 					? 'true'
 					: null;
 			},
 			get ariaLabel() {
 				const ctx = getContext();
+				// For footer overlays, use isOverlayOpen.
+				if ( ctx.overlayId ) {
+					return state.isOverlayOpen ? ctx.ariaLabel : null;
+				}
+				// Legacy: for inline overlays/submenus.
 				return ctx.type === 'overlay' && state.isMenuOpen
 					? ctx.ariaLabel
 					: null;
@@ -214,6 +247,125 @@ const { state, actions } = store(
 					}
 				}
 			},
+
+			/**
+			 * Opens a footer-rendered overlay by ID.
+			 * Called from the toggle button with data-wp-overlay-id attribute.
+			 */
+			openOverlayById() {
+				const { ref } = getElement();
+				const overlayId = ref.dataset.wpOverlayId;
+				if ( ! overlayId ) {
+					return;
+				}
+
+				// Initialize overlay state if not exists.
+				if ( ! state.overlays[ overlayId ] ) {
+					state.overlays[ overlayId ] = {};
+				}
+
+				// Store the toggle button reference for focus restoration.
+				state.overlays[ overlayId ].previousFocus = ref;
+				state.overlays[ overlayId ].isOpen = true;
+
+				// Add modal-open class to document.
+				document.documentElement.classList.add( 'has-modal-open' );
+			},
+
+			/**
+			 * Closes the current footer-rendered overlay.
+			 * Uses the overlay ID from context.
+			 */
+			closeOverlayById() {
+				const ctx = getContext();
+				const overlayId = ctx.overlayId;
+				if ( ! overlayId || ! state.overlays[ overlayId ] ) {
+					return;
+				}
+
+				const overlayState = state.overlays[ overlayId ];
+				overlayState.isOpen = false;
+
+				// Restore focus to the toggle button.
+				if (
+					overlayState.modal?.contains(
+						window.document.activeElement
+					)
+				) {
+					overlayState.previousFocus?.focus();
+				}
+
+				// Remove modal-open class from document.
+				document.documentElement.classList.remove( 'has-modal-open' );
+			},
+
+			/**
+			 * Handles keydown events for footer-rendered overlays.
+			 * Escape closes the overlay, Tab traps focus within.
+			 */
+			handleOverlayKeydown: withSyncEvent( ( event ) => {
+				const ctx = getContext();
+				const overlayId = ctx.overlayId;
+				if ( ! overlayId || ! state.overlays[ overlayId ]?.isOpen ) {
+					return;
+				}
+
+				const overlayState = state.overlays[ overlayId ];
+
+				// Escape closes the overlay.
+				if ( event.key === 'Escape' ) {
+					event.stopPropagation();
+					actions.closeOverlayById();
+					return;
+				}
+
+				// Tab traps focus within the overlay.
+				if ( event.key === 'Tab' ) {
+					const { firstFocusableElement, lastFocusableElement } =
+						overlayState;
+					if ( ! firstFocusableElement || ! lastFocusableElement ) {
+						return;
+					}
+
+					if (
+						event.shiftKey &&
+						window.document.activeElement === firstFocusableElement
+					) {
+						event.preventDefault();
+						lastFocusableElement.focus();
+					} else if (
+						! event.shiftKey &&
+						window.document.activeElement === lastFocusableElement
+					) {
+						event.preventDefault();
+						firstFocusableElement.focus();
+					}
+				}
+			} ),
+
+			/**
+			 * Handles focusout events for footer-rendered overlays.
+			 * Closes the overlay if focus moves outside.
+			 */
+			handleOverlayFocusout: withSyncEvent( ( event ) => {
+				const ctx = getContext();
+				const overlayId = ctx.overlayId;
+				if ( ! overlayId || ! state.overlays[ overlayId ]?.isOpen ) {
+					return;
+				}
+
+				const overlayState = state.overlays[ overlayId ];
+
+				// Close if focus moves outside the overlay.
+				// event.relatedTarget is null when clicking outside (Safari).
+				if (
+					event.relatedTarget === null ||
+					( overlayState.modal &&
+						! overlayState.modal.contains( event.relatedTarget ) )
+				) {
+					actions.closeOverlayById();
+				}
+			} ),
 		},
 		callbacks: {
 			initMenu() {
@@ -228,10 +380,54 @@ const { state, actions } = store(
 				}
 			},
 			focusFirstElement() {
+				const ctx = getContext();
 				const { ref } = getElement();
+
+				// For footer overlays, use isOverlayOpen.
+				if ( ctx.overlayId ) {
+					if ( state.isOverlayOpen ) {
+						const focusableElements = getFocusableElements( ref );
+						focusableElements?.[ 0 ]?.focus();
+					}
+					return;
+				}
+
+				// Legacy: for inline overlays/submenus.
 				if ( state.isMenuOpen ) {
 					const focusableElements = getFocusableElements( ref );
 					focusableElements?.[ 0 ]?.focus();
+				}
+			},
+
+			/**
+			 * Initializes a footer-rendered overlay.
+			 * Registers the modal DOM reference and focusable elements.
+			 */
+			initOverlay() {
+				const ctx = getContext();
+				const { ref } = getElement();
+				const overlayId = ctx.overlayId;
+
+				if ( ! overlayId ) {
+					return;
+				}
+
+				// Initialize overlay state if not exists.
+				if ( ! state.overlays[ overlayId ] ) {
+					state.overlays[ overlayId ] = {};
+				}
+
+				const overlayState = state.overlays[ overlayId ];
+
+				// Always register the modal reference.
+				overlayState.modal = ref;
+
+				// When overlay is open, calculate focusable elements.
+				if ( overlayState.isOpen ) {
+					const focusableElements = getFocusableElements( ref );
+					overlayState.firstFocusableElement = focusableElements[ 0 ];
+					overlayState.lastFocusableElement =
+						focusableElements[ focusableElements.length - 1 ];
 				}
 			},
 		},

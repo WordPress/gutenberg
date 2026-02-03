@@ -73,6 +73,88 @@ class WP_Navigation_Block_Renderer {
 	private static $seen_menu_names = array();
 
 	/**
+	 * Stores overlay markup to be rendered in the footer.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @var array
+	 */
+	private static $footer_overlays = array();
+
+	/**
+	 * Whether the footer overlay action has been registered.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @var bool
+	 */
+	private static $footer_action_registered = false;
+
+	/**
+	 * Generates a unique overlay ID for a Navigation block.
+	 *
+	 * Uses the navigation menu ref ID if available for consistency,
+	 * otherwise generates a unique ID.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array $attributes The block attributes.
+	 * @return string The unique overlay ID.
+	 */
+	private static function get_overlay_id( $attributes ) {
+		// Use ref (navigation menu ID) if available for consistent IDs across page loads.
+		if ( isset( $attributes['ref'] ) ) {
+			return 'nav-overlay-' . $attributes['ref'];
+		}
+		return wp_unique_id( 'nav-overlay-' );
+	}
+
+	/**
+	 * Registers an overlay to be rendered in the footer via wp_footer hook.
+	 *
+	 * This approach renders overlays at the end of the HTML document to:
+	 * - Keep overlay content out of the main page content flow (better SEO)
+	 * - Provide a flexible container that can hold any blocks
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param string $overlay_id     The unique overlay ID.
+	 * @param string $overlay_markup The HTML markup for the overlay.
+	 */
+	private static function register_overlay_for_footer( $overlay_id, $overlay_markup ) {
+		// Store the overlay markup keyed by ID.
+		static::$footer_overlays[ $overlay_id ] = $overlay_markup;
+
+		// Register the wp_footer action only once.
+		if ( ! static::$footer_action_registered ) {
+			add_action(
+				'wp_footer',
+				array( __CLASS__, 'render_footer_overlays' ),
+				20
+			);
+			static::$footer_action_registered = true;
+		}
+	}
+
+	/**
+	 * Renders all registered overlays in the footer.
+	 *
+	 * Called via the wp_footer action hook.
+	 *
+	 * @since 7.0.0
+	 */
+	public static function render_footer_overlays() {
+		if ( empty( static::$footer_overlays ) ) {
+			return;
+		}
+
+		foreach ( static::$footer_overlays as $overlay_id => $markup ) {
+			// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Markup is escaped during generation.
+			echo $markup;
+		}
+	}
+
+	/**
 	 * Returns whether the navigation overlay experiment is enabled.
 	 *
 	 * @since 6.5.0
@@ -677,57 +759,54 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
-	 * Get the responsive container markup
+	 * Get the responsive container markup.
+	 *
+	 * The overlay is rendered in the footer via wp_footer hook to:
+	 * - Keep overlay content out of the main page content flow (better SEO)
+	 * - Provide a flexible container that can hold any blocks
 	 *
 	 * @since 6.5.0
+	 * @since 7.0.0 Refactored to render overlay in footer.
 	 *
 	 * @param array         $attributes The block attributes.
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 * @param string        $inner_blocks_html The markup for the inner blocks.
-	 * @return string Returns the container markup.
+	 * @return string Returns the toggle button markup (overlay is rendered in footer).
 	 */
 	private static function get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html ) {
-		$is_interactive  = static::is_interactive( $attributes, $inner_blocks );
-		$colors          = block_core_navigation_build_css_colors( $attributes );
-		$modal_unique_id = wp_unique_id( 'modal-' );
-
+		$is_interactive       = static::is_interactive( $attributes, $inner_blocks );
+		$colors               = block_core_navigation_build_css_colors( $attributes );
+		$overlay_id           = static::get_overlay_id( $attributes );
 		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
 
-		// Set-up variables for the custom overlay experiment.
-		// Values are set to "off" so they don't affect the default behavior.
-		$is_overlay_experiment_enabled  = static::is_overlay_experiment_enabled();
+		// Set-up variables for the custom overlay.
 		$has_custom_overlay             = false;
 		$close_button_markup            = '';
 		$has_custom_overlay_close_block = false;
 		$overlay_blocks_html            = '';
-		$custom_overlay_markup          = '';
 
-		if ( $is_overlay_experiment_enabled ) {
-			// Check if an overlay template part is selected and render it.
-			// This needs to happen before building classes so we know if overlay blocks actually exist.
-			if ( ! empty( $attributes['overlay'] ) ) {
-				// Get blocks from the overlay template part.
-				$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
-				// Check if overlay contains a navigation-overlay-close block.
-				$has_custom_overlay_close_block = block_core_navigation_block_tree_has_block_type(
-					$overlay_blocks,
-					'core/navigation-overlay-close',
-					array( 'core/navigation' ) // Skip navigation blocks, as they cannot contain an overlay close block
-				);
-				// Render template part blocks directly without navigation container wrapper.
-				$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
-				// Add Interactivity API directives to the overlay close block if present.
-				if ( $has_custom_overlay_close_block && $is_interactive ) {
-					$tags                = new WP_HTML_Tag_Processor( $overlay_blocks_html );
-					$overlay_blocks_html = block_core_navigation_add_directives_to_overlay_close( $tags );
-				}
+		// Check if an overlay template part is selected and render it.
+		if ( ! empty( $attributes['overlay'] ) ) {
+			// Get blocks from the overlay template part.
+			$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
+			// Check if overlay contains a navigation-overlay-close block.
+			$has_custom_overlay_close_block = block_core_navigation_block_tree_has_block_type(
+				$overlay_blocks,
+				'core/navigation-overlay-close',
+				array( 'core/navigation' ) // Skip navigation blocks, as they cannot contain an overlay close block.
+			);
+			// Render template part blocks directly without navigation container wrapper.
+			$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
+			// Add Interactivity API directives to the overlay close block if present.
+			if ( $has_custom_overlay_close_block && $is_interactive ) {
+				$tags                = new WP_HTML_Tag_Processor( $overlay_blocks_html );
+				$overlay_blocks_html = block_core_navigation_add_directives_to_overlay_close( $tags );
 			}
 
 			$has_custom_overlay = ! empty( $overlay_blocks_html );
 		}
 
-		$responsive_container_classes = static::get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors );
-
+		// Build toggle button.
 		$open_button_classes = array(
 			'wp-block-navigation__responsive-container-open',
 			$is_hidden_by_default ? 'always-shown' : '',
@@ -743,53 +822,42 @@ class WP_Navigation_Block_Renderer {
 		$toggle_button_content       = $should_display_icon_label ? $toggle_button_icon : __( 'Menu' );
 		$toggle_close_button_icon    = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z"></path></svg>';
 		$toggle_close_button_content = $should_display_icon_label ? $toggle_close_button_icon : __( 'Close' );
-		$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : ''; // Open button label.
-		$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : ''; // Close button label.
+		$toggle_aria_label_open      = $should_display_icon_label ? 'aria-label="' . __( 'Open menu' ) . '"' : '';
+		$toggle_aria_label_close     = $should_display_icon_label ? 'aria-label="' . __( 'Close menu' ) . '"' : '';
 
-		// Add Interactivity API directives to the markup if needed.
-		$open_button_directives          = '';
-		$responsive_container_directives = '';
-		$responsive_dialog_directives    = '';
-		$close_button_directives         = '';
+		// Add Interactivity API directives.
+		$open_button_directives = '';
+		$overlay_directives     = '';
+		$close_button_directives = '';
+
 		if ( $is_interactive ) {
-			$open_button_directives                  = '
-				data-wp-on--click="actions.openMenuOnClick"
+			// Toggle button references the overlay by ID.
+			$open_button_directives = sprintf(
+				'data-wp-on--click="actions.openOverlayById"
 				data-wp-on--keydown="actions.handleMenuKeydown"
-			';
-			$responsive_container_directives         = '
-				data-wp-class--has-modal-open="state.isMenuOpen"
-				data-wp-class--is-menu-open="state.isMenuOpen"
-				data-wp-watch="callbacks.initMenu"
-				data-wp-on--keydown="actions.handleMenuKeydown"
-				data-wp-on--focusout="actions.handleMenuFocusout"
-				tabindex="-1"
-			';
-			$responsive_dialog_directives            = '
-				data-wp-bind--aria-modal="state.ariaModal"
-				data-wp-bind--aria-label="state.ariaLabel"
-				data-wp-bind--role="state.roleAttribute"
-			';
-			$close_button_directives                 = '
-				data-wp-on--click="actions.closeMenuOnClick"
-			';
-			$responsive_container_content_directives = '
-				data-wp-watch="callbacks.focusFirstElement"
-			';
-		}
-
-		// Don't apply overlay inline styles if using a custom overlay template part.
-		// The custom overlay is responsible for its own styling.
-		$overlay_inline_styles = static::get_overlay_inline_styles( $has_custom_overlay, $colors );
-
-		if ( $has_custom_overlay ) {
-			$custom_overlay_markup = sprintf(
-				'<div class="wp-block-navigation__overlay-container">%s</div>',
-				$overlay_blocks_html
+				data-wp-overlay-id="%s"',
+				esc_attr( $overlay_id )
 			);
+
+			// Overlay directives for footer-rendered overlay.
+			$overlay_directives = sprintf(
+				'data-wp-interactive="core/navigation"
+				data-wp-context=\'{ "overlayId": "%1$s", "type": "overlay" }\'
+				data-wp-class--has-modal-open="state.isOverlayOpen"
+				data-wp-class--is-menu-open="state.isOverlayOpen"
+				data-wp-watch="callbacks.initOverlay"
+				data-wp-on--keydown="actions.handleOverlayKeydown"
+				data-wp-on--focusout="actions.handleOverlayFocusout"
+				data-wp-bind--aria-modal="state.ariaModal"
+				data-wp-bind--role="state.roleAttribute"
+				tabindex="-1"',
+				esc_attr( $overlay_id )
+			);
+
+			$close_button_directives = 'data-wp-on--click="actions.closeOverlayById"';
 		}
 
-		// Show default close button for all responsive navigation,
-		// unless custom overlay has its own close block.
+		// Build close button markup (unless custom overlay has its own).
 		if ( ! $has_custom_overlay_close_block ) {
 			$close_button_markup = sprintf(
 				'<button %1$s class="wp-block-navigation__responsive-container-close" %2$s>%3$s</button>',
@@ -799,34 +867,59 @@ class WP_Navigation_Block_Renderer {
 			);
 		}
 
-		return sprintf(
-			'<button aria-haspopup="dialog" %3$s class="%6$s" %10$s>%8$s</button>
-				<div class="%5$s" %7$s id="%1$s" %11$s>
-					<div class="wp-block-navigation__responsive-close" tabindex="-1">
-						<div class="wp-block-navigation__responsive-dialog" %12$s>
-							%13$s
-							<div class="wp-block-navigation__responsive-container-content" %14$s id="%1$s-content">
-								%2$s
-								%15$s
-							</div>
-						</div>
-					</div>
-				</div>',
-			esc_attr( $modal_unique_id ),
-			$inner_blocks_html,
-			$toggle_aria_label_open,
-			$toggle_aria_label_close,
-			esc_attr( trim( implode( ' ', $responsive_container_classes ) ) ),
-			esc_attr( trim( implode( ' ', $open_button_classes ) ) ),
+		// Build overlay classes.
+		$overlay_classes = array( 'wp-block-navigation-overlay' );
+		if ( $is_hidden_by_default ) {
+			$overlay_classes[] = 'hidden-by-default';
+		}
+		if ( ! $has_custom_overlay ) {
+			// Apply overlay color classes from navigation block if no custom overlay.
+			$overlay_classes = array_merge( $overlay_classes, $colors['overlay_css_classes'] );
+		}
+
+		// Get overlay inline styles (only if no custom overlay).
+		$overlay_inline_styles = '';
+		if ( ! $has_custom_overlay && ! empty( $colors['overlay_inline_styles'] ) ) {
+			$overlay_inline_styles = sprintf(
+				'style="%s"',
+				esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) )
+			);
+		}
+
+		// Build the overlay content.
+		$overlay_content = $has_custom_overlay
+			? sprintf( '<div class="wp-block-navigation-overlay__custom-content">%s</div>', $overlay_blocks_html )
+			: sprintf( '<div class="wp-block-navigation-overlay__default-content">%s</div>', $inner_blocks_html );
+
+		// Build the footer overlay markup.
+		// The overlay is a generic <div> container, not a <nav>.
+		// Users can add a Navigation block inside the overlay template part if they want.
+		$overlay_markup = sprintf(
+			'<div class="%1$s" id="%2$s" %3$s %4$s aria-label="%5$s">
+				<div class="wp-block-navigation-overlay__content" data-wp-watch="callbacks.focusFirstElement">
+					%6$s
+					%7$s
+				</div>
+			</div>',
+			esc_attr( trim( implode( ' ', $overlay_classes ) ) ),
+			esc_attr( $overlay_id ),
+			$overlay_directives,
 			$overlay_inline_styles,
-			$toggle_button_content,
-			$toggle_close_button_content,
-			$open_button_directives,
-			$responsive_container_directives,
-			$responsive_dialog_directives,
+			esc_attr( __( 'Menu' ) ),
 			$close_button_markup,
-			$responsive_container_content_directives,
-			$has_custom_overlay ? $custom_overlay_markup : ''
+			$overlay_content
+		);
+
+		// Register the overlay for footer rendering.
+		static::register_overlay_for_footer( $overlay_id, $overlay_markup );
+
+		// Return only the toggle button (overlay is rendered in footer).
+		return sprintf(
+			'<button aria-haspopup="dialog" %1$s class="%2$s" %3$s>%4$s</button>',
+			$toggle_aria_label_open,
+			esc_attr( trim( implode( ' ', $open_button_classes ) ) ),
+			$open_button_directives,
+			$toggle_button_content
 		);
 	}
 
@@ -1105,6 +1198,7 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
  * markup using the Tag Processor.
  *
  * @since 6.5.0
+ * @since 7.0.0 Updated to use closeOverlayById for footer-rendered overlays.
  *
  * @param WP_HTML_Tag_Processor $tags Markup of the navigation block.
  * @return string Overlay close markup with the directives injected.
@@ -1117,8 +1211,9 @@ function block_core_navigation_add_directives_to_overlay_close( $tags ) {
 			'class_name' => 'wp-block-navigation-overlay-close',
 		)
 	) ) {
-		// Add the same close directive as the default close button.
-		$tags->set_attribute( 'data-wp-on--click', 'actions.closeMenuOnClick' );
+		// Use closeOverlayById for footer-rendered overlays.
+		// The overlay's context provides the overlayId needed by this action.
+		$tags->set_attribute( 'data-wp-on--click', 'actions.closeOverlayById' );
 	}
 	return $tags->get_updated_html();
 }
