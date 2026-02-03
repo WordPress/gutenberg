@@ -36,13 +36,15 @@ describe( 'Dialog', () => {
 		// Click trigger to open dialog
 		await user.click( triggerRef.current! );
 
-		// Wait for the dialog to appear, at which point inner refs will be available
+		// Wait for the dialog to appear
 		await waitFor( () => {
 			expect( popupRef.current ).toBeInstanceOf( HTMLDivElement );
-			expect( headingRef.current ).toBeInstanceOf( HTMLHeadingElement );
-			expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
-			expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
-			expect( footerRef.current ).toBeInstanceOf( HTMLDivElement );
 		} );
+
+		// Now that the dialog is open, verify all inner refs
+		expect( headingRef.current ).toBeInstanceOf( HTMLHeadingElement );
+		expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
+		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
+		expect( footerRef.current ).toBeInstanceOf( HTMLDivElement );
 	} );
 } );
