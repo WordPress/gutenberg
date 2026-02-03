@@ -9,9 +9,6 @@ import VipsModule from 'wasm-vips/vips.wasm';
 // @ts-expect-error - WASM files are inlined as base64 data URLs at build time
 import VipsJxlModule from 'wasm-vips/vips-jxl.wasm';
 
-// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
-import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
-
 /**
  * Internal dependencies
  */
@@ -44,6 +41,9 @@ async function getVips(): Promise< typeof Vips > {
 	}
 
 	vipsInstance = await Vips( {
+		// Only load JXL module, skip HEIF due to trademark issues.
+		// wasm-vips defaults to ["vips-jxl.wasm", "vips-heif.wasm"].
+		dynamicLibraries: [ 'vips-jxl.wasm' ],
 		locateFile: ( fileName: string ) => {
 			// WASM files are inlined as base64 data URLs at build time,
 			// eliminating the need for separate file downloads and avoiding
@@ -52,8 +52,6 @@ async function getVips(): Promise< typeof Vips > {
 				return VipsModule;
 			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) ) {
 				return VipsJxlModule;
-			} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
-				return VipsHeifModule;
 			}
 			return fileName;
 		},
