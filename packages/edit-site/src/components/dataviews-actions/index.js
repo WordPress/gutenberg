@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { pencil, drawerRight } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
@@ -106,6 +106,7 @@ export const useQuickEditPostAction = () => {
 			label: __( 'Quick Edit' ),
 			icon: drawerRight,
 			isPrimary: true,
+			supportsBulk: true,
 			isEligible( post ) {
 				if ( post.status === 'trash' ) {
 					return false;
@@ -114,22 +115,28 @@ export const useQuickEditPostAction = () => {
 				return post.type !== PATTERN_TYPES.theme;
 			},
 			modalHeader( items ) {
+				if ( items.length === 1 ) {
+					return sprintf(
+						/* translators: %s: post title */
+						__( 'Quick edit "%s"' ),
+						items[ 0 ]?.title?.rendered ||
+							items[ 0 ]?.title?.raw ||
+							items[ 0 ]?.title ||
+							''
+					);
+				}
 				return sprintf(
-					/* translators: %s: post title */
-					__( 'Quick edit "%s"' ),
-					items[ 0 ]?.title?.rendered ||
-						items[ 0 ]?.title?.raw ||
-						items[ 0 ]?.title ||
-						''
+					/* translators: %d: number of items */
+					_n( 'Edit %d item', 'Edit %d items', items.length ),
+					items.length
 				);
 			},
-			RenderModal( { items, closeModal } ) {
-				const post = items[ 0 ];
+			RenderModal( { items, closeModal, onActionPerformed } ) {
 				return (
 					<QuickEditModal
-						postType={ post.type }
-						postId={ post.id }
+						items={ items }
 						closeModal={ closeModal }
+						onActionPerformed={ onActionPerformed }
 					/>
 				);
 			},
