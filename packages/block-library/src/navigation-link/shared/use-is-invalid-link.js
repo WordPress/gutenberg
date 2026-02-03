@@ -6,25 +6,16 @@ import { store as coreStore } from '@wordpress/core-data';
 import { useBlockEditingMode } from '@wordpress/block-editor';
 
 /**
- * Custom hook to check if a navigation link points to an invalid or deleted entity.
+ * A React hook to determine if a navigation link or submenu's parent link is invalid.
  *
- * Checks if a post-type link is:
- * - Deleted (entity no longer exists)
- * - Trashed (post status is 'trash')
- * - Draft (post status is 'draft')
+ * @param {string}  kind    The kind of link (post-type, custom, taxonomy, etc).
+ * @param {string}  type    The type of post (post, page, etc).
+ * @param {number}  id      The post or term id.
+ * @param {boolean} enabled Whether to enable the validation check.
  *
- * This check is skipped when:
- * - The block editing mode is 'disabled' (e.g., in templates)
- * - The `enabled` parameter is false
- * - The link is not a post-type link
- *
- * @param {string}  kind    The kind of entity (e.g., 'post-type', 'taxonomy').
- * @param {string}  type    The entity type (e.g., 'post', 'page').
- * @param {number}  id      The entity ID.
- * @param {boolean} enabled Whether to perform the validation check.
- * @return {Array} A tuple of [isInvalid, isDraft] booleans.
+ * @return {Array} Array containing [isInvalid, isDraft] booleans.
  */
-export function useIsInvalidLink( kind, type, id, enabled ) {
+export const useIsInvalidLink = ( kind, type, id, enabled ) => {
 	const isPostType =
 		kind === 'post-type' || type === 'post' || type === 'page';
 	const hasId = Number.isInteger( id );
@@ -78,4 +69,4 @@ export function useIsInvalidLink( kind, type, id, enabled ) {
 	const isDraft = 'draft' === postStatus;
 
 	return [ isInvalid, isDraft ];
-}
+};
