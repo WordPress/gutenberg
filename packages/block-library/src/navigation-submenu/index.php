@@ -249,7 +249,7 @@ function render_block_core_navigation_submenu( $attributes, $content, $block ) {
 		$html .= '</button>';
 
 		if ( $has_submenu ) {
-			$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_shared_navigation_render_submenu_icon() . '</span>';
+			$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_render_submenu_icon() . '</span>';
 		}
 	}
 
