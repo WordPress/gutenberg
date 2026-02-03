@@ -63,7 +63,6 @@ function gutenberg_get_default_image_output_formats() {
 		'image/gif',
 		'image/webp',
 		'image/avif',
-		'image/heic',
 	);
 
 	$output_formats = array();
