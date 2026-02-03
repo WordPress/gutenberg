@@ -2360,6 +2360,52 @@ describe( 'Tabs', () => {
 			);
 		} );
 
+		it( 'should handle dynamic value changes correctly', async () => {
+			const { rerender } = render(
+				<Tabs.Root defaultValue="one">
+					<Tabs.List>
+						<Tabs.Tab value="one">One</Tabs.Tab>
+						<Tabs.Tab value="two">Two</Tabs.Tab>
+					</Tabs.List>
+					<Tabs.Panel value="one">First panel</Tabs.Panel>
+					<Tabs.Panel value="two">Second panel</Tabs.Panel>
+				</Tabs.Root>
+			);
+
+			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
+
+			// Wait for validation
+			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+
+			// No warnings since all values match
+			expect( console ).not.toHaveWarned();
+
+			// Change a tab's value to create a mismatch
+			rerender(
+				<Tabs.Root defaultValue="one">
+					<Tabs.List>
+						<Tabs.Tab value="one">One</Tabs.Tab>
+						<Tabs.Tab value="changed">Two</Tabs.Tab>
+					</Tabs.List>
+					<Tabs.Panel value="one">First panel</Tabs.Panel>
+					<Tabs.Panel value="two">Second panel</Tabs.Panel>
+				</Tabs.Root>
+			);
+
+			// Wait for validation to run after the value change
+			await waitFor( () => {
+				expect( console ).toHaveWarned();
+			} );
+
+			// Should warn about "changed" tab without panel AND "two" panel without tab
+			expect( console ).toHaveWarnedWith(
+				'Tabs: Found Tab(s) without matching Panel(s). Each Tab should have a corresponding Panel with the same `value` prop. Tab value(s) without panels: changed'
+			);
+			expect( console ).toHaveWarnedWith(
+				'Tabs: Found Panel(s) without matching Tab(s). Each Panel should have a corresponding Tab with the same `value` prop. Panel value(s) without tabs: two'
+			);
+		} );
+
 		it( 'should not warn when all Tabs and Panels match', async () => {
 			render(
 				<Tabs.Root defaultValue="one">
