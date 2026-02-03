@@ -14,6 +14,18 @@ Install the module
 npm install @wordpress/dataviews --save
 ```
 
+## Stylesheet Dependencies
+
+As an implementation of the design system, these components depend on CSS custom properties defined by the `@wordpress/theme` package. In a WordPress admin page context, these are loaded automatically. For applications outside WordPress, you will need to install and include the design tokens stylesheet:
+
+```bash
+npm install @wordpress/theme
+```
+
+```tsx
+import '@wordpress/theme/design-tokens.css';
+```
+
 ## `DataViews`
 
 <div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's an <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviews--docs">example implementation of the Dataviews component</a>.</div>
