@@ -901,7 +901,15 @@ const ValidationComponent = ( {
 				},
 			},
 		];
-	}, [ elements, custom, pattern, minMax, getElements, getIsRequired ] );
+	}, [
+		elements,
+		custom,
+		pattern,
+		minMax,
+		getElements,
+		getIsRequired,
+		required,
+	] );
 
 	const form = useMemo( () => {
 		if ( layout === 'regular' ) {
