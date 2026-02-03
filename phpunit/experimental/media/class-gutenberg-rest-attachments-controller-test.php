@@ -562,11 +562,11 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertArrayHasKey( 'file', $medium_size );
 		$this->assertArrayHasKey( 'width', $medium_size );
 		$this->assertArrayHasKey( 'height', $medium_size );
-		$this->assertArrayHasKey( 'mime_type', $medium_size );
+		$this->assertArrayHasKey( 'mime-type', $medium_size );
 		$this->assertArrayHasKey( 'filesize', $medium_size );
 
 		$this->assertSame( 'canola-300x200.jpg', $medium_size['file'] );
-		$this->assertSame( 'image/jpeg', $medium_size['mime_type'] );
+		$this->assertSame( 'image/jpeg', $medium_size['mime-type'] );
 		$this->assertGreaterThan( 0, $medium_size['filesize'] );
 	}
 
