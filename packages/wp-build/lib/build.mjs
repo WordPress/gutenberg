@@ -779,110 +779,78 @@ async function bundlePackage( packageName, options = {} ) {
  * @param {string} config.global       Global variable name (e.g., 'React', 'ReactDOM').
  * @param {string} config.handle       WordPress script handle (e.g., 'react', 'react-dom').
  * @param {Array}  config.dependencies Array of dependency handles (e.g., ['react']).
- * @param {Array}  allVendorScripts    All vendor scripts being built (for externalization).
  * @return {Promise<Object>} Built script info for registration.
  */
-async function bundleVendorScript( config, allVendorScripts = [] ) {
-	const {
-		name,
-		global: globalName,
-		handle,
-		dependencies = [],
-	} = config;
-
-	const { createRequire } = await import( 'module' );
-	const require = createRequire( import.meta.url );
-
-	// Resolve the package entry point from node_modules
-	let entryPoint;
-	try {
-		// For subpath exports like 'react/jsx-runtime', resolve directly
-		entryPoint = require.resolve( name, { paths: [ ROOT_DIR ] } );
-	} catch {
-		throw new Error( `Could not resolve vendor package: ${ name }` );
-	}
+async function bundleVendorScript( config ) {
+	const { name, global: globalName, handle, dependencies = [] } = config;
 
 	const outputDir = path.join( BUILD_DIR, 'scripts', handle );
 	const target = browserslistToEsbuild();
 
-	// Build a map of vendor scripts to externalize (other than the current one)
-	const vendorExternalsMap = {};
-	for ( const vendor of allVendorScripts ) {
-		if ( vendor.name !== name ) {
-			vendorExternalsMap[ vendor.name ] = {
-				global: vendor.global,
-				handle: vendor.handle,
-			};
-		}
-	}
-
-	// Create a simple plugin to externalize other vendor packages
-	const vendorExternalsPlugin = {
-		name: 'vendor-externals',
+	// Plugin that provides a synthetic entry point module.
+	const virtualEntryPlugin = {
+		name: 'virtual-entry',
 		setup( build ) {
-			for ( const [ pkgName, pkgConfig ] of Object.entries(
-				vendorExternalsMap
-			) ) {
-				build.onResolve(
-					{ filter: new RegExp( `^${ pkgName.replace( '/', '\\/' ) }$` ) },
-					() => ( {
-						path: pkgName,
-						namespace: 'vendor-external',
-						pluginData: { global: pkgConfig.global },
-					} )
-				);
-			}
+			build.onResolve( { filter: /^virtual:entry$/ }, () => ( {
+				path: 'virtual:entry',
+				namespace: 'virtual-entry',
+			} ) );
 
 			build.onLoad(
-				{ filter: /.*/, namespace: 'vendor-external' },
-				( args ) => {
-					const vendorGlobal = args.pluginData.global;
-					return {
-						contents: `module.exports = window.${ vendorGlobal };`,
-						loader: 'js',
-					};
-				}
+				{ filter: /.*/, namespace: 'virtual-entry' },
+				() => ( {
+					contents: `export * from '${ name }';`,
+					loader: 'js',
+					resolveDir: ROOT_DIR,
+				} )
 			);
 		},
 	};
 
-	// Generate content hash for versioning
-	const generateVendorHash = async ( filePath ) => {
-		const { createHash } = await import( 'crypto' );
-		const content = await readFile( filePath );
-		return createHash( 'sha256' ).digest( 'hex' ).slice( 0, 20 );
+	// Plugin that externalizes the `react` package.
+	const reactExternalPlugin = {
+		name: 'react-external',
+		setup( build ) {
+			build.onResolve( { filter: /^react$/ }, () => {
+				return {
+					path: 'react',
+					namespace: 'react-external',
+				};
+			} );
+
+			build.onLoad(
+				{ filter: /.*/, namespace: 'react-external' },
+				() => ( {
+					contents: `module.exports = globalThis.React`,
+					loader: 'js',
+				} )
+			);
+		},
 	};
 
 	// Build both minified and non-minified versions
-	await Promise.all( [
-		esbuild.build( {
-			entryPoints: [ entryPoint ],
-			outfile: path.join( outputDir, 'index.min.js' ),
-			bundle: true,
-			format: 'iife',
-			globalName,
-			minify: true,
-			target,
-			platform: 'browser',
-			define: getDefine( false ),
-			plugins: [ vendorExternalsPlugin ],
-		} ),
-		esbuild.build( {
-			entryPoints: [ entryPoint ],
-			outfile: path.join( outputDir, 'index.js' ),
-			bundle: true,
-			format: 'iife',
-			globalName,
-			minify: false,
-			target,
-			platform: 'browser',
-			define: getDefine( true ),
-			plugins: [ vendorExternalsPlugin ],
-		} ),
-	] );
+	const builds = [
+		[ 'index.js', false ],
+		[ 'index.min.js', true ],
+	];
+	await Promise.all(
+		builds.map( ( [ outputFile, production ] ) =>
+			esbuild.build( {
+				entryPoints: [ 'virtual:entry' ],
+				outfile: path.join( outputDir, outputFile ),
+				bundle: true,
+				format: 'iife',
+				globalName,
+				minify: production,
+				target,
+				platform: 'browser',
+				define: getDefine( ! production ),
+				plugins: [ virtualEntryPlugin, reactExternalPlugin ],
+			} )
+		)
+	);
 
 	// Generate content hash from built file
-	const { createHash } = await import( 'crypto' );
 	const builtContent = await readFile(
 		path.join( outputDir, 'index.min.js' )
 	);
@@ -920,23 +888,10 @@ async function bundleAllVendorScripts() {
 
 	const builtScripts = [];
 
-	// Build vendor scripts in dependency order
-	// First pass: scripts with no dependencies
-	// Second pass: scripts with dependencies
-	const noDeps = VENDOR_SCRIPTS.filter(
-		( v ) => ! v.dependencies || v.dependencies.length === 0
-	);
-	const withDeps = VENDOR_SCRIPTS.filter(
-		( v ) => v.dependencies && v.dependencies.length > 0
-	);
-
-	for ( const vendorConfig of [ ...noDeps, ...withDeps ] ) {
+	for ( const vendorConfig of VENDOR_SCRIPTS ) {
 		try {
 			const startTime = Date.now();
-			const scriptInfo = await bundleVendorScript(
-				vendorConfig,
-				VENDOR_SCRIPTS
-			);
+			const scriptInfo = await bundleVendorScript( vendorConfig );
 			const buildTime = Date.now() - startTime;
 			builtScripts.push( scriptInfo );
 			console.log(

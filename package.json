@@ -41,18 +41,12 @@
 			{
 				"name": "react-dom",
 				"global": "ReactDOM",
-				"handle": "react-dom",
-				"dependencies": [
-					"react"
-				]
+				"handle": "react-dom"
 			},
 			{
 				"name": "react/jsx-runtime",
 				"global": "ReactJSXRuntime",
-				"handle": "react-jsx-runtime",
-				"dependencies": [
-					"react"
-				]
+				"handle": "react-jsx-runtime"
 			}
 		]
 	},
