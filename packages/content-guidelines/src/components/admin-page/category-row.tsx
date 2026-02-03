@@ -8,6 +8,7 @@ interface CategoryRowProps {
 	description: string;
 	value: string;
 	onChange: ( value: string ) => void;
+	maxLength?: number;
 }
 
 /**
@@ -18,6 +19,8 @@ interface CategoryRowProps {
  * @param props.description Help text for the textarea.
  * @param props.value       Current value of the textarea.
  * @param props.onChange    Callback when value changes.
+ * @param props.maxLength   Maximum length for the textarea.
+ *                          Default is 5000.
  * @return CategoryRow component.
  */
 export default function CategoryRow( {
@@ -25,6 +28,7 @@ export default function CategoryRow( {
 	description,
 	value,
 	onChange,
+	maxLength,
 }: CategoryRowProps ) {
 	return (
 		<tr>
@@ -38,6 +42,7 @@ export default function CategoryRow( {
 					onChange={ onChange }
 					rows={ 6 }
 					help={ description }
+					maxLength={ maxLength }
 				/>
 			</td>
 		</tr>

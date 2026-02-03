@@ -220,6 +220,7 @@ export default function AdminPage() {
 												categoryValue
 											)
 										}
+										maxLength={ 5000 }
 									/>
 								);
 							} ) }

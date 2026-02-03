@@ -250,6 +250,7 @@ export default function BlockGuidelinesRow( {
 									help={ __(
 										'Enter guidelines specific to this block type.'
 									) }
+									maxLength={ 5000 }
 								/>
 							</div>
 						) }
