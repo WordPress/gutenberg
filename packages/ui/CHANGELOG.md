@@ -10,6 +10,10 @@
 
 -   `Button`: Add minimum content width (`6ch` + padding) to prevent overly narrow buttons with short labels ([#75133](https://github.com/WordPress/gutenberg/pull/75133)).
 
+### Internal
+
+-   `Button`, `InputLayout`, `Tabs`: use semantic dimension tokens ([#74557](https://github.com/WordPress/gutenberg/pull/74557)).
+
 ## 0.6.0 (2026-01-29)
 
 ### New Features
