@@ -29,7 +29,6 @@ import {
 	logProcessStart,
 	logOperationStart,
 	logOperationComplete,
-	logPrepareOperations,
 	logResizeCrop,
 	logResizeComplete,
 	logRotation,
@@ -741,12 +740,6 @@ export function prepareItem( id: QueueItemId ) {
 		} else {
 			operations.push( OperationType.Upload );
 		}
-
-		// Log the prepared operations list
-		const operationNames = operations.map( ( op ) =>
-			Array.isArray( op ) ? op[ 0 ] : op
-		);
-		logPrepareOperations( id, file.name, operationNames );
 
 		dispatch< AddOperationsAction >( {
 			type: Type.AddOperations,
