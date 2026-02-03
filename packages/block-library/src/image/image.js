@@ -39,7 +39,13 @@ import {
 	privateApis as blockEditorPrivateApis,
 	BlockSettingsMenuControls,
 } from '@wordpress/block-editor';
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
@@ -230,16 +236,16 @@ function ContentOnlyControls( {
 								lockTitleControls ? (
 									<>{ lockTitleControlsMessage }</>
 								) : (
-									<>
-										{ __(
-											'Describe the role of this image on the page.'
-										) }
-										<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
-											{ __(
-												'(Note: many devices and browsers do not display this text.)'
-											) }
-										</ExternalLink>
-									</>
+									createInterpolateElement(
+										__(
+											'Describe the role of this image on the page. <a>(Note: many devices and browsers do not display this text.)</a>'
+										),
+										{
+											a: (
+												<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute" />
+											),
+										}
+									)
 								)
 							}
 						/>
@@ -304,16 +310,39 @@ export default function Image( {
 	const setRefs = useMergeRefs( [ setImageElement, setResizeObserved ] );
 	const { allowResize = true } = context;
 
-	const image = useSelect(
-		( select ) =>
-			id && isSingleSelected
-				? select( coreStore ).getEntityRecord(
-						'postType',
-						'attachment',
-						id,
-						{ context: 'view' }
-				  )
-				: null,
+	const { image, canUserEdit } = useSelect(
+		( select ) => {
+			const imageRecord =
+				id && isSingleSelected
+					? select( coreStore ).getEntityRecord(
+							'postType',
+							'attachment',
+							id,
+							{ context: 'view' }
+					  )
+					: null;
+
+			// Check edit permissions. When the media editor experiment is enabled,
+			// use getEntityRecordPermissions which checks via canUser API.
+			// Only check when the image is selected to avoid unnecessary API requests.
+			let canEdit = false;
+			if ( id && isSingleSelected && window?.__experimentalMediaEditor ) {
+				const { getEntityRecordPermissions } = unlock(
+					select( coreStore )
+				);
+				const permissions = getEntityRecordPermissions(
+					'postType',
+					'attachment',
+					id
+				);
+				canEdit = permissions?.update || false;
+			}
+
+			return {
+				image: imageRecord,
+				canUserEdit: canEdit,
+			};
+		},
 		[ id, isSingleSelected ]
 	);
 
@@ -338,6 +367,7 @@ export default function Image( {
 		[ clientId ]
 	);
 	const { getBlock, getSettings } = useSelect( blockEditorStore );
+	const onNavigateToEntityRecord = getSettings().onNavigateToEntityRecord;
 
 	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } =
@@ -355,6 +385,7 @@ export default function Image( {
 	const [ hasImageErrored, setHasImageErrored ] = useState( false );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
+	const showDimensionsControls = allowResize && hasNonContentControls;
 	const isResizable =
 		allowResize &&
 		hasNonContentControls &&
@@ -558,7 +589,7 @@ export default function Image( {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const dimensionsControl =
-		isResizable &&
+		showDimensionsControls &&
 		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
 			<DimensionsTool
 				panelId={ clientId }
@@ -600,6 +631,11 @@ export default function Image( {
 				defaultAspectRatio="auto"
 				scaleOptions={ scaleOptions }
 				unitsOptions={ dimensionsUnitsOptions }
+				tools={
+					isWideAligned
+						? [ 'aspectRatio', 'scale' ]
+						: [ 'aspectRatio', 'widthHeight', 'scale' ]
+				}
 			/>
 		) );
 
@@ -726,6 +762,27 @@ export default function Image( {
 	const hasDataFormBlockFields =
 		window?.__experimentalContentOnlyInspectorFields;
 
+	const editMediaButton = window?.__experimentalMediaEditor &&
+		id &&
+		isSingleSelected &&
+		canUserEdit &&
+		! isExternalImage( id, url ) &&
+		! isEditingImage &&
+		onNavigateToEntityRecord && (
+			<BlockControls group="other">
+				<ToolbarButton
+					onClick={ () => {
+						onNavigateToEntityRecord( {
+							postId: id,
+							postType: 'attachment',
+						} );
+					} }
+				>
+					{ __( 'Edit media' ) }
+				</ToolbarButton>
+			</BlockControls>
+		);
+
 	const controls = (
 		<>
 			{ showBlockControls && (
@@ -788,14 +845,14 @@ export default function Image( {
 					/>
 				</BlockControls>
 			) }
-			{ ! hasDataFormBlockFields && (
+			{ ! hasDataFormBlockFields && isSingleSelected && (
 				<InspectorControls group="content">
 					<ToolsPanel
 						label={ __( 'Media' ) }
 						resetAll={ () => onSelectImage( undefined ) }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
-						{ isSingleSelected && ! lockUrlControls && (
+						{ ! lockUrlControls && (
 							<ToolsPanelItem
 								label={ __( 'Image' ) }
 								hasValue={ () => !! url }
@@ -822,47 +879,45 @@ export default function Image( {
 								/>
 							</ToolsPanelItem>
 						) }
-						{ isSingleSelected && (
-							<ToolsPanelItem
+						<ToolsPanelItem
+							label={ __( 'Alternative text' ) }
+							isShownByDefault
+							hasValue={ () => !! alt }
+							onDeselect={ () =>
+								setAttributes( { alt: undefined } )
+							}
+						>
+							<TextareaControl
 								label={ __( 'Alternative text' ) }
-								isShownByDefault
-								hasValue={ () => !! alt }
-								onDeselect={ () =>
-									setAttributes( { alt: undefined } )
-								}
-							>
-								<TextareaControl
-									label={ __( 'Alternative text' ) }
-									value={ alt || '' }
-									onChange={ updateAlt }
-									readOnly={ lockAltControls }
-									help={
-										lockAltControls ? (
-											<>{ lockAltControlsMessage }</>
-										) : (
-											<>
-												<ExternalLink
-													href={
-														// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
-														__(
-															'https://www.w3.org/WAI/tutorials/images/decision-tree/'
-														)
-													}
-												>
-													{ __(
-														'Describe the purpose of the image.'
-													) }
-												</ExternalLink>
-												<br />
+								value={ alt || '' }
+								onChange={ updateAlt }
+								readOnly={ lockAltControls }
+								help={
+									lockAltControls ? (
+										<>{ lockAltControlsMessage }</>
+									) : (
+										<>
+											<ExternalLink
+												href={
+													// translators: Localized tutorial, if one exists. W3C Web Accessibility Initiative link has list of existing translations.
+													__(
+														'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+													)
+												}
+											>
 												{ __(
-													'Leave empty if decorative.'
+													'Describe the purpose of the image.'
 												) }
-											</>
-										)
-									}
-								/>
-							</ToolsPanelItem>
-						) }
+											</ExternalLink>
+											<br />
+											{ __(
+												'Leave empty if decorative.'
+											) }
+										</>
+									)
+								}
+							/>
+						</ToolsPanelItem>
 					</ToolsPanel>
 				</InspectorControls>
 			) }
@@ -932,16 +987,16 @@ export default function Image( {
 						lockTitleControls ? (
 							<>{ lockTitleControlsMessage }</>
 						) : (
-							<>
-								{ __(
-									'Describe the role of this image on the page.'
-								) }
-								<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
-									{ __(
-										'(Note: many devices and browsers do not display this text.)'
-									) }
-								</ExternalLink>
-							</>
+							createInterpolateElement(
+								__(
+									'Describe the role of this image on the page. <a>(Note: many devices and browsers do not display this text.)</a>'
+								),
+								{
+									a: (
+										<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute" />
+									),
+								}
+							)
 						)
 					}
 				/>
@@ -1201,6 +1256,7 @@ export default function Image( {
 
 	return (
 		<>
+			{ editMediaButton }
 			{ mediaReplaceFlow }
 			{ controls }
 			{ featuredImageControl }

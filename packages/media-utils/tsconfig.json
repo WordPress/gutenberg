@@ -16,6 +16,7 @@
 		{ "path": "../i18n" },
 		{ "path": "../icons" },
 		{ "path": "../media-fields" },
+		{ "path": "../notices" },
 		{ "path": "../private-apis" }
 	]
 }

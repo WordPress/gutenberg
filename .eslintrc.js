@@ -65,6 +65,11 @@ const restrictedImports = [
 		message:
 			"Please use `clsx` instead. It's a lighter and faster drop-in replacement for `classnames`.",
 	},
+	{
+		name: '@base-ui/react',
+		message:
+			'Avoid using Base UI directly. Consider a new `@wordpress/ui` component instead.',
+	},
 ];
 
 const restrictedSyntax = [
@@ -105,16 +110,6 @@ const restrictedSyntax = [
 			'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] > Literal[value=/(?<![-\\w])sidebar(?![-\\w])/i]',
 		message:
 			"Avoid using the word 'sidebar' in translatable strings. Consider using 'panel' instead.",
-	},
-];
-
-/** `no-restricted-syntax` rules for components. */
-const restrictedSyntaxComponents = [
-	{
-		selector:
-			'JSXOpeningElement[name.name="Button"]:not(:has(JSXAttribute[name.name="accessibleWhenDisabled"])) JSXAttribute[name.name="disabled"]',
-		message:
-			'`disabled` used without the `accessibleWhenDisabled` prop. Disabling a control without maintaining focusability can cause accessibility issues, by hiding their presence from screen reader users, or preventing focus from returning to a trigger element. (Ignore this error if you truly mean to disable.)',
 	},
 ];
 
@@ -255,63 +250,22 @@ module.exports = {
 				'packages/*/src/**/*.[tj]s?(x)',
 				'storybook/stories/**/*.[tj]s?(x)',
 			],
-			excludedFiles: [ '**/*.native.js' ],
+			excludedFiles: [ '**/*.@(android|ios|native).[tj]s?(x)' ],
 			rules: {
-				'no-restricted-syntax': [
-					'error',
-					...restrictedSyntax,
-					...restrictedSyntaxComponents,
-				],
+				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+				'@wordpress/components-no-unsafe-button-disabled': 'error',
 			},
 		},
 		{
 			files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
 			excludedFiles: [
 				'packages/*/src/**/@(test|stories)/**',
-				'**/*.@(native|ios|android).js',
+				'**/*.@(android|ios|native).[tj]s?(x)',
 			],
 			rules: {
-				'no-restricted-syntax': [
-					'error',
-					...restrictedSyntax,
-					...restrictedSyntaxComponents,
-					// Temporary rules until we're ready to officially default to the new size.
-					...[
-						'BorderBoxControl',
-						'BorderControl',
-						'BoxControl',
-						'Button',
-						'ComboboxControl',
-						'CustomSelectControl',
-
-						'FontAppearanceControl',
-						'FontFamilyControl',
-						'FontSizePicker',
-						'FormTokenField',
-						'InputControl',
-						'LetterSpacingControl',
-						'LineHeightControl',
-						'NumberControl',
-						'RangeControl',
-						'SelectControl',
-						'TextControl',
-						'ToggleGroupControl',
-						'UnitControl',
-					].map( ( componentName ) => ( {
-						// Falsy `__next40pxDefaultSize` without a non-default `size` prop.
-						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="size"][value.value!="default"]))`,
-						message:
-							componentName +
-							' should have the `__next40pxDefaultSize` prop when using the default size.',
-					} ) ),
-					{
-						// Falsy `__next40pxDefaultSize` without a `render` prop.
-						selector:
-							'JSXOpeningElement[name.name="FormFileUpload"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="render"]))',
-						message:
-							'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
-					},
-				],
+				'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+				'@wordpress/components-no-unsafe-button-disabled': 'error',
+				'@wordpress/components-no-missing-40px-size-prop': 'error',
 			},
 		},
 		{
@@ -443,7 +397,6 @@ module.exports = {
 				'no-restricted-syntax': [
 					'error',
 					...restrictedSyntax,
-					...restrictedSyntaxComponents,
 					{
 						selector:
 							':matches(Literal[value=/--wp-admin-theme-/],TemplateElement[value.cooked=/--wp-admin-theme-/])',
@@ -461,19 +414,48 @@ module.exports = {
 			},
 		},
 		{
+			// Override the @wordpress/components-* rules by adding the
+			// `checkLocalImports` flag, which adds the linting also to relative
+			// imports.
+			files: [ 'packages/components/src/**' ],
+			excludedFiles: [ '**/*.@(android|ios|native).[tj]s?(x)' ],
+			rules: {
+				'@wordpress/components-no-unsafe-button-disabled': [
+					'error',
+					{ checkLocalImports: true },
+				],
+				'@wordpress/components-no-missing-40px-size-prop': [
+					'error',
+					{ checkLocalImports: true },
+				],
+			},
+		},
+		{
 			files: [ 'packages/components/src/**' ],
 			excludedFiles: [ 'packages/components/src/**/@(test|stories)/**' ],
 			plugins: [ 'ssr-friendly' ],
 			extends: [ 'plugin:ssr-friendly/recommended' ],
 		},
 		{
-			files: [ 'packages/components/src/**', 'packages/ui/src/**' ],
+			files: [
+				'packages/block-editor/src/**',
+				'packages/components/src/**',
+				'packages/dataviews/src/**',
+				'packages/ui/src/**',
+			],
+			excludedFiles: [ '**/@(test|stories)/**', '*.native.*' ],
+			rules: {
+				// Enforce display names for easier debugging and better storybook integration.
+				'react/display-name': 'error',
+			},
+		},
+		{
+			files: [ 'packages/components/src/**' ],
 			rules: {
 				'no-restricted-imports': [
 					'error',
-					// The `ariakit` and `framer-motion` APIs are meant to be consumed via
-					// the `@wordpress/components` and @wordpress/ui` packages, hence why
-					// importing those imports should be allowed only in those packages.
+					// The following dependencies are meant to be consumed directly in the
+					// @wordpress/components package, hence why their imports are allowed.
 					{
 						paths: restrictedImports.filter(
 							( { name } ) =>
@@ -481,6 +463,22 @@ module.exports = {
 									'@ariakit/react',
 									'framer-motion',
 								].includes( name )
+						),
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/ui/src/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					// The following dependencies are meant to be consumed directly in the
+					// @wordpress/ui package, hence why their imports are allowed.
+					{
+						paths: restrictedImports.filter(
+							( { name } ) =>
+								! [ '@base-ui/react' ].includes( name )
 						),
 					},
 				],
@@ -532,6 +530,12 @@ module.exports = {
 			rules: {
 				'react-compiler/react-compiler': 'off',
 				'react/react-in-jsx-scope': 'error',
+			},
+		},
+		{
+			files: [ 'packages/ui/src/**' ],
+			rules: {
+				'@wordpress/dependency-group': [ 'error', 'never' ],
 			},
 		},
 	],

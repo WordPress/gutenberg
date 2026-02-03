@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/media-utils",
-	"version": "5.37.0",
+	"version": "5.39.0",
 	"description": "WordPress Media Upload Utils.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -58,6 +58,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/media-fields": "file:../media-fields",
+		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis"
 	},
 	"peerDependencies": {

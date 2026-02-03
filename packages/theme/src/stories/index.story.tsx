@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -21,7 +21,7 @@ import { ThemeProvider } from '../theme-provider';
 import '../prebuilt/css/design-tokens.css';
 
 const meta: Meta< typeof ThemeProvider > = {
-	title: 'Design System/Theme Provider',
+	title: 'Design System/Theme/Theme Provider',
 	component: ThemeProvider,
 	args: {
 		isRoot: true,
@@ -132,7 +132,7 @@ const DSTokensList = () => {
 
 	return (
 		<div style={ { color: 'var( --wpds-color-fg-content-neutral )' } }>
-			<h1>DS Color tokens</h1>
+			<h1>Design System Color tokens</h1>
 			<h2>Semantic tokens (can be consumed directly)</h2>
 			<ColorTokenTable tokens={ props.semanticProps } />
 			<h2>Legacy tokens (should not be consumed directly)</h2>
@@ -202,7 +202,7 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 	<div
 		style={ {
-			padding: 'var(--wpds-dimension-padding-surface-sm)',
+			padding: 'var(--wpds-dimension-padding-lg)',
 			color: 'var(--wpds-color-fg-content-neutral)',
 			backgroundColor: 'var(--wpds-color-bg-surface-neutral)',
 			display: 'flex',
@@ -217,7 +217,7 @@ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 		<span
 			style={ {
 				display: 'inline-block',
-				padding: 'var(--wpds-dimension-padding-surface-xs)',
+				padding: 'var(--wpds-dimension-padding-sm)',
 				borderRadius: '0.25rem',
 				backgroundColor:
 					'var(--wpds-color-bg-interactive-brand-strong)',
@@ -230,10 +230,10 @@ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 			style={ {
 				display: 'inline-block',
 				marginInlineStart: '0.25rem',
-				padding: 'var(--wpds-dimension-padding-surface-xs)',
+				padding: 'var(--wpds-dimension-padding-sm)',
 				borderRadius: '0.25rem',
 				backgroundColor:
-					'var(--wpds-color-bg-interactive-brand-weak-disabled)',
+					'var(--wpds-color-bg-interactive-neutral-weak-disabled)',
 				color: 'var(--wpds-color-fg-content-neutral)',
 			} }
 		>
@@ -411,7 +411,7 @@ export const AcrossIframes: StoryObj< typeof ThemeProvider > = {
 				<span
 					style={ {
 						display: 'inline-block',
-						padding: 'var(--wpds-dimension-padding-surface-xs)',
+						padding: 'var(--wpds-dimension-padding-sm)',
 						borderRadius: '0.25rem',
 						backgroundColor:
 							'var(--wpds-color-bg-interactive-brand-strong)',

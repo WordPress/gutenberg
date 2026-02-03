@@ -17,6 +17,7 @@ import { forwardRef } from '@wordpress/element';
 import useMultiSelection from './use-multi-selection';
 import useTabNav from './use-tab-nav';
 import useArrowNav from './use-arrow-nav';
+import { usePreviewModeNav } from './use-preview-mode-nav';
 import useSelectAll from './use-select-all';
 import useDragSelection from './use-drag-selection';
 import useSelectionObserver from './use-selection-observer';
@@ -44,6 +45,7 @@ export function useWritingFlow() {
 			useMultiSelection(),
 			useSelectAll(),
 			useArrowNav(),
+			usePreviewModeNav(),
 			useRefEffect(
 				( node ) => {
 					node.tabIndex = 0;

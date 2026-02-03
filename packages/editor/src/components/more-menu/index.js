@@ -26,7 +26,7 @@ import ToolsMoreMenuGroup from './tools-more-menu-group';
 import ViewMoreMenuGroup from './view-more-menu-group';
 import { store as editorStore } from '../../store';
 
-export default function MoreMenu() {
+export default function MoreMenu( { disabled = false } ) {
 	const { openModal } = useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const { toggleDistractionFree } = useDispatch( editorStore );
@@ -54,6 +54,7 @@ export default function MoreMenu() {
 					...( showIconLabels && { variant: 'tertiary' } ),
 					tooltipPosition: 'bottom',
 					size: 'compact',
+					disabled,
 				} }
 			>
 				{ ( { onClose } ) => (

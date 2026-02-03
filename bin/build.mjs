@@ -78,7 +78,7 @@ function exec( command, args = [], options = {} ) {
  * Main build orchestration function.
  */
 async function build() {
-	const fast = process.argv.includes( '--fast' );
+	const skipTypes = process.argv.includes( '--skip-types' );
 
 	console.log( '🔨 Starting build process...\n' );
 
@@ -97,7 +97,14 @@ async function build() {
 			{ silent: true }
 		);
 
-		if ( ! fast ) {
+		// Step 2.5: Generate worker placeholders
+		// This must happen before TypeScript compilation because some packages
+		// (like vips) have source files that import from generated worker-code.ts
+		await exec( 'node', [
+			'./bin/packages/generate-worker-placeholders.mjs',
+		] );
+
+		if ( ! skipTypes ) {
 			// Step 3: Validate TypeScript version
 			console.log( '\n🔍 Validating TypeScript version...' );
 			await exec( 'node', [
@@ -128,10 +135,38 @@ async function build() {
 		console.log( '\n📦 Building packages (production mode)...' );
 		const buildArgs = process.argv
 			.slice( 2 )
-			.filter( ( arg ) => arg !== '--fast' );
+			.filter( ( arg ) => arg !== '--skip-types' );
 		await exec( 'wp-build', buildArgs, {
 			env: { ...process.env, NODE_ENV: 'production' },
 		} );
+
+		// Step 7.5: Build blocks manifests
+		console.log( '\n📦 Building blocks manifests...' );
+		const blocksDirs = [
+			{
+				input: 'build/scripts/block-library',
+				output: 'build/scripts/block-library/blocks-manifest.php',
+			},
+			{
+				input: 'build/scripts/edit-widgets/blocks',
+				output: 'build/scripts/edit-widgets/blocks/blocks-manifest.php',
+			},
+			{
+				input: 'build/scripts/widgets/blocks',
+				output: 'build/scripts/widgets/blocks/blocks-manifest.php',
+			},
+		];
+		for ( const { input, output } of blocksDirs ) {
+			await exec(
+				'wp-scripts',
+				[
+					'build-blocks-manifest',
+					`--input=${ input }`,
+					`--output=${ output }`,
+				],
+				{ silent: true }
+			);
+		}
 
 		// Step 8: Build workspace :wp targets
 		console.log( '\n📦 Building workspace :wp targets...' );

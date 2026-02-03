@@ -5,13 +5,15 @@
  */
 import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
+import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
 import glob from 'fast-glob';
 import chokidar from 'chokidar';
 import browserslistToEsbuild from 'browserslist-to-esbuild';
-import { sassPlugin, postcssModules } from 'esbuild-sass-plugin';
+import { sassPlugin } from 'esbuild-sass-plugin';
 import postcss from 'postcss';
+import postcssModules from 'postcss-modules';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
@@ -30,6 +32,7 @@ import {
 import {
 	generatePhpFromTemplate,
 	getPhpReplacements,
+	renderTemplateToString,
 } from './php-generator.mjs';
 import { getPackageInfo, getPackageInfoFromFile } from './package-utils.mjs';
 import { createWordpressExternalsPlugin } from './wordpress-externals-plugin.mjs';
@@ -39,6 +42,11 @@ import {
 	getRouteMetadata,
 	generateContentEntryPoint,
 } from './route-utils.mjs';
+import {
+	generateWorkerPlaceholder,
+	buildWorkers,
+	generateWorkerCode,
+} from './worker-build.mjs';
 
 const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
@@ -132,6 +140,61 @@ function getSassOptions( workingDir ) {
 	};
 }
 
+function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
+	return async function styleType( cssText, _dirname, filePath ) {
+		// Always hash the untransformed code.
+		const hash = createHash( 'sha1' )
+			.update( cssText )
+			.digest( 'hex' )
+			.slice( 0, 10 );
+
+		let moduleExports = null;
+
+		// Transform the code: CSS modules and minification.
+		const plugins = [
+			cssModules &&
+				postcssModules( {
+					generateScopedName: '[contenthash]__[local]',
+					getJSON: ( _, json ) => {
+						moduleExports = json;
+					},
+				} ),
+			minify &&
+				cssnano( {
+					preset: [
+						'default',
+						{ discardComments: { removeAll: true } },
+					],
+				} ),
+		].filter( Boolean );
+
+		const { css } = await postcss( plugins ).process( cssText, {
+			from: filePath,
+			map: false,
+		} );
+
+		let cssModule = `if (typeof document !== 'undefined' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
+	const style = document.createElement("style");
+	style.setAttribute("data-wp-hash", "${ hash }");
+	style.appendChild(document.createTextNode(${ JSON.stringify( css ) }));
+	document.head.appendChild(style);
+}
+`;
+
+		// The CSS modules transform produces an `exports` object with class name mappings.
+		if ( moduleExports ) {
+			const exportsString = JSON.stringify( moduleExports );
+			cssModule += `export default ${ exportsString };\n`;
+		}
+		return cssModule;
+	};
+}
+
+function inlineStyle( contents ) {
+	// The `contents` is already a JS code created by `compileInlineStyle`.
+	return contents;
+}
+
 /**
  * Create style bundling plugins with the given working directory.
  *
@@ -145,10 +208,8 @@ function createStyleBundlingPlugins( workingDir ) {
 		sassPlugin( {
 			embedded: true,
 			filter: /\.module\.(css|scss)$/,
-			transform: postcssModules( {
-				generateScopedName: '[name]__[local]__[hash:base64:5]',
-			} ),
-			type: 'style',
+			transform: compileInlineStyle( { cssModules: true } ),
+			type: inlineStyle,
 			...sassOptions,
 		} ),
 		// Handle regular CSS/SCSS files
@@ -156,11 +217,59 @@ function createStyleBundlingPlugins( workingDir ) {
 		sassPlugin( {
 			embedded: true,
 			filter: /\.(css|scss)$/,
-			type: 'style',
+			transform: compileInlineStyle(),
+			type: inlineStyle,
 			...sassOptions,
 		} ),
 	];
 }
+
+/**
+ * Plugin to inline WASM files as base64 data URLs.
+ * This eliminates the need for separate WASM file downloads and avoids
+ * issues with hosts not serving WASM files with the correct MIME type.
+ *
+ * @return {Object} esbuild plugin.
+ */
+const wasmInlinePlugin = {
+	name: 'wasm-inline',
+	setup( build ) {
+		// Resolve .wasm imports from node_modules.
+		build.onResolve( { filter: /\.wasm$/ }, async ( args ) => {
+			// Handle imports like 'wasm-vips/vips.wasm'.
+			if ( ! args.path.startsWith( '.' ) ) {
+				const { createRequire } = await import( 'module' );
+				const require = createRequire( args.resolveDir + '/index.js' );
+				try {
+					const resolved = require.resolve( args.path );
+					return {
+						path: resolved,
+						namespace: 'wasm-inline',
+					};
+				} catch {
+					// If resolution fails, let other plugins handle it.
+					return null;
+				}
+			}
+			return null;
+		} );
+
+		// Load WASM files and convert to base64 data URLs.
+		build.onLoad(
+			{ filter: /.*/, namespace: 'wasm-inline' },
+			async ( args ) => {
+				const wasmBuffer = await readFile( args.path );
+				const base64 = wasmBuffer.toString( 'base64' );
+				const dataUrl = `data:application/wasm;base64,${ base64 }`;
+
+				return {
+					contents: `export default "${ dataUrl }";`,
+					loader: 'js',
+				};
+			}
+		);
+	},
+};
 
 /**
  * Normalize path separators for cross-platform compatibility.
@@ -227,56 +336,36 @@ function transformPhpContent( content, transforms ) {
 function momentTimezoneAliasPlugin() {
 	return {
 		name: 'moment-timezone-alias',
-		async setup( build ) {
-			const { createRequire } = await import( 'module' );
-			const require = createRequire( import.meta.url );
-
-			// Cached paths - resolved lazily on first use
-			let preBuiltBundlePath;
-			let momentTimezoneUtilsPath;
-			const resolvePaths = () => {
-				if ( preBuiltBundlePath ) {
-					return;
-				}
-				preBuiltBundlePath = require.resolve(
-					'moment-timezone/builds/moment-timezone-with-data-1970-2030'
-				);
-				momentTimezoneUtilsPath = require.resolve(
-					'moment-timezone/moment-timezone-utils.js'
-				);
-			};
+		setup( build ) {
+			// Alias path that esbuild will resolve
+			const aliasPath =
+				'moment-timezone/builds/moment-timezone-with-data-1970-2030.js';
 
 			// Redirect main moment-timezone files to pre-built bundle
 			build.onResolve(
-				{ filter: /^moment-timezone\/moment-timezone$/ },
-				() => {
-					resolvePaths();
-					return { path: preBuiltBundlePath };
-				}
-			);
-
-			// For utils, we need to load it but ensure it works with the pre-built bundle.
-			// The utils file tries to require('./') which would load index.js.
-			// We need to make sure it gets the pre-built bundle instead.
-			build.onResolve(
-				{ filter: /^moment-timezone\/moment-timezone-utils$/ },
-				() => {
-					resolvePaths();
-					return { path: momentTimezoneUtilsPath };
-				}
+				{ filter: /^moment-timezone\/moment-timezone\.js$/ },
+				( { importer, resolveDir, kind } ) =>
+					build.resolve( aliasPath, {
+						importer,
+						resolveDir,
+						kind,
+					} )
 			);
 
 			// Intercept the require('./') call inside moment-timezone-utils
 			// and redirect it to the pre-built bundle.
-			build.onResolve( { filter: /^\.\/$/ }, ( args ) => {
-				if (
-					args.importer &&
-					args.importer.includes( 'moment-timezone-utils' )
-				) {
-					resolvePaths();
-					return { path: preBuiltBundlePath };
+			build.onResolve(
+				{ filter: /^\.\/$/ },
+				( { importer, resolveDir, kind } ) => {
+					if ( importer.includes( 'moment-timezone-utils' ) ) {
+						return build.resolve( aliasPath, {
+							importer,
+							resolveDir,
+							kind,
+						} );
+					}
 				}
-			} );
+			);
 		},
 	};
 }
@@ -763,7 +852,7 @@ async function generateModuleRegistrationPhp( modules, replacements ) {
 	await Promise.all( [
 		generatePhpFromTemplate(
 			'module-registry.php.template',
-			path.join( BUILD_DIR, 'modules', 'index.php' ),
+			path.join( BUILD_DIR, 'modules', 'registry.php' ),
 			{ ...replacements, '{{MODULES}}': modulesArray }
 		),
 		generatePhpFromTemplate(
@@ -796,7 +885,7 @@ async function generateScriptRegistrationPhp( scripts, replacements ) {
 	await Promise.all( [
 		generatePhpFromTemplate(
 			'script-registry.php.template',
-			path.join( BUILD_DIR, 'scripts', 'index.php' ),
+			path.join( BUILD_DIR, 'scripts', 'registry.php' ),
 			{ ...replacements, '{{SCRIPTS}}': scriptsArray }
 		),
 		generatePhpFromTemplate(
@@ -844,7 +933,7 @@ async function generateStyleRegistrationPhp( styles, replacements ) {
 	await Promise.all( [
 		generatePhpFromTemplate(
 			'style-registry.php.template',
-			path.join( BUILD_DIR, 'styles', 'index.php' ),
+			path.join( BUILD_DIR, 'styles', 'registry.php' ),
 			{ ...replacements, '{{STYLES}}': stylesArray }
 		),
 		generatePhpFromTemplate(
@@ -856,14 +945,14 @@ async function generateStyleRegistrationPhp( styles, replacements ) {
 }
 
 /**
- * Generate main index.php that loads both modules and scripts.
+ * Generate main build.php that loads both modules and scripts.
  *
  * @param {Record<string, string>} replacements PHP template replacements.
  */
-async function generateMainIndexPhp( replacements ) {
+async function generateMainBuildPhp( replacements ) {
 	await generatePhpFromTemplate(
-		'index.php.template',
-		path.join( BUILD_DIR, 'index.php' ),
+		'build.php.template',
+		path.join( BUILD_DIR, 'build.php' ),
 		replacements
 	);
 }
@@ -896,10 +985,10 @@ async function generateRoutesRegistry( routes, replacements ) {
 		} )
 		.join( ',\n' );
 
-	// Generate single global registry at build/routes/index.php
+	// Generate single global registry at build/routes/registry.php
 	await generatePhpFromTemplate(
 		'route-registry.php.template',
-		path.join( BUILD_DIR, 'routes', 'index.php' ),
+		path.join( BUILD_DIR, 'routes', 'registry.php' ),
 		{ ...replacements, '{{ROUTES}}': routeEntries }
 	);
 }
@@ -917,11 +1006,35 @@ async function generateRoutesPhp( routes, replacements ) {
 		return;
 	}
 
-	// Generate routes.php from template
+	// Get unique pages from routes
+	const pages = [ ...new Set( routes.map( ( route ) => route.page ) ) ];
+
+	// Generate page-specific functions for each page
+	const pageFunctionsPromises = pages.map( async ( pageSlug ) => {
+		const pageSlugUnderscore = pageSlug.replace( /-/g, '_' );
+		const pageReplacements = {
+			...replacements,
+			'{{PAGE_SLUG}}': pageSlug,
+			'{{PAGE_SLUG_UNDERSCORE}}': pageSlugUnderscore,
+		};
+		return renderTemplateToString(
+			'routes-page-functions.php.template',
+			pageReplacements
+		);
+	} );
+
+	const pageFunctions = await Promise.all( pageFunctionsPromises );
+	const pageRouteFunctionsCode = pageFunctions.join( '\n' );
+
+	// Generate routes.php from template with injected page functions
 	await generatePhpFromTemplate(
 		'routes-registration.php.template',
 		path.join( BUILD_DIR, 'routes.php' ),
-		{ ...replacements, '{{HANDLE_PREFIX}}': HANDLE_PREFIX }
+		{
+			...replacements,
+			'{{HANDLE_PREFIX}}': HANDLE_PREFIX,
+			'{{PAGE_ROUTE_FUNCTIONS}}': pageRouteFunctionsCode,
+		}
 	);
 }
 
@@ -1051,6 +1164,11 @@ async function transpilePackage( packageName ) {
 
 	const builds = [];
 
+	// Generate placeholder worker-code.ts if this package has wpWorkers defined
+	// and the file doesn't exist yet. This is needed because transpilation happens
+	// before worker bundling, but vips-worker.ts imports from worker-code.ts.
+	await generateWorkerPlaceholder( packageDir, packageJson );
+
 	// Check if this is the components package that needs emotion babel plugin.
 	// Ideally we should remove this exception and move away from emotion.
 	const needsEmotionPlugin = packageName === 'components';
@@ -1125,6 +1243,7 @@ async function transpilePackage( packageName ) {
 	};
 	const plugins = [
 		needsEmotionPlugin && emotionPlugin,
+		wasmInlinePlugin,
 		externalizeAllExceptCssPlugin,
 		...createStyleBundlingPlugins( packageDir ),
 	].filter( Boolean );
@@ -1192,6 +1311,24 @@ async function transpilePackage( packageName ) {
 	}
 
 	await Promise.all( builds );
+
+	// Build workers if wpWorkers is defined in package.json.
+	// Workers are bundled as self-contained files with all dependencies included.
+	await buildWorkers( packageDir, packageJson, {
+		buildDir,
+		buildModuleDir,
+		target,
+		wasmInlinePlugin,
+	} );
+
+	// Generate inline worker code exports and re-transpile worker-code.ts.
+	await generateWorkerCode( packageDir, packageName, packageJson, {
+		srcDir,
+		buildDir,
+		buildModuleDir,
+		target,
+		plugins,
+	} );
 
 	await compileStyles( packageName );
 
@@ -1362,12 +1499,6 @@ async function buildRoute( routeName ) {
 
 	// Ensure output directory exists
 	await mkdir( outputDir, { recursive: true } );
-
-	// Copy package.json
-	await copyFile(
-		path.join( routeDir, 'package.json' ),
-		path.join( outputDir, 'package.json' )
-	);
 
 	const files = getRouteFiles( routeDir );
 
@@ -1666,7 +1797,7 @@ async function buildAll( baseUrlExpression ) {
 		baseUrlExpression
 	);
 	await Promise.all( [
-		generateMainIndexPhp( phpReplacements ),
+		generateMainBuildPhp( phpReplacements ),
 		generateModuleRegistrationPhp( modules, phpReplacements ),
 		generateScriptRegistrationPhp( scripts, phpReplacements ),
 		generateStyleRegistrationPhp( styles, phpReplacements ),
@@ -1675,13 +1806,14 @@ async function buildAll( baseUrlExpression ) {
 		generateRoutesPhp( routes, phpReplacements ),
 		generatePagesPhp( pageData, phpReplacements ),
 	] );
+	console.log( '   ✔ Generated build/build.php' );
 	console.log( '   ✔ Generated build/modules.php' );
-	console.log( '   ✔ Generated build/modules/index.php' );
+	console.log( '   ✔ Generated build/modules/registry.php' );
 	console.log( '   ✔ Generated build/scripts.php' );
-	console.log( '   ✔ Generated build/scripts/index.php' );
+	console.log( '   ✔ Generated build/scripts/registry.php' );
 	console.log( '   ✔ Generated build/styles.php' );
-	console.log( '   ✔ Generated build/styles/index.php' );
-	console.log( '   ✔ Generated build/version.php' );
+	console.log( '   ✔ Generated build/styles/registry.php' );
+	console.log( '   ✔ Generated build/constants.php' );
 	console.log( '   ✔ Generated build/routes.php' );
 	if ( pageData.length > 0 ) {
 		console.log( '   ✔ Generated build/pages.php' );
@@ -1694,7 +1826,6 @@ async function buildAll( baseUrlExpression ) {
 			);
 		}
 	}
-	console.log( '   ✔ Generated build/index.php' );
 
 	const totalTime = Date.now() - startTime;
 	console.log(
@@ -1964,6 +2095,7 @@ async function main() {
 				default: 'plugin_dir_url( __FILE__ )',
 			},
 		},
+		strict: false,
 	} );
 
 	const baseUrlExpression = values[ 'base-url' ];

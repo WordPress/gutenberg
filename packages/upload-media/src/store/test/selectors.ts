@@ -7,7 +7,18 @@ import {
 	isUploadingById,
 	isUploadingByUrl,
 } from '../selectors';
-import { ItemStatus, type QueueItem, type State } from '../types';
+import {
+	getActiveUploadCount,
+	getFailedItems,
+	getItemProgress,
+	getPendingUploads,
+} from '../private-selectors';
+import {
+	ItemStatus,
+	OperationType,
+	type QueueItem,
+	type State,
+} from '../types';
 
 describe( 'selectors', () => {
 	describe( 'getItems', () => {
@@ -100,6 +111,128 @@ describe( 'selectors', () => {
 
 			expect( isUploadingById( state, 123 ) ).toBe( true );
 			expect( isUploadingById( state, 789 ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getActiveUploadCount', () => {
+		it( 'should return the count of items currently uploading', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.Upload,
+					},
+					{
+						id: '2',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.Prepare,
+					},
+					{
+						id: '3',
+						status: ItemStatus.Processing,
+						currentOperation: OperationType.Upload,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( getActiveUploadCount( state ) ).toBe( 2 );
+		} );
+	} );
+
+	describe( 'getPendingUploads', () => {
+		it( 'should return items waiting for upload', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						operations: [ OperationType.Upload ],
+						currentOperation: undefined,
+					},
+					{
+						id: '2',
+						status: ItemStatus.Processing,
+						operations: [ OperationType.Upload ],
+						currentOperation: OperationType.Upload,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			const pending = getPendingUploads( state );
+			expect( pending ).toHaveLength( 1 );
+			expect( pending[ 0 ].id ).toBe( '1' );
+		} );
+	} );
+
+	describe( 'getFailedItems', () => {
+		it( 'should return items with errors', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						error: new Error( 'Upload failed' ),
+					},
+					{
+						id: '2',
+						status: ItemStatus.Processing,
+					},
+					{
+						id: '3',
+						status: ItemStatus.Processing,
+						error: new Error( 'Network error' ),
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			const failed = getFailedItems( state );
+			expect( failed ).toHaveLength( 2 );
+			expect( failed[ 0 ].id ).toBe( '1' );
+			expect( failed[ 1 ].id ).toBe( '3' );
+		} );
+	} );
+
+	describe( 'getItemProgress', () => {
+		it( 'should return the progress of a specific item', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+						progress: 50,
+					},
+					{
+						id: '2',
+						status: ItemStatus.Processing,
+						progress: 75,
+					},
+				] as QueueItem[],
+				queueStatus: 'active',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( getItemProgress( state, '1' ) ).toBe( 50 );
+			expect( getItemProgress( state, '2' ) ).toBe( 75 );
+			expect( getItemProgress( state, '999' ) ).toBeUndefined();
 		} );
 	} );
 } );

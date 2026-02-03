@@ -21,7 +21,7 @@ const FORM_FIELD_LAYOUTS = [
 			<Stack
 				direction="column"
 				className="dataforms-layouts__wrapper"
-				gap="md"
+				gap="lg"
 			>
 				{ children }
 			</Stack>
@@ -34,7 +34,7 @@ const FORM_FIELD_LAYOUTS = [
 			<Stack
 				direction="column"
 				className="dataforms-layouts__wrapper"
-				gap="xs"
+				gap="sm"
 			>
 				{ children }
 			</Stack>
@@ -47,7 +47,7 @@ const FORM_FIELD_LAYOUTS = [
 			<Stack
 				direction="column"
 				className="dataforms-layouts__wrapper"
-				gap="lg"
+				gap="xl"
 			>
 				{ children }
 			</Stack>
@@ -66,12 +66,12 @@ const FORM_FIELD_LAYOUTS = [
 			<Stack
 				direction="column"
 				className="dataforms-layouts__wrapper"
-				gap="md"
+				gap="lg"
 			>
 				<div className="dataforms-layouts-row__field">
 					<Stack
 						direction="row"
-						gap="md"
+						gap="lg"
 						align={ ( layout as NormalizedRowLayout ).alignment }
 					>
 						{ children }

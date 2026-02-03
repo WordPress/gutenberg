@@ -94,7 +94,7 @@ function OperatorSelector( {
 		operatorOptions.length > 1 && (
 			<Stack
 				direction="row"
-				gap="xs"
+				gap="sm"
 				justify="flex-start"
 				className="dataviews-filters__summary-operators-container"
 				align="center"

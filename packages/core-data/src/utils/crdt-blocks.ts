@@ -2,21 +2,20 @@
  * External dependencies
  */
 import { v4 as uuidv4 } from 'uuid';
-import fastDeepEqual from 'fast-deep-equal/es6';
+import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 
 /**
  * WordPress dependencies
  */
-import { RichTextData } from '@wordpress/rich-text';
-import { Y } from '@wordpress/sync';
-
 // @ts-expect-error No exported types.
 import { getBlockTypes } from '@wordpress/blocks';
+import { RichTextData } from '@wordpress/rich-text';
+import { Y, Delta } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
-import type { WPBlockSelection } from '../types';
+import { createYMap, type YMapRecord, type YMapWrap } from './crdt-utils';
 
 interface BlockAttributes {
 	[ key: string ]: unknown;
@@ -27,34 +26,33 @@ interface BlockType {
 	attributes?: Record< string, { type?: string } >;
 }
 
+// A block as represented in Gutenberg's data store.
 export interface Block {
 	attributes: BlockAttributes;
 	clientId?: string;
 	innerBlocks: Block[];
-	originalContent?: string; // unserializable
+	isValid?: boolean;
+	name: string;
+	originalContent?: string;
 	validationIssues?: string[]; // unserializable
+}
+
+// A block as represented in the CRDT document (Y.Map).
+interface YBlockRecord extends YMapRecord {
+	attributes: YBlockAttributes;
+	clientId: string;
+	innerBlocks: YBlocks;
+	isValid?: boolean;
+	originalContent?: string;
 	name: string;
 }
 
-export type YBlock = Y.Map<
-	/* name, clientId, and originalContent are strings. */
-	| string
-	/* validationIssues? is an array of strings. */
-	| string[]
-	/* attributes is a Y.Map< unknown >. */
-	| YBlockAttributes
-	/* innerBlocks is a Y.Array< YBlock >. */
-	| YBlocks
->;
-
+export type YBlock = YMapWrap< YBlockRecord >;
 export type YBlocks = Y.Array< YBlock >;
-export type YBlockAttributes = Y.Map< Y.Text | unknown >;
 
-// The Y.Map type is not easy to work with. The generic type it accepts represents
-// the possible values of the map, which are varied in our case. This type is
-// accurate, but will require aggressive type narrowing when the map values are
-// accessed -- or type casting with `as`.
-// export type YBlock = Y.Map< Block[ keyof Block ] >;
+// Block attribute schema cannot be known at compile time, so we use Y.Map.
+// Attribute values will be typed as the union of `Y.Text` and `unknown`.
+export type YBlockAttributes = Y.Map< Y.Text | unknown >;
 
 const serializableBlocksCache = new WeakMap< WeakKey, Block[] >();
 
@@ -70,13 +68,10 @@ function makeBlockAttributesSerializable(
 	return newAttributes;
 }
 
-function makeBlocksSerializable( blocks: Block[] | YBlocks ): Block[] {
-	return blocks.map( ( block: Block | YBlock ) => {
-		const blockAsJson = block instanceof Y.Map ? block.toJSON() : block;
-		const { name, innerBlocks, attributes, ...rest } = blockAsJson;
+function makeBlocksSerializable( blocks: Block[] ): Block[] {
+	return blocks.map( ( block: Block ) => {
+		const { name, innerBlocks, attributes, ...rest } = block;
 		delete rest.validationIssues;
-		delete rest.originalContent;
-		// delete rest.isValid
 		return {
 			...rest,
 			name,
@@ -104,10 +99,10 @@ function areBlocksEqual( gblock: Block, yblock: YBlock ): boolean {
 		Object.assign( {}, yblockAsJson, overwrites )
 	);
 	const inners = gblock.innerBlocks || [];
-	const yinners = yblock.get( 'innerBlocks' ) as YBlocks;
+	const yinners = yblock.get( 'innerBlocks' );
 	return (
 		res &&
-		inners.length === yinners.length &&
+		inners.length === yinners?.length &&
 		inners.every( ( block: Block, i: number ) =>
 			areBlocksEqual( block, yinners.get( i ) )
 		)
@@ -149,35 +144,40 @@ function createNewYAttributeValue(
 }
 
 function createNewYBlock( block: Block ): YBlock {
-	return new Y.Map(
-		Object.entries( block ).map( ( [ key, value ] ) => {
-			switch ( key ) {
-				case 'attributes': {
-					return [ key, createNewYAttributeMap( block.name, value ) ];
-				}
+	return createYMap< YBlockRecord >(
+		Object.fromEntries(
+			Object.entries( block ).map( ( [ key, value ] ) => {
+				switch ( key ) {
+					case 'attributes': {
+						return [
+							key,
+							createNewYAttributeMap( block.name, value ),
+						];
+					}
 
-				case 'innerBlocks': {
-					const innerBlocks = new Y.Array();
+					case 'innerBlocks': {
+						const innerBlocks = new Y.Array();
 
-					// If not an array, set to empty Y.Array.
-					if ( ! Array.isArray( value ) ) {
+						// If not an array, set to empty Y.Array.
+						if ( ! Array.isArray( value ) ) {
+							return [ key, innerBlocks ];
+						}
+
+						innerBlocks.insert(
+							0,
+							value.map( ( innerBlock: Block ) =>
+								createNewYBlock( innerBlock )
+							)
+						);
+
 						return [ key, innerBlocks ];
 					}
 
-					innerBlocks.insert(
-						0,
-						value.map( ( innerBlock: Block ) =>
-							createNewYBlock( innerBlock )
-						)
-					);
-
-					return [ key, innerBlocks ];
+					default:
+						return [ key, value ];
 				}
-
-				default:
-					return [ key, value ];
-			}
-		} )
+			} )
+		)
 	);
 }
 
@@ -186,13 +186,13 @@ function createNewYBlock( block: Block ): YBlock {
  * This function is called to sync local block changes to a shared Y.Doc.
  *
  * @param yblocks        The blocks in the local Y.Doc.
- * @param incomingBlocks Gutenberg blocks being synced, either from a peer or from the local editor.
- * @param lastSelection  The last cursor position, used for hinting the diff algorithm.
+ * @param incomingBlocks Gutenberg blocks being synced.
+ * @param cursorPosition The position of the cursor after the change occurs.
  */
 export function mergeCrdtBlocks(
 	yblocks: YBlocks,
 	incomingBlocks: Block[],
-	lastSelection: WPBlockSelection | null
+	cursorPosition: number | null
 ): void {
 	// Ensure we are working with serializable block data.
 	if ( ! serializableBlocksCache.has( incomingBlocks ) ) {
@@ -269,9 +269,7 @@ export function mergeCrdtBlocks(
 		Object.entries( block ).forEach( ( [ key, value ] ) => {
 			switch ( key ) {
 				case 'attributes': {
-					const currentAttributes = yblock.get(
-						key
-					) as YBlockAttributes;
+					const currentAttributes = yblock.get( key );
 
 					// If attributes are not set on the yblock, use the new values.
 					if ( ! currentAttributes ) {
@@ -293,6 +291,8 @@ export function mergeCrdtBlocks(
 								return;
 							}
 
+							const currentAttribute =
+								currentAttributes.get( attributeName );
 							const isRichText = isRichTextAttribute(
 								block.name,
 								attributeName
@@ -302,18 +302,14 @@ export function mergeCrdtBlocks(
 								isRichText &&
 								'string' === typeof attributeValue &&
 								currentAttributes.has( attributeName ) &&
-								currentAttributes.get(
-									attributeName
-								) instanceof Y.Text
+								currentAttribute instanceof Y.Text
 							) {
 								// Rich text values are stored as persistent Y.Text instances.
 								// Update the value with a delta in place.
 								mergeRichTextUpdate(
-									currentAttributes.get(
-										attributeName
-									) as Y.Text,
+									currentAttribute,
 									attributeValue,
-									lastSelection
+									cursorPosition
 								);
 							} else {
 								currentAttributes.set(
@@ -342,8 +338,18 @@ export function mergeCrdtBlocks(
 
 				case 'innerBlocks': {
 					// Recursively merge innerBlocks
-					const yInnerBlocks = yblock.get( key ) as Y.Array< YBlock >;
-					mergeCrdtBlocks( yInnerBlocks, value ?? [], lastSelection );
+					let yInnerBlocks = yblock.get( key );
+
+					if ( ! ( yInnerBlocks instanceof Y.Array ) ) {
+						yInnerBlocks = new Y.Array< YBlock >();
+						yblock.set( key, yInnerBlocks );
+					}
+
+					mergeCrdtBlocks(
+						yInnerBlocks,
+						value ?? [],
+						cursorPosition
+					);
 					break;
 				}
 
@@ -375,7 +381,11 @@ export function mergeCrdtBlocks(
 	for ( let j = 0; j < yblocks.length; j++ ) {
 		const yblock: YBlock = yblocks.get( j );
 
-		let clientId: string = yblock.get( 'clientId' ) as string;
+		let clientId = yblock.get( 'clientId' );
+
+		if ( ! clientId ) {
+			continue;
+		}
 
 		if ( knownClientIds.has( clientId ) ) {
 			clientId = uuidv4();
@@ -452,22 +462,21 @@ function isRichTextAttribute(
 	);
 }
 
+let localDoc: Y.Doc;
+
 /**
  * Given a Y.Text object and an updated string value, diff the new value and
  * apply the delta to the Y.Text.
  *
- * @param blockYText    The Y.Text to update.
- * @param updatedValue  The updated value.
- * @param lastSelection The last cursor position before this update, used to hint the diff algorithm.
+ * @param blockYText     The Y.Text to update.
+ * @param updatedValue   The updated value.
+ * @param cursorPosition The position of the cursor after the change occurs.
  */
 function mergeRichTextUpdate(
 	blockYText: Y.Text,
 	updatedValue: string,
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	lastSelection: WPBlockSelection | null
+	cursorPosition: number | null
 ): void {
-	// TODO
-	// ====
 	// Gutenberg does not use Yjs shared types natively, so we can only subscribe
 	// to changes from store and apply them to Yjs types that we create and
 	// manage. Crucially, for rich-text attributes, we do not receive granular
@@ -475,31 +484,24 @@ function mergeRichTextUpdate(
 	// only a single character changed.
 	//
 	// The code below allows us to compute a delta between the current and new
-	// value, then apply it to the Y.Text. However, it relies on a library
-	// (quill-delta) with a licensing issue that we are working to resolve.
-	//
-	// For now, we simply replace the full text content on each change.
-	//
-	// if ( ! localDoc ) {
-	// 	// Y.Text must be attached to a Y.Doc to be able to do operations on it.
-	// 	// Create a temporary Y.Text attached to a local Y.Doc for delta computation.
-	// 	localDoc = new Y.Doc();
-	// }
+	// value, then apply it to the Y.Text.
 
-	// const localYText = localDoc.getText( 'temporary-text' );
-	// localYText.delete( 0, localYText.length );
-	// localYText.insert( 0, updatedValue );
+	if ( ! localDoc ) {
+		// Y.Text must be attached to a Y.Doc to be able to do operations on it.
+		// Create a temporary Y.Text attached to a local Y.Doc for delta computation.
+		localDoc = new Y.Doc();
+	}
 
-	// const currentValueAsDelta = new Delta( blockYText.toDelta() );
-	// const updatedValueAsDelta = new Delta( localYText.toDelta() );
+	const localYText = localDoc.getText( 'temporary-text' );
+	localYText.delete( 0, localYText.length );
+	localYText.insert( 0, updatedValue );
 
-	// const deltaDiff = currentValueAsDelta.diff(
-	// 	updatedValueAsDelta,
-	// 	lastSelection?.offset
-	// );
+	const currentValueAsDelta = new Delta( blockYText.toDelta() );
+	const updatedValueAsDelta = new Delta( localYText.toDelta() );
+	const deltaDiff = currentValueAsDelta.diffWithCursor(
+		updatedValueAsDelta,
+		cursorPosition
+	);
 
-	// blockYText.applyDelta( deltaDiff.ops );
-
-	blockYText.delete( 0, blockYText.toString().length );
-	blockYText.insert( 0, updatedValue );
+	blockYText.applyDelta( deltaDiff.ops );
 }

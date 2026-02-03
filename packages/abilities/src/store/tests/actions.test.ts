@@ -398,6 +398,35 @@ describe( 'Store Actions', () => {
 			expect( mockDispatch ).not.toHaveBeenCalled();
 		} );
 
+		it( 'should preserve arbitrary meta properties like scope', () => {
+			const ability: Ability = {
+				name: 'test/ability-with-scope',
+				label: 'Test Ability',
+				description: 'Test ability with custom scope',
+				category: 'test-category',
+				callback: jest.fn(),
+				meta: {
+					scope: 'editor',
+					customProperty: 'customValue',
+				},
+			};
+
+			const action = registerAbility( ability );
+			action( { select: mockSelect, dispatch: mockDispatch } );
+
+			expect( mockDispatch ).toHaveBeenCalledWith( {
+				type: REGISTER_ABILITY,
+				ability: {
+					...ability,
+					meta: {
+						scope: 'editor',
+						customProperty: 'customValue',
+						annotations: { clientRegistered: true },
+					},
+				},
+			} );
+		} );
+
 		it( 'should validate and reject already registered ability', () => {
 			const existingAbility: Ability = {
 				name: 'test/ability',

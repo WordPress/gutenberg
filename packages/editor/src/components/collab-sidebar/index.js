@@ -9,6 +9,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -80,7 +81,7 @@ function NotesSidebarContent( {
 	);
 }
 
-function NotesSidebar( { postId, mode } ) {
+function NotesSidebar( { postId } ) {
 	// Enum: 'closed' | 'creating' | 'open'
 	const [ newNoteFormState, setNewNoteFormState ] = useState( 'closed' );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
@@ -89,26 +90,25 @@ function NotesSidebar( { postId, mode } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
-	const showFloatingSidebar = isLargeViewport && mode === 'post-only';
+	const showFloatingSidebar = isLargeViewport;
 
-	const { clientId, blockCommentId, isDistractionFree } = useSelect(
-		( select ) => {
-			const {
-				getBlockAttributes,
-				getSelectedBlockClientId,
-				getSettings,
-			} = select( blockEditorStore );
-			const _clientId = getSelectedBlockClientId();
-			return {
-				clientId: _clientId,
-				blockCommentId: _clientId
-					? getBlockAttributes( _clientId )?.metadata?.noteId
-					: null,
-				isDistractionFree: getSettings().isDistractionFree,
-			};
-		},
-		[]
-	);
+	const { clientId, blockCommentId } = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId } =
+			select( blockEditorStore );
+		const _clientId = getSelectedBlockClientId();
+		return {
+			clientId: _clientId,
+			blockCommentId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.noteId
+				: null,
+		};
+	}, [] );
+	const { isDistractionFree } = useSelect( ( select ) => {
+		const { get } = select( preferencesStore );
+		return {
+			isDistractionFree: get( 'core', 'distractionFree' ),
+		};
+	}, [] );
 
 	const {
 		resultComments,
@@ -130,8 +130,7 @@ function NotesSidebar( { postId, mode } ) {
 	const currentThread = blockCommentId
 		? resultComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
-	const showAllNotesSidebar =
-		resultComments.length > 0 || ! showFloatingSidebar;
+	const showAllNotesSidebar = resultComments.length > 0;
 
 	async function openTheSidebar() {
 		const prevArea = await getActiveComplementaryArea( 'core' );
@@ -195,8 +194,6 @@ function NotesSidebar( { postId, mode } ) {
 						newNoteFormState={ newNoteFormState }
 						setNewNoteFormState={ setNewNoteFormState }
 						commentSidebarRef={ commentSidebarRef }
-						reflowComments={ reflowComments }
-						commentLastUpdated={ commentLastUpdated }
 					/>
 				</PluginSidebar>
 			) }
@@ -228,12 +225,10 @@ function NotesSidebar( { postId, mode } ) {
 }
 
 export default function NotesSidebarContainer() {
-	const { postId, mode, editorMode } = useSelect( ( select ) => {
-		const { getCurrentPostId, getRenderingMode, getEditorMode } =
-			select( editorStore );
+	const { postId, editorMode } = useSelect( ( select ) => {
+		const { getCurrentPostId, getEditorMode } = select( editorStore );
 		return {
 			postId: getCurrentPostId(),
-			mode: getRenderingMode(),
 			editorMode: getEditorMode(),
 		};
 	}, [] );
@@ -249,7 +244,7 @@ export default function NotesSidebarContainer() {
 
 	return (
 		<PostTypeSupportCheck supportKeys="editor.notes">
-			<NotesSidebar postId={ postId } mode={ mode } />
+			<NotesSidebar postId={ postId } />
 		</PostTypeSupportCheck>
 	);
 }

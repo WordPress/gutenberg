@@ -11,14 +11,14 @@ A theming package that's part of the WordPress Design System. It has two parts:
 
 ## Design Tokens
 
-In the **[Design Tokens Reference](docs/ds-tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
+In the **[Design Tokens Reference](https://github.com/WordPress/gutenberg/blob/trunk/packages/theme/docs/tokens.md)** document there is a complete reference of all available design tokens including colors, spacing, typography, and more.
 
 ### Architecture
 
 Internally, the design system uses a tiered token architecture:
 
-- **Primitive tokens**: Raw values like hex colors or pixel dimensions which are what the browsers eventually interpret. These live in the `/tokens` directory as JSON source files and are an internal implementation detail.
-- **Semantic tokens**: Purpose-driven tokens with meaningful names that reference primitives and describe their intended use. These are what get exported as CSS custom properties.
+-   **Primitive tokens**: Raw values like hex colors or pixel dimensions which are what the browsers eventually interpret. These live in the `/tokens` directory as JSON source files and are an internal implementation detail.
+-   **Semantic tokens**: Purpose-driven tokens with meaningful names that reference primitives and describe their intended use. These are what get exported as CSS custom properties.
 
 This separation allows the design system to maintain consistency while providing flexibility, since primitive values can be updated without changing the semantic token names that developers use in their code.
 
@@ -26,7 +26,7 @@ This separation allows the design system to maintain consistency while providing
 
 Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
 
-Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-bg-interactive-brand-strong` or `--wpds-dimension-padding-surface-md` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
+Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-bg-interactive-brand-strong` or `--wpds-dimension-padding-2xl` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
 
 #### Structure
 
@@ -62,17 +62,17 @@ Semantic tokens follow a consistent naming pattern:
 
 **Property** is the specific design property being defined.
 
-| Value    | Description                        |
-| -------- | ---------------------------------- |
-| `bg`     | Background color                   |
-| `fg`     | Foreground color (text and icons)  |
-| `stroke` | Border and outline color           |
-| `padding`| Internal spacing within an element |
-| `gap`    | Spacing between elements           |
-| `radius` | Border radius for rounded corners  |
-| `width`  | Border width                       |
-| `size`   | Font size                          |
-| `family` | Font family                        |
+| Value     | Description                        |
+| --------- | ---------------------------------- |
+| `bg`      | Background color                   |
+| `fg`      | Foreground color (text and icons)  |
+| `stroke`  | Border and outline color           |
+| `padding` | Internal spacing within an element |
+| `gap`     | Spacing between elements           |
+| `radius`  | Border radius for rounded corners  |
+| `width`   | Border width                       |
+| `size`    | Font size                          |
+| `family`  | Font family                        |
 
 **Target** is the component or element type the token applies to.
 
@@ -89,7 +89,7 @@ Semantic tokens follow a consistent naming pattern:
 
 | Value                               | Description          |
 | ----------------------------------- | -------------------- |
-| `2xs`, `xs`, `sm`, `md`, `lg`, `xl` | Size scale modifiers |
+| `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` | Size scale modifiers |
 
 #### Color Token Modifiers
 
@@ -117,10 +117,10 @@ Color tokens extend the base pattern with additional modifiers for tone, emphasi
 
 **Emphasis** adjusts color strength relative to the base tone, if specified. The default is a normal emphasis.
 
-| Value                | Description                                    |
-| -------------------- | ---------------------------------------------- |
-| `strong`             | Higher contrast and/or elevated emphasis       |
-| `weak`               | Subtle variant for secondary or muted elements |
+| Value    | Description                                    |
+| -------- | ---------------------------------------------- |
+| `strong` | Higher contrast and/or elevated emphasis       |
+| `weak`   | Subtle variant for secondary or muted elements |
 
 **State** represents the interactive state of the element, if specified. The default is an idle state.
 

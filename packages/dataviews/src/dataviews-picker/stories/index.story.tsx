@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta } from '@storybook/react-webpack5';
+import type { Meta } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -238,7 +238,7 @@ export const WithModal = ( {
 
 	return (
 		<>
-			<Stack direction="row" justify="left" gap="xs">
+			<Stack direction="row" justify="left" gap="sm">
 				<Button
 					variant="primary"
 					onClick={ () => setIsModalOpen( true ) }
