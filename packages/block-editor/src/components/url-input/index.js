@@ -493,7 +493,7 @@ class URLInput extends Component {
 		}
 
 		return (
-			<BaseControl __nextHasNoMarginBottom { ...controlProps }>
+			<BaseControl { ...controlProps }>
 				<ValidatedInputControl
 					{ ...inputProps }
 					{ ...validationProps }
