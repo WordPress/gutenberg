@@ -17,6 +17,10 @@ export function useShouldIframe() {
 	return useSelect( ( select ) => {
 		const { getEditorSettings, getCurrentPostType, getDeviceType } =
 			select( editorStore );
+		const { getClientIdsWithDescendants, getBlockName } =
+			select( blockEditorStore );
+		const { getBlockType } = select( blocksStore );
+
 		return (
 			// If the theme is block based and the Gutenberg plugin is active,
 			// we ALWAYS use the iframe for consistency across the post and site
@@ -29,11 +33,12 @@ export function useShouldIframe() {
 			getDeviceType() !== 'Desktop' ||
 			[ 'wp_template', 'wp_block' ].includes( getCurrentPostType() ) ||
 			unlock( select( blockEditorStore ) ).isZoomOut() ||
-			// Finally, still iframe the editor if all blocks are v3 (which means
-			// they are marked as iframe-compatible).
-			select( blocksStore )
-				.getBlockTypes()
-				.every( ( type ) => type.apiVersion >= 3 )
+			// Finally, still iframe the editor if all present blocks are v3
+			// (which means they are marked as iframe-compatible).
+			[ ...new Set( getClientIdsWithDescendants().map( getBlockName ) ) ]
+				.map( getBlockType )
+				.filter( Boolean )
+				.every( ( blockType ) => blockType.apiVersion >= 3 )
 		);
 	}, [] );
 }
