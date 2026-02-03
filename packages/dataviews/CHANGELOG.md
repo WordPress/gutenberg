@@ -10,6 +10,7 @@
 
 ### Enhancements
 - DataViews: Add details form layout validation. [#74996](https://github.com/WordPress/gutenberg/pull/74996)
+- Add new `adaptiveSelect` DataForm control. [#74937](https://github.com/WordPress/gutenberg/pull/74937)
 - DataViews: Consistent rendering of selection checkbox and actions in grid layout. [#75056](https://github.com/WordPress/gutenberg/pull/75056)
 
 ## 11.3.0 (2026-01-29)
