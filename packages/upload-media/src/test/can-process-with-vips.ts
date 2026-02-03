@@ -11,7 +11,6 @@ describe( 'canProcessWithVips', () => {
 		[ 'image.gif', 'image/gif', true ],
 		[ 'image.webp', 'image/webp', true ],
 		[ 'image.avif', 'image/avif', true ],
-		[ 'image.heic', 'image/heic', true ],
 		[ 'document.pdf', 'application/pdf', false ],
 		[ 'video.mp4', 'video/mp4', false ],
 		[ 'audio.mp3', 'audio/mpeg', false ],

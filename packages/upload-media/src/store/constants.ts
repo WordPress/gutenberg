@@ -17,5 +17,4 @@ export const CLIENT_SIDE_SUPPORTED_MIME_TYPES: readonly string[] = [
 	'image/gif',
 	'image/webp',
 	'image/avif',
-	'image/heic',
 ] as const;
