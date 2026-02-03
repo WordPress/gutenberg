@@ -796,8 +796,8 @@ class WP_Navigation_Block_Renderer {
 				$toggle_aria_label_close,
 				$close_button_directives,
 				$toggle_close_button_content
-		);
-	}
+			);
+		}
 
 		return sprintf(
 			'<button aria-haspopup="dialog" %3$s class="%6$s" %10$s>%8$s</button>
