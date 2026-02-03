@@ -60,7 +60,7 @@ export interface HeaderProps extends ComponentProps< 'div' > {
 export type HeadingProps = ComponentProps< 'div' >;
 
 export interface CloseIconProps
-	extends DistributiveOmit<
+	extends Omit<
 		ComponentProps< typeof IconButton >,
 		'label' | 'icon' | 'loading' | 'loadingAnnouncement'
 	> {
