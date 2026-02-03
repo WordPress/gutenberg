@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "core/dialog",
 	"version": "1.0.0",
-	"title": "Dialog",
+	"title": "Dialog Wrapper",
 	"description": "Render content in a <dialog/> element modal. Includes a trigger to open the dialog, and dialog element to render content.",
 	"category": "media",
 	"keywords": [ "dialog", "modal", "popup" ],

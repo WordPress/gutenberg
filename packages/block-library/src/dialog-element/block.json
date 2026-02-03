@@ -3,7 +3,7 @@
 	"apiVersion": 3,
 	"name": "core/dialog-element",
 	"version": "1.0.0",
-	"title": "Dialog Element",
+	"title": "Dialog",
 	"category": "media",
 	"__experimental": true,
 	"attributes": {

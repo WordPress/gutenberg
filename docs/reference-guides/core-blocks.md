@@ -305,7 +305,7 @@ Hide and show additional content. ([Source](https://github.com/WordPress/gutenbe
 -	**Supports:** align (full, wide), allowedBlocks, anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** name, placeholder, showContent, summary
 
-## Dialog
+## Dialog Wrapper
 
 Render content in a <dialog/> element modal. Includes a trigger to open the dialog, and dialog element to render content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog))
 
@@ -316,7 +316,7 @@ Render content in a <dialog/> element modal. Includes a trigger to open the dial
 -	**Supports:** align (center, full, left, right, wide), anchor, interactivity, ~~html~~
 -	**Attributes:** editorIsDialogOpen
 
-## Dialog Element
+## Dialog
 
 undefined ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-element))
 
