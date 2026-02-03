@@ -22,7 +22,11 @@ import {
 	useBlockProps,
 	useBlockEditingMode,
 } from '@wordpress/block-editor';
-import { useState, useEffect } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useState,
+	useEffect,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -160,18 +164,16 @@ export function Edit( props ) {
 					className="outermost-icon-block__title-control"
 					value={ title || '' }
 					onChange={ ( value ) => setAttributes( { title: value } ) }
-					help={
-						<>
-							{ __(
-								'Describe the role of this icon on the page.'
-							) }{ ' ' }
-							<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
-								{ __(
-									'Note: many devices and browsers do not display this text.'
-								) }
-							</ExternalLink>
-						</>
-					}
+					help={ createInterpolateElement(
+						__(
+							'Describe the role of this icon on the page. <a>Note: many devices and browsers do not display this text.</a>'
+						),
+						{
+							a: (
+								<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute" />
+							),
+						}
+					) }
 					__next40pxDefaultSize
 				/>
 			</InspectorControls>
