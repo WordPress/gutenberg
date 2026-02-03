@@ -155,12 +155,12 @@ export const Mark = styled.span`
 
 const markLabelFill = ( { isFilled }: RangeMarkProps ) => {
 	return css( {
-		color: isFilled ? COLORS.gray[ 700 ] : COLORS.gray[ 300 ],
+		color: isFilled ? COLORS.theme.gray[ 700 ] : COLORS.theme.gray[ 300 ],
 	} );
 };
 
 export const MarkLabel = styled.span`
-	color: ${ COLORS.gray[ 300 ] };
+	color: ${ COLORS.theme.gray[ 300 ] };
 	font-size: 11px;
 	position: absolute;
 	top: 8px;
