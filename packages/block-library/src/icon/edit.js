@@ -78,7 +78,7 @@ export function Edit( props ) {
 			// `__unstableMarkNextChangeAsNotPersistent()`.
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
-				style: { dimensions: { width: '48px', ...style } },
+				style: { ...style, dimensions: { width: '48px' } },
 			} );
 		}
 	}, [ style, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
