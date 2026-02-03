@@ -7,7 +7,12 @@ import {
 	useEffect,
 } from '@wordpress/element';
 
-type TabValue = any;
+import type { TabProps } from './types';
+
+/**
+ * The type for tab/panel value props, derived from the actual TabProps.
+ */
+type TabValue = TabProps[ 'value' ];
 
 type TabsValidationContextType = {
 	registerTab: ( value: TabValue ) => () => void;
