@@ -3,7 +3,7 @@ import type { ComponentProps } from 'react';
 import * as Dialog from '../index';
 
 const meta: Meta< typeof Dialog.Root > = {
-	title: 'Design System/Dialog',
+	title: 'Design System/Components/Dialog',
 	component: Dialog.Root,
 	subcomponents: {
 		'Dialog.Trigger': Dialog.Trigger,
@@ -33,9 +33,17 @@ export default meta;
 
 type Story = StoryObj< typeof Dialog.Root >;
 
+const ThemedParagraph = ( { children }: { children: React.ReactNode } ) => (
+	<p style={ { color: 'var( --wpds-color-fg-content-neutral )' } }>
+		{ children }
+	</p>
+);
+
 function DialogWithSize( {
 	size,
-}: Pick< ComponentProps< typeof Dialog.Popup >, 'size' > ) {
+}: {
+	size?: ComponentProps< typeof Dialog.Popup >[ 'size' ];
+} ) {
 	return (
 		<>
 			<Dialog.Trigger>Open Dialog</Dialog.Trigger>
@@ -44,12 +52,11 @@ function DialogWithSize( {
 					<Dialog.Heading />
 					<Dialog.CloseIcon />
 				</Dialog.Header>
-				<p>
+				<ThemedParagraph>
 					This dialog demonstrates best practices for informational
 					dialogs. It includes a close icon because dismissing it is
 					safe and expected.
-				</p>
-				<CheckboxControl label="Don't show this again" />
+				</ThemedParagraph>
 				<Dialog.Footer>
 					<Dialog.Action>Got it</Dialog.Action>
 				</Dialog.Footer>
@@ -84,10 +91,10 @@ export const ConfirmDialog: Story = {
 					<Dialog.Header>
 						<Dialog.Heading />
 					</Dialog.Header>
-					<p>
+					<ThemedParagraph>
 						Are you sure you want to proceed? This action cannot be
 						undone.
-					</p>
+					</ThemedParagraph>
 					<Dialog.Footer>
 						<Dialog.Action variant="outline">Cancel</Dialog.Action>
 						<Dialog.Action>Confirm</Dialog.Action>
