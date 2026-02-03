@@ -2259,13 +2259,21 @@ describe( 'Tabs', () => {
 
 	describe( 'Development mode validation', () => {
 		describe( 'components used outside of Root', () => {
-			// Suppress React's error boundary logging for these tests
+			// Suppress React's error boundary logging for these tests.
+			// We use manual mocking because @wordpress/jest-console's toHaveErrored()
+			// has issues when running in the full test suite context.
+			let originalConsoleError: typeof console.error;
+
 			beforeEach( () => {
-				jest.spyOn( console, 'error' ).mockImplementation( () => {} );
+				// eslint-disable-next-line no-console
+				originalConsoleError = console.error;
+				// eslint-disable-next-line no-console
+				console.error = jest.fn();
 			} );
 
 			afterEach( () => {
-				( console.error as jest.Mock ).mockRestore();
+				// eslint-disable-next-line no-console
+				console.error = originalConsoleError;
 			} );
 
 			it( 'should throw when Tabs.Tab is used outside of Tabs.Root', () => {
@@ -2300,10 +2308,6 @@ describe( 'Tabs', () => {
 		} );
 
 		it( 'should warn when a Tab has no matching Panel', async () => {
-			const consoleWarnSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
-
 			render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
@@ -2321,25 +2325,16 @@ describe( 'Tabs', () => {
 
 			// Wait for the validation to run (it's scheduled with setTimeout)
 			await waitFor( () => {
-				expect( consoleWarnSpy ).toHaveBeenCalledWith(
-					expect.stringContaining(
-						'Found Tab(s) without matching Panel(s)'
-					)
-				);
+				expect( console ).toHaveWarned();
 			} );
 
-			expect( consoleWarnSpy ).toHaveBeenCalledWith(
-				expect.stringContaining( 'three' )
+			// Verify the warning mentions the orphan tab value
+			expect( console ).toHaveWarnedWith(
+				'Tabs: Found Tab(s) without matching Panel(s). Each Tab should have a corresponding Panel with the same `value` prop. Tab value(s) without panels: three'
 			);
-
-			consoleWarnSpy.mockRestore();
 		} );
 
 		it( 'should warn when a Panel has no matching Tab', async () => {
-			const consoleWarnSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
-
 			render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
@@ -2356,25 +2351,16 @@ describe( 'Tabs', () => {
 
 			// Wait for the validation to run (it's scheduled with setTimeout)
 			await waitFor( () => {
-				expect( consoleWarnSpy ).toHaveBeenCalledWith(
-					expect.stringContaining(
-						'Found Panel(s) without matching Tab(s)'
-					)
-				);
+				expect( console ).toHaveWarned();
 			} );
 
-			expect( consoleWarnSpy ).toHaveBeenCalledWith(
-				expect.stringContaining( 'orphan' )
+			// Verify the warning mentions the orphan panel value
+			expect( console ).toHaveWarnedWith(
+				'Tabs: Found Panel(s) without matching Tab(s). Each Panel should have a corresponding Tab with the same `value` prop. Panel value(s) without tabs: orphan'
 			);
-
-			consoleWarnSpy.mockRestore();
 		} );
 
 		it( 'should not warn when all Tabs and Panels match', async () => {
-			const consoleWarnSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
-
 			render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
@@ -2391,16 +2377,10 @@ describe( 'Tabs', () => {
 			// Wait a bit to ensure validation has run
 			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
 
-			expect( consoleWarnSpy ).not.toHaveBeenCalled();
-
-			consoleWarnSpy.mockRestore();
+			expect( console ).not.toHaveWarned();
 		} );
 
 		it( 'should warn about multiple mismatches', async () => {
-			const consoleWarnSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
-
 			render(
 				<Tabs.Root defaultValue="one">
 					<Tabs.List>
@@ -2417,23 +2397,18 @@ describe( 'Tabs', () => {
 
 			// Wait for the validation to run
 			await waitFor( () => {
-				expect( consoleWarnSpy ).toHaveBeenCalledTimes( 2 );
+				expect( console ).toHaveWarned();
 			} );
 
-			// Check for tabs without panels warning
-			expect( consoleWarnSpy ).toHaveBeenCalledWith(
-				expect.stringContaining( 'orphan-tab-1' )
-			);
-			expect( consoleWarnSpy ).toHaveBeenCalledWith(
-				expect.stringContaining( 'orphan-tab-2' )
+			// Check for tabs without panels warning (both orphan tabs in one message)
+			expect( console ).toHaveWarnedWith(
+				'Tabs: Found Tab(s) without matching Panel(s). Each Tab should have a corresponding Panel with the same `value` prop. Tab value(s) without panels: orphan-tab-1, orphan-tab-2'
 			);
 
 			// Check for panels without tabs warning
-			expect( consoleWarnSpy ).toHaveBeenCalledWith(
-				expect.stringContaining( 'orphan-panel' )
+			expect( console ).toHaveWarnedWith(
+				'Tabs: Found Panel(s) without matching Tab(s). Each Panel should have a corresponding Tab with the same `value` prop. Panel value(s) without tabs: orphan-panel'
 			);
-
-			consoleWarnSpy.mockRestore();
 		} );
 	} );
 } );
