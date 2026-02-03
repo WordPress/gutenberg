@@ -82,7 +82,6 @@ export const useEditPostAction = () => {
 		() => ( {
 			id: 'edit-post',
 			label: __( 'Edit' ),
-			isPrimary: true,
 			icon: pencil,
 			isEligible( post ) {
 				if ( post.status === 'trash' ) {
@@ -106,6 +105,7 @@ export const useQuickEditPostAction = () => {
 			id: 'quick-edit',
 			label: __( 'Quick Edit' ),
 			icon: drawerRight,
+			isPrimary: true,
 			isEligible( post ) {
 				if ( post.status === 'trash' ) {
 					return false;
