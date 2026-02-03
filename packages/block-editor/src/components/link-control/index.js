@@ -270,21 +270,6 @@ function LinkControl( {
 		};
 	}, [] );
 
-	// Trigger validation display when customValidity becomes invalid.
-	// This effect runs after React has applied the customValidity state update
-	// and ControlWithError's useEffect has set the native validity on the input.
-	useEffect( () => {
-		if ( customValidity?.type === 'invalid' ) {
-			const inputElement = searchInputRef.current;
-			if (
-				inputElement &&
-				typeof inputElement.reportValidity === 'function'
-			) {
-				inputElement.reportValidity();
-			}
-		}
-	}, [ customValidity ] );
-
 	const hasLinkValue = value?.url?.trim()?.length > 0;
 
 	/**
