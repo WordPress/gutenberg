@@ -1,0 +1,102 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.backdrop {
+		position: fixed;
+		inset: 0;
+		background-color: rgba( 0, 0, 0, 0.35 );
+
+		&[data-starting-style],
+		&[data-ending-style] {
+			opacity: 0;
+		}
+
+		&[data-open] {
+			opacity: 1;
+		}
+
+		@media not ( prefers-reduced-motion ) {
+			transition: opacity 0.2s ease-out;
+		}
+	}
+
+	.popup {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate( -50%, -50% );
+		min-width: 384px;
+		max-width: 90vw;
+		max-height: 90vh;
+		padding: calc(
+			8 * var( --wpds-dimension-base )
+		); /* TODO: Use token: surface-lg? */
+		background-color: var( --wpds-color-bg-surface-neutral-strong );
+		border-radius: var( --wpds-border-radius-surface-lg );
+		overflow: auto;
+		font-family: var( --wpds-font-family-body );
+		font-size: var( --wpds-font-size-md );
+		line-height: var( --wpds-font-line-height-md );
+		color: var( --wpds-color-fg-content-neutral );
+
+		&[data-starting-style],
+		&[data-ending-style] {
+			opacity: 0;
+			transform: translate( -50%, -50% ) scale( 0.9 );
+		}
+
+		@media not ( prefers-reduced-motion ) {
+			transition:
+				opacity 0.2s cubic-bezier( 1, 0, 0.2, 1 ),
+				transform 0.2s cubic-bezier( 1, 0, 0.2, 1 );
+
+			&[data-open] {
+				transition:
+					opacity 0.2s cubic-bezier( 0.29, 0, 0, 1 ),
+					transform 0.2s cubic-bezier( 0.29, 0, 0, 1 );
+			}
+		}
+
+		&.is-small {
+			width: clamp( 384px, 90vw, 384px );
+		}
+
+		&.is-medium {
+			width: clamp( 384px, 90vw, 512px );
+		}
+
+		&.is-large {
+			width: clamp( 384px, 90vw, 840px );
+		}
+	}
+
+	.header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: calc(
+			4 * var( --wpds-dimension-base )
+		); /* TODO: Use or create new gap token? */
+	}
+
+	.heading {
+		margin: 0;
+		font-size: var( --wpds-font-size-xl );
+		font-weight: 590;
+		line-height: var( --wpds-font-line-height-xl );
+		color: var( --wpds-color-fg-content-neutral );
+	}
+
+	.footer {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		gap: calc(
+			2 * var( --wpds-dimension-base )
+		); /* TODO: Use or create new gap token? (possibly control/interactive gap) */
+		margin: calc( 4 * var( --wpds-dimension-base ) ) 0 0 0; /* TODO: Use or create new gap token? */
+		padding-top: calc(
+			4 * var( --wpds-dimension-base )
+		); /* TODO: Use or create new gap token? */
+	}
+}
