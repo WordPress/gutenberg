@@ -62,7 +62,6 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 				<ToolbarButton
 					className="components-toolbar__control"
 					onClick={ addTab }
-					showTooltip
 					text={ __( 'Add tab' ) }
 				/>
 			</ToolbarGroup>
