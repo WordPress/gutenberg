@@ -1,7 +1,7 @@
 import { forwardRef, useEffect } from '@wordpress/element';
 import clsx from 'clsx';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
-import { useTabsValidationContext } from './context';
+import { useTabsValidationContext, useRequireTabsRoot } from './context';
 import styles from './style.module.css';
 import type { TabPanelProps } from './types';
 
@@ -13,6 +13,7 @@ import type { TabPanelProps } from './types';
  */
 export const Panel = forwardRef< HTMLDivElement, TabPanelProps >(
 	function TabPanel( { className, value, ...otherProps }, forwardedRef ) {
+		useRequireTabsRoot( 'Tabs.Panel' );
 		const validationContext = useTabsValidationContext();
 
 		// Register this panel's value for validation

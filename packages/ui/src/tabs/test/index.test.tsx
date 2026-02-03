@@ -2258,6 +2258,47 @@ describe( 'Tabs', () => {
 	} );
 
 	describe( 'Development mode validation', () => {
+		describe( 'components used outside of Root', () => {
+			// Suppress React's error boundary logging for these tests
+			beforeEach( () => {
+				jest.spyOn( console, 'error' ).mockImplementation( () => {} );
+			} );
+
+			afterEach( () => {
+				( console.error as jest.Mock ).mockRestore();
+			} );
+
+			it( 'should throw when Tabs.Tab is used outside of Tabs.Root', () => {
+				expect( () => {
+					render( <Tabs.Tab value="orphan">Orphan Tab</Tabs.Tab> );
+				} ).toThrow(
+					'`Tabs.Tab` must be used within a `Tabs.Root` component.'
+				);
+			} );
+
+			it( 'should throw when Tabs.Panel is used outside of Tabs.Root', () => {
+				expect( () => {
+					render(
+						<Tabs.Panel value="orphan">Orphan Panel</Tabs.Panel>
+					);
+				} ).toThrow(
+					'`Tabs.Panel` must be used within a `Tabs.Root` component.'
+				);
+			} );
+
+			it( 'should throw when Tabs.List is used outside of Tabs.Root', () => {
+				expect( () => {
+					render(
+						<Tabs.List>
+							<Tabs.Tab value="one">One</Tabs.Tab>
+						</Tabs.List>
+					);
+				} ).toThrow(
+					'`Tabs.List` must be used within a `Tabs.Root` component.'
+				);
+			} );
+		} );
+
 		it( 'should warn when a Tab has no matching Panel', async () => {
 			const consoleWarnSpy = jest
 				.spyOn( console, 'warn' )

@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { Tabs as _Tabs } from '@base-ui/react/tabs';
 import { chevronRight } from '@wordpress/icons';
 import { Icon } from '../icon';
-import { useTabsValidationContext } from './context';
+import { useTabsValidationContext, useRequireTabsRoot } from './context';
 import styles from './style.module.css';
 import type { TabProps } from './types';
 
@@ -17,6 +17,7 @@ export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
 	{ className, children, value, ...otherProps },
 	forwardedRef
 ) {
+	useRequireTabsRoot( 'Tabs.Tab' );
 	const validationContext = useTabsValidationContext();
 
 	// Register this tab's value for validation

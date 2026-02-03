@@ -40,6 +40,22 @@ export function useTabsValidationContext() {
 }
 
 /**
+ * Hook that throws an error in development if the component
+ * is not wrapped in a Tabs.Root.
+ *
+ * @param componentName The name of the component (for the error message).
+ */
+export function useRequireTabsRoot( componentName: string ) {
+	const context = useTabsValidationContext();
+
+	if ( VALIDATION_ENABLED && context === null ) {
+		throw new Error(
+			`\`${ componentName }\` must be used within a \`Tabs.Root\` component.`
+		);
+	}
+}
+
+/**
  * Provider component that tracks registered tabs and panels,
  * and validates that they match in development mode.
  *
