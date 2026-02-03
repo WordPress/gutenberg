@@ -1,7 +1,6 @@
 import { Dialog as _Dialog } from '@base-ui/react/dialog';
 import clsx from 'clsx';
-import { forwardRef, useContext } from '@wordpress/element';
-import { DialogContext } from './context';
+import { forwardRef } from '@wordpress/element';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
 
@@ -13,8 +12,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 	{ className, size, children, ...props },
 	ref
 ) {
-	const { title } = useContext( DialogContext );
-
 	return (
 		<_Dialog.Portal>
 			<_Dialog.Backdrop className={ styles.backdrop } />
@@ -26,8 +23,6 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 					size && styles[ `is-${ size }` ]
 				) }
 				{ ...props }
-				aria-labelledby={ undefined }
-				aria-label={ title }
 			>
 				{ children }
 			</_Dialog.Popup>

@@ -57,7 +57,7 @@
 		}
 
 		&.is-small {
-			width: clamp(384px, 90vw, 384px);
+			width: min(384px, 90vw);
 		}
 
 		&.is-medium {
