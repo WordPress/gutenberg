@@ -706,7 +706,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	private function sanitize_standard_category( $category ) {
 		$sanitized = array_intersect_key( $category, array_flip( array( 'label', 'guidelines' ) ) );
 
-		foreach ( $sanitized as $prop => &$value ) {
+		foreach ( $sanitized as &$value ) {
 			$value = is_string( $value ) ? wp_kses_post( $value ) : '';
 		}
 
