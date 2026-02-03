@@ -22,6 +22,14 @@
 		border-style: solid;
 	}
 
+	// Default background color and padding for dialog element.
+	&:not(.has-background) {
+		background-color: var(--wp--style--dialog-background-color, #fff);
+	}
+	padding-top: var(--wp--preset--spacing--30);
+	padding-bottom: var(--wp--preset--spacing--30);
+	padding-inline: var(--wp--preset--spacing--30);
+
 	// Open state with fade-in animation
 	&[open].active {
 		visibility: visible;

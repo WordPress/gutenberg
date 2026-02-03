@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useMemo } from '@wordpress/element';
+import { useRef, useMemo, useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	useBlockProps,
@@ -68,18 +68,26 @@ const TEMPLATE = [
 export default function Edit( { attributes, setAttributes, clientId } ) {
 	const { editorIsDialogOpen = false } = attributes;
 
-	// Get the dialog-element block from inner blocks.
-	const { dialogElementClientId } = useSelect(
+	// Get the dialog-element block from inner blocks and check if it's selected.
+	const { dialogElementClientId, isDialogElementSelected } = useSelect(
 		( select ) => {
-			const { getBlock } = select( blockEditorStore );
+			const { getBlock, isBlockSelected, hasSelectedInnerBlock } =
+				select( blockEditorStore );
 			const block = getBlock( clientId );
 			const dialogElementBlock = block?.innerBlocks?.find(
 				( innerBlock ) => innerBlock.name === 'core/dialog-element'
 			);
 			const dialogElementId = dialogElementBlock?.clientId;
 
+			// Check if dialog-element or any of its descendants are selected
+			const isSelected = dialogElementId
+				? isBlockSelected( dialogElementId ) ||
+				  hasSelectedInnerBlock( dialogElementId, true )
+				: false;
+
 			return {
 				dialogElementClientId: dialogElementId,
+				isDialogElementSelected: isSelected,
 			};
 		},
 		[ clientId ]
@@ -92,6 +100,14 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	// Get block editor dispatch for non-persistent updates
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
+
+	// Auto-open dialog when dialog-element or its children are selected
+	useEffect( () => {
+		if ( isDialogElementSelected && ! editorIsDialogOpen ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { editorIsDialogOpen: true } );
+		}
+	}, [ isDialogElementSelected, editorIsDialogOpen ] );
 
 	// Set up a ref for the block container
 	const ref = useRef( null );
