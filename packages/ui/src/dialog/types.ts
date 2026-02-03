@@ -1,17 +1,11 @@
-/**
- * External dependencies
- */
-import { type ReactNode } from 'react';
-import { type Dialog as BaseUIDialog } from '@base-ui/react/dialog';
-
-/**
- * Internal dependencies
- */
-import type { ComponentProps, DistributiveOmit } from '../utils/types';
-import { type Button, type IconButton } from '..';
+import type { Dialog as _Dialog } from '@base-ui/react/dialog';
+import type { ReactNode } from 'react';
+import type { Button } from '../button';
+import type { IconButton } from '../icon-button';
+import type { ComponentProps } from '../utils/types';
 
 export interface RootProps
-	extends Pick< BaseUIDialog.Root.Props, 'open' | 'onOpenChange' > {
+	extends Pick< _Dialog.Root.Props, 'open' | 'onOpenChange' > {
 	/**
 	 * The title text for the dialog. This is required to be a string to ensure
 	 * accessible labeling of the dialog.

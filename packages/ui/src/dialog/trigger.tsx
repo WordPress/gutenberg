@@ -1,17 +1,13 @@
-/**
- * External dependencies
- */
-import { forwardRef } from 'react';
-import { Dialog } from '@base-ui/react/dialog';
+import { Dialog as _Dialog } from '@base-ui/react/dialog';
+import { forwardRef } from '@wordpress/element';
+import type { TriggerProps } from './types';
 
 /**
- * Internal dependencies
+ * Renders a button that opens the dialog popup when clicked.
  */
-import { type TriggerProps } from './types';
-
 const Trigger = forwardRef< HTMLButtonElement, TriggerProps >(
 	function DialogTrigger( props, ref ) {
-		return <Dialog.Trigger ref={ ref } { ...props } />;
+		return <_Dialog.Trigger ref={ ref } { ...props } />;
 	}
 );
 

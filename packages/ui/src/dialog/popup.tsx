@@ -1,17 +1,14 @@
-/**
- * External dependencies
- */
-import { forwardRef, useContext } from 'react';
+import { Dialog as _Dialog } from '@base-ui/react/dialog';
 import clsx from 'clsx';
-import { Dialog } from '@base-ui/react/dialog';
+import { forwardRef, useContext } from '@wordpress/element';
+import { DialogContext } from './context';
+import styles from './style.module.css';
+import type { PopupProps } from './types';
 
 /**
- * Internal dependencies
+ * Renders the dialog popup element that contains the dialog content.
+ * Uses a portal to render outside the DOM hierarchy.
  */
-import { type PopupProps } from './types';
-import styles from './style.module.css';
-import { DialogContext } from './context';
-
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 	{ className, size, children, ...props },
 	ref
@@ -19,9 +16,9 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 	const { title } = useContext( DialogContext );
 
 	return (
-		<Dialog.Portal>
-			<Dialog.Backdrop className={ styles.backdrop } />
-			<Dialog.Popup
+		<_Dialog.Portal>
+			<_Dialog.Backdrop className={ styles.backdrop } />
+			<_Dialog.Popup
 				ref={ ref }
 				className={ clsx(
 					styles.popup,
@@ -33,8 +30,8 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 				aria-label={ title }
 			>
 				{ children }
-			</Dialog.Popup>
-		</Dialog.Portal>
+			</_Dialog.Popup>
+		</_Dialog.Portal>
 	);
 } );
 

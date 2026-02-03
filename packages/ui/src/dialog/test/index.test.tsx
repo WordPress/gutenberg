@@ -1,13 +1,6 @@
-/**
- * External dependencies
- */
 import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { createRef } from 'react';
-
-/**
- * Internal dependencies
- */
+import { createRef } from '@wordpress/element';
 import * as Dialog from '../index';
 
 jest.setTimeout( 10000 );

@@ -1,13 +1,10 @@
-/**
- * Internal dependencies
- */
-import { Root } from './root';
-import { Trigger } from './trigger';
-import { Popup } from './popup';
+import { Action } from './action';
+import { CloseIcon } from './close-icon';
+import { Footer } from './footer';
 import { Header } from './header';
 import { Heading } from './heading';
-import { CloseIcon } from './close-icon';
-import { Action } from './action';
-import { Footer } from './footer';
+import { Popup } from './popup';
+import { Root } from './root';
+import { Trigger } from './trigger';
 
-export { Root, Trigger, Popup, Header, Heading, CloseIcon, Action, Footer };
+export { Action, CloseIcon, Footer, Header, Heading, Popup, Root, Trigger };

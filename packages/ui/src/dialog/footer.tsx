@@ -1,15 +1,12 @@
-/**
- * External dependencies
- */
-import { forwardRef } from 'react';
 import clsx from 'clsx';
+import { forwardRef } from '@wordpress/element';
+import styles from './style.module.css';
+import type { FooterProps } from './types';
 
 /**
- * Internal dependencies
+ * Renders the footer section of the dialog, typically containing
+ * action buttons.
  */
-import { type FooterProps } from './types';
-import styles from './style.module.css';
-
 const Footer = forwardRef< HTMLDivElement, FooterProps >( function DialogFooter(
 	{ className, children, ...props },
 	ref

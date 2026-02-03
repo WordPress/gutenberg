@@ -1,25 +1,18 @@
-/**
- * External dependencies
- */
-import { forwardRef } from 'react';
-import { Dialog } from '@base-ui/react/dialog';
-
-/**
- * WordPress dependencies
- */
-import { close } from '@wordpress/icons';
+import { Dialog as _Dialog } from '@base-ui/react/dialog';
+import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { close } from '@wordpress/icons';
+import { IconButton } from '../icon-button';
+import type { CloseIconProps } from './types';
 
 /**
- * Internal dependencies
+ * Renders an icon button that closes the dialog when clicked.
+ * Provides a default close icon and accessible label.
  */
-import { type CloseIconProps } from './types';
-import { IconButton } from '..';
-
 const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
 	function DialogCloseIcon( props, ref ) {
 		return (
-			<Dialog.Close
+			<_Dialog.Close
 				ref={ ref }
 				render={
 					<IconButton
