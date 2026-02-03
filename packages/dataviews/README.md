@@ -16,13 +16,14 @@ npm install @wordpress/dataviews --save
 
 ## Stylesheet Dependencies
 
-As an implementation of the design system, these components depend on CSS custom properties defined by the `@wordpress/theme` package. In a WordPress admin page context, these are loaded automatically. For applications outside WordPress, you will need to install and include the design tokens stylesheet:
+DataViews depends on stylesheets from `@wordpress/components` and `@wordpress/theme`. In a WordPress admin page context, these are loaded automatically. For applications outside WordPress, you will need to include these stylesheets:
 
 ```bash
-npm install @wordpress/theme
+npm install @wordpress/components @wordpress/theme
 ```
 
 ```tsx
+import '@wordpress/components/build-style/style.css';
 import '@wordpress/theme/design-tokens.css';
 ```
 
