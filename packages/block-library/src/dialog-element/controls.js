@@ -31,7 +31,7 @@ export function Toolbar( { openDialog, closeDialog, isOpen, clientId } ) {
 		[ clientId ]
 	);
 	const buttonLabel = useMemo(
-		() => ( isOpen ? __( 'Close Dialog' ) : __( 'Edit Dialog' ) ),
+		() => ( isOpen ? __( 'Close dialog' ) : __( 'Edit dialog' ) ),
 		[ isOpen ]
 	);
 
@@ -77,7 +77,7 @@ export function InspectorPanel( {
 				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __( 'Enable Deep Linking' ) }
+						label={ __( 'Enable deep linking' ) }
 						help={ __(
 							'Allow the dialog to be opened via a URL hash (e.g., #dialog-id).'
 						) }
@@ -90,7 +90,7 @@ export function InspectorPanel( {
 					/>
 					<ToggleControl
 						__nextHasNoMarginBottom
-						label={ __( 'Auto Activation Timer' ) }
+						label={ __( 'Auto activation timer' ) }
 						help={ __(
 							'Automatically open the dialog after the specified time, in milliseconds.'
 						) }
@@ -106,7 +106,7 @@ export function InspectorPanel( {
 					{ 1 <= autoActivationTimer && (
 						<NumberControl
 							__next40pxDefaultSize
-							label="Activation Timer Duration"
+							label={ __( 'Activation timer duration' ) }
 							isShiftStepEnabled
 							onChange={ ( newDuration ) =>
 								setAttributes( {

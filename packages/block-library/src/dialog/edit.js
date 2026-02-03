@@ -32,7 +32,7 @@ const TEMPLATE = [
 				'core/paragraph',
 				{
 					placeholder: __(
-						'Start typing to add Dialog trigger text…'
+						'Start typing to add dialog trigger text…'
 					),
 				},
 			],
@@ -127,7 +127,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 
 	const buttonLabel = useMemo(
 		() =>
-			editorIsDialogOpen ? __( 'Close Dialog' ) : __( 'Edit Dialog' ),
+			editorIsDialogOpen ? __( 'Close dialog' ) : __( 'Edit dialog' ),
 		[ editorIsDialogOpen ]
 	);
 
@@ -156,7 +156,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Dialog Settings' ) }>
+				<PanelBody title={ __( 'Dialog settings' ) }>
 					<div>
 						<p>
 							{ __(
@@ -171,8 +171,8 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 							accessibleWhenDisabled
 						>
 							{ editorIsDialogOpen
-								? __( 'Close Dialog' )
-								: __( 'Edit Dialog' ) }
+								? __( 'Close dialog' )
+								: __( 'Edit dialog' ) }
 						</Button>
 					</div>
 				</PanelBody>

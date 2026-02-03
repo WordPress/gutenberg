@@ -53,7 +53,7 @@ export default function Edit( { context, clientId } ) {
 	} );
 
 	const buttonLabel = useMemo(
-		() => ( isDialogOpen ? __( 'Close Dialog' ) : __( 'Edit Dialog' ) ),
+		() => ( isDialogOpen ? __( 'Close dialog' ) : __( 'Edit dialog' ) ),
 		[ isDialogOpen ]
 	);
 
