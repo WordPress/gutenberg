@@ -1,16 +1,13 @@
-/**
- * External dependencies
- */
-import { forwardRef, useContext } from 'react';
 import { Dialog as _Dialog } from '@base-ui/react/dialog';
+import { forwardRef, useContext } from '@wordpress/element';
+import { DialogContext } from './context';
+import styles from './style.module.css';
+import type { HeadingProps } from './types';
 
 /**
- * Internal dependencies
+ * Renders the dialog title heading. The title text is provided
+ * via the `title` prop on `Dialog.Root`.
  */
-import { type HeadingProps } from './types';
-import styles from './style.module.css';
-import { DialogContext } from './context';
-
 const Heading = forwardRef< HTMLDivElement, HeadingProps >(
 	function DialogHeading( props, ref ) {
 		const { title } = useContext( DialogContext );

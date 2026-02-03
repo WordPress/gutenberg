@@ -1,7 +1,4 @@
-/**
- * External dependencies
- */
-import { createContext } from 'react';
+import { createContext } from '@wordpress/element';
 
 interface DialogContextValue {
 	title?: string;
