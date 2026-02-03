@@ -20,7 +20,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { unlock } from '../../lock-unlock';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 
-const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
+const { usePostFields } = unlock( editorPrivateApis );
 
 export function QuickEditModal( { postType, postId, closeModal } ) {
 	const { record, hasFinishedResolution } = useSelect(
@@ -148,7 +148,6 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 
 	return (
 		<VStack spacing={ 4 }>
-			<PostCardPanel postType={ postType } postId={ postId } />
 			{ hasFinishedResolution && (
 				<DataForm
 					data={ record }
