@@ -45,30 +45,25 @@ export function ListViewPanel( { clientId, name } ) {
 			const { getBlockCount, getBlockParents, getBlockName } =
 				select( blockEditorStore );
 
-			// When the ListView is shown in a section, avoid showing List Views
-			// for both parent and child blocks that have support. In this situation
-			// the parent will show the child anyway in its List.
-			// Search parents to see if there's one that also has support, and if so
-			// skip rendering.
+			// Avoid showing List Views for both parent and child blocks that have support.
+			// In this situation the parent will show the child in its list already.
+			// Search parents to see if there's one that also has support, and if so skip rendering.
 			// This matches closely the logic in the `BlockCard` component.
-			let _isNestedListView = false;
-			if ( isSelectionWithinCurrentSection ) {
-				const parents = getBlockParents( clientId, true );
-				_isNestedListView = parents.find( ( parentId ) => {
-					const parentName = getBlockName( parentId );
-					return (
-						parentName === 'core/navigation' ||
-						hasBlockSupport( parentName, 'listView' )
-					);
-				} );
-			}
+			const parents = getBlockParents( clientId, false );
+			const _isNestedListView = parents.find( ( parentId ) => {
+				const parentName = getBlockName( parentId );
+				return (
+					parentName === 'core/navigation' ||
+					hasBlockSupport( parentName, 'listView' )
+				);
+			} );
 
 			return {
 				hasChildren: !! getBlockCount( clientId ),
 				isNestedListView: _isNestedListView,
 			};
 		},
-		[ clientId, isSelectionWithinCurrentSection ]
+		[ clientId ]
 	);
 	const title = useBlockDisplayTitle( {
 		clientId,
