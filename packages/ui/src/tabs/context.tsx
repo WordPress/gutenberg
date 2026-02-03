@@ -6,6 +6,7 @@ import {
 	useRef,
 	useEffect,
 } from '@wordpress/element';
+import warning from '@wordpress/warning';
 
 import type { TabProps } from './types';
 
@@ -128,8 +129,7 @@ function TabsValidationProviderDev( {
 
 			// Warn about mismatches
 			if ( tabsWithoutPanels.length > 0 ) {
-				// eslint-disable-next-line no-console
-				console.warn(
+				warning(
 					`Tabs: Found Tab(s) without matching Panel(s). ` +
 						`Each Tab should have a corresponding Panel with the same \`value\` prop. ` +
 						`Tab value(s) without panels: ${ tabsWithoutPanels
@@ -139,8 +139,7 @@ function TabsValidationProviderDev( {
 			}
 
 			if ( panelsWithoutTabs.length > 0 ) {
-				// eslint-disable-next-line no-console
-				console.warn(
+				warning(
 					`Tabs: Found Panel(s) without matching Tab(s). ` +
 						`Each Panel should have a corresponding Tab with the same \`value\` prop. ` +
 						`Panel value(s) without tabs: ${ panelsWithoutTabs

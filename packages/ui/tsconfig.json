@@ -2,19 +2,45 @@
 	"$schema": "https://json.schemastore.org/tsconfig.json",
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
-		"types": [ "node", "jest" ]
+		"types": [
+			"node",
+			"jest"
+		]
 	},
 	"references": [
-		{ "path": "../a11y" },
-		{ "path": "../compose" },
-		{ "path": "../element" },
-		{ "path": "../i18n" },
-		{ "path": "../icons" },
-		{ "path": "../keycodes" },
-		{ "path": "../primitives" },
-		{ "path": "../private-apis" },
-		{ "path": "../theme" }
+		{
+			"path": "../a11y"
+		},
+		{
+			"path": "../compose"
+		},
+		{
+			"path": "../element"
+		},
+		{
+			"path": "../i18n"
+		},
+		{
+			"path": "../icons"
+		},
+		{
+			"path": "../keycodes"
+		},
+		{
+			"path": "../primitives"
+		},
+		{
+			"path": "../private-apis"
+		},
+		{
+			"path": "../theme"
+		},
+		{
+			"path": "../warning"
+		}
 	],
-	"files": [ "global.d.ts" ],
+	"files": [
+		"global.d.ts"
+	],
 	"exclude": []
 }
