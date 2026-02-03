@@ -150,11 +150,11 @@ function NotesSidebar( { postId } ) {
 			return;
 		}
 
-		selectNote( ! currentThread ? 'new' : undefined );
+		selectNote( currentThread ? currentThread.id : 'new' );
 		focusCommentThread(
 			currentThread?.id,
 			commentSidebarRef.current,
-			// Focus a comment thread when there's a selected block with a comment.
+			// Focus the textarea when creating a new note.
 			! currentThread ? 'textarea' : undefined
 		);
 		toggleBlockSpotlight( clientId, true );
