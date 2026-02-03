@@ -167,7 +167,7 @@ function CalendarDateTimeControl< Item >( {
 			help={ description }
 			hideLabelFromVision={ hideLabelFromVision }
 		>
-			<Stack direction="column" gap="md">
+			<Stack direction="column" gap="lg">
 				{ /* Calendar widget */ }
 				<DateCalendar
 					style={ { width: '100%' } }

@@ -132,7 +132,7 @@ function ModalContent< Item >( {
 			<Stack
 				direction="row"
 				className="dataforms-layouts-panel__modal-footer"
-				gap="sm"
+				gap="md"
 			>
 				<Spacer style={ { flex: 1 } } />
 				<Button

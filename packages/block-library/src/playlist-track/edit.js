@@ -161,7 +161,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Artist' ) }
 						value={ artist ? stripHTML( artist ) : '' }
@@ -170,7 +169,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						} }
 					/>
 					<TextControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Album' ) }
 						value={ album ? stripHTML( album ) : '' }
@@ -179,7 +177,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						} }
 					/>
 					<TextControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Title' ) }
 						value={ title ? stripHTML( title ) : '' }

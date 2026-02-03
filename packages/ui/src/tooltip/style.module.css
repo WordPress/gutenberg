@@ -8,8 +8,8 @@
 	.popup {
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		padding:
-			var(--wpds-dimension-padding-surface-2xs)
-			var(--wpds-dimension-padding-surface-xs);
+			var(--wpds-dimension-padding-xs)
+			var(--wpds-dimension-padding-sm);
 		border-radius: var(--wpds-border-radius-sm);
 		font-family: var(--wpds-font-family-body);
 		font-size: var(--wpds-font-size-sm);

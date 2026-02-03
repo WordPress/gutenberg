@@ -22,7 +22,7 @@ function Header( { title }: { title: string } ) {
 		<Stack
 			direction="column"
 			className="dataforms-layouts-row__header"
-			gap="md"
+			gap="lg"
 		>
 			<Stack direction="row" align="center">
 				<Heading level={ 2 } size={ 13 }>
@@ -57,7 +57,7 @@ export default function FormRowField< Item >( {
 				{ ! hideLabelFromVision && field.label && (
 					<Header title={ field.label } />
 				) }
-				<Stack direction="row" align={ layout.alignment } gap="md">
+				<Stack direction="row" align={ layout.alignment } gap="lg">
 					<DataFormLayout
 						data={ data }
 						form={ form }

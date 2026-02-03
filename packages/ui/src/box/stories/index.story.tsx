@@ -23,7 +23,15 @@ export const Default: Story = {
 	argTypes: {
 		padding: {
 			control: 'select',
-			options: [ '2xs', 'xs', 'sm', 'md', 'lg' ] satisfies PaddingSize[],
+			options: [
+				'xs',
+				'sm',
+				'md',
+				'lg',
+				'xl',
+				'2xl',
+				'3xl',
+			] satisfies PaddingSize[],
 		},
 	},
 };

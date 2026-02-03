@@ -613,7 +613,6 @@ export default function TypographyPanel( {
 					/>
 					{ isGlobalStyles && (
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Indent all paragraphs' ) }
 							checked={ isTextIndentAll }
 							onChange={ onToggleTextIndentAll }

@@ -30,7 +30,7 @@ function Header( { title }: { title: string } ) {
 		<Stack
 			direction="column"
 			className="dataforms-layouts-regular__header"
-			gap="md"
+			gap="lg"
 		>
 			<Stack direction="row" align="center">
 				<Heading level={ 2 } size={ 13 }>
@@ -89,7 +89,7 @@ export default function FormRegularField< Item >( {
 			<Stack
 				direction="row"
 				className="dataforms-layouts-regular__field"
-				gap="xs"
+				gap="sm"
 			>
 				<div
 					className={ clsx(

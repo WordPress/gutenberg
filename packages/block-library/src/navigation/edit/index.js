@@ -831,7 +831,6 @@ function Navigation( {
 									isShownByDefault
 								>
 									<ToggleGroupControl
-										__nextHasNoMarginBottom
 										__next40pxDefaultSize
 										label={ __( 'Submenu Visibility' ) }
 										value={ submenuVisibility }
