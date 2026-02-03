@@ -1560,6 +1560,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/content-guidelines",
+		"slug": "packages-content-guidelines",
+		"markdown_source": "../packages/content-guidelines/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/core-abilities",
 		"slug": "packages-core-abilities",
 		"markdown_source": "../packages/core-abilities/README.md",

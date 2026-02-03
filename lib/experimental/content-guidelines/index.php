@@ -9,9 +9,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
-require_once __DIR__ . '/class-post-type.php';
-require_once __DIR__ . '/class-rest-controller.php';
-require_once __DIR__ . '/class-admin-page.php';
+require_once __DIR__ . '/class-gutenberg-content-guidelines-post-type.php';
+require_once __DIR__ . '/class-gutenberg-content-guidelines-rest-controller.php';
+require_once __DIR__ . '/class-gutenberg-content-guidelines-admin-page.php';
 
 // Register CPT.
 add_action( 'init', array( 'Gutenberg_Content_Guidelines_Post_Type', 'register' ) );
