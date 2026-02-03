@@ -16,6 +16,11 @@
 			"type": "string",
 			"default": "_self",
 			"role": "content"
+		},
+		"linkType": {
+			"type": "string",
+			"default": "archive",
+			"role": "content"
 		}
 	},
 	"usesContext": [ "postType", "postId" ],
