@@ -1,65 +1,64 @@
 .wp-block-dialog-element {
-	// Custom properties for animation control with enhanced timing
-	--wp--style--dialog-animation-duration: 0.35s;
-	--wp--style--dialog-animation-timing: cubic-bezier(0.34, 1.56, 0.64, 1); // Smooth bounce
-	--wp--style--dialog-animation-timing-out: cubic-bezier(0.55, 0.055, 0.675, 0.19); // Sharp exit
-	--wp--style--dialog-backdrop-duration: 0.25s;
-	--wp--style--dialog-backdrop-timing: cubic-bezier(0.16, 1, 0.3, 1); // Smooth ease-out
-
 	border: inherit;
 	background: inherit;
 	padding: inherit;
 	z-index: 10;
-	max-width: 95vw;
+	min-width: 320px;
+	max-width: 90vw;
+	width: fit-content;
 
-	// Performance optimizations for smooth animations
-	will-change: transform, opacity, scale;
-	contain: layout;
-	backface-visibility: hidden;
-	transform-style: preserve-3d;
+	// Default hidden state for animation
+	visibility: hidden;
+	opacity: 0;
 
 	@media (max-width: 480px) {
+		min-width: unset;
+		max-width: 95vw;
 		max-height: 90vh;
 		padding: 1em !important;
 	}
 
-	&.is-size-small {
-		min-width: 25vw !important;
-	}
-	&.is-size-medium {
-		min-width: 50vw !important;
-	}
-	&.is-size-large {
-		min-width: 75vw !important;
-	}
 	&.has-border-color {
 		border-style: solid;
 	}
 
-	&::backdrop {
-		cursor: zoom-out;
-		background-color: var(--wp--style--dialog-backdrop-color, var(--wp--style--dialog-backdrop-color, rgba(0, 0, 0, 0.8)));
-		opacity: 0.5;
-
-		// Enhanced backdrop transitions with independent timing
-		transition:
-			background-color var(--wp--style--dialog-backdrop-duration) var(--wp--style--dialog-backdrop-timing),
-			opacity var(--wp--style--dialog-backdrop-duration) var(--wp--style--dialog-backdrop-timing),
-			overlay var(--wp--style--dialog-backdrop-duration) var(--wp--style--dialog-backdrop-timing) allow-discrete,
-			display var(--wp--style--dialog-backdrop-duration) var(--wp--style--dialog-backdrop-timing) allow-discrete;
-
-		// Performance optimizations for backdrop
-		will-change: background-color, opacity;
-		contain: strict;
-	}
-
-	// Starting styles for backdrop
-	@starting-style {
-		&:open::backdrop {
-			background-color: transparent;
-			opacity: 0;
+	// Open state with fade-in animation
+	&[open].active {
+		visibility: visible;
+		@media not (prefers-reduced-motion) {
+			animation: turn-on-visibility 0.4s forwards;
+		}
+		@media (prefers-reduced-motion) {
+			opacity: 1;
 		}
 	}
+
+	// Closing animation
+	&[open].show-closing-animation:not(.active) {
+		@media not (prefers-reduced-motion) {
+			animation: turn-off-visibility 0.35s forwards;
+		}
+	}
+
+	&::backdrop {
+		cursor: zoom-out;
+		background-color: var(--wp--style--dialog-backdrop-color, rgba(0, 0, 0, 0.8));
+		opacity: 0;
+
+		@media not (prefers-reduced-motion) {
+			animation: turn-on-visibility 0.4s forwards;
+		}
+		@media (prefers-reduced-motion) {
+			opacity: 0.5;
+		}
+	}
+
+	&.show-closing-animation:not(.active)::backdrop {
+		@media not (prefers-reduced-motion) {
+			animation: turn-off-visibility 0.35s forwards;
+		}
+	}
+
 	&__inner {
 		margin-block-start: 0 !important;
 		& > *:first-child {
@@ -70,395 +69,41 @@
 		appearance: none;
 		background: none;
 		border: none;
-		padding: 0px;
-		padding-inline: 0px;
-		margin: 0px;
+		padding: 0;
 		float: right;
-		margin: 0.25em;
 		cursor: pointer;
 		position: relative;
 		z-index: 1;
-		transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 		border-radius: 50%;
-
-		i.icon {
-			font-size: 18px;
-			transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-			will-change: transform;
-		}
 
 		&:hover {
 			background-color: rgba(0, 0, 0, 0.1);
-			transform: rotate(90deg);
-
-			i.icon {
-				transform: scale(1.15);
-			}
-		}
-
-		&:active {
-			transform: rotate(90deg) scale(0.95);
-			transition-duration: 0.1s;
 		}
 	}
 }
 
-// Animation keyframes
-// Fade animations
-@keyframes fadeIn {
-	from {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
-}
-@keyframes fadeOut {
-	from {
-		opacity: 1;
-	}
-	to {
-		opacity: 0;
-	}
-}
-
-// Pop animations
-@keyframes popIn {
-	from {
-		transform: scale(0.9);
-		opacity: 0;
-	}
-	to {
-		transform: scale(1);
-		opacity: 1;
-	}
-}
-@keyframes popOut {
-	from {
-		transform: scale(1);
-		opacity: 1;
-	}
-	to {
-		transform: scale(0.9);
-		opacity: 0;
-	}
-}
-
-// Slide animations
-@keyframes slideInDown {
-	from {
-		opacity: 0;
-		transform: translate3d(0, -100%, 0);
-	}
-	to {
-		opacity: 1;
-		transform: translate3d(0, 0, 0);
-	}
-}
-@keyframes slideOutDown {
-	from {
-		opacity: 1;
-		transform: translate3d(0, 0, 0);
-	}
-	to {
-		opacity: 0;
-		transform: translate3d(0, 100%, 0);
-	}
-}
-@keyframes slideInUp {
-	from {
-		opacity: 0;
-		transform: translate3d(0, 100%, 0);
-	}
-	to {
-		opacity: 1;
-		transform: translate3d(0, 0, 0);
-	}
-}
-@keyframes slideOutUp {
-	from {
-		opacity: 1;
-		transform: translate3d(0, 0, 0);
-	}
-	to {
-		opacity: 0;
-		transform: translate3d(0, -100%, 0);
-	}
-}
-@keyframes slideInLeft {
-	from {
-		opacity: 0;
-		transform: translate3d(-100%, 0, 0);
-	}
-	to {
-		opacity: 1;
-		transform: translate3d(0, 0, 0);
-	}
-}
-@keyframes slideOutLeft {
-	from {
-		opacity: 1;
-		transform: translate3d(0, 0, 0);
-	}
-	to {
-		opacity: 0;
-		transform: translate3d(-100%, 0, 0);
-	}
-}
-@keyframes slideInRight {
-	from {
-		opacity: 0;
-		transform: translate3d(100%, 0, 0);
-	}
-	to {
-		opacity: 1;
-		transform: translate3d(0, 0, 0);
-	}
-}
-@keyframes slideOutRight {
-	from {
-		opacity: 1;
-		transform: translate3d(0, 0, 0);
-	}
-	to {
-		opacity: 0;
-		transform: translate3d(100%, 0, 0);
-	}
-}
-
-// Zoom animations
-@keyframes zoomIn {
-	from {
-		opacity: 0;
-		transform: scale(0.3);
-	}
-	to {
-		opacity: 1;
-		transform: scale(1);
-	}
-}
-@keyframes zoomOut {
-	from {
-		opacity: 1;
-		transform: scale(1);
-	}
-	to {
-		opacity: 0;
-		transform: scale(0.3);
-	}
-}
-
-// Bounce animations
-@keyframes bounceIn {
-	0%,
-	20%,
-	40%,
-	60%,
-	80% {
-		animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
-	}
+// Animation keyframes (adapted from image block lightbox)
+@keyframes turn-on-visibility {
 	0% {
 		opacity: 0;
-		transform: scale3d(0.3, 0.3, 0.3);
 	}
-	20% {
-		transform: scale3d(1.1, 1.1, 1.1);
-	}
-	40% {
-		transform: scale3d(0.9, 0.9, 0.9);
-	}
-	60% {
+	100% {
 		opacity: 1;
-		transform: scale3d(1.03, 1.03, 1.03);
-	}
-	80% {
-		transform: scale3d(0.97, 0.97, 0.97);
-	}
-	to {
-		opacity: 1;
-		transform: scale3d(1, 1, 1);
 	}
 }
-@keyframes bounceOut {
-	20% {
-		transform: scale3d(0.9, 0.9, 0.9);
-	}
-	50%,
-	55% {
+
+@keyframes turn-off-visibility {
+	0% {
 		opacity: 1;
-		transform: scale3d(1.1, 1.1, 1.1);
+		visibility: visible;
 	}
-	to {
+	99% {
 		opacity: 0;
-		transform: scale3d(0.3, 0.3, 0.3);
+		visibility: visible;
 	}
-}
-
-// Modern dialog animation approach following latest MDN recommendations
-// Uses @starting-style with CSS transitions for optimal performance
-
-.wp-block-dialog-element {
-	// Enhanced transition properties with sophisticated timing
-	transition:
-		opacity var(--wp--style--dialog-animation-duration) var(--wp--style--dialog-animation-timing),
-		transform var(--wp--style--dialog-animation-duration) var(--wp--style--dialog-animation-timing),
-		scale var(--wp--style--dialog-animation-duration) var(--wp--style--dialog-animation-timing),
-		filter var(--wp--style--dialog-animation-duration) var(--wp--style--dialog-animation-timing),
-		overlay var(--wp--style--dialog-animation-duration) var(--wp--style--dialog-animation-timing) allow-discrete,
-		display var(--wp--style--dialog-animation-duration) var(--wp--style--dialog-animation-timing) allow-discrete;
-
-	// Add subtle filter effects during animations
-	filter: blur(0px) brightness(1);
-
-	// Open state (visible dialog)
-	&:open {
-		opacity: 1;
-		transform: translate(0);
-		scale: 1;
-	}
-
-	// Enhanced closed state with sophisticated exit animations
-	&:not(:open) {
+	100% {
 		opacity: 0;
-		display: none;
-		filter: blur(2px) brightness(0.8);
-
-		&.is-animation-pop {
-			scale: 0.85;
-			filter: blur(1px);
-		}
-
-		&.is-animation-slide,
-		&.is-animation-slide-down {
-			transform: translateY(-120%) scale(0.95);
-		}
-
-		&.is-animation-slide-up {
-			transform: translateY(120%) scale(0.95);
-		}
-
-		&.is-animation-slide-left {
-			transform: translateX(-120%) scale(0.95);
-		}
-
-		&.is-animation-slide-right {
-			transform: translateX(120%) scale(0.95);
-		}
-
-		&.is-animation-zoom {
-			scale: 0.2;
-			filter: blur(3px);
-		}
+		visibility: hidden;
 	}
 }
 
-// Enhanced starting styles for entry animations with sophisticated choreography
-@starting-style {
-	.wp-block-dialog-element:open {
-		opacity: 0;
-		filter: blur(2px) brightness(0.8);
-
-		&.is-animation-pop {
-			scale: 0.85;
-			filter: blur(1px);
-		}
-
-		&.is-animation-slide,
-		&.is-animation-slide-down {
-			transform: translateY(-120%) scale(0.95);
-			filter: blur(1px);
-		}
-
-		&.is-animation-slide-up {
-			transform: translateY(120%) scale(0.95);
-			filter: blur(1px);
-		}
-
-		&.is-animation-slide-left {
-			transform: translateX(-120%) scale(0.95);
-			filter: blur(1px);
-		}
-
-		&.is-animation-slide-right {
-			transform: translateX(120%) scale(0.95);
-			filter: blur(1px);
-		}
-
-		&.is-animation-zoom {
-			scale: 0.2;
-			filter: blur(3px);
-		}
-	}
-}
-
-// Fallback keyframe animations for browsers that don't support modern transition-based animations
-// This provides a graceful fallback using keyframe animations
-.wp-block-dialog-element:open {
-	// Keyframe animations as fallback (will be overridden by modern transitions where supported)
-	animation-duration: var(--wp--style--dialog-animation-duration, 0.3s);
-	animation-timing-function: var(--wp--style--dialog-animation-timing, ease);
-	animation-fill-mode: both;
-
-	// Default fade animation
-	animation-name: fadeIn;
-	&.is-closing {
-		animation-name: fadeOut;
-	}
-
-	// Animation variants
-	&.is-animation-pop {
-		animation-name: popIn;
-		&.is-closing {
-			animation-name: popOut;
-		}
-	}
-
-	&.is-animation-slide,
-	&.is-animation-slide-down {
-		animation-name: slideInDown;
-		&.is-closing {
-			animation-name: slideOutDown;
-		}
-	}
-
-	&.is-animation-slide-up {
-		animation-name: slideInUp;
-		&.is-closing {
-			animation-name: slideOutUp;
-		}
-	}
-
-	&.is-animation-slide-left {
-		animation-name: slideInLeft;
-		&.is-closing {
-			animation-name: slideOutLeft;
-		}
-	}
-
-	&.is-animation-slide-right {
-		animation-name: slideInRight;
-		&.is-closing {
-			animation-name: slideOutRight;
-		}
-	}
-
-	&.is-animation-zoom {
-		animation-name: zoomIn;
-		&.is-closing {
-			animation-name: zoomOut;
-		}
-	}
-}
-
-// Complex bounce animation always uses keyframes (both modern and fallback browsers)
-.wp-block-dialog-element:open.is-animation-bounce {
-	animation-name: bounceIn;
-	animation-duration: var(--wp--style--dialog-animation-duration, 0.6s);
-	animation-timing-function: var(--wp--style--dialog-animation-timing, ease);
-	animation-fill-mode: both;
-
-	&.is-closing {
-		animation-name: bounceOut;
-		animation-duration: var(--wp--style--dialog-animation-duration, 0.6s);
-	}
-}

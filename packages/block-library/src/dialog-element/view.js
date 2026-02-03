@@ -23,6 +23,12 @@ function removeDialogIdFromUrl() {
 	window.history.replaceState( {}, '', url );
 }
 
+/**
+ * Animation duration in milliseconds. Must match the CSS animation duration
+ * defined in style.scss (turn-on-visibility: 0.4s, turn-off-visibility: 0.35s).
+ */
+const ANIMATION_DURATION = 400;
+
 function createReadOnlyProxy( obj ) {
 	return new Proxy( obj, {
 		get( target, prop ) {
@@ -112,7 +118,7 @@ const { actions: privateActions, state: privateState } = store(
 					return;
 				}
 				privateState.dialogs[ id ].isOpen = true;
-				privateState.dialogs[ id ].closingModal = false;
+				privateState.dialogs[ id ].showClosingAnimation = false;
 			},
 			/**
 			 * This function allows you to directly close a dialog by passing an id from another store, like so:
@@ -177,7 +183,7 @@ const { actions: privateActions, state: privateState } = store(
 					return;
 				}
 				// If already closing, don't start another close animation
-				if ( dialog.isClosing ) {
+				if ( dialog.showClosingAnimation ) {
 					return;
 				}
 				// Only proceed if the dialog element is actually open in the DOM
@@ -186,17 +192,16 @@ const { actions: privateActions, state: privateState } = store(
 				if ( ! dialogElement.open ) {
 					return;
 				}
-				// Start isClosing animation...
-				privateState.dialogs[ id ].isClosing = true;
-				// Allow for animation to complete...
+				// Start closing animation...
+				privateState.dialogs[ id ].showClosingAnimation = true;
+				// Wait for animation to complete before closing the dialog element
 				setTimeout(
 					withScope( () => {
 						dialogElement?.close();
 						removeDialogIdFromUrl( id ); // We always clean the dialog id regardless of whether deep linking is enabled or not.
-						privateState.dialogs[ id ].isClosing = false;
-						privateState.dialogs[ id ].isOpen = false;
+						privateState.dialogs[ id ].showClosingAnimation = false;
 					} ),
-					dialog.animationDuration
+					ANIMATION_DURATION
 				);
 			},
 			/**
@@ -217,7 +222,7 @@ const { actions: privateActions, state: privateState } = store(
 					return;
 				}
 				const { dialog, id } = privateState;
-				if ( true !== dialog.isOpen || dialog.isClosing ) {
+				if ( true !== dialog.isOpen || dialog.showClosingAnimation ) {
 					return;
 				}
 				privateActions.close( id );
@@ -307,6 +312,7 @@ store( 'core/dialog/test', {
 			const dialogContext = getContext( 'core/dialog/private' );
 			const id = dialogContext?.id;
 			if ( ! id ) {
+				// eslint-disable-next-line no-console
 				console.warn( 'No dialog id found in context.' );
 				return;
 			}

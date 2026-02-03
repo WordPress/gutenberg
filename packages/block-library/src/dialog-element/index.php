@@ -45,62 +45,6 @@ function block_core_dialog_generate_color_styles( array $attributes ): string {
 }
 
 /**
- * Build inline CSS custom properties for animation settings.
- *
- * @param array $attributes Block attributes.
- *
- * @return string Inline CSS string.
- */
-function block_core_dialog_generate_animation_styles( array $attributes ): string {
-	$animation_duration = $attributes['animationDuration'] ?? 500;
-	$animation_styles   = "--wp--style--dialog-animation-duration: {$animation_duration}ms;";
-
-	return $animation_styles;
-}
-
-/**
- * Build inline CSS custom properties for position settings.
- *
- * @param array $attributes Block attributes.
- *
- * @return string Inline CSS string.
- */
-function block_core_dialog_generate_position_styles( array $attributes ): string {
-	$dialog_position = $attributes['dialogPosition'] ?? 'center';
-
-	$position_styles = '';
-
-	switch ( $dialog_position ) {
-		case 'top left':
-			$position_styles = 'margin-top: 1em; margin-left: 1em;';
-			break;
-		case 'top center':
-			$position_styles = 'margin-top: 1em;';
-			break;
-		case 'top right':
-			$position_styles = 'margin-top: 1em; margin-right: 1em;';
-			break;
-		case 'center left':
-			$position_styles = 'margin-left: 1em;';
-			break;
-		case 'center right':
-			$position_styles = 'margin-right: 1em;';
-			break;
-		case 'bottom left':
-			$position_styles = 'margin-bottom: 1em; margin-left: 1em;';
-			break;
-		case 'bottom center':
-			$position_styles = 'margin-bottom: 1em;';
-			break;
-		case 'bottom right':
-			$position_styles = 'margin-bottom: 1em; margin-right: 1em;';
-			break;
-	}
-
-	return $position_styles;
-}
-
-/**
  * Render the 'core/dialog-element' block.
  *
  * @param array    $attributes Block attributes.
@@ -119,9 +63,6 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 		return '';
 	}
 	$is_open                 = get_query_var( 'dialogId', false ) === $context_id;
-	$dialog_size             = isset( $attributes['dialogSize'] ) ? $attributes['dialogSize'] : 'small';
-	$animation               = isset( $attributes['animation'] ) ? $attributes['animation'] : 'fade';
-	$animation_duration      = $attributes['animationDuration'] ?? 500;
 	$auto_activate_on_render = array_key_exists( 'autoActivateOnRender', $attributes ) ? $attributes['autoActivateOnRender'] : false;
 	$default_is_open         = $auto_activate_on_render;
 	$auto_activation_timer   = array_key_exists( 'autoActivationTimer', $attributes ) ? $attributes['autoActivationTimer'] : -1;
@@ -134,18 +75,14 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 			$context_id => array(
 				'id'                      => $context_id,
 				'activationTimerDuration' => (int) $auto_activation_timer,
-				'animationDuration'       => (int) $animation_duration,
 				'isOpen'                  => $is_open,
 				'enableDeepLink'          => $enable_deep_link,
-				'isClosing'               => false,
+				'showClosingAnimation'    => false,
 			)
 		)
 	) );
 
-	$block_styles  = block_core_dialog_generate_animation_styles( $attributes );
-	$block_styles .= ' ' . block_core_dialog_generate_color_styles( $attributes );
-	$block_styles .= ' ' . block_core_dialog_generate_position_styles( $attributes );
-	$block_styles  = trim( $block_styles );
+	$block_styles = block_core_dialog_generate_color_styles( $attributes );
 
 	$aria_labelledby = '';
 	// Check if $content contains any <h*> tags, and if so, add the id of the first one to aria-labelledby.
@@ -167,19 +104,19 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 
 	$block_wrapper_attrs = get_block_wrapper_attributes(
 		array(
-			'id'                               => $context_id,
-			'class'                            => 'is-size-' . $dialog_size . ' is-animation-' . $animation,
-			'role'                             => 'dialog',
-			'aria-modal'                       => 'true',
-			'aria-labelledby'                  => $aria_labelledby,
-			'data-wp-interactive'              => 'core/dialog/private',
-			'data-wp-class--is-closing'        => 'state.isClosing',
-			'data-wp-on--click'                => 'callbacks.onBackdropClick',
-			'data-wp-init--on-auto-activation' => 'callbacks.onAutoActivation',
-			'data-wp-on-document--keydown'     => 'callbacks.onESCKey',
-			'data-wp-watch--on-dialog-open'    => 'callbacks.onOpen',
-			'data-wp-watch--on-dialog-close'   => 'callbacks.onClose',
-			'style'                            => $block_styles,
+			'id'                                        => $context_id,
+			'role'                                      => 'dialog',
+			'aria-modal'                                => 'true',
+			'aria-labelledby'                           => $aria_labelledby,
+			'data-wp-interactive'                       => 'core/dialog/private',
+			'data-wp-class--active'                     => 'state.dialog.isOpen',
+			'data-wp-class--show-closing-animation'     => 'state.dialog.showClosingAnimation',
+			'data-wp-on--click'                         => 'callbacks.onBackdropClick',
+			'data-wp-init--on-auto-activation'          => 'callbacks.onAutoActivation',
+			'data-wp-on-document--keydown'              => 'callbacks.onESCKey',
+			'data-wp-watch--on-dialog-open'             => 'callbacks.onOpen',
+			'data-wp-watch--on-dialog-close'            => 'callbacks.onClose',
+			'style'                                     => $block_styles,
 		)
 	);
 

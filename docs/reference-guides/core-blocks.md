@@ -325,7 +325,7 @@ undefined ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/b
 -	**Category:** media
 -	**Parent:** core/dialog
 -	**Supports:** animations, color (background, enableContrastChecker, link, text), interactivity, layout (allowEditing), shadow, spacing (blockGap, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~
--	**Attributes:** animation, animationDuration, autoActivateOnRender, autoActivationTimer, backdropColor, customBackdropColor, dialogLabel, dialogPosition, dialogSize, enableDeepLink
+-	**Attributes:** autoActivateOnRender, autoActivationTimer, backdropColor, customBackdropColor, dialogLabel, enableDeepLink
 
 ## Dialog Trigger
 

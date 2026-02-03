@@ -23,20 +23,20 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { Toolbar, InspectorPanel } from './controls';
 import StyleEngine from './style-engine';
 
+/**
+ * Animation duration in milliseconds. Must match the CSS animation duration
+ * defined in style.scss (turn-on-visibility: 0.4s, turn-off-visibility: 0.35s).
+ */
+const ANIMATION_DURATION = 400;
+
 function Edit( {
 	attributes,
 	setAttributes,
 	context,
 	clientId,
-	className,
 	backdropColor,
 	setBackdropColor,
 } ) {
-	const {
-		dialogSize = 'medium',
-		animation = 'fade',
-		animationDuration = 500,
-	} = attributes;
 	const {
 		selectBlock,
 		updateBlockAttributes,
@@ -47,7 +47,8 @@ function Edit( {
 	const isOpen = context[ 'core/dialog-isDialogOpen' ] ?? false;
 
 	// Local state for closing animation
-	const [ isClosingModal, setIsClosingModal ] = useState( false );
+	const [ showClosingAnimation, setShowClosingAnimation ] = useState( false );
+	const closeTimeoutRef = useRef( null );
 
 	const { rootClientId, dialogClientId } = useSelect(
 		( select ) => {
@@ -62,22 +63,21 @@ function Edit( {
 	);
 
 	/**
-	 * Setup state and ref for the dialog.
+	 * Setup ref for the dialog.
 	 */
 	const dialogElementRef = useRef( null );
-	const closeTimeoutRef = useRef( null );
 
 	// Sync DOM state with context state
 	useEffect( () => {
 		if ( dialogElementRef.current ) {
 			if ( isOpen && ! dialogElementRef.current.open ) {
-				dialogElementRef.current.showModal();
-				// Reset closing state when opening and clear any pending close timeout
-				setIsClosingModal( false );
+				// Reset closing animation when opening
+				setShowClosingAnimation( false );
 				if ( closeTimeoutRef.current ) {
 					clearTimeout( closeTimeoutRef.current );
 					closeTimeoutRef.current = null;
 				}
+				dialogElementRef.current.showModal();
 			} else if ( ! isOpen && dialogElementRef.current.open ) {
 				dialogElementRef.current.close();
 			}
@@ -109,8 +109,9 @@ function Edit( {
 		if ( closeTimeoutRef.current ) {
 			clearTimeout( closeTimeoutRef.current );
 		}
-		setIsClosingModal( true );
-		// After animation, actually close
+		// Start closing animation
+		setShowClosingAnimation( true );
+		// After animation completes, actually close
 		closeTimeoutRef.current = setTimeout( () => {
 			if ( dialogClientId ) {
 				__unstableMarkNextChangeAsNotPersistent();
@@ -118,10 +119,10 @@ function Edit( {
 					editorIsDialogOpen: false,
 				} );
 			}
-			setIsClosingModal( false );
+			setShowClosingAnimation( false );
 			selectBlock( rootClientId );
 			closeTimeoutRef.current = null;
-		}, animationDuration );
+		}, ANIMATION_DURATION );
 	};
 	const onEscHandler = ( e ) => {
 		e.preventDefault();
@@ -130,12 +131,9 @@ function Edit( {
 
 	const blockProps = useBlockProps( {
 		ref: dialogElementRef,
-		className: clsx( className, {
-			'is-size-small': 'small' === dialogSize,
-			'is-size-medium': 'medium' === dialogSize,
-			'is-size-large': 'large' === dialogSize,
-			[ `is-animation-${ animation }` ]: animation,
-			'is-closing-modal': isClosingModal,
+		className: clsx( {
+			active: isOpen && ! showClosingAnimation,
+			'show-closing-animation': showClosingAnimation,
 		} ),
 		role: 'dialog',
 		'aria-modal': 'true',

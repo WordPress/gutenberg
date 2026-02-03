@@ -21,24 +21,6 @@
 			"type": "boolean",
 			"default": false
 		},
-		"animation": {
-			"type": "string",
-			"enum": [
-				"fade",
-				"pop",
-				"bounce",
-				"slide",
-				"slide-up",
-				"slide-left",
-				"slide-right",
-				"zoom"
-			],
-			"default": "fade"
-		},
-		"animationDuration": {
-			"type": "number",
-			"default": 500
-		},
 		"autoActivationTimer": {
 			"type": "number",
 			"default": -1
@@ -46,26 +28,6 @@
 		"enableDeepLink": {
 			"type": "boolean",
 			"default": false
-		},
-		"dialogSize": {
-			"type": "string",
-			"enum": [ "small", "medium", "large" ],
-			"default": "small"
-		},
-		"dialogPosition": {
-			"type": "string",
-			"enum": [
-				"center",
-				"top",
-				"bottom",
-				"center left",
-				"center right",
-				"top left",
-				"top right",
-				"bottom left",
-				"bottom right"
-			],
-			"default": "center"
 		}
 	},
 	"supports": {
