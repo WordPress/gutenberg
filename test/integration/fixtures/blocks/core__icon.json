@@ -3,7 +3,11 @@
 		"name": "core/icon",
 		"isValid": true,
 		"attributes": {
-			"icon": ""
+			"style": {
+				"dimensions": {
+					"width": "48px"
+				}
+			}
 		},
 		"innerBlocks": []
 	}
