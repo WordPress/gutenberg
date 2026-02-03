@@ -188,6 +188,19 @@ function render_block_core_cover( $attributes, $content ) {
 		$content = substr( $content, 0, $offset ) . $image . substr( $content, $offset );
 	}
 
+	/*
+	 * When using a featured image without an overlay, remove the `is-light` class
+	 * as it may have been incorrectly set at template save time when no image was
+	 * available for color analysis. This aligns with the default `isDark: true` in block.json.
+	 */
+	if ( ! isset( $attributes['overlayColor'] ) ) {
+		$processor = new WP_HTML_Tag_Processor( $content );
+		if ( $processor->next_tag( array( 'class_name' => 'wp-block-cover' ) ) && $processor->has_class( 'is-light' ) ) {
+			$processor->remove_class( 'is-light' );
+			$content = $processor->get_updated_html();
+		}
+	}
+
 	return $content;
 }
 
