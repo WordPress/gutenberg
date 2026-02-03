@@ -205,15 +205,26 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 				setErrorMessage( validityTarget?.validationMessage );
 
 				setStatusMessage( undefined );
+
+				// Mark field as touched when consumer explicitly sets an invalid state.
+				// This ensures validation errors show even when validateOnBlur={false},
+				// since explicit validation (like on submit) should trigger error display.
+				setIsTouched( true );
 				break;
 			}
 		}
 	}, [ customValidity, getValidityTarget ] );
 
-	// Show messages if field has been touched (i.e. has blurred at least once),
+	// Show messages if field has been touched (i.e. has blurred at least once and validateOnBlur is true),
 	// or validation has been triggered by the consumer/user.
 	useEffect( (): ReturnType< React.EffectCallback > => {
 		if ( ! isTouched || showMessage ) {
+			return;
+		}
+
+		// If validateOnBlur is false, only show messages when explicitly triggered
+		// (via customValidity or invalid event), not just because the field was touched.
+		if ( ! validateOnBlur && ! customValidity?.type ) {
 			return;
 		}
 
@@ -227,17 +238,11 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		}
 
 		setShowMessage( true );
-	}, [ isTouched, customValidity?.type, showMessage ] );
+	}, [ isTouched, customValidity?.type, showMessage, validateOnBlur ] );
 
 	// Mark blurred fields as touched.
 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
 		if ( isTouched ) {
-			return;
-		}
-
-		// If validateOnBlur is false, don't mark the field as touched on blur.
-		// This prevents validation errors from showing when the field loses focus.
-		if ( ! validateOnBlur ) {
 			return;
 		}
 
@@ -248,7 +253,6 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 			! event.currentTarget.contains( event.relatedTarget )
 		) {
 			setIsTouched( true );
-			getValidityTarget()?.setAttribute( VALIDITY_VISIBLE_ATTRIBUTE, '' );
 		}
 	};
 
