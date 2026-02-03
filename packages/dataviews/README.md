@@ -970,7 +970,7 @@ The user facing description of the action.
 
 ```js
 {
-	label: 'Trash';
+	label: 'Trash'
 }
 ```
 
@@ -1918,7 +1918,6 @@ Display format configuration for fields. Supported for date, number, and integer
 -   Optional.
 
 For `date` fields:
-
 -   Properties:
     -   `date`: The format string using PHP date format (e.g., 'F j, Y' for 'March 10, 2023'). Optional, defaults to WordPress "Date Format" setting.
     -   `weekStartsOn`: Specifies the first day of the week for calendar controls. One of 0, 1, 2, 3, 4, 5, 6. Optional, defaults to WordPress "Week Starts On" setting, whose value is 0 (Sunday).
