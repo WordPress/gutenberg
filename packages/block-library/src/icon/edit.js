@@ -21,8 +21,10 @@ import {
 	InspectorControls,
 	useBlockProps,
 	useBlockEditingMode,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -38,14 +40,18 @@ import getIcons from './icons';
  */
 export function Edit( props ) {
 	const { attributes, setAttributes } = props;
-	const { icon, label, title } = attributes;
+	const { icon, label, title, style } = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 	const [ iconToDisplay, setIconToDisplay ] = useState();
 	const [ allIcons, setAllIcons ] = useState();
 
+	const { __unstableMarkNextChangeAsNotPersistent } =
+		useDispatch( blockEditorStore );
+
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 
+	// Load the icons once.
 	useEffect( () => {
 		const requestIcons = async () => {
 			const iconList = await getIcons();
@@ -54,12 +60,27 @@ export function Edit( props ) {
 		requestIcons();
 	}, [] );
 
+	// Update the active icons when it's changed.
 	useEffect( () => {
 		if ( icon && allIcons ) {
 			const selectedIcon = allIcons.find( ( { name } ) => name === icon );
 			setIconToDisplay( parseIcon( selectedIcon?.content ) );
 		}
 	}, [ allIcons, icon ] );
+
+	// Is the width value is 0, reset it to the default value.
+	useEffect( () => {
+		if (
+			! style?.dimensions?.width ||
+			parseFloat( style?.dimensions?.width ) === 0
+		) {
+			// To avoid interfering with undo/redo operations any changes in this
+			// effect must not make history and should be preceded by
+			// `__unstableMarkNextChangeAsNotPersistent()`.
+			__unstableMarkNextChangeAsNotPersistent();
+			setAttributes( { style: { dimensions: { width: '48px' } } } );
+		}
+	}, [ style, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
 	function resetAll() {
 		setAttributes( {
