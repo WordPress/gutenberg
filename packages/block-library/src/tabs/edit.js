@@ -25,7 +25,7 @@ const TABS_TEMPLATE = [
 		},
 	],
 	[
-		'core/tab-panels',
+		'core/tab-panel',
 		{
 			lock: {
 				remove: true,
@@ -74,7 +74,7 @@ function Edit( {
 
 			// Find tab-panels block and extract tab data
 			const tabPanels = innerBlocks.find(
-				( block ) => block.name === 'core/tab-panels'
+				( block ) => block.name === 'core/tab-panel'
 			);
 
 			if ( ! tabPanels ) {

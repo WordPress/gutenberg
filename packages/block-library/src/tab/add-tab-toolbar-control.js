@@ -33,7 +33,7 @@ export default function AddTabToolbarControl( { tabsClientId } ) {
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( tabsClientId );
 			const tabPanels = innerBlocks.find(
-				( block ) => block.name === 'core/tab-panels'
+				( block ) => block.name === 'core/tab-panel'
 			);
 			return {
 				tabPanelsClientId: tabPanels?.clientId || null,

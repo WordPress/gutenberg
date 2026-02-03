@@ -94,7 +94,7 @@ function v1Save( { attributes } ) {
  * New structure:
  * - core/tabs (orientation only)
  *   - core/tabs-menu (with color attributes)
- *   - core/tab-panels
+ *   - core/tab-panel
  *     - core/tab
  *     - core/tab
  *
@@ -153,7 +153,7 @@ function v1Migrate( attributes, innerBlocks ) {
 	const tabsMenuBlock = createBlock( 'core/tabs-menu', tabsMenuAttributes );
 
 	// Create tab-panels block with existing tab innerblocks
-	const tabPanelsBlock = createBlock( 'core/tab-panels', {}, innerBlocks );
+	const tabPanelsBlock = createBlock( 'core/tab-panel', {}, innerBlocks );
 
 	// Return new attributes (stripped of color attrs) and new innerblocks structure
 	const newAttributes = {

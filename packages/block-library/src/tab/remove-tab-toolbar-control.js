@@ -44,7 +44,7 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 				0;
 			const innerBlocks = getBlocks( tabsClientId );
 			const tabPanels = innerBlocks.find(
-				( block ) => block.name === 'core/tab-panels'
+				( block ) => block.name === 'core/tab-panel'
 			);
 			const tabs = tabPanels?.innerBlocks || [];
 			const activeTab = tabs[ activeIndex ];

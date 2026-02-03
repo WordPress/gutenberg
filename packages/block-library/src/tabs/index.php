@@ -17,7 +17,7 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array() ): arr
 
 	// Find tab-panels block
 	foreach ( $innerblocks as $inner_block ) {
-		if ( 'core/tab-panels' === ( $inner_block['blockName'] ?? '' ) ) {
+		if ( 'core/tab-panel' === ( $inner_block['blockName'] ?? '' ) ) {
 			$tab_index = 0;
 			foreach ( $inner_block['innerBlocks'] ?? array() as $tab_block ) {
 				if ( 'core/tab' === ( $tab_block['blockName'] ?? '' ) ) {
