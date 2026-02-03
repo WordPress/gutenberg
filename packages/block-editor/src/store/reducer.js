@@ -2005,6 +2005,9 @@ export function blockEditingModes( state = new Map(), action ) {
 				? new Map().set( '', state.get( '' ) )
 				: state;
 		}
+		case 'RESET_BLOCK_EDITING_MODES': {
+			return new Map();
+		}
 	}
 	return state;
 }
