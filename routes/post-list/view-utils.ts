@@ -55,17 +55,26 @@ export const DEFAULT_VIEWS: {
 	},
 ];
 
-export function getActiveFiltersForTab( slug: string ): Filter[] {
+type ActiveViewOverrides = {
+	filters?: Filter[];
+	sort?: View[ 'sort' ];
+};
+
+export function getActiveViewOverridesForTab(
+	slug: string
+): ActiveViewOverrides {
 	if ( slug === 'all' ) {
-		return [];
+		return {};
 	}
-	return [
-		{
-			field: 'status',
-			operator: 'is',
-			value: slug,
-		},
-	];
+	return {
+		filters: [
+			{
+				field: 'status',
+				operator: 'is',
+				value: slug,
+			},
+		],
+	};
 }
 
 export function getDefaultView( postType: Type | undefined ): View {
@@ -87,7 +96,7 @@ export async function ensureView(
 		name: type,
 		slug: 'default-new',
 		defaultView,
-		activeFilters: getActiveFiltersForTab( slug ?? 'all' ),
+		activeViewOverrides: getActiveViewOverridesForTab( slug ?? 'all' ),
 		queryParams: search,
 	} );
 }

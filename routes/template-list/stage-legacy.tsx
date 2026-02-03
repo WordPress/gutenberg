@@ -28,7 +28,7 @@ import { layout } from '@wordpress/icons';
 import { unlock } from '../lock-unlock';
 import {
 	DEFAULT_VIEW_LEGACY,
-	getActiveFiltersForTabLegacy,
+	getActiveViewOverridesForTabLegacy,
 	DEFAULT_LAYOUTS,
 } from './view-utils';
 import { previewField } from './fields/preview';
@@ -64,8 +64,8 @@ function TemplateListLegacy() {
 		[]
 	);
 	const defaultView = DEFAULT_VIEW_LEGACY;
-	const activeFilters = useMemo(
-		() => getActiveFiltersForTabLegacy( activeView ),
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTabLegacy( activeView ),
 		[ activeView ]
 	);
 
@@ -88,7 +88,7 @@ function TemplateListLegacy() {
 		name: 'wp_template',
 		slug: 'default-new',
 		defaultView,
-		activeFilters,
+		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );

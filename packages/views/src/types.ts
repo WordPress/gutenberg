@@ -27,11 +27,14 @@ export interface ViewConfig {
 	defaultView: View;
 
 	/**
-	 * Filters applied on top of the persisted view but never persisted.
-	 * These represent tab-specific filtering that should override
-	 * any persisted filters on the same fields.
+	 * View overrides applied on top of the persisted view but never persisted.
+	 * These represent tab-specific configuration (filters, sort) that should
+	 * override the persisted view settings.
 	 */
-	activeFilters?: Filter[];
+	activeViewOverrides?: {
+		filters?: Filter[];
+		sort?: View[ 'sort' ];
+	};
 
 	/**
 	 * Optional query parameters from URL (page, search)

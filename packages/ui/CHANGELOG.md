@@ -2,7 +2,15 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `Tabs` primitive ([#74652](https://github.com/WordPress/gutenberg/pull/74652)).
+
 ## 0.6.0 (2026-01-29)
+
+### New Features
+
+-   Add `Select` primitive ([#74661](https://github.com/WordPress/gutenberg/pull/74661)).
 
 ## 0.5.0 (2026-01-16)
 
@@ -20,4 +28,3 @@
 -   Add `Button` component ([#74415](https://github.com/WordPress/gutenberg/pull/74415), [#74416](https://github.com/WordPress/gutenberg/pull/74416), [#74470](https://github.com/WordPress/gutenberg/pull/74470)).
 -   Add `InputLayout` primitive ([#74313](https://github.com/WordPress/gutenberg/pull/74313)).
 -   Add `Input` primitive ([#74615](https://github.com/WordPress/gutenberg/pull/74615)).
--   Add `Select` primitive ([#74661](https://github.com/WordPress/gutenberg/pull/74661)).

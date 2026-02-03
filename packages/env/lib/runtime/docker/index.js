@@ -355,6 +355,15 @@ class DockerRuntime {
 	}
 
 	/**
+	 * Get the warning message for cleanup confirmation.
+	 *
+	 * @return {string} Warning message.
+	 */
+	getCleanupWarningMessage() {
+		return 'WARNING! This will remove Docker containers, volumes, networks, and local files associated with the WordPress instance. Docker images will be preserved.';
+	}
+
+	/**
 	 * Stop the Docker containers.
 	 *
 	 * @param {WPConfig} config          The wp-env config object.
@@ -398,7 +407,8 @@ class DockerRuntime {
 		spinner.text = 'Removing local files.';
 		// Note: there is a race condition where docker compose actually hasn't finished
 		// by this point, which causes rimraf to fail. We need to wait at least 2.5-5s,
-		// but using 10s in case it's dependant on the machine.
+		// but using 10s in case it's dependent on the machine. Removing images takes
+		// longer so we use a longer wait time here.
 		await new Promise( ( resolve ) => setTimeout( resolve, 10000 ) );
 		await rimraf( config.workDirectoryPath );
 
@@ -406,11 +416,38 @@ class DockerRuntime {
 	}
 
 	/**
-	 * Clean/reset the WordPress database.
+	 * Cleanup the Docker containers and remove local files, but preserve images.
+	 *
+	 * @param {WPConfig} config          The wp-env config object.
+	 * @param {Object}   options         Cleanup options.
+	 * @param {Object}   options.spinner A CLI spinner which indicates progress.
+	 * @param {boolean}  options.debug   True if debug mode is enabled.
+	 */
+	async cleanup( config, { spinner, debug } ) {
+		spinner.text = 'Removing docker containers, volumes, and networks.';
+
+		await dockerCompose.down( {
+			config: config.dockerComposeConfigPath,
+			commandOptions: [ '--volumes', '--remove-orphans' ],
+			log: debug,
+		} );
+
+		spinner.text = 'Removing local files.';
+		// Note: there is a race condition where docker compose actually hasn't finished
+		// by this point, which causes rimraf to fail. We need to wait at least 2.5-5s,
+		// but since we're not removing images, the wait can be shorter.
+		await new Promise( ( resolve ) => setTimeout( resolve, 3000 ) );
+		await rimraf( config.workDirectoryPath );
+
+		spinner.text = 'Cleaned up WordPress environment.';
+	}
+
+	/**
+	 * Reset the WordPress database.
 	 *
 	 * @param {WPConfig} config              The wp-env config object.
-	 * @param {Object}   options             Clean options.
-	 * @param {string}   options.environment The environment to clean.
+	 * @param {Object}   options             Reset options.
+	 * @param {string}   options.environment The environment to reset.
 	 * @param {Object}   options.spinner     A CLI spinner which indicates progress.
 	 * @param {boolean}  options.debug       True if debug mode is enabled.
 	 */
@@ -420,7 +457,7 @@ class DockerRuntime {
 		const description = `${ environment } environment${
 			environment === 'all' ? 's' : ''
 		}`;
-		spinner.text = `Cleaning ${ description }.`;
+		spinner.text = `Resetting ${ description }.`;
 
 		const tasks = [];
 
@@ -461,7 +498,7 @@ class DockerRuntime {
 
 		await Promise.all( tasks );
 
-		spinner.text = `Cleaned ${ description }.`;
+		spinner.text = `Reset ${ description }.`;
 	}
 
 	/**
