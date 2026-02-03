@@ -132,6 +132,8 @@ export function InspectorPanel( {
 									customBackdropColor: value,
 								} );
 							},
+							enableAlpha: true,
+							clearable: true,
 						},
 					] }
 					panelId={ clientId }

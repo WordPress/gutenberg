@@ -20,32 +20,9 @@ function block_core_dialog_add_query_var( $qvars ) {
 add_filter( 'query_vars', 'block_core_dialog_add_query_var' );
 
 /**
- * Build inline CSS custom properties for backdrop color settings.
- *
- * @param array $attributes Block attributes.
- *
- * @return string Inline CSS string.
- */
-function block_core_dialog_generate_color_styles( array $attributes ): string {
-	$custom_backdrop_color = $attributes['customBackdropColor'] ?? '';
-
-	$styles = array(
-		'--wp--style--dialog-backdrop-color' => $custom_backdrop_color,
-	);
-
-	$style_string = array_map(
-		static function ( string $key, string $value ): string {
-			return ! empty( $value ) ? $key . ': ' . $value . ';' : '';
-		},
-		array_keys( $styles ),
-		$styles
-	);
-
-	return implode( ' ', array_filter( $style_string ) );
-}
-
-/**
  * Render the 'core/dialog-element' block.
+ *
+ * Applies IAPI directives and dialog-specific attributes to the saved content.
  *
  * @param array    $attributes Block attributes.
  * @param string   $content Block content.
@@ -62,6 +39,7 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 	if ( ! $context_id ) {
 		return '';
 	}
+
 	$is_open                 = get_query_var( 'dialogId', false ) === $context_id;
 	$auto_activate_on_render = array_key_exists( 'autoActivateOnRender', $attributes ) ? $attributes['autoActivateOnRender'] : false;
 	$default_is_open         = $auto_activate_on_render;
@@ -70,20 +48,22 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 	$enable_deep_link        = array_key_exists( 'enableDeepLink', $attributes ) ? $attributes['enableDeepLink'] : false;
 
 	// By using state any 3rd party can interact as easy as `store('core/dialog').state.dialogs.[blockId].isOpen = true;` which would open the dialog given the blockId.
-	wp_interactivity_state( 'core/dialog/private', array(
-		'dialogs' => array(
-			$context_id => array(
-				'id'                      => $context_id,
-				'activationTimerDuration' => (int) $auto_activation_timer,
-				'isOpen'                  => $is_open,
-				'enableDeepLink'          => $enable_deep_link,
-				'showClosingAnimation'    => false,
-			)
+	wp_interactivity_state(
+		'core/dialog/private',
+		array(
+			'dialogs' => array(
+				$context_id => array(
+					'id'                      => $context_id,
+					'activationTimerDuration' => (int) $auto_activation_timer,
+					'isOpen'                  => $is_open,
+					'enableDeepLink'          => $enable_deep_link,
+					'showClosingAnimation'    => false,
+				),
+			),
 		)
-	) );
+	);
 
-	$block_styles = block_core_dialog_generate_color_styles( $attributes );
-
+	// Determine aria-labelledby value by finding or creating a heading.
 	$aria_labelledby = '';
 	// Check if $content contains any <h*> tags, and if so, add the id of the first one to aria-labelledby.
 	if ( preg_match( '/<h[1-6][^>]*>(.*?)<\/h[1-6]>/', $content, $matches ) ) {
@@ -98,42 +78,51 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 		$dialog_label    = isset( $attributes['dialogLabel'] ) ? $attributes['dialogLabel'] : __( 'Dialog', 'default' );
 		$hidden_id       = wp_unique_id( 'dialog-heading-' );
 		$hidden_h2       = wp_sprintf( '<h2 id="%1$s" class="screen-reader-text">%2$s</h2>', esc_attr( $hidden_id ), esc_html( $dialog_label ) );
-		$content         = $hidden_h2 . $content;
 		$aria_labelledby = $hidden_id;
 	}
 
-	$block_wrapper_attrs = get_block_wrapper_attributes(
-		array(
-			'id'                                        => $context_id,
-			'role'                                      => 'dialog',
-			'aria-modal'                                => 'true',
-			'aria-labelledby'                           => $aria_labelledby,
-			'data-wp-interactive'                       => 'core/dialog/private',
-			'data-wp-class--active'                     => 'state.dialog.isOpen',
-			'data-wp-class--show-closing-animation'     => 'state.dialog.showClosingAnimation',
-			'data-wp-on--click'                         => 'callbacks.onBackdropClick',
-			'data-wp-init--on-auto-activation'          => 'callbacks.onAutoActivation',
-			'data-wp-on-document--keydown'              => 'callbacks.onESCKey',
-			'data-wp-watch--on-dialog-open'             => 'callbacks.onOpen',
-			'data-wp-watch--on-dialog-close'            => 'callbacks.onClose',
-			'style'                                     => $block_styles,
-		)
-	);
+	// Process the saved content to add IAPI directives.
+	$tag_processor = new WP_HTML_Tag_Processor( $content );
+
+	if ( $tag_processor->next_tag( 'dialog' ) ) {
+		// Set dialog-specific attributes.
+		$tag_processor->set_attribute( 'id', $context_id );
+		$tag_processor->set_attribute( 'role', 'dialog' );
+		$tag_processor->set_attribute( 'aria-modal', 'true' );
+		$tag_processor->set_attribute( 'aria-labelledby', $aria_labelledby );
+
+		// Add IAPI directives.
+		$tag_processor->set_attribute( 'data-wp-interactive', 'core/dialog/private' );
+		$tag_processor->set_attribute( 'data-wp-class--active', 'state.dialog.isOpen' );
+		$tag_processor->set_attribute( 'data-wp-class--show-closing-animation', 'state.dialog.showClosingAnimation' );
+		$tag_processor->set_attribute( 'data-wp-on--click', 'callbacks.onBackdropClick' );
+		$tag_processor->set_attribute( 'data-wp-init--on-auto-activation', 'callbacks.onAutoActivation' );
+		$tag_processor->set_attribute( 'data-wp-on-document--keydown', 'callbacks.onESCKey' );
+		$tag_processor->set_attribute( 'data-wp-watch--on-dialog-open', 'callbacks.onOpen' );
+		$tag_processor->set_attribute( 'data-wp-watch--on-dialog-close', 'callbacks.onClose' );
+	}
+
+	// Get updated HTML.
+	$output = $tag_processor->get_updated_html();
 
 	// This will enable anyone to supply their own close icon asset.
 	$close_icon = 'X';
 
 	$close_button = wp_sprintf(
-		'<button class="wp-block-dialog-element__close-button" data-wp-on--click="actions.onClickClose" type="button" aria-label="Close dialog">%1$s</button>',
-		$close_icon,
+		'<button class="wp-block-dialog-element__close-button" data-wp-on--click="actions.onClickClose" type="button" aria-label="%1$s">%2$s</button>',
+		esc_attr__( 'Close dialog', 'default' ),
+		$close_icon
 	);
 
-	return wp_sprintf(
-		'<dialog %1$s>%2$s<div class="wp-block-dialog-element__inner">%3$s</div></dialog>',
-		$block_wrapper_attrs, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		$close_button, // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		$content // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	// Inject close button and hidden heading (if needed) before the inner div.
+	$hidden_heading_html = isset( $hidden_h2 ) ? $hidden_h2 : '';
+	$output              = str_replace(
+		'<div class="wp-block-dialog-element__inner">',
+		$close_button . $hidden_heading_html . '<div class="wp-block-dialog-element__inner">',
+		$output
 	);
+
+	return $output;
 }
 
 /**

@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { Icon, cancelCircleFilled } from '@wordpress/icons';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect, useState, useMemo } from '@wordpress/element';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -21,7 +21,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { Toolbar, InspectorPanel } from './controls';
-import StyleEngine from './style-engine';
 
 /**
  * Animation duration in milliseconds. Must match the CSS animation duration
@@ -135,12 +134,26 @@ function Edit( {
 		}
 	};
 
+	// Build CSS custom properties for backdrop color
+	const customColorStyles = useMemo( () => {
+		const styles = {};
+		const backdropColorValue =
+			backdropColor?.color || attributes.customBackdropColor;
+
+		if ( backdropColorValue ) {
+			styles[ '--wp--style--dialog-backdrop-color' ] = backdropColorValue;
+		}
+
+		return styles;
+	}, [ backdropColor?.color, attributes.customBackdropColor ] );
+
 	const blockProps = useBlockProps( {
 		ref: dialogElementRef,
 		className: clsx( {
 			active: isOpen && ! showClosingAnimation,
 			'show-closing-animation': showClosingAnimation,
 		} ),
+		style: customColorStyles,
 		role: 'dialog',
 		'aria-modal': 'true',
 		'aria-labelledby': '',
@@ -165,7 +178,6 @@ function Edit( {
 		>
 			{ /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- Keyboard support provided via KeyboardShortcuts ESC handler above */ }
 			<dialog { ...blockProps } onClick={ onBackdropClick }>
-				<StyleEngine attributes={ attributes } clientId={ clientId } />
 				<InspectorPanel
 					colors={ {
 						backdropColor,

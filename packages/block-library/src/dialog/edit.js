@@ -7,16 +7,10 @@ import {
 	BlockControls,
 	useBlockProps,
 	useInnerBlocksProps,
-	InspectorControls,
 	store as blockEditorStore,
 	BlockContextProvider,
 } from '@wordpress/block-editor';
-import {
-	Button,
-	ToolbarButton,
-	ToolbarGroup,
-	PanelBody,
-} from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 const TEMPLATE = [
 	[
@@ -107,7 +101,12 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { editorIsDialogOpen: true } );
 		}
-	}, [ isDialogElementSelected, editorIsDialogOpen ] );
+	}, [
+		isDialogElementSelected,
+		editorIsDialogOpen,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	// Set up a ref for the block container
 	const ref = useRef( null );
@@ -155,28 +154,6 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Dialog settings' ) }>
-					<div>
-						<p>
-							{ __(
-								'The dialog element requires a dialog trigger and a dialog element. You can edit the text of the trigger and the content of the dialog by clicking the "Edit Dialog" button above.'
-							) }
-						</p>
-						<Button
-							__next40pxDefaultSize
-							variant="tertiary"
-							onClick={ toggleDialog }
-							disabled={ ! dialogElementClientId }
-							accessibleWhenDisabled
-						>
-							{ editorIsDialogOpen
-								? __( 'Close dialog' )
-								: __( 'Edit dialog' ) }
-						</Button>
-					</div>
-				</PanelBody>
-			</InspectorControls>
 			<div { ...blockProps }>
 				<BlockContextProvider
 					value={ {
