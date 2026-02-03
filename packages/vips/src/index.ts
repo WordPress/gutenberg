@@ -9,6 +9,9 @@ import VipsModule from 'wasm-vips/vips.wasm';
 // @ts-expect-error - WASM files are inlined as base64 data URLs at build time
 import VipsJxlModule from 'wasm-vips/vips-jxl.wasm';
 
+// @ts-expect-error - WASM files are inlined as base64 data URLs at build time
+import VipsHeifModule from 'wasm-vips/vips-heif.wasm';
+
 /**
  * Internal dependencies
  */
@@ -80,27 +83,34 @@ async function getVips(): Promise< typeof Vips > {
 	vipsLog( 'Initializing VIPS WebAssembly module...' );
 	const startTime = performance.now();
 
-	vipsInstance = await Vips( {
-		locateFile: ( fileName: string ) => {
-			// WASM files are inlined as base64 data URLs at build time,
-			// eliminating the need for separate file downloads and avoiding
-			// issues with hosts not serving WASM files with correct MIME types.
-			if ( fileName.endsWith( 'vips.wasm' ) ) {
-				return VipsModule;
-			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) ) {
-				return VipsJxlModule;
-			}
-
-			return fileName;
-		},
-		preRun: ( module: EmscriptenModule ) => {
-			// https://github.com/kleisauke/wasm-vips/issues/13#issuecomment-1073246828
-			module.setAutoDeleteLater( true );
-			module.setDelayFunction( ( fn: () => void ) => {
-				cleanup = fn;
-			} );
-		},
-	} );
+	try {
+		vipsInstance = await Vips( {
+			locateFile: ( fileName: string ) => {
+				// WASM files are inlined as base64 data URLs at build time,
+				// eliminating the need for separate file downloads and avoiding
+				// issues with hosts not serving WASM files with correct MIME types.
+				if ( fileName.endsWith( 'vips.wasm' ) ) {
+					return VipsModule;
+				} else if ( fileName.endsWith( 'vips-jxl.wasm' ) ) {
+					return VipsJxlModule;
+				} else if ( fileName.endsWith( 'vips-heif.wasm' ) ) {
+					return VipsHeifModule;
+				}
+				return fileName;
+			},
+			preRun: ( module: EmscriptenModule ) => {
+				// https://github.com/kleisauke/wasm-vips/issues/13#issuecomment-1073246828
+				module.setAutoDeleteLater( true );
+				module.setDelayFunction( ( fn: () => void ) => {
+					cleanup = fn;
+				} );
+			},
+		} );
+	} catch ( error ) {
+		// eslint-disable-next-line no-console
+		console.error( '[VIPS] Failed to initialize VIPS:', error );
+		throw error;
+	}
 
 	const duration = Math.round( performance.now() - startTime );
 	vipsLog( `VIPS WebAssembly module initialized`, { durationMs: duration } );
