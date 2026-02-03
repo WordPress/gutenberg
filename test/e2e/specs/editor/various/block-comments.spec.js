@@ -859,6 +859,108 @@ test.describe( 'Block Comments', () => {
 	} );
 } );
 
+test.describe( 'Multiple notes per block', () => {
+	test.use( {
+		blockCommentUtils: async ( { page, editor }, use ) => {
+			await use( new BlockCommentUtils( { page, editor } ) );
+		},
+	} );
+
+	test.beforeEach( async ( { admin } ) => {
+		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deleteAllComments( 'note' );
+	} );
+
+	test( 'can add multiple notes to the same block', async ( {
+		editor,
+		page,
+		blockCommentUtils,
+	} ) => {
+		// Add a block with the first note.
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/paragraph',
+			attributes: { content: 'Block with multiple notes' },
+			comment: 'First note on block',
+		} );
+
+		// Click "Add note" again to add a second note.
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+
+		// Verify the new note form is shown (not the reply form).
+		const newNoteForm = page.getByRole( 'textbox', {
+			name: 'New note',
+			exact: true,
+		} );
+		await expect( newNoteForm ).toBeFocused();
+
+		// Add the second note.
+		await newNoteForm.fill( 'Second note on block' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
+
+		// Verify both notes are visible as separate threads.
+		const firstThread = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'treeitem', { name: 'Note: First note on block' } );
+		const secondThread = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'treeitem', { name: 'Note: Second note on block' } );
+
+		await expect( firstThread ).toBeVisible();
+		await expect( secondThread ).toBeVisible();
+
+		// Verify "Note added." (not "Reply added.").
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note added.' } )
+		).toBeVisible();
+	} );
+
+	test( 'multiple notes on same block are stored as array in metadata', async ( {
+		editor,
+		page,
+		blockCommentUtils,
+	} ) => {
+		await blockCommentUtils.addBlockWithComment( {
+			type: 'core/paragraph',
+			attributes: { content: 'Block with multiple notes' },
+			comment: 'First note',
+		} );
+
+		// Add second note.
+		await editor.clickBlockOptionsMenuItem( 'Add note' );
+		await page
+			.getByRole( 'textbox', { name: 'New note', exact: true } )
+			.fill( 'Second note' );
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Add note', exact: true } )
+			.click();
+
+		await expect(
+			page
+				.getByRole( 'button', { name: 'Dismiss this notice' } )
+				.filter( { hasText: 'Note added.' } )
+		).toBeVisible();
+
+		// Verify noteId is an array with 2 elements.
+		const blocks = await editor.getBlocks();
+		const paragraphBlock = blocks.find(
+			( b ) => b.name === 'core/paragraph'
+		);
+		const noteIds = paragraphBlock?.attributes?.metadata?.noteId;
+
+		expect( Array.isArray( noteIds ) ).toBe( true );
+		expect( noteIds.length ).toBe( 2 );
+	} );
+} );
+
 class BlockCommentUtils {
 	/** @type {import('@playwright/test').Page} */
 	#page;
