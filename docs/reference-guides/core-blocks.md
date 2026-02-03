@@ -437,7 +437,7 @@ Insert an SVG icon or graphic. ([Source](https://github.com/WordPress/gutenberg/
 -	**Experimental:** true
 -	**Category:** media
 -	**Supports:** align, anchor, dimensions (width), interactivity (clientNavigation), spacing (margin, padding), ~~html~~
--	**Attributes:** icon, label, style, title
+-	**Attributes:** icon, label, title
 
 ## Image
 

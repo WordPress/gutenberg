@@ -7,6 +7,7 @@
 	"category": "media",
 	"description": "Insert an SVG icon or graphic.",
 	"keywords": [ "icon", "svg" ],
+	"textdomain": "default",
 	"attributes": {
 		"icon": {
 			"type": "string",
@@ -17,14 +18,6 @@
 		},
 		"title": {
 			"type": "string"
-		},
-		"style": {
-			"type": "object",
-			"default": {
-				"dimensions": {
-					"width": "48px"
-				}
-			}
 		}
 	},
 	"supports": {
@@ -59,7 +52,6 @@
 			"width": true
 		}
 	},
-	"textdomain": "icon-block",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./editor.css",
 	"style": "file:./style.css"
