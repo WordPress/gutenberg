@@ -970,7 +970,7 @@ The user facing description of the action.
 
 ```js
 {
-	label: 'Trash'
+	label: 'Trash';
 }
 ```
 
@@ -1756,23 +1756,15 @@ Note this function may be called many times in the lifetime of the DataViews/Dat
 	type: 'integer',
 	label: 'Selected product',
 	getElements: () => {
-		return Promise.resolve( {
-			elements: [
-				{ value: '1', label: 'Product A' },
-				{ value: '2', label: 'Product B' },
-				{ value: '3', label: 'Product C' },
-				{ value: '4', label: 'Product D' },
-			],
-			paginationInfo: {
-				totalItems: 4,
-				totalPages: 1,
-			},
-		} );
+		return Promise.resolve( [
+			{ value: '1', label: 'Product A' },
+			{ value: '2', label: 'Product B' },
+			{ value: '3', label: 'Product C' },
+			{ value: '4', label: 'Product D' },
+		] );
 	}
 }
 ```
-
-**Note**: The `paginationInfo` property is optional. If omitted, it will be automatically calculated based on the number of elements returned, assuming there is one page of results.
 
 ### `filterBy`
 
@@ -1926,6 +1918,7 @@ Display format configuration for fields. Supported for date, number, and integer
 -   Optional.
 
 For `date` fields:
+
 -   Properties:
     -   `date`: The format string using PHP date format (e.g., 'F j, Y' for 'March 10, 2023'). Optional, defaults to WordPress "Date Format" setting.
     -   `weekStartsOn`: Specifies the first day of the week for calendar controls. One of 0, 1, 2, 3, 4, 5, 6. Optional, defaults to WordPress "Week Starts On" setting, whose value is 0 (Sunday).

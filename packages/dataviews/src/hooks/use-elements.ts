@@ -6,11 +6,7 @@ import { useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type {
-	Option,
-	GetElementsResult,
-	GetElementsPaginationInfo,
-} from '../types';
+import type { Option } from '../types';
 
 const EMPTY_ARRAY: Option[] = [];
 
@@ -19,57 +15,37 @@ export default function useElements( {
 	getElements,
 }: {
 	elements?: Option[];
-	getElements?: () => Promise< GetElementsResult >;
+	getElements?: () => Promise< Option[] >;
 } ) {
-	const [ records, setRecords ] = useState< Option[] >( EMPTY_ARRAY );
+	const staticElements =
+		Array.isArray( elements ) && elements.length > 0
+			? elements
+			: EMPTY_ARRAY;
+	const [ records, setRecords ] = useState< Option[] >( staticElements );
 	const [ isLoading, setIsLoading ] = useState( false );
-	const [ paginationInfo, setPaginationInfo ] =
-		useState< GetElementsPaginationInfo >( {
-			totalItems: elements?.length || 0,
-			totalPages: 1,
-		} );
 
 	useEffect( () => {
-		// Compute static elements from current elements prop
-		const currentElements =
-			Array.isArray( elements ) && elements.length > 0
-				? elements
-				: EMPTY_ARRAY;
 		if ( ! getElements ) {
-			setRecords( currentElements );
-			setPaginationInfo( {
-				totalItems: currentElements.length,
-				totalPages: 1,
-			} );
+			setRecords( staticElements );
 			return;
 		}
 
 		let cancelled = false;
 		setIsLoading( true );
 		getElements()
-			.then( ( result ) => {
+			.then( ( fetchedElements ) => {
 				if ( ! cancelled ) {
-					const fetchedElements =
-						Array.isArray( result.elements ) &&
-						!! result.elements.length
-							? result.elements
-							: EMPTY_ARRAY;
-					setRecords( fetchedElements );
-					setPaginationInfo( {
-						totalItems:
-							result.paginationInfo?.totalItems ??
-							fetchedElements.length,
-						totalPages: result.paginationInfo?.totalPages ?? 1,
-					} );
+					const dynamicElements =
+						Array.isArray( fetchedElements ) &&
+						fetchedElements.length > 0
+							? fetchedElements
+							: staticElements;
+					setRecords( dynamicElements );
 				}
 			} )
 			.catch( () => {
 				if ( ! cancelled ) {
-					setRecords( currentElements );
-					setPaginationInfo( {
-						totalItems: currentElements.length,
-						totalPages: 1,
-					} );
+					setRecords( staticElements );
 				}
 			} )
 			.finally( () => {
@@ -81,11 +57,10 @@ export default function useElements( {
 		return () => {
 			cancelled = true;
 		};
-	}, [ getElements, elements ] );
+	}, [ getElements, staticElements ] );
 
 	return {
 		elements: records,
 		isLoading,
-		paginationInfo,
 	};
 }

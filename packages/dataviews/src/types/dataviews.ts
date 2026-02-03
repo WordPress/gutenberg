@@ -12,7 +12,6 @@ import type { useFocusOnMount } from '@wordpress/compose';
  * Internal dependencies
  */
 import type {
-	GetElementsResult,
 	NormalizedField,
 	Operator,
 	Option,
@@ -64,7 +63,7 @@ export interface NormalizedFilter {
 	/**
 	 * Retrieval function to get the elements.
 	 */
-	getElements?: () => Promise< GetElementsResult >;
+	getElements?: () => Promise< Option[] >;
 
 	/**
 	 * Whether the filter has elements.

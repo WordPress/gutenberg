@@ -145,13 +145,7 @@ describe( 'useFormValidity', () => {
 					getElements: async () =>
 						await new Promise( ( resolve ) => {
 							setTimeout( resolve, 5 );
-						} ).then( () => ( {
-							elements: [ { value: 2, label: 'Two' } ],
-							paginationInfo: {
-								totalItems: 1,
-								totalPages: 1,
-							},
-						} ) ),
+						} ).then( () => [ { value: 2, label: 'Two' } ] ),
 					isValid: {
 						elements: true,
 					},

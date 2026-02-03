@@ -55,19 +55,11 @@ const mockUsers = [
 // Override author field with mock getElements for Storybook.
 const authorFieldForStory: Field< any > = {
 	...authorField,
-	getElements: async () => {
-		const elements = mockUsers.map( ( { id, name } ) => ( {
+	getElements: async () =>
+		mockUsers.map( ( { id, name } ) => ( {
 			value: id,
 			label: name,
-		} ) );
-		return {
-			elements,
-			paginationInfo: {
-				totalItems: elements.length,
-				totalPages: 1,
-			},
-		};
-	},
+		} ) ),
 };
 
 export default {

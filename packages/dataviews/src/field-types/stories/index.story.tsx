@@ -34,13 +34,13 @@ const meta = {
 				'Chooses the Edit function for the field. "Default" means use the default Edit function for the field type.',
 			options: [
 				'default',
+				'adaptiveSelect',
 				'array',
 				'checkbox',
 				'color',
 				'combobox',
 				'date',
 				'datetime',
-				'elementsControl',
 				'email',
 				'integer',
 				'number',
@@ -64,7 +64,7 @@ const meta = {
 			control: { type: 'boolean' },
 			description:
 				'Add 10 more elements to push over the threshold and trigger Combobox rendering',
-			if: { arg: 'Edit', eq: 'elementsControl' },
+			if: { arg: 'Edit', eq: 'adaptiveSelect' },
 		},
 	},
 	args: {
@@ -553,13 +553,13 @@ const fields: Field< DataType >[] = [
 type PanelTypes = 'regular' | 'panel';
 type ControlTypes =
 	| 'default'
+	| 'adaptiveSelect'
 	| 'array'
 	| 'checkbox'
 	| 'color'
 	| 'combobox'
 	| 'date'
 	| 'datetime'
-	| 'elementsControl'
 	| 'email'
 	| 'integer'
 	| 'number'
@@ -597,8 +597,8 @@ const FieldTypeStory = ( {
 			} ) );
 		}
 
-		// Expand elements when elementsControl is selected and manyElements is toggled
-		if ( Edit === 'elementsControl' && manyElements ) {
+		// Expand elements when adaptiveSelect is selected and manyElements is toggled
+		if ( Edit === 'adaptiveSelect' && manyElements ) {
 			fieldsToProcess = fieldsToProcess.map( ( field ) => {
 				if ( field.elements && Array.isArray( field.elements ) ) {
 					const fieldIdPrefix = field.id.replace(
@@ -627,17 +627,7 @@ const FieldTypeStory = ( {
 						elements: undefined,
 						getElements: () =>
 							new Promise( ( resolve ) =>
-								setTimeout(
-									() =>
-										resolve( {
-											elements,
-											paginationInfo: {
-												totalItems: elements.length,
-												totalPages: 1,
-											},
-										} ),
-									500
-								)
+								setTimeout( () => resolve( elements ), 500 )
 							),
 					};
 				}
