@@ -16,8 +16,13 @@
 		"label": {
 			"type": "string"
 		},
-		"title": {
-			"type": "string"
+		"style": {
+			"type": "object",
+			"default": {
+				"dimensions": {
+					"width": "48px"
+				}
+			}
 		}
 	},
 	"supports": {

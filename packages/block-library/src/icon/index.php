@@ -27,15 +27,27 @@ function render_block_core_icon( $attributes, $content, $block ) {
 	if ( is_null( $icon ) )  {
 		return;
 	}
-
+	// Is there a label set.
+	$label = ! empty( $attributes['label'] ) ? $attributes['label'] : false;
+	
 	$processor = new \WP_HTML_Tag_Processor( $icon['content'] );
 	$processor->next_tag( 'svg' );
 	$processor->set_attribute( 'class', 'wp-block-icon' );
-	// Icon is decorative, hide it from screen readers.
-	$processor->set_attribute( 'aria-hidden', 'true' );
-	$processor->set_attribute( 'focusable', 'false' );
+	if ( ! $label ) {
+		// Icon is decorative, hide it from screen readers.
+		$processor->set_attribute( 'aria-hidden', 'true' );
+		$processor->set_attribute( 'focusable', 'false' );
+	} else {
+		$processor->set_attribute( 'role', 'img' );
+		$processor->set_attribute( 'aria-label', esc_html( $label ) );
+	}
 
-	// Check for width and set default to 25px.
+	// Add the label as the title attribute regardless of decorative or informative status.
+	if ( ! $label ) {
+		$processor->set_attribute( 'title', esc_html( $label ) );
+	}
+
+	// Check for width and set default.
 	$processor->set_attribute( 'width', $attributes['style']['dimensions']['width'] ?? '48px' );
 
 	// Return the updated SVG markup.

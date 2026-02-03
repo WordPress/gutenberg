@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import { __ } from '@wordpress/i18n';
 import {
 	DropdownMenu,
-	ExternalLink,
 	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
@@ -24,11 +23,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useDispatch } from '@wordpress/data';
-import {
-	createInterpolateElement,
-	useState,
-	useEffect,
-} from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -44,7 +39,7 @@ import getIcons from './icons';
  */
 export function Edit( props ) {
 	const { attributes, setAttributes } = props;
-	const { icon, label, title, style } = attributes;
+	const { icon, label, style } = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 	const [ iconToDisplay, setIconToDisplay ] = useState();
@@ -136,7 +131,7 @@ export function Edit( props ) {
 										setAttributes( { label: value } )
 									}
 									help={ __(
-										'Briefly describe the icon to help screen reader users.'
+										'Briefly describe the icon to help screen reader users. Leave blank for decorative icons.'
 									) }
 									__next40pxDefaultSize
 								/>
@@ -167,7 +162,7 @@ export function Edit( props ) {
 						<TextControl
 							label={ __( 'Label' ) }
 							help={ __(
-								'Briefly describe the icon to help screen reader users.'
+								'Briefly describe the icon to help screen reader users. Leave blank for decorative icons.'
 							) }
 							value={ label || '' }
 							onChange={ ( value ) =>
@@ -177,26 +172,6 @@ export function Edit( props ) {
 						/>
 					</ToolsPanelItem>
 				</ToolsPanel>
-			</InspectorControls>
-
-			<InspectorControls group="advanced">
-				<TextControl
-					label={ __( 'Title attribute' ) }
-					className="outermost-icon-block__title-control"
-					value={ title || '' }
-					onChange={ ( value ) => setAttributes( { title: value } ) }
-					help={ createInterpolateElement(
-						__(
-							'Describe the role of this icon on the page. <a>Note: many devices and browsers do not display this text.</a>'
-						),
-						{
-							a: (
-								<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute" />
-							),
-						}
-					) }
-					__next40pxDefaultSize
-				/>
 			</InspectorControls>
 		</>
 	);
