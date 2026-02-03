@@ -2256,5 +2256,144 @@ describe( 'Tabs', () => {
 			);
 		} );
 	} );
+
+	describe( 'Development mode validation', () => {
+		it( 'should warn when a Tab has no matching Panel', async () => {
+			const consoleWarnSpy = jest
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
+
+			render(
+				<Tabs.Root defaultValue="one">
+					<Tabs.List>
+						<Tabs.Tab value="one">One</Tabs.Tab>
+						<Tabs.Tab value="two">Two</Tabs.Tab>
+						<Tabs.Tab value="three">Three</Tabs.Tab>
+					</Tabs.List>
+					<Tabs.Panel value="one">First panel</Tabs.Panel>
+					<Tabs.Panel value="two">Second panel</Tabs.Panel>
+					{ /* Missing panel for "three" */ }
+				</Tabs.Root>
+			);
+
+			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
+
+			// Wait for the validation to run (it's scheduled with setTimeout)
+			await waitFor( () => {
+				expect( consoleWarnSpy ).toHaveBeenCalledWith(
+					expect.stringContaining(
+						'Found Tab(s) without matching Panel(s)'
+					)
+				);
+			} );
+
+			expect( consoleWarnSpy ).toHaveBeenCalledWith(
+				expect.stringContaining( '"three"' )
+			);
+
+			consoleWarnSpy.mockRestore();
+		} );
+
+		it( 'should warn when a Panel has no matching Tab', async () => {
+			const consoleWarnSpy = jest
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
+
+			render(
+				<Tabs.Root defaultValue="one">
+					<Tabs.List>
+						<Tabs.Tab value="one">One</Tabs.Tab>
+						<Tabs.Tab value="two">Two</Tabs.Tab>
+					</Tabs.List>
+					<Tabs.Panel value="one">First panel</Tabs.Panel>
+					<Tabs.Panel value="two">Second panel</Tabs.Panel>
+					<Tabs.Panel value="orphan">Orphan panel</Tabs.Panel>
+				</Tabs.Root>
+			);
+
+			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
+
+			// Wait for the validation to run (it's scheduled with setTimeout)
+			await waitFor( () => {
+				expect( consoleWarnSpy ).toHaveBeenCalledWith(
+					expect.stringContaining(
+						'Found Panel(s) without matching Tab(s)'
+					)
+				);
+			} );
+
+			expect( consoleWarnSpy ).toHaveBeenCalledWith(
+				expect.stringContaining( '"orphan"' )
+			);
+
+			consoleWarnSpy.mockRestore();
+		} );
+
+		it( 'should not warn when all Tabs and Panels match', async () => {
+			const consoleWarnSpy = jest
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
+
+			render(
+				<Tabs.Root defaultValue="one">
+					<Tabs.List>
+						<Tabs.Tab value="one">One</Tabs.Tab>
+						<Tabs.Tab value="two">Two</Tabs.Tab>
+					</Tabs.List>
+					<Tabs.Panel value="one">First panel</Tabs.Panel>
+					<Tabs.Panel value="two">Second panel</Tabs.Panel>
+				</Tabs.Root>
+			);
+
+			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
+
+			// Wait a bit to ensure validation has run
+			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
+
+			expect( consoleWarnSpy ).not.toHaveBeenCalled();
+
+			consoleWarnSpy.mockRestore();
+		} );
+
+		it( 'should warn about multiple mismatches', async () => {
+			const consoleWarnSpy = jest
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
+
+			render(
+				<Tabs.Root defaultValue="one">
+					<Tabs.List>
+						<Tabs.Tab value="one">One</Tabs.Tab>
+						<Tabs.Tab value="orphan-tab-1">Orphan Tab 1</Tabs.Tab>
+						<Tabs.Tab value="orphan-tab-2">Orphan Tab 2</Tabs.Tab>
+					</Tabs.List>
+					<Tabs.Panel value="one">First panel</Tabs.Panel>
+					<Tabs.Panel value="orphan-panel">Orphan panel</Tabs.Panel>
+				</Tabs.Root>
+			);
+
+			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
+
+			// Wait for the validation to run
+			await waitFor( () => {
+				expect( consoleWarnSpy ).toHaveBeenCalledTimes( 2 );
+			} );
+
+			// Check for tabs without panels warning
+			expect( consoleWarnSpy ).toHaveBeenCalledWith(
+				expect.stringContaining( '"orphan-tab-1"' )
+			);
+			expect( consoleWarnSpy ).toHaveBeenCalledWith(
+				expect.stringContaining( '"orphan-tab-2"' )
+			);
+
+			// Check for panels without tabs warning
+			expect( consoleWarnSpy ).toHaveBeenCalledWith(
+				expect.stringContaining( '"orphan-panel"' )
+			);
+
+			consoleWarnSpy.mockRestore();
+		} );
+	} );
 } );
 /* eslint-enable jest/no-conditional-expect */
