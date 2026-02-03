@@ -996,7 +996,7 @@ Content for a tab in a tabbed interface. ([Source](https://github.com/WordPress/
 
 ## Tab Panel
 
-Container for tab panel content in a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panels))
+Container for tab panel content in a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panel))
 
 -	**Name:** core/tab-panel
 -	**Experimental:** true
