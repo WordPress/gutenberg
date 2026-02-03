@@ -48,7 +48,7 @@
 	},
 	"dependencies": {
 		"@wordpress/worker-threads": "file:../worker-threads",
-		"wasm-vips": "^0.0.10"
+		"wasm-vips": "^0.0.16"
 	},
 	"publishConfig": {
 		"access": "public"
