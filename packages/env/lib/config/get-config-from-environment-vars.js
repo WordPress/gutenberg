@@ -23,7 +23,6 @@ const { checkPort, checkVersion, checkString } = require( './validate-config' );
  * @property {?number}                  phpmyadminPort   An override for the development environment's phpMyAdmin port.
  * @property {?WPSource}                coreSource       An override for all environment's coreSource.
  * @property {?string}                  phpVersion       An override for all environment's PHP version.
- * @property {?boolean}                 multisite        An override for if environmen should be multisite.
  * @property {?Object.<string, string>} lifecycleScripts An override for various lifecycle scripts.
  */
 
@@ -67,13 +66,6 @@ module.exports = function getConfigFromEnvironmentVars( cacheDirectoryPath ) {
 			process.env.WP_ENV_PHP_VERSION
 		);
 		environmentConfig.phpVersion = process.env.WP_ENV_PHP_VERSION;
-	}
-
-	if ( process.env.WP_ENV_MULTISITE ) {
-		const rawValue = process.env.WP_ENV_MULTISITE.trim().toLowerCase();
-		if ( rawValue === '1' || rawValue === 'true' ) {
-			environmentConfig.multisite = true;
-		}
 	}
 
 	return environmentConfig;

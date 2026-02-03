@@ -5,7 +5,7 @@
 ### Bug Fixes
 
 -   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with `MARIADB_AUTO_UPGRADE` to support both new and existing installations.
--   Fix `WP_ENV_MULTISITE` environment variable override not working correctly ([#72567](https://github.com/WordPress/gutenberg/pull/72567)).
+-   Remove non-functional `WP_ENV_MULTISITE` config.
 
 ### Breaking Changes
 
