@@ -16,7 +16,7 @@
  *
  * @return string Returns the Icon.
  */
-function render_block_core_icon( $attributes, $content, $block ) {
+function render_block_core_icon( $attributes ) {
 	if ( empty( $attributes['icon'] ) ) {
 		return;
 	}
@@ -24,12 +24,13 @@ function render_block_core_icon( $attributes, $content, $block ) {
 	$registry = \WP_Icons_Registry::get_instance();
 	$icon     = $registry->get_registered_icon( $attributes['icon'] );
 
-	if ( is_null( $icon ) )  {
+	if ( is_null( $icon ) ) {
 		return;
 	}
 	// Is there a label set.
 	$label = ! empty( $attributes['label'] ) ? $attributes['label'] : false;
-	
+
+	// Process the markup.
 	$processor = new \WP_HTML_Tag_Processor( $icon['content'] );
 	$processor->next_tag( 'svg' );
 	$processor->set_attribute( 'class', 'wp-block-icon' );
