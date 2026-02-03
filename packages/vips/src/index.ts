@@ -80,35 +80,27 @@ async function getVips(): Promise< typeof Vips > {
 	vipsLog( 'Initializing VIPS WebAssembly module...' );
 	const startTime = performance.now();
 
-	try {
-		vipsInstance = await Vips( {
-			// Only load JXL module, skip HEIF due to trademark issues.
-			// wasm-vips defaults to ["vips-jxl.wasm", "vips-heif.wasm"].
-			dynamicLibraries: [ 'vips-jxl.wasm' ],
-			locateFile: ( fileName: string ) => {
-				// WASM files are inlined as base64 data URLs at build time,
-				// eliminating the need for separate file downloads and avoiding
-				// issues with hosts not serving WASM files with correct MIME types.
-				if ( fileName.endsWith( 'vips.wasm' ) ) {
-					return VipsModule;
-				} else if ( fileName.endsWith( 'vips-jxl.wasm' ) ) {
-					return VipsJxlModule;
-				}
-				return fileName;
-			},
-			preRun: ( module: EmscriptenModule ) => {
-				// https://github.com/kleisauke/wasm-vips/issues/13#issuecomment-1073246828
-				module.setAutoDeleteLater( true );
-				module.setDelayFunction( ( fn: () => void ) => {
-					cleanup = fn;
-				} );
-			},
-		} );
-	} catch ( error ) {
-		// eslint-disable-next-line no-console
-		console.error( '[VIPS] Failed to initialize VIPS:', error );
-		throw error;
-	}
+	vipsInstance = await Vips( {
+		locateFile: ( fileName: string ) => {
+			// WASM files are inlined as base64 data URLs at build time,
+			// eliminating the need for separate file downloads and avoiding
+			// issues with hosts not serving WASM files with correct MIME types.
+			if ( fileName.endsWith( 'vips.wasm' ) ) {
+				return VipsModule;
+			} else if ( fileName.endsWith( 'vips-jxl.wasm' ) ) {
+				return VipsJxlModule;
+			}
+
+			return fileName;
+		},
+		preRun: ( module: EmscriptenModule ) => {
+			// https://github.com/kleisauke/wasm-vips/issues/13#issuecomment-1073246828
+			module.setAutoDeleteLater( true );
+			module.setDelayFunction( ( fn: () => void ) => {
+				cleanup = fn;
+			} );
+		},
+	} );
 
 	const duration = Math.round( performance.now() - startTime );
 	vipsLog( `VIPS WebAssembly module initialized`, { durationMs: duration } );
@@ -465,6 +457,26 @@ export async function rotateImage(
 } > {
 	const ext = type.split( '/' )[ 1 ];
 
+	const orientationNames: Record< number, string > = {
+		1: 'Normal',
+		2: 'Flipped horizontally',
+		3: 'Rotated 180°',
+		4: 'Flipped vertically',
+		5: 'Rotated 90° CCW + flipped horizontally',
+		6: 'Rotated 90° CW',
+		7: 'Rotated 90° CW + flipped horizontally',
+		8: 'Rotated 90° CCW',
+	};
+
+	vipsLog( `Rotating image based on EXIF orientation`, {
+		itemId: id,
+		type,
+		orientation,
+		orientationName: orientationNames[ orientation ] || 'Unknown',
+		inputSize: formatBytes( buffer.byteLength ),
+	} );
+	const startTime = performance.now();
+
 	inProgressOperations.add( id );
 
 	const vips = await getVips();
@@ -528,6 +540,16 @@ export async function rotateImage(
 		width: image.width,
 		height: image.pageHeight,
 	};
+
+	const duration = Math.round( performance.now() - startTime );
+	vipsLog( `Image rotation completed`, {
+		itemId: id,
+		orientation,
+		newDimensions: `${ result.width }x${ result.height }`,
+		inputSize: formatBytes( buffer.byteLength ),
+		outputSize: formatBytes( result.buffer.byteLength ),
+		durationMs: duration,
+	} );
 
 	// Only call after `image` is no longer being used.
 	cleanup?.();
