@@ -60,6 +60,7 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		markWhenOptional,
 		customValidity,
 		getValidityTarget,
+		validateOnBlur = true,
 		children,
 	}: {
 		/**
@@ -75,6 +76,13 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 		 * A function that returns the actual element on which the validity data should be applied.
 		 */
 		getValidityTarget: () => ValidityTarget | null | undefined;
+		/**
+		 * Whether to show validation errors when the field blurs.
+		 * When false, errors only show on submit or when customValidity is set.
+		 *
+		 * @default true
+		 */
+		validateOnBlur?: boolean;
 		/**
 		 * The control component to apply validation to.
 		 *
@@ -224,6 +232,12 @@ function UnforwardedControlWithError< C extends React.ReactElement >(
 	// Mark blurred fields as touched.
 	const onBlur = ( event: React.FocusEvent< HTMLDivElement > ) => {
 		if ( isTouched ) {
+			return;
+		}
+
+		// If validateOnBlur is false, don't mark the field as touched on blur.
+		// This prevents validation errors from showing when the field loses focus.
+		if ( ! validateOnBlur ) {
 			return;
 		}
 

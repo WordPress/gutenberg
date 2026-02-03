@@ -10,6 +10,12 @@ export type ValidatedControlProps = {
 	 */
 	markWhenOptional?: boolean;
 	/**
+	 * Whether to show validation errors when the field blurs.
+	 * When false, errors only show on submit or when customValidity is set.
+	 * @default true
+	 */
+	validateOnBlur?: boolean;
+	/**
 	 * Show a custom message based on the validation status.
 	 *
 	 * - When `type` is `invalid`, the message will be applied to the underlying element using the

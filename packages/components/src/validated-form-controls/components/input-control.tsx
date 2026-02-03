@@ -16,6 +16,7 @@ const UnforwardedValidatedInputControl = (
 		required,
 		customValidity,
 		markWhenOptional,
+		validateOnBlur,
 		...restProps
 	}: Omit<
 		React.ComponentProps< typeof InputControl >,
@@ -32,6 +33,7 @@ const UnforwardedValidatedInputControl = (
 			required={ required }
 			markWhenOptional={ markWhenOptional }
 			customValidity={ customValidity }
+			validateOnBlur={ validateOnBlur }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
 			<InputControl
