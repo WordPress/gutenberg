@@ -46,19 +46,17 @@ async function generateContentHash(
  * This plugin handles WordPress package externals and vendor libraries,
  * treating them as external dependencies available via global variables.
  *
- * @param {string}                                                              packageNamespace   Custom package namespace (e.g., 'wordpress', 'my-plugin').
- * @param {string|false}                                                        scriptGlobal       Global variable name (e.g., 'wp', 'myPlugin') or false to disable globals.
- * @param {Object}                                                              externalNamespaces Additional namespaces to externalize (e.g., { 'woo': { global: 'woo', handlePrefix: 'woocommerce' } }).
- * @param {string}                                                              handlePrefix       Handle prefix for main package (e.g., 'wp', 'mp'). Defaults to packageNamespace.
- * @param {Array<{name: string, global: string, handle: string}>} vendorScripts      Array of vendor script configs that are built locally (e.g., React).
+ * @param {string}       packageNamespace   Custom package namespace (e.g., 'wordpress', 'my-plugin').
+ * @param {string|false} scriptGlobal       Global variable name (e.g., 'wp', 'myPlugin') or false to disable globals.
+ * @param {Object}       externalNamespaces Additional namespaces to externalize (e.g., { 'woo': { global: 'woo', handlePrefix: 'woocommerce' } }).
+ * @param {string}       handlePrefix       Handle prefix for main package (e.g., 'wp', 'mp'). Defaults to packageNamespace.
  * @return {Function} Function that creates the esbuild plugin instance.
  */
 export function createWordpressExternalsPlugin(
 	packageNamespace,
 	scriptGlobal,
 	externalNamespaces = {},
-	handlePrefix,
-	vendorScripts = []
+	handlePrefix
 ) {
 	/**
 	 * WordPress externals plugin for esbuild.
@@ -124,9 +122,6 @@ export function createWordpressExternalsPlugin(
 				}
 
 				// Map of vendor packages to their global variables and handles
-				// These defaults are kept for third-party plugins using wp-build
-				// that rely on WordPress core providing these scripts
-				/** @type {Record<string, {global: string, handle: string}>} */
 				const vendorExternals = {
 					react: { global: 'React', handle: 'react' },
 					'react-dom': { global: 'ReactDOM', handle: 'react-dom' },
@@ -143,21 +138,6 @@ export function createWordpressExternalsPlugin(
 					'lodash-es': { global: 'lodash', handle: 'lodash' },
 					jquery: { global: 'jQuery', handle: 'jquery' },
 				};
-
-				// Override with vendor scripts from config (these are built locally)
-				for ( const vendor of vendorScripts ) {
-					vendorExternals[ vendor.name ] = {
-						global: vendor.global,
-						handle: vendor.handle,
-					};
-					// Add special alias for jsx-dev-runtime if jsx-runtime is configured
-					if ( vendor.name === 'react/jsx-runtime' ) {
-						vendorExternals[ 'react/jsx-dev-runtime' ] = {
-							global: vendor.global,
-							handle: vendor.handle,
-						};
-					}
-				}
 
 				// Build list of package namespace configurations
 				const packageExternals = [

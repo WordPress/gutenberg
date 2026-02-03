@@ -92,7 +92,6 @@ const PACKAGE_NAMESPACE = WP_PLUGIN_CONFIG.packageNamespace;
 const HANDLE_PREFIX = WP_PLUGIN_CONFIG.handlePrefix || PACKAGE_NAMESPACE;
 const EXTERNAL_NAMESPACES = WP_PLUGIN_CONFIG.externalNamespaces || {};
 const PAGES = WP_PLUGIN_CONFIG.pages || [];
-const VENDOR_SCRIPTS = WP_PLUGIN_CONFIG.vendorScripts || [];
 
 const baseDefine = {
 	'globalThis.IS_GUTENBERG_PLUGIN': JSON.stringify(
@@ -109,14 +108,12 @@ const getDefine = ( scriptDebug ) => ( {
 
 /**
  * Initialize WordPress externals plugin with custom namespace configuration.
- * Pass vendor scripts so the plugin knows which vendors are built locally.
  */
 const wordpressExternalsPlugin = createWordpressExternalsPlugin(
 	PACKAGE_NAMESPACE,
 	SCRIPT_GLOBAL,
 	EXTERNAL_NAMESPACES,
-	HANDLE_PREFIX,
-	VENDOR_SCRIPTS
+	HANDLE_PREFIX
 );
 
 /**
@@ -768,143 +765,6 @@ async function bundlePackage( packageName, options = {} ) {
 		scripts: builtScripts,
 		styles: builtStyles,
 	};
-}
-
-/**
- * Bundle a vendor script from node_modules into an IIFE script.
- * This is used to build packages like React that don't ship UMD builds.
- *
- * @param {Object} config              Vendor script configuration.
- * @param {string} config.name         Package name (e.g., 'react', 'react-dom', 'react/jsx-runtime').
- * @param {string} config.global       Global variable name (e.g., 'React', 'ReactDOM').
- * @param {string} config.handle       WordPress script handle (e.g., 'react', 'react-dom').
- * @param {Array}  config.dependencies Array of dependency handles (e.g., ['react']).
- * @return {Promise<Object>} Built script info for registration.
- */
-async function bundleVendorScript( config ) {
-	const { name, global: globalName, handle, dependencies = [] } = config;
-
-	const outputDir = path.join( BUILD_DIR, 'scripts', handle );
-	const target = browserslistToEsbuild();
-
-	// Plugin that provides a synthetic entry point module.
-	const virtualEntryPlugin = {
-		name: 'virtual-entry',
-		setup( build ) {
-			build.onResolve( { filter: /^virtual:entry$/ }, () => ( {
-				path: 'virtual:entry',
-				namespace: 'virtual-entry',
-			} ) );
-
-			build.onLoad(
-				{ filter: /.*/, namespace: 'virtual-entry' },
-				() => ( {
-					contents: `export * from '${ name }';`,
-					loader: 'js',
-					resolveDir: ROOT_DIR,
-				} )
-			);
-		},
-	};
-
-	// Plugin that externalizes the `react` package.
-	const reactExternalPlugin = {
-		name: 'react-external',
-		setup( build ) {
-			build.onResolve( { filter: /^react$/ }, () => {
-				return {
-					path: 'react',
-					namespace: 'react-external',
-				};
-			} );
-
-			build.onLoad(
-				{ filter: /.*/, namespace: 'react-external' },
-				() => ( {
-					contents: `module.exports = globalThis.React`,
-					loader: 'js',
-				} )
-			);
-		},
-	};
-
-	// Build both minified and non-minified versions
-	const builds = [
-		[ 'index.js', false ],
-		[ 'index.min.js', true ],
-	];
-	await Promise.all(
-		builds.map( ( [ outputFile, production ] ) =>
-			esbuild.build( {
-				entryPoints: [ 'virtual:entry' ],
-				outfile: path.join( outputDir, outputFile ),
-				bundle: true,
-				format: 'iife',
-				globalName,
-				minify: production,
-				target,
-				platform: 'browser',
-				define: getDefine( ! production ),
-				plugins: [ virtualEntryPlugin, reactExternalPlugin ],
-			} )
-		)
-	);
-
-	// Generate content hash from built file
-	const builtContent = await readFile(
-		path.join( outputDir, 'index.min.js' )
-	);
-	const version = createHash( 'sha256' )
-		.update( builtContent )
-		.digest( 'hex' )
-		.slice( 0, 20 );
-
-	// Generate asset file
-	const depsString = dependencies.map( ( d ) => `'${ d }'` ).join( ', ' );
-	const assetContent = `<?php return array('dependencies' => array(${ depsString }), 'version' => '${ version }');`;
-	await writeFile(
-		path.join( outputDir, 'index.min.asset.php' ),
-		assetContent
-	);
-
-	return {
-		handle,
-		path: `${ handle }/index`,
-		asset: `${ handle }/index.min.asset.php`,
-	};
-}
-
-/**
- * Bundle all configured vendor scripts.
- *
- * @return {Promise<Array>} Array of built script info objects.
- */
-async function bundleAllVendorScripts() {
-	if ( VENDOR_SCRIPTS.length === 0 ) {
-		return [];
-	}
-
-	console.log( '\n📦 Bundling vendor scripts...\n' );
-
-	const builtScripts = [];
-
-	for ( const vendorConfig of VENDOR_SCRIPTS ) {
-		try {
-			const startTime = Date.now();
-			const scriptInfo = await bundleVendorScript( vendorConfig );
-			const buildTime = Date.now() - startTime;
-			builtScripts.push( scriptInfo );
-			console.log(
-				`   ✔ Bundled vendor ${ vendorConfig.name } (${ buildTime }ms)`
-			);
-		} catch ( error ) {
-			console.error(
-				`   ✘ Failed to bundle vendor ${ vendorConfig.name }: ${ error.message }`
-			);
-		}
-	}
-
-	return builtScripts;
 }
 
 /**
@@ -1835,10 +1695,6 @@ async function buildAll( baseUrlExpression ) {
 			}
 		} )
 	);
-
-	// Bundle vendor scripts (e.g., React) from node_modules
-	const builtVendorScripts = await bundleAllVendorScripts();
-	scripts.push( ...builtVendorScripts );
 
 	// Build routes
 	await buildAllRoutes();
