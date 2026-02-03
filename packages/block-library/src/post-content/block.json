@@ -76,7 +76,8 @@
 				"width": true,
 				"style": true
 			}
-		}
+		},
+		"__experimentalDisableBlockOverlay": true
 	},
 	"style": "wp-block-post-content",
 	"editorStyle": "wp-block-post-content-editor"

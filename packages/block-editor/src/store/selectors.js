@@ -3060,11 +3060,9 @@ export const __unstableGetVisibleBlocks = createSelector(
 );
 
 export function __unstableHasActiveBlockOverlayActive( state, clientId ) {
-	// Prevent overlay on blocks with a non-default editing mode. If the mode is
-	// 'disabled' then the overlay is redundant since the block can't be
-	// selected. If the mode is 'contentOnly' then the overlay is redundant
-	// since there will be no controls to interact with once selected.
-	if ( getBlockEditingMode( state, clientId ) !== 'default' ) {
+	// Prevent overlay on blocks with a disabled editing mode. If the mode is
+	// 'disabled' then the overlay is redundant since the block can't be selected.
+	if ( getBlockEditingMode( state, clientId ) === 'disabled' ) {
 		return false;
 	}
 
