@@ -25,6 +25,7 @@ export const Tab = forwardRef< HTMLButtonElement, TabProps >( function Tab(
 		if ( validationContext && value !== undefined ) {
 			return validationContext.registerTab( value );
 		}
+		return undefined;
 	}, [ validationContext, value ] );
 
 	return (

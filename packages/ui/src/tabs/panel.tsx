@@ -21,6 +21,7 @@ export const Panel = forwardRef< HTMLDivElement, TabPanelProps >(
 			if ( validationContext && value !== undefined ) {
 				return validationContext.registerPanel( value );
 			}
+			return undefined;
 		}, [ validationContext, value ] );
 
 		return (
