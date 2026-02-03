@@ -29,6 +29,10 @@
 		"anchor": true,
 		"align": true,
 		"html": false,
+		"color": {
+			"background": true,
+			"text": true
+		},
 		"interactivity": {
 			"clientNavigation": true
 		},
@@ -37,7 +41,6 @@
 			"radius": true,
 			"style": true,
 			"width": true,
-			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
 				"color": false,
 				"radius": false,
@@ -58,6 +61,5 @@
 		}
 	},
 	"editorScript": "file:./index.js",
-	"editorStyle": "file:./editor.css",
 	"style": "file:./style.css"
 }

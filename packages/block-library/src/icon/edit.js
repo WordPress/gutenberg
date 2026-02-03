@@ -77,7 +77,9 @@ export function Edit( props ) {
 			// effect must not make history and should be preceded by
 			// `__unstableMarkNextChangeAsNotPersistent()`.
 			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { style: { dimensions: { width: '48px' } } } );
+			setAttributes( {
+				style: { dimensions: { width: '48px', ...style } },
+			} );
 		}
 	}, [ style, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 

@@ -33,7 +33,6 @@ function render_block_core_icon( $attributes ) {
 	// Process the markup.
 	$processor = new \WP_HTML_Tag_Processor( $icon['content'] );
 	$processor->next_tag( 'svg' );
-	$processor->set_attribute( 'class', 'wp-block-icon' );
 	if ( ! $label ) {
 		// Icon is decorative, hide it from screen readers.
 		$processor->set_attribute( 'aria-hidden', 'true' );
@@ -49,10 +48,12 @@ function render_block_core_icon( $attributes ) {
 	}
 
 	// Check for width and set default.
-	$processor->set_attribute( 'width', $attributes['style']['dimensions']['width'] ?? '48px' );
+	// $processor->set_attribute( 'width', $attributes['style']['dimensions']['width'] ?? '48px' );
 
 	// Return the updated SVG markup.
-	return $processor->get_updated_html();
+	$svg = $processor->get_updated_html();
+	
+	return '<div ' . get_block_wrapper_attributes(). '>' . $svg .'</div>';
 }
 
 

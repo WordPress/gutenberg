@@ -4,14 +4,10 @@
 
 /* Icon Block styles. */
 .wp-block-icon {
-	display: flex;
 	line-height: 0;
-
 	svg {
 		width: 100%;
 		height: 100%;
-		transition: transform 0.1s ease-in-out;
-		transform: rotate(var(--outermost--icon-block--transform-rotate, 0deg)) scaleX(var(--outermost--icon-block--transform-scale-x, 1)) scaleY(var(--outermost--icon-block--transform-scale-y, 1));
+		fill: currentColor;
 	}
-
 }
