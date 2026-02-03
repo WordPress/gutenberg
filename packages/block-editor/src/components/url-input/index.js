@@ -492,13 +492,25 @@ class URLInput extends Component {
 			return renderControl( controlProps, inputProps, loading );
 		}
 
+		const handleBlurCapture = ( event ) => {
+			// If a custom onBlur handler is provided, call it during capture phase.
+			// This allows the parent to control blur behavior (e.g., stop propagation
+			// to prevent validation from triggering on blur) before the event reaches
+			// ControlWithError's onBlur handler.
+			if ( this.props.onBlur ) {
+				this.props.onBlur( event );
+			}
+		};
+
 		return (
 			<BaseControl __nextHasNoMarginBottom { ...controlProps }>
-				<ValidatedInputControl
-					{ ...inputProps }
-					{ ...validationProps }
-					__next40pxDefaultSize
-				/>
+				<div onBlurCapture={ handleBlurCapture }>
+					<ValidatedInputControl
+						{ ...inputProps }
+						{ ...validationProps }
+						__next40pxDefaultSize
+					/>
+				</div>
 				{ loading && <Spinner /> }
 			</BaseControl>
 		);

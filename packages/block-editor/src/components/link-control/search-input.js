@@ -153,6 +153,11 @@ const LinkControlSearchInput = forwardRef(
 					// but we don't want to show the indicator as it looks cluttered
 					// in the link control UI.
 					markWhenOptional
+					// Prevent blur from triggering validation in ControlWithError.
+					// For LinkControl, validation should only occur on submit, not on blur.
+					onBlur={ ( event ) => {
+						event.stopPropagation();
+					} }
 					onSubmit={ ( suggestion, event ) => {
 						const hasSuggestion = suggestion || focusedSuggestion;
 
