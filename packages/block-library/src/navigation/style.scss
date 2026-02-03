@@ -851,3 +851,100 @@ button.wp-block-navigation-item__content {
 html.has-modal-open {
 	overflow: hidden;
 }
+
+/**
+ * Footer-rendered navigation overlay.
+ * This overlay is rendered in the footer via wp_footer hook.
+ * It's a generic container that can hold any blocks.
+ */
+.wp-block-navigation-overlay {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 100000;
+	overflow: auto;
+
+	// Default background and text color.
+	background-color: #fff;
+	color: #000;
+
+	// Low specificity so themes can override.
+	&:where(.has-background) {
+		// Use color classes when set.
+	}
+
+	&:where(.has-text-color) {
+		// Use color classes when set.
+	}
+
+	// Show overlay when open.
+	&.is-menu-open {
+		display: flex;
+		flex-direction: column;
+
+		// Animation.
+		@media not (prefers-reduced-motion) {
+			animation: overlay-menu__fade-in-animation 0.1s ease-out;
+			animation-fill-mode: forwards;
+		}
+	}
+
+	// Overlay content container.
+	.wp-block-navigation-overlay__content {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		// Add extra padding at top to accommodate close button.
+		padding-top: calc(2rem + #{$navigation-icon-size});
+		padding-right: clamp(1rem, var(--wp--style--root--padding-right), 20rem);
+		padding-bottom: clamp(1rem, var(--wp--style--root--padding-bottom), 20rem);
+		padding-left: clamp(1rem, var(--wp--style--root--padding-left), 20rem);
+	}
+
+	// Close button.
+	.wp-block-navigation__responsive-container-close {
+		position: absolute;
+		top: clamp(1rem, var(--wp--style--root--padding-top), 20rem);
+		right: clamp(1rem, var(--wp--style--root--padding-right), 20rem);
+		z-index: 2;
+		vertical-align: middle;
+		cursor: pointer;
+		color: currentColor;
+		background: transparent;
+		border: none;
+		margin: 0;
+		padding: 0;
+
+		svg {
+			fill: currentColor;
+			pointer-events: none;
+			display: block;
+			width: $navigation-icon-size;
+			height: $navigation-icon-size;
+		}
+	}
+
+	// Default content container (navigation links).
+	.wp-block-navigation-overlay__default-content {
+		display: flex;
+		flex-direction: column;
+		gap: var(--wp--style--block-gap, 2em);
+	}
+
+	// Custom content container (template part blocks).
+	.wp-block-navigation-overlay__custom-content {
+		display: block;
+	}
+}
+
+// Handle admin bar offset for footer overlay.
+.has-modal-open .admin-bar .wp-block-navigation-overlay.is-menu-open {
+	margin-top: $admin-bar-height-big;
+
+	@include break-medium() {
+		margin-top: $admin-bar-height;
+	}
+}
