@@ -67,7 +67,8 @@ const restrictedImports = [
 	},
 	{
 		name: '@base-ui/react',
-		message: 'Avoid using Base UI directly. Consider a new `@wordpress/ui` component instead.',
+		message:
+			'Avoid using Base UI directly. Consider a new `@wordpress/ui` component instead.',
 	},
 ];
 
@@ -453,6 +454,8 @@ module.exports = {
 			rules: {
 				'no-restricted-imports': [
 					'error',
+					// The following dependencies are meant to be consumed directly in the
+					// @wordpress/components package, hence why their imports are allowed.
 					{
 						paths: restrictedImports.filter(
 							( { name } ) =>
@@ -470,12 +473,12 @@ module.exports = {
 			rules: {
 				'no-restricted-imports': [
 					'error',
+					// The following dependencies are meant to be consumed directly in the
+					// @wordpress/ui package, hence why their imports are allowed.
 					{
 						paths: restrictedImports.filter(
 							( { name } ) =>
-								! [
-									'@base-ui/react',
-								].includes( name )
+								! [ '@base-ui/react' ].includes( name )
 						),
 					},
 				],
