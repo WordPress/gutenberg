@@ -79,6 +79,37 @@ const BLOCK_REMOVAL_RULES = [
 			}
 		},
 	},
+	{
+		// Dialog blocks.
+		// Warn when removing critical dialog components.
+		postTypes: [
+			'post',
+			'page',
+			'wp_template',
+			'wp_template_part',
+			'wp_block',
+		],
+		callback( removedBlocks ) {
+			// Check for dialog-trigger removal
+			const removedDialogTriggers = removedBlocks.filter(
+				( { name } ) => name === 'core/dialog-trigger'
+			);
+			if ( removedDialogTriggers.length ) {
+				return {
+					description: __(
+						'The Dialog Trigger block provides the clickable element that opens the dialog.'
+					),
+					warning: __(
+						'Without it, visitors will have no way to open the dialog.'
+					),
+					subtext: __(
+						'If you still want the dialog to appear, consider using the Auto Activation Timer feature in the Dialog Element settings.'
+					),
+					requireConfirmation: true,
+				};
+			}
+		},
+	},
 ];
 
 export default function BlockRemovalWarnings() {

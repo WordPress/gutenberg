@@ -74,7 +74,7 @@ export function InspectorPanel( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Dialog Settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						__nextHasNoMarginBottom
 						label={ __( 'Enable Deep Linking' ) }

@@ -49,6 +49,7 @@ export default function Edit( { context, clientId } ) {
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock: false,
+		__experimentalCaptureToolbars: true,
 	} );
 
 	const buttonLabel = useMemo(

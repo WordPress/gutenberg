@@ -128,6 +128,12 @@ function Edit( {
 		e.preventDefault();
 		closeDialog();
 	};
+	const onBackdropClick = ( event ) => {
+		// Only close if clicking directly on the dialog backdrop, not its children
+		if ( event.target === event.currentTarget ) {
+			closeDialog();
+		}
+	};
 
 	const blockProps = useBlockProps( {
 		ref: dialogElementRef,
@@ -157,7 +163,8 @@ function Edit( {
 				esc: onEscHandler,
 			} }
 		>
-			<dialog { ...blockProps }>
+			{ /* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions -- Keyboard support provided via KeyboardShortcuts ESC handler above */ }
+			<dialog { ...blockProps } onClick={ onBackdropClick }>
 				<StyleEngine attributes={ attributes } clientId={ clientId } />
 				<InspectorPanel
 					colors={ {

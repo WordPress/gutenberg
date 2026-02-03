@@ -324,7 +324,7 @@ undefined ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/b
 -	**Experimental:** true
 -	**Category:** media
 -	**Parent:** core/dialog
--	**Supports:** animations, color (background, enableContrastChecker, link, text), interactivity, layout (allowEditing), shadow, spacing (blockGap, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~
+-	**Supports:** animations, color (background, button, enableContrastChecker, heading, link, text), interactivity, layout (allowEditing), shadow, spacing (blockGap, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~
 -	**Attributes:** autoActivateOnRender, autoActivationTimer, backdropColor, customBackdropColor, dialogLabel, enableDeepLink
 
 ## Dialog Trigger
@@ -335,7 +335,8 @@ The content inside this block will act as the clickable 'trigger' to display the
 -	**Experimental:** true
 -	**Category:** media
 -	**Parent:** core/dialog
--	**Supports:** interactivity, spacing (margin, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~
+-	**Allowed Blocks:** core/buttons, core/paragraph, core/heading, core/image, core/group
+-	**Supports:** interactivity, spacing (margin, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~, ~~reusable~~
 
 ## Embed
 

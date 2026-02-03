@@ -8,10 +8,18 @@
 	"category": "media",
 	"__experimental": true,
 	"attributes": {},
+	"allowedBlocks": [
+		"core/buttons",
+		"core/paragraph",
+		"core/heading",
+		"core/image",
+		"core/group"
+	],
 	"supports": {
 		"html": false,
 		"align": false,
 		"inserter": false,
+		"reusable": false,
 		"spacing": {
 			"margin": [ "top", "bottom" ],
 			"padding": true,

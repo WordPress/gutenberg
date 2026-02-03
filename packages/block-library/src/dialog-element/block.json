@@ -34,11 +34,15 @@
 		"html": false,
 		"align": false,
 		"inserter": false,
+		"lock": false,
+		"reusable": false,
 		"animations": true,
 		"color": {
 			"background": true,
 			"text": true,
 			"link": true,
+			"heading": true,
+			"button": true,
 			"enableContrastChecker": true
 		},
 		"layout": {
