@@ -17,21 +17,23 @@ test.describe( 'Should iframe', () => {
 		// Initially, the editor should be iframed (all core blocks are v3).
 		await expect( iframe ).toBeVisible();
 
-		// Register a v2 block dynamically.
 		await page.evaluate( () => {
-			window.wp.blocks.registerBlockType( 'test/v2', {
-				apiVersion: 2,
-				title: 'Test V2 Block',
+			window.wp.blocks.registerBlockType( 'test/v1', {
+				apiVersion: 1,
+				title: 'Test V1 Block',
 				edit: () =>
-					window.wp.element.createElement( 'p', null, 'v2 block' ),
+					window.wp.element.createElement( 'p', null, 'v1 block' ),
 				save: () => null,
 			} );
 		} );
 
-		// Insert the v2 block.
-		await editor.insertBlock( { name: 'test/v2' } );
+		// The editor should still be iframed.
+		await expect( iframe ).toBeVisible();
+
+		// Insert the v1 block.
+		await editor.insertBlock( { name: 'test/v1' } );
 
 		// The editor should no longer be iframed.
-		await expect( iframe ).not.toBeVisible();
+		await expect( iframe ).toBeHidden();
 	} );
 } );
