@@ -1,27 +1,10 @@
 == Changelog ==
 
-= 22.5.0-rc.1 =
-
+= 22.5.0 =
 
 ## Changelog
 
-### Features
-
-#### Block Library
-- Feat/core tabs restructure. ([74412](https://github.com/WordPress/gutenberg/pull/74412))
-- Stabilise viewport based block visibility. ([74839](https://github.com/WordPress/gutenberg/pull/74839))
-
-#### Post Editor
-- Pattern editing: Stabilize and remove the experiment flag. ([74843](https://github.com/WordPress/gutenberg/pull/74843))
-
-
 ### Enhancements
-
-- Consolidate border tokens. ([74617](https://github.com/WordPress/gutenberg/pull/74617))
-- Create Block: Simplify blocks-manifest registration. ([74647](https://github.com/WordPress/gutenberg/pull/74647))
-- Design System: Add guidelines for destructive actions UX. ([74778](https://github.com/WordPress/gutenberg/pull/74778))
-- Remove legacy babel plugins. ([74916](https://github.com/WordPress/gutenberg/pull/74916))
-- Update: Preserve additional meta properties on client side abilities. ([73918](https://github.com/WordPress/gutenberg/pull/73918))
 
 #### Block Library
 - Add custom CSS support for individual block instances. ([73959](https://github.com/WordPress/gutenberg/pull/73959))
@@ -50,6 +33,8 @@
 - Navigation: Don't use a nav tag for navigation blocks inside overlays. ([74764](https://github.com/WordPress/gutenberg/pull/74764))
 - Paragraph: Add text column support. ([74656](https://github.com/WordPress/gutenberg/pull/74656))
 - Verse Block: Add new textAlign support. ([74724](https://github.com/WordPress/gutenberg/pull/74724))
+- Feat/core tabs restructure. ([74412](https://github.com/WordPress/gutenberg/pull/74412))
+- Stabilise viewport based block visibility. ([74839](https://github.com/WordPress/gutenberg/pull/74839))
 
 #### Block Editor
 - Block visibility supports: Refactor metadata to use nested structure. ([74602](https://github.com/WordPress/gutenberg/pull/74602))
@@ -59,6 +44,7 @@
 - List View support: Show full block titles. ([74798](https://github.com/WordPress/gutenberg/pull/74798))
 - MediaReplaceFlow: Move Reset option to bottom of menu. ([74882](https://github.com/WordPress/gutenberg/pull/74882))
 - Try storing global styles in static var in layout render. ([74828](https://github.com/WordPress/gutenberg/pull/74828))
+- Pattern editing: Stabilize and remove the experiment flag. ([74843](https://github.com/WordPress/gutenberg/pull/74843))
 
 #### DataViews
 - Add card form layout validation. ([74547](https://github.com/WordPress/gutenberg/pull/74547))
@@ -71,6 +57,8 @@
 - DataForm: Add `combobox` control. ([74891](https://github.com/WordPress/gutenberg/pull/74891))
 - UI: Add `Select` primitive. ([74661](https://github.com/WordPress/gutenberg/pull/74661))
 - Add `Tooltip` component to `@wordpress/ui`. ([74625](https://github.com/WordPress/gutenberg/pull/74625))
+- Consolidate border tokens. ([74617](https://github.com/WordPress/gutenberg/pull/74617))
+- Design System: Add guidelines for destructive actions UX. ([74778](https://github.com/WordPress/gutenberg/pull/74778))
 
 #### Post Editor
 - In-editor revisions (initial changes, without diffing). ([74771](https://github.com/WordPress/gutenberg/pull/74771))
@@ -78,6 +66,10 @@
 #### Icons
 - Add missing chevron-up-small icon. ([74607](https://github.com/WordPress/gutenberg/pull/74607))
 
+#### Collaboration
+- Real-time collaboration: Add default HTTP polling sync provider. ([74564](https://github.com/WordPress/gutenberg/pull/74564))
+- Real-time collaboration: Sync collections. ([74665](https://github.com/WordPress/gutenberg/pull/74665))
+- Real-time collaboration: Use relative positions in undo stack. ([74878](https://github.com/WordPress/gutenberg/pull/74878))
 
 ### Bug Fixes
 
@@ -115,6 +107,7 @@
 - Fix: Stretchy text issue when nested on flex containers. ([73652](https://github.com/WordPress/gutenberg/pull/73652))
 - List View: Ensure element exists in document before focusing. ([74613](https://github.com/WordPress/gutenberg/pull/74613))
 - Pattern Editing: Prevent double-click editing for template parts and synced patterns. ([74755](https://github.com/WordPress/gutenberg/pull/74755))
+- Calculate viewport based on iframe size in resizable editor. ([75156](https://github.com/WordPress/gutenberg/pull/75156))
 
 #### Collaboration
 - Real-time collaboration: Do not wrap persisted doc applied update in transaction. ([74753](https://github.com/WordPress/gutenberg/pull/74753))
@@ -145,7 +138,7 @@
 
 #### Global Styles
 - Core backport for Global Styles: Allow arbitrary CSS, protect from KSES mangling. ([74371](https://github.com/WordPress/gutenberg/pull/74371))
-
+- Remove comment about non-existing property. ([75003](https://github.com/WordPress/gutenberg/pull/75003))
 
 ### Performance
 
@@ -187,7 +180,8 @@
 - iAPI Docs: Add configuration to state/context guide. ([71355](https://github.com/WordPress/gutenberg/pull/71355))
 - iAPI: Don't use deprecated `data-wp-on-async` in documentation. ([72591](https://github.com/WordPress/gutenberg/pull/72591))
 - iAPI: Update deprecation warning for unique ID format. ([74580](https://github.com/WordPress/gutenberg/pull/74580))
-
+- Move grid manual mode sync into 7.1 folder. ([74792](https://github.com/WordPress/gutenberg/pull/74792))
+- Update: Preserve additional meta properties on client side abilities. ([73918](https://github.com/WordPress/gutenberg/pull/73918))
 
 ### Code Quality
 
@@ -236,18 +230,8 @@
 - Remove react-refresh bundling. ([74721](https://github.com/WordPress/gutenberg/pull/74721))
 - Storybook: Fix missing props from component stories. ([74807](https://github.com/WordPress/gutenberg/pull/74807))
 - wp-env: Add experimental WordPress Playground runtime support. ([74609](https://github.com/WordPress/gutenberg/pull/74609))
-
-
-### Various
-
-- Move grid manual mode sync into 7.1 folder. ([74792](https://github.com/WordPress/gutenberg/pull/74792))
-- Remove comment about non-existing property. ([75003](https://github.com/WordPress/gutenberg/pull/75003))
-
-#### Collaboration
-- Real-time collaboration: Add default HTTP polling sync provider. ([74564](https://github.com/WordPress/gutenberg/pull/74564))
-- Real-time collaboration: Sync collections. ([74665](https://github.com/WordPress/gutenberg/pull/74665))
-- Real-time collaboration: Use relative positions in undo stack. ([74878](https://github.com/WordPress/gutenberg/pull/74878))
-
+- Create Block: Simplify blocks-manifest registration. ([74647](https://github.com/WordPress/gutenberg/pull/74647))
+- Remove legacy babel plugins. ([74916](https://github.com/WordPress/gutenberg/pull/74916))
 
 ## First-time contributors
 
