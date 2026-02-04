@@ -60,5 +60,6 @@
 			"width": true
 		}
 	},
-	"style": "wp-block-icon"
+	"style": "wp-block-icon",
+	"editorStyle": "wp-block-icon-editor"
 }
