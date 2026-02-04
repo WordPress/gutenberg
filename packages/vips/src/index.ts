@@ -21,43 +21,6 @@ import type {
 } from './types';
 import { supportsAnimation, supportsInterlace, supportsQuality } from './utils';
 
-/**
- * Debug logging for VIPS operations.
- * Set to true to enable debug logging.
- */
-const DEBUG_ENABLED = false;
-
-function vipsLog( message: string, data?: Record< string, unknown > ): void {
-	if ( ! DEBUG_ENABLED ) {
-		return;
-	}
-	const timestamp = new Date().toISOString().split( 'T' )[ 1 ].slice( 0, -1 );
-	// eslint-disable-next-line no-console
-	console.log(
-		`%c${ timestamp } [VIPS]%c ${ message }`,
-		'color: #9C27B0; font-weight: bold;',
-		'color: inherit;'
-	);
-	if ( data && Object.keys( data ).length > 0 ) {
-		// eslint-disable-next-line no-console
-		console.log( '%c  └─ Details:', 'color: #888;', data );
-	}
-}
-
-function formatBytes( bytes: number ): string {
-	if ( bytes === 0 ) {
-		return '0 Bytes';
-	}
-	const k = 1024;
-	const sizes = [ 'Bytes', 'KB', 'MB', 'GB' ];
-	const i = Math.floor( Math.log( bytes ) / Math.log( k ) );
-	return (
-		parseFloat( ( bytes / Math.pow( k, i ) ).toFixed( 2 ) ) +
-		' ' +
-		sizes[ i ]
-	);
-}
-
 interface EmscriptenModule {
 	setAutoDeleteLater: ( autoDelete: boolean ) => void;
 	setDelayFunction: ( fn: ( fn: () => void ) => void ) => void;
@@ -76,9 +39,6 @@ async function getVips(): Promise< typeof Vips > {
 	if ( vipsInstance ) {
 		return vipsInstance;
 	}
-
-	vipsLog( 'Initializing VIPS WebAssembly module...' );
-	const startTime = performance.now();
 
 	try {
 		vipsInstance = await Vips( {
@@ -110,9 +70,6 @@ async function getVips(): Promise< typeof Vips > {
 		throw error;
 	}
 
-	const duration = Math.round( performance.now() - startTime );
-	vipsLog( `VIPS WebAssembly module initialized`, { durationMs: duration } );
-
 	return vipsInstance;
 }
 
@@ -133,12 +90,7 @@ const inProgressOperations = new Set< ItemId >();
  * @return boolean Whether any operation was cancelled.
  */
 export async function cancelOperations( id: ItemId ) {
-	const hadOperation = inProgressOperations.has( id );
-	const result = inProgressOperations.delete( id );
-	if ( hadOperation ) {
-		vipsLog( `Cancelled operations`, { itemId: id } );
-	}
-	return result;
+	return inProgressOperations.delete( id );
 }
 
 /**
@@ -161,16 +113,6 @@ export async function convertImageFormat(
 	interlaced = false
 ): Promise< ArrayBuffer | ArrayBufferLike > {
 	const ext = outputType.split( '/' )[ 1 ];
-
-	vipsLog( `Converting image format`, {
-		itemId: id,
-		inputType,
-		outputType,
-		inputSize: formatBytes( buffer.byteLength ),
-		quality: Math.round( quality * 100 ) + '%',
-		interlaced,
-	} );
-	const startTime = performance.now();
 
 	inProgressOperations.add( id );
 
@@ -213,50 +155,24 @@ export async function convertImageFormat(
 			saveOptions.effort = 2;
 		}
 
+		// Apply MozJPEG optimizations for JPEG output.
+		// optimize_coding enables optimal Huffman coding tables.
+		// quant_table 3 uses improved quantization tables similar to MozJPEG.
+		// These settings typically provide 10-15% smaller file sizes.
+		if ( 'image/jpeg' === outputType ) {
+			( saveOptions as SaveOptions< 'image/jpeg' > ).optimize_coding =
+				true;
+			( saveOptions as SaveOptions< 'image/jpeg' > ).quant_table = 3;
+		}
+
 		const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
-		const result = outBuffer.buffer;
 
 		cleanup?.();
 
-		return result;
+		return outBuffer.buffer;
 	} finally {
 		inProgressOperations.delete( id );
 	}
-
-	if ( interlaced && supportsInterlace( outputType ) ) {
-		saveOptions.interlace = interlaced;
-	}
-
-	// See https://github.com/swissspidy/media-experiments/issues/324.
-	if ( 'image/avif' === outputType ) {
-		saveOptions.effort = 2;
-	}
-
-	// Apply MozJPEG optimizations for JPEG output.
-	// optimize_coding enables optimal Huffman coding tables.
-	// quant_table 3 uses improved quantization tables similar to MozJPEG.
-	// These settings typically provide 10-15% smaller file sizes.
-	if ( 'image/jpeg' === outputType ) {
-		( saveOptions as SaveOptions< 'image/jpeg' > ).optimize_coding = true;
-		( saveOptions as SaveOptions< 'image/jpeg' > ).quant_table = 3;
-	}
-
-	const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
-	const result = outBuffer.buffer;
-
-	const duration = Math.round( performance.now() - startTime );
-	vipsLog( `Image format conversion completed`, {
-		itemId: id,
-		inputType,
-		outputType,
-		inputSize: formatBytes( buffer.byteLength ),
-		outputSize: formatBytes( result.byteLength ),
-		durationMs: duration,
-	} );
-
-	cleanup?.();
-
-	return result;
 }
 
 /**
@@ -304,17 +220,6 @@ export async function resizeImage(
 	originalHeight: number;
 } > {
 	const ext = type.split( '/' )[ 1 ];
-
-	vipsLog( `Resizing image`, {
-		itemId: id,
-		type,
-		inputSize: formatBytes( buffer.byteLength ),
-		targetWidth: resize.width,
-		targetHeight: resize.height,
-		crop: resize.crop || false,
-		smartCrop,
-	} );
-	const startTime = performance.now();
 
 	inProgressOperations.add( id );
 
@@ -485,119 +390,8 @@ export async function rotateImage(
 
 	inProgressOperations.add( id );
 
-	const duration = Math.round( performance.now() - startTime );
-	vipsLog( `Image resize completed`, {
-		itemId: id,
-		originalDimensions: `${ width }x${ pageHeight }`,
-		newDimensions: `${ result.width }x${ result.height }`,
-		inputSize: formatBytes( buffer.byteLength ),
-		outputSize: formatBytes( result.buffer.byteLength ),
-		durationMs: duration,
-	} );
-
-	// Only call after `image` is no longer being used.
-	cleanup?.();
-
-	return result;
-}
-
-/**
- * Rotates an image based on EXIF orientation value.
- *
- * EXIF orientation values:
- * 1 = Normal (no rotation needed)
- * 2 = Flipped horizontally
- * 3 = Rotated 180°
- * 4 = Flipped vertically
- * 5 = Rotated 90° CCW and flipped horizontally
- * 6 = Rotated 90° CW
- * 7 = Rotated 90° CW and flipped horizontally
- * 8 = Rotated 90° CCW
- *
- * @param id          Item ID.
- * @param buffer      Original file buffer.
- * @param type        Mime type.
- * @param orientation EXIF orientation value (1-8).
- * @return Rotated file data plus the new dimensions.
- */
-export async function rotateImage(
-	id: ItemId,
-	buffer: ArrayBuffer,
-	type: string,
-	orientation: number
-): Promise< {
-	buffer: ArrayBuffer | ArrayBufferLike;
-	width: number;
-	height: number;
-} > {
-	const ext = type.split( '/' )[ 1 ];
-
-	inProgressOperations.add( id );
-
-	const vips = await getVips();
-
-	let strOptions = '';
-	const loadOptions: LoadOptions< typeof type > = {};
-
-	// To ensure all frames are loaded in case the image is animated.
-	if ( supportsAnimation( type ) ) {
-		strOptions = '[n=-1]';
-		( loadOptions as LoadOptions< typeof type > ).n = -1;
-	}
-
-	let image = vips.Image.newFromBuffer( buffer, strOptions, loadOptions );
-
-	image.onProgress = () => {
-		if ( ! inProgressOperations.has( id ) ) {
-			image.kill = true;
-		}
-	};
-
-	// Apply transformation based on EXIF orientation.
-	// See: https://exiftool.org/TagNames/EXIF.html#:~:text=0x0112,Orientation
-	switch ( orientation ) {
-		case 2:
-			// Flipped horizontally
-			image = image.flipHor();
-			break;
-		case 3:
-			// Rotated 180°
-			image = image.rot180();
-			break;
-		case 4:
-			// Flipped vertically
-			image = image.flipVer();
-			break;
-		case 5:
-			// Rotated 90° CCW and flipped horizontally
-			image = image.rot270().flipHor();
-			break;
-		case 6:
-			// Rotated 90° CW
-			image = image.rot90();
-			break;
-		case 7:
-			// Rotated 90° CW and flipped horizontally
-			image = image.rot90().flipHor();
-			break;
-		case 8:
-			// Rotated 90° CCW
-			image = image.rot270();
-			break;
-		// case 1 and default: no transformation needed
-	}
-
-	const saveOptions: SaveOptions< typeof type > = {};
-	const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
-
-	const result = {
-		buffer: outBuffer.buffer,
-		width: image.width,
-		height: image.pageHeight,
-	};
-
-	// Only call after `image` is no longer being used.
-	cleanup?.();
+	try {
+		const vips = await getVips();
 
 		let strOptions = '';
 		const loadOptions: LoadOptions< typeof type > = {};
