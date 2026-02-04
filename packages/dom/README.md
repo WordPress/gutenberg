@@ -369,7 +369,7 @@ Strips scripts and on\* attributes from HTML.
 
 _Parameters_
 
--   _html_ `string`: HTML to sanitize.
+-   _html_ `string|RichTextData`: HTML to sanitize.
 
 _Returns_
 
