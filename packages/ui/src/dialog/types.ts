@@ -34,7 +34,7 @@ export interface PopupProps extends ComponentProps< 'div' > {
 	/**
 	 * Renders the dialog at a preset width.
 	 */
-	size?: 'small' | 'medium' | 'large';
+	size?: 'small' | 'medium' | 'large' | 'full';
 }
 export interface ActionProps extends ComponentProps< typeof Button > {
 	/**

@@ -68,6 +68,14 @@
 		&.is-large {
 			max-width: 840px;
 		}
+
+		&.is-full {
+			/*
+			 * Force full height (full width is already in default styles).
+			 * The max-{width,height} properties will make sure some padding is shown.
+			 */
+			height: 100vh;
+		}
 	}
 
 	.header {

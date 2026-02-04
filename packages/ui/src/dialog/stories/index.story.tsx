@@ -122,3 +122,11 @@ export const LargeSize: Story = {
 		children: <DialogWithSize size="large" />,
 	},
 };
+
+export const FullSize: Story = {
+	...Default,
+	args: {
+		...Default.args,
+		children: <DialogWithSize size="full" />,
+	},
+};
