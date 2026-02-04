@@ -24,8 +24,8 @@ import { useState, useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import HtmlRenderer from '../utils/html-renderer';
 import { IconPlaceholder, InserterModal } from './components';
-import { parseIcon } from './utils';
 import getIcons from './icons';
 
 /**
@@ -59,7 +59,7 @@ export function Edit( props ) {
 	useEffect( () => {
 		if ( icon && allIcons ) {
 			const selectedIcon = allIcons.find( ( { name } ) => name === icon );
-			setIconToDisplay( parseIcon( selectedIcon?.content ) );
+			setIconToDisplay( selectedIcon?.content );
 		}
 	}, [ allIcons, icon ] );
 
@@ -170,7 +170,7 @@ export function Edit( props ) {
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
 				{ icon ? (
-					iconToDisplay
+					<HtmlRenderer html={ iconToDisplay } />
 				) : (
 					<IconPlaceholder
 						setInserterOpen={ setInserterOpen }

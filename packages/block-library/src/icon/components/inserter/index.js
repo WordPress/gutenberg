@@ -9,13 +9,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { parseIcon } from '../../utils';
+import HtmlRenderer from '../../../utils/html-renderer';
 
 const fields = [
 	{
 		id: 'icon',
 		label: 'Icon',
-		render: ( { item } ) => <>{ parseIcon( item.content ) }</>,
+		render: ( { item } ) => <HtmlRenderer html={ item.content } />,
 		type: 'media',
 		enableHiding: false,
 	},
