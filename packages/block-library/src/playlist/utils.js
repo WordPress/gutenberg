@@ -103,6 +103,9 @@ export function getWaveformColors( element ) {
  *
  * @param {Object} options               - The options for the container.
  * @param {string} options.url           - The audio URL.
+ * @param {string} options.title         - The track title.
+ * @param {string} options.artist        - The track artist.
+ * @param {string} options.artwork       - The album artwork URL.
  * @param {string} options.waveformColor - The waveform bar color.
  * @param {string} options.progressColor - The progress indicator color.
  * @param {string} options.buttonColor   - The play button color.
@@ -110,6 +113,9 @@ export function getWaveformColors( element ) {
  */
 export function createWaveformContainer( {
 	url,
+	title,
+	artist,
+	artwork,
 	waveformColor,
 	progressColor,
 	buttonColor,
@@ -117,10 +123,20 @@ export function createWaveformContainer( {
 	const container = document.createElement( 'div' );
 	container.setAttribute( 'data-waveform-player', '' );
 	container.setAttribute( 'data-url', url );
+	container.setAttribute( 'data-height', '100' );
 	container.setAttribute( 'data-waveform-style', 'bars' );
 	container.setAttribute( 'data-waveform-color', waveformColor );
 	container.setAttribute( 'data-progress-color', progressColor );
 	container.setAttribute( 'data-button-color', buttonColor );
+	if ( title ) {
+		container.setAttribute( 'data-title', title );
+	}
+	if ( artist ) {
+		container.setAttribute( 'data-subtitle', artist );
+	}
+	if ( artwork ) {
+		container.setAttribute( 'data-artwork', artwork );
+	}
 	return container;
 }
 

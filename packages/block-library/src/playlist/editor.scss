@@ -1,3 +1,39 @@
+.wp-block-playlist {
+	li.block-list-appender.block-list-appender {
+		position: initial;
+		margin-top: var(--wp--preset--spacing--30, 1em);
+	}
+
+	// WaveformPlayer structural styles - needed in the editor iframe where
+	// the JS-imported CSS doesn't load.
+	.waveform-player {
+		width: 100%;
+		height: 100%;
+		font-family: inherit;
+		color: inherit;
+		line-height: 1.4;
+	}
+
+	.waveform-track {
+		display: flex;
+		align-items: center;
+		gap: 0;
+		position: relative;
+		width: 100%;
+		height: 100%;
+	}
+
+	// Make the waveform visualization fill the available space.
+	.waveform-container {
+		flex: 1 1 auto;
+
+		// Override WaveformPlayer's inline width style on the canvas.
+		canvas {
+			width: 100% !important;
+		}
+	}
+}
+
 .wp-block-playlist__waveform-color-controls {
 	display: grid;
 	grid-column: 1 / -1;
