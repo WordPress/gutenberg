@@ -10,12 +10,6 @@ export interface RootProps
 		'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
 	> {
 	/**
-	 * The title text for the dialog. This is required to be a string to ensure
-	 * accessible labeling of the dialog.
-	 */
-	title: string;
-
-	/**
 	 * The content to be rendered inside the component.
 	 */
 	children?: ReactNode;
@@ -60,7 +54,13 @@ export interface HeaderProps extends ComponentProps< 'div' > {
 	children?: ReactNode;
 }
 
-export type HeadingProps = ComponentProps< 'div' >;
+export interface TitleProps extends ComponentProps< 'h2' > {
+	/**
+	 * The title content to be rendered. This serves as both the visible
+	 * heading and the accessible label for the dialog.
+	 */
+	children: ReactNode;
+}
 
 export interface CloseIconProps
 	extends Omit<

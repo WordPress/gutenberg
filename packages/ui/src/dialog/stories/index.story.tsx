@@ -9,18 +9,17 @@ const meta: Meta< typeof Dialog.Root > = {
 		'Dialog.Trigger': Dialog.Trigger,
 		'Dialog.Popup': Dialog.Popup,
 		'Dialog.Header': Dialog.Header,
-		'Dialog.Heading': Dialog.Heading,
+		'Dialog.Title': Dialog.Title,
 		'Dialog.CloseIcon': Dialog.CloseIcon,
 		'Dialog.Action': Dialog.Action,
 		'Dialog.Footer': Dialog.Footer,
-	},
-	args: {
-		title: 'Dialog Title',
 	},
 	parameters: {
 		docs: {
 			description: {
 				component: `
+Dialog is a popup that opens on top of the entire page. Every dialog must include a \`Dialog.Title\` component for accessibility — it serves as both the visible heading and the accessible label for the dialog.
+
 When using the Dialog component, make sure to always include a visible close button, either \`Dialog.CloseIcon\` or a clear dismissing action button. If your dialog has a "Cancel" button in the footer, the close icon may be redundant and create confusion about what clicking "X" means.
 
 Use \`Dialog.CloseIcon\` for informational dialogs where dismissing is safe and expected. For dialogs requiring explicit user choice (especially destructive actions), omit the close icon and rely on footer action buttons like "Cancel" and "Confirm" instead.
@@ -35,15 +34,17 @@ type Story = StoryObj< typeof Dialog.Root >;
 
 function DialogWithSize( {
 	size,
+	title = 'Welcome',
 }: {
 	size?: ComponentProps< typeof Dialog.Popup >[ 'size' ];
+	title?: string;
 } ) {
 	return (
 		<>
 			<Dialog.Trigger>Open Dialog</Dialog.Trigger>
 			<Dialog.Popup size={ size }>
 				<Dialog.Header>
-					<Dialog.Heading />
+					<Dialog.Title>{ title }</Dialog.Title>
 					<Dialog.CloseIcon />
 				</Dialog.Header>
 				<p>
@@ -65,7 +66,6 @@ function DialogWithSize( {
  */
 export const Default: Story = {
 	args: {
-		title: 'Welcome',
 		children: <DialogWithSize />,
 	},
 };
@@ -77,13 +77,12 @@ export const Default: Story = {
  */
 export const ConfirmDialog: Story = {
 	args: {
-		title: 'Confirm Action',
 		children: (
 			<>
 				<Dialog.Trigger>Confirm Action</Dialog.Trigger>
 				<Dialog.Popup>
 					<Dialog.Header>
-						<Dialog.Heading />
+						<Dialog.Title>Confirm Action</Dialog.Title>
 					</Dialog.Header>
 					<p>
 						Are you sure you want to proceed? This action cannot be
@@ -100,33 +99,25 @@ export const ConfirmDialog: Story = {
 };
 
 export const SmallSize: Story = {
-	...Default,
 	args: {
-		...Default.args,
 		children: <DialogWithSize size="small" />,
 	},
 };
 
 export const MediumSize: Story = {
-	...Default,
 	args: {
-		...Default.args,
 		children: <DialogWithSize size="medium" />,
 	},
 };
 
 export const LargeSize: Story = {
-	...Default,
 	args: {
-		...Default.args,
 		children: <DialogWithSize size="large" />,
 	},
 };
 
 export const FullSize: Story = {
-	...Default,
 	args: {
-		...Default.args,
 		children: <DialogWithSize size="full" />,
 	},
 };

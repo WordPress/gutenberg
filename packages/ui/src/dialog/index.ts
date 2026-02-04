@@ -2,9 +2,9 @@ import { Action } from './action';
 import { CloseIcon } from './close-icon';
 import { Footer } from './footer';
 import { Header } from './header';
-import { Heading } from './heading';
 import { Popup } from './popup';
 import { Root } from './root';
+import { Title } from './title';
 import { Trigger } from './trigger';
 
-export { Action, CloseIcon, Footer, Header, Heading, Popup, Root, Trigger };
+export { Action, CloseIcon, Footer, Header, Popup, Root, Title, Trigger };
