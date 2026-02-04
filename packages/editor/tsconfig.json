@@ -35,6 +35,7 @@
 		{ "path": "../private-apis" },
 		{ "path": "../rich-text" },
 		{ "path": "../url" },
+		{ "path": "../upload-media" },
 		{ "path": "../warning" },
 		{ "path": "../wordcount" }
 	]
