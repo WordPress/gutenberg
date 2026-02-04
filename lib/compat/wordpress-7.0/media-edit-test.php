@@ -41,23 +41,23 @@ function gutenberg_register_media_edit_test_rest_fields() {
 							'context' => array( 'view', 'edit' ),
 							'default' => 0,
 						),
-					'get_callback'    => function ( $object ) use ( $field_name, $is_array ) {
-						if ( ! isset( $object['id'] ) ) {
+					'get_callback'    => function ( $post ) use ( $field_name, $is_array ) {
+						if ( ! isset( $post['id'] ) ) {
 							return $is_array ? array() : 0;
 						}
-						$meta = get_post_meta( $object['id'], $field_name, true );
+						$meta = get_post_meta( $post['id'], $field_name, true );
 						if ( $is_array ) {
 							return ( empty( $meta ) || ! is_array( $meta ) ) ? array() : array_map( 'intval', $meta );
 						}
 						return $meta ? intval( $meta ) : 0;
 					},
-					'update_callback' => function ( $value, $object ) use ( $field_name, $is_array ) {
+					'update_callback' => function ( $value, $post ) use ( $field_name, $is_array ) {
 						if ( $is_array ) {
 							$value = is_array( $value ) ? array_map( 'intval', $value ) : ( $value ? array( intval( $value ) ) : array() );
 						} else {
 							$value = intval( $value );
 						}
-						update_post_meta( $object->ID, $field_name, $value );
+						update_post_meta( $post->ID, $field_name, $value );
 						return true;
 					},
 				)
