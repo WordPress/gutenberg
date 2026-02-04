@@ -179,7 +179,7 @@ describe( 'Controls', () => {
 
 			expect(
 				screen.getByText(
-					'This link is to a draft page, and will not appear on your site until it is published.'
+					'This link is to a draft page and will not appear on your site until the page is published.'
 				)
 			).toBeInTheDocument();
 		} );
@@ -201,7 +201,7 @@ describe( 'Controls', () => {
 
 			expect(
 				screen.getByText(
-					'This link is to a draft post, and will not appear on your site until it is published.'
+					'This link is to a draft post and will not appear on your site until the post is published.'
 				)
 			).toBeInTheDocument();
 		} );

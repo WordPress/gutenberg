@@ -90,9 +90,12 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	let helpText = '';
 
 	if ( isInvalid || ( hasUrlBinding && ! isBoundEntityAvailable ) ) {
-		helpText = InvalidLinkHelpText();
+		// Show invalid link help text for:
+		// 1. Invalid post-type links (trashed/deleted posts/pages) - via useIsInvalidLink
+		// 2. Missing bound taxonomy entities (deleted categories/tags) - useIsInvalidLink only checks post-types
+		helpText = getInvalidLinkHelpText();
 	} else if ( isDraft ) {
-		helpText = DraftHelpText( {
+		helpText = getDraftHelpText( {
 			type: attributes.type,
 			kind: attributes.kind,
 		} );
@@ -251,30 +254,30 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	);
 }
 /**
- * Returns help text for invalid or draft navigation links.
+ * Returns help text for invalid links.
  *
  * @return {string} Error help text string (empty string if valid).
  */
-export function InvalidLinkHelpText() {
+export function getInvalidLinkHelpText() {
 	return __(
 		'This link is invalid and will not appear on your site. Please update the link.'
 	);
 }
 
 /**
- * Component to display draft help text
+ * Returns the help text for links to draft entities
  *
- * @param {Object} props      - Component props
+ * @param {Object} props      - Function props
  * @param {string} props.type - The entity type
  * @param {string} props.kind - The entity kind
- * @return {JSX.Element} Draft help text component
+ * @return {string} Draft help text
  */
-function DraftHelpText( { type, kind } ) {
+function getDraftHelpText( { type, kind } ) {
 	const entityType = getEntityTypeName( type, kind );
 	return sprintf(
-		/* translators: %s is the entity type (e.g., "page", "post", "category") */
+		/* translators: %1$s is the entity type (e.g., "page", "post", "category") */
 		__(
-			'This link is to a draft %s, and will not appear on your site until it is published.'
+			'This link is to a draft %1$s and will not appear on your site until the %1$s is published.'
 		),
 		entityType
 	);

@@ -5,7 +5,7 @@
  * to reduce code duplication and ensure consistent behavior.
  */
 
-export { Controls, InvalidLinkHelpText } from './controls';
+export { Controls, getInvalidLinkHelpText } from './controls';
 export { updateAttributes } from './update-attributes';
 export {
 	useEntityBinding,

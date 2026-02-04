@@ -37,7 +37,7 @@ import {
 	Controls,
 	LinkUI,
 	useEntityBinding,
-	InvalidLinkHelpText,
+	getInvalidLinkHelpText,
 	useHandleLinkChange,
 	useIsInvalidLink,
 	InvalidDraftDisplay,
@@ -366,6 +366,7 @@ export default function NavigationLinkEdit( {
 	} );
 
 	const missingText = getMissingText( type );
+	const invalidLinkHelpText = getInvalidLinkHelpText();
 
 	return (
 		<>
@@ -400,7 +401,7 @@ export default function NavigationLinkEdit( {
 			<div { ...blockProps }>
 				{ hasMissingEntity && (
 					<VisuallyHidden id={ missingEntityDescriptionId }>
-						<InvalidLinkHelpText />
+						{ invalidLinkHelpText }
 					</VisuallyHidden>
 				) }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
