@@ -144,7 +144,7 @@ export function Edit( props ) {
 						isShownByDefault
 						hasValue={ () => !! ariaLabel }
 						onDeselect={ () =>
-							setAttributes( { label: undefined } )
+							setAttributes( { ariaLabel: undefined } )
 						}
 					>
 						<TextControl
