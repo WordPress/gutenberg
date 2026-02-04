@@ -23,8 +23,9 @@ import { useState, useEffect } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { IconPlaceholder, InserterModal } from './components';
-import { parseIcon, useToolsPanelDropdownMenuProps } from './utils';
+import { parseIcon } from './utils';
 import getIcons from './icons';
 
 /**
