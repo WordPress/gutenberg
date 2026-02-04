@@ -75,6 +75,10 @@ module.exports = {
 };
 EOF
 
+# Set NODE_PATH so wp-scripts can find its dependencies (e.g., webpack) which
+# may not be hoisted to root node_modules with nested install strategies.
+export NODE_PATH="../packages/scripts/node_modules:$NODE_PATH"
+
 status "Formatting files..."
 ../node_modules/.bin/wp-scripts format
 
