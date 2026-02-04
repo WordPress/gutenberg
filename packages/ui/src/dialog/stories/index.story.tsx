@@ -33,12 +33,6 @@ export default meta;
 
 type Story = StoryObj< typeof Dialog.Root >;
 
-const ThemedParagraph = ( { children }: { children: React.ReactNode } ) => (
-	<p style={ { color: 'var( --wpds-color-fg-content-neutral )' } }>
-		{ children }
-	</p>
-);
-
 function DialogWithSize( {
 	size,
 }: {
@@ -52,11 +46,11 @@ function DialogWithSize( {
 					<Dialog.Heading />
 					<Dialog.CloseIcon />
 				</Dialog.Header>
-				<ThemedParagraph>
+				<p>
 					This dialog demonstrates best practices for informational
 					dialogs. It includes a close icon because dismissing it is
 					safe and expected.
-				</ThemedParagraph>
+				</p>
 				<Dialog.Footer>
 					<Dialog.Action>Got it</Dialog.Action>
 				</Dialog.Footer>
@@ -91,10 +85,10 @@ export const ConfirmDialog: Story = {
 					<Dialog.Header>
 						<Dialog.Heading />
 					</Dialog.Header>
-					<ThemedParagraph>
+					<p>
 						Are you sure you want to proceed? This action cannot be
 						undone.
-					</ThemedParagraph>
+					</p>
 					<Dialog.Footer>
 						<Dialog.Action variant="outline">Cancel</Dialog.Action>
 						<Dialog.Action>Confirm</Dialog.Action>
