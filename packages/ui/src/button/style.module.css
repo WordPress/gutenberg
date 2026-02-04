@@ -17,7 +17,7 @@
 		--wp-ui-button-foreground-color: var(--wpds-color-fg-interactive-brand-strong);
 		--wp-ui-button-foreground-color-active: var(--wpds-color-fg-interactive-brand-strong-active);
 		--wp-ui-button-foreground-color-disabled: var(--wpds-color-fg-interactive-neutral-strong-disabled);
-		--wp-ui-button-padding-inline: calc(3 * var(--wpds-dimension-base)); /* TODO: Create new interactive padding tokens */
+		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-md);
 		--wp-ui-button-height: 40px;
 		--wp-ui-button-aspect-ratio: auto; /* Useful for overrides such as icon buttons */
 		--wp-ui-button-font-size: var(--wpds-font-size-md);
@@ -33,7 +33,7 @@
 		display: inline-flex;
 		justify-content: center;
 		align-items: center;
-		gap: calc(2 * var(--wpds-dimension-base)); /* TODO: Consider new interactive/control gap tokens */
+		gap: var(--wpds-dimension-gap-sm);
 		aspect-ratio: var(--wp-ui-button-aspect-ratio);
 		min-width: var(--wp-ui-button-min-width);
 		height: var(--wp-ui-button-height);
@@ -121,7 +121,7 @@
 	}
 
 	.is-small {
-		--wp-ui-button-padding-inline: calc(2 * var(--wpds-dimension-base)); /* TODO: Create new interactive padding tokens */
+		--wp-ui-button-padding-inline: var(--wpds-dimension-padding-sm);
 		--wp-ui-button-height: 24px;
 	}
 

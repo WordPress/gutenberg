@@ -1,0 +1,31 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-collaborators-presence__avatar {
+	background-image: var(--avatar-url);
+	background-size: cover;
+	background-position: center;
+	border-radius: $grid-unit-05 + 2;
+	border-width: 1.5px;
+	border-style: solid;
+	border-color: $gray-300;
+	font-size: 0;
+
+	&--small {
+		width: $button-size-small;
+		height: $button-size-small;
+		border-radius: $grid-unit-05 + 2;
+	}
+
+	&--medium {
+		width: $button-size-compact;
+		height: $button-size-compact;
+		border-radius: $grid-unit-10;
+	}
+
+	&--with-color-border {
+		border-color: var(--user-color);
+		box-shadow: inset 0 0 0 1px rgba($white, 0.7);
+		background-clip: padding-box;
+	}
+}
