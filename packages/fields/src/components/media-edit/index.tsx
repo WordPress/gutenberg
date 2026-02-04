@@ -59,6 +59,13 @@ type BlobItem = {
 	alt_text?: string;
 };
 
+function normalizeValue( value: number | number[] | undefined ): number[] {
+	if ( Array.isArray( value ) ) {
+		return value;
+	}
+	return value ? [ value ] : [];
+}
+
 /**
  * Conditional Media component that uses MediaUploadModal when experiment is enabled,
  * otherwise falls back to media-utils MediaUpload.
@@ -225,6 +232,7 @@ interface MediaEditAttachmentsProps {
 	open: () => void;
 	onFilesDrop: ( files: File[], attachmentId?: number ) => void;
 	isUploading: boolean;
+	setTargetItemId: ( id?: number ) => void;
 }
 
 function ExpandedMediaEditAttachments( {
@@ -235,6 +243,7 @@ function ExpandedMediaEditAttachments( {
 	open,
 	onFilesDrop,
 	isUploading,
+	setTargetItemId,
 }: MediaEditAttachmentsProps ) {
 	return (
 		<div
@@ -256,7 +265,10 @@ function ExpandedMediaEditAttachments( {
 						} ) }
 					>
 						<MediaPickerButton
-							open={ open }
+							open={ () => {
+								setTargetItemId( attachment.id as number );
+								open();
+							} }
 							label={ __( 'Replace' ) }
 							showTooltip
 							onFilesDrop={ onFilesDrop }
@@ -320,7 +332,10 @@ function ExpandedMediaEditAttachments( {
 			} ) }
 			{ ( multiple || ! allItems?.length ) && (
 				<MediaEditPlaceholder
-					open={ open }
+					open={ () => {
+						setTargetItemId( undefined );
+						open();
+					} }
 					label={ addButtonLabel }
 					onFilesDrop={ onFilesDrop }
 					isUploading={ isUploading }
@@ -338,6 +353,7 @@ function CompactMediaEditAttachments( {
 	open,
 	onFilesDrop,
 	isUploading,
+	setTargetItemId,
 }: MediaEditAttachmentsProps ) {
 	return (
 		<>
@@ -351,7 +367,12 @@ function CompactMediaEditAttachments( {
 								className="fields__media-edit-compact"
 							>
 								<MediaPickerButton
-									open={ open }
+									open={ () => {
+										setTargetItemId(
+											attachment.id as number
+										);
+										open();
+									} }
 									label={ __( 'Replace' ) }
 									showTooltip
 									onFilesDrop={ onFilesDrop }
@@ -396,7 +417,10 @@ function CompactMediaEditAttachments( {
 			) }
 			{ ( multiple || ! allItems?.length ) && (
 				<MediaEditPlaceholder
-					open={ open }
+					open={ () => {
+						setTargetItemId( undefined );
+						open();
+					} }
 					label={ addButtonLabel }
 					onFilesDrop={ onFilesDrop }
 					isUploading={ isUploading }
@@ -477,17 +501,18 @@ export default function MediaEdit< Item >( {
 			if ( ! value ) {
 				return null;
 			}
-			const normalizedValue = Array.isArray( value ) ? value : [ value ];
+			const normalizedValue = normalizeValue( value );
 			const { getEntityRecords } = select( coreStore );
 			return getEntityRecords( 'postType', 'attachment', {
 				include: normalizedValue,
+				orderby: 'include',
 			} ) as Attachment< 'view' >[] | null;
 		},
 		[ value ]
 	);
 	const { createErrorNotice } = useDispatch( noticesStore );
 	// Support one upload action at a time for now.
-	const [ replacementId, setReplacementId ] = useState< number >();
+	const [ targetItemId, setTargetItemId ] = useState< number >();
 	const [ blobs, setBlobs ] = useState< string[] >( [] );
 	const onChangeControl = useCallback(
 		( newValue: number | number[] | undefined ) =>
@@ -496,7 +521,7 @@ export default function MediaEdit< Item >( {
 	);
 	const removeItem = useCallback(
 		( itemId: number ) => {
-			const currentIds = Array.isArray( value ) ? value : [ value ];
+			const currentIds = normalizeValue( value );
 			const newIds = currentIds.filter( ( id ) => id !== itemId );
 			// Mark as touched to immediately show any validation error.
 			setIsTouched( true );
@@ -505,57 +530,46 @@ export default function MediaEdit< Item >( {
 		[ value, onChangeControl ]
 	);
 	const onFilesDrop = useCallback(
-		( files: File[], _replacementId?: number ) => {
+		( files: File[], _targetItemId?: number ) => {
+			setTargetItemId( _targetItemId );
 			uploadMedia( {
 				allowedTypes: allowedTypes?.length ? allowedTypes : undefined,
 				filesList: files,
 				onFileChange( uploadedMedia: any[] ) {
-					setReplacementId( _replacementId );
-					const { blobItems, uploadedItems } = uploadedMedia.reduce(
-						( accumulator, item ) => {
-							if ( isBlobURL( item.url ) ) {
-								accumulator.blobItems.push( item.url );
-							} else {
-								accumulator.uploadedItems.push( item.id );
-							}
-							return accumulator;
-						},
-						{
-							blobItems: [] as string[],
-							uploadedItems: [] as number[],
-						}
+					const blobUrls = uploadedMedia
+						.filter( ( item ) => isBlobURL( item.url ) )
+						.map( ( item ) => item.url );
+					setBlobs( blobUrls );
+					// Wait for all uploads to complete before updating value.
+					if ( !! blobUrls.length ) {
+						return;
+					}
+					const uploadedIds = uploadedMedia.map(
+						( item ) => item.id
 					);
-					setBlobs( blobItems );
-					// If all uploads are complete reset the replacementId.
-					if ( uploadedItems.length === uploadedMedia.length ) {
-						setReplacementId( undefined );
-					}
-					if ( ! uploadedItems.length ) {
-						return;
-					}
 					if ( ! multiple ) {
-						onChangeControl( uploadedItems[ 0 ] );
+						onChangeControl( uploadedIds[ 0 ] );
+						setTargetItemId( undefined );
 						return;
 					}
-					if ( ! value ) {
-						onChangeControl( uploadedItems );
-						return;
+					const currentValue = normalizeValue( value );
+					// Dropped on placeholder: append new items.
+					if ( _targetItemId === undefined ) {
+						onChangeControl( [ ...currentValue, ...uploadedIds ] );
+					} else {
+						// Dropped on existing item: insert at that position.
+						const newValue = [ ...currentValue ];
+						newValue.splice(
+							currentValue.indexOf( _targetItemId ),
+							1,
+							...uploadedIds
+						);
+						onChangeControl( newValue );
 					}
-					const normalizedValue = Array.isArray( value )
-						? value
-						: [ value ];
-					const newIds = [
-						...( _replacementId
-							? normalizedValue.filter(
-									( id: any ) => id !== _replacementId
-							  )
-							: normalizedValue ),
-						...uploadedItems,
-					];
-					onChangeControl( newIds );
+					setTargetItemId( undefined );
 				},
 				onError( error: Error ) {
-					setReplacementId( undefined );
+					setTargetItemId( undefined );
 					setBlobs( [] );
 					createErrorNotice( error.message, { type: 'snackbar' } );
 				},
@@ -580,21 +594,17 @@ export default function MediaEdit< Item >( {
 			source_url: url,
 			mime_type: getBlobTypeByURL( url ),
 		} ) );
-		const replacementIndex = items.findIndex(
-			( a ) => a.id === replacementId
-		);
-		// Place blobs at the replacement index, when files
-		// dropped in existing media item.
-		if ( replacementIndex !== -1 ) {
-			return [
-				...items.slice( 0, replacementIndex ),
-				...blobItems,
-				...items.slice( replacementIndex + 1 ),
-			];
+		if ( targetItemId !== undefined ) {
+			// When files dropped in existing media item, place the blobs at that item.
+			const targetIndex = items.findIndex(
+				( a ) => a.id === targetItemId
+			);
+			items.splice( targetIndex, 1, ...blobItems );
+		} else {
+			items.push( ...blobItems );
 		}
-		items.push( ...blobItems );
 		return items;
-	}, [ attachments, replacementId, blobs ] );
+	}, [ attachments, targetItemId, blobs ] );
 	useEffect( () => {
 		if ( ! isTouched ) {
 			return;
@@ -640,15 +650,70 @@ export default function MediaEdit< Item >( {
 		<div onBlur={ onBlur }>
 			<fieldset className="fields__media-edit" data-field-id={ field.id }>
 				<ConditionalMediaUpload
+					/*
+					 * The media picker returns selected items in its own order,
+					 * not preserving our existing order. We manually handle the
+					 * order to keep previously selected items in their original
+					 * positions and append newly selected items at the end (or
+					 * at a specific position when replacing an existing item).
+					 */
 					onSelect={ ( selectedMedia: any ) => {
-						if ( multiple ) {
-							const newIds = Array.isArray( selectedMedia )
-								? selectedMedia.map( ( m: any ) => m.id )
-								: [ selectedMedia.id ];
-							onChangeControl( newIds );
-						} else {
+						if ( ! multiple ) {
 							onChangeControl( selectedMedia.id );
+							setTargetItemId( undefined );
+							return;
 						}
+						const newIds = Array.isArray( selectedMedia )
+							? selectedMedia.map( ( m: any ) => m.id )
+							: [ selectedMedia.id ];
+						const currentValue = normalizeValue( value );
+						if ( ! currentValue.length ) {
+							onChangeControl( newIds );
+						} else if ( targetItemId === undefined ) {
+							// Placeholder clicked: keep existing items that are
+							// still selected, then append newly selected items.
+							const existingItems = currentValue.filter( ( id ) =>
+								newIds.includes( id )
+							);
+							const newItems = newIds.filter(
+								( id ) => ! currentValue.includes( id )
+							);
+							onChangeControl( [
+								...existingItems,
+								...newItems,
+							] );
+						} else {
+							// Existing item clicked (`replace`): insert newly
+							// selected items at that position and remove any
+							// other items that were deselected.
+							const isClickedItemStillSelected =
+								newIds.includes( targetItemId );
+							const newItems = newIds.filter(
+								( id ) => ! currentValue.includes( id )
+							);
+							// Keep only items that are still selected.
+							const keptItems = currentValue.filter( ( id ) =>
+								newIds.includes( id )
+							);
+							// Find insert position based on where target was.
+							const originalTargetIndex =
+								currentValue.indexOf( targetItemId );
+							const insertIndex = currentValue
+								.slice( 0, originalTargetIndex )
+								.filter( ( id ) =>
+									newIds.includes( id )
+								).length;
+							// Insert new items at target position.
+							const newValue = [ ...keptItems ];
+							newValue.splice(
+								insertIndex +
+									( isClickedItemStillSelected ? 1 : 0 ),
+								0,
+								...newItems
+							);
+							onChangeControl( newValue );
+						}
+						setTargetItemId( undefined );
 					} }
 					allowedTypes={ allowedTypes }
 					value={ value }
@@ -678,6 +743,7 @@ export default function MediaEdit< Item >( {
 									open={ open }
 									onFilesDrop={ onFilesDrop }
 									isUploading={ !! blobs.length }
+									setTargetItemId={ setTargetItemId }
 								/>
 								{ field.description && (
 									<Text variant="muted">
