@@ -93,6 +93,8 @@ import * as pattern from './pattern';
 import * as pageList from './page-list';
 import * as pageListItem from './page-list-item';
 import * as paragraph from './paragraph';
+import * as playlist from './playlist';
+import * as playlistTrack from './playlist-track';
 import * as postAuthor from './post-author';
 import * as postAuthorName from './post-author-name';
 import * as postAuthorBiography from './post-author-biography';
@@ -133,9 +135,12 @@ import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
 import * as tab from './tab';
+import * as tabPanel from './tab-panel';
 import * as table from './table';
 import * as tableOfContents from './table-of-contents';
 import * as tabs from './tabs';
+import * as tabsMenu from './tabs-menu';
+import * as tabsMenuItem from './tabs-menu-item';
 import * as tagCloud from './tag-cloud';
 import * as templatePart from './template-part';
 import * as termCount from './term-count';
@@ -274,6 +279,9 @@ const getAllBlocks = () => {
 	if ( window?.__experimentalEnableBlockExperiments ) {
 		blocks.push( tab );
 		blocks.push( tabs );
+		blocks.push( tabsMenu );
+		blocks.push( tabsMenuItem );
+		blocks.push( tabPanel );
 	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
@@ -285,6 +293,11 @@ const getAllBlocks = () => {
 
 	if ( window?.__experimentalNavigationOverlays ) {
 		blocks.push( navigationOverlayClose );
+	}
+
+	if ( window?.__experimentalEnableBlockExperiments ) {
+		blocks.push( playlist );
+		blocks.push( playlistTrack );
 	}
 
 	// When in a WordPress context, conditionally

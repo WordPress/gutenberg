@@ -43,6 +43,7 @@ import {
 	InvalidDraftDisplay,
 	useEnableLinkStatusValidation,
 	useIsDraggingWithin,
+	selectLabelText,
 } from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
@@ -243,7 +244,7 @@ export default function NavigationLinkEdit( {
 		// If the label looks like a URL, focus and select the label text.
 		if ( isURL( prependHTTP( label ) ) && /^.+\.[a-z]+/.test( label ) ) {
 			// Focus and select the label text.
-			selectLabelText();
+			selectLabelText( ref );
 		} else {
 			// If the link was just created, we want to select the block so the inspector controls
 			// are accurate.
@@ -266,21 +267,6 @@ export default function NavigationLinkEdit( {
 			}
 		}
 	}, [ url, isLinkOpen, isNewLink, label ] );
-
-	/**
-	 * Focus the Link label text and select it.
-	 */
-	function selectLabelText() {
-		ref.current.focus();
-		const { ownerDocument } = ref.current;
-		const { defaultView } = ownerDocument;
-		const selection = defaultView.getSelection();
-		const range = ownerDocument.createRange();
-		// Get the range of the current ref contents so we can add this range to the selection.
-		range.selectNodeContents( ref.current );
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}
 
 	/**
 	 * Removes the current link if set.

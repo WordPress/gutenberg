@@ -576,3 +576,89 @@ export function setCanvasMinHeight( minHeight ) {
 		minHeight,
 	};
 }
+
+/**
+ * Set the current revision ID for revisions preview mode.
+ * Pass a revision ID to enter revisions mode, or null to exit.
+ *
+ * @param {number|null} revisionId The revision ID, or null to exit revisions mode.
+ * @return {Object} Action object.
+ */
+export function setCurrentRevisionId( revisionId ) {
+	return {
+		type: 'SET_CURRENT_REVISION_ID',
+		revisionId,
+	};
+}
+
+/**
+ * Restore a revision by replacing the current content with the revision's content
+ * and auto-saving.
+ *
+ * @param {number} revisionId The revision ID to restore.
+ */
+export const restoreRevision =
+	( revisionId ) =>
+	async ( { select, dispatch, registry } ) => {
+		const postType = select.getCurrentPostType();
+		const postId = select.getCurrentPostId();
+
+		const revision = registry
+			.select( coreStore )
+			.getRevision( 'postType', postType, postId, revisionId, {
+				context: 'edit',
+			} );
+
+		if ( ! revision ) {
+			return;
+		}
+
+		// Build the edits object with all restorable fields from the revision.
+		// Setting blocks to undefined clears edited blocks, forcing a re-parse of content.
+		const edits = {
+			blocks: undefined,
+			content: revision.content.raw,
+		};
+		if ( revision.title?.raw !== undefined ) {
+			edits.title = revision.title.raw;
+		}
+		if ( revision.excerpt?.raw !== undefined ) {
+			edits.excerpt = revision.excerpt.raw;
+		}
+		if ( revision.meta !== undefined ) {
+			edits.meta = revision.meta;
+		}
+
+		// Apply edits and save.
+		dispatch.editPost( edits );
+
+		// Exit revisions mode.
+		dispatch.setCurrentRevisionId( null );
+
+		// Save the post to persist the restored revision.
+		await dispatch.savePost();
+
+		// Show success notice.
+		registry
+			.dispatch( noticesStore )
+			.createSuccessNotice( __( 'Revision restored.' ), {
+				type: 'snackbar',
+				id: 'editor-revision-restored',
+			} );
+	};
+
+/**
+ * Select a note by its ID, or clear the selection.
+ *
+ * @param {undefined|number|'new'} noteId          The note ID to select, 'new' to open the new note form, or undefined to clear.
+ * @param {Object}                 [options]       Optional options for the selection.
+ * @param {boolean}                [options.focus] Whether to focus the selected note. Default false.
+ * @return {Object} Action object.
+ */
+export function selectNote( noteId, options = { focus: false } ) {
+	return {
+		type: 'SELECT_NOTE',
+		noteId,
+		options,
+	};
+}

@@ -100,12 +100,19 @@ export const Validation = {
 		layout: {
 			control: { type: 'select' },
 			description: 'Choose the form layout type.',
-			options: [ 'regular', 'panel', 'card', 'details' ],
+			options: [
+				'regular',
+				'panel-dropdown',
+				'panel-modal',
+				'card-collapsible',
+				'card-not-collapsible',
+				'details',
+			],
 		},
 		required: {
 			control: { type: 'boolean' },
 			description:
-				'Whether or not the required validation rule is active.',
+				'Whether or not the required validation rule is active (only applies when fieldDistribution is allSame).',
 		},
 		elements: {
 			control: { type: 'select' },

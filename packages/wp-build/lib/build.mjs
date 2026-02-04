@@ -5,13 +5,15 @@
  */
 import { readFile, writeFile, copyFile, mkdir, unlink } from 'fs/promises';
 import path from 'path';
+import { createHash } from 'node:crypto';
 import { parseArgs } from 'node:util';
 import esbuild from 'esbuild';
 import glob from 'fast-glob';
 import chokidar from 'chokidar';
 import browserslistToEsbuild from 'browserslist-to-esbuild';
-import { sassPlugin, postcssModules } from 'esbuild-sass-plugin';
+import { sassPlugin } from 'esbuild-sass-plugin';
 import postcss from 'postcss';
+import postcssModules from 'postcss-modules';
 import autoprefixer from 'autoprefixer';
 import rtlcss from 'rtlcss';
 import cssnano from 'cssnano';
@@ -40,6 +42,11 @@ import {
 	getRouteMetadata,
 	generateContentEntryPoint,
 } from './route-utils.mjs';
+import {
+	generateWorkerPlaceholder,
+	buildWorkers,
+	generateWorkerCode,
+} from './worker-build.mjs';
 
 const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
@@ -133,6 +140,61 @@ function getSassOptions( workingDir ) {
 	};
 }
 
+function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
+	return async function styleType( cssText, _dirname, filePath ) {
+		// Always hash the untransformed code.
+		const hash = createHash( 'sha1' )
+			.update( cssText )
+			.digest( 'hex' )
+			.slice( 0, 10 );
+
+		let moduleExports = null;
+
+		// Transform the code: CSS modules and minification.
+		const plugins = [
+			cssModules &&
+				postcssModules( {
+					generateScopedName: '[contenthash]__[local]',
+					getJSON: ( _, json ) => {
+						moduleExports = json;
+					},
+				} ),
+			minify &&
+				cssnano( {
+					preset: [
+						'default',
+						{ discardComments: { removeAll: true } },
+					],
+				} ),
+		].filter( Boolean );
+
+		const { css } = await postcss( plugins ).process( cssText, {
+			from: filePath,
+			map: false,
+		} );
+
+		let cssModule = `if (typeof document !== 'undefined' && !document.head.querySelector("style[data-wp-hash='${ hash }']")) {
+	const style = document.createElement("style");
+	style.setAttribute("data-wp-hash", "${ hash }");
+	style.appendChild(document.createTextNode(${ JSON.stringify( css ) }));
+	document.head.appendChild(style);
+}
+`;
+
+		// The CSS modules transform produces an `exports` object with class name mappings.
+		if ( moduleExports ) {
+			const exportsString = JSON.stringify( moduleExports );
+			cssModule += `export default ${ exportsString };\n`;
+		}
+		return cssModule;
+	};
+}
+
+function inlineStyle( contents ) {
+	// The `contents` is already a JS code created by `compileInlineStyle`.
+	return contents;
+}
+
 /**
  * Create style bundling plugins with the given working directory.
  *
@@ -146,10 +208,8 @@ function createStyleBundlingPlugins( workingDir ) {
 		sassPlugin( {
 			embedded: true,
 			filter: /\.module\.(css|scss)$/,
-			transform: postcssModules( {
-				generateScopedName: '[name]__[local]__[hash:base64:5]',
-			} ),
-			type: 'style',
+			transform: compileInlineStyle( { cssModules: true } ),
+			type: inlineStyle,
 			...sassOptions,
 		} ),
 		// Handle regular CSS/SCSS files
@@ -157,11 +217,59 @@ function createStyleBundlingPlugins( workingDir ) {
 		sassPlugin( {
 			embedded: true,
 			filter: /\.(css|scss)$/,
-			type: 'style',
+			transform: compileInlineStyle(),
+			type: inlineStyle,
 			...sassOptions,
 		} ),
 	];
 }
+
+/**
+ * Plugin to inline WASM files as base64 data URLs.
+ * This eliminates the need for separate WASM file downloads and avoids
+ * issues with hosts not serving WASM files with the correct MIME type.
+ *
+ * @return {Object} esbuild plugin.
+ */
+const wasmInlinePlugin = {
+	name: 'wasm-inline',
+	setup( build ) {
+		// Resolve .wasm imports from node_modules.
+		build.onResolve( { filter: /\.wasm$/ }, async ( args ) => {
+			// Handle imports like 'wasm-vips/vips.wasm'.
+			if ( ! args.path.startsWith( '.' ) ) {
+				const { createRequire } = await import( 'module' );
+				const require = createRequire( args.resolveDir + '/index.js' );
+				try {
+					const resolved = require.resolve( args.path );
+					return {
+						path: resolved,
+						namespace: 'wasm-inline',
+					};
+				} catch {
+					// If resolution fails, let other plugins handle it.
+					return null;
+				}
+			}
+			return null;
+		} );
+
+		// Load WASM files and convert to base64 data URLs.
+		build.onLoad(
+			{ filter: /.*/, namespace: 'wasm-inline' },
+			async ( args ) => {
+				const wasmBuffer = await readFile( args.path );
+				const base64 = wasmBuffer.toString( 'base64' );
+				const dataUrl = `data:application/wasm;base64,${ base64 }`;
+
+				return {
+					contents: `export default "${ dataUrl }";`,
+					loader: 'js',
+				};
+			}
+		);
+	},
+};
 
 /**
  * Normalize path separators for cross-platform compatibility.
@@ -1056,6 +1164,11 @@ async function transpilePackage( packageName ) {
 
 	const builds = [];
 
+	// Generate placeholder worker-code.ts if this package has wpWorkers defined
+	// and the file doesn't exist yet. This is needed because transpilation happens
+	// before worker bundling, but vips-worker.ts imports from worker-code.ts.
+	await generateWorkerPlaceholder( packageDir, packageJson );
+
 	// Check if this is the components package that needs emotion babel plugin.
 	// Ideally we should remove this exception and move away from emotion.
 	const needsEmotionPlugin = packageName === 'components';
@@ -1130,6 +1243,7 @@ async function transpilePackage( packageName ) {
 	};
 	const plugins = [
 		needsEmotionPlugin && emotionPlugin,
+		wasmInlinePlugin,
 		externalizeAllExceptCssPlugin,
 		...createStyleBundlingPlugins( packageDir ),
 	].filter( Boolean );
@@ -1197,6 +1311,24 @@ async function transpilePackage( packageName ) {
 	}
 
 	await Promise.all( builds );
+
+	// Build workers if wpWorkers is defined in package.json.
+	// Workers are bundled as self-contained files with all dependencies included.
+	await buildWorkers( packageDir, packageJson, {
+		buildDir,
+		buildModuleDir,
+		target,
+		wasmInlinePlugin,
+	} );
+
+	// Generate inline worker code exports and re-transpile worker-code.ts.
+	await generateWorkerCode( packageDir, packageName, packageJson, {
+		srcDir,
+		buildDir,
+		buildModuleDir,
+		target,
+		plugins,
+	} );
 
 	await compileStyles( packageName );
 

@@ -583,7 +583,7 @@ const PublicForwardedRichTextContainer = forwardRef( ( props, ref ) => {
 				ref={ ref }
 				{ ...contentProps }
 				dangerouslySetInnerHTML={ {
-					__html: valueToHTMLString( value, multiline ),
+					__html: valueToHTMLString( value, multiline ) || '<br>',
 				} }
 			/>
 		);

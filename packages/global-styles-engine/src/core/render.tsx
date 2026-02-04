@@ -338,6 +338,53 @@ function concatFeatureVariationSelectorString(
 }
 
 /**
+ * Updates the text indent selector for paragraph blocks based on the textIndent setting.
+ *
+ * The textIndent setting can be 'subsequent' (default), 'all', or false.
+ * When set to 'all', the selector should be '.wp-block-paragraph' instead of
+ * '.wp-block-paragraph + .wp-block-paragraph' to apply indent to all paragraphs.
+ *
+ * @param featureDeclarations The feature declarations keyed by selector
+ * @param settings            Theme.json settings
+ * @param blockName           The name of the block being processed
+ * @return Updated feature declarations
+ */
+const updateParagraphTextIndentSelector = (
+	featureDeclarations: Record< string, string[] >,
+	settings: Record< string, any > | undefined,
+	blockName: string | undefined
+): Record< string, string[] > => {
+	if ( blockName !== 'core/paragraph' ) {
+		return featureDeclarations;
+	}
+
+	// Check block-level settings first, then fall back to global settings.
+	const blockSettings = settings?.blocks?.[ 'core/paragraph' ];
+	const textIndentSetting =
+		blockSettings?.typography?.textIndent ??
+		settings?.typography?.textIndent ??
+		'subsequent';
+
+	if ( textIndentSetting !== 'all' ) {
+		return featureDeclarations;
+	}
+
+	// Look for the text indent selector and replace it.
+	const oldSelector = '.wp-block-paragraph + .wp-block-paragraph';
+	const newSelector = '.wp-block-paragraph';
+
+	if ( oldSelector in featureDeclarations ) {
+		const declarations = featureDeclarations[ oldSelector ];
+		const updated = { ...featureDeclarations };
+		delete updated[ oldSelector ];
+		updated[ newSelector ] = declarations;
+		return updated;
+	}
+
+	return featureDeclarations;
+};
+
+/**
  * Generate style declarations for a block's custom feature and subfeature
  * selectors.
  *
@@ -795,6 +842,7 @@ export const getNodesWithStyles = (
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
 		styleVariationSelectors?: Record< string, string >;
+		name?: string;
 	}[] = [];
 
 	if ( ! tree?.styles ) {
@@ -833,6 +881,10 @@ export const getNodesWithStyles = (
 			const blockStyles = pickStyleKeys( node );
 			const typedNode = node as BlockNode;
 
+			// Store variation data for later processing, but don't add to nodes yet.
+			// Variations should be processed AFTER the main block styles to match PHP order.
+			const variationNodesToAdd: typeof nodes = [];
+
 			if ( typedNode?.variations ) {
 				const variations: Record< string, any > = {};
 				Object.entries( typedNode.variations ).forEach(
@@ -860,7 +912,7 @@ export const getNodesWithStyles = (
 							typedVariation?.elements ?? {}
 						).forEach( ( [ element, elementStyles ] ) => {
 							if ( elementStyles && ELEMENTS[ element ] ) {
-								nodes.push( {
+								variationNodesToAdd.push( {
 									styles: elementStyles,
 									selector: scopeSelector(
 										variationSelector,
@@ -919,7 +971,7 @@ export const getNodesWithStyles = (
 									return;
 								}
 
-								nodes.push( {
+								variationNodesToAdd.push( {
 									selector: variationBlockSelector,
 									duotoneSelector: variationDuotoneSelector,
 									featureSelectors: variationFeatureSelectors,
@@ -945,7 +997,7 @@ export const getNodesWithStyles = (
 											variationBlockElementStyles &&
 											ELEMENTS[ variationBlockElement ]
 										) {
-											nodes.push( {
+											variationNodesToAdd.push( {
 												styles: variationBlockElementStyles,
 												selector: scopeSelector(
 													variationBlockSelector,
@@ -981,6 +1033,7 @@ export const getNodesWithStyles = (
 						blockSelectors[ blockName ].featureSelectors,
 					styleVariationSelectors:
 						blockSelectors[ blockName ].styleVariationSelectors,
+					name: blockName,
 				} );
 			}
 
@@ -1009,6 +1062,10 @@ export const getNodesWithStyles = (
 					}
 				}
 			);
+
+			// Add variation nodes AFTER the main block and its elements
+			// to match PHP processing order.
+			nodes.push( ...variationNodesToAdd );
 		}
 	);
 
@@ -1182,13 +1239,21 @@ export const transformToStyles = (
 				featureSelectors,
 				styleVariationSelectors,
 				skipSelectorWrapper,
+				name,
 			} ) => {
 				// Process styles for block support features with custom feature level
 				// CSS selectors set.
 				if ( featureSelectors ) {
-					const featureDeclarations = getFeatureDeclarations(
+					let featureDeclarations = getFeatureDeclarations(
 						featureSelectors,
 						styles
+					);
+
+					// Update text indent selector for paragraph blocks based on the textIndent setting.
+					featureDeclarations = updateParagraphTextIndentSelector(
+						featureDeclarations,
+						tree.settings,
+						name
 					);
 
 					Object.entries( featureDeclarations ).forEach(
@@ -1262,10 +1327,18 @@ export const transformToStyles = (
 							if ( styleVariations ) {
 								// If the block uses any custom selectors for block support, add those first.
 								if ( featureSelectors ) {
-									const featureDeclarations =
+									let featureDeclarations =
 										getFeatureDeclarations(
 											featureSelectors,
 											styleVariations
+										);
+
+									// Update text indent selector for paragraph blocks based on the textIndent setting.
+									featureDeclarations =
+										updateParagraphTextIndentSelector(
+											featureDeclarations,
+											tree.settings,
+											name
 										);
 
 									Object.entries(
@@ -1307,6 +1380,22 @@ export const transformToStyles = (
 										styleVariations.css,
 										`:root :where(${ styleVariationSelector })`
 									);
+								}
+								// Generate layout styles for the variation if it supports layout and has blockGap defined.
+								if (
+									hasLayoutSupport &&
+									styleVariations?.spacing?.blockGap
+								) {
+									// Append block selector to variation selector so layout classes are properly constructed.
+									const variationSelectorWithBlock =
+										styleVariationSelector + selector;
+									ruleset += getLayoutStyles( {
+										style: styleVariations,
+										selector: variationSelectorWithBlock,
+										hasBlockGapSupport: true,
+										hasFallbackGapSupport,
+										fallbackGapValue,
+									} );
 								}
 							}
 						}

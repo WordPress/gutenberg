@@ -41,12 +41,14 @@ import {
 	InvalidDraftDisplay,
 	useEnableLinkStatusValidation,
 	useIsDraggingWithin,
+	selectLabelText,
 } from '../navigation-link/shared';
 import {
 	getColors,
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
 import { DEFAULT_BLOCK } from '../navigation/constants';
+import { getSubmenuVisibility } from '../navigation/utils/get-submenu-visibility';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -83,16 +85,15 @@ export default function NavigationSubmenuEdit( {
 } ) {
 	const { label, url, description, kind, type, id } = attributes;
 
-	const {
-		showSubmenuIcon,
-		maxNestingLevel,
-		openSubmenusOnClick: contextOpenSubmenusOnClick,
-	} = context;
+	const { showSubmenuIcon, maxNestingLevel } = context;
 	const blockEditingMode = useBlockEditingMode();
+
+	// Determine effective submenu visibility with backward compatibility
+	const submenuVisibility = getSubmenuVisibility( context );
 
 	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
 	const openSubmenusOnClick =
-		blockEditingMode !== 'default' ? true : contextOpenSubmenusOnClick;
+		blockEditingMode !== 'default' ? true : submenuVisibility === 'click';
 
 	// URL binding logic
 	const { clearBinding, createBinding } = useEntityBinding( {
@@ -208,25 +209,10 @@ export default function NavigationSubmenuEdit( {
 				/^.+\.[a-z]+/.test( label )
 			) {
 				// Focus and select the label text.
-				selectLabelText();
+				selectLabelText( ref );
 			}
 		}
 	}, [ url ] );
-
-	/**
-	 * Focus the Link label text and select it.
-	 */
-	function selectLabelText() {
-		ref.current.focus();
-		const { ownerDocument } = ref.current;
-		const { defaultView } = ownerDocument;
-		const selection = defaultView.getSelection();
-		const range = ownerDocument.createRange();
-		// Get the range of the current ref contents so we can add this range to the selection.
-		range.selectNodeContents( ref.current );
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}
 
 	const {
 		textColor,
@@ -260,6 +246,7 @@ export default function NavigationSubmenuEdit( {
 			[ getColorClassName( 'background-color', backgroundColor ) ]:
 				!! backgroundColor,
 			'open-on-click': openSubmenusOnClick,
+			'open-always': submenuVisibility === 'always',
 		} ),
 		style: {
 			color: ! textColor && customTextColor,

@@ -51,7 +51,7 @@ export function WithDesignSystemTheme(
 								background:
 									'var(--wpds-color-bg-surface-neutral-strong)',
 								padding:
-									'var(--wpds-dimension-padding-surface-sm) var(--wpds-dimension-padding-surface-sm) var(--wpds-dimension-padding-surface-xs)',
+									'var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-sm)',
 								outline:
 									'1px dashed var(--wpds-color-stroke-surface-neutral)',
 								outlineOffset: '2px',
@@ -65,7 +65,7 @@ export function WithDesignSystemTheme(
 						style={ {
 							display: 'block',
 							opacity: 0.5,
-							marginTop: 'var(--wpds-dimension-gap-sm)',
+							marginTop: 'var(--wpds-dimension-gap-md)',
 							fontSize: 'var(--wpds-font-size-xs)',
 							color: 'var(--wpds-color-fg-content-neutral-weak)',
 							textTransform: 'uppercase',

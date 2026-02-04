@@ -60,8 +60,8 @@ const CONFIG = [
 	},
 	{
 		componentIdMatcher: /^dataviews-/,
-		ltr: [ componentsLtr, dataviewsLtr ],
-		rtl: [ componentsRtl, dataviewsRtl ],
+		ltr: [ designTokens, componentsLtr, dataviewsLtr ],
+		rtl: [ designTokens, componentsRtl, dataviewsRtl ],
 	},
 	{
 		componentIdMatcher: /^fields-/,

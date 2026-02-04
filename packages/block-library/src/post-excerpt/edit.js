@@ -169,7 +169,7 @@ export default function PostExcerptEditor( {
 	let trimmedExcerpt = '';
 	if ( wordCountType === 'words' ) {
 		trimmedExcerpt = rawOrRenderedExcerpt
-			.split( ' ', excerptLength )
+			.split( /\s+/, excerptLength )
 			.join( ' ' );
 	} else if ( wordCountType === 'characters_excluding_spaces' ) {
 		/*
@@ -213,6 +213,8 @@ export default function PostExcerptEditor( {
 			}
 			onChange={ setExcerpt }
 			tagName="p"
+			allowedFormats={ [] }
+			preserveWhiteSpace
 		/>
 	) : (
 		<p className={ excerptClassName }>

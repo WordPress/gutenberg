@@ -60,7 +60,7 @@ export default function ViewActivity< Item >(
 	// Render grouped activity
 	if ( hasData && groupField && dataByGroup ) {
 		return (
-			<Stack direction="column" gap="xs" className={ wrapperClassName }>
+			<Stack direction="column" gap="sm" className={ wrapperClassName }>
 				{ groupedEntries.map(
 					( [ groupName, groupData ]: [ string, Item[] ] ) => (
 						<ActivityGroup< Item >
