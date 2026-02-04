@@ -27,7 +27,7 @@
 		"ariaLabel": {
 			"__experimentalSkipSerialization": true
 		},
-		"align": true,
+		"align": [ "left", "center", "right" ],
 		"html": false,
 		"color": {
 			"background": true,
