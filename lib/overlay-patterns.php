@@ -41,7 +41,7 @@ function gutenberg_register_overlay_block_patterns() {
 <!-- /wp:group -->',
 			'categories'  => array( 'navigation' ),
 			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
-			'source'      => 'gutenberg/navigation-overlay',
+			'source'      => 'core',
 		)
 	);
 
@@ -86,7 +86,7 @@ function gutenberg_register_overlay_block_patterns() {
 <!-- /wp:group -->',
 			'categories'  => array( 'navigation' ),
 			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
-			'source'      => 'gutenberg/navigation-overlay',
+			'source'      => 'core',
 		)
 	);
 	register_block_pattern(
@@ -129,7 +129,7 @@ function gutenberg_register_overlay_block_patterns() {
 <!-- /wp:group -->',
 			'categories'  => array( 'navigation' ),
 			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
-			'source'      => 'gutenberg/navigation-overlay',
+			'source'      => 'core',
 		)
 	);
 	register_block_pattern(
@@ -148,7 +148,7 @@ function gutenberg_register_overlay_block_patterns() {
 <!-- /wp:group -->',
 			'categories'  => array( 'navigation' ),
 			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
-			'source'      => 'gutenberg/navigation-overlay',
+			'source'      => 'core',
 		)
 	);
 }

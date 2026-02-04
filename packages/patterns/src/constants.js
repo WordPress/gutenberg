@@ -9,8 +9,6 @@ export const EXCLUDED_PATTERN_SOURCES = [
 	'core',
 	'pattern-directory/core',
 	'pattern-directory/featured',
-	// Remove once the patterns are merged into core.
-	'gutenberg/navigation-overlay',
 ];
 export const PATTERN_SYNC_TYPES = {
 	full: 'fully',
