@@ -158,6 +158,9 @@ const { state } = store(
 				// Create the waveform container.
 				const container = createWaveformContainer( {
 					url: track.url,
+					title: track.title,
+					artist: track.artist,
+					artwork: track.image,
 					waveformColor,
 					progressColor,
 					buttonColor: textColor,

@@ -1,7 +1,7 @@
 @use "@wordpress/base-styles/variables" as *;
 
-// Waveform button dimensions.
-$waveform-button-size: 60px;
+// Waveform player dimensions.
+$waveform-player-height: 100px;
 
 .wp-block-playlist {
 	.wp-block-playlist__current-item {
@@ -40,9 +40,6 @@ $waveform-button-size: 60px;
 		margin-top: 10px;
 		margin-bottom: $grid-unit-20;
 		position: relative;
-		// Fixed height to match WaveformPlayer default.
-		height: $waveform-button-size;
-		overflow: hidden;
 
 		// Style the audio element inside WaveformPlayer.
 		audio {
@@ -50,42 +47,19 @@ $waveform-button-size: 60px;
 		}
 	}
 
-	// WaveformPlayer component styles - duplicated here to ensure they apply
-	// in the editor iframe where the JS-imported CSS doesn't load.
-	.waveform-player {
-		width: 100%;
-		height: 100%;
-		font-family: inherit;
-		color: inherit;
-		line-height: 1.4;
-	}
-
+	// Set the waveform track height.
 	.waveform-track {
-		display: flex;
-		align-items: center;
-		gap: 0;
-		position: relative;
-		width: 100%;
-		height: 100%;
+		height: $waveform-player-height;
 	}
 
-	// Make the waveform visualization fill the available space.
-	.waveform-container {
-		flex: 1 1 auto;
-
-		// Override WaveformPlayer's inline width style on the canvas.
-		canvas {
-			width: 100% !important;
-		}
-	}
-
+	// WaveformPlayer button styling.
 	.waveform-btn {
 		border-radius: 0;
 		border-end-start-radius: 0.125rem;
 		border-start-start-radius: 0.125rem;
-		width: $waveform-button-size;
-		height: $waveform-button-size;
-		min-width: $waveform-button-size;
+		width: $waveform-player-height;
+		height: $waveform-player-height;
+		min-width: $waveform-player-height;
 		background: currentColor;
 		margin: 0;
 
@@ -111,13 +85,6 @@ $waveform-button-size: 60px;
 
 	.waveform-progress {
 		background: color-mix(in srgb, currentColor 30%, transparent);
-	}
-
-	// Hide WaveformPlayer's built-in info display since we show our own.
-	// Using !important to override the library's inline styles.
-	.waveform-info,
-	.waveform-time {
-		display: none !important;
 	}
 
 	.wp-block-playlist__tracklist {

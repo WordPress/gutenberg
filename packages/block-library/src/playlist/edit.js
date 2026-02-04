@@ -25,7 +25,6 @@ import {
 	ToggleControl,
 	Disabled,
 	SelectControl,
-	Spinner,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
@@ -33,7 +32,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
-import { safeHTML, __unstableStripHTML as stripHTML } from '@wordpress/dom';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -49,33 +48,9 @@ import {
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
-const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
+const CurrentTrack = ( { track, onTrackEnd } ) => {
 	const waveformRef = useRef( null );
 	const waveformInstanceRef = useRef( null );
-
-	/**
-	 * dangerouslySetInnerHTML and safeHTML are used because
-	 * the media library allows using some HTML tags in the title, artist, and album fields.
-	 */
-	const trackTitle = {
-		dangerouslySetInnerHTML: {
-			__html: safeHTML( track?.title ? track.title : __( 'Untitled' ) ),
-		},
-	};
-	const trackArtist = {
-		dangerouslySetInnerHTML: {
-			__html: safeHTML(
-				track?.artist ? track.artist : __( 'Unknown artist' )
-			),
-		},
-	};
-	const trackAlbum = {
-		dangerouslySetInnerHTML: {
-			__html: safeHTML(
-				track?.album ? track.album : __( 'Unknown album' )
-			),
-		},
-	};
 
 	let ariaLabel;
 	if ( track?.title && track?.artist && track?.album ) {
@@ -114,6 +89,9 @@ const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
 		// Create waveform container.
 		const container = createWaveformContainer( {
 			url: track.src,
+			title: track.title,
+			artist: track.artist,
+			artwork: track.image,
 			waveformColor,
 			progressColor,
 			buttonColor: textColor,
@@ -157,46 +135,11 @@ const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
 	}, [ track?.src, onTrackEnd ] );
 
 	return (
-		<>
-			<div className="wp-block-playlist__current-item">
-				{ showImages && track?.image && (
-					<img
-						className="wp-block-playlist__item-image"
-						src={ track.image }
-						alt=""
-						width="70px"
-						height="70px"
-					/>
-				) }
-				<div>
-					{ ! track?.title ? (
-						<span className="wp-block-playlist__item-title">
-							<Spinner />
-						</span>
-					) : (
-						<span
-							className="wp-block-playlist__item-title"
-							{ ...trackTitle }
-						/>
-					) }
-					<div className="wp-block-playlist__current-item-artist-album">
-						<span
-							className="wp-block-playlist__item-artist"
-							{ ...trackArtist }
-						/>
-						<span
-							className="wp-block-playlist__item-album"
-							{ ...trackAlbum }
-						/>
-					</div>
-				</div>
-			</div>
-			<div
-				ref={ waveformRef }
-				className="wp-block-playlist__waveform-player"
-				aria-label={ ariaLabel }
-			/>
-		</>
+		<div
+			ref={ waveformRef }
+			className="wp-block-playlist__waveform-player"
+			aria-label={ ariaLabel }
+		/>
 	);
 };
 
@@ -567,7 +510,6 @@ const PlaylistEdit = ( {
 				<Disabled isDisabled={ ! isSelected }>
 					<CurrentTrack
 						track={ tracks[ trackListIndex ] }
-						showImages={ showImages }
 						onTrackEnd={ onTrackEnd }
 					/>
 				</Disabled>
