@@ -176,7 +176,7 @@ export function Comments( {
 				commentSidebarRef.current,
 				selectedNote === 'new' ? 'textarea' : undefined
 			);
-			// Clear meta to avoid re-triggering.
+			// Clear focus flag to avoid re-triggering.
 			selectNote( selectedNote );
 		}
 	}, [ noteFocused, selectedNote, selectNote, commentSidebarRef ] );

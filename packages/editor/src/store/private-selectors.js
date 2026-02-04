@@ -374,5 +374,5 @@ export function getSelectedNote( state ) {
  * @return {boolean} Whether the selected note should be focused.
  */
 export function isNoteFocused( state ) {
-	return !! state.selectedNote?.meta?.focus;
+	return !! state.selectedNote?.options?.focus;
 }
