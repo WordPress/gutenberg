@@ -25,7 +25,7 @@ export default function useNavigateToEntityRecord() {
 	const history = useHistory();
 	const { query, path } = useLocation();
 	const getExternalClientId = useSelect(
-		( select ) => select( blockEditorStore ).getExternalClientId,
+		( select ) => unlock( select( blockEditorStore ) ).getExternalClientId,
 		[]
 	);
 

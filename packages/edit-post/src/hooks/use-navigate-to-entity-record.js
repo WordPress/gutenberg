@@ -7,6 +7,11 @@ import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
+/**
  * A hook that records the 'entity' history in the post editor as a user
  * navigates between editing a post and editing the post template or patterns.
  *
@@ -27,7 +32,7 @@ export default function useNavigateToEntityRecord(
 	defaultRenderingMode
 ) {
 	const getExternalClientId = useSelect(
-		( select ) => select( blockEditorStore ).getExternalClientId,
+		( select ) => unlock( select( blockEditorStore ) ).getExternalClientId,
 		[]
 	);
 	const [ postHistory, dispatch ] = useReducer(
