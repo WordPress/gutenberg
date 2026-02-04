@@ -183,6 +183,7 @@ export default function FormCardField< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
@@ -347,6 +348,7 @@ export default function FormCardField< Item >( {
 						hideLabelFromVision={
 							hideLabelFromVision || withHeader
 						}
+						markWhenOptional={ markWhenOptional }
 						validity={ validity }
 					/>
 				</CardBody>

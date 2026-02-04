@@ -314,6 +314,12 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.env.tests.phpVersion = overrides.phpVersion;
 	}
 
+	if ( overrides.multisite ) {
+		overrideConfig.multisite = overrides.multisite;
+		overrideConfig.env.development.multisite = overrides.multisite;
+		overrideConfig.env.tests.multisite = overrides.multisite;
+	}
+
 	return overrideConfig;
 }
 

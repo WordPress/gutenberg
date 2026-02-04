@@ -4,7 +4,8 @@
 
 ### Bug Fixes
 
--   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used.
+-   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
+-   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
 
 ### Enhancements
 
@@ -23,6 +24,10 @@
 ### Internal
 
 -   `ValidatedComboboxControl`: Expose the component under private API's. [#74891](https://github.com/WordPress/gutenberg/pull/74891)
+
+### Enhancements
+
+-   `ToggleControl` pass full props and support required validation in `ValidatedToggleControl`. [#74956](https://github.com/WordPress/gutenberg/pull/74956)
 
 ## 32.0.0 (2026-01-16)
 

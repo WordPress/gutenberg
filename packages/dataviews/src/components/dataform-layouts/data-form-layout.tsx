@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -40,14 +40,26 @@ export function DataFormLayout< Item >( {
 			field: NormalizedFormField;
 			onChange: ( value: any ) => void;
 			hideLabelFromVision?: boolean;
+			markWhenOptional?: boolean;
 			validity?: FieldValidity;
 		} ) => React.JSX.Element | null,
 		childField: NormalizedFormField,
-		childFieldValidity?: FieldValidity
+		childFieldValidity?: FieldValidity,
+		markWhenOptional?: boolean
 	) => React.JSX.Element;
 	as?: React.ComponentType< { children: React.ReactNode } >;
 } ) {
 	const { fields: fieldDefinitions } = useContext( DataFormContext );
+
+	// Auto-compute: mark the minority of fields
+	// When counts are equal, mark required fields
+	const markWhenOptional = useMemo( () => {
+		const requiredCount = fieldDefinitions.filter(
+			( f ) => !! f.isValid?.required
+		).length;
+		const optionalCount = fieldDefinitions.length - requiredCount;
+		return requiredCount > optionalCount;
+	}, [ fieldDefinitions ] );
 
 	function getFieldDefinition( field: NormalizedFormField ) {
 		return fieldDefinitions.find(
@@ -86,7 +98,8 @@ export function DataFormLayout< Item >( {
 					return children(
 						FieldLayout,
 						formField,
-						validity?.[ formField.id ]
+						validity?.[ formField.id ],
+						markWhenOptional
 					);
 				}
 
@@ -96,6 +109,7 @@ export function DataFormLayout< Item >( {
 						data={ data }
 						field={ formField }
 						onChange={ onChange }
+						markWhenOptional={ markWhenOptional }
 						validity={ validity?.[ formField.id ] }
 					/>
 				);

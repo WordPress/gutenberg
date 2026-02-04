@@ -43,7 +43,11 @@ export const settings = {
 				name: 'core/heading',
 				attributes: {
 					content: __( 'La Mancha' ),
-					textAlign: 'center',
+					style: {
+						typography: {
+							textAlign: 'center',
+						},
+					},
 				},
 			},
 			{

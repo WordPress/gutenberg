@@ -112,7 +112,7 @@ export const Validation = {
 		required: {
 			control: { type: 'boolean' },
 			description:
-				'Whether or not the required validation rule is active.',
+				'Whether or not the required validation rule is active (only applies when fieldDistribution is allSame).',
 		},
 		elements: {
 			control: { type: 'select' },

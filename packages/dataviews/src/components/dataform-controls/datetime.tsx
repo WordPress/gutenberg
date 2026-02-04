@@ -43,6 +43,7 @@ function CalendarDateTimeControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { id, label, description, setValue, getValue, isValid } = field;
@@ -155,10 +156,16 @@ function CalendarDateTimeControl< Item >( {
 		timezone: { string: timezoneString },
 	} = getSettings();
 
-	const displayLabel =
-		isValid?.required && ! hideLabelFromVision
-			? `${ label } (${ __( 'Required' ) })`
-			: label;
+	let displayLabel = label;
+	if ( isValid?.required && ! markWhenOptional && ! hideLabelFromVision ) {
+		displayLabel = `${ label } (${ __( 'Required' ) })`;
+	} else if (
+		! isValid?.required &&
+		markWhenOptional &&
+		! hideLabelFromVision
+	) {
+		displayLabel = `${ label } (${ __( 'Optional' ) })`;
+	}
 
 	return (
 		<BaseControl
@@ -208,6 +215,7 @@ export default function DateTime< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	operator,
 	validity,
 }: DataFormControlProps< Item > ) {
@@ -230,6 +238,7 @@ export default function DateTime< Item >( {
 			field={ field }
 			onChange={ onChange }
 			hideLabelFromVision={ hideLabelFromVision }
+			markWhenOptional={ markWhenOptional }
 			validity={ validity }
 		/>
 	);
