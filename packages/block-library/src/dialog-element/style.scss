@@ -15,7 +15,6 @@
 		min-width: unset;
 		max-width: 95vw;
 		max-height: 90vh;
-		padding: 1em !important;
 	}
 
 	&.has-border-color {
@@ -28,7 +27,8 @@
 	}
 	padding-top: var(--wp--preset--spacing--30);
 	padding-bottom: var(--wp--preset--spacing--30);
-	padding-inline: var(--wp--preset--spacing--30);
+	padding-left: var(--wp--preset--spacing--30);
+	padding-right: var(--wp--preset--spacing--30);
 
 	// Open state with fade-in animation
 	&[open].active {
@@ -54,7 +54,7 @@
 
 	&::backdrop {
 		cursor: zoom-out;
-		background-color: var(--wp--style--dialog-backdrop-color, rgba(0, 0, 0, 0.8));
+		background-color: var(--wp--style--dialog-backdrop-color, rgba(0, 0, 0, 0.5));
 		opacity: 0;
 
 		@media not (prefers-reduced-motion) {

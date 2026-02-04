@@ -50,7 +50,8 @@
 			"enableContrastChecker": true
 		},
 		"layout": {
-			"allowEditing": true
+			"allowEditing": true,
+			"allowJustification": false
 		},
 		"shadow": true,
 		"__experimentalBorder": {
