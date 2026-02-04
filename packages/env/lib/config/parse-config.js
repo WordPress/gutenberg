@@ -314,6 +314,11 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.env.tests.phpVersion = overrides.phpVersion;
 	}
 
+	if ( overrides.config && Object.keys( overrides.config ).length > 0 ) {
+		overrideConfig.env.development.config = overrides.config;
+		overrideConfig.env.tests.config = overrides.config;
+	}
+
 	return overrideConfig;
 }
 

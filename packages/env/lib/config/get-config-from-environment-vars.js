@@ -25,6 +25,7 @@ const { checkPort, checkVersion, checkString } = require( './validate-config' );
  * @property {?string}                  phpVersion       An override for all environment's PHP version.
  * @property {?boolean}                 multisite        An override for if environmen should be multisite.
  * @property {?Object.<string, string>} lifecycleScripts An override for various lifecycle scripts.
+ * @property {?Object.<string, any>}    config           An override for various wp-config.php constants.
  */
 
 /**
@@ -49,6 +50,7 @@ module.exports = function getConfigFromEnvironmentVars( cacheDirectoryPath ) {
 			'WP_ENV_TESTS_PHPMYADMIN_PORT'
 		),
 		lifecycleScripts: getLifecycleScriptOverrides(),
+		config: getWpConfigOverrides(),
 	};
 
 	if ( process.env.WP_ENV_CORE ) {
@@ -123,4 +125,42 @@ function getLifecycleScriptOverrides() {
 	}
 
 	return lifecycleScripts;
+}
+
+/**
+ * Gets wp-config.php constant overrides from environment variables.
+ *
+ * @return {Object.<string, any>} The wp-config.php constants to override.
+ */
+function getWpConfigOverrides() {
+	const wpConfigOverrides = {};
+	const WP_ENV_CONFIG_PREFIX = 'WP_ENV_CONFIG_';
+
+	Object.keys( process.env ).forEach( ( key ) => {
+		if ( key.startsWith( WP_ENV_CONFIG_PREFIX ) ) {
+			const constantName = key.substring( WP_ENV_CONFIG_PREFIX.length );
+
+			if ( constantName ) {
+				let value = process.env[ key ];
+				if ( typeof value === 'string' ) {
+					if ( value.toLowerCase() === 'true' ) {
+						value = true;
+					} else if ( value.toLowerCase() === 'false' ) {
+						value = false;
+					} else if ( value.toLowerCase() === 'null' ) {
+						value = null;
+					} else if (
+						! isNaN( Number( value ) ) &&
+						value.trim() !== ''
+					) {
+						value = Number( value );
+					}
+				}
+
+				wpConfigOverrides[ constantName ] = value;
+			}
+		}
+	} );
+
+	return wpConfigOverrides;
 }
