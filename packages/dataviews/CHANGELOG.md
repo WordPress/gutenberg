@@ -125,6 +125,7 @@
 ### Code Quality
 
 - DataForm: Style SummaryButton in panel layout with `is-disabled` classname. [#75470](https://github.com/WordPress/gutenberg/pull/75470)
+- DataViews: Migrate styles from `@wordpress/base-styles` SCSS variables to `@wordpress/theme` CSS custom properties (design tokens). [#75204](https://github.com/WordPress/gutenberg/pull/75204)
 
 ### Internal
 
