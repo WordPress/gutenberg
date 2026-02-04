@@ -5,7 +5,10 @@ import type { IconButton } from '../icon-button';
 import type { ComponentProps } from '../utils/types';
 
 export interface RootProps
-	extends Pick< _Dialog.Root.Props, 'open' | 'onOpenChange' > {
+	extends Pick<
+		_Dialog.Root.Props,
+		'open' | 'onOpenChange' | 'defaultOpen' | 'modal'
+	> {
 	/**
 	 * The title text for the dialog. This is required to be a string to ensure
 	 * accessible labeling of the dialog.
