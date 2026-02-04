@@ -8,7 +8,7 @@ If anything looks incorrect here, please bring it up in #core-editor in [WordPre
 
 | Gutenberg Version | WordPress Version |
 |  ---------------- | ----------------- |
-| 21.9              | 6.9               |
+| 21.9              | 6.9.X             |
 | 20.4              | 6.8.X             |
 | 19.3              | 6.7.X             |
 | 18.5              | 6.6.X             |
