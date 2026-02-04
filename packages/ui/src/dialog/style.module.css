@@ -26,9 +26,10 @@
 		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical centering technique used with transform: translate(-50%, -50%) */
 		left: 50%;
 		transform: translate(-50%, -50%);
-		min-width: 384px;
-		max-width: 90vw;
-		max-height: 90vh;
+		box-sizing: border-box;
+		min-width: 320px;
+		width: calc(100vw - 2 * var(--wpds-dimension-padding-xl));
+		max-height: calc(100vh - 2 * var(--wpds-dimension-padding-xl));
 		padding: var(--wpds-dimension-padding-3xl);
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		border-radius: var(--wpds-border-radius-lg);
@@ -57,15 +58,15 @@
 		}
 
 		&.is-small {
-			width: clamp(384px, 90vw, 384px);
+			max-width: 384px;
 		}
 
 		&.is-medium {
-			width: clamp(384px, 90vw, 512px);
+			max-width: 512px;
 		}
 
 		&.is-large {
-			width: clamp(384px, 90vw, 840px);
+			max-width: 840px;
 		}
 	}
 
