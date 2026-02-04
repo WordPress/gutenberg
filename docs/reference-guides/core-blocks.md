@@ -307,7 +307,7 @@ Hide and show additional content. ([Source](https://github.com/WordPress/gutenbe
 
 ## Dialog Wrapper
 
-Render content in a <dialog/> element modal. Includes a trigger to open the dialog, and dialog element to render content. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog))
+A container that pairs a trigger element with a dialog, enabling interactive modal experiences. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog))
 
 -	**Name:** core/dialog
 -	**Experimental:** true
@@ -329,7 +329,7 @@ A dialog is a modal window that appears on top of the current page. It is used t
 
 ## Dialog Trigger
 
-The content inside this block will act as the clickable 'trigger' to display the dialog element. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-trigger))
+Contains the interactive element that opens the associated dialog when activated. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-trigger))
 
 -	**Name:** core/dialog-trigger
 -	**Experimental:** true

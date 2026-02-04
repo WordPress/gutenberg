@@ -4,7 +4,7 @@
 	"name": "core/dialog",
 	"version": "1.0.0",
 	"title": "Dialog Wrapper",
-	"description": "Render content in a <dialog/> element modal. Includes a trigger to open the dialog, and dialog element to render content.",
+	"description": "A container that pairs a trigger element with a dialog, enabling interactive modal experiences.",
 	"category": "media",
 	"keywords": [ "dialog", "modal", "popup" ],
 	"__experimental": true,

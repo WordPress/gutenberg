@@ -4,7 +4,7 @@
 	"name": "core/dialog-trigger",
 	"version": "1.0.0",
 	"title": "Dialog Trigger",
-	"description": "The content inside this block will act as the clickable 'trigger' to display the dialog element.",
+	"description": "Contains the interactive element that opens the associated dialog when activated.",
 	"category": "media",
 	"__experimental": true,
 	"attributes": {},
