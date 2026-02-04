@@ -21,6 +21,7 @@ import { plus } from '@wordpress/icons';
 import InserterMenu from './menu';
 import QuickInserter from './quick-inserter';
 import { store as blockEditorStore } from '../../store';
+import { getAppenderLabel } from './get-appender-label';
 
 const defaultRenderToggle = ( {
 	onToggle,
@@ -47,22 +48,7 @@ const defaultRenderToggle = ( {
 			blockTitle.toLowerCase()
 		);
 	} else if ( ! label ) {
-		// Get appender label from block's __experimentalLabel function
-		const appenderLabel =
-			defaultBlock &&
-			defaultBlock.attributes &&
-			defaultBlockType?.__experimentalLabel
-				? ( () => {
-						const result = defaultBlockType.__experimentalLabel(
-							defaultBlock.attributes,
-							{ context: 'appender' }
-						);
-						// Only use if it's a string and not too long (safety check)
-						return typeof result === 'string' && result.length < 50
-							? result.toLowerCase()
-							: null;
-				  } )()
-				: null;
+		const appenderLabel = getAppenderLabel( defaultBlock, defaultBlockType );
 
 		if ( appenderLabel ) {
 			label = sprintf(
