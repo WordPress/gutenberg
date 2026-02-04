@@ -42,7 +42,7 @@ test.describe( 'Block Comments', () => {
 		// Close the pinned notes sidebar.
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'All notes', exact: true } )
+			.getByRole( 'button', { name: 'Notes', exact: true } )
 			.click();
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 		await expect( form ).toBeFocused();
@@ -844,22 +844,13 @@ class BlockCommentUtils {
 	}
 
 	async openBlockCommentSidebar() {
-		const toggleButton = this.#page
+		await this.#page
 			.getByRole( 'region', { name: 'Editor top bar' } )
-			.getByRole( 'button', { name: 'All notes', exact: true } );
-
-		const isClosed =
-			( await toggleButton.getAttribute( 'aria-expanded' ) ) === 'false';
-
-		if ( isClosed ) {
-			await toggleButton.click();
-			await this.#page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Close Notes' } )
-				.waitFor();
-		}
-
-		return toggleButton;
+			.getByRole( 'button', { name: 'Notes', exact: true } )
+			.click();
+		await this.#page
+			.getByRole( 'menuitemradio', { name: 'Show all notes' } )
+			.click();
 	}
 
 	async addBlockWithComment( { type, attributes = {}, comment } ) {
