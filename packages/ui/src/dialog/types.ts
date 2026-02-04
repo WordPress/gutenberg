@@ -33,6 +33,7 @@ export interface PopupProps extends ComponentProps< 'div' > {
 	 */
 	size?: 'small' | 'medium' | 'large' | 'full';
 }
+
 export interface ActionProps extends ComponentProps< typeof Button > {
 	/**
 	 * The content to be rendered inside the component.
