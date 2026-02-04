@@ -1,7 +1,7 @@
-diff --git a/node_modules/react-devtools-core/dist/backend.js b/node_modules/react-devtools-core/dist/backend.js
+diff --git a/node_modules/@wordpress/react-native-editor/node_modules/react-native/node_modules/react-devtools-core/dist/backend.js b/node_modules/@wordpress/react-native-editor/node_modules/react-native/node_modules/react-devtools-core/dist/backend.js
 index d5837ee..1530af4 100644
---- a/node_modules/react-devtools-core/dist/backend.js
-+++ b/node_modules/react-devtools-core/dist/backend.js
+--- a/node_modules/@wordpress/react-native-editor/node_modules/react-native/node_modules/react-devtools-core/dist/backend.js
++++ b/node_modules/@wordpress/react-native-editor/node_modules/react-native/node_modules/react-devtools-core/dist/backend.js
 @@ -4671,7 +4671,7 @@ var SHOW_DURATION = 2000;
  var timeoutID = null;
  var overlay = null;

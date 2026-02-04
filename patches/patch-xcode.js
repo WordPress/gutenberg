@@ -37,7 +37,19 @@ const fetchRNPackageDirs = ( dir ) => {
 	return packageDirs;
 };
 
-const packagesWithPodspec = fetchRNPackageDirs( nodeModulesDir );
+// Also scan workspace packages' node_modules for nested installs.
+const nodeModuleDirs = [ nodeModulesDir ];
+const packagesDir = path.join( __dirname, '../', 'packages' );
+for ( const entry of fs.readdirSync( packagesDir, { withFileTypes: true } ) ) {
+	if ( entry.isDirectory() ) {
+		const nested = path.join( packagesDir, entry.name, 'node_modules' );
+		if ( fs.existsSync( nested ) ) {
+			nodeModuleDirs.push( nested );
+		}
+	}
+}
+
+const packagesWithPodspec = nodeModuleDirs.flatMap( fetchRNPackageDirs );
 const dependencyRegex = /(s\.dependency +(?:'|"))React('|")/;
 packagesWithPodspec.forEach( ( packageWithPodspec ) => {
 	packageWithPodspec.files.forEach( ( file ) => {
