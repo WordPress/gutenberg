@@ -10,7 +10,7 @@ import type { CloseIconProps } from './types';
  * Provides a default close icon and accessible label.
  */
 const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
-	function DialogCloseIcon( props, ref ) {
+	function DialogCloseIcon( { icon, label, ...props }, ref ) {
 		return (
 			<_Dialog.Close
 				ref={ ref }
@@ -20,8 +20,8 @@ const CloseIcon = forwardRef< HTMLButtonElement, CloseIconProps >(
 						size="compact"
 						tone="neutral"
 						{ ...props }
-						icon={ close }
-						label={ __( 'Close' ) }
+						icon={ icon ?? close }
+						label={ label ?? __( 'Close' ) }
 					/>
 				}
 			/>
