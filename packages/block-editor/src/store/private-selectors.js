@@ -950,3 +950,55 @@ export function isLockedBlock( state, clientId ) {
 		isRemoveLockedBlock( state, clientId )
 	);
 }
+
+/**
+ * Converts an external (original) clientId to its internal (cloned) equivalent.
+ * This is used for controlled inner blocks where blocks are cloned with new clientIds.
+ * Searches all controllers and returns the first match.
+ *
+ * @param {Object} state      Global application state.
+ * @param {string} externalId The external clientId to convert.
+ *
+ * @return {string} The internal clientId, or the original externalId if no mapping exists.
+ */
+export function getInternalClientId( state, externalId ) {
+	// Search all controlled inner blocks for a mapping
+	for ( const controllerData of Object.values(
+		state.blocks.controlledInnerBlocks
+	) ) {
+		if ( controllerData.externalToInternal ) {
+			const internalId =
+				controllerData.externalToInternal.get( externalId );
+			if ( internalId ) {
+				return internalId; // Return first match
+			}
+		}
+	}
+	return externalId; // No mapping = root block, external === internal
+}
+
+/**
+ * Converts an internal (cloned) clientId to its external (original) equivalent.
+ * This is used for controlled inner blocks where blocks are cloned with new clientIds.
+ * Searches all controllers for the mapping.
+ *
+ * @param {Object} state      Global application state.
+ * @param {string} internalId The internal clientId to convert.
+ *
+ * @return {string} The external clientId, or the original internalId if no mapping exists.
+ */
+export function getExternalClientId( state, internalId ) {
+	// Search all controlled inner blocks for a mapping
+	for ( const controllerData of Object.values(
+		state.blocks.controlledInnerBlocks
+	) ) {
+		if ( controllerData.internalToExternal ) {
+			const externalId =
+				controllerData.internalToExternal.get( internalId );
+			if ( externalId ) {
+				return externalId;
+			}
+		}
+	}
+	return internalId; // No mapping = root block, external === internal
+}

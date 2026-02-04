@@ -9,6 +9,7 @@ import { cloneBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const noop = () => {};
 
@@ -163,13 +164,11 @@ export default function useBlockSync( {
 		selectBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
-	const {
-		getBlockName,
-		getBlocks,
-		getSelectionStart,
-		getSelectionEnd,
-		getInternalClientId,
-	} = registry.select( blockEditorStore );
+	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
+		registry.select( blockEditorStore );
+	const { getInternalClientId } = unlock(
+		registry.select( blockEditorStore )
+	);
 	const isControlled = useSelect(
 		( select ) => {
 			return (
