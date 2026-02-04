@@ -43,7 +43,7 @@ function TabBlockMover( {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
-	const { tabPanelsClientId, orientation } = useSelect(
+	const { tabPanelClientId, orientation } = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, getBlockAttributes } =
 				select( blockEditorStore );
@@ -53,7 +53,7 @@ function TabBlockMover( {
 				? getBlockAttributes( tabsMenuClientId )
 				: null;
 			return {
-				tabPanelsClientId: getBlockRootClientId( tabClientId ),
+				tabPanelClientId: getBlockRootClientId( tabClientId ),
 				orientation:
 					tabsMenuAttributes?.layout?.orientation || 'horizontal',
 			};
@@ -88,7 +88,7 @@ function TabBlockMover( {
 
 	// Handle moving tab and updating active index to follow the moved tab
 	const handleMoveUp = () => {
-		moveBlocksUp( [ tabClientId ], tabPanelsClientId );
+		moveBlocksUp( [ tabClientId ], tabPanelClientId );
 		// Update editorActiveTabIndex to follow the moved tab
 		if ( tabsClientId ) {
 			__unstableMarkNextChangeAsNotPersistent();
@@ -99,7 +99,7 @@ function TabBlockMover( {
 	};
 
 	const handleMoveDown = () => {
-		moveBlocksDown( [ tabClientId ], tabPanelsClientId );
+		moveBlocksDown( [ tabClientId ], tabPanelClientId );
 		// Update editorActiveTabIndex to follow the moved tab
 		if ( tabsClientId ) {
 			__unstableMarkNextChangeAsNotPersistent();
