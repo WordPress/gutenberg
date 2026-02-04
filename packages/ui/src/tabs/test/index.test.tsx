@@ -2456,6 +2456,37 @@ describe( 'Tabs', () => {
 				'Tabs: Found Panel(s) without matching Tab(s). Each Panel should have a corresponding Tab with the same `value` prop. Panel value(s) without tabs: orphan-panel'
 			);
 		} );
+
+		// Note: We cannot test duplicate Tab values directly because Base UI's
+		// internal state management breaks with "Maximum update depth exceeded"
+		// when duplicate tab values are present. The validation warning for
+		// duplicate tabs would help developers catch this before the error.
+
+		it( 'should warn when duplicate Panel values are detected', async () => {
+			render(
+				<Tabs.Root defaultValue="one">
+					<Tabs.List>
+						<Tabs.Tab value="one">One</Tabs.Tab>
+						<Tabs.Tab value="two">Two</Tabs.Tab>
+					</Tabs.List>
+					<Tabs.Panel value="one">First panel</Tabs.Panel>
+					<Tabs.Panel value="two">Second panel</Tabs.Panel>
+					<Tabs.Panel value="two">Second panel duplicate</Tabs.Panel>
+				</Tabs.Root>
+			);
+
+			await waitForComponentToBeInitializedWithSelectedTab( 'One' );
+
+			// Wait for the validation to run
+			await waitFor( () => {
+				expect( console ).toHaveWarned();
+			} );
+
+			// Verify the warning mentions the duplicate panel value
+			expect( console ).toHaveWarnedWith(
+				'Tabs: Found duplicate Panel value(s). Each Panel should have a unique `value` prop. Duplicate value(s): two'
+			);
+		} );
 	} );
 } );
 /* eslint-enable jest/no-conditional-expect */

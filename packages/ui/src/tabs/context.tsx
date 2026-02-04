@@ -94,8 +94,10 @@ function TabsValidationProviderDev( {
 }: {
 	children: React.ReactNode;
 } ) {
-	const tabsRef = useRef< Set< TabValue > >( new Set() );
-	const panelsRef = useRef< Set< TabValue > >( new Set() );
+	// Use Map<TabValue, number> to track counts of each value.
+	// This correctly handles multiple instances with the same value.
+	const tabsRef = useRef< Map< TabValue, number > >( new Map() );
+	const panelsRef = useRef< Map< TabValue, number > >( new Map() );
 	const validationScheduledRef = useRef< ReturnType<
 		typeof setTimeout
 	> | null >( null );
@@ -108,22 +110,38 @@ function TabsValidationProviderDev( {
 
 		// Schedule validation for the next tick to allow all registrations to complete
 		validationScheduledRef.current = setTimeout( () => {
-			const tabValues = tabsRef.current;
-			const panelValues = panelsRef.current;
+			const tabCounts = tabsRef.current;
+			const panelCounts = panelsRef.current;
 
 			// Find tabs without matching panels
 			const tabsWithoutPanels: TabValue[] = [];
-			tabValues.forEach( ( value ) => {
-				if ( ! panelValues.has( value ) ) {
+			tabCounts.forEach( ( _count, value ) => {
+				if ( ! panelCounts.has( value ) ) {
 					tabsWithoutPanels.push( value );
 				}
 			} );
 
 			// Find panels without matching tabs
 			const panelsWithoutTabs: TabValue[] = [];
-			panelValues.forEach( ( value ) => {
-				if ( ! tabValues.has( value ) ) {
+			panelCounts.forEach( ( _count, value ) => {
+				if ( ! tabCounts.has( value ) ) {
 					panelsWithoutTabs.push( value );
+				}
+			} );
+
+			// Find duplicate tabs (count > 1)
+			const duplicateTabs: TabValue[] = [];
+			tabCounts.forEach( ( count, value ) => {
+				if ( count > 1 ) {
+					duplicateTabs.push( value );
+				}
+			} );
+
+			// Find duplicate panels (count > 1)
+			const duplicatePanels: TabValue[] = [];
+			panelCounts.forEach( ( count, value ) => {
+				if ( count > 1 ) {
+					duplicatePanels.push( value );
 				}
 			} );
 
@@ -148,18 +166,45 @@ function TabsValidationProviderDev( {
 				);
 			}
 
+			// Warn about duplicates
+			if ( duplicateTabs.length > 0 ) {
+				warning(
+					`Tabs: Found duplicate Tab value(s). ` +
+						`Each Tab should have a unique \`value\` prop. ` +
+						`Duplicate value(s): ${ duplicateTabs
+							.map( String )
+							.join( ', ' ) }`
+				);
+			}
+
+			if ( duplicatePanels.length > 0 ) {
+				warning(
+					`Tabs: Found duplicate Panel value(s). ` +
+						`Each Panel should have a unique \`value\` prop. ` +
+						`Duplicate value(s): ${ duplicatePanels
+							.map( String )
+							.join( ', ' ) }`
+				);
+			}
+
 			validationScheduledRef.current = null;
 		}, 0 );
 	}, [] );
 
 	const registerTab = useCallback(
 		( value: TabValue ) => {
-			tabsRef.current.add( value );
+			const currentCount = tabsRef.current.get( value ) ?? 0;
+			tabsRef.current.set( value, currentCount + 1 );
 			scheduleValidation();
 
 			// Return unregister function
 			return () => {
-				tabsRef.current.delete( value );
+				const count = tabsRef.current.get( value ) ?? 0;
+				if ( count <= 1 ) {
+					tabsRef.current.delete( value );
+				} else {
+					tabsRef.current.set( value, count - 1 );
+				}
 				scheduleValidation();
 			};
 		},
@@ -168,12 +213,18 @@ function TabsValidationProviderDev( {
 
 	const registerPanel = useCallback(
 		( value: TabValue ) => {
-			panelsRef.current.add( value );
+			const currentCount = panelsRef.current.get( value ) ?? 0;
+			panelsRef.current.set( value, currentCount + 1 );
 			scheduleValidation();
 
 			// Return unregister function
 			return () => {
-				panelsRef.current.delete( value );
+				const count = panelsRef.current.get( value ) ?? 0;
+				if ( count <= 1 ) {
+					panelsRef.current.delete( value );
+				} else {
+					panelsRef.current.set( value, count - 1 );
+				}
 				scheduleValidation();
 			};
 		},
