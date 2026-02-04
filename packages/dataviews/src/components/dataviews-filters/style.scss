@@ -90,7 +90,7 @@
 		}
 
 		&.has-reset {
-			padding-inline-end: calc(24px + var(--wpds-dimension-padding-xs));
+			padding-inline-end: calc(24px + var(--wpds-dimension-padding-sm));
 		}
 
 		&:hover:not(&.is-not-clickable),
@@ -129,7 +129,7 @@
 	.dataviews-filters__summary-chip-remove {
 		width: vars.$icon-size;
 		height: vars.$icon-size;
-		border-radius: 50%;
+		border-radius: var(--wpds-border-radius-md);
 		border: 0;
 		padding: 0;
 		position: absolute;
@@ -143,7 +143,7 @@
 		cursor: var(--wpds-cursor-control);
 
 		svg {
-			fill: var(--wpds-color-fg-interactive-neutral-weak);
+			fill: var(--wpds-color-fg-interactive-neutral);
 		}
 
 		&:hover,
@@ -208,7 +208,7 @@
 	&:hover,
 	&[data-active-item],
 	&:focus {
-		background-color: var(--wpds-color-bg-interactive-neutral-weak-active);
+		background-color: var(--wpds-color-bg-interactive-brand-weak-active);
 
 		.dataviews-filters__search-widget-listitem-single-selection {
 			border-color: var(--wp-admin-theme-color-darker-20, #183ad6);
