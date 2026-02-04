@@ -13,11 +13,14 @@
  * @param mixed $qvars Query vars.
  * @return mixed
  */
-function block_core_dialog_add_query_var( $qvars ) {
+function block_core_dialog_element_add_query_var( $qvars ) {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-block-experiments' ) ) {
+		return $qvars;
+	}
 	$qvars[] = 'dialogId';
 	return $qvars;
 }
-add_filter( 'query_vars', 'block_core_dialog_add_query_var' );
+add_filter( 'query_vars', 'block_core_dialog_element_add_query_var' );
 
 /**
  * Render the 'core/dialog-element' block.
