@@ -39,6 +39,7 @@ import {
 	getActiveViewOverridesForTab,
 } from './view-utils';
 import useNotesCount from './use-notes-count';
+import { QuickEditModal } from './quick-edit-modal';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -57,7 +58,7 @@ function getItemLevel( item ) {
 
 export default function PostList( { postType } ) {
 	const { path, query } = useLocation();
-	const { activeView = 'all', postId } = query;
+	const { activeView = 'all', postId, quickEdit } = query;
 	const history = useHistory();
 	const defaultView = DEFAULT_VIEW;
 	const activeViewOverrides = useMemo(
@@ -92,19 +93,6 @@ export default function PostList( { postType } ) {
 			history.invalidate();
 		}
 	} );
-
-	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
-	const onChangeSelection = useCallback(
-		( items ) => {
-			setSelection( items );
-			history.navigate(
-				addQueryArgs( path, {
-					postId: items.join( ',' ),
-				} )
-			);
-		},
-		[ path, history ]
-	);
 
 	const fields = usePostFields( {
 		postType,
@@ -196,6 +184,36 @@ export default function PostList( { postType } ) {
 		return processedRecords;
 	}, [ records, fields, view?.sort, notesCount ] );
 
+	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
+	const [ selectedItems, setSelectedItems ] = useState(
+		data.filter( ( item ) =>
+			( postId?.split( ',' ) ?? [] ).includes( getItemId( item ) )
+		)
+	);
+	const onChangeSelection = useCallback(
+		( items ) => {
+			setSelection( items );
+			setSelectedItems(
+				data.filter( ( item ) => items.includes( getItemId( item ) ) )
+			);
+			history.navigate(
+				addQueryArgs( path, {
+					postId: items.join( ',' ),
+				} )
+			);
+		},
+		[ data, path, history ]
+	);
+	useEffect( () => {
+		const newSelection = postId?.split( ',' ) ?? [];
+		setSelection( newSelection );
+		setSelectedItems(
+			data?.filter( ( item ) =>
+				newSelection.includes( getItemId( item ) )
+			) ?? []
+		);
+	}, [ postId, data ] );
+
 	const ids = data?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
 	const deletedIds = prevIds.filter( ( id ) => ! ids.includes( id ) );
@@ -238,6 +256,7 @@ export default function PostList( { postType } ) {
 		context: 'list',
 	} );
 	const editAction = useEditPostAction();
+
 	const quickEditAction = useQuickEditPostAction();
 	const actions = useMemo(
 		() => [ editAction, quickEditAction, ...postTypeActions ],
@@ -251,6 +270,14 @@ export default function PostList( { postType } ) {
 	const handleNewPage = ( { type, id } ) => {
 		history.navigate( `/${ type }/${ id }?canvas=edit` );
 		closeModal();
+	};
+	const closeQuickEditModal = () => {
+		history.navigate(
+			addQueryArgs( path, {
+				...query,
+				quickEdit: undefined,
+			} )
+		);
 	};
 
 	return (
@@ -309,6 +336,13 @@ export default function PostList( { postType } ) {
 				getItemLevel={ getItemLevel }
 				defaultLayouts={ defaultLayouts }
 			/>
+			{ quickEdit && ! isLoadingData && selectedItems.length > 0 && (
+				<QuickEditModal
+					postType={ postType }
+					items={ selectedItems }
+					closeModal={ closeQuickEditModal }
+				/>
+			) }
 		</Page>
 	);
 }

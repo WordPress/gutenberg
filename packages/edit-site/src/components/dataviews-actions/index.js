@@ -1,21 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { pencil, drawerRight } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import { PATTERN_TYPES } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
-import { QuickEditModal } from '../post-list/quick-edit-modal';
 
-const { useHistory } = unlock( routerPrivateApis );
+const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 export const useSetActiveTemplateAction = () => {
 	const activeTheme = useSelect( ( select ) =>
@@ -100,6 +100,8 @@ export const useEditPostAction = () => {
 };
 
 export const useQuickEditPostAction = () => {
+	const history = useHistory();
+	const { path, query } = useLocation();
 	return useMemo(
 		() => ( {
 			id: 'quick-edit',
@@ -114,33 +116,16 @@ export const useQuickEditPostAction = () => {
 				// It's eligible for all post types except theme patterns.
 				return post.type !== PATTERN_TYPES.theme;
 			},
-			modalHeader( items ) {
-				if ( items.length === 1 ) {
-					return sprintf(
-						/* translators: %s: post title */
-						__( 'Quick edit "%s"' ),
-						items[ 0 ]?.title?.rendered ||
-							items[ 0 ]?.title?.raw ||
-							items[ 0 ]?.title ||
-							''
-					);
-				}
-				return sprintf(
-					/* translators: %d: number of items */
-					_n( 'Edit %d item', 'Edit %d items', items.length ),
-					items.length
-				);
-			},
-			RenderModal( { items, closeModal, onActionPerformed } ) {
-				return (
-					<QuickEditModal
-						items={ items }
-						closeModal={ closeModal }
-						onActionPerformed={ onActionPerformed }
-					/>
+			callback( items ) {
+				history.navigate(
+					addQueryArgs( path, {
+						...query,
+						quickEdit: true,
+						postId: items.map( ( item ) => item.id ).join( ',' ),
+					} )
 				);
 			},
 		} ),
-		[]
+		[ history, path, query ]
 	);
 };
