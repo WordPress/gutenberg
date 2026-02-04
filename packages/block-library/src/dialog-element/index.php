@@ -105,8 +105,19 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 	// Get updated HTML.
 	$output = $tag_processor->get_updated_html();
 
-	// This will enable anyone to supply their own close icon asset.
-	$close_icon = 'X';
+	// Use the icon registry if available, otherwise fall back to inline SVG.
+	if ( class_exists( 'WP_Icons_Registry' ) ) {
+		$registry   = WP_Icons_Registry::get_instance();
+		$icon_data  = $registry->get_registered_icon( 'core/cancel-circle-filled' );
+		$close_icon = $icon_data['content'] ?? '';
+	}
+
+	if ( empty( $close_icon ) ) {
+		$close_icon = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24" aria-hidden="true" focusable="false"><path d="M12 4c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8Zm3.8 10.7-1.1 1.1-2.7-2.7-2.7 2.7-1.1-1.1 2.7-2.7-2.7-2.7 1.1-1.1 2.7 2.7 2.7-2.7 1.1 1.1-2.7 2.7 2.7 2.7Z" /></svg>';
+	}
+
+	// Allow themes/plugins to customize the close icon.
+	$close_icon = apply_filters( 'block_core_dialog_close_icon', $close_icon );
 
 	$close_button = wp_sprintf(
 		'<button class="wp-block-dialog-element__close-button" data-wp-on--click="actions.onClickClose" type="button" aria-label="%1$s">%2$s</button>',
@@ -149,4 +160,4 @@ function register_block_core_dialog_element() {
 		)
 	);
 }
-add_action('init', 'register_block_core_dialog_element');
+add_action( 'init', 'register_block_core_dialog_element' );

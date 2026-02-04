@@ -16,10 +16,6 @@
 function render_block_core_dialog_trigger( $attributes, $content, $block ) {
 	$context_id = isset( $block->context['core/dialog-id'] ) ? $block->context['core/dialog-id'] : null;
 	$trigger_template = '<button %1$s>%2$s</button>';
-	// @TODO: This is temporary test code during PR review phase.
-	if ( WP_DEBUG ) {
-		$trigger_template .= '<button data-wp-interactive="core/dialog/test" data-wp-on--click="actions.onClickOpen">TEST 3RD PARTY INTERACTION.</button>';
-	}
 	return wp_sprintf(
 		$trigger_template,
 		get_block_wrapper_attributes(
