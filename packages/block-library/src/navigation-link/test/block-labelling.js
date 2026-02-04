@@ -2,10 +2,10 @@
  * The __experimentalLabel function extracted for isolated testing.
  * This avoids importing the full settings object which has complex dependencies.
  *
- * @param {Object} attributes Block attributes.
- * @param {Object} root0 Options object.
+ * @param {Object} attributes    Block attributes.
+ * @param {Object} root0         Options object.
  * @param {string} root0.context The context for the label.
- * @return {string|undefined} The label for the given context.
+ * @return {string|undefined}             The label for the given context.
  */
 const __experimentalLabel = ( attributes, { context } ) => {
 	if ( context === 'list-view' ) {

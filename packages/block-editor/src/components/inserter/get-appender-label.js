@@ -6,7 +6,7 @@
  *
  * @param {Object} defaultBlock     The default block configuration with name and attributes.
  * @param {Object} defaultBlockType The block type object containing __experimentalLabel.
- * @return {string|null} The appender label in lowercase, or null if not available.
+ * @return {string|null}            The appender label in lowercase, or null if not available.
  */
 export function getAppenderLabel( defaultBlock, defaultBlockType ) {
 	if (
