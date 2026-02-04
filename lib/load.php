@@ -71,6 +71,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-static-templates-controller.php';
 	require __DIR__ . '/compat/wordpress-7.0/template-activate.php';
 	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
+	require __DIR__ . '/compat/wordpress-7.0/media-edit-test.php';
 	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
 
 	// Plugin specific code.
