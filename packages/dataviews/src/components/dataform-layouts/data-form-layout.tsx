@@ -52,7 +52,7 @@ export function DataFormLayout< Item >( {
 	const { fields: fieldDefinitions } = useContext( DataFormContext );
 
 	// Auto-compute: mark the minority of fields
-	// When counts are equal, mark required fields (per @ntsekouras feedback)
+	// When counts are equal, mark required fields
 	const markWhenOptional = useMemo( () => {
 		const requiredCount = fieldDefinitions.filter(
 			( f ) => !! f.isValid?.required
