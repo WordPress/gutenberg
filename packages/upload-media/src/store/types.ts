@@ -168,12 +168,12 @@ export interface Settings {
 	// Maximum number of concurrent uploads.
 	maxConcurrentUploads: number;
 	// Big image size threshold in pixels.
-	// Images larger than this will be scaled down before upload.
+	// Images larger than this will be scaled down.
 	// Default is 2560 (matching WordPress core).
 	bigImageSizeThreshold?: number;
 }
 
-// Must match the Attachment type from the media-utils package.
+// Matches the Attachment type from the media-utils package.
 export interface Attachment {
 	id: number;
 	alt: string;

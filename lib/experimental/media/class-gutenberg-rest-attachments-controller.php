@@ -117,8 +117,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		// Add EXIF orientation for images.
 		if ( rest_is_field_included( 'exif_orientation', $fields ) ) {
-			$mime_type = get_post_mime_type( $item );
-
 			if ( wp_attachment_is_image( $item ) ) {
 				$metadata = wp_get_attachment_metadata( $item->ID, true );
 
