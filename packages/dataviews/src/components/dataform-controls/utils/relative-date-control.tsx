@@ -92,7 +92,7 @@ export default function RelativeDateControl< Item >( {
 			label={ label }
 			hideLabelFromVision={ hideLabelFromVision }
 		>
-			<Stack direction="row" gap="xs">
+			<Stack direction="row" gap="sm">
 				<NumberControl
 					__next40pxDefaultSize
 					className="dataviews-controls__relative-date-number"

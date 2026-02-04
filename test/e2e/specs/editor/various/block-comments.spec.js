@@ -881,10 +881,15 @@ class BlockCommentUtils {
 					.getByRole( 'region', { name: 'Editor settings' } )
 					.getByRole( 'button', { name: 'Add note', exact: true } )
 					.click();
-				await this.#page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note added.' } )
-					.click();
+				await expect(
+					this.#page
+						.getByRole( 'region', {
+							name: 'Editor settings',
+						} )
+						.getByRole( 'treeitem', {
+							name: `Note: ${ comment }`,
+						} )
+				).toBeVisible();
 			},
 			{ box: true }
 		);

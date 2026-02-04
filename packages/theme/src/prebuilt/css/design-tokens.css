@@ -101,17 +101,20 @@
 	--wpds-color-stroke-surface-warning: #d0b381; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-warning-strong: #926300; /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
 	--wpds-dimension-base: 4px; /* Base dimension unit */
-	--wpds-dimension-gap-2xs: 4px; /* 2x extra small gap */
-	--wpds-dimension-gap-lg: 24px; /* Large gap */
-	--wpds-dimension-gap-md: 16px; /* Medium gap */
-	--wpds-dimension-gap-sm: 12px; /* Small gap */
-	--wpds-dimension-gap-xl: 40px; /* Extra large gap */
-	--wpds-dimension-gap-xs: 8px; /* Extra small gap */
-	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
-	--wpds-dimension-padding-surface-lg: 32px; /* Large spacing for surfaces */
-	--wpds-dimension-padding-surface-md: 24px; /* Medium spacing for surfaces */
-	--wpds-dimension-padding-surface-sm: 16px; /* Small spacing for surfaces */
-	--wpds-dimension-padding-surface-xs: 8px; /* Extra small spacing for surfaces */
+	--wpds-dimension-gap-2xl: 32px; /* 2x extra large gap */
+	--wpds-dimension-gap-3xl: 40px; /* 3x extra large gap */
+	--wpds-dimension-gap-lg: 16px; /* Large gap */
+	--wpds-dimension-gap-md: 12px; /* Medium gap */
+	--wpds-dimension-gap-sm: 8px; /* Small gap */
+	--wpds-dimension-gap-xl: 24px; /* Extra large gap */
+	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
+	--wpds-dimension-padding-2xl: 24px; /* 2x extra large padding */
+	--wpds-dimension-padding-3xl: 32px; /* 3x extra large padding */
+	--wpds-dimension-padding-lg: 16px; /* Large padding */
+	--wpds-dimension-padding-md: 12px; /* Medium padding */
+	--wpds-dimension-padding-sm: 8px; /* Small padding */
+	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
+	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
 	--wpds-elevation-large: 0 5px 15px 0 #00000014, 0 15px 27px 0 #00000012,
 		0 30px 36px 0 #0000000a, 0 50px 43px 0 #00000005; /* For components that confirm decisions or handle necessary interruptions. Example: Modals. */
 	--wpds-elevation-medium: 0 2px 3px 0 #0000000d, 0 4px 5px 0 #0000000a,
@@ -143,45 +146,54 @@
 
 [data-wpds-theme-provider-id][data-wpds-density='default'] {
 	--wpds-dimension-base: 4px; /* Base dimension unit */
-	--wpds-dimension-gap-2xs: 4px; /* 2x extra small gap */
-	--wpds-dimension-gap-lg: 24px; /* Large gap */
-	--wpds-dimension-gap-md: 16px; /* Medium gap */
-	--wpds-dimension-gap-sm: 12px; /* Small gap */
-	--wpds-dimension-gap-xl: 40px; /* Extra large gap */
-	--wpds-dimension-gap-xs: 8px; /* Extra small gap */
-	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
-	--wpds-dimension-padding-surface-lg: 32px; /* Large spacing for surfaces */
-	--wpds-dimension-padding-surface-md: 24px; /* Medium spacing for surfaces */
-	--wpds-dimension-padding-surface-sm: 16px; /* Small spacing for surfaces */
-	--wpds-dimension-padding-surface-xs: 8px; /* Extra small spacing for surfaces */
+	--wpds-dimension-gap-2xl: 32px; /* 2x extra large gap */
+	--wpds-dimension-gap-3xl: 40px; /* 3x extra large gap */
+	--wpds-dimension-gap-lg: 16px; /* Large gap */
+	--wpds-dimension-gap-md: 12px; /* Medium gap */
+	--wpds-dimension-gap-sm: 8px; /* Small gap */
+	--wpds-dimension-gap-xl: 24px; /* Extra large gap */
+	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
+	--wpds-dimension-padding-2xl: 24px; /* 2x extra large padding */
+	--wpds-dimension-padding-3xl: 32px; /* 3x extra large padding */
+	--wpds-dimension-padding-lg: 16px; /* Large padding */
+	--wpds-dimension-padding-md: 12px; /* Medium padding */
+	--wpds-dimension-padding-sm: 8px; /* Small padding */
+	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
+	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
 }
 
 [data-wpds-theme-provider-id][data-wpds-density='compact'] {
-	--wpds-dimension-gap-2xs: 4px; /* 2x extra small gap */
-	--wpds-dimension-gap-lg: 20px; /* Large gap */
-	--wpds-dimension-gap-md: 12px; /* Medium gap */
-	--wpds-dimension-gap-sm: 8px; /* Small gap */
-	--wpds-dimension-gap-xl: 32px; /* Extra large gap */
+	--wpds-dimension-gap-2xl: 24px; /* 2x extra large gap */
+	--wpds-dimension-gap-3xl: 32px; /* 3x extra large gap */
+	--wpds-dimension-gap-lg: 12px; /* Large gap */
+	--wpds-dimension-gap-md: 8px; /* Medium gap */
+	--wpds-dimension-gap-sm: 4px; /* Small gap */
+	--wpds-dimension-gap-xl: 20px; /* Extra large gap */
 	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
-	--wpds-dimension-padding-surface-2xs: 4px; /* 2x extra small spacing for surfaces */
-	--wpds-dimension-padding-surface-lg: 24px; /* Large spacing for surfaces */
-	--wpds-dimension-padding-surface-md: 20px; /* Medium spacing for surfaces */
-	--wpds-dimension-padding-surface-sm: 12px; /* Small spacing for surfaces */
-	--wpds-dimension-padding-surface-xs: 4px; /* Extra small spacing for surfaces */
+	--wpds-dimension-padding-2xl: 20px; /* 2x extra large padding */
+	--wpds-dimension-padding-3xl: 24px; /* 3x extra large padding */
+	--wpds-dimension-padding-lg: 12px; /* Large padding */
+	--wpds-dimension-padding-md: 8px; /* Medium padding */
+	--wpds-dimension-padding-sm: 4px; /* Small padding */
+	--wpds-dimension-padding-xl: 16px; /* Extra large padding */
+	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
 }
 
 [data-wpds-theme-provider-id][data-wpds-density='comfortable'] {
-	--wpds-dimension-gap-2xs: 8px; /* 2x extra small gap */
-	--wpds-dimension-gap-lg: 32px; /* Large gap */
-	--wpds-dimension-gap-md: 20px; /* Medium gap */
-	--wpds-dimension-gap-sm: 16px; /* Small gap */
-	--wpds-dimension-gap-xl: 48px; /* Extra large gap */
-	--wpds-dimension-gap-xs: 12px; /* Extra small gap */
-	--wpds-dimension-padding-surface-2xs: 8px; /* 2x extra small spacing for surfaces */
-	--wpds-dimension-padding-surface-lg: 40px; /* Large spacing for surfaces */
-	--wpds-dimension-padding-surface-md: 32px; /* Medium spacing for surfaces */
-	--wpds-dimension-padding-surface-sm: 20px; /* Small spacing for surfaces */
-	--wpds-dimension-padding-surface-xs: 12px; /* Extra small spacing for surfaces */
+	--wpds-dimension-gap-2xl: 40px; /* 2x extra large gap */
+	--wpds-dimension-gap-3xl: 48px; /* 3x extra large gap */
+	--wpds-dimension-gap-lg: 20px; /* Large gap */
+	--wpds-dimension-gap-md: 16px; /* Medium gap */
+	--wpds-dimension-gap-sm: 12px; /* Small gap */
+	--wpds-dimension-gap-xl: 32px; /* Extra large gap */
+	--wpds-dimension-gap-xs: 8px; /* Extra small gap */
+	--wpds-dimension-padding-2xl: 32px; /* 2x extra large padding */
+	--wpds-dimension-padding-3xl: 40px; /* 3x extra large padding */
+	--wpds-dimension-padding-lg: 20px; /* Large padding */
+	--wpds-dimension-padding-md: 16px; /* Medium padding */
+	--wpds-dimension-padding-sm: 12px; /* Small padding */
+	--wpds-dimension-padding-xl: 24px; /* Extra large padding */
+	--wpds-dimension-padding-xs: 8px; /* Extra small padding */
 }
 
 @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {

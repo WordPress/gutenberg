@@ -6,6 +6,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,6 +32,7 @@ import OverlayPreview from './overlay-preview';
  * @param {string}   props.overlayMenuPreviewId      ID for overlay menu preview.
  * @param {boolean}  props.isResponsive              Whether overlay menu is responsive.
  * @param {string}   props.currentTheme              Current theme stylesheet name.
+ * @param {boolean}  props.hasOverlays               Whether any overlay template parts exist.
  * @return {JSX.Element|null}                       The overlay panel component or null if overlay is disabled.
  */
 export default function OverlayPanel( {
@@ -46,7 +48,10 @@ export default function OverlayPanel( {
 	overlayMenuPreviewId,
 	isResponsive,
 	currentTheme,
+	hasOverlays,
 } ) {
+	const [ isCreatingOverlay, setIsCreatingOverlay ] = useState( false );
+
 	return (
 		<PanelBody title={ __( 'Overlay' ) } initialOpen>
 			<VStack spacing={ 4 }>
@@ -73,15 +78,20 @@ export default function OverlayPanel( {
 						overlay={ overlay }
 						setAttributes={ setAttributes }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
+						isCreatingOverlay={ isCreatingOverlay }
+						setIsCreatingOverlay={ setIsCreatingOverlay }
 					/>
 				) }
 
-				{ overlayMenu !== 'never' && overlay && (
-					<OverlayPreview
-						overlay={ overlay }
-						currentTheme={ currentTheme }
-					/>
-				) }
+				{ overlayMenu !== 'never' &&
+					overlay &&
+					hasOverlays &&
+					! isCreatingOverlay && (
+						<OverlayPreview
+							overlay={ overlay }
+							currentTheme={ currentTheme }
+						/>
+					) }
 			</VStack>
 		</PanelBody>
 	);

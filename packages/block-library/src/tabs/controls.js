@@ -25,12 +25,11 @@ export default function Controls( { attributes, setAttributes, clientId } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
-						label={ __( 'Tabs Title' ) }
+						label={ __( 'Title' ) }
 						help={ __(
-							'The tabs title is used by screen readers to describe the purpose and content of the tabs.'
+							'The tabs title is used by screen readers to describe the purpose and content of the tab panel.'
 						) }
 						value={ metadata.name }
-						placeholder={ __( 'Tab Contents' ) }
 						onChange={ ( value ) => {
 							setAttributes( {
 								metadata: { ...metadata, name: value },

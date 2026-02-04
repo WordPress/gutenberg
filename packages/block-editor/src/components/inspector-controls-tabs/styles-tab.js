@@ -23,14 +23,14 @@ function SectionBlockColorControls( {
 	const settings = useBlockSettings( blockName );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
-	const { hasButton, hasHeading } = useSelect(
+	const { hasButtons, hasHeading } = useSelect(
 		( select ) => {
 			const blockNames =
 				select( blockEditorStore ).getBlockNamesByClientId(
 					contentClientIds
 				);
 			return {
-				hasButton: blockNames.includes( 'core/button' ),
+				hasButtons: blockNames.includes( 'core/buttons' ),
 				hasHeading: blockNames.includes( 'core/heading' ),
 			};
 		},
@@ -52,7 +52,7 @@ function SectionBlockColorControls( {
 			defaultControls={ {
 				text: true,
 				background: true,
-				button: hasButton,
+				button: hasButtons,
 				heading: hasHeading,
 			} }
 		/>

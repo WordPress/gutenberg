@@ -18,6 +18,7 @@ export default function Checkbox< Item >( {
 	onChange,
 	data,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { getValue, setValue, label, description, isValid } = field;
@@ -31,6 +32,7 @@ export default function Checkbox< Item >( {
 	return (
 		<ValidatedCheckboxControl
 			required={ !! field.isValid?.required }
+			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			hidden={ hideLabelFromVision }
 			label={ label }
