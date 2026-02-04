@@ -96,7 +96,7 @@ function usePostEditorAwarenessState(
  * @param  postType - The type of the post.
  * @return {ActiveUser[]} The active users.
  */
-export function useActiveUsers(
+export function useActiveCollaborators(
 	postId: number | null,
 	postType: string | null
 ): ActiveUser[] {

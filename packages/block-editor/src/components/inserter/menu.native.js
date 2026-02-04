@@ -129,6 +129,7 @@ function InserterMenu( {
 				insertionIndex,
 				destinationRootClientId,
 				true,
+				0,
 				{ source: 'inserter_menu' }
 			);
 		},

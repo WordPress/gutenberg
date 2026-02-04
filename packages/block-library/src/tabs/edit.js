@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -26,7 +25,7 @@ const TABS_TEMPLATE = [
 		},
 	],
 	[
-		'core/tab-panels',
+		'core/tab-panel',
 		{
 			lock: {
 				remove: true,
@@ -39,14 +38,7 @@ const TABS_TEMPLATE = [
 					anchor: 'tab-1',
 					label: 'Tab 1',
 				},
-				[
-					[
-						'core/paragraph',
-						{
-							placeholder: __( 'Type / to add a block to tab' ),
-						},
-					],
-				],
+				[ [ 'core/paragraph' ] ],
 			],
 		],
 	],
@@ -72,7 +64,7 @@ function Edit( {
 
 	/**
 	 * Compute tabs list from innerblocks to provide via context.
-	 * This traverses the tab-panels block to find all tab blocks
+	 * This traverses the tab-panel block to find all tab blocks
 	 * and extracts their label and anchor for the tabs-menu to consume.
 	 */
 	const tabsList = useSelect(
@@ -80,16 +72,16 @@ function Edit( {
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
 
-			// Find tab-panels block and extract tab data
-			const tabPanels = innerBlocks.find(
-				( block ) => block.name === 'core/tab-panels'
+			// Find tab-panel block and extract tab data
+			const tabPanel = innerBlocks.find(
+				( block ) => block.name === 'core/tab-panel'
 			);
 
-			if ( ! tabPanels ) {
+			if ( ! tabPanel ) {
 				return [];
 			}
 
-			return tabPanels.innerBlocks
+			return tabPanel.innerBlocks
 				.filter( ( block ) => block.name === 'core/tab' )
 				.map( ( tab, index ) => ( {
 					id: tab.attributes.anchor || `tab-${ index }`,

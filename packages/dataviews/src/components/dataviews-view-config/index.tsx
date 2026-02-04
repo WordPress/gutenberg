@@ -321,12 +321,12 @@ export function DataviewsViewConfigDropdown() {
 					<Stack
 						direction="column"
 						className="dataviews-view-config"
-						gap="lg"
+						gap="xl"
 					>
 						<SettingsSection title={ __( 'Appearance' ) }>
 							<Stack
 								direction="row"
-								gap="xs"
+								gap="sm"
 								className="is-divided-in-two"
 							>
 								<SortFieldControl />
