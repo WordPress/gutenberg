@@ -330,7 +330,7 @@ export function processItem( id: QueueItemId ) {
 		if ( ! operation ) {
 			if (
 				parentId ||
-				( ! parentId && ! select.isUploadingByParentId( id ) )
+				( ! parentId && ! select.hasPendingItemsByParentId( id ) )
 			) {
 				if ( attachment ) {
 					onSuccess?.( [ attachment ] );
