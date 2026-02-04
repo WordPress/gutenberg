@@ -54,8 +54,20 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { unlock } from '../../lock-unlock';
 import type { MediaEditProps } from '../../types';
+import useMovingAnimation from './use-moving-animation';
 
 const { MediaUploadModal } = unlock( mediaUtilsPrivateApis );
+
+function AnimatedMediaItem( {
+	children,
+	index,
+}: {
+	children: React.ReactNode;
+	index: number;
+} ) {
+	const ref = useMovingAnimation( index );
+	return <div ref={ ref }>{ children }</div>;
+}
 
 type BlobItem = {
 	id: string;
@@ -311,98 +323,102 @@ function ExpandedMediaEditAttachments( {
 					attachment.mime_type?.startsWith( 'image' );
 				const isBlob = isBlobURL( attachment.source_url );
 				return (
-					<div
-						key={ attachment.id }
-						className={ clsx( 'fields__media-edit-expanded-item', {
-							'has-preview-image': hasPreviewImage,
-						} ) }
-					>
-						<MediaPickerButton
-							open={ () => {
-								setTargetItemId( attachment.id as number );
-								open();
-							} }
-							label={ __( 'Replace' ) }
-							showTooltip
-							onFilesDrop={ onFilesDrop }
-							attachment={ attachment }
-							isUploading={ isUploading }
+					<AnimatedMediaItem key={ attachment.id } index={ index }>
+						<div
+							className={ clsx(
+								'fields__media-edit-expanded-item',
+								{ 'has-preview-image': hasPreviewImage }
+							) }
 						>
-							<div className="fields__media-edit-expanded-preview">
-								<VStack
-									spacing={ 0 }
-									alignment="center"
-									justify="center"
-									className="fields__media-edit-expanded-preview-stack"
-								>
-									{ ( ! isBlob || hasPreviewImage ) && (
-										<MediaPreview
-											attachment={ attachment }
-										/>
-									) }
-									{ ! isBlob &&
-										( ! hasPreviewImage ? (
-											<MediaTitle
-												attachment={
-													attachment as Attachment< 'view' >
-												}
-											/>
-										) : (
-											<div className="fields__media-edit-expanded-overlay">
-												<div className="fields__media-edit-expanded-title">
-													<MediaTitle
-														attachment={
-															attachment as Attachment< 'view' >
-														}
-													/>
-												</div>
-											</div>
-										) ) }
-								</VStack>
-							</div>
-						</MediaPickerButton>
-						{ ! isBlob && (
-							<div className="fields__media-edit-expanded-overlay">
-								<HStack
-									className="fields__media-edit-expanded-actions"
-									spacing={ 1 }
-									alignment="flex-end"
-									expanded={ false }
-								>
-									{ multiple &&
-										allItems &&
-										allItems.length > 1 && (
-											<MoveButtons
-												itemId={
-													attachment.id as number
-												}
-												index={ index }
-												totalItems={ allItems.length }
-												isUploading={ isUploading }
-												moveItem={ moveItem }
-												orientation="horizontal"
+							<MediaPickerButton
+								open={ () => {
+									setTargetItemId( attachment.id as number );
+									open();
+								} }
+								label={ __( 'Replace' ) }
+								showTooltip
+								onFilesDrop={ onFilesDrop }
+								attachment={ attachment }
+								isUploading={ isUploading }
+							>
+								<div className="fields__media-edit-expanded-preview">
+									<VStack
+										spacing={ 0 }
+										alignment="center"
+										justify="center"
+										className="fields__media-edit-expanded-preview-stack"
+									>
+										{ ( ! isBlob || hasPreviewImage ) && (
+											<MediaPreview
+												attachment={ attachment }
 											/>
 										) }
-									<Button
-										__next40pxDefaultSize
-										icon={ closeSmall }
-										label={ __( 'Remove' ) }
-										size="small"
-										disabled={ isUploading }
-										accessibleWhenDisabled
-										onClick={ (
-											event: React.MouseEvent< HTMLButtonElement >
-										) => {
-											event.stopPropagation();
-											removeItem(
-												attachment.id as number
-											);
-										} }
-									/>
-								</HStack>
-							</div>
-						) }
-					</div>
+										{ ! isBlob &&
+											( ! hasPreviewImage ? (
+												<MediaTitle
+													attachment={
+														attachment as Attachment< 'view' >
+													}
+												/>
+											) : (
+												<div className="fields__media-edit-expanded-overlay">
+													<div className="fields__media-edit-expanded-title">
+														<MediaTitle
+															attachment={
+																attachment as Attachment< 'view' >
+															}
+														/>
+													</div>
+												</div>
+											) ) }
+									</VStack>
+								</div>
+							</MediaPickerButton>
+							{ ! isBlob && (
+								<div className="fields__media-edit-expanded-overlay">
+									<HStack
+										className="fields__media-edit-expanded-actions"
+										spacing={ 1 }
+										alignment="flex-end"
+										expanded={ false }
+									>
+										{ multiple &&
+											allItems &&
+											allItems.length > 1 && (
+												<MoveButtons
+													itemId={
+														attachment.id as number
+													}
+													index={ index }
+													totalItems={
+														allItems.length
+													}
+													isUploading={ isUploading }
+													moveItem={ moveItem }
+													orientation="horizontal"
+												/>
+											) }
+										<Button
+											__next40pxDefaultSize
+											icon={ closeSmall }
+											label={ __( 'Remove' ) }
+											size="small"
+											disabled={ isUploading }
+											accessibleWhenDisabled
+											onClick={ (
+												event: React.MouseEvent< HTMLButtonElement >
+											) => {
+												event.stopPropagation();
+												removeItem(
+													attachment.id as number
+												);
+											} }
+										/>
+									</HStack>
+								</div>
+							) }
+						</div>
+					</AnimatedMediaItem>
 				);
 			} ) }
 			{ ( multiple || ! allItems?.length ) && (
@@ -438,81 +454,86 @@ function CompactMediaEditAttachments( {
 					{ allItems.map( ( attachment, index ) => {
 						const isBlob = isBlobURL( attachment.source_url );
 						return (
-							<div
+							<AnimatedMediaItem
 								key={ attachment.id }
-								className="fields__media-edit-compact"
+								index={ index }
 							>
-								<div className="fields__media-edit-compact-item">
-									<MediaPickerButton
-										open={ () => {
-											setTargetItemId(
-												attachment.id as number
-											);
-											open();
-										} }
-										label={ __( 'Replace' ) }
-										showTooltip
-										onFilesDrop={ onFilesDrop }
-										attachment={ attachment }
-										isUploading={ isUploading }
-									>
-										<>
-											<MediaPreview
-												attachment={ attachment }
-											/>
-											{ ! isBlob && (
-												<MediaTitle
-													attachment={
-														attachment as Attachment< 'view' >
-													}
+								<div className="fields__media-edit-compact">
+									<div className="fields__media-edit-compact-item">
+										<MediaPickerButton
+											open={ () => {
+												setTargetItemId(
+													attachment.id as number
+												);
+												open();
+											} }
+											label={ __( 'Replace' ) }
+											showTooltip
+											onFilesDrop={ onFilesDrop }
+											attachment={ attachment }
+											isUploading={ isUploading }
+										>
+											<>
+												<MediaPreview
+													attachment={ attachment }
 												/>
+												{ ! isBlob && (
+													<MediaTitle
+														attachment={
+															attachment as Attachment< 'view' >
+														}
+													/>
+												) }
+											</>
+										</MediaPickerButton>
+										{ ! isBlob &&
+											multiple &&
+											allItems &&
+											allItems.length > 1 && (
+												<HStack
+													className="fields__media-edit-compact-movers"
+													spacing={ 1 }
+													alignment="flex-end"
+													expanded={ false }
+												>
+													<MoveButtons
+														itemId={
+															attachment.id as number
+														}
+														index={ index }
+														totalItems={
+															allItems.length
+														}
+														isUploading={
+															isUploading
+														}
+														moveItem={ moveItem }
+														orientation="vertical"
+													/>
+												</HStack>
 											) }
-										</>
-									</MediaPickerButton>
-									{ ! isBlob &&
-										multiple &&
-										allItems &&
-										allItems.length > 1 && (
-											<HStack
-												className="fields__media-edit-compact-movers"
-												spacing={ 1 }
-												alignment="flex-end"
-												expanded={ false }
-											>
-												<MoveButtons
-													itemId={
-														attachment.id as number
-													}
-													index={ index }
-													totalItems={
-														allItems.length
-													}
-													isUploading={ isUploading }
-													moveItem={ moveItem }
-													orientation="vertical"
-												/>
-											</HStack>
-										) }
+									</div>
+									<Button
+										__next40pxDefaultSize
+										className="fields__media-edit-remove"
+										text={ __( 'Remove' ) }
+										variant="secondary"
+										disabled={ isUploading }
+										accessibleWhenDisabled
+										onClick={ (
+											event: React.MouseEvent< HTMLButtonElement >
+										) => {
+											event.stopPropagation();
+											if (
+												typeof attachment.id ===
+												'number'
+											) {
+												removeItem( attachment.id );
+											}
+										} }
+									/>
 								</div>
-								<Button
-									__next40pxDefaultSize
-									className="fields__media-edit-remove"
-									text={ __( 'Remove' ) }
-									variant="secondary"
-									disabled={ isUploading }
-									accessibleWhenDisabled
-									onClick={ (
-										event: React.MouseEvent< HTMLButtonElement >
-									) => {
-										event.stopPropagation();
-										if (
-											typeof attachment.id === 'number'
-										) {
-											removeItem( attachment.id );
-										}
-									} }
-								/>
-							</div>
+							</AnimatedMediaItem>
 						);
 					} ) }
 				</VStack>
