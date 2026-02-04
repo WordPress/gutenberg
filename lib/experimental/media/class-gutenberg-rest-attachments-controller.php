@@ -117,8 +117,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		// Add EXIF orientation for images.
 		if ( rest_is_field_included( 'exif_orientation', $fields ) ) {
-			$mime_type = get_post_mime_type( $item );
-
 			if ( wp_attachment_is_image( $item ) ) {
 				$metadata = wp_get_attachment_metadata( $item->ID, true );
 
@@ -135,8 +133,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				$data['exif_orientation'] = $orientation;
 			}
 		}
-
-		// Handle missing image sizes for PDFs.
 
 		if (
 			rest_is_field_included( 'missing_image_sizes', $fields ) &&
@@ -288,7 +284,6 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 */
 	public function sideload_item( WP_REST_Request $request ) {
 		$attachment_id = $request['id'];
-		$image_size    = $request['image_size'];
 
 		$post = $this->get_post( $attachment_id );
 
