@@ -21,4 +21,8 @@
 	// on newer components like InputControl, SelectControl, etc.
 	// These values should be shared with the `controlPaddingX` in ./utils/config-values.js
 	padding: $grid-unit-15;
+
+	&.is-connected {
+		border-color: var(--wp-block-synced-color);
+	}
 }
