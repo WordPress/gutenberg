@@ -193,12 +193,14 @@ export function Edit( props ) {
 					/>
 				) }
 			</div>
-			<InserterModal
-				isInserterOpen={ isInserterOpen }
-				setInserterOpen={ setInserterOpen }
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-			/>
+			{ isInserterOpen && (
+				<InserterModal
+					icons={ allIcons }
+					setInserterOpen={ setInserterOpen }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+				/>
+			) }
 		</>
 	);
 }

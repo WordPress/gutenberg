@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, useEffect } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { DataViewsPicker, filterSortAndPaginate } from '@wordpress/dataviews';
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -10,7 +10,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { parseIcon } from '../../utils';
-import getIcons from '../../icons';
 
 const fields = [
 	{
@@ -35,7 +34,7 @@ const fields = [
 ];
 
 const InserterModal = ( {
-	isInserterOpen,
+	icons,
 	setInserterOpen,
 	attributes,
 	setAttributes,
@@ -56,21 +55,6 @@ const InserterModal = ( {
 			previewSize: 100,
 		},
 	} );
-
-	const [ icons, setIcons ] = useState( [] );
-	const [ isLoading, setIsLoading ] = useState( true );
-
-	useEffect( () => {
-		if ( isInserterOpen ) {
-			// This will be replaced with an actual API call later.
-			const requestIcons = async () => {
-				const iconList = await getIcons();
-				setIcons( iconList );
-				setIsLoading( false );
-			};
-			requestIcons();
-		}
-	}, [ isInserterOpen ] );
 
 	const [ selection, setSelection ] = useState(
 		[ attributes.icon ].filter( Boolean )
@@ -106,11 +90,6 @@ const InserterModal = ( {
 		},
 	];
 
-	// Only render the modal if it's open.
-	if ( ! isInserterOpen ) {
-		return null;
-	}
-
 	return (
 		<Modal
 			className="wp-block-outermost-icon-inserter__modal"
@@ -135,7 +114,6 @@ const InserterModal = ( {
 				paginationInfo={ paginationInfo }
 				selection={ selection }
 				view={ view }
-				isLoading={ isLoading }
 			/>
 		</Modal>
 	);
