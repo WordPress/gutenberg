@@ -28,9 +28,9 @@
 		transform: translate(-50%, -50%);
 		box-sizing: border-box;
 		min-width: 320px;
-		width: calc(100vw - 2 * var(--wpds-dimension-padding-xl));
-		max-height: calc(100vh - 2 * var(--wpds-dimension-padding-xl));
-		padding: var(--wpds-dimension-padding-3xl);
+		width: calc(100vw - 2 * var(--wpds-dimension-padding-2xl));
+		max-height: calc(100vh - 2 * var(--wpds-dimension-padding-2xl));
+		padding: var(--wpds-dimension-padding-2xl);
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		border-radius: var(--wpds-border-radius-lg);
 		overflow: auto;
