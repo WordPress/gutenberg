@@ -369,16 +369,20 @@ function ExpandedMediaEditAttachments( {
 									alignment="flex-end"
 									expanded={ false }
 								>
-									{ multiple && !! allItems?.length && (
-										<MoveButtons
-											itemId={ attachment.id as number }
-											index={ index }
-											totalItems={ allItems.length }
-											isUploading={ isUploading }
-											moveItem={ moveItem }
-											orientation="horizontal"
-										/>
-									) }
+									{ multiple &&
+										allItems &&
+										allItems.length > 1 && (
+											<MoveButtons
+												itemId={
+													attachment.id as number
+												}
+												index={ index }
+												totalItems={ allItems.length }
+												isUploading={ isUploading }
+												moveItem={ moveItem }
+												orientation="horizontal"
+											/>
+										) }
 									<Button
 										__next40pxDefaultSize
 										icon={ closeSmall }
@@ -467,7 +471,8 @@ function CompactMediaEditAttachments( {
 									</MediaPickerButton>
 									{ ! isBlob &&
 										multiple &&
-										!! allItems?.length && (
+										allItems &&
+										allItems.length > 1 && (
 											<HStack
 												className="fields__media-edit-compact-movers"
 												spacing={ 1 }
@@ -643,17 +648,19 @@ export default function MediaEdit< Item >( {
 	);
 	const moveItem = useCallback(
 		( itemId: number, direction: 'up' | 'down' ) => {
-			const currentIds = normalizeValue( value );
+			if ( ! orderedAttachments ) {
+				return;
+			}
+			const currentIds = orderedAttachments.map( ( a ) => a.id );
 			const index = currentIds.indexOf( itemId );
 			const newIndex = direction === 'up' ? index - 1 : index + 1;
-			const newIds = [ ...currentIds ];
-			[ newIds[ index ], newIds[ newIndex ] ] = [
-				newIds[ newIndex ],
-				newIds[ index ],
+			[ currentIds[ index ], currentIds[ newIndex ] ] = [
+				currentIds[ newIndex ],
+				currentIds[ index ],
 			];
-			onChangeControl( newIds );
+			onChangeControl( currentIds );
 		},
-		[ value, onChangeControl ]
+		[ orderedAttachments, onChangeControl ]
 	);
 	const onFilesDrop = useCallback(
 		( files: File[], _targetItemId?: number ) => {
