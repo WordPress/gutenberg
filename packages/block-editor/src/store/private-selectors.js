@@ -950,3 +950,14 @@ export function isLockedBlock( state, clientId ) {
 		isRemoveLockedBlock( state, clientId )
 	);
 }
+
+/**
+ * Returns whether the list view content panel popover is open.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the popover is open.
+ */
+export function isListViewContentPanelOpen( state ) {
+	return state.listViewContentPanelOpen;
+}
