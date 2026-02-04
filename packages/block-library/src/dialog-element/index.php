@@ -50,9 +50,9 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 	$auto_activation_timer   = $default_is_open ? 0 : $auto_activation_timer;
 	$enable_deep_link        = array_key_exists( 'enableDeepLink', $attributes ) ? $attributes['enableDeepLink'] : false;
 
-	// Animation duration in milliseconds. This value is used both in the Interactivity API context
-	// and as a CSS custom property to keep JS and CSS animations in sync.
-	// Developers can override this value using WP_HTML_Tag_Processor to modify the context and inline style.
+	// Animation duration in milliseconds. Used as a CSS custom property for styling.
+	// The JS uses animationend events instead of timing, so this is only for CSS.
+	// Developers can override this value using WP_HTML_Tag_Processor to modify the inline style.
 	$animation_duration = array_key_exists( 'animationDuration', $attributes ) ? $attributes['animationDuration'] : 400;
 
 	// By using state any 3rd party can interact as easy as `store('core/dialog').state.dialogs.[blockId].isOpen = true;` which would open the dialog given the blockId.
@@ -63,7 +63,6 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 				$context_id => array(
 					'id'                      => $context_id,
 					'activationTimerDuration' => (int) $auto_activation_timer,
-					'animationDuration'       => (int) $animation_duration,
 					'isOpen'                  => $is_open,
 					'enableDeepLink'          => $enable_deep_link,
 					'showClosingAnimation'    => false,

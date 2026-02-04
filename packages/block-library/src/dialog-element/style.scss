@@ -41,10 +41,14 @@
 		}
 	}
 
-	// Closing animation
+	// Closing animation - keep visible while fading out
 	&[open].show-closing-animation:not(.active) {
+		visibility: visible;
 		@media not (prefers-reduced-motion) {
 			animation: turn-off-visibility var(--wp--style--dialog-animation-duration, 400ms) forwards;
+		}
+		@media (prefers-reduced-motion) {
+			opacity: 0;
 		}
 	}
 
@@ -98,15 +102,9 @@
 @keyframes turn-off-visibility {
 	0% {
 		opacity: 1;
-		visibility: visible;
-	}
-	99% {
-		opacity: 0;
-		visibility: visible;
 	}
 	100% {
 		opacity: 0;
-		visibility: hidden;
 	}
 }
 

@@ -7,7 +7,13 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { Icon, cancelCircleFilled } from '@wordpress/icons';
-import { useRef, useEffect, useState, useMemo } from '@wordpress/element';
+import {
+	useRef,
+	useEffect,
+	useState,
+	useMemo,
+	useCallback,
+} from '@wordpress/element';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -30,7 +36,6 @@ function Edit( {
 	backdropColor,
 	setBackdropColor,
 } ) {
-	const { animationDuration } = attributes;
 	const {
 		selectBlock,
 		updateBlockAttributes,
@@ -42,7 +47,6 @@ function Edit( {
 
 	// Local state for closing animation
 	const [ showClosingAnimation, setShowClosingAnimation ] = useState( false );
-	const closeTimeoutRef = useRef( null );
 
 	const { rootClientId, dialogClientId } = useSelect(
 		( select ) => {
@@ -67,10 +71,6 @@ function Edit( {
 			if ( isOpen && ! dialogElementRef.current.open ) {
 				// Reset closing animation when opening
 				setShowClosingAnimation( false );
-				if ( closeTimeoutRef.current ) {
-					clearTimeout( closeTimeoutRef.current );
-					closeTimeoutRef.current = null;
-				}
 				dialogElementRef.current.showModal();
 			} else if ( ! isOpen && dialogElementRef.current.open ) {
 				dialogElementRef.current.close();
@@ -78,14 +78,25 @@ function Edit( {
 		}
 	}, [ isOpen ] );
 
-	// Cleanup timeout on unmount
-	useEffect( () => {
-		return () => {
-			if ( closeTimeoutRef.current ) {
-				clearTimeout( closeTimeoutRef.current );
-			}
-		};
-	}, [] );
+	/**
+	 * Finalize the close operation - update block attributes and select parent.
+	 */
+	const finalizeClose = useCallback( () => {
+		if ( dialogClientId ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			updateBlockAttributes( dialogClientId, {
+				editorIsDialogOpen: false,
+			} );
+		}
+		setShowClosingAnimation( false );
+		selectBlock( rootClientId );
+	}, [
+		dialogClientId,
+		rootClientId,
+		selectBlock,
+		updateBlockAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	/**
 	 * Helper functions:
@@ -98,26 +109,41 @@ function Edit( {
 			} );
 		}
 	};
-	const closeDialog = () => {
-		// Clear any existing timeout before setting a new one
-		if ( closeTimeoutRef.current ) {
-			clearTimeout( closeTimeoutRef.current );
+
+	const closeDialog = useCallback( () => {
+		// Check if user prefers reduced motion - if so, close immediately
+		const prefersReducedMotion = window.matchMedia(
+			'(prefers-reduced-motion: reduce)'
+		).matches;
+
+		if ( prefersReducedMotion ) {
+			finalizeClose();
+			return;
 		}
+
 		// Start closing animation
 		setShowClosingAnimation( true );
-		// After animation completes, actually close
-		closeTimeoutRef.current = setTimeout( () => {
-			if ( dialogClientId ) {
-				__unstableMarkNextChangeAsNotPersistent();
-				updateBlockAttributes( dialogClientId, {
-					editorIsDialogOpen: false,
-				} );
+
+		// Wait for the CSS animation to complete before closing.
+		// Using animationend ensures we close at the exact moment
+		// the animation finishes, avoiding timing mismatches.
+		const dialogElement = dialogElementRef.current;
+		if ( ! dialogElement ) {
+			finalizeClose();
+			return;
+		}
+
+		const onAnimationEnd = ( event ) => {
+			// Only handle our closing animation
+			if ( event.animationName !== 'turn-off-visibility' ) {
+				return;
 			}
-			setShowClosingAnimation( false );
-			selectBlock( rootClientId );
-			closeTimeoutRef.current = null;
-		}, animationDuration );
-	};
+			dialogElement.removeEventListener( 'animationend', onAnimationEnd );
+			finalizeClose();
+		};
+
+		dialogElement.addEventListener( 'animationend', onAnimationEnd );
+	}, [ finalizeClose ] );
 	const onEscHandler = ( e ) => {
 		e.preventDefault();
 		closeDialog();

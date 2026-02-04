@@ -186,18 +186,42 @@ const { actions: privateActions, state: privateState } = store(
 				if ( ! dialogElement.open ) {
 					return;
 				}
-				// Get animation duration from dialog state, with fallback to default.
-				const animationDuration = dialog?.animationDuration ?? 400;
+
+				// Check if user prefers reduced motion - if so, close immediately without animation
+				const prefersReducedMotion = window.matchMedia(
+					'(prefers-reduced-motion: reduce)'
+				).matches;
+
+				if ( prefersReducedMotion ) {
+					// Close immediately without animation
+					dialogElement.close();
+					removeDialogIdFromUrl( id );
+					return;
+				}
+
 				// Start closing animation...
 				privateState.dialogs[ id ].showClosingAnimation = true;
-				// Wait for animation to complete before closing the dialog element
-				setTimeout(
-					withScope( () => {
-						dialogElement?.close();
-						removeDialogIdFromUrl( id ); // We always clean the dialog id regardless of whether deep linking is enabled or not.
-						privateState.dialogs[ id ].showClosingAnimation = false;
-					} ),
-					animationDuration
+
+				// Wait for the CSS animation to complete before closing the dialog element.
+				// Using animationend event ensures we close at the exact moment the animation
+				// finishes, avoiding timing mismatches between JS and CSS.
+				const onAnimationEnd = withScope( ( event ) => {
+					// Only handle our closing animation, not other animations
+					if ( event.animationName !== 'turn-off-visibility' ) {
+						return;
+					}
+					dialogElement.removeEventListener(
+						'animationend',
+						onAnimationEnd
+					);
+					dialogElement.close();
+					removeDialogIdFromUrl( id );
+					privateState.dialogs[ id ].showClosingAnimation = false;
+				} );
+
+				dialogElement.addEventListener(
+					'animationend',
+					onAnimationEnd
 				);
 			},
 			/**
