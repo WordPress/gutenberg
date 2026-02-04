@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -91,16 +86,6 @@ export function Edit( props ) {
 
 	const blockControls = (
 		<>
-			{ icon && (
-				<BlockControls group="block">
-					<ToolbarGroup
-						className={ clsx( 'components-toolbar-group', {
-							'wp-block-outermost-icon-block__toolbar':
-								! isContentOnlyMode,
-						} ) }
-					></ToolbarGroup>
-				</BlockControls>
-			) }
 			<BlockControls group={ isContentOnlyMode ? 'inline' : 'other' }>
 				<ToolbarButton
 					onClick={ () => {
