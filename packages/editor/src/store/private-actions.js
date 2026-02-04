@@ -651,11 +651,13 @@ export const restoreRevision =
  * Select a note by its ID, or clear the selection.
  *
  * @param {undefined|number|'new'} noteId The note ID to select, 'new' to open the new note form, or undefined to clear.
+ * @param {Object}                 [meta] Optional metadata for the selection.
  * @return {Object} Action object.
  */
-export function selectNote( noteId ) {
+export function selectNote( noteId, meta ) {
 	return {
 		type: 'SELECT_NOTE',
 		noteId,
+		meta,
 	};
 }

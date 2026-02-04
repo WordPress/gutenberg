@@ -85,10 +85,15 @@ export function Comments( {
 				orderedBlockIds: getClientIdsWithDescendants(),
 			};
 		}, [] );
-	const selectedNote = useSelect(
-		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
-		[]
-	);
+	const { selectedNote, noteFocused } = useSelect( ( select ) => {
+		const { getSelectedNote, isNoteFocused } = unlock(
+			select( editorStore )
+		);
+		return {
+			selectedNote: getSelectedNote(),
+			noteFocused: isNoteFocused(),
+		};
+	}, [] );
 
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
@@ -162,6 +167,19 @@ export function Comments( {
 	useEffect( () => {
 		selectNote( blockCommentId ?? undefined );
 	}, [ blockCommentId, selectNote ] );
+
+	// Focus the selected note when requested.
+	useEffect( () => {
+		if ( noteFocused && selectedNote ) {
+			focusCommentThread(
+				selectedNote,
+				commentSidebarRef.current,
+				selectedNote === 'new' ? 'textarea' : undefined
+			);
+			// Clear meta to avoid re-triggering.
+			selectNote( selectedNote );
+		}
+	}, [ noteFocused, selectedNote, selectNote, commentSidebarRef ] );
 
 	// Recalculate floating comment thread offsets whenever the heights change.
 	useEffect( () => {
