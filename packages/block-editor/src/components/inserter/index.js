@@ -48,7 +48,10 @@ const defaultRenderToggle = ( {
 			blockTitle.toLowerCase()
 		);
 	} else if ( ! label ) {
-		const appenderLabel = getAppenderLabel( defaultBlock, defaultBlockType );
+		const appenderLabel = getAppenderLabel(
+			defaultBlock,
+			defaultBlockType
+		);
 
 		if ( appenderLabel ) {
 			label = sprintf(

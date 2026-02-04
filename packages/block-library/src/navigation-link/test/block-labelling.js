@@ -17,7 +17,6 @@ const __experimentalLabel = ( attributes, { context } ) => {
 };
 
 describe( 'Navigation Link Block Labelling', () => {
-
 	describe( 'appender context', () => {
 		it( 'should return "page" for post-type with type "page"', () => {
 			const attributes = {
@@ -210,12 +209,9 @@ describe( 'Navigation Link Block Labelling', () => {
 				type: 'page',
 			};
 
-			const result = __experimentalLabel(
-				defaultBlockAttributes,
-				{
-					context: 'appender',
-				}
-			);
+			const result = __experimentalLabel( defaultBlockAttributes, {
+				context: 'appender',
+			} );
 
 			expect( result ).toBe( 'page' );
 		} );
@@ -226,12 +222,9 @@ describe( 'Navigation Link Block Labelling', () => {
 				type: 'post',
 			};
 
-			const result = __experimentalLabel(
-				defaultBlockAttributes,
-				{
-					context: 'appender',
-				}
-			);
+			const result = __experimentalLabel( defaultBlockAttributes, {
+				context: 'appender',
+			} );
 
 			expect( result ).toBe( 'post' );
 		} );
