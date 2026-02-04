@@ -599,14 +599,29 @@ export default function MediaEdit< Item >( {
 				return null;
 			}
 			const normalizedValue = normalizeValue( value );
+			// Sorted IDs ensure stable cache key, avoiding
+			// unnecessary new requests on reorder.
+			const sortedIds = [ ...normalizedValue ].sort( ( a, b ) => a - b );
 			const { getEntityRecords } = select( coreStore );
 			return getEntityRecords( 'postType', 'attachment', {
-				include: normalizedValue,
-				orderby: 'include',
+				include: sortedIds,
 			} ) as Attachment< 'view' >[] | null;
 		},
 		[ value ]
 	);
+	// Reorder attachments to match value order.
+	const orderedAttachments = useMemo( () => {
+		if ( ! attachments ) {
+			return null;
+		}
+		const normalizedValue = normalizeValue( value );
+		const attachmentMap = new Map(
+			attachments.map( ( a ) => [ a.id, a ] )
+		);
+		return normalizedValue
+			.map( ( id ) => attachmentMap.get( id ) )
+			.filter( ( a ): a is Attachment< 'view' > => a !== undefined );
+	}, [ attachments, value ] );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	// Support one upload action at a time for now.
 	const [ targetItemId, setTargetItemId ] = useState< number >();
@@ -695,10 +710,10 @@ export default function MediaEdit< Item >( {
 	// Merge real attachments with any existing blob items that are being uploaded.
 	const allItems: Array< MediaEditAttachment > | null = useMemo( () => {
 		if ( ! blobs.length ) {
-			return attachments;
+			return orderedAttachments;
 		}
 		const items: Array< MediaEditAttachment > = [
-			...( attachments || [] ),
+			...( orderedAttachments || [] ),
 		];
 		const blobItems = blobs.map( ( url ) => ( {
 			id: url,
@@ -715,7 +730,7 @@ export default function MediaEdit< Item >( {
 			items.push( ...blobItems );
 		}
 		return items;
-	}, [ attachments, targetItemId, blobs ] );
+	}, [ orderedAttachments, targetItemId, blobs ] );
 	useEffect( () => {
 		if ( ! isTouched ) {
 			return;
