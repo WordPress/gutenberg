@@ -3,8 +3,9 @@
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useCallback } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
-import { privateApis as editorPrivateApis } from '@wordpress/editor';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -12,7 +13,6 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { unlock } from '../../lock-unlock';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
-const { useGenerateBlockPath } = unlock( editorPrivateApis );
 
 /**
  * Hook to handle navigation to entity records and retrieve initial block selection.
@@ -24,38 +24,30 @@ const { useGenerateBlockPath } = unlock( editorPrivateApis );
 export default function useNavigateToEntityRecord() {
 	const history = useHistory();
 	const { query, path } = useLocation();
-	const generateBlockPath = useGenerateBlockPath();
+	const getExternalClientId = useSelect(
+		( select ) => select( blockEditorStore ).getExternalClientId,
+		[]
+	);
 
-	// Get the selected block from URL parameters and decode the block path
-	let initialBlockSelection = null;
-	if ( query.selectedBlock ) {
-		try {
-			initialBlockSelection = JSON.parse(
-				decodeURIComponent( query.selectedBlock )
-			);
-		} catch ( e ) {
-			// Invalid JSON, ignore
-			initialBlockSelection = null;
-		}
-	}
+	// Get the selected block from URL parameters.
+	// The selectedBlock query param now stores the external clientId directly.
+	const initialBlockSelection = query.selectedBlock
+		? { clientId: query.selectedBlock }
+		: null;
 
 	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
-			// First, update the current URL to include the selected block path for when we navigate back
-			if ( params.selectedBlockClientId ) {
-				const blockPath = generateBlockPath(
-					params.selectedBlockClientId
+			// First, update the current URL to include the selected block for when we navigate back
+			if ( params.selection?.clientId ) {
+				// Convert internal clientId to external for storage
+				const externalClientId = getExternalClientId(
+					params.selection.clientId
 				);
-				if ( blockPath ) {
-					// Encode the block path as JSON in the URL
-					const currentUrl = addQueryArgs( path, {
-						...query,
-						selectedBlock: encodeURIComponent(
-							JSON.stringify( blockPath )
-						),
-					} );
-					history.navigate( currentUrl, { replace: true } );
-				}
+				const currentUrl = addQueryArgs( path, {
+					...query,
+					selectedBlock: externalClientId,
+				} );
+				history.navigate( currentUrl, { replace: true } );
 			}
 
 			// Then navigate to the new entity record
@@ -69,7 +61,7 @@ export default function useNavigateToEntityRecord() {
 
 			history.navigate( url );
 		},
-		[ history, path, query, generateBlockPath ]
+		[ history, path, query, getExternalClientId ]
 	);
 
 	return [ onNavigateToEntityRecord, initialBlockSelection ];

@@ -238,7 +238,7 @@ describe( 'useBlockSync hook', () => {
 				onInput={ jest.fn() }
 			/>
 		);
-		expect( setAsController ).toHaveBeenCalledWith( 'test', true );
+		expect( setAsController ).toHaveBeenCalledWith( 'test', true, [] );
 	} );
 
 	it( 'calls onInput when a non-persistent block change occurs', async () => {
