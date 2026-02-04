@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useMemo } from '@wordpress/element';
+import { createContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,10 +23,8 @@ export function DataFormProvider< Item >( {
 }: React.PropsWithChildren< {
 	fields: NormalizedField< Item >[];
 } > ) {
-	// Memoize to prevent unnecessary re-renders
-	const value = useMemo( () => ( { fields } ), [ fields ] );
 	return (
-		<DataFormContext.Provider value={ value }>
+		<DataFormContext.Provider value={ { fields } }>
 			{ children }
 		</DataFormContext.Provider>
 	);
