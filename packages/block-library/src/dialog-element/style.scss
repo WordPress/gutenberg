@@ -34,7 +34,7 @@
 	&[open].active {
 		visibility: visible;
 		@media not (prefers-reduced-motion) {
-			animation: turn-on-visibility 0.4s forwards;
+			animation: turn-on-visibility var(--wp--style--dialog-animation-duration, 400ms) forwards;
 		}
 		@media (prefers-reduced-motion) {
 			opacity: 1;
@@ -44,7 +44,7 @@
 	// Closing animation
 	&[open].show-closing-animation:not(.active) {
 		@media not (prefers-reduced-motion) {
-			animation: turn-off-visibility 0.35s forwards;
+			animation: turn-off-visibility var(--wp--style--dialog-animation-duration, 400ms) forwards;
 		}
 	}
 
@@ -54,7 +54,7 @@
 		opacity: 0;
 
 		@media not (prefers-reduced-motion) {
-			animation: turn-on-visibility 0.4s forwards;
+			animation: turn-on-visibility var(--wp--style--dialog-animation-duration, 400ms) forwards;
 		}
 		@media (prefers-reduced-motion) {
 			opacity: 0.5;
@@ -63,7 +63,7 @@
 
 	&.show-closing-animation:not(.active)::backdrop {
 		@media not (prefers-reduced-motion) {
-			animation: turn-off-visibility 0.35s forwards;
+			animation: turn-off-visibility var(--wp--style--dialog-animation-duration, 400ms) forwards;
 		}
 	}
 

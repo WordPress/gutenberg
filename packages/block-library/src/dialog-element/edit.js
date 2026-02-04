@@ -22,12 +22,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { Toolbar, InspectorPanel } from './controls';
 
-/**
- * Animation duration in milliseconds. Must match the CSS animation duration
- * defined in style.scss (turn-on-visibility: 0.4s, turn-off-visibility: 0.35s).
- */
-const ANIMATION_DURATION = 400;
-
 function Edit( {
 	attributes,
 	setAttributes,
@@ -36,6 +30,7 @@ function Edit( {
 	backdropColor,
 	setBackdropColor,
 } ) {
+	const { animationDuration } = attributes;
 	const {
 		selectBlock,
 		updateBlockAttributes,
@@ -121,7 +116,7 @@ function Edit( {
 			setShowClosingAnimation( false );
 			selectBlock( rootClientId );
 			closeTimeoutRef.current = null;
-		}, ANIMATION_DURATION );
+		}, animationDuration );
 	};
 	const onEscHandler = ( e ) => {
 		e.preventDefault();

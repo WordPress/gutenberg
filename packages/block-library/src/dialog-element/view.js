@@ -23,12 +23,6 @@ function removeDialogIdFromUrl() {
 	window.history.replaceState( {}, '', url );
 }
 
-/**
- * Animation duration in milliseconds. Must match the CSS animation duration
- * defined in style.scss (turn-on-visibility: 0.4s, turn-off-visibility: 0.35s).
- */
-const ANIMATION_DURATION = 400;
-
 function createReadOnlyProxy( obj ) {
 	return new Proxy( obj, {
 		get( target, prop ) {
@@ -192,6 +186,8 @@ const { actions: privateActions, state: privateState } = store(
 				if ( ! dialogElement.open ) {
 					return;
 				}
+				// Get animation duration from dialog state, with fallback to default.
+				const animationDuration = dialog?.animationDuration ?? 400;
 				// Start closing animation...
 				privateState.dialogs[ id ].showClosingAnimation = true;
 				// Wait for animation to complete before closing the dialog element
@@ -201,7 +197,7 @@ const { actions: privateActions, state: privateState } = store(
 						removeDialogIdFromUrl( id ); // We always clean the dialog id regardless of whether deep linking is enabled or not.
 						privateState.dialogs[ id ].showClosingAnimation = false;
 					} ),
-					ANIMATION_DURATION
+					animationDuration
 				);
 			},
 			/**

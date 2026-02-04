@@ -50,6 +50,11 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 	$auto_activation_timer   = $default_is_open ? 0 : $auto_activation_timer;
 	$enable_deep_link        = array_key_exists( 'enableDeepLink', $attributes ) ? $attributes['enableDeepLink'] : false;
 
+	// Animation duration in milliseconds. This value is used both in the Interactivity API context
+	// and as a CSS custom property to keep JS and CSS animations in sync.
+	// Developers can override this value using WP_HTML_Tag_Processor to modify the context and inline style.
+	$animation_duration = array_key_exists( 'animationDuration', $attributes ) ? $attributes['animationDuration'] : 400;
+
 	// By using state any 3rd party can interact as easy as `store('core/dialog').state.dialogs.[blockId].isOpen = true;` which would open the dialog given the blockId.
 	wp_interactivity_state(
 		'core/dialog/private',
@@ -58,6 +63,7 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 				$context_id => array(
 					'id'                      => $context_id,
 					'activationTimerDuration' => (int) $auto_activation_timer,
+					'animationDuration'       => (int) $animation_duration,
 					'isOpen'                  => $is_open,
 					'enableDeepLink'          => $enable_deep_link,
 					'showClosingAnimation'    => false,
@@ -96,6 +102,12 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 
 		// Add IAPI directives.
 		$tag_processor->set_attribute( 'data-wp-interactive', 'core/dialog/private' );
+		// Set the animation duration as a CSS custom property to keep CSS animations in sync with JS.
+		// Merge with any existing inline styles from block supports.
+		$existing_style         = $tag_processor->get_attribute( 'style' ) ?? '';
+		$animation_duration_css = sprintf( '--wp--style--dialog-animation-duration: %dms;', $animation_duration );
+		$merged_style           = $existing_style ? $existing_style . ' ' . $animation_duration_css : $animation_duration_css;
+		$tag_processor->set_attribute( 'style', $merged_style );
 		$tag_processor->set_attribute( 'data-wp-class--active', 'state.dialog.isOpen' );
 		$tag_processor->set_attribute( 'data-wp-class--show-closing-animation', 'state.dialog.showClosingAnimation' );
 		$tag_processor->set_attribute( 'data-wp-on--click', 'callbacks.onBackdropClick' );
@@ -115,6 +127,7 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 		$close_icon = $icon_data['content'] ?? '';
 	}
 
+	// Fallback to a copy of the core/cancel-circle-filled icon if the icon registry is not available. (it is experimental currently)
 	if ( empty( $close_icon ) ) {
 		$close_icon = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24" aria-hidden="true" focusable="false"><path d="M12 4c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8Zm3.8 10.7-1.1 1.1-2.7-2.7-2.7 2.7-1.1-1.1 2.7-2.7-2.7-2.7 1.1-1.1 2.7 2.7 2.7-2.7 1.1 1.1-2.7 2.7 2.7 2.7Z" /></svg>';
 	}
