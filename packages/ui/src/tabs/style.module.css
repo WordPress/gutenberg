@@ -185,10 +185,11 @@
 
 			&::after {
 				/*
-				 * Add enough inset to prevent the focus ring (which is 1.5px thick)
-				 * from being visually clipped by the tablist.
+				 * Prevent clipping the focus ring at the tablist edge.
+				 * Use rounding, as the focus ring width may have sub-pixel values
+				 * depending on the screen pixel ratio.
 				 */
-				inset-inline: 2px;
+				inset-inline: round(up, var(--wpds-border-width-focus), 1px);
 			}
 		}
 
