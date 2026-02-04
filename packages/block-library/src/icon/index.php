@@ -28,23 +28,23 @@ function render_block_core_icon( $attributes ) {
 		return;
 	}
 	// Is there a label set.
-	$label = ! empty( $attributes['label'] ) ? $attributes['label'] : false;
+	$aria_label = ! empty( $attributes['ariaLabel'] ) ? $attributes['ariaLabel'] : false;
 
 	// Process the markup.
 	$processor = new \WP_HTML_Tag_Processor( $icon['content'] );
 	$processor->next_tag( 'svg' );
-	if ( ! $label ) {
+	if ( ! $aria_label ) {
 		// Icon is decorative, hide it from screen readers.
 		$processor->set_attribute( 'aria-hidden', 'true' );
 		$processor->set_attribute( 'focusable', 'false' );
 	} else {
 		$processor->set_attribute( 'role', 'img' );
-		$processor->set_attribute( 'aria-label', esc_html( $label ) );
+		$processor->set_attribute( 'aria-label', esc_html( $aria_label ) );
 	}
 
 	// Add the label as the title attribute regardless of decorative or informative status.
-	if ( ! $label ) {
-		$processor->set_attribute( 'title', esc_html( $label ) );
+	if ( ! $aria_label ) {
+		$processor->set_attribute( 'title', esc_html( $aria_label ) );
 	}
 
 	// Return the updated SVG markup.

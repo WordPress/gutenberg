@@ -13,9 +13,6 @@
 			"type": "string",
 			"role": "content"
 		},
-		"label": {
-			"type": "string"
-		},
 		"style": {
 			"type": "object",
 			"default": {
@@ -27,6 +24,9 @@
 	},
 	"supports": {
 		"anchor": true,
+		"ariaLabel": {
+			"__experimentalSkipSerialization": true
+		},
 		"align": true,
 		"html": false,
 		"color": {

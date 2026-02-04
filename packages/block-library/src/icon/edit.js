@@ -39,7 +39,7 @@ import getIcons from './icons';
  */
 export function Edit( props ) {
 	const { attributes, setAttributes } = props;
-	const { icon, label, style } = attributes;
+	const { icon, ariaLabel, style } = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 	const [ iconToDisplay, setIconToDisplay ] = useState();
@@ -85,7 +85,7 @@ export function Edit( props ) {
 
 	function resetAll() {
 		setAttributes( {
-			label: undefined,
+			ariaLabel: undefined,
 		} );
 	}
 
@@ -128,9 +128,9 @@ export function Edit( props ) {
 								<TextControl
 									className="wp-block-outermost-icon-block__toolbar_content"
 									label={ __( 'Label' ) }
-									value={ label || '' }
+									value={ ariaLabel || '' }
 									onChange={ ( value ) =>
-										setAttributes( { label: value } )
+										setAttributes( { ariaLabel: value } )
 									}
 									help={ __(
 										'Briefly describe the icon to help screen reader users. Leave blank for decorative icons.'
@@ -156,7 +156,7 @@ export function Edit( props ) {
 					<ToolsPanelItem
 						label={ __( 'Label' ) }
 						isShownByDefault
-						hasValue={ () => !! label }
+						hasValue={ () => !! ariaLabel }
 						onDeselect={ () =>
 							setAttributes( { label: undefined } )
 						}
@@ -166,9 +166,9 @@ export function Edit( props ) {
 							help={ __(
 								'Briefly describe the icon to help screen reader users. Leave blank for decorative icons.'
 							) }
-							value={ label || '' }
+							value={ ariaLabel || '' }
 							onChange={ ( value ) =>
-								setAttributes( { label: value } )
+								setAttributes( { ariaLabel: value } )
 							}
 							__next40pxDefaultSize
 						/>
