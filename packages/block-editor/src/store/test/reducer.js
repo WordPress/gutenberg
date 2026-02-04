@@ -3291,11 +3291,43 @@ describe( 'state', () => {
 			const state = blockListSettings( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
+				blocks: [],
 			} );
 
 			expect( state ).toEqual( {
 				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
 					allowedBlocks: [ 'core/paragraph' ],
+				},
+			} );
+		} );
+
+		it( 'should preserve the settings of a block when its clientId is reused in replacement', () => {
+			const original = deepFreeze( {
+				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
+					allowedBlocks: [ 'core/paragraph' ],
+				},
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+					allowedBlocks: true,
+				},
+			} );
+
+			const state = blockListSettings( original, {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
+				blocks: [
+					{
+						clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						innerBlocks: [],
+					},
+				],
+			} );
+
+			expect( state ).toEqual( {
+				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
+					allowedBlocks: [ 'core/paragraph' ],
+				},
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+					allowedBlocks: true,
 				},
 			} );
 		} );
