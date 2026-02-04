@@ -60,6 +60,5 @@
 			"width": true
 		}
 	},
-	"editorScript": "file:./index.js",
-	"style": "file:./style.css"
+	"style": "wp-block-icon"
 }
