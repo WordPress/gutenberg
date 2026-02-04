@@ -5,6 +5,11 @@ import { getFilename } from '@wordpress/url';
 import { _x } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import { CLIENT_SIDE_SUPPORTED_MIME_TYPES } from './store/constants';
+
+/**
  * Converts a Blob to a File with a default name like "image.png".
  *
  * If it is already a File object, it is returned unchanged.
@@ -87,4 +92,18 @@ export function getFileBasename( name: string ): string {
  */
 export function getFileNameFromUrl( url: string ) {
 	return getFilename( url ) || _x( 'unnamed', 'file name' );
+}
+
+/**
+ * Checks if a file can be processed using client-side media processing.
+ *
+ * Only certain image formats are supported by the WebAssembly-based
+ * vips library used for client-side processing. Unsupported formats
+ * (like PDFs) should be uploaded directly to the server.
+ *
+ * @param file File object to check.
+ * @return Whether the file can be processed client-side.
+ */
+export function canProcessWithVips( file: File ): boolean {
+	return CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes( file.type );
 }

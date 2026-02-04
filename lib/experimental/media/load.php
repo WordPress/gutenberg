@@ -418,8 +418,8 @@ add_action( 'wp_enqueue_media', 'gutenberg_override_media_templates' );
 /**
  * Filters the block editor preload paths to include media processing fields.
  *
- * Adds image_sizes, image_size_threshold, image_output_formats, and interlace
- * settings to the root endpoint preload to avoid extra API requests.
+ * Adds image_sizes and image_size_threshold to the root endpoint preload
+ * to avoid an extra API request when these fields are needed.
  *
  * @param array                   $paths   REST API paths to preload.
  * @return array Filtered preload paths.
@@ -427,11 +427,11 @@ add_action( 'wp_enqueue_media', 'gutenberg_override_media_templates' );
 function gutenberg_media_processing_preload_paths( $paths ) {
 	foreach ( $paths as $key => $path ) {
 		if ( is_string( $path ) && str_starts_with( $path, '/?_fields=' ) ) {
-			// Add media processing fields after "home," to match
+			// Add image_sizes and image_size_threshold after "home," to match
 			// the field order in packages/core-data/src/entities.js.
 			$paths[ $key ] = str_replace(
 				',home,',
-				',home,image_sizes,image_size_threshold,image_output_formats,jpeg_interlaced,png_interlaced,gif_interlaced,',
+				',home,image_sizes,image_size_threshold,',
 				$path
 			);
 			break;

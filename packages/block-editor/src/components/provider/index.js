@@ -7,6 +7,7 @@ import { SlotFillProvider } from '@wordpress/components';
 import {
 	MediaUploadProvider,
 	store as uploadStore,
+	canProcessWithVips,
 } from '@wordpress/upload-media';
 
 /**
@@ -29,7 +30,13 @@ const noop = () => {};
  * Upload a media file when the file upload button is activated
  * or when adding a file to the editor via drag & drop.
  *
+ * Files are split based on whether they can be processed client-side.
+ * Supported formats (images like JPEG, PNG, WebP, etc.) go through
+ * client-side processing, while unsupported formats (like PDFs)
+ * are passed directly to the server-side upload.
+ *
  * @param {WPDataRegistry} registry
+ * @param {Function}       serverMediaUpload The original server-side media upload function.
  * @param {Object}         $3                Parameters object passed to the function.
  * @param {Array}          $3.allowedTypes   Array with the types of media that can be uploaded, if unset all types are allowed.
  * @param {Object}         $3.additionalData Additional data to include in the request.
@@ -41,6 +48,7 @@ const noop = () => {};
  */
 function mediaUpload(
 	registry,
+	serverMediaUpload,
 	{
 		allowedTypes,
 		additionalData = {},
@@ -51,15 +59,42 @@ function mediaUpload(
 		onBatchSuccess,
 	}
 ) {
-	void registry.dispatch( uploadStore ).addItems( {
-		files: Array.from( filesList ),
-		onChange: onFileChange,
-		onSuccess,
-		onBatchSuccess,
-		onError: ( { message } ) => onError( message ),
-		additionalData,
-		allowedTypes,
-	} );
+	// Split files into those that can be processed client-side and those that cannot.
+	const clientSideFiles = [];
+	const serverSideFiles = [];
+
+	for ( const file of filesList ) {
+		if ( canProcessWithVips( file ) ) {
+			clientSideFiles.push( file );
+		} else {
+			serverSideFiles.push( file );
+		}
+	}
+
+	// Process supported files using client-side media processing.
+	if ( clientSideFiles.length > 0 ) {
+		void registry.dispatch( uploadStore ).addItems( {
+			files: clientSideFiles,
+			onChange: onFileChange,
+			onSuccess,
+			onBatchSuccess,
+			onError: ( { message } ) => onError( message ),
+			additionalData,
+			allowedTypes,
+		} );
+	}
+
+	// Process unsupported files using server-side upload.
+	if ( serverSideFiles.length > 0 ) {
+		serverMediaUpload( {
+			allowedTypes,
+			additionalData,
+			filesList: serverSideFiles,
+			onError,
+			onFileChange,
+			onSuccess,
+		} );
+	}
 }
 
 export const ExperimentalBlockEditorProvider = withRegistryProvider(
@@ -78,9 +113,14 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 				_settings?.mediaUpload
 			) {
 				// Create a new object so that the original props.settings.mediaUpload is not modified.
+				// Pass the original mediaUpload for server-side fallback of unsupported formats.
 				return {
 					..._settings,
-					mediaUpload: mediaUpload.bind( null, registry ),
+					mediaUpload: mediaUpload.bind(
+						null,
+						registry,
+						_settings.mediaUpload
+					),
 				};
 			}
 			return _settings;
