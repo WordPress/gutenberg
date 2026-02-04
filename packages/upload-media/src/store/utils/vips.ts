@@ -8,7 +8,7 @@ import {
 	vipsResizeImage as resizeImage,
 	vipsRotateImage as rotateImage,
 	vipsCancelOperations as cancelOperations,
-} from '@wordpress/vips';
+} from '@wordpress/vips/worker';
 
 /**
  * Internal dependencies
