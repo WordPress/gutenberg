@@ -1,3 +1,183 @@
+/**
+ * Editor only styles for the Icon Block.
+ */
+
+// Style for the icon library modal.
+.wp-block-outermost-icon-inserter__modal {
+	.components-modal__content {
+		flex: 1 1 0%;
+		overflow: auto;
+		padding: 0;
+
+		&::before {
+			margin-bottom: 0;
+		}
+	}
+
+	.icon-inserter {
+		align-items: stretch;
+		display: flex;
+		height: 100%;
+	}
+
+	.icon-inserter__content {
+		display: flex;
+		flex-direction: column;
+		flex-shrink: 0;
+		overflow: auto;
+		padding: 24px 32px;
+		width: 100%;
+
+		.icon-inserter__content-header {
+			align-items: center;
+			display: flex;
+			height: 40px;
+			justify-content: space-between;
+			margin-bottom: 24px;
+
+			.icon-inserter__content-header__search {
+				display: flex;
+				align-items: center;
+
+				.search-results {
+					color: #757575;
+					padding-left: 10px;
+				}
+			}
+
+			.icon-controls__size {
+				display: flex;
+				align-items: center;
+				margin-right: 6px;
+
+				& > span {
+					font-size: 11px;
+					font-weight: 500;
+					line-height: 1.4;
+					text-transform: uppercase;
+					display: block;
+					margin-right: 18px;
+				}
+
+				.components-range-control {
+					width: 116px;
+
+					.components-base-control__field {
+						margin-bottom: 0;
+					}
+				}
+			}
+		}
+
+		.icons-list {
+			padding: 4px 4px 72px 4px;
+			margin: 0;
+			display: grid;
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+
+			@media (min-width: 600px) {
+				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+			}
+
+			@media (min-width: 900px) {
+				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+			}
+
+			@media (min-width: 1100px) {
+				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+			}
+
+			@media (min-width: 1450px) {
+				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+			}
+
+			@media (min-width: 1600px) {
+				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+			}
+
+			.icons-list__item {
+				&.is-active {
+					background-color: var(--wp-admin-theme-color);
+					color: rgb(255 255 255 / 80%);
+
+					&:hover {
+						color: #fff !important;
+					}
+
+					svg {
+						fill: #fff;
+					}
+
+					&.has-no-icon-fill {
+						svg {
+							color: #fff;
+							fill: none;
+						}
+					}
+				}
+			}
+		}
+
+		.block-editor-inserter__no-results {
+			height: calc(100% - 56px);
+			margin-top: 0;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+
+			svg {
+				margin: 0 auto;
+			}
+		}
+	}
+}
+
+// Styles for the icon list grid
+.wp-block-outermost-icon-inserter__modal,
+.wp-block-outermost-icon-inserter__quick-inserter {
+	.icons-list {
+		display: flex;
+		flex-wrap: wrap;
+
+		.icons-list__item {
+			align-items: stretch;
+			background: transparent;
+			border: 1px solid transparent;
+			border-radius: 2px;
+			color: #1e1e1e;
+			cursor: pointer;
+			display: flex;
+			flex-direction: column;
+			font-size: 13px;
+			height: auto;
+			justify-content: center;
+			padding: 8px;
+			position: relative;
+			transition: all 0.05s ease-in-out;
+			word-break: break-word;
+
+			&:hover {
+				color: var(--wp-admin-theme-color) !important;
+			}
+
+			.icons-list__item-icon {
+				border-radius: 2px;
+				color: #1e1e1e;
+				padding: 12px;
+				transition: all 0.05s ease-in-out;
+			}
+
+			.icons-list__item-title {
+				font-size: 12px;
+				padding: 4px 2px 8px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+		}
+	}
+}
+
 // Minor style fix for the block toolbar. Not perfect, but better than nothing.
 .wp-block-outermost-icon-block__toolbar {
 	padding-left: 0;

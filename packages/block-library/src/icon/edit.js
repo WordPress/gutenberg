@@ -25,7 +25,7 @@ import { useState, useEffect } from '@wordpress/element';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
-import { IconPlaceholder, InserterModal } from './components';
+import { CustomInserterModal, IconPlaceholder } from './components';
 import getIcons from './icons';
 
 /**
@@ -180,7 +180,7 @@ export function Edit( props ) {
 				) }
 			</div>
 			{ isInserterOpen && (
-				<InserterModal
+				<CustomInserterModal
 					icons={ allIcons }
 					setInserterOpen={ setInserterOpen }
 					attributes={ attributes }
