@@ -26,7 +26,6 @@ interface UseInfiniteScrollDataResult< Item > {
  * - Loading more data when scrolling up or down
  * - Maintaining stable positions for items
  * - Unloading items that are no longer visible (with a buffer)
- * - Managing placeholders for unloaded items
  *
  * @param params           - Configuration parameters
  * @param params.view      - Current view configuration
@@ -65,12 +64,10 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 
 	// Initialize data on first load or when view changes significantly
 	useEffect( () => {
-		if (
-			( view.startPosition === undefined && ! allLoadedRecords.length ) ||
-			! view.infiniteScrollEnabled
-		) {
+		if ( ! allLoadedRecords.length || ! view.infiniteScrollEnabled ) {
 			// First page - replace all data and initialize range
-			const startPosition = 1;
+			// Use the view's startPosition if defined, otherwise default to 1
+			const startPosition = view.startPosition ?? 1;
 			const records = shownData.map( ( record, index ) => {
 				const position = view.infiniteScrollEnabled
 					? startPosition + index
