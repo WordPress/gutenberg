@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Validated form controls (private API): Add `validateOnBlur` prop to control whether validation errors show on blur. When `false`, errors only show on submit or when `customValidity` is explicitly set ([#75188](https://github.com/WordPress/gutenberg/pull/75188)).
+
 ### Bug Fixes
 
 -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used.
