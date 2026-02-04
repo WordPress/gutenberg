@@ -156,6 +156,21 @@ export function getFailedItems( state: State ): QueueItem[] {
 }
 
 /**
+ * Returns true if any child items with the given parentId exist in the queue.
+ *
+ * @param state    Upload state.
+ * @param parentId Parent item ID.
+ *
+ * @return Whether any child items with the given parentId exist in the queue.
+ */
+export function hasPendingItemsByParentId(
+	state: State,
+	parentId: QueueItemId
+): boolean {
+	return state.queue.some( ( item ) => item.parentId === parentId );
+}
+
+/**
  * Returns the progress of a specific item.
  *
  * @param state Upload state.

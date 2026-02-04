@@ -42,11 +42,17 @@ export const rootEntitiesConfig = [
 		baseURL: '/',
 		baseURLParams: {
 			// Please also change the preload path when changing this.
-			// @see lib/compat/wordpress-6.8/preload.php
+			// @see lib/compat/wordpress-7.0/preload.php
 			_fields: [
 				'description',
 				'gmt_offset',
 				'home',
+				'image_sizes',
+				'image_size_threshold',
+				'image_output_formats',
+				'jpeg_interlaced',
+				'png_interlaced',
+				'gif_interlaced',
 				'name',
 				'site_icon',
 				'site_icon_url',

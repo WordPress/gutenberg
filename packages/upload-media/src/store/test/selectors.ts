@@ -12,6 +12,7 @@ import {
 	getFailedItems,
 	getItemProgress,
 	getPendingUploads,
+	hasPendingItemsByParentId,
 } from '../private-selectors';
 import {
 	ItemStatus,
@@ -233,6 +234,56 @@ describe( 'selectors', () => {
 			expect( getItemProgress( state, '1' ) ).toBe( 50 );
 			expect( getItemProgress( state, '2' ) ).toBe( 75 );
 			expect( getItemProgress( state, '999' ) ).toBeUndefined();
+		} );
+	} );
+
+	describe( 'hasPendingItemsByParentId', () => {
+		it( 'should return true if there are items with matching parent ID', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						parentId: 'parent-1',
+						status: ItemStatus.Processing,
+					},
+					{
+						id: '2',
+						status: ItemStatus.Processing,
+					},
+				] as QueueItem[],
+				queueStatus: 'paused',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( hasPendingItemsByParentId( state, 'parent-1' ) ).toBe(
+				true
+			);
+			expect( hasPendingItemsByParentId( state, 'parent-2' ) ).toBe(
+				false
+			);
+		} );
+
+		it( 'should return false if no items have a parent ID', () => {
+			const state: State = {
+				queue: [
+					{
+						id: '1',
+						status: ItemStatus.Processing,
+					},
+				] as QueueItem[],
+				queueStatus: 'paused',
+				blobUrls: {},
+				settings: {
+					mediaUpload: jest.fn(),
+				},
+			};
+
+			expect( hasPendingItemsByParentId( state, 'parent-1' ) ).toBe(
+				false
+			);
 		} );
 	} );
 } );

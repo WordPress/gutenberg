@@ -15,6 +15,40 @@ import path from 'path';
 import esbuild from 'esbuild';
 
 /**
+ * Creates an esbuild plugin to force wasm-vips to use its CommonJS version.
+ *
+ * The ES module version (vips-es6.js) uses import.meta.url which fails
+ * when loaded in a Blob URL Worker context. The CommonJS version (vips.js)
+ * doesn't have this issue.
+ *
+ * This plugin intercepts the resolved vips-es6.js path and redirects it
+ * to vips.js. It must run after esbuild's default resolution.
+ *
+ * @return {Object} The esbuild plugin.
+ */
+function createWasmVipsCommonJsPlugin() {
+	return {
+		name: 'wasm-vips-commonjs',
+		setup( build ) {
+			// Intercept vips-es6.js and redirect to vips.js
+			build.onLoad( { filter: /vips-es6\.js$/ }, ( args ) => {
+				// Replace the ES6 module with a re-export from the CommonJS version
+				const vipsJsPath = args.path.replace(
+					'vips-es6.js',
+					'vips.js'
+				);
+				return {
+					contents: `export { default } from ${ JSON.stringify(
+						vipsJsPath
+					) };`,
+					loader: 'js',
+				};
+			} );
+		},
+	};
+}
+
+/**
  * Generate placeholder worker-code.ts for packages with wpWorkers.
  *
  * This must run before transpilation since worker files import worker-code.ts.
@@ -98,7 +132,12 @@ export async function buildWorkers(
 					sourcemap: true,
 					// Bundle everything - workers need to be self-contained.
 					external: [],
-					plugins: [ wasmInlinePlugin ],
+					// Plugin redirects wasm-vips ES6 to CommonJS to avoid
+					// import.meta.url issues in Blob URL Worker context.
+					plugins: [
+						wasmInlinePlugin,
+						createWasmVipsCommonJsPlugin(),
+					],
 					define: {
 						'process.env.NODE_ENV': JSON.stringify(
 							process.env.NODE_ENV || 'production'

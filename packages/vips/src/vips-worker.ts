@@ -43,7 +43,7 @@ function getWorkerAPI(): Remote< WorkerAPI > {
 			type: 'application/javascript',
 		} );
 		workerBlobUrl = URL.createObjectURL( blob );
-		worker = new Worker( workerBlobUrl );
+		worker = new Worker( workerBlobUrl, { type: 'module' } );
 		workerAPI = wrap< WorkerAPI >( worker );
 	}
 	return workerAPI;

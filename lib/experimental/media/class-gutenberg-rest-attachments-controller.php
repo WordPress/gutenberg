@@ -79,9 +79,30 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	}
 
 	/**
+	 * Retrieves the attachment's schema, conforming to JSON Schema.
+	 *
+	 * Adds exif_orientation field to the schema.
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		$schema = parent::get_item_schema();
+
+		$schema['properties']['exif_orientation'] = array(
+			'description' => __( 'EXIF orientation value from the original image. Values 1-8 follow the EXIF specification. A value other than 1 indicates the image needs rotation.', 'gutenberg' ),
+			'type'        => 'integer',
+			'context'     => array( 'edit' ),
+			'readonly'    => true,
+		);
+
+		return $schema;
+	}
+
+	/**
 	 * Prepares a single attachment output for response.
 	 *
 	 * Ensures 'missing_image_sizes' is set for PDFs and not just images.
+	 * Adds 'exif_orientation' for images that need client-side rotation.
 	 *
 	 * @param WP_Post         $item    Attachment object.
 	 * @param WP_REST_Request $request Request object.
@@ -92,9 +113,26 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		$data = $response->get_data();
 
-		// Handle missing image sizes for PDFs.
-
 		$fields = $this->get_fields_for_response( $request );
+
+		// Add EXIF orientation for images.
+		if ( rest_is_field_included( 'exif_orientation', $fields ) ) {
+			if ( wp_attachment_is_image( $item ) ) {
+				$metadata = wp_get_attachment_metadata( $item->ID, true );
+
+				// Get the EXIF orientation from the image metadata.
+				// This is stored by wp_read_image_metadata() during upload.
+				$orientation = 1; // Default: no rotation needed.
+				if (
+					is_array( $metadata ) &&
+					isset( $metadata['image_meta']['orientation'] )
+				) {
+					$orientation = (int) $metadata['image_meta']['orientation'];
+				}
+
+				$data['exif_orientation'] = $orientation;
+			}
+		}
 
 		if (
 			rest_is_field_included( 'missing_image_sizes', $fields ) &&
@@ -158,7 +196,9 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		if ( ! $request['generate_sub_sizes'] ) {
 			add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 100 );
 			add_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
-
+			// Disable server-side EXIF rotation so the client can handle it.
+			// This preserves the original orientation value in the metadata.
+			add_filter( 'wp_image_maybe_exif_rotate', '__return_false', 100 );
 		}
 
 		if ( ! $request['convert_format'] ) {
@@ -169,6 +209,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		remove_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 100 );
 		remove_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
+		remove_filter( 'wp_image_maybe_exif_rotate', '__return_false', 100 );
 		remove_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 
 		return $response;
