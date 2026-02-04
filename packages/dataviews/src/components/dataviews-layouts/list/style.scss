@@ -96,7 +96,7 @@ div.dataviews-view-list {
 	div[role="article"].is-selected:focus-within {
 		.dataviews-view-list__item-wrapper {
 			background-color: rgba(var(--wp-admin-theme-color--rgb), 0.08);
-			color: var(--wpds-color-fg-interactive-neutral-active);
+			color: var(--wpds-color-fg-interactive-neutral);
 
 			.dataviews-title-field,
 			.dataviews-view-list__field {

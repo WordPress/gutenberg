@@ -20,7 +20,7 @@
 	display: flex;
 	flex-direction: column;
 	font-size: var(--wpds-font-size-md);
-	line-height: 1.4;
+	line-height: var(--wpds-font-line-height-sm);
 	background-color: var(--wp-dataviews-color-background, var(--wpds-color-bg-surface-neutral-strong));
 }
 
@@ -108,7 +108,7 @@
 		overflow: hidden;
 		display: block;
 		width: 100%;
-		color: var(--wpds-color-fg-interactive-neutral);
+		color: var(--wpds-color-fg-interactive-neutral-active);
 		&:hover {
 			color: var(--wp-admin-theme-color);
 		}
