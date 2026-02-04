@@ -29,14 +29,12 @@ export const settings = {
 		}
 
 		if ( context === 'appender' ) {
-			if ( attributes?.kind === 'post-type' ) {
-				return attributes.type; // 'page', 'post', etc.
-			}
-			if ( attributes?.kind === 'taxonomy' ) {
-				return attributes.type; // 'category', 'tag', etc.
-			}
-			return 'link';
+			// Return the type (e.g., 'page', 'post', 'category') or fallback to 'link'
+			return attributes?.type || 'link';
 		}
+
+		// Backwards compatibility - return label for unknown contexts
+		return attributes?.label;
 	},
 
 	merge( leftAttributes, { label: rightLabel = '' } ) {
