@@ -171,7 +171,7 @@
 
 		[data-orientation="horizontal"] & {
 			padding-inline: var(--wpds-dimension-padding-lg);
-			height: 48px;
+			height: 48px; /* TODO: use semantic size/height tokens when available */
 			scroll-margin: 24px;
 
 			&::after {
@@ -194,7 +194,7 @@
 
 		[data-orientation="vertical"] & {
 			padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
-			min-height: 40px;
+			min-height: 40px;  /* TODO: use semantic size/height tokens when available */
 		}
 
 		[data-orientation="vertical"][data-select-on-move="false"] &::after {
