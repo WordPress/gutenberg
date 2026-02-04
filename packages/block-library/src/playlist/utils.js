@@ -54,12 +54,17 @@ export function getTrackAttributes( media ) {
 }
 
 /**
+ * External dependencies
+ */
+import { colord } from 'colord';
+
+/**
  * Get the effective background color, falling back to body if transparent.
  *
  * @param {Element} element - The element to get the background color from.
  * @return {string} The background color.
  */
-export function getEffectiveBackgroundColor( element ) {
+function getEffectiveBackgroundColor( element ) {
 	const blockContainer = element.closest( '.wp-block-playlist' );
 	let bgColor = blockContainer
 		? window.getComputedStyle( blockContainer ).backgroundColor
@@ -76,6 +81,21 @@ export function getEffectiveBackgroundColor( element ) {
 	}
 
 	return bgColor;
+}
+
+/**
+ * Get all colors needed for the waveform player based on the element's styles.
+ *
+ * @param {Element} element - The element to derive colors from.
+ * @return {Object} Object containing textColor, bgColor, waveformColor, progressColor.
+ */
+export function getWaveformColors( element ) {
+	const textColor = window.getComputedStyle( element ).color;
+	const bgColor = getEffectiveBackgroundColor( element );
+	const waveformColor = colord( textColor ).alpha( 0.3 ).toRgbString();
+	const progressColor = colord( textColor ).alpha( 0.6 ).toRgbString();
+
+	return { textColor, bgColor, waveformColor, progressColor };
 }
 
 /**
