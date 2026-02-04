@@ -30,7 +30,14 @@
 		"esModuleInterop": false,
 		"resolveJsonModule": true,
 
-		"typeRoots": [ "./typings", "./node_modules/@types" ],
+		"typeRoots": [
+			"./typings",
+			// Workspace specific node_modules/@types, for non-hoisted deps
+			"${configDir}/node_modules/@types",
+			// Root node_modules/@types, for hoisted deps
+			// TODO remove this when nothing is hoisted
+			"./node_modules/@types"
+		],
 		"types": [],
 
 		"rootDir": "${configDir}/src",
