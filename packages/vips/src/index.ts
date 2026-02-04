@@ -24,43 +24,6 @@ import type {
 } from './types';
 import { supportsAnimation, supportsInterlace, supportsQuality } from './utils';
 
-/**
- * Debug logging for VIPS operations.
- * Set to true to enable debug logging.
- */
-const DEBUG_ENABLED = false;
-
-function vipsLog( message: string, data?: Record< string, unknown > ): void {
-	if ( ! DEBUG_ENABLED ) {
-		return;
-	}
-	const timestamp = new Date().toISOString().split( 'T' )[ 1 ].slice( 0, -1 );
-	// eslint-disable-next-line no-console
-	console.log(
-		`%c${ timestamp } [VIPS]%c ${ message }`,
-		'color: #9C27B0; font-weight: bold;',
-		'color: inherit;'
-	);
-	if ( data && Object.keys( data ).length > 0 ) {
-		// eslint-disable-next-line no-console
-		console.log( '%c  └─ Details:', 'color: #888;', data );
-	}
-}
-
-function formatBytes( bytes: number ): string {
-	if ( bytes === 0 ) {
-		return '0 Bytes';
-	}
-	const k = 1024;
-	const sizes = [ 'Bytes', 'KB', 'MB', 'GB' ];
-	const i = Math.floor( Math.log( bytes ) / Math.log( k ) );
-	return (
-		parseFloat( ( bytes / Math.pow( k, i ) ).toFixed( 2 ) ) +
-		' ' +
-		sizes[ i ]
-	);
-}
-
 interface EmscriptenModule {
 	setAutoDeleteLater: ( autoDelete: boolean ) => void;
 	setDelayFunction: ( fn: ( fn: () => void ) => void ) => void;
@@ -79,9 +42,6 @@ async function getVips(): Promise< typeof Vips > {
 	if ( vipsInstance ) {
 		return vipsInstance;
 	}
-
-	vipsLog( 'Initializing VIPS WebAssembly module...' );
-	const startTime = performance.now();
 
 	try {
 		vipsInstance = await Vips( {
@@ -107,13 +67,8 @@ async function getVips(): Promise< typeof Vips > {
 			},
 		} );
 	} catch ( error ) {
-		// eslint-disable-next-line no-console
-		console.error( '[VIPS] Failed to initialize VIPS:', error );
 		throw error;
 	}
-
-	const duration = Math.round( performance.now() - startTime );
-	vipsLog( `VIPS WebAssembly module initialized`, { durationMs: duration } );
 
 	return vipsInstance;
 }
@@ -135,11 +90,7 @@ const inProgressOperations = new Set< ItemId >();
  * @return boolean Whether any operation was cancelled.
  */
 export async function cancelOperations( id: ItemId ) {
-	const hadOperation = inProgressOperations.has( id );
 	const result = inProgressOperations.delete( id );
-	if ( hadOperation ) {
-		vipsLog( `Cancelled operations`, { itemId: id } );
-	}
 	return result;
 }
 
@@ -163,16 +114,6 @@ export async function convertImageFormat(
 	interlaced = false
 ): Promise< ArrayBuffer | ArrayBufferLike > {
 	const ext = outputType.split( '/' )[ 1 ];
-
-	vipsLog( `Converting image format`, {
-		itemId: id,
-		inputType,
-		outputType,
-		inputSize: formatBytes( buffer.byteLength ),
-		quality: Math.round( quality * 100 ) + '%',
-		interlaced,
-	} );
-	const startTime = performance.now();
 
 	inProgressOperations.add( id );
 
@@ -221,16 +162,6 @@ export async function convertImageFormat(
 
 	const outBuffer = image.writeToBuffer( `.${ ext }`, saveOptions );
 	const result = outBuffer.buffer;
-
-	const duration = Math.round( performance.now() - startTime );
-	vipsLog( `Image format conversion completed`, {
-		itemId: id,
-		inputType,
-		outputType,
-		inputSize: formatBytes( buffer.byteLength ),
-		outputSize: formatBytes( result.byteLength ),
-		durationMs: duration,
-	} );
 
 	cleanup?.();
 
@@ -282,17 +213,6 @@ export async function resizeImage(
 	originalHeight: number;
 } > {
 	const ext = type.split( '/' )[ 1 ];
-
-	vipsLog( `Resizing image`, {
-		itemId: id,
-		type,
-		inputSize: formatBytes( buffer.byteLength ),
-		targetWidth: resize.width,
-		targetHeight: resize.height,
-		crop: resize.crop || false,
-		smartCrop,
-	} );
-	const startTime = performance.now();
 
 	inProgressOperations.add( id );
 
@@ -419,16 +339,6 @@ export async function resizeImage(
 		originalWidth: width,
 		originalHeight: pageHeight,
 	};
-
-	const duration = Math.round( performance.now() - startTime );
-	vipsLog( `Image resize completed`, {
-		itemId: id,
-		originalDimensions: `${ width }x${ pageHeight }`,
-		newDimensions: `${ result.width }x${ result.height }`,
-		inputSize: formatBytes( buffer.byteLength ),
-		outputSize: formatBytes( result.buffer.byteLength ),
-		durationMs: duration,
-	} );
 
 	// Only call after `image` is no longer being used.
 	cleanup?.();
