@@ -8,7 +8,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useRef, useCallback, useState } from '@wordpress/element';
+import { useRef, useCallback, useEffect, useState } from '@wordpress/element';
 import { debounce } from '@wordpress/compose';
 
 /**
@@ -312,6 +312,73 @@ export const CustomErrorsOnSubmit: StoryObj< typeof ValidatedInputControl > = {
 					}
 				/>
 			</>
+		);
+	},
+};
+
+/**
+ * Sometimes, a custom validity state can only be determined after a certain user action,
+ * such as clicking the submit button. In this case, the custom validity state can be
+ * set in the submit handler.
+ */
+export const ValidateOnlyOnSubmit: StoryObj< typeof ValidatedInputControl > = {
+	decorators: [],
+	args: {
+		label: 'Text',
+		help: 'The word "error" will trigger an error, but only on submit and not on blur.',
+	},
+	render: function Template( { ...args } ) {
+		const formRef = useRef< HTMLFormElement >( null );
+		const [ text, setText ] = useState< string | undefined >( '' );
+		const [ customValidity, setCustomValidity ] =
+			useState<
+				React.ComponentProps<
+					typeof ValidatedInputControl
+				>[ 'customValidity' ]
+			>( undefined );
+
+		useEffect( () => {
+			if ( customValidity?.type === 'invalid' ) {
+				formRef.current?.reportValidity();
+			}
+		}, [ customValidity ] );
+
+		return (
+			<form
+				ref={ formRef }
+				onSubmit={ ( event ) => {
+					event.preventDefault();
+					if ( text === 'error' ) {
+						setCustomValidity( {
+							type: 'invalid',
+							message: 'The word "error" is not allowed.',
+						} );
+					} else {
+						setCustomValidity( undefined );
+						// eslint-disable-next-line no-alert
+						alert( 'Form submitted!' );
+					}
+				} }
+			>
+				<VStack spacing={ 4 } alignment="left">
+					<ValidatedInputControl
+						{ ...args }
+						value={ text }
+						onChange={ ( value ) => {
+							setText( value ?? '' );
+							setCustomValidity( undefined );
+						} }
+						customValidity={ customValidity }
+					/>
+					<Button
+						variant="primary"
+						__next40pxDefaultSize
+						type="submit"
+					>
+						Submit
+					</Button>
+				</VStack>
+			</form>
 		);
 	},
 };
