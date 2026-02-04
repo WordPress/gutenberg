@@ -41,12 +41,7 @@ function render_block_core_icon( $attributes ) {
 		$processor->set_attribute( 'role', 'img' );
 		$processor->set_attribute( 'aria-label', esc_html( $aria_label ) );
 	}
-
-	// Add the label as the title attribute regardless of decorative or informative status.
-	if ( ! $aria_label ) {
-		$processor->set_attribute( 'title', esc_html( $aria_label ) );
-	}
-
+	
 	// Return the updated SVG markup.
 	$svg = $processor->get_updated_html();
 	return '<div ' . get_block_wrapper_attributes() . '>' . $svg . '</div>';
