@@ -62,9 +62,6 @@ export default function mediaUpload( {
 			? currentPost.id
 			: currentPost?.wp_id;
 	const setSaveLock = () => {
-		if ( window.__experimentalMediaProcessing ) {
-			return; // Skip - handled by useUploadSaveLock in editor provider
-		}
 		lockPostSaving( lockKey );
 		lockPostAutosaving( lockKey );
 		imageIsUploading = true;
@@ -72,9 +69,6 @@ export default function mediaUpload( {
 
 	const postData = currentPostId ? { post: currentPostId } : {};
 	const clearSaveLock = () => {
-		if ( window.__experimentalMediaProcessing ) {
-			return; // Skip - handled by useUploadSaveLock in editor provider
-		}
 		unlockPostSaving( lockKey );
 		unlockPostAutosaving( lockKey );
 		imageIsUploading = false;
