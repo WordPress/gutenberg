@@ -10,6 +10,7 @@ import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
 import { store as preferencesStore } from '@wordpress/preferences';
+import { registerFormatType } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -33,6 +34,10 @@ import {
 import { focusCommentThread } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
+import { formatName, format } from './format';
+
+// Register the note format.
+registerFormatType( formatName, format );
 
 function NotesSidebarContent( {
 	styles,

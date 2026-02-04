@@ -26,6 +26,12 @@ import {
 import { store as noticesStore } from '@wordpress/notices';
 import { decodeEntities } from '@wordpress/html-entities';
 import { store as interfaceStore } from '@wordpress/interface';
+import {
+	RichTextData,
+	applyFormat,
+	create,
+	isCollapsed,
+} from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -174,8 +180,12 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
 	const { getCurrentPostId } = useSelect( editorStore );
-	const { getBlockAttributes, getSelectedBlockClientId } =
-		useSelect( blockEditorStore );
+	const {
+		getBlockAttributes,
+		getSelectedBlockClientId,
+		getSelectionStart,
+		getSelectionEnd,
+	} = useSelect( blockEditorStore );
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	const onError = ( error ) => {
@@ -204,16 +214,48 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				{ throwOnError: true }
 			);
 
+			if ( ! savedRecord?.id ) {
+				throw new Error( __( 'Failed to create the note.' ) );
+			}
+
+			const clientId = getSelectedBlockClientId();
+			const attributes = getBlockAttributes( clientId ) ?? {};
+			const start = getSelectionStart();
+			const end = getSelectionEnd();
+			const hasSelection = ! isCollapsed( {
+				start: start.offset,
+				end: end.offset,
+			} );
+			const newAttributes = {};
+			const record = attributes[ start.attributeKey ];
+
 			// If it's a main comment, update the block attributes with the comment id.
-			if ( ! parent && savedRecord?.id ) {
-				const clientId = getSelectedBlockClientId();
-				const metadata = getBlockAttributes( clientId )?.metadata;
-				updateBlockAttributes( clientId, {
-					metadata: {
-						...metadata,
-						noteId: savedRecord.id,
+			// Note: This doesn't work as well. Requires https://github.com/WordPress/gutenberg/pull/75147.
+			if ( ! parent && ! hasSelection ) {
+				newAttributes.metadata = {
+					...attributes.metadata,
+					noteId: savedRecord.id,
+				};
+			}
+
+			if ( hasSelection && record instanceof RichTextData ) {
+				const formatted = applyFormat(
+					create( { html: record } ),
+					{
+						type: 'core/note',
+						attributes: { 'data-id': String( savedRecord.id ) },
 					},
-				} );
+					start.offset,
+					end.offset
+				);
+
+				newAttributes[ start.attributeKey ] = new RichTextData(
+					formatted
+				);
+			}
+
+			if ( Object.keys( newAttributes ).length > 0 ) {
+				updateBlockAttributes( clientId, newAttributes );
 			}
 
 			createNotice(
