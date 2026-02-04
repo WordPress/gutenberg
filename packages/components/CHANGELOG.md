@@ -25,6 +25,10 @@
 
 -   `ValidatedComboboxControl`: Expose the component under private API's. [#74891](https://github.com/WordPress/gutenberg/pull/74891)
 
+### Enhancements
+
+-   `ToggleControl` pass full props and support required validation in `ValidatedToggleControl`. [#74956](https://github.com/WordPress/gutenberg/pull/74956)
+
 ## 32.0.0 (2026-01-16)
 
 ### Code Quality
