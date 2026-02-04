@@ -109,12 +109,6 @@ export const Validation = {
 				'details',
 			],
 		},
-		fieldDistribution: {
-			control: { type: 'select' },
-			description:
-				'Field distribution for demonstrating markWhenOptional behavior. Use this to see how the minority of fields gets labeled.',
-			options: [ 'allSame', 'mostlyRequired', 'mostlyOptional' ],
-		},
 		required: {
 			control: { type: 'boolean' },
 			description:
@@ -144,7 +138,6 @@ export const Validation = {
 	},
 	args: {
 		layout: 'regular',
-		fieldDistribution: 'allSame',
 		required: true,
 		elements: 'sync',
 		custom: 'sync',
