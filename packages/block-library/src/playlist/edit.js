@@ -2,12 +2,15 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import { colord } from 'colord';
 import { v4 as uuid } from 'uuid';
+import WaveformPlayer from '@arraypress/waveform-player';
+import '@arraypress/waveform-player/dist/waveform-player.css';
 
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useEffect } from '@wordpress/element';
+import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	MediaPlaceholder,
@@ -39,10 +42,18 @@ import { createBlock } from '@wordpress/blocks';
  */
 import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import {
+	getEffectiveBackgroundColor,
+	createWaveformContainer,
+	styleSvgIcons,
+} from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
 const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
+	const waveformRef = useRef( null );
+	const waveformInstanceRef = useRef( null );
+
 	/**
 	 * dangerouslySetInnerHTML and safeHTML are used because
 	 * the media library allows using some HTML tags in the title, artist, and album fields.
@@ -87,6 +98,67 @@ const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
 		ariaLabel = stripHTML( __( 'Untitled' ) );
 	}
 
+	// Initialize WaveformPlayer when track changes.
+	useEffect( () => {
+		const currentElement = waveformRef.current;
+		if ( ! currentElement || ! track?.src ) {
+			return;
+		}
+
+		// Get the text and background colors for styling.
+		const textColor = window.getComputedStyle( currentElement ).color;
+		const bgColor = getEffectiveBackgroundColor( currentElement );
+		const waveformColor = colord( textColor ).alpha( 0.3 ).toRgbString();
+		const progressColor = colord( textColor ).alpha( 0.6 ).toRgbString();
+
+		// Clear any leftover DOM elements from previous player.
+		currentElement.innerHTML = '';
+
+		// Create waveform container.
+		const container = createWaveformContainer( {
+			url: track.src,
+			waveformColor,
+			progressColor,
+			buttonColor: textColor,
+		} );
+		currentElement.appendChild( container );
+
+		// Create WaveformPlayer instance.
+		const instance = new WaveformPlayer( container );
+		waveformInstanceRef.current = instance;
+
+		// Apply background color to SVG icons for contrast.
+		styleSvgIcons( container, bgColor );
+
+		// Handle track end.
+		const handleEnded = () => {
+			onTrackEnd();
+		};
+
+		container.addEventListener( 'waveformplayer:ended', handleEnded );
+
+		// Store for cleanup.
+		currentElement._container = container;
+		currentElement._handleEnded = handleEnded;
+
+		return () => {
+			// Clean up event listeners.
+			if ( currentElement._container && currentElement._handleEnded ) {
+				currentElement._container.removeEventListener(
+					'waveformplayer:ended',
+					currentElement._handleEnded
+				);
+			}
+
+			// Destroy instance.
+			try {
+				waveformInstanceRef.current?.destroy();
+			} catch ( e ) {
+				// Silently ignore cleanup errors.
+			}
+		};
+	}, [ track?.src, onTrackEnd ] );
+
 	return (
 		<>
 			<div className="wp-block-playlist__current-item">
@@ -122,12 +194,10 @@ const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
 					</div>
 				</div>
 			</div>
-			<audio
-				controls="controls"
-				src={ track?.url ? track.url : '' }
-				onEnded={ onTrackEnd }
+			<div
+				ref={ waveformRef }
+				className="wp-block-playlist__waveform-player"
 				aria-label={ ariaLabel }
-				tabIndex={ 0 }
 			/>
 		</>
 	);

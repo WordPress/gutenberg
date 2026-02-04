@@ -121,16 +121,15 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 			</div>
 		</div>
 	</div>
-		<audio
-			controls="controls"
-			data-wp-on--ended="actions.nextSong"
-			data-wp-on--play="actions.isPlaying"
-			data-wp-on--pause="actions.isPaused"
-			data-wp-bind--src="state.currentTrack.url"
-			data-wp-bind--aria-label="state.currentTrack.ariaLabel"
-			data-wp-watch="callbacks.autoPlay"
-		></audio>
 	';
+
+	// Add waveform player container.
+	$html .= '<div class="wp-block-playlist__waveform-player"
+		data-wp-on--waveform-ended="actions.nextSong"
+		data-wp-on--waveform-play="actions.isPlaying"
+		data-wp-on--waveform-pause="actions.isPaused"
+		data-wp-watch="callbacks.initWaveformPlayer"
+	></div>';
 
 	// Add the HTML for the current track inside the figure.
 	$figure = null;
