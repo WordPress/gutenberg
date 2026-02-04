@@ -1,3 +1,4 @@
+import { mergeProps, useRender } from '@base-ui/react';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
 import styles from './style.module.css';
@@ -8,18 +9,18 @@ import type { FooterProps } from './types';
  * action buttons.
  */
 const Footer = forwardRef< HTMLDivElement, FooterProps >( function DialogFooter(
-	{ className, children, ...props },
+	{ className, render, ...props },
 	ref
 ) {
-	return (
-		<div
-			ref={ ref }
-			className={ clsx( styles.footer, className ) }
-			{ ...props }
-		>
-			{ children }
-		</div>
-	);
+	const element = useRender( {
+		render,
+		ref,
+		props: mergeProps< 'div' >( props, {
+			className: clsx( styles.footer, className ),
+		} ),
+	} );
+
+	return element;
 } );
 
 export { Footer };
