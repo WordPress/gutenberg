@@ -21,6 +21,8 @@ import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
+import { parse } from '@wordpress/blocks';
+import { getRawValue } from './utils/crdt';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -411,6 +413,12 @@ export const editEntityRecord =
 
 			return acc;
 		}, {} );
+
+		if ( ( ! editsWithMerges.blocks || editsWithMerges.blocks.length === 0 ) && getRawValue( editsWithMerges.content ) ) {
+			console.log( 'blocks are empty and content is present', JSON.stringify( editsWithMerges, null, 2 ) );
+			editsWithMerges.blocks = parse( getRawValue( editsWithMerges.content ) );
+			console.log( 'parsed blocks', JSON.stringify( editsWithMerges.blocks, null, 2 ) );
+		}
 
 		const edit = {
 			kind,
