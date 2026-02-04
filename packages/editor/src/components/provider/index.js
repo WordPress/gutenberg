@@ -160,6 +160,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		recovery,
 		initialEdits,
 		children,
+		initialSelection,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
@@ -396,6 +397,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							selection={ selection }
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
+							initialSelection={ initialSelection }
 						>
 							{ children }
 							{ ! settings.isPreviewMode && (

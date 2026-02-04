@@ -1187,13 +1187,35 @@ export const blocks = pipe(
 
 	controlledInnerBlocks(
 		state = {},
-		{ type, clientId, hasControlledInnerBlocks }
+		{ type, clientId, hasControlledInnerBlocks, mappings }
 	) {
 		if ( type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
-			return {
-				...state,
-				[ clientId ]: hasControlledInnerBlocks,
-			};
+			if ( hasControlledInnerBlocks ) {
+				// Build mapping objects from array
+				const externalToInternal = new Map();
+				const internalToExternal = new Map();
+
+				if ( mappings ) {
+					for ( const { external, internal } of mappings ) {
+						externalToInternal.set( external, internal );
+						internalToExternal.set( internal, external );
+					}
+				}
+
+				return {
+					...state,
+					[ clientId ]: {
+						hasControlledInnerBlocks: true,
+						externalToInternal,
+						internalToExternal,
+					},
+				};
+			}
+
+			// When setting to false, remove the entry entirely
+			const newState = { ...state };
+			delete newState[ clientId ];
+			return newState;
 		}
 		return state;
 	},

@@ -537,6 +537,19 @@ _Returns_
 
 -   `string[]`: Array of dragged block client ids.
 
+### getExternalClientId
+
+Converts an internal (cloned) clientId to its external (original) equivalent. This is used for controlled inner blocks where blocks are cloned with new clientIds. Searches all controllers for the mapping.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _internalId_ `string`: The internal clientId to convert.
+
+_Returns_
+
+-   `string`: The external clientId, or the original internalId if no mapping exists.
+
 ### getFirstMultiSelectedBlockClientId
 
 Returns the client ID of the first block in the multi-selection set, or null if there is no multi-selection.
@@ -602,6 +615,19 @@ _Properties_
 -   _keywords_ `string[]`: Keywords that can be searched to find this item.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
+
+### getInternalClientId
+
+Converts an external (original) clientId to its internal (cloned) equivalent. This is used for controlled inner blocks where blocks are cloned with new clientIds. Searches all controllers and returns the first match.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _externalId_ `string`: The external clientId to convert.
+
+_Returns_
+
+-   `string`: The internal clientId, or the original externalId if no mapping exists.
 
 ### getLastMultiSelectedBlockClientId
 
@@ -1689,6 +1715,7 @@ _Parameters_
 
 -   _clientId_ `string`: The block's clientId.
 -   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
+-   _mappings_ `Object[]`: Optional array of { external, internal } clientId mappings.
 
 ### setTemplateValidity
 

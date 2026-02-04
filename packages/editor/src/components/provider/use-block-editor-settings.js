@@ -279,7 +279,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 
 			return settings.onNavigateToEntityRecord( {
 				...params,
-				selectedBlockClientId,
+				// Pass selection as an object for future extensibility (ranges, etc.)
+				selection: selectedBlockClientId
+					? { clientId: selectedBlockClientId }
+					: null,
 			} );
 		},
 		[ settings, getSelectedBlockClientId ]
