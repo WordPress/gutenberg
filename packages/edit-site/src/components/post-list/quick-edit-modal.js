@@ -34,12 +34,12 @@ const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
 function getModalHeader( items, postTypeLabel ) {
 	if ( items.length === 1 ) {
-		return stripHTML(
-			items[ 0 ]?.title?.rendered ||
-				items[ 0 ]?.title?.raw ||
-				items[ 0 ]?.title ||
-				''
-		);
+		let title = items[ 0 ]?.title;
+		if ( typeof title === 'object' ) {
+			title = title?.rendered || title?.raw;
+		}
+
+		return stripHTML( title || __( '(no title)' ) );
 	}
 
 	return sprintf(
