@@ -57,7 +57,7 @@ export default function EmbedVideoUrlInput( {
 					</Notice>
 				) }
 				<TextControl
-					className="wp-block-cover__embed-video-url-input"
+					type="url"
 					__next40pxDefaultSize
 					label={ __( 'Video URL' ) }
 					value={ url }
