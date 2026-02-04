@@ -56,7 +56,7 @@ function render_block_core_icon( $attributes ) {
 /**
  * Registers the `core/icon` block on server.
  *
- * @since 6.9.0
+ * @since 7.0.0
  */
 function register_block_core_icon() {
 	register_block_type_from_metadata(
