@@ -357,7 +357,7 @@ describe( 'Block Actions Menu', () => {
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );
 
-		it( 'transforms a Paragraph block into a Quote block', async () => {
+		it( 'transforms a Paragraph block into a Pullquote block', async () => {
 			const screen = await initializeEditor();
 			const { getByLabelText, getByRole } = screen;
 
@@ -397,7 +397,7 @@ describe( 'Block Actions Menu', () => {
 			expect( headerTitle ).toBeVisible();
 
 			// Tap on the Transform block button
-			fireEvent.press( getByLabelText( /Quote/ ) );
+			fireEvent.press( getByLabelText( /Pullquote/ ) );
 
 			expect( getEditorHtml() ).toMatchSnapshot();
 		} );

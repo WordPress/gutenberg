@@ -11,7 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * "Remove Tab" button in the block toolbar for the tab block.
- * Removes the currently active tab from the tab-panels block.
+ * Removes the currently active tab from the tab-panel block.
  *
  * @param {Object} props
  * @param {string} props.tabsClientId The client ID of the parent tabs block.
@@ -25,7 +25,7 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
-	// Find the tab-panels block, active tab, and tab count within the tabs block
+	// Find the tab-panel block, active tab, and tab count within the tabs block
 	const { activeTabClientId, tabCount, editorActiveTabIndex } = useSelect(
 		( select ) => {
 			if ( ! tabsClientId ) {
@@ -43,10 +43,10 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 				tabsAttributes?.activeTabIndex ??
 				0;
 			const innerBlocks = getBlocks( tabsClientId );
-			const tabPanels = innerBlocks.find(
-				( block ) => block.name === 'core/tab-panels'
+			const tabPanel = innerBlocks.find(
+				( block ) => block.name === 'core/tab-panel'
 			);
-			const tabs = tabPanels?.innerBlocks || [];
+			const tabs = tabPanel?.innerBlocks || [];
 			const activeTab = tabs[ activeIndex ];
 			return {
 				activeTabClientId: activeTab?.clientId || null,
@@ -91,10 +91,8 @@ export default function RemoveTabToolbarControl( { tabsClientId } ) {
 			<ToolbarGroup>
 				<ToolbarButton
 					className="components-toolbar__control"
-					label={ __( 'Remove the current tab' ) }
 					onClick={ removeTab }
-					showTooltip
-					text={ __( 'Remove Tab' ) }
+					text={ __( 'Remove tab' ) }
 					disabled={ isDisabled }
 				/>
 			</ToolbarGroup>

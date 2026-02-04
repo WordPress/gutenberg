@@ -135,7 +135,7 @@ import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 import * as spacer from './spacer';
 import * as tab from './tab';
-import * as tabPanels from './tab-panels';
+import * as tabPanel from './tab-panel';
 import * as table from './table';
 import * as tableOfContents from './table-of-contents';
 import * as tabs from './tabs';
@@ -281,7 +281,7 @@ const getAllBlocks = () => {
 		blocks.push( tabs );
 		blocks.push( tabsMenu );
 		blocks.push( tabsMenuItem );
-		blocks.push( tabPanels );
+		blocks.push( tabPanel );
 	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {

@@ -333,9 +333,9 @@ export const actions: Action< SpaceObject >[] = [
 					? `Are you sure you want to delete ${ items.length } items?`
 					: `Are you sure you want to delete "${ items[ 0 ].name.title }"?`;
 			return (
-				<Stack direction="column" gap="lg">
+				<Stack direction="column" gap="xl">
 					<Text>{ label }</Text>
-					<Stack direction="row" gap="xs" justify="right">
+					<Stack direction="row" gap="sm" justify="right">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"
@@ -371,7 +371,7 @@ export const fields: Field< SpaceObject >[] = [
 		id: 'image',
 		type: 'media',
 		header: (
-			<Stack direction="row" gap="2xs" justify="start" align="center">
+			<Stack direction="row" gap="xs" justify="start" align="center">
 				<Icon icon={ image } />
 				<span style={ { minWidth: 0 } }>Image</span>
 			</Stack>
@@ -477,7 +477,7 @@ export const fields: Field< SpaceObject >[] = [
 		label: 'Categories',
 		id: 'categories',
 		header: (
-			<Stack direction="row" gap="2xs" justify="start" align="center">
+			<Stack direction="row" gap="xs" justify="start" align="center">
 				<Icon icon={ category } />
 				<span style={ { minWidth: 0 } }>Categories</span>
 			</Stack>

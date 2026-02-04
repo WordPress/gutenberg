@@ -30,7 +30,9 @@ module.exports = async function run( {
 	debug,
 } ) {
 	const config = await loadConfig( path.resolve( '.' ) );
-	const runtime = getRuntime( detectRuntime( config.workDirectoryPath ) );
+	const runtime = getRuntime(
+		await detectRuntime( config.workDirectoryPath )
+	);
 
 	// Include any double dashed arguments in the command so that we can pass them to Docker.
 	// This lets users pass options that the command defines without them being parsed.

@@ -632,10 +632,6 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 }
 
 .wp-block-navigation__menu-inspector-controls {
-	overflow-x: auto;
-
-	@include custom-scrollbars-on-hover(transparent, $gray-600);
-
 	// Add top padding when showing inspector to account for border
 	&:has(.wp-block-navigation__menu-item-inspector) {
 		padding-top: $grid-unit-20;
@@ -655,15 +651,12 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 	grid-column: span 2;
 }
 
-// Nudge the edit button down to align with the select control input field.
-// The SelectControl has a label above it, so we need to offset the button
-// to align it with the input rather than the top of the control.
-.wp-block-navigation__overlay-edit-button {
-	margin-top: $grid-unit-30;
-}
-
 .wp-block-navigation__overlay-selector {
 	position: relative;
+}
+
+.wp-block-navigation__overlay-selector-controls {
+	margin-bottom: $grid-unit-10;
 }
 
 .wp-block-navigation__overlay-create-button {
@@ -677,7 +670,6 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 
 // Overlay Preview styles
 .wp-block-navigation__overlay-preview {
-	margin-top: $grid-unit-20;
 	border: 1px solid $gray-300;
 	border-radius: 2px;
 	overflow-y: auto;
@@ -739,4 +731,15 @@ body.editor-styles-wrapper .wp-block-navigation__responsive-container.is-menu-op
 		padding-left: $grid-unit-10;
 		padding-right: $grid-unit-10;
 	}
+}
+
+// Create Overlay button
+.wp-block-navigation__overlay-create-button-prominent {
+	width: 100%;
+	justify-content: center;
+	margin-bottom: $grid-unit-10;
+}
+
+.wp-block-navigation__overlay-help-text-wrapper {
+	margin-top: $grid-unit-10;
 }

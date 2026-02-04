@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 22.4.3 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Library
+- Navigation: Use :where on the :Not(.disable-default-overlay) selector so that the scope doesn't change. ([75090](https://github.com/WordPress/gutenberg/pull/75090))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@scruffian
+
+
 = 22.5.0-rc.1 =
 
 

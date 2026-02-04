@@ -421,7 +421,6 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show Tracklist' ) }
 							onChange={ toggleAttribute( 'showTracklist' ) }
 							checked={ showTracklist }
@@ -438,7 +437,6 @@ const PlaylistEdit = ( {
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __(
 										'Show artist name in Tracklist'
 									) }
@@ -457,7 +455,6 @@ const PlaylistEdit = ( {
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Show number in Tracklist' ) }
 									onChange={ toggleAttribute(
 										'showNumbers'
@@ -476,7 +473,6 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show images' ) }
 							onChange={ toggleAttribute( 'showImages' ) }
 							checked={ showImages }
@@ -490,7 +486,6 @@ const PlaylistEdit = ( {
 					>
 						<SelectControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Order' ) }
 							value={ order }
 							options={ [

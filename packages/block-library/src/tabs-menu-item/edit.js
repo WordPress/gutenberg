@@ -294,7 +294,7 @@ function Edit( {
 						withoutInteractiveFormatting
 						placeholder={ sprintf(
 							/* translators: %d is the tab index + 1 */
-							__( 'Tab %d…' ),
+							__( 'Tab title %d' ),
 							tabIndex + 1
 						) }
 						value={ decodeEntities( editingLabel ) }

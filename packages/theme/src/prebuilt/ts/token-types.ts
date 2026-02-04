@@ -6,12 +6,12 @@
 /**
  * Size scale for padding tokens.
  */
-export type PaddingSize = '2xs' | 'xs' | 'sm' | 'md' | 'lg';
+export type PaddingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 
 /**
  * Size scale for gap tokens.
  */
-export type GapSize = '2xs' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+export type GapSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl';
 
 /**
  * Size scale for border radius tokens.

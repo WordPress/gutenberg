@@ -33,7 +33,7 @@ test.describe( 'Pages View Persistence', () => {
 		}
 	} );
 
-	test( 'persists table layout and shows reset button across navigation', async ( {
+	test( 'persists table layout across all tabs with unified view persistence', async ( {
 		page,
 	} ) => {
 		// Change layout to table view
@@ -56,14 +56,13 @@ test.describe( 'Pages View Persistence', () => {
 			} )
 			.click();
 
-		// On Drafts view, we should be back to default view (list)
-		// and Reset button should not be visible/enabled for modifications
-		await expect( page.getByRole( 'grid' ) ).toBeVisible();
-		await expect( resetButton ).toBeHidden();
-		// Verify canvas (preview) is visible in list layout
-		await expect(
-			page.getByRole( 'region', { name: 'Editor content' } )
-		).toBeVisible();
+		// With unified persistence, Drafts tab should also show table layout
+		// since all tabs share the same persisted view
+		await expect( page.getByRole( 'table' ) ).toBeVisible();
+
+		// Reset button should still be visible on Drafts tab
+		await expect( resetButton ).toBeVisible();
+		await expect( resetButton ).toBeEnabled();
 
 		// Navigate back to All Pages
 		await page

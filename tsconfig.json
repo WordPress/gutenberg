@@ -78,6 +78,7 @@
 		{ "path": "packages/vips" },
 		{ "path": "packages/warning" },
 		{ "path": "packages/wordcount" },
+		{ "path": "packages/worker-threads" },
 		{ "path": "packages/wp-build" },
 		{ "path": "storybook" },
 		{ "path": "test/e2e" },

@@ -2,11 +2,32 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Playground runtime now supports zip archive themes, matching Docker runtime behavior. ([#75140](https://github.com/WordPress/gutenberg/issues/75140)).
+-   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with `MARIADB_AUTO_UPGRADE` to support both new and existing installations.
+-   Remove non-functional `WP_ENV_MULTISITE` config.
+
+### Breaking Changes
+
+-   Replaced `install-path` command with `status` command. The work directory path is now available as part of the status output.
+
+### New Features
+
+-   Added `status` command that shows comprehensive environment information including running state, URLs, ports, configuration, and paths.
+
 ## 10.39.0 (2026-01-29)
 
 ### New Features
 
 -   Add experimental WordPress Playground runtime support. Use `--runtime=playground` flag to start wp-env with Playground instead of Docker.
+-   Add `cleanup` command to remove environment-specific resources (containers, volumes, networks, and local files) while preserving Docker images for faster re-starts.
+-   Add `--force` flag to both `destroy` and `cleanup` commands to skip the confirmation prompt.
+-   Rename `clean` command to `reset` for clarity. The `clean` command is now deprecated but still works as an alias.
+
+### Deprecation
+
+-   The `clean` command is deprecated. Use `reset` instead. The `afterClean` lifecycle script is also deprecated in favor of `afterReset`.
 
 ## 10.38.0 (2026-01-16)
 

@@ -20,16 +20,11 @@ const capitalize = ( str: string ): string =>
  * fallback).
  *
  * @param property The CSS property name.
- * @param target   The design system token target.
  * @param value    The size token name.
  * @return A CSS value string with variable references.
  */
-const getSpacingValue = (
-	property: string,
-	target: string,
-	value: string
-): string =>
-	`var(--wpds-dimension-${ property }-${ target }-${ value }, var(--wpds-dimension-${ property }-surface-${ value }))`;
+const getSpacingValue = ( property: string, value: string ): string =>
+	`var(--wpds-dimension-${ property }-${ value }, var(--wpds-dimension-${ property }-${ value }))`;
 
 /**
  * Generates CSS styles for properties with optionally directional values,
@@ -37,23 +32,20 @@ const getSpacingValue = (
  * properties.
  *
  * @param property The CSS property name from BoxProps.
- * @param target   The design system token target.
  * @param value    The property value (single or object with directional keys).
  * @return A CSSProperties object with the computed styles.
  */
 const getDimensionVariantStyles = < T extends keyof BoxProps >(
 	property: T,
-	target: string,
 	value: NonNullable< BoxProps[ T ] >
 ): React.CSSProperties =>
 	typeof value !== 'object'
-		? { [ property ]: getSpacingValue( property, target, value ) }
+		? { [ property ]: getSpacingValue( property, value ) }
 		: Object.keys( value ).reduce(
 				( result, key ) => ( {
 					...result,
 					[ property + capitalize( key ) ]: getSpacingValue(
 						property,
-						target,
 						value[ key ]
 					),
 				} ),
@@ -89,10 +81,7 @@ export const Box = forwardRef< HTMLDivElement, BoxProps >( function Box(
 	}
 
 	if ( padding ) {
-		Object.assign(
-			style,
-			getDimensionVariantStyles( 'padding', target, padding )
-		);
+		Object.assign( style, getDimensionVariantStyles( 'padding', padding ) );
 	}
 
 	if ( borderRadius ) {
