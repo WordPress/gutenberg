@@ -70,7 +70,7 @@ export const Badge = forwardRef< HTMLDivElement, BadgeProps >( function Badge(
 	return (
 		<Box
 			{ ...intentStyles }
-			padding={ { inline: 'xs', block: '2xs' } }
+			padding={ { inline: 'sm', block: 'xs' } }
 			borderRadius="lg"
 			render={ render }
 			style={ {

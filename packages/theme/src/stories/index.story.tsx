@@ -202,7 +202,7 @@ export const WithPicker: StoryObj< typeof ThemeProvider > = {
 const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 	<div
 		style={ {
-			padding: 'var(--wpds-dimension-padding-surface-sm)',
+			padding: 'var(--wpds-dimension-padding-lg)',
 			color: 'var(--wpds-color-fg-content-neutral)',
 			backgroundColor: 'var(--wpds-color-bg-surface-neutral)',
 			display: 'flex',
@@ -217,7 +217,7 @@ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 		<span
 			style={ {
 				display: 'inline-block',
-				padding: 'var(--wpds-dimension-padding-surface-xs)',
+				padding: 'var(--wpds-dimension-padding-sm)',
 				borderRadius: '0.25rem',
 				backgroundColor:
 					'var(--wpds-color-bg-interactive-brand-strong)',
@@ -230,7 +230,7 @@ const NestingDebug = ( { bg = '', primary = '', density = '' } ) => (
 			style={ {
 				display: 'inline-block',
 				marginInlineStart: '0.25rem',
-				padding: 'var(--wpds-dimension-padding-surface-xs)',
+				padding: 'var(--wpds-dimension-padding-sm)',
 				borderRadius: '0.25rem',
 				backgroundColor:
 					'var(--wpds-color-bg-interactive-neutral-weak-disabled)',
@@ -411,7 +411,7 @@ export const AcrossIframes: StoryObj< typeof ThemeProvider > = {
 				<span
 					style={ {
 						display: 'inline-block',
-						padding: 'var(--wpds-dimension-padding-surface-xs)',
+						padding: 'var(--wpds-dimension-padding-sm)',
 						borderRadius: '0.25rem',
 						backgroundColor:
 							'var(--wpds-color-bg-interactive-brand-strong)',

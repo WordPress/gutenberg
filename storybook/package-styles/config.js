@@ -17,6 +17,7 @@ import fieldsLtr from '../package-styles/fields-ltr.lazy.scss?inline';
 import fieldsRtl from '../package-styles/fields-rtl.lazy.scss?inline';
 import mediaFieldsLtr from '../package-styles/media-fields-ltr.lazy.scss?inline';
 import mediaFieldsRtl from '../package-styles/media-fields-rtl.lazy.scss?inline';
+import theme from '../package-styles/theme.lazy.scss?inline';
 import ui from '../package-styles/ui.lazy.scss?inline';
 
 /**
@@ -60,8 +61,8 @@ const CONFIG = [
 	},
 	{
 		componentIdMatcher: /^dataviews-/,
-		ltr: [ componentsLtr, dataviewsLtr ],
-		rtl: [ componentsRtl, dataviewsRtl ],
+		ltr: [ theme, componentsLtr, dataviewsLtr ],
+		rtl: [ theme, componentsRtl, dataviewsRtl ],
 	},
 	{
 		componentIdMatcher: /^fields-/,

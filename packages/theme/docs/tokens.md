@@ -116,20 +116,23 @@ Do not edit directly.
 
 ### Dimension
 
-| Variable name                          | Description                         |
-| -------------------------------------- | ----------------------------------- |
-| `--wpds-dimension-base`                | Base dimension unit                 |
-| `--wpds-dimension-padding-surface-2xs` | 2x extra small spacing for surfaces |
-| `--wpds-dimension-padding-surface-xs`  | Extra small spacing for surfaces    |
-| `--wpds-dimension-padding-surface-sm`  | Small spacing for surfaces          |
-| `--wpds-dimension-padding-surface-md`  | Medium spacing for surfaces         |
-| `--wpds-dimension-padding-surface-lg`  | Large spacing for surfaces          |
-| `--wpds-dimension-gap-2xs`             | 2x extra small gap                  |
-| `--wpds-dimension-gap-xs`              | Extra small gap                     |
-| `--wpds-dimension-gap-sm`              | Small gap                           |
-| `--wpds-dimension-gap-md`              | Medium gap                          |
-| `--wpds-dimension-gap-lg`              | Large gap                           |
-| `--wpds-dimension-gap-xl`              | Extra large gap                     |
+| Variable name                  | Description            |
+| ------------------------------ | ---------------------- |
+| `--wpds-dimension-base`        | Base dimension unit    |
+| `--wpds-dimension-padding-xs`  | Extra small padding    |
+| `--wpds-dimension-padding-sm`  | Small padding          |
+| `--wpds-dimension-padding-md`  | Medium padding         |
+| `--wpds-dimension-padding-lg`  | Large padding          |
+| `--wpds-dimension-padding-xl`  | Extra large padding    |
+| `--wpds-dimension-padding-2xl` | 2x extra large padding |
+| `--wpds-dimension-padding-3xl` | 3x extra large padding |
+| `--wpds-dimension-gap-xs`      | Extra small gap        |
+| `--wpds-dimension-gap-sm`      | Small gap              |
+| `--wpds-dimension-gap-md`      | Medium gap             |
+| `--wpds-dimension-gap-lg`      | Large gap              |
+| `--wpds-dimension-gap-xl`      | Extra large gap        |
+| `--wpds-dimension-gap-2xl`     | 2x extra large gap     |
+| `--wpds-dimension-gap-3xl`     | 3x extra large gap     |
 
 ### Elevation
 

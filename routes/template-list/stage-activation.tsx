@@ -29,7 +29,7 @@ import { published, commentAuthorAvatar } from '@wordpress/icons';
 import { unlock } from '../lock-unlock';
 import {
 	DEFAULT_VIEW,
-	getActiveFiltersForTab,
+	getActiveViewOverridesForTab,
 	DEFAULT_LAYOUTS,
 } from './view-utils';
 import { previewField } from './fields/preview';
@@ -70,8 +70,8 @@ function TemplateListActivation() {
 	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
 		useState< Template | null >( null );
 	const defaultView = DEFAULT_VIEW;
-	const activeFilters = useMemo(
-		() => getActiveFiltersForTab( activeView ),
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTab( activeView ),
 		[ activeView ]
 	);
 
@@ -94,7 +94,7 @@ function TemplateListActivation() {
 		name: 'wp_template',
 		slug: 'default-new',
 		defaultView,
-		activeFilters,
+		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );

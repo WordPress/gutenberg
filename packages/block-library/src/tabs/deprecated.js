@@ -94,7 +94,7 @@ function v1Save( { attributes } ) {
  * New structure:
  * - core/tabs (orientation only)
  *   - core/tabs-menu (with color attributes)
- *   - core/tab-panels
+ *   - core/tab-panel
  *     - core/tab
  *     - core/tab
  *
@@ -152,8 +152,8 @@ function v1Migrate( attributes, innerBlocks ) {
 	// Create tabs-menu block
 	const tabsMenuBlock = createBlock( 'core/tabs-menu', tabsMenuAttributes );
 
-	// Create tab-panels block with existing tab innerblocks
-	const tabPanelsBlock = createBlock( 'core/tab-panels', {}, innerBlocks );
+	// Create tab-panel block with existing tab innerblocks
+	const tabPanelBlock = createBlock( 'core/tab-panel', {}, innerBlocks );
 
 	// Return new attributes (stripped of color attrs) and new innerblocks structure
 	const newAttributes = {
@@ -163,7 +163,7 @@ function v1Migrate( attributes, innerBlocks ) {
 		metadata: attributes.metadata,
 	};
 
-	return [ newAttributes, [ tabsMenuBlock, tabPanelsBlock ] ];
+	return [ newAttributes, [ tabsMenuBlock, tabPanelBlock ] ];
 }
 
 /**
@@ -173,7 +173,7 @@ function v1Migrate( attributes, innerBlocks ) {
  * @param {Array}  innerBlocks Inner blocks array.
  */
 function v1IsEligible( attributes, innerBlocks ) {
-	// If there are any direct tab children (not wrapped in tab-panels), this is old structure
+	// If there are any direct tab children (not wrapped in tab-panel), this is old structure
 	return innerBlocks.some( ( block ) => block.name === 'core/tab' );
 }
 

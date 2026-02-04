@@ -8,7 +8,7 @@
 	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
-	"allowedBlocks": [ "core/tabs-menu", "core/tab-panels" ],
+	"allowedBlocks": [ "core/tabs-menu", "core/tab-panel" ],
 	"attributes": {
 		"activeTabIndex": {
 			"type": "number",
@@ -69,7 +69,7 @@
 				]
 			},
 			{
-				"name": "core/tab-panels",
+				"name": "core/tab-panel",
 				"attributes": {},
 				"innerBlocks": [
 					{

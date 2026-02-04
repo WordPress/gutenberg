@@ -166,34 +166,6 @@ async function dev() {
 		console.log( '\n📦 Building vendor files...' );
 		await exec( 'node', [ './bin/packages/build-vendors.mjs' ] );
 
-		// Step 6.5: Build blocks manifests (initial)
-		console.log( '\n📦 Building blocks manifests...' );
-		const blocksDirs = [
-			{
-				input: 'build/scripts/block-library',
-				output: 'build/scripts/block-library/blocks-manifest.php',
-			},
-			{
-				input: 'build/scripts/edit-widgets/blocks',
-				output: 'build/scripts/edit-widgets/blocks/blocks-manifest.php',
-			},
-			{
-				input: 'build/scripts/widgets/blocks',
-				output: 'build/scripts/widgets/blocks/blocks-manifest.php',
-			},
-		];
-		for ( const { input, output } of blocksDirs ) {
-			await exec(
-				'wp-scripts',
-				[
-					'build-blocks-manifest',
-					`--input=${ input }`,
-					`--output=${ output }`,
-				],
-				{ silent: true }
-			);
-		}
-
 		const setupTime = Date.now() - startTime;
 		console.log(
 			`\n✅ Initial build completed! (${ Math.round(
@@ -239,11 +211,39 @@ async function dev() {
 		// Using .then() ensures cleanup handlers are registered before awaiting,
 		// so early termination still triggers cleanup.
 		let isReady = false;
-		buildWatch.stdout.on( 'data', ( data ) => {
+		buildWatch.stdout.on( 'data', async ( data ) => {
 			const output = data.toString();
 			process.stdout.write( output );
 			if ( ! isReady && output.includes( 'Watching for changes' ) ) {
 				isReady = true;
+
+				// Build blocks manifests after initial build completes
+				const blocksDirs = [
+					{
+						input: 'build/scripts/block-library',
+						output: 'build/scripts/block-library/blocks-manifest.php',
+					},
+					{
+						input: 'build/scripts/edit-widgets/blocks',
+						output: 'build/scripts/edit-widgets/blocks/blocks-manifest.php',
+					},
+					{
+						input: 'build/scripts/widgets/blocks',
+						output: 'build/scripts/widgets/blocks/blocks-manifest.php',
+					},
+				];
+				for ( const { input, output: outputPath } of blocksDirs ) {
+					await exec(
+						'wp-scripts',
+						[
+							'build-blocks-manifest',
+							`--input=${ input }`,
+							`--output=${ outputPath }`,
+						],
+						{ silent: true }
+					);
+				}
+
 				readyMarkerFile.create();
 			}
 		} );
