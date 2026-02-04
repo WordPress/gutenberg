@@ -6,6 +6,34 @@
  */
 
 /**
+ * Debug logging for client-side media processing.
+ * Set $debug_enabled to true to enable logging.
+ *
+ * @param string $message Log message.
+ * @param array  $data    Optional data to include in log.
+ */
+function gutenberg_media_debug_log( $message, $data = array() ) {
+	// Set to true to enable debug logging.
+	$debug_enabled = false;
+
+	if ( ! $debug_enabled ) {
+		return;
+	}
+
+	$timestamp = gmdate( 'H:i:s.v' );
+	$prefix    = "[MEDIA:PHP] $timestamp";
+
+	if ( ! empty( $data ) ) {
+		$data_str = wp_json_encode( $data, JSON_PRETTY_PRINT );
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( "$prefix $message\n  └─ Details: $data_str" );
+	} else {
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		error_log( "$prefix $message" );
+	}
+}
+
+/**
  * Class Gutenberg_REST_Attachments_Controller.
  */
 class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controller {
@@ -117,15 +145,22 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		// Add EXIF orientation for images.
 		if ( rest_is_field_included( 'exif_orientation', $fields ) ) {
+			$mime_type = get_post_mime_type( $item );
+
 			if ( wp_attachment_is_image( $item ) ) {
 				$metadata = wp_get_attachment_metadata( $item->ID, true );
 
 				// Get the EXIF orientation from the image metadata.
 				// This is stored by wp_read_image_metadata() during upload.
+				// Values:
+				//   0 = undefined (no EXIF data), treat as no rotation needed
+				//   1 = normal (no rotation needed)
+				//   2-8 = various rotations/flips needed
 				$orientation = 1; // Default: no rotation needed.
 				if (
 					is_array( $metadata ) &&
-					isset( $metadata['image_meta']['orientation'] )
+					isset( $metadata['image_meta']['orientation'] ) &&
+					(int) $metadata['image_meta']['orientation'] > 0
 				) {
 					$orientation = (int) $metadata['image_meta']['orientation'];
 				}
@@ -133,6 +168,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				$data['exif_orientation'] = $orientation;
 			}
 		}
+
+		// Handle missing image sizes for PDFs.
 
 		if (
 			rest_is_field_included( 'missing_image_sizes', $fields ) &&
@@ -193,7 +230,22 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 * @return WP_REST_Response|WP_Error Response object on success, WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
+		$files     = $request->get_file_params();
+		$file_info = isset( $files['file'] ) ? $files['file'] : array();
+
+		gutenberg_media_debug_log(
+			'Creating attachment (upload)',
+			array(
+				'filename'           => isset( $file_info['name'] ) ? $file_info['name'] : 'unknown',
+				'size'               => isset( $file_info['size'] ) ? size_format( $file_info['size'] ) : 'unknown',
+				'type'               => isset( $file_info['type'] ) ? $file_info['type'] : 'unknown',
+				'generate_sub_sizes' => $request['generate_sub_sizes'] ? 'yes' : 'no (client-side)',
+				'convert_format'     => $request['convert_format'] ? 'yes' : 'no (client-side)',
+			)
+		);
+
 		if ( ! $request['generate_sub_sizes'] ) {
+			gutenberg_media_debug_log( 'Server-side sub-size generation DISABLED (client will generate)' );
 			add_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 100 );
 			add_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
 			// Disable server-side EXIF rotation so the client can handle it.
@@ -202,6 +254,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		if ( ! $request['convert_format'] ) {
+			gutenberg_media_debug_log( 'Server-side format conversion DISABLED (client will convert)' );
 			add_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 		}
 
@@ -211,6 +264,27 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		remove_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
 		remove_filter( 'wp_image_maybe_exif_rotate', '__return_false', 100 );
 		remove_filter( 'image_editor_output_format', '__return_empty_array', 100 );
+
+		if ( is_wp_error( $response ) ) {
+			gutenberg_media_debug_log(
+				'Attachment creation FAILED',
+				array(
+					'error_code'    => $response->get_error_code(),
+					'error_message' => $response->get_error_message(),
+				)
+			);
+		} else {
+			$data = $response->get_data();
+			gutenberg_media_debug_log(
+				'Attachment created successfully',
+				array(
+					'attachment_id'       => isset( $data['id'] ) ? $data['id'] : 'unknown',
+					'url'                 => isset( $data['source_url'] ) ? $data['source_url'] : 'unknown',
+					'missing_image_sizes' => isset( $data['missing_image_sizes'] ) ? $data['missing_image_sizes'] : array(),
+					'exif_orientation'    => isset( $data['exif_orientation'] ) ? $data['exif_orientation'] : 1,
+				)
+			);
+		}
 
 		return $response;
 	}
@@ -284,10 +358,32 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 */
 	public function sideload_item( WP_REST_Request $request ) {
 		$attachment_id = $request['id'];
+		$image_size    = $request['image_size'];
+
+		$files     = $request->get_file_params();
+		$file_info = isset( $files['file'] ) ? $files['file'] : array();
+
+		gutenberg_media_debug_log(
+			'Sideloading sub-size image',
+			array(
+				'attachment_id' => $attachment_id,
+				'image_size'    => $image_size,
+				'filename'      => isset( $file_info['name'] ) ? $file_info['name'] : 'unknown',
+				'size'          => isset( $file_info['size'] ) ? size_format( $file_info['size'] ) : 'unknown',
+				'type'          => isset( $file_info['type'] ) ? $file_info['type'] : 'unknown',
+			)
+		);
 
 		$post = $this->get_post( $attachment_id );
 
 		if ( is_wp_error( $post ) ) {
+			gutenberg_media_debug_log(
+				'Sideload FAILED - invalid attachment',
+				array(
+					'attachment_id' => $attachment_id,
+					'error'         => $post->get_error_message(),
+				)
+			);
 			return $post;
 		}
 
@@ -356,6 +452,15 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		remove_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 
 		if ( is_wp_error( $file ) ) {
+			gutenberg_media_debug_log(
+				'Sideload FAILED - file upload error',
+				array(
+					'attachment_id' => $attachment_id,
+					'image_size'    => $image_size,
+					'error_code'    => $file->get_error_code(),
+					'error_message' => $file->get_error_message(),
+				)
+			);
 			return $file;
 		}
 
@@ -387,6 +492,16 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		wp_update_attachment_metadata( $attachment_id, $metadata );
+
+		gutenberg_media_debug_log(
+			'Sideload completed successfully',
+			array(
+				'attachment_id' => $attachment_id,
+				'image_size'    => $image_size,
+				'file_path'     => wp_basename( $path ),
+				'dimensions'    => isset( $size ) && $size ? $size[0] . 'x' . $size[1] : 'unknown',
+			)
+		);
 
 		$response_request = new WP_REST_Request(
 			WP_REST_Server::READABLE,

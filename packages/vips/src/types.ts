@@ -123,6 +123,22 @@ export interface SaveOptions< T extends string > {
 	 * it is most relevant for AVIF, as it is slow by default.
 	 */
 	effort?: number;
+	/**
+	 * Compute optimal Huffman coding tables (JPEG only).
+	 * This is a MozJPEG optimization that typically improves compression.
+	 */
+	optimize_coding?: T extends 'image/jpeg' ? boolean : never;
+	/**
+	 * Quantization table index (JPEG only).
+	 * Use 3 for MozJPEG's improved quantization tables.
+	 * 0 = JPEG Annex K (default)
+	 * 1 = Flat
+	 * 2 = Custom (from tune setting)
+	 * 3 = ImageMagick tables (similar to MozJPEG)
+	 * 4 = Custom (from tune setting)
+	 * 5 = MS pattern
+	 */
+	quant_table?: T extends 'image/jpeg' ? number : never;
 }
 
 export interface ThumbnailOptions {

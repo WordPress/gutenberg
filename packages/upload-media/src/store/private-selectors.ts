@@ -156,14 +156,14 @@ export function getFailedItems( state: State ): QueueItem[] {
 }
 
 /**
- * Returns true if any child items with the given parentId exist in the queue.
+ * Determines whether any upload is currently in progress for items with a given parent ID.
  *
  * @param state    Upload state.
  * @param parentId Parent item ID.
  *
- * @return Whether any child items with the given parentId exist in the queue.
+ * @return Whether any child item is still uploading.
  */
-export function hasPendingItemsByParentId(
+export function isUploadingByParentId(
 	state: State,
 	parentId: QueueItemId
 ): boolean {

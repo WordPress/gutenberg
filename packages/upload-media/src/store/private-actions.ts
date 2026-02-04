@@ -17,13 +17,44 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 import { cloneFile, convertBlobToFile, renameFile } from '../utils';
 import { StubFile } from '../stub-file';
 import { UploadError } from '../upload-error';
-import { vipsResizeImage, vipsRotateImage } from './utils';
+import {
+	vipsResizeImage,
+	vipsRotateImage,
+	vipsConvertImageFormat,
+} from './utils';
+import {
+	logQueueAdd,
+	logSideloadAdd,
+	logProcessStart,
+	logOperationStart,
+	logOperationComplete,
+	logResizeCrop,
+	logResizeComplete,
+	logRotation,
+	logRotationComplete,
+	logTranscode,
+	logTranscodeComplete,
+	logUploadStart,
+	logUploadComplete,
+	logSideloadStart,
+	logSideloadComplete,
+	logThumbnailGenerationStart,
+	logThumbnailCreate,
+	logQueueRemove,
+	logError,
+	logItemPause,
+	logItemResume,
+	logConcurrencyLimit,
+	logBatchComplete,
+	createTimer,
+} from './utils/debug-logger';
 import type {
 	AddAction,
 	AdditionalData,
 	AddOperationsAction,
 	BatchId,
 	CacheBlobUrlAction,
+	ImageFormat,
 	OnBatchSuccessHandler,
 	OnChangeHandler,
 	OnErrorHandler,
@@ -62,6 +93,7 @@ type ActionCreators = {
 	sideloadItem: typeof sideloadItem;
 	resizeCropItem: typeof resizeCropItem;
 	rotateItem: typeof rotateItem;
+	transcodeImageItem: typeof transcodeImageItem;
 	generateThumbnails: typeof generateThumbnails;
 	updateItemProgress: typeof updateItemProgress;
 	revokeBlobUrls: typeof revokeBlobUrls;
@@ -160,6 +192,8 @@ export function addItem( {
 		// See https://github.com/WordPress/gutenberg/pull/65693 for an example.
 		const file = convertBlobToFile( fileOrBlob );
 
+		logQueueAdd( itemId, file.name, file.size, file.type, batchId );
+
 		let blobUrl;
 
 		// StubFile could be coming from addItemFromUrl().
@@ -236,6 +270,12 @@ export function addSideloadItem( {
 }: AddSideloadItemArgs ) {
 	return ( { dispatch }: ThunkArgs ) => {
 		const itemId = uuidv4();
+
+		const imageSize =
+			( additionalData as SideloadAdditionalData )?.image_size ||
+			'unknown';
+		logSideloadAdd( itemId, file.name, parentId || 'none', imageSize );
+
 		dispatch< AddAction >( {
 			type: Type.Add,
 			item: {
@@ -278,6 +318,8 @@ export function processItem( id: QueueItemId ) {
 			return;
 		}
 
+		logProcessStart( id, item.file.name );
+
 		const {
 			attachment,
 			onChange,
@@ -297,6 +339,10 @@ export function processItem( id: QueueItemId ) {
 		// If we're sideloading a thumbnail, pause upload to avoid race conditions.
 		// It will be resumed after the previous upload finishes.
 		if ( shouldPauseForSideload( item, operation, select ) ) {
+			logItemPause(
+				id,
+				'Waiting for previous upload to same post to complete'
+			);
 			dispatch< PauseItemAction >( {
 				type: Type.PauseItem,
 				id,
@@ -313,6 +359,11 @@ export function processItem( id: QueueItemId ) {
 			const settings = select.getSettings();
 			const activeCount = select.getActiveUploadCount();
 			if ( activeCount >= settings.maxConcurrentUploads ) {
+				logConcurrencyLimit(
+					id,
+					activeCount,
+					settings.maxConcurrentUploads
+				);
 				return;
 			}
 		}
@@ -330,7 +381,7 @@ export function processItem( id: QueueItemId ) {
 		if ( ! operation ) {
 			if (
 				parentId ||
-				( ! parentId && ! select.hasPendingItemsByParentId( id ) )
+				( ! parentId && ! select.isUploadingByParentId( id ) )
 			) {
 				if ( attachment ) {
 					onSuccess?.( [ attachment ] );
@@ -340,6 +391,7 @@ export function processItem( id: QueueItemId ) {
 				dispatch.revokeBlobUrls( id );
 
 				if ( batchId && select.isBatchUploaded( batchId ) ) {
+					logBatchComplete( batchId );
 					onBatchSuccess?.();
 				}
 			}
@@ -380,6 +432,8 @@ export function processItem( id: QueueItemId ) {
 			operation,
 		} );
 
+		logOperationStart( id, operation, item.file.name );
+
 		switch ( operation ) {
 			case OperationType.Prepare:
 				dispatch.prepareItem( item.id );
@@ -396,6 +450,13 @@ export function processItem( id: QueueItemId ) {
 				dispatch.rotateItem(
 					item.id,
 					operationArgs as OperationArgs[ OperationType.Rotate ]
+				);
+				break;
+
+			case OperationType.TranscodeImage:
+				dispatch.transcodeImageItem(
+					item.id,
+					operationArgs as OperationArgs[ OperationType.TranscodeImage ]
 				);
 				break;
 
@@ -472,6 +533,7 @@ export function resumeItemByPostId( postOrAttachmentId: number ) {
 	return async ( { select, dispatch }: ThunkArgs ) => {
 		const item = select.getPausedUploadForPost( postOrAttachmentId );
 		if ( item ) {
+			logItemResume( item.id );
 			dispatch< ResumeItemAction >( {
 				type: Type.ResumeItem,
 				id: item.id,
@@ -492,6 +554,8 @@ export function removeItem( id: QueueItemId ) {
 		if ( ! item ) {
 			return;
 		}
+
+		logQueueRemove( id, item.file.name );
 
 		dispatch( {
 			type: Type.Remove,
@@ -514,6 +578,10 @@ export function finishOperation(
 		const item = select.getItem( id );
 		const previousOperation = item?.currentOperation;
 
+		if ( previousOperation && item ) {
+			logOperationComplete( id, previousOperation, item.file.name );
+		}
+
 		dispatch< OperationFinishAction >( {
 			type: Type.OperationFinish,
 			id,
@@ -533,6 +601,41 @@ export function finishOperation(
 			}
 		}
 	};
+}
+
+const VALID_IMAGE_FORMATS = [ 'jpeg', 'webp', 'avif', 'png', 'gif' ] as const;
+
+/**
+ * Checks if a format string is a valid ImageFormat.
+ *
+ * @param format The format string to validate.
+ * @return Whether the format is valid.
+ */
+function isValidImageFormat( format: string ): format is ImageFormat {
+	return VALID_IMAGE_FORMATS.includes( format as ImageFormat );
+}
+
+/**
+ * Gets the appropriate interlace setting for the given output format.
+ *
+ * @param outputMimeType The output mime type.
+ * @param settings       The upload settings.
+ * @return Whether to use interlaced encoding.
+ */
+function getInterlacedSetting(
+	outputMimeType: string,
+	settings: Settings
+): boolean {
+	switch ( outputMimeType ) {
+		case 'image/jpeg':
+			return settings.jpegInterlaced ?? false;
+		case 'image/png':
+			return settings.pngInterlaced ?? false;
+		case 'image/gif':
+			return settings.gifInterlaced ?? false;
+		default:
+			return false;
+	}
 }
 
 /**
@@ -611,23 +714,38 @@ export function uploadItem( id: QueueItemId ) {
 			return;
 		}
 
+		logUploadStart( id, item.file.name, item.file.size );
+
 		select.getSettings().mediaUpload( {
 			filesList: [ item.file ],
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
 			onFileChange: ( [ attachment ] ) => {
 				if ( ! isBlobURL( attachment.url ) ) {
+					logUploadComplete(
+						id,
+						item.file.name,
+						attachment.id,
+						attachment.url
+					);
 					dispatch.finishOperation( id, {
 						attachment,
 					} );
 				}
 			},
 			onSuccess: ( [ attachment ] ) => {
+				logUploadComplete(
+					id,
+					item.file.name,
+					attachment.id,
+					attachment.url
+				);
 				dispatch.finishOperation( id, {
 					attachment,
 				} );
 			},
 			onError: ( error ) => {
+				logError( 'uploadItem', error, id );
 				dispatch.cancelItem( id, error );
 			},
 		} );
@@ -646,8 +764,11 @@ export function sideloadItem( id: QueueItemId ) {
 			return;
 		}
 
-		const { post, ...additionalData } =
-			item.additionalData as SideloadAdditionalData;
+		const {
+			post,
+			image_size: imageSize,
+			...additionalData
+		} = item.additionalData as SideloadAdditionalData;
 
 		const mediaSideload = select.getSettings().mediaSideload;
 		if ( ! mediaSideload ) {
@@ -656,16 +777,29 @@ export function sideloadItem( id: QueueItemId ) {
 			return;
 		}
 
+		logSideloadStart(
+			id,
+			item.file.name,
+			post as number,
+			imageSize || 'unknown'
+		);
+
 		mediaSideload( {
 			file: item.file,
 			attachmentId: post as number,
-			additionalData,
+			additionalData: { image_size: imageSize, ...additionalData },
 			signal: item.abortController?.signal,
 			onFileChange: ( [ attachment ] ) => {
+				logSideloadComplete(
+					id,
+					item.file.name,
+					imageSize || 'unknown'
+				);
 				dispatch.finishOperation( id, { attachment } );
 				dispatch.resumeItemByPostId( post as number );
 			},
 			onError: ( error ) => {
+				logError( 'sideloadItem', error, id );
 				dispatch.cancelItem( id, error );
 				dispatch.resumeItemByPostId( post as number );
 			},
@@ -700,7 +834,16 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 		// Add '-scaled' suffix for big image threshold resizing.
 		const scaledSuffix = Boolean( args.isThresholdResize );
 
+		logResizeCrop(
+			id,
+			item.file.name,
+			args.resize,
+			Boolean( args.isThresholdResize ),
+			addSuffix
+		);
+
 		try {
+			const timer = createTimer();
 			const file = await vipsResizeImage(
 				item.id,
 				item.file,
@@ -710,6 +853,26 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				item.abortController?.signal,
 				scaledSuffix
 			);
+			const duration = timer.stop();
+
+			// Log resize completion with dimensions
+			const imageFile = file as {
+				width?: number;
+				height?: number;
+				originalWidth?: number;
+				originalHeight?: number;
+			};
+			logResizeComplete(
+				id,
+				file.name,
+				imageFile.originalWidth || 0,
+				imageFile.originalHeight || 0,
+				imageFile.width || 0,
+				imageFile.height || 0,
+				file.size
+			);
+
+			logOperationComplete( id, 'ResizeCrop', file.name, duration );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -725,6 +888,11 @@ export function resizeCropItem( id: QueueItemId, args?: ResizeCropItemArgs ) {
 				},
 			} );
 		} catch ( error ) {
+			logError(
+				'resizeCropItem',
+				error instanceof Error ? error : String( error ),
+				id
+			);
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
@@ -765,13 +933,28 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 			return;
 		}
 
+		logRotation( id, item.file.name, args.orientation );
+
 		try {
+			const timer = createTimer();
 			const file = await vipsRotateImage(
 				item.id,
 				item.file,
 				args.orientation,
 				item.abortController?.signal
 			);
+			const duration = timer.stop();
+
+			// Log rotation completion with new dimensions
+			const imageFile = file as { width?: number; height?: number };
+			logRotationComplete(
+				id,
+				file.name,
+				imageFile.width || 0,
+				imageFile.height || 0
+			);
+
+			logOperationComplete( id, 'Rotate', file.name, duration );
 
 			const blobUrl = createBlobURL( file );
 			dispatch< CacheBlobUrlAction >( {
@@ -787,11 +970,119 @@ export function rotateItem( id: QueueItemId, args?: RotateItemArgs ) {
 				},
 			} );
 		} catch ( error ) {
+			logError(
+				'rotateItem',
+				error instanceof Error ? error : String( error ),
+				id
+			);
 			dispatch.cancelItem(
 				id,
 				new UploadError( {
 					code: 'IMAGE_ROTATION_ERROR',
 					message: 'Image could not be rotated',
+					file: item.file,
+					cause: error instanceof Error ? error : undefined,
+				} )
+			);
+		}
+	};
+}
+
+type TranscodeImageItemArgs = OperationArgs[ OperationType.TranscodeImage ];
+
+/**
+ * Transcodes an image to a different format.
+ *
+ * This operation converts images between formats (e.g., PNG to WebP, JPEG to AVIF)
+ * based on the WordPress image_editor_output_format filter settings.
+ *
+ * @param id     Item ID.
+ * @param [args] Transcode arguments including output format, quality, and interlace settings.
+ */
+export function transcodeImageItem(
+	id: QueueItemId,
+	args?: TranscodeImageItemArgs
+) {
+	return async ( { select, dispatch }: ThunkArgs ) => {
+		const item = select.getItem( id );
+		if ( ! item ) {
+			return;
+		}
+
+		// If no output format specified, skip transcoding.
+		if ( ! args?.outputFormat ) {
+			dispatch.finishOperation( id, {
+				file: item.file,
+			} );
+			return;
+		}
+
+		const outputMimeType = `image/${ args.outputFormat }` as
+			| 'image/jpeg'
+			| 'image/png'
+			| 'image/webp'
+			| 'image/avif'
+			| 'image/gif';
+		const quality = args.outputQuality ?? 0.82;
+		const interlaced = args.interlaced ?? false;
+
+		logTranscode(
+			id,
+			item.file.name,
+			item.file.type,
+			outputMimeType,
+			quality
+		);
+
+		try {
+			const timer = createTimer();
+			const originalSize = item.file.size;
+
+			const file = await vipsConvertImageFormat(
+				item.id,
+				item.file,
+				outputMimeType,
+				quality,
+				interlaced
+			);
+
+			const duration = timer.stop();
+
+			logTranscodeComplete(
+				id,
+				file.name,
+				outputMimeType,
+				originalSize,
+				file.size
+			);
+
+			logOperationComplete( id, 'TranscodeImage', file.name, duration );
+
+			const blobUrl = createBlobURL( file );
+			dispatch< CacheBlobUrlAction >( {
+				type: Type.CacheBlobUrl,
+				id,
+				blobUrl,
+			} );
+
+			dispatch.finishOperation( id, {
+				file,
+				attachment: {
+					url: blobUrl,
+				},
+			} );
+		} catch ( error ) {
+			logError(
+				'transcodeImageItem',
+				error instanceof Error ? error : String( error ),
+				id
+			);
+			dispatch.cancelItem(
+				id,
+				new UploadError( {
+					code: 'MEDIA_TRANSCODING_ERROR',
+					message:
+						'Image could not be transcoded to the target format',
 					file: item.file,
 					cause: error instanceof Error ? error : undefined,
 				} )
@@ -869,6 +1160,12 @@ export function generateThumbnails( id: QueueItemId ) {
 			attachment.missing_image_sizes &&
 			attachment.missing_image_sizes.length > 0
 		) {
+			logThumbnailGenerationStart(
+				id,
+				item.file.name,
+				attachment.missing_image_sizes
+			);
+
 			// Use sourceFile for thumbnail generation to preserve quality.
 			// WordPress core generates thumbnails from the original (unscaled) image.
 			// Vips will auto-rotate based on EXIF orientation during thumbnail generation.
@@ -877,7 +1174,15 @@ export function generateThumbnails( id: QueueItemId ) {
 				: item.sourceFile;
 			const batchId = uuidv4();
 
-			const allImageSizes = select.getSettings().allImageSizes || {};
+			const settings = select.getSettings();
+			const allImageSizes = settings.allImageSizes || {};
+			const { imageOutputFormats } = settings;
+
+			// Check if thumbnails should be transcoded to a different format.
+			const sourceType = item.sourceFile.type;
+			const outputMimeType = imageOutputFormats?.[ sourceType ];
+			const shouldTranscodeThumbnails =
+				outputMimeType && outputMimeType !== sourceType;
 
 			for ( const name of attachment.missing_image_sizes ) {
 				const imageSize = allImageSizes[ name ];
@@ -888,6 +1193,43 @@ export function generateThumbnails( id: QueueItemId ) {
 					);
 					continue;
 				}
+
+				logThumbnailCreate(
+					id,
+					name,
+					imageSize.width,
+					imageSize.height,
+					imageSize.crop
+				);
+
+				// Build operations list for this thumbnail.
+				const thumbnailOperations: Operation[] = [
+					[ OperationType.ResizeCrop, { resize: imageSize } ],
+				];
+
+				// Add transcoding if format conversion is configured.
+				// Note: For PNG->JPEG thumbnails, we rely on the main image
+				// transparency check. If the main image was not transcoded
+				// (due to having transparency), thumbnails won't be either.
+				// This matches the server behavior.
+				if ( shouldTranscodeThumbnails ) {
+					const formatPart = outputMimeType.split( '/' )[ 1 ];
+					if ( isValidImageFormat( formatPart ) ) {
+						thumbnailOperations.push( [
+							OperationType.TranscodeImage,
+							{
+								outputFormat: formatPart,
+								outputQuality: 0.82,
+								interlaced: getInterlacedSetting(
+									outputMimeType,
+									settings
+								),
+							},
+						] );
+					}
+				}
+
+				thumbnailOperations.push( OperationType.Upload );
 
 				dispatch.addSideloadItem( {
 					file,

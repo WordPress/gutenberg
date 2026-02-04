@@ -12,7 +12,7 @@ import {
 	getFailedItems,
 	getItemProgress,
 	getPendingUploads,
-	hasPendingItemsByParentId,
+	isUploadingByParentId,
 } from '../private-selectors';
 import {
 	ItemStatus,
@@ -237,7 +237,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'hasPendingItemsByParentId', () => {
+	describe( 'isUploadingByParentId', () => {
 		it( 'should return true if there are items with matching parent ID', () => {
 			const state: State = {
 				queue: [
@@ -258,12 +258,8 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( hasPendingItemsByParentId( state, 'parent-1' ) ).toBe(
-				true
-			);
-			expect( hasPendingItemsByParentId( state, 'parent-2' ) ).toBe(
-				false
-			);
+			expect( isUploadingByParentId( state, 'parent-1' ) ).toBe( true );
+			expect( isUploadingByParentId( state, 'parent-2' ) ).toBe( false );
 		} );
 
 		it( 'should return false if no items have a parent ID', () => {
@@ -281,9 +277,7 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( hasPendingItemsByParentId( state, 'parent-1' ) ).toBe(
-				false
-			);
+			expect( isUploadingByParentId( state, 'parent-1' ) ).toBe( false );
 		} );
 	} );
 } );

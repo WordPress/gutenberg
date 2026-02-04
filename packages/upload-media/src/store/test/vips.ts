@@ -2,9 +2,9 @@
  * External dependencies
  */
 
-// Mock the vips module.
+// Mock the vips worker module.
 // The mock functions must be declared inside the factory to avoid hoisting issues.
-jest.mock( '@wordpress/vips', () => ( {
+jest.mock( '@wordpress/vips/worker', () => ( {
 	vipsConvertImageFormat: jest.fn(),
 	vipsCompressImage: jest.fn(),
 	vipsHasTransparency: jest.fn(),
@@ -14,7 +14,7 @@ jest.mock( '@wordpress/vips', () => ( {
 } ) );
 
 // Import the mocked module to get access to the mock functions.
-import * as vipsWorker from '@wordpress/vips';
+import * as vipsWorker from '@wordpress/vips/worker';
 
 /**
  * Internal dependencies
@@ -131,19 +131,13 @@ describe( 'vips utilities', () => {
 
 	describe( 'vipsHasTransparency', () => {
 		let mockFetch: jest.Mock;
-		let originalFetch: typeof window.fetch;
 
 		beforeEach( () => {
-			originalFetch = window.fetch;
 			mockFetch = jest.fn().mockResolvedValue( {
 				ok: true,
 				arrayBuffer: () => Promise.resolve( new ArrayBuffer( 0 ) ),
 			} as Response );
 			window.fetch = mockFetch;
-		} );
-
-		afterEach( () => {
-			window.fetch = originalFetch;
 		} );
 
 		it( 'returns true when image has transparency', async () => {

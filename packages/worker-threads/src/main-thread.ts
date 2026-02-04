@@ -14,6 +14,29 @@ import {
 import { WORKER_SYMBOL, type Remote, type WithWorker } from './types';
 
 /**
+ * Debug logging for client side media.
+ * Set to true to enable debug logging.
+ */
+const DEBUG_ENABLED = false;
+
+function workerLog( message: string, data?: Record< string, unknown > ): void {
+	if ( ! DEBUG_ENABLED ) {
+		return;
+	}
+	const timestamp = new Date().toISOString().split( 'T' )[ 1 ].slice( 0, -1 );
+	// eslint-disable-next-line no-console
+	console.log(
+		`%c${ timestamp } [WORKER-RPC]%c ${ message }`,
+		'color: #FF5722; font-weight: bold;',
+		'color: inherit;'
+	);
+	if ( data && Object.keys( data ).length > 0 ) {
+		// eslint-disable-next-line no-console
+		console.log( '%c  └─ Details:', 'color: #888;', data );
+	}
+}
+
+/**
  * Adapter for injecting (main thread calling worker).
  */
 class WorkerInjectAdapter implements Adapter {
@@ -59,6 +82,8 @@ const remoteWorkers = new WeakMap< object, Worker >();
  * @return A proxy object with all exposed methods as async functions.
  */
 export function wrap< T extends object >( worker: Worker ): Remote< T > {
+	workerLog( 'Wrapping worker for RPC communication' );
+
 	// Create the inject function using defineProxy with an empty object
 	// (the actual implementation is on the worker side).
 	const [ , inject ] = defineProxy( () => ( {} ) as T, {
@@ -114,6 +139,8 @@ export function terminate( remote: Remote< unknown > ): void {
 	if ( ! worker ) {
 		return;
 	}
+
+	workerLog( 'Terminating worker' );
 
 	// Clean up the worker reference.
 	remoteWorkers.delete( remote as object );
