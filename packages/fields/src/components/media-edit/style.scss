@@ -37,6 +37,41 @@ fieldset.fields__media-edit {
 		gap: $grid-unit-10;
 		align-items: center;
 		@include compact-drop-zone-label;
+
+		.fields__media-edit-compact-item {
+			position: relative;
+			min-width: 0;
+			flex: 1;
+
+			&:hover,
+			&:focus-within {
+				.fields__media-edit-compact-movers {
+					opacity: 1;
+				}
+			}
+		}
+
+		.fields__media-edit-compact-movers {
+			position: absolute;
+			right: $grid-unit-10;
+			top: 50%;
+			transform: translateY(-50%);
+			opacity: 0;
+			pointer-events: none;
+			z-index: 1;
+
+			@media not (prefers-reduced-motion) {
+				transition: opacity 50ms ease-out;
+			}
+
+			* {
+				pointer-events: auto;
+			}
+
+			button {
+				@include preview-overlay;
+			}
+		}
 	}
 
 	// Apply to placeholders outside of expanded view (compact contexts)
@@ -140,11 +175,14 @@ fieldset.fields__media-edit {
 			}
 		}
 
-		.fields__media-edit-expanded-remove {
+		.fields__media-edit-expanded-actions {
 			position: absolute;
 			top: $grid-unit-10;
 			right: $grid-unit-10;
-			@include preview-overlay;
+
+			button {
+				@include preview-overlay;
+			}
 		}
 
 		.fields__media-edit-expanded-title {

@@ -14,6 +14,7 @@ import {
 	__experimentalText as Text,
 	__experimentalTruncate as Truncate,
 	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 	BaseControl,
 	Tooltip,
 	VisuallyHidden,
@@ -36,6 +37,10 @@ import {
 	file,
 	closeSmall,
 	error as errorIcon,
+	chevronUp,
+	chevronDown,
+	chevronLeft,
+	chevronRight,
 } from '@wordpress/icons';
 import {
 	MediaUpload,
@@ -202,6 +207,52 @@ function MediaEditPlaceholder( props: {
 	);
 }
 
+function MoveButtons( {
+	itemId,
+	index,
+	totalItems,
+	isUploading,
+	moveItem,
+	orientation = 'vertical',
+}: {
+	itemId: number;
+	index: number;
+	totalItems: number;
+	isUploading: boolean;
+	moveItem: ( id: number, direction: 'up' | 'down' ) => void;
+	orientation?: 'vertical' | 'horizontal';
+} ) {
+	const isHorizontal = orientation === 'horizontal';
+	return (
+		<>
+			<Button
+				__next40pxDefaultSize
+				icon={ isHorizontal ? chevronLeft : chevronUp }
+				label={ isHorizontal ? __( 'Move left' ) : __( 'Move up' ) }
+				size="small"
+				disabled={ isUploading || index === 0 }
+				accessibleWhenDisabled
+				onClick={ ( event: React.MouseEvent< HTMLButtonElement > ) => {
+					event.stopPropagation();
+					moveItem( itemId, 'up' );
+				} }
+			/>
+			<Button
+				__next40pxDefaultSize
+				icon={ isHorizontal ? chevronRight : chevronDown }
+				label={ isHorizontal ? __( 'Move right' ) : __( 'Move down' ) }
+				size="small"
+				disabled={ isUploading || index === totalItems - 1 }
+				accessibleWhenDisabled
+				onClick={ ( event: React.MouseEvent< HTMLButtonElement > ) => {
+					event.stopPropagation();
+					moveItem( itemId, 'down' );
+				} }
+			/>
+		</>
+	);
+}
+
 function MediaPreview( { attachment }: { attachment: MediaEditAttachment } ) {
 	const url = attachment.source_url;
 	const mimeType = attachment.mime_type || '';
@@ -229,6 +280,7 @@ interface MediaEditAttachmentsProps {
 	addButtonLabel: string;
 	multiple?: boolean;
 	removeItem: ( itemId: number ) => void;
+	moveItem: ( itemId: number, direction: 'up' | 'down' ) => void;
 	open: () => void;
 	onFilesDrop: ( files: File[], attachmentId?: number ) => void;
 	isUploading: boolean;
@@ -240,6 +292,7 @@ function ExpandedMediaEditAttachments( {
 	addButtonLabel,
 	multiple,
 	removeItem,
+	moveItem,
 	open,
 	onFilesDrop,
 	isUploading,
@@ -253,7 +306,7 @@ function ExpandedMediaEditAttachments( {
 				'is-empty': ! allItems?.length,
 			} ) }
 		>
-			{ allItems?.map( ( attachment ) => {
+			{ allItems?.map( ( attachment, index ) => {
 				const hasPreviewImage =
 					attachment.mime_type?.startsWith( 'image' );
 				const isBlob = isBlobURL( attachment.source_url );
@@ -310,21 +363,39 @@ function ExpandedMediaEditAttachments( {
 						</MediaPickerButton>
 						{ ! isBlob && (
 							<div className="fields__media-edit-expanded-overlay">
-								<Button
-									__next40pxDefaultSize
-									className="fields__media-edit-expanded-remove"
-									icon={ closeSmall }
-									label={ __( 'Remove' ) }
-									size="small"
-									disabled={ isUploading }
-									accessibleWhenDisabled
-									onClick={ (
-										event: React.MouseEvent< HTMLButtonElement >
-									) => {
-										event.stopPropagation();
-										removeItem( attachment.id as number );
-									} }
-								/>
+								<HStack
+									className="fields__media-edit-expanded-actions"
+									spacing={ 1 }
+									alignment="flex-end"
+									expanded={ false }
+								>
+									{ multiple && !! allItems?.length && (
+										<MoveButtons
+											itemId={ attachment.id as number }
+											index={ index }
+											totalItems={ allItems.length }
+											isUploading={ isUploading }
+											moveItem={ moveItem }
+											orientation="horizontal"
+										/>
+									) }
+									<Button
+										__next40pxDefaultSize
+										icon={ closeSmall }
+										label={ __( 'Remove' ) }
+										size="small"
+										disabled={ isUploading }
+										accessibleWhenDisabled
+										onClick={ (
+											event: React.MouseEvent< HTMLButtonElement >
+										) => {
+											event.stopPropagation();
+											removeItem(
+												attachment.id as number
+											);
+										} }
+									/>
+								</HStack>
 							</div>
 						) }
 					</div>
@@ -350,6 +421,7 @@ function CompactMediaEditAttachments( {
 	addButtonLabel,
 	multiple,
 	removeItem,
+	moveItem,
 	open,
 	onFilesDrop,
 	isUploading,
@@ -359,39 +431,64 @@ function CompactMediaEditAttachments( {
 		<>
 			{ !! allItems?.length && (
 				<VStack spacing={ 2 }>
-					{ allItems.map( ( attachment ) => {
+					{ allItems.map( ( attachment, index ) => {
 						const isBlob = isBlobURL( attachment.source_url );
 						return (
 							<div
 								key={ attachment.id }
 								className="fields__media-edit-compact"
 							>
-								<MediaPickerButton
-									open={ () => {
-										setTargetItemId(
-											attachment.id as number
-										);
-										open();
-									} }
-									label={ __( 'Replace' ) }
-									showTooltip
-									onFilesDrop={ onFilesDrop }
-									attachment={ attachment }
-									isUploading={ isUploading }
-								>
-									<>
-										<MediaPreview
-											attachment={ attachment }
-										/>
-										{ ! isBlob && (
-											<MediaTitle
-												attachment={
-													attachment as Attachment< 'view' >
-												}
+								<div className="fields__media-edit-compact-item">
+									<MediaPickerButton
+										open={ () => {
+											setTargetItemId(
+												attachment.id as number
+											);
+											open();
+										} }
+										label={ __( 'Replace' ) }
+										showTooltip
+										onFilesDrop={ onFilesDrop }
+										attachment={ attachment }
+										isUploading={ isUploading }
+									>
+										<>
+											<MediaPreview
+												attachment={ attachment }
 											/>
+											{ ! isBlob && (
+												<MediaTitle
+													attachment={
+														attachment as Attachment< 'view' >
+													}
+												/>
+											) }
+										</>
+									</MediaPickerButton>
+									{ ! isBlob &&
+										multiple &&
+										!! allItems?.length && (
+											<HStack
+												className="fields__media-edit-compact-movers"
+												spacing={ 1 }
+												alignment="flex-end"
+												expanded={ false }
+											>
+												<MoveButtons
+													itemId={
+														attachment.id as number
+													}
+													index={ index }
+													totalItems={
+														allItems.length
+													}
+													isUploading={ isUploading }
+													moveItem={ moveItem }
+													orientation="vertical"
+												/>
+											</HStack>
 										) }
-									</>
-								</MediaPickerButton>
+								</div>
 								<Button
 									__next40pxDefaultSize
 									className="fields__media-edit-remove"
@@ -526,6 +623,20 @@ export default function MediaEdit< Item >( {
 			// Mark as touched to immediately show any validation error.
 			setIsTouched( true );
 			onChangeControl( newIds.length ? newIds : undefined );
+		},
+		[ value, onChangeControl ]
+	);
+	const moveItem = useCallback(
+		( itemId: number, direction: 'up' | 'down' ) => {
+			const currentIds = normalizeValue( value );
+			const index = currentIds.indexOf( itemId );
+			const newIndex = direction === 'up' ? index - 1 : index + 1;
+			const newIds = [ ...currentIds ];
+			[ newIds[ index ], newIds[ newIndex ] ] = [
+				newIds[ newIndex ],
+				newIds[ index ],
+			];
+			onChangeControl( newIds );
 		},
 		[ value, onChangeControl ]
 	);
@@ -740,6 +851,7 @@ export default function MediaEdit< Item >( {
 									addButtonLabel={ addButtonLabel }
 									multiple={ multiple }
 									removeItem={ removeItem }
+									moveItem={ moveItem }
 									open={ open }
 									onFilesDrop={ onFilesDrop }
 									isUploading={ !! blobs.length }
