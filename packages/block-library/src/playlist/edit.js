@@ -2,7 +2,6 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import { colord } from 'colord';
 import { v4 as uuid } from 'uuid';
 import WaveformPlayer from '@arraypress/waveform-player';
 import '@arraypress/waveform-player/dist/waveform-player.css';
@@ -43,7 +42,7 @@ import { createBlock } from '@wordpress/blocks';
 import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import {
-	getEffectiveBackgroundColor,
+	getWaveformColors,
 	createWaveformContainer,
 	styleSvgIcons,
 } from './utils';
@@ -105,11 +104,9 @@ const CurrentTrack = ( { track, showImages, onTrackEnd } ) => {
 			return;
 		}
 
-		// Get the text and background colors for styling.
-		const textColor = window.getComputedStyle( currentElement ).color;
-		const bgColor = getEffectiveBackgroundColor( currentElement );
-		const waveformColor = colord( textColor ).alpha( 0.3 ).toRgbString();
-		const progressColor = colord( textColor ).alpha( 0.6 ).toRgbString();
+		// Get colors for styling.
+		const { textColor, bgColor, waveformColor, progressColor } =
+			getWaveformColors( currentElement );
 
 		// Clear any leftover DOM elements from previous player.
 		currentElement.innerHTML = '';

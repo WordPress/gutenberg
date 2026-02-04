@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { colord } from 'colord';
 import WaveformPlayer from '@arraypress/waveform-player';
 import '@arraypress/waveform-player/dist/waveform-player.css';
 
@@ -14,7 +13,7 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
  * Internal dependencies
  */
 import {
-	getEffectiveBackgroundColor,
+	getWaveformColors,
 	createWaveformContainer,
 	styleSvgIcons,
 } from './utils';
@@ -153,14 +152,8 @@ const { state } = store(
 				ref.removeAttribute( 'data-waveform-initialized' );
 
 				// Get colors for styling.
-				const textColor = window.getComputedStyle( ref ).color;
-				const bgColor = getEffectiveBackgroundColor( ref );
-				const waveformColor = colord( textColor )
-					.alpha( 0.3 )
-					.toRgbString();
-				const progressColor = colord( textColor )
-					.alpha( 0.6 )
-					.toRgbString();
+				const { textColor, bgColor, waveformColor, progressColor } =
+					getWaveformColors( ref );
 
 				// Create the waveform container.
 				const container = createWaveformContainer( {
