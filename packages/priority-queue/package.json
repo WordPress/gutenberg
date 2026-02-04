@@ -48,7 +48,7 @@
 		"requestidlecallback": "^0.3.0"
 	},
 	"devDependencies": {
-		"@types/requestidlecallback": "0.3.4"
+		"@types/requestidlecallback": "^0.3.7"
 	},
 	"publishConfig": {
 		"access": "public"
