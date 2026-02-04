@@ -18,9 +18,9 @@
 function block_core_dialog_id_fallback( $context, $block ) {
 	// If the block already has an ID, don't override it.
 	if ( 'core/dialog' === $block['blockName'] ) {
-		$tag_processor = new WP_HTML_Tag_Processor($block['innerHTML']);
+		$tag_processor = new WP_HTML_Tag_Processor( $block['innerHTML'] );
 		$tag_processor->next_tag();
-		$id = $tag_processor->get_attribute('id');
+		$id = $tag_processor->get_attribute( 'id' );
 		if ( $id ) {
 			$context['core/dialog-id'] = $id;
 		} else {
@@ -42,6 +42,7 @@ add_filter( 'render_block_context', 'block_core_dialog_id_fallback', 10, 2 );
  */
 function render_block_core_dialog( $attributes, $content, $block ) {
 	$block_context = $block->context;
+
 	$block_id = array_key_exists( 'core/dialog-id', $block_context ) ? $block_context['core/dialog-id'] : false;
 
 	if ( ! $block_id ) {
@@ -49,18 +50,18 @@ function render_block_core_dialog( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$tag_processor = new WP_HTML_Tag_Processor($content);
+	$tag_processor = new WP_HTML_Tag_Processor( $content );
 	$tag_processor->next_tag();
 	// This ID is consumed by dialog-element via block context and used as that element's ID.
 	// Here, the ID is removed from the dialog block to avoid duplication and then
 	// added as a Interactivity API `wp-key` directive to ensure uniqueness.
-	$tag_processor->remove_attribute('id');
+	$tag_processor->remove_attribute( 'id' );
 
 	$context = wp_json_encode( array( 'id' => $block_id ) );
 
-	$tag_processor->set_attribute('data-wp-interactive', 'core/dialog/private');
-	$tag_processor->set_attribute('data-wp-key', $block_id);
-	$tag_processor->set_attribute('data-wp-context', $context);
+	$tag_processor->set_attribute( 'data-wp-interactive', 'core/dialog/private' );
+	$tag_processor->set_attribute( 'data-wp-key', $block_id );
+	$tag_processor->set_attribute( 'data-wp-context', $context );
 
 	return $tag_processor->get_updated_html();
 }
