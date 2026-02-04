@@ -14,7 +14,7 @@ import {
 const VALIDATION_ENABLED = process.env.NODE_ENV !== 'production';
 
 type DialogValidationContextType = {
-	registerTitle: () => void;
+	registerTitle: ( element: HTMLElement | null ) => void;
 };
 
 // Context is only created in development mode.
@@ -52,10 +52,10 @@ function DialogValidationProviderDev( {
 }: {
 	children: React.ReactNode;
 } ) {
-	const titleRegisteredRef = useRef( false );
+	const titleElementRef = useRef< HTMLElement | null >( null );
 
-	const registerTitle = useCallback( () => {
-		titleRegisteredRef.current = true;
+	const registerTitle = useCallback( ( element: HTMLElement | null ) => {
+		titleElementRef.current = element;
 	}, [] );
 
 	const contextValue = useMemo(
@@ -63,15 +63,25 @@ function DialogValidationProviderDev( {
 		[ registerTitle ]
 	);
 
-	// Validate that Dialog.Title is rendered
+	// Validate that Dialog.Title is rendered with non-empty text content
 	useEffect( () => {
 		// useLayoutEffect in Title runs before this useEffect,
-		// so titleRegisteredRef should already be set if Title is present
-		if ( ! titleRegisteredRef.current ) {
+		// so titleElementRef should already be set if Title is present
+		const titleElement = titleElementRef.current;
+
+		if ( ! titleElement ) {
 			throw new Error(
 				'Dialog: Missing <Dialog.Title>. ' +
 					'For accessibility, every dialog requires a title. ' +
 					'If needed, the title can be visually hidden but must not be omitted.'
+			);
+		}
+
+		const textContent = titleElement.textContent?.trim();
+		if ( ! textContent ) {
+			throw new Error(
+				'Dialog: <Dialog.Title> cannot be empty. ' +
+					'Provide meaningful text content for the dialog title.'
 			);
 		}
 	}, [] );

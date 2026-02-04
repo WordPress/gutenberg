@@ -1,6 +1,7 @@
 import { Dialog as _Dialog } from '@base-ui/react/dialog';
 import clsx from 'clsx';
-import { forwardRef, useLayoutEffect } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { forwardRef, useLayoutEffect, useRef } from '@wordpress/element';
 import { useDialogValidationContext } from './context';
 import styles from './style.module.css';
 import type { TitleProps } from './types';
@@ -14,17 +15,19 @@ import type { TitleProps } from './types';
  * to customize the element if needed.
  */
 const Title = forwardRef< HTMLHeadingElement, TitleProps >(
-	function DialogTitle( { className, render, ...props }, ref ) {
+	function DialogTitle( { className, render, ...props }, forwardedRef ) {
 		const validationContext = useDialogValidationContext();
+		const internalRef = useRef< HTMLHeadingElement >( null );
+		const mergedRef = useMergeRefs( [ internalRef, forwardedRef ] );
 
 		// Register this title with the parent Popup for validation (dev only)
 		useLayoutEffect( () => {
-			validationContext?.registerTitle();
+			validationContext?.registerTitle( internalRef.current );
 		}, [ validationContext ] );
 
 		return (
 			<_Dialog.Title
-				ref={ ref }
+				ref={ mergedRef }
 				className={ clsx( styles.title, className ) }
 				render={ render }
 				{ ...props }
