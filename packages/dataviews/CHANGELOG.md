@@ -10,7 +10,7 @@
 
 ### Enhancements
 
-- DataForm: Add `markWhenOptional` auto-compute logic to show minority field labels. [#74430](https://github.com/WordPress/gutenberg/pull/74430)
+- DataForm: Add automatic field labeling - forms now automatically mark the minority of fields (required or optional) to reduce visual noise. [#74430](https://github.com/WordPress/gutenberg/pull/74430)
 - DataViews: Add details form layout validation. [#74996](https://github.com/WordPress/gutenberg/pull/74996)
 - DataViews: Consistent rendering of selection checkbox and actions in grid layout. [#75056](https://github.com/WordPress/gutenberg/pull/75056)
 
