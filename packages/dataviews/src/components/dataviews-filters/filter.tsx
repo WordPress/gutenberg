@@ -255,8 +255,10 @@ export default function Filter( {
 
 	const isPrimary = filter.isPrimary;
 	const isLocked = filterInView?.isLocked;
+	const isRequired = filterInView?.isRequired;
 	const hasValues = ! isLocked && filterInView?.value !== undefined;
-	const canResetOrRemove = ! isLocked && ( ! isPrimary || hasValues );
+	const canResetOrRemove =
+		! isLocked && ! isRequired && ( ! isPrimary || hasValues );
 	return (
 		<Dropdown
 			defaultOpen={ openedFilter === filter.field }

@@ -29,6 +29,7 @@ export default function ResetFilter( {
 		! view.filters?.some(
 			( _filter ) =>
 				! _filter.isLocked &&
+				! _filter.isRequired &&
 				( _filter.value !== undefined || ! isPrimary( _filter.field ) )
 		);
 	return (
@@ -44,7 +45,9 @@ export default function ResetFilter( {
 					page: 1,
 					search: '',
 					filters:
-						view.filters?.filter( ( f ) => !! f.isLocked ) || [],
+						view.filters?.filter(
+							( f ) => !! f.isLocked || !! f.isRequired
+						) || [],
 				} );
 			} }
 		>
