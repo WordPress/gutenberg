@@ -3,8 +3,6 @@ import userEvent from '@testing-library/user-event';
 import { createRef } from '@wordpress/element';
 import * as Dialog from '../index';
 
-jest.setTimeout( 10000 );
-
 describe( 'Dialog', () => {
 	it( 'forwards ref', async () => {
 		const user = userEvent.setup();
