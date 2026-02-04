@@ -318,7 +318,7 @@ Render content in a <dialog/> element modal. Includes a trigger to open the dial
 
 ## Dialog
 
-undefined ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-element))
+A dialog is a modal window that appears on top of the current page. It is used to display content that requires the user's attention or interaction. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-element))
 
 -	**Name:** core/dialog-element
 -	**Experimental:** true

@@ -4,6 +4,7 @@
 	"name": "core/dialog-element",
 	"version": "1.0.0",
 	"title": "Dialog",
+	"description": "A dialog is a modal window that appears on top of the current page. It is used to display content that requires the user's attention or interaction.",
 	"category": "media",
 	"__experimental": true,
 	"attributes": {
