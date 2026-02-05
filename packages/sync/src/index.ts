@@ -37,6 +37,13 @@
 export * as Y from 'yjs';
 
 /**
+ * The major version of Yjs that is bundled and exported by this package. This
+ * can be used by third-party code to ensure that they are targeting a compatible
+ * version of Yjs.
+ */
+export const YJS_VERSION = '13';
+
+/**
  * Similar to Yjs, the Awareness protocol should not be considered a public API.
  * It is a third-party library that will experience breaking changes in the
  * future.
