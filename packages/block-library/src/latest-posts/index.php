@@ -191,22 +191,14 @@ function render_block_core_latest_posts( $attributes ) {
 			} else {
 				// Check if we're already rendering this post to prevent infinite recursion.
 				if ( in_array( $post->ID, $rendering_stack, true ) ) {
-					// Skip rendering to prevent recursion.
 					$post_content = '';
 				} else {
-					// Add this post to the rendering stack.
 					$rendering_stack[] = $post->ID;
 
 					try {
 						// Parse blocks so they are properly rendered with styles and attributes.
-						// This will parse any blocks in the post content, including nested Latest Posts blocks.
-						// If a nested Latest Posts block tries to render this same post (creating recursion),
-						// the check above (in_array check) will detect it and skip rendering that post's content,
-						// preventing infinite recursion while still allowing the nested block to render other posts.
 						$post_content = do_blocks( $post_content );
 					} finally {
-						// Remove this post from the rendering stack.
-						// Using finally ensures cleanup even if do_blocks() throws an exception.
 						array_pop( $rendering_stack );
 					}
 				}
@@ -214,7 +206,7 @@ function render_block_core_latest_posts( $attributes ) {
 
 			$list_items_markup .= sprintf(
 				'<div class="wp-block-latest-posts__post-full-content">%1$s</div>',
-				wp_kses_post( $post_content )
+				$post_content
 			);
 		}
 
