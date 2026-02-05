@@ -4,8 +4,22 @@
 
 ### New Features
 
--   Add `Select` primitive ([#74661](https://github.com/WordPress/gutenberg/pull/74661)).
+-   Add `Tabs` primitive ([#74652](https://github.com/WordPress/gutenberg/pull/74652)).
 -   Add `Textarea` primitive ([#74707](https://github.com/WordPress/gutenberg/pull/74707)).
+
+### Enhancements
+
+-   `Button`: Add minimum content width (`6ch` + padding) to prevent overly narrow buttons with short labels ([#75133](https://github.com/WordPress/gutenberg/pull/75133)).
+
+### Internal
+
+-   `Button`, `InputLayout`, `Tabs`: use semantic dimension tokens ([#74557](https://github.com/WordPress/gutenberg/pull/74557)).
+
+## 0.6.0 (2026-01-29)
+
+### New Features
+
+-   Add `Select` primitive ([#74661](https://github.com/WordPress/gutenberg/pull/74661)).
 
 ## 0.5.0 (2026-01-16)
 

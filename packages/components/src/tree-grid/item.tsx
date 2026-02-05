@@ -28,5 +28,6 @@ function UnforwardedTreeGridItem(
  * @see {@link https://www.w3.org/TR/wai-aria-practices/examples/treegrid/treegrid-1.html}
  */
 export const TreeGridItem = forwardRef( UnforwardedTreeGridItem );
+TreeGridItem.displayName = 'TreeGridItem';
 
 export default TreeGridItem;

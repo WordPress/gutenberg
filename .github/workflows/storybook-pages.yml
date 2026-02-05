@@ -29,6 +29,7 @@ jobs:
 
             - name: Build Storybook
               env:
+                  NODE_OPTIONS: --max-old-space-size=8192
                   NODE_ENV: production
               run: npm run storybook:build
 

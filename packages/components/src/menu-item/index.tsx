@@ -109,5 +109,6 @@ function UnforwardedMenuItem(
  * ```
  */
 export const MenuItem = forwardRef( UnforwardedMenuItem );
+MenuItem.displayName = 'MenuItem';
 
 export default MenuItem;

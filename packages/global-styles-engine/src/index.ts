@@ -16,6 +16,7 @@ export {
 	transformToStyles as toStyles,
 	getBlockSelectors,
 	getLayoutStyles,
+	processCSSNesting,
 } from './core/render';
 export { getBlockSelector } from './core/selectors';
 

@@ -39,7 +39,13 @@ import {
 	privateApis as blockEditorPrivateApis,
 	BlockSettingsMenuControls,
 } from '@wordpress/block-editor';
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
@@ -230,16 +236,16 @@ function ContentOnlyControls( {
 								lockTitleControls ? (
 									<>{ lockTitleControlsMessage }</>
 								) : (
-									<>
-										{ __(
-											'Describe the role of this image on the page.'
-										) }
-										<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
-											{ __(
-												'(Note: many devices and browsers do not display this text.)'
-											) }
-										</ExternalLink>
-									</>
+									createInterpolateElement(
+										__(
+											'Describe the role of this image on the page. <a>(Note: many devices and browsers do not display this text.)</a>'
+										),
+										{
+											a: (
+												<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute" />
+											),
+										}
+									)
 								)
 							}
 						/>
@@ -379,6 +385,7 @@ export default function Image( {
 	const [ hasImageErrored, setHasImageErrored ] = useState( false );
 	const hasNonContentControls = blockEditingMode === 'default';
 	const isContentOnlyMode = blockEditingMode === 'contentOnly';
+	const showDimensionsControls = allowResize && hasNonContentControls;
 	const isResizable =
 		allowResize &&
 		hasNonContentControls &&
@@ -582,7 +589,7 @@ export default function Image( {
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
 	const dimensionsControl =
-		isResizable &&
+		showDimensionsControls &&
 		( SIZED_LAYOUTS.includes( parentLayoutType ) ? (
 			<DimensionsTool
 				panelId={ clientId }
@@ -624,6 +631,11 @@ export default function Image( {
 				defaultAspectRatio="auto"
 				scaleOptions={ scaleOptions }
 				unitsOptions={ dimensionsUnitsOptions }
+				tools={
+					isWideAligned
+						? [ 'aspectRatio', 'scale' ]
+						: [ 'aspectRatio', 'widthHeight', 'scale' ]
+				}
 			/>
 		) );
 
@@ -975,16 +987,16 @@ export default function Image( {
 						lockTitleControls ? (
 							<>{ lockTitleControlsMessage }</>
 						) : (
-							<>
-								{ __(
-									'Describe the role of this image on the page.'
-								) }
-								<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
-									{ __(
-										'(Note: many devices and browsers do not display this text.)'
-									) }
-								</ExternalLink>
-							</>
+							createInterpolateElement(
+								__(
+									'Describe the role of this image on the page. <a>(Note: many devices and browsers do not display this text.)</a>'
+								),
+								{
+									a: (
+										<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute" />
+									),
+								}
+							)
 						)
 					}
 				/>

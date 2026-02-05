@@ -24,6 +24,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { useResizeObserver } from '@wordpress/compose';
+import { getProtocol, prependHTTPS } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -276,7 +277,6 @@ export function ImageEdit( {
 		if ( ! linkDestination ) {
 			// Use the WordPress option to determine the proper default.
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
-			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
 			switch (
 				window?.wp?.media?.view?.settings?.defaultProps?.link ||
 				LINK_DESTINATION_NONE
@@ -320,10 +320,14 @@ export function ImageEdit( {
 	}
 
 	function onSelectURL( newURL ) {
-		if ( newURL !== url ) {
+		// Handle URLs without protocol.
+		const normalizedNewURL = getProtocol( newURL )
+			? newURL
+			: prependHTTPS( newURL );
+		if ( normalizedNewURL !== url ) {
 			setAttributes( {
 				blob: undefined,
-				url: newURL,
+				url: normalizedNewURL,
 				id: undefined,
 				sizeSlug: getSettings().imageDefaultSize,
 			} );

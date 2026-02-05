@@ -5,7 +5,7 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
+import { PanelBody, TextControl, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -14,6 +14,7 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import AddTabToolbarControl from './add-tab-toolbar-control';
+import RemoveTabToolbarControl from './remove-tab-toolbar-control';
 import slugFromLabel from './slug-from-label';
 
 export default function Controls( {
@@ -29,14 +30,12 @@ export default function Controls( {
 
 	return (
 		<>
-			<AddTabToolbarControl
-				tabsClientId={ tabsClientId }
-				attributes={ attributes }
-			/>
+			<AddTabToolbarControl tabsClientId={ tabsClientId } />
+			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
 			<InspectorControls>
-				<PanelBody title={ __( 'Tab Settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
-						label={ __( 'Tab Label' ) }
+						label={ __( 'Label' ) }
 						value={ decodeEntities( label ) }
 						onChange={ ( value ) => {
 							setAttributes( {
@@ -46,17 +45,14 @@ export default function Controls( {
 						} }
 						__next40pxDefaultSize
 					/>
-					<ToggleControl
-						label={ __( 'Default Tab' ) }
+					<CheckboxControl
+						label={ __( 'Default tab' ) }
 						checked={ isDefaultTab }
 						onChange={ ( value ) => {
 							updateBlockAttributes( tabsClientId, {
 								activeTabIndex: value ? blockIndex : 0,
 							} );
 						} }
-						help={ __(
-							'If toggled, this tab will be selected when the page loads.'
-						) }
 					/>
 				</PanelBody>
 			</InspectorControls>

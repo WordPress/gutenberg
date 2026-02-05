@@ -147,9 +147,9 @@ export default function FormPanelField< Item >( {
 		null
 	);
 
-	// Track if the panel has been opened (touched) to only show errors after interaction.
+	// Track if the panel has been closed (touched) to only show errors after interaction.
 	const [ touched, setTouched ] = useState( false );
-	const handleOpen = () => setTouched( true );
+	const handleClose = () => setTouched( true );
 
 	const { fieldDefinition, summaryFields } =
 		getFieldDefinitionAndSummaryFields( layout, field, fields );
@@ -172,7 +172,7 @@ export default function FormPanelField< Item >( {
 		<Tooltip text={ errorMessage } placement="top">
 			<Stack
 				direction="row"
-				gap="xs"
+				gap="sm"
 				className="dataforms-layouts-panel__field-label-error-content"
 				justify="flex-start"
 			>
@@ -193,7 +193,8 @@ export default function FormPanelField< Item >( {
 				labelPosition={ labelPosition }
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
-				onOpen={ handleOpen }
+				onClose={ handleClose }
+				touched={ touched }
 			/>
 		) : (
 			<PanelDropdown
@@ -205,7 +206,8 @@ export default function FormPanelField< Item >( {
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
 				popoverAnchor={ popoverAnchor }
-				onOpen={ handleOpen }
+				onClose={ handleClose }
+				touched={ touched }
 			/>
 		);
 
@@ -232,7 +234,7 @@ export default function FormPanelField< Item >( {
 		return (
 			<Stack
 				direction="row"
-				gap="xs"
+				gap="sm"
 				className="dataforms-layouts-panel__field dataforms-layouts-panel__field--label-position-none"
 			>
 				{ showError && (
@@ -255,7 +257,7 @@ export default function FormPanelField< Item >( {
 	return (
 		<Stack
 			direction="row"
-			gap="xs"
+			gap="sm"
 			ref={ setPopoverAnchor }
 			className="dataforms-layouts-panel__field"
 		>

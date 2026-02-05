@@ -119,11 +119,10 @@ Icon.args = {
 	icon: 'wordpress',
 };
 
-export const GroupedIcons = () => {
-	const GroupContainer = ( { children }: { children: ReactNode } ) => (
-		<div style={ { display: 'inline-flex' } }>{ children }</div>
-	);
-
+const GroupContainer = ( { children }: { children: ReactNode } ) => (
+	<div style={ { display: 'inline-flex' } }>{ children }</div>
+);
+export function GroupedIcons() {
 	return (
 		<GroupContainer>
 			<Button __next40pxDefaultSize icon={ formatBold } label="Bold" />
@@ -135,4 +134,4 @@ export const GroupedIcons = () => {
 			<Button __next40pxDefaultSize icon={ link } label="Link" />
 		</GroupContainer>
 	);
-};
+}

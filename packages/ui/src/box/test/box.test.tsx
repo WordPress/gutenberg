@@ -1,16 +1,5 @@
-/**
- * External dependencies
- */
 import { render, screen } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
 import { createRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
 import { Box } from '../box';
 
 describe( 'Box', () => {
