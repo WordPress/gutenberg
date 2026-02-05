@@ -614,9 +614,8 @@ export const restoreRevision =
 		}
 
 		// Build the edits object with all restorable fields from the revision.
-		// Setting blocks to undefined clears edited blocks, forcing a re-parse of content.
 		const edits = {
-			blocks: undefined,
+			blocks: parse( revision.content.raw ),
 			content: revision.content.raw,
 		};
 		if ( revision.title?.raw !== undefined ) {

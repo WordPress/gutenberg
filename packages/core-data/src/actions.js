@@ -8,7 +8,6 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { parse } from '@wordpress/blocks';
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
 
@@ -21,7 +20,6 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { createBatch } from './batch';
 import { STORE_NAME } from './name';
 import { LOCAL_EDITOR_ORIGIN, getSyncManager } from './sync';
-import { getRawValue } from './utils/crdt';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**
@@ -413,19 +411,6 @@ export const editEntityRecord =
 
 			return acc;
 		}, {} );
-
-		// When a revision is restored, the blocks are empty but the content is present.
-		// This causes the other collaborators to lose their content.
-		// So the workaround is to parse the content and set the blocks.
-		if (
-			( ! editsWithMerges.blocks ||
-				editsWithMerges.blocks.length === 0 ) &&
-			getRawValue( editsWithMerges.content )
-		) {
-			editsWithMerges.blocks = parse(
-				getRawValue( editsWithMerges.content )
-			);
-		}
 
 		const edit = {
 			kind,
