@@ -184,11 +184,10 @@ function render_block_core_latest_posts( $attributes ) {
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
 			&& isset( $attributes['displayPostContentRadio'] ) && 'full_post' === $attributes['displayPostContentRadio'] ) {
 
-			$post_content = html_entity_decode( $post->post_content, ENT_QUOTES, get_option( 'blog_charset' ) );
-
 			if ( post_password_required( $post ) ) {
 				$post_content = __( 'This content is password protected.' );
 			} else {
+				$post_content = $post->post_content;
 				// Check if we're already rendering this post to prevent infinite recursion.
 				if ( in_array( $post->ID, $rendering_stack, true ) ) {
 					$post_content = '';
@@ -196,8 +195,14 @@ function render_block_core_latest_posts( $attributes ) {
 					$rendering_stack[] = $post->ID;
 
 					try {
-						// Parse blocks so they are properly rendered with styles and attributes.
+						// Run through the actions that are typically taken on the_content.
 						$post_content = do_blocks( $post_content );
+						$post_content = shortcode_unautop( $post_content );
+						$post_content = do_shortcode( $post_content );
+						$post_content = wp_filter_content_tags( $post_content, 'latest-posts' );
+
+						global $wp_embed;
+						$post_content = $wp_embed->autoembed( $post_content );
 					} finally {
 						array_pop( $rendering_stack );
 					}
