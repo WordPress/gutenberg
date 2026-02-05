@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import type { EnhancedState, Y } from '@wordpress/sync';
+import type { Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -43,6 +43,15 @@ export interface PostEditorState extends BaseState {
 }
 
 /**
+ * An enhanced state includes additional metadata about the user's connection.
+ */
+export type EnhancedState< State > = State & {
+	clientId: number;
+	isConnected: boolean;
+	isMe: boolean;
+};
+
+/**
  * An enhanced post editor awareness state includes additional metadata about
  * the user and their connection.
  */
@@ -81,3 +90,8 @@ export type SerializableYItem = Pick<
 	left: SerializableYItemRef | null;
 	right: SerializableYItemRef | null;
 };
+
+export type EqualityFieldCheck< State, FieldName extends keyof State > = (
+	value1?: State[ FieldName ],
+	value2?: State[ FieldName ]
+) => boolean;

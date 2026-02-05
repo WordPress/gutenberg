@@ -12,7 +12,6 @@ import type { Awareness } from 'y-protocols/awareness';
 /**
  * Internal dependencies
  */
-import type { AwarenessState } from './awareness/awareness-state';
 import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
 
 export type CRDTDoc = Y.Doc;
@@ -73,7 +72,7 @@ export interface RecordHandlers {
 	saveRecord: () => Promise< void >;
 }
 
-export interface SyncConfig< State extends object = {} > {
+export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >
@@ -81,7 +80,7 @@ export interface SyncConfig< State extends object = {} > {
 	createAwareness?: (
 		ydoc: Y.Doc,
 		objectId?: ObjectID
-	) => AwarenessState< State > | undefined;
+	) => Awareness | undefined;
 	getChangesFromCRDTDoc: (
 		ydoc: Y.Doc,
 		editedRecord: ObjectData
@@ -94,7 +93,7 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => Record< string, string >;
-	getAwareness: < State extends AwarenessState< any > >(
+	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => State | undefined;

@@ -1061,6 +1061,31 @@ describe( 'Link submission', () => {
 
 		expect( editSubmitButton ).toHaveAttribute( 'aria-disabled', 'false' );
 	} );
+
+	it( 'should disable Apply button when URL is cleared', async () => {
+		const user = userEvent.setup();
+		const mockOnChange = jest.fn();
+
+		const existingLink = { url: 'https://example.com', title: 'Example' };
+		render(
+			<LinkControl
+				value={ existingLink }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox' );
+		// Clear the input
+		await user.clear( searchInput );
+
+		// Apply button should be disabled when input is empty
+		const submitButton = screen.getByRole( 'button', { name: 'Apply' } );
+		expect( submitButton ).toHaveAttribute( 'aria-disabled', 'true' );
+
+		// onChange should not be called
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
 } );
 
 describe( 'Default search suggestions', () => {
@@ -3236,6 +3261,241 @@ describe( 'Custom settings rendering', () => {
 			customToggleSetting: true,
 		} );
 	} );
+} );
+
+describe( 'URL validation', () => {
+	const user = userEvent.setup();
+	const mockOnChange = jest.fn();
+
+	beforeEach( () => {
+		mockOnChange.mockClear();
+	} );
+
+	it( 'should prevent submission for invalid URLs', async () => {
+		render(
+			<LinkControl
+				value={ { url: '' } }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox' );
+		// Use a string that is not a valid URL
+		await user.type( searchInput, 'not a url' );
+
+		// Press Enter - this should trigger validation
+		// Since the value doesn't pass isURLLike, it won't create a suggestion,
+		// but if it did, validation would prevent submission
+		triggerEnter( searchInput );
+
+		// For URLs that don't pass isURLLike, no suggestion is created,
+		// so onChange won't be called (which is the expected behavior)
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
+
+	it.each( [
+		{
+			description: 'valid URLs with protocol',
+			url: 'https://wordpress.org',
+			searchPattern: /https:\/\/wordpress\.org/,
+		},
+		{
+			description: 'valid URLs without protocol (without http://)',
+			url: 'www.wordpress.org',
+			searchPattern: /www\.wordpress\.org/,
+		},
+		{
+			description: 'hash links (internal anchor links)',
+			url: '#section',
+			searchPattern: /#section/,
+		},
+		{
+			description: 'relative paths (URLs starting with /)',
+			url: '/handbook',
+			searchPattern: /\/handbook/,
+		},
+	] )( 'should accept $description', async ( { url, searchPattern } ) => {
+		render(
+			<LinkControl
+				value={ { url: '' } }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox' );
+		await user.type( searchInput, url );
+
+		// Wait for suggestion to appear and become stable
+		await screen.findByRole( 'option', {
+			name: searchPattern,
+		} );
+
+		triggerEnter( searchInput );
+
+		// No validation error - should succeed
+		await waitFor( () => {
+			expect( mockOnChange ).toHaveBeenCalled();
+		} );
+
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url,
+			} )
+		);
+	} );
+
+	it( 'should skip validation for entity suggestions (posts, pages, categories)', async () => {
+		const entityLink = {
+			id: 1,
+			title: 'Hello Page',
+			type: 'page',
+			url: '?p=1',
+		};
+
+		render(
+			<LinkControl
+				value={ entityLink }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+				hasTextControl
+			/>
+		);
+
+		// Make a change by toggling the "Open in new tab" setting
+		// Entity links with unchanged URLs skip validation
+		const advancedButton = screen.getByRole( 'button', {
+			name: 'Advanced',
+		} );
+		await user.click( advancedButton );
+
+		const newTabToggle = screen.getByRole( 'checkbox', {
+			name: 'Open in new tab',
+		} );
+		await user.click( newTabToggle );
+
+		const submitButton = screen.getByRole( 'button', { name: 'Apply' } );
+		await user.click( submitButton );
+
+		// Should succeed without validation error
+		await waitFor( () => {
+			expect( mockOnChange ).toHaveBeenCalled();
+		} );
+		expect(
+			screen.queryByText( 'Please enter a valid URL.' )
+		).not.toBeInTheDocument();
+	} );
+
+	it( 'should show validation error when clicking Apply button with invalid URL', async () => {
+		// When editing an existing link, use Apply button
+		const existingLink = { url: 'https://example.com', title: 'Example' };
+		render(
+			<LinkControl
+				value={ existingLink }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox' );
+		await user.clear( searchInput );
+		await user.type( searchInput, 'invalid url' );
+
+		const submitButton = screen.getByRole( 'button', { name: 'Apply' } );
+
+		// Click the button - validation will run and prevent submission
+		await user.click( submitButton );
+
+		// Wait for the next frame where validation error appears
+		await waitFor(
+			() => {
+				expect(
+					screen.getByText( 'Please enter a valid URL.' )
+				).toBeVisible();
+			},
+			{ timeout: 100 }
+		);
+
+		// onChange should not be called because validation prevented submission
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should show validation error when pressing Enter to submit with an invalid URL', async () => {
+		// When editing an existing link, use Apply button
+		const existingLink = { url: 'https://example.com', title: 'Example' };
+		render(
+			<LinkControl
+				value={ existingLink }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox' );
+		await user.clear( searchInput );
+		await user.type( searchInput, 'invalid url' );
+
+		// Click without blur - use fireEvent for synchronous click
+		triggerEnter( searchInput );
+
+		// Wait for the next frame where validation error appears
+		await waitFor(
+			() => {
+				expect(
+					screen.getByText( 'Please enter a valid URL.' )
+				).toBeVisible();
+			},
+			{ timeout: 100 }
+		);
+
+		// onChange should not be called because validation prevented submission
+		expect( mockOnChange ).not.toHaveBeenCalled();
+	} );
+
+	it( 'should allow URLs that pass native URL constructor validation', async () => {
+		render(
+			<LinkControl
+				value={ { url: '' } }
+				forceIsEditingLink
+				onChange={ mockOnChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox' );
+		// This URL may seem invalid but passes native URL constructor
+		await user.type( searchInput, 'www.wordpress' );
+
+		// Wait for suggestion to appear and become stable
+		await screen.findByRole( 'option', {
+			name: /www\.wordpress/,
+		} );
+
+		triggerEnter( searchInput );
+
+		// Should be accepted (validation philosophy: native URL constructor is authoritative)
+		await waitFor( () => {
+			expect( mockOnChange ).toHaveBeenCalled();
+		} );
+
+		// This URL passes native URL constructor validation, so we allow it.
+		// While "www.wordpress" (without a TLD like .com or .org) is technically
+		// valid and could resolve (e.g., on an intranet), it's unlikely to be
+		// a useful URL in practice. However, our validation philosophy is to
+		// trust the native URL constructor as the authoritative source - if the
+		// browser accepts it, we accept it.
+		expect( mockOnChange ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				url: 'www.wordpress',
+			} )
+		);
+	} );
+
+	// Note: mailto: and tel: protocol URLs are handled by the validation logic
+	// (they skip URL constructor validation if they have a valid protocol),
+	// but testing them in the jsdom environment is problematic as the native
+	// URL constructor behavior may differ. These URLs are covered by the
+	// isURLLike validation which checks for valid protocols.
 } );
 
 function getSettingsDrawerToggle() {

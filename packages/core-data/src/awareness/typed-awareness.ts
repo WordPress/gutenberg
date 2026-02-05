@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { Awareness } from 'y-protocols/awareness';
+import { Awareness } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
-import { getRecordValue } from '../utils';
+import { getRecordValue } from './utils';
 
 /**
  * Extended Awareness class with typed state accessors.
@@ -42,17 +42,3 @@ export class TypedAwareness< State extends object > extends Awareness {
 		super.setLocalStateField( field, value );
 	}
 }
-
-/**
- * An enhanced state includes additional metadata about the user's connection.
- */
-export type EnhancedState< State > = State & {
-	clientId: number;
-	isConnected: boolean;
-	isMe: boolean;
-};
-
-export type EqualityFieldCheck< State, FieldName extends keyof State > = (
-	value1?: State[ FieldName ],
-	value2?: State[ FieldName ]
-) => boolean;

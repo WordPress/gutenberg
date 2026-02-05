@@ -68,7 +68,7 @@ export const Labels: Story = {
 		);
 
 		return (
-			<Stack direction="column" gap="md">
+			<Stack direction="column" gap="lg">
 				<DataForm< SampleData >
 					data={ data }
 					fields={ fields }
@@ -135,7 +135,7 @@ export const HelpText: Story = {
 		);
 
 		return (
-			<Stack direction="column" gap="md">
+			<Stack direction="column" gap="lg">
 				<DataForm< HelpTextData >
 					data={ data }
 					fields={ fields }
@@ -240,7 +240,7 @@ export const ValidationMessages: Story = {
 
 		return (
 			<div ref={ containerRef }>
-				<Stack direction="column" gap="lg">
+				<Stack direction="column" gap="xl">
 					<DataForm< ValidationMessagesData >
 						data={ data }
 						fields={ fields }
@@ -314,7 +314,7 @@ export const HighLevelHelpText: Story = {
 		);
 
 		return (
-			<Stack direction="column" gap="md">
+			<Stack direction="column" gap="lg">
 				<DataForm< HighLevelHelpTextData >
 					data={ data }
 					fields={ fields }
@@ -375,7 +375,7 @@ export const Placeholders: Story = {
 		);
 
 		return (
-			<Stack direction="column" gap="md">
+			<Stack direction="column" gap="lg">
 				<DataForm< PlaceholdersData >
 					data={ data }
 					fields={ fields }

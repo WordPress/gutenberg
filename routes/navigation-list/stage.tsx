@@ -66,7 +66,7 @@ function NavigationList() {
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: NAVIGATION_POST_TYPE,
-		slug: 'all',
+		slug: 'default-new',
 		defaultView,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,

@@ -10,20 +10,22 @@
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
-	padding-block-start: $button-size-compact;
 }
 
 .edit-post-meta-boxes-main__presenter {
+	flex-shrink: 0;
 	display: flex;
+	justify-content: center;
 	box-shadow: 0 $border-width $gray-300;
 	// Windows High Contrast mode will show this outline, but not the shadow.
 	outline: 1px solid transparent;
 	position: relative;
-	// Re-resizable adds an invisible overlay during resizes (apparently meant to avoid text selections)
-	// and this has to appear in front of it or else click events will be blocked on touch devices.
-	z-index: 10000;
-	inset: 0 0 auto;
+	z-index: 1;
 	height: $button-size-compact;
+	// Enlarge the toggle/resizable hit area on touch devices.
+	@media (pointer: coarse) {
+		height: $button-size;
+	}
 
 	// Style reset for both toggle and separator buttons.
 	> button {
@@ -32,6 +34,8 @@
 		border: none;
 		outline: none;
 		background-color: transparent;
+		// Ensure the drag gesture behaves as expected for touch input.
+		touch-action: none;
 	}
 
 	> button[aria-expanded] {
@@ -56,12 +60,12 @@
 		}
 	}
 
-	button[role="separator"] {
+	// This button is only present when resizable.
+	> button[role="separator"] {
 		cursor: row-resize;
-		width: $grid-unit-80;
-		margin: auto;
 		position: absolute;
-		inset: 0;
+		width: $grid-unit-80;
+		height: inherit;
 
 		&::before {
 			content: "";
@@ -80,20 +84,10 @@
 			}
 		}
 
-		&:is(:hover, :focus-visible)::before {
+		&:is(:hover, :focus)::before {
 			background-color: var(--wp-admin-theme-color);
 			width: $grid-unit-80 + $grid-unit-20;
 		}
-	}
-}
-
-// Enlarge the toggle/resizable hit area on touch devices.
-@media (pointer: coarse) {
-	.edit-post-meta-boxes-main {
-		padding-block-start: $button-size;
-	}
-	.edit-post-meta-boxes-main__presenter {
-		height: $button-size;
 	}
 }
 

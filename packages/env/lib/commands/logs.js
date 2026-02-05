@@ -21,6 +21,8 @@ const { getRuntime, detectRuntime } = require( '../runtime' );
  */
 module.exports = async function logs( { environment, watch, spinner, debug } ) {
 	const config = await loadConfig( path.resolve( '.' ) );
-	const runtime = getRuntime( detectRuntime( config.workDirectoryPath ) );
+	const runtime = getRuntime(
+		await detectRuntime( config.workDirectoryPath )
+	);
 	await runtime.logs( config, { environment, watch, spinner, debug } );
 };

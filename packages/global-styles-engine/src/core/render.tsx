@@ -338,6 +338,53 @@ function concatFeatureVariationSelectorString(
 }
 
 /**
+ * Updates the text indent selector for paragraph blocks based on the textIndent setting.
+ *
+ * The textIndent setting can be 'subsequent' (default), 'all', or false.
+ * When set to 'all', the selector should be '.wp-block-paragraph' instead of
+ * '.wp-block-paragraph + .wp-block-paragraph' to apply indent to all paragraphs.
+ *
+ * @param featureDeclarations The feature declarations keyed by selector
+ * @param settings            Theme.json settings
+ * @param blockName           The name of the block being processed
+ * @return Updated feature declarations
+ */
+const updateParagraphTextIndentSelector = (
+	featureDeclarations: Record< string, string[] >,
+	settings: Record< string, any > | undefined,
+	blockName: string | undefined
+): Record< string, string[] > => {
+	if ( blockName !== 'core/paragraph' ) {
+		return featureDeclarations;
+	}
+
+	// Check block-level settings first, then fall back to global settings.
+	const blockSettings = settings?.blocks?.[ 'core/paragraph' ];
+	const textIndentSetting =
+		blockSettings?.typography?.textIndent ??
+		settings?.typography?.textIndent ??
+		'subsequent';
+
+	if ( textIndentSetting !== 'all' ) {
+		return featureDeclarations;
+	}
+
+	// Look for the text indent selector and replace it.
+	const oldSelector = '.wp-block-paragraph + .wp-block-paragraph';
+	const newSelector = '.wp-block-paragraph';
+
+	if ( oldSelector in featureDeclarations ) {
+		const declarations = featureDeclarations[ oldSelector ];
+		const updated = { ...featureDeclarations };
+		delete updated[ oldSelector ];
+		updated[ newSelector ] = declarations;
+		return updated;
+	}
+
+	return featureDeclarations;
+};
+
+/**
  * Generate style declarations for a block's custom feature and subfeature
  * selectors.
  *
@@ -795,6 +842,7 @@ export const getNodesWithStyles = (
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
 		styleVariationSelectors?: Record< string, string >;
+		name?: string;
 	}[] = [];
 
 	if ( ! tree?.styles ) {
@@ -985,6 +1033,7 @@ export const getNodesWithStyles = (
 						blockSelectors[ blockName ].featureSelectors,
 					styleVariationSelectors:
 						blockSelectors[ blockName ].styleVariationSelectors,
+					name: blockName,
 				} );
 			}
 
@@ -1190,13 +1239,21 @@ export const transformToStyles = (
 				featureSelectors,
 				styleVariationSelectors,
 				skipSelectorWrapper,
+				name,
 			} ) => {
 				// Process styles for block support features with custom feature level
 				// CSS selectors set.
 				if ( featureSelectors ) {
-					const featureDeclarations = getFeatureDeclarations(
+					let featureDeclarations = getFeatureDeclarations(
 						featureSelectors,
 						styles
+					);
+
+					// Update text indent selector for paragraph blocks based on the textIndent setting.
+					featureDeclarations = updateParagraphTextIndentSelector(
+						featureDeclarations,
+						tree.settings,
+						name
 					);
 
 					Object.entries( featureDeclarations ).forEach(
@@ -1270,10 +1327,18 @@ export const transformToStyles = (
 							if ( styleVariations ) {
 								// If the block uses any custom selectors for block support, add those first.
 								if ( featureSelectors ) {
-									const featureDeclarations =
+									let featureDeclarations =
 										getFeatureDeclarations(
 											featureSelectors,
 											styleVariations
+										);
+
+									// Update text indent selector for paragraph blocks based on the textIndent setting.
+									featureDeclarations =
+										updateParagraphTextIndentSelector(
+											featureDeclarations,
+											tree.settings,
+											name
 										);
 
 									Object.entries(

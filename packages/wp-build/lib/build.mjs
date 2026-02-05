@@ -42,6 +42,11 @@ import {
 	getRouteMetadata,
 	generateContentEntryPoint,
 } from './route-utils.mjs';
+import {
+	generateWorkerPlaceholder,
+	buildWorkers,
+	generateWorkerCode,
+} from './worker-build.mjs';
 
 const ROOT_DIR = process.cwd();
 const PACKAGES_DIR = path.join( ROOT_DIR, 'packages' );
@@ -218,6 +223,53 @@ function createStyleBundlingPlugins( workingDir ) {
 		} ),
 	];
 }
+
+/**
+ * Plugin to inline WASM files as base64 data URLs.
+ * This eliminates the need for separate WASM file downloads and avoids
+ * issues with hosts not serving WASM files with the correct MIME type.
+ *
+ * @return {Object} esbuild plugin.
+ */
+const wasmInlinePlugin = {
+	name: 'wasm-inline',
+	setup( build ) {
+		// Resolve .wasm imports from node_modules.
+		build.onResolve( { filter: /\.wasm$/ }, async ( args ) => {
+			// Handle imports like 'wasm-vips/vips.wasm'.
+			if ( ! args.path.startsWith( '.' ) ) {
+				const { createRequire } = await import( 'module' );
+				const require = createRequire( args.resolveDir + '/index.js' );
+				try {
+					const resolved = require.resolve( args.path );
+					return {
+						path: resolved,
+						namespace: 'wasm-inline',
+					};
+				} catch {
+					// If resolution fails, let other plugins handle it.
+					return null;
+				}
+			}
+			return null;
+		} );
+
+		// Load WASM files and convert to base64 data URLs.
+		build.onLoad(
+			{ filter: /.*/, namespace: 'wasm-inline' },
+			async ( args ) => {
+				const wasmBuffer = await readFile( args.path );
+				const base64 = wasmBuffer.toString( 'base64' );
+				const dataUrl = `data:application/wasm;base64,${ base64 }`;
+
+				return {
+					contents: `export default "${ dataUrl }";`,
+					loader: 'js',
+				};
+			}
+		);
+	},
+};
 
 /**
  * Normalize path separators for cross-platform compatibility.
@@ -1112,6 +1164,11 @@ async function transpilePackage( packageName ) {
 
 	const builds = [];
 
+	// Generate placeholder worker-code.ts if this package has wpWorkers defined
+	// and the file doesn't exist yet. This is needed because transpilation happens
+	// before worker bundling, but vips-worker.ts imports from worker-code.ts.
+	await generateWorkerPlaceholder( packageDir, packageJson );
+
 	// Check if this is the components package that needs emotion babel plugin.
 	// Ideally we should remove this exception and move away from emotion.
 	const needsEmotionPlugin = packageName === 'components';
@@ -1186,6 +1243,7 @@ async function transpilePackage( packageName ) {
 	};
 	const plugins = [
 		needsEmotionPlugin && emotionPlugin,
+		wasmInlinePlugin,
 		externalizeAllExceptCssPlugin,
 		...createStyleBundlingPlugins( packageDir ),
 	].filter( Boolean );
@@ -1253,6 +1311,24 @@ async function transpilePackage( packageName ) {
 	}
 
 	await Promise.all( builds );
+
+	// Build workers if wpWorkers is defined in package.json.
+	// Workers are bundled as self-contained files with all dependencies included.
+	await buildWorkers( packageDir, packageJson, {
+		buildDir,
+		buildModuleDir,
+		target,
+		wasmInlinePlugin,
+	} );
+
+	// Generate inline worker code exports and re-transpile worker-code.ts.
+	await generateWorkerCode( packageDir, packageName, packageJson, {
+		srcDir,
+		buildDir,
+		buildModuleDir,
+		target,
+		plugins,
+	} );
 
 	await compileStyles( packageName );
 

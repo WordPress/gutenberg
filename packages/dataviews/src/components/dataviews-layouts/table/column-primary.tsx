@@ -38,7 +38,7 @@ function ColumnPrimary< Item >( {
 	isItemClickable: ( item: Item ) => boolean;
 } ) {
 	return (
-		<Stack direction="row" gap="sm" align="flex-start" justify="flex-start">
+		<Stack direction="row" gap="md" align="flex-start" justify="flex-start">
 			{ mediaField && (
 				<ItemClickWrapper
 					item={ item }

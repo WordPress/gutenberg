@@ -12,11 +12,15 @@
 export * as Y from 'yjs';
 
 /**
+ * Awareness is used to track user presence and state.
+ */
+export { Awareness } from 'y-protocols/awareness';
+
+/**
  * Deltas are used to calculate incremental Y.Text updates.
  */
 export { default as Delta } from './quill-delta/Delta';
 
-export { AwarenessState } from './awareness/awareness-state';
 export {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_RECORD_MAP_KEY,
@@ -29,8 +33,4 @@ export {
 } from './config';
 export { createSyncManager } from './manager';
 
-/**
- * An enhanced state includes additional metadata about the user's connection.
- */
-export type { EnhancedState } from './awareness/awareness-types';
 export type * from './types';

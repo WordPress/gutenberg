@@ -11,7 +11,6 @@ const { rimraf } = require( 'rimraf' );
 /**
  * Promisified dependencies
  */
-const sleep = util.promisify( setTimeout );
 const exec = util.promisify( require( 'child_process' ).exec );
 
 /**
@@ -26,7 +25,6 @@ const {
 	validateRunContainer,
 } = require( './validate-run-container' );
 const {
-	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,
 	setupWordPressDirectories,
@@ -174,7 +172,7 @@ class DockerRuntime {
 		}
 
 		await Promise.all( [
-			dockerCompose.upOne( 'mysql', {
+			dockerCompose.upMany( [ 'mysql', 'tests-mysql' ], {
 				...dockerComposeConfig,
 				commandOptions: shouldConfigureWp
 					? [ '--build', '--force-recreate' ]
@@ -249,19 +247,6 @@ class DockerRuntime {
 		// Only run WordPress install/configuration when config has changed.
 		if ( shouldConfigureWp ) {
 			spinner.text = 'Configuring WordPress.';
-
-			try {
-				await checkDatabaseConnection( fullConfig );
-			} catch ( error ) {
-				// Wait 30 seconds for MySQL to accept connections.
-				await retry( () => checkDatabaseConnection( fullConfig ), {
-					times: 30,
-					delay: 1000,
-				} );
-
-				// It takes 3-4 seconds for MySQL to be ready after it starts accepting connections.
-				await sleep( 4000 );
-			}
 
 			// Retry WordPress installation in case MySQL *still* wasn't ready.
 			await Promise.all( [
@@ -370,6 +355,15 @@ class DockerRuntime {
 	}
 
 	/**
+	 * Get the warning message for cleanup confirmation.
+	 *
+	 * @return {string} Warning message.
+	 */
+	getCleanupWarningMessage() {
+		return 'WARNING! This will remove Docker containers, volumes, networks, and local files associated with the WordPress instance. Docker images will be preserved.';
+	}
+
+	/**
 	 * Stop the Docker containers.
 	 *
 	 * @param {WPConfig} config          The wp-env config object.
@@ -413,7 +407,8 @@ class DockerRuntime {
 		spinner.text = 'Removing local files.';
 		// Note: there is a race condition where docker compose actually hasn't finished
 		// by this point, which causes rimraf to fail. We need to wait at least 2.5-5s,
-		// but using 10s in case it's dependant on the machine.
+		// but using 10s in case it's dependent on the machine. Removing images takes
+		// longer so we use a longer wait time here.
 		await new Promise( ( resolve ) => setTimeout( resolve, 10000 ) );
 		await rimraf( config.workDirectoryPath );
 
@@ -421,11 +416,38 @@ class DockerRuntime {
 	}
 
 	/**
-	 * Clean/reset the WordPress database.
+	 * Cleanup the Docker containers and remove local files, but preserve images.
+	 *
+	 * @param {WPConfig} config          The wp-env config object.
+	 * @param {Object}   options         Cleanup options.
+	 * @param {Object}   options.spinner A CLI spinner which indicates progress.
+	 * @param {boolean}  options.debug   True if debug mode is enabled.
+	 */
+	async cleanup( config, { spinner, debug } ) {
+		spinner.text = 'Removing docker containers, volumes, and networks.';
+
+		await dockerCompose.down( {
+			config: config.dockerComposeConfigPath,
+			commandOptions: [ '--volumes', '--remove-orphans' ],
+			log: debug,
+		} );
+
+		spinner.text = 'Removing local files.';
+		// Note: there is a race condition where docker compose actually hasn't finished
+		// by this point, which causes rimraf to fail. We need to wait at least 2.5-5s,
+		// but since we're not removing images, the wait can be shorter.
+		await new Promise( ( resolve ) => setTimeout( resolve, 3000 ) );
+		await rimraf( config.workDirectoryPath );
+
+		spinner.text = 'Cleaned up WordPress environment.';
+	}
+
+	/**
+	 * Reset the WordPress database.
 	 *
 	 * @param {WPConfig} config              The wp-env config object.
-	 * @param {Object}   options             Clean options.
-	 * @param {string}   options.environment The environment to clean.
+	 * @param {Object}   options             Reset options.
+	 * @param {string}   options.environment The environment to reset.
 	 * @param {Object}   options.spinner     A CLI spinner which indicates progress.
 	 * @param {boolean}  options.debug       True if debug mode is enabled.
 	 */
@@ -435,13 +457,23 @@ class DockerRuntime {
 		const description = `${ environment } environment${
 			environment === 'all' ? 's' : ''
 		}`;
-		spinner.text = `Cleaning ${ description }.`;
+		spinner.text = `Resetting ${ description }.`;
 
 		const tasks = [];
 
-		// Start the database first to avoid race conditions where all tasks create
-		// different docker networks with the same name.
-		await dockerCompose.upOne( 'mysql', {
+		// Start the appropriate MySQL service(s) first to avoid race conditions
+		// where parallel tasks try to create docker networks with the same name.
+		// The dependency chain (cli -> wordpress -> mysql with service_healthy)
+		// ensures MySQL is ready before database operations run.
+		const mysqlServices = [];
+		if ( environment === 'all' || environment === 'development' ) {
+			mysqlServices.push( 'mysql' );
+		}
+		if ( environment === 'all' || environment === 'tests' ) {
+			mysqlServices.push( 'tests-mysql' );
+		}
+
+		await dockerCompose.upMany( mysqlServices, {
 			config: fullConfig.dockerComposeConfigPath,
 			log: fullConfig.debug,
 		} );
@@ -466,7 +498,7 @@ class DockerRuntime {
 
 		await Promise.all( tasks );
 
-		spinner.text = `Cleaned ${ description }.`;
+		spinner.text = `Reset ${ description }.`;
 	}
 
 	/**
