@@ -106,8 +106,7 @@ export function Edit( props ) {
 						<DropdownMenu
 							icon=""
 							popoverProps={ {
-								className:
-									'outermost-icon-block__replace-popover is-alternate',
+								className: 'is-alternate',
 							} }
 							text={ __( 'Label' ) }
 						>
