@@ -31,7 +31,9 @@ import { useLinkPreview } from './use-link-preview';
 import { useIsInvalidLink } from './use-is-invalid-link';
 import { unlock } from '../../lock-unlock';
 
-const { LinkPicker } = unlock( blockEditorPrivateApis );
+const { LinkPicker, isHashLink, isRelativePath } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Get a human-readable entity type name.
@@ -151,6 +153,11 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		[]
 	);
 
+	const homeUrl = useSelect( ( select ) => {
+		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			?.home;
+	}, [] );
+
 	const preview = useLinkPreview( {
 		url,
 		title: linkTitle,
@@ -160,6 +167,16 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		hasBinding: hasUrlBinding,
 		isEntityAvailable: isBoundEntityAvailable,
 	} );
+
+	// Check if URL is viewable (not hash link or other relative path like ./ or ../)
+	const isViewableUrl =
+		url &&
+		( ! isHashLink( url ) ||
+			( isRelativePath( url ) && ! url.startsWith( '/' ) ) );
+
+	// Construct full URL for viewing (prepend home URL for absolute paths starting with /)
+	const viewUrl =
+		isViewableUrl && url.startsWith( '/' ) && homeUrl ? homeUrl + url : url;
 
 	return (
 		<ToolsPanel
@@ -243,23 +260,25 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 								) }
 							</Button>
 						) }
-					<Button
-						variant="minimal"
-						href={ url }
-						target="_blank"
-						icon={ external }
-						iconPosition="right"
-						__next40pxDefaultSize
-					>
-						{ sprintf(
-							/* translators: %s: entity type (e.g., "page", "post", "category") */
-							__( 'View %s' ),
-							getEntityTypeName(
-								attributes.type,
-								attributes.kind
-							)
-						) }
-					</Button>
+					{ isViewableUrl && (
+						<Button
+							variant="secondary"
+							href={ viewUrl }
+							target="_blank"
+							icon={ external }
+							iconPosition="right"
+							__next40pxDefaultSize
+						>
+							{ sprintf(
+								/* translators: %s: entity type (e.g., "page", "post", "category") */
+								__( 'View %s' ),
+								getEntityTypeName(
+									attributes.type,
+									attributes.kind
+								)
+							) }
+						</Button>
+					) }
 				</HStack>
 			) }
 
