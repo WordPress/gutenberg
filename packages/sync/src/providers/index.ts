@@ -42,11 +42,11 @@ export function getProviderCreators(): ProviderCreator[] {
 	}
 
 	/**
-	 * Filter the
+	 * Filter the available provider creators.
 	 */
 	const filteredProviderCreators: unknown = applyFilters(
 		'sync.providers',
-		[] // Replace with `getDefaultProviderCreators()` to enable sync
+		[] // Replace `[]` with `getDefaultProviderCreators()` to enable sync.
 	);
 
 	// If the returned value is not an array, ignore and set to empty array.
