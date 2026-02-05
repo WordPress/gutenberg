@@ -753,12 +753,25 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	}
 
 	public function test_get_stylesheet_preset_css_vars_use_feature_selector() {
+		register_block_type(
+			'test/feature-selector',
+			array(
+				'api_version' => 3,
+				'selectors'   => array(
+					'root'       => '.wp-block-test-feature-selector .wp-block-test-feature-selector__inner',
+					'dimensions' => array(
+						'root' => '.wp-block-test-feature-selector',
+					),
+				),
+			)
+		);
+
 		$theme_json = new WP_Theme_JSON_Gutenberg(
 			array(
 				'version'  => WP_Theme_JSON_Gutenberg::LATEST_SCHEMA,
 				'settings' => array(
 					'blocks' => array(
-						'core/button' => array(
+						'test/feature-selector' => array(
 							'dimensions' => array(
 								'dimensionSizes' => array(
 									array(
@@ -779,16 +792,18 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 
 		$variables = $theme_json->get_stylesheet( array( 'variables' ) );
 
-		// Dimension preset CSS vars should be on the feature selector (.wp-block-button),
-		// not the block's root selector (.wp-block-button .wp-block-button__link).
+		// Dimension preset CSS vars should be on the feature selector,
+		// not the block's root selector.
 		$this->assertStringContainsString(
-			'.wp-block-button{--wp--preset--dimension--25: 25%;--wp--preset--dimension--50: 50%;}',
+			'.wp-block-test-feature-selector{--wp--preset--dimension--25: 25%;--wp--preset--dimension--50: 50%;}',
 			$variables
 		);
 		$this->assertStringNotContainsString(
-			'.wp-block-button .wp-block-button__link{--wp--preset--dimension',
+			'.wp-block-test-feature-selector .wp-block-test-feature-selector__inner{--wp--preset--dimension',
 			$variables
 		);
+
+		unregister_block_type( 'test/feature-selector' );
 	}
 
 	public function test_get_stylesheet_preset_rules_come_after_block_rules() {
