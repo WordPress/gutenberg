@@ -6,7 +6,7 @@
  */
 
 /**
- * Extract tabs list from tab-panels innerblocks.
+ * Extract tabs list from tab-panel innerblocks.
  *
  * @param array $innerblocks Parsed inner blocks of tabs block.
  *
@@ -15,9 +15,9 @@
 function block_core_tabs_generate_tabs_list( array $innerblocks = array() ): array {
 	$tabs_list = array();
 
-	// Find tab-panels block
+	// Find tab-panel block
 	foreach ( $innerblocks as $inner_block ) {
-		if ( 'core/tab-panels' === ( $inner_block['blockName'] ?? '' ) ) {
+		if ( 'core/tab-panel' === ( $inner_block['blockName'] ?? '' ) ) {
 			$tab_index = 0;
 			foreach ( $inner_block['innerBlocks'] ?? array() as $tab_block ) {
 				if ( 'core/tab' === ( $tab_block['blockName'] ?? '' ) ) {

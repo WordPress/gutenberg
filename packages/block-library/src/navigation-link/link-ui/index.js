@@ -37,22 +37,25 @@ import { useEntityBinding } from '../shared/use-entity-binding';
  * @return {{ type?: string, subtype?: string }} Search query params.
  */
 export function getSuggestionsQuery( type, kind ) {
+	// How many results to show initially and per search.
+	const perPage = 20;
+
 	switch ( type ) {
 		case 'post':
 		case 'page':
-			return { type: 'post', subtype: type };
+			return { type: 'post', subtype: type, perPage };
 		case 'category':
-			return { type: 'term', subtype: 'category' };
+			return { type: 'term', subtype: 'category', perPage };
 		case 'tag':
-			return { type: 'term', subtype: 'post_tag' };
+			return { type: 'term', subtype: 'post_tag', perPage };
 		case 'post_format':
-			return { type: 'post-format' };
+			return { type: 'post-format', perPage };
 		default:
 			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type };
+				return { type: 'term', subtype: type, perPage };
 			}
 			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type };
+				return { type: 'post', subtype: type, perPage };
 			}
 			return {
 				// for custom link which has no type
@@ -60,7 +63,7 @@ export function getSuggestionsQuery( type, kind ) {
 				initialSuggestionsSearchOptions: {
 					type: 'post',
 					subtype: 'page',
-					perPage: 20,
+					perPage,
 				},
 			};
 	}

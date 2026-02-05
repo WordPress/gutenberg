@@ -5,7 +5,7 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
+import { PanelBody, TextControl, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -35,7 +35,7 @@ export default function Controls( {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
-						label={ __( 'Tab Label' ) }
+						label={ __( 'Label' ) }
 						value={ decodeEntities( label ) }
 						onChange={ ( value ) => {
 							setAttributes( {
@@ -45,17 +45,14 @@ export default function Controls( {
 						} }
 						__next40pxDefaultSize
 					/>
-					<ToggleControl
-						label={ __( 'Default Tab' ) }
+					<CheckboxControl
+						label={ __( 'Default tab' ) }
 						checked={ isDefaultTab }
 						onChange={ ( value ) => {
 							updateBlockAttributes( tabsClientId, {
 								activeTabIndex: value ? blockIndex : 0,
 							} );
 						} }
-						help={ __(
-							'If toggled, this tab will be selected when the page loads.'
-						) }
 					/>
 				</PanelBody>
 			</InspectorControls>

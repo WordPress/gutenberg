@@ -8,9 +8,7 @@
 	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
-	"parent": [
-		"core/tabs-menu"
-	],
+	"parent": [ "core/tabs-menu" ],
 	"usesContext": [
 		"core/tabs-menu-item-index",
 		"core/tabs-menu-item-id",

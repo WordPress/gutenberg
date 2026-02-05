@@ -117,13 +117,19 @@ function ModalContent< Item >( {
 					onChange={ handleOnChange }
 					validity={ validity }
 				>
-					{ ( FieldLayout, childField, childFieldValidity ) => (
+					{ (
+						FieldLayout,
+						childField,
+						childFieldValidity,
+						markWhenOptional
+					) => (
 						<FieldLayout
 							key={ childField.id }
 							data={ modalData }
 							field={ childField }
 							onChange={ handleOnChange }
 							hideLabelFromVision={ form.fields.length < 2 }
+							markWhenOptional={ markWhenOptional }
 							validity={ childFieldValidity }
 						/>
 					) }

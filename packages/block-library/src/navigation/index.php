@@ -72,17 +72,6 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static $seen_menu_names = array();
 
-	/**
-	 * Returns whether the navigation overlay experiment is enabled.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return bool Returns whether the navigation overlay experiment is enabled.
-	 */
-	private static function is_overlay_experiment_enabled() {
-		$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-		return $gutenberg_experiments && array_key_exists( 'gutenberg-customizable-navigation-overlays', $gutenberg_experiments );
-	}
 
 	/**
 	 * Returns whether or not this is responsive navigation.
@@ -652,7 +641,6 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		if ( $has_custom_overlay ) {
-			// Only add the disable-default-overlay class if experiment is enabled AND overlay blocks actually rendered.
 			$responsive_container_classes[] = 'disable-default-overlay';
 		} else {
 			// Don't apply overlay color classes if using a custom overlay template part.
@@ -693,38 +681,34 @@ class WP_Navigation_Block_Renderer {
 
 		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
 
-		// Set-up variables for the custom overlay experiment.
-		// Values are set to "off" so they don't affect the default behavior.
-		$is_overlay_experiment_enabled  = static::is_overlay_experiment_enabled();
+		// Set-up variables for custom overlays.
 		$has_custom_overlay             = false;
 		$close_button_markup            = '';
 		$has_custom_overlay_close_block = false;
 		$overlay_blocks_html            = '';
 		$custom_overlay_markup          = '';
 
-		if ( $is_overlay_experiment_enabled ) {
-			// Check if an overlay template part is selected and render it.
-			// This needs to happen before building classes so we know if overlay blocks actually exist.
-			if ( ! empty( $attributes['overlay'] ) ) {
-				// Get blocks from the overlay template part.
-				$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
-				// Check if overlay contains a navigation-overlay-close block.
-				$has_custom_overlay_close_block = block_core_navigation_block_tree_has_block_type(
-					$overlay_blocks,
-					'core/navigation-overlay-close',
-					array( 'core/navigation' ) // Skip navigation blocks, as they cannot contain an overlay close block
-				);
-				// Render template part blocks directly without navigation container wrapper.
-				$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
-				// Add Interactivity API directives to the overlay close block if present.
-				if ( $has_custom_overlay_close_block && $is_interactive ) {
-					$tags                = new WP_HTML_Tag_Processor( $overlay_blocks_html );
-					$overlay_blocks_html = block_core_navigation_add_directives_to_overlay_close( $tags );
-				}
+		// Check if an overlay template part is selected and render it.
+		// This needs to happen before building classes so we know if overlay blocks actually exist.
+		if ( ! empty( $attributes['overlay'] ) ) {
+			// Get blocks from the overlay template part.
+			$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
+			// Check if overlay contains a navigation-overlay-close block.
+			$has_custom_overlay_close_block = block_core_navigation_block_tree_has_block_type(
+				$overlay_blocks,
+				'core/navigation-overlay-close',
+				array( 'core/navigation' ) // Skip navigation blocks, as they cannot contain an overlay close block
+			);
+			// Render template part blocks directly without navigation container wrapper.
+			$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
+			// Add Interactivity API directives to the overlay close block if present.
+			if ( $has_custom_overlay_close_block && $is_interactive ) {
+				$tags                = new WP_HTML_Tag_Processor( $overlay_blocks_html );
+				$overlay_blocks_html = block_core_navigation_add_directives_to_overlay_close( $tags );
 			}
-
-			$has_custom_overlay = ! empty( $overlay_blocks_html );
 		}
+
+		$has_custom_overlay = ! empty( $overlay_blocks_html );
 
 		$responsive_container_classes = static::get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors );
 

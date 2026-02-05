@@ -23,13 +23,12 @@ import { unlock } from '../../lock-unlock';
 import CommentAuthorInfo from './comment-author-info';
 import CommentForm from './comment-form';
 import { focusCommentThread, noop } from './utils';
+import { store as editorStore } from '../../store';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 
 export function AddComment( {
 	onSubmit,
-	newNoteFormState,
-	setNewNoteFormState,
 	commentSidebarRef,
 	reflowComments = noop,
 	isFloating = false,
@@ -42,16 +41,21 @@ export function AddComment( {
 			clientId: getSelectedBlockClientId(),
 		};
 	}, [] );
+	const selectedNote = useSelect(
+		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
+		[]
+	);
 	const blockElement = useBlockElement( clientId );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const { selectNote } = unlock( useDispatch( editorStore ) );
 
 	const unselectThread = () => {
-		setNewNoteFormState( 'closed' );
+		selectNote( undefined );
 		blockElement?.focus();
 		toggleBlockSpotlight( clientId, false );
 	};
 
-	if ( newNoteFormState !== 'open' || ! clientId ) {
+	if ( selectedNote !== 'new' || ! clientId ) {
 		return null;
 	}
 
@@ -79,7 +83,7 @@ export function AddComment( {
 					return;
 				}
 				toggleBlockSpotlight( clientId, false );
-				setNewNoteFormState( 'closed' );
+				selectNote( undefined );
 			} }
 		>
 			<HStack alignment="left" spacing="3">
@@ -88,8 +92,8 @@ export function AddComment( {
 			<CommentForm
 				onSubmit={ async ( inputComment ) => {
 					const { id } = await onSubmit( { content: inputComment } );
+					selectNote( id );
 					focusCommentThread( id, commentSidebarRef.current );
-					setNewNoteFormState( 'creating' );
 				} }
 				onCancel={ unselectThread }
 				reflowComments={ reflowComments }
