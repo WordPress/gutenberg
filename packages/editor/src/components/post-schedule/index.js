@@ -55,9 +55,11 @@ export function PrivatePostSchedule( {
 	const { editPost } = useDispatch( editorStore );
 	const onUpdateDate = ( date ) => editPost( { date } );
 
-	const [ previewedMonth, setPreviewedMonth ] = useState(
-		startOfMonth( new Date( postDate ) )
-	);
+	const [ previewedMonth, setPreviewedMonth ] = useState( () => {
+		const date = new Date( postDate );
+		// Fallback to current date if postDate is invalid (defense in depth).
+		return startOfMonth( isNaN( date.getTime() ) ? new Date() : date );
+	} );
 
 	// Pick up published and scheduled site posts.
 	const eventsByPostType = useSelect(
