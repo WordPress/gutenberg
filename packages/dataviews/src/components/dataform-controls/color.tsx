@@ -75,6 +75,7 @@ export default function Color< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { label, placeholder, description, setValue, isValid } = field;
@@ -97,6 +98,7 @@ export default function Color< Item >( {
 	return (
 		<ValidatedInputControl
 			required={ !! field.isValid?.required }
+			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }

@@ -30,7 +30,7 @@ function Header( { title }: { title: string } ) {
 		<Stack
 			direction="column"
 			className="dataforms-layouts-regular__header"
-			gap="md"
+			gap="lg"
 		>
 			<Stack direction="row" align="center">
 				<Heading level={ 2 } size={ 13 }>
@@ -46,6 +46,7 @@ export default function FormRegularField< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
@@ -89,7 +90,7 @@ export default function FormRegularField< Item >( {
 			<Stack
 				direction="row"
 				className="dataforms-layouts-regular__field"
-				gap="xs"
+				gap="sm"
 			>
 				<div
 					className={ clsx(
@@ -112,6 +113,7 @@ export default function FormRegularField< Item >( {
 							field={ fieldDefinition }
 							onChange={ onChange }
 							hideLabelFromVision
+							markWhenOptional={ markWhenOptional }
 							validity={ validity }
 						/>
 					) }
@@ -144,6 +146,7 @@ export default function FormRegularField< Item >( {
 					hideLabelFromVision={
 						labelPosition === 'none' ? true : hideLabelFromVision
 					}
+					markWhenOptional={ markWhenOptional }
 					validity={ validity }
 				/>
 			) }

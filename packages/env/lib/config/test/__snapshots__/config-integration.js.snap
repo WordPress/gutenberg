@@ -71,7 +71,9 @@ exports[`Config Integration should load local and override configuration files 1
   },
   "lifecycleScripts": {
     "afterClean": null,
+    "afterCleanup": null,
     "afterDestroy": "test",
+    "afterReset": null,
     "afterStart": null,
   },
   "name": "gutenberg",
@@ -150,7 +152,9 @@ exports[`Config Integration should load local configuration file 1`] = `
   },
   "lifecycleScripts": {
     "afterClean": null,
+    "afterCleanup": null,
     "afterDestroy": null,
+    "afterReset": null,
     "afterStart": "test",
   },
   "name": "gutenberg",
@@ -229,7 +233,9 @@ exports[`Config Integration should use default configuration 1`] = `
   },
   "lifecycleScripts": {
     "afterClean": null,
+    "afterCleanup": null,
     "afterDestroy": null,
+    "afterReset": null,
     "afterStart": null,
   },
   "name": "gutenberg",
@@ -310,7 +316,9 @@ exports[`Config Integration should use environment variables over local and over
   },
   "lifecycleScripts": {
     "afterClean": null,
+    "afterCleanup": null,
     "afterDestroy": null,
+    "afterReset": null,
     "afterStart": "test",
   },
   "name": "gutenberg",

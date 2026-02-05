@@ -6,6 +6,11 @@ const { readdir, readFile, writeFile } = require( 'fs' ).promises;
 const { execFile } = require( 'child_process' );
 const { promisify } = require( 'util' );
 
+/**
+ * Internal dependencies
+ */
+const { validateCollection } = require( './validate-collection.cjs' );
+
 const execFileAsync = promisify( execFile );
 
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
@@ -25,6 +30,7 @@ async function main() {
 	await cleanup();
 	await generateTsxFiles();
 	await generateIndex();
+	await validateCollection();
 }
 
 // Before automatically generating TSX files from SVG ones, ensure that all

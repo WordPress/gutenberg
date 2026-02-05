@@ -484,7 +484,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 		label: 'Categories',
 		id: 'categories',
 		header: (
-			<Stack direction="row" gap="2xs" justify="start" align="center">
+			<Stack direction="row" gap="sm" justify="start" align="center">
 				<Icon icon={ category } />
 				<span style={ { minWidth: 0 } }>Categories</span>
 			</Stack>
@@ -554,9 +554,9 @@ export const orderEventActions: Action< OrderEvent >[] = [
 				closeModal?.();
 			};
 			return (
-				<Stack direction="column" gap="lg">
+				<Stack direction="column" gap="xl">
 					<Text>{ label }</Text>
-					<Stack direction="row" gap="xs" justify="right">
+					<Stack direction="row" gap="sm" justify="right">
 						<Button
 							__next40pxDefaultSize
 							variant="tertiary"

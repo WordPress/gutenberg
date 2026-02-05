@@ -30,6 +30,7 @@ import { useBlockEditingMode } from '../components/block-editing-mode';
 import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 import { useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
+import { globalStylesDataKey } from '../store/private-keys';
 
 const layoutBlockSupportKey = 'layout';
 const { kebabCase } = unlock( componentsPrivateApis );
@@ -367,6 +368,7 @@ function BlockWithLayoutStyles( {
 	block: BlockListBlock,
 	props,
 	blockGapSupport,
+	globalBlockGapValue,
 	layoutClasses,
 } ) {
 	const { name, attributes } = props;
@@ -393,6 +395,7 @@ function BlockWithLayoutStyles( {
 		layout: usedLayout,
 		style: attributes?.style,
 		hasBlockGapSupport,
+		globalBlockGapValue,
 	} );
 
 	// Attach a `wp-container-` id-based class name as well as a layout class name such as `is-layout-flex`.
@@ -436,7 +439,8 @@ export const withLayoutStyles = createHigherOrderComponent(
 					const { getSettings, getBlockSettings } = unlock(
 						select( blockEditorStore )
 					);
-					const { disableLayoutStyles } = getSettings();
+					const settings = getSettings();
+					const { disableLayoutStyles } = settings;
 
 					if ( disableLayoutStyles ) {
 						return;
@@ -447,7 +451,14 @@ export const withLayoutStyles = createHigherOrderComponent(
 						'spacing.blockGap'
 					);
 
-					return { blockGapSupport };
+					// Get default blockGap value from global styles for use in layouts like grid.
+					// Check block-specific styles first, then fall back to root styles.
+					const globalStyles = settings[ globalStylesDataKey ];
+					const globalBlockGapValue =
+						globalStyles?.blocks?.[ name ]?.spacing?.blockGap ??
+						globalStyles?.spacing?.blockGap;
+
+					return { blockGapSupport, globalBlockGapValue };
 				},
 				[ blockSupportsLayout, clientId ]
 			);

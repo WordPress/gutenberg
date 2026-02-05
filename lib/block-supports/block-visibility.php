@@ -25,10 +25,6 @@ function gutenberg_render_block_visibility_support( $block_content, $block ) {
 		return '';
 	}
 
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-hide-blocks-based-on-screen-size' ) ) {
-		return $block_content;
-	}
-
 	if ( is_array( $block_visibility ) && ! empty( $block_visibility ) ) {
 		// Get viewport configuration from nested structure.
 		$viewport_config = $block_visibility['viewport'] ?? null;

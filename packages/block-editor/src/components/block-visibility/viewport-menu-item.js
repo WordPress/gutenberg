@@ -16,11 +16,17 @@ import { unlock } from '../../lock-unlock';
 
 export default function BlockVisibilityViewportMenuItem( { clientIds } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
-	const areBlocksHiddenAnywhere = useSelect(
-		( select ) =>
-			unlock( select( blockEditorStore ) ).areBlocksHiddenAnywhere(
-				clientIds
-			),
+	const { areBlocksHiddenAnywhere } = useSelect(
+		( select ) => {
+			const { isBlockHiddenAnywhere } = unlock(
+				select( blockEditorStore )
+			);
+			return {
+				areBlocksHiddenAnywhere: clientIds?.every( ( clientId ) =>
+					isBlockHiddenAnywhere( clientId )
+				),
+			};
+		},
 		[ clientIds ]
 	);
 	return (

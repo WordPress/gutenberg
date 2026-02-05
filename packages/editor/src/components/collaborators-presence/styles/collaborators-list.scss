@@ -1,0 +1,96 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-collaborators-presence__list.components-popover {
+	// Popover wrapper styles
+	.components-popover__content {
+		border: 1px solid $gray-300;
+		border-width: 1px 0 0 1px;
+		border-radius: $radius-large;
+		background: $white;
+		box-shadow: $elevation-small;
+	}
+
+	.editor-collaborators-presence__list-content {
+		min-width: 280px;
+	}
+
+	// Header with title and action button
+	.editor-collaborators-presence__list-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0 $grid-unit-20;
+
+		&-title {
+			font-size: $font-size-medium;
+			font-weight: $font-weight-medium;
+			text-transform: uppercase;
+			line-height: $font-line-height-small;
+			padding: 14px 0;
+
+			span {
+				color: $gray-700;
+			}
+		}
+
+		&-action {
+			padding: $grid-unit-10 0;
+
+			button {
+				color: $gray-900;
+				height: $button-size-small;
+				width: $button-size-small;
+				padding: 0;
+			}
+		}
+	}
+
+	// List of collaborators
+	.editor-collaborators-presence__list-items {
+		display: flex;
+		flex-direction: column;
+		padding: 0 10px $grid-unit-20;
+	}
+
+	.editor-collaborators-presence__list-item {
+		// Reset button styles
+		all: unset;
+		box-sizing: border-box;
+
+		// Layout styles
+		display: flex;
+		align-items: center;
+		padding: $grid-unit-05 + 2;
+		gap: $grid-unit-10;
+		border-radius: $radius-large + $grid-unit-05;
+		width: 100%;
+		cursor: pointer;
+		transition: background-color 0.2s ease;
+
+		&:hover:not(:disabled) {
+			background-color: rgba($black, 0.05);
+		}
+
+		&:active:not(:disabled) {
+			background-color: rgba($black, 0.08);
+		}
+
+		&:focus-visible {
+			outline: 2px solid var(--wp-admin-theme-color, #007cba);
+			outline-offset: -2px;
+		}
+
+		&:disabled {
+			cursor: default;
+		}
+
+		&-info {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			line-height: $font-line-height-x-small;
+			font-size: $font-size-small;
+		}
+	}
+}

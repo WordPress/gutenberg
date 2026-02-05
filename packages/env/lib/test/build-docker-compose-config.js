@@ -2,8 +2,8 @@
 /**
  * Internal dependencies
  */
-const buildDockerComposeConfig = require( '../build-docker-compose-config' );
-const getHostUser = require( '../get-host-user' );
+const buildDockerComposeConfig = require( '../runtime/docker/build-docker-compose-config' );
+const getHostUser = require( '../runtime/docker/get-host-user' );
 
 // The basic config keys which build docker compose config requires.
 const CONFIG = {
@@ -14,7 +14,7 @@ const CONFIG = {
 	configDirectoryPath: '/path/to/config',
 };
 
-jest.mock( '../get-host-user', () => jest.fn() );
+jest.mock( '../runtime/docker/get-host-user', () => jest.fn() );
 getHostUser.mockImplementation( () => {
 	return {
 		name: 'test',
@@ -130,5 +130,88 @@ describe( 'buildDockerComposeConfig', () => {
 
 		expect( dockerConfig.volumes.wordpress ).toBe( undefined );
 		expect( dockerConfig.volumes[ 'tests-wordpress' ] ).toBe( undefined );
+	} );
+
+	it( 'should add healthcheck to mysql services', () => {
+		const config = buildDockerComposeConfig( {
+			workDirectoryPath: '/some/path',
+			env: {
+				development: {
+					port: 8888,
+					mysqlPort: 3306,
+					coreSource: null,
+					pluginSources: [],
+					themeSources: [],
+					mappings: {},
+				},
+				tests: {
+					port: 8889,
+					mysqlPort: 3307,
+					coreSource: null,
+					pluginSources: [],
+					themeSources: [],
+					mappings: {},
+				},
+			},
+		} );
+
+		expect( config.services.mysql.healthcheck ).toBeDefined();
+		expect( config.services.mysql.healthcheck.test ).toEqual( [
+			'CMD',
+			'healthcheck.sh',
+			'--connect',
+			'--innodb_initialized',
+		] );
+		expect( config.services.mysql.healthcheck.interval ).toBe( '5s' );
+		expect( config.services.mysql.healthcheck.timeout ).toBe( '10s' );
+		expect( config.services.mysql.healthcheck.retries ).toBe( 12 );
+		expect( config.services.mysql.healthcheck.start_period ).toBe( '60s' );
+
+		// Verify MARIADB_AUTO_UPGRADE is set for existing installations
+		expect( config.services.mysql.environment.MARIADB_AUTO_UPGRADE ).toBe(
+			'1'
+		);
+
+		expect( config.services[ 'tests-mysql' ].healthcheck ).toBeDefined();
+		expect( config.services[ 'tests-mysql' ].healthcheck.test ).toEqual( [
+			'CMD',
+			'healthcheck.sh',
+			'--connect',
+			'--innodb_initialized',
+		] );
+		expect(
+			config.services[ 'tests-mysql' ].environment.MARIADB_AUTO_UPGRADE
+		).toBe( '1' );
+	} );
+
+	it( 'should use service_healthy condition for WordPress depends_on', () => {
+		const config = buildDockerComposeConfig( {
+			workDirectoryPath: '/some/path',
+			env: {
+				development: {
+					port: 8888,
+					mysqlPort: 3306,
+					coreSource: null,
+					pluginSources: [],
+					themeSources: [],
+					mappings: {},
+				},
+				tests: {
+					port: 8889,
+					mysqlPort: 3307,
+					coreSource: null,
+					pluginSources: [],
+					themeSources: [],
+					mappings: {},
+				},
+			},
+		} );
+
+		expect( config.services.wordpress.depends_on ).toEqual( {
+			mysql: { condition: 'service_healthy' },
+		} );
+		expect( config.services[ 'tests-wordpress' ].depends_on ).toEqual( {
+			'tests-mysql': { condition: 'service_healthy' },
+		} );
 	} );
 } );
