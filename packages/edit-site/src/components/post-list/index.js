@@ -195,7 +195,9 @@ export default function PostList( { postType } ) {
 		( items ) => {
 			setSelection( items );
 			setSelectedItems(
-				data.filter( ( item ) => items.includes( getItemId( item ) ) )
+				data?.filter( ( item ) =>
+					items.includes( getItemId( item ) )
+				) ?? []
 			);
 			history.navigate(
 				addQueryArgs( path, {
@@ -259,13 +261,24 @@ export default function PostList( { postType } ) {
 	const editAction = useEditPostAction();
 	const quickEditAction = useQuickEditPostAction();
 	const actions = useMemo( () => {
-		if ( view.type !== LAYOUT_LIST ) {
-			return [ editAction, quickEditAction, ...postTypeActions ];
+		if ( ! window.__experimentalQuickEditDataViews ) {
+			const editActionPrimary = { ...editAction, isPrimary: true };
+			return [ editActionPrimary, ...postTypeActions ];
 		}
 
-		const editActionPrimary = { ...editAction, isPrimary: true };
-		return [ editActionPrimary, ...postTypeActions ];
-	}, [ postTypeActions, editAction, quickEditAction, view.type ] );
+		if ( view.type === LAYOUT_LIST ) {
+			const editActionPrimary = { ...editAction, isPrimary: true };
+			return [ editActionPrimary, ...postTypeActions ];
+		}
+
+		return [ editAction, quickEditAction, ...postTypeActions ];
+	}, [
+		window.__experimentalQuickEditDataViews,
+		view.type,
+		editAction,
+		quickEditAction,
+		postTypeActions,
+	] );
 
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
 

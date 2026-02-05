@@ -113,8 +113,8 @@ export const useQuickEditPostAction = () => {
 				if ( post.status === 'trash' ) {
 					return false;
 				}
-				// It's eligible for all post types except theme patterns.
-				return post.type !== PATTERN_TYPES.theme;
+
+				return post.type === 'page';
 			},
 			callback( items ) {
 				history.navigate(

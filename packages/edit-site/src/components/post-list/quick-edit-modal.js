@@ -222,12 +222,10 @@ export function QuickEditModal( { postType, items, closeModal } ) {
 		} );
 	}, [ fields, settings ] );
 
-	const titleId = 'quick-edit-modal-title';
 	return (
 		<Modal
 			overlayClassName="dataviews-action-modal__quick-edit"
 			__experimentalHideHeader
-			aria={ { labelledby: titleId } }
 			shouldCloseOnEsc={ false }
 			shouldCloseOnClickOutside={ false }
 		>
