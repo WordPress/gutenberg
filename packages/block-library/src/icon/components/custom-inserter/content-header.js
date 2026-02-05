@@ -13,7 +13,6 @@ export default function ContentHeader( props ) {
 				<SearchControl
 					value={ searchInput }
 					onChange={ setSearchInput }
-					__nextHasNoMarginBottom
 				/>
 				<div className="search-results">
 					{ searchInput &&
