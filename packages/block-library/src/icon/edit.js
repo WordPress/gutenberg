@@ -9,6 +9,7 @@ import {
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	Placeholder,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -25,8 +26,8 @@ import { useState, useEffect } from '@wordpress/element';
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
-import { CustomInserterModal, IconPlaceholder } from './components';
-import getIcons from './icons';
+import { CustomInserterModal } from './components';
+import { default as getIcons, bolt } from './icons';
 
 /**
  * The edit function for the Icon Block.
@@ -93,7 +94,7 @@ export function Edit( props ) {
 						setInserterOpen( true );
 					} }
 				>
-					{ icon ? __( 'Replace' ) : __( 'Add icon' ) }
+					{ icon ? __( 'Replace' ) : __( 'Choose icon' ) }
 				</ToolbarButton>
 			</BlockControls>
 			{ isContentOnlyMode && icon && (
@@ -112,7 +113,7 @@ export function Edit( props ) {
 						>
 							{ () => (
 								<TextControl
-									className="wp-block-outermost-icon-block__toolbar_content"
+									className="wp-block-icon__toolbar-content"
 									label={ __( 'Label' ) }
 									value={ ariaLabel || '' }
 									onChange={ ( value ) =>
@@ -172,11 +173,7 @@ export function Edit( props ) {
 				{ icon ? (
 					<HtmlRenderer html={ iconToDisplay } />
 				) : (
-					<IconPlaceholder
-						setInserterOpen={ setInserterOpen }
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-					/>
+					<Placeholder icon={ bolt } withIllustration />
 				) }
 			</div>
 			{ isInserterOpen && (

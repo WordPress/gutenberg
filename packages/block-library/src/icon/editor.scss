@@ -3,7 +3,7 @@
  */
 
 // Style for the icon library modal.
-.wp-block-outermost-icon-inserter__modal {
+.wp-block-icon__inserter-modal {
 	.components-modal__content {
 		flex: 1 1 0%;
 		overflow: auto;
@@ -14,13 +14,13 @@
 		}
 	}
 
-	.icon-inserter {
+	.wp-block-icon__inserter {
 		align-items: stretch;
 		display: flex;
 		height: 100%;
 	}
 
-	.icon-inserter__content {
+	.wp-block-icon__inserter-content {
 		display: flex;
 		flex-direction: column;
 		flex-shrink: 0;
@@ -28,7 +28,7 @@
 		padding: 24px 32px;
 		width: 100%;
 
-		.icon-inserter__content-header {
+		.wp-block-icon__inserter-content-header {
 			align-items: center;
 			display: flex;
 			height: 40px;
@@ -130,11 +130,7 @@
 			}
 		}
 	}
-}
 
-// Styles for the icon list grid
-.wp-block-outermost-icon-inserter__modal,
-.wp-block-outermost-icon-inserter__quick-inserter {
 	.icons-list {
 		display: flex;
 		flex-wrap: wrap;
@@ -183,6 +179,6 @@
 	padding-left: 0;
 }
 
-.wp-block-outermost-icon-block__toolbar_content {
+.wp-block-icon__toolbar-content {
 	width: 250px;
 }
