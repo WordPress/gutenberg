@@ -73,7 +73,7 @@ export function Comments( {
 		useDispatch( blockEditorStore )
 	);
 
-	const { blockNoteIds, selectedBlockClientId, orderedBlockIds } = useSelect(
+	const { rawNoteId, selectedBlockClientId, orderedBlockIds } = useSelect(
 		( select ) => {
 			const {
 				getBlockAttributes,
@@ -85,7 +85,7 @@ export function Comments( {
 				? getBlockAttributes( clientId )?.metadata
 				: null;
 			return {
-				blockNoteIds: getNoteIdsFromMetadata( metadata ),
+				rawNoteId: metadata?.noteId ?? null,
 				selectedBlockClientId: clientId,
 				orderedBlockIds: getClientIdsWithDescendants(),
 			};
@@ -99,6 +99,11 @@ export function Comments( {
 			noteFocused: isNoteFocused(),
 		};
 	}, [] );
+
+	const blockNoteIds = useMemo(
+		() => getNoteIdsFromMetadata( { noteId: rawNoteId } ),
+		[ rawNoteId ]
+	);
 
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 

@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
+import { useRef, useMemo } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -86,26 +86,25 @@ function NotesSidebar( { postId } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
-	const { clientId, blockNoteIds, isClassicBlock } = useSelect(
-		( select ) => {
-			const {
-				getBlockAttributes,
-				getSelectedBlockClientId,
-				getBlockName,
-			} = select( blockEditorStore );
-			const _clientId = getSelectedBlockClientId();
-			const metadata = _clientId
-				? getBlockAttributes( _clientId )?.metadata
-				: null;
-			return {
-				clientId: _clientId,
-				blockNoteIds: getNoteIdsFromMetadata( metadata ),
-				isClassicBlock: _clientId
-					? getBlockName( _clientId ) === 'core/freeform'
-					: false,
-			};
-		},
-		[]
+	const { clientId, rawNoteId, isClassicBlock } = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
+			select( blockEditorStore );
+		const _clientId = getSelectedBlockClientId();
+		const metadata = _clientId
+			? getBlockAttributes( _clientId )?.metadata
+			: null;
+		return {
+			clientId: _clientId,
+			rawNoteId: metadata?.noteId ?? null,
+			isClassicBlock: _clientId
+				? getBlockName( _clientId ) === 'core/freeform'
+				: false,
+		};
+	}, [] );
+
+	const blockNoteIds = useMemo(
+		() => getNoteIdsFromMetadata( { noteId: rawNoteId } ),
+		[ rawNoteId ]
 	);
 	const { isDistractionFree } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
