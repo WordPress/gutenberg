@@ -37,6 +37,14 @@
 		z-index: 1;
 	}
 
+	// Show the add-reaction button on thread hover or focus.
+	&:hover,
+	&:focus-within {
+		.editor-collab-sidebar-panel__add-reaction-button {
+			opacity: 1;
+		}
+	}
+
 	&:focus {
 		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
 		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
@@ -235,14 +243,6 @@ mark.wp-note {
 	gap: $grid-unit-05;
 	align-items: center;
 	margin-top: $grid-unit-10;
-
-	// Show the add-reaction button on hover or when the dropdown is open.
-	&:hover,
-	&:focus-within {
-		.editor-collab-sidebar-panel__add-reaction-button {
-			opacity: 1;
-		}
-	}
 }
 
 .editor-collab-sidebar-panel__reaction-button {

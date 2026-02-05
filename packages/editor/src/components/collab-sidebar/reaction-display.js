@@ -93,6 +93,10 @@ export default function ReactionDisplay( {
 } ) {
 	const reactedEmojis = getReactedEmojis( reactions );
 
+	if ( reactedEmojis.length === 0 ) {
+		return null;
+	}
+
 	return (
 		<div className="editor-collab-sidebar-panel__reactions">
 			{ reactedEmojis.map( ( emoji ) => {
@@ -138,38 +142,46 @@ export default function ReactionDisplay( {
 					</Button>
 				);
 			} ) }
-			<Dropdown
-				className="editor-collab-sidebar-panel__add-reaction-dropdown"
-				contentClassName="editor-collab-sidebar-panel__add-reaction-popover"
-				popoverProps={ {
-					placement: 'bottom-start',
-					// Focus the first element in the popover so the thread's
-					// onBlur handler detects focus inside .components-popover
-					// and does not collapse the note.
-					focusOnMount: 'firstElement',
-				} }
-				renderToggle={ ( { isOpen, onToggle } ) => (
-					<Button
-						size="compact"
-						className="editor-collab-sidebar-panel__add-reaction-button"
-						icon={ smileyIcon }
-						onClick={ ( event ) => {
-							event.stopPropagation();
-							onToggle();
-						} }
-						aria-expanded={ isOpen }
-						label={ __( 'Add reaction' ) }
-					/>
-				) }
-				renderContent={ ( { onClose } ) => (
-					<ReactionEmojiPicker
-						onSelect={ ( emoji ) => {
-							onToggleReaction( emoji );
-							onClose();
-						} }
-					/>
-				) }
-			/>
 		</div>
+	);
+}
+
+/**
+ * Standalone add-reaction button with emoji picker dropdown.
+ *
+ * @param {Object}   props                  Component props.
+ * @param {Function} props.onToggleReaction Callback to toggle a reaction.
+ */
+export function AddReactionButton( { onToggleReaction } ) {
+	return (
+		<Dropdown
+			className="editor-collab-sidebar-panel__add-reaction-dropdown"
+			contentClassName="editor-collab-sidebar-panel__add-reaction-popover"
+			popoverProps={ {
+				placement: 'bottom-start',
+				focusOnMount: 'firstElement',
+			} }
+			renderToggle={ ( { isOpen, onToggle } ) => (
+				<Button
+					size="compact"
+					className="editor-collab-sidebar-panel__add-reaction-button"
+					icon={ smileyIcon }
+					onClick={ ( event ) => {
+						event.stopPropagation();
+						onToggle();
+					} }
+					aria-expanded={ isOpen }
+					label={ __( 'Add reaction' ) }
+				/>
+			) }
+			renderContent={ ( { onClose } ) => (
+				<ReactionEmojiPicker
+					onSelect={ ( emoji ) => {
+						onToggleReaction( emoji );
+						onClose();
+					} }
+				/>
+			) }
+		/>
 	);
 }

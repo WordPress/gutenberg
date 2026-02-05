@@ -544,7 +544,6 @@ export function useNoteActions( reflowComments = () => {} ) {
 				{
 					id: commentId,
 					meta: {
-						...comment.meta,
 						_wp_reactions: updatedReactions,
 					},
 				},
@@ -607,11 +606,10 @@ export function useNoteActions( reflowComments = () => {} ) {
 				{
 					id: commentId,
 					meta: {
-						...comment.meta,
 						_wp_reactions:
 							Object.keys( updatedReactions ).length > 0
 								? updatedReactions
-								: undefined,
+								: {},
 					},
 				},
 				{ throwOnError: true }
