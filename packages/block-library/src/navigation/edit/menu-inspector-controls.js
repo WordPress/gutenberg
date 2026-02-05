@@ -200,6 +200,9 @@ const MenuInspectorControls = ( props ) => {
 		blockEditingMode,
 	} = props;
 
+	const { navigationMenu } = useNavigationMenu( currentMenuId );
+	const menuTitle = navigationMenu?.title || __( 'Untitled menu' );
+
 	return (
 		<InspectorControls group="list">
 			<PanelBody title={ null }>
@@ -208,7 +211,7 @@ const MenuInspectorControls = ( props ) => {
 						className="wp-block-navigation-off-canvas-editor__title"
 						level={ 2 }
 					>
-						{ __( 'Menu' ) }
+						{ __( 'Menu' ) } ({ menuTitle })
 					</Heading>
 					{ blockEditingMode === 'default' && (
 						<NavigationMenuSelector
