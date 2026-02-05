@@ -25,6 +25,7 @@ import {
 	OPERATOR_IS_NONE,
 	OPERATOR_BEFORE,
 	OPERATOR_AFTER,
+	LAYOUT_LIST,
 } from '../../utils/constants';
 
 import AddNewPostModal from '../add-new-post';
@@ -256,12 +257,15 @@ export default function PostList( { postType } ) {
 		context: 'list',
 	} );
 	const editAction = useEditPostAction();
-
 	const quickEditAction = useQuickEditPostAction();
-	const actions = useMemo(
-		() => [ editAction, quickEditAction, ...postTypeActions ],
-		[ postTypeActions, editAction, quickEditAction ]
-	);
+	const actions = useMemo( () => {
+		if ( view.type !== LAYOUT_LIST ) {
+			return [ editAction, quickEditAction, ...postTypeActions ];
+		}
+
+		const editActionPrimary = { ...editAction, isPrimary: true };
+		return [ editActionPrimary, ...postTypeActions ];
+	}, [ postTypeActions, editAction, quickEditAction, view.type ] );
 
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
 
