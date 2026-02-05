@@ -52,6 +52,36 @@ function getModalHeader( items, postTypeLabel ) {
 
 export function QuickEditModal( { postType, items, closeModal } ) {
 	const ids = useMemo( () => items.map( ( item ) => item.id ), [ items ] );
+
+	// Before calling the onRequestClose callback, the modal introduces a animation delay
+	// that produces a visual glitch, see https://github.com/WordPress/gutenberg/pull/75173#pullrequestreview-3755585506
+	// Handling the ESC key and click-outside ourselves fixes it.
+	useEffect( () => {
+		const handleKeyDown = ( event ) => {
+			if ( event.key === 'Escape' || event.code === 'Escape' ) {
+				event.preventDefault();
+				event.stopPropagation();
+				closeModal?.();
+			}
+		};
+
+		const handleClickOutside = ( event ) => {
+			if (
+				event.target.classList.contains(
+					'dataviews-action-modal__quick-edit'
+				)
+			) {
+				closeModal?.();
+			}
+		};
+		document.addEventListener( 'keydown', handleKeyDown );
+		document.addEventListener( 'mousedown', handleClickOutside );
+		return () => {
+			document.removeEventListener( 'keydown', handleKeyDown );
+			document.removeEventListener( 'mousedown', handleClickOutside );
+		};
+	}, [ closeModal ] );
+
 	const isBulk = ids.length > 1;
 
 	const { record, postTypeLabel, postTypeIcon, hasFinishedResolution } =
@@ -227,10 +257,11 @@ export function QuickEditModal( { postType, items, closeModal } ) {
 	const titleId = 'quick-edit-modal-title';
 	return (
 		<Modal
-			onRequestClose={ closeModal }
 			overlayClassName="dataviews-action-modal__quick-edit"
 			__experimentalHideHeader
 			aria={ { labelledby: titleId } }
+			shouldCloseOnEsc={ false }
+			shouldCloseOnClickOutside={ false }
 		>
 			<div className="dataviews-action-modal__quick-edit-header">
 				<HStack justify="space-between" align="center">
