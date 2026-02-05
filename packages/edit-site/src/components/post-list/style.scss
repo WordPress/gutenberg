@@ -77,10 +77,16 @@
 	}
 }
 
+.fields-controls__password {
+	border-top: $border-width solid $gray-200;
+	padding-top: $grid-unit-20;
+}
+
 // Quick Edit Modal as right-side drawer
 .dataviews-action-modal__quick-edit {
 	justify-content: flex-end;
 	align-items: stretch;
+
 
 	.dataviews-action-modal__quick-edit-header {
 		margin-bottom: $grid-unit-20;
