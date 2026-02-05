@@ -574,6 +574,10 @@ test.describe( 'Image', () => {
 		await expect( imageBlock ).not.toHaveClass( /is-transient/, {
 			timeout: 30_000,
 		} );
+		// Wait for the Publish button to be enabled (all background processing complete).
+		await expect(
+			page.getByRole( 'button', { name: 'Publish', exact: true } )
+		).toBeEnabled( { timeout: 30_000 } );
 
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
@@ -708,6 +712,11 @@ test.describe( 'Image', () => {
 		await form.getByLabel( 'URL' ).fill( url );
 
 		await form.getByRole( 'button', { name: 'Apply' } ).click();
+
+		// Wait for the Publish button to be enabled (all background processing complete).
+		await expect(
+			page.getByRole( 'button', { name: 'Publish', exact: true } )
+		).toBeEnabled( { timeout: 30_000 } );
 
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
