@@ -6,13 +6,9 @@ import type { TextareaProps } from './types';
 import { Input } from '../input';
 
 const wrappedRender = (
-	render: TextareaProps[ 'render' ],
+	render: NonNullable< TextareaProps[ 'render' ] >,
 	restProps: TextareaProps & { ref: React.Ref< HTMLTextAreaElement > }
 ) => {
-	if ( ! render ) {
-		return;
-	}
-
 	return function Render(
 		props: React.HTMLAttributes< HTMLTextAreaElement >
 	) {
