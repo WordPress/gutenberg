@@ -235,6 +235,14 @@ mark.wp-note {
 	gap: $grid-unit-05;
 	align-items: center;
 	margin-top: $grid-unit-10;
+
+	// Show the add-reaction button on hover or when the dropdown is open.
+	&:hover,
+	&:focus-within {
+		.editor-collab-sidebar-panel__add-reaction-button {
+			opacity: 1;
+		}
+	}
 }
 
 .editor-collab-sidebar-panel__reaction-button {
@@ -280,26 +288,40 @@ mark.wp-note {
 	align-items: center;
 	justify-content: center;
 	width: 28px;
-	height: 28px;
+	height: 28px !important; // Override Button component's size constraints.
+	min-width: 28px !important;
 	padding: 0;
 	border-radius: $radius-round;
-	border: $border-width dashed $gray-400;
-	background-color: transparent;
+	border: $border-width solid $gray-300;
+	background-color: $white;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 	cursor: pointer;
-	transition: background-color 0.1s ease, border-color 0.1s ease;
+	opacity: 0;
+	transition: opacity 0.15s ease, background-color 0.1s ease, box-shadow 0.1s ease;
 
 	&:hover {
 		background-color: $gray-100;
-		border-color: $gray-600;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 	}
 
 	&:focus {
+		opacity: 1;
 		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
 		outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
 	}
 
 	svg {
-		fill: $gray-600;
+		fill: none;
+		color: $gray-700;
+		width: 20px;
+		height: 20px;
+	}
+}
+
+// Keep the button visible while the emoji picker dropdown is open.
+.editor-collab-sidebar-panel__add-reaction-dropdown {
+	&:focus-within .editor-collab-sidebar-panel__add-reaction-button {
+		opacity: 1;
 	}
 }
 

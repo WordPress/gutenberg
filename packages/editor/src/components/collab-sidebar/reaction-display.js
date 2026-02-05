@@ -3,13 +3,38 @@
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { Button, Dropdown } from '@wordpress/components';
-import { plus } from '@wordpress/icons';
+import { SVG, Circle, Path } from '@wordpress/primitives';
 import clsx from 'clsx';
 
 /**
  * Internal dependencies
  */
 import ReactionEmojiPicker from './reaction-emoji-picker';
+
+/**
+ * Smiley face icon for the add-reaction button, inspired by Google Docs.
+ */
+const smileyIcon = (
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<Circle
+			cx="12"
+			cy="12"
+			r="10"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="1.5"
+		/>
+		<Circle cx="9" cy="10" r="1" fill="currentColor" />
+		<Circle cx="15" cy="10" r="1" fill="currentColor" />
+		<Path
+			d="M8.5 14.5c1 1.5 2.5 2 3.5 2s2.5-.5 3.5-2"
+			fill="none"
+			stroke="currentColor"
+			strokeWidth="1.5"
+			strokeLinecap="round"
+		/>
+	</SVG>
+);
 
 /**
  * Get the count of reactions for a specific emoji.
@@ -116,12 +141,18 @@ export default function ReactionDisplay( {
 			<Dropdown
 				className="editor-collab-sidebar-panel__add-reaction-dropdown"
 				contentClassName="editor-collab-sidebar-panel__add-reaction-popover"
-				popoverProps={ { placement: 'bottom-start' } }
+				popoverProps={ {
+					placement: 'bottom-start',
+					// Focus the first element in the popover so the thread's
+					// onBlur handler detects focus inside .components-popover
+					// and does not collapse the note.
+					focusOnMount: 'firstElement',
+				} }
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<Button
-						size="small"
+						size="compact"
 						className="editor-collab-sidebar-panel__add-reaction-button"
-						icon={ plus }
+						icon={ smileyIcon }
 						onClick={ ( event ) => {
 							event.stopPropagation();
 							onToggle();
