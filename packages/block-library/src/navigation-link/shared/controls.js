@@ -178,6 +178,11 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 	const viewUrl =
 		isViewableUrl && url.startsWith( '/' ) && homeUrl ? homeUrl + url : url;
 
+	const entityTypeName = getEntityTypeName(
+		attributes.type,
+		attributes.kind
+	);
+
 	return (
 		<ToolsPanel
 			label={ __( 'Settings' ) }
@@ -230,9 +235,8 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 			{ url && (
 				<HStack
 					className="navigation-link-to__actions"
-					alignment="stretch"
-					expanded
-					justify="stretch"
+					alignment="left"
+					justify="left"
 					style={ { gridColumn: '1 / -1' } }
 				>
 					{ hasUrlBinding &&
@@ -253,10 +257,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 								{ sprintf(
 									/* translators: %s: entity type (e.g., "page", "post", "category") */
 									__( 'Edit %s' ),
-									getEntityTypeName(
-										attributes.type,
-										attributes.kind
-									)
+									entityTypeName
 								) }
 							</Button>
 						) }
@@ -270,12 +271,11 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 							__next40pxDefaultSize
 						>
 							{ sprintf(
-								/* translators: %s: entity type (e.g., "page", "post", "category") */
+								/* translators: %s: entity type (e.g., "page", "post", "category") or "site" for external links */
 								__( 'View %s' ),
-								getEntityTypeName(
-									attributes.type,
-									attributes.kind
-								)
+								entityTypeName !== 'item'
+									? entityTypeName
+									: __( 'site' )
 							) }
 						</Button>
 					) }
