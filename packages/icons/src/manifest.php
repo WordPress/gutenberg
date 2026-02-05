@@ -485,9 +485,9 @@ return array(
 		'label'    => _x( 'Format Uppercase', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-uppercase.svg',
 	),
-	'fullheight'                     => array(
+	'full-height'                     => array(
 		'label'    => _x( 'Full height', 'icon label', 'gutenberg' ),
-		'filePath' => 'library/fullheight.svg',
+		'filePath' => 'library/full-height.svg',
 	),
 	'fullscreen'                     => array(
 		'label'    => _x( 'Fullscreen', 'icon label', 'gutenberg' ),
