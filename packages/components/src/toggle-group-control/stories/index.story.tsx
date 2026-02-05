@@ -40,6 +40,7 @@ const meta: Meta< typeof ToggleGroupControl > = {
 		componentStatus: {
 			status: 'stable',
 			whereUsed: 'global',
+			notes: 'Will be superseded by `ToggleGroupControl` in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };

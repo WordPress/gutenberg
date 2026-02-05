@@ -39,6 +39,7 @@ const meta: Meta< typeof RadioControl > = {
 		componentStatus: {
 			status: 'stable',
 			whereUsed: 'global',
+			notes: 'Will be superseded by `RadioGroupControl` in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };

@@ -37,6 +37,7 @@ const meta: Meta< typeof CheckboxControl > = {
 		componentStatus: {
 			status: 'stable',
 			whereUsed: 'global',
+			notes: 'Will be superseded by `CheckboxControl` in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };

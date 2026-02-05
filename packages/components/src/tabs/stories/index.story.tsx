@@ -37,7 +37,7 @@ const meta: Meta< typeof Tabs > = {
 		componentStatus: {
 			status: 'stable',
 			whereUsed: 'global',
-			notes: 'When building for the Gutenberg repo, use this component instead of `TabPanel`. Otherwise, continue using `TabPanel` for now.',
+			notes: 'When building for the Gutenberg repo, use this component instead of `TabPanel`. Otherwise, continue using `TabPanel`. Both will be superseded by `Tabs` in `@wordpress/ui`, but continue using these for now.',
 		},
 	},
 	args: {

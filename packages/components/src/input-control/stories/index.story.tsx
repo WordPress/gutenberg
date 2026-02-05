@@ -43,6 +43,7 @@ const meta: Meta< typeof InputControl > = {
 		componentStatus: {
 			status: 'stable',
 			whereUsed: 'global',
+			notes: 'Will be superseded by `InputControl` in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };

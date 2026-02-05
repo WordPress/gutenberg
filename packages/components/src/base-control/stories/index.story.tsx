@@ -27,6 +27,7 @@ const meta: Meta< typeof BaseControl > = {
 		componentStatus: {
 			status: 'stable',
 			whereUsed: 'global',
+			notes: 'Will be superseded by `Field` in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };
