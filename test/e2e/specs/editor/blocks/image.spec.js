@@ -569,6 +569,11 @@ test.describe( 'Image', () => {
 		await expect( imageInEditor ).toHaveAttribute( 'src', /^https?:\/\//, {
 			timeout: 30_000,
 		} );
+		// Also wait for the is-transient class to be removed, indicating all
+		// processing (including thumbnail generation) is complete.
+		await expect( imageBlock ).not.toHaveClass( /is-transient/, {
+			timeout: 30_000,
+		} );
 
 		const postId = await editor.publishPost();
 		await page.goto( `/?p=${ postId }` );
@@ -685,6 +690,10 @@ test.describe( 'Image', () => {
 			name: 'This image has an empty alt attribute',
 		} );
 		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+			timeout: 30_000,
+		} );
+		// Also wait for the is-transient class to be removed.
+		await expect( imageBlock ).not.toHaveClass( /is-transient/, {
 			timeout: 30_000,
 		} );
 
