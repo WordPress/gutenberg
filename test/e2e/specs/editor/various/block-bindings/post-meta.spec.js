@@ -568,14 +568,12 @@ test.describe( 'Post Meta source', () => {
 					},
 				},
 			} );
-
 			const contentInput = page.getByRole( 'textbox', {
 				label: 'Content',
 			} );
 			await expect( contentInput ).toHaveText(
 				'Movie field default value'
 			);
-
 			await contentInput.fill( 'new value' );
 			// Check that the paragraph content attribute didn't change.
 			const [ paragraphBlockObject ] = await editor.getBlocks();
