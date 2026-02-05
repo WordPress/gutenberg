@@ -1,18 +1,8 @@
 // Override WordPress Button component styles in the editor
-// to ensure our grid layout works correctly.
+// to ensure our flexbox layout works correctly.
 .wp-block-playlist-track {
 	.wp-block-playlist-track__button.components-button {
-		display: grid;
-		grid-template-columns: 1fr auto;
-		grid-template-rows: auto auto;
-		row-gap: 2px;
-		align-items: center;
 		height: auto;
 		min-height: auto;
-
-		.wp-block-playlist__tracklist-show-numbers & {
-			grid-template-columns: auto 1fr auto;
-		}
 	}
 }
-

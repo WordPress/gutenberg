@@ -238,30 +238,32 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						currentTrack === uniqueId ? 'true' : 'false'
 					}
 				>
-					<RichText
-						tagName="span"
-						className="wp-block-playlist-track__title"
-						value={ title }
-						placeholder={ __( 'Add title' ) }
-						onChange={ ( value ) => {
-							setAttributes( { title: value } );
-						} }
-						allowedFormats={ [] }
-						withoutInteractiveFormatting
-					/>
-					{ showArtists && (
+					<span className="wp-block-playlist-track__content">
 						<RichText
 							tagName="span"
-							className="wp-block-playlist-track__artist"
-							value={ artist }
-							placeholder={ __( 'Add artist' ) }
-							onChange={ ( value ) =>
-								setAttributes( { artist: value } )
-							}
+							className="wp-block-playlist-track__title"
+							value={ title }
+							placeholder={ __( 'Add title' ) }
+							onChange={ ( value ) => {
+								setAttributes( { title: value } );
+							} }
 							allowedFormats={ [] }
 							withoutInteractiveFormatting
 						/>
-					) }
+						{ showArtists && (
+							<RichText
+								tagName="span"
+								className="wp-block-playlist-track__artist"
+								value={ artist }
+								placeholder={ __( 'Add artist' ) }
+								onChange={ ( value ) =>
+									setAttributes( { artist: value } )
+								}
+								allowedFormats={ [] }
+								withoutInteractiveFormatting
+							/>
+						) }
+					</span>
 					<span className="wp-block-playlist-track__length">
 						{ length && (
 							<span className="screen-reader-text">

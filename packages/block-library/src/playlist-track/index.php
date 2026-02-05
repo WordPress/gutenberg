@@ -35,12 +35,15 @@ function render_block_core_playlist_track( $attributes ) {
 	$html  = '<li ' . $wrapper_attributes . '>';
 	$html .= '<button ' . $context . 'data-wp-on--click="actions.changeTrack" data-wp-bind--aria-current="state.isCurrentTrack" class="wp-block-playlist-track__button">';
 
+	$html .= '<span class="wp-block-playlist-track__content">';
 	if ( $title ) {
 		$html .= '<span class="wp-block-playlist-track__title">' . wp_kses_post( $title ) . '</span>';
 	}
 	if ( $artist ) {
 		$html .= '<span class="wp-block-playlist-track__artist">' . wp_kses_post( $artist ) . '</span>';
 	}
+	$html .= '</span>';
+
 	if ( $length ) {
 		$html .= '<span class="wp-block-playlist-track__length">';
 		$html .= '<span class="screen-reader-text">' . esc_html__( 'Length:' ) . ' </span>';
