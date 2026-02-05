@@ -34,29 +34,6 @@
 			height: 40px;
 			justify-content: space-between;
 			margin-bottom: 24px;
-
-			.icon-controls__size {
-				display: flex;
-				align-items: center;
-				margin-right: 6px;
-
-				& > span {
-					font-size: 11px;
-					font-weight: 500;
-					line-height: 1.4;
-					text-transform: uppercase;
-					display: block;
-					margin-right: 18px;
-				}
-
-				.components-range-control {
-					width: 116px;
-
-					.components-base-control__field {
-						margin-bottom: 0;
-					}
-				}
-			}
 		}
 
 		.wp-block-icon__inserter-content-grid-icons-list {
@@ -154,11 +131,6 @@
 			}
 		}
 	}
-}
-
-// Minor style fix for the block toolbar. Not perfect, but better than nothing.
-.wp-block-outermost-icon-block__toolbar {
-	padding-left: 0;
 }
 
 .wp-block-icon__toolbar-content {
