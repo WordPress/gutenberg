@@ -91,13 +91,12 @@ function BlockQuickNavigationItem( {
 			className="block-editor-block-quick-navigation__item"
 			isPressed={ isSelected }
 			onClick={ async () => {
+				await selectBlock( clientId );
+
 				// If the block has children and List View is available,
-				// switch to List View and select the first child.
+				// switch to List View to show the expanded container.
 				if ( canNavigateToListView && onSwitchToListView ) {
-					await selectBlock( childBlocks[ 0 ] );
-					onSwitchToListView();
-				} else {
-					await selectBlock( clientId );
+					onSwitchToListView( clientId );
 				}
 
 				if ( onSelect ) {

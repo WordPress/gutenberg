@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useContext } from '@wordpress/element';
 
@@ -39,6 +39,24 @@ export function hasListViewSupport( nameOrType ) {
 export function ListViewPanel( { clientId, name } ) {
 	const { isSelectionWithinCurrentSection } =
 		useContext( PrivateBlockContext );
+
+	const { isOpened, expandRevision } = useSelect(
+		( select ) => {
+			const {
+				__unstableIsListViewPanelOpened,
+				__unstableGetListViewExpandRevision,
+			} = select( blockEditorStore );
+			return {
+				isOpened: __unstableIsListViewPanelOpened( clientId ),
+				expandRevision: __unstableGetListViewExpandRevision(),
+			};
+		},
+		[ clientId ]
+	);
+
+	const { __unstableToggleListViewPanel: toggleListViewPanel } =
+		useDispatch( blockEditorStore );
+
 	const isEnabled = hasListViewSupport( name );
 	const { hasChildren, isNestedListView } = useSelect(
 		( select ) => {
@@ -75,6 +93,11 @@ export function ListViewPanel( { clientId, name } ) {
 		context: 'list-view',
 	} );
 
+	// Handle manual toggle
+	const handleToggle = ( opened ) => {
+		toggleListViewPanel( clientId, opened );
+	};
+
 	if ( ! isEnabled || isNestedListView ) {
 		return null;
 	}
@@ -83,13 +106,18 @@ export function ListViewPanel( { clientId, name } ) {
 
 	return (
 		<InspectorControls group="list">
-			<PanelBody title={ showBlockTitle ? title : undefined }>
+			<PanelBody
+				title={ showBlockTitle ? title : undefined }
+				opened={ isOpened }
+				onToggle={ handleToggle }
+			>
 				{ ! hasChildren && (
 					<p className="block-editor-block-inspector__no-blocks">
 						{ __( 'No items yet.' ) }
 					</p>
 				) }
 				<PrivateListView
+					key={ `${ clientId }-${ expandRevision }` }
 					rootClientId={ clientId }
 					isExpanded
 					description={ title }

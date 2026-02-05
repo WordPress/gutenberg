@@ -2102,6 +2102,48 @@ export function insertionPoint( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the opened List View panels state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+function openedListViewPanels( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_OPEN_LIST_VIEW_PANEL':
+			// Open only the specified panel, close all others
+			return action.clientId ? { [ action.clientId ]: true } : {};
+		case 'SET_ALL_LIST_VIEW_PANELS_OPEN':
+			// Special flag to open all panels
+			return { __allOpen: true };
+		case 'TOGGLE_LIST_VIEW_PANEL':
+			// If we're in "all open" mode, exit it when user manually toggles
+			const newState = { ...state };
+			delete newState.__allOpen;
+			newState[ action.clientId ] = action.isOpen;
+			return newState;
+	}
+	return state;
+}
+
+/**
+ * Reducer returning the List View expand revision.
+ *
+ * @param {number} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {number} Updated state.
+ */
+function listViewExpandRevision( state = 0, action ) {
+	switch ( action.type ) {
+		case 'INCREMENT_LIST_VIEW_EXPAND_REVISION':
+			return state + 1;
+	}
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2133,6 +2175,8 @@ const combinedReducers = combineReducers( {
 	registeredInserterMediaCategories,
 	zoomLevel,
 	hasBlockSpotlight,
+	openedListViewPanels,
+	listViewExpandRevision,
 } );
 
 /**

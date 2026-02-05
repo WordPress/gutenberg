@@ -134,6 +134,7 @@ const MainContent = ( {
 	isLoading,
 	isNavigationMenuMissing,
 	onCreateNew,
+	expandRevision,
 } ) => {
 	const hasChildren = useSelect(
 		( select ) => {
@@ -172,6 +173,7 @@ const MainContent = ( {
 				</p>
 			) }
 			<PrivateListView
+				key={ `${ clientId }-${ expandRevision }` }
 				rootClientId={ clientId }
 				isExpanded
 				description={ description }
@@ -185,6 +187,7 @@ const MainContent = ( {
 
 const MenuInspectorControls = ( props ) => {
 	const {
+		clientId,
 		createNavigationMenuIsSuccess,
 		createNavigationMenuIsError,
 		currentMenuId = null,
@@ -195,9 +198,35 @@ const MenuInspectorControls = ( props ) => {
 		blockEditingMode,
 	} = props;
 
+	const { isOpened, expandRevision } = useSelect(
+		( select ) => {
+			const {
+				__unstableIsListViewPanelOpened,
+				__unstableGetListViewExpandRevision,
+			} = select( blockEditorStore );
+			return {
+				isOpened: __unstableIsListViewPanelOpened( clientId ),
+				expandRevision: __unstableGetListViewExpandRevision(),
+			};
+		},
+		[ clientId ]
+	);
+
+	const { __unstableToggleListViewPanel: toggleListViewPanel } =
+		useDispatch( blockEditorStore );
+
+	// Handle manual toggle
+	const handleToggle = ( opened ) => {
+		toggleListViewPanel( clientId, opened );
+	};
+
 	return (
 		<InspectorControls group="list">
-			<PanelBody title={ __( 'Navigation' ) }>
+			<PanelBody
+				title={ __( 'Navigation' ) }
+				opened={ isOpened }
+				onToggle={ handleToggle }
+			>
 				{ blockEditingMode === 'default' && (
 					<NavigationMenuSelector
 						currentMenuId={ currentMenuId }
@@ -216,7 +245,7 @@ const MenuInspectorControls = ( props ) => {
 						}
 					/>
 				) }
-				<MainContent { ...props } />
+				<MainContent { ...props } expandRevision={ expandRevision } />
 			</PanelBody>
 		</InspectorControls>
 	);
