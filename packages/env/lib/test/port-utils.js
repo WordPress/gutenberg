@@ -61,12 +61,10 @@ describe( 'port-utils', () => {
 			try {
 				const result = await findAvailablePort( {
 					preferredPort,
-					min: 59990,
-					max: 59999,
 				} );
 				expect( result ).not.toBe( preferredPort );
-				expect( result ).toBeGreaterThanOrEqual( 59990 );
-				expect( result ).toBeLessThanOrEqual( 59999 );
+				expect( result ).toBeGreaterThanOrEqual( DEFAULT_MIN_PORT );
+				expect( result ).toBeLessThanOrEqual( DEFAULT_MAX_PORT );
 			} finally {
 				await new Promise( ( resolve ) => {
 					server.close( resolve );
@@ -74,71 +72,18 @@ describe( 'port-utils', () => {
 			}
 		} );
 
-		it( 'respects minimum port constraint', async () => {
-			const result = await findAvailablePort( {
-				preferredPort: 1000,
-				min: 59990,
-				max: 59999,
-			} );
-			expect( result ).toBeGreaterThanOrEqual( 59990 );
-			expect( result ).toBeLessThanOrEqual( 59999 );
-		} );
-
-		it( 'respects maximum port constraint', async () => {
-			const result = await findAvailablePort( {
-				preferredPort: 60000,
-				min: 59990,
-				max: 59999,
-			} );
-			expect( result ).toBeGreaterThanOrEqual( 59990 );
-			expect( result ).toBeLessThanOrEqual( 59999 );
-		} );
-
 		it( 'excludes specified ports', async () => {
 			const preferredPort = 59995;
 			const result = await findAvailablePort( {
 				preferredPort,
 				exclude: [ 59995 ],
-				min: 59990,
-				max: 59999,
 			} );
 			expect( result ).not.toBe( 59995 );
-			expect( result ).toBeGreaterThanOrEqual( 59990 );
-			expect( result ).toBeLessThanOrEqual( 59999 );
+			expect( result ).toBeGreaterThanOrEqual( DEFAULT_MIN_PORT );
+			expect( result ).toBeLessThanOrEqual( DEFAULT_MAX_PORT );
 		} );
 
-		it( 'throws when no port is available in range', async () => {
-			// Occupy all ports in a tiny range
-			const servers = [];
-			const minPort = 59980;
-			const maxPort = 59982;
-
-			for ( let port = minPort; port <= maxPort; port++ ) {
-				const server = net.createServer();
-				await new Promise( ( resolve ) => {
-					server.listen( port, '0.0.0.0', resolve );
-				} );
-				servers.push( server );
-			}
-
-			try {
-				await expect(
-					findAvailablePort( {
-						preferredPort: minPort,
-						min: minPort,
-						max: maxPort,
-					} )
-				).rejects.toThrow( /No available port found/ );
-			} finally {
-				for ( const server of servers ) {
-					await new Promise( ( resolve ) => {
-						server.close( resolve );
-					} );
-				}
-			}
-		} );
-
-		it( 'uses default range when min/max not specified', async () => {
+		it( 'uses ephemeral port range as fallback', async () => {
 			const result = await findAvailablePort( {
 				preferredPort: 59994,
 			} );

@@ -593,10 +593,6 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"themes"`           | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
 | `"port"`             | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
 | `"testsPort"`        | `integer`      | `8889`                                 | The port number for the test site. You'll access the instance through the port: 'http://localhost:8889'.                         |
-| `"portRangeMin"`     | `integer`      | `null`                                 | Minimum port number to use when automatically selecting an available port. Applies to development environment.                   |
-| `"portRangeMax"`     | `integer`      | `null`                                 | Maximum port number to use when automatically selecting an available port. Applies to development environment.                   |
-| `"testsPortRangeMin"`| `integer`      | `null`                                 | Minimum port number to use when automatically selecting an available port for the tests environment.                              |
-| `"testsPortRangeMax"`| `integer`      | `null`                                 | Maximum port number to use when automatically selecting an available port for the tests environment.                              |
 | `"testsEnvironment"` | `boolean`      | `false`                                | _Deprecated._ Whether to create a separate test environment with its own database and containers. Use `--config` with a separate config file instead. |
 | `"config"`           | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`         | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
@@ -610,17 +606,7 @@ _Note: the port number environment variable (`WP_ENV_PORT`) takes precedence ove
 
 ### Automatic Port Selection
 
-By default, `wp-env` will try to use ports 8888 and 8889 for the development and tests sites respectively. If these ports are already in use, `wp-env` will automatically find available ports. You can constrain the port selection by setting `portRangeMin` and/or `portRangeMax`:
-
-```json
-{
-	"plugins": [ "." ],
-	"portRangeMin": 8000,
-	"portRangeMax": 9000
-}
-```
-
-When a port is automatically changed, `wp-env` will display a message indicating the new port being used.
+By default, `wp-env` will try to use ports 8888 and 8889 for the development and tests sites respectively. If these ports are already in use, `wp-env` will automatically find an available port in the ephemeral range (49152-65535). When a port is automatically changed, `wp-env` will display a message indicating the new port being used.
 
 Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 
@@ -806,8 +792,6 @@ These can also be set via environment variables:
 
 - `WP_ENV_PORT` to override the development environment's web server's port.
 - `WP_ENV_TESTS_PORT` to override the testing environment's web server's port.
-- `WP_ENV_PORT_RANGE_MIN` and `WP_ENV_PORT_RANGE_MAX` to constrain the automatic port selection range for the development environment.
-- `WP_ENV_TESTS_PORT_RANGE_MIN` and `WP_ENV_TESTS_PORT_RANGE_MAX` to constrain the automatic port selection range for the testing environment.
 - phpMyAdmin is not enabled by default. Enable it with `"phpmyadmin": true` in `.wp-env.json`. The Docker runtime port can also be overridden via `WP_ENV_PHPMYADMIN_PORT`.
 - By default, MySQL isn't exposed to the host, which means no chance of port conflicts. But this can also be overridden via `WP_ENV_MYSQL_PORT`.
 

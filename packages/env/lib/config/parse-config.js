@@ -15,7 +15,6 @@ const {
 const {
 	ValidationError,
 	checkPort,
-	checkPortRangeValue,
 	checkStringArray,
 	checkObjectWithValues,
 	checkVersion,
@@ -90,17 +89,9 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	themes: [],
 	port: 8888,
 	testsPort: 8889,
-	portRangeMin: null,
-	portRangeMax: null,
-	testsPortRangeMin: null,
-	testsPortRangeMax: null,
 	mysqlPort: null,
-	mysqlPortRangeMin: null,
-	mysqlPortRangeMax: null,
 	phpmyadmin: false,
 	phpmyadminPort: null,
-	phpmyadminPortRangeMin: null,
-	phpmyadminPortRangeMax: null,
 	multisite: false,
 	mappings: {},
 	config: {
@@ -310,16 +301,6 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.env.development.port = overrides.port;
 	}
 
-	if ( overrides.portRangeMin ) {
-		overrideConfig.portRangeMin = overrides.portRangeMin;
-		overrideConfig.env.development.portRangeMin = overrides.portRangeMin;
-	}
-
-	if ( overrides.portRangeMax ) {
-		overrideConfig.portRangeMax = overrides.portRangeMax;
-		overrideConfig.env.development.portRangeMax = overrides.portRangeMax;
-	}
-
 	if ( overrides.mysqlPort ) {
 		overrideConfig.env.development.mysqlPort = overrides.mysqlPort;
 	}
@@ -333,16 +314,6 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 	if ( overrides.testsPort ) {
 		overrideConfig.testsPort = overrides.testsPort;
 		overrideConfig.env.tests.port = overrides.testsPort;
-	}
-
-	if ( overrides.testsPortRangeMin ) {
-		overrideConfig.testsPortRangeMin = overrides.testsPortRangeMin;
-		overrideConfig.env.tests.portRangeMin = overrides.testsPortRangeMin;
-	}
-
-	if ( overrides.testsPortRangeMax ) {
-		overrideConfig.testsPortRangeMax = overrides.testsPortRangeMax;
-		overrideConfig.env.tests.portRangeMax = overrides.testsPortRangeMax;
 	}
 
 	if ( overrides.testsMysqlPort ) {
@@ -422,28 +393,6 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 		}
 		parsedConfig.testsEnvironment = rawConfig.testsEnvironment;
 	}
-	if (
-		rawConfig.testsPortRangeMin !== undefined &&
-		rawConfig.testsPortRangeMin !== null
-	) {
-		checkPortRangeValue(
-			configFile,
-			`testsPortRangeMin`,
-			rawConfig.testsPortRangeMin
-		);
-		parsedConfig.testsPortRangeMin = rawConfig.testsPortRangeMin;
-	}
-	if (
-		rawConfig.testsPortRangeMax !== undefined &&
-		rawConfig.testsPortRangeMax !== null
-	) {
-		checkPortRangeValue(
-			configFile,
-			`testsPortRangeMax`,
-			rawConfig.testsPortRangeMax
-		);
-		parsedConfig.testsPortRangeMax = rawConfig.testsPortRangeMax;
-	}
 	parsedConfig.lifecycleScripts = {};
 	if ( rawConfig.lifecycleScripts ) {
 		checkObjectWithValues(
@@ -522,8 +471,6 @@ async function parseEnvironmentConfig(
 		switch ( key ) {
 			case 'testsPort':
 			case 'testsEnvironment':
-			case 'testsPortRangeMin':
-			case 'testsPortRangeMax':
 			case 'lifecycleScripts':
 			case 'env': {
 				if ( options.rootConfig ) {
@@ -548,50 +495,8 @@ async function parseEnvironmentConfig(
 		parsedConfig.port = config.port;
 	}
 
-	if ( config.portRangeMin !== undefined && config.portRangeMin !== null ) {
-		checkPortRangeValue(
-			configFile,
-			`${ environmentPrefix }portRangeMin`,
-			config.portRangeMin
-		);
-		parsedConfig.portRangeMin = config.portRangeMin;
-	}
-
-	if ( config.portRangeMax !== undefined && config.portRangeMax !== null ) {
-		checkPortRangeValue(
-			configFile,
-			`${ environmentPrefix }portRangeMax`,
-			config.portRangeMax
-		);
-		parsedConfig.portRangeMax = config.portRangeMax;
-	}
-
 	if ( config.mysqlPort !== undefined ) {
 		parsedConfig.mysqlPort = config.mysqlPort;
-	}
-
-	if (
-		config.mysqlPortRangeMin !== undefined &&
-		config.mysqlPortRangeMin !== null
-	) {
-		checkPortRangeValue(
-			configFile,
-			`${ environmentPrefix }mysqlPortRangeMin`,
-			config.mysqlPortRangeMin
-		);
-		parsedConfig.mysqlPortRangeMin = config.mysqlPortRangeMin;
-	}
-
-	if (
-		config.mysqlPortRangeMax !== undefined &&
-		config.mysqlPortRangeMax !== null
-	) {
-		checkPortRangeValue(
-			configFile,
-			`${ environmentPrefix }mysqlPortRangeMax`,
-			config.mysqlPortRangeMax
-		);
-		parsedConfig.mysqlPortRangeMax = config.mysqlPortRangeMax;
 	}
 
 	if ( config.phpmyadmin !== undefined ) {
@@ -605,30 +510,6 @@ async function parseEnvironmentConfig(
 		if ( config.phpmyadmin === undefined ) {
 			parsedConfig.phpmyadmin = true;
 		}
-	}
-
-	if (
-		config.phpmyadminPortRangeMin !== undefined &&
-		config.phpmyadminPortRangeMin !== null
-	) {
-		checkPortRangeValue(
-			configFile,
-			`${ environmentPrefix }phpmyadminPortRangeMin`,
-			config.phpmyadminPortRangeMin
-		);
-		parsedConfig.phpmyadminPortRangeMin = config.phpmyadminPortRangeMin;
-	}
-
-	if (
-		config.phpmyadminPortRangeMax !== undefined &&
-		config.phpmyadminPortRangeMax !== null
-	) {
-		checkPortRangeValue(
-			configFile,
-			`${ environmentPrefix }phpmyadminPortRangeMax`,
-			config.phpmyadminPortRangeMax
-		);
-		parsedConfig.phpmyadminPortRangeMax = config.phpmyadminPortRangeMax;
 	}
 
 	if ( config.multisite !== undefined ) {

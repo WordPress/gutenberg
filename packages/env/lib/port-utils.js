@@ -7,7 +7,7 @@ const net = require( 'net' );
 /**
  * Default port range bounds.
  */
-const DEFAULT_MIN_PORT = 1024;
+const DEFAULT_MIN_PORT = 49152;
 const DEFAULT_MAX_PORT = 65535;
 
 /**
@@ -41,23 +41,17 @@ async function isPortAvailable( port ) {
 
 /**
  * Finds an available port, starting with the preferred port.
+ * Falls back to scanning the ephemeral port range (49152-65535).
  *
  * @param {Object}   options               Options for finding a port.
  * @param {number}   options.preferredPort The preferred port to try first.
- * @param {?number}  options.min           Minimum port number (default: 1024).
- * @param {?number}  options.max           Maximum port number (default: 65535).
  * @param {number[]} options.exclude       Ports to exclude from selection.
  * @return {Promise<number>} An available port number.
  * @throws {Error} If no available port is found within the range.
  */
-async function findAvailablePort( {
-	preferredPort,
-	min = null,
-	max = null,
-	exclude = [],
-} ) {
-	const effectiveMin = min ?? DEFAULT_MIN_PORT;
-	const effectiveMax = max ?? DEFAULT_MAX_PORT;
+async function findAvailablePort( { preferredPort, exclude = [] } ) {
+	const effectiveMin = DEFAULT_MIN_PORT;
+	const effectiveMax = DEFAULT_MAX_PORT;
 
 	// Try the preferred port first if it's within range and not excluded
 	if (

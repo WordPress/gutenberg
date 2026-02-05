@@ -24,8 +24,6 @@ async function resolveAvailablePorts( config, spinner ) {
 	// Resolve development environment port
 	const devPortResult = await resolvePort( {
 		preferredPort: config.env.development.port,
-		min: config.env.development.portRangeMin,
-		max: config.env.development.portRangeMax,
 		exclude: usedPorts,
 		portName: 'development',
 		spinner,
@@ -51,8 +49,6 @@ async function resolveAvailablePorts( config, spinner ) {
 	// Resolve tests environment port
 	const testsPortResult = await resolvePort( {
 		preferredPort: config.env.tests.port,
-		min: config.env.tests.portRangeMin,
-		max: config.env.tests.portRangeMax,
 		exclude: usedPorts,
 		portName: 'tests',
 		spinner,
@@ -83,8 +79,6 @@ async function resolveAvailablePorts( config, spinner ) {
 	if ( config.env.development.mysqlPort ) {
 		const devMysqlResult = await resolvePort( {
 			preferredPort: config.env.development.mysqlPort,
-			min: config.env.development.mysqlPortRangeMin,
-			max: config.env.development.mysqlPortRangeMax,
 			exclude: usedPorts,
 			portName: 'development MySQL',
 			spinner,
@@ -100,8 +94,6 @@ async function resolveAvailablePorts( config, spinner ) {
 	if ( config.env.tests.mysqlPort ) {
 		const testsMysqlResult = await resolvePort( {
 			preferredPort: config.env.tests.mysqlPort,
-			min: config.env.tests.mysqlPortRangeMin,
-			max: config.env.tests.mysqlPortRangeMax,
 			exclude: usedPorts,
 			portName: 'tests MySQL',
 			spinner,
@@ -117,8 +109,6 @@ async function resolveAvailablePorts( config, spinner ) {
 	if ( config.env.development.phpmyadminPort ) {
 		const devPhpmyadminResult = await resolvePort( {
 			preferredPort: config.env.development.phpmyadminPort,
-			min: config.env.development.phpmyadminPortRangeMin,
-			max: config.env.development.phpmyadminPortRangeMax,
 			exclude: usedPorts,
 			portName: 'development phpMyAdmin',
 			spinner,
@@ -134,8 +124,6 @@ async function resolveAvailablePorts( config, spinner ) {
 	if ( config.env.tests.phpmyadminPort ) {
 		const testsPhpmyadminResult = await resolvePort( {
 			preferredPort: config.env.tests.phpmyadminPort,
-			min: config.env.tests.phpmyadminPortRangeMin,
-			max: config.env.tests.phpmyadminPortRangeMax,
 			exclude: usedPorts,
 			portName: 'tests phpMyAdmin',
 			spinner,
@@ -155,21 +143,12 @@ async function resolveAvailablePorts( config, spinner ) {
  *
  * @param {Object}   options               Options for port resolution.
  * @param {number}   options.preferredPort The preferred port to use.
- * @param {?number}  options.min           Minimum port in range.
- * @param {?number}  options.max           Maximum port in range.
  * @param {number[]} options.exclude       Ports to exclude.
  * @param {string}   options.portName      Name of the port for messages.
  * @param {Object}   options.spinner       CLI spinner.
  * @return {Promise<{port: number, changed: boolean, message: ?string}>} Resolution result.
  */
-async function resolvePort( {
-	preferredPort,
-	min,
-	max,
-	exclude,
-	portName,
-	spinner,
-} ) {
+async function resolvePort( { preferredPort, exclude, portName, spinner } ) {
 	if ( spinner ) {
 		spinner.text = `Checking ${ portName } port availability.`;
 	}
@@ -177,8 +156,6 @@ async function resolvePort( {
 	try {
 		const resolvedPort = await findAvailablePort( {
 			preferredPort,
-			min,
-			max,
 			exclude,
 		} );
 
