@@ -57,6 +57,7 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 
 	const isBulk = postId.length > 1;
 
+	const [ localEdits, setLocalEdits ] = useState( {} );
 	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
 			const {
@@ -82,8 +83,6 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 		},
 		[ postType, postId, isBulk ]
 	);
-
-	const [ multiEdits, setMultiEdits ] = useState( {} );
 	const { editEntityRecord, saveEditedEntityRecord } =
 		useDispatch( coreDataStore );
 
@@ -152,36 +151,35 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 	}, [ isBulk ] );
 
 	const onChange = ( edits ) => {
-		for ( const id of postId ) {
-			if (
-				edits.status &&
-				edits.status !== 'future' &&
-				record?.status === 'future' &&
-				new Date( record.date ) > new Date()
-			) {
-				edits.date = null;
-			}
-			if (
-				edits.status &&
-				edits.status === 'private' &&
-				record?.password
-			) {
-				edits.password = '';
-			}
-			editEntityRecord( 'postType', postType, id, edits );
-			if ( postId.length > 1 ) {
-				setMultiEdits( ( prev ) => ( {
-					...prev,
-					...edits,
-				} ) );
-			}
+		const currentData = { ...record, ...localEdits };
+
+		if (
+			edits.status &&
+			edits.status !== 'future' &&
+			currentData?.status === 'future' &&
+			new Date( currentData.date ) > new Date()
+		) {
+			edits.date = null;
 		}
+		if (
+			edits.status &&
+			edits.status === 'private' &&
+			currentData?.password
+		) {
+			edits.password = '';
+		}
+
+		setLocalEdits( ( prev ) => ( { ...prev, ...edits } ) );
 	};
 	useEffect( () => {
-		setMultiEdits( {} );
+		setLocalEdits( {} );
 	}, [ postId ] );
 
 	const onSave = async () => {
+		for ( const id of postId ) {
+			editEntityRecord( 'postType', postType, id, localEdits );
+		}
+
 		if ( isBulk ) {
 			await Promise.allSettled(
 				postId.map( ( id ) =>
@@ -241,7 +239,7 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 			>
 				{ hasFinishedResolution && (
 					<DataForm
-						data={ isBulk ? multiEdits : record }
+						data={ { ...record, ...localEdits } }
 						fields={ fieldsWithDependency }
 						form={ form }
 						onChange={ onChange }
