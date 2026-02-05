@@ -27,7 +27,7 @@ const defaultState: AwarenessState = {
 	getDebugData: () => ( {
 		doc: {},
 		clients: {},
-		userMap: {},
+		collaboratorMap: {},
 	} ),
 	isCurrentCollaboratorDisconnected: false,
 };

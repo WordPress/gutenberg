@@ -53,7 +53,7 @@ export function CollaboratorsPresence( {
 	const visibleCollaborators = otherActiveCollaborators.slice( 0, 3 );
 	const remainingCollaborators = otherActiveCollaborators.slice( 3 );
 	const remainingCollaboratorsText = remainingCollaborators
-		.map( ( { userInfo } ) => userInfo.name )
+		.map( ( { collaboratorInfo } ) => collaboratorInfo.name )
 		.join( ', ' );
 
 	return visibleCollaborators.length > 0 ? (
@@ -69,8 +69,8 @@ export function CollaboratorsPresence( {
 				{ visibleCollaborators.map( ( collaboratorState ) => (
 					<Avatar
 						key={ collaboratorState.clientId }
-						userInfo={ collaboratorState.userInfo }
-						showUserColorBorder={ false }
+						collaboratorInfo={ collaboratorState.collaboratorInfo }
+						showCollaboratorColorBorder={ false }
 						size="small"
 					/>
 				) ) }

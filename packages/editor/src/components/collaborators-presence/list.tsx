@@ -63,13 +63,15 @@ export function CollaboratorsList( {
 							} }
 						>
 							<Avatar
-								userInfo={ collaboratorState.userInfo }
-								showUserColorBorder
+								collaboratorInfo={
+									collaboratorState.collaboratorInfo
+								}
+								showCollaboratorColorBorder
 								size="medium"
 							/>
 							<div className="editor-collaborators-presence__list-item-info">
 								<div className="editor-collaborators-presence__list-item-name">
-									{ collaboratorState.userInfo.name }
+									{ collaboratorState.collaboratorInfo.name }
 								</div>
 							</div>
 						</button>
