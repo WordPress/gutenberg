@@ -4,29 +4,27 @@ export type ComponentStatus =
 	| 'not-recommended'
 	| 'unaudited';
 
-export const statuses: {
-	value: ComponentStatus;
-	label: string;
-	icon: string;
-}[] = [
+export const statuses: Record<
+	ComponentStatus,
 	{
-		value: 'stable',
+		label: string;
+		icon: string;
+	}
+> = {
+	stable: {
 		label: 'Stable',
 		icon: '✅',
 	},
-	{
-		value: 'use-with-caution',
+	'use-with-caution': {
 		label: 'Use with caution',
 		icon: '⚠️',
 	},
-	{
-		value: 'not-recommended',
+	'not-recommended': {
 		label: 'Not recommended',
 		icon: '🚫',
 	},
-	{
-		value: 'unaudited',
+	unaudited: {
 		label: 'Unaudited',
 		icon: '❓',
 	},
-];
+};

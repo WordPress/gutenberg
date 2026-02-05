@@ -15,9 +15,7 @@ export function ComponentStatusIndicator() {
 		return null;
 	}
 
-	const statusInfo = statuses.find(
-		( s ) => s.value === componentStatus.status
-	);
+	const statusInfo = statuses[ componentStatus.status ];
 
 	if ( ! statusInfo ) {
 		return null;
