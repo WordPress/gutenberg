@@ -267,6 +267,7 @@ const getAllBlocks = () => {
 		tableOfContents,
 		homeLink,
 		logInOut,
+		navigationOverlayClose,
 		termCount,
 		termDescription,
 		termName,
@@ -290,10 +291,6 @@ const getAllBlocks = () => {
 		blocks.push( formInput );
 		blocks.push( formSubmitButton );
 		blocks.push( formSubmissionNotification );
-	}
-
-	if ( window?.__experimentalNavigationOverlays ) {
-		blocks.push( navigationOverlayClose );
 	}
 
 	if ( window?.__experimentalEnableBlockExperiments ) {

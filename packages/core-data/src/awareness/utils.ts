@@ -114,6 +114,28 @@ function getBrowserName(): string {
 	return browserName;
 }
 
+export function areMapsEqual< Key, Value >(
+	map1: Map< Key, Value >,
+	map2: Map< Key, Value >,
+	comparatorFn: ( value1: Value, value2: Value ) => boolean
+): boolean {
+	if ( map1.size !== map2.size ) {
+		return false;
+	}
+
+	for ( const [ key, value1 ] of map1.entries() ) {
+		if ( ! map2.has( key ) ) {
+			return false;
+		}
+
+		if ( ! comparatorFn( value1, map2.get( key )! ) ) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 /**
  * Check if two user infos are equal.
  *
@@ -156,4 +178,19 @@ export function generateUserInfo(
 		color: getNewUserColor( existingColors ),
 		enteredAt: Date.now(),
 	};
+}
+
+export function getRecordValue< RecordType, Key extends keyof RecordType >(
+	obj: unknown,
+	key: Key
+): RecordType[ Key ] | null {
+	if ( 'object' === typeof obj && null !== obj && key in obj ) {
+		return ( obj as RecordType )[ key ];
+	}
+
+	return null;
+}
+
+export function getTypedKeys< T extends object >( obj: T ): Array< keyof T > {
+	return Object.keys( obj ) as Array< keyof T >;
 }

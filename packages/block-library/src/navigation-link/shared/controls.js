@@ -22,6 +22,7 @@ import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
 import { getSuggestionsQuery } from '../link-ui';
 import { useLinkPreview } from './use-link-preview';
+import { useIsInvalidLink } from './use-is-invalid-link';
 import { unlock } from '../../lock-unlock';
 
 const { LinkPicker } = unlock( blockEditorPrivateApis );
@@ -79,17 +80,26 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 			attributes,
 		} );
 
-	const needsHelpText = hasUrlBinding;
-	const helpText = isBoundEntityAvailable
-		? BindingHelpText( {
-				type: attributes.type,
-				kind: attributes.kind,
-		  } )
-		: MissingEntityHelpText( {
-				type: attributes.type,
-				kind: attributes.kind,
-		  } );
+	const [ isInvalid, isDraft ] = useIsInvalidLink(
+		attributes.kind,
+		attributes.type,
+		entityRecord?.id,
+		hasUrlBinding
+	);
 
+	let helpText = '';
+
+	if ( isInvalid || ( hasUrlBinding && ! isBoundEntityAvailable ) ) {
+		// Show invalid link help text for:
+		// 1. Invalid post-type links (trashed/deleted posts/pages) - via useIsInvalidLink
+		// 2. Missing bound taxonomy entities (deleted categories/tags) - useIsInvalidLink only checks post-types
+		helpText = getInvalidLinkHelpText();
+	} else if ( isDraft ) {
+		helpText = getDraftHelpText( {
+			type: attributes.type,
+			kind: attributes.kind,
+		} );
+	}
 	// Get the link change handler with built-in binding management
 	const handleLinkChange = useHandleLinkChange( {
 		clientId,
@@ -184,7 +194,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						attributes.kind
 					) }
 					label={ __( 'Link to' ) }
-					help={ needsHelpText ? helpText : undefined }
+					help={ helpText ? helpText : undefined }
 				/>
 			</ToolsPanelItem>
 
@@ -243,37 +253,32 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		</ToolsPanel>
 	);
 }
-
 /**
- * Component to display help text for bound URL attributes.
+ * Returns help text for invalid links.
  *
- * @param {Object} props      - Component props
- * @param {string} props.type - The entity type
- * @param {string} props.kind - The entity kind
- * @return {string} Help text for the bound URL
+ * @return {string} Error help text string (empty string if valid).
  */
-export function BindingHelpText( { type, kind } ) {
-	const entityType = getEntityTypeName( type, kind );
-	return sprintf(
-		/* translators: %s is the entity type (e.g., "page", "post", "category") */
-		__( 'Synced with the selected %s.' ),
-		entityType
+export function getInvalidLinkHelpText() {
+	return __(
+		'This link is invalid and will not appear on your site. Please update the link.'
 	);
 }
 
 /**
- * Component to display error help text for missing entity bindings.
+ * Returns the help text for links to draft entities
  *
- * @param {Object} props      - Component props
+ * @param {Object} props      - Function props
  * @param {string} props.type - The entity type
  * @param {string} props.kind - The entity kind
- * @return {JSX.Element} Error help text component
+ * @return {string} Draft help text
  */
-export function MissingEntityHelpText( { type, kind } ) {
+function getDraftHelpText( { type, kind } ) {
 	const entityType = getEntityTypeName( type, kind );
 	return sprintf(
-		/* translators: %s is the entity type (e.g., "page", "post", "category") */
-		__( 'Synced %s is missing. Please update or remove this link.' ),
+		/* translators: %1$s is the entity type (e.g., "page", "post", "category") */
+		__(
+			'This link is to a draft %1$s and will not appear on your site until the %1$s is published.'
+		),
 		entityType
 	);
 }

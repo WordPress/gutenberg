@@ -65,8 +65,6 @@ import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
 import OverlayMenuPreview from './overlay-menu-preview';
 import OverlayPanel from './overlay-panel';
-import OverlayVisibilityControl from './overlay-visibility-control';
-import OverlayMenuPreviewButton from './overlay-menu-preview-button';
 import useConvertClassicToBlockMenu, {
 	CLASSIC_MENU_CONVERSION_ERROR,
 	CLASSIC_MENU_CONVERSION_PENDING,
@@ -339,10 +337,6 @@ function Navigation( {
 	const hasAlreadyRendered = isPreviewMode ? false : recursionDetected;
 
 	const blockEditingMode = useBlockEditingMode();
-
-	const isOverlayExperimentEnabled =
-		typeof window !== 'undefined' &&
-		window.__experimentalNavigationOverlays === true;
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
@@ -755,7 +749,7 @@ function Navigation( {
 	const stylingInspectorControls = (
 		<>
 			<InspectorControls>
-				{ ( ! isOverlayExperimentEnabled || hasSubmenus ) && (
+				{ hasSubmenus && (
 					<ToolsPanel
 						label={ __( 'Display' ) }
 						resetAll={ () => {
@@ -769,50 +763,6 @@ function Navigation( {
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
-						{ ! isOverlayExperimentEnabled && (
-							<>
-								{ isResponsive && (
-									<OverlayMenuPreviewButton
-										isResponsive={ isResponsive }
-										overlayMenuPreview={
-											overlayMenuPreview
-										}
-										setOverlayMenuPreview={
-											setOverlayMenuPreview
-										}
-										hasIcon={ hasIcon }
-										icon={ icon }
-										setAttributes={ setAttributes }
-										overlayMenuPreviewClasses={
-											overlayMenuPreviewClasses
-										}
-										overlayMenuPreviewId={
-											overlayMenuPreviewId
-										}
-										containerStyle={ {
-											gridColumn: 'span 2',
-										} }
-									/>
-								) }
-
-								<ToolsPanelItem
-									hasValue={ () => overlayMenu !== 'mobile' }
-									label={ __( 'Overlay Visibility' ) }
-									onDeselect={ () =>
-										setAttributes( {
-											overlayMenu: 'mobile',
-										} )
-									}
-									isShownByDefault
-								>
-									<OverlayVisibilityControl
-										overlayMenu={ overlayMenu }
-										setAttributes={ setAttributes }
-									/>
-								</ToolsPanelItem>
-							</>
-						) }
-
 						{ hasSubmenus && (
 							<>
 								<h3 className="wp-block-navigation__submenu-header">
@@ -919,7 +869,7 @@ function Navigation( {
 					</ToolsPanel>
 				) }
 			</InspectorControls>
-			{ isOverlayExperimentEnabled && ! isWithinOverlay && (
+			{ ! isWithinOverlay && (
 				<InspectorControls>
 					<OverlayPanel
 						overlayMenu={ overlayMenu }

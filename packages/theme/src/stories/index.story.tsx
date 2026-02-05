@@ -18,7 +18,6 @@ import {
  * Internal dependencies
  */
 import { ThemeProvider } from '../theme-provider';
-import '../prebuilt/css/design-tokens.css';
 
 const meta: Meta< typeof ThemeProvider > = {
 	title: 'Design System/Theme/Theme Provider',
