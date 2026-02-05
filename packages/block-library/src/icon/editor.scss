@@ -59,7 +59,7 @@
 			}
 		}
 
-		.icons-list {
+		.wp-block-icon__inserter-content-grid-icons-list {
 			padding: 4px 4px 72px 4px;
 			margin: 0;
 			display: grid;
@@ -85,7 +85,7 @@
 				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
 			}
 
-			.icons-list__item {
+			.wp-block-icon__inserter-content-grid-icons-list-item {
 				&.is-active {
 					background-color: var(--wp-admin-theme-color);
 					color: rgb(255 255 255 / 80%);
@@ -97,22 +97,14 @@
 					svg {
 						fill: #fff;
 					}
-
-					&.has-no-icon-fill {
-						svg {
-							color: #fff;
-							fill: none;
-						}
-					}
 				}
 			}
 		}
 
-		.block-editor-inserter__no-results {
+		.wp-block-icon__inserter-content-grid-no-results {
 			height: calc(100% - 56px);
 			margin-top: 0;
 			display: flex;
-			flex-direction: column;
 			justify-content: center;
 
 			svg {
@@ -121,11 +113,11 @@
 		}
 	}
 
-	.icons-list {
+	.wp-block-icon__inserter-content-grid-icons-list {
 		display: flex;
 		flex-wrap: wrap;
 
-		.icons-list__item {
+		.wp-block-icon__inserter-content-grid-icons-list-item {
 			align-items: stretch;
 			background: transparent;
 			border: 1px solid transparent;
@@ -146,14 +138,14 @@
 				color: var(--wp-admin-theme-color) !important;
 			}
 
-			.icons-list__item-icon {
+			.wp-block-icon__inserter-content-grid-icons-list-item-icon {
 				border-radius: 2px;
 				color: #1e1e1e;
 				padding: 12px;
 				transition: all 0.05s ease-in-out;
 			}
 
-			.icons-list__item-title {
+			.wp-block-icon__inserter-content-grid-icons-list-item-title {
 				font-size: 12px;
 				padding: 4px 2px 8px;
 				overflow: hidden;
