@@ -73,7 +73,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 		const settings = useMemo( () => {
 			if (
-				window.__experimentalMediaProcessing &&
+				window.__clientSideMediaProcessing &&
 				_settings?.mediaUpload
 			) {
 				// Create a new object so that the original props.settings.mediaUpload is not modified.
@@ -115,7 +115,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			</SlotFillProvider>
 		);
 
-		if ( window.__experimentalMediaProcessing ) {
+		if ( window.__clientSideMediaProcessing ) {
 			return (
 				<MediaUploadProvider
 					settings={ mediaUploadSettings }

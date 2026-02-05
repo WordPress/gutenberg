@@ -2,11 +2,14 @@
 /**
  * Class Gutenberg_REST_Attachments_Controller.
  *
- * @package MediaExperiments
+ * @package gutenberg
  */
 
 /**
- * Class Gutenberg_REST_Attachments_Controller.
+ * REST API controller for media attachments.
+ *
+ * Extends the core attachments controller to add client-side media processing
+ * functionality including sideload support and sub-size generation control.
  */
 class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controller {
 	/**

@@ -48,6 +48,27 @@ function gutenberg_is_experiment_enabled( $name ) {
 	return ! empty( $experiments[ $name ] );
 }
 
+/**
+ * Checks whether client-side media processing is enabled.
+ *
+ * Client-side media processing uses the browser's capabilities to handle
+ * tasks like image resizing and compression before uploading to the server.
+ *
+ * @since 20.8.0
+ *
+ * @return bool Whether client-side media processing is enabled.
+ */
+function gutenberg_is_client_side_media_processing_enabled() {
+	/**
+	 * Filters whether client-side media processing is enabled.
+	 *
+	 * @since 20.8.0
+	 *
+	 * @param bool $enabled Whether client-side media processing is enabled. Default true.
+	 */
+	return apply_filters( 'gutenberg_client_side_media_processing_enabled', true );
+}
+
 // These files only need to be loaded if within a rest server instance.
 // which this class will exist if that is the case.
 if ( class_exists( 'WP_REST_Controller' ) ) {
@@ -190,9 +211,7 @@ require __DIR__ . '/block-supports/block-visibility.php';
 require __DIR__ . '/block-supports/custom-css.php';
 
 // Client-side media processing.
-if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
-	require_once __DIR__ . '/experimental/media/load.php';
-}
+require_once __DIR__ . '/media/load.php';
 
 // Interactivity API full-page client-side navigation.
 if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
