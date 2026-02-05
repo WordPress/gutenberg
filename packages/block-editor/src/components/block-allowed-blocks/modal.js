@@ -44,7 +44,7 @@ export default function BlockAllowedBlocksModal( {
 
 	return (
 		<Modal
-			title={ (0, import_i18n57._x)( 'Manage allowed blocks', "menu title" ) }
+			title={ _x( 'Manage allowed blocks', 'modal title' ) }
 			onRequestClose={ onClose }
 			overlayClassName="block-editor-block-allowed-blocks-modal"
 			focusOnMount="firstContentElement"
