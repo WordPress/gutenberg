@@ -1,11 +1,13 @@
 import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { privateApis } from '@wordpress/core-data';
+import {
+	privateApis,
+	type PostEditorAwarenessState,
+} from '@wordpress/core-data';
 
 import { Avatar } from './avatar';
 import { CollaboratorsList } from './list';
 import { unlock } from '../../lock-unlock';
-import { type PostEditorAwarenessState } from '../../../../core-data/src/awareness/types';
 
 import './styles/collaborators-presence.scss';
 
