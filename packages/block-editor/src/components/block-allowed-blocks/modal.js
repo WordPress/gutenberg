@@ -10,7 +10,7 @@ import {
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { _x, __ } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
 
 /**
@@ -44,7 +44,7 @@ export default function BlockAllowedBlocksModal( {
 
 	return (
 		<Modal
-			title={ __( 'Manage allowed blocks' ) }
+			title={ (0, import_i18n57._x)( 'Manage allowed blocks', "menu title" ) }
 			onRequestClose={ onClose }
 			overlayClassName="block-editor-block-allowed-blocks-modal"
 			focusOnMount="firstContentElement"
