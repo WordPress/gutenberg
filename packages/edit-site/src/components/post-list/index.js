@@ -187,9 +187,9 @@ export default function PostList( { postType } ) {
 
 	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
 	const [ selectedItems, setSelectedItems ] = useState(
-		data.filter( ( item ) =>
+		data?.filter( ( item ) =>
 			( postId?.split( ',' ) ?? [] ).includes( getItemId( item ) )
-		)
+		) ?? []
 	);
 	const onChangeSelection = useCallback(
 		( items ) => {
@@ -272,13 +272,7 @@ export default function PostList( { postType } ) {
 		}
 
 		return [ editAction, quickEditAction, ...postTypeActions ];
-	}, [
-		window.__experimentalQuickEditDataViews,
-		view.type,
-		editAction,
-		quickEditAction,
-		postTypeActions,
-	] );
+	}, [ view.type, editAction, quickEditAction, postTypeActions ] );
 
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
 

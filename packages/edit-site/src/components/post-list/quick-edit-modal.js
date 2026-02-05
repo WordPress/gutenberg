@@ -166,7 +166,7 @@ export function QuickEditModal( { postType, items, closeModal } ) {
 			if (
 				edits.status &&
 				edits.status === 'private' &&
-				record.password
+				record?.password
 			) {
 				edits.password = '';
 			}
