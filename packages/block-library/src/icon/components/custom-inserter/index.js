@@ -49,12 +49,8 @@ export default function InserterModal( props ) {
 			onRequestClose={ () => setInserterOpen( false ) }
 			isFullScreen
 		>
-			<div
-				className={ clsx( 'icon-inserter', {
-					'is-searching': searchInput,
-				} ) }
-			>
-				<div className="icon-inserter__content">
+			<div className="wp-block-icon__inserter">
+				<div className="wp-block-icon__inserter-content">
 					<ContentHeader
 						searchInput={ searchInput }
 						setSearchInput={ setSearchInput }
