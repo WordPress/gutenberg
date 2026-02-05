@@ -608,6 +608,8 @@ _Note: the port number environment variable (`WP_ENV_PORT`) takes precedence ove
 
 By default, `wp-env` will try to use ports 8888 and 8889 for the development and tests sites respectively. If these ports are already in use, `wp-env` will automatically find an available port in the ephemeral range (49152-65535). When a port is automatically changed, `wp-env` will display a message indicating the new port being used.
 
+To disable automatic port selection (for example in CI environments where predictable ports are required), set `WP_ENV_AUTO_PORT=false`. When disabled, `wp-env` will fail with an error if the configured port is busy instead of silently selecting a different one.
+
 Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 
 | Type              | Format                                       | Example(s)                                                                                                                         |

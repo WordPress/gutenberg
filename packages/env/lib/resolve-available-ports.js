@@ -2,7 +2,7 @@
 /**
  * Internal dependencies
  */
-const { findAvailablePort } = require( './port-utils' );
+const { findAvailablePort, isPortAvailable } = require( './port-utils' );
 const addOrReplacePort = require( './config/add-or-replace-port' );
 
 /**
@@ -151,6 +151,24 @@ async function resolveAvailablePorts( config, spinner ) {
 async function resolvePort( { preferredPort, exclude, portName, spinner } ) {
 	if ( spinner ) {
 		spinner.text = `Checking ${ portName } port availability.`;
+	}
+
+	// When auto-port selection is disabled, only use the configured port.
+	if ( process.env.WP_ENV_AUTO_PORT === 'false' ) {
+		if ( exclude.includes( preferredPort ) ) {
+			throw new Error(
+				`Port ${ preferredPort } for ${ portName } conflicts with another wp-env service. ` +
+					`Set a different port or enable automatic port selection with WP_ENV_AUTO_PORT=true.`
+			);
+		}
+		const available = await isPortAvailable( preferredPort );
+		if ( ! available ) {
+			throw new Error(
+				`Port ${ preferredPort } for ${ portName } is busy. ` +
+					`Free the port, set a different one, or enable automatic port selection with WP_ENV_AUTO_PORT=true.`
+			);
+		}
+		return { port: preferredPort, changed: false, message: null };
 	}
 
 	try {
