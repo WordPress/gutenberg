@@ -116,7 +116,12 @@ export default function ReactionDisplay( {
 			<Dropdown
 				className="editor-collab-sidebar-panel__add-reaction-dropdown"
 				contentClassName="editor-collab-sidebar-panel__add-reaction-popover"
-				popoverProps={ { placement: 'bottom-start' } }
+				popoverProps={ {
+					placement: 'bottom-start',
+					// Prevent the popover from stealing focus, which would
+					// trigger the thread's onBlur and collapse the note.
+					focusOnMount: false,
+				} }
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<Button
 						size="small"

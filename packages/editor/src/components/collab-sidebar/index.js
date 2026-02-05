@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useState, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
@@ -35,8 +35,6 @@ import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
 function NotesSidebarContent( {
-	newNoteFormState,
-	setNewNoteFormState,
 	styles,
 	comments,
 	commentSidebarRef,
@@ -71,8 +69,6 @@ function NotesSidebarContent( {
 				onAddReply={ onCreate }
 				onCommentDelete={ onDelete }
 				onToggleReaction={ onToggleReaction }
-				newNoteFormState={ newNoteFormState }
-				setNewNoteFormState={ setNewNoteFormState }
 				commentSidebarRef={ commentSidebarRef }
 				reflowComments={ reflowComments }
 				commentLastUpdated={ commentLastUpdated }
@@ -83,15 +79,12 @@ function NotesSidebarContent( {
 }
 
 function NotesSidebar( { postId } ) {
-	// Enum: 'closed' | 'creating' | 'open'
-	const [ newNoteFormState, setNewNoteFormState ] = useState( 'closed' );
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
-
-	const showFloatingSidebar = isLargeViewport;
 
 	const { clientId, blockCommentId } = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId } =
@@ -110,7 +103,12 @@ function NotesSidebar( { postId } ) {
 			isDistractionFree: get( 'core', 'distractionFree' ),
 		};
 	}, [] );
+	const selectedNote = useSelect(
+		( select ) => unlock( select( editorStore ) ).getSelectedNote(),
+		[]
+	);
 
+	const showFloatingSidebar = isLargeViewport;
 	const {
 		resultComments,
 		unresolvedSortedThreads,
@@ -119,8 +117,7 @@ function NotesSidebar( { postId } ) {
 	} = useBlockComments( postId );
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
-			( unresolvedSortedThreads.length > 0 ||
-				newNoteFormState !== 'closed' )
+			( unresolvedSortedThreads.length > 0 || selectedNote !== undefined )
 	);
 
 	// Get the global styles to set the background color of the sidebar.
@@ -154,11 +151,11 @@ function NotesSidebar( { postId } ) {
 			return;
 		}
 
-		setNewNoteFormState( ! currentThread ? 'open' : 'closed' );
+		selectNote( currentThread ? currentThread.id : 'new' );
 		focusCommentThread(
 			currentThread?.id,
 			commentSidebarRef.current,
-			// Focus a comment thread when there's a selected block with a comment.
+			// Focus the textarea when creating a new note.
 			! currentThread ? 'textarea' : undefined
 		);
 		toggleBlockSpotlight( clientId, true );
@@ -192,8 +189,6 @@ function NotesSidebar( { postId } ) {
 				>
 					<NotesSidebarContent
 						comments={ resultComments }
-						newNoteFormState={ newNoteFormState }
-						setNewNoteFormState={ setNewNoteFormState }
 						commentSidebarRef={ commentSidebarRef }
 					/>
 				</PluginSidebar>
@@ -209,8 +204,6 @@ function NotesSidebar( { postId } ) {
 				>
 					<NotesSidebarContent
 						comments={ unresolvedSortedThreads }
-						newNoteFormState={ newNoteFormState }
-						setNewNoteFormState={ setNewNoteFormState }
 						commentSidebarRef={ commentSidebarRef }
 						reflowComments={ reflowComments }
 						commentLastUpdated={ commentLastUpdated }

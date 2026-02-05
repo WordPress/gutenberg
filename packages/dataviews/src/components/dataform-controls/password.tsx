@@ -19,6 +19,7 @@ export default function Password< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	const [ isVisible, setIsVisible ] = useState( false );
@@ -34,6 +35,7 @@ export default function Password< Item >( {
 				field,
 				onChange,
 				hideLabelFromVision,
+				markWhenOptional,
 				validity,
 				type: isVisible ? 'text' : 'password',
 				suffix: (

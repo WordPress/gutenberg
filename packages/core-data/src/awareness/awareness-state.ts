@@ -1,13 +1,10 @@
 /**
  * Internal dependencies
  */
-import {
-	TypedAwareness,
-	type EnhancedState,
-	type EqualityFieldCheck,
-} from './awareness-types';
-import { getTypedKeys, areMapsEqual } from '../utils';
-import { REMOVAL_DELAY_IN_MS } from '../config';
+import { REMOVAL_DELAY_IN_MS } from './config';
+import { TypedAwareness } from './typed-awareness';
+import type { EnhancedState, EqualityFieldCheck } from './types';
+import { getTypedKeys, areMapsEqual } from './utils';
 
 type AwarenessClientID = number;
 

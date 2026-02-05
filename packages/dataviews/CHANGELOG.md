@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+- The design tokens stylesheet (`@wordpress/theme/design-tokens.css`) is no longer embedded in the DataViews stylesheet. Applications using DataViews outside of WordPress must now explicitly include the design tokens stylesheet. See the README for installation instructions. [#75182](https://github.com/WordPress/gutenberg/pull/75182)
+
 ### Bug Fixes
 
 - DataViews: Add title attribute in grid item title field. [#75085](https://github.com/WordPress/gutenberg/pull/75085)
@@ -9,6 +13,8 @@
 - DataViews: Fix fields async validation. [#74948](https://github.com/WordPress/gutenberg/pull/74948)
 
 ### Enhancements
+
+- DataForm: Add automatic field labeling - forms now automatically mark the minority of fields (required or optional) to reduce visual noise. [#74430](https://github.com/WordPress/gutenberg/pull/74430)
 - DataViews: Add details form layout validation. [#74996](https://github.com/WordPress/gutenberg/pull/74996)
 - DataViews: Consistent rendering of selection checkbox and actions in grid layout. [#75056](https://github.com/WordPress/gutenberg/pull/75056)
 

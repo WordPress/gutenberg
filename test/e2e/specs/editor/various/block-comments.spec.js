@@ -1042,10 +1042,15 @@ class BlockCommentUtils {
 					.getByRole( 'region', { name: 'Editor settings' } )
 					.getByRole( 'button', { name: 'Add note', exact: true } )
 					.click();
-				await this.#page
-					.getByRole( 'button', { name: 'Dismiss this notice' } )
-					.filter( { hasText: 'Note added.' } )
-					.click();
+				await expect(
+					this.#page
+						.getByRole( 'region', {
+							name: 'Editor settings',
+						} )
+						.getByRole( 'treeitem', {
+							name: `Note: ${ comment }`,
+						} )
+				).toBeVisible();
 			},
 			{ box: true }
 		);
@@ -1064,7 +1069,15 @@ class BlockCommentUtils {
 		await this.#page
 			.getByRole( 'button', { name: 'Add reaction' } )
 			.click();
-		await this.#page
+
+		// Wait for the emoji picker popover to appear.
+		const emojiPicker = this.#page.locator(
+			'.editor-collab-sidebar-panel__emoji-picker'
+		);
+		await expect( emojiPicker ).toBeVisible();
+
+		// Click the specific emoji within the picker.
+		await emojiPicker
 			.getByRole( 'option', { name: new RegExp( emoji, 'i' ) } )
 			.click();
 	}

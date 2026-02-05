@@ -104,7 +104,6 @@ function RevisionsSlider() {
 
 	return (
 		<RangeControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			className="editor-revisions-header__slider"
 			hideLabelFromVision

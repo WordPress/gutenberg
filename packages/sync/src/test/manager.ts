@@ -33,18 +33,6 @@ import type {
 	RecordHandlers,
 	SyncConfig,
 } from '../types';
-import { AwarenessState } from '../awareness/awareness-state';
-
-/**
- * A minimal mock awareness class for testing.
- */
-class MockAwarenessState extends AwarenessState {
-	protected equalityFieldChecks = {};
-
-	protected onSetUp(): void {
-		// No-op for testing.
-	}
-}
 
 // Mock dependencies.
 jest.mock( '../providers', () => ( {
@@ -96,7 +84,7 @@ describe( 'SyncManager', () => {
 			),
 			supports: {},
 			createAwareness: jest.fn(
-				( ydoc: Y.Doc ) => new MockAwarenessState( ydoc )
+				( ydoc: Y.Doc ) => new Awareness( ydoc )
 			),
 		};
 

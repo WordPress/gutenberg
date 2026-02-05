@@ -1,6 +1,6 @@
 <?php
 /**
- * Shared helper functions for Navigation Link and Navigation Submenu blocks.
+ * Shared helper function for checking if navigation items should render.
  *
  * @package WordPress
  */
