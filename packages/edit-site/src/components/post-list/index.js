@@ -59,7 +59,7 @@ function getItemLevel( item ) {
 
 export default function PostList( { postType } ) {
 	const { path, query } = useLocation();
-	const { activeView = 'all', postId, quickEdit } = query;
+	const { activeView = 'all', postId, quickEdit = false } = query;
 	const history = useHistory();
 	const defaultView = DEFAULT_VIEW;
 	const activeViewOverrides = useMemo(
@@ -94,6 +94,23 @@ export default function PostList( { postType } ) {
 			history.invalidate();
 		}
 	} );
+
+	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
+	const onChangeSelection = useCallback(
+		( items ) => {
+			setSelection( items );
+			history.navigate(
+				addQueryArgs( path, {
+					postId: items.join( ',' ),
+				} )
+			);
+		},
+		[ path, history ]
+	);
+	useEffect( () => {
+		const newSelection = postId?.split( ',' ) ?? [];
+		setSelection( newSelection );
+	}, [ postId ] );
 
 	const fields = usePostFields( {
 		postType,
@@ -184,23 +201,6 @@ export default function PostList( { postType } ) {
 
 		return processedRecords;
 	}, [ records, fields, view?.sort, notesCount ] );
-
-	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
-	const onChangeSelection = useCallback(
-		( items ) => {
-			setSelection( items );
-			history.navigate(
-				addQueryArgs( path, {
-					postId: items.join( ',' ),
-				} )
-			);
-		},
-		[ path, history ]
-	);
-	useEffect( () => {
-		const newSelection = postId?.split( ',' ) ?? [];
-		setSelection( newSelection );
-	}, [ postId ] );
 
 	const ids = data?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
