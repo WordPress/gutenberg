@@ -33,9 +33,14 @@ function createWasmVipsCommonJsPlugin() {
 			// Intercept vips-es6.js and redirect to vips.js
 			build.onLoad( { filter: /vips-es6\.js$/ }, ( args ) => {
 				// Replace the ES6 module with a re-export from the CommonJS version
-				const vipsJsPath = args.path.replace( 'vips-es6.js', 'vips.js' );
+				const vipsJsPath = args.path.replace(
+					'vips-es6.js',
+					'vips.js'
+				);
 				return {
-					contents: `export { default } from ${ JSON.stringify( vipsJsPath ) };`,
+					contents: `export { default } from ${ JSON.stringify(
+						vipsJsPath
+					) };`,
 					loader: 'js',
 				};
 			} );
