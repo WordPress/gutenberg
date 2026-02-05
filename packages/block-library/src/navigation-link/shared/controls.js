@@ -2,17 +2,23 @@
  * WordPress dependencies
  */
 import {
+	Button,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalHStack as HStack,
 	CheckboxControl,
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -139,6 +145,12 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		[ entityRecord?.featured_media ]
 	);
 
+	const onNavigateToEntityRecord = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
+		[]
+	);
+
 	const preview = useLinkPreview( {
 		url,
 		title: linkTitle,
@@ -197,6 +209,59 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 					help={ helpText ? helpText : undefined }
 				/>
 			</ToolsPanelItem>
+
+			{ url && (
+				<HStack
+					className="navigation-link-to__actions"
+					alignment="stretch"
+					expanded
+					justify="stretch"
+					style={ { gridColumn: '1 / -1' } }
+				>
+					{ hasUrlBinding &&
+						isBoundEntityAvailable &&
+						entityRecord?.id &&
+						attributes.kind === 'post-type' &&
+						onNavigateToEntityRecord && (
+							<Button
+								variant="secondary"
+								onClick={ () => {
+									onNavigateToEntityRecord( {
+										postId: entityRecord.id,
+										postType: attributes.type,
+									} );
+								} }
+								__next40pxDefaultSize
+							>
+								{ sprintf(
+									/* translators: %s: entity type (e.g., "page", "post", "category") */
+									__( 'Edit %s' ),
+									getEntityTypeName(
+										attributes.type,
+										attributes.kind
+									)
+								) }
+							</Button>
+						) }
+					<Button
+						variant="minimal"
+						href={ url }
+						target="_blank"
+						icon={ external }
+						iconPosition="right"
+						__next40pxDefaultSize
+					>
+						{ sprintf(
+							/* translators: %s: entity type (e.g., "page", "post", "category") */
+							__( 'View %s' ),
+							getEntityTypeName(
+								attributes.type,
+								attributes.kind
+							)
+						) }
+					</Button>
+				</HStack>
+			) }
 
 			<ToolsPanelItem
 				hasValue={ () => !! opensInNewTab }
