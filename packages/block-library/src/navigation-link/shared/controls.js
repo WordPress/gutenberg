@@ -173,7 +173,16 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 			<ToolsPanelItem
 				hasValue={ () => !! url }
 				label={ __( 'Link to' ) }
-				onDeselect={ () => setAttributes( { url: '' } ) }
+				onDeselect={ () =>
+					setAttributes( {
+						url: undefined,
+						label: undefined,
+						id: undefined,
+						kind: undefined,
+						type: undefined,
+						opensInNewTab: false,
+					} )
+				}
 				isShownByDefault
 			>
 				<LinkPicker
