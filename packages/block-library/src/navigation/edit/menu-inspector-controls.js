@@ -6,12 +6,7 @@ import {
 	InspectorControls,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	PanelBody,
-	__experimentalHStack as HStack,
-	__experimentalHeading as Heading,
-	Spinner,
-} from '@wordpress/components';
+import { PanelBody, Spinner } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -202,33 +197,25 @@ const MenuInspectorControls = ( props ) => {
 
 	return (
 		<InspectorControls group="list">
-			<PanelBody title={ null }>
-				<HStack className="wp-block-navigation-off-canvas-editor__header">
-					<Heading
-						className="wp-block-navigation-off-canvas-editor__title"
-						level={ 2 }
-					>
-						{ __( 'Menu' ) }
-					</Heading>
-					{ blockEditingMode === 'default' && (
-						<NavigationMenuSelector
-							currentMenuId={ currentMenuId }
-							onSelectClassicMenu={ onSelectClassicMenu }
-							onSelectNavigationMenu={ onSelectNavigationMenu }
-							onCreateNew={ onCreateNew }
-							createNavigationMenuIsSuccess={
-								createNavigationMenuIsSuccess
-							}
-							createNavigationMenuIsError={
-								createNavigationMenuIsError
-							}
-							actionLabel={ actionLabel }
-							isManageMenusButtonDisabled={
-								isManageMenusButtonDisabled
-							}
-						/>
-					) }
-				</HStack>
+			<PanelBody title={ __( 'Navigation' ) }>
+				{ blockEditingMode === 'default' && (
+					<NavigationMenuSelector
+						currentMenuId={ currentMenuId }
+						onSelectClassicMenu={ onSelectClassicMenu }
+						onSelectNavigationMenu={ onSelectNavigationMenu }
+						onCreateNew={ onCreateNew }
+						createNavigationMenuIsSuccess={
+							createNavigationMenuIsSuccess
+						}
+						createNavigationMenuIsError={
+							createNavigationMenuIsError
+						}
+						actionLabel={ actionLabel }
+						isManageMenusButtonDisabled={
+							isManageMenusButtonDisabled
+						}
+					/>
+				) }
 				<MainContent { ...props } />
 			</PanelBody>
 		</InspectorControls>
