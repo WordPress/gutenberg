@@ -45,7 +45,7 @@ import { focusCommentThread, getCommentExcerpt } from './utils';
 import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
-import ReactionDisplay from './reaction-display';
+import ReactionDisplay, { AddReactionButton } from './reaction-display';
 import ReactionDetailsPopover from './reaction-details-popover';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
@@ -889,6 +889,14 @@ const CommentBoard = ( {
 						} }
 					>
 						<HStack spacing="0">
+							<AddReactionButton
+								onToggleReaction={ ( emoji ) =>
+									onToggleReaction?.( {
+										commentId: thread.id,
+										emoji,
+									} )
+								}
+							/>
 							{ canResolve && (
 								<Button
 									label={ _x(

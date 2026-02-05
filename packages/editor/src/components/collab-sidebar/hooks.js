@@ -386,7 +386,6 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				{
 					id: commentId,
 					meta: {
-						...comment.meta,
 						_wp_reactions: updatedReactions,
 					},
 				},
@@ -449,11 +448,10 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				{
 					id: commentId,
 					meta: {
-						...comment.meta,
 						_wp_reactions:
 							Object.keys( updatedReactions ).length > 0
 								? updatedReactions
-								: undefined,
+								: {},
 					},
 				},
 				{ throwOnError: true }
