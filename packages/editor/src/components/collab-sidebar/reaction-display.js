@@ -111,6 +111,7 @@ export default function ReactionDisplay( {
 					<Button
 						key={ emoji }
 						size="small"
+						variant="tertiary"
 						className={ clsx(
 							'editor-collab-sidebar-panel__reaction-button',
 							{
