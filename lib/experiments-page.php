@@ -174,18 +174,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-content-only-pattern-insertion',
-		__( 'Pattern Editing: Make patterns contentOnly by default upon insertion', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'When patterns are inserted, default to a simplified content only mode for editing pattern content.', 'gutenberg' ),
-			'id'    => 'gutenberg-content-only-pattern-insertion',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-content-only-inspector-fields',
 		__( 'Block fields: Show dataform driven inspector fields on blocks that support them', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -242,6 +230,18 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables editing media items (attachments) directly in the block editor with a dedicated media preview and metadata panel.', 'gutenberg' ),
 			'id'    => 'gutenberg-media-editor',
+		)
+	);
+
+	add_settings_field(
+		'gutenberg-svg-icon-registry',
+		__( 'SVG Icon Registration API', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables a REST API endpoint for accessing SVG icons.', 'gutenberg' ),
+			'id'    => 'gutenberg-svg-icon-registry',
 		)
 	);
 

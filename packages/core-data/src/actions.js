@@ -402,6 +402,16 @@ export const editEntityRecord =
 			recordId
 		);
 
+		// Some fields are merged with the existing value instead of replaced.
+		// See `mergedEdits` definition on the entity config.
+		const editsWithMerges = Object.keys( edits ).reduce( ( acc, key ) => {
+			acc[ key ] = mergedEdits[ key ]
+				? { ...editedRecord[ key ], ...edits[ key ] }
+				: edits[ key ];
+
+			return acc;
+		}, {} );
+
 		const edit = {
 			kind,
 			name,
@@ -410,10 +420,7 @@ export const editEntityRecord =
 			// so that the property is not considered dirty.
 			edits: Object.keys( edits ).reduce( ( acc, key ) => {
 				const recordValue = record[ key ];
-				const editedRecordValue = editedRecord[ key ];
-				const value = mergedEdits[ key ]
-					? { ...editedRecordValue, ...edits[ key ] }
-					: edits[ key ];
+				const value = editsWithMerges[ key ];
 				acc[ key ] = fastDeepEqual( recordValue, value )
 					? undefined
 					: value;
@@ -425,11 +432,28 @@ export const editEntityRecord =
 				const objectType = `${ kind }/${ name }`;
 				const objectId = recordId;
 
+				// Determine whether this edit should create a new undo level.
+				//
+				// In Gutenberg, block changes flow through two callbacks:
+				// - `onInput`: For transient/in-progress changes (e.g., typing each
+				//   character). These use `isCached: true` and get merged into
+				//   the current undo item.
+				// - `onChange`: For persistent/completed changes (e.g., formatting
+				//   transforms, block insertions). These use `isCached: false` and
+				//   should create a new undo level.
+				//
+				// Additionally, `undoIgnore: true` means the change should not
+				// affect the undo history at all (e.g., selection-only changes).
+				const isNewUndoLevel = options.undoIgnore
+					? false
+					: ! options.isCached;
+
 				getSyncManager()?.update(
 					objectType,
 					objectId,
-					edit.edits,
-					LOCAL_EDITOR_ORIGIN
+					editsWithMerges,
+					LOCAL_EDITOR_ORIGIN,
+					{ isNewUndoLevel }
 				);
 			}
 		}
@@ -730,7 +754,7 @@ export const saveEntityRecord =
 								recordId,
 								updatedRecord,
 								LOCAL_EDITOR_ORIGIN,
-								true // isSave
+								{ isSave: true }
 							);
 						}
 					}

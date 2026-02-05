@@ -50,6 +50,10 @@ export const settings = {
 			return customName || summary;
 		}
 
+		if ( context === 'breadcrumb' && customName ) {
+			return customName;
+		}
+
 		if ( context === 'accessibility' ) {
 			return ! hasSummary
 				? __( 'Details. Empty.' )

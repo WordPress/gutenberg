@@ -198,7 +198,7 @@ function gutenberg_register_core_block_assets( $block_name ) {
  * This shim is INTENTIONALLY left out of core, as Social Links have never
  * landed there.
  *
- * @see https://github.com/WordPress/gutenberg/pull/19887
+ * @link https://github.com/WordPress/gutenberg/pull/19887
  */
 function gutenberg_register_legacy_social_link_blocks() {
 	$services = array(

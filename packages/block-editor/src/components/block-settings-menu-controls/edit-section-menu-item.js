@@ -31,13 +31,7 @@ export function EditSectionMenuItem( { clientId, onClose } ) {
 		[ clientId ]
 	);
 
-	// Only show when the experiment is enabled, the block is a section block,
-	// and we're not already editing it
-	if (
-		! window?.__experimentalContentOnlyPatternInsertion ||
-		! isSectionBlock ||
-		isEditingContentOnlySection
-	) {
+	if ( ! isSectionBlock || isEditingContentOnlySection ) {
 		return null;
 	}
 

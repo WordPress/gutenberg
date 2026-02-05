@@ -320,7 +320,7 @@ export const fields: Field< SpaceObject >[] = [
 		id: 'image',
 		type: 'media',
 		header: (
-			<Stack direction="row" gap="2xs" justify="start" align="center">
+			<Stack direction="row" gap="xs" justify="start" align="center">
 				<Icon icon={ image } />
 				<span style={ { minWidth: 0 } }>Image</span>
 			</Stack>
@@ -426,7 +426,7 @@ export const fields: Field< SpaceObject >[] = [
 		label: 'Categories',
 		id: 'categories',
 		header: (
-			<Stack direction="row" gap="2xs" justify="start" align="center">
+			<Stack direction="row" gap="xs" justify="start" align="center">
 				<Icon icon={ category } />
 				<span style={ { minWidth: 0 } }>Categories</span>
 			</Stack>

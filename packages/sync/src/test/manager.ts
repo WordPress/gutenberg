@@ -40,6 +40,10 @@ import { AwarenessState } from '../awareness/awareness-state';
  */
 class MockAwarenessState extends AwarenessState {
 	protected equalityFieldChecks = {};
+
+	protected onSetUp(): void {
+		// No-op for testing.
+	}
 }
 
 // Mock dependencies.
@@ -601,7 +605,9 @@ describe( 'SyncManager', () => {
 			const changes = { title: 'Updated Title' };
 			const now = Date.now();
 
-			manager.update( 'post', '123', changes, 'local-editor', true );
+			manager.update( 'post', '123', changes, 'local-editor', {
+				isSave: true,
+			} );
 
 			// Verify that applyChangesToCRDTDoc was called with the changes.
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
