@@ -902,14 +902,22 @@ test.describe( 'Navigation block', () => {
 				await expect( linkControlSearch ).toBeFocused();
 			} );
 
+			await test.step( 'Should not show validation error when input is empty', async () => {
+				// Press tab twice to reach the "Create page" button
+				await pageUtils.pressKeys( 'Tab', { times: 2 } );
+
+				await expect(
+					page.getByText( 'Please fill out this field' )
+				).not.toBeVisible();
+			} );
+
 			await test.step( 'Click Create Page button', async () => {
 				// Find and click the "Create page" button
 				const createPageButton = page.getByRole( 'button', {
 					name: 'Create page',
 				} );
 				await expect( createPageButton ).toBeVisible();
-				// Press tab twice to reach the "Create page" button
-				await pageUtils.pressKeys( 'Tab', { times: 2 } );
+
 				// expect the "Create page" button to be focused
 				await expect( createPageButton ).toBeFocused();
 				await page.keyboard.press( 'Enter' );
@@ -1202,6 +1210,13 @@ test.describe( 'Navigation block', () => {
 				await expect( linkButton ).toContainText(
 					url.pathname.replace( /\/$/, '' )
 				);
+
+				// Verify help text
+				await expect(
+					settingsControls.getByText(
+						'Synced with the selected page.'
+					)
+				).toBeVisible();
 			} );
 
 			await test.step( 'Verify bound link works correctly on frontend', async () => {
@@ -1626,14 +1641,14 @@ test.describe( 'Navigation block', () => {
 
 				// With LinkControlInspector, unavailable entities show a button with error badge
 				const linkButton = settingsControls.getByRole( 'button', {
-					name: /Missing page/i,
+					name: /No link selected/i,
 				} );
 
 				// Button is enabled (can click to fix the link)
 				await expect( linkButton ).toBeEnabled();
 
-				// Button should show "Missing page" for unavailable entity
-				await expect( linkButton ).toContainText( 'Missing page' );
+				// Button should show "No link selected" for unavailable entity
+				await expect( linkButton ).toContainText( 'No link selected' );
 			} );
 
 			await test.step( 'Verify clicking button with error opens link control for fixing', async () => {
@@ -1642,7 +1657,7 @@ test.describe( 'Navigation block', () => {
 					.getByRole( 'tabpanel', { name: 'Settings' } );
 
 				const linkButton = settingsControls.getByRole( 'button', {
-					name: /Missing page/i,
+					name: /No link selected/i,
 				} );
 
 				// Click the button to open the link control and fix the link
