@@ -30,6 +30,8 @@ The `@wordpress/interactivity-router` package is bundled with WordPress Core sin
 2. **Define router regions**: Mark the HTML elements that should be updated during navigation.
 3. **Trigger navigation**: Use the `actions.navigate()` function to navigate programmatically.
 
+For detailed API documentation, see the [`@wordpress/interactivity-router` package README](/packages/interactivity-router/README.md).
+
 ### Setting up router regions
 
 First, define router regions in your block's markup:
