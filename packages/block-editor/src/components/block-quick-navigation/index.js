@@ -10,6 +10,7 @@ import {
 	FlexBlock,
 	FlexItem,
 } from '@wordpress/components';
+import { Icon, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -19,7 +20,12 @@ import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
 import useBlockDisplayTitle from '../block-title/use-block-display-title';
 
-export default function BlockQuickNavigation( { clientIds, onSelect } ) {
+export default function BlockQuickNavigation( {
+	clientIds,
+	onSelect,
+	onSwitchToListView,
+	hasListView,
+} ) {
 	if ( ! clientIds.length ) {
 		return null;
 	}
@@ -28,6 +34,8 @@ export default function BlockQuickNavigation( { clientIds, onSelect } ) {
 			{ clientIds.map( ( clientId ) => (
 				<BlockQuickNavigationItem
 					onSelect={ onSelect }
+					onSwitchToListView={ onSwitchToListView }
+					hasListView={ hasListView }
 					key={ clientId }
 					clientId={ clientId }
 				/>
@@ -36,26 +44,35 @@ export default function BlockQuickNavigation( { clientIds, onSelect } ) {
 	);
 }
 
-function BlockQuickNavigationItem( { clientId, onSelect } ) {
+function BlockQuickNavigationItem( {
+	clientId,
+	onSelect,
+	onSwitchToListView,
+	hasListView,
+} ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 		context: 'list-view',
 	} );
-	const { isSelected } = useSelect(
+	const { isSelected, childBlocks } = useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock } =
+			const { isBlockSelected, hasSelectedInnerBlock, getBlockOrder } =
 				select( blockEditorStore );
 
 			return {
 				isSelected:
 					isBlockSelected( clientId ) ||
 					hasSelectedInnerBlock( clientId, /* deep: */ true ),
+				childBlocks: getBlockOrder( clientId ),
 			};
 		},
 		[ clientId ]
 	);
 	const { selectBlock } = useDispatch( blockEditorStore );
+
+	const hasChildren = childBlocks && childBlocks.length > 0;
+	const canNavigateToListView = hasChildren && hasListView;
 
 	return (
 		<Button
@@ -63,7 +80,15 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 			className="block-editor-block-quick-navigation__item"
 			isPressed={ isSelected }
 			onClick={ async () => {
-				await selectBlock( clientId );
+				// If the block has children and List View is available,
+				// switch to List View and select the first child.
+				if ( canNavigateToListView && onSwitchToListView ) {
+					await selectBlock( childBlocks[ 0 ] );
+					onSwitchToListView();
+				} else {
+					await selectBlock( clientId );
+				}
+
 				if ( onSelect ) {
 					onSelect( clientId );
 				}
@@ -76,6 +101,11 @@ function BlockQuickNavigationItem( { clientId, onSelect } ) {
 				<FlexBlock style={ { textAlign: 'left' } }>
 					<Truncate>{ blockTitle }</Truncate>
 				</FlexBlock>
+				{ canNavigateToListView && (
+					<FlexItem>
+						<Icon icon={ chevronRight } size={ 24 } />
+					</FlexItem>
+				) }
 			</Flex>
 		</Button>
 	);

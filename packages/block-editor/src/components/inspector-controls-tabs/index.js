@@ -63,6 +63,14 @@ export default function InspectorControlsTabs( {
 		hasUserSelectionRef.current = true;
 	};
 
+	const hasListView = tabs.some( ( tab ) => tab.name === TAB_LIST_VIEW.name );
+
+	const switchToListView = () => {
+		if ( hasListView ) {
+			handleTabSelect( TAB_LIST_VIEW.name );
+		}
+	};
+
 	return (
 		<div className="block-editor-block-inspector__tabs">
 			<Tabs
@@ -101,7 +109,11 @@ export default function InspectorControlsTabs( {
 					/>
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
-					<ContentTab contentClientIds={ contentClientIds } />
+					<ContentTab
+						contentClientIds={ contentClientIds }
+						onSwitchToListView={ switchToListView }
+						hasListView={ hasListView }
+					/>
 					<InspectorControls.Slot group="content" />
 				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name } focusable={ false }>
