@@ -113,14 +113,11 @@ const DataViewsPickerContent = ( {
 			};
 
 			if ( infiniteScrollEnabled ) {
-				// Use 15 items for table layout, 10 for others
-				const itemCount =
-					prevView.type === LAYOUT_PICKER_TABLE ? 15 : 10;
 				return {
 					...prevView,
 					...baseUpdates,
 					startPosition: 1,
-					endPosition: itemCount,
+					endPosition: 15,
 					page: undefined,
 					perPage: undefined,
 				} as View;

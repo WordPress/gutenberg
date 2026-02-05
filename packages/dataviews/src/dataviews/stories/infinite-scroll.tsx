@@ -22,7 +22,7 @@ const InfiniteScroll = () => {
 		type: LAYOUT_GRID,
 		search: '',
 		startPosition: 1,
-		endPosition: 8, // Start with a small number to demonstrate pagination
+		endPosition: 15, // Start with a small number to demonstrate pagination
 		filters: [],
 		fields: [ 'satellites' ],
 		titleField: 'title',
@@ -33,7 +33,6 @@ const InfiniteScroll = () => {
 	const { data: shownData, paginationInfo } = useMemo( () => {
 		return filterSortAndPaginate( data, view, fields );
 	}, [ view ] );
-
 	return (
 		<>
 			<style>{ `

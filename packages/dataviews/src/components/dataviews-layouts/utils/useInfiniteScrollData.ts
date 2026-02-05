@@ -133,15 +133,24 @@ export function useInfiniteScrollData< Item extends { id: number } >( {
 					scrollDirection === 'up'
 						? [ ...newRecords, ...prevWithoutDuplicates ]
 						: [ ...prevWithoutDuplicates, ...newRecords ];
-
 				// Filter to keep only records that should remain visible
 				// Keep items within a certain range of visible entries
+				// Sort all records by position to ensure correct order
+				// This is crucial when items are reloaded after scrolling in different directions
+				allRecords.sort( ( a, b ) => {
+					const posA = ( a as Item & { position: number } ).position;
+					const posB = ( b as Item & { position: number } ).position;
+					return posA - posB;
+				} );
+
 				if ( visibleEntries.length > 0 ) {
 					const visibleMin = Math.min( ...visibleEntries );
 					const visibleMax = Math.max( ...visibleEntries );
 					// Buffer size balances allowing new items to render (when prepended
-					// during scroll up) while unloading items no longer on screen
-					const buffer = 10;
+					// during scroll up) while unloading items no longer on screen.
+					// Use a larger buffer to prevent scrollbar from jumping when items
+					// are unloaded, which could trigger unwanted scroll events.
+					const buffer = 20;
 
 					const filtered = allRecords.filter( ( record ) => {
 						const itemPosition = (
