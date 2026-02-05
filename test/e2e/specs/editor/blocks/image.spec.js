@@ -51,7 +51,10 @@ test.describe( 'Image', () => {
 			name: 'This image has an empty alt attribute',
 		} );
 		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
+		// Wait for upload to complete (includes client-side media processing time).
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ), {
+			timeout: 30_000,
+		} );
 
 		const regex = new RegExp(
 			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none"} -->
@@ -78,7 +81,10 @@ test.describe( 'Image', () => {
 		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
-		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
+		// Wait for upload to complete (includes client-side media processing time).
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ), {
+			timeout: 30_000,
+		} );
 		await editor.clickBlockToolbarButton( 'Add caption' );
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
@@ -111,7 +117,10 @@ test.describe( 'Image', () => {
 		);
 
 		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
+		// Wait for upload to complete (includes client-side media processing time).
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ), {
+			timeout: 30_000,
+		} );
 		await editor.clickBlockToolbarButton( 'Add caption' );
 		await page.keyboard.type( '12' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -144,7 +153,10 @@ test.describe( 'Image', () => {
 		);
 
 		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
+		// Wait for upload to complete (includes client-side media processing time).
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ), {
+			timeout: 30_000,
+		} );
 
 		// Add caption and navigate to inline toolbar.
 		await editor.clickBlockToolbarButton( 'Add caption' );
@@ -221,7 +233,10 @@ test.describe( 'Image', () => {
 			[ tmpInput, pX, pY ]
 		);
 
-		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
+		// Wait for upload to complete (includes client-side media processing time).
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ), {
+			timeout: 30_000,
+		} );
 	} );
 
 	test( 'allows zooming using the crop tools', async ( {
@@ -244,7 +259,10 @@ test.describe( 'Image', () => {
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
-		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
+		// Wait for upload to complete (includes client-side media processing time).
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ), {
+			timeout: 30_000,
+		} );
 
 		// Assert that the image is initially unscaled and unedited.
 		const initialImageSrc = await image.getAttribute( 'src' );
@@ -312,7 +330,10 @@ test.describe( 'Image', () => {
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
-		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
+		// Wait for upload to complete (includes client-side media processing time).
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ), {
+			timeout: 30_000,
+		} );
 
 		// Assert that the image is initially unscaled and unedited.
 		const initialImageSrc = await image.getAttribute( 'src' );
@@ -371,7 +392,10 @@ test.describe( 'Image', () => {
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
-		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
+		// Wait for upload to complete (includes client-side media processing time).
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ), {
+			timeout: 30_000,
+		} );
 
 		// Rotate the image.
 		await editor.clickBlockToolbarButton( 'Crop' );
@@ -409,7 +433,10 @@ test.describe( 'Image', () => {
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
 
-		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
+		// Wait for upload to complete (includes client-side media processing time).
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ), {
+			timeout: 30_000,
+		} );
 		await editor.canvas.locator( '.wp-block-image' ).focus();
 		await pageUtils.pressKeys( 'primary+z' );
 
@@ -535,9 +562,11 @@ test.describe( 'Image', () => {
 			name: 'This image has an empty alt attribute',
 		} );
 		await expect( imageInEditor ).toBeVisible();
+		// Wait for upload to complete (includes client-side media processing time).
 		await expect( imageInEditor ).toHaveAttribute(
 			'src',
-			new RegExp( fileName )
+			new RegExp( fileName ),
+			{ timeout: 30_000 }
 		);
 
 		const postId = await editor.publishPost();
@@ -649,9 +678,17 @@ test.describe( 'Image', () => {
 		);
 		await expect( imageBlock ).toBeVisible();
 
-		await imageBlockUtils.upload(
+		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
+
+		// Wait for upload to complete (includes client-side media processing time).
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ), {
+			timeout: 30_000,
+		} );
 
 		await page.getByLabel( 'Block tools' ).getByLabel( 'Link' ).click();
 
@@ -687,9 +724,17 @@ test.describe( 'Image', () => {
 		);
 		await expect( imageBlock ).toBeVisible();
 
-		await imageBlockUtils.upload(
+		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
+
+		// Wait for upload to complete (includes client-side media processing time).
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ), {
+			timeout: 30_000,
+		} );
 
 		await editor.clickBlockToolbarButton( 'Link' );
 
@@ -803,9 +848,17 @@ test.describe( 'Image', () => {
 		);
 		await expect( imageBlock ).toBeVisible();
 
-		await imageBlockUtils.upload(
+		const fileName = await imageBlockUtils.upload(
 			imageBlock.locator( 'data-testid=form-file-upload-input' )
 		);
+
+		// Wait for upload to complete (includes client-side media processing time).
+		const image = imageBlock.getByRole( 'img', {
+			name: 'This image has an empty alt attribute',
+		} );
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ), {
+			timeout: 30_000,
+		} );
 
 		await page.getByLabel( 'Block tools' ).getByLabel( 'Link' ).click();
 
@@ -1057,7 +1110,10 @@ test.describe( 'Image - Site editor', () => {
 			name: 'This image has an empty alt attribute',
 		} );
 		await expect( image ).toBeVisible();
-		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ) );
+		// Wait for upload to complete (includes client-side media processing time).
+		await expect( image ).toHaveAttribute( 'src', new RegExp( fileName ), {
+			timeout: 30_000,
+		} );
 
 		const regex = new RegExp(
 			`<!-- wp:image {"id":(\\d+),"sizeSlug":"full","linkDestination":"none"} -->

@@ -64,11 +64,11 @@ test.describe( 'Cover', () => {
 
 		// Wait for the img's src attribute to be prefixed with http.
 		// Otherwise, the URL for the img src attribute starts is a placeholder
-		// beginning with `blob`.
+		// beginning with `blob`. Increased timeout for client-side media processing.
 		await expect( async () => {
 			const src = await coverBlock.locator( 'img' ).getAttribute( 'src' );
 			expect( src.includes( fileBasename ) ).toBe( true );
-		} ).toPass();
+		} ).toPass( { timeout: 30_000 } );
 	} );
 
 	test( 'dims background image down by 50% with the average image color when an image is uploaded', async ( {
