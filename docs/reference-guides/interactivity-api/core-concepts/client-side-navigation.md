@@ -164,6 +164,52 @@ If the region was dynamically created via `attachTo` during a previous navigatio
 
 <!-- IMAGE: Three-panel diagram showing the three scenarios. Panel 1 "Update": Same-shaped regions on both pages with a refresh arrow. Panel 2 "Create": Region with attachTo appears from the target page and gets inserted into current page's body. Panel 3 "Remove": Region fades out/disappears from current page. -->
 
+**What happens to HTML outside router regions?**
+
+An important detail to understand is that HTML outside of router regions remains completely untouched during client-side navigation. The router only modifies the content inside the regions it manages—everything else in the DOM stays exactly as it was.
+
+This means that if you have static elements like a site header, footer, or navigation menu that aren't wrapped in a router region, they won't change when the user navigates between pages. This can be intentional (for elements that truly are the same across all pages) or it can be a source of confusion if you expect those elements to update.
+
+However, there's an important exception: **interactive elements outside router regions can still react to global state changes**. If you have an interactive block outside any router region, with directives that use `getServerState()` to read global state, these directives will automatically re-evaluate when navigation brings in new server state.
+
+For example, consider a shopping cart icon in the header that displays the number of items:
+
+```html
+<!-- This header is NOT inside a router region -->
+<header data-wp-interactive="myShop">
+    <div class="cart-icon">
+        <span data-wp-text="state.cartCount"></span> items
+    </div>
+</header>
+
+<!-- This is the router region that updates during navigation -->
+<main
+    data-wp-interactive="myShop"
+    data-wp-router-region="myShop/content"
+>
+    <!-- Page content -->
+</main>
+```
+
+If `state.cartCount` comes from the regular client-side state, the cart icon will not update during navigation—even if the new page has a different cart count in its server state. The header, while being interactive, is outside any router region, so it's not re-rendered.
+
+But if you use `getServerState()` instead:
+
+```js
+const { state } = store( 'myShop', {
+    state: {
+        get cartCount() {
+            // This reacts to server state changes during navigation
+            return getServerState().cartCount;
+        },
+    },
+} );
+```
+
+Now the cart icon will update whenever navigation brings in a new `cartCount` value from the server, even though the header itself is outside any router region. This is because `getServerState()` creates a reactive subscription to server-provided state, which is updated during every navigation.
+
+This pattern is useful for global UI elements that need to stay synchronized with server data across navigations, without requiring them to be inside a router region.
+
 #### CSS handling
 
 One of the trickier aspects of client-side navigation is managing CSS style sheets. Different pages may require different styles, and the router must ensure that the correct styles are active for each page—without causing flashes of unstyled content or breaking the CSS cascade order.
