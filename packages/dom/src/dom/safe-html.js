@@ -4,7 +4,7 @@
 import remove from './remove';
 
 /**
- * Mock the RichTextData to avoid making the `dom` package depend on `rich-text`
+ * Mock to avoid making the `dom` package depend on `rich-text`
  *
  * @typedef {Object} RichTextData
  * @property {Function} toHTMLString Method used for duck typing
@@ -51,7 +51,7 @@ export default function safeHTML( html ) {
  * checker while actually guarding against accidental passing of a
  * non-RichTextData value.
  *
- * @param {any} maybeRichText String-like rich text
+ * @param {any} maybeRichText Either string-like rich text, or an invalid value
  *
  * @return {string} TypeScript-normalized string-like value
  */
