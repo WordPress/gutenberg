@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -45,7 +40,7 @@ export default function InserterModal( props ) {
 	return (
 		<Modal
 			className="wp-block-icon__inserter-modal"
-			title={ __( 'Icon Library' ) }
+			title={ __( 'Icon library' ) }
 			onRequestClose={ () => setInserterOpen( false ) }
 			isFullScreen
 		>
