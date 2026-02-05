@@ -109,6 +109,19 @@ export default function BlockColorContrastChecker( { clientId, name } ) {
 		window.requestAnimationFrame( () =>
 			window.requestAnimationFrame( updateColors )
 		);
+
+		const observer = new window.MutationObserver( () => {
+			window.requestAnimationFrame( updateColors );
+		} );
+
+		observer.observe( blockEl, {
+			attributes: true,
+			attributeFilter: [ 'class', 'style' ],
+		} );
+
+		return () => {
+			observer.disconnect();
+		};
 	} );
 
 	return (
