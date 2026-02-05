@@ -5,6 +5,7 @@ import * as Y from 'yjs';
 import * as encoding from 'lib0/encoding';
 import * as decoding from 'lib0/decoding';
 import type { Awareness } from 'y-protocols/awareness';
+import { removeAwarenessStates } from 'y-protocols/awareness';
 import * as syncProtocol from 'y-protocols/sync';
 
 /**
@@ -162,14 +163,21 @@ function processAwarenessUpdate(
 		}
 	} );
 
-	if ( added.size + updated.size + removed.size > 0 ) {
+	if ( added.size + updated.size > 0 ) {
 		awareness.emit( 'change', [
 			{
 				added: Array.from( added ),
 				updated: Array.from( updated ),
-				removed: Array.from( removed ),
 			},
 		] );
+	}
+
+	if ( removed.size > 0 ) {
+		removeAwarenessStates(
+			awareness,
+			Array.from( removed ),
+			POLLING_MANAGER_ORIGIN
+		);
 	}
 }
 

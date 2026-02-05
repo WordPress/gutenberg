@@ -165,6 +165,8 @@ export abstract class AwarenessState<
 
 		this.hasSetupRun = true;
 
+		this.onSetUp();
+
 		this.on(
 			'change',
 			( { added, removed, updated }: AwarenessStateChange ) => {
@@ -186,8 +188,6 @@ export abstract class AwarenessState<
 				this.updateSubscribers();
 			}
 		);
-
-		this.onSetUp();
 	};
 
 	/**
