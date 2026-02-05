@@ -38,7 +38,6 @@ import type {
 	BlockStyleVariation,
 	BlockType,
 	GlobalStylesConfig,
-	GlobalStylesSettings,
 	GlobalStylesStyles,
 } from '../types';
 
@@ -159,56 +158,6 @@ const BLOCK_SUPPORT_FEATURE_LEVEL_SELECTORS = {
 	spacing: 'spacing',
 	typography: 'typography',
 };
-
-/**
- * Transform given preset tree into a set of style declarations.
- *
- * @param blockPresets   Block presets object
- * @param mergedSettings Merged theme.json settings
- * @return An array of style declarations
- */
-function getPresetsDeclarations(
-	blockPresets: Record< string, any > = {},
-	mergedSettings: GlobalStylesSettings
-): string[] {
-	return PRESET_METADATA.reduce(
-		(
-			declarations: string[],
-			{ path, valueKey, valueFunc, cssVarInfix }: PresetMetadata
-		) => {
-			const presetByOrigin = getValueFromObjectPath(
-				blockPresets,
-				path,
-				[]
-			) as PresetsByOrigin;
-			[ 'default', 'theme', 'custom' ].forEach( ( origin ) => {
-				if ( presetByOrigin[ origin ] ) {
-					presetByOrigin[ origin ].forEach( ( value: any ) => {
-						if ( valueKey && ! valueFunc ) {
-							declarations.push(
-								`--wp--preset--${ cssVarInfix }--${ kebabCase(
-									value.slug
-								) }: ${ value[ valueKey ] }`
-							);
-						} else if (
-							valueFunc &&
-							typeof valueFunc === 'function'
-						) {
-							declarations.push(
-								`--wp--preset--${ cssVarInfix }--${ kebabCase(
-									value.slug
-								) }: ${ valueFunc( value, mergedSettings ) }`
-							);
-						}
-					} );
-				}
-			} );
-
-			return declarations;
-		},
-		[] as string[]
-	);
-}
 
 /**
  * Transform given preset tree into a set of preset class declarations.
@@ -1083,7 +1032,9 @@ export const getNodesWithSettings = (
 		duotoneSelector?: string;
 		fallbackGapValue?: string;
 		hasLayoutSupport?: boolean;
-		featureSelectors?: Record< string, string >;
+		featureSelectors?:
+			| string
+			| Record< string, string | Record< string, string > >;
 		styleVariationSelectors?: Record< string, string >;
 	}[] = [];
 
@@ -1129,6 +1080,8 @@ export const getNodesWithSettings = (
 					presets: blockPresets,
 					custom: blockCustom,
 					selector: blockSelectors[ blockName ]?.selector,
+					featureSelectors:
+						blockSelectors[ blockName ]?.featureSelectors,
 				} );
 			}
 		}
@@ -1137,25 +1090,144 @@ export const getNodesWithSettings = (
 	return nodes;
 };
 
+/**
+ * Resolves the selector for a given block support feature.
+ *
+ * If the block defines a feature-level selector (as a string or an object
+ * with a `root` key), that selector is returned. Otherwise the fallback
+ * selector is used.
+ *
+ * @param {string|Record<string,string|Record<string,string>>|undefined} featureSelectors The block's feature selectors.
+ * @param {string}                                                       featureKey       The feature key to resolve.
+ * @param {string}                                                       fallback         The default selector.
+ * @return {string} The resolved selector.
+ */
+function resolveFeatureSelector(
+	featureSelectors:
+		| string
+		| Record< string, string | Record< string, string > >
+		| undefined,
+	featureKey: string,
+	fallback: string
+): string {
+	if ( ! featureSelectors || typeof featureSelectors === 'string' ) {
+		return fallback;
+	}
+
+	const feature = featureSelectors[ featureKey ];
+	if ( typeof feature === 'string' ) {
+		return feature;
+	}
+	if ( typeof feature === 'object' && feature.root ) {
+		return feature.root;
+	}
+	return fallback;
+}
+
+/**
+ * Collects CSS variable declarations for a single preset metadata entry
+ * across all origins.
+ *
+ * @param {Record<string,any>}             presets           The preset values keyed by origin.
+ * @param {GlobalStylesConfig['settings']} mergedSettings    The merged global styles settings.
+ * @param {Object}                         root0             The preset metadata.
+ * @param {string[]}                       root0.path        Path to the preset values.
+ * @param {string}                         root0.valueKey    Key to read the value from.
+ * @param {Function}                       root0.valueFunc   Function to compute the value.
+ * @param {string}                         root0.cssVarInfix The CSS variable infix string.
+ * @return {string[]} The CSS variable declarations.
+ */
+function getPresetVarDeclarations(
+	presets: Record< string, any >,
+	mergedSettings: GlobalStylesConfig[ 'settings' ],
+	{ path, valueKey, valueFunc, cssVarInfix }: PresetMetadata
+): string[] {
+	const presetByOrigin = getValueFromObjectPath(
+		presets,
+		path,
+		[]
+	) as PresetsByOrigin;
+
+	const declarations: string[] = [];
+	for ( const origin of [ 'default', 'theme', 'custom' ] ) {
+		if ( ! presetByOrigin[ origin ] ) {
+			continue;
+		}
+		for ( const value of presetByOrigin[ origin ] ) {
+			const slug = kebabCase( value.slug );
+			if ( valueKey && ! valueFunc ) {
+				declarations.push(
+					`--wp--preset--${ cssVarInfix }--${ slug }: ${ value[ valueKey ] }`
+				);
+			} else if ( valueFunc && typeof valueFunc === 'function' ) {
+				declarations.push(
+					`--wp--preset--${ cssVarInfix }--${ slug }: ${ valueFunc(
+						value,
+						mergedSettings
+					) }`
+				);
+			}
+		}
+	}
+	return declarations;
+}
+
 export const generateCustomProperties = (
 	tree: GlobalStylesConfig,
 	blockSelectors: BlockSelectors
 ): string => {
-	const settings = getNodesWithSettings( tree, blockSelectors );
+	const nodes = getNodesWithSettings( tree, blockSelectors );
 	let ruleset = '';
-	settings.forEach( ( { presets, custom, selector } ) => {
-		const declarations = tree?.settings
-			? getPresetsDeclarations( presets, tree?.settings )
-			: [];
-		const customProps = flattenTree( custom, '--wp--custom--', '--' );
-		if ( customProps.length > 0 ) {
-			declarations.push( ...customProps );
+
+	for ( const { presets, custom, selector, featureSelectors } of nodes ) {
+		const defaultSelector = selector as string;
+
+		/*
+		 * Group preset declarations by selector. Blocks that define
+		 * feature-level selectors need their preset CSS variables output
+		 * under that feature selector instead of the block's root selector.
+		 */
+		const varsBySelector: Record< string, string[] > = {
+			[ defaultSelector ]: [],
+		};
+
+		if ( tree?.settings ) {
+			for ( const metadata of PRESET_METADATA ) {
+				const declarations = getPresetVarDeclarations(
+					presets,
+					tree.settings,
+					metadata
+				);
+				if ( declarations.length === 0 ) {
+					continue;
+				}
+
+				const target = resolveFeatureSelector(
+					featureSelectors,
+					metadata.path[ 0 ],
+					defaultSelector
+				);
+				if ( ! varsBySelector[ target ] ) {
+					varsBySelector[ target ] = [];
+				}
+				varsBySelector[ target ].push( ...declarations );
+			}
 		}
 
-		if ( declarations.length > 0 ) {
-			ruleset += `${ selector }{${ declarations.join( ';' ) };}`;
+		// Custom properties always use the block's default selector.
+		const customProps = flattenTree( custom, '--wp--custom--', '--' );
+		if ( customProps.length > 0 ) {
+			varsBySelector[ defaultSelector ].push( ...customProps );
 		}
-	} );
+
+		for ( const [ ruleSelector, declarations ] of Object.entries(
+			varsBySelector
+		) ) {
+			if ( declarations.length > 0 ) {
+				ruleset += `${ ruleSelector }{${ declarations.join( ';' ) };}`;
+			}
+		}
+	}
 
 	return ruleset;
 };
