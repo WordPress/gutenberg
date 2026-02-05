@@ -82,24 +82,12 @@
 	padding-top: $grid-unit-20;
 }
 
-// Quick Edit Modal as right-side drawer
 .dataviews-action-modal__quick-edit {
 	justify-content: flex-end;
 	align-items: stretch;
 
-
 	.dataviews-action-modal__quick-edit-header {
 		margin-bottom: $grid-unit-20;
-
-		h1 {
-			font-size: $font-size-x-large;
-			font-weight: 600;
-			margin: 0;
-		}
-	}
-
-	.dataviews-action-modal__quick-edit-description {
-		color: $gray-700;
 	}
 
 	.components-modal__frame {
@@ -136,14 +124,6 @@
 			justify-content: center;
 		}
 	}
-
-	&.is-animating-out .components-modal__frame {
-		animation: none;
-
-		@media (prefers-reduced-motion: no-preference) {
-			animation: quick-edit-slide-out-right 0.1s ease-in;
-		}
-	}
 }
 
 @keyframes quick-edit-slide-in-right {
@@ -152,14 +132,5 @@
 	}
 	to {
 		transform: translateX(0);
-	}
-}
-
-@keyframes quick-edit-slide-out-right {
-	from {
-		transform: translateX(0);
-	}
-	to {
-		transform: translateX(100%);
 	}
 }
