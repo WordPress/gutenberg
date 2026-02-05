@@ -115,15 +115,13 @@ function ListViewBlock( {
 		getBlockRootClientId,
 		getBlockOrder,
 		getBlockParents,
+		getBlockEditingMode,
 		getBlocksByClientId,
 		canEditBlock,
 		canMoveBlock,
 		canRemoveBlocks,
 		isGroupable,
 	} = useSelect( blockEditorStore );
-	const { getBlockEditingMode, getBlockAttributes } = unlock(
-		useSelect( blockEditorStore )
-	);
 	const { getGroupingBlockName } = useSelect( blocksStore );
 
 	const blockInformation = useBlockDisplayInformation( clientId );
