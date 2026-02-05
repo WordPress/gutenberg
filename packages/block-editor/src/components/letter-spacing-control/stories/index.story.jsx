@@ -78,23 +78,3 @@ export const Default = {
 		);
 	},
 };
-
-export const WithCustomWidth = {
-	args: {
-		__next40pxDefaultSize: true,
-		__unstableInputWidth: '100px',
-	},
-	render: function Template( { onChange, ...args } ) {
-		const [ value, setValue ] = useState( '0.1em' );
-		return (
-			<LetterSpacingControl
-				{ ...args }
-				value={ value }
-				onChange={ ( newValue ) => {
-					onChange( newValue );
-					setValue( newValue );
-				} }
-			/>
-		);
-	},
-};
