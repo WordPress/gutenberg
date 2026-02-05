@@ -49,7 +49,7 @@ export default function IconGrid( props ) {
 							<HtmlRenderer
 								html={ icon.content }
 								wrapperProps={ {
-									style: { width: `48px` },
+									style: { width: `24px` },
 								} }
 							/>
 						</span>
