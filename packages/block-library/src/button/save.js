@@ -13,9 +13,15 @@ import {
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 	__experimentalGetShadowClassesAndStyles as getShadowClassesAndStyles,
+	__experimentalGetDimensionsClassesAndStyles as getDimensionsClassesAndStyles,
 	__experimentalGetElementClassName,
 	getTypographyClassesAndStyles,
 } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { getWidthClasses, isPercentageWidth } from './utils';
 
 export default function save( { attributes, className } ) {
 	const {
@@ -28,8 +34,8 @@ export default function save( { attributes, className } ) {
 		text,
 		title,
 		url,
-		width,
 	} = attributes;
+	const { width } = style?.dimensions || {};
 
 	const TagName = tagName || 'a';
 	const isButtonTag = 'button' === TagName;
@@ -38,6 +44,7 @@ export default function save( { attributes, className } ) {
 	const colorProps = getColorClassesAndStyles( attributes );
 	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const shadowProps = getShadowClassesAndStyles( attributes );
+	const dimensionsProps = getDimensionsClassesAndStyles( attributes );
 	const typographyProps = getTypographyClassesAndStyles( attributes );
 	const buttonClasses = clsx(
 		'wp-block-button__link',
@@ -65,12 +72,23 @@ export default function save( { attributes, className } ) {
 	// if it had already been assigned, for the sake of backward-compatibility.
 	// A title will no longer be assigned for new or updated button block links.
 
-	const wrapperClasses = clsx( className, {
-		[ `has-custom-width wp-block-button__width-${ width }` ]: width,
-	} );
+	const wrapperClasses = clsx( className, getWidthClasses( width ) );
+
+	// Apply width styles to wrapper
+	let wrapperStyle = {};
+	if ( width ) {
+		wrapperStyle = isPercentageWidth( width )
+			? { '--wp--block-button--width': parseInt( width, 10 ) }
+			: dimensionsProps.style;
+	}
 
 	return (
-		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
+		<div
+			{ ...useBlockProps.save( {
+				className: wrapperClasses,
+				style: wrapperStyle,
+			} ) }
+		>
 			<RichText.Content
 				tagName={ TagName }
 				type={ isButtonTag ? buttonType : null }

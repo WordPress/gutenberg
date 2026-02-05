@@ -60,6 +60,67 @@ function render_block_core_button( $attributes, $content ) {
 		return '';
 	}
 
+	$width = $attributes['style']['dimensions']['width'] ?? null;
+
+	if ( $width ) {
+		// Resolve preset references to their actual values.
+		$resolved_width = $width;
+		$is_preset      = str_starts_with( $width, 'var:preset|dimension|' );
+
+		if ( $is_preset ) {
+			$slug              = substr( $width, strlen( 'var:preset|dimension|' ) );
+			$dimension_presets = wp_get_global_settings(
+				array( 'dimensions', 'dimensionSizes' ),
+				array( 'block_name' => 'core/button' )
+			);
+
+			// Search origins in priority order: custom > theme > default.
+			if ( is_array( $dimension_presets ) ) {
+				foreach ( array( 'custom', 'theme', 'default' ) as $origin ) {
+					if ( empty( $dimension_presets[ $origin ] ) || ! is_array( $dimension_presets[ $origin ] ) ) {
+						continue;
+					}
+					foreach ( $dimension_presets[ $origin ] as $preset ) {
+						if ( isset( $preset['slug'] ) && $preset['slug'] === $slug ) {
+							$resolved_width = $preset['size'] ?? $width;
+							break 2;
+						}
+					}
+				}
+			}
+		}
+
+		$is_percentage = str_ends_with( $resolved_width, '%' );
+
+		$p = new WP_HTML_Tag_Processor( $content );
+		// Target the outer wrapper div.
+		if ( $p->next_tag( array( 'class_name' => 'wp-block-button' ) ) ) {
+			if ( $is_percentage ) {
+				$numeric_width = (int) $resolved_width;
+				$p->add_class( 'wp-block-button__width' );
+
+				// Maintain legacy class for the standard percentage widths.
+				$legacy_widths = array( 25, 50, 75, 100 );
+				if ( in_array( $numeric_width, $legacy_widths, true ) ) {
+					$p->add_class( 'wp-block-button__width-' . $numeric_width );
+				}
+
+				$existing_style = $p->get_attribute( 'style' ) ?? '';
+				$width_style    = "--wp--block-button--width: $numeric_width;";
+				$p->set_attribute( 'style', $width_style . ( $existing_style ? ' ' . $existing_style : '' ) );
+			} else {
+				$css_value      = $is_preset
+					? 'var(--wp--preset--dimension--' . $slug . ')'
+					: $resolved_width;
+				$existing_style = $p->get_attribute( 'style' ) ?? '';
+				$width_style    = "width: $css_value;";
+				$p->set_attribute( 'style', $width_style . ( $existing_style ? ' ' . $existing_style : '' ) );
+			}
+
+			$content = $p->get_updated_html();
+		}
+	}
+
 	return $content;
 }
 
