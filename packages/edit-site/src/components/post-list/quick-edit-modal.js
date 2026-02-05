@@ -1,17 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
-	Icon,
 	Modal,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
-	__experimentalText as Text,
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import {
@@ -19,8 +17,6 @@ import {
 	store as editorStore,
 } from '@wordpress/editor';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { close } from '@wordpress/icons';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -28,27 +24,9 @@ import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { unlock } from '../../lock-unlock';
 import usePatternSettings from '../page-patterns/use-pattern-settings';
 
-const { usePostFields } = unlock( editorPrivateApis );
+const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
-
-function getModalHeader( items, postTypeLabel ) {
-	if ( items.length === 1 ) {
-		let title = items[ 0 ]?.title;
-		if ( typeof title === 'object' ) {
-			title = title?.rendered || title?.raw;
-		}
-
-		return stripHTML( title || __( '(no title)' ) );
-	}
-
-	return sprintf(
-		// translators: %1$d number of selected items %2$s: Name of the plural post type e.g: "Posts".
-		__( '%1$d %2$s' ),
-		items.length,
-		postTypeLabel?.name
-	);
-}
 
 export function QuickEditModal( { postType, items, closeModal } ) {
 	const ids = useMemo( () => items.map( ( item ) => item.id ), [ items ] );
@@ -84,38 +62,37 @@ export function QuickEditModal( { postType, items, closeModal } ) {
 
 	const isBulk = ids.length > 1;
 
-	const { record, postTypeLabel, postTypeIcon, hasFinishedResolution } =
-		useSelect(
-			( select ) => {
-				const {
-					getEditedEntityRecord,
-					hasFinishedResolution: hasFinished,
-					getPostType,
-				} = select( coreDataStore );
-				const { getPostIcon } = unlock( select( editorStore ) );
+	const { record, hasFinishedResolution } = useSelect(
+		( select ) => {
+			const {
+				getEditedEntityRecord,
+				hasFinishedResolution: hasFinished,
+				getPostType,
+			} = select( coreDataStore );
+			const { getPostIcon } = unlock( select( editorStore ) );
 
-				if ( isBulk ) {
-					return {
-						record: null,
-						postTypeLabel: getPostType( postType )?.labels,
-						postTypeIcon: getPostIcon( postType ),
-						hasFinishedResolution: true,
-					};
-				}
-
-				const args = [ 'postType', postType, ids[ 0 ] ];
+			if ( isBulk ) {
 				return {
-					record: getEditedEntityRecord( ...args ),
-					postTypeLabel: '',
+					record: null,
+					postTypeLabel: getPostType( postType )?.labels,
 					postTypeIcon: getPostIcon( postType ),
-					hasFinishedResolution: hasFinished(
-						'getEditedEntityRecord',
-						args
-					),
+					hasFinishedResolution: true,
 				};
-			},
-			[ postType, ids, isBulk ]
-		);
+			}
+
+			const args = [ 'postType', postType, ids[ 0 ] ];
+			return {
+				record: getEditedEntityRecord( ...args ),
+				postTypeLabel: '',
+				postTypeIcon: getPostIcon( postType ),
+				hasFinishedResolution: hasFinished(
+					'getEditedEntityRecord',
+					args
+				),
+			};
+		},
+		[ postType, ids, isBulk ]
+	);
 
 	const [ multiEdits, setMultiEdits ] = useState( {} );
 	const { editEntityRecord, saveEditedEntityRecord } =
@@ -264,36 +241,12 @@ export function QuickEditModal( { postType, items, closeModal } ) {
 			shouldCloseOnClickOutside={ false }
 		>
 			<div className="dataviews-action-modal__quick-edit-header">
-				<HStack justify="space-between" align="center">
-					<Icon
-						className="editor-post-card-panel__icon"
-						icon={ postTypeIcon }
-					/>
-					<Text
-						id={ titleId }
-						numberOfLines={ 2 }
-						truncate
-						className="editor-post-card-panel__title"
-						as="h2"
-					>
-						{ getModalHeader( items, postTypeLabel ) }
-					</Text>
-					<Button
-						size="compact"
-						icon={ close }
-						label={ __( 'Close' ) }
-						onClick={ closeModal }
-					/>
-				</HStack>
-				{ ids.length > 1 && (
-					<Text className="dataviews-action-modal__quick-edit-description">
-						{ sprintf(
-							// translators: %s: Name of the plural post type e.g: "Posts".
-							__( 'Changes will be applied to all selected %s.' ),
-							postTypeLabel?.name.toLowerCase()
-						) }
-					</Text>
-				) }
+				<PostCardPanel
+					postType={ postType }
+					postId={ ids }
+					onClose={ closeModal }
+					hideActions
+				/>
 			</div>
 			<VStack
 				spacing={ 4 }

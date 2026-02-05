@@ -9,7 +9,7 @@ import {
 	__experimentalText as Text,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { moreVertical } from '@wordpress/icons';
+import { moreVertical, close } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -36,13 +36,17 @@ const { Badge } = unlock( componentsPrivateApis );
  * @param {Object}          props                     - Component props.
  * @param {string}          [props.postType]          - The post type string.
  * @param {string|string[]} [props.postId]            - The post id or list of post ids.
+ * @param {boolean}         [props.hideActions]       - Whether to hide the actions. False by default.
  * @param {Function}        [props.onActionPerformed] - A callback function for when a quick action is performed.
+ * @param {Function}        [props.onClose]           - A callback function for when the close button is clicked.
  * @return {React.ReactNode} The rendered component.
  */
 export default function PostCardPanel( {
 	postType,
 	postId,
+	hideActions = false,
 	onActionPerformed,
+	onClose,
 } ) {
 	const postIds = useMemo(
 		() => ( Array.isArray( postId ) ? postId : [ postId ] ),
@@ -141,7 +145,7 @@ export default function PostCardPanel( {
 						<Badge>{ pageTypeBadge }</Badge>
 					) }
 				</Text>
-				{ postIds.length === 1 && (
+				{ ! hideActions && postIds.length === 1 && (
 					<>
 						{ isRevision ? (
 							<Button
@@ -160,6 +164,14 @@ export default function PostCardPanel( {
 							/>
 						) }
 					</>
+				) }
+				{ onClose && (
+					<Button
+						size="small"
+						icon={ close }
+						label={ __( 'Close' ) }
+						onClick={ onClose }
+					/>
 				) }
 			</HStack>
 			{ postIds.length > 1 && (
