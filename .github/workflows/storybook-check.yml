@@ -39,7 +39,9 @@ jobs:
 
             - name: Install test-runner and Playwright dependencies
               run: |
-                  npm install --no-save @storybook/test-runner@0.24.2
+                  # storybook and playwright are needed as peer dependencies of @storybook/test-runner for pnpm
+                  STORYBOOK_VERSION=$(node -p "require('./storybook/package.json').devDependencies.storybook")
+                  npm install --no-save "storybook@$STORYBOOK_VERSION" @storybook/test-runner@0.24.2 playwright
                   npx playwright install --with-deps
 
             - name: Serve Storybook and run tests
