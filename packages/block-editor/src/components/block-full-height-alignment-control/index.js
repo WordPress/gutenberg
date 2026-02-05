@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
-import { fullscreen } from '@wordpress/icons';
+import { fullheight } from '@wordpress/icons';
 
 function BlockFullHeightAlignmentControl( {
 	isActive,
@@ -14,7 +14,7 @@ function BlockFullHeightAlignmentControl( {
 	return (
 		<ToolbarButton
 			isActive={ isActive }
-			icon={ fullscreen }
+			icon={ fullheight }
 			label={ label }
 			onClick={ () => onToggle( ! isActive ) }
 			disabled={ isDisabled }
