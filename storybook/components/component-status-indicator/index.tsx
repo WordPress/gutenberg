@@ -1,5 +1,4 @@
 import { Markdown, useOf } from '@storybook/addon-docs/blocks';
-import type { Parameters } from 'storybook/internal/types';
 import { statuses } from './statuses';
 
 export function ComponentStatusIndicator() {
@@ -10,8 +9,7 @@ export function ComponentStatusIndicator() {
 	}
 
 	const { parameters } = resolvedOf.preparedMeta;
-	const componentStatus =
-		parameters?.componentStatus as Parameters[ 'componentStatus' ];
+	const componentStatus = parameters?.componentStatus;
 
 	if ( ! componentStatus?.status ) {
 		return null;
