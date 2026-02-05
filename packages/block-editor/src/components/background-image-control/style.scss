@@ -124,7 +124,6 @@
 
 	// Without this, the ellipsis can sometimes be partially hidden by the Button padding.
 	text-align: start;
-	text-align-last: center;
 }
 
 .block-editor-global-styles-background-panel__inspector-preview-inner {
@@ -137,11 +136,20 @@
 
 .block-editor-global-styles-background-panel__inspector-image-indicator {
 	background-size: cover;
-	border-radius: $radius-round;
+	border-radius: $radius-small;
 	width: 20px;
 	height: 20px;
 	display: block;
 	position: relative;
+
+	// Show a thin outline in Windows high contrast mode, otherwise the button is invisible.
+	border: 1px solid transparent;
+	&.has-image {
+		background-image: var(--wp-admin-background-image-preview-url);
+	}
+	&.has-image::after {
+		background: unset;
+	}
 }
 
 .block-editor-global-styles-background-panel__inspector-image-indicator::after {
@@ -151,10 +159,9 @@
 	left: -1px;
 	bottom: -1px;
 	right: -1px;
-	border-radius: $radius-round;
+	border-radius: $radius-small;
 	box-shadow: inset 0 0 0 $border-width rgba(0, 0, 0, 0.2);
-	// Show a thin outline in Windows high contrast mode, otherwise the button is invisible.
-	border: 1px solid transparent;
+	background: #fff linear-gradient(-45deg, #0000 48%, #ddd 0, #ddd 52%, #0000 0);
 	box-sizing: inherit;
 }
 
