@@ -8,8 +8,8 @@ export default function ContentHeader( props ) {
 	const { searchInput, setSearchInput, shownIconsCount } = props;
 
 	return (
-		<div className="icon-inserter__content-header">
-			<div className="icon-inserter__content-header__search">
+		<div className="wp-block-icon__inserter-content-header">
+			<div className="wp-block-icon__inserter-content-header-search">
 				<SearchControl
 					value={ searchInput }
 					onChange={ setSearchInput }
