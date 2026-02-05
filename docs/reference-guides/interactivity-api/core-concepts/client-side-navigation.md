@@ -22,61 +22,41 @@ This approach offers several benefits:
 - **Smooth transitions**: No flash of white screen between pages; transitions feel instant and app-like.
 - **SEO-friendly**: Since the server still renders complete HTML pages, search engines can crawl your site normally.
 
-## Getting started with the Interactivity Router
+### In depth
 
-The `@wordpress/interactivity-router` package is bundled with WordPress Core since version 6.5. To use it in your interactive blocks, you need to:
+This section explains the client-side navigation algorithm in more detail. You can skip to [Using the Interactivity API router](#using-the-interactivity-api-router) if you're more interested in practical usage.
 
-1. **Add the dependency**: Ensure `@wordpress/interactivity-router` is listed as a dependency for your script module.
-2. **Define router regions**: Mark the HTML elements that should be updated during navigation.
-3. **Trigger navigation**: Use the `actions.navigate()` function to navigate programmatically.
+#### Router regions
 
-### Dynamic imports for optimal performance
+Router regions are the fundamental building blocks of client-side navigation. They define which parts of the page should be updated during navigation.
 
-The recommended pattern is to import the router package dynamically to reduce the initial JavaScript bundle size. The router is only loaded when navigation is actually needed:
+**How router regions are defined:**
 
-```js
-import { store, withSyncEvent } from '@wordpress/interactivity';
+Router regions are defined using the `data-wp-router-region` directive. The value can be either:
 
-store( 'myPlugin', {
-	actions: {
-		// Use withSyncEvent because we need to call preventDefault().
-		goToPage: withSyncEvent( function* ( event ) {
-			event.preventDefault();
-
-			// Dynamically import the router when needed.
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
-			yield actions.navigate( event.target.href );
-		} ),
-	},
-} );
-```
-
-_Note: Actions that need to call synchronous event methods like `event.preventDefault()` must wrap the handler with `withSyncEvent()`. See the [withSyncEvent() documentation](/docs/reference-guides/interactivity-api/directives-and-store.md#withsyncevent) for details._
-
-## Defining router regions
-
-Router regions are sections of your page that will be updated during client-side navigation. You define them using the `data-wp-router-region` directive.
-
-### Basic usage
-
-To create a router region, add the `data-wp-router-region` directive to an element that also has `data-wp-interactive`:
-
-```html
-<div
+1. A simple string ID:
+   ```html
+   <div
 	data-wp-interactive="myPlugin"
 	data-wp-router-region="main-content"
->
-	<!-- This content will be replaced during navigation -->
-	<h1>Page Title</h1>
-	<p>Page content goes here...</p>
-</div>
-```
+   >
+	<!-- Region content -->
+   </div>
+   ```
 
-The value of `data-wp-router-region` must be a unique identifier for that region. When navigating to a new page, the router will find regions with matching IDs and replace their content.
+2. A JSON object with `id` and optional `attachTo` property:
+   ```html
+   <div
+	data-wp-interactive="myPlugin"
+	data-wp-router-region='{ "id": "my-modal", "attachTo": "body" }'
+   >
+	<!-- Region content -->
+   </div>
+   ```
 
-### Requirements for router regions
+The region ID must be unique within the page and consistent across pages that share the same region.
+
+**Where router regions can appear:**
 
 For a router region to work correctly:
 
@@ -103,309 +83,225 @@ For a router region to work correctly:
 </div>
 ```
 
-### How regions are matched during navigation
+**How regions are handled:**
 
-When navigating between pages, the router compares regions:
+_During fetch (`prefetch()` or `navigate()`):_
 
-- **Region exists on both pages**: The content is updated with the new page's content.
-- **Region exists only on the new page (without `attachTo`)**: The region is not added to the DOM.
-- **Region exists only on the new page (with `attachTo`)**: The region is created and appended to the specified parent.
-- **Region exists only on the current page**: The region is removed from the DOM.
+1. **Regions are identified**: The router scans the fetched HTML for all elements with `data-wp-router-region`.
+2. **Regions are converted to virtual DOM**: Each region's HTML (including the region element itself) is converted into a virtual DOM representation. This means directives on the region element, such as `data-wp-context`, will also be processed and updated during navigation.
+3. **Regions are cached**: Each region is stored in the page cache with its corresponding ID.
 
-## Using the navigate action
+_On `navigate()`:_
 
-The `navigate` action is the primary way to trigger client-side navigation programmatically.
+1. **Regions are located in the current page**: The router finds all existing regions by their IDs.
+2. **Existing regions are updated**: If a region exists in both the current page and the target page, its content is updated with the new virtual DOM using Preact's diffing algorithm.
+3. **New regions with `attachTo` are created**: If a region exists in the target page but not the current page, and it has an `attachTo` selector, the region is created and appended to the specified element.
+4. **Orphaned regions are removed**: Regions that exist only in the current page are removed from the DOM.
 
-### Basic navigation
+#### CSS handling
+
+The router carefully manages style sheets during navigation to ensure pages are styled correctly while minimizing network requests and avoiding flash of unstyled content.
+
+**On `prefetch()`:**
+
+1. **Styles are extracted**: The router extracts all `<link rel="stylesheet">` and `<style>` elements from the fetched HTML.
+2. **Styles are compared**: Extracted styles are compared with those already present in the current page.
+3. **New styles are added**: Style sheets that don't exist in the current page are added to the document with `media="not all"` (for `<link>` elements) so they are loaded but not applied yet. The router uses a [Shortest Common Supersequence](https://en.wikipedia.org/wiki/Shortest_common_supersequence) algorithm to add new style sheets while preserving CSS cascade order.
+4. **Styles are recorded**: Both existing and newly added styles related to this page are recorded for later activation.
+
+**On `navigate()`:**
+
+1. **Styles are toggled**: The router enables or disables style sheets based on whether they belong to the page being navigated to:
+   - Styles needed by the new page have their `media` attribute restored (enabled).
+   - Styles not needed by the new page have their `media` attribute set to `not all` (disabled).
+
+This approach ensures that:
+- Style sheets are only loaded once, even if multiple pages use them.
+- CSS cascade order is maintained correctly.
+- Styles are ready before the page renders, preventing flash of unstyled content.
+
+#### Script module handling
+
+Script modules (ES modules loaded via `<script type="module">`) are managed to ensure all necessary JavaScript is available for the new page's interactive features.
+
+**On `prefetch()`:**
+
+1. **Script modules are located**: The router identifies script modules in the fetched HTML that should be loaded during client-side navigation. These are marked with `data-wp-router-options='{"loadOnClientNavigation": true}'`.
+2. **Import map is processed**: The import map from the fetched page is parsed to resolve module dependencies.
+3. **Modules are fetched and cached**: Script modules and their dependencies are fetched and cached by the browser's module system.
+
+**On `navigate()`:**
+
+1. **Cached modules are imported**: The router imports the cached script modules using dynamic `import()`.
+2. **Modules are evaluated**: Each module is evaluated, initializing any stores or callbacks it contains.
+3. **Deduplication is automatic**: Because modules are cached by the browser, importing the same module multiple times returns the cached version, ensuring each module is only evaluated once.
+
+#### Server state and context
+
+Server-rendered state and context are preserved and synchronized during navigation to maintain consistency between server and client.
+
+**On `prefetch()`:**
+
+1. **Global state is extracted**: Server state (from `wp_interactivity_state()`) is extracted from the fetched HTML.
+2. **Local context is extracted**: Context values (from `data-wp-context` attributes) are extracted as part of each router region's virtual DOM.
+3. **Data is cached**: Both state and context are stored in the page cache.
+
+**On `navigate()`:**
+
+1. **State and context are merged**: The server-provided state and context from the target page are merged with the existing client state.
+2. **Reactive updates occur**: Components subscribed to the state or context will automatically re-render.
+3. **Use `getServerState()` and `getServerContext()`**: To react to server-provided changes specifically, use these functions in your callbacks. See the [Understanding global state, local context and derived state](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md#subscribing-to-server-state-and-context) guide for details.
+
+## Getting started with the Interactivity Router
+
+The `@wordpress/interactivity-router` package is bundled with WordPress Core since version 6.5. To use it in your interactive blocks, you need to:
+
+1. **Add the dependency**: Ensure `@wordpress/interactivity-router` is listed as a dependency for your script module.
+2. **Define router regions**: Mark the HTML elements that should be updated during navigation.
+3. **Trigger navigation**: Use the `actions.navigate()` function to navigate programmatically.
+
+### Setting up router regions
+
+First, define router regions in your block's markup:
+
+```php
+// render.php
+<div
+    <?php echo get_block_wrapper_attributes(); ?>
+    data-wp-interactive="myPlugin"
+    data-wp-router-region="myPlugin/posts-list"
+>
+    <?php foreach ( $posts as $post ) : ?>
+        <article>
+            <h2><?php echo esc_html( $post->post_title ); ?></h2>
+            <p><?php echo esc_html( $post->post_excerpt ); ?></p>
+        </article>
+    <?php endforeach; ?>
+</div>
+```
+
+### Implementing navigation
+
+Use `navigate()` to handle link clicks:
 
 ```js
+// view.js
 import { store, withSyncEvent } from '@wordpress/interactivity';
 
 store( 'myPlugin', {
-	actions: {
-		handleLinkClick: withSyncEvent( function* ( event ) {
-			event.preventDefault();
+    actions: {
+        navigateTo: withSyncEvent( function* ( event ) {
+            event.preventDefault();
 
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
-			yield actions.navigate( event.target.href );
-		} ),
-	},
+            const { actions } = yield import(
+                '@wordpress/interactivity-router'
+            );
+            yield actions.navigate( event.target.href );
+        } ),
+    },
 } );
 ```
 
 ```html
 <a
-	data-wp-on--click="actions.handleLinkClick"
-	href="/another-page/"
+    data-wp-on--click="actions.navigateTo"
+    href="/page-2/"
 >
-	Go to another page
+    Go to Page 2
 </a>
 ```
 
-### Navigation options
+_Note: The `withSyncEvent()` wrapper is required for actions that need to call synchronous event methods like `event.preventDefault()`. See the [withSyncEvent() documentation](/docs/reference-guides/interactivity-api/directives-and-store.md#withsyncevent) for details._
 
-The `navigate` function accepts an optional second parameter with configuration options:
+### Implementing prefetching
 
-```js
-yield actions.navigate( href, {
-	force: false, // Re-fetch even if the page is cached
-	replace: false, // Replace current history entry instead of adding new one
-	timeout: 10000, // Abort navigation after this many milliseconds
-	loadingAnimation: true, // Show loading animation during navigation
-	screenReaderAnnouncement: true, // Announce navigation to screen readers
-	html: null, // Provide HTML directly instead of fetching
-} );
-```
-
-#### Option details
-
-| Option                     | Type    | Default | Description                                                       |
-| -------------------------- | ------- | ------- | ----------------------------------------------------------------- |
-| `force`                    | boolean | `false` | Force re-fetching the page even if it's already cached            |
-| `replace`                  | boolean | `false` | Replace the current browser history entry instead of adding a new one |
-| `timeout`                  | number  | `10000` | Maximum time (in ms) to wait for the navigation before aborting   |
-| `loadingAnimation`         | boolean | `true`  | Whether to show the loading animation during navigation           |
-| `screenReaderAnnouncement` | boolean | `true`  | Whether to announce navigation status to screen readers           |
-| `html`                     | string  | `null`  | HTML string to use instead of fetching from the URL               |
-
-### Example: Navigation with custom options
+Use `prefetch()` to load pages before navigation:
 
 ```js
+// view.js
+import { store, withSyncEvent } from '@wordpress/interactivity';
+
 store( 'myPlugin', {
-	actions: {
-		navigateWithReplace: withSyncEvent( function* ( event ) {
-			event.preventDefault();
+    actions: {
+        prefetchPage: function* ( event ) {
+            const { actions } = yield import(
+                '@wordpress/interactivity-router'
+            );
+            yield actions.prefetch( event.target.href );
+        },
 
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
+        navigateTo: withSyncEvent( function* ( event ) {
+            event.preventDefault();
 
-			// Replace history entry and use a shorter timeout.
-			yield actions.navigate( event.target.href, {
-				replace: true,
-				timeout: 5000,
-			} );
-		} ),
-	},
-} );
-```
-
-## Prefetching pages
-
-Prefetching allows you to load a page's content before the user actually navigates to it. This makes subsequent navigation feel instant.
-
-### Basic prefetching
-
-```js
-store( 'myPlugin', {
-	actions: {
-		*prefetchPage( event ) {
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
-			yield actions.prefetch( event.target.href );
-		},
-	},
+            const { actions } = yield import(
+                '@wordpress/interactivity-router'
+            );
+            yield actions.navigate( event.target.href );
+        } ),
+    },
 } );
 ```
 
 ```html
 <a
-	data-wp-on--mouseenter="actions.prefetchPage"
-	data-wp-on--click="actions.handleLinkClick"
-	href="/another-page/"
+    data-wp-on--mouseenter="actions.prefetchPage"
+    data-wp-on--click="actions.navigateTo"
+    href="/page-2/"
 >
-	Hover to prefetch
+    Hover to prefetch, click to navigate
 </a>
 ```
 
-### Prefetch options
+### Complete example: Pagination
 
-| Option  | Type    | Default | Description                                           |
-| ------- | ------- | ------- | ----------------------------------------------------- |
-| `force` | boolean | `false` | Force re-fetching even if the page is already cached  |
-| `html`  | string  | `null`  | HTML string to use instead of fetching from the URL   |
-
-### Example: Prefetch on hover with force reload
-
-```js
-store( 'myPlugin', {
-	actions: {
-		*prefetchFresh( event ) {
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
-			// Always fetch fresh content, ignore cache.
-			yield actions.prefetch( event.target.href, { force: true } );
-		},
-	},
-} );
-```
-
-## Router state
-
-The Interactivity Router exposes reactive state that you can use in your directives:
-
-```js
-const { state } = store( 'core/router', {
-	state: {
-		url: window.location.href,
-		navigation: {
-			hasStarted: false,
-			hasFinished: false,
-		},
-	},
-} );
-```
-
-### Available state properties
-
-| Property                    | Type    | Description                                     |
-| --------------------------- | ------- | ----------------------------------------------- |
-| `state.url`                 | string  | The current URL, synchronized with browser location |
-| `state.navigation.hasStarted`  | boolean | `true` when a navigation has started            |
-| `state.navigation.hasFinished` | boolean | `true` when a navigation has completed          |
-
-### Example: Showing a loading indicator
-
-```html
-<div data-wp-interactive="myPlugin">
-	<div
-		data-wp-class--is-loading="state.navigation.hasStarted"
-		data-wp-class--is-loaded="state.navigation.hasFinished"
-	>
-		<span data-wp-bind--hidden="!state.navigation.hasStarted">
-			Loading...
-		</span>
-		<!-- Page content -->
-	</div>
-</div>
-```
-
-```css
-.is-loading {
-	opacity: 0.5;
-	pointer-events: none;
-}
-```
-
-## Dynamic regions with attachTo
-
-The `attachTo` property allows you to create regions that can be dynamically added to any part of the DOM, even if they don't exist on the initial page. This is useful for elements like modals, overlays, or sidebars that appear only on certain pages.
-
-### Using attachTo
-
-Instead of a simple string ID, pass a JSON object with `id` and `attachTo` properties:
-
-```html
-<div
-	data-wp-interactive="myPlugin"
-	data-wp-router-region='{ "id": "my-modal", "attachTo": "body" }'
->
-	<div class="modal">
-		<!-- Modal content -->
-	</div>
-</div>
-```
-
-The `attachTo` value is a CSS selector pointing to the parent element where the region should be appended.
-
-### How attachTo works
-
-- If the region with `attachTo` exists on the new page but not the current page, it is created and appended to the element matching the `attachTo` selector.
-- If the region exists on both pages, the content is updated (and `attachTo` is ignored).
-- If the region exists on the current page but not the new page, it is removed from the DOM.
-- If the region with `attachTo` is present on the initial page load, it is treated as a regular region (the `attachTo` property is ignored for the initial page).
-
-### Example: Modal that appears on navigation
-
-**Page 1 (no modal):**
-```html
-<div data-wp-interactive="myPlugin" data-wp-router-region="main">
-	<h1>Page without modal</h1>
-	<a
-		data-wp-on--click="actions.navigate"
-		href="/page-with-modal/"
-	>
-		Open page with modal
-	</a>
-</div>
-```
-
-**Page 2 (with modal):**
-```html
-<div data-wp-interactive="myPlugin" data-wp-router-region="main">
-	<h1>Page with modal</h1>
-</div>
-
-<!-- Modal region that will be appended to body -->
-<div
-	data-wp-interactive="myPlugin"
-	data-wp-router-region='{ "id": "myPlugin/modal", "attachTo": "body" }'
->
-	<div class="modal-overlay">
-		<div class="modal-content">
-			<h2>I'm a modal!</h2>
-			<a
-				data-wp-on--click="actions.navigate"
-				href="/page-without-modal/"
-			>
-				Close
-			</a>
-		</div>
-	</div>
-</div>
-```
-
-When navigating from Page 1 to Page 2, the modal region is created and appended to `body`. When navigating back to Page 1, the modal is removed.
-
-## Practical examples
-
-### Example 1: Simple pagination
-
-This example shows how to implement client-side pagination for a list of posts.
+Here's a complete example implementing client-side pagination:
 
 **PHP (render.php):**
 ```php
 <?php
-$current_page = isset( $_GET['paged'] ) ? (int) $_GET['paged'] : 1;
-$posts = new WP_Query( array(
-	'paged' => $current_page,
-	'posts_per_page' => 5,
+$current_page = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
+$query = new WP_Query( array(
+    'paged'          => $current_page,
+    'posts_per_page' => 5,
 ) );
 ?>
 
 <div
-	data-wp-interactive="myPagination"
-	data-wp-router-region="posts-list"
+    <?php echo get_block_wrapper_attributes(); ?>
+    data-wp-interactive="myPagination"
+    data-wp-router-region="myPagination/posts"
 >
-	<ul class="posts-list">
-		<?php while ( $posts->have_posts() ) : $posts->the_post(); ?>
-			<li><?php the_title(); ?></li>
-		<?php endwhile; ?>
-	</ul>
+    <ul class="posts-list">
+        <?php while ( $query->have_posts() ) : $query->the_post(); ?>
+            <li>
+                <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+            </li>
+        <?php endwhile; wp_reset_postdata(); ?>
+    </ul>
 
-	<nav class="pagination">
-		<?php if ( $current_page > 1 ) : ?>
-			<a
-				data-wp-on--click="actions.navigate"
-				href="?paged=<?php echo $current_page - 1; ?>"
-			>
-				Previous
-			</a>
-		<?php endif; ?>
+    <nav class="pagination">
+        <?php if ( $current_page > 1 ) : ?>
+            <a
+                data-wp-on--mouseenter="actions.prefetch"
+                data-wp-on--click="actions.navigate"
+                href="?paged=<?php echo $current_page - 1; ?>"
+            >
+                &larr; Previous
+            </a>
+        <?php endif; ?>
 
-		<?php if ( $posts->max_num_pages > $current_page ) : ?>
-			<a
-				data-wp-on--click="actions.navigate"
-				href="?paged=<?php echo $current_page + 1; ?>"
-			>
-				Next
-			</a>
-		<?php endif; ?>
-	</nav>
+        <span>Page <?php echo $current_page; ?></span>
+
+        <?php if ( $query->max_num_pages > $current_page ) : ?>
+            <a
+                data-wp-on--mouseenter="actions.prefetch"
+                data-wp-on--click="actions.navigate"
+                href="?paged=<?php echo $current_page + 1; ?>"
+            >
+                Next &rarr;
+            </a>
+        <?php endif; ?>
+    </nav>
 </div>
 ```
 
@@ -414,400 +310,340 @@ $posts = new WP_Query( array(
 import { store, withSyncEvent } from '@wordpress/interactivity';
 
 store( 'myPagination', {
-	actions: {
-		navigate: withSyncEvent( function* ( event ) {
-			event.preventDefault();
+    actions: {
+        prefetch: function* ( event ) {
+            const { actions } = yield import(
+                '@wordpress/interactivity-router'
+            );
+            yield actions.prefetch( event.target.href );
+        },
 
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
-			yield actions.navigate( event.target.href );
+        navigate: withSyncEvent( function* ( event ) {
+            event.preventDefault();
 
-			// Scroll to top after navigation.
-			window.scrollTo( { top: 0, behavior: 'smooth' } );
-		} ),
-	},
+            const { actions } = yield import(
+                '@wordpress/interactivity-router'
+            );
+            yield actions.navigate( event.target.href );
+
+            // Scroll to top after navigation.
+            window.scrollTo( { top: 0, behavior: 'smooth' } );
+        } ),
+    },
 } );
 ```
 
-### Example 2: Tab-based navigation with state preservation
+## More advanced use cases
 
-This example demonstrates tabs where the active tab content loads via client-side navigation while preserving local state.
+### Adding new regions on navigation
 
-**PHP (render.php):**
-```php
-<?php
-$active_tab = isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'overview';
-$base_url = get_permalink();
-?>
+The `attachTo` option allows router regions to be dynamically added to the DOM when navigating to a page where they exist, even if they weren't present on the original page. This is useful for modals, sidebars, or other UI elements that appear only on certain pages.
 
-<div
-	data-wp-interactive="myTabs"
-	data-wp-router-region="tabbed-content"
-	data-wp-context='{ "lastVisited": "" }'
->
-	<nav class="tabs-nav">
-		<a
-			data-wp-on--click="actions.switchTab"
-			data-wp-class--active="<?php echo $active_tab === 'overview' ? 'true' : 'false'; ?>"
-			href="<?php echo esc_url( add_query_arg( 'tab', 'overview', $base_url ) ); ?>"
-		>
-			Overview
-		</a>
-		<a
-			data-wp-on--click="actions.switchTab"
-			data-wp-class--active="<?php echo $active_tab === 'details' ? 'true' : 'false'; ?>"
-			href="<?php echo esc_url( add_query_arg( 'tab', 'details', $base_url ) ); ?>"
-		>
-			Details
-		</a>
-		<a
-			data-wp-on--click="actions.switchTab"
-			data-wp-class--active="<?php echo $active_tab === 'reviews' ? 'true' : 'false'; ?>"
-			href="<?php echo esc_url( add_query_arg( 'tab', 'reviews', $base_url ) ); ?>"
-		>
-			Reviews
-		</a>
-	</nav>
-
-	<div class="tab-content">
-		<?php if ( $active_tab === 'overview' ) : ?>
-			<h2>Overview</h2>
-			<p>Product overview content...</p>
-		<?php elseif ( $active_tab === 'details' ) : ?>
-			<h2>Details</h2>
-			<p>Product details content...</p>
-		<?php else : ?>
-			<h2>Reviews</h2>
-			<p>Product reviews content...</p>
-		<?php endif; ?>
-	</div>
-
-	<p data-wp-text="state.visitMessage"></p>
-</div>
-```
-
-**JavaScript (view.js):**
-```js
-import { store, getContext, withSyncEvent } from '@wordpress/interactivity';
-
-const { state } = store( 'myTabs', {
-	state: {
-		get visitMessage() {
-			const { lastVisited } = getContext();
-			return lastVisited
-				? `You previously visited: ${ lastVisited }`
-				: 'Welcome!';
-		},
-	},
-	actions: {
-		switchTab: withSyncEvent( function* ( event ) {
-			event.preventDefault();
-
-			// Update context before navigation (this persists).
-			const context = getContext();
-			const currentUrl = new URL( window.location.href );
-			context.lastVisited =
-				currentUrl.searchParams.get( 'tab' ) || 'overview';
-
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
-			yield actions.navigate( event.target.href );
-		} ),
-	},
-} );
-```
-
-### Example 3: Infinite scroll
-
-This example shows how to implement infinite scroll loading.
-
-**PHP (render.php):**
-```php
-<?php
-$page = isset( $_GET['page'] ) ? (int) $_GET['page'] : 1;
-$items = get_items_for_page( $page );
-$has_more = has_more_items( $page );
-$next_url = add_query_arg( 'page', $page + 1, get_permalink() );
-
-wp_interactivity_state( 'myInfiniteScroll', array(
-	'hasMore' => $has_more,
-	'nextUrl' => $next_url,
-	'isLoading' => false,
-) );
-?>
-
-<div
-	data-wp-interactive="myInfiniteScroll"
-	data-wp-router-region="infinite-list"
->
-	<ul class="items-list">
-		<?php foreach ( $items as $item ) : ?>
-			<li><?php echo esc_html( $item['title'] ); ?></li>
-		<?php endforeach; ?>
-	</ul>
-
-	<div
-		data-wp-bind--hidden="!state.hasMore"
-		data-wp-watch="callbacks.observeLoadMore"
-	>
-		<span data-wp-bind--hidden="!state.isLoading">Loading more...</span>
-		<button
-			data-wp-on--click="actions.loadMore"
-			data-wp-bind--disabled="state.isLoading"
-		>
-			Load More
-		</button>
-	</div>
-</div>
-```
-
-**JavaScript (view.js):**
-```js
-import { store, getElement } from '@wordpress/interactivity';
-
-const { state } = store( 'myInfiniteScroll', {
-	actions: {
-		*loadMore() {
-			if ( state.isLoading || ! state.hasMore ) {
-				return;
-			}
-
-			state.isLoading = true;
-
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
-			yield actions.navigate( state.nextUrl, {
-				// Replace history so back button works correctly.
-				replace: true,
-			} );
-
-			state.isLoading = false;
-		},
-	},
-	callbacks: {
-		observeLoadMore() {
-			const { ref } = getElement();
-
-			// Use Intersection Observer for automatic loading.
-			const observer = new IntersectionObserver(
-				( entries ) => {
-					if ( entries[ 0 ].isIntersecting ) {
-						store( 'myInfiniteScroll' ).actions.loadMore();
-					}
-				},
-				{ rootMargin: '100px' }
-			);
-
-			observer.observe( ref );
-
-			// Cleanup function.
-			return () => observer.disconnect();
-		},
-	},
-} );
-```
-
-### Example 4: Handling navigation errors
-
-This example demonstrates proper error handling during navigation.
-
-```js
-import { store, withSyncEvent } from '@wordpress/interactivity';
-
-const { state } = store( 'myPlugin', {
-	state: {
-		error: null,
-		isNavigating: false,
-	},
-	actions: {
-		navigate: withSyncEvent( function* ( event ) {
-			event.preventDefault();
-			state.error = null;
-			state.isNavigating = true;
-
-			try {
-				const { actions } = yield import(
-					'@wordpress/interactivity-router'
-				);
-				yield actions.navigate( event.target.href, {
-					timeout: 5000,
-				} );
-			} catch ( error ) {
-				state.error = 'Navigation failed. Please try again.';
-				console.error( 'Navigation error:', error );
-			} finally {
-				state.isNavigating = false;
-			}
-		} ),
-	},
-} );
-```
+**Defining a region with `attachTo`:**
 
 ```html
-<div data-wp-interactive="myPlugin">
-	<div
-		data-wp-bind--hidden="!state.error"
-		class="error-message"
-		data-wp-text="state.error"
-	></div>
-
-	<a
-		data-wp-on--click="actions.navigate"
-		data-wp-class--is-loading="state.isNavigating"
-		href="/another-page/"
-	>
-		Navigate
-	</a>
+<div
+    data-wp-interactive="myPlugin"
+    data-wp-router-region='{ "id": "myPlugin/modal", "attachTo": "body" }'
+>
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <h2>Modal Title</h2>
+            <p>Modal content here...</p>
+        </div>
+    </div>
 </div>
 ```
 
-## Disabling client-side navigation
+The `attachTo` value is a CSS selector. When navigating to this page from a page without this region, the region will be created and appended to the element matching the selector.
 
-There are scenarios where you may need to disable client-side navigation and force a full page reload. The Interactivity API provides a configuration option for this.
+**Example: Modal that appears on navigation**
 
-### Using wp_interactivity_config
-
-In PHP, use `wp_interactivity_config()` to disable client-side navigation:
-
+_Page without modal (page-1.php):_
 ```php
-// Disable client navigation for this page.
-wp_interactivity_config(
-	'core/router',
-	array( 'clientNavigationDisabled' => true )
-);
+<div
+    data-wp-interactive="myPlugin"
+    data-wp-router-region="myPlugin/content"
+>
+    <h1>Page 1</h1>
+    <a
+        data-wp-on--click="actions.navigate"
+        href="/page-with-modal/"
+    >
+        Open page with modal
+    </a>
+</div>
 ```
 
-When `clientNavigationDisabled` is set to `true`:
+_Page with modal (page-2.php):_
+```php
+<div
+    data-wp-interactive="myPlugin"
+    data-wp-router-region="myPlugin/content"
+>
+    <h1>Page 2</h1>
+    <a
+        data-wp-on--click="actions.navigate"
+        href="/page-without-modal/"
+    >
+        Close modal
+    </a>
+</div>
 
-- Calls to `actions.navigate()` will trigger a full page reload instead of client-side navigation.
-- Calls to `actions.prefetch()` will do nothing.
-- If a user navigates to a page with this configuration, the router will force a page reload.
+<div
+    data-wp-interactive="myPlugin"
+    data-wp-router-region='{ "id": "myPlugin/modal", "attachTo": "body" }'
+>
+    <div class="modal-overlay">
+        <div class="modal-content">
+            <h2>I'm a modal!</h2>
+        </div>
+    </div>
+</div>
+```
 
-### Use cases for disabling client navigation
+When navigating from Page 1 to Page 2, the modal region is created and appended to `<body>`. When navigating back to Page 1, the modal is automatically removed.
 
-- **Plugin incompatibility**: When third-party plugins require full page reloads.
-- **Complex state resets**: When you need to ensure all JavaScript state is completely reset.
-- **Admin pages**: When the full WordPress admin experience is needed.
-- **Specific page types**: When certain pages have special requirements that conflict with client-side navigation.
+### Handling server state updates
 
-## Synchronizing with server data
-
-When using client-side navigation, the global state and local context are preserved on the client. However, the server may provide updated data for each page. The Interactivity API provides `getServerState()` and `getServerContext()` functions to help synchronize client state with server-provided data.
-
-_Please, visit the [Understanding global state, local context and derived state](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md#subscribing-to-server-state-and-context) guide to learn more about `getServerState()` and `getServerContext()`._
-
-### Example: Updating state after navigation
+During client-side navigation, the client-side state persists while the server provides new state for the target page. Use `getServerState()` and `getServerContext()` to react specifically to server-provided values.
 
 ```js
 import {
-	store,
-	getContext,
-	getServerState,
-	getServerContext,
+    store,
+    getContext,
+    getServerState,
+    getServerContext,
 } from '@wordpress/interactivity';
 
 const { state } = store( 'myPlugin', {
-	callbacks: {
-		// This callback watches for server state changes.
-		syncWithServer() {
-			const serverState = getServerState();
-			const serverContext = getServerContext();
-			const context = getContext();
+    callbacks: {
+        syncWithServer() {
+            const serverState = getServerState();
+            const serverContext = getServerContext();
+            const context = getContext();
 
-			// Selectively update what you need from the server.
-			if ( serverState.pageTitle ) {
-				state.pageTitle = serverState.pageTitle;
-			}
+            // Update client state with server values selectively.
+            if ( serverState.productCount !== undefined ) {
+                state.productCount = serverState.productCount;
+            }
 
-			if ( serverContext.itemCount !== undefined ) {
-				context.itemCount = serverContext.itemCount;
-			}
-		},
-	},
+            if ( serverContext.isExpanded !== undefined ) {
+                context.isExpanded = serverContext.isExpanded;
+            }
+        },
+    },
 } );
 ```
 
-## Best practices
+For more details, see the [Understanding global state, local context and derived state](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md#subscribing-to-server-state-and-context) guide.
 
-### 1. Keep regions focused
+### Overriding cached pages
 
-Define router regions around the content that actually changes between pages. Avoid wrapping the entire page in a single region.
+By default, once a page is cached, subsequent navigations use the cached version. Use the `force` option to re-fetch a page even if it's cached:
 
-```html
-<!-- Good: Specific regions for changing content -->
-<header data-wp-interactive="myTheme" data-wp-router-region="header">
-	<nav><!-- Navigation that might show active states --></nav>
-</header>
+```js
+// Force re-fetch with navigate()
+yield actions.navigate( '/products/', { force: true } );
 
-<main data-wp-interactive="myTheme" data-wp-router-region="main-content">
-	<!-- Main content that changes between pages -->
-</main>
-
-<!-- Avoid: One giant region -->
-<body data-wp-interactive="myTheme" data-wp-router-region="everything">
-	<!-- This defeats the purpose of partial updates -->
-</body>
+// Force re-fetch with prefetch()
+yield actions.prefetch( '/products/', { force: true } );
 ```
 
-### 2. Use consistent region IDs
-
-Ensure region IDs are consistent across all pages where they should be updated. Use namespaced IDs to avoid conflicts.
-
-```html
-<!-- Good: Namespaced, descriptive IDs -->
-<div data-wp-router-region="myPlugin/product-list">...</div>
-<div data-wp-router-region="myPlugin/sidebar">...</div>
-
-<!-- Avoid: Generic IDs that might conflict -->
-<div data-wp-router-region="content">...</div>
-<div data-wp-router-region="sidebar">...</div>
-```
-
-### 3. Prefetch strategically
-
-Prefetch pages that users are likely to visit, but avoid prefetching everything. Good candidates for prefetching include:
-
-- Links on hover (most common pattern)
-- "Next" links in pagination
-- Primary navigation items on viewport visibility
+**Important:** If you're using `force: true` to refresh a page after a mutation (POST, PUT, DELETE request), make sure the mutation has completed before navigating:
 
 ```js
 store( 'myPlugin', {
-	actions: {
-		*prefetchOnHover( event ) {
-			const { actions } = yield import(
-				'@wordpress/interactivity-router'
-			);
-			yield actions.prefetch( event.target.href );
-		},
-	},
+    actions: {
+        deleteAndRefresh: function* () {
+            // Wait for the deletion to complete.
+            yield fetch( '/api/items/123', { method: 'DELETE' } );
+
+            // Now refresh the page to show updated data.
+            const { actions } = yield import(
+                '@wordpress/interactivity-router'
+            );
+            yield actions.navigate( window.location.href, { force: true } );
+        },
+    },
 } );
 ```
 
-### 4. Handle loading states gracefully
+### Using custom HTML
 
-Always provide visual feedback during navigation. Use the router's built-in state or manage your own loading indicators.
+Instead of fetching a page from a URL, you can provide HTML directly using the `html` option:
 
-### 5. Test back/forward navigation
+```js
+// Navigate with custom HTML
+yield actions.navigate( '/custom-page/', {
+    html: `
+        <div data-wp-interactive="myPlugin" data-wp-router-region="myPlugin/content">
+            <h1>Custom Content</h1>
+            <p>This HTML was provided directly, not fetched.</p>
+        </div>
+    `,
+} );
 
-Ensure your interactive blocks work correctly when users use browser back/forward buttons. The router automatically handles caching, but your state management should account for these navigation patterns.
+// Prefetch with custom HTML
+yield actions.prefetch( '/custom-page/', {
+    html: customHtmlString,
+} );
+```
 
-### 6. Consider accessibility
+This is useful for:
+- Optimistic UI updates where you construct the expected HTML before the server responds.
+- Offline scenarios where you provide cached or fallback content.
+- Testing and development.
 
-The router provides screen reader announcements by default. Keep this enabled unless you have a specific reason to disable it and are providing your own accessibility handling.
+### Managing browser history
 
-## Conclusion
+By default, `navigate()` adds a new entry to the browser's session history using `pushState`. Use the `replace` option to replace the current history entry instead:
 
-Client-side navigation with the Interactivity API provides a powerful way to create faster, more responsive WordPress sites while maintaining the benefits of server-side rendering. By using router regions to define what changes between pages, prefetching to anticipate user navigation, and proper state management, you can create experiences that feel instant and app-like.
+```js
+// Default behavior: adds new history entry (pushState)
+yield actions.navigate( '/page-2/' );
 
-Key takeaways:
+// Replace current history entry (replaceState)
+yield actions.navigate( '/page-2/', { replace: true } );
+```
 
-- Use `data-wp-router-region` to mark content that should be updated during navigation.
-- Import the router dynamically with `yield import('@wordpress/interactivity-router')` to minimize initial bundle size.
-- Use `actions.navigate()` for programmatic navigation and `actions.prefetch()` for preloading.
-- Leverage `state.navigation.hasStarted` and `state.navigation.hasFinished` for loading states.
-- Use `attachTo` for regions that should be dynamically injected into the DOM.
-- Consider using `getServerState()` and `getServerContext()` to synchronize with server-provided data after navigation.
+Use `replace: true` when:
+- Implementing redirects where the original URL shouldn't be in history.
+- Updating query parameters for filtering/sorting where each change shouldn't be a separate history entry.
+- Implementing infinite scroll where you update the URL but don't want each page to be a separate history entry.
+
+### Changing the timeout
+
+Navigation will abort if it takes too long. The default timeout is 10 seconds. Use the `timeout` option to change this:
+
+```js
+// Shorter timeout for faster failure
+yield actions.navigate( '/page/', { timeout: 5000 } );
+
+// Longer timeout for slow connections
+yield actions.navigate( '/page/', { timeout: 30000 } );
+```
+
+### Handling fetch errors
+
+When navigation fails (network error, timeout, or server error), the router automatically falls back to a full page reload. You can implement custom error handling by catching errors from `navigate()`:
+
+```js
+store( 'myPlugin', {
+    state: {
+        error: null,
+    },
+    actions: {
+        navigateSafely: withSyncEvent( function* ( event ) {
+            event.preventDefault();
+            state.error = null;
+
+            try {
+                const { actions } = yield import(
+                    '@wordpress/interactivity-router'
+                );
+                yield actions.navigate( event.target.href, {
+                    timeout: 5000,
+                } );
+            } catch ( error ) {
+                state.error = 'Navigation failed. Please try again.';
+                console.error( 'Navigation error:', error );
+
+                // Optionally fall back to full page navigation:
+                // window.location.href = event.target.href;
+            }
+        } ),
+    },
+} );
+```
+
+For more control, you can fetch and process pages manually:
+
+```js
+store( 'myPlugin', {
+    actions: {
+        navigateWithCustomErrorHandling: withSyncEvent( function* ( event ) {
+            event.preventDefault();
+            const url = event.target.href;
+
+            try {
+                // Fetch the page manually.
+                const response = yield fetch( url );
+
+                if ( ! response.ok ) {
+                    // Handle HTTP errors.
+                    state.error = `Error: ${response.status}`;
+                    return;
+                }
+
+                const html = yield response.text();
+
+                // Navigate using the fetched HTML.
+                const { actions } = yield import(
+                    '@wordpress/interactivity-router'
+                );
+                yield actions.navigate( url, { html } );
+            } catch ( error ) {
+                state.error = 'Network error. Please check your connection.';
+            }
+        } ),
+    },
+} );
+```
+
+### Disabling client-side navigation on certain pages
+
+Some pages may require a full page reload instead of client-side navigation. Use `wp_interactivity_config()` to disable client navigation:
+
+```php
+// In your theme's functions.php or a plugin
+add_action( 'wp', function() {
+    // Disable on specific page templates.
+    if ( is_page_template( 'template-complex.php' ) ) {
+        wp_interactivity_config(
+            'core/router',
+            array( 'clientNavigationDisabled' => true )
+        );
+    }
+
+    // Disable on admin-like pages.
+    if ( is_page( 'dashboard' ) ) {
+        wp_interactivity_config(
+            'core/router',
+            array( 'clientNavigationDisabled' => true )
+        );
+    }
+} );
+```
+
+When `clientNavigationDisabled` is `true`:
+- `actions.navigate()` triggers a full page reload.
+- `actions.prefetch()` does nothing.
+- Navigating from another page to this page forces a reload.
+
+### Disabling navigation feedback
+
+The Interactivity API router includes built-in feedback during navigation:
+- **Loading animation**: A progress bar that appears during navigation.
+- **Screen reader announcements**: Accessibility announcements for navigation progress.
+
+In some cases, you may want to disable these:
+
+```js
+// Disable loading animation (for instant-feeling updates)
+yield actions.navigate( '/page/', { loadingAnimation: false } );
+
+// Disable screen reader announcements (when providing custom announcements)
+yield actions.navigate( '/page/', { screenReaderAnnouncement: false } );
+
+// Disable both
+yield actions.navigate( '/page/', {
+    loadingAnimation: false,
+    screenReaderAnnouncement: false,
+} );
+```
+
+Use cases for disabling feedback:
+- **Silent updates**: Background refreshes where you don't want to draw attention.
+- **Custom loading UI**: When you're implementing your own loading indicators.
+- **Custom accessibility**: When you're providing your own screen reader announcements.
