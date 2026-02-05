@@ -5,11 +5,13 @@
  * @package WordPress
  */
 
-// Path differs between source and build: './shared/helpers.php' in source, './navigation-link/shared/helpers.php' in build.
-if ( file_exists( __DIR__ . '/shared/helpers.php' ) ) {
-	require_once __DIR__ . '/shared/helpers.php';
+// Path differs between source and build: './shared/' in source, './navigation-link/shared/' in build.
+if ( file_exists( __DIR__ . '/shared/item-should-render.php' ) ) {
+	require_once __DIR__ . '/shared/item-should-render.php';
+	require_once __DIR__ . '/shared/render-submenu-icon.php';
 } else {
-	require_once __DIR__ . '/navigation-link/shared/helpers.php';
+	require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
+	require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
 }
 
 /**
@@ -119,17 +121,6 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
 	}
 
 	return $font_sizes;
-}
-
-/**
- * Returns the top-level submenu SVG chevron icon.
- *
- * @since 5.9.0
- *
- * @return string
- */
-function block_core_navigation_link_render_submenu_icon() {
-	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
 /**
@@ -271,7 +262,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 
 	if ( isset( $block->context['showSubmenuIcon'] ) && $block->context['showSubmenuIcon'] && $has_submenu ) {
 		// The submenu icon can be hidden by a CSS rule on the Navigation Block.
-		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_link_render_submenu_icon() . '</span>';
+		$html .= '<span class="wp-block-navigation__submenu-icon">' . block_core_navigation_render_submenu_icon() . '</span>';
 	}
 
 	if ( $has_submenu ) {

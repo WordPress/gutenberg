@@ -65,6 +65,11 @@ const restrictedImports = [
 		message:
 			"Please use `clsx` instead. It's a lighter and faster drop-in replacement for `classnames`.",
 	},
+	{
+		name: '@base-ui/react',
+		message:
+			'Avoid using Base UI directly. Consider a new `@wordpress/ui` component instead.',
+	},
 ];
 
 const restrictedSyntax = [
@@ -445,13 +450,12 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'packages/components/src/**', 'packages/ui/src/**' ],
+			files: [ 'packages/components/src/**' ],
 			rules: {
 				'no-restricted-imports': [
 					'error',
-					// The `ariakit` and `framer-motion` APIs are meant to be consumed via
-					// the `@wordpress/components` and @wordpress/ui` packages, hence why
-					// importing those imports should be allowed only in those packages.
+					// The following dependencies are meant to be consumed directly in the
+					// @wordpress/components package, hence why their imports are allowed.
 					{
 						paths: restrictedImports.filter(
 							( { name } ) =>
@@ -459,6 +463,22 @@ module.exports = {
 									'@ariakit/react',
 									'framer-motion',
 								].includes( name )
+						),
+					},
+				],
+			},
+		},
+		{
+			files: [ 'packages/ui/src/**' ],
+			rules: {
+				'no-restricted-imports': [
+					'error',
+					// The following dependencies are meant to be consumed directly in the
+					// @wordpress/ui package, hence why their imports are allowed.
+					{
+						paths: restrictedImports.filter(
+							( { name } ) =>
+								! [ '@base-ui/react' ].includes( name )
 						),
 					},
 				],

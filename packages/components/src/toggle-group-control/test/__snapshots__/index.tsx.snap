@@ -69,7 +69,7 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   content: '';
   position: absolute;
   pointer-events: none;
-  background: var(--wp-components-color-foreground-inverted, #fff);
+  background: var(--wp-components-color-gray-100, #f0f0f0);
   border: 1px solid var(--wp-components-color-gray-700, #757575);
   outline: 2px solid transparent;
   outline-offset: -3px;
@@ -410,7 +410,7 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   content: '';
   position: absolute;
   pointer-events: none;
-  background: var(--wp-components-color-foreground-inverted, #fff);
+  background: var(--wp-components-color-gray-100, #f0f0f0);
   border: 1px solid var(--wp-components-color-gray-700, #757575);
   outline: 2px solid transparent;
   outline-offset: -3px;
@@ -658,7 +658,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   content: '';
   position: absolute;
   pointer-events: none;
-  background: var(--wp-components-color-foreground-inverted, #fff);
+  background: var(--wp-components-color-gray-100, #f0f0f0);
   border: 1px solid var(--wp-components-color-gray-700, #757575);
   outline: 2px solid transparent;
   outline-offset: -3px;
@@ -993,7 +993,7 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   content: '';
   position: absolute;
   pointer-events: none;
-  background: var(--wp-components-color-foreground-inverted, #fff);
+  background: var(--wp-components-color-gray-100, #f0f0f0);
   border: 1px solid var(--wp-components-color-gray-700, #757575);
   outline: 2px solid transparent;
   outline-offset: -3px;

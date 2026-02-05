@@ -28,6 +28,7 @@ function UnforwardedToggleControl(
 		className,
 		onChange,
 		disabled,
+		...additionalProps
 	}: WordPressComponentProps< ToggleControlProps, 'input', false >,
 	ref: ForwardedRef< HTMLInputElement >
 ) {
@@ -74,6 +75,7 @@ function UnforwardedToggleControl(
 					aria-describedby={ describedBy }
 					disabled={ disabled }
 					ref={ ref }
+					{ ...additionalProps }
 				/>
 				<FlexBlock
 					as="label"

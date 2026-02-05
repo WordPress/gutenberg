@@ -200,6 +200,9 @@ export function MediaUploadModal( {
 		page: 1,
 		perPage: 20,
 		filters: [],
+		layout: {
+			previewSize: 170,
+		},
 	} ) );
 
 	// Build query args based on view properties, similar to PostList

@@ -6,6 +6,7 @@
 
 -   Playground runtime now supports zip archive themes, matching Docker runtime behavior. ([#75140](https://github.com/WordPress/gutenberg/issues/75140)).
 -   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with `MARIADB_AUTO_UPGRADE` to support both new and existing installations.
+-   Remove non-functional `WP_ENV_MULTISITE` config.
 
 ### Breaking Changes
 

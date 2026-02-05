@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 import { resolveSelect } from '@wordpress/data';
-import { AwarenessState } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
+import { AwarenessState } from './awareness-state';
 import { STORE_NAME as coreStore } from '../name';
 import { generateUserInfo, areUserInfosEqual } from './utils';
 
