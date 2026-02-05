@@ -181,44 +181,6 @@ export function getDaysInMonth( year: number, month: number ): number {
 }
 
 /**
- * Validates a day value for a given year/month combination.
- * Returns the validated day (clamped to valid range or reset to fallback).
- *
- * @param day         The day value to validate
- * @param month       The month (1-indexed, 1-12)
- * @param year        The year
- * @param fallbackDay The fallback day to use if validation fails
- * @return The validated day value
- */
-export function validateDay(
-	day: number,
-	month: number,
-	year: number,
-	fallbackDay: number
-): number {
-	const maxDays = getDaysInMonth( year, month );
-	if ( isNaN( day ) || day < 1 || day > maxDays ) {
-		return fallbackDay;
-	}
-	return day;
-}
-
-/**
- * Validates a year value.
- * Returns the validated year (within 1000-9999 or reset to fallback).
- *
- * @param year         The year value to validate
- * @param fallbackYear The fallback year to use if validation fails
- * @return The validated year value
- */
-export function validateYear( year: number, fallbackYear: number ): number {
-	if ( isNaN( year ) || year < 1000 || year > 9999 ) {
-		return fallbackYear;
-	}
-	return year;
-}
-
-/**
  * Validates the target of a React event to ensure it is an input element and
  * that the input is valid.
  * @param event

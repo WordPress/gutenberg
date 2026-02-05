@@ -76,6 +76,7 @@ export function TimePicker( {
 	// Key to force re-render of inputs when values are clamped.
 	// Incrementing this remounts the input, resetting its internal state to match the controlled value.
 	const [ inputResetKey, setInputResetKey ] = useState( 0 );
+	const resetInputs = () => setInputResetKey( ( key ) => key + 1 );
 
 	// Reset the state when currentTime changed.
 	// TODO: useEffect() shouldn't be used like this, causes an unnecessary render
@@ -126,20 +127,19 @@ export function TimePicker( {
 			const currentYear = Number( formatDate( 'Y', date ) );
 			const currentDay = Number( formatDate( 'j', date ) );
 
-			// Detect if field was cleared (empty or browser set to min).
-			// When a number input is cleared and blurred, the browser sets it to min.
-			// We detect this by checking if the new value is the HTML min attribute value
-			// AND the previous controlled value was different.
-			const htmlMin = method === 'date' ? 1 : 1; // Both have min=1
+			// Detect if field was cleared or contains incomplete/invalid input.
 			const previousValue = method === 'date' ? currentDay : currentYear;
-
-			const isCleared =
-				stringValue === '' ||
-				( method === 'year' && numberValue < 1000 ) ||
-				( numberValue === htmlMin && previousValue !== htmlMin );
+			const isEmpty = stringValue === '';
+			const isIncompleteYear = method === 'year' && numberValue < 1000;
+			// When a number input is cleared and blurred, the browser sets it to min.
+			// Read the min from the element rather than hardcoding it.
+			const target = event.target as HTMLInputElement;
+			const htmlMin = Number( target.min );
+			const wasResetByBrowser = numberValue === htmlMin && previousValue !== htmlMin;
+			const isCleared = isEmpty || isIncompleteYear || wasResetByBrowser;
 
 			if ( isCleared ) {
-				setInputResetKey( ( key ) => key + 1 );
+				resetInputs();
 				return;
 			}
 
@@ -151,7 +151,7 @@ export function TimePicker( {
 				// Clamp to valid range (consistent with hour/minute behavior).
 				const maxDays = getDaysInMonth( currentYear, currentMonth );
 				if ( isNaN( numberValue ) ) {
-					setInputResetKey( ( key ) => key + 1 );
+					resetInputs();
 					return;
 				}
 				const clampedDay = Math.max( 1, Math.min( numberValue, maxDays ) );
@@ -163,7 +163,7 @@ export function TimePicker( {
 				// Validate year: must be 1000-9999.
 				// Clamp to valid range (consistent with hour/minute behavior).
 				if ( isNaN( numberValue ) ) {
-					setInputResetKey( ( key ) => key + 1 );
+					resetInputs();
 					return;
 				}
 				const clampedYear = Math.max( 1000, Math.min( numberValue, 9999 ) );
@@ -192,7 +192,7 @@ export function TimePicker( {
 
 				// If value was clamped, force re-render of inputs to show corrected value.
 				if ( wasClamped ) {
-					setInputResetKey( ( key ) => key + 1 );
+					resetInputs();
 				}
 			}
 		};
