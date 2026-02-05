@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.7.0-next.0 (2026-02-05)
+
 ### New Features
 
 -   Add `Tabs` primitive ([#74652](https://github.com/WordPress/gutenberg/pull/74652)).
