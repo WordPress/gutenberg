@@ -186,36 +186,21 @@ export default function PostList( { postType } ) {
 	}, [ records, fields, view?.sort, notesCount ] );
 
 	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
-	const [ selectedItems, setSelectedItems ] = useState(
-		data?.filter( ( item ) =>
-			( postId?.split( ',' ) ?? [] ).includes( getItemId( item ) )
-		) ?? []
-	);
 	const onChangeSelection = useCallback(
 		( items ) => {
 			setSelection( items );
-			setSelectedItems(
-				data?.filter( ( item ) =>
-					items.includes( getItemId( item ) )
-				) ?? []
-			);
 			history.navigate(
 				addQueryArgs( path, {
 					postId: items.join( ',' ),
 				} )
 			);
 		},
-		[ data, path, history ]
+		[ path, history ]
 	);
 	useEffect( () => {
 		const newSelection = postId?.split( ',' ) ?? [];
 		setSelection( newSelection );
-		setSelectedItems(
-			data?.filter( ( item ) =>
-				newSelection.includes( getItemId( item ) )
-			) ?? []
-		);
-	}, [ postId, data ] );
+	}, [ postId ] );
 
 	const ids = data?.map( ( record ) => getItemId( record ) ) ?? [];
 	const prevIds = usePrevious( ids ) ?? [];
@@ -347,10 +332,10 @@ export default function PostList( { postType } ) {
 				getItemLevel={ getItemLevel }
 				defaultLayouts={ defaultLayouts }
 			/>
-			{ quickEdit && ! isLoadingData && selectedItems.length > 0 && (
+			{ quickEdit && ! isLoadingData && selection.length > 0 && (
 				<QuickEditModal
 					postType={ postType }
-					items={ selectedItems }
+					postId={ selection }
 					closeModal={ closeQuickEditModal }
 				/>
 			) }

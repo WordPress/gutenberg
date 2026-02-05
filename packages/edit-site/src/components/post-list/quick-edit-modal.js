@@ -25,9 +25,7 @@ const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
-export function QuickEditModal( { postType, items, closeModal } ) {
-	const ids = useMemo( () => items.map( ( item ) => item.id ), [ items ] );
-
+export function QuickEditModal( { postType, postId, closeModal } ) {
 	// Before calling the onRequestClose callback, the modal introduces a animation delay
 	// that produces a visual glitch, see https://github.com/WordPress/gutenberg/pull/75173#pullrequestreview-3755585506
 	// Handling the ESC key and click-outside ourselves fixes it.
@@ -57,7 +55,7 @@ export function QuickEditModal( { postType, items, closeModal } ) {
 		};
 	}, [ closeModal ] );
 
-	const isBulk = ids.length > 1;
+	const isBulk = postId.length > 1;
 
 	const { record, hasFinishedResolution } = useSelect(
 		( select ) => {
@@ -73,7 +71,7 @@ export function QuickEditModal( { postType, items, closeModal } ) {
 				};
 			}
 
-			const args = [ 'postType', postType, ids[ 0 ] ];
+			const args = [ 'postType', postType, postId[ 0 ] ];
 			return {
 				record: getEditedEntityRecord( ...args ),
 				hasFinishedResolution: hasFinished(
@@ -82,7 +80,7 @@ export function QuickEditModal( { postType, items, closeModal } ) {
 				),
 			};
 		},
-		[ postType, ids, isBulk ]
+		[ postType, postId, isBulk ]
 	);
 
 	const [ multiEdits, setMultiEdits ] = useState( {} );
@@ -154,7 +152,7 @@ export function QuickEditModal( { postType, items, closeModal } ) {
 	}, [ isBulk ] );
 
 	const onChange = ( edits ) => {
-		for ( const id of ids ) {
+		for ( const id of postId ) {
 			if (
 				edits.status &&
 				edits.status !== 'future' &&
@@ -171,7 +169,7 @@ export function QuickEditModal( { postType, items, closeModal } ) {
 				edits.password = '';
 			}
 			editEntityRecord( 'postType', postType, id, edits );
-			if ( ids.length > 1 ) {
+			if ( postId.length > 1 ) {
 				setMultiEdits( ( prev ) => ( {
 					...prev,
 					...edits,
@@ -181,17 +179,17 @@ export function QuickEditModal( { postType, items, closeModal } ) {
 	};
 	useEffect( () => {
 		setMultiEdits( {} );
-	}, [ ids ] );
+	}, [ postId ] );
 
 	const onSave = async () => {
 		if ( isBulk ) {
 			await Promise.allSettled(
-				ids.map( ( id ) =>
+				postId.map( ( id ) =>
 					saveEditedEntityRecord( 'postType', postType, id )
 				)
 			);
 		} else {
-			await saveEditedEntityRecord( 'postType', postType, ids[ 0 ] );
+			await saveEditedEntityRecord( 'postType', postType, postId[ 0 ] );
 		}
 		closeModal?.();
 	};
@@ -232,7 +230,7 @@ export function QuickEditModal( { postType, items, closeModal } ) {
 			<div className="dataviews-action-modal__quick-edit-header">
 				<PostCardPanel
 					postType={ postType }
-					postId={ ids }
+					postId={ postId }
 					onClose={ closeModal }
 					hideActions
 				/>
