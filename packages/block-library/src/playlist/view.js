@@ -151,7 +151,7 @@ const { state } = store(
 				// Remove the initialized flag so WaveformPlayer creates fresh.
 				ref.removeAttribute( 'data-waveform-initialized' );
 
-				// Get colors for styling.
+				// Get colors from computed styles for proper inheritance.
 				const { textColor, bgColor, waveformColor, progressColor } =
 					getWaveformColors( ref );
 
