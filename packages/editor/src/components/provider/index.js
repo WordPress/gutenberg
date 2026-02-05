@@ -353,7 +353,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		// Register the editor commands.
 		useCommands();
 
-		// Lock post saving when media uploads are in progress (experimental feature).
+		// Lock post saving when client side media processing is in progress.
 		useUploadSaveLock();
 
 		if ( ! isReady || ! mode ) {
