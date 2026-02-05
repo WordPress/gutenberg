@@ -92,7 +92,7 @@ export default ( props ) => ( element ) => {
 		// When a non-collapsed selection is deleted (not replaced with new
 		// text), the old active formats refer to the deleted content and
 		// should not be carried forward.
-		const isDelete =
+		const clearFormats =
 			! isCollapsed( record.current ) && currentValue.start <= start;
 
 		// Update the formats between the last and new caret position.
@@ -100,7 +100,7 @@ export default ( props ) => ( element ) => {
 			value: currentValue,
 			start,
 			end: currentValue.start,
-			formats: isDelete ? [] : oldActiveFormats,
+			formats: clearFormats ? [] : oldActiveFormats,
 		} );
 
 		handleChange( change );
