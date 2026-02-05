@@ -78,12 +78,9 @@
 }
 
 // Quick Edit Modal as right-side drawer
-// Uses a lower z-index than other modals (media library is 160000)
-// so that nested modals (like Featured Image picker) can stack on top.
 .dataviews-action-modal__quick-edit {
 	justify-content: flex-end;
 	align-items: stretch;
-	z-index: 159000;
 
 	.dataviews-action-modal__quick-edit-header {
 		margin-bottom: $grid-unit-20;
