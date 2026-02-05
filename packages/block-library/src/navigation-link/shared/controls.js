@@ -181,6 +181,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						kind: undefined,
 						type: undefined,
 						opensInNewTab: false,
+						rel: undefined,
 					} )
 				}
 				isShownByDefault
