@@ -51,7 +51,7 @@ const meta: Meta< typeof ComboboxControl > = {
 		componentStatus: {
 			status: 'stable',
 			whereUsed: 'global',
-			notes: 'Will be superseded by `SearchableSelect` in `@wordpress/ui`, but continue using for now.',
+			notes: 'Will be superseded by `SearchableSelectControl` in `@wordpress/ui`, but continue using for now.',
 		},
 	},
 };
