@@ -12,10 +12,7 @@ import {
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
-import {
-	privateApis as editorPrivateApis,
-	store as editorStore,
-} from '@wordpress/editor';
+import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
@@ -67,15 +64,11 @@ export function QuickEditModal( { postType, items, closeModal } ) {
 			const {
 				getEditedEntityRecord,
 				hasFinishedResolution: hasFinished,
-				getPostType,
 			} = select( coreDataStore );
-			const { getPostIcon } = unlock( select( editorStore ) );
 
 			if ( isBulk ) {
 				return {
 					record: null,
-					postTypeLabel: getPostType( postType )?.labels,
-					postTypeIcon: getPostIcon( postType ),
 					hasFinishedResolution: true,
 				};
 			}
@@ -83,8 +76,6 @@ export function QuickEditModal( { postType, items, closeModal } ) {
 			const args = [ 'postType', postType, ids[ 0 ] ];
 			return {
 				record: getEditedEntityRecord( ...args ),
-				postTypeLabel: '',
-				postTypeIcon: getPostIcon( postType ),
 				hasFinishedResolution: hasFinished(
 					'getEditedEntityRecord',
 					args
