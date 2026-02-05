@@ -1,7 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { RichTextData } from '@wordpress/rich-text';
+
+/**
  * Internal dependencies
  */
 import {
+	safeHTML,
 	isHorizontalEdge,
 	placeCaretAtHorizontalEdge,
 	isTextField,
@@ -21,6 +27,28 @@ describe( 'DOM', () => {
 
 	afterEach( () => {
 		parent.remove();
+	} );
+
+	describe( 'safeHTML', () => {
+		it( 'should strip scripts and on* attributes from strings', () => {
+			expect(
+				safeHTML( '<p>hi<script>alert()</script>, friend</p>' )
+			).toBe( '<p>hi, friend</p>' );
+		} );
+
+		it( 'should strip scripts and on* attributes from RichText values', () => {
+			expect(
+				safeHTML(
+					RichTextData.fromHTMLString(
+						'<p>hi<script>alert()</script>, friend</p>'
+					)
+				)
+			).toBe( '<p>hi, friend</p>' );
+		} );
+
+		it( 'should reject other values', () => {
+			expect( safeHTML( {} ) ).toBe( '' );
+		} );
 	} );
 
 	describe( 'isHorizontalEdge', () => {
