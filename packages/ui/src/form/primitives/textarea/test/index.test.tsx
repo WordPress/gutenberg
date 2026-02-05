@@ -128,4 +128,16 @@ describe( 'Textarea', () => {
 			);
 		} );
 	} );
+
+	it( 'disables the textarea when disabled prop is true', () => {
+		render( <Textarea disabled /> );
+
+		expect( screen.getByRole( 'textbox' ) ).toBeDisabled();
+	} );
+
+	it( 'applies custom rows value', () => {
+		render( <Textarea rows={ 10 } /> );
+
+		expect( screen.getByRole( 'textbox' ) ).toHaveAttribute( 'rows', '10' );
+	} );
 } );
