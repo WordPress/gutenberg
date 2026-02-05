@@ -46,6 +46,7 @@ const LinkControlSearchInput = forwardRef(
 			suffix,
 			isEntity = false,
 			customValidity: customValidityProp,
+			required = false,
 		},
 		ref
 	) => {
@@ -148,9 +149,11 @@ const LinkControlSearchInput = forwardRef(
 						showInitialSuggestions
 					}
 					customValidity={ customValidityProp }
-					// Don't mark the field as required to avoid browser validation errors
-					// on blur. Validation is handled manually via onSubmit and handleSubmit.
-					required={ false }
+					// When required=false, validation is handled manually via onSubmit and handleSubmit.
+					// When required=true (e.g., in modals with text control), browser validation is used.
+					// Use markWhenOptional when required=true to suppress the "(Required)" indicator.
+					required={ required }
+					{ ...( required && { markWhenOptional: true } ) }
 					onSubmit={ ( suggestion, event ) => {
 						const hasSuggestion = suggestion || focusedSuggestion;
 
