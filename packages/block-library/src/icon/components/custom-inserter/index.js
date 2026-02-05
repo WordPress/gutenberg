@@ -49,7 +49,6 @@ export default function InserterModal( props ) {
 					<ContentHeader
 						searchInput={ searchInput }
 						setSearchInput={ setSearchInput }
-						shownIconsCount={ getFilteredIcons().length }
 					/>
 					<IconGrid
 						shownIcons={ getFilteredIcons() }
