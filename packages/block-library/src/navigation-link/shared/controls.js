@@ -176,12 +176,9 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				onDeselect={ () =>
 					setAttributes( {
 						url: undefined,
-						label: undefined,
 						id: undefined,
 						kind: undefined,
 						type: undefined,
-						opensInNewTab: false,
-						rel: undefined,
 					} )
 				}
 				isShownByDefault
