@@ -18,6 +18,8 @@ import useElements from '../../hooks/use-elements';
 
 const { ValidatedToggleGroupControl } = unlock( privateApis );
 
+const QUERY_ALL_RESULTS = { perPage: -1 };
+
 export default function ToggleGroup< Item >( {
 	data,
 	field,
@@ -38,6 +40,7 @@ export default function ToggleGroup< Item >( {
 	const { elements, isLoading } = useElements( {
 		elements: field.elements,
 		getElements: field.getElements,
+		query: QUERY_ALL_RESULTS,
 	} );
 
 	if ( isLoading ) {

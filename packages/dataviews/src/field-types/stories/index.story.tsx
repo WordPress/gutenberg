@@ -56,14 +56,22 @@ const meta = {
 		asyncElements: {
 			control: { type: 'boolean' },
 			description:
-				'Whether the filter should fetch elements asynchronously.',
+				'Whether the filter should fetch elements asynchronously. When enabled, the filter dropdowns always include a search input and conditionally show the total records.',
 			options: [ true, false ],
+		},
+		partialResults: {
+			control: { type: 'boolean' },
+			description:
+				'When enabled with asyncElements, returns only a subset of elements to demonstrate pagination (e.g., 3 of 20 results).',
+			options: [ true, false ],
+			if: { arg: 'asyncElements', truthy: true },
 		},
 	},
 	args: {
 		type: 'regular',
 		Edit: 'default',
 		asyncElements: false,
+		partialResults: false,
 	},
 };
 export default meta;
@@ -330,6 +338,13 @@ const fields: Field< DataType >[] = [
 			{ value: 'john@example.com', label: 'John Doe' },
 			{ value: 'jane@example.com', label: 'Jane Doe' },
 			{ value: 'bob@example.com', label: 'Bob Smith' },
+			{ value: 'alice@example.com', label: 'Alice Johnson' },
+			{ value: 'charlie@example.com', label: 'Charlie Brown' },
+			{ value: 'diana@example.com', label: 'Diana Prince' },
+			{ value: 'eve@example.com', label: 'Eve Anderson' },
+			{ value: 'frank@example.com', label: 'Frank Miller' },
+			{ value: 'george@example.com', label: 'George Wilson' },
+			{ value: 'hannah@example.com', label: 'Hannah Lee' },
 		],
 		setValue: ( { value } ) => ( {
 			emailWithElements: value,
@@ -551,6 +566,7 @@ interface FieldTypeStoryProps {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	partialResults: boolean;
 }
 
 const FieldTypeStory = ( {
@@ -558,6 +574,7 @@ const FieldTypeStory = ( {
 	type,
 	Edit,
 	asyncElements,
+	partialResults,
 }: FieldTypeStoryProps ) => {
 	const storyFields = useMemo( () => {
 		let fieldsToProcess = _fields;
@@ -570,15 +587,95 @@ const FieldTypeStory = ( {
 		}
 
 		if ( asyncElements ) {
+			const PARTIAL_RESULTS_COUNT = 3;
 			fieldsToProcess = fieldsToProcess.map( ( field ) => {
 				if ( field.elements ) {
-					const elements = field.elements;
+					const allElements = field.elements;
 					return {
 						...field,
 						elements: undefined,
-						getElements: () =>
+						getTotalAvailableElementsCount: () =>
+							Promise.resolve( allElements.length ),
+						getElements: ( query ) =>
 							new Promise( ( resolve ) =>
-								setTimeout( () => resolve( elements ), 3500 )
+								setTimeout( () => {
+									let filteredElements = allElements;
+
+									// Handle search filtering
+									if ( query?.search ) {
+										const searchLower =
+											query.search.toLowerCase();
+										filteredElements = allElements.filter(
+											( element ) =>
+												element.label
+													.toLowerCase()
+													.includes( searchLower )
+										);
+									}
+
+									// Handle include parameter - add at the beginning
+									if ( query?.include?.length ) {
+										const includedElements =
+											allElements.filter( ( element ) =>
+												query.include!.includes(
+													element.value
+												)
+											);
+										// Merge included elements at the beginning if not already in filtered results
+										const existingValues = new Set(
+											filteredElements.map(
+												( e ) => e.value
+											)
+										);
+										const newIncludedElements =
+											includedElements.filter(
+												( element ) =>
+													! existingValues.has(
+														element.value
+													)
+											);
+										filteredElements = [
+											...newIncludedElements,
+											...filteredElements,
+										];
+									}
+
+									// Handle perPage pagination
+									const perPage = query?.perPage ?? 20;
+									const returnedElements =
+										perPage === -1
+											? filteredElements
+											: filteredElements.slice(
+													0,
+													perPage
+											  );
+
+									// For partialResults mode, further limit to PARTIAL_RESULTS_COUNT
+									// But skip slicing if we have included elements to ensure they're always visible
+									const hasIncludedElements =
+										query?.include?.length ?? 0 > 0;
+									const finalElements =
+										partialResults && ! hasIncludedElements
+											? returnedElements.slice(
+													0,
+													PARTIAL_RESULTS_COUNT
+											  )
+											: returnedElements;
+
+									resolve( {
+										elements: finalElements,
+										paginationInfo: {
+											totalPages:
+												partialResults &&
+												! hasIncludedElements
+													? Math.ceil(
+															filteredElements.length /
+																PARTIAL_RESULTS_COUNT
+													  )
+													: 1,
+										},
+									} );
+								}, 20 )
 							),
 					};
 				}
@@ -587,7 +684,7 @@ const FieldTypeStory = ( {
 		}
 
 		return fieldsToProcess;
-	}, [ _fields, Edit, asyncElements ] );
+	}, [ _fields, Edit, asyncElements, partialResults ] );
 	const form = useMemo(
 		() => ( {
 			layout: { type },
@@ -694,10 +791,12 @@ export const AllComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	partialResults,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	partialResults: boolean;
 } ) => {
 	return (
 		<FieldTypeStory
@@ -705,6 +804,7 @@ export const AllComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };
@@ -714,10 +814,12 @@ export const TextComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	partialResults,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	partialResults: boolean;
 } ) => {
 	const textFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'text' ),
@@ -730,6 +832,7 @@ export const TextComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };
@@ -740,11 +843,13 @@ export const IntegerComponent = ( {
 	Edit,
 	asyncElements,
 	formatSeparatorThousand,
+	partialResults,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
 	formatSeparatorThousand?: string;
+	partialResults: boolean;
 } ) => {
 	const integerFields = useMemo(
 		() =>
@@ -770,6 +875,7 @@ export const IntegerComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };
@@ -792,6 +898,7 @@ export const NumberComponent = ( {
 	formatSeparatorThousand,
 	formatSeparatorDecimal,
 	formatDecimals,
+	partialResults,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
@@ -799,6 +906,7 @@ export const NumberComponent = ( {
 	formatSeparatorThousand?: string;
 	formatSeparatorDecimal?: string;
 	formatDecimals?: number;
+	partialResults: boolean;
 } ) => {
 	const numberFields = useMemo(
 		() =>
@@ -840,6 +948,7 @@ export const NumberComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };
@@ -871,10 +980,12 @@ export const BooleanComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	partialResults,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	partialResults: boolean;
 } ) => {
 	const booleanFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'boolean' ),
@@ -887,6 +998,7 @@ export const BooleanComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };
@@ -898,12 +1010,14 @@ export const DateTimeComponent = ( {
 	asyncElements,
 	formatDatetime,
 	formatWeekStartsOn,
+	partialResults,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
 	formatDatetime?: string;
 	formatWeekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+	partialResults: boolean;
 } ) => {
 	const datetimeFields = useMemo(
 		() =>
@@ -937,6 +1051,7 @@ export const DateTimeComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };
@@ -972,12 +1087,14 @@ export const DateComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	partialResults,
 	formatDate,
 	formatWeekStartsOn,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	partialResults: boolean;
 	formatDate?: string;
 	formatWeekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 } ) => {
@@ -1013,6 +1130,7 @@ export const DateComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };
@@ -1048,10 +1166,12 @@ export const EmailComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	partialResults,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	partialResults: boolean;
 } ) => {
 	const emailFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'email' ),
@@ -1064,6 +1184,7 @@ export const EmailComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };
@@ -1073,10 +1194,12 @@ export const TelephoneComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	partialResults,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	partialResults: boolean;
 } ) => {
 	const telephoneFields = fields.filter( ( field ) =>
 		field.id.startsWith( 'telephone' )
@@ -1088,6 +1211,7 @@ export const TelephoneComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };
@@ -1097,10 +1221,12 @@ export const UrlComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	partialResults,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	partialResults: boolean;
 } ) => {
 	const urlFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'url' ),
@@ -1113,6 +1239,7 @@ export const UrlComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };
@@ -1122,10 +1249,12 @@ export const ColorComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	partialResults,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	partialResults: boolean;
 } ) => {
 	const colorFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'color' ),
@@ -1138,6 +1267,7 @@ export const ColorComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };
@@ -1147,10 +1277,12 @@ export const MediaComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	partialResults,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	partialResults: boolean;
 } ) => {
 	const mediaFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'media' ),
@@ -1163,6 +1295,7 @@ export const MediaComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };
@@ -1172,10 +1305,12 @@ export const ArrayComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	partialResults,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	partialResults: boolean;
 } ) => {
 	const arrayTextFields = useMemo(
 		() => fields.filter( ( field ) => field.type === 'array' ),
@@ -1188,6 +1323,7 @@ export const ArrayComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };
@@ -1197,10 +1333,12 @@ export const PasswordComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	partialResults,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	partialResults: boolean;
 } ) => {
 	const passwordFields = fields.filter( ( field ) =>
 		field.id.startsWith( 'password' )
@@ -1212,6 +1350,7 @@ export const PasswordComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };
@@ -1221,10 +1360,12 @@ export const NoTypeComponent = ( {
 	type,
 	Edit,
 	asyncElements,
+	partialResults,
 }: {
 	type: PanelTypes;
 	Edit: ControlTypes;
 	asyncElements: boolean;
+	partialResults: boolean;
 } ) => {
 	const noTypeFields = useMemo(
 		() => fields.filter( ( field ) => field.type === undefined ),
@@ -1237,6 +1378,7 @@ export const NoTypeComponent = ( {
 			type={ type }
 			Edit={ Edit }
 			asyncElements={ asyncElements }
+			partialResults={ partialResults }
 		/>
 	);
 };

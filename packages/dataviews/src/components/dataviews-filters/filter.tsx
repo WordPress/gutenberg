@@ -22,8 +22,7 @@ import { Stack } from '@wordpress/ui';
 /**
  * Internal dependencies
  */
-import SearchWidget from './search-widget';
-import InputWidget from './input-widget';
+import FilterWidget from './filter-widget';
 import { getOperatorByName } from '../../utils/operators';
 import type {
 	Filter,
@@ -198,18 +197,44 @@ export default function Filter( {
 		return currentField;
 	}, [ fields, filter.field ] );
 
-	const { elements } = useElements( {
+	// Build include array from selected values for fetching their labels.
+	const includeValues = useMemo( () => {
+		if ( filterInView?.value === undefined ) {
+			return;
+		}
+		if ( filter.singleSelection ) {
+			return [ filterInView.value ];
+		}
+		if ( Array.isArray( filterInView.value ) ) {
+			return filterInView.value;
+		}
+		return [];
+	}, [ filterInView?.value, filter.singleSelection ] );
+
+	// Memoize query object to prevent infinite loops in useElements.
+	const includeQuery = useMemo( () => {
+		return includeValues?.length ? { include: includeValues } : undefined;
+	}, [ includeValues ] );
+
+	// Call 1: Fetch elements WITH include query for chip label display.
+	const { elements: selectedElements } = useElements( {
 		elements: filter.elements,
 		getElements: filter.getElements,
+		query: includeQuery,
 	} );
 
-	if ( elements.length > 0 ) {
-		// When there are elements, we favor those
-		activeElements = elements.filter( ( element ) => {
+	if ( selectedElements.length > 0 ) {
+		// Use string comparison because filter values from Ariakit are stored as strings,
+		// but element.value from getElements may be of different types.
+		activeElements = selectedElements.filter( ( element ) => {
 			if ( filter.singleSelection ) {
-				return element.value === filterInView?.value;
+				return (
+					String( element.value ) === String( filterInView?.value )
+				);
 			}
-			return filterInView?.value?.includes( element.value );
+			return filterInView?.value?.some(
+				( v: any ) => String( v ) === String( element.value )
+			);
 		} );
 	} else if ( Array.isArray( filterInView?.value ) ) {
 		// or, filterInView.value can also be array
@@ -351,17 +376,7 @@ export default function Filter( {
 				return (
 					<Stack direction="column" justify="flex-start">
 						<OperatorSelector { ...commonProps } />
-						{ commonProps.filter.hasElements ? (
-							<SearchWidget
-								{ ...commonProps }
-								filter={ {
-									...commonProps.filter,
-									elements,
-								} }
-							/>
-						) : (
-							<InputWidget { ...commonProps } fields={ fields } />
-						) }
+						<FilterWidget { ...commonProps } fields={ fields } />
 					</Stack>
 				);
 			} }

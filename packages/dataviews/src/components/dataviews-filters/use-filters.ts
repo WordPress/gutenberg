@@ -34,6 +34,8 @@ function useFilters( fields: NormalizedField< any >[], view: View ) {
 				name: field.label,
 				elements: field.elements,
 				getElements: field.getElements,
+				getTotalAvailableElementsCount:
+					field.getTotalAvailableElementsCount,
 				hasElements: field.hasElements,
 				singleSelection: operators.some( ( op ) =>
 					isSingleSelectionOperator( op )
