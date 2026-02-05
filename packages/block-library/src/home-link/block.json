@@ -25,6 +25,7 @@
 	"supports": {
 		"anchor": true,
 		"reusable": false,
+		"renaming": false,
 		"html": false,
 		"typography": {
 			"fontSize": true,
