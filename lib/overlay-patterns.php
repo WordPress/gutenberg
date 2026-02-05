@@ -8,23 +8,27 @@
 /**
  * Registers block patterns for navigation overlays.
  *
- * This function adds patterns that are specific to the navigation overlays
- * experiment. It runs after core patterns are registered to ensure all patterns
+ * This function adds patterns that are specific to navigation overlays.
+ * It runs after core patterns are registered to ensure all patterns
  * are available.
  *
  * @since 6.0.0
  */
 function gutenberg_register_overlay_block_patterns() {
-	register_block_pattern_category(
-		'navigation',
-		array(
-			'label'       => _x( 'Navigation', 'Block pattern category', 'gutenberg' ),
-			'description' => _x( 'Display your website navigation.', 'Block pattern category', 'gutenberg' ),
-		)
-	);
+	// Register category only if it doesn't exist in core.
+	$category_registry = WP_Block_Pattern_Categories_Registry::get_instance();
+	if ( ! $category_registry->is_registered( 'navigation' ) ) {
+		register_block_pattern_category(
+			'navigation',
+			array(
+				'label'       => _x( 'Navigation', 'Block pattern category', 'gutenberg' ),
+				'description' => _x( 'Display your website navigation.', 'Block pattern category', 'gutenberg' ),
+			)
+		);
+	}
 
 	register_block_pattern(
-		'gutenberg/navigation-overlay',
+		'core/navigation-overlay',
 		array(
 			'title'       => __( 'Navigation Overlay', 'gutenberg' ),
 			'description' => _x( 'A simple pattern with a navigation block and a navigation overlay close button.', 'Block pattern description', 'gutenberg' ),
@@ -37,11 +41,12 @@ function gutenberg_register_overlay_block_patterns() {
 <!-- /wp:group -->',
 			'categories'  => array( 'navigation' ),
 			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
+			'source'      => 'core',
 		)
 	);
 
 	register_block_pattern(
-		'gutenberg/navigation-overlay-black-bg',
+		'core/navigation-overlay-black-bg',
 		array(
 			'title'       => __( 'Overlay with black background', 'gutenberg' ),
 			'description' => _x( 'A navigation overlay with black background and big white text', 'Block pattern description', 'gutenberg' ),
@@ -54,10 +59,11 @@ function gutenberg_register_overlay_block_patterns() {
 <!-- /wp:group -->',
 			'categories'  => array( 'navigation' ),
 			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
+			'source'      => 'core',
 		)
 	);
 	register_block_pattern(
-		'gutenberg/navigation-overlay-accent-bg',
+		'core/navigation-overlay-accent-bg',
 		array(
 			'title'       => __( 'Overlay with orange background', 'gutenberg' ),
 			'description' => _x( 'A navigation overlay with orange background site title and tagline', 'Block pattern description', 'gutenberg' ),
@@ -80,10 +86,11 @@ function gutenberg_register_overlay_block_patterns() {
 <!-- /wp:group -->',
 			'categories'  => array( 'navigation' ),
 			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
+			'source'      => 'core',
 		)
 	);
 	register_block_pattern(
-		'gutenberg/navigation-overlay-centered-with-extras',
+		'core/navigation-overlay-centered-with-extras',
 		array(
 			'title'       => __( 'Overlay with site info and CTA', 'gutenberg' ),
 			'description' => _x( 'A navigation overlay with vertically and horizontally centered navigation, site info, and a CTA', 'Block pattern description', 'gutenberg' ),
@@ -122,10 +129,11 @@ function gutenberg_register_overlay_block_patterns() {
 <!-- /wp:group -->',
 			'categories'  => array( 'navigation' ),
 			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
+			'source'      => 'core',
 		)
 	);
 	register_block_pattern(
-		'gutenberg/navigation-overlay-centered',
+		'core/navigation-overlay-centered',
 		array(
 			'title'       => __( 'Overlay with centered navigation', 'gutenberg' ),
 			'description' => _x( 'A navigation overlay with vertically and horizontally centered navigation', 'Block pattern description', 'gutenberg' ),
@@ -140,6 +148,7 @@ function gutenberg_register_overlay_block_patterns() {
 <!-- /wp:group -->',
 			'categories'  => array( 'navigation' ),
 			'blockTypes'  => array( 'core/template-part/navigation-overlay' ),
+			'source'      => 'core',
 		)
 	);
 }

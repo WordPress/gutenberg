@@ -14,6 +14,7 @@ export default function Text< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	config,
 	validity,
 }: DataFormControlProps< Item > ) {
@@ -26,6 +27,7 @@ export default function Text< Item >( {
 				field,
 				onChange,
 				hideLabelFromVision,
+				markWhenOptional,
 				validity,
 				prefix: prefix ? createElement( prefix ) : undefined,
 				suffix: suffix ? createElement( suffix ) : undefined,
