@@ -34,7 +34,7 @@ import ZoomOutModeInserters from './zoom-out-mode-inserters';
 import { useShowBlockTools } from './use-show-block-tools';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
-import { BlockRenameModal } from '../block-rename';
+import { BlockRenameModal, useBlockRename } from '../block-rename';
 import { BlockVisibilityModal } from '../block-visibility';
 
 function selector( select ) {
@@ -83,7 +83,6 @@ export default function BlockTools( {
 		getSelectedBlockClientIds,
 		getBlockRootClientId,
 		getBlockEditingMode,
-		getBlockAttributes,
 		getBlockName,
 		isGroupable,
 		getEditedContentOnlySection,
@@ -95,6 +94,9 @@ export default function BlockTools( {
 	const [ renamingBlockClientId, setRenamingBlockClientId ] =
 		useState( null );
 
+	const { canRename } = useBlockRename(
+		getBlockName( getSelectedBlockClientIds()[ 0 ] )
+	);
 	const {
 		duplicateBlocks,
 		removeBlocks,
@@ -222,16 +224,10 @@ export default function BlockTools( {
 		} else if ( isMatch( 'core/block-editor/rename', event ) ) {
 			const clientIds = getSelectedBlockClientIds();
 			if ( clientIds.length === 1 ) {
-				const blockName = getBlockName( clientIds[ 0 ] );
 				const isContentOnly =
 					getBlockEditingMode( clientIds[ 0 ] ) === 'contentOnly';
-				const isNavigationLink =
-					getBlockAttributes( clientIds[ 0 ] )?.type !== undefined;
-				const canRename =
-					hasBlockSupport( blockName, 'renaming', true ) &&
-					! isContentOnly &&
-					! isNavigationLink;
-				if ( canRename ) {
+				const canRenameBlock = canRename && ! isContentOnly;
+				if ( canRenameBlock ) {
 					event.preventDefault();
 					setRenamingBlockClientId( clientIds[ 0 ] );
 				}

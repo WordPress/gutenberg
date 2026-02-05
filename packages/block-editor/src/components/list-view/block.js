@@ -421,14 +421,7 @@ function ListViewBlock( {
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const isContentOnly =
 				getBlockEditingMode( blocksToUpdate[ 0 ] ) === 'contentOnly';
-			const isNavigationLink =
-				getBlockAttributes( blocksToUpdate[ 0 ] )?.type !== undefined;
-			if (
-				blocksToUpdate.length === 1 &&
-				canRename &&
-				! isContentOnly &&
-				! isNavigationLink
-			) {
+			if ( blocksToUpdate.length === 1 && canRename && ! isContentOnly ) {
 				event.preventDefault();
 				setIsRenameModalOpen( true );
 			}
