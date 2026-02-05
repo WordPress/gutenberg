@@ -216,6 +216,16 @@ export function FlatTermSelector( { slug } ) {
 		}
 
 		if ( ! hasCreateAction ) {
+			onUpdateTerms( termNamesToIds( uniqueTerms, availableTerms ) );
+
+			createErrorNotice(
+				__(
+					'Some terms were not added because you do not have permission to create new terms.'
+				),
+				{
+					type: 'snackbar',
+				}
+			);
 			return;
 		}
 
