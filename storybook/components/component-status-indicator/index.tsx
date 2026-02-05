@@ -31,6 +31,7 @@ export function ComponentStatusIndicator() {
 				flexDirection: 'row',
 				marginBottom: '20px',
 				fontSize: '14px',
+				lineHeight: '1.5',
 			} }
 		>
 			<div
@@ -39,13 +40,21 @@ export function ComponentStatusIndicator() {
 					flexDirection: 'column',
 					width: 'fit-content',
 					flexShrink: 0,
+					fontSize: 'inherit',
 				} }
 			>
-				<dt style={ { fontStyle: 'normal', color: '#757575' } }>
+				<dt
+					style={ {
+						margin: 0,
+						fontStyle: 'normal',
+						color: '#757575',
+					} }
+				>
 					Status
 				</dt>
 				<dd
 					style={ {
+						margin: 0,
 						fontStyle: 'normal',
 						padding: 0,
 						fontWeight: 'bold',
@@ -60,13 +69,22 @@ export function ComponentStatusIndicator() {
 						display: 'flex',
 						flexDirection: 'column',
 						width: 'fit-content',
+						fontSize: 'inherit',
 					} }
 				>
-					<dt style={ { fontStyle: 'normal', color: '#757575' } }>
+					<dt
+						style={ {
+							margin: 0,
+							fontStyle: 'normal',
+							color: '#757575',
+						} }
+					>
 						Notes
 					</dt>
-					<dd style={ { padding: 0, fontWeight: 'bold' } }>
-						<Markdown>{ componentStatus.notes }</Markdown>
+					<dd style={ { margin: 0, padding: 0, fontWeight: 'bold' } }>
+						<Markdown style={ { lineHeight: 'inherit' } }>
+							{ componentStatus.notes }
+						</Markdown>
 					</dd>
 				</div>
 			) }
