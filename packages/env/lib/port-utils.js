@@ -50,30 +50,16 @@ async function isPortAvailable( port ) {
  * @throws {Error} If no available port is found within the range.
  */
 async function findAvailablePort( { preferredPort, exclude = [] } ) {
-	const effectiveMin = DEFAULT_MIN_PORT;
-	const effectiveMax = DEFAULT_MAX_PORT;
-
-	// Try the preferred port first if it's within range and not excluded
-	if (
-		preferredPort >= effectiveMin &&
-		preferredPort <= effectiveMax &&
-		! exclude.includes( preferredPort )
-	) {
+	// Try the preferred port first if it's not excluded
+	if ( ! exclude.includes( preferredPort ) ) {
 		const isAvailable = await isPortAvailable( preferredPort );
 		if ( isAvailable ) {
 			return preferredPort;
 		}
 	}
 
-	// If preferred port is not available, search for an available port
-	// Start from preferred port if within range, otherwise start from min
-	const startPort =
-		preferredPort >= effectiveMin && preferredPort <= effectiveMax
-			? preferredPort
-			: effectiveMin;
-
-	// Search forward from start port to max
-	for ( let port = startPort; port <= effectiveMax; port++ ) {
+	// If preferred port is not available, search the ephemeral range
+	for ( let port = DEFAULT_MIN_PORT; port <= DEFAULT_MAX_PORT; port++ ) {
 		if ( exclude.includes( port ) ) {
 			continue;
 		}
@@ -83,21 +69,8 @@ async function findAvailablePort( { preferredPort, exclude = [] } ) {
 		}
 	}
 
-	// Search backward from start port to min (if we started above min)
-	if ( startPort > effectiveMin ) {
-		for ( let port = startPort - 1; port >= effectiveMin; port-- ) {
-			if ( exclude.includes( port ) ) {
-				continue;
-			}
-			const isAvailable = await isPortAvailable( port );
-			if ( isAvailable ) {
-				return port;
-			}
-		}
-	}
-
 	throw new Error(
-		`No available port found in range ${ effectiveMin }-${ effectiveMax }.`
+		`No available port found in range ${ DEFAULT_MIN_PORT }-${ DEFAULT_MAX_PORT }.`
 	);
 }
 
