@@ -33,6 +33,8 @@ import {
 	buildPadInputStateReducer,
 	validateInputElementTarget,
 	setInConfiguredTimezone,
+	isValidDate,
+	getDaysInMonth,
 } from '../utils';
 import { TIMEZONELESS_FORMAT } from '../constants';
 import { TimeInput } from './time-input';
@@ -70,6 +72,10 @@ export function TimePicker( {
 		// Truncate the date at the minutes, see: #15495.
 		startOfMinute( inputToDate( currentTime ?? new Date() ) )
 	);
+
+	// Key to force re-render of inputs when values are clamped.
+	// Incrementing this remounts the input, resetting its internal state to match the controlled value.
+	const [ inputResetKey, setInputResetKey ] = useState( 0 );
 
 	// Reset the state when currentTime changed.
 	// TODO: useEffect() shouldn't be used like this, causes an unnecessary render
@@ -112,16 +118,83 @@ export function TimePicker( {
 				return;
 			}
 
-			// We can safely assume value is a number if target is valid.
+			const stringValue = String( value ).trim();
 			const numberValue = Number( value );
+
+			// Get current date components in configured timezone.
+			const currentMonth = Number( formatDate( 'n', date ) );
+			const currentYear = Number( formatDate( 'Y', date ) );
+			const currentDay = Number( formatDate( 'j', date ) );
+
+			// Detect if field was cleared (empty or browser set to min).
+			// When a number input is cleared and blurred, the browser sets it to min.
+			// We detect this by checking if the new value is the HTML min attribute value
+			// AND the previous controlled value was different.
+			const htmlMin = method === 'date' ? 1 : 1; // Both have min=1
+			const previousValue = method === 'date' ? currentDay : currentYear;
+
+			const isCleared =
+				stringValue === '' ||
+				( method === 'year' && numberValue < 1000 ) ||
+				( numberValue === htmlMin && previousValue !== htmlMin );
+
+			if ( isCleared ) {
+				setInputResetKey( ( key ) => key + 1 );
+				return;
+			}
+
+			let updates: { date?: number; year?: number } = {};
+			let wasClamped = false;
+
+			if ( method === 'date' ) {
+				// Validate day: must be 1-31 and valid for current month/year.
+				// Clamp to valid range (consistent with hour/minute behavior).
+				const maxDays = getDaysInMonth( currentYear, currentMonth );
+				if ( isNaN( numberValue ) ) {
+					setInputResetKey( ( key ) => key + 1 );
+					return;
+				}
+				const clampedDay = Math.max( 1, Math.min( numberValue, maxDays ) );
+				wasClamped = clampedDay !== numberValue;
+				updates = { date: clampedDay };
+			}
+
+			if ( method === 'year' ) {
+				// Validate year: must be 1000-9999.
+				// Clamp to valid range (consistent with hour/minute behavior).
+				if ( isNaN( numberValue ) ) {
+					setInputResetKey( ( key ) => key + 1 );
+					return;
+				}
+				const clampedYear = Math.max( 1000, Math.min( numberValue, 9999 ) );
+				wasClamped = clampedYear !== numberValue;
+
+				// Re-validate day for new year (leap year handling).
+				// If current day exceeds max days in the new year/month, clamp it.
+				const maxDays = getDaysInMonth( clampedYear, currentMonth );
+				const validDay = Math.min( currentDay, maxDays );
+
+				updates = { year: clampedYear };
+				if ( validDay !== currentDay ) {
+					updates.date = validDay;
+					wasClamped = true;
+				}
+			}
 
 			// Internal date is UTC-normalized, but the field should be updated
 			// as if in the configured timezone.
-			const newDate = setInConfiguredTimezone( date, {
-				[ method ]: numberValue,
-			} );
-			setDate( newDate );
-			onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+			const newDate = setInConfiguredTimezone( date, updates );
+
+			// Only update if the new date is valid.
+			if ( isValidDate( newDate ) ) {
+				setDate( newDate );
+				onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+
+				// If value was clamped, force re-render of inputs to show corrected value.
+				if ( wasClamped ) {
+					setInputResetKey( ( key ) => key + 1 );
+				}
+			}
 		};
 		return callback;
 	};
@@ -142,7 +215,7 @@ export function TimePicker( {
 
 	const dayField = (
 		<DayInput
-			key="day"
+			key={ `day-${ inputResetKey }` }
 			className="components-datetime__time-field components-datetime__time-field-day" // Unused, for backwards compatibility.
 			label={ __( 'Day' ) }
 			hideLabelFromVision
@@ -157,6 +230,7 @@ export function TimePicker( {
 			isDragEnabled={ false }
 			isShiftStepEnabled={ false }
 			onChange={ buildNumberControlChangeCallback( 'date' ) }
+			__unstableStateReducer={ buildPadInputStateReducer( 2 ) }
 		/>
 	);
 
@@ -170,13 +244,27 @@ export function TimePicker( {
 				value={ month }
 				options={ monthOptions }
 				onChange={ ( value ) => {
+					const newMonth = Number( value );
+					const currentDay = Number( formatDate( 'j', date ) );
+					const currentYear = Number( formatDate( 'Y', date ) );
+
+					// Check if current day is valid for new month.
+					// Clamp day to max valid day for the new month (e.g., Jan 31 -> Feb 28).
+					const maxDays = getDaysInMonth( currentYear, newMonth );
+					const validDay = Math.min( currentDay, maxDays );
+
 					// Internal date is UTC-normalized, but the field should be updated
 					// as if in the configured timezone.
 					const newDate = setInConfiguredTimezone( date, {
-						month: Number( value ) - 1,
+						month: newMonth - 1,
+						date: validDay,
 					} );
-					setDate( newDate );
-					onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+
+					// Only update if the new date is valid.
+					if ( isValidDate( newDate ) ) {
+						setDate( newDate );
+						onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+					}
 				} }
 			/>
 		</MonthSelectWrapper>
@@ -184,7 +272,7 @@ export function TimePicker( {
 
 	const yearField = (
 		<YearInput
-			key="year"
+			key={ `year-${ inputResetKey }` }
 			className="components-datetime__time-field components-datetime__time-field-year" // Unused, for backwards compatibility.
 			label={ __( 'Year' ) }
 			hideLabelFromVision

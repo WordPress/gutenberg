@@ -11,7 +11,13 @@ import { getSettings, setSettings, type DateSettings } from '@wordpress/date';
 /**
  * Internal dependencies
  */
-import { inputToDate } from '../utils';
+import {
+	inputToDate,
+	isValidDate,
+	getDaysInMonth,
+	validateDay,
+	validateYear,
+} from '../utils';
 
 describe( 'inputToDate', () => {
 	let originalSettings: DateSettings;
@@ -223,5 +229,111 @@ describe( 'inputToDate', () => {
 			expect( result.getUTCMinutes() ).toBe( 30 );
 			expect( result.getUTCSeconds() ).toBe( 45 );
 		} );
+	} );
+} );
+
+describe( 'isValidDate', () => {
+	it( 'should return true for valid dates', () => {
+		expect( isValidDate( new Date( '2025-02-05' ) ) ).toBe( true );
+		expect( isValidDate( new Date( 2025, 1, 5 ) ) ).toBe( true );
+		expect( isValidDate( new Date() ) ).toBe( true );
+	} );
+
+	it( 'should return false for Invalid Date', () => {
+		expect( isValidDate( new Date( 'invalid' ) ) ).toBe( false );
+		expect( isValidDate( new Date( NaN ) ) ).toBe( false );
+	} );
+
+	it( 'should return false for Date created with invalid string', () => {
+		expect( isValidDate( new Date( 'not-a-date' ) ) ).toBe( false );
+	} );
+} );
+
+describe( 'getDaysInMonth', () => {
+	it( 'should return 31 for January', () => {
+		expect( getDaysInMonth( 2025, 1 ) ).toBe( 31 );
+	} );
+
+	it( 'should return 28 for February in non-leap year', () => {
+		expect( getDaysInMonth( 2025, 2 ) ).toBe( 28 );
+		expect( getDaysInMonth( 2023, 2 ) ).toBe( 28 );
+		expect( getDaysInMonth( 2100, 2 ) ).toBe( 28 ); // Century year, not leap
+	} );
+
+	it( 'should return 29 for February in leap year', () => {
+		expect( getDaysInMonth( 2024, 2 ) ).toBe( 29 );
+		expect( getDaysInMonth( 2000, 2 ) ).toBe( 29 ); // Century year divisible by 400
+		expect( getDaysInMonth( 2028, 2 ) ).toBe( 29 );
+	} );
+
+	it( 'should return 30 for April, June, September, November', () => {
+		expect( getDaysInMonth( 2025, 4 ) ).toBe( 30 );
+		expect( getDaysInMonth( 2025, 6 ) ).toBe( 30 );
+		expect( getDaysInMonth( 2025, 9 ) ).toBe( 30 );
+		expect( getDaysInMonth( 2025, 11 ) ).toBe( 30 );
+	} );
+
+	it( 'should return 31 for March, May, July, August, October, December', () => {
+		expect( getDaysInMonth( 2025, 3 ) ).toBe( 31 );
+		expect( getDaysInMonth( 2025, 5 ) ).toBe( 31 );
+		expect( getDaysInMonth( 2025, 7 ) ).toBe( 31 );
+		expect( getDaysInMonth( 2025, 8 ) ).toBe( 31 );
+		expect( getDaysInMonth( 2025, 10 ) ).toBe( 31 );
+		expect( getDaysInMonth( 2025, 12 ) ).toBe( 31 );
+	} );
+} );
+
+describe( 'validateDay', () => {
+	it( 'should return the day if valid', () => {
+		expect( validateDay( 15, 2, 2025, 1 ) ).toBe( 15 );
+		expect( validateDay( 1, 1, 2025, 10 ) ).toBe( 1 );
+		expect( validateDay( 31, 1, 2025, 10 ) ).toBe( 31 );
+	} );
+
+	it( 'should return fallback day for NaN input', () => {
+		expect( validateDay( NaN, 2, 2025, 15 ) ).toBe( 15 );
+	} );
+
+	it( 'should return fallback day for day < 1', () => {
+		expect( validateDay( 0, 2, 2025, 15 ) ).toBe( 15 );
+		expect( validateDay( -1, 2, 2025, 15 ) ).toBe( 15 );
+	} );
+
+	it( 'should return fallback day for day > max days in month', () => {
+		// February in non-leap year has 28 days
+		expect( validateDay( 29, 2, 2025, 15 ) ).toBe( 15 );
+		expect( validateDay( 30, 2, 2025, 15 ) ).toBe( 15 );
+		expect( validateDay( 31, 2, 2025, 15 ) ).toBe( 15 );
+	} );
+
+	it( 'should accept 29 for February in leap year', () => {
+		expect( validateDay( 29, 2, 2024, 15 ) ).toBe( 29 );
+	} );
+
+	it( 'should reject 31 for April (30-day month)', () => {
+		expect( validateDay( 31, 4, 2025, 15 ) ).toBe( 15 );
+	} );
+} );
+
+describe( 'validateYear', () => {
+	it( 'should return the year if valid', () => {
+		expect( validateYear( 2025, 2000 ) ).toBe( 2025 );
+		expect( validateYear( 1000, 2000 ) ).toBe( 1000 );
+		expect( validateYear( 9999, 2000 ) ).toBe( 9999 );
+	} );
+
+	it( 'should return fallback year for NaN input', () => {
+		expect( validateYear( NaN, 2025 ) ).toBe( 2025 );
+	} );
+
+	it( 'should return fallback year for year < 1000', () => {
+		expect( validateYear( 999, 2025 ) ).toBe( 2025 );
+		expect( validateYear( 0, 2025 ) ).toBe( 2025 );
+		expect( validateYear( -1, 2025 ) ).toBe( 2025 );
+	} );
+
+	it( 'should return fallback year for year > 9999', () => {
+		expect( validateYear( 10000, 2025 ) ).toBe( 2025 );
+		expect( validateYear( 99999, 2025 ) ).toBe( 2025 );
 	} );
 } );

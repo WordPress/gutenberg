@@ -148,7 +148,74 @@ export function setInConfiguredTimezone(
 	const timezoneless = `${ year }-${ month }-${ day }T${ hours }:${ minutes }:${ seconds }`;
 
 	// Parse as WordPress-configured timezone time and convert to a UTC instant.
-	return new UTCDateMini( getDate( timezoneless ).getTime() );
+	const result = new UTCDateMini( getDate( timezoneless ).getTime() );
+
+	// If the constructed date is invalid, return the original date unchanged.
+	if ( ! isValidDate( result ) ) {
+		return date;
+	}
+
+	return result;
+}
+
+/**
+ * Checks if a Date object is valid (not Invalid Date).
+ *
+ * @param date A Date object to validate
+ * @return True if the date is valid, false if it's an Invalid Date
+ */
+export function isValidDate( date: Date ): boolean {
+	return ! isNaN( date.getTime() );
+}
+
+/**
+ * Gets the number of days in a given month.
+ *
+ * @param year  The year (e.g., 2025)
+ * @param month The month (1-indexed, 1-12)
+ * @return The number of days in the month
+ */
+export function getDaysInMonth( year: number, month: number ): number {
+	// Using day 0 of the next month gives the last day of the target month
+	return new Date( year, month, 0 ).getDate();
+}
+
+/**
+ * Validates a day value for a given year/month combination.
+ * Returns the validated day (clamped to valid range or reset to fallback).
+ *
+ * @param day         The day value to validate
+ * @param month       The month (1-indexed, 1-12)
+ * @param year        The year
+ * @param fallbackDay The fallback day to use if validation fails
+ * @return The validated day value
+ */
+export function validateDay(
+	day: number,
+	month: number,
+	year: number,
+	fallbackDay: number
+): number {
+	const maxDays = getDaysInMonth( year, month );
+	if ( isNaN( day ) || day < 1 || day > maxDays ) {
+		return fallbackDay;
+	}
+	return day;
+}
+
+/**
+ * Validates a year value.
+ * Returns the validated year (within 1000-9999 or reset to fallback).
+ *
+ * @param year         The year value to validate
+ * @param fallbackYear The fallback year to use if validation fails
+ * @return The validated year value
+ */
+export function validateYear( year: number, fallbackYear: number ): number {
+	if ( isNaN( year ) || year < 1000 || year > 9999 ) {
+		return fallbackYear;
+	}
+	return year;
 }
 
 /**
