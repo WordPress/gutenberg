@@ -8,7 +8,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useEffect, useRef } from '@wordpress/element';
+import { useMemo, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
