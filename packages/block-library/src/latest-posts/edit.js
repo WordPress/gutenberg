@@ -819,7 +819,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 									<div
 										className="wp-block-latest-posts__post-full-content"
 										dangerouslySetInnerHTML={ {
-											__html: post.content.raw.trim(),
+											__html: post.content.rendered.trim(),
 										} }
 									/>
 								) }
