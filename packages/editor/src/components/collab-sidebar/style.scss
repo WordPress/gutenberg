@@ -368,13 +368,12 @@ mark.wp-note {
 	}
 }
 
-.editor-collab-sidebar-panel__reaction-details {
-	padding: $grid-unit-20;
-	min-width: 200px;
-	max-width: 300px;
+.editor-collab-sidebar-panel__reaction-details .components-popover__content {
+	width: 260px;
 }
 
 .editor-collab-sidebar-panel__reaction-details-content {
+	padding: $grid-unit-30;
 	max-height: 300px;
 	overflow-y: auto;
 }
@@ -393,4 +392,8 @@ mark.wp-note {
 	height: 24px;
 	border-radius: $radius-round;
 	flex-shrink: 0;
+}
+
+.editor-collab-sidebar-panel__reaction-details-timestamp {
+	font-size: 12px;
 }
