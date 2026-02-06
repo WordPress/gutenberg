@@ -185,6 +185,7 @@ export function addItem( {
 				},
 				additionalData: {
 					convert_format: false,
+					generate_sub_sizes: false,
 					...additionalData,
 				},
 				onChange,
