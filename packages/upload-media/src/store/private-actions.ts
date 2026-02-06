@@ -17,7 +17,7 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
 import { cloneFile, convertBlobToFile, renameFile } from '../utils';
 import { StubFile } from '../stub-file';
 import { UploadError } from '../upload-error';
-import { vipsResizeImage, vipsRotateImage } from './utils';
+import { vipsResizeImage, vipsRotateImage, terminateVipsWorker } from './utils';
 import type {
 	AddAction,
 	AdditionalData,
@@ -515,6 +515,14 @@ export function removeItem( id: QueueItemId ) {
 			type: Type.Remove,
 			id,
 		} );
+
+		/*
+		 * If the queue is now empty, terminate the VIPS worker to free
+		 * WASM memory. The worker will be lazily re-created if needed.
+		 */
+		if ( select.getAllItems().length === 0 ) {
+			terminateVipsWorker();
+		}
 	};
 }
 

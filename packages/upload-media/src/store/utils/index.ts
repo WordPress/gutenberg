@@ -5,4 +5,5 @@ export {
 	vipsResizeImage,
 	vipsRotateImage,
 	vipsCancelOperations,
+	terminateVipsWorker,
 } from './vips';
