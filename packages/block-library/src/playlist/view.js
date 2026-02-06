@@ -185,7 +185,7 @@ const { state } = store(
 				if ( playBtn ) {
 					playBtn.setAttribute(
 						'aria-label',
-						track.ariaLabel || track.title || 'Play'
+						track.ariaLabel || track.title
 					);
 					playBtn.setAttribute( 'role', 'button' );
 
