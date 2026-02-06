@@ -36,6 +36,14 @@ export type TimePickerProps = {
 	 * @default false
 	 */
 	hideLabelFromVision?: boolean;
+
+	/**
+	 * The minimum year that can be selected. Defaults to 1000 to prevent
+	 * dates that moment.js cannot parse reliably.
+	 *
+	 * @default 1000
+	 */
+	minYear?: number;
 };
 
 export type TimeInputValue = {

@@ -103,6 +103,7 @@ export function PrivatePostSchedule( {
 				/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
 				_x( 'dmy', 'date order' )
 			}
+			minYear={ new Date().getFullYear() }
 			events={ events }
 			onMonthPreviewed={ ( date ) =>
 				setPreviewedMonth( parseISO( date ) )

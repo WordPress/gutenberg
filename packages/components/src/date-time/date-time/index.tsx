@@ -30,6 +30,7 @@ function UnforwardedDateTimePicker(
 		onChange,
 		events,
 		startOfWeek,
+		minYear,
 	}: DateTimePickerProps,
 	ref: ForwardedRef< any >
 ) {
@@ -41,6 +42,7 @@ function UnforwardedDateTimePicker(
 					onChange={ onChange }
 					is12Hour={ is12Hour }
 					dateOrder={ dateOrder }
+					minYear={ minYear }
 				/>
 				<DatePicker
 					currentDate={ currentDate }

@@ -65,6 +65,7 @@ export function TimePicker( {
 	onChange,
 	dateOrder: dateOrderProp,
 	hideLabelFromVision = false,
+	minYear = 1000,
 }: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
@@ -120,24 +121,14 @@ export function TimePicker( {
 				return;
 			}
 
-			// Ignore empty values (they produce 0 which creates invalid dates)
+			// Ignore empty values - they can occur during user interaction
+			// before browser constraint validation coerces to min value
 			if ( value === '' || value === null || value === undefined ) {
 				return;
 			}
 
 			// We can safely assume value is a number if target is valid.
 			const numberValue = Number( value );
-
-			// Confidence check for year values - reject unreasonably small years
-			// that would create dates moment can't parse properly
-			if ( method === 'year' && numberValue < 1000 ) {
-				return;
-			}
-
-			// Confidence check for day values - must be positive
-			if ( method === 'date' && numberValue < 1 ) {
-				return;
-			}
 
 			// Internal date is UTC-normalized, but the field should be updated
 			// as if in the configured timezone.
@@ -212,7 +203,7 @@ export function TimePicker( {
 			__next40pxDefaultSize
 			value={ year }
 			step={ 1 }
-			min={ 1 }
+			min={ minYear }
 			max={ 9999 }
 			required
 			spinControls="none"
