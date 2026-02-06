@@ -452,6 +452,10 @@ class WP_Duotone_Gutenberg {
 	 * @return string The slug of the duotone preset or an empty string if no slug is found.
 	 */
 	private static function get_slug_from_attribute( $duotone_attr ) {
+		if ( ! is_string( $duotone_attr ) ) {
+			return '';
+		}
+
 		// Uses Branch Reset Groups `(?|…)` to return one capture group.
 		preg_match( '/(?|var:preset\|duotone\|(\S+)|var\(--wp--preset--duotone--(\S+)\))/', $duotone_attr, $matches );
 
@@ -465,6 +469,10 @@ class WP_Duotone_Gutenberg {
 	 * @return bool True if the duotone preset present and valid.
 	 */
 	private static function is_preset( $duotone_attr ) {
+		if ( ! is_string( $duotone_attr ) ) {
+			return false;
+		}
+
 		$slug      = self::get_slug_from_attribute( $duotone_attr );
 		$filter_id = self::get_filter_id( $slug );
 
@@ -809,6 +817,11 @@ class WP_Duotone_Gutenberg {
 				continue;
 			}
 			// If it has a duotone filter preset, save the block name and the preset slug.
+			// Only process if it's a string (preset reference), not an array (custom colors).
+			if ( ! is_string( $duotone_attr ) ) {
+				continue;
+			}
+
 			$slug = self::get_slug_from_attribute( $duotone_attr );
 
 			if ( $slug && $slug !== $duotone_attr ) {
