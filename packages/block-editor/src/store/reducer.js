@@ -2133,6 +2133,25 @@ function openedListViewPanels(
 					[ action.clientId ]: action.isOpen,
 				},
 			};
+		case 'REPLACE_BLOCKS':
+		case 'REMOVE_BLOCKS': {
+			// Clean up stale entries when blocks are removed or replaced
+			if ( ! action.clientIds || action.clientIds.length === 0 ) {
+				return state;
+			}
+			const newPanels = { ...state.panels };
+			let hasChanges = false;
+			action.clientIds.forEach( ( clientId ) => {
+				if ( clientId in newPanels ) {
+					delete newPanels[ clientId ];
+					hasChanges = true;
+				}
+			} );
+			return hasChanges ? { ...state, panels: newPanels } : state;
+		}
+		case 'RESET_BLOCKS':
+			// Clear all panel state when blocks are reset
+			return { allOpen: false, panels: {} };
 	}
 	return state;
 }
