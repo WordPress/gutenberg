@@ -1,6 +1,10 @@
 .wp-block-playlist-track {
-	&:hover {
+	&:has([aria-current="true"]) {
 		background-color: color-mix(in srgb, currentColor 10%, transparent);
+	}
+
+	&:hover {
+		background-color: color-mix(in srgb, currentColor 15%, transparent);
 	}
 
 	.wp-block-playlist__tracklist-show-numbers & {
