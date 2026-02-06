@@ -318,6 +318,23 @@ export function processItem( id: QueueItemId ) {
 			}
 		}
 
+		/*
+		 * If the next operation is image processing (resize/crop/rotate),
+		 * check the image processing concurrency limit.
+		 * If at capacity, the item remains queued and will be processed
+		 * when another image processing operation completes.
+		 */
+		if (
+			operation === OperationType.ResizeCrop ||
+			operation === OperationType.Rotate
+		) {
+			const settings = select.getSettings();
+			const activeCount = select.getActiveImageProcessingCount();
+			if ( activeCount >= settings.maxConcurrentImageProcessing ) {
+				return;
+			}
+		}
+
 		if ( attachment ) {
 			onChange?.( [ attachment ] );
 		}
