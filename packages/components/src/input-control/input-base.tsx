@@ -92,7 +92,6 @@ function InputBase(
 	}, [ __next40pxDefaultSize, size ] );
 
 	return (
-		// @ts-expect-error The `direction` prop from Flex (FlexDirection) conflicts with legacy SVGAttributes `direction` (string) that come from React intrinsic prop definitions.
 		<Root
 			{ ...restProps }
 			{ ...getUIFlexProps( labelPosition ) }

@@ -36,7 +36,7 @@ export default function useEvent< T extends AnyFunction >(
 	 */
 	callback?: T
 ) {
-	const ref = useRef< AnyFunction | undefined >( () => {
+	const ref = useRef< AnyFunction >( () => {
 		throw new Error(
 			'Callbacks created with `useEvent` cannot be called during rendering.'
 		);
