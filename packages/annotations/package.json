@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/annotations",
-	"version": "3.39.0",
+	"version": "3.39.1-next.v.20260206T143.0+81f8de885",
 	"description": "Annotate content in the Gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

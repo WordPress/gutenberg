@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/abilities",
-	"version": "0.5.0",
+	"version": "0.5.1-next.v.20260206T143.0+81f8de885",
 	"description": "JavaScript client for WordPress Abilities API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

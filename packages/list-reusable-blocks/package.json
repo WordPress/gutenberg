@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/list-reusable-blocks",
-	"version": "5.39.0",
+	"version": "5.39.1-next.v.20260206T143.0+81f8de885",
 	"description": "Adding Export/Import support to the reusable blocks listing.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
