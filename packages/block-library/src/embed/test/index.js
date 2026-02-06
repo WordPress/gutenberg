@@ -124,6 +124,73 @@ describe( 'utils', () => {
 				existingClassNames
 			);
 		} );
+
+		it( 'should not add aspect ratio classes when iframe width is a percentage (e.g., Spotify embeds)', () => {
+			// Spotify embeds use width="100%" which shouldn't be used for aspect ratio calculation
+			const html = '<iframe width="100%" height="352"></iframe>';
+			const existingClassNames = 'wp-block-embed';
+			// Should not add aspect ratio classes because width is a percentage
+			expect( getClassNames( html, existingClassNames, true ) ).toEqual(
+				existingClassNames
+			);
+		} );
+
+		it( 'should not add aspect ratio classes when iframe height is a percentage', () => {
+			const html = '<iframe width="640" height="100%"></iframe>';
+			const existingClassNames = 'wp-block-embed';
+			// Should not add aspect ratio classes because height is a percentage
+			expect( getClassNames( html, existingClassNames, true ) ).toEqual(
+				existingClassNames
+			);
+		} );
+
+		it( 'should remove existing aspect ratio classes when iframe width is a percentage', () => {
+			const html = '<iframe width="100%" height="352"></iframe>';
+			const existingClassNames =
+				'wp-block-embed wp-embed-aspect-21-9 wp-has-aspect-ratio';
+			// Should remove the incorrect aspect ratio classes
+			expect( getClassNames( html, existingClassNames, true ) ).toEqual(
+				'wp-block-embed'
+			);
+		} );
+
+		it( 'should apply vertical aspect ratio when iframe has percentage width with very large height', () => {
+			// Prevent layout break with extremely large heights
+			const html = '<iframe width="100%" height="4000"></iframe>';
+			const existingClassNames = 'wp-block-embed';
+			// Should apply constraining 9:16 aspect ratio to prevent breaking layout
+			expect( getClassNames( html, existingClassNames, true ) ).toEqual(
+				'wp-block-embed wp-embed-aspect-9-16 wp-has-aspect-ratio'
+			);
+		} );
+
+		it( 'should apply vertical aspect ratio when iframe has percentage height with very large width', () => {
+			const html = '<iframe width="2000" height="100%"></iframe>';
+			const existingClassNames = 'wp-block-embed';
+			// Should apply constraining aspect ratio
+			expect( getClassNames( html, existingClassNames, true ) ).toEqual(
+				'wp-block-embed wp-embed-aspect-9-16 wp-has-aspect-ratio'
+			);
+		} );
+
+		it( 'should not add aspect ratio classes when both iframe width and height are percentage with different values and have ratio higher than 2.43', () => {
+			const html = '<iframe width="100%" height="25%"></iframe>';
+			const existingClassNames = 'wp-block-embed';
+			// Should not add aspect ratio classes because both dimensions are percentage and ratio is higher than 2.43
+			expect( getClassNames( html, existingClassNames, true ) ).toEqual(
+				existingClassNames
+			);
+		} );
+
+		it( 'should add aspect ratio classes when both iframe width and height are percentage with same values', () => {
+			const html = '<iframe width="100%" height="100%"></iframe>';
+			const existingClassNames =
+				'wp-block-embed wp-embed-aspect-1-1 wp-has-aspect-ratio';
+			// Should add aspect ratio classes because both dimensions are percentage
+			expect( getClassNames( html, existingClassNames, true ) ).toEqual(
+				existingClassNames
+			);
+		} );
 	} );
 	describe( 'hasInlineResponsivePadding', () => {
 		it( 'should return true when HTML contains padding-bottom percentage', () => {

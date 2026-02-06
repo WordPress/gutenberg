@@ -239,7 +239,50 @@ export function getClassNames(
 
 	// If we have a fixed aspect iframe, and it's a responsive embed block.
 	if ( iframe && iframe.height && iframe.width ) {
-		const aspectRatio = ( iframe.width / iframe.height ).toFixed( 2 );
+		// Skip aspect ratio calculation if width or height is a percentage (e.g., Spotify embeds use "100%").
+		const widthAttr = iframe.getAttribute( 'width' );
+		const heightAttr = iframe.getAttribute( 'height' );
+		const hasPercentageWidth = widthAttr && widthAttr.includes( '%' );
+		const hasPercentageHeight = heightAttr && heightAttr.includes( '%' );
+
+		// If the embed has percentage-based dimensions, we generally want to skip adding aspect ratio classes, because the embed should already be responsive. However, if only one of the dimensions is percentage-based and the other is a fixed size that is very large, we should add aspect ratio classes to prevent it from breaking the layout.
+		// also if both dimensions are percentage-based, we should add aspect ratio classes to prevent layout issues.
+		if (
+			( hasPercentageWidth || hasPercentageHeight ) &&
+			! ( hasPercentageWidth && hasPercentageHeight )
+		) {
+			// If width is percentage with a reasonable fixed height (e.g., Spotify: 100% x 352px),
+			// skip aspect ratio to let it render naturally. But if height is very large (>800px),
+			// apply a constraining aspect ratio to prevent breaking the layout.
+			const numericHeight = parseFloat( heightAttr );
+			const numericWidth = parseFloat( widthAttr );
+
+			// Check if we have an unreasonably large dimension that needs constraining
+			const hasLargeHeight =
+				hasPercentageWidth &&
+				! isNaN( numericHeight ) &&
+				numericHeight > 800;
+			const hasLargeWidth =
+				hasPercentageHeight &&
+				! isNaN( numericWidth ) &&
+				numericWidth > 800;
+
+			if ( hasLargeHeight || hasLargeWidth ) {
+				// Apply a vertical aspect ratio (9:16) to constrain the oversized embed
+				return clsx(
+					removeAspectRatioClasses( existingClassNames ),
+					'wp-embed-aspect-9-16',
+					'wp-has-aspect-ratio'
+				);
+			}
+
+			// For normal percentage embeds (like Spotify), skip aspect ratio
+			return removeAspectRatioClasses( existingClassNames );
+		}
+		const aspectRatio = (
+			parseFloat( iframe.width ) / parseFloat( iframe.height )
+		).toFixed( 2 );
+
 		// Given the actual aspect ratio, find the widest ratio to support it.
 		for (
 			let ratioIndex = 0;
