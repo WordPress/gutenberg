@@ -9,7 +9,7 @@ import { Composite } from '@wordpress/components';
  */
 export const REACTION_EMOJIS = [
 	{ emoji: '👍', label: __( 'Thumbs up' ) },
-	{ emoji: '👎', label: __( 'Thumbs down' ) },
+	{ emoji: '🤔', label: __( 'Thinking' ) },
 	{ emoji: '❤️', label: __( 'Heart' ) },
 	{ emoji: '🎉', label: __( 'Celebration' ) },
 	{ emoji: '😄', label: __( 'Smile' ) },
