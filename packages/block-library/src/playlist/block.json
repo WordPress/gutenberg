@@ -43,7 +43,6 @@
 	},
 	"providesContext": {
 		"showArtists": "showArtists",
-		"showNumbers": "showNumbers",
 		"currentTrack": "currentTrack"
 	},
 	"supports": {
