@@ -117,13 +117,7 @@ const CurrentTrack = ( { track, onTrackEnd } ) => {
 				'waveformplayer:ended',
 				handleEnded
 			);
-
-			// Destroy instance.
-			try {
-				waveformInstanceRef.current?.destroy();
-			} catch ( e ) {
-				// Silently ignore cleanup errors.
-			}
+			waveformInstanceRef.current?.destroy();
 		};
 	}, [ track?.src, onTrackEnd ] );
 
