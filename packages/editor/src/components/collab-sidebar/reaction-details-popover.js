@@ -108,6 +108,8 @@ export default function ReactionDetailsPopover( {
 			placement="bottom-start"
 			onClose={ onClose }
 			anchor={ anchor }
+			focusOnMount
+			shift
 			className="editor-collab-sidebar-panel__reaction-details"
 		>
 			<VStack
@@ -149,17 +151,22 @@ export default function ReactionDetailsPopover( {
 												className="editor-collab-sidebar-panel__reaction-details-avatar"
 											/>
 										) }
-										<Text>
-											{ getUserName(
-												users,
-												reaction.userId
-											) }
-										</Text>
-										<Text variant="muted">
-											{ humanTimeDiff(
-												reaction.timestamp
-											) }
-										</Text>
+										<VStack spacing="0">
+											<Text>
+												{ getUserName(
+													users,
+													reaction.userId
+												) }
+											</Text>
+											<Text
+												variant="muted"
+												className="editor-collab-sidebar-panel__reaction-details-timestamp"
+											>
+												{ humanTimeDiff(
+													reaction.timestamp
+												) }
+											</Text>
+										</VStack>
 									</HStack>
 								) ) }
 							</VStack>
