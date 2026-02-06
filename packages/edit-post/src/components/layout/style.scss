@@ -23,7 +23,7 @@
 	z-index: 1;
 	height: $button-size-compact;
 	// Enlarge the toggle/resizable hit area on touch devices.
-	@media (pointer: coarse) {
+	@media ( pointer: coarse ) {
 		height: $button-size;
 	}
 
@@ -124,12 +124,13 @@
 }
 
 // Adjust the position of the notices
-.edit-post-layout .edit-post-layout__snackbar {
+.edit-post-layout__snackbar {
 	position: fixed;
+	left: 0;
 	right: 0;
+	margin: 0 auto;
+	width: max-content;
 	bottom: 24px;
 	padding-left: 24px;
 	padding-right: 24px;
 }
-
-@include editor-left( ".edit-post-layout .edit-post-layout__snackbar" );

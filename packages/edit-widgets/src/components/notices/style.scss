@@ -3,12 +3,14 @@
 
 .edit-widgets-notices__snackbar {
 	position: fixed;
+	left: 0;
 	right: 0;
+	margin: 0 auto;
+	width: max-content;
 	bottom: 20px;
 	padding-left: 16px;
 	padding-right: 16px;
 }
-@include editor-left(".edit-widgets-notices__snackbar");
 
 .edit-widgets-notices__dismissible,
 .edit-widgets-notices__pinned {

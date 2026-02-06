@@ -281,18 +281,12 @@ html.canvas-mode-edit-transition::view-transition-group( toggle ) {
 }
 
 .edit-site-layout__snackbar {
-	&--canvas-visible {
-		position: fixed;
-		right: 0;
-		bottom: 16px;
-		padding-left: 16px;
-		padding-right: 16px;
-	}
-	&--in-area {
-		position: absolute;
-		right: 0;
-		bottom: 16px;
-		padding-left: 16px;
-		padding-right: 16px;
-	}
+	position: fixed;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+	width: max-content;
+	bottom: 16px;
+	padding-left: 16px;
+	padding-right: 16px;
 }

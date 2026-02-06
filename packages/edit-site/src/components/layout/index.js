@@ -20,13 +20,7 @@ import {
 	usePrevious,
 } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-import {
-	createPortal,
-	useLayoutEffect,
-	useState,
-	useRef,
-	useEffect,
-} from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import {
 	UnsavedChangesWarning,
 	ErrorBoundary,
@@ -62,10 +56,6 @@ function Layout() {
 	const canvas = routeKey === 'notfound' ? 'view' : query?.canvas ?? 'view';
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const toggleRef = useRef();
-	const mainContentRef = useRef();
-	const contentSidebarRef = useRef();
-	const editSidebarRef = useRef();
-	const [ snackbarTarget, setSnackbarTarget ] = useState( null );
 	const navigateRegionsProps = useNavigateRegions();
 	const disableMotion = useReducedMotion();
 	const [ canvasResizer, canvasSize ] = useResizeObserver();
@@ -95,34 +85,6 @@ function Layout() {
 		// Should not depend on the previous canvas mode value but the next.
 	}, [ canvas ] );
 
-	const isFullCanvas = canvas === 'edit';
-	const shouldSnackbarBeFixed =
-		isFullCanvas ||
-		! ( contentSidebarRef.current ?? editSidebarRef.current );
-	useLayoutEffect( () => {
-		const areaTarget = contentSidebarRef.current ?? editSidebarRef.current;
-		const nextTarget =
-			isFullCanvas || ! areaTarget ? mainContentRef.current : areaTarget;
-
-		if ( nextTarget && nextTarget !== snackbarTarget ) {
-			setSnackbarTarget( nextTarget );
-		}
-	}, [ isFullCanvas, snackbarTarget ] );
-
-	const snackbarList = snackbarTarget
-		? createPortal(
-				<SnackbarNotices
-					className={ clsx( 'edit-site-layout__snackbar', {
-						'edit-site-layout__snackbar--canvas-visible':
-							shouldSnackbarBeFixed,
-						'edit-site-layout__snackbar--in-area':
-							! shouldSnackbarBeFixed,
-					} ) }
-				/>,
-				snackbarTarget
-		  )
-		: null;
-
 	return (
 		<>
 			<UnsavedChangesWarning />
@@ -134,15 +96,12 @@ function Layout() {
 					'edit-site-layout',
 					navigateRegionsProps.className,
 					{
-						'is-full-canvas': isFullCanvas,
+						'is-full-canvas': canvas === 'edit',
 						'show-icon-labels': showIconLabels,
 					}
 				) }
 			>
-				<div
-					className="edit-site-layout__content"
-					ref={ mainContentRef }
-				>
+				<div className="edit-site-layout__content">
 					{ /*
 						The NavigableRegion must always be rendered and not use
 						`inert` otherwise `useNavigateRegions` will fail.
@@ -196,6 +155,8 @@ function Layout() {
 						</NavigableRegion>
 					) }
 
+					<SnackbarNotices className="edit-site-layout__snackbar" />
+
 					{ isMobileViewport && areas.mobile && (
 						<div className="edit-site-layout__mobile">
 							<SidebarNavigationProvider>
@@ -229,10 +190,7 @@ function Layout() {
 						canvas !== 'edit' && (
 							<div
 								className="edit-site-layout__area"
-								ref={ contentSidebarRef }
-								style={ {
-									maxWidth: widths?.content,
-								} }
+								style={ { maxWidth: widths?.content } }
 							>
 								<ErrorBoundary>{ areas.content }</ErrorBoundary>
 							</div>
@@ -241,10 +199,7 @@ function Layout() {
 					{ ! isMobileViewport && areas.edit && canvas !== 'edit' && (
 						<div
 							className="edit-site-layout__area"
-							ref={ editSidebarRef }
-							style={ {
-								maxWidth: widths?.edit,
-							} }
+							style={ { maxWidth: widths?.edit } }
 						>
 							<ErrorBoundary>{ areas.edit }</ErrorBoundary>
 						</div>
@@ -295,7 +250,6 @@ function Layout() {
 					) }
 				</div>
 			</div>
-			{ snackbarList }
 		</>
 	);
 }
