@@ -25,7 +25,6 @@ function Editor( {
 	settings,
 	children,
 	initialEdits,
-	initialSelection,
 
 	// This could be part of the settings.
 	onActionPerformed,
@@ -115,7 +114,6 @@ function Editor( {
 					__unstableTemplate={ template }
 					settings={ settings }
 					initialEdits={ initialEdits }
-					initialSelection={ initialSelection }
 					useSubRegistry={ false }
 				>
 					<EditorInterface { ...props }>

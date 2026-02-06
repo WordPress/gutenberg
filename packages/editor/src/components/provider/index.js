@@ -161,7 +161,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		recovery,
 		initialEdits,
 		children,
-		initialSelection,
 		BlockEditorProviderComponent = ExperimentalBlockEditorProvider,
 		__unstableTemplate: template,
 	} ) => {
@@ -177,12 +176,12 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			( select ) => {
 				const {
 					getEditorSettings,
-					getEditorSelection,
 					getRenderingMode,
 					__unstableIsEditorReady,
 					getDefaultRenderingMode,
 				} = unlock( select( editorStore ) );
-				const { getEntitiesConfig } = select( coreStore );
+				const { getEntitiesConfig, getEntityRecordEdits } =
+					select( coreStore );
 
 				const _mode = getRenderingMode();
 				const _defaultMode = getDefaultRenderingMode( post.type );
@@ -200,6 +199,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 				// Wait until the default mode is retrieved and start rendering canvas.
 				const isRenderingModeReady = _defaultMode !== undefined;
 
+				// Read selection directly from entity edits using the post prop,
+				// bypassing getCurrentPostId() which lags behind in useEffect.
+				const entityEdits = getEntityRecordEdits(
+					'postType',
+					post.type,
+					post.id
+				);
+
 				return {
 					editorSettings: getEditorSettings(),
 					isReady: __unstableIsEditorReady(),
@@ -207,14 +214,14 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 					defaultMode: hasResolvedDefaultMode
 						? _defaultMode
 						: undefined,
-					selection: getEditorSelection(),
+					selection: entityEdits?.selection,
 					postTypeEntities:
 						post.type === 'wp_template'
 							? getEntitiesConfig( 'postType' )
 							: null,
 				};
 			},
-			[ post.type, hasTemplate ]
+			[ post.type, post.id, hasTemplate ]
 		);
 
 		const shouldRenderTemplate = hasTemplate && mode !== 'post-only';
@@ -401,7 +408,6 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							selection={ selection }
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
-							initialSelection={ initialSelection }
 						>
 							{ children }
 							{ ! settings.isPreviewMode && (
