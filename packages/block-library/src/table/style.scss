@@ -244,13 +244,13 @@
 				// This buffer is necessary to prevent the border from being cropped by overflow-y: clip;.
 				// When set to half a pixel, it ensures the figure element is the same height as the table.
 				margin: 1px 0;
-				transform: translateY(2px);
 			}
 
 			&::before {
 				left: 0;
 				margin-block-end: calc(-infinity * 1px);
 				background: linear-gradient(90deg, var(--scroll-cue-color), transparent);
+				transform: translateY(-2px);
 			}
 
 			&::after {
@@ -258,6 +258,7 @@
 				left: calc(100% - var(--scroll-cue-size));
 				margin-block-start: calc(-infinity * 1px);
 				background: linear-gradient(-90deg, var(--scroll-cue-color), transparent);
+				transform: translateY(2px);
 			}
 		}
 	}
