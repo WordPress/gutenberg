@@ -1,8 +1,19 @@
 /**
  * External dependencies
  */
-// eslint-disable-next-line no-restricted-imports
-import type { combineReducers as reduxCombineReducers } from 'redux';
+import type {
+	combineReducers as reduxCombineReducers, // eslint-disable-line no-restricted-imports
+	UnknownAction,
+} from 'redux';
+
+/**
+ * Internal dependencies
+ */
+import type {
+	invalidateResolution,
+	invalidateResolutionForStore,
+	invalidateResolutionForStoreSelector,
+} from './redux-store/metadata/actions';
 
 type MapOf< T > = { [ name: string ]: T };
 
@@ -42,6 +53,34 @@ export interface ReduxStoreConfig<
 	selectors?: Selectors;
 	controls?: MapOf< Function >;
 }
+
+type InvalidateResolution = typeof invalidateResolution;
+type InvalidateResolutionForStore = typeof invalidateResolutionForStore;
+type InvalidateResolutionForStoreSelector =
+	typeof invalidateResolutionForStoreSelector;
+
+type InvalidateResolutionAction = ReturnType< InvalidateResolution >;
+type InvalidateResolutionForStoreAction =
+	ReturnType< InvalidateResolutionForStore >;
+type InvalidateResolutionForStoreSelectorAction =
+	ReturnType< InvalidateResolutionForStoreSelector >;
+
+/**
+ * The action creators for metadata actions.
+ */
+type MetadataActionCreators = {
+	invalidateResolution: InvalidateResolution;
+	invalidateResolutionForStore: InvalidateResolutionForStore;
+	invalidateResolutionForStoreSelector: InvalidateResolutionForStoreSelector;
+};
+
+/**
+ * Metadata actions.
+ */
+type MetadataAction =
+	| InvalidateResolutionAction
+	| InvalidateResolutionForStoreAction
+	| InvalidateResolutionForStoreSelectorAction;
 
 // Return type for the useSelect() hook.
 export type UseSelectReturn< F extends MapSelect | StoreDescriptor< any > > =
@@ -194,20 +233,35 @@ export interface SelectorWithCustomCurrySignature {
 }
 
 export interface DataRegistry {
-	register: ( store: StoreDescriptor< any > ) => void;
-	dispatch: < S extends StoreDescriptor< any > >(
-		store: S
-	) => ActionCreatorsOf< ConfigOf< S > >;
+	register: ( store: StoreDescriptor< AnyConfig > ) => void;
+	dispatch: < S extends string | StoreDescriptor< AnyConfig > >(
+		storeNameOrDescriptor: S
+	) => S extends StoreDescriptor< infer Config >
+		? ActionCreatorsOf< Config >
+		: unknown;
+	select: < S extends string | StoreDescriptor< AnyConfig > >(
+		storeNameOrDescriptor: S
+	) => S extends StoreDescriptor< infer Config >
+		? CurriedSelectorsOf< Config >
+		: unknown;
 }
 
 // Type Helpers.
 
 export type ConfigOf< S > = S extends StoreDescriptor< infer C > ? C : never;
 
-export type ActionCreatorsOf< Config extends AnyConfig > =
+export type BaseActionCreatorsOf< Config extends AnyConfig > =
 	Config extends ReduxStoreConfig< any, infer ActionCreators, any >
 		? PromisifiedActionCreators< ActionCreators >
 		: never;
+
+/**
+ * The action creators for a store config.
+ *
+ * Also includes metadata actions creators.
+ */
+type ActionCreatorsOf< Config extends AnyConfig > =
+	BaseActionCreatorsOf< Config > & MetadataActionCreators;
 
 // Takes an object containing all action creators for a store and updates the
 // return type of each action creator to account for internal registry details --
@@ -244,5 +298,41 @@ type SelectorsOf< Config extends AnyConfig > = Config extends ReduxStoreConfig<
 >
 	? { [ name in keyof Selectors ]: Function }
 	: never;
+
+/**
+ * Thunk arguments.
+ *
+ * Used to type the arguments passed to a thunk function.
+ */
+export type ThunkArgs<
+	Action extends UnknownAction,
+	S extends StoreDescriptor< AnyConfig >,
+> = {
+	/**
+	 * Dispatch an action to the store.
+	 */
+	dispatch: ( S extends StoreDescriptor< infer Config >
+		? ActionCreatorsOf< Config >
+		: unknown ) &
+		( ( action: Action | MetadataAction ) => void );
+
+	/**
+	 * Selectors for the store.
+	 */
+	select: CurriedSelectorsOf< S >;
+
+	/**
+	 * The store registry object.
+	 */
+	registry: DataRegistry;
+};
+
+export type Thunk<
+	A extends UnknownAction,
+	S extends StoreDescriptor< AnyConfig >,
+	T extends unknown = void,
+> = T extends Awaited< infer R >
+	? ( args: ThunkArgs< A, S > ) => Promise< R >
+	: ( args: ThunkArgs< A, S > ) => T;
 
 export type combineReducers = typeof reduxCombineReducers;
