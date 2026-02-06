@@ -416,38 +416,9 @@ yield actions.navigate( '/page/', { timeout: 30000 } );
 
 ### Handling fetch errors
 
-When navigation fails (network error, timeout, or server error), the router automatically falls back to a full page reload. You can implement custom error handling by catching errors from `navigate()`:
+When navigation fails (network error, timeout, or server error), the router automatically falls back to a full page reload. This means you cannot catch fetch errors from `navigate()` directly — the browser takes over before your code has a chance to handle them.
 
-```js
-store( 'myPlugin', {
-    state: {
-        error: null,
-    },
-    actions: {
-        navigateSafely: withSyncEvent( function* ( event ) {
-            event.preventDefault();
-            state.error = null;
-
-            try {
-                const { actions } = yield import(
-                    '@wordpress/interactivity-router'
-                );
-                yield actions.navigate( event.target.href, {
-                    timeout: 5000,
-                } );
-            } catch ( error ) {
-                state.error = 'Navigation failed. Please try again.';
-                console.error( 'Navigation error:', error );
-
-                // Optionally fall back to full page navigation:
-                // window.location.href = event.target.href;
-            }
-        } ),
-    },
-} );
-```
-
-For more control, you can fetch and process pages manually:
+If you need custom error handling (for example, showing an error message instead of reloading), you can fetch the page manually, handle any errors yourself, and then pass the fetched HTML to `navigate()` using the `html` option:
 
 ```js
 store( 'myPlugin', {
