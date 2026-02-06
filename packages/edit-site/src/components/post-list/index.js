@@ -332,13 +332,16 @@ export default function PostList( { postType } ) {
 				getItemLevel={ getItemLevel }
 				defaultLayouts={ defaultLayouts }
 			/>
-			{ quickEdit && ! isLoadingData && selection.length > 0 && (
-				<QuickEditModal
-					postType={ postType }
-					postId={ selection }
-					closeModal={ closeQuickEditModal }
-				/>
-			) }
+			{ quickEdit &&
+				! isLoadingData &&
+				selection.length > 0 &&
+				view.type !== LAYOUT_LIST && (
+					<QuickEditModal
+						postType={ postType }
+						postId={ selection }
+						closeModal={ closeQuickEditModal }
+					/>
+				) }
 		</Page>
 	);
 }
