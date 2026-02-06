@@ -8,11 +8,17 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
  */
 import { RampTable } from './ramp-table';
 import { buildBgRamp, buildAccentRamp, checkAccessibleCombinations } from '..';
-import { DEFAULT_SEED_COLORS, getQualitativeSeeds } from '../lib/constants';
+import {
+	DEFAULT_SEED_COLORS,
+	DEFAULT_ACCENT_SEEDS,
+	getQualitativeSeeds,
+	accentSeedsToRecord,
+} from '../lib/constants';
 
 const ColorGen = ( props: {
 	background: string;
 	primary: string;
+	accents: string;
 	children: React.ReactNode;
 } ) => {
 	return <div>{ props.children }</div>;
@@ -31,6 +37,11 @@ const meta: Meta< typeof ColorGen > = {
 				presetColors: [ '#3858e9', '#069e08', '#873eff' ],
 			},
 		},
+		accents: {
+			control: { type: 'text' },
+			description:
+				'Comma-separated hex colors (e.g. "#ff0000, #00ff00, #0000ff"). Leave empty for auto-generated accents.',
+		},
 	},
 	parameters: {
 		controls: { expanded: true },
@@ -39,6 +50,20 @@ const meta: Meta< typeof ColorGen > = {
 	tags: [ 'status-experimental' ],
 };
 export default meta;
+
+/**
+ * Parse comma-separated hex colors from the Storybook text control.
+ * Returns an empty array if the input is empty or undefined.
+ */
+function parseAccentsInput( input?: string ): string[] {
+	if ( ! input || input.trim() === '' ) {
+		return [];
+	}
+	return input
+		.split( ',' )
+		.map( ( s ) => s.trim() )
+		.filter( ( s ) => s.length > 0 );
+}
 
 export const Default: StoryObj< typeof ColorGen > = {
 	render: ( args ) => {
@@ -97,21 +122,30 @@ export const Default: StoryObj< typeof ColorGen > = {
 			ramp: buildAccentRamp( DEFAULT_SEED_COLORS.error, bgRamp ).ramp,
 		};
 
-		// Generate qualitative accent ramps from the primary seed
-		const qualitativeSeeds = getQualitativeSeeds( primarySeed );
-		const accentRampObjs = (
-			Object.entries( qualitativeSeeds ) as [
-				keyof typeof qualitativeSeeds,
-				string,
-			][]
-		 ).map( ( [ name, seed ] ) => ( {
-			seed: {
-				name: 'bgFill1' as const,
-				value: seed,
-			},
-			ramp: buildAccentRamp( seed, bgRamp ).ramp,
-			label: name,
-		} ) );
+		// Use manual accents if provided, then default seeds, then auto-generate.
+		const manualAccents = parseAccentsInput( args.accents );
+		let qualitativeSeeds;
+		if ( manualAccents.length > 0 ) {
+			qualitativeSeeds = accentSeedsToRecord( manualAccents );
+		} else if ( DEFAULT_ACCENT_SEEDS.length > 0 ) {
+			qualitativeSeeds = accentSeedsToRecord( DEFAULT_ACCENT_SEEDS );
+		} else {
+			qualitativeSeeds = getQualitativeSeeds( primarySeed );
+		}
+
+		const isManual =
+			manualAccents.length > 0 || DEFAULT_ACCENT_SEEDS.length > 0;
+
+		const accentRampObjs = Object.entries( qualitativeSeeds ).map(
+			( [ name, seed ] ) => ( {
+				seed: {
+					name: 'bgFill1' as const,
+					value: seed,
+				},
+				ramp: buildAccentRamp( seed, bgRamp ).ramp,
+				label: name,
+			} )
+		);
 
 		const unmetTargets = checkAccessibleCombinations( {
 			bgRamp,
@@ -142,7 +176,7 @@ export const Default: StoryObj< typeof ColorGen > = {
 
 				<div>
 					<h3 style={ { marginBottom: 8 } }>
-						Qualitative Accent Ramps (hue rotations from primary)
+						Qualitative Accent Ramps
 					</h3>
 					<p
 						style={ {
@@ -151,9 +185,13 @@ export const Default: StoryObj< typeof ColorGen > = {
 							marginBottom: 12,
 						} }
 					>
-						8 distinct colors for visual differentiation (e.g.,
-						collaborator avatars). Primary (0°) + accent1-7 (45°
-						increments).
+						{ isManual
+							? `${
+									Object.keys( qualitativeSeeds ).length
+							  } manually defined accent colors.`
+							: `Primary (0\u00B0) + ${
+									Object.keys( qualitativeSeeds ).length
+							  } hue-rotated accents (60\u00B0 increments).` }
 					</p>
 					<RampTable
 						ramps={ [ primaryRampObj, ...accentRampObjs ] }
@@ -205,7 +243,9 @@ export const Default: StoryObj< typeof ColorGen > = {
 			</div>
 		);
 	},
-	args: {},
+	args: {
+		background: '#ffffff',
+	},
 };
 
 export const SampleCombinations: StoryObj< typeof ColorGen > = {
@@ -308,50 +348,36 @@ export const QualitativePalette: StoryObj< typeof ColorGen > = {
 		const bgSeed = args.background ?? DEFAULT_SEED_COLORS.bg;
 		const bgRamp = buildBgRamp( bgSeed );
 
-		// Generate all 8 qualitative colors (primary + accent1-7)
-		const qualitativeSeeds = getQualitativeSeeds( primarySeed );
+		// Use manual accents if provided, then default seeds, then auto-generate.
+		const manualAccents = parseAccentsInput( args.accents );
+		const isManual =
+			manualAccents.length > 0 || DEFAULT_ACCENT_SEEDS.length > 0;
+		let qualitativeSeeds;
+		if ( manualAccents.length > 0 ) {
+			qualitativeSeeds = accentSeedsToRecord( manualAccents );
+		} else if ( DEFAULT_ACCENT_SEEDS.length > 0 ) {
+			qualitativeSeeds = accentSeedsToRecord( DEFAULT_ACCENT_SEEDS );
+		} else {
+			qualitativeSeeds = getQualitativeSeeds( primarySeed );
+		}
+
+		const accentCount = Object.keys( qualitativeSeeds ).length;
+
+		// Build primary + accent entries for display
 		const allSeeds = [
-			{ name: 'primary', seed: primarySeed, rotation: '0°' },
-			{
-				name: 'accent1',
-				seed: qualitativeSeeds.accent1,
-				rotation: '45°',
-			},
-			{
-				name: 'accent2',
-				seed: qualitativeSeeds.accent2,
-				rotation: '90°',
-			},
-			{
-				name: 'accent3',
-				seed: qualitativeSeeds.accent3,
-				rotation: '135°',
-			},
-			{
-				name: 'accent4',
-				seed: qualitativeSeeds.accent4,
-				rotation: '180°',
-			},
-			{
-				name: 'accent5',
-				seed: qualitativeSeeds.accent5,
-				rotation: '225°',
-			},
-			{
-				name: 'accent6',
-				seed: qualitativeSeeds.accent6,
-				rotation: '270°',
-			},
-			{
-				name: 'accent7',
-				seed: qualitativeSeeds.accent7,
-				rotation: '315°',
-			},
+			{ name: 'primary', seed: primarySeed, source: '0\u00B0' },
+			...Object.entries( qualitativeSeeds ).map(
+				( [ name, seed ], i ) => ( {
+					name,
+					seed,
+					source: isManual ? 'manual' : `${ ( i + 1 ) * 60 }\u00B0`,
+				} )
+			),
 		];
 
-		const ramps = allSeeds.map( ( { name, seed, rotation } ) => {
+		const ramps = allSeeds.map( ( { name, seed, source } ) => {
 			const accentRamp = buildAccentRamp( seed, bgRamp );
-			return { name, seed, rotation, ramp: accentRamp.ramp };
+			return { name, seed, source, ramp: accentRamp.ramp };
 		} );
 
 		return (
@@ -366,11 +392,13 @@ export const QualitativePalette: StoryObj< typeof ColorGen > = {
 				<div>
 					<h3>Qualitative Color Palette</h3>
 					<p style={ { fontSize: 14, color: '#666', maxWidth: 600 } }>
-						8 visually distinct colors derived by rotating the
-						primary hue in 45° increments. Use for distinguishing
-						items that need color differentiation without semantic
-						meaning (e.g., collaborator avatars, chart series,
-						tags).
+						{ isManual
+							? `${ accentCount } manually defined accent colors.`
+							: `${
+									accentCount + 1
+							  } visually distinct colors: primary (0\u00B0) + ${ accentCount } accents via 60\u00B0 hue rotation.` }{ ' ' }
+						Use the accents control to provide comma-separated hex
+						colors, or leave empty for auto-generation.
 					</p>
 				</div>
 
@@ -414,11 +442,11 @@ export const QualitativePalette: StoryObj< typeof ColorGen > = {
 					<div
 						style={ {
 							display: 'grid',
-							gridTemplateColumns: 'repeat(8, 1fr)',
+							gridTemplateColumns: `repeat(${ ramps.length }, 1fr)`,
 							gap: 8,
 						} }
 					>
-						{ ramps.map( ( { name, seed, rotation, ramp } ) => (
+						{ ramps.map( ( { name, seed, source, ramp } ) => (
 							<div
 								key={ name }
 								style={ {
@@ -449,7 +477,7 @@ export const QualitativePalette: StoryObj< typeof ColorGen > = {
 									{ name }
 								</span>
 								<span style={ { fontSize: 10, color: '#888' } }>
-									{ rotation }
+									{ source }
 								</span>
 								<span style={ { fontSize: 10, color: '#888' } }>
 									{ seed }
@@ -536,5 +564,7 @@ export const QualitativePalette: StoryObj< typeof ColorGen > = {
 			</div>
 		);
 	},
-	args: {},
+	args: {
+		accents: '#9f32cd, #ff008c, #ff6300, #e1ff00, #13d3ec, #00ffe1',
+	},
 };

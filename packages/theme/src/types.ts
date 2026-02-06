@@ -22,6 +22,17 @@ export interface ThemeProviderSettings {
 		 * and fallbacks to statically built CSS.
 		 */
 		bg?: string;
+		/**
+		 * Optional manually-specified accent seed colors as an array of
+		 * hex strings. Any number of accents can be provided. They will
+		 * be mapped to accent1, accent2, etc. in order.
+		 *
+		 * When omitted, accents are auto-generated via hue rotation
+		 * from the primary color.
+		 *
+		 * By default, it inherits from parent `ThemeProvider`.
+		 */
+		accents?: string[];
 	};
 
 	/**

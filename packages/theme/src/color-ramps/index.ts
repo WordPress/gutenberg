@@ -17,7 +17,12 @@ import type {
 } from './lib/types';
 import { getContrast, rotateHue } from './lib/color-utils';
 import { CONTRAST_COMBINATIONS } from './lib/constants';
-export { DEFAULT_SEED_COLORS, getQualitativeSeeds } from './lib/constants';
+export {
+	DEFAULT_SEED_COLORS,
+	DEFAULT_ACCENT_SEEDS,
+	getQualitativeSeeds,
+	accentSeedsToRecord,
+} from './lib/constants';
 export { rotateHue };
 
 /**
