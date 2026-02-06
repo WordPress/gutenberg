@@ -39,6 +39,7 @@ describe( 'Dialog', () => {
 		const triggerRef = createRef< HTMLButtonElement >();
 		const popupRef = createRef< HTMLDivElement >();
 		const actionRef = createRef< HTMLButtonElement >();
+		const headerRef = createRef< HTMLDivElement >();
 		const titleRef = createRef< HTMLHeadingElement >();
 		const closeIconRef = createRef< HTMLButtonElement >();
 		const footerRef = createRef< HTMLDivElement >();
@@ -47,7 +48,7 @@ describe( 'Dialog', () => {
 			<Dialog.Root>
 				<Dialog.Trigger ref={ triggerRef }>Open Dialog</Dialog.Trigger>
 				<Dialog.Popup ref={ popupRef }>
-					<Dialog.Header>
+					<Dialog.Header ref={ headerRef }>
 						<Dialog.Title ref={ titleRef }>
 							Test Dialog
 						</Dialog.Title>
@@ -72,6 +73,7 @@ describe( 'Dialog', () => {
 		} );
 
 		// Now that the dialog is open, verify all inner refs
+		expect( headerRef.current ).toBeInstanceOf( HTMLDivElement );
 		expect( titleRef.current ).toBeInstanceOf( HTMLHeadingElement );
 		expect( closeIconRef.current ).toBeInstanceOf( HTMLButtonElement );
 		expect( actionRef.current ).toBeInstanceOf( HTMLButtonElement );
