@@ -638,10 +638,11 @@ describe( 'TimePicker', () => {
 		it( 'should not call onChange when year is cleared and blurred', async () => {
 			const user = userEvent.setup();
 			const onChangeSpy = jest.fn();
+			const year = '1986';
 
 			render(
 				<TimePicker
-					currentTime="1986-10-18T11:00:00"
+					currentTime={ `${ year }-10-18T11:00:00` }
 					onChange={ onChangeSpy }
 					is12Hour
 				/>
@@ -659,6 +660,8 @@ describe( 'TimePicker', () => {
 			// should prevent onChange from being called.
 			const callCountAfterClear = onChangeSpy.mock.calls.length;
 			expect( callCountAfterClear ).toBe( initialCallCount ); // No new calls made
+
+			expect( yearInput ).toHaveValue( year );
 		} );
 
 		it( 'should not call onChange with an invalid date when day is cleared and month is changed', async () => {
@@ -686,7 +689,9 @@ describe( 'TimePicker', () => {
 			// should have properly formatted dates without "NaN" or "Invalid".
 			onChangeSpy.mock.calls.forEach( ( call ) => {
 				const dateString = call[ 0 ];
-				expect( dateString ).toMatch( /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/ );
+				expect( dateString ).toMatch(
+					/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/
+				);
 				expect( dateString ).not.toContain( 'NaN' );
 				expect( dateString ).not.toContain( 'Invalid' );
 			} );
