@@ -421,6 +421,7 @@ export const registerCoreBlocks = (
 	setUnregisteredTypeHandlerName( missing.name );
 	setGroupingBlockName( group.name );
 };
+
 /**
  * Function to register experimental core blocks depending on editor settings.
  *
