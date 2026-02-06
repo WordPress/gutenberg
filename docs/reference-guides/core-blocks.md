@@ -990,7 +990,7 @@ Content for a tab in a tabbed interface. ([Source](https://github.com/WordPress/
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/tab-panel
--	**Supports:** anchor, color (background, text), layout (allowJustification, allowOrientation, allowSizingOnChildren, allowSwitching, allowVerticalAlignment, ~~allowInheriting~~), renaming, spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~
+-	**Supports:** anchor, color (background, text), layout, renaming, spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~
 -	**Attributes:** label
 
 ## Tab Panel
