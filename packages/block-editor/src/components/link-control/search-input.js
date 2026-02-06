@@ -46,7 +46,7 @@ const LinkControlSearchInput = forwardRef(
 			suffix,
 			isEntity = false,
 			customValidity: customValidityProp,
-			required = false,
+			required,
 		},
 		ref
 	) => {
