@@ -5,11 +5,11 @@ import { computeDisplayUrl, computeBadges } from '../use-link-preview';
 
 describe( 'computeDisplayUrl', () => {
 	describe( 'external links', () => {
-		it( 'should mark URLs without protocol as external (bug case)', () => {
+		it( 'should mark URLs without protocol as external', () => {
 			const result = computeDisplayUrl( 'www.test.com' );
 			expect( result ).toEqual( {
 				displayUrl: 'www.test.com',
-				isExternal: true, // This is currently failing - it returns false
+				isExternal: true,
 			} );
 		} );
 
@@ -17,6 +17,14 @@ describe( 'computeDisplayUrl', () => {
 			const result = computeDisplayUrl( 'google.com' );
 			expect( result ).toEqual( {
 				displayUrl: 'google.com',
+				isExternal: true,
+			} );
+		} );
+
+		it( 'should handle external URLs', () => {
+			const result = computeDisplayUrl( 'https://google.com' );
+			expect( result ).toEqual( {
+				displayUrl: 'https://google.com/search',
 				isExternal: true,
 			} );
 		} );
@@ -116,20 +124,16 @@ describe( 'computeBadges', () => {
 			} );
 		} );
 
-		it( 'should show no kind badge for internal links without type or hash', () => {
+		it( 'should show page badge for relative paths', () => {
 			const badges = computeBadges( {
-				url: '/custom-path',
+				url: '/relative-path',
 				isExternal: false,
 			} );
 
-			// Should not have any "kind" badge (External link, Page, or Internal link)
-			expect(
-				badges.some(
-					( badge ) =>
-						badge.label === 'External link' ||
-						badge.label === 'Internal link'
-				)
-			).toBe( false );
+			expect( badges ).toContainEqual( {
+				label: 'Page',
+				intent: 'default',
+			} );
 		} );
 	} );
 
