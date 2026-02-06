@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { Icon, Tooltip } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
 import { error as errorIcon, pencil } from '@wordpress/icons';
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -23,6 +24,7 @@ export default function SummaryButton< Item >( {
 	disabled,
 	onClick,
 	'aria-expanded': ariaExpanded,
+	'aria-haspopup': ariaHasPopup,
 	labelContent,
 	labelClassName,
 	showError,
@@ -35,6 +37,7 @@ export default function SummaryButton< Item >( {
 	disabled?: boolean;
 	onClick: () => void;
 	'aria-expanded'?: boolean;
+	'aria-haspopup'?: 'dialog' | 'menu' | 'listbox' | 'tree' | 'grid';
 	labelContent?: React.ReactNode;
 	labelClassName?: string;
 	showError?: boolean;
@@ -44,6 +47,23 @@ export default function SummaryButton< Item >( {
 		'dataforms-layouts-panel__field-trigger',
 		`dataforms-layouts-panel__field-trigger--label-${ labelPosition }`
 	);
+
+	const controlId = useInstanceId(
+		SummaryButton,
+		'dataforms-layouts-panel__field-control'
+	);
+
+	const ariaLabel = showError
+		? sprintf(
+				// translators: %s: Field name.
+				_x( 'Edit %s (has errors)', 'field' ),
+				fieldLabel || ''
+		  )
+		: sprintf(
+				// translators: %s: Field name.
+				_x( 'Edit %s', 'field' ),
+				fieldLabel || ''
+		  );
 
 	return (
 		<div className={ className } aria-disabled={ disabled || undefined }>
@@ -57,7 +77,10 @@ export default function SummaryButton< Item >( {
 					</span>
 				</Tooltip>
 			) }
-			<span className="dataforms-layouts-panel__field-control">
+			<span
+				id={ `${ controlId }` }
+				className="dataforms-layouts-panel__field-control"
+			>
 				{ summaryFields.length > 1 ? (
 					<span
 						style={ {
@@ -94,12 +117,10 @@ export default function SummaryButton< Item >( {
 				<button
 					type="button"
 					className="dataforms-layouts-panel__field-trigger-icon"
-					aria-label={ sprintf(
-						// translators: %s: Field name.
-						_x( 'Edit %s', 'field' ),
-						fieldLabel || ''
-					) }
+					aria-label={ ariaLabel }
 					aria-expanded={ ariaExpanded }
+					aria-haspopup={ ariaHasPopup }
+					aria-describedby={ `${ controlId }` }
 					onClick={ onClick }
 				>
 					<Icon icon={ pencil } size={ 24 } />

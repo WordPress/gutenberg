@@ -170,6 +170,7 @@ function PanelDropdown< Item >( {
 						disabled={ fieldDefinition.readOnly === true }
 						onClick={ onToggle }
 						aria-expanded={ isOpen }
+						aria-haspopup="dialog"
 						labelContent={ labelContent }
 						labelClassName={ labelClassName }
 						showError={ showError }
