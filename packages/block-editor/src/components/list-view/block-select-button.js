@@ -60,42 +60,35 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const {
-		isContentOnly,
-		blockName,
-		isBlockHidden,
-		hasPatternName,
-		isNavigationLink,
-	} = useSelect(
-		( select ) => {
-			const {
-				isBlockHiddenAnywhere: _isBlockHidden,
-				getBlockAttributes,
-				getBlockName,
-			} = unlock( select( blockEditorStore ) );
-			const blockAttributes = getBlockAttributes( clientId );
+	const { isContentOnly, blockName, isBlockHidden, hasPatternName } =
+		useSelect(
+			( select ) => {
+				const {
+					isBlockHiddenAnywhere: _isBlockHidden,
+					getBlockAttributes,
+					getBlockName,
+				} = unlock( select( blockEditorStore ) );
 
-			return {
-				isContentOnly:
-					select( blockEditorStore ).getBlockEditingMode(
-						clientId
-					) === 'contentOnly',
-				blockName: getBlockName( clientId ),
-				isBlockHidden: _isBlockHidden( clientId ),
-				hasPatternName:
-					!! getBlockAttributes( clientId )?.metadata?.patternName,
-				isNavigationLink: !! blockAttributes?.type,
-			};
-		},
-		[ clientId ]
-	);
+				return {
+					isContentOnly:
+						select( blockEditorStore ).getBlockEditingMode(
+							clientId
+						) === 'contentOnly',
+					blockName: getBlockName( clientId ),
+					isBlockHidden: _isBlockHidden( clientId ),
+					hasPatternName:
+						!! getBlockAttributes( clientId )?.metadata
+							?.patternName,
+				};
+			},
+			[ clientId ]
+		);
 
 	const shouldShowLockIcon = isLocked;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 	const { canRename: blockSupportsRename } = useBlockRename( blockName );
-	const canRename =
-		blockSupportsRename && ! isContentOnly && ! isNavigationLink;
+	const canRename = blockSupportsRename && ! isContentOnly;
 	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
