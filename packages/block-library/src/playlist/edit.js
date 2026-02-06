@@ -48,88 +48,6 @@ import {
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
-const CurrentTrack = ( { track, onTrackEnd } ) => {
-	const waveformRef = useRef( null );
-	const waveformInstanceRef = useRef( null );
-
-	let ariaLabel;
-	if ( track?.title && track?.artist && track?.album ) {
-		ariaLabel = stripHTML(
-			sprintf(
-				/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
-				_x(
-					'%1$s by %2$s from the album %3$s',
-					'track title, artist name, album name'
-				),
-				track?.title,
-				track?.artist,
-				track?.album
-			)
-		);
-	} else if ( track?.title ) {
-		ariaLabel = stripHTML( track.title );
-	} else {
-		ariaLabel = stripHTML( __( 'Untitled' ) );
-	}
-
-	// Initialize WaveformPlayer when track changes.
-	useEffect( () => {
-		const currentElement = waveformRef.current;
-		if ( ! currentElement || ! track?.src ) {
-			return;
-		}
-
-		// Get colors for styling.
-		const { textColor, bgColor, waveformColor, progressColor } =
-			getWaveformColors( currentElement );
-
-		// Clear any leftover DOM elements from previous player.
-		currentElement.innerHTML = '';
-
-		// Create waveform container.
-		const container = createWaveformContainer( {
-			url: track.src,
-			title: track.title,
-			artist: track.artist,
-			artwork: track.image,
-			waveformColor,
-			progressColor,
-			buttonColor: textColor,
-		} );
-		currentElement.appendChild( container );
-
-		// Create WaveformPlayer instance.
-		const instance = new WaveformPlayer( container );
-		waveformInstanceRef.current = instance;
-
-		// Apply background color to SVG icons for contrast.
-		styleSvgIcons( container, bgColor );
-
-		// Handle track end.
-		const handleEnded = () => {
-			onTrackEnd();
-		};
-
-		container.addEventListener( 'waveformplayer:ended', handleEnded );
-
-		return () => {
-			container.removeEventListener(
-				'waveformplayer:ended',
-				handleEnded
-			);
-			waveformInstanceRef.current?.destroy();
-		};
-	}, [ track?.src, onTrackEnd ] );
-
-	return (
-		<div
-			ref={ waveformRef }
-			className="wp-block-playlist__waveform-player"
-			aria-label={ ariaLabel }
-		/>
-	);
-};
-
 const PlaylistEdit = ( {
 	attributes,
 	setAttributes,
@@ -146,6 +64,10 @@ const PlaylistEdit = ( {
 		currentTrack,
 	} = attributes;
 	const [ trackListIndex, setTrackListIndex ] = useState( 0 );
+	const waveformRef = useRef( null );
+	const waveformInstanceRef = useRef( null );
+	const trackListIndexRef = useRef( trackListIndex );
+	const tracksRef = useRef( [] );
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -279,29 +201,116 @@ const PlaylistEdit = ( {
 		]
 	);
 
-	const onTrackEnd = useCallback( () => {
-		/* If there are tracks left, play the next track */
-		if ( trackListIndex < tracks.length - 1 ) {
-			if ( tracks[ trackListIndex + 1 ]?.uniqueId ) {
-				setTrackListIndex( trackListIndex + 1 );
-				setAttributes( {
-					currentTrack: tracks[ trackListIndex + 1 ].uniqueId,
-				} );
-			}
-		} else {
-			setTrackListIndex( 0 );
-			if ( tracks[ 0 ].uniqueId ) {
-				setAttributes( { currentTrack: tracks[ 0 ].uniqueId } );
-			} else if ( tracks.length > 0 ) {
-				const validTrack = tracks.find(
-					( track ) => track.uniqueId !== undefined
-				);
-				if ( validTrack ) {
-					setAttributes( { currentTrack: validTrack.uniqueId } );
+	// Keep refs updated for use in waveform event handler.
+	useEffect( () => {
+		trackListIndexRef.current = trackListIndex;
+	}, [ trackListIndex ] );
+
+	useEffect( () => {
+		tracksRef.current = tracks;
+	}, [ tracks ] );
+
+	// Get current track data.
+	const currentTrackData = tracks[ trackListIndex ];
+
+	// Compute aria label for waveform player.
+	let waveformAriaLabel;
+	if (
+		currentTrackData?.title &&
+		currentTrackData?.artist &&
+		currentTrackData?.album
+	) {
+		waveformAriaLabel = stripHTML(
+			sprintf(
+				/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
+				_x(
+					'%1$s by %2$s from the album %3$s',
+					'track title, artist name, album name'
+				),
+				currentTrackData?.title,
+				currentTrackData?.artist,
+				currentTrackData?.album
+			)
+		);
+	} else if ( currentTrackData?.title ) {
+		waveformAriaLabel = stripHTML( currentTrackData.title );
+	} else {
+		waveformAriaLabel = stripHTML( __( 'Untitled' ) );
+	}
+
+	// Initialize WaveformPlayer when track changes.
+	useEffect( () => {
+		const currentElement = waveformRef.current;
+		if ( ! currentElement || ! currentTrackData?.src ) {
+			return;
+		}
+
+		// Get colors for styling.
+		const { textColor, bgColor, waveformColor, progressColor } =
+			getWaveformColors( currentElement );
+
+		// Clear any leftover DOM elements from previous player.
+		currentElement.innerHTML = '';
+
+		// Create waveform container.
+		const container = createWaveformContainer( {
+			url: currentTrackData.src,
+			title: currentTrackData.title,
+			artist: currentTrackData.artist,
+			artwork: currentTrackData.image,
+			waveformColor,
+			progressColor,
+			buttonColor: textColor,
+		} );
+		currentElement.appendChild( container );
+
+		// Create WaveformPlayer instance.
+		const instance = new WaveformPlayer( container );
+		waveformInstanceRef.current = instance;
+
+		// Apply background color to SVG icons for contrast.
+		styleSvgIcons( container, bgColor );
+
+		// Handle track end - advance to next track.
+		const handleEnded = () => {
+			const currentIndex = trackListIndexRef.current;
+			const currentTracks = tracksRef.current;
+
+			if ( currentIndex < currentTracks.length - 1 ) {
+				if ( currentTracks[ currentIndex + 1 ]?.uniqueId ) {
+					setTrackListIndex( currentIndex + 1 );
+					setAttributes( {
+						currentTrack:
+							currentTracks[ currentIndex + 1 ].uniqueId,
+					} );
+				}
+			} else {
+				setTrackListIndex( 0 );
+				if ( currentTracks[ 0 ]?.uniqueId ) {
+					setAttributes( {
+						currentTrack: currentTracks[ 0 ].uniqueId,
+					} );
+				} else if ( currentTracks.length > 0 ) {
+					const validTrack = currentTracks.find(
+						( track ) => track.uniqueId !== undefined
+					);
+					if ( validTrack ) {
+						setAttributes( { currentTrack: validTrack.uniqueId } );
+					}
 				}
 			}
-		}
-	}, [ setAttributes, trackListIndex, tracks ] );
+		};
+
+		container.addEventListener( 'waveformplayer:ended', handleEnded );
+
+		return () => {
+			container.removeEventListener(
+				'waveformplayer:ended',
+				handleEnded
+			);
+			waveformInstanceRef.current?.destroy();
+		};
+	}, [ currentTrackData?.src, setAttributes ] );
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
@@ -495,9 +504,10 @@ const PlaylistEdit = ( {
 			</InspectorControls>
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
-					<CurrentTrack
-						track={ tracks[ trackListIndex ] }
-						onTrackEnd={ onTrackEnd }
+					<div
+						ref={ waveformRef }
+						className="wp-block-playlist__waveform-player"
+						aria-label={ waveformAriaLabel }
 					/>
 				</Disabled>
 				{ showTracklist && (
