@@ -230,9 +230,8 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 			</InspectorControls>
 			<li { ...blockProps }>
 				{ !! temporaryURL && <Spinner /> }
-				<Button
+				<button
 					className="wp-block-playlist-track__button"
-					__next40pxDefaultSize
 					data-wp-context={ JSON.stringify( { uniqueId } ) }
 					aria-current={
 						currentTrack === uniqueId ? 'true' : 'false'
@@ -278,7 +277,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 					<span className="screen-reader-text">
 						{ __( 'Select to play this track' ) }
 					</span>
-				</Button>
+				</button>
 			</li>
 		</>
 	);
