@@ -160,3 +160,17 @@ export function receiveEditorAssets( assets ) {
 		assets,
 	};
 }
+
+/**
+ * Returns an action object used to receive icons.
+ *
+ * @param {Array} icons List of icons.
+ *
+ * @return {Object} Action object.
+ */
+export function receiveIcons( icons ) {
+	return {
+		type: 'RECEIVE_ICONS',
+		icons,
+	};
+}

@@ -308,3 +308,13 @@ export function getEditorSettings(
 export function getEditorAssets( state: State ): Record< string, any > | null {
 	return state.editorAssets;
 }
+
+/**
+ * Returns the list of available icons.
+ *
+ * @param state Data state.
+ * @return The list of icons or empty array if not loaded.
+ */
+export function getIcons( state: State ): Array< any > {
+	return state.icons ?? [];
+}

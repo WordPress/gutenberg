@@ -4,7 +4,7 @@
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import metadata from './block.json';
-import { icon } from './icons';
+import icon from './icon';
 
 const { name } = metadata;
 export { metadata, name };

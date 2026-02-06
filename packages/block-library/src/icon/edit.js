@@ -18,7 +18,8 @@ import {
 	useBlockEditingMode,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 import { useState, useEffect } from '@wordpress/element';
 
 /**
@@ -27,7 +28,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
-import getIcons from './icons';
+import { unlock } from '../lock-unlock';
 
 /**
  * The edit function for the Icon Block.
@@ -39,20 +40,14 @@ export function Edit( props ) {
 	const { icon, ariaLabel, style } = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
-	const [ allIcons, setAllIcons ] = useState();
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 
-	// Load the icons once.
-	useEffect( () => {
-		const requestIcons = async () => {
-			const iconList = await getIcons();
-			setAllIcons( iconList );
-		};
-		requestIcons();
+	const allIcons = useSelect( ( select ) => {
+		return unlock( select( coreDataStore ) ).getIcons();
 	}, [] );
 
 	// Is the width value is 0, reset it to the default value.
