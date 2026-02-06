@@ -118,45 +118,6 @@ function gutenberg_add_crdt_meta_on_autosave( WP_REST_Response $response, WP_Pos
 		return $response;
 	}
 
-	if ( 'revision' === $post->post_type ) {
-		$base_post_id = $post->post_parent;
-		$is_draft     = 'draft' === $post->post_status || 'auto-draft' === $post->post_status;
-
-		if ( $base_post_id && $is_draft ) {
-			/*
-			 * Fix for autosave behavior in WordPress:
-			 * https://github.com/WordPress/wordpress-develop/blob/6.9.1/src/wp-includes/rest-api/endpoints/class-wp-rest-autosaves-controller.php#L233-L244
-			 *
-			 * In the context of RTC, we don't care if a user has the post lock or is
-			 * the original author when `$is_draft` is true. In both cases, update the
-			 * post content directly instead of creating an autosave revision.
-			 *
-			 * Otherwise:
-			 * - Autosaves from the original author (if they have the post lock) will become
-			 *   part of the saved post content automatically.
-			 * - Autosaves from other users are applied to a post revision.
-			 * - If any user reloads a post, they see the content from the author's
-			 *   autosave as it's applied direcly to the document via wp_update_post().
-			 *   All other users are treated differently and their autosaved edits won't
-			 *   be applied to the post.
-			 *
-			 * This change ensures the behavior is consistent for all users as post lock
-			 * is not relevant in the context of RTC.
-			 *
-			 * Note that autosaves for other post statuses are still separated per-user,
-			 * because this wp_update_post() conditional is the only place where there is
-			 * an autosave distinction based on author and post lock status.
-			 */
-			wp_update_post(
-				array(
-					'ID'           => $base_post_id,
-					'post_content' => $post->post_content,
-				),
-				true
-			);
-		}
-	}
-
 	// Get the persisted CRDT meta from the request.
 	$meta  = $request->get_param( 'meta' );
 	$key   = '_crdt_document'; // Must match the key registered in gutenberg_rest_api_crdt_post_meta().
@@ -176,3 +137,24 @@ function gutenberg_add_crdt_meta_on_autosave( WP_REST_Response $response, WP_Pos
 	return $response;
 }
 add_filter( 'rest_prepare_autosave', 'gutenberg_add_crdt_meta_on_autosave', 10, 3 );
+
+/**
+ * Overrides the default REST controller for autosaves to fix real-time
+ * collaboration on draft posts.
+ *
+ * When RTC is enabled, draft autosaves from all users update the post directly
+ * instead of creating per-user autosave revisions depending on post lock and
+ * assigned author.
+ *
+ * Only overrides when autosave_rest_controller_class is not explicitly set,
+ * i.e. when WP_REST_Autosaves_Controller would be used by default. Post types
+ * with their own specialized autosave controller (e.g. templates) are left alone.
+ */
+function gutenberg_override_autosaves_rest_controller( $args, $post_type ) {
+	if ( empty( $args['autosave_rest_controller_class'] ) ) {
+		$args['autosave_rest_controller_class'] = 'Gutenberg_REST_Autosaves_Controller';
+	}
+	return $args;
+}
+
+add_filter( 'register_post_type_args', 'gutenberg_override_autosaves_rest_controller', 10, 2 );
