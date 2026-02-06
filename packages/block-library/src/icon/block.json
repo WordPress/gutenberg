@@ -5,7 +5,7 @@
 	"title": "Icon",
 	"__experimental": true,
 	"category": "media",
-	"description": "Insert an SVG icon or graphic.",
+	"description": "Insert an SVG icon.",
 	"keywords": [ "icon", "svg" ],
 	"textdomain": "default",
 	"attributes": {
@@ -32,9 +32,6 @@
 		"color": {
 			"background": true,
 			"text": true
-		},
-		"interactivity": {
-			"clientNavigation": true
 		},
 		"__experimentalBorder": {
 			"color": true,
