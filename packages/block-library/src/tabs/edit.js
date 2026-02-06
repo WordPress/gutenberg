@@ -66,41 +66,41 @@ function Edit( {
 	 * Construct a list of core/tab blocks, used to create tabs-list context.
 	 */
 	const tabs = useSelect(
-		(select) => {
-			const { getBlocks } = select(blockEditorStore);
-			const innerBlocks = getBlocks(clientId);
+		( select ) => {
+			const { getBlocks } = select( blockEditorStore );
+			const innerBlocks = getBlocks( clientId );
 
 			// Find tab-panel block and extract tab data
 			const tabPanel = innerBlocks.find(
-				(block) => block.name === 'core/tab-panel'
+				( block ) => block.name === 'core/tab-panel'
 			);
 
-			if (!tabPanel) {
+			if ( ! tabPanel ) {
 				return [];
 			}
 
 			return tabPanel.innerBlocks.filter(
-				(block) => block.name === 'core/tab'
+				( block ) => block.name === 'core/tab'
 			);
 		},
-		[clientId]
+		[ clientId ]
 	);
 
 	/**
 	 * Memoize context value to prevent unnecessary re-renders.
 	 */
-	const contextValue = useMemo(() => {
+	const contextValue = useMemo( () => {
 		/**
 		 * Compute tabs list from innerblocks to provide via context.
 		 * This traverses the tab-panel block to find all tab blocks
 		 * and extracts their label and anchor for the tabs-menu to consume.
 		 */
-		const tabList = tabs.map((tab, index) => ({
-			id: tab.attributes.anchor || `tab-${index}`,
+		const tabList = tabs.map( ( tab, index ) => ( {
+			id: tab.attributes.anchor || `tab-${ index }`,
 			label: tab.attributes.label || '',
 			clientId: tab.clientId,
 			index,
-		}));
+		} ) );
 
 		return {
 			'core/tabs-list': tabList,
@@ -108,7 +108,7 @@ function Edit( {
 			'core/tabs-activeTabIndex': activeTabIndex,
 			'core/tabs-editorActiveTabIndex': editorActiveTabIndex,
 		};
-	}, [tabs, anchor, activeTabIndex, editorActiveTabIndex]);
+	}, [ tabs, anchor, activeTabIndex, editorActiveTabIndex ] );
 
 	/**
 	 * Block props for the tabs container.
@@ -121,10 +121,10 @@ function Edit( {
 	 * Innerblocks props for the tabs container.
 	 */
 	const innerBlockProps = useInnerBlocksProps( blockProps, {
+		__experimentalCaptureToolbars: true,
 		template: TABS_TEMPLATE,
 		templateLock: false,
 		renderAppender: false,
-		__experimentalCaptureToolbars: true,
 	} );
 
 	return (

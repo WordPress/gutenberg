@@ -99,7 +99,8 @@ function Edit( {
 	const { layout } = useBlockEditContext();
 
 	const tabsId = context[ 'core/tabs-id' ] || null;
-	const tabsList = context[ 'core/tabs-list' ] || [];
+	const tabsListRaw = context[ 'core/tabs-list' ];
+	const tabsList = useMemo( () => tabsListRaw || [], [ tabsListRaw ] );
 	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ] ?? 0;
 	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
 
