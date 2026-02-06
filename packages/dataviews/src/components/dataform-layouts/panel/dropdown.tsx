@@ -26,7 +26,7 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
-import useReportValidity from '../../../hooks/use-report-validity';
+import { useReportValidity } from '../../../hooks';
 
 function DropdownHeader( {
 	title,

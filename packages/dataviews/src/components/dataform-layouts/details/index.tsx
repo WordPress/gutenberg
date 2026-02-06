@@ -23,7 +23,7 @@ import type {
 import DataFormContext from '../../dataform-context';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
-import useReportValidity from '../../../hooks/use-report-validity';
+import { useReportValidity } from '../../../hooks';
 import ValidationBadge from '../validation-badge';
 
 export default function FormDetailsField< Item >( {

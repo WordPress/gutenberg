@@ -29,7 +29,7 @@ import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useFormValidity from '../../../hooks/use-form-validity';
-import useReportValidity from '../../../hooks/use-report-validity';
+import { useReportValidity } from '../../../hooks';
 import DataFormContext from '../../dataform-context';
 
 function ModalContent< Item >( {
