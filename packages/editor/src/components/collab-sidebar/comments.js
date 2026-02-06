@@ -89,7 +89,9 @@ export function Comments( {
 				selectedBlockClientId: clientId,
 				orderedBlockIds: getClientIdsWithDescendants(),
 			};
-		}, [] );
+		},
+		[]
+	);
 	const { selectedNote, noteFocused } = useSelect( ( select ) => {
 		const { getSelectedNote, isNoteFocused } = unlock(
 			select( editorStore )
@@ -185,9 +187,7 @@ export function Comments( {
 			const firstThread = noteThreads.find( ( thread ) =>
 				blockNoteIds.includes( thread.id )
 			);
-			selectNote(
-				unresolvedThread?.id ?? firstThread?.id ?? undefined
-			);
+			selectNote( unresolvedThread?.id ?? firstThread?.id ?? undefined );
 		} else {
 			selectNote( undefined );
 		}
