@@ -48,6 +48,10 @@
 
 	&[aria-disabled="true"] {
 		cursor: default;
+
+		.dataforms-layouts-panel__field-control {
+			color: $gray-700;
+		}
 	}
 }
 
