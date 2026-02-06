@@ -127,13 +127,9 @@ export function TimePicker( {
 
 	const buildNumberControlChangeCallback = ( method: 'date' | 'year' ) => {
 		const callback: InputChangeCallback = ( value, { event } ) => {
+			// validateInputElementTarget checks event.target.validity.valid,
+			// which catches empty values via the 'required' attribute
 			if ( ! validateInputElementTarget( event ) ) {
-				return;
-			}
-
-			// Ignore empty values - they can occur during user interaction
-			// before browser constraint validation coerces to min value
-			if ( value === '' || value === null || value === undefined ) {
 				return;
 			}
 
