@@ -36,24 +36,33 @@ import { getSummaryFields } from '../get-summary-fields';
 import useReportValidity from '../../../hooks/use-report-validity';
 import ValidationBadge from '../validation-badge';
 
+<<<<<<< HEAD
 function CardHeader( {
 	label,
+=======
+function StableCardHeader( {
+>>>>>>> b64aac77b2 (Fix focus loss when collapsing DataForm Card view)
 	isOpen,
 	isCollapsible,
 	onToggle,
 	children,
+	...props
 }: {
-	label?: string;
 	isOpen: boolean;
 	isCollapsible: boolean;
 	onToggle: () => void;
-	children?: React.ReactNode;
+	children: React.ReactNode;
+	[ key: string ]: any;
 } ) {
 	return (
 		<OriginalCardHeader
-			isBorderless
+			{ ...props }
 			onClick={ isCollapsible ? onToggle : undefined }
-			style={ isCollapsible ? { cursor: 'pointer' } : undefined }
+			style={ {
+				cursor: isCollapsible ? 'pointer' : undefined,
+				...props.style,
+			} }
+			isBorderless
 		>
 			<div
 				style={ {
@@ -64,11 +73,6 @@ function CardHeader( {
 					alignItems: 'center',
 				} }
 			>
-				{ label && (
-					<span className="dataforms-layouts-card__field-header-label">
-						{ label }
-					</span>
-				) }
 				{ children }
 
 				{ isCollapsible && (
@@ -77,7 +81,13 @@ function CardHeader( {
 						variant="tertiary"
 						icon={ isOpen ? chevronUp : chevronDown }
 						aria-expanded={ isOpen }
+<<<<<<< HEAD
 						aria-label={ isOpen ? __( 'Collapse' ) : __( 'Expand' ) }
+=======
+						aria-label={
+							isOpen ? __( 'Collapse' ) : __( 'Expand' )
+						}
+>>>>>>> b64aac77b2 (Fix focus loss when collapsing DataForm Card view)
 					/>
 				) }
 			</div>
@@ -211,13 +221,25 @@ export default function FormCardField< Item >( {
 		return (
 			<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 				{ withHeader && (
+<<<<<<< HEAD
 					<CardHeader
 						className="dataforms-layouts-card__field-header"
 						label={ field.label }
+=======
+					<StableCardHeader
+						className="dataforms-layouts-card__field-header"
+>>>>>>> b64aac77b2 (Fix focus loss when collapsing DataForm Card view)
 						isOpen={ isOpen }
 						isCollapsible={ !! layout.isCollapsible }
 						onToggle={ toggle }
 					>
+<<<<<<< HEAD
+=======
+						<span className="dataforms-layouts-card__field-header-label">
+							{ field.label }
+						</span>
+
+>>>>>>> b64aac77b2 (Fix focus loss when collapsing DataForm Card view)
 						{ validationBadge }
 
 						{ visibleSummaryFields.length > 0 && (
@@ -233,7 +255,7 @@ export default function FormCardField< Item >( {
 								) }
 							</div>
 						) }
-					</CardHeader>
+					</StableCardHeader>
 				) }
 
 				{ ( isOpen || ! withHeader ) && (
@@ -248,6 +270,7 @@ export default function FormCardField< Item >( {
 								{ field.description }
 							</div>
 						) }
+
 						<DataFormLayout
 							data={ data }
 							form={ form }
@@ -285,13 +308,25 @@ export default function FormCardField< Item >( {
 	return (
 		<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 			{ withHeader && (
+<<<<<<< HEAD
 				<CardHeader
 					className="dataforms-layouts-card__field-header"
 					label={ fieldDefinition.label }
+=======
+				<StableCardHeader
+					className="dataforms-layouts-card__field-header"
+>>>>>>> b64aac77b2 (Fix focus loss when collapsing DataForm Card view)
 					isOpen={ isOpen }
 					isCollapsible={ !! layout.isCollapsible }
 					onToggle={ toggle }
 				>
+<<<<<<< HEAD
+=======
+					<span className="dataforms-layouts-card__field-header-label">
+						{ fieldDefinition.label }
+					</span>
+
+>>>>>>> b64aac77b2 (Fix focus loss when collapsing DataForm Card view)
 					{ validationBadge }
 
 					{ visibleSummaryFields.length > 0 && (
@@ -305,7 +340,7 @@ export default function FormCardField< Item >( {
 							) ) }
 						</div>
 					) }
-				</CardHeader>
+				</StableCardHeader>
 			) }
 
 			{ ( isOpen || ! withHeader ) && (

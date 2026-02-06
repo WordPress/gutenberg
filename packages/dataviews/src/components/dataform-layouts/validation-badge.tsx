@@ -1,63 +1,72 @@
 /**
  * WordPress dependencies
  */
-import { Badge } from '@wordpress/ui';
-import { sprintf, _n } from '@wordpress/i18n';
+import { Icon, Tooltip } from '@wordpress/components';
+import { error as errorIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import type { FieldValidity } from '../../types';
 
-function countInvalidFields( validity: FieldValidity | undefined ): number {
+function getFirstValidationError(
+	validity: FieldValidity | undefined
+): string | undefined {
 	if ( ! validity ) {
-		return 0;
+		return undefined;
 	}
 
-	let count = 0;
 	const validityRules = Object.keys( validity ).filter(
 		( key ) => key !== 'children'
 	);
 
 	for ( const key of validityRules ) {
 		const rule = validity[ key as keyof Omit< FieldValidity, 'children' > ];
-		if ( rule?.type === 'invalid' ) {
-			count++;
+		if ( rule === undefined ) {
+			continue;
+		}
+
+		if ( rule.type === 'invalid' ) {
+			if ( rule.message ) {
+				return rule.message;
+			}
+
+			if ( key === 'required' ) {
+				return 'A required field is empty';
+			}
+
+			return 'Unidentified validation error';
 		}
 	}
 
-	// Count children recursively
 	if ( validity.children ) {
 		for ( const childValidity of Object.values( validity.children ) ) {
-			count += countInvalidFields( childValidity );
+			const childError = getFirstValidationError( childValidity );
+			if ( childError ) {
+				return childError;
+			}
 		}
 	}
 
-	return count;
+	return undefined;
 }
 
-export default function ValidationBadge( {
-	validity,
-}: {
-	validity: FieldValidity | undefined;
-} ) {
-	const invalidCount = countInvalidFields( validity );
+interface ValidationBadgeProps {
+	validity?: FieldValidity;
+}
 
-	if ( invalidCount === 0 ) {
+export default function ValidationBadge( { validity }: ValidationBadgeProps ) {
+	const errorMessage = getFirstValidationError( validity );
+
+	if ( ! errorMessage ) {
 		return null;
 	}
 
 	return (
-		<Badge intent="high">
-			{ sprintf(
-				/* translators: %d: Number of fields that need attention */
-				_n(
-					'%d field needs attention',
-					'%d fields need attention',
-					invalidCount
-				),
-				invalidCount
-			) }
-		</Badge>
+		<Tooltip text={ errorMessage }>
+			<span className="dataforms-layouts__validation-badge">
+				<Icon icon={ errorIcon } size={ 24 } />
+			</span>
+		</Tooltip>
 	);
 }
