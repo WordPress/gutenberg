@@ -89,7 +89,7 @@ export const ConfirmDialog: Story = {
 	},
 };
 
-const ALL_SIZES = [ 'small', 'medium', 'large', 'full' ] as const;
+const ALL_SIZES = [ 'small', 'medium', 'large', 'stretch', 'full' ] as const;
 
 function SizeSelector( {
 	value,

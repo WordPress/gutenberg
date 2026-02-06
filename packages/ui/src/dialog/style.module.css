@@ -74,6 +74,11 @@
 			max-width: 840px;
 		}
 
+		&.is-stretch {
+			/* The dialog stretches to fill available width. */
+			max-width: none;
+		}
+
 		&.is-full {
 			/*
 			 * Force full height (full width is already in default styles).

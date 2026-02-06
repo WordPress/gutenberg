@@ -30,9 +30,16 @@ export interface PopupProps extends ComponentProps< 'div' > {
 
 	/**
 	 * Renders the dialog at a preset width.
+	 *
+	 * - `'small'` — max-width of 384px.
+	 * - `'medium'` — max-width of 512px.
+	 * - `'large'` — max-width of 840px.
+	 * - `'stretch'` — no max-width, stretches to fill available space.
+	 * - `'full'` — stretches to fill available width and height.
+	 *
 	 * @default 'medium'
 	 */
-	size?: 'small' | 'medium' | 'large' | 'full';
+	size?: 'small' | 'medium' | 'large' | 'stretch' | 'full';
 }
 
 export interface ActionProps extends ComponentProps< typeof Button > {
