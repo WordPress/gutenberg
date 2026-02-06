@@ -16,7 +16,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
-import { useContext, useRef, useEffect } from '@wordpress/element';
+import { useContext, useRef } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -36,6 +36,10 @@ import { GridItems } from '../utils/grid-items';
 const { Badge } = unlock( componentsPrivateApis );
 import getDataByGroup from '../utils/get-data-by-group';
 import { useGridColumns } from '../grid/preview-size-picker';
+import {
+	useIntersectionObserver,
+	usePlaceholdersNeeded,
+} from '../utils/use-infinite-scroll';
 
 interface GridItemProps< Item > {
 	view: ViewPickerGridType;
@@ -75,38 +79,13 @@ function GridItem< Item >( {
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const id = getItemId( item );
 	const elementRef = useRef< HTMLElement | null >( null );
-	const { intersectionObserverCallback } = useContext( DataViewsContext );
 	const isSelected = selection.includes( id );
 
 	const setElementRef = ( element: HTMLElement | null ) => {
 		elementRef.current = element;
 	};
 
-	// Set up IntersectionObserver for this item
-	useEffect( () => {
-		if (
-			! intersectionObserverCallback ||
-			! elementRef.current ||
-			posinset === undefined
-		) {
-			return;
-		}
-
-		const observer = new IntersectionObserver(
-			intersectionObserverCallback,
-			{
-				root: null,
-				rootMargin: '0px',
-				threshold: 0.1,
-			}
-		);
-
-		observer.observe( elementRef.current );
-
-		return () => {
-			observer.disconnect();
-		};
-	}, [ intersectionObserverCallback, posinset ] );
+	useIntersectionObserver( elementRef, posinset );
 
 	const renderedMediaField = mediaField?.render ? (
 		<mediaField.render
@@ -353,7 +332,8 @@ function ViewPickerGrid< Item >( {
 		: null;
 	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 
-	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	const isInfiniteScroll =
+		( view.infiniteScrollEnabled && ! dataByGroup ) ?? false;
 
 	const currentPage = view?.page ?? 1;
 	const perPage = view?.perPage ?? 0;
@@ -361,12 +341,11 @@ function ViewPickerGrid< Item >( {
 
 	// Calculate placeholders needed for infinite scroll
 	const gridColumns = useGridColumns();
-	const firstItemPosition =
-		hasData && isInfiniteScroll ? ( data[ 0 ] as any ).position : undefined;
-	const placeholdersNeeded =
-		firstItemPosition && gridColumns
-			? ( firstItemPosition - 1 ) % gridColumns
-			: 0;
+	const placeholdersNeeded = usePlaceholdersNeeded(
+		data,
+		isInfiniteScroll,
+		gridColumns
+	);
 
 	return (
 		<>

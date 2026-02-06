@@ -33,6 +33,7 @@ import type { SetSelection } from '../../../types/private';
 import ColumnHeaderMenu from '../table/column-header-menu';
 import ColumnPrimary from '../table/column-primary';
 import getDataByGroup from '../utils/get-data-by-group';
+import { useIntersectionObserver } from '../utils/use-infinite-scroll';
 
 interface TableColumnFieldProps< Item > {
 	fields: NormalizedField< Item >[];
@@ -94,8 +95,7 @@ function TableRow< Item >( {
 	multiselect,
 	posinset,
 }: TableRowProps< Item > ) {
-	const { paginationInfo, intersectionObserverCallback } =
-		useContext( DataViewsContext );
+	const { paginationInfo } = useContext( DataViewsContext );
 	const isSelected = selection.includes( id );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const elementRef = useRef< HTMLElement | null >( null );
@@ -104,31 +104,7 @@ function TableRow< Item >( {
 		elementRef.current = element;
 	};
 
-	// Set up IntersectionObserver for this item
-	useEffect( () => {
-		if (
-			! intersectionObserverCallback ||
-			! elementRef.current ||
-			posinset === undefined
-		) {
-			return;
-		}
-
-		const observer = new IntersectionObserver(
-			intersectionObserverCallback,
-			{
-				root: null,
-				rootMargin: '0px',
-				threshold: 0.1,
-			}
-		);
-
-		observer.observe( elementRef.current );
-
-		return () => {
-			observer.disconnect();
-		};
-	}, [ intersectionObserverCallback, posinset ] );
+	useIntersectionObserver( elementRef, posinset );
 	const {
 		showTitle = true,
 		showMedia = true,

@@ -18,7 +18,7 @@ import { Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isAppleOS } from '@wordpress/keycodes';
-import { useContext, useEffect, useRef, forwardRef } from '@wordpress/element';
+import { useContext, useRef, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -41,6 +41,10 @@ import { ItemClickWrapper } from '../utils/item-click-wrapper';
 const { Badge } = unlock( componentsPrivateApis );
 import { useGridColumns } from './preview-size-picker';
 import { GridItems } from '../utils/grid-items';
+import {
+	useIntersectionObserver,
+	usePlaceholdersNeeded,
+} from '../utils/use-infinite-scroll';
 
 function chunk< T >( array: T[], size: number ): T[][] {
 	const chunks: T[][] = [];
@@ -120,35 +124,9 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 				forwardedRef.current = node;
 			}
 		};
-		const { intersectionObserverCallback } = useContext( DataViewsContext );
+		useIntersectionObserver( elementRef, posinset );
 		const instanceId = useInstanceId( GridItem );
 		const isSelected = selection.includes( id );
-
-		// Set up IntersectionObserver for this item
-		useEffect( () => {
-			if (
-				! intersectionObserverCallback ||
-				! elementRef.current ||
-				posinset === undefined
-			) {
-				return;
-			}
-
-			const observer = new IntersectionObserver(
-				intersectionObserverCallback,
-				{
-					root: null,
-					rootMargin: '0px',
-					threshold: 0.1,
-				}
-			);
-
-			observer.observe( elementRef.current );
-
-			return () => {
-				observer.disconnect();
-			};
-		}, [ intersectionObserverCallback, posinset ] );
 		const mediaPlaceholder = (
 			<span className="dataviews-view-grid__media-placeholder" />
 		);
@@ -427,13 +405,11 @@ export default function CompositeGrid< Item >( {
 	const totalRows = Math.ceil( data.length / gridColumns );
 
 	// Calculate placeholders needed for infinite scroll
-	const hasData = !! data?.length;
-	const firstItemPosition =
-		hasData && isInfiniteScroll ? ( data[ 0 ] as any ).position : undefined;
-	const placeholdersNeeded =
-		firstItemPosition && gridColumns
-			? ( firstItemPosition - 1 ) % gridColumns
-			: 0;
+	const placeholdersNeeded = usePlaceholdersNeeded(
+		data,
+		isInfiniteScroll,
+		gridColumns
+	);
 
 	return (
 		<>
