@@ -3498,6 +3498,132 @@ describe( 'URL validation', () => {
 	// isURLLike validation which checks for valid protocols.
 } );
 
+describe( 'defaultInputValue prop', () => {
+	it( 'should use defaultInputValue as initial value when no link value is provided', () => {
+		render( <LinkControl defaultInputValue="wordpress" /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		expect( searchInput.value ).toBe( 'wordpress' );
+	} );
+
+	it( 'should not use defaultInputValue when value.url is provided', () => {
+		const value = {
+			url: 'https://example.com',
+		};
+
+		render(
+			<LinkControl
+				value={ value }
+				defaultInputValue="wordpress"
+				forceIsEditingLink
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		expect( searchInput.value ).toBe( 'https://example.com' );
+	} );
+
+	it( 'should respect user input over defaultInputValue after user types', async () => {
+		const user = userEvent.setup();
+
+		render( <LinkControl defaultInputValue="wordpress" /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initial value from defaultInputValue
+		expect( searchInput.value ).toBe( 'wordpress' );
+
+		// User types something
+		await user.clear( searchInput );
+		await user.type( searchInput, 'example' );
+
+		expect( searchInput.value ).toBe( 'example' );
+	} );
+
+	it( 'should respect empty string after user clears input, not revert to defaultInputValue', async () => {
+		const user = userEvent.setup();
+
+		render( <LinkControl defaultInputValue="wordpress" /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initial value from defaultInputValue
+		expect( searchInput.value ).toBe( 'wordpress' );
+
+		// User clears the input
+		await user.clear( searchInput );
+
+		// Should be empty, NOT revert to "wordpress"
+		expect( searchInput.value ).toBe( '' );
+	} );
+
+	it( 'should call onInputChange when user types, with observable pattern', async () => {
+		const user = userEvent.setup();
+		const onInputChange = jest.fn();
+
+		render(
+			<LinkControl
+				defaultInputValue="wordpress"
+				onInputChange={ onInputChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// User types
+		await user.type( searchInput, 'test' );
+
+		// onInputChange should be called for each character typed
+		expect( onInputChange ).toHaveBeenCalled();
+		// Last call should have the full value
+		expect( onInputChange ).toHaveBeenLastCalledWith( 'wordpresstest' );
+	} );
+} );
+
+describe( 'inputValue prop deprecation', () => {
+	it( 'should show deprecation warning when inputValue prop is used', () => {
+		// The WordPress deprecated() function uses console.warn
+		const warnSpy = jest.spyOn( console, 'warn' ).mockImplementation();
+
+		render( <LinkControl inputValue="wordpress" /> );
+
+		// Verify deprecation warning was called
+		expect( warnSpy ).toHaveBeenCalledWith(
+			expect.stringContaining( 'inputValue' )
+		);
+
+		warnSpy.mockRestore();
+	} );
+
+	it( 'should still work with inputValue prop for backward compatibility', () => {
+		// Suppress the deprecation warning for this test
+		const warnSpy = jest.spyOn( console, 'warn' ).mockImplementation();
+
+		render( <LinkControl inputValue="wordpress" /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Should work like defaultInputValue
+		expect( searchInput.value ).toBe( 'wordpress' );
+
+		warnSpy.mockRestore();
+	} );
+} );
+
 function getSettingsDrawerToggle() {
 	return screen.queryByRole( 'button', {
 		name: 'Advanced',

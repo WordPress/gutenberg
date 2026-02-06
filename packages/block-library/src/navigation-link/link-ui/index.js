@@ -185,7 +185,7 @@ function UnforwardedLinkUI( props, ref ) {
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 						onChange={ props.onChange }
 						onInputChange={ setSearchInputValue }
-						inputValue={ searchInputValue }
+						defaultInputValue={ searchInputValue }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
 						handleEntities={ isBoundEntityAvailable }
