@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { hasBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport, getBlockType } from '@wordpress/blocks';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -14,7 +14,6 @@ import { store as blockEditorStore } from '../store';
 import { PrivateListView } from '../components/list-view';
 import InspectorControls from '../components/inspector-controls/fill';
 import { PrivateBlockContext } from '../components/block-list/private-block-context';
-import useBlockDisplayTitle from '../components/block-title/use-block-display-title';
 import useListViewPanelState from '../components/use-list-view-panel-state';
 
 export const LIST_VIEW_SUPPORT_KEY = 'listView';
@@ -75,10 +74,9 @@ export function ListViewPanel( { clientId, name } ) {
 		},
 		[ clientId, isSelectionWithinCurrentSection ]
 	);
-	const title = useBlockDisplayTitle( {
-		clientId,
-		context: 'list-view',
-	} );
+
+	const blockType = getBlockType( name );
+	const title = blockType?.title || name;
 
 	if ( ! isEnabled || isNestedListView ) {
 		return null;
