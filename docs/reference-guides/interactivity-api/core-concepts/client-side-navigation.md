@@ -24,17 +24,25 @@ This approach offers several benefits:
 
 ## Getting started with the Interactivity Router
 
-The `@wordpress/interactivity-router` package is bundled with WordPress Core since version 6.5. To use it in your interactive blocks, you need to:
+The `@wordpress/interactivity-router` package is bundled with WordPress Core since version 6.5. If you are starting a new project, the easiest way to get set up is using the [`@wordpress/create-block-interactive-template`](https://www.npmjs.com/package/@wordpress/create-block-interactive-template) scaffolding tool, which creates a block with the Interactivity API already configured:
 
-1. **Add the dependency**: Ensure `@wordpress/interactivity-router` is listed as a dependency for your script module.
-2. **Define router regions**: Mark the HTML elements that should be updated during navigation.
-3. **Trigger navigation**: Use the `actions.navigate()` function to navigate programmatically.
+```bash
+npx @wordpress/create-block@latest my-interactive-block --template @wordpress/create-block-interactive-template
+```
+
+If you already have an interactive block and want to add client-side navigation, you need to:
+
+1. **Add the router dependency**: Add `@wordpress/interactivity-router` as a dependency of your block's script module. This is typically done by dynamically importing the package in your `view.js` file (as shown in the examples below), which ensures it is only loaded when needed.
+2. **Define router regions**: Mark the HTML elements that should be updated during navigation using the `data-wp-router-region` attribute.
+3. **Trigger navigation**: Use the router's `actions.navigate()` function to navigate programmatically when the user interacts with your block.
 
 For detailed API documentation, see the [`@wordpress/interactivity-router` package README](/packages/interactivity-router/README.md).
 
 ### Setting up router regions
 
-First, define router regions in your block's markup:
+Router regions are the parts of your page that the router will update during client-side navigation. You mark them with the `data-wp-router-region` directive, which takes a unique ID as its value. When navigation occurs, the router matches regions on the current page with regions on the target page by their IDs and replaces their content — leaving everything outside router regions untouched.
+
+Define a router region in your block's markup by adding `data-wp-router-region` alongside `data-wp-interactive`:
 
 ```php
 // render.php
@@ -54,7 +62,20 @@ First, define router regions in your block's markup:
 
 ### Implementing navigation
 
-Use `navigate()` to handle link clicks:
+To trigger client-side navigation, you define an **action** in your block's store and connect it to a DOM event using an Interactivity API directive. Actions are functions defined inside `store()` that handle user interactions — similar to event handlers in other frameworks. When connected to an element through a directive like `data-wp-on--click`, the action runs whenever that event fires.
+
+Here's how to implement a link that navigates client-side. First, the HTML in your block's `render.php` connects the link's click event to the `navigateTo` action:
+
+```html
+<a
+    data-wp-on--click="actions.navigateTo"
+    href="/page-2/"
+>
+    Go to Page 2
+</a>
+```
+
+Then, in your `view.js`, you define the `navigateTo` action. It prevents the browser's default full-page navigation and uses the router's `navigate()` function instead:
 
 ```js
 // view.js
@@ -74,20 +95,25 @@ store( 'myPlugin', {
 } );
 ```
 
-```html
-<a
-    data-wp-on--click="actions.navigateTo"
-    href="/page-2/"
->
-    Go to Page 2
-</a>
-```
-
 _Note: The `withSyncEvent()` wrapper is required for actions that need to call synchronous event methods like `event.preventDefault()`. See the [withSyncEvent() documentation](/docs/reference-guides/interactivity-api/directives-and-store.md#withsyncevent) for details._
 
 ### Implementing prefetching
 
-Use `prefetch()` to load pages before navigation:
+The router also provides a `prefetch()` function that fetches a page and stores it in an internal cache without performing navigation. By prefetching pages before the user clicks, subsequent navigations feel instant because the content is already available.
+
+A common pattern is to prefetch a page when the user hovers over a link, and navigate when they click. You can combine both behaviors on the same element using two directives — `data-wp-on--mouseenter` for prefetching and `data-wp-on--click` for navigation:
+
+```html
+<a
+    data-wp-on--mouseenter="actions.prefetchPage"
+    data-wp-on--click="actions.navigateTo"
+    href="/page-2/"
+>
+    Hover to prefetch, click to navigate
+</a>
+```
+
+The corresponding actions in `view.js` handle each event:
 
 ```js
 // view.js
@@ -114,19 +140,11 @@ store( 'myPlugin', {
 } );
 ```
 
-```html
-<a
-    data-wp-on--mouseenter="actions.prefetchPage"
-    data-wp-on--click="actions.navigateTo"
-    href="/page-2/"
->
-    Hover to prefetch, click to navigate
-</a>
-```
-
 ### Complete example: Pagination
 
-Here's a complete example implementing client-side pagination:
+This example brings together router regions, navigation, and prefetching to implement client-side pagination for a list of posts.
+
+The block queries posts for the current page and renders them inside a router region. Pagination links at the bottom allow the user to move between pages. When the user hovers over a "Previous" or "Next" link, the target page is prefetched. When they click, the router navigates client-side — replacing only the content inside the router region without a full page reload. After navigation, the page scrolls smoothly to the top.
 
 **PHP (render.php):**
 ```php
