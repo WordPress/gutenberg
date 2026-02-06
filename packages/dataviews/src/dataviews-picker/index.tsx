@@ -39,7 +39,7 @@ import DataViewsViewConfig, {
 	ViewTypeMenu,
 } from '../components/dataviews-view-config';
 import normalizeFields from '../field-types';
-import { useInfiniteScrollData } from '../components/dataviews-layouts/utils/useInfiniteScrollData';
+import { useInfiniteScrollData } from '../hooks/use-infinite-scroll-data';
 import type { ActionButton, Field, View, SupportedLayouts } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
 type ItemWithId = { id: string };

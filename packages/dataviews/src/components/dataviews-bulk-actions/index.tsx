@@ -8,7 +8,13 @@ import type { ReactElement } from 'react';
  */
 import { Button, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState, useRef, useContext } from '@wordpress/element';
+import {
+	useMemo,
+	useState,
+	useRef,
+	useContext,
+	useCallback,
+} from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 import { closeSmall } from '@wordpress/icons';
 import { useViewportMatch } from '@wordpress/compose';
@@ -23,6 +29,7 @@ import type { Action, ActionModal as ActionModalType } from '../../types';
 import type { SetSelection } from '../../types/private';
 import type { ActionTriggerProps } from '../dataviews-item-actions';
 import getFooterMessage from '../../utils/get-footer-message';
+import useSelectedItems from '../../hooks/use-selected-items';
 
 interface ActionWithModalProps< Item > {
 	action: ActionModalType< Item >;
@@ -332,55 +339,27 @@ function FooterContent< Item >( {
 	const footerContentRef = useRef< React.JSX.Element >( undefined );
 	const isMobile = useViewportMatch( 'medium', '<' );
 
-	// Cache for selected items when using infinite scroll.
-	// This preserves item objects even when they scroll out of view.
-	const selectedItemsCacheRef = useRef< Map< string, Item > >( new Map() );
-
 	const bulkActions = useMemo(
 		() => actions.filter( ( action ) => action.supportsBulk ),
 		[ actions ]
 	);
-	const selectableItems = useMemo( () => {
-		return data.filter( ( item ) => {
-			return bulkActions.some(
+
+	// Create a filter function to check if an item is selectable (eligible for at least one bulk action)
+	const selectableFilter = useCallback(
+		( item: Item ) =>
+			bulkActions.some(
 				( action ) => ! action.isEligible || action.isEligible( item )
-			);
-		} );
-	}, [ data, bulkActions ] );
+			),
+		[ bulkActions ]
+	);
 
-	const selectedItems = useMemo( () => {
-		if ( view.infiniteScrollEnabled ) {
-			// Update cache with any newly visible selected items
-			data.forEach( ( item ) => {
-				const id = getItemId( item );
-				if ( selection.includes( id ) ) {
-					selectedItemsCacheRef.current.set( id, item );
-				}
-			} );
-
-			// Remove items from cache that are no longer selected
-			selectedItemsCacheRef.current.forEach( ( _, id ) => {
-				if ( ! selection.includes( id ) ) {
-					selectedItemsCacheRef.current.delete( id );
-				}
-			} );
-
-			// Return all cached selected items
-			return Array.from( selectedItemsCacheRef.current.values() );
-		}
-
-		return data.filter(
-			( item ) =>
-				selection.includes( getItemId( item ) ) &&
-				selectableItems.includes( item )
-		);
-	}, [
-		selection,
+	const selectedItems = useSelectedItems(
+		view,
 		data,
+		selection,
 		getItemId,
-		selectableItems,
-		view.infiniteScrollEnabled,
-	] );
+		selectableFilter
+	);
 
 	const actionsToShow = useMemo(
 		() =>

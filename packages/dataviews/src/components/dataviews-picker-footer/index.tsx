@@ -3,7 +3,7 @@
  */
 import { Button, CheckboxControl } from '@wordpress/components';
 import { useRegistry } from '@wordpress/data';
-import { useContext, useMemo, useRef, useState } from '@wordpress/element';
+import { useContext, useMemo, useState } from '@wordpress/element';
 import { Stack } from '@wordpress/ui';
 import { __ } from '@wordpress/i18n';
 
@@ -15,6 +15,7 @@ import DataViewsContext from '../dataviews-context';
 import type { SetSelection } from '../../types/private';
 import type { Action } from '../../types';
 import getFooterMessage from '../../utils/get-footer-message';
+import useSelectedItems from '../../hooks/use-selected-items';
 
 const EMPTY_ARRAY: [] = [];
 
@@ -148,10 +149,6 @@ export function DataViewsPickerFooter() {
 
 	const isMultiselect = useIsMultiselectPicker( actions );
 
-	// Cache for selected items when using infinite scroll.
-	// This preserves item objects even when they scroll out of view.
-	const selectedItemsCacheRef = useRef< Map< string, unknown > >( new Map() );
-
 	const message = getFooterMessage(
 		selection.length,
 		data.length,
@@ -159,31 +156,7 @@ export function DataViewsPickerFooter() {
 		view.infiniteScrollEnabled
 	);
 
-	const selectedItems = useMemo( () => {
-		if ( view.infiniteScrollEnabled ) {
-			// Update cache with any newly visible selected items
-			data.forEach( ( item ) => {
-				const id = getItemId( item );
-				if ( selection.includes( id ) ) {
-					selectedItemsCacheRef.current.set( id, item );
-				}
-			} );
-
-			// Remove items from cache that are no longer selected
-			selectedItemsCacheRef.current.forEach( ( _, id ) => {
-				if ( ! selection.includes( id ) ) {
-					selectedItemsCacheRef.current.delete( id );
-				}
-			} );
-
-			// Return all cached selected items
-			return Array.from( selectedItemsCacheRef.current.values() );
-		}
-
-		return data.filter( ( item ) =>
-			selection.includes( getItemId( item ) )
-		);
-	}, [ selection, getItemId, data, view.infiniteScrollEnabled ] );
+	const selectedItems = useSelectedItems( view, data, selection, getItemId );
 
 	return (
 		<Stack

@@ -6,7 +6,7 @@ import { useState, useEffect, useRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import type { View } from '../../../types';
+import type { View } from '../types';
 
 interface UseInfiniteScrollDataParams< Item > {
 	view: View;
