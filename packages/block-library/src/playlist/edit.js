@@ -112,18 +112,11 @@ const CurrentTrack = ( { track, onTrackEnd } ) => {
 
 		container.addEventListener( 'waveformplayer:ended', handleEnded );
 
-		// Store for cleanup.
-		currentElement._container = container;
-		currentElement._handleEnded = handleEnded;
-
 		return () => {
-			// Clean up event listeners.
-			if ( currentElement._container && currentElement._handleEnded ) {
-				currentElement._container.removeEventListener(
-					'waveformplayer:ended',
-					currentElement._handleEnded
-				);
-			}
+			container.removeEventListener(
+				'waveformplayer:ended',
+				handleEnded
+			);
 
 			// Destroy instance.
 			try {
