@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
 
 // Style for the icon library modal.
 .wp-block-icon__inserter {
@@ -43,4 +44,14 @@
 
 .wp-block-icon__toolbar-content {
 	width: 250px;
+}
+
+// Provide special styling for the placeholder.
+// @todo this particular minimal style of placeholder could be componentized further.
+.wp-block-icon .components-placeholder {
+	padding: 0;
+	min-height: $grid-unit-60;
+	min-width: $grid-unit-60;
+	height: 100%;
+	width: 100%;
 }

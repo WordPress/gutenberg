@@ -27,7 +27,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
-import { default as getIcons, icon as blockIcon } from './icons';
+import getIcons from './icons';
 
 /**
  * The edit function for the Icon Block.
@@ -172,7 +172,7 @@ export function Edit( props ) {
 				{ icon ? (
 					<HtmlRenderer html={ iconToDisplay } />
 				) : (
-					<Placeholder icon={ blockIcon } withIllustration />
+					<Placeholder withIllustration />
 				) }
 			</div>
 			{ isInserterOpen && (
