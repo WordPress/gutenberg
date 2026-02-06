@@ -40,6 +40,11 @@ const meta: Meta< typeof InputControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `InputControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;

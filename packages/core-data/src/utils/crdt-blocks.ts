@@ -10,12 +10,13 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 // @ts-expect-error No exported types.
 import { getBlockTypes } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
-import { Y, Delta } from '@wordpress/sync';
+import { Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
 import { createYMap, type YMapRecord, type YMapWrap } from './crdt-utils';
+import { Delta } from '../sync';
 
 interface BlockAttributes {
 	[ key: string ]: unknown;
