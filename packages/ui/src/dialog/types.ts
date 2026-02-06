@@ -79,11 +79,14 @@ export interface CloseIconProps
 	/**
 	 * A label describing the button's action, shown as a tooltip and to
 	 * assistive technology.
+	 *
+	 * @default __( 'Close' )
 	 */
 	label?: ComponentProps< typeof IconButton >[ 'label' ];
-
 	/**
 	 * The icon to display in the button.
+	 *
+	 * @default the `close` icon from `@wordpress/icons`
 	 */
 	icon?: ComponentProps< typeof IconButton >[ 'icon' ];
 }
