@@ -5,6 +5,7 @@ import { useCallback, useReducer } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -64,17 +65,19 @@ export default function useNavigateToEntityRecord(
 			},
 		]
 	);
-	const { post, previousRenderingMode, selectedBlockClientId } =
+	const { post, previousRenderingMode } =
 		postHistory[ postHistory.length - 1 ];
 
 	const { getRenderingMode } = useSelect( editorStore );
 	const { setRenderingMode } = useDispatch( editorStore );
+	const { editEntityRecord } = useDispatch( coreStore );
 
 	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
 			// Convert internal clientId to external for storage
-			const externalClientId = params.selection?.clientId
-				? getExternalClientId( params.selection.clientId )
+			const internalClientId = params.selection?.clientId;
+			const externalClientId = internalClientId
+				? getExternalClientId( internalClientId )
 				: null;
 
 			dispatch( {
@@ -95,13 +98,42 @@ export default function useNavigateToEntityRecord(
 	);
 
 	const onNavigateToPreviousEntityRecord = useCallback( () => {
+		// Get the item we're navigating back to (second to last in history)
+		// to set its selection on the entity record
+		if ( postHistory.length > 1 ) {
+			const previousItem = postHistory[ postHistory.length - 2 ];
+
+			if ( previousItem.selectedBlockClientId ) {
+				// Set the selection on the entity we're navigating back to
+				editEntityRecord(
+					'postType',
+					previousItem.post.postType,
+					previousItem.post.postId,
+					{
+						selection: {
+							selectionStart: {
+								clientId: previousItem.selectedBlockClientId,
+							},
+							selectionEnd: {
+								clientId: previousItem.selectedBlockClientId,
+							},
+						},
+					}
+				);
+			}
+		}
 		dispatch( {
 			type: 'pop',
 		} );
 		if ( previousRenderingMode ) {
 			setRenderingMode( previousRenderingMode );
 		}
-	}, [ setRenderingMode, previousRenderingMode ] );
+	}, [
+		setRenderingMode,
+		previousRenderingMode,
+		postHistory,
+		editEntityRecord,
+	] );
 
 	return {
 		currentPost: post,
@@ -110,9 +142,5 @@ export default function useNavigateToEntityRecord(
 			postHistory.length > 1
 				? onNavigateToPreviousEntityRecord
 				: undefined,
-		// Return the initial selection object from the current history item
-		initialSelection: selectedBlockClientId
-			? { clientId: selectedBlockClientId }
-			: null,
 	};
 }

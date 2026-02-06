@@ -125,32 +125,30 @@ function restoreSelectionIds( selection, mapping ) {
  *   controllers.
  * - Passes selection state from the block-editor store to the controlling entity.
  *
- * @param {Object}        props                  Props for the block sync hook
- * @param {string}        props.clientId         The client ID of the inner block controller.
- *                                               If none is passed, then it is assumed to be a
- *                                               root controller rather than an inner block
- *                                               controller.
- * @param {Object[]}      props.value            The control value for the blocks. This value
- *                                               is used to initialize the block-editor store
- *                                               and for resetting the blocks to incoming
- *                                               changes like undo.
- * @param {Object}        props.selection        The selection state responsible to restore the selection on undo/redo.
- * @param {Object}        props.initialSelection Optional object with external clientId to select on mount.
- * @param {onBlockUpdate} props.onChange         Function to call when a persistent
- *                                               change has been made in the block-editor blocks
- *                                               for the given clientId. For example, after
- *                                               this function is called, an entity is marked
- *                                               dirty because it has changes to save.
- * @param {onBlockUpdate} props.onInput          Function to call when a non-persistent
- *                                               change has been made in the block-editor blocks
- *                                               for the given clientId. When this is called,
- *                                               controlling sources do not become dirty.
+ * @param {Object}        props           Props for the block sync hook
+ * @param {string}        props.clientId  The client ID of the inner block controller.
+ *                                        If none is passed, then it is assumed to be a
+ *                                        root controller rather than an inner block
+ *                                        controller.
+ * @param {Object[]}      props.value     The control value for the blocks. This value
+ *                                        is used to initialize the block-editor store
+ *                                        and for resetting the blocks to incoming
+ *                                        changes like undo.
+ * @param {Object}        props.selection The selection state responsible to restore the selection on undo/redo.
+ * @param {onBlockUpdate} props.onChange  Function to call when a persistent
+ *                                        change has been made in the block-editor blocks
+ *                                        for the given clientId. For example, after
+ *                                        this function is called, an entity is marked
+ *                                        dirty because it has changes to save.
+ * @param {onBlockUpdate} props.onInput   Function to call when a non-persistent
+ *                                        change has been made in the block-editor blocks
+ *                                        for the given clientId. When this is called,
+ *                                        controlling sources do not become dirty.
  */
 export default function useBlockSync( {
 	clientId = null,
 	value: controlledBlocks,
 	selection: controlledSelection,
-	initialSelection,
 	onChange = noop,
 	onInput = noop,
 } ) {
@@ -161,7 +159,6 @@ export default function useBlockSync( {
 		resetSelection,
 		replaceInnerBlocks,
 		setHasControlledInnerBlocks,
-		selectBlock,
 		__unstableMarkNextChangeAsNotPersistent,
 	} = registry.dispatch( blockEditorStore );
 	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
@@ -181,7 +178,6 @@ export default function useBlockSync( {
 
 	const pendingChangesRef = useRef( { incoming: null, outgoing: [] } );
 	const subscribedRef = useRef( false );
-	const hasAppliedInitialSelectionRef = useRef( false );
 
 	// Mapping between external (original) and internal (cloned) client IDs.
 	// This allows stable external IDs while using unique internal IDs.
@@ -288,11 +284,31 @@ export default function useBlockSync( {
 			setControlledBlocks();
 
 			if ( controlledSelection ) {
-				resetSelection(
-					controlledSelection.selectionStart,
-					controlledSelection.selectionEnd,
-					controlledSelection.initialPosition
-				);
+				// Use requestAnimationFrame to ensure nested controlled blocks
+				// (like synced patterns within templates) have finished setting up
+				// their clientId mappings before we try to convert selection IDs.
+				window.requestAnimationFrame( () => {
+					// Convert external clientIds to internal clientIds for controlled blocks.
+					// The selection stored in the entity uses external IDs, but resetSelection
+					// needs internal IDs that exist in the block-editor store.
+					const convertSelectionIds = ( sel ) => {
+						if ( ! sel?.clientId ) {
+							return sel;
+						}
+						return {
+							...sel,
+							clientId: getInternalClientId( sel.clientId ),
+						};
+					};
+
+					resetSelection(
+						convertSelectionIds(
+							controlledSelection.selectionStart
+						),
+						convertSelectionIds( controlledSelection.selectionEnd ),
+						controlledSelection.initialPosition
+					);
+				} );
 			}
 		}
 	}, [ controlledBlocks, clientId ] );
@@ -423,31 +439,4 @@ export default function useBlockSync( {
 			unsetControlledBlocks();
 		};
 	}, [] );
-
-	// Apply initial selection after blocks are reset.
-	// Use store selector to convert external to internal clientId (works for any nesting level).
-	useEffect( () => {
-		if (
-			hasAppliedInitialSelectionRef.current ||
-			! initialSelection?.clientId
-		) {
-			return;
-		}
-
-		// Use the store selector to get internal clientId.
-		// This works for both root blocks (no mapping) and nested controlled blocks.
-		const internalClientId = getInternalClientId(
-			initialSelection.clientId
-		);
-
-		if ( internalClientId ) {
-			selectBlock( internalClientId );
-			hasAppliedInitialSelectionRef.current = true;
-		}
-	}, [
-		controlledBlocks,
-		initialSelection,
-		getInternalClientId,
-		selectBlock,
-	] );
 }

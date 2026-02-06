@@ -58,6 +58,8 @@ export function useResolveEditedEntity() {
 	const { name, params = {}, query } = useLocation();
 	const { postId = query?.postId } = params; // Fallback to query param for postId for list view routes.
 	const postType = getPostType( name, postId ) ?? query?.postType;
+	// Extract selectedBlock from URL for selection restoration on navigation back.
+	const { selectedBlock } = query;
 
 	const homePage = useSelect( ( select ) => {
 		const { getHomePage } = unlock( select( coreDataStore ) );
@@ -128,7 +130,7 @@ export function useResolveEditedEntity() {
 	}, [ homePage, postType, postId ] );
 
 	if ( postTypesWithoutParentTemplate.includes( postType ) && postId ) {
-		return { isReady: true, postType, postId, context };
+		return { isReady: true, postType, postId, context, selectedBlock };
 	}
 
 	if ( !! homePage ) {
@@ -137,10 +139,11 @@ export function useResolveEditedEntity() {
 			postType: TEMPLATE_POST_TYPE,
 			postId: resolvedTemplateId,
 			context,
+			selectedBlock,
 		};
 	}
 
-	return { isReady: false };
+	return { isReady: false, selectedBlock };
 }
 
 export function useSyncDeprecatedEntityIntoState( {
