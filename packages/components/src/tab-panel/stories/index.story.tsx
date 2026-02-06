@@ -21,6 +21,11 @@ const meta: Meta< typeof TabPanel > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'When building for the Gutenberg repo, use `Tabs` instead. Otherwise, continue using for now.',
+		},
 	},
 	args: {
 		onSelect: fn(),

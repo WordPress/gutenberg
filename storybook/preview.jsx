@@ -6,14 +6,11 @@ import {
 	Subtitle,
 	Title,
 } from '@storybook/addon-docs/blocks';
-
-/**
- * Internal dependencies
- */
 import { WithGlobalCSS } from './decorators/with-global-css';
 import { WithMaxWidthWrapper } from './decorators/with-max-width-wrapper';
 import { WithRTL } from './decorators/with-rtl';
 import { WithDesignSystemTheme } from './decorators/with-design-system-theme';
+import { ComponentStatusIndicator } from './components/component-status-indicator';
 
 export const globalTypes = {
 	direction: {
@@ -87,6 +84,7 @@ export const parameters = {
 			<>
 				<Title />
 				<Subtitle />
+				<ComponentStatusIndicator />
 				<Primary />
 				<Description />
 				<Controls />

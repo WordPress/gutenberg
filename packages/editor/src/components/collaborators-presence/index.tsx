@@ -1,11 +1,14 @@
 import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { privateApis } from '@wordpress/core-data';
+import {
+	privateApis,
+	type PostEditorAwarenessState,
+} from '@wordpress/core-data';
+import { __, sprintf } from '@wordpress/i18n';
 
 import { Avatar } from './avatar';
 import { CollaboratorsList } from './list';
 import { unlock } from '../../lock-unlock';
-import { type PostEditorAwarenessState } from '../../../../core-data/src/awareness/types';
 
 import './styles/collaborators-presence.scss';
 
@@ -64,7 +67,11 @@ export function CollaboratorsPresence( {
 				onClick={ () => setIsPopoverVisible( ! isPopoverVisible ) }
 				isPressed={ isPopoverVisible }
 				ref={ setPopoverAnchor }
-				aria-label={ `Collaborators list, ${ otherActiveCollaborators.length } online` }
+				aria-label={ sprintf(
+					// translators: %d: number of online collaborators.
+					__( 'Collaborators list, %d online' ),
+					otherActiveCollaborators.length
+				) }
 			>
 				{ visibleCollaborators.map( ( collaboratorState ) => (
 					<Avatar

@@ -1,5 +1,5 @@
 import { clsx } from 'clsx';
-import { type PostEditorAwarenessState } from '../../../../core-data/src/awareness/types';
+import { type PostEditorAwarenessState } from '@wordpress/core-data';
 import './styles/avatar.scss';
 
 type AvatarSize = 'small' | 'medium';

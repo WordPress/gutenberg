@@ -136,6 +136,7 @@ register( store ); // Register store after unlocking private selectors to allow 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';
 export * from './entity-types';
+export * from './awareness/types';
 export * from './fetch';
 export * from './hooks';
 export * from './private-apis';
