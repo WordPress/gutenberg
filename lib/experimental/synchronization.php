@@ -150,11 +150,11 @@ add_filter( 'rest_prepare_autosave', 'gutenberg_add_crdt_meta_on_autosave', 10, 
  * i.e. when WP_REST_Autosaves_Controller would be used by default. Post types
  * with their own specialized autosave controller (e.g. templates) are left alone.
  */
-function gutenberg_override_autosaves_rest_controller( $args, $post_type ) {
+function gutenberg_override_autosaves_rest_controller( $args ) {
 	if ( empty( $args['autosave_rest_controller_class'] ) ) {
 		$args['autosave_rest_controller_class'] = 'Gutenberg_REST_Autosaves_Controller';
 	}
 	return $args;
 }
 
-add_filter( 'register_post_type_args', 'gutenberg_override_autosaves_rest_controller', 10, 2 );
+add_filter( 'register_post_type_args', 'gutenberg_override_autosaves_rest_controller', 10, 1 );
