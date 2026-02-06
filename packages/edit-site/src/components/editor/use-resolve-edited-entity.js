@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useMemo } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -55,11 +55,16 @@ function getPostType( name ) {
 }
 
 export function useResolveEditedEntity() {
+	const registry = useRegistry();
 	const { name, params = {}, query } = useLocation();
 	const { postId = query?.postId } = params; // Fallback to query param for postId for list view routes.
 	const postType = getPostType( name, postId ) ?? query?.postType;
 	// Extract selectedBlock from URL for selection restoration on navigation back.
 	const { selectedBlock } = query;
+
+	// Track which selection we've applied to avoid re-applying the same one,
+	// but allow applying a new one if the URL changes.
+	const appliedSelectionRef = useRef( null );
 
 	const homePage = useSelect( ( select ) => {
 		const { getHomePage } = unlock( select( coreDataStore ) );
@@ -129,21 +134,40 @@ export function useResolveEditedEntity() {
 		return {};
 	}, [ homePage, postType, postId ] );
 
+	// Compute entity info based on conditions
+	let entity;
 	if ( postTypesWithoutParentTemplate.includes( postType ) && postId ) {
-		return { isReady: true, postType, postId, context, selectedBlock };
-	}
-
-	if ( !! homePage ) {
-		return {
+		entity = { isReady: true, postType, postId, context };
+	} else if ( !! homePage ) {
+		entity = {
 			isReady: resolvedTemplateId !== undefined,
 			postType: TEMPLATE_POST_TYPE,
 			postId: resolvedTemplateId,
 			context,
-			selectedBlock,
 		};
+	} else {
+		entity = { isReady: false };
 	}
 
-	return { isReady: false, selectedBlock };
+	// Restore selection from URL synchronously, before EditorProvider renders.
+	// This ensures the selection is available when blocks are reset.
+	if (
+		selectedBlock &&
+		entity.isReady &&
+		appliedSelectionRef.current !== selectedBlock
+	) {
+		registry
+			.dispatch( coreDataStore )
+			.editEntityRecord( 'postType', entity.postType, entity.postId, {
+				selection: {
+					selectionStart: { clientId: selectedBlock },
+					selectionEnd: { clientId: selectedBlock },
+				},
+			} );
+		appliedSelectionRef.current = selectedBlock;
+	}
+
+	return entity;
 }
 
 export function useSyncDeprecatedEntityIntoState( {

@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect, useRegistry } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { Button, __unstableMotion as motion } from '@wordpress/components';
 import { useInstanceId, useReducedMotion } from '@wordpress/compose';
 import {
@@ -17,13 +17,13 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { decodeEntities } from '@wordpress/html-entities';
 import { Icon, arrowUpLeft } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { addQueryArgs, removeQueryArgs } from '@wordpress/url';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -115,45 +115,13 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 	const disableMotion = useReducedMotion();
 	const location = useLocation();
 	const history = useHistory();
-	const registry = useRegistry();
 	const { canvas = 'view' } = location.query;
 	const isLoading = useIsSiteEditorLoading();
 	useAdaptEditorToCanvas( canvas );
 	const entity = useResolveEditedEntity();
 	// deprecated sync state with url
 	useSyncDeprecatedEntityIntoState( entity );
-	const { postType, postId, context, selectedBlock } = entity;
-
-	// Restore selection from URL synchronously, before EditorProvider renders.
-	// This ensures the selection is available when blocks are reset.
-	// We track which selectedBlock we've applied to avoid re-applying the same one,
-	// but allow applying a new one if the URL changes.
-	const appliedSelectionRef = useRef( null );
-	if (
-		selectedBlock &&
-		entity.isReady &&
-		appliedSelectionRef.current !== selectedBlock
-	) {
-		registry
-			.dispatch( coreDataStore )
-			.editEntityRecord( 'postType', entity.postType, entity.postId, {
-				selection: {
-					selectionStart: { clientId: selectedBlock },
-					selectionEnd: { clientId: selectedBlock },
-				},
-			} );
-		appliedSelectionRef.current = selectedBlock;
-
-		// Clear URL param to prevent re-apply on future navigations.
-		queueMicrotask( () => {
-			const currentUrl =
-				location.path +
-				'?' +
-				new URLSearchParams( location.query ).toString();
-			const cleanUrl = removeQueryArgs( currentUrl, 'selectedBlock' );
-			history.navigate( cleanUrl, { replace: true } );
-		} );
-	}
+	const { postType, postId, context } = entity;
 	const { isBlockBasedTheme, hasSiteIcon } = useSelect( ( select ) => {
 		const { getCurrentTheme, getEntityRecord } = select( coreDataStore );
 		const siteData = getEntityRecord( 'root', '__unstableBase', undefined );
