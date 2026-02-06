@@ -550,6 +550,21 @@ export function finishOperation(
 				dispatch.processItem( pendingItem.id );
 			}
 		}
+
+		/*
+		 * If an image processing operation just finished, there may be items
+		 * waiting in the queue due to the image processing concurrency limit.
+		 * Trigger processing for them.
+		 */
+		if (
+			previousOperation === OperationType.ResizeCrop ||
+			previousOperation === OperationType.Rotate
+		) {
+			const pendingItems = select.getPendingImageProcessing();
+			for ( const pendingItem of pendingItems ) {
+				dispatch.processItem( pendingItem.id );
+			}
+		}
 	};
 }
 
