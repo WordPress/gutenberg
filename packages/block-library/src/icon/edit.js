@@ -66,10 +66,15 @@ export function Edit( props ) {
 			// `__unstableMarkNextChangeAsNotPersistent()`.
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
-				style: { ...style, dimensions: { width: '48px' } },
+				style: { ...style, dimensions: { width: '12px' } },
 			} );
 		}
-	}, [ style, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
+	}, [
+		icon,
+		style,
+		setAttributes,
+		__unstableMarkNextChangeAsNotPersistent,
+	] );
 
 	const iconToDisplay =
 		allIcons?.length > 0
