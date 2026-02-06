@@ -8,7 +8,6 @@ import clsx from 'clsx';
  */
 import { Icon, Tooltip } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
-import { forwardRef } from '@wordpress/element';
 import { error as errorIcon, pencil } from '@wordpress/icons';
 
 /**
@@ -16,53 +15,38 @@ import { error as errorIcon, pencil } from '@wordpress/icons';
  */
 import type { NormalizedField } from '../../../types';
 
-function SummaryButton< Item >(
-	{
-		summaryFields,
-		data,
-		labelPosition,
-		fieldLabel,
-		disabled,
-		onClick,
-		'aria-expanded': ariaExpanded,
-		labelContent,
-		labelClassName,
-		showError,
-		errorMessage,
-	}: {
-		summaryFields: NormalizedField< Item >[];
-		data: Item;
-		labelPosition: 'side' | 'top' | 'none';
-		fieldLabel?: string;
-		disabled?: boolean;
-		onClick: () => void;
-		'aria-expanded'?: boolean;
-		labelContent?: React.ReactNode;
-		labelClassName?: string;
-		showError?: boolean;
-		errorMessage?: string;
-	},
-	ref: React.Ref< HTMLButtonElement >
-) {
+export default function SummaryButton< Item >( {
+	summaryFields,
+	data,
+	labelPosition,
+	fieldLabel,
+	disabled,
+	onClick,
+	'aria-expanded': ariaExpanded,
+	labelContent,
+	labelClassName,
+	showError,
+	errorMessage,
+}: {
+	summaryFields: NormalizedField< Item >[];
+	data: Item;
+	labelPosition: 'side' | 'top' | 'none';
+	fieldLabel?: string;
+	disabled?: boolean;
+	onClick: () => void;
+	'aria-expanded'?: boolean;
+	labelContent?: React.ReactNode;
+	labelClassName?: string;
+	showError?: boolean;
+	errorMessage?: string;
+} ) {
 	const className = clsx(
 		'dataforms-layouts-panel__field-trigger',
 		`dataforms-layouts-panel__field-trigger--label-${ labelPosition }`
 	);
 
 	return (
-		<button
-			ref={ ref }
-			type="button"
-			className={ className }
-			aria-label={ sprintf(
-				// translators: %s: Field name.
-				_x( 'Edit %s', 'field' ),
-				fieldLabel || ''
-			) }
-			aria-expanded={ ariaExpanded }
-			aria-disabled={ disabled || undefined }
-			onClick={ disabled ? undefined : onClick }
-		>
+		<div className={ className } aria-disabled={ disabled || undefined }>
 			{ labelPosition !== 'none' && (
 				<span className={ labelClassName }>{ labelContent }</span>
 			) }
@@ -107,12 +91,20 @@ function SummaryButton< Item >(
 				) }
 			</span>
 			{ ! disabled && (
-				<span className="dataforms-layouts-panel__field-trigger-icon">
+				<button
+					type="button"
+					className="dataforms-layouts-panel__field-trigger-icon"
+					aria-label={ sprintf(
+						// translators: %s: Field name.
+						_x( 'Edit %s', 'field' ),
+						fieldLabel || ''
+					) }
+					aria-expanded={ ariaExpanded }
+					onClick={ onClick }
+				>
 					<Icon icon={ pencil } size={ 24 } />
-				</span>
+				</button>
 			) }
-		</button>
+		</div>
 	);
 }
-
-export default forwardRef( SummaryButton ) as typeof SummaryButton;
