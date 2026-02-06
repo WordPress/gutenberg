@@ -111,6 +111,16 @@ export function TimePicker( {
 		if ( ! Number.isFinite( newDate.getTime() ) ) {
 			return;
 		}
+
+		// Guard against years below 1000 that moment.js cannot parse reliably.
+		// Even if a consumer passes minYear={1}, the browser will enforce it
+		// but moment.js (used internally by setInConfiguredTimezone) will emit
+		// deprecation warnings and fall back to unreliable js Date() parsing.
+		// This prevents those dates from reaching onChange.
+		if ( newDate.getFullYear() < 1000 ) {
+			return;
+		}
+
 		setDate( newDate );
 		onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
 	};
@@ -129,6 +139,14 @@ export function TimePicker( {
 
 			// We can safely assume value is a number if target is valid.
 			const numberValue = Number( value );
+
+			// Prevent years below 1000 from reaching setInConfiguredTimezone.
+			// Even if minYear allows lower values, moment.js (used internally)
+			// cannot parse dates with years < 1000 reliably and will emit
+			// deprecation warnings.
+			if ( method === 'year' && numberValue < 1000 ) {
+				return;
+			}
 
 			// Internal date is UTC-normalized, but the field should be updated
 			// as if in the configured timezone.

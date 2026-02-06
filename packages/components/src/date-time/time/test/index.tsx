@@ -695,5 +695,35 @@ describe( 'TimePicker', () => {
 				expect( dateString ).not.toContain( 'Invalid' );
 			} );
 		} );
+
+		it( 'should handle years below 1000 when minYear allows them without moment.js warnings', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = jest.fn();
+
+			// Set minYear to 1, which browser will enforce but moment.js may struggle with
+			render(
+				<TimePicker
+					currentTime="1986-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					minYear={ 1 }
+					is12Hour
+				/>
+			);
+
+			const yearInput = screen.getByLabelText( 'Year' );
+
+			// Clear the year field and blur - browser will coerce to minYear (1)
+			await user.clear( yearInput );
+			await user.keyboard( '{Tab}' );
+
+			// Verify that if onChange was called, it only received valid date strings
+			// without triggering moment.js warnings
+			onChangeSpy.mock.calls.forEach( ( call ) => {
+				const dateString = call[ 0 ];
+				expect( dateString ).toMatch( /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/ );
+				expect( dateString ).not.toContain( 'NaN' );
+				expect( dateString ).not.toContain( 'Invalid' );
+			} );
+		} );
 	} );
 } );
