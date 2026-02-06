@@ -436,7 +436,7 @@ Insert an SVG icon. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/
 -	**Name:** core/icon
 -	**Experimental:** true
 -	**Category:** media
--	**Supports:** align (center, left, right), anchor, ariaLabel (), color (background, text), dimensions (width), spacing (margin, padding), ~~html~~
+-	**Supports:** align (center, left, right), anchor, ariaLabel (), color (background, text), dimensions (width), interactivity (clientNavigation), spacing (margin, padding), ~~html~~
 -	**Attributes:** icon, style
 
 ## Image

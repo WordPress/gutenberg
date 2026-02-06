@@ -33,6 +33,9 @@
 			"background": true,
 			"text": true
 		},
+		"interactivity": {
+			"clientNavigation": true
+		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
