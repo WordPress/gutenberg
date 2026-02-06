@@ -34,15 +34,24 @@ export default {
 		label: {
 			control: 'text',
 			description: 'Label for the control.',
+			table: {
+				type: { summary: 'string' },
+			},
 		},
 		disableCustomColors: {
 			control: 'boolean',
 			description:
 				'Whether to allow the user to pick a custom hex color.',
+			table: {
+				type: { summary: 'boolean' },
+			},
 		},
 		colors: {
 			control: 'object',
 			description: 'Array of color definitions ({ name, color, slug }).',
+			table: {
+				type: { summary: 'object[]' },
+			},
 		},
 	},
 };
