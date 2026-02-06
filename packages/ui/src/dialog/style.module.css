@@ -88,7 +88,7 @@
 	.title {
 		margin: 0;
 		font-size: var(--wpds-font-size-xl);
-		font-weight: 590;
+		font-weight: var(--wpds-font-weight-medium);
 		line-height: var(--wpds-font-line-height-xl);
 		color: var(--wpds-color-fg-content-neutral);
 	}
