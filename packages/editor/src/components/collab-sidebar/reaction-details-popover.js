@@ -69,16 +69,25 @@ export default function ReactionDetailsPopover( {
 		return Array.from( userIdSet ).sort( ( a, b ) => a - b );
 	}, [ reactions ] );
 
-	// Fetch user data for all users who reacted.
+	// Fetch user data for all users who reacted in a single request.
 	const users = useSelect(
 		( select ) => {
-			const { getUser } = select( coreStore );
+			if ( ! userIdArray.length ) {
+				return {};
+			}
+			const { getUsers } = select( coreStore );
+			const userList = getUsers( {
+				include: userIdArray,
+				context: 'view',
+				_fields: 'id,name,avatar_urls',
+				per_page: -1,
+			} );
+			if ( ! userList ) {
+				return {};
+			}
 			const userData = {};
-			userIdArray.forEach( ( userId ) => {
-				const user = getUser( userId );
-				if ( user ) {
-					userData[ userId ] = user;
-				}
+			userList.forEach( ( user ) => {
+				userData[ user.id ] = user;
 			} );
 			return userData;
 		},
