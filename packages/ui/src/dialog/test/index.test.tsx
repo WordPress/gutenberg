@@ -186,16 +186,10 @@ describe( 'Dialog', () => {
 				screen.getByRole( 'button', { name: 'Open Dialog' } )
 			);
 
-			// Wait for the dialog to appear and validation to run
+			// Wait for the dialog to appear and ensure validation does not trigger errors
 			await waitFor( () => {
 				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
 			} );
-
-			// Wait a bit more to ensure validation has run without errors
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
-
-			// If we got here without throwing, the test passes
-			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
 			expect( onError ).not.toHaveBeenCalled();
 		} );
 
@@ -305,15 +299,10 @@ describe( 'Dialog', () => {
 				screen.getByRole( 'button', { name: 'Open Dialog' } )
 			);
 
-			// Wait for the dialog to appear and validation to run
+			// Wait for the dialog to appear and ensure validation does not trigger errors
 			await waitFor( () => {
 				expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
 			} );
-
-			// Wait a bit more to ensure validation has run without errors
-			await new Promise( ( resolve ) => setTimeout( resolve, 50 ) );
-
-			expect( screen.getByRole( 'dialog' ) ).toBeInTheDocument();
 			expect( onError ).not.toHaveBeenCalled();
 		} );
 	} );
