@@ -15,31 +15,24 @@ import { unlock } from '../../lock-unlock';
 const { useHistory, useLocation } = unlock( routerPrivateApis );
 
 /**
- * Hook to handle navigation to entity records and retrieve initial block selection.
+ * Hook to handle navigation to entity records.
  *
- * @return {Array} A tuple containing:
- *   - onNavigateToEntityRecord: Function to navigate to an entity record
- *   - initialBlockSelection: The block path or clientId to restore selection, or null if none stored
+ * @return {Function} Function to navigate to an entity record.
  */
 export default function useNavigateToEntityRecord() {
 	const history = useHistory();
-	const { query, path } = useLocation();
+	const location = useLocation();
+	const { query, path } = location;
 	const getExternalClientId = useSelect(
 		( select ) => unlock( select( blockEditorStore ) ).getExternalClientId,
 		[]
 	);
 
-	// Get the selected block from URL parameters.
-	// The selectedBlock query param now stores the external clientId directly.
-	const initialBlockSelection = query.selectedBlock
-		? { clientId: query.selectedBlock }
-		: null;
-
 	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
-			// First, update the current URL to include the selected block for when we navigate back
+			// Store the selected block in the URL for restoration when navigating back.
+			// The selectedBlock is converted to external clientId for stable storage.
 			if ( params.selection?.clientId ) {
-				// Convert internal clientId to external for storage
 				const externalClientId = getExternalClientId(
 					params.selection.clientId
 				);
@@ -50,7 +43,7 @@ export default function useNavigateToEntityRecord() {
 				history.navigate( currentUrl, { replace: true } );
 			}
 
-			// Then navigate to the new entity record
+			// Navigate to the new entity record
 			const url = addQueryArgs(
 				`/${ params.postType }/${ params.postId }`,
 				{
@@ -64,5 +57,5 @@ export default function useNavigateToEntityRecord() {
 		[ history, path, query, getExternalClientId ]
 	);
 
-	return [ onNavigateToEntityRecord, initialBlockSelection ];
+	return onNavigateToEntityRecord;
 }
