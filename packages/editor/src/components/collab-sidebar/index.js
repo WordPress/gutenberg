@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
-import { useRef, useMemo } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -102,10 +102,7 @@ function NotesSidebar( { postId } ) {
 		};
 	}, [] );
 
-	const blockNoteIds = useMemo(
-		() => getNoteIdsFromMetadata( { noteId: rawNoteId } ),
-		[ rawNoteId ]
-	);
+	const blockNoteIds = getNoteIdsFromMetadata( { noteId: rawNoteId } );
 	const { isDistractionFree } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
