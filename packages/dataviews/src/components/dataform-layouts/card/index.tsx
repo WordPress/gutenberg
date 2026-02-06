@@ -33,7 +33,7 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import { getSummaryFields } from '../get-summary-fields';
-import useReportValidity from '../../../hooks/use-report-validity';
+import { useReportValidity } from '../../../hooks';
 import ValidationBadge from '../validation-badge';
 
 function CardHeader( {
