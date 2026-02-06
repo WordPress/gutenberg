@@ -24,7 +24,7 @@ describe( 'computeDisplayUrl', () => {
 		it( 'should handle external URLs', () => {
 			const result = computeDisplayUrl( 'https://google.com' );
 			expect( result ).toEqual( {
-				displayUrl: 'https://google.com/search',
+				displayUrl: 'https://google.com',
 				isExternal: true,
 			} );
 		} );
@@ -46,6 +46,20 @@ describe( 'computeDisplayUrl', () => {
 
 		it( 'should NOT mark anchor links as external', () => {
 			const result = computeDisplayUrl( '#section' );
+			expect( result.isExternal ).toBe( false );
+		} );
+
+		it( 'should treat entity links as internal', () => {
+			const result = computeDisplayUrl( 'https://example.com/my-page', {
+				type: 'page',
+			} );
+			expect( result.isExternal ).toBe( false );
+		} );
+
+		it( 'should treat links with entity binding as internal', () => {
+			const result = computeDisplayUrl( 'https://example.com/my-post', {
+				hasBinding: true,
+			} );
 			expect( result.isExternal ).toBe( false );
 		} );
 	} );

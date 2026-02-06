@@ -4,6 +4,8 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { safeDecodeURI } from '@wordpress/url';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -27,10 +29,14 @@ function capitalize( str ) {
 /**
  * Compute display URL - strips site URL if internal, shows full URL if external.
  *
- * @param {string} url - The URL to process
+ * @param {string}  url                - The URL to process
+ * @param {Object}  options            - Optional parameters
+ * @param {string}  options.type       - Entity type (page, post, etc.) - indicates an entity link
+ * @param {boolean} options.hasBinding - Whether the link has an entity binding
+ * @param {string}  options.siteUrl    - The WordPress site URL (falls back to window.location.origin)
  * @return {Object} Object with displayUrl and isExternal flag
  */
-export function computeDisplayUrl( url ) {
+export function computeDisplayUrl( url, { type, hasBinding, siteUrl } = {} ) {
 	if ( ! url ) {
 		return { displayUrl: '', isExternal: false };
 	}
@@ -38,10 +44,22 @@ export function computeDisplayUrl( url ) {
 	let displayUrl = safeDecodeURI( url );
 	let isExternal = false;
 
+	// If this link has an entity binding (bound to a page/post/etc), it's internal
+	if ( hasBinding || ( type && type !== 'custom' ) ) {
+		return { displayUrl, isExternal: false };
+	}
+
+	// Check if URL is a relative path or hash link (internal, non-parseable)
+	if ( isRelativePath( url ) || isHashLink( url ) ) {
+		return { displayUrl, isExternal: false };
+	}
+
+	// Try to parse as a full URL
 	try {
 		const linkUrl = new URL( url );
-		const siteUrl = window.location.origin;
-		if ( linkUrl.origin === siteUrl ) {
+		// Use provided siteUrl or fall back to window.location.origin
+		const siteDomain = siteUrl || window.location.origin;
+		if ( linkUrl.origin === siteDomain ) {
 			// Show only the pathname (and search/hash if present)
 			let path = linkUrl.pathname + linkUrl.search + linkUrl.hash;
 			// Remove trailing slash
@@ -53,12 +71,9 @@ export function computeDisplayUrl( url ) {
 			isExternal = true;
 		}
 	} catch ( e ) {
-		// If URL parsing fails, treat as external unless it's a relative path or hash link.
-		// This handles URLs without protocols (e.g., "www.example.com").
-		if ( ! isRelativePath( url ) && ! isHashLink( url ) ) {
-			isExternal = true;
-		}
-		displayUrl = safeDecodeURI( url );
+		// URL parsing failed - this means it's likely a URL without a protocol (e.g., "www.example.com")
+		// Since we already checked for relative paths and hash links above, treat as external
+		isExternal = true;
 	}
 
 	return { displayUrl, isExternal };
@@ -98,6 +113,11 @@ export function computeBadges( {
 		} else if ( isHashLink( url ) ) {
 			badges.push( {
 				label: __( 'Internal link' ),
+				intent: 'default',
+			} );
+		} else if ( isRelativePath( url ) ) {
+			badges.push( {
+				label: __( 'Page' ),
 				intent: 'default',
 			} );
 		}
@@ -158,11 +178,24 @@ export function useLinkPreview( {
 	hasBinding,
 	isEntityAvailable,
 } ) {
+	// Get the WordPress site URL from settings
+	const siteUrl = useSelect( ( select ) => {
+		const siteEntity = select( coreDataStore ).getEntityRecord(
+			'root',
+			'site'
+		);
+		return siteEntity?.url;
+	}, [] );
+
 	// Fetch rich URL data if we don't have a title. Internal links should have passed a title.
 	const { richData } = useRemoteUrlData( title ? null : url );
 
 	// Compute display URL and external flag
-	const { displayUrl, isExternal } = computeDisplayUrl( url );
+	const { displayUrl, isExternal } = computeDisplayUrl( url, {
+		type,
+		hasBinding,
+		siteUrl,
+	} );
 
 	// Compute badges
 	const badges = computeBadges( {
