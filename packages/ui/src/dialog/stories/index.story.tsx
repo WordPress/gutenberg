@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { useId, useState } from '@wordpress/element';
 import type { ComponentProps } from 'react';
 import * as Dialog from '../index';
 
@@ -32,41 +33,31 @@ export default meta;
 
 type Story = StoryObj< typeof Dialog.Root >;
 
-function DialogWithSize( {
-	size,
-	title = 'Welcome',
-}: {
-	size?: ComponentProps< typeof Dialog.Popup >[ 'size' ];
-	title?: string;
-} ) {
-	return (
-		<>
-			<Dialog.Trigger>Open Dialog</Dialog.Trigger>
-			<Dialog.Popup size={ size }>
-				<Dialog.Header>
-					<Dialog.Title>{ title }</Dialog.Title>
-					<Dialog.CloseIcon />
-				</Dialog.Header>
-				<p>
-					This dialog demonstrates best practices for informational
-					dialogs. It includes a close icon because dismissing it is
-					safe and expected.
-				</p>
-				<Dialog.Footer>
-					<Dialog.Action>Got it</Dialog.Action>
-				</Dialog.Footer>
-			</Dialog.Popup>
-		</>
-	);
-}
-
 /**
  * An informational dialog with a close icon, where there is no ambiguity on
  * what happens when clicking the close icon.
  */
-export const Default: Story = {
+export const _Default: Story = {
 	args: {
-		children: <DialogWithSize />,
+		children: (
+			<>
+				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+				<Dialog.Popup>
+					<Dialog.Header>
+						<Dialog.Title>Welcome</Dialog.Title>
+						<Dialog.CloseIcon />
+					</Dialog.Header>
+					<p>
+						This dialog demonstrates best practices for
+						informational dialogs. It includes a close icon because
+						dismissing it is safe and expected.
+					</p>
+					<Dialog.Footer>
+						<Dialog.Action>Got it</Dialog.Action>
+					</Dialog.Footer>
+				</Dialog.Popup>
+			</>
+		),
 	},
 };
 
@@ -98,26 +89,77 @@ export const ConfirmDialog: Story = {
 	},
 };
 
-export const SmallSize: Story = {
-	args: {
-		children: <DialogWithSize size="small" />,
-	},
-};
+const ALL_SIZES = [ 'small', 'medium', 'large', 'full' ] as const;
 
-export const MediumSize: Story = {
-	args: {
-		children: <DialogWithSize size="medium" />,
-	},
-};
+function SizeSelector( {
+	value,
+	onChange,
+}: {
+	value: ComponentProps< typeof Dialog.Popup >[ 'size' ];
+	onChange: ( size: ComponentProps< typeof Dialog.Popup >[ 'size' ] ) => void;
+} ) {
+	const selectId = useId();
+	return (
+		<div style={ { display: 'flex', gap: 8, alignItems: 'center' } }>
+			<label htmlFor={ selectId }>Dialog size preset</label>
+			<select
+				id={ selectId }
+				value={ value }
+				onChange={ ( e ) =>
+					onChange(
+						e.target.value as ComponentProps<
+							typeof Dialog.Popup
+						>[ 'size' ]
+					)
+				}
+			>
+				{ ALL_SIZES.map( ( s ) => (
+					<option key={ s } value={ s }>
+						{ s }
+						{ s === 'medium' ? ' (default)' : '' }
+					</option>
+				) ) }
+			</select>
+		</div>
+	);
+}
 
-export const LargeSize: Story = {
-	args: {
-		children: <DialogWithSize size="large" />,
-	},
-};
+function SizePlaygroundContent() {
+	const [ size, setSize ] =
+		useState< ComponentProps< typeof Dialog.Popup >[ 'size' ] >( 'medium' );
+	return (
+		<>
+			<div
+				style={ {
+					display: 'flex',
+					flexDirection: 'column',
+					gap: 16,
+					alignItems: 'start',
+				} }
+			>
+				<SizeSelector value={ size } onChange={ setSize } />
+				<Dialog.Trigger>Open Dialog</Dialog.Trigger>
+			</div>
+			<Dialog.Popup size={ size }>
+				<Dialog.Header>
+					<Dialog.Title>Size Playground</Dialog.Title>
+					<Dialog.CloseIcon />
+				</Dialog.Header>
+				<SizeSelector value={ size } onChange={ setSize } />
+				<p>
+					Use the dropdown above (or outside the dialog) to change the
+					popup size. Both controls stay in sync.
+				</p>
+				<Dialog.Footer>
+					<Dialog.Action>Got it</Dialog.Action>
+				</Dialog.Footer>
+			</Dialog.Popup>
+		</>
+	);
+}
 
-export const FullSize: Story = {
+export const AllSizes: Story = {
 	args: {
-		children: <DialogWithSize size="full" />,
+		children: <SizePlaygroundContent />,
 	},
 };
