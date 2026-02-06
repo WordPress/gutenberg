@@ -390,9 +390,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-			reflowComments();
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
@@ -449,9 +447,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-			reflowComments();
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
@@ -485,7 +481,6 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				await onAddReaction( { commentId, emoji } );
 			}
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
