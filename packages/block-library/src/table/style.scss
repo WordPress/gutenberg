@@ -243,7 +243,8 @@
 
 				// This buffer is necessary to prevent the border from being cropped by overflow-y: clip;.
 				// When set to half a pixel, it ensures the figure element is the same height as the table.
-				padding: 0.5px 0;
+				margin: 1px 0;
+				transform: translateY(2px);
 			}
 
 			&::before {
