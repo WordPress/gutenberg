@@ -29,6 +29,11 @@ const meta: Meta< typeof Notice > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `Notice` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;

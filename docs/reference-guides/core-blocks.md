@@ -390,7 +390,7 @@ Display multiple images in a rich gallery. ([Source](https://github.com/WordPres
 -	**Category:** media
 -	**Allowed Blocks:** core/image
 -	**Supports:** align, anchor, color (background, gradients, ~~text~~), interactivity (clientNavigation), layout (default, ~~allowEditing~~, ~~allowInheriting~~, ~~allowSwitching~~), spacing (blockGap, margin, padding), units (em, px, rem, vh, vw), ~~html~~
--	**Attributes:** allowResize, aspectRatio, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, randomOrder, shortCodeTransforms, sizeSlug
+-	**Attributes:** allowResize, aspectRatio, caption, columns, fixedHeight, ids, imageCrop, images, linkTarget, linkTo, navigationButtonType, randomOrder, shortCodeTransforms, sizeSlug
 
 ## Group
 
@@ -548,7 +548,6 @@ Add a page, link, or another item to your navigation. ([Source](https://github.c
 A customizable button to close overlays. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/navigation-overlay-close))
 
 -	**Name:** core/navigation-overlay-close
--	**Experimental:** true
 -	**Category:** design
 -	**Supports:** color (background, text, ~~gradients~~), spacing (padding), typography (fontSize, lineHeight)
 -	**Attributes:** displayMode, text

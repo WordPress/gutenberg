@@ -580,6 +580,7 @@ export const orderEventActions: Action< OrderEvent >[] = [
 
 const LayoutActivityComponent = ( {
 	backgroundColor,
+	fullWidth = false,
 	hasClickableItems = true,
 	groupBy = true,
 	groupByLabel = true,
@@ -587,6 +588,7 @@ const LayoutActivityComponent = ( {
 	showMedia = true,
 }: {
 	backgroundColor?: string;
+	fullWidth?: boolean;
 	hasClickableItems?: boolean;
 	groupBy?: boolean;
 	groupByLabel?: boolean;
@@ -640,6 +642,7 @@ const LayoutActivityComponent = ( {
 		<div
 			style={
 				{
+					maxWidth: fullWidth ? undefined : '400px',
 					'--wp-dataviews-color-background': backgroundColor,
 				} as React.CSSProperties
 			}

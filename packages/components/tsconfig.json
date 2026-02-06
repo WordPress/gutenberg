@@ -29,7 +29,7 @@
 		{ "path": "../rich-text" },
 		{ "path": "../warning" }
 	],
-	"files": [ "global.d.ts" ],
+	"files": [ "global.d.ts", "storybook.d.ts" ],
 	"exclude": [
 		"src/**/*.android.js",
 		"src/**/*.ios.js",

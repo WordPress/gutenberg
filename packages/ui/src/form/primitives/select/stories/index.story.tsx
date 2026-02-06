@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import '@wordpress/theme/design-tokens.css';
 import { Select } from '../../../..';
 
 const meta: Meta< typeof Select.Root > = {

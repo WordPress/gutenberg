@@ -1,11 +1,11 @@
 import { __ } from '@wordpress/i18n';
 import { Popover, Button } from '@wordpress/components';
 import { close } from '@wordpress/icons';
+import { type PostEditorAwarenessState } from '@wordpress/core-data';
 
 import { Avatar } from './avatar';
 
 import './styles/collaborators-list.scss';
-import { type PostEditorAwarenessState } from '../../../../core-data/src/awareness/types';
 
 interface CollaboratorsListProps {
 	activeUsers: PostEditorAwarenessState[];
