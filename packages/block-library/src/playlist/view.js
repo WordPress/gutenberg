@@ -8,6 +8,7 @@ import '@arraypress/waveform-player/dist/waveform-player.css';
  * WordPress dependencies
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -17,6 +18,12 @@ import {
 	createWaveformContainer,
 	styleSvgIcons,
 } from './utils';
+
+/**
+ * Configuration constants.
+ */
+const SEEK_AMOUNT = 5; // Seconds to seek with arrow keys.
+const NEXT_TRACK_DELAY = 1000; // Delay in ms before auto-playing next track.
 
 /**
  * Store player state for each element (instance, url, event listeners).
@@ -80,7 +87,7 @@ const { state } = store(
 						if ( audio ) {
 							audio.play();
 						}
-					}, 1000 );
+					}, NEXT_TRACK_DELAY );
 				}
 			},
 		},
@@ -179,7 +186,7 @@ const { state } = store(
 				if ( playBtn ) {
 					playBtn.setAttribute(
 						'aria-label',
-						track.ariaLabel || track.title || 'Play'
+						track.ariaLabel || track.title || __( 'Play' )
 					);
 					playBtn.setAttribute( 'role', 'button' );
 
@@ -190,20 +197,19 @@ const { state } = store(
 							return;
 						}
 
-						const seekAmount = 5; // Seconds to seek.
 						switch ( event.key ) {
 							case 'ArrowLeft':
 								event.preventDefault();
 								audio.currentTime = Math.max(
 									0,
-									audio.currentTime - seekAmount
+									audio.currentTime - SEEK_AMOUNT
 								);
 								break;
 							case 'ArrowRight':
 								event.preventDefault();
 								audio.currentTime = Math.min(
 									audio.duration,
-									audio.currentTime + seekAmount
+									audio.currentTime + SEEK_AMOUNT
 								);
 								break;
 						}

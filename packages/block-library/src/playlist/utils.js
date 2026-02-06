@@ -8,6 +8,12 @@
 import { colord } from 'colord';
 
 /**
+ * Configuration constants.
+ * Note: WAVEFORM_HEIGHT must match $waveform-player-height in style.scss.
+ */
+const WAVEFORM_HEIGHT = 100;
+
+/**
  * Get the effective background color, falling back to body if transparent.
  *
  * @param {Element} element - The element to get the background color from.
@@ -72,7 +78,7 @@ export function createWaveformContainer( {
 	const container = document.createElement( 'div' );
 	container.setAttribute( 'data-waveform-player', '' );
 	container.setAttribute( 'data-url', url );
-	container.setAttribute( 'data-height', '100' );
+	container.setAttribute( 'data-height', String( WAVEFORM_HEIGHT ) );
 	container.setAttribute( 'data-waveform-style', 'bars' );
 	container.setAttribute( 'data-waveform-color', waveformColor );
 	container.setAttribute( 'data-progress-color', progressColor );
