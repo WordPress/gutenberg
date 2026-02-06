@@ -124,12 +124,13 @@
 }
 
 // Adjust the position of the notices
-.edit-post-layout .edit-post-layout__snackbar {
+.edit-post-layout__snackbar {
 	position: fixed;
-	right: 0;
 	bottom: 24px;
-	padding-left: 24px;
-	padding-right: 24px;
+	left: 50%;
+	right: auto;
+	transform: translateX(-50%);
+	width: max-content;
+	max-width: calc(100vw - 32px);
+	box-sizing: border-box;
 }
-
-@include editor-left( ".edit-post-layout .edit-post-layout__snackbar" );

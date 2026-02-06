@@ -16,13 +16,7 @@ import {
 	SlotFillProvider,
 } from '@wordpress/components';
 import { menu } from '@wordpress/icons';
-import {
-	createPortal,
-	useLayoutEffect,
-	useState,
-	useEffect,
-	useRef,
-} from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Page } from '@wordpress/admin-ui';
 
@@ -56,10 +50,6 @@ export default function Root() {
 
 	// Mobile sidebar state
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
-	const layoutRef = useRef< HTMLDivElement | null >( null );
-	const contentSurfacesRef = useRef< HTMLDivElement | null >( null );
-	const [ snackbarTarget, setSnackbarTarget ] =
-		useState< HTMLElement | null >( null );
 	const [ isMobileSidebarOpen, setIsMobileSidebarOpen ] = useState( false );
 	const disableMotion = useReducedMotion();
 	// Close mobile sidebar on viewport resize and path change
@@ -67,46 +57,18 @@ export default function Root() {
 		setIsMobileSidebarOpen( false );
 	}, [ location.pathname, isMobileViewport ] );
 
-	useLayoutEffect( () => {
-		const nextTarget =
-			isFullScreen || ! contentSurfacesRef.current
-				? layoutRef.current
-				: contentSurfacesRef.current;
-
-		if ( nextTarget && nextTarget !== snackbarTarget ) {
-			setSnackbarTarget( nextTarget );
-		}
-	}, [ isFullScreen, snackbarTarget ] );
-
-	const shouldSnackbarBeFixed = isFullScreen || ! contentSurfacesRef.current;
-
-	const snackbarList = snackbarTarget
-		? createPortal(
-				<SnackbarNotices
-					className={ clsx( 'boot-layout__snackbar', {
-						'boot-layout__snackbar--canvas-visible':
-							shouldSnackbarBeFixed,
-						'boot-layout__snackbar--in-area':
-							! shouldSnackbarBeFixed,
-					} ) }
-				/>,
-				snackbarTarget
-		  )
-		: null;
-
 	return (
 		<SlotFillProvider>
 			<UserThemeProvider isRoot color={ { bg: '#f8f8f8' } }>
 				<UserThemeProvider color={ { bg: '#1d2327' } }>
 					<div
-						ref={ layoutRef }
 						className={ clsx( 'boot-layout', {
 							'has-canvas': !! canvas || canvas === null,
 							'has-full-canvas': isFullScreen,
 						} ) }
 					>
 						<SavePanel />
-						{ snackbarList }
+						<SnackbarNotices className="editor-notices__snackbar" />
 						{ isMobileViewport && (
 							<Page.SidebarToggleFill>
 								<Button
@@ -176,10 +138,7 @@ export default function Root() {
 								<Sidebar />
 							</div>
 						) }
-						<div
-							className="boot-layout__surfaces"
-							ref={ contentSurfacesRef }
-						>
+						<div className="boot-layout__surfaces">
 							<UserThemeProvider color={ { bg: '#ffffff' } }>
 								<Outlet />
 								{ /* Render Canvas in Root to prevent remounting on route changes */ }

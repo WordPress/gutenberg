@@ -129,10 +129,8 @@
 			// This ensure the radius work properly.
 			overflow: hidden;
 
-			@media not ( prefers-reduced-motion ) {
-				transition:
-					border-radius,
-					box-shadow 0.4s;
+			@media not (prefers-reduced-motion) {
+				transition: border-radius, box-shadow 0.4s;
 			}
 
 			.edit-site-layout:not(.is-full-canvas) & {
@@ -165,22 +163,20 @@
 }
 
 /* stylelint-disable -- Disable reason: View Transitions not supported properly by stylelint. */
-html.canvas-mode-edit-transition::view-transition-group( toggle ) {
+html.canvas-mode-edit-transition::view-transition-group(toggle) {
 	animation-delay: 255ms;
 }
 
-@media ( prefers-reduced-motion ) {
-	::view-transition-group( * ),
-	::view-transition-old( * ),
-	::view-transition-new( * ) {
+@media (prefers-reduced-motion) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
 		animation: none !important;
 	}
 }
 /* stylelint-enable  */
 
-.edit-site-layout.is-full-canvas
-.edit-site-layout__sidebar-region
-.edit-site-layout__view-mode-toggle {
+.edit-site-layout.is-full-canvas .edit-site-layout__sidebar-region .edit-site-layout__view-mode-toggle {
 	display: none;
 }
 
@@ -207,9 +203,7 @@ html.canvas-mode-edit-transition::view-transition-group( toggle ) {
 
 	&:focus-visible,
 	&:focus {
-		box-shadow:
-			0 0 0 3px #1e1e1e,
-			0 0 0 6px var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 3px #1e1e1e, 0 0 0 6px var(--wp-admin-theme-color);
 		outline: 4px solid #0000;
 		outline-offset: 4px;
 	}
@@ -225,7 +219,7 @@ html.canvas-mode-edit-transition::view-transition-group( toggle ) {
 		border-radius: $radius-medium;
 		box-shadow: none;
 
-		@media not ( prefers-reduced-motion ) {
+		@media not (prefers-reduced-motion) {
 			transition: box-shadow 0.1s ease;
 		}
 	}
@@ -273,7 +267,6 @@ html.canvas-mode-edit-transition::view-transition-group( toggle ) {
 	margin: 0;
 	overflow: hidden;
 	box-shadow: $elevation-x-small;
-	position: relative;
 	@include break-medium() {
 		border-radius: 8px;
 		margin: $canvas-padding $canvas-padding $canvas-padding 0;
@@ -281,18 +274,12 @@ html.canvas-mode-edit-transition::view-transition-group( toggle ) {
 }
 
 .edit-site-layout__snackbar {
-	&--canvas-visible {
-		position: fixed;
-		right: 0;
-		bottom: 16px;
-		padding-left: 16px;
-		padding-right: 16px;
-	}
-	&--in-area {
-		position: absolute;
-		right: 0;
-		bottom: 16px;
-		padding-left: 16px;
-		padding-right: 16px;
-	}
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	right: auto;
+	transform: translateX(-50%);
+	width: max-content;
+	max-width: calc(100vw - 32px);
+	box-sizing: border-box;
 }

@@ -50,9 +50,7 @@
 	z-index: 3;
 	background: var(--wpds-color-bg-surface-neutral, #fff);
 	padding: variables.$grid-unit-20;
-	border-bottom:
-		1px solid
-		var(--wpds-color-stroke-surface-neutral-weak, #ddd);
+	border-bottom: 1px solid var(--wpds-color-stroke-surface-neutral-weak, #ddd);
 	display: flex;
 	justify-content: flex-start;
 	align-items: center;
@@ -68,7 +66,6 @@
 	flex-grow: 1;
 	margin: 0;
 	gap: variables.$grid-unit-10;
-	position: relative;
 
 	@include mixins.break-medium {
 		margin: variables.$grid-unit-10;
@@ -193,21 +190,4 @@
 	border: none;
 	box-shadow: none;
 	overflow: hidden;
-}
-
-.snackbar-list {
-	&--canvas-visible {
-		position: fixed;
-		right: 0;
-		bottom: 16px;
-		padding-left: 16px;
-		padding-right: 16px;
-	}
-	&--in-area {
-		position: absolute;
-		right: 0;
-		bottom: 16px;
-		padding-left: 16px;
-		padding-right: 16px;
-	}
 }
