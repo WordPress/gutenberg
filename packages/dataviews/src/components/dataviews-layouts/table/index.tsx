@@ -430,111 +430,120 @@ function ViewTable< Item >( {
 						<PropertiesSection showLabel={ false } />
 					</Popover>
 				) }
-				<thead onContextMenu={ handleHeaderContextMenu }>
-					<tr className="dataviews-view-table__row">
-						{ hasBulkActions && (
-							<th
-								className="dataviews-view-table__checkbox-column"
-								scope="col"
-								onContextMenu={ handleHeaderContextMenu }
-							>
-								<BulkSelectionCheckbox
-									selection={ selection }
-									onChangeSelection={ onChangeSelection }
-									data={ data }
-									actions={ actions }
-									getItemId={ getItemId }
-								/>
-							</th>
-						) }
-						{ hasPrimaryColumn && (
-							<th scope="col">
-								{ titleField && (
-									<ColumnHeaderMenu
-										ref={ headerMenuRef(
-											titleField.id,
-											0
-										) }
-										fieldId={ titleField.id }
-										view={ view }
-										fields={ fields }
-										onChangeView={ onChangeView }
-										onHide={ onHide }
-										setOpenedFilter={ setOpenedFilter }
-										canMove={ false }
-										canInsertLeft={
-											isRtl
-												? view.layout?.enableMoving ??
-												  true
-												: false
-										}
-										canInsertRight={
-											isRtl
-												? false
-												: view.layout?.enableMoving ??
-												  true
-										}
-									/>
-								) }
-							</th>
-						) }
-						{ columns.map( ( column, index ) => {
-							// Explicit picks the supported styles.
-							const { width, maxWidth, minWidth, align } =
-								view.layout?.styles?.[ column ] ?? {};
-							const canInsertOrMove =
-								view.layout?.enableMoving ?? true;
-							return (
+				{ ( hasData || isLoading ) && (
+					<thead onContextMenu={ handleHeaderContextMenu }>
+						<tr className="dataviews-view-table__row">
+							{ hasBulkActions && (
 								<th
-									key={ column }
-									style={ {
-										width,
-										maxWidth,
-										minWidth,
-										textAlign: align,
-									} }
-									aria-sort={
-										view.sort?.direction &&
-										view.sort?.field === column
-											? sortValues[ view.sort.direction ]
-											: undefined
-									}
+									className="dataviews-view-table__checkbox-column"
 									scope="col"
+									onContextMenu={ handleHeaderContextMenu }
 								>
-									<ColumnHeaderMenu
-										ref={ headerMenuRef( column, index ) }
-										fieldId={ column }
-										view={ view }
-										fields={ fields }
-										onChangeView={ onChangeView }
-										onHide={ onHide }
-										setOpenedFilter={ setOpenedFilter }
-										canMove={ canInsertOrMove }
-										canInsertLeft={ canInsertOrMove }
-										canInsertRight={ canInsertOrMove }
+									<BulkSelectionCheckbox
+										selection={ selection }
+										onChangeSelection={ onChangeSelection }
+										data={ data }
+										actions={ actions }
+										getItemId={ getItemId }
 									/>
 								</th>
-							);
-						} ) }
-						{ !! actions?.length && (
-							<th
-								className={ clsx(
-									'dataviews-view-table__actions-column',
-									{
-										'dataviews-view-table__actions-column--sticky':
-											true,
-										'dataviews-view-table__actions-column--stuck':
-											! isHorizontalScrollEnd,
-									}
-								) }
-							>
-								<span className="dataviews-view-table-header">
-									{ __( 'Actions' ) }
-								</span>
-							</th>
-						) }
-					</tr>
-				</thead>
+							) }
+							{ hasPrimaryColumn && (
+								<th scope="col">
+									{ titleField && (
+										<ColumnHeaderMenu
+											ref={ headerMenuRef(
+												titleField.id,
+												0
+											) }
+											fieldId={ titleField.id }
+											view={ view }
+											fields={ fields }
+											onChangeView={ onChangeView }
+											onHide={ onHide }
+											setOpenedFilter={ setOpenedFilter }
+											canMove={ false }
+											canInsertLeft={
+												isRtl
+													? view.layout
+															?.enableMoving ??
+													  true
+													: false
+											}
+											canInsertRight={
+												isRtl
+													? false
+													: view.layout
+															?.enableMoving ??
+													  true
+											}
+										/>
+									) }
+								</th>
+							) }
+							{ columns.map( ( column, index ) => {
+								// Explicit picks the supported styles.
+								const { width, maxWidth, minWidth, align } =
+									view.layout?.styles?.[ column ] ?? {};
+								const canInsertOrMove =
+									view.layout?.enableMoving ?? true;
+								return (
+									<th
+										key={ column }
+										style={ {
+											width,
+											maxWidth,
+											minWidth,
+											textAlign: align,
+										} }
+										aria-sort={
+											view.sort?.direction &&
+											view.sort?.field === column
+												? sortValues[
+														view.sort.direction
+												  ]
+												: undefined
+										}
+										scope="col"
+									>
+										<ColumnHeaderMenu
+											ref={ headerMenuRef(
+												column,
+												index
+											) }
+											fieldId={ column }
+											view={ view }
+											fields={ fields }
+											onChangeView={ onChangeView }
+											onHide={ onHide }
+											setOpenedFilter={ setOpenedFilter }
+											canMove={ canInsertOrMove }
+											canInsertLeft={ canInsertOrMove }
+											canInsertRight={ canInsertOrMove }
+										/>
+									</th>
+								);
+							} ) }
+							{ !! actions?.length && (
+								<th
+									className={ clsx(
+										'dataviews-view-table__actions-column',
+										{
+											'dataviews-view-table__actions-column--sticky':
+												true,
+											'dataviews-view-table__actions-column--stuck':
+												! isHorizontalScrollEnd,
+										}
+									) }
+								>
+									<span className="dataviews-view-table-header">
+										{ __( 'Actions' ) }
+									</span>
+								</th>
+							) }
+						</tr>
+					</thead>
+				) }
 				{ /* Render grouped data if groupBy is specified */ }
 				{ hasData && groupField && dataByGroup ? (
 					Array.from( dataByGroup.entries() ).map(
