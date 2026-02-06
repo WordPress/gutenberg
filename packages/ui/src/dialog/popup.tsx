@@ -10,7 +10,7 @@ import type { PopupProps } from './types';
  * Uses a portal to render outside the DOM hierarchy.
  */
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
-	{ className, size, children, ...props },
+	{ className, size = 'medium', children, ...props },
 	ref
 ) {
 	return (
