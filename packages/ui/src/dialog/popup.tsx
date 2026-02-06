@@ -21,7 +21,7 @@ const Popup = forwardRef< HTMLDivElement, PopupProps >( function DialogPopup(
 				className={ clsx(
 					styles.popup,
 					className,
-					size && styles[ `is-${ size }` ]
+					styles[ `is-${ size }` ]
 				) }
 				{ ...props }
 			>
