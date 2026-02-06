@@ -95,7 +95,8 @@ store( 'myPlugin', {
 } );
 ```
 
-_Note: The `withSyncEvent()` wrapper is required for actions that need to call synchronous event methods like `event.preventDefault()`. See the [withSyncEvent() documentation](/docs/reference-guides/interactivity-api/directives-and-store.md#withsyncevent) for details._
+> [!NOTE]
+> The `withSyncEvent()` wrapper is required for actions that need to call synchronous event methods like `event.preventDefault()`. See the [withSyncEvent() documentation](/docs/reference-guides/interactivity-api/directives-and-store.md#withsyncevent) for details.
 
 ### Implementing prefetching
 
@@ -340,7 +341,8 @@ yield actions.navigate( '/products/', { force: true } );
 yield actions.prefetch( '/products/', { force: true } );
 ```
 
-**Important:** If you're using `force: true` to refresh a page after a mutation (POST, PUT, DELETE request), make sure the mutation has completed before navigating:
+> [!IMPORTANT]
+> If you're using `force: true` to refresh a page after a mutation (POST, PUT, DELETE request), make sure the mutation has completed before navigating:
 
 ```js
 store( 'myPlugin', {
