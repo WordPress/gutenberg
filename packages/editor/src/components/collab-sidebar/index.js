@@ -90,12 +90,11 @@ function NotesSidebar( { postId } ) {
 		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
 			select( blockEditorStore );
 		const _clientId = getSelectedBlockClientId();
-		const metadata = _clientId
-			? getBlockAttributes( _clientId )?.metadata
-			: null;
 		return {
 			clientId: _clientId,
-			rawNoteId: metadata?.noteId ?? null,
+			rawNoteId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.noteId ?? null
+				: null,
 			isClassicBlock: _clientId
 				? getBlockName( _clientId ) === 'core/freeform'
 				: false,
