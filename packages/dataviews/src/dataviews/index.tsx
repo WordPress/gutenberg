@@ -41,7 +41,6 @@ import DataViewsViewConfig, {
 } from '../components/dataviews-view-config';
 import normalizeFields from '../field-types';
 import useData from '../hooks/use-data';
-import { useInfiniteScrollData } from '../hooks/use-infinite-scroll-data';
 import type { Action, Field, View, SupportedLayouts } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
 type ItemWithId = { id: string };
@@ -158,25 +157,25 @@ function DataViews< Item >( {
 	empty,
 	onReset,
 }: DataViewsProps< Item > ) {
-	// Always use useData for pagination info and initial load tracking
+	// useData handles both infinite scroll and standard pagination paths,
+	// preserving previous data while loading and tracking initial load state.
 	const {
-		data: dataFromUseData,
-		paginationInfo: paginationInfoFromUseData,
+		data: displayData,
+		paginationInfo: displayPaginationInfo,
 		hasInitiallyLoaded,
-	} = useData( data, isLoading, paginationInfo );
-
-	// Use infinite scroll hook when enabled to get the infinite scroll data
-	const { data: infiniteScrollData, setVisibleEntries } =
-		useInfiniteScrollData( {
-			view,
-			data: data as any,
-			getItemId: getItemId as any,
-		} );
-
-	// Use infinite scroll data when enabled, otherwise use data from useData
-	const displayData = view.infiniteScrollEnabled
-		? ( infiniteScrollData as Item[] )
-		: ( dataFromUseData as Item[] );
+		setVisibleEntries,
+	} = useData( {
+		view,
+		data: data as any,
+		getItemId: getItemId as any,
+		isLoading,
+		paginationInfo,
+	} ) as {
+		data: Item[];
+		paginationInfo: { totalItems: number; totalPages: number };
+		hasInitiallyLoaded: boolean;
+		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
+	};
 	const containerRef = useRef< HTMLDivElement >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const isLoadingRef = useRef( false );
@@ -454,7 +453,7 @@ function DataViews< Item >( {
 				actions,
 				data: displayData,
 				isLoading,
-				paginationInfo: paginationInfoFromUseData,
+				paginationInfo: displayPaginationInfo,
 				selection: _selection,
 				onChangeSelection: setSelectionWithChange,
 				openedFilter,
