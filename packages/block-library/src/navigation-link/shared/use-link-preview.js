@@ -10,7 +10,9 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { unlock } from '../../lock-unlock';
 
-const { useRemoteUrlData } = unlock( blockEditorPrivateApis );
+const { useRemoteUrlData, isHashLink, isRelativePath } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Capitalize the first letter of a string.
@@ -28,7 +30,7 @@ function capitalize( str ) {
  * @param {string} url - The URL to process
  * @return {Object} Object with displayUrl and isExternal flag
  */
-function computeDisplayUrl( url ) {
+export function computeDisplayUrl( url ) {
 	if ( ! url ) {
 		return { displayUrl: '', isExternal: false };
 	}
@@ -51,7 +53,11 @@ function computeDisplayUrl( url ) {
 			isExternal = true;
 		}
 	} catch ( e ) {
-		// If URL parsing fails, use the original URL
+		// If URL parsing fails, treat as external unless it's a relative path or hash link.
+		// This handles URLs without protocols (e.g., "www.example.com").
+		if ( ! isRelativePath( url ) && ! isHashLink( url ) ) {
+			isExternal = true;
+		}
 		displayUrl = safeDecodeURI( url );
 	}
 
@@ -70,7 +76,7 @@ function computeDisplayUrl( url ) {
  * @param {boolean} options.isEntityAvailable - Whether bound entity exists
  * @return {Array} Array of badge objects with label and intent
  */
-function computeBadges( {
+export function computeBadges( {
 	url,
 	type,
 	isExternal,
@@ -89,6 +95,11 @@ function computeBadges( {
 			} );
 		} else if ( type ) {
 			badges.push( { label: capitalize( type ), intent: 'default' } );
+		} else if ( isHashLink( url ) ) {
+			badges.push( {
+				label: __( 'Internal link' ),
+				intent: 'default',
+			} );
 		}
 	}
 
