@@ -29,7 +29,8 @@ export interface PopupProps extends ComponentProps< 'div' > {
 	children?: ReactNode;
 
 	/**
-	 * Renders the dialog at a preset width.
+	 * Renders the dialog at a preset width (excluding additional padding from
+	 * the viewport edges).
 	 *
 	 * - `'small'` — max-width of 384px.
 	 * - `'medium'` — max-width of 512px.
