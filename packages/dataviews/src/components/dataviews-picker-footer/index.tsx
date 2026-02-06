@@ -153,7 +153,7 @@ export function DataViewsPickerFooter() {
 		selection.length,
 		data.length,
 		paginationInfo.totalItems,
-		view.infiniteScrollEnabled
+		view.infiniteScrollEnabled // onlyTotalCount
 	);
 
 	const selectedItems = useSelectedItems( view, data, selection, getItemId );

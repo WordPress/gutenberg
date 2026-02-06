@@ -264,13 +264,13 @@ function renderFooterContent< Item >(
 		totalItems: number;
 		totalPages: number;
 	},
-	infiniteScrollEnabled?: boolean
+	onlyTotalCount?: boolean
 ) {
 	const message = getFooterMessage(
 		selection.length,
 		data.length,
 		paginationInfo.totalItems,
-		infiniteScrollEnabled
+		onlyTotalCount
 	);
 	return (
 		<Stack
@@ -390,7 +390,7 @@ function FooterContent< Item >( {
 			setActionInProgress,
 			onChangeSelection,
 			paginationInfo,
-			view.infiniteScrollEnabled
+			view.infiniteScrollEnabled // onlyTotalCount
 		);
 	} else if ( ! footerContentRef.current ) {
 		footerContentRef.current = renderFooterContent(
@@ -404,7 +404,7 @@ function FooterContent< Item >( {
 			setActionInProgress,
 			onChangeSelection,
 			paginationInfo,
-			view.infiniteScrollEnabled
+			view.infiniteScrollEnabled // onlyTotalCount
 		);
 	}
 	return footerContentRef.current;

@@ -6,17 +6,17 @@ import { _n, sprintf } from '@wordpress/i18n';
 /**
  * Get the footer message for the DataViews footer.
  *
- * @param selectionCount        - The number of items selected.
- * @param itemsCount            - The number of items in the current page.
- * @param totalItems            - The total number of items.
- * @param infiniteScrollEnabled - Whether infinite scroll is enabled.
- * @return                      - The footer message.
+ * @param selectionCount - The number of items selected.
+ * @param itemsCount     - The number of items in the current page.
+ * @param totalItems     - The total number of items.
+ * @param onlyTotalCount - Whether to only show the total count.
+ * @return               - The footer message.
  */
 export default function getFooterMessage(
 	selectionCount: number,
 	itemsCount: number,
 	totalItems: number,
-	infiniteScrollEnabled = false
+	onlyTotalCount = false
 ): string {
 	if ( selectionCount > 0 ) {
 		return sprintf(
@@ -26,7 +26,7 @@ export default function getFooterMessage(
 		);
 	}
 
-	if ( infiniteScrollEnabled || totalItems <= itemsCount ) {
+	if ( onlyTotalCount || totalItems <= itemsCount ) {
 		return sprintf(
 			/* translators: %d: number of items. */
 			_n( '%d Item', '%d Items', totalItems ),
