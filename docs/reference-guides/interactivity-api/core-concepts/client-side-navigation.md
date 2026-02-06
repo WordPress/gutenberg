@@ -879,11 +879,9 @@ When the router fetches a new page, it extracts both types of server data:
 
 When navigation renders the new page, the server-provided data needs to merge with the existing client-side state. This merge follows specific rules:
 
-For global state, the new server state is deeply merged with the existing state. Properties from the server overwrite existing properties with the same path, but properties that exist only on the client are preserved. This allows client-side code to have modified the state (for example, incrementing a counter) while still receiving updates from the server for other properties.
+For global state, the server state does not overwrite existing client state properties. During navigation, only properties that don't already exist on the client are added. Existing client-side properties are preserved as-is. If you need the client state to reflect server changes during navigation, you must use `getServerState()` to subscribe to server state updates and then manually update the client state accordingly.
 
-For local context, the behavior depends on the region. When a region is updated, its new context (from the server) replaces the region's previous context. However, because the Interactivity API tracks both "server context" and "client context" separately, your code can choose whether to use the server-provided values or preserve client modifications.
-
-<!-- IMAGE: Diagram showing state merge. Left box shows "Existing Client State" with properties {a: 1, b: 2, c: 3}. Right box shows "New Server State" with properties {a: 10, d: 4}. Arrow points to "Merged Result" showing {a: 10, b: 2, c: 3, d: 4}. Caption explains that 'a' was overwritten by server, 'b' and 'c' preserved from client, 'd' added from server. -->
+For local context, the behavior is similar. The server context and client context are tracked separately by the Interactivity API. During navigation, the server context is updated with the values from the new page, but the client context is not automatically overwritten. You can use `getServerContext()` to read the server-provided values or `getContext()` to read the client-side values, and decide which one to use in your code.
 
 **Subscribing to server data changes**
 
@@ -894,7 +892,7 @@ The Interactivity API provides two functions for accessing server-provided data 
 
 These functions are reactive. When used inside a callback or derived state getter, they automatically set up a subscription. When navigation occurs and new server data arrives, any code using these functions will re-run with the new values.
 
-This is different from the regular `state` and `getContext()`, which reflect the current merged state including any client-side modifications. Use `getServerState()` and `getServerContext()` when you specifically need to react to what the server sent, regardless of client modifications.
+This is different from the regular `state` and `getContext()`, which return the client-side state and context. As explained above, existing client-side values are not overwritten during navigation, so `state` and `getContext()` will keep reflecting whatever the client had before navigating. Use `getServerState()` and `getServerContext()` when you need to react to the values that the server sent for the new page.
 
 For more details, see the [Understanding global state, local context and derived state](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md#subscribing-to-server-state-and-context) guide.
 
