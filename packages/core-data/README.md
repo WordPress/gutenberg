@@ -529,18 +529,6 @@ _Returns_
 
 -   `string`: The default template id for the given query.
 
-### getDisconnectedSyncConnectionState
-
-Returns the first disconnected sync connection state, if any.
-
-_Parameters_
-
--   _state_ `State`: Data state.
-
-_Returns_
-
--   `SyncConnectionState | undefined`: The first disconnected connection state, or undefined if all connected.
-
 ### getEditedEntityRecord
 
 Returns the specified entity record, merged with its edits.
@@ -845,6 +833,18 @@ _Parameters_
 _Returns_
 
 -   `RevisionRecord[] | null`: Record.
+
+### getSyncConnectionState
+
+Returns the current sync connection state across all entities. Prioritizes disconnected states, then connecting, then connected.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `SyncConnectionState | undefined`: The current sync connection state, prioritized by importance.
 
 ### getThemeSupports
 

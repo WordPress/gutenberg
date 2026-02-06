@@ -48,7 +48,7 @@ export function getSyncErrorMessages( error ) {
 		),
 	};
 
-	if ( ! error ) {
+	if ( typeof error?.code !== 'string' ) {
 		return genericDisconnectMessages;
 	}
 

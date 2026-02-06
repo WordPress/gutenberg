@@ -1626,13 +1626,14 @@ export function getEntitySyncConnectionState(
 }
 
 /**
- * Returns the first disconnected sync connection state, if any.
+ * Returns the current sync connection state across all entities.
+ * Prioritizes disconnected states, then connecting, then connected.
  *
  * @param state Data state.
  *
- * @return The first disconnected connection state, or undefined if all connected.
+ * @return The current sync connection state, prioritized by importance.
  */
-export function getDisconnectedSyncConnectionState(
+export function getSyncConnectionState(
 	state: State
 ): SyncConnectionState | undefined {
 	if ( ! state.syncConnectionStates ) {
@@ -1642,10 +1643,20 @@ export function getDisconnectedSyncConnectionState(
 	for ( const connectionState of Object.values(
 		state.syncConnectionStates
 	) ) {
-		if ( connectionState?.status === 'disconnected' ) {
+		if ( connectionState.status === 'disconnected' ) {
 			return connectionState;
 		}
 	}
 
-	return undefined;
+	for ( const connectionState of Object.values(
+		state.syncConnectionStates
+	) ) {
+		if ( connectionState.status === 'connecting' ) {
+			return connectionState;
+		}
+	}
+
+	return {
+		status: 'connected',
+	};
 }
