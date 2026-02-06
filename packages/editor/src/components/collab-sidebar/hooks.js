@@ -341,12 +341,6 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				registry.select( coreStore ).getCurrentUser() || {};
 			const userId = currentUser.id;
 
-			if ( ! userId ) {
-				throw new Error(
-					__( 'You must be logged in to add reactions.' )
-				);
-			}
-
 			// Get current comment data.
 			const comment = registry
 				.select( coreStore )
@@ -410,12 +404,6 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				registry.select( coreStore ).getCurrentUser() || {};
 			const userId = currentUser.id;
 
-			if ( ! userId ) {
-				throw new Error(
-					__( 'You must be logged in to remove reactions.' )
-				);
-			}
-
 			// Get current comment data.
 			const comment = registry
 				.select( coreStore )
@@ -474,10 +462,6 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 			const currentUser =
 				registry.select( coreStore ).getCurrentUser() || {};
 			const userId = currentUser.id;
-
-			if ( ! userId ) {
-				throw new Error( __( 'You must be logged in to react.' ) );
-			}
 
 			// Get current comment data.
 			const comment = registry
