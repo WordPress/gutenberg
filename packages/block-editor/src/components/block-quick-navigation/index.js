@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	Button,
@@ -24,7 +25,7 @@ export default function BlockQuickNavigation( {
 	clientIds,
 	onSelect,
 	onSwitchToListView,
-	hasListView,
+	hasListViewTab,
 } ) {
 	if ( ! clientIds.length ) {
 		return null;
@@ -35,7 +36,7 @@ export default function BlockQuickNavigation( {
 				<BlockQuickNavigationItem
 					onSelect={ onSelect }
 					onSwitchToListView={ onSwitchToListView }
-					hasListView={ hasListView }
+					hasListViewTab={ hasListViewTab }
 					key={ clientId }
 					clientId={ clientId }
 				/>
@@ -48,23 +49,32 @@ function BlockQuickNavigationItem( {
 	clientId,
 	onSelect,
 	onSwitchToListView,
-	hasListView,
+	hasListViewTab,
 } ) {
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 		context: 'list-view',
 	} );
-	const { isSelected, childBlocks } = useSelect(
+	const { isSelected, childBlocks, hasListViewSupport } = useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock, getBlockOrder } =
-				select( blockEditorStore );
+			const {
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				getBlockOrder,
+				getBlockName,
+			} = select( blockEditorStore );
+
+			const blockName = getBlockName( clientId );
 
 			return {
 				isSelected:
 					isBlockSelected( clientId ) ||
 					hasSelectedInnerBlock( clientId, /* deep: */ true ),
 				childBlocks: getBlockOrder( clientId ),
+				hasListViewSupport:
+					blockName === 'core/navigation' ||
+					hasBlockSupport( blockName, 'listView' ),
 			};
 		},
 		[ clientId ]
@@ -72,7 +82,8 @@ function BlockQuickNavigationItem( {
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const hasChildren = childBlocks && childBlocks.length > 0;
-	const canNavigateToListView = hasChildren && hasListView;
+	const canNavigateToListView =
+		hasChildren && hasListViewTab && hasListViewSupport;
 
 	return (
 		<Button

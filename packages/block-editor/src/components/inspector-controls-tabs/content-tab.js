@@ -12,7 +12,7 @@ import BlockQuickNavigation from '../block-quick-navigation';
 const ContentTab = ( {
 	contentClientIds,
 	onSwitchToListView,
-	hasListView,
+	hasListViewTab,
 } ) => {
 	if ( ! contentClientIds || contentClientIds.length === 0 ) {
 		return null;
@@ -28,7 +28,7 @@ const ContentTab = ( {
 					<BlockQuickNavigation
 						clientIds={ contentClientIds }
 						onSwitchToListView={ onSwitchToListView }
-						hasListView={ hasListView }
+						hasListViewTab={ hasListViewTab }
 					/>
 				</PanelBody>
 			) }

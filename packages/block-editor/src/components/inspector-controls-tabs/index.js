@@ -63,10 +63,12 @@ export default function InspectorControlsTabs( {
 		hasUserSelectionRef.current = true;
 	};
 
-	const hasListView = tabs.some( ( tab ) => tab.name === TAB_LIST_VIEW.name );
+	const hasListViewTab = tabs.some(
+		( tab ) => tab.name === TAB_LIST_VIEW.name
+	);
 
 	const switchToListView = () => {
-		if ( hasListView ) {
+		if ( hasListViewTab ) {
 			handleTabSelect( TAB_LIST_VIEW.name );
 		}
 	};
@@ -112,7 +114,7 @@ export default function InspectorControlsTabs( {
 					<ContentTab
 						contentClientIds={ contentClientIds }
 						onSwitchToListView={ switchToListView }
-						hasListView={ hasListView }
+						hasListViewTab={ hasListViewTab }
 					/>
 					<InspectorControls.Slot group="content" />
 				</Tabs.TabPanel>
