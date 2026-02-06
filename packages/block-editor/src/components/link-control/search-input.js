@@ -153,7 +153,7 @@ const LinkControlSearchInput = forwardRef(
 					// When required=true (e.g., in modals with text control), browser validation is used.
 					// Use markWhenOptional when required=true to suppress the "(Required)" indicator.
 					required={ required }
-					{ ...( required && { markWhenOptional: true } ) }
+					markWhenOptional={ required }
 					onSubmit={ ( suggestion, event ) => {
 						const hasSuggestion = suggestion || focusedSuggestion;
 
