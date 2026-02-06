@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -18,29 +13,30 @@ export default function IconGrid( props ) {
 	const { shownIcons, updateIconAtts, attributes } = props;
 
 	return (
-		<div className="wp-block-icon__inserter-content-grid">
+		<div className="wp-block-icon__inserter-grid">
 			{ shownIcons.length === 0 ? (
-				<div className="wp-block-icon__inserter-content-grid-no-results">
+				<div className="wp-block-icon__inserter-grid-no-results">
 					<p>{ __( 'No results found.' ) }</p>
 				</div>
 			) : (
-				<div className="wp-block-icon__inserter-content-grid-icons-list">
+				<div
+					className="wp-block-icon__inserter-grid-icons-list"
+					aria-label={ __( 'Icon library' ) }
+				>
 					{ shownIcons.map( ( icon ) => {
 						return (
 							<Button
 								key={ `icon-${ icon.name }` }
-								className={ clsx(
-									'wp-block-icon__inserter-content-grid-icons-list-item',
-									'block-editor-block-types-list__item',
-									{
-										'is-active':
-											icon.name === attributes?.icon,
-									}
-								) }
+								className="wp-block-icon__inserter-grid-icons-list-item"
 								onClick={ () => updateIconAtts( icon.name ) }
+								variant={
+									icon.name === attributes?.icon
+										? 'primary'
+										: undefined
+								}
 								__next40pxDefaultSize
 							>
-								<span className="wp-block-icon__inserter-content-grid-icons-list-item-icon">
+								<span className="wp-block-icon__inserter-grid-icons-list-item-icon">
 									<HtmlRenderer
 										html={ icon.content }
 										wrapperProps={ {
@@ -48,7 +44,7 @@ export default function IconGrid( props ) {
 										} }
 									/>
 								</span>
-								<span className="wp-block-icon__inserter-content-grid-icons-list-item-title">
+								<span className="wp-block-icon__inserter-grid-icons-list-item-title">
 									{ icon.label }
 								</span>
 							</Button>

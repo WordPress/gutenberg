@@ -45,17 +45,15 @@ export default function InserterModal( props ) {
 			isFullScreen
 		>
 			<div className="wp-block-icon__inserter">
-				<div className="wp-block-icon__inserter-content">
-					<ContentHeader
-						searchInput={ searchInput }
-						setSearchInput={ setSearchInput }
-					/>
-					<IconGrid
-						shownIcons={ getFilteredIcons() }
-						updateIconAtts={ updateIconAtts }
-						attributes={ attributes }
-					/>
-				</div>
+				<ContentHeader
+					searchInput={ searchInput }
+					setSearchInput={ setSearchInput }
+				/>
+				<IconGrid
+					shownIcons={ getFilteredIcons() }
+					updateIconAtts={ updateIconAtts }
+					attributes={ attributes }
+				/>
 			</div>
 		</Modal>
 	);

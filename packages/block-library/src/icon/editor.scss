@@ -1,136 +1,44 @@
-/**
- * Editor only styles for the Icon Block.
- */
+@use "@wordpress/base-styles/variables" as *;
 
 // Style for the icon library modal.
-.wp-block-icon__inserter-modal {
-	.components-modal__content {
-		flex: 1 1 0%;
-		overflow: auto;
-		padding: 0;
+.wp-block-icon__inserter {
+	padding: 0 $grid-unit-30;
+	margin: 0 (-1 * $grid-unit-30);
+}
 
-		&::before {
-			margin-bottom: 0;
-		}
-	}
+.wp-block-icon__inserter-header {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: $grid-unit-20;
+}
 
-	.wp-block-icon__inserter {
-		align-items: stretch;
-		display: flex;
-		height: 100%;
-	}
+.wp-block-icon__inserter-grid-icons-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
 
-	.wp-block-icon__inserter-content {
-		display: flex;
-		flex-direction: column;
-		flex-shrink: 0;
-		overflow: auto;
-		padding: 24px 32px;
-		width: 100%;
+.wp-block-icon__inserter-grid-no-results {
+	display: flex;
+	justify-content: center;
+}
 
-		.wp-block-icon__inserter-content-header {
-			align-items: center;
-			display: flex;
-			height: 40px;
-			justify-content: space-between;
-			margin-bottom: 24px;
-		}
+.wp-block-icon__inserter-grid-icons-list-item {
+	display: flex;
+	flex-direction: column;
+	height: auto !important;
+}
 
-		.wp-block-icon__inserter-content-grid-icons-list {
-			padding: 4px 4px 72px 4px;
-			margin: 0;
-			display: grid;
-			grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
+.wp-block-icon__inserter-grid-icons-list-item-icon {
+	padding: $grid-unit-15;
+}
 
-			@media (min-width: 600px) {
-				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
-			}
-
-			@media (min-width: 900px) {
-				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
-			}
-
-			@media (min-width: 1100px) {
-				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
-			}
-
-			@media (min-width: 1450px) {
-				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
-			}
-
-			@media (min-width: 1600px) {
-				grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr);
-			}
-
-			.wp-block-icon__inserter-content-grid-icons-list-item {
-				&.is-active {
-					background-color: var(--wp-admin-theme-color);
-					color: rgb(255 255 255 / 80%);
-
-					&:hover {
-						color: #fff !important;
-					}
-
-					svg {
-						fill: #fff;
-					}
-				}
-			}
-		}
-
-		.wp-block-icon__inserter-content-grid-no-results {
-			height: calc(100% - 56px);
-			margin-top: 0;
-			display: flex;
-			justify-content: center;
-
-			svg {
-				margin: 0 auto;
-			}
-		}
-	}
-
-	.wp-block-icon__inserter-content-grid-icons-list {
-		display: flex;
-		flex-wrap: wrap;
-
-		.wp-block-icon__inserter-content-grid-icons-list-item {
-			align-items: stretch;
-			background: transparent;
-			border: 1px solid transparent;
-			border-radius: 2px;
-			color: #1e1e1e;
-			cursor: pointer;
-			display: flex;
-			flex-direction: column;
-			font-size: 13px;
-			height: auto;
-			justify-content: center;
-			padding: 8px;
-			position: relative;
-			transition: all 0.05s ease-in-out;
-			word-break: break-word;
-
-			&:hover {
-				color: var(--wp-admin-theme-color) !important;
-			}
-
-			.wp-block-icon__inserter-content-grid-icons-list-item-icon {
-				border-radius: 2px;
-				color: #1e1e1e;
-				padding: 12px;
-				transition: all 0.05s ease-in-out;
-			}
-
-			.wp-block-icon__inserter-content-grid-icons-list-item-title {
-				font-size: 12px;
-				padding: 4px 2px 8px;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
-		}
-	}
+.wp-block-icon__inserter-grid-icons-list-item-title {
+	font-size: $font-size-small;
+	padding: $grid-unit-05 $grid-unit-05 $grid-unit-10;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 }
 
 .wp-block-icon__toolbar-content {
