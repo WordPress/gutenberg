@@ -47,3 +47,53 @@ function gutenberg_rest_api_crdt_post_meta() {
 	);
 }
 add_action( 'init', 'gutenberg_rest_api_crdt_post_meta' );
+
+/**
+ * Registers the real-time collaboration setting.
+ */
+function gutenberg_register_real_time_collaboration_setting() {
+	$option_name = 'gutenberg_enable_real_time_collaboration';
+
+	register_setting(
+		'writing',
+		$option_name,
+		array(
+			'type'              => 'boolean',
+			'description'       => __( 'Enable Real-Time Collaboration', 'gutenberg' ),
+			'sanitize_callback' => 'rest_sanitize_boolean',
+			'default'           => false,
+			'show_in_rest'      => true,
+		)
+	);
+
+	add_settings_field(
+		$option_name,
+		__( 'Collaboration', 'gutenberg' ),
+		function () use ( $option_name ) {
+			$option_value = get_option( $option_name );
+
+			?>
+			<label for="gutenberg_enable_real_time_collaboration">
+				<input name="gutenberg_enable_real_time_collaboration" type="checkbox" id="gutenberg_enable_real_time_collaboration" value="1" <?php checked( '1', $option_value ); ?>/>
+				<?php _e( 'Enable real-time collaboration', 'gutenberg' ); ?>
+			</label>
+			<?php
+		},
+		'writing'
+	);
+}
+add_action( 'admin_init', 'gutenberg_register_real_time_collaboration_setting' );
+
+/**
+ * Injects the real-time collaboration setting for the sync package.
+ */
+function gutenberg_inject_real_time_collaboration_setting() {
+	if ( get_option( 'gutenberg_enable_real_time_collaboration' ) ) {
+		wp_add_inline_script(
+			'wp-sync',
+			'window.__wpSyncEnabled = true;',
+			'after'
+		);
+	}
+}
+add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/build",
-	"version": "0.7.1-next.v.0+642962a6d",
+	"version": "0.7.0",
 	"description": "Build tool for WordPress plugins.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

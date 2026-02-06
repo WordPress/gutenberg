@@ -1,8 +1,6 @@
 @use "@wordpress/base-styles/variables" as *;
 
 .wp-block-playlist {
-	border: 1px solid color-mix(in srgb, currentColor 20%, transparent);
-	border-radius: 2px;
 	padding: $grid-unit-20;
 
 	.wp-block-playlist__current-item {

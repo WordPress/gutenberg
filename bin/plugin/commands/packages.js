@@ -367,6 +367,12 @@ async function publishPackagesToNpm( {
 		gitWorkingDirectoryPath
 	).revparse( [ '--short', 'HEAD' ] );
 
+	// Timestamp is the current time in `YYYYMMDDHHMM` format.
+	const timestamp = new Date()
+		.toISOString()
+		.replace( /[-:]/g, '' )
+		.substring( 0, 12 );
+
 	const yesFlag = interactive ? '' : '--yes';
 	const noVerifyAccessFlag = interactive ? '' : '--no-verify-access';
 	if ( releaseType === 'next' ) {
@@ -375,7 +381,7 @@ async function publishPackagesToNpm( {
 		);
 
 		await command(
-			`npx lerna version pre${ minimumVersionBump } --preid next.v --build-metadata ${ beforeCommitHash } --no-private ${ yesFlag }`,
+			`npx lerna version pre${ minimumVersionBump } --preid next.v.${ timestamp } --build-metadata ${ beforeCommitHash } --no-private ${ yesFlag }`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
