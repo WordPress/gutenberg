@@ -31,7 +31,9 @@ import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
 import CSSClassesSettingComponent from './css-classes-setting';
 
-// CSSClassesSettingComponent moved to its own file and imported above.
+// Text *selection* always extends +1 beyond the edge of the format.
+// This offset accounts for that when calculating the format boundaries for active formats.
+const FORMAT_BOUNDARY_EDGE_OFFSET = 1;
 
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
@@ -167,7 +169,17 @@ function InlineLinkUI( {
 
 			return;
 		} else if ( newText === richTextText ) {
-			newValue = applyFormat( value, linkFormat );
+			// Use explicit format boundaries rather than relying on the
+			// current selection which may be collapsed or misaligned.
+			const boundary = getFormatBoundary( value, {
+				type: 'core/link',
+			} );
+			newValue = applyFormat(
+				value,
+				linkFormat,
+				boundary.start,
+				boundary.end + FORMAT_BOUNDARY_EDGE_OFFSET
+			);
 		} else {
 			// Scenario: Editing an existing link.
 
@@ -319,9 +331,7 @@ function getRichTextValueFromSelection( value, isActive ) {
 
 		textStart = boundary.start;
 
-		// Text *selection* always extends +1 beyond the edge of the format.
-		// We account for that here.
-		textEnd = boundary.end + 1;
+		textEnd = boundary.end + FORMAT_BOUNDARY_EDGE_OFFSET;
 	}
 
 	// Get a RichTextValue containing the selected text content.
