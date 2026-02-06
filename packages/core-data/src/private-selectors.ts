@@ -6,7 +6,12 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { getDefaultTemplateId, getEntityRecord, type State } from './selectors';
+import {
+	getDefaultTemplateId,
+	getEntityRecord,
+	type State,
+	type Icon,
+} from './selectors';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
 import { getSyncManager } from './sync';
@@ -315,6 +320,6 @@ export function getEditorAssets( state: State ): Record< string, any > | null {
  * @param state Data state.
  * @return The list of icons or empty array if not loaded.
  */
-export function getIcons( state: State ): Array< any > {
+export function getIcons( state: State ): Icon[] {
 	return state.icons ?? [];
 }
