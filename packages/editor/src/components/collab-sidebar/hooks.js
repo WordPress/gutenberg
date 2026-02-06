@@ -548,9 +548,7 @@ export function useNoteActions( reflowComments = () => {} ) {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-			reflowComments();
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
@@ -607,9 +605,7 @@ export function useNoteActions( reflowComments = () => {} ) {
 				type: 'snackbar',
 				isDismissible: true,
 			} );
-			reflowComments();
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
@@ -643,7 +639,6 @@ export function useNoteActions( reflowComments = () => {} ) {
 				await onAddReaction( { commentId, emoji } );
 			}
 		} catch ( error ) {
-			reflowComments();
 			onError( error );
 		}
 	};
