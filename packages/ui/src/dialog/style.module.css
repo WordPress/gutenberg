@@ -57,6 +57,10 @@
 			}
 		}
 
+		@media (min-width: 480px) {
+			min-width: 384px;
+		}
+
 		&.is-small {
 			max-width: 384px;
 		}
