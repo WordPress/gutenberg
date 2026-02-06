@@ -104,10 +104,11 @@ function NotesSidebar( { postId } ) {
 				blockCommentId: _clientId
 					? getBlockAttributes( _clientId )?.metadata?.noteId
 					: null,
-				isCompactNote: !! select( preferencesStore ).get(
-					'core',
-					'compactNotes'
-				),
+				isCompactNote:
+					select( preferencesStore ).get(
+						'core',
+						'notesDisplayMode'
+					) === 'minimize',
 				isAllNotesSidebarActive:
 					select( interfaceStore ).getActiveComplementaryArea(
 						'core'
@@ -240,8 +241,8 @@ function NotesSidebar( { postId } ) {
 											}
 											setPreference(
 												'core',
-												'compactNotes',
-												value === 'minimize'
+												'notesDisplayMode',
+												value
 											);
 										}
 									} }
