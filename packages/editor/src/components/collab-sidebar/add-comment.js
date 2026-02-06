@@ -81,6 +81,9 @@ export function AddComment( {
 					: undefined
 			}
 			onBlur={ ( event ) => {
+				// Prevent blur from closing the form while the async
+				// submit is in progress. Clicking "Add note" moves focus
+				// away, triggering blur before onSubmit completes.
 				if ( isSubmittingRef.current ) {
 					return;
 				}
