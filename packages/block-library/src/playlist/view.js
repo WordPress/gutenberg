@@ -8,7 +8,6 @@ import '@arraypress/waveform-player/dist/waveform-player.css';
  * WordPress dependencies
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -186,7 +185,7 @@ const { state } = store(
 				if ( playBtn ) {
 					playBtn.setAttribute(
 						'aria-label',
-						track.ariaLabel || track.title || __( 'Play' )
+						track.ariaLabel || track.title || 'Play'
 					);
 					playBtn.setAttribute( 'role', 'button' );
 
