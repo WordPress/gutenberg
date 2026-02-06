@@ -23,9 +23,12 @@ export default {
 	},
 	argTypes: {
 		onChange: {
-			control: false,
-			table: { disable: true },
 			action: 'onChange',
+			control: { type: null },
+			table: {
+				type: { summary: 'function' },
+			},
+			description: 'Callback fired when color changes.',
 		},
 		value: {
 			control: false,
