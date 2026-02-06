@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta } from '@storybook/react-webpack5';
+import type { Meta } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -11,6 +11,7 @@ import LayoutActivityComponent from './layout-activity';
 import LayoutTableComponent from './layout-table';
 import LayoutGridComponent from './layout-grid';
 import LayoutListComponent from './layout-list';
+import LayoutCustomComponent from './layout-custom';
 import InfiniteScrollComponent from './infinite-scroll';
 import WithCardComponent from './with-card';
 import FreeCompositionComponent from './free-composition';
@@ -118,6 +119,7 @@ export const LayoutGrid = {
 export const LayoutList = {
 	render: LayoutListComponent,
 	args: {
+		fullWidth: false,
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
@@ -128,6 +130,11 @@ export const LayoutList = {
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',
+		},
+		fullWidth: {
+			control: 'boolean',
+			description:
+				'Whether to use full width or a contained layout (400px)',
 		},
 		groupBy: {
 			control: 'boolean',
@@ -156,6 +163,7 @@ export const LayoutList = {
 export const LayoutActivity = {
 	render: LayoutActivityComponent,
 	args: {
+		fullWidth: false,
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
@@ -166,6 +174,11 @@ export const LayoutActivity = {
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',
+		},
+		fullWidth: {
+			control: 'boolean',
+			description:
+				'Whether to use full width or a contained layout (400px)',
 		},
 		groupBy: {
 			control: 'boolean',
@@ -189,6 +202,10 @@ export const LayoutActivity = {
 			description: 'Whether to display the media field',
 		},
 	},
+};
+
+export const LayoutCustom = {
+	render: LayoutCustomComponent,
 };
 
 export const Empty = {

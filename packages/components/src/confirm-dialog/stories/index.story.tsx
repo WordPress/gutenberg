@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 /**
@@ -33,6 +33,10 @@ const meta: Meta< typeof ConfirmDialog > = {
 		controls: {
 			expanded: true,
 		},
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 		docs: { canvas: { sourceState: 'shown' } },
 	},
 };
@@ -58,7 +62,11 @@ const Template: StoryFn< typeof ConfirmDialog > = ( {
 
 	return (
 		<>
-			<Button variant="primary" onClick={ () => setIsOpen( true ) }>
+			<Button
+				__next40pxDefaultSize
+				variant="primary"
+				onClick={ () => setIsOpen( true ) }
+			>
 				Open ConfirmDialog
 			</Button>
 

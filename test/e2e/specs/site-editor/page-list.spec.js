@@ -176,12 +176,6 @@ test.describe( 'Page List', () => {
 				assertEditedState: async ( page ) => {
 					const author = page.getByLabel( 'Edit Author' );
 					await expect( author ).toContainText( 'Test Author' );
-					// Check that the list still shows "admin" (changes not yet saved).
-					const selectedItem = page.locator( '.is-selected' );
-					const authorCell = selectedItem.getByRole( 'cell', {
-						name: 'admin',
-					} );
-					await expect( authorCell ).toBeVisible();
 				},
 			},
 			date: {
@@ -321,13 +315,10 @@ test.describe( 'Page List', () => {
 			await page.getByRole( 'button', { name: 'Pages' } ).click();
 			await page.getByRole( 'button', { name: 'Layout' } ).click();
 			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
-			const privacyPolicyCheckbox = page.getByRole( 'checkbox', {
-				name: 'Privacy Policy',
-			} );
 
-			await privacyPolicyCheckbox.check();
-
-			await page.getByRole( 'button', { name: 'Details' } ).click();
+			// Trigger Quick Edit action on Privacy Policy row
+			const row = page.getByRole( 'row', { name: /Privacy Policy/ } );
+			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
 		} );
 
 		Object.entries( fields ).forEach(
@@ -351,28 +342,28 @@ test.describe( 'Page List', () => {
 			page,
 			requestUtils,
 		} ) => {
-			const selectedItem = page.locator( '.is-selected' );
-			const imagePlaceholder = selectedItem.locator(
-				'.fields__media-edit-placeholder'
-			);
-			const status = selectedItem.getByRole( 'cell', {
-				name: 'Published',
-			} );
-			await expect( status ).toBeVisible();
-
 			const { featuredImage, statusVisibility } = fields;
 			await statusVisibility.performEdit( page );
 			await featuredImage.performEdit( page );
-			// Ensure that no dropdown is open
-			await page.getByRole( 'button', { name: 'Close' } ).click();
-			const saveButton = page.getByLabel( 'Review 1 change…' );
-			await saveButton.click();
-			await page.getByRole( 'button', { name: 'Save' } ).click();
-			const updatedStatus = selectedItem.getByRole( 'cell', {
-				name: 'Private',
-			} );
-			await expect( imagePlaceholder ).toBeHidden();
+
+			// Click Done to save changes (modal saves directly)
+			await page.getByRole( 'button', { name: 'Done' } ).click();
+
+			// Wait for modal to close and verify changes in the table
+			await expect(
+				page.locator( '.dataviews-action-modal__quick-edit' )
+			).toBeHidden();
+
+			// Find the Privacy Policy row and verify updated values
+			const row = page.getByRole( 'row', { name: /Privacy Policy/ } );
+			const updatedStatus = row.getByRole( 'cell', { name: 'Private' } );
 			await expect( updatedStatus ).toBeVisible();
+
+			// Verify featured image placeholder is gone (image was set)
+			const imagePlaceholder = row.locator(
+				'.fields__media-edit-placeholder'
+			);
+			await expect( imagePlaceholder ).toBeHidden();
 
 			// Reset the page to its original state
 			await requestUtils.deleteAllPages();

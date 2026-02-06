@@ -113,25 +113,26 @@ if ( window.crossOriginIsolated ) {
 		'credentialless' in window.HTMLIFrameElement.prototype;
 
 	const disableEmbedPreviews = createHigherOrderComponent(
-		( BlockEdit ) => ( props ) => {
-			if ( 'core/embed' !== props.name ) {
-				return <BlockEdit { ...props } />;
-			}
+		( BlockEdit ) =>
+			function DisableEmbedPreviews( props ) {
+				if ( 'core/embed' !== props.name ) {
+					return <BlockEdit { ...props } />;
+				}
 
-			// List of embeds that do not support a preview is from packages/block-library/src/embed/variations.js.
-			const previewable =
-				supportsCredentialless &&
-				! [ 'facebook', 'smugmug' ].includes(
-					props.attributes.providerNameSlug
+				// List of embeds that do not support a preview is from packages/block-library/src/embed/variations.js.
+				const previewable =
+					supportsCredentialless &&
+					! [ 'facebook', 'smugmug' ].includes(
+						props.attributes.providerNameSlug
+					);
+
+				return (
+					<BlockEdit
+						{ ...props }
+						attributes={ { ...props.attributes, previewable } }
+					/>
 				);
-
-			return (
-				<BlockEdit
-					{ ...props }
-					attributes={ { ...props.attributes, previewable } }
-				/>
-			);
-		},
+			},
 		'withDisabledEmbedPreview'
 	);
 

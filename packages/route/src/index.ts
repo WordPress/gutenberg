@@ -4,7 +4,9 @@
 import { useRouter } from '@tanstack/react-router';
 export {
 	Link,
+	notFound,
 	redirect,
+	useLinkProps,
 	useNavigate,
 	useParams,
 	useSearch,

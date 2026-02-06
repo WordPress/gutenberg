@@ -86,6 +86,20 @@ exports[`Slot bubblesVirtually true should unmount two slots with the same name 
 </div>
 `;
 
+exports[`Slot should not infinite loop with useSlotFills 1`] = `
+<div>
+  <div>
+    <div>
+      fills:
+      1
+    </div>
+    <div>
+      fill content
+    </div>
+  </div>
+</div>
+`;
+
 exports[`Slot should re-render Slot when not bubbling virtually 1`] = `
 <div>
   <div>

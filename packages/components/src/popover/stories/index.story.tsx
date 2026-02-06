@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 /**
  * WordPress dependencies
@@ -55,6 +55,10 @@ const meta: Meta< typeof Popover > = {
 	},
 	parameters: {
 		controls: { expanded: true },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 	},
 };
 
@@ -114,6 +118,7 @@ export const Default: StoryObj< typeof Popover > = {
 					} }
 				>
 					<Button
+						__next40pxDefaultSize
 						variant="secondary"
 						onClick={ toggleVisible }
 						ref={ buttonRef }
@@ -209,6 +214,7 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
 				<div style={ { padding: '20px' } }>
 					<div>
 						<Button
+							__next40pxDefaultSize
 							variant="primary"
 							onClick={ increase }
 							style={ {
@@ -218,7 +224,11 @@ export const DynamicHeight: StoryObj< typeof Popover > = {
 							Increase Size
 						</Button>
 
-						<Button variant="primary" onClick={ decrease }>
+						<Button
+							__next40pxDefaultSize
+							variant="primary"
+							onClick={ decrease }
+						>
 							Decrease Size
 						</Button>
 					</div>
@@ -302,6 +312,7 @@ export const WithCloseHandlers: StoryObj< typeof Popover > = {
 				} }
 			>
 				<Button
+					__next40pxDefaultSize
 					variant="secondary"
 					onClick={ toggleVisible }
 					ref={ buttonRef }

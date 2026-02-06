@@ -27,6 +27,14 @@ function isBlockHiddenForViewport( block, viewport ) {
 		return false;
 	}
 
+	// Get viewport configuration from nested structure.
+	const viewportConfig = blockVisibility.viewport;
+
+	// If no viewport config, block is not hidden for any specific viewport.
+	if ( ! viewportConfig || 'object' !== typeof viewportConfig ) {
+		return false;
+	}
+
 	// Check if the viewport is valid.
 	if (
 		! BLOCK_VISIBILITY_VIEWPORT_ENTRIES.some(
@@ -37,7 +45,7 @@ function isBlockHiddenForViewport( block, viewport ) {
 	}
 
 	// Check if the specific viewport is hidden.
-	return blockVisibility[ viewport ] === false;
+	return viewportConfig[ viewport ] === false;
 }
 
 /**

@@ -25,10 +25,12 @@ import TemplateValidationNotice from '../template-validation-notice';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
+import { RevisionsHeader, RevisionsCanvas } from '../post-revisions-preview';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
 import StylesCanvas from '../styles-canvas';
+import { MediaPreview } from '../media';
 
 const interfaceLabels = {
 	/* translators: accessibility text for the editor top bar landmark region. */
@@ -57,6 +59,7 @@ export default function EditorInterface( {
 } ) {
 	const {
 		mode,
+		isAttachment,
 		isInserterOpened,
 		isListViewOpened,
 		isDistractionFree,
@@ -65,12 +68,16 @@ export default function EditorInterface( {
 		postTypeLabel,
 		stylesPath,
 		showStylebook,
+		isRevisionsMode,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
-		const { getStylesPath, getShowStylebook } = unlock(
-			select( editorStore )
-		);
+		const { getEditorSettings, getPostTypeLabel, getCurrentPostType } =
+			select( editorStore );
+		const {
+			getStylesPath,
+			getShowStylebook,
+			isRevisionsMode: _isRevisionsMode,
+		} = unlock( select( editorStore ) );
 		const editorSettings = getEditorSettings();
 
 		let _mode = select( editorStore ).getEditorMode();
@@ -91,14 +98,22 @@ export default function EditorInterface( {
 			postTypeLabel: getPostTypeLabel(),
 			stylesPath: getStylesPath(),
 			showStylebook: getShowStylebook(),
+			isAttachment:
+				getCurrentPostType() === 'attachment' &&
+				window?.__experimentalMediaEditor,
+			isRevisionsMode: _isRevisionsMode(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const secondarySidebarLabel = isListViewOpened
 		? __( 'Document Overview' )
 		: __( 'Block Library' );
+	const shouldShowMediaEditor = !! isAttachment;
 	const shouldShowStylesCanvas =
-		showStylebook || stylesPath?.startsWith( '/revisions' );
+		! isAttachment &&
+		( showStylebook || stylesPath?.startsWith( '/revisions' ) );
+	const shouldShowBlockEditor =
+		! shouldShowMediaEditor && ! shouldShowStylesCanvas;
 
 	// Local state for save panel.
 	// Note 'truthy' callback implies an open panel.
@@ -113,6 +128,19 @@ export default function EditorInterface( {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
+
+	// When in revisions mode, render the revisions interface.
+	if ( isRevisionsMode ) {
+		return (
+			<InterfaceSkeleton
+				className={ clsx( 'editor-editor-interface', className ) }
+				labels={ interfaceLabels }
+				header={ <RevisionsHeader /> }
+				content={ <RevisionsCanvas /> }
+				sidebar={ <ComplementaryArea.Slot scope="core" /> }
+			/>
+		);
+	}
 
 	return (
 		<InterfaceSkeleton
@@ -146,6 +174,7 @@ export default function EditorInterface( {
 				</InlineNotices>
 			}
 			secondarySidebar={
+				! isAttachment &&
 				! isPreviewMode &&
 				mode === 'visual' &&
 				( ( isInserterOpened && <InserterSidebar /> ) ||
@@ -165,10 +194,11 @@ export default function EditorInterface( {
 							<TemplateValidationNotice />
 						</InlineNotices>
 					) }
-
-					{ shouldShowStylesCanvas ? (
-						<StylesCanvas />
-					) : (
+					{ shouldShowMediaEditor && (
+						<MediaPreview { ...iframeProps } />
+					) }
+					{ shouldShowStylesCanvas && <StylesCanvas /> }
+					{ shouldShowBlockEditor && (
 						<>
 							{ ! isPreviewMode && mode === 'text' && (
 								<TextEditor

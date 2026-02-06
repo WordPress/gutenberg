@@ -1202,13 +1202,6 @@ test.describe( 'Navigation block', () => {
 				await expect( linkButton ).toContainText(
 					url.pathname.replace( /\/$/, '' )
 				);
-
-				// Verify help text
-				await expect(
-					settingsControls.getByText(
-						'Synced with the selected page.'
-					)
-				).toBeVisible();
 			} );
 
 			await test.step( 'Verify bound link works correctly on frontend', async () => {
@@ -1633,14 +1626,14 @@ test.describe( 'Navigation block', () => {
 
 				// With LinkControlInspector, unavailable entities show a button with error badge
 				const linkButton = settingsControls.getByRole( 'button', {
-					name: /No link selected/i,
+					name: /Missing page/i,
 				} );
 
 				// Button is enabled (can click to fix the link)
 				await expect( linkButton ).toBeEnabled();
 
-				// Button should show "No link selected" for unavailable entity
-				await expect( linkButton ).toContainText( 'No link selected' );
+				// Button should show "Missing page" for unavailable entity
+				await expect( linkButton ).toContainText( 'Missing page' );
 			} );
 
 			await test.step( 'Verify clicking button with error opens link control for fixing', async () => {
@@ -1649,7 +1642,7 @@ test.describe( 'Navigation block', () => {
 					.getByRole( 'tabpanel', { name: 'Settings' } );
 
 				const linkButton = settingsControls.getByRole( 'button', {
-					name: /No link selected/i,
+					name: /Missing page/i,
 				} );
 
 				// Click the button to open the link control and fix the link

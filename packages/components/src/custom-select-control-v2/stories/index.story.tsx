@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 /**
@@ -30,6 +30,11 @@ const meta: Meta< typeof CustomSelectControlV2 > = {
 		controls: { expanded: true },
 		docs: {
 			source: { excludeDecorators: true },
+		},
+		componentStatus: {
+			status: 'not-recommended',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `SelectControl` in `@wordpress/ui`. Continue using `CustomSelectControl` (v1) for now.',
 		},
 	},
 	decorators: [

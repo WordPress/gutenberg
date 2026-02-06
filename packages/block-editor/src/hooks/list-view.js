@@ -4,14 +4,17 @@
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { store as blocksStore, hasBlockSupport } from '@wordpress/blocks';
+import { hasBlockSupport } from '@wordpress/blocks';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import InspectorControls from '../components/inspector-controls';
 import { store as blockEditorStore } from '../store';
 import { PrivateListView } from '../components/list-view';
+import InspectorControls from '../components/inspector-controls/fill';
+import { PrivateBlockContext } from '../components/block-list/private-block-context';
+import useBlockDisplayTitle from '../components/block-title/use-block-display-title';
 
 export const LIST_VIEW_SUPPORT_KEY = 'listView';
 
@@ -34,23 +37,48 @@ export function hasListViewSupport( nameOrType ) {
  * @return {Element|null} List view inspector controls or null.
  */
 export function ListViewPanel( { clientId, name } ) {
+	const { isSelectionWithinCurrentSection } =
+		useContext( PrivateBlockContext );
 	const isEnabled = hasListViewSupport( name );
-	const { hasChildren, blockTitle } = useSelect(
-		( select ) => ( {
-			hasChildren:
-				!! select( blockEditorStore ).getBlockCount( clientId ),
-			blockTitle: select( blocksStore ).getBlockType( name )?.title,
-		} ),
-		[ clientId, name ]
-	);
+	const { hasChildren, isNestedListView } = useSelect(
+		( select ) => {
+			const { getBlockCount, getBlockParents, getBlockName } =
+				select( blockEditorStore );
 
-	if ( ! isEnabled ) {
+			// Avoid showing List Views for both parent and child blocks that have support.
+			// In this situation the parent will show the child in its list already.
+			// Search parents to see if there's one that also has support, and if so skip rendering.
+			// This matches closely the logic in the `BlockCard` component.
+			const parents = getBlockParents( clientId, false );
+			const _isNestedListView = parents.find( ( parentId ) => {
+				const parentName = getBlockName( parentId );
+				return (
+					parentName === 'core/navigation' ||
+					hasBlockSupport( parentName, 'listView' )
+				);
+			} );
+
+			return {
+				hasChildren: !! getBlockCount( clientId ),
+				isNestedListView: _isNestedListView,
+			};
+		},
+		[ clientId ]
+	);
+	const title = useBlockDisplayTitle( {
+		clientId,
+		context: 'list-view',
+	} );
+
+	if ( ! isEnabled || isNestedListView ) {
 		return null;
 	}
 
+	const showBlockTitle = isSelectionWithinCurrentSection;
+
 	return (
 		<InspectorControls group="list">
-			<PanelBody title={ null }>
+			<PanelBody title={ showBlockTitle ? title : undefined }>
 				{ ! hasChildren && (
 					<p className="block-editor-block-inspector__no-blocks">
 						{ __( 'No items yet.' ) }
@@ -59,7 +87,7 @@ export function ListViewPanel( { clientId, name } ) {
 				<PrivateListView
 					rootClientId={ clientId }
 					isExpanded
-					description={ blockTitle }
+					description={ title }
 					showAppender
 				/>
 			</PanelBody>
@@ -74,4 +102,5 @@ export default {
 	edit: ListViewPanel,
 	hasSupport: hasListViewSupport,
 	attributeKeys: [],
+	supportsPatternEditing: true,
 };

@@ -6,14 +6,21 @@
  */
 
 /**
+ * Registers REST API routes for collaborative editing.
+ */
+function gutenberg_rest_api_register_routes_for_collaborative_editing(): void {
+	$sync_storage = new Gutenberg_Sync_Post_Meta_Storage();
+	$sync_storage->init();
+
+	$sse_sync_server = new Gutenberg_HTTP_Polling_Sync_Server( $sync_storage );
+	$sse_sync_server->init();
+}
+add_action( 'init', 'gutenberg_rest_api_register_routes_for_collaborative_editing' );
+
+/**
  * Registers post meta for persisting CRDT documents.
  */
 function gutenberg_rest_api_crdt_post_meta() {
-	$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-	if ( ! $gutenberg_experiments || ! array_key_exists( 'gutenberg-sync-collaboration', $gutenberg_experiments ) ) {
-		return;
-	}
-
 	// This string must match WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE in @wordpress/sync.
 	$persisted_crdt_post_meta_key = '_crdt_document';
 

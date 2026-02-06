@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 /**
@@ -34,6 +34,11 @@ const meta: Meta< typeof Tabs > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'When building for the Gutenberg repo, use this component instead of `TabPanel`. Otherwise, continue using `TabPanel`. Both will be superseded by `Tabs` in `@wordpress/ui`, but continue using these for now.',
+		},
 	},
 	args: {
 		onActiveTabIdChange: fn(),
@@ -65,7 +70,9 @@ const Template: StoryFn< typeof Tabs > = ( props ) => {
 					Instead, the [Tab] key will move focus to the first
 					focusable element within the panel.
 				</p>
-				<Button variant="primary">I&apos;m a button!</Button>
+				<Button __next40pxDefaultSize variant="primary">
+					I&apos;m a button!
+				</Button>
 			</Tabs.TabPanel>
 		</Tabs>
 	);
@@ -118,6 +125,7 @@ export const SizeAndOverflowPlayground: StoryFn< typeof Tabs > = ( props ) => {
 				</ul>
 			</div>
 			<Button
+				__next40pxDefaultSize
 				style={ { marginBottom: '1rem' } }
 				variant="primary"
 				onClick={ () => setFullWidth( ! fullWidth ) }
@@ -332,6 +340,7 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
 								<Tabs.Tab tabId="tab3">Tab 3</Tabs.Tab>
 							</Tabs.TabList>
 							<Button
+								__next40pxDefaultSize
 								variant="tertiary"
 								style={ {
 									marginLeft: 'auto',
@@ -354,7 +363,11 @@ const CloseButtonTemplate: StoryFn< typeof Tabs > = ( props ) => {
 					</Tabs>
 				</div>
 			) : (
-				<Button variant="tertiary" onClick={ () => setIsOpen( true ) }>
+				<Button
+					__next40pxDefaultSize
+					variant="tertiary"
+					onClick={ () => setIsOpen( true ) }
+				>
 					Open Tabs
 				</Button>
 			) }

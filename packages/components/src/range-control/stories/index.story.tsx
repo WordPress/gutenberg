@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 /**
@@ -57,6 +57,11 @@ const meta: Meta< typeof RangeControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `SliderControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;
@@ -66,6 +71,7 @@ const Template: StoryFn< typeof RangeControl > = ( { onChange, ...args } ) => {
 
 	return (
 		<RangeControl
+			__next40pxDefaultSize
 			{ ...args }
 			value={ value }
 			onChange={ ( v ) => {
@@ -100,6 +106,7 @@ export const WithAnyStep: StoryFn< typeof RangeControl > = ( {
 	return (
 		<>
 			<RangeControl
+				__next40pxDefaultSize
 				{ ...args }
 				value={ value }
 				onChange={ ( v ) => {
@@ -130,6 +137,7 @@ const MarkTemplate: StoryFn< typeof RangeControl > = ( {
 		<>
 			<h2>{ label }</h2>
 			<RangeControl
+				__next40pxDefaultSize
 				{ ...args }
 				label="Automatic marks"
 				marks
@@ -140,6 +148,7 @@ const MarkTemplate: StoryFn< typeof RangeControl > = ( {
 				value={ automaticValue }
 			/>
 			<RangeControl
+				__next40pxDefaultSize
 				{ ...args }
 				label="Custom marks"
 				onChange={ ( v ) => {

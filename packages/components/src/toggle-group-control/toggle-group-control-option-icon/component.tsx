@@ -71,5 +71,6 @@ function UnforwardedToggleGroupControlOptionIcon(
 export const ToggleGroupControlOptionIcon = forwardRef(
 	UnforwardedToggleGroupControlOptionIcon
 );
+ToggleGroupControlOptionIcon.displayName = 'ToggleGroupControlOptionIcon';
 
 export default ToggleGroupControlOptionIcon;

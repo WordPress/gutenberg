@@ -39,13 +39,14 @@ import '@wordpress/theme/design-tokens.css';
 ### Basic Component Usage
 
 ```tsx
-import { Box } from '@wordpress/ui';
+import { Stack } from '@wordpress/ui';
 
 function MyComponent() {
 	return (
-		<Box background="neutral" padding="sm">
-			Hello World
-		</Box>
+		<Stack gap="sm">
+			<div>Item 1</div>
+			<div>Item 2</div>
+		</Stack>
 	);
 }
 ```
@@ -59,11 +60,11 @@ All components in the design system follow consistent patterns for maximum flexi
 Every component supports the `render` prop for complete control over the underlying HTML element:
 
 ```tsx
-import { Box } from '@wordpress/ui';
+import { Stack } from '@wordpress/ui';
 
 function MyComponent() {
-	// Render Box as a <span /> instead of the default <div />
-	return <Box render={ <span /> }>{ /* ... */ }</Box>;
+	// Render Stack as a <section /> instead of the default <div />
+	return <Stack render={ <section /> }>{ /* ... */ }</Stack>;
 }
 ```
 
@@ -73,12 +74,12 @@ All components forward refs to their underlying DOM elements:
 
 ```tsx
 import { useRef } from '@wordpress/element';
-import { Box } from '@wordpress/ui';
+import { Stack } from '@wordpress/ui';
 
 function MyComponent() {
-	const boxRef = useRef< HTMLDivElement >( null );
+	const stackRef = useRef< HTMLDivElement >( null );
 
-	return <Box ref={ boxRef }>{ /* ... */ }</Box>;
+	return <Stack ref={ stackRef }>{ /* ... */ }</Stack>;
 }
 ```
 
@@ -87,11 +88,11 @@ function MyComponent() {
 Components merge provided `className` props with their internal styles:
 
 ```tsx
-import { Box } from '@wordpress/ui';
+import { Stack } from '@wordpress/ui';
 
 function MyComponent() {
 	// Your custom CSS className is merged with component styles
-	return <Box className="my-custom-class">{ /* ... */ }</Box>;
+	return <Stack className="my-custom-class">{ /* ... */ }</Stack>;
 }
 ```
 

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "23.0.0",
+	"version": "24.1.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -42,6 +42,7 @@
 		"@typescript-eslint/parser": "^6.4.1",
 		"@wordpress/babel-preset-default": "file:../babel-preset-default",
 		"@wordpress/prettier-config": "file:../prettier-config",
+		"@wordpress/theme": "file:../theme",
 		"cosmiconfig": "^7.0.0",
 		"eslint-config-prettier": "^8.3.0",
 		"eslint-import-resolver-typescript": "^4.4.4",

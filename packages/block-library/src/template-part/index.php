@@ -159,7 +159,11 @@ function render_block_core_template_part( $attributes ) {
 	$content = convert_smilies( $content );
 	$content = wp_filter_content_tags( $content, "template_part_{$area}" );
 
-	// Handle embeds for block template parts.
+	/**
+	 * Handle embeds for block template parts.
+	 *
+	 * @global WP_Embed $wp_embed WordPress Embed object.
+	 */
 	global $wp_embed;
 	$content = $wp_embed->autoembed( $content );
 

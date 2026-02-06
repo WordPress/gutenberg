@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 5.39.0 (2026-01-29)
+
+## 5.38.0 (2026-01-16)
+
 ### Enhancements
 
 -   Improved TypeScript definitions ([#67565](https://github.com/WordPress/gutenberg/pull/67565)).

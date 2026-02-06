@@ -7,7 +7,7 @@ import type { ComponentProps, ReactElement } from 'react';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { Spinner, Popover } from '@wordpress/components';
 import {
 	useContext,
@@ -381,6 +381,7 @@ function ViewTable< Item >( {
 			}
 		};
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	const isRtl = isRTL();
 
 	return (
 		<>
@@ -461,9 +462,17 @@ function ViewTable< Item >( {
 										onHide={ onHide }
 										setOpenedFilter={ setOpenedFilter }
 										canMove={ false }
-										canInsertLeft={ false }
+										canInsertLeft={
+											isRtl
+												? view.layout?.enableMoving ??
+												  true
+												: false
+										}
 										canInsertRight={
-											view.layout?.enableMoving ?? true
+											isRtl
+												? false
+												: view.layout?.enableMoving ??
+												  true
 										}
 									/>
 								) }

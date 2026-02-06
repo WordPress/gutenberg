@@ -104,6 +104,16 @@ export type CustomValidator< Item > =
 			field: NormalizedField< Item >
 	  ) => Promise< null | string > );
 
+export type FilterOperator< Item > = (
+	item: Item,
+	field: NormalizedField< Item >,
+	filterValue: any
+) => boolean;
+
+export type FilterOperatorMap< Item > = Partial<
+	Record< Operator, FilterOperator< Item > >
+>;
+
 type NormalizedRule< Item, ConstraintType > = {
 	constraint: ConstraintType;
 	validate: Validator< Item >;
@@ -356,6 +366,7 @@ export type NormalizedField< Item > = Omit<
 	enableHiding: boolean;
 	enableSorting: boolean;
 	filterBy: Required< FilterByConfig > | false;
+	filter: FilterOperatorMap< Item >;
 	readOnly: boolean;
 	format:
 		| {}
@@ -417,6 +428,10 @@ export type DataFormControlProps< Item > = {
 	field: NormalizedField< Item >;
 	onChange: ( value: DeepPartial< Item > ) => void;
 	hideLabelFromVision?: boolean;
+	/**
+	 * Label the control as "optional" when _not_ required, instead of showing "required".
+	 */
+	markWhenOptional?: boolean;
 	/**
 	 * The currently selected filter operator for this field.
 	 *

@@ -1,218 +1,108 @@
 #!/usr/bin/env node
 
-/**
- * External dependencies
- */
-import { copyFile, mkdir, writeFile, readFile } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import esbuild from 'esbuild';
-import { createHash } from 'crypto';
 
 const __dirname = path.dirname( fileURLToPath( import.meta.url ) );
 const ROOT_DIR = path.resolve( __dirname, '../..' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build', 'scripts' );
 const VENDORS_DIR = path.join( BUILD_DIR, 'vendors' );
 
+const VENDOR_SCRIPTS = [
+	{
+		name: 'react',
+		global: 'React',
+		handle: 'react',
+	},
+	{
+		name: 'react-dom',
+		global: 'ReactDOM',
+		handle: 'react-dom',
+	},
+	{
+		name: 'react/jsx-runtime',
+		global: 'ReactJSXRuntime',
+		handle: 'react-jsx-runtime',
+	},
+];
+
 /**
- * Generate a content hash from file contents.
- * Uses SHA256 algorithm for broad compatibility across Node.js versions.
+ * Bundle a vendor script from node_modules into an IIFE script.
+ * This is used to build packages like React that don't ship UMD builds.
  *
- * @param {string[]} filePaths - Absolute paths to files to hash
- * @param {string}   algorithm - Hash algorithm (default: 'sha256')
- * @param {number}   length    - Hash length (default: 20)
- * @return {Promise<string>} Content hash string
+ * @param {Object} config        Vendor script configuration.
+ * @param {string} config.name   Package name (e.g., 'react', 'react-dom', 'react/jsx-runtime').
+ * @param {string} config.global Global variable name (e.g., 'React', 'ReactDOM').
+ * @param {string} config.handle WordPress script handle (e.g., 'react', 'react-dom').
+ * @return {Promise<void>} Promise that resolves when all builds are finished.
  */
-async function generateContentHash(
-	filePaths,
-	algorithm = 'sha256',
-	length = 20
-) {
-	const hashBuilder = createHash( algorithm );
+async function bundleVendorScript( config ) {
+	const { name, global, handle } = config;
 
-	// Sort paths for deterministic ordering
-	const sortedPaths = [ ...filePaths ].sort();
+	// Plugin that externalizes the `react` package.
+	const reactExternalPlugin = {
+		name: 'react-external',
+		setup( build ) {
+			build.onResolve( { filter: /^react$/ }, ( args ) => {
+				if ( args.kind === 'entry-point' ) {
+					return null;
+				}
+				return {
+					path: 'react',
+					namespace: 'react-external',
+				};
+			} );
 
-	// Read and hash each file
-	for ( const filePath of sortedPaths ) {
-		const content = await readFile( filePath );
-		hashBuilder.update( content );
-	}
-
-	// Generate hash as hex string and truncate
-	const fullHash = hashBuilder.digest( 'hex' );
-	return fullHash.slice( 0, length );
-}
-
-/**
- * Copy React and ReactDOM UMD files from node_modules.
- * These are pre-built browser-ready bundles that don't need processing.
- */
-async function copyReactUMDFiles() {
-	console.log( '📦 Copying React UMD files...' );
-
-	const filesToCopy = [
-		{
-			from: 'node_modules/react/umd/react.development.js',
-			to: 'react.js',
+			build.onLoad(
+				{ filter: /.*/, namespace: 'react-external' },
+				() => ( {
+					contents: `module.exports = globalThis.React`,
+					loader: 'js',
+				} )
+			);
 		},
-		{
-			from: 'node_modules/react/umd/react.production.min.js',
-			to: 'react.min.js',
-		},
-		{
-			from: 'node_modules/react-dom/umd/react-dom.development.js',
-			to: 'react-dom.js',
-		},
-		{
-			from: 'node_modules/react-dom/umd/react-dom.production.min.js',
-			to: 'react-dom.min.js',
-		},
-	];
+	};
 
-	await mkdir( VENDORS_DIR, { recursive: true } );
-
+	// Build both minified and non-minified versions
 	await Promise.all(
-		filesToCopy.map( ( { from, to } ) => {
-			const source = path.join( ROOT_DIR, from );
-			const dest = path.join( VENDORS_DIR, to );
-			return copyFile( source, dest );
+		[ false, true ].map( ( production ) => {
+			const outputFile = handle + ( production ? '.min.js' : '.js' );
+			return esbuild.build( {
+				entryPoints: [ name ],
+				outfile: path.join( VENDORS_DIR, outputFile ),
+				bundle: true,
+				format: 'iife',
+				globalName: global,
+				minify: production,
+				target: 'esnext', // Don't transpile, just bundle.
+				platform: 'browser',
+				plugins: [ reactExternalPlugin ],
+			} );
 		} )
 	);
-
-	console.log( '   ✔ Copied React UMD files' );
-}
-
-/**
- * Bundle react-jsx-runtime using esbuild.
- * Creates a browser-ready bundle that exposes ReactJSXRuntime global.
- */
-async function bundleReactJsxRuntime() {
-	console.log( '📦 Bundling react-jsx-runtime...' );
-
-	// Plugin to map React import to global window.React
-	const reactGlobalPlugin = {
-		name: 'react-global',
-		setup( build ) {
-			// Intercept imports of 'react' and provide window.React instead
-			build.onResolve( { filter: /^react$/ }, ( args ) => ( {
-				path: args.path,
-				namespace: 'react-global',
-			} ) );
-
-			build.onLoad( { filter: /.*/, namespace: 'react-global' }, () => ( {
-				contents: 'module.exports = window.React',
-				loader: 'js',
-			} ) );
-		},
-	};
-
-	const baseConfig = {
-		entryPoints: [ 'react/jsx-runtime' ],
-		bundle: true,
-		format: 'iife',
-		globalName: 'ReactJSXRuntime',
-		target: 'es2015',
-		platform: 'browser',
-		plugins: [ reactGlobalPlugin ],
-		banner: {
-			js: '/* React JSX Runtime - https://react.dev/ */\n',
-		},
-	};
-
-	await Promise.all( [
-		// Development build
-		esbuild.build( {
-			...baseConfig,
-			outfile: path.join( VENDORS_DIR, 'react-jsx-runtime.js' ),
-			minify: false,
-		} ),
-		// Production build
-		esbuild.build( {
-			...baseConfig,
-			outfile: path.join( VENDORS_DIR, 'react-jsx-runtime.min.js' ),
-			minify: true,
-		} ),
-	] );
-
-	console.log( '   ✔ Bundled react-jsx-runtime' );
-}
-
-/**
- * Bundle React Refresh files for hot module replacement during development.
- * Only needed when SCRIPT_DEBUG is enabled.
- */
-async function bundleReactRefresh() {
-	console.log( '📦 Bundling React Refresh...' );
-
-	// Bundle react-refresh-entry
-	const entryDir = path.join( BUILD_DIR, 'react-refresh-entry' );
-	await mkdir( entryDir, { recursive: true } );
-
-	await esbuild.build( {
-		entryPoints: [
-			'@pmmmwh/react-refresh-webpack-plugin/client/ReactRefreshEntry.js',
-		],
-		outfile: path.join( entryDir, 'index.min.js' ),
-		bundle: true,
-		format: 'iife',
-		target: 'es2015',
-		platform: 'browser',
-		minify: false,
-	} );
-
-	// Generate asset file for react-refresh-entry
-	const entryOutputFile = path.join( entryDir, 'index.min.js' );
-	const entryVersion = await generateContentHash( [ entryOutputFile ] );
-	const entryAssetContent = `<?php return array('dependencies' => array('wp-react-refresh-runtime'), 'version' => '${ entryVersion }');`;
-	await writeFile(
-		path.join( entryDir, 'index.min.asset.php' ),
-		entryAssetContent
-	);
-
-	// Bundle react-refresh-runtime
-	const runtimeDir = path.join( BUILD_DIR, 'react-refresh-runtime' );
-	await mkdir( runtimeDir, { recursive: true } );
-
-	await esbuild.build( {
-		entryPoints: [ 'react-refresh/runtime' ],
-		outfile: path.join( runtimeDir, 'index.min.js' ),
-		bundle: true,
-		format: 'iife',
-		globalName: 'ReactRefreshRuntime',
-		target: 'es2015',
-		platform: 'browser',
-		minify: false,
-	} );
-
-	// Generate asset file for react-refresh-runtime
-	const runtimeOutputFile = path.join( runtimeDir, 'index.min.js' );
-	const runtimeVersion = await generateContentHash( [ runtimeOutputFile ] );
-	const runtimeAssetContent = `<?php return array('dependencies' => array(), 'version' => '${ runtimeVersion }');`;
-	await writeFile(
-		path.join( runtimeDir, 'index.min.asset.php' ),
-		runtimeAssetContent
-	);
-
-	console.log( '   ✔ Bundled React Refresh' );
 }
 
 /**
  * Main build function.
  */
 async function buildVendors() {
-	console.log( '🔨 Building vendor files...\n' );
+	console.log( '\n📦 Bundling vendor scripts...\n' );
 
-	const startTime = Date.now();
-
-	await Promise.all( [
-		copyReactUMDFiles(),
-		bundleReactJsxRuntime(),
-		bundleReactRefresh(),
-	] );
-
-	const totalTime = Date.now() - startTime;
-	console.log( `\n🎉 Vendor files built successfully! (${ totalTime }ms)` );
+	for ( const vendorConfig of VENDOR_SCRIPTS ) {
+		try {
+			const startTime = Date.now();
+			await bundleVendorScript( vendorConfig );
+			const buildTime = Date.now() - startTime;
+			console.log(
+				`   ✔ Bundled vendor ${ vendorConfig.name } (${ buildTime }ms)`
+			);
+		} catch ( error ) {
+			console.error(
+				`   ✘ Failed to bundle vendor ${ vendorConfig.name }: ${ error.message }`
+			);
+		}
+	}
 }
 
 buildVendors().catch( ( error ) => {

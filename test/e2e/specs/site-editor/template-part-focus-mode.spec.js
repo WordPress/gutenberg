@@ -34,7 +34,7 @@ test.describe( 'Template Part Focus mode', () => {
 			.click();
 
 		// Navigate to Focus mode
-		await editor.clickBlockToolbarButton( 'Edit' );
+		await editor.clickBlockToolbarButton( 'Edit section' );
 
 		// Check if focus mode is active
 		await expect( page.locator( 'h1' ) ).toContainText( 'Header' );
