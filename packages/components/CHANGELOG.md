@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 32.2.0-next.0 (2026-02-06)
+
 ### Bug Fixes
 
 -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
