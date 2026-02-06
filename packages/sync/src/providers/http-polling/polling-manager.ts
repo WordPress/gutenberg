@@ -45,7 +45,7 @@ interface RegisterRoomOptions {
 	awareness: Awareness;
 	log: LogFunction;
 	onSync: () => void;
-	onStatusChange?: ( status: SyncConnectionStatus ) => void;
+	onStatusChange: ( status: SyncConnectionStatus ) => void;
 }
 
 interface RoomState {
@@ -53,7 +53,7 @@ interface RoomState {
 	endCursor: number;
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
-	onStatusChange?: ( status: SyncConnectionStatus ) => void;
+	onStatusChange: ( status: SyncConnectionStatus ) => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
 	unregister: () => void;
@@ -258,7 +258,7 @@ function poll(): void {
 		if ( lastConnectionStatus === 'disconnected' ) {
 			lastConnectionStatus = 'connecting';
 			roomStates.forEach( ( state ) => {
-				state.onStatusChange?.( 'connecting' );
+				state.onStatusChange( 'connecting' );
 			} );
 		}
 
@@ -289,7 +289,7 @@ function poll(): void {
 			if ( lastConnectionStatus !== 'connected' ) {
 				lastConnectionStatus = 'connected';
 				roomStates.forEach( ( state ) => {
-					state.onStatusChange?.( 'connected' );
+					state.onStatusChange( 'connected' );
 				} );
 			}
 
@@ -354,7 +354,7 @@ function poll(): void {
 
 			lastConnectionStatus = 'disconnected';
 			roomStates.forEach( ( state ) => {
-				state.onStatusChange?.( 'disconnected' );
+				state.onStatusChange( 'disconnected' );
 			} );
 		}
 

@@ -16,6 +16,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalVStack as VStack,
 } from '@wordpress/components';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { error as errorIcon } from '@wordpress/icons';
 
@@ -23,6 +24,9 @@ import { error as errorIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import { getSyncErrorMessages } from '../../utils';
+
+// Debounce time for initial disconnected status to allow connection to establish.
+const INITIAL_DISCONNECTED_DEBOUNCE_MS = 5000;
 
 /**
  * Sync connection modal that displays when any entity reports a disconnection.
@@ -35,25 +39,66 @@ export function SyncConnectionModal() {
 		const blocks = select( blockEditorStore ).getBlocks();
 		const serializedContent = serialize( blocks );
 
-		// Get the first disconnected sync connection state from core-data.
-		const disconnectedState =
-			select( coreDataStore ).getDisconnectedSyncConnectionState();
+		// Get the current sync connection state from core-data.
+		const syncState = select( coreDataStore ).getSyncConnectionState();
 
 		return {
-			connectionState: disconnectedState || null,
+			connectionState: syncState || null,
 			content: serializedContent,
 		};
 	}, [] );
 
 	const copyButtonRef = useCopyToClipboard( content ?? '' );
+	const [ syncConnectionMessage, setSyncConnectionMessage ] =
+		useState( null );
+	const debounceTimerRef = useRef( null );
+	// Track whether we've passed the initial load phase.
+	// Once true, disconnected status will show immediately without debounce.
+	const hasInitializedRef = useRef( false );
 
-	if ( connectionState?.status !== 'disconnected' ) {
+	useEffect( () => {
+		const status = connectionState?.status;
+
+		// Clear any pending debounce timer when status changes.
+		if ( debounceTimerRef.current ) {
+			clearTimeout( debounceTimerRef.current );
+			debounceTimerRef.current = null;
+		}
+
+		if ( status === 'connected' ) {
+			hasInitializedRef.current = true;
+			setSyncConnectionMessage( null );
+		} else if ( status === 'disconnected' ) {
+			const showModal = () => {
+				hasInitializedRef.current = true;
+				setSyncConnectionMessage(
+					getSyncErrorMessages( connectionState.error ?? {} )
+				);
+			};
+
+			// Debounce only on first load to allow connection to establish.
+			if ( hasInitializedRef.current ) {
+				showModal();
+			} else {
+				debounceTimerRef.current = setTimeout(
+					showModal,
+					INITIAL_DISCONNECTED_DEBOUNCE_MS
+				);
+			}
+		}
+
+		return () => {
+			if ( debounceTimerRef.current ) {
+				clearTimeout( debounceTimerRef.current );
+			}
+		};
+	}, [ connectionState ] );
+
+	if ( ! syncConnectionMessage ) {
 		return null;
 	}
 
-	const { title, description } = getSyncErrorMessages(
-		connectionState.error
-	);
+	const { title, description } = syncConnectionMessage;
 
 	return (
 		<BlockCanvasCover.Fill>
