@@ -106,22 +106,45 @@ export function TimePicker( {
 		[ date ]
 	);
 
+	const updateDate = ( newDate: Date ) => {
+		if ( ! Number.isFinite( newDate.getTime() ) ) {
+			return;
+		}
+		setDate( newDate );
+		onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+	};
+
 	const buildNumberControlChangeCallback = ( method: 'date' | 'year' ) => {
 		const callback: InputChangeCallback = ( value, { event } ) => {
 			if ( ! validateInputElementTarget( event ) ) {
 				return;
 			}
 
+			// Ignore empty values (they produce 0 which creates invalid dates)
+			if ( value === '' || value === null || value === undefined ) {
+				return;
+			}
+
 			// We can safely assume value is a number if target is valid.
 			const numberValue = Number( value );
+
+			// Sanity check for year values - reject unreasonably small years
+			// that would create dates moment can't parse properly
+			if ( method === 'year' && numberValue < 1000 ) {
+				return;
+			}
+
+			// Sanity check for day values - must be positive
+			if ( method === 'date' && numberValue < 1 ) {
+				return;
+			}
 
 			// Internal date is UTC-normalized, but the field should be updated
 			// as if in the configured timezone.
 			const newDate = setInConfiguredTimezone( date, {
 				[ method ]: numberValue,
 			} );
-			setDate( newDate );
-			onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+			updateDate( newDate );
 		};
 		return callback;
 	};
@@ -136,8 +159,7 @@ export function TimePicker( {
 			hours: newHours,
 			minutes: newMinutes,
 		} );
-		setDate( newDate );
-		onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+		updateDate( newDate );
 	};
 
 	const dayField = (
@@ -175,8 +197,7 @@ export function TimePicker( {
 					const newDate = setInConfiguredTimezone( date, {
 						month: Number( value ) - 1,
 					} );
-					setDate( newDate );
-					onChange?.( formatDate( TIMEZONELESS_FORMAT, newDate ) );
+					updateDate( newDate );
 				} }
 			/>
 		</MonthSelectWrapper>

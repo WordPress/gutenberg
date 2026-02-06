@@ -633,4 +633,60 @@ describe( 'TimePicker', () => {
 			expect( outputDate ).not.toContain( 'Invalid' );
 		} );
 	} );
+
+	describe( 'Invalid date handling', () => {
+		it( 'should not call onChange when year is cleared and blurred', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = jest.fn();
+
+			render(
+				<TimePicker
+					currentTime="1986-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					is12Hour
+				/>
+			);
+
+			const yearInput = screen.getByLabelText( 'Year' );
+			const initialCallCount = onChangeSpy.mock.calls.length;
+
+			// Clear the year field
+			await user.clear( yearInput );
+			// Blur the field (tab away)
+			await user.keyboard( '{Tab}' );
+
+			// onChange should not be called when the year is cleared
+			// because it would produce an invalid date
+			expect( onChangeSpy ).toHaveBeenCalledTimes( initialCallCount );
+		} );
+
+		it( 'should not call onChange with an invalid date when day is cleared and month is changed', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = jest.fn();
+
+			render(
+				<TimePicker
+					currentTime="1986-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					is12Hour
+				/>
+			);
+
+			const dayInput = screen.getByLabelText( 'Day' );
+			const monthInput = screen.getByLabelText( 'Month' );
+
+			// Clear the day field
+			await user.clear( dayInput );
+			// Change the month
+			await user.selectOptions( monthInput, '12' );
+
+			// All onChange calls should have valid date strings
+			onChangeSpy.mock.calls.forEach( ( call ) => {
+				const dateString = call[ 0 ];
+				expect( dateString ).toMatch( /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/ );
+				expect( dateString ).not.toContain( 'NaN' );
+				expect( dateString ).not.toContain( 'Invalid' );
+			} );
+		} );
+	} );
 } );
