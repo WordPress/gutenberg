@@ -12,8 +12,11 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
+import { privateApis } from '../../../private-apis';
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 import { isFiltered } from '../../../store/utils';
+
+const { isNavigationOverlayContextKey } = unlock( privateApis );
 
 /**
  * Retrieves the block patterns inserter state.
@@ -42,7 +45,7 @@ const usePatternsState = (
 	const isWithinNavigationOverlayContext = useSelect( ( select ) => {
 		const { getSettings } = unlock( select( blockEditorStore ) );
 		const settings = getSettings();
-		return settings.__experimentalIsNavigationOverlayContext ?? false;
+		return settings[ isNavigationOverlayContextKey ] ?? false;
 	}, [] );
 
 	const { patternCategories, patterns, userPatternCategories } = useSelect(
@@ -68,6 +71,7 @@ const usePatternsState = (
 
 	// Filter out patterns with "navigation" category unless we're in
 	// navigation-overlay template part context.
+	// TO DO: create an api for patterns to decide in which context they should be shown.
 	const filteredPatterns = useMemo( () => {
 		return patterns.filter( ( pattern ) => {
 			const hasNavigationCategory =

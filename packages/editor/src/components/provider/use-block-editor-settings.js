@@ -100,6 +100,7 @@ const {
 	getMediaSelectKey,
 	isIsolatedEditorKey,
 	deviceTypeKey,
+	isNavigationOverlayContextKey,
 } = unlock( privateApis );
 
 /**
@@ -398,8 +399,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				'wp_navigation',
 			].includes( postType ),
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
-			__experimentalIsNavigationOverlayContext:
-				isNavigationOverlayContext,
+			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
 		};
 
 		return blockEditorSettings;
