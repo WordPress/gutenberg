@@ -1,8 +1,0 @@
-// Override WordPress Button component styles in the editor
-// to ensure our flexbox layout works correctly.
-.wp-block-playlist-track {
-	.wp-block-playlist-track__button.components-button {
-		height: auto;
-		min-height: auto;
-	}
-}
