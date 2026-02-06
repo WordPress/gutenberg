@@ -5,46 +5,27 @@ import { computeDisplayUrl, computeBadges } from '../use-link-preview';
 
 describe( 'computeDisplayUrl', () => {
 	describe( 'external links', () => {
-		it( 'should mark URLs without protocol as external', () => {
-			const result = computeDisplayUrl( 'www.test.com' );
+		test.each( [
+			[ 'www.test.com', 'URLs without protocol' ],
+			[ 'google.com', 'domain-only URLs without protocol' ],
+			[ 'https://google.com', 'external URLs' ],
+			[ 'https://google.com/search', 'external URLs with paths' ],
+		] )( 'should mark %s as external (%s)', ( url ) => {
+			const result = computeDisplayUrl( url );
 			expect( result ).toEqual( {
-				displayUrl: 'www.test.com',
-				isExternal: true,
-			} );
-		} );
-
-		it( 'should mark domain-only URLs without protocol as external', () => {
-			const result = computeDisplayUrl( 'google.com' );
-			expect( result ).toEqual( {
-				displayUrl: 'google.com',
-				isExternal: true,
-			} );
-		} );
-
-		it( 'should handle external URLs', () => {
-			const result = computeDisplayUrl( 'https://google.com' );
-			expect( result ).toEqual( {
-				displayUrl: 'https://google.com',
-				isExternal: true,
-			} );
-		} );
-
-		it( 'should handle external URLs with paths', () => {
-			const result = computeDisplayUrl( 'https://google.com/search' );
-			expect( result ).toEqual( {
-				displayUrl: 'https://google.com/search',
+				displayUrl: url,
 				isExternal: true,
 			} );
 		} );
 	} );
 
 	describe( 'internal links', () => {
-		it( 'should NOT mark relative paths as external', () => {
+		it( 'should mark relative paths as internal', () => {
 			const result = computeDisplayUrl( '/page' );
 			expect( result.isExternal ).toBe( false );
 		} );
 
-		it( 'should NOT mark anchor links as external', () => {
+		it( 'should mark anchor links as internal', () => {
 			const result = computeDisplayUrl( '#section' );
 			expect( result.isExternal ).toBe( false );
 		} );
@@ -65,32 +46,25 @@ describe( 'computeDisplayUrl', () => {
 	} );
 
 	describe( 'special protocols and edge cases', () => {
-		it( 'should mark mailto links as external', () => {
-			const result = computeDisplayUrl( 'mailto:test@example.com' );
-			expect( result ).toEqual( {
-				displayUrl: 'mailto:test@example.com',
-				isExternal: true,
-			} );
-		} );
+		test.each( [
+			[ 'mailto:test@example.com', 'mailto:test@example.com', true ],
+			[ 'tel:5555555', 'tel:5555555', true ],
+		] )(
+			'should mark %s as external',
+			( url, expectedDisplay, expectedExternal ) => {
+				const result = computeDisplayUrl( url );
+				expect( result ).toEqual( {
+					displayUrl: expectedDisplay,
+					isExternal: expectedExternal,
+				} );
+			}
+		);
 
-		it( 'should mark tel links as external', () => {
-			const result = computeDisplayUrl( 'tel:5555555' );
-			expect( result ).toEqual( {
-				displayUrl: 'tel:5555555',
-				isExternal: true,
-			} );
-		} );
-
-		it( 'should handle empty URL', () => {
-			const result = computeDisplayUrl( '' );
-			expect( result ).toEqual( {
-				displayUrl: '',
-				isExternal: false,
-			} );
-		} );
-
-		it( 'should handle null URL', () => {
-			const result = computeDisplayUrl( null );
+		test.each( [
+			[ '', 'empty URL' ],
+			[ null, 'null URL' ],
+		] )( 'should handle %s', ( url ) => {
+			const result = computeDisplayUrl( url );
 			expect( result ).toEqual( {
 				displayUrl: '',
 				isExternal: false,
