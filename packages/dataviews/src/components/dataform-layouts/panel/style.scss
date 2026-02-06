@@ -83,6 +83,12 @@
 	align-items: center;
 	line-height: $grid-unit-05 * 5;
 	hyphens: auto;
+	color: $gray-700;
+
+	.components-base-control__label {
+		display: inline;
+		margin-bottom: 0;
+	}
 
 	&--label-position-side {
 		align-self: center;

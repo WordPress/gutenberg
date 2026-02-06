@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Icon, Tooltip } from '@wordpress/components';
+import { BaseControl, Icon, Tooltip } from '@wordpress/components';
 import { useState, useContext } from '@wordpress/element';
 import { error as errorIcon } from '@wordpress/icons';
 
@@ -165,11 +165,13 @@ export default function FormPanelField< Item >( {
 		<Tooltip text={ errorMessage } placement="top">
 			<span className="dataforms-layouts-panel__field-label-error-content">
 				<Icon icon={ errorIcon } size={ 16 } />
-				<span>{ fieldLabel }</span>
+				<BaseControl.VisualLabel>
+					{ fieldLabel }
+				</BaseControl.VisualLabel>
 			</span>
 		</Tooltip>
 	) : (
-		fieldLabel
+		<BaseControl.VisualLabel>{ fieldLabel }</BaseControl.VisualLabel>
 	);
 
 	if ( layout.openAs === 'modal' ) {
