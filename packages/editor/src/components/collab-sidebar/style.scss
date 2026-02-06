@@ -248,12 +248,13 @@ mark.wp-note {
 .editor-collab-sidebar-panel__reaction-button {
 	display: inline-flex;
 	align-items: center;
-	gap: $grid-unit-05;
-	padding: $grid-unit-05 $grid-unit-10;
+	gap: 2px;
+	padding: $grid-unit-05 !important; // Override Button component's size constraints.
 	border-radius: $radius-round;
 	border: $border-width solid $gray-300;
 	background-color: $gray-100;
 	font-size: $default-font-size;
+	height: 32px !important; // Override Button component's size constraints.
 	cursor: pointer;
 	transition: background-color 0.1s ease;
 
