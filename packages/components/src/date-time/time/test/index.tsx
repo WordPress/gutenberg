@@ -650,14 +650,15 @@ describe( 'TimePicker', () => {
 			const yearInput = screen.getByLabelText( 'Year' );
 			const initialCallCount = onChangeSpy.mock.calls.length;
 
-			// Clear the year field
+			// Clear the year field and blur
 			await user.clear( yearInput );
-			// Blur the field (tab away)
 			await user.keyboard( '{Tab}' );
 
-			// onChange should not be called when the year is cleared
-			// because it would produce an invalid date
-			expect( onChangeSpy ).toHaveBeenCalledTimes( initialCallCount );
+			// Verify onChange was not called with an invalid date.
+			// Clearing the year would create an Invalid Date, so our guard
+			// should prevent onChange from being called.
+			const callCountAfterClear = onChangeSpy.mock.calls.length;
+			expect( callCountAfterClear ).toBe( initialCallCount ); // No new calls made
 		} );
 
 		it( 'should not call onChange with an invalid date when day is cleared and month is changed', async () => {
@@ -677,10 +678,12 @@ describe( 'TimePicker', () => {
 
 			// Clear the day field
 			await user.clear( dayInput );
-			// Change the month
+			// Change the month (this would create an invalid date if day is 0)
 			await user.selectOptions( monthInput, '12' );
 
-			// All onChange calls should have valid date strings
+			// Verify that if onChange was called, it only received valid date strings.
+			// Our guard should prevent invalid dates from being emitted, so any calls
+			// should have properly formatted dates without "NaN" or "Invalid".
 			onChangeSpy.mock.calls.forEach( ( call ) => {
 				const dateString = call[ 0 ];
 				expect( dateString ).toMatch( /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/ );
