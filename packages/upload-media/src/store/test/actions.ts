@@ -20,9 +20,9 @@ jest.mock( '@wordpress/blob', () => ( {
 } ) );
 
 jest.mock( '../utils', () => ( {
-	__esModule: true,
 	vipsCancelOperations: jest.fn( () => Promise.resolve( true ) ),
 	vipsResizeImage: jest.fn(),
+	terminateVipsWorker: jest.fn(),
 } ) );
 
 // Import the mocked module to access the mock function.

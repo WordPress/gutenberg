@@ -167,6 +167,8 @@ export interface Settings {
 	maxUploadFileSize?: number;
 	// Maximum number of concurrent uploads.
 	maxConcurrentUploads: number;
+	// Maximum number of concurrent image processing operations (resize, crop, rotate).
+	maxConcurrentImageProcessing: number;
 	/**
 	 * Big image size threshold in pixels.
 	 * Images larger than this will be scaled down before upload.
@@ -204,7 +206,7 @@ export interface Settings {
 	gifInterlaced?: boolean;
 }
 
-// Must match the Attachment type from the media-utils package.
+// Matches the Attachment type from the media-utils package.
 export interface Attachment {
 	id: number;
 	alt: string;

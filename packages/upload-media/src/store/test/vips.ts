@@ -131,13 +131,19 @@ describe( 'vips utilities', () => {
 
 	describe( 'vipsHasTransparency', () => {
 		let mockFetch: jest.Mock;
+		let originalFetch: typeof window.fetch;
 
 		beforeEach( () => {
+			originalFetch = window.fetch;
 			mockFetch = jest.fn().mockResolvedValue( {
 				ok: true,
 				arrayBuffer: () => Promise.resolve( new ArrayBuffer( 0 ) ),
 			} as Response );
 			window.fetch = mockFetch;
+		} );
+
+		afterEach( () => {
+			window.fetch = originalFetch;
 		} );
 
 		it( 'returns true when image has transparency', async () => {

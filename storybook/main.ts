@@ -137,6 +137,7 @@ const config: StorybookConfig = {
 								export const vipsRotateImage = rotateImage;
 								export const vipsHasTransparency = hasTransparency;
 								export const vipsCancelOperations = cancelOperations;
+								export const terminateVipsWorker = () => {};
 							`;
 						}
 						if ( id === '\0virtual:wasm-vips-stub' ) {

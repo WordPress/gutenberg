@@ -52,7 +52,7 @@ function mediaUpload(
 	}
 ) {
 	void registry.dispatch( uploadStore ).addItems( {
-		files: filesList,
+		files: Array.from( filesList ),
 		onChange: onFileChange,
 		onSuccess,
 		onBatchSuccess,

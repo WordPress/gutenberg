@@ -8,6 +8,7 @@ import {
 	vipsResizeImage as resizeImage,
 	vipsRotateImage as rotateImage,
 	vipsCancelOperations as cancelOperations,
+	terminateVipsWorker,
 } from '@wordpress/vips/worker';
 
 /**
@@ -235,3 +236,5 @@ export async function vipsRotateImage(
 export async function vipsCancelOperations( id: QueueItemId ) {
 	return cancelOperations( id );
 }
+
+export { terminateVipsWorker };

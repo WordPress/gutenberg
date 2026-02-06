@@ -21,6 +21,7 @@ import {
 	vipsResizeImage,
 	vipsRotateImage,
 	vipsConvertImageFormat,
+	terminateVipsWorker,
 } from './utils';
 import type {
 	AddAction,
@@ -191,6 +192,7 @@ export function addItem( {
 				},
 				additionalData: {
 					convert_format: false,
+					generate_sub_sizes: false,
 					...additionalData,
 				},
 				onChange,
@@ -242,7 +244,6 @@ export function addSideloadItem( {
 }: AddSideloadItemArgs ) {
 	return ( { dispatch }: ThunkArgs ) => {
 		const itemId = uuidv4();
-
 		dispatch< AddAction >( {
 			type: Type.Add,
 			item: {
@@ -324,6 +325,23 @@ export function processItem( id: QueueItemId ) {
 			}
 		}
 
+		/*
+		 * If the next operation is image processing (resize/crop/rotate),
+		 * check the image processing concurrency limit.
+		 * If at capacity, the item remains queued and will be processed
+		 * when another image processing operation completes.
+		 */
+		if (
+			operation === OperationType.ResizeCrop ||
+			operation === OperationType.Rotate
+		) {
+			const settings = select.getSettings();
+			const activeCount = select.getActiveImageProcessingCount();
+			if ( activeCount >= settings.maxConcurrentImageProcessing ) {
+				return;
+			}
+		}
+
 		if ( attachment ) {
 			onChange?.( [ attachment ] );
 		}
@@ -337,7 +355,7 @@ export function processItem( id: QueueItemId ) {
 		if ( ! operation ) {
 			if (
 				parentId ||
-				( ! parentId && ! select.isUploadingByParentId( id ) )
+				( ! parentId && ! select.hasPendingItemsByParentId( id ) )
 			) {
 				if ( attachment ) {
 					onSuccess?.( [ attachment ] );
@@ -511,6 +529,14 @@ export function removeItem( id: QueueItemId ) {
 			type: Type.Remove,
 			id,
 		} );
+
+		/*
+		 * If the queue is now empty, terminate the VIPS worker to free
+		 * WASM memory. The worker will be lazily re-created if needed.
+		 */
+		if ( select.getAllItems().length === 0 ) {
+			terminateVipsWorker();
+		}
 	};
 }
 
@@ -543,6 +569,21 @@ export function finishOperation(
 		if ( previousOperation === OperationType.Upload ) {
 			const pendingUploads = select.getPendingUploads();
 			for ( const pendingItem of pendingUploads ) {
+				dispatch.processItem( pendingItem.id );
+			}
+		}
+
+		/*
+		 * If an image processing operation just finished, there may be items
+		 * waiting in the queue due to the image processing concurrency limit.
+		 * Trigger processing for them.
+		 */
+		if (
+			previousOperation === OperationType.ResizeCrop ||
+			previousOperation === OperationType.Rotate
+		) {
+			const pendingItems = select.getPendingImageProcessing();
+			for ( const pendingItem of pendingItems ) {
 				dispatch.processItem( pendingItem.id );
 			}
 		}
