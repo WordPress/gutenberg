@@ -2,14 +2,76 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/z-index" as *;
 
-.dataforms-layouts-panel__field {
+.dataforms-layouts-panel__field-trigger {
+	appearance: none;
+	background: none;
+	border: none;
+	padding: 0;
+	margin: 0;
+	font: inherit;
+	color: inherit;
+	text-align: start;
+	display: flex;
 	width: 100%;
 	min-height: $grid-unit-40;
-	justify-content: flex-start !important;
-	align-items: flex-start !important;
+	cursor: pointer;
+	align-items: flex-start;
+	position: relative;
+	border-radius: $radius-small;
 
-	&--label-position-none {
-		align-items: center !important;
+	&--label-side {
+		flex-direction: row;
+		gap: $grid-unit-10;
+	}
+
+	&--label-top {
+		flex-direction: column;
+	}
+
+	&--label-none {
+		align-items: center;
+	}
+
+	&:focus-visible {
+		outline: var(--wp-admin-theme-color, #007cba) solid 1.5px;
+		outline-offset: -1.5px;
+	}
+
+	&:not([aria-disabled="true"]):hover {
+		background-color: rgba(var(--wp-admin-theme-color--rgb), 0.04);
+		color: var(--wp-admin-theme-color);
+
+		.dataforms-layouts-panel__field-trigger-icon {
+			opacity: 1;
+		}
+	}
+
+	&[aria-disabled="true"] {
+		cursor: default;
+	}
+}
+
+.dataforms-layouts-panel__field-trigger-icon {
+	position: absolute;
+	right: $grid-unit-05;
+	top: 50%;
+	transform: translateY(-50%);
+	opacity: 0;
+	color: var(--wp-admin-theme-color);
+	display: flex;
+	align-items: center;
+
+	.dataforms-layouts-panel__field-trigger--label-top & {
+		top: 0;
+		transform: translateY(25%);
+	}
+}
+
+.dataforms-layouts-panel__field-dropdown-anchor {
+	width: 100%;
+
+	.components-dropdown {
+		width: 100%;
 	}
 }
 
@@ -34,6 +96,10 @@
 .dataforms-layouts-panel__field-label-error-content {
 	cursor: help;
 	fill: $alert-red;
+	display: inline-flex;
+	flex-direction: row;
+	align-items: center;
+	gap: $grid-unit-05;
 	svg {
 		fill: currentColor;
 	}
@@ -44,23 +110,6 @@
 	min-height: $grid-unit-40;
 	display: flex;
 	align-items: center;
-
-	.components-button {
-		max-width: 100%;
-		text-align: left;
-		white-space: normal;
-		text-wrap: balance; // Fallback for Safari.
-		text-wrap: pretty;
-		min-height: $button-size-compact;
-	}
-
-	&.components-button.is-link[aria-disabled="true"] {
-		text-decoration: none;
-	}
-
-	.components-dropdown {
-		max-width: 100%;
-	}
 }
 
 .dataforms-layouts-panel__field-dropdown .components-popover__content {
@@ -78,8 +127,4 @@
 
 .components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown {
 	z-index: z-index(".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown");
-}
-
-.dataforms-layouts-panel__summary-button:empty {
-	min-width: $admin-sidebar-width;
 }

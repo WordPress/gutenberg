@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import { Icon, Tooltip } from '@wordpress/components';
 import { useState, useContext } from '@wordpress/element';
 import { error as errorIcon } from '@wordpress/icons';
-import { Stack } from '@wordpress/ui';
 
 /**
  * Internal dependencies
@@ -141,12 +140,6 @@ export default function FormPanelField< Item >( {
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedPanelLayout;
 
-	// Use internal state instead of a ref to make sure that the component
-	// re-renders when the popover's anchor updates.
-	const [ popoverAnchor, setPopoverAnchor ] = useState< HTMLElement | null >(
-		null
-	);
-
 	// Track if the panel has been closed (touched) to only show errors after interaction.
 	const [ touched, setTouched ] = useState( false );
 	const handleClose = () => setTouched( true );
@@ -170,22 +163,17 @@ export default function FormPanelField< Item >( {
 
 	const labelContent = showError ? (
 		<Tooltip text={ errorMessage } placement="top">
-			<Stack
-				direction="row"
-				gap="sm"
-				className="dataforms-layouts-panel__field-label-error-content"
-				justify="flex-start"
-			>
+			<span className="dataforms-layouts-panel__field-label-error-content">
 				<Icon icon={ errorIcon } size={ 16 } />
-				<>{ fieldLabel }</>
-			</Stack>
+				<span>{ fieldLabel }</span>
+			</span>
 		</Tooltip>
 	) : (
 		fieldLabel
 	);
 
-	const renderedControl =
-		layout.openAs === 'modal' ? (
+	if ( layout.openAs === 'modal' ) {
+		return (
 			<PanelModal
 				data={ data }
 				field={ field }
@@ -195,76 +183,29 @@ export default function FormPanelField< Item >( {
 				fieldDefinition={ fieldDefinition }
 				onClose={ handleClose }
 				touched={ touched }
+				labelContent={ labelContent }
+				labelClassName={ labelClassName }
+				showError={ showError }
+				errorMessage={ errorMessage }
 			/>
-		) : (
-			<PanelDropdown
-				data={ data }
-				field={ field }
-				onChange={ onChange }
-				validity={ validity }
-				labelPosition={ labelPosition }
-				summaryFields={ summaryFields }
-				fieldDefinition={ fieldDefinition }
-				popoverAnchor={ popoverAnchor }
-				onClose={ handleClose }
-				touched={ touched }
-			/>
-		);
-
-	if ( labelPosition === 'top' ) {
-		return (
-			<Stack
-				direction="column"
-				className="dataforms-layouts-panel__field"
-			>
-				<div
-					className={ labelClassName }
-					style={ { paddingBottom: 0 } }
-				>
-					{ labelContent }
-				</div>
-				<div className="dataforms-layouts-panel__field-control">
-					{ renderedControl }
-				</div>
-			</Stack>
 		);
 	}
 
-	if ( labelPosition === 'none' ) {
-		return (
-			<Stack
-				direction="row"
-				gap="sm"
-				className="dataforms-layouts-panel__field dataforms-layouts-panel__field--label-position-none"
-			>
-				{ showError && (
-					<Tooltip text={ errorMessage } placement="top">
-						<Icon
-							className="dataforms-layouts-panel__field-label-error-content"
-							icon={ errorIcon }
-							size={ 16 }
-						/>
-					</Tooltip>
-				) }
-				<div className="dataforms-layouts-panel__field-control">
-					{ renderedControl }
-				</div>
-			</Stack>
-		);
-	}
-
-	// Defaults to label position side.
 	return (
-		<Stack
-			direction="row"
-			gap="sm"
-			ref={ setPopoverAnchor }
-			className="dataforms-layouts-panel__field"
-		>
-			<div className={ labelClassName }>{ labelContent }</div>
-			<div className="dataforms-layouts-panel__field-control">
-				{ renderedControl }
-			</div>
-		</Stack>
+		<PanelDropdown
+			data={ data }
+			field={ field }
+			onChange={ onChange }
+			validity={ validity }
+			labelPosition={ labelPosition }
+			summaryFields={ summaryFields }
+			fieldDefinition={ fieldDefinition }
+			onClose={ handleClose }
+			touched={ touched }
+			labelContent={ labelContent }
+			labelClassName={ labelClassName }
+			showError={ showError }
+			errorMessage={ errorMessage }
+		/>
 	);
 }

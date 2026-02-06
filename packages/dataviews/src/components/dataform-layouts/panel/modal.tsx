@@ -169,6 +169,10 @@ function PanelModal< Item >( {
 	fieldDefinition,
 	onClose: onCloseCallback,
 	touched,
+	labelContent,
+	labelClassName,
+	showError,
+	errorMessage,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -178,6 +182,10 @@ function PanelModal< Item >( {
 	fieldDefinition: NormalizedField< Item >;
 	onClose?: () => void;
 	touched: boolean;
+	labelContent?: React.ReactNode;
+	labelClassName?: string;
+	showError?: boolean;
+	errorMessage?: string;
 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 
@@ -198,6 +206,10 @@ function PanelModal< Item >( {
 				disabled={ fieldDefinition.readOnly === true }
 				onClick={ () => setIsOpen( true ) }
 				aria-expanded={ isOpen }
+				labelContent={ labelContent }
+				labelClassName={ labelClassName }
+				showError={ showError }
+				errorMessage={ errorMessage }
 			/>
 			{ isOpen && (
 				<ModalContent

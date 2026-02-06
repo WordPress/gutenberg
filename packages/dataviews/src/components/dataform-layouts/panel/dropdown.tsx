@@ -8,7 +8,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useRef } from '@wordpress/element';
+import { useMemo, useRef, useState } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
@@ -81,9 +81,12 @@ function PanelDropdown< Item >( {
 	labelPosition = 'side',
 	summaryFields,
 	fieldDefinition,
-	popoverAnchor,
 	onClose: onCloseCallback,
 	touched,
+	labelContent,
+	labelClassName,
+	showError,
+	errorMessage,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -92,11 +95,20 @@ function PanelDropdown< Item >( {
 	labelPosition: 'side' | 'top' | 'none';
 	summaryFields: NormalizedField< Item >[];
 	fieldDefinition: NormalizedField< Item >;
-	popoverAnchor: HTMLElement | null;
 	onClose?: () => void;
 	touched: boolean;
+	labelContent?: React.ReactNode;
+	labelClassName?: string;
+	showError?: boolean;
+	errorMessage?: string;
 } ) {
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
+
+	// Use internal state instead of a ref to make sure that the component
+	// re-renders when the popover's anchor updates.
+	const [ popoverAnchor, setPopoverAnchor ] = useState< HTMLElement | null >(
+		null
+	);
 
 	const form: NormalizedForm = useMemo(
 		() => ( {
@@ -136,64 +148,71 @@ function PanelDropdown< Item >( {
 	const focusOnMountRef = useFocusOnMount( 'firstInputElement' );
 
 	return (
-		<Dropdown
-			contentClassName="dataforms-layouts-panel__field-dropdown"
-			popoverProps={ popoverProps }
-			focusOnMount={ false }
-			onToggle={ ( willOpen ) => {
-				if ( ! willOpen ) {
-					onCloseCallback?.();
-				}
-			} }
-			toggleProps={ {
-				size: 'compact',
-				variant: 'tertiary',
-				tooltipPosition: 'middle left',
-			} }
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<SummaryButton
-					summaryFields={ summaryFields }
-					data={ data }
-					labelPosition={ labelPosition }
-					fieldLabel={ fieldLabel }
-					disabled={ fieldDefinition.readOnly === true }
-					onClick={ onToggle }
-					aria-expanded={ isOpen }
-				/>
-			) }
-			renderContent={ ( { onClose } ) => (
-				<DropdownContentWithValidation touched={ touched }>
-					<DropdownHeader title={ fieldLabel } onClose={ onClose } />
-					<div ref={ focusOnMountRef }>
-						<DataFormLayout
-							data={ data }
-							form={ form }
-							onChange={ onChange }
-							validity={ formValidity }
-						>
-							{ (
-								FieldLayout,
-								childField,
-								childFieldValidity,
-								markWhenOptional
-							) => (
-								<FieldLayout
-									key={ childField.id }
-									data={ data }
-									field={ childField }
-									onChange={ onChange }
-									hideLabelFromVision={
-										( form?.fields ?? [] ).length < 2
-									}
-									markWhenOptional={ markWhenOptional }
-									validity={ childFieldValidity }
-								/>
-							) }
-						</DataFormLayout>
-					</div>
-				</DropdownContentWithValidation>
-			) }
-		/>
+		<div
+			ref={ setPopoverAnchor }
+			className="dataforms-layouts-panel__field-dropdown-anchor"
+		>
+			<Dropdown
+				contentClassName="dataforms-layouts-panel__field-dropdown"
+				popoverProps={ popoverProps }
+				focusOnMount={ false }
+				onToggle={ ( willOpen ) => {
+					if ( ! willOpen ) {
+						onCloseCallback?.();
+					}
+				} }
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<SummaryButton
+						summaryFields={ summaryFields }
+						data={ data }
+						labelPosition={ labelPosition }
+						fieldLabel={ fieldLabel }
+						disabled={ fieldDefinition.readOnly === true }
+						onClick={ onToggle }
+						aria-expanded={ isOpen }
+						labelContent={ labelContent }
+						labelClassName={ labelClassName }
+						showError={ showError }
+						errorMessage={ errorMessage }
+					/>
+				) }
+				renderContent={ ( { onClose } ) => (
+					<DropdownContentWithValidation touched={ touched }>
+						<DropdownHeader
+							title={ fieldLabel }
+							onClose={ onClose }
+						/>
+						<div ref={ focusOnMountRef }>
+							<DataFormLayout
+								data={ data }
+								form={ form }
+								onChange={ onChange }
+								validity={ formValidity }
+							>
+								{ (
+									FieldLayout,
+									childField,
+									childFieldValidity,
+									markWhenOptional
+								) => (
+									<FieldLayout
+										key={ childField.id }
+										data={ data }
+										field={ childField }
+										onChange={ onChange }
+										hideLabelFromVision={
+											( form?.fields ?? [] ).length < 2
+										}
+										markWhenOptional={ markWhenOptional }
+										validity={ childFieldValidity }
+									/>
+								) }
+							</DataFormLayout>
+						</div>
+					</DropdownContentWithValidation>
+				) }
+			/>
+		</div>
 	);
 }
 
