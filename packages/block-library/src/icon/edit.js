@@ -39,7 +39,6 @@ export function Edit( props ) {
 	const { icon, ariaLabel, style } = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
-	const [ iconToDisplay, setIconToDisplay ] = useState();
 	const [ allIcons, setAllIcons ] = useState();
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
@@ -55,14 +54,6 @@ export function Edit( props ) {
 		};
 		requestIcons();
 	}, [] );
-
-	// Update the active icons when it's changed.
-	useEffect( () => {
-		if ( icon && allIcons ) {
-			const selectedIcon = allIcons.find( ( { name } ) => name === icon );
-			setIconToDisplay( selectedIcon?.content );
-		}
-	}, [ allIcons, icon ] );
 
 	// Is the width value is 0, reset it to the default value.
 	useEffect( () => {
@@ -80,11 +71,10 @@ export function Edit( props ) {
 		}
 	}, [ style, setAttributes, __unstableMarkNextChangeAsNotPersistent ] );
 
-	function resetAll() {
-		setAttributes( {
-			ariaLabel: undefined,
-		} );
-	}
+	const iconToDisplay =
+		allIcons?.length > 0
+			? allIcons?.find( ( { name } ) => name === icon )?.content
+			: '';
 
 	const blockControls = (
 		<>
@@ -136,7 +126,11 @@ export function Edit( props ) {
 			<InspectorControls group="settings">
 				<ToolsPanel
 					label={ __( 'Settings' ) }
-					resetAll={ resetAll }
+					resetAll={ () =>
+						setAttributes( {
+							ariaLabel: undefined,
+						} )
+					}
 					dropdownMenuProps={ dropdownMenuProps }
 				>
 					<ToolsPanelItem
