@@ -15,6 +15,18 @@ const meta: Meta< typeof Dialog.Root > = {
 		'Dialog.Action': Dialog.Action,
 		'Dialog.Footer': Dialog.Footer,
 	},
+	argTypes: {
+		modal: {
+			control: 'inline-radio',
+			options: [ true, false, 'trap-focus' ],
+			table: {
+				defaultValue: { summary: 'true' },
+				type: {
+					summary: 'boolean | "trap-focus"',
+				},
+			},
+		},
+	},
 	parameters: {
 		docs: {
 			description: {
