@@ -60,9 +60,9 @@ import { colord } from 'colord';
 
 /**
  * Configuration constants.
- * Note: WAVEFORM_HEIGHT must match $waveform-player-height in style.scss.
+ * Note: DEFAULT_WAVEFORM_HEIGHT should match $waveform-player-height in style.scss.
  */
-const WAVEFORM_HEIGHT = 100;
+const DEFAULT_WAVEFORM_HEIGHT = 100;
 
 /**
  * Get the effective background color, falling back to body if transparent.
@@ -115,6 +115,7 @@ export function getWaveformColors( element ) {
  * @param {string} options.waveformColor - The waveform bar color.
  * @param {string} options.progressColor - The progress indicator color.
  * @param {string} options.buttonColor   - The play button color.
+ * @param {number} options.height        - The waveform height in pixels.
  * @return {Element} The configured container element.
  */
 export function createWaveformContainer( {
@@ -125,11 +126,12 @@ export function createWaveformContainer( {
 	waveformColor,
 	progressColor,
 	buttonColor,
+	height = DEFAULT_WAVEFORM_HEIGHT,
 } ) {
 	const container = document.createElement( 'div' );
 	container.setAttribute( 'data-waveform-player', '' );
 	container.setAttribute( 'data-url', url );
-	container.setAttribute( 'data-height', String( WAVEFORM_HEIGHT ) );
+	container.setAttribute( 'data-height', String( height ) );
 	container.setAttribute( 'data-waveform-style', 'bars' );
 	container.setAttribute( 'data-waveform-color', waveformColor );
 	container.setAttribute( 'data-progress-color', progressColor );
