@@ -64,6 +64,7 @@ import {
 import { LinkPicker } from './components/link-picker';
 import useRemoteUrlData from './components/link-control/use-rich-url-data';
 import { PrivateBlockContext } from './components/block-list/private-block-context';
+import useListViewPanelState from './components/use-list-view-panel-state';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -124,4 +125,5 @@ lock( privateApis, {
 	LinkPicker,
 	useRemoteUrlData,
 	PrivateBlockContext,
+	useListViewPanelState,
 } );

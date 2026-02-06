@@ -36,9 +36,12 @@ const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-link',
 	'core/navigation-submenu',
 ];
-const { PrivateListView, useBlockDisplayTitle, PrivateBlockContext } = unlock(
-	blockEditorPrivateApis
-);
+const {
+	PrivateListView,
+	useBlockDisplayTitle,
+	PrivateBlockContext,
+	useListViewPanelState,
+} = unlock( blockEditorPrivateApis );
 
 function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
 	const { updateBlockAttributes, removeBlock } =
@@ -217,27 +220,8 @@ const MenuInspectorControls = ( props ) => {
 	// Only make panel collapsible in contentOnly mode
 	const showBlockTitle = isSelectionWithinCurrentSection;
 
-	const { isOpened, expandRevision } = useSelect(
-		( select ) => {
-			const {
-				__unstableIsListViewPanelOpened,
-				__unstableGetListViewExpandRevision,
-			} = select( blockEditorStore );
-			return {
-				isOpened: __unstableIsListViewPanelOpened( clientId ),
-				expandRevision: __unstableGetListViewExpandRevision(),
-			};
-		},
-		[ clientId ]
-	);
-
-	const { __unstableToggleListViewPanel: toggleListViewPanel } =
-		useDispatch( blockEditorStore );
-
-	// Handle manual toggle
-	const handleToggle = ( opened ) => {
-		toggleListViewPanel( clientId, opened );
-	};
+	const { isOpened, expandRevision, handleToggle } =
+		useListViewPanelState( clientId );
 
 	if ( ! showBlockTitle ) {
 		return (

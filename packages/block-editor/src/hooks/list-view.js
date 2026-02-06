@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useContext } from '@wordpress/element';
 
@@ -15,6 +15,7 @@ import { PrivateListView } from '../components/list-view';
 import InspectorControls from '../components/inspector-controls/fill';
 import { PrivateBlockContext } from '../components/block-list/private-block-context';
 import useBlockDisplayTitle from '../components/block-title/use-block-display-title';
+import useListViewPanelState from '../components/use-list-view-panel-state';
 
 export const LIST_VIEW_SUPPORT_KEY = 'listView';
 
@@ -40,22 +41,8 @@ export function ListViewPanel( { clientId, name } ) {
 	const { isSelectionWithinCurrentSection } =
 		useContext( PrivateBlockContext );
 
-	const { isOpened, expandRevision } = useSelect(
-		( select ) => {
-			const {
-				__unstableIsListViewPanelOpened,
-				__unstableGetListViewExpandRevision,
-			} = select( blockEditorStore );
-			return {
-				isOpened: __unstableIsListViewPanelOpened( clientId ),
-				expandRevision: __unstableGetListViewExpandRevision(),
-			};
-		},
-		[ clientId ]
-	);
-
-	const { __unstableToggleListViewPanel: toggleListViewPanel } =
-		useDispatch( blockEditorStore );
+	const { isOpened, expandRevision, handleToggle } =
+		useListViewPanelState( clientId );
 
 	const isEnabled = hasListViewSupport( name );
 	const { hasChildren, isNestedListView } = useSelect(
@@ -92,11 +79,6 @@ export function ListViewPanel( { clientId, name } ) {
 		clientId,
 		context: 'list-view',
 	} );
-
-	// Handle manual toggle
-	const handleToggle = ( opened ) => {
-		toggleListViewPanel( clientId, opened );
-	};
 
 	if ( ! isEnabled || isNestedListView ) {
 		return null;
