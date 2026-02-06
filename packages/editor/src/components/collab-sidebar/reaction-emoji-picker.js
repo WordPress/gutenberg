@@ -20,7 +20,7 @@ export const REACTION_EMOJIS = [
 ];
 
 /**
- * A horizontal row of emoji buttons for adding reactions.
+ * A selection of emoji buttons for adding reactions.
  *
  * @param {Object}   props          Component props.
  * @param {Function} props.onSelect Callback when an emoji is selected.
