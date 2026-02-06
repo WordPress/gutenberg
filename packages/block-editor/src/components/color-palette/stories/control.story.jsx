@@ -17,7 +17,7 @@ export default {
 			canvas: { sourceState: 'shown' },
 			description: {
 				component:
-					'ColorPaletteControl is a wrapper designed for the Block Inspector sidebar. It provides a label, a color swatch grid, and a color value input',
+					'ColorPaletteControl is a wrapper designed for the Block Inspector sidebar. It provides a label, a color swatch grid, and a color value input.',
 			},
 		},
 	},
