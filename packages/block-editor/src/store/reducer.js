@@ -2110,20 +2110,29 @@ export function insertionPoint( state = null, action ) {
  *
  * @return {Object} Updated state.
  */
-function openedListViewPanels( state = {}, action ) {
+function openedListViewPanels(
+	state = { allOpen: false, panels: {} },
+	action
+) {
 	switch ( action.type ) {
 		case 'SET_OPEN_LIST_VIEW_PANEL':
 			// Open only the specified panel, close all others
-			return action.clientId ? { [ action.clientId ]: true } : {};
+			return {
+				allOpen: false,
+				panels: action.clientId ? { [ action.clientId ]: true } : {},
+			};
 		case 'SET_ALL_LIST_VIEW_PANELS_OPEN':
-			// Special flag to open all panels
-			return { __allOpen: true };
+			// Set flag to open all panels
+			return { allOpen: true, panels: {} };
 		case 'TOGGLE_LIST_VIEW_PANEL':
 			// If we're in "all open" mode, exit it when user manually toggles
-			const newState = { ...state };
-			delete newState.__allOpen;
-			newState[ action.clientId ] = action.isOpen;
-			return newState;
+			return {
+				allOpen: false,
+				panels: {
+					...state.panels,
+					[ action.clientId ]: action.isOpen,
+				},
+			};
 	}
 	return state;
 }

@@ -3296,11 +3296,11 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
  * @return {boolean} Whether the panel is opened.
  */
 export function __unstableIsListViewPanelOpened( state, clientId ) {
-	// If __allOpen flag is set, all panels are open
-	if ( state.openedListViewPanels?.__allOpen ) {
+	// If allOpen flag is set, all panels are open
+	if ( state.openedListViewPanels?.allOpen ) {
 		return true;
 	}
-	return state.openedListViewPanels?.[ clientId ] === true;
+	return state.openedListViewPanels?.panels?.[ clientId ] === true;
 }
 
 /**
