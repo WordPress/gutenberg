@@ -12,11 +12,9 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { store as blockEditorStore } from '../../../store';
 import { unlock } from '../../../lock-unlock';
-import { privateApis } from '../../../private-apis';
+import { isNavigationOverlayContextKey } from '../../../store/private-keys';
 import { INSERTER_PATTERN_TYPES } from '../block-patterns-tab/utils';
 import { isFiltered } from '../../../store/utils';
-
-const { isNavigationOverlayContextKey } = unlock( privateApis );
 
 /**
  * Retrieves the block patterns inserter state.
