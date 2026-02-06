@@ -128,13 +128,13 @@ export function TimePicker( {
 			// We can safely assume value is a number if target is valid.
 			const numberValue = Number( value );
 
-			// Sanity check for year values - reject unreasonably small years
+			// Confidence check for year values - reject unreasonably small years
 			// that would create dates moment can't parse properly
 			if ( method === 'year' && numberValue < 1000 ) {
 				return;
 			}
 
-			// Sanity check for day values - must be positive
+			// Confidence check for day values - must be positive
 			if ( method === 'date' && numberValue < 1 ) {
 				return;
 			}
