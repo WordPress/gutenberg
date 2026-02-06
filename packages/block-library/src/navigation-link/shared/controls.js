@@ -245,6 +245,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						attributes.kind === 'post-type' &&
 						onNavigateToEntityRecord && (
 							<Button
+								size="compact"
 								variant="secondary"
 								onClick={ () => {
 									onNavigateToEntityRecord( {
@@ -263,6 +264,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						) }
 					{ isViewableUrl && (
 						<Button
+							size="compact"
 							variant="secondary"
 							href={ viewUrl }
 							target="_blank"
