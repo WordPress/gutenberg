@@ -1,51 +1,61 @@
 {
 	"wpds-dimension": {
 		"padding": {
-			"surface": {
-				"2xs": {
-					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.10}"
-				},
-				"xs": {
-					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.10}"
-				},
-				"sm": {
-					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.30}"
-				},
-				"md": {
-					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.50}"
-				},
-				"lg": {
-					"$type": "dimension",
-					"$value": "{wpds-dimension.primitive.space.60}"
-				}
-			}
-		},
-		"gap": {
-			"2xs": {
-				"$type": "dimension",
-				"$value": "{wpds-dimension.primitive.space.10}"
-			},
 			"xs": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.10}"
 			},
 			"sm": {
 				"$type": "dimension",
-				"$value": "{wpds-dimension.primitive.space.20}"
+				"$value": "{wpds-dimension.primitive.space.10}"
 			},
 			"md": {
 				"$type": "dimension",
-				"$value": "{wpds-dimension.primitive.space.30}"
+				"$value": "{wpds-dimension.primitive.space.20}"
 			},
 			"lg": {
 				"$type": "dimension",
-				"$value": "{wpds-dimension.primitive.space.50}"
+				"$value": "{wpds-dimension.primitive.space.30}"
 			},
 			"xl": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.40}"
+			},
+			"2xl": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.50}"
+			},
+			"3xl": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.60}"
+			}
+		},
+		"gap": {
+			"xs": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.10}"
+			},
+			"sm": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.10}"
+			},
+			"md": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.20}"
+			},
+			"lg": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.30}"
+			},
+			"xl": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.50}"
+			},
+			"2xl": {
+				"$type": "dimension",
+				"$value": "{wpds-dimension.primitive.space.60}"
+			},
+			"3xl": {
 				"$type": "dimension",
 				"$value": "{wpds-dimension.primitive.space.70}"
 			}

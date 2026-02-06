@@ -7,7 +7,6 @@ import {
 	CardBody,
 	CardHeader as OriginalCardHeader,
 } from '@wordpress/components';
-import { Badge } from '@wordpress/ui';
 import {
 	useCallback,
 	useContext,
@@ -17,7 +16,6 @@ import {
 	useState,
 } from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
-import { sprintf, _n } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -26,7 +24,6 @@ import { getFormFieldLayout } from '..';
 import DataFormContext from '../../dataform-context';
 import type {
 	FieldLayoutProps,
-	FieldValidity,
 	NormalizedCardLayout,
 	NormalizedField,
 	NormalizedForm,
@@ -35,33 +32,8 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import { getSummaryFields } from '../get-summary-fields';
-
-function countInvalidFields( validity: FieldValidity | undefined ): number {
-	if ( ! validity ) {
-		return 0;
-	}
-
-	let count = 0;
-	const validityRules = Object.keys( validity ).filter(
-		( key ) => key !== 'children'
-	);
-
-	for ( const key of validityRules ) {
-		const rule = validity[ key as keyof Omit< FieldValidity, 'children' > ];
-		if ( rule?.type === 'invalid' ) {
-			count++;
-		}
-	}
-
-	// Count children recursively
-	if ( validity.children ) {
-		for ( const childValidity of Object.values( validity.children ) ) {
-			count += countInvalidFields( childValidity );
-		}
-	}
-
-	return count;
-}
+import useReportValidity from '../../../hooks/use-report-validity';
+import ValidationBadge from '../validation-badge';
 
 const NonCollapsibleCardHeader = ( {
 	children,
@@ -211,6 +183,7 @@ export default function FormCardField< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: FieldLayoutProps< Item > ) {
 	const { fields } = useContext( DataFormContext );
@@ -235,18 +208,7 @@ export default function FormCardField< Item >( {
 
 	// When the card is expanded after being touched (collapsed with errors),
 	// trigger reportValidity to show field-level errors.
-	useEffect( () => {
-		if ( isOpen && touched && cardBodyRef.current ) {
-			// Trigger reportValidity on each input within the card to fire the
-			// 'invalid' event, which makes validated controls show errors.
-			const inputs = cardBodyRef.current.querySelectorAll(
-				'input, textarea, select, fieldset'
-			);
-			inputs.forEach( ( input ) => {
-				( input as HTMLInputElement ).reportValidity();
-			} );
-		}
-	}, [ isOpen, touched ] );
+	useReportValidity( cardBodyRef, isOpen && touched );
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
 
@@ -254,24 +216,10 @@ export default function FormCardField< Item >( {
 		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
 	);
 
-	// Count invalid fields for validation badge
-	const invalidCount = countInvalidFields( validity );
-	const showValidationBadge =
-		touched && invalidCount > 0 && layout.isCollapsible;
-
-	const validationBadge = showValidationBadge ? (
-		<Badge intent="high">
-			{ sprintf(
-				/* translators: %d: Number of fields that need attention */
-				_n(
-					'%d field needs attention',
-					'%d fields need attention',
-					invalidCount
-				),
-				invalidCount
-			) }
-		</Badge>
-	) : null;
+	const validationBadge =
+		touched && layout.isCollapsible ? (
+			<ValidationBadge validity={ validity } />
+		) : null;
 
 	const sizeCard = {
 		blockStart: 'medium' as const,
@@ -400,6 +348,7 @@ export default function FormCardField< Item >( {
 						hideLabelFromVision={
 							hideLabelFromVision || withHeader
 						}
+						markWhenOptional={ markWhenOptional }
 						validity={ validity }
 					/>
 				</CardBody>

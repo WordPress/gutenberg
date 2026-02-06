@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getProtocol, prependHTTP } from '@wordpress/url';
+import { getProtocol, prependHTTPS } from '@wordpress/url';
 import { useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
@@ -41,7 +41,7 @@ export const handleDirectEntry = ( val ) => {
 		{
 			id: val,
 			title: val,
-			url: type === 'URL' ? prependHTTP( val ) : val,
+			url: type === 'URL' ? prependHTTPS( val ) : val,
 			type,
 		},
 	] );

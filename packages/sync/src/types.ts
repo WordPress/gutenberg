@@ -12,22 +12,7 @@ import type { Awareness } from 'y-protocols/awareness';
 /**
  * Internal dependencies
  */
-import type { AwarenessState } from './awareness/awareness-state';
 import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
-
-/* globalThis */
-declare global {
-	interface Window {
-		__experimentalCollaborativeEditingSecret?: string;
-		wp?: {
-			ajax?: {
-				settings?: {
-					url?: string;
-				};
-			};
-		};
-	}
-}
 
 export type CRDTDoc = Y.Doc;
 export type AwarenessID = string;
@@ -70,6 +55,11 @@ export interface CollectionHandlers {
 	refetchRecords: () => Promise< void >;
 }
 
+export interface SyncManagerUpdateOptions {
+	isSave?: boolean;
+	isNewUndoLevel?: boolean;
+}
+
 export interface RecordHandlers {
 	addUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	editRecord: (
@@ -82,7 +72,7 @@ export interface RecordHandlers {
 	saveRecord: () => Promise< void >;
 }
 
-export interface SyncConfig< State extends object = {} > {
+export interface SyncConfig {
 	applyChangesToCRDTDoc: (
 		ydoc: Y.Doc,
 		changes: Partial< ObjectData >
@@ -90,7 +80,7 @@ export interface SyncConfig< State extends object = {} > {
 	createAwareness?: (
 		ydoc: Y.Doc,
 		objectId?: ObjectID
-	) => AwarenessState< State > | undefined;
+	) => Awareness | undefined;
 	getChangesFromCRDTDoc: (
 		ydoc: Y.Doc,
 		editedRecord: ObjectData
@@ -103,10 +93,10 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => Record< string, string >;
-	getAwareness: (
+	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,
 		objectId: ObjectID
-	) => AwarenessState | undefined;
+	) => State | undefined;
 	load: (
 		syncConfig: SyncConfig,
 		objectType: ObjectType,
@@ -127,7 +117,7 @@ export interface SyncManager {
 		objectId: ObjectID | null,
 		changes: Partial< ObjectData >,
 		origin: string,
-		isSave?: boolean
+		options?: SyncManagerUpdateOptions
 	) => void;
 }
 
@@ -136,4 +126,5 @@ export interface SyncUndoManager extends WPUndoManager< ObjectData > {
 		ymap: Y.Map< any >,
 		handlers: Pick< RecordHandlers, 'addUndoMeta' | 'restoreUndoMeta' >
 	) => void;
+	stopCapturing: () => void;
 }

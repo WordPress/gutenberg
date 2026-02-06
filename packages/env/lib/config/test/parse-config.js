@@ -52,6 +52,8 @@ const DEFAULT_CONFIG = {
 	lifecycleScripts: {
 		afterStart: null,
 		afterClean: null,
+		afterReset: null,
+		afterCleanup: null,
 		afterDestroy: null,
 	},
 	env: {

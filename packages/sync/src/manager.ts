@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as Y from 'yjs';
+import type { Awareness } from 'y-protocols/awareness';
 
 /**
  * Internal dependencies
@@ -25,14 +26,14 @@ import type {
 	RecordHandlers,
 	SyncConfig,
 	SyncManager,
+	SyncManagerUpdateOptions,
 	SyncUndoManager,
 } from './types';
 import { createUndoManager } from './undo-manager';
 import { createYjsDoc, markEntityAsSaved } from './utils';
-import type { AwarenessState } from './awareness/awareness-state';
 
 interface CollectionState {
-	awareness?: AwarenessState;
+	awareness?: Awareness;
 	handlers: CollectionHandlers;
 	syncConfig: SyncConfig;
 	unload: () => void;
@@ -40,7 +41,7 @@ interface CollectionState {
 }
 
 interface EntityState {
-	awareness?: AwarenessState;
+	awareness?: Awareness;
 	handlers: RecordHandlers;
 	objectId: ObjectID;
 	objectType: ObjectType;
@@ -133,7 +134,6 @@ export function createSyncManager(): SyncManager {
 
 		// If the sync config supports awareness, create it.
 		const awareness = syncConfig.createAwareness?.( ydoc, objectId );
-		awareness?.setUp();
 
 		// When the CRDT document is updated by an UndoManager or a connection (not
 		// a local origin), update the local store.
@@ -269,7 +269,6 @@ export function createSyncManager(): SyncManager {
 
 		// If the sync config supports awareness, create it.
 		const awareness = syncConfig.createAwareness?.( ydoc );
-		awareness?.setUp();
 
 		const collectionState: CollectionState = {
 			awareness,
@@ -306,7 +305,7 @@ export function createSyncManager(): SyncManager {
 	 */
 	function unloadEntity( objectType: ObjectType, objectId: ObjectID ): void {
 		entityStates.get( getEntityId( objectType, objectId ) )?.unload();
-		updateCRDTDoc( objectType, null, {}, origin, true /* isSave */ );
+		updateCRDTDoc( objectType, null, {}, origin, { isSave: true } );
 	}
 
 	/**
@@ -325,14 +324,15 @@ export function createSyncManager(): SyncManager {
 	/**
 	 * Get the awareness instance for the given object type and object ID, if supported.
 	 *
+	 * @template {Awareness} State
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
-	 * @return {AwarenessState | undefined} The awareness instance, or undefined if not supported.
+	 * @return {State | undefined} The awareness instance, or undefined if not supported.
 	 */
-	function getAwareness(
+	function getAwareness< State extends Awareness >(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): AwarenessState | undefined {
+	): State | undefined {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
@@ -340,7 +340,7 @@ export function createSyncManager(): SyncManager {
 			return undefined;
 		}
 
-		return entityState.awareness;
+		return entityState.awareness as State;
 	}
 
 	/**
@@ -450,25 +450,38 @@ export function createSyncManager(): SyncManager {
 	/**
 	 * Update CRDT document with changes from the local store.
 	 *
-	 * @param {ObjectType}            objectType Object type.
-	 * @param {ObjectID}              objectId   Object ID.
-	 * @param {Partial< ObjectData >} changes    Updates to make.
-	 * @param {string}                origin     The source of change.
-	 * @param {boolean}               isSave     Whether this update is part of a save operation.
+	 * @param {ObjectType}               objectType             Object type.
+	 * @param {ObjectID}                 objectId               Object ID.
+	 * @param {Partial< ObjectData >}    changes                Updates to make.
+	 * @param {string}                   origin                 The source of change.
+	 * @param {SyncManagerUpdateOptions} options                Optional flags for the update.
+	 * @param {boolean}                  options.isSave         Whether this update is part of a save operation. Defaults to false.
+	 * @param {boolean}                  options.isNewUndoLevel Whether to create a new undo level for this change. Defaults to false.
 	 */
 	function updateCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID | null,
 		changes: Partial< ObjectData >,
 		origin: string,
-		isSave: boolean = false
+		options: SyncManagerUpdateOptions = {}
 	): void {
+		const { isSave = false, isNewUndoLevel = false } = options;
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 		const collectionState = collectionStates.get( objectType );
 
 		if ( entityState ) {
 			const { syncConfig, ydoc } = entityState;
+
+			// If this is change should create a new undo level, tell the undo
+			// manager to stop capturing and create a new undo group.
+			// We can't do this in the undo manager itself, because addRecord() is
+			// called after the CRDT changes have been applied, and we want to
+			// ensure that the undo set is created before the changes are applied.
+			if ( isNewUndoLevel && undoManager ) {
+				undoManager.stopCapturing?.();
+			}
+
 			ydoc.transact( () => {
 				syncConfig.applyChangesToCRDTDoc( ydoc, changes );
 

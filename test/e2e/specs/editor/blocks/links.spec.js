@@ -1195,6 +1195,51 @@ test.describe( 'Links', () => {
 			] );
 		} );
 	} );
+
+	test( 'should maintain focus when correcting invalid URL after validation error', async ( {
+		page,
+		editor,
+		pageUtils,
+	} ) => {
+		// Create a paragraph with text and select it
+		await editor.canvas
+			.getByRole( 'button', { name: 'Add default block' } )
+			.click();
+		await page.keyboard.type( 'Link text' );
+
+		// Select the text
+		await pageUtils.pressKeys( 'primary+a' );
+
+		// Open link UI
+		await pageUtils.pressKeys( 'primary+k' );
+
+		const urlInput = page.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Type an invalid URL (no TLD, has spaces)
+		await urlInput.fill( 'wordpress' );
+
+		// Try to submit - this should trigger validation error
+		await pageUtils.pressKeys( 'Enter' );
+
+		// Verify validation error is shown
+		await expect(
+			page.locator( '.components-validated-control__indicator' )
+		).toBeVisible();
+
+		// Verify focus is still on the input
+		await expect( urlInput ).toBeFocused();
+
+		// Bug fix: focus gets stolen after first character
+		await page.keyboard.type( '.org', { delay: 100 } );
+
+		// Verify the full input value is now the corrected URL
+		await expect( urlInput ).toHaveValue( 'wordpress.org' );
+
+		// Verify focus is still on the input
+		await expect( urlInput ).toBeFocused();
+	} );
 } );
 
 class LinkUtils {

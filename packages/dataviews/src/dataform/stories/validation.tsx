@@ -88,7 +88,8 @@ const ValidationComponent = ( {
 	minMax: boolean;
 	layout:
 		| 'regular'
-		| 'panel'
+		| 'panel-dropdown'
+		| 'panel-modal'
 		| 'card-collapsible'
 		| 'card-not-collapsible'
 		| 'details';
@@ -876,7 +877,7 @@ const ValidationComponent = ( {
 				},
 			},
 		];
-	}, [ elements, custom, required, pattern, minMax, getElements ] );
+	}, [ elements, custom, pattern, minMax, getElements, required ] );
 
 	const form = useMemo( () => {
 		if ( layout === 'regular' ) {
@@ -978,9 +979,16 @@ const ValidationComponent = ( {
 			},
 		];
 
-		if ( layout === 'panel' ) {
+		if ( layout === 'panel-dropdown' ) {
 			return {
-				layout: { type: 'panel' as const },
+				layout: { type: 'panel' as const, openAs: 'dropdown' as const },
+				fields: groupedFields,
+			};
+		}
+
+		if ( layout === 'panel-modal' ) {
+			return {
+				layout: { type: 'panel' as const, openAs: 'modal' as const },
 				fields: groupedFields,
 			};
 		}
@@ -1010,7 +1018,7 @@ const ValidationComponent = ( {
 
 	return (
 		<form>
-			<Stack direction="column" align="start" gap="xl">
+			<Stack direction="column" align="start" gap="3xl">
 				<DataForm< ValidatedItem >
 					data={ post }
 					fields={ _fields }

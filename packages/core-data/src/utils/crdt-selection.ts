@@ -1,9 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { dispatch } from '@wordpress/data';
+import { dispatch, select } from '@wordpress/data';
 // @ts-expect-error No exported types.
 import { store as blockEditorStore } from '@wordpress/block-editor';
+// @ts-expect-error No exported types.
+import { isUnmodifiedBlock } from '@wordpress/blocks';
 import { type CRDTDoc, Y } from '@wordpress/sync';
 
 /**
@@ -153,6 +155,7 @@ export function restoreSelection(
 		return;
 	}
 
+	const { getBlock } = select( blockEditorStore );
 	const { resetSelection } = dispatch( blockEditorStore );
 	const { selectionStart, selectionEnd } = selectionToRestore;
 	const isSelectionInSameBlock =
@@ -161,12 +164,42 @@ export function restoreSelection(
 	if ( isSelectionInSameBlock ) {
 		// Case 2: After content is restored, the selection is available
 		// within the same block
-		resetSelection( selectionStart, selectionEnd, null );
+
+		const block = getBlock( selectionStart.clientId );
+		const isBlockEmpty = block && isUnmodifiedBlock( block );
+		const isBeginningOfEmptyBlock =
+			0 === selectionStart.offset &&
+			0 === selectionEnd.offset &&
+			isBlockEmpty;
+
+		if ( isBeginningOfEmptyBlock ) {
+			// Case 2a: When the content in a block has been removed after an
+			// undo, WordPress will set the selection to the block's client ID
+			// with an undefined startOffset and endOffset.
+			//
+			// To match the default behavior and tests, exclude the selection
+			// offset when resetting to position 0.
+			const selectionStartWithoutOffset = {
+				clientId: selectionStart.clientId,
+			};
+			const selectionEndWithoutOffset = {
+				clientId: selectionEnd.clientId,
+			};
+
+			resetSelection(
+				selectionStartWithoutOffset,
+				selectionEndWithoutOffset,
+				0
+			);
+		} else {
+			// Case 2b: Otherwise, reset including the saved selection offset.
+			resetSelection( selectionStart, selectionEnd, 0 );
+		}
 	} else {
 		// Case 3: A multi-block selection was made. resetSelection() can only
 		// restore selections within the same block.
 		// When a multi-block selection is made, selectionEnd represents
 		// where the user's cursor ended.
-		resetSelection( selectionEnd, selectionEnd, null );
+		resetSelection( selectionEnd, selectionEnd, 0 );
 	}
 }

@@ -33,14 +33,6 @@ import type {
 	RecordHandlers,
 	SyncConfig,
 } from '../types';
-import { AwarenessState } from '../awareness/awareness-state';
-
-/**
- * A minimal mock awareness class for testing.
- */
-class MockAwarenessState extends AwarenessState {
-	protected equalityFieldChecks = {};
-}
 
 // Mock dependencies.
 jest.mock( '../providers', () => ( {
@@ -92,7 +84,7 @@ describe( 'SyncManager', () => {
 			),
 			supports: {},
 			createAwareness: jest.fn(
-				( ydoc: Y.Doc ) => new MockAwarenessState( ydoc )
+				( ydoc: Y.Doc ) => new Awareness( ydoc )
 			),
 		};
 
@@ -601,7 +593,9 @@ describe( 'SyncManager', () => {
 			const changes = { title: 'Updated Title' };
 			const now = Date.now();
 
-			manager.update( 'post', '123', changes, 'local-editor', true );
+			manager.update( 'post', '123', changes, 'local-editor', {
+				isSave: true,
+			} );
 
 			// Verify that applyChangesToCRDTDoc was called with the changes.
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(

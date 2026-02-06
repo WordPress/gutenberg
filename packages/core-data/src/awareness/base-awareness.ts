@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data';
-import { AwarenessState } from '@wordpress/sync';
+import { resolveSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import { AwarenessState } from './awareness-state';
 import { STORE_NAME as coreStore } from '../name';
 import { generateUserInfo, areUserInfosEqual } from './utils';
 
@@ -15,16 +15,14 @@ import type { BaseState } from './types';
 export abstract class BaseAwarenessState<
 	State extends BaseState,
 > extends AwarenessState< State > {
-	public setUp(): void {
-		super.setUp();
-
-		this.setCurrentUserInfo();
+	protected onSetUp(): void {
+		void this.setCurrentUserInfo();
 	}
 
 	/**
 	 * Set the current user info in the local state.
 	 */
-	private setCurrentUserInfo(): void {
+	private async setCurrentUserInfo(): Promise< void > {
 		const states = this.getStates();
 		const otherUserColors = Array.from( states.entries() )
 			.filter(
@@ -35,7 +33,7 @@ export abstract class BaseAwarenessState<
 			.filter( Boolean );
 
 		// Get current user info and set it in local state.
-		const currentUser = select( coreStore ).getCurrentUser();
+		const currentUser = await resolveSelect( coreStore ).getCurrentUser();
 		const userInfo = generateUserInfo( currentUser, otherUserColors );
 		this.setLocalStateField( 'userInfo', userInfo );
 	}

@@ -548,7 +548,10 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/file' } );
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/paragraph' }, { name: 'core/code' } ],
+			innerBlocks: [
+				{ name: 'core/paragraph' },
+				{ name: 'core/pullquote' },
+			],
 		} );
 
 		// Open List View.
@@ -562,13 +565,12 @@ test.describe( 'List View', () => {
 			} )
 			.click();
 
-		// Expand group block, then move to code block, and copy.
+		// Move down to group block, expand, and then move to the paragraph block.
+		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
 		await pageUtils.pressKeys( 'primary+c' );
-
-		// Move up to paragraph block and paste.
 		await page.keyboard.press( 'ArrowUp' );
 		await pageUtils.pressKeys( 'primary+v' );
 
@@ -585,12 +587,12 @@ test.describe( 'List View', () => {
 					selected: true,
 					innerBlocks: [
 						{
-							name: 'core/code',
+							name: 'core/pullquote',
 							selected: false,
 							focused: true,
 						},
 						{
-							name: 'core/code',
+							name: 'core/pullquote',
 							selected: false,
 							focused: false,
 						},
@@ -690,7 +692,10 @@ test.describe( 'List View', () => {
 		await editor.insertBlock( { name: 'core/file' } );
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/code' }, { name: 'core/code' } ],
+			innerBlocks: [
+				{ name: 'core/pullquote' },
+				{ name: 'core/pullquote' },
+			],
 		} );
 
 		// Open List View.
@@ -732,12 +737,12 @@ test.describe( 'List View', () => {
 					focused: true,
 					innerBlocks: [
 						{
-							name: 'core/code',
+							name: 'core/pullquote',
 							selected: false,
 							focused: false,
 						},
 						{
-							name: 'core/code',
+							name: 'core/pullquote',
 							selected: false,
 							focused: false,
 						},
@@ -755,7 +760,7 @@ test.describe( 'List View', () => {
 		// Insert some blocks of different types.
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/quote' } ],
+			innerBlocks: [ { name: 'core/pullquote' } ],
 		} );
 		await editor.insertBlock( {
 			name: 'core/columns',
@@ -883,7 +888,7 @@ test.describe( 'List View', () => {
 		// Insert some blocks of different types.
 		await editor.insertBlock( {
 			name: 'core/group',
-			innerBlocks: [ { name: 'core/quote' } ],
+			innerBlocks: [ { name: 'core/pullquote' } ],
 		} );
 		await editor.insertBlock( {
 			name: 'core/columns',

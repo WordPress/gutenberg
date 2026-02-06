@@ -8,7 +8,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useRef } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { useFocusOnMount } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
@@ -26,6 +26,7 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
+import useReportValidity from '../../../hooks/use-report-validity';
 
 function DropdownHeader( {
 	title,
@@ -38,9 +39,9 @@ function DropdownHeader( {
 		<Stack
 			direction="column"
 			className="dataforms-layouts-panel__dropdown-header"
-			gap="md"
+			gap="lg"
 		>
-			<Stack direction="row" gap="xs" align="center">
+			<Stack direction="row" gap="sm" align="center">
 				{ title && (
 					<Heading level={ 2 } size={ 13 }>
 						{ title }
@@ -60,6 +61,18 @@ function DropdownHeader( {
 	);
 }
 
+function DropdownContentWithValidation( {
+	touched,
+	children,
+}: {
+	touched: boolean;
+	children: React.ReactNode;
+} ) {
+	const ref = useRef< HTMLDivElement >( null );
+	useReportValidity( ref, touched );
+	return <div ref={ ref }>{ children }</div>;
+}
+
 function PanelDropdown< Item >( {
 	data,
 	field,
@@ -69,7 +82,8 @@ function PanelDropdown< Item >( {
 	summaryFields,
 	fieldDefinition,
 	popoverAnchor,
-	onOpen,
+	onClose: onCloseCallback,
+	touched,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -79,7 +93,8 @@ function PanelDropdown< Item >( {
 	summaryFields: NormalizedField< Item >[];
 	fieldDefinition: NormalizedField< Item >;
 	popoverAnchor: HTMLElement | null;
-	onOpen?: () => void;
+	onClose?: () => void;
+	touched: boolean;
 } ) {
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
@@ -125,6 +140,11 @@ function PanelDropdown< Item >( {
 			contentClassName="dataforms-layouts-panel__field-dropdown"
 			popoverProps={ popoverProps }
 			focusOnMount={ false }
+			onToggle={ ( willOpen ) => {
+				if ( ! willOpen ) {
+					onCloseCallback?.();
+				}
+			} }
 			toggleProps={ {
 				size: 'compact',
 				variant: 'tertiary',
@@ -137,17 +157,12 @@ function PanelDropdown< Item >( {
 					labelPosition={ labelPosition }
 					fieldLabel={ fieldLabel }
 					disabled={ fieldDefinition.readOnly === true }
-					onClick={ () => {
-						if ( ! isOpen && onOpen ) {
-							onOpen();
-						}
-						onToggle();
-					} }
+					onClick={ onToggle }
 					aria-expanded={ isOpen }
 				/>
 			) }
 			renderContent={ ( { onClose } ) => (
-				<>
+				<DropdownContentWithValidation touched={ touched }>
 					<DropdownHeader title={ fieldLabel } onClose={ onClose } />
 					<div ref={ focusOnMountRef }>
 						<DataFormLayout
@@ -159,7 +174,8 @@ function PanelDropdown< Item >( {
 							{ (
 								FieldLayout,
 								childField,
-								childFieldValidity
+								childFieldValidity,
+								markWhenOptional
 							) => (
 								<FieldLayout
 									key={ childField.id }
@@ -169,12 +185,13 @@ function PanelDropdown< Item >( {
 									hideLabelFromVision={
 										( form?.fields ?? [] ).length < 2
 									}
+									markWhenOptional={ markWhenOptional }
 									validity={ childFieldValidity }
 								/>
 							) }
 						</DataFormLayout>
 					</div>
-				</>
+				</DropdownContentWithValidation>
 			) }
 		/>
 	);
