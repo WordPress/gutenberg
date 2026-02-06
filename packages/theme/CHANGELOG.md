@@ -4,6 +4,20 @@
 
 ### Breaking changes
 
+-   Renamed padding tokens to remove the `surface` segment and updated the scale from `2xs`–`lg` to `xs`–`3xl` ([#75054](https://github.com/WordPress/gutenberg/pull/75054)). To preserve the same values:
+    -   `--wpds-dimension-padding-surface-2xs`: use `--wpds-dimension-padding-xs` instead.
+    -   `--wpds-dimension-padding-surface-xs`: use `--wpds-dimension-padding-sm` instead.
+    -   `--wpds-dimension-padding-surface-sm`: use `--wpds-dimension-padding-lg` instead.
+    -   `--wpds-dimension-padding-surface-md`: use `--wpds-dimension-padding-2xl` instead.
+    -   `--wpds-dimension-padding-surface-lg`: use `--wpds-dimension-padding-3xl` instead.
+-   Updated gap token scale from `2xs`–`xl` to `xs`–`3xl` ([#75054](https://github.com/WordPress/gutenberg/pull/75054)). To preserve the same values:
+    -   `--wpds-dimension-gap-2xs`: use `--wpds-dimension-gap-xs` instead.
+    -   `--wpds-dimension-gap-xs`: use `--wpds-dimension-gap-sm` instead.
+    -   `--wpds-dimension-gap-sm`: use `--wpds-dimension-gap-md` instead.
+    -   `--wpds-dimension-gap-md`: use `--wpds-dimension-gap-lg` instead.
+    -   `--wpds-dimension-gap-lg`: use `--wpds-dimension-gap-xl` instead.
+    -   `--wpds-dimension-gap-xl`: use `--wpds-dimension-gap-2xl` instead.
+    -   `--wpds-dimension-gap-2xl`: use `--wpds-dimension-gap-3xl` instead.
 -   Renamed elevation tokens to use abbreviated size names for consistency with other tokens ([#75103](https://github.com/WordPress/gutenberg/pull/75103)):
     -   `--wpds-elevation-x-small`: use `--wpds-elevation-xs` instead.
     -   `--wpds-elevation-small`: use `--wpds-elevation-sm` instead.
