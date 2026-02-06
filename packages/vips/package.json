@@ -25,23 +25,29 @@
 	},
 	"files": [
 		"src",
-		"build",
 		"build-module",
 		"build-types",
 		"*.md"
 	],
-	"main": "build/index.cjs",
+	"type": "module",
 	"module": "build-module/index.mjs",
 	"exports": {
 		".": {
 			"types": "./build-types/index.d.ts",
-			"import": "./build-module/index.mjs",
-			"default": "./build/index.cjs"
+			"import": "./build-module/index.mjs"
+		},
+		"./worker": {
+			"types": "./build-types/vips-worker.d.ts",
+			"import": "./build-module/vips-worker.mjs"
 		},
 		"./package.json": "./package.json"
 	},
 	"types": "build-types",
+	"wpWorkers": {
+		"./worker": "./src/worker.ts"
+	},
 	"dependencies": {
+		"@wordpress/worker-threads": "file:../worker-threads",
 		"wasm-vips": "^0.0.10"
 	},
 	"publishConfig": {

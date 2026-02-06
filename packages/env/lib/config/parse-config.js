@@ -235,6 +235,8 @@ async function getDefaultConfig(
 		lifecycleScripts: {
 			afterStart: null,
 			afterClean: null,
+			afterReset: null,
+			afterCleanup: null,
 			afterDestroy: null,
 		},
 		env: {
@@ -310,6 +312,12 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 		overrideConfig.phpVersion = overrides.phpVersion;
 		overrideConfig.env.development.phpVersion = overrides.phpVersion;
 		overrideConfig.env.tests.phpVersion = overrides.phpVersion;
+	}
+
+	if ( overrides.multisite ) {
+		overrideConfig.multisite = overrides.multisite;
+		overrideConfig.env.development.multisite = overrides.multisite;
+		overrideConfig.env.tests.multisite = overrides.multisite;
 	}
 
 	return overrideConfig;

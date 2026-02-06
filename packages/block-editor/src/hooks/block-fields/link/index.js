@@ -67,12 +67,11 @@ export function getUpdatedLinkAttributes( {
 	};
 }
 
-export default function Link( { data, field, onChange, config = {} } ) {
+export default function Link( { data, field, onChange } ) {
 	const [ isLinkControlOpen, setIsLinkControlOpen ] = useState( false );
 	const { popoverProps } = useInspectorPopoverPlacement( {
 		isControl: true,
 	} );
-	const { fieldDef } = config;
 	const value = field.getValue( { item: data } );
 	const url = value?.url;
 	const rel = value?.rel || '';
@@ -148,21 +147,10 @@ export default function Link( { data, field, onChange, config = {} } ) {
 							);
 						} }
 						onRemove={ () => {
-							// Remove all link-related properties based on what's in the mapping
-							const removeValue = {};
-
-							if ( fieldDef?.mapping ) {
-								Object.keys( fieldDef.mapping ).forEach(
-									( key ) => {
-										removeValue[ key ] = undefined;
-									}
-								);
-							}
-
 							onChange(
 								field.setValue( {
 									item: data,
-									value: removeValue,
+									value: {},
 								} )
 							);
 						} }

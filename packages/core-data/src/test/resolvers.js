@@ -59,10 +59,6 @@ describe( 'getEntityRecord', () => {
 		getSyncManager.mockImplementation( () => syncManager );
 	} );
 
-	afterEach( () => {
-		delete window.__experimentalEnableSync;
-	} );
-
 	it( 'yields with requested post type', async () => {
 		// Provide response
 		triggerFetch.mockImplementation( () => POST_TYPE_RESPONSE );
@@ -132,7 +128,7 @@ describe( 'getEntityRecord', () => {
 		);
 	} );
 
-	it( 'loads entity with sync manager when __experimentalEnableSync is true', async () => {
+	it( 'loads entity with sync manager when IS_GUTENBERG_PLUGIN is true', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {
 			json: () => Promise.resolve( POST_RECORD ),
@@ -146,8 +142,6 @@ describe( 'getEntityRecord', () => {
 				syncConfig: {},
 			},
 		];
-
-		window.__experimentalEnableSync = true;
 
 		const resolveSelectWithSync = {
 			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
@@ -174,8 +168,11 @@ describe( 'getEntityRecord', () => {
 			1,
 			POST_RECORD,
 			{
+				addUndoMeta: expect.any( Function ),
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
+				refetchRecord: expect.any( Function ),
+				restoreUndoMeta: expect.any( Function ),
 				saveRecord: expect.any( Function ),
 			}
 		);
@@ -200,8 +197,6 @@ describe( 'getEntityRecord', () => {
 				},
 			},
 		];
-
-		window.__experimentalEnableSync = true;
 
 		const resolveSelectWithSync = {
 			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
@@ -228,8 +223,11 @@ describe( 'getEntityRecord', () => {
 			1,
 			{ ...POST_RECORD, foo: 'bar' },
 			{
+				addUndoMeta: expect.any( Function ),
 				editRecord: expect.any( Function ),
 				getEditedRecord: expect.any( Function ),
+				refetchRecord: expect.any( Function ),
+				restoreUndoMeta: expect.any( Function ),
 				saveRecord: expect.any( Function ),
 			}
 		);
@@ -250,8 +248,6 @@ describe( 'getEntityRecord', () => {
 			},
 		];
 
-		window.__experimentalEnableSync = true;
-
 		const resolveSelectWithSync = {
 			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
 		};
@@ -260,40 +256,6 @@ describe( 'getEntityRecord', () => {
 
 		// Call with a query parameter
 		await getEntityRecord( 'postType', 'post', 1, { foo: 'bar' } )( {
-			dispatch,
-			registry,
-			resolveSelect: resolveSelectWithSync,
-		} );
-
-		expect( syncManager.load ).not.toHaveBeenCalled();
-	} );
-
-	it( 'does not load entity when __experimentalEnableSync is undefined', async () => {
-		const POST_RECORD = { id: 1, title: 'Test Post' };
-		const POST_RESPONSE = {
-			json: () => Promise.resolve( POST_RECORD ),
-		};
-		const ENTITIES_WITH_SYNC = [
-			{
-				name: 'post',
-				kind: 'postType',
-				baseURL: '/wp/v2/posts',
-				baseURLParams: { context: 'edit' },
-				syncConfig: {},
-			},
-		];
-
-		const resolveSelectWithSync = {
-			getEntitiesConfig: jest.fn( () => ENTITIES_WITH_SYNC ),
-		};
-
-		triggerFetch.mockImplementation( () => POST_RESPONSE );
-
-		await getEntityRecord(
-			'postType',
-			'post',
-			1
-		)( {
 			dispatch,
 			registry,
 			resolveSelect: resolveSelectWithSync,

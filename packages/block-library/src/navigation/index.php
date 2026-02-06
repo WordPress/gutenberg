@@ -6,6 +6,37 @@
  */
 
 /**
+ * Returns the submenu visibility value with backward compatibility
+ * for the deprecated openSubmenusOnClick attribute.
+ *
+ * NOTE: Keep this function in sync with getSubmenuVisibility in
+ * packages/block-library/src/navigation/utils/get-submenu-visibility.js
+ *
+ * This function centralizes the migration logic from the boolean
+ * openSubmenusOnClick to the new submenuVisibility enum.
+ *
+ * @since 6.9.0
+ *
+ * @param array $attributes Block attributes containing submenuVisibility and/or openSubmenusOnClick.
+ * @return string The visibility mode: 'hover', 'click', or 'always'.
+ */
+function block_core_navigation_get_submenu_visibility( $attributes ) {
+	$submenu_visibility     = isset( $attributes['submenuVisibility'] ) ? $attributes['submenuVisibility'] : null;
+	$open_submenus_on_click = isset( $attributes['openSubmenusOnClick'] ) ? $attributes['openSubmenusOnClick'] : null;
+
+	// If new attribute is set, use it.
+	if ( null !== $submenu_visibility ) {
+		return $submenu_visibility;
+	}
+
+	// Fall back to old attribute for backward compatibility.
+	// openSubmenusOnClick: true  -> 'click'
+	// openSubmenusOnClick: false -> 'hover'
+	// openSubmenusOnClick: null  -> 'hover' (default)
+	return ! empty( $open_submenus_on_click ) ? 'click' : 'hover';
+}
+
+/**
  * Helper functions used to render the navigation block.
  *
  * @since 6.5.0
@@ -41,17 +72,6 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static $seen_menu_names = array();
 
-	/**
-	 * Returns whether the navigation overlay experiment is enabled.
-	 *
-	 * @since 6.5.0
-	 *
-	 * @return bool Returns whether the navigation overlay experiment is enabled.
-	 */
-	private static function is_overlay_experiment_enabled() {
-		$gutenberg_experiments = get_option( 'gutenberg-experiments' );
-		return $gutenberg_experiments && array_key_exists( 'gutenberg-customizable-navigation-overlays', $gutenberg_experiments );
-	}
 
 	/**
 	 * Returns whether or not this is responsive navigation.
@@ -119,9 +139,12 @@ class WP_Navigation_Block_Renderer {
 	 * @return bool Returns whether or not to load the view script.
 	 */
 	private static function is_interactive( $attributes, $inner_blocks ) {
-		$has_submenus       = static::has_submenus( $inner_blocks );
-		$is_responsive_menu = static::is_responsive( $attributes );
-		return ( $has_submenus && ( $attributes['openSubmenusOnClick'] || $attributes['showSubmenuIcon'] ) ) || $is_responsive_menu;
+		$has_submenus        = static::has_submenus( $inner_blocks );
+		$is_responsive_menu  = static::is_responsive( $attributes );
+		$computed_visibility = block_core_navigation_get_submenu_visibility( $attributes );
+		$open_on_click       = 'click' === $computed_visibility;
+		$show_submenu_icon   = ! empty( $attributes['showSubmenuIcon'] );
+		return ( $has_submenus && ( $open_on_click || $show_submenu_icon ) ) || $is_responsive_menu;
 	}
 
 	/**
@@ -325,6 +348,9 @@ class WP_Navigation_Block_Renderer {
 					$block['attrs'] = array();
 				}
 				$block['attrs']['overlayMenu'] = 'never';
+				// Mark this as a nested navigation within an overlay template part
+				// so we can handle its rendering differently.
+				$block['attrs']['_isWithinOverlayTemplatePart'] = true;
 			}
 
 			// Recursively process inner blocks.
@@ -351,13 +377,17 @@ class WP_Navigation_Block_Renderer {
 		}
 
 		// Parse the template part ID (format: "theme//slug").
+		// If it's just a slug, construct the full ID using the current theme.
 		$parts = explode( '//', $overlay_template_part_id, 2 );
-		if ( count( $parts ) !== 2 ) {
-			return new WP_Block_List( array(), $attributes );
+		if ( count( $parts ) === 2 ) {
+			// Already in "theme//slug" format (backward compatibility).
+			$theme = $parts[0];
+			$slug  = $parts[1];
+		} else {
+			// Just a slug, use current theme.
+			$theme = get_stylesheet();
+			$slug  = $overlay_template_part_id;
 		}
-
-		$theme = $parts[0];
-		$slug  = $parts[1];
 
 		// Only query for template parts from the active theme.
 		if ( get_stylesheet() !== $theme ) {
@@ -387,7 +417,9 @@ class WP_Navigation_Block_Renderer {
 
 		if ( ! $template_part_post ) {
 			// Try to get from theme file if not in database.
-			$block_template = get_block_file_template( $overlay_template_part_id, 'wp_template_part' );
+			// Construct the full template part ID for get_block_file_template.
+			$full_template_part_id = $theme . '//' . $slug;
+			$block_template        = get_block_file_template( $full_template_part_id, 'wp_template_part' );
 			if ( isset( $block_template->content ) ) {
 				$parsed_blocks = parse_blocks( $block_template->content );
 				$blocks        = block_core_navigation_filter_out_empty_blocks( $parsed_blocks );
@@ -507,15 +539,7 @@ class WP_Navigation_Block_Renderer {
 			// Only published posts are valid. If this is changed then a corresponding change
 			// must also be implemented in `use-navigation-menu.js`.
 			if ( 'publish' === $navigation_post->post_status ) {
-				$navigation_name = $navigation_post->post_title;
-
-				// This is used to count the number of times a navigation name has been seen,
-				// so that we can ensure every navigation has a unique id.
-				if ( isset( static::$seen_menu_names[ $navigation_name ] ) ) {
-					++static::$seen_menu_names[ $navigation_name ];
-				} else {
-					static::$seen_menu_names[ $navigation_name ] = 1;
-				}
+				return $navigation_post->post_title;
 			}
 		}
 
@@ -600,6 +624,47 @@ class WP_Navigation_Block_Renderer {
 	}
 
 	/**
+	 * Get responsive container classes for the navigation block.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param bool  $is_hidden_by_default Whether the responsive menu is hidden by default.
+	 * @param bool  $has_custom_overlay Whether a custom overlay is used.
+	 * @param array $colors The colors array.
+	 * @return array Returns the responsive container classes.
+	 */
+	private static function get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors ) {
+		$responsive_container_classes = array( 'wp-block-navigation__responsive-container' );
+
+		if ( $is_hidden_by_default ) {
+			$responsive_container_classes[] = 'hidden-by-default';
+		}
+
+		if ( $has_custom_overlay ) {
+			$responsive_container_classes[] = 'disable-default-overlay';
+		} else {
+			// Don't apply overlay color classes if using a custom overlay template part.
+			// The custom overlay is responsible for its own styling.
+			$responsive_container_classes[] = implode( ' ', $colors['overlay_css_classes'] );
+		}
+
+		return $responsive_container_classes;
+	}
+
+	/**
+	 * Get overlay inline styles for the navigation block.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @param array $colors The colors array.
+	 * @return string Returns the overlay inline styles.
+	 */
+	private static function get_overlay_inline_styles( $has_custom_overlay, $colors ) {
+		$overlay_inline_styles = $has_custom_overlay ? '' : esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
+		return ( ! empty( $overlay_inline_styles ) ) ? "style=\"$overlay_inline_styles\"" : '';
+	}
+
+	/**
 	 * Get the responsive container markup
 	 *
 	 * @since 6.5.0
@@ -616,47 +681,38 @@ class WP_Navigation_Block_Renderer {
 
 		$is_hidden_by_default = isset( $attributes['overlayMenu'] ) && 'always' === $attributes['overlayMenu'];
 
-		// Set-up variables for the custom overlay experiment.
-		// Values are set to "off" so they don't affect the default behavior.
-		$is_overlay_experiment_enabled  = static::is_overlay_experiment_enabled();
+		// Set-up variables for custom overlays.
 		$has_custom_overlay             = false;
 		$close_button_markup            = '';
 		$has_custom_overlay_close_block = false;
 		$overlay_blocks_html            = '';
 		$custom_overlay_markup          = '';
 
-		if ( $is_overlay_experiment_enabled ) {
-			// Check if an overlay template part is selected and render it.
-			// This needs to happen before building classes so we know if overlay blocks actually exist.
-			if ( ! empty( $attributes['overlay'] ) ) {
-				// Get blocks from the overlay template part.
-				$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
-				// Check if overlay contains a navigation-overlay-close block.
-				$has_custom_overlay_close_block = block_core_navigation_block_tree_has_block_type(
-					$overlay_blocks,
-					'core/navigation-overlay-close',
-					array( 'core/navigation' ) // Skip navigation blocks, as they cannot contain an overlay close block
-				);
-				// Render template part blocks directly without navigation container wrapper.
-				$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
-				// Add Interactivity API directives to the overlay close block if present.
-				if ( $has_custom_overlay_close_block && $is_interactive ) {
-					$tags                = new WP_HTML_Tag_Processor( $overlay_blocks_html );
-					$overlay_blocks_html = block_core_navigation_add_directives_to_overlay_close( $tags );
-				}
+		// Check if an overlay template part is selected and render it.
+		// This needs to happen before building classes so we know if overlay blocks actually exist.
+		if ( ! empty( $attributes['overlay'] ) ) {
+			// Get blocks from the overlay template part.
+			$overlay_blocks = static::get_overlay_blocks_from_template_part( $attributes['overlay'], $attributes );
+			// Check if overlay contains a navigation-overlay-close block.
+			$has_custom_overlay_close_block = block_core_navigation_block_tree_has_block_type(
+				$overlay_blocks,
+				'core/navigation-overlay-close',
+				array( 'core/navigation' ) // Skip navigation blocks, as they cannot contain an overlay close block
+			);
+			// Render template part blocks directly without navigation container wrapper.
+			$overlay_blocks_html = static::get_template_part_blocks_html( $overlay_blocks );
+			// Add Interactivity API directives to the overlay close block if present.
+			if ( $has_custom_overlay_close_block && $is_interactive ) {
+				$tags                = new WP_HTML_Tag_Processor( $overlay_blocks_html );
+				$overlay_blocks_html = block_core_navigation_add_directives_to_overlay_close( $tags );
 			}
-
-			$has_custom_overlay = ! empty( $overlay_blocks_html );
 		}
 
-		// Only add the disable-default-overlay class if experiment is enabled AND overlay blocks actually rendered.
-		$responsive_container_classes = array(
-			'wp-block-navigation__responsive-container',
-			$is_hidden_by_default ? 'hidden-by-default' : '',
-			$has_custom_overlay ? 'disable-default-overlay' : '',
-			implode( ' ', $colors['overlay_css_classes'] ),
-		);
-		$open_button_classes          = array(
+		$has_custom_overlay = ! empty( $overlay_blocks_html );
+
+		$responsive_container_classes = static::get_responsive_container_classes( $is_hidden_by_default, $has_custom_overlay, $colors );
+
+		$open_button_classes = array(
 			'wp-block-navigation__responsive-container-open',
 			$is_hidden_by_default ? 'always-shown' : '',
 		);
@@ -705,7 +761,9 @@ class WP_Navigation_Block_Renderer {
 			';
 		}
 
-		$overlay_inline_styles = esc_attr( safecss_filter_attr( $colors['overlay_inline_styles'] ) );
+		// Don't apply overlay inline styles if using a custom overlay template part.
+		// The custom overlay is responsible for its own styling.
+		$overlay_inline_styles = static::get_overlay_inline_styles( $has_custom_overlay, $colors );
 
 		if ( $has_custom_overlay ) {
 			$custom_overlay_markup = sprintf(
@@ -744,7 +802,7 @@ class WP_Navigation_Block_Renderer {
 			$toggle_aria_label_close,
 			esc_attr( trim( implode( ' ', $responsive_container_classes ) ) ),
 			esc_attr( trim( implode( ' ', $open_button_classes ) ) ),
-			( ! empty( $overlay_inline_styles ) ) ? "style=\"$overlay_inline_styles\"" : '',
+			$overlay_inline_styles,
 			$toggle_button_content,
 			$toggle_close_button_content,
 			$open_button_directives,
@@ -765,8 +823,7 @@ class WP_Navigation_Block_Renderer {
 	 * @param WP_Block_List $inner_blocks  A list of inner blocks.
 	 * @return string Returns the navigation block markup.
 	 */
-	private static function get_nav_wrapper_attributes( $attributes, $inner_blocks ) {
-		$nav_menu_name      = static::get_unique_navigation_name( $attributes );
+	private static function get_nav_attributes( $attributes, $inner_blocks ) {
 		$is_interactive     = static::is_interactive( $attributes, $inner_blocks );
 		$is_responsive_menu = static::is_responsive( $attributes );
 		$style              = static::get_styles( $attributes );
@@ -775,6 +832,15 @@ class WP_Navigation_Block_Renderer {
 			'class' => $class,
 			'style' => $style,
 		);
+		// Only add aria-label for top-level navigation blocks.
+		// Skip navigation blocks marked as being within overlay template parts.
+		$is_within_overlay = $attributes['_isWithinOverlayTemplatePart'] ?? false;
+		if ( $is_within_overlay ) {
+			$nav_menu_name = static::get_navigation_name( $attributes );
+		} else {
+			$nav_menu_name = static::get_unique_navigation_name( $attributes );
+		}
+
 		if ( ! empty( $nav_menu_name ) ) {
 			$extra_attributes['aria-label'] = $nav_menu_name;
 		}
@@ -844,7 +910,7 @@ class WP_Navigation_Block_Renderer {
 	 * @param WP_Block_List $inner_blocks The list of inner blocks.
 	 * @return string Returns the navigation wrapper markup.
 	 */
-	private static function get_wrapper_markup( $attributes, $inner_blocks ) {
+	private static function get_inner_block_markup( $attributes, $inner_blocks ) {
 		$inner_blocks_html = static::get_inner_blocks_html( $attributes, $inner_blocks );
 		if ( static::is_responsive( $attributes ) ) {
 			return static::get_responsive_container_markup( $attributes, $inner_blocks, $inner_blocks_html );
@@ -862,6 +928,14 @@ class WP_Navigation_Block_Renderer {
 	 */
 	private static function get_unique_navigation_name( $attributes ) {
 		$nav_menu_name = static::get_navigation_name( $attributes );
+
+		// This is used to count the number of times a navigation name has been seen,
+		// so that we can ensure every navigation has a unique id.
+		if ( isset( static::$seen_menu_names[ $nav_menu_name ] ) ) {
+			++static::$seen_menu_names[ $nav_menu_name ];
+		} else {
+			static::$seen_menu_names[ $nav_menu_name ] = 1;
+		}
 
 		// If the menu name has been used previously then append an ID
 		// to the name to ensure uniqueness across a given post.
@@ -912,10 +986,15 @@ class WP_Navigation_Block_Renderer {
 
 		static::handle_view_script_module_loading( $attributes, $block, $inner_blocks );
 
+		// Use div wrapper if this navigation block is within an overlay template part.
+		$is_within_overlay = $attributes['_isWithinOverlayTemplatePart'] ?? false;
+		$tag_name          = $is_within_overlay ? 'div' : 'nav';
+
 		return sprintf(
-			'<nav %1$s>%2$s</nav>',
-			static::get_nav_wrapper_attributes( $attributes, $inner_blocks ),
-			static::get_wrapper_markup( $attributes, $inner_blocks )
+			'<%1$s %2$s>%3$s</%1$s>',
+			$tag_name,
+			static::get_nav_attributes( $attributes, $inner_blocks ),
+			static::get_inner_block_markup( $attributes, $inner_blocks )
 		);
 	}
 }
@@ -1059,7 +1138,10 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		// event.
 		$tags->set_attribute( 'tabindex', '-1' );
 
-		if ( ! isset( $block_attributes['openSubmenusOnClick'] ) || false === $block_attributes['openSubmenusOnClick'] ) {
+		$computed_visibility = block_core_navigation_get_submenu_visibility( $block_attributes );
+		$open_on_hover       = 'hover' === $computed_visibility;
+
+		if ( $open_on_hover ) {
 			$tags->set_attribute( 'data-wp-on--mouseenter', 'actions.openMenuOnHover' );
 			$tags->set_attribute( 'data-wp-on--mouseleave', 'actions.closeMenuOnHover' );
 		}

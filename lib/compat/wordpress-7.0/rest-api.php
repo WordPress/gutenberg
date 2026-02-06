@@ -34,7 +34,7 @@ if ( ! gutenberg_is_experiment_enabled( 'active_templates' ) ) {
 
 /**
  * Registers the Registered Templates Parts REST API routes.
- * The template activation experiement does not, however, register the routes for the wp_template_part post type,
+ * The template activation experiment does not, however, register the routes for the wp_template_part post type,
  * so we need to register the routes for that post type here.
  * See: lib/compat/wordpress-7.0/template-activate.php
  *
@@ -49,25 +49,23 @@ function gutenberg_modify_wp_template_part_post_type_args_7_0( $args ) {
 add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_wp_template_part_post_type_args_7_0' );
 
 /**
- * Registers the 'navigation-overlay' template part area when the experiment is enabled.
+ * Registers the 'navigation-overlay' template part area.
  *
  * @param array $areas Array of template part area definitions.
  * @return array Modified array of template part area definitions.
  */
-if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
-	function gutenberg_register_overlay_template_part_area( $areas ) {
-		$areas[] = array(
-			'area'        => 'navigation-overlay',
-			'label'       => __( 'Navigation Overlay', 'gutenberg' ),
-			'description' => __( 'Custom overlay area for navigation overlays.', 'gutenberg' ),
-			'icon'        => 'overlay',
-			'area_tag'    => 'div',
-		);
+function gutenberg_register_overlay_template_part_area( $areas ) {
+	$areas[] = array(
+		'area'        => 'navigation-overlay',
+		'label'       => __( 'Navigation Overlay', 'gutenberg' ),
+		'description' => __( 'Custom overlay area for navigation overlays.', 'gutenberg' ),
+		'icon'        => 'overlay',
+		'area_tag'    => 'div',
+	);
 
-		return $areas;
-	}
-	add_filter( 'default_wp_template_part_areas', 'gutenberg_register_overlay_template_part_area' );
+	return $areas;
 }
+add_filter( 'default_wp_template_part_areas', 'gutenberg_register_overlay_template_part_area' );
 
 /**
  * Adds user global styles link relation to all theme responses.

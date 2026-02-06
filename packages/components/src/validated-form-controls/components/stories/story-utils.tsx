@@ -5,7 +5,7 @@
 /**
  * External dependencies
  */
-import type { Meta } from '@storybook/react';
+import type { Meta } from '@storybook/react-vite';
 
 /**
  * Internal dependencies

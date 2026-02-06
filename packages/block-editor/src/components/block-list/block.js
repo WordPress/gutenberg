@@ -106,6 +106,7 @@ function BlockListBlock( {
 	const {
 		mayDisplayControls,
 		mayDisplayParentControls,
+		isSelectionWithinCurrentSection,
 		themeSupportsLayout,
 		...context
 	} = useContext( PrivateBlockContext );
@@ -135,6 +136,7 @@ function BlockListBlock( {
 			}
 			mayDisplayControls={ mayDisplayControls }
 			mayDisplayParentControls={ mayDisplayParentControls }
+			mayDisplayPatternEditingControls={ isSelectionWithinCurrentSection }
 			blockEditingMode={ context.blockEditingMode }
 			isPreviewMode={ context.isPreviewMode }
 		/>
@@ -231,6 +233,7 @@ function BlockListBlock( {
 			value={ {
 				wrapperProps: updatedWrapperProps,
 				isAligned,
+				isSelectionWithinCurrentSection,
 				...context,
 			} }
 		>
@@ -621,6 +624,8 @@ function BlockListBlockProvider( props ) {
 				settings?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
 
 			const hasLightBlockWrapper = blockType?.apiVersion > 1;
+			const isMultiSelected = isBlockMultiSelected( clientId );
+			const blockEditingMode = getBlockEditingMode( clientId );
 			const previewContext = {
 				isPreviewMode,
 				blockWithoutAttributes,
@@ -640,6 +645,9 @@ function BlockListBlockProvider( props ) {
 				bindableAttributes,
 				blockVisibility,
 				deviceType,
+				isMultiSelected,
+				blockEditingMode,
+				isEditingDisabled: blockEditingMode === 'disabled',
 			};
 
 			// When in preview mode, we can avoid a lot of selection and
@@ -651,13 +659,11 @@ function BlockListBlockProvider( props ) {
 			const canRemove = canRemoveBlock( clientId );
 			const canMove = canMoveBlock( clientId );
 			const match = getActiveBlockVariation( blockName, attributes );
-			const isMultiSelected = isBlockMultiSelected( clientId );
 			const checkDeep = true;
 			const isAncestorOfSelectedBlock = hasSelectedInnerBlock(
 				clientId,
 				checkDeep
 			);
-			const blockEditingMode = getBlockEditingMode( clientId );
 			const sectionBlockClientId = _isSectionBlock( clientId )
 				? clientId
 				: getParentSectionBlock( clientId );

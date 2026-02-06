@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 /**
  * Internal dependencies
@@ -36,6 +36,11 @@ const meta: Meta< typeof Card > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Design is in flux, and may differ from the version used in `@wordpress/dataviews`.',
+		},
 	},
 };
 
@@ -66,7 +71,9 @@ export const Default: StoryObj< typeof Card > = {
 				</CardMedia>
 				<CardFooter>
 					<Text>CardFooter</Text>
-					<Button variant="secondary">Action Button</Button>
+					<Button __next40pxDefaultSize variant="secondary">
+						Action Button
+					</Button>
 				</CardFooter>
 			</>
 		),

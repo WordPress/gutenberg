@@ -248,6 +248,13 @@ export const selectPreviousBlock =
 			const firstParentClientId = select.getBlockRootClientId( clientId );
 			if ( firstParentClientId ) {
 				dispatch.selectBlock( firstParentClientId, -1 );
+			} else {
+				// Fallback to next block when no previous block and no parent
+				const nextBlockClientId =
+					select.getNextBlockClientId( clientId );
+				if ( nextBlockClientId ) {
+					dispatch.selectBlock( nextBlockClientId, 0 );
+				}
 			}
 		}
 	};
@@ -510,11 +517,12 @@ export function moveBlockToPosition(
  * Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if
  * a templateLock is active on the block list.
  *
- * @param {Object}   block           Block object to insert.
- * @param {?number}  index           Index at which block should be inserted.
- * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
- * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
- * @param {?Object}  meta            Optional Meta values to be passed to the action object.
+ * @param {Object}    block           Block object to insert.
+ * @param {?number}   index           Index at which block should be inserted.
+ * @param {?string}   rootClientId    Optional root client ID of block list on which to insert.
+ * @param {?boolean}  updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
+ * @param {0|-1|null} initialPosition Initial focus position. Setting it to null prevent focusing the inserted block.
+ * @param {?Object}   meta            Optional Meta values to be passed to the action object.
  *
  * @return {Object} Action object.
  */
@@ -523,6 +531,7 @@ export function insertBlock(
 	index,
 	rootClientId,
 	updateSelection,
+	initialPosition,
 	meta
 ) {
 	return insertBlocks(
@@ -530,7 +539,7 @@ export function insertBlock(
 		index,
 		rootClientId,
 		updateSelection,
-		0,
+		initialPosition,
 		meta
 	);
 }

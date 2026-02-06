@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-webpack5';
+import type { Meta, StoryFn } from '@storybook/react-vite';
 import type { DragEvent } from 'react';
 import { fn } from 'storybook/test';
 
@@ -33,6 +33,11 @@ const meta: Meta< typeof Draggable > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { source: { code: '' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'May be deprecated.',
+		},
 	},
 };
 export default meta;

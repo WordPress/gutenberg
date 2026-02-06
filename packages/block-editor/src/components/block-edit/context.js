@@ -5,6 +5,9 @@ import { createContext, useContext } from '@wordpress/element';
 
 export const mayDisplayControlsKey = Symbol( 'mayDisplayControls' );
 export const mayDisplayParentControlsKey = Symbol( 'mayDisplayParentControls' );
+export const mayDisplayPatternEditingControlsKey = Symbol(
+	'mayDisplayPatternEditingControls'
+);
 export const blockEditingModeKey = Symbol( 'blockEditingMode' );
 export const blockBindingsKey = Symbol( 'blockBindings' );
 export const isPreviewModeKey = Symbol( 'isPreviewMode' );

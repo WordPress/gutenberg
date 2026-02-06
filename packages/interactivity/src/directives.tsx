@@ -46,7 +46,7 @@ const warnUniqueIdWithTwoHyphens = (
 		warn(
 			`The usage of data-wp-${ prefix }--${ suffix }${
 				uniqueId ? `--${ uniqueId }` : ''
-			} (two hyphens for unique ID) is deprecated and will stop working in WordPress 7.0. Please use data-wp-${ prefix }${
+			} (two hyphens for unique ID) is deprecated and will stop working in WordPress 7.1. Please use data-wp-${ prefix }${
 				uniqueId ? `--${ suffix }---${ uniqueId }` : `---${ suffix }`
 			} (three hyphens for unique ID) from now on.`
 		);

@@ -1,5 +1,5 @@
-import { Fragment, useState } from '@wordpress/element';
-import type { Meta, StoryObj } from '@storybook/react-webpack5';
+import { Fragment } from '@wordpress/element';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { cog } from '@wordpress/icons';
 import { Button } from '../index';
 
@@ -131,11 +131,6 @@ export const AllTonesAndVariants: Story = {
 									{ ...args }
 									tone={ tone }
 									variant={ variant }
-									// Disabling because this lint rule was meant for the
-									// `@wordpress/components` Button, but is being applied here.
-									// TODO: rework the lint rule so that it checks the package
-									// where the Button comes from.
-									// eslint-disable-next-line no-restricted-syntax
 									disabled
 								/>
 							</div>
@@ -171,8 +166,7 @@ export const Loading: Story = {
 
 /**
  * The pressed state is only available for buttons with `tone="neutral"` and
- * `variant="minimal"`. This represents a toggle button that is currently in an
- * active/pressed state.
+ * `variant="minimal"` and can be toggled via the `aria-pressed` HTML attribute.
  */
 export const Pressed: Story = {
 	...Default,
@@ -180,18 +174,6 @@ export const Pressed: Story = {
 		...Default.args,
 		tone: 'neutral',
 		variant: 'minimal',
-	},
-	render: ( args ) => {
-		const [ isPressed, setIsPressed ] = useState( true );
-
-		return (
-			<Button
-				{ ...args }
-				aria-pressed={ isPressed }
-				onClick={ () => setIsPressed( ! isPressed ) }
-			>
-				Button
-			</Button>
-		);
+		'aria-pressed': true,
 	},
 };

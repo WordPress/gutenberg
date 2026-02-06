@@ -5,6 +5,7 @@ build-style
 build-types
 build-wp
 node_modules
+.wasm-vips-build
 gutenberg.zip
 .content-entry.js
 coverage

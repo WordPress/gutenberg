@@ -45,7 +45,7 @@ interface DetectOutsideComponentProps {
 }
 
 const DetectOutside = withFocusOutside(
-	class extends Component< DetectOutsideComponentProps > {
+	class DetectOutsideComponent extends Component< DetectOutsideComponentProps > {
 		handleFocusOutside( event: React.FocusEvent ) {
 			this.props.onFocusOutside( event );
 		}

@@ -21,7 +21,9 @@ describe( 'block-visibility utils', () => {
 				{
 					attributes: {
 						metadata: {
-							blockVisibility: {},
+							blockVisibility: {
+								viewport: {},
+							},
 						},
 					},
 				},
@@ -75,7 +77,9 @@ describe( 'block-visibility utils', () => {
 					attributes: {
 						metadata: {
 							blockVisibility: {
-								mobile: false,
+								viewport: {
+									mobile: false,
+								},
 							},
 						},
 					},
@@ -83,7 +87,9 @@ describe( 'block-visibility utils', () => {
 				{
 					attributes: {
 						metadata: {
-							blockVisibility: {},
+							blockVisibility: {
+								viewport: {},
+							},
 						},
 					},
 				},
@@ -105,7 +111,9 @@ describe( 'block-visibility utils', () => {
 				{
 					attributes: {
 						metadata: {
-							blockVisibility: {},
+							blockVisibility: {
+								viewport: {},
+							},
 						},
 					},
 				},
@@ -122,7 +130,9 @@ describe( 'block-visibility utils', () => {
 				attributes: {
 					metadata: {
 						blockVisibility: {
-							mobile: false,
+							viewport: {
+								mobile: false,
+							},
 						},
 					},
 				},
@@ -188,7 +198,9 @@ describe( 'block-visibility utils', () => {
 				{
 					attributes: {
 						metadata: {
-							blockVisibility: {},
+							blockVisibility: {
+								viewport: {},
+							},
 						},
 					},
 				},
@@ -245,7 +257,9 @@ describe( 'block-visibility utils', () => {
 					attributes: {
 						metadata: {
 							blockVisibility: {
-								mobile: false,
+								viewport: {
+									mobile: false,
+								},
 							},
 						},
 					},
@@ -254,7 +268,9 @@ describe( 'block-visibility utils', () => {
 					attributes: {
 						metadata: {
 							blockVisibility: {
-								tablet: false,
+								viewport: {
+									tablet: false,
+								},
 							},
 						},
 					},
