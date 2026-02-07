@@ -95,6 +95,9 @@ function render_block_core_button( $attributes, $content ) {
 		$p = new WP_HTML_Tag_Processor( $content );
 		// Target the outer wrapper div.
 		if ( $p->next_tag( array( 'class_name' => 'wp-block-button' ) ) ) {
+			$p->add_class( 'has-custom-width' );
+			$existing_style = $p->get_attribute( 'style' ) ?? '';
+
 			if ( $is_percentage ) {
 				$numeric_width = (int) $resolved_width;
 				$p->add_class( 'wp-block-button__width' );
@@ -105,15 +108,10 @@ function render_block_core_button( $attributes, $content ) {
 					$p->add_class( 'wp-block-button__width-' . $numeric_width );
 				}
 
-				$existing_style = $p->get_attribute( 'style' ) ?? '';
 				$width_style    = "--wp--block-button--width: $numeric_width;";
 				$p->set_attribute( 'style', $width_style . ( $existing_style ? ' ' . $existing_style : '' ) );
 			} else {
-				$css_value      = $is_preset
-					? 'var(--wp--preset--dimension--' . $slug . ')'
-					: $resolved_width;
-				$existing_style = $p->get_attribute( 'style' ) ?? '';
-				$width_style    = "width: $css_value;";
+				$width_style    = "width: $width;";
 				$p->set_attribute( 'style', $width_style . ( $existing_style ? ' ' . $existing_style : '' ) );
 			}
 
