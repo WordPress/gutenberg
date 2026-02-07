@@ -479,6 +479,14 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 					'terms'    => $stylesheet,
 				),
 			),
+			// Exclude style variation posts - they have their own meta-based lookup.
+			// These posts are linked to variations, not to the default global styles.
+			'meta_query'             => array(
+				array(
+					'key'     => defined( 'GUTENBERG_VARIATION_SOURCE_META_KEY' ) ? GUTENBERG_VARIATION_SOURCE_META_KEY : '_wp_source_variation_id',
+					'compare' => 'NOT EXISTS',
+				),
+			),
 		);
 
 		$global_style_query = new WP_Query();
@@ -619,6 +627,199 @@ class WP_Theme_JSON_Resolver_Gutenberg {
 		}
 
 		$result->merge( static::get_user_data() );
+		return $result;
+	}
+
+	/**
+	 * Returns theme data using an optional base theme instead of the current theme.
+	 *
+	 * This method is used when a style variation specifies a base theme
+	 * that should replace the current theme's theme.json.
+	 *
+		 *
+	 * @param string|null $base_theme_id Optional. The ID of a registered base theme.
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds theme data.
+	 */
+	public static function get_theme_data_with_base( $base_theme_id = null ) {
+		if ( empty( $base_theme_id ) ) {
+			return static::get_theme_data();
+		}
+
+		$registry   = WP_Base_Themes_Registry_Gutenberg::get_instance();
+		$base_theme = $registry->get_registered( $base_theme_id );
+
+		if ( ! $base_theme ) {
+			return static::get_theme_data();
+		}
+
+		// Create theme JSON from base theme data.
+		$base_theme_json = new WP_Theme_JSON_Gutenberg( $base_theme['data'], 'theme' );
+
+		/*
+		 * We want the presets and settings declared in the base theme
+		 * to override the ones declared via theme supports.
+		 */
+		$theme_support_data  = WP_Theme_JSON_Gutenberg::get_from_editor_settings( get_classic_theme_supports_block_editor_settings() );
+		$with_theme_supports = new WP_Theme_JSON_Gutenberg( $theme_support_data );
+		$with_theme_supports->merge( $base_theme_json );
+
+		return $with_theme_supports;
+	}
+
+	/**
+	 * Returns user data from a specific global styles post.
+	 *
+	 * This method is used when a template has an associated style variation
+	 * and we need to use that variation's post as the user layer.
+	 *
+		 *
+	 * @param int $post_id The global styles post ID.
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds user data from the specified post.
+	 */
+	public static function get_user_data_from_post( $post_id ) {
+		$config = array();
+		$post   = get_post( $post_id );
+
+		if ( ! $post || 'wp_global_styles' !== $post->post_type ) {
+			return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
+		}
+
+		$decoded_data = json_decode( $post->post_content, true );
+
+		$json_decoding_error = json_last_error();
+		if ( JSON_ERROR_NONE !== $json_decoding_error ) {
+			return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
+		}
+
+		// Verify the isGlobalStylesUserThemeJSON flag for safety, then accept the data.
+		// Variation posts created via gutenberg_get_or_create_variation_post() include
+		// this flag. Accept data both with and without the flag for variation posts
+		// (which are always created through controlled code paths).
+		if ( is_array( $decoded_data ) ) {
+			unset( $decoded_data['isGlobalStylesUserThemeJSON'] );
+			$config = $decoded_data;
+		}
+
+		/** This filter is documented in wp-includes/class-wp-theme-json-resolver.php */
+		$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
+
+		return $theme_json->get_theme_json();
+	}
+
+	/**
+	 * Returns user data from a registered style variation.
+	 *
+	 * This method is used when a template has an associated style variation
+	 * by string ID, and we need to use that variation's data as the user layer.
+	 *
+		 *
+	 * @param string $variation_id The registered style variation ID.
+	 * @return WP_Theme_JSON_Gutenberg Entity that holds user data from the variation.
+	 */
+	public static function get_user_data_from_registered_variation( $variation_id ) {
+		$config = array();
+
+		// Get the variation from the registry.
+		if ( ! class_exists( 'WP_Style_Variations_Registry_Gutenberg' ) ) {
+			return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
+		}
+
+		$registry  = WP_Style_Variations_Registry_Gutenberg::get_instance();
+		$variation = $registry->get_registered( $variation_id );
+
+		if ( ! $variation || empty( $variation['data'] ) ) {
+			return new WP_Theme_JSON_Gutenberg( $config, 'custom' );
+		}
+
+		$config = $variation['data'];
+
+		/** This filter is documented in wp-includes/class-wp-theme-json-resolver.php */
+		$theme_json = apply_filters( 'wp_theme_json_data_user', new WP_Theme_JSON_Data_Gutenberg( $config, 'custom' ) );
+
+		return $theme_json->get_theme_json();
+	}
+
+	/**
+	 * Returns the merged data for a specific template.
+	 *
+	 * If the template has an associated style variation, that variation's
+	 * styles are used as the user layer. If the variation has an associated
+	 * wp_global_styles post (with user edits), that post's data is used.
+	 * Otherwise, the registered variation's data is used.
+	 *
+	 * Merge order: Core -> Blocks -> Theme (or Base Theme) -> User (variation post OR registered variation OR global)
+	 *
+		 *
+	 * @param string $template_id The template ID (e.g., 'theme//single').
+	 * @param string $origin      Optional. To what level should we merge data.
+	 * @return WP_Theme_JSON_Gutenberg
+	 */
+	public static function get_merged_data_for_template( $template_id, $origin = 'custom' ) {
+		// Check if the experiment is enabled.
+		if ( ! function_exists( 'gutenberg_is_experiment_enabled' ) || ! gutenberg_is_experiment_enabled( 'gutenberg-template-style-variations' ) ) {
+			return static::get_merged_data( $origin );
+		}
+
+		// Get the template's style variation ID (now a string ID like 'demo//dark-mode').
+		$variation_id = null;
+		if ( function_exists( 'gutenberg_get_template_style_variation_id' ) ) {
+			$variation_id = gutenberg_get_template_style_variation_id( $template_id );
+		}
+
+		// If no variation, fall back to normal merge.
+		if ( ! $variation_id ) {
+			return static::get_merged_data( $origin );
+		}
+
+		// Check if there's a wp_global_styles post for this variation.
+		$variation_post_id = null;
+		if ( $variation_id && function_exists( 'gutenberg_get_variation_post_id' ) ) {
+			$variation_post_id = gutenberg_get_variation_post_id( $variation_id );
+		}
+
+		// Get the variation from the registry to check for base_theme.
+		$base_theme_id = null;
+		if ( class_exists( 'WP_Style_Variations_Registry_Gutenberg' ) ) {
+			$registry  = WP_Style_Variations_Registry_Gutenberg::get_instance();
+			$variation = $registry->get_registered( $variation_id );
+			if ( $variation && ! empty( $variation['base_theme'] ) ) {
+				$base_theme_id = $variation['base_theme'];
+			}
+		}
+
+		// Build merged data with template-specific layers.
+		$result = new WP_Theme_JSON_Gutenberg();
+		$result->merge( static::get_core_data() );
+
+		if ( 'default' === $origin ) {
+			return $result;
+		}
+
+		$result->merge( static::get_block_data() );
+
+		if ( 'blocks' === $origin ) {
+			return $result;
+		}
+
+		// Use base theme if specified, otherwise use current theme.
+		if ( $base_theme_id ) {
+			$result->merge( static::get_theme_data_with_base( $base_theme_id ) );
+		} else {
+			$result->merge( static::get_theme_data() );
+		}
+
+		if ( 'theme' === $origin ) {
+			return $result;
+		}
+
+		// Use template-specific user data.
+		// Priority: variation post (user edits) > registered variation data.
+		if ( $variation_post_id ) {
+			$result->merge( static::get_user_data_from_post( $variation_post_id ) );
+		} else {
+			$result->merge( static::get_user_data_from_registered_variation( $variation_id ) );
+		}
+
 		return $result;
 	}
 
