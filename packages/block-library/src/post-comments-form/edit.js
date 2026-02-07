@@ -29,5 +29,4 @@ export default function PostCommentsFormEdit( { context } ) {
 			</VisuallyHidden>
 		</div>
 	);
-
 }
