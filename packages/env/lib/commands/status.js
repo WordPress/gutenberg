@@ -70,7 +70,7 @@ module.exports = async function status( { spinner, debug, json } ) {
 	}
 
 	// Detect and get runtime.
-	const runtimeName = detectRuntime( config.workDirectoryPath );
+	const runtimeName = await detectRuntime( config.workDirectoryPath );
 	const runtime = getRuntime( runtimeName );
 
 	// Get status from runtime.
