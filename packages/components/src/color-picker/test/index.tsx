@@ -419,4 +419,102 @@ describe( 'ColorPicker', () => {
 			expect( alphaInput ).toHaveValue( 75 );
 		} );
 	} );
+
+	describe( 'Hue preservation', () => {
+		it( 'should preserve the picker hue when the color becomes black', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<ControlledColorPicker
+					onChange={ jest.fn() }
+					enableAlpha={ false }
+					initialColor="#3366ff"
+				/>
+			);
+
+			const pickerHueSlider = screen.getByRole( 'slider', {
+				name: 'Hue',
+			} );
+
+			// Blue (#3366ff) has a hue of 225°.
+			expect( pickerHueSlider ).toHaveAttribute( 'aria-valuenow', '225' );
+
+			// Change color to black via hex input.
+			const hexInput = screen.getByRole( 'textbox' );
+			await user.clear( hexInput );
+			await user.type( hexInput, '000000' );
+
+			// The picker hue should still be 225° (blue), not 0° (red).
+			await waitFor( () => {
+				expect( pickerHueSlider ).toHaveAttribute(
+					'aria-valuenow',
+					'225'
+				);
+			} );
+		} );
+
+		it( 'should preserve the picker hue when the color becomes white', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<ControlledColorPicker
+					onChange={ jest.fn() }
+					enableAlpha={ false }
+					initialColor="#38cc38"
+				/>
+			);
+
+			const pickerHueSlider = screen.getByRole( 'slider', {
+				name: 'Hue',
+			} );
+
+			// Green (#38cc38) has a hue of 120°.
+			expect( pickerHueSlider ).toHaveAttribute( 'aria-valuenow', '120' );
+
+			// Change color to white via hex input.
+			const hexInput = screen.getByRole( 'textbox' );
+			await user.clear( hexInput );
+			await user.type( hexInput, 'ffffff' );
+
+			// The picker hue should still be 120° (green), not 0° (red).
+			await waitFor( () => {
+				expect( pickerHueSlider ).toHaveAttribute(
+					'aria-valuenow',
+					'120'
+				);
+			} );
+		} );
+
+		it( 'should preserve the picker hue when the color becomes gray', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<ControlledColorPicker
+					onChange={ jest.fn() }
+					enableAlpha={ false }
+					initialColor="#0000ff"
+				/>
+			);
+
+			const pickerHueSlider = screen.getByRole( 'slider', {
+				name: 'Hue',
+			} );
+
+			// Pure blue (#0000ff) has a hue of 240°.
+			expect( pickerHueSlider ).toHaveAttribute( 'aria-valuenow', '240' );
+
+			// Change color to gray via hex input.
+			const hexInput = screen.getByRole( 'textbox' );
+			await user.clear( hexInput );
+			await user.type( hexInput, '999' );
+
+			// The picker hue should still be 240° (blue), not 0° (red).
+			await waitFor( () => {
+				expect( pickerHueSlider ).toHaveAttribute(
+					'aria-valuenow',
+					'240'
+				);
+			} );
+		} );
+	} );
 } );
