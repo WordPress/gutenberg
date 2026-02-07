@@ -1,16 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	createPortal,
-	findDOMNode,
-	flushSync,
-	/* eslint-disable react/no-deprecated */
-	render,
-	hydrate,
-	unmountComponentAtNode,
-	/* eslint-enable react/no-deprecated */
-} from 'react-dom';
+import { createPortal, flushSync } from 'react-dom';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 
 /**
@@ -25,34 +16,11 @@ import { createRoot, hydrateRoot } from 'react-dom/client';
 export { createPortal };
 
 /**
- * Finds the dom node of a React component.
- *
- * @param {React.ComponentType} component Component's instance.
- */
-export { findDOMNode };
-
-/**
  * Forces React to flush any updates inside the provided callback synchronously.
  *
  * @param {Function} callback Callback to run synchronously.
  */
 export { flushSync };
-
-/**
- * Renders a given element into the target DOM node.
- *
- * @deprecated since WordPress 6.2.0. Use `createRoot` instead.
- * @see https://react.dev/reference/react-dom/render
- */
-export { render };
-
-/**
- * Hydrates a given element into the target DOM node.
- *
- * @deprecated since WordPress 6.2.0. Use `hydrateRoot` instead.
- * @see https://react.dev/reference/react-dom/hydrate
- */
-export { hydrate };
 
 /**
  * Creates a new React root for the target DOM node.
@@ -69,11 +37,3 @@ export { createRoot };
  * @see https://react.dev/reference/react-dom/client/hydrateRoot
  */
 export { hydrateRoot };
-
-/**
- * Removes any mounted element from the target DOM node.
- *
- * @deprecated since WordPress 6.2.0. Use `root.unmount()` instead.
- * @see https://react.dev/reference/react-dom/unmountComponentAtNode
- */
-export { unmountComponentAtNode };

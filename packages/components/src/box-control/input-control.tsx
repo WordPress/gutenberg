@@ -228,7 +228,7 @@ export default function BoxInputControl( {
 						aria-controls={ inputId }
 						label={ LABELS[ side ] }
 						hideLabelFromVision
-						onChange={ ( newValue: number ) => {
+						onChange={ ( newValue ) => {
 							handleOnValueChange(
 								newValue !== undefined
 									? [ newValue, computedUnit ].join( '' )
