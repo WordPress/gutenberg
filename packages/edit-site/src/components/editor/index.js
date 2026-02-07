@@ -33,6 +33,8 @@ import CanvasLoader from '../canvas-loader';
 import { unlock } from '../../lock-unlock';
 import { useSpecificEditorSettings } from '../block-editor/use-site-editor-settings';
 import PluginTemplateSettingPanel from '../plugin-template-setting-panel';
+import TemplateStyleVariationPanel from '../template-style-variation-panel';
+import TemplateStyleVariationProvider from '../template-style-variation-provider';
 import { isPreviewingTheme } from '../../utils/is-previewing-theme';
 import SaveButton from '../save-button';
 import SavePanel from '../save-panel';
@@ -143,7 +145,17 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 		'edit-site-editor__loading-progress'
 	);
 
-	const settings = useSpecificEditorSettings();
+	// Determine the resolved template ID for style variation context.
+	// When editing a page with its template, postId is the resolved template ID.
+	// When editing a template directly, postId is the template ID.
+	let resolvedTemplateIdForSettings = null;
+	if ( postType === 'wp_template' ) {
+		resolvedTemplateIdForSettings = postId;
+	} else if ( postWithTemplate ) {
+		resolvedTemplateIdForSettings = postId;
+	}
+
+	const settings = useSpecificEditorSettings( resolvedTemplateIdForSettings );
 	const { initialBlockSelection, ...editorSettings } = settings;
 	const { resetZoomLevel } = unlock( useDispatch( blockEditorStore ) );
 	const { setCurrentRevisionId } = unlock( useDispatch( editorStore ) );
@@ -211,7 +223,9 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 	return ! isBlockBasedTheme && isHomeRoute ? (
 		<SitePreview />
 	) : (
-		<>
+		<TemplateStyleVariationProvider
+			resolvedTemplateId={ resolvedTemplateIdForSettings }
+		>
 			<EditorKeyboardShortcutsRegister />
 			{ isEditMode && <BlockKeyboardShortcuts /> }
 			{ ! isReady ? <CanvasLoader id={ loadingProgressId } /> : null }
@@ -236,7 +250,10 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 					onActionPerformed={ onActionPerformed }
 					extraSidebarPanels={
 						! postWithTemplate && (
-							<PluginTemplateSettingPanel.Slot />
+							<>
+								<PluginTemplateSettingPanel.Slot />
+								<TemplateStyleVariationPanel />
+							</>
 						)
 					}
 				>
@@ -300,6 +317,6 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 					<SiteEditorMoreMenu />
 				</Editor>
 			) }
-		</>
+		</TemplateStyleVariationProvider>
 	);
 }

@@ -9,7 +9,11 @@ import {
 	store as editorStore,
 	privateApis as editorPrivateApis,
 } from '@wordpress/editor';
-import { generateGlobalStyles } from '@wordpress/global-styles-engine';
+import { store as coreStore } from '@wordpress/core-data';
+import {
+	generateGlobalStyles,
+	mergeGlobalStyles,
+} from '@wordpress/global-styles-engine';
 
 /**
  * Internal dependencies
@@ -21,6 +25,86 @@ import { FOCUSABLE_ENTITIES } from '../../utils/constants';
 
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 const { useGlobalStyles } = unlock( editorPrivateApis );
+
+/**
+ * Look up a template's style variation data directly from core-data.
+ * Called outside the TemplateStyleVariationProvider context, so it performs
+ * its own lookup. When the variation has a wp_global_styles post with user
+ * edits, the post data is returned; otherwise registered data is used.
+ *
+ * @param {string|null} templateId The template ID to look up.
+ * @return {Object} Object with variation styles and settings.
+ */
+function useTemplateStyleVariationLookup( templateId ) {
+	return useSelect(
+		( select ) => {
+			if ( ! templateId ) {
+				return {
+					variationStyles: null,
+					variationSettings: null,
+				};
+			}
+
+			const { getEditedEntityRecord } = select( coreStore );
+			const template = getEditedEntityRecord(
+				'postType',
+				'wp_template',
+				templateId
+			);
+
+			const variationId = template?.style_variation || null;
+
+			if ( ! variationId ) {
+				return {
+					variationStyles: null,
+					variationSettings: null,
+				};
+			}
+
+			// Look up variation data from the registry.
+			const getRegisteredVariations =
+				select( coreStore ).__experimentalGetRegisteredStyleVariations;
+			if ( typeof getRegisteredVariations !== 'function' ) {
+				return {
+					variationStyles: null,
+					variationSettings: null,
+				};
+			}
+
+			const variations = getRegisteredVariations() || [];
+			const variation = variations.find( ( v ) => v.id === variationId );
+			if ( ! variation ) {
+				return {
+					variationStyles: null,
+					variationSettings: null,
+				};
+			}
+
+			// If the variation has a wp_global_styles post, use its
+			// (potentially user-edited) data instead of registered defaults.
+			if ( variation.post_id ) {
+				const postRecord = getEditedEntityRecord(
+					'root',
+					'globalStyles',
+					variation.post_id
+				);
+				if ( postRecord?.settings || postRecord?.styles ) {
+					return {
+						variationStyles: postRecord.styles || null,
+						variationSettings: postRecord.settings || null,
+					};
+				}
+			}
+
+			// Fall back to registered data.
+			return {
+				variationStyles: variation.styles || null,
+				variationSettings: variation.settings || null,
+			};
+		},
+		[ templateId ]
+	);
+}
 
 function useNavigateToPreviousEntityRecord() {
 	const location = useLocation();
@@ -38,7 +122,7 @@ function useNavigateToPreviousEntityRecord() {
 	return goBack;
 }
 
-export function useSpecificEditorSettings() {
+export function useSpecificEditorSettings( resolvedTemplateId = null ) {
 	const { query } = useLocation();
 	const { canvas = 'view' } = query;
 	const [ onNavigateToEntityRecord, initialBlockSelection ] =
@@ -53,6 +137,11 @@ export function useSpecificEditorSettings() {
 	 */
 	const { merged: mergedConfig } = useGlobalStyles();
 
+	// Look up the template's style variation directly (outside the context provider).
+	// This uses post data (user edits) when available, falling back to registered data.
+	const { variationStyles, variationSettings } =
+		useTemplateStyleVariationLookup( resolvedTemplateId );
+
 	const { settings, currentPostIsTrashed } = useSelect( ( select ) => {
 		const { getSettings } = select( editSiteStore );
 		const { getCurrentPostAttribute } = select( editorStore );
@@ -66,11 +155,22 @@ export function useSpecificEditorSettings() {
 	const onNavigateToPreviousEntityRecord =
 		useNavigateToPreviousEntityRecord();
 
+	// Merge variation styles/settings into the config if a variation is assigned.
+	const effectiveMergedConfig = useMemo( () => {
+		if ( ! variationStyles && ! variationSettings ) {
+			return mergedConfig;
+		}
+		return mergeGlobalStyles( mergedConfig, {
+			styles: variationStyles || {},
+			settings: variationSettings || {},
+		} );
+	}, [ mergedConfig, variationStyles, variationSettings ] );
+
 	const [ globalStyles, globalSettings ] = useMemo( () => {
-		return generateGlobalStyles( mergedConfig, [], {
+		return generateGlobalStyles( effectiveMergedConfig, [], {
 			disableRootPadding: false,
 		} );
-	}, [ mergedConfig ] );
+	}, [ effectiveMergedConfig ] );
 
 	const defaultEditorSettings = useMemo( () => {
 		// Preserve non-global styles from settings.styles (e.g., editor styles from add_editor_style)
