@@ -33,6 +33,7 @@ import {
 	useGenerateBlockPath,
 	useRestoreBlockFromPath,
 } from './utils/block-selection-path';
+import { TemplateStyleVariationProvider } from './components/template-style-variation-context';
 
 const { store: interfaceStore, ...remainingInterfaceApis } = interfaceApis;
 
@@ -63,6 +64,8 @@ lock( privateApis, {
 	// Block selection
 	useGenerateBlockPath,
 	useRestoreBlockFromPath,
+	// Template style variations
+	TemplateStyleVariationProvider,
 	// This is a temporary private API while we're updating the site editor to use EditorProvider.
 	interfaceStore,
 	...remainingInterfaceApis,

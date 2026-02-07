@@ -52,6 +52,25 @@ export interface State {
 	registeredPostMeta: Record< string, Object >;
 	editorSettings: Record< string, any > | null;
 	editorAssets: Record< string, any > | null;
+	registeredStyleVariations: Array< RegisteredStyleVariation >;
+	baseThemes: Array< BaseTheme >;
+}
+
+export interface RegisteredStyleVariation {
+	id: string;
+	title: string;
+	settings?: Object;
+	styles?: Object;
+	base_theme?: string | null;
+	source?: string;
+	post_id?: number | null;
+}
+
+export interface BaseTheme {
+	id: string;
+	title: string;
+	settings?: Object;
+	styles?: Object;
 }
 
 type EntityRecordKey = string | number;
@@ -1595,3 +1614,29 @@ export const getRevision = createSelector(
 		];
 	}
 );
+
+/**
+ * Returns the registered style variations (experimental).
+ *
+ * @param state Data state.
+ *
+ * @return The registered style variations.
+ */
+export function __experimentalGetRegisteredStyleVariations(
+	state: State
+): Array< RegisteredStyleVariation > {
+	return state.registeredStyleVariations;
+}
+
+/**
+ * Returns the base themes (experimental).
+ *
+ * @param state Data state.
+ *
+ * @return The base themes.
+ */
+export function __experimentalGetBaseThemes(
+	state: State
+): Array< BaseTheme > {
+	return state.baseThemes;
+}

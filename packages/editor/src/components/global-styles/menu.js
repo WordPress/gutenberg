@@ -25,7 +25,8 @@ export function GlobalStylesActionMenu( {
 	hideWelcomeGuide = false,
 	onChangePath,
 } ) {
-	const { user, setUser } = useGlobalStyles();
+	const { user, setUser, styleVariationId, registeredVariationBaseData } =
+		useGlobalStyles();
 
 	// Check if there are user customizations that can be reset
 	const canReset =
@@ -33,9 +34,20 @@ export function GlobalStylesActionMenu( {
 		( Object.keys( user?.styles ?? {} ).length > 0 ||
 			Object.keys( user?.settings ?? {} ).length > 0 );
 
-	// Reset function to clear all user customizations
+	// Reset function to clear all user customizations.
+	// When editing a template with a style variation, reset to the registered
+	// variation's original data. Otherwise, reset to empty (default global styles).
 	const onReset = () => {
-		setUser( { styles: {}, settings: {} } );
+		if ( styleVariationId && registeredVariationBaseData ) {
+			// Reset to the registered variation's original data.
+			setUser( {
+				styles: registeredVariationBaseData.styles ?? {},
+				settings: registeredVariationBaseData.settings ?? {},
+			} );
+		} else {
+			// Reset to empty (default global styles behavior).
+			setUser( { styles: {}, settings: {} } );
+		}
 	};
 	const { toggle } = useDispatch( preferencesStore );
 	const { canEditCSS } = useSelect( ( select ) => {
