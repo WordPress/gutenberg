@@ -233,6 +233,18 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
+	add_settings_field(
+		'gutenberg-template-style-variations',
+		__( 'Template Style Variations', 'gutenberg' ),
+		'gutenberg_display_experiment_field',
+		'gutenberg-experiments',
+		'gutenberg_experiments_section',
+		array(
+			'label' => __( 'Enables associating templates with specific style variations, allowing different templates to use different global styles configurations.', 'gutenberg' ),
+			'id'    => 'gutenberg-template-style-variations',
+		)
+	);
+
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

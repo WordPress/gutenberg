@@ -135,6 +135,33 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 			 */
 			true
 		);
+
+		// Endpoint to create/get the variation post for a template.
+		// Note: experiment check is done in the callback to ensure route is always registered.
+		// Uses a separate route base to avoid conflicts with the greedy template ID pattern.
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '-variation-post/(?P<id>.+)',
+			array(
+				'args' => array(
+					'id'           => array(
+						'description'       => __( 'The id of a template' ),
+						'type'              => 'string',
+						'sanitize_callback' => array( $this, '_sanitize_template_id' ),
+					),
+					'variation_id' => array(
+						'description' => __( 'The style variation ID. If provided, this is used instead of looking up the variation from template meta. This allows creating variation posts for non-customized templates.' ),
+						'type'        => 'string',
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'ensure_variation_post' ),
+					'permission_callback' => array( $this, 'update_item_permissions_check' ),
+				),
+			),
+			true
+		);
 	}
 
 	/**
@@ -275,6 +302,21 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 			}
 		}
 
+		// Template style variation support (experimental).
+		// Templates link to style variations by ID. The variation's wp_global_styles post
+		// (if any) is looked up by the variation ID, not stored on the template.
+		if ( gutenberg_is_experiment_enabled( 'gutenberg-template-style-variations' ) ) {
+			if ( rest_is_field_included( 'style_variation', $fields ) ) {
+				$data['style_variation'] = null;
+				if ( $template->wp_id ) {
+					$variation_id = get_post_meta( $template->wp_id, GUTENBERG_TEMPLATE_STYLE_VARIATION_META_KEY, true );
+					if ( $variation_id ) {
+						$data['style_variation'] = $variation_id;
+					}
+				}
+			}
+		}
+
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		$data    = $this->add_additional_fields_to_object( $data, $request );
 		$data    = $this->filter_response_by_context( $data, $context );
@@ -409,5 +451,164 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 
 		// Fail-safe to return a string should the original source ever fall through.
 		return '';
+	}
+
+	/**
+	 * Retrieves the template's schema, conforming to JSON Schema.
+	 *
+	 * Extends parent schema to add style_variation field when experiment is enabled.
+	 *
+		 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		$schema = parent::get_item_schema();
+
+		// Add style_variation field if experiment is enabled.
+		// The variation's wp_global_styles post is looked up by variation ID, not stored on template.
+		if ( gutenberg_is_experiment_enabled( 'gutenberg-template-style-variations' ) ) {
+			$schema['properties']['style_variation'] = array(
+				'description' => __( 'The registered style variation ID associated with this template.', 'gutenberg' ),
+				'type'        => array( 'string', 'null' ),
+				'context'     => array( 'view', 'edit', 'embed' ),
+			);
+		}
+
+		return $schema;
+	}
+
+	/**
+	 * Prepares a single template for update.
+	 *
+	 * Extends parent to handle style_variation field.
+	 *
+		 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return stdClass Changes to pass to wp_update_post.
+	 */
+	protected function prepare_item_for_database( $request ) {
+		$changes = parent::prepare_item_for_database( $request );
+
+		// Handle style_variation field if experiment is enabled.
+		// Use has_param() instead of isset() because isset() returns false for null values,
+		// and we need to detect when the user explicitly sets style_variation to null (to unset it).
+		if ( gutenberg_is_experiment_enabled( 'gutenberg-template-style-variations' ) && $request->has_param( 'style_variation' ) ) {
+			// Store the style_variation in meta via a custom property.
+			$changes->meta_input = isset( $changes->meta_input ) ? $changes->meta_input : array();
+			if ( null === $request['style_variation'] || '' === $request['style_variation'] ) {
+				// Set to empty to trigger deletion.
+				$changes->meta_input[ GUTENBERG_TEMPLATE_STYLE_VARIATION_META_KEY ] = '';
+			} else {
+				$changes->meta_input[ GUTENBERG_TEMPLATE_STYLE_VARIATION_META_KEY ] = sanitize_text_field( $request['style_variation'] );
+			}
+		}
+
+		return $changes;
+	}
+
+	/**
+	 * Updates a single template.
+	 *
+	 * Extends parent to handle style_variation meta changes.
+	 *
+		 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function update_item( $request ) {
+		$response = parent::update_item( $request );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		// Handle style_variation removal.
+		// Use has_param() instead of isset() because isset() returns false for null values,
+		// and we need to detect when the user explicitly sets style_variation to null (to unset it).
+		if ( gutenberg_is_experiment_enabled( 'gutenberg-template-style-variations' ) && $request->has_param( 'style_variation' ) ) {
+			$new_variation_id = $request['style_variation'];
+			$template         = get_block_template( $request['id'], $this->post_type );
+
+			if ( $template && $template->wp_id ) {
+				// If variation is removed (null or empty), delete the meta.
+				if ( null === $new_variation_id || '' === $new_variation_id ) {
+					delete_post_meta( $template->wp_id, GUTENBERG_TEMPLATE_STYLE_VARIATION_META_KEY );
+				}
+			}
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Creates or returns the wp_global_styles post for a style variation.
+	 *
+	 * The variation can be identified either from:
+	 * 1. The variation_id parameter passed in the request body (preferred)
+	 * 2. The template's style_variation meta (fallback for backwards compatibility)
+	 *
+	 * There is ONE post per variation, shared by all templates using that variation.
+	 *
+		 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
+	public function ensure_variation_post( $request ) {
+		if ( ! gutenberg_is_experiment_enabled( 'gutenberg-template-style-variations' ) ) {
+			return new WP_Error(
+				'rest_feature_disabled',
+				__( 'Template style variations feature is not enabled.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		// First, try to get variation_id from the request body.
+		// This allows creating a variation post even for non-customized templates.
+		$variation_id = isset( $request['variation_id'] ) ? sanitize_text_field( $request['variation_id'] ) : null;
+
+		// If no variation_id in request, fall back to looking it up from template meta.
+		if ( ! $variation_id ) {
+			$template = get_block_template( $request['id'], $this->post_type );
+
+			if ( ! $template ) {
+				return new WP_Error(
+					'rest_template_not_found',
+					__( 'No templates exist with that id.', 'gutenberg' ),
+					array( 'status' => 404 )
+				);
+			}
+
+			if ( ! $template->wp_id ) {
+				return new WP_Error(
+					'rest_template_not_customized',
+					__( 'Template must be customized before creating a variation post, or pass variation_id in the request.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			$variation_id = get_post_meta( $template->wp_id, GUTENBERG_TEMPLATE_STYLE_VARIATION_META_KEY, true );
+		}
+
+		if ( ! $variation_id ) {
+			return new WP_Error(
+				'rest_no_variation',
+				__( 'No variation_id provided and template does not have a style variation assigned.', 'gutenberg' ),
+				array( 'status' => 400 )
+			);
+		}
+
+		// Get or create the variation post. This is shared by all templates using this variation.
+		$post_id = gutenberg_get_or_create_variation_post( $variation_id );
+
+		if ( is_wp_error( $post_id ) ) {
+			return $post_id;
+		}
+
+		return rest_ensure_response(
+			array(
+				'post_id'      => $post_id,
+				'variation_id' => $variation_id,
+			)
+		);
 	}
 }

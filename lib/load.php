@@ -76,6 +76,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	// Plugin specific code.
 	require_once __DIR__ . '/class-wp-rest-global-styles-controller-gutenberg.php';
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
+	require_once __DIR__ . '/class-wp-rest-style-variations-controller-gutenberg.php';
+	require_once __DIR__ . '/class-wp-rest-base-themes-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
 
 	require_once __DIR__ . '/experimental/rest-api.php';
@@ -148,6 +150,11 @@ require __DIR__ . '/script-loader.php';
 require __DIR__ . '/global-styles-and-settings.php';
 require __DIR__ . '/class-wp-theme-json-data-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-gutenberg.php';
+
+// Template style variations registries (must load before resolver).
+require __DIR__ . '/class-wp-style-variations-registry-gutenberg.php';
+require __DIR__ . '/class-wp-base-themes-registry-gutenberg.php';
+
 require __DIR__ . '/class-wp-theme-json-resolver-gutenberg.php';
 require __DIR__ . '/class-wp-theme-json-schema-gutenberg.php';
 require __DIR__ . '/class-wp-duotone-gutenberg.php';
@@ -206,4 +213,10 @@ require __DIR__ . '/overlay-patterns.php';
 if ( gutenberg_is_experiment_enabled( 'gutenberg-svg-icon-registry' ) ) {
 	require __DIR__ . '/experimental/class-wp-icons-registry.php';
 	require __DIR__ . '/experimental/class-wp-rest-icons-controller.php';
+}
+
+// Template style variations (only load when experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-template-style-variations' ) ) {
+	require __DIR__ . '/template-style-variations.php';
+	require __DIR__ . '/experimental/demo-template-style-variations.php';
 }

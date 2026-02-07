@@ -47,3 +47,35 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-svg-icon-registry' ) ) {
 	}
 	add_action( 'rest_api_init', 'gutenberg_register_icon_controller_endpoints' );
 }
+
+/**
+ * Registers the Style Variations REST API routes.
+ *
+ * Only registered when the template style variations experiment is enabled.
+ *
+ */
+function gutenberg_register_style_variations_controller_endpoints() {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-template-style-variations' ) ) {
+		return;
+	}
+
+	$style_variations_controller = new WP_REST_Style_Variations_Controller_Gutenberg();
+	$style_variations_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_style_variations_controller_endpoints' );
+
+/**
+ * Registers the Base Themes REST API routes.
+ *
+ * Only registered when the template style variations experiment is enabled.
+ *
+ */
+function gutenberg_register_base_themes_controller_endpoints() {
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-template-style-variations' ) ) {
+		return;
+	}
+
+	$base_themes_controller = new WP_REST_Base_Themes_Controller_Gutenberg();
+	$base_themes_controller->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_base_themes_controller_endpoints' );
