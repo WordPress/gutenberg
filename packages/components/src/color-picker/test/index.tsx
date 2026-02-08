@@ -95,7 +95,9 @@ describe( 'ColorPicker', () => {
 			await user.clear( hexInput );
 			await user.type( hexInput, '1ab' );
 
-			expect( onChangeComplete ).toHaveBeenCalledTimes( 3 );
+			// Clearing the input triggers onChange once (to white),
+			// then typing triggers 3 more times
+			expect( onChangeComplete ).toHaveBeenCalledTimes( 4 );
 			expect( onChangeComplete ).toHaveBeenLastCalledWith(
 				legacyColorMatcher
 			);
@@ -126,8 +128,38 @@ describe( 'ColorPicker', () => {
 			await user.clear( hexInput );
 			await user.type( hexInput, '1ab' );
 
-			expect( onChange ).toHaveBeenCalledTimes( 3 );
+			// Clearing the input triggers onChange once (to white),
+			// then typing triggers 3 more times
+			expect( onChange ).toHaveBeenCalledTimes( 4 );
 			expect( onChange ).toHaveBeenLastCalledWith( '#11aabb' );
+		} );
+
+		it( 'should default to white when hex input is cleared', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+			const color = '#ff0000';
+
+			render(
+				<ColorPicker
+					onChange={ onChange }
+					color={ color }
+					enableAlpha={ false }
+				/>
+			);
+
+			const formatSelector = screen.getByRole( 'combobox' );
+			expect( formatSelector ).toBeVisible();
+
+			await user.selectOptions( formatSelector, 'hex' );
+
+			const hexInput = screen.getByRole( 'textbox' );
+			expect( hexInput ).toBeVisible();
+
+			// Clear the entire hex input at once
+			await user.clear( hexInput );
+
+			// Should default to white (#ffffff)
+			expect( onChange ).toHaveBeenCalledWith( '#ffffff' );
 		} );
 	} );
 
