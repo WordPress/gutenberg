@@ -62,6 +62,9 @@ export default function mediaUpload( {
 			? currentPost.id
 			: currentPost?.wp_id;
 	const setSaveLock = () => {
+		if ( window.__experimentalMediaProcessing ) {
+			return; // Skip - handled by useUploadSaveLock in editor provider
+		}
 		lockPostSaving( lockKey );
 		lockPostAutosaving( lockKey );
 		imageIsUploading = true;
@@ -69,6 +72,9 @@ export default function mediaUpload( {
 
 	const postData = currentPostId ? { post: currentPostId } : {};
 	const clearSaveLock = () => {
+		if ( window.__experimentalMediaProcessing ) {
+			return; // Skip - handled by useUploadSaveLock in editor provider
+		}
 		unlockPostSaving( lockKey );
 		unlockPostAutosaving( lockKey );
 		imageIsUploading = false;
@@ -78,14 +84,10 @@ export default function mediaUpload( {
 		allowedTypes,
 		filesList,
 		onFileChange: ( file ) => {
-			// When client-side media processing is enabled, save locking
-			// is handled by useUploadSaveLock in the editor provider.
-			if ( ! window.__experimentalMediaProcessing ) {
-				if ( ! imageIsUploading ) {
-					setSaveLock();
-				} else {
-					clearSaveLock();
-				}
+			if ( ! imageIsUploading ) {
+				setSaveLock();
+			} else {
+				clearSaveLock();
 			}
 			onFileChange?.( file );
 
@@ -111,9 +113,7 @@ export default function mediaUpload( {
 		},
 		maxUploadFileSize,
 		onError: ( { message } ) => {
-			if ( ! window.__experimentalMediaProcessing ) {
-				clearSaveLock();
-			}
+			clearSaveLock();
 			onError( message );
 		},
 		wpAllowedMimeTypes,

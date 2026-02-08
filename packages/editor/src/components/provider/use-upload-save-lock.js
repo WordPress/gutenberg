@@ -4,8 +4,11 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
 import { store as uploadStore } from '@wordpress/upload-media';
-import { store as editorStore } from '@wordpress/editor';
 
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 const LOCK_NAME = 'upload-in-progress';
 

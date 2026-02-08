@@ -18,9 +18,6 @@
 		"node": ">=20.10.0",
 		"npm": ">=10.2.3"
 	},
-	"dependencies": {
-		"@wordpress/upload-media": "0.24.0"
-	},
 	"wpPlugin": {
 		"name": "gutenberg",
 		"scriptGlobal": "wp",
