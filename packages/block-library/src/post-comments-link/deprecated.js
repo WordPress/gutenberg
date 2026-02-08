@@ -50,8 +50,8 @@ const v1 = {
 				color: true,
 				width: true,
 				style: true,
-			}
-		}
+			},
+		},
 	},
 	migrate: migrateTextAlign,
 	isEligible( attributes ) {
