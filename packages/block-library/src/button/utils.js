@@ -15,21 +15,24 @@ export function isPercentageWidth( width ) {
  * @return {Object} Object with width-related class names as keys and true as values.
  */
 export function getWidthClasses( width ) {
-	const legacyPercentageWidths = [ '25%', '50%', '75%', '100%' ];
-
 	if ( ! width ) {
 		return {};
 	}
 
 	if ( isPercentageWidth( width ) ) {
-		const numericWidth = parseInt( width, 10 );
+		const legacyWidthClasses = {
+			'25%': 'wp-block-button__width-25',
+			'50%': 'wp-block-button__width-50',
+			'75%': 'wp-block-button__width-75',
+			'100%': 'wp-block-button__width-100',
+		};
 		return {
 			'has-custom-width': true,
 			'wp-block-button__width': true,
 			// Maintain legacy class for backwards compatibility.
-			...( legacyPercentageWidths.includes( width )
-				? { [ `wp-block-button__width-${ numericWidth }` ]: true }
-				: {} ),
+			...( legacyWidthClasses[ width ] && {
+				[ legacyWidthClasses[ width ] ]: true,
+			} ),
 		};
 	}
 

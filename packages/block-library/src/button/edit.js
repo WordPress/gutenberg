@@ -312,7 +312,7 @@ function ButtonEdit( props ) {
 		}
 		if ( isPercentageWidth( resolvedWidth ) ) {
 			return {
-				'--wp--block-button--width': parseInt( resolvedWidth, 10 ),
+				'--wp--block-button--width': parseFloat( resolvedWidth ),
 			};
 		}
 		return dimensionsProps.style;

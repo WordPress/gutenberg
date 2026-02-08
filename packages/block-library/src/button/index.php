@@ -99,13 +99,18 @@ function render_block_core_button( $attributes, $content ) {
 			$existing_style = $p->get_attribute( 'style' ) ?? '';
 
 			if ( $is_percentage ) {
-				$numeric_width = (int) $resolved_width;
+				$numeric_width = (float) $resolved_width;
 				$p->add_class( 'wp-block-button__width' );
 
 				// Maintain legacy class for the standard percentage widths.
-				$legacy_widths = array( 25, 50, 75, 100 );
-				if ( in_array( $numeric_width, $legacy_widths, true ) ) {
-					$p->add_class( 'wp-block-button__width-' . $numeric_width );
+				$legacy_widths = array(
+					'25%'  => 'wp-block-button__width-25',
+					'50%'  => 'wp-block-button__width-50',
+					'75%'  => 'wp-block-button__width-75',
+					'100%' => 'wp-block-button__width-100',
+				);
+				if ( isset( $legacy_widths[ $resolved_width ] ) ) {
+					$p->add_class( $legacy_widths[ $resolved_width ] );
 				}
 
 				$width_style    = "--wp--block-button--width: $numeric_width;";
