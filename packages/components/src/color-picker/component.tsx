@@ -67,6 +67,11 @@ const UnconnectedColorPicker = (
 
 	const handleChange = useCallback(
 		( nextValue: Colord ) => {
+			// Handle invalid/empty colors by clearing the selection
+			if ( ! nextValue || ! nextValue.isValid() ) {
+				debouncedSetColor( '' );
+				return;
+			}
 			debouncedSetColor( nextValue.toHex() );
 		},
 		[ debouncedSetColor ]

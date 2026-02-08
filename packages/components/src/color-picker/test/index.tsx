@@ -95,7 +95,7 @@ describe( 'ColorPicker', () => {
 			await user.clear( hexInput );
 			await user.type( hexInput, '1ab' );
 
-			// Clearing the input triggers onChange once (to white),
+			// Clearing the input triggers onChange once (to empty string),
 			// then typing triggers 3 more times
 			expect( onChangeComplete ).toHaveBeenCalledTimes( 4 );
 			expect( onChangeComplete ).toHaveBeenLastCalledWith(
@@ -128,13 +128,13 @@ describe( 'ColorPicker', () => {
 			await user.clear( hexInput );
 			await user.type( hexInput, '1ab' );
 
-			// Clearing the input triggers onChange once (to white),
+			// Clearing the input triggers onChange once (to empty string),
 			// then typing triggers 3 more times
 			expect( onChange ).toHaveBeenCalledTimes( 4 );
 			expect( onChange ).toHaveBeenLastCalledWith( '#11aabb' );
 		} );
 
-		it( 'should default to white when hex input is cleared', async () => {
+		it( 'should clear the color when hex input is cleared', async () => {
 			const user = userEvent.setup();
 			const onChange = jest.fn();
 			const color = '#ff0000';
@@ -158,8 +158,8 @@ describe( 'ColorPicker', () => {
 			// Clear the entire hex input at once
 			await user.clear( hexInput );
 
-			// Should default to white (#ffffff)
-			expect( onChange ).toHaveBeenCalledWith( '#ffffff' );
+			// Should clear the color (pass empty string)
+			expect( onChange ).toHaveBeenCalledWith( '' );
 		} );
 	} );
 
