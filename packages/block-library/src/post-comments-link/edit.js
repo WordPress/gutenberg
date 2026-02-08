@@ -60,26 +60,25 @@ function PostCommentsLinkEdit( { context } ) {
 	}
 
 	return (
-		<>
-			<div { ...blockProps }>
-				{ post?.link && commentsText !== undefined ? (
-					<a
-						href={ post?.link + '#comments' }
-						onClick={ ( event ) => event.preventDefault() }
-					>
-						{ commentsText }
-					</a>
-				) : (
-					<a
-						href="#post-comments-link-pseudo-link"
-						onClick={ ( event ) => event.preventDefault() }
-					>
-						{ __( 'No comments' ) }
-					</a>
-				) }
-			</div>
-		</>
+		<div { ...blockProps }>
+			{ post?.link && commentsText !== undefined ? (
+				<a
+					href={ post?.link + '#comments' }
+					onClick={ ( event ) => event.preventDefault() }
+				>
+					{ commentsText }
+				</a>
+			) : (
+				<a
+					href="#post-comments-link-pseudo-link"
+					onClick={ ( event ) => event.preventDefault() }
+				>
+					{ __( 'No comments' ) }
+				</a>
+			) }
+		</div>
 	);
+
 }
 
 export default PostCommentsLinkEdit;
