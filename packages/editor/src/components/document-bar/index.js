@@ -1,8 +1,20 @@
 /**
  * External dependencies
  */
+/**
+ * External dependencies
+ */
+/**
+ * External dependencies
+ */
 import clsx from 'clsx';
 
+/**
+ * WordPress dependencies
+ */
+/**
+ * WordPress dependencies
+ */
 /**
  * WordPress dependencies
  */
@@ -24,6 +36,12 @@ import { useReducedMotion } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
+/**
+ * Internal dependencies
+ */
+/**
+ * Internal dependencies
+ */
 /**
  * Internal dependencies
  */
@@ -208,14 +226,9 @@ export default function DocumentBar( props ) {
 			{ isNotFound ? (
 				<Text>{ __( 'Document not found' ) }</Text>
 			) : (
-				<Button
-					className="editor-document-bar__command"
-					onClick={ () => openCommandCenter() }
-					size="compact"
-				>
+				<>
 					<motion.div
 						className="editor-document-bar__title"
-						// Force entry animation when the back button is added or removed.
 						key={ hasBackButton }
 						initial={
 							mountedRef.current
@@ -225,12 +238,9 @@ export default function DocumentBar( props ) {
 											? 'translateX(15%)'
 											: 'translateX(-15%)',
 								  }
-								: false // Don't show entry animation when DocumentBar mounts.
+								: false
 						}
-						animate={ {
-							opacity: 1,
-							transform: 'translateX(0%)',
-						} }
+						animate={ { opacity: 1, transform: 'translateX(0%)' } }
 						transition={
 							isReducedMotion ? { duration: 0 } : undefined
 						}
@@ -267,10 +277,16 @@ export default function DocumentBar( props ) {
 								) }
 						</Text>
 					</motion.div>
-					<span className="editor-document-bar__shortcut">
+
+					<Button
+						className="editor-document-bar__command"
+						onClick={ () => openCommandCenter() }
+						size="compact"
+						aria-label={ __( 'Open command palette' ) }
+					>
 						{ displayShortcut.primary( 'k' ) }
-					</span>
-				</Button>
+					</Button>
+				</>
 			) }
 		</div>
 	);

@@ -24,7 +24,7 @@
 	.components-button {
 		border-radius: $grid-unit-05;
 
-		@media not (prefers-reduced-motion) {
+		@media not ( prefers-reduced-motion ) {
 			transition: all 0.1s ease-out;
 		}
 
@@ -43,15 +43,17 @@
 }
 
 .editor-document-bar__command {
-	flex-grow: 1;
+	flex-grow: 0; // don’t let it expand
+	margin-left: auto; // push it to the far right
 	color: var(--wp-block-synced-color);
 	overflow: hidden;
 }
 
 .editor-document-bar__title {
+	flex-grow: 1; // let the title expand between back + command buttons
 	overflow: hidden;
 	color: $gray-900;
-	margin: 0 auto;
+	text-align: center; // ensure text stays centered
 	max-width: 70%;
 
 	// Offset the layout based on the width of the ⌘K label. This ensures the title is centrally aligned.

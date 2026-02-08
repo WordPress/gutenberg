@@ -23,3 +23,7 @@ docs/** linguist-documentation
 
 # TSConfig files use jsonc.
 tsconfig*.json linguist-language=jsonc
+
+# Add these at the end:
+*.js text eol=lf
+*.scss text eol=lf
