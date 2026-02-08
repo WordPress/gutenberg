@@ -10,7 +10,7 @@ const transforms = {
 			blocks: [ 'core/post-comments-link' ],
 			transform: ( { textAlign } ) => {
 				return createBlock( 'core/post-comments-link', {
-					textAlign,
+					style: { typography: { textAlign } },
 				} );
 			},
 		},
