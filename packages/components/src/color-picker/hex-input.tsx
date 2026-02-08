@@ -20,7 +20,8 @@ import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 
 export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 	const handleChange = ( nextValue: string | undefined ) => {
-		// Default to white when the input is empty or undefined
+		// When input is empty, default to white (#fff) to match the ColorPicker's
+		// defaultValue and ensure consistent behavior regardless of how the input is cleared.
 		if ( ! nextValue ) {
 			onChange( colord( '#fff' ) );
 			return;
