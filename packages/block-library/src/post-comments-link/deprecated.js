@@ -49,7 +49,7 @@ const v1 = {
 				radius: true,
 				color: true,
 				width: true,
-				style: true
+				style: true,
 			}
 		}
 	},
