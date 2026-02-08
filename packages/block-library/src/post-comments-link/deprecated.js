@@ -22,7 +22,7 @@ const v1 = {
 			__experimentalDefaultControls: {
 				background: true,
 				link: true,
-			}
+			},
 		},
 		typography: {
 			fontSize: true,
