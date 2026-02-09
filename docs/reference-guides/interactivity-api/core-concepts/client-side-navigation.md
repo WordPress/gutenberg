@@ -929,43 +929,43 @@ For more details, see the [Understanding global state, local context, and derive
 
 Now that we've examined each component, let's trace through a complete navigation to see how they work together.
 
-**Phase 1: Prefetch (optional but recommended)**
+#### Phase 1: Prefetch (optional but recommended)
 
 When the user hovers over a link, your code might call `prefetch()`:
 
-1. The router normalizes the URL and checks the page cache
-2. If not cached, it begins fetching the HTML
-3. The fetched HTML is parsed into a document
-4. Router regions are extracted and converted to virtual DOM
-5. Style sheets are compared with current page; new ones are added with `media="preload"`
-6. Script modules are identified, dependencies resolved, and source code fetched
-7. Server state is extracted
-8. The fully processed page is stored in the cache
-9. The function returns (the page is now ready for instant navigation)
+1. The router normalizes the URL and checks the page cache.
+2. If not cached, it begins fetching the HTML.
+3. The fetched HTML is parsed into a document.
+4. Router regions are extracted and converted to virtual DOM.
+5. Style sheets are compared with current page; new ones are added with `media="preload"`.
+6. Script modules are identified, dependencies resolved, and source code fetched.
+7. Server state is extracted.
+8. The fully processed page is stored in the cache.
+9. The function returns (the page is now ready for instant navigation).
 
-**Phase 2: Navigate**
+#### Phase 2: Navigate
 
 When the user clicks the link and your code calls `navigate()`:
 
-1. The router checks if client navigation is disabled; if so, falls back to full page load
-2. If not already prefetched, the fetch process from Phase 1 runs now
-3. The router waits for the page to be ready (fetch complete, styles loaded)
-4. A loading indicator may appear if the wait exceeds a threshold (400ms)
-5. Script modules for the new page are imported and executed
+1. The router checks if client navigation is disabled; if so, falls back to full page load.
+2. If not already prefetched, the fetch process from Phase 1 runs now.
+3. The router waits for the page to be ready (fetch complete, styles loaded).
+4. A loading indicator may appear if the wait exceeds a threshold (400ms).
+5. Script modules for the new page are imported and executed.
 6. The rendering phase begins (wrapped in a batch for efficiency):
-   - Server state is merged with client state
-   - Each router region is updated with its new virtual DOM
-   - Regions with `attachTo` that don't exist are created and appended
-   - Styles are activated/deactivated as needed
-   - The document title is updated
-7. Browser history is updated (pushState or replaceState)
-8. Screen reader announcement is made for accessibility
-9. If the URL has a hash, the page scrolls to that element
-10. Navigation is complete
+   - Server state is merged with client state.
+   - Each router region is updated with its new virtual DOM.
+   - Regions with `attachTo` that don't exist are created and appended.
+   - Styles are activated/deactivated as needed.
+   - The document title is updated.
+7. Browser history is updated (pushState or replaceState).
+8. Screen reader announcement is made for accessibility.
+9. If the URL has a hash, the page scrolls to that element.
+10. Navigation is complete.
 
 <!-- IMAGE: Flowchart showing complete navigation flow. Starts with "User hovers link" flowing to "prefetch()" which branches through the prefetch steps. Then "User clicks link" leads to "navigate()" which shows the navigation steps in sequence. Key decision points are shown as diamonds (e.g., "In cache?", "Styles loaded?"). The flow ends at "Navigation complete" with a checkmark. -->
 
-**Race condition protection**
+#### Race condition protection
 
 A subtle but important detail: users don't always wait for navigation to complete before clicking another link. The router handles this gracefully.
 
