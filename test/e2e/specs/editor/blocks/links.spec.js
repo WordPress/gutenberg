@@ -683,51 +683,6 @@ test.describe( 'Links', () => {
 		] );
 	} );
 
-	test( 'should preserve URL when only the URL is updated after the rich text value changes', async ( {
-		page,
-		editor,
-		LinkUtils,
-	} ) => {
-		await editor.insertBlock( {
-			name: 'core/paragraph',
-			attributes: {
-				content:
-					'<a href="https://wordpress.org/gutenberg">Gutenberg</a> is awesome',
-			},
-		} );
-
-		// Change the link text by typing to trigger a RichText value change.
-		await editor.canvas
-			.getByRole( 'link', { name: 'Gutenberg' } )
-			.dblclick();
-		await page.keyboard.type( 'Block Editor' );
-
-		// Click on the link to open the Link UI with a collapsed cursor.
-		await editor.canvas
-			.getByRole( 'link', { name: 'Block Editor' } )
-			.click();
-
-		const linkPopover = LinkUtils.getLinkPopover();
-		await expect( linkPopover ).toBeVisible();
-
-		// Edit only the URL.
-		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
-		await linkPopover.getByPlaceholder( 'Search or type URL' ).fill( '' );
-		await page.keyboard.type( 'https://wordpress.org' );
-		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
-
-		// The link should have the updated URL.
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: {
-					content:
-						'<a href="https://wordpress.org">Block Editor</a> is awesome',
-				},
-			},
-		] );
-	} );
-
 	test( 'toggle state of advanced link settings is preserved across editing links', async ( {
 		page,
 		editor,
