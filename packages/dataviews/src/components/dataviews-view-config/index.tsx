@@ -335,11 +335,7 @@ export function DataviewsViewConfigDropdown() {
 							<ResetViewButton />
 						</Stack>
 						<Stack direction="column" gap="lg">
-							<Stack
-								direction="row"
-								gap="sm"
-								className="is-divided-in-two"
-							>
+							<Stack direction="row" gap="sm">
 								<SortFieldControl />
 								<SortDirectionControl />
 							</Stack>
