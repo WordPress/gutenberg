@@ -757,6 +757,9 @@ describe( 'TimePicker', () => {
 		await user.type( yearInput, '500' );
 		await user.keyboard( '{Tab}' );
 
+		// Verify input displays human-readable year
+		expect( yearInput ).toHaveValue( 500 );
+
 		// Verify onChange emits zero-padded ISO 8601 format
 		const lastCall = onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
 		expect( lastCall[ 0 ] ).toMatch( /^0500-10-18T/ );
@@ -806,6 +809,9 @@ describe( 'TimePicker', () => {
 		);
 
 		const yearInput = screen.getByLabelText( 'Year' );
+
+		// Verify initial input displays correctly
+		expect( yearInput ).toHaveValue( 1986 );
 
 		// Type year 500 - should be allowed
 		await user.clear( yearInput );
