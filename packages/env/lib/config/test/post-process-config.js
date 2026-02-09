@@ -10,8 +10,8 @@ describe( 'postProcessConfig', () => {
 		jest.clearAllMocks();
 	} );
 
-	it( 'should merge relevant root options into environment options', () => {
-		const processed = postProcessConfig( {
+	it( 'should merge relevant root options into environment options', async () => {
+		const processed = await postProcessConfig( {
 			port: 123,
 			testsPort: 456,
 			coreSource: {
@@ -152,8 +152,8 @@ describe( 'postProcessConfig', () => {
 		} );
 	} );
 
-	it( 'should not merge some root options into environment options', () => {
-		const processed = postProcessConfig( {
+	it( 'should not merge some root options into environment options', async () => {
+		const processed = await postProcessConfig( {
 			port: 8888,
 			testsPort: 8889,
 			lifecycleScripts: {
@@ -183,8 +183,8 @@ describe( 'postProcessConfig', () => {
 	} );
 
 	describe( 'appendPortToWPConfigs', () => {
-		it( 'should add port to certain environment config options', () => {
-			const processed = postProcessConfig( {
+		it( 'should add port to certain environment config options', async () => {
+			const processed = await postProcessConfig( {
 				port: 123,
 				config: {
 					WP_TESTS_DOMAIN: 'localhost',
@@ -231,8 +231,8 @@ describe( 'postProcessConfig', () => {
 			} );
 		} );
 
-		it( 'should not overwrite port in WP_HOME', () => {
-			const processed = postProcessConfig( {
+		it( 'should not overwrite port in WP_HOME', async () => {
+			const processed = await postProcessConfig( {
 				env: {
 					development: {
 						port: 123,
@@ -277,8 +277,8 @@ describe( 'postProcessConfig', () => {
 	} );
 
 	describe( 'validatePortUniqueness', () => {
-		it( 'should fail when two environments have the same port', () => {
-			expect( () => {
+		it( 'should fail when two environments have the same port', async () => {
+			await expect(
 				postProcessConfig( {
 					env: {
 						development: {
@@ -288,8 +288,8 @@ describe( 'postProcessConfig', () => {
 							port: 123,
 						},
 					},
-				} );
-			} ).toThrow(
+				} )
+			).rejects.toThrow(
 				new ValidationError(
 					'The "development" and "tests" environments may not have the same port.'
 				)
