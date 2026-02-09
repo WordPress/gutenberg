@@ -582,7 +582,7 @@ The attribute value serves as a unique identifier for that region. You can speci
    ```html
    <div
        data-wp-interactive="myPlugin"
-       data-wp-router-region="main-content"
+       data-wp-router-region="myPlugin/main-content"
    >
        <!-- Region content -->
    </div>
@@ -592,7 +592,7 @@ The attribute value serves as a unique identifier for that region. You can speci
    ```html
    <div
        data-wp-interactive="myPlugin"
-       data-wp-router-region='{ "id": "my-modal", "attachTo": "body" }'
+       data-wp-router-region='{ "id": "myPlugin/modal", "attachTo": "body" }'
    >
        <!-- Region content -->
    </div>
@@ -617,7 +617,7 @@ For a router region to function correctly, it must meet these requirements:
 <div data-wp-interactive="myPlugin">
     <div
         data-wp-interactive="myPlugin"
-        data-wp-router-region="sidebar"
+        data-wp-router-region="myPlugin/sidebar"
     >
         <!-- Sidebar content -->
     </div>
@@ -625,7 +625,7 @@ For a router region to function correctly, it must meet these requirements:
 
 <!-- Incorrect: This region may not update properly -->
 <div data-wp-interactive="myPlugin">
-    <div data-wp-router-region="sidebar">
+    <div data-wp-router-region="myPlugin/sidebar">
         <!-- This won't work reliably! -->
     </div>
 </div>
