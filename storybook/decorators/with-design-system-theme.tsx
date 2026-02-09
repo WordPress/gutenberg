@@ -1,20 +1,5 @@
-/**
- * External dependencies
- */
 import type { StoryContext } from 'storybook/internal/types';
-
-/**
- * WordPress dependencies
- */
-import { privateApis as themeApis } from '@wordpress/theme';
-import { __dangerousOptInToUnstableAPIsOnlyForCoreModules } from '@wordpress/private-apis';
-
-const { unlock } = __dangerousOptInToUnstableAPIsOnlyForCoreModules(
-	'I acknowledge private features are not for use in themes or plugins and doing so will break in the next version of WordPress.',
-	'@wordpress/theme'
-);
-
-const { ThemeProvider } = unlock( themeApis );
+import { ThemeProvider } from '@wordpress/theme/theme-provider';
 
 /**
  * Decorator that applies Design System theme based on toolbar selections.
