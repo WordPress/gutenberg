@@ -209,10 +209,9 @@ export function PrivateBlockToolbar( {
 			key={ toolbarKey }
 		>
 			<div ref={ toolbarWrapperRef } className={ innerClasses }>
-				{ ! areSelectedBlocksHiddenOnViewport &&
-					showParentSelector &&
-					! isMultiToolbar &&
-					isLargeViewport && <BlockParentSelector /> }
+				{ showParentSelector && ! isMultiToolbar && isLargeViewport && (
+					<BlockParentSelector />
+				) }
 				{ ( shouldShowVisualToolbar || isMultiToolbar ) && (
 					<div ref={ nodeRef } { ...showHoveredOrFocusedGestures }>
 						<ToolbarGroup className="block-editor-block-toolbar__block-controls">
