@@ -11,6 +11,7 @@ const fs = require( 'fs' ).promises;
 const getCacheDirectory = require( './get-cache-directory' );
 const md5 = require( '../md5' );
 const { parseConfig, getConfigFilePath } = require( './parse-config' );
+const { ValidationError } = require( './validate-config' );
 const postProcessConfig = require( './post-process-config' );
 
 /**
@@ -35,12 +36,31 @@ const postProcessConfig = require( './post-process-config' );
 /**
  * Loads any configuration from a given directory.
  *
- * @param {string} configDirectoryPath The directory we want to load the config from.
+ * @param {string}      configDirectoryPath The directory we want to load the config from.
+ * @param {string|null} customConfigPath    Optional custom config file path.
  *
  * @return {Promise<WPConfig>} The config object we've loaded.
  */
-module.exports = async function loadConfig( configDirectoryPath ) {
-	const configFilePath = getConfigFilePath( configDirectoryPath );
+module.exports = async function loadConfig(
+	configDirectoryPath,
+	customConfigPath = null
+) {
+	const configFilePath = getConfigFilePath(
+		configDirectoryPath,
+		'local',
+		customConfigPath
+	);
+
+	// If a custom config path was provided, verify the file exists.
+	if ( customConfigPath ) {
+		try {
+			await fs.stat( configFilePath );
+		} catch ( error ) {
+			throw new ValidationError(
+				`Config file not found: ${ configFilePath }`
+			);
+		}
+	}
 
 	const cacheDirectoryPath = path.resolve(
 		await getCacheDirectory(),
@@ -49,7 +69,11 @@ module.exports = async function loadConfig( configDirectoryPath ) {
 
 	// Parse any configuration we found in the given directory.
 	// This comes merged and prepared for internal consumption.
-	let config = await parseConfig( configDirectoryPath, cacheDirectoryPath );
+	let config = await parseConfig(
+		configDirectoryPath,
+		cacheDirectoryPath,
+		customConfigPath
+	);
 
 	// Make sure to perform any additional post-processing that
 	// may be needed before the config object is ready for
@@ -64,9 +88,14 @@ module.exports = async function loadConfig( configDirectoryPath ) {
 		),
 		configDirectoryPath,
 		workDirectoryPath: cacheDirectoryPath,
+		customConfigPath,
 		detectedLocalConfig: await hasLocalConfig( [
 			configFilePath,
-			getConfigFilePath( configDirectoryPath, 'override' ),
+			getConfigFilePath(
+				configDirectoryPath,
+				'override',
+				customConfigPath
+			),
 		] ),
 		lifecycleScripts: config.lifecycleScripts,
 		env: config.env,

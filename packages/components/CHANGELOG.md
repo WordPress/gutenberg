@@ -4,10 +4,13 @@
 
 ### Bug Fixes
 
+-   `TimePicker`: Fix date parsing for years below 1000 by implementing ISO 8601 compliant year formatting with zero-padding ([#75343](https://github.com/WordPress/gutenberg/pull/75343)).
 -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
 -   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
 -   `ToggleControl`: Prevent `__nextHasNoMarginBottom` from logging a console warning ([#75296](https://github.com/WordPress/gutenberg/pull/75296)).
 -   `ColorPicker`: Preserve hue when the saturation picker reaches black, white, or gray ([#75157](https://github.com/WordPress/gutenberg/pull/75157)).
+-   `createSlotFill`: fix ref forwarding ([#75274](https://github.com/WordPress/gutenberg/pull/75274)).
+-   `Button`: Fix native outline showing when focused and active ([#75346](https://github.com/WordPress/gutenberg/pull/75346)).
 
 ### Enhancements
 
@@ -16,6 +19,8 @@
 ### Internal
 
 -   Expose `useDrag` from `@use-gesture/react` package via private API's ([#66735](https://github.com/WordPress/gutenberg/pull/66735)).
+-   `Disabled`, `Modal`, `Popover`, `Tooltip`: Move context code to separate files to help docgen prop extraction ([#75316](https://github.com/WordPress/gutenberg/pull/75316)).
+-   Update Emotion dependencies to ensure compatibility with React 19 ([#75324](https://github.com/WordPress/gutenberg/pull/75324)).
 
 ## 32.1.0 (2026-01-29)
 

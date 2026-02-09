@@ -35,7 +35,7 @@
 		"wp-build": "./lib/build.mjs"
 	},
 	"dependencies": {
-		"@emotion/babel-plugin": "11.11.0",
+		"@emotion/babel-plugin": "11.13.5",
 		"autoprefixer": "10.4.21",
 		"browserslist-to-esbuild": "2.1.1",
 		"change-case": "4.1.2",

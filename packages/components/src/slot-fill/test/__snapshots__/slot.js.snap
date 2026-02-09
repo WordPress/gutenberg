@@ -43,14 +43,14 @@ exports[`Slot bubblesVirtually true should subsume another slot by the same name
     data-position="first"
   >
     <div
-      class="emotion-0 emotion-1"
+      class="css-1ragr82-PolymorphicDiv emotion-0"
     />
   </div>
   <div
     data-position="second"
   >
     <div
-      class="emotion-0 emotion-1"
+      class="css-1ragr82-PolymorphicDiv emotion-0"
     >
       Content
     </div>
@@ -67,7 +67,7 @@ exports[`Slot bubblesVirtually true should subsume another slot by the same name
     data-position="second"
   >
     <div
-      class="emotion-0 emotion-1"
+      class="css-1ragr82-PolymorphicDiv emotion-0"
     >
       Content
     </div>
@@ -208,7 +208,7 @@ exports[`Slot should warn without a Provider 1`] = `
 <div>
   <div>
     <div
-      class="emotion-0 emotion-1"
+      class="css-1ragr82-PolymorphicDiv emotion-0"
     />
   </div>
 </div>
