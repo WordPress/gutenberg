@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { Modal, SearchControl } from '@wordpress/components';
 import { useState, useCallback } from '@wordpress/element';
+import { useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -15,6 +16,9 @@ export default function InserterModal( props ) {
 
 	const [ searchInput, setSearchInput ] = useState( '' );
 
+	// Debounce the search input with a 300ms delay
+	const debouncedSearchInput = useDebounce( searchInput, 300 );
+
 	function updateIconAtts( name ) {
 		setAttributes( {
 			icon: name,
@@ -24,9 +28,12 @@ export default function InserterModal( props ) {
 
 	// Move the filtering logic to a separate function
 	const getFilteredIcons = useCallback( () => {
-		if ( searchInput ) {
+		if (
+			debouncedSearchInput &&
+			typeof debouncedSearchInput === 'string'
+		) {
 			return icons.filter( ( icon ) => {
-				const input = searchInput.toLowerCase();
+				const input = debouncedSearchInput.toLowerCase();
 				const iconName = icon.name.toLowerCase();
 
 				return iconName.includes( input );
@@ -34,7 +41,7 @@ export default function InserterModal( props ) {
 		}
 
 		return icons;
-	}, [ searchInput, icons ] );
+	}, [ debouncedSearchInput, icons ] );
 
 	return (
 		<Modal
