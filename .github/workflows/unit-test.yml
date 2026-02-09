@@ -268,7 +268,7 @@ jobs:
 
             - name: Docker container debug information
               run: |
-                  npm run wp-env-test -- run mysql mysql -- --version
+                  npm run wp-env-test -- run mysql mariadb -- --version
                   npm run wp-env-test -- run wordpress php -- --version
                   npm run wp-env-test -- run wordpress php -m
                   npm run wp-env-test -- run wordpress php -i
