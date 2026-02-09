@@ -46,13 +46,13 @@ class Tests_Font_Face_File_Status extends WP_UnitTestCase {
 	 */
 	public function test_file_status_existing_when_file_exists() {
 		wp_set_current_user( self::$super_admin_id );
-		$font_family_id = $this->create_font_family();
+		$font_family_id  = $this->create_font_family();
 		$create_response = $this->create_font_face_with_upload( $font_family_id );
 
 		$this->assertSame( 201, $create_response->get_status(), 'The font face should be created successfully.' );
 
-		$create_data   = $create_response->get_data();
-		$font_face_id  = $create_data['id'];
+		$create_data  = $create_response->get_data();
+		$font_face_id = $create_data['id'];
 
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/font-families/' . $font_family_id . '/font-faces/' . $font_face_id );
 		$response = rest_get_server()->dispatch( $request );
