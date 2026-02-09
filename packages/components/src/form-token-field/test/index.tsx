@@ -1749,7 +1749,7 @@ describe( 'FormTokenField', () => {
 			] );
 		} );
 
-		it( "is applied to each suggestions, but doesn't influence the matching against the search value", async () => {
+		it( 'is applied to each suggestion and influences the matching against the search value', async () => {
 			const user = userEvent.setup();
 
 			const onChangeSpy = jest.fn();
@@ -1768,15 +1768,26 @@ describe( 'FormTokenField', () => {
 
 			const input = screen.getByRole( 'combobox' );
 
-			// The `displayTransform` function is only applied to the value
-			// rendered in the DOM, while the data behind is not modified.
+			// Matching is done against the displayed label (the result of
+			// `displayTransform`), not the raw suggestion value. Since
+			// `displayTransform` replaces "hot" with "cold", typing "hot"
+			// will not match any suggestion.
 			await user.type( input, 'hot' );
+
+			expect( screen.queryByRole( 'listbox' ) ).not.toBeInTheDocument();
+
+			// Typing "cold" matches the displayed labels "cold coffee" and
+			// "cold tea".
+			await user.clear( input );
+			await user.type( input, 'cold' );
 
 			expectVisibleSuggestionsToBe( screen.getByRole( 'listbox' ), [
 				'cold coffee',
 				'cold tea',
 			] );
 
+			// Selecting a suggestion still passes the original (untransformed)
+			// value to `onChange`.
 			await user.keyboard( '[ArrowDown][Enter]' );
 
 			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );

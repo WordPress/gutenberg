@@ -516,6 +516,8 @@ export function FormTokenField( props: FormTokenFieldProps ) {
 			match = match.normalize( 'NFKC' ).toLocaleLowerCase();
 
 			_suggestions.forEach( ( suggestion ) => {
+				// Match against the displayed label (i.e. the result of
+				// `displayTransform`), not the raw suggestion value.
 				const index = displayTransform( suggestion )
 					.normalize( 'NFKC' )
 					.toLocaleLowerCase()
