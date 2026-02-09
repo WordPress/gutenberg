@@ -17,8 +17,7 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	/**
 	 * Parent post controller.
 	 *
-	 * Stored separately because the parent class property is private.
-	 *
+	 * @since 5.0.0
 	 * @var WP_REST_Controller
 	 */
 	private $gutenberg_parent_controller;
@@ -26,11 +25,15 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	/**
 	 * Constructor.
 	 *
+	 * @since 5.0.0
+	 *
 	 * @param string $parent_post_type Post type of the parent.
 	 */
 	public function __construct( $parent_post_type ) {
 		parent::__construct( $parent_post_type );
 
+		// Create an instance of the parent post type controller that is accessible
+		// by this extended class.
 		$post_type_object  = get_post_type_object( $parent_post_type );
 		$parent_controller = $post_type_object->get_rest_controller();
 
@@ -44,15 +47,13 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 	/**
 	 * Creates, updates or deletes an autosave revision.
 	 *
-	 * This overrides the parent method to add support for real-time
-	 * collaboration on draft posts. When RTC is enabled for a post type,
-	 * all users' autosaves on drafts update the post directly instead of
-	 * creating separate autosave revisions per user.
+	 * @since 5.0.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
+
 		if ( ! defined( 'WP_RUN_CORE_TESTS' ) && ! defined( 'DOING_AUTOSAVE' ) ) {
 			define( 'DOING_AUTOSAVE', true );
 		}
@@ -75,32 +76,34 @@ class Gutenberg_REST_Autosaves_Controller extends WP_REST_Autosaves_Controller {
 		$post_lock = wp_check_post_lock( $post->ID );
 		$is_draft  = 'draft' === $post->post_status || 'auto-draft' === $post->post_status;
 
-		$is_real_time_collaboration_enabled = true;
+		/**
+		 * In the context of real-time collaboration, all peers are effectively
+		 * authors and we don't want to vary behavior based on whether they are the
+		 * original author. Always target an autosave revision.
+		 *
+		 * This avoids the following issue when real-time collaboration is enabled:
+		 *
+		 * - Autosaves from the original author (if they have the post lock) will
+		 *   target the saved post.
+		 *
+		 * - Autosaves from other users are applied to a post revision.
+		 *
+		 * - If any user reloads a post, they load changes from the author's autosave.
+		 *
+		 * - The saved post has now diverged from the persisted CRDT document. The
+		 *   content (and/or title or excerpt) are now "ahead" of the persisted CRDT
+		 *   document.
+		 *
+		 * - When the persisted CRDT document is loaded, a diff is computed against
+		 *   the saved post. This diff is then applied to the in-memory CRDT
+		 *   document, which can lead to duplicate inserts or deletions.
+		 *
+		 * Load the real-time collaboration setting and, when enabled, ensure that an
+		 * an autosave revision is always targeted.
+		 */
+		$is_collaboration_enabled = get_option( 'gutenberg_enable_real_time_collaboration' );
 
-		if ( $is_real_time_collaboration_enabled && $is_draft ) {
-			/*
-			 * In the context of RTC, we don't care if a user has the post lock or is
-			 * the original author when `$is_draft` is true. In both cases, update the
-			 * post content directly instead of creating an autosave revision.
-			 *
-			 * Otherwise:
-			 * - Autosaves from the original author (if they have the post lock) will become
-			 *   part of the saved post content automatically.
-			 * - Autosaves from other users are applied to a post revision.
-			 * - If any user reloads a post, they see the content from the author's
-			 *   autosave as it's applied direcly to the document via wp_update_post().
-			 *   All other users are treated differently and their autosaved edits won't
-			 *   be applied to the post.
-			 *
-			 * This change ensures the behavior is consistent for all users as post lock
-			 * is not relevant in the context of RTC.
-			 *
-			 * Note that autosaves for other post statuses are still separated per-user,
-			 * because this wp_update_post() conditional is the only place where there is
-			 * an autosave distinction based on author and post lock status.
-			 */
-			$autosave_id = wp_update_post( wp_slash( (array) $prepared_post ), true );
-		} elseif ( $is_draft && (int) $post->post_author === $user_id && ! $post_lock ) {
+		if ( $is_draft && (int) $post->post_author === $user_id && ! $post_lock && ! $is_collaboration_enabled ) {
 			/*
 			 * Draft posts for the same author: autosaving updates the post and does not create a revision.
 			 * Convert the post object to an array and add slashes, wp_update_post() expects escaped array.
