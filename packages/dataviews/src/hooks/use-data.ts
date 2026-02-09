@@ -125,10 +125,32 @@ export default function useData< Item >( {
 			// Subsequent pages - load more data
 			setAllLoadedRecords( ( prev ) => {
 				const shownDataIds = new Set( shownData.map( getItemId ) );
-				let nextPosition =
-					positionMapRef.current.size > 0
-						? Math.max( ...positionMapRef.current.values() ) + 1
-						: 1;
+				const scrollDirection = scrollDirectionRef.current;
+
+				// Count how many new items need positions assigned
+				const newItemsCount = shownData.filter( ( record ) => {
+					const itemId = getItemId( record );
+					return ! positionMapRef.current.has( itemId );
+				} ).length;
+
+				// Calculate start position based on scroll direction
+				// When scrolling up, new items should have positions before the minimum
+				// We start at (min - count) so that after incrementing through all items,
+				// the last new item ends up just before the previous minimum.
+				// When scrolling down, new items should have positions after the maximum
+				let nextPosition: number;
+				if ( positionMapRef.current.size > 0 ) {
+					if ( scrollDirection === 'up' ) {
+						nextPosition =
+							Math.min( ...positionMapRef.current.values() ) -
+							newItemsCount;
+					} else {
+						nextPosition =
+							Math.max( ...positionMapRef.current.values() ) + 1;
+					}
+				} else {
+					nextPosition = 1;
+				}
 
 				const newRecords = shownData.map( ( record ) => {
 					const itemId = getItemId( record );
@@ -162,7 +184,7 @@ export default function useData< Item >( {
 					return prev;
 				}
 
-				const scrollDirection = scrollDirectionRef.current;
+				// Update the loaded range
 				const allRecords =
 					scrollDirection === 'up'
 						? [ ...newRecords, ...prevWithoutDuplicates ]
