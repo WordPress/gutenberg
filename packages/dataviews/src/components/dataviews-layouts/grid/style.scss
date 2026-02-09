@@ -164,6 +164,11 @@
 			padding-bottom: $grid-unit-15;
 		}
 	}
+
+	&.is-refreshing {
+		opacity: 0.5;
+		pointer-events: none;
+	}
 }
 
 .dataviews-view-grid__field-value:empty,

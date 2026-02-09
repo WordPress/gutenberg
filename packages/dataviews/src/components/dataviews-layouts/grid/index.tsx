@@ -15,6 +15,7 @@ import { Stack } from '@wordpress/ui';
  */
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
+import useDisplayData from '../utils/use-display-data';
 import CompositeGrid from './composite-grid';
 
 function ViewGrid< Item >( {
@@ -32,14 +33,22 @@ function ViewGrid< Item >( {
 	className,
 	empty,
 }: ViewGridProps< Item > ) {
-	const hasData = !! data?.length;
+	const displayData = useDisplayData( data, isLoading );
+
+	const hasData = !! displayData?.length;
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
 		: null;
-	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+	const dataByGroup = groupField
+		? getDataByGroup( displayData, groupField )
+		: null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	const noResults = ! hasData && ! isLoading;
+	const showGrid = hasData || ( isLoading && isInfiniteScroll );
+	const isRefreshing = ! isInfiniteScroll && isLoading && hasData;
 	const gridProps = {
-		className,
+		className: clsx( className, { 'is-refreshing': isRefreshing } ),
+		inert: isRefreshing ? 'true' : undefined,
 		isLoading,
 		view,
 		fields,
@@ -87,34 +96,21 @@ function ViewGrid< Item >( {
 			}
 			{
 				// Render a single grid with all data.
-				hasData && ! dataByGroup && (
+				showGrid && ! dataByGroup && (
 					<CompositeGrid
 						{ ...gridProps }
-						data={ data }
+						data={ displayData }
 						isInfiniteScroll={ !! isInfiniteScroll }
 					/>
 				)
 			}
 			{
 				// Render empty state.
-				! hasData && (
-					<div
-						className={ clsx( {
-							'dataviews-loading': isLoading,
-							'dataviews-no-results': ! isLoading,
-						} ) }
-					>
-						{ isLoading ? (
-							<p>
-								<Spinner />
-							</p>
-						) : (
-							empty
-						) }
-					</div>
+				noResults && (
+					<div className="dataviews-no-results">{ empty }</div>
 				)
 			}
-			{ hasData && isLoading && (
+			{ isInfiniteScroll && isLoading && (
 				<p className="dataviews-loading-more">
 					<Spinner />
 				</p>

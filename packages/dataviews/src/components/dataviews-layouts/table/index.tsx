@@ -41,6 +41,7 @@ import ColumnHeaderMenu from './column-header-menu';
 import ColumnPrimary from './column-primary';
 import { useIsHorizontalScrollEnd } from './use-is-horizontal-scroll-end';
 import getDataByGroup from '../utils/get-data-by-group';
+import useDisplayData from '../utils/use-display-data';
 import { PropertiesSection } from '../../dataviews-view-config/properties-section';
 
 interface TableColumnFieldProps< Item > {
@@ -311,18 +312,7 @@ function ViewTable< Item >( {
 		enabled: !! actions?.length,
 	} );
 
-	// Preserve previous loaded data to apply loading pulse animation
-	// while refreshing to avoid flickering.
-	const previousDataRef = useRef< Item[] >( data );
-	useEffect( () => {
-		if ( ! isLoading ) {
-			previousDataRef.current = data;
-		}
-	}, [ data, isLoading ] );
-	const displayData =
-		isLoading && previousDataRef.current?.length
-			? previousDataRef.current
-			: data;
+	const displayData = useDisplayData( data, isLoading );
 
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction(
 		actions,
@@ -402,16 +392,12 @@ function ViewTable< Item >( {
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
 	const isRtl = isRTL();
 
-	// If new data are loading but previous loaded data were empty,
-	// keep showing just the spinner.
 	const isRefreshing = ! isInfiniteScroll && isLoading && hasData;
 	const noResults = ! hasData && ! isLoading;
-	// Determine if we should show loading spinner. Infinite scroll has
-	// different logic and spinner.
-	const showLoadingSpinner = ! hasData && isLoading;
+	const showTable = hasData || ( isLoading && isInfiniteScroll );
 	return (
 		<>
-			{ ! noResults && ! showLoadingSpinner && (
+			{ showTable && (
 				<>
 					<table
 						className={ clsx( 'dataviews-view-table', className, {
@@ -708,7 +694,7 @@ function ViewTable< Item >( {
 							</tbody>
 						) }
 					</table>
-					{ isInfiniteScroll && hasData && isLoading && (
+					{ isInfiniteScroll && isLoading && (
 						<div className="dataviews-loading" id={ tableNoticeId }>
 							<p className="dataviews-loading-more">
 								<Spinner />
@@ -717,21 +703,9 @@ function ViewTable< Item >( {
 					) }
 				</>
 			) }
-			{ ( showLoadingSpinner || noResults ) && (
-				<div
-					className={ clsx( {
-						'dataviews-loading': showLoadingSpinner,
-						'dataviews-no-results': noResults,
-					} ) }
-					id={ tableNoticeId }
-				>
-					{ showLoadingSpinner ? (
-						<p>
-							<Spinner />
-						</p>
-					) : (
-						empty
-					) }
+			{ noResults && (
+				<div className="dataviews-no-results" id={ tableNoticeId }>
+					{ empty }
 				</div>
 			) }
 		</>

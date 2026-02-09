@@ -41,6 +41,7 @@ import type {
 	ActionModal as ActionModalType,
 } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
+import useDisplayData from '../utils/use-display-data';
 
 interface ListViewItemProps< Item > {
 	view: ViewListType;
@@ -390,7 +391,9 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 	} = props;
 	const baseId = useInstanceId( ViewList, 'view-list' );
 
-	const selectedItem = data?.findLast( ( item ) =>
+	const displayData = useDisplayData( data, isLoading );
+
+	const selectedItem = displayData?.findLast( ( item ) =>
 		selection.includes( getItemId( item ) )
 	);
 	const titleField = fields.find( ( field ) => field.id === view.titleField );
@@ -436,7 +439,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		}
 	}, [ selectedItem, generateCompositeItemIdPrefix ] );
 
-	const activeItemIndex = data.findIndex( ( item ) =>
+	const activeItemIndex = displayData.findIndex( ( item ) =>
 		isActiveCompositeItem( item, activeCompositeId ?? '' )
 	);
 	const previousActiveItemIndex = usePrevious( activeItemIndex );
@@ -449,23 +452,23 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			// target composite item ID
 			generateCompositeId: ( idPrefix: string ) => string
 		) => {
-			// Clamping between 0 and data.length - 1 to avoid out of bounds.
+			// Clamping between 0 and displayData.length - 1 to avoid out of bounds.
 			const clampedIndex = Math.min(
-				data.length - 1,
+				displayData.length - 1,
 				Math.max( 0, targetIndex )
 			);
-			if ( ! data[ clampedIndex ] ) {
+			if ( ! displayData[ clampedIndex ] ) {
 				return;
 			}
 			const itemIdPrefix = generateCompositeItemIdPrefix(
-				data[ clampedIndex ]
+				displayData[ clampedIndex ]
 			);
 			const targetCompositeItemId = generateCompositeId( itemIdPrefix );
 
 			setActiveCompositeId( targetCompositeItemId );
 			document.getElementById( targetCompositeItemId )?.focus();
 		},
-		[ data, generateCompositeItemIdPrefix ]
+		[ displayData, generateCompositeItemIdPrefix ]
 	);
 
 	// Select a new active composite item when the current active item
@@ -511,31 +514,25 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 		[ selectCompositeItem, activeItemIndex ]
 	);
 
-	const hasData = data?.length;
-	if ( ! hasData ) {
-		return (
-			<div
-				className={ clsx( {
-					'dataviews-loading': isLoading,
-					'dataviews-no-results': ! hasData && ! isLoading,
-				} ) }
-			>
-				{ ! hasData &&
-					( isLoading ? (
-						<p>
-							<Spinner />
-						</p>
-					) : (
-						empty
-					) ) }
-			</div>
-		);
-	}
-
+	const hasData = !! displayData?.length;
 	const groupField = view.groupBy?.field
 		? fields.find( ( field ) => field.id === view.groupBy?.field )
 		: null;
-	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+	const dataByGroup =
+		hasData && groupField
+			? getDataByGroup( displayData, groupField )
+			: null;
+	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	const noResults = ! hasData && ! isLoading;
+	const isRefreshing = ! isInfiniteScroll && isLoading && hasData;
+
+	if ( noResults ) {
+		return <div className="dataviews-no-results">{ empty }</div>;
+	}
+
+	if ( ! hasData && ! isInfiniteScroll ) {
+		return null;
+	}
 
 	// Render data grouped by field
 	if ( hasData && groupField && dataByGroup ) {
@@ -614,12 +611,15 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 						[ 'compact', 'comfortable' ].includes(
 							view.layout.density
 						),
+					'is-refreshing': isRefreshing,
 				} ) }
 				role={ view.infiniteScrollEnabled ? 'feed' : 'grid' }
 				activeId={ activeCompositeId }
 				setActiveId={ setActiveCompositeId }
+				// @ts-ignore
+				inert={ isRefreshing ? 'true' : undefined }
 			>
-				{ data.map( ( item, index ) => {
+				{ displayData.map( ( item, index ) => {
 					const id = generateCompositeItemIdPrefix( item );
 					return (
 						<ListItem
@@ -646,7 +646,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 					);
 				} ) }
 			</Composite>
-			{ hasData && isLoading && (
+			{ isInfiniteScroll && isLoading && (
 				<p className="dataviews-loading-more">
 					<Spinner />
 				</p>

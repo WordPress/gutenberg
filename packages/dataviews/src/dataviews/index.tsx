@@ -8,6 +8,7 @@ import type { ReactNode, ComponentProps, ReactElement } from 'react';
  */
 import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { useResizeObserver, throttle } from '@wordpress/compose';
+import { ProgressBar } from '@wordpress/components';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -273,6 +274,9 @@ function DataViews< Item >( {
 			} }
 		>
 			<div className="dataviews-wrapper" ref={ containerRef }>
+				{ isLoading && ! infiniteScrollHandler && (
+					<ProgressBar className="dataviews-wrapper__loading-progress" />
+				) }
 				{ children ?? (
 					<DefaultUI
 						header={ header }

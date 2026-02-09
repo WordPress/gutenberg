@@ -4,6 +4,7 @@
 
 .dataviews-wrapper,
 .dataviews-picker-wrapper {
+	position: relative;
 	height: 100%;
 	overflow: auto;
 	box-sizing: border-box;
@@ -15,6 +16,17 @@
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 	background-color: var(--wp-dataviews-color-background, $white);
+}
+
+.dataviews-wrapper .dataviews-wrapper__loading-progress {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	z-index: 10;
+	border-radius: 0;
+	--wp-components-color-foreground: var(--wp-admin-theme-color);
 }
 
 .dataviews__view-actions,

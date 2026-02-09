@@ -271,6 +271,11 @@ div.dataviews-view-list {
 			}
 		}
 	}
+
+	&.is-refreshing {
+		opacity: 0.5;
+		pointer-events: none;
+	}
 }
 
 .dataviews-view-list__group-header {
