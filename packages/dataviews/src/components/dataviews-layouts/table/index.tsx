@@ -353,6 +353,26 @@ function ViewTable< Item >( {
 
 	const hasData = !! data?.length;
 
+	if ( ! hasData ) {
+		return (
+			<div
+				className={ clsx( {
+					'dataviews-loading': isLoading,
+					'dataviews-no-results': ! isLoading,
+				} ) }
+				id={ tableNoticeId }
+			>
+				{ isLoading ? (
+					<p>
+						<Spinner />
+					</p>
+				) : (
+					empty
+				) }
+			</div>
+		);
+	}
+
 	const titleField = fields.find( ( field ) => field.id === view.titleField );
 	const mediaField = fields.find( ( field ) => field.id === view.mediaField );
 	const descriptionField = fields.find(
@@ -536,7 +556,7 @@ function ViewTable< Item >( {
 					</tr>
 				</thead>
 				{ /* Render grouped data if groupBy is specified */ }
-				{ hasData && groupField && dataByGroup ? (
+				{ groupField && dataByGroup ? (
 					Array.from( dataByGroup.entries() ).map(
 						( [ groupName, groupItems ] ) => (
 							<tbody key={ `group-${ groupName }` }>
@@ -597,58 +617,48 @@ function ViewTable< Item >( {
 					)
 				) : (
 					<tbody>
-						{ hasData &&
-							data.map( ( item, index ) => (
-								<TableRow
-									key={ getItemId( item ) }
-									item={ item }
-									level={
-										view.showLevels &&
-										typeof getItemLevel === 'function'
-											? getItemLevel( item )
-											: undefined
-									}
-									hasBulkActions={ hasBulkActions }
-									actions={ actions }
-									fields={ fields }
-									id={ getItemId( item ) || index.toString() }
-									view={ view }
-									titleField={ titleField }
-									mediaField={ mediaField }
-									descriptionField={ descriptionField }
-									selection={ selection }
-									getItemId={ getItemId }
-									onChangeSelection={ onChangeSelection }
-									onClickItem={ onClickItem }
-									renderItemLink={ renderItemLink }
-									isItemClickable={ isItemClickable }
-									isActionsColumnSticky={
-										! isHorizontalScrollEnd
-									}
-									posinset={
-										isInfiniteScroll ? index + 1 : undefined
-									}
-								/>
-							) ) }
+						{ data.map( ( item, index ) => (
+							<TableRow
+								key={ getItemId( item ) }
+								item={ item }
+								level={
+									view.showLevels &&
+									typeof getItemLevel === 'function'
+										? getItemLevel( item )
+										: undefined
+								}
+								hasBulkActions={ hasBulkActions }
+								actions={ actions }
+								fields={ fields }
+								id={ getItemId( item ) || index.toString() }
+								view={ view }
+								titleField={ titleField }
+								mediaField={ mediaField }
+								descriptionField={ descriptionField }
+								selection={ selection }
+								getItemId={ getItemId }
+								onChangeSelection={ onChangeSelection }
+								onClickItem={ onClickItem }
+								renderItemLink={ renderItemLink }
+								isItemClickable={ isItemClickable }
+								isActionsColumnSticky={
+									! isHorizontalScrollEnd
+								}
+								posinset={
+									isInfiniteScroll ? index + 1 : undefined
+								}
+							/>
+						) ) }
 					</tbody>
 				) }
 			</table>
 			<div
 				className={ clsx( {
 					'dataviews-loading': isLoading,
-					'dataviews-no-results': ! hasData && ! isLoading,
 				} ) }
 				id={ tableNoticeId }
 			>
-				{ ! hasData &&
-					( isLoading ? (
-						<p>
-							<Spinner />
-						</p>
-					) : (
-						empty
-					) ) }
-				{ hasData && isLoading && (
+				{ isLoading && (
 					<p className="dataviews-loading-more">
 						<Spinner />
 					</p>
