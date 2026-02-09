@@ -1,11 +1,4 @@
-import {
-	type ThemeProvider as ThemeProviderType,
-	privateApis as themePrivateApis,
-} from '@wordpress/theme';
-import { unlock } from '../../lock-unlock';
-
-const ThemeProvider: typeof ThemeProviderType =
-	unlock( themePrivateApis ).ThemeProvider;
+import { ThemeProvider } from '@wordpress/theme/theme-provider';
 
 const THEME_PRIMARY_COLORS = new Map< string, string >( [
 	[ 'light', '#0085ba' ],
