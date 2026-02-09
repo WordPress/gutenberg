@@ -54,6 +54,7 @@ export interface CollectionFontFamily {
 export interface CollectionFontFace {
 	id: string;
 	font_face_settings: FontFace;
+	file_status?: 'existing' | 'missing' | 'none';
 }
 
 export type FontCollection< C extends Context = 'edit' > =

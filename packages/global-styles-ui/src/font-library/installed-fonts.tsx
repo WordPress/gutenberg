@@ -165,12 +165,27 @@ function InstalledFonts() {
 			font.slug,
 			font.source
 		).length;
-		return sprintf(
+		const variantsMissing =
+			font?.fontFace?.filter( ( face ) => face.fileStatus === 'missing' )
+				.length ?? 0;
+		const activeText = sprintf(
 			/* translators: 1: Active font variants, 2: Total font variants. */
 			__( '%1$d/%2$d variants active' ),
 			variantsActive,
 			variantsInstalled
 		);
+		if ( variantsMissing > 0 ) {
+			return (
+				activeText +
+				', ' +
+				sprintf(
+					/* translators: %d: Number of font variants with missing files. */
+					__( '%d missing' ),
+					variantsMissing
+				)
+			);
+		}
+		return activeText;
 	};
 
 	useEffect( () => {
@@ -218,7 +233,7 @@ function InstalledFonts() {
 			libraryFontSelected.fontFace.forEach( ( face ) => {
 				if ( isSelectAllChecked ) {
 					unloadFontFaceInBrowser( face, 'all' );
-				} else {
+				} else if ( face.fileStatus !== 'missing' ) {
 					const displaySrc = getDisplaySrcFromFontFace(
 						face?.src ?? ''
 					);

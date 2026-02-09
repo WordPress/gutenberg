@@ -90,7 +90,11 @@ function FontDemo( { font, text }: FontDemoProps ) {
 	useEffect( () => {
 		const loadAsset = async () => {
 			if ( isIntersecting ) {
-				if ( ! isPreviewImage && fontFace.src ) {
+				// Skip loading font faces with missing files.
+				const isMissing =
+					'fileStatus' in fontFace &&
+					fontFace.fileStatus === 'missing';
+				if ( ! isPreviewImage && fontFace.src && ! isMissing ) {
 					await loadFontFaceAsset( fontFace );
 				}
 				setIsAssetLoaded( true );

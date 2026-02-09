@@ -108,3 +108,22 @@ function gutenberg_rest_theme_global_styles_link_rel_7_0( $response, $theme ) {
 	return $response;
 }
 add_filter( 'rest_prepare_theme', 'gutenberg_rest_theme_global_styles_link_rel_7_0', 10, 2 );
+
+/**
+ * Overrides the REST controller for the wp_font_face post type to add
+ * a file_status field indicating whether font files exist on disk.
+ *
+ * @since 20.4.0
+ *
+ * @param array  $args      Array of arguments for registering a post type.
+ * @param string $post_type Post type key.
+ * @return array Modified array of arguments.
+ */
+function gutenberg_override_font_faces_rest_controller_7_0( $args, $post_type ) {
+	if ( 'wp_font_face' === $post_type ) {
+		$args['rest_controller_class']   = 'Gutenberg_REST_Font_Faces_Controller_7_0';
+		$args['late_route_registration'] = true;
+	}
+	return $args;
+}
+add_filter( 'register_post_type_args', 'gutenberg_override_font_faces_rest_controller_7_0', 10, 2 );

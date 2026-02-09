@@ -39,6 +39,7 @@ declare module './base-entity-records' {
 					font_faces?: Array< {
 						id: string;
 						font_face_settings: FontFace;
+						file_status?: 'existing' | 'missing' | 'none';
 					} >;
 				},
 				'view' | 'edit',
@@ -85,6 +86,7 @@ export interface FontFace {
 	fontFeatureSettings?: string;
 	fontVariationSettings?: string;
 	unicodeRange?: string;
+	fileStatus?: 'existing' | 'missing' | 'none';
 }
 
 export type WpFontFamily< C extends Context = 'edit' > = OmitNevers<
