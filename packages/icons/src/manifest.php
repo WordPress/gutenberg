@@ -329,6 +329,10 @@ return array(
 		'label'    => _x( 'Create', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/create.svg',
 	),
+	'contents'                       => array(
+		'label'    => _x( 'Contents', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/contents.svg',
+	),
 	'crop'                           => array(
 		'label'    => _x( 'Crop', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/crop.svg',
@@ -1180,6 +1184,18 @@ return array(
 	'tablet'                         => array(
 		'label'    => _x( 'Tablet', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/tablet.svg',
+	),
+	'tab'                            => array(
+		'label'    => _x( 'Tab', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/tab.svg',
+	),
+	'tabs'                           => array(
+		'label'    => _x( 'Tabs', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/tabs.svg',
+	),
+	'tabs-menu'                      => array(
+		'label'    => _x( 'Tabs Menu', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/tabs-menu.svg',
 	),
 	'tag'                            => array(
 		'label'    => _x( 'Tag', 'icon label', 'gutenberg' ),
