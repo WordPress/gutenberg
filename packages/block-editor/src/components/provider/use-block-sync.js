@@ -315,21 +315,10 @@ export default function useBlockSync( {
 					);
 				} else {
 					window.requestAnimationFrame( () => {
-						const deferredStart = convertSelectionIds(
-							controlledSelection.selectionStart
-						);
-						// After the rAF, re-check if the block exists.
-						// If it still doesn't, this is a stale selection
-						// (e.g. from a template revert), not a controlled
-						// inner block waiting for setup — skip restoration.
-						if (
-							deferredStart?.clientId &&
-							! getBlockName( deferredStart.clientId )
-						) {
-							return;
-						}
 						resetSelection(
-							deferredStart,
+							convertSelectionIds(
+								controlledSelection.selectionStart
+							),
 							convertSelectionIds(
 								controlledSelection.selectionEnd
 							),
