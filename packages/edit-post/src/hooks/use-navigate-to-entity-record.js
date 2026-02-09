@@ -118,7 +118,8 @@ export default function useNavigateToEntityRecord(
 								clientId: previousItem.selectedBlockClientId,
 							},
 						},
-					}
+					},
+					{ undoIgnore: true }
 				);
 			}
 		}
