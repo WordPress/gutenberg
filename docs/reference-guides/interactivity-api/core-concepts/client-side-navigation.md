@@ -326,7 +326,9 @@ When navigating from Page 1 to Page 2, the modal region is created and appended 
 
 ### Handling server state updates
 
-During client-side navigation, the client-side state persists while the server provides new state for the target page. Use `getServerState()` and `getServerContext()` to react specifically to server-provided values.
+During client-side navigation, the client-side state persists while the server provides new state for the target page. In some cases, you may want parts of your client state to stay in sync with what the server provides for each page — for example, updating a product count that changes across pages, or resetting an "expanded" flag based on the new page's context.
+
+Use `getServerState()` and `getServerContext()` to react specifically to server-provided values and selectively update the client state in a callback:
 
 ```js
 import {
@@ -343,11 +345,12 @@ const { state } = store( 'myPlugin', {
             const serverContext = getServerContext();
             const context = getContext();
 
-            // Update client state with server values selectively.
+            // Keep the product count in sync with the server across navigations.
             if ( serverState.productCount !== undefined ) {
                 state.productCount = serverState.productCount;
             }
 
+            // Reset the expanded state based on the new page's context.
             if ( serverContext.isExpanded !== undefined ) {
                 context.isExpanded = serverContext.isExpanded;
             }
