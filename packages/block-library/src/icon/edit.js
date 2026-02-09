@@ -166,7 +166,13 @@ export function Edit( props ) {
 				{ icon ? (
 					<HtmlRenderer html={ iconToDisplay } />
 				) : (
-					<Placeholder withIllustration />
+					<Placeholder
+						withIllustration
+						style={ {
+							height: attributes?.style?.dimensions?.width,
+							width: attributes?.style?.dimensions?.width,
+						} }
+					/>
 				) }
 			</div>
 			{ isInserterOpen && (
