@@ -71,10 +71,10 @@
 
 .dataviews-view-config__modified-indicator {
 	position: absolute;
-	top: $grid-unit-05;
-	right: $grid-unit-05;
-	width: $grid-unit-05;
-	height: $grid-unit-05;
+	top: var(--wpds-dimension-gap-xs);
+	right: var(--wpds-dimension-gap-xs);
+	width: var(--wpds-dimension-gap-xs);
+	height: var(--wpds-dimension-gap-xs);
 	background: var(--wp-admin-theme-color, #3858e9);
 	border-radius: 50%;
 	pointer-events: none;
