@@ -597,14 +597,13 @@ describe( 'TimePicker', () => {
 			const user = userEvent.setup();
 			const onChangeSpy = jest.fn();
 
-			render(
-				<TimePicker
-					currentTime="0999-10-18T11:00:00"
-					onChange={ onChangeSpy }
-					minYear={ 1 }
-					is12Hour
-				/>
-			);
+		render(
+			<TimePicker
+				currentTime="0999-10-18T11:00:00"
+				onChange={ onChangeSpy }
+				is12Hour
+			/>
+		);
 
 			const yearInput = screen.getByLabelText( 'Year' );
 			expect( yearInput ).toHaveValue( 999 );
