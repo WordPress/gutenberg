@@ -6,7 +6,7 @@ import { parseISO, endOfMonth, startOfMonth } from 'date-fns';
 /**
  * WordPress dependencies
  */
-import { getSettings } from '@wordpress/date';
+import { getDate, getSettings } from '@wordpress/date';
 import { _x } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
@@ -94,6 +94,11 @@ export function PrivatePostSchedule( {
 			.join( '' ) // Reverse the string and test for "a" not followed by a slash.
 	);
 
+	// Get the current year in the site's timezone to use as the minimum schedulable year.
+	// We use getDate() instead of new Date() to ensure we respect the WordPress site's
+	// configured timezone rather than the browser/system timezone.
+	const currentSiteYear = getDate().getFullYear();
+
 	return (
 		<PrivatePublishDateTimePicker
 			currentDate={ postDate }
@@ -103,7 +108,7 @@ export function PrivatePostSchedule( {
 				/* translators: Order of day, month, and year. Available formats are 'dmy', 'mdy', and 'ymd'. */
 				_x( 'dmy', 'date order' )
 			}
-			minYear={ new Date().getFullYear() }
+			minYear={ currentSiteYear }
 			events={ events }
 			onMonthPreviewed={ ( date ) =>
 				setPreviewedMonth( parseISO( date ) )
