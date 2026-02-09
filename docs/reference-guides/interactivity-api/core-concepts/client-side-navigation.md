@@ -903,11 +903,11 @@ When the router fetches a new page, it extracts both types of server data:
 
 **Merging server data during navigation**
 
-When navigation renders the new page, the server-provided data needs to merge with the existing client-side state. This merge follows specific rules:
+When navigation renders the new page, the server-provided data may need to merge with the existing client-side state, depending on the use case. The key principle here is that **client-side state is never automatically overwritten by the server**. This design ensures that any changes your JavaScript code has made to the state (such as user preferences, UI toggles, or form input) are preserved across navigations.
 
-For global state, the server state does not overwrite existing client state properties. During navigation, only properties that don't already exist on the client are added. Existing client-side properties are preserved as-is. If you need the client state to reflect server changes during navigation, you must use `getServerState()` to subscribe to server state updates and then manually update the client state accordingly.
+For **global state**, the merge works as follows: properties that already exist on the client are left untouched, and only new properties (those that don't exist on the client yet) are added from the server data. If you need the client state to reflect server changes during navigation, use `getServerState()` to subscribe to the server-provided values and update the client state yourself.
 
-For local context, the behavior is similar. The server context and client context are tracked separately by the Interactivity API. During navigation, the server context is updated with the values from the new page, but the client context is not automatically overwritten. You can use `getServerContext()` to read the server-provided values or `getContext()` to read the client-side values, and decide which one to use in your code.
+For **local context**, the behavior follows the same principle. The Interactivity API tracks server context and client context separately. During navigation, the server context is updated with the values from the new page, but the client context remains unchanged. Use `getServerContext()` to read the server-provided values and `getContext()` to read the client-side values, choosing whichever is appropriate for your use case.
 
 **Subscribing to server data changes**
 
