@@ -51,7 +51,7 @@ const LayoutCardSaveExample = () => {
 };
 
 const meta: Meta< typeof LayoutCardSaveExample > = {
-	title: 'Design System/Patterns/Save & submit UX',
+	title: 'Design System/Patterns/Save & Submit',
 	component: LayoutCardSaveExample,
 	parameters: {
 		controls: { disable: true },
