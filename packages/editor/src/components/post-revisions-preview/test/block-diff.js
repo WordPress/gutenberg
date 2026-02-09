@@ -8,11 +8,7 @@ import {
 	getBlockType,
 	serialize,
 } from '@wordpress/blocks';
-import {
-	RichTextData,
-	registerFormatType,
-	unregisterFormatType,
-} from '@wordpress/rich-text';
+import { RichTextData } from '@wordpress/rich-text';
 import * as paragraphBlock from '@wordpress/block-library/src/paragraph';
 import * as groupBlock from '@wordpress/block-library/src/group';
 
@@ -20,6 +16,10 @@ import * as groupBlock from '@wordpress/block-library/src/group';
  * Internal dependencies
  */
 import { diffRevisionContent } from '../block-diff';
+import {
+	registerDiffFormatTypes,
+	unregisterDiffFormatTypes,
+} from '../diff-format-types';
 
 /**
  * Convert blocks to a normalized format for comparison.
@@ -66,42 +66,7 @@ describe( 'diffRevisionContent', () => {
 			);
 		}
 
-		// Register custom format types for revision diff.
-		registerFormatType( 'revision/diff-removed', {
-			name: 'revision/diff-removed',
-			title: 'Removed',
-			tagName: 'del',
-			className: 'revision-diff-removed',
-			edit: () => null,
-		} );
-		registerFormatType( 'revision/diff-added', {
-			name: 'revision/diff-added',
-			title: 'Added',
-			tagName: 'ins',
-			className: 'revision-diff-added',
-			edit: () => null,
-		} );
-		registerFormatType( 'revision/diff-format-added', {
-			name: 'revision/diff-format-added',
-			title: 'Format Added',
-			tagName: 'span',
-			className: 'revision-diff-format-added',
-			edit: () => null,
-		} );
-		registerFormatType( 'revision/diff-format-removed', {
-			name: 'revision/diff-format-removed',
-			title: 'Format Removed',
-			tagName: 'span',
-			className: 'revision-diff-format-removed',
-			edit: () => null,
-		} );
-		registerFormatType( 'revision/diff-format-changed', {
-			name: 'revision/diff-format-changed',
-			title: 'Format Changed',
-			tagName: 'span',
-			className: 'revision-diff-format-changed',
-			edit: () => null,
-		} );
+		registerDiffFormatTypes();
 	} );
 
 	afterAll( () => {
@@ -112,12 +77,7 @@ describe( 'diffRevisionContent', () => {
 			unregisterBlockType( 'core/group' );
 		}
 
-		// Unregister format types.
-		unregisterFormatType( 'revision/diff-removed' );
-		unregisterFormatType( 'revision/diff-added' );
-		unregisterFormatType( 'revision/diff-format-added' );
-		unregisterFormatType( 'revision/diff-format-removed' );
-		unregisterFormatType( 'revision/diff-format-changed' );
+		unregisterDiffFormatTypes();
 	} );
 
 	it( 'marks all blocks as added when no previous content', () => {

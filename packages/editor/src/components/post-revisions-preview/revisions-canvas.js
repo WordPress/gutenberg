@@ -13,10 +13,8 @@ import {
 } from '@wordpress/block-editor';
 import { createBlock, parse } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
-import { __ } from '@wordpress/i18n';
-import { registerFormatType } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -24,6 +22,10 @@ import { registerFormatType } from '@wordpress/rich-text';
 import { unlock } from '../../lock-unlock';
 import { store as editorStore } from '../../store';
 import VisualEditor from '../visual-editor';
+import {
+	registerDiffFormatTypes,
+	unregisterDiffFormatTypes,
+} from './diff-format-types';
 import { useDiffMarkers } from './diff-markers';
 import { preserveClientIds } from './preserve-client-ids';
 import { diffRevisionContent } from './block-diff';
@@ -92,52 +94,6 @@ const REVISION_DIFF_STYLES = `
 	}
 `;
 
-// Register custom format types for revision diff at module level.
-registerFormatType( 'revision/diff-removed', {
-	name: 'revision/diff-removed',
-	title: __( 'Removed' ),
-	tagName: 'del',
-	className: 'revision-diff-removed',
-	attributes: { title: 'title' },
-	edit: () => null,
-} );
-
-registerFormatType( 'revision/diff-added', {
-	name: 'revision/diff-added',
-	title: __( 'Added' ),
-	tagName: 'ins',
-	className: 'revision-diff-added',
-	attributes: { title: 'title' },
-	edit: () => null,
-} );
-
-registerFormatType( 'revision/diff-format-added', {
-	name: 'revision/diff-format-added',
-	title: __( 'Format added' ),
-	tagName: 'span',
-	className: 'revision-diff-format-added',
-	attributes: { title: 'title' },
-	edit: () => null,
-} );
-
-registerFormatType( 'revision/diff-format-removed', {
-	name: 'revision/diff-format-removed',
-	title: __( 'Format removed' ),
-	tagName: 'span',
-	className: 'revision-diff-format-removed',
-	attributes: { title: 'title' },
-	edit: () => null,
-} );
-
-registerFormatType( 'revision/diff-format-changed', {
-	name: 'revision/diff-format-changed',
-	title: __( 'Format changed' ),
-	tagName: 'span',
-	className: 'revision-diff-format-changed',
-	attributes: { title: 'title' },
-	edit: () => null,
-} );
-
 /**
  * Filter to add diff status CSS classes to blocks.
  *
@@ -200,6 +156,13 @@ function CanvasContent( { showDiff } ) {
  * @return {JSX.Element} The revisions canvas component.
  */
 export default function RevisionsCanvas( { showDiff } ) {
+	useEffect( () => {
+		registerDiffFormatTypes();
+		return () => {
+			unregisterDiffFormatTypes();
+		};
+	}, [] );
+
 	const { revision, previousRevision, postType, blockEditorSettings } =
 		useSelect( ( select ) => {
 			const {
