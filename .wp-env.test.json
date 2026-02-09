@@ -5,6 +5,10 @@
 	"core": "WordPress/WordPress",
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
+	"config": {
+		"WP_DEBUG": false,
+		"SCRIPT_DEBUG": false
+	},
 	"mappings": {
 		"wp-content/plugins/gutenberg": ".",
 		"wp-content/mu-plugins": "./packages/e2e-tests/mu-plugins",
