@@ -46,7 +46,7 @@ function gutenberg_rest_api_crdt_post_meta() {
 		)
 	);
 }
-add_action( 'init', 'gutenberg_rest_api_crdt_post_meta', 999, 0 );
+add_action( 'init', 'gutenberg_rest_api_crdt_post_meta' );
 
 /**
  * Registers the real-time collaboration setting.
@@ -74,7 +74,7 @@ function gutenberg_register_real_time_collaboration_setting() {
 
 			?>
 			<label for="gutenberg_enable_real_time_collaboration">
-			<input name="gutenberg_enable_real_time_collaboration" type="checkbox" id="gutenberg_enable_real_time_collaboration" value="1" <?php checked( '1', $option_value ); ?>/>
+				<input name="gutenberg_enable_real_time_collaboration" type="checkbox" id="gutenberg_enable_real_time_collaboration" value="1" <?php checked( '1', $option_value ); ?>/>
 				<?php _e( 'Enable real-time collaboration', 'gutenberg' ); ?>
 			</label>
 			<?php
