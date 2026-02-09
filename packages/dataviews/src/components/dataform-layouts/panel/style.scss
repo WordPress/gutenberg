@@ -42,8 +42,7 @@
 		}
 
 		.dataforms-layouts-panel__field-trigger-icon {
-			width: auto;
-			overflow: visible;
+			opacity: 1;
 		}
 	}
 
@@ -68,8 +67,7 @@
 	align-self: center;
 	color: var(--wp-admin-theme-color);
 	flex: 0 0 auto;
-	overflow: hidden;
-	width: 0;
+	opacity: 0;
 
 	&::after {
 		content: "";
@@ -80,8 +78,7 @@
 
 	&:focus-visible {
 		outline: none;
-		width: auto;
-		overflow: visible;
+		opacity: 1;
 
 		&::after {
 			outline: var(--wp-admin-theme-color, #007cba) solid 1.5px;
