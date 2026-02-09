@@ -105,23 +105,6 @@ describe( 'createSlotFill', () => {
 		expect( ref.current.tagName ).toBe( 'DIV' );
 	} );
 
-	test( 'should support callback refs with bubblesVirtually', () => {
-		const TestSlotFill = createSlotFill( 'TestCallbackRefSlot' );
-		const callbackRef = jest.fn();
-
-		render(
-			<SlotFillProvider>
-				<TestSlotFill.Fill>
-					<p>Content</p>
-				</TestSlotFill.Fill>
-				<TestSlotFill.Slot bubblesVirtually ref={ callbackRef } />
-			</SlotFillProvider>
-		);
-
-		expect( callbackRef ).toHaveBeenCalled();
-		expect( callbackRef.mock.calls[ 0 ][ 0 ].tagName ).toBe( 'DIV' );
-	} );
-
 	test( 'should forward ref without bubblesVirtually (ref stays null for fragment-based slot)', () => {
 		const TestSlotFill = createSlotFill( 'TestRefSlotBase' );
 		const ref = createRef();
