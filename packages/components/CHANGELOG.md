@@ -12,7 +12,7 @@
 ### Enhancements
 
 -   Improve visual emphasis of the selected item in the ToggleGroupControl component ([#75138](https://github.com/WordPress/gutenberg/pull/75138)).
-- FormTokenField: Match label instead of key in suggestions. [#74772](https://github.com/WordPress/gutenberg/pull/74772)
+-   FormTokenField: Match label instead of key in suggestions. [#74772](https://github.com/WordPress/gutenberg/pull/74772)
 
 ### Internal
 
