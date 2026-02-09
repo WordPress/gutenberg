@@ -257,7 +257,7 @@ store( 'myPagination', {
 
 ### Adding new regions on navigation
 
-The `attachTo` option allows router regions to be dynamically added to the DOM when navigating to a page where they exist, even if they weren't present on the original page. This is useful for modals, sidebars, or other UI elements that appear only on certain pages.
+Sometimes you need UI elements — like modals, sidebars, or notification panels — that only appear on certain pages. With regular router regions, a region must already exist on the current page to be updated during navigation. The `attachTo` option solves this by letting you define regions that are dynamically created and inserted into the DOM when navigating to a page where they exist, even if they weren't present on the original page.
 
 **Defining a region with `attachTo`:**
 
