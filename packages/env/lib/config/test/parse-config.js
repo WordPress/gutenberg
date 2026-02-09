@@ -457,4 +457,35 @@ describe( 'parseConfig', () => {
 		};
 		expect( parsed.env ).toEqual( expected );
 	} );
+
+	it( 'should accept testsEnvironment as a boolean', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					testsEnvironment: false,
+				};
+			}
+		} );
+
+		const parsed = await parseConfig( '/test/gutenberg', '/cache' );
+		expect( parsed.testsEnvironment ).toEqual( false );
+	} );
+
+	it( 'throws for non-boolean testsEnvironment', async () => {
+		readRawConfigFile.mockImplementation( async ( configFile ) => {
+			if ( configFile === '/test/gutenberg/.wp-env.json' ) {
+				return {
+					testsEnvironment: 'false',
+				};
+			}
+		} );
+
+		await expect(
+			parseConfig( '/test/gutenberg', '/cache' )
+		).rejects.toEqual(
+			new ValidationError(
+				`Invalid /test/gutenberg/.wp-env.json: "testsEnvironment" must be a boolean.`
+			)
+		);
+	} );
 } );

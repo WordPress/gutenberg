@@ -93,10 +93,12 @@ module.exports = async function start( {
 		spinner.start();
 	}
 
-	// Display Playground limitations info
-	if ( runtimeName === 'playground' ) {
-		spinner.info(
-			'Note: Playground runtime does not support a separate tests environment. Only the development environment will be started.\n'
+	if ( config.testsEnvironment !== false ) {
+		spinner.warn(
+			'Warning: wp-env starts both development and tests environments by default.\n' +
+				'This behavior is deprecated and will be removed in a future version.\n' +
+				'To avoid this warning, add "testsEnvironment": false to your .wp-env.json\n' +
+				'and use the --config option to start the tests environment separately when needed.\n'
 		);
 		spinner.start();
 	}

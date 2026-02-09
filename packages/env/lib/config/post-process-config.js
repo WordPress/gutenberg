@@ -39,6 +39,8 @@ module.exports = function postProcessConfig( config ) {
  * @return {WPRootConfig} The config object with the root options merged together with the environment-specific options.
  */
 function mergeRootToEnvironments( config ) {
+	const testsDisabled = config.testsEnvironment === false;
+
 	// Some root-level options need to be handled early because they have a special
 	// cascade behavior that would break the normal merge. After merging we then
 	// delete them to avoid that breakage and add them back before we return.
@@ -52,6 +54,7 @@ function mergeRootToEnvironments( config ) {
 		delete config.port;
 	}
 	if (
+		! testsDisabled &&
 		config.testsPort !== undefined &&
 		config.env.tests.port === undefined
 	) {
@@ -67,6 +70,10 @@ function mergeRootToEnvironments( config ) {
 	// Merge the root config and the environment configs together so that
 	// we can ignore the root config and have full environment configs.
 	for ( const env in config.env ) {
+		// Skip merging root options into the tests environment when it's disabled.
+		if ( env === 'tests' && testsDisabled ) {
+			continue;
+		}
 		config.env[ env ] = mergeConfigs(
 			deepCopyRootOptions( config ),
 			config.env[ env ]
@@ -89,12 +96,16 @@ function mergeRootToEnvironments( config ) {
  * @return {WPRootConfig} The config after post-processing.
  */
 function appendPortToWPConfigs( config ) {
+	const testsDisabled = config.testsEnvironment === false;
 	const options = [ 'WP_TESTS_DOMAIN', 'WP_SITEURL', 'WP_HOME' ];
 
 	// We are only interested in editing the config options for environment-specific configs.
 	// If we made this change to the root config it would cause problems since they would
 	// be mapped to all environments even though the ports will be different.
 	for ( const env in config.env ) {
+		if ( env === 'tests' && testsDisabled ) {
+			continue;
+		}
 		// There's nothing to do without any wp-config options set.
 		if ( config.env[ env ].config === undefined ) {
 			continue;
@@ -128,6 +139,8 @@ function appendPortToWPConfigs( config ) {
  * @param {WPRootConfig} config The config to process.
  */
 function validatePortUniqueness( config ) {
+	const testsDisabled = config.testsEnvironment === false;
+
 	// We're going to build a map of the environments and their port
 	// so we can accommodate root-level config options more easily.
 	const environmentPorts = {};
@@ -135,6 +148,9 @@ function validatePortUniqueness( config ) {
 	// Add all of the environments to the map. This will
 	// overwrite any root-level options if necessary.
 	for ( const env in config.env ) {
+		if ( env === 'tests' && testsDisabled ) {
+			continue;
+		}
 		if ( config.env[ env ].port === undefined ) {
 			throw new ValidationError(
 				`The "${ env }" environment has an invalid port.`
