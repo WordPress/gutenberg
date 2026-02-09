@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/boot",
-	"version": "0.6.0",
+	"version": "0.6.1-next.v.202602091733.0+daa0b19c4",
 	"description": "Minimal boot package for WordPress admin pages.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
