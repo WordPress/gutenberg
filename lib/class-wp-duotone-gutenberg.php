@@ -448,8 +448,8 @@ class WP_Duotone_Gutenberg {
 	 * var:preset|duotone|blue-orange
 	 * var(--wp--preset--duotone--blue-orange)
 	 *
-	 * @param string $duotone_attr The duotone attribute from a block.
-	 * @return string The slug of the duotone preset or an empty string if no slug is found.
+	 * @param string|string[] $duotone_attr The duotone attribute from a block.
+	 * @return string The slug of the duotone preset or an empty string if no slug is found (including when an array was passed).
 	 */
 	private static function get_slug_from_attribute( $duotone_attr ) {
 		if ( ! is_string( $duotone_attr ) ) {
@@ -465,7 +465,7 @@ class WP_Duotone_Gutenberg {
 	/**
 	 * Check if we have a valid duotone preset.
 	 *
-	 * @param string $duotone_attr The duotone attribute from a block.
+	 * @param string|string[] $duotone_attr The duotone attribute from a block.
 	 * @return bool True if the duotone preset present and valid.
 	 */
 	private static function is_preset( $duotone_attr ) {
