@@ -165,14 +165,18 @@ export function useResolveEditedEntity() {
 			? entity.context.postId
 			: entity.postId;
 
-		registry
-			.dispatch( coreDataStore )
-			.editEntityRecord( 'postType', selectionPostType, selectionPostId, {
+		registry.dispatch( coreDataStore ).editEntityRecord(
+			'postType',
+			selectionPostType,
+			selectionPostId,
+			{
 				selection: {
 					selectionStart: { clientId: selectedBlock },
 					selectionEnd: { clientId: selectedBlock },
 				},
-			} );
+			},
+			{ undoIgnore: true }
+		);
 		appliedSelectionRef.current = selectedBlock;
 	}
 
