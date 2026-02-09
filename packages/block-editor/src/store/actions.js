@@ -1876,20 +1876,17 @@ export const flashBlock =
 /**
  * Action that sets whether a block has controlled inner blocks.
  *
- * @param {string}   clientId                 The block's clientId.
- * @param {boolean}  hasControlledInnerBlocks True if the block's inner blocks are controlled.
- * @param {Object[]} mappings                 Optional array of { external, internal } clientId mappings.
+ * @param {string}  clientId                 The block's clientId.
+ * @param {boolean} hasControlledInnerBlocks True if the block's inner blocks are controlled.
  */
 export function setHasControlledInnerBlocks(
 	clientId,
-	hasControlledInnerBlocks,
-	mappings
+	hasControlledInnerBlocks
 ) {
 	return {
 		type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
 		hasControlledInnerBlocks,
 		clientId,
-		mappings,
 	};
 }
 

@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useLayoutEffect, useMemo } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
@@ -291,6 +296,20 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 			setEditedPost,
 			setRenderingMode,
 		} = unlock( useDispatch( editorStore ) );
+		const { editEntityRecord } = useDispatch( coreStore );
+
+		const onChangeSelection = useCallback(
+			( newSelection ) => {
+				editEntityRecord(
+					'postType',
+					post.type,
+					post.id,
+					{ selection: newSelection },
+					{ undoIgnore: true }
+				);
+			},
+			[ editEntityRecord, post.type, post.id ]
+		);
 		const { createWarningNotice, removeNotice } =
 			useDispatch( noticesStore );
 
@@ -406,6 +425,7 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 							onChange={ onChange }
 							onInput={ onInput }
 							selection={ selection }
+							onChangeSelection={ onChangeSelection }
 							settings={ blockEditorSettings }
 							useSubRegistry={ false }
 						>

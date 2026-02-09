@@ -3,9 +3,10 @@
  */
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useCallback } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -23,19 +24,29 @@ export default function useNavigateToEntityRecord() {
 	const history = useHistory();
 	const location = useLocation();
 	const { query, path } = location;
-	const getExternalClientId = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).getExternalClientId,
-		[]
-	);
+	const registry = useRegistry();
 
 	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
-			// Store the selected block in the URL for restoration when navigating back.
-			// The selectedBlock is converted to external clientId for stable storage.
-			if ( params.selection?.clientId ) {
-				const externalClientId = getExternalClientId(
-					params.selection.clientId
+			// Read entity selection (already has external IDs from onChangeSelection)
+			const currentPostType = registry
+				.select( editorStore )
+				.getCurrentPostType();
+			const currentPostId = registry
+				.select( editorStore )
+				.getCurrentPostId();
+			const entityEdits = registry
+				.select( coreStore )
+				.getEntityRecordEdits(
+					'postType',
+					currentPostType,
+					currentPostId
 				);
+			const externalClientId =
+				entityEdits?.selection?.selectionStart?.clientId;
+
+			// Store the selected block in the URL for restoration when navigating back.
+			if ( externalClientId ) {
 				const currentUrl = addQueryArgs( path, {
 					...query,
 					selectedBlock: externalClientId,
@@ -54,7 +65,7 @@ export default function useNavigateToEntityRecord() {
 
 			history.navigate( url );
 		},
-		[ history, path, query, getExternalClientId ]
+		[ history, path, query, registry ]
 	);
 
 	return onNavigateToEntityRecord;

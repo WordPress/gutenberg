@@ -20,6 +20,7 @@ import { BlockRefsProvider } from './block-refs-provider';
 import { unlock } from '../../lock-unlock';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import useMediaUploadSettings from './use-media-upload-settings';
+import { SelectionContext } from './selection-context';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
@@ -167,11 +168,25 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		// Syncs the entity provider with changes in the block-editor store.
 		useBlockSync( props );
 
+		const selectionContextValue = useMemo(
+			() => ( {
+				selection: props.selection ?? undefined,
+				onChangeSelection: props.onChangeSelection ?? noop,
+			} ),
+			[ props.selection, props.onChangeSelection ]
+		);
+
 		const children = (
-			<SlotFillProvider passthrough>
-				{ ! settings?.isPreviewMode && <KeyboardShortcuts.Register /> }
-				<BlockRefsProvider>{ props.children }</BlockRefsProvider>
-			</SlotFillProvider>
+			<SelectionContext.Provider value={ selectionContextValue }>
+				<SlotFillProvider passthrough>
+					{ ! settings?.isPreviewMode && (
+						<KeyboardShortcuts.Register />
+					) }
+					<BlockRefsProvider>
+						{ props.children }
+					</BlockRefsProvider>
+				</SlotFillProvider>
+			</SelectionContext.Provider>
 		);
 
 		if ( isClientSideMediaEnabled ) {

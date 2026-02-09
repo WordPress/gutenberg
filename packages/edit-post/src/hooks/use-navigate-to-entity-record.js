@@ -2,15 +2,9 @@
  * WordPress dependencies
  */
 import { useCallback, useReducer } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
-import { unlock } from '../lock-unlock';
 
 /**
  * A hook that records the 'entity' history in the post editor as a user
@@ -32,10 +26,7 @@ export default function useNavigateToEntityRecord(
 	initialPostType,
 	defaultRenderingMode
 ) {
-	const getExternalClientId = useSelect(
-		( select ) => unlock( select( blockEditorStore ) ).getExternalClientId,
-		[]
-	);
+	const registry = useRegistry();
 	const [ postHistory, dispatch ] = useReducer(
 		(
 			historyState,
@@ -74,11 +65,16 @@ export default function useNavigateToEntityRecord(
 
 	const onNavigateToEntityRecord = useCallback(
 		( params ) => {
-			// Convert internal clientId to external for storage
-			const internalClientId = params.selection?.clientId;
-			const externalClientId = internalClientId
-				? getExternalClientId( internalClientId )
-				: null;
+			// Read entity selection (already has external IDs from onChangeSelection)
+			const entityEdits = registry
+				.select( coreStore )
+				.getEntityRecordEdits(
+					'postType',
+					post.postType,
+					post.postId
+				);
+			const externalClientId =
+				entityEdits?.selection?.selectionStart?.clientId ?? null;
 
 			dispatch( {
 				type: 'push',
@@ -90,10 +86,12 @@ export default function useNavigateToEntityRecord(
 			setRenderingMode( defaultRenderingMode );
 		},
 		[
+			registry,
+			post.postType,
+			post.postId,
 			getRenderingMode,
 			setRenderingMode,
 			defaultRenderingMode,
-			getExternalClientId,
 		]
 	);
 

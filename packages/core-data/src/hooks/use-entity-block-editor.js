@@ -89,13 +89,11 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			if ( noChange ) {
 				return __unstableCreateUndoLevel( kind, name, id );
 			}
-			const { selection, ...rest } = options;
 
 			// We create a new function here on every persistent edit
 			// to make sure the edit makes the post dirty and creates
 			// a new undo level.
 			const edits = {
-				selection,
 				content: ( { blocks: blocksForSerialization = [] } ) =>
 					__unstableSerializeAndClean( blocksForSerialization ),
 				...updateFootnotesFromMeta( newBlocks, meta ),
@@ -103,7 +101,7 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 			editEntityRecord( kind, name, id, edits, {
 				isCached: false,
-				...rest,
+				...options,
 			} );
 		},
 		[
@@ -119,13 +117,11 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 
 	const onInput = useCallback(
 		( newBlocks, options ) => {
-			const { selection, ...rest } = options;
-			const footnotesChanges = updateFootnotesFromMeta( newBlocks, meta );
-			const edits = { selection, ...footnotesChanges };
+			const edits = updateFootnotesFromMeta( newBlocks, meta );
 
 			editEntityRecord( kind, name, id, edits, {
 				isCached: true,
-				...rest,
+				...options,
 			} );
 		},
 		[ kind, name, id, meta, editEntityRecord ]
