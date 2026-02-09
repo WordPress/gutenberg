@@ -40,6 +40,20 @@ import { TimeInput } from './time-input';
 const VALID_DATE_ORDERS = [ 'dmy', 'mdy', 'ymd' ];
 
 /**
+ * Minimum year that can be reliably parsed by moment.js and Date().
+ *
+ * Years below 1000 cause moment.js (used internally by setInConfiguredTimezone)
+ * to emit deprecation warnings and fall back to unreliable js Date() parsing.
+ * This constant is used as:
+ * - The default value for the minYear prop
+ * - An internal guard to prevent Invalid Date propagation
+ *
+ * Even if consumers pass minYear={1}, dates with years < 1000 are blocked
+ * internally to prevent moment.js issues.
+ */
+const MIN_SUPPORTED_YEAR = 1000;
+
+/**
  * TimePicker is a React component that renders a clock for time selection.
  *
  * ```jsx
@@ -65,7 +79,7 @@ export function TimePicker( {
 	onChange,
 	dateOrder: dateOrderProp,
 	hideLabelFromVision = false,
-	minYear = 1000,
+	minYear = MIN_SUPPORTED_YEAR,
 }: TimePickerProps ) {
 	const [ date, setDate ] = useState( () =>
 		// Truncate the date at the minutes, see: #15495.
@@ -108,16 +122,12 @@ export function TimePicker( {
 	);
 
 	const updateDate = ( newDate: Date ) => {
-		if ( ! Number.isFinite( newDate.getTime() ) ) {
+		if ( newDate instanceof Date && ! Number.isFinite( newDate.getTime() ) ) {
 			return;
 		}
 
-		// Guard against years below 1000 that moment.js cannot parse reliably.
-		// Even if a consumer passes minYear={1}, the browser will enforce it
-		// but moment.js (used internally by setInConfiguredTimezone) will emit
-		// deprecation warnings and fall back to unreliable js Date() parsing.
-		// This prevents those dates from reaching onChange.
-		if ( newDate.getFullYear() < 1000 ) {
+		// Guard against years below MIN_SUPPORTED_YEAR to prevent Invalid Date propagation.
+		if ( newDate.getFullYear() < MIN_SUPPORTED_YEAR ) {
 			return;
 		}
 
@@ -133,16 +143,13 @@ export function TimePicker( {
 				return;
 			}
 
-			// We can safely assume value is a number if target is valid.
-			const numberValue = Number( value );
+		// We can safely assume value is a number if target is valid.
+		const numberValue = Number( value );
 
-			// Prevent years below 1000 from reaching setInConfiguredTimezone.
-			// Even if minYear allows lower values, moment.js (used internally)
-			// cannot parse dates with years < 1000 reliably and will emit
-			// deprecation warnings.
-			if ( method === 'year' && numberValue < 1000 ) {
-				return;
-			}
+		// Prevent years below MIN_SUPPORTED_YEAR to guard against Invalid Date.
+		if ( method === 'year' && numberValue < MIN_SUPPORTED_YEAR ) {
+			return;
+		}
 
 			// Internal date is UTC-normalized, but the field should be updated
 			// as if in the configured timezone.

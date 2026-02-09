@@ -38,8 +38,13 @@ export type TimePickerProps = {
 	hideLabelFromVision?: boolean;
 
 	/**
-	 * The minimum year that can be selected. Defaults to 1000 to prevent
-	 * dates that moment.js cannot parse reliably.
+	 * The minimum year that can be selected.
+	 *
+	 * Defaults to MIN_SUPPORTED_YEAR (1000) because years below this value
+	 * cannot be reliably parsed by moment.js (used internally). Even if a
+	 * lower minYear value is provided, the component will internally block
+	 * years < 1000 to prevent Invalid Date propagation and moment.js
+	 * deprecation warnings.
 	 *
 	 * @default 1000
 	 */

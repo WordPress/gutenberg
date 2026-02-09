@@ -649,19 +649,22 @@ describe( 'TimePicker', () => {
 
 			const yearInput = screen.getByLabelText( 'Year' );
 
-			// Clear the year field and blur
-			await user.clear( yearInput );
-			await user.keyboard( '{Tab}' );
+		// Clear the year field and blur
+		await user.clear( yearInput );
+		await user.keyboard( '{Tab}' );
 
-			// When the year is cleared, the browser may coerce to minYear.
-			// If onChange is called, it should only emit valid date strings.
-			onChangeSpy.mock.calls.forEach( ( call ) => {
-				const dateString = call[ 0 ];
-				expect( dateString ).toMatch( /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/ );
-				expect( dateString ).not.toContain( 'NaN' );
-				expect( dateString ).not.toContain( 'Invalid' );
-			} );
+		// Verify the input field value after browser coercion
+		expect( yearInput ).toHaveValue( 1000 );
+
+		// When the year is cleared, the browser may coerce to minYear.
+		// If onChange is called, it should only emit valid date strings.
+		onChangeSpy.mock.calls.forEach( ( call ) => {
+			const dateString = call[ 0 ];
+			expect( dateString ).toMatch( /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/ );
+			expect( dateString ).not.toContain( 'NaN' );
+			expect( dateString ).not.toContain( 'Invalid' );
 		} );
+	} );
 
 		it( 'should not call onChange with an invalid date when day is cleared and month is changed', async () => {
 			const user = userEvent.setup();
@@ -678,23 +681,26 @@ describe( 'TimePicker', () => {
 			const dayInput = screen.getByLabelText( 'Day' );
 			const monthInput = screen.getByLabelText( 'Month' );
 
-			// Clear the day field
-			await user.clear( dayInput );
-			// Change the month (this would create an invalid date if day is 0)
-			await user.selectOptions( monthInput, '12' );
+		// Clear the day field
+		await user.clear( dayInput );
+		// Change the month (this would create an invalid date if day is 0)
+		await user.selectOptions( monthInput, '12' );
 
-			// Verify that if onChange was called, it only received valid date strings.
-			// Our guard should prevent invalid dates from being emitted, so any calls
-			// should have properly formatted dates without "NaN" or "Invalid".
-			onChangeSpy.mock.calls.forEach( ( call ) => {
-				const dateString = call[ 0 ];
-				expect( dateString ).toMatch(
-					/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/
-				);
-				expect( dateString ).not.toContain( 'NaN' );
-				expect( dateString ).not.toContain( 'Invalid' );
-			} );
+		// Verify the input field value after browser coercion
+		expect( dayInput ).toHaveValue( 1 );
+
+		// Verify that if onChange was called, it only received valid date strings.
+		// Our guard should prevent invalid dates from being emitted, so any calls
+		// should have properly formatted dates without "NaN" or "Invalid".
+		onChangeSpy.mock.calls.forEach( ( call ) => {
+			const dateString = call[ 0 ];
+			expect( dateString ).toMatch(
+				/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/
+			);
+			expect( dateString ).not.toContain( 'NaN' );
+			expect( dateString ).not.toContain( 'Invalid' );
 		} );
+	} );
 
 		it( 'should handle years below 1000 when minYear allows them without moment.js warnings', async () => {
 			const user = userEvent.setup();
@@ -712,18 +718,23 @@ describe( 'TimePicker', () => {
 
 			const yearInput = screen.getByLabelText( 'Year' );
 
-			// Clear the year field and blur - browser will coerce to minYear (1)
-			await user.clear( yearInput );
-			await user.keyboard( '{Tab}' );
+		// Clear the year field and blur - browser will coerce to minYear (1)
+		await user.clear( yearInput );
+		await user.keyboard( '{Tab}' );
 
-			// Verify that if onChange was called, it only received valid date strings
-			// without triggering moment.js warnings
-			onChangeSpy.mock.calls.forEach( ( call ) => {
-				const dateString = call[ 0 ];
-				expect( dateString ).toMatch( /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/ );
-				expect( dateString ).not.toContain( 'NaN' );
-				expect( dateString ).not.toContain( 'Invalid' );
-			} );
+		// Verify the input field value after browser coercion to minYear
+		expect( yearInput ).toHaveValue( 1 );
+
+		// Our internal guard should prevent years < 1000 from propagating,
+		// so onChange should NOT have been called with the year 1
+		// Verify that if onChange was called, it only received valid date strings
+		// without triggering moment.js warnings
+		onChangeSpy.mock.calls.forEach( ( call ) => {
+			const dateString = call[ 0 ];
+			expect( dateString ).toMatch( /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/ );
+			expect( dateString ).not.toContain( 'NaN' );
+			expect( dateString ).not.toContain( 'Invalid' );
 		} );
+	} );
 	} );
 } );

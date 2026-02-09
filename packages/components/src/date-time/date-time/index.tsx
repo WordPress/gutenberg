@@ -30,7 +30,7 @@ function UnforwardedDateTimePicker(
 		onChange,
 		events,
 		startOfWeek,
-		minYear,
+		minYear = 1000,
 	}: DateTimePickerProps,
 	ref: ForwardedRef< any >
 ) {
