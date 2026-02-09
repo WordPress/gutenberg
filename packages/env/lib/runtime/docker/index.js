@@ -353,9 +353,13 @@ class DockerRuntime {
 		}
 
 		// Add port change messages if any ports were automatically reassigned
-		if ( fullConfig.portMessages && fullConfig.portMessages.length > 0 ) {
-			message.push( '' ); // Empty line for separation
-			message.push( ...fullConfig.portMessages );
+		if ( fullConfig.portChanges && fullConfig.portChanges.length > 0 ) {
+			message.push(
+				...fullConfig.portChanges.map(
+					( { configPath, from, to } ) =>
+						`Port ${ from } was busy, using ${ to } for ${ configPath } instead.`
+				)
+			);
 		}
 
 		const formattedMessage = message.filter( Boolean ).join( '\n' );

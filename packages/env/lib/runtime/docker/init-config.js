@@ -12,7 +12,7 @@ const yaml = require( 'js-yaml' );
  */
 const { loadConfig, ValidationError } = require( '../../config' );
 const buildDockerComposeConfig = require( './build-docker-compose-config' );
-const resolveAvailablePorts = require( '../../resolve-available-ports' );
+const { createPortResolver } = require( '../../resolve-available-ports' );
 
 /**
  * @typedef {import('../../config').WPConfig} WPConfig
@@ -44,7 +44,16 @@ module.exports = async function initConfig( {
 	writeChanges = false,
 	customConfigPath = null,
 } ) {
-	const config = await loadConfig( path.resolve( '.' ), customConfigPath );
+	// When writing changes (i.e. `start` command), create a port resolver
+	// so that ports are resolved during config post-processing, before
+	// URLs like WP_SITEURL are set.
+	const portResolver = writeChanges
+		? createPortResolver( spinner )
+		: undefined;
+
+	const config = await loadConfig( path.resolve( '.' ), customConfigPath, {
+		portResolver,
+	} );
 	config.debug = debug;
 
 	// Adding this to the config allows the start command to understand that the
@@ -56,14 +65,6 @@ module.exports = async function initConfig( {
 	// config has changed when only the spx param has changed. This is needed
 	// so that Docker will rebuild the image whenever the spx flag changes.
 	config.spx = spx;
-
-	// Resolve available ports before building docker-compose config.
-	// This will find alternative ports if the configured ones are busy.
-	if ( writeChanges ) {
-		spinner.text = 'Checking port availability.';
-		const { portMessages } = await resolveAvailablePorts( config, spinner );
-		config.portMessages = portMessages;
-	}
 
 	const dockerComposeConfig = buildDockerComposeConfig( config );
 

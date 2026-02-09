@@ -5,6 +5,7 @@
 const mergeConfigs = require( './merge-configs' );
 const addOrReplacePort = require( './add-or-replace-port' );
 const { ValidationError } = require( './validate-config' );
+const { resolveConfigPorts } = require( '../resolve-available-ports' );
 
 /**
  * @typedef {import('./parse-config').WPRootConfig} WPRootConfig
@@ -14,14 +15,26 @@ const { ValidationError } = require( './validate-config' );
 /**
  * Performs any additional post-processing on the config object.
  *
- * @param {WPEnvironmentConfig} config The config to process.
+ * @param {WPEnvironmentConfig} config               The config to process.
+ * @param {Object}              options              Options for post-processing.
+ * @param {Object}              options.portResolver An optional port resolver for automatic port selection.
  *
- * @return {WPEnvironmentConfig} The config after post-processing.
+ * @return {Promise<WPEnvironmentConfig>} The config after post-processing.
  */
-module.exports = function postProcessConfig( config ) {
+module.exports = async function postProcessConfig(
+	config,
+	{ portResolver } = {}
+) {
 	// Make sure that we're operating on a config object that has
 	// complete environment configs for convenience.
 	config = mergeRootToEnvironments( config );
+
+	// Resolve ports after merging (so environment ports are finalized)
+	// but before appending ports to URLs. This way appendPortToWPConfigs
+	// uses the resolved ports and we don't need to fix URLs afterward.
+	if ( portResolver ) {
+		config = await resolveConfigPorts( config, portResolver );
+	}
 
 	config = appendPortToWPConfigs( config );
 

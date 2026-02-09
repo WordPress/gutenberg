@@ -3,194 +3,130 @@
  * Internal dependencies
  */
 const { findAvailablePort, isPortAvailable } = require( './port-utils' );
-const addOrReplacePort = require( './config/add-or-replace-port' );
 
 /**
- * @typedef {import('./config').WPConfig} WPConfig
+ * Port definitions to resolve. Each entry maps a config path to its
+ * environment and property. MySQL ports are excluded because they
+ * already support Docker-native auto-assignment via `null`.
  */
+const PORT_DEFINITIONS = [
+	{ env: 'development', property: 'port' },
+	{ env: 'tests', property: 'port' },
+	{ env: 'development', property: 'phpmyadminPort' },
+	{ env: 'tests', property: 'phpmyadminPort' },
+];
 
 /**
- * Resolves available ports for the given configuration.
- * If configured ports are busy, finds alternatives within the specified range.
+ * Creates a port resolver that tracks used ports and records changes.
  *
- * @param {WPConfig} config  The wp-env configuration object.
- * @param {Object}   spinner A CLI spinner for displaying progress.
- * @return {Promise<{config: WPConfig, portMessages: string[]}>} The updated config and messages about port changes.
+ * The resolver is designed to be called during config post-processing,
+ * after environments have been merged but before URLs are set. This
+ * allows `appendPortToWPConfigs` to use the resolved ports directly.
+ *
+ * @param {Object} spinner A CLI spinner for displaying progress.
+ * @return {Object} A port resolver with `resolve` and `getChanges` methods.
  */
-async function resolveAvailablePorts( config, spinner ) {
-	const portMessages = [];
+function createPortResolver( spinner ) {
 	const usedPorts = [];
+	const portChanges = [];
 
-	// Resolve development environment port
-	const devPortResult = await resolvePort( {
-		preferredPort: config.env.development.port,
-		exclude: usedPorts,
-		portName: 'development',
-		spinner,
-	} );
-	config.env.development.port = devPortResult.port;
-	usedPorts.push( devPortResult.port );
-	if ( devPortResult.message ) {
-		portMessages.push( devPortResult.message );
-	}
+	return {
+		/**
+		 * Resolves a single port, finding an alternative if it's busy.
+		 *
+		 * @param {number} preferredPort The preferred port to use.
+		 * @param {string} configPath    Config path for error messages (e.g. "env.development.port").
+		 * @return {Promise<number>} The resolved port number.
+		 */
+		async resolve( preferredPort, configPath ) {
+			if ( spinner ) {
+				spinner.text = `Checking ${ configPath } availability.`;
+			}
 
-	// Update WP_HOME and WP_SITEURL for development if port changed
-	if ( devPortResult.changed ) {
-		config.env.development.config.WP_SITEURL = addOrReplacePort(
-			config.env.development.config.WP_SITEURL,
-			devPortResult.port
-		);
-		config.env.development.config.WP_HOME = addOrReplacePort(
-			config.env.development.config.WP_HOME,
-			devPortResult.port
-		);
-	}
+			// When auto-port selection is disabled, only use the configured port.
+			if ( process.env.WP_ENV_AUTO_PORT === 'false' ) {
+				if ( usedPorts.includes( preferredPort ) ) {
+					throw new Error(
+						`Port ${ preferredPort } (${ configPath }) conflicts with another wp-env service. ` +
+							`Set a different port or enable automatic port selection with WP_ENV_AUTO_PORT=true.`
+					);
+				}
+				const available = await isPortAvailable( preferredPort );
+				if ( ! available ) {
+					throw new Error(
+						`Port ${ preferredPort } (${ configPath }) is busy. ` +
+							`Free the port, set a different one, or enable automatic port selection with WP_ENV_AUTO_PORT=true.`
+					);
+				}
+				usedPorts.push( preferredPort );
+				return preferredPort;
+			}
 
-	// Resolve tests environment port
-	const testsPortResult = await resolvePort( {
-		preferredPort: config.env.tests.port,
-		exclude: usedPorts,
-		portName: 'tests',
-		spinner,
-	} );
-	config.env.tests.port = testsPortResult.port;
-	usedPorts.push( testsPortResult.port );
-	if ( testsPortResult.message ) {
-		portMessages.push( testsPortResult.message );
-	}
+			try {
+				const resolvedPort = await findAvailablePort( {
+					preferredPort,
+					exclude: usedPorts,
+				} );
 
-	// Update WP_HOME, WP_SITEURL, and WP_TESTS_DOMAIN for tests if port changed
-	if ( testsPortResult.changed ) {
-		config.env.tests.config.WP_SITEURL = addOrReplacePort(
-			config.env.tests.config.WP_SITEURL,
-			testsPortResult.port
-		);
-		config.env.tests.config.WP_HOME = addOrReplacePort(
-			config.env.tests.config.WP_HOME,
-			testsPortResult.port
-		);
-		config.env.tests.config.WP_TESTS_DOMAIN = addOrReplacePort(
-			config.env.tests.config.WP_TESTS_DOMAIN,
-			testsPortResult.port
-		);
-	}
+				usedPorts.push( resolvedPort );
 
-	// Resolve MySQL port for development (if configured)
-	if ( config.env.development.mysqlPort ) {
-		const devMysqlResult = await resolvePort( {
-			preferredPort: config.env.development.mysqlPort,
-			exclude: usedPorts,
-			portName: 'development MySQL',
-			spinner,
-		} );
-		config.env.development.mysqlPort = devMysqlResult.port;
-		usedPorts.push( devMysqlResult.port );
-		if ( devMysqlResult.message ) {
-			portMessages.push( devMysqlResult.message );
-		}
-	}
+				if ( resolvedPort !== preferredPort ) {
+					portChanges.push( {
+						configPath,
+						from: preferredPort,
+						to: resolvedPort,
+					} );
+				}
 
-	// Resolve MySQL port for tests (if configured)
-	if ( config.env.tests.mysqlPort ) {
-		const testsMysqlResult = await resolvePort( {
-			preferredPort: config.env.tests.mysqlPort,
-			exclude: usedPorts,
-			portName: 'tests MySQL',
-			spinner,
-		} );
-		config.env.tests.mysqlPort = testsMysqlResult.port;
-		usedPorts.push( testsMysqlResult.port );
-		if ( testsMysqlResult.message ) {
-			portMessages.push( testsMysqlResult.message );
-		}
-	}
+				return resolvedPort;
+			} catch ( error ) {
+				throw new Error(
+					`Could not find available port for ${ configPath }: ${ error.message }`
+				);
+			}
+		},
 
-	// Resolve phpMyAdmin port for development (if configured)
-	if ( config.env.development.phpmyadminPort ) {
-		const devPhpmyadminResult = await resolvePort( {
-			preferredPort: config.env.development.phpmyadminPort,
-			exclude: usedPorts,
-			portName: 'development phpMyAdmin',
-			spinner,
-		} );
-		config.env.development.phpmyadminPort = devPhpmyadminResult.port;
-		usedPorts.push( devPhpmyadminResult.port );
-		if ( devPhpmyadminResult.message ) {
-			portMessages.push( devPhpmyadminResult.message );
-		}
-	}
-
-	// Resolve phpMyAdmin port for tests (if configured)
-	if ( config.env.tests.phpmyadminPort ) {
-		const testsPhpmyadminResult = await resolvePort( {
-			preferredPort: config.env.tests.phpmyadminPort,
-			exclude: usedPorts,
-			portName: 'tests phpMyAdmin',
-			spinner,
-		} );
-		config.env.tests.phpmyadminPort = testsPhpmyadminResult.port;
-		usedPorts.push( testsPhpmyadminResult.port );
-		if ( testsPhpmyadminResult.message ) {
-			portMessages.push( testsPhpmyadminResult.message );
-		}
-	}
-
-	return { config, portMessages };
+		/**
+		 * Returns all port changes that occurred during resolution.
+		 *
+		 * @return {Array<{configPath: string, from: number, to: number}>} Port changes.
+		 */
+		getChanges() {
+			return portChanges;
+		},
+	};
 }
 
 /**
- * Resolves a single port, finding an alternative if the preferred port is busy.
+ * Resolves available ports on a config object. Iterates over the
+ * defined port properties and resolves each one that has a value.
  *
- * @param {Object}   options               Options for port resolution.
- * @param {number}   options.preferredPort The preferred port to use.
- * @param {number[]} options.exclude       Ports to exclude.
- * @param {string}   options.portName      Name of the port for messages.
- * @param {Object}   options.spinner       CLI spinner.
- * @return {Promise<{port: number, changed: boolean, message: ?string}>} Resolution result.
+ * @param {Object} config       The config object (after mergeRootToEnvironments).
+ * @param {Object} portResolver A port resolver created by `createPortResolver`.
+ * @return {Promise<Object>} The config with resolved ports and portChanges attached.
  */
-async function resolvePort( { preferredPort, exclude, portName, spinner } ) {
-	if ( spinner ) {
-		spinner.text = `Checking ${ portName } port availability.`;
-	}
+async function resolveConfigPorts( config, portResolver ) {
+	for ( const { env, property } of PORT_DEFINITIONS ) {
+		const currentValue = config.env[ env ][ property ];
 
-	// When auto-port selection is disabled, only use the configured port.
-	if ( process.env.WP_ENV_AUTO_PORT === 'false' ) {
-		if ( exclude.includes( preferredPort ) ) {
-			throw new Error(
-				`Port ${ preferredPort } for ${ portName } conflicts with another wp-env service. ` +
-					`Set a different port or enable automatic port selection with WP_ENV_AUTO_PORT=true.`
-			);
-		}
-		const available = await isPortAvailable( preferredPort );
-		if ( ! available ) {
-			throw new Error(
-				`Port ${ preferredPort } for ${ portName } is busy. ` +
-					`Free the port, set a different one, or enable automatic port selection with WP_ENV_AUTO_PORT=true.`
-			);
-		}
-		return { port: preferredPort, changed: false, message: null };
-	}
-
-	try {
-		const resolvedPort = await findAvailablePort( {
-			preferredPort,
-			exclude,
-		} );
-
-		const changed = resolvedPort !== preferredPort;
-		let message = null;
-
-		if ( changed ) {
-			message = `Port ${ preferredPort } was busy, using ${ resolvedPort } for ${ portName } instead.`;
+		// Skip ports that aren't configured (null/undefined).
+		if ( ! currentValue ) {
+			continue;
 		}
 
-		return { port: resolvedPort, changed, message };
-	} catch ( error ) {
-		// Re-throw with more context
-		throw new Error(
-			`Could not find available port for ${ portName }: ${ error.message }`
+		const configPath = `env.${ env }.${ property }`;
+		config.env[ env ][ property ] = await portResolver.resolve(
+			currentValue,
+			configPath
 		);
 	}
+
+	config.portChanges = portResolver.getChanges();
+	return config;
 }
 
-module.exports = resolveAvailablePorts;
+module.exports = {
+	createPortResolver,
+	resolveConfigPorts,
+	PORT_DEFINITIONS,
+};

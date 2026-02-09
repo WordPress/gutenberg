@@ -36,14 +36,17 @@ const postProcessConfig = require( './post-process-config' );
 /**
  * Loads any configuration from a given directory.
  *
- * @param {string}      configDirectoryPath The directory we want to load the config from.
- * @param {string|null} customConfigPath    Optional custom config file path.
+ * @param {string}      configDirectoryPath  The directory we want to load the config from.
+ * @param {string|null} customConfigPath     Optional custom config file path.
+ * @param {Object}      options              Options for loading the config.
+ * @param {Object}      options.portResolver An optional port resolver for automatic port selection.
  *
  * @return {Promise<WPConfig>} The config object we've loaded.
  */
 module.exports = async function loadConfig(
 	configDirectoryPath,
-	customConfigPath = null
+	customConfigPath = null,
+	{ portResolver } = {}
 ) {
 	const configFilePath = getConfigFilePath(
 		configDirectoryPath,
@@ -78,7 +81,7 @@ module.exports = async function loadConfig(
 	// Make sure to perform any additional post-processing that
 	// may be needed before the config object is ready for
 	// consumption elsewhere in the tool.
-	config = postProcessConfig( config );
+	config = await postProcessConfig( config, { portResolver } );
 
 	return {
 		name: path.basename( configDirectoryPath ),
@@ -100,6 +103,7 @@ module.exports = async function loadConfig(
 		] ),
 		lifecycleScripts: config.lifecycleScripts,
 		env: config.env,
+		portChanges: config.portChanges || [],
 	};
 };
 
