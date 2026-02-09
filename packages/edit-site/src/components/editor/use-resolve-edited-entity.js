@@ -151,14 +151,23 @@ export function useResolveEditedEntity() {
 
 	// Restore selection from URL synchronously, before EditorProvider renders.
 	// This ensures the selection is available when blocks are reset.
+	// When editing a page with a template, EditorProvider reads selection from
+	// the page entity (context), not the template entity.
 	if (
 		selectedBlock &&
 		entity.isReady &&
 		appliedSelectionRef.current !== selectedBlock
 	) {
+		const selectionPostType = entity.context?.postId
+			? entity.context.postType
+			: entity.postType;
+		const selectionPostId = entity.context?.postId
+			? entity.context.postId
+			: entity.postId;
+
 		registry
 			.dispatch( coreDataStore )
-			.editEntityRecord( 'postType', entity.postType, entity.postId, {
+			.editEntityRecord( 'postType', selectionPostType, selectionPostId, {
 				selection: {
 					selectionStart: { clientId: selectedBlock },
 					selectionEnd: { clientId: selectedBlock },
