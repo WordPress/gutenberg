@@ -299,7 +299,9 @@ export function switchChildrenNodeName(
 				return elt;
 			}
 
-			const { children: childrenProp, ...props } = elt.props;
+			const { children: childrenProp, ...props } = (
+				elt as React.ReactElement< React.PropsWithChildren< unknown > >
+			 ).props;
 			return createElement(
 				nodeName,
 				{ key: index, ...props },
