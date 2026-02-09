@@ -16,8 +16,8 @@ const stories = [
 	// - Playground stories are complex renderings of many components, which is
 	//   both slow and redundant with individual component stories.
 	NODE_ENV === 'test' ? '' : './stories/playground/**/*.story.@(jsx|tsx)',
-	NODE_ENV === 'test' ? '' : './stories/**/*.story.@(js|jsx|ts|tsx|mdx)',
 	NODE_ENV === 'test' ? '' : './stories/**/*.mdx',
+	'./stories/design-system/**/*.story.@(ts|tsx)',
 	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
