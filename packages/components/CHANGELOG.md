@@ -8,11 +8,11 @@
 -   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
 -   `ToggleControl`: Prevent `__nextHasNoMarginBottom` from logging a console warning ([#75296](https://github.com/WordPress/gutenberg/pull/75296)).
 -   `createSlotFill`: fix ref forwarding ([#75274](https://github.com/WordPress/gutenberg/pull/75274)).
+-   FormTokenField: Match label instead of key in suggestions. [#74772](https://github.com/WordPress/gutenberg/pull/74772)
 
 ### Enhancements
 
 -   Improve visual emphasis of the selected item in the ToggleGroupControl component ([#75138](https://github.com/WordPress/gutenberg/pull/75138)).
--   FormTokenField: Match label instead of key in suggestions. [#74772](https://github.com/WordPress/gutenberg/pull/74772)
 
 ### Internal
 
