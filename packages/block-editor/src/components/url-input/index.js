@@ -455,7 +455,7 @@ class URLInput extends Component {
 		const inputProps = {
 			id: inputId,
 			value,
-			required: true,
+			required: this.props.required ?? true,
 			type: 'text',
 			name: inputId,
 			autoComplete: 'off',
