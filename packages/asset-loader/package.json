@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/asset-loader",
-	"version": "1.5.1-next.v.20260206T143.0+81f8de885",
+	"version": "1.5.0",
 	"description": "Utility to dynamically load WordPress scripts and styles with dependency resolution.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

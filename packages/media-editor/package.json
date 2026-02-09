@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/media-editor",
-	"version": "0.2.1-next.v.20260206T143.0+81f8de885",
+	"version": "0.2.0",
 	"description": "Media editor components for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

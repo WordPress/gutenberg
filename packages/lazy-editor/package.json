@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/lazy-editor",
-	"version": "1.5.1-next.v.20260206T143.0+81f8de885",
+	"version": "1.5.0",
 	"description": "Lazy-loading editor component with automatic asset and settings management.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

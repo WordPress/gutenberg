@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "14.39.1-next.v.20260206T143.0+81f8de885",
+	"version": "14.39.0",
 	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

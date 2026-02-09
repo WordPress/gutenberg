@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 11.0.0-next.0 (2026-02-06)
-
 ### Bug Fixes
 
 -   Playground runtime now supports zip archive themes, matching Docker runtime behavior. ([#75140](https://github.com/WordPress/gutenberg/issues/75140)).
@@ -17,6 +15,7 @@
 ### New Features
 
 -   Added `status` command that shows comprehensive environment information including running state, URLs, ports, configuration, and paths.
+-   Added `--config` global option to specify a custom configuration file path, enabling multiple parallel environments from the same directory.
 
 ## 10.39.0 (2026-01-29)
 

@@ -110,6 +110,16 @@ function EditorKeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/editor/new-note',
+			category: 'global',
+			description: __( 'Add a new note.' ),
+			keyCombination: {
+				modifier: 'primaryAlt',
+				character: 'm',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/editor/next-region',
 			category: 'global',
 			description: __( 'Navigate to the next part of the editor.' ),

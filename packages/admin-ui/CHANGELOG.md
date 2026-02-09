@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 1.8.0-next.0 (2026-02-06)
-
 ### Enhancements
 
 - Apply `text-wrap: pretty` for more balanced text in Page component [#74907](https://github.com/WordPress/gutenberg/pull/74907)
