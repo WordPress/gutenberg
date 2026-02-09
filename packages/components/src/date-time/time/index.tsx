@@ -109,7 +109,10 @@ export function TimePicker( {
 
 	const updateDate = ( newDate: Date ) => {
 		// Guard against Invalid Date propagation.
-		if ( newDate instanceof Date && ! Number.isFinite( newDate.getTime() ) ) {
+		if (
+			newDate instanceof Date &&
+			! Number.isFinite( newDate.getTime() )
+		) {
 			return;
 		}
 
