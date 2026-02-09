@@ -2,17 +2,23 @@
  * WordPress dependencies
  */
 import {
+	Button,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalHStack as HStack,
 	CheckboxControl,
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -22,9 +28,12 @@ import { useHandleLinkChange } from './use-handle-link-change';
 import { useEntityBinding } from './use-entity-binding';
 import { getSuggestionsQuery } from '../link-ui';
 import { useLinkPreview } from './use-link-preview';
+import { useIsInvalidLink } from './use-is-invalid-link';
 import { unlock } from '../../lock-unlock';
 
-const { LinkPicker } = unlock( blockEditorPrivateApis );
+const { LinkPicker, isHashLink, isRelativePath } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Get a human-readable entity type name.
@@ -79,17 +88,26 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 			attributes,
 		} );
 
-	const needsHelpText = hasUrlBinding;
-	const helpText = isBoundEntityAvailable
-		? BindingHelpText( {
-				type: attributes.type,
-				kind: attributes.kind,
-		  } )
-		: MissingEntityHelpText( {
-				type: attributes.type,
-				kind: attributes.kind,
-		  } );
+	const [ isInvalid, isDraft ] = useIsInvalidLink(
+		attributes.kind,
+		attributes.type,
+		entityRecord?.id,
+		hasUrlBinding
+	);
 
+	let helpText = '';
+
+	if ( isInvalid || ( hasUrlBinding && ! isBoundEntityAvailable ) ) {
+		// Show invalid link help text for:
+		// 1. Invalid post-type links (trashed/deleted posts/pages) - via useIsInvalidLink
+		// 2. Missing bound taxonomy entities (deleted categories/tags) - useIsInvalidLink only checks post-types
+		helpText = getInvalidLinkHelpText();
+	} else if ( isDraft ) {
+		helpText = getDraftHelpText( {
+			type: attributes.type,
+			kind: attributes.kind,
+		} );
+	}
 	// Get the link change handler with built-in binding management
 	const handleLinkChange = useHandleLinkChange( {
 		clientId,
@@ -129,6 +147,17 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		[ entityRecord?.featured_media ]
 	);
 
+	const onNavigateToEntityRecord = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
+		[]
+	);
+
+	const homeUrl = useSelect( ( select ) => {
+		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			?.home;
+	}, [] );
+
 	const preview = useLinkPreview( {
 		url,
 		title: linkTitle,
@@ -138,6 +167,21 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		hasBinding: hasUrlBinding,
 		isEntityAvailable: isBoundEntityAvailable,
 	} );
+
+	// Check if URL is viewable (not hash link or other relative path like ./ or ../)
+	const isViewableUrl =
+		url &&
+		( ! isHashLink( url ) ||
+			( isRelativePath( url ) && ! url.startsWith( '/' ) ) );
+
+	// Construct full URL for viewing (prepend home URL for absolute paths starting with /)
+	const viewUrl =
+		isViewableUrl && url.startsWith( '/' ) && homeUrl ? homeUrl + url : url;
+
+	const entityTypeName = getEntityTypeName(
+		attributes.type,
+		attributes.kind
+	);
 
 	return (
 		<ToolsPanel
@@ -173,7 +217,14 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 			<ToolsPanelItem
 				hasValue={ () => !! url }
 				label={ __( 'Link to' ) }
-				onDeselect={ () => setAttributes( { url: '' } ) }
+				onDeselect={ () =>
+					setAttributes( {
+						url: undefined,
+						id: undefined,
+						kind: undefined,
+						type: undefined,
+					} )
+				}
 				isShownByDefault
 			>
 				<LinkPicker
@@ -184,9 +235,61 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 						attributes.kind
 					) }
 					label={ __( 'Link to' ) }
-					help={ needsHelpText ? helpText : undefined }
+					help={ helpText ? helpText : undefined }
 				/>
 			</ToolsPanelItem>
+
+			{ url && (
+				<HStack
+					className="navigation-link-to__actions"
+					alignment="left"
+					justify="left"
+					style={ { gridColumn: '1 / -1' } }
+				>
+					{ hasUrlBinding &&
+						isBoundEntityAvailable &&
+						entityRecord?.id &&
+						attributes.kind === 'post-type' &&
+						onNavigateToEntityRecord && (
+							<Button
+								size="compact"
+								variant="secondary"
+								onClick={ () => {
+									onNavigateToEntityRecord( {
+										postId: entityRecord.id,
+										postType: attributes.type,
+									} );
+								} }
+								__next40pxDefaultSize
+							>
+								{ sprintf(
+									/* translators: %s: entity type (e.g., "page", "post", "category") */
+									__( 'Edit %s' ),
+									entityTypeName
+								) }
+							</Button>
+						) }
+					{ isViewableUrl && (
+						<Button
+							size="compact"
+							variant="secondary"
+							href={ viewUrl }
+							target="_blank"
+							icon={ external }
+							iconPosition="right"
+							__next40pxDefaultSize
+						>
+							{ sprintf(
+								/* translators: %s: entity type (e.g., "page", "post", "category") or "site" for external links */
+								__( 'View %s' ),
+								entityTypeName !== 'item'
+									? entityTypeName
+									: __( 'site' )
+							) }
+						</Button>
+					) }
+				</HStack>
+			) }
 
 			<ToolsPanelItem
 				hasValue={ () => !! opensInNewTab }
@@ -243,37 +346,32 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		</ToolsPanel>
 	);
 }
-
 /**
- * Component to display help text for bound URL attributes.
+ * Returns help text for invalid links.
  *
- * @param {Object} props      - Component props
- * @param {string} props.type - The entity type
- * @param {string} props.kind - The entity kind
- * @return {string} Help text for the bound URL
+ * @return {string} Error help text string (empty string if valid).
  */
-export function BindingHelpText( { type, kind } ) {
-	const entityType = getEntityTypeName( type, kind );
-	return sprintf(
-		/* translators: %s is the entity type (e.g., "page", "post", "category") */
-		__( 'Synced with the selected %s.' ),
-		entityType
+export function getInvalidLinkHelpText() {
+	return __(
+		'This link is invalid and will not appear on your site. Please update the link.'
 	);
 }
 
 /**
- * Component to display error help text for missing entity bindings.
+ * Returns the help text for links to draft entities
  *
- * @param {Object} props      - Component props
+ * @param {Object} props      - Function props
  * @param {string} props.type - The entity type
  * @param {string} props.kind - The entity kind
- * @return {JSX.Element} Error help text component
+ * @return {string} Draft help text
  */
-export function MissingEntityHelpText( { type, kind } ) {
+function getDraftHelpText( { type, kind } ) {
 	const entityType = getEntityTypeName( type, kind );
 	return sprintf(
-		/* translators: %s is the entity type (e.g., "page", "post", "category") */
-		__( 'Synced %s is missing. Please update or remove this link.' ),
+		/* translators: %1$s is the entity type (e.g., "page", "post", "category") */
+		__(
+			'This link is to a draft %1$s and will not appear on your site until the %1$s is published.'
+		),
 		entityType
 	);
 }

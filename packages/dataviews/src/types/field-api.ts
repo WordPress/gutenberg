@@ -429,6 +429,10 @@ export type DataFormControlProps< Item > = {
 	onChange: ( value: DeepPartial< Item > ) => void;
 	hideLabelFromVision?: boolean;
 	/**
+	 * Label the control as "optional" when _not_ required, instead of showing "required".
+	 */
+	markWhenOptional?: boolean;
+	/**
 	 * The currently selected filter operator for this field.
 	 *
 	 * Used by DataViews filters to determine which control to render based on the operator type.

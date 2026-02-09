@@ -177,6 +177,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: '.my-heading1, .my-heading2',
+					name: 'core/heading',
 				},
 				{
 					styles: {
@@ -219,6 +220,7 @@ describe( 'global styles renderer', () => {
 						},
 					},
 					selector: '.my-image',
+					name: 'core/image',
 					featureSelectors: '.my-image img, .my-image .crop-area',
 				},
 			] );

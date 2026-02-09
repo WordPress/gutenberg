@@ -16,6 +16,7 @@ module.exports = {
 	moduleNameMapper: {
 		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
 			'packages/$1/src',
+		'@wordpress/vips/worker': '<rootDir>/packages/vips/src/vips-worker.ts',
 		'@wordpress/theme/design-tokens.js':
 			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
@@ -24,7 +25,6 @@ module.exports = {
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-env.js',
-		'<rootDir>/test/unit/config/suppress-browser-warnings.js',
 	],
 	setupFilesAfterEnv: [
 		'<rootDir>/test/unit/config/testing-library.js',
@@ -50,7 +50,7 @@ module.exports = {
 		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	transformIgnorePatterns: [
-		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js)/)',
+		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx)/)',
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [

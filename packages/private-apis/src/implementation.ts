@@ -36,7 +36,6 @@ const CORE_MODULES_USING_PRIVATE_APIS = [
 	'@wordpress/routes',
 	'@wordpress/sync',
 	'@wordpress/theme',
-	'@wordpress/ui',
 	'@wordpress/dataviews',
 	'@wordpress/fields',
 	'@wordpress/lazy-editor',

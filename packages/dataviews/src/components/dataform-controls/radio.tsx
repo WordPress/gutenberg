@@ -19,6 +19,7 @@ export default function Radio< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { label, description, getValue, setValue, isValid } = field;
@@ -41,6 +42,7 @@ export default function Radio< Item >( {
 	return (
 		<ValidatedRadioControl
 			required={ !! field.isValid?.required }
+			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			help={ description }

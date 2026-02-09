@@ -23,6 +23,7 @@ export default function ToggleGroup< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { getValue, setValue, isValid } = field;
@@ -51,6 +52,7 @@ export default function ToggleGroup< Item >( {
 	return (
 		<ValidatedToggleGroupControl
 			required={ !! field.isValid?.required }
+			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			__next40pxDefaultSize
 			isBlock

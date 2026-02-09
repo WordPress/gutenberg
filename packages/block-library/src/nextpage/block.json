@@ -16,7 +16,8 @@
 		"visibility": false,
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"customCSS": false
 	},
 	"editorStyle": "wp-block-nextpage-editor"
 }

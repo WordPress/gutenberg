@@ -20,4 +20,12 @@
 	.dataviews-footer {
 		padding-bottom: $grid-unit-10;
 	}
+
+	.media-upload-modal__snackbar {
+		position: absolute;
+		left: 0;
+		bottom: 16px;
+		padding-left: 16px;
+		padding-right: 16px;
+	}
 }

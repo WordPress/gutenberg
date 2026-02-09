@@ -47,6 +47,10 @@ export const settings = {
 		if ( context === 'list-view' && ( customName || hasContent ) ) {
 			return customName || text;
 		}
+
+		if ( context === 'breadcrumb' && customName ) {
+			return customName;
+		}
 	},
 };
 

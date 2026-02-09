@@ -45,6 +45,8 @@ const LinkControlSearchInput = forwardRef(
 			hideLabelFromVision = false,
 			suffix,
 			isEntity = false,
+			customValidity: customValidityProp,
+			required,
 		},
 		ref
 	) => {
@@ -146,6 +148,12 @@ const LinkControlSearchInput = forwardRef(
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
+					customValidity={ customValidityProp }
+					// When required=false, validation is handled manually via onSubmit and handleSubmit.
+					// When required=true (e.g., in modals with text control), browser validation is used.
+					// Use markWhenOptional when required=true to suppress the "(Required)" indicator.
+					required={ required }
+					markWhenOptional={ required }
 					onSubmit={ ( suggestion, event ) => {
 						const hasSuggestion = suggestion || focusedSuggestion;
 

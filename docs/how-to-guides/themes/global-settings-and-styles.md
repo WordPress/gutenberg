@@ -273,6 +273,7 @@ The settings section has the following structure:
 			"textAlign": true,
 			"textColumns": false,
 			"textDecoration": true,
+			"textIndent": true,
 			"textTransform": true
 		},
 		"blocks": {
