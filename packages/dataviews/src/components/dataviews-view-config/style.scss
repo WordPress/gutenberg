@@ -59,6 +59,10 @@
 	}
 }
 
+.dataviews-view-config__sort-controls > * {
+	flex: 1;
+}
+
 .dataviews-view-config__label {
 	text-wrap: nowrap;
 }

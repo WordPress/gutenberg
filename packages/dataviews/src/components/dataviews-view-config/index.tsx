@@ -335,7 +335,11 @@ export function DataviewsViewConfigDropdown() {
 							<ResetViewButton />
 						</Stack>
 						<Stack direction="column" gap="lg">
-							<Stack direction="row" gap="sm">
+							<Stack
+								direction="row"
+								gap="sm"
+								className="dataviews-view-config__sort-controls"
+							>
 								<SortFieldControl />
 								<SortDirectionControl />
 							</Stack>
