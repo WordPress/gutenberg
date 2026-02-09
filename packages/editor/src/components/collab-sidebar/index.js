@@ -86,17 +86,26 @@ function NotesSidebar( { postId } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
-	const { clientId, blockCommentId } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } =
-			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-		return {
-			clientId: _clientId,
-			blockCommentId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
-		};
-	}, [] );
+	const { clientId, blockCommentId, isClassicBlock } = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getSelectedBlockClientId,
+				getBlockName,
+			} = select( blockEditorStore );
+			const _clientId = getSelectedBlockClientId();
+			return {
+				clientId: _clientId,
+				blockCommentId: _clientId
+					? getBlockAttributes( _clientId )?.metadata?.noteId
+					: null,
+				isClassicBlock: _clientId
+					? getBlockName( _clientId ) === 'core/freeform'
+					: false,
+			};
+		},
+		[]
+	);
 	const { isDistractionFree } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
@@ -129,7 +138,11 @@ function NotesSidebar( { postId } ) {
 		{
 			// When multiple notes per block are supported. Remove note ID check.
 			// See: https://github.com/WordPress/gutenberg/pull/75147.
-			isDisabled: isDistractionFree || ! clientId || !! blockCommentId,
+			isDisabled:
+				isDistractionFree ||
+				isClassicBlock ||
+				! clientId ||
+				!! blockCommentId,
 		}
 	);
 
