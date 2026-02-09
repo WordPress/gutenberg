@@ -51,8 +51,13 @@ export type ModalProps = {
 	 */
 	contentLabel?: string;
 	/**
-	 * If this property is true, it will focus the first tabbable element
-	 * rendered in the modal.
+	 * Determines focus behavior when the modal opens.
+	 *
+	 * - `"firstElement"` focuses the first tabbable element within.
+	 * - `"firstInputElement"` focuses the first value control within.
+	 * - `true` focuses the element itself.
+	 * - `false` does nothing and _should not be used unless an accessible
+	 *    substitute behavior is implemented_.
 	 *
 	 * @default true
 	 */

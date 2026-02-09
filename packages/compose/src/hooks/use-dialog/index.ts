@@ -20,10 +20,13 @@ import useMergeRefs from '../use-merge-refs';
 
 type DialogOptions = {
 	/**
-	 * Determines whether focus should be automatically moved to the popover
-	 * when it mounts. `false` causes no focus shift, `true` causes the popover
-	 * itself to gain focus, and `firstElement` focuses the first focusable
-	 * element within the popover.
+	 * Determines focus behavior when the dialog mounts.
+	 *
+	 * - `"firstElement"` focuses the first tabbable element within.
+	 * - `"firstInputElement"` focuses the first value control within.
+	 * - `true` focuses the element itself.
+	 * - `false` does nothing and _should not be used unless an accessible
+	 *    substitute behavior is implemented_.
 	 *
 	 * @default 'firstElement'
 	 */

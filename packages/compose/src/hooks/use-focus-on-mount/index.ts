@@ -3,9 +3,15 @@ import { useEffect, useRef } from '@wordpress/element';
 import useRefEffect from '../use-ref-effect';
 
 /**
- * Hook used to focus the first tabbable element on mount.
+ * Determines focus behavior when the element mounts.
  *
- * @param focusOnMount Focus on mount mode.
+ * @param focusOnMount Behavioral mode. Defaults to `"firstElement"`.
+ *
+ *                     - `"firstElement"` focuses the first tabbable element within.
+ *                     - `"firstInputElement"` focuses the first value control within.
+ *                     - `true` focuses the element itself.
+ *                     - `false` does nothing and _should not be used unless an accessible
+ *                     substitute behavior is implemented_.
  * @return Ref callback.
  *
  * @example
