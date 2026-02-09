@@ -615,15 +615,21 @@ describe( 'TimePicker', () => {
 		await user.type( yearInput, '500' );
 		await user.keyboard( '{Tab}' );
 
-		// Verify input field value after change
+		// Verify input field value after change (human-readable, not zero-padded)
 		expect( yearInput ).toHaveValue( 500 );
 
 		// Verify onChange emits zero-padded ISO 8601 format
-		if ( onChangeSpy.mock.calls.length > 0 ) {
-			const lastCall = onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
-			expect( lastCall[ 0 ] ).toMatch( /^0500-/ );
-			expect( lastCall[ 0 ] ).not.toContain( 'NaN' );
-		}
+		expect( onChangeSpy ).toHaveBeenCalled();
+		const lastCall = onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
+		const outputDate = lastCall[ 0 ];
+
+		// Extract year from output and verify it's zero-padded to 4 digits
+		const yearMatch = outputDate.match( /^(\d{4})-/ );
+		expect( yearMatch ).not.toBeNull();
+		expect( yearMatch[ 1 ] ).toBe( '0500' ); // Explicitly verify zero-padded year
+
+		expect( outputDate ).not.toContain( 'NaN' );
+		expect( outputDate ).not.toContain( 'Invalid' );
 		} );
 	} );
 } );
