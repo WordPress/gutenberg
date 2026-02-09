@@ -15,6 +15,7 @@
 
 ### Enhancements
 
+- DataViews: Add `onReset` prop to control view reset functionality from the view config dropdown. [#75093](https://github.com/WordPress/gutenberg/pull/75093)
 - DataForm: Add automatic field labeling - forms now automatically mark the minority of fields (required or optional) to reduce visual noise. [#74430](https://github.com/WordPress/gutenberg/pull/74430)
 - DataViews: Add details form layout validation. [#74996](https://github.com/WordPress/gutenberg/pull/74996)
 - Add new `adaptiveSelect` DataForm control. [#74937](https://github.com/WordPress/gutenberg/pull/74937)

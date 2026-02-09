@@ -370,8 +370,8 @@ async function publishPackagesToNpm( {
 	// Timestamp is the current time in `YYYYMMDDHHMM` format.
 	const timestamp = new Date()
 		.toISOString()
-		.replace( /[-:]/g, '' )
-		.substring( 0, 12 );
+		.substring( 0, 16 )
+		.replace( /[-:T]/g, '' );
 
 	const yesFlag = interactive ? '' : '--yes';
 	const noVerifyAccessFlag = interactive ? '' : '--no-verify-access';
