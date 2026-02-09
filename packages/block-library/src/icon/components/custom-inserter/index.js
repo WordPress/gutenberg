@@ -2,13 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Modal } from '@wordpress/components';
+import { Modal, SearchControl } from '@wordpress/components';
 import { useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import ContentHeader from './content-header';
 import IconGrid from './icon-grid';
 
 export default function InserterModal( props ) {
@@ -45,10 +44,12 @@ export default function InserterModal( props ) {
 			isFullScreen
 		>
 			<div className="wp-block-icon__inserter">
-				<ContentHeader
-					searchInput={ searchInput }
-					setSearchInput={ setSearchInput }
-				/>
+				<div className="wp-block-icon__inserter-header">
+					<SearchControl
+						value={ searchInput }
+						onChange={ setSearchInput }
+					/>
+				</div>
 				<IconGrid
 					shownIcons={ getFilteredIcons() }
 					updateIconAtts={ updateIconAtts }
