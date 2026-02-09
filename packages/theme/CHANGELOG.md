@@ -4,6 +4,7 @@
 
 ### Breaking changes
 
+-   Removed `privateApis` from the package's exports. `ThemeProvider` is now available by direct import from the `@wordpress/theme/theme-provider` subpath entrypoint, e.g. `import { ThemeProvider } from '@wordpress/theme/theme-provider'` ([#75352](https://github.com/WordPress/gutenberg/pull/75352)).
 -   Renamed padding tokens to remove the `surface` segment and updated the scale from `2xs`–`lg` to `xs`–`3xl` ([#75054](https://github.com/WordPress/gutenberg/pull/75054)). To preserve the same values:
     -   `--wpds-dimension-padding-surface-2xs`: use `--wpds-dimension-padding-xs` instead.
     -   `--wpds-dimension-padding-surface-xs`: use `--wpds-dimension-padding-sm` instead.
