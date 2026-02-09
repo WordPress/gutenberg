@@ -284,31 +284,48 @@ export default function useBlockSync( {
 			setControlledBlocks();
 
 			if ( controlledSelection ) {
-				// Use requestAnimationFrame to ensure nested controlled blocks
-				// (like synced patterns within templates) have finished setting up
-				// their clientId mappings before we try to convert selection IDs.
-				window.requestAnimationFrame( () => {
-					// Convert external clientIds to internal clientIds for controlled blocks.
-					// The selection stored in the entity uses external IDs, but resetSelection
-					// needs internal IDs that exist in the block-editor store.
-					const convertSelectionIds = ( sel ) => {
-						if ( ! sel?.clientId ) {
-							return sel;
-						}
-						return {
-							...sel,
-							clientId: getInternalClientId( sel.clientId ),
-						};
+				const convertSelectionIds = ( sel ) => {
+					if ( ! sel?.clientId ) {
+						return sel;
+					}
+					return {
+						...sel,
+						clientId: getInternalClientId( sel.clientId ),
 					};
+				};
 
+				const convertedStart = convertSelectionIds(
+					controlledSelection.selectionStart
+				);
+
+				// If the target block exists in the store, apply selection
+				// synchronously. For root-level blocks, external === internal
+				// IDs so they always exist immediately. For blocks inside
+				// controlled inner blocks (e.g. template parts), the block
+				// may not exist yet because the inner controller hasn't set
+				// up its clientId mappings — defer with requestAnimationFrame.
+				if (
+					! convertedStart?.clientId ||
+					getBlockName( convertedStart.clientId )
+				) {
 					resetSelection(
-						convertSelectionIds(
-							controlledSelection.selectionStart
-						),
+						convertedStart,
 						convertSelectionIds( controlledSelection.selectionEnd ),
 						controlledSelection.initialPosition
 					);
-				} );
+				} else {
+					window.requestAnimationFrame( () => {
+						resetSelection(
+							convertSelectionIds(
+								controlledSelection.selectionStart
+							),
+							convertSelectionIds(
+								controlledSelection.selectionEnd
+							),
+							controlledSelection.initialPosition
+						);
+					} );
+				}
 			}
 		}
 	}, [ controlledBlocks, clientId ] );
