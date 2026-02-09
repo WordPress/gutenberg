@@ -12,6 +12,7 @@
 ### Enhancements
 
 -   Improve visual emphasis of the selected item in the ToggleGroupControl component ([#75138](https://github.com/WordPress/gutenberg/pull/75138)).
+- FormTokenField: Match label instead of key in suggestions. [#74772](https://github.com/WordPress/gutenberg/pull/74772)
 
 ### Internal
 
@@ -31,7 +32,7 @@
 ### Enhancements
 
 -   `ToggleControl` pass full props and support required validation in `ValidatedToggleControl`. [#74956](https://github.com/WordPress/gutenberg/pull/74956)
--   FormTokenField: Match label instead of key in suggestions. [#74772](https://github.com/WordPress/gutenberg/pull/74772)
+
 ## 32.0.0 (2026-01-16)
 
 ### Code Quality
