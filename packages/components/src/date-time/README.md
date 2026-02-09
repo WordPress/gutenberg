@@ -92,17 +92,15 @@ The day that the week should start on. 0 for Sunday, 1 for Monday, etc.
 
 ### `minYear`: `number`
 
-The minimum year that can be selected in the date fields. This prop helps prevent invalid dates from being created.
-
-**Important:** Internally, the component enforces a minimum of 1000 for the year field regardless of the `minYear` value provided. This is because years below 1000 cannot be reliably parsed by moment.js (used internally) and would cause deprecation warnings or parsing errors.
+The minimum year that can be selected in the year input field.
 
 - Required: No
-- Default: `1000`
+- Default: `1`
 
 **Usage examples:**
 
 ```jsx
-// Default behavior - allows years from 1000 onwards
+// Default behavior - allows years from 1 onwards
 <DateTimePicker
 	currentDate={ date }
 	onChange={ setDate }

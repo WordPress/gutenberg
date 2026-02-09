@@ -635,26 +635,26 @@ describe( 'TimePicker', () => {
 	} );
 
 	describe( 'Invalid date handling', () => {
-		it( 'should not emit invalid dates when year is cleared and blurred', async () => {
-			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+	it( 'should not emit invalid dates when year is cleared and blurred', async () => {
+		const user = userEvent.setup();
+		const onChangeSpy = jest.fn();
 
-			render(
-				<TimePicker
-					currentTime="1986-10-18T11:00:00"
-					onChange={ onChangeSpy }
-					is12Hour
-				/>
-			);
+		render(
+			<TimePicker
+				currentTime="1986-10-18T11:00:00"
+				onChange={ onChangeSpy }
+				is12Hour
+			/>
+		);
 
-			const yearInput = screen.getByLabelText( 'Year' );
+		const yearInput = screen.getByLabelText( 'Year' );
 
 		// Clear the year field and blur
 		await user.clear( yearInput );
 		await user.keyboard( '{Tab}' );
 
 		// Verify the input field value after browser coercion
-		expect( yearInput ).toHaveValue( 1000 );
+		expect( yearInput ).toHaveValue( 1 );
 
 		// When the year is cleared, the browser may coerce to minYear.
 		// If onChange is called, it should only emit valid date strings.
@@ -702,21 +702,20 @@ describe( 'TimePicker', () => {
 		} );
 	} );
 
-		it( 'should handle years below 1000 when minYear allows them without moment.js warnings', async () => {
-			const user = userEvent.setup();
-			const onChangeSpy = jest.fn();
+	it( 'should handle years below 1000 when minYear allows them', async () => {
+		const user = userEvent.setup();
+		const onChangeSpy = jest.fn();
 
-			// Set minYear to 1, which browser will enforce but moment.js may struggle with
-			render(
-				<TimePicker
-					currentTime="1986-10-18T11:00:00"
-					onChange={ onChangeSpy }
-					minYear={ 1 }
-					is12Hour
-				/>
-			);
+		render(
+			<TimePicker
+				currentTime="1986-10-18T11:00:00"
+				onChange={ onChangeSpy }
+				minYear={ 1 }
+				is12Hour
+			/>
+		);
 
-			const yearInput = screen.getByLabelText( 'Year' );
+		const yearInput = screen.getByLabelText( 'Year' );
 
 		// Clear the year field and blur - browser will coerce to minYear (1)
 		await user.clear( yearInput );
@@ -725,10 +724,7 @@ describe( 'TimePicker', () => {
 		// Verify the input field value after browser coercion to minYear
 		expect( yearInput ).toHaveValue( 1 );
 
-		// Our internal guard should prevent years < 1000 from propagating,
-		// so onChange should NOT have been called with the year 1
 		// Verify that if onChange was called, it only received valid date strings
-		// without triggering moment.js warnings
 		onChangeSpy.mock.calls.forEach( ( call ) => {
 			const dateString = call[ 0 ];
 			expect( dateString ).toMatch( /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/ );
@@ -736,5 +732,123 @@ describe( 'TimePicker', () => {
 			expect( dateString ).not.toContain( 'Invalid' );
 		} );
 	} );
+	} );
+
+	describe( 'Years below 1000 support', () => {
+		it( 'should handle year 999 with zero-padded output', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = jest.fn();
+
+			render(
+				<TimePicker
+					currentTime="0999-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					minYear={ 1 }
+				/>
+			);
+
+		const yearInput = screen.getByLabelText( 'Year' );
+
+		// Verify input displays human-readable year (not zero-padded)
+		expect( yearInput ).toHaveValue( 999 );
+
+		// Change to year 500
+		await user.clear( yearInput );
+		await user.type( yearInput, '500' );
+		await user.keyboard( '{Tab}' );
+
+		// Verify onChange emits zero-padded ISO 8601 format
+		const lastCall = onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
+		expect( lastCall[ 0 ] ).toMatch( /^0500-10-18T/ );
+		expect( lastCall[ 0 ] ).not.toContain( 'NaN' );
+		} );
+
+		it( 'should handle year 1 with zero-padded output', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = jest.fn();
+
+			render(
+				<TimePicker
+					currentTime="0001-01-01T12:00:00"
+					onChange={ onChangeSpy }
+					minYear={ 1 }
+				/>
+			);
+
+		const yearInput = screen.getByLabelText( 'Year' );
+
+		// Verify input displays human-readable year (not zero-padded)
+		expect( yearInput ).toHaveValue( 1 );
+
+		// Change to year 99
+		await user.clear( yearInput );
+		await user.type( yearInput, '99' );
+		await user.keyboard( '{Tab}' );
+
+		// Verify input displays human-readable year
+		expect( yearInput ).toHaveValue( 99 );
+
+		// Verify onChange emits zero-padded ISO 8601 format
+		const lastCall = onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
+		expect( lastCall[ 0 ] ).toMatch( /^0099-01-01T/ );
+		} );
+
+	it( 'should allow years below 1000 when minYear permits', async () => {
+		const user = userEvent.setup();
+		const onChangeSpy = jest.fn();
+
+		render(
+			<TimePicker
+				currentTime="1986-10-18T11:00:00"
+				onChange={ onChangeSpy }
+				minYear={ 1 }
+			/>
+		);
+
+		const yearInput = screen.getByLabelText( 'Year' );
+
+		// Type year 500 - should be allowed
+		await user.clear( yearInput );
+		await user.type( yearInput, '500' );
+		await user.keyboard( '{Tab}' );
+
+		// Verify input displays human-readable year (not zero-padded)
+		expect( yearInput ).toHaveValue( 500 );
+
+		// Verify onChange was called with zero-padded ISO 8601 format
+		expect( onChangeSpy ).toHaveBeenCalled();
+		const lastCall = onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
+		expect( lastCall[ 0 ] ).toMatch( /^0500-/ );
+	} );
+
+		it( 'should handle year 500 correctly', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = jest.fn();
+
+			render(
+				<TimePicker
+					currentTime="0500-06-15T09:30:00"
+					onChange={ onChangeSpy }
+					minYear={ 1 }
+				/>
+			);
+
+		const yearInput = screen.getByLabelText( 'Year' );
+
+		// Verify input displays human-readable year (not zero-padded)
+		expect( yearInput ).toHaveValue( 500 );
+
+		// Change to year 750
+		await user.clear( yearInput );
+		await user.type( yearInput, '750' );
+		await user.keyboard( '{Tab}' );
+
+		// Verify input displays human-readable year
+		expect( yearInput ).toHaveValue( 750 );
+
+		// Verify onChange emits zero-padded ISO 8601 format
+		const lastCall = onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
+		expect( lastCall[ 0 ] ).toMatch( /^0750-06-15T/ );
+		} );
 	} );
 } );

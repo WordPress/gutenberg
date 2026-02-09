@@ -5,7 +5,7 @@
 ### Bug Fixes
 
 -   `TimePicker`: Fix date parsing for years below 1000 by implementing ISO 8601 compliant year formatting with zero-padding ([#75343](https://github.com/WordPress/gutenberg/pull/75343)).
--   `TimePicker`: Fix Invalid Date propagation that caused critical errors when clearing date fields during post scheduling ([#75285](https://github.com/WordPress/gutenberg/pull/75285)).
+-   `TimePicker`: Fix Invalid Date errors by implementing ISO 8601 compliant year formatting. Years below 1000 are now properly zero-padded (e.g., year 999 becomes "0999") to ensure reliable date parsing ([#75285](https://github.com/WordPress/gutenberg/pull/75285)).
 -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
 -   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
 -   `ToggleControl`: Prevent `__nextHasNoMarginBottom` from logging a console warning ([#75296](https://github.com/WordPress/gutenberg/pull/75296)).
@@ -13,7 +13,7 @@
 
 ### Enhancements
 
--   `TimePicker`, `DateTimePicker`: Add `minYear` prop to control minimum selectable year (defaults to 1000) ([#75285](https://github.com/WordPress/gutenberg/pull/75285)).
+-   `TimePicker`, `DateTimePicker`: Add `minYear` prop to control minimum selectable year. Defaults to 1, enabling support for historical dates. Post scheduling continues to restrict dates to the current year and future via the `minYear` prop ([#75285](https://github.com/WordPress/gutenberg/pull/75285)).
 -   Improve visual emphasis of the selected item in the ToggleGroupControl component ([#75138](https://github.com/WordPress/gutenberg/pull/75138)).
 
 ### Internal
