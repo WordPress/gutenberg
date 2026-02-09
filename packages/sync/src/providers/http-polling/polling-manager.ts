@@ -168,6 +168,8 @@ function processAwarenessUpdate(
 			{
 				added: Array.from( added ),
 				updated: Array.from( updated ),
+				// Left blank on purpose, as the removal of clients is handled in the if condition below.
+				removed: [],
 			},
 		] );
 	}
@@ -294,6 +296,9 @@ function poll(): void {
 				}
 			} );
 		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Error posting sync update:', error );
+
 			// Restore updates to queues on failure so they can be retried.
 			for ( const room of payload.rooms ) {
 				if ( ! roomStates.has( room.room ) ) {
