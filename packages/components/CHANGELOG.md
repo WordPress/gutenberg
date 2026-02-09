@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 32.2.0-next.0 (2026-02-09)
+
 ### Bug Fixes
 
 -   `TimePicker`: Fix date parsing for years below 1000 by implementing ISO 8601 compliant year formatting with zero-padding ([#75343](https://github.com/WordPress/gutenberg/pull/75343)).
