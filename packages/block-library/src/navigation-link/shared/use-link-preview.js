@@ -10,7 +10,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  */
 import { unlock } from '../../lock-unlock';
 
-const { useRemoteUrlData } = unlock( blockEditorPrivateApis );
+const { useRemoteUrlData, useFeaturedImage } = unlock( blockEditorPrivateApis );
 
 /**
  * Capitalize the first letter of a string.
@@ -125,28 +125,37 @@ function computeBadges( {
 /**
  * Hook to compute link preview data for display.
  *
- * This hook takes raw link data and entity information and computes
- * presentation-ready preview data including formatted title, URL, and badges.
+ * This hook takes an entity record and computes presentation-ready preview data
+ * including formatted title, URL, featured image, and badges.
  *
  * @param {Object}  options                   - Options object
+ * @param {Object}  options.entityRecord      - The entity record containing link data
  * @param {string}  options.url               - Link URL
- * @param {string}  options.title             - Link title (from entity or rich data)
- * @param {string}  options.image             - Link image URL
  * @param {string}  options.type              - Entity type (page, post, etc.)
- * @param {string}  options.entityStatus      - Entity status (publish, draft, etc.)
  * @param {boolean} options.hasBinding        - Whether link has entity binding
  * @param {boolean} options.isEntityAvailable - Whether bound entity exists
  * @return {Object} Preview data object with title, url, image, and badges
  */
 export function useLinkPreview( {
+	entityRecord: providedEntityRecord,
 	url,
-	title,
-	image,
 	type,
-	entityStatus,
 	hasBinding,
 	isEntityAvailable,
 } ) {
+	// Use provided entity record directly (navigation controls provide this)
+	const entityRecord = providedEntityRecord;
+
+	// Fetch the featured image using the shared hook
+	const image = useFeaturedImage( entityRecord );
+
+	// Extract entity data
+	const title =
+		entityRecord?.title?.rendered ||
+		entityRecord?.title ||
+		entityRecord?.name;
+	const entityStatus = entityRecord?.status;
+
 	// Fetch rich URL data if we don't have a title. Internal links should have passed a title.
 	const { richData } = useRemoteUrlData( title ? null : url );
 

@@ -63,6 +63,7 @@ import {
 } from './components/block-list/use-block-props/use-block-refs';
 import { LinkPicker } from './components/link-picker';
 import useRemoteUrlData from './components/link-control/use-rich-url-data';
+import { useFeaturedImage } from './components/hooks/use-featured-image';
 import { PrivateBlockContext } from './components/block-list/private-block-context';
 import useListViewPanelState from './components/use-list-view-panel-state';
 import {
@@ -128,6 +129,7 @@ lock( privateApis, {
 	useBlockElementRef,
 	LinkPicker,
 	useRemoteUrlData,
+	useFeaturedImage,
 	PrivateBlockContext,
 	useListViewPanelState,
 	isHashLink,

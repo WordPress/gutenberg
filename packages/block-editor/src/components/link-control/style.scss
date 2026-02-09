@@ -192,6 +192,7 @@ $block-editor-link-control-number-of-actions: 1;
 		word-break: break-all;
 	}
 
+	.block-editor-link-control__preview-image,
 	.block-editor-link-control__preview-icon {
 		position: relative;
 		flex-shrink: 0;
@@ -199,7 +200,9 @@ $block-editor-link-control-number-of-actions: 1;
 		width: $grid-unit-40;
 		height: $grid-unit-40;
 		border-radius: $radius-small;
+	}
 
+	.block-editor-link-control__preview-icon.is-favicon {
 		img {
 			width: $grid-unit-20; // favicons often have a source of 32px
 		}

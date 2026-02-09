@@ -34,6 +34,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 import { ViewerSlot } from './viewer-slot';
 
 import useRichUrlData from './use-rich-url-data';
+import { useFeaturedImage } from '../hooks/use-featured-image';
 
 /**
  * Filters the title for display. Removes the protocol and www prefix.
@@ -62,6 +63,33 @@ export default function LinkPreview( {
 		[]
 	);
 
+	// Fetch entity record for internal entity links (post-type only)
+	// We can tell it's an entity by checking if value has an id
+	const entityRecord = useSelect(
+		( select ) => {
+			// Only fetch for post-type entities with id, kind, and type
+			if (
+				! value?.id ||
+				! value?.kind ||
+				! value?.type ||
+				value.kind !== 'post-type'
+			) {
+				return null;
+			}
+
+			// Use string literal to avoid circular dependency with @wordpress/core-data
+			// eslint-disable-next-line @wordpress/data-no-store-string-literals
+			const { getEntityRecord } = select( 'core' );
+
+			// getEntityRecord expects 'postType' (camelCase) not 'post-type' (kebab-case)
+			return getEntityRecord( 'postType', value.type, value.id );
+		},
+		[ value?.id, value?.kind, value?.type ]
+	);
+
+	// Fetch featured image from the entity record
+	const featuredImage = useFeaturedImage( entityRecord );
+
 	// Avoid fetching if rich previews are not desired.
 	const showRichPreviews = hasRichPreviews ? value?.url : null;
 
@@ -86,7 +114,12 @@ export default function LinkPreview( {
 
 	let icon;
 
-	if ( richData?.icon ) {
+	const hasFeaturedImage = featuredImage && typeof featuredImage === 'string';
+
+	// Only use featuredImage if it's a valid string URL
+	if ( hasFeaturedImage ) {
+		icon = <img src={ featuredImage } alt="" />;
+	} else if ( richData?.icon ) {
 		icon = <img src={ richData?.icon } alt="" />;
 	} else if ( isEmptyURL ) {
 		icon = <Icon icon={ info } size={ 32 } />;
@@ -125,17 +158,26 @@ export default function LinkPreview( {
 					}
 					justify="start"
 				>
-					<Flex
-						className={ clsx(
-							'block-editor-link-control__preview-icon',
-							{
-								'is-image': richData?.icon,
-							}
-						) }
-						justify="center"
-					>
-						{ icon }
-					</Flex>
+					{ hasFeaturedImage ? (
+						<Flex
+							className="block-editor-link-control__preview-image"
+							justify="center"
+						>
+							{ icon }
+						</Flex>
+					) : (
+						<Flex
+							className={ clsx(
+								'block-editor-link-control__preview-icon',
+								{
+									'is-image': richData?.icon,
+								}
+							) }
+							justify="center"
+						>
+							{ icon }
+						</Flex>
+					) }
 					<Flex
 						className="block-editor-link-control__preview-details"
 						direction="column"
