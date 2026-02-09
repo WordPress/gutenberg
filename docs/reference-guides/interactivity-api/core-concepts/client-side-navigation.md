@@ -366,10 +366,10 @@ For more details, see the [Understanding global state, local context, and derive
 By default, once a page is cached, subsequent navigations use the cached version. Use the `force` option to re-fetch a page even if it's cached:
 
 ```js
-// Force re-fetch with navigate()
+// Force re-fetch with navigate().
 yield actions.navigate( '/products/', { force: true } );
 
-// Force re-fetch with prefetch()
+// Force re-fetch with prefetch().
 yield actions.prefetch( '/products/', { force: true } );
 ```
 
@@ -398,7 +398,7 @@ store( 'myPlugin', {
 Instead of fetching a page from a URL, you can provide HTML directly using the `html` option:
 
 ```js
-// Navigate with custom HTML
+// Navigate with custom HTML.
 yield actions.navigate( '/custom-page/', {
     html: `
         <div data-wp-interactive="myPlugin" data-wp-router-region="myPlugin/content">
@@ -408,7 +408,7 @@ yield actions.navigate( '/custom-page/', {
     `,
 } );
 
-// Prefetch with custom HTML
+// Prefetch with custom HTML.
 yield actions.prefetch( '/custom-page/', {
     html: customHtmlString,
 } );
@@ -424,10 +424,10 @@ This is useful for:
 By default, `navigate()` adds a new entry to the browser's session history using `pushState`. Use the `replace` option to replace the current history entry instead:
 
 ```js
-// Default behavior: adds new history entry (pushState)
+// Default behavior: adds new history entry (pushState).
 yield actions.navigate( '/page-2/' );
 
-// Replace current history entry (replaceState)
+// Replace current history entry (replaceState).
 yield actions.navigate( '/page-2/', { replace: true } );
 ```
 
@@ -441,10 +441,10 @@ Use `replace: true` when:
 Navigation will abort if it takes too long. The default timeout is 10 seconds. Use the `timeout` option to change this:
 
 ```js
-// Shorter timeout for faster failure
+// Shorter timeout for faster failure.
 yield actions.navigate( '/page/', { timeout: 5000 } );
 
-// Longer timeout for slow connections
+// Longer timeout for slow connections.
 yield actions.navigate( '/page/', { timeout: 30000 } );
 ```
 
@@ -491,7 +491,7 @@ store( 'myPlugin', {
 Some pages may require a full page reload instead of client-side navigation. Use `wp_interactivity_config()` to disable client navigation:
 
 ```php
-// In your theme's functions.php or a plugin
+// In your theme's functions.php or a plugin.
 add_action( 'wp', function() {
     // Disable on specific page templates.
     if ( is_page_template( 'template-complex.php' ) ) {
@@ -525,13 +525,13 @@ The Interactivity API router includes built-in feedback during navigation:
 In some cases, you may want to disable these:
 
 ```js
-// Disable loading animation (for instant-feeling updates)
+// Disable loading animation (for instant-feeling updates).
 yield actions.navigate( '/page/', { loadingAnimation: false } );
 
-// Disable screen reader announcements (when providing custom announcements)
+// Disable screen reader announcements (when providing custom announcements).
 yield actions.navigate( '/page/', { screenReaderAnnouncement: false } );
 
-// Disable both
+// Disable both.
 yield actions.navigate( '/page/', {
     loadingAnimation: false,
     screenReaderAnnouncement: false,
@@ -551,7 +551,7 @@ This section provides a detailed technical explanation of how client-side naviga
 
 ### The page cache
 
-At the heart of the Interactivity API router is a page cache—a simple in-memory store that maps URLs to their processed page representations. When you call `prefetch()` or `navigate()`, the router first checks this cache to see if the target page has already been fetched and processed.
+At the heart of the Interactivity API router is a page cache — a simple in-memory store that maps URLs to their processed page representations. When you call `prefetch()` or `navigate()`, the router first checks this cache to see if the target page has already been fetched and processed.
 
 The cache uses a normalized version of the URL as its key. This normalization strips away the domain and any hash fragments, keeping only the pathname and query parameters. For example, `https://example.com/products/?category=shoes#details` becomes `/products/?category=shoes`. This ensures that navigations to the same logical page (regardless of how the URL was constructed) share the same cache entry.
 
@@ -567,7 +567,7 @@ Each entry in the cache stores not just the fetched HTML, but a fully processed 
 
 An important detail is that the cache stores promises rather than resolved values. When a fetch begins, the router immediately stores the pending promise in the cache. This means that if multiple calls to `prefetch()` or `navigate()` target the same URL simultaneously (for example, if a user rapidly hovers over multiple links pointing to the same page), only one network request is made. All callers receive the same promise and wait for the same result.
 
-Once a page is in the cache, it remains there for the duration of the browser session. Subsequent navigations to that URL will use the cached version instantly, without any network request. This is why client-side navigation feels so fast after the initial visit—the page is already prepared and ready to render.
+Once a page is in the cache, it remains there for the duration of the browser session. Subsequent navigations to that URL will use the cached version instantly, without any network request. This is why client-side navigation feels so fast after the initial visit — the page is already prepared and ready to render.
 
 If you need to force a fresh fetch (for example, after submitting a form that changes the page's content), you can use the `force: true` option with `navigate()` or `prefetch()`. This bypasses the cache check and fetches the page anew, replacing the existing cache entry with the fresh content.
 
@@ -642,7 +642,7 @@ First, the router parses the fetched HTML into a document structure using the br
 
 Next, the router scans this document for all elements that have both `data-wp-interactive` and `data-wp-router-region` attributes. For each region found, it extracts the region ID and checks whether the region is nested inside another region. Only top-level regions are processed directly; nested regions are handled as part of their parent's content.
 
-For each top-level region, the router converts the HTML into a virtual DOM (vDOM) representation. The virtual DOM is a lightweight JavaScript object structure that mirrors the actual DOM but can be compared and manipulated much more efficiently. Importantly, the region element itself is included in this conversion—not just its children. This means that attributes on the region element, such as `data-wp-context`, will also be processed and updated during navigation.
+For each top-level region, the router converts the HTML into a virtual DOM (vDOM) representation. The virtual DOM is a lightweight JavaScript object structure that mirrors the actual DOM but can be compared and manipulated much more efficiently. Importantly, the region element itself is included in this conversion — not just its children. This means that attributes on the region element, such as `data-wp-context`, will also be processed and updated during navigation.
 
 <!-- IMAGE: Flowchart showing the region processing pipeline. Starting with "Fetched HTML" (showing raw HTML code), an arrow leads to "Parse HTML" (DOM tree icon), then to "Find Regions" (highlighting regions in the tree), then to "Convert to vDOM" (showing a simplified tree structure), and finally to "Store in Cache" (the cache icon from earlier). -->
 
@@ -660,13 +660,13 @@ This is the most common case. When a region with a given ID exists on both the c
 
 Rather than simply replacing the entire region's HTML (which would destroy any internal state and cause a jarring visual transition), the router uses a virtual DOM diffing algorithm. This algorithm compares the current region's virtual DOM with the new region's virtual DOM and calculates the minimum set of changes needed to transform one into the other.
 
-For example, if a product list region contains 10 products on the current page and 10 different products on the new page, the diffing algorithm might determine that it only needs to update the text content and image sources within the existing list item elements—rather than destroying and recreating all 10 items from scratch. This preserves DOM state (like scroll position within the region, or focus state) and produces smoother visual transitions.
+For example, if a product list region contains 10 products on the current page and 10 different products on the new page, the diffing algorithm might determine that it only needs to update the text content and image sources within the existing list item elements — rather than destroying and recreating all 10 items from scratch. This preserves DOM state (like scroll position within the region, or focus state) and produces smoother visual transitions.
 
 <!-- IMAGE: Before/after comparison showing region update. Left side shows "Current Page" with a region containing items A, B, C (each in a box). Right side shows "Target Page" with items A, D, C. In the middle, arrows show that A and C stay in place while B transforms into D. Caption: "The diffing algorithm minimizes DOM changes." -->
 
 **Scenario 2: Region exists only on the target page with `attachTo` (create)**
 
-Sometimes a page contains a region that doesn't exist on the current page—for example, a modal dialog that only appears on certain pages. If this region has the `attachTo` property specified, the router will dynamically create it.
+Sometimes a page contains a region that doesn't exist on the current page — for example, a modal dialog that only appears on certain pages. If this region has the `attachTo` property specified, the router will dynamically create it.
 
 The `attachTo` property contains a CSS selector that identifies where in the current page the new region should be appended. When the router encounters such a region, it:
 
@@ -687,7 +687,7 @@ If the region was dynamically created via `attachTo` during a previous navigatio
 
 **What happens to HTML outside router regions?**
 
-An important detail to understand is that HTML outside of router regions remains completely untouched during client-side navigation. The router only modifies the content inside the regions it manages—everything else in the DOM stays exactly as it was.
+An important detail to understand is that HTML outside of router regions remains completely untouched during client-side navigation. The router only modifies the content inside the regions it manages — everything else in the DOM stays exactly as it was.
 
 This means that if you have static elements like a site header, footer, or navigation menu that aren't wrapped in a router region, they won't change when the user navigates between pages. This can be intentional (for elements that truly are the same across all pages) or it can be a source of confusion if you expect those elements to update.
 
@@ -712,7 +712,7 @@ For example, consider a shopping cart icon in the header that displays the numbe
 </main>
 ```
 
-If `state.cartCount` comes from the regular client-side state, the cart icon will not update during navigation—even if the new page has a different cart count in its server state. The header, while being interactive, is outside any router region, so it's not re-rendered.
+If `state.cartCount` comes from the regular client-side state, the cart icon will not update during navigation — even if the new page has a different cart count in its server state. The header, while being interactive, is outside any router region, so it's not re-rendered.
 
 But if you use `getServerState()` instead:
 
@@ -720,7 +720,7 @@ But if you use `getServerState()` instead:
 const { state } = store( 'myShop', {
     state: {
         get cartCount() {
-            // This reacts to server state changes during navigation
+            // This reacts to server state changes during navigation.
             return getServerState().cartCount;
         },
     },
@@ -733,13 +733,13 @@ This pattern is useful for global UI elements that need to stay synchronized wit
 
 ### CSS handling
 
-One of the trickier aspects of client-side navigation is managing CSS style sheets. Different pages may require different styles, and the router must ensure that the correct styles are active for each page—without causing flashes of unstyled content or breaking the CSS cascade order.
+One of the trickier aspects of client-side navigation is managing CSS style sheets. Different pages may require different styles, and the router must ensure that the correct styles are active for each page — without causing flashes of unstyled content or breaking the CSS cascade order.
 
 **The challenge of CSS cascade order**
 
 CSS rules are applied in a specific order, and when two rules have the same specificity, the one that appears later in the document "wins." This means that the order of `<link>` and `<style>` elements in your HTML matters. If the router simply appended new style sheets to the end of the document, it could inadvertently change which rules take precedence, causing visual bugs.
 
-Consider this example: Page A has style sheets [base.css, theme.css], and Page B has [base.css, components.css, theme.css]. If the user navigates from A to B, the router needs to insert components.css between base.css and theme.css—not at the end. Otherwise, any rules in theme.css that are meant to override components.css would stop working.
+Consider this example: Page A has style sheets [base.css, theme.css], and Page B has [base.css, components.css, theme.css]. If the user navigates from A to B, the router needs to insert components.css between base.css and theme.css — not at the end. Otherwise, any rules in theme.css that are meant to override components.css would stop working.
 
 **How styles are extracted and prepared**
 
@@ -755,7 +755,7 @@ The router then compares the extracted styles with those already present in the 
 
 For new style sheets, the router faces a dilemma: it needs to ensure the styles are fully loaded before showing the new page content (to prevent flash of unstyled content), but it doesn't want to apply them yet (because the user is still viewing the current page).
 
-The solution is to add new `<link>` elements with their `media` attribute set to a value that prevents them from applying. The router uses `media="preload"`, which tells the browser "this style sheet applies to no media types"—effectively disabling it while still allowing the browser to download and parse it.
+The solution is to add new `<link>` elements with their `media` attribute set to a value that prevents them from applying. The router uses `media="preload"`, which tells the browser "this style sheet applies to no media types" — effectively disabling it while still allowing the browser to download and parse it.
 
 When a `<link>` element is added this way, the browser begins downloading the CSS file immediately. The router tracks when each style sheet finishes loading by listening for the `load` event. This allows it to wait until all new styles are ready before proceeding with navigation.
 
@@ -838,7 +838,7 @@ To handle this, the router performs a recursive dependency resolution:
 4. It recursively fetches and parses each dependency
 5. This continues until all modules in the dependency tree have been fetched
 
-The router is smart about avoiding redundant work. If a module has already been loaded by the initial page (it appears in the initial import map), the router doesn't fetch it again—the browser already has it cached.
+The router is smart about avoiding redundant work. If a module has already been loaded by the initial page (it appears in the initial import map), the router doesn't fetch it again — the browser already has it cached.
 
 <!-- IMAGE: Tree diagram showing module dependency resolution. At the top, "view.js" (the entry point). Arrows lead down to its dependencies: "@wordpress/interactivity" and "./components/modal.js". The interactivity module is shown grayed out with a note "Already loaded - skip". The modal.js module has its own dependencies branching below it. Each node shows whether it needs to be fetched or can be skipped. -->
 
@@ -855,7 +855,7 @@ Because the browser's module system caches modules by URL, importing the same bl
 When `navigate()` renders the new page, it imports all the modules that were preloaded for that page:
 
 ```js
-// Simplified conceptual view of what happens
+// Simplified conceptual view of what happens.
 for (const moduleInfo of page.scriptModules) {
     await import(moduleInfo.blobUrl);
 }
@@ -865,7 +865,7 @@ Each module's top-level code runs, which typically includes calls to `store()` t
 
 ### Server state and context
 
-WordPress blocks often need data from the server—configuration values, content from the database, user preferences, and more. The Interactivity API provides two mechanisms for this: global state and local context. During client-side navigation, this server-provided data needs to be extracted from the new page and made available to the client-side code.
+WordPress blocks often need data from the server — configuration values, content from the database, user preferences, and more. The Interactivity API provides two mechanisms for this: global state and local context. During client-side navigation, this server-provided data needs to be extracted from the new page and made available to the client-side code.
 
 **How server data is embedded in pages**
 
@@ -969,6 +969,6 @@ When the user clicks the link and your code calls `navigate()`:
 
 A subtle but important detail: users don't always wait for navigation to complete before clicking another link. The router handles this gracefully.
 
-When `navigate()` is called, the router remembers the target URL. If another `navigate()` call comes in before the first completes, the router updates its target and the first navigation is abandoned. When the first navigation's fetch completes, it checks whether its URL is still the current target—if not, it simply returns without rendering.
+When `navigate()` is called, the router remembers the target URL. If another `navigate()` call comes in before the first completes, the router updates its target and the first navigation is abandoned. When the first navigation's fetch completes, it checks whether its URL is still the current target — if not, it simply returns without rendering.
 
 This ensures that rapid clicking through multiple links doesn't cause visual glitches or render stale content. Only the most recent navigation completes.
