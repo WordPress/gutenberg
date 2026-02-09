@@ -169,16 +169,21 @@ function InlineLinkUI( {
 
 			return;
 		} else if ( newText === richTextText ) {
-			// Use explicit format boundaries rather than relying on the
-			// current selection which may be collapsed or misaligned.
-			const boundary = getFormatBoundary( value, {
-				type: 'core/link',
-			} );
+			// Use explicit format boundaries rather than relying on
+			// the current selection which may be collapsed or
+			// misaligned after external value changes.
+			const boundary = isActive
+				? getFormatBoundary( value, {
+						type: 'core/link',
+				  } )
+				: undefined;
 			newValue = applyFormat(
 				value,
 				linkFormat,
-				boundary.start,
-				boundary.end + FORMAT_BOUNDARY_EDGE_OFFSET
+				boundary?.start,
+				boundary?.end
+					? boundary.end + FORMAT_BOUNDARY_EDGE_OFFSET
+					: undefined
 			);
 		} else {
 			// Scenario: Editing an existing link.
