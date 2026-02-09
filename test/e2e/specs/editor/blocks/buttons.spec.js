@@ -332,7 +332,7 @@ test.describe( 'Buttons', () => {
 			expect( content ).toBe(
 				`<!-- wp:buttons -->
 <div class="wp-block-buttons"><!-- wp:button {"style":{"dimensions":{"width":"25%"}}} -->
-<div class="wp-block-button has-custom-width wp-block-button__width wp-block-button__width-25" style="--wp--block-button--width:25"><a class="wp-block-button__link wp-element-button">Content</a></div>
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Content</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->`
 			);

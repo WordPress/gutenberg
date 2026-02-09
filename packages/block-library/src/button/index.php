@@ -113,10 +113,10 @@ function render_block_core_button( $attributes, $content ) {
 					$p->add_class( $legacy_widths[ $resolved_width ] );
 				}
 
-				$width_style    = "--wp--block-button--width: $numeric_width;";
+				$width_style = "--wp--block-button--width: $numeric_width;";
 				$p->set_attribute( 'style', $width_style . ( $existing_style ? ' ' . $existing_style : '' ) );
 			} else {
-				$width_style    = "width: $width;";
+				$width_style = "width: $width;";
 				$p->set_attribute( 'style', $width_style . ( $existing_style ? ' ' . $existing_style : '' ) );
 			}
 
