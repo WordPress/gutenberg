@@ -4,6 +4,32 @@ Client-side navigation is a technique that allows navigation between pages witho
 
 The Interactivity API provides client-side navigation through the `@wordpress/interactivity-router` package. This package enables you to implement region-based navigation, where only specific parts of your page are updated when navigating between URLs.
 
+## Table of contents
+
+- [How client-side navigation works](#how-client-side-navigation-works)
+- [Getting started with the Interactivity Router](#getting-started-with-the-interactivity-router)
+    - [Setting up router regions](#setting-up-router-regions)
+    - [Implementing navigation](#implementing-navigation)
+    - [Implementing prefetching](#implementing-prefetching)
+    - [Complete example: Pagination](#complete-example-pagination)
+- [More advanced use cases](#more-advanced-use-cases)
+    - [Adding new regions on navigation](#adding-new-regions-on-navigation)
+    - [Handling server state updates](#handling-server-state-updates)
+    - [Overriding cached pages](#overriding-cached-pages)
+    - [Using custom HTML](#using-custom-html)
+    - [Managing browser history](#managing-browser-history)
+    - [Changing the timeout](#changing-the-timeout)
+    - [Handling fetch errors](#handling-fetch-errors)
+    - [Disabling client-side navigation on certain pages](#disabling-client-side-navigation-on-certain-pages)
+    - [Disabling navigation feedback](#disabling-navigation-feedback)
+- [The Interactivity Router in depth](#the-interactivity-router-in-depth)
+    - [The page cache](#the-page-cache)
+    - [Router regions](#router-regions)
+    - [CSS handling](#css-handling)
+    - [Script module handling](#script-module-handling)
+    - [Server state and context](#server-state-and-context)
+    - [Putting it all together: the navigation flow](#putting-it-all-together-the-navigation-flow)
+
 ## How client-side navigation works
 
 When a user triggers a navigation (for example, by clicking a link), the Interactivity Router:
