@@ -53,6 +53,11 @@
 			"import": "./src/stylelint-plugins/no-setting-wpds-custom-properties.mjs",
 			"default": "./build/stylelint-plugins/no-setting-wpds-custom-properties.cjs"
 		},
+		"./theme-provider": {
+			"types": "./build-types/theme-provider.d.ts",
+			"import": "./build-module/theme-provider.mjs",
+			"default": "./build/theme-provider.cjs"
+		},
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",

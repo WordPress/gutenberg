@@ -1,17 +1,10 @@
 import { Dialog as _Dialog } from '@base-ui/react/dialog';
 import clsx from 'clsx';
 import { forwardRef } from '@wordpress/element';
-import {
-	type ThemeProvider as ThemeProviderType,
-	privateApis as themePrivateApis,
-} from '@wordpress/theme';
-import { unlock } from '../lock-unlock';
+import { ThemeProvider } from '@wordpress/theme/theme-provider';
 import { DialogValidationProvider } from './context';
 import styles from './style.module.css';
 import type { PopupProps } from './types';
-
-const ThemeProvider: typeof ThemeProviderType =
-	unlock( themePrivateApis ).ThemeProvider;
 
 /**
  * Renders the dialog popup element that contains the dialog content.

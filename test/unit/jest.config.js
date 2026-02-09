@@ -19,6 +19,8 @@ module.exports = {
 		'@wordpress/vips/worker': '<rootDir>/packages/vips/src/vips-worker.ts',
 		'@wordpress/theme/design-tokens.js':
 			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
+		'@wordpress/theme/theme-provider':
+			'<rootDir>/packages/theme/src/theme-provider.tsx',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
 	},
 	preset: '@wordpress/jest-preset-default',

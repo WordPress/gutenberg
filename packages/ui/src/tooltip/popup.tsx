@@ -1,17 +1,10 @@
 import clsx from 'clsx';
 import { Tooltip } from '@base-ui/react/tooltip';
 import { forwardRef } from '@wordpress/element';
-import {
-	type ThemeProvider as ThemeProviderType,
-	privateApis as themePrivateApis,
-} from '@wordpress/theme';
+import { ThemeProvider } from '@wordpress/theme/theme-provider';
 import type { PopupProps } from './types';
-import { unlock } from '../lock-unlock';
 import resetStyles from '../utils/css/resets.module.css';
 import styles from './style.module.css';
-
-const ThemeProvider: typeof ThemeProviderType =
-	unlock( themePrivateApis ).ThemeProvider;
 
 const Popup = forwardRef< HTMLDivElement, PopupProps >( function TooltipPopup(
 	{
