@@ -95,8 +95,14 @@ function TableRow< Item >( {
 	multiselect,
 	posinset,
 }: TableRowProps< Item > ) {
-	const { paginationInfo } = useContext( DataViewsContext );
-	const isSelected = selection.includes( id );
+	const { paginationInfo, isSelectAllMode } = useContext( DataViewsContext );
+
+	// In select all mode, selection is a deselection list
+	const isInSelectionArray = selection.includes( id );
+	const isSelected = isSelectAllMode
+		? ! isInSelectionArray
+		: isInSelectionArray;
+
 	const [ isHovered, setIsHovered ] = useState( false );
 	const elementRef = useRef< HTMLElement | null >( null );
 
@@ -145,7 +151,9 @@ function TableRow< Item >( {
 			aria-posinset={ posinset }
 			role={ infiniteScrollEnabled ? 'article' : 'option' }
 			onClick={ () => {
-				if ( isSelected ) {
+				// Toggle in/out of selection array
+				// Works for both normal mode (selection list) and select-all mode (deselection list)
+				if ( isInSelectionArray ) {
 					onChangeSelection(
 						selection.filter( ( itemId ) => id !== itemId )
 					);

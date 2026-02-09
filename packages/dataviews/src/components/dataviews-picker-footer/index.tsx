@@ -29,24 +29,40 @@ export function useIsMultiselectPicker< Item >(
 
 function BulkSelectionCheckbox< Item >( {
 	selection,
-	selectedItems,
 	onChangeSelection,
 	data,
 	getItemId,
-	infiniteScrollEnabled,
 }: {
 	selection: string[];
-	selectedItems: Item[];
 	onChangeSelection: SetSelection;
 	data: Item[];
 	getItemId: ( item: Item ) => string;
-	infiniteScrollEnabled?: boolean;
 } ) {
-	const areAllSelected = selectedItems.length === data.length;
-	// For infinite scroll, use selection.length to determine indeterminate state
-	// since selected items may have scrolled out of view.
-	const hasSelection = infiniteScrollEnabled
-		? selection.length > 0
+	const { view, isSelectAllMode, setIsSelectAllMode } =
+		useContext( DataViewsContext );
+
+	const selectedItems = useSelectedItems(
+		view,
+		data,
+		selection,
+		getItemId,
+		undefined,
+		isSelectAllMode
+	);
+
+	const infiniteScrollEnabled = view.infiniteScrollEnabled;
+
+	// In select all mode, all are selected if deselection list is empty
+	// In normal mode, all are selected if all items are in selection
+	const areAllSelected = isSelectAllMode
+		? selection.length === 0
+		: selectedItems.length === data.length;
+
+	// Determine if there's any selection
+	// In select all mode: has selection if deselection list doesn't include all items
+	// In normal mode: has selection if any items are selected
+	const hasSelection = isSelectAllMode
+		? selection.length < data.length // Some items still selected
 		: selectedItems.length > 0;
 
 	return (
@@ -55,7 +71,18 @@ function BulkSelectionCheckbox< Item >( {
 			checked={ areAllSelected }
 			indeterminate={ ! areAllSelected && hasSelection }
 			onChange={ () => {
-				if ( areAllSelected ) {
+				if ( infiniteScrollEnabled ) {
+					// For infinite scroll, toggle isSelectAllMode
+					if ( isSelectAllMode ) {
+						// Deselect all: clear selection and disable select all mode
+						setIsSelectAllMode( false );
+						onChangeSelection( [] );
+					} else {
+						// Select all: enable select all mode with empty deselection list
+						setIsSelectAllMode( true );
+						onChangeSelection( [] );
+					}
+				} else if ( areAllSelected ) {
 					// Deselect all - remove the current page from the total selection.
 					onChangeSelection(
 						selection.filter(
@@ -145,6 +172,7 @@ export function DataViewsPickerFooter() {
 		actions = EMPTY_ARRAY,
 		paginationInfo,
 		view,
+		isSelectAllMode,
 	} = useContext( DataViewsContext );
 
 	const isMultiselect = useIsMultiselectPicker( actions );
@@ -153,10 +181,18 @@ export function DataViewsPickerFooter() {
 		selection.length,
 		data.length,
 		paginationInfo.totalItems,
-		view.infiniteScrollEnabled // onlyTotalCount
+		view.infiniteScrollEnabled, // onlyTotalCount
+		isSelectAllMode
 	);
 
-	const selectedItems = useSelectedItems( view, data, selection, getItemId );
+	const selectedItems = useSelectedItems(
+		view,
+		data,
+		selection,
+		getItemId,
+		undefined,
+		isSelectAllMode
+	);
 
 	return (
 		<Stack
@@ -175,11 +211,9 @@ export function DataViewsPickerFooter() {
 				{ isMultiselect && (
 					<BulkSelectionCheckbox
 						selection={ selection }
-						selectedItems={ selectedItems }
 						onChangeSelection={ onChangeSelection }
 						data={ data }
 						getItemId={ getItemId }
-						infiniteScrollEnabled={ view.infiniteScrollEnabled }
 					/>
 				) }
 				<span className="dataviews-bulk-actions-footer__item-count">

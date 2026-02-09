@@ -34,6 +34,13 @@ type DataViewsContextType< Item > = {
 	};
 	selection: string[];
 	onChangeSelection: SetSelection;
+	/**
+	 * Whether "select all" mode is active.
+	 * When true, all items (including those not yet loaded) are considered selected.
+	 * Used with infiniteScrollEnabled to handle bulk selection.
+	 */
+	isSelectAllMode: boolean;
+	setIsSelectAllMode: ( value: boolean ) => void;
 	openedFilter: string | null;
 	setOpenedFilter: ( openedFilter: string | null ) => void;
 	getItemId: ( item: Item ) => string;
@@ -73,6 +80,8 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	},
 	selection: [],
 	onChangeSelection: () => {},
+	isSelectAllMode: false,
+	setIsSelectAllMode: () => {},
 	setOpenedFilter: () => {},
 	openedFilter: null,
 	getItemId: ( item ) => item.id,

@@ -10,6 +10,7 @@ import type {
 
 export type SelectionOrUpdater = string[] | ( ( prev: string[] ) => string[] );
 export type SetSelection = ( selection: SelectionOrUpdater ) => void;
+export type SetIsSelectAllMode = ( isSelectAllMode: boolean ) => void;
 export type FieldType< Item > = Pick<
 	NormalizedField< Item >,
 	| 'type'

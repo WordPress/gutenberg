@@ -111,7 +111,8 @@ export function BulkSelectionCheckbox< Item >( {
 	actions,
 	getItemId,
 }: BulkSelectionCheckboxProps< Item > ) {
-	const { view } = useContext( DataViewsContext );
+	const { view, isSelectAllMode, setIsSelectAllMode } =
+		useContext( DataViewsContext );
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
 			return actions.some(
@@ -121,26 +122,50 @@ export function BulkSelectionCheckbox< Item >( {
 			);
 		} );
 	}, [ data, actions ] );
-	const selectedItems = data.filter(
-		( item ) =>
-			selection.includes( getItemId( item ) ) &&
-			selectableItems.includes( item )
-	);
-	const areAllSelected = selectedItems.length === selectableItems.length;
-	// For infinite scroll, use selection.length to determine indeterminate state
-	// since selected items may have scrolled out of view.
-	const hasSelection = view.infiniteScrollEnabled
-		? selection.length > 0
+
+	// Calculate selected items based on mode
+	// In select all mode: selection is a deselection list, so selected = NOT in array
+	// In normal mode: selected = IN array
+	const selectedItems = selectableItems.filter( ( item ) => {
+		const isInArray = selection.includes( getItemId( item ) );
+		return isSelectAllMode ? ! isInArray : isInArray;
+	} );
+
+	// In select all mode, all are selected if deselection list is empty
+	// In normal mode, all are selected if all selectable items are in selection
+	const areAllSelected = isSelectAllMode
+		? selection.length === 0
+		: selectedItems.length === selectableItems.length;
+
+	// Determine if there's any selection
+	// In select all mode: has selection if deselection list doesn't include all items
+	// In normal mode: has selection if any items are selected
+	const hasSelection = isSelectAllMode
+		? selection.length < selectableItems.length // Some items still selected
 		: selectedItems.length > 0;
+
 	return (
 		<CheckboxControl
 			className="dataviews-view-table-selection-checkbox"
 			checked={ areAllSelected }
 			indeterminate={ ! areAllSelected && hasSelection }
 			onChange={ () => {
-				if ( areAllSelected ) {
+				if ( view.infiniteScrollEnabled ) {
+					// For infinite scroll, toggle isSelectAllMode
+					if ( isSelectAllMode ) {
+						// Deselect all: clear selection and disable select all mode
+						setIsSelectAllMode( false );
+						onChangeSelection( [] );
+					} else {
+						// Select all: enable select all mode with empty deselection list
+						setIsSelectAllMode( true );
+						onChangeSelection( [] );
+					}
+				} else if ( areAllSelected ) {
+					// Standard pagination behavior: deselect all
 					onChangeSelection( [] );
 				} else {
+					// Standard pagination behavior: select all
 					onChangeSelection(
 						selectableItems.map( ( item ) => getItemId( item ) )
 					);
@@ -264,13 +289,15 @@ function renderFooterContent< Item >(
 		totalItems: number;
 		totalPages: number;
 	},
-	onlyTotalCount?: boolean
+	onlyTotalCount?: boolean,
+	isSelectAllMode?: boolean
 ) {
 	const message = getFooterMessage(
 		selection.length,
 		data.length,
 		paginationInfo.totalItems,
-		onlyTotalCount
+		onlyTotalCount,
+		isSelectAllMode
 	);
 	return (
 		<Stack
@@ -332,7 +359,7 @@ function FooterContent< Item >( {
 	getItemId,
 	paginationInfo,
 }: ToolbarContentProps< Item > ) {
-	const { view } = useContext( DataViewsContext );
+	const { view, isSelectAllMode } = useContext( DataViewsContext );
 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
 		null
 	);
@@ -358,7 +385,8 @@ function FooterContent< Item >( {
 		data,
 		selection,
 		getItemId,
-		selectableFilter
+		selectableFilter,
+		isSelectAllMode
 	);
 
 	const actionsToShow = useMemo(
@@ -390,7 +418,8 @@ function FooterContent< Item >( {
 			setActionInProgress,
 			onChangeSelection,
 			paginationInfo,
-			view.infiniteScrollEnabled // onlyTotalCount
+			view.infiniteScrollEnabled, // onlyTotalCount
+			isSelectAllMode
 		);
 	} else if ( ! footerContentRef.current ) {
 		footerContentRef.current = renderFooterContent(
@@ -404,7 +433,8 @@ function FooterContent< Item >( {
 			setActionInProgress,
 			onChangeSelection,
 			paginationInfo,
-			view.infiniteScrollEnabled // onlyTotalCount
+			view.infiniteScrollEnabled, // onlyTotalCount
+			isSelectAllMode
 		);
 	}
 	return footerContentRef.current;
