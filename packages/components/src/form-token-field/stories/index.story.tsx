@@ -161,7 +161,7 @@ ValidateNewTokens.args = {
 };
 
 /**
- * This demonstrates matching suggestions by their display labels and/or values.
+ * This demonstrates matching suggestions by their display labels.
  */
 export const DisplayLabelMatching: StoryFn< typeof FormTokenField > =
 	DefaultTemplate.bind( {} );

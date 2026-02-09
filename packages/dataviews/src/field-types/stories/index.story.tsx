@@ -167,7 +167,6 @@ const data: DataType[] = [
 		mediaWithElements:
 			'https://live.staticflickr.com/7398/9458193857_e1256123e3_z.jpg',
 		array: [ 'United States', 'United Kingdom', 'Spain' ],
-		// Use short values here so it's easy to verify searching by value still works.
 		arrayWithElements: [ 'us', 'uk', 'es' ],
 		notype: 'No type',
 		notypeWithElements: 'No type',
