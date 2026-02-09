@@ -115,7 +115,6 @@
 	}
 
 	.dataviews-action-modal__quick-edit-header {
-		margin-bottom: $grid-unit-20;
 		padding: $grid-unit-30 $grid-unit-30 0;
 	}
 
@@ -123,6 +122,7 @@
 		flex: 1;
 		min-height: 0;
 		overflow-y: auto;
+		padding-top: $grid-unit-20;
 
 		.dataforms-layouts__wrapper {
 			flex: 1;
