@@ -1,6 +1,7 @@
 {
 	"$schema": "./schemas/json/wp-env.json",
 	"testsEnvironment": false,
+	"port": 8889,
 	"core": "WordPress/WordPress",
 	"plugins": [ "." ],
 	"themes": [ "./test/emptytheme" ],
