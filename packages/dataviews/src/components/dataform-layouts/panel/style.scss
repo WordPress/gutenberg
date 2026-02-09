@@ -27,7 +27,8 @@
 	}
 
 	&--label-top {
-		flex-wrap: wrap;
+		display: grid;
+		grid-template-columns: 1fr auto;
 	}
 
 	&--label-none {
@@ -150,6 +151,15 @@
 
 .dataforms-layouts-panel__field-trigger--label-top .dataforms-layouts-panel__field-label {
 	width: 100%;
+}
+
+.dataforms-layouts-panel__field-trigger--label-top .dataforms-layouts-panel__field-control {
+	grid-column: 1 / -1;
+}
+
+.dataforms-layouts-panel__field-trigger--label-top .dataforms-layouts-panel__field-trigger-icon {
+	grid-row: 1;
+	grid-column: 2;
 }
 
 .dataforms-layouts-panel__field-dropdown .components-popover__content {
