@@ -83,7 +83,6 @@ export default function PatternConvertButton( {
 				);
 
 			const isUnsyncedPattern =
-				window?.__experimentalContentOnlyPatternInsertion &&
 				blocks.length === 1 &&
 				blocks?.[ 0 ]?.attributes?.metadata?.patternName;
 

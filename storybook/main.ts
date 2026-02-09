@@ -1,4 +1,9 @@
-import { type InlineConfig, mergeConfig, transformWithEsbuild } from 'vite';
+import {
+	type InlineConfig,
+	type PluginOption,
+	mergeConfig,
+	transformWithEsbuild,
+} from 'vite';
 import react from '@vitejs/plugin-react';
 import type { StorybookConfig } from '@storybook/react-vite';
 
@@ -27,7 +32,7 @@ const stories = [
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 ].filter( Boolean );
 
-export default {
+const config: StorybookConfig = {
 	core: {
 		disableTelemetry: true,
 	},
@@ -52,6 +57,7 @@ export default {
 		// Should match defaults in Storybook except for the propFilter.
 		// https://github.com/storybookjs/storybook/blob/3e34a288c8fabc7d5b5cc43b28ae9d674c48e3ea/code/core/src/core-server/presets/common-preset.ts#L162-L168
 		reactDocgenTypescriptOptions: {
+			EXPERIMENTAL_useProjectService: true,
 			shouldExtractLiteralValuesFromEnum: true,
 			shouldRemoveUndefinedFromOptional: true,
 			propFilter: ( prop ) => {
@@ -68,15 +74,15 @@ export default {
 			savePropValueAsString: true,
 		},
 	},
-	viteFinal: async ( config ) => {
-		return mergeConfig( config, {
+	viteFinal: async ( viteConfig ) => {
+		return mergeConfig( viteConfig, {
 			plugins: [
 				react( {
 					jsxImportSource: '@emotion/react',
 					babel: {
 						plugins: [ '@emotion/babel-plugin' ],
 					},
-				} ),
+				} ) as PluginOption,
 				{
 					name: 'load-js-files-as-jsx',
 					async transform( code: string, id: string ) {
@@ -121,4 +127,6 @@ export default {
 			},
 		} satisfies InlineConfig );
 	},
-} satisfies StorybookConfig;
+};
+
+export default config;

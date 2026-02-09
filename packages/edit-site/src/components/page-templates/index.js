@@ -16,7 +16,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEvent } from '@wordpress/compose';
 import { useView } from '@wordpress/views';
-import { Button, Modal } from '@wordpress/components';
+import { Modal } from '@wordpress/components';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -37,7 +37,11 @@ import {
 	slugField,
 	useThemeField,
 } from './fields';
-import { defaultLayouts, getDefaultView } from './view-utils';
+import {
+	defaultLayouts,
+	DEFAULT_VIEW,
+	getActiveViewOverridesForTab,
+} from './view-utils';
 
 const { usePostActions, usePostFields, templateTitleField } =
 	unlock( editorPrivateApis );
@@ -50,14 +54,17 @@ export default function PageTemplates() {
 	const [ selection, setSelection ] = useState( [ postId ] );
 	const [ selectedRegisteredTemplate, setSelectedRegisteredTemplate ] =
 		useState( false );
-	const defaultView = useMemo( () => {
-		return getDefaultView( activeView );
-	}, [ activeView ] );
+	const defaultView = DEFAULT_VIEW;
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTab( activeView ),
+		[ activeView ]
+	);
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: TEMPLATE_POST_TYPE,
-		slug: activeView,
+		slug: 'default',
 		defaultView,
+		activeViewOverrides,
 		queryParams: {
 			page: query.pageNumber,
 			search: query.search,
@@ -303,11 +310,11 @@ export default function PageTemplates() {
 	);
 
 	const onChangeView = useEvent( ( newView ) => {
+		updateView( newView );
 		if ( newView.type !== view.type ) {
 			// Retrigger the routing areas resolution.
 			history.invalidate();
 		}
-		updateView( newView );
 	} );
 
 	const duplicateAction = actions.find(
@@ -318,22 +325,7 @@ export default function PageTemplates() {
 		<Page
 			className="edit-site-page-templates"
 			title={ __( 'Templates' ) }
-			actions={
-				<>
-					{ isModified && (
-						<Button
-							__next40pxDefaultSize
-							onClick={ () => {
-								resetToDefault();
-								history.invalidate();
-							} }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					<AddNewTemplate />
-				</>
-			}
+			actions={ <AddNewTemplate /> }
 		>
 			<DataViews
 				key={ activeView }
@@ -357,6 +349,14 @@ export default function PageTemplates() {
 				} }
 				selection={ selection }
 				defaultLayouts={ defaultLayouts }
+				onReset={
+					isModified
+						? () => {
+								resetToDefault();
+								history.invalidate();
+						  }
+						: false
+				}
 			/>
 			{ selectedRegisteredTemplate && duplicateAction && (
 				<Modal

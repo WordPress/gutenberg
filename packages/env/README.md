@@ -20,9 +20,38 @@ The database credentials are: user `root`, password `password`. For a comprehens
 
 `wp-env` relies on a few commonly used developer tools:
 
--   **Docker**. `wp-env` is powered by Docker. There are instructions available for installing Docker on [Windows](https://docs.docker.com/desktop/install/windows-install/) (we recommend the WSL2 backend), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/desktop/install/linux-install/).
+-   **Docker**. `wp-env` is powered by Docker by default. There are instructions available for installing Docker on [Windows](https://docs.docker.com/desktop/install/windows-install/) (we recommend the WSL2 backend), [macOS](https://docs.docker.com/docker-for-mac/install/), and [Linux](https://docs.docker.com/desktop/install/linux-install/).
 -   **Node.js**. `wp-env` is written as a Node script. We recommend using a Node version manager like [nvm](https://github.com/nvm-sh/nvm) to install the latest LTS version. Alternatively, you can [download it directly here](https://nodejs.org/en/download).
 -   **git**. Git is used for downloading software from source control, such as WordPress, plugins, and themes. [You can find the installation instructions here.](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+
+## Experimental: WordPress Playground Runtime
+
+`wp-env` now supports an experimental alternative runtime using [WordPress Playground](https://wordpress.github.io/wordpress-playground/). Playground runs WordPress entirely in WebAssembly, eliminating the need for Docker.
+
+To use the Playground runtime:
+
+```sh
+$ wp-env start --runtime=playground
+```
+
+### Playground vs Docker
+
+| Feature | Docker | Playground |
+|---------|--------|------------|
+| Requires Docker | Yes | No |
+| Test environment | Yes | No |
+| Xdebug | Yes | Yes |
+| SPX profiling | Yes | No |
+| phpMyAdmin | Yes | No |
+| MySQL database | Yes | No (SQLite) |
+| Multisite | Yes | Yes |
+| Custom PHP version | Yes | Yes |
+| Plugin/theme mounting | Yes | Yes |
+| `wp-env run` command | Yes | No |
+
+The Playground runtime is ideal for quick testing or environments where Docker is unavailable. However, it lacks some features available in the Docker runtime, such as the tests environment and the `run` command for executing arbitrary commands.
+
+Once started with a runtime, wp-env will automatically detect and use the same runtime for subsequent commands (`stop`, `destroy`, etc.) until the environment is destroyed.
 
 ## Installation
 
@@ -157,7 +186,7 @@ To reset the database:
 **⚠️ WARNING: This will permanently delete any posts, pages, media, etc. in the local WordPress installation.**
 
 ```sh
-$ wp-env clean all
+$ wp-env reset all
 $ wp-env start
 ```
 
@@ -266,6 +295,42 @@ Here is a summary:
 
 `wp-env` creates generated files in the `wp-env` home directory. By default, this is `~/.wp-env`. The exception is Linux, where files are placed at `~/wp-env` [for compatibility with Snap Packages](https://github.com/WordPress/gutenberg/issues/20180#issuecomment-587046325). The `wp-env` home directory contains a subdirectory for each project named `/$md5_of_project_path`. To change the `wp-env` home directory, set the `WP_ENV_HOME` environment variable. For example, running `WP_ENV_HOME="something" wp-env start` will download the project files to the directory `./something/$md5_of_project_path` (relative to the current directory).
 
+### Global options
+
+These options apply to all `wp-env` commands:
+
+```
+--debug    Enable debug output.                      [boolean] [default: false]
+--config   Path to a custom .wp-env.json configuration file.           [string]
+```
+
+The `--config` option allows you to use a custom configuration file instead of the default `.wp-env.json`. This is useful for running multiple parallel environments from the same directory.
+
+When using a custom config file, the override file is derived from its name. For example:
+- `--config=staging.json` will look for `staging.override.json`
+- `--config=./configs/dev.wp-env.json` will look for `./configs/dev.wp-env.override.json`
+
+#### Running parallel environments
+
+You can run multiple wp-env environments from the same folder by using different config files and ports:
+
+```sh
+# Start first environment with default config
+wp-env start
+
+# Start second environment with custom config on different ports
+WP_ENV_PORT=8890 WP_ENV_TESTS_PORT=8891 wp-env start --config=./staging.json
+
+# Check status of each environment
+wp-env status
+wp-env status --config=./staging.json
+
+# Stop specific environment
+wp-env stop --config=./staging.json
+```
+
+Each config file gets its own isolated Docker containers and data, so changes in one environment don't affect the other.
+
 ### `wp-env start`
 
 The start command installs and initializes the WordPress environment, which includes downloading any specified remote sources. By default, `wp-env` will not update or re-configure the environment except when the configuration file changes. Tell `wp-env` to update sources and apply the configuration options again with `wp-env start --update`. This will not overwrite any existing content.
@@ -284,6 +349,9 @@ Options:
   --debug    Enable debug output.                     [boolean] [default: false]
   --update   Download source updates and apply WordPress configuration.
                                                       [boolean] [default: false]
+  --runtime  Select the runtime to use. "docker" uses Docker containers,
+             "playground" uses WordPress Playground (experimental).
+                                  [string] [choices: "docker", "playground"]
   --xdebug   Enables Xdebug. If not passed, Xdebug is turned off. If no modes
              are set, uses "debug". You may set multiple Xdebug modes by passing
              them in a comma-separated list: `--xdebug=develop,coverage`. See
@@ -308,15 +376,15 @@ Options:
   --debug            Enable debug output.             [boolean] [default: false]
 ```
 
-### `wp-env clean [environment]`
+### `wp-env reset [environment]`
 
 ```sh
-wp-env clean [environment]
+wp-env reset [environment]
 
-Cleans the WordPress databases.
+Resets the WordPress databases.
 
 Positionals:
-  environment  Which environments' databases to clean.
+  environment  Which environments' databases to reset.
             [string] [choices: "all", "development", "tests"] [default: "tests"]
 
 Options:
@@ -437,17 +505,32 @@ To set the permalink to the year, month, and post name:
 wp-env run cli "wp rewrite structure /%year%/%monthnum%/%postname%/"
 ```
 
+### `wp-env cleanup`
+
+```sh
+wp-env cleanup
+
+Cleanup the WordPress environment. Removes docker containers, volumes, networks,
+and local files, but preserves docker images for faster re-starts.
+
+Options:
+  --debug    Enable debug output.                     [boolean] [default: false]
+  --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
+  --force    Skip the confirmation prompt.            [boolean] [default: false]
+```
+
 ### `wp-env destroy`
 
 ```sh
 wp-env destroy
 
-Destroy the WordPress environment. Deletes docker containers, volumes, and
-networks associated with the WordPress environment and removes local files.
+Destroy the WordPress environment. Deletes docker containers, volumes, networks,
+and images associated with the WordPress environment and removes local files.
 
 Options:
   --debug    Enable debug output.                     [boolean] [default: false]
   --scripts  Execute any configured lifecycle scripts. [boolean] [default: true]
+  --force    Skip the confirmation prompt.            [boolean] [default: false]
 ```
 
 ### `wp-env logs [environment]`
@@ -466,16 +549,36 @@ Options:
   --watch    Watch for logs as they happen.            [boolean] [default: true]
 ```
 
-### `wp-env install-path`
+### `wp-env status`
 
-Get the path where all of the environment files are stored. This includes the Docker files, WordPress, PHPUnit files, and any sources that were downloaded.
+Get the status of the wp-env environment including whether it's running, URLs, ports, and configuration.
 
 Example:
 
 ```sh
-$ wp-env install-path
+$ wp-env status
 
-/home/user/.wp-env/63263e6506becb7b8613b02d42280a49
+status: running
+    - runtime: docker
+    - install path: /home/user/.wp-env/63263e6506becb7b8613b02d42280a49
+    - config: /home/user/my-plugin
+
+environment:
+        - url: http://localhost:8888
+        - multisite: no
+        - xdebug: off
+        - http port: 8888
+        - mysql port: 13306
+        - test http port: 8889
+```
+
+```sh
+$ wp-env status --help
+Get the status of the wp-env environment including URLs, ports, and configuration.
+
+Options:
+  --debug    Enable debug output.                      [boolean] [default: false]
+  --json     Output status as JSON.                    [boolean] [default: false]
 ```
 
 ## .wp-env.json
@@ -577,7 +680,8 @@ example, `WP_ENV_LIFECYCLE_SCRIPT_AFTER_START`. Keep in mind that these will be 
 build won't break on subsequent executions.
 
 * `afterStart`: Runs after `wp-env start` has finished setting up the environment.
-* `afterClean`: Runs after `wp-env clean` has finished cleaning the environment.
+* `afterReset`: Runs after `wp-env reset` has finished resetting the environment.
+* `afterCleanup`: Runs after `wp-env cleanup` has cleaned up the environment.
 * `afterDestroy`: Runs after `wp-env destroy` has destroyed the environment.
 
 ## Examples
@@ -717,7 +821,7 @@ You can tell `wp-env` to use a specific PHP version for compatibility and testin
 
 ### Multisite support
 
-You can tell `wp-env`  if the site should be multisite enabled. This can also be set via the environment variable `WP_ENV_MULTISITE`.
+You can tell `wp-env` if the site should be multisite enabled.
 
 ```json
 {

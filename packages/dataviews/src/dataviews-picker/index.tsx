@@ -86,18 +86,18 @@ function DefaultUI( {
 				align="top"
 				justify="space-between"
 				className="dataviews__view-actions"
-				gap="2xs"
+				gap="xs"
 			>
 				<Stack
 					direction="row"
-					gap="xs"
+					gap="sm"
 					justify="start"
 					className="dataviews__search"
 				>
 					{ search && <DataViewsSearch label={ searchLabel } /> }
 					<FiltersToggle />
 				</Stack>
-				<Stack direction="row" gap="2xs" style={ { flexShrink: 0 } }>
+				<Stack direction="row" gap="xs" style={ { flexShrink: 0 } }>
 					<DataViewsViewConfig />
 				</Stack>
 			</Stack>

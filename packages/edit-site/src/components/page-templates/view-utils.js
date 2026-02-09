@@ -10,7 +10,7 @@ export const defaultLayouts = {
 	},
 };
 
-const DEFAULT_VIEW = {
+export const DEFAULT_VIEW = {
 	type: 'grid',
 	perPage: 20,
 	sort: {
@@ -25,24 +25,25 @@ const DEFAULT_VIEW = {
 	...defaultLayouts.grid,
 };
 
-export function getDefaultView( activeView ) {
+export function getActiveViewOverridesForTab( activeView ) {
+	// User view: sort by date, newest first
+	if ( activeView === 'user' ) {
+		return {
+			sort: { field: 'date', direction: 'desc' },
+		};
+	}
+	// Active view: no overrides
+	if ( activeView === 'active' ) {
+		return {};
+	}
+	// Author-based view: filter by author
 	return {
-		...DEFAULT_VIEW,
-		sort:
-			activeView === 'user'
-				? {
-						field: 'date',
-						direction: 'desc',
-				  }
-				: DEFAULT_VIEW.sort,
-		filters: ! [ 'active', 'user' ].includes( activeView )
-			? [
-					{
-						field: 'author',
-						operator: 'isAny',
-						value: [ activeView ],
-					},
-			  ]
-			: [],
+		filters: [
+			{
+				field: 'author',
+				operator: 'isAny',
+				value: [ activeView ],
+			},
+		],
 	};
 }

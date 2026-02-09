@@ -1,0 +1,55 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+import * as DataViewsStories from './index.story';
+
+<Meta of={ DataViewsStories } name="Best practices" />
+
+# Data Views
+
+Data Views allow users to display and interact with information through different layouts such as table or grid. It includes features like search, filtering, sorting, pagination, and customization options to adjust column order, items per page, and hide columns, enhancing data exploration and flexibility. 
+
+A typical flow might be:
+
+- Use search and filters to narrow down a large collection.
+- Adjust the layout and visible fields to match the task (compare, skim, or visually scan).
+- Take inline actions on item metadata, or open an editing interface when more detail is needed.
+
+## Choosing a layout
+
+### When to use **List**
+
+Use the **List** layout when:
+
+- **Content needs the most compact layout**, whether because it's used in a constrained context, or if paired with a preview surface.
+- Default information density allows for a reduced set of secondary metadata.
+- The view needs to work well in **narrow spaces**.
+
+List is a good fit for items like Pages that benefit from a live preview next to the list.
+
+### When to use **Grid**
+
+Use the **Grid** layout when:
+
+-   **Visual previews across multiple items at once are important** for recognition (patterns, templates, media, products).
+-   You want a **card‑based experience**, with each item having its own tile (image + metadata).
+-   You expect more **browsing and scanning by look** than comparing raw values.
+
+Grid works well when choosing “by look” is more important than comparing precise numbers or dates.
+
+### When to use **Table**
+
+Use the **Table** layout when:
+
+-   Users need to **compare multiple attributes across items** at once.
+-   **Column headers and alignment** are critical for understanding the data.
+-   The task involves working with structured data.
+
+Table is ideal for dense, structured information where sorting and scanning down aligned columns is the primary workflow, such as posts or comments where metadata is important for choosing the next action.
+
+## When to use something else
+
+Data Views are designed for **browsing and managing collections**. In other situations, consider other components in the `@wordpress/dataviews` package:
+
+- **Use `DataForm`** when the primary workflow primarily relates to **creating or editing a single item** at a level that doesn't require a full editor.
+- **Use `DataViewsPicker`** when the goal is **selecting one or more items** and returning that selection to another part of the UI. This is a better fit for dialogs and sidebars where the outcome is a selection, not ongoing management of a collection, e.g. inserting from a media library.
+

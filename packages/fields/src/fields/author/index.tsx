@@ -28,6 +28,9 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 				'user',
 				{
 					per_page: -1,
+					who: 'authors',
+					_fields: 'id,name',
+					context: 'view',
 				}
 			) ) ?? [];
 		return authors.map( ( { id, name } ) => ( {

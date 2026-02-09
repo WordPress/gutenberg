@@ -11,6 +11,7 @@ import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useView } from '@wordpress/views';
 import { useSelect } from '@wordpress/data';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -32,9 +33,7 @@ import {
 	previewField,
 	templatePartAuthorField,
 } from './fields';
-import { addQueryArgs } from '@wordpress/url';
 import usePatternCategories from '../sidebar-navigation-screen-patterns/use-pattern-categories';
-import { Button } from '@wordpress/components';
 
 const { ExperimentalBlockEditorProvider } = unlock( blockEditorPrivateApis );
 const { usePostActions, patternTitleField } = unlock( editorPrivateApis );
@@ -103,7 +102,7 @@ export default function DataviewsPatterns() {
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: postType,
-		slug: categoryId,
+		slug: 'default',
 		defaultView: DEFAULT_VIEW,
 		queryParams: {
 			page: query.pageNumber,
@@ -205,17 +204,10 @@ export default function DataviewsPatterns() {
 				title={ title }
 				subTitle={ description }
 				actions={
-					<>
-						{ isModified && (
-							<Button
-								__next40pxDefaultSize
-								onClick={ resetToDefault }
-							>
-								{ __( 'Reset view' ) }
-							</Button>
-						) }
-						<PatternsActions />
-					</>
+					<PatternsActions
+						categoryId={ categoryId }
+						postType={ postType }
+					/>
 				}
 			>
 				<DataViews
@@ -244,6 +236,7 @@ export default function DataviewsPatterns() {
 					view={ view }
 					onChangeView={ updateView }
 					defaultLayouts={ defaultLayouts }
+					onReset={ isModified ? resetToDefault : false }
 				/>
 			</Page>
 		</ExperimentalBlockEditorProvider>

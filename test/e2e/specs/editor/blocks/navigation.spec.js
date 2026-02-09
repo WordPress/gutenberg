@@ -902,14 +902,22 @@ test.describe( 'Navigation block', () => {
 				await expect( linkControlSearch ).toBeFocused();
 			} );
 
+			await test.step( 'Should not show validation error on blur when input is empty', async () => {
+				// Press tab twice to reach the "Create page" button
+				await pageUtils.pressKeys( 'Tab', { times: 2 } );
+
+				await expect(
+					page.getByText( 'Please fill out this field' )
+				).toBeHidden();
+			} );
+
 			await test.step( 'Click Create Page button', async () => {
 				// Find and click the "Create page" button
 				const createPageButton = page.getByRole( 'button', {
 					name: 'Create page',
 				} );
 				await expect( createPageButton ).toBeVisible();
-				// Press tab twice to reach the "Create page" button
-				await pageUtils.pressKeys( 'Tab', { times: 2 } );
+
 				// expect the "Create page" button to be focused
 				await expect( createPageButton ).toBeFocused();
 				await page.keyboard.press( 'Enter' );
@@ -1202,13 +1210,6 @@ test.describe( 'Navigation block', () => {
 				await expect( linkButton ).toContainText(
 					url.pathname.replace( /\/$/, '' )
 				);
-
-				// Verify help text
-				await expect(
-					settingsControls.getByText(
-						'Synced with the selected page.'
-					)
-				).toBeVisible();
 			} );
 
 			await test.step( 'Verify bound link works correctly on frontend', async () => {
@@ -1303,11 +1304,12 @@ test.describe( 'Navigation block', () => {
 				);
 			} );
 
+			const linkPopover = navigation.getLinkPopover();
+
 			await test.step( 'Verify Link UI popover also reflects updated page URL', async () => {
 				// Open Link UI via keyboard shortcut
 				await pageUtils.pressKeys( 'primary+k' );
 
-				const linkPopover = navigation.getLinkPopover();
 				await expect( linkPopover ).toBeVisible();
 
 				// Click Edit button to see form fields
@@ -1331,7 +1333,6 @@ test.describe( 'Navigation block', () => {
 				// Open Link UI via keyboard shortcut
 				await pageUtils.pressKeys( 'primary+k' );
 
-				const linkPopover = navigation.getLinkPopover();
 				await expect( linkPopover ).toBeVisible();
 
 				// Click Edit button
@@ -1351,16 +1352,24 @@ test.describe( 'Navigation block', () => {
 
 				// Verify Link field becomes enabled
 				await expect( linkInput ).toBeEnabled();
-
-				// Cancel to preserve bound state for sidebar tests
-				await linkPopover
-					.getByRole( 'button', { name: 'Cancel' } )
-					.click();
-
-				// Pressing Escape closes the popover
-				await page.keyboard.press( 'Escape' );
-				await expect( linkPopover ).toBeHidden();
+				await expect( linkInput ).toBeFocused();
+				await expect( linkInput ).toHaveValue( '' );
 			} );
+
+			await test.step( 'Verify link field validates on blur in Link UI popover', async () => {
+				await page.keyboard.press( 'Tab' );
+
+				await expect(
+					page.getByText( 'Please fill out this field' )
+				).toBeVisible();
+			} );
+
+			// Cancel to preserve bound state for sidebar tests
+			await linkPopover.getByRole( 'button', { name: 'Cancel' } ).click();
+
+			// Pressing Escape closes the popover
+			await page.keyboard.press( 'Escape' );
+			await expect( linkPopover ).toBeHidden();
 		} );
 
 		test( 'existing links with id but no binding remain editable', async ( {
@@ -1633,14 +1642,14 @@ test.describe( 'Navigation block', () => {
 
 				// With LinkControlInspector, unavailable entities show a button with error badge
 				const linkButton = settingsControls.getByRole( 'button', {
-					name: /No link selected/i,
+					name: /Missing page/i,
 				} );
 
 				// Button is enabled (can click to fix the link)
 				await expect( linkButton ).toBeEnabled();
 
-				// Button should show "No link selected" for unavailable entity
-				await expect( linkButton ).toContainText( 'No link selected' );
+				// Button should show "Missing page" for unavailable entity
+				await expect( linkButton ).toContainText( 'Missing page' );
 			} );
 
 			await test.step( 'Verify clicking button with error opens link control for fixing', async () => {
@@ -1649,7 +1658,7 @@ test.describe( 'Navigation block', () => {
 					.getByRole( 'tabpanel', { name: 'Settings' } );
 
 				const linkButton = settingsControls.getByRole( 'button', {
-					name: /No link selected/i,
+					name: /Missing page/i,
 				} );
 
 				// Click the button to open the link control and fix the link

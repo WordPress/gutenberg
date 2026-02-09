@@ -21,7 +21,6 @@ import {
 } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
-import { hasBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -61,30 +60,22 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { canToggleBlockVisibility, isBlockHidden, hasPatternName } =
-		useSelect(
-			( select ) => {
-				const { getBlockName, getBlockAttributes } =
-					select( blockEditorStore );
-				const { areBlocksHiddenAnywhere } = unlock(
-					select( blockEditorStore )
-				);
-				const blockAttributes = getBlockAttributes( clientId );
-				return {
-					canToggleBlockVisibility: hasBlockSupport(
-						getBlockName( clientId ),
-						'visibility',
-						true
-					),
-					isBlockHidden: areBlocksHiddenAnywhere( [ clientId ] ),
-					hasPatternName: !! blockAttributes?.metadata?.patternName,
-				};
-			},
-			[ clientId ]
-		);
+	const { isBlockHidden, hasPatternName } = useSelect(
+		( select ) => {
+			const {
+				isBlockHiddenAnywhere: _isBlockHidden,
+				getBlockAttributes,
+			} = unlock( select( blockEditorStore ) );
+			return {
+				isBlockHidden: _isBlockHidden( clientId ),
+				hasPatternName:
+					!! getBlockAttributes( clientId )?.metadata?.patternName,
+			};
+		},
+		[ clientId ]
+	);
+
 	const shouldShowLockIcon = isLocked;
-	const shouldShowBlockVisibilityIcon =
-		canToggleBlockVisibility && isBlockHidden;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 
@@ -170,7 +161,7 @@ function ListViewBlockSelectButton(
 						) ) }
 					</span>
 				) : null }
-				{ shouldShowBlockVisibilityIcon && (
+				{ isBlockHidden && (
 					<span className="block-editor-list-view-block-select-button__block-visibility">
 						<Icon icon={ unseen } />
 					</span>

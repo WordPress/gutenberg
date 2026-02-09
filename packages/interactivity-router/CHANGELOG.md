@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 2.39.0 (2026-01-29)
+
+### Bug Fixes
+
+-   Prevent router regions with data-wp-key from being recreated on navigation. ([#74750](https://github.com/WordPress/gutenberg/pull/74750))
+-   Fix initial router regions with `attachTo` being duplicated after `navigate()`. ([#74857](https://github.com/WordPress/gutenberg/pull/74857))
+
 ## 2.38.0 (2026-01-16)
 
 ## 2.36.0 (2025-11-26)

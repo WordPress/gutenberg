@@ -2,9 +2,35 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
+-   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
+-   `ToggleControl`: Prevent `__nextHasNoMarginBottom` from logging a console warning ([#75296](https://github.com/WordPress/gutenberg/pull/75296)).
+-   `createSlotFill`: fix ref forwarding ([#75274](https://github.com/WordPress/gutenberg/pull/75274)).
+
+### Enhancements
+
+-   Improve visual emphasis of the selected item in the ToggleGroupControl component ([#75138](https://github.com/WordPress/gutenberg/pull/75138)).
+
+### Internal
+
+-   Expose `useDrag` from `@use-gesture/react` package via private API's ([#66735](https://github.com/WordPress/gutenberg/pull/66735)).
+-   Update Emotion dependencies to ensure compatibility with React 19 ([#75324](https://github.com/WordPress/gutenberg/pull/75324)).
+
+## 32.1.0 (2026-01-29)
+
 ### Code Quality
 
 -   Add `displayName` to components to improve debugging and fix Storybook source code. [#74716](https://github.com/WordPress/gutenberg/pull/74716)
+
+### Internal
+
+-   `ValidatedComboboxControl`: Expose the component under private API's. [#74891](https://github.com/WordPress/gutenberg/pull/74891)
+
+### Enhancements
+
+-   `ToggleControl` pass full props and support required validation in `ValidatedToggleControl`. [#74956](https://github.com/WordPress/gutenberg/pull/74956)
 
 ## 32.0.0 (2026-01-16)
 

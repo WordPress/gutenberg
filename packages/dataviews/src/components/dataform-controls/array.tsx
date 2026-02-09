@@ -19,6 +19,7 @@ export default function ArrayControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { label, placeholder, getValue, setValue, isValid } = field;
@@ -65,6 +66,7 @@ export default function ArrayControl< Item >( {
 	return (
 		<ValidatedFormTokenField
 			required={ !! isValid?.required }
+			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ hideLabelFromVision ? undefined : label }
 			value={ arrayValueAsElements }

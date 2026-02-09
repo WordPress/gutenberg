@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	CRDT_RECORD_MAP_KEY,
-	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
-	Y,
-} from '@wordpress/sync';
+import { Y } from '@wordpress/sync';
 
 /**
  * External dependencies
@@ -15,6 +11,10 @@ import { describe, expect, it, jest, beforeEach } from '@jest/globals';
 /**
  * Internal dependencies
  */
+import {
+	CRDT_RECORD_MAP_KEY,
+	WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
+} from '../../sync';
 import {
 	applyPostChangesToCRDTDoc,
 	getPostChangesFromCRDTDoc,

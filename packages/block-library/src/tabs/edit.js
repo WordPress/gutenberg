@@ -1,108 +1,144 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import {
 	useBlockProps,
 	useInnerBlocksProps,
-	withColors,
+	BlockContextProvider,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { useMemo, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import StyleEngine from './style-engine';
 import Controls from './controls';
 
-const TABS_TEMPLATE = [ [ 'core/tab', {} ] ];
-
-const DEFAULT_BLOCK = {
-	name: 'core/tab',
-	attributesToCopy: [ 'className', 'fontFamily', 'fontSize' ],
-};
+const TABS_TEMPLATE = [
+	[
+		'core/tabs-menu',
+		{
+			lock: {
+				remove: true,
+			},
+		},
+	],
+	[
+		'core/tab-panel',
+		{
+			lock: {
+				remove: true,
+			},
+		},
+		[
+			[
+				'core/tab',
+				{
+					anchor: 'tab-1',
+					label: 'Tab 1',
+				},
+				[ [ 'core/paragraph' ] ],
+			],
+		],
+	],
+];
 
 function Edit( {
 	clientId,
 	attributes,
 	setAttributes,
-	tabInactiveColor,
-	setTabInactiveColor,
-	tabHoverColor,
-	setTabHoverColor,
-	tabActiveColor,
-	setTabActiveColor,
-	tabTextColor,
-	setTabTextColor,
-	tabActiveTextColor,
-	setTabActiveTextColor,
-	tabHoverTextColor,
-	setTabHoverTextColor,
+	__unstableLayoutClassNames: layoutClassNames,
 } ) {
-	const { style, orientation } = attributes;
+	const { anchor, activeTabIndex, editorActiveTabIndex } = attributes;
+
+	/**
+	 * Initialize editorActiveTabIndex to activeTabIndex on mount.
+	 * This ensures the ephemeral editor state starts at the persisted default.
+	 */
+	useEffect( () => {
+		if ( editorActiveTabIndex === undefined ) {
+			setAttributes( { editorActiveTabIndex: activeTabIndex } );
+		}
+	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
+
+	/**
+	 * Construct a list of core/tab blocks, used to create tabs-list context.
+	 */
+	const tabs = useSelect(
+		( select ) => {
+			const { getBlocks } = select( blockEditorStore );
+			const innerBlocks = getBlocks( clientId );
+
+			// Find tab-panel block and extract tab data
+			const tabPanel = innerBlocks.find(
+				( block ) => block.name === 'core/tab-panel'
+			);
+
+			if ( ! tabPanel ) {
+				return [];
+			}
+
+			return tabPanel.innerBlocks.filter(
+				( block ) => block.name === 'core/tab'
+			);
+		},
+		[ clientId ]
+	);
+
+	/**
+	 * Memoize context value to prevent unnecessary re-renders.
+	 */
+	const contextValue = useMemo( () => {
+		/**
+		 * Compute tabs list from innerblocks to provide via context.
+		 * This traverses the tab-panel block to find all tab blocks
+		 * and extracts their label and anchor for the tabs-menu to consume.
+		 */
+		const tabList = tabs.map( ( tab, index ) => ( {
+			id: tab.attributes.anchor || `tab-${ index }`,
+			label: tab.attributes.label || '',
+			clientId: tab.clientId,
+			index,
+		} ) );
+
+		return {
+			'core/tabs-list': tabList,
+			'core/tabs-id': anchor,
+			'core/tabs-activeTabIndex': activeTabIndex,
+			'core/tabs-editorActiveTabIndex': editorActiveTabIndex,
+		};
+	}, [ tabs, anchor, activeTabIndex, editorActiveTabIndex ] );
 
 	/**
 	 * Block props for the tabs container.
 	 */
 	const blockProps = useBlockProps( {
-		className: clsx(
-			'vertical' === orientation ? 'is-vertical' : 'is-horizontal'
-		),
-		style: {
-			...style,
-		},
+		className: layoutClassNames,
 	} );
 
 	/**
-	 * Innerblocks props for the tabs list.
+	 * Innerblocks props for the tabs container.
 	 */
 	const innerBlockProps = useInnerBlocksProps( blockProps, {
-		defaultBlock: DEFAULT_BLOCK,
-		directInsert: true,
 		__experimentalCaptureToolbars: true,
-		clientId,
-		orientation,
 		template: TABS_TEMPLATE,
-		renderAppender: false, // Appender is rendered by individual tab blocks.
+		templateLock: false,
+		renderAppender: false,
 	} );
 
 	return (
-		<>
+		<BlockContextProvider value={ contextValue }>
 			<div { ...innerBlockProps }>
-				{ innerBlockProps.children }
-				<StyleEngine attributes={ attributes } clientId={ clientId } />
 				<Controls
-					{ ...{
-						clientId,
-						attributes,
-						setAttributes,
-						tabInactiveColor,
-						setTabInactiveColor,
-						tabHoverColor,
-						setTabHoverColor,
-						tabActiveColor,
-						setTabActiveColor,
-						tabTextColor,
-						setTabTextColor,
-						tabActiveTextColor,
-						setTabActiveTextColor,
-						tabHoverTextColor,
-						setTabHoverTextColor,
-					} }
+					clientId={ clientId }
+					attributes={ attributes }
+					setAttributes={ setAttributes }
 				/>
+				{ innerBlockProps.children }
 			</div>
-		</>
+		</BlockContextProvider>
 	);
 }
 
-export default withColors(
-	'tabInactiveColor',
-	'tabHoverColor',
-	'tabActiveColor',
-	'tabTextColor',
-	'tabActiveTextColor',
-	'tabHoverTextColor'
-)( Edit );
+export default Edit;

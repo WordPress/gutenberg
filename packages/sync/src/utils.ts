@@ -10,6 +10,9 @@ import * as buffer from 'lib0/buffer';
 import {
 	CRDT_DOC_META_PERSISTENCE_KEY,
 	CRDT_DOC_VERSION,
+	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_KEY,
+	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
+	CRDT_RECORD_METADATA_SAVED_BY_KEY as SAVED_BY_KEY,
 	CRDT_STATE_MAP_KEY,
 	CRDT_STATE_VERSION_KEY,
 } from './config';
@@ -34,6 +37,18 @@ export function createYjsDoc( documentMeta: DocumentMeta = {} ): Y.Doc {
 	stateMap.set( CRDT_STATE_VERSION_KEY, CRDT_DOC_VERSION );
 
 	return ydoc;
+}
+
+/**
+ * Record that the entity was saved (persisted to the database) in the CRDT
+ * document record metadata.
+ *
+ * @param {CRDTDoc} ydoc CRDT document.
+ */
+export function markEntityAsSaved( ydoc: CRDTDoc ): void {
+	const recordMeta = ydoc.getMap( RECORD_METADATA_KEY );
+	recordMeta.set( SAVED_AT_KEY, Date.now() );
+	recordMeta.set( SAVED_BY_KEY, ydoc.clientID );
 }
 
 export function serializeCrdtDoc( crdtDoc: CRDTDoc ): string {
@@ -67,41 +82,4 @@ export function deserializeCrdtDoc(
 	} catch ( e ) {
 		return null;
 	}
-}
-
-export function getRecordValue< RecordType, Key extends keyof RecordType >(
-	obj: unknown,
-	key: Key
-): RecordType[ Key ] | null {
-	if ( 'object' === typeof obj && null !== obj && key in obj ) {
-		return ( obj as RecordType )[ key ];
-	}
-
-	return null;
-}
-
-export function getTypedKeys< T extends object >( obj: T ): Array< keyof T > {
-	return Object.keys( obj ) as Array< keyof T >;
-}
-
-export function areMapsEqual< Key, Value >(
-	map1: Map< Key, Value >,
-	map2: Map< Key, Value >,
-	comparatorFn: ( value1: Value, value2: Value ) => boolean
-): boolean {
-	if ( map1.size !== map2.size ) {
-		return false;
-	}
-
-	for ( const [ key, value1 ] of map1.entries() ) {
-		if ( ! map2.has( key ) ) {
-			return false;
-		}
-
-		if ( ! comparatorFn( value1, map2.get( key )! ) ) {
-			return false;
-		}
-	}
-
-	return true;
 }
