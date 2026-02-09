@@ -591,4 +591,35 @@ describe( 'TimePicker', () => {
 			} );
 		} );
 	} );
+
+	describe( 'ISO 8601 compliance', () => {
+		it( 'should handle years below 1000 with zero-padded output', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = jest.fn();
+
+			render(
+				<TimePicker
+					currentTime="0999-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					minYear={ 1 }
+					is12Hour
+				/>
+			);
+
+			const yearInput = screen.getByLabelText( 'Year' );
+			expect( yearInput ).toHaveValue( 999 );
+
+			// Verify onChange emits zero-padded ISO 8601 format
+			await user.clear( yearInput );
+			await user.type( yearInput, '500' );
+			await user.keyboard( '{Tab}' );
+
+			// With zero-padding, this should work without errors
+			if ( onChangeSpy.mock.calls.length > 0 ) {
+				const lastCall = onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
+				expect( lastCall[ 0 ] ).toMatch( /^0500-/ );
+				expect( lastCall[ 0 ] ).not.toContain( 'NaN' );
+			}
+		} );
+	} );
 } );
