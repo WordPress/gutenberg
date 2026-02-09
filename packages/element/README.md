@@ -149,14 +149,6 @@ _Changelog_
 
 `6.2.0` Introduced in WordPress core.
 
-### findDOMNode
-
-Finds the dom node of a React component.
-
-_Parameters_
-
--   _component_ `React.ComponentType`: Component's instance.
-
 ### flushSync
 
 Forces React to flush any updates inside the provided callback synchronously.
@@ -180,16 +172,6 @@ _Returns_
 ### Fragment
 
 A component which renders its children without any wrapping element.
-
-### hydrate
-
-> **Deprecated** since WordPress 6.2.0. Use `hydrateRoot` instead.
-
-Hydrates a given element into the target DOM node.
-
-_Related_
-
--   <https://react.dev/reference/react-dom/hydrate>
 
 ### hydrateRoot
 
@@ -296,16 +278,6 @@ _Returns_
 
 -   Dangerously-rendering component.
 
-### render
-
-> **Deprecated** since WordPress 6.2.0. Use `createRoot` instead.
-
-Renders a given element into the target DOM node.
-
-_Related_
-
--   <https://react.dev/reference/react-dom/render>
-
 ### renderToString
 
 Serializes a React element to string.
@@ -344,16 +316,6 @@ _Parameters_
 _Returns_
 
 -   `ReactNode`: The updated children object.
-
-### unmountComponentAtNode
-
-> **Deprecated** since WordPress 6.2.0. Use `root.unmount()` instead.
-
-Removes any mounted element from the target DOM node.
-
-_Related_
-
--   <https://react.dev/reference/react-dom/unmountComponentAtNode>
 
 ### useCallback
 
