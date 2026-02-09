@@ -14,78 +14,111 @@ const {
 	DEFAULT_MAX_PORT,
 } = require( '../port-utils' );
 
+jest.mock( 'net' );
+
 describe( 'port-utils', () => {
+	afterEach( () => {
+		jest.restoreAllMocks();
+	} );
+
+	/**
+	 * Helper that configures net.createServer to return fresh mock servers.
+	 * Takes a function that receives the port and returns true if available.
+	 *
+	 * @param {Function} isAvailable A function (port) => boolean.
+	 */
+	function mockPortAvailability( isAvailable ) {
+		net.createServer.mockImplementation( () => {
+			let errorCb, listenCb;
+
+			const server = {
+				once: jest.fn( ( event, cb ) => {
+					if ( event === 'error' ) {
+						errorCb = cb;
+					}
+					if ( event === 'listening' ) {
+						listenCb = cb;
+					}
+				} ),
+				listen: jest.fn( ( port ) => {
+					if ( isAvailable( port ) ) {
+						server.close.mockImplementation( ( cb ) => cb() );
+						listenCb();
+					} else {
+						errorCb( { code: 'EADDRINUSE' } );
+					}
+				} ),
+				close: jest.fn(),
+			};
+
+			return server;
+		} );
+	}
+
 	describe( 'isPortAvailable', () => {
 		it( 'returns true for an available port', async () => {
-			// Use a high port that's unlikely to be in use
-			const result = await isPortAvailable( 59999 );
+			mockPortAvailability( () => true );
+			const result = await isPortAvailable( 8888 );
 			expect( result ).toBe( true );
 		} );
 
 		it( 'returns false for a port in use', async () => {
-			// Start a server on a port
-			const server = net.createServer();
-			const port = 59998;
+			mockPortAvailability( () => false );
+			const result = await isPortAvailable( 8888 );
+			expect( result ).toBe( false );
+		} );
 
-			await new Promise( ( resolve ) => {
-				server.listen( port, '0.0.0.0', resolve );
+		it( 'returns false for EACCES error', async () => {
+			net.createServer.mockImplementation( () => {
+				let errorCb;
+				const server = {
+					once: jest.fn( ( event, cb ) => {
+						if ( event === 'error' ) {
+							errorCb = cb;
+						}
+					} ),
+					listen: jest.fn( () => {
+						errorCb( { code: 'EACCES' } );
+					} ),
+					close: jest.fn(),
+				};
+				return server;
 			} );
-
-			try {
-				const result = await isPortAvailable( port );
-				expect( result ).toBe( false );
-			} finally {
-				await new Promise( ( resolve ) => {
-					server.close( resolve );
-				} );
-			}
+			const result = await isPortAvailable( 80 );
+			expect( result ).toBe( false );
 		} );
 	} );
 
 	describe( 'findAvailablePort', () => {
 		it( 'returns the preferred port when available', async () => {
-			const preferredPort = 59997;
-			const result = await findAvailablePort( { preferredPort } );
-			expect( result ).toBe( preferredPort );
+			mockPortAvailability( () => true );
+			const result = await findAvailablePort( {
+				preferredPort: 8888,
+			} );
+			expect( result ).toBe( 8888 );
 		} );
 
 		it( 'finds an alternative when preferred port is busy', async () => {
-			const preferredPort = 59996;
-
-			// Occupy the preferred port
-			const server = net.createServer();
-			await new Promise( ( resolve ) => {
-				server.listen( preferredPort, '0.0.0.0', resolve );
+			mockPortAvailability( ( port ) => port !== 8888 );
+			const result = await findAvailablePort( {
+				preferredPort: 8888,
 			} );
-
-			try {
-				const result = await findAvailablePort( {
-					preferredPort,
-				} );
-				expect( result ).not.toBe( preferredPort );
-				expect( result ).toBeGreaterThanOrEqual( DEFAULT_MIN_PORT );
-				expect( result ).toBeLessThanOrEqual( DEFAULT_MAX_PORT );
-			} finally {
-				await new Promise( ( resolve ) => {
-					server.close( resolve );
-				} );
-			}
+			expect( result ).toBe( DEFAULT_MIN_PORT );
 		} );
 
 		it( 'excludes specified ports', async () => {
-			const preferredPort = 59995;
+			mockPortAvailability( () => true );
 			const result = await findAvailablePort( {
-				preferredPort,
-				exclude: [ 59995 ],
+				preferredPort: 8888,
+				exclude: [ 8888 ],
 			} );
-			expect( result ).not.toBe( 59995 );
-			expect( result ).toBeGreaterThanOrEqual( DEFAULT_MIN_PORT );
-			expect( result ).toBeLessThanOrEqual( DEFAULT_MAX_PORT );
+			expect( result ).toBe( DEFAULT_MIN_PORT );
 		} );
 
-		it( 'uses ephemeral port range as fallback', async () => {
+		it( 'returns a port within the ephemeral range', async () => {
+			mockPortAvailability( ( port ) => port !== 8888 );
 			const result = await findAvailablePort( {
-				preferredPort: 59994,
+				preferredPort: 8888,
 			} );
 			expect( result ).toBeGreaterThanOrEqual( DEFAULT_MIN_PORT );
 			expect( result ).toBeLessThanOrEqual( DEFAULT_MAX_PORT );
