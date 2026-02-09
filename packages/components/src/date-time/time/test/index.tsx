@@ -606,7 +606,7 @@ describe( 'TimePicker', () => {
 		);
 
 		const yearInput = screen.getByLabelText( 'Year' );
-		
+
 		// Verify initial input displays correctly
 		expect( yearInput ).toHaveValue( 999 );
 
