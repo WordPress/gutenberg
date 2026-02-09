@@ -60,29 +60,6 @@ Default.args = {
 	currentTime: new Date(),
 };
 
-/**
- * Test story for ISO 8601 zero-padding with years below 1000.
- * Open browser console to see zero-padded output format.
- */
-export const YearBelow1000: StoryFn< typeof TimePicker > = () => {
-	const [ time, setTime ] = useState( '0999-10-18T11:00:00' );
-	return (
-		<div>
-			<p>
-				Current value: <code>{ time }</code>
-			</p>
-			<TimePicker
-				currentTime={ time }
-				onChange={ ( newTime ) => {
-					console.log( '🔍 onChange output:', newTime );
-					setTime( newTime );
-				} }
-				is12Hour
-			/>
-		</div>
-	);
-};
-
 const TimeInputTemplate: StoryFn< typeof TimePicker.TimeInput > = ( args ) => {
 	return <TimePicker.TimeInput { ...args } />;
 };
