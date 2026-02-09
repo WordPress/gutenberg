@@ -77,6 +77,12 @@ function CommentForm( {
 					) {
 						event.target.parentNode.requestSubmit();
 					}
+
+					if ( event.key === 'Escape' ) {
+						event.preventDefault();
+						// Passing event for reply forms.
+						onCancel( event );
+					}
 				} }
 			/>
 			<HStack spacing="2" justify="flex-end" wrap>

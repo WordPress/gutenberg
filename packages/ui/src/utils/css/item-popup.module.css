@@ -14,7 +14,7 @@
 		max-width: var(--available-width);
 		border-radius: var(--wpds-border-radius-md);
 		border: 1px solid var(--wpds-color-stroke-surface-neutral);
-		box-shadow: var(--wpds-elevation-medium);
+		box-shadow: var(--wpds-elevation-md);
 		background-color: var(--wpds-color-bg-surface-neutral-strong);
 		font-family: var(--wpds-font-family-body);
 		font-size: var(--wpds-font-size-md);

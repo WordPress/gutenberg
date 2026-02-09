@@ -31,6 +31,7 @@ import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
 import RemoveTabToolbarControl from '../tab/remove-tab-toolbar-control';
 
 const TABS_MENU_ITEM_TEMPLATE = [ [ 'core/tabs-menu-item', {} ] ];
+const EMPTY_ARRAY = [];
 
 /**
  * Preview component for non-active tab menu items.
@@ -99,7 +100,7 @@ function Edit( {
 	const { layout } = useBlockEditContext();
 
 	const tabsId = context[ 'core/tabs-id' ] || null;
-	const tabsList = context[ 'core/tabs-list' ] || [];
+	const tabsList = context[ 'core/tabs-list' ] || EMPTY_ARRAY;
 	const activeTabIndex = context[ 'core/tabs-activeTabIndex' ] ?? 0;
 	const editorActiveTabIndex = context[ 'core/tabs-editorActiveTabIndex' ];
 

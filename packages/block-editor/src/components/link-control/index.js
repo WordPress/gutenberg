@@ -629,6 +629,7 @@ function LinkControl( {
 							hideLabelFromVision={ ! showTextControl }
 							isEntity={ isEntity }
 							customValidity={ customValidity }
+							required={ showTextControl }
 							suffix={
 								<SearchSuffixControl
 									isEntity={ isEntity }

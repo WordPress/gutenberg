@@ -1,36 +1,17 @@
-/**
- * External dependencies
- */
 import * as Ariakit from '@ariakit/react';
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import { useInstanceId } from '@wordpress/compose';
 import {
 	Children,
 	useContext,
-	createContext,
 	forwardRef,
 	cloneElement,
 } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-
-/**
- * Internal dependencies
- */
-import type {
-	TooltipProps,
-	TooltipInternalContext as TooltipInternalContextType,
-} from './types';
+import type { TooltipProps } from './types';
 import Shortcut from '../shortcut';
 import { positionToPlacement } from '../popover/utils';
-
-const TooltipInternalContext = createContext< TooltipInternalContextType >( {
-	isNestedInTooltip: false,
-} );
-TooltipInternalContext.displayName = 'TooltipInternalContext';
+import { TooltipInternalContext } from './context';
 
 /**
  * Time over anchor to wait before showing tooltip
@@ -158,6 +139,5 @@ function UnforwardedTooltip(
 	);
 }
 export const Tooltip = forwardRef( UnforwardedTooltip );
-Tooltip.displayName = 'Tooltip';
 
 export default Tooltip;

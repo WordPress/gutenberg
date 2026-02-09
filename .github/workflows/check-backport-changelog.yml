@@ -18,6 +18,7 @@ on:
             - '!packages/block-serialization-default-parser/**'
             - '!packages/widgets/**'
             - '!packages/e2e-tests/**'
+            - '!packages/icons/src/manifest.php'
 
 # Disable permissions for all available scopes by default.
 # Any needed permissions should be configured at the job level.
