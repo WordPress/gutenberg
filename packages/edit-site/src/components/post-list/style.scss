@@ -93,10 +93,22 @@
 		max-width: 400px;
 		border-radius: $radius-large;
 		position: relative;
-		animation: none;
+		animation-name: none;
 
 		@media (prefers-reduced-motion: no-preference) {
-			animation: quick-edit-slide-in-right 0.2s ease-out;
+			animation-name: quick-edit-slide-in-right;
+			animation-duration: 0.2s;
+			animation-timing-function: ease-out;
+		}
+	}
+
+	&.is-animating-out .components-modal__frame {
+		animation-name: none;
+
+		@media (prefers-reduced-motion: no-preference) {
+			animation-name: quick-edit-slide-out-right;
+			animation-duration: 0.2s;
+			animation-timing-function: ease-out;
 		}
 	}
 
@@ -149,5 +161,14 @@
 	}
 	to {
 		transform: translateX(0);
+	}
+}
+
+@keyframes quick-edit-slide-out-right {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(100%);
 	}
 }
