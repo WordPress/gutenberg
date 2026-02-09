@@ -778,7 +778,7 @@ export default function MediaEdit< Item >( {
 					customValidityResult.message || __( 'Invalid' )
 				);
 			} else {
-				input.setCustomValidity( '' ); // Clear validity
+				input.setCustomValidity( '' ); // Clear validity.
 			}
 		} else {
 			// Clear any previous validation.
@@ -804,13 +804,6 @@ export default function MediaEdit< Item >( {
 		<div onBlur={ onBlur }>
 			<fieldset className="fields__media-edit" data-field-id={ field.id }>
 				<ConditionalMediaUpload
-					/*
-					 * The media picker returns selected items in its own order,
-					 * not preserving our existing order. We manually handle the
-					 * order to keep previously selected items in their original
-					 * positions and append newly selected items at the end (or
-					 * at a specific position when replacing an existing item).
-					 */
 					onSelect={ ( selectedMedia: any ) => {
 						if ( ! multiple ) {
 							onChangeControl( selectedMedia.id );
@@ -836,42 +829,28 @@ export default function MediaEdit< Item >( {
 								...existingItems,
 								...newItems,
 							] );
-						} else {
-							// Existing item clicked (`replace`): insert newly
-							// selected items at that position and remove any
-							// other items that were deselected.
-							const isClickedItemStillSelected =
-								newIds.includes( targetItemId );
-							const newItems = newIds.filter(
-								( id ) => ! currentValue.includes( id )
+						} else if ( selectedMedia.id !== targetItemId ) {
+							// Remove selected item from its old position, if it
+							// already exists in the value.
+							const filtered = currentValue.filter(
+								( id ) => id !== selectedMedia.id
 							);
-							// Keep only items that are still selected.
-							const keptItems = currentValue.filter( ( id ) =>
-								newIds.includes( id )
+							// Replace the clicked item with the selected one.
+							onChangeControl(
+								filtered.map( ( id ) =>
+									id === targetItemId ? selectedMedia.id : id
+								)
 							);
-							// Find insert position based on where target was.
-							const originalTargetIndex =
-								currentValue.indexOf( targetItemId );
-							const insertIndex = currentValue
-								.slice( 0, originalTargetIndex )
-								.filter( ( id ) =>
-									newIds.includes( id )
-								).length;
-							// Insert new items at target position.
-							const newValue = [ ...keptItems ];
-							newValue.splice(
-								insertIndex +
-									( isClickedItemStillSelected ? 1 : 0 ),
-								0,
-								...newItems
-							);
-							onChangeControl( newValue );
 						}
 						setTargetItemId( undefined );
 					} }
+					onClose={ () => setTargetItemId( undefined ) }
 					allowedTypes={ allowedTypes }
-					value={ value }
-					multiple={ multiple }
+					// When replacing an existing item, pass only that item's ID
+					// and open in single-select mode so the user picks exactly
+					// one replacement, even if `multiple` is true.					`
+					value={ targetItemId !== undefined ? targetItemId : value }
+					multiple={ multiple && targetItemId === undefined }
 					title={ field.label }
 					render={ ( { open }: any ) => {
 						const AttachmentsComponent = isExpanded
