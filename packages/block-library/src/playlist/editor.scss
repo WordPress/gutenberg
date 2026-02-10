@@ -23,11 +23,12 @@
 		height: 100%;
 	}
 
-	// Center the play/pause icon within the button.
+	// Center the play/pause icon within the button and remove default border.
 	.waveform-btn {
 		display: flex;
 		align-items: center;
 		justify-content: center;
+		border: none;
 	}
 
 	// WaveformPlayer info section layout - needed in the editor iframe.
