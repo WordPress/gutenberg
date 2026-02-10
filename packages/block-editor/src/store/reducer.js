@@ -1277,35 +1277,13 @@ export const blocks = pipe(
 
 	controlledInnerBlocks(
 		state = {},
-		{ type, clientId, hasControlledInnerBlocks, mappings }
+		{ type, clientId, hasControlledInnerBlocks }
 	) {
 		if ( type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
-			if ( hasControlledInnerBlocks ) {
-				// Build mapping objects from array
-				const externalToInternal = new Map();
-				const internalToExternal = new Map();
-
-				if ( mappings ) {
-					for ( const { external, internal } of mappings ) {
-						externalToInternal.set( external, internal );
-						internalToExternal.set( internal, external );
-					}
-				}
-
-				return {
-					...state,
-					[ clientId ]: {
-						hasControlledInnerBlocks: true,
-						externalToInternal,
-						internalToExternal,
-					},
-				};
-			}
-
-			// When setting to false, remove the entry entirely
-			const newState = { ...state };
-			delete newState[ clientId ];
-			return newState;
+			return {
+				...state,
+				[ clientId ]: hasControlledInnerBlocks,
+			};
 		}
 		return state;
 	},
@@ -1528,37 +1506,12 @@ export function selection( state = {}, action ) {
 				selectionEnd: { clientId: end },
 			};
 		case 'RESET_BLOCKS':
-			const startClientId = state?.selectionStart?.clientId;
-			const endClientId = state?.selectionEnd?.clientId;
-
-			// Do nothing if there's no selected block.
-			if ( ! startClientId && ! endClientId ) {
-				return state;
-			}
-
-			// If the start of the selection won't exist after reset, remove selection.
-			if (
-				! action.blocks.some(
-					( block ) => block.clientId === startClientId
-				)
-			) {
-				return {
-					selectionStart: {},
-					selectionEnd: {},
-				};
-			}
-
-			// If the end of the selection won't exist after reset, collapse selection.
-			if (
-				! action.blocks.some(
-					( block ) => block.clientId === endClientId
-				)
-			) {
-				return {
-					...state,
-					selectionEnd: state.selectionStart,
-				};
-			}
+			// Selection is managed separately (via SelectionContext and
+			// useBlockSync's selection restoration). Preserve it here so
+			// that a block reset driven by an entity sync does not
+			// inadvertently wipe a selection that lives inside a
+			// controlled inner block container.
+			return state;
 	}
 
 	const selectionStart = selectionHelper( state.selectionStart, action );

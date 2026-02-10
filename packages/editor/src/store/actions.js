@@ -741,11 +741,10 @@ export const setRenderingMode =
 	( { dispatch, registry, select } ) => {
 		if (
 			select.__unstableIsEditorReady() &&
-			! select.getEditorSettings().isPreviewMode
+			! select.getEditorSettings().isPreviewMode &&
+			mode !== select.getRenderingMode()
 		) {
-			// We clear the block selection but we also need to clear the selection from the core store.
 			registry.dispatch( blockEditorStore ).clearSelectedBlock();
-			dispatch.editPost( { selection: undefined }, { undoIgnore: true } );
 		}
 
 		dispatch( {
