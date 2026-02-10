@@ -310,6 +310,8 @@ function initPlayer( ref, track, shouldAutoPlay ) {
 
 	// Auto-play if switching tracks (user action), not on initial page load.
 	// Use setTimeout to let WaveformPlayer fully initialize before playing.
+	// Without the setTimeout, play() can sometimes be called before the player is ready,
+	// and the pause button doesn't render.
 	if ( shouldAutoPlay && instance ) {
 		setTimeout( () => {
 			try {
