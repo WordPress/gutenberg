@@ -35,6 +35,7 @@ import DataFormContext from '../../dataform-context';
 import getFirstValidationError from './utils/get-first-validation-error';
 import getFieldDefinitionAndSummaryFields from './utils/get-field-definition-and-summary-fields';
 import getLabelClassName from './utils/get-label-classname';
+import getLabelContent from './utils/get-label-content';
 
 function ModalContent< Item >( {
 	data,
@@ -171,7 +172,6 @@ function PanelModal< Item >( {
 	validity,
 	onClose: onCloseCallback,
 	touched,
-	labelContent,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -179,7 +179,6 @@ function PanelModal< Item >( {
 	validity?: FieldValidity;
 	onClose?: () => void;
 	touched: boolean;
-	labelContent?: React.ReactNode;
 } ) {
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedPanelLayout;
@@ -197,6 +196,7 @@ function PanelModal< Item >( {
 	const errorMessage = getFirstValidationError( validity );
 	const showError = touched && !! errorMessage;
 	const labelClassName = getLabelClassName( labelPosition, showError );
+	const labelContent = getLabelContent( showError, errorMessage, fieldLabel );
 
 	const handleClose = () => {
 		setIsOpen( false );
