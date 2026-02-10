@@ -31,7 +31,7 @@ function render_block_core_icon( $attributes ) {
 	$aria_label = ! empty( $attributes['ariaLabel'] ) ? $attributes['ariaLabel'] : false;
 
 	// Process the markup.
-	$processor = new \WP_HTML_Tag_Processor( $icon['content'] );
+	$processor = new WP_HTML_Tag_Processor( $icon['content'] );
 	$processor->next_tag( 'svg' );
 	if ( ! $aria_label ) {
 		// Icon is decorative, hide it from screen readers.
