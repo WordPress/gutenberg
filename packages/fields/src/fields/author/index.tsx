@@ -22,18 +22,29 @@ const authorField: Field< BasePostWithEmbeddedAuthor > = {
 	id: 'author',
 	type: 'integer',
 	getElements: async () => {
-		const authors: Author[] =
-			( await resolveSelect( coreDataStore ).getEntityRecords(
-				'root',
-				'user',
-				{
-					per_page: -1,
-					who: 'authors',
-					_fields: 'id,name',
-					context: 'view',
-				}
-			) ) ?? [];
-		return authors.map( ( { id, name } ) => ( {
+		const query = {
+			per_page: -1,
+			_fields: 'id,name',
+			context: 'view',
+		};
+		const [ capableAuthors, publishedAuthors ] = await Promise.all( [
+			resolveSelect( coreDataStore ).getEntityRecords( 'root', 'user', {
+				...query,
+				who: 'authors',
+			} ),
+			resolveSelect( coreDataStore ).getEntityRecords( 'root', 'user', {
+				...query,
+				has_published_posts: true,
+			} ),
+		] );
+		const authorsMap = new Map< number, Author >();
+		for ( const author of [
+			...( ( capableAuthors ?? [] ) as Author[] ),
+			...( ( publishedAuthors ?? [] ) as Author[] ),
+		] ) {
+			authorsMap.set( author.id, author );
+		}
+		return Array.from( authorsMap.values() ).map( ( { id, name } ) => ( {
 			value: id,
 			label: name,
 		} ) );
