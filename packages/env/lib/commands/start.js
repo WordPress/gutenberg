@@ -11,6 +11,7 @@ const { rimraf } = require( 'rimraf' );
  * Internal dependencies
  */
 const { loadConfig } = require( '../config' );
+const { createPortResolver } = require( '../resolve-available-ports' );
 const { executeLifecycleScript } = require( '../execute-lifecycle-script' );
 const { getRuntime, getSavedRuntime, saveRuntime } = require( '../runtime' );
 
@@ -50,8 +51,13 @@ module.exports = async function start( {
 		await checkForLegacyInstall( spinner );
 	}
 
-	const config = await loadConfig( path.resolve( '.' ), customConfigPath );
+	const portResolver = createPortResolver( spinner );
+	const config = await loadConfig( path.resolve( '.' ), customConfigPath, {
+		portResolver,
+	} );
 	config.debug = debug;
+	config.xdebug = xdebug;
+	config.spx = spx;
 
 	// Check if switching runtimes and prompt user to destroy old environment first.
 	const savedRuntime = await getSavedRuntime( config.workDirectoryPath );
@@ -109,9 +115,6 @@ module.exports = async function start( {
 		result = await runtime.start( config, {
 			spinner,
 			update,
-			xdebug,
-			spx,
-			debug,
 		} );
 
 		// Save the runtime type after successful start.

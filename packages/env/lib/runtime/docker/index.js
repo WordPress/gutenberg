@@ -16,7 +16,7 @@ const exec = util.promisify( require( 'child_process' ).exec );
 /**
  * Internal dependencies
  */
-const initConfig = require( './init-config' );
+const { writeDockerFiles, loadDockerConfig } = require( './docker-config' );
 const getHostUser = require( './get-host-user' );
 const downloadSources = require( './download-sources' );
 const downloadWPPHPUnit = require( './download-wp-phpunit' );
@@ -94,21 +94,13 @@ class DockerRuntime {
 	 * @param {Object}   options         Start options.
 	 * @param {Object}   options.spinner A CLI spinner which indicates progress.
 	 * @param {boolean}  options.update  If true, update sources.
-	 * @param {string}   options.xdebug  The Xdebug mode to set.
-	 * @param {string}   options.spx     The SPX mode to set.
-	 * @param {boolean}  options.debug   True if debug mode is enabled.
 	 * @return {Promise<Object>} Result object with message and siteUrl.
 	 */
-	async start( config, { spinner, update, xdebug, spx, debug } ) {
-		// Initialize Docker-specific files (docker-compose.yml, Dockerfiles)
-		const fullConfig = await initConfig( {
-			spinner,
-			debug,
-			xdebug,
-			spx,
-			writeChanges: true,
-			customConfigPath: config.customConfigPath,
-		} );
+	async start( config, { spinner, update } ) {
+		// Write Docker-specific files (docker-compose.yml, Dockerfiles).
+		// The config already has ports resolved and xdebug/spx set by start.js.
+		const fullConfig = await writeDockerFiles( config );
+		const debug = fullConfig.debug;
 
 		const testsEnabled = fullConfig.testsEnvironment !== false;
 
@@ -414,7 +406,7 @@ class DockerRuntime {
 	 * @param {boolean}  options.debug   True if debug mode is enabled.
 	 */
 	async stop( config, { spinner, debug } ) {
-		const { dockerComposeConfigPath } = await initConfig( {
+		const { dockerComposeConfigPath } = await loadDockerConfig( {
 			spinner,
 			debug,
 			customConfigPath: config.customConfigPath,
@@ -495,7 +487,7 @@ class DockerRuntime {
 	 * @param {boolean}  options.debug       True if debug mode is enabled.
 	 */
 	async clean( config, { environment, spinner, debug } ) {
-		const fullConfig = await initConfig( {
+		const fullConfig = await loadDockerConfig( {
 			spinner,
 			debug,
 			customConfigPath: config.customConfigPath,
@@ -595,7 +587,7 @@ class DockerRuntime {
 			);
 		}
 
-		const fullConfig = await initConfig( {
+		const fullConfig = await loadDockerConfig( {
 			spinner,
 			debug,
 			customConfigPath: config.customConfigPath,
@@ -626,7 +618,7 @@ class DockerRuntime {
 	 * @param {boolean}  options.debug       True if debug mode is enabled.
 	 */
 	async logs( config, { environment, watch, spinner, debug } ) {
-		const fullConfig = await initConfig( {
+		const fullConfig = await loadDockerConfig( {
 			spinner,
 			debug,
 			customConfigPath: config.customConfigPath,
@@ -713,7 +705,7 @@ class DockerRuntime {
 	async getStatus( config, { spinner, debug } ) {
 		spinner.text = 'Getting environment status.';
 
-		const fullConfig = await initConfig( {
+		const fullConfig = await loadDockerConfig( {
 			spinner,
 			debug,
 			customConfigPath: config.customConfigPath,
