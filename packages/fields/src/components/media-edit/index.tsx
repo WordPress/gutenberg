@@ -329,101 +329,98 @@ function ExpandedMediaEditAttachments( {
 					attachment.mime_type?.startsWith( 'image' );
 				const isBlob = isBlobURL( attachment.source_url );
 				return (
-					<AnimatedMediaItem key={ attachment.id } index={ index }>
-						<div
-							className={ clsx(
-								'fields__media-edit-expanded-item',
-								{ 'has-preview-image': hasPreviewImage }
-							) }
+					<AnimatedMediaItem
+						key={ attachment.id }
+						index={ index }
+						className={ clsx( 'fields__media-edit-expanded-item', {
+							'has-preview-image': hasPreviewImage,
+						} ) }
+					>
+						<MediaPickerButton
+							open={ () => {
+								setTargetItemId( attachment.id as number );
+								open();
+							} }
+							label={ __( 'Replace' ) }
+							showTooltip
+							onFilesDrop={ onFilesDrop }
+							attachment={ attachment }
+							isUploading={ isUploading }
 						>
-							<MediaPickerButton
-								open={ () => {
-									setTargetItemId( attachment.id as number );
-									open();
-								} }
-								label={ __( 'Replace' ) }
-								showTooltip
-								onFilesDrop={ onFilesDrop }
-								attachment={ attachment }
-								isUploading={ isUploading }
-							>
-								<div className="fields__media-edit-expanded-preview">
-									<VStack
-										spacing={ 0 }
-										alignment="center"
-										justify="center"
-										className="fields__media-edit-expanded-preview-stack"
-									>
-										{ ( ! isBlob || hasPreviewImage ) && (
-											<MediaPreview
-												attachment={ attachment }
+							<div className="fields__media-edit-expanded-preview">
+								<VStack
+									spacing={ 0 }
+									alignment="center"
+									justify="center"
+									className="fields__media-edit-expanded-preview-stack"
+								>
+									{ ( ! isBlob || hasPreviewImage ) && (
+										<MediaPreview
+											attachment={ attachment }
+										/>
+									) }
+									{ ! isBlob &&
+										( ! hasPreviewImage ? (
+											<MediaTitle
+												attachment={
+													attachment as Attachment< 'view' >
+												}
+											/>
+										) : (
+											<div className="fields__media-edit-expanded-overlay">
+												<div className="fields__media-edit-expanded-title">
+													<MediaTitle
+														attachment={
+															attachment as Attachment< 'view' >
+														}
+													/>
+												</div>
+											</div>
+										) ) }
+								</VStack>
+							</div>
+						</MediaPickerButton>
+						{ ! isBlob && (
+							<div className="fields__media-edit-expanded-overlay">
+								<HStack
+									className="fields__media-edit-expanded-actions"
+									spacing={ 1 }
+									alignment="flex-end"
+									expanded={ false }
+								>
+									{ multiple &&
+										allItems &&
+										allItems.length > 1 && (
+											<MoveButtons
+												itemId={
+													attachment.id as number
+												}
+												index={ index }
+												totalItems={ allItems.length }
+												isUploading={ isUploading }
+												moveItem={ moveItem }
+												orientation="horizontal"
 											/>
 										) }
-										{ ! isBlob &&
-											( ! hasPreviewImage ? (
-												<MediaTitle
-													attachment={
-														attachment as Attachment< 'view' >
-													}
-												/>
-											) : (
-												<div className="fields__media-edit-expanded-overlay">
-													<div className="fields__media-edit-expanded-title">
-														<MediaTitle
-															attachment={
-																attachment as Attachment< 'view' >
-															}
-														/>
-													</div>
-												</div>
-											) ) }
-									</VStack>
-								</div>
-							</MediaPickerButton>
-							{ ! isBlob && (
-								<div className="fields__media-edit-expanded-overlay">
-									<HStack
-										className="fields__media-edit-expanded-actions"
-										spacing={ 1 }
-										alignment="flex-end"
-										expanded={ false }
-									>
-										{ multiple &&
-											allItems &&
-											allItems.length > 1 && (
-												<MoveButtons
-													itemId={
-														attachment.id as number
-													}
-													index={ index }
-													totalItems={
-														allItems.length
-													}
-													isUploading={ isUploading }
-													moveItem={ moveItem }
-													orientation="horizontal"
-												/>
-											) }
-										<Button
-											__next40pxDefaultSize
-											icon={ closeSmall }
-											label={ __( 'Remove' ) }
-											size="small"
-											disabled={ isUploading }
-											accessibleWhenDisabled
-											onClick={ (
-												event: React.MouseEvent< HTMLButtonElement >
-											) => {
-												event.stopPropagation();
-												removeItem(
-													attachment.id as number
-												);
-											} }
-										/>
-									</HStack>
-								</div>
-							) }
-						</div>
+									<Button
+										__next40pxDefaultSize
+										icon={ closeSmall }
+										label={ __( 'Remove' ) }
+										size="small"
+										disabled={ isUploading }
+										accessibleWhenDisabled
+										onClick={ (
+											event: React.MouseEvent< HTMLButtonElement >
+										) => {
+											event.stopPropagation();
+											removeItem(
+												attachment.id as number
+											);
+										} }
+									/>
+								</HStack>
+							</div>
+						) }
 					</AnimatedMediaItem>
 				);
 			} ) }
