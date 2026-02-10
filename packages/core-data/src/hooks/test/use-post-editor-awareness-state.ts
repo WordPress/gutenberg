@@ -7,7 +7,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
  * Internal dependencies
  */
 import {
-	useActiveUsers,
+	useActiveCollaborators,
 	useGetAbsolutePositionIndex,
 	useGetDebugData,
 	useIsDisconnected,
@@ -37,7 +37,7 @@ const createMockActiveUser = (
 	clientId: 12345,
 	isMe: false,
 	isConnected: true,
-	userInfo: {
+	collaboratorInfo: {
 		id: 1,
 		name: 'Test User',
 		slug: 'test-user',
@@ -57,7 +57,7 @@ const createMockActiveUser = (
 const createMockDebugData = (): YDocDebugData => ( {
 	doc: { testKey: 'testValue' },
 	clients: {},
-	userMap: {},
+	collaboratorMap: {},
 } );
 
 describe( 'use-post-editor-awareness-state hooks', () => {
@@ -103,7 +103,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 	describe( 'useActiveUsers', () => {
 		test( 'should return empty array when postId is null', () => {
 			const { result } = renderHook( () =>
-				useActiveUsers( null, 'post' )
+				useActiveCollaborators( null, 'post' )
 			);
 
 			expect( result.current ).toEqual( [] );
@@ -111,7 +111,9 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should return empty array when postType is null', () => {
-			const { result } = renderHook( () => useActiveUsers( 123, null ) );
+			const { result } = renderHook( () =>
+				useActiveCollaborators( 123, null )
+			);
 
 			expect( result.current ).toEqual( [] );
 			expect( mockSyncManager.getAwareness ).not.toHaveBeenCalled();
@@ -121,7 +123,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			( getSyncManager as jest.Mock ).mockReturnValue( undefined );
 
 			const { result } = renderHook( () =>
-				useActiveUsers( 123, 'post' )
+				useActiveCollaborators( 123, 'post' )
 			);
 
 			expect( result.current ).toEqual( [] );
@@ -131,14 +133,14 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			mockSyncManager.getAwareness.mockReturnValue( undefined );
 
 			const { result } = renderHook( () =>
-				useActiveUsers( 123, 'post' )
+				useActiveCollaborators( 123, 'post' )
 			);
 
 			expect( result.current ).toEqual( [] );
 		} );
 
 		test( 'should call getAwareness with correct parameters', () => {
-			renderHook( () => useActiveUsers( 123, 'post' ) );
+			renderHook( () => useActiveCollaborators( 123, 'post' ) );
 
 			expect( mockSyncManager.getAwareness ).toHaveBeenCalledWith(
 				'postType/post',
@@ -147,7 +149,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 
 		test( 'should call awareness.setUp', () => {
-			renderHook( () => useActiveUsers( 123, 'post' ) );
+			renderHook( () => useActiveCollaborators( 123, 'post' ) );
 
 			expect( mockAwareness.setUp ).toHaveBeenCalled();
 		} );
@@ -157,14 +159,14 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			mockAwareness.getCurrentState.mockReturnValue( mockUsers );
 
 			const { result } = renderHook( () =>
-				useActiveUsers( 123, 'post' )
+				useActiveCollaborators( 123, 'post' )
 			);
 
 			expect( result.current ).toEqual( mockUsers );
 		} );
 
 		test( 'should subscribe to state changes', () => {
-			renderHook( () => useActiveUsers( 123, 'post' ) );
+			renderHook( () => useActiveCollaborators( 123, 'post' ) );
 
 			expect( mockAwareness.onStateChange ).toHaveBeenCalled();
 		} );
@@ -176,7 +178,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			mockAwareness.getCurrentState.mockReturnValue( initialUsers );
 
 			const { result } = renderHook( () =>
-				useActiveUsers( 123, 'post' )
+				useActiveCollaborators( 123, 'post' )
 			);
 
 			expect( result.current ).toEqual( initialUsers );
@@ -196,7 +198,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			mockAwareness.onStateChange.mockReturnValue( unsubscribe );
 
 			const { rerender } = renderHook(
-				( { postId } ) => useActiveUsers( postId, 'post' ),
+				( { postId } ) => useActiveCollaborators( postId, 'post' ),
 				{ initialProps: { postId: 123 as number | null } }
 			);
 
@@ -212,7 +214,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			mockAwareness.onStateChange.mockReturnValue( unsubscribe );
 
 			const { rerender } = renderHook(
-				( { postType } ) => useActiveUsers( 123, postType ),
+				( { postType } ) => useActiveCollaborators( 123, postType ),
 				{ initialProps: { postType: 'post' as string | null } }
 			);
 
@@ -228,7 +230,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			mockAwareness.getCurrentState.mockReturnValue( mockUsers );
 
 			const { result, rerender } = renderHook(
-				( { postId } ) => useActiveUsers( postId, 'post' ),
+				( { postId } ) => useActiveCollaborators( postId, 'post' ),
 				{ initialProps: { postId: 123 as number | null } }
 			);
 
@@ -291,7 +293,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			expect( result.current ).toEqual( {
 				doc: {},
 				clients: {},
-				userMap: {},
+				collaboratorMap: {},
 			} );
 		} );
 
@@ -395,7 +397,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			mockAwareness.onStateChange.mockReturnValue( unsubscribe );
 
 			const { unmount } = renderHook( () =>
-				useActiveUsers( 123, 'post' )
+				useActiveCollaborators( 123, 'post' )
 			);
 
 			expect( unsubscribe ).not.toHaveBeenCalled();
@@ -411,7 +413,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			const user1 = createMockActiveUser( {
 				clientId: 1,
 				isMe: true,
-				userInfo: {
+				collaboratorInfo: {
 					id: 1,
 					name: 'User One',
 					slug: 'user-one',
@@ -424,7 +426,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			const user2 = createMockActiveUser( {
 				clientId: 2,
 				isMe: false,
-				userInfo: {
+				collaboratorInfo: {
 					id: 2,
 					name: 'User Two',
 					slug: 'user-two',
@@ -438,12 +440,16 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			mockAwareness.getCurrentState.mockReturnValue( [ user1, user2 ] );
 
 			const { result } = renderHook( () =>
-				useActiveUsers( 123, 'post' )
+				useActiveCollaborators( 123, 'post' )
 			);
 
 			expect( result.current ).toHaveLength( 2 );
-			expect( result.current[ 0 ].userInfo.name ).toBe( 'User One' );
-			expect( result.current[ 1 ].userInfo.name ).toBe( 'User Two' );
+			expect( result.current[ 0 ].collaboratorInfo.name ).toBe(
+				'User One'
+			);
+			expect( result.current[ 1 ].collaboratorInfo.name ).toBe(
+				'User Two'
+			);
 		} );
 
 		test( 'should identify correct user as disconnected among multiple', () => {
