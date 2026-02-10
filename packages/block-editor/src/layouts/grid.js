@@ -144,7 +144,7 @@ export default {
 		let fallbackGapValue = '1.2rem';
 		if ( globalBlockGapValue ) {
 			const processedGap = getGapCSSValue( globalBlockGapValue, '0.5em' );
-			const gapParts = processedGap?.split( ' ' ) || [];
+			const gapParts = processedGap.split( ' ' );
 			fallbackGapValue =
 				gapParts.length > 1 ? gapParts[ 1 ] : gapParts[ 0 ];
 		}

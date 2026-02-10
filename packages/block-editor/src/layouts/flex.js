@@ -153,7 +153,7 @@ export default {
 				'0.5em'
 			);
 			// Use the column gap value (second value if two values exist)
-			const gapParts = processedGlobalGap?.split( ' ' ) || [];
+			const gapParts = processedGlobalGap.split( ' ' );
 			fallbackGapValue =
 				gapParts.length > 1 ? gapParts[ 1 ] : gapParts[ 0 ];
 		}
