@@ -20,3 +20,52 @@
 	justify-content: center;
 	height: 100%;
 }
+
+.editor-revisions-canvas__content {
+	display: flex;
+	height: 100%;
+
+	.editor-visual-editor {
+		flex: 1;
+		min-width: 0;
+	}
+}
+
+// Diff markers minimap
+.revision-diff-markers {
+	position: relative;
+	flex-shrink: 0;
+	width: 12px;
+	background: rgba(0, 0, 0, 0.05);
+
+	.revision-diff-marker {
+		position: absolute;
+		width: 100%;
+		min-height: 4px;
+		border: none;
+		padding: 0;
+		cursor: pointer;
+		transition: opacity 0.1s ease;
+
+		&.is-added {
+			background: #00a32a;
+		}
+
+		&.is-removed {
+			background: #d63638;
+		}
+
+		&.is-modified {
+			background: #dba617;
+		}
+
+		&:hover {
+			opacity: 0.7;
+		}
+
+		&:focus {
+			outline: 2px solid $gray-900;
+			outline-offset: -2px;
+		}
+	}
+}

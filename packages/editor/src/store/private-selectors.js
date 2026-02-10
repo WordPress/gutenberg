@@ -376,3 +376,47 @@ export function getSelectedNote( state ) {
 export function isNoteFocused( state ) {
 	return !! state.selectedNote?.options?.focus;
 }
+
+/**
+ * Returns the previous revision (the one before the current revision).
+ * Used for diffing between revisions.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object|null|undefined} The previous revision object, null if loading or no previous revision, or undefined if not in revisions mode.
+ */
+export const getPreviousRevision = createRegistrySelector(
+	( select ) => ( state ) => {
+		const currentRevisionId = getCurrentRevisionId( state );
+		if ( ! currentRevisionId ) {
+			return undefined;
+		}
+
+		const { type: postType, id: postId } = getCurrentPost( state );
+		const revisions = select( coreStore ).getRevisions(
+			'postType',
+			postType,
+			postId,
+			{ per_page: -1, context: 'edit' }
+		);
+		if ( ! revisions ) {
+			return null;
+		}
+
+		// Sort by date ascending (oldest first).
+		const sortedRevisions = [ ...revisions ].sort(
+			( a, b ) => new Date( a.date ) - new Date( b.date )
+		);
+
+		// Find current revision index.
+		const currentIndex = sortedRevisions.findIndex(
+			( r ) => r.id === currentRevisionId
+		);
+
+		// Return the previous revision (older one) if it exists.
+		if ( currentIndex > 0 ) {
+			return sortedRevisions[ currentIndex - 1 ];
+		}
+
+		return null;
+	}
+);

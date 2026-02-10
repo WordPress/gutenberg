@@ -86,10 +86,6 @@
 	justify-content: flex-end;
 	align-items: stretch;
 
-	.dataviews-action-modal__quick-edit-header {
-		margin-bottom: $grid-unit-20;
-	}
-
 	.components-modal__frame {
 		margin: $grid-unit-20 $grid-unit-20 $grid-unit-20 0;
 		height: calc(100% - #{$grid-unit-20 * 2});
@@ -107,18 +103,38 @@
 	.components-modal__content {
 		display: flex;
 		flex-direction: column;
-		height: 100%;
+		overflow: hidden;
+		padding: 0;
+
+		> * {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			min-height: 0;
+		}
+	}
+
+	.dataviews-action-modal__quick-edit-header {
+		margin-bottom: $grid-unit-20;
+		padding: $grid-unit-30 $grid-unit-30 0;
 	}
 
 	.dataviews-action-modal__quick-edit-content {
-		flex-grow: 1;
-		display: flex;
-		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+
+		.dataforms-layouts__wrapper {
+			flex: 1;
+			padding: 0 $grid-unit-30 $grid-unit-05; // Horizontal + bottom space for focus ring
+		}
 	}
 
 	.dataviews-action-modal__quick-edit-footer {
-		margin-top: auto;
-		padding-top: $grid-unit-20;
+		position: sticky;
+		bottom: 0;
+		flex-shrink: 0;
+		padding: $grid-unit-20 $grid-unit-30 $grid-unit-30;
 
 		.components-button {
 			flex: 1;

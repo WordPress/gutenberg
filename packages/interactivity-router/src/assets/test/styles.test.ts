@@ -78,7 +78,7 @@ describe( 'Router styles management', () => {
 
 	describe( 'updateStylesWithSCS', () => {
 		it( 'should append all elements when X is empty in the correct order', () => {
-			const X = [];
+			const X: HTMLStyleElement[] = [];
 			const Y = [
 				createStyleElement( 'style1' ),
 				createLinkElement( 'link1' ),
@@ -514,25 +514,22 @@ describe( 'Router styles management', () => {
 
 	// Tests for preloadStyles function.
 	describe( 'preloadStyles', () => {
-		it( 'should use cached promises for the same URL', () => {
+		it( 'should return cached promises for the same HTML', () => {
 			// Create a test document.
 			const doc = document.implementation.createHTMLDocument();
 			const style = doc.createElement( 'style' );
 			doc.head.appendChild( style );
 
+			// NOTE: preloadStyles() modifies the passed document. That's why
+			// the document is cloned beforehand.
+
 			// First call should update the DOM.
-			const firstResult = preloadStyles(
-				doc,
-				'https://example.com/test'
-			);
+			const firstResult = preloadStyles( doc.cloneNode() as Document );
 			expect( firstResult ).toBeTruthy();
 
 			// Second call should return the same promises.
-			const secondResult = preloadStyles(
-				doc,
-				'https://example.com/test'
-			);
-			expect( secondResult ).toBe( firstResult );
+			const secondResult = preloadStyles( doc.cloneNode() as Document );
+			expect( secondResult ).toEqual( firstResult );
 		} );
 
 		it( 'should extract style elements from the provided document', () => {
@@ -546,7 +543,7 @@ describe( 'Router styles management', () => {
 			doc.head.appendChild( style1 );
 			doc.head.appendChild( style2 );
 
-			preloadStyles( doc, 'https://example.com/another-test-page' );
+			preloadStyles( doc );
 
 			// Check that styles were extracted and added to the document.
 			const addedStyle1 = document.querySelector( '#test-style-1' );

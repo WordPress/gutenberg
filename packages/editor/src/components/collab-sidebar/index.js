@@ -6,6 +6,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __experimentalVStack as VStack } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore } from '@wordpress/interface';
@@ -16,8 +17,8 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import PluginSidebar from '../plugin-sidebar';
 import {
-	collabHistorySidebarName,
-	collabSidebarName,
+	ALL_NOTES_SIDEBAR,
+	FLOATING_NOTES_SIDEBAR,
 	SIDEBARS,
 } from './constants';
 import { Comments } from './comments';
@@ -85,17 +86,26 @@ function NotesSidebar( { postId } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
-	const { clientId, blockCommentId } = useSelect( ( select ) => {
-		const { getBlockAttributes, getSelectedBlockClientId } =
-			select( blockEditorStore );
-		const _clientId = getSelectedBlockClientId();
-		return {
-			clientId: _clientId,
-			blockCommentId: _clientId
-				? getBlockAttributes( _clientId )?.metadata?.noteId
-				: null,
-		};
-	}, [] );
+	const { clientId, blockCommentId, isClassicBlock } = useSelect(
+		( select ) => {
+			const {
+				getBlockAttributes,
+				getSelectedBlockClientId,
+				getBlockName,
+			} = select( blockEditorStore );
+			const _clientId = getSelectedBlockClientId();
+			return {
+				clientId: _clientId,
+				blockCommentId: _clientId
+					? getBlockAttributes( _clientId )?.metadata?.noteId
+					: null,
+				isClassicBlock: _clientId
+					? getBlockName( _clientId ) === 'core/freeform'
+					: false,
+			};
+		},
+		[]
+	);
 	const { isDistractionFree } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
@@ -119,6 +129,23 @@ function NotesSidebar( { postId } ) {
 			( unresolvedSortedThreads.length > 0 || selectedNote !== undefined )
 	);
 
+	useShortcut(
+		'core/editor/new-note',
+		( event ) => {
+			event.preventDefault();
+			openTheSidebar();
+		},
+		{
+			// When multiple notes per block are supported. Remove note ID check.
+			// See: https://github.com/WordPress/gutenberg/pull/75147.
+			isDisabled:
+				isDistractionFree ||
+				isClassicBlock ||
+				! clientId ||
+				!! blockCommentId,
+		}
+	);
+
 	// Get the global styles to set the background color of the sidebar.
 	const { merged: GlobalStyles } = useGlobalStylesContext();
 	const backgroundColor = GlobalStyles?.styles?.color?.background;
@@ -134,13 +161,11 @@ function NotesSidebar( { postId } ) {
 		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
 
 		if ( currentThread?.status === 'approved' ) {
-			enableComplementaryArea( 'core', collabHistorySidebarName );
+			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
 		} else if ( ! activeNotesArea || ! showAllNotesSidebar ) {
 			enableComplementaryArea(
 				'core',
-				showFloatingSidebar
-					? collabSidebarName
-					: collabHistorySidebarName
+				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
 			);
 		}
 
@@ -175,8 +200,8 @@ function NotesSidebar( { postId } ) {
 			<AddCommentMenuItem onClick={ openTheSidebar } />
 			{ showAllNotesSidebar && (
 				<PluginSidebar
-					identifier={ collabHistorySidebarName }
-					name={ collabHistorySidebarName }
+					identifier={ ALL_NOTES_SIDEBAR }
+					name={ ALL_NOTES_SIDEBAR }
 					title={ __( 'All notes' ) }
 					header={
 						<h2 className="interface-complementary-area-header__title">
@@ -196,7 +221,7 @@ function NotesSidebar( { postId } ) {
 				<PluginSidebar
 					isPinnable={ false }
 					header={ false }
-					identifier={ collabSidebarName }
+					identifier={ FLOATING_NOTES_SIDEBAR }
 					className="editor-collab-sidebar"
 					headerClassName="editor-collab-sidebar__header"
 					backgroundColor={ backgroundColor }

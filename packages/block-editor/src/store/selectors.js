@@ -3286,3 +3286,30 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 	);
 	return getEditedContentOnlySection( state );
 }
+
+/**
+ * Returns whether a List View panel is opened.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether the panel is opened.
+ */
+export function __unstableIsListViewPanelOpened( state, clientId ) {
+	// If allOpen flag is set, all panels are open
+	if ( state.openedListViewPanels?.allOpen ) {
+		return true;
+	}
+	return state.openedListViewPanels?.panels?.[ clientId ] === true;
+}
+
+/**
+ * Returns the List View expand revision number.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {number} The expand revision number.
+ */
+export function __unstableGetListViewExpandRevision( state ) {
+	return state.listViewExpandRevision || 0;
+}

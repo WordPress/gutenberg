@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 22.5.1 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Library
+- Fixed: Custom colors are now reflected in the editor for heading blocks. ([75234](https://github.com/WordPress/gutenberg/pull/75234))
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@shimotmk
+
+
 = 22.5.0 =
 
 ## Changelog

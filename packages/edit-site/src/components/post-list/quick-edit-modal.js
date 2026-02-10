@@ -8,7 +8,6 @@ import { DataForm } from '@wordpress/dataviews';
 import {
 	Button,
 	Modal,
-	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -233,10 +232,7 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 					hideActions
 				/>
 			</div>
-			<VStack
-				spacing={ 4 }
-				className="dataviews-action-modal__quick-edit-content"
-			>
+			<div className="dataviews-action-modal__quick-edit-content">
 				{ hasFinishedResolution && (
 					<DataForm
 						data={ { ...record, ...localEdits } }
@@ -245,23 +241,23 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 						onChange={ onChange }
 					/>
 				) }
-				<HStack className="dataviews-action-modal__quick-edit-footer">
-					<Button
-						__next40pxDefaultSize
-						variant="secondary"
-						onClick={ closeModal }
-					>
-						{ __( 'Cancel' ) }
-					</Button>
-					<Button
-						__next40pxDefaultSize
-						variant="primary"
-						onClick={ onSave }
-					>
-						{ __( 'Done' ) }
-					</Button>
-				</HStack>
-			</VStack>
+			</div>
+			<HStack className="dataviews-action-modal__quick-edit-footer">
+				<Button
+					__next40pxDefaultSize
+					variant="secondary"
+					onClick={ closeModal }
+				>
+					{ __( 'Cancel' ) }
+				</Button>
+				<Button
+					__next40pxDefaultSize
+					variant="primary"
+					onClick={ onSave }
+				>
+					{ __( 'Done' ) }
+				</Button>
+			</HStack>
 		</Modal>
 	);
 }
