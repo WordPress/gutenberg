@@ -307,5 +307,3 @@ export function __unstableUseRichText( props ) {
 	} );
 	return useRichText( props );
 }
-
-export default function __experimentalRichText() {}

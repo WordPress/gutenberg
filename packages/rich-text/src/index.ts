@@ -24,13 +24,12 @@ export { unregisterFormatType } from './unregister-format-type';
 export { createElement as __unstableCreateElement } from './create-element';
 
 export { privateApis } from './private-apis';
-export { useAnchorRef } from './component/use-anchor-ref';
-export { useAnchor } from './component/use-anchor';
+export { useAnchorRef } from './hook/use-anchor-ref';
+export { useAnchor } from './hook/use-anchor';
+export { __unstableUseRichText } from './hook';
 
-export {
-	default as __experimentalRichText,
-	__unstableUseRichText,
-} from './component';
+// Remnant that is left in an abundance of caution to ensure there's no errors.
+export function __experimentalRichText() {}
 
 /**
  * An object which represents a formatted string. See main `@wordpress/rich-text`
