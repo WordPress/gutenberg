@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import clsx from 'clsx';
-
-/**
  * WordPress dependencies
  */
 import { BaseControl, Icon, Tooltip } from '@wordpress/components';
@@ -38,14 +33,8 @@ export default function FormPanelField< Item >( {
 	const [ touched, setTouched ] = useState( false );
 	const handleClose = () => setTouched( true );
 
-	const labelPosition = layout.labelPosition;
 	const errorMessage = getFirstValidationError( validity );
 	const showError = touched && !! errorMessage;
-	const labelClassName = clsx(
-		'dataforms-layouts-panel__field-label',
-		`dataforms-layouts-panel__field-label--label-position-${ labelPosition }`,
-		{ 'has-error': showError }
-	);
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
 	const labelContent = showError ? (
@@ -71,7 +60,6 @@ export default function FormPanelField< Item >( {
 				onClose={ handleClose }
 				touched={ touched }
 				labelContent={ labelContent }
-				labelClassName={ labelClassName }
 			/>
 		);
 	}
@@ -85,7 +73,6 @@ export default function FormPanelField< Item >( {
 			onClose={ handleClose }
 			touched={ touched }
 			labelContent={ labelContent }
-			labelClassName={ labelClassName }
 		/>
 	);
 }
