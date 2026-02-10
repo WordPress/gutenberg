@@ -25,6 +25,7 @@ import type {
 	NormalizedFormField,
 	NormalizedField,
 	NormalizedPanelLayout,
+	FieldValidity,
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
@@ -32,6 +33,7 @@ import SummaryButton from './summary-button';
 import useFormValidity from '../../../hooks/use-form-validity';
 import useReportValidity from '../../../hooks/use-report-validity';
 import DataFormContext from '../../dataform-context';
+import getFirstValidationError from './utils/get-first-validation-error';
 
 function ModalContent< Item >( {
 	data,
@@ -165,6 +167,7 @@ function PanelModal< Item >( {
 	data,
 	field,
 	onChange,
+	validity,
 	summaryFields,
 	fieldDefinition,
 	onClose: onCloseCallback,
@@ -172,11 +175,11 @@ function PanelModal< Item >( {
 	labelContent,
 	labelClassName,
 	showError,
-	errorMessage,
 }: {
 	data: Item;
 	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
+	validity?: FieldValidity;
 	summaryFields: NormalizedField< Item >[];
 	fieldDefinition: NormalizedField< Item >;
 	onClose?: () => void;
@@ -184,10 +187,10 @@ function PanelModal< Item >( {
 	labelContent?: React.ReactNode;
 	labelClassName?: string;
 	showError?: boolean;
-	errorMessage?: string;
 } ) {
 	const layout = field.layout as NormalizedPanelLayout;
 	const labelPosition = layout.labelPosition;
+	const errorMessage = getFirstValidationError( validity );
 
 	const [ isOpen, setIsOpen ] = useState( false );
 

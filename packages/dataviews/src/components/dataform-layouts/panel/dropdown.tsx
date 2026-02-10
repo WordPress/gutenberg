@@ -28,6 +28,7 @@ import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useReportValidity from '../../../hooks/use-report-validity';
+import getFirstValidationError from './utils/get-first-validation-error';
 
 function DropdownHeader( {
 	title,
@@ -86,7 +87,6 @@ function PanelDropdown< Item >( {
 	labelContent,
 	labelClassName,
 	showError,
-	errorMessage,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -99,10 +99,10 @@ function PanelDropdown< Item >( {
 	labelContent?: React.ReactNode;
 	labelClassName?: string;
 	showError?: boolean;
-	errorMessage?: string;
 } ) {
 	const layout = field.layout as NormalizedPanelLayout;
 	const labelPosition = layout.labelPosition;
+	const errorMessage = getFirstValidationError( validity );
 
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 

@@ -15,7 +15,6 @@ import { error as errorIcon } from '@wordpress/icons';
  */
 import type {
 	FieldLayoutProps,
-	FieldValidity,
 	NormalizedField,
 	NormalizedFormField,
 	NormalizedPanelLayout,
@@ -24,50 +23,7 @@ import DataFormContext from '../../dataform-context';
 import PanelDropdown from './dropdown';
 import PanelModal from './modal';
 import { getSummaryFields } from '../get-summary-fields';
-
-function getFirstValidationError(
-	validity: FieldValidity | undefined
-): string | undefined {
-	if ( ! validity ) {
-		return undefined;
-	}
-
-	const validityRules = Object.keys( validity ).filter(
-		( key ) => key !== 'children'
-	);
-
-	for ( const key of validityRules ) {
-		const rule = validity[ key as keyof Omit< FieldValidity, 'children' > ];
-		if ( rule === undefined ) {
-			continue;
-		}
-
-		if ( rule.type === 'invalid' ) {
-			if ( rule.message ) {
-				return rule.message;
-			}
-
-			// Provide default message for required validation (message is optional)
-			if ( key === 'required' ) {
-				return 'A required field is empty';
-			}
-
-			return 'Unidentified validation error';
-		}
-	}
-
-	// Check children recursively
-	if ( validity.children ) {
-		for ( const childValidity of Object.values( validity.children ) ) {
-			const childError = getFirstValidationError( childValidity );
-			if ( childError ) {
-				return childError;
-			}
-		}
-	}
-
-	return undefined;
-}
+import getFirstValidationError from './utils/get-first-validation-error';
 
 const getFieldDefinition = < Item, >(
 	field: NormalizedFormField,
@@ -180,6 +136,7 @@ export default function FormPanelField< Item >( {
 				data={ data }
 				field={ field }
 				onChange={ onChange }
+				validity={ validity }
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
 				onClose={ handleClose }
@@ -187,7 +144,6 @@ export default function FormPanelField< Item >( {
 				labelContent={ labelContent }
 				labelClassName={ labelClassName }
 				showError={ showError }
-				errorMessage={ errorMessage }
 			/>
 		);
 	}
@@ -205,7 +161,6 @@ export default function FormPanelField< Item >( {
 			labelContent={ labelContent }
 			labelClassName={ labelClassName }
 			showError={ showError }
-			errorMessage={ errorMessage }
 		/>
 	);
 }
