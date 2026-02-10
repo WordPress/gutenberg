@@ -582,7 +582,7 @@ export function createSyncManager( debug = false ): SyncManager {
 	// Wrap and return the public API.
 	return {
 		createMeta: debugWrap( createEntityMeta ),
-		getAwareness: debugWrap( getAwareness ),
+		getAwareness,
 		load: debugWrap( loadEntity ),
 		loadCollection: debugWrap( loadCollection ),
 		// Use getter to ensure we always return the current value of `undoManager`.
