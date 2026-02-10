@@ -1,9 +1,13 @@
 <?php
 /**
- * Adds media-related experimental functionality.
+ * Adds media-related functionality for client-side media processing.
  *
  * @package gutenberg
  */
+
+if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
+	return;
+}
 
 /**
  * Returns a list of all available image sizes.
@@ -195,9 +199,9 @@ function gutenberg_rest_get_attachment_filesize( array $post ): ?int {
  * @return string Filtered rewrite rules.
  */
 function gutenberg_filter_mod_rewrite_rules( string $rules ): string {
-	$rules .= "\n# BEGIN Gutenberg client-side media processing experiment\n" .
+	$rules .= "\n# BEGIN Gutenberg client-side media processing\n" .
 				"AddType application/wasm wasm\n" .
-				"# END Gutenberg client-side media processing experiment\n";
+				"# END Gutenberg client-side media processing\n";
 
 	return $rules;
 }
