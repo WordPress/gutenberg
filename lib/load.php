@@ -210,3 +210,8 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-svg-icon-registry' ) ) {
 	require __DIR__ . '/experimental/class-wp-icons-registry.php';
 	require __DIR__ . '/experimental/class-wp-rest-icons-controller.php';
 }
+
+// Content Guidelines (only load when experiment is enabled).
+if ( gutenberg_is_experiment_enabled( 'gutenberg-content-guidelines' ) ) {
+	require __DIR__ . '/experimental/content-guidelines/index.php';
+}
