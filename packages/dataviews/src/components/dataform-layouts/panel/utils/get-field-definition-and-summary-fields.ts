@@ -41,29 +41,31 @@ const getFieldDefinition = < Item >(
  * 3. If the form field id doesn't exist, pick the first child field
  * 4. If no field definition is found, return empty summary fields
  *
- * @param layout - The normalized panel layout configuration
  * @param field  - The form field to get definition for
  * @param fields - Array of normalized field definitions
- * @return Object containing fieldDefinition and summaryFields
+ * @return Object containing fieldDefinition, fieldLabel, and summaryFields
  */
 const getFieldDefinitionAndSummaryFields = < Item >(
-	layout: NormalizedPanelLayout,
 	field: NormalizedFormField,
 	fields: NormalizedField< Item >[]
 ) => {
+	const layout = field.layout as NormalizedPanelLayout;
 	const summaryFields = getSummaryFields( layout.summary, fields );
 	const fieldDefinition = getFieldDefinition( field, fields );
+	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
 	if ( summaryFields.length === 0 ) {
 		return {
 			summaryFields: fieldDefinition ? [ fieldDefinition ] : [],
 			fieldDefinition,
+			fieldLabel,
 		};
 	}
 
 	return {
 		summaryFields,
 		fieldDefinition,
+		fieldLabel,
 	};
 };
 

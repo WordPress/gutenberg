@@ -19,7 +19,6 @@ import { Stack } from '@wordpress/ui';
 import type {
 	FieldLayoutProps,
 	NormalizedForm,
-	NormalizedPanelLayout,
 	FormValidity,
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
@@ -82,19 +81,27 @@ function PanelDropdown< Item >( {
 }: FieldLayoutProps< Item > ) {
 	const [ touched, setTouched ] = useState( false );
 
-	const { fields } = useContext( DataFormContext );
-	const layout = field.layout as NormalizedPanelLayout;
-
-	const { fieldDefinition, summaryFields } =
-		getFieldDefinitionAndSummaryFields( layout, field, fields );
-
-	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
-
 	// Use internal state instead of a ref to make sure that the component
 	// re-renders when the popover's anchor updates.
 	const [ popoverAnchor, setPopoverAnchor ] = useState< HTMLElement | null >(
 		null
 	);
+	// Memoize popoverProps to avoid returning a new object every time.
+	const popoverProps = useMemo(
+		() => ( {
+			// Anchor the popover to the middle of the entire row so that it doesn't
+			// move around when the label changes.
+			anchor: popoverAnchor,
+			placement: 'left-start',
+			offset: 36,
+			shift: true,
+		} ),
+		[ popoverAnchor ]
+	);
+
+	const { fields } = useContext( DataFormContext );
+	const { fieldDefinition, fieldLabel, summaryFields } =
+		getFieldDefinitionAndSummaryFields( field, fields );
 
 	const form: NormalizedForm = useMemo(
 		() => ( {
@@ -117,19 +124,6 @@ function PanelDropdown< Item >( {
 
 		return { [ field.id ]: validity };
 	}, [ validity, field ] );
-
-	// Memoize popoverProps to avoid returning a new object every time.
-	const popoverProps = useMemo(
-		() => ( {
-			// Anchor the popover to the middle of the entire row so that it doesn't
-			// move around when the label changes.
-			anchor: popoverAnchor,
-			placement: 'left-start',
-			offset: 36,
-			shift: true,
-		} ),
-		[ popoverAnchor ]
-	);
 
 	const [ dialogRef, dialogProps ] = useDialog( {
 		focusOnMount: 'firstInputElement',

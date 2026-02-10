@@ -23,7 +23,6 @@ import type {
 	Field,
 	NormalizedForm,
 	NormalizedFormField,
-	NormalizedPanelLayout,
 	FieldLayoutProps,
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
@@ -170,18 +169,15 @@ function PanelModal< Item >( {
 }: FieldLayoutProps< Item > ) {
 	const [ touched, setTouched ] = useState( false );
 
-	const { fields } = useContext( DataFormContext );
-	const layout = field.layout as NormalizedPanelLayout;
-	const { fieldDefinition, summaryFields } =
-		getFieldDefinitionAndSummaryFields( layout, field, fields );
-
 	const [ isOpen, setIsOpen ] = useState( false );
+
+	const { fields } = useContext( DataFormContext );
+	const { fieldDefinition, fieldLabel, summaryFields } =
+		getFieldDefinitionAndSummaryFields( field, fields );
 
 	if ( ! fieldDefinition ) {
 		return null;
 	}
-
-	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
 	const handleClose = () => {
 		setIsOpen( false );
