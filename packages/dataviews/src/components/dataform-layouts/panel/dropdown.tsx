@@ -186,11 +186,11 @@ function PanelDropdown< Item >( {
 				) }
 				renderContent={ ( { onClose } ) => (
 					<DropdownContentWithValidation touched={ touched }>
-						<DropdownHeader
-							title={ fieldLabel }
-							onClose={ onClose }
-						/>
 						<div ref={ dialogRef } { ...dialogProps }>
+							<DropdownHeader
+								title={ fieldLabel }
+								onClose={ onClose }
+							/>
 							<DataFormLayout
 								data={ data }
 								form={ form }
