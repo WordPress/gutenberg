@@ -300,7 +300,6 @@ export default function useBlockSync( {
 
 		// Restore selection from context if it targets our scope.
 		restoreSelection();
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ controlledBlocks, clientId ] );
 
 	useEffect( () => {

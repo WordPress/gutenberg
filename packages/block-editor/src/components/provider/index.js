@@ -182,9 +182,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 					{ ! settings?.isPreviewMode && (
 						<KeyboardShortcuts.Register />
 					) }
-					<BlockRefsProvider>
-						{ props.children }
-					</BlockRefsProvider>
+					<BlockRefsProvider>{ props.children }</BlockRefsProvider>
 				</SlotFillProvider>
 			</SelectionContext.Provider>
 		);
