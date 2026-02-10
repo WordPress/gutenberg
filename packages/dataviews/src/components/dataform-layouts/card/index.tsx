@@ -33,62 +33,8 @@ import type {
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import { getSummaryFields } from '../get-summary-fields';
-import { useReportValidity } from '../../../hooks';
+import useReportValidity from '../../../hooks/use-report-validity';
 import ValidationBadge from '../validation-badge';
-
-function CardHeader( {
-	label,
-	isOpen,
-	isCollapsible,
-	onToggle,
-	children,
-	className,
-}: {
-	label?: string;
-	isOpen: boolean;
-	isCollapsible: boolean;
-	onToggle: () => void;
-	children?: React.ReactNode;
-	className?: string;
-} ) {
-	return (
-		<OriginalCardHeader
-			className={ className }
-			isBorderless
-			onClick={ isCollapsible ? onToggle : undefined }
-			style={ isCollapsible ? { cursor: 'pointer' } : undefined }
-		>
-			<div
-				style={ {
-					height: '40px',
-					width: '100%',
-					display: 'flex',
-					justifyContent: 'space-between',
-					alignItems: 'center',
-				} }
-			>
-				{ label && (
-					<span className="dataforms-layouts-card__field-header-label">
-						{ label }
-					</span>
-				) }
-				{ children }
-
-				{ isCollapsible && (
-					<Button
-						__next40pxDefaultSize
-						variant="tertiary"
-						icon={ isOpen ? chevronUp : chevronDown }
-						aria-expanded={ isOpen }
-						aria-label={
-							isOpen ? __( 'Collapse' ) : __( 'Expand' )
-						}
-					/>
-				) }
-			</div>
-		</OriginalCardHeader>
-	);
-}
 
 function isSummaryFieldVisible< Item >(
 	summaryField: NormalizedField< Item >,
@@ -149,7 +95,6 @@ export default function FormCardField< Item >( {
 	const [ isOpen, setIsOpen ] = useState(
 		layout.isCollapsible ? layout.isOpened : true
 	);
-
 	const [ touched, setTouched ] = useState( false );
 
 	useEffect( () => {
@@ -161,13 +106,19 @@ export default function FormCardField< Item >( {
 	}, [ layout.isOpened, layout.isCollapsible ] );
 
 	const toggle = useCallback( () => {
-		setIsOpen( ( prev ) => {
-			if ( prev ) {
-				setTouched( true );
-			}
-			return ! prev;
-		} );
-	}, [] );
+		if ( isOpen ) {
+			setTouched( true );
+		}
+		setIsOpen( ( prev ) => ! prev );
+	}, [ isOpen ] );
+
+	const onToggleButtonClick = useCallback(
+		( event: React.MouseEvent< HTMLButtonElement > ) => {
+			event.stopPropagation();
+			toggle();
+		},
+		[ toggle ]
+	);
 
 	const form: NormalizedForm = useMemo(
 		() => ( {
@@ -184,7 +135,6 @@ export default function FormCardField< Item >( {
 	useReportValidity( cardBodyRef, isOpen && touched );
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
-
 	const visibleSummaryFields = summaryFields.filter( ( summaryField ) =>
 		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
 	);
@@ -216,29 +166,61 @@ export default function FormCardField< Item >( {
 		return (
 			<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 				{ withHeader && (
-					<CardHeader
+					<OriginalCardHeader
 						className="dataforms-layouts-card__field-header"
-						label={ field.label }
-						isOpen={ isOpen }
-						isCollapsible={ !! layout.isCollapsible }
-						onToggle={ toggle }
+						isBorderless
+						onClick={ layout.isCollapsible ? toggle : undefined }
+						style={
+							layout.isCollapsible
+								? { cursor: 'pointer' }
+								: undefined
+						}
 					>
-						{ validationBadge }
+						<div
+							style={ {
+								height: '40px', // Match the expand/collapse button height to prevent UI jumps when the button is not displayed.
+								width: '100%',
+								display: 'flex',
+								justifyContent: 'space-between',
+								alignItems: 'center',
+							} }
+						>
+							<span className="dataforms-layouts-card__field-header-label">
+								{ field.label }
+							</span>
 
-						{ visibleSummaryFields.length > 0 && (
-							<div className="dataforms-layouts-card__field-summary">
-								{ visibleSummaryFields.map(
-									( summaryField ) => (
-										<summaryField.render
-											key={ summaryField.id }
-											item={ data }
-											field={ summaryField }
-										/>
-									)
-								) }
-							</div>
-						) }
-					</CardHeader>
+							{ validationBadge }
+
+							{ visibleSummaryFields.length > 0 && (
+								<div className="dataforms-layouts-card__field-summary">
+									{ visibleSummaryFields.map(
+										( summaryField ) => (
+											<summaryField.render
+												key={ summaryField.id }
+												item={ data }
+												field={ summaryField }
+											/>
+										)
+									) }
+								</div>
+							) }
+
+							{ layout.isCollapsible && (
+								<Button
+									__next40pxDefaultSize
+									variant="tertiary"
+									icon={ isOpen ? chevronUp : chevronDown }
+									aria-expanded={ isOpen }
+									aria-label={
+										isOpen
+											? __( 'Collapse' )
+											: __( 'Expand' )
+									}
+									onClick={ onToggleButtonClick }
+								/>
+							) }
+						</div>
+					</OriginalCardHeader>
 				) }
 
 				{ ( isOpen || ! withHeader ) && (
@@ -290,27 +272,57 @@ export default function FormCardField< Item >( {
 	return (
 		<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 			{ withHeader && (
-				<CardHeader
+				<OriginalCardHeader
 					className="dataforms-layouts-card__field-header"
-					label={ fieldDefinition.label }
-					isOpen={ isOpen }
-					isCollapsible={ !! layout.isCollapsible }
-					onToggle={ toggle }
+					isBorderless
+					onClick={ layout.isCollapsible ? toggle : undefined }
+					style={
+						layout.isCollapsible ? { cursor: 'pointer' } : undefined
+					}
 				>
-					{ validationBadge }
+					<div
+						style={ {
+							height: '40px', // Match the expand/collapse button height to prevent UI jumps when the button is not displayed.
+							width: '100%',
+							display: 'flex',
+							justifyContent: 'space-between',
+							alignItems: 'center',
+						} }
+					>
+						<span className="dataforms-layouts-card__field-header-label">
+							{ fieldDefinition.label }
+						</span>
 
-					{ visibleSummaryFields.length > 0 && (
-						<div className="dataforms-layouts-card__field-summary">
-							{ visibleSummaryFields.map( ( summaryField ) => (
-								<summaryField.render
-									key={ summaryField.id }
-									item={ data }
-									field={ summaryField }
-								/>
-							) ) }
-						</div>
-					) }
-				</CardHeader>
+						{ validationBadge }
+
+						{ visibleSummaryFields.length > 0 && (
+							<div className="dataforms-layouts-card__field-summary">
+								{ visibleSummaryFields.map(
+									( summaryField ) => (
+										<summaryField.render
+											key={ summaryField.id }
+											item={ data }
+											field={ summaryField }
+										/>
+									)
+								) }
+							</div>
+						) }
+
+						{ layout.isCollapsible && (
+							<Button
+								__next40pxDefaultSize
+								variant="tertiary"
+								icon={ isOpen ? chevronUp : chevronDown }
+								aria-expanded={ isOpen }
+								aria-label={
+									isOpen ? __( 'Collapse' ) : __( 'Expand' )
+								}
+								onClick={ onToggleButtonClick }
+							/>
+						) }
+					</div>
+				</OriginalCardHeader>
 			) }
 
 			{ ( isOpen || ! withHeader ) && (
