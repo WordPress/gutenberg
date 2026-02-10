@@ -118,8 +118,12 @@ const getTransformCommands = () =>
 		const commands = possibleBlockTransformations.map(
 			( transformation ) => {
 				const { name, title, icon } = transformation;
+				/*
+				 * Command menu uses Icon from @wordpress/icons, which expects a ReactElement
+				 * (cloneElement). Normalize to blockDefaultIcon to avoid crash. See #55668 / PR #55676.
+				 */
 				const blockIcon =
-					icon?.src === 'block-default'
+					! icon?.src || icon?.src === 'block-default'
 						? {
 								src: blockDefaultIcon,
 						  }
