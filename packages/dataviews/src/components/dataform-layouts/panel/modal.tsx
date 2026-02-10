@@ -24,6 +24,7 @@ import type {
 	NormalizedForm,
 	NormalizedFormField,
 	NormalizedField,
+	NormalizedPanelLayout,
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
@@ -164,7 +165,6 @@ function PanelModal< Item >( {
 	data,
 	field,
 	onChange,
-	labelPosition,
 	summaryFields,
 	fieldDefinition,
 	onClose: onCloseCallback,
@@ -177,7 +177,6 @@ function PanelModal< Item >( {
 	data: Item;
 	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
-	labelPosition: 'side' | 'top' | 'none';
 	summaryFields: NormalizedField< Item >[];
 	fieldDefinition: NormalizedField< Item >;
 	onClose?: () => void;
@@ -187,6 +186,9 @@ function PanelModal< Item >( {
 	showError?: boolean;
 	errorMessage?: string;
 } ) {
+	const layout = field.layout as NormalizedPanelLayout;
+	const labelPosition = layout.labelPosition;
+
 	const [ isOpen, setIsOpen ] = useState( false );
 
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;

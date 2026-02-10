@@ -180,7 +180,6 @@ export default function FormPanelField< Item >( {
 				data={ data }
 				field={ field }
 				onChange={ onChange }
-				labelPosition={ labelPosition }
 				summaryFields={ summaryFields }
 				fieldDefinition={ fieldDefinition }
 				onClose={ handleClose }
@@ -199,7 +198,6 @@ export default function FormPanelField< Item >( {
 			field={ field }
 			onChange={ onChange }
 			validity={ validity }
-			labelPosition={ labelPosition }
 			summaryFields={ summaryFields }
 			fieldDefinition={ fieldDefinition }
 			onClose={ handleClose }

@@ -10,12 +10,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useMemo, useRef, useState } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import {
-	// useFocusOnMount,
-	// useFocusReturn,
-	// useMergeRefs,
-	__experimentalUseDialog as useDialog,
-} from '@wordpress/compose';
+import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -27,6 +22,7 @@ import type {
 	NormalizedFormField,
 	FormValidity,
 	NormalizedField,
+	NormalizedPanelLayout,
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
@@ -83,7 +79,6 @@ function PanelDropdown< Item >( {
 	field,
 	onChange,
 	validity,
-	labelPosition = 'side',
 	summaryFields,
 	fieldDefinition,
 	onClose: onCloseCallback,
@@ -97,7 +92,6 @@ function PanelDropdown< Item >( {
 	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
 	validity?: FieldValidity;
-	labelPosition: 'side' | 'top' | 'none';
 	summaryFields: NormalizedField< Item >[];
 	fieldDefinition: NormalizedField< Item >;
 	onClose?: () => void;
@@ -107,6 +101,9 @@ function PanelDropdown< Item >( {
 	showError?: boolean;
 	errorMessage?: string;
 } ) {
+	const layout = field.layout as NormalizedPanelLayout;
+	const labelPosition = layout.labelPosition;
+
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
 	// Use internal state instead of a ref to make sure that the component
