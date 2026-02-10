@@ -123,7 +123,7 @@ const getTransformCommands = () =>
 						'core/block-editor/transform-to-' +
 						name.replace( '/', '-' ),
 					/* translators: %s: Block or block variation name. */
-					label: sprintf( __( 'Transform to %s block' ), title ),
+					label: sprintf( __( 'Transform to %s' ), title ),
 					icon: icon?.src ?? blockDefaultIcon,
 					callback: ( { close } ) => {
 						onBlockTransform( name );
