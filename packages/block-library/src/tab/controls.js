@@ -40,7 +40,7 @@ export default function Controls( { tabsClientId, blockIndex, isDefaultTab } ) {
 				>
 					<ToolsPanelItem
 						label={ __( 'Default tab' ) }
-						hasValue={ () => isDefaultTab }
+						hasValue={ () => isDefaultTab && blockIndex !== 0 }
 						onDeselect={ () => {
 							updateBlockAttributes( tabsClientId, {
 								activeTabIndex: 0,
