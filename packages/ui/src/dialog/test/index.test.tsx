@@ -52,7 +52,7 @@ describe( 'Dialog', () => {
 						<Dialog.Title ref={ titleRef }>
 							Test Dialog
 						</Dialog.Title>
-						<Dialog.CloseIcon ref={ closeIconRef } />
+						<Dialog.CloseIconButton ref={ closeIconRef } />
 					</Dialog.Header>
 					<Dialog.Footer ref={ footerRef }>
 						<Dialog.Action ref={ actionRef }>Close</Dialog.Action>
