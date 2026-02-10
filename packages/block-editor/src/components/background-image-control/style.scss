@@ -126,14 +126,6 @@
 	text-align: start;
 }
 
-.block-editor-global-styles-background-panel__inspector-preview-inner {
-	.block-editor-global-styles-background-panel__inspector-image-indicator-wrapper {
-		width: 20px;
-		height: 20px;
-		min-width: auto;
-	}
-}
-
 .block-editor-global-styles-background-panel__inspector-image-indicator {
 	width: 20px;
 	height: 20px;
@@ -143,17 +135,6 @@
 	background-size: cover;
 	// Show a thin outline in Windows high contrast mode, otherwise the button is invisible.
 	outline: 1px solid transparent;
-}
-
-.block-editor-global-styles-background-panel__inspector-image-indicator::after {
-	content: "";
-	position: absolute;
-	top: -1px;
-	left: -1px;
-	bottom: -1px;
-	right: -1px;
-	border-radius: $radius-small;
-	box-sizing: inherit;
 }
 
 .block-editor-global-styles-background-panel__dropdown-content-wrapper {
