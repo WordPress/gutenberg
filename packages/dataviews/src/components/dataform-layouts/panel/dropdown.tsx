@@ -10,7 +10,11 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useMemo, useRef, useState } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
-import { useFocusOnMount } from '@wordpress/compose';
+import {
+	useFocusOnMount,
+	useFocusReturn,
+	useMergeRefs,
+} from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
 
 /**
@@ -146,6 +150,8 @@ function PanelDropdown< Item >( {
 	);
 
 	const focusOnMountRef = useFocusOnMount( 'firstInputElement' );
+	const focusReturnRef = useFocusReturn();
+	const mergedRef = useMergeRefs( [ focusOnMountRef, focusReturnRef ] );
 
 	return (
 		<div
@@ -183,7 +189,7 @@ function PanelDropdown< Item >( {
 							title={ fieldLabel }
 							onClose={ onClose }
 						/>
-						<div ref={ focusOnMountRef }>
+						<div ref={ mergedRef }>
 							<DataFormLayout
 								data={ data }
 								form={ form }
