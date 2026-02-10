@@ -149,14 +149,19 @@ export function createWaveformContainer( {
 }
 
 /**
- * Apply background color to SVG icon paths for contrast.
+ * Apply contrasting color to SVG icon paths for visibility.
+ * The icons should contrast with the button background (which uses textColor).
  *
- * @param {Element} container - The waveform container element.
- * @param {string}  bgColor   - The background color to apply.
+ * @param {Element} container   - The waveform container element.
+ * @param {string}  buttonColor - The button background color (textColor).
  */
-export function styleSvgIcons( container, bgColor ) {
+export function styleSvgIcons( container, buttonColor ) {
+	// Compute a contrasting color for the icons based on button brightness.
+	const isButtonDark = colord( buttonColor ).isDark();
+	const iconColor = isButtonDark ? '#ffffff' : '#000000';
+
 	const svgPaths = container.querySelectorAll( 'svg path' );
 	svgPaths.forEach( ( path ) => {
-		path.style.fill = bgColor;
+		path.style.fill = iconColor;
 	} );
 }

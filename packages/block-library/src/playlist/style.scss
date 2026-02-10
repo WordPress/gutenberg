@@ -1,4 +1,4 @@
-@use "@arraypress/waveform-player/dist/waveform-player";
+@use '@arraypress/waveform-player/dist/waveform-player';
 
 // Waveform player dimensions.
 $waveform-player-height: 100px;
@@ -7,7 +7,7 @@ $waveform-player-height: 100px;
 	// Main waveform player container.
 	.wp-block-playlist__waveform-player {
 		width: 100%;
-		margin: var(--wp--preset--spacing--20, 0.625em) 0;
+		margin: var( --wp--preset--spacing--20, 0.625em ) 0;
 		position: relative;
 
 		&:focus-visible {
@@ -34,7 +34,7 @@ $waveform-player-height: 100px;
 		background: currentColor;
 		margin: 0;
 
-		&:hover:not(:disabled) {
+		&:hover:not( :disabled ) {
 			transform: none;
 		}
 
@@ -54,13 +54,13 @@ $waveform-player-height: 100px;
 
 	.waveform-player.has-play-button-artwork {
 		.waveform-btn {
-			background-image: var(--wp--playlist--play-button-artwork);
+			background-image: var( --wp--playlist--play-button-artwork );
 			background-position: center;
 			background-size: cover;
 			color: #fff;
 
 			svg {
-				filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+				filter: drop-shadow( 0 1px 2px rgba( 0, 0, 0, 0.45 ) );
 			}
 
 			svg path {
@@ -80,12 +80,20 @@ $waveform-player-height: 100px;
 		outline-offset: revert;
 	}
 
-	.waveform-artist {
+	.waveform-artist,
+	.waveform-subtitle {
 		opacity: 0.7;
+	}
+
+	// Override WaveformPlayer's inline text colors to inherit from the block.
+	.waveform-title,
+	.waveform-subtitle {
+		color: currentColor !important;
 	}
 
 	.waveform-info,
 	.waveform-artist,
+	.waveform-subtitle,
 	.waveform-title,
 	.waveform-time {
 		font-size: inherit;
