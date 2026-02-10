@@ -18,6 +18,7 @@ import {
 	ungroup,
 	seen,
 	unseen,
+	blockDefault as blockDefaultIcon,
 } from '@wordpress/icons';
 
 /**
@@ -123,7 +124,7 @@ const getTransformCommands = () =>
 						name.replace( '/', '-' ),
 					/* translators: %s: Block or block variation name. */
 					label: sprintf( __( 'Transform to %s block' ), title ),
-					icon: icon.src,
+					icon: icon?.src ?? blockDefaultIcon,
 					callback: ( { close } ) => {
 						onBlockTransform( name );
 						close();
