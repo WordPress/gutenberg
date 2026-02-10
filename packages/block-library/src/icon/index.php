@@ -27,8 +27,8 @@ function render_block_core_icon( $attributes ) {
 	if ( is_null( $icon ) ) {
 		return;
 	}
-	// Is there a label set.
-	$aria_label = ! empty( $attributes['ariaLabel'] ) ? $attributes['ariaLabel'] : false;
+
+	$aria_label = ! empty( $attributes['ariaLabel'] ) ? $attributes['ariaLabel'] : '';
 
 	// Process the markup.
 	$processor = new WP_HTML_Tag_Processor( $icon['content'] );
