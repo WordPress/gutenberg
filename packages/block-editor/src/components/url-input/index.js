@@ -494,17 +494,17 @@ class URLInput extends Component {
 			return renderControl( controlProps, inputProps, loading );
 		}
 
+		const MaybeValidatedInputControl = useCustomValidation
+			? ValidatedInputControl
+			: InputControl;
+
 		return (
 			<BaseControl { ...controlProps }>
-				{ useCustomValidation ? (
-					<ValidatedInputControl
-						{ ...inputProps }
-						{ ...validationProps }
-						__next40pxDefaultSize
-					/>
-				) : (
-					<InputControl { ...inputProps } __next40pxDefaultSize />
-				) }
+				<MaybeValidatedInputControl
+					{ ...inputProps }
+					{ ...( useCustomValidation ? validationProps : {} ) }
+					__next40pxDefaultSize
+				/>
 				{ loading && <Spinner /> }
 			</BaseControl>
 		);
