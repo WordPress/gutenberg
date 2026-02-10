@@ -31,7 +31,7 @@ import SummaryButton from './summary-button';
 import useFormValidity from '../../../hooks/use-form-validity';
 import useReportValidity from '../../../hooks/use-report-validity';
 import DataFormContext from '../../dataform-context';
-import getFieldDefinitionAndSummaryFields from './utils/get-field-definition-and-summary-fields';
+import useFieldFromFormField from './utils/use-field-from-form-field';
 
 function ModalContent< Item >( {
 	data,
@@ -171,10 +171,8 @@ function PanelModal< Item >( {
 
 	const [ isOpen, setIsOpen ] = useState( false );
 
-	const { fields } = useContext( DataFormContext );
 	const { fieldDefinition, fieldLabel, summaryFields } =
-		getFieldDefinitionAndSummaryFields( field, fields );
-
+		useFieldFromFormField( field );
 	if ( ! fieldDefinition ) {
 		return null;
 	}
@@ -189,10 +187,10 @@ function PanelModal< Item >( {
 			<SummaryButton
 				data={ data }
 				field={ field }
+				fieldLabel={ fieldLabel }
+				summaryFields={ summaryFields }
 				validity={ validity }
 				touched={ touched }
-				summaryFields={ summaryFields }
-				fieldLabel={ fieldLabel }
 				disabled={ fieldDefinition.readOnly === true }
 				onClick={ () => setIsOpen( true ) }
 				aria-expanded={ isOpen }

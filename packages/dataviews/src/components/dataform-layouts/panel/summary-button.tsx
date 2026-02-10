@@ -27,20 +27,20 @@ import getFirstValidationError from './utils/get-first-validation-error';
 export default function SummaryButton< Item >( {
 	data,
 	field,
+	fieldLabel,
+	summaryFields,
 	validity,
 	touched,
-	summaryFields,
-	fieldLabel,
 	disabled,
 	onClick,
 	'aria-expanded': ariaExpanded,
 }: {
 	data: Item;
 	field: NormalizedFormField;
+	fieldLabel?: string;
+	summaryFields: NormalizedField< Item >[];
 	validity?: FieldValidity;
 	touched: boolean;
-	summaryFields: NormalizedField< Item >[];
-	fieldLabel?: string;
 	disabled?: boolean;
 	onClick: () => void;
 	'aria-expanded'?: boolean;

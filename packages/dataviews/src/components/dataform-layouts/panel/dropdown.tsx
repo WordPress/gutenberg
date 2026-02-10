@@ -8,7 +8,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useContext, useMemo, useRef, useState } from '@wordpress/element';
+import { useMemo, useRef, useState } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
@@ -25,8 +25,7 @@ import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useReportValidity from '../../../hooks/use-report-validity';
-import getFieldDefinitionAndSummaryFields from './utils/get-field-definition-and-summary-fields';
-import DataFormContext from '../../dataform-context';
+import useFieldFromFormField from './utils/use-field-from-form-field';
 
 function DropdownHeader( {
 	title,
@@ -98,10 +97,9 @@ function PanelDropdown< Item >( {
 		} ),
 		[ popoverAnchor ]
 	);
-
-	const { fields } = useContext( DataFormContext );
-	const { fieldDefinition, fieldLabel, summaryFields } =
-		getFieldDefinitionAndSummaryFields( field, fields );
+	const [ dialogRef, dialogProps ] = useDialog( {
+		focusOnMount: 'firstInputElement',
+	} );
 
 	const form: NormalizedForm = useMemo(
 		() => ( {
@@ -125,10 +123,8 @@ function PanelDropdown< Item >( {
 		return { [ field.id ]: validity };
 	}, [ validity, field ] );
 
-	const [ dialogRef, dialogProps ] = useDialog( {
-		focusOnMount: 'firstInputElement',
-	} );
-
+	const { fieldDefinition, fieldLabel, summaryFields } =
+		useFieldFromFormField( field );
 	if ( ! fieldDefinition ) {
 		return null;
 	}
@@ -151,10 +147,10 @@ function PanelDropdown< Item >( {
 					<SummaryButton
 						data={ data }
 						field={ field }
+						fieldLabel={ fieldLabel }
+						summaryFields={ summaryFields }
 						validity={ validity }
 						touched={ touched }
-						summaryFields={ summaryFields }
-						fieldLabel={ fieldLabel }
 						disabled={ fieldDefinition.readOnly === true }
 						onClick={ onToggle }
 						aria-expanded={ isOpen }
