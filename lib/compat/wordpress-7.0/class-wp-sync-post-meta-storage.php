@@ -5,15 +5,15 @@
  * @package Gutenberg
  */
 
-/**
- * Class that implements an interface for storing and retrieving sync
- * updates and awareness data during a collaborative session.
- *
- * Data is stored as post meta on a singleton post of a custom post type.
- *
- * @access private
- * @internal
- */
+if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) [ /**
+	 * Class that implements an interface for storing and retrieving sync
+	 * updates and awareness data during a collaborative session.
+	 *
+	 * Data is stored as post meta on a singleton post of a custom post type.
+	 *
+	 * @access private
+	 * @internal
+	 */
 class WP_Sync_Post_Meta_Storage implements WP_Sync_Storage {
 	/**
 	 * Post type for sync storage
@@ -180,4 +180,4 @@ class WP_Sync_Post_Meta_Storage implements WP_Sync_Storage {
 
 		update_post_meta( $post_id, $meta_key, $awareness );
 	}
-}
+} ]

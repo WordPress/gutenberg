@@ -129,4 +129,3 @@ function gutenberg_override_autosaves_rest_controller( $args ) {
 }
 
 add_filter( 'register_post_type_args', 'gutenberg_override_autosaves_rest_controller', 10, 1 );
-
