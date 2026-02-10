@@ -2102,6 +2102,76 @@ export function insertionPoint( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the opened List View panels state.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+function openedListViewPanels(
+	state = { allOpen: false, panels: {} },
+	action
+) {
+	switch ( action.type ) {
+		case 'SET_OPEN_LIST_VIEW_PANEL':
+			// Open only the specified panel, close all others
+			return {
+				allOpen: false,
+				panels: action.clientId ? { [ action.clientId ]: true } : {},
+			};
+		case 'SET_ALL_LIST_VIEW_PANELS_OPEN':
+			// Set flag to open all panels
+			return { allOpen: true, panels: {} };
+		case 'TOGGLE_LIST_VIEW_PANEL':
+			// If we're in "all open" mode, exit it when user manually toggles
+			return {
+				allOpen: false,
+				panels: {
+					...state.panels,
+					[ action.clientId ]: action.isOpen,
+				},
+			};
+		case 'REPLACE_BLOCKS':
+		case 'REMOVE_BLOCKS': {
+			// Clean up stale entries when blocks are removed or replaced
+			if ( ! action.clientIds || action.clientIds.length === 0 ) {
+				return state;
+			}
+			const newPanels = { ...state.panels };
+			let hasChanges = false;
+			action.clientIds.forEach( ( clientId ) => {
+				if ( clientId in newPanels ) {
+					delete newPanels[ clientId ];
+					hasChanges = true;
+				}
+			} );
+			return hasChanges ? { ...state, panels: newPanels } : state;
+		}
+		case 'RESET_BLOCKS':
+			// Clear all panel state when blocks are reset
+			return { allOpen: false, panels: {} };
+	}
+	return state;
+}
+
+/**
+ * Reducer returning the List View expand revision.
+ *
+ * @param {number} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {number} Updated state.
+ */
+function listViewExpandRevision( state = 0, action ) {
+	switch ( action.type ) {
+		case 'INCREMENT_LIST_VIEW_EXPAND_REVISION':
+			return state + 1;
+	}
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2133,6 +2203,8 @@ const combinedReducers = combineReducers( {
 	registeredInserterMediaCategories,
 	zoomLevel,
 	hasBlockSpotlight,
+	openedListViewPanels,
+	listViewExpandRevision,
 } );
 
 /**

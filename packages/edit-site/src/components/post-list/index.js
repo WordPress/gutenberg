@@ -12,7 +12,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect } from '@wordpress/data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
 import { useEvent, usePrevious } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
 import { useView } from '@wordpress/views';
@@ -281,17 +280,6 @@ export default function PostList( { postType } ) {
 			title={ labels?.name }
 			actions={
 				<>
-					{ isModified && (
-						<Button
-							__next40pxDefaultSize
-							onClick={ () => {
-								resetToDefault();
-								history.invalidate();
-							} }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
 					{ labels?.add_new_item && canCreateRecord && (
 						<>
 							<Button
@@ -331,14 +319,25 @@ export default function PostList( { postType } ) {
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
 				defaultLayouts={ defaultLayouts }
+				onReset={
+					isModified
+						? () => {
+								resetToDefault();
+								history.invalidate();
+						  }
+						: false
+				}
 			/>
-			{ quickEdit && ! isLoadingData && selection.length > 0 && (
-				<QuickEditModal
-					postType={ postType }
-					postId={ selection }
-					closeModal={ closeQuickEditModal }
-				/>
-			) }
+			{ quickEdit &&
+				! isLoadingData &&
+				selection.length > 0 &&
+				view.type !== LAYOUT_LIST && (
+					<QuickEditModal
+						postType={ postType }
+						postId={ selection }
+						closeModal={ closeQuickEditModal }
+					/>
+				) }
 		</Page>
 	);
 }

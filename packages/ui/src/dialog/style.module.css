@@ -1,0 +1,114 @@
+@layer wp-ui-utilities, wp-ui-components, wp-ui-compositions, wp-ui-overrides;
+
+@layer wp-ui-components {
+	.backdrop {
+		position: fixed;
+		inset: 0;
+		background-color: rgba(0, 0, 0, 0.35);
+
+		&[data-starting-style],
+		&[data-ending-style] {
+			opacity: 0;
+		}
+
+		&[data-open] {
+			opacity: 1;
+		}
+
+		@media not (prefers-reduced-motion) {
+			transition: opacity 0.2s ease-out;
+		}
+	}
+
+	.popup {
+		position: fixed;
+		top: 50%;
+		/* stylelint-disable-next-line plugin/use-logical-properties-and-values -- Physical centering technique used with transform: translate(-50%, -50%) */
+		left: 50%;
+		transform: translate(-50%, -50%);
+		box-sizing: border-box;
+		min-width: 320px;
+		width: calc(100vw - 2 * var(--wpds-dimension-padding-2xl));
+		max-height: calc(100vh - 2 * var(--wpds-dimension-padding-2xl));
+		padding: var(--wpds-dimension-padding-2xl);
+		background-color: var(--wpds-color-bg-surface-neutral-strong);
+		border-radius: var(--wpds-border-radius-lg);
+		box-shadow: var(--wpds-elevation-lg);
+		overflow: auto;
+		font-family: var(--wpds-font-family-body);
+		font-size: var(--wpds-font-size-md);
+		line-height: var(--wpds-font-line-height-md);
+		color: var(--wpds-color-fg-content-neutral);
+
+		&[data-starting-style],
+		&[data-ending-style] {
+			opacity: 0;
+			transform: translate(-50%, -50%) scale(0.9);
+		}
+
+		@media not (prefers-reduced-motion) {
+			transition:
+				opacity 0.2s cubic-bezier(1, 0, 0.2, 1),
+				transform 0.2s cubic-bezier(1, 0, 0.2, 1);
+
+			&[data-open] {
+				transition:
+					opacity 0.2s cubic-bezier(0.29, 0, 0, 1),
+					transform 0.2s cubic-bezier(0.29, 0, 0, 1);
+			}
+		}
+
+		@media (min-width: 480px) {
+			min-width: 384px;
+		}
+
+		&.is-small {
+			max-width: 384px;
+		}
+
+		&.is-medium {
+			max-width: 512px;
+		}
+
+		&.is-large {
+			max-width: 840px;
+		}
+
+		&.is-stretch {
+			/* The dialog stretches to fill available width. */
+			max-width: none;
+		}
+
+		&.is-full {
+			/*
+			 * Force full height (full width is already in default styles).
+			 * The max-{width,height} properties will make sure some padding is shown.
+			 */
+			height: 100vh;
+		}
+	}
+
+	.header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: var(--wpds-dimension-gap-lg);
+	}
+
+	.title {
+		margin: 0;
+		font-size: var(--wpds-font-size-xl);
+		font-weight: var(--wpds-font-weight-medium);
+		line-height: var(--wpds-font-line-height-xl);
+		color: var(--wpds-color-fg-content-neutral);
+	}
+
+	.footer {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		gap: var(--wpds-dimension-gap-sm);
+		margin-top: var(--wpds-dimension-gap-lg);
+		padding-top: var(--wpds-dimension-padding-lg);
+	}
+}

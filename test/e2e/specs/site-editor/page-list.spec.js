@@ -307,6 +307,7 @@ test.describe( 'Page List', () => {
 				firstName: 'Test',
 				lastName: 'Author',
 				password: '1',
+				roles: [ 'author' ],
 			} );
 		} );
 

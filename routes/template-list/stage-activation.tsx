@@ -13,7 +13,6 @@ import { Page } from '@wordpress/admin-ui';
 import type { View, Action } from '@wordpress/dataviews';
 import { store as coreStore } from '@wordpress/core-data';
 import {
-	Button,
 	Modal,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -302,20 +301,7 @@ function TemplateListActivation() {
 		<Page
 			title={ __( 'Templates' ) }
 			className="template-page"
-			actions={
-				<>
-					{ isModified && (
-						<Button
-							variant="tertiary"
-							size="compact"
-							onClick={ onReset }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					<AddNewTemplate />
-				</>
-			}
+			actions={ <AddNewTemplate /> }
 			hasPadding={ false }
 		>
 			{ tabs.length > 1 && (
@@ -345,6 +331,7 @@ function TemplateListActivation() {
 				defaultLayouts={ DEFAULT_LAYOUTS }
 				getItemId={ getItemId }
 				selection={ selection }
+				onReset={ isModified ? onReset : false }
 				onChangeSelection={ ( items: string[] ) => {
 					navigate( {
 						search: {

@@ -21,8 +21,8 @@ import TemplateValidationNotice from '../template-validation-notice';
  */
 export function EditorNotices() {
 	deprecated( 'wp.editor.EditorNotices', {
-		since: '6.7',
-		version: '6.9',
+		since: '7.0',
+		version: '7.2',
 		alternative: 'wp.notices.InlineNotices',
 	} );
 
