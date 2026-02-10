@@ -4,7 +4,8 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { safeDecodeURI } from '@wordpress/url';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
@@ -130,9 +131,8 @@ function computeBadges( {
  *
  * @param {Object}  options                   - Options object
  * @param {string}  options.url               - Link URL
- * @param {string}  options.title             - Link title (from entity or rich data)
- * @param {string}  options.image             - Link image URL
  * @param {string}  options.type              - Entity type (page, post, etc.)
+ * @param {Object}  options.entityRecord      - Entity record
  * @param {string}  options.entityStatus      - Entity status (publish, draft, etc.)
  * @param {boolean} options.hasBinding        - Whether link has entity binding
  * @param {boolean} options.isEntityAvailable - Whether bound entity exists
@@ -140,18 +140,49 @@ function computeBadges( {
  */
 export function useLinkPreview( {
 	url,
-	title,
-	image,
+	entityRecord,
 	type,
 	entityStatus,
 	hasBinding,
 	isEntityAvailable,
 } ) {
+	const title =
+		entityRecord?.title?.rendered ||
+		entityRecord?.title ||
+		entityRecord?.name;
+
 	// Fetch rich URL data if we don't have a title. Internal links should have passed a title.
 	const { richData } = useRemoteUrlData( title ? null : url );
 
 	// Compute display URL and external flag
 	const { displayUrl, isExternal } = computeDisplayUrl( url );
+
+	const image = useSelect(
+		( select ) => {
+			// Only fetch for post-type entities with featured media
+			if ( ! entityRecord?.featured_media ) {
+				return null;
+			}
+
+			const { getEntityRecord } = select( coreStore );
+
+			// Get the media entity to fetch the image URL
+			const media = getEntityRecord(
+				'postType',
+				'attachment',
+				entityRecord.featured_media
+			);
+
+			// Return the thumbnail or medium size URL, fallback to source_url
+			return (
+				media?.media_details?.sizes?.thumbnail?.source_url ||
+				media?.media_details?.sizes?.medium?.source_url ||
+				media?.source_url ||
+				null
+			);
+		},
+		[ entityRecord?.featured_media ]
+	);
 
 	// Compute badges
 	const badges = computeBadges( {
