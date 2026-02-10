@@ -305,5 +305,5 @@ export function __unstableUseRichText( props ) {
 	deprecated( '`__unstableUseRichText` hook', {
 		since: '7.0',
 	} );
-	return useRichText( props );
+	return useRichTextBase( props );
 }
