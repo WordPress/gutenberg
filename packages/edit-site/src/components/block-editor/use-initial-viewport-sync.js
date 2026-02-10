@@ -21,9 +21,10 @@ const VIEWPORT_TO_DEVICE_TYPE = {
 };
 
 /**
- * Syncs the editor's device type with the `viewport` URL query param when present.
- * Used to open the editor in a specific viewport (e.g. mobile for overlay template parts).
- * Runs once on mount when a valid viewport param is in the URL.
+ * Syncs the editor's device type with the `viewport` URL query param.
+ * - When viewport is in the URL and valid: use it (e.g. mobile when editing a specific entity).
+ * - When no viewport or invalid: default to Desktop (full-size viewport), e.g. when
+ *   returning from a focused entity editor without a saved viewport.
  */
 export default function useInitialViewportSync() {
 	const { query } = useLocation();
@@ -31,18 +32,16 @@ export default function useInitialViewportSync() {
 
 	useEffect( () => {
 		const viewport = query?.viewport;
-		if (
-			! viewport ||
-			typeof viewport !== 'string' ||
-			! VALID_VIEWPORTS.includes( viewport.toLowerCase() )
-		) {
-			return;
-		}
+		const isValidViewport =
+			viewport &&
+			typeof viewport === 'string' &&
+			VALID_VIEWPORTS.includes( viewport.toLowerCase() );
 
-		const deviceType = VIEWPORT_TO_DEVICE_TYPE[ viewport.toLowerCase() ];
-		if ( deviceType ) {
-			setDeviceType( deviceType );
-		}
+		const deviceType = isValidViewport
+			? VIEWPORT_TO_DEVICE_TYPE[ viewport.toLowerCase() ]
+			: 'Desktop';
+
+		setDeviceType( deviceType );
 	}, [ query?.viewport, setDeviceType ] );
 }
 
