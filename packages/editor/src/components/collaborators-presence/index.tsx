@@ -36,9 +36,11 @@ export function CollaboratorsPresence( {
 		postType
 	) as PostEditorAwarenessState[];
 
-	// Filter out current user - we never show ourselves in the list
+	// Filter out current user - we never show ourselves in the list.
+	// Also filter out collaborators whose info is not yet available (can happen
+	// while awareness state is syncing, e.g. before getCurrentUser() resolves).
 	const otherActiveCollaborators = activeCollaborators.filter(
-		( collaborator ) => ! collaborator.isMe
+		( collaborator ) => ! collaborator.isMe && collaborator.collaboratorInfo
 	);
 
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
@@ -56,6 +58,7 @@ export function CollaboratorsPresence( {
 	const visibleCollaborators = otherActiveCollaborators.slice( 0, 3 );
 	const remainingCollaborators = otherActiveCollaborators.slice( 3 );
 	const remainingCollaboratorsText = remainingCollaborators
+		.filter( ( { collaboratorInfo } ) => collaboratorInfo )
 		.map( ( { collaboratorInfo } ) => collaboratorInfo.name )
 		.join( ', ' );
 
