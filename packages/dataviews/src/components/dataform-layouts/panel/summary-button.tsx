@@ -29,7 +29,6 @@ export default function SummaryButton< Item >( {
 	disabled,
 	onClick,
 	'aria-expanded': ariaExpanded,
-	'aria-haspopup': ariaHasPopup,
 	labelContent,
 	showError,
 	errorMessage,
@@ -41,7 +40,6 @@ export default function SummaryButton< Item >( {
 	disabled?: boolean;
 	onClick: () => void;
 	'aria-expanded'?: boolean;
-	'aria-haspopup'?: 'dialog' | 'menu' | 'listbox' | 'tree' | 'grid';
 	labelContent?: React.ReactNode;
 	showError?: boolean;
 	errorMessage?: string;
@@ -125,7 +123,7 @@ export default function SummaryButton< Item >( {
 					className="dataforms-layouts-panel__field-trigger-icon"
 					aria-label={ ariaLabel }
 					aria-expanded={ ariaExpanded }
-					aria-haspopup={ ariaHasPopup }
+					aria-haspopup="dialog"
 					aria-describedby={ `${ controlId }` }
 					onClick={ onClick }
 				>

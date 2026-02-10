@@ -203,7 +203,6 @@ function PanelModal< Item >( {
 				disabled={ fieldDefinition.readOnly === true }
 				onClick={ () => setIsOpen( true ) }
 				aria-expanded={ isOpen }
-				aria-haspopup="dialog"
 				labelContent={ labelContent }
 				showError={ showError }
 				errorMessage={ errorMessage }
