@@ -169,19 +169,19 @@ const drawUserSelections = (
 				// Create parent container
 				// Use `document` instead of `editorDocument` because the overlay is in the parent document.
 				const userContainer = document.createElement( 'div' );
-				userContainer.className = 'vip-real-time-collaboration-user';
+				userContainer.className = 'collaborators-overlay-user';
 				userContainer.style.left = `${ coords.x }px`;
 				userContainer.style.top = `${ coords.y }px`;
 
 				// Create cursor element
 				const cursor = document.createElement( 'div' );
-				cursor.className = 'vip-real-time-collaboration-user-cursor';
+				cursor.className = 'collaborators-overlay-user-cursor';
 				cursor.style.backgroundColor = color;
 				cursor.style.height = `${ coords.height }px`;
 
 				// Create label
 				const label = document.createElement( 'div' );
-				label.className = 'vip-real-time-collaboration-user-label';
+				label.className = 'collaborators-overlay-user-label';
 				label.textContent = userName;
 				label.style.backgroundColor = color;
 

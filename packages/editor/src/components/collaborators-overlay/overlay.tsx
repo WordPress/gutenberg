@@ -4,6 +4,7 @@ import { useEffect, useRef } from '@wordpress/element';
 import { useBlockHighlighting } from './use-block-highlighting';
 import { useRenderCursors } from './use-render-cursors';
 import { type CursorRegistry } from './cursor-registry';
+import { OVERLAY_IFRAME_STYLES } from './overlay-iframe-styles';
 
 import './overlay.scss';
 
@@ -49,12 +50,28 @@ export function Overlay( {
 
 	useBlockHighlighting( document, postId ?? null, postType ?? null );
 
+	// Inject overlay styles into the iframe. The overlay renders inside the
+	// iframe (via BlockCanvasCover) but overlay.scss is loaded in the parent
+	// document, so the iframe has no access to it. We inject the same styles
+	// here so cursors and labels are styled correctly.
+	useEffect( () => {
+		if ( ! blockEditorDocument ) {
+			return;
+		}
+		const id = 'collaborators-overlay-styles';
+		if ( blockEditorDocument.getElementById( id ) ) {
+			return;
+		}
+		const style = blockEditorDocument.createElement( 'style' );
+		style.id = id;
+		style.textContent = OVERLAY_IFRAME_STYLES;
+		blockEditorDocument.head.appendChild( style );
+		return () => {
+			style.remove();
+		};
+	}, [ blockEditorDocument ] );
+
 	// This is a full overlay that covers the entire iframe document. Good for
 	// scrollable elements like cursor indicators.
-	return (
-		<div
-			className="vip-real-time-collaboration-overlay-full"
-			ref={ mergedRef }
-		/>
-	);
+	return <div className="collaborators-overlay-full" ref={ mergedRef } />;
 }

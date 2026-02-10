@@ -1,8 +1,15 @@
 import { store as coreStore } from '@wordpress/core-data';
-import { dispatch, select } from '@wordpress/data';
+import { dispatch } from '@wordpress/data';
 import { Y } from '@wordpress/sync';
-import { store as editorStore } from '@wordpress/editor';
-import type { WPBlockSelection } from '../../store/selectors';
+
+// Local type matching core/editor selection shape. Defined here to avoid
+// importing from the editor store (which would pull in @wordpress/block-editor
+// and create a circular dependency with collaborators-overlay).
+export type WPBlockSelection = {
+	clientId: string;
+	attributeKey: string;
+	offset: number;
+};
 
 // Convenience types to manage block values with a clientId, attributes, and innerBlocks.
 type BlockClientId = string;
@@ -175,17 +182,16 @@ export function getSelectionState(
  * @param selectionStart  - The start position of the selection
  * @param selectionEnd    - The end position of the selection
  * @param initialPosition - The initial position of the selection
+ * @param postId          - The ID of the post
+ * @param postType        - The type of the post
  */
 export async function updateSelectionInEntityRecord(
 	selectionStart: WPBlockSelection,
 	selectionEnd: WPBlockSelection,
-	initialPosition: number | null
+	initialPosition: number | null,
+	postId: number | null,
+	postType: string | null
 ): Promise< void > {
-	const { getCurrentPostId, getCurrentPostType } = select( editorStore );
-
-	const postId = getCurrentPostId();
-	const postType = getCurrentPostType();
-
 	if ( ! postId || ! postType || ! selectionStart.clientId ) {
 		return;
 	}

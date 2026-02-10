@@ -82,14 +82,12 @@ export class CursorRegistry {
 	 */
 	private highlightCursor( element: HTMLElement, duration: number ): void {
 		// Add highlight class
-		element.classList.add(
-			'vip-real-time-collaboration-cursor-highlighted'
-		);
+		element.classList.add( 'collaborators-overlay-cursor-highlighted' );
 
 		// Remove after duration
 		setTimeout( () => {
 			element.classList.remove(
-				'vip-real-time-collaboration-cursor-highlighted'
+				'collaborators-overlay-cursor-highlighted'
 			);
 		}, duration );
 	}
