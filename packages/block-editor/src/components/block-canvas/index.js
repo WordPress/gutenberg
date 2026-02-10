@@ -67,10 +67,7 @@ export function ExperimentalBlockCanvas( {
 					ref={ contentRef }
 					className="editor-styles-wrapper"
 					tabIndex={ -1 }
-					style={ {
-						height: '100%',
-						width: '100%',
-					} }
+					style={ { overflow: 'auto' } }
 				>
 					{ children }
 				</WritingFlow>
