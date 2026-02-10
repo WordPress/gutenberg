@@ -24,15 +24,19 @@ const { getRuntime, detectRuntime } = require( '../runtime' );
  * @param {Object}                 options.spinner     A CLI spinner which indicates progress.
  * @param {boolean}                options.scripts     Indicates whether or not lifecycle scripts should be executed.
  * @param {boolean}                options.debug       True if debug mode is enabled.
+ * @param {string|null}            options.config      Path to a custom .wp-env.json configuration file.
  */
 module.exports = async function reset( {
 	environment,
 	spinner,
 	scripts,
 	debug,
+	config: customConfigPath,
 } ) {
-	const config = await loadConfig( path.resolve( '.' ) );
-	const runtime = getRuntime( detectRuntime( config.workDirectoryPath ) );
+	const config = await loadConfig( path.resolve( '.' ), customConfigPath );
+	const runtime = getRuntime(
+		await detectRuntime( config.workDirectoryPath )
+	);
 
 	await runtime.clean( config, { environment, spinner, debug } );
 

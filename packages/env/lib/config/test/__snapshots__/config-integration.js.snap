@@ -3,6 +3,7 @@
 exports[`Config Integration should load local and override configuration files 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
+  "customConfigPath": null,
   "detectedLocalConfig": true,
   "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
   "env": {
@@ -84,6 +85,7 @@ exports[`Config Integration should load local and override configuration files 1
 exports[`Config Integration should load local configuration file 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
+  "customConfigPath": null,
   "detectedLocalConfig": true,
   "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
   "env": {
@@ -165,6 +167,7 @@ exports[`Config Integration should load local configuration file 1`] = `
 exports[`Config Integration should use default configuration 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
+  "customConfigPath": null,
   "detectedLocalConfig": true,
   "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
   "env": {
@@ -246,6 +249,7 @@ exports[`Config Integration should use default configuration 1`] = `
 exports[`Config Integration should use environment variables over local and override configuration files 1`] = `
 {
   "configDirectoryPath": "/test/gutenberg",
+  "customConfigPath": null,
   "detectedLocalConfig": true,
   "dockerComposeConfigPath": "/cache/5fea4c5689ef6cc4a4e6eaaa39323338/docker-compose.yml",
   "env": {

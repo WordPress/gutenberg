@@ -47,6 +47,10 @@ const meta: Meta< typeof Composite > = {
 		docs: {
 			canvas: { sourceState: 'shown' },
 		},
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 	},
 	decorators: [
 		( Story ) => {

@@ -26,6 +26,11 @@ const meta: Meta< typeof ToggleControl > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `ToggleControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;

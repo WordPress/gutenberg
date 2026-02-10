@@ -24,6 +24,10 @@ const meta: Meta< typeof PaletteEdit > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;

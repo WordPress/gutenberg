@@ -128,14 +128,22 @@ export default function EditorInterface( {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	// Local state for diff toggle in revisions mode.
+	const [ showDiff, setShowDiff ] = useState( true );
+
 	// When in revisions mode, render the revisions interface.
 	if ( isRevisionsMode ) {
 		return (
 			<InterfaceSkeleton
 				className={ clsx( 'editor-editor-interface', className ) }
 				labels={ interfaceLabels }
-				header={ <RevisionsHeader /> }
-				content={ <RevisionsCanvas /> }
+				header={
+					<RevisionsHeader
+						showDiff={ showDiff }
+						onToggleDiff={ () => setShowDiff( ! showDiff ) }
+					/>
+				}
+				content={ <RevisionsCanvas showDiff={ showDiff } /> }
 				sidebar={ <ComplementaryArea.Slot scope="core" /> }
 			/>
 		);
