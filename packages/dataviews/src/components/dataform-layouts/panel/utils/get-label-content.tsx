@@ -5,7 +5,7 @@ import { BaseControl, Icon, Tooltip } from '@wordpress/components';
 import { error as errorIcon } from '@wordpress/icons';
 
 function getLabelContent(
-	showError: boolean,
+	showError?: boolean,
 	errorMessage?: string,
 	fieldLabel?: string
 ) {

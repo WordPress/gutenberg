@@ -34,7 +34,6 @@ import useReportValidity from '../../../hooks/use-report-validity';
 import DataFormContext from '../../dataform-context';
 import getFirstValidationError from './utils/get-first-validation-error';
 import getFieldDefinitionAndSummaryFields from './utils/get-field-definition-and-summary-fields';
-import getLabelContent from './utils/get-label-content';
 
 function ModalContent< Item >( {
 	data,
@@ -186,7 +185,6 @@ function PanelModal< Item >( {
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 	const errorMessage = getFirstValidationError( validity );
 	const showError = touched && !! errorMessage;
-	const labelContent = getLabelContent( showError, errorMessage, fieldLabel );
 
 	const handleClose = () => {
 		setIsOpen( false );
@@ -203,7 +201,6 @@ function PanelModal< Item >( {
 				disabled={ fieldDefinition.readOnly === true }
 				onClick={ () => setIsOpen( true ) }
 				aria-expanded={ isOpen }
-				labelContent={ labelContent }
 				showError={ showError }
 				errorMessage={ errorMessage }
 			/>

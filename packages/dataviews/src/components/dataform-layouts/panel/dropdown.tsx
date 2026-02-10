@@ -29,7 +29,6 @@ import useReportValidity from '../../../hooks/use-report-validity';
 import getFirstValidationError from './utils/get-first-validation-error';
 import getFieldDefinitionAndSummaryFields from './utils/get-field-definition-and-summary-fields';
 import DataFormContext from '../../dataform-context';
-import getLabelContent from './utils/get-label-content';
 
 function DropdownHeader( {
 	title,
@@ -143,7 +142,6 @@ function PanelDropdown< Item >( {
 
 	const errorMessage = getFirstValidationError( validity );
 	const showError = touched && !! errorMessage;
-	const labelContent = getLabelContent( showError, errorMessage, fieldLabel );
 
 	return (
 		<div
@@ -168,7 +166,6 @@ function PanelDropdown< Item >( {
 						disabled={ fieldDefinition.readOnly === true }
 						onClick={ onToggle }
 						aria-expanded={ isOpen }
-						labelContent={ labelContent }
 						showError={ showError }
 						errorMessage={ errorMessage }
 					/>
