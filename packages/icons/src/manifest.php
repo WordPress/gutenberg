@@ -1197,6 +1197,10 @@ return array(
 		'label'    => _x( 'Tabs Menu', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/tabs-menu.svg',
 	),
+	'tabs-menu-item'                 => array(
+		'label'    => _x( 'Tabs Menu Item', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/tabs-menu-item.svg',
+	),
 	'tag'                            => array(
 		'label'    => _x( 'Tag', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/tag.svg',
