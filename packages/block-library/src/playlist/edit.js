@@ -44,6 +44,7 @@ import {
 	getWaveformColors,
 	createWaveformContainer,
 	styleSvgIcons,
+	ensureWaveformText,
 } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
@@ -310,6 +311,14 @@ const PlaylistEdit = ( {
 
 			// Apply contrasting color to SVG icons for visibility.
 			styleSvgIcons( container, textColor );
+
+			// Ensure title, subtitle, and duration are populated (WaveformPlayer may not do this in editor).
+			ensureWaveformText(
+				container,
+				currentTrackData.title,
+				currentTrackData.artist,
+				currentTrackData.length
+			);
 
 			container.addEventListener( 'waveformplayer:ended', handleEnded );
 		}, 100 );

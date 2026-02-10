@@ -30,13 +30,40 @@
 		justify-content: center;
 	}
 
+	// WaveformPlayer info section layout - needed in the editor iframe.
+	.waveform-info {
+		display: flex;
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: flex-start;
+		margin-top: 0.5em;
+	}
+
+	.waveform-text {
+		flex: 1 1 auto;
+		min-width: 0;
+	}
+
 	// Override WaveformPlayer's inline text colors to inherit from the block.
+	// Force block display so title and subtitle appear on separate lines.
 	.waveform-title,
 	.waveform-subtitle {
+		display: block;
 		color: currentColor !important;
 	}
 
+	.waveform-title {
+		font-size: 13px;
+	}
+
 	.waveform-subtitle {
+		font-size: 11px;
+		opacity: 0.7;
+	}
+
+	.waveform-time {
+		flex-shrink: 0;
+		font-size: 11px;
 		opacity: 0.7;
 	}
 
