@@ -165,3 +165,29 @@ export function styleSvgIcons( container, buttonColor ) {
 		path.style.fill = iconColor;
 	} );
 }
+
+/**
+ * Ensure the waveform title, subtitle, and duration elements have the correct content.
+ * WaveformPlayer may not populate these correctly in certain contexts (e.g., editor iframe).
+ *
+ * @param {Element} container - The waveform container element.
+ * @param {string}  title     - The track title.
+ * @param {string}  artist    - The track artist (subtitle).
+ * @param {string}  duration  - The track duration (e.g., "1:30").
+ */
+export function ensureWaveformText( container, title, artist, duration ) {
+	const titleEl = container.querySelector( '.waveform-title' );
+	const subtitleEl = container.querySelector( '.waveform-subtitle' );
+	const timeEl = container.querySelector( '.waveform-time' );
+
+	if ( titleEl && title && ! titleEl.textContent ) {
+		titleEl.textContent = title;
+	}
+	if ( subtitleEl && artist && ! subtitleEl.textContent ) {
+		subtitleEl.textContent = artist;
+	}
+	// Set the duration if available and currently showing 0:00 / 0:00.
+	if ( timeEl && duration && timeEl.textContent?.includes( '0:00 / 0:00' ) ) {
+		timeEl.textContent = `0:00 / ${ duration }`;
+	}
+}
