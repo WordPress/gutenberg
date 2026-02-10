@@ -79,7 +79,7 @@
 			width: inherit;
 			height: $grid-unit-05;
 			border-radius: $radius-small;
-			@media not ( prefers-reduced-motion ) {
+			@media not (prefers-reduced-motion) {
 				transition: width 0.3s ease-out;
 			}
 		}
@@ -112,9 +112,7 @@
 
 // Only when the split view is active the visual editor should allow shrinking and
 // its main size should be zero.
-.has-metaboxes
-.interface-interface-skeleton__content:has(.edit-post-meta-boxes-main)
-.editor-visual-editor {
+.has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main) .editor-visual-editor {
 	flex-shrink: 1;
 	flex-basis: 0%;
 }
@@ -124,7 +122,7 @@
 }
 
 // Adjust the position of the notices
-.edit-post-layout .edit-post-layout__snackbar {
+.edit-post-layout__snackbar {
 	position: fixed;
 	right: 0;
 	bottom: 24px;
@@ -132,4 +130,4 @@
 	padding-right: 24px;
 }
 
-@include editor-left( ".edit-post-layout .edit-post-layout__snackbar" );
+@include editor-left(".edit-post-layout__snackbar");
