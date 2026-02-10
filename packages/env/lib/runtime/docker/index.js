@@ -692,6 +692,8 @@ class DockerRuntime {
 
 		// Check if containers are running by trying to get a port.
 		let isRunning = false;
+		let developmentPort = null;
+		let testsPort = null;
 		let mySQLPort = null;
 		let phpmyadminPort = null;
 
@@ -702,6 +704,18 @@ class DockerRuntime {
 				dockerComposeConfig
 			);
 			isRunning = true;
+
+			developmentPort = await this._getPublicDockerPort(
+				'wordpress',
+				80,
+				dockerComposeConfig
+			);
+
+			testsPort = await this._getPublicDockerPort(
+				'tests-wordpress',
+				80,
+				dockerComposeConfig
+			);
 
 			if ( config.env.development.phpmyadmin ) {
 				phpmyadminPort = await this._getPublicDockerPort(
@@ -729,9 +743,9 @@ class DockerRuntime {
 						: null,
 			},
 			ports: {
-				development: config.env.development.port,
+				development: developmentPort,
 				...( testsEnabled && {
-					tests: config.env.tests.port,
+					tests: testsPort,
 				} ),
 				mysql: mySQLPort,
 			},
