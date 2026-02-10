@@ -2260,10 +2260,7 @@ describe( 'state', () => {
 						hasControlledInnerBlocks: true,
 					} );
 
-					expect(
-						state.controlledInnerBlocks.chicken
-							.hasControlledInnerBlocks
-					).toBe( true );
+					expect( state.controlledInnerBlocks.chicken ).toBe( true );
 					// The previous content of the block should be removed
 					expect( state.byClientId.child ).toBeUndefined();
 					expect( state.tree.get( 'child' ) ).toBeUndefined();

@@ -1506,12 +1506,37 @@ export function selection( state = {}, action ) {
 				selectionEnd: { clientId: end },
 			};
 		case 'RESET_BLOCKS':
-			// Selection is managed separately (via SelectionContext and
-			// useBlockSync's selection restoration). Preserve it here so
-			// that a block reset driven by an entity sync does not
-			// inadvertently wipe a selection that lives inside a
-			// controlled inner block container.
-			return state;
+			const startClientId = state?.selectionStart?.clientId;
+			const endClientId = state?.selectionEnd?.clientId;
+
+			// Do nothing if there's no selected block.
+			if ( ! startClientId && ! endClientId ) {
+				return state;
+			}
+
+			// If the start of the selection won't exist after reset, remove selection.
+			if (
+				! action.blocks.some(
+					( block ) => block.clientId === startClientId
+				)
+			) {
+				return {
+					selectionStart: {},
+					selectionEnd: {},
+				};
+			}
+
+			// If the end of the selection won't exist after reset, collapse selection.
+			if (
+				! action.blocks.some(
+					( block ) => block.clientId === endClientId
+				)
+			) {
+				return {
+					...state,
+					selectionEnd: state.selectionStart,
+				};
+			}
 	}
 
 	const selectionStart = selectionHelper( state.selectionStart, action );

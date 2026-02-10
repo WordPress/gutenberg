@@ -95,24 +95,24 @@ function restoreExternalIds( blocks, mapping ) {
  *   controllers.
  * - Passes selection state from the block-editor store to the controlling entity.
  *
- * @param {Object}        props           Props for the block sync hook
- * @param {string}        props.clientId  The client ID of the inner block controller.
- *                                        If none is passed, then it is assumed to be a
- *                                        root controller rather than an inner block
- *                                        controller.
- * @param {Object[]}      props.value     The control value for the blocks. This value
- *                                        is used to initialize the block-editor store
- *                                        and for resetting the blocks to incoming
- *                                        changes like undo.
- * @param {onBlockUpdate} props.onChange  Function to call when a persistent
- *                                        change has been made in the block-editor blocks
- *                                        for the given clientId. For example, after
- *                                        this function is called, an entity is marked
- *                                        dirty because it has changes to save.
- * @param {onBlockUpdate} props.onInput   Function to call when a non-persistent
- *                                        change has been made in the block-editor blocks
- *                                        for the given clientId. When this is called,
- *                                        controlling sources do not become dirty.
+ * @param {Object}        props          Props for the block sync hook
+ * @param {string}        props.clientId The client ID of the inner block controller.
+ *                                       If none is passed, then it is assumed to be a
+ *                                       root controller rather than an inner block
+ *                                       controller.
+ * @param {Object[]}      props.value    The control value for the blocks. This value
+ *                                       is used to initialize the block-editor store
+ *                                       and for resetting the blocks to incoming
+ *                                       changes like undo.
+ * @param {onBlockUpdate} props.onChange Function to call when a persistent
+ *                                       change has been made in the block-editor blocks
+ *                                       for the given clientId. For example, after
+ *                                       this function is called, an entity is marked
+ *                                       dirty because it has changes to save.
+ * @param {onBlockUpdate} props.onInput  Function to call when a non-persistent
+ *                                       change has been made in the block-editor blocks
+ *                                       for the given clientId. When this is called,
+ *                                       controlling sources do not become dirty.
  */
 export default function useBlockSync( {
 	clientId = null,
@@ -142,6 +142,13 @@ export default function useBlockSync( {
 		externalToInternal: new Map(),
 		internalToExternal: new Map(),
 	} );
+
+	// Tracks which context selection has already been applied, to avoid
+	// duplicate restoration.
+	const appliedSelectionRef = useRef( null );
+	// Flag to prevent the subscription from re-reporting a selection
+	// change that was just restored from context (which would loop).
+	const isRestoringSelectionRef = useRef( false );
 
 	// Restores selection from the SelectionContext using the current
 	// idMapping.  Called after blocks are (re-)cloned so that the
@@ -199,12 +206,9 @@ export default function useBlockSync( {
 		// We don't need to persist this change because we only replace
 		// controlled inner blocks when the change was caused by an entity,
 		// and so it would already be persisted.
-		__unstableMarkNextChangeAsNotPersistent();
 		if ( clientId ) {
-			// It is important to batch here because otherwise,
-			// as soon as `setHasControlledInnerBlocks` is called
-			// the effect to restore might be triggered
-			// before the actual blocks get set properly in state.
+			// Batch so that the controlled flag and block replacement
+			// are applied atomically — subscribers see a consistent state.
 			registry.batch( () => {
 				// Clear previous mappings and build new ones during cloning.
 				// This ensures the mapping stays in sync with the current blocks.
@@ -223,20 +227,17 @@ export default function useBlockSync( {
 				__unstableMarkNextChangeAsNotPersistent();
 				replaceInnerBlocks( clientId, storeBlocks );
 
-				// Restore selection using the fresh mapping. This
-				// ensures that if blocks are re-cloned (e.g. after a
-				// RESET_BLOCKS cascade clears controlledInnerBlocks),
-				// the selection is updated to use the new internal IDs.
-				// Reset appliedSelectionRef so restoreSelection() doesn't
-				// skip when the context selection reference hasn't changed
-				// but the mapping has been rebuilt with new internal IDs.
+				// Invalidate the applied-selection ref so that
+				// restoreSelection() at the end of the
+				// controlledBlocks effect re-applies with the
+				// freshly-built mapping (new internal IDs).
 				appliedSelectionRef.current = null;
-				restoreSelection();
 			} );
 		} else {
 			if ( subscribedRef.current ) {
 				pendingChangesRef.current.incoming = controlledBlocks;
 			}
+			__unstableMarkNextChangeAsNotPersistent();
 			resetBlocks( controlledBlocks );
 		}
 	};
@@ -269,10 +270,12 @@ export default function useBlockSync( {
 
 	// Determine if blocks need to be reset when they change.
 	// Also restores selection from context after blocks are set.
-	const appliedSelectionRef = useRef( null );
-	const isRestoringSelectionRef = useRef( false );
 	useEffect( () => {
-		if ( pendingChangesRef.current.outgoing.includes( controlledBlocks ) ) {
+		const isOutgoing =
+			pendingChangesRef.current.outgoing.includes( controlledBlocks );
+		const storeMatch = getBlocks( clientId ) === controlledBlocks;
+
+		if ( isOutgoing ) {
 			// Skip block reset if the value matches expected outbound sync
 			// triggered by this component by a preceding change detection.
 			// Only skip if the value matches expectation, since a reset should
@@ -286,7 +289,7 @@ export default function useBlockSync( {
 			) {
 				pendingChangesRef.current.outgoing = [];
 			}
-		} else if ( getBlocks( clientId ) !== controlledBlocks ) {
+		} else if ( ! storeMatch ) {
 			// Reset changing value in all other cases than the sync described
 			// above. Since this can be reached in an update following an out-
 			// bound sync, unset the outbound value to avoid considering it in
@@ -297,7 +300,7 @@ export default function useBlockSync( {
 
 		// Restore selection from context if it targets our scope.
 		restoreSelection();
-	// eslint-disable-next-line react-hooks/exhaustive-deps
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ controlledBlocks, clientId ] );
 
 	useEffect( () => {
@@ -351,8 +354,7 @@ export default function useBlockSync( {
 				newIsPersistent &&
 				! isPersistent;
 
-			const blocksChanged =
-				areBlocksDifferent || didPersistenceChange;
+			const blocksChanged = areBlocksDifferent || didPersistenceChange;
 
 			// Check if selection changed.
 			const newSelectionStart = getSelectionStart();
@@ -376,10 +378,7 @@ export default function useBlockSync( {
 						// For inner block controllers (clientId is set), restore external IDs
 						// before passing blocks to the parent.
 						const blocksForParent = clientId
-							? restoreExternalIds(
-									blocks,
-									idMappingRef.current
-							  )
+							? restoreExternalIds( blocks, idMappingRef.current )
 							: blocks;
 
 						pendingChangesRef.current.outgoing.push(
@@ -428,10 +427,8 @@ export default function useBlockSync( {
 								};
 							};
 							onChangeSelectionRef.current( {
-								selectionStart:
-									convert( newSelectionStart ),
-								selectionEnd:
-									convert( newSelectionEnd ),
+								selectionStart: convert( newSelectionStart ),
+								selectionEnd: convert( newSelectionEnd ),
 								initialPosition:
 									getSelectedBlocksInitialCaretPosition(),
 							} );

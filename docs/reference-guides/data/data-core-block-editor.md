@@ -1690,7 +1690,6 @@ _Parameters_
 
 -   _clientId_ `string`: The block's clientId.
 -   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
--   _mappings_ `Object[]`: Optional array of { external, internal } clientId mappings.
 
 ### setTemplateValidity
 
