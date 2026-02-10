@@ -2,14 +2,19 @@
  * WordPress dependencies
  */
 import { __, sprintf, _n } from '@wordpress/i18n';
-import { Button, Dropdown } from '@wordpress/components';
+import {
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { SVG, Path } from '@wordpress/primitives';
-import clsx from 'clsx';
 
 /**
  * Internal dependencies
  */
-import ReactionEmojiPicker from './reaction-emoji-picker';
+import ReactionEmojiPicker, { getEmojiBySlug } from './reaction-emoji-picker';
+import { unlock } from '../../lock-unlock';
+
+const { Menu } = unlock( componentsPrivateApis );
 
 /**
  * Smiley face icon for the add-reaction button.
@@ -30,44 +35,44 @@ const smileyIcon = (
 );
 
 /**
- * Get the count of reactions for a specific emoji.
+ * Get the count of reactions for a specific slug.
  *
- * @param {Object} reactions The reactions object.
- * @param {string} emoji     The emoji to count.
+ * @param {Object} reactions The reactions object (keyed by slug).
+ * @param {string} slug      The reaction slug to count.
  * @return {number} The count of reactions.
  */
-function getReactionCount( reactions, emoji ) {
-	return reactions?.[ emoji ]?.length || 0;
+function getReactionCount( reactions, slug ) {
+	return reactions?.[ slug ]?.length || 0;
 }
 
 /**
- * Check if the current user has reacted with a specific emoji.
+ * Check if the current user has reacted with a specific slug.
  *
- * @param {Object} reactions     The reactions object.
- * @param {string} emoji         The emoji to check.
+ * @param {Object} reactions     The reactions object (keyed by slug).
+ * @param {string} slug          The reaction slug to check.
  * @param {number} currentUserId The current user's ID.
  * @return {boolean} Whether the user has reacted.
  */
-function hasUserReacted( reactions, emoji, currentUserId ) {
+function hasUserReacted( reactions, slug, currentUserId ) {
 	return (
-		reactions?.[ emoji ]?.some(
+		reactions?.[ slug ]?.some(
 			( reaction ) => reaction.userId === currentUserId
 		) || false
 	);
 }
 
 /**
- * Get all emojis that have reactions.
+ * Get all reaction slugs that have reactions.
  *
- * @param {Object} reactions The reactions object.
- * @return {string[]} Array of emojis with reactions.
+ * @param {Object} reactions The reactions object (keyed by slug).
+ * @return {string[]} Array of slugs with reactions.
  */
-function getReactedEmojis( reactions ) {
+function getReactedSlugs( reactions ) {
 	if ( ! reactions ) {
 		return [];
 	}
 	return Object.keys( reactions ).filter(
-		( emoji ) => reactions[ emoji ]?.length > 0
+		( slug ) => reactions[ slug ]?.length > 0
 	);
 }
 
@@ -84,38 +89,43 @@ export default function ReactionDisplay( {
 	currentUserId,
 	onToggleReaction,
 } ) {
-	const reactedEmojis = getReactedEmojis( reactions );
+	const reactedSlugs = getReactedSlugs( reactions );
 
-	if ( reactedEmojis.length === 0 ) {
+	if ( reactedSlugs.length === 0 ) {
 		return null;
 	}
 
 	return (
 		<div className="editor-collab-sidebar-panel__reactions">
-			{ reactedEmojis.map( ( emoji ) => {
-				const count = getReactionCount( reactions, emoji );
+			{ reactedSlugs.map( ( slug ) => {
+				const count = getReactionCount( reactions, slug );
 				const isActive = hasUserReacted(
 					reactions,
-					emoji,
+					slug,
 					currentUserId
 				);
+				const emoji = getEmojiBySlug( slug );
 
 				return (
 					<Button
-						key={ emoji }
+						key={ slug }
 						size="small"
-						variant="tertiary"
-						className={ clsx(
-							'editor-collab-sidebar-panel__reaction-button',
-							{
-								'is-active': isActive,
-							}
-						) }
+						className="editor-collab-sidebar-panel__reaction-button"
 						onClick={ ( event ) => {
 							event.stopPropagation();
-							onToggleReaction( emoji );
+							// When removing the last reaction for this emoji,
+							// the button will disappear. Move focus to the
+							// parent note to prevent focus loss.
+							if ( isActive && count === 1 ) {
+								event.target
+									.closest(
+										'.editor-collab-sidebar-panel__thread'
+									)
+									?.focus();
+							}
+							onToggleReaction( slug );
 						} }
-						aria-pressed={ isActive }
+						isPressed={ isActive }
 						aria-label={ sprintf(
 							/* translators: 1: emoji, 2: count of reactions */
 							_n(
@@ -127,12 +137,8 @@ export default function ReactionDisplay( {
 							count
 						) }
 					>
-						<span className="editor-collab-sidebar-panel__reaction-emoji">
-							{ emoji }
-						</span>
-						<span className="editor-collab-sidebar-panel__reaction-count">
-							{ count }
-						</span>
+						<span>{ emoji }</span>
+						<span>{ count }</span>
 					</Button>
 				);
 			} ) }
@@ -148,34 +154,27 @@ export default function ReactionDisplay( {
  */
 export function AddReactionButton( { onToggleReaction } ) {
 	return (
-		<Dropdown
-			className="editor-collab-sidebar-panel__add-reaction-dropdown"
-			contentClassName="editor-collab-sidebar-panel__add-reaction-popover"
-			popoverProps={ {
-				placement: 'bottom-start',
-				focusOnMount: 'firstElement',
-			} }
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<Button
-					size="compact"
-					className="editor-collab-sidebar-panel__add-reaction-button"
-					icon={ smileyIcon }
-					onClick={ ( event ) => {
-						event.stopPropagation();
-						onToggle();
-					} }
-					aria-expanded={ isOpen }
-					label={ __( 'Add reaction' ) }
-				/>
-			) }
-			renderContent={ ( { onClose } ) => (
+		<Menu placement="bottom-start">
+			<Menu.TriggerButton
+				render={
+					<Button
+						size="compact"
+						className="editor-collab-sidebar-panel__add-reaction-button"
+						icon={ smileyIcon }
+						label={ __( 'Add reaction' ) }
+					/>
+				}
+			/>
+			<Menu.Popover
+				modal={ false }
+				className="editor-collab-sidebar-panel__add-reaction-popover"
+			>
 				<ReactionEmojiPicker
-					onSelect={ ( emoji ) => {
-						onToggleReaction( emoji );
-						onClose();
+					onSelect={ ( slug ) => {
+						onToggleReaction( slug );
 					} }
 				/>
-			) }
-		/>
+			</Menu.Popover>
+		</Menu>
 	);
 }
