@@ -19,6 +19,7 @@ import type {
 	NormalizedFormField,
 	NormalizedPanelLayout,
 } from '../../../types';
+import getLabelClassName from './utils/get-label-classname';
 
 export default function SummaryButton< Item >( {
 	data,
@@ -30,7 +31,6 @@ export default function SummaryButton< Item >( {
 	'aria-expanded': ariaExpanded,
 	'aria-haspopup': ariaHasPopup,
 	labelContent,
-	labelClassName,
 	showError,
 	errorMessage,
 }: {
@@ -43,12 +43,12 @@ export default function SummaryButton< Item >( {
 	'aria-expanded'?: boolean;
 	'aria-haspopup'?: 'dialog' | 'menu' | 'listbox' | 'tree' | 'grid';
 	labelContent?: React.ReactNode;
-	labelClassName?: string;
 	showError?: boolean;
 	errorMessage?: string;
 } ) {
 	const labelPosition = ( field.layout as NormalizedPanelLayout )
 		.labelPosition;
+	const labelClassName = getLabelClassName( labelPosition, showError );
 	const className = clsx(
 		'dataforms-layouts-panel__field-trigger',
 		`dataforms-layouts-panel__field-trigger--label-${ labelPosition }`

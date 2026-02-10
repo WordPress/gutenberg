@@ -29,7 +29,6 @@ import useReportValidity from '../../../hooks/use-report-validity';
 import getFirstValidationError from './utils/get-first-validation-error';
 import getFieldDefinitionAndSummaryFields from './utils/get-field-definition-and-summary-fields';
 import DataFormContext from '../../dataform-context';
-import getLabelClassName from './utils/get-label-classname';
 import getLabelContent from './utils/get-label-content';
 
 function DropdownHeader( {
@@ -87,7 +86,6 @@ function PanelDropdown< Item >( {
 
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedPanelLayout;
-	const labelPosition = layout.labelPosition;
 
 	const { fieldDefinition, summaryFields } =
 		getFieldDefinitionAndSummaryFields( layout, field, fields );
@@ -145,7 +143,6 @@ function PanelDropdown< Item >( {
 
 	const errorMessage = getFirstValidationError( validity );
 	const showError = touched && !! errorMessage;
-	const labelClassName = getLabelClassName( labelPosition, showError );
 	const labelContent = getLabelContent( showError, errorMessage, fieldLabel );
 
 	return (
@@ -173,7 +170,6 @@ function PanelDropdown< Item >( {
 						aria-expanded={ isOpen }
 						aria-haspopup="dialog"
 						labelContent={ labelContent }
-						labelClassName={ labelClassName }
 						showError={ showError }
 						errorMessage={ errorMessage }
 					/>
