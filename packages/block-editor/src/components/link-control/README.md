@@ -50,7 +50,16 @@ Consumers who which to take advantage of this functionality should ensure that t
 When creating links the `LinkControl` component will handle two kinds of input from users:
 
 1. Entity searches - the user may input free-text based search queries for entities retrieved from remote data sources (in the context of WordPress these are post-type entities). For example, a user might search for a `Page` they have just created by name (eg: About) and the UI will return a matching result if found.
-2. Direct entry - the user may also enter any arbitrary URL-like text. This includes full URLs (https://), URL fragments (eg: `#myinternallink`), `tel` protocol links (eg: `tel: 0800 1234`) and `mailto` protocol links (eg: `mailto: hello@wordpress.org`).
+2. Direct entry - the user may also enter any arbitrary URL-like text. This includes:
+    - Full URLs (https://)
+    - Domain names without protocol (example.com) - automatically prepended with https://
+    - URLs with www prefix (www.example.com) - automatically prepended with https://
+    - URL fragments (eg: `#myinternallink`)
+    - `tel` protocol links (eg: `tel: 0800 1234`)
+    - `mailto` protocol links (eg: `mailto: hello@wordpress.org`)
+    - Relative paths (`/page`, `./page`, `../page`)
+
+When a URL without a valid protocol is submitted (either by pressing Enter or clicking Apply), the component automatically prepends `https://` to ensure valid links. Special protocols (mailto:, tel:), hash links, and relative paths are preserved as-is.
 
 In addition, `<LinkControl>` also allows for on the fly creation of links based on the **current content of the `<input>` element**. When enabled, a default "Create new" search suggestion is appended to all non-URL-like search results.
 
@@ -349,6 +358,8 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
 -   Required: No
 
 Suggestion selection handler, called when the user chooses one of the suggested items with `selectedValues` as the argument.
+
+**Note:** URLs are automatically normalized before being passed to this handler. Domain names without protocols (e.g., `wordpress.org`) are prepended with `https://`, while special protocols (`mailto:`, `tel:`), hash links, and relative paths are preserved as-is.
 
 ### placeholder
 

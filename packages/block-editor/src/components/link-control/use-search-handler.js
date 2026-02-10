@@ -20,6 +20,37 @@ import { store as blockEditorStore } from '../../store';
 
 export const handleNoop = () => Promise.resolve( [] );
 
+/**
+ * Normalizes a URL value by prepending https:// when appropriate.
+ * Handles special protocols (mailto, tel), hash links, and relative paths.
+ *
+ * This is the single source of truth for URL normalization across LinkControl.
+ * Used by both handleDirectEntry (suggestion flow) and direct submission (Enter key).
+ *
+ * @param {string} val The URL value to normalize
+ * @return {string} The normalized URL with protocol if needed
+ */
+export function normalizeDirectEntryURL( val ) {
+	let type = URL_TYPE;
+
+	const protocol = getProtocol( val ) || '';
+
+	if ( protocol.includes( 'mailto' ) ) {
+		type = MAILTO_TYPE;
+	}
+
+	if ( protocol.includes( 'tel' ) ) {
+		type = TEL_TYPE;
+	}
+
+	if ( val?.startsWith( '#' ) ) {
+		type = INTERNAL_TYPE;
+	}
+
+	// Only prepend https:// for standard URLs without valid protocols
+	return type === URL_TYPE ? prependHTTPS( val ) : val;
+}
+
 export const handleDirectEntry = ( val ) => {
 	let type = URL_TYPE;
 
@@ -41,7 +72,7 @@ export const handleDirectEntry = ( val ) => {
 		{
 			id: val,
 			title: val,
-			url: type === 'URL' ? prependHTTPS( val ) : val,
+			url: normalizeDirectEntryURL( val ),
 			type,
 		},
 	] );

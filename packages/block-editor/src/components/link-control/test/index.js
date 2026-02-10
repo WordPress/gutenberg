@@ -2981,6 +2981,190 @@ describe( 'Entity handling', () => {
 		);
 	} );
 
+	describe( 'Direct entry URL normalization', () => {
+		it( 'should prepend https:// to plain domain names when pressing Enter', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<LinkControl
+					value={ { url: '' } }
+					forceIsEditingLink
+					onChange={ onChange }
+				/>
+			);
+
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+
+			await user.type( searchInput, 'wordpress.org' );
+			triggerEnter( searchInput );
+
+			expect( onChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					url: 'https://wordpress.org',
+				} )
+			);
+		} );
+
+		it( 'should prepend https:// to domain names with www prefix when pressing Enter', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<LinkControl
+					value={ { url: '' } }
+					forceIsEditingLink
+					onChange={ onChange }
+				/>
+			);
+
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+
+			await user.type( searchInput, 'www.wordpress.org' );
+			triggerEnter( searchInput );
+
+			expect( onChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					url: 'https://www.wordpress.org',
+				} )
+			);
+		} );
+
+		it( 'should NOT prepend https:// to mailto: links', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<LinkControl
+					value={ { url: '' } }
+					forceIsEditingLink
+					onChange={ onChange }
+				/>
+			);
+
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+
+			await user.type( searchInput, 'mailto:test@example.com' );
+			triggerEnter( searchInput );
+
+			expect( onChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					url: 'mailto:test@example.com',
+				} )
+			);
+		} );
+
+		it( 'should NOT prepend https:// to tel: links', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<LinkControl
+					value={ { url: '' } }
+					forceIsEditingLink
+					onChange={ onChange }
+				/>
+			);
+
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+
+			await user.type( searchInput, 'tel:123456789' );
+			triggerEnter( searchInput );
+
+			expect( onChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					url: 'tel:123456789',
+				} )
+			);
+		} );
+
+		it( 'should NOT prepend https:// to hash/anchor links', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<LinkControl
+					value={ { url: '' } }
+					forceIsEditingLink
+					onChange={ onChange }
+				/>
+			);
+
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+
+			await user.type( searchInput, '#section-anchor' );
+			triggerEnter( searchInput );
+
+			expect( onChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					url: '#section-anchor',
+				} )
+			);
+		} );
+
+		it( 'should NOT prepend https:// to relative paths', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<LinkControl
+					value={ { url: '' } }
+					forceIsEditingLink
+					onChange={ onChange }
+				/>
+			);
+
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+
+			await user.type( searchInput, '/relative/path' );
+			triggerEnter( searchInput );
+
+			expect( onChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					url: '/relative/path',
+				} )
+			);
+		} );
+
+		it( 'should NOT double-prepend https:// to URLs that already have protocol', async () => {
+			const user = userEvent.setup();
+			const onChange = jest.fn();
+
+			render(
+				<LinkControl
+					value={ { url: '' } }
+					forceIsEditingLink
+					onChange={ onChange }
+				/>
+			);
+
+			const searchInput = screen.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+
+			await user.type( searchInput, 'https://already-has-protocol.com' );
+			triggerEnter( searchInput );
+
+			expect( onChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					url: 'https://already-has-protocol.com',
+				} )
+			);
+		} );
+	} );
+
 	describe( 'Accessibility association for entity links', () => {
 		it( 'should associate unlink button with help text via aria-describedby', () => {
 			const entityLink = {
@@ -3298,53 +3482,60 @@ describe( 'URL validation', () => {
 		{
 			description: 'valid URLs with protocol',
 			url: 'https://wordpress.org',
+			expectedUrl: 'https://wordpress.org',
 			searchPattern: /https:\/\/wordpress\.org/,
 		},
 		{
 			description: 'valid URLs without protocol (without http://)',
 			url: 'www.wordpress.org',
+			expectedUrl: 'https://www.wordpress.org',
 			searchPattern: /www\.wordpress\.org/,
 		},
 		{
 			description: 'hash links (internal anchor links)',
 			url: '#section',
+			expectedUrl: '#section',
 			searchPattern: /#section/,
 		},
 		{
 			description: 'relative paths (URLs starting with /)',
 			url: '/handbook',
+			expectedUrl: '/handbook',
 			searchPattern: /\/handbook/,
 		},
-	] )( 'should accept $description', async ( { url, searchPattern } ) => {
-		render(
-			<LinkControl
-				value={ { url: '' } }
-				forceIsEditingLink
-				onChange={ mockOnChange }
-			/>
-		);
+	] )(
+		'should accept $description',
+		async ( { url, expectedUrl, searchPattern } ) => {
+			render(
+				<LinkControl
+					value={ { url: '' } }
+					forceIsEditingLink
+					onChange={ mockOnChange }
+				/>
+			);
 
-		const searchInput = screen.getByRole( 'combobox' );
-		await user.type( searchInput, url );
+			const searchInput = screen.getByRole( 'combobox' );
+			await user.type( searchInput, url );
 
-		// Wait for suggestion to appear and become stable
-		await screen.findByRole( 'option', {
-			name: searchPattern,
-		} );
+			// Wait for suggestion to appear and become stable
+			await screen.findByRole( 'option', {
+				name: searchPattern,
+			} );
 
-		triggerEnter( searchInput );
+			triggerEnter( searchInput );
 
-		// No validation error - should succeed
-		await waitFor( () => {
-			expect( mockOnChange ).toHaveBeenCalled();
-		} );
+			// No validation error - should succeed
+			await waitFor( () => {
+				expect( mockOnChange ).toHaveBeenCalled();
+			} );
 
-		expect( mockOnChange ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				url,
-			} )
-		);
-	} );
+			expect( mockOnChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					url: expectedUrl,
+				} )
+			);
+		}
+	);
 
 	it( 'should skip validation for entity suggestions (posts, pages, categories)', async () => {
 		const entityLink = {
@@ -3484,9 +3675,10 @@ describe( 'URL validation', () => {
 		// a useful URL in practice. However, our validation philosophy is to
 		// trust the native URL constructor as the authoritative source - if the
 		// browser accepts it, we accept it.
+		// The URL is automatically prepended with https:// for consistency.
 		expect( mockOnChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
-				url: 'www.wordpress',
+				url: 'https://www.wordpress',
 			} )
 		);
 	} );
