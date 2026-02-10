@@ -5,6 +5,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 return array(
+	'accordion'                      => array(
+		'label'    => _x( 'Accordion', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/accordion.svg',
+	),
+	'accordion-heading'              => array(
+		'label'    => _x( 'Accordion Heading', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/accordion-heading.svg',
+	),
+	'accordion-item'                 => array(
+		'label'    => _x( 'Accordion Item', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/accordion-item.svg',
+	),
 	'add-card'                       => array(
 		'label'    => _x( 'Add Card', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/add-card.svg',
