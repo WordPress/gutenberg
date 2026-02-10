@@ -10,12 +10,9 @@ import { Button, Composite } from '@wordpress/components';
  * potential encoding issues with emoji characters.
  */
 export const REACTION_EMOJIS = [
-	{ emoji: '👍', label: __( 'Thumbs up' ), value: 'thumbs-up' },
-	{ emoji: '🤔', label: __( 'Thinking' ), value: 'thinking' },
 	{ emoji: '❤️', label: __( 'Heart' ), value: 'heart' },
 	{ emoji: '🎉', label: __( 'Celebration' ), value: 'celebration' },
 	{ emoji: '😄', label: __( 'Smile' ), value: 'smile' },
-	{ emoji: '😕', label: __( 'Confused' ), value: 'confused' },
 	{ emoji: '👀', label: __( 'Eyes' ), value: 'eyes' },
 	{ emoji: '🚀', label: __( 'Rocket' ), value: 'rocket' },
 ];
