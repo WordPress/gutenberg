@@ -128,7 +128,7 @@ describe( 'getEntityRecord', () => {
 		);
 	} );
 
-	it( 'loads entity with sync manager when IS_GUTENBERG_PLUGIN is true', async () => {
+	it( 'loads entity with sync manager', async () => {
 		const POST_RECORD = { id: 1, title: 'Test Post' };
 		const POST_RESPONSE = {
 			json: () => Promise.resolve( POST_RECORD ),
