@@ -231,6 +231,13 @@
 		}
 	}
 
+	.dataviews-filters__search-widget-listitem-value {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		min-width: 0;
+	}
+
 	.dataviews-filters__search-widget-listitem-description {
 		display: block;
 		overflow: hidden;
