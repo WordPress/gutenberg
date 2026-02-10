@@ -15,7 +15,7 @@ import * as Y from 'yjs';
  * Internal dependencies
  */
 import { AwarenessState } from '../awareness-state';
-import type { EnhancedState, EqualityFieldCheck } from '../awareness-types';
+import type { EnhancedState, EqualityFieldCheck } from '../types';
 
 interface TestState {
 	name: string;

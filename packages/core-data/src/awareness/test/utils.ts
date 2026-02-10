@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { areUserInfosEqual, generateUserInfo } from '../utils';
-import type { UserInfo } from '../types';
+import { areCollaboratorInfosEqual, generateCollaboratorInfo } from '../utils';
+import type { CollaboratorInfo } from '../types';
 import type { User } from '../../entity-types';
 
 // Mock window.navigator.userAgent
@@ -14,18 +14,18 @@ const mockUserAgent = ( userAgent: string ) => {
 };
 
 describe( 'Awareness Utils', () => {
-	describe( 'areUserInfosEqual', () => {
+	describe( 'arecollaboratorInfosEqual', () => {
 		// Shared avatar_urls reference for equality checks
-		// (areUserInfosEqual uses === which compares references for objects)
+		// (arecollaboratorInfosEqual uses === which compares references for objects)
 		const sharedAvatarUrls = {
 			'24': 'https://example.com/avatar-24.png',
 			'48': 'https://example.com/avatar-48.png',
 			'96': 'https://example.com/avatar-96.png',
 		};
 
-		const createUserInfo = (
-			overrides: Partial< UserInfo > = {}
-		): UserInfo => ( {
+		const createCollaboratorInfo = (
+			overrides: Partial< CollaboratorInfo > = {}
+		): CollaboratorInfo => ( {
 			id: 1,
 			name: 'Test User',
 			slug: 'test-user',
@@ -36,74 +36,140 @@ describe( 'Awareness Utils', () => {
 			...overrides,
 		} );
 
-		test( 'should return true when both userInfos are undefined', () => {
-			expect( areUserInfosEqual( undefined, undefined ) ).toBe( true );
+		test( 'should return true when both collaboratorInfos are undefined', () => {
+			expect( areCollaboratorInfosEqual( undefined, undefined ) ).toBe(
+				true
+			);
 		} );
 
-		test( 'should return false when first userInfo is undefined', () => {
-			const userInfo = createUserInfo();
-			expect( areUserInfosEqual( undefined, userInfo ) ).toBe( false );
+		test( 'should return false when first collaboratorInfo is undefined', () => {
+			const collaboratorInfo = createCollaboratorInfo();
+			expect(
+				areCollaboratorInfosEqual( undefined, collaboratorInfo )
+			).toBe( false );
 		} );
 
-		test( 'should return false when second userInfo is undefined', () => {
-			const userInfo = createUserInfo();
-			expect( areUserInfosEqual( userInfo, undefined ) ).toBe( false );
+		test( 'should return false when second collaboratorInfo is undefined', () => {
+			const collaboratorInfo = createCollaboratorInfo();
+			expect(
+				areCollaboratorInfosEqual( collaboratorInfo, undefined )
+			).toBe( false );
 		} );
 
-		test( 'should return true when userInfos are identical', () => {
-			const userInfo1 = createUserInfo();
-			const userInfo2 = createUserInfo();
-			expect( areUserInfosEqual( userInfo1, userInfo2 ) ).toBe( true );
+		test( 'should return true when collaboratorInfos are identical', () => {
+			const collaboratorInfo1 = createCollaboratorInfo();
+			const collaboratorInfo2 = createCollaboratorInfo();
+			expect(
+				areCollaboratorInfosEqual(
+					collaboratorInfo1,
+					collaboratorInfo2
+				)
+			).toBe( true );
 		} );
 
 		test( 'should return false when id differs', () => {
-			const userInfo1 = createUserInfo( { id: 1 } );
-			const userInfo2 = createUserInfo( { id: 2 } );
-			expect( areUserInfosEqual( userInfo1, userInfo2 ) ).toBe( false );
+			const collaboratorInfo1 = createCollaboratorInfo( { id: 1 } );
+			const collaboratorInfo2 = createCollaboratorInfo( { id: 2 } );
+			expect(
+				areCollaboratorInfosEqual(
+					collaboratorInfo1,
+					collaboratorInfo2
+				)
+			).toBe( false );
 		} );
 
 		test( 'should return false when name differs', () => {
-			const userInfo1 = createUserInfo( { name: 'User A' } );
-			const userInfo2 = createUserInfo( { name: 'User B' } );
-			expect( areUserInfosEqual( userInfo1, userInfo2 ) ).toBe( false );
+			const collaboratorInfo1 = createCollaboratorInfo( {
+				name: 'User A',
+			} );
+			const collaboratorInfo2 = createCollaboratorInfo( {
+				name: 'User B',
+			} );
+			expect(
+				areCollaboratorInfosEqual(
+					collaboratorInfo1,
+					collaboratorInfo2
+				)
+			).toBe( false );
 		} );
 
 		test( 'should return false when slug differs', () => {
-			const userInfo1 = createUserInfo( { slug: 'user-a' } );
-			const userInfo2 = createUserInfo( { slug: 'user-b' } );
-			expect( areUserInfosEqual( userInfo1, userInfo2 ) ).toBe( false );
+			const collaboratorInfo1 = createCollaboratorInfo( {
+				slug: 'user-a',
+			} );
+			const collaboratorInfo2 = createCollaboratorInfo( {
+				slug: 'user-b',
+			} );
+			expect(
+				areCollaboratorInfosEqual(
+					collaboratorInfo1,
+					collaboratorInfo2
+				)
+			).toBe( false );
 		} );
 
 		test( 'should return false when browserType differs', () => {
-			const userInfo1 = createUserInfo( { browserType: 'Chrome' } );
-			const userInfo2 = createUserInfo( { browserType: 'Firefox' } );
-			expect( areUserInfosEqual( userInfo1, userInfo2 ) ).toBe( false );
+			const collaboratorInfo1 = createCollaboratorInfo( {
+				browserType: 'Chrome',
+			} );
+			const collaboratorInfo2 = createCollaboratorInfo( {
+				browserType: 'Firefox',
+			} );
+			expect(
+				areCollaboratorInfosEqual(
+					collaboratorInfo1,
+					collaboratorInfo2
+				)
+			).toBe( false );
 		} );
 
 		test( 'should return false when color differs', () => {
-			const userInfo1 = createUserInfo( { color: '#3858E9' } );
-			const userInfo2 = createUserInfo( { color: '#B42AED' } );
-			expect( areUserInfosEqual( userInfo1, userInfo2 ) ).toBe( false );
+			const collaboratorInfo1 = createCollaboratorInfo( {
+				color: '#3858E9',
+			} );
+			const collaboratorInfo2 = createCollaboratorInfo( {
+				color: '#B42AED',
+			} );
+			expect(
+				areCollaboratorInfosEqual(
+					collaboratorInfo1,
+					collaboratorInfo2
+				)
+			).toBe( false );
 		} );
 
 		test( 'should return false when enteredAt differs', () => {
-			const userInfo1 = createUserInfo( { enteredAt: 1000 } );
-			const userInfo2 = createUserInfo( { enteredAt: 2000 } );
-			expect( areUserInfosEqual( userInfo1, userInfo2 ) ).toBe( false );
+			const collaboratorInfo1 = createCollaboratorInfo( {
+				enteredAt: 1000,
+			} );
+			const collaboratorInfo2 = createCollaboratorInfo( {
+				enteredAt: 2000,
+			} );
+			expect(
+				areCollaboratorInfosEqual(
+					collaboratorInfo1,
+					collaboratorInfo2
+				)
+			).toBe( false );
 		} );
 
 		test( 'should return false when objects have different number of keys', () => {
-			const userInfo1 = createUserInfo();
-			// Create userInfo2 with an extra key by casting
-			const userInfo2 = {
-				...createUserInfo(),
+			const collaboratorInfo1 = createCollaboratorInfo();
+			// Create collaboratorInfo2 with an extra key by casting
+			const collaboratorInfo2 = {
+				...createCollaboratorInfo(),
 				extraKey: 'extra',
-			} as unknown as UserInfo;
-			expect( areUserInfosEqual( userInfo1, userInfo2 ) ).toBe( false );
+			} as unknown as CollaboratorInfo;
+			expect(
+				areCollaboratorInfosEqual(
+					collaboratorInfo1,
+					collaboratorInfo2
+				)
+			).toBe( false );
 		} );
 	} );
 
-	describe( 'generateUserInfo', () => {
+	describe( 'generateCollaboratorInfo', () => {
 		const createMockUser = (
 			overrides: Partial< User< 'view' > > = {}
 		): User< 'view' > =>
@@ -131,20 +197,20 @@ describe( 'Awareness Utils', () => {
 			jest.restoreAllMocks();
 		} );
 
-		test( 'should generate userInfo with user properties', () => {
+		test( 'should generate collaboratorInfo with user properties', () => {
 			const user = createMockUser( { id: 42, name: 'Jane Doe' } );
-			const userInfo = generateUserInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user, [] );
 
-			expect( userInfo.id ).toBe( 42 );
-			expect( userInfo.name ).toBe( 'Jane Doe' );
-			expect( userInfo.slug ).toBe( 'test-user' );
+			expect( collaboratorInfo.id ).toBe( 42 );
+			expect( collaboratorInfo.name ).toBe( 'Jane Doe' );
+			expect( collaboratorInfo.slug ).toBe( 'test-user' );
 		} );
 
 		test( 'should include browser type', () => {
 			const user = createMockUser();
-			const userInfo = generateUserInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user, [] );
 
-			expect( userInfo.browserType ).toBe( 'Chrome' );
+			expect( collaboratorInfo.browserType ).toBe( 'Chrome' );
 		} );
 
 		test( 'should detect Firefox browser', () => {
@@ -152,9 +218,9 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0'
 			);
 			const user = createMockUser();
-			const userInfo = generateUserInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user, [] );
 
-			expect( userInfo.browserType ).toBe( 'Firefox' );
+			expect( collaboratorInfo.browserType ).toBe( 'Firefox' );
 		} );
 
 		test( 'should detect Microsoft Edge browser', () => {
@@ -162,9 +228,9 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59'
 			);
 			const user = createMockUser();
-			const userInfo = generateUserInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user, [] );
 
-			expect( userInfo.browserType ).toBe( 'Microsoft Edge' );
+			expect( collaboratorInfo.browserType ).toBe( 'Microsoft Edge' );
 		} );
 
 		test( 'should detect Safari browser', () => {
@@ -172,9 +238,9 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15'
 			);
 			const user = createMockUser();
-			const userInfo = generateUserInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user, [] );
 
-			expect( userInfo.browserType ).toBe( 'Safari' );
+			expect( collaboratorInfo.browserType ).toBe( 'Safari' );
 		} );
 
 		test( 'should detect Internet Explorer browser (MSIE)', () => {
@@ -182,9 +248,9 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; MSIE 10.0; rv:11.0) like Gecko'
 			);
 			const user = createMockUser();
-			const userInfo = generateUserInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user, [] );
 
-			expect( userInfo.browserType ).toBe( 'Internet Explorer' );
+			expect( collaboratorInfo.browserType ).toBe( 'Internet Explorer' );
 		} );
 
 		test( 'should detect Internet Explorer browser (Trident)', () => {
@@ -192,9 +258,9 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'
 			);
 			const user = createMockUser();
-			const userInfo = generateUserInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user, [] );
 
-			expect( userInfo.browserType ).toBe( 'Internet Explorer' );
+			expect( collaboratorInfo.browserType ).toBe( 'Internet Explorer' );
 		} );
 
 		test( 'should detect Opera browser (Opera)', () => {
@@ -202,9 +268,9 @@ describe( 'Awareness Utils', () => {
 				'Opera/9.80 (Windows NT 6.1; WOW64) Presto/2.12.388 Version/12.18'
 			);
 			const user = createMockUser();
-			const userInfo = generateUserInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user, [] );
 
-			expect( userInfo.browserType ).toBe( 'Opera' );
+			expect( collaboratorInfo.browserType ).toBe( 'Opera' );
 		} );
 
 		test( 'should detect Opera browser (OPR)', () => {
@@ -215,29 +281,29 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) OPR/77.0.4054.203'
 			);
 			const user = createMockUser();
-			const userInfo = generateUserInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user, [] );
 
-			expect( userInfo.browserType ).toBe( 'Opera' );
+			expect( collaboratorInfo.browserType ).toBe( 'Opera' );
 		} );
 
 		test( 'should return Unknown for unrecognized browser', () => {
 			mockUserAgent( 'Some Unknown Browser/1.0' );
 			const user = createMockUser();
-			const userInfo = generateUserInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user, [] );
 
-			expect( userInfo.browserType ).toBe( 'Unknown' );
+			expect( collaboratorInfo.browserType ).toBe( 'Unknown' );
 		} );
 
 		test( 'should include enteredAt timestamp', () => {
 			const user = createMockUser();
-			const userInfo = generateUserInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user, [] );
 
-			expect( userInfo.enteredAt ).toBe( 1704067200000 );
+			expect( collaboratorInfo.enteredAt ).toBe( 1704067200000 );
 		} );
 
 		test( 'should assign a color from the palette when no existing colors', () => {
 			const user = createMockUser();
-			const userInfo = generateUserInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user, [] );
 
 			const colorPalette = [
 				'#3858E9',
@@ -249,7 +315,7 @@ describe( 'Awareness Utils', () => {
 				'#00FDD9',
 				'#37C5F0',
 			];
-			expect( colorPalette ).toContain( userInfo.color );
+			expect( colorPalette ).toContain( collaboratorInfo.color );
 		} );
 
 		test( 'should avoid existing colors when assigning', () => {
@@ -263,10 +329,13 @@ describe( 'Awareness Utils', () => {
 				'#97FE17',
 				'#00FDD9',
 			];
-			const userInfo = generateUserInfo( user, existingColors );
+			const collaboratorInfo = generateCollaboratorInfo(
+				user,
+				existingColors
+			);
 
 			// The only available color from the palette is #37C5F0 (cyan)
-			expect( userInfo.color ).toBe( '#37C5F0' );
+			expect( collaboratorInfo.color ).toBe( '#37C5F0' );
 		} );
 
 		test( 'should generate color variation when all palette colors are in use', () => {
@@ -281,10 +350,13 @@ describe( 'Awareness Utils', () => {
 				'#00FDD9',
 				'#37C5F0',
 			];
-			const userInfo = generateUserInfo( user, existingColors );
+			const collaboratorInfo = generateCollaboratorInfo(
+				user,
+				existingColors
+			);
 
 			// Should be a valid hex color
-			expect( userInfo.color ).toMatch( /^#[0-9A-F]{6}$/i );
+			expect( collaboratorInfo.color ).toMatch( /^#[0-9A-F]{6}$/i );
 			// And should not be one of the original colors
 			// (it's a variation so could be close but not exactly the same in most cases)
 		} );
@@ -297,9 +369,9 @@ describe( 'Awareness Utils', () => {
 					'96': 'https://example.com/large.png',
 				},
 			} );
-			const userInfo = generateUserInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user, [] );
 
-			expect( userInfo.avatar_urls ).toEqual( {
+			expect( collaboratorInfo.avatar_urls ).toEqual( {
 				'24': 'https://example.com/small.png',
 				'48': 'https://example.com/medium.png',
 				'96': 'https://example.com/large.png',

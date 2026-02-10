@@ -11,6 +11,7 @@ import { PostEditorAwareness } from '../post-editor-awareness';
 import { SelectionType } from '../../utils/crdt-user-selections';
 import type { SelectionNone, SelectionCursor } from '../../types';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
+import type { CollaboratorInfo } from '../types';
 
 // Mock WordPress dependencies
 jest.mock( '@wordpress/data', () => ( {
@@ -437,7 +438,7 @@ describe( 'PostEditorAwareness', () => {
 
 			expect( debugData ).toHaveProperty( 'doc' );
 			expect( debugData ).toHaveProperty( 'clients' );
-			expect( debugData ).toHaveProperty( 'userMap' );
+			expect( debugData ).toHaveProperty( 'collaboratorMap' );
 		} );
 
 		test( 'should include document data', async () => {
@@ -473,7 +474,7 @@ describe( 'PostEditorAwareness', () => {
 	} );
 
 	describe( 'equalityFieldChecks', () => {
-		test( 'should include userInfo check from baseEqualityFieldChecks', async () => {
+		test( 'should include collaboratorInfo check from baseEqualityFieldChecks', async () => {
 			const awareness = new PostEditorAwareness(
 				doc,
 				'postType',
@@ -483,8 +484,8 @@ describe( 'PostEditorAwareness', () => {
 			awareness.setUp();
 			await Promise.resolve();
 
-			// Set userInfo and verify equality check works
-			const userInfo = {
+			// Set collaboratorInfo and verify equality check works
+			const collaboratorInfo: CollaboratorInfo = {
 				id: 1,
 				name: 'Test',
 				slug: 'test',
@@ -494,10 +495,14 @@ describe( 'PostEditorAwareness', () => {
 				enteredAt: 1704067200000,
 			};
 
-			awareness.setLocalStateField( 'userInfo', userInfo );
-			const storedInfo = awareness.getLocalStateField( 'userInfo' );
+			awareness.setLocalStateField(
+				'collaboratorInfo',
+				collaboratorInfo
+			);
+			const storedInfo =
+				awareness.getLocalStateField( 'collaboratorInfo' );
 
-			expect( storedInfo ).toEqual( userInfo );
+			expect( storedInfo ).toEqual( collaboratorInfo );
 		} );
 
 		test( 'should include editorState check', async () => {

@@ -12,8 +12,8 @@ import {
 	BaseAwareness,
 	baseEqualityFieldChecks,
 } from '../base-awareness';
-import { areUserInfosEqual } from '../utils';
-import type { BaseState, UserInfo } from '../types';
+import { areCollaboratorInfosEqual } from '../utils';
+import type { BaseState, CollaboratorInfo } from '../types';
 
 // Mock WordPress data
 jest.mock( '@wordpress/data', () => ( {
@@ -34,7 +34,7 @@ const mockAvatarUrls = {
 	'96': 'https://example.com/avatar-96.png',
 };
 
-const createMockUser = () => ( {
+const createMockCollaboratorInfo = () => ( {
 	id: 1,
 	name: 'Test User',
 	slug: 'test-user',
@@ -58,7 +58,9 @@ describe( 'BaseAwareness', () => {
 
 		// Mock resolveSelect to return getCurrentUser
 		( resolveSelect as jest.Mock ).mockReturnValue( {
-			getCurrentUser: jest.fn().mockResolvedValue( createMockUser() ),
+			getCurrentUser: jest
+				.fn()
+				.mockResolvedValue( createMockCollaboratorInfo() ),
 		} );
 	} );
 
@@ -99,18 +101,19 @@ describe( 'BaseAwareness', () => {
 			// Wait for async operations
 			await Promise.resolve();
 
-			const userInfo = awareness.getLocalStateField( 'userInfo' );
-			expect( userInfo ).toBeDefined();
-			expect( userInfo?.id ).toBe( 1 );
-			expect( userInfo?.name ).toBe( 'Test User' );
-			expect( userInfo?.browserType ).toBe( 'Chrome' );
+			const collaboratorInfo =
+				awareness.getLocalStateField( 'collaboratorInfo' );
+			expect( collaboratorInfo ).toBeDefined();
+			expect( collaboratorInfo?.id ).toBe( 1 );
+			expect( collaboratorInfo?.name ).toBe( 'Test User' );
+			expect( collaboratorInfo?.browserType ).toBe( 'Chrome' );
 		} );
 	} );
 
 	describe( 'baseEqualityFieldChecks', () => {
 		test( 'should have userInfo equality check', () => {
-			expect( baseEqualityFieldChecks.userInfo ).toBe(
-				areUserInfosEqual
+			expect( baseEqualityFieldChecks.collaboratorInfo ).toBe(
+				areCollaboratorInfosEqual
 			);
 		} );
 	} );
@@ -122,7 +125,7 @@ describe( 'BaseAwarenessState', () => {
 	 */
 	class TestBaseAwarenessState extends BaseAwarenessState< BaseState > {
 		protected equalityFieldChecks = {
-			userInfo: areUserInfosEqual,
+			collaboratorInfo: areCollaboratorInfosEqual,
 		};
 	}
 
@@ -139,7 +142,9 @@ describe( 'BaseAwarenessState', () => {
 		jest.spyOn( Date, 'now' ).mockReturnValue( 1704067200000 );
 
 		( resolveSelect as jest.Mock ).mockReturnValue( {
-			getCurrentUser: jest.fn().mockResolvedValue( createMockUser() ),
+			getCurrentUser: jest
+				.fn()
+				.mockResolvedValue( createMockCollaboratorInfo() ),
 		} );
 	} );
 
@@ -165,7 +170,7 @@ describe( 'BaseAwarenessState', () => {
 			const awareness = new TestBaseAwarenessState( doc );
 
 			// Manually add another user's state with a specific color
-			awareness.setLocalStateField( 'userInfo', {
+			awareness.setLocalStateField( 'collaboratorInfo', {
 				id: 2,
 				name: 'Other User',
 				slug: 'other-user',
@@ -179,8 +184,9 @@ describe( 'BaseAwarenessState', () => {
 			await Promise.resolve();
 
 			// The new user should get a different color if possible
-			const userInfo = awareness.getLocalStateField( 'userInfo' );
-			expect( userInfo ).toBeDefined();
+			const collaboratorInfo =
+				awareness.getLocalStateField( 'collaboratorInfo' );
+			expect( collaboratorInfo ).toBeDefined();
 
 			doc2.destroy();
 		} );
@@ -189,24 +195,27 @@ describe( 'BaseAwarenessState', () => {
 	describe( 'getLocalStateField', () => {
 		test( 'should return null when field not set', () => {
 			const awareness = new TestBaseAwarenessState( doc );
-			expect( awareness.getLocalStateField( 'userInfo' ) ).toBeNull();
+			expect(
+				awareness.getLocalStateField( 'collaboratorInfo' )
+			).toBeNull();
 		} );
 
-		test( 'should return userInfo after setUp', async () => {
+		test( 'should return collaboratorInfo after setUp', async () => {
 			const awareness = new TestBaseAwarenessState( doc );
 			awareness.setUp();
 			await Promise.resolve();
 
-			const userInfo = awareness.getLocalStateField( 'userInfo' );
-			expect( userInfo ).not.toBeNull();
-			expect( userInfo?.name ).toBe( 'Test User' );
+			const collaboratorInfo =
+				awareness.getLocalStateField( 'collaboratorInfo' );
+			expect( collaboratorInfo ).not.toBeNull();
+			expect( collaboratorInfo?.name ).toBe( 'Test User' );
 		} );
 	} );
 
 	describe( 'setLocalStateField', () => {
-		test( 'should set userInfo field', () => {
+		test( 'should set collaboratorInfo field', () => {
 			const awareness = new TestBaseAwarenessState( doc );
-			const userInfo: UserInfo = {
+			const collaboratorInfo: CollaboratorInfo = {
 				id: 42,
 				name: 'Custom User',
 				slug: 'custom-user',
@@ -216,16 +225,19 @@ describe( 'BaseAwarenessState', () => {
 				enteredAt: 1704067200000,
 			};
 
-			awareness.setLocalStateField( 'userInfo', userInfo );
-
-			expect( awareness.getLocalStateField( 'userInfo' ) ).toEqual(
-				userInfo
+			awareness.setLocalStateField(
+				'collaboratorInfo',
+				collaboratorInfo
 			);
+
+			expect(
+				awareness.getLocalStateField( 'collaboratorInfo' )
+			).toEqual( collaboratorInfo );
 		} );
 
-		test( 'should not update if userInfo is equal', () => {
+		test( 'should not update if collaboratorInfo is equal', () => {
 			const awareness = new TestBaseAwarenessState( doc );
-			const userInfo: UserInfo = {
+			const collaboratorInfo: CollaboratorInfo = {
 				id: 42,
 				name: 'Custom User',
 				slug: 'custom-user',
@@ -235,14 +247,19 @@ describe( 'BaseAwarenessState', () => {
 				enteredAt: 1704067200000,
 			};
 
-			awareness.setLocalStateField( 'userInfo', userInfo );
+			awareness.setLocalStateField(
+				'collaboratorInfo',
+				collaboratorInfo
+			);
 
 			// Subscribe to detect updates
 			const callback = jest.fn();
 			awareness.onStateChange( callback );
 
-			// Set same userInfo
-			awareness.setLocalStateField( 'userInfo', { ...userInfo } );
+			// Set same collaboratorInfo
+			awareness.setLocalStateField( 'collaboratorInfo', {
+				...collaboratorInfo,
+			} );
 
 			// Trigger awareness change event to test if callback is called
 			awareness.emit( 'change', [

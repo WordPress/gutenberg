@@ -7,7 +7,8 @@ import * as Y from 'yjs';
 /**
  * Internal dependencies
  */
-import { TypedAwareness, type EnhancedState } from '../awareness-types';
+import { TypedAwareness } from '../typed-awareness';
+import type { EnhancedState } from '../types';
 
 interface TestState {
 	name: string;
