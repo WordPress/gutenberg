@@ -295,6 +295,42 @@ Here is a summary:
 
 `wp-env` creates generated files in the `wp-env` home directory. By default, this is `~/.wp-env`. The exception is Linux, where files are placed at `~/wp-env` [for compatibility with Snap Packages](https://github.com/WordPress/gutenberg/issues/20180#issuecomment-587046325). The `wp-env` home directory contains a subdirectory for each project named `/$md5_of_project_path`. To change the `wp-env` home directory, set the `WP_ENV_HOME` environment variable. For example, running `WP_ENV_HOME="something" wp-env start` will download the project files to the directory `./something/$md5_of_project_path` (relative to the current directory).
 
+### Global options
+
+These options apply to all `wp-env` commands:
+
+```
+--debug    Enable debug output.                      [boolean] [default: false]
+--config   Path to a custom .wp-env.json configuration file.           [string]
+```
+
+The `--config` option allows you to use a custom configuration file instead of the default `.wp-env.json`. This is useful for running multiple parallel environments from the same directory.
+
+When using a custom config file, the override file is derived from its name. For example:
+- `--config=staging.json` will look for `staging.override.json`
+- `--config=./configs/dev.wp-env.json` will look for `./configs/dev.wp-env.override.json`
+
+#### Running parallel environments
+
+You can run multiple wp-env environments from the same folder by using different config files and ports:
+
+```sh
+# Start first environment with default config
+wp-env start
+
+# Start second environment with custom config on different ports
+WP_ENV_PORT=8890 WP_ENV_TESTS_PORT=8891 wp-env start --config=./staging.json
+
+# Check status of each environment
+wp-env status
+wp-env status --config=./staging.json
+
+# Stop specific environment
+wp-env stop --config=./staging.json
+```
+
+Each config file gets its own isolated Docker containers and data, so changes in one environment don't affect the other.
+
 ### `wp-env start`
 
 The start command installs and initializes the WordPress environment, which includes downloading any specified remote sources. By default, `wp-env` will not update or re-configure the environment except when the configuration file changes. Tell `wp-env` to update sources and apply the configuration options again with `wp-env start --update`. This will not overwrite any existing content.

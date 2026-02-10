@@ -19,6 +19,10 @@
 	&--label-position-side {
 		align-self: center;
 	}
+
+	.components-base-control__label {
+		margin-bottom: 0;
+	}
 }
 
 .dataforms-layouts-regular__field-control {

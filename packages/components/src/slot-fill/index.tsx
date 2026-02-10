@@ -64,9 +64,18 @@ export function createSlotFill( key: SlotKey ) {
 	);
 	FillComponent.displayName = `${ baseName }Fill`;
 
-	const SlotComponent = (
-		props: DistributiveOmit< SlotComponentProps, 'name' >
-	) => <Slot name={ key } { ...props } />;
+	// Wrap SlotComponent with forwardRef to support ref forwarding
+	const SlotComponent = forwardRef(
+		(
+			props: DistributiveOmit< SlotComponentProps, 'name' >,
+			ref: ForwardedRef< any >
+		) => <Slot name={ key } ref={ ref } { ...props } />
+	) as React.ForwardRefExoticComponent<
+		DistributiveOmit< SlotComponentProps, 'name' > &
+			React.RefAttributes< any >
+	> & {
+		__unstableName: SlotKey;
+	};
 	SlotComponent.displayName = `${ baseName }Slot`;
 	/**
 	 * @deprecated 6.8.0
