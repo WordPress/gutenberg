@@ -6,16 +6,18 @@ import { Composite } from '@wordpress/components';
 
 /**
  * Curated emoji set for reactions.
+ * The `value` slug is used as the storage key in the database to avoid
+ * potential encoding issues with emoji characters.
  */
 export const REACTION_EMOJIS = [
-	{ emoji: '👍', label: __( 'Thumbs up' ) },
-	{ emoji: '🤔', label: __( 'Thinking' ) },
-	{ emoji: '❤️', label: __( 'Heart' ) },
-	{ emoji: '🎉', label: __( 'Celebration' ) },
-	{ emoji: '😄', label: __( 'Smile' ) },
-	{ emoji: '😕', label: __( 'Confused' ) },
-	{ emoji: '👀', label: __( 'Eyes' ) },
-	{ emoji: '🚀', label: __( 'Rocket' ) },
+	{ emoji: '👍', label: __( 'Thumbs up' ), value: 'thumbs-up' },
+	{ emoji: '🤔', label: __( 'Thinking' ), value: 'thinking' },
+	{ emoji: '❤️', label: __( 'Heart' ), value: 'heart' },
+	{ emoji: '🎉', label: __( 'Celebration' ), value: 'celebration' },
+	{ emoji: '😄', label: __( 'Smile' ), value: 'smile' },
+	{ emoji: '😕', label: __( 'Confused' ), value: 'confused' },
+	{ emoji: '👀', label: __( 'Eyes' ), value: 'eyes' },
+	{ emoji: '🚀', label: __( 'Rocket' ), value: 'rocket' },
 ];
 
 /**

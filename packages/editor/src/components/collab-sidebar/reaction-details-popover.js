@@ -16,7 +16,11 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { REACTION_EMOJIS } from './reaction-emoji-picker';
+import {
+	REACTION_EMOJIS,
+	getEmojiBySlug,
+	getLabelBySlug,
+} from './reaction-emoji-picker';
 
 /**
  * Get user display name by ID.
@@ -98,9 +102,9 @@ export default function ReactionDetailsPopover( {
 		return null;
 	}
 
-	// Get emojis that have reactions, in the order they appear in REACTION_EMOJIS.
-	const orderedEmojis = REACTION_EMOJIS.map( ( { emoji } ) => emoji ).filter(
-		( emoji ) => reactions[ emoji ]?.length > 0
+	// Get slugs that have reactions, in the order they appear in REACTION_EMOJIS.
+	const orderedSlugs = REACTION_EMOJIS.map( ( { value } ) => value ).filter(
+		( slug ) => reactions[ slug ]?.length > 0
 	);
 
 	return (
@@ -116,19 +120,18 @@ export default function ReactionDetailsPopover( {
 				spacing="3"
 				className="editor-collab-sidebar-panel__reaction-details-content"
 			>
-				{ orderedEmojis.map( ( emoji ) => {
-					const emojiData = REACTION_EMOJIS.find(
-						( e ) => e.emoji === emoji
-					);
-					const reactionList = reactions[ emoji ];
+				{ orderedSlugs.map( ( slug ) => {
+					const reactionList = reactions[ slug ];
 
 					return (
-						<VStack key={ emoji } spacing="2">
+						<VStack key={ slug } spacing="2">
 							<HStack spacing="2" alignment="left">
 								<span className="editor-collab-sidebar-panel__reaction-details-emoji">
-									{ emoji }
+									{ getEmojiBySlug( slug ) }
 								</span>
-								<Text weight={ 600 }>{ emojiData?.label }</Text>
+								<Text weight={ 600 }>
+									{ getLabelBySlug( slug ) }
+								</Text>
 							</HStack>
 							<VStack spacing="1">
 								{ reactionList.map( ( reaction, index ) => (
