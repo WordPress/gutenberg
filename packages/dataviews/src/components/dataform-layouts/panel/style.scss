@@ -15,7 +15,7 @@
 
 	&--label-side {
 		flex-direction: row;
-		gap: $grid-unit-10;
+		gap: var(--wpds-dimension-gap-md);
 	}
 
 	&--label-top {
