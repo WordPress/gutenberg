@@ -24,7 +24,7 @@ import type {
 	NormalizedForm,
 	NormalizedFormField,
 	NormalizedPanelLayout,
-	FieldValidity,
+	FieldLayoutProps,
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
@@ -170,12 +170,7 @@ function PanelModal< Item >( {
 	field,
 	onChange,
 	validity,
-}: {
-	data: Item;
-	field: NormalizedFormField;
-	onChange: ( value: any ) => void;
-	validity?: FieldValidity;
-} ) {
+}: FieldLayoutProps< Item > ) {
 	const [ touched, setTouched ] = useState( false );
 
 	const { fields } = useContext( DataFormContext );

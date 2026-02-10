@@ -17,9 +17,8 @@ import { Stack } from '@wordpress/ui';
  * Internal dependencies
  */
 import type {
-	FieldValidity,
+	FieldLayoutProps,
 	NormalizedForm,
-	NormalizedFormField,
 	NormalizedPanelLayout,
 	FormValidity,
 } from '../../../types';
@@ -83,12 +82,7 @@ function PanelDropdown< Item >( {
 	field,
 	onChange,
 	validity,
-}: {
-	data: Item;
-	field: NormalizedFormField;
-	onChange: ( value: any ) => void;
-	validity?: FieldValidity;
-} ) {
+}: FieldLayoutProps< Item > ) {
 	const [ touched, setTouched ] = useState( false );
 
 	const { fields } = useContext( DataFormContext );
