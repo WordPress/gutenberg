@@ -21,7 +21,7 @@ function render_block_core_icon( $attributes ) {
 		return;
 	}
 
-	$registry = \WP_Icons_Registry::get_instance();
+	$registry = WP_Icons_Registry::get_instance();
 	$icon     = $registry->get_registered_icon( $attributes['icon'] );
 
 	if ( is_null( $icon ) ) {
