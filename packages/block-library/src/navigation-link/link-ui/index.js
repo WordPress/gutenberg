@@ -26,7 +26,7 @@ import { useInstanceId } from '@wordpress/compose';
  */
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
-import { useEntityBinding } from '../shared/use-entity-binding';
+import { useEntityBinding, useLinkPreview } from '../shared';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -70,8 +70,18 @@ export function getSuggestionsQuery( type, kind ) {
 }
 
 function UnforwardedLinkUI( props, ref ) {
-	const { label, url, opensInNewTab, type, kind, id, image, badges } =
-		props.link;
+	const { label, url, opensInNewTab, type, kind, id } = props.link;
+
+	const { entityRecord, hasBinding, isEntityAvailable } = props.entity;
+
+	const { image, badges } = useLinkPreview( {
+		url,
+		entityRecord,
+		type,
+		hasBinding,
+		isEntityAvailable,
+	} );
+
 	const { clientId } = props;
 	const postType = type || 'page';
 
