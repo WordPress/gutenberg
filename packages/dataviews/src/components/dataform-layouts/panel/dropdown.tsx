@@ -83,16 +83,14 @@ function PanelDropdown< Item >( {
 	field,
 	onChange,
 	validity,
-	onClose: onCloseCallback,
-	touched,
 }: {
 	data: Item;
 	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
 	validity?: FieldValidity;
-	onClose?: () => void;
-	touched: boolean;
 } ) {
+	const [ touched, setTouched ] = useState( false );
+
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedPanelLayout;
 	const labelPosition = layout.labelPosition;
@@ -167,7 +165,7 @@ function PanelDropdown< Item >( {
 				focusOnMount={ false }
 				onToggle={ ( willOpen ) => {
 					if ( ! willOpen ) {
-						onCloseCallback?.();
+						setTouched( true );
 					}
 				} }
 				renderToggle={ ( { isOpen, onToggle } ) => (

@@ -170,16 +170,14 @@ function PanelModal< Item >( {
 	field,
 	onChange,
 	validity,
-	onClose: onCloseCallback,
-	touched,
 }: {
 	data: Item;
 	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
 	validity?: FieldValidity;
-	onClose?: () => void;
-	touched: boolean;
 } ) {
+	const [ touched, setTouched ] = useState( false );
+
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedPanelLayout;
 	const labelPosition = layout.labelPosition;
@@ -200,7 +198,7 @@ function PanelModal< Item >( {
 
 	const handleClose = () => {
 		setIsOpen( false );
-		onCloseCallback?.();
+		setTouched( true );
 	};
 
 	return (

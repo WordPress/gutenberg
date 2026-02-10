@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { useState } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import type { FieldLayoutProps, NormalizedPanelLayout } from '../../../types';
@@ -18,9 +13,6 @@ export default function FormPanelField< Item >( {
 }: FieldLayoutProps< Item > ) {
 	const layout = field.layout as NormalizedPanelLayout;
 
-	const [ touched, setTouched ] = useState( false );
-	const handleClose = () => setTouched( true );
-
 	if ( layout.openAs === 'modal' ) {
 		return (
 			<PanelModal
@@ -28,8 +20,6 @@ export default function FormPanelField< Item >( {
 				field={ field }
 				onChange={ onChange }
 				validity={ validity }
-				onClose={ handleClose }
-				touched={ touched }
 			/>
 		);
 	}
@@ -40,8 +30,6 @@ export default function FormPanelField< Item >( {
 			field={ field }
 			onChange={ onChange }
 			validity={ validity }
-			onClose={ handleClose }
-			touched={ touched }
 		/>
 	);
 }
