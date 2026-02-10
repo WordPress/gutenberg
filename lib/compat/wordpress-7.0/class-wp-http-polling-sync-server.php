@@ -18,7 +18,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		/**
 		 * REST API namespace.
 		 */
-		const REST_NAMESPACE = 'wp/v2/sync';
+		const REST_NAMESPACE = 'wp-sync/v1';
 
 		/**
 		 * Awareness timeout in seconds. Clients that haven't updated
@@ -110,7 +110,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				),
 			);
 
-			// POST /wp/v2/sync/updates
+			// POST /wp-sync/v1/updates
 			register_rest_route(
 				self::REST_NAMESPACE,
 				'/updates',
