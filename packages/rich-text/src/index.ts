@@ -23,6 +23,7 @@ export { toggleFormat } from './toggle-format';
 export { unregisterFormatType } from './unregister-format-type';
 export { createElement as __unstableCreateElement } from './create-element';
 
+export { privateApis } from './private-apis';
 export { useAnchorRef } from './component/use-anchor-ref';
 export { useAnchor } from './component/use-anchor';
 
