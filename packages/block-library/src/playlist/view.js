@@ -205,7 +205,7 @@ function initPlayer( ref, track, shouldAutoPlay ) {
 	ref.removeAttribute( 'data-waveform-initialized' );
 
 	// Get colors from computed styles for proper inheritance.
-	const { textColor, bgColor, waveformColor, progressColor } =
+	const { textColor, waveformColor, progressColor } =
 		getWaveformColors( ref );
 
 	// Create the waveform container.
@@ -223,8 +223,8 @@ function initPlayer( ref, track, shouldAutoPlay ) {
 	// Create WaveformPlayer instance.
 	const instance = new WaveformPlayer( container );
 
-	// Apply background color to SVG icons for contrast.
-	styleSvgIcons( container, bgColor );
+	// Apply contrasting color to SVG icons for visibility.
+	styleSvgIcons( container, textColor );
 
 	// Enhance play button accessibility.
 	const playBtn = container.querySelector( '.waveform-btn' );

@@ -245,31 +245,11 @@ const PlaylistEdit = ( {
 			return;
 		}
 
-		// Get colors for styling.
-		const { textColor, bgColor, waveformColor, progressColor } =
-			getWaveformColors( currentElement );
-
 		// Clear any leftover DOM elements from previous player.
 		currentElement.innerHTML = '';
 
-		// Create waveform container.
-		const container = createWaveformContainer( {
-			url: currentTrackData.src,
-			title: currentTrackData.title,
-			artist: currentTrackData.artist,
-			artwork: currentTrackData.image,
-			waveformColor,
-			progressColor,
-			buttonColor: textColor,
-		} );
-		currentElement.appendChild( container );
-
-		// Create WaveformPlayer instance.
-		const instance = new WaveformPlayer( container );
-		waveformInstanceRef.current = instance;
-
-		// Apply background color to SVG icons for contrast.
-		styleSvgIcons( container, bgColor );
+		// Track cleanup state to avoid initializing after unmount.
+		let isCleanedUp = false;
 
 		// Handle track end - advance to next track.
 		const handleEnded = () => {
@@ -301,13 +281,51 @@ const PlaylistEdit = ( {
 			}
 		};
 
-		container.addEventListener( 'waveformplayer:ended', handleEnded );
+		// Defer initialization to ensure CSS is fully applied.
+		// The editor's iframe may not have styles ready immediately.
+		const timeoutId = setTimeout( () => {
+			if ( isCleanedUp ) {
+				return;
+			}
+
+			// Get colors for styling after CSS is applied.
+			const { textColor, waveformColor, progressColor } =
+				getWaveformColors( currentElement );
+
+			// Create waveform container with correct colors.
+			const container = createWaveformContainer( {
+				url: currentTrackData.src,
+				title: currentTrackData.title,
+				artist: currentTrackData.artist,
+				artwork: currentTrackData.image,
+				waveformColor,
+				progressColor,
+				buttonColor: textColor,
+			} );
+			currentElement.appendChild( container );
+
+			// Create WaveformPlayer instance.
+			const instance = new WaveformPlayer( container );
+			waveformInstanceRef.current = instance;
+
+			// Apply contrasting color to SVG icons for visibility.
+			styleSvgIcons( container, textColor );
+
+			container.addEventListener( 'waveformplayer:ended', handleEnded );
+		}, 100 );
 
 		return () => {
-			container.removeEventListener(
-				'waveformplayer:ended',
-				handleEnded
+			isCleanedUp = true;
+			clearTimeout( timeoutId );
+			const container = currentElement.querySelector(
+				'[data-waveform-player]'
 			);
+			if ( container ) {
+				container.removeEventListener(
+					'waveformplayer:ended',
+					handleEnded
+				);
+			}
 			waveformInstanceRef.current?.destroy();
 		};
 	}, [ currentTrackData?.src, setAttributes ] );

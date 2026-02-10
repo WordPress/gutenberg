@@ -87,6 +87,16 @@ $waveform-player-height: 100px;
 		background: color-mix(in srgb, currentColor 30%, transparent);
 	}
 
+	// Override WaveformPlayer's inline text colors to inherit from the block.
+	.waveform-title,
+	.waveform-subtitle {
+		color: currentColor !important;
+	}
+
+	.waveform-subtitle {
+		opacity: 0.7;
+	}
+
 	.wp-block-playlist__tracklist {
 		margin: 0;
 		padding-left: 0;
