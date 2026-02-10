@@ -988,3 +988,15 @@ export function isListViewPanelOpened( state, clientId ) {
 export function getListViewExpandRevision( state ) {
 	return state.listViewExpandRevision || 0;
 }
+
+/**
+ * Returns the client IDs for the block visibility modal, or null if
+ * the modal is not open.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array|null} Client IDs for the visibility modal, or null.
+ */
+export function getBlockVisibilityModalClientIds( state ) {
+	return state.blockVisibilityModalClientIds;
+}

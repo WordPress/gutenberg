@@ -75,8 +75,6 @@ export default function BlockTools( {
 } ) {
 	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode, isDragging } =
 		useSelect( selector, [] );
-	const [ visibilityModalClientIds, setVisibilityModalClientIds ] =
-		useState( null );
 	const isMatch = useShortcutEventMatch();
 	const {
 		getBlocksByClientId,
@@ -86,7 +84,9 @@ export default function BlockTools( {
 		getBlockName,
 		isGroupable,
 		getEditedContentOnlySection,
+		getBlockVisibilityModalClientIds,
 	} = unlock( useSelect( blockEditorStore ) );
+	const visibilityModalClientIds = getBlockVisibilityModalClientIds();
 	const { getGroupingBlockName } = useSelect( blocksStore );
 	const { showEmptyBlockSideInserter, showBlockToolbarPopover } =
 		useShowBlockTools();
@@ -108,6 +108,8 @@ export default function BlockTools( {
 		moveBlocksDown,
 		expandBlock,
 		stopEditingContentOnlySection,
+		showBlockVisibilityModal,
+		hideBlockVisibilityModal,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	function onKeyDown( event ) {
@@ -248,7 +250,7 @@ export default function BlockTools( {
 				}
 
 				// Open the visibility breakpoints modal.
-				setVisibilityModalClientIds( clientIds );
+				showBlockVisibilityModal( clientIds );
 			}
 		}
 
@@ -324,7 +326,7 @@ export default function BlockTools( {
 			{ visibilityModalClientIds && (
 				<BlockVisibilityModal
 					clientIds={ visibilityModalClientIds }
-					onClose={ () => setVisibilityModalClientIds( null ) }
+					onClose={ hideBlockVisibilityModal }
 				/>
 			) }
 		</div>

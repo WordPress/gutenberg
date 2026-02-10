@@ -9,6 +9,8 @@ import {
 	setInsertionPoint,
 	startDragging,
 	stopDragging,
+	showBlockVisibilityModal,
+	hideBlockVisibilityModal,
 } from '../private-actions';
 
 describe( 'private actions', () => {
@@ -118,6 +120,24 @@ describe( 'private actions', () => {
 			).toEqual( {
 				type: 'SET_INSERTION_POINT',
 				value: { rootClientId: '', index: '123' },
+			} );
+		} );
+	} );
+
+	describe( 'showBlockVisibilityModal', () => {
+		it( 'should return the SHOW_BLOCK_VISIBILITY_MODAL action with clientIds', () => {
+			const clientIds = [ 'client-1', 'client-2' ];
+			expect( showBlockVisibilityModal( clientIds ) ).toEqual( {
+				type: 'SHOW_BLOCK_VISIBILITY_MODAL',
+				clientIds,
+			} );
+		} );
+	} );
+
+	describe( 'hideBlockVisibilityModal', () => {
+		it( 'should return the HIDE_BLOCK_VISIBILITY_MODAL action', () => {
+			expect( hideBlockVisibilityModal() ).toEqual( {
+				type: 'HIDE_BLOCK_VISIBILITY_MODAL',
 			} );
 		} );
 	} );

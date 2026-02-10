@@ -475,3 +475,28 @@ export function closeListViewContentPanel() {
 		type: 'CLOSE_LIST_VIEW_CONTENT_PANEL',
 	};
 }
+
+/**
+ * Returns an action object used to open the block visibility modal
+ * for the given client IDs.
+ *
+ * @param {string[]} clientIds Client IDs of blocks to configure visibility for.
+ * @return {Object} Action object.
+ */
+export function showBlockVisibilityModal( clientIds ) {
+	return {
+		type: 'SHOW_BLOCK_VISIBILITY_MODAL',
+		clientIds,
+	};
+}
+
+/**
+ * Returns an action object used to close the block visibility modal.
+ *
+ * @return {Object} Action object.
+ */
+export function hideBlockVisibilityModal() {
+	return {
+		type: 'HIDE_BLOCK_VISIBILITY_MODAL',
+	};
+}

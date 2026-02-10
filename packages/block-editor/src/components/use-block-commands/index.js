@@ -16,6 +16,7 @@ import {
 	plus as add,
 	group,
 	ungroup,
+	unseen,
 } from '@wordpress/icons';
 
 /**
@@ -23,6 +24,7 @@ import {
  */
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 const getTransformCommands = () =>
 	function useTransformCommands() {
@@ -163,13 +165,14 @@ const getQuickActionsCommands = () =>
 
 		const blocks = getBlocksByClientId( clientIds );
 
+		const blockEditorDispatch = useDispatch( blockEditorStore );
 		const {
 			removeBlocks,
 			replaceBlocks,
 			duplicateBlocks,
 			insertAfterBlock,
 			insertBeforeBlock,
-		} = useDispatch( blockEditorStore );
+		} = blockEditorDispatch;
 
 		const onGroup = () => {
 			if ( ! blocks.length ) {
@@ -204,6 +207,7 @@ const getQuickActionsCommands = () =>
 			return { isLoading: false, commands: [] };
 		}
 
+		const { showBlockVisibilityModal } = unlock( blockEditorDispatch );
 		const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 		const canInsertDefaultBlock = canInsertBlockType(
 			getDefaultBlockName(),
@@ -280,6 +284,20 @@ const getQuickActionsCommands = () =>
 				label: __( 'Delete' ),
 				callback: () => removeBlocks( clientIds, true ),
 				icon: remove,
+			} );
+		}
+
+		const supportsVisibility = blocks.every(
+			( block ) =>
+				!! block && hasBlockSupport( block.name, 'visibility', true )
+		);
+
+		if ( supportsVisibility ) {
+			commands.push( {
+				name: 'toggle-visibility',
+				label: __( 'Hide' ),
+				callback: () => showBlockVisibilityModal( clientIds ),
+				icon: unseen,
 			} );
 		}
 

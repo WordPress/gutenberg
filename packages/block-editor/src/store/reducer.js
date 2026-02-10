@@ -1511,6 +1511,25 @@ export function isSelectionEnabled( state = true, action ) {
  *
  * @return {Object|false} Data for removal prompt display, if any.
  */
+/**
+ * Reducer returning the client IDs for the block visibility modal,
+ * or null if the modal is not open.
+ *
+ * @param {Array|null} state  Current state.
+ * @param {Object}     action Dispatched action.
+ *
+ * @return {Array|null} Client IDs for the visibility modal.
+ */
+export function blockVisibilityModalClientIds( state = null, action ) {
+	switch ( action.type ) {
+		case 'SHOW_BLOCK_VISIBILITY_MODAL':
+			return action.clientIds;
+		case 'HIDE_BLOCK_VISIBILITY_MODAL':
+			return null;
+	}
+	return state;
+}
+
 function removalPromptData( state = false, action ) {
 	switch ( action.type ) {
 		case 'DISPLAY_BLOCK_REMOVAL_PROMPT':
@@ -2220,6 +2239,7 @@ const combinedReducers = combineReducers( {
 	lastBlockInserted,
 	editedContentOnlySection,
 	blockVisibility,
+	blockVisibilityModalClientIds,
 	blockEditingModes,
 	styleOverrides,
 	removalPromptData,

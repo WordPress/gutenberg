@@ -42,6 +42,7 @@ import {
 	zoomLevel,
 	editedContentOnlySection,
 	withDerivedBlockEditingModes,
+	blockVisibilityModalClientIds,
 } from '../reducer';
 
 import { unlock } from '../../lock-unlock';
@@ -4568,6 +4569,37 @@ describe( 'state', () => {
 					)
 				);
 			} );
+		} );
+	} );
+
+	describe( 'blockVisibilityModalClientIds', () => {
+		it( 'should default to null', () => {
+			const state = blockVisibilityModalClientIds( undefined, {} );
+			expect( state ).toBeNull();
+		} );
+
+		it( 'should return clientIds on SHOW_BLOCK_VISIBILITY_MODAL', () => {
+			const clientIds = [ 'client-1', 'client-2' ];
+			const state = blockVisibilityModalClientIds( null, {
+				type: 'SHOW_BLOCK_VISIBILITY_MODAL',
+				clientIds,
+			} );
+			expect( state ).toEqual( clientIds );
+		} );
+
+		it( 'should return null on HIDE_BLOCK_VISIBILITY_MODAL', () => {
+			const state = blockVisibilityModalClientIds( [ 'client-1' ], {
+				type: 'HIDE_BLOCK_VISIBILITY_MODAL',
+			} );
+			expect( state ).toBeNull();
+		} );
+
+		it( 'should return current state for unknown actions', () => {
+			const currentState = [ 'client-1' ];
+			const state = blockVisibilityModalClientIds( currentState, {
+				type: 'UNKNOWN_ACTION',
+			} );
+			expect( state ).toBe( currentState );
 		} );
 	} );
 } );
