@@ -4,31 +4,6 @@
 $waveform-player-height: 100px;
 
 .wp-block-playlist {
-	.wp-block-playlist__current-item {
-		display: flex;
-		align-items: center;
-		gap: var(--wp--preset--spacing--40, 1.5em);
-		align-self: stretch;
-		padding-bottom: var(--wp--preset--spacing--30, 1em);
-		margin-bottom: var(--wp--preset--spacing--30, 1em);
-
-		div {
-			display: flex;
-			flex-direction: column;
-			align-items: flex-start;
-			gap: var(--wp--preset--spacing--20, 0.5em);
-		}
-
-		& .wp-block-playlist__current-item-artist-album {
-			flex-direction: row;
-		}
-
-		.wp-block-playlist__item-title {
-			word-break: break-all;
-		}
-
-	}
-
 	audio {
 		width: 100%;
 		margin-top: var(--wp--preset--spacing--20, 0.625em);
