@@ -2,6 +2,8 @@
 @use "@wordpress/admin-ui/build-style/style.css" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/breakpoints" as *;
+
 
 .boot-layout-container .boot-layout {
 	// On mobile the main content area has to scroll, otherwise you can invoke
@@ -32,8 +34,11 @@
 
 .boot-layout .components-editor-notices__snackbar {
 	position: fixed;
-	right: 0;
 	bottom: 16px;
 	padding-left: 16px;
 	padding-right: 16px;
+
+	@media (max-width: $break-small) {
+		right: 0;
+	}
 }
