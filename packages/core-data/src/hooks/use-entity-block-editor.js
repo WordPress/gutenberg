@@ -60,7 +60,7 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			return undefined;
 		}
 
-		if ( editedBlocks ) {
+		if ( editedBlocks && editedBlocks.length > 0 ) {
 			return editedBlocks;
 		}
 
