@@ -190,7 +190,11 @@ function MediaPickerButton( {
 	if ( ! showTooltip ) {
 		return mediaPickerButton;
 	}
-	return <Tooltip text={ label }>{ mediaPickerButton }</Tooltip>;
+	return (
+		<Tooltip text={ label } placement="top">
+			{ mediaPickerButton }
+		</Tooltip>
+	);
 }
 
 const archiveMimeTypes = [
@@ -250,6 +254,7 @@ function MoveButtons( {
 				size="small"
 				disabled={ isUploading || index === 0 }
 				accessibleWhenDisabled
+				tooltipPosition="top"
 				onClick={ ( event: React.MouseEvent< HTMLButtonElement > ) => {
 					event.stopPropagation();
 					moveItem( itemId, 'up' );
@@ -262,6 +267,7 @@ function MoveButtons( {
 				size="small"
 				disabled={ isUploading || index === totalItems - 1 }
 				accessibleWhenDisabled
+				tooltipPosition="top"
 				onClick={ ( event: React.MouseEvent< HTMLButtonElement > ) => {
 					event.stopPropagation();
 					moveItem( itemId, 'down' );
@@ -401,6 +407,7 @@ function ExpandedMediaEditAttachments( {
 										size="small"
 										disabled={ isUploading }
 										accessibleWhenDisabled
+										tooltipPosition="top"
 										onClick={ (
 											event: React.MouseEvent< HTMLButtonElement >
 										) => {
@@ -511,6 +518,7 @@ function CompactMediaEditAttachments( {
 												size="small"
 												disabled={ isUploading }
 												accessibleWhenDisabled
+												tooltipPosition="top"
 												onClick={ (
 													event: React.MouseEvent< HTMLButtonElement >
 												) => {
