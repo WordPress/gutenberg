@@ -193,6 +193,7 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 			overlayClassName="dataviews-action-modal__quick-edit"
 			__experimentalHideHeader
 			onRequestClose={ closeModal }
+			focusOnMount="firstElement"
 		>
 			<div className="dataviews-action-modal__quick-edit-header">
 				<PostCardPanel

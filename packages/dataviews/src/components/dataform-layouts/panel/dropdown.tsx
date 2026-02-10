@@ -11,9 +11,10 @@ import { __ } from '@wordpress/i18n';
 import { useMemo, useRef, useState } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import {
-	useFocusOnMount,
-	useFocusReturn,
-	useMergeRefs,
+	// useFocusOnMount,
+	// useFocusReturn,
+	// useMergeRefs,
+	__experimentalUseDialog as useDialog,
 } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
 
@@ -149,9 +150,9 @@ function PanelDropdown< Item >( {
 		[ popoverAnchor ]
 	);
 
-	const focusOnMountRef = useFocusOnMount( 'firstInputElement' );
-	const focusReturnRef = useFocusReturn();
-	const mergedRef = useMergeRefs( [ focusOnMountRef, focusReturnRef ] );
+	const [ dialogRef, dialogProps ] = useDialog( {
+		focusOnMount: 'firstInputElement',
+	} );
 
 	return (
 		<div
@@ -189,7 +190,7 @@ function PanelDropdown< Item >( {
 							title={ fieldLabel }
 							onClose={ onClose }
 						/>
-						<div ref={ mergedRef }>
+						<div ref={ dialogRef } { ...dialogProps }>
 							<DataFormLayout
 								data={ data }
 								form={ form }
