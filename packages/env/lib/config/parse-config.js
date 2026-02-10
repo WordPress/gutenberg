@@ -87,8 +87,8 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	phpVersion: null,
 	plugins: [],
 	themes: [],
-	port: 8888,
-	testsPort: 8889,
+	port: null,
+	testsPort: null,
 	mysqlPort: null,
 	phpmyadmin: false,
 	phpmyadminPort: null,
@@ -382,7 +382,9 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 
 	// Parse any root-only options.
 	if ( rawConfig.testsPort !== undefined ) {
-		checkPort( configFile, `testsPort`, rawConfig.testsPort );
+		if ( rawConfig.testsPort !== null ) {
+			checkPort( configFile, `testsPort`, rawConfig.testsPort );
+		}
 		parsedConfig.testsPort = rawConfig.testsPort;
 	}
 	if ( rawConfig.testsEnvironment !== undefined ) {
@@ -491,7 +493,9 @@ async function parseEnvironmentConfig(
 	const parsedConfig = {};
 
 	if ( config.port !== undefined ) {
-		checkPort( configFile, `${ environmentPrefix }port`, config.port );
+		if ( config.port !== null ) {
+			checkPort( configFile, `${ environmentPrefix }port`, config.port );
+		}
 		parsedConfig.port = config.port;
 	}
 

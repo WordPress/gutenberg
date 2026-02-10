@@ -591,8 +591,8 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"phpVersion"`       | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
 | `"plugins"`          | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
 | `"themes"`           | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
-| `"port"`             | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
-| `"testsPort"`        | `integer`      | `8889`                                 | The port number for the test site. You'll access the instance through the port: 'http://localhost:8889'.                         |
+| `"port"`             | `integer\|null` | `null`                                 | The port number to use for the installation. If `null`, `wp-env` will try port 8888 (8889 for tests) and fall back to an available port. An explicit integer disables automatic fallback. |
+| `"testsPort"`        | `integer\|null` | `null`                                 | The port number for the test site. If `null`, `wp-env` will try port 8889 and fall back to an available port. An explicit integer disables automatic fallback. |
 | `"testsEnvironment"` | `boolean`      | `false`                                | _Deprecated._ Whether to create a separate test environment with its own database and containers. Use `--config` with a separate config file instead. |
 | `"config"`           | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`         | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
@@ -606,9 +606,9 @@ _Note: the port number environment variable (`WP_ENV_PORT`) takes precedence ove
 
 ### Automatic Port Selection
 
-By default, `wp-env` will try to use ports 8888 and 8889 for the development and tests sites respectively. If these ports are already in use, `wp-env` will automatically find an available port in the ephemeral range (49152-65535). When a port is automatically changed, `wp-env` will display a message indicating the new port being used.
+When `port` or `testsPort` is `null` (the default), `wp-env` will try ports 8888 and 8889 respectively. If the preferred port is busy, it automatically finds an available port in the ephemeral range (49152-65535) and displays a message indicating the new port.
 
-To disable automatic port selection (for example in CI environments where predictable ports are required), set `WP_ENV_AUTO_PORT=false`. When disabled, `wp-env` will fail with an error if the configured port is busy instead of silently selecting a different one.
+When you set an explicit port number (e.g. `"port": 9000`), `wp-env` uses that exact port and fails with an error if it is busy. This is useful in CI environments where predictable ports are required.
 
 Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 

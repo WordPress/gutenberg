@@ -54,7 +54,6 @@ jobs:
 
             - name: Run the tests
               env:
-                  WP_ENV_AUTO_PORT: 'false'
                   PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: 1
                   SHARD_PART: ${{ matrix.part }}
                   SHARD_TOTAL: ${{ matrix.totalParts }}

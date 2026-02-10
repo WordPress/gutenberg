@@ -130,7 +130,10 @@ function appendPortToWPConfigs( config ) {
 			continue;
 		}
 
-		if ( config.env[ env ].port === undefined ) {
+		if (
+			config.env[ env ].port === undefined ||
+			config.env[ env ].port === null
+		) {
 			continue;
 		}
 
@@ -170,10 +173,12 @@ function validatePortUniqueness( config ) {
 		if ( env === 'tests' && testsDisabled ) {
 			continue;
 		}
-		if ( config.env[ env ].port === undefined ) {
-			throw new ValidationError(
-				`The "${ env }" environment has an invalid port.`
-			);
+		if (
+			config.env[ env ].port === undefined ||
+			config.env[ env ].port === null
+		) {
+			// Null ports will be resolved later; skip validation.
+			continue;
 		}
 
 		environmentPorts[ env ] = config.env[ env ].port;

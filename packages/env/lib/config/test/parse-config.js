@@ -19,8 +19,8 @@ jest.mock( '../../wordpress', () => ( {
  * Since our configurations are merged, we will want to refer to the parsed default config frequently.
  */
 const DEFAULT_CONFIG = {
-	port: 8888,
-	testsPort: 8889,
+	port: null,
+	testsPort: null,
 	mysqlPort: null,
 	phpmyadmin: false,
 	phpmyadminPort: null,

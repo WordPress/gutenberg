@@ -61,8 +61,8 @@ describe( 'Config Integration', () => {
 
 		const config = await loadConfig( '/test/gutenberg' );
 
-		expect( config.env.development.port ).toEqual( 8888 );
-		expect( config.env.tests.port ).toEqual( 8889 );
+		expect( config.env.development.port ).toEqual( null );
+		expect( config.env.tests.port ).toEqual( null );
 		expect( config.env.development.mysqlPort ).toEqual( null );
 		expect( config.env.tests.mysqlPort ).toEqual( null );
 		expect( config ).toMatchSnapshot();
@@ -96,7 +96,7 @@ describe( 'Config Integration', () => {
 		const config = await loadConfig( '/test/gutenberg' );
 
 		expect( config.env.development.port ).toEqual( 123 );
-		expect( config.env.tests.port ).toEqual( 8889 );
+		expect( config.env.tests.port ).toEqual( null );
 		expect( config.env.development.mysqlPort ).toEqual( 13306 );
 		expect( config.env.tests.mysqlPort ).toEqual( 23307 );
 		expect( config ).toMatchSnapshot();

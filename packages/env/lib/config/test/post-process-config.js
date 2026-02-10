@@ -274,6 +274,30 @@ describe( 'postProcessConfig', () => {
 				},
 			} );
 		} );
+
+		it( 'should not append port to URLs when port is null', async () => {
+			const processed = await postProcessConfig( {
+				port: null,
+				testsPort: null,
+				config: {
+					WP_TESTS_DOMAIN: 'localhost',
+					WP_SITEURL: 'http://localhost',
+					WP_HOME: 'http://localhost',
+				},
+				env: {
+					development: {},
+					tests: {},
+				},
+			} );
+
+			// Null ports should not be appended to URLs.
+			expect( processed.env.development.config.WP_SITEURL ).toEqual(
+				'http://localhost'
+			);
+			expect( processed.env.tests.config.WP_SITEURL ).toEqual(
+				'http://localhost'
+			);
+		} );
 	} );
 
 	describe( 'validatePortUniqueness', () => {
@@ -307,6 +331,20 @@ describe( 'postProcessConfig', () => {
 					},
 				} );
 			} ).not.toThrow();
+		} );
+
+		it( 'should not fail when both environments have null ports', async () => {
+			const processed = await postProcessConfig( {
+				port: null,
+				testsPort: null,
+				env: {
+					development: {},
+					tests: {},
+				},
+			} );
+
+			expect( processed.env.development.port ).toEqual( null );
+			expect( processed.env.tests.port ).toEqual( null );
 		} );
 	} );
 
