@@ -11,7 +11,9 @@ import {
 	Button,
 	ExternalLink,
 	__experimentalTruncate as Truncate,
+	__experimentalHStack as HStack,
 	Flex,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
@@ -31,7 +33,10 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
+import { unlock } from '../../lock-unlock';
 import { ViewerSlot } from './viewer-slot';
+
+const { Badge } = unlock( componentsPrivateApis );
 
 import useRichUrlData from './use-rich-url-data';
 
@@ -115,7 +120,7 @@ export default function LinkPreview( {
 				'is-url-title': displayTitle === displayURL,
 			} ) }
 		>
-			<Flex gap={ 0 }>
+			<Flex gap={ 0 } align="flex-start">
 				<Flex
 					className="block-editor-link-control__link-information"
 					role="figure"
@@ -124,6 +129,7 @@ export default function LinkPreview( {
 						__( 'Link information' )
 					}
 					justify="start"
+					align="flex-start"
 				>
 					{ value?.image ? (
 						<Flex
@@ -148,7 +154,7 @@ export default function LinkPreview( {
 					<Flex
 						className="block-editor-link-control__preview-details"
 						direction="column"
-						gap={ 1 }
+						gap={ 2 }
 					>
 						{ ! isEmptyURL ? (
 							<>
@@ -166,6 +172,22 @@ export default function LinkPreview( {
 											{ displayURL }
 										</Truncate>
 									</span>
+								) }
+								{ value?.badges?.length > 0 && (
+									<HStack
+										className="block-editor-link-control__preview-badges"
+										alignment="left"
+										gap={ 1 }
+									>
+										{ value.badges.map( ( badge ) => (
+											<Badge
+												key={ `${ badge.label }|${ badge.intent }` }
+												intent={ badge.intent }
+											>
+												{ badge.label }
+											</Badge>
+										) ) }
+									</HStack>
 								) }
 							</>
 						) : (
