@@ -44,6 +44,7 @@
 
 		.dataforms-layouts-panel__field-control {
 			color: $gray-700;
+			font-weight: var(--wpds-font-weight-regular);
 		}
 	}
 }
@@ -57,7 +58,6 @@
 	cursor: pointer;
 	display: flex;
 	align-items: center;
-	align-self: center;
 	fill: var(--wp-admin-theme-color);
 	flex: 0 0 auto;
 	opacity: 0;
@@ -99,10 +99,6 @@
 		line-height: inherit;
 	}
 
-	&--label-position-side {
-		align-self: center;
-	}
-
 	&.has-error {
 		color: $alert-red;
 	}
@@ -123,13 +119,14 @@
 }
 
 .dataforms-layouts-panel__field-control {
-	align-self: center;
 	flex-grow: 1;
 	min-width: 0;
-	min-height: $grid-unit-40;
+	min-height: $grid-unit-30;
+	line-height: var(--wpds-font-line-height-md);
 	display: flex;
 	align-items: center;
 	overflow: hidden;
+	font-weight: var(--wpds-font-weight-medium);
 
 	> * {
 		min-width: 0;
