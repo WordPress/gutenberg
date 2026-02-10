@@ -305,8 +305,8 @@ mark.wp-note {
 
 .editor-collab-sidebar-panel__emoji-picker {
 	display: flex;
+	flex-direction: column;
 	gap: $grid-unit-05;
-	flex-wrap: wrap;
 }
 
 .editor-collab-sidebar-panel__emoji-option {
