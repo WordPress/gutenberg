@@ -81,6 +81,7 @@ const EntitiesSavedStatesForPreview = ( {
 				saveLabel: activateSaveLabel,
 				renderDialog,
 				variant,
+				successNoticeContent: __( 'Theme activated.' ),
 			} }
 		/>
 	);
