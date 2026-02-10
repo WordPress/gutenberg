@@ -63,6 +63,12 @@
 	opacity: 0;
 	border-radius: var(--wpds-border-radius-xs);
 
+	&::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+	}
+
 	&:focus-visible {
 		opacity: 1;
 		outline: var(--wpds-border-width-focus) solid var(--wp-admin-theme-color);
