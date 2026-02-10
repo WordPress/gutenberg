@@ -8,7 +8,7 @@ import {
 	Button,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useRef, useState } from '@wordpress/element';
+import { useContext, useMemo, useRef, useState } from '@wordpress/element';
 import { closeSmall } from '@wordpress/icons';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
 import { Stack } from '@wordpress/ui';
@@ -20,15 +20,16 @@ import type {
 	FieldValidity,
 	NormalizedForm,
 	NormalizedFormField,
-	FormValidity,
-	NormalizedField,
 	NormalizedPanelLayout,
+	FormValidity,
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useReportValidity from '../../../hooks/use-report-validity';
 import getFirstValidationError from './utils/get-first-validation-error';
+import getFieldDefinitionAndSummaryFields from './utils/get-field-definition-and-summary-fields';
+import DataFormContext from '../../dataform-context';
 
 function DropdownHeader( {
 	title,
@@ -80,8 +81,6 @@ function PanelDropdown< Item >( {
 	field,
 	onChange,
 	validity,
-	summaryFields,
-	fieldDefinition,
 	onClose: onCloseCallback,
 	touched,
 	labelContent,
@@ -92,17 +91,18 @@ function PanelDropdown< Item >( {
 	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
 	validity?: FieldValidity;
-	summaryFields: NormalizedField< Item >[];
-	fieldDefinition: NormalizedField< Item >;
 	onClose?: () => void;
 	touched: boolean;
 	labelContent?: React.ReactNode;
 	labelClassName?: string;
 	showError?: boolean;
 } ) {
+	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedPanelLayout;
 	const labelPosition = layout.labelPosition;
-	const errorMessage = getFirstValidationError( validity );
+
+	const { fieldDefinition, summaryFields } =
+		getFieldDefinitionAndSummaryFields( layout, field, fields );
 
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 
@@ -150,6 +150,11 @@ function PanelDropdown< Item >( {
 	const [ dialogRef, dialogProps ] = useDialog( {
 		focusOnMount: 'firstInputElement',
 	} );
+
+	if ( ! fieldDefinition ) {
+		return null;
+	}
+	const errorMessage = getFirstValidationError( validity );
 
 	return (
 		<div

@@ -23,7 +23,6 @@ import type {
 	Field,
 	NormalizedForm,
 	NormalizedFormField,
-	NormalizedField,
 	NormalizedPanelLayout,
 	FieldValidity,
 } from '../../../types';
@@ -34,6 +33,7 @@ import useFormValidity from '../../../hooks/use-form-validity';
 import useReportValidity from '../../../hooks/use-report-validity';
 import DataFormContext from '../../dataform-context';
 import getFirstValidationError from './utils/get-first-validation-error';
+import getFieldDefinitionAndSummaryFields from './utils/get-field-definition-and-summary-fields';
 
 function ModalContent< Item >( {
 	data,
@@ -168,8 +168,6 @@ function PanelModal< Item >( {
 	field,
 	onChange,
 	validity,
-	summaryFields,
-	fieldDefinition,
 	onClose: onCloseCallback,
 	touched,
 	labelContent,
@@ -180,21 +178,26 @@ function PanelModal< Item >( {
 	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
 	validity?: FieldValidity;
-	summaryFields: NormalizedField< Item >[];
-	fieldDefinition: NormalizedField< Item >;
 	onClose?: () => void;
 	touched: boolean;
 	labelContent?: React.ReactNode;
 	labelClassName?: string;
 	showError?: boolean;
 } ) {
+	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedPanelLayout;
 	const labelPosition = layout.labelPosition;
-	const errorMessage = getFirstValidationError( validity );
+	const { fieldDefinition, summaryFields } =
+		getFieldDefinitionAndSummaryFields( layout, field, fields );
 
 	const [ isOpen, setIsOpen ] = useState( false );
 
+	if ( ! fieldDefinition ) {
+		return null;
+	}
+
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
+	const errorMessage = getFirstValidationError( validity );
 
 	const handleClose = () => {
 		setIsOpen( false );
