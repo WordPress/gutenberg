@@ -78,6 +78,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
 
+	// Experimental autosaves controller override for real-time collaboration.
+	require_once __DIR__ . '/experimental/sync/class-gutenberg-rest-autosaves-controller.php';
+
 	require_once __DIR__ . '/experimental/rest-api.php';
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 }

@@ -1329,6 +1329,10 @@ test.describe( 'Navigation block', () => {
 				await expect( linkPopover ).toBeHidden();
 			} );
 
+			const linkInput = linkPopover.getByRole( 'combobox', {
+				name: 'Link',
+			} );
+
 			await test.step( 'Verify unsync button works in Link UI popover', async () => {
 				// Open Link UI via keyboard shortcut
 				await pageUtils.pressKeys( 'primary+k' );
@@ -1339,10 +1343,6 @@ test.describe( 'Navigation block', () => {
 				await linkPopover
 					.getByRole( 'button', { name: 'Edit' } )
 					.click();
-
-				const linkInput = linkPopover.getByRole( 'combobox', {
-					name: 'Link',
-				} );
 
 				// Find and click unsync button
 				const unsyncButton = linkPopover.getByRole( 'button', {
@@ -1356,11 +1356,24 @@ test.describe( 'Navigation block', () => {
 				await expect( linkInput ).toHaveValue( '' );
 			} );
 
-			await test.step( 'Verify link field validates on blur in Link UI popover', async () => {
+			await test.step( 'Verify link field validates on submit in Link UI popover', async () => {
+				await page.keyboard.type( 'invalid url string' );
+
 				await page.keyboard.press( 'Tab' );
 
+				// Verify validation error is not shown on blur
 				await expect(
 					page.getByText( 'Please fill out this field' )
+				).toBeHidden();
+
+				// Go back to the link input and press enter to submit
+				await pageUtils.pressKeys( 'Shift+Tab' );
+				await expect( linkInput ).toBeFocused();
+				await page.keyboard.press( 'Enter' );
+
+				// Verify validation error is shown
+				await expect(
+					page.getByText( 'Please enter a valid URL.' )
 				).toBeVisible();
 			} );
 

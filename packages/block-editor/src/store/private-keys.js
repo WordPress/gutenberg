@@ -5,6 +5,5 @@ export const reusableBlocksSelectKey = Symbol( 'reusableBlocksSelect' );
 export const sectionRootClientIdKey = Symbol( 'sectionRootClientIdKey' );
 export const mediaEditKey = Symbol( 'mediaEditKey' );
 export const getMediaSelectKey = Symbol( 'getMediaSelect' );
-export const essentialFormatKey = Symbol( 'essentialFormat' );
 export const isIsolatedEditorKey = Symbol( 'isIsolatedEditor' );
 export const deviceTypeKey = Symbol( 'deviceTypeKey' );

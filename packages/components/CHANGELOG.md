@@ -9,6 +9,7 @@
 -   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
 -   `ToggleControl`: Prevent `__nextHasNoMarginBottom` from logging a console warning ([#75296](https://github.com/WordPress/gutenberg/pull/75296)).
 -   `createSlotFill`: fix ref forwarding ([#75274](https://github.com/WordPress/gutenberg/pull/75274)).
+-   `Button`: Fix native outline showing when focused and active ([#75346](https://github.com/WordPress/gutenberg/pull/75346)).
 
 ### Enhancements
 
