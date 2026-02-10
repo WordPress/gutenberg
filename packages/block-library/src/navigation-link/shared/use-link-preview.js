@@ -133,7 +133,6 @@ function computeBadges( {
  * @param {string}  options.url               - Link URL
  * @param {string}  options.type              - Entity type (page, post, etc.)
  * @param {Object}  options.entityRecord      - Entity record
- * @param {string}  options.entityStatus      - Entity status (publish, draft, etc.)
  * @param {boolean} options.hasBinding        - Whether link has entity binding
  * @param {boolean} options.isEntityAvailable - Whether bound entity exists
  * @return {Object} Preview data object with title, url, image, and badges
@@ -142,7 +141,6 @@ export function useLinkPreview( {
 	url,
 	entityRecord,
 	type,
-	entityStatus,
 	hasBinding,
 	isEntityAvailable,
 } ) {
@@ -189,7 +187,7 @@ export function useLinkPreview( {
 		url,
 		type,
 		isExternal,
-		entityStatus,
+		entityStatus: entityRecord?.status,
 		hasBinding,
 		isEntityAvailable,
 	} );

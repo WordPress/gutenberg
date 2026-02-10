@@ -70,7 +70,8 @@ export function getSuggestionsQuery( type, kind ) {
 }
 
 function UnforwardedLinkUI( props, ref ) {
-	const { label, url, opensInNewTab, type, kind, id } = props.link;
+	const { label, url, opensInNewTab, type, kind, id, image, badges } =
+		props.link;
 	const { clientId } = props;
 	const postType = type || 'page';
 
@@ -101,8 +102,10 @@ function UnforwardedLinkUI( props, ref ) {
 			kind,
 			type,
 			id,
+			image,
+			badges,
 		} ),
-		[ label, opensInNewTab, url, kind, type, id ]
+		[ label, opensInNewTab, url, kind, type, id, image, badges ]
 	);
 
 	const handlePageCreated = ( pageLink ) => {

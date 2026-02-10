@@ -130,7 +130,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		url,
 		entityRecord,
 		type: attributes.type,
-		entityStatus: entityRecord?.status,
 		hasBinding: hasUrlBinding,
 		isEntityAvailable: isBoundEntityAvailable,
 	} );

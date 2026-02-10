@@ -44,6 +44,7 @@ import {
 	useEnableLinkStatusValidation,
 	useIsDraggingWithin,
 	selectLabelText,
+	useLinkPreview,
 } from './shared';
 
 const DEFAULT_BLOCK = { name: 'core/navigation-link' };
@@ -167,9 +168,18 @@ export default function NavigationLinkEdit( {
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const { hasUrlBinding, isBoundEntityAvailable } = useEntityBinding( {
-		clientId,
-		attributes,
+	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
+
+	const linkPreview = useLinkPreview( {
+		url,
+		entityRecord,
+		type,
+		hasBinding: hasUrlBinding,
+		isEntityAvailable: isBoundEntityAvailable,
 	} );
 
 	const handleLinkChange = useHandleLinkChange( {
@@ -461,7 +471,7 @@ export default function NavigationLinkEdit( {
 						<LinkUI
 							ref={ linkUIref }
 							clientId={ clientId }
-							link={ attributes }
+							link={ { ...attributes, ...linkPreview } }
 							onClose={ () => {
 								setIsLinkOpen( false );
 								// If there is no link and no binding, remove the auto-inserted block.

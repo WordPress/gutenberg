@@ -125,17 +125,26 @@ export default function LinkPreview( {
 					}
 					justify="start"
 				>
-					<Flex
-						className={ clsx(
-							'block-editor-link-control__preview-icon',
-							{
-								'is-image': richData?.icon,
-							}
-						) }
-						justify="center"
-					>
-						{ icon }
-					</Flex>
+					{ value?.image ? (
+						<Flex
+							className="block-editor-link-control__preview-image"
+							justify="center"
+						>
+							<img src={ value?.image } alt="" />
+						</Flex>
+					) : (
+						<Flex
+							className={ clsx(
+								'block-editor-link-control__preview-icon',
+								{
+									'is-image': richData?.icon,
+								}
+							) }
+							justify="center"
+						>
+							{ icon }
+						</Flex>
+					) }
 					<Flex
 						className="block-editor-link-control__preview-details"
 						direction="column"
