@@ -30,13 +30,7 @@ import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
 import { unlock } from '../lock-unlock';
 
-/**
- * The edit function for the Icon Block.
- *
- * @param {Object} props All props passed to this function.
- */
-export function Edit( props ) {
-	const { attributes, setAttributes } = props;
+export function Edit( { attributes, setAttributes } ) {
 	const { icon, ariaLabel, style } = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
