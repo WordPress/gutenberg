@@ -117,16 +117,16 @@ export default function BreadcrumbEdit( {
 	}, [ content, status ] );
 	const [ showLoader, setShowLoader ] = useState( false );
 	useEffect( () => {
-		if ( status === 'loading' ) {
-			const timeout = setTimeout( () => {
-				setShowLoader( true );
-			}, 400 );
-			return () => {
-				clearTimeout( timeout );
-				setShowLoader( false );
-			};
+		if ( status !== 'loading' ) {
+			return;
 		}
-		setShowLoader( false );
+		const timeout = setTimeout( () => {
+			setShowLoader( true );
+		}, 400 );
+		return () => {
+			clearTimeout( timeout );
+			setShowLoader( false );
+		};
 	}, [ status ] );
 	const disabledRef = useDisabled();
 	const blockProps = useBlockProps( { ref: disabledRef } );
