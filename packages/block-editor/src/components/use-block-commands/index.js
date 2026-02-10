@@ -23,7 +23,6 @@ import {
 /**
  * Internal dependencies
  */
-import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
@@ -123,8 +122,8 @@ const getTransformCommands = () =>
 						'core/block-editor/transform-to-' +
 						name.replace( '/', '-' ),
 					/* translators: %s: Block or block variation name. */
-					label: sprintf( __( 'Transform to %s' ), title ),
-					icon: <BlockIcon icon={ icon } />,
+					label: sprintf( __( 'Transform to %s block' ), title ),
+					icon: icon.src,
 					callback: ( { close } ) => {
 						onBlockTransform( name );
 						close();
