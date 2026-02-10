@@ -39,6 +39,10 @@ fieldset.fields__media-edit {
 		.fields__media-edit-picker-button {
 			border: 0;
 			border-radius: 0;
+
+			&:focus-visible {
+				box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			}
 		}
 
 		// Target AnimatedMediaItem wrapper divs (direct children of VStack)
