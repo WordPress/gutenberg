@@ -7,7 +7,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { store as richTextStore } from './store';
+import { store as richTextStore } from '../store';
 
 function formatTypesSelector( select ) {
 	return select( richTextStore ).getFormatTypes();

@@ -29,7 +29,7 @@ export { useAnchor } from './component/use-anchor';
 
 export {
 	default as __experimentalRichText,
-	useRichText as __unstableUseRichText,
+	__unstableUseRichText,
 } from './component';
 
 /**
