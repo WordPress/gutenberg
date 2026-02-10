@@ -61,12 +61,18 @@ const { MediaUploadModal } = unlock( mediaUtilsPrivateApis );
 function AnimatedMediaItem( {
 	children,
 	index,
+	className,
 }: {
 	children: React.ReactNode;
 	index: number;
+	className?: string;
 } ) {
 	const ref = useMovingAnimation( index );
-	return <div ref={ ref }>{ children }</div>;
+	return (
+		<div ref={ ref } className={ className }>
+			{ children }
+		</div>
+	);
 }
 
 type BlobItem = {
@@ -450,93 +456,93 @@ function CompactMediaEditAttachments( {
 	return (
 		<>
 			{ !! allItems?.length && (
-				<VStack spacing={ 2 }>
-					{ allItems.map( ( attachment, index ) => {
-						const isBlob = isBlobURL( attachment.source_url );
-						return (
-							<AnimatedMediaItem
-								key={ attachment.id }
-								index={ index }
-							>
-								<div className="fields__media-edit-compact">
-									<div className="fields__media-edit-compact-item">
-										<MediaPickerButton
-											open={ () => {
-												setTargetItemId(
-													attachment.id as number
-												);
-												open();
-											} }
-											label={ __( 'Replace' ) }
-											showTooltip
-											onFilesDrop={ onFilesDrop }
-											attachment={ attachment }
-											isUploading={ isUploading }
-										>
-											<>
-												<MediaPreview
-													attachment={ attachment }
-												/>
-												{ ! isBlob && (
-													<MediaTitle
-														attachment={
-															attachment as Attachment< 'view' >
-														}
-													/>
-												) }
-											</>
-										</MediaPickerButton>
-										{ ! isBlob &&
-											multiple &&
-											allItems &&
-											allItems.length > 1 && (
-												<HStack
-													className="fields__media-edit-compact-movers"
-													spacing={ 1 }
-													alignment="flex-end"
-													expanded={ false }
-												>
-													<MoveButtons
-														itemId={
-															attachment.id as number
-														}
-														index={ index }
-														totalItems={
-															allItems.length
-														}
-														isUploading={
-															isUploading
-														}
-														moveItem={ moveItem }
-														orientation="vertical"
-													/>
-												</HStack>
-											) }
-									</div>
-									<Button
-										__next40pxDefaultSize
-										className="fields__media-edit-remove"
-										text={ __( 'Remove' ) }
-										variant="secondary"
-										disabled={ isUploading }
-										accessibleWhenDisabled
-										onClick={ (
-											event: React.MouseEvent< HTMLButtonElement >
-										) => {
-											event.stopPropagation();
-											if (
-												typeof attachment.id ===
-												'number'
-											) {
-												removeItem( attachment.id );
-											}
+				<div className="fields__media-edit-compact-group">
+					<VStack spacing={ 0 }>
+						{ allItems.map( ( attachment, index ) => {
+							const isBlob = isBlobURL( attachment.source_url );
+							const showMoveButtons =
+								multiple && allItems && allItems.length > 1;
+							return (
+								<AnimatedMediaItem
+									key={ attachment.id }
+									index={ index }
+									className="fields__media-edit-compact"
+								>
+									<MediaPickerButton
+										open={ () => {
+											setTargetItemId(
+												attachment.id as number
+											);
+											open();
 										} }
-									/>
-								</div>
-							</AnimatedMediaItem>
-						);
-					} ) }
-				</VStack>
+										label={ __( 'Replace' ) }
+										showTooltip
+										onFilesDrop={ onFilesDrop }
+										attachment={ attachment }
+										isUploading={ isUploading }
+									>
+										<>
+											<MediaPreview
+												attachment={ attachment }
+											/>
+											{ ! isBlob && (
+												<MediaTitle
+													attachment={
+														attachment as Attachment< 'view' >
+													}
+												/>
+											) }
+										</>
+									</MediaPickerButton>
+									{ ! isBlob && (
+										<HStack
+											className="fields__media-edit-compact-movers"
+											spacing={ 1 }
+											alignment="flex-end"
+											expanded={ false }
+										>
+											{ showMoveButtons && (
+												<MoveButtons
+													itemId={
+														attachment.id as number
+													}
+													index={ index }
+													totalItems={
+														allItems.length
+													}
+													isUploading={ isUploading }
+													moveItem={ moveItem }
+													orientation="vertical"
+												/>
+											) }
+											<Button
+												__next40pxDefaultSize
+												icon={ closeSmall }
+												label={ __( 'Remove' ) }
+												size="small"
+												disabled={ isUploading }
+												accessibleWhenDisabled
+												onClick={ (
+													event: React.MouseEvent< HTMLButtonElement >
+												) => {
+													event.stopPropagation();
+													if (
+														typeof attachment.id ===
+														'number'
+													) {
+														removeItem(
+															attachment.id
+														);
+													}
+												} }
+											/>
+										</HStack>
+									) }
+								</AnimatedMediaItem>
+							);
+						} ) }
+					</VStack>
+				</div>
 			) }
 			{ ( multiple || ! allItems?.length ) && (
 				<MediaEditPlaceholder

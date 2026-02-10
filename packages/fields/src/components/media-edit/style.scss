@@ -31,23 +31,31 @@ fieldset.fields__media-edit {
 	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
 	container-type: inline-size;
 
+	.fields__media-edit-compact-group {
+		border: $border-width dashed $gray-600;
+		border-radius: $radius-x-small;
+		overflow: hidden;
+
+		.fields__media-edit-picker-button {
+			border: 0;
+			border-radius: 0;
+		}
+
+		// Target AnimatedMediaItem wrapper divs (direct children of VStack)
+		> div > .fields__media-edit-compact:not(:last-child) {
+			border-bottom: $border-width solid $gray-300;
+		}
+	}
+
 	.fields__media-edit-compact {
-		display: grid;
-		grid-template-columns: 1fr auto;
-		gap: $grid-unit-10;
-		align-items: center;
 		@include compact-drop-zone-label;
+		position: relative;
+		min-width: 0;
 
-		.fields__media-edit-compact-item {
-			position: relative;
-			min-width: 0;
-			flex: 1;
-
-			&:hover,
-			&:focus-within {
-				.fields__media-edit-compact-movers {
-					opacity: 1;
-				}
+		&:hover,
+		&:focus-within {
+			.fields__media-edit-compact-movers {
+				opacity: 1;
 			}
 		}
 
