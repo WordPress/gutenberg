@@ -867,7 +867,10 @@ export default function MediaEdit< Item >( {
 											{ field.label }
 										</VisuallyHidden>
 									) : (
-										<BaseControl.VisualLabel as="legend">
+										<BaseControl.VisualLabel
+											as="legend"
+											style={ { marginBottom: 0 } }
+										>
 											{ field.label }
 										</BaseControl.VisualLabel>
 									) ) }
