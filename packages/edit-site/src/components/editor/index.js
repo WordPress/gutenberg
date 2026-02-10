@@ -39,6 +39,9 @@ import SavePanel from '../save-panel';
 import SiteEditorMoreMenu from '../more-menu';
 import SiteIcon from '../site-icon';
 import useEditorIframeProps from '../block-editor/use-editor-iframe-props';
+import {
+	InitialViewportSync,
+} from '../block-editor/use-initial-viewport-sync';
 import useEditorTitle from './use-editor-title';
 import { useIsSiteEditorLoading } from '../layout/hooks';
 import { useAdaptEditorToCanvas } from './use-adapt-editor-to-canvas';
@@ -238,6 +241,7 @@ export default function EditSiteEditor( { isHomeRoute = false } ) {
 						)
 					}
 				>
+					{ isEditMode && <InitialViewportSync /> }
 					{ isEditMode && (
 						<BackButton>
 							{ ( { length } ) =>
