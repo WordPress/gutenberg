@@ -437,7 +437,7 @@ describe( 'ColorPicker', () => {
 			} );
 
 			// Blue (#3366ff) has a hue of 225°.
-			expect( pickerHueSlider ).toHaveAttribute( 'aria-valuenow', '225' );
+			expect( pickerHueSlider ).toHaveValue( 225 );
 
 			// Change color to black via hex input.
 			const hexInput = screen.getByRole( 'textbox' );
@@ -446,10 +446,7 @@ describe( 'ColorPicker', () => {
 
 			// The picker hue should still be 225° (blue), not 0° (red).
 			await waitFor( () => {
-				expect( pickerHueSlider ).toHaveAttribute(
-					'aria-valuenow',
-					'225'
-				);
+				expect( pickerHueSlider ).toHaveValue( 225 );
 			} );
 		} );
 
@@ -469,7 +466,7 @@ describe( 'ColorPicker', () => {
 			} );
 
 			// Green (#38cc38) has a hue of 120°.
-			expect( pickerHueSlider ).toHaveAttribute( 'aria-valuenow', '120' );
+			expect( pickerHueSlider ).toHaveValue( 120 );
 
 			// Change color to white via hex input.
 			const hexInput = screen.getByRole( 'textbox' );
@@ -478,10 +475,7 @@ describe( 'ColorPicker', () => {
 
 			// The picker hue should still be 120° (green), not 0° (red).
 			await waitFor( () => {
-				expect( pickerHueSlider ).toHaveAttribute(
-					'aria-valuenow',
-					'120'
-				);
+				expect( pickerHueSlider ).toHaveValue( 120 );
 			} );
 		} );
 
@@ -501,7 +495,7 @@ describe( 'ColorPicker', () => {
 			} );
 
 			// Pure blue (#0000ff) has a hue of 240°.
-			expect( pickerHueSlider ).toHaveAttribute( 'aria-valuenow', '240' );
+			expect( pickerHueSlider ).toHaveValue( 240 );
 
 			// Change color to gray via hex input.
 			const hexInput = screen.getByRole( 'textbox' );
@@ -510,10 +504,7 @@ describe( 'ColorPicker', () => {
 
 			// The picker hue should still be 240° (blue), not 0° (red).
 			await waitFor( () => {
-				expect( pickerHueSlider ).toHaveAttribute(
-					'aria-valuenow',
-					'240'
-				);
+				expect( pickerHueSlider ).toHaveValue( 240 );
 			} );
 		} );
 	} );

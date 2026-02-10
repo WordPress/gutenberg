@@ -88,7 +88,9 @@ export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
 		<Component
 			color={ hsvColor }
 			onChange={ ( nextHsv ) => {
-				if ( isChromatic( nextHsv ) ) {
+				const chromatic = isChromatic( nextHsv );
+
+				if ( chromatic ) {
 					preservedHueRef.current = nextHsv.h;
 				}
 
@@ -96,9 +98,7 @@ export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
 
 				// Cache the HSV and hex to prevent jitter on re-render.
 				lastHsvRef.current = {
-					h: isChromatic( nextHsv )
-						? nextHsv.h
-						: preservedHueRef.current,
+					h: chromatic ? nextHsv.h : preservedHueRef.current,
 					s: nextHsv.s,
 					v: nextHsv.v,
 					a: 'a' in nextHsv ? nextHsv.a : 1,
@@ -106,6 +106,16 @@ export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
 				lastHexRef.current = nextColord.toHex();
 
 				onChange( nextColord );
+			} }
+			// Pointer capture fortifies drag gestures so that they continue to
+			// work while dragging outside the component over objects like
+			// iframes. If a newer version of react-colorful begins to employ
+			// pointer capture this will be redundant and should be removed.
+			onPointerDown={ ( { currentTarget, pointerId } ) => {
+				currentTarget.setPointerCapture( pointerId );
+			} }
+			onPointerUp={ ( { currentTarget, pointerId } ) => {
+				currentTarget.releasePointerCapture( pointerId );
 			} }
 		/>
 	);
