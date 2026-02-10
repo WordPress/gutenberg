@@ -33,7 +33,7 @@ fieldset.fields__media-edit {
 
 	.fields__media-edit-compact-group {
 		border: $border-width dashed $gray-600;
-		border-radius: $radius-x-small;
+		border-radius: $radius-small;
 		overflow: hidden;
 
 		.fields__media-edit-picker-button {
@@ -47,7 +47,7 @@ fieldset.fields__media-edit {
 
 		// Target AnimatedMediaItem wrapper divs (direct children of VStack)
 		> div > .fields__media-edit-compact:not(:last-child) {
-			border-bottom: $border-width solid $gray-300;
+			border-bottom: $border-width solid $gray-100;
 		}
 	}
 
@@ -71,6 +71,7 @@ fieldset.fields__media-edit {
 			opacity: 0;
 			pointer-events: none;
 			z-index: 1;
+			@include preview-overlay;
 
 			@media not (prefers-reduced-motion) {
 				transition: opacity 50ms ease-out;
@@ -78,10 +79,6 @@ fieldset.fields__media-edit {
 
 			* {
 				pointer-events: auto;
-			}
-
-			button {
-				@include preview-overlay;
 			}
 		}
 	}
@@ -103,7 +100,7 @@ fieldset.fields__media-edit {
 		min-width: 0;
 
 		&:hover {
-			background-color: $gray-100;
+			color: var(--wp-admin-theme-color);
 		}
 
 		&:focus-visible {

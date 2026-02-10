@@ -494,7 +494,7 @@ function CompactMediaEditAttachments( {
 									{ ! isBlob && (
 										<HStack
 											className="fields__media-edit-compact-movers"
-											spacing={ 1 }
+											spacing={ 0 }
 											alignment="flex-end"
 											expanded={ false }
 										>
