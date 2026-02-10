@@ -39,7 +39,7 @@ function render_block_core_icon( $attributes ) {
 		$processor->set_attribute( 'focusable', 'false' );
 	} else {
 		$processor->set_attribute( 'role', 'img' );
-		$processor->set_attribute( 'aria-label', esc_html( $aria_label ) );
+		$processor->set_attribute( 'aria-label', $aria_label );
 	}
 
 	// Return the updated SVG markup.
