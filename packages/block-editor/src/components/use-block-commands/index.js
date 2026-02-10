@@ -118,13 +118,20 @@ const getTransformCommands = () =>
 		const commands = possibleBlockTransformations.map(
 			( transformation ) => {
 				const { name, title, icon } = transformation;
+				const blockIcon =
+					icon?.src === 'block-default'
+						? {
+								src: blockDefaultIcon,
+						  }
+						: icon;
+
 				return {
 					name:
 						'core/block-editor/transform-to-' +
 						name.replace( '/', '-' ),
 					/* translators: %s: Block or block variation name. */
 					label: sprintf( __( 'Transform to %s' ), title ),
-					icon: icon?.src ?? blockDefaultIcon,
+					icon: blockIcon?.src,
 					callback: ( { close } ) => {
 						onBlockTransform( name );
 						close();
