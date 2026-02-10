@@ -384,7 +384,7 @@ function ExpandedMediaEditAttachments( {
 							<div className="fields__media-edit-expanded-overlay">
 								<HStack
 									className="fields__media-edit-expanded-actions"
-									spacing={ 1 }
+									spacing={ 0 }
 									alignment="flex-end"
 									expanded={ false }
 								>

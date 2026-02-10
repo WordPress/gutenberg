@@ -2,7 +2,7 @@
 @use "@wordpress/base-styles/variables" as *;
 
 @mixin preview-overlay {
-	border-radius: $radius-x-small;
+	border-radius: $radius-small;
 	backdrop-filter: blur(16px) saturate(180%);
 	background: rgba(255, 255, 255, 0.75);
 }
@@ -94,7 +94,7 @@ fieldset.fields__media-edit {
 		align-items: center;
 		gap: $grid-unit-15;
 		border: $border-width dashed $gray-600;
-		border-radius: $radius-x-small;
+		border-radius: $radius-medium;
 		padding: calc(8px - #{$border-width});
 		cursor: pointer;
 		min-width: 0;
@@ -186,20 +186,16 @@ fieldset.fields__media-edit {
 
 		.fields__media-edit-expanded-actions {
 			position: absolute;
-			top: $grid-unit-10;
-			right: $grid-unit-10;
-
-			button {
-				@include preview-overlay;
-			}
+			top: $grid-unit-05;
+			right: $grid-unit-05;
+			@include preview-overlay;
 		}
 
 		.fields__media-edit-expanded-title {
 			position: absolute;
-			bottom: 0;
-			left: 0;
-			right: 0;
-			margin: $grid-unit-10;
+			bottom: $grid-unit-05;
+			left: $grid-unit-05;
+			right: $grid-unit-05;
 			padding: $grid-unit-05;
 			text-align: center;
 			@include preview-overlay;
