@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Composite } from '@wordpress/components';
+import { Button, Composite } from '@wordpress/components';
 
 /**
  * Curated emoji set for reactions.
@@ -21,29 +21,51 @@ export const REACTION_EMOJIS = [
 ];
 
 /**
+ * Get the emoji character for a given reaction slug.
+ *
+ * @param {string} slug The reaction slug.
+ * @return {string} The emoji character, or the slug if not found.
+ */
+export function getEmojiBySlug( slug ) {
+	return REACTION_EMOJIS.find( ( r ) => r.value === slug )?.emoji ?? slug;
+}
+
+/**
+ * Get the label for a given reaction slug.
+ *
+ * @param {string} slug The reaction slug.
+ * @return {string} The label, or the slug if not found.
+ */
+export function getLabelBySlug( slug ) {
+	return REACTION_EMOJIS.find( ( r ) => r.value === slug )?.label ?? slug;
+}
+
+/**
  * A selection of emoji buttons for adding reactions.
  *
  * @param {Object}   props          Component props.
  * @param {Function} props.onSelect Callback when an emoji is selected.
- * @param {boolean}  props.disabled Whether the picker is disabled.
+ * @return {WPElement} The ReactionEmojiPicker component.
  */
-export default function ReactionEmojiPicker( { onSelect, disabled = false } ) {
+export default function ReactionEmojiPicker( { onSelect } ) {
 	return (
 		<Composite
 			role="listbox"
 			aria-label={ __( 'Select an emoji reaction' ) }
 			className="editor-collab-sidebar-panel__emoji-picker"
 		>
-			{ REACTION_EMOJIS.map( ( { emoji, label } ) => (
+			{ REACTION_EMOJIS.map( ( { emoji, label, value } ) => (
 				<Composite.Item
-					key={ emoji }
-					role="option"
-					className="editor-collab-sidebar-panel__emoji-option"
-					onClick={ () => onSelect( emoji ) }
-					disabled={ disabled }
-					accessibleWhenDisabled
-					aria-label={ label }
-					type="button"
+					key={ value }
+					render={
+						<Button
+							role="option"
+							size="compact"
+							onClick={ () => onSelect( value ) }
+							aria-label={ label }
+							className="editor-collab-sidebar-panel__emoji-option"
+						/>
+					}
 				>
 					{ emoji }
 				</Composite.Item>

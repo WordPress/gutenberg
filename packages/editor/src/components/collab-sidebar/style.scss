@@ -1,6 +1,7 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/mixins" as *;
 @use "@wordpress/base-styles/variables" as *;
+@use "sass:math";
 
 .interface-interface-skeleton__sidebar:has(.editor-collab-sidebar) {
 	box-shadow: none;
@@ -246,50 +247,19 @@ mark.wp-note {
 }
 
 .editor-collab-sidebar-panel__reaction-button {
-	display: inline-flex;
-	align-items: center;
-	gap: 2px;
-	padding: $grid-unit-05 !important; // Override Button component's size constraints.
-	border-radius: $radius-round;
+	gap: $grid-unit-05;
 	border: $border-width solid $gray-300;
 	background-color: $gray-100;
-	font-size: $default-font-size;
-	height: 32px !important; // Override Button component's size constraints.
-	cursor: pointer;
-	transition: background-color 0.1s ease;
-
-	&:hover {
-		background-color: $gray-200;
-	}
-
-	&:focus {
-		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
-		outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
-	}
-
-	&.is-active {
-		background-color: var(--wp-admin-theme-color--rgb, rgba(56, 88, 233, 0.1));
-		border-color: var(--wp-admin-theme-color);
-	}
-
-	// Override the Button component's .is-pressed dark background (#1E1E1E)
-	// which gets added automatically when aria-pressed is true.
-	&.is-pressed:not(:disabled),
-	&.is-pressed:hover:not(:disabled) {
-		background: rgba(56, 88, 233, 0.1);
-		color: $gray-700;
-	}
-}
-
-.editor-collab-sidebar-panel__reaction-emoji {
-	font-size: 14px;
-	line-height: 1;
-}
-
-.editor-collab-sidebar-panel__reaction-count {
-	font-size: $default-font-size;
 	font-weight: $font-weight-medium;
 	color: $gray-700;
+	border-radius: math.div($button-size-compact, 2);
+	font-size: $font-size-small;
+
+	&.editor-collab-sidebar-panel__reaction-button[aria-pressed="true"] {
+		background-color: var(--wp-admin-theme-color--rgb, rgba(56, 88, 233, 0.1));
+		border-color: var(--wp-admin-theme-color);
+		color: inherit;
+	}
 }
 
 .editor-collab-sidebar-panel__add-reaction-button {
@@ -313,7 +283,8 @@ mark.wp-note {
 		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 	}
 
-	&:focus {
+	&:focus,
+	&[aria-expanded="true"] {
 		opacity: 1;
 		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
 		outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
@@ -327,12 +298,6 @@ mark.wp-note {
 	}
 }
 
-// Keep the button visible while the emoji picker dropdown is open.
-.editor-collab-sidebar-panel__add-reaction-dropdown {
-	&:focus-within .editor-collab-sidebar-panel__add-reaction-button {
-		opacity: 1;
-	}
-}
 
 .editor-collab-sidebar-panel__add-reaction-popover {
 	padding: $grid-unit-10;
@@ -345,27 +310,9 @@ mark.wp-note {
 }
 
 .editor-collab-sidebar-panel__emoji-option {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
 	width: 32px;
-	height: 32px;
-	padding: 0;
-	border: none;
-	border-radius: $radius-medium;
-	background-color: transparent;
 	font-size: 18px;
-	cursor: pointer;
-	transition: background-color 0.1s ease;
-
-	&:hover {
-		background-color: $gray-200;
-	}
-
-	&:focus {
-		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
-		outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
-	}
+	justify-content: center;
 }
 
 .editor-collab-sidebar-panel__reaction-details .components-popover__content {
