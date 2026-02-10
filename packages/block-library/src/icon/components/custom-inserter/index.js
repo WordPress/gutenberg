@@ -17,7 +17,6 @@ export default function CustomInserterModal( {
 	attributes,
 	setAttributes,
 } ) {
-
 	const [ searchInput, setSearchInput ] = useState( '' );
 
 	// Debounce the search input with a 300ms delay
