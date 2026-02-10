@@ -1,11 +1,11 @@
 <?php
 /**
- * Gutenberg_Sync_Storage interface
+ * WP_Sync_Storage interface
  *
  * @package Gutenberg
  */
 
-interface Gutenberg_Sync_Storage {
+interface WP_Sync_Storage {
 	/**
 	 * Initialize the storage mechanism.
 	 */

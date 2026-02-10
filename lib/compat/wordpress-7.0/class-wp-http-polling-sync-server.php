@@ -1,17 +1,18 @@
 <?php
 /**
- * Gutenberg_HTTP_Polling_Sync_Server class
+ * WP_HTTP_Polling_Sync_Server class
  *
  * @package Gutenberg
  */
 
 /**
- * Gutenberg class that contains an HTTP server used for collaborative editing.
+ * Class that implements an HTTP server used to sync collaborative editing
+ * updates.
  *
  * @access private
  * @internal
  */
-class Gutenberg_HTTP_Polling_Sync_Server {
+class WP_HTTP_Polling_Sync_Server {
 	/**
 	 * REST API namespace.
 	 */
@@ -43,7 +44,7 @@ class Gutenberg_HTTP_Polling_Sync_Server {
 	 */
 	private $storage;
 
-	public function __construct( Gutenberg_Sync_Storage $storage ) {
+	public function __construct( WP_Sync_Storage $storage ) {
 		$this->storage = $storage;
 	}
 
@@ -115,17 +116,15 @@ class Gutenberg_HTTP_Polling_Sync_Server {
 				'methods'             => array( WP_REST_Server::CREATABLE ),
 				'callback'            => array( $this, 'handle_request' ),
 				'permission_callback' => array( $this, 'check_permissions' ),
-				'args'                => array_merge(
-					array(
-						'rooms' => array(
-							'items'    => array(
-								'properties' => $room_args,
-								'type'       => 'object',
-							),
-							'required' => true,
-							'type'     => 'array',
+				'args'                => array(
+					'rooms' => array(
+						'items'    => array(
+							'properties' => $room_args,
+							'type'       => 'object',
 						),
-					)
+						'required' => true,
+						'type'     => 'array',
+					),
 				),
 			)
 		);

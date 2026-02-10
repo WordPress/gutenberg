@@ -1893,6 +1893,8 @@ export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 			currentPostType
 		);
 
-		return Boolean( entityConfig?.syncConfig && window.__wpSyncEnabled );
+		return Boolean(
+			entityConfig?.syncConfig && window._wpCollaborationEnabled
+		);
 	}
 );

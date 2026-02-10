@@ -1,12 +1,12 @@
 <?php
 /**
- * Gutenberg_Sync_Post_Meta_Storage class
+ * WP_Sync_Post_Meta_Storage class
  *
  * @package Gutenberg
  */
 
 /**
- * Gutenberg class that provides an interface for storing and retrieving sync
+ * Class that implements an interface for storing and retrieving sync
  * updates and awareness data during a collaborative session.
  *
  * Data is stored as post meta on a singleton post of a custom post type.
@@ -14,7 +14,7 @@
  * @access private
  * @internal
  */
-class Gutenberg_Sync_Post_Meta_Storage implements Gutenberg_Sync_Storage {
+class WP_Sync_Post_Meta_Storage implements WP_Sync_Storage {
 	/**
 	 * Post type for sync storage
 	 */
