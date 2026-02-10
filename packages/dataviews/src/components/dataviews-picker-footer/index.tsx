@@ -74,9 +74,14 @@ function BulkSelectionCheckbox< Item >( {
 				if ( infiniteScrollEnabled ) {
 					// For infinite scroll, toggle isSelectAllMode
 					if ( isSelectAllMode ) {
-						// Deselect all: clear selection and disable select all mode
-						setIsSelectAllMode( false );
-						onChangeSelection( [] );
+						if ( areAllSelected ) {
+							// All are selected, deselect all: disable select all mode
+							setIsSelectAllMode( false );
+							onChangeSelection( [] );
+						} else {
+							// Some items were manually deselected, re-select all by clearing deselection list
+							onChangeSelection( [] );
+						}
 					} else {
 						// Select all: enable select all mode with empty deselection list
 						setIsSelectAllMode( true );
