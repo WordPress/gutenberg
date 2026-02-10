@@ -60,33 +60,41 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			return undefined;
 		}
 
+		let _blocks;
+
 		if ( editedBlocks ) {
-			return editedBlocks;
-		}
-
-		if ( ! content || typeof content !== 'string' ) {
+			_blocks = editedBlocks;
+		} else if ( ! content || typeof content !== 'string' ) {
 			return EMPTY_ARRAY;
+		} else {
+			// If there's an edit, cache the parsed blocks by the edit.
+			// If not, cache by the original entity record.
+			const edits = getEntityRecordEdits( kind, name, id );
+			const isUnedited = ! edits || ! Object.keys( edits ).length;
+			const cackeKey = isUnedited
+				? getEntityRecord( kind, name, id )
+				: edits;
+			_blocks = parsedBlocksCache.get( cackeKey );
+
+			if ( ! _blocks ) {
+				_blocks = parse( content );
+				parsedBlocksCache.set( cackeKey, _blocks );
+			}
 		}
 
-		// If there's an edit, cache the parsed blocks by the edit.
-		// If not, cache by the original entity record.
-		const edits = getEntityRecordEdits( kind, name, id );
-		const isUnedited = ! edits || ! Object.keys( edits ).length;
-		const cackeKey = isUnedited ? getEntityRecord( kind, name, id ) : edits;
-		let _blocks = parsedBlocksCache.get( cackeKey );
-
-		if ( ! _blocks ) {
-			_blocks = parse( content );
-			parsedBlocksCache.set( cackeKey, _blocks );
-		}
-
-		return _blocks;
+		// Process footnote numbering. This ensures correct numbering on
+		// initial load (from parsed content) and after undo/redo (when
+		// editedBlocks may have stale numbering). The function short-circuits
+		// when order hasn't changed, so the cost is a cheap comparison.
+		const footnotesResult = updateFootnotesFromMeta( _blocks, meta );
+		return footnotesResult.blocks || _blocks;
 	}, [
 		kind,
 		name,
 		id,
 		editedBlocks,
 		content,
+		meta,
 		getEntityRecord,
 		getEntityRecordEdits,
 	] );

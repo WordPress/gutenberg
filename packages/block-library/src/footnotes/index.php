@@ -26,13 +26,17 @@ function render_block_core_footnotes( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$footnotes = get_post_meta( $block->context['postId'], 'footnotes', true );
-
-	if ( ! $footnotes ) {
-		return '';
+	// Read from block attributes first (new approach), fall back to post meta
+	// for backward compatibility with posts not yet migrated.
+	$footnotes = null;
+	if ( ! empty( $attributes['footnotes'] ) && is_array( $attributes['footnotes'] ) ) {
+		$footnotes = $attributes['footnotes'];
+	} else {
+		$footnotes_meta = get_post_meta( $block->context['postId'], 'footnotes', true );
+		if ( $footnotes_meta ) {
+			$footnotes = json_decode( $footnotes_meta, true );
+		}
 	}
-
-	$footnotes = json_decode( $footnotes, true );
 
 	if ( ! is_array( $footnotes ) || count( $footnotes ) === 0 ) {
 		return '';

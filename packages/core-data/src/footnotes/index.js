@@ -6,21 +6,58 @@ import { RichTextData, create, toHTMLString } from '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
+import findFootnotesBlock from './find-footnotes-block';
 import getFootnotesOrder from './get-footnotes-order';
+import updateFootnotesFromBlockAttributes from './update-footnotes-from-block-attributes';
 
 let oldFootnotes = {};
 
 export function updateFootnotesFromMeta( blocks, meta ) {
 	const output = { blocks };
+
 	if ( ! meta ) {
 		return output;
 	}
 
-	// If meta.footnotes is empty, it means the meta is not registered.
+	// If meta.footnotes is undefined, the meta is not registered.
 	if ( meta.footnotes === undefined ) {
 		return output;
 	}
 
+	// Check if the footnotes block has data in block attributes (new approach).
+	// If so, use the block-attributes path and keep meta in sync for backward
+	// compatibility (Phase 1: dual-write).
+	const footnotesBlock = findFootnotesBlock( blocks );
+	const hasBlockAttributes =
+		footnotesBlock?.attributes?.footnotes &&
+		Array.isArray( footnotesBlock.attributes.footnotes ) &&
+		footnotesBlock.attributes.footnotes.length > 0;
+
+	if ( hasBlockAttributes ) {
+		const result = updateFootnotesFromBlockAttributes( blocks );
+
+		// No changes needed — return input blocks unchanged.
+		if ( result.blocks === blocks ) {
+			return output;
+		}
+
+		// Footnote order changed. Keep meta in sync (Phase 1: dual-write).
+		const updatedFootnotesBlock = findFootnotesBlock( result.blocks );
+		const updatedFootnotes =
+			updatedFootnotesBlock?.attributes?.footnotes || [];
+
+		return {
+			blocks: result.blocks,
+			meta: {
+				...meta,
+				footnotes: JSON.stringify( updatedFootnotes ),
+			},
+		};
+	}
+
+	// Legacy path: footnotes stored in post meta.
+	// This handles posts that haven't been migrated yet.
+	// Can be removed once Phase 3 migration is complete.
 	const newOrder = getFootnotesOrder( blocks );
 
 	const footnotes = meta.footnotes ? JSON.parse( meta.footnotes ) : [];

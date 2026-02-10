@@ -7,7 +7,16 @@ import { __ } from '@wordpress/i18n';
 import { Placeholder } from '@wordpress/components';
 import { formatListNumbered as icon } from '@wordpress/icons';
 
-export default function FootnotesEdit( { context: { postType, postId } } ) {
+/**
+ * Internal dependencies
+ */
+import { useMigrateFootnotes } from './use-migrate-footnotes';
+
+export default function FootnotesEdit( {
+	attributes,
+	setAttributes,
+	context: { postType, postId },
+} ) {
 	const [ meta, updateMeta ] = useEntityProp(
 		'postType',
 		postType,
@@ -15,7 +24,9 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 		postId
 	);
 	const footnotesSupported = 'string' === typeof meta?.footnotes;
-	const footnotes = meta?.footnotes ? JSON.parse( meta.footnotes ) : [];
+
+	// Migrate footnotes from meta to block attributes on first load.
+	const footnotes = useMigrateFootnotes( attributes, setAttributes, meta );
 	const blockProps = useBlockProps();
 
 	if ( ! footnotesSupported ) {
@@ -75,19 +86,32 @@ export default function FootnotesEdit( { context: { postType, postId } } ) {
 							}
 						} }
 						onChange={ ( nextFootnote ) => {
-							updateMeta( {
-								...meta,
-								footnotes: JSON.stringify(
-									footnotes.map( ( footnote ) => {
-										return footnote.id === id
-											? {
-													content: nextFootnote,
-													id,
-											  }
-											: footnote;
-									} )
-								),
+							const updatedFootnotes = footnotes.map(
+								( footnote ) => {
+									return footnote.id === id
+										? {
+												content: nextFootnote,
+												id,
+										  }
+										: footnote;
+								}
+							);
+
+							// Primary: update block attributes.
+							setAttributes( {
+								footnotes: updatedFootnotes,
 							} );
+
+							// Phase 1: dual-write to meta for backward compatibility.
+							// This ensures older editor versions can still read footnotes.
+							// Remove in Phase 2 when meta writes are dropped.
+							if ( footnotesSupported ) {
+								updateMeta( {
+									...meta,
+									footnotes:
+										JSON.stringify( updatedFootnotes ),
+								} );
+							}
 						} }
 					/>{ ' ' }
 					<a href={ `#${ id }-link` }>↩︎</a>
