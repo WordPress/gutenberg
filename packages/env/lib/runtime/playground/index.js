@@ -19,6 +19,7 @@ const { rimraf } = require( 'rimraf' );
 const { buildBlueprint, getMountArgs } = require( './blueprint-builder' );
 const { UnsupportedCommandError } = require( '../errors' );
 const { downloadSource } = require( '../../download-sources' );
+const { findAvailablePort } = require( '../../port-utils' );
 
 /**
  * Playground runtime implementation for wp-env.
@@ -148,8 +149,16 @@ class PlaygroundRuntime {
 		// Get mount arguments
 		const mountArgs = getMountArgs( config );
 
-		// Determine port
-		const port = envConfig.port || 8888;
+		// Determine port — resolve an available one when null.
+		const port =
+			envConfig.port ??
+			( await findAvailablePort( { preferredPort: 8888 } ) );
+
+		// Persist the resolved port so getStatus() can read it.
+		await fs.writeFile(
+			path.join( config.workDirectoryPath, 'playground-port' ),
+			String( port )
+		);
 		const phpVersion = envConfig.phpVersion || '8.2';
 
 		// Build command arguments for direct execution
@@ -452,7 +461,18 @@ class PlaygroundRuntime {
 		spinner.text = 'Getting environment status.';
 
 		const envConfig = config.env.development;
-		const port = envConfig.port || 8888;
+		let port = envConfig.port;
+		if ( ! port ) {
+			try {
+				const savedPort = await fs.readFile(
+					path.join( config.workDirectoryPath, 'playground-port' ),
+					'utf8'
+				);
+				port = parseInt( savedPort.trim(), 10 );
+			} catch {
+				port = 8888;
+			}
+		}
 		const pidFile = path.join( config.workDirectoryPath, 'playground.pid' );
 
 		// Check if server is running.
