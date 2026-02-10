@@ -164,9 +164,9 @@ function PanelDropdown< Item >( {
 				} }
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<SummaryButton
-						summaryFields={ summaryFields }
 						data={ data }
-						labelPosition={ labelPosition }
+						field={ field }
+						summaryFields={ summaryFields }
 						fieldLabel={ fieldLabel }
 						disabled={ fieldDefinition.readOnly === true }
 						onClick={ onToggle }

@@ -14,12 +14,16 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import type { NormalizedField } from '../../../types';
+import type {
+	NormalizedField,
+	NormalizedFormField,
+	NormalizedPanelLayout,
+} from '../../../types';
 
 export default function SummaryButton< Item >( {
-	summaryFields,
 	data,
-	labelPosition,
+	field,
+	summaryFields,
 	fieldLabel,
 	disabled,
 	onClick,
@@ -30,9 +34,9 @@ export default function SummaryButton< Item >( {
 	showError,
 	errorMessage,
 }: {
-	summaryFields: NormalizedField< Item >[];
 	data: Item;
-	labelPosition: 'side' | 'top' | 'none';
+	field: NormalizedFormField;
+	summaryFields: NormalizedField< Item >[];
 	fieldLabel?: string;
 	disabled?: boolean;
 	onClick: () => void;
@@ -43,6 +47,8 @@ export default function SummaryButton< Item >( {
 	showError?: boolean;
 	errorMessage?: string;
 } ) {
+	const labelPosition = ( field.layout as NormalizedPanelLayout )
+		.labelPosition;
 	const className = clsx(
 		'dataforms-layouts-panel__field-trigger',
 		`dataforms-layouts-panel__field-trigger--label-${ labelPosition }`

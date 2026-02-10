@@ -199,9 +199,9 @@ function PanelModal< Item >( {
 	return (
 		<>
 			<SummaryButton
-				summaryFields={ summaryFields }
 				data={ data }
-				labelPosition={ labelPosition }
+				field={ field }
+				summaryFields={ summaryFields }
 				fieldLabel={ fieldLabel }
 				disabled={ fieldDefinition.readOnly === true }
 				onClick={ () => setIsOpen( true ) }
