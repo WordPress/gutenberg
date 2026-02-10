@@ -11,8 +11,12 @@ import { useDebounce } from '@wordpress/compose';
  */
 import IconGrid from './icon-grid';
 
-export default function InserterModal( props ) {
-	const { icons, setInserterOpen, attributes, setAttributes } = props;
+export default function CustomInserterModal( {
+	icons,
+	setInserterOpen,
+	attributes,
+	setAttributes,
+} ) {
 
 	const [ searchInput, setSearchInput ] = useState( '' );
 
