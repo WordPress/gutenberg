@@ -4,6 +4,7 @@
 import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
 import { useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { createSlotFill } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -18,6 +19,26 @@ import { useBlockSelectionClearer } from '../block-selection-clearer';
 import { useBlockCommands } from '../use-block-commands';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+
+export const BlockCanvasCover = createSlotFill( 'BlockCanvasCover' );
+
+function BlockCanvasCoverWrapper( { children } ) {
+	return (
+		<div
+			className="block-canvas-cover"
+			style={ {
+				position: 'absolute',
+				top: 0,
+				left: 0,
+				width: '100%',
+				height: '100%',
+				pointerEvents: 'none',
+			} }
+		>
+			{ children }
+		</div>
+	);
+}
 
 // EditorStyles is a memoized component, so avoid passing a new
 // object reference on each render.
@@ -75,6 +96,15 @@ export function ExperimentalBlockCanvas( {
 				>
 					{ children }
 				</WritingFlow>
+				<BlockCanvasCover.Slot fillProps={ { containerRef: localRef } }>
+					{ ( covers ) =>
+						covers.map( ( cover, index ) => (
+							<BlockCanvasCoverWrapper key={ index }>
+								{ cover }
+							</BlockCanvasCoverWrapper>
+						) )
+					}
+				</BlockCanvasCover.Slot>
 			</BlockTools>
 		);
 	}
@@ -96,6 +126,15 @@ export function ExperimentalBlockCanvas( {
 			>
 				<EditorStyles styles={ styles } />
 				{ children }
+				<BlockCanvasCover.Slot fillProps={ { containerRef: localRef } }>
+					{ ( covers ) =>
+						covers.map( ( cover, index ) => (
+							<BlockCanvasCoverWrapper key={ index }>
+								{ cover }
+							</BlockCanvasCoverWrapper>
+						) )
+					}
+				</BlockCanvasCover.Slot>
 			</Iframe>
 		</BlockTools>
 	);

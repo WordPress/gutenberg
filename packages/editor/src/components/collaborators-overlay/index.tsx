@@ -1,0 +1,51 @@
+import {
+	// @ts-ignore
+	privateApis,
+	// @ts-ignore
+} from '@wordpress/block-editor';
+import { useRef } from '@wordpress/element';
+import { unlock } from '../../lock-unlock';
+import { CursorRegistry } from './cursor-registry';
+import { Overlay } from './overlay';
+
+const { BlockCanvasCover } = unlock( privateApis );
+
+interface Props {
+	postId: number | null;
+	postType: string | null;
+}
+
+/**
+ * Collaborators Overlay component
+ * @param props          - The props for the CollaboratorsOverlay component
+ * @param props.postId   - The ID of the post
+ * @param props.postType - The type of the post
+ * @return The CollaboratorsOverlay component
+ */
+export function CollaboratorsOverlay( { postId, postType }: Props ) {
+	// A single instance of the cursor registry is shared between CollaboratorsPresence
+	// and CollaboratorsOverlay. A ref is used to persist the instance across re-renders.
+	const cursorRegistry = useRef< CursorRegistry >( new CursorRegistry() );
+
+	return (
+		BlockCanvasCover &&
+		BlockCanvasCover.Fill && (
+			<BlockCanvasCover.Fill>
+				{ ( {
+					containerRef,
+				}: {
+					containerRef: React.MutableRefObject< HTMLElement | null >;
+				} ) => (
+					<Overlay
+						blockEditorDocument={
+							containerRef.current?.ownerDocument
+						}
+						cursorRegistry={ cursorRegistry.current }
+						postId={ postId }
+						postType={ postType }
+					/>
+				) }
+			</BlockCanvasCover.Fill>
+		)
+	);
+}
