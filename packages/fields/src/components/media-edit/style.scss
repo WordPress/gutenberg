@@ -33,7 +33,7 @@ fieldset.fields__media-edit {
 
 	.fields__media-edit-compact-group {
 		border: $border-width dashed $gray-600;
-		border-radius: $radius-small;
+		border-radius: $radius-medium;
 		overflow: hidden;
 
 		.fields__media-edit-picker-button {
@@ -55,6 +55,10 @@ fieldset.fields__media-edit {
 		@include compact-drop-zone-label;
 		position: relative;
 		min-width: 0;
+
+		.fields__media-edit-picker-button {
+			border-radius: $radius-small;
+		}
 
 		&:hover,
 		&:focus-within {
@@ -86,6 +90,7 @@ fieldset.fields__media-edit {
 	// Apply to placeholders outside of expanded view (compact contexts)
 	.fields__media-edit-picker-button:has(.fields__media-edit-placeholder):not(.fields__media-edit-expanded *) {
 		@include compact-drop-zone-label;
+		border-radius: $radius-small;
 	}
 
 	.fields__media-edit-picker-button {

@@ -29,7 +29,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	archive,
 	audio,
@@ -341,7 +341,17 @@ function ExpandedMediaEditAttachments( {
 								setTargetItemId( attachment.id as number );
 								open();
 							} }
-							label={ __( 'Replace' ) }
+							label={
+								! isBlob
+									? sprintf(
+											/* translators: %s: The title of the media item. */
+											__( 'Replace %s' ),
+											(
+												attachment as Attachment< 'view' >
+											 ).title.rendered
+									  )
+									: __( 'Replace' )
+							}
 							showTooltip
 							onFilesDrop={ onFilesDrop }
 							attachment={ attachment }
@@ -359,24 +369,6 @@ function ExpandedMediaEditAttachments( {
 											attachment={ attachment }
 										/>
 									) }
-									{ ! isBlob &&
-										( ! hasPreviewImage ? (
-											<MediaTitle
-												attachment={
-													attachment as Attachment< 'view' >
-												}
-											/>
-										) : (
-											<div className="fields__media-edit-expanded-overlay">
-												<div className="fields__media-edit-expanded-title">
-													<MediaTitle
-														attachment={
-															attachment as Attachment< 'view' >
-														}
-													/>
-												</div>
-											</div>
-										) ) }
 								</VStack>
 							</div>
 						</MediaPickerButton>
