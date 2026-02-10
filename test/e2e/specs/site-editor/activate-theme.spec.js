@@ -23,7 +23,7 @@ test.describe( 'Activate theme', () => {
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Dismiss this notice' } )
-		).toContainText( 'Site updated' );
+		).toContainText( 'Theme activated.' );
 		await admin.visitAdminPage( 'themes.php' );
 		await expect( page.getByLabel( 'Customize Emptytheme' ) ).toBeVisible();
 	} );
@@ -36,6 +36,10 @@ test.describe( 'Activate theme', () => {
 		await expect( page.locator( '.edit-site-canvas-loader' ) ).toHaveCount(
 			0
 		);
+		// Disable welcome guide to prevent onboarding modal from appearing.
+		await editor.setPreferences( 'core/edit-site', {
+			welcomeGuide: false,
+		} );
 		await editor.canvas.locator( 'body' ).click();
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
@@ -46,7 +50,7 @@ test.describe( 'Activate theme', () => {
 			.click();
 		await expect(
 			page.getByRole( 'button', { name: 'Dismiss this notice' } )
-		).toContainText( 'Site updated' );
+		).toContainText( 'Theme activated.' );
 		await admin.visitAdminPage( 'themes.php' );
 		await expect( page.getByLabel( 'Customize Emptytheme' ) ).toBeVisible();
 	} );
