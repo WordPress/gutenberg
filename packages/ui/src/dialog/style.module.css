@@ -90,13 +90,14 @@
 
 	.header {
 		display: flex;
-		justify-content: space-between;
 		align-items: center;
+		gap: var(--wpds-dimension-gap-sm);
 		margin-bottom: var(--wpds-dimension-gap-lg);
 	}
 
 	.title {
 		margin: 0;
+		margin-inline-end: auto;
 		font-size: var(--wpds-font-size-xl);
 		font-weight: var(--wpds-font-weight-medium);
 		line-height: var(--wpds-font-line-height-xl);
