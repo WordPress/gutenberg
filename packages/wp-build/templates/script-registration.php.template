@@ -55,8 +55,7 @@ if ( ! function_exists( '{{PREFIX}}_register_package_scripts' ) ) {
 	function {{PREFIX}}_register_package_scripts( $scripts ) {
 		// Load build constants
 		$build_constants = require __DIR__ . '/constants.php';
-		$default_version = ! SCRIPT_DEBUG ? $build_constants['version'] : time();
-		$extension       = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
+		$default_version = ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? time() : $build_constants['version'];
 
 		$scripts_dir  = __DIR__ . '/scripts';
 		$scripts_file = $scripts_dir . '/registry.php';
@@ -66,6 +65,15 @@ if ( ! function_exists( '{{PREFIX}}_register_package_scripts' ) ) {
 		}
 
 		$scripts_data = require $scripts_file;
+
+		// Default to minified. When SCRIPT_DEBUG is enabled, check whether unminified
+		// files are available — they may be excluded from production distributions.
+		$extension = '.min.js';
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+			if ( ! empty( $scripts_data[0]['path'] ) && file_exists( $scripts_dir . '/' . $scripts_data[0]['path'] . '.js' ) ) {
+				$extension = '.js';
+			}
+		}
 		$plugin_dir   = dirname( __FILE__ );
 
 		foreach ( $scripts_data as $script_data ) {

@@ -22,7 +22,14 @@ if ( ! function_exists( '{{PREFIX}}_register_script_modules' ) ) {
 
 		$modules = require $modules_file;
 		$base_url = $build_constants['build_url'] . 'modules/';
-		$extension = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '.js' : '.min.js';
+		// Default to minified. When SCRIPT_DEBUG is enabled, check whether unminified
+		// files are available — they may be excluded from production distributions.
+		$extension = '.min.js';
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+			if ( ! empty( $modules[0]['path'] ) && file_exists( $modules_dir . '/' . $modules[0]['path'] . '.js' ) ) {
+				$extension = '.js';
+			}
+		}
 
 		foreach ( $modules as $module ) {
 			$asset_path = $modules_dir . '/' . $module['asset'];
