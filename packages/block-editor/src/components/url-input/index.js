@@ -12,6 +12,7 @@ import { UP, DOWN, ENTER, TAB } from '@wordpress/keycodes';
 import {
 	BaseControl,
 	Button,
+	__experimentalInputControl as InputControl,
 	Spinner,
 	withSpokenMessages,
 	Popover,
@@ -431,6 +432,7 @@ class URLInput extends Component {
 			disabled = false,
 			customValidity,
 			markWhenOptional,
+			useCustomValidation = false,
 		} = this.props;
 
 		const {
@@ -494,11 +496,15 @@ class URLInput extends Component {
 
 		return (
 			<BaseControl { ...controlProps }>
-				<ValidatedInputControl
-					{ ...inputProps }
-					{ ...validationProps }
-					__next40pxDefaultSize
-				/>
+				{ useCustomValidation ? (
+					<ValidatedInputControl
+						{ ...inputProps }
+						{ ...validationProps }
+						__next40pxDefaultSize
+					/>
+				) : (
+					<InputControl { ...inputProps } __next40pxDefaultSize />
+				) }
 				{ loading && <Spinner /> }
 			</BaseControl>
 		);

@@ -147,6 +147,7 @@ const LinkControlSearchInput = forwardRef(
 					__experimentalShowInitialSuggestions={
 						showInitialSuggestions
 					}
+					useCustomValidation
 					customValidity={ customValidityProp }
 					// Validation is handled manually via onSubmit and handleSubmit. We may be able to rely
 					// on browser validation when enhancements land to base level components:
