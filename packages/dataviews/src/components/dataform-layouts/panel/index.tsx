@@ -72,7 +72,6 @@ export default function FormPanelField< Item >( {
 				touched={ touched }
 				labelContent={ labelContent }
 				labelClassName={ labelClassName }
-				showError={ showError }
 			/>
 		);
 	}
@@ -87,7 +86,6 @@ export default function FormPanelField< Item >( {
 			touched={ touched }
 			labelContent={ labelContent }
 			labelClassName={ labelClassName }
-			showError={ showError }
 		/>
 	);
 }

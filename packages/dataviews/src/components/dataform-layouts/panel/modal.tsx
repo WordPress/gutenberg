@@ -172,7 +172,6 @@ function PanelModal< Item >( {
 	touched,
 	labelContent,
 	labelClassName,
-	showError,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -182,7 +181,6 @@ function PanelModal< Item >( {
 	touched: boolean;
 	labelContent?: React.ReactNode;
 	labelClassName?: string;
-	showError?: boolean;
 } ) {
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedPanelLayout;
@@ -198,6 +196,7 @@ function PanelModal< Item >( {
 
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
 	const errorMessage = getFirstValidationError( validity );
+	const showError = touched && !! errorMessage;
 
 	const handleClose = () => {
 		setIsOpen( false );

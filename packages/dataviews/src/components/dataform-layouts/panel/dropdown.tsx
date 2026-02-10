@@ -85,7 +85,6 @@ function PanelDropdown< Item >( {
 	touched,
 	labelContent,
 	labelClassName,
-	showError,
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -95,7 +94,6 @@ function PanelDropdown< Item >( {
 	touched: boolean;
 	labelContent?: React.ReactNode;
 	labelClassName?: string;
-	showError?: boolean;
 } ) {
 	const { fields } = useContext( DataFormContext );
 	const layout = field.layout as NormalizedPanelLayout;
@@ -154,7 +152,9 @@ function PanelDropdown< Item >( {
 	if ( ! fieldDefinition ) {
 		return null;
 	}
+
 	const errorMessage = getFirstValidationError( validity );
+	const showError = touched && !! errorMessage;
 
 	return (
 		<div
