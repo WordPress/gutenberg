@@ -4,29 +4,38 @@
 import { useEffect } from '@wordpress/element';
 
 /**
- * Triggers `reportValidity()` on all form inputs within a container element.
- * This fires the browser's `invalid` event on each input, which validated
- * controls listen to in order to display their error states.
+ * A hook that reports custom validity on form elements within a container.
+ * When `shouldReport` is true, it triggers the browser's native validation UI
+ * by calling `reportValidity()` on the container's form elements.
  *
- * Used by panel and card layouts to show validation errors
- * immediately when their content becomes visible after prior interaction.
- *
- * @param ref          A ref to the container element.
- * @param shouldReport Whether to trigger reportValidity. Typically
- *                     derived from `touched` state and open/visible state.
+ * @param ref          - A ref to the container element
+ * @param shouldReport - Whether to report validity
  */
 export default function useReportValidity(
 	ref: React.RefObject< HTMLElement | null >,
 	shouldReport: boolean
-) {
+): void {
 	useEffect( () => {
-		if ( shouldReport && ref.current ) {
-			const inputs = ref.current.querySelectorAll(
-				'input, textarea, select'
-			);
-			inputs.forEach( ( input ) => {
-				( input as HTMLInputElement ).reportValidity();
-			} );
+		if ( ! shouldReport || ! ref.current ) {
+			return;
 		}
-	}, [ shouldReport, ref ] );
+
+		// Find the first invalid form element and report its validity
+		const formElements = ref.current.querySelectorAll(
+			'input, select, textarea'
+		);
+
+		for ( const element of formElements ) {
+			if (
+				element instanceof HTMLInputElement ||
+				element instanceof HTMLSelectElement ||
+				element instanceof HTMLTextAreaElement
+			) {
+				if ( ! element.validity.valid ) {
+					element.reportValidity();
+					break;
+				}
+			}
+		}
+	}, [ ref, shouldReport ] );
 }

@@ -42,15 +42,18 @@ function CardHeader( {
 	isCollapsible,
 	onToggle,
 	children,
+	className,
 }: {
 	label?: string;
 	isOpen: boolean;
 	isCollapsible: boolean;
 	onToggle: () => void;
 	children?: React.ReactNode;
+	className?: string;
 } ) {
 	return (
 		<OriginalCardHeader
+			className={ className }
 			isBorderless
 			onClick={ isCollapsible ? onToggle : undefined }
 			style={ isCollapsible ? { cursor: 'pointer' } : undefined }
