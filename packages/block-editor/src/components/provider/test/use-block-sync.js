@@ -270,16 +270,9 @@ describe( 'useBlockSync hook', () => {
 			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
-		expect( onInput ).toHaveBeenCalledWith(
-			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
-			expect.objectContaining( {
-				selection: {
-					selectionEnd: {},
-					selectionStart: {},
-					initialPosition: null,
-				},
-			} )
-		);
+		expect( onInput ).toHaveBeenCalledWith( [
+			{ clientId: 'a', innerBlocks: [], attributes: { foo: 2 } },
+		] );
 		expect( onChange ).not.toHaveBeenCalled();
 	} );
 
@@ -310,16 +303,9 @@ describe( 'useBlockSync hook', () => {
 			.dispatch( blockEditorStore )
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
-		expect( onChange ).toHaveBeenCalledWith(
-			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
-			expect.objectContaining( {
-				selection: {
-					selectionEnd: {},
-					selectionStart: {},
-					initialPosition: null,
-				},
-			} )
-		);
+		expect( onChange ).toHaveBeenCalledWith( [
+			{ clientId: 'a', innerBlocks: [], attributes: { foo: 2 } },
+		] );
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
 
@@ -407,23 +393,14 @@ describe( 'useBlockSync hook', () => {
 			.updateBlockAttributes( 'a', { foo: 2 } );
 
 		expect( replaceInnerBlocks ).not.toHaveBeenCalled();
-		expect( onChange ).toHaveBeenCalledWith(
-			[
-				{
-					name: 'test/test-block',
-					clientId: 'a',
-					innerBlocks: [],
-					attributes: { foo: 2 },
-				},
-			],
-			expect.objectContaining( {
-				selection: {
-					selectionEnd: {},
-					selectionStart: {},
-					initialPosition: null,
-				},
-			} )
-		);
+		expect( onChange ).toHaveBeenCalledWith( [
+			{
+				name: 'test/test-block',
+				clientId: 'a',
+				innerBlocks: [],
+				attributes: { foo: 2 },
+			},
+		] );
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
 
@@ -457,16 +434,7 @@ describe( 'useBlockSync hook', () => {
 			{ clientId: 'a', innerBlocks: [], attributes: { foo: 2 } },
 		];
 
-		expect( onChange1 ).toHaveBeenCalledWith(
-			updatedBlocks1,
-			expect.objectContaining( {
-				selection: {
-					initialPosition: null,
-					selectionEnd: {},
-					selectionStart: {},
-				},
-			} )
-		);
+		expect( onChange1 ).toHaveBeenCalledWith( updatedBlocks1 );
 
 		const newBlocks = [
 			{ clientId: 'b', innerBlocks: [], attributes: { foo: 1 } },
@@ -496,16 +464,9 @@ describe( 'useBlockSync hook', () => {
 		expect( onChange1 ).not.toHaveBeenCalled();
 
 		// The second callback should be called with the new change.
-		expect( onChange2 ).toHaveBeenCalledWith(
-			[ { clientId: 'b', innerBlocks: [], attributes: { foo: 3 } } ],
-			expect.objectContaining( {
-				selection: {
-					selectionEnd: {},
-					selectionStart: {},
-					initialPosition: null,
-				},
-			} )
-		);
+		expect( onChange2 ).toHaveBeenCalledWith( [
+			{ clientId: 'b', innerBlocks: [], attributes: { foo: 3 } },
+		] );
 	} );
 
 	it( 'should use fresh callbacks if onChange/onInput have been updated when no previous changes have been made', async () => {
@@ -555,16 +516,9 @@ describe( 'useBlockSync hook', () => {
 		expect( onChange1 ).not.toHaveBeenCalled();
 
 		// Only the new callback should be called.
-		expect( onChange2 ).toHaveBeenCalledWith(
-			[ { clientId: 'b', innerBlocks: [], attributes: { foo: 3 } } ],
-			expect.objectContaining( {
-				selection: {
-					selectionEnd: {},
-					selectionStart: {},
-					initialPosition: null,
-				},
-			} )
-		);
+		expect( onChange2 ).toHaveBeenCalledWith( [
+			{ clientId: 'b', innerBlocks: [], attributes: { foo: 3 } },
+		] );
 	} );
 
 	it( 'preserves external client IDs in onChange callback for inner block controllers', async () => {
@@ -631,10 +585,7 @@ describe( 'useBlockSync hook', () => {
 						} ),
 					] ),
 				} ),
-			] ),
-			expect.objectContaining( {
-				selection: expect.any( Object ),
-			} )
+			] )
 		);
 	} );
 
