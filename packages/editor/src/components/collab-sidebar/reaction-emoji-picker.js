@@ -42,7 +42,6 @@ export function getLabelBySlug( slug ) {
  *
  * @param {Object}   props          Component props.
  * @param {Function} props.onSelect Callback when an emoji is selected.
- * @return {WPElement} The ReactionEmojiPicker component.
  */
 export default function ReactionEmojiPicker( { onSelect } ) {
 	return (
