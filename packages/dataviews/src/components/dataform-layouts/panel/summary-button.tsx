@@ -15,36 +15,40 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import type {
+	FieldValidity,
 	NormalizedField,
 	NormalizedFormField,
 	NormalizedPanelLayout,
 } from '../../../types';
 import getLabelClassName from './utils/get-label-classname';
 import getLabelContent from './utils/get-label-content';
+import getFirstValidationError from './utils/get-first-validation-error';
 
 export default function SummaryButton< Item >( {
 	data,
 	field,
+	validity,
+	touched,
 	summaryFields,
 	fieldLabel,
 	disabled,
 	onClick,
 	'aria-expanded': ariaExpanded,
-	showError,
-	errorMessage,
 }: {
 	data: Item;
 	field: NormalizedFormField;
+	validity?: FieldValidity;
+	touched: boolean;
 	summaryFields: NormalizedField< Item >[];
 	fieldLabel?: string;
 	disabled?: boolean;
 	onClick: () => void;
 	'aria-expanded'?: boolean;
-	showError?: boolean;
-	errorMessage?: string;
 } ) {
 	const labelPosition = ( field.layout as NormalizedPanelLayout )
 		.labelPosition;
+	const errorMessage = getFirstValidationError( validity );
+	const showError = touched && !! errorMessage;
 	const labelClassName = getLabelClassName( labelPosition, showError );
 	const labelContent = getLabelContent( showError, errorMessage, fieldLabel );
 	const className = clsx(

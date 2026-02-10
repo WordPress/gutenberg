@@ -32,7 +32,6 @@ import SummaryButton from './summary-button';
 import useFormValidity from '../../../hooks/use-form-validity';
 import useReportValidity from '../../../hooks/use-report-validity';
 import DataFormContext from '../../dataform-context';
-import getFirstValidationError from './utils/get-first-validation-error';
 import getFieldDefinitionAndSummaryFields from './utils/get-field-definition-and-summary-fields';
 
 function ModalContent< Item >( {
@@ -183,8 +182,6 @@ function PanelModal< Item >( {
 	}
 
 	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
-	const errorMessage = getFirstValidationError( validity );
-	const showError = touched && !! errorMessage;
 
 	const handleClose = () => {
 		setIsOpen( false );
@@ -196,13 +193,13 @@ function PanelModal< Item >( {
 			<SummaryButton
 				data={ data }
 				field={ field }
+				validity={ validity }
+				touched={ touched }
 				summaryFields={ summaryFields }
 				fieldLabel={ fieldLabel }
 				disabled={ fieldDefinition.readOnly === true }
 				onClick={ () => setIsOpen( true ) }
 				aria-expanded={ isOpen }
-				showError={ showError }
-				errorMessage={ errorMessage }
 			/>
 			{ isOpen && (
 				<ModalContent

@@ -26,7 +26,6 @@ import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
 import SummaryButton from './summary-button';
 import useReportValidity from '../../../hooks/use-report-validity';
-import getFirstValidationError from './utils/get-first-validation-error';
 import getFieldDefinitionAndSummaryFields from './utils/get-field-definition-and-summary-fields';
 import DataFormContext from '../../dataform-context';
 
@@ -140,9 +139,6 @@ function PanelDropdown< Item >( {
 		return null;
 	}
 
-	const errorMessage = getFirstValidationError( validity );
-	const showError = touched && !! errorMessage;
-
 	return (
 		<div
 			ref={ setPopoverAnchor }
@@ -161,13 +157,13 @@ function PanelDropdown< Item >( {
 					<SummaryButton
 						data={ data }
 						field={ field }
+						validity={ validity }
+						touched={ touched }
 						summaryFields={ summaryFields }
 						fieldLabel={ fieldLabel }
 						disabled={ fieldDefinition.readOnly === true }
 						onClick={ onToggle }
 						aria-expanded={ isOpen }
-						showError={ showError }
-						errorMessage={ errorMessage }
 					/>
 				) }
 				renderContent={ ( { onClose } ) => (
