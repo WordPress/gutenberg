@@ -7,6 +7,7 @@ import { colord } from 'colord';
  * WordPress dependencies
  */
 import {
+	ColorPicker,
 	Dropdown,
 	privateApis,
 	__experimentalInputControlPrefixWrapper as InputControlPrefixWrapper,
@@ -20,14 +21,14 @@ import type { DataFormControlProps } from '../../types';
 import { unlock } from '../../lock-unlock';
 import getCustomValidity from './utils/get-custom-validity';
 
-const { ValidatedInputControl, Picker } = unlock( privateApis );
+const { ValidatedInputControl } = unlock( privateApis );
 
-const ColorPicker = ( {
+const ColorPickerDropdown = ( {
 	color,
 	onColorChange,
 }: {
 	color: string;
-	onColorChange: ( colorObject: any ) => void;
+	onColorChange: ( newColor: string ) => void;
 } ) => {
 	const validColor = color && colord( color ).isValid() ? color : '#ffffff';
 
@@ -59,8 +60,8 @@ const ColorPicker = ( {
 			) }
 			renderContent={ () => (
 				<div style={ { padding: '16px' } }>
-					<Picker
-						color={ colord( validColor ) }
+					<ColorPicker
+						color={ validColor }
 						onChange={ onColorChange }
 						enableAlpha
 					/>
@@ -82,8 +83,8 @@ export default function Color< Item >( {
 	const value = field.getValue( { item: data } ) || '';
 
 	const handleColorChange = useCallback(
-		( colorObject: any ) => {
-			onChange( setValue( { item: data, value: colorObject.toHex() } ) );
+		( newColor: string ) => {
+			onChange( setValue( { item: data, value: newColor } ) );
 		},
 		[ data, onChange, setValue ]
 	);
@@ -108,7 +109,7 @@ export default function Color< Item >( {
 			hideLabelFromVision={ hideLabelFromVision }
 			type="text"
 			prefix={
-				<ColorPicker
+				<ColorPickerDropdown
 					color={ value }
 					onColorChange={ handleColorChange }
 				/>
