@@ -55,7 +55,10 @@ export function Edit( { attributes, setAttributes } ) {
 			// `__unstableMarkNextChangeAsNotPersistent()`.
 			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
-				style: { ...style, dimensions: { width: '12px' } },
+				style: {
+					...style,
+					dimensions: { ...style?.dimensions, width: '12px' },
+				},
 			} );
 		}
 	}, [
