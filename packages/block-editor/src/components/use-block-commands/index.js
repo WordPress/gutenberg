@@ -16,6 +16,7 @@ import {
 	plus as add,
 	group,
 	ungroup,
+	seen,
 	unseen,
 } from '@wordpress/icons';
 
@@ -159,7 +160,8 @@ const getQuickActionsCommands = () =>
 			getBlockRootClientId,
 			getBlocksByClientId,
 			canRemoveBlocks,
-		} = useSelect( blockEditorStore );
+			isBlockHiddenAnywhere,
+		} = unlock( useSelect( blockEditorStore ) );
 		const { getDefaultBlockName, getGroupingBlockName } =
 			useSelect( blocksStore );
 
@@ -293,11 +295,14 @@ const getQuickActionsCommands = () =>
 		);
 
 		if ( supportsVisibility ) {
+			const hasHiddenBlock = clientIds.some( ( id ) =>
+				isBlockHiddenAnywhere( id )
+			);
 			commands.push( {
 				name: 'toggle-visibility',
-				label: __( 'Hide' ),
+				label: hasHiddenBlock ? __( 'Show' ) : __( 'Hide' ),
 				callback: () => showBlockVisibilityModal( clientIds ),
-				icon: unseen,
+				icon: hasHiddenBlock ? seen : unseen,
 			} );
 		}
 
