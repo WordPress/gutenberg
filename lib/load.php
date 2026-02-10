@@ -78,6 +78,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
 
+	// Experimental autosaves controller override for real-time collaboration.
+	require_once __DIR__ . '/experimental/sync/class-gutenberg-rest-autosaves-controller.php';
+
 	require_once __DIR__ . '/experimental/rest-api.php';
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
 }
@@ -200,7 +203,10 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 	Gutenberg_Interactivity_API_Full_Page_Navigation::instance();
 }
 
-// Block patterns (only load when navigation overlays experiment is enabled).
-if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
-	require __DIR__ . '/experimental/overlay-patterns.php';
+// Block patterns for navigation overlays.
+require __DIR__ . '/overlay-patterns.php';
+
+if ( gutenberg_is_experiment_enabled( 'gutenberg-svg-icon-registry' ) ) {
+	require __DIR__ . '/experimental/class-wp-icons-registry.php';
+	require __DIR__ . '/experimental/class-wp-rest-icons-controller.php';
 }

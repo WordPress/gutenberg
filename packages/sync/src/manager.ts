@@ -2,6 +2,7 @@
  * External dependencies
  */
 import * as Y from 'yjs';
+import type { Awareness } from 'y-protocols/awareness';
 
 /**
  * Internal dependencies
@@ -30,10 +31,9 @@ import type {
 } from './types';
 import { createUndoManager } from './undo-manager';
 import { createYjsDoc, markEntityAsSaved } from './utils';
-import type { AwarenessState } from './awareness/awareness-state';
 
 interface CollectionState {
-	awareness?: AwarenessState;
+	awareness?: Awareness;
 	handlers: CollectionHandlers;
 	syncConfig: SyncConfig;
 	unload: () => void;
@@ -41,7 +41,7 @@ interface CollectionState {
 }
 
 interface EntityState {
-	awareness?: AwarenessState;
+	awareness?: Awareness;
 	handlers: RecordHandlers;
 	objectId: ObjectID;
 	objectType: ObjectType;
@@ -269,7 +269,6 @@ export function createSyncManager(): SyncManager {
 
 		// If the sync config supports awareness, create it.
 		const awareness = syncConfig.createAwareness?.( ydoc );
-		awareness?.setUp();
 
 		const collectionState: CollectionState = {
 			awareness,
@@ -325,12 +324,12 @@ export function createSyncManager(): SyncManager {
 	/**
 	 * Get the awareness instance for the given object type and object ID, if supported.
 	 *
-	 * @template {AwarenessState<any>} State
+	 * @template {Awareness} State
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
 	 * @return {State | undefined} The awareness instance, or undefined if not supported.
 	 */
-	function getAwareness< State extends AwarenessState< any > >(
+	function getAwareness< State extends Awareness >(
 		objectType: ObjectType,
 		objectId: ObjectID
 	): State | undefined {

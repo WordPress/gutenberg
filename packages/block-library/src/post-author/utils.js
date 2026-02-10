@@ -116,19 +116,19 @@ export function recreateWithRecommendedBlocks( attributes, blockTypes ) {
 						createBlock( 'core/post-author-name', {
 							isLink,
 							linkTarget,
-							textAlign,
 							style: {
 								typography: {
 									fontSize: '1em',
+									textAlign,
 								},
 							},
 						} ),
 					shouldInsertPostAuthorBiographyBlock &&
 						createBlock( 'core/post-author-biography', {
-							textAlign,
 							style: {
 								typography: {
 									fontSize: '0.7em',
+									textAlign,
 								},
 							},
 						} ),

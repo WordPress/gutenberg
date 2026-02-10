@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { getActiveFormats } from '../../get-active-formats';
+import { isCollapsed } from '../../is-collapsed';
 import { updateFormats } from '../../update-formats';
 
 /**
@@ -88,12 +89,18 @@ export default ( props ) => ( element ) => {
 		const currentValue = createRecord();
 		const { start, activeFormats: oldActiveFormats = [] } = record.current;
 
+		// When a non-collapsed selection is deleted (not replaced with new
+		// text), the old active formats refer to the deleted content and
+		// should not be carried forward.
+		const clearFormats =
+			! isCollapsed( record.current ) && currentValue.start <= start;
+
 		// Update the formats between the last and new caret position.
 		const change = updateFormats( {
 			value: currentValue,
 			start,
 			end: currentValue.start,
-			formats: oldActiveFormats,
+			formats: clearFormats ? [] : oldActiveFormats,
 		} );
 
 		handleChange( change );

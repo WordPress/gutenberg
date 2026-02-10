@@ -105,6 +105,31 @@ const transforms = {
 	to: [
 		{
 			type: 'block',
+			blocks: [ 'core/pullquote' ],
+			isMatch: ( {}, block ) => {
+				return block.innerBlocks.every(
+					( { name } ) => name === 'core/paragraph'
+				);
+			},
+			transform: (
+				{ align, citation, anchor, fontSize, style },
+				innerBlocks
+			) => {
+				const value = innerBlocks
+					.map( ( { attributes } ) => `${ attributes.content }` )
+					.join( '<br>' );
+				return createBlock( 'core/pullquote', {
+					value,
+					align,
+					citation,
+					anchor,
+					fontSize,
+					style,
+				} );
+			},
+		},
+		{
+			type: 'block',
 			blocks: [ 'core/verse' ],
 			isMatch: ( {}, block ) => {
 				return block.innerBlocks.every( ( innerBlock ) => {

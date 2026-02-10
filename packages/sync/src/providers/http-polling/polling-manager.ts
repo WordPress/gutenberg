@@ -5,6 +5,7 @@ import * as Y from 'yjs';
 import * as encoding from 'lib0/encoding';
 import * as decoding from 'lib0/decoding';
 import type { Awareness } from 'y-protocols/awareness';
+import { removeAwarenessStates } from 'y-protocols/awareness';
 import * as syncProtocol from 'y-protocols/sync';
 
 /**
@@ -30,12 +31,15 @@ const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = 250; // 250 milliseconds
 const MAX_ERROR_BACKOFF_IN_MS = 30 * 1000; // 30 seconds
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
+type LogFunction = ( message: string, debug?: object ) => void;
+
 interface PollingManager {
 	registerRoom: (
 		room: string,
 		doc: Y.Doc,
 		awareness: Awareness,
-		onSync: () => void
+		onSync: () => void,
+		log: LogFunction
 	) => void;
 	unregisterRoom: ( room: string ) => void;
 }
@@ -44,6 +48,7 @@ interface RoomState {
 	clientId: number;
 	endCursor: number;
 	localAwarenessState: LocalAwarenessState;
+	log: LogFunction;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
 	unregister: () => void;
@@ -162,14 +167,23 @@ function processAwarenessUpdate(
 		}
 	} );
 
-	if ( added.size + updated.size + removed.size > 0 ) {
+	if ( added.size + updated.size > 0 ) {
 		awareness.emit( 'change', [
 			{
 				added: Array.from( added ),
 				updated: Array.from( updated ),
-				removed: Array.from( removed ),
+				// Left blank on purpose, as the removal of clients is handled in the if condition below.
+				removed: [],
 			},
 		] );
+	}
+
+	if ( removed.size > 0 ) {
+		removeAwarenessStates(
+			awareness,
+			Array.from( removed ),
+			POLLING_MANAGER_ORIGIN
+		);
 	}
 }
 
@@ -286,6 +300,12 @@ function poll(): void {
 				}
 			} );
 		} catch ( error ) {
+			// Exponential backoff on error: double the backoff time, up to max
+			pollInterval = Math.min(
+				pollInterval * 2,
+				MAX_ERROR_BACKOFF_IN_MS
+			);
+
 			// Restore updates to queues on failure so they can be retried.
 			for ( const room of payload.rooms ) {
 				if ( ! roomStates.has( room.room ) ) {
@@ -294,13 +314,14 @@ function poll(): void {
 
 				const state = roomStates.get( room.room )!;
 				state.updateQueue.restore( room.updates );
+				state.log(
+					'Error posting sync update, will retry with backoff',
+					{
+						error,
+						nextPoll: pollInterval,
+					}
+				);
 			}
-
-			// Exponential backoff on error: double the backoff time, up to max
-			pollInterval = Math.min(
-				pollInterval * 2,
-				MAX_ERROR_BACKOFF_IN_MS
-			);
 		}
 
 		setTimeout( poll, pollInterval );
@@ -314,7 +335,8 @@ function registerRoom(
 	room: string,
 	doc: Y.Doc,
 	awareness: Awareness,
-	onSync: () => void
+	onSync: () => void,
+	log: LogFunction
 ): void {
 	if ( roomStates.has( room ) ) {
 		return;
@@ -347,6 +369,7 @@ function registerRoom(
 		clientId: doc.clientID,
 		endCursor: 0,
 		localAwarenessState: awareness.getLocalState() ?? {},
+		log,
 		processAwarenessUpdate: ( state: AwarenessState ) =>
 			processAwarenessUpdate( state, awareness ),
 		processDocUpdate: ( update: SyncUpdate ) =>

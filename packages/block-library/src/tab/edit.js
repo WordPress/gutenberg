@@ -66,10 +66,10 @@ export default function Edit( {
 				hasSelectedInnerBlock,
 			} = select( blockEditorStore );
 
-			// Get the tab-panels parent first
-			const tabPanelsClientId = getBlockRootClientId( clientId );
+			// Get the tab-panel parent first
+			const tabPanelClientId = getBlockRootClientId( clientId );
 			// Then get the tabs parent
-			const _tabsClientId = getBlockRootClientId( tabPanelsClientId );
+			const _tabsClientId = getBlockRootClientId( tabPanelClientId );
 
 			// Get data about this instance of core/tab.
 			const _blockIndex = getBlockIndex( clientId );

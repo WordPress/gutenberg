@@ -22,7 +22,7 @@ import {
 
 import type { SelectionCursor, WPBlockSelection } from '../types';
 import type {
-	DebugUserData,
+	DebugCollaboratorData,
 	EditorState,
 	PostEditorState,
 	SerializableYItem,
@@ -47,13 +47,13 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	protected onSetUp(): void {
 		super.onSetUp();
 
-		this.subscribeToUserSelectionChanges();
+		this.subscribeToCollaboratorSelectionChanges();
 	}
 
 	/**
-	 * Subscribe to user selection changes and update the selection state.
+	 * Subscribe to collaborator selection changes and update the selection state.
 	 */
-	private subscribeToUserSelectionChanges(): void {
+	private subscribeToCollaboratorSelectionChanges(): void {
 		const {
 			getSelectionStart,
 			getSelectionEnd,
@@ -116,7 +116,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	}
 
 	/**
-	 * Update the entity record with the current user's selection.
+	 * Update the entity record with the current collaborator's selection.
 	 *
 	 * @param selectionStart  - The start position of the selection.
 	 * @param selectionEnd    - The end position of the selection.
@@ -213,14 +213,14 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			] )
 		);
 
-		// Build userMap from awareness store (all users seen this session)
-		const userMapData = new Map< string, DebugUserData >(
+		// Build collaboratorMap from awareness store (all collaborators seen this session)
+		const collaboratorMapData = new Map< string, DebugCollaboratorData >(
 			Array.from( this.getSeenStates().entries() ).map(
-				( [ clientId, userState ] ) => [
+				( [ clientId, collaboratorState ] ) => [
 					String( clientId ),
 					{
-						name: userState.userInfo.name,
-						wpUserId: userState.userInfo.id,
+						name: collaboratorState.collaboratorInfo.name,
+						wpUserId: collaboratorState.collaboratorInfo.id,
 					},
 				]
 			)
@@ -264,7 +264,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		return {
 			doc: docData,
 			clients: serializableClientItems,
-			userMap: Object.fromEntries( userMapData ),
+			collaboratorMap: Object.fromEntries( collaboratorMapData ),
 		};
 	}
 }

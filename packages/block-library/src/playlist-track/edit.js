@@ -161,7 +161,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 			<InspectorControls>
 				<PanelBody title={ __( 'Settings' ) }>
 					<TextControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Artist' ) }
 						value={ artist ? stripHTML( artist ) : '' }
@@ -170,7 +169,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						} }
 					/>
 					<TextControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Album' ) }
 						value={ album ? stripHTML( album ) : '' }
@@ -179,7 +177,6 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 						} }
 					/>
 					<TextControl
-						__nextHasNoMarginBottom
 						__next40pxDefaultSize
 						label={ __( 'Title' ) }
 						value={ title ? stripHTML( title ) : '' }
@@ -233,38 +230,39 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 			</InspectorControls>
 			<li { ...blockProps }>
 				{ !! temporaryURL && <Spinner /> }
-				<Button
+				<button
 					className="wp-block-playlist-track__button"
-					__next40pxDefaultSize
 					data-wp-context={ JSON.stringify( { uniqueId } ) }
 					aria-current={
 						currentTrack === uniqueId ? 'true' : 'false'
 					}
 				>
-					<RichText
-						tagName="span"
-						className="wp-block-playlist-track__title"
-						value={ title }
-						placeholder={ __( 'Add title' ) }
-						onChange={ ( value ) => {
-							setAttributes( { title: value } );
-						} }
-						allowedFormats={ [] }
-						withoutInteractiveFormatting
-					/>
-					{ showArtists && (
+					<span className="wp-block-playlist-track__content">
 						<RichText
 							tagName="span"
-							className="wp-block-playlist-track__artist"
-							value={ artist }
-							placeholder={ __( 'Add artist' ) }
-							onChange={ ( value ) =>
-								setAttributes( { artist: value } )
-							}
+							className="wp-block-playlist-track__title"
+							value={ title }
+							placeholder={ __( 'Add title' ) }
+							onChange={ ( value ) => {
+								setAttributes( { title: value } );
+							} }
 							allowedFormats={ [] }
 							withoutInteractiveFormatting
 						/>
-					) }
+						{ showArtists && (
+							<RichText
+								tagName="span"
+								className="wp-block-playlist-track__artist"
+								value={ artist }
+								placeholder={ __( 'Add artist' ) }
+								onChange={ ( value ) =>
+									setAttributes( { artist: value } )
+								}
+								allowedFormats={ [] }
+								withoutInteractiveFormatting
+							/>
+						) }
+					</span>
 					<span className="wp-block-playlist-track__length">
 						{ length && (
 							<span className="screen-reader-text">
@@ -279,7 +277,7 @@ const PlaylistTrackEdit = ( { attributes, setAttributes, context } ) => {
 					<span className="screen-reader-text">
 						{ __( 'Select to play this track' ) }
 					</span>
-				</Button>
+				</button>
 			</li>
 		</>
 	);

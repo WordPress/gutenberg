@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import {
 	useBlockProps,
 	useInnerBlocksProps,
@@ -26,7 +25,7 @@ const TABS_TEMPLATE = [
 		},
 	],
 	[
-		'core/tab-panels',
+		'core/tab-panel',
 		{
 			lock: {
 				remove: true,
@@ -39,14 +38,7 @@ const TABS_TEMPLATE = [
 					anchor: 'tab-1',
 					label: 'Tab 1',
 				},
-				[
-					[
-						'core/paragraph',
-						{
-							placeholder: __( 'Type / to add a block to tab' ),
-						},
-					],
-				],
+				[ [ 'core/paragraph' ] ],
 			],
 		],
 	],
@@ -71,32 +63,25 @@ function Edit( {
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/**
-	 * Compute tabs list from innerblocks to provide via context.
-	 * This traverses the tab-panels block to find all tab blocks
-	 * and extracts their label and anchor for the tabs-menu to consume.
+	 * Construct a list of core/tab blocks, used to create tabs-list context.
 	 */
-	const tabsList = useSelect(
+	const tabs = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
 
-			// Find tab-panels block and extract tab data
-			const tabPanels = innerBlocks.find(
-				( block ) => block.name === 'core/tab-panels'
+			// Find tab-panel block and extract tab data
+			const tabPanel = innerBlocks.find(
+				( block ) => block.name === 'core/tab-panel'
 			);
 
-			if ( ! tabPanels ) {
+			if ( ! tabPanel ) {
 				return [];
 			}
 
-			return tabPanels.innerBlocks
-				.filter( ( block ) => block.name === 'core/tab' )
-				.map( ( tab, index ) => ( {
-					id: tab.attributes.anchor || `tab-${ index }`,
-					label: tab.attributes.label || '',
-					clientId: tab.clientId,
-					index,
-				} ) );
+			return tabPanel.innerBlocks.filter(
+				( block ) => block.name === 'core/tab'
+			);
 		},
 		[ clientId ]
 	);
@@ -104,15 +89,26 @@ function Edit( {
 	/**
 	 * Memoize context value to prevent unnecessary re-renders.
 	 */
-	const contextValue = useMemo(
-		() => ( {
-			'core/tabs-list': tabsList,
+	const contextValue = useMemo( () => {
+		/**
+		 * Compute tabs list from innerblocks to provide via context.
+		 * This traverses the tab-panel block to find all tab blocks
+		 * and extracts their label and anchor for the tabs-menu to consume.
+		 */
+		const tabList = tabs.map( ( tab, index ) => ( {
+			id: tab.attributes.anchor || `tab-${ index }`,
+			label: tab.attributes.label || '',
+			clientId: tab.clientId,
+			index,
+		} ) );
+
+		return {
+			'core/tabs-list': tabList,
 			'core/tabs-id': anchor,
 			'core/tabs-activeTabIndex': activeTabIndex,
 			'core/tabs-editorActiveTabIndex': editorActiveTabIndex,
-		} ),
-		[ tabsList, anchor, activeTabIndex, editorActiveTabIndex ]
-	);
+		};
+	}, [ tabs, anchor, activeTabIndex, editorActiveTabIndex ] );
 
 	/**
 	 * Block props for the tabs container.
@@ -125,10 +121,10 @@ function Edit( {
 	 * Innerblocks props for the tabs container.
 	 */
 	const innerBlockProps = useInnerBlocksProps( blockProps, {
+		__experimentalCaptureToolbars: true,
 		template: TABS_TEMPLATE,
 		templateLock: false,
 		renderAppender: false,
-		__experimentalCaptureToolbars: true,
 	} );
 
 	return (

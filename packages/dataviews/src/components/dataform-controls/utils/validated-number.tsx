@@ -88,6 +88,7 @@ export default function ValidatedNumber< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	operator,
 	validity,
 }: DataFormControlProps< Item > ) {
@@ -149,6 +150,7 @@ export default function ValidatedNumber< Item >( {
 	return (
 		<ValidatedNumberControl
 			required={ !! isValid.required }
+			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			help={ description }

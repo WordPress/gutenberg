@@ -1,11 +1,12 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
-import { Y, CRDT_RECORD_MAP_KEY } from '@wordpress/sync';
+import { Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
+import { CRDT_RECORD_MAP_KEY } from '../sync';
 import type { YPostRecord } from './crdt';
 import type { YBlock, YBlocks } from './crdt-blocks';
 import { getRootMap } from './crdt-utils';

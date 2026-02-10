@@ -104,7 +104,7 @@ export default defineConfig( {
 				{
 					name: 'PaddingSize',
 					description: 'Size scale for padding tokens.',
-					patterns: [ /^wpds-dimension\.padding\.[^.]+\.([^.]+)$/ ],
+					patterns: [ /^wpds-dimension\.padding\.([^.]+)$/ ],
 				},
 				{
 					name: 'GapSize',

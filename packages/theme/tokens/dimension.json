@@ -50,68 +50,9 @@
 			"$description": "Base dimension unit"
 		},
 		"padding": {
-			"surface": {
-				"2xs": {
-					"$value": "{wpds-dimension.primitive.space.10}",
-					"$description": "2x extra small spacing for surfaces",
-					"$extensions": {
-						"mode": {
-							"compact": "{wpds-dimension.primitive.space.10}",
-							"comfortable": "{wpds-dimension.primitive.space.20}"
-						},
-						"com.figma.scopes": [ "GAP" ]
-					}
-				},
-				"xs": {
-					"$value": "{wpds-dimension.primitive.space.20}",
-					"$description": "Extra small spacing for surfaces",
-					"$extensions": {
-						"mode": {
-							"compact": "{wpds-dimension.primitive.space.10}",
-							"comfortable": "{wpds-dimension.primitive.space.30}"
-						},
-						"com.figma.scopes": [ "GAP" ]
-					}
-				},
-				"sm": {
-					"$value": "{wpds-dimension.primitive.space.40}",
-					"$description": "Small spacing for surfaces",
-					"$extensions": {
-						"mode": {
-							"compact": "{wpds-dimension.primitive.space.30}",
-							"comfortable": "{wpds-dimension.primitive.space.50}"
-						},
-						"com.figma.scopes": [ "GAP" ]
-					}
-				},
-				"md": {
-					"$value": "{wpds-dimension.primitive.space.60}",
-					"$description": "Medium spacing for surfaces",
-					"$extensions": {
-						"mode": {
-							"compact": "{wpds-dimension.primitive.space.50}",
-							"comfortable": "{wpds-dimension.primitive.space.70}"
-						},
-						"com.figma.scopes": [ "GAP" ]
-					}
-				},
-				"lg": {
-					"$value": "{wpds-dimension.primitive.space.70}",
-					"$description": "Large spacing for surfaces",
-					"$extensions": {
-						"mode": {
-							"compact": "{wpds-dimension.primitive.space.60}",
-							"comfortable": "{wpds-dimension.primitive.space.80}"
-						},
-						"com.figma.scopes": [ "GAP" ]
-					}
-				}
-			}
-		},
-		"gap": {
-			"2xs": {
+			"xs": {
 				"$value": "{wpds-dimension.primitive.space.10}",
-				"$description": "2x extra small gap",
+				"$description": "Extra small padding",
 				"$extensions": {
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.10}",
@@ -120,9 +61,9 @@
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
-			"xs": {
+			"sm": {
 				"$value": "{wpds-dimension.primitive.space.20}",
-				"$description": "Extra small gap",
+				"$description": "Small padding",
 				"$extensions": {
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.10}",
@@ -131,9 +72,9 @@
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
-			"sm": {
+			"md": {
 				"$value": "{wpds-dimension.primitive.space.30}",
-				"$description": "Small gap",
+				"$description": "Medium padding",
 				"$extensions": {
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.20}",
@@ -142,9 +83,9 @@
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
-			"md": {
+			"lg": {
 				"$value": "{wpds-dimension.primitive.space.40}",
-				"$description": "Medium gap",
+				"$description": "Large padding",
 				"$extensions": {
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.30}",
@@ -153,9 +94,20 @@
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
-			"lg": {
+			"xl": {
+				"$value": "{wpds-dimension.primitive.space.50}",
+				"$description": "Extra large padding",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.40}",
+						"comfortable": "{wpds-dimension.primitive.space.60}"
+					},
+					"com.figma.scopes": [ "GAP" ]
+				}
+			},
+			"2xl": {
 				"$value": "{wpds-dimension.primitive.space.60}",
-				"$description": "Large gap",
+				"$description": "2x extra large padding",
 				"$extensions": {
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.50}",
@@ -164,9 +116,88 @@
 					"com.figma.scopes": [ "GAP" ]
 				}
 			},
+			"3xl": {
+				"$value": "{wpds-dimension.primitive.space.70}",
+				"$description": "3x extra large padding",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.60}",
+						"comfortable": "{wpds-dimension.primitive.space.80}"
+					},
+					"com.figma.scopes": [ "GAP" ]
+				}
+			}
+		},
+		"gap": {
+			"xs": {
+				"$value": "{wpds-dimension.primitive.space.10}",
+				"$description": "Extra small gap",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.10}",
+						"comfortable": "{wpds-dimension.primitive.space.20}"
+					},
+					"com.figma.scopes": [ "GAP" ]
+				}
+			},
+			"sm": {
+				"$value": "{wpds-dimension.primitive.space.20}",
+				"$description": "Small gap",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.10}",
+						"comfortable": "{wpds-dimension.primitive.space.30}"
+					},
+					"com.figma.scopes": [ "GAP" ]
+				}
+			},
+			"md": {
+				"$value": "{wpds-dimension.primitive.space.30}",
+				"$description": "Medium gap",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.20}",
+						"comfortable": "{wpds-dimension.primitive.space.40}"
+					},
+					"com.figma.scopes": [ "GAP" ]
+				}
+			},
+			"lg": {
+				"$value": "{wpds-dimension.primitive.space.40}",
+				"$description": "Large gap",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.30}",
+						"comfortable": "{wpds-dimension.primitive.space.50}"
+					},
+					"com.figma.scopes": [ "GAP" ]
+				}
+			},
 			"xl": {
-				"$value": "{wpds-dimension.primitive.space.80}",
+				"$value": "{wpds-dimension.primitive.space.60}",
 				"$description": "Extra large gap",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.50}",
+						"comfortable": "{wpds-dimension.primitive.space.70}"
+					},
+					"com.figma.scopes": [ "GAP" ]
+				}
+			},
+			"2xl": {
+				"$value": "{wpds-dimension.primitive.space.70}",
+				"$description": "2x extra large gap",
+				"$extensions": {
+					"mode": {
+						"compact": "{wpds-dimension.primitive.space.60}",
+						"comfortable": "{wpds-dimension.primitive.space.80}"
+					},
+					"com.figma.scopes": [ "GAP" ]
+				}
+			},
+			"3xl": {
+				"$value": "{wpds-dimension.primitive.space.80}",
+				"$description": "3x extra large gap",
 				"$extensions": {
 					"mode": {
 						"compact": "{wpds-dimension.primitive.space.70}",

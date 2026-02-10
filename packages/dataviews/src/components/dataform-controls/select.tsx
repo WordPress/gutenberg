@@ -19,6 +19,7 @@ export default function Select< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { type, label, description, getValue, setValue, isValid } = field;
@@ -44,6 +45,7 @@ export default function Select< Item >( {
 	return (
 		<ValidatedSelectControl
 			required={ !! field.isValid?.required }
+			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			value={ value }

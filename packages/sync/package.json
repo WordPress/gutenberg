@@ -40,11 +40,13 @@
 		"./package.json": "./package.json"
 	},
 	"react-native": "src/index",
+	"wpScript": true,
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/undo-manager": "file:../undo-manager",
 		"diff": "^4.0.2",
 		"fast-deep-equal": "^3.1.3",

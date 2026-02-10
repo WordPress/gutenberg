@@ -877,7 +877,7 @@ const ValidationComponent = ( {
 				},
 			},
 		];
-	}, [ elements, custom, required, pattern, minMax, getElements ] );
+	}, [ elements, custom, pattern, minMax, getElements, required ] );
 
 	const form = useMemo( () => {
 		if ( layout === 'regular' ) {
@@ -1018,7 +1018,7 @@ const ValidationComponent = ( {
 
 	return (
 		<form>
-			<Stack direction="column" align="start" gap="xl">
+			<Stack direction="column" align="start" gap="3xl">
 				<DataForm< ValidatedItem >
 					data={ post }
 					fields={ _fields }

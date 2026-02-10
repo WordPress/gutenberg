@@ -39,9 +39,9 @@ function DropdownHeader( {
 		<Stack
 			direction="column"
 			className="dataforms-layouts-panel__dropdown-header"
-			gap="md"
+			gap="lg"
 		>
-			<Stack direction="row" gap="xs" align="center">
+			<Stack direction="row" gap="sm" align="center">
 				{ title && (
 					<Heading level={ 2 } size={ 13 }>
 						{ title }
@@ -174,7 +174,8 @@ function PanelDropdown< Item >( {
 							{ (
 								FieldLayout,
 								childField,
-								childFieldValidity
+								childFieldValidity,
+								markWhenOptional
 							) => (
 								<FieldLayout
 									key={ childField.id }
@@ -184,6 +185,7 @@ function PanelDropdown< Item >( {
 									hideLabelFromVision={
 										( form?.fields ?? [] ).length < 2
 									}
+									markWhenOptional={ markWhenOptional }
 									validity={ childFieldValidity }
 								/>
 							) }

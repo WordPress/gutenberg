@@ -26,14 +26,19 @@ test.describe( 'Pages View Persistence', () => {
 		await admin.visitSiteEditor();
 		await page.getByRole( 'button', { name: 'Pages' } ).click();
 
-		const resetButton = page.getByRole( 'button', { name: 'Reset view' } );
-		if ( await resetButton.isVisible() ) {
-			await resetButton.click();
-			await expect( resetButton ).toBeHidden();
+		// Check if view is modified by looking for the blue dot indicator
+		const modifiedIndicator = page.locator(
+			'.dataviews-view-config__modified-indicator'
+		);
+		if ( await modifiedIndicator.isVisible() ) {
+			// Open dropdown and reset
+			await page.getByRole( 'button', { name: 'View options' } ).click();
+			await page.getByRole( 'button', { name: 'Reset view' } ).click();
+			await expect( modifiedIndicator ).toBeHidden();
 		}
 	} );
 
-	test( 'persists table layout and shows reset button across navigation', async ( {
+	test( 'persists table layout across all tabs with unified view persistence', async ( {
 		page,
 	} ) => {
 		// Change layout to table view
@@ -43,10 +48,11 @@ test.describe( 'Pages View Persistence', () => {
 		// Verify table is visible
 		await expect( page.getByRole( 'table' ) ).toBeVisible();
 
-		// Verify the Reset button appears when view is modified
-		const resetButton = page.getByRole( 'button', { name: 'Reset view' } );
-		await expect( resetButton ).toBeVisible();
-		await expect( resetButton ).toBeEnabled();
+		// Verify the modified indicator (blue dot) appears when view is modified
+		const modifiedIndicator = page.locator(
+			'.dataviews-view-config__modified-indicator'
+		);
+		await expect( modifiedIndicator ).toBeVisible();
 
 		// Navigate to Drafts view
 		await page
@@ -56,14 +62,12 @@ test.describe( 'Pages View Persistence', () => {
 			} )
 			.click();
 
-		// On Drafts view, we should be back to default view (list)
-		// and Reset button should not be visible/enabled for modifications
-		await expect( page.getByRole( 'grid' ) ).toBeVisible();
-		await expect( resetButton ).toBeHidden();
-		// Verify canvas (preview) is visible in list layout
-		await expect(
-			page.getByRole( 'region', { name: 'Editor content' } )
-		).toBeVisible();
+		// With unified persistence, Drafts tab should also show table layout
+		// since all tabs share the same persisted view
+		await expect( page.getByRole( 'table' ) ).toBeVisible();
+
+		// Modified indicator should still be visible on Drafts tab
+		await expect( modifiedIndicator ).toBeVisible();
 
 		// Navigate back to All Pages
 		await page
@@ -75,15 +79,17 @@ test.describe( 'Pages View Persistence', () => {
 		// Verify table layout persisted
 		await expect( page.getByRole( 'table' ) ).toBeVisible();
 
-		// Verify Reset button is still visible
-		await expect( resetButton ).toBeVisible();
-		await expect( resetButton ).toBeEnabled();
+		// Verify modified indicator is still visible
+		await expect( modifiedIndicator ).toBeVisible();
 
-		// Click the Reset button
+		// Open dropdown and click the Reset button
+		await page.getByRole( 'button', { name: 'View options' } ).click();
+		const resetButton = page.getByRole( 'button', { name: 'Reset view' } );
+		await expect( resetButton ).toBeEnabled();
 		await resetButton.click();
 
-		// wait for the reset button to be hidden
-		await expect( resetButton ).toBeHidden();
+		// Verify the modified indicator is hidden after reset
+		await expect( modifiedIndicator ).toBeHidden();
 
 		// Verify view returns to list layout
 		await expect( page.getByRole( 'grid' ) ).toBeVisible();

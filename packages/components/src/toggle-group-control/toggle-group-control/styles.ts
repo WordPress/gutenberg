@@ -39,7 +39,7 @@ export const toggleGroupControl = ( {
 		content: '';
 		position: absolute;
 		pointer-events: none;
-		background: ${ COLORS.theme.foregroundInverted };
+		background: ${ COLORS.theme.gray[ 100 ] };
 		border: 1px solid ${ COLORS.theme.gray[ 700 ] };
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
