@@ -260,10 +260,16 @@ mark.wp-note {
 		border-color: var(--wp-admin-theme-color);
 		color: inherit;
 	}
+	&.editor-collab-sidebar-panel__reaction-button[aria-pressed="true"]:hover {
+		background-color: $gray-100;
+		border-color: $gray-700;
+		color: inherit;
+	}
 }
 
 .editor-collab-sidebar-panel__add-reaction-button {
 	display: inline-flex;
+	margin: 0;
 	align-items: center;
 	justify-content: center;
 	width: 28px;
@@ -303,20 +309,20 @@ mark.wp-note {
 	padding: $grid-unit-10;
 }
 
+.editor-collab-sidebar-panel .editor-collab-sidebar-panel__add-reaction-popover {
+	min-width: 40px;
+}
+
 .editor-collab-sidebar-panel__emoji-picker {
 	display: flex;
 	flex-direction: column;
-	gap: $grid-unit-05;
+	gap: 0;
 }
 
 .editor-collab-sidebar-panel__emoji-option {
 	width: 32px;
 	font-size: 18px;
 	justify-content: center;
-}
-
-.editor-collab-sidebar-panel__reaction-details .components-popover__content {
-	width: 260px;
 }
 
 .editor-collab-sidebar-panel__reaction-details-content {
