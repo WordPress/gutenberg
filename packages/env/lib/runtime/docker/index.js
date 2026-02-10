@@ -16,7 +16,10 @@ const exec = util.promisify( require( 'child_process' ).exec );
 /**
  * Internal dependencies
  */
-const { writeDockerFiles, loadDockerConfig } = require( './docker-config' );
+const {
+	writeDockerFiles,
+	ensureDockerInitialized,
+} = require( './docker-config' );
 const getHostUser = require( './get-host-user' );
 const downloadSources = require( './download-sources' );
 const downloadWPPHPUnit = require( './download-wp-phpunit' );
@@ -406,16 +409,12 @@ class DockerRuntime {
 	 * @param {boolean}  options.debug   True if debug mode is enabled.
 	 */
 	async stop( config, { spinner, debug } ) {
-		const { dockerComposeConfigPath } = await loadDockerConfig( {
-			spinner,
-			debug,
-			customConfigPath: config.customConfigPath,
-		} );
+		ensureDockerInitialized( config, spinner );
 
 		spinner.text = 'Stopping WordPress.';
 
 		await dockerCompose.down( {
-			config: dockerComposeConfigPath,
+			config: config.dockerComposeConfigPath,
 			log: debug,
 		} );
 
@@ -487,11 +486,7 @@ class DockerRuntime {
 	 * @param {boolean}  options.debug       True if debug mode is enabled.
 	 */
 	async clean( config, { environment, spinner, debug } ) {
-		const fullConfig = await loadDockerConfig( {
-			spinner,
-			debug,
-			customConfigPath: config.customConfigPath,
-		} );
+		ensureDockerInitialized( config, spinner );
 
 		const testsEnabled = fullConfig.testsEnvironment !== false;
 
@@ -524,16 +519,14 @@ class DockerRuntime {
 		}
 
 		await dockerCompose.upMany( mysqlServices, {
-			config: fullConfig.dockerComposeConfigPath,
-			log: fullConfig.debug,
+			config: config.dockerComposeConfigPath,
+			log: debug,
 		} );
 
 		if ( environment === 'all' || environment === 'development' ) {
 			tasks.push(
-				resetDatabase( 'development', fullConfig )
-					.then( () =>
-						configureWordPress( 'development', fullConfig )
-					)
+				resetDatabase( 'development', config )
+					.then( () => configureWordPress( 'development', config ) )
 					.catch( () => {} )
 			);
 		}
@@ -543,8 +536,8 @@ class DockerRuntime {
 			( environment === 'all' || environment === 'tests' )
 		) {
 			tasks.push(
-				resetDatabase( 'tests', fullConfig )
-					.then( () => configureWordPress( 'tests', fullConfig ) )
+				resetDatabase( 'tests', config )
+					.then( () => configureWordPress( 'tests', config ) )
 					.catch( () => {} )
 			);
 		}
@@ -572,9 +565,8 @@ class DockerRuntime {
 	 * @param {string[]} options.command   The command to run.
 	 * @param {string}   options.envCwd    The working directory.
 	 * @param {Object}   options.spinner   A CLI spinner which indicates progress.
-	 * @param {boolean}  options.debug     True if debug mode is enabled.
 	 */
-	async run( config, { container, command, envCwd, spinner, debug } ) {
+	async run( config, { container, command, envCwd, spinner } ) {
 		// Validate the container name (throws for deprecated containers)
 		validateRunContainer( container );
 
@@ -587,22 +579,13 @@ class DockerRuntime {
 			);
 		}
 
-		const fullConfig = await loadDockerConfig( {
-			spinner,
-			debug,
-			customConfigPath: config.customConfigPath,
-		} );
+		ensureDockerInitialized( config, spinner );
 
 		// Shows a contextual tip for the given command.
 		const joinedCommand = command.join( ' ' );
 		this._showCommandTips( joinedCommand, container, spinner );
 
-		await this._spawnCommandDirectly(
-			fullConfig,
-			container,
-			command,
-			envCwd
-		);
+		await this._spawnCommandDirectly( config, container, command, envCwd );
 
 		spinner.text = `Ran \`${ joinedCommand }\` in '${ container }'.`;
 	}
@@ -615,14 +598,9 @@ class DockerRuntime {
 	 * @param {string}   options.environment The environment to show logs for.
 	 * @param {boolean}  options.watch       If true, follow along with log output.
 	 * @param {Object}   options.spinner     A CLI spinner which indicates progress.
-	 * @param {boolean}  options.debug       True if debug mode is enabled.
 	 */
-	async logs( config, { environment, watch, spinner, debug } ) {
-		const fullConfig = await loadDockerConfig( {
-			spinner,
-			debug,
-			customConfigPath: config.customConfigPath,
-		} );
+	async logs( config, { environment, watch, spinner } ) {
+		ensureDockerInitialized( config, spinner );
 
 		const testsEnabled = fullConfig.testsEnvironment !== false;
 
@@ -653,7 +631,7 @@ class DockerRuntime {
 		const output = await Promise.all( [
 			...servicesToWatch.map( ( service ) =>
 				dockerCompose.logs( service, {
-					config: fullConfig.dockerComposeConfigPath,
+					config: config.dockerComposeConfigPath,
 					log: watch, // Must log inline if we are watching the log output.
 					commandOptions: watch ? [ '--follow' ] : [],
 				} )
@@ -705,13 +683,10 @@ class DockerRuntime {
 	async getStatus( config, { spinner, debug } ) {
 		spinner.text = 'Getting environment status.';
 
-		const fullConfig = await loadDockerConfig( {
-			spinner,
-			debug,
-			customConfigPath: config.customConfigPath,
-		} );
+		ensureDockerInitialized( config, spinner );
+
 		const dockerComposeConfig = {
-			config: fullConfig.dockerComposeConfigPath,
+			config: config.dockerComposeConfigPath,
 			log: debug,
 		};
 
@@ -728,7 +703,7 @@ class DockerRuntime {
 			);
 			isRunning = true;
 
-			if ( fullConfig.env.development.phpmyadmin ) {
+			if ( config.env.development.phpmyadmin ) {
 				phpmyadminPort = await this._getPublicDockerPort(
 					'phpmyadmin',
 					80,
@@ -739,7 +714,7 @@ class DockerRuntime {
 			// Containers are not running.
 		}
 
-		const siteUrl = fullConfig.env.development.config.WP_SITEURL;
+		const siteUrl = config.env.development.config.WP_SITEURL;
 
 		const testsEnabled = fullConfig.testsEnvironment !== false;
 
@@ -754,18 +729,18 @@ class DockerRuntime {
 						: null,
 			},
 			ports: {
-				development: fullConfig.env.development.port,
+				development: config.env.development.port,
 				...( testsEnabled && {
-					tests: fullConfig.env.tests.port,
+					tests: config.env.tests.port,
 				} ),
 				mysql: mySQLPort,
 			},
 			config: {
-				multisite: fullConfig.env.development.multisite,
-				xdebug: fullConfig.xdebug || 'off',
+				multisite: config.env.development.multisite,
+				xdebug: config.xdebug || 'off',
 			},
-			configPath: fullConfig.configDirectoryPath,
-			installPath: fullConfig.workDirectoryPath,
+			configPath: config.configDirectoryPath,
+			installPath: config.workDirectoryPath,
 		};
 	}
 

@@ -10,7 +10,7 @@ const yaml = require( 'js-yaml' );
 /**
  * Internal dependencies
  */
-const { loadConfig, ValidationError } = require( '../../config' );
+const { ValidationError } = require( '../../config' );
 const buildDockerComposeConfig = require( './build-docker-compose-config' );
 
 /**
@@ -59,28 +59,20 @@ async function writeDockerFiles( config ) {
 }
 
 /**
- * Loads configuration for non-start Docker commands (stop, clean, run, logs,
- * getStatus). Does not resolve ports or write any files — only reads the
- * existing config and verifies the work directory exists.
+ * Verifies that the Docker environment has been initialized (i.e. `wp-env
+ * start` has been run at least once). Exits with an error message when the
+ * work directory does not exist.
  *
- * @param {Object}      options
- * @param {Object}      options.spinner          A CLI spinner which indicates progress.
- * @param {boolean}     options.debug            True if debug mode is enabled.
- * @param {string|null} options.customConfigPath Path to a custom .wp-env.json configuration file.
- * @return {WPConfig} The wp-env config object.
+ * @param {WPConfig} config  The wp-env config object.
+ * @param {Object}   spinner A CLI spinner which indicates progress.
  */
-async function loadDockerConfig( { spinner, debug, customConfigPath = null } ) {
-	const config = await loadConfig( path.resolve( '.' ), customConfigPath );
-	config.debug = debug;
-
+function ensureDockerInitialized( config, spinner ) {
 	if ( ! existsSync( config.workDirectoryPath ) ) {
 		spinner.fail(
 			'wp-env has not yet been initialized. Please run `wp-env start` to install the WordPress instance before using any other commands. This is only necessary to set up the environment for the first time; it is typically not necessary for the instance to be running after that in order to use other commands.'
 		);
 		process.exit( 1 );
 	}
-
-	return config;
 }
 
 /**
@@ -341,5 +333,5 @@ RUN mkdir -p /tmp/spx && chmod 777 /tmp/spx`;
 
 module.exports = {
 	writeDockerFiles,
-	loadDockerConfig,
+	ensureDockerInitialized,
 };
