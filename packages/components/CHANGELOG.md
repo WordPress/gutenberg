@@ -8,7 +8,7 @@
 -   `Text`: Remove `text-wrap: balance` fallback. Only `text-wrap: pretty` is now used ([#75089](https://github.com/WordPress/gutenberg/pull/75089)).
 -   `RangeControl`: support forced-colors mode ([#75165](https://github.com/WordPress/gutenberg/pull/75165)).
 -   `ToggleControl`: Prevent `__nextHasNoMarginBottom` from logging a console warning ([#75296](https://github.com/WordPress/gutenberg/pull/75296)).
--   `ColorPicker`: Preserve hue when the saturation picker reaches black, white, or gray ([#75157](https://github.com/WordPress/gutenberg/pull/75157)).
+-   `ColorPicker`: Preserve hue when the selected color becomes a-chromatic ([#75157](https://github.com/WordPress/gutenberg/pull/75157)).
 -   `createSlotFill`: fix ref forwarding ([#75274](https://github.com/WordPress/gutenberg/pull/75274)).
 -   `Button`: Fix native outline showing when focused and active ([#75346](https://github.com/WordPress/gutenberg/pull/75346)).
 
