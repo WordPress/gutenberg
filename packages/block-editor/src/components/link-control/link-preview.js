@@ -40,20 +40,6 @@ const { Badge } = unlock( componentsPrivateApis );
 
 import useRichUrlData from './use-rich-url-data';
 
-/**
- * Filters the title for display. Removes the protocol and www prefix.
- *
- * @param {string} title The title to be filtered.
- *
- * @return {string} The filtered title.
- */
-function filterTitleForDisplay( title ) {
-	// Derived from `filterURLForDisplay` in `@wordpress/url`.
-	return title
-		.replace( /^[a-z\-.\+]+[0-9]*:(\/\/)?/i, '' )
-		.replace( /^www\./i, '' );
-}
-
 export default function LinkPreview( {
 	value,
 	onEditClick,
@@ -85,9 +71,6 @@ export default function LinkPreview( {
 	const displayTitle =
 		! isEmptyURL &&
 		stripHTML( richData?.title || value?.title || displayURL );
-
-	const isUrlRedundant =
-		! value?.url || filterTitleForDisplay( displayTitle ) === displayURL;
 
 	let icon;
 
@@ -166,13 +149,11 @@ export default function LinkPreview( {
 										{ displayTitle }
 									</Truncate>
 								</ExternalLink>
-								{ ! isUrlRedundant && (
-									<span className="block-editor-link-control__preview-info">
-										<Truncate numberOfLines={ 1 }>
-											{ displayURL }
-										</Truncate>
-									</span>
-								) }
+								<span className="block-editor-link-control__preview-info">
+									<Truncate numberOfLines={ 1 }>
+										{ displayURL }
+									</Truncate>
+								</span>
 								{ value?.badges?.length > 0 && (
 									<HStack
 										className="block-editor-link-control__preview-badges"
