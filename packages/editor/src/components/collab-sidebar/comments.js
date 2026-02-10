@@ -505,9 +505,6 @@ function Thread( {
 		);
 		const isDialogFocused =
 			event.relatedTarget?.closest( '[role="dialog"]' );
-		const isPopoverFocused = event.relatedTarget?.closest(
-			'.components-popover'
-		);
 		const isTabbing = isKeyboardTabbingRef.current;
 
 		// When another note is clicked, do nothing because the current note is automatically closed.
@@ -516,10 +513,6 @@ function Thread( {
 		}
 		// When deleting a note, a dialog appears, but the note should not be collapsed.
 		if ( isDialogFocused ) {
-			return;
-		}
-		// When a popover is focused (e.g., emoji reaction picker), the note should not be collapsed.
-		if ( isPopoverFocused ) {
 			return;
 		}
 		// When tabbing, do nothing if the focus is within the current note.
