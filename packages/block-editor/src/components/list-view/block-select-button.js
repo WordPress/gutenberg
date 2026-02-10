@@ -11,7 +11,7 @@ import {
 	__experimentalTruncate as Truncate,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useState } from '@wordpress/element';
 import {
 	Icon,
 	lockSmall as lock,
@@ -33,7 +33,7 @@ import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-
+import { BlockRenameModal, useBlockRename } from '../block-rename';
 const { Badge } = unlock( componentsPrivateApis );
 
 function ListViewBlockSelectButton(
@@ -60,24 +60,36 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { isBlockHidden, hasPatternName } = useSelect(
-		( select ) => {
-			const {
-				isBlockHiddenAnywhere: _isBlockHidden,
-				getBlockAttributes,
-			} = unlock( select( blockEditorStore ) );
-			return {
-				isBlockHidden: _isBlockHidden( clientId ),
-				hasPatternName:
-					!! getBlockAttributes( clientId )?.metadata?.patternName,
-			};
-		},
-		[ clientId ]
-	);
+	const { isContentOnly, blockName, isBlockHidden, hasPatternName } =
+		useSelect(
+			( select ) => {
+				const {
+					isBlockHiddenAnywhere: _isBlockHidden,
+					getBlockAttributes,
+					getBlockName,
+				} = unlock( select( blockEditorStore ) );
+
+				return {
+					isContentOnly:
+						select( blockEditorStore ).getBlockEditingMode(
+							clientId
+						) === 'contentOnly',
+					blockName: getBlockName( clientId ),
+					isBlockHidden: _isBlockHidden( clientId ),
+					hasPatternName:
+						!! getBlockAttributes( clientId )?.metadata
+							?.patternName,
+				};
+			},
+			[ clientId ]
+		);
 
 	const shouldShowLockIcon = isLocked;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
+	const { canRename: blockSupportsRename } = useBlockRename( blockName );
+	const canRename = blockSupportsRename && ! isContentOnly;
+	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -98,81 +110,92 @@ function ListViewBlockSelectButton(
 	}
 
 	return (
-		<a
-			className={ clsx(
-				'block-editor-list-view-block-select-button',
-				className
-			) }
-			onClick={ onClick }
-			onContextMenu={ onContextMenu }
-			onKeyDown={ onKeyDown }
-			onMouseDown={ onMouseDown }
-			ref={ ref }
-			tabIndex={ tabIndex }
-			onFocus={ onFocus }
-			onDragStart={ onDragStartHandler }
-			onDragEnd={ onDragEnd }
-			draggable={ draggable }
-			href={ `#block-${ clientId }` }
-			aria-describedby={ ariaDescribedBy }
-			aria-expanded={ isExpanded }
-		>
-			<ListViewExpander onClick={ onToggleExpanded } />
-			<BlockIcon
-				icon={ hasPatternName ? symbol : blockInformation?.icon }
-				showColors
-				context="list-view"
-			/>
-			<HStack
-				alignment="center"
-				className="block-editor-list-view-block-select-button__label-wrapper"
-				justify="flex-start"
-				spacing={ 1 }
+		<>
+			<a
+				className={ clsx(
+					'block-editor-list-view-block-select-button',
+					className
+				) }
+				onClick={ onClick }
+				onDoubleClick={ () =>
+					canRename ? setIsRenameModalOpen( true ) : undefined
+				}
+				onContextMenu={ onContextMenu }
+				onKeyDown={ onKeyDown }
+				onMouseDown={ onMouseDown }
+				ref={ ref }
+				tabIndex={ tabIndex }
+				onFocus={ onFocus }
+				onDragStart={ onDragStartHandler }
+				onDragEnd={ onDragEnd }
+				draggable={ draggable }
+				href={ `#block-${ clientId }` }
+				aria-describedby={ ariaDescribedBy }
+				aria-expanded={ isExpanded }
 			>
-				<span className="block-editor-list-view-block-select-button__title">
-					<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
-				</span>
-				{ blockInformation?.anchor && (
-					<span className="block-editor-list-view-block-select-button__anchor-wrapper">
-						<Badge className="block-editor-list-view-block-select-button__anchor">
-							{ blockInformation.anchor }
-						</Badge>
+				<ListViewExpander onClick={ onToggleExpanded } />
+				<BlockIcon
+					icon={ hasPatternName ? symbol : blockInformation?.icon }
+					showColors
+					context="list-view"
+				/>
+				<HStack
+					alignment="center"
+					className="block-editor-list-view-block-select-button__label-wrapper"
+					justify="flex-start"
+					spacing={ 1 }
+				>
+					<span className="block-editor-list-view-block-select-button__title">
+						<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
 					</span>
-				) }
-				{ isSticky && (
-					<span className="block-editor-list-view-block-select-button__sticky">
-						<Icon icon={ pinSmall } />
-					</span>
-				) }
-				{ images.length ? (
-					<span
-						className="block-editor-list-view-block-select-button__images"
-						aria-hidden
-					>
-						{ images.map( ( image, index ) => (
-							<span
-								className="block-editor-list-view-block-select-button__image"
-								key={ image.clientId }
-								style={ {
-									backgroundImage: `url(${ image.url })`,
-									zIndex: images.length - index, // Ensure the first image is on top, and subsequent images are behind.
-								} }
-							/>
-						) ) }
-					</span>
-				) : null }
-				{ isBlockHidden && (
-					<span className="block-editor-list-view-block-select-button__block-visibility">
-						<Icon icon={ unseen } />
-					</span>
-				) }
-				{ shouldShowLockIcon && (
-					<span className="block-editor-list-view-block-select-button__lock">
-						<Icon icon={ lock } />
-					</span>
-				) }
-			</HStack>
-		</a>
+					{ blockInformation?.anchor && (
+						<span className="block-editor-list-view-block-select-button__anchor-wrapper">
+							<Badge className="block-editor-list-view-block-select-button__anchor">
+								{ blockInformation.anchor }
+							</Badge>
+						</span>
+					) }
+					{ isSticky && (
+						<span className="block-editor-list-view-block-select-button__sticky">
+							<Icon icon={ pinSmall } />
+						</span>
+					) }
+					{ images.length ? (
+						<span
+							className="block-editor-list-view-block-select-button__images"
+							aria-hidden
+						>
+							{ images.map( ( image, index ) => (
+								<span
+									className="block-editor-list-view-block-select-button__image"
+									key={ image.clientId }
+									style={ {
+										backgroundImage: `url(${ image.url })`,
+										zIndex: images.length - index, // Ensure the first image is on top, and subsequent images are behind.
+									} }
+								/>
+							) ) }
+						</span>
+					) : null }
+					{ isBlockHidden && (
+						<span className="block-editor-list-view-block-select-button__block-visibility">
+							<Icon icon={ unseen } />
+						</span>
+					) }
+					{ shouldShowLockIcon && (
+						<span className="block-editor-list-view-block-select-button__lock">
+							<Icon icon={ lock } />
+						</span>
+					) }
+				</HStack>
+			</a>
+			{ isRenameModalOpen && canRename && (
+				<BlockRenameModal
+					clientId={ clientId }
+					onClose={ () => setIsRenameModalOpen( false ) }
+				/>
+			) }
+		</>
 	);
 }
 
