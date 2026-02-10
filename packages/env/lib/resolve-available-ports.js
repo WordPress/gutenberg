@@ -136,7 +136,9 @@ async function resolveConfigPorts( config, portResolver ) {
 			continue;
 		}
 
-		const strict = currentValue !== null;
+		// Only the main web port uses strict mode (fail if busy).
+		// Other ports (phpmyadminPort) always auto-fallback.
+		const strict = currentValue !== null && property === 'port';
 		const configPath = `env.${ key }`;
 		config.env[ env ][ property ] = await portResolver.resolve(
 			preferredPort,

@@ -12,7 +12,7 @@ jest.mock( '../port-utils' );
 
 describe( 'resolve-available-ports', () => {
 	afterEach( () => {
-		jest.restoreAllMocks();
+		jest.clearAllMocks();
 	} );
 
 	describe( 'createPortResolver', () => {
@@ -122,6 +122,27 @@ describe( 'resolve-available-ports', () => {
 			// Strict mode uses isPortAvailable, not findAvailablePort.
 			expect( isPortAvailable ).toHaveBeenCalledWith( 9000 );
 			expect( isPortAvailable ).toHaveBeenCalledWith( 9001 );
+		} );
+
+		it( 'should resolve explicit phpmyadminPort with auto-fallback', async () => {
+			findAvailablePort.mockResolvedValue( 49152 );
+
+			const resolver = createPortResolver();
+			const config = {
+				env: {
+					development: { port: null, phpmyadminPort: 9000 },
+					tests: { port: null },
+				},
+			};
+
+			await resolveConfigPorts( config, resolver );
+
+			// phpmyadminPort should use findAvailablePort (non-strict),
+			// not isPortAvailable (strict), even with an explicit value.
+			expect( findAvailablePort ).toHaveBeenCalledWith(
+				expect.objectContaining( { preferredPort: 9000 } )
+			);
+			expect( isPortAvailable ).not.toHaveBeenCalledWith( 9000 );
 		} );
 
 		it( 'should skip undefined ports', async () => {
