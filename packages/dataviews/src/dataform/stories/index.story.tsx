@@ -60,7 +60,7 @@ export const LayoutPanel = {
 		openAs: {
 			control: { type: 'select' },
 			description: 'Chooses how to open the panel.',
-			options: [ 'default', 'dropdown', 'modal' ],
+			options: [ 'default', 'dropdown', 'modal', 'menu' ],
 		},
 	},
 };

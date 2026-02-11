@@ -4,6 +4,7 @@
 import type { FieldLayoutProps, NormalizedPanelLayout } from '../../../types';
 import PanelModal from './modal';
 import PanelDropdown from './dropdown';
+import PanelMenu from './menu';
 
 export default function FormPanelField< Item >( {
 	data,
@@ -16,6 +17,17 @@ export default function FormPanelField< Item >( {
 	if ( layout.openAs === 'modal' ) {
 		return (
 			<PanelModal
+				data={ data }
+				field={ field }
+				onChange={ onChange }
+				validity={ validity }
+			/>
+		);
+	}
+
+	if ( layout.openAs === 'menu' ) {
+		return (
+			<PanelMenu
 				data={ data }
 				field={ field }
 				onChange={ onChange }

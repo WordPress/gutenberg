@@ -24,13 +24,13 @@ export type NormalizedRegularLayout = {
 export type PanelLayout = {
 	type: 'panel';
 	labelPosition?: LabelPosition;
-	openAs?: 'dropdown' | 'modal';
+	openAs?: 'dropdown' | 'modal' | 'menu';
 	summary?: PanelSummaryField;
 };
 export type NormalizedPanelLayout = {
 	type: 'panel';
 	labelPosition: LabelPosition;
-	openAs: 'dropdown' | 'modal';
+	openAs: 'dropdown' | 'modal' | 'menu';
 	summary: NormalizedPanelSummaryField;
 };
 

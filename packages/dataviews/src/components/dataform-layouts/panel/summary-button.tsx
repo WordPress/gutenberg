@@ -34,6 +34,7 @@ export default function SummaryButton< Item >( {
 	disabled,
 	onClick,
 	'aria-expanded': ariaExpanded,
+	'aria-haspopup': ariaHasPopup = 'dialog',
 }: {
 	data: Item;
 	field: NormalizedFormField;
@@ -44,6 +45,7 @@ export default function SummaryButton< Item >( {
 	disabled?: boolean;
 	onClick: () => void;
 	'aria-expanded'?: boolean;
+	'aria-haspopup'?: 'dialog' | 'menu';
 } ) {
 	const labelPosition = ( field.layout as NormalizedPanelLayout )
 		.labelPosition;
@@ -127,7 +129,7 @@ export default function SummaryButton< Item >( {
 					className="dataforms-layouts-panel__field-trigger-icon"
 					aria-label={ ariaLabel }
 					aria-expanded={ ariaExpanded }
-					aria-haspopup="dialog"
+					aria-haspopup={ ariaHasPopup }
 					aria-describedby={ `${ controlId }` }
 					onClick={ onClick }
 				>

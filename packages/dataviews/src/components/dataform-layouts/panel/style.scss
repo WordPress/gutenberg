@@ -159,6 +159,11 @@
 	margin-top: $grid-unit-20;
 }
 
+.dataforms-layouts-panel__field-dropdown--menu .components-popover__content {
+	padding: 0;
+	min-width: 200px;
+}
+
 .components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown {
 	z-index: z-index(".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown");
 }

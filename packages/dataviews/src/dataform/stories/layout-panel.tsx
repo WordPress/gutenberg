@@ -264,7 +264,7 @@ const getPanelLayoutFromStoryArgs = ( {
 }: {
 	summary?: string[];
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
-	openAs?: 'default' | 'dropdown' | 'modal';
+	openAs?: 'default' | 'dropdown' | 'modal' | 'menu';
 } ): Layout | undefined => {
 	const panelLayout: PanelLayout = {
 		type: 'panel',
@@ -291,7 +291,7 @@ const LayoutPanelComponent = ( {
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card';
 	labelPosition: 'default' | 'top' | 'side' | 'none';
-	openAs: 'default' | 'dropdown' | 'modal';
+	openAs: 'default' | 'dropdown' | 'modal' | 'menu';
 } ) => {
 	const [ post, setPost ] = useState< SamplePost >( {
 		title: 'Hello, World!',

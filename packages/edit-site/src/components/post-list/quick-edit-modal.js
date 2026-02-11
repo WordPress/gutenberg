@@ -100,8 +100,8 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 				label: __( 'Template' ),
 				id: 'template',
 				layout: {
-					type: 'regular',
-					labelPosition: 'side',
+					type: 'panel',
+					openAs: 'menu',
 				},
 			},
 		];
