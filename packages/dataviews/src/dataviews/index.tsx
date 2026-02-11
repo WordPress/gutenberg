@@ -186,7 +186,6 @@ function DataViews< Item >( {
 		{ box: 'border-box' }
 	);
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
-	const [ isSelectAllMode, setIsSelectAllMode ] = useState( false );
 	const isUncontrolled =
 		selectionProperty === undefined || onChangeSelection === undefined;
 	const selection = isUncontrolled ? selectionState : selectionProperty;
@@ -271,8 +270,6 @@ function DataViews< Item >( {
 				paginationInfo: displayPaginationInfo,
 				selection: _selection,
 				onChangeSelection: setSelectionWithChange,
-				isSelectAllMode,
-				setIsSelectAllMode,
 				openedFilter,
 				setOpenedFilter,
 				getItemId,

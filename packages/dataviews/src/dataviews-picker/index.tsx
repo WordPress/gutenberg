@@ -161,7 +161,6 @@ function DataViewsPicker< Item >( {
 		{ box: 'border-box' }
 	);
 	const [ openedFilter, setOpenedFilter ] = useState< string | null >( null );
-	const [ isSelectAllMode, setIsSelectAllMode ] = useState( false );
 	function setSelectionWithChange( value: SelectionOrUpdater ) {
 		const newValue =
 			typeof value === 'function' ? value( selection ) : value;
@@ -230,8 +229,6 @@ function DataViewsPicker< Item >( {
 				isItemClickable,
 				selection,
 				onChangeSelection: setSelectionWithChange,
-				isSelectAllMode,
-				setIsSelectAllMode,
 				openedFilter,
 				setOpenedFilter,
 				getItemId,

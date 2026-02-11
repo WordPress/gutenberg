@@ -76,16 +76,11 @@ function GridItem< Item >( {
 	posinset,
 	setsize,
 }: GridItemProps< Item > ) {
-	const { isSelectAllMode } = useContext( DataViewsContext );
 	const { showTitle = true, showMedia = true, showDescription = true } = view;
 	const id = getItemId( item );
 	const elementRef = useRef< HTMLElement | null >( null );
 
-	// In select all mode, selection is a deselection list
-	const isInSelectionArray = selection.includes( id );
-	const isSelected = isSelectAllMode
-		? ! isInSelectionArray
-		: isInSelectionArray;
+	const isSelected = selection.includes( id );
 
 	const setElementRef = ( element: HTMLElement | null ) => {
 		elementRef.current = element;
@@ -126,8 +121,7 @@ function GridItem< Item >( {
 			aria-selected={ isSelected }
 			onClick={ () => {
 				// Toggle in/out of selection array
-				// Works for both normal mode (selection list) and select-all mode (deselection list)
-				if ( isInSelectionArray ) {
+				if ( isSelected ) {
 					onChangeSelection(
 						selection.filter( ( itemId ) => id !== itemId )
 					);

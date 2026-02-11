@@ -3,14 +3,12 @@
  */
 import { CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import type { SetSelection } from '../../types/private';
 import type { NormalizedField } from '../../types';
-import DataViewsContext from '../dataviews-context';
 
 interface DataViewsSelectionCheckboxProps< Item > {
 	selection: string[];
@@ -31,17 +29,9 @@ export default function DataViewsSelectionCheckbox< Item >( {
 	disabled,
 	...extraProps
 }: DataViewsSelectionCheckboxProps< Item > ) {
-	const { isSelectAllMode } = useContext( DataViewsContext );
 	const id = getItemId( item );
-
-	// In select all mode, selection array is a deselection list:
-	// - Item is selected if NOT in the array
-	// In normal mode:
-	// - Item is selected if IN the array
 	const isInSelectionArray = selection.includes( id );
-	const checked =
-		! disabled &&
-		( isSelectAllMode ? ! isInSelectionArray : isInSelectionArray );
+	const checked = ! disabled && isInSelectionArray;
 
 	// Fallback label to ensure accessibility
 	const selectionLabel =
@@ -59,8 +49,6 @@ export default function DataViewsSelectionCheckbox< Item >( {
 				}
 
 				// Toggle in/out of selection array
-				// In normal mode: adds/removes from selection
-				// In select all mode: adds/removes from deselection list
 				onChangeSelection(
 					isInSelectionArray
 						? selection.filter( ( itemId ) => id !== itemId )

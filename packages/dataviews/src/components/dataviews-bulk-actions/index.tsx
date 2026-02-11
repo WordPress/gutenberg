@@ -111,8 +111,6 @@ export function BulkSelectionCheckbox< Item >( {
 	actions,
 	getItemId,
 }: BulkSelectionCheckboxProps< Item > ) {
-	const { view, isSelectAllMode, setIsSelectAllMode } =
-		useContext( DataViewsContext );
 	const selectableItems = useMemo( () => {
 		return data.filter( ( item ) => {
 			return actions.some(
@@ -123,26 +121,18 @@ export function BulkSelectionCheckbox< Item >( {
 		} );
 	}, [ data, actions ] );
 
-	// Calculate selected items based on mode
-	// In select all mode: selection is a deselection list, so selected = NOT in array
-	// In normal mode: selected = IN array
+	// Selected items are those in the selection array
 	const selectedItems = selectableItems.filter( ( item ) => {
-		const isInArray = selection.includes( getItemId( item ) );
-		return isSelectAllMode ? ! isInArray : isInArray;
+		return selection.includes( getItemId( item ) );
 	} );
 
-	// In select all mode, all are selected if deselection list is empty
-	// In normal mode, all are selected if all selectable items are in selection
-	const areAllSelected = isSelectAllMode
-		? selection.length === 0
-		: selectedItems.length === selectableItems.length;
+	// All are selected if all selectable items are in selection
+	const areAllSelected =
+		selectableItems.length > 0 &&
+		selectedItems.length === selectableItems.length;
 
-	// Determine if there's any selection
-	// In select all mode: has selection if deselection list doesn't include all items
-	// In normal mode: has selection if any items are selected
-	const hasSelection = isSelectAllMode
-		? selection.length < selectableItems.length // Some items still selected
-		: selectedItems.length > 0;
+	// Has selection if any items are selected
+	const hasSelection = selectedItems.length > 0;
 
 	return (
 		<CheckboxControl
@@ -150,30 +140,23 @@ export function BulkSelectionCheckbox< Item >( {
 			checked={ areAllSelected }
 			indeterminate={ ! areAllSelected && hasSelection }
 			onChange={ () => {
-				if ( view.infiniteScrollEnabled ) {
-					// For infinite scroll, toggle isSelectAllMode
-					if ( isSelectAllMode ) {
-						if ( areAllSelected ) {
-							// All are selected, deselect all: disable select all mode
-							setIsSelectAllMode( false );
-							onChangeSelection( [] );
-						} else {
-							// Some items were manually deselected, re-select all by clearing deselection list
-							onChangeSelection( [] );
-						}
-					} else {
-						// Select all: enable select all mode with empty deselection list
-						setIsSelectAllMode( true );
-						onChangeSelection( [] );
-					}
-				} else if ( areAllSelected ) {
-					// Standard pagination behavior: deselect all
-					onChangeSelection( [] );
-				} else {
-					// Standard pagination behavior: select all
+				if ( areAllSelected ) {
+					// Deselect all - remove loaded items from selection
 					onChangeSelection(
-						selectableItems.map( ( item ) => getItemId( item ) )
+						selection.filter(
+							( id ) =>
+								! selectableItems.some(
+									( item ) => id === getItemId( item )
+								)
+						)
 					);
+				} else {
+					// Select all - merge loaded selectable items into selection
+					const selectionSet = new Set( [
+						...selection,
+						...selectableItems.map( ( item ) => getItemId( item ) ),
+					] );
+					onChangeSelection( Array.from( selectionSet ) );
 				}
 			} }
 			aria-label={
@@ -294,15 +277,15 @@ function renderFooterContent< Item >(
 		totalItems: number;
 		totalPages: number;
 	},
-	onlyTotalCount?: boolean,
-	isSelectAllMode?: boolean
+	onlyTotalCount?: boolean
 ) {
+	// For bulk actions, use selectedItems.length (actual loaded items) instead of selection.length
+	// This accurately reflects items available for bulk actions
 	const message = getFooterMessage(
-		selection.length,
+		selectedItems.length,
 		data.length,
 		paginationInfo.totalItems,
-		onlyTotalCount,
-		isSelectAllMode
+		onlyTotalCount
 	);
 	return (
 		<Stack
@@ -364,7 +347,7 @@ function FooterContent< Item >( {
 	getItemId,
 	paginationInfo,
 }: ToolbarContentProps< Item > ) {
-	const { view, isSelectAllMode } = useContext( DataViewsContext );
+	const { view } = useContext( DataViewsContext );
 	const [ actionInProgress, setActionInProgress ] = useState< string | null >(
 		null
 	);
@@ -390,8 +373,7 @@ function FooterContent< Item >( {
 		data,
 		selection,
 		getItemId,
-		selectableFilter,
-		isSelectAllMode
+		selectableFilter
 	);
 
 	const actionsToShow = useMemo(
@@ -423,8 +405,7 @@ function FooterContent< Item >( {
 			setActionInProgress,
 			onChangeSelection,
 			paginationInfo,
-			view.infiniteScrollEnabled, // onlyTotalCount
-			isSelectAllMode
+			view.infiniteScrollEnabled // onlyTotalCount
 		);
 	} else if ( ! footerContentRef.current ) {
 		footerContentRef.current = renderFooterContent(
@@ -438,8 +419,7 @@ function FooterContent< Item >( {
 			setActionInProgress,
 			onChangeSelection,
 			paginationInfo,
-			view.infiniteScrollEnabled, // onlyTotalCount
-			isSelectAllMode
+			view.infiniteScrollEnabled // onlyTotalCount
 		);
 	}
 	return footerContentRef.current;

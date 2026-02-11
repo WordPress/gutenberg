@@ -38,32 +38,20 @@ function BulkSelectionCheckbox< Item >( {
 	data: Item[];
 	getItemId: ( item: Item ) => string;
 } ) {
-	const { view, isSelectAllMode, setIsSelectAllMode } =
-		useContext( DataViewsContext );
-
-	const selectedItems = useSelectedItems(
-		view,
-		data,
-		selection,
-		getItemId,
-		undefined,
-		isSelectAllMode
+	// Calculate selected items from current data directly (not from cache)
+	// This ensures areAllSelected correctly reflects the current visible items
+	const selectedItems = useMemo(
+		() =>
+			data.filter( ( item ) => selection.includes( getItemId( item ) ) ),
+		[ data, selection, getItemId ]
 	);
 
-	const infiniteScrollEnabled = view.infiniteScrollEnabled;
+	// All are selected if all loaded items are in selection
+	const areAllSelected =
+		data.length > 0 && selectedItems.length === data.length;
 
-	// In select all mode, all are selected if deselection list is empty
-	// In normal mode, all are selected if all items are in selection
-	const areAllSelected = isSelectAllMode
-		? selection.length === 0
-		: selectedItems.length === data.length;
-
-	// Determine if there's any selection
-	// In select all mode: has selection if deselection list doesn't include all items
-	// In normal mode: has selection if any items are selected
-	const hasSelection = isSelectAllMode
-		? selection.length < data.length // Some items still selected
-		: selectedItems.length > 0;
+	// Has selection if any items are selected
+	const hasSelection = selectedItems.length > 0;
 
 	return (
 		<CheckboxControl
@@ -71,24 +59,8 @@ function BulkSelectionCheckbox< Item >( {
 			checked={ areAllSelected }
 			indeterminate={ ! areAllSelected && hasSelection }
 			onChange={ () => {
-				if ( infiniteScrollEnabled ) {
-					// For infinite scroll, toggle isSelectAllMode
-					if ( isSelectAllMode ) {
-						if ( areAllSelected ) {
-							// All are selected, deselect all: disable select all mode
-							setIsSelectAllMode( false );
-							onChangeSelection( [] );
-						} else {
-							// Some items were manually deselected, re-select all by clearing deselection list
-							onChangeSelection( [] );
-						}
-					} else {
-						// Select all: enable select all mode with empty deselection list
-						setIsSelectAllMode( true );
-						onChangeSelection( [] );
-					}
-				} else if ( areAllSelected ) {
-					// Deselect all - remove the current page from the total selection.
+				if ( areAllSelected ) {
+					// Deselect all - remove loaded items from selection
 					onChangeSelection(
 						selection.filter(
 							( id ) =>
@@ -98,7 +70,7 @@ function BulkSelectionCheckbox< Item >( {
 						)
 					);
 				} else {
-					// Select all - merge the current page into the total selection.
+					// Select all - merge loaded items into selection
 					const selectionSet = new Set( [
 						...selection,
 						...data.map( ( item ) => getItemId( item ) ),
@@ -177,26 +149,18 @@ export function DataViewsPickerFooter() {
 		actions = EMPTY_ARRAY,
 		paginationInfo,
 		view,
-		isSelectAllMode,
 	} = useContext( DataViewsContext );
 
 	const isMultiselect = useIsMultiselectPicker( actions );
 
+	const selectedItems = useSelectedItems( view, data, selection, getItemId );
+
+	// Use selectedItems.length to accurately reflect items available for actions
 	const message = getFooterMessage(
-		selection.length,
+		selectedItems.length,
 		data.length,
 		paginationInfo.totalItems,
-		view.infiniteScrollEnabled, // onlyTotalCount
-		isSelectAllMode
-	);
-
-	const selectedItems = useSelectedItems(
-		view,
-		data,
-		selection,
-		getItemId,
-		undefined,
-		isSelectAllMode
+		view.infiniteScrollEnabled // onlyTotalCount
 	);
 
 	return (

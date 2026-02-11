@@ -106,7 +106,6 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 		},
 		forwardedRef
 	) {
-		const { isSelectAllMode } = useContext( DataViewsContext );
 		const {
 			showTitle = true,
 			showMedia = true,
@@ -128,11 +127,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 		useIntersectionObserver( elementRef, posinset );
 		const instanceId = useInstanceId( GridItem );
 
-		// In select all mode, selection is a deselection list
-		const isInSelectionArray = selection.includes( id );
-		const isSelected = isSelectAllMode
-			? ! isInSelectionArray
-			: isInSelectionArray;
+		const isSelected = selection.includes( id );
 
 		const mediaPlaceholder = (
 			<span className="dataviews-view-grid__media-placeholder" />
@@ -191,7 +186,7 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 							return;
 						}
 						onChangeSelection(
-							isInSelectionArray
+							isSelected
 								? selection.filter(
 										( itemId ) => id !== itemId
 								  )
