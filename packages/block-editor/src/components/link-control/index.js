@@ -100,15 +100,6 @@ import isURLLike, { isHashLink, isRelativePath } from './is-url-like';
  * @property {WPLinkControlValue=}        value                      Current link value.
  * @property {WPLinkControlOnChangeProp=} onChange                   Value change handler, called with the updated value if
  *                                                                   the user selects a new link or updates settings.
- * @property {Function=}                  onInputChange              Callback fired when the search input value changes.
- *                                                                   Use this for observation only (e.g., to track search state).
- *                                                                   This does NOT control the input value - use defaultInputValue
- *                                                                   to set an initial value.
- * @property {string=}                    defaultInputValue          Initial value for the search input (uncontrolled).
- *                                                                   Use this to pre-populate the search field with a default value.
- *                                                                   The component manages its own state after initial render.
- * @property {string=}                    inputValue                 **Deprecated**: Use `defaultInputValue` instead.
- *                                                                   This prop is maintained for backward compatibility only.
  * @property {boolean=}                   noDirectEntry              Whether to allow turning a URL-like search query directly into a link.
  * @property {boolean=}                   showSuggestions            Whether to present suggestions when typing the URL.
  * @property {boolean=}                   showInitialSuggestions     Whether to present initial suggestions immediately.
@@ -131,35 +122,6 @@ const PREFERENCE_KEY = 'linkControlSettingsDrawer';
  * a value associated with a link (HTML anchor element) and relevant settings
  * for how that link is expected to behave.
  *
- * ## Usage Patterns
- *
- * ### Uncontrolled (default)
- * The component manages its own search input state:
- * ```jsx
- * <LinkControl value={ link } onChange={ setLink } />
- * ```
- *
- * ### Observable
- * Observe input changes without controlling the value:
- * ```jsx
- * <LinkControl
- *   value={ link }
- *   onChange={ setLink }
- *   onInputChange={ ( newValue ) => console.log( newValue ) }
- * />
- * ```
- *
- * ### Uncontrolled with Initial Value
- * Pre-populate the search input with a default value:
- * ```jsx
- * <LinkControl
- *   value={ link }
- *   onChange={ setLink }
- *   defaultInputValue="wordpress"
- *   onInputChange={ ( newValue ) => console.log( newValue ) }
- * />
- * ```
- *
  * @param {WPLinkControlProps} props Component props.
  */
 function LinkControl( {
@@ -176,8 +138,7 @@ function LinkControl( {
 	forceIsEditingLink,
 	createSuggestion,
 	withCreateSuggestion,
-	inputValue: deprecatedInputValue,
-	defaultInputValue,
+	inputValue: propInputValue = '',
 	suggestionsQuery = {},
 	noURLSuggestion = false,
 	createSuggestionButtonText,
@@ -186,20 +147,6 @@ function LinkControl( {
 	renderControlBottom = null,
 	handleEntities = false,
 } ) {
-	// Handle deprecated inputValue prop
-	if ( deprecatedInputValue !== undefined ) {
-		deprecated( '`inputValue` prop in `wp.blockEditor.LinkControl`', {
-			since: '7.0',
-			alternative: '`defaultInputValue`',
-			hint: 'Use `defaultInputValue` for setting an initial value, and `onInputChange` for observing changes.',
-		} );
-
-		// Map deprecated prop to new prop for backward compatibility
-		if ( defaultInputValue === undefined ) {
-			defaultInputValue = deprecatedInputValue;
-		}
-	}
-
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
 	}
@@ -590,14 +537,8 @@ function LinkControl( {
 		}
 	}, [ shouldFocusSearchInput ] );
 
-	// Prioritize internal value (even if empty string), otherwise use defaultInputValue for initial state.
-	// This ensures defaultInputValue acts as an initial value only (uncontrolled pattern) and never
-	// overrides the internal state once it's been set by user interaction.
-	// We check for `undefined` specifically so empty string "" from user clearing the input is respected.
 	const currentUrlInputValue =
-		internalControlValue?.url !== undefined
-			? internalControlValue.url
-			: defaultInputValue || '';
+		propInputValue || internalControlValue?.url || '';
 
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
