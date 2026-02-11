@@ -60,8 +60,14 @@ export default function InputWidget( {
 	const field = useMemo( () => {
 		const currentField = fields.find( ( f ) => f.id === filter.field );
 		if ( currentField ) {
+			// In filter mode we reuse the field edit control, but without allowing
+			// EditConfig.disabled to make the filter UI non-interactive.
+			// NormalizedField.filter is created at normalization time for that purpose.
+			const FilterEdit = currentField.filter ?? currentField.Edit;
+
 			return {
 				...currentField,
+				Edit: FilterEdit,
 				// Deactivate validation for filters.
 				isValid: {} satisfies NormalizedRules< any >,
 				// Configure getValue/setValue as if Item was a plain object.

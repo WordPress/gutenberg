@@ -289,6 +289,7 @@ function CalendarDateControl< Item >( {
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	const {
 		id,
@@ -298,6 +299,7 @@ function CalendarDateControl< Item >( {
 		isValid,
 		format: fieldFormat,
 	} = field;
+	const { disabled = false } = config || {};
 	const [ selectedPresetId, setSelectedPresetId ] = useState< string | null >(
 		null
 	);
@@ -404,6 +406,8 @@ function CalendarDateControl< Item >( {
 									variant="tertiary"
 									isPressed={ isSelected }
 									size="small"
+									disabled={ disabled }
+									accessibleWhenDisabled={ false }
 									onClick={ () =>
 										handlePresetClick( preset )
 									}
@@ -417,7 +421,7 @@ function CalendarDateControl< Item >( {
 							variant="tertiary"
 							isPressed={ ! selectedPresetId }
 							size="small"
-							disabled={ !! selectedPresetId }
+							disabled={ !! selectedPresetId || disabled }
 							accessibleWhenDisabled={ false }
 						>
 							{ __( 'Custom' ) }
@@ -434,6 +438,7 @@ function CalendarDateControl< Item >( {
 						value={ value }
 						onChange={ handleManualDateChange }
 						required={ !! field.isValid?.required }
+						disabled={ disabled }
 					/>
 
 					{ /* Calendar widget */ }
@@ -447,6 +452,7 @@ function CalendarDateControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezoneString || undefined }
 						weekStartsOn={ weekStartsOn }
+						disabled={ disabled }
 					/>
 				</Stack>
 			</BaseControl>
@@ -461,8 +467,10 @@ function CalendarDateRangeControl< Item >( {
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	const { id, label, getValue, setValue, format: fieldFormat } = field;
+	const { disabled = false } = config || {};
 	let value: DateRange;
 	const fieldValue = getValue( { item: data } );
 	if (
@@ -616,6 +624,8 @@ function CalendarDateRangeControl< Item >( {
 									variant="tertiary"
 									isPressed={ isSelected }
 									size="small"
+									disabled={ disabled }
+									accessibleWhenDisabled={ false }
 									onClick={ () =>
 										handlePresetClick( preset )
 									}
@@ -630,7 +640,7 @@ function CalendarDateRangeControl< Item >( {
 							isPressed={ ! selectedPresetId }
 							size="small"
 							accessibleWhenDisabled={ false }
-							disabled={ !! selectedPresetId }
+							disabled={ !! selectedPresetId || disabled }
 						>
 							{ __( 'Custom' ) }
 						</Button>
@@ -654,6 +664,7 @@ function CalendarDateRangeControl< Item >( {
 								handleManualDateChange( 'from', newValue )
 							}
 							required={ !! field.isValid?.required }
+							disabled={ disabled }
 						/>
 						<InputControl
 							__next40pxDefaultSize
@@ -666,6 +677,7 @@ function CalendarDateRangeControl< Item >( {
 								handleManualDateChange( 'to', newValue )
 							}
 							required={ !! field.isValid?.required }
+							disabled={ disabled }
 						/>
 					</Stack>
 
@@ -677,6 +689,7 @@ function CalendarDateRangeControl< Item >( {
 						onMonthChange={ setCalendarMonth }
 						timeZone={ timezone.string || undefined }
 						weekStartsOn={ weekStartsOn }
+						disabled={ disabled }
 					/>
 				</Stack>
 			</BaseControl>
@@ -692,6 +705,7 @@ export default function DateControl< Item >( {
 	markWhenOptional,
 	operator,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
@@ -702,6 +716,7 @@ export default function DateControl< Item >( {
 				onChange={ onChange }
 				hideLabelFromVision={ hideLabelFromVision }
 				operator={ operator }
+				config={ config }
 			/>
 		);
 	}
@@ -715,6 +730,7 @@ export default function DateControl< Item >( {
 				hideLabelFromVision={ hideLabelFromVision }
 				markWhenOptional={ markWhenOptional }
 				validity={ validity }
+				config={ config }
 			/>
 		);
 	}
@@ -727,6 +743,7 @@ export default function DateControl< Item >( {
 			hideLabelFromVision={ hideLabelFromVision }
 			markWhenOptional={ markWhenOptional }
 			validity={ validity }
+			config={ config }
 		/>
 	);
 }

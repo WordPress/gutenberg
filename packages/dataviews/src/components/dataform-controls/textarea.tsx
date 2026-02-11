@@ -22,7 +22,7 @@ export default function Textarea< Item >( {
 	config,
 	validity,
 }: DataFormControlProps< Item > ) {
-	const { rows = 4 } = config || {};
+	const { rows = 4, disabled = false } = config || {};
 	const { label, placeholder, description, setValue, isValid } = field;
 	const value = field.getValue( { item: data } );
 
@@ -43,6 +43,7 @@ export default function Textarea< Item >( {
 			help={ description }
 			onChange={ onChangeControl }
 			rows={ rows }
+			disabled={ disabled }
 			minLength={
 				isValid.minLength ? isValid.minLength.constraint : undefined
 			}

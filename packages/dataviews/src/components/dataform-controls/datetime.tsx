@@ -45,8 +45,10 @@ function CalendarDateTimeControl< Item >( {
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	const { id, label, description, setValue, getValue, isValid } = field;
+	const { disabled = false } = config || {};
 	const fieldValue = getValue( { item: data } );
 	const value = typeof fieldValue === 'string' ? fieldValue : undefined;
 
@@ -186,6 +188,7 @@ function CalendarDateTimeControl< Item >( {
 					onMonthChange={ setCalendarMonth }
 					timeZone={ timezoneString || undefined }
 					weekStartsOn={ weekStartsOn }
+					disabled={ disabled }
 				/>
 				{ /* Manual datetime input */ }
 				<ValidatedInputControl
@@ -204,6 +207,7 @@ function CalendarDateTimeControl< Item >( {
 							: ''
 					}
 					onChange={ handleManualDateTimeChange }
+					disabled={ disabled }
 				/>
 			</Stack>
 		</BaseControl>
@@ -218,6 +222,7 @@ export default function DateTime< Item >( {
 	markWhenOptional,
 	operator,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	if ( operator === OPERATOR_IN_THE_PAST || operator === OPERATOR_OVER ) {
 		return (
@@ -228,6 +233,7 @@ export default function DateTime< Item >( {
 				onChange={ onChange }
 				hideLabelFromVision={ hideLabelFromVision }
 				operator={ operator }
+				config={ config }
 			/>
 		);
 	}
@@ -240,6 +246,7 @@ export default function DateTime< Item >( {
 			hideLabelFromVision={ hideLabelFromVision }
 			markWhenOptional={ markWhenOptional }
 			validity={ validity }
+			config={ config }
 		/>
 	);
 }

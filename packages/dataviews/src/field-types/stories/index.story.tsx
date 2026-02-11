@@ -200,6 +200,10 @@ const fields: Field< DataType >[] = [
 		type: 'text',
 		label: 'Text',
 		description: 'Help for text.',
+		Edit: {
+			control: 'text',
+			disabled: true,
+		},
 	},
 	{
 		id: 'textWithElements',

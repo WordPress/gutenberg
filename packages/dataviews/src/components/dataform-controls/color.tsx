@@ -25,9 +25,11 @@ const { ValidatedInputControl, Picker } = unlock( privateApis );
 const ColorPicker = ( {
 	color,
 	onColorChange,
+	disabled,
 }: {
 	color: string;
 	onColorChange: ( colorObject: any ) => void;
+	disabled?: boolean;
 } ) => {
 	const validColor = color && colord( color ).isValid() ? color : '#ffffff';
 
@@ -38,13 +40,14 @@ const ColorPicker = ( {
 					<button
 						type="button"
 						onClick={ onToggle }
+						disabled={ disabled }
 						style={ {
 							width: '24px',
 							height: '24px',
 							borderRadius: '50%',
 							backgroundColor: validColor,
 							border: '1px solid #ddd',
-							cursor: 'pointer',
+							cursor: disabled ? 'default' : 'pointer',
 							outline: isOpen ? '2px solid #007cba' : 'none',
 							outlineOffset: '2px',
 							display: 'flex',
@@ -52,6 +55,7 @@ const ColorPicker = ( {
 							justifyContent: 'center',
 							padding: 0,
 							margin: 0,
+							opacity: disabled ? 0.4 : 1,
 						} }
 						aria-label="Open color picker"
 					/>
@@ -77,8 +81,10 @@ export default function Color< Item >( {
 	hideLabelFromVision,
 	markWhenOptional,
 	validity,
+	config,
 }: DataFormControlProps< Item > ) {
 	const { label, placeholder, description, setValue, isValid } = field;
+	const { disabled = false } = config || {};
 	const value = field.getValue( { item: data } ) || '';
 
 	const handleColorChange = useCallback(
@@ -107,10 +113,12 @@ export default function Color< Item >( {
 			onChange={ handleInputChange }
 			hideLabelFromVision={ hideLabelFromVision }
 			type="text"
+			disabled={ disabled }
 			prefix={
 				<ColorPicker
 					color={ value }
 					onColorChange={ handleColorChange }
+					disabled={ disabled }
 				/>
 			}
 		/>
