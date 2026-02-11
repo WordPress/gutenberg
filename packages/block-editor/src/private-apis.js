@@ -15,7 +15,7 @@ import {
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
-import { cleanEmptyObject } from './hooks/utils';
+import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import BlockManager from './components/block-manager';
@@ -42,7 +42,6 @@ import {
 	sectionRootClientIdKey,
 	mediaEditKey,
 	getMediaSelectKey,
-	essentialFormatKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
 } from './store/private-keys';
@@ -89,6 +88,7 @@ lock( privateApis, {
 	InspectorControlsLastItem,
 	useHasBlockToolbar,
 	cleanEmptyObject,
+	usePrivateStyleOverride,
 	BlockQuickNavigation,
 	LayoutStyle,
 	BlockManager,
@@ -121,7 +121,6 @@ lock( privateApis, {
 	CommentIconToolbarSlotFill,
 	mediaEditKey,
 	getMediaSelectKey,
-	essentialFormatKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
 	useBlockElement,

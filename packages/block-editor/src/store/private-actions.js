@@ -453,3 +453,25 @@ export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {
 		hasBlockSpotlight,
 	};
 }
+
+/**
+ * Opens the list view content panel popover.
+ *
+ * @return {Object} Action object.
+ */
+export function openListViewContentPanel() {
+	return {
+		type: 'OPEN_LIST_VIEW_CONTENT_PANEL',
+	};
+}
+
+/**
+ * Closes the list view content panel popover.
+ *
+ * @return {Object} Action object.
+ */
+export function closeListViewContentPanel() {
+	return {
+		type: 'CLOSE_LIST_VIEW_CONTENT_PANEL',
+	};
+}

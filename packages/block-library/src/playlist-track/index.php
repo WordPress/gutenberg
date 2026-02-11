@@ -21,9 +21,9 @@ function render_block_core_playlist_track( $attributes ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes();
 
-	$unique_id = isset( $attributes['uniqueId'] ) ? $attributes['uniqueId'] : wp_unique_id( 'playlist-track-' );
-	$artist    = isset( $attributes['artist'] ) ? $attributes['artist'] : '';
-	$length    = isset( $attributes['length'] ) ? $attributes['length'] : '';
+	$unique_id = $attributes['uniqueId'] ?? wp_unique_id( 'playlist-track-' );
+	$artist    = $attributes['artist'] ?? '';
+	$length    = $attributes['length'] ?? '';
 	$title     = isset( $attributes['title'] ) && ! empty( $attributes['title'] ) ? $attributes['title'] : __( 'Unknown title' );
 
 	$context = wp_interactivity_data_wp_context(

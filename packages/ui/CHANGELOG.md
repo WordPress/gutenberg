@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 0.7.0-next.0 (2026-02-09)
-
 ### Breaking Changes
 
 -   Remove `Box` component. Components that previously used `Box` should use the equivalent design tokens in their CSS directly ([#74981](https://github.com/WordPress/gutenberg/issues/74981)).

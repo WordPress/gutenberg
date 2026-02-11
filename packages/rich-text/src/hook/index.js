@@ -4,6 +4,7 @@
 import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { useRegistry } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -11,11 +12,13 @@ import { useRegistry } from '@wordpress/data';
 import { create, RichTextData } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
+import { removeFormat } from '../remove-format';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useEventListeners } from './event-listeners';
+import { useFormatTypes } from './use-format-types';
 
-export function useRichText( {
+function useRichTextBase( {
 	value = '',
 	selectionStart,
 	selectionEnd,
@@ -233,4 +236,74 @@ export function useRichText( {
 	};
 }
 
-export default function __experimentalRichText() {}
+export function useRichText( {
+	allowedFormats,
+	withoutInteractiveFormatting,
+	onChange,
+	__unstableDependencies = [],
+	__unstableFormatTypeHandlerContext,
+	...props
+} ) {
+	const {
+		formatTypes,
+		prepareHandlers,
+		valueHandlers,
+		changeHandlers,
+		dependencies,
+	} = useFormatTypes( {
+		allowedFormats,
+		withoutInteractiveFormatting,
+		__unstableFormatTypeHandlerContext,
+	} );
+
+	function addEditorOnlyFormats( record ) {
+		return valueHandlers.reduce(
+			( accumulator, fn ) => fn( accumulator, record.text ),
+			record.formats
+		);
+	}
+
+	function removeEditorOnlyFormats( record ) {
+		formatTypes.forEach( ( formatType ) => {
+			if ( formatType.__experimentalCreatePrepareEditableTree ) {
+				record = removeFormat(
+					record,
+					formatType.name,
+					0,
+					record.text.length
+				);
+			}
+		} );
+		return record.formats;
+	}
+
+	function addInvisibleFormats( record ) {
+		return prepareHandlers.reduce(
+			( accumulator, fn ) => fn( accumulator, record.text ),
+			record.formats
+		);
+	}
+
+	const result = useRichTextBase( {
+		...props,
+		onChange( value, { __unstableFormats, __unstableText } ) {
+			onChange( value, { __unstableFormats, __unstableText } );
+			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
+				changeHandler( __unstableFormats, __unstableText );
+			} );
+		},
+		__unstableDependencies: [ ...dependencies, ...__unstableDependencies ],
+		__unstableAfterParse: addEditorOnlyFormats,
+		__unstableBeforeSerialize: removeEditorOnlyFormats,
+		__unstableAddInvisibleFormats: addInvisibleFormats,
+	} );
+
+	return { ...result, formatTypes };
+}
+
+export function __unstableUseRichText( props ) {
+	deprecated( '`__unstableUseRichText` hook', {
+		since: '7.0',
+	} );
+	return useRichTextBase( props );
+}

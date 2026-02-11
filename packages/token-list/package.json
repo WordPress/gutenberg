@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/token-list",
-	"version": "3.39.1-next.v.202602091733.0+daa0b19c4",
+	"version": "3.39.0",
 	"description": "Constructable, plain JavaScript DOMTokenList implementation, supporting non-browser runtimes.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
