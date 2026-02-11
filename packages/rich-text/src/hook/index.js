@@ -239,9 +239,9 @@ function useRichTextBase( {
 export function useRichText( {
 	allowedFormats,
 	withoutInteractiveFormatting,
-	__unstableFormatTypeHandlerContext,
 	onChange,
 	__unstableDependencies = [],
+	__unstableFormatTypeHandlerContext,
 	...props
 } ) {
 	const {
