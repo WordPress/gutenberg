@@ -8,7 +8,7 @@
 /**
  * Get the first style variation name from a className string that matches a registered style.
  *
- * @param string $class_name       CSS class string for a block.
+ * @param string $class_name        CSS class string for a block.
  * @param array  $registered_styles Currently registered block styles.
  *
  * @return string|null The name of the first registered variation, or null if none found.
