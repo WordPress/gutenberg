@@ -22,17 +22,6 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	protected $post_type = 'wp_guidelines';
 
 	/**
-	 * JSON encoding flags for consistent and secure encoding.
-	 *
-	 * - JSON_UNESCAPED_SLASHES: Prevents escaping forward slashes (cleaner output)
-	 * - JSON_HEX_TAG: Encodes < and > as \u003C and \u003E (XSS prevention)
-	 * - JSON_HEX_AMP: Encodes & as \u0026 (XSS prevention)
-	 *
-	 * @var int
-	 */
-	protected $json_encode_flags = JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP;
-
-	/**
 	 * Maximum length for guideline text strings.
 	 *
 	 * @var int
@@ -342,16 +331,20 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 
 		$post_id = wp_insert_post(
 			array(
-				'post_type'    => $this->post_type,
-				'post_status'  => isset( $prepared['status'] ) && 'published' === $prepared['status'] ? 'publish' : 'draft',
-				'post_title'   => __( 'Content Guidelines', 'gutenberg' ),
-				'post_content' => $this->encode_json_for_storage( $prepared['content'] ),
+				'post_type'   => $this->post_type,
+				'post_status' => isset( $prepared['status'] ) && 'published' === $prepared['status'] ? 'publish' : 'draft',
+				'post_title'  => __( 'Content Guidelines', 'gutenberg' ),
 			),
 			true
 		);
 
 		if ( is_wp_error( $post_id ) ) {
 			return $post_id;
+		}
+
+		// Save guideline categories to post meta.
+		if ( ! empty( $prepared['categories'] ) ) {
+			$this->save_guideline_categories_to_meta( $post_id, $prepared['categories'] );
 		}
 
 		$post = get_post( $post_id );
@@ -377,19 +370,19 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 
 		$prepared = $this->prepare_item_for_database( $request );
 
-		// Get existing content and merge with new content.
-		$existing_content = $this->decode_json_from_storage( $post->post_content );
-		$new_content      = array_merge( $existing_content, $prepared['content'] );
+		// Save guideline categories to post meta.
+		if ( ! empty( $prepared['categories'] ) ) {
+			$this->save_guideline_categories_to_meta( $post->ID, $prepared['categories'] );
+		}
 
-		$update_args = array(
-			'ID'           => $post->ID,
-			'post_content' => $this->encode_json_for_storage( $new_content ),
-		);
-
+		// Update post status if provided.
+		$update_args = array( 'ID' => $post->ID );
 		if ( isset( $prepared['status'] ) ) {
 			$update_args['post_status'] = 'published' === $prepared['status'] ? 'publish' : 'draft';
 		}
 
+		// Trigger a post update to create a revision with the meta changes.
+		// We update post_modified to ensure a revision is created.
 		$result = wp_update_post( $update_args, true );
 
 		if ( is_wp_error( $result ) ) {
@@ -524,7 +517,8 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 			);
 		}
 
-		$content = $this->decode_json_from_storage( $revision->post_content );
+		// Get guideline categories from revision meta.
+		$guideline_categories = $this->get_guideline_categories_from_meta( $revision->ID );
 
 		$author = get_user_by( 'id', $revision->post_author );
 
@@ -535,7 +529,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 			'date_gmt'             => mysql_to_rfc3339( $revision->post_date_gmt ),
 			'author'               => $revision->post_author,
 			'author_name'          => $author ? $author->display_name : __( 'Unknown', 'gutenberg' ),
-			'guideline_categories' => ! empty( $content['guideline_categories'] ) ? $content['guideline_categories'] : new stdClass(),
+			'guideline_categories' => ! empty( $guideline_categories ) ? $guideline_categories : new stdClass(),
 		);
 
 		return rest_ensure_response( $data );
@@ -605,11 +599,9 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response Response object.
 	 */
 	public function prepare_item_for_response( $post, $request ) {
-		$content = $this->decode_json_from_storage( $post->post_content );
+		$guideline_categories = $this->get_guideline_categories_from_meta( $post->ID );
 
 		$author = get_user_by( 'id', $post->post_author );
-
-		$guideline_categories = ! empty( $content['guideline_categories'] ) ? $content['guideline_categories'] : array();
 
 		// Handle ?category filter - return only the requested category.
 		$category_filter = $request->get_param( 'category' );
@@ -643,6 +635,57 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	}
 
 	/**
+	 * Gets guideline categories from post meta.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return array Guideline categories.
+	 */
+	protected function get_guideline_categories_from_meta( $post_id ) {
+		$category_labels = array(
+			'copy'   => __( 'Copy Guidelines', 'gutenberg' ),
+			'images' => __( 'Image Guidelines', 'gutenberg' ),
+			'site'   => __( 'Site Context', 'gutenberg' ),
+			'other'  => __( 'Other Guidelines', 'gutenberg' ),
+		);
+
+		$guideline_categories = array();
+
+		// Get standard categories.
+		foreach ( Gutenberg_Content_Guidelines_Post_Type::CATEGORY_META_KEYS as $category ) {
+			$meta_key = '_content_guideline_' . $category;
+			$value    = get_post_meta( $post_id, $meta_key, true );
+
+			$guideline_categories[ $category ] = array(
+				'label'      => $category_labels[ $category ],
+				'guidelines' => $value,
+			);
+		}
+
+		// Get block-specific guidelines from individual meta keys.
+		$all_meta = get_post_meta( $post_id );
+
+		$blocks = array();
+		foreach ( $all_meta as $meta_key => $meta_values ) {
+			if ( Gutenberg_Content_Guidelines_Post_Type::is_block_meta_key( $meta_key ) ) {
+				$block_name = Gutenberg_Content_Guidelines_Post_Type::meta_key_to_block_name( $meta_key );
+				$value      = isset( $meta_values[0] ) ? $meta_values[0] : '';
+
+				if ( ! empty( $value ) ) {
+					$blocks[ $block_name ] = array(
+						'guidelines' => $value,
+					);
+				}
+			}
+		}
+
+		if ( ! empty( $blocks ) ) {
+			$guideline_categories['blocks'] = $blocks;
+		}
+
+		return $guideline_categories;
+	}
+
+	/**
 	 * Prepares a single guidelines for database.
 	 *
 	 * @param WP_REST_Request $request Request object.
@@ -650,7 +693,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	 */
 	protected function prepare_item_for_database( $request ) {
 		$prepared = array(
-			'content' => array(),
+			'categories' => array(),
 		);
 
 		if ( isset( $request['status'] ) ) {
@@ -658,10 +701,45 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 		}
 
 		if ( isset( $request['guideline_categories'] ) ) {
-			$prepared['content']['guideline_categories'] = $this->sanitize_guideline_categories( $request['guideline_categories'] );
+			$prepared['categories'] = $this->sanitize_guideline_categories( $request['guideline_categories'] );
 		}
 
 		return $prepared;
+	}
+
+	/**
+	 * Saves guideline categories to post meta.
+	 *
+	 * @param int   $post_id    Post ID.
+	 * @param array $categories Sanitized guideline categories.
+	 */
+	protected function save_guideline_categories_to_meta( $post_id, $categories ) {
+		// Save standard categories.
+		foreach ( Gutenberg_Content_Guidelines_Post_Type::CATEGORY_META_KEYS as $category ) {
+			if ( isset( $categories[ $category ] ) ) {
+				$meta_key = '_content_guideline_' . $category;
+				$value    = isset( $categories[ $category ]['guidelines'] )
+					? $categories[ $category ]['guidelines']
+					: '';
+				update_post_meta( $post_id, $meta_key, $value );
+			}
+		}
+
+		// Handle block-specific guidelines as individual meta keys.
+		// No registration needed - just save directly, revisions handled via filter.
+		if ( isset( $categories['blocks'] ) && is_array( $categories['blocks'] ) ) {
+			foreach ( $categories['blocks'] as $block_name => $block_data ) {
+				$meta_key = Gutenberg_Content_Guidelines_Post_Type::block_name_to_meta_key( $block_name );
+				$value    = isset( $block_data['guidelines'] ) ? $block_data['guidelines'] : '';
+
+				if ( ! empty( $value ) ) {
+					update_post_meta( $post_id, $meta_key, $value );
+				} else {
+					// Remove meta if value is empty (block guideline deleted).
+					delete_post_meta( $post_id, $meta_key );
+				}
+			}
+		}
 	}
 
 	/**
@@ -757,35 +835,6 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 			return null;
 		}
 		return $post;
-	}
-
-	/**
-	 * Encodes data as JSON for storage in post_content.
-	 *
-	 * Uses consistent encoding flags and wp_slash() for WordPress database compatibility.
-	 * This ensures special characters (quotes, HTML entities) are properly escaped.
-	 *
-	 * @param array $data Data to encode.
-	 * @return string Slashed JSON string ready for wp_insert_post/wp_update_post.
-	 */
-	protected function encode_json_for_storage( $data ) {
-		return wp_slash( wp_json_encode( $data, $this->json_encode_flags ) );
-	}
-
-	/**
-	 * Decodes JSON from post_content with error handling.
-	 *
-	 * @param string $json_string JSON string to decode.
-	 * @return array Decoded array, or empty array if decoding fails.
-	 */
-	protected function decode_json_from_storage( $json_string ) {
-		$decoded = json_decode( $json_string, true );
-
-		if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $decoded ) ) {
-			return array();
-		}
-
-		return $decoded;
 	}
 
 	/**
