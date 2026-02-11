@@ -127,8 +127,8 @@ describe( 'getFormatBoundary', () => {
 			expect(
 				getFormatBoundary( record, { type: 'core/link' } )
 			).toEqual( {
-				start: null,
-				end: null,
+				start: undefined,
+				end: undefined,
 			} );
 		} );
 
@@ -168,8 +168,8 @@ describe( 'getFormatBoundary', () => {
 				expect(
 					getFormatBoundary( record, { type: 'core/link' } )
 				).toEqual( {
-					start: null,
-					end: null,
+					start: undefined,
+					end: undefined,
 				} );
 			}
 		);
@@ -213,8 +213,8 @@ describe( 'getFormatBoundary', () => {
 				expect(
 					getFormatBoundary( record, { type: 'core/link' } )
 				).toEqual( {
-					start: null,
-					end: null,
+					start: undefined,
+					end: undefined,
 				} );
 			}
 		);

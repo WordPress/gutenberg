@@ -152,8 +152,8 @@ export function getFormatBoundary(
 	endIndex = value.end
 ) {
 	const EMPTY_BOUNDARIES = {
-		start: null,
-		end: null,
+		start: undefined,
+		end: undefined,
 	};
 
 	const { formats } = value;

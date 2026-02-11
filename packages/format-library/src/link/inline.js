@@ -168,16 +168,14 @@ function InlineLinkUI( {
 			// Use explicit format boundaries rather than relying on
 			// the current selection which may be collapsed or
 			// misaligned after external value changes.
-			const boundary = isActive
-				? getFormatBoundary( value, {
-						type: 'core/link',
-				  } )
-				: undefined;
+			const boundary = getFormatBoundary( value, {
+				type: 'core/link',
+			} );
 			newValue = applyFormat(
 				value,
 				linkFormat,
-				boundary?.start,
-				boundary?.end
+				boundary.start,
+				boundary.end
 			);
 		} else {
 			// Scenario: Editing an existing link.
