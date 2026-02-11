@@ -19,8 +19,7 @@ export default function CustomInserterModal( {
 } ) {
 	const [ searchInput, setSearchInput ] = useState( '' );
 
-	// Debounce the search input with a 300ms delay
-	const debouncedSearchInput = useDebounce( searchInput, 300 );
+	const debouncedSetSearchInput = useDebounce( setSearchInput, 300 );
 
 	function updateIconAtts( name ) {
 		setAttributes( {
@@ -31,12 +30,9 @@ export default function CustomInserterModal( {
 
 	// Move the filtering logic to a separate function
 	const getFilteredIcons = useCallback( () => {
-		if (
-			debouncedSearchInput &&
-			typeof debouncedSearchInput === 'string'
-		) {
+		if ( searchInput ) {
 			return icons.filter( ( icon ) => {
-				const input = debouncedSearchInput.toLowerCase();
+				const input = searchInput.toLowerCase();
 				const iconName = icon.name.toLowerCase();
 
 				return iconName.includes( input );
@@ -44,7 +40,7 @@ export default function CustomInserterModal( {
 		}
 
 		return icons;
-	}, [ debouncedSearchInput, icons ] );
+	}, [ searchInput, icons ] );
 
 	return (
 		<Modal
@@ -57,7 +53,7 @@ export default function CustomInserterModal( {
 				<div className="wp-block-icon__inserter-header">
 					<SearchControl
 						value={ searchInput }
-						onChange={ setSearchInput }
+						onChange={ debouncedSetSearchInput }
 					/>
 				</div>
 				<IconGrid
