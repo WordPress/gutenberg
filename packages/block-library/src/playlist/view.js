@@ -277,11 +277,13 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 	} );
 
 	// Auto-play if switching tracks (user action), not on initial page load.
-	// Use setTimeout to let WaveformPlayer fully initialize before playing.
-	// Without the setTimeout, play() can sometimes be called before the player is ready,
-	// and the pause button doesn't render.
-	if ( shouldAutoPlay && instance ) {
-		setTimeout( () => {
+	// Wait for the ready event to ensure WaveformPlayer is fully initialized.
+	if ( shouldAutoPlay ) {
+		const handleReady = () => {
+			container.removeEventListener(
+				'waveformplayer:ready',
+				handleReady
+			);
 			try {
 				const playPromise = instance.play();
 				if ( playPromise && typeof playPromise.catch === 'function' ) {
@@ -292,6 +294,7 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			} catch ( e ) {
 				// Silently ignore errors.
 			}
-		}, 100 );
+		};
+		container.addEventListener( 'waveformplayer:ready', handleReady );
 	}
 }
