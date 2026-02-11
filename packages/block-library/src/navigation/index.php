@@ -9,11 +9,15 @@
  * Returns the submenu visibility value with backward compatibility
  * for the deprecated openSubmenusOnClick attribute.
  *
- * NOTE: Keep this function in sync with getSubmenuVisibility in
+ * NOTE: If you make changes to this function, you may need to update the getSubmenuVisibility function in
  * packages/block-library/src/navigation/utils/get-submenu-visibility.js
  *
  * This function centralizes the migration logic from the boolean
  * openSubmenusOnClick to the new submenuVisibility enum.
+ *
+ * Backward compatibility: WordPress applies default attribute values, so submenuVisibility
+ * will always have a value even for legacy blocks. We check the legacy openSubmenusOnClick
+ * attribute first to preserve original behavior for blocks saved before the migration.
  *
  * @since 6.9.0
  *
@@ -24,16 +28,18 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
 	$submenu_visibility     = $attributes['submenuVisibility'] ?? null;
 	$open_submenus_on_click = $attributes['openSubmenusOnClick'] ?? null;
 
-	// If new attribute is set, use it.
-	if ( null !== $submenu_visibility ) {
-		return $submenu_visibility;
+	// For backward compatibility, prioritize the legacy attribute if present.
+	// Legacy blocks have openSubmenusOnClick in the database. Since WordPress applies
+	// default values, submenuVisibility will also have a value, but we check the legacy
+	// attribute first to preserve the original behavior. If the block has been loaded 
+	// and saved in the editor, then the deprecatedOpenSubmenusOnClick will not be present.
+	if ( null !== $open_submenus_on_click ) {
+		// Convert boolean to string: true -> 'click', false -> 'hover'.
+		return ! empty( $open_submenus_on_click ) ? 'click' : 'hover';
 	}
 
-	// Fall back to old attribute for backward compatibility.
-	// openSubmenusOnClick: true  -> 'click'
-	// openSubmenusOnClick: false -> 'hover'
-	// openSubmenusOnClick: null  -> 'hover' (default)
-	return ! empty( $open_submenus_on_click ) ? 'click' : 'hover';
+	// Use submenuVisibility for migrated/new blocks (where openSubmenusOnClick is null).
+	return $submenu_visibility ?? 'hover';
 }
 
 /**

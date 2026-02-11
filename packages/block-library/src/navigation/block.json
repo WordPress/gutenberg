@@ -104,6 +104,7 @@
 		"customFontSize": "customFontSize",
 		"showSubmenuIcon": "showSubmenuIcon",
 		"submenuVisibility": "submenuVisibility",
+		"deprecatedOpenSubmenusOnClick": "openSubmenusOnClick",
 		"style": "style",
 		"maxNestingLevel": "maxNestingLevel"
 	},

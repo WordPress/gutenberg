@@ -57,6 +57,7 @@
 		"maxNestingLevel",
 		"openSubmenusOnClick",
 		"submenuVisibility",
+		"deprecatedOpenSubmenusOnClick",
 		"style"
 	],
 	"supports": {
