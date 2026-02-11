@@ -474,11 +474,11 @@ return array(
 		'filePath' => 'library/format-lowercase.svg',
 	),
 	'format-ltr'                     => array(
-		'label'    => _x( 'Format Ltr', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'Format LTR', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-ltr.svg',
 	),
 	'format-outdent-rtl'             => array(
-		'label'    => _x( 'Format Outdent Rtl', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'Format Outdent RTL', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-outdent-rtl.svg',
 	),
 	'format-outdent'                 => array(
@@ -486,7 +486,7 @@ return array(
 		'filePath' => 'library/format-outdent.svg',
 	),
 	'format-rtl'                     => array(
-		'label'    => _x( 'Format Rtl', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'Format RTL', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-rtl.svg',
 	),
 	'format-strikethrough'           => array(
@@ -586,7 +586,7 @@ return array(
 		'filePath' => 'library/home.svg',
 	),
 	'html'                           => array(
-		'label'    => _x( 'Html', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'HTML', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/html.svg',
 	),
 	'image'                          => array(
@@ -1014,7 +1014,7 @@ return array(
 		'filePath' => 'library/row.svg',
 	),
 	'rss'                            => array(
-		'label'    => _x( 'Rss', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'RSS', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/rss.svg',
 	),
 	'scheduled'                      => array(
