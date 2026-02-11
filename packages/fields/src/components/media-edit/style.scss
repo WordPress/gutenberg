@@ -90,10 +90,10 @@ fieldset.fields__media-edit {
 		position: relative;
 		display: flex;
 		align-items: center;
-		gap: $grid-unit-15;
+		gap: $grid-unit-10;
 		border: $border-width dashed $gray-600;
 		border-radius: $radius-small;
-		padding: $grid-unit-05 $grid-unit-15;
+		padding: $grid-unit-05 $grid-unit-10;
 		min-height: $grid-unit-50;
 		cursor: pointer;
 		min-width: 0;
@@ -104,6 +104,8 @@ fieldset.fields__media-edit {
 
 			&:hover {
 				background-color: color-mix(in srgb, var(--wp-admin-theme-color, #3858e9) 4%, transparent);
+				color: var(--wp-admin-theme-color-darker-20);
+				border-color: var(--wp-admin-theme-color-darker-20);
 			}
 		}
 
