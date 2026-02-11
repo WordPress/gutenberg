@@ -334,6 +334,7 @@ function ExpandedMediaEditAttachments( {
 				const hasPreviewImage =
 					attachment.mime_type?.startsWith( 'image' );
 				const isBlob = isBlobURL( attachment.source_url );
+				const attachmentNumericId = attachment.id as number;
 				return (
 					<AnimatedMediaItem
 						key={ attachment.id }
@@ -344,7 +345,7 @@ function ExpandedMediaEditAttachments( {
 					>
 						<MediaPickerButton
 							open={ () => {
-								setTargetItemId( attachment.id as number );
+								setTargetItemId( attachmentNumericId );
 								open();
 							} }
 							label={
@@ -386,20 +387,16 @@ function ExpandedMediaEditAttachments( {
 									alignment="flex-end"
 									expanded={ false }
 								>
-									{ multiple &&
-										allItems &&
-										allItems.length > 1 && (
-											<MoveButtons
-												itemId={
-													attachment.id as number
-												}
-												index={ index }
-												totalItems={ allItems.length }
-												isUploading={ isUploading }
-												moveItem={ moveItem }
-												orientation="horizontal"
-											/>
-										) }
+									{ multiple && allItems.length > 1 && (
+										<MoveButtons
+											itemId={ attachmentNumericId }
+											index={ index }
+											totalItems={ allItems.length }
+											isUploading={ isUploading }
+											moveItem={ moveItem }
+											orientation="horizontal"
+										/>
+									) }
 									<Button
 										__next40pxDefaultSize
 										icon={ closeSmall }
@@ -412,9 +409,7 @@ function ExpandedMediaEditAttachments( {
 											event: React.MouseEvent< HTMLButtonElement >
 										) => {
 											event.stopPropagation();
-											removeItem(
-												attachment.id as number
-											);
+											removeItem( attachmentNumericId );
 										} }
 									/>
 								</HStack>
@@ -457,7 +452,8 @@ function CompactMediaEditAttachments( {
 						{ allItems.map( ( attachment, index ) => {
 							const isBlob = isBlobURL( attachment.source_url );
 							const showMoveButtons =
-								multiple && allItems && allItems.length > 1;
+								multiple && allItems.length > 1;
+							const attachmentNumericId = attachment.id as number;
 							return (
 								<AnimatedMediaItem
 									key={ attachment.id }
@@ -467,7 +463,7 @@ function CompactMediaEditAttachments( {
 									<MediaPickerButton
 										open={ () => {
 											setTargetItemId(
-												attachment.id as number
+												attachmentNumericId
 											);
 											open();
 										} }
@@ -500,7 +496,7 @@ function CompactMediaEditAttachments( {
 											{ showMoveButtons && (
 												<MoveButtons
 													itemId={
-														attachment.id as number
+														attachmentNumericId
 													}
 													index={ index }
 													totalItems={
@@ -523,14 +519,9 @@ function CompactMediaEditAttachments( {
 													event: React.MouseEvent< HTMLButtonElement >
 												) => {
 													event.stopPropagation();
-													if (
-														typeof attachment.id ===
-														'number'
-													) {
-														removeItem(
-															attachment.id
-														);
-													}
+													removeItem(
+														attachmentNumericId
+													);
 												} }
 											/>
 										</HStack>
@@ -752,7 +743,7 @@ export default function MediaEdit< Item >( {
 			mime_type: getBlobTypeByURL( url ),
 		} ) );
 		if ( targetItemId !== undefined ) {
-			// When files dropped in existing media item, place the blobs at that item.
+			// When files are dropped in existing media item, place the blobs at that item.
 			const targetIndex = items.findIndex(
 				( a ) => a.id === targetItemId
 			);
@@ -851,7 +842,7 @@ export default function MediaEdit< Item >( {
 					allowedTypes={ allowedTypes }
 					// When replacing an existing item, pass only that item's ID
 					// and open in single-select mode so the user picks exactly
-					// one replacement, even if `multiple` is true.					`
+					// one replacement, even if `multiple` is true.
 					value={ targetItemId !== undefined ? targetItemId : value }
 					multiple={ multiple && targetItemId === undefined }
 					title={ field.label }

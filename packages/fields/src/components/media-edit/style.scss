@@ -45,8 +45,7 @@ fieldset.fields__media-edit {
 			}
 		}
 
-		// Target AnimatedMediaItem wrapper divs (direct children of VStack)
-		> div > .fields__media-edit-compact:not(:last-child) {
+		.fields__media-edit-compact:not(:last-child) {
 			border-bottom: $border-width solid $gray-100;
 		}
 	}

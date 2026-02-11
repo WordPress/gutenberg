@@ -23,8 +23,6 @@ function getAbsolutePosition( element: HTMLElement ) {
  *  - It takes a snapshot of the position of the element to use it
  *    as a destination point for the animation.
  *  - It restores the element to the previous position using a CSS transform
- *  - It uses the "resetAnimation" flag to reset the animation
- *    from the beginning in order to animate to the new destination point.
  *
  * @param triggerAnimationOnChange Variable used to trigger the animation if it changes.
  */
