@@ -649,6 +649,7 @@ export default function MediaEdit< Item >( {
 			.filter( ( a ): a is Attachment< 'view' > => a !== undefined );
 	}, [ attachments, value ] );
 	const { createErrorNotice } = useDispatch( noticesStore );
+	const { receiveEntityRecords } = useDispatch( coreStore );
 	// Support one upload action at a time for now.
 	const [ targetItemId, setTargetItemId ] = useState< number >();
 	// Deferred open: the legacy class-based MediaUpload reads props
@@ -711,6 +712,17 @@ export default function MediaEdit< Item >( {
 					if ( !! blobUrls.length ) {
 						return;
 					}
+					// `uploadMedia` creates attachments via `apiFetch`
+					// outside the core-data store, so invalidate
+					// all attachment queries to keep them fresh for
+					// other components that rely on core-data.
+					receiveEntityRecords(
+						'postType',
+						'attachment',
+						[],
+						undefined,
+						true
+					);
 					const uploadedIds = uploadedMedia.map(
 						( item ) => item.id
 					);
@@ -743,7 +755,14 @@ export default function MediaEdit< Item >( {
 				multiple: !! multiple,
 			} );
 		},
-		[ allowedTypes, value, multiple, createErrorNotice, onChangeControl ]
+		[
+			allowedTypes,
+			value,
+			multiple,
+			createErrorNotice,
+			onChangeControl,
+			receiveEntityRecords,
+		]
 	);
 	const addButtonLabel =
 		field.placeholder ||
