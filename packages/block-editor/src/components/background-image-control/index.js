@@ -8,6 +8,7 @@ import clsx from 'clsx';
  */
 import {
 	ToggleControl,
+	ColorIndicator,
 	__experimentalToggleGroupControl as ToggleGroupControl,
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalUnitControl as UnitControl,
@@ -151,23 +152,33 @@ function InspectorImagePreviewItem( {
 				as="span"
 				className="block-editor-global-styles-background-panel__inspector-preview-inner"
 			>
-				{ imgUrl && (
-					<span
-						className="block-editor-global-styles-background-panel__inspector-image-indicator-wrapper"
-						aria-hidden
-					>
+				<span
+					className="block-editor-global-styles-background-panel__inspector-image-indicator-wrapper"
+					aria-hidden
+				>
+					{ imgUrl ? (
 						<span
 							className="block-editor-global-styles-background-panel__inspector-image-indicator"
 							style={ {
 								backgroundImage: `url(${ imgUrl })`,
 							} }
 						/>
-					</span>
-				) }
+					) : (
+						<ColorIndicator
+							as="span"
+							className="block-editor-global-styles-background-panel__inspector-image-indicator"
+							colorValue={ undefined }
+						/>
+					) }
+				</span>
 				<FlexItem as="span" style={ imgUrl ? {} : { flexGrow: 1 } }>
 					<Truncate
 						numberOfLines={ 1 }
-						className="block-editor-global-styles-background-panel__inspector-media-replace-title"
+						className={
+							imgUrl
+								? 'block-editor-global-styles-background-panel__inspector-media-replace-title'
+								: 'block-editor-global-styles-background-panel__inspector-media-replace-title-placeholder'
+						}
 					>
 						{ label }
 					</Truncate>

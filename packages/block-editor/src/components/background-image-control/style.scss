@@ -127,6 +127,13 @@
 	text-align-last: center;
 }
 
+.block-editor-global-styles-background-panel__inspector-media-replace-title-placeholder {
+	word-break: break-all;
+	// The Button component is white-space: nowrap, and that won't work with line-clamp.
+	white-space: normal;
+	text-align: start;
+}
+
 .block-editor-global-styles-background-panel__inspector-preview-inner {
 	.block-editor-global-styles-background-panel__inspector-image-indicator-wrapper {
 		width: 20px;
