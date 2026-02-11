@@ -35,39 +35,9 @@ import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 import { useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 import { globalStylesDataKey } from '../store/private-keys';
+import { getVariationNameFromClass } from './block-style-variation';
 
 const VARIATION_PREFIX = 'is-style-';
-
-/**
- * Get the first style variation name from a className string that matches a registered style.
- *
- * @param {string} className        CSS class string for a block.
- * @param {Array}  registeredStyles Currently registered block styles.
- *
- * @return {string|null} The name of the first registered variation, or null if none found.
- */
-function getVariationNameFromClass( className, registeredStyles = [] ) {
-	if ( ! className ) {
-		return null;
-	}
-
-	const matches = className.split( /\s+/ ).reduce( ( acc, name ) => {
-		if ( name.startsWith( VARIATION_PREFIX ) ) {
-			const match = name.slice( VARIATION_PREFIX.length );
-			if ( match !== 'default' ) {
-				acc.push( match );
-			}
-		}
-		return acc;
-	}, [] );
-
-	for ( const variation of matches ) {
-		if ( registeredStyles.some( ( style ) => style.name === variation ) ) {
-			return variation;
-		}
-	}
-	return null;
-}
 
 const layoutBlockSupportKey = 'layout';
 const { kebabCase } = unlock( componentsPrivateApis );

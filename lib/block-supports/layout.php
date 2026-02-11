@@ -18,21 +18,15 @@ function gutenberg_get_variation_name_from_class( $class_name, $registered_style
 		return null;
 	}
 
-	$matches = array();
-	$classes = explode( ' ', $class_name );
+	$registered_names = array_filter( array_column( $registered_styles, 'name' ) );
 
-	foreach ( $classes as $name ) {
-		if ( str_starts_with( $name, 'is-style-' ) ) {
-			$match = substr( $name, strlen( 'is-style-' ) );
-			if ( 'default' !== $match ) {
-				$matches[] = $match;
-			}
-		}
-	}
+	$prefix = 'is-style-';
+	$len    = strlen( $prefix );
 
-	foreach ( $matches as $variation ) {
-		foreach ( $registered_styles as $style ) {
-			if ( isset( $style['name'] ) && $style['name'] === $variation ) {
+	foreach ( explode( ' ', $class_name ) as $class ) {
+		if ( str_starts_with( $class, $prefix ) ) {
+			$variation = substr( $class, $len );
+			if ( 'default' !== $variation && in_array( $variation, $registered_names, true ) ) {
 				return $variation;
 			}
 		}
