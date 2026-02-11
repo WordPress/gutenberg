@@ -635,19 +635,39 @@ export default function MediaEdit< Item >( {
 		},
 		[ value ]
 	);
+	// Keep previous attachments during null transitions. When value changes,
+	// useSelect briefly returns null while the new query resolves. For pure
+	// reorders (same IDs), we fall back to the cached list to avoid a visual
+	// flash in compact mode. For replacements/uploads (new IDs not in cache),
+	// we let attachments be null as normal.
+	const stableAttachmentsRef = useRef< Attachment< 'view' >[] | null >(
+		null
+	);
+	if ( attachments !== null ) {
+		stableAttachmentsRef.current = attachments;
+	}
+	let stableAttachments = attachments;
+	if ( attachments === null && stableAttachmentsRef.current && value ) {
+		const stableIds = new Set(
+			stableAttachmentsRef.current.map( ( a ) => a.id )
+		);
+		if ( normalizeValue( value ).every( ( id ) => stableIds.has( id ) ) ) {
+			stableAttachments = stableAttachmentsRef.current;
+		}
+	}
 	// Reorder attachments to match value order.
 	const orderedAttachments = useMemo( () => {
-		if ( ! attachments ) {
+		if ( ! stableAttachments ) {
 			return null;
 		}
 		const normalizedValue = normalizeValue( value );
 		const attachmentMap = new Map(
-			attachments.map( ( a ) => [ a.id, a ] )
+			stableAttachments.map( ( a ) => [ a.id, a ] )
 		);
 		return normalizedValue
 			.map( ( id ) => attachmentMap.get( id ) )
 			.filter( ( a ): a is Attachment< 'view' > => a !== undefined );
-	}, [ attachments, value ] );
+	}, [ stableAttachments, value ] );
 	const { createErrorNotice } = useDispatch( noticesStore );
 	const { receiveEntityRecords } = useDispatch( coreStore );
 	// Support one upload action at a time for now.
