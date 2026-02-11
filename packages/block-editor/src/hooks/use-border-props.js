@@ -20,9 +20,23 @@ export function getBorderClassesAndStyles( attributes ) {
 	const border = attributes.style?.border || {};
 	const className = getBorderClasses( attributes );
 
+	// Sanitize border sides: remove sides that have color but no width.
+	// A border with only color (no width) is invisible and generates
+	// orphaned CSS like `border-right-color` without `border-right-width`.
+	const sanitizedBorder = { ...border };
+	[ 'top', 'right', 'bottom', 'left' ].forEach( ( side ) => {
+		if (
+			sanitizedBorder[ side ] &&
+			! sanitizedBorder[ side ]?.width &&
+			sanitizedBorder[ side ]?.color
+		) {
+			delete sanitizedBorder[ side ];
+		}
+	} );
+
 	return {
 		className: className || undefined,
-		style: getInlineStyles( { border } ),
+		style: getInlineStyles( { border: sanitizedBorder } ),
 	};
 }
 
