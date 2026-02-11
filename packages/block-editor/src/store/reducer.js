@@ -1503,22 +1503,13 @@ export function isSelectionEnabled( state = true, action ) {
 }
 
 /**
- * Reducer returning the data needed to display a prompt when certain blocks
- * are removed, or `false` if no such prompt is requested.
- *
- * @param {boolean} state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {Object|false} Data for removal prompt display, if any.
- */
-/**
  * Reducer returning the client IDs for the block visibility modal,
  * or null if the modal is not open.
  *
- * @param {Array|null} state  Current state.
- * @param {Object}     action Dispatched action.
+ * @param {string[]|null} state  Current state.
+ * @param {Object}        action Dispatched action.
  *
- * @return {Array|null} Client IDs for the visibility modal.
+ * @return {string[]|null} Client IDs for the visibility modal.
  */
 export function blockVisibilityModalClientIds( state = null, action ) {
 	switch ( action.type ) {
@@ -1530,6 +1521,15 @@ export function blockVisibilityModalClientIds( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the data needed to display a prompt when certain blocks
+ * are removed, or `false` if no such prompt is requested.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object|false} Data for removal prompt display, if any.
+ */
 function removalPromptData( state = false, action ) {
 	switch ( action.type ) {
 		case 'DISPLAY_BLOCK_REMOVAL_PROMPT':

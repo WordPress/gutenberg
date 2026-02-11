@@ -995,7 +995,7 @@ export function getListViewExpandRevision( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {Array|null} Client IDs for the visibility modal, or null.
+ * @return {string[]|null} Client IDs for the visibility modal, or null.
  */
 export function getBlockVisibilityModalClientIds( state ) {
 	return state.blockVisibilityModalClientIds;
