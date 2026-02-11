@@ -1,0 +1,21 @@
+[
+	{
+		"name": "core/tabs-menu",
+		"isValid": true,
+		"attributes": {},
+		"innerBlocks": [
+			{
+				"name": "core/tabs-menu-item",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": []
+			},
+			{
+				"name": "core/tabs-menu-item",
+				"isValid": true,
+				"attributes": {},
+				"innerBlocks": []
+			}
+		]
+	}
+]

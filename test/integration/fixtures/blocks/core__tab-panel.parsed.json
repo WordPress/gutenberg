@@ -1,0 +1,37 @@
+[
+	{
+		"blockName": "core/tab-panel",
+		"attrs": {},
+		"innerBlocks": [
+			{
+				"blockName": "core/tab",
+				"attrs": {
+					"label": "Tab 1"
+				},
+				"innerBlocks": [
+					{
+						"blockName": "core/paragraph",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "\n\t\t<p>Content inside the tab panel.</p>\n\t\t",
+						"innerContent": [
+							"\n\t\t<p>Content inside the tab panel.</p>\n\t\t"
+						]
+					}
+				],
+				"innerHTML": "\n\t<section class=\"wp-block-tab\">\n\t\t\n\t</section>\n\t",
+				"innerContent": [
+					"\n\t<section class=\"wp-block-tab\">\n\t\t",
+					null,
+					"\n\t</section>\n\t"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-tab-panel\">\n\t\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-tab-panel\">\n\t",
+			null,
+			"\n</div>\n"
+		]
+	}
+]
