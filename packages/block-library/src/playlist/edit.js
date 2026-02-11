@@ -9,7 +9,7 @@ import '@arraypress/waveform-player/dist/waveform-player.css';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
+import { useState, useCallback, useEffect } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import {
 	store as blockEditorStore,
@@ -65,7 +65,6 @@ const PlaylistEdit = ( {
 		currentTrack,
 	} = attributes;
 	const [ trackListIndex, setTrackListIndex ] = useState( 0 );
-	const waveformInstanceRef = useRef( null );
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -278,7 +277,6 @@ const PlaylistEdit = ( {
 
 			// Create WaveformPlayer instance.
 			const instance = new WaveformPlayer( container );
-			waveformInstanceRef.current = instance;
 
 			// Apply contrasting color to SVG icons for visibility.
 			styleSvgIcons( container, textColor );
@@ -290,8 +288,7 @@ const PlaylistEdit = ( {
 					'waveformplayer:ended',
 					handleEnded
 				);
-				waveformInstanceRef.current?.destroy();
-				waveformInstanceRef.current = null;
+				instance.destroy();
 			};
 		},
 		[ currentTrackData, setAttributes, trackListIndex, tracks ]
