@@ -34,7 +34,7 @@ export const settings = {
 	},
 	transforms,
 	[ unlock( privateApis ).requiresWrapperOnCopy ]: true,
-	__experimentalLabel( attributes, { context } ) {
+	label( attributes, { context } ) {
 		const { content } = attributes;
 
 		const customName = attributes?.metadata?.name;

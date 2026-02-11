@@ -16,7 +16,7 @@ import {
 } from '@wordpress/element';
 import { withFilters } from '@wordpress/components';
 import {
-	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
+	getAccessibleBlockLabel,
 	getBlockType,
 	getDefaultBlockName,
 	isUnmodifiedBlock,

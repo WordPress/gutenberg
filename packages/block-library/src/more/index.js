@@ -24,7 +24,7 @@ export { metadata, name };
 export const settings = {
 	icon,
 	example: {},
-	__experimentalLabel( attributes, { context } ) {
+	label( attributes, { context } ) {
 		const customName = attributes?.metadata?.name;
 
 		if (

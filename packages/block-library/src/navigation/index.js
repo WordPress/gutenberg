@@ -55,7 +55,7 @@ export const settings = {
 	},
 	edit,
 	save,
-	__experimentalLabel: ( { ref } ) => {
+	label: ( { ref } ) => {
 		if ( ! ref ) {
 			return;
 		}

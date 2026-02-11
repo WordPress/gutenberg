@@ -17,7 +17,7 @@ export { metadata, name };
 
 export const settings = {
 	name,
-	__experimentalLabel( attributes, { context } ) {
+	label( attributes, { context } ) {
 		if ( context === 'accessibility' ) {
 			const { originalName } = attributes;
 

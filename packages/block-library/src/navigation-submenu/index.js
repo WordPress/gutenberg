@@ -28,7 +28,7 @@ export const settings = {
 		}
 		return addSubmenu;
 	},
-	__experimentalLabel( attributes, { context } ) {
+	label( attributes, { context } ) {
 		const { label } = attributes;
 
 		const customName = attributes?.metadata?.name;

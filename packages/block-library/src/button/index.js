@@ -36,7 +36,7 @@ export const settings = {
 		...a,
 		text: ( a.text || '' ) + text,
 	} ),
-	__experimentalLabel( attributes, { context } ) {
+	label( attributes, { context } ) {
 		const { text } = attributes;
 
 		const customName = attributes?.metadata?.name;

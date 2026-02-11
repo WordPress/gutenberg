@@ -175,6 +175,29 @@ export function normalizeBlockType( blockTypeOrName ) {
 }
 
 /**
+ * Resolves the block label callback from block type settings.
+ * Prefers the stable `label` property, falls back to `__experimentalLabel` with deprecation.
+ *
+ * @param {Object} blockType The block type.
+ * @return {Function|undefined} The label callback if available.
+ */
+export function resolveBlockLabelCallback( blockType ) {
+	if ( blockType.label ) {
+		return blockType.label;
+	}
+	if ( blockType.__experimentalLabel ) {
+		deprecated( '__experimentalLabel block type property', {
+			since: '6.12',
+			version: '7.0',
+			alternative: 'label',
+			hint: 'Update your block registration to use the stable `label` property.',
+		} );
+		return blockType.__experimentalLabel;
+	}
+	return undefined;
+}
+
+/**
  * Get the label for the block, usually this is either the block title,
  * or the value of the block's `label` function when that's specified.
  *
@@ -185,7 +208,8 @@ export function normalizeBlockType( blockTypeOrName ) {
  * @return {string} The block label.
  */
 export function getBlockLabel( blockType, attributes, context = 'visual' ) {
-	const { __experimentalLabel: getLabel, title } = blockType;
+	const getLabel = resolveBlockLabelCallback( blockType );
+	const { title } = blockType;
 
 	const label = getLabel && getLabel( attributes, { context } );
 
@@ -283,6 +307,24 @@ export function getAccessibleBlockLabel(
 		title
 	);
 }
+
+export const __experimentalGetBlockLabel = ( ...args ) => {
+	deprecated( '__experimentalGetBlockLabel', {
+		since: '6.12',
+		version: '7.0',
+		alternative: 'getBlockLabel',
+	} );
+	return getBlockLabel( ...args );
+};
+
+export const __experimentalGetAccessibleBlockLabel = ( ...args ) => {
+	deprecated( '__experimentalGetAccessibleBlockLabel', {
+		since: '6.12',
+		version: '7.0',
+		alternative: 'getAccessibleBlockLabel',
+	} );
+	return getAccessibleBlockLabel( ...args );
+};
 
 export function getDefault( attributeSchema ) {
 	if ( attributeSchema.default !== undefined ) {

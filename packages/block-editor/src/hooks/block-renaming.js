@@ -3,9 +3,10 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 
 /**
- * Filters registered block settings, adding an `__experimentalLabel` callback if one does not already exist.
+ * Filters registered block settings, adding a `label` callback if one does not already exist.
  *
  * @param {Object} settings Original block settings.
  *
@@ -13,7 +14,16 @@ import { hasBlockSupport } from '@wordpress/blocks';
  */
 export function addLabelCallback( settings ) {
 	// If blocks provide their own label callback, do not override it.
-	if ( settings.__experimentalLabel ) {
+	const hasLabel = settings.label || settings.__experimentalLabel;
+	if ( hasLabel ) {
+		if ( settings.__experimentalLabel && ! settings.label ) {
+			deprecated( '__experimentalLabel block type property', {
+				since: '6.12',
+				version: '7.0',
+				alternative: 'label',
+				hint: 'Update your block registration to use the stable `label` property.',
+			} );
+		}
 		return settings;
 	}
 
@@ -25,20 +35,31 @@ export function addLabelCallback( settings ) {
 
 	// Check whether block metadata is supported before using it.
 	if ( supportsBlockNaming ) {
-		settings.__experimentalLabel = ( attributes, { context } ) => {
-			const { metadata } = attributes;
-
-			// In the list view and breadcrumb, use the block's name attribute as the label.
-			if (
-				( context === 'list-view' || context === 'breadcrumb' ) &&
-				metadata?.name
-			) {
-				return metadata.name;
-			}
-		};
+		settings.label = defaultBlockLabelCallback;
 	}
 
 	return settings;
+}
+
+/**
+ * Default label callback for blocks that support renaming.
+ * Uses metadata.name for list-view and breadcrumb contexts.
+ *
+ * @param {Object} attributes        Block attributes.
+ * @param {Object} options           Options object.
+ * @param {string} [options.context] The context for the label (e.g. 'list-view', 'breadcrumb').
+ * @return {string|undefined} The label or undefined.
+ */
+function defaultBlockLabelCallback( attributes, { context } ) {
+	const { metadata } = attributes;
+
+	// In the list view and breadcrumb, use the block's name attribute as the label.
+	if (
+		( context === 'list-view' || context === 'breadcrumb' ) &&
+		metadata?.name
+	) {
+		return metadata.name;
+	}
 }
 
 addFilter(

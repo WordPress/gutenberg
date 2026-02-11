@@ -122,33 +122,57 @@ describe( 'getBlockLabel', () => {
 		expect( getBlockLabel( blockType, attributes ) ).toBe( 'Recipe' );
 	} );
 
-	it( 'returns only the block title when the block has a `getLabel` function, but it returns a falsey value', () => {
-		const blockType = { title: 'Recipe', __experimentalLabel: () => '' };
+	it( 'returns only the block title when the block has a `label` function, but it returns a falsey value', () => {
+		const blockType = { title: 'Recipe', label: () => '' };
 		const attributes = {};
 
 		expect( getBlockLabel( blockType, attributes ) ).toBe( 'Recipe' );
 	} );
 
-	it( 'returns the block title with the label when the `getLabel` function returns a value', () => {
+	it( 'returns the block title with the label when the `label` function returns a value', () => {
 		const blockType = {
 			title: 'Recipe',
-			__experimentalLabel: ( { heading } ) => heading,
+			label: ( { heading } ) => heading,
 		};
 		const attributes = { heading: 'Cupcakes!' };
 
 		expect( getBlockLabel( blockType, attributes ) ).toBe( 'Cupcakes!' );
 	} );
 
-	it( 'removes any html elements from the output of the `getLabel` function', () => {
+	it( 'removes any html elements from the output of the `label` function', () => {
 		const blockType = {
 			title: 'Recipe',
-			__experimentalLabel: ( { heading } ) => heading,
+			label: ( { heading } ) => heading,
 		};
 		const attributes = {
 			heading: '<b><span class="my-class">Cupcakes!</span></b>',
 		};
 
 		expect( getBlockLabel( blockType, attributes ) ).toBe( 'Cupcakes!' );
+	} );
+
+	it( 'prefers `label` over `__experimentalLabel` when both exist', () => {
+		const blockType = {
+			title: 'Recipe',
+			label: () => 'Stable',
+			__experimentalLabel: () => 'Experimental',
+		};
+		const attributes = {};
+
+		expect( getBlockLabel( blockType, attributes ) ).toBe( 'Stable' );
+	} );
+
+	it( 'falls back to `__experimentalLabel` with deprecation when `label` is not present', () => {
+		const blockType = {
+			title: 'Recipe',
+			__experimentalLabel: ( { heading } ) => heading,
+		};
+		const attributes = { heading: 'Cupcakes!' };
+
+		const result = getBlockLabel( blockType, attributes );
+
+		expect( console ).toHaveWarned();
+		expect( result ).toBe( 'Cupcakes!' );
 	} );
 } );
 
@@ -162,8 +186,8 @@ describe( 'getAccessibleBlockLabel', () => {
 		);
 	} );
 
-	it( 'returns only the block title when the block has a `getLabel` function, but it returns a falsey value', () => {
-		const blockType = { title: 'Recipe', __experimentalLabel: () => '' };
+	it( 'returns only the block title when the block has a `label` function, but it returns a falsey value', () => {
+		const blockType = { title: 'Recipe', label: () => '' };
 		const attributes = {};
 
 		expect( getAccessibleBlockLabel( blockType, attributes ) ).toBe(
@@ -171,10 +195,10 @@ describe( 'getAccessibleBlockLabel', () => {
 		);
 	} );
 
-	it( 'returns the block title with the label when the `getLabel` function returns a value', () => {
+	it( 'returns the block title with the label when the `label` function returns a value', () => {
 		const blockType = {
 			title: 'Recipe',
-			__experimentalLabel: ( { heading } ) => heading,
+			label: ( { heading } ) => heading,
 		};
 		const attributes = { heading: 'Cupcakes!' };
 
@@ -183,10 +207,10 @@ describe( 'getAccessibleBlockLabel', () => {
 		);
 	} );
 
-	it( 'removes any html elements from the output of the `getLabel` function', () => {
+	it( 'removes any html elements from the output of the `label` function', () => {
 		const blockType = {
 			title: 'Recipe',
-			__experimentalLabel: ( { heading } ) => heading,
+			label: ( { heading } ) => heading,
 		};
 		const attributes = {
 			heading: '<b><span class="my-class">Cupcakes!</span></b>',
@@ -200,7 +224,7 @@ describe( 'getAccessibleBlockLabel', () => {
 	it( 'outputs the block title and label with a row number indicating the position of the block, when the optional third parameter is provided', () => {
 		const blockType = {
 			title: 'Recipe',
-			__experimentalLabel: ( { heading } ) => heading,
+			label: ( { heading } ) => heading,
 		};
 		const attributes = { heading: 'Cupcakes!' };
 
