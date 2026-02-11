@@ -108,12 +108,20 @@ export function useBorderBoxControl(
 		newBorder: Border | undefined,
 		side: BorderSide
 	) => {
-		const updatedBorders = { ...splitValue, [ side ]: newBorder };
+		// Sanitize: if a border side has color but no width, treat it as
+		// empty. A color-only border generates orphaned CSS on the frontend
+		// (e.g. `border-right-color` without `border-right-width`).
+		const sanitizedBorder =
+			newBorder && ! newBorder.width && newBorder.color
+				? undefined
+				: newBorder;
+
+		const updatedBorders = { ...splitValue, [ side ]: sanitizedBorder };
 
 		if ( hasMixedBorders( updatedBorders ) ) {
 			onChange( updatedBorders );
 		} else {
-			onChange( newBorder );
+			onChange( sanitizedBorder );
 		}
 	};
 
