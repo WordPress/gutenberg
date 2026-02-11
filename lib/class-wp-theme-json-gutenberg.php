@@ -2020,9 +2020,9 @@ class WP_Theme_JSON_Gutenberg {
 	 * object with a `root` key), that selector is returned. Otherwise,
 	 * the block's default selector is used.
 	 *
-	 * @param array<string, string|array> $feature_selectors The block's feature selectors map.
-	 * @param string                      $feature_key       The feature to look up (e.g. 'dimensions').
-	 * @param string                      $default_selector  Fallback selector.
+	 * @param array<string, string|array<string, string>> $feature_selectors The block's feature selectors map.
+	 * @param string                                      $feature_key       The feature to look up (e.g. 'dimensions').
+	 * @param string                                      $default_selector  Fallback selector.
 	 * @return string The resolved selector.
 	 */
 	private static function get_feature_selector( array $feature_selectors, string $feature_key, string $default_selector ): string {
