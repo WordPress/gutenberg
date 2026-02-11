@@ -163,6 +163,46 @@ describe( 'crdt', () => {
 			expect( blocks ).toBeInstanceOf( Y.Array );
 		} );
 
+		it( 'sets blocks to undefined when blocks value is undefined', () => {
+			// First, set some blocks.
+			map.set( 'blocks', new Y.Array< YBlock >() );
+
+			const changes = {
+				blocks: undefined,
+			};
+
+			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+
+			// The key should still exist, but the value should be undefined.
+			expect( map.has( 'blocks' ) ).toBe( true );
+			expect( map.get( 'blocks' ) ).toBeUndefined();
+		} );
+
+		it( 'syncs content as a string', () => {
+			const changes = {
+				content: 'Hello, world!',
+			} as PostChanges;
+
+			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+
+			expect( map.get( 'content' ) ).toBe( 'Hello, world!' );
+		} );
+
+		it( 'syncs content with RenderedText format', () => {
+			const changes = {
+				content: {
+					raw: '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->',
+					rendered: '<p>Hello</p>',
+				},
+			} as PostChanges;
+
+			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+
+			expect( map.get( 'content' ) ).toBe(
+				'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->'
+			);
+		} );
+
 		it( 'syncs meta fields', () => {
 			const changes = {
 				meta: {
@@ -350,6 +390,77 @@ describe( 'crdt', () => {
 			);
 
 			expect( changes ).toHaveProperty( 'blocks' );
+		} );
+
+		it( 'includes undefined blocks in changes', () => {
+			map.set( 'blocks', undefined );
+
+			const editedRecord = {
+				blocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Test' },
+						innerBlocks: [],
+					},
+				],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changes ).toHaveProperty( 'blocks' );
+			expect( changes.blocks ).toBeUndefined();
+		} );
+
+		it( 'detects content changes from string value', () => {
+			map.set( 'content', 'New content' );
+
+			const editedRecord = {
+				content: 'Old content',
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changes.content ).toBe( 'New content' );
+		} );
+
+		it( 'detects content changes from RenderedText value', () => {
+			map.set( 'content', 'New content' );
+
+			const editedRecord = {
+				content: { raw: 'Old content', rendered: 'Old content' },
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changes.content ).toBe( 'New content' );
+		} );
+
+		it( 'excludes content when unchanged from RenderedText value', () => {
+			map.set( 'content', 'Same content' );
+
+			const editedRecord = {
+				content: { raw: 'Same content', rendered: 'Same content' },
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changes ).not.toHaveProperty( 'content' );
 		} );
 
 		it( 'includes meta in changes', () => {
