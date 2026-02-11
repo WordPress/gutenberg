@@ -53,7 +53,10 @@ export type PostChanges = Partial< Post > & {
 // A post record as represented in the CRDT document (Y.Map).
 export interface YPostRecord extends YMapRecord {
 	author: number;
-	blocks: YBlocks;
+	// Note: Blocks can be undefined when they need to be re-parsed.
+	// So this has been typed to communicate that the property can
+	// exist, but could be undefined.
+	blocks: YBlocks | undefined;
 	categories: number[];
 	comment_status: string;
 	date: string | null;
@@ -156,6 +159,12 @@ export function applyPostChangesToCRDTDoc(
 
 		switch ( key ) {
 			case 'blocks': {
+				// Blocks can be undefined when they need to be re-parsed.
+				if ( newValue === undefined ) {
+					ymap.set( key, undefined );
+					break;
+				}
+
 				let currentBlocks = ymap.get( key );
 
 				// Initialize.
@@ -314,7 +323,10 @@ export function getPostChangesFromCRDTDoc(
 					// We cannot directly compare the `blocks` from the CRDT document to
 					// the `blocks` derived from the `content` in the persisted record,
 					// because the latter will have different client IDs.
+					//
+					// Note: Blocks can be undefined when they need to be re-parsed.
 					if (
+						currentValue !== undefined &&
 						ydoc.meta?.get( CRDT_DOC_META_PERSISTENCE_KEY ) &&
 						editedRecord.content
 					) {
