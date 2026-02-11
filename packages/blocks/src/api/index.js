@@ -155,7 +155,6 @@ export {
 	getAccessibleBlockLabel,
 	__experimentalGetBlockLabel,
 	__experimentalGetAccessibleBlockLabel,
-	resolveBlockLabelCallback,
 	__experimentalSanitizeBlockAttributes,
 	getBlockAttributesNamesByRole,
 	__experimentalGetBlockAttributesNamesByRole,

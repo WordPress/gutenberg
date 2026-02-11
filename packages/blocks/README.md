@@ -706,18 +706,6 @@ _Parameters_
 -   _blockName_ `string`: Name of the block (example: “core/columns”).
 -   _variation_ `WPBlockVariation`: Object describing a block variation.
 
-### resolveBlockLabelCallback
-
-Resolves the block label callback from block type settings. Prefers the stable `label` property, falls back to `__experimentalLabel` with deprecation.
-
-_Parameters_
-
--   _blockType_ `Object`: The block type.
-
-_Returns_
-
--   `Function|undefined`: The label callback if available.
-
 ### serialize
 
 Takes a block or set of blocks and returns the serialized post content.
