@@ -9,9 +9,6 @@
  * Returns the submenu visibility value with backward compatibility
  * for the deprecated openSubmenusOnClick attribute.
  *
- * NOTE: If you make changes to this function, you may need to update the getSubmenuVisibility function in
- * packages/block-library/src/navigation/utils/get-submenu-visibility.js
- *
  * This function centralizes the migration logic from the boolean
  * openSubmenusOnClick to the new submenuVisibility enum.
  *
@@ -31,7 +28,7 @@ function block_core_navigation_get_submenu_visibility( $attributes ) {
 	// For backward compatibility, prioritize the legacy attribute if present.
 	// Legacy blocks have openSubmenusOnClick in the database. Since WordPress applies
 	// default values, submenuVisibility will also have a value, but we check the legacy
-	// attribute first to preserve the original behavior. If the block has been loaded 
+	// attribute first to preserve the original behavior. If the block has been loaded
 	// and saved in the editor, then the deprecatedOpenSubmenusOnClick will not be present.
 	if ( null !== $open_submenus_on_click ) {
 		// Convert boolean to string: true -> 'click', false -> 'hover'.
