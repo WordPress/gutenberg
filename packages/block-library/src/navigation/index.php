@@ -21,8 +21,8 @@
  * @return string The visibility mode: 'hover', 'click', or 'always'.
  */
 function block_core_navigation_get_submenu_visibility( $attributes ) {
-	$submenu_visibility     = isset( $attributes['submenuVisibility'] ) ? $attributes['submenuVisibility'] : null;
-	$open_submenus_on_click = isset( $attributes['openSubmenusOnClick'] ) ? $attributes['openSubmenusOnClick'] : null;
+	$submenu_visibility     = $attributes['submenuVisibility'] ?? null;
+	$open_submenus_on_click = $attributes['openSubmenusOnClick'] ?? null;
 
 	// If new attribute is set, use it.
 	if ( null !== $submenu_visibility ) {
