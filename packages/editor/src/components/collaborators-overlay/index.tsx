@@ -3,7 +3,7 @@ import {
 	privateApis,
 	// @ts-ignore
 } from '@wordpress/block-editor';
-import { useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { CursorRegistry } from './cursor-registry';
 import { Overlay } from './overlay';
@@ -25,11 +25,12 @@ interface Props {
 export function CollaboratorsOverlay( { postId, postType }: Props ) {
 	// A single instance of the cursor registry is shared between CollaboratorsPresence
 	// and CollaboratorsOverlay. A ref is used to persist the instance across re-renders.
-	const cursorRegistry = useRef< CursorRegistry >( new CursorRegistry() );
+	const [ cursorRegistry ] = useState< CursorRegistry >(
+		() => new CursorRegistry()
+	);
 
 	return (
-		BlockCanvasCover &&
-		BlockCanvasCover.Fill && (
+		BlockCanvasCover?.Fill && (
 			<BlockCanvasCover.Fill>
 				{ ( {
 					containerRef,
@@ -40,7 +41,7 @@ export function CollaboratorsOverlay( { postId, postType }: Props ) {
 						blockEditorDocument={
 							containerRef.current?.ownerDocument
 						}
-						cursorRegistry={ cursorRegistry.current }
+						cursorRegistry={ cursorRegistry }
 						postId={ postId }
 						postType={ postType }
 					/>
