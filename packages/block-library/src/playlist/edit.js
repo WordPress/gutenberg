@@ -67,8 +67,6 @@ const PlaylistEdit = ( {
 	const [ trackListIndex, setTrackListIndex ] = useState( 0 );
 	const waveformRef = useRef( null );
 	const waveformInstanceRef = useRef( null );
-	const trackListIndexRef = useRef( trackListIndex );
-	const tracksRef = useRef( [] );
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -202,15 +200,6 @@ const PlaylistEdit = ( {
 		]
 	);
 
-	// Keep refs updated for use in waveform event handler.
-	useEffect( () => {
-		trackListIndexRef.current = trackListIndex;
-	}, [ trackListIndex ] );
-
-	useEffect( () => {
-		tracksRef.current = tracks;
-	}, [ tracks ] );
-
 	// Get current track data.
 	const currentTrackData = tracks[ trackListIndex ];
 
@@ -254,25 +243,21 @@ const PlaylistEdit = ( {
 
 		// Handle track end - advance to next track.
 		const handleEnded = () => {
-			const currentIndex = trackListIndexRef.current;
-			const currentTracks = tracksRef.current;
-
-			if ( currentIndex < currentTracks.length - 1 ) {
-				if ( currentTracks[ currentIndex + 1 ]?.uniqueId ) {
-					setTrackListIndex( currentIndex + 1 );
+			if ( trackListIndex < tracks.length - 1 ) {
+				if ( tracks[ trackListIndex + 1 ]?.uniqueId ) {
+					setTrackListIndex( trackListIndex + 1 );
 					setAttributes( {
-						currentTrack:
-							currentTracks[ currentIndex + 1 ].uniqueId,
+						currentTrack: tracks[ trackListIndex + 1 ].uniqueId,
 					} );
 				}
 			} else {
 				setTrackListIndex( 0 );
-				if ( currentTracks[ 0 ]?.uniqueId ) {
+				if ( tracks[ 0 ]?.uniqueId ) {
 					setAttributes( {
-						currentTrack: currentTracks[ 0 ].uniqueId,
+						currentTrack: tracks[ 0 ].uniqueId,
 					} );
-				} else if ( currentTracks.length > 0 ) {
-					const validTrack = currentTracks.find(
+				} else if ( tracks.length > 0 ) {
+					const validTrack = tracks.find(
 						( track ) => track.uniqueId !== undefined
 					);
 					if ( validTrack ) {
@@ -337,7 +322,7 @@ const PlaylistEdit = ( {
 			}
 			waveformInstanceRef.current?.destroy();
 		};
-	}, [ currentTrackData?.src, setAttributes ] );
+	}, [ currentTrackData?.src, setAttributes, trackListIndex, tracks ] );
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
