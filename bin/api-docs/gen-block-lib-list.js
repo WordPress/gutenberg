@@ -8,8 +8,8 @@
  * External dependencies
  */
 const path = require( 'path' );
-const glob = require( 'fast-glob' );
 const fs = require( 'fs' );
+const glob = require( 'fast-glob' );
 /**
  * Path to root project directory.
  *
@@ -93,7 +93,11 @@ function processObjWithInnerKeys( obj ) {
 			rtn.push( `${ key } (${ obj[ key ].sort().join( ', ' ) })` );
 		} else if ( typeof obj[ key ] === 'object' ) {
 			const innerKeys = getTruthyKeys( obj[ key ] );
-			rtn.push( `${ key } (${ innerKeys.sort().join( ', ' ) })` );
+			if ( innerKeys.length ) {
+				rtn.push( `${ key } (${ innerKeys.sort().join( ', ' ) })` );
+			} else {
+				rtn.push( key );
+			}
 		} else {
 			rtn.push( key );
 		}

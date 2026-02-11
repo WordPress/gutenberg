@@ -18,7 +18,7 @@ class Gutenberg_HTTP_Polling_Sync_Server {
 	const REST_NAMESPACE = 'wp/v2/sync';
 
 	/**
-	 * Awareness timeout in milliseconds. Clients that haven't updated
+	 * Awareness timeout in seconds. Clients that haven't updated
 	 * their awareness state within this time are considered disconnected.
 	 */
 	const AWARENESS_TIMEOUT_IN_S = 30; // 30 seconds
@@ -87,6 +87,7 @@ class Gutenberg_HTTP_Polling_Sync_Server {
 			),
 			'awareness' => array(
 				'required' => true,
+				'type'     => 'object',
 			),
 			'client_id' => array(
 				'minimum'  => 1,

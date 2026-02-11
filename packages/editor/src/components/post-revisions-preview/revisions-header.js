@@ -6,7 +6,8 @@ import { useViewportMatch } from '@wordpress/compose';
 import { Button } from '@wordpress/components';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { PinnedItems } from '@wordpress/interface';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
+import { seen } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -27,9 +28,12 @@ import { unlock } from '../../lock-unlock';
 /**
  * Header component for revisions preview mode.
  *
+ * @param {Object}   props              Component props.
+ * @param {boolean}  props.showDiff     Whether diff highlighting is enabled.
+ * @param {Function} props.onToggleDiff Callback to toggle diff highlighting.
  * @return {JSX.Element} The revisions header component.
  */
-function RevisionsHeader() {
+function RevisionsHeader( { showDiff, onToggleDiff } ) {
 	const isWideViewport = useViewportMatch( 'large' );
 	const { postType, showIconLabels, currentRevisionId } = useSelect(
 		( select ) => {
@@ -68,6 +72,16 @@ function RevisionsHeader() {
 	return (
 		<HeaderSkeleton
 			className="editor-revisions-header"
+			toolbar={
+				<Button
+					__next40pxDefaultSize
+					size="compact"
+					icon={ seen }
+					label={ _x( 'Show changes', 'revisions' ) }
+					isPressed={ showDiff }
+					onClick={ onToggleDiff }
+				/>
+			}
 			center={ <RevisionsSlider /> }
 			settings={
 				<>

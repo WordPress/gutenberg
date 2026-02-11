@@ -950,3 +950,41 @@ export function isLockedBlock( state, clientId ) {
 		isRemoveLockedBlock( state, clientId )
 	);
 }
+
+/**
+ * Returns whether the list view content panel popover is open.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the popover is open.
+ */
+export function isListViewContentPanelOpen( state ) {
+	return state.listViewContentPanelOpen;
+}
+
+/**
+ * Returns whether a List View panel is opened.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether the panel is opened.
+ */
+export function isListViewPanelOpened( state, clientId ) {
+	// If allOpen flag is set, all panels are open
+	if ( state.openedListViewPanels?.allOpen ) {
+		return true;
+	}
+	return state.openedListViewPanels?.panels?.[ clientId ] === true;
+}
+
+/**
+ * Returns the List View expand revision number.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {number} The expand revision number.
+ */
+export function getListViewExpandRevision( state ) {
+	return state.listViewExpandRevision || 0;
+}

@@ -113,10 +113,12 @@ test.describe( 'Page List', () => {
 			},
 			statusVisibility: {
 				performEdit: async ( page ) => {
-					const statusAndVisibility = page.getByLabel(
-						'Status & Visibility'
-					);
-					await statusAndVisibility.click();
+					const editButton = page.getByRole( 'button', {
+						name: 'Edit Status & Visibility',
+					} );
+					await editButton.locator( '..' ).hover();
+					await editButton.click();
+					const statusAndVisibility = editButton.locator( '..' );
 					const options = [
 						'Published',
 						'Draft',
@@ -142,17 +144,21 @@ test.describe( 'Page List', () => {
 					}
 				},
 				assertInitialState: async ( page ) => {
-					const statusAndVisibility = page.getByLabel(
-						'Status & Visibility'
-					);
+					const statusAndVisibility = page
+						.getByRole( 'button', {
+							name: 'Edit Status & Visibility',
+						} )
+						.locator( '..' );
 					await expect( statusAndVisibility ).toContainText(
 						'Published'
 					);
 				},
 				assertEditedState: async ( page ) => {
-					const statusAndVisibility = page.getByLabel(
-						'Status & Visibility'
-					);
+					const statusAndVisibility = page
+						.getByRole( 'button', {
+							name: 'Edit Status & Visibility',
+						} )
+						.locator( '..' );
 					await expect( statusAndVisibility ).toContainText(
 						'Private'
 					);
@@ -160,12 +166,17 @@ test.describe( 'Page List', () => {
 			},
 			author: {
 				assertInitialState: async ( page ) => {
-					const author = page.getByLabel( 'Author' );
+					const author = page
+						.getByRole( 'button', { name: 'Edit Author' } )
+						.locator( '..' );
 					await expect( author ).toContainText( 'admin' );
 				},
 				performEdit: async ( page ) => {
-					const author = page.getByLabel( 'Author' );
-					await author.click();
+					const editButton = page.getByRole( 'button', {
+						name: 'Edit Author',
+					} );
+					await editButton.locator( '..' ).hover();
+					await editButton.click();
 					const selectElement = page.locator(
 						'select:has(option[value="1"])'
 					);
@@ -174,27 +185,28 @@ test.describe( 'Page List', () => {
 					} );
 				},
 				assertEditedState: async ( page ) => {
-					const author = page.getByLabel( 'Edit Author' );
+					const author = page
+						.getByRole( 'button', { name: 'Edit Author' } )
+						.locator( '..' );
 					await expect( author ).toContainText( 'Test Author' );
-					// Check that the list still shows "admin" (changes not yet saved).
-					const selectedItem = page.locator( '.is-selected' );
-					const authorCell = selectedItem.getByRole( 'cell', {
-						name: 'admin',
-					} );
-					await expect( authorCell ).toBeVisible();
 				},
 			},
 			date: {
 				assertInitialState: async ( page ) => {
-					const dateEl = page.getByLabel( 'Edit Date' );
+					const dateEl = page
+						.getByRole( 'button', { name: 'Edit Date' } )
+						.locator( '..' );
 					const date = new Date();
 					const yy = String( date.getFullYear() );
 
 					await expect( dateEl ).toContainText( yy );
 				},
 				performEdit: async ( page ) => {
-					const dateEl = page.getByLabel( 'Edit Date' );
-					await dateEl.click();
+					const editButton = page.getByRole( 'button', {
+						name: 'Edit Date',
+					} );
+					await editButton.locator( '..' ).hover();
+					await editButton.click();
 
 					// Wait for the datetime control to appear
 					const datetimeInput = page.locator(
@@ -219,18 +231,25 @@ test.describe( 'Page List', () => {
 				assertEditedState: async ( page ) => {
 					const date = new Date();
 					const yy = Number( date.getFullYear() );
-					const dateEl = page.getByLabel( 'Edit Date' );
+					const dateEl = page
+						.getByRole( 'button', { name: 'Edit Date' } )
+						.locator( '..' );
 					await expect( dateEl ).toContainText( String( yy + 1 ) );
 				},
 			},
 			slug: {
 				assertInitialState: async ( page ) => {
-					const slug = page.getByLabel( 'Edit Slug' );
+					const slug = page
+						.getByRole( 'button', { name: 'Edit Slug' } )
+						.locator( '..' );
 					await expect( slug ).toContainText( 'privacy-policy' );
 				},
 				performEdit: async ( page ) => {
-					const slug = page.getByLabel( 'Edit Slug' );
-					await slug.click();
+					const editButton = page.getByRole( 'button', {
+						name: 'Edit Slug',
+					} );
+					await editButton.locator( '..' ).hover();
+					await editButton.click();
 					await expect(
 						page.getByRole( 'link', {
 							name: 'http://localhost:8889/?',
@@ -241,12 +260,17 @@ test.describe( 'Page List', () => {
 			},
 			parent: {
 				assertInitialState: async ( page ) => {
-					const parent = page.getByLabel( 'Edit Parent' );
+					const parent = page
+						.getByRole( 'button', { name: 'Edit Parent' } )
+						.locator( '..' );
 					await expect( parent ).toContainText( 'None' );
 				},
 				performEdit: async ( page ) => {
-					const parent = page.getByLabel( 'Edit Parent' );
-					await parent.click();
+					const editButton = page.getByRole( 'button', {
+						name: 'Edit Parent',
+					} );
+					await editButton.locator( '..' ).hover();
+					await editButton.click();
 					await page
 						.getByLabel( 'Parent', { exact: true } )
 						.fill( 'Sample' );
@@ -256,7 +280,9 @@ test.describe( 'Page List', () => {
 						.click();
 				},
 				assertEditedState: async ( page ) => {
-					const parent = page.getByLabel( 'Edit Parent' );
+					const parent = page
+						.getByRole( 'button', { name: 'Edit Parent' } )
+						.locator( '..' );
 					await expect( parent ).toContainText( 'Sample Page' );
 				},
 			},
@@ -283,12 +309,19 @@ test.describe( 'Page List', () => {
 			// },
 			discussion: {
 				assertInitialState: async ( page ) => {
-					const discussion = page.getByLabel( 'Edit Discussion' );
+					const discussion = page
+						.getByRole( 'button', {
+							name: 'Edit Discussion',
+						} )
+						.locator( '..' );
 					await expect( discussion ).toContainText( 'Closed' );
 				},
 				performEdit: async ( page ) => {
-					const discussion = page.getByLabel( 'Edit Discussion' );
-					await discussion.click();
+					const editButton = page.getByRole( 'button', {
+						name: 'Edit Discussion',
+					} );
+					await editButton.locator( '..' ).hover();
+					await editButton.click();
 					await page
 						.getByLabel( 'Open', {
 							exact: true,
@@ -296,7 +329,11 @@ test.describe( 'Page List', () => {
 						.check();
 				},
 				assertEditedState: async ( page ) => {
-					const discussion = page.getByLabel( 'Edit Discussion' );
+					const discussion = page
+						.getByRole( 'button', {
+							name: 'Edit Discussion',
+						} )
+						.locator( '..' );
 					await expect( discussion ).toContainText( 'Comments only' );
 				},
 			},
@@ -313,6 +350,7 @@ test.describe( 'Page List', () => {
 				firstName: 'Test',
 				lastName: 'Author',
 				password: '1',
+				roles: [ 'author' ],
 			} );
 		} );
 
@@ -321,13 +359,10 @@ test.describe( 'Page List', () => {
 			await page.getByRole( 'button', { name: 'Pages' } ).click();
 			await page.getByRole( 'button', { name: 'Layout' } ).click();
 			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
-			const privacyPolicyCheckbox = page.getByRole( 'checkbox', {
-				name: 'Privacy Policy',
-			} );
 
-			await privacyPolicyCheckbox.check();
-
-			await page.getByRole( 'button', { name: 'Details' } ).click();
+			// Trigger Quick Edit action on Privacy Policy row
+			const row = page.getByRole( 'row', { name: /Privacy Policy/ } );
+			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
 		} );
 
 		Object.entries( fields ).forEach(
@@ -351,28 +386,28 @@ test.describe( 'Page List', () => {
 			page,
 			requestUtils,
 		} ) => {
-			const selectedItem = page.locator( '.is-selected' );
-			const imagePlaceholder = selectedItem.locator(
-				'.fields__media-edit-placeholder'
-			);
-			const status = selectedItem.getByRole( 'cell', {
-				name: 'Published',
-			} );
-			await expect( status ).toBeVisible();
-
 			const { featuredImage, statusVisibility } = fields;
 			await statusVisibility.performEdit( page );
 			await featuredImage.performEdit( page );
-			// Ensure that no dropdown is open
-			await page.getByRole( 'button', { name: 'Close' } ).click();
-			const saveButton = page.getByLabel( 'Review 1 change…' );
-			await saveButton.click();
-			await page.getByRole( 'button', { name: 'Save' } ).click();
-			const updatedStatus = selectedItem.getByRole( 'cell', {
-				name: 'Private',
-			} );
-			await expect( imagePlaceholder ).toBeHidden();
+
+			// Click Done to save changes (modal saves directly)
+			await page.getByRole( 'button', { name: 'Done' } ).click();
+
+			// Wait for modal to close and verify changes in the table
+			await expect(
+				page.locator( '.dataviews-action-modal__quick-edit' )
+			).toBeHidden();
+
+			// Find the Privacy Policy row and verify updated values
+			const row = page.getByRole( 'row', { name: /Privacy Policy/ } );
+			const updatedStatus = row.getByRole( 'cell', { name: 'Private' } );
 			await expect( updatedStatus ).toBeVisible();
+
+			// Verify featured image placeholder is gone (image was set)
+			const imagePlaceholder = row.locator(
+				'.fields__media-edit-placeholder'
+			);
+			await expect( imagePlaceholder ).toBeHidden();
 
 			// Reset the page to its original state
 			await requestUtils.deleteAllPages();

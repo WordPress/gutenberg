@@ -15,7 +15,7 @@ import {
 import { PrivateListView } from './components/list-view';
 import InspectorControlsLastItem from './components/inspector-controls/last-item';
 import { useHasBlockToolbar } from './components/block-toolbar/use-has-block-toolbar';
-import { cleanEmptyObject } from './hooks/utils';
+import { cleanEmptyObject, usePrivateStyleOverride } from './hooks/utils';
 import BlockQuickNavigation from './components/block-quick-navigation';
 import { LayoutStyle } from './components/block-list/layout';
 import BlockManager from './components/block-manager';
@@ -42,7 +42,6 @@ import {
 	sectionRootClientIdKey,
 	mediaEditKey,
 	getMediaSelectKey,
-	essentialFormatKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
 } from './store/private-keys';
@@ -63,6 +62,12 @@ import {
 } from './components/block-list/use-block-props/use-block-refs';
 import { LinkPicker } from './components/link-picker';
 import useRemoteUrlData from './components/link-control/use-rich-url-data';
+import { PrivateBlockContext } from './components/block-list/private-block-context';
+import useListViewPanelState from './components/use-list-view-panel-state';
+import {
+	isHashLink,
+	isRelativePath,
+} from './components/link-control/is-url-like';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -83,6 +88,7 @@ lock( privateApis, {
 	InspectorControlsLastItem,
 	useHasBlockToolbar,
 	cleanEmptyObject,
+	usePrivateStyleOverride,
 	BlockQuickNavigation,
 	LayoutStyle,
 	BlockManager,
@@ -115,11 +121,14 @@ lock( privateApis, {
 	CommentIconToolbarSlotFill,
 	mediaEditKey,
 	getMediaSelectKey,
-	essentialFormatKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
 	useBlockElement,
 	useBlockElementRef,
 	LinkPicker,
 	useRemoteUrlData,
+	PrivateBlockContext,
+	useListViewPanelState,
+	isHashLink,
+	isRelativePath,
 } );

@@ -22,16 +22,17 @@ const buildDockerComposeConfig = require( './build-docker-compose-config' );
  * ./.wp-env.json, creates ~/.wp-env, ~/.wp-env/docker-compose.yml, and
  * ~/.wp-env/Dockerfile.
  *
- * @param {Object}  options
- * @param {Object}  options.spinner      A CLI spinner which indicates progress.
- * @param {boolean} options.debug        True if debug mode is enabled.
- * @param {string}  options.xdebug       The Xdebug mode to set. Defaults to "off".
- * @param {string}  options.spx          The SPX mode to set. Defaults to "off".
- * @param {boolean} options.writeChanges If true, writes the parsed config to the
- *                                       required docker files like docker-compose
- *                                       and Dockerfile. By default, this is false
- *                                       and only the `start` command writes any
- *                                       changes.
+ * @param {Object}      options
+ * @param {Object}      options.spinner          A CLI spinner which indicates progress.
+ * @param {boolean}     options.debug            True if debug mode is enabled.
+ * @param {string}      options.xdebug           The Xdebug mode to set. Defaults to "off".
+ * @param {string}      options.spx              The SPX mode to set. Defaults to "off".
+ * @param {boolean}     options.writeChanges     If true, writes the parsed config to the
+ *                                               required docker files like docker-compose
+ *                                               and Dockerfile. By default, this is false
+ *                                               and only the `start` command writes any
+ *                                               changes.
+ * @param {string|null} options.customConfigPath Path to a custom .wp-env.json configuration file.
  * @return {WPConfig} The-env config object.
  */
 module.exports = async function initConfig( {
@@ -40,8 +41,9 @@ module.exports = async function initConfig( {
 	xdebug = 'off',
 	spx = 'off',
 	writeChanges = false,
+	customConfigPath = null,
 } ) {
-	const config = await loadConfig( path.resolve( '.' ) );
+	const config = await loadConfig( path.resolve( '.' ), customConfigPath );
 	config.debug = debug;
 
 	// Adding this to the config allows the start command to understand that the

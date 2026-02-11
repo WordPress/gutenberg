@@ -13,7 +13,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { ENTER } from '@wordpress/keycodes';
 import { pasteHandler } from '@wordpress/blocks';
 import {
-	__unstableUseRichText as useRichText,
+	privateApis as richTextPrivateApis,
 	create,
 	insert,
 } from '@wordpress/rich-text';
@@ -29,6 +29,8 @@ import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
 
 import { unlock } from '../../lock-unlock';
+
+const { useRichText } = unlock( richTextPrivateApis );
 
 const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	const { placeholder, isEditingContentOnlySection, isPreview } = useSelect(

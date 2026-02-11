@@ -15,6 +15,7 @@
 ### New Features
 
 -   Added `status` command that shows comprehensive environment information including running state, URLs, ports, configuration, and paths.
+-   Added `--config` global option to specify a custom configuration file path, enabling multiple parallel environments from the same directory.
 
 ## 10.39.0 (2026-01-29)
 

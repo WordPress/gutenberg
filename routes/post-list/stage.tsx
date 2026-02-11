@@ -24,7 +24,6 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import type { Post } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -277,32 +276,21 @@ function PostList() {
 			subTitle={ postTypeObject.labels?.description }
 			className={ `${ postTypeObject.name.toLowerCase() }-page` }
 			actions={
-				<>
-					{ isModified && (
-						<Button
-							variant="tertiary"
-							size="compact"
-							onClick={ onReset }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					{ labels?.add_new_item &&
-						canCreateRecord &&
-						postType !== 'attachment' && (
-							<Button
-								variant="primary"
-								onClick={ () => {
-									navigate( {
-										to: `/types/${ postType }/new`,
-									} );
-								} }
-								size="compact"
-							>
-								{ labels.add_new_item }
-							</Button>
-						) }
-				</>
+				labels?.add_new_item &&
+				canCreateRecord &&
+				postType !== 'attachment' && (
+					<Button
+						variant="primary"
+						onClick={ () => {
+							navigate( {
+								to: `/types/${ postType }/new`,
+							} );
+						} }
+						size="compact"
+					>
+						{ labels.add_new_item }
+					</Button>
+				)
 			}
 			hasPadding={ false }
 		>
@@ -342,6 +330,7 @@ function PostList() {
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
 				selection={ selection }
+				onReset={ isModified ? onReset : false }
 				onChangeSelection={ ( items: string[] ) => {
 					navigate( {
 						search: {

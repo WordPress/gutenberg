@@ -14,9 +14,7 @@ import {
 	__experimentalToggleGroupControlOption as ToggleGroupControlOption,
 	__experimentalToggleGroupControlOptionIcon as ToggleGroupControlOptionIcon,
 	SelectControl,
-	__experimentalGrid as Grid,
 	__experimentalHeading as Heading,
-	__experimentalText as Text,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
@@ -247,46 +245,36 @@ function ItemsPerPageControl() {
 	);
 }
 
-function SettingsSection( {
-	title,
-	description,
-	children,
-}: {
-	title: string;
-	description?: string;
-	children: React.ReactNode;
-} ) {
+function ResetViewButton() {
+	const { onReset } = useContext( DataViewsContext );
+
+	// Don't render if no persistence support (onReset is undefined)
+	if ( onReset === undefined ) {
+		return null;
+	}
+
+	const isDisabled = onReset === false;
+
 	return (
-		<Grid columns={ 12 } className="dataviews-settings-section" gap={ 4 }>
-			<div className="dataviews-settings-section__sidebar">
-				<Heading
-					level={ 2 }
-					className="dataviews-settings-section__title"
-				>
-					{ title }
-				</Heading>
-				{ description && (
-					<Text
-						variant="muted"
-						className="dataviews-settings-section__description"
-					>
-						{ description }
-					</Text>
-				) }
-			</div>
-			<Grid
-				columns={ 8 }
-				gap={ 4 }
-				className="dataviews-settings-section__content"
-			>
-				{ children }
-			</Grid>
-		</Grid>
+		<Button
+			variant="tertiary"
+			size="compact"
+			disabled={ isDisabled }
+			accessibleWhenDisabled
+			className="dataviews-view-config__reset-button"
+			onClick={ () => {
+				if ( typeof onReset === 'function' ) {
+					onReset();
+				}
+			} }
+		>
+			{ __( 'Reset view' ) }
+		</Button>
 	);
 }
 
 export function DataviewsViewConfigDropdown() {
-	const { view } = useContext( DataViewsContext );
+	const { view, onReset } = useContext( DataViewsContext );
 	const popoverId = useInstanceId(
 		_DataViewsViewConfig,
 		'dataviews-view-config-dropdown'
@@ -294,6 +282,7 @@ export function DataviewsViewConfigDropdown() {
 	const activeLayout = VIEW_LAYOUTS.find(
 		( layout ) => layout.type === view.type
 	);
+	const isModified = typeof onReset === 'function';
 	return (
 		<Dropdown
 			expandOnMobile
@@ -303,14 +292,22 @@ export function DataviewsViewConfigDropdown() {
 			} }
 			renderToggle={ ( { onToggle, isOpen } ) => {
 				return (
-					<Button
-						size="compact"
-						icon={ cog }
-						label={ _x( 'View options', 'View is used as a noun' ) }
-						onClick={ onToggle }
-						aria-expanded={ isOpen ? 'true' : 'false' }
-						aria-controls={ popoverId }
-					/>
+					<div className="dataviews-view-config__toggle-wrapper">
+						<Button
+							size="compact"
+							icon={ cog }
+							label={ _x(
+								'View options',
+								'View is used as a noun'
+							) }
+							onClick={ onToggle }
+							aria-expanded={ isOpen ? 'true' : 'false' }
+							aria-controls={ popoverId }
+						/>
+						{ isModified && (
+							<span className="dataviews-view-config__modified-indicator" />
+						) }
+					</div>
 				);
 			} }
 			renderContent={ () => (
@@ -323,11 +320,25 @@ export function DataviewsViewConfigDropdown() {
 						className="dataviews-view-config"
 						gap="xl"
 					>
-						<SettingsSection title={ __( 'Appearance' ) }>
+						<Stack
+							direction="row"
+							justify="space-between"
+							align="center"
+							className="dataviews-view-config__header"
+						>
+							<Heading
+								level={ 2 }
+								className="dataviews-settings-section__title"
+							>
+								{ __( 'Appearance' ) }
+							</Heading>
+							<ResetViewButton />
+						</Stack>
+						<Stack direction="column" gap="lg">
 							<Stack
 								direction="row"
 								gap="sm"
-								className="is-divided-in-two"
+								className="dataviews-view-config__sort-controls"
 							>
 								<SortFieldControl />
 								<SortDirectionControl />
@@ -338,7 +349,7 @@ export function DataviewsViewConfigDropdown() {
 							<InfiniteScrollToggle />
 							<ItemsPerPageControl />
 							<PropertiesSection />
-						</SettingsSection>
+						</Stack>
 					</Stack>
 				</DropdownContentWrapper>
 			) }
