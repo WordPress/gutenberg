@@ -58,13 +58,15 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					);
 				}
 
+				// Data is passed to wp_interactivity_state() which JSON-encodes it,
+				// so we don't need HTML escaping here. URLs still use esc_url().
 				$tracks_data[ $unique_id ] = array(
 					'url'       => esc_url( $url ),
-					'title'     => esc_html( $title ),
-					'artist'    => esc_html( $artist ),
-					'album'     => esc_html( $album ),
+					'title'     => $title,
+					'artist'    => $artist,
+					'album'     => $album,
 					'image'     => esc_url( $image ),
-					'ariaLabel' => esc_attr( $aria_label ),
+					'ariaLabel' => $aria_label,
 				);
 
 				if ( $unique_id === $current_media_id ) {
