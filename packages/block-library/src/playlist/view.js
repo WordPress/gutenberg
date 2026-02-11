@@ -287,14 +287,26 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			try {
 				const playPromise = instance.play();
 				if ( playPromise && typeof playPromise.catch === 'function' ) {
-					playPromise.catch( () => {
-						// Silently ignore play errors.
-					} );
+					playPromise.catch( logPlayError );
 				}
 			} catch ( e ) {
-				// Silently ignore errors.
+				logPlayError( e );
 			}
 		};
 		container.addEventListener( 'waveformplayer:ready', handleReady );
 	}
+}
+
+/**
+ * Log play errors, filtering out expected AbortError.
+ *
+ * @param {Error} error - The error from play().
+ */
+function logPlayError( error ) {
+	// AbortError is expected when play() is interrupted by pause() or track change.
+	if ( error.name === 'AbortError' ) {
+		return;
+	}
+	// eslint-disable-next-line no-console
+	console.error( 'Playlist play error:', error );
 }
