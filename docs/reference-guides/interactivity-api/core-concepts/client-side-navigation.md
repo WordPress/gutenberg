@@ -14,6 +14,11 @@ This is known as **region-based client-side navigation**, and it is the recommen
     - [Implementing navigation](#implementing-navigation)
     - [Implementing prefetching](#implementing-prefetching)
     - [Complete example: Pagination](#complete-example-pagination)
+- [Block compatibility](#block-compatibility)
+    - [The `supports.interactivity` field](#the-supportsinteractivity-field)
+    - [Non-interactive blocks](#non-interactive-blocks)
+    - [Interactive blocks using the Interactivity API](#interactive-blocks-using-the-interactivity-api)
+    - [Interactive blocks using other libraries](#interactive-blocks-using-other-libraries)
 - [More advanced use cases](#more-advanced-use-cases)
     - [Adding new regions on navigation](#adding-new-regions-on-navigation)
     - [Handling server state updates](#handling-server-state-updates)
@@ -255,6 +260,100 @@ store( 'myPagination', {
     },
 } );
 ```
+
+## Block compatibility
+
+For client-side navigation to work correctly, the blocks inside a router region need to be compatible with it. A block is compatible when it can be re-rendered by the router without breaking its functionality. This primarily depends on how the block handles interactivity.
+
+Blocks declare their compatibility with client-side navigation through the `supports.interactivity` field in their `block.json` file. This information tells WordPress whether a block can safely participate in region-based navigation.
+
+### The `supports.interactivity` field
+
+The `supports.interactivity` field in `block.json` can be set as a boolean or as an object with two sub-properties:
+
+- **`interactive`** (`boolean`, default: `false`): Indicates whether the block uses Interactivity API directives.
+- **`clientNavigation`** (`boolean`, default: `false`): Indicates whether the block is compatible with client-side navigation.
+
+Setting `supports.interactivity` to `true` is a shorthand for setting both `interactive` and `clientNavigation` to `true`:
+
+```json
+{
+    "supports": {
+        "interactivity": true
+    }
+}
+```
+
+This is equivalent to:
+
+```json
+{
+    "supports": {
+        "interactivity": {
+            "clientNavigation": true,
+            "interactive": true
+        }
+    }
+}
+```
+
+The `clientNavigation` property is the key to compatibility. Set it to `true` only if:
+
+- The block is **not interactive** (it renders only static HTML), or
+- The block **is interactive and uses the Interactivity API** for all its client-side behavior.
+
+Set it to `false` (or leave it unset) if the block is interactive but uses vanilla JavaScript, jQuery, or any other JavaScript framework or library other than the Interactivity API.
+
+### Non-interactive blocks
+
+Blocks that render only static HTML — with no JavaScript-driven interactivity — are inherently compatible with client-side navigation. Since they have no client-side state to manage or event listeners to re-attach, they can be safely re-rendered by the router at any time.
+
+For these blocks, set only `clientNavigation` to `true`:
+
+```json
+{
+    "supports": {
+        "interactivity": {
+            "clientNavigation": true
+        }
+    }
+}
+```
+
+Examples of non-interactive blocks include the Paragraph, Heading, Image, and List blocks. Even though they don't use Interactivity API directives, they are fully compatible with client-side navigation because their output is purely static HTML.
+
+### Interactive blocks using the Interactivity API
+
+Blocks that use the Interactivity API for their client-side behavior are compatible with client-side navigation. The Interactivity API's directive system integrates with the router, so interactive state, event handlers, and reactive bindings are properly preserved or re-initialized when regions are updated during navigation.
+
+For these blocks, set both properties to `true` (or use the shorthand):
+
+```json
+{
+    "supports": {
+        "interactivity": true
+    }
+}
+```
+
+### Interactive blocks using other libraries
+
+Blocks that use vanilla JavaScript, jQuery, or other JavaScript frameworks for interactivity are **not compatible** with client-side navigation. When the router replaces a region's content, any event listeners attached via these libraries are lost, and the block's JavaScript will not re-initialize for the new content.
+
+For these blocks, leave `supports.interactivity` at its default value (`false`) or explicitly set `clientNavigation` to `false`:
+
+```json
+{
+    "supports": {
+        "interactivity": {
+            "clientNavigation": false
+        }
+    }
+}
+```
+
+> [!IMPORTANT]
+> If a block that is not compatible with client-side navigation is detected inside a router region, WordPress may automatically disable client-side navigation on that page to prevent broken behavior. For example, the Query block's enhanced pagination checks for incompatible blocks and falls back to full page reloads when they are found.
 
 ## More advanced use cases
 
