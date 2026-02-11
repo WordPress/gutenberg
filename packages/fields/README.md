@@ -112,10 +112,6 @@ _Returns_
 
 Undocumented declaration.
 
-### mediaEditTestFields
-
-Undocumented declaration.
-
 ### notesField
 
 Notes count field for post types that support editor.notes.
