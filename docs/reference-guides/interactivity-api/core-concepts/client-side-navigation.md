@@ -2,7 +2,9 @@
 
 Client-side navigation is a technique that allows navigation between pages without requiring a full page reload. Instead of the browser fetching an entirely new HTML document from the server, client-side navigation fetches the new page's content and updates only the parts of the DOM that have changed. This results in faster, smoother page transitions and a more app-like user experience.
 
-The Interactivity API provides client-side navigation through the `@wordpress/interactivity-router` package. This package enables you to implement region-based navigation, where only specific parts of your page are updated when navigating between URLs.
+The Interactivity API provides client-side navigation through the `@wordpress/interactivity-router` package. The central concept is the **router region**: a section of your page that the router knows how to update during navigation. You mark these sections with the `data-wp-router-region` directive, and when the user navigates to a new URL, the router fetches the destination page and replaces only the content inside matching regions — leaving everything else on the page untouched.
+
+This is known as **region-based client-side navigation**, and it is the recommended approach for implementing client-side navigation in WordPress. There is also an experimental **full-page client-side navigation** mode, which treats the entire `<body>` element as a single region — effectively updating the whole page content without a traditional reload. Full-page navigation is covered at the end of this guide in [Full-page client-side navigation (experimental)](#full-page-client-side-navigation-experimental).
 
 ## Table of contents
 
@@ -29,6 +31,7 @@ The Interactivity API provides client-side navigation through the `@wordpress/in
     - [Script module handling](#script-module-handling)
     - [Server state and context](#server-state-and-context)
     - [Putting it all together: the navigation flow](#putting-it-all-together-the-navigation-flow)
+- [Full-page client-side navigation (experimental)](#full-page-client-side-navigation-experimental)
 
 ## How client-side navigation works
 
@@ -972,3 +975,20 @@ A subtle but important detail: users don't always wait for navigation to complet
 When `navigate()` is called, the router remembers the target URL. If another `navigate()` call comes in before the first completes, the router updates its target and the first navigation is abandoned. When the first navigation's fetch completes, it checks whether its URL is still the current target — if not, it simply returns without rendering.
 
 This ensures that rapid clicking through multiple links doesn't cause visual glitches or render stale content. Only the most recent navigation completes.
+
+## Full-page client-side navigation (experimental)
+
+Full-page client-side navigation is an experimental feature that extends the region-based approach described throughout this guide. Instead of requiring you to define individual router regions, full-page navigation treats the entire `<body>` element as a single region — effectively replacing all page content during navigation.
+
+This feature is only available in the Gutenberg plugin and must be enabled manually. To activate it, go to **Admin Panel > Gutenberg > Experiments** and check the **"Interactivity API: Full-page client-side navigation"** option.
+
+Once enabled, this mode automatically intercepts all link clicks and hover events on the page, triggering client-side navigation and prefetching without you needing to write any custom action handlers. It is available through a separate entry point in the router package:
+
+```js
+import '@wordpress/interactivity-router/full-page';
+```
+
+Full-page client-side navigation is essentially a special case of region-based navigation where there is only one region covering the whole page. Because it replaces all content, **every block on the page must be compatible with client-side navigation** — meaning all interactive blocks must use the Interactivity API (not jQuery or other libraries). See [Block compatibility](#block-compatibility) for details on how to declare block compatibility.
+
+> [!WARNING]
+> This feature is experimental and still under active development. It may not work correctly in all scenarios. If you try it out, please report any issues you encounter in the [Gutenberg GitHub repository](https://github.com/WordPress/gutenberg/issues). Contributions are also welcome!
