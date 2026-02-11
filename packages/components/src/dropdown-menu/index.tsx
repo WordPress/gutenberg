@@ -93,7 +93,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 
 					if ( ! isOpen && event.code === 'ArrowDown' ) {
 						event.preventDefault();
-						onToggle();
+						onToggle( event );
 					}
 				};
 				const { as: Toggle = Button, ...restToggleProps } =
@@ -114,7 +114,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 						icon={ icon }
 						onClick={
 							( ( event ) => {
-								onToggle();
+								onToggle( event );
 								if ( mergedToggleProps.onClick ) {
 									mergedToggleProps.onClick( event );
 								}

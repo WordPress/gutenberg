@@ -10,7 +10,7 @@ import type {
 import type Popover from '../popover';
 import type { PopoverProps } from '../popover/types';
 
-type CallbackProps = {
+export type CallbackProps = {
 	isOpen: boolean;
 	/**
 	 * The optional event parameter is only applicable when the component’s

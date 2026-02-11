@@ -6,7 +6,11 @@ import deprecated from '@wordpress/deprecated';
 import { contextConnect, useContextSystem } from '../context';
 import { useControlledValue } from '../utils/hooks';
 import Popover from '../popover';
-import type { DropdownProps, DropdownInternalContext } from './types';
+import type {
+	DropdownProps,
+	DropdownInternalContext,
+	CallbackProps,
+} from './types';
 
 const UnconnectedDropdown = (
 	props: DropdownProps,
@@ -19,7 +23,7 @@ const UnconnectedDropdown = (
 		contentClassName,
 		expandOnMobile,
 		headerTitle,
-		focusOnMount,
+		focusOnMount = () => focusOnMountRef.current,
 		popoverProps,
 		onClose,
 		onToggle,
@@ -58,6 +62,21 @@ const UnconnectedDropdown = (
 		onChange: onToggle,
 	} );
 
+	const focusOnMountRef = useRef< 'firstElement' | true >( 'firstElement' );
+	const determineFocusOnMount = (
+		event: Parameters< CallbackProps[ 'onToggle' ] >[ 0 ]
+	) => {
+		let doFocusFirstElement = ! event;
+		if ( event && 'nativeEvent' in event ) {
+			const { detail, nativeEvent } = event;
+			doFocusFirstElement =
+				detail === 0 ||
+				( 'pointerType' in nativeEvent &&
+					nativeEvent.pointerType === '' );
+		}
+		focusOnMountRef.current = doFocusFirstElement ? 'firstElement' : true;
+	};
+
 	/**
 	 * Closes the popover when focus leaves it unless the toggle was pressed or
 	 * focus has moved to a separate dialog. The former is to let the toggle
@@ -85,9 +104,15 @@ const UnconnectedDropdown = (
 		setIsOpen( false );
 	}
 
-	const args = {
+	const args: CallbackProps = {
 		isOpen: !! isOpen,
-		onToggle: () => setIsOpen( ! isOpen ),
+		onToggle: ( event ) => {
+			const nextIsOpen = ! isOpen;
+			setIsOpen( nextIsOpen );
+			if ( nextIsOpen ) {
+				determineFocusOnMount( event );
+			}
+		},
 		onClose: close,
 	};
 	const popoverPropsHaveAnchor =
