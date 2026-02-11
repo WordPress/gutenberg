@@ -20,7 +20,7 @@ import { useBlockCommands } from '../use-block-commands';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 
-export const BlockCanvasCover = createSlotFill( 'BlockCanvasCover' );
+export const BlockCanvasCover = createSlotFill( Symbol( 'BlockCanvasCover' ) );
 
 function BlockCanvasCoverWrapper( { children } ) {
 	return (
