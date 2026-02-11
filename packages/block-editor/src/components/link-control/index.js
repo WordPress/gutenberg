@@ -100,6 +100,9 @@ import isURLLike, { isHashLink, isRelativePath } from './is-url-like';
  * @property {WPLinkControlValue=}        value                      Current link value.
  * @property {WPLinkControlOnChangeProp=} onChange                   Value change handler, called with the updated value if
  *                                                                   the user selects a new link or updates settings.
+ * @property {Function=}                  onInputChange              Callback fired when the search input value changes.
+ *                                                                   Use this for observation only (e.g., to track search state).
+ * @property {string=}                    inputValue                 Initial value for the search input (uncontrolled).
  * @property {boolean=}                   noDirectEntry              Whether to allow turning a URL-like search query directly into a link.
  * @property {boolean=}                   showSuggestions            Whether to present suggestions when typing the URL.
  * @property {boolean=}                   showInitialSuggestions     Whether to present initial suggestions immediately.
@@ -121,6 +124,37 @@ const PREFERENCE_KEY = 'linkControlSettingsDrawer';
  * Renders a link control. A link control is a controlled input which maintains
  * a value associated with a link (HTML anchor element) and relevant settings
  * for how that link is expected to behave.
+ * ## Usage Patterns
+ *
+ * The component does not support a fully controlled implementation,
+ * but it does support an observable implementation.
+ *
+ * ### Uncontrolled (default)
+ * The component manages its own search input state:
+ * ```jsx
+ * <LinkControl value={ link } onChange={ setLink } />
+ * ```
+ *
+ * ### Observable
+ * Observe input changes without controlling the value:
+ * ```jsx
+ * <LinkControl
+ *   value={ link }
+ *   onChange={ setLink }
+ *   onInputChange={ ( newValue ) => console.log( newValue ) }
+ * />
+ * ```
+ *
+ * ### Uncontrolled with Initial Value
+ * Pre-populate the search input with a default value:
+ * ```jsx
+ * <LinkControl
+ *   value={ link }
+ *   onChange={ setLink }
+ *   inputValue="wordpress"
+ *   onInputChange={ ( newValue ) => console.log( newValue ) }
+ * />
+ * ```
  *
  * @param {WPLinkControlProps} props Component props.
  */
@@ -537,8 +571,12 @@ function LinkControl( {
 		}
 	}, [ shouldFocusSearchInput ] );
 
+	// Prioritize internal value (even if empty string), but allow propInputValue to set
+	// the initial default value.
 	const currentUrlInputValue =
-		propInputValue || internalControlValue?.url || '';
+		internalControlValue?.url !== undefined
+			? internalControlValue.url
+			: propInputValue || '';
 
 	const currentInputIsEmpty = ! currentUrlInputValue?.trim()?.length;
 
