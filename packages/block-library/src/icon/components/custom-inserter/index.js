@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import removeAccents from 'remove-accents';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -10,6 +15,12 @@ import { useDebounce } from '@wordpress/compose';
  * Internal dependencies
  */
 import IconGrid from './icon-grid';
+
+function normalizeSearchTerm( term ) {
+	return removeAccents( term ?? '' )
+		.toLowerCase()
+		.trim();
+}
 
 export default function CustomInserterModal( {
 	icons,
@@ -30,10 +41,10 @@ export default function CustomInserterModal( {
 
 	const filteredIcons = useMemo( () => {
 		if ( searchInput ) {
-			const input = searchInput.toLowerCase();
+			const input = normalizeSearchTerm( searchInput );
 			return icons.filter( ( icon ) => {
-				const iconName = icon.name.toLowerCase();
-				const iconLabel = icon.label.toLowerCase();
+				const iconName = normalizeSearchTerm( icon.name );
+				const iconLabel = normalizeSearchTerm( icon.label );
 
 				return (
 					iconName.includes( input ) || iconLabel.includes( input )
