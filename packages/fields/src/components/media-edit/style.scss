@@ -247,9 +247,8 @@ fieldset.fields__media-edit {
 			border-radius: $radius-medium;
 		}
 
-		// But in single context with attachment or empty state, use small radius
-		&.is-single .fields__media-edit-picker-button.has-attachment,
-		&.is-single.is-empty .fields__media-edit-picker-button {
+		// In empty state, use small radius
+		&.is-empty .fields__media-edit-picker-button {
 			border-radius: $radius-small;
 		}
 
