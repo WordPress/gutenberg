@@ -16,7 +16,6 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import Inserter from '../inserter';
-import { getAppenderLabel } from '../inserter/get-appender-label';
 
 function ButtonBlockAppender(
 	{ rootClientId, className, onFocus, tabIndex, onSelect },
@@ -38,27 +37,22 @@ function ButtonBlockAppender(
 				isOpen,
 				blockTitle,
 				hasSingleBlockType,
-				defaultBlock,
-				defaultBlockType,
+				appenderLabel,
 			} ) => {
 				const isToggleButton = ! hasSingleBlockType;
-				const appenderLabel = getAppenderLabel(
-					defaultBlock,
-					defaultBlockType
-				);
 
 				let label;
-				if ( hasSingleBlockType ) {
-					label = sprintf(
-						// translators: %s: the name of the block when there is only one
-						_x( 'Add %s', 'directly add the only allowed block' ),
-						blockTitle.toLowerCase()
-					);
-				} else if ( appenderLabel ) {
+				if ( appenderLabel ) {
 					label = sprintf(
 						// translators: %s: the appender label for the default block
 						_x( 'Add %s', 'add default block type' ),
 						appenderLabel
+					);
+				} else if ( hasSingleBlockType ) {
+					label = sprintf(
+						// translators: %s: the name of the block when there is only one
+						_x( 'Add %s', 'directly add the only allowed block' ),
+						blockTitle.toLowerCase()
 					);
 				} else {
 					label = _x(
