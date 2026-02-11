@@ -10,6 +10,7 @@ import '@arraypress/waveform-player/dist/waveform-player.css';
  * WordPress dependencies
  */
 import { useState, useCallback, useEffect, useRef } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 import {
 	store as blockEditorStore,
 	MediaPlaceholder,
@@ -65,7 +66,6 @@ const PlaylistEdit = ( {
 		currentTrack,
 	} = attributes;
 	const [ trackListIndex, setTrackListIndex ] = useState( 0 );
-	const waveformRef = useRef( null );
 	const waveformInstanceRef = useRef( null );
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
@@ -225,55 +225,48 @@ const PlaylistEdit = ( {
 		waveformAriaLabel = stripHTML( __( 'Untitled' ) );
 	}
 
-	// Initialize WaveformPlayer when track changes.
-	useEffect( () => {
-		const currentElement = waveformRef.current;
-		if ( ! currentElement || ! currentTrackData?.src ) {
-			return;
-		}
-
-		// Clear any leftover DOM elements from previous player.
-		currentElement.innerHTML = '';
-
-		// Track cleanup state to avoid initializing after unmount.
-		let isCleanedUp = false;
-
-		// Handle track end - advance to next track.
-		const handleEnded = () => {
-			if ( trackListIndex < tracks.length - 1 ) {
-				if ( tracks[ trackListIndex + 1 ]?.uniqueId ) {
-					setTrackListIndex( trackListIndex + 1 );
-					setAttributes( {
-						currentTrack: tracks[ trackListIndex + 1 ].uniqueId,
-					} );
-				}
-			} else {
-				setTrackListIndex( 0 );
-				if ( tracks[ 0 ]?.uniqueId ) {
-					setAttributes( {
-						currentTrack: tracks[ 0 ].uniqueId,
-					} );
-				} else if ( tracks.length > 0 ) {
-					const validTrack = tracks.find(
-						( track ) => track.uniqueId !== undefined
-					);
-					if ( validTrack ) {
-						setAttributes( { currentTrack: validTrack.uniqueId } );
-					}
-				}
-			}
-		};
-
-		// Defer initialization to ensure CSS is fully applied.
-		// The editor's iframe may not have styles ready immediately.
-		const timeoutId = setTimeout( () => {
-			if ( isCleanedUp ) {
+	// Initialize WaveformPlayer when the element mounts or track changes.
+	// useRefEffect ensures styles are applied before initialization (important for iframed editor).
+	const waveformRef = useRefEffect(
+		( element ) => {
+			if ( ! currentTrackData?.src ) {
 				return;
 			}
 
-			// Get colors for styling after CSS is applied.
+			// Clear any leftover DOM elements from previous player.
+			element.innerHTML = '';
+
+			// Handle track end - advance to next track.
+			const handleEnded = () => {
+				if ( trackListIndex < tracks.length - 1 ) {
+					if ( tracks[ trackListIndex + 1 ]?.uniqueId ) {
+						setTrackListIndex( trackListIndex + 1 );
+						setAttributes( {
+							currentTrack: tracks[ trackListIndex + 1 ].uniqueId,
+						} );
+					}
+				} else {
+					setTrackListIndex( 0 );
+					if ( tracks[ 0 ]?.uniqueId ) {
+						setAttributes( {
+							currentTrack: tracks[ 0 ].uniqueId,
+						} );
+					} else if ( tracks.length > 0 ) {
+						const validTrack = tracks.find(
+							( track ) => track.uniqueId !== undefined
+						);
+						if ( validTrack ) {
+							setAttributes( {
+								currentTrack: validTrack.uniqueId,
+							} );
+						}
+					}
+				}
+			};
+
+			// Get colors for styling (CSS is applied when useRefEffect runs).
 			const { textColor, waveformColor, progressColor } =
-				getWaveformColors( currentElement );
+				getWaveformColors( element );
 
 			// Create waveform container with correct colors.
 			const container = createWaveformContainer( {
@@ -285,7 +278,7 @@ const PlaylistEdit = ( {
 				progressColor,
 				buttonColor: textColor,
 			} );
-			currentElement.appendChild( container );
+			element.appendChild( container );
 
 			// Create WaveformPlayer instance.
 			const instance = new WaveformPlayer( container );
@@ -303,23 +296,17 @@ const PlaylistEdit = ( {
 			);
 
 			container.addEventListener( 'waveformplayer:ended', handleEnded );
-		}, 100 );
 
-		return () => {
-			isCleanedUp = true;
-			clearTimeout( timeoutId );
-			const container = currentElement.querySelector(
-				'[data-waveform-player]'
-			);
-			if ( container ) {
+			return () => {
 				container.removeEventListener(
 					'waveformplayer:ended',
 					handleEnded
 				);
-			}
-			waveformInstanceRef.current?.destroy();
-		};
-	}, [ currentTrackData, setAttributes, trackListIndex, tracks ] );
+				waveformInstanceRef.current?.destroy();
+			};
+		},
+		[ currentTrackData, setAttributes, trackListIndex, tracks ]
+	);
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
