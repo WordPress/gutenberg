@@ -26,6 +26,7 @@
 ### Internal
 
 - DataForm: Use public `ColorPicker` component instead of internal `Picker` in color control. [#75394](https://github.com/WordPress/gutenberg/pull/75394)
+- Update Testing Library packages used in unit tests ([#75340](https://github.com/WordPress/gutenberg/pull/75340))
 
 ## 11.3.0 (2026-01-29)
 
