@@ -30,7 +30,7 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { createBlock } from '@wordpress/blocks';
@@ -212,11 +212,8 @@ const PlaylistEdit = ( {
 	) {
 		waveformAriaLabel = stripHTML(
 			sprintf(
-				/* translators: %1$s: track title, %2$s artist name, %3$s: album name. */
-				_x(
-					'%1$s by %2$s from the album %3$s',
-					'track title, artist name, album name'
-				),
+				/* translators: %1$s: track title, %2$s: artist name, %3$s: album name. */
+				__( '%1$s by %2$s from the album %3$s' ),
 				currentTrackData?.title,
 				currentTrackData?.artist,
 				currentTrackData?.album
@@ -322,7 +319,7 @@ const PlaylistEdit = ( {
 			}
 			waveformInstanceRef.current?.destroy();
 		};
-	}, [ currentTrackData?.src, setAttributes, trackListIndex, tracks ] );
+	}, [ currentTrackData, setAttributes, trackListIndex, tracks ] );
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
