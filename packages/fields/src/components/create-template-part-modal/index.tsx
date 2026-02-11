@@ -86,14 +86,13 @@ export default function CreateTemplatePartModal( {
 }
 
 /**
- * Helper function to retrieve the corresponding icon by area name or icon name.
+ * Helper function to retrieve the corresponding icon by area name.
  *
- * @param {string} areaOrIconName The area name (e.g., 'header', 'navigation-overlay') or icon name (e.g., 'menu').
+ * @param {string} areaOrIconName The area name (e.g., 'header', 'navigation-overlay').
  *
  * @return {Object} The corresponding icon.
  */
 const getTemplatePartIcon = ( areaOrIconName: string ) => {
-	// Handle area names first
 	if ( 'header' === areaOrIconName ) {
 		return headerIcon;
 	} else if ( 'footer' === areaOrIconName ) {
@@ -104,10 +103,6 @@ const getTemplatePartIcon = ( areaOrIconName: string ) => {
 		'overlay' === areaOrIconName || // Backwards compat: remove once Core PR is merged and packages sync (see #75249).
 		'navigation-overlay' === areaOrIconName
 	) {
-		return navigationOverlayIcon;
-	}
-	// Handle icon names for backwards compatibility.
-	if ( 'menu' === areaOrIconName ) {
 		return navigationOverlayIcon;
 	}
 	return symbolFilledIcon;
