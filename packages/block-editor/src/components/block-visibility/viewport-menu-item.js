@@ -31,12 +31,10 @@ export default function BlockVisibilityViewportMenuItem( { clientIds } ) {
 		},
 		[ clientIds ]
 	);
-	const { showBlockVisibilityModal } = unlock(
-		useDispatch( blockEditorStore )
-	);
+	const { showViewportModal } = unlock( useDispatch( blockEditorStore ) );
 	return (
 		<MenuItem
-			onClick={ () => showBlockVisibilityModal( clientIds ) }
+			onClick={ () => showViewportModal( clientIds ) }
 			shortcut={ shortcut }
 		>
 			{ areBlocksHiddenAnywhere ? __( 'Show' ) : __( 'Hide' ) }

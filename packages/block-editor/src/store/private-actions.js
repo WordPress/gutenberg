@@ -477,26 +477,26 @@ export function closeListViewContentPanel() {
 }
 
 /**
- * Returns an action object used to open the block visibility modal
+ * Returns an action object used to open the viewport modal
  * for the given client IDs.
  *
- * @param {string[]} clientIds Client IDs of blocks to configure visibility for.
+ * @param {string[]} clientIds Client IDs of blocks to configure viewport settings for.
  * @return {Object} Action object.
  */
-export function showBlockVisibilityModal( clientIds ) {
+export function showViewportModal( clientIds ) {
 	return {
-		type: 'SHOW_BLOCK_VISIBILITY_MODAL',
+		type: 'SHOW_VIEWPORT_MODAL',
 		clientIds,
 	};
 }
 
 /**
- * Returns an action object used to close the block visibility modal.
+ * Returns an action object used to close the viewport modal.
  *
  * @return {Object} Action object.
  */
-export function hideBlockVisibilityModal() {
+export function hideViewportModal() {
 	return {
-		type: 'HIDE_BLOCK_VISIBILITY_MODAL',
+		type: 'HIDE_VIEWPORT_MODAL',
 	};
 }

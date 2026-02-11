@@ -209,7 +209,7 @@ const getQuickActionsCommands = () =>
 			return { isLoading: false, commands: [] };
 		}
 
-		const { showBlockVisibilityModal } = unlock( blockEditorDispatch );
+		const { showViewportModal } = unlock( blockEditorDispatch );
 		const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 		const canInsertDefaultBlock = canInsertBlockType(
 			getDefaultBlockName(),
@@ -301,7 +301,7 @@ const getQuickActionsCommands = () =>
 			commands.push( {
 				name: 'toggle-visibility',
 				label: hasHiddenBlock ? __( 'Show' ) : __( 'Hide' ),
-				callback: () => showBlockVisibilityModal( clientIds ),
+				callback: () => showViewportModal( clientIds ),
 				icon: hasHiddenBlock ? seen : unseen,
 			} );
 		}

@@ -23,7 +23,7 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 					getBlocksByClientId,
 					getBlockName,
 					isBlockHiddenAnywhere,
-					getBlockVisibilityModalClientIds,
+					getViewportModalClientIds,
 				} = unlock( select( blockEditorStore ) );
 				const _blocks = getBlocksByClientId( clientIds );
 				return {
@@ -37,7 +37,7 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 					areBlocksHiddenAnywhere: clientIds?.every( ( clientId ) =>
 						isBlockHiddenAnywhere( clientId )
 					),
-					isModalOpen: getBlockVisibilityModalClientIds() !== null,
+					isModalOpen: getViewportModalClientIds() !== null,
 				};
 			},
 
@@ -65,7 +65,7 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 		return null;
 	}
 
-	const { showBlockVisibilityModal } = unlock( blockEditorDispatch );
+	const { showViewportModal } = unlock( blockEditorDispatch );
 
 	return (
 		<ToolbarGroup className="block-editor-block-visibility-toolbar">
@@ -75,7 +75,7 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 				label={
 					areBlocksHiddenAnywhere ? __( 'Hidden' ) : __( 'Visible' )
 				}
-				onClick={ () => showBlockVisibilityModal( clientIds ) }
+				onClick={ () => showViewportModal( clientIds ) }
 				aria-expanded={ isModalOpen }
 				aria-haspopup="dialog"
 			/>

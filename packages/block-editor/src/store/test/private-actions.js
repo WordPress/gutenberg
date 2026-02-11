@@ -9,8 +9,8 @@ import {
 	setInsertionPoint,
 	startDragging,
 	stopDragging,
-	showBlockVisibilityModal,
-	hideBlockVisibilityModal,
+	showViewportModal,
+	hideViewportModal,
 } from '../private-actions';
 
 describe( 'private actions', () => {
@@ -124,20 +124,20 @@ describe( 'private actions', () => {
 		} );
 	} );
 
-	describe( 'showBlockVisibilityModal', () => {
-		it( 'should return the SHOW_BLOCK_VISIBILITY_MODAL action with clientIds', () => {
+	describe( 'showViewportModal', () => {
+		it( 'should return the SHOW_VIEWPORT_MODAL action with clientIds', () => {
 			const clientIds = [ 'client-1', 'client-2' ];
-			expect( showBlockVisibilityModal( clientIds ) ).toEqual( {
-				type: 'SHOW_BLOCK_VISIBILITY_MODAL',
+			expect( showViewportModal( clientIds ) ).toEqual( {
+				type: 'SHOW_VIEWPORT_MODAL',
 				clientIds,
 			} );
 		} );
 	} );
 
-	describe( 'hideBlockVisibilityModal', () => {
-		it( 'should return the HIDE_BLOCK_VISIBILITY_MODAL action', () => {
-			expect( hideBlockVisibilityModal() ).toEqual( {
-				type: 'HIDE_BLOCK_VISIBILITY_MODAL',
+	describe( 'hideViewportModal', () => {
+		it( 'should return the HIDE_VIEWPORT_MODAL action', () => {
+			expect( hideViewportModal() ).toEqual( {
+				type: 'HIDE_VIEWPORT_MODAL',
 			} );
 		} );
 	} );

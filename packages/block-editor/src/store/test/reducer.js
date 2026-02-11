@@ -42,7 +42,7 @@ import {
 	zoomLevel,
 	editedContentOnlySection,
 	withDerivedBlockEditingModes,
-	blockVisibilityModalClientIds,
+	viewportModalClientIds,
 } from '../reducer';
 
 import { unlock } from '../../lock-unlock';
@@ -4572,31 +4572,31 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'blockVisibilityModalClientIds', () => {
+	describe( 'viewportModalClientIds', () => {
 		it( 'should default to null', () => {
-			const state = blockVisibilityModalClientIds( undefined, {} );
+			const state = viewportModalClientIds( undefined, {} );
 			expect( state ).toBeNull();
 		} );
 
-		it( 'should return clientIds on SHOW_BLOCK_VISIBILITY_MODAL', () => {
+		it( 'should return clientIds on SHOW_VIEWPORT_MODAL', () => {
 			const clientIds = [ 'client-1', 'client-2' ];
-			const state = blockVisibilityModalClientIds( null, {
-				type: 'SHOW_BLOCK_VISIBILITY_MODAL',
+			const state = viewportModalClientIds( null, {
+				type: 'SHOW_VIEWPORT_MODAL',
 				clientIds,
 			} );
 			expect( state ).toEqual( clientIds );
 		} );
 
-		it( 'should return null on HIDE_BLOCK_VISIBILITY_MODAL', () => {
-			const state = blockVisibilityModalClientIds( [ 'client-1' ], {
-				type: 'HIDE_BLOCK_VISIBILITY_MODAL',
+		it( 'should return null on HIDE_VIEWPORT_MODAL', () => {
+			const state = viewportModalClientIds( [ 'client-1' ], {
+				type: 'HIDE_VIEWPORT_MODAL',
 			} );
 			expect( state ).toBeNull();
 		} );
 
 		it( 'should return current state for unknown actions', () => {
 			const currentState = [ 'client-1' ];
-			const state = blockVisibilityModalClientIds( currentState, {
+			const state = viewportModalClientIds( currentState, {
 				type: 'UNKNOWN_ACTION',
 			} );
 			expect( state ).toBe( currentState );

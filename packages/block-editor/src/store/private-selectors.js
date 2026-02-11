@@ -990,13 +990,40 @@ export function getListViewExpandRevision( state ) {
 }
 
 /**
- * Returns the client IDs for the block visibility modal, or null if
+ * Returns whether a List View panel is opened.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether the panel is opened.
+ */
+export function isListViewPanelOpened( state, clientId ) {
+	// If allOpen flag is set, all panels are open
+	if ( state.openedListViewPanels?.allOpen ) {
+		return true;
+	}
+	return state.openedListViewPanels?.panels?.[ clientId ] === true;
+}
+
+/**
+ * Returns the List View expand revision number.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {number} The expand revision number.
+ */
+export function getListViewExpandRevision( state ) {
+	return state.listViewExpandRevision || 0;
+}
+
+/**
+ * Returns the client IDs for the viewport modal, or null if
  * the modal is not open.
  *
  * @param {Object} state Global application state.
  *
  * @return {string[]|null} Client IDs for the visibility modal, or null.
  */
-export function getBlockVisibilityModalClientIds( state ) {
-	return state.blockVisibilityModalClientIds;
+export function getViewportModalClientIds( state ) {
+	return state.viewportModalClientIds;
 }

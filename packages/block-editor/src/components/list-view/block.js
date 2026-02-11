@@ -99,7 +99,7 @@ function ListViewBlock( {
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-		showBlockVisibilityModal,
+		showViewportModal,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	const debouncedToggleBlockHighlight = useDebounce(
@@ -413,7 +413,7 @@ function ListViewBlock( {
 			}
 
 			// Open the visibility breakpoints modal.
-			showBlockVisibilityModal( blocksToUpdate );
+			showViewportModal( blocksToUpdate );
 		} else if ( isMatch( 'core/block-editor/rename', event ) ) {
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const isContentOnly =
