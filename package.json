@@ -30,7 +30,8 @@
 					"@wordpress/edit-site-init"
 				]
 			},
-			"font-library"
+			"font-library",
+			"content-guidelines"
 		]
 	},
 	"config": {
