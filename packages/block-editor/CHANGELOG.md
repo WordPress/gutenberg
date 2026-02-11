@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 15.12.1-next.0 (2026-02-11)
+
 ### Bug Fixes
 
 -   Store: `insertBlock` - the meta argument is now the 6th argument of the action, the 5th argument is `initialPosition` ([#75197](https://github.com/WordPress/gutenberg/pull/75197)).

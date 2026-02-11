@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.0.0-next.0 (2026-02-11)
+
 ### Bug Fixes
 
 -   Playground runtime now supports zip archive themes, matching Docker runtime behavior. ([#75140](https://github.com/WordPress/gutenberg/issues/75140)).
