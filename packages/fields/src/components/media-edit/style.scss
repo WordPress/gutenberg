@@ -93,7 +93,8 @@ fieldset.fields__media-edit {
 		gap: $grid-unit-15;
 		border: $border-width dashed $gray-600;
 		border-radius: $radius-small;
-		padding: calc(8px - #{$border-width});
+		padding: $grid-unit-05 $grid-unit-15;
+		min-height: $grid-unit-50;
 		cursor: pointer;
 		min-width: 0;
 
