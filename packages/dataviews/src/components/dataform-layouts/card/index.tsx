@@ -36,11 +36,113 @@ import { getSummaryFields } from '../get-summary-fields';
 import useReportValidity from '../../../hooks/use-report-validity';
 import ValidationBadge from '../validation-badge';
 
+const NonCollapsibleCardHeader = ( {
+	children,
+	...props
+}: {
+	children: React.ReactNode;
+} ) => (
+	<OriginalCardHeader isBorderless { ...props }>
+		<div
+			style={ {
+				height: '40px', // This is to match the chevron's __next40pxDefaultSize
+				width: '100%',
+				display: 'flex',
+				justifyContent: 'space-between',
+				alignItems: 'center',
+			} }
+		>
+			{ children }
+		</div>
+	</OriginalCardHeader>
+);
+
+export function useCardHeader( layout: NormalizedCardLayout ) {
+	const { isOpened, isCollapsible } = layout;
+	const [ isOpen, setIsOpen ] = useState( isOpened );
+	const [ touched, setTouched ] = useState( false );
+
+	// Sync internal state when the isOpened prop changes.
+	// This is unlikely to happen in production, but it helps with storybook controls.
+	useEffect( () => {
+		setIsOpen( isOpened );
+	}, [ isOpened ] );
+
+	const toggle = useCallback( () => {
+		// Mark as touched when collapsing (going from open to closed)
+		if ( isOpen ) {
+			setTouched( true );
+		}
+		setIsOpen( ( prev ) => ! prev );
+	}, [ isOpen ] );
+
+	const onToggleButtonClick = useCallback(
+		( event: any ) => {
+			event.stopPropagation();
+			toggle();
+		},
+		[ toggle ]
+	);
+
+	const CollapsibleCardHeader = useCallback(
+		( {
+			children,
+			...props
+		}: {
+			children: React.ReactNode;
+			[ key: string ]: any;
+		} ) => (
+			<OriginalCardHeader
+				{ ...props }
+				onClick={ toggle }
+				style={ {
+					cursor: 'pointer',
+					...props.style,
+				} }
+				isBorderless
+			>
+				<div
+					style={ {
+						width: '100%',
+						display: 'flex',
+						justifyContent: 'space-between',
+						alignItems: 'center',
+					} }
+				>
+					{ children }
+				</div>
+				<Button
+					__next40pxDefaultSize
+					variant="tertiary"
+					icon={ isOpen ? chevronUp : chevronDown }
+					aria-expanded={ isOpen }
+					aria-label={ isOpen ? __( 'Collapse' ) : __( 'Expand' ) }
+					onClick={ onToggleButtonClick }
+				/>
+			</OriginalCardHeader>
+		),
+		[ toggle, isOpen, onToggleButtonClick ]
+	);
+
+	const effectiveIsOpen = isCollapsible ? isOpen : true;
+	const CardHeaderComponent = isCollapsible
+		? CollapsibleCardHeader
+		: NonCollapsibleCardHeader;
+
+	return {
+		isOpen: effectiveIsOpen,
+		CardHeader: CardHeaderComponent,
+		touched,
+		setTouched,
+	};
+}
+
 function isSummaryFieldVisible< Item >(
 	summaryField: NormalizedField< Item >,
 	summaryConfig: NormalizedCardLayout[ 'summary' ],
 	isOpen: boolean
 ) {
+	// If no summary config, dont't show any fields
 	if (
 		! summaryConfig ||
 		( Array.isArray( summaryConfig ) && summaryConfig.length === 0 )
@@ -48,10 +150,12 @@ function isSummaryFieldVisible< Item >(
 		return false;
 	}
 
+	// Convert to array for consistent handling
 	const summaryConfigArray = Array.isArray( summaryConfig )
 		? summaryConfig
 		: [ summaryConfig ];
 
+	// Find the config for this specific field
 	const fieldConfig = summaryConfigArray.find( ( config ) => {
 		if ( typeof config === 'string' ) {
 			return config === summaryField.id;
@@ -62,14 +166,17 @@ function isSummaryFieldVisible< Item >(
 		return false;
 	} );
 
+	// If field is not in summary config, don't show it
 	if ( ! fieldConfig ) {
 		return false;
 	}
 
+	// If it's a string, always show it
 	if ( typeof fieldConfig === 'string' ) {
 		return true;
 	}
 
+	// If it has visibility rules, respect them
 	if ( typeof fieldConfig === 'object' && 'visibility' in fieldConfig ) {
 		return (
 			fieldConfig.visibility === 'always' ||
@@ -77,6 +184,7 @@ function isSummaryFieldVisible< Item >(
 		);
 	}
 
+	// Default to always show
 	return true;
 }
 
@@ -92,34 +200,6 @@ export default function FormCardField< Item >( {
 	const layout = field.layout as NormalizedCardLayout;
 	const cardBodyRef = useRef< HTMLDivElement >( null );
 
-	const [ isOpen, setIsOpen ] = useState(
-		layout.isCollapsible ? layout.isOpened : true
-	);
-	const [ touched, setTouched ] = useState( false );
-
-	useEffect( () => {
-		if ( layout.isCollapsible ) {
-			setIsOpen( layout.isOpened );
-		} else {
-			setIsOpen( true );
-		}
-	}, [ layout.isOpened, layout.isCollapsible ] );
-
-	const toggle = useCallback( () => {
-		if ( isOpen ) {
-			setTouched( true );
-		}
-		setIsOpen( ( prev ) => ! prev );
-	}, [ isOpen ] );
-
-	const onToggleButtonClick = useCallback(
-		( event: React.MouseEvent< HTMLButtonElement > ) => {
-			event.stopPropagation();
-			toggle();
-		},
-		[ toggle ]
-	);
-
 	const form: NormalizedForm = useMemo(
 		() => ( {
 			layout: DEFAULT_LAYOUT as NormalizedLayout,
@@ -128,13 +208,20 @@ export default function FormCardField< Item >( {
 		[ field ]
 	);
 
+	const { isOpen, CardHeader, touched, setTouched } = useCardHeader( layout );
+
+	// Mark the card as touched when any field inside it is blurred.
+	// This aligns with how validated controls show errors on blur.
 	const handleBlur = useCallback( () => {
 		setTouched( true );
-	}, [] );
+	}, [ setTouched ] );
 
+	// When the card is expanded after being touched (collapsed with errors),
+	// trigger reportValidity to show field-level errors.
 	useReportValidity( cardBodyRef, isOpen && touched );
 
 	const summaryFields = getSummaryFields< Item >( layout.summary, fields );
+
 	const visibleSummaryFields = summaryFields.filter( ( summaryField ) =>
 		isSummaryFieldVisible( summaryField, layout.summary, isOpen )
 	);
@@ -151,7 +238,7 @@ export default function FormCardField< Item >( {
 		inlineEnd: 'medium' as const,
 	};
 
-	if ( field.children ) {
+	if ( !! field.children ) {
 		const withHeader = !! field.label && layout.withHeader;
 
 		const sizeCardBody = {
@@ -166,32 +253,13 @@ export default function FormCardField< Item >( {
 		return (
 			<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 				{ withHeader && (
-					<OriginalCardHeader
-						className="dataforms-layouts-card__field-header"
-						isBorderless
-						onClick={ layout.isCollapsible ? toggle : undefined }
-						style={
-							layout.isCollapsible
-								? { cursor: 'pointer' }
-								: undefined
-						}
-					>
-						<div
-							style={ {
-								height: '40px', // Match the expand/collapse button height to prevent UI jumps when the button is not displayed.
-								width: '100%',
-								display: 'flex',
-								justifyContent: 'space-between',
-								alignItems: 'center',
-							} }
-						>
-							<span className="dataforms-layouts-card__field-header-label">
-								{ field.label }
-							</span>
-
-							{ validationBadge }
-
-							{ visibleSummaryFields.length > 0 && (
+					<CardHeader className="dataforms-layouts-card__field-header">
+						<span className="dataforms-layouts-card__field-header-label">
+							{ field.label }
+						</span>
+						{ validationBadge }
+						{ visibleSummaryFields.length > 0 &&
+							layout.withHeader && (
 								<div className="dataforms-layouts-card__field-summary">
 									{ visibleSummaryFields.map(
 										( summaryField ) => (
@@ -204,26 +272,11 @@ export default function FormCardField< Item >( {
 									) }
 								</div>
 							) }
-
-							{ layout.isCollapsible && (
-								<Button
-									__next40pxDefaultSize
-									variant="tertiary"
-									icon={ isOpen ? chevronUp : chevronDown }
-									aria-expanded={ isOpen }
-									aria-label={
-										isOpen
-											? __( 'Collapse' )
-											: __( 'Expand' )
-									}
-									onClick={ onToggleButtonClick }
-								/>
-							) }
-						</div>
-					</OriginalCardHeader>
+					</CardHeader>
 				) }
-
 				{ ( isOpen || ! withHeader ) && (
+					// If it doesn't have a header, keep it open.
+					// Otherwise, the card will not be visible.
 					<CardBody
 						size={ sizeCardBody }
 						className="dataforms-layouts-card__field-control"
@@ -259,7 +312,6 @@ export default function FormCardField< Item >( {
 	if ( ! RegularLayout ) {
 		return null;
 	}
-
 	const withHeader = !! fieldDefinition.label && layout.withHeader;
 
 	const sizeCardBody = {
@@ -272,60 +324,27 @@ export default function FormCardField< Item >( {
 	return (
 		<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 			{ withHeader && (
-				<OriginalCardHeader
-					className="dataforms-layouts-card__field-header"
-					isBorderless
-					onClick={ layout.isCollapsible ? toggle : undefined }
-					style={
-						layout.isCollapsible ? { cursor: 'pointer' } : undefined
-					}
-				>
-					<div
-						style={ {
-							height: '40px', // Match the expand/collapse button height to prevent UI jumps when the button is not displayed.
-							width: '100%',
-							display: 'flex',
-							justifyContent: 'space-between',
-							alignItems: 'center',
-						} }
-					>
-						<span className="dataforms-layouts-card__field-header-label">
-							{ fieldDefinition.label }
-						</span>
-
-						{ validationBadge }
-
-						{ visibleSummaryFields.length > 0 && (
-							<div className="dataforms-layouts-card__field-summary">
-								{ visibleSummaryFields.map(
-									( summaryField ) => (
-										<summaryField.render
-											key={ summaryField.id }
-											item={ data }
-											field={ summaryField }
-										/>
-									)
-								) }
-							</div>
-						) }
-
-						{ layout.isCollapsible && (
-							<Button
-								__next40pxDefaultSize
-								variant="tertiary"
-								icon={ isOpen ? chevronUp : chevronDown }
-								aria-expanded={ isOpen }
-								aria-label={
-									isOpen ? __( 'Collapse' ) : __( 'Expand' )
-								}
-								onClick={ onToggleButtonClick }
-							/>
-						) }
-					</div>
-				</OriginalCardHeader>
+				<CardHeader className="dataforms-layouts-card__field-header">
+					<span className="dataforms-layouts-card__field-header-label">
+						{ fieldDefinition.label }
+					</span>
+					{ validationBadge }
+					{ visibleSummaryFields.length > 0 && layout.withHeader && (
+						<div className="dataforms-layouts-card__field-summary">
+							{ visibleSummaryFields.map( ( summaryField ) => (
+								<summaryField.render
+									key={ summaryField.id }
+									item={ data }
+									field={ summaryField }
+								/>
+							) ) }
+						</div>
+					) }
+				</CardHeader>
 			) }
-
 			{ ( isOpen || ! withHeader ) && (
+				// If it doesn't have a header, keep it open.
+				// Otherwise, the card will not be visible.
 				<CardBody
 					size={ sizeCardBody }
 					className="dataforms-layouts-card__field-control"
