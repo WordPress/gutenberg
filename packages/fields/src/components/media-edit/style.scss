@@ -24,8 +24,11 @@ fieldset.fields__media-edit {
 	border: 0;
 	padding: 0;
 	margin: 0;
-
 	width: 100%;
+
+	.components-base-control__label {
+		color: $gray-900;
+	}
 
 	/* stylelint-disable-next-line property-no-unknown -- '@container' not globally permitted */
 	container-type: inline-size;
