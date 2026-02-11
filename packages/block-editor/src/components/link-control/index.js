@@ -311,6 +311,25 @@ function LinkControl( {
 		};
 	}, [] );
 
+	// Warn when inputValue changes after mount. inputValue only sets the
+	// initial value. The component is uncontrolled and changes
+	// from the parent will not update the search input.
+	const prevInputValueRef = useRef();
+	useEffect( () => {
+		if ( prevInputValueRef.current === undefined ) {
+			prevInputValueRef.current = propInputValue;
+			return;
+		}
+
+		if ( prevInputValueRef.current !== propInputValue ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				'LinkControl: The inputValue prop is uncontrolled and only sets the initial value. onInputChange is an observer for the input value. Changes to inputValue from the parent will not update the search input.'
+			);
+			prevInputValueRef.current = propInputValue;
+		}
+	}, [ propInputValue ] );
+
 	// Trigger validation display when customValidity becomes invalid.
 	// This effect runs after React has applied the customValidity state update
 	// and ControlWithError's useEffect has set the native validity on the input.
