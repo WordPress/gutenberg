@@ -2036,7 +2036,11 @@ class WP_Theme_JSON_Gutenberg {
 			return $feature;
 		}
 
-		return $feature['root'] ?? $default_selector;
+		if ( isset( $feature['root'] ) && is_string( $feature['root'] ) ) {
+			return $feature['root'];
+		}
+
+		return $default_selector;
 	}
 
 	/**
