@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**
  * Internal dependencies
@@ -175,6 +176,7 @@ export const clearEntityRecordEdits =
 	( kind, name, recordId, options = {} ) =>
 	( { select, dispatch } ) => {
 		const entityConfig = select.getEntityConfig( kind, name );
+		logEntityDeprecation( kind, name, 'clearEntityRecordEdits' );
 		if ( ! entityConfig ) {
 			throw new Error(
 				`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
