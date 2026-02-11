@@ -78,7 +78,10 @@ function UnforwardedLinkUI( props, ref ) {
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ addingPage, setAddingPage ] = useState( false );
 	const [ shouldFocusPane, setShouldFocusPane ] = useState( null );
-	const [ searchInputValue, setSearchInputValue ] = useState( '' );
+	// Tracks search input value. Only read when LinkControl remounts (Back from
+	// Create page) — ref updates don't cause re-renders, so we never pass a changed
+	// inputValue to LinkControl (which causes warnings since it's uncontrolled).
+	const searchInputValueRef = useRef( '' );
 	const linkControlWrapperRef = useRef();
 	const addPageButtonRef = useRef();
 	const addBlockButtonRef = useRef();
@@ -114,7 +117,7 @@ function UnforwardedLinkUI( props, ref ) {
 		setAddingPage( false );
 		setShouldFocusPane( true );
 		// Clear search input value
-		setSearchInputValue( '' );
+		searchInputValueRef.current = '';
 	};
 
 	const dialogTitleId = useInstanceId(
@@ -184,8 +187,10 @@ function UnforwardedLinkUI( props, ref ) {
 						noURLSuggestion={ !! type }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 						onChange={ props.onChange }
-						onInputChange={ setSearchInputValue }
-						inputValue={ searchInputValue }
+						onInputChange={ ( value ) => {
+							searchInputValueRef.current = value;
+						} }
+						inputValue={ searchInputValueRef.current }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
 						handleEntities={ isBoundEntityAvailable }
@@ -240,8 +245,9 @@ function UnforwardedLinkUI( props, ref ) {
 					} }
 					onPageCreated={ handlePageCreated }
 					initialTitle={
-						searchInputValue && ! isURL( searchInputValue )
-							? searchInputValue
+						searchInputValueRef.current &&
+						! isURL( searchInputValueRef.current )
+							? searchInputValueRef.current
 							: ''
 					}
 				/>
