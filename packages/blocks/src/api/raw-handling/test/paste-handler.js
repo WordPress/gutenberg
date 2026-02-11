@@ -7,6 +7,7 @@ import { pasteHandler } from '@wordpress/blocks';
  */
 import { init as initAndRegisterTableBlock } from '../../../../../block-library/src/table';
 import { init as initAndRegisterVideoBlock } from '../../../../../block-library/src/video';
+import { init as initAndRegisterEmbedBlock } from '../../../../../block-library/src/embed';
 
 const tableWithHeaderFooterAndBodyUsingColspan = `
 <table>
@@ -85,6 +86,7 @@ describe( 'pasteHandler', () => {
 	beforeAll( () => {
 		initAndRegisterTableBlock();
 		initAndRegisterVideoBlock();
+		initAndRegisterEmbedBlock();
 	} );
 
 	it( 'can handle a table with thead, tbody and tfoot using colspan', () => {
@@ -286,5 +288,61 @@ describe( 'pasteHandler', () => {
 		} );
 		expect( result.name ).toEqual( 'core/video' );
 		expect( result.isValid ).toBeTruthy();
+	} );
+
+	it( 'creates a video block when pasting a direct video URL', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<p>https://example.com/video.mp4</p>',
+			plainText: 'https://example.com/video.mp4',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result.name ).toEqual( 'core/video' );
+		expect( result.attributes.src ).toEqual(
+			'https://example.com/video.mp4'
+		);
+	} );
+
+	it( 'creates a video block for various video extensions', () => {
+		const extensions = [ 'mp4', 'webm', 'ogv', 'mov', 'avi' ];
+
+		for ( const ext of extensions ) {
+			const url = `https://example.com/video.${ ext }`;
+			const [ result ] = pasteHandler( {
+				HTML: `<p>${ url }</p>`,
+				plainText: url,
+				mode: 'BLOCKS',
+			} );
+
+			expect( result.name ).toEqual( 'core/video' );
+			expect( result.attributes.src ).toEqual( url );
+		}
+
+		expect( console ).toHaveLogged();
+	} );
+
+	it( 'creates a video block for video URLs with query parameters', () => {
+		const url = 'https://example.com/video.mp4?quality=hd&token=abc';
+		const [ result ] = pasteHandler( {
+			HTML: `<p>${ url }</p>`,
+			plainText: url,
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result.name ).toEqual( 'core/video' );
+		expect( result.attributes.src ).toEqual( url );
+	} );
+
+	it( 'creates an embed block for non-video URLs', () => {
+		const [ result ] = pasteHandler( {
+			HTML: '<p>https://www.youtube.com/watch?v=dQw4w9WgXcQ</p>',
+			plainText: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+			mode: 'BLOCKS',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( result.name ).toEqual( 'core/embed' );
 	} );
 } );
