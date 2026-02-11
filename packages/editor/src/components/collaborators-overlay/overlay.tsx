@@ -48,7 +48,11 @@ export function Overlay( {
 	// Merge the refs to use the same element for both overlay and resize observation
 	const mergedRef = useMergeRefs( [ overlayRef, resizeObserverRef ] );
 
-	useBlockHighlighting( document, postId ?? null, postType ?? null );
+	useBlockHighlighting(
+		blockEditorDocument ?? null,
+		postId ?? null,
+		postType ?? null
+	);
 
 	// Inject overlay styles into the iframe. The overlay renders inside the
 	// iframe (via BlockCanvasCover) but overlay.scss is loaded in the parent
