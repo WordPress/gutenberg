@@ -1,3 +1,4 @@
+@use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
 .dataforms-layouts-regular__field {
@@ -5,6 +6,11 @@
 	min-height: $grid-unit-40;
 	justify-content: flex-start !important;
 	align-items: flex-start !important;
+
+	.components-base-control__label,
+	.components-input-control__label {
+		color: $gray-700;
+	}
 }
 
 .dataforms-layouts-regular__field-label {

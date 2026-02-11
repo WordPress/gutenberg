@@ -1094,8 +1094,8 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
  * @return string Overlay close markup with the directives injected.
  */
 function block_core_navigation_add_directives_to_overlay_close( $tags ) {
-	// Find the navigation-overlay-close button.
-	if ( $tags->next_tag(
+	// Find all navigation-overlay-close buttons.
+	while ( $tags->next_tag(
 		array(
 			'tag_name'   => 'BUTTON',
 			'class_name' => 'wp-block-navigation-overlay-close',

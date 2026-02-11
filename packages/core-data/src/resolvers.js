@@ -185,8 +185,8 @@ export const getEntityRecord =
 								transientConfig.read( recordWithTransients );
 						} );
 
-					// Load the entity record for syncing.
-					await getSyncManager()?.load(
+					// Load the entity record for syncing. Do not await promise.
+					void getSyncManager()?.load(
 						entityConfig.syncConfig,
 						objectType,
 						objectId,

@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+- DataViews: Improve styling for filters when long values are in use. [#75369](https://github.com/WordPress/gutenberg/pull/75369)
 - DataForm: Fix label case for regular layout. [#75292](https://github.com/WordPress/gutenberg/pull/75292)
 - DataViews: Add title attribute in grid item title field. [#75085](https://github.com/WordPress/gutenberg/pull/75085)
 - DataViews: Fix title truncation in list layout. [#75063](https://github.com/WordPress/gutenberg/pull/75063)
@@ -15,6 +16,7 @@
 
 ### Enhancements
 
+- DataForm: Update trigger mechanism for panel layout. [#75290](https://github.com/WordPress/gutenberg/pull/75290)
 - DataViews: Add `onReset` prop to control view reset functionality from the view config dropdown. [#75093](https://github.com/WordPress/gutenberg/pull/75093)
 - DataForm: Add automatic field labeling - forms now automatically mark the minority of fields (required or optional) to reduce visual noise. [#74430](https://github.com/WordPress/gutenberg/pull/74430)
 - DataViews: Add details form layout validation. [#74996](https://github.com/WordPress/gutenberg/pull/74996)

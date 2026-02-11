@@ -5,6 +5,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 return array(
+	'accordion'                      => array(
+		'label'    => _x( 'Accordion', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/accordion.svg',
+	),
+	'accordion-heading'              => array(
+		'label'    => _x( 'Accordion Heading', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/accordion-heading.svg',
+	),
+	'accordion-item'                 => array(
+		'label'    => _x( 'Accordion Item', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/accordion-item.svg',
+	),
 	'add-card'                       => array(
 		'label'    => _x( 'Add Card', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/add-card.svg',
@@ -328,6 +340,10 @@ return array(
 	'create'                         => array(
 		'label'    => _x( 'Create', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/create.svg',
+	),
+	'contents'                       => array(
+		'label'    => _x( 'Contents', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/contents.svg',
 	),
 	'crop'                           => array(
 		'label'    => _x( 'Crop', 'icon label', 'gutenberg' ),
@@ -1180,6 +1196,22 @@ return array(
 	'tablet'                         => array(
 		'label'    => _x( 'Tablet', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/tablet.svg',
+	),
+	'tab'                            => array(
+		'label'    => _x( 'Tab', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/tab.svg',
+	),
+	'tabs'                           => array(
+		'label'    => _x( 'Tabs', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/tabs.svg',
+	),
+	'tabs-menu'                      => array(
+		'label'    => _x( 'Tabs Menu', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/tabs-menu.svg',
+	),
+	'tabs-menu-item'                 => array(
+		'label'    => _x( 'Tabs Menu Item', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/tabs-menu-item.svg',
 	),
 	'tag'                            => array(
 		'label'    => _x( 'Tag', 'icon label', 'gutenberg' ),

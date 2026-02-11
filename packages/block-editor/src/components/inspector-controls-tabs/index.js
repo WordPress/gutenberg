@@ -17,6 +17,7 @@ import { TAB_SETTINGS, TAB_STYLES, TAB_LIST_VIEW, TAB_CONTENT } from './utils';
 import SettingsTab from './settings-tab';
 import StylesTab from './styles-tab';
 import ContentTab from './content-tab';
+import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
 import InspectorControls from '../inspector-controls';
 import { unlock } from '../../lock-unlock';
 import { store as blockEditorStore } from '../../store';
@@ -31,6 +32,7 @@ export default function InspectorControlsTabs( {
 	isSectionBlock,
 	contentClientIds,
 } ) {
+	const listViewRef = useRef( null );
 	const showIconLabels = useSelect( ( select ) => {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
 	}, [] );
@@ -123,6 +125,18 @@ export default function InspectorControlsTabs( {
 						)
 					) }
 				</Tabs.TabList>
+				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
+					<ContentTab
+						contentClientIds={ contentClientIds }
+						onSwitchToListView={ switchToListView }
+						hasListViewTab={ hasListViewTab }
+					/>
+					<InspectorControls.Slot group="content" />
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name } focusable={ false }>
+					<InspectorControls.Slot group="list" ref={ listViewRef } />
+					<ListViewContentPopover listViewRef={ listViewRef } />
+				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_SETTINGS.name } focusable={ false }>
 					<SettingsTab showAdvancedControls={ !! blockName } />
 				</Tabs.TabPanel>
@@ -134,17 +148,6 @@ export default function InspectorControlsTabs( {
 						isSectionBlock={ isSectionBlock }
 						contentClientIds={ contentClientIds }
 					/>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
-					<ContentTab
-						contentClientIds={ contentClientIds }
-						onSwitchToListView={ switchToListView }
-						hasListViewTab={ hasListViewTab }
-					/>
-					<InspectorControls.Slot group="content" />
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name } focusable={ false }>
-					<InspectorControls.Slot group="list" />
 				</Tabs.TabPanel>
 			</Tabs>
 		</div>
