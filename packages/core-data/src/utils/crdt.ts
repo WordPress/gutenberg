@@ -160,7 +160,7 @@ export function applyPostChangesToCRDTDoc(
 		switch ( key ) {
 			case 'blocks': {
 				// Blocks can be undefined when they need to be re-parsed.
-				if ( newValue === undefined ) {
+				if ( ! newValue ) {
 					ymap.set( key, undefined );
 					break;
 				}
@@ -331,11 +331,14 @@ export function getPostChangesFromCRDTDoc(
 						editedRecord.content
 					) {
 						const blocks = ymap.get( 'blocks' ) as YBlocks;
-						return (
-							__unstableSerializeAndClean(
-								blocks.toJSON()
-							).trim() !== editedRecord.content.raw.trim()
-						);
+
+						if ( blocks ) {
+							return (
+								__unstableSerializeAndClean(
+									blocks.toJSON()
+								).trim() !== editedRecord.content.raw.trim()
+							);
+						}
 					}
 
 					// The consumers of blocks have memoization that renders optimization
