@@ -163,8 +163,10 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 			);
 		}
 
-		// Don't call destroy() as it can cause AbortError if there's a pending
-		// play() Promise. The DOM is already cleared via ref.innerHTML = '',
+		// TODO: Once @arraypress/waveform-player is updated with the isDestroying
+		// guards (PR #3), simplify this to just: existing.instance.destroy()
+		// For now, don't call destroy() as it can cause AbortError if there's a
+		// pending play() Promise. The DOM is already cleared via ref.innerHTML = '',
 		// and the old instance will be garbage collected.
 		playerState.delete( ref );
 	}
