@@ -29,8 +29,7 @@ const defaultRenderToggle = ( {
 	isOpen,
 	blockTitle,
 	hasSingleBlockType,
-	defaultBlock,
-	defaultBlockType,
+	appenderLabel,
 	toggleProps = {},
 } ) => {
 	const {
@@ -41,30 +40,20 @@ const defaultRenderToggle = ( {
 	} = toggleProps;
 
 	let label = labelProp;
-	if ( ! label && hasSingleBlockType ) {
+	if ( ! label && appenderLabel ) {
+		label = sprintf(
+			// translators: %s: the appender label for the default block
+			_x( 'Add %s', 'add default block type' ),
+			appenderLabel
+		);
+	} else if ( ! label && hasSingleBlockType ) {
 		label = sprintf(
 			// translators: %s: the name of the block when there is only one
 			_x( 'Add %s', 'directly add the only allowed block' ),
 			blockTitle.toLowerCase()
 		);
 	} else if ( ! label ) {
-		const appenderLabel = getAppenderLabel(
-			defaultBlock,
-			defaultBlockType
-		);
-
-		if ( appenderLabel ) {
-			label = sprintf(
-				// translators: %s: the appender label for the default block
-				_x( 'Add %s', 'add default block type' ),
-				appenderLabel
-			);
-		} else {
-			label = _x(
-				'Add block',
-				'Generic label for block inserter button'
-			);
-		}
+		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
 
 	// Handle both onClick functions from the toggle and the parent component.
@@ -126,8 +115,7 @@ class Inserter extends Component {
 			disabled,
 			blockTitle,
 			hasSingleBlockType,
-			directInsertBlock,
-			defaultBlockType,
+			appenderLabel,
 			toggleProps,
 			hasItems,
 			renderToggle = defaultRenderToggle,
@@ -139,8 +127,7 @@ class Inserter extends Component {
 			disabled: disabled || ! hasItems,
 			blockTitle,
 			hasSingleBlockType,
-			defaultBlock: directInsertBlock,
-			defaultBlockType,
+			appenderLabel,
 			toggleProps,
 		} );
 	}
@@ -271,6 +258,10 @@ export default compose( [
 			const defaultBlockType = directInsertBlock
 				? getBlockType( directInsertBlock.name )
 				: null;
+			const appenderLabel = getAppenderLabel(
+				directInsertBlock,
+				defaultBlockType
+			);
 
 			return {
 				hasItems: hasInserterItems( rootClientId ),
@@ -278,7 +269,7 @@ export default compose( [
 				blockTitle: allowedBlockType ? allowedBlockType.title : '',
 				allowedBlockType,
 				directInsertBlock,
-				defaultBlockType,
+				appenderLabel,
 				rootClientId,
 			};
 		}
