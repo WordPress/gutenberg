@@ -65,43 +65,27 @@ import { colord } from 'colord';
 const DEFAULT_WAVEFORM_HEIGHT = 100;
 
 /**
- * Get the effective background color, falling back to body if transparent.
+ * Get computed style for an element, using ownerDocument for iframe compatibility.
  *
- * @param {Element} element - The element to get the background color from.
- * @return {string} The background color.
+ * @param {Element} element - The element to get styles from.
+ * @return {CSSStyleDeclaration} The computed style.
  */
-function getEffectiveBackgroundColor( element ) {
-	const blockContainer = element.closest( '.wp-block-playlist' );
-	let bgColor = blockContainer
-		? window.getComputedStyle( blockContainer ).backgroundColor
-		: window.getComputedStyle( element ).backgroundColor;
-
-	const isTransparent =
-		! bgColor ||
-		bgColor === 'transparent' ||
-		bgColor === 'rgba(0, 0, 0, 0)' ||
-		bgColor.match( /rgba\([^)]+,\s*0\s*\)/ );
-
-	if ( isTransparent ) {
-		bgColor = window.getComputedStyle( document.body ).backgroundColor;
-	}
-
-	return bgColor;
+function getComputedStyle( element ) {
+	return element.ownerDocument.defaultView.getComputedStyle( element );
 }
 
 /**
  * Get all colors needed for the waveform player based on the element's styles.
  *
  * @param {Element} element - The element to derive colors from.
- * @return {Object} Object containing textColor, bgColor, waveformColor, progressColor.
+ * @return {Object} Object containing textColor, waveformColor, progressColor.
  */
 export function getWaveformColors( element ) {
-	const textColor = window.getComputedStyle( element ).color;
-	const bgColor = getEffectiveBackgroundColor( element );
+	const textColor = getComputedStyle( element ).color;
 	const waveformColor = colord( textColor ).alpha( 0.3 ).toRgbString();
 	const progressColor = colord( textColor ).alpha( 0.6 ).toRgbString();
 
-	return { textColor, bgColor, waveformColor, progressColor };
+	return { textColor, waveformColor, progressColor };
 }
 
 /**
