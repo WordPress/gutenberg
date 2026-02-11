@@ -1,11 +1,16 @@
 /**
+ * WordPress dependencies
+ */
+import { _x, sprintf } from '@wordpress/i18n';
+
+/**
  * The __experimentalLabel function extracted for isolated testing.
  * This avoids importing the full settings object which has complex dependencies.
  *
  * @param {Object} attributes    Block attributes.
  * @param {Object} root0         Options object.
  * @param {string} root0.context The context for the label.
- * @return {string|undefined}             The label for the given context.
+ * @return {string|undefined}    The label for the given context.
  */
 const __experimentalLabel = ( attributes, { context } ) => {
 	if ( context === 'list-view' ) {
@@ -13,8 +18,12 @@ const __experimentalLabel = ( attributes, { context } ) => {
 	}
 
 	if ( context === 'appender' ) {
-		// Return the type (e.g., 'page', 'post', 'category') or fallback to 'link'
-		return attributes?.type || 'link';
+		const type = attributes?.type || 'link';
+		return sprintf(
+			/* translators: %s: block type (e.g., 'page', 'post', 'category') */
+			_x( 'Add %s', 'add default block type' ),
+			type
+		);
 	}
 
 	// Backwards compatibility - return label for unknown contexts
@@ -23,7 +32,7 @@ const __experimentalLabel = ( attributes, { context } ) => {
 
 describe( 'Navigation Link Block Labelling', () => {
 	describe( 'appender context', () => {
-		it( 'should return "page" for post-type with type "page"', () => {
+		it( 'should return "Add page" for post-type with type "page"', () => {
 			const attributes = {
 				kind: 'post-type',
 				type: 'page',
@@ -33,10 +42,10 @@ describe( 'Navigation Link Block Labelling', () => {
 				context: 'appender',
 			} );
 
-			expect( result ).toBe( 'page' );
+			expect( result ).toBe( 'Add page' );
 		} );
 
-		it( 'should return "post" for post-type with type "post"', () => {
+		it( 'should return "Add post" for post-type with type "post"', () => {
 			const attributes = {
 				kind: 'post-type',
 				type: 'post',
@@ -46,10 +55,10 @@ describe( 'Navigation Link Block Labelling', () => {
 				context: 'appender',
 			} );
 
-			expect( result ).toBe( 'post' );
+			expect( result ).toBe( 'Add post' );
 		} );
 
-		it( 'should return "category" for taxonomy with type "category"', () => {
+		it( 'should return "Add category" for taxonomy with type "category"', () => {
 			const attributes = {
 				kind: 'taxonomy',
 				type: 'category',
@@ -59,10 +68,10 @@ describe( 'Navigation Link Block Labelling', () => {
 				context: 'appender',
 			} );
 
-			expect( result ).toBe( 'category' );
+			expect( result ).toBe( 'Add category' );
 		} );
 
-		it( 'should return "tag" for taxonomy with type "post_tag"', () => {
+		it( 'should return "Add post_tag" for taxonomy with type "post_tag"', () => {
 			const attributes = {
 				kind: 'taxonomy',
 				type: 'post_tag',
@@ -72,7 +81,7 @@ describe( 'Navigation Link Block Labelling', () => {
 				context: 'appender',
 			} );
 
-			expect( result ).toBe( 'post_tag' );
+			expect( result ).toBe( 'Add post_tag' );
 		} );
 
 		it( 'should return type even for unknown kind', () => {
@@ -85,7 +94,7 @@ describe( 'Navigation Link Block Labelling', () => {
 				context: 'appender',
 			} );
 
-			expect( result ).toBe( 'something' );
+			expect( result ).toBe( 'Add something' );
 		} );
 
 		it( 'should return type when kind is missing', () => {
@@ -97,33 +106,33 @@ describe( 'Navigation Link Block Labelling', () => {
 				context: 'appender',
 			} );
 
-			expect( result ).toBe( 'page' );
+			expect( result ).toBe( 'Add page' );
 		} );
 
-		it( 'should return "link" when attributes are empty', () => {
+		it( 'should return "Add link" when attributes are empty', () => {
 			const attributes = {};
 
 			const result = __experimentalLabel( attributes, {
 				context: 'appender',
 			} );
 
-			expect( result ).toBe( 'link' );
+			expect( result ).toBe( 'Add link' );
 		} );
 
-		it( 'should return "link" when attributes are null', () => {
+		it( 'should return "Add link" when attributes are null', () => {
 			const result = __experimentalLabel( null, {
 				context: 'appender',
 			} );
 
-			expect( result ).toBe( 'link' );
+			expect( result ).toBe( 'Add link' );
 		} );
 
-		it( 'should return "link" when attributes are undefined', () => {
+		it( 'should return "Add link" when attributes are undefined', () => {
 			const result = __experimentalLabel( undefined, {
 				context: 'appender',
 			} );
 
-			expect( result ).toBe( 'link' );
+			expect( result ).toBe( 'Add link' );
 		} );
 
 		it( 'should handle custom post types', () => {
@@ -136,7 +145,7 @@ describe( 'Navigation Link Block Labelling', () => {
 				context: 'appender',
 			} );
 
-			expect( result ).toBe( 'product' );
+			expect( result ).toBe( 'Add product' );
 		} );
 
 		it( 'should handle custom taxonomies', () => {
@@ -149,7 +158,7 @@ describe( 'Navigation Link Block Labelling', () => {
 				context: 'appender',
 			} );
 
-			expect( result ).toBe( 'product_category' );
+			expect( result ).toBe( 'Add product_category' );
 		} );
 	} );
 
@@ -218,7 +227,7 @@ describe( 'Navigation Link Block Labelling', () => {
 				context: 'appender',
 			} );
 
-			expect( result ).toBe( 'page' );
+			expect( result ).toBe( 'Add page' );
 		} );
 
 		it( 'should work with Navigation block default block for posts', () => {
@@ -231,7 +240,7 @@ describe( 'Navigation Link Block Labelling', () => {
 				context: 'appender',
 			} );
 
-			expect( result ).toBe( 'post' );
+			expect( result ).toBe( 'Add post' );
 		} );
 	} );
 } );

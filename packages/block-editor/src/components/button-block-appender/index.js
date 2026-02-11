@@ -43,11 +43,8 @@ function ButtonBlockAppender(
 
 				let label;
 				if ( appenderLabel ) {
-					label = sprintf(
-						// translators: %s: the appender label for the default block
-						_x( 'Add %s', 'add default block type' ),
-						appenderLabel
-					);
+					// Block returns the full label; use directly (consistent with getBlockLabel).
+					label = appenderLabel;
 				} else if ( hasSingleBlockType ) {
 					label = sprintf(
 						// translators: %s: the name of the block when there is only one

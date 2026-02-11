@@ -55,7 +55,7 @@ describe( 'getAppenderLabel', () => {
 			attributes: { type: 'page', kind: 'post-type' },
 		};
 		const defaultBlockType = {
-			__experimentalLabel: jest.fn( () => 'page' ),
+			__experimentalLabel: jest.fn( () => 'Add page' ),
 		};
 
 		getAppenderLabel( defaultBlock, defaultBlockType );
@@ -66,18 +66,33 @@ describe( 'getAppenderLabel', () => {
 		);
 	} );
 
-	it( 'should return the label in lowercase', () => {
+	it( 'should return the label as-is without modification', () => {
 		const defaultBlock = {
 			name: 'core/test',
 			attributes: { type: 'page' },
 		};
+		const fullLabel = 'Add page';
 		const defaultBlockType = {
-			__experimentalLabel: jest.fn( () => 'PAGE' ),
+			__experimentalLabel: jest.fn( () => fullLabel ),
 		};
 
 		const result = getAppenderLabel( defaultBlock, defaultBlockType );
 
-		expect( result ).toBe( 'page' );
+		expect( result ).toBe( fullLabel );
+	} );
+
+	it( 'should return arbitrary label from __experimentalLabel regardless of attributes', () => {
+		const defaultBlock = {
+			name: 'core/custom',
+			attributes: { foo: 'bar' },
+		};
+		const defaultBlockType = {
+			__experimentalLabel: jest.fn( () => 'This is a test' ),
+		};
+
+		const result = getAppenderLabel( defaultBlock, defaultBlockType );
+
+		expect( result ).toBe( 'This is a test' );
 	} );
 
 	it( 'should return null when __experimentalLabel returns null', () => {
@@ -177,13 +192,20 @@ describe( 'getAppenderLabel', () => {
 
 		const result = getAppenderLabel( defaultBlock, defaultBlockType );
 
-		// Empty string is technically a valid string, but it's falsy
-		// The function returns the empty string lowercased, which is still ''
-		expect( result ).toBe( '' );
+		expect( result ).toBeNull();
 	} );
 
 	describe( 'Navigation Link block integration', () => {
-		it( 'should return "page" for Navigation Link page variation', () => {
+		// Navigation Link returns the full label (e.g. "Add page") for appender context.
+		const navigationLinkAppenderLabel = ( attributes, { context } ) => {
+			if ( context === 'appender' ) {
+				const type = attributes?.type || 'link';
+				return `Add ${ type }`;
+			}
+			return attributes?.label;
+		};
+
+		it( 'should return "Add page" for Navigation Link page variation', () => {
 			const defaultBlock = {
 				name: 'core/navigation-link',
 				attributes: {
@@ -192,20 +214,15 @@ describe( 'getAppenderLabel', () => {
 				},
 			};
 			const defaultBlockType = {
-				__experimentalLabel: ( attributes, { context } ) => {
-					if ( context === 'appender' ) {
-						return attributes?.type || 'link';
-					}
-					return attributes?.label;
-				},
+				__experimentalLabel: navigationLinkAppenderLabel,
 			};
 
 			const result = getAppenderLabel( defaultBlock, defaultBlockType );
 
-			expect( result ).toBe( 'page' );
+			expect( result ).toBe( 'Add page' );
 		} );
 
-		it( 'should return "post" for Navigation Link post variation', () => {
+		it( 'should return "Add post" for Navigation Link post variation', () => {
 			const defaultBlock = {
 				name: 'core/navigation-link',
 				attributes: {
@@ -214,20 +231,15 @@ describe( 'getAppenderLabel', () => {
 				},
 			};
 			const defaultBlockType = {
-				__experimentalLabel: ( attributes, { context } ) => {
-					if ( context === 'appender' ) {
-						return attributes?.type || 'link';
-					}
-					return attributes?.label;
-				},
+				__experimentalLabel: navigationLinkAppenderLabel,
 			};
 
 			const result = getAppenderLabel( defaultBlock, defaultBlockType );
 
-			expect( result ).toBe( 'post' );
+			expect( result ).toBe( 'Add post' );
 		} );
 
-		it( 'should return "category" for Navigation Link category variation', () => {
+		it( 'should return "Add category" for Navigation Link category variation', () => {
 			const defaultBlock = {
 				name: 'core/navigation-link',
 				attributes: {
@@ -236,17 +248,12 @@ describe( 'getAppenderLabel', () => {
 				},
 			};
 			const defaultBlockType = {
-				__experimentalLabel: ( attributes, { context } ) => {
-					if ( context === 'appender' ) {
-						return attributes?.type || 'link';
-					}
-					return attributes?.label;
-				},
+				__experimentalLabel: navigationLinkAppenderLabel,
 			};
 
 			const result = getAppenderLabel( defaultBlock, defaultBlockType );
 
-			expect( result ).toBe( 'category' );
+			expect( result ).toBe( 'Add category' );
 		} );
 	} );
 } );

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x, __ } from '@wordpress/i18n';
+import { _x, __, sprintf } from '@wordpress/i18n';
 import { customLink as linkIcon } from '@wordpress/icons';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
@@ -33,8 +33,12 @@ export const settings = {
 		}
 
 		if ( context === 'appender' ) {
-			// Return the type (e.g., 'page', 'post', 'category') or fallback to 'link'
-			return attributes?.type || 'link';
+			const type = attributes?.type || 'link';
+			return sprintf(
+				/* translators: %s: block type (e.g., 'page', 'post', 'category') */
+				_x( 'Add %s', 'add default block type' ),
+				type
+			);
 		}
 
 		// Backwards compatibility - return label for unknown contexts
