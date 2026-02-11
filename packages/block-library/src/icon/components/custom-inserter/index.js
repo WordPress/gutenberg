@@ -8,7 +8,7 @@ import removeAccents from 'remove-accents';
  */
 import { __ } from '@wordpress/i18n';
 import { Modal, SearchControl } from '@wordpress/components';
-import { useState, useMemo } from '@wordpress/element';
+import { useState, useMemo, useCallback } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 
 /**
@@ -32,12 +32,15 @@ export default function CustomInserterModal( {
 
 	const debouncedSetSearchInput = useDebounce( setSearchInput, 300 );
 
-	function updateIconAtts( name ) {
-		setAttributes( {
-			icon: name,
-		} );
-		setInserterOpen( false );
-	}
+	const setIcon = useCallback(
+		( name ) => {
+			setAttributes( {
+				icon: name,
+			} );
+			setInserterOpen( false );
+		},
+		[ setAttributes, setInserterOpen ]
+	);
 
 	const filteredIcons = useMemo( () => {
 		if ( searchInput ) {
@@ -70,8 +73,8 @@ export default function CustomInserterModal( {
 					/>
 				</div>
 				<IconGrid
-					shownIcons={ filteredIcons }
-					updateIconAtts={ updateIconAtts }
+					icons={ filteredIcons }
+					onChange={ setIcon }
 					attributes={ attributes }
 				/>
 			</div>

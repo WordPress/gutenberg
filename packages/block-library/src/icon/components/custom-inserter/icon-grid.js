@@ -9,12 +9,10 @@ import { Button } from '@wordpress/components';
  */
 import HtmlRenderer from '../../../utils/html-renderer';
 
-export default function IconGrid( props ) {
-	const { shownIcons, updateIconAtts, attributes } = props;
-
+export default function IconGrid( { icons, onChange, attributes } ) {
 	return (
 		<div className="wp-block-icon__inserter-grid">
-			{ shownIcons.length === 0 ? (
+			{ icons.length === 0 ? (
 				<div className="wp-block-icon__inserter-grid-no-results">
 					<p>{ __( 'No results found.' ) }</p>
 				</div>
@@ -23,12 +21,12 @@ export default function IconGrid( props ) {
 					className="wp-block-icon__inserter-grid-icons-list"
 					aria-label={ __( 'Icon library' ) }
 				>
-					{ shownIcons.map( ( icon ) => {
+					{ icons.map( ( icon ) => {
 						return (
 							<Button
-								key={ `icon-${ icon.name }` }
+								key={ icon.name }
 								className="wp-block-icon__inserter-grid-icons-list-item"
-								onClick={ () => updateIconAtts( icon.name ) }
+								onClick={ () => onChange( icon.name ) }
 								variant={
 									icon.name === attributes?.icon
 										? 'primary'
@@ -40,7 +38,7 @@ export default function IconGrid( props ) {
 									<HtmlRenderer
 										html={ icon.content }
 										wrapperProps={ {
-											style: { width: `24px` },
+											style: { width: '24px' },
 										} }
 									/>
 								</span>
