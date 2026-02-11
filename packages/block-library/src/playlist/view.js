@@ -61,39 +61,6 @@ const { state } = store(
 				context.currentId = context.uniqueId;
 				context.isPlaying = true;
 			},
-			isPlaying() {
-				const context = getContext();
-				context.isPlaying = true;
-			},
-			isPaused() {
-				const context = getContext();
-				context.isPlaying = false;
-			},
-			nextSong( event ) {
-				const { ref } = getElement();
-
-				// Check if this event is for this specific player instance.
-				if ( event?.detail?.element && event.detail.element !== ref ) {
-					return;
-				}
-
-				const context = getContext();
-				const currentIndex = context.tracks.findIndex(
-					( uniqueId ) => uniqueId === context.currentId
-				);
-				const nextTrack = context.tracks[ currentIndex + 1 ];
-				if ( nextTrack ) {
-					context.currentId = nextTrack;
-					// Waits a moment before changing the track, since
-					// immediately changing the track can be jarring.
-					setTimeout( () => {
-						const audio = ref.querySelector( 'audio' );
-						if ( audio ) {
-							audio.play();
-						}
-					}, NEXT_TRACK_DELAY );
-				}
-			},
 		},
 		callbacks: {
 			initWaveformPlayer() {
@@ -133,7 +100,7 @@ const { state } = store(
 				// This ensures only the last clicked track gets initialized.
 				const timeoutId = setTimeout( () => {
 					pendingInit.delete( ref );
-					initPlayer( ref, track, shouldAutoPlay );
+					initPlayer( ref, track, shouldAutoPlay, context );
 				}, 50 );
 
 				pendingInit.set( ref, timeoutId );
@@ -149,8 +116,9 @@ const { state } = store(
  * @param {Element} ref            - The container element.
  * @param {Object}  track          - The track data.
  * @param {boolean} shouldAutoPlay - Whether to auto-play after initialization.
+ * @param {Object}  context        - The Interactivity API context.
  */
-function initPlayer( ref, track, shouldAutoPlay ) {
+function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const existing = playerState.get( ref );
 
 	// Double-check we haven't already initialized this URL
@@ -163,9 +131,9 @@ function initPlayer( ref, track, shouldAutoPlay ) {
 	if ( existing ) {
 		const {
 			container: existingContainer,
-			handlers,
 			playBtn,
 			keyboardHandler,
+			eventHandlers,
 		} = existing;
 
 		// Pause the old audio first to prevent AbortError
@@ -178,20 +146,23 @@ function initPlayer( ref, track, shouldAutoPlay ) {
 		if ( playBtn && keyboardHandler ) {
 			playBtn.removeEventListener( 'keydown', keyboardHandler );
 		}
-		if ( existingContainer && handlers ) {
+
+		// Remove WaveformPlayer event listeners.
+		if ( eventHandlers && existingContainer ) {
 			existingContainer.removeEventListener(
 				'waveformplayer:ended',
-				handlers.ended
+				eventHandlers.handleEnded
 			);
 			existingContainer.removeEventListener(
 				'waveformplayer:play',
-				handlers.play
+				eventHandlers.handlePlay
 			);
 			existingContainer.removeEventListener(
 				'waveformplayer:pause',
-				handlers.pause
+				eventHandlers.handlePause
 			);
 		}
+
 		// Don't call destroy() as it can cause AbortError if there's a pending
 		// play() Promise. The DOM is already cleared via ref.innerHTML = '',
 		// and the old instance will be garbage collected.
@@ -261,51 +232,46 @@ function initPlayer( ref, track, shouldAutoPlay ) {
 		playBtn.addEventListener( 'keydown', keyboardHandler );
 	}
 
-	// Create event handlers for WaveformPlayer events.
+	// Create event handlers using WaveformPlayer's custom events.
+	// Events are dispatched on the container element.
 	const handleEnded = () => {
-		ref.dispatchEvent(
-			new CustomEvent( 'waveform-ended', {
-				bubbles: true,
-				detail: { element: ref },
-			} )
+		// Advance to next track.
+		const currentIndex = context.tracks.findIndex(
+			( uniqueId ) => uniqueId === context.currentId
 		);
+		const nextTrack = context.tracks[ currentIndex + 1 ];
+		if ( nextTrack ) {
+			context.currentId = nextTrack;
+			// Wait before playing next track to avoid jarring transition.
+			setTimeout( () => {
+				const nextAudio = ref.querySelector( 'audio' );
+				if ( nextAudio ) {
+					nextAudio.play();
+				}
+			}, NEXT_TRACK_DELAY );
+		}
 	};
-
 	const handlePlay = () => {
-		ref.dispatchEvent(
-			new CustomEvent( 'waveform-play', {
-				bubbles: true,
-				detail: { element: ref },
-			} )
-		);
+		context.isPlaying = true;
 	};
-
 	const handlePause = () => {
-		ref.dispatchEvent(
-			new CustomEvent( 'waveform-pause', {
-				bubbles: true,
-				detail: { element: ref },
-			} )
-		);
+		context.isPlaying = false;
 	};
 
-	// Add event listeners.
 	container.addEventListener( 'waveformplayer:ended', handleEnded );
 	container.addEventListener( 'waveformplayer:play', handlePlay );
 	container.addEventListener( 'waveformplayer:pause', handlePause );
 
-	// Store all state for cleanup.
+	const eventHandlers = { handleEnded, handlePlay, handlePause };
+
+	// Store state for cleanup.
 	playerState.set( ref, {
 		url: track.url,
 		instance,
 		container,
 		playBtn,
 		keyboardHandler,
-		handlers: {
-			ended: handleEnded,
-			play: handlePlay,
-			pause: handlePause,
-		},
+		eventHandlers,
 	} );
 
 	// Auto-play if switching tracks (user action), not on initial page load.

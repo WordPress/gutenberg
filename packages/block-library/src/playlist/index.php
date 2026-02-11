@@ -98,9 +98,6 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 
 	// Add waveform player container.
 	$html = '<div class="wp-block-playlist__waveform-player"
-		data-wp-on--waveform-ended="actions.nextSong"
-		data-wp-on--waveform-play="actions.isPlaying"
-		data-wp-on--waveform-pause="actions.isPaused"
 		data-wp-watch="callbacks.initWaveformPlayer"
 	></div>';
 
