@@ -196,16 +196,6 @@ fieldset.fields__media-edit {
 			@include preview-overlay;
 		}
 
-		.fields__media-edit-expanded-title {
-			position: absolute;
-			bottom: $grid-unit-05;
-			left: $grid-unit-05;
-			right: $grid-unit-05;
-			padding: $grid-unit-05;
-			text-align: center;
-			@include preview-overlay;
-		}
-
 		.fields__media-edit-expanded-item {
 			position: relative;
 			min-width: 0;
