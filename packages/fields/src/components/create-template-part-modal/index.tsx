@@ -99,10 +99,7 @@ const getTemplatePartIcon = ( areaOrIconName: string ) => {
 		return footerIcon;
 	} else if ( 'sidebar' === areaOrIconName ) {
 		return sidebarIcon;
-	} else if (
-		'overlay' === areaOrIconName || // Backwards compat: remove once Core PR is merged and packages sync (see #75249).
-		'navigation-overlay' === areaOrIconName
-	) {
+	} else if ( 'navigation-overlay' === areaOrIconName ) {
 		return navigationOverlayIcon;
 	}
 	return symbolFilledIcon;
