@@ -5,7 +5,7 @@ import {
 	header as headerIcon,
 	footer as footerIcon,
 	sidebar as sidebarIcon,
-	tableColumnAfter as overlayIcon,
+	navigationOverlay as navigationOverlayIcon,
 	symbolFilled as symbolFilledIcon,
 } from '@wordpress/icons';
 
@@ -24,16 +24,15 @@ export function getTemplatePartIcon( areaOrIconName ) {
 		return footerIcon;
 	} else if ( 'sidebar' === areaOrIconName ) {
 		return sidebarIcon;
-	} else if ( 'overlay' === areaOrIconName ) {
-		// TODO: Replace with a proper overlay icon when available.
-		// Using tableColumnAfter as a placeholder.
-		return overlayIcon;
+	} else if (
+		'overlay' === areaOrIconName || // Backwards compat: remove once Core PR is merged and packages sync (see #75249).
+		'navigation-overlay' === areaOrIconName
+	) {
+		return navigationOverlayIcon;
 	}
-	// Handle icon names for backwards compatibility
+	// Handle icon names for backwards compatibility.
 	if ( 'menu' === areaOrIconName ) {
-		// TODO: Replace with a proper overlay icon when available.
-		// Using tableColumnAfter as a placeholder.
-		return overlayIcon;
+		return navigationOverlayIcon;
 	}
 	return symbolFilledIcon;
 }

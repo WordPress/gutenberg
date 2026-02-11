@@ -59,7 +59,7 @@ function gutenberg_register_overlay_template_part_area( $areas ) {
 		'area'        => 'navigation-overlay',
 		'label'       => __( 'Navigation Overlay', 'gutenberg' ),
 		'description' => __( 'Custom overlay area for navigation overlays.', 'gutenberg' ),
-		'icon'        => 'overlay',
+		'icon'        => 'navigation-overlay',
 		'area_tag'    => 'div',
 	);
 
