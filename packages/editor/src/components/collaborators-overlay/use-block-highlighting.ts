@@ -1,9 +1,18 @@
-import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
+/**
+ * WordPress dependencies
+ */
+import {
+	privateApis as coreDataPrivateApis,
+	type SelectionWholeBlock,
+} from '@wordpress/core-data';
 import { useEffect, useRef } from '@wordpress/element';
-import { unlock } from '../../lock-unlock';
-import { SelectionType, type SelectionWholeBlock } from './selection';
 
-const { useActiveCollaborators } = unlock( coreDataPrivateApis );
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../../lock-unlock';
+
+const { SelectionType, useActiveCollaborators } = unlock( coreDataPrivateApis );
 
 /**
  * Custom hook for highlighting selected blocks in the editor

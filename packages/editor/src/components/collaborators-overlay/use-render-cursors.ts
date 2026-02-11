@@ -1,12 +1,12 @@
-import { privateApis as coreDataPrivateApis } from '@wordpress/core-data';
-import { type RefObject, useEffect, useMemo } from '@wordpress/element';
-
-import { type CursorRegistry } from './cursor-registry';
 import {
+	privateApis as coreDataPrivateApis,
 	type SelectionCursor,
 	type SelectionState,
 	SelectionType,
-} from './selection';
+} from '@wordpress/core-data';
+import { type RefObject, useEffect, useMemo } from '@wordpress/element';
+
+import { type CursorRegistry } from './cursor-registry';
 import { unlock } from '../../lock-unlock';
 
 const { useActiveCollaborators, useGetAbsolutePositionIndex } =
