@@ -1,0 +1,27 @@
+// Figma design tokens from Content guidelines
+$content-guidelines-gray-900: #1e1e1e;
+$content-guidelines-gray-700: #757575;
+$content-guidelines-gray-200: #e0e0e0;
+$content-guidelines-white: #fff;
+$content-guidelines-radius-l: 8px;
+$content-guidelines-grid-20: 16px;
+$content-guidelines-grid-30: 24px;
+
+.content-guidelines__content {
+	margin-top: 0;
+	padding: $content-guidelines-grid-30;
+	border-radius: $content-guidelines-radius-l;
+}
+
+.content-guidelines__list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	flex-direction: column;
+	gap: $content-guidelines-grid-20;
+}
+
+.content-guidelines__list-item {
+	margin-bottom: 0;
+}

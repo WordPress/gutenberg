@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { GuidelineCategories, BlockGuidelines } from '../store/constants';
+import type { GuidelineCategories, BlockGuidelines } from '../types';
 
 /**
  * Shape of a single block entry in the flat import/export format.
@@ -92,7 +92,7 @@ export function validateImportJson( data: unknown ): {
 }
 
 /**
- * Maps the flat import JSON structure to the internal store model.
+ * Maps the flat import JSON structure to the internal model.
  *
  * @param flatJson Validated import data.
  * @return Guideline categories in the internal format.
@@ -119,9 +119,9 @@ export function mapImportToInternal(
 }
 
 /**
- * Maps the internal store model to the flat export JSON structure.
+ * Maps the internal model to the flat export JSON structure.
  *
- * @param categories The guideline categories from the store.
+ * @param categories The guideline categories.
  * @return The flat export schema ready for serialisation.
  */
 export function mapInternalToExport(

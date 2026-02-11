@@ -1,11 +1,3 @@
-/**
- * Store name.
- */
-export const STORE_NAME = 'content-guidelines';
-
-/**
- * Types for the store.
- */
 export interface CategoryGuideline {
 	label?: string;
 	guidelines: string;
@@ -30,9 +22,7 @@ export interface Guidelines {
 	status: 'draft' | 'published';
 	guideline_categories: GuidelineCategories;
 	date?: string;
-	date_gmt?: string;
 	modified?: string;
-	modified_gmt?: string;
 	author?: number;
 	author_name?: string;
 }
@@ -43,28 +33,6 @@ export interface Revision {
 	author_name: string;
 }
 
-export interface RevisionPagination {
-	currentPage: number;
-	totalPages: number;
-	totalItems: number;
-	perPage: number;
-}
-
-export interface State {
-	guidelines: Guidelines | null;
-	originalGuidelines: Guidelines | null;
-	isLoading: boolean;
-	isSaving: boolean;
-	error: string | null;
-	revisions: Revision[];
-	isLoadingRevisions: boolean;
-	isRestoring: number | null;
-	revisionPagination: RevisionPagination;
-}
-
-/**
- * Default guideline categories.
- */
 export const DEFAULT_CATEGORIES: GuidelineCategories = {
 	copy: {
 		label: 'Copy Guidelines',
@@ -82,25 +50,5 @@ export const DEFAULT_CATEGORIES: GuidelineCategories = {
 	other: {
 		label: 'Other Guidelines',
 		guidelines: '',
-	},
-};
-
-/**
- * Default state.
- */
-export const DEFAULT_STATE: State = {
-	guidelines: null,
-	originalGuidelines: null,
-	isLoading: false,
-	isSaving: false,
-	error: null,
-	revisions: [],
-	isLoadingRevisions: false,
-	isRestoring: null,
-	revisionPagination: {
-		currentPage: 1,
-		totalPages: 1,
-		totalItems: 0,
-		perPage: 5,
 	},
 };

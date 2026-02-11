@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useRef, useState, useCallback } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -13,41 +12,34 @@ import {
 	Button,
 	Notice,
 	FlexItem,
-	__experimentalUseNavigator as useNavigator,
+	useNavigator,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
-import { store } from '../../store';
+import type { GuidelineCategories } from '../types';
 import {
 	validateImportJson,
 	mapImportToInternal,
 	mapInternalToExport,
-} from '../../utils/import-export';
-import type { ExportSchema } from '../../utils/import-export';
-import type { Guidelines } from '../../store/constants';
+} from '../utils/import-export';
+import type { ExportSchema } from '../utils/import-export';
 
-export default function ActionsSection() {
+interface ActionsSectionProps {
+	guidelines: GuidelineCategories | null;
+	onImport: ( categories: GuidelineCategories ) => void;
+}
+
+export default function ActionsSection( {
+	guidelines,
+	onImport,
+}: ActionsSectionProps ) {
 	const fileInputRef = useRef< HTMLInputElement >( null );
 	const [ importError, setImportError ] = useState< string | null >( null );
 	const { goTo } = useNavigator();
 
-	const { guidelines } = useSelect( ( select ) => {
-		const selectors = select( store );
-		return {
-			guidelines: selectors.getGuidelines(),
-		};
-	}, [] );
-
-	const { saveGuidelines } = useDispatch( store );
-	const { createSuccessNotice } = useDispatch( noticesStore );
-
-	/**
-	 * Handles the file input change event for importing guidelines.
-	 */
 	const handleImport = useCallback(
 		( event: React.ChangeEvent< HTMLInputElement > ) => {
 			const file = event.target.files?.[ 0 ];
@@ -60,7 +52,7 @@ export default function ActionsSection() {
 
 			const reader = new FileReader();
 
-			reader.onload = async ( e ) => {
+			reader.onload = ( e ) => {
 				try {
 					const text = e.target?.result;
 					if ( typeof text !== 'string' ) {
@@ -92,25 +84,8 @@ export default function ActionsSection() {
 						parsed as ExportSchema
 					);
 
-					// Build the full Guidelines object, preserving metadata
-					// from existing guidelines or creating defaults.
-					const updatedGuidelines: Guidelines = {
-						id: guidelines?.id ?? 0,
-						status: guidelines?.status ?? 'published',
-						guideline_categories: categories,
-						date: guidelines?.date,
-						modified: new Date().toISOString(),
-						author: guidelines?.author,
-						author_name: guidelines?.author_name,
-					};
-
-					await saveGuidelines( updatedGuidelines );
-
+					onImport( categories );
 					setImportError( null );
-					createSuccessNotice(
-						__( 'Content guidelines imported successfully.' ),
-						{ type: 'snackbar' }
-					);
 				} catch {
 					setImportError(
 						__( 'An error occurred while importing guidelines.' )
@@ -124,20 +99,15 @@ export default function ActionsSection() {
 
 			reader.readAsText( file );
 		},
-		[ guidelines, saveGuidelines, createSuccessNotice ]
+		[ onImport ]
 	);
 
-	/**
-	 * Handles exporting guidelines as a JSON file download.
-	 */
 	const handleExport = useCallback( () => {
 		if ( ! guidelines ) {
 			return;
 		}
 
-		const exportData = mapInternalToExport(
-			guidelines.guideline_categories
-		);
+		const exportData = mapInternalToExport( guidelines );
 		const json = JSON.stringify( exportData, null, 2 );
 		const blob = new Blob( [ json ], { type: 'application/json' } );
 		const url = URL.createObjectURL( blob );
@@ -152,12 +122,7 @@ export default function ActionsSection() {
 		link.click();
 		document.body.removeChild( link );
 		URL.revokeObjectURL( url );
-
-		createSuccessNotice(
-			__( 'Content guidelines exported successfully.' ),
-			{ type: 'snackbar' }
-		);
-	}, [ guidelines, createSuccessNotice ] );
+	}, [ guidelines ] );
 
 	return (
 		<VStack spacing={ 4 }>

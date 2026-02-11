@@ -1,0 +1,57 @@
+// Figma design tokens from Content guidelines
+$content-guidelines-gray-900: #1e1e1e;
+$content-guidelines-gray-700: #757575;
+$content-guidelines-gray-200: #e0e0e0;
+$content-guidelines-white: #fff;
+$content-guidelines-radius-l: 8px;
+$content-guidelines-grid-30: 24px;
+
+.content-guidelines__card {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	max-width: 600px;
+	padding: $content-guidelines-grid-30 $content-guidelines-grid-30;
+	text-align: left;
+	background: $content-guidelines-white;
+	border: 1px solid $content-guidelines-gray-200;
+	border-radius: $content-guidelines-radius-l;
+	cursor: pointer;
+
+	&:focus-visible {
+		outline: 2px solid var(--wp-admin-theme-color, #3858e9);
+		outline-offset: 2px;
+	}
+}
+
+.content-guidelines__card-icon {
+	display: flex;
+	flex-shrink: 0;
+	fill: $content-guidelines-gray-700;
+}
+
+.content-guidelines__card-content {
+	flex: 1;
+	min-width: 0;
+}
+
+.content-guidelines__card-title {
+	display: block;
+	font-size: 14px;
+	font-weight: 500;
+	color: $content-guidelines-gray-900;
+	margin-bottom: 4px;
+}
+
+.content-guidelines__card-description {
+	display: block;
+	font-size: 13px;
+	font-weight: 400;
+	color: $content-guidelines-gray-700;
+	line-height: 1.4;
+}
+
+.content-guidelines__card-chevron {
+	flex-shrink: 0;
+	fill: $content-guidelines-gray-700;
+}
