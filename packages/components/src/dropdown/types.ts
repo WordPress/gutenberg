@@ -1,11 +1,23 @@
 import type { useFocusOnMount } from '@wordpress/compose';
-import type { ComponentPropsWithoutRef, CSSProperties, ReactNode } from 'react';
+import type {
+	ComponentPropsWithoutRef,
+	CSSProperties,
+	KeyboardEvent,
+	MouseEvent,
+	PointerEvent,
+	ReactNode,
+} from 'react';
 import type Popover from '../popover';
 import type { PopoverProps } from '../popover/types';
 
 type CallbackProps = {
 	isOpen: boolean;
-	onToggle: () => void;
+	/**
+	 * The optional event parameter is only applicable when the component’s
+	 * `focusOnMount` prop is unspecified. In that case it’s recommended and
+	 * used for input device specific focus behavior when the dropdown opens.
+	 */
+	onToggle: ( event?: KeyboardEvent | MouseEvent | PointerEvent ) => void;
 	onClose: () => void;
 };
 
@@ -48,9 +60,13 @@ export type DropdownProps = {
 	 * - `false` does nothing and _should not be used unless an accessible
 	 *    substitute behavior is implemented_.
 	 *
+	 * For dynamic resolution of the focus option pass a callback whose return
+	 * value is one of the preceding options, `undefined` to default or an
+	 * `HTMLElement` to focus.
+	 *
 	 * @default 'firstElement'
 	 */
-	focusOnMount?: useFocusOnMount.Mode;
+	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
 	/**
 	 * Set this to customize the text that is shown in the dropdown's header
 	 * when it is fullscreen on mobile.

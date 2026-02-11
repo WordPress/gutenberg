@@ -21,9 +21,13 @@ type DialogOptions = {
 	 * - `false` does nothing and _should not be used unless an accessible
 	 *    substitute behavior is implemented_.
 	 *
+	 * For dynamic resolution of the focus option pass a callback whose return
+	 * value is one of the preceding options, `undefined` to default or an
+	 * `HTMLElement` to focus.
+	 *
 	 * @default 'firstElement'
 	 */
-	focusOnMount?: useFocusOnMount.Mode;
+	focusOnMount?: useFocusOnMount.FocusOptions;
 	/**
 	 * Determines whether tabbing is constrained to within the popover,
 	 * preventing keyboard focus from leaving the popover content without

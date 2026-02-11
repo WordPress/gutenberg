@@ -59,9 +59,13 @@ export type ModalProps = {
 	 * - `false` does nothing and _should not be used unless an accessible
 	 *    substitute behavior is implemented_.
 	 *
+	 * For dynamic resolution of the focus option pass a callback whose return
+	 * value is one of the preceding options, `undefined` to default or an
+	 * `HTMLElement` to focus.
+	 *
 	 * @default true
 	 */
-	focusOnMount?: useFocusOnMount.Mode | 'firstContentElement';
+	focusOnMount?: useFocusOnMount.FocusOptions | 'firstContentElement';
 	/**
 	 * Elements that are injected into the modal header to the left of the close button (if rendered).
 	 * Hidden if `__experimentalHideHeader` is `true`.
