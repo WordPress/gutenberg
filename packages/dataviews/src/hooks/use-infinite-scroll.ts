@@ -14,6 +14,58 @@ import { throttle } from '@wordpress/compose';
  */
 import type { View } from '../types';
 
+/**
+ * Captures an anchor element for scroll position preservation.
+ * Finds the element closest to the center of the viewport and stores its position.
+ *
+ * @param container        The scrollable container element.
+ * @param anchorElementRef Ref to store the anchor element data.
+ * @param direction        The scroll direction ('up' or 'down').
+ * @return Whether an anchor element was successfully captured.
+ */
+function captureAnchorElement(
+	container: HTMLElement,
+	anchorElementRef: React.MutableRefObject< {
+		posinset: number;
+		viewportOffset: number;
+		direction: 'up' | 'down' | null;
+	} | null >,
+	direction: 'up' | 'down'
+): boolean {
+	// Find a visible element to use as anchor - prefer one in the middle of the viewport
+	const containerRect = container.getBoundingClientRect();
+	const centerY = containerRect.top + containerRect.height / 2;
+
+	// Query all items with aria-posinset and find the one closest to center
+	const items = Array.from( container.querySelectorAll( '[aria-posinset]' ) );
+
+	if ( items.length === 0 ) {
+		return false;
+	}
+
+	// Find the item closest to the center of the viewport
+	const bestAnchor = items.reduce( ( best, item ) => {
+		const itemRect = item.getBoundingClientRect();
+		const itemCenterY = itemRect.top + itemRect.height / 2;
+		const distance = Math.abs( itemCenterY - centerY );
+
+		const bestRect = best.getBoundingClientRect();
+		const bestCenterY = bestRect.top + bestRect.height / 2;
+		const bestDistance = Math.abs( bestCenterY - centerY );
+
+		return distance < bestDistance ? item : best;
+	} );
+
+	const posinset = Number( bestAnchor.getAttribute( 'aria-posinset' ) );
+	const anchorRect = bestAnchor.getBoundingClientRect();
+	anchorElementRef.current = {
+		posinset,
+		viewportOffset: anchorRect.top - containerRect.top,
+		direction,
+	};
+	return true;
+}
+
 type UseInfiniteScrollProps = {
 	view: View;
 	onChangeView: ( view: View ) => void;
@@ -23,7 +75,6 @@ type UseInfiniteScrollProps = {
 		totalPages: number;
 	};
 	containerRef: React.MutableRefObject< HTMLDivElement | null >;
-	displayData: unknown[];
 	setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 };
 
@@ -37,19 +88,17 @@ export function useInfiniteScroll( {
 	isLoading,
 	paginationInfo,
 	containerRef,
-	displayData,
 	setVisibleEntries,
 }: UseInfiniteScrollProps ): UseInfiniteScrollResult {
-	const isLoadingRef = useRef( false );
 	// Store the initial batch size calculated from the first startPosition and endPosition
 	const initialBatchSizeRef = useRef< number | null >( null );
-	// Track scroll position for preservation when prepending items
-	const scrollPreservationRef = useRef< {
-		scrollHeight: number;
-		scrollTop: number;
-		isPending: boolean;
+	// Track an anchor element for scroll position preservation
+	// This approach is robust even when items are added/removed from both ends simultaneously
+	const anchorElementRef = useRef< {
+		posinset: number;
+		viewportOffset: number;
 		direction: 'up' | 'down' | null;
-	} >( { scrollHeight: 0, scrollTop: 0, isPending: false, direction: null } );
+	} | null >( null );
 
 	const intersectionObserverCallback: IntersectionObserverCallback =
 		useCallback(
@@ -92,36 +141,41 @@ export function useInfiniteScroll( {
 		);
 
 	// Preserve scroll position when items are added or removed during infinite scroll
+	// Uses anchor element approach: find the same element after render and restore its viewport position
 	useLayoutEffect( () => {
 		const container = containerRef.current;
+		const anchor = anchorElementRef.current;
+
 		if (
 			! container ||
 			! view.infiniteScrollEnabled ||
-			! scrollPreservationRef.current.isPending
+			! anchor ||
+			isLoading
 		) {
 			return;
 		}
 
-		// Calculate the height difference and adjust scroll position
-		const heightDiff =
-			container.scrollHeight - scrollPreservationRef.current.scrollHeight;
-		const { direction } = scrollPreservationRef.current;
+		// Find the anchor element by its posinset
+		const anchorElement = container.querySelector(
+			`[aria-posinset="${ anchor.posinset }"]`
+		);
 
-		if ( direction === 'up' && heightDiff > 0 ) {
-			// Items were prepended while scrolling up, add the difference to maintain position
-			container.scrollTop =
-				scrollPreservationRef.current.scrollTop + heightDiff;
-		} else if ( direction === 'down' && heightDiff < 0 ) {
-			// Items were removed from top while scrolling down, adjust to prevent jumping up
-			container.scrollTop =
-				scrollPreservationRef.current.scrollTop + heightDiff;
+		if ( anchorElement ) {
+			const containerRect = container.getBoundingClientRect();
+			const anchorRect = anchorElement.getBoundingClientRect();
+			const currentOffset = anchorRect.top - containerRect.top;
+
+			// Calculate how much the anchor has moved and adjust scroll to compensate
+			const scrollAdjustment = currentOffset - anchor.viewportOffset;
+
+			if ( Math.abs( scrollAdjustment ) > 1 ) {
+				container.scrollTop += scrollAdjustment;
+			}
 		}
-		// When scrolling down and items are added at bottom (heightDiff > 0), no adjustment needed
-		// When scrolling up and items are removed from bottom (heightDiff < 0), no adjustment needed
 
-		scrollPreservationRef.current.isPending = false;
-		scrollPreservationRef.current.direction = null;
-	}, [ containerRef, displayData, view.infiniteScrollEnabled ] );
+		// Reset the anchor state now that we've adjusted
+		anchorElementRef.current = null;
+	}, [ containerRef, isLoading, view.infiniteScrollEnabled ] );
 
 	// Attach scroll event listener for infinite scroll
 	useEffect( () => {
@@ -145,7 +199,7 @@ export function useInfiniteScroll( {
 			lastScrollTop = scrollTop;
 
 			// Don't trigger if already loading
-			if ( isLoadingRef.current || isLoading ) {
+			if ( isLoading ) {
 				return;
 			}
 
@@ -167,27 +221,20 @@ export function useInfiniteScroll( {
 			) {
 				// Check if there's more data to load
 				if ( currentEndPosition < paginationInfo.totalItems ) {
-					isLoadingRef.current = true;
-
-					// Store current scroll state for position preservation when items are unloaded
-					scrollPreservationRef.current = {
-						scrollHeight: target.scrollHeight,
-						scrollTop: target.scrollTop,
-						isPending: true,
-						direction: 'down',
-					};
-
 					const newStartPosition = currentEndPosition - 3;
 					const newEndPosition = Math.min(
 						newStartPosition + batchSize,
 						paginationInfo.totalItems
 					);
+
+					// Capture anchor element for scroll position preservation
+					captureAnchorElement( target, anchorElementRef, 'down' );
+
 					onChangeView( {
 						...view,
 						startPosition: newStartPosition,
 						endPosition: newEndPosition,
 					} );
-					isLoadingRef.current = false;
 				}
 			}
 
@@ -195,28 +242,22 @@ export function useInfiniteScroll( {
 			if ( scrollDirection === 'up' && scrollTop <= TOP_THRESHOLD ) {
 				// Check if there's more data to load
 				if ( currentStartPosition > 1 ) {
-					isLoadingRef.current = true;
-
-					// Store current scroll state for position preservation
-					scrollPreservationRef.current = {
-						scrollHeight: target.scrollHeight,
-						scrollTop: target.scrollTop,
-						isPending: true,
-						direction: 'up',
-					};
-
 					const newEndPosition = currentStartPosition + 1;
-					const newStartPosition = Math.max(
-						newEndPosition - batchSize,
-						1
-					);
+					// Round to 1 if we're close to the beginning to avoid tiny batches
+					const calculatedStartPosition = newEndPosition - batchSize;
+					const newStartPosition =
+						calculatedStartPosition < 6
+							? 1
+							: calculatedStartPosition;
+
+					// Capture anchor element for scroll position preservation
+					captureAnchorElement( target, anchorElementRef, 'up' );
 
 					onChangeView( {
 						...view,
 						startPosition: newStartPosition,
 						endPosition: newEndPosition,
 					} );
-					isLoadingRef.current = false;
 				}
 			}
 		}, 50 ); // Faster throttle (50ms) for better response to fast scrolling

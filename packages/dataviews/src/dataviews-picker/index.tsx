@@ -189,7 +189,6 @@ function DataViewsPicker< Item >( {
 		isLoading,
 		paginationInfo,
 		containerRef,
-		displayData,
 		setVisibleEntries,
 	} );
 

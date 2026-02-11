@@ -231,7 +231,6 @@ function DataViews< Item >( {
 		isLoading,
 		paginationInfo,
 		containerRef,
-		displayData,
 		setVisibleEntries,
 	} );
 

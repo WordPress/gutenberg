@@ -197,7 +197,7 @@ export function MediaUploadModal( {
 		mediaField: 'media_thumbnail',
 		search: '',
 		startPosition: 1,
-		endPosition: 30,
+		endPosition: 50,
 		filters: [],
 		layout: {
 			previewSize: 170,

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useMemo, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -81,11 +81,13 @@ export default function useData< Item >( {
 	}, [ shownData, isLoading, paginationInfo ] );
 
 	// --- Infinite scroll state ---
-	const [ allLoadedRecords, setAllLoadedRecords ] = useState< Item[] >( [] );
 	const [ visibleEntries, setVisibleEntries ] = useState< number[] >( [] );
 
 	// Track the mapping of item IDs to their positions in the full dataset
 	const positionMapRef = useRef< Map< string, number > >( new Map() );
+
+	// Store accumulated records in a ref for persistence across renders
+	const allLoadedRecordsRef = useRef< Item[] >( [] );
 
 	// Track previous view parameters to detect when we need to reset
 	const prevViewParamsRef = useRef< {
@@ -102,36 +104,38 @@ export default function useData< Item >( {
 	const scrollDirectionRef = useRef< 'up' | 'down' | undefined >( undefined );
 	const prevStartPositionRef = useRef< number | undefined >( undefined );
 
-	if (
-		view.startPosition !== undefined &&
-		prevStartPositionRef.current !== undefined
-	) {
-		if ( view.startPosition < prevStartPositionRef.current ) {
-			scrollDirectionRef.current = 'up';
-		} else if ( view.startPosition > prevStartPositionRef.current ) {
-			scrollDirectionRef.current = 'down';
-		}
-	}
-	prevStartPositionRef.current = view.startPosition;
+	// Track whether we've done initial load
+	const hasInitializedRef = useRef( false );
 
-	// Initialize data on first load or when view changes significantly
-	useEffect( () => {
-		if ( ! isInfiniteScrollEnabled ) {
-			return;
+	// Compute data synchronously during render using useMemo
+	// This ensures the returned data is always in sync with shownData
+	const allLoadedRecords = useMemo( () => {
+		// Update scroll direction based on position changes
+		if (
+			view.startPosition !== undefined &&
+			prevStartPositionRef.current !== undefined
+		) {
+			if ( view.startPosition < prevStartPositionRef.current ) {
+				scrollDirectionRef.current = 'up';
+			} else if ( view.startPosition > prevStartPositionRef.current ) {
+				scrollDirectionRef.current = 'down';
+			}
 		}
+		prevStartPositionRef.current = view.startPosition;
 
-		// First page - replace all data and initialize range
 		// Serialize filters for comparison
 		const currentFiltersKey = JSON.stringify( view.filters ?? [] );
 		const prevFiltersKey = prevViewParamsRef.current.filters;
 
 		// Check if view parameters that require a reset have changed
 		const shouldReset =
-			! allLoadedRecords.length ||
+			! hasInitializedRef.current ||
 			! view.infiniteScrollEnabled ||
 			view.search !== prevViewParamsRef.current.search ||
 			currentFiltersKey !== prevFiltersKey ||
 			view.perPage !== prevViewParamsRef.current.perPage;
+
+		hasInitializedRef.current = true;
 
 		// Update tracked view parameters
 		prevViewParamsRef.current = {
@@ -155,121 +159,104 @@ export default function useData< Item >( {
 					position,
 				};
 			} );
-			setAllLoadedRecords( records );
-		} else {
-			// Subsequent pages - load more data
-			setAllLoadedRecords( ( prev ) => {
-				const shownDataIds = new Set( shownData.map( getItemId ) );
-				const scrollDirection = scrollDirectionRef.current;
+			allLoadedRecordsRef.current = records;
+			return records;
+		}
 
-				// Count how many new items need positions assigned
-				const newItemsCount = shownData.filter( ( record ) => {
-					const itemId = getItemId( record );
-					return ! positionMapRef.current.has( itemId );
-				} ).length;
+		// Subsequent pages - merge with existing data
+		const prev = allLoadedRecordsRef.current;
+		const shownDataIds = new Set( shownData.map( getItemId ) );
+		const scrollDirection = scrollDirectionRef.current;
 
-				// Calculate start position based on scroll direction
-				// When scrolling up, new items should have positions before the minimum
-				// We start at (min - count) so that after incrementing through all items,
-				// the last new item ends up just before the previous minimum.
-				// When scrolling down, new items should have positions after the maximum
-				let nextPosition: number;
-				if ( positionMapRef.current.size > 0 ) {
-					if ( scrollDirection === 'up' ) {
-						nextPosition =
-							Math.min( ...positionMapRef.current.values() ) -
-							newItemsCount;
-					} else {
-						nextPosition =
-							Math.max( ...positionMapRef.current.values() ) + 1;
-					}
-				} else {
-					nextPosition = 1;
+		// The position for each item in shownData should be based on the
+		// current startPosition from the view, which reflects the actual
+		// offset in the dataset. This ensures aria-posinset values are
+		// semantically correct - if startPosition is 40, there are exactly
+		// 39 items before the first item in shownData.
+		const basePosition = view.startPosition ?? 1;
+
+		const newRecords = shownData.map( ( record, index ) => {
+			const itemId = getItemId( record );
+			const position = view.infiniteScrollEnabled
+				? basePosition + index
+				: undefined;
+
+			// Always update the position map with the correct position
+			// based on the current query's startPosition
+			if ( position !== undefined ) {
+				positionMapRef.current.set( itemId, position );
+			}
+
+			return {
+				...record,
+				position,
+			};
+		} );
+
+		if ( newRecords.length === 0 ) {
+			return prev;
+		}
+
+		// Remove duplicates from prev, keeping only records not in shownData
+		const prevWithoutDuplicates = prev.filter(
+			( record ) => ! shownDataIds.has( getItemId( record ) )
+		);
+
+		// Update the loaded range
+		const allRecords =
+			scrollDirection === 'up'
+				? [ ...newRecords, ...prevWithoutDuplicates ]
+				: [ ...prevWithoutDuplicates, ...newRecords ];
+
+		// Sort all records by position to ensure correct order
+		// This is crucial when items are reloaded after scrolling in different directions
+		allRecords.sort( ( a, b ) => {
+			const posA = ( a as Item & { position: number } ).position;
+			const posB = ( b as Item & { position: number } ).position;
+			return posA - posB;
+		} );
+
+		let result = allRecords;
+
+		if ( visibleEntries.length > 0 ) {
+			const visibleMin = Math.min( ...visibleEntries );
+			const visibleMax = Math.max( ...visibleEntries );
+			// Buffer size balances allowing new items to render (when prepended
+			// during scroll up) while unloading items no longer on screen.
+			// Use a larger buffer to prevent scrollbar from jumping when items
+			// are unloaded, which could trigger unwanted scroll events.
+			const buffer = 20;
+
+			result = allRecords.filter( ( record ) => {
+				const itemPosition = ( record as Item & { position: number } )
+					.position;
+				// When scrolling, only trim items from the end we're scrolling away from
+				if ( scrollDirection === 'up' ) {
+					// When scrolling up, only trim items below the visible range
+					return itemPosition <= visibleMax + buffer;
+				} else if ( scrollDirection === 'down' ) {
+					// When scrolling down, only trim items above the visible range
+					return itemPosition >= visibleMin - buffer;
 				}
-
-				const newRecords = shownData.map( ( record ) => {
-					const itemId = getItemId( record );
-					const existingPosition =
-						positionMapRef.current.get( itemId );
-					let position: number;
-
-					if ( existingPosition !== undefined ) {
-						position = existingPosition;
-					} else {
-						position = nextPosition;
-						positionMapRef.current.set( itemId, position );
-						nextPosition++;
-					}
-
-					return {
-						...record,
-						position,
-					};
-				} );
-
-				// Remove duplicates from prev, keeping only records not in shownData
-				const prevWithoutDuplicates = prev.filter(
-					( record ) => ! shownDataIds.has( getItemId( record ) )
+				// When not scrolling or first load, keep items within buffer range
+				return (
+					itemPosition >= visibleMin - buffer &&
+					itemPosition <= visibleMax + buffer
 				);
-
-				if (
-					newRecords.length === 0 &&
-					prevWithoutDuplicates.length === 0
-				) {
-					return prev;
-				}
-
-				// Update the loaded range
-				const allRecords =
-					scrollDirection === 'up'
-						? [ ...newRecords, ...prevWithoutDuplicates ]
-						: [ ...prevWithoutDuplicates, ...newRecords ];
-
-				// Sort all records by position to ensure correct order
-				allRecords.sort( ( a, b ) => {
-					const posA = ( a as Item & { position: number } ).position;
-					const posB = ( b as Item & { position: number } ).position;
-					return posA - posB;
-				} );
-
-				if ( visibleEntries.length > 0 ) {
-					const visibleMin = Math.min( ...visibleEntries );
-					const visibleMax = Math.max( ...visibleEntries );
-					const buffer = 20;
-
-					const filtered = allRecords.filter( ( record ) => {
-						const itemPosition = (
-							record as Item & { position: number }
-						 ).position;
-						if ( scrollDirection === 'up' ) {
-							return itemPosition <= visibleMax + buffer;
-						} else if ( scrollDirection === 'down' ) {
-							return itemPosition >= visibleMin - buffer;
-						}
-						return (
-							itemPosition >= visibleMin - buffer &&
-							itemPosition <= visibleMax + buffer
-						);
-					} );
-
-					return filtered;
-				}
-
-				return allRecords;
 			} );
 		}
+
+		allLoadedRecordsRef.current = result;
+		return result;
 	}, [
 		shownData,
 		view.search,
 		view.filters,
 		view.perPage,
 		view.startPosition,
-		view.endPosition,
-		isInfiniteScrollEnabled,
-		allLoadedRecords.length,
+		view.infiniteScrollEnabled,
 		visibleEntries,
 		getItemId,
-		view.infiniteScrollEnabled,
 	] );
 
 	// When infinite scroll is disabled, preserve previous data while loading
