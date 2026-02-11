@@ -645,7 +645,20 @@ export default function MediaEdit< Item >( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 	// Support one upload action at a time for now.
 	const [ targetItemId, setTargetItemId ] = useState< number >();
+	// Deferred open: the legacy class-based MediaUpload reads props
+	// imperatively when `open()` is called, so calling it in the same
+	// handler as `setTargetItemId()` would open the modal with stale
+	// `value`/`multiple` props. Setting a pending flag defers the open
+	// until after the next render when props are up to date.
+	const openModalRef = useRef< ( () => void ) | null >( null );
+	const [ pendingOpen, setPendingOpen ] = useState( false );
 	const [ blobs, setBlobs ] = useState< string[] >( [] );
+	useEffect( () => {
+		if ( pendingOpen ) {
+			setPendingOpen( false );
+			openModalRef.current?.();
+		}
+	}, [ pendingOpen ] );
 	const onChangeControl = useCallback(
 		( newValue: number | number[] | undefined ) =>
 			onChange( field.setValue( { item: data, value: newValue } ) ),
@@ -847,6 +860,8 @@ export default function MediaEdit< Item >( {
 					multiple={ multiple && targetItemId === undefined }
 					title={ field.label }
 					render={ ( { open }: any ) => {
+						// Keep a ref to the latest `open` so the deferred effect can call it.
+						openModalRef.current = open;
 						const AttachmentsComponent = isExpanded
 							? ExpandedMediaEditAttachments
 							: CompactMediaEditAttachments;
@@ -871,7 +886,7 @@ export default function MediaEdit< Item >( {
 									multiple={ multiple }
 									removeItem={ removeItem }
 									moveItem={ moveItem }
-									open={ open }
+									open={ () => setPendingOpen( true ) }
 									onFilesDrop={ onFilesDrop }
 									isUploading={ !! blobs.length }
 									setTargetItemId={ setTargetItemId }
