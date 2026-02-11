@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Modal, SearchControl } from '@wordpress/components';
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useMemo } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 
 /**
@@ -28,8 +28,7 @@ export default function CustomInserterModal( {
 		setInserterOpen( false );
 	}
 
-	// Move the filtering logic to a separate function
-	const getFilteredIcons = useCallback( () => {
+	const filteredIcons = useMemo( () => {
 		if ( searchInput ) {
 			return icons.filter( ( icon ) => {
 				const input = searchInput.toLowerCase();
@@ -57,7 +56,7 @@ export default function CustomInserterModal( {
 					/>
 				</div>
 				<IconGrid
-					shownIcons={ getFilteredIcons() }
+					shownIcons={ filteredIcons }
 					updateIconAtts={ updateIconAtts }
 					attributes={ attributes }
 				/>
