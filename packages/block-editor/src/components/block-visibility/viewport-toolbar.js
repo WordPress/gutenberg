@@ -16,27 +16,33 @@ import { unlock } from '../../lock-unlock';
 
 export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 	const hasBlockVisibilityButtonShownRef = useRef( false );
-	const { canToggleBlockVisibility, areBlocksHiddenAnywhere } = useSelect(
-		( select ) => {
-			const { getBlocksByClientId, getBlockName, isBlockHiddenAnywhere } =
-				unlock( select( blockEditorStore ) );
-			const _blocks = getBlocksByClientId( clientIds );
-			return {
-				canToggleBlockVisibility: _blocks.every( ( { clientId } ) =>
-					hasBlockSupport(
-						getBlockName( clientId ),
-						'visibility',
-						true
-					)
-				),
-				areBlocksHiddenAnywhere: clientIds?.every( ( clientId ) =>
-					isBlockHiddenAnywhere( clientId )
-				),
-			};
-		},
+	const { canToggleBlockVisibility, areBlocksHiddenAnywhere, isModalOpen } =
+		useSelect(
+			( select ) => {
+				const {
+					getBlocksByClientId,
+					getBlockName,
+					isBlockHiddenAnywhere,
+					getBlockVisibilityModalClientIds,
+				} = unlock( select( blockEditorStore ) );
+				const _blocks = getBlocksByClientId( clientIds );
+				return {
+					canToggleBlockVisibility: _blocks.every( ( { clientId } ) =>
+						hasBlockSupport(
+							getBlockName( clientId ),
+							'visibility',
+							true
+						)
+					),
+					areBlocksHiddenAnywhere: clientIds?.every( ( clientId ) =>
+						isBlockHiddenAnywhere( clientId )
+					),
+					isModalOpen: getBlockVisibilityModalClientIds() !== null,
+				};
+			},
 
-		[ clientIds ]
-	);
+			[ clientIds ]
+		);
 	const blockEditorDispatch = useDispatch( blockEditorStore );
 
 	/*
@@ -70,6 +76,7 @@ export default function BlockVisibilityViewportToolbar( { clientIds } ) {
 					areBlocksHiddenAnywhere ? __( 'Hidden' ) : __( 'Visible' )
 				}
 				onClick={ () => showBlockVisibilityModal( clientIds ) }
+				aria-expanded={ isModalOpen }
 				aria-haspopup="dialog"
 			/>
 		</ToolbarGroup>
