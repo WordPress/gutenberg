@@ -449,7 +449,11 @@ function CompactMediaEditAttachments( {
 	return (
 		<>
 			{ !! allItems?.length && (
-				<div className="fields__media-edit-compact-group">
+				<div
+					className={ clsx( 'fields__media-edit-compact-group', {
+						'is-single': allItems.length === 1,
+					} ) }
+				>
 					<VStack spacing={ 0 }>
 						{ allItems.map( ( attachment, index ) => {
 							const isBlob = isBlobURL( attachment.source_url );
