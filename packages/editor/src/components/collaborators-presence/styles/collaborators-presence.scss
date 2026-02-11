@@ -55,7 +55,6 @@
 	.editor-collaborators-presence__avatar {
 		margin-left: -16px;
 		flex-shrink: 0;
-		border-color: $gray-100;
 
 		&:nth-child(1) {
 			margin-left: 0;
@@ -69,15 +68,5 @@
 		&:nth-child(3) {
 			z-index: 1;
 		}
-	}
-
-	// Avatar hover state
-	.editor-collaborators-presence:hover & .editor-collaborators-presence__avatar {
-		border-color: $gray-300;
-	}
-
-	// Avatar pressed state
-	&.is-pressed .editor-collaborators-presence__avatar {
-		border-color: $gray-300;
 	}
 }
