@@ -9,9 +9,11 @@ import clsx from 'clsx';
 import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	Icon,
 	lockSmall as lock,
@@ -33,6 +35,10 @@ import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import {
+	BLOCK_VISIBILITY_VIEWPORTS,
+	BLOCK_VISIBILITY_VIEWPORT_ENTRIES,
+} from '../block-visibility/constants';
 
 const { Badge } = unlock( componentsPrivateApis );
 
@@ -60,16 +66,17 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { isBlockHidden, hasPatternName } = useSelect(
+	const { isBlockHidden, hasPatternName, blockVisibility } = useSelect(
 		( select ) => {
 			const {
 				isBlockHiddenAnywhere: _isBlockHidden,
 				getBlockAttributes,
 			} = unlock( select( blockEditorStore ) );
+			const attributes = getBlockAttributes( clientId );
 			return {
 				isBlockHidden: _isBlockHidden( clientId ),
-				hasPatternName:
-					!! getBlockAttributes( clientId )?.metadata?.patternName,
+				hasPatternName: !! attributes?.metadata?.patternName,
+				blockVisibility: attributes?.metadata?.blockVisibility,
 			};
 		},
 		[ clientId ]
@@ -78,6 +85,31 @@ function ListViewBlockSelectButton(
 	const shouldShowLockIcon = isLocked;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
+
+	// Determine which viewports the block is hidden on.
+	let hiddenViewports = [];
+	if ( isBlockHidden ) {
+		if ( blockVisibility === false ) {
+			hiddenViewports = Object.values( BLOCK_VISIBILITY_VIEWPORTS );
+		} else if ( blockVisibility?.viewport ) {
+			hiddenViewports = BLOCK_VISIBILITY_VIEWPORT_ENTRIES.filter(
+				( [ key ] ) => blockVisibility.viewport[ key ] === false
+			).map( ( [ , viewport ] ) => viewport );
+		}
+	}
+
+	let visibilityLabel;
+	if ( isBlockHidden ) {
+		if ( blockVisibility === false ) {
+			visibilityLabel = __( 'Hidden on all viewports' );
+		} else if ( hiddenViewports.length > 0 ) {
+			visibilityLabel = sprintf(
+				/* translators: %s: comma-separated list of viewport names (Desktop, Tablet, Mobile) */
+				__( 'Hidden on %s' ),
+				hiddenViewports.map( ( v ) => v.label ).join( ', ' )
+			);
+		}
+	}
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -162,9 +194,19 @@ function ListViewBlockSelectButton(
 					</span>
 				) : null }
 				{ isBlockHidden && (
-					<span className="block-editor-list-view-block-select-button__block-visibility">
-						<Icon icon={ unseen } />
-					</span>
+					<Tooltip text={ visibilityLabel }>
+						<span className="block-editor-list-view-block-select-button__block-visibility">
+							<Icon icon={ unseen } />
+							{ blockVisibility !== false &&
+								hiddenViewports.map( ( viewport ) => (
+									<Icon
+										key={ viewport.key }
+										icon={ viewport.icon }
+										size={ 20 }
+									/>
+								) ) }
+						</span>
+					</Tooltip>
 				) }
 				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">
