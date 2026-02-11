@@ -75,30 +75,16 @@ const schema = ( { phrasingContentSchema } ) => ( {
 const IMAGE_EXTENSIONS =
 	/\.(?:jpe?g|png|gif|webp|avif|ico|heic|heif|bmp|tiff?)(?:\?.*)?$/i;
 
-/**
- * Checks if a URL points directly to an image file.
- *
- * @param {string} url The URL to check.
- * @return {boolean} True if the URL appears to be a direct image URL.
- */
-function isImageFileUrl( url ) {
-	try {
-		const { pathname } = new URL( url );
-		return IMAGE_EXTENSIONS.test( pathname );
-	} catch {
-		return false;
-	}
-}
-
 const transforms = {
 	from: [
 		{
 			type: 'raw',
+			priority: 9, // Required, to be able to insert an image from URL. See https://github.com/WordPress/gutenberg/pull/74752
 			isMatch: ( node ) =>
 				node.nodeName === 'P' &&
 				/^\s*(https?:\/\/\S+)\s*$/i.test( node.textContent ) &&
 				node.textContent?.match( /https/gi )?.length === 1 &&
-				isImageFileUrl( node.textContent.trim() ),
+				IMAGE_EXTENSIONS.test( node.textContent.trim() ),
 			transform: ( node ) => {
 				return createBlock( 'core/image', {
 					url: node.textContent.trim(),
