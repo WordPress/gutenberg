@@ -45,6 +45,7 @@ import {
 // Changes that can be applied to a post entity record.
 export type PostChanges = Partial< Post > & {
 	blocks?: Block[];
+	content?: Post[ 'content' ] | string;
 	excerpt?: Post[ 'excerpt' ] | string;
 	selection?: WPSelection;
 	title?: Post[ 'title' ] | string;
@@ -57,6 +58,7 @@ export interface YPostRecord extends YMapRecord {
 	// So this has been typed to communicate that the property can
 	// exist, but could be undefined.
 	blocks: YBlocks | undefined;
+	content: string;
 	categories: number[];
 	comment_status: string;
 	date: string | null;
@@ -77,6 +79,7 @@ export interface YPostRecord extends YMapRecord {
 const allowedPostProperties = new Set< string >( [
 	'author',
 	'blocks',
+	'content',
 	'categories',
 	'comment_status',
 	'date',
@@ -159,8 +162,10 @@ export function applyPostChangesToCRDTDoc(
 
 		switch ( key ) {
 			case 'blocks': {
-				// Blocks can be undefined when they need to be re-parsed.
+				// Blocks are undefined when they need to be re-parsed from content.
 				if ( ! newValue ) {
+					// Set to undefined instead of deleting the key. This is important
+					// since we iterate over the Y.Map keys in getPostChangesFromCRDTDoc.
 					ymap.set( key, undefined );
 					break;
 				}
@@ -173,9 +178,6 @@ export function applyPostChangesToCRDTDoc(
 					ymap.set( key, currentBlocks );
 				}
 
-				// Block[] from local changes.
-				const newBlocks = ( newValue as PostChanges[ 'blocks' ] ) ?? [];
-
 				// Block changes from typing are bundled with a 'selection' update.
 				// Pass the resulting cursor position to the mergeCrdtBlocks function.
 				const cursorPosition =
@@ -183,7 +185,15 @@ export function applyPostChangesToCRDTDoc(
 
 				// Merge blocks does not need `setValue` because it is operating on a
 				// Yjs type that is already in the Y.Doc.
-				mergeCrdtBlocks( currentBlocks, newBlocks, cursorPosition );
+				mergeCrdtBlocks( currentBlocks, newValue, cursorPosition );
+				break;
+			}
+
+			case 'content': {
+				const currentValue = ymap.get( 'content' );
+				const rawNewValue = getRawValue( newValue );
+
+				updateMapValue( ymap, key, currentValue, rawNewValue );
 				break;
 			}
 
@@ -306,6 +316,8 @@ export function getPostChangesFromCRDTDoc(
 
 			switch ( key ) {
 				case 'blocks': {
+					const blocks = ymap.get( 'blocks' );
+
 					// When we are passed a persisted CRDT document, make a special
 					// comparison of the content and blocks.
 					//
@@ -326,19 +338,15 @@ export function getPostChangesFromCRDTDoc(
 					//
 					// Note: Blocks can be undefined when they need to be re-parsed.
 					if (
-						currentValue !== undefined &&
+						blocks &&
 						ydoc.meta?.get( CRDT_DOC_META_PERSISTENCE_KEY ) &&
 						editedRecord.content
 					) {
-						const blocks = ymap.get( 'blocks' ) as YBlocks;
-
-						if ( blocks ) {
-							return (
-								__unstableSerializeAndClean(
-									blocks.toJSON()
-								).trim() !== editedRecord.content.raw.trim()
-							);
-						}
+						return (
+							__unstableSerializeAndClean(
+								blocks.toJSON()
+							).trim() !== getRawValue( editedRecord.content )
+						);
 					}
 
 					// The consumers of blocks have memoization that renders optimization
@@ -390,6 +398,7 @@ export function getPostChangesFromCRDTDoc(
 					return haveValuesChanged( currentValue, newValue );
 				}
 
+				case 'content':
 				case 'excerpt':
 				case 'title': {
 					return haveValuesChanged(
