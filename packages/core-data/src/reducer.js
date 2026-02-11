@@ -660,6 +660,38 @@ export function editorAssets( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing registered style variations (experimental).
+ *
+ * @param {Array}  state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Array} Updated state.
+ */
+export function registeredStyleVariations( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_REGISTERED_STYLE_VARIATIONS':
+			return action.variations;
+	}
+	return state;
+}
+
+/**
+ * Reducer managing base themes (experimental).
+ *
+ * @param {Array}  state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Array} Updated state.
+ */
+export function baseThemes( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_BASE_THEMES':
+			return action.baseThemes;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -682,4 +714,6 @@ export default combineReducers( {
 	registeredPostMeta,
 	editorSettings,
 	editorAssets,
+	registeredStyleVariations,
+	baseThemes,
 } );

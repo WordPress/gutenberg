@@ -76,6 +76,11 @@ add_filter( 'default_wp_template_part_areas', 'gutenberg_register_overlay_templa
  * WordPress core only adds this link for block themes with theme.json support.
  * This filter extends that functionality to all themes.
  *
+ * Additionally, this filter ensures the link points to the correct global styles post.
+ * WordPress core's WP_Theme_JSON_Resolver may return a template style variation post
+ * instead of the default global styles post. We use WP_Theme_JSON_Resolver_Gutenberg
+ * which has the fix to exclude variation posts from the default query.
+ *
  * @param WP_REST_Response $response The response object.
  * @param WP_Theme         $theme    Theme object used to create response.
  * @return WP_REST_Response Modified response object.
@@ -86,20 +91,17 @@ function gutenberg_rest_theme_global_styles_link_rel_7_0( $response, $theme ) {
 		return $response;
 	}
 
-	// Check if the link already exists (WordPress core adds it for block themes).
-	$all_links = $response->get_links();
-	if ( isset( $all_links['https://api.w.org/user-global-styles'] ) ) {
-		return $response;
-	}
-
-	// Get or create the global styles post ID for this theme.
-	// Now that we've removed the theme.json check, this works for all themes.
+	// Get or create the global styles post ID for this theme using Gutenberg's resolver.
+	// This ensures we get the correct default global styles post, not a variation post.
 	$global_styles_id = WP_Theme_JSON_Resolver_Gutenberg::get_user_global_styles_post_id();
 	if ( ! $global_styles_id ) {
 		return $response;
 	}
 
-	// Add the wp:user-global-styles link.
+	// Remove any existing link that core may have added (it might point to wrong post).
+	$response->remove_link( 'https://api.w.org/user-global-styles' );
+
+	// Add the wp:user-global-styles link with the correct post ID.
 	$response->add_link(
 		'https://api.w.org/user-global-styles',
 		rest_url( 'wp/v2/global-styles/' . $global_styles_id )

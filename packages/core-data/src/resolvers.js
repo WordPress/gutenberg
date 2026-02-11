@@ -1254,3 +1254,39 @@ export const getEditorAssets =
 		} );
 		dispatch.receiveEditorAssets( assets );
 	};
+
+/**
+ * Requests registered style variations from the REST API (experimental).
+ */
+export const __experimentalGetRegisteredStyleVariations =
+	() =>
+	async ( { dispatch } ) => {
+		try {
+			const variations = await apiFetch( {
+				path: '/wp/v2/style-variations',
+			} );
+			dispatch.__experimentalReceiveRegisteredStyleVariations(
+				variations
+			);
+		} catch {
+			// Silently fail if the endpoint doesn't exist (experiment not enabled).
+			dispatch.__experimentalReceiveRegisteredStyleVariations( [] );
+		}
+	};
+
+/**
+ * Requests base themes from the REST API (experimental).
+ */
+export const __experimentalGetBaseThemes =
+	() =>
+	async ( { dispatch } ) => {
+		try {
+			const baseThemes = await apiFetch( {
+				path: '/wp/v2/base-themes',
+			} );
+			dispatch.__experimentalReceiveBaseThemes( baseThemes );
+		} catch {
+			// Silently fail if the endpoint doesn't exist (experiment not enabled).
+			dispatch.__experimentalReceiveBaseThemes( [] );
+		}
+	};

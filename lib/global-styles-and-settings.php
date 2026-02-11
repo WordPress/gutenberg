@@ -412,3 +412,54 @@ function gutenberg_get_global_styles( $path = array(), $context = array() ) {
 function gutenberg_get_theme_directory_pattern_slugs() {
 	return WP_Theme_JSON_Resolver_Gutenberg::get_theme_data( array(), array( 'with_supports' => false ) )->get_patterns();
 }
+
+/**
+ * Returns the stylesheet for a specific template, considering any associated style variation.
+ *
+ * If the template has an associated style variation, that variation's styles are used.
+ * If the variation specifies a base theme, that is used instead of the current theme's theme.json.
+ *
+ *
+ * @param string $template_id The template ID (e.g., 'theme//single').
+ * @param array  $types       Types of styles to load. Optional.
+ *                            See {@see 'WP_Theme_JSON::get_stylesheet'} for all valid types.
+ *                            If empty, will load: 'variables', 'presets', 'styles'.
+ *
+ * @return string Stylesheet.
+ */
+function gutenberg_get_global_stylesheet_for_template( $template_id, $types = array() ) {
+	// Check if the experiment is enabled.
+	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-template-style-variations' ) ) {
+		return gutenberg_get_global_stylesheet( $types );
+	}
+
+	$tree = WP_Theme_JSON_Resolver_Gutenberg::get_merged_data_for_template( $template_id );
+	$tree = WP_Theme_JSON_Resolver_Gutenberg::resolve_theme_file_uris( $tree );
+
+	if ( empty( $types ) ) {
+		$types = array( 'variables', 'presets', 'styles' );
+	}
+
+	/*
+	 * Enable base layout styles only mode for classic themes without theme.json.
+	 */
+	$options = array();
+	if ( ! wp_is_block_theme() && ! wp_theme_has_theme_json() ) {
+		$options['base_layout_styles'] = true;
+	}
+
+	$styles_variables = '';
+	if ( in_array( 'variables', $types, true ) ) {
+		$origins          = array( 'default', 'theme', 'custom' );
+		$styles_variables = $tree->get_stylesheet( array( 'variables' ), $origins, $options );
+		$types            = array_diff( $types, array( 'variables' ) );
+	}
+
+	$styles_rest = '';
+	if ( ! empty( $types ) ) {
+		$origins     = array( 'default', 'theme', 'custom' );
+		$styles_rest = $tree->get_stylesheet( $types, $origins, $options );
+	}
+
+	return $styles_variables . $styles_rest;
+}

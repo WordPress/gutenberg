@@ -1039,6 +1039,40 @@ export function receiveDefaultTemplateId( query, templateId ) {
 }
 
 /**
+ * Returns an action object used in signalling that registered style variations have been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
+ *
+ * @param {Array} variations The registered style variations.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalReceiveRegisteredStyleVariations( variations ) {
+	return {
+		type: 'RECEIVE_REGISTERED_STYLE_VARIATIONS',
+		variations,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that base themes have been received.
+ * Ignored from documentation as it's internal to the data store.
+ *
+ * @ignore
+ *
+ * @param {Array} baseThemes The base themes.
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalReceiveBaseThemes( baseThemes ) {
+	return {
+		type: 'RECEIVE_BASE_THEMES',
+		baseThemes,
+	};
+}
+
+/**
  * Action triggered to receive revision items.
  *
  * @param {string}        kind            Kind of the received entity record revisions.

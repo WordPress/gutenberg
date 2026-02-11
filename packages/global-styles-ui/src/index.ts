@@ -3,6 +3,9 @@ export { StyleVariations } from './style-variations';
 export { ColorVariations } from './color-variations';
 export { TypographyVariations } from './typography-variations';
 
+// Template Style Variations (experimental)
+export { TemplateStyleVariationPicker } from './template-style-variation-picker';
+
 // Ideally this should just be a core-data selector.
 export { default as useGlobalStylesRevisions } from './screen-revisions/use-global-styles-revisions';
 

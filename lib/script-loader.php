@@ -42,7 +42,26 @@ function gutenberg_enqueue_global_styles() {
 	 */
 	add_filter( 'wp_theme_json_get_style_nodes', 'wp_filter_out_block_nodes' );
 
-	$stylesheet = gutenberg_get_global_stylesheet();
+	/*
+	 * Check if template style variations are enabled and we have a current template.
+	 * If so, use template-specific styles.
+	 */
+	$stylesheet = '';
+	if (
+		function_exists( 'gutenberg_is_experiment_enabled' ) &&
+		gutenberg_is_experiment_enabled( 'gutenberg-template-style-variations' ) &&
+		function_exists( 'gutenberg_get_current_template_id' )
+	) {
+		$template_id = gutenberg_get_current_template_id();
+		if ( $template_id ) {
+			$stylesheet = gutenberg_get_global_stylesheet_for_template( $template_id );
+		}
+	}
+
+	// Fall back to default stylesheet if no template-specific one.
+	if ( empty( $stylesheet ) ) {
+		$stylesheet = gutenberg_get_global_stylesheet();
+	}
 
 	/*
 	 * For block themes, merge Customizer's custom CSS into the global styles stylesheet

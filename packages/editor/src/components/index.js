@@ -103,6 +103,12 @@ export { default as CharacterCount } from './character-count';
 // State Related Components.
 export { default as EditorProvider } from './provider';
 
+// Template Style Variation (experimental).
+export {
+	TemplateStyleVariationContext as __experimentalTemplateStyleVariationContext,
+	TemplateStyleVariationProvider as __experimentalTemplateStyleVariationProvider,
+} from './template-style-variation-context';
+
 export * from './deprecated';
 
 /**
