@@ -45,7 +45,6 @@ import {
 	getWaveformColors,
 	createWaveformContainer,
 	styleSvgIcons,
-	ensureWaveformText,
 } from './utils';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
@@ -233,9 +232,6 @@ const PlaylistEdit = ( {
 				return;
 			}
 
-			// Clear any leftover DOM elements from previous player.
-			element.innerHTML = '';
-
 			// Handle track end - advance to next track.
 			const handleEnded = () => {
 				if ( trackListIndex < tracks.length - 1 ) {
@@ -287,14 +283,6 @@ const PlaylistEdit = ( {
 			// Apply contrasting color to SVG icons for visibility.
 			styleSvgIcons( container, textColor );
 
-			// Ensure title, subtitle, and duration are populated (WaveformPlayer may not do this in editor).
-			ensureWaveformText(
-				container,
-				currentTrackData.title,
-				currentTrackData.artist,
-				currentTrackData.length
-			);
-
 			container.addEventListener( 'waveformplayer:ended', handleEnded );
 
 			return () => {
@@ -303,6 +291,7 @@ const PlaylistEdit = ( {
 					handleEnded
 				);
 				waveformInstanceRef.current?.destroy();
+				waveformInstanceRef.current = null;
 			};
 		},
 		[ currentTrackData, setAttributes, trackListIndex, tracks ]
