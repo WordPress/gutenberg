@@ -46,6 +46,16 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 		static::$user_id = self::factory()->user->create();
 	}
 
+	public function tear_down() {
+		$registry = WP_Block_Type_Registry::get_instance();
+
+		if ( $registry->is_registered( 'test/feature-selector' ) ) {
+			unregister_block_type( 'test/feature-selector' );
+		}
+
+		parent::tear_down();
+	}
+
 	/**
 	 * Pretty print CSS in test assertions so that it provides a better diff when a test fails.
 	 * Without this: the failing test outputs the entire css string as being different.
@@ -802,8 +812,6 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'.wp-block-test-feature-selector .wp-block-test-feature-selector__inner{--wp--preset--dimension',
 			$variables
 		);
-
-		unregister_block_type( 'test/feature-selector' );
 	}
 
 	public function test_get_stylesheet_preset_rules_come_after_block_rules() {
