@@ -30,11 +30,14 @@ export default function CustomInserterModal( {
 
 	const filteredIcons = useMemo( () => {
 		if ( searchInput ) {
+			const input = searchInput.toLowerCase();
 			return icons.filter( ( icon ) => {
-				const input = searchInput.toLowerCase();
 				const iconName = icon.name.toLowerCase();
+				const iconLabel = icon.label.toLowerCase();
 
-				return iconName.includes( input );
+				return (
+					iconName.includes( input ) || iconLabel.includes( input )
+				);
 			} );
 		}
 
