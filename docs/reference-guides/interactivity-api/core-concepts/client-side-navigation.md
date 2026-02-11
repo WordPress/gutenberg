@@ -29,6 +29,7 @@ This is known as **region-based client-side navigation**, and it is the recommen
     - [Handling fetch errors](#handling-fetch-errors)
     - [Disabling client-side navigation on certain pages](#disabling-client-side-navigation-on-certain-pages)
     - [Disabling navigation feedback](#disabling-navigation-feedback)
+    - [Subscribing to page changes](#subscribing-to-page-changes)
 - [The Interactivity Router in depth](#the-interactivity-router-in-depth)
     - [The page cache](#the-page-cache)
     - [Router regions](#router-regions)
@@ -645,7 +646,52 @@ Use cases for disabling feedback:
 - **Custom loading UI**: When you're implementing your own loading indicators.
 - **Custom accessibility**: When you're providing your own screen reader announcements.
 
+### Subscribing to page changes
 
+When using client-side navigation, traditional page load events (like `DOMContentLoaded` or `load`) don't fire because the browser isn't performing a full page reload. If you need to run code after each navigation — for example, to send analytics events or update third-party widgets — you can subscribe to the router's reactive state.
+
+The `core/router` store exposes a reactive `state.url` property that updates every time a client-side navigation occurs. By reading this value inside a callback, you create a reactive subscription that re-runs whenever the URL changes.
+
+There is one subtlety to be aware of: the `@wordpress/interactivity-router` module is loaded asynchronously, so `state.url` is initially `undefined`. When the router module is finally imported, `state.url` is set to the current page URL — but this is not an actual navigation, just the initial value being populated. To avoid sending a spurious page view in either case, compare against the previous URL and only react to actual changes:
+
+```js
+// view.js
+import { store } from '@wordpress/interactivity';
+
+const routerStore = store( 'core/router' );
+
+// Track the previous URL so we only react to actual navigations.
+let previousUrl = window.location.href;
+
+store( 'myAnalytics', {
+    callbacks: {
+        onPageChange() {
+            // Reading state.url creates a reactive subscription.
+            const url = routerStore.state.url;
+
+            // Skip if the router hasn't loaded yet or if the URL
+            // hasn't actually changed (e.g., initial router load).
+            if ( url && url !== previousUrl ) {
+                previousUrl = url;
+                sendAnalyticsPageView( url );
+            }
+        },
+    },
+} );
+```
+
+Place this callback on an element that is always present in the DOM (like a site header or a persistent wrapper) using the `data-wp-watch` directive:
+
+```html
+<div
+    data-wp-interactive="myAnalytics"
+    data-wp-watch="callbacks.onPageChange"
+>
+    <!-- Site content -->
+</div>
+```
+
+The router also exposes `state.navigation.hasStarted` and `state.navigation.hasFinished` properties if you need to track the navigation lifecycle more granularly — for example, to show custom loading indicators or to time how long navigations take.
 
 ## The Interactivity Router in depth
 
