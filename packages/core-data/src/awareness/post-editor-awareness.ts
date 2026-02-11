@@ -219,8 +219,8 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				( [ clientId, collaboratorState ] ) => [
 					String( clientId ),
 					{
-						name: collaboratorState.collaboratorInfo.name,
-						wpUserId: collaboratorState.collaboratorInfo.id,
+						name: collaboratorState?.collaboratorInfo?.name,
+						wpUserId: collaboratorState?.collaboratorInfo?.id,
 					},
 				]
 			)

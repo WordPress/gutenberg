@@ -13,6 +13,34 @@ interface CollaboratorsListProps {
 	setIsPopoverVisible: ( isVisible: boolean ) => void;
 }
 
+function CollaboratorsListItem( {
+	collaboratorState,
+}: {
+	collaboratorState: PostEditorAwarenessState;
+} ) {
+	return (
+		<button
+			key={ collaboratorState.clientId }
+			className="editor-collaborators-presence__list-item"
+			disabled
+			style={ {
+				opacity: collaboratorState.isConnected ? 1 : 0.5,
+			} }
+		>
+			<Avatar
+				collaboratorInfo={ collaboratorState.collaboratorInfo }
+				showCollaboratorColorBorder
+				size="medium"
+			/>
+			<div className="editor-collaborators-presence__list-item-info">
+				<div className="editor-collaborators-presence__list-item-name">
+					{ collaboratorState.collaboratorInfo.name }
+				</div>
+			</div>
+		</button>
+	);
+}
+
 /**
  * Renders a list showing all active collaborators with their details.
  * Note: activeUsers should already exclude the current user (filtered by parent component).
@@ -51,31 +79,15 @@ export function CollaboratorsList( {
 					</div>
 				</div>
 				<div className="editor-collaborators-presence__list-items">
-					{ activeCollaborators.map( ( collaboratorState ) => (
-						<button
-							key={ collaboratorState.clientId }
-							className="editor-collaborators-presence__list-item"
-							disabled
-							style={ {
-								opacity: collaboratorState.isConnected
-									? 1
-									: 0.5,
-							} }
-						>
-							<Avatar
-								collaboratorInfo={
-									collaboratorState.collaboratorInfo
-								}
-								showCollaboratorColorBorder
-								size="medium"
-							/>
-							<div className="editor-collaborators-presence__list-item-info">
-								<div className="editor-collaborators-presence__list-item-name">
-									{ collaboratorState.collaboratorInfo.name }
-								</div>
-							</div>
-						</button>
-					) ) }
+					{ activeCollaborators.map(
+						( collaboratorState ) =>
+							collaboratorState.collaboratorInfo && (
+								<CollaboratorsListItem
+									key={ collaboratorState.clientId }
+									collaboratorState={ collaboratorState }
+								/>
+							)
+					) }
 				</div>
 			</div>
 		</Popover>

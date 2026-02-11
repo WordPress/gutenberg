@@ -5,7 +5,7 @@ import './styles/avatar.scss';
 type AvatarSize = 'small' | 'medium';
 
 interface AvatarProps {
-	collaboratorInfo: PostEditorAwarenessState[ 'collaboratorInfo' ];
+	collaboratorInfo?: PostEditorAwarenessState[ 'collaboratorInfo' ] | null;
 	showCollaboratorColorBorder?: boolean;
 	size?: AvatarSize;
 }
@@ -23,6 +23,13 @@ export function Avatar( {
 	showCollaboratorColorBorder,
 	size = 'small',
 }: AvatarProps ) {
+	// collaboratorInfo can be undefined while awareness state is syncing (e.g. before
+	// getCurrentUser() resolves for the local user, or for remote users before their
+	// state is fully propagated).
+	if ( ! collaboratorInfo ) {
+		return null;
+	}
+
 	const className = clsx(
 		'editor-collaborators-presence__avatar',
 		`editor-collaborators-presence__avatar--${ size }`,
@@ -36,7 +43,7 @@ export function Avatar( {
 		collaboratorInfo.avatar_urls?.[ 24 ];
 
 	const avatarStyles = {
-		'--avatar-url': `url(${ avatarUrl })`,
+		'--avatar-url': avatarUrl ? `url(${ avatarUrl })` : undefined,
 		'--collaborator-color': collaboratorInfo.color,
 	} as React.CSSProperties;
 
