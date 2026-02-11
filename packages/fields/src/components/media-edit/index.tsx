@@ -152,7 +152,9 @@ function MediaPickerButton( {
 	const isBlob = attachment && isBlobURL( attachment.source_url );
 	const mediaPickerButton = (
 		<div
-			className="fields__media-edit-picker-button"
+			className={ clsx( 'fields__media-edit-picker-button', {
+				'has-attachment': attachment,
+			} ) }
 			role="button"
 			tabIndex={ 0 }
 			onClick={ () => {
