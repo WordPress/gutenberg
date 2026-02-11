@@ -81,7 +81,7 @@ export function CollaboratorsPresence( {
 							collaboratorInfo={
 								collaboratorState.collaboratorInfo
 							}
-							showCollaboratorColorBorder={ false }
+							showCollaboratorColorBorder
 							size="small"
 						/>
 					) ) }
