@@ -161,6 +161,10 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 				'waveformplayer:pause',
 				eventHandlers.handlePause
 			);
+			existingContainer.removeEventListener(
+				'waveformplayer:ready',
+				eventHandlers.handleReady
+			);
 		}
 
 		// TODO: Once @arraypress/waveform-player is updated with the isDestroying
@@ -195,9 +199,6 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 
 	// Create WaveformPlayer instance.
 	const instance = new WaveformPlayer( container );
-
-	// Apply contrasting color to SVG icons for visibility.
-	styleSvgIcons( container, textColor );
 
 	// Enhance play button accessibility.
 	const playBtn = container.querySelector( '.waveform-btn' );
@@ -243,12 +244,23 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		);
 		const nextTrack = context.tracks[ currentIndex + 1 ];
 		if ( nextTrack ) {
+			const expectedTrack = nextTrack;
 			context.currentId = nextTrack;
 			// Wait before playing next track to avoid jarring transition.
 			setTimeout( () => {
+				// Verify we're still on the expected track (user might have clicked elsewhere).
+				if ( context.currentId !== expectedTrack ) {
+					return;
+				}
 				const nextAudio = ref.querySelector( 'audio' );
 				if ( nextAudio ) {
-					nextAudio.play();
+					const playPromise = nextAudio.play();
+					if (
+						playPromise &&
+						typeof playPromise.catch === 'function'
+					) {
+						playPromise.catch( logPlayError );
+					}
 				}
 			}, NEXT_TRACK_DELAY );
 		}
@@ -264,7 +276,30 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 	container.addEventListener( 'waveformplayer:play', handlePlay );
 	container.addEventListener( 'waveformplayer:pause', handlePause );
 
-	const eventHandlers = { handleEnded, handlePlay, handlePause };
+	// Wait for the ready event to style icons (they may not exist until ready).
+	// Also auto-play if switching tracks.
+	const handleReady = () => {
+		container.removeEventListener( 'waveformplayer:ready', handleReady );
+
+		// Apply contrasting color to SVG icons for visibility.
+		// Done here because icons may not exist until WaveformPlayer is ready.
+		styleSvgIcons( container, textColor );
+
+		// Auto-play if switching tracks (user action), not on initial page load.
+		if ( shouldAutoPlay ) {
+			try {
+				const playPromise = instance.play();
+				if ( playPromise && typeof playPromise.catch === 'function' ) {
+					playPromise.catch( logPlayError );
+				}
+			} catch ( e ) {
+				logPlayError( e );
+			}
+		}
+	};
+	container.addEventListener( 'waveformplayer:ready', handleReady );
+
+	const eventHandlers = { handleEnded, handlePlay, handlePause, handleReady };
 
 	// Store state for cleanup.
 	playerState.set( ref, {
@@ -275,26 +310,6 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		keyboardHandler,
 		eventHandlers,
 	} );
-
-	// Auto-play if switching tracks (user action), not on initial page load.
-	// Wait for the ready event to ensure WaveformPlayer is fully initialized.
-	if ( shouldAutoPlay ) {
-		const handleReady = () => {
-			container.removeEventListener(
-				'waveformplayer:ready',
-				handleReady
-			);
-			try {
-				const playPromise = instance.play();
-				if ( playPromise && typeof playPromise.catch === 'function' ) {
-					playPromise.catch( logPlayError );
-				}
-			} catch ( e ) {
-				logPlayError( e );
-			}
-		};
-		container.addEventListener( 'waveformplayer:ready', handleReady );
-	}
 }
 
 /**

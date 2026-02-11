@@ -278,12 +278,22 @@ const PlaylistEdit = ( {
 			// Create WaveformPlayer instance.
 			const instance = new WaveformPlayer( container );
 
-			// Apply contrasting color to SVG icons for visibility.
-			styleSvgIcons( container, textColor );
-
+			// Apply contrasting color to SVG icons once WaveformPlayer is ready.
+			const handleReady = () => {
+				container.removeEventListener(
+					'waveformplayer:ready',
+					handleReady
+				);
+				styleSvgIcons( container, textColor );
+			};
+			container.addEventListener( 'waveformplayer:ready', handleReady );
 			container.addEventListener( 'waveformplayer:ended', handleEnded );
 
 			return () => {
+				container.removeEventListener(
+					'waveformplayer:ready',
+					handleReady
+				);
 				container.removeEventListener(
 					'waveformplayer:ended',
 					handleEnded
