@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/theme",
-	"version": "0.7.0-prerelease",
+	"version": "0.7.1-next.v.202602111440.0+a307a2e35",
 	"description": "Theme and context provider for the WordPress Design System.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

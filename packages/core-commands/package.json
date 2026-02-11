@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/core-commands",
-	"version": "1.39.0",
+	"version": "1.39.1-next.v.202602111440.0+a307a2e35",
 	"description": "WordPress core reusable commands.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
