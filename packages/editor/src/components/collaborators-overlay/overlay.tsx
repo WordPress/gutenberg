@@ -4,7 +4,10 @@ import { useEffect, useState } from '@wordpress/element';
 
 import { useBlockHighlighting } from './use-block-highlighting';
 import { useRenderCursors } from './use-render-cursors';
-import { COLLABORATOR_CONTRAST_SHADOW } from './collaborator-styles';
+import {
+	ELEVATION_X_SMALL,
+	COLLABORATOR_CONTRAST_SHADOW,
+} from './collaborator-styles';
 
 const COLLABORATORS_OVERLAY_STYLES = `
 .block-canvas-cover {
@@ -34,18 +37,51 @@ const COLLABORATORS_OVERLAY_STYLES = `
 .collaborators-overlay-user-cursor {
 	position: absolute;
 	width: 2px;
+	outline: 1px solid #fff;
+	box-shadow: ${ ELEVATION_X_SMALL };
 	animation: collaborators-overlay-cursor-blink 1s infinite;
 }
 .collaborators-overlay-user-label {
 	position: absolute;
-	font-size: 11px;
-	padding: 2px 6px;
-	border-radius: 4px;
-	transform: translateY(-100%);
-	margin-top: -2px;
-	background-color: var(--wp--preset--color--black);
-	color: var(--wp--preset--color--white);
+	display: flex;
+	align-items: center;
+	max-width: 240px;
+	border-radius: 9999px;
+	transform: translate(-12px, -100%);
+	margin-top: -4px;
 	white-space: nowrap;
+	overflow: clip;
+	pointer-events: auto;
+	outline: 1px solid #fff;
+	box-shadow: ${ ELEVATION_X_SMALL };
+}
+.collaborators-overlay-user-label__avatar {
+	box-sizing: border-box;
+	background-image: var(--avatar-url);
+	background-size: cover;
+	background-position: center;
+	border-radius: 50%;
+	border-width: var(--wp-admin-border-width-focus, 2px);
+	border-style: solid;
+	width: 24px;
+	height: 24px;
+	flex-shrink: 0;
+	box-shadow: inset 0 0 0 1px #fff;
+}
+.collaborators-overlay-user-label__name {
+	font-size: 13px;
+	line-height: 20px;
+	color: #fff;
+	max-width: 0;
+	padding: 0;
+	overflow: hidden;
+	opacity: 0;
+	transition: max-width 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
+}
+.collaborators-overlay-user-label:hover .collaborators-overlay-user-label__name {
+	max-width: 200px;
+	padding: 0 8px 2px 4px;
+	opacity: 1;
 }
 @keyframes collaborators-overlay-cursor-blink {
 	0%, 100% { opacity: 1; }
@@ -69,11 +105,11 @@ const COLLABORATORS_OVERLAY_STYLES = `
 }
 @keyframes collaborators-overlay-label-highlight {
 	0%, 100% {
-		transform: translateY(-100%) scale(1);
+		transform: translate(-12px, -100%) scale(1);
 		filter: drop-shadow(0 0 0 transparent);
 	}
 	50% {
-		transform: translateY(-100%) scale(1.1);
+		transform: translate(-12px, -100%) scale(1.1);
 		filter: drop-shadow(0 0 6px currentColor);
 	}
 }
@@ -89,7 +125,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	outline-style: solid;
 	outline-width: calc(var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
 	outline-offset: calc(-1 * var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
-	box-shadow: ${ COLLABORATOR_CONTRAST_SHADOW };
+	box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus, 2px) + 1px) #fff, 0 0 0 1px #fff, ${ ELEVATION_X_SMALL };
 	z-index: 1;
 }
 `;
@@ -170,7 +206,20 @@ export function Overlay( {
 							backgroundColor: cursor.color,
 						} }
 					>
-						{ cursor.userName }
+						<div
+							className="collaborators-overlay-user-label__avatar"
+							style={
+								{
+									'--avatar-url': cursor.avatarUrl
+										? `url(${ cursor.avatarUrl })`
+										: undefined,
+									borderColor: cursor.color,
+								} as React.CSSProperties
+							}
+						/>
+						<span className="collaborators-overlay-user-label__name">
+							{ cursor.userName }
+						</span>
 					</div>
 				</div>
 			) ) }

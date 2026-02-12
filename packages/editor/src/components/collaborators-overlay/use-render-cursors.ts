@@ -14,6 +14,7 @@ export interface CursorData {
 	userName: string;
 	clientId: number;
 	color: string;
+	avatarUrl?: string;
 	x: number;
 	y: number;
 	height: number;
@@ -67,6 +68,10 @@ export function useRenderCursors(
 				const userName = user.collaboratorInfo.name;
 				const clientId = user.clientId;
 				const color = user.collaboratorInfo.backgroundColor;
+				const avatarUrl =
+					user.collaboratorInfo.avatar_urls?.[ 48 ] ||
+					user.collaboratorInfo.avatar_urls?.[ 96 ] ||
+					user.collaboratorInfo.avatar_urls?.[ 24 ];
 
 				let coords: {
 					x: number;
@@ -120,6 +125,7 @@ export function useRenderCursors(
 						userName,
 						clientId,
 						color,
+						avatarUrl,
 						...coords,
 					} );
 				}
