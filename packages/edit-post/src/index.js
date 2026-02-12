@@ -71,6 +71,7 @@ export function initializeEditor(
 		showIconLabels: false,
 		showListViewByDefault: false,
 		enableChoosePatternModal: true,
+		contentOnlyPatternSections: true,
 		isPublishSidebarEnabled: true,
 	} );
 

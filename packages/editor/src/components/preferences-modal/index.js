@@ -55,20 +55,29 @@ export default function EditorPreferencesModal( { extraSections = {} } ) {
 
 function PreferencesModalContents( { extraSections = {} } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const showBlockBreadcrumbsOption = useSelect(
-		( select ) => {
-			const { getEditorSettings } = select( editorStore );
-			const { get } = select( preferencesStore );
-			const isRichEditingEnabled = getEditorSettings().richEditingEnabled;
-			const isDistractionFreeEnabled = get( 'core', 'distractionFree' );
-			return (
-				! isDistractionFreeEnabled &&
-				isLargeViewport &&
-				isRichEditingEnabled
-			);
-		},
-		[ isLargeViewport ]
-	);
+	const { showBlockBreadcrumbsOption, showContentOnlyPatternSectionsOption } =
+		useSelect(
+			( select ) => {
+				const { getEditorSettings } = select( editorStore );
+				const { get } = select( preferencesStore );
+				const isRichEditingEnabled =
+					getEditorSettings().richEditingEnabled;
+				const isDistractionFreeEnabled = get(
+					'core',
+					'distractionFree'
+				);
+				return {
+					showBlockBreadcrumbsOption:
+						! isDistractionFreeEnabled &&
+						isLargeViewport &&
+						isRichEditingEnabled,
+					showContentOnlyPatternSectionsOption:
+						getEditorSettings().contentOnlyPatternSections !==
+						false,
+				};
+			},
+			[ isLargeViewport ]
+		);
 	const { setIsListViewOpened, setIsInserterOpened } =
 		useDispatch( editorStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
@@ -120,6 +129,18 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									) }
 									label={ __( 'Show starter patterns' ) }
 								/>
+								{ showContentOnlyPatternSectionsOption && (
+									<PreferenceToggleControl
+										scope="core"
+										featureName="contentOnlyPatternSections"
+										help={ __(
+											'Restrict editing in pattern sections to content blocks only.'
+										) }
+										label={ __(
+											'Content-only pattern editing'
+										) }
+									/>
+								) }
 							</PreferencesModalSection>
 							<PreferencesModalSection
 								title={ __( 'Document settings' ) }
@@ -332,6 +353,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 			].filter( Boolean ),
 		[
 			showBlockBreadcrumbsOption,
+			showContentOnlyPatternSectionsOption,
 			extraSections,
 			setIsInserterOpened,
 			setIsListViewOpened,

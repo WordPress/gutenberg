@@ -130,6 +130,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		pageForPosts,
 		userPatternCategories,
 		restBlockPatternCategories,
+		contentOnlyPatternSections,
 		sectionRootClientId,
 		deviceType,
 	} = useSelect(
@@ -170,6 +171,10 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
+				),
+				contentOnlyPatternSections: get(
+					'core',
+					'contentOnlyPatternSections'
 				),
 				blockTypes: getBlockTypes(),
 				canUseUnfilteredHTML: getRawEntityRecord(
@@ -306,6 +311,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	}, [ settings.allowedBlockTypes, hiddenBlockTypes, blockTypes ] );
 
 	const forceDisableFocusMode = settings.focusMode === false;
+	const forceDisableContentOnlyPatternSections =
+		settings.contentOnlyPatternSections === false;
 
 	return useMemo( () => {
 		const blockEditorSettings = {
@@ -321,6 +328,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
 			allowedBlockTypes,
 			allowRightClickOverrides,
+			contentOnlyPatternSections:
+				contentOnlyPatternSections &&
+				! forceDisableContentOnlyPatternSections,
 			focusMode: focusMode && ! forceDisableFocusMode,
 			hasFixedToolbar,
 			isDistractionFree,
@@ -396,6 +406,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	}, [
 		allowedBlockTypes,
 		allowRightClickOverrides,
+		contentOnlyPatternSections,
+		forceDisableContentOnlyPatternSections,
 		focusMode,
 		forceDisableFocusMode,
 		hasFixedToolbar,
