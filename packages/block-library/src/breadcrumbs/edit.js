@@ -15,7 +15,7 @@ import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { useServerSideRender } from '@wordpress/server-side-render';
-import { useDisabled } from '@wordpress/compose';
+import { useDelayedLoading, useDisabled } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -115,19 +115,7 @@ export default function BreadcrumbEdit( {
 			prevContentRef.current = content;
 		}
 	}, [ content, status ] );
-	const [ showLoader, setShowLoader ] = useState( false );
-	useEffect( () => {
-		if ( status !== 'loading' ) {
-			return;
-		}
-		const timeout = setTimeout( () => {
-			setShowLoader( true );
-		}, 400 );
-		return () => {
-			clearTimeout( timeout );
-			setShowLoader( false );
-		};
-	}, [ status ] );
+	const showLoading = useDelayedLoading( status === 'loading' );
 	const disabledRef = useDisabled();
 	const blockProps = useBlockProps( { ref: disabledRef } );
 
@@ -312,7 +300,7 @@ export default function BreadcrumbEdit( {
 							...blockProps,
 							style: {
 								...blockProps.style,
-								opacity: showLoader ? 0.3 : 1,
+								opacity: showLoading ? 0.3 : 1,
 							},
 						} }
 						html={ prevContentRef.current }

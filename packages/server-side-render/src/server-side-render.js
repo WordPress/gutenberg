@@ -1,16 +1,11 @@
 /**
  * WordPress dependencies
  */
-import {
-	RawHTML,
-	useEffect,
-	useState,
-	useRef,
-	useMemo,
-} from '@wordpress/element';
+import { RawHTML, useEffect, useRef, useMemo } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { Placeholder, Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { useDelayedLoading } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -37,15 +32,7 @@ function DefaultErrorResponsePlaceholder( { message, className } ) {
 }
 
 function DefaultLoadingResponsePlaceholder( { children } ) {
-	const [ showLoader, setShowLoader ] = useState( false );
-
-	useEffect( () => {
-		// Schedule showing the Spinner after 1 second.
-		const timeout = setTimeout( () => {
-			setShowLoader( true );
-		}, 1000 );
-		return () => clearTimeout( timeout );
-	}, [] );
+	const showLoader = useDelayedLoading( true, { delay: 1000 } );
 
 	return (
 		<div style={ { position: 'relative' } }>

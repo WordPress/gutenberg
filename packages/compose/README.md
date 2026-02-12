@@ -271,6 +271,22 @@ _Returns_
 
 -   `[ string, ( value: string ) => void, string ]`: The input value, the setter and the debounced input value.
 
+### useDelayedLoading
+
+Delay showing a loader to avoid visual flicker for fast loads.
+
+Returns `true` only after `isLoading` has been `true` for at least `options.delay` milliseconds. Resets to `false` when loading ends.
+
+_Parameters_
+
+-   _isLoading_ `boolean`: Whether a loading operation is in progress.
+-   _options_ `{ delay: number; }`: Options object.
+-   _options.delay_ `{ delay: number; }`: Time in milliseconds to wait before showing the loader. Default `400`.
+
+_Returns_
+
+-   `boolean`: Whether the loader should be shown.
+
 ### useDisabled
 
 In some circumstances, such as block previews, all focusable DOM elements (input fields, links, buttons, etc.) need to be disabled. This hook adds the behavior to disable nested DOM elements to the returned ref.
