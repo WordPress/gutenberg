@@ -537,3 +537,4 @@ const PlaylistEdit = ( {
 };
 
 export default PlaylistEdit;
+export { getTrackAriaLabel, getTrackAttributes };
