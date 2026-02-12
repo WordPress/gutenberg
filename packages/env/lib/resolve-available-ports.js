@@ -27,18 +27,17 @@ const PREFERRED_PORTS = {
 };
 
 /**
- * Creates a port resolver that tracks used ports and records changes.
+ * Creates a port resolver that tracks used ports.
  *
  * The resolver is designed to be called during config post-processing,
  * after environments have been merged but before URLs are set. This
  * allows `appendPortToWPConfigs` to use the resolved ports directly.
  *
  * @param {Object} spinner A CLI spinner for displaying progress.
- * @return {Object} A port resolver with `resolve` and `getChanges` methods.
+ * @return {Object} A port resolver with a `resolve` method.
  */
 function createPortResolver( spinner ) {
 	const usedPorts = [];
-	const portChanges = [];
 
 	return {
 		/**
@@ -81,29 +80,12 @@ function createPortResolver( spinner ) {
 
 				usedPorts.push( resolvedPort );
 
-				if ( resolvedPort !== preferredPort ) {
-					portChanges.push( {
-						configPath,
-						from: preferredPort,
-						to: resolvedPort,
-					} );
-				}
-
 				return resolvedPort;
 			} catch ( error ) {
 				throw new Error(
 					`Could not find available port for ${ configPath }: ${ error.message }`
 				);
 			}
-		},
-
-		/**
-		 * Returns all port changes that occurred during resolution.
-		 *
-		 * @return {Array<{configPath: string, from: number, to: number}>} Port changes.
-		 */
-		getChanges() {
-			return portChanges;
 		},
 	};
 }
@@ -114,7 +96,7 @@ function createPortResolver( spinner ) {
  *
  * @param {Object} config       The config object (after mergeRootToEnvironments).
  * @param {Object} portResolver A port resolver created by `createPortResolver`.
- * @return {Promise<Object>} The config with resolved ports and portChanges attached.
+ * @return {Promise<Object>} The config with resolved ports.
  */
 async function resolveConfigPorts( config, portResolver ) {
 	for ( const { env, property } of PORT_DEFINITIONS ) {
@@ -147,7 +129,6 @@ async function resolveConfigPorts( config, portResolver ) {
 		);
 	}
 
-	config.portChanges = portResolver.getChanges();
 	return config;
 }
 

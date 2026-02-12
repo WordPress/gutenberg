@@ -28,22 +28,6 @@ describe( 'resolve-available-ports', () => {
 			);
 		} );
 
-		it( 'should record port changes when a different port is used', async () => {
-			findAvailablePort.mockResolvedValue( 49152 );
-
-			const resolver = createPortResolver();
-			const port = await resolver.resolve( 8888, 'env.development.port' );
-
-			expect( port ).toBe( 49152 );
-			expect( resolver.getChanges() ).toEqual( [
-				{
-					configPath: 'env.development.port',
-					from: 8888,
-					to: 49152,
-				},
-			] );
-		} );
-
 		it( 'should fail in strict mode when port is busy', async () => {
 			isPortAvailable.mockResolvedValue( false );
 

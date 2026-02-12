@@ -103,7 +103,6 @@ module.exports = async function loadConfig(
 		] ),
 		lifecycleScripts: config.lifecycleScripts,
 		env: config.env,
-		portChanges: config.portChanges || [],
 	};
 };
 
