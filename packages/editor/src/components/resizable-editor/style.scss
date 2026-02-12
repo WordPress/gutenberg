@@ -7,6 +7,11 @@
 .editor-resizable-editor.is-resizable {
 	overflow: visible;
 	margin: 0 auto;
+
+	// Animate width changes when switching between device presets
+	&.is-animating {
+		transition: width 0.3s ease-in-out;
+	}
 }
 
 .editor-resizable-editor__resize-handle {

@@ -37,7 +37,11 @@ import { store as editorStore } from '../../store';
 import PostPreviewButton from '../post-preview-button';
 import { unlock } from '../../lock-unlock';
 
-export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
+export default function PreviewDropdown( {
+	forceIsAutosaveable,
+	disabled,
+	enableResizing = false,
+} ) {
 	const {
 		deviceType,
 		homeUrl,
@@ -108,7 +112,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 	 *
 	 * @type {Array}
 	 */
-	const choices = [
+	const allChoices = [
 		{
 			value: 'Desktop',
 			label: __( 'Desktop' ),
@@ -130,6 +134,11 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			icon: dragHandle,
 		},
 	];
+
+	// Only include Custom option when resizing is enabled
+	const choices = enableResizing
+		? allChoices
+		: allChoices.filter( ( choice ) => choice.value !== 'Custom' );
 
 	return (
 		<DropdownMenu

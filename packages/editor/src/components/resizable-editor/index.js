@@ -37,8 +37,10 @@ function ResizableEditor( {
 	onDeviceTypeChange,
 } ) {
 	const [ width, setWidth ] = useState( '100%' );
+	const [ isAnimating, setIsAnimating ] = useState( false );
 	const resizableRef = useRef();
 	const isResizingRef = useRef( false );
+	const previousDeviceTypeRef = useRef( deviceType );
 
 	const resizeWidthBy = useCallback( ( deltaPixels ) => {
 		if ( resizableRef.current ) {
@@ -50,7 +52,24 @@ function ResizableEditor( {
 	useEffect( () => {
 		if ( enableResizing && deviceType && deviceType !== 'Custom' ) {
 			const deviceWidth = DEVICE_PREVIEW_WIDTHS[ deviceType ];
+
+			// Animate only when switching between known presets (not from Custom)
+			const shouldAnimate =
+				previousDeviceTypeRef.current &&
+				previousDeviceTypeRef.current !== 'Custom' &&
+				previousDeviceTypeRef.current !== deviceType;
+
+			if ( shouldAnimate ) {
+				setIsAnimating( true );
+				const timeoutId = setTimeout(
+					() => setIsAnimating( false ),
+					300
+				); // Match CSS transition duration
+				return () => clearTimeout( timeoutId );
+			}
+
 			setWidth( deviceWidth ?? '100%' );
+			previousDeviceTypeRef.current = deviceType;
 		}
 	}, [ deviceType, enableResizing ] );
 
@@ -58,6 +77,7 @@ function ResizableEditor( {
 		<ResizableBox
 			className={ clsx( 'editor-resizable-editor', className, {
 				'is-resizable': enableResizing,
+				'is-animating': isAnimating && enableResizing,
 			} ) }
 			ref={ ( api ) => {
 				resizableRef.current = api?.resizable;
@@ -68,6 +88,7 @@ function ResizableEditor( {
 			} }
 			onResizeStart={ () => {
 				isResizingRef.current = true;
+				setIsAnimating( false ); // Disable animation during manual resize
 			} }
 			onResizeStop={ ( event, direction, element ) => {
 				const newWidth = parseInt( element.style.width );

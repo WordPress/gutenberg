@@ -23,7 +23,12 @@ import PostViewLink from '../post-view-link';
 import PreviewDropdown from '../preview-dropdown';
 import ZoomOutToggle from '../zoom-out-toggle';
 import { store as editorStore } from '../../store';
-import { ATTACHMENT_POST_TYPE } from '../../store/constants';
+import {
+	ATTACHMENT_POST_TYPE,
+	NAVIGATION_POST_TYPE,
+	TEMPLATE_PART_POST_TYPE,
+	PATTERN_POST_TYPE,
+} from '../../store/constants';
 import { CollaboratorsPresence } from '../collaborators-presence/index';
 import { unlock } from '../../lock-unlock';
 
@@ -35,6 +40,7 @@ function Header( {
 	const isWideViewport = useViewportMatch( 'large' );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isTooNarrowForDocumentBar = useMediaQuery( '(max-width: 403px)' );
+	const isMobileViewport = useViewportMatch( 'small', '<' );
 	const {
 		postId,
 		postType,
@@ -46,6 +52,8 @@ function Header( {
 		hasSectionRootClientId,
 		isStylesCanvasActive,
 		isAttachment,
+		isPreview,
+		isZoomedOut,
 	} = useSelect( ( select ) => {
 		const { get: getPreference } = select( preferencesStore );
 		const {
@@ -53,13 +61,16 @@ function Header( {
 			getCurrentPostType,
 			getCurrentPostId,
 			isPublishSidebarOpened: _isPublishSidebarOpened,
+			getEditorSettings,
 		} = select( editorStore );
 		const { getStylesPath, getShowStylebook } = unlock(
 			select( editorStore )
 		);
-		const { getBlockSelectionStart, getSectionRootClientId } = unlock(
-			select( blockEditorStore )
-		);
+		const {
+			getBlockSelectionStart,
+			getSectionRootClientId,
+			isZoomOut: _isZoomOut,
+		} = unlock( select( blockEditorStore ) );
 
 		return {
 			postId: getCurrentPostId(),
@@ -76,6 +87,8 @@ function Header( {
 			isAttachment:
 				getCurrentPostType() === ATTACHMENT_POST_TYPE &&
 				window?.__experimentalMediaEditor,
+			isPreview: getEditorSettings().isPreviewMode,
+			isZoomedOut: _isZoomOut(),
 		};
 	}, [] );
 
@@ -85,6 +98,16 @@ function Header( {
 
 	const disablePreviewOption =
 		[ ATTACHMENT_POST_TYPE ].includes( postType ) || isStylesCanvasActive;
+
+	const enableResizing =
+		[
+			NAVIGATION_POST_TYPE,
+			TEMPLATE_PART_POST_TYPE,
+			PATTERN_POST_TYPE,
+		].includes( postType ) &&
+		! isPreview &&
+		! isMobileViewport &&
+		! isZoomedOut;
 
 	const [ isBlockToolsCollapsed, setIsBlockToolsCollapsed ] =
 		useState( true );
@@ -143,6 +166,7 @@ function Header( {
 					<PreviewDropdown
 						forceIsAutosaveable={ forceIsDirty }
 						disabled={ disablePreviewOption }
+						enableResizing={ enableResizing }
 					/>
 
 					<PostPreviewButton
