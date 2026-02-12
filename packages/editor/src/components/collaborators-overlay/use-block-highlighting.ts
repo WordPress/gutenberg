@@ -3,6 +3,7 @@
  */
 import {
 	privateApis as coreDataPrivateApis,
+	SelectionType,
 	type SelectionWholeBlock,
 } from '@wordpress/core-data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -12,7 +13,7 @@ import { useEffect, useRef } from '@wordpress/element';
  */
 import { unlock } from '../../lock-unlock';
 
-const { SelectionType, useActiveCollaborators } = unlock( coreDataPrivateApis );
+const { useActiveCollaborators } = unlock( coreDataPrivateApis );
 
 /**
  * Custom hook for highlighting selected blocks in the editor
