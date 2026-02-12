@@ -16,7 +16,7 @@ import {
 	getWaveformColors,
 	createWaveformContainer,
 	styleSvgIcons,
-} from './utils';
+} from '../utils/waveform-utils';
 
 /**
  * Configuration constants.

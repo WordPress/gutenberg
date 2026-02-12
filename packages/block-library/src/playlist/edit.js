@@ -3,14 +3,11 @@
  */
 import clsx from 'clsx';
 import { v4 as uuid } from 'uuid';
-import WaveformPlayer from '@arraypress/waveform-player';
-import '@arraypress/waveform-player/dist/waveform-player.css';
 
 /**
  * WordPress dependencies
  */
 import { useState, useCallback, useEffect } from '@wordpress/element';
-import { useRefEffect } from '@wordpress/compose';
 import {
 	store as blockEditorStore,
 	MediaPlaceholder,
@@ -41,11 +38,7 @@ import { createBlock } from '@wordpress/blocks';
  */
 import { Caption } from '../utils/caption';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import {
-	getWaveformColors,
-	createWaveformContainer,
-	styleSvgIcons,
-} from './utils';
+import { WaveformPlayer } from '../utils/waveform-player';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
@@ -233,86 +226,33 @@ const PlaylistEdit = ( {
 	const currentTrackData = tracks[ trackListIndex ];
 	const waveformAriaLabel = getTrackAriaLabel( currentTrackData );
 
-	// Initialize WaveformPlayer when the element mounts or track changes.
-	// useRefEffect ensures styles are applied before initialization (important for iframed editor).
-	const waveformRef = useRefEffect(
-		( element ) => {
-			if ( ! currentTrackData?.src ) {
-				return;
+	// Handle track end - advance to next track.
+	const onTrackEnded = useCallback( () => {
+		if ( trackListIndex < tracks.length - 1 ) {
+			if ( tracks[ trackListIndex + 1 ]?.uniqueId ) {
+				setTrackListIndex( trackListIndex + 1 );
+				setAttributes( {
+					currentTrack: tracks[ trackListIndex + 1 ].uniqueId,
+				} );
 			}
-
-			// Handle track end - advance to next track.
-			const handleEnded = () => {
-				if ( trackListIndex < tracks.length - 1 ) {
-					if ( tracks[ trackListIndex + 1 ]?.uniqueId ) {
-						setTrackListIndex( trackListIndex + 1 );
-						setAttributes( {
-							currentTrack: tracks[ trackListIndex + 1 ].uniqueId,
-						} );
-					}
-				} else {
-					setTrackListIndex( 0 );
-					if ( tracks[ 0 ]?.uniqueId ) {
-						setAttributes( {
-							currentTrack: tracks[ 0 ].uniqueId,
-						} );
-					} else if ( tracks.length > 0 ) {
-						const validTrack = tracks.find(
-							( track ) => track.uniqueId !== undefined
-						);
-						if ( validTrack ) {
-							setAttributes( {
-								currentTrack: validTrack.uniqueId,
-							} );
-						}
-					}
+		} else {
+			setTrackListIndex( 0 );
+			if ( tracks[ 0 ]?.uniqueId ) {
+				setAttributes( {
+					currentTrack: tracks[ 0 ].uniqueId,
+				} );
+			} else if ( tracks.length > 0 ) {
+				const validTrack = tracks.find(
+					( track ) => track.uniqueId !== undefined
+				);
+				if ( validTrack ) {
+					setAttributes( {
+						currentTrack: validTrack.uniqueId,
+					} );
 				}
-			};
-
-			// Get colors for styling (CSS is applied when useRefEffect runs).
-			const { textColor, waveformColor, progressColor } =
-				getWaveformColors( element );
-
-			// Create waveform container with correct colors.
-			const container = createWaveformContainer( {
-				url: currentTrackData.src,
-				title: currentTrackData.title,
-				artist: currentTrackData.artist,
-				artwork: currentTrackData.image,
-				waveformColor,
-				progressColor,
-				buttonColor: textColor,
-			} );
-			element.appendChild( container );
-
-			// Create WaveformPlayer instance.
-			const instance = new WaveformPlayer( container );
-
-			// Apply contrasting color to SVG icons once WaveformPlayer is ready.
-			const handleReady = () => {
-				container.removeEventListener(
-					'waveformplayer:ready',
-					handleReady
-				);
-				styleSvgIcons( container, textColor );
-			};
-			container.addEventListener( 'waveformplayer:ready', handleReady );
-			container.addEventListener( 'waveformplayer:ended', handleEnded );
-
-			return () => {
-				container.removeEventListener(
-					'waveformplayer:ready',
-					handleReady
-				);
-				container.removeEventListener(
-					'waveformplayer:ended',
-					handleEnded
-				);
-				instance.destroy();
-			};
-		},
-		[ currentTrackData, setAttributes, trackListIndex, tracks ]
-	);
+			}
+		}
+	}, [ trackListIndex, tracks, setAttributes ] );
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
@@ -506,10 +446,13 @@ const PlaylistEdit = ( {
 			</InspectorControls>
 			<figure { ...blockProps }>
 				<Disabled isDisabled={ ! isSelected }>
-					<div
-						ref={ waveformRef }
-						className="wp-block-playlist__waveform-player"
-						aria-label={ waveformAriaLabel }
+					<WaveformPlayer
+						src={ currentTrackData?.src }
+						title={ currentTrackData?.title }
+						artist={ currentTrackData?.artist }
+						image={ currentTrackData?.image }
+						ariaLabel={ waveformAriaLabel }
+						onEnded={ onTrackEnded }
 					/>
 				</Disabled>
 				{ showTracklist && (

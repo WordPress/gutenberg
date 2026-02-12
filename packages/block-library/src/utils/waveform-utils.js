@@ -1,5 +1,6 @@
 /**
- * Shared utilities for the playlist block.
+ * Shared utilities for waveform audio player functionality.
+ * Used by both the WaveformPlayer component (editor) and view.js (frontend).
  */
 
 /**
