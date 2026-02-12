@@ -177,6 +177,8 @@ describe( 'BaseAwarenessState', () => {
 				avatar_urls: mockAvatarUrls,
 				browserType: 'Firefox',
 				color: '#3858E9', // blueberry
+				strokeColor: '#3858e9',
+				backgroundColor: '#3858e9',
 				enteredAt: 1704067200000,
 			} );
 
@@ -222,6 +224,8 @@ describe( 'BaseAwarenessState', () => {
 				avatar_urls: mockAvatarUrls,
 				browserType: 'Safari',
 				color: '#E33184',
+				strokeColor: '#e33184',
+				backgroundColor: '#c3006a',
 				enteredAt: 1704067200000,
 			};
 
@@ -244,6 +248,8 @@ describe( 'BaseAwarenessState', () => {
 				avatar_urls: mockAvatarUrls,
 				browserType: 'Safari',
 				color: '#E33184',
+				strokeColor: '#e33184',
+				backgroundColor: '#c3006a',
 				enteredAt: 1704067200000,
 			};
 

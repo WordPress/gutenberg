@@ -44,6 +44,8 @@ const createMockActiveUser = (
 		avatar_urls: mockAvatarUrls,
 		browserType: 'Chrome',
 		color: '#3858E9',
+		strokeColor: '#3858e9',
+		backgroundColor: '#3858e9',
 		enteredAt: 1704067200000,
 	},
 	editorState: {
@@ -420,6 +422,8 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 					avatar_urls: mockAvatarUrls,
 					browserType: 'Chrome',
 					color: '#3858E9',
+					strokeColor: '#3858e9',
+					backgroundColor: '#3858e9',
 					enteredAt: 1704067200000,
 				},
 			} );
@@ -433,6 +437,8 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 					avatar_urls: mockAvatarUrls,
 					browserType: 'Firefox',
 					color: '#E33184',
+					strokeColor: '#e33184',
+					backgroundColor: '#c3006a',
 					enteredAt: 1704067300000,
 				},
 			} );
