@@ -196,13 +196,7 @@ function render_block_core_latest_posts( $attributes ) {
 
 					try {
 						// Run through the actions that are typically taken on the_content.
-						$post_content = do_blocks( $post_content );
-						$post_content = shortcode_unautop( $post_content );
-						$post_content = do_shortcode( $post_content );
-						$post_content = wp_filter_content_tags( $post_content, 'latest-posts' );
-
-						global $wp_embed;
-						$post_content = $wp_embed->autoembed( $post_content );
+						$post_content = gutenberg_apply_content_filters( $post_content, 'latest-posts' );
 					} finally {
 						array_pop( $rendering_stack );
 					}
