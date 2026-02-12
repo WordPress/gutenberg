@@ -5,16 +5,16 @@
  * @package WordPress
  */
 
+// Path differs between source and build: '../navigation-link/shared/' in source, './navigation-link/shared/' in build.
+if ( file_exists( __DIR__ . '/../navigation-link/shared/get-submenu-visibility.php' ) ) {
+	require_once __DIR__ . '/../navigation-link/shared/get-submenu-visibility.php';
+} else {
+	require_once __DIR__ . '/navigation-link/shared/get-submenu-visibility.php';
+}
+
 /**
  * Returns the submenu visibility value with backward compatibility
  * for the deprecated openSubmenusOnClick attribute.
- *
- * This function centralizes the migration logic from the boolean
- * openSubmenusOnClick to the new submenuVisibility enum.
- *
- * Backward compatibility: WordPress applies default attribute values, so submenuVisibility
- * will always have a value even for legacy blocks. We check the legacy openSubmenusOnClick
- * attribute first to preserve original behavior for blocks saved before the migration.
  *
  * @since 6.9.0
  *
@@ -22,22 +22,7 @@
  * @return string The visibility mode: 'hover', 'click', or 'always'.
  */
 function block_core_navigation_get_submenu_visibility( $attributes ) {
-	$open_submenus_on_click = $attributes['openSubmenusOnClick'] ?? null;
-
-	// For backward compatibility, prioritize the legacy attribute if present.
-	// Legacy blocks have openSubmenusOnClick in the database. Since WordPress applies
-	// default values, submenuVisibility will also have a value, but we check the legacy
-	// attribute first to preserve the original behavior. If the block has been loaded
-	// and saved in the editor, then the deprecatedOpenSubmenusOnClick will not be present.
-	if ( null !== $open_submenus_on_click ) {
-		// Convert boolean to string: true -> 'click', false -> 'hover'.
-		return ! empty( $open_submenus_on_click ) ? 'click' : 'hover';
-	}
-
-	$submenu_visibility = $attributes['submenuVisibility'] ?? null;
-
-	// Use submenuVisibility for migrated/new blocks (where openSubmenusOnClick is null).
-	return $submenu_visibility ?? 'hover';
+	return block_core_shared_navigation_get_submenu_visibility( $attributes );
 }
 
 /**
