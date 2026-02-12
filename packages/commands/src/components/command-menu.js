@@ -14,6 +14,8 @@ import {
 	useRef,
 	useCallback,
 	useMemo,
+	isValidElement,
+	Component,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
@@ -27,7 +29,6 @@ import {
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
 import { Icon, search as inputIcon } from '@wordpress/icons';
-import { isValidIcon } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -38,6 +39,26 @@ import { unlock } from '../lock-unlock';
 const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );
 
 const inputLabel = __( 'Search commands and settings' );
+
+/**
+ * Function that checks if the parameter is a valid icon.
+ * Taken from @wordpress/blocks/src/api/utils.js and copied
+ * in case requirements diverge and to avoid a dependency on @wordpress/blocks.
+ *
+ * @param {*} icon Parameter to be checked.
+ *
+ * @return {boolean} True if the parameter is a valid icon and false otherwise.
+ */
+
+export function isValidIcon( icon ) {
+	return (
+		!! icon &&
+		( typeof icon === 'string' ||
+			isValidElement( icon ) ||
+			typeof icon === 'function' ||
+			icon instanceof Component )
+	);
+}
 
 function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 	const { isLoading, commands = [] } = hook( { search } ) ?? {};
