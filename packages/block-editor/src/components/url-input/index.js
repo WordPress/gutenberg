@@ -57,6 +57,7 @@ class URLInput extends Component {
 		this.bindSuggestionNode = this.bindSuggestionNode.bind( this );
 		this.autocompleteRef = props.autocompleteRef || createRef();
 		this.inputRef = props.inputRef || createRef();
+		this.hasRenderedValidation = { current: false };
 		this.updateSuggestions = debounce(
 			this.updateSuggestions.bind( this ),
 			200
@@ -432,7 +433,6 @@ class URLInput extends Component {
 			disabled = false,
 			customValidity,
 			markWhenOptional,
-			useCustomValidation = false,
 		} = this.props;
 
 		const {
@@ -494,7 +494,12 @@ class URLInput extends Component {
 			return renderControl( controlProps, inputProps, loading );
 		}
 
-		const MaybeValidatedInputControl = useCustomValidation
+		// Use ValidatedInputControl if customValidity has ever had a non-undefined value.
+		if ( customValidity !== undefined ) {
+			this.hasRenderedValidation.current = true;
+		}
+
+		const MaybeValidatedInputControl = this.hasRenderedValidation.current
 			? ValidatedInputControl
 			: InputControl;
 
@@ -502,7 +507,9 @@ class URLInput extends Component {
 			<BaseControl { ...controlProps }>
 				<MaybeValidatedInputControl
 					{ ...inputProps }
-					{ ...( useCustomValidation ? validationProps : {} ) }
+					{ ...( this.hasRenderedValidation.current
+						? validationProps
+						: {} ) }
 					__next40pxDefaultSize
 				/>
 				{ loading && <Spinner /> }

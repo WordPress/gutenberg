@@ -1377,6 +1377,32 @@ test.describe( 'Navigation block', () => {
 				).toBeVisible();
 			} );
 
+			await test.step( 'Verify focus remains on link input after validation error', async () => {
+				// Verify the input is focused and has the correct value
+				await expect( linkInput ).toBeFocused();
+				await expect( linkInput ).toHaveValue( 'invalid url string' );
+			} );
+
+			// If we type in the link input after a validation error, the validation error should be removed and the input should remain focused
+			// This checks to make sure the input switching from a base input to validated input does not cause focus loss
+			await test.step( 'Verify typing in link input after validation error works', async () => {
+				await page.keyboard.press( 'ArrowRight' );
+				await page.keyboard.type( ' after validation error' );
+
+				// Verify the input is still focused
+				await expect( linkInput ).toBeFocused();
+
+				// Verify validation error is gone now
+				await expect(
+					page.getByText( 'Please enter a valid URL.' )
+				).toBeHidden();
+
+				await expect( linkInput ).toHaveValue(
+					'invalid url string after validation error'
+				);
+				await expect( linkInput ).toBeFocused();
+			} );
+
 			// Cancel to preserve bound state for sidebar tests
 			await linkPopover.getByRole( 'button', { name: 'Cancel' } ).click();
 
