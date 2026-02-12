@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useCallback } from '@wordpress/element';
+import { useRef, useCallback } from '@wordpress/element';
 import {
 	__experimentalItemGroup as ItemGroup,
 	__experimentalItem as Item,
@@ -10,11 +10,12 @@ import {
 	__experimentalText as Text,
 	__experimentalHeading as Heading,
 	Button,
-	Notice,
 	FlexItem,
 	useNavigator,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -37,8 +38,8 @@ export default function ActionsSection( {
 	onImport,
 }: ActionsSectionProps ) {
 	const fileInputRef = useRef< HTMLInputElement >( null );
-	const [ importError, setImportError ] = useState< string | null >( null );
 	const { goTo } = useNavigator();
+	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const handleImport = useCallback(
 		( event: React.ChangeEvent< HTMLInputElement > ) => {
@@ -56,8 +57,9 @@ export default function ActionsSection( {
 				try {
 					const text = e.target?.result;
 					if ( typeof text !== 'string' ) {
-						setImportError(
-							__( 'Could not read the selected file.' )
+						createErrorNotice(
+							__( 'Could not read the selected file.' ),
+							{ type: 'snackbar' }
 						);
 						return;
 					}
@@ -66,16 +68,18 @@ export default function ActionsSection( {
 					try {
 						parsed = JSON.parse( text );
 					} catch {
-						setImportError(
-							__( 'The selected file is not valid JSON.' )
+						createErrorNotice(
+							__( 'The selected file is not valid JSON.' ),
+							{ type: 'snackbar' }
 						);
 						return;
 					}
 
 					const validation = validateImportJson( parsed );
 					if ( ! validation.valid ) {
-						setImportError(
-							validation.error ?? __( 'Invalid import file.' )
+						createErrorNotice(
+							validation.error ?? __( 'Invalid import file.' ),
+							{ type: 'snackbar' }
 						);
 						return;
 					}
@@ -85,21 +89,23 @@ export default function ActionsSection( {
 					);
 
 					onImport( categories );
-					setImportError( null );
 				} catch {
-					setImportError(
-						__( 'An error occurred while importing guidelines.' )
+					createErrorNotice(
+						__( 'An error occurred while importing guidelines.' ),
+						{ type: 'snackbar' }
 					);
 				}
 			};
 
 			reader.onerror = () => {
-				setImportError( __( 'Could not read the selected file.' ) );
+				createErrorNotice( __( 'Could not read the selected file.' ), {
+					type: 'snackbar',
+				} );
 			};
 
 			reader.readAsText( file );
 		},
-		[ onImport ]
+		[ onImport, createErrorNotice ]
 	);
 
 	const handleExport = useCallback( () => {
@@ -129,16 +135,6 @@ export default function ActionsSection( {
 			<Heading level={ 2 } size={ 13 }>
 				{ __( 'Actions' ) }
 			</Heading>
-
-			{ importError && (
-				<Notice
-					status="error"
-					isDismissible
-					onDismiss={ () => setImportError( null ) }
-				>
-					{ importError }
-				</Notice>
-			) }
 
 			<input
 				ref={ fileInputRef }

@@ -26,6 +26,23 @@ export interface ExportSchema {
 /**
  * Validates that the provided data conforms to the expected import schema.
  *
+ * @example
+ * ```json
+ * {
+ *   "version": "1.0",
+ *   "site": { "guidelines": "..." },
+ *   "copy": { "guidelines": "..." },
+ *   "images": { "guidelines": "..." },
+ *   "blocks": [
+ *     {
+ *       "blockType": "paragraph",
+ *       "guidelines": "..."
+ *     }
+ *   ],
+ *   "additional": { "guidelines": "..." }
+ * }
+ * ```
+ *
  * @param data Parsed JSON data to validate.
  * @return Object indicating validity and an optional error message.
  */

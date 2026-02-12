@@ -5,6 +5,9 @@ import { Page } from '@wordpress/admin-ui';
 import { __ } from '@wordpress/i18n';
 import { Navigator } from '@wordpress/components';
 import { useState, useCallback } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -34,23 +37,41 @@ function ContentGuidelinesPage() {
 	const [ revisions, setRevisions ] = useState<
 		Array< Revision & { categories: GuidelineCategories } >
 	>( [] );
+	const { createSuccessNotice } = useDispatch( noticesStore );
+	const currentUser = useSelect(
+		( select ) => select( coreStore ).getCurrentUser(),
+		[]
+	);
 
-	const handleImport = useCallback( ( categories: GuidelineCategories ) => {
-		setGuidelines( categories );
-		setRevisions( ( prev ) => [
-			{
-				id: Date.now(),
-				date: new Date().toISOString(),
-				author_name: 'Admin',
-				categories,
-			},
-			...prev,
-		] );
-	}, [] );
+	const handleImport = useCallback(
+		( categories: GuidelineCategories ) => {
+			setGuidelines( categories );
+			setRevisions( ( prev ) => [
+				{
+					id: Date.now(),
+					date: new Date().toISOString(),
+					author_name: currentUser?.name || __( 'User' ),
+					categories,
+				},
+				...prev,
+			] );
+			createSuccessNotice(
+				__( 'Content guidelines imported successfully.' ),
+				{ type: 'snackbar' }
+			);
+		},
+		[ createSuccessNotice, currentUser ]
+	);
 
-	const handleRestore = useCallback( ( categories: GuidelineCategories ) => {
-		setGuidelines( categories );
-	}, [] );
+	const handleRestore = useCallback(
+		( categories: GuidelineCategories ) => {
+			setGuidelines( categories );
+			createSuccessNotice( __( 'Revision restored successfully.' ), {
+				type: 'snackbar',
+			} );
+		},
+		[ createSuccessNotice ]
+	);
 
 	return (
 		<Page
