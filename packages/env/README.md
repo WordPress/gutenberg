@@ -303,11 +303,14 @@ These options apply to all `wp-env` commands:
 --config   Path to a custom .wp-env.json configuration file.           [string]
 ```
 
-The `--config` option allows you to use a custom configuration file instead of the default `.wp-env.json`. This is useful for running multiple parallel environments from the same directory.
+The `--config` option allows you to use a custom configuration file instead of the default `.wp-env.json`. This is useful for running multiple parallel environments from the same directory. Each config file gets its own isolated set of Docker containers and data.
 
-When using a custom config file, the override file is derived from its name. For example:
+When using a custom config file, the override file is derived from its name by inserting `.override` before the extension. For example:
+- `--config=.wp-env.test.json` will look for `.wp-env.test.override.json`
 - `--config=staging.json` will look for `staging.override.json`
 - `--config=./configs/dev.wp-env.json` will look for `./configs/dev.wp-env.override.json`
+
+Override files for custom configs work the same way as `.wp-env.override.json` does for the default config (see [.wp-env.override.json](#wp-envoverridejson)).
 
 #### Running parallel environments
 
@@ -635,6 +638,8 @@ For running a separate test environment, use `--config` with a separate config f
 ## .wp-env.override.json
 
 Any fields here will take precedence over .wp-env.json. This file is useful when ignored from version control, to persist local development overrides. Note that options like `plugins` and `themes` are not merged. As a result, if you set `plugins` in your override file, this will override all of the plugins listed in the base-level config. The only keys which are merged are `config` and `mappings`. This means that you can set your own wp-config values without losing any of the default values.
+
+When using `--config` with a custom config file, the override file name is derived by inserting `.override` before the extension. For example, `.wp-env.test.json` will look for `.wp-env.test.override.json`.
 
 ## Default wp-config values.
 
