@@ -255,6 +255,16 @@ export default function BlockTools( {
 					return;
 				}
 
+				// Don't allow visibility toggle for blocks that
+				// are not in the default editing mode.
+				if (
+					clientIds.some(
+						( id ) => getBlockEditingMode( id ) !== 'default'
+					)
+				) {
+					return;
+				}
+
 				// Open the visibility breakpoints modal.
 				showViewportModal( clientIds );
 			}

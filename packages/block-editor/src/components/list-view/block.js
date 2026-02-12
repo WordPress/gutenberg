@@ -412,6 +412,16 @@ function ListViewBlock( {
 				return;
 			}
 
+			// Don't allow visibility toggle for blocks that
+			// are not in the default editing mode.
+			if (
+				blocksToUpdate.some(
+					( id ) => getBlockEditingMode( id ) !== 'default'
+				)
+			) {
+				return;
+			}
+
 			// Open the visibility breakpoints modal.
 			showViewportModal( blocksToUpdate );
 		} else if ( isMatch( 'core/block-editor/rename', event ) ) {

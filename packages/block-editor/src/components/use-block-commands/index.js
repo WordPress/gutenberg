@@ -162,6 +162,7 @@ const getQuickActionsCommands = () =>
 			canRemoveBlocks,
 			isBlockHiddenAnywhere,
 		} = unlock( useSelect( blockEditorStore ) );
+		const { getBlockEditingMode } = useSelect( blockEditorStore );
 		const { getDefaultBlockName, getGroupingBlockName } =
 			useSelect( blocksStore );
 
@@ -293,8 +294,11 @@ const getQuickActionsCommands = () =>
 			( block ) =>
 				!! block && hasBlockSupport( block.name, 'visibility', true )
 		);
+		const allBlocksDefaultMode = clientIds.every(
+			( id ) => getBlockEditingMode( id ) === 'default'
+		);
 
-		if ( supportsVisibility ) {
+		if ( supportsVisibility && allBlocksDefaultMode ) {
 			const hasHiddenBlock = clientIds.some( ( id ) =>
 				isBlockHiddenAnywhere( id )
 			);
