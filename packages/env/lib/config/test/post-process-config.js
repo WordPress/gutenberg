@@ -300,10 +300,9 @@ describe( 'postProcessConfig', () => {
 			expect( () => {
 				postProcessConfig( {
 					testsEnvironment: false,
+					port: 123,
 					env: {
-						development: {
-							port: 123,
-						},
+						development: {},
 						tests: {},
 					},
 				} );
@@ -312,7 +311,7 @@ describe( 'postProcessConfig', () => {
 	} );
 
 	describe( 'testsEnvironment', () => {
-		it( 'should not merge root options into tests when testsEnvironment is false', () => {
+		it( 'should ignore env overrides entirely when testsEnvironment is false', () => {
 			const processed = postProcessConfig( {
 				testsEnvironment: false,
 				port: 123,
@@ -338,11 +337,12 @@ describe( 'postProcessConfig', () => {
 				},
 			} );
 
-			// Development should still get root options merged.
+			// Development should get root options but NOT env overrides.
 			expect( processed.env.development.port ).toEqual( 123 );
 			expect( processed.env.development.config.TESTS_ROOT ).toEqual(
 				'root'
 			);
+			expect( processed.env.development.config.TEST_ENV ).toBeUndefined();
 
 			// Tests should not get root options merged.
 			expect( processed.env.tests ).toEqual( {} );

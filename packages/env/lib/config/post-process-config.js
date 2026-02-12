@@ -45,22 +45,26 @@ function mergeRootToEnvironments( config ) {
 	// cascade behavior that would break the normal merge. After merging we then
 	// delete them to avoid that breakage and add them back before we return.
 	const removedRootOptions = {};
-	if (
-		config.port !== undefined &&
-		config.env.development.port === undefined
-	) {
-		removedRootOptions.port = config.port;
-		config.env.development.port = config.port;
-		delete config.port;
-	}
-	if (
-		! testsDisabled &&
-		config.testsPort !== undefined &&
-		config.env.tests.port === undefined
-	) {
-		removedRootOptions.testsPort = config.testsPort;
-		config.env.tests.port = config.testsPort;
-		delete config.testsPort;
+
+	// When tests are disabled, the env key is ignored entirely since there
+	// is only one environment. All config should be at the root level.
+	if ( ! testsDisabled ) {
+		if (
+			config.port !== undefined &&
+			config.env.development.port === undefined
+		) {
+			removedRootOptions.port = config.port;
+			config.env.development.port = config.port;
+			delete config.port;
+		}
+		if (
+			config.testsPort !== undefined &&
+			config.env.tests.port === undefined
+		) {
+			removedRootOptions.testsPort = config.testsPort;
+			config.env.tests.port = config.testsPort;
+			delete config.testsPort;
+		}
 	}
 	if ( config.lifecycleScripts !== undefined ) {
 		removedRootOptions.lifecycleScripts = config.lifecycleScripts;
@@ -76,7 +80,9 @@ function mergeRootToEnvironments( config ) {
 		}
 		config.env[ env ] = mergeConfigs(
 			deepCopyRootOptions( config ),
-			config.env[ env ]
+			// When tests are disabled, ignore env overrides — all config
+			// should be specified at the root level.
+			testsDisabled ? {} : config.env[ env ]
 		);
 	}
 

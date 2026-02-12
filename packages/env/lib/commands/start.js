@@ -97,8 +97,9 @@ module.exports = async function start( {
 		spinner.warn(
 			'Warning: wp-env starts both development and tests environments by default.\n' +
 				'This behavior is deprecated and will be removed in a future version.\n' +
-				'To avoid this warning, add "testsEnvironment": false to your .wp-env.json\n' +
-				'and use the --config option to start the tests environment separately when needed.\n'
+				'To avoid this warning, add "testsEnvironment": false to your .wp-env.json.\n' +
+				'The "env", "testsPort", and "testsEnvironment" options are also deprecated.\n' +
+				'Use the --config option with a separate config file for test environments instead.\n'
 		);
 		spinner.start();
 	}
