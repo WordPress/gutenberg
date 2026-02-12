@@ -2926,12 +2926,12 @@ export function withDerivedBlockEditingModes( reducer ) {
 			}
 			case 'UPDATE_SETTINGS': {
 				// Recompute the entire tree if the section root or
-				// disableContentOnlySections setting changes.
+				// the effective disableContentOnlySections value changes.
 				if (
 					state?.settings?.[ sectionRootClientIdKey ] !==
 						nextState?.settings?.[ sectionRootClientIdKey ] ||
-					state?.settings?.disableContentOnlySections !==
-						nextState?.settings?.disableContentOnlySections
+					!! state?.settings?.disableContentOnlySections !==
+						!! nextState?.settings?.disableContentOnlySections
 				) {
 					return {
 						...nextState,
