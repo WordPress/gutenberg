@@ -118,9 +118,9 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 		'data-wp-context',
 		wp_json_encode(
 			array(
-				'tabsId'          => $tabs_id,
-				'activeTabIndex'  => $active_tab_index,
-				'isVertical'      => $is_vertical,
+				'tabsId'         => $tabs_id,
+				'activeTabIndex' => $active_tab_index,
+				'isVertical'     => $is_vertical,
 			)
 		)
 	);
