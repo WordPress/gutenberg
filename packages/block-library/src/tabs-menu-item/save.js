@@ -35,10 +35,10 @@ export default function save( { attributes } ) {
 	} );
 
 	return (
-		<a { ...blockProps }>
+		<button type="button" { ...blockProps }>
 			<span className="screen-reader-text">
 				{ __( 'Tab menu item' ) }
 			</span>
-		</a>
+		</button>
 	);
 }
