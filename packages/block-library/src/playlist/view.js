@@ -25,6 +25,52 @@ const SEEK_AMOUNT = 5; // Seconds to seek with arrow keys.
 const NEXT_TRACK_DELAY = 1000; // Delay in ms before auto-playing next track.
 
 /**
+ * Set up play button accessibility: aria attributes and keyboard seeking.
+ *
+ * @param {Element} container - The waveform container element.
+ * @param {Object}  track     - The track data with ariaLabel and title.
+ * @return {Object} Object with playBtn element and keyboardHandler function.
+ */
+function setupPlayButtonAccessibility( container, track ) {
+	const playBtn = container.querySelector( '.waveform-btn' );
+	let keyboardHandler = null;
+
+	if ( playBtn ) {
+		playBtn.setAttribute( 'aria-label', track.ariaLabel || track.title );
+		playBtn.setAttribute( 'role', 'button' );
+
+		// Add keyboard support for seeking.
+		keyboardHandler = ( event ) => {
+			const audio = container.querySelector( 'audio' );
+			if ( ! audio ) {
+				return;
+			}
+
+			switch ( event.key ) {
+				case 'ArrowLeft':
+					event.preventDefault();
+					audio.currentTime = Math.max(
+						0,
+						audio.currentTime - SEEK_AMOUNT
+					);
+					break;
+				case 'ArrowRight':
+					event.preventDefault();
+					audio.currentTime = Math.min(
+						audio.duration,
+						audio.currentTime + SEEK_AMOUNT
+					);
+					break;
+			}
+		};
+
+		playBtn.addEventListener( 'keydown', keyboardHandler );
+	}
+
+	return { playBtn, keyboardHandler };
+}
+
+/**
  * Clean up an existing player instance and its event listeners.
  *
  * @param {Object} existing - The existing player state object.
@@ -209,39 +255,10 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 	const instance = new WaveformPlayer( container );
 
 	// Enhance play button accessibility.
-	const playBtn = container.querySelector( '.waveform-btn' );
-	let keyboardHandler = null;
-	if ( playBtn ) {
-		playBtn.setAttribute( 'aria-label', track.ariaLabel || track.title );
-		playBtn.setAttribute( 'role', 'button' );
-
-		// Add keyboard support for seeking.
-		keyboardHandler = ( event ) => {
-			const audio = container.querySelector( 'audio' );
-			if ( ! audio ) {
-				return;
-			}
-
-			switch ( event.key ) {
-				case 'ArrowLeft':
-					event.preventDefault();
-					audio.currentTime = Math.max(
-						0,
-						audio.currentTime - SEEK_AMOUNT
-					);
-					break;
-				case 'ArrowRight':
-					event.preventDefault();
-					audio.currentTime = Math.min(
-						audio.duration,
-						audio.currentTime + SEEK_AMOUNT
-					);
-					break;
-			}
-		};
-
-		playBtn.addEventListener( 'keydown', keyboardHandler );
-	}
+	const { playBtn, keyboardHandler } = setupPlayButtonAccessibility(
+		container,
+		track
+	);
 
 	// Create event handlers using WaveformPlayer's custom events.
 	// Events are dispatched on the container element.
