@@ -5,7 +5,7 @@ import {
 	Button,
 	TextControl,
 	Notice,
-	ToggleControl,
+	CheckboxControl,
 	__experimentalVStack as VStack,
 	__experimentalHStack as HStack,
 } from '@wordpress/components';
@@ -135,7 +135,7 @@ export function LinkUIPageCreator( {
 							value={ title }
 						/>
 
-						<ToggleControl
+						<CheckboxControl
 							label={ __( 'Publish' ) }
 							help={ __(
 								"Turn off to save as a draft. Drafts won't appear on your site until published."
