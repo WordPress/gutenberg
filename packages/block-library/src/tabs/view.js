@@ -86,13 +86,51 @@ const { actions: privateActions, state: privateState } = store(
 				return activeTabIndex === tabIndex;
 			},
 			/**
-			 * The value of the tabindex attribute.
+			 * The value of the tabindex attribute for tab buttons.
 			 * Only the active tab should be in the tab sequence.
 			 *
 			 * @type {number}
 			 */
 			get tabIndexAttribute() {
 				return privateState.isActiveTab ? 0 : -1;
+			},
+			/**
+			 * The value of the tabindex attribute for tab panels.
+			 * Returns 0 if the panel contains no focusable elements,
+			 * -1 if it does (to allow direct tabbing to content).
+			 *
+			 * Guidelines: https://www.w3.org/WAI/ARIA/apg/patterns/tabs/
+			 *
+			 * @type {number}
+			 */
+			get tabPanelTabIndexAttribute() {
+				const { ref } = getElement();
+
+				if ( ! ref ) {
+					return -1;
+				}
+
+				// Check if panel contains any focusable elements
+				const focusableSelector = [
+					'a[href]',
+					'button:not([disabled])',
+					'input:not([disabled])',
+					'select:not([disabled])',
+					'textarea:not([disabled])',
+					'[tabindex]:not([tabindex="-1"])',
+					'audio[controls]',
+					'video[controls]',
+					'[contenteditable]:not([contenteditable="false"])',
+					'details > summary:first-of-type',
+					'details',
+				].join( ', ' );
+
+				const hasFocusableContent =
+					ref.querySelector( focusableSelector ) !== null;
+
+				// If panel has focusable content, use -1
+				// If panel has no focusable content, use 0
+				return hasFocusableContent ? -1 : 0;
 			},
 		},
 		actions: {
