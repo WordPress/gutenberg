@@ -1,5 +1,25 @@
 == Changelog ==
 
+= 22.5.3 =
+
+
+## Changelog
+
+### Bug Fixes
+
+#### Block Library
+- Post Excerpt Block: Remove REST API filter for excerpt length in post excerpt block. ([75299](https://github.com/WordPress/gutenberg/pull/75299))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@SirLouen
+
+
 = 22.5.1 =
 
 
