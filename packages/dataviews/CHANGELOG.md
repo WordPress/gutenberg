@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+- DataForm: Fix summary button a11y issue in panel layout. [#75470](https://github.com/WordPress/gutenberg/pull/75470)
 - DataViews: Improve styling for filters when long values are in use. [#75369](https://github.com/WordPress/gutenberg/pull/75369)
 - DataForm: Fix label case for regular layout. [#75292](https://github.com/WordPress/gutenberg/pull/75292)
 - DataViews: Add title attribute in grid item title field. [#75085](https://github.com/WordPress/gutenberg/pull/75085)
