@@ -156,9 +156,6 @@ const { actions: privateActions, state: privateState } = store(
 					newIndex = 0;
 				}
 
-				const context = getContext();
-				context.focusedTabIndex = newIndex;
-
 				const tabId = tabsList[ newIndex ].id;
 				const tabElement = document.getElementById( 'tab__' + tabId );
 				if ( tabElement ) {
@@ -187,7 +184,6 @@ const { actions: privateActions, state: privateState } = store(
 
 				const context = getContext();
 				context.activeTabIndex = newIndex;
-				context.focusedTabIndex = newIndex;
 
 				if ( scrollToTab ) {
 					const tabId = tabsList[ newIndex ].id;
@@ -209,11 +205,6 @@ const { actions: privateActions, state: privateState } = store(
 				const { tabsList } = privateState;
 				if ( tabsList.length === 0 ) {
 					return;
-				}
-
-				const context = getContext();
-				if ( context.focusedTabIndex === undefined ) {
-					context.focusedTabIndex = context.activeTabIndex ?? 0;
 				}
 
 				const { hash } = window.location;
