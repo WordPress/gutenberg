@@ -178,26 +178,12 @@ export function logPlayError( error ) {
  * @param {string}   options.image     - The artwork image URL.
  * @param {string}   options.ariaLabel - Optional accessible label for play button. Enables accessibility features.
  * @param {boolean}  options.autoPlay  - Whether to auto-play when ready.
- * @param {Function} options.onReady   - Callback when player is ready. Receives { instance, container }.
  * @param {Function} options.onEnded   - Callback when track ends.
- * @param {Function} options.onPlay    - Callback when playback starts.
- * @param {Function} options.onPause   - Callback when playback pauses.
  * @return {Object} Object with instance, container, and destroy function.
  */
 export function initWaveformPlayer(
 	element,
-	{
-		src,
-		title,
-		artist,
-		image,
-		ariaLabel,
-		autoPlay,
-		onReady,
-		onEnded,
-		onPlay,
-		onPause,
-	}
+	{ src, title, artist, image, ariaLabel, autoPlay, onEnded }
 ) {
 	// Get colors from computed styles.
 	const { textColor, waveformColor, progressColor } =
@@ -246,17 +232,12 @@ export function initWaveformPlayer(
 					logPlayError( e );
 				}
 			}
-			onReady?.( { instance, container } );
 		},
 		ended: () => onEnded?.(),
-		play: () => onPlay?.(),
-		pause: () => onPause?.(),
 	};
 
 	container.addEventListener( 'waveformplayer:ready', handlers.ready );
 	container.addEventListener( 'waveformplayer:ended', handlers.ended );
-	container.addEventListener( 'waveformplayer:play', handlers.play );
-	container.addEventListener( 'waveformplayer:pause', handlers.pause );
 
 	// Return instance, container, and cleanup function.
 	return {
@@ -278,14 +259,6 @@ export function initWaveformPlayer(
 			container.removeEventListener(
 				'waveformplayer:ended',
 				handlers.ended
-			);
-			container.removeEventListener(
-				'waveformplayer:play',
-				handlers.play
-			);
-			container.removeEventListener(
-				'waveformplayer:pause',
-				handlers.pause
 			);
 			cleanupAccessibility?.();
 			instance.destroy();

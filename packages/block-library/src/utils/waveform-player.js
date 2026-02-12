@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import clsx from 'clsx';
 import '@arraypress/waveform-player/dist/waveform-player.css';
 
 /**
@@ -20,23 +19,15 @@ import { initWaveformPlayer } from './waveform-utils';
  * Renders an audio waveform visualization with play/pause controls.
  * Automatically inherits colors from the parent block's text color.
  *
- * @param {Object}   props           - Component props.
- * @param {string}   props.src       - The audio file URL.
- * @param {string}   props.title     - The track title.
- * @param {string}   props.artist    - The artist name.
- * @param {string}   props.image     - The artwork image URL.
- * @param {Function} props.onEnded   - Callback when the track finishes playing.
- * @param {string}   props.className - Additional CSS class names.
+ * @param {Object}   props         - Component props.
+ * @param {string}   props.src     - The audio file URL.
+ * @param {string}   props.title   - The track title.
+ * @param {string}   props.artist  - The artist name.
+ * @param {string}   props.image   - The artwork image URL.
+ * @param {Function} props.onEnded - Callback when the track finishes playing.
  * @return {Element} The WaveformPlayer element.
  */
-export function WaveformPlayer( {
-	src,
-	title,
-	artist,
-	image,
-	onEnded,
-	className,
-} ) {
+export function WaveformPlayer( { src, title, artist, image, onEnded } ) {
 	const ref = useRefEffect(
 		( element ) => {
 			if ( ! src ) {
@@ -56,13 +47,5 @@ export function WaveformPlayer( {
 		[ src, title, artist, image, onEnded ]
 	);
 
-	return (
-		<div
-			ref={ ref }
-			className={ clsx(
-				'wp-block-playlist__waveform-player',
-				className
-			) }
-		/>
-	);
+	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;
 }

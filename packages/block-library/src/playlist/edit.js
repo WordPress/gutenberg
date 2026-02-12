@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useEffect } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	MediaPlaceholder,
@@ -28,9 +28,8 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
-import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -41,30 +40,6 @@ import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import { WaveformPlayer } from '../utils/waveform-player';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
-
-/**
- * Compute an accessible aria label for a track.
- *
- * @param {Object} track - The track data object.
- * @return {string} The aria label for the track.
- */
-function getTrackAriaLabel( track ) {
-	if ( track?.title && track?.artist && track?.album ) {
-		return stripHTML(
-			sprintf(
-				/* translators: %1$s: track title, %2$s: artist name, %3$s: album name. */
-				__( '%1$s by %2$s from the album %3$s' ),
-				track.title,
-				track.artist,
-				track.album
-			)
-		);
-	}
-	if ( track?.title ) {
-		return stripHTML( track.title );
-	}
-	return __( 'Untitled' );
-}
 
 /**
  * Transform media library data into track block attributes.
@@ -114,7 +89,6 @@ const PlaylistEdit = ( {
 		showArtists,
 		currentTrack,
 	} = attributes;
-	const [ trackListIndex, setTrackListIndex ] = useState( 0 );
 	const blockProps = useBlockProps();
 	const { replaceInnerBlocks, __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
@@ -222,36 +196,21 @@ const PlaylistEdit = ( {
 		]
 	);
 
-	// Get current track data.
-	const currentTrackData = tracks[ trackListIndex ];
+	// Get current track data by finding the track with matching uniqueId.
+	const currentTrackData = tracks.find(
+		( track ) => track.uniqueId === currentTrack
+	);
 
-	// Handle track end - advance to next track.
+	// Handle track end - advance to next track or loop to first.
 	const onTrackEnded = useCallback( () => {
-		if ( trackListIndex < tracks.length - 1 ) {
-			if ( tracks[ trackListIndex + 1 ]?.uniqueId ) {
-				setTrackListIndex( trackListIndex + 1 );
-				setAttributes( {
-					currentTrack: tracks[ trackListIndex + 1 ].uniqueId,
-				} );
-			}
-		} else {
-			setTrackListIndex( 0 );
-			if ( tracks[ 0 ]?.uniqueId ) {
-				setAttributes( {
-					currentTrack: tracks[ 0 ].uniqueId,
-				} );
-			} else if ( tracks.length > 0 ) {
-				const validTrack = tracks.find(
-					( track ) => track.uniqueId !== undefined
-				);
-				if ( validTrack ) {
-					setAttributes( {
-						currentTrack: validTrack.uniqueId,
-					} );
-				}
-			}
+		const currentIndex = tracks.findIndex(
+			( track ) => track.uniqueId === currentTrack
+		);
+		const nextTrack = tracks[ currentIndex + 1 ] || tracks[ 0 ];
+		if ( nextTrack?.uniqueId ) {
+			setAttributes( { currentTrack: nextTrack.uniqueId } );
 		}
-	}, [ trackListIndex, tracks, setAttributes ] );
+	}, [ currentTrack, tracks, setAttributes ] );
 
 	const onChangeOrder = useCallback(
 		( trackOrder ) => {
@@ -478,4 +437,4 @@ const PlaylistEdit = ( {
 };
 
 export default PlaylistEdit;
-export { getTrackAriaLabel, getTrackAttributes };
+export { getTrackAttributes };

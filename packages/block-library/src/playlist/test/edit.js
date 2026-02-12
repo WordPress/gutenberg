@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getTrackAriaLabel, getTrackAttributes } from '../edit';
+import { getTrackAttributes } from '../edit';
 
 // Mock uuid to return predictable values.
 jest.mock( 'uuid', () => ( {
@@ -9,54 +9,6 @@ jest.mock( 'uuid', () => ( {
 } ) );
 
 describe( 'Playlist block edit utilities', () => {
-	describe( 'getTrackAriaLabel', () => {
-		it( 'should return formatted label with title, artist, and album', () => {
-			const track = {
-				title: 'My Song',
-				artist: 'The Artist',
-				album: 'Great Album',
-			};
-			const result = getTrackAriaLabel( track );
-			expect( result ).toBe(
-				'My Song by The Artist from the album Great Album'
-			);
-		} );
-
-		it( 'should return just the title when artist or album is missing', () => {
-			const trackWithoutArtist = {
-				title: 'My Song',
-				album: 'Great Album',
-			};
-			expect( getTrackAriaLabel( trackWithoutArtist ) ).toBe( 'My Song' );
-
-			const trackWithoutAlbum = {
-				title: 'My Song',
-				artist: 'The Artist',
-			};
-			expect( getTrackAriaLabel( trackWithoutAlbum ) ).toBe( 'My Song' );
-		} );
-
-		it( 'should return "Untitled" when track has no title', () => {
-			expect( getTrackAriaLabel( {} ) ).toBe( 'Untitled' );
-			expect( getTrackAriaLabel( { artist: 'The Artist' } ) ).toBe(
-				'Untitled'
-			);
-		} );
-
-		it( 'should handle undefined or null track', () => {
-			expect( getTrackAriaLabel( undefined ) ).toBe( 'Untitled' );
-			expect( getTrackAriaLabel( null ) ).toBe( 'Untitled' );
-		} );
-
-		it( 'should strip HTML from title', () => {
-			const track = {
-				title: '<script>alert("xss")</script>My Song',
-			};
-			const result = getTrackAriaLabel( track );
-			expect( result ).not.toContain( '<script>' );
-		} );
-	} );
-
 	describe( 'getTrackAttributes', () => {
 		it( 'should transform media object to track attributes', () => {
 			const media = {
