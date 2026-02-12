@@ -27,6 +27,7 @@ import {
 	useShortcut,
 } from '@wordpress/keyboard-shortcuts';
 import { Icon, search as inputIcon } from '@wordpress/icons';
+import { isValidIcon } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -64,7 +65,9 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 							'has-icon': command.icon,
 						} ) }
 					>
-						{ command.icon && <Icon icon={ command.icon } /> }
+						{ isValidIcon( command.icon ) ? (
+							<Icon icon={ command.icon } />
+						) : null }
 						<span>
 							<TextHighlight
 								text={ command.label }
