@@ -1,29 +1,50 @@
 /**
  * External dependencies
  */
-import { RgbStringColorPicker, RgbaStringColorPicker } from 'react-colorful';
-import { colord } from 'colord';
+import { HslStringColorPicker, HslaStringColorPicker } from 'react-colorful';
+import type { HslaColor } from 'react-colorful';
 
-/**
- * WordPress dependencies
- */
-import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
 import type { PickerProps } from './types';
 
-export const Picker = ( { color, enableAlpha, onChange }: PickerProps ) => {
+function hslaToHslString( { h, s, l }: HslaColor ): string {
+	return `hsl(${ h }, ${ s }%, ${ l }%)`;
+}
+
+function hslaToHslaString( { h, s, l, a }: HslaColor ): string {
+	return `hsla(${ h }, ${ s }%, ${ l }%, ${ a })`;
+}
+
+function parseHslString( str: string ): HslaColor {
+	const match = str.match(
+		/hsla?\(\s*([\d.]+),\s*([\d.]+)%,\s*([\d.]+)%(?:,\s*([\d.]+))?\s*\)/
+	);
+	if ( ! match ) {
+		return { h: 0, s: 0, l: 0, a: 1 };
+	}
+	return {
+		h: Math.round( parseFloat( match[ 1 ] ) ),
+		s: Math.round( parseFloat( match[ 2 ] ) ),
+		l: Math.round( parseFloat( match[ 3 ] ) ),
+		a: match[ 4 ] !== undefined ? parseFloat( match[ 4 ] ) : 1,
+	};
+}
+
+export const Picker = ( { hsla, enableAlpha, onChange }: PickerProps ) => {
 	const Component = enableAlpha
-		? RgbaStringColorPicker
-		: RgbStringColorPicker;
-	const rgbColor = useMemo( () => color.toRgbString(), [ color ] );
+		? HslaStringColorPicker
+		: HslStringColorPicker;
+	const colorString = enableAlpha
+		? hslaToHslaString( hsla )
+		: hslaToHslString( hsla );
 
 	return (
 		<Component
-			color={ rgbColor }
+			color={ colorString }
 			onChange={ ( nextColor ) => {
-				onChange( colord( nextColor ) );
+				onChange( parseHslString( nextColor ) );
 			} }
 			// Pointer capture fortifies drag gestures so that they continue to
 			// work while dragging outside the component over objects like
