@@ -49,6 +49,10 @@
 	}
 }
 
+.dataforms-layouts-panel__field-trigger--edit-always .dataforms-layouts-panel__field-trigger-icon {
+	opacity: 1;
+}
+
 .dataforms-layouts-panel__field-trigger-icon {
 	padding: 0;
 	color: var(--wp-admin-theme-color);
