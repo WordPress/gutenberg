@@ -34,9 +34,7 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 		$tag_processor->remove_attribute( 'hidden' );
 
 		// Set tab-specific attributes
-		$tag_processor->set_attribute( 'type', 'button' );
 		$tag_processor->set_attribute( 'id', 'tab__' . $tab_id );
-		$tag_processor->set_attribute( 'role', 'tab' );
 		$tag_processor->set_attribute( 'aria-controls', $tab_id );
 
 		// Add IAPI directives
