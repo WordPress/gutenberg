@@ -24,7 +24,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { keyboardReturn, linkOff } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
-import { isURL } from '@wordpress/url';
+import { isURL, prependHTTPS } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -312,8 +312,10 @@ function LinkControl( {
 			type: 'valid',
 		};
 
+		const trimmedValue = urlToValidate?.trim();
+
 		// If empty or not URL-like, return invalid
-		if ( ! urlToValidate?.length || ! isURLLike( urlToValidate ) ) {
+		if ( ! trimmedValue?.length || ! isURLLike( trimmedValue ) ) {
 			return invalidResult;
 		}
 
@@ -321,13 +323,14 @@ function LinkControl( {
 		// valid href values but cannot be validated by the native URL constructor
 		// (which requires absolute URLs). These are already validated by isURLLike.
 		// Skip URL constructor validation for these cases.
-		if ( isHashLink( urlToValidate ) || isRelativePath( urlToValidate ) ) {
+		if ( isHashLink( trimmedValue ) || isRelativePath( trimmedValue ) ) {
 			return validResult;
 		}
 
 		// Perform URL validation using the native URL constructor as the authoritative source.
 		// The native URL constructor is the standard for URL validity - if it accepts a URL,
-		// we should allow it.
+		// we should allow it. For URLs without a protocol (e.g., "www.wordpress.org"),
+		// prepend "http://" before validating, as the URL constructor requires a protocol.
 		//
 		// Note: Protocol URLs (mailto:, tel:, etc.) are also validated by the native
 		// URL constructor, so we don't need special handling for them.
@@ -335,7 +338,8 @@ function LinkControl( {
 		// Note: We rely on the native URL constructor rather than implementing custom TLD
 		// validation to avoid blocking valid URLs. If a URL passes the native constructor,
 		// it's technically valid according to web standards.
-		return isURL( urlToValidate ) ? validResult : invalidResult;
+		const urlToCheck = prependHTTPS( trimmedValue );
+		return isURL( urlToCheck ) ? validResult : invalidResult;
 	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
@@ -360,6 +364,13 @@ function LinkControl( {
 				setCustomValidity( validation );
 				return;
 			}
+
+			// Validation passed - normalize the URL
+			const { url: normalizedUrl } = normalizeUrl( urlToValidate );
+			updatedValue = {
+				...updatedValue,
+				url: normalizedUrl,
+			};
 		}
 
 		// Preserve the URL for taxonomy entities before binding overrides it
@@ -396,10 +407,12 @@ function LinkControl( {
 	};
 
 	// Centralized validation function
-	const validateAndSetValidity = ( urlToValidate = currentUrlInputValue ) => {
+	const validateAndSetValidity = () => {
 		if ( currentInputIsEmpty ) {
 			return false;
 		}
+
+		const trimmedValue = currentUrlInputValue.trim();
 
 		// If the current value is an entity link (has id and type not in LINK_ENTRY_TYPES)
 		// and the URL hasn't changed from the original value, skip validation.
@@ -410,7 +423,7 @@ function LinkControl( {
 			internalControlValue.id &&
 			internalControlValue.type &&
 			! LINK_ENTRY_TYPES.includes( internalControlValue.type );
-		const urlUnchanged = value?.url === urlToValidate;
+		const urlUnchanged = value?.url === trimmedValue;
 
 		if ( isEntityLink && urlUnchanged ) {
 			// Entity link with unchanged URL - skip validation
@@ -419,7 +432,7 @@ function LinkControl( {
 		}
 
 		// Validate the URL using the shared validation helper
-		const validation = validateUrl( urlToValidate );
+		const validation = validateUrl( currentUrlInputValue );
 
 		if ( validation.type === 'invalid' ) {
 			setCustomValidity( validation );
@@ -432,14 +445,14 @@ function LinkControl( {
 	};
 
 	// Centralized submission function
-	const submitUrlValue = ( urlToSubmit ) => {
+	const submitUrlValue = () => {
 		if ( valueHasChanges ) {
 			// Submit the original value with new stored values applied
 			// on top. URL is a special case as it may also be a prop.
 			onChange( {
 				...value,
 				...internalControlValue,
-				url: urlToSubmit,
+				url: normalizeUrl( currentUrlInputValue ).url,
 			} );
 		}
 		stopEditing();
@@ -447,19 +460,18 @@ function LinkControl( {
 	};
 
 	const handleSubmit = () => {
-		// Normalize the URL
-		const { url: normalizedUrl } = normalizeUrl( currentUrlInputValue );
-		// Validate the normalized URL
-		if ( ! validateAndSetValidity( normalizedUrl ) ) {
+		// Validate URL before submitting
+		if ( ! validateAndSetValidity() ) {
 			return;
 		}
 
 		// Validation passed - proceed with submission
-		submitUrlValue( normalizedUrl );
+		submitUrlValue();
 	};
 
 	const handleSubmitWithEnter = ( event ) => {
 		const { keyCode } = event;
+
 		if (
 			keyCode === ENTER &&
 			! currentInputIsEmpty // Disallow submitting empty values.

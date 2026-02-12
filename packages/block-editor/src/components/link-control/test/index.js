@@ -3267,28 +3267,43 @@ describe( 'URL validation', () => {
 		mockOnChange.mockClear();
 	} );
 
-	it( 'should prevent submission for invalid URLs', async () => {
-		render(
-			<LinkControl
-				value={ { url: '' } }
-				forceIsEditingLink
-				onChange={ mockOnChange }
-			/>
-		);
+	it.each( [
+		{
+			description: 'URLs with spaces',
+			inputUrl: 'not a url',
+		},
+		{
+			description: 'single words without TLD or protocol',
+			inputUrl: 'wordpress',
+		},
+	] )(
+		'should prevent submission for $description',
+		async ( { inputUrl } ) => {
+			render(
+				<LinkControl
+					value={ { url: '' } }
+					forceIsEditingLink
+					onChange={ mockOnChange }
+				/>
+			);
 
-		const searchInput = screen.getByRole( 'combobox' );
-		// Use a string that is not a valid URL
-		await user.type( searchInput, 'not a url' );
+			const searchInput = screen.getByRole( 'combobox' );
+			await user.type( searchInput, inputUrl );
 
-		// Press Enter - this should trigger validation
-		// Since the value doesn't pass isURLLike, it won't create a suggestion,
-		// but if it did, validation would prevent submission
-		triggerEnter( searchInput );
+			// Press Enter - this should trigger validation
+			triggerEnter( searchInput );
 
-		// For URLs that don't pass isURLLike, no suggestion is created,
-		// so onChange won't be called (which is the expected behavior)
-		expect( mockOnChange ).not.toHaveBeenCalled();
-	} );
+			// Wait for validation error to appear
+			await waitFor( () => {
+				expect(
+					screen.getByText( 'Please enter a valid URL.' )
+				).toBeInTheDocument();
+			} );
+
+			// onChange should NOT have been called (submission prevented)
+			expect( mockOnChange ).not.toHaveBeenCalled();
+		}
+	);
 
 	it.each( [
 		{
