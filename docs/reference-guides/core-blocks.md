@@ -1039,7 +1039,7 @@ Display content in a tabbed interface to help users navigate detailed content wi
 -	**Experimental:** true
 -	**Category:** design
 -	**Allowed Blocks:** core/tabs-menu, core/tab-panel
--	**Supports:** align, anchor, color (~~background~~, ~~text~~), interactivity, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowVerticalAlignment, default, ~~allowSwitching~~), renaming, spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
+-	**Supports:** align, anchor, color (background, text), interactivity, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowVerticalAlignment, default, ~~allowSwitching~~), renaming, spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
 -	**Attributes:** activeTabIndex, editorActiveTabIndex
 
 ## Tabs Menu
