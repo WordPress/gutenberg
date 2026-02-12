@@ -38,6 +38,7 @@ import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS, LINK_ENTRY_TYPES } from './constants';
 import isURLLike, { isHashLink, isRelativePath } from './is-url-like';
+import normalizeUrl from './normalize-url';
 
 /**
  * Default properties associated with a link control value.
@@ -399,12 +400,12 @@ function LinkControl( {
 	};
 
 	// Centralized validation function
-	const validateAndSetValidity = () => {
+	const validateAndSetValidity = ( urlToValidate = currentUrlInputValue ) => {
 		if ( currentInputIsEmpty ) {
 			return false;
 		}
 
-		const trimmedValue = currentUrlInputValue.trim();
+		const trimmedValue = urlToValidate.trim();
 
 		// If the current value is an entity link (has id and type not in LINK_ENTRY_TYPES)
 		// and the URL hasn't changed from the original value, skip validation.
@@ -424,7 +425,7 @@ function LinkControl( {
 		}
 
 		// Validate the URL using the shared validation helper
-		const validation = validateUrl( currentUrlInputValue );
+		const validation = validateUrl( urlToValidate );
 
 		if ( validation.type === 'invalid' ) {
 			setCustomValidity( validation );
@@ -437,14 +438,14 @@ function LinkControl( {
 	};
 
 	// Centralized submission function
-	const submitUrlValue = () => {
+	const submitUrlValue = ( urlToSubmit ) => {
 		if ( valueHasChanges ) {
 			// Submit the original value with new stored values applied
 			// on top. URL is a special case as it may also be a prop.
 			onChange( {
 				...value,
 				...internalControlValue,
-				url: currentUrlInputValue,
+				url: urlToSubmit,
 			} );
 		}
 		stopEditing();
@@ -452,13 +453,18 @@ function LinkControl( {
 	};
 
 	const handleSubmit = () => {
-		// Validate URL before submitting
-		if ( ! validateAndSetValidity() ) {
+		// Normalize the URL
+		const { url: normalizedUrl } = normalizeUrl(
+			currentUrlInputValue.trim()
+		);
+
+		// Validate the normalized URL
+		if ( ! validateAndSetValidity( normalizedUrl ) ) {
 			return;
 		}
 
 		// Validation passed - proceed with submission
-		submitUrlValue();
+		submitUrlValue( normalizedUrl );
 	};
 
 	const handleSubmitWithEnter = ( event ) => {

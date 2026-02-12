@@ -2832,14 +2832,10 @@ describe( 'Entity handling', () => {
 
 		// Verify that onChange was called with entity metadata cleared.
 		// Kind should be undefined (no longer an entity).
-		// Note: Currently when clicking Apply (vs selecting a suggestion),
-		// type and id are also undefined - that's a separate issue with the
-		// TODO: Apply button handler not processing URLs through handleDirectEntry,
-		// so the shape of the data for a custom link can be different depending on
-		// how it was submitted.
+		// The URL should be normalized (https:// prepended to bare domain).
 		expect( onChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
-				url: 'www.wordpress.org',
+				url: 'https://www.wordpress.org',
 				kind: undefined,
 			} )
 		);
