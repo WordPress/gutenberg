@@ -1,5 +1,6 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
+@use "../../collaborators-overlay/collaborator-mixins" as *;
 
 .editor-collaborators-presence__avatar {
 	background-image: var(--avatar-url);
@@ -23,9 +24,6 @@
 
 	&--with-color-border {
 		border-color: var(--collaborator-color);
-		box-shadow:
-			inset 0 0 2px 2px $white,
-			0 0 0 1px $white,
-			$elevation-x-small;
+		@include collaborator-contrast-shadow();
 	}
 }
