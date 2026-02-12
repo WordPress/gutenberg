@@ -22,7 +22,7 @@ if ( file_exists( __DIR__ . '/../navigation-link/shared/get-submenu-visibility.p
  * @return string The visibility mode: 'hover', 'click', or 'always'.
  */
 function block_core_navigation_get_submenu_visibility( $attributes ) {
-	return block_core_shared_navigation_get_submenu_visibility( $attributes );
+	return gutenberg_block_core_shared_navigation_get_submenu_visibility( $attributes );
 }
 
 /**
