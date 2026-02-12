@@ -25,6 +25,51 @@ const SEEK_AMOUNT = 5; // Seconds to seek with arrow keys.
 const NEXT_TRACK_DELAY = 1000; // Delay in ms before auto-playing next track.
 
 /**
+ * Clean up an existing player instance and its event listeners.
+ *
+ * @param {Object} existing - The existing player state object.
+ */
+function cleanupPlayer( existing ) {
+	const {
+		container: existingContainer,
+		playBtn,
+		keyboardHandler,
+		eventHandlers,
+	} = existing;
+
+	// Pause the old audio first to prevent AbortError
+	// when destroy() interrupts a pending play() Promise.
+	const oldAudio = existingContainer?.querySelector( 'audio' );
+	if ( oldAudio && ! oldAudio.paused ) {
+		oldAudio.pause();
+	}
+
+	if ( playBtn && keyboardHandler ) {
+		playBtn.removeEventListener( 'keydown', keyboardHandler );
+	}
+
+	// Remove WaveformPlayer event listeners.
+	if ( eventHandlers && existingContainer ) {
+		existingContainer.removeEventListener(
+			'waveformplayer:ended',
+			eventHandlers.handleEnded
+		);
+		existingContainer.removeEventListener(
+			'waveformplayer:play',
+			eventHandlers.handlePlay
+		);
+		existingContainer.removeEventListener(
+			'waveformplayer:pause',
+			eventHandlers.handlePause
+		);
+		existingContainer.removeEventListener(
+			'waveformplayer:ready',
+			eventHandlers.handleReady
+		);
+	}
+}
+
+/**
  * Store player state for each element (instance, url, event listeners).
  */
 const playerState = new Map();
@@ -129,49 +174,12 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 
 	// Clean up any existing player state.
 	if ( existing ) {
-		const {
-			container: existingContainer,
-			playBtn,
-			keyboardHandler,
-			eventHandlers,
-		} = existing;
-
-		// Pause the old audio first to prevent AbortError
-		// when destroy() interrupts a pending play() Promise.
-		const oldAudio = existingContainer?.querySelector( 'audio' );
-		if ( oldAudio && ! oldAudio.paused ) {
-			oldAudio.pause();
-		}
-
-		if ( playBtn && keyboardHandler ) {
-			playBtn.removeEventListener( 'keydown', keyboardHandler );
-		}
-
-		// Remove WaveformPlayer event listeners.
-		if ( eventHandlers && existingContainer ) {
-			existingContainer.removeEventListener(
-				'waveformplayer:ended',
-				eventHandlers.handleEnded
-			);
-			existingContainer.removeEventListener(
-				'waveformplayer:play',
-				eventHandlers.handlePlay
-			);
-			existingContainer.removeEventListener(
-				'waveformplayer:pause',
-				eventHandlers.handlePause
-			);
-			existingContainer.removeEventListener(
-				'waveformplayer:ready',
-				eventHandlers.handleReady
-			);
-		}
-
 		// TODO: Once @arraypress/waveform-player is updated with the isDestroying
 		// guards (PR #3), simplify this to just: existing.instance.destroy()
 		// For now, don't call destroy() as it can cause AbortError if there's a
 		// pending play() Promise. The DOM is already cleared via ref.innerHTML = '',
 		// and the old instance will be garbage collected.
+		cleanupPlayer( existing );
 		playerState.delete( ref );
 	}
 
