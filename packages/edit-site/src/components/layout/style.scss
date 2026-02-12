@@ -274,12 +274,5 @@ html.canvas-mode-edit-transition::view-transition-group(toggle) {
 }
 
 .edit-site-layout__snackbar {
-	position: fixed;
-	bottom: 24px;
-	left: 50%;
-	right: auto;
-	transform: translateX(-50%);
-	width: max-content;
-	max-width: calc(100vw - 32px);
-	box-sizing: border-box;
+	@include snackbar-container();
 }

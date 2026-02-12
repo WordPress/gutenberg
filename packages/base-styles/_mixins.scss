@@ -221,6 +221,20 @@
  * Styles that are reused verbatim in a few places
  */
 
+@mixin snackbar-container() {
+	position: fixed;
+	bottom: 24px;
+	left: 50%;
+	right: auto;
+	transform: translateX(-50%);
+	width: max-content;
+	max-width: calc(100vw - 32px);
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
 // These are additional styles for all captions, when the theme opts in to block styles.
 @mixin caption-style() {
 	margin-top: 0.5em;
