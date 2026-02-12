@@ -77,8 +77,9 @@ Here's how to implement a link that navigates client-side. First, the HTML in yo
 </a>
 ```
 
-> [!NOTE]
-> This element must be placed inside an element with the `data-wp-interactive="myPlugin"` directive (like the router region defined above), so the directive knows which store namespace to look up the action in. Alternatively, you can specify the namespace explicitly in the directive value itself: `data-wp-on--click="myPlugin::actions.navigateTo"`. For more details on how namespaces work, see the [Interactivity API Reference](/docs/reference-guides/interactivity-api/directives-and-store.md).
+<div class="callout callout-info">
+This element must be placed inside an element with the <code>data-wp-interactive="myPlugin"</code> directive (like the router region defined above), so the directive knows which store namespace to look up the action in. Alternatively, you can specify the namespace explicitly in the directive value itself: <code>data-wp-on--click="myPlugin::actions.navigateTo"</code>. For more details on how namespaces work, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/">Interactivity API Reference</a>.
+</div>
 
 Then, in your `view.js`, you define the `navigateTo` action. It prevents the browser's default full-page navigation and uses the router's `navigate()` function instead:
 
@@ -100,8 +101,9 @@ store( 'myPlugin', {
 } );
 ```
 
-> [!NOTE]
-> The `withSyncEvent()` wrapper is required for actions that need to call synchronous event methods like `event.preventDefault()`. See the [withSyncEvent() documentation](/docs/reference-guides/interactivity-api/directives-and-store.md#withsyncevent) for details.
+<div class="callout callout-info">
+The <code>withSyncEvent()</code> wrapper is required for actions that need to call synchronous event methods like <code>event.preventDefault()</code>. See the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#withsyncevent">withSyncEvent() documentation</a> for details.
+</div>
 
 ### Implementing prefetching
 
@@ -320,8 +322,9 @@ For these blocks, leave `supports.interactivity` at its default value (`false`) 
 }
 ```
 
-> [!IMPORTANT]
-> If a block that is not compatible with client-side navigation is detected inside a router region, WordPress may automatically disable client-side navigation on that page to prevent broken behavior. For example, the Query block's enhanced pagination checks for incompatible blocks and falls back to full page reloads when they are found.
+<div class="callout callout-warning">
+If a block that is not compatible with client-side navigation is detected inside a router region, WordPress may automatically disable client-side navigation on that page to prevent broken behavior. For example, the Query block's enhanced pagination checks for incompatible blocks and falls back to full page reloads when they are found.
+</div>
 
 ## More advanced use cases
 
@@ -443,8 +446,9 @@ yield actions.navigate( '/products/', { force: true } );
 yield actions.prefetch( '/products/', { force: true } );
 ```
 
-> [!IMPORTANT]
-> If you're using `force: true` to refresh a page after a mutation (POST, PUT, DELETE request), make sure the mutation has completed before navigating:
+<div class="callout callout-warning">
+If you're using <code>force: true</code> to refresh a page after a mutation (POST, PUT, DELETE request), make sure the mutation has completed before navigating:
+</div>
 
 ```js
 store( 'myPlugin', {
@@ -1102,5 +1106,6 @@ import '@wordpress/interactivity-router/full-page';
 
 Full-page client-side navigation is essentially a special case of region-based navigation where there is only one region covering the whole page. Because it replaces all content, **every block on the page must be compatible with client-side navigation** — meaning all interactive blocks must use the Interactivity API (not jQuery or other libraries). See [Block compatibility](#block-compatibility) for details on how to declare block compatibility.
 
-> [!WARNING]
-> This feature is experimental and still under active development. It may not work correctly in all scenarios. If you try it out, please report any issues you encounter in the [Gutenberg GitHub repository](https://github.com/WordPress/gutenberg/issues). Contributions are also welcome!
+<div class="callout callout-alert">
+This feature is experimental and still under active development. It may not work correctly in all scenarios. If you try it out, please report any issues you encounter in the <a href="https://github.com/WordPress/gutenberg/issues">Gutenberg GitHub repository</a>. Contributions are also welcome!
+</div>
