@@ -4,6 +4,7 @@ import { useEffect, useState } from '@wordpress/element';
 
 import { useBlockHighlighting } from './use-block-highlighting';
 import { useRenderCursors } from './use-render-cursors';
+import { COLLABORATOR_CONTRAST_SHADOW } from './collaborator-styles';
 
 const COLLABORATORS_OVERLAY_STYLES = `
 .block-canvas-cover {
@@ -49,6 +50,47 @@ const COLLABORATORS_OVERLAY_STYLES = `
 @keyframes collaborators-overlay-cursor-blink {
 	0%, 100% { opacity: 1; }
 	50% { opacity: 0.5; }
+}
+.collaborators-overlay-cursor-highlighted .collaborators-overlay-user-cursor {
+	animation: collaborators-overlay-cursor-highlight 0.6s ease-in-out 3;
+}
+.collaborators-overlay-cursor-highlighted .collaborators-overlay-user-label {
+	animation: collaborators-overlay-label-highlight 0.6s ease-in-out 3;
+}
+@keyframes collaborators-overlay-cursor-highlight {
+	0%, 100% {
+		transform: scale(1);
+		filter: drop-shadow(0 0 0 transparent);
+	}
+	50% {
+		transform: scale(1.2);
+		filter: drop-shadow(0 0 8px currentColor);
+	}
+}
+@keyframes collaborators-overlay-label-highlight {
+	0%, 100% {
+		transform: translateY(-100%) scale(1);
+		filter: drop-shadow(0 0 0 transparent);
+	}
+	50% {
+		transform: translateY(-100%) scale(1.1);
+		filter: drop-shadow(0 0 6px currentColor);
+	}
+}
+.block-editor-block-list__block.is-collaborator-selected:not(:focus)::after {
+	content: "";
+	position: absolute;
+	pointer-events: none;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	outline-color: var(--collaborator-outline-color);
+	outline-style: solid;
+	outline-width: calc(var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
+	outline-offset: calc(-1 * var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
+	box-shadow: ${ COLLABORATOR_CONTRAST_SHADOW };
+	z-index: 1;
 }
 `;
 

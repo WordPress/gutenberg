@@ -48,8 +48,10 @@ export function useBlockHighlighting(
 				);
 
 				if ( blockElement ) {
-					blockElement.style.boxShadow = '';
-					blockElement.style.borderRadius = '';
+					blockElement.classList.remove( 'is-collaborator-selected' );
+					blockElement.style.removeProperty(
+						'--collaborator-outline-color'
+					);
 				}
 
 				highlightedBlockIds.current.delete( blockId );
@@ -100,8 +102,11 @@ export function useBlockHighlighting(
 			}
 
 			if ( blockElement ) {
-				blockElement.style.boxShadow = `${ color } 0 0 0 2px`;
-				blockElement.style.borderRadius = '4px';
+				blockElement.classList.add( 'is-collaborator-selected' );
+				blockElement.style.setProperty(
+					'--collaborator-outline-color',
+					color
+				);
 				highlightedBlockIds.current.add( blockId );
 			}
 		} );
