@@ -91,6 +91,14 @@ const addHistoryChangesIntoRecord = < T >(
 	return nextRecord;
 };
 
+const isMatchingRecordId = (
+	recordId: string | Record< string, unknown >,
+	id: string | Record< string, unknown >
+): boolean =>
+	typeof recordId === 'string'
+		? recordId === id
+		: typeof id !== 'string' && isShallowEqual( recordId, id );
+
 /**
  * Creates an undo manager.
  *
@@ -189,6 +197,26 @@ export function createUndoManager< T = unknown >(): UndoManager< T > {
 
 		hasRedo(): boolean {
 			return !! history[ history.length + offset ];
+		},
+
+		clearById( id: string | Record< string, unknown > ): void {
+			const filterRecord = ( record: HistoryRecord< T > ) =>
+				record.filter(
+					( { id: recordId } ) => ! isMatchingRecordId( recordId, id )
+				);
+			const splitIndex = history.length + offset;
+			const filteredPastHistory = history
+				.slice( 0, splitIndex )
+				.map( filterRecord )
+				.filter( ( record ) => record.length > 0 );
+			const filteredFutureHistory = history
+				.slice( splitIndex )
+				.map( filterRecord )
+				.filter( ( record ) => record.length > 0 );
+
+			history = [ ...filteredPastHistory, ...filteredFutureHistory ];
+			stagedRecord = filterRecord( stagedRecord );
+			offset = -filteredFutureHistory.length;
 		},
 	};
 }

@@ -257,4 +257,26 @@ describe( 'Undo Manager', () => {
 			'b',
 		] );
 	} );
+
+	it( 'clears undo and redo history for a specific id', () => {
+		const manager = createUndoManager();
+		manager.addRecord( [
+			{ id: '1', changes: { value: { from: undefined, to: 1 } } },
+		] );
+		manager.addRecord( [
+			{ id: '2', changes: { value: { from: undefined, to: 2 } } },
+		] );
+		manager.addRecord( [
+			{ id: '1', changes: { value: { from: 1, to: 3 } } },
+		] );
+		manager.undo();
+
+		manager.clearById( '1' );
+
+		expect( manager.hasRedo() ).toBe( false );
+		expect( manager.undo() ).toEqual( [
+			{ id: '2', changes: { value: { from: undefined, to: 2 } } },
+		] );
+		expect( manager.undo() ).toBeUndefined();
+	} );
 } );

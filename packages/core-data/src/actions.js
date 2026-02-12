@@ -526,8 +526,12 @@ export const clearEntityRecordEdits =
 			{}
 		);
 
-		// Record in the undo manager so the clear can be undone.
-		if ( ! options.undoIgnore ) {
+		// `undoIgnore` for a clear means this should not be undoable.
+		// Clear the history to avoid undoing into partial stale edits.
+		if ( options.undoIgnore ) {
+			select.getUndoManager().clearById( { kind, name, recordId } );
+		} else {
+			// Record in the undo manager so the clear can be undone.
 			select.getUndoManager().addRecord( [
 				{
 					id: { kind, name, recordId },

@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { createUndoManager } from '@wordpress/undo-manager';
 
 jest.mock( '@wordpress/api-fetch' );
 
@@ -11,6 +12,7 @@ jest.mock( '@wordpress/api-fetch' );
 import {
 	editEntityRecord,
 	clearEntityRecordEdits,
+	undo,
 	saveEntityRecord,
 	saveEditedEntityRecord,
 	deleteEntityRecord,
@@ -576,7 +578,7 @@ describe( 'clearEntityRecordEdits', () => {
 
 	it( 'skips the undo manager when undoIgnore is true', () => {
 		const dispatch = jest.fn();
-		const undoManager = { addRecord: jest.fn() };
+		const undoManager = { addRecord: jest.fn(), clearById: jest.fn() };
 		const select = {
 			getEntityConfig: () => ( {
 				kind: 'postType',
@@ -600,6 +602,11 @@ describe( 'clearEntityRecordEdits', () => {
 		} );
 
 		expect( undoManager.addRecord ).not.toHaveBeenCalled();
+		expect( undoManager.clearById ).toHaveBeenCalledWith( {
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+		} );
 		expect( dispatch ).toHaveBeenCalledWith( {
 			type: 'EDIT_ENTITY_RECORD',
 			kind: 'postType',
@@ -609,6 +616,70 @@ describe( 'clearEntityRecordEdits', () => {
 				title: undefined,
 			},
 		} );
+	} );
+
+	it( 'clears the whole undo history for the record when undoIgnore is true', () => {
+		const dispatch = jest.fn();
+		const undoManager = createUndoManager();
+		const clearByIdSpy = jest.spyOn( undoManager, 'clearById' );
+		const select = {
+			getEntityConfig: () => ( {
+				kind: 'postType',
+				name: 'post',
+			} ),
+			getEntityRecordEdits: () => ( {
+				title: 'New Title',
+				content: 'New Content',
+			} ),
+			getEditedEntityRecord: () => ( {
+				id: 1,
+				title: 'New Title',
+				content: 'New Content',
+			} ),
+			getUndoManager: () => undoManager,
+		};
+
+		undoManager.addRecord( [
+			{
+				id: { kind: 'postType', name: 'post', recordId: 1 },
+				changes: {
+					title: {
+						from: 'Title',
+						to: 'New Title',
+					},
+				},
+			},
+		] );
+		undoManager.addRecord( [
+			{
+				id: { kind: 'postType', name: 'post', recordId: 1 },
+				changes: {
+					content: {
+						from: 'A paragraph.',
+						to: 'A paragraph. Another block.',
+					},
+				},
+			},
+		] );
+		expect( undoManager.hasUndo() ).toBe( true );
+
+		clearEntityRecordEdits( 'postType', 'post', 1, {
+			undoIgnore: true,
+		} )( {
+			select,
+			dispatch,
+		} );
+
+		expect( clearByIdSpy ).toHaveBeenCalledWith( {
+			kind: 'postType',
+			name: 'post',
+			recordId: 1,
+		} );
+		expect( undoManager.hasUndo() ).toBe( false );
+
+		dispatch.mockClear();
+		undo()( { select, dispatch } );
+		expect( dispatch ).not.toHaveBeenCalled();
 	} );
 } );
 
