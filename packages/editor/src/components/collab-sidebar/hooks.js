@@ -31,6 +31,7 @@ import { store as interfaceStore } from '@wordpress/interface';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { sidebars as DEFAULT_SIDEBARS } from '../sidebar/constants';
 import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { noop } from './utils';
@@ -348,19 +349,28 @@ export function useEnableFloatingSidebar( enabled = false ) {
 		const { disableComplementaryArea, enableComplementaryArea } =
 			registry.dispatch( interfaceStore );
 
+		let wasHiddenByUser = false;
 		const unsubscribe = registry.subscribe( () => {
 			// Return `null` to indicate the user hid the complementary area.
 			if ( getActiveComplementaryArea( 'core' ) === null ) {
+				wasHiddenByUser = true;
 				enableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
 			}
 		} );
 
 		return () => {
 			unsubscribe();
-			if (
-				getActiveComplementaryArea( 'core' ) === FLOATING_NOTES_SIDEBAR
-			) {
-				disableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
+			const activeArea = getActiveComplementaryArea( 'core' );
+			if ( activeArea === FLOATING_NOTES_SIDEBAR ) {
+				if ( wasHiddenByUser ) {
+					disableComplementaryArea( 'core' );
+				} else {
+					// Restore the default sidebar if user didn't explicitly hide it.
+					enableComplementaryArea(
+						'core',
+						DEFAULT_SIDEBARS.document
+					);
+				}
 			}
 		};
 	}, [ enabled, registry ] );
