@@ -87,7 +87,6 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 
 	// Clear any DOM elements from previous player.
 	ref.innerHTML = '';
-	ref.removeAttribute( 'data-waveform-initialized' );
 
 	// Initialize using the shared core.
 	const player = initWaveformPlayer( ref, {

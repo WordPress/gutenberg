@@ -223,16 +223,13 @@ const PlaylistEdit = ( {
 				}
 				return titleB.localeCompare( titleA );
 			} );
-			const sortedTracks = sortedBlocks.map(
-				( block ) => block.attributes
-			);
+			const firstUniqueId = sortedBlocks[ 0 ]?.attributes?.uniqueId;
 			replaceInnerBlocks( clientId, sortedBlocks );
 			setAttributes( {
 				order: trackOrder,
 				currentTrack:
-					sortedTracks.length > 0 &&
-					sortedTracks[ 0 ].uniqueId !== currentTrack
-						? sortedTracks[ 0 ].uniqueId
+					firstUniqueId && firstUniqueId !== currentTrack
+						? firstUniqueId
 						: currentTrack,
 			} );
 		},
@@ -264,7 +261,7 @@ const PlaylistEdit = ( {
 		renderAppender: hasAnySelected && InnerBlocks.ButtonBlockAppender,
 	} );
 
-	if ( ! tracks || ( Array.isArray( tracks ) && tracks.length === 0 ) ) {
+	if ( tracks.length === 0 ) {
 		return (
 			<div
 				{ ...blockProps }
