@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -23,6 +24,14 @@ import { initWaveformPlayer } from './waveform-utils';
  * @return {Element} The WaveformPlayer element.
  */
 export function WaveformPlayer( { src, title, artist, image, onEnded } ) {
+	// Store onEnded in a ref so it doesn't need to be a useRefEffect dependency.
+	// The callback changes reference on every render (its dependency chain
+	// includes an unstable array), which would cause useRefEffect to destroy
+	// and recreate the entire player on every re-render, making it disappear
+	// during editor resizes.
+	const onEndedRef = useRef( onEnded );
+	onEndedRef.current = onEnded;
+
 	const ref = useRefEffect(
 		( element ) => {
 			if ( ! src ) {
@@ -34,12 +43,12 @@ export function WaveformPlayer( { src, title, artist, image, onEnded } ) {
 				title,
 				artist,
 				image,
-				onEnded,
+				onEnded: () => onEndedRef.current?.(),
 			} );
 
 			return destroy;
 		},
-		[ src, title, artist, image, onEnded ]
+		[ src, title, artist, image ]
 	);
 
 	return <div ref={ ref } className="wp-block-playlist__waveform-player" />;

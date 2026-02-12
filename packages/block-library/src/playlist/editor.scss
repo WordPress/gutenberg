@@ -1,15 +1,3 @@
 // WaveformPlayer library styles for the editor iframe.
 // The JS-imported CSS doesn't load in the iframe, so we import the library styles here.
 @import "../../node_modules/@arraypress/waveform-player/dist/waveform-player";
-
-.wp-block-playlist {
-	&.is-placeholder {
-		padding: 0;
-		border: none;
-	}
-
-	// Override WaveformPlayer's inline width style on the canvas.
-	.waveform-container canvas {
-		width: 100% !important;
-	}
-}
