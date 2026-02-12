@@ -8,7 +8,7 @@ test.describe( 'Should iframe', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'should switch to non-iframe when a v2 block is added', async ( {
+	test( 'should remain iframed when a v1 block is added', async ( {
 		page,
 		editor,
 	} ) => {
@@ -33,7 +33,7 @@ test.describe( 'Should iframe', () => {
 		// Insert the v1 block.
 		await editor.insertBlock( { name: 'test/v1' } );
 
-		// The editor should no longer be iframed.
-		await expect( iframe ).toBeHidden();
+		// The editor should remain iframed because Gutenberg is active.
+		await expect( iframe ).toBeVisible();
 	} );
 } );
