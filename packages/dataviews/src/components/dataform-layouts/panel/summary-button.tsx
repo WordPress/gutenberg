@@ -122,19 +122,19 @@ export default function SummaryButton< Item >( {
 					) )
 				) }
 			</span>
-			<Button
-				className="dataforms-layouts-panel__field-trigger-icon"
-				label={ ariaLabel }
-				showTooltip={ false }
-				icon={ pencil }
-				size="small"
-				aria-expanded={ disabled ? undefined : ariaExpanded }
-				aria-haspopup={ disabled ? undefined : 'dialog' }
-				aria-describedby={ `${ controlId }` }
-				disabled={ disabled }
-				accessibleWhenDisabled
-				onClick={ onClick }
-			/>
+			{ ! disabled && (
+				<Button
+					className="dataforms-layouts-panel__field-trigger-icon"
+					label={ ariaLabel }
+					showTooltip={ false }
+					icon={ pencil }
+					size="small"
+					aria-expanded={ ariaExpanded }
+					aria-haspopup="dialog"
+					aria-describedby={ `${ controlId }` }
+					onClick={ onClick }
+				/>
+			) }
 		</div>
 	);
 }
