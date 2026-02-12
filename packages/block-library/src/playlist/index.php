@@ -120,7 +120,6 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				'playlistId' => $playlist_id,
 				'currentId'  => $current_unique_id,
 				'tracks'     => $playlist_tracks,
-				'isPlaying'  => false,
 			)
 		)
 	);

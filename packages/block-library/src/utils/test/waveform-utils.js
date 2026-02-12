@@ -1,7 +1,12 @@
 /**
  * Internal dependencies
  */
-import { createWaveformContainer, styleSvgIcons } from '../waveform-utils';
+import {
+	createWaveformContainer,
+	styleSvgIcons,
+	setupPlayButtonAccessibility,
+	logPlayError,
+} from '../waveform-utils';
 
 describe( 'Waveform utilities', () => {
 	describe( 'createWaveformContainer', () => {
@@ -223,6 +228,157 @@ describe( 'Waveform utilities', () => {
 			styleSvgIcons( container, '#ffff00' );
 
 			expect( path ).toHaveStyle( { fill: '#000000' } );
+		} );
+	} );
+
+	describe( 'setupPlayButtonAccessibility', () => {
+		it( 'should set aria-label and role on play button', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			setupPlayButtonAccessibility( container, 'Play My Song' );
+
+			expect( playBtn ).toHaveAttribute( 'aria-label', 'Play My Song' );
+			expect( playBtn ).toHaveAttribute( 'role', 'button' );
+		} );
+
+		it( 'should return cleanup function that removes event listener', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			const cleanup = setupPlayButtonAccessibility(
+				container,
+				'Play My Song'
+			);
+
+			expect( typeof cleanup ).toBe( 'function' );
+			// Cleanup should not throw.
+			expect( () => cleanup() ).not.toThrow();
+		} );
+
+		it( 'should return no-op cleanup when play button not found', () => {
+			const container = document.createElement( 'div' );
+
+			const cleanup = setupPlayButtonAccessibility(
+				container,
+				'Play My Song'
+			);
+
+			expect( typeof cleanup ).toBe( 'function' );
+			expect( () => cleanup() ).not.toThrow();
+		} );
+
+		it( 'should add keyboard handler for seeking', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			// Create a mock audio element.
+			const audio = document.createElement( 'audio' );
+			Object.defineProperty( audio, 'duration', { value: 100 } );
+			audio.currentTime = 50;
+			container.appendChild( audio );
+
+			setupPlayButtonAccessibility( container, 'Play My Song' );
+
+			// Simulate ArrowRight keydown.
+			const rightEvent = new window.KeyboardEvent( 'keydown', {
+				key: 'ArrowRight',
+			} );
+			playBtn.dispatchEvent( rightEvent );
+
+			expect( audio.currentTime ).toBe( 55 ); // 50 + 5
+
+			// Simulate ArrowLeft keydown.
+			const leftEvent = new window.KeyboardEvent( 'keydown', {
+				key: 'ArrowLeft',
+			} );
+			playBtn.dispatchEvent( leftEvent );
+
+			expect( audio.currentTime ).toBe( 50 ); // 55 - 5
+		} );
+
+		it( 'should not seek past audio boundaries', () => {
+			const container = document.createElement( 'div' );
+			const playBtn = document.createElement( 'button' );
+			playBtn.className = 'waveform-btn';
+			container.appendChild( playBtn );
+
+			const audio = document.createElement( 'audio' );
+			Object.defineProperty( audio, 'duration', { value: 100 } );
+			audio.currentTime = 2;
+			container.appendChild( audio );
+
+			setupPlayButtonAccessibility( container, 'Play My Song' );
+
+			// Seek left past 0.
+			const leftEvent = new window.KeyboardEvent( 'keydown', {
+				key: 'ArrowLeft',
+			} );
+			playBtn.dispatchEvent( leftEvent );
+
+			expect( audio.currentTime ).toBe( 0 ); // Clamped to 0
+
+			// Set near end and seek right past duration.
+			audio.currentTime = 98;
+			const rightEvent = new window.KeyboardEvent( 'keydown', {
+				key: 'ArrowRight',
+			} );
+			playBtn.dispatchEvent( rightEvent );
+
+			expect( audio.currentTime ).toBe( 100 ); // Clamped to duration
+		} );
+	} );
+
+	describe( 'logPlayError', () => {
+		let consoleErrorSpy;
+
+		beforeEach( () => {
+			consoleErrorSpy = jest
+				.spyOn( console, 'error' )
+				.mockImplementation( () => {} );
+		} );
+
+		afterEach( () => {
+			consoleErrorSpy.mockRestore();
+		} );
+
+		it( 'should not log AbortError', () => {
+			const abortError = new DOMException( 'Aborted', 'AbortError' );
+
+			logPlayError( abortError );
+
+			expect( consoleErrorSpy ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should log other errors', () => {
+			const otherError = new Error( 'Some other error' );
+
+			logPlayError( otherError );
+
+			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+				'Playlist play error:',
+				otherError
+			);
+		} );
+
+		it( 'should log NotAllowedError', () => {
+			const notAllowedError = new DOMException(
+				'Not allowed',
+				'NotAllowedError'
+			);
+
+			logPlayError( notAllowedError );
+
+			expect( consoleErrorSpy ).toHaveBeenCalledWith(
+				'Playlist play error:',
+				notAllowedError
+			);
 		} );
 	} );
 } );

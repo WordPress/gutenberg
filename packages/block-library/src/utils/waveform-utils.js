@@ -14,6 +14,7 @@ import WaveformPlayerLib from '@arraypress/waveform-player';
  * Note: DEFAULT_WAVEFORM_HEIGHT should match $waveform-player-height in style.scss.
  */
 const DEFAULT_WAVEFORM_HEIGHT = 100;
+const SEEK_AMOUNT = 5; // Seconds to seek with arrow keys.
 
 /**
  * Get computed style for an element, using ownerDocument for iframe compatibility.
@@ -102,26 +103,101 @@ export function styleSvgIcons( container, buttonColor ) {
 }
 
 /**
+ * Set up play button accessibility: aria attributes and keyboard seeking.
+ *
+ * @param {Element} container - The waveform container element.
+ * @param {string}  ariaLabel - The accessible label for the play button.
+ * @return {Function} Cleanup function to remove event listener.
+ */
+export function setupPlayButtonAccessibility( container, ariaLabel ) {
+	const playBtn = container.querySelector( '.waveform-btn' );
+	if ( ! playBtn ) {
+		return () => {};
+	}
+
+	playBtn.setAttribute( 'aria-label', ariaLabel );
+	playBtn.setAttribute( 'role', 'button' );
+
+	// Add keyboard support for seeking.
+	const keyboardHandler = ( event ) => {
+		const audio = container.querySelector( 'audio' );
+		if ( ! audio ) {
+			return;
+		}
+
+		switch ( event.key ) {
+			case 'ArrowLeft':
+				event.preventDefault();
+				audio.currentTime = Math.max(
+					0,
+					audio.currentTime - SEEK_AMOUNT
+				);
+				break;
+			case 'ArrowRight':
+				event.preventDefault();
+				audio.currentTime = Math.min(
+					audio.duration,
+					audio.currentTime + SEEK_AMOUNT
+				);
+				break;
+		}
+	};
+
+	playBtn.addEventListener( 'keydown', keyboardHandler );
+
+	return () => {
+		playBtn.removeEventListener( 'keydown', keyboardHandler );
+	};
+}
+
+/**
+ * Log play errors, filtering out expected AbortError.
+ *
+ * @param {Error} error - The error from play().
+ */
+export function logPlayError( error ) {
+	// AbortError is expected when play() is interrupted by pause() or track change.
+	if ( error.name === 'AbortError' ) {
+		return;
+	}
+	// eslint-disable-next-line no-console
+	console.error( 'Playlist play error:', error );
+}
+
+/**
  * Initialize a WaveformPlayer instance on an element.
  *
  * This is the shared core logic used by both the React component (editor)
  * and the Interactivity API (frontend).
  *
- * @param {Element}  element         - The container element (must be in DOM).
- * @param {Object}   options         - Configuration options.
- * @param {string}   options.src     - The audio file URL.
- * @param {string}   options.title   - The track title.
- * @param {string}   options.artist  - The artist name.
- * @param {string}   options.image   - The artwork image URL.
- * @param {Function} options.onReady - Callback when player is ready. Receives { instance, container }.
- * @param {Function} options.onEnded - Callback when track ends.
- * @param {Function} options.onPlay  - Callback when playback starts.
- * @param {Function} options.onPause - Callback when playback pauses.
+ * @param {Element}  element           - The container element (must be in DOM).
+ * @param {Object}   options           - Configuration options.
+ * @param {string}   options.src       - The audio file URL.
+ * @param {string}   options.title     - The track title.
+ * @param {string}   options.artist    - The artist name.
+ * @param {string}   options.image     - The artwork image URL.
+ * @param {string}   options.ariaLabel - Optional accessible label for play button. Enables accessibility features.
+ * @param {boolean}  options.autoPlay  - Whether to auto-play when ready.
+ * @param {Function} options.onReady   - Callback when player is ready. Receives { instance, container }.
+ * @param {Function} options.onEnded   - Callback when track ends.
+ * @param {Function} options.onPlay    - Callback when playback starts.
+ * @param {Function} options.onPause   - Callback when playback pauses.
  * @return {Object} Object with instance, container, and destroy function.
  */
 export function initWaveformPlayer(
 	element,
-	{ src, title, artist, image, onReady, onEnded, onPlay, onPause }
+	{
+		src,
+		title,
+		artist,
+		image,
+		ariaLabel,
+		autoPlay,
+		onReady,
+		onEnded,
+		onPlay,
+		onPause,
+	}
 ) {
 	// Get colors from computed styles.
 	const { textColor, waveformColor, progressColor } =
@@ -142,10 +218,34 @@ export function initWaveformPlayer(
 	// Initialize the WaveformPlayer library.
 	const instance = new WaveformPlayerLib( container );
 
+	// Track cleanup function for accessibility.
+	let cleanupAccessibility = null;
+
 	// Set up event handlers.
 	const handlers = {
 		ready: () => {
 			styleSvgIcons( container, textColor );
+			// Set up accessibility if ariaLabel was provided.
+			if ( ariaLabel ) {
+				cleanupAccessibility = setupPlayButtonAccessibility(
+					container,
+					ariaLabel
+				);
+			}
+			// Auto-play if requested.
+			if ( autoPlay ) {
+				try {
+					const playPromise = instance.play();
+					if (
+						playPromise &&
+						typeof playPromise.catch === 'function'
+					) {
+						playPromise.catch( logPlayError );
+					}
+				} catch ( e ) {
+					logPlayError( e );
+				}
+			}
 			onReady?.( { instance, container } );
 		},
 		ended: () => onEnded?.(),
@@ -159,13 +259,18 @@ export function initWaveformPlayer(
 	container.addEventListener( 'waveformplayer:pause', handlers.pause );
 
 	// Return instance, container, and cleanup function.
-	// TODO: Once @arraypress/waveform-player is updated with the isDestroying
-	// guards (PR #3), we can safely call instance.destroy() without risk of
-	// AbortError from pending play() Promises.
 	return {
 		instance,
 		container,
 		destroy: () => {
+			// Pause audio before destroying to prevent AbortError when
+			// destroy() interrupts a pending play() Promise.
+			// TODO: Once @arraypress/waveform-player is updated with isDestroying
+			// guards (PR #3), the pause-before-destroy workaround may not be needed.
+			const audio = container.querySelector( 'audio' );
+			if ( audio && ! audio.paused ) {
+				audio.pause();
+			}
 			container.removeEventListener(
 				'waveformplayer:ready',
 				handlers.ready
@@ -182,6 +287,7 @@ export function initWaveformPlayer(
 				'waveformplayer:pause',
 				handlers.pause
 			);
+			cleanupAccessibility?.();
 			instance.destroy();
 		},
 	};
