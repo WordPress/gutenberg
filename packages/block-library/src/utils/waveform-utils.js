@@ -220,17 +220,7 @@ export function initWaveformPlayer(
 			}
 			// Auto-play if requested.
 			if ( autoPlay ) {
-				try {
-					const playPromise = instance.play();
-					if (
-						playPromise &&
-						typeof playPromise.catch === 'function'
-					) {
-						playPromise.catch( logPlayError );
-					}
-				} catch ( e ) {
-					logPlayError( e );
-				}
+				instance.play()?.catch( logPlayError );
 			}
 		},
 		ended: () => onEnded?.(),
