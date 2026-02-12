@@ -85,5 +85,7 @@ if ( ! function_exists( '{{PREFIX}}_register_package_scripts' ) ) {
 		}
 	}
 
-	add_action( 'wp_default_scripts', '{{PREFIX}}_register_package_scripts' );
+	// Priority 9 so that the Gutenberg plugin (priority 10) can override
+	// these scripts with newer versions when it is active.
+	add_action( 'wp_default_scripts', '{{PREFIX}}_register_package_scripts', 9 );
 }
