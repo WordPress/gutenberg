@@ -10,6 +10,18 @@ import getFootnotesOrder from './get-footnotes-order';
 
 let oldFootnotes = {};
 
+/**
+ * @typedef {Object} UpdateFootnotesFromMetaResult
+ * @property {Record<string, unknown>} meta   - The updated meta information.
+ * @property {Array}                   blocks - The updated blocks with footnotes processed.
+ */
+
+/**
+ * Updates footnotes in blocks based on meta information.
+ * @param {Array}                   blocks - The blocks to update.
+ * @param {Record<string, unknown>} meta   - The meta information to use for updates.
+ * @return {UpdateFootnotesFromMetaResult} - The updated blocks and meta information.
+ */
 export function updateFootnotesFromMeta( blocks, meta ) {
 	const output = { blocks };
 	if ( ! meta ) {
@@ -140,4 +152,30 @@ export function updateFootnotesFromMeta( blocks, meta ) {
 		},
 		blocks: newBlocks,
 	};
+}
+
+/**
+ * Checks if the block list contains a subscript attribute
+ *
+ * @param {Array} blockList - The list of blocks to check.
+ *
+ * @return {boolean} - Returns true if a core/footnotes block is found, otherwise false.
+ */
+export function hasFootnotesSubscriptBlock( blockList ) {
+	for ( const block of blockList ) {
+		if (
+			block.attributes &&
+			block.attributes[ 'data-fn' ] &&
+			block.tagName === 'sup'
+		) {
+			return true;
+		}
+
+		if ( block.innerBlocks && block.innerBlocks.length > 0 ) {
+			if ( hasFootnotesSubscriptBlock( block.innerBlocks ) ) {
+				return true;
+			}
+		}
+	}
+	return false;
 }

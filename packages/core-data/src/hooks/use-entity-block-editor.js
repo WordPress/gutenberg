@@ -10,7 +10,10 @@ import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
  */
 import { STORE_NAME } from '../name';
 import useEntityId from './use-entity-id';
-import { updateFootnotesFromMeta } from '../footnotes';
+import {
+	hasFootnotesSubscriptBlock,
+	updateFootnotesFromMeta,
+} from '../footnotes';
 
 const EMPTY_ARRAY = [];
 const parsedBlocksCache = new WeakMap();
@@ -72,23 +75,31 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 		// If not, cache by the original entity record.
 		const edits = getEntityRecordEdits( kind, name, id );
 		const isUnedited = ! edits || ! Object.keys( edits ).length;
-		const cackeKey = isUnedited ? getEntityRecord( kind, name, id ) : edits;
-		let _blocks = parsedBlocksCache.get( cackeKey );
+		const cacheKey = isUnedited ? getEntityRecord( kind, name, id ) : edits;
+		let _blocks = parsedBlocksCache.get( cacheKey );
 
 		if ( ! _blocks ) {
 			_blocks = parse( content );
-			parsedBlocksCache.set( cackeKey, _blocks );
+			parsedBlocksCache.set( cacheKey, _blocks );
+		}
+
+		if ( hasFootnotesSubscriptBlock( _blocks ) ) {
+			// If the blocks contain footnotes, we need to process them.
+			// This is done to ensure that footnotes are always up-to-date
+			_blocks = updateFootnotesFromMeta( _blocks, meta ).blocks;
+			parsedBlocksCache.set( cacheKey, _blocks );
 		}
 
 		return _blocks;
 	}, [
+		id,
 		kind,
 		name,
-		id,
 		editedBlocks,
 		content,
-		getEntityRecord,
 		getEntityRecordEdits,
+		getEntityRecord,
+		meta,
 	] );
 
 	const onChange = useCallback(
@@ -115,13 +126,13 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			} );
 		},
 		[
+			blocks,
+			meta,
+			editEntityRecord,
 			kind,
 			name,
 			id,
-			blocks,
-			meta,
 			__unstableCreateUndoLevel,
-			editEntityRecord,
 		]
 	);
 
