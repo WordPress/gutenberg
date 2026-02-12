@@ -3,12 +3,7 @@
 @use "../../collaborators-overlay/collaborator-mixins" as *;
 
 .editor-collaborators-presence__avatar {
-	background-image: var(--avatar-url);
-	background-size: cover;
-	background-position: center;
-	border-radius: $radius-round;
-	border-width: var(--wp-admin-border-width-focus, $border-width-focus-fallback);
-	border-style: solid;
+	@include collaborator-avatar();
 	border-color: $gray-300;
 	font-size: 0;
 

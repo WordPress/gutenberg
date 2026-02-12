@@ -1,12 +1,28 @@
 @use "@wordpress/base-styles/colors" as *;
 @use "@wordpress/base-styles/variables" as *;
 
-// Shared contrast outline for collaborator UI elements (block highlights, avatars).
-// Provides a white inner and outer ring around the collaborator's color to ensure
-// sufficient contrast against any background.
+// Full contrast shadow for collaborator UI elements that sit on arbitrary
+// backgrounds.  Combines the inner white ring (inset), an outer white ring,
+// and the elevation shadow in one box-shadow so it can't be accidentally
+// overridden by a partial declaration.
+// Block highlights don't use this mixin — they build their own box-shadow
+// because the inset needs to be wider than the outline (see overlay.scss).
 @mixin collaborator-contrast-shadow() {
 	box-shadow:
-		inset 0 0 0 1px $white,
-		0 0 0 1px $white,
+		inset 0 0 0 $border-width $white,
+		0 0 0 $border-width $white,
 		$elevation-x-small;
+}
+
+// Base styles shared by all collaborator avatars (presence list and cursor label).
+// Sets up the circular image via the --avatar-url custom property. Consumers
+// must provide their own width/height and border-color.
+@mixin collaborator-avatar() {
+	background-image: var(--avatar-url);
+	background-size: cover;
+	background-position: center;
+	border-radius: $radius-round;
+	border-width: var(--wp-admin-border-width-focus, $border-width-focus-fallback);
+	border-style: solid;
+	box-shadow: inset 0 0 0 $border-width $white;
 }
