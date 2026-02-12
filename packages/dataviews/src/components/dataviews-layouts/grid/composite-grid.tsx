@@ -18,7 +18,12 @@ import { Stack } from '@wordpress/ui';
 import { __, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { isAppleOS } from '@wordpress/keycodes';
-import { useContext, useRef, forwardRef } from '@wordpress/element';
+import {
+	useCallback,
+	useContext,
+	useRef,
+	forwardRef,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -116,14 +121,17 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 		const elementRef = useRef< HTMLDivElement | null >( null );
 
 		// Merge refs callback
-		const setRefs = ( node: HTMLDivElement | null ) => {
-			elementRef.current = node;
-			if ( typeof forwardedRef === 'function' ) {
-				forwardedRef( node );
-			} else if ( forwardedRef ) {
-				forwardedRef.current = node;
-			}
-		};
+		const setRefs = useCallback(
+			( node: HTMLDivElement | null ) => {
+				elementRef.current = node;
+				if ( typeof forwardedRef === 'function' ) {
+					forwardedRef( node );
+				} else if ( forwardedRef ) {
+					forwardedRef.current = node;
+				}
+			},
+			[ forwardedRef ]
+		);
 		useIntersectionObserver( elementRef, posinset );
 		const instanceId = useInstanceId( GridItem );
 
