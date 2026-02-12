@@ -34,9 +34,12 @@ function ResizableEditor( {
 	height,
 	children,
 	deviceType,
+	onDeviceTypeChange,
 } ) {
 	const [ width, setWidth ] = useState( '100%' );
 	const resizableRef = useRef();
+	const isResizingRef = useRef( false );
+
 	const resizeWidthBy = useCallback( ( deltaPixels ) => {
 		if ( resizableRef.current ) {
 			setWidth( resizableRef.current.offsetWidth + deltaPixels );
@@ -45,7 +48,7 @@ function ResizableEditor( {
 
 	// When deviceType changes, snap the width to the device preset
 	useEffect( () => {
-		if ( enableResizing && deviceType ) {
+		if ( enableResizing && deviceType && deviceType !== 'Custom' ) {
 			const deviceWidth = DEVICE_PREVIEW_WIDTHS[ deviceType ];
 			setWidth( deviceWidth ?? '100%' );
 		}
@@ -63,8 +66,33 @@ function ResizableEditor( {
 				width: enableResizing ? width : '100%',
 				height: enableResizing && height ? height : '100%',
 			} }
+			onResizeStart={ () => {
+				isResizingRef.current = true;
+			} }
 			onResizeStop={ ( event, direction, element ) => {
+				const newWidth = parseInt( element.style.width );
 				setWidth( element.style.width );
+				isResizingRef.current = false;
+
+				// Check if the new width matches any device preset
+				const matchesPreset = Object.entries(
+					DEVICE_PREVIEW_WIDTHS
+				).some(
+					( [ type, presetWidth ] ) =>
+						type !== 'Custom' &&
+						presetWidth !== null &&
+						Math.abs( newWidth - presetWidth ) < 5 // Allow 5px tolerance
+				);
+
+				// If manually resized to a width that doesn't match a preset, switch to Custom
+				if (
+					enableResizing &&
+					onDeviceTypeChange &&
+					! matchesPreset &&
+					deviceType !== 'Custom'
+				) {
+					onDeviceTypeChange( 'Custom' );
+				}
 			} }
 			minWidth={ 300 }
 			maxWidth="100%"

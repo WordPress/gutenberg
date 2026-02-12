@@ -17,7 +17,7 @@ import {
 	__experimentalUseResizeCanvas as useResizeCanvas,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { parse } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 import { useMergeRefs, useViewportMatch } from '@wordpress/compose';
@@ -185,6 +185,8 @@ function VisualEditor( {
 			isZoomedOut: _isZoomOut(),
 		};
 	}, [] );
+
+	const { setDeviceType } = unlock( useDispatch( editorStore ) );
 
 	const enableResizing =
 		[
@@ -417,6 +419,7 @@ function VisualEditor( {
 				enableResizing={ enableResizing }
 				height="100%"
 				deviceType={ deviceType }
+				onDeviceTypeChange={ setDeviceType }
 			>
 				<BlockCanvas
 					shouldIframe={ ! disableIframe }

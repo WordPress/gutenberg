@@ -14,10 +14,12 @@ export const DEVICE_PREVIEW_WIDTHS = {
 	Desktop: null, // full width, no constraint
 	Tablet: 781, // 782 - 1: triggers useViewportMatch( 'medium', '<' )
 	Mobile: 479, // 480 - 1: triggers useViewportMatch( 'mobile', '<' )
+	Custom: null, // manual resize, no constraint
 };
 
 export const DEVICE_PREVIEW_HEIGHTS = {
 	Desktop: null,
 	Tablet: 1024,
 	Mobile: 768,
+	Custom: null,
 };

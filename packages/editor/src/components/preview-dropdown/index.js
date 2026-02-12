@@ -16,7 +16,14 @@ import {
 	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { desktop, mobile, tablet, external, check } from '@wordpress/icons';
+import {
+	desktop,
+	mobile,
+	tablet,
+	external,
+	check,
+	dragHandle,
+} from '@wordpress/icons';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as preferencesStore } from '@wordpress/preferences';
@@ -93,6 +100,7 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 		desktop,
 		mobile,
 		tablet,
+		custom: dragHandle,
 	};
 
 	/**
@@ -115,6 +123,11 @@ export default function PreviewDropdown( { forceIsAutosaveable, disabled } ) {
 			value: 'Mobile',
 			label: __( 'Mobile' ),
 			icon: mobile,
+		},
+		{
+			value: 'Custom',
+			label: __( 'Custom' ),
+			icon: dragHandle,
 		},
 	];
 
