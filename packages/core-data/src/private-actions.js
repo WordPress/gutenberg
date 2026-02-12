@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import logEntityDeprecation from './utils/log-entity-deprecation';
 
 /**
  * Internal dependencies
@@ -161,77 +160,3 @@ export function receiveEditorAssets( assets ) {
 		assets,
 	};
 }
-
-/**
- * Action triggered to clear all edits from
- * an entity record.
- *
- * @param {string}        kind                 Kind of the entity.
- * @param {string}        name                 Name of the entity.
- * @param {number|string} recordId             Record ID of the entity record.
- * @param {Object}        options              Options for the clear.
- * @param {boolean}       [options.undoIgnore] Whether to ignore the clear in undo history or not.
- */
-export const clearEntityRecordEdits =
-	( kind, name, recordId, options = {} ) =>
-	( { select, dispatch } ) => {
-		const entityConfig = select.getEntityConfig( kind, name );
-		logEntityDeprecation( kind, name, 'clearEntityRecordEdits' );
-		if ( ! entityConfig ) {
-			throw new Error(
-				`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
-			);
-		}
-
-		const currentEdits = select.getEntityRecordEdits(
-			kind,
-			name,
-			recordId
-		);
-		if ( ! currentEdits ) {
-			return;
-		}
-
-		const editedRecord = select.getEditedEntityRecord(
-			kind,
-			name,
-			recordId
-		);
-
-		// Build an edits object with all current edit keys set to undefined
-		// so the reducer removes them.
-		const clearedEdits = Object.keys( currentEdits ).reduce(
-			( acc, key ) => {
-				acc[ key ] = undefined;
-				return acc;
-			},
-			{}
-		);
-
-		// Record in the undo manager so the clear can be undone.
-		if ( ! options.undoIgnore ) {
-			select.getUndoManager().addRecord( [
-				{
-					id: { kind, name, recordId },
-					changes: Object.keys( currentEdits ).reduce(
-						( acc, key ) => {
-							acc[ key ] = {
-								from: editedRecord[ key ],
-								to: undefined,
-							};
-							return acc;
-						},
-						{}
-					),
-				},
-			] );
-		}
-
-		dispatch( {
-			type: 'EDIT_ENTITY_RECORD',
-			kind,
-			name,
-			recordId,
-			edits: clearedEdits,
-		} );
-	};

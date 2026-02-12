@@ -174,6 +174,18 @@ _Returns_
 
 -   `Object`: Action object.
 
+### clearEntityRecordEdits
+
+Action triggered to clear all edits from an entity record.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the entity.
+-   _name_ `string`: Name of the entity.
+-   _recordId_ `number|string`: Record ID of the entity record.
+-   _options_ `Object`: Options for the clear.
+-   _options.undoIgnore_ `[boolean]`: Whether to ignore the clear in undo history or not.
+
 ### deleteEntityRecord
 
 Action triggered to delete an entity record.
