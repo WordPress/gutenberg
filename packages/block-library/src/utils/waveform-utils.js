@@ -7,6 +7,7 @@
  * External dependencies
  */
 import { colord } from 'colord';
+import WaveformPlayerLib from '@arraypress/waveform-player';
 
 /**
  * Configuration constants.
@@ -98,4 +99,90 @@ export function styleSvgIcons( container, buttonColor ) {
 	svgPaths.forEach( ( path ) => {
 		path.style.fill = iconColor;
 	} );
+}
+
+/**
+ * Initialize a WaveformPlayer instance on an element.
+ *
+ * This is the shared core logic used by both the React component (editor)
+ * and the Interactivity API (frontend).
+ *
+ * @param {Element}  element         - The container element (must be in DOM).
+ * @param {Object}   options         - Configuration options.
+ * @param {string}   options.src     - The audio file URL.
+ * @param {string}   options.title   - The track title.
+ * @param {string}   options.artist  - The artist name.
+ * @param {string}   options.image   - The artwork image URL.
+ * @param {Function} options.onReady - Callback when player is ready. Receives { instance, container }.
+ * @param {Function} options.onEnded - Callback when track ends.
+ * @param {Function} options.onPlay  - Callback when playback starts.
+ * @param {Function} options.onPause - Callback when playback pauses.
+ * @return {Object} Object with instance, container, and destroy function.
+ */
+export function initWaveformPlayer(
+	element,
+	{ src, title, artist, image, onReady, onEnded, onPlay, onPause }
+) {
+	// Get colors from computed styles.
+	const { textColor, waveformColor, progressColor } =
+		getWaveformColors( element );
+
+	// Create the waveform container.
+	const container = createWaveformContainer( {
+		url: src,
+		title,
+		artist,
+		artwork: image,
+		waveformColor,
+		progressColor,
+		buttonColor: textColor,
+	} );
+	element.appendChild( container );
+
+	// Initialize the WaveformPlayer library.
+	const instance = new WaveformPlayerLib( container );
+
+	// Set up event handlers.
+	const handlers = {
+		ready: () => {
+			styleSvgIcons( container, textColor );
+			onReady?.( { instance, container } );
+		},
+		ended: () => onEnded?.(),
+		play: () => onPlay?.(),
+		pause: () => onPause?.(),
+	};
+
+	container.addEventListener( 'waveformplayer:ready', handlers.ready );
+	container.addEventListener( 'waveformplayer:ended', handlers.ended );
+	container.addEventListener( 'waveformplayer:play', handlers.play );
+	container.addEventListener( 'waveformplayer:pause', handlers.pause );
+
+	// Return instance, container, and cleanup function.
+	// TODO: Once @arraypress/waveform-player is updated with the isDestroying
+	// guards (PR #3), we can safely call instance.destroy() without risk of
+	// AbortError from pending play() Promises.
+	return {
+		instance,
+		container,
+		destroy: () => {
+			container.removeEventListener(
+				'waveformplayer:ready',
+				handlers.ready
+			);
+			container.removeEventListener(
+				'waveformplayer:ended',
+				handlers.ended
+			);
+			container.removeEventListener(
+				'waveformplayer:play',
+				handlers.play
+			);
+			container.removeEventListener(
+				'waveformplayer:pause',
+				handlers.pause
+			);
+			instance.destroy();
+		},
+	};
 }

@@ -2,7 +2,6 @@
  * External dependencies
  */
 import clsx from 'clsx';
-import WaveformPlayerLib from '@arraypress/waveform-player';
 import '@arraypress/waveform-player/dist/waveform-player.css';
 
 /**
@@ -13,11 +12,7 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import {
-	getWaveformColors,
-	createWaveformContainer,
-	styleSvgIcons,
-} from './waveform-utils';
+import { initWaveformPlayer } from './waveform-utils';
 
 /**
  * A reusable WaveformPlayer component for the block editor.
@@ -44,63 +39,21 @@ export function WaveformPlayer( {
 	onEnded,
 	className,
 } ) {
-	// Initialize WaveformPlayer when the element mounts or track changes.
-	// useRefEffect ensures styles are applied before initialization
-	// (important for iframed editor).
 	const ref = useRefEffect(
 		( element ) => {
 			if ( ! src ) {
 				return;
 			}
 
-			// Get colors for styling (CSS is applied when useRefEffect runs).
-			const { textColor, waveformColor, progressColor } =
-				getWaveformColors( element );
-
-			// Create waveform container with correct colors.
-			const container = createWaveformContainer( {
-				url: src,
+			const { destroy } = initWaveformPlayer( element, {
+				src,
 				title,
 				artist,
-				artwork: image,
-				waveformColor,
-				progressColor,
-				buttonColor: textColor,
+				image,
+				onEnded,
 			} );
-			element.appendChild( container );
 
-			// Create WaveformPlayer instance.
-			const instance = new WaveformPlayerLib( container );
-
-			// Apply contrasting color to SVG icons once WaveformPlayer is ready.
-			const handleReady = () => {
-				container.removeEventListener(
-					'waveformplayer:ready',
-					handleReady
-				);
-				styleSvgIcons( container, textColor );
-			};
-			container.addEventListener( 'waveformplayer:ready', handleReady );
-
-			// Handle track end event.
-			const handleEnded = () => {
-				if ( onEnded ) {
-					onEnded();
-				}
-			};
-			container.addEventListener( 'waveformplayer:ended', handleEnded );
-
-			return () => {
-				container.removeEventListener(
-					'waveformplayer:ready',
-					handleReady
-				);
-				container.removeEventListener(
-					'waveformplayer:ended',
-					handleEnded
-				);
-				instance.destroy();
-			};
+			return destroy;
 		},
 		[ src, title, artist, image, onEnded ]
 	);

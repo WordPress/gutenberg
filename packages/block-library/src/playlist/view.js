@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import WaveformPlayer from '@arraypress/waveform-player';
 import '@arraypress/waveform-player/dist/waveform-player.css';
 
 /**
@@ -12,11 +11,7 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 /**
  * Internal dependencies
  */
-import {
-	getWaveformColors,
-	createWaveformContainer,
-	styleSvgIcons,
-} from '../utils/waveform-utils';
+import { initWaveformPlayer } from '../utils/waveform-utils';
 
 /**
  * Configuration constants.
@@ -29,94 +24,51 @@ const NEXT_TRACK_DELAY = 1000; // Delay in ms before auto-playing next track.
  *
  * @param {Element} container - The waveform container element.
  * @param {Object}  track     - The track data with ariaLabel and title.
- * @return {Object} Object with playBtn element and keyboardHandler function.
+ * @return {Function} Cleanup function to remove event listener.
  */
 function setupPlayButtonAccessibility( container, track ) {
 	const playBtn = container.querySelector( '.waveform-btn' );
-	let keyboardHandler = null;
-
-	if ( playBtn ) {
-		playBtn.setAttribute( 'aria-label', track.ariaLabel || track.title );
-		playBtn.setAttribute( 'role', 'button' );
-
-		// Add keyboard support for seeking.
-		keyboardHandler = ( event ) => {
-			const audio = container.querySelector( 'audio' );
-			if ( ! audio ) {
-				return;
-			}
-
-			switch ( event.key ) {
-				case 'ArrowLeft':
-					event.preventDefault();
-					audio.currentTime = Math.max(
-						0,
-						audio.currentTime - SEEK_AMOUNT
-					);
-					break;
-				case 'ArrowRight':
-					event.preventDefault();
-					audio.currentTime = Math.min(
-						audio.duration,
-						audio.currentTime + SEEK_AMOUNT
-					);
-					break;
-			}
-		};
-
-		playBtn.addEventListener( 'keydown', keyboardHandler );
+	if ( ! playBtn ) {
+		return () => {};
 	}
 
-	return { playBtn, keyboardHandler };
-}
+	playBtn.setAttribute( 'aria-label', track.ariaLabel || track.title );
+	playBtn.setAttribute( 'role', 'button' );
 
-/**
- * Clean up an existing player instance and its event listeners.
- *
- * @param {Object} existing - The existing player state object.
- */
-function cleanupPlayer( existing ) {
-	const {
-		container: existingContainer,
-		playBtn,
-		keyboardHandler,
-		eventHandlers,
-	} = existing;
+	// Add keyboard support for seeking.
+	const keyboardHandler = ( event ) => {
+		const audio = container.querySelector( 'audio' );
+		if ( ! audio ) {
+			return;
+		}
 
-	// Pause the old audio first to prevent AbortError
-	// when destroy() interrupts a pending play() Promise.
-	const oldAudio = existingContainer?.querySelector( 'audio' );
-	if ( oldAudio && ! oldAudio.paused ) {
-		oldAudio.pause();
-	}
+		switch ( event.key ) {
+			case 'ArrowLeft':
+				event.preventDefault();
+				audio.currentTime = Math.max(
+					0,
+					audio.currentTime - SEEK_AMOUNT
+				);
+				break;
+			case 'ArrowRight':
+				event.preventDefault();
+				audio.currentTime = Math.min(
+					audio.duration,
+					audio.currentTime + SEEK_AMOUNT
+				);
+				break;
+		}
+	};
 
-	if ( playBtn && keyboardHandler ) {
+	playBtn.addEventListener( 'keydown', keyboardHandler );
+
+	return () => {
 		playBtn.removeEventListener( 'keydown', keyboardHandler );
-	}
-
-	// Remove WaveformPlayer event listeners.
-	if ( eventHandlers && existingContainer ) {
-		existingContainer.removeEventListener(
-			'waveformplayer:ended',
-			eventHandlers.handleEnded
-		);
-		existingContainer.removeEventListener(
-			'waveformplayer:play',
-			eventHandlers.handlePlay
-		);
-		existingContainer.removeEventListener(
-			'waveformplayer:pause',
-			eventHandlers.handlePause
-		);
-		existingContainer.removeEventListener(
-			'waveformplayer:ready',
-			eventHandlers.handleReady
-		);
-	}
+	};
 }
 
 /**
- * Store player state for each element (instance, url, event listeners).
+ * Store player state for each element.
  */
 const playerState = new Map();
 
@@ -218,122 +170,96 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		return;
 	}
 
-	// Clean up any existing player state.
+	// Clean up any existing player.
 	if ( existing ) {
-		// TODO: Once @arraypress/waveform-player is updated with the isDestroying
-		// guards (PR #3), simplify this to just: existing.instance.destroy()
-		// For now, don't call destroy() as it can cause AbortError if there's a
-		// pending play() Promise. The DOM is already cleared via ref.innerHTML = '',
-		// and the old instance will be garbage collected.
-		cleanupPlayer( existing );
+		existing.destroy();
 		playerState.delete( ref );
 	}
 
 	// Clear any DOM elements from previous player.
 	ref.innerHTML = '';
-
-	// Remove the initialized flag so WaveformPlayer creates fresh.
 	ref.removeAttribute( 'data-waveform-initialized' );
 
-	// Get colors from computed styles for proper inheritance.
-	const { textColor, waveformColor, progressColor } =
-		getWaveformColors( ref );
-
-	// Create the waveform container.
-	const container = createWaveformContainer( {
-		url: track.url,
+	// Initialize using the shared core.
+	const player = initWaveformPlayer( ref, {
+		src: track.url,
 		title: track.title,
 		artist: track.artist,
-		artwork: track.image,
-		waveformColor,
-		progressColor,
-		buttonColor: textColor,
-	} );
-	ref.appendChild( container );
+		image: track.image,
+		onReady: ( { instance } ) => {
+			// Set up accessibility after player is ready.
+			const cleanupAccessibility = setupPlayButtonAccessibility(
+				player.container,
+				track
+			);
+			player.cleanupAccessibility = cleanupAccessibility;
 
-	// Create WaveformPlayer instance.
-	const instance = new WaveformPlayer( container );
-
-	// Enhance play button accessibility.
-	const { playBtn, keyboardHandler } = setupPlayButtonAccessibility(
-		container,
-		track
-	);
-
-	// Create event handlers using WaveformPlayer's custom events.
-	// Events are dispatched on the container element.
-	const handleEnded = () => {
-		// Advance to next track.
-		const currentIndex = context.tracks.findIndex(
-			( uniqueId ) => uniqueId === context.currentId
-		);
-		const nextTrack = context.tracks[ currentIndex + 1 ];
-		if ( nextTrack ) {
-			const expectedTrack = nextTrack;
-			context.currentId = nextTrack;
-			// Wait before playing next track to avoid jarring transition.
-			setTimeout( () => {
-				// Verify we're still on the expected track (user might have clicked elsewhere).
-				if ( context.currentId !== expectedTrack ) {
-					return;
-				}
-				const nextAudio = ref.querySelector( 'audio' );
-				if ( nextAudio ) {
-					const playPromise = nextAudio.play();
+			// Auto-play if switching tracks (user action), not on initial page load.
+			if ( shouldAutoPlay ) {
+				try {
+					const playPromise = instance.play();
 					if (
 						playPromise &&
 						typeof playPromise.catch === 'function'
 					) {
 						playPromise.catch( logPlayError );
 					}
+				} catch ( e ) {
+					logPlayError( e );
 				}
-			}, NEXT_TRACK_DELAY );
-		}
-	};
-	const handlePlay = () => {
-		context.isPlaying = true;
-	};
-	const handlePause = () => {
-		context.isPlaying = false;
-	};
-
-	container.addEventListener( 'waveformplayer:ended', handleEnded );
-	container.addEventListener( 'waveformplayer:play', handlePlay );
-	container.addEventListener( 'waveformplayer:pause', handlePause );
-
-	// Wait for the ready event to style icons (they may not exist until ready).
-	// Also auto-play if switching tracks.
-	const handleReady = () => {
-		container.removeEventListener( 'waveformplayer:ready', handleReady );
-
-		// Apply contrasting color to SVG icons for visibility.
-		// Done here because icons may not exist until WaveformPlayer is ready.
-		styleSvgIcons( container, textColor );
-
-		// Auto-play if switching tracks (user action), not on initial page load.
-		if ( shouldAutoPlay ) {
-			try {
-				const playPromise = instance.play();
-				if ( playPromise && typeof playPromise.catch === 'function' ) {
-					playPromise.catch( logPlayError );
-				}
-			} catch ( e ) {
-				logPlayError( e );
 			}
-		}
-	};
-	container.addEventListener( 'waveformplayer:ready', handleReady );
-
-	const eventHandlers = { handleEnded, handlePlay, handlePause, handleReady };
+		},
+		onEnded: () => {
+			// Advance to next track.
+			const currentIndex = context.tracks.findIndex(
+				( uniqueId ) => uniqueId === context.currentId
+			);
+			const nextTrack = context.tracks[ currentIndex + 1 ];
+			if ( nextTrack ) {
+				const expectedTrack = nextTrack;
+				context.currentId = nextTrack;
+				// Wait before playing next track to avoid jarring transition.
+				setTimeout( () => {
+					// Verify we're still on the expected track.
+					if ( context.currentId !== expectedTrack ) {
+						return;
+					}
+					const nextAudio = ref.querySelector( 'audio' );
+					if ( nextAudio ) {
+						const playPromise = nextAudio.play();
+						if (
+							playPromise &&
+							typeof playPromise.catch === 'function'
+						) {
+							playPromise.catch( logPlayError );
+						}
+					}
+				}, NEXT_TRACK_DELAY );
+			}
+		},
+		onPlay: () => {
+			context.isPlaying = true;
+		},
+		onPause: () => {
+			context.isPlaying = false;
+		},
+	} );
 
 	// Store state for cleanup.
+	// Note: We pause audio before destroying to prevent AbortError when
+	// destroy() interrupts a pending play() Promise.
+	// TODO: Once @arraypress/waveform-player is updated with isDestroying
+	// guards (PR #3), the pause-before-destroy workaround may not be needed.
 	playerState.set( ref, {
 		url: track.url,
-		instance,
-		container,
-		playBtn,
-		keyboardHandler,
-		eventHandlers,
+		destroy: () => {
+			const audio = player.container?.querySelector( 'audio' );
+			if ( audio && ! audio.paused ) {
+				audio.pause();
+			}
+			player.cleanupAccessibility?.();
+			player.destroy();
+		},
 	} );
 }
 
