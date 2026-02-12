@@ -32,6 +32,8 @@ describe( 'Awareness Utils', () => {
 			avatar_urls: sharedAvatarUrls,
 			browserType: 'Chrome',
 			color: '#3858E9',
+			strokeColor: '#3858e9',
+			backgroundColor: '#3858e9',
 			enteredAt: 1704067200000,
 			...overrides,
 		} );
@@ -129,6 +131,36 @@ describe( 'Awareness Utils', () => {
 			} );
 			const collaboratorInfo2 = createCollaboratorInfo( {
 				color: '#B42AED',
+			} );
+			expect(
+				areCollaboratorInfosEqual(
+					collaboratorInfo1,
+					collaboratorInfo2
+				)
+			).toBe( false );
+		} );
+
+		test( 'should return false when strokeColor differs', () => {
+			const collaboratorInfo1 = createCollaboratorInfo( {
+				strokeColor: '#3858e9',
+			} );
+			const collaboratorInfo2 = createCollaboratorInfo( {
+				strokeColor: '#9500ff',
+			} );
+			expect(
+				areCollaboratorInfosEqual(
+					collaboratorInfo1,
+					collaboratorInfo2
+				)
+			).toBe( false );
+		} );
+
+		test( 'should return false when backgroundColor differs', () => {
+			const collaboratorInfo1 = createCollaboratorInfo( {
+				backgroundColor: '#3858e9',
+			} );
+			const collaboratorInfo2 = createCollaboratorInfo( {
+				backgroundColor: '#9500ff',
 			} );
 			expect(
 				areCollaboratorInfosEqual(
@@ -307,48 +339,58 @@ describe( 'Awareness Utils', () => {
 
 			const colorPalette = [
 				'#3858E9',
-				'#B42AED',
-				'#E33184',
-				'#F3661D',
-				'#ECBD3A',
-				'#97FE17',
-				'#00FDD9',
-				'#37C5F0',
+				'#9500FF',
+				'#FF0080',
+				'#F4800B',
+				'#FF00EA',
+				'#C3E619',
+				'#4DB3A2',
+				'#00D5FF',
 			];
 			expect( colorPalette ).toContain( collaboratorInfo.color );
+		} );
+
+		test( 'should derive strokeColor and backgroundColor from seed', () => {
+			const user = createMockUser();
+			const collaboratorInfo = generateCollaboratorInfo( user, [] );
+
+			expect( collaboratorInfo.strokeColor ).toMatch( /^#[0-9a-f]{6}$/i );
+			expect( collaboratorInfo.backgroundColor ).toMatch(
+				/^#[0-9a-f]{6}$/i
+			);
 		} );
 
 		test( 'should avoid existing colors when assigning', () => {
 			const user = createMockUser();
 			const existingColors = [
 				'#3858E9',
-				'#B42AED',
-				'#E33184',
-				'#F3661D',
-				'#ECBD3A',
-				'#97FE17',
-				'#00FDD9',
+				'#9500FF',
+				'#FF0080',
+				'#F4800B',
+				'#FF00EA',
+				'#C3E619',
+				'#4DB3A2',
 			];
 			const collaboratorInfo = generateCollaboratorInfo(
 				user,
 				existingColors
 			);
 
-			// The only available color from the palette is #37C5F0 (cyan)
-			expect( collaboratorInfo.color ).toBe( '#37C5F0' );
+			// The only available color from the palette is #00D5FF (cyan)
+			expect( collaboratorInfo.color ).toBe( '#00D5FF' );
 		} );
 
 		test( 'should generate color variation when all palette colors are in use', () => {
 			const user = createMockUser();
 			const existingColors = [
 				'#3858E9',
-				'#B42AED',
-				'#E33184',
-				'#F3661D',
-				'#ECBD3A',
-				'#97FE17',
-				'#00FDD9',
-				'#37C5F0',
+				'#9500FF',
+				'#FF0080',
+				'#F4800B',
+				'#FF00EA',
+				'#C3E619',
+				'#4DB3A2',
+				'#00D5FF',
 			];
 			const collaboratorInfo = generateCollaboratorInfo(
 				user,
@@ -356,9 +398,9 @@ describe( 'Awareness Utils', () => {
 			);
 
 			// Should be a valid hex color
-			expect( collaboratorInfo.color ).toMatch( /^#[0-9A-F]{6}$/i );
+			expect( collaboratorInfo.color ).toMatch( /^#[0-9a-f]{6}$/i );
 			// And should not be one of the original colors
-			// (it's a variation so could be close but not exactly the same in most cases)
+			// (it's a hue-rotated variation)
 		} );
 
 		test( 'should include avatar_urls from user', () => {

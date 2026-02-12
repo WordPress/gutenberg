@@ -15,6 +15,8 @@ export type CollaboratorInfo = Pick<
 > & {
 	browserType: string;
 	color: string;
+	strokeColor: string;
+	backgroundColor: string;
 	enteredAt: number;
 };
 

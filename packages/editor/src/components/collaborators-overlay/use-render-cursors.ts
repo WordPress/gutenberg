@@ -66,7 +66,7 @@ export function useRenderCursors(
 				};
 				const userName = user.collaboratorInfo.name;
 				const clientId = user.clientId;
-				const color = user.collaboratorInfo.color;
+				const color = user.collaboratorInfo.backgroundColor;
 
 				let coords: {
 					x: number;

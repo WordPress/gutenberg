@@ -69,7 +69,7 @@ export function useBlockHighlighting(
 
 					return {
 						blockId: selection.blockId,
-						color: userState.collaboratorInfo.color,
+						color: userState.collaboratorInfo.strokeColor,
 					};
 				}
 

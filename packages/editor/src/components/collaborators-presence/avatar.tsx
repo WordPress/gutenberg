@@ -37,7 +37,7 @@ export function Avatar( {
 
 	const avatarStyles = {
 		'--avatar-url': `url(${ avatarUrl })`,
-		'--collaborator-color': collaboratorInfo.color,
+		'--collaborator-color': collaboratorInfo.strokeColor,
 	} as React.CSSProperties;
 
 	return (

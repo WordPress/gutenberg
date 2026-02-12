@@ -492,6 +492,8 @@ describe( 'PostEditorAwareness', () => {
 				avatar_urls: mockAvatarUrls,
 				browserType: 'Chrome',
 				color: '#3858E9',
+				strokeColor: '#3858e9',
+				backgroundColor: '#3858e9',
 				enteredAt: 1704067200000,
 			};
 
