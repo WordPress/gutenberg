@@ -48,11 +48,11 @@ function block_core_post_template_uses_featured_image( $inner_blocks ) {
  */
 function render_block_core_post_template( $attributes, $content, $block ) {
 	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$enhanced_pagination = $block->context['enhancedPagination'] ?? false;
+	$enhanced_pagination = (bool) ( $block->context['enhancedPagination'] ?? false );
 	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 
 	// Use global query if needed.
-	$use_global_query = $block->context['query']['inherit'] ?? false;
+	$use_global_query = (bool) ( $block->context['query']['inherit'] ?? false );
 	if ( $use_global_query ) {
 		global $wp_query;
 

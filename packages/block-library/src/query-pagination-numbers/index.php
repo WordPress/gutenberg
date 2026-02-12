@@ -20,7 +20,7 @@
  */
 function render_block_core_query_pagination_numbers( $attributes, $content, $block ) {
 	$page_key            = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
-	$enhanced_pagination = $block->context['enhancedPagination'] ?? false;
+	$enhanced_pagination = (bool) ( $block->context['enhancedPagination'] ?? false );
 	$page                = empty( $_GET[ $page_key ] ) ? 1 : (int) $_GET[ $page_key ];
 	$max_page            = (int) ( $block->context['query']['pages'] ?? 0 );
 
