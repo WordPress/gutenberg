@@ -111,7 +111,7 @@ Here's how to implement a link that navigates client-side. First, the HTML in yo
 ```
 
 > [!NOTE]
-> This element must be placed inside an element with the `data-wp-interactive="myPlugin"` directive (like the router region defined above), so the directive knows which store namespace to look up the action in. Alternatively, you can specify the namespace explicitly in the directive value itself: `data-wp-on--click="myPlugin::actions.navigateTo"`. For more details on how namespaces work, see the [Interactivity API Reference](/docs/reference-guides/interactivity-api/api-reference.md).
+> This element must be placed inside an element with the `data-wp-interactive="myPlugin"` directive (like the router region defined above), so the directive knows which store namespace to look up the action in. Alternatively, you can specify the namespace explicitly in the directive value itself: `data-wp-on--click="myPlugin::actions.navigateTo"`. For more details on how namespaces work, see the [Interactivity API Reference](/docs/reference-guides/interactivity-api/directives-and-store.md).
 
 Then, in your `view.js`, you define the `navigateTo` action. It prevents the browser's default full-page navigation and uses the router's `navigate()` function instead:
 
