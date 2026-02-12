@@ -432,7 +432,7 @@ const { state } = store( 'myPlugin', {
 } );
 ```
 
-For more details, see the [Understanding global state, local context, and derived state](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md#subscribing-to-server-state-and-context) guide.
+For more details, see the [Understanding global state, local context, and derived state](/docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-and-derived-state.md#subscribing-to-server-state-and-context) guide.
 
 ### Overriding cached pages
 
@@ -1042,7 +1042,7 @@ These functions are reactive. When used inside a callback or derived state gette
 
 This is different from the regular `state` and `getContext()`, which return the client-side state and context. As explained above, existing client-side values are not overwritten during navigation, so `state` and `getContext()` will keep reflecting whatever the client had before navigating. Use `getServerState()` and `getServerContext()` when you need to react to the values that the server sent for the new page.
 
-For more details, see the [Understanding global state, local context, and derived state](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md#subscribing-to-server-state-and-context) guide.
+For more details, see the [Understanding global state, local context, and derived state](/docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-and-derived-state.md#subscribing-to-server-state-and-context) guide.
 
 ### Putting it all together: the navigation flow
 
