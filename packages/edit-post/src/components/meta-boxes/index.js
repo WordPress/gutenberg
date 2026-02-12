@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Fragment } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -8,6 +9,7 @@ import { useSelect } from '@wordpress/data';
  */
 import MetaBoxesArea from './meta-boxes-area';
 import MetaBoxVisibility from './meta-box-visibility';
+import MetaBoxCollaborationWarning from './meta-box-collaboration-warning';
 import { store as editPostStore } from '../../store';
 
 export default function MetaBoxes( { location } ) {
@@ -19,7 +21,10 @@ export default function MetaBoxes( { location } ) {
 	return (
 		<>
 			{ ( metaBoxes ?? [] ).map( ( { id } ) => (
-				<MetaBoxVisibility key={ id } id={ id } />
+				<Fragment key={ id }>
+					<MetaBoxVisibility id={ id } />
+					<MetaBoxCollaborationWarning id={ id } />
+				</Fragment>
 			) ) }
 			<MetaBoxesArea location={ location } />
 		</>
