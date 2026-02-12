@@ -204,18 +204,14 @@ export function applyPostChangesToCRDTDoc(
 					rawValue = '';
 				}
 
-				// Empty raw value is valid.
 				if (
 					currentValue instanceof Y.Text &&
 					rawValue !== undefined
 				) {
 					mergeRichTextUpdate( currentValue, rawValue );
-				} else if ( rawValue !== undefined ) {
-					// If the raw value is not undefined, create a new Y.Text and set it.
-					const newYText = new Y.Text( rawValue );
-					ymap.set( key, newYText );
 				} else {
-					ymap.delete( key );
+					const newYText = new Y.Text( rawValue ?? '' );
+					ymap.set( key, newYText );
 				}
 
 				break;
