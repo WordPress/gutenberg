@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -83,6 +83,15 @@ function DimensionsTool( {
 	// previous value.
 	const [ lastScale, setLastScale ] = useState( scale );
 	const [ lastAspectRatio, setLastAspectRatio ] = useState( aspectRatio );
+
+	// Sync internal state with external prop changes
+	useEffect( () => {
+		setLastScale( scale );
+	}, [ scale ] );
+
+	useEffect( () => {
+		setLastAspectRatio( aspectRatio );
+	}, [ aspectRatio ] );
 
 	// 'custom' is not a valid value for CSS aspect-ratio, but it is used in the
 	// dropdown to indicate that setting both the width and height is the same
