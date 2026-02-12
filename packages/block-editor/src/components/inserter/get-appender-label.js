@@ -11,6 +11,8 @@
  * @param {Object} defaultBlockType The block type object containing __experimentalLabel.
  * @return {string|null}            The full appender label, or null if not available.
  */
+const MAX_APPENDER_LABEL_LENGTH = 50;
+
 export function getAppenderLabel( defaultBlock, defaultBlockType ) {
 	if (
 		! defaultBlock ||
@@ -28,7 +30,7 @@ export function getAppenderLabel( defaultBlock, defaultBlockType ) {
 	// Only use if it's a string and not too long (safety check)
 	if (
 		typeof result === 'string' &&
-		result.length < 50 &&
+		result.length < MAX_APPENDER_LABEL_LENGTH &&
 		result.length > 0
 	) {
 		return result;
