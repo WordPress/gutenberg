@@ -4457,7 +4457,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		describe( 'unsynced patterns with contentOnlyPatternSections disabled', () => {
+		describe( 'unsynced patterns with disableContentOnlySections enabled', () => {
 			let initialState;
 			beforeAll( () => {
 				initialState = dispatchActions(
@@ -4465,7 +4465,7 @@ describe( 'state', () => {
 						{
 							type: 'UPDATE_SETTINGS',
 							settings: {
-								contentOnlyPatternSections: false,
+								disableContentOnlySections: true,
 							},
 						},
 						{
@@ -4508,7 +4508,7 @@ describe( 'state', () => {
 				);
 			} );
 
-			it( 'returns no derived editing modes for unsynced patterns when contentOnlyPatternSections is false', () => {
+			it( 'returns no derived editing modes for unsynced patterns when disableContentOnlySections is true', () => {
 				expect( initialState.derivedBlockEditingModes ).toEqual(
 					new Map()
 				);
@@ -4520,7 +4520,7 @@ describe( 'state', () => {
 						{
 							type: 'UPDATE_SETTINGS',
 							settings: {
-								contentOnlyPatternSections: false,
+								disableContentOnlySections: true,
 							},
 						},
 						{

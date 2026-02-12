@@ -2398,13 +2398,13 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	// don't apply contentOnly mode to nested unsynced patterns or template parts.
 	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
 
-	const contentOnlyPatternSections =
-		state.settings?.contentOnlyPatternSections !== false;
+	const disableContentOnlySections =
+		state.settings?.disableContentOnlySections;
 
 	// Use array.from for better back compat. Older versions of the iterator returned
 	// from `keys()` didn't have the `filter` method.
 	const unsyncedPatternClientIds =
-		isIsolatedEditor || ! contentOnlyPatternSections
+		isIsolatedEditor || disableContentOnlySections
 			? []
 			: Array.from( state.blocks.attributes.keys() ).filter(
 					( clientId ) =>
@@ -2706,10 +2706,10 @@ export function withDerivedBlockEditingModes( reducer ) {
 				// Handle unsynced patterns which indicate their contentOnly-ness via
 				// the `attributes.metadata.patternName` property.
 				// Check when this is added or removed and update blockEditingModes.
-				const contentOnlyPatternSections =
-					nextState.settings?.contentOnlyPatternSections !== false;
+				const disableContentOnlySections =
+					nextState.settings?.disableContentOnlySections;
 
-				if ( ! contentOnlyPatternSections ) {
+				if ( disableContentOnlySections ) {
 					break;
 				}
 
@@ -2926,12 +2926,12 @@ export function withDerivedBlockEditingModes( reducer ) {
 			}
 			case 'UPDATE_SETTINGS': {
 				// Recompute the entire tree if the section root or
-				// contentOnlyPatternSections setting changes.
+				// disableContentOnlySections setting changes.
 				if (
 					state?.settings?.[ sectionRootClientIdKey ] !==
 						nextState?.settings?.[ sectionRootClientIdKey ] ||
-					state?.settings?.contentOnlyPatternSections !==
-						nextState?.settings?.contentOnlyPatternSections
+					state?.settings?.disableContentOnlySections !==
+						nextState?.settings?.disableContentOnlySections
 				) {
 					return {
 						...nextState,

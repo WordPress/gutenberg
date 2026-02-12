@@ -1345,7 +1345,7 @@ describe( 'private selectors', () => {
 		const createState = ( {
 			blockName = 'core/group',
 			patternName,
-			contentOnlyPatternSections,
+			disableContentOnlySections,
 			templateLock,
 			rootTemplateLock,
 		} = {} ) => {
@@ -1368,8 +1368,8 @@ describe( 'private selectors', () => {
 						: {},
 				},
 				settings:
-					contentOnlyPatternSections !== undefined
-						? { contentOnlyPatternSections }
+					disableContentOnlySections !== undefined
+						? { disableContentOnlySections }
 						: {},
 				editedContentOnlySection: undefined,
 			};
@@ -1382,34 +1382,34 @@ describe( 'private selectors', () => {
 			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should return false for blocks with patternName when contentOnlyPatternSections is false', () => {
+		it( 'should return false for blocks with patternName when disableContentOnlySections is true', () => {
 			const state = createState( {
 				patternName: 'my-pattern',
-				contentOnlyPatternSections: false,
+				disableContentOnlySections: true,
 			} );
 			expect( isSectionBlock( state, 'block-1' ) ).toBe( false );
 		} );
 
-		it( 'should still return true for template parts when contentOnlyPatternSections is false', () => {
+		it( 'should still return true for template parts when disableContentOnlySections is true', () => {
 			const state = createState( {
 				blockName: 'core/template-part',
-				contentOnlyPatternSections: false,
+				disableContentOnlySections: true,
 			} );
 			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should still return true for synced patterns (core/block) when contentOnlyPatternSections is false', () => {
+		it( 'should still return true for synced patterns (core/block) when disableContentOnlySections is true', () => {
 			const state = createState( {
 				blockName: 'core/block',
-				contentOnlyPatternSections: false,
+				disableContentOnlySections: true,
 			} );
 			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
-		it( 'should return true for blocks with patternName when contentOnlyPatternSections is true', () => {
+		it( 'should return true for blocks with patternName when disableContentOnlySections is false', () => {
 			const state = createState( {
 				patternName: 'my-pattern',
-				contentOnlyPatternSections: true,
+				disableContentOnlySections: false,
 			} );
 			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
 		} );

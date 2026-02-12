@@ -521,11 +521,12 @@ export function isSectionBlock( state, clientId ) {
 	// don't treat nested unsynced patterns as section blocks.
 	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
 
-	const contentOnlyPatternSections =
-		state.settings?.contentOnlyPatternSections !== false;
+	const disableContentOnlySections =
+		state.settings?.disableContentOnlySections;
 
 	if (
-		( ( contentOnlyPatternSections && attributes?.metadata?.patternName ) ||
+		( ( ! disableContentOnlySections &&
+			attributes?.metadata?.patternName ) ||
 			isTemplatePart ) &&
 		! isIsolatedEditor
 	) {
