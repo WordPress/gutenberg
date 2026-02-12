@@ -37,6 +37,22 @@ export default function InspectorControlsTabs( {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
 	}, [] );
 
+	// Get the actual selected block name and clientId to detect when navigation block is selected via "Edit Navigation" button
+	const { selectedBlockName, selectedBlockClientId } = useSelect(
+		( select ) => {
+			const { getSelectedBlockClientId, getBlockName } =
+				select( blockEditorStore );
+			const selectedClientId = getSelectedBlockClientId();
+			return {
+				selectedBlockName: selectedClientId
+					? getBlockName( selectedClientId )
+					: null,
+				selectedBlockClientId: selectedClientId,
+			};
+		},
+		[]
+	);
+
 	const [ selectedTabId, setSelectedTabId ] = useState( tabs[ 0 ]?.name );
 	const hasUserSelectionRef = useRef( false );
 	const isProgrammaticSwitchRef = useRef( false );
@@ -69,7 +85,6 @@ export default function InspectorControlsTabs( {
 	] );
 
 	// Auto-select first available tab unless user has made a selection
-	// In contentOnly mode, prefer List View tab over Content tab
 	useEffect( () => {
 		if (
 			! tabs?.length ||
@@ -79,9 +94,10 @@ export default function InspectorControlsTabs( {
 			return;
 		}
 
-		// In contentOnly mode, prefer List View tab if it exists
+		// Open the list view tab for the nav block when it's being edited via "Edit Navigation" button
 		const isContentOnlyMode =
-			isSectionBlock || contentClientIds?.length > 0;
+			selectedBlockName === 'core/navigation' &&
+			contentClientIds?.length > 0;
 		const hasListViewTab = tabs.some(
 			( tab ) => tab.name === TAB_LIST_VIEW.name
 		);
@@ -89,12 +105,26 @@ export default function InspectorControlsTabs( {
 		let defaultTabName = tabs[ 0 ]?.name;
 		if ( isContentOnlyMode && hasListViewTab ) {
 			defaultTabName = TAB_LIST_VIEW.name;
+			// Open the navigation block's accordion in List View
+			if ( selectedBlockClientId ) {
+				setOpenListViewPanel( selectedBlockClientId );
+				incrementListViewExpandRevision();
+				isProgrammaticSwitchRef.current = true;
+			}
 		}
 
 		if ( selectedTabId !== defaultTabName ) {
 			setSelectedTabId( defaultTabName );
 		}
-	}, [ tabs, selectedTabId, isSectionBlock, contentClientIds ] );
+	}, [
+		tabs,
+		selectedTabId,
+		selectedBlockName,
+		selectedBlockClientId,
+		contentClientIds,
+		setOpenListViewPanel,
+		incrementListViewExpandRevision,
+	] );
 
 	const handleTabSelect = ( tabId ) => {
 		setSelectedTabId( tabId );

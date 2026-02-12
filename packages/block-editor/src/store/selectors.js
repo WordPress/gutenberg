@@ -3286,3 +3286,55 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 	);
 	return getEditedContentOnlySection( state );
 }
+
+/**
+ * Returns whether a List View panel is opened.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether the panel is opened.
+ */
+export function __unstableIsListViewPanelOpened( state, clientId ) {
+	// If allOpen flag is set, all panels are open
+	if ( state.openedListViewPanels?.allOpen ) {
+		return true;
+	}
+	// Check if panel is explicitly set to open
+	if ( state.openedListViewPanels?.panels?.[ clientId ] === true ) {
+		return true;
+	}
+	// Default to open for navigation block when it's the selected block and has contentOnly children
+	// This handles the "Edit Navigation" button case without flash
+	const selectedClientId = getSelectedBlockClientId( state );
+	if ( selectedClientId === clientId ) {
+		const blockName = getBlockName( state, clientId );
+		if ( blockName === 'core/navigation' ) {
+			// Check if navigation block has contentOnly children (indicating Edit Navigation context)
+			const descendants = getClientIdsOfDescendants( state, clientId );
+			const hasContentOnlyChildren = descendants.some(
+				( descendantId ) => {
+					return (
+						getBlockEditingMode( state, descendantId ) ===
+						'contentOnly'
+					);
+				}
+			);
+			if ( hasContentOnlyChildren ) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
+/**
+ * Returns the List View expand revision number.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {number} The expand revision number.
+ */
+export function __unstableGetListViewExpandRevision( state ) {
+	return state.listViewExpandRevision || 0;
+}
