@@ -214,6 +214,8 @@ export function applyPostChangesToCRDTDoc(
 					// If the raw value is not undefined, create a new Y.Text and set it.
 					const newYText = new Y.Text( rawValue );
 					ymap.set( key, newYText );
+				} else {
+					ymap.delete( key );
 				}
 
 				break;
