@@ -6,39 +6,6 @@ The Interactivity API provides client-side navigation through the `@wordpress/in
 
 This is known as **region-based client-side navigation**, and it is the recommended approach for implementing client-side navigation in WordPress. There is also an experimental **full-page client-side navigation** mode, which treats the entire `<body>` element as a single region — effectively updating the whole page content without a traditional reload. Full-page navigation is covered at the end of this guide in [Full-page client-side navigation (experimental)](#full-page-client-side-navigation-experimental).
 
-## Table of contents
-
-- [How client-side navigation works](#how-client-side-navigation-works)
-- [Getting started with the Interactivity Router](#getting-started-with-the-interactivity-router)
-    - [Setting up router regions](#setting-up-router-regions)
-    - [Implementing navigation](#implementing-navigation)
-    - [Implementing prefetching](#implementing-prefetching)
-    - [Complete example: Pagination](#complete-example-pagination)
-- [Block compatibility](#block-compatibility)
-    - [The `supports.interactivity` field](#the-supportsinteractivity-field)
-    - [Non-interactive blocks](#non-interactive-blocks)
-    - [Interactive blocks using the Interactivity API](#interactive-blocks-using-the-interactivity-api)
-    - [Interactive blocks using other libraries](#interactive-blocks-using-other-libraries)
-- [More advanced use cases](#more-advanced-use-cases)
-    - [Adding new regions on navigation](#adding-new-regions-on-navigation)
-    - [Handling server state updates](#handling-server-state-updates)
-    - [Overriding cached pages](#overriding-cached-pages)
-    - [Using custom HTML](#using-custom-html)
-    - [Managing browser history](#managing-browser-history)
-    - [Changing the timeout](#changing-the-timeout)
-    - [Handling fetch errors](#handling-fetch-errors)
-    - [Disabling client-side navigation on certain pages](#disabling-client-side-navigation-on-certain-pages)
-    - [Disabling navigation feedback](#disabling-navigation-feedback)
-    - [Subscribing to page changes](#subscribing-to-page-changes)
-- [The Interactivity Router in depth](#the-interactivity-router-in-depth)
-    - [The page cache](#the-page-cache)
-    - [Router regions](#router-regions)
-    - [CSS handling](#css-handling)
-    - [Script module handling](#script-module-handling)
-    - [Server state and context](#server-state-and-context)
-    - [Putting it all together: the navigation flow](#putting-it-all-together-the-navigation-flow)
-- [Full-page client-side navigation (experimental)](#full-page-client-side-navigation-experimental)
-
 ## How client-side navigation works
 
 When a user triggers a navigation (for example, by clicking a link), the Interactivity Router:
