@@ -1503,6 +1503,25 @@ export function isSelectionEnabled( state = true, action ) {
 }
 
 /**
+ * Reducer returning the client IDs for the viewport modal,
+ * or null if the modal is not open.
+ *
+ * @param {string[]|null} state  Current state.
+ * @param {Object}        action Dispatched action.
+ *
+ * @return {string[]|null} Client IDs for the viewport modal.
+ */
+export function viewportModalClientIds( state = null, action ) {
+	switch ( action.type ) {
+		case 'SHOW_VIEWPORT_MODAL':
+			return action.clientIds;
+		case 'HIDE_VIEWPORT_MODAL':
+			return null;
+	}
+	return state;
+}
+
+/**
  * Reducer returning the data needed to display a prompt when certain blocks
  * are removed, or `false` if no such prompt is requested.
  *
@@ -2220,6 +2239,7 @@ const combinedReducers = combineReducers( {
 	lastBlockInserted,
 	editedContentOnlySection,
 	blockVisibility,
+	viewportModalClientIds,
 	blockEditingModes,
 	styleOverrides,
 	removalPromptData,

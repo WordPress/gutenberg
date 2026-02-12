@@ -785,6 +785,10 @@ return array(
 		'label'    => _x( 'Navigation', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/navigation.svg',
 	),
+	'navigation-overlay'             => array(
+		'label'    => _x( 'Navigation Overlay', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/navigation-overlay.svg',
+	),
 	'next'                           => array(
 		'label'    => _x( 'Next', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/next.svg',

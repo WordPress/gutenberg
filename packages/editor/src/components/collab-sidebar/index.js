@@ -117,13 +117,18 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const showFloatingSidebar = isLargeViewport;
 	const {
 		resultComments,
 		unresolvedSortedThreads,
 		reflowComments,
 		commentLastUpdated,
 	} = useBlockComments( postId );
+
+	// Only enable the floating sidebar for large viewports.
+	const showFloatingSidebar = isLargeViewport;
+	// Fallback to "All notes" sidebar on smaller viewports.
+	const showAllNotesSidebar =
+		resultComments.length > 0 || ! showFloatingSidebar;
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
 			( unresolvedSortedThreads.length > 0 || selectedNote !== undefined )
@@ -154,7 +159,6 @@ function NotesSidebar( { postId } ) {
 	const currentThread = blockCommentId
 		? resultComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
-	const showAllNotesSidebar = resultComments.length > 0;
 
 	async function openTheSidebar() {
 		const prevArea = await getActiveComplementaryArea( 'core' );

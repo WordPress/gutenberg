@@ -1,4 +1,4 @@
-# API Reference
+# Directives and Store
 
 <div class="callout callout-alert">
 Interactivity API is only available for WordPress 6.5 and above.
