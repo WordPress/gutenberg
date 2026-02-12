@@ -53,7 +53,7 @@
 
 	// Avatar styles
 	.editor-collaborators-presence__avatar {
-		margin-left: -16px;
+		margin-left: -$grid-unit-20;
 		flex-shrink: 0;
 
 		&:nth-child(1) {
