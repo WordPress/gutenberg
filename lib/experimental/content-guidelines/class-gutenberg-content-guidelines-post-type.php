@@ -83,31 +83,66 @@ class Gutenberg_Content_Guidelines_Post_Type {
 
 	/**
 	 * Register post meta fields with revision support.
-	 *
-	 * Standard categories are registered here. Block-specific meta keys
-	 * are not registered individually - they're handled dynamically via
-	 * the wp_post_revision_meta_keys filter.
 	 */
 	public static function register_post_meta() {
+		$meta_args = array(
+			'show_in_rest'      => true,
+			'single'            => true,
+			'type'              => 'string',
+			'revisions_enabled' => true,
+			'auth_callback'     => function () {
+				return current_user_can( 'manage_options' );
+			},
+			'sanitize_callback' => 'sanitize_textarea_field',
+		);
+
 		// Register standard category meta.
 		foreach ( self::CATEGORY_META_KEYS as $category ) {
-			$meta_key = '_content_guideline_' . $category;
-
-			register_post_meta(
-				self::POST_TYPE,
-				$meta_key,
-				array(
-					'show_in_rest'      => true,
-					'single'            => true,
-					'type'              => 'string',
-					'revisions_enabled' => true,
-					'auth_callback'     => function () {
-						return current_user_can( 'manage_options' );
-					},
-					'sanitize_callback' => 'sanitize_textarea_field',
-				)
-			);
+			register_post_meta( self::POST_TYPE, '_content_guideline_' . $category, $meta_args );
 		}
+
+		// Register meta for content blocks.
+		foreach ( self::get_content_blocks() as $block_name ) {
+			register_post_meta( self::POST_TYPE, self::block_name_to_meta_key( $block_name ), $meta_args );
+		}
+	}
+
+	/**
+	 * Get block names that have content role attributes.
+	 *
+	 * @return array Block names with content role.
+	 */
+	public static function get_content_blocks() {
+		$content_blocks = array();
+		$registry       = WP_Block_Type_Registry::get_instance();
+
+		foreach ( $registry->get_all_registered() as $block_type ) {
+			if ( self::block_has_content_role( $block_type ) ) {
+				$content_blocks[] = $block_type->name;
+			}
+		}
+
+		return $content_blocks;
+	}
+
+	/**
+	 * Check if a block type has any attribute with content role.
+	 *
+	 * @param WP_Block_Type $block_type The block type to check.
+	 * @return bool True if block has content role attribute.
+	 */
+	private static function block_has_content_role( $block_type ) {
+		if ( empty( $block_type->attributes ) ) {
+			return false;
+		}
+
+		foreach ( $block_type->attributes as $attribute ) {
+			if ( isset( $attribute['role'] ) && 'content' === $attribute['role'] ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
