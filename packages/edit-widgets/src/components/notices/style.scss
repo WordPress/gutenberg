@@ -8,6 +8,7 @@
 	right: auto;
 	transform: translateX(-50%);
 	width: max-content;
+	max-width: calc(100vw - 32px);
 	box-sizing: border-box;
 }
 
