@@ -104,9 +104,16 @@ const { actions: privateActions, state: privateState } = store(
 			 * @type {number}
 			 */
 			get tabPanelTabIndexAttribute() {
-				const { ref } = getElement();
+				const { attributes } = getElement();
+				const panelId = attributes?.id;
 
-				if ( ! ref ) {
+				if ( ! panelId ) {
+					return -1;
+				}
+
+				// Get the DOM element
+				const panelElement = document.getElementById( panelId );
+				if ( ! panelElement ) {
 					return -1;
 				}
 
@@ -117,16 +124,16 @@ const { actions: privateActions, state: privateState } = store(
 					'input:not([disabled])',
 					'select:not([disabled])',
 					'textarea:not([disabled])',
-					'[tabindex]:not([tabindex="-1"])',
 					'audio[controls]',
 					'video[controls]',
 					'[contenteditable]:not([contenteditable="false"])',
 					'details > summary:first-of-type',
 					'details',
+					'iframe',
 				].join( ', ' );
 
 				const hasFocusableContent =
-					ref.querySelector( focusableSelector ) !== null;
+					panelElement.querySelector( focusableSelector ) !== null;
 
 				// If panel has focusable content, use -1
 				// If panel has no focusable content, use 0
