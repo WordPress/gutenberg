@@ -25,7 +25,6 @@ import { initWaveformPlayer } from './waveform-utils';
  * @param {string}   props.title     - The track title.
  * @param {string}   props.artist    - The artist name.
  * @param {string}   props.image     - The artwork image URL.
- * @param {string}   props.ariaLabel - Accessible label for the player.
  * @param {Function} props.onEnded   - Callback when the track finishes playing.
  * @param {string}   props.className - Additional CSS class names.
  * @return {Element} The WaveformPlayer element.
@@ -35,7 +34,6 @@ export function WaveformPlayer( {
 	title,
 	artist,
 	image,
-	ariaLabel,
 	onEnded,
 	className,
 } ) {
@@ -65,7 +63,6 @@ export function WaveformPlayer( {
 				'wp-block-playlist__waveform-player',
 				className
 			) }
-			aria-label={ ariaLabel }
 		/>
 	);
 }

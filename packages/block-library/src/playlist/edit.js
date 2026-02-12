@@ -224,7 +224,6 @@ const PlaylistEdit = ( {
 
 	// Get current track data.
 	const currentTrackData = tracks[ trackListIndex ];
-	const waveformAriaLabel = getTrackAriaLabel( currentTrackData );
 
 	// Handle track end - advance to next track.
 	const onTrackEnded = useCallback( () => {
@@ -451,7 +450,6 @@ const PlaylistEdit = ( {
 						title={ currentTrackData?.title }
 						artist={ currentTrackData?.artist }
 						image={ currentTrackData?.image }
-						ariaLabel={ waveformAriaLabel }
 						onEnded={ onTrackEnded }
 					/>
 				</Disabled>
