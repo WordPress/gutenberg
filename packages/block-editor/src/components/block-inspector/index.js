@@ -357,6 +357,7 @@ const BlockInspectorSingleBlock = ( {
 						tabs={ availableTabs }
 						isSectionBlock={ isSectionBlock }
 						contentClientIds={ contentClientIds }
+						editedContentOnlySection={ editedContentOnlySection }
 					/>
 				</>
 			) }

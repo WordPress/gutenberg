@@ -6,7 +6,13 @@ import {
 	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import {
+	useEffect,
+	useLayoutEffect,
+	useMemo,
+	useState,
+	useRef,
+} from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -63,10 +69,51 @@ export default function InspectorControlsTabs( {
 		__unstableSetAllListViewPanelsOpen: setAllListViewPanelsOpen,
 	} = useDispatch( blockEditorStore );
 
+	const hasListViewTab = tabs.some(
+		( tab ) => tab.name === TAB_LIST_VIEW.name
+	);
+
+	// Check if we should show List View tab for navigation block (Edit Navigation context)
+	const shouldShowListViewForNavigation = useMemo( () => {
+		return (
+			selectedBlockName === 'core/navigation' &&
+			contentClientIds?.length > 0 &&
+			hasListViewTab
+		);
+	}, [ selectedBlockName, contentClientIds, hasListViewTab ] );
+
 	// Reset when switching blocks
 	useEffect( () => {
 		hasUserSelectionRef.current = false;
 	}, [ clientId ] );
+
+	// Switch to List View tab synchronously before paint when navigation block is selected
+	// This prevents the flash of Content tab showing the navigation block
+	useLayoutEffect( () => {
+		if ( ! tabs?.length ) {
+			return;
+		}
+
+		if (
+			shouldShowListViewForNavigation &&
+			selectedTabId !== TAB_LIST_VIEW.name
+		) {
+			setSelectedTabId( TAB_LIST_VIEW.name );
+			// Open the navigation block's accordion in List View
+			if ( selectedBlockClientId ) {
+				setOpenListViewPanel( selectedBlockClientId );
+				incrementListViewExpandRevision();
+				isProgrammaticSwitchRef.current = true;
+			}
+		}
+	}, [
+		tabs,
+		selectedTabId,
+		shouldShowListViewForNavigation,
+		selectedBlockClientId,
+		setOpenListViewPanel,
+		incrementListViewExpandRevision,
+	] );
 
 	// Initialize List View panels when the tab is selected and clientId changes
 	useEffect( () => {
@@ -94,37 +141,16 @@ export default function InspectorControlsTabs( {
 			return;
 		}
 
-		// Open the list view tab for the nav block when it's being edited via "Edit Navigation" button
-		const isContentOnlyMode =
-			selectedBlockName === 'core/navigation' &&
-			contentClientIds?.length > 0;
-		const hasListViewTab = tabs.some(
-			( tab ) => tab.name === TAB_LIST_VIEW.name
-		);
-
-		let defaultTabName = tabs[ 0 ]?.name;
-		if ( isContentOnlyMode && hasListViewTab ) {
-			defaultTabName = TAB_LIST_VIEW.name;
-			// Open the navigation block's accordion in List View
-			if ( selectedBlockClientId ) {
-				setOpenListViewPanel( selectedBlockClientId );
-				incrementListViewExpandRevision();
-				isProgrammaticSwitchRef.current = true;
-			}
+		// Skip if we already handled navigation block in useLayoutEffect
+		if ( shouldShowListViewForNavigation ) {
+			return;
 		}
 
+		const defaultTabName = tabs[ 0 ]?.name;
 		if ( selectedTabId !== defaultTabName ) {
 			setSelectedTabId( defaultTabName );
 		}
-	}, [
-		tabs,
-		selectedTabId,
-		selectedBlockName,
-		selectedBlockClientId,
-		contentClientIds,
-		setOpenListViewPanel,
-		incrementListViewExpandRevision,
-	] );
+	}, [ tabs, selectedTabId, shouldShowListViewForNavigation ] );
 
 	const handleTabSelect = ( tabId ) => {
 		setSelectedTabId( tabId );
@@ -142,10 +168,6 @@ export default function InspectorControlsTabs( {
 		// Reset the flag
 		isProgrammaticSwitchRef.current = false;
 	};
-
-	const hasListViewTab = tabs.some(
-		( tab ) => tab.name === TAB_LIST_VIEW.name
-	);
 
 	const switchToListView = ( targetClientId ) => {
 		if ( hasListViewTab ) {

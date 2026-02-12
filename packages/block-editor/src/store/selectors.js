@@ -3307,22 +3307,18 @@ export function __unstableIsListViewPanelOpened( state, clientId ) {
 	// Default to open for navigation block when it's the selected block and has contentOnly children
 	// This handles the "Edit Navigation" button case without flash
 	const selectedClientId = getSelectedBlockClientId( state );
-	if ( selectedClientId === clientId ) {
-		const blockName = getBlockName( state, clientId );
-		if ( blockName === 'core/navigation' ) {
-			// Check if navigation block has contentOnly children (indicating Edit Navigation context)
-			const descendants = getClientIdsOfDescendants( state, clientId );
-			const hasContentOnlyChildren = descendants.some(
-				( descendantId ) => {
-					return (
-						getBlockEditingMode( state, descendantId ) ===
-						'contentOnly'
-					);
-				}
-			);
-			if ( hasContentOnlyChildren ) {
-				return true;
-			}
+	if (
+		selectedClientId === clientId &&
+		getBlockName( state, clientId ) === 'core/navigation'
+	) {
+		// Check if navigation block has contentOnly children (indicating Edit Navigation context)
+		const descendants = getClientIdsOfDescendants( state, clientId );
+		const hasContentOnlyChildren = descendants.some(
+			( descendantId ) =>
+				getBlockEditingMode( state, descendantId ) === 'contentOnly'
+		);
+		if ( hasContentOnlyChildren ) {
+			return true;
 		}
 	}
 	return false;
