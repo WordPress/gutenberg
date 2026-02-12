@@ -11,12 +11,7 @@ import { store, getContext, getElement } from '@wordpress/interactivity';
 /**
  * Internal dependencies
  */
-import { initWaveformPlayer, logPlayError } from '../utils/waveform-utils';
-
-/**
- * Configuration constants.
- */
-const NEXT_TRACK_DELAY = 1000; // Delay in ms before auto-playing next track.
+import { initWaveformPlayer } from '../utils/waveform-utils';
 
 /**
  * Store player state for each element.
@@ -28,17 +23,6 @@ const { state } = store(
 	{
 		state: {
 			playlists: {},
-			get currentTrack() {
-				const { currentId, playlistId } = getContext();
-				if ( ! currentId || ! playlistId ) {
-					return {};
-				}
-				const playlist = state.playlists[ playlistId ];
-				if ( ! playlist ) {
-					return {};
-				}
-				return playlist.tracks[ currentId ] || {};
-			},
 			get isCurrentTrack() {
 				const { currentId, uniqueId } = getContext();
 				return currentId === uniqueId;
@@ -114,31 +98,13 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		ariaLabel: track.ariaLabel || track.title,
 		autoPlay: shouldAutoPlay,
 		onEnded: () => {
-			// Advance to next track.
+			// Advance to next track (autoPlay handles playback).
 			const currentIndex = context.tracks.findIndex(
 				( uniqueId ) => uniqueId === context.currentId
 			);
 			const nextTrack = context.tracks[ currentIndex + 1 ];
 			if ( nextTrack ) {
-				const expectedTrack = nextTrack;
 				context.currentId = nextTrack;
-				// Wait before playing next track to avoid jarring transition.
-				setTimeout( () => {
-					// Verify we're still on the expected track.
-					if ( context.currentId !== expectedTrack ) {
-						return;
-					}
-					const nextAudio = ref.querySelector( 'audio' );
-					if ( nextAudio ) {
-						const playPromise = nextAudio.play();
-						if (
-							playPromise &&
-							typeof playPromise.catch === 'function'
-						) {
-							playPromise.catch( logPlayError );
-						}
-					}
-				}, NEXT_TRACK_DELAY );
 			}
 		},
 	} );
