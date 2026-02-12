@@ -225,8 +225,7 @@ export function PrivateBlockToolbar( {
 										clientIds={ blockClientIds }
 									/>
 								) }
-							{ ! areSelectedBlocksHiddenOnViewport &&
-								! isMultiToolbar &&
+							{ ! isMultiToolbar &&
 								isDefaultEditingMode &&
 								showLockButtons && (
 									<BlockLockToolbar
@@ -280,9 +279,7 @@ export function PrivateBlockToolbar( {
 							<__unstableBlockToolbarLastItem.Slot />
 						</>
 					) }
-				{ ! areSelectedBlocksHiddenOnViewport && (
-					<BlockEditVisuallyButton clientIds={ blockClientIds } />
-				) }
+				<BlockEditVisuallyButton clientIds={ blockClientIds } />
 				<BlockSettingsMenu clientIds={ blockClientIds } />
 			</div>
 		</NavigableToolbar>
