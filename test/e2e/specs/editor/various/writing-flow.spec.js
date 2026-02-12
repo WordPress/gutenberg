@@ -1143,7 +1143,6 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 		await editor.canvas
 			.getByRole( 'document', { name: 'Empty block' } )
 			.fill( 'A partial selection' );
-		// Testing: Comment out this like for test to pass.
 		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
 
 		const spacer = editor.canvas.getByRole( 'document', {
