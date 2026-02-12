@@ -21,6 +21,7 @@ import {
 import { BaseAwareness } from '../awareness/base-awareness';
 import {
 	mergeCrdtBlocks,
+	mergeRichTextUpdate,
 	type Block,
 	type YBlock,
 	type YBlocks,
@@ -56,11 +57,11 @@ export interface YPostRecord extends YMapRecord {
 	author: number;
 	// Blocks are undefined when they need to be re-parsed from content.
 	blocks: YBlocks | undefined;
-	content: string;
+	content: Y.Text;
 	categories: number[];
 	comment_status: string;
 	date: string | null;
-	excerpt: string;
+	excerpt: Y.Text;
 	featured_media: number;
 	format: string;
 	meta: YMapWrap< YMapRecord >;
@@ -70,7 +71,7 @@ export interface YPostRecord extends YMapRecord {
 	sticky: boolean;
 	tags: number[];
 	template: string;
-	title: string;
+	title: Y.Text;
 }
 
 // Properties that are allowed to be synced for a post.
@@ -188,11 +189,33 @@ export function applyPostChangesToCRDTDoc(
 			}
 
 			case 'content':
-			case 'excerpt': {
+			case 'excerpt':
+			case 'title': {
 				const currentValue = ymap.get( key );
-				const rawNewValue = getRawValue( newValue );
+				let rawValue = getRawValue( newValue );
 
-				updateMapValue( ymap, key, currentValue, rawNewValue );
+				// Copy logic from prePersistPostType to ensure that the "Auto
+				// Draft" template title is not synced.
+				if (
+					key === 'title' &&
+					! currentValue &&
+					'Auto Draft' === rawValue
+				) {
+					rawValue = '';
+				}
+
+				// Empty raw value is valid.
+				if (
+					currentValue instanceof Y.Text &&
+					rawValue !== undefined
+				) {
+					mergeRichTextUpdate( currentValue, rawValue );
+				} else if ( rawValue !== undefined ) {
+					// If the raw value is not undefined, create a new Y.Text and set it.
+					const newYText = new Y.Text( rawValue );
+					ymap.set( key, newYText );
+				}
+
 				break;
 			}
 
@@ -234,20 +257,6 @@ export function applyPostChangesToCRDTDoc(
 
 				const currentValue = ymap.get( key );
 				updateMapValue( ymap, key, currentValue, newValue );
-				break;
-			}
-
-			case 'title': {
-				const currentValue = ymap.get( key );
-
-				// Copy logic from prePersistPostType to ensure that the "Auto
-				// Draft" template title is not synced.
-				let rawNewValue = getRawValue( newValue );
-				if ( ! currentValue && 'Auto Draft' === rawNewValue ) {
-					rawNewValue = '';
-				}
-
-				updateMapValue( ymap, key, currentValue, rawNewValue );
 				break;
 			}
 
