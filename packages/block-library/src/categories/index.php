@@ -10,6 +10,7 @@
  *
  * @since 5.0.0
  * @since 6.7.0 Enable client-side rendering if enhancedPagination context is true.
+ * @since 6.9.0 Added support for the `disableInlineScript` attribute.
  *
  * @param array    $attributes The block attributes.
  * @param string   $content    Block default content.
@@ -57,7 +58,7 @@ function render_block_core_categories( $attributes, $content, $block ) {
 		$items_markup   = wp_dropdown_categories( $args );
 		$type           = 'dropdown';
 
-		if ( ! is_admin() ) {
+		if ( ! is_admin() && empty( $attributes['disableInlineScript'] ) ) {
 			// Inject the dropdown script immediately after the select dropdown.
 			$items_markup = preg_replace(
 				'#(?<=</select>)#',

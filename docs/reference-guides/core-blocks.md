@@ -129,7 +129,7 @@ Display a list of all terms of a given taxonomy. ([Source](https://github.com/Wo
 -	**Name:** core/categories
 -	**Category:** widgets
 -	**Supports:** align, anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** displayAsDropdown, label, showEmpty, showHierarchy, showLabel, showOnlyTopLevel, showPostCounts, taxonomy
+-	**Attributes:** disableInlineScript, displayAsDropdown, label, showEmpty, showHierarchy, showLabel, showOnlyTopLevel, showPostCounts, taxonomy
 
 ## Code
 
