@@ -40,7 +40,6 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 		// Add IAPI directives
 		$tag_processor->set_attribute( 'data-wp-on--click', 'actions.handleTabClick' );
 		$tag_processor->set_attribute( 'data-wp-on--keydown', 'actions.handleTabKeyDown' );
-		$tag_processor->set_attribute( 'data-wp-on--keyup', 'actions.handleTabKeyUp' );
 		$tag_processor->set_attribute( 'data-wp-bind--aria-selected', 'state.isActiveTab' );
 		$tag_processor->set_attribute( 'data-wp-bind--tabindex', 'state.tabIndexAttribute' );
 

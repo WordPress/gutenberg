@@ -110,12 +110,7 @@ const { actions: privateActions, state: privateState } = store(
 					return;
 				}
 
-				if ( event.key === 'Enter' ) {
-					event.preventDefault();
-					privateActions.setActiveTab( tabIndex );
-				} else if ( event.key === ' ' ) {
-					event.preventDefault();
-				} else if ( event.key === 'ArrowRight' && ! isVertical ) {
+				if ( event.key === 'ArrowRight' && ! isVertical ) {
 					event.preventDefault();
 					privateActions.moveFocus( tabIndex + 1 );
 				} else if ( event.key === 'ArrowLeft' && ! isVertical ) {
@@ -127,23 +122,6 @@ const { actions: privateActions, state: privateState } = store(
 				} else if ( event.key === 'ArrowUp' && isVertical ) {
 					event.preventDefault();
 					privateActions.moveFocus( tabIndex - 1 );
-				}
-			} ),
-			/**
-			 * Handles the keyup event for the tab label.
-			 *
-			 * @param {KeyboardEvent} event The keyup event.
-			 */
-			handleTabKeyUp: withSyncEvent( ( event ) => {
-				const { tabIndex } = privateState;
-
-				if ( tabIndex === null ) {
-					return;
-				}
-
-				if ( event.key === ' ' ) {
-					event.preventDefault();
-					privateActions.setActiveTab( tabIndex );
 				}
 			} ),
 			/**
