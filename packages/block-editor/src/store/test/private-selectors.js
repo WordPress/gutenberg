@@ -22,6 +22,7 @@ import {
 	isBlockHiddenAnywhere,
 	isBlockHiddenAtViewport,
 	getViewportModalClientIds,
+	isSectionBlock,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -1337,6 +1338,80 @@ describe( 'private selectors', () => {
 				viewportModalClientIds: clientIds,
 			};
 			expect( getViewportModalClientIds( state ) ).toEqual( clientIds );
+		} );
+	} );
+
+	describe( 'isSectionBlock', () => {
+		const createState = ( {
+			blockName = 'core/group',
+			patternName,
+			contentOnlyPatternSections,
+			templateLock,
+			rootTemplateLock,
+		} = {} ) => {
+			const clientId = 'block-1';
+			const rootClientId = '';
+			const attributes = patternName ? { metadata: { patternName } } : {};
+
+			return {
+				blocks: {
+					byClientId: new Map( [
+						[ clientId, { name: blockName } ],
+					] ),
+					attributes: new Map( [ [ clientId, attributes ] ] ),
+					parents: new Map( [ [ clientId, rootClientId ] ] ),
+				},
+				blockListSettings: {
+					[ clientId ]: templateLock ? { templateLock } : {},
+					'': rootTemplateLock
+						? { templateLock: rootTemplateLock }
+						: {},
+				},
+				settings:
+					contentOnlyPatternSections !== undefined
+						? { contentOnlyPatternSections }
+						: {},
+				editedContentOnlySection: undefined,
+			};
+		};
+
+		it( 'should return true for blocks with patternName by default', () => {
+			const state = createState( {
+				patternName: 'my-pattern',
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'should return false for blocks with patternName when contentOnlyPatternSections is false', () => {
+			const state = createState( {
+				patternName: 'my-pattern',
+				contentOnlyPatternSections: false,
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'should still return true for template parts when contentOnlyPatternSections is false', () => {
+			const state = createState( {
+				blockName: 'core/template-part',
+				contentOnlyPatternSections: false,
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'should still return true for synced patterns (core/block) when contentOnlyPatternSections is false', () => {
+			const state = createState( {
+				blockName: 'core/block',
+				contentOnlyPatternSections: false,
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'should return true for blocks with patternName when contentOnlyPatternSections is true', () => {
+			const state = createState( {
+				patternName: 'my-pattern',
+				contentOnlyPatternSections: true,
+			} );
+			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
 		} );
 	} );
 } );

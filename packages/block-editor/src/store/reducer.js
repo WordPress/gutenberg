@@ -2398,15 +2398,19 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	// don't apply contentOnly mode to nested unsynced patterns or template parts.
 	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
 
+	const contentOnlyPatternSections =
+		state.settings?.contentOnlyPatternSections !== false;
+
 	// Use array.from for better back compat. Older versions of the iterator returned
 	// from `keys()` didn't have the `filter` method.
-	const unsyncedPatternClientIds = isIsolatedEditor
-		? []
-		: Array.from( state.blocks.attributes.keys() ).filter(
-				( clientId ) =>
-					state.blocks.attributes.get( clientId )?.metadata
-						?.patternName
-		  );
+	const unsyncedPatternClientIds =
+		isIsolatedEditor || ! contentOnlyPatternSections
+			? []
+			: Array.from( state.blocks.attributes.keys() ).filter(
+					( clientId ) =>
+						state.blocks.attributes.get( clientId )?.metadata
+							?.patternName
+			  );
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
 		...unsyncedPatternClientIds,
@@ -2702,6 +2706,13 @@ export function withDerivedBlockEditingModes( reducer ) {
 				// Handle unsynced patterns which indicate their contentOnly-ness via
 				// the `attributes.metadata.patternName` property.
 				// Check when this is added or removed and update blockEditingModes.
+				const contentOnlyPatternSections =
+					nextState.settings?.contentOnlyPatternSections !== false;
+
+				if ( ! contentOnlyPatternSections ) {
+					break;
+				}
+
 				const addedBlocks = [];
 				const removedClientIds = [];
 
@@ -2914,10 +2925,13 @@ export function withDerivedBlockEditingModes( reducer ) {
 				break;
 			}
 			case 'UPDATE_SETTINGS': {
-				// Recompute the entire tree if the section root changes.
+				// Recompute the entire tree if the section root or
+				// contentOnlyPatternSections setting changes.
 				if (
 					state?.settings?.[ sectionRootClientIdKey ] !==
-					nextState?.settings?.[ sectionRootClientIdKey ]
+						nextState?.settings?.[ sectionRootClientIdKey ] ||
+					state?.settings?.contentOnlyPatternSections !==
+						nextState?.settings?.contentOnlyPatternSections
 				) {
 					return {
 						...nextState,

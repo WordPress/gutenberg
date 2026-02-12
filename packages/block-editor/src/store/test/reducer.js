@@ -4457,6 +4457,114 @@ describe( 'state', () => {
 			} );
 		} );
 
+		describe( 'unsynced patterns with contentOnlyPatternSections disabled', () => {
+			let initialState;
+			beforeAll( () => {
+				initialState = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								contentOnlyPatternSections: false,
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-1',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
+											name: 'core/group',
+											clientId: 'group-2',
+											attributes: {},
+											innerBlocks: [
+												{
+													name: 'core/paragraph',
+													clientId: 'paragraph-2',
+													attributes: {},
+													innerBlocks: [],
+												},
+											],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+			} );
+
+			it( 'returns no derived editing modes for unsynced patterns when contentOnlyPatternSections is false', () => {
+				expect( initialState.derivedBlockEditingModes ).toEqual(
+					new Map()
+				);
+			} );
+
+			it( 'does not add editing modes when a patternName attribute is set via UPDATE_BLOCK_ATTRIBUTES', () => {
+				const stateWithoutPatternName = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								contentOnlyPatternSections: false,
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-1',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'UPDATE_BLOCK_ATTRIBUTES',
+							clientIds: [ 'group-1' ],
+							attributes: {
+								metadata: {
+									patternName: 'test-pattern',
+								},
+							},
+						},
+					],
+					testReducer,
+					stateWithoutPatternName
+				);
+
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
+			} );
+		} );
+
 		describe( 'template parts', () => {
 			let initialState;
 			beforeAll( () => {
