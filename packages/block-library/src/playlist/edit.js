@@ -49,6 +49,30 @@ import {
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
+/**
+ * Compute an accessible aria label for a track.
+ *
+ * @param {Object} track - The track data object.
+ * @return {string} The aria label for the track.
+ */
+function getTrackAriaLabel( track ) {
+	if ( track?.title && track?.artist && track?.album ) {
+		return stripHTML(
+			sprintf(
+				/* translators: %1$s: track title, %2$s: artist name, %3$s: album name. */
+				__( '%1$s by %2$s from the album %3$s' ),
+				track.title,
+				track.artist,
+				track.album
+			)
+		);
+	}
+	if ( track?.title ) {
+		return stripHTML( track.title );
+	}
+	return __( 'Untitled' );
+}
+
 const PlaylistEdit = ( {
 	attributes,
 	setAttributes,
@@ -200,28 +224,7 @@ const PlaylistEdit = ( {
 
 	// Get current track data.
 	const currentTrackData = tracks[ trackListIndex ];
-
-	// Compute aria label for waveform player.
-	let waveformAriaLabel;
-	if (
-		currentTrackData?.title &&
-		currentTrackData?.artist &&
-		currentTrackData?.album
-	) {
-		waveformAriaLabel = stripHTML(
-			sprintf(
-				/* translators: %1$s: track title, %2$s: artist name, %3$s: album name. */
-				__( '%1$s by %2$s from the album %3$s' ),
-				currentTrackData?.title,
-				currentTrackData?.artist,
-				currentTrackData?.album
-			)
-		);
-	} else if ( currentTrackData?.title ) {
-		waveformAriaLabel = stripHTML( currentTrackData.title );
-	} else {
-		waveformAriaLabel = stripHTML( __( 'Untitled' ) );
-	}
+	const waveformAriaLabel = getTrackAriaLabel( currentTrackData );
 
 	// Initialize WaveformPlayer when the element mounts or track changes.
 	// useRefEffect ensures styles are applied before initialization (important for iframed editor).
