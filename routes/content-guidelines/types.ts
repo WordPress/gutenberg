@@ -3,18 +3,17 @@ export interface CategoryGuideline {
 	guidelines: string;
 }
 
-export interface BlockGuidelines {
-	[ blockName: string ]: {
-		guidelines: string;
-	};
+export interface BlockGuideline {
+	blockType: string;
+	guidelines: string;
 }
 
 export interface GuidelineCategories {
 	copy: CategoryGuideline;
 	images: CategoryGuideline;
 	site: CategoryGuideline;
-	blocks: BlockGuidelines;
-	other: CategoryGuideline;
+	blocks: BlockGuideline[];
+	additional: CategoryGuideline;
 }
 
 export interface Guidelines {
@@ -46,8 +45,8 @@ export const DEFAULT_CATEGORIES: GuidelineCategories = {
 		label: 'Site Context',
 		guidelines: '',
 	},
-	blocks: {},
-	other: {
+	blocks: [],
+	additional: {
 		label: 'Other Guidelines',
 		guidelines: '',
 	},

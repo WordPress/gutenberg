@@ -37,6 +37,9 @@ function ContentGuidelinesPage() {
 	const [ revisions, setRevisions ] = useState<
 		Array< Revision & { categories: GuidelineCategories } >
 	>( [] );
+	const [ currentRevisionId, setCurrentRevisionId ] = useState<
+		number | null
+	>( null );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const currentUser = useSelect(
 		( select ) => select( coreStore ).getCurrentUser(),
@@ -45,10 +48,12 @@ function ContentGuidelinesPage() {
 
 	const handleImport = useCallback(
 		( categories: GuidelineCategories ) => {
+			const id = Date.now();
 			setGuidelines( categories );
+			setCurrentRevisionId( id );
 			setRevisions( ( prev ) => [
 				{
-					id: Date.now(),
+					id,
 					date: new Date().toISOString(),
 					author_name: currentUser?.name || __( 'User' ),
 					categories,
@@ -64,8 +69,9 @@ function ContentGuidelinesPage() {
 	);
 
 	const handleRestore = useCallback(
-		( categories: GuidelineCategories ) => {
+		( revisionId: number, categories: GuidelineCategories ) => {
 			setGuidelines( categories );
+			setCurrentRevisionId( revisionId );
 			createSuccessNotice( __( 'Revision restored successfully.' ), {
 				type: 'snackbar',
 			} );
@@ -91,6 +97,7 @@ function ContentGuidelinesPage() {
 				<Navigator.Screen path="/revisions">
 					<RevisionHistoryScreen
 						revisions={ revisions }
+						currentRevisionId={ currentRevisionId }
 						onRestore={ handleRestore }
 					/>
 				</Navigator.Screen>

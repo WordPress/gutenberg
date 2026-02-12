@@ -1,11 +1,13 @@
 // Figma design tokens from Content guidelines
 $content-guidelines-gray-900: #1e1e1e;
+$content-guidelines-gray-800: #2f2f2f;
 $content-guidelines-gray-700: #757575;
 $content-guidelines-gray-200: #e0e0e0;
 $content-guidelines-white: #fff;
 $content-guidelines-radius-l: 8px;
 $content-guidelines-grid-20: 16px;
 $content-guidelines-grid-30: 24px;
+$content-guidelines-max-width: 660px;
 
 .content-guidelines__content {
 	margin-top: 0;
@@ -13,6 +15,26 @@ $content-guidelines-grid-30: 24px;
 	border-radius: $content-guidelines-radius-l;
 }
 
+.content-guidelines__actions {
+	max-width: $content-guidelines-max-width;
+}
+
 .content-guidelines__item-edit {
 	padding: $content-guidelines-grid-30;
+}
+
+.content-guidelines__item-edit-title {
+	font-size: 14px;
+	font-weight: normal;
+	color: $content-guidelines-gray-900;
+	margin: 0;
+}
+
+.content-guidelines__item-edit-description {
+	font-size: 13px;
+	font-weight: 400;
+	color: $content-guidelines-gray-800;
+	line-height: 1.4;
+	margin: 0;
+	max-width: $content-guidelines-max-width;
 }

@@ -21,12 +21,7 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import type { GuidelineCategories } from '../types';
-import {
-	validateImportJson,
-	mapImportToInternal,
-	mapInternalToExport,
-} from '../utils/import-export';
-import type { ExportSchema } from '../utils/import-export';
+import { validateGuidelinesJson } from '../utils/import-export';
 
 interface ActionsSectionProps {
 	guidelines: GuidelineCategories | null;
@@ -75,7 +70,7 @@ export default function ActionsSection( {
 						return;
 					}
 
-					const validation = validateImportJson( parsed );
+					const validation = validateGuidelinesJson( parsed );
 					if ( ! validation.valid ) {
 						createErrorNotice(
 							validation.error ?? __( 'Invalid import file.' ),
@@ -84,11 +79,7 @@ export default function ActionsSection( {
 						return;
 					}
 
-					const categories = mapImportToInternal(
-						parsed as ExportSchema
-					);
-
-					onImport( categories );
+					onImport( parsed as GuidelineCategories );
 				} catch {
 					createErrorNotice(
 						__( 'An error occurred while importing guidelines.' ),
@@ -113,8 +104,7 @@ export default function ActionsSection( {
 			return;
 		}
 
-		const exportData = mapInternalToExport( guidelines );
-		const json = JSON.stringify( exportData, null, 2 );
+		const json = JSON.stringify( guidelines, null, 2 );
 		const blob = new Blob( [ json ], { type: 'application/json' } );
 		const url = URL.createObjectURL( blob );
 
@@ -131,7 +121,7 @@ export default function ActionsSection( {
 	}, [ guidelines ] );
 
 	return (
-		<VStack spacing={ 4 }>
+		<VStack spacing={ 4 } className="content-guidelines__actions">
 			<Heading level={ 2 } size={ 13 }>
 				{ __( 'Actions' ) }
 			</Heading>
@@ -204,6 +194,8 @@ export default function ActionsSection( {
 						<FlexItem>
 							<Button
 								variant="secondary"
+								disabled={ ! guidelines }
+								accessibleWhenDisabled
 								onClick={ () => goTo( '/revisions' ) }
 								__next40pxDefaultSize
 							>

@@ -1,36 +1,10 @@
 /**
- * Internal dependencies
- */
-import type { GuidelineCategories, BlockGuidelines } from '../types';
-
-/**
- * Shape of a single block entry in the flat import/export format.
- */
-interface ExportBlock {
-	blockType: string;
-	guidelines: string;
-}
-
-/**
- * The flat JSON structure used for importing and exporting guidelines.
- */
-export interface ExportSchema {
-	version: string;
-	site: { guidelines: string };
-	copy: { guidelines: string };
-	images: { guidelines: string };
-	blocks: ExportBlock[];
-	additional: { guidelines: string };
-}
-
-/**
- * Validates that the provided data conforms to the expected import schema.
+ * Validates that the provided data conforms to the expected guidelines schema.
  *
  * @example
  * ```json
  * {
- *   "version": "1.0",
- *   "site": { "guidelines": "..." },
+ *   "site": { "label": "Site Context", "guidelines": "..." },
  *   "copy": { "guidelines": "..." },
  *   "images": { "guidelines": "..." },
  *   "blocks": [
@@ -46,7 +20,7 @@ export interface ExportSchema {
  * @param data Parsed JSON data to validate.
  * @return Object indicating validity and an optional error message.
  */
-export function validateImportJson( data: unknown ): {
+export function validateGuidelinesJson( data: unknown ): {
 	valid: boolean;
 	error?: string;
 } {
@@ -65,13 +39,21 @@ export function validateImportJson( data: unknown ): {
 				error: `Missing or invalid "${ key }" field.`,
 			};
 		}
-		if (
-			typeof ( value as Record< string, unknown > ).guidelines !==
-			'string'
-		) {
+
+		const category = value as Record< string, unknown >;
+		if ( typeof category.guidelines !== 'string' ) {
 			return {
 				valid: false,
 				error: `"${ key }.guidelines" must be a string.`,
+			};
+		}
+		if (
+			category.label !== undefined &&
+			typeof category.label !== 'string'
+		) {
+			return {
+				valid: false,
+				error: `"${ key }.label" must be a string.`,
 			};
 		}
 	}
@@ -106,57 +88,4 @@ export function validateImportJson( data: unknown ): {
 	}
 
 	return { valid: true };
-}
-
-/**
- * Maps the flat import JSON structure to the internal model.
- *
- * @param flatJson Validated import data.
- * @return Guideline categories in the internal format.
- */
-export function mapImportToInternal(
-	flatJson: ExportSchema
-): GuidelineCategories {
-	const blocks: BlockGuidelines = {};
-	if ( flatJson.blocks ) {
-		for ( const block of flatJson.blocks ) {
-			blocks[ block.blockType ] = {
-				guidelines: block.guidelines,
-			};
-		}
-	}
-
-	return {
-		site: { guidelines: flatJson.site.guidelines },
-		copy: { guidelines: flatJson.copy.guidelines },
-		images: { guidelines: flatJson.images.guidelines },
-		blocks,
-		other: { guidelines: flatJson.additional.guidelines },
-	};
-}
-
-/**
- * Maps the internal model to the flat export JSON structure.
- *
- * @param categories The guideline categories.
- * @return The flat export schema ready for serialisation.
- */
-export function mapInternalToExport(
-	categories: GuidelineCategories
-): ExportSchema {
-	const blocks: ExportBlock[] = Object.entries( categories.blocks ).map(
-		( [ blockType, value ] ) => ( {
-			blockType,
-			guidelines: value.guidelines,
-		} )
-	);
-
-	return {
-		version: '1.0',
-		site: { guidelines: categories.site.guidelines },
-		copy: { guidelines: categories.copy.guidelines },
-		images: { guidelines: categories.images.guidelines },
-		blocks,
-		additional: { guidelines: categories.other.guidelines },
-	};
 }

@@ -12,8 +12,8 @@ import {
 import { __ } from '@wordpress/i18n';
 import { dateI18n } from '@wordpress/date';
 import { chevronLeft } from '@wordpress/icons';
-import { DataViews } from '@wordpress/dataviews';
-import type { Action, View } from '@wordpress/dataviews';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
+import type { Action, Field, View } from '@wordpress/dataviews';
 
 /**
  * Internal dependencies
@@ -31,23 +31,32 @@ interface RevisionItem {
 
 interface RevisionHistoryScreenProps {
 	revisions: Array< Revision & { categories: GuidelineCategories } >;
-	onRestore: ( categories: GuidelineCategories ) => void;
+	currentRevisionId: number | null;
+	onRestore: ( revisionId: number, categories: GuidelineCategories ) => void;
 }
 
 export default function RevisionHistoryScreen( {
 	revisions,
+	currentRevisionId,
 	onRestore,
 }: RevisionHistoryScreenProps ) {
 	const items: RevisionItem[] = useMemo( () => {
-		return revisions.map( ( revision, index ) => ( {
+		return revisions.map( ( revision ) => ( {
 			id: String( revision.id ),
 			revisionId: revision.id,
 			date: revision.date,
 			authorName: revision.author_name || __( 'Unknown' ),
-			isCurrent: index === 0,
+			isCurrent: revision.id === currentRevisionId,
 			categories: revision.categories,
 		} ) );
-	}, [ revisions ] );
+	}, [ revisions, currentRevisionId ] );
+
+	const uniqueAuthors = useMemo( () => {
+		const names = [
+			...new Set( items.map( ( item ) => item.authorName ) ),
+		];
+		return names.map( ( name ) => ( { value: name, label: name } ) );
+	}, [ items ] );
 
 	const [ view, setView ] = useState< View >( {
 		type: 'table',
@@ -61,13 +70,13 @@ export default function RevisionHistoryScreen( {
 		setView( newView );
 	}, [] );
 
-	const fields = useMemo(
+	const fields: Field< RevisionItem >[] = useMemo(
 		() => [
 			{
 				id: 'date',
 				label: __( 'Date' ),
 				enableSorting: false,
-				render: ( { item }: { item: RevisionItem } ) => (
+				render: ( { item } ) => (
 					<span>
 						{ dateI18n( 'F j, Y \\a\\t g:i a', item.date ) }
 						{ item.isCurrent && <em> ({ __( 'current' ) })</em> }
@@ -78,10 +87,19 @@ export default function RevisionHistoryScreen( {
 				id: 'authorName',
 				label: __( 'User' ),
 				enableSorting: false,
+				enableGlobalSearch: true,
+				elements: uniqueAuthors,
+				filterBy: {
+					operators: [ 'is', 'isNot' ],
+				},
 			},
 		],
-		[]
+		[ uniqueAuthors ]
 	);
+
+	const { data, paginationInfo } = useMemo( () => {
+		return filterSortAndPaginate( items, view, fields );
+	}, [ items, view, fields ] );
 
 	const actions: Action< RevisionItem >[] = useMemo(
 		() => [
@@ -126,7 +144,10 @@ export default function RevisionHistoryScreen( {
 								<Button
 									variant="primary"
 									onClick={ () => {
-										onRestore( item.categories );
+										onRestore(
+											item.revisionId,
+											item.categories
+										);
 										closeModal?.();
 									} }
 									__next40pxDefaultSize
@@ -158,7 +179,10 @@ export default function RevisionHistoryScreen( {
 						{ __( 'Revision history' ) }
 					</h2>
 				</HStack>
-				<Text variant="muted">
+				<Text
+					variant="muted"
+					className="content-guidelines__item-edit-description"
+				>
 					{ __(
 						'Use a previous version of your content guidelines.'
 					) }
@@ -168,15 +192,12 @@ export default function RevisionHistoryScreen( {
 					<Text>{ __( 'No revisions yet.' ) }</Text>
 				) : (
 					<DataViews
-						data={ items }
+						data={ data }
 						fields={ fields }
 						view={ view }
 						onChangeView={ handleChangeView }
 						actions={ actions }
-						paginationInfo={ {
-							totalItems: items.length,
-							totalPages: 1,
-						} }
+						paginationInfo={ paginationInfo }
 						defaultLayouts={ {
 							table: {},
 						} }
