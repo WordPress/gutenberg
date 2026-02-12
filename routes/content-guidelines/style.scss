@@ -3,7 +3,9 @@ $content-guidelines-gray-900: #1e1e1e;
 $content-guidelines-gray-800: #2f2f2f;
 $content-guidelines-gray-700: #757575;
 $content-guidelines-gray-200: #e0e0e0;
+$content-guidelines-gray-100: #f0f0f0;
 $content-guidelines-white: #fff;
+$content-guidelines-blue: #3858e9;
 $content-guidelines-radius-l: 8px;
 $content-guidelines-grid-20: 16px;
 $content-guidelines-grid-30: 24px;
@@ -17,6 +19,32 @@ $content-guidelines-max-width: 660px;
 
 .content-guidelines__actions {
 	max-width: $content-guidelines-max-width;
+
+	.components-button.is-secondary {
+		min-width: 120px;
+		justify-content: center;
+
+		&:not(:disabled, [aria-disabled="true"]) {
+			border-color: $content-guidelines-blue;
+			color: $content-guidelines-blue;
+		}
+	}
+
+	.components-item {
+		padding: $content-guidelines-grid-30;
+	}
+}
+
+.content-guidelines__action-name {
+	font-size: 14px;
+	font-weight: 500;
+	color: $content-guidelines-gray-900;
+}
+
+.content-guidelines__action-description {
+	font-size: 13px;
+	font-weight: 400;
+	color: $content-guidelines-gray-700;
 }
 
 .content-guidelines__item-edit {

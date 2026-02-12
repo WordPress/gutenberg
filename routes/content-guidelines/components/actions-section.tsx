@@ -138,8 +138,13 @@ export default function ActionsSection( {
 				<Item>
 					<HStack justify="space-between">
 						<VStack spacing={ 1 }>
-							<span>{ __( 'Import' ) }</span>
-							<Text variant="muted">
+							<span className="content-guidelines__action-name">
+								{ __( 'Import' ) }
+							</span>
+							<Text
+								variant="muted"
+								className="content-guidelines__action-description"
+							>
 								{ __(
 									'Upload a JSON file to import your content guidelines'
 								) }
@@ -160,8 +165,13 @@ export default function ActionsSection( {
 				<Item>
 					<HStack justify="space-between">
 						<VStack spacing={ 1 }>
-							<span>{ __( 'Export' ) }</span>
-							<Text variant="muted">
+							<span className="content-guidelines__action-name">
+								{ __( 'Export' ) }
+							</span>
+							<Text
+								variant="muted"
+								className="content-guidelines__action-description"
+							>
 								{ __(
 									'Export your content guidelines to a JSON file.'
 								) }
@@ -184,8 +194,13 @@ export default function ActionsSection( {
 				<Item>
 					<HStack justify="space-between">
 						<VStack spacing={ 1 }>
-							<span>{ __( 'Revert' ) }</span>
-							<Text variant="muted">
+							<span className="content-guidelines__action-name">
+								{ __( 'Revert' ) }
+							</span>
+							<Text
+								variant="muted"
+								className="content-guidelines__action-description"
+							>
 								{ __(
 									'Use a previous version of your content guidelines'
 								) }
