@@ -3293,54 +3293,61 @@ describe( 'URL validation', () => {
 	it.each( [
 		{
 			description: 'valid URLs with protocol',
-			url: 'https://wordpress.org',
+			inputUrl: 'https://wordpress.org',
+			expectedUrl: 'https://wordpress.org',
 			searchPattern: /https:\/\/wordpress\.org/,
 		},
 		{
 			description: 'valid URLs without protocol (without http://)',
-			url: 'www.wordpress.org',
+			inputUrl: 'www.wordpress.org',
+			expectedUrl: 'https://www.wordpress.org',
 			searchPattern: /www\.wordpress\.org/,
 		},
 		{
 			description: 'hash links (internal anchor links)',
-			url: '#section',
+			inputUrl: '#section',
+			expectedUrl: '#section',
 			searchPattern: /#section/,
 		},
 		{
 			description: 'relative paths (URLs starting with /)',
-			url: '/handbook',
+			inputUrl: '/handbook',
+			expectedUrl: '/handbook',
 			searchPattern: /\/handbook/,
 		},
-	] )( 'should accept $description', async ( { url, searchPattern } ) => {
-		render(
-			<LinkControl
-				value={ { url: '' } }
-				forceIsEditingLink
-				onChange={ mockOnChange }
-			/>
-		);
+	] )(
+		'should accept $description',
+		async ( { inputUrl, expectedUrl, searchPattern } ) => {
+			render(
+				<LinkControl
+					value={ { url: '' } }
+					forceIsEditingLink
+					onChange={ mockOnChange }
+				/>
+			);
 
-		const searchInput = screen.getByRole( 'combobox' );
-		await user.type( searchInput, url );
+			const searchInput = screen.getByRole( 'combobox' );
+			await user.type( searchInput, inputUrl );
 
-		// Wait for suggestion to appear and become stable
-		await screen.findByRole( 'option', {
-			name: searchPattern,
-		} );
+			// Wait for suggestion to appear and become stable
+			await screen.findByRole( 'option', {
+				name: searchPattern,
+			} );
 
-		triggerEnter( searchInput );
+			triggerEnter( searchInput );
 
-		// No validation error - should succeed
-		await waitFor( () => {
-			expect( mockOnChange ).toHaveBeenCalled();
-		} );
+			// No validation error - should succeed
+			await waitFor( () => {
+				expect( mockOnChange ).toHaveBeenCalled();
+			} );
 
-		expect( mockOnChange ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				url,
-			} )
-		);
-	} );
+			expect( mockOnChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					url: expectedUrl,
+				} )
+			);
+		}
+	);
 
 	it( 'should skip validation for entity suggestions (posts, pages, categories)', async () => {
 		const entityLink = {
@@ -3480,9 +3487,10 @@ describe( 'URL validation', () => {
 		// a useful URL in practice. However, our validation philosophy is to
 		// trust the native URL constructor as the authoritative source - if the
 		// browser accepts it, we accept it.
+		// Note: The URL gets normalized with https:// prepended since it's a bare domain.
 		expect( mockOnChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
-				url: 'www.wordpress',
+				url: 'https://www.wordpress',
 			} )
 		);
 	} );

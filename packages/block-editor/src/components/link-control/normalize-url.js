@@ -23,27 +23,34 @@ import { TEL_TYPE, MAILTO_TYPE, INTERNAL_TYPE, URL_TYPE } from './constants';
  * @return {Object} An object containing the normalized URL and its type
  */
 export default function normalizeUrl( url ) {
-	if ( ! url ) {
-		return { url, type: URL_TYPE };
+	const trimmedUrl = url?.trim();
+
+	if ( ! trimmedUrl ) {
+		return { url: trimmedUrl, type: URL_TYPE };
 	}
 
 	let type = URL_TYPE;
-	const protocol = getProtocol( url ) || '';
+	const protocol = getProtocol( trimmedUrl ) || '';
 
 	// Determine the type based on the URL format
 	if ( protocol.includes( 'mailto' ) ) {
 		type = MAILTO_TYPE;
 	} else if ( protocol.includes( 'tel' ) ) {
 		type = TEL_TYPE;
-	} else if ( url?.startsWith( '#' ) ) {
+	} else if ( trimmedUrl?.startsWith( '#' ) ) {
 		type = INTERNAL_TYPE;
 	}
 
-	// Hash links, relative paths, and URLs with protocols should not be modified
-	if ( isHashLink( url ) || isRelativePath( url ) || protocol ) {
-		return { url, type };
+	// Hash links, relative paths, query parameters, and URLs with protocols should not be modified
+	if (
+		isHashLink( trimmedUrl ) ||
+		isRelativePath( trimmedUrl ) ||
+		trimmedUrl.startsWith( '?' ) ||
+		protocol
+	) {
+		return { url: trimmedUrl, type };
 	}
 
 	// Bare domains need https:// prepended
-	return { url: prependHTTPS( url ), type };
+	return { url: prependHTTPS( trimmedUrl ), type };
 }

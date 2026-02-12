@@ -24,7 +24,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { keyboardReturn, linkOff } from '@wordpress/icons';
 import deprecated from '@wordpress/deprecated';
-import { isURL, prependHTTPS } from '@wordpress/url';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -312,10 +312,8 @@ function LinkControl( {
 			type: 'valid',
 		};
 
-		const trimmedValue = urlToValidate?.trim();
-
 		// If empty or not URL-like, return invalid
-		if ( ! trimmedValue?.length || ! isURLLike( trimmedValue ) ) {
+		if ( ! urlToValidate?.length || ! isURLLike( urlToValidate ) ) {
 			return invalidResult;
 		}
 
@@ -323,14 +321,13 @@ function LinkControl( {
 		// valid href values but cannot be validated by the native URL constructor
 		// (which requires absolute URLs). These are already validated by isURLLike.
 		// Skip URL constructor validation for these cases.
-		if ( isHashLink( trimmedValue ) || isRelativePath( trimmedValue ) ) {
+		if ( isHashLink( urlToValidate ) || isRelativePath( urlToValidate ) ) {
 			return validResult;
 		}
 
 		// Perform URL validation using the native URL constructor as the authoritative source.
 		// The native URL constructor is the standard for URL validity - if it accepts a URL,
-		// we should allow it. For URLs without a protocol (e.g., "www.wordpress.org"),
-		// prepend "http://" before validating, as the URL constructor requires a protocol.
+		// we should allow it.
 		//
 		// Note: Protocol URLs (mailto:, tel:, etc.) are also validated by the native
 		// URL constructor, so we don't need special handling for them.
@@ -338,8 +335,7 @@ function LinkControl( {
 		// Note: We rely on the native URL constructor rather than implementing custom TLD
 		// validation to avoid blocking valid URLs. If a URL passes the native constructor,
 		// it's technically valid according to web standards.
-		const urlToCheck = prependHTTPS( trimmedValue );
-		return isURL( urlToCheck ) ? validResult : invalidResult;
+		return isURL( urlToValidate ) ? validResult : invalidResult;
 	};
 
 	const handleSelectSuggestion = ( updatedValue ) => {
@@ -405,8 +401,6 @@ function LinkControl( {
 			return false;
 		}
 
-		const trimmedValue = urlToValidate.trim();
-
 		// If the current value is an entity link (has id and type not in LINK_ENTRY_TYPES)
 		// and the URL hasn't changed from the original value, skip validation.
 		// This allows entity links with permalink formats like "?p=2" to work without
@@ -416,7 +410,7 @@ function LinkControl( {
 			internalControlValue.id &&
 			internalControlValue.type &&
 			! LINK_ENTRY_TYPES.includes( internalControlValue.type );
-		const urlUnchanged = value?.url === trimmedValue;
+		const urlUnchanged = value?.url === urlToValidate;
 
 		if ( isEntityLink && urlUnchanged ) {
 			// Entity link with unchanged URL - skip validation
@@ -454,10 +448,7 @@ function LinkControl( {
 
 	const handleSubmit = () => {
 		// Normalize the URL
-		const { url: normalizedUrl } = normalizeUrl(
-			currentUrlInputValue.trim()
-		);
-
+		const { url: normalizedUrl } = normalizeUrl( currentUrlInputValue );
 		// Validate the normalized URL
 		if ( ! validateAndSetValidity( normalizedUrl ) ) {
 			return;
@@ -469,7 +460,6 @@ function LinkControl( {
 
 	const handleSubmitWithEnter = ( event ) => {
 		const { keyCode } = event;
-
 		if (
 			keyCode === ENTER &&
 			! currentInputIsEmpty // Disallow submitting empty values.

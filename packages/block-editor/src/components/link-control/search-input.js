@@ -12,6 +12,7 @@ import { URLInput } from '../';
 import LinkControlSearchResults from './search-results';
 import { CREATE_TYPE } from './constants';
 import useSearchHandler from './use-search-handler';
+import normalizeUrl from './normalize-url';
 
 // Must be a function as otherwise URLInput will default
 // to the fetchLinkSuggestions passed in block editor settings
@@ -154,14 +155,17 @@ const LinkControlSearchInput = forwardRef(
 					required={ false }
 					onSubmit={ ( suggestion, event ) => {
 						const hasSuggestion = suggestion || focusedSuggestion;
+						const directEntryUrl = {
+							url: normalizeUrl( value ).url,
+						};
 
 						// If there is no suggestion and the value (ie: any manually entered URL) is empty
 						// then don't allow submission otherwise we get empty links.
-						if ( ! hasSuggestion && ! value?.trim()?.length ) {
+						if ( ! hasSuggestion && ! directEntryUrl.url ) {
 							event.preventDefault();
 						} else {
 							onSuggestionSelected(
-								hasSuggestion || { url: value }
+								hasSuggestion || directEntryUrl
 							);
 						}
 					} }
