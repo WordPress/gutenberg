@@ -1356,53 +1356,6 @@ test.describe( 'Navigation block', () => {
 				await expect( linkInput ).toHaveValue( '' );
 			} );
 
-			await test.step( 'Verify link field validates on submit in Link UI popover', async () => {
-				await page.keyboard.type( 'invalid url string' );
-
-				await page.keyboard.press( 'Tab' );
-
-				// Verify validation error is not shown on blur
-				await expect(
-					page.getByText( 'Please fill out this field' )
-				).toBeHidden();
-
-				// Go back to the link input and press enter to submit
-				await pageUtils.pressKeys( 'Shift+Tab' );
-				await expect( linkInput ).toBeFocused();
-				await page.keyboard.press( 'Enter' );
-
-				// Verify validation error is shown
-				await expect(
-					page.getByText( 'Please enter a valid URL.' )
-				).toBeVisible();
-			} );
-
-			await test.step( 'Verify focus remains on link input after validation error', async () => {
-				// Verify the input is focused and has the correct value
-				await expect( linkInput ).toBeFocused();
-				await expect( linkInput ).toHaveValue( 'invalid url string' );
-			} );
-
-			// If we type in the link input after a validation error, the validation error should be removed and the input should remain focused
-			// This checks to make sure the input switching from a base input to validated input does not cause focus loss
-			await test.step( 'Verify typing in link input after validation error works', async () => {
-				await page.keyboard.press( 'ArrowRight' );
-				await page.keyboard.type( ' after validation error' );
-
-				// Verify the input is still focused
-				await expect( linkInput ).toBeFocused();
-
-				// Verify validation error is gone now
-				await expect(
-					page.getByText( 'Please enter a valid URL.' )
-				).toBeHidden();
-
-				await expect( linkInput ).toHaveValue(
-					'invalid url string after validation error'
-				);
-				await expect( linkInput ).toBeFocused();
-			} );
-
 			// Cancel to preserve bound state for sidebar tests
 			await linkPopover.getByRole( 'button', { name: 'Cancel' } ).click();
 
@@ -1732,6 +1685,128 @@ test.describe( 'Navigation block', () => {
 				await expect( updatedLinkButton ).toContainText(
 					'example.com'
 				);
+			} );
+		} );
+	} );
+
+	test.describe( 'URL Validation', () => {
+		let testPage1;
+
+		test.beforeEach( async ( { admin, editor, requestUtils } ) => {
+			// Create test pages
+			testPage1 = await requestUtils.createPage( {
+				title: 'Test Page 1',
+				status: 'publish',
+			} );
+
+			// Create post and navigation block with pre-populated links
+			await admin.createNewPost();
+
+			const menu = await requestUtils.createNavigationMenu( {
+				title: 'Test Menu',
+				content:
+					`<!-- wp:navigation-link {"label":"Test Page 1","type":"page","id":${ testPage1.id },"url":"${ testPage1.link }","kind":"post-type"} /-->` +
+					'<!-- wp:navigation-link {"label":"wordpress.org","type":"custom","url":"https://wordpress.org","kind":"custom"} /-->' +
+					'<!-- wp:navigation-link {"label":"Empty Link"} /-->',
+			} );
+
+			await editor.insertBlock( {
+				name: 'core/navigation',
+				attributes: {
+					ref: menu.id,
+				},
+			} );
+		} );
+
+		test.afterEach( async ( { requestUtils } ) => {
+			await requestUtils.deleteAllPages();
+		} );
+
+		test( 'link field validates on submit in Link UI popover', async ( {
+			editor,
+			page,
+			admin,
+			navigation,
+			requestUtils,
+			pageUtils,
+		} ) => {
+			await test.step( 'Setup - Create menu and navigation block', async () => {
+				await admin.createNewPost();
+
+				// create an empty menu for use - avoids Page List block
+				const menu = await requestUtils.createNavigationMenu( {
+					title: 'Test Menu',
+					content: '',
+				} );
+
+				await editor.insertBlock( {
+					name: 'core/navigation',
+					attributes: {
+						ref: menu.id,
+					},
+				} );
+			} );
+
+			const linkPopover = navigation.getLinkPopover();
+			const linkInput = linkPopover.getByRole( 'combobox', {
+				name: 'Search or type URL',
+			} );
+
+			await test.step( 'Open Link inspector', async () => {
+				await expect( navigation.getNavBlockInserter() ).toBeVisible();
+				await pageUtils.pressKeys( 'ArrowDown' );
+				await navigation.useBlockInserter();
+
+				await expect( linkPopover ).toBeVisible();
+				await expect( linkInput ).toBeFocused();
+				await expect( linkInput ).toHaveValue( '' );
+			} );
+
+			await test.step( 'Verify link field validates on submit in Link UI popover', async () => {
+				await page.keyboard.type( 'invalid url string' );
+
+				await page.keyboard.press( 'Tab' );
+
+				// Verify validation error is not shown on blur
+				await expect(
+					page.getByText( 'Please fill out this field' )
+				).toBeHidden();
+
+				// Go back to the link input and press enter to submit
+				await pageUtils.pressKeys( 'Shift+Tab' );
+				await expect( linkInput ).toBeFocused();
+				await page.keyboard.press( 'Enter' );
+
+				// Verify validation error is shown
+				await expect(
+					page.getByText( 'Please enter a valid URL.' )
+				).toBeVisible();
+			} );
+
+			await test.step( 'Verify focus remains on link input after validation error', async () => {
+				// Verify the input is focused and has the correct value
+				await expect( linkInput ).toBeFocused();
+				await expect( linkInput ).toHaveValue( 'invalid url string' );
+			} );
+
+			// If we type in the link input after a validation error, the validation error should be removed and the input should remain focused
+			// This checks to make sure the input switching from a base input to validated input does not cause focus loss
+			await test.step( 'Verify typing in link input after validation error works', async () => {
+				await page.keyboard.press( 'ArrowRight' );
+				await page.keyboard.type( ' after validation error' );
+
+				// Verify the input is still focused
+				await expect( linkInput ).toBeFocused();
+
+				// Verify validation error is gone now
+				await expect(
+					page.getByText( 'Please enter a valid URL.' )
+				).toBeHidden();
+
+				await expect( linkInput ).toHaveValue(
+					'invalid url string after validation error'
+				);
+				await expect( linkInput ).toBeFocused();
 			} );
 		} );
 	} );
