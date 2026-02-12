@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+- DataViews: Improve styling for filters when long values are in use. [#75369](https://github.com/WordPress/gutenberg/pull/75369)
 - DataForm: Fix label case for regular layout. [#75292](https://github.com/WordPress/gutenberg/pull/75292)
 - DataViews: Add title attribute in grid item title field. [#75085](https://github.com/WordPress/gutenberg/pull/75085)
 - DataViews: Fix title truncation in list layout. [#75063](https://github.com/WordPress/gutenberg/pull/75063)
@@ -21,6 +22,10 @@
 - DataViews: Add details form layout validation. [#74996](https://github.com/WordPress/gutenberg/pull/74996)
 - Add new `adaptiveSelect` DataForm control. [#74937](https://github.com/WordPress/gutenberg/pull/74937)
 - DataViews: Consistent rendering of selection checkbox and actions in grid layout. [#75056](https://github.com/WordPress/gutenberg/pull/75056)
+
+### Internal
+
+- DataForm: Use public `ColorPicker` component instead of internal `Picker` in color control. [#75394](https://github.com/WordPress/gutenberg/pull/75394)
 
 ## 11.3.0 (2026-01-29)
 

@@ -21,6 +21,7 @@ import {
 	isLockedBlock,
 	isBlockHiddenAnywhere,
 	isBlockHiddenAtViewport,
+	getViewportModalClientIds,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -1319,6 +1320,23 @@ describe( 'private selectors', () => {
 			);
 			const result = isBlockHiddenAnywhere( state, 'test-block' );
 			expect( result ).toBe( false );
+		} );
+	} );
+
+	describe( 'getViewportModalClientIds', () => {
+		it( 'should return null when modal is not open', () => {
+			const state = {
+				viewportModalClientIds: null,
+			};
+			expect( getViewportModalClientIds( state ) ).toBeNull();
+		} );
+
+		it( 'should return client IDs when modal is open', () => {
+			const clientIds = [ 'client-1', 'client-2' ];
+			const state = {
+				viewportModalClientIds: clientIds,
+			};
+			expect( getViewportModalClientIds( state ) ).toEqual( clientIds );
 		} );
 	} );
 } );

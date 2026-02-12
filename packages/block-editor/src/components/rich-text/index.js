@@ -11,16 +11,14 @@ import {
 	useRef,
 	useState,
 	useCallback,
+	useMemo,
 	forwardRef,
 	createContext,
 	useContext,
 } from '@wordpress/element';
 import { useDispatch, useRegistry, useSelect } from '@wordpress/data';
 import { useMergeRefs, useInstanceId } from '@wordpress/compose';
-import {
-	__unstableUseRichText as useRichText,
-	removeFormat,
-} from '@wordpress/rich-text';
+import { privateApis as richTextPrivateApis } from '@wordpress/rich-text';
 import { Popover } from '@wordpress/components';
 import { getBlockBindingsSource } from '@wordpress/blocks';
 import deprecated from '@wordpress/deprecated';
@@ -35,13 +33,15 @@ import { blockBindingsKey, isPreviewModeKey } from '../block-edit/context';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useMarkPersistent } from './use-mark-persistent';
-import { useFormatTypes } from './use-format-types';
 import { useEventListeners } from './event-listeners';
 import FormatEdit from './format-edit';
 import { getAllowedFormats } from './utils';
 import { Content, valueToHTMLString } from './content';
 import { withDeprecations } from './with-deprecations';
 import BlockContext from '../block-context';
+import { unlock } from '../../lock-unlock';
+
+const { useRichText } = unlock( richTextPrivateApis );
 
 export const keyboardShortcutContext = createContext();
 keyboardShortcutContext.displayName = 'keyboardShortcutContext';
@@ -340,61 +340,14 @@ export function RichTextWrapper(
 	);
 
 	const {
-		formatTypes,
-		prepareHandlers,
-		valueHandlers,
-		changeHandlers,
-		dependencies,
-	} = useFormatTypes( {
-		clientId,
-		identifier,
-		withoutInteractiveFormatting,
-		allowedFormats: adjustedAllowedFormats,
-	} );
-
-	function addEditorOnlyFormats( value ) {
-		return valueHandlers.reduce(
-			( accumulator, fn ) => fn( accumulator, value.text ),
-			value.formats
-		);
-	}
-
-	function removeEditorOnlyFormats( value ) {
-		formatTypes.forEach( ( formatType ) => {
-			// Remove formats created by prepareEditableTree, because they are editor only.
-			if ( formatType.__experimentalCreatePrepareEditableTree ) {
-				value = removeFormat(
-					value,
-					formatType.name,
-					0,
-					value.text.length
-				);
-			}
-		} );
-
-		return value.formats;
-	}
-
-	function addInvisibleFormats( value ) {
-		return prepareHandlers.reduce(
-			( accumulator, fn ) => fn( accumulator, value.text ),
-			value.formats
-		);
-	}
-
-	const {
 		value,
 		getValue,
 		onChange,
 		ref: richTextRef,
+		formatTypes,
 	} = useRichText( {
 		value: adjustedValue,
-		onChange( html, { __unstableFormats, __unstableText } ) {
-			adjustedOnChange( html );
-			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
-				changeHandler( __unstableFormats, __unstableText );
-			} );
-		},
+		onChange: adjustedOnChange,
 		selectionStart,
 		selectionEnd,
 		onSelectionChange,
@@ -402,10 +355,16 @@ export function RichTextWrapper(
 		__unstableIsSelected: isSelected,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
-		__unstableDependencies: [ ...dependencies, tagName ],
-		__unstableAfterParse: addEditorOnlyFormats,
-		__unstableBeforeSerialize: removeEditorOnlyFormats,
-		__unstableAddInvisibleFormats: addInvisibleFormats,
+		__unstableDependencies: [ tagName ],
+		allowedFormats: adjustedAllowedFormats,
+		withoutInteractiveFormatting,
+		__unstableFormatTypeHandlerContext: useMemo(
+			() => ( {
+				richTextIdentifier: identifier,
+				blockClientId: clientId,
+			} ),
+			[ identifier, clientId ]
+		),
 	} );
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
 		onReplace,
@@ -490,7 +449,6 @@ export function RichTextWrapper(
 						pastePlainText,
 						onMerge,
 						onRemove,
-						removeEditorOnlyFormats,
 						disableLineBreaks,
 						onSplitAtEnd,
 						onSplitAtDoubleLineEnd,

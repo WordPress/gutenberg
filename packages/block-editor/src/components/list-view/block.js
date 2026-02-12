@@ -54,7 +54,7 @@ import { useBlockRename, BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
-import { useBlockVisibility, BlockVisibilityModal } from '../block-visibility';
+import { useBlockVisibility } from '../block-visibility';
 import { deviceTypeKey } from '../../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../block-visibility/constants';
 
@@ -83,8 +83,6 @@ function ListViewBlock( {
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
 	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
-	const [ visibilityModalClientIds, setVisibilityModalClientIds ] =
-		useState( null );
 	const { isLocked } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
@@ -101,6 +99,7 @@ function ListViewBlock( {
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
+		showViewportModal,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	const debouncedToggleBlockHighlight = useDebounce(
@@ -414,7 +413,7 @@ function ListViewBlock( {
 			}
 
 			// Open the visibility breakpoints modal.
-			setVisibilityModalClientIds( blocksToUpdate );
+			showViewportModal( blocksToUpdate );
 		} else if ( isMatch( 'core/block-editor/rename', event ) ) {
 			const { blocksToUpdate } = getBlocksToUpdate();
 			const isContentOnly =
@@ -720,12 +719,6 @@ function ListViewBlock( {
 						/>
 					) }
 				</TreeGridCell>
-			) }
-			{ visibilityModalClientIds && (
-				<BlockVisibilityModal
-					clientIds={ visibilityModalClientIds }
-					onClose={ () => setVisibilityModalClientIds( null ) }
-				/>
 			) }
 			{ isRenameModalOpen && (
 				<BlockRenameModal

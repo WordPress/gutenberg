@@ -3,7 +3,11 @@
  */
 import { useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as richTextStore } from '@wordpress/rich-text';
+
+/**
+ * Internal dependencies
+ */
+import { store as richTextStore } from '../store';
 
 function formatTypesSelector( select ) {
 	return select( richTextStore ).getFormatTypes();
@@ -56,17 +60,15 @@ function getPrefixedSelectKeys( selected, prefix ) {
  * This hook provides RichText with the `formatTypes` and its derived props from
  * experimental format type settings.
  *
- * @param {Object}  $0                              Options
- * @param {string}  $0.clientId                     Block client ID.
- * @param {string}  $0.identifier                   Block attribute.
- * @param {boolean} $0.withoutInteractiveFormatting Whether to clean the interactive formatting or not.
- * @param {Array}   $0.allowedFormats               Allowed formats
+ * @param {Object}  options                                    Options
+ * @param {Array}   options.allowedFormats                     Allowed formats
+ * @param {boolean} options.withoutInteractiveFormatting       Whether to clean the interactive formatting or not.
+ * @param {Object}  options.__unstableFormatTypeHandlerContext Context object passed to experimental format type methods.
  */
 export function useFormatTypes( {
-	clientId,
-	identifier,
-	withoutInteractiveFormatting,
 	allowedFormats,
+	withoutInteractiveFormatting,
+	__unstableFormatTypeHandlerContext,
 } ) {
 	const allFormatTypes = useSelect( formatTypesSelector, [] );
 	const formatTypes = useMemo( () => {
@@ -88,7 +90,10 @@ export function useFormatTypes( {
 	const keyedSelected = useSelect(
 		( select ) =>
 			formatTypes.reduce( ( accumulator, type ) => {
-				if ( ! type.__experimentalGetPropsForEditableTreePreparation ) {
+				if (
+					! type.__experimentalGetPropsForEditableTreePreparation ||
+					! __unstableFormatTypeHandlerContext
+				) {
 					return accumulator;
 				}
 
@@ -97,16 +102,13 @@ export function useFormatTypes( {
 					...prefixSelectKeys(
 						type.__experimentalGetPropsForEditableTreePreparation(
 							select,
-							{
-								richTextIdentifier: identifier,
-								blockClientId: clientId,
-							}
+							__unstableFormatTypeHandlerContext
 						),
 						type.name
 					),
 				};
 			}, {} ),
-		[ formatTypes, clientId, identifier ]
+		[ formatTypes, __unstableFormatTypeHandlerContext ]
 	);
 	const dispatch = useDispatch();
 	const prepareHandlers = [];
@@ -119,13 +121,13 @@ export function useFormatTypes( {
 	}
 
 	formatTypes.forEach( ( type ) => {
-		if ( type.__experimentalCreatePrepareEditableTree ) {
+		if (
+			type.__experimentalCreatePrepareEditableTree &&
+			__unstableFormatTypeHandlerContext
+		) {
 			const handler = type.__experimentalCreatePrepareEditableTree(
 				getPrefixedSelectKeys( keyedSelected, type.name ),
-				{
-					richTextIdentifier: identifier,
-					blockClientId: clientId,
-				}
+				__unstableFormatTypeHandlerContext
 			);
 
 			if ( type.__experimentalCreateOnChangeEditableValue ) {
@@ -135,17 +137,17 @@ export function useFormatTypes( {
 			}
 		}
 
-		if ( type.__experimentalCreateOnChangeEditableValue ) {
+		if (
+			type.__experimentalCreateOnChangeEditableValue &&
+			__unstableFormatTypeHandlerContext
+		) {
 			let dispatchers = {};
 
 			if ( type.__experimentalGetPropsForEditableTreeChangeHandler ) {
 				dispatchers =
 					type.__experimentalGetPropsForEditableTreeChangeHandler(
 						dispatch,
-						{
-							richTextIdentifier: identifier,
-							blockClientId: clientId,
-						}
+						__unstableFormatTypeHandlerContext
 					);
 			}
 
@@ -156,10 +158,7 @@ export function useFormatTypes( {
 						...( typeof selected === 'object' ? selected : {} ),
 						...dispatchers,
 					},
-					{
-						richTextIdentifier: identifier,
-						blockClientId: clientId,
-					}
+					__unstableFormatTypeHandlerContext
 				)
 			);
 		}

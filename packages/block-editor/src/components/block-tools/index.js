@@ -45,6 +45,7 @@ function selector( select ) {
 		isTyping,
 		isDragging,
 		isZoomOut,
+		getViewportModalClientIds,
 	} = unlock( select( blockEditorStore ) );
 
 	const clientId =
@@ -56,6 +57,7 @@ function selector( select ) {
 		isTyping: isTyping(),
 		isZoomOutMode: isZoomOut(),
 		isDragging: isDragging(),
+		viewportModalClientIds: getViewportModalClientIds(),
 	};
 }
 
@@ -73,10 +75,14 @@ export default function BlockTools( {
 	__unstableContentRef,
 	...props
 } ) {
-	const { clientId, hasFixedToolbar, isTyping, isZoomOutMode, isDragging } =
-		useSelect( selector, [] );
-	const [ visibilityModalClientIds, setVisibilityModalClientIds ] =
-		useState( null );
+	const {
+		clientId,
+		hasFixedToolbar,
+		isTyping,
+		isZoomOutMode,
+		isDragging,
+		viewportModalClientIds,
+	} = useSelect( selector, [] );
 	const isMatch = useShortcutEventMatch();
 	const {
 		getBlocksByClientId,
@@ -108,6 +114,8 @@ export default function BlockTools( {
 		moveBlocksDown,
 		expandBlock,
 		stopEditingContentOnlySection,
+		showViewportModal,
+		hideViewportModal,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	function onKeyDown( event ) {
@@ -248,7 +256,7 @@ export default function BlockTools( {
 				}
 
 				// Open the visibility breakpoints modal.
-				setVisibilityModalClientIds( clientIds );
+				showViewportModal( clientIds );
 			}
 		}
 
@@ -321,10 +329,10 @@ export default function BlockTools( {
 					onClose={ () => setRenamingBlockClientId( null ) }
 				/>
 			) }
-			{ visibilityModalClientIds && (
+			{ viewportModalClientIds && (
 				<BlockVisibilityModal
-					clientIds={ visibilityModalClientIds }
-					onClose={ () => setVisibilityModalClientIds( null ) }
+					clientIds={ viewportModalClientIds }
+					onClose={ hideViewportModal }
 				/>
 			) }
 		</div>

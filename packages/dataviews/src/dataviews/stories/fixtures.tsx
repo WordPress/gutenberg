@@ -24,6 +24,7 @@ export type SpaceObject = {
 	date: string;
 	datetime: string;
 	email: string;
+	author: string;
 };
 
 export const data: SpaceObject[] = [
@@ -42,6 +43,7 @@ export const data: SpaceObject[] = [
 		date: '2021-01-01',
 		datetime: '2021-01-01T14:30:00Z',
 		email: 'moon@example.com',
+		author: 'lunarian_observer',
 	},
 	{
 		id: 2,
@@ -57,6 +59,7 @@ export const data: SpaceObject[] = [
 		date: '2019-01-02',
 		datetime: '2019-01-02T09:15:00Z',
 		email: 'io@example.com',
+		author: 'galilean_moon_enthusiast_supreme',
 	},
 	{
 		id: 3,
@@ -72,6 +75,7 @@ export const data: SpaceObject[] = [
 		date: '2025-01-03',
 		datetime: '2025-01-03T16:45:30Z',
 		email: 'europa@example.com',
+		author: 'icy_ocean_explorer',
 	},
 	{
 		id: 4,
@@ -87,6 +91,7 @@ export const data: SpaceObject[] = [
 		date: '2022-01-04',
 		datetime: '2022-01-04T12:30:00Z',
 		email: 'ganymede@example.com',
+		author: 'jovian_satellite_researcher',
 	},
 	{
 		id: 5,
@@ -102,6 +107,7 @@ export const data: SpaceObject[] = [
 		date: '2021-01-05',
 		datetime: '2021-01-05T14:15:30Z',
 		email: 'callisto@example.com',
+		author: 'crater_cartography_specialist',
 	},
 	{
 		id: 6,
@@ -117,6 +123,7 @@ export const data: SpaceObject[] = [
 		date: '2020-01-06',
 		datetime: '2020-01-06T10:45:15Z',
 		email: 'amalthea@example.com',
+		author: 'astro_photographer',
 	},
 	{
 		id: 7,
@@ -132,6 +139,7 @@ export const data: SpaceObject[] = [
 		date: '2019-01-07',
 		datetime: '2019-01-07T16:20:45Z',
 		email: 'himalia@example.com',
+		author: 'irregular_orbit_analyst',
 	},
 	{
 		id: 8,
@@ -147,6 +155,7 @@ export const data: SpaceObject[] = [
 		date: '2020-01-01',
 		datetime: '2020-01-01T11:22:15Z',
 		email: 'neptune@example.com',
+		author: 'neptunian_dynamics_professor',
 	},
 	{
 		id: 9,
@@ -162,6 +171,7 @@ export const data: SpaceObject[] = [
 		date: '2021-02-01',
 		datetime: '2021-02-01T11:30:00Z',
 		email: 'triton@example.com',
+		author: 'retrograde_orbit_specialist',
 	},
 	{
 		id: 10,
@@ -177,6 +187,7 @@ export const data: SpaceObject[] = [
 		date: '2020-02-02',
 		datetime: '2020-02-02T15:45:30Z',
 		email: 'nereid@example.com',
+		author: 'outer_solar_system_voyager_mission_director',
 	},
 	{
 		id: 11,
@@ -192,6 +203,7 @@ export const data: SpaceObject[] = [
 		date: '2019-02-03',
 		datetime: '2019-02-03T09:20:15Z',
 		email: 'proteus@example.com',
+		author: 'space_observer',
 	},
 	{
 		id: 12,
@@ -207,6 +219,7 @@ export const data: SpaceObject[] = [
 		date: '2020-01-02',
 		datetime: '2020-01-02T13:05:45Z',
 		email: 'mercury@example.com',
+		author: 'solar_wind_scientist',
 	},
 	{
 		id: 13,
@@ -222,6 +235,7 @@ export const data: SpaceObject[] = [
 		date: '2020-01-02',
 		datetime: '2020-01-02T08:30:12Z',
 		email: 'venus@example.com',
+		author: 'atmospheric_chemistry_expert',
 	},
 	{
 		id: 14,
@@ -237,6 +251,7 @@ export const data: SpaceObject[] = [
 		date: '2023-01-03',
 		datetime: '2023-01-03T18:15:30Z',
 		email: 'earth@example.com',
+		author: 'planetary_geologist',
 	},
 	{
 		id: 15,
@@ -252,6 +267,7 @@ export const data: SpaceObject[] = [
 		date: '2020-01-01',
 		datetime: '2020-01-01T20:45:00Z',
 		email: 'mars@example.com',
+		author: 'red_planet_explorer',
 	},
 	{
 		id: 16,
@@ -267,6 +283,7 @@ export const data: SpaceObject[] = [
 		date: '2017-01-01',
 		datetime: '2017-01-01T00:01:00Z',
 		email: 'jupiter@example.com',
+		author: 'gas_giant_meteorologist',
 	},
 	{
 		id: 17,
@@ -282,6 +299,7 @@ export const data: SpaceObject[] = [
 		date: '2020-02-01',
 		datetime: '2020-02-01T00:02:00Z',
 		email: 'saturn@example.com',
+		author: 'ring_system_analyst',
 	},
 	{
 		id: 18,
@@ -297,6 +315,7 @@ export const data: SpaceObject[] = [
 		date: '2020-03-01',
 		datetime: '2020-03-01T10:15:20Z',
 		email: 'uranus@example.com',
+		author: 'axial_tilt_researcher',
 	},
 	{
 		id: 19,
@@ -312,6 +331,7 @@ export const data: SpaceObject[] = [
 		date: '2020-03-01',
 		datetime: '2020-03-01T10:15:20Z',
 		email: 'thessalonikopolymnianebuchodonossarinacharybdis@example.com',
+		author: 'interstellar_nomadic_planetary_body_tracking_specialist',
 	},
 ];
 
@@ -429,6 +449,10 @@ export const fields: Field< SpaceObject >[] = [
 				value: 'Trans-Neptunian object',
 				label: 'Trans-Neptunian object',
 			},
+			{
+				value: 'Extreme Trans-Neptunian Scattered Disc Object',
+				label: 'Extreme Trans-Neptunian Scattered Disc Object',
+			},
 		],
 		filterBy: {
 			operators: [ 'is', 'isNot' ],
@@ -492,8 +516,73 @@ export const fields: Field< SpaceObject >[] = [
 			{ value: 'Ice giant', label: 'Ice giant' },
 			{ value: 'Terrestrial', label: 'Terrestrial' },
 			{ value: 'Gas giant', label: 'Gas giant' },
+			{
+				value: 'Extreme Outer Solar System Trans-Neptunian Region',
+				label: 'Extreme Outer Solar System Trans-Neptunian Region',
+			},
 		],
 		type: 'array',
 		enableGlobalSearch: true,
+	},
+	{
+		label: 'Author',
+		id: 'author',
+		type: 'text',
+		enableHiding: false,
+		enableGlobalSearch: true,
+		elements: [
+			{ value: 'lunarian_observer', label: 'lunarian_observer' },
+			{
+				value: 'galilean_moon_enthusiast_supreme',
+				label: 'galilean_moon_enthusiast_supreme',
+			},
+			{ value: 'icy_ocean_explorer', label: 'icy_ocean_explorer' },
+			{
+				value: 'jovian_satellite_researcher',
+				label: 'jovian_satellite_researcher',
+			},
+			{
+				value: 'crater_cartography_specialist',
+				label: 'crater_cartography_specialist',
+			},
+			{ value: 'astro_photographer', label: 'astro_photographer' },
+			{
+				value: 'irregular_orbit_analyst',
+				label: 'irregular_orbit_analyst',
+			},
+			{
+				value: 'neptunian_dynamics_professor',
+				label: 'neptunian_dynamics_professor',
+			},
+			{
+				value: 'retrograde_orbit_specialist',
+				label: 'retrograde_orbit_specialist',
+			},
+			{
+				value: 'outer_solar_system_voyager_mission_director',
+				label: 'outer_solar_system_voyager_mission_director',
+			},
+			{ value: 'space_observer', label: 'space_observer' },
+			{ value: 'solar_wind_scientist', label: 'solar_wind_scientist' },
+			{
+				value: 'atmospheric_chemistry_expert',
+				label: 'atmospheric_chemistry_expert',
+			},
+			{ value: 'planetary_geologist', label: 'planetary_geologist' },
+			{ value: 'red_planet_explorer', label: 'red_planet_explorer' },
+			{
+				value: 'gas_giant_meteorologist',
+				label: 'gas_giant_meteorologist',
+			},
+			{ value: 'ring_system_analyst', label: 'ring_system_analyst' },
+			{ value: 'axial_tilt_researcher', label: 'axial_tilt_researcher' },
+			{
+				value: 'interstellar_nomadic_planetary_body_tracking_specialist',
+				label: 'interstellar_nomadic_planetary_body_tracking_specialist',
+			},
+		],
+		filterBy: {
+			operators: [ 'isAny', 'isNone' ],
+		},
 	},
 ];
