@@ -599,6 +599,17 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
  */
 const withBlockReset = ( reducer ) => ( state, action ) => {
 	if ( action.type === 'RESET_BLOCKS' ) {
+		/**
+		 * Preserve controlled inner block flags across RESET_BLOCKS.
+		 * Previously this was cleared to `{}`, which caused nested
+		 * controllers (e.g. post-content, patterns) to lose their
+		 * controlled status and unnecessarily re-clone blocks. Stale
+		 * flags are cleaned up naturally by unsetControlledBlocks()
+		 * when useBlockSync unmounts.
+		 */
+		const preservedControlledInnerBlocks =
+			state?.controlledInnerBlocks ?? {};
+
 		const newState = {
 			...state,
 			byClientId: new Map(
@@ -607,11 +618,82 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			attributes: new Map( getFlattenedBlockAttributes( action.blocks ) ),
 			order: mapBlockOrder( action.blocks ),
 			parents: new Map( mapBlockParents( action.blocks ) ),
-			controlledInnerBlocks: {},
+			controlledInnerBlocks: preservedControlledInnerBlocks,
 		};
+
+		// Preserve controlled inner blocks data from the old state.
+		// The maps above are rebuilt solely from action.blocks, but
+		// controlled inner blocks live under cloned IDs that aren't
+		// present in action.blocks. Re-inject them so the state
+		// remains consistent with the preserved flags.
+		if ( state?.order ) {
+			for ( const clientId of Object.keys(
+				preservedControlledInnerBlocks
+			) ) {
+				if ( ! preservedControlledInnerBlocks[ clientId ] ) {
+					continue;
+				}
+				// Only preserve if the parent block still exists.
+				if ( ! newState.byClientId.has( clientId ) ) {
+					continue;
+				}
+				const oldOrder = state.order.get( clientId );
+				if ( ! oldOrder?.length ) {
+					continue;
+				}
+				newState.order.set( clientId, oldOrder );
+				const preserveBlock = ( blockId, parentId ) => {
+					const blockData = state.byClientId?.get( blockId );
+					if ( ! blockData ) {
+						return;
+					}
+					newState.byClientId.set( blockId, blockData );
+					newState.attributes.set(
+						blockId,
+						state.attributes?.get( blockId )
+					);
+					newState.parents.set( blockId, parentId );
+					const childOrder = state.order?.get( blockId ) || [];
+					newState.order.set( blockId, childOrder );
+					childOrder.forEach( ( childId ) =>
+						preserveBlock( childId, blockId )
+					);
+				};
+				oldOrder.forEach( ( id ) => preserveBlock( id, clientId ) );
+			}
+		}
 
 		newState.tree = new Map( state?.tree );
 		updateBlockTreeForBlocks( newState, action.blocks );
+
+		// Fix tree entries for controlled blocks. updateBlockTreeForBlocks
+		// built tree entries using action.blocks' inner block structure
+		// (entity-level IDs), but we need them to reference the preserved
+		// cloned inner blocks instead. Mutating the existing object
+		// preserves references held by ancestor tree entries.
+		for ( const clientId of Object.keys(
+			preservedControlledInnerBlocks
+		) ) {
+			if ( ! preservedControlledInnerBlocks[ clientId ] ) {
+				continue;
+			}
+			if ( ! newState.byClientId.has( clientId ) ) {
+				continue;
+			}
+			const controlledOrder = newState.order.get( clientId );
+			if ( ! controlledOrder?.length ) {
+				continue;
+			}
+			const innerBlocks = controlledOrder.map( ( id ) =>
+				newState.tree.get( id )
+			);
+			const existingEntry = newState.tree.get( clientId );
+			if ( existingEntry ) {
+				existingEntry.innerBlocks = innerBlocks;
+			}
+			newState.tree.set( 'controlled||' + clientId, { innerBlocks } );
+		}
+
 		newState.tree.set( '', {
 			innerBlocks: action.blocks.map( ( subBlock ) =>
 				newState.tree.get( subBlock.clientId )
@@ -741,14 +823,22 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
  */
 const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
 	if ( action.type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
-		// when switching a block from controlled to uncontrolled or inverse,
-		// we need to remove its content first.
-		const tempState = reducer( state, {
-			type: 'REPLACE_INNER_BLOCKS',
-			rootClientId: action.clientId,
-			blocks: [],
-		} );
-		return reducer( tempState, action );
+		// When switching a block from controlled to uncontrolled or inverse,
+		// we need to remove its content first — but only if there are inner
+		// blocks to remove. Skipping the no-op dispatch is important because
+		// REPLACE_INNER_BLOCKS creates new state references even when empty,
+		// which propagates tree changes up to the root and triggers false-
+		// positive change detection in parent subscriptions.
+		const innerBlockOrder = state.order.get( action.clientId );
+		if ( innerBlockOrder?.length ) {
+			const tempState = reducer( state, {
+				type: 'REPLACE_INNER_BLOCKS',
+				rootClientId: action.clientId,
+				blocks: [],
+			} );
+			return reducer( tempState, action );
+		}
+		return reducer( state, action );
 	}
 
 	return reducer( state, action );

@@ -2404,6 +2404,71 @@ describe( 'state', () => {
 						)
 					);
 				} );
+
+				it( 'should preserve controlledInnerBlocks flags across RESET_BLOCKS', () => {
+					const original = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					} );
+					const withControlled = blocks( original, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'chicken',
+						hasControlledInnerBlocks: true,
+					} );
+					expect( withControlled.controlledInnerBlocks.chicken ).toBe(
+						true
+					);
+
+					const state = blocks( withControlled, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					} );
+
+					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+				} );
+
+				it( 'should not create new state references when setting controlled inner blocks on a block with no inner blocks', () => {
+					const original = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					} );
+
+					const state = blocks( original, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'chicken',
+						hasControlledInnerBlocks: true,
+					} );
+
+					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					// The order and byClientId Maps should be the same
+					// reference because the block has no inner blocks to
+					// remove, so REPLACE_INNER_BLOCKS should be skipped.
+					expect( state.order ).toBe( original.order );
+					expect( state.byClientId ).toBe( original.byClientId );
+					expect( state.attributes ).toBe( original.attributes );
+					expect( state.parents ).toBe( original.parents );
+				} );
 			} );
 		} );
 	} );
