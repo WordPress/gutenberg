@@ -86,23 +86,13 @@ const { actions: privateActions, state: privateState } = store(
 				return activeTabIndex === tabIndex;
 			},
 			/**
-			 * Whether the tab has keyboard focus.
-			 *
-			 * @type {boolean}
-			 */
-			get isFocusedTab() {
-				const { focusedTabIndex } = getContext();
-				const { tabIndex } = privateState;
-				return focusedTabIndex === tabIndex;
-			},
-			/**
 			 * The value of the tabindex attribute.
-			 * Only the focused tab should be keyboard-focusable.
+			 * Only the active tab should be in the tab sequence.
 			 *
 			 * @type {number}
 			 */
 			get tabIndexAttribute() {
-				return privateState.isFocusedTab ? 0 : -1;
+				return privateState.isActiveTab ? 0 : -1;
 			},
 		},
 		actions: {
