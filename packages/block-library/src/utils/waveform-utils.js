@@ -244,14 +244,6 @@ export function initWaveformPlayer(
 		instance,
 		container,
 		destroy: () => {
-			// Pause audio before destroying to prevent AbortError when
-			// destroy() interrupts a pending play() Promise.
-			// TODO: Once @arraypress/waveform-player is updated with isDestroying
-			// guards (PR #3), the pause-before-destroy workaround may not be needed.
-			const audio = container.querySelector( 'audio' );
-			if ( audio && ! audio.paused ) {
-				audio.pause();
-			}
 			container.removeEventListener(
 				'waveformplayer:ready',
 				handlers.ready
