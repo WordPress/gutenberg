@@ -22,9 +22,10 @@ $waveform-player-height: 100px;
 		}
 	}
 
-	// Set the waveform track height.
+	// Set the waveform track height and remove gap between button and waveform.
 	.waveform-track {
 		height: $waveform-player-height;
+		gap: 0;
 	}
 
 	// WaveformPlayer button styling.
