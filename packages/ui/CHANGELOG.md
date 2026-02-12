@@ -16,6 +16,10 @@
 
 -   `Button`: Add minimum content width (`6ch` + padding) to prevent overly narrow buttons with short labels ([#75133](https://github.com/WordPress/gutenberg/pull/75133)).
 
+### Bug Fixes
+
+-   `Fieldset`: Fix gap token to match spec ([#75479](https://github.com/WordPress/gutenberg/pull/75479)).
+
 ### Internal
 
 -   `Button`, `InputLayout`, `Tabs`: use semantic dimension tokens ([#74557](https://github.com/WordPress/gutenberg/pull/74557)).
