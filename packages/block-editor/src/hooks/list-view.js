@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { hasBlockSupport, getBlockType } from '@wordpress/blocks';
+import { hasBlockSupport } from '@wordpress/blocks';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -15,6 +15,7 @@ import { PrivateListView } from '../components/list-view';
 import InspectorControls from '../components/inspector-controls/fill';
 import { PrivateBlockContext } from '../components/block-list/private-block-context';
 import useListViewPanelState from '../components/use-list-view-panel-state';
+import useBlockDisplayTitle from '../components/block-title/use-block-display-title';
 
 export const LIST_VIEW_SUPPORT_KEY = 'listView';
 
@@ -31,18 +32,52 @@ export function hasListViewSupport( nameOrType ) {
 /**
  * Inspector controls panel for list view.
  *
+ * @param {Object}  props             Component props.
+ * @param {string}  props.clientId    Block client ID.
+ * @param {boolean} props.hasChildren Whether there are child blocks of the clientId.
+ * @return {Element|null} List view inspector controls or null.
+ */
+function ListViewPanel( { clientId, hasChildren } ) {
+	const { isSelectionWithinCurrentSection } =
+		useContext( PrivateBlockContext );
+	const { isOpened, expandRevision, handleToggle } =
+		useListViewPanelState( clientId );
+	const showBlockTitle = isSelectionWithinCurrentSection;
+	const title = useBlockDisplayTitle( { clientId, context: 'list-view' } );
+
+	return (
+		<InspectorControls group="list">
+			<PanelBody
+				title={ showBlockTitle ? title : undefined }
+				opened={ isOpened }
+				onToggle={ handleToggle }
+			>
+				{ ! hasChildren && (
+					<p className="block-editor-block-inspector__no-blocks">
+						{ __( 'No items yet.' ) }
+					</p>
+				) }
+				<PrivateListView
+					key={ `${ clientId }-${ expandRevision }` }
+					rootClientId={ clientId }
+					isExpanded
+					description={ title }
+					showAppender
+				/>
+			</PanelBody>
+		</InspectorControls>
+	);
+}
+
+/**
+ * Support hook component for the block List View feature.
+ *
  * @param {Object} props          Component props.
  * @param {string} props.clientId Block client ID.
  * @param {string} props.name     Block name.
  * @return {Element|null} List view inspector controls or null.
  */
-export function ListViewPanel( { clientId, name } ) {
-	const { isSelectionWithinCurrentSection } =
-		useContext( PrivateBlockContext );
-
-	const { isOpened, expandRevision, handleToggle } =
-		useListViewPanelState( clientId );
-
+function ListViewEdit( { clientId, name } ) {
 	const isEnabled = hasListViewSupport( name );
 	const { hasChildren, isNestedListView } = useSelect(
 		( select ) => {
@@ -70,36 +105,16 @@ export function ListViewPanel( { clientId, name } ) {
 		[ clientId ]
 	);
 
-	const blockType = getBlockType( name );
-	const title = blockType?.title || name;
-
 	if ( ! isEnabled || isNestedListView ) {
 		return null;
 	}
 
-	const showBlockTitle = isSelectionWithinCurrentSection;
-
 	return (
-		<InspectorControls group="list">
-			<PanelBody
-				title={ showBlockTitle ? title : undefined }
-				opened={ isOpened }
-				onToggle={ handleToggle }
-			>
-				{ ! hasChildren && (
-					<p className="block-editor-block-inspector__no-blocks">
-						{ __( 'No items yet.' ) }
-					</p>
-				) }
-				<PrivateListView
-					key={ `${ clientId }-${ expandRevision }` }
-					rootClientId={ clientId }
-					isExpanded
-					description={ title }
-					showAppender
-				/>
-			</PanelBody>
-		</InspectorControls>
+		<ListViewPanel
+			clientId={ clientId }
+			name={ name }
+			hasChildren={ hasChildren }
+		/>
 	);
 }
 
@@ -107,7 +122,7 @@ export function ListViewPanel( { clientId, name } ) {
  * Export block support definition.
  */
 export default {
-	edit: ListViewPanel,
+	edit: ListViewEdit,
 	hasSupport: hasListViewSupport,
 	attributeKeys: [],
 	supportsPatternEditing: true,
