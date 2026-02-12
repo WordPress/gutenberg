@@ -6,8 +6,9 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useCallback } from '@wordpress/element';
+import { useState, useRef, useCallback, useEffect } from '@wordpress/element';
 import { ResizableBox } from '@wordpress/components';
+import { DEVICE_PREVIEW_WIDTHS } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -27,7 +28,13 @@ const HANDLE_STYLES_OVERRIDE = {
 	left: undefined,
 };
 
-function ResizableEditor( { className, enableResizing, height, children } ) {
+function ResizableEditor( {
+	className,
+	enableResizing,
+	height,
+	children,
+	deviceType,
+} ) {
 	const [ width, setWidth ] = useState( '100%' );
 	const resizableRef = useRef();
 	const resizeWidthBy = useCallback( ( deltaPixels ) => {
@@ -35,6 +42,15 @@ function ResizableEditor( { className, enableResizing, height, children } ) {
 			setWidth( resizableRef.current.offsetWidth + deltaPixels );
 		}
 	}, [] );
+
+	// When deviceType changes, snap the width to the device preset
+	useEffect( () => {
+		if ( enableResizing && deviceType ) {
+			const deviceWidth = DEVICE_PREVIEW_WIDTHS[ deviceType ];
+			setWidth( deviceWidth ?? '100%' );
+		}
+	}, [ deviceType, enableResizing ] );
+
 	return (
 		<ResizableBox
 			className={ clsx( 'editor-resizable-editor', className, {

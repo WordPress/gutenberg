@@ -116,6 +116,10 @@ export { default as __unstableBlockToolbarLastItem } from './block-toolbar/block
 export { default as __unstableInserterMenuExtension } from './inserter-menu-extension';
 export { default as __experimentalPreviewOptions } from './preview-options';
 export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
+export {
+	DEVICE_PREVIEW_WIDTHS,
+	DEVICE_PREVIEW_HEIGHTS,
+} from './use-resize-canvas/constants';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { useBlockProps } from './block-list/use-block-props';

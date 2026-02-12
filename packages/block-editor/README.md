@@ -392,6 +392,22 @@ _Returns_
 
 Undocumented declaration.
 
+### DEVICE_PREVIEW_HEIGHTS
+
+Undocumented declaration.
+
+### DEVICE_PREVIEW_WIDTHS
+
+Device preview width constants.
+
+These values match the breakpoints in:
+
+-   packages/base-styles/\_breakpoints.scss ($break-medium: 782px, $break-mobile: 480px)
+-   packages/compose/src/hooks/use-viewport-match/index.js (medium: 782, mobile: 480)
+-   packages/components/src/utils/breakpoint-values.js
+
+The minus-1 arithmetic ensures the preview triggers the correct media query for useViewportMatch with '\<' operator.
+
 ### DimensionControl
 
 DimensionControl renders a linked unit control and range control for adjusting dimensions of a block.

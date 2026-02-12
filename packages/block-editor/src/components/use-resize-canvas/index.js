@@ -4,6 +4,11 @@
 import { useEffect, useState } from '@wordpress/element';
 
 /**
+ * Internal dependencies
+ */
+import { DEVICE_PREVIEW_WIDTHS, DEVICE_PREVIEW_HEIGHTS } from './constants';
+
+/**
  * Function to resize the editor window.
  *
  * @param {string} deviceType Used for determining the size of the container (e.g. Desktop, Tablet, Mobile)
@@ -27,29 +32,17 @@ export default function useResizeCanvas( deviceType ) {
 	}, [ deviceType ] );
 
 	const getCanvasWidth = ( device ) => {
-		let deviceWidth;
+		const deviceWidth = DEVICE_PREVIEW_WIDTHS[ device ];
 
-		/*
-		 * Matches the breakpoints in packages/base-styles/_breakpoints.scss,
-		 * and breakpoints in packages/compose/src/hooks/use-viewport-match/index.js.
-		 * minus 1 to trigger the media query for device preview.
-		 */
-		switch ( device ) {
-			case 'Tablet':
-				deviceWidth = 782 - 1; // preview for useViewportMatch( 'medium', '<' )
-				break;
-			case 'Mobile':
-				deviceWidth = 480 - 1; // preview for useViewportMatch( 'mobile', '<' )
-				break;
-			default:
-				return null;
+		if ( deviceWidth === null || deviceWidth === undefined ) {
+			return null;
 		}
 
 		return deviceWidth < actualWidth ? deviceWidth : actualWidth;
 	};
 
 	const contentInlineStyles = ( device ) => {
-		const height = device === 'Mobile' ? '768px' : '1024px';
+		const height = DEVICE_PREVIEW_HEIGHTS[ device ];
 		const marginVertical = '40px';
 		const marginHorizontal = 'auto';
 
@@ -64,7 +57,7 @@ export default function useResizeCanvas( deviceType ) {
 					marginBottom: marginVertical,
 					marginLeft: marginHorizontal,
 					marginRight: marginHorizontal,
-					height,
+					height: height ? `${ height }px` : undefined,
 					overflowY: 'auto',
 				};
 			default:

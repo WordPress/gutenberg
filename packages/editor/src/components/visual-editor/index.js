@@ -186,8 +186,25 @@ function VisualEditor( {
 		};
 	}, [] );
 
+	const enableResizing =
+		[
+			NAVIGATION_POST_TYPE,
+			TEMPLATE_PART_POST_TYPE,
+			PATTERN_POST_TYPE,
+		].includes( postType ) &&
+		// Disable in previews / view mode.
+		! isPreview &&
+		// Disable resizing in mobile viewport.
+		! isMobileViewport &&
+		// Disable resizing in zoomed-out mode.
+		! isZoomedOut;
+
 	const localRef = useRef();
-	const deviceStyles = useResizeCanvas( deviceType );
+	// When resizing is enabled, skip useResizeCanvas by passing 'Desktop' (no width constraint).
+	// The ResizableEditor handles width instead, responding to deviceType changes.
+	const deviceStyles = useResizeCanvas(
+		enableResizing ? 'Desktop' : deviceType
+	);
 	const [ globalLayoutSettings ] = useSettings( 'layout' );
 
 	// fallbackLayout is used if there is no Post Content,
@@ -320,19 +337,6 @@ function VisualEditor( {
 		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
 		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
-	const enableResizing =
-		[
-			NAVIGATION_POST_TYPE,
-			TEMPLATE_PART_POST_TYPE,
-			PATTERN_POST_TYPE,
-		].includes( postType ) &&
-		// Disable in previews / view mode.
-		! isPreview &&
-		// Disable resizing in mobile viewport.
-		! isMobileViewport &&
-		// Disable resizing in zoomed-out mode.
-		! isZoomedOut;
-
 	// Calculate the minimum height including scroll offset to fit all notes.
 	const calculatedMinHeight = useMemo( () => {
 		if ( ! localRef.current ) {
@@ -409,7 +413,11 @@ function VisualEditor( {
 				}
 			) }
 		>
-			<ResizableEditor enableResizing={ enableResizing } height="100%">
+			<ResizableEditor
+				enableResizing={ enableResizing }
+				height="100%"
+				deviceType={ deviceType }
+			>
 				<BlockCanvas
 					shouldIframe={ ! disableIframe }
 					contentRef={ contentRef }
