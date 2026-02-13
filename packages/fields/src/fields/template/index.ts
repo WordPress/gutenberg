@@ -18,14 +18,14 @@ const templateField: Field< BasePost > = {
 	id: 'template',
 	type: 'text',
 	label: __( 'Template' ),
-	getElements: async () => {
+	getElements: async ( args ) => {
 		const templates: WpTemplate[] =
 			( await resolveSelect( coreDataStore ).getEntityRecords(
 				'postType',
 				'wp_template',
 				{
 					per_page: -1,
-					post_type: 'page', // TODO: this should be data.type
+					post_type: args?.item?.type || 'page',
 				}
 			) ) ?? EMPTY_ARRAY;
 		return templates.map( ( { slug, title } ) => ( {
