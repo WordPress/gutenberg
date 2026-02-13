@@ -17,8 +17,8 @@ const transforms = {
 								textAlign,
 							},
 						},
-					} ),
-				} );
+					}),
+				});
 			},
 		},
 	],
