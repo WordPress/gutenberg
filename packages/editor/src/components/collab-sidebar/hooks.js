@@ -492,7 +492,7 @@ export function useNoteActions( reflowComments = () => {} ) {
 		}
 	};
 
-	const onAddReaction = async ( { commentId, emoji } ) => {
+	const onToggleReaction = async ( { commentId, emoji } ) => {
 		try {
 			// Get current user from the store.
 			const currentUser =
@@ -510,27 +510,37 @@ export function useNoteActions( reflowComments = () => {} ) {
 
 			// Get existing reactions or initialize empty object.
 			const existingReactions = comment.meta?._wp_note_reactions || {};
-
-			// Check if user already reacted with this emoji.
 			const emojiReactions = existingReactions[ emoji ] || [];
 			const alreadyReacted = emojiReactions.some(
 				( reaction ) => reaction.userId === userId
 			);
 
+			let updatedReactions;
+
 			if ( alreadyReacted ) {
-				return;
+				// Remove the user's reaction.
+				const updatedEmojiReactions = emojiReactions.filter(
+					( reaction ) => reaction.userId !== userId
+				);
+
+				updatedReactions = { ...existingReactions };
+				if ( updatedEmojiReactions.length > 0 ) {
+					updatedReactions[ emoji ] = updatedEmojiReactions;
+				} else {
+					delete updatedReactions[ emoji ];
+				}
+			} else {
+				// Add new reaction.
+				const newReaction = {
+					userId,
+					timestamp: new Date().toISOString(),
+				};
+
+				updatedReactions = {
+					...existingReactions,
+					[ emoji ]: [ ...emojiReactions, newReaction ],
+				};
 			}
-
-			// Add new reaction.
-			const newReaction = {
-				userId,
-				timestamp: new Date().toISOString(),
-			};
-
-			const updatedReactions = {
-				...existingReactions,
-				[ emoji ]: [ ...emojiReactions, newReaction ],
-			};
 
 			await saveEntityRecord(
 				'root',
@@ -544,100 +554,16 @@ export function useNoteActions( reflowComments = () => {} ) {
 				{ throwOnError: true }
 			);
 
-			createNotice( 'snackbar', __( 'Reaction added.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
-		} catch ( error ) {
-			onError( error );
-		}
-	};
-
-	const onRemoveReaction = async ( { commentId, emoji } ) => {
-		try {
-			// Get current user from the store.
-			const currentUser =
-				registry.select( coreStore ).getCurrentUser() || {};
-			const userId = currentUser.id;
-
-			// Get current comment data.
-			const comment = registry
-				.select( coreStore )
-				.getEntityRecord( 'root', 'comment', commentId );
-
-			if ( ! comment ) {
-				throw new Error( __( 'Comment not found.' ) );
-			}
-
-			// Get existing reactions.
-			const existingReactions = comment.meta?._wp_note_reactions || {};
-			const emojiReactions = existingReactions[ emoji ] || [];
-
-			// Filter out current user's reaction.
-			const updatedEmojiReactions = emojiReactions.filter(
-				( reaction ) => reaction.userId !== userId
-			);
-
-			// Build updated reactions object, removing empty arrays.
-			const updatedReactions = { ...existingReactions };
-			if ( updatedEmojiReactions.length > 0 ) {
-				updatedReactions[ emoji ] = updatedEmojiReactions;
-			} else {
-				delete updatedReactions[ emoji ];
-			}
-
-			await saveEntityRecord(
-				'root',
-				'comment',
+			createNotice(
+				'snackbar',
+				alreadyReacted
+					? __( 'Reaction removed.' )
+					: __( 'Reaction added.' ),
 				{
-					id: commentId,
-					meta: {
-						_wp_note_reactions:
-							Object.keys( updatedReactions ).length > 0
-								? updatedReactions
-								: {},
-					},
-				},
-				{ throwOnError: true }
+					type: 'snackbar',
+					isDismissible: true,
+				}
 			);
-
-			createNotice( 'snackbar', __( 'Reaction removed.' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
-		} catch ( error ) {
-			onError( error );
-		}
-	};
-
-	const onToggleReaction = async ( { commentId, emoji } ) => {
-		try {
-			// Get current user from the store.
-			const currentUser =
-				registry.select( coreStore ).getCurrentUser() || {};
-			const userId = currentUser.id;
-
-			// Get current comment data.
-			const comment = registry
-				.select( coreStore )
-				.getEntityRecord( 'root', 'comment', commentId );
-
-			if ( ! comment ) {
-				throw new Error( __( 'Comment not found.' ) );
-			}
-
-			// Check if user already reacted with this emoji.
-			const existingReactions = comment.meta?._wp_note_reactions || {};
-			const emojiReactions = existingReactions[ emoji ] || [];
-			const alreadyReacted = emojiReactions.some(
-				( reaction ) => reaction.userId === userId
-			);
-
-			if ( alreadyReacted ) {
-				await onRemoveReaction( { commentId, emoji } );
-			} else {
-				await onAddReaction( { commentId, emoji } );
-			}
 		} catch ( error ) {
 			onError( error );
 		}
@@ -647,8 +573,6 @@ export function useNoteActions( reflowComments = () => {} ) {
 		onCreate,
 		onEdit,
 		onDelete,
-		onAddReaction,
-		onRemoveReaction,
 		onToggleReaction,
 	};
 }
