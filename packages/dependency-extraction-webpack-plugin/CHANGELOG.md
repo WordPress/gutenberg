@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Add `@wordpress/boot`,  `@wordpress/theme`, and `@wordpress/route` to list of bundled packages. These won't be externalized to WP/Gutenberg by the plugin and are instead included in the build output.
+-   Add `@wordpress/boot`, `@wordpress/theme`, and `@wordpress/route` to list of bundled packages. These won't be externalized to WP/Gutenberg by the plugin and are instead included in the build output.
 
 ## 6.39.0 (2026-01-29)
 
