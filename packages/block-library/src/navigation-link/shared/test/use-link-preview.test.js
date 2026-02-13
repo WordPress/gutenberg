@@ -11,12 +11,25 @@ describe( 'computeDisplayUrl', () => {
 			[ 'https://google.com', 'external URLs' ],
 			[ 'https://google.com/search', 'external URLs with paths' ],
 		] )( 'should mark %s as external (%s)', ( url ) => {
-			const result = computeDisplayUrl( url );
+			const result = computeDisplayUrl( { linkUrl: url } );
 			expect( result ).toEqual( {
 				displayUrl: url,
 				isExternal: true,
 			} );
 		} );
+
+		test.each( [
+			[ 'www.test.com', 'URLs without protocol' ],
+			[ 'google.com', 'domain-only URLs without protocol' ],
+			[ 'https://google.com', 'external URLs' ],
+			[ 'https://google.com/search', 'external URLs with paths' ],
+		] )(
+			'should mark %s as external regardless of other attributes (%s)',
+			( url ) => {
+				const result = computeDisplayUrl( { linkUrl: url } );
+				expect( result.isExternal ).toBe( true );
+			}
+		);
 	} );
 
 	describe( 'internal links', () => {
@@ -30,16 +43,10 @@ describe( 'computeDisplayUrl', () => {
 			expect( result.isExternal ).toBe( false );
 		} );
 
-		it( 'should treat entity links as internal', () => {
-			const result = computeDisplayUrl( 'https://example.com/my-page', {
-				type: 'page',
-			} );
-			expect( result.isExternal ).toBe( false );
-		} );
-
-		it( 'should treat links with entity binding as internal', () => {
-			const result = computeDisplayUrl( 'https://example.com/my-post', {
-				hasBinding: true,
+		it( 'should treat same-origin URLs as internal', () => {
+			const result = computeDisplayUrl( {
+				linkUrl: 'https://example.com/my-page',
+				siteUrl: 'https://example.com',
 			} );
 			expect( result.isExternal ).toBe( false );
 		} );
@@ -52,7 +59,7 @@ describe( 'computeDisplayUrl', () => {
 		] )(
 			'should mark %s as external',
 			( url, expectedDisplay, expectedExternal ) => {
-				const result = computeDisplayUrl( url );
+				const result = computeDisplayUrl( { linkUrl: url } );
 				expect( result ).toEqual( {
 					displayUrl: expectedDisplay,
 					isExternal: expectedExternal,
@@ -64,7 +71,7 @@ describe( 'computeDisplayUrl', () => {
 			[ '', 'empty URL' ],
 			[ null, 'null URL' ],
 		] )( 'should handle %s', ( url ) => {
-			const result = computeDisplayUrl( url );
+			const result = computeDisplayUrl( { linkUrl: url } );
 			expect( result ).toEqual( {
 				displayUrl: '',
 				isExternal: false,
@@ -197,3 +204,30 @@ it( 'should show "Internal link" badge for hash links even when type is present'
 		intent: 'default',
 	} );
 } );
+
+test.each( [
+	[ 'www.test.com', 'URLs without protocol' ],
+	[ 'google.com', 'domain-only URLs without protocol' ],
+	[ 'https://google.com', 'external URLs' ],
+	[ 'https://google.com/search', 'external URLs with paths' ],
+] )(
+	'should show "External link" badge for %s even when type is present (%s)',
+	( url ) => {
+		const badges = computeBadges( {
+			url,
+			type: 'page', // Bug: type is set incorrectly
+			isExternal: true,
+		} );
+
+		// Should prioritize external link detection over type
+		expect( badges ).toContainEqual( {
+			label: 'External link',
+			intent: 'default',
+		} );
+		// Should NOT show Page badge
+		expect( badges ).not.toContainEqual( {
+			label: 'Page',
+			intent: 'default',
+		} );
+	}
+);

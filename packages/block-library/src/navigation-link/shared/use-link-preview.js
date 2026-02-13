@@ -29,45 +29,40 @@ function capitalize( str ) {
 /**
  * Compute display URL - strips site URL if internal, shows full URL if external.
  *
- * @param {string}  url                - The URL to process
- * @param {Object}  options            - Optional parameters
- * @param {string}  options.type       - Entity type (page, post, etc.) - indicates an entity link
- * @param {boolean} options.hasBinding - Whether the link has an entity binding
- * @param {string}  options.siteUrl    - The WordPress site URL (falls back to window.location.origin)
+ * @param {Object} options         - Parameters object
+ * @param {string} options.linkUrl - The URL to process
+ * @param {string} options.siteUrl - The WordPress site URL (falls back to window.location.origin)
  * @return {Object} Object with displayUrl and isExternal flag
  */
-export function computeDisplayUrl( url, { type, hasBinding, siteUrl } = {} ) {
-	if ( ! url ) {
+export function computeDisplayUrl( { linkUrl, siteUrl } = {} ) {
+	if ( ! linkUrl ) {
 		return { displayUrl: '', isExternal: false };
 	}
 
-	let displayUrl = safeDecodeURI( url );
+	let displayUrl = safeDecodeURI( linkUrl );
 	let isExternal = false;
 
-	// If this link has an entity binding (bound to a page/post/etc), it's internal
-	if ( hasBinding || ( type && type !== 'custom' ) ) {
+	// Check hash links and relative paths first - these are always internal
+	if ( isRelativePath( linkUrl ) || isHashLink( linkUrl ) ) {
 		return { displayUrl, isExternal: false };
 	}
 
-	// Check if URL is a relative path or hash link (internal, non-parseable)
-	if ( isRelativePath( url ) || isHashLink( url ) ) {
-		return { displayUrl, isExternal: false };
-	}
-
-	// Try to parse as a full URL
+	// Try to parse as a full URL to determine if it's actually external
+	// This must happen before trusting the type attribute
 	try {
-		const linkUrl = new URL( url );
+		const parsedUrl = new URL( linkUrl );
 		// Use provided siteUrl or fall back to window.location.origin
 		const siteDomain = siteUrl || window.location.origin;
-		if ( linkUrl.origin === siteDomain ) {
+		if ( parsedUrl.origin === siteDomain ) {
 			// Show only the pathname (and search/hash if present)
-			let path = linkUrl.pathname + linkUrl.search + linkUrl.hash;
+			let path = parsedUrl.pathname + parsedUrl.search + parsedUrl.hash;
 			// Remove trailing slash
 			if ( path.endsWith( '/' ) && path.length > 1 ) {
 				path = path.slice( 0, -1 );
 			}
 			displayUrl = path;
 		} else {
+			// Different origin - this is an external link
 			isExternal = true;
 		}
 	} catch ( e ) {
@@ -193,9 +188,8 @@ export function useLinkPreview( {
 	const { richData } = useRemoteUrlData( title ? null : url );
 
 	// Compute display URL and external flag
-	const { displayUrl, isExternal } = computeDisplayUrl( url, {
-		type,
-		hasBinding,
+	const { displayUrl, isExternal } = computeDisplayUrl( {
+		linkUrl: url,
 		siteUrl,
 	} );
 
