@@ -1,5 +1,12 @@
+/**
+ * WordPress dependencies
+ */
 import { privateApis } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 import { unlock } from '../../lock-unlock';
 import { CursorRegistry } from './cursor-registry';
 import { Overlay } from './overlay';
