@@ -8,7 +8,7 @@ import {
 } from '@wordpress/components';
 import { SVG, Path } from '@wordpress/primitives';
 import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -268,8 +268,9 @@ export default function ReactionDisplay( { reactions, onToggleReaction } ) {
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
  */
 export function AddReactionButton( { onToggleReaction } ) {
+	const [ isOpen, setIsOpen ] = useState( false );
 	return (
-		<Menu placement="bottom-end">
+		<Menu placement="bottom-end" open={ isOpen } onOpenChange={ setIsOpen }>
 			<Menu.TriggerButton
 				render={
 					<Button
@@ -286,6 +287,7 @@ export function AddReactionButton( { onToggleReaction } ) {
 			>
 				<ReactionEmojiPicker
 					onSelect={ ( slug ) => {
+						setIsOpen( false );
 						onToggleReaction( slug );
 					} }
 				/>
