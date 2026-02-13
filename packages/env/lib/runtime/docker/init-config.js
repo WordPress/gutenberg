@@ -89,10 +89,16 @@ module.exports = async function initConfig( {
 			yaml.dump( dockerComposeConfig )
 		);
 
-		// Write four Dockerfiles for each service we provided.
+		// Write Dockerfiles for each service we provided.
 		// (WordPress and CLI services, then a development and test environment for each.)
 		for ( const imageType of [ 'WordPress', 'CLI' ] ) {
 			for ( const envType of [ 'development', 'tests' ] ) {
+				if (
+					envType === 'tests' &&
+					config.testsEnvironment === false
+				) {
+					continue;
+				}
 				await writeFile(
 					path.resolve(
 						config.workDirectoryPath,

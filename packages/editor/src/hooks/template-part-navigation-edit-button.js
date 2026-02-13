@@ -26,7 +26,7 @@ const BLOCK_INSPECTOR_AREA = 'edit-post/block';
  *
  * @param {Object} props          Component props.
  * @param {string} props.clientId The template part block client ID.
- * @return {JSX.Element|null} The Edit navigation button component or null if not applicable.
+ * @return {React.JSX.Element} The Edit navigation button component or null if not applicable.
  */
 function TemplatePartNavigationEditButton( { clientId } ) {
 	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );

@@ -122,7 +122,7 @@ function Iframe( {
 		};
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
-	/** @type {[Document, import('react').Dispatch<Document>]} */
+	/** @type {[Document, React.Dispatch<Document>]} */
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const [ before, writingFlowRef, after ] = useWritingFlow();

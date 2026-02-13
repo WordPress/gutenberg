@@ -1,6 +1,5 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"__experimental": true,
 	"apiVersion": 3,
 	"name": "core/tabs",
 	"title": "Tabs",
@@ -23,8 +22,12 @@
 		"align": true,
 		"anchor": true,
 		"color": {
-			"text": false,
-			"background": false
+			"text": true,
+			"background": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
 		},
 		"layout": {
 			"default": {

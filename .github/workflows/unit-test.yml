@@ -261,20 +261,20 @@ jobs:
                   locale -a
 
             - name: Start Docker environment
-              run: npm run wp-env start
+              run: npm run wp-env-test start
 
             - name: Log running Docker containers
               run: docker ps -a
 
             - name: Docker container debug information
               run: |
-                  npm run wp-env run tests-mysql mysql -- --version
-                  npm run wp-env run tests-wordpress php -- --version
-                  npm run wp-env run tests-wordpress php -m
-                  npm run wp-env run tests-wordpress php -i
-                  npm run wp-env run tests-wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -- --version
-                  npm run wp-env run tests-wordpress locale -a
-                  npm run wp-env run tests-cli wp core version
+                  npm run wp-env-test -- run mysql mariadb -- --version
+                  npm run wp-env-test -- run wordpress php -- --version
+                  npm run wp-env-test -- run wordpress php -m
+                  npm run wp-env-test -- run wordpress php -i
+                  npm run wp-env-test -- run wordpress /var/www/html/wp-content/plugins/gutenberg/vendor/bin/phpunit -- --version
+                  npm run wp-env-test -- run wordpress locale -a
+                  npm run wp-env-test -- run cli wp core version
 
             - name: Running single site unit tests
               if: ${{ ! matrix.multisite }}

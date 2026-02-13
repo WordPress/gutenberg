@@ -39,7 +39,6 @@ $ wp-env start --runtime=playground
 | Feature | Docker | Playground |
 |---------|--------|------------|
 | Requires Docker | Yes | No |
-| Test environment | Yes | No |
 | Xdebug | Yes | Yes |
 | SPX profiling | Yes | No |
 | phpMyAdmin | Yes | No |
@@ -49,7 +48,7 @@ $ wp-env start --runtime=playground
 | Plugin/theme mounting | Yes | Yes |
 | `wp-env run` command | Yes | No |
 
-The Playground runtime is ideal for quick testing or environments where Docker is unavailable. However, it lacks some features available in the Docker runtime, such as the tests environment and the `run` command for executing arbitrary commands.
+The Playground runtime is ideal for quick testing or environments where Docker is unavailable. However, it lacks some features available in the Docker runtime, such as the `run` command for executing arbitrary commands.
 
 Once started with a runtime, wp-env will automatically detect and use the same runtime for subsequent commands (`stop`, `destroy`, etc.) until the environment is destroyed.
 
@@ -136,7 +135,7 @@ First, check that `wp-env` is running. One way to do this is to have Docker prin
 $ docker ps
 ```
 
-In this table, by default, you should see three entries: `wordpress` with port 8888, `tests-wordpress` with port 8889 and `mariadb` with port 3306.
+In this table, by default, you should see two entries: `wordpress` with port 8888 and `mariadb`.
 
 ### 2. Check the port number
 
@@ -214,9 +213,9 @@ While we do provide a default `wp-tests-config.php` file within the environment,
 
 ## Using `composer`, `phpunit`, and `wp-cli` tools.
 
-For ease of use, Composer, PHPUnit, and wp-cli are available for in the environment. To run these executables, use `wp-env run <env> <tool> <command>`. For example, `wp-env run cli composer install`, or `wp-env run tests-cli phpunit`. You can also access various shells like `wp-env run cli bash` or `wp-env run cli wp shell`.
+For ease of use, Composer, PHPUnit, and wp-cli are available in the environment. To run these executables, use `wp-env run <container> <tool> <command>`. For example, `wp-env run cli composer install`, or `wp-env run cli phpunit`. You can also access various shells like `wp-env run cli bash` or `wp-env run cli wp shell`.
 
-For the `env` part, `cli` and `wordpress` share a database and mapped volumes, but more tools are available in the cli environment. You should use the `tests-cli` / `tests-wordpress` environments for a separate testing database.
+The `cli` and `wordpress` containers share a database and mapped volumes, but more tools are available in the `cli` container. For test isolation, use `--config` with a separate config file to run a parallel environment (see [Running parallel environments](#running-parallel-environments)).
 
 By default, the cwd of the run command is the root of the WordPress install. If you're working on a plugin, you likely need to pass `--env-cwd` to make sure composer/phpunit commands are executed relative to the plugin you're working on. For example, `wp-env run cli --env-cwd=wp-content/plugins/gutenberg composer install`.
 
@@ -304,11 +303,14 @@ These options apply to all `wp-env` commands:
 --config   Path to a custom .wp-env.json configuration file.           [string]
 ```
 
-The `--config` option allows you to use a custom configuration file instead of the default `.wp-env.json`. This is useful for running multiple parallel environments from the same directory.
+The `--config` option allows you to use a custom configuration file instead of the default `.wp-env.json`. This is useful for running multiple parallel environments from the same directory. Each config file gets its own isolated set of Docker containers and data.
 
-When using a custom config file, the override file is derived from its name. For example:
+When using a custom config file, the override file is derived from its name by inserting `.override` before the extension. For example:
+- `--config=.wp-env.test.json` will look for `.wp-env.test.override.json`
 - `--config=staging.json` will look for `staging.override.json`
 - `--config=./configs/dev.wp-env.json` will look for `./configs/dev.wp-env.override.json`
+
+Override files for custom configs work the same way as `.wp-env.override.json` does for the default config (see [.wp-env.override.json](#wp-envoverridejson)).
 
 #### Running parallel environments
 
@@ -319,7 +321,7 @@ You can run multiple wp-env environments from the same folder by using different
 wp-env start
 
 # Start second environment with custom config on different ports
-WP_ENV_PORT=8890 WP_ENV_TESTS_PORT=8891 wp-env start --config=./staging.json
+WP_ENV_PORT=8890 wp-env start --config=./staging.json
 
 # Check status of each environment
 wp-env status
@@ -339,8 +341,7 @@ The start command installs and initializes the WordPress environment, which incl
 wp-env start
 
 Starts WordPress for development on port 8888 (​http://localhost:8888​)
-(override with WP_ENV_PORT) and tests on port 8889 (​http://localhost:8889​)
-(override with WP_ENV_TESTS_PORT). The current working directory must be a
+(override with WP_ENV_PORT). The current working directory must be a
 WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After
 first install, use the '--update' flag to download updates to mapped sources and
 to re-apply WordPress configuration options.
@@ -370,7 +371,7 @@ Options:
 ```sh
 wp-env stop
 
-Stops running WordPress for development and tests and frees the ports.
+Stops running WordPress for development and frees the ports.
 
 Options:
   --debug            Enable debug output.             [boolean] [default: false]
@@ -385,7 +386,7 @@ Resets the WordPress databases.
 
 Positionals:
   environment  Which environments' databases to reset.
-            [string] [choices: "all", "development", "tests"] [default: "tests"]
+      [string] [choices: "all", "development", "tests"] [default: "development"]
 
 Options:
   --debug    Enable debug output.                     [boolean] [default: false]
@@ -421,8 +422,8 @@ containers.
 
 Positionals:
   container  The Docker service to run the command on.
-              [string] [required] [choices: "mysql", "tests-mysql", "wordpress",
-                   "tests-wordpress", "cli", "tests-cli", "composer", "phpmyadmin"]
+            [string] [required] [choices: "mysql", "wordpress", "cli", "composer",
+                                                                     "phpmyadmin"]
   command    The command to run.                                      [required]
 
 Options:
@@ -446,29 +447,27 @@ ID      user_login      display_name    user_email      user_registered roles
 ✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
 ```
 
-#### Creating a post on the tests instance:
+#### Creating a post on the development instance:
 
 ```sh
-wp-env run tests-cli "wp post create --post_type=page --post_title='Ready'"
+wp-env run cli "wp post create --post_type=page --post_title='Ready'"
 
-ℹ Starting 'wp post create --post_type=page --post_title='Ready'' on the tests-cli container.
+ℹ Starting 'wp post create --post_type=page --post_title='Ready'' on the cli container.
 
 Success: Created post 5.
-✔ Ran `wp post create --post_type=page --post_title='Ready'` in 'tests-cli'. (in 3s 293ms)
+✔ Ran `wp post create --post_type=page --post_title='Ready'` in 'cli'. (in 3s 293ms)
 ```
 
-#### Opening the WordPress shell on the tests instance and running PHP commands:
+#### Opening the WordPress shell and running PHP commands:
 
 ```sh
-wp-env run tests-cli wp shell
-ℹ Starting 'wp shell' on the tests-cli container. Exit the WordPress shell with ctrl-c.
+wp-env run cli wp shell
+ℹ Starting 'wp shell' on the cli container. Exit the WordPress shell with ctrl-c.
 
-Starting 31911d623e75f345e9ed328b9f48cff6_mysql_1 ... done
-Starting 31911d623e75f345e9ed328b9f48cff6_tests-wordpress_1 ... done
 wp> echo( 'hello world!' );
 hello world!
 wp> ^C
-✔ Ran `wp shell` in 'tests-cli'. (in 16s 400ms)
+✔ Ran `wp shell` in 'cli'. (in 16s 400ms)
 ```
 
 #### Installing a plugin or theme on the development instance
@@ -542,7 +541,7 @@ displays PHP and Docker logs for given WordPress environment.
 
 Positionals:
   environment  Which environment to display the logs from.
-      [string] [choices: "development", "tests", "all"] [default: "development"]
+                          [string] [choices: "development"] [default: "development"]
 
 Options:
   --debug    Enable debug output.                     [boolean] [default: false]
@@ -569,7 +568,6 @@ environment:
         - xdebug: off
         - http port: 8888
         - mysql port: 13306
-        - test http port: 8889
 ```
 
 ```sh
@@ -585,7 +583,7 @@ Options:
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
 
-`.wp-env.json` supports fields for options applicable to both the tests and development instances.
+`.wp-env.json` supports the following fields:
 
 | Field                | Type           | Default                                | Description                                                                                                                      |
 |----------------------|----------------|----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------|
@@ -593,16 +591,16 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"phpVersion"`       | `string\|null` | `null`                                 | The PHP version to use. If `null` is specified, `wp-env` will use the default version used with production release of WordPress. |
 | `"plugins"`          | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                                    |
 | `"themes"`           | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                                  |
-| `"port"`             | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
-| `"testsPort"`        | `integer`      | `8889`                                 | The port number for the test site. You'll access the instance through the port: 'http://localhost:8889'.                         |
+| `"port"`             | `integer`      | `8888`                                 | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
+| `"testsEnvironment"` | `boolean`      | `false`                                | _Deprecated._ Whether to create a separate test environment with its own database and containers. Use `--config` with a separate config file instead. |
 | `"config"`           | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`         | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
-| `"mysqlPort"`        | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose. The setting is only available in the `env.development` and `env.tests` objects.                 |
+| `"mysqlPort"`        | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose.                                                                                                 |
 | `"phpmyadminPort"`   | `integer`      | `null`                                 | The port number for phpMyAdmin. If provided, you'll access phpMyAdmin through: http://localhost:<port>                           |
 | `"multisite"`        | `boolean`      | `false`                                | Whether to set up a multisite installation.                                                                                      |
 | `"lifecycleScripts"` | `Object`       | `"{}"`                                 | Mapping of commands that should be executed at certain points in the lifecycle.                                                   |
 
-_Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
+_Note: the port number environment variable (`WP_ENV_PORT`) takes precedence over the .wp-env.json value._
 
 Several types of strings can be passed into the `core`, `plugins`, `themes`, and `mappings` fields.
 
@@ -616,7 +614,7 @@ Several types of strings can be passed into the `core`, `plugins`, `themes`, and
 
 Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.
 
-Additionally, the key `env` is available to override any of the above options on an individual-environment basis. For example, take the following `.wp-env.json` file:
+Additionally, the key `env` is available to override any of the above options on the development environment. For example, take the following `.wp-env.json` file:
 
 ```json
 {
@@ -628,28 +626,20 @@ Additionally, the key `env` is available to override any of the above options on
 	"env": {
 		"development": {
 			"themes": [ "./one-theme" ]
-		},
-		"tests": {
-			"config": {
-				"KEY_1": false
-			},
-			"port": 3000,
-			"mysqlPort": 13306,
-			"phpmyadminPort": 9001
 		}
 	}
 }
 ```
 
-On the development instance, `cwd` will be mapped as a plugin, `one-theme` will be mapped as a theme, KEY_1 will be set to true, and KEY_2 will be set to false. Also note that the default port, 8888, will be used as well.
+Here, `cwd` will be mapped as a plugin, `one-theme` will be mapped as a theme, KEY_1 will be set to true, and KEY_2 will be set to false.
 
-On the tests instance, `cwd` is still mapped as a plugin, but no theme is mapped. Additionally, while KEY_2 is still set to false, KEY_1 is overridden and set to false. 3000 overrides the default port as well.
-
-This gives you a lot of power to change the options applicable to each environment.
+For running a separate test environment, use `--config` with a separate config file instead of `env.tests` (see [Running parallel environments](#running-parallel-environments)).
 
 ## .wp-env.override.json
 
 Any fields here will take precedence over .wp-env.json. This file is useful when ignored from version control, to persist local development overrides. Note that options like `plugins` and `themes` are not merged. As a result, if you set `plugins` in your override file, this will override all of the plugins listed in the base-level config. The only keys which are merged are `config` and `mappings`. This means that you can set your own wp-config values without losing any of the default values.
+
+When using `--config` with a custom config file, the override file name is derived by inserting `.override` before the extension. For example, `.wp-env.test.json` will look for `.wp-env.test.override.json`.
 
 ## Default wp-config values.
 
@@ -666,11 +656,9 @@ WP_SITEURL: 'http://localhost',
 WP_HOME: 'http://localhost',
 ```
 
-On the test instance, all of the above are still defined, but `WP_DEBUG` and `SCRIPT_DEBUG` are set to false.
-
 These can be overridden by setting a value within the `config` configuration. Setting it to `null` will prevent the constant being defined entirely.
 
-Additionally, the values referencing a URL include the specified port for the given environment. So if you set `testsPort: 3000, port: 2000`, `WP_HOME` (for example) will be `http://localhost:3000` on the tests instance and `http://localhost:2000` on the development instance.
+The values referencing a URL include the specified port. So if you set `port: 2000`, `WP_HOME` (for example) will be `http://localhost:2000`.
 
 ## Lifecycle Scripts
 
@@ -770,20 +758,18 @@ Since all plugins in the `plugins` key are activated by default, you should use 
 }
 ```
 
-### Map a plugin only in the tests environment
+### Map a plugin only in a specific environment
 
-If you need a plugin active in one environment but not the other, you can use `env.<envName>` to set options specific to one environment. Here, we activate cwd and a test plugin on the tests instance. This plugin is not activated on any other instances.
+If you need a plugin active in one environment but not another, use `--config` with a separate config file. For example, create a `test.wp-env.json` that includes an extra test plugin:
 
 ```json
 {
-	"plugins": [ "." ],
-	"env": {
-		"tests": {
-			"plugins": [ ".", "path/to/test/plugin" ]
-		}
-	}
+	"plugins": [ ".", "path/to/test/plugin" ],
+	"port": 8889
 }
 ```
+
+Then start it with `wp-env start --config=test.wp-env.json`.
 
 ### Custom Port Numbers
 
@@ -792,21 +778,15 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 ```json
 {
 	"plugins": [ "." ],
-	"port": 4013,
-	"env": {
-		"tests": {
-			"port": 4012
-		}
-	}
+	"port": 4013
 }
 ```
 
 These can also be set via environment variables:
 
-- `WP_ENV_PORT` to override the development environment's web server's port.
-- `WP_ENV_TESTS_PORT` to override the testing environment's web server's port.
-- phpMyAdmin is not enabled by default, but its port can also be overridden for the development and testing environments via `WP_ENV_PHPMYADMIN_PORT` and `WP_ENV_TESTS_PHPMYADMIN_PORT`, respectively.
-- By default, MySQL aren't exposed to the host, which means no chance of port conflicts. But these can also be overridden for the development and testing environments via `WP_ENV_MYSQL_PORT` and `WP_ENV_TESTS_MYSQL_PORT`, respectively.
+- `WP_ENV_PORT` to override the web server's port.
+- phpMyAdmin is not enabled by default, but its port can also be overridden via `WP_ENV_PHPMYADMIN_PORT`.
+- By default, MySQL isn't exposed to the host, which means no chance of port conflicts. But this can also be overridden via `WP_ENV_MYSQL_PORT`.
 
 ### Specific PHP Version
 
@@ -877,8 +857,7 @@ wp-env start --spx
 
 Once enabled, you can access the SPX web UI by visiting any page in your WordPress environment with the query parameters `?SPX_KEY=dev&SPX_UI_URI=/`. For example:
 
-- Development site: `http://localhost:8888/?SPX_KEY=dev&SPX_UI_URI=/`
-- Test site: `http://localhost:8889/?SPX_KEY=dev&SPX_UI_URI=/`
+- `http://localhost:8888/?SPX_KEY=dev&SPX_UI_URI=/`
 
 From the SPX interface, you can:
 - Enable profiling for subsequent requests

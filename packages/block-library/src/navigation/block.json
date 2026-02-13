@@ -11,6 +11,7 @@
 		"core/page-list",
 		"core/spacer",
 		"core/home-link",
+		"core/icon",
 		"core/site-title",
 		"core/site-logo",
 		"core/navigation-submenu",

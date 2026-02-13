@@ -101,7 +101,7 @@ module.exports = {
 					...temporaryWordPressInternalTypes,
 					...temporaryExternalTypes,
 					'void',
-					'JSX',
+					'React',
 				],
 			},
 		],

@@ -47,6 +47,7 @@
 		"src/**/*.scss"
 	],
 	"dependencies": {
+		"@react-spring/web": "^9.4.5",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/blob": "file:../blob",

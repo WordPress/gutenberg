@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import glob from 'fast-glob';
 import { format } from 'util';
+import glob from 'fast-glob';
 
 /**
  * WordPress dependencies
  */
+import prettierConfig from '@wordpress/prettier-config';
 import {
 	getBlockTypes,
 	parse,
@@ -18,7 +19,6 @@ import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import prettierConfig from '@wordpress/prettier-config';
 
 /**
  * Internal dependencies
@@ -66,6 +66,9 @@ describe( 'full post content fixture', () => {
 		// Form-related blocks will not be registered unless they are opted
 		// in on the experimental settings page.
 		window.__experimentalEnableFormBlocks = true;
+		// Icon block will not be registered unless are opted into on the
+		// experimental settings page.
+		window.__experimentalEnableIconBlock = true;
 		registerCoreBlocks();
 
 		if ( globalThis.IS_GUTENBERG_PLUGIN ) {

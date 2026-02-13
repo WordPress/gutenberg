@@ -206,7 +206,12 @@ function ListBox( { view, filter, onChangeView }: SearchWidgetProps ) {
 							selected={ currentValue.includes( element.value ) }
 						/>
 					) }
-					<span>{ element.label }</span>
+					<span
+						className="dataviews-filters__search-widget-listitem-value"
+						title={ element.label }
+					>
+						{ element.label }
+					</span>
 				</Composite.Hover>
 			) ) }
 		</Composite>
@@ -307,7 +312,10 @@ function ComboboxList( { view, filter, onChangeView }: SearchWidgetProps ) {
 									) }
 								/>
 							) }
-							<span>
+							<span
+								className="dataviews-filters__search-widget-listitem-value"
+								title={ element.label }
+							>
 								<Ariakit.ComboboxItemValue
 									className="dataviews-filters__search-widget-filter-combobox-item-value"
 									value={ element.label }

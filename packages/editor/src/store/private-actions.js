@@ -625,7 +625,7 @@ export const restoreRevision =
 
 		// Build the edits object with all restorable fields from the revision.
 		const edits = {
-			blocks: parse( revision.content.raw ),
+			blocks: undefined,
 			content: revision.content.raw,
 		};
 		if ( revision.title?.raw !== undefined ) {

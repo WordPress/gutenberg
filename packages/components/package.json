@@ -105,7 +105,7 @@
 		"@ariakit/test": "^0.4.7",
 		"@storybook/addon-docs": "^10.1.11",
 		"@storybook/react-vite": "^10.1.11",
-		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/jest-dom": "^6.9.1",
 		"@types/jest": "^29.5.14",
 		"@wordpress/jest-console": "file:../jest-console",
 		"snapshot-diff": "^0.10.0",

@@ -8,7 +8,11 @@ import clsx from 'clsx';
  */
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
-import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockSupport,
+	hasBlockSupport,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
 	__experimentalToggleGroupControl as ToggleGroupControl,
@@ -31,6 +35,9 @@ import { LAYOUT_DEFINITIONS } from '../layouts/definitions';
 import { useBlockSettings, useStyleOverride } from './utils';
 import { unlock } from '../lock-unlock';
 import { globalStylesDataKey } from '../store/private-keys';
+import { getVariationNameFromClass } from './block-style-variation';
+
+const VARIATION_PREFIX = 'is-style-';
 
 const layoutBlockSupportKey = 'layout';
 const { kebabCase } = unlock( componentsPrivateApis );
@@ -452,15 +459,35 @@ export const withLayoutStyles = createHigherOrderComponent(
 					);
 
 					// Get default blockGap value from global styles for use in layouts like grid.
-					// Check block-specific styles first, then fall back to root styles.
+					// Check style variation first, then block-specific styles, then fall back to root styles.
 					const globalStyles = settings[ globalStylesDataKey ];
+
+					// Check if the block has an active style variation with a blockGap value.
+					// Only check the registry if the className contains a variation class to avoid unnecessary lookups.
+					let variationBlockGapValue;
+					const className = attributes?.className;
+					if ( className?.includes( VARIATION_PREFIX ) ) {
+						const { getBlockStyles } = select( blocksStore );
+						const registeredStyles = getBlockStyles( name );
+						const variationName = getVariationNameFromClass(
+							className,
+							registeredStyles
+						);
+						variationBlockGapValue = variationName
+							? globalStyles?.blocks?.[ name ]?.variations?.[
+									variationName
+							  ]?.spacing?.blockGap
+							: undefined;
+					}
+
 					const globalBlockGapValue =
+						variationBlockGapValue ??
 						globalStyles?.blocks?.[ name ]?.spacing?.blockGap ??
 						globalStyles?.spacing?.blockGap;
 
 					return { blockGapSupport, globalBlockGapValue };
 				},
-				[ blockSupportsLayout, clientId ]
+				[ blockSupportsLayout, clientId, attributes?.className, name ]
 			);
 
 			if ( ! extraProps ) {
