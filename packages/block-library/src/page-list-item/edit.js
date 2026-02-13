@@ -42,12 +42,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 
 	// Compute submenu visibility with backward compatibility
 	// Check old attribute first, then fall back to new attribute
-	let submenuVisibility = 'hover';
-	if ( context.openSubmenusOnClick !== undefined ) {
-		submenuVisibility = context.openSubmenusOnClick ? 'click' : 'hover';
-	} else if ( context.submenuVisibility ) {
-		submenuVisibility = context.submenuVisibility;
-	}
+	const submenuVisibility = context.submenuVisibility;
 
 	const openOnClick = submenuVisibility === 'click';
 
