@@ -842,7 +842,7 @@ test.describe( 'Block Comments', () => {
 				comment: 'Test comment for reactions',
 			} );
 
-			await blockCommentUtils.addReactionToComment( 'Thumbs up' );
+			await blockCommentUtils.addReactionToComment( 'Heart' );
 
 			await expect(
 				page
@@ -970,7 +970,7 @@ test.describe( 'Block Comments', () => {
 			} );
 
 			// Add first reaction.
-			await blockCommentUtils.addReactionToComment( 'Thumbs up' );
+			await blockCommentUtils.addReactionToComment( 'Smile' );
 			await expect(
 				page
 					.getByRole( 'button', { name: 'Dismiss this notice' } )
