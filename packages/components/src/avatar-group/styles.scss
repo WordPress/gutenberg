@@ -1,0 +1,37 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.components-avatar-group {
+	display: flex;
+	align-items: center;
+
+	// Overlap subsequent avatars.
+	> .components-avatar + .components-avatar {
+		margin-inline-start: -$grid-unit-10;
+	}
+
+	// Stack avatars so the first sits on top.
+	> .components-avatar {
+		position: relative;
+
+		&:nth-child(1) {
+			z-index: 3;
+		}
+
+		&:nth-child(2) {
+			z-index: 2;
+		}
+
+		&:nth-child(3) {
+			z-index: 1;
+		}
+	}
+}
+
+.components-avatar-group__overflow {
+	margin-inline-start: $grid-unit-05;
+	font-size: $font-size-small;
+	line-height: $font-line-height-small;
+	color: $gray-700;
+	white-space: nowrap;
+}
