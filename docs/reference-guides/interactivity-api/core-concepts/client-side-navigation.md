@@ -682,8 +682,6 @@ Each entry in the cache stores not just the fetched HTML, but a fully processed 
 - **The page title** for updating the document title
 - **Server state** that was embedded in the page by WordPress
 
-<!-- IMAGE: Diagram showing the page cache structure. A box labeled "Page Cache" contains multiple entries, each showing a URL path (like "/products/", "/about/", "/contact/") mapped to a "Page Object" containing icons for vDOM, styles, scripts, title, and state. Arrows show how navigate() and prefetch() interact with this cache. -->
-
 An important detail is that the cache stores promises rather than resolved values. When a fetch begins, the router immediately stores the pending promise in the cache. This means that if multiple calls to `prefetch()` or `navigate()` target the same URL simultaneously (for example, if a user rapidly hovers over multiple links pointing to the same page), only one network request is made. All callers receive the same promise and wait for the same result.
 
 Once a page is in the cache, it remains there for the duration of the browser session. Subsequent navigations to that URL will use the cached version instantly, without any network request. This is why client-side navigation feels so fast after the initial visit — the page is already prepared and ready to render.
@@ -721,8 +719,6 @@ The attribute value serves as a unique identifier for that region. You can speci
    ```
 
 The region ID must be unique within a single page and consistent across pages that share the same region. For example, if both your "Products" page and "Product Detail" page have a sidebar, and you want that sidebar to update during navigation, both pages should define a region with the same ID (e.g., `"myPlugin/sidebar"`).
-
-<!-- IMAGE: Side-by-side comparison of two pages. Page A shows a layout with header, main content area (highlighted and labeled "data-wp-router-region='main'"), and sidebar. Page B shows a similar layout with the same regions highlighted. Arrows between them show how regions with matching IDs correspond to each other. -->
 
 **Requirements for router regions**
 
@@ -763,8 +759,6 @@ Next, the router scans this document for all elements that have both `data-wp-in
 
 For each top-level region, the router converts the HTML into a virtual DOM (vDOM) representation. The virtual DOM is a lightweight JavaScript object structure that mirrors the actual DOM but can be compared and manipulated much more efficiently. Importantly, the region element itself is included in this conversion — not just its children. This means that attributes on the region element, such as `data-wp-context`, will also be processed and updated during navigation.
 
-<!-- IMAGE: Flowchart showing the region processing pipeline. Starting with "Fetched HTML" (showing raw HTML code), an arrow leads to "Parse HTML" (DOM tree icon), then to "Find Regions" (highlighting regions in the tree), then to "Convert to vDOM" (showing a simplified tree structure), and finally to "Store in Cache" (the cache icon from earlier). -->
-
 Finally, each region's virtual DOM is stored in the page cache entry, indexed by its region ID. The cache entry now contains a map of region IDs to their corresponding virtual DOM trees.
 
 **How regions are rendered during navigation**
@@ -780,8 +774,6 @@ This is the most common case. When a region with a given ID exists on both the c
 Rather than simply replacing the entire region's HTML (which would destroy any internal state and cause a jarring visual transition), the router uses a virtual DOM diffing algorithm. This algorithm compares the current region's virtual DOM with the new region's virtual DOM and calculates the minimum set of changes needed to transform one into the other.
 
 For example, if a product list region contains 10 products on the current page and 10 different products on the new page, the diffing algorithm might determine that it only needs to update the text content and image sources within the existing list item elements — rather than destroying and recreating all 10 items from scratch. This preserves DOM state (like scroll position within the region, or focus state) and produces smoother visual transitions.
-
-<!-- IMAGE: Before/after comparison showing region update. Left side shows "Current Page" with a region containing items A, B, C (each in a box). Right side shows "Target Page" with items A, D, C. In the middle, arrows show that A and C stay in place while B transforms into D. Caption: "The diffing algorithm minimizes DOM changes." -->
 
 **Scenario 2: Region exists only on the target page with `attachTo` (create)**
 
@@ -801,8 +793,6 @@ This allows content that exists on one page but not another to appear smoothly d
 When a region exists on the current page but not on the target page, it means that content is no longer needed. The router handles this by setting the region's content to empty, effectively clearing it from the display.
 
 If the region was dynamically created via `attachTo` during a previous navigation, the entire region element is removed from the DOM. If it was part of the original page structure, the element remains but its content is cleared.
-
-<!-- IMAGE: Three-panel diagram showing the three scenarios. Panel 1 "Update": Same-shaped regions on both pages with a refresh arrow. Panel 2 "Create": Region with attachTo appears from the target page and gets inserted into current page's body. Panel 3 "Remove": Region fades out/disappears from current page. -->
 
 **What happens to HTML outside router regions?**
 
@@ -878,8 +868,6 @@ The solution is to add new `<link>` elements with their `media` attribute set to
 
 When a `<link>` element is added this way, the browser begins downloading the CSS file immediately. The router tracks when each style sheet finishes loading by listening for the `load` event. This allows it to wait until all new styles are ready before proceeding with navigation.
 
-<!-- IMAGE: Timeline diagram showing style preloading. At t=0, "Prefetch starts" and a link element with media="preload" is added. Browser download begins (shown as a progress bar). At t=200ms, download completes and "load event fires". The styles remain inactive (grayed out) until navigation actually occurs. -->
-
 **Maintaining cascade order with the Shortest Common Supersequence algorithm**
 
 When inserting new style sheets, the router must preserve the correct cascade order. It accomplishes this using an algorithm based on finding the Shortest Common Supersequence (SCS) of two sequences.
@@ -892,8 +880,6 @@ For example:
 - Shortest Common Supersequence: [A, B, C, D, E]
 
 The algorithm then determines: keep A and C in place, insert B between A and C, keep D after C, and insert E at the end.
-
-<!-- IMAGE: Visual representation of the SCS algorithm. Two rows show the "Current" sequence [A, C, D] and "Target" sequence [A, B, C, E]. Below them, the "Merged (SCS)" sequence shows [A, B, C, D, E] with color coding: A and C in blue (shared), B and E in green (inserted), D in gray (will be disabled). Arrows show how elements from both sequences map to the merged result. -->
 
 This approach ensures that:
 - Style sheets that appear in both pages remain in their correct relative order
@@ -958,8 +944,6 @@ To handle this, the router performs a recursive dependency resolution:
 5. This continues until all modules in the dependency tree have been fetched
 
 The router is smart about avoiding redundant work. If a module has already been loaded by the initial page (it appears in the initial import map), the router doesn't fetch it again — the browser already has it cached.
-
-<!-- IMAGE: Tree diagram showing module dependency resolution. At the top, "view.js" (the entry point). Arrows lead down to its dependencies: "@wordpress/interactivity" and "./components/modal.js". The interactivity module is shown grayed out with a note "Already loaded - skip". The modal.js module has its own dependencies branching below it. Each node shows whether it needs to be fetched or can be skipped. -->
 
 **Handling the import timing**
 
@@ -1081,8 +1065,6 @@ When the user clicks the link and your code calls `navigate()`:
 8. Screen reader announcement is made for accessibility.
 9. If the URL has a hash, the page scrolls to that element.
 10. Navigation is complete.
-
-<!-- IMAGE: Flowchart showing complete navigation flow. Starts with "User hovers link" flowing to "prefetch()" which branches through the prefetch steps. Then "User clicks link" leads to "navigate()" which shows the navigation steps in sequence. Key decision points are shown as diamonds (e.g., "In cache?", "Styles loaded?"). The flow ends at "Navigation complete" with a checkmark. -->
 
 #### Race condition protection
 
