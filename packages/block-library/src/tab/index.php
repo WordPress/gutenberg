@@ -8,6 +8,8 @@
 /**
  * Render callback for core/tab.
  *
+ * @since 7.0.0
+ *
  * @param array     $attributes Block attributes.
  * @param string    $content    Block content.
  *

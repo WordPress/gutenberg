@@ -10,6 +10,8 @@
  *
  * Applies IAPI directives and tab-specific attributes to the saved content.
  *
+ * @since 7.0.0
+ *
  * @param array     $attributes Block attributes.
  * @param string    $content    Block content.
  * @param \WP_Block $block      WP_Block instance.
