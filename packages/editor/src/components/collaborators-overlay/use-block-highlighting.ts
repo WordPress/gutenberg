@@ -5,7 +5,6 @@ import {
 	privateApis as coreDataPrivateApis,
 	SelectionType,
 	type SelectionWholeBlock,
-	SelectionType,
 } from '@wordpress/core-data';
 import { useEffect, useRef } from '@wordpress/element';
 
