@@ -380,7 +380,9 @@ function Navigation( {
 	} = useInnerBlocks( clientId );
 
 	const hasSubmenus = !! innerBlocks.find(
-		( block ) => block.name === 'core/navigation-submenu'
+		( block ) =>
+			block.name === 'core/navigation-submenu' ||
+			block.name === 'core/page-list'
 	);
 
 	// Check if any overlay template parts exist

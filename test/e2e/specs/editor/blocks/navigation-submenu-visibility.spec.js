@@ -125,4 +125,76 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 			await expect( contactLink ).toBeVisible();
 		} );
 	} );
+
+	test( 'Page List exposes submenu visibility UI when page-list is present', async ( {
+		editor,
+		page,
+		admin,
+		requestUtils,
+	} ) => {
+		// Create parent and child pages for testing
+		const parentPage = await requestUtils.createPage( {
+			title: 'Test Parent Page',
+			status: 'publish',
+		} );
+
+		await requestUtils.createPage( {
+			title: 'Test Child Page',
+			status: 'publish',
+			parent: parentPage.id,
+		} );
+
+		// Create a new post with navigation + page-list
+		await admin.createNewPost();
+
+		// Insert navigation block with page-list
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			innerBlocks: [
+				{
+					name: 'core/page-list',
+				},
+			],
+		} );
+
+		// Wait for navigation block to be visible
+		const navBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Navigation',
+		} );
+		await expect( navBlock ).toBeVisible();
+
+		// Wait for page list to load
+		const pageListBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Page List',
+		} );
+		await expect( pageListBlock ).toBeVisible( { timeout: 10000 } );
+
+		// Select navigation block and check settings
+		await editor.selectBlocks( navBlock );
+		await editor.openDocumentSettingsSidebar();
+
+		// Click the Settings tab
+		const settingsTab = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tab', { name: 'Settings' } );
+		await settingsTab.click();
+
+		const settingsPanel = page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'tabpanel', { name: 'Settings' } );
+
+		// Check if Submenu Visibility control exists
+		const submenuVisibilityGroup = settingsPanel.getByRole( 'radiogroup', {
+			name: 'Submenu Visibility',
+		} );
+
+		const isVisible = await submenuVisibilityGroup.isVisible();
+
+		// FIXED: Submenu Visibility control now appears when navigation contains page-list
+		// This allows users to control submenu behavior for hierarchical pages
+		expect( isVisible ).toBe( true );
+
+		// Clean up
+		await requestUtils.deleteAllPages();
+	} );
 } );

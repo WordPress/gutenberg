@@ -6,6 +6,36 @@
  */
 
 /**
+ * Returns the submenu visibility value with backward compatibility
+ * for the deprecated openSubmenusOnClick attribute.
+ *
+ * @since 6.9.0
+ *
+ * @param array $context Block context from parent Navigation block.
+ * @return string The visibility mode: 'hover', 'click', or 'always'.
+ */
+function block_core_page_list_get_submenu_visibility( $context ) {
+	// If not a child of navigation block, return default 'hover'.
+	if ( ! array_key_exists( 'showSubmenuIcon', $context ) ) {
+		return 'hover';
+	}
+
+	$deprecated_open_submenus_on_click = $context['openSubmenusOnClick'] ?? null;
+
+	// For backward compatibility, prioritize the legacy attribute if present. If it has been loaded and saved in the editor, then
+	// the deprecated attribute will be replaced by submenuVisibility.
+	if ( null !== $deprecated_open_submenus_on_click ) {
+		// Convert boolean to string: true -> 'click', false -> 'hover'.
+		return ! empty( $deprecated_open_submenus_on_click ) ? 'click' : 'hover';
+	}
+
+	$submenu_visibility = $context['submenuVisibility'] ?? null;
+
+	// Use submenuVisibility for migrated/new blocks.
+	return $submenu_visibility ?? 'hover';
+}
+
+/**
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the pages markup in the front-end when it is a descendant of navigation.
  *
@@ -332,7 +362,9 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 
 	$is_navigation_child = array_key_exists( 'showSubmenuIcon', $block->context );
 
-	$open_submenus_on_click = array_key_exists( 'openSubmenusOnClick', $block->context ) ? $block->context['openSubmenusOnClick'] : false;
+	// Get submenu visibility with backward compatibility for openSubmenusOnClick.
+	$computed_visibility    = block_core_page_list_get_submenu_visibility( $block->context );
+	$open_submenus_on_click = 'click' === $computed_visibility;
 
 	$show_submenu_icons = array_key_exists( 'showSubmenuIcon', $block->context ) ? $block->context['showSubmenuIcon'] : false;
 
