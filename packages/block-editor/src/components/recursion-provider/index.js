@@ -40,12 +40,12 @@ function addToBlockType( renderedBlocks, blockName, uniqueId ) {
  * Wrap block content with this provider and provide the same `uniqueId` prop as used
  * with `useHasRecursion`.
  *
- * @param {Object}      props
- * @param {*}           props.uniqueId  Any value that acts as a unique identifier for a block instance.
- * @param {string}      props.blockName Optional block name.
- * @param {JSX.Element} props.children  React children.
+ * @param {Object}            props
+ * @param {*}                 props.uniqueId  Any value that acts as a unique identifier for a block instance.
+ * @param {string}            props.blockName Optional block name.
+ * @param {React.JSX.Element} props.children  React children.
  *
- * @return {JSX.Element} A React element.
+ * @return {React.JSX.Element} A React element.
  */
 export function RecursionProvider( { children, uniqueId, blockName = '' } ) {
 	const previouslyRenderedBlocks = useContext( RenderedRefsContext );

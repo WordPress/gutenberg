@@ -210,7 +210,7 @@ const ConstrainedTabbingExample = () => {
 
 _Returns_
 
--   `import('react').RefCallback<Element>`: Element Ref.
+-   `React.RefCallback<Element>`: Element Ref.
 
 ### useCopyOnClick
 
@@ -220,7 +220,7 @@ Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
 
--   _ref_ `import('react').RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
+-   _ref_ `React.RefObject<string | Element | NodeListOf<Element>>`: Reference with the element.
 -   _text_ `string|Function`: The text to copy.
 -   _timeout_ `[number]`: Optional timeout to reset the returned state. 4 seconds by default.
 
@@ -239,7 +239,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').Ref<TElementType>`: A ref to assign to the target element.
+-   `React.Ref<TElementType>`: A ref to assign to the target element.
 
 ### useDebounce
 
@@ -303,7 +303,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').RefCallback<HTMLElement>`: Element Ref.
+-   `React.RefCallback<HTMLElement>`: Element Ref.
 
 ### useEvent
 
@@ -362,7 +362,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').RefCallback<HTMLElement>`: Ref callback.
+-   `React.RefCallback<HTMLElement>`: Ref callback.
 
 ### useFocusReturn
 
@@ -390,7 +390,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').RefCallback<HTMLElement>`: Element Ref.
+-   `React.RefCallback<HTMLElement>`: Element Ref.
 
 ### useInstanceId
 
@@ -421,7 +421,7 @@ _Related_
 _Parameters_
 
 -   _shortcuts_ `string[]|string`: Keyboard Shortcuts.
--   _callback_ `(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
+-   _callback_ `(e: Mousetrap.ExtendedKeyboardEvent, combo: string) => void`: Shortcut callback.
 -   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
 
 ### useMediaQuery
@@ -471,7 +471,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
+-   `React.RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
 
 ### useObservableValue
 

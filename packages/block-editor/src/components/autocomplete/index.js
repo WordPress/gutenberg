@@ -66,7 +66,7 @@ export function useBlockEditorAutocompleteProps( props ) {
  * Wrap the default Autocomplete component with one that supports a filter hook
  * for customizing its list of autocompleters.
  *
- * @type {import('react').FC}
+ * @type {React.FC}
  */
 function BlockEditorAutocomplete( props ) {
 	return <Autocomplete { ...props } completers={ useCompleters( props ) } />;

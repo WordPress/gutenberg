@@ -58,7 +58,7 @@ const EMPTY_BLOCKS = [];
  * @param {Object}   props           Component props.
  * @param {Array}    props.clientIds The client IDs of the blocks to hide.
  * @param {Function} props.onClose   Callback function invoked when the modal is closed.
- * @return {JSX.Element} The modal component.
+ * @return {React.JSX.Element} The modal component.
  */
 export default function BlockVisibilityModal( { clientIds, onClose } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );

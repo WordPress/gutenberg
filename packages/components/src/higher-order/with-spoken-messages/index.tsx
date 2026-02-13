@@ -4,7 +4,7 @@
 import { createHigherOrderComponent, useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
 
-/** @typedef {import('react').ComponentType} ComponentType */
+/** @typedef {React.ComponentType} ComponentType */
 
 /**
  * A Higher Order Component used to provide speak and debounced speak functions.

@@ -12,7 +12,7 @@ import {
 } from '@wordpress/icons';
 import { Icon } from '@wordpress/components';
 
-/** @typedef {import('react').ComponentType} ComponentType */
+/** @typedef {React.ComponentType} ComponentType */
 
 /**
  * HeadingLevelIcon props.

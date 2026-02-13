@@ -129,7 +129,7 @@ export function TaxonomyControls( { onChange, query } ) {
  * @param {number[]} props.oppositeTermIds An array with the opposite control's term ids (to exclude from suggestions).
  * @param {Function} props.onChange        Callback `onChange` function.
  * @param {string}   props.label           Label of the control.
- * @return {JSX.Element} The rendered component.
+ * @return {React.JSX.Element} The rendered component.
  */
 function TaxonomyItem( {
 	taxonomy,

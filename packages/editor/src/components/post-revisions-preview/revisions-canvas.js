@@ -153,7 +153,7 @@ function CanvasContent( { showDiff } ) {
  *
  * @param {Object}  props          Component props.
  * @param {boolean} props.showDiff Whether to show diff highlighting.
- * @return {JSX.Element} The revisions canvas component.
+ * @return {React.JSX.Element} The revisions canvas component.
  */
 export default function RevisionsCanvas( { showDiff } ) {
 	useEffect( () => {

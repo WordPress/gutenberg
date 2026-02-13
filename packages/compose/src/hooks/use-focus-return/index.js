@@ -11,7 +11,7 @@ let origin = null;
  * previously as is expected for roles like menus or dialogs.
  *
  * @param {() => void} [onFocusReturn] Overrides the default return behavior.
- * @return {import('react').RefCallback<HTMLElement>} Element Ref.
+ * @return {React.RefCallback<HTMLElement>} Element Ref.
  *
  * @example
  * ```js
@@ -29,9 +29,9 @@ let origin = null;
  * ```
  */
 function useFocusReturn( onFocusReturn ) {
-	/** @type {import('react').MutableRefObject<null | HTMLElement>} */
+	/** @type {React.MutableRefObject<null | HTMLElement>} */
 	const ref = useRef( null );
-	/** @type {import('react').MutableRefObject<null | Element>} */
+	/** @type {React.MutableRefObject<null | Element>} */
 	const focusedBeforeMount = useRef( null );
 	const onFocusReturnRef = useRef( onFocusReturn );
 	useEffect( () => {

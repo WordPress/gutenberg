@@ -214,7 +214,7 @@ describe( 'Type annotations', () => {
 	describe( 'imports, parameterized types, rest types, operator types, type predicates, index accessed types', () => {
 		const node = parse( `
 			function fn(
-				foo: import('react').bar.baz.types.ComponentType[ 'displayName' ],
+				foo: React.bar.baz.types.ComponentType[ 'displayName' ],
 				...rest: [ string | number, ...( keyof constant ) ]
 			): foo is string {}
 		` );

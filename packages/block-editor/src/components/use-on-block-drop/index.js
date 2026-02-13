@@ -18,7 +18,7 @@ import { getFilesFromDataTransfer } from '@wordpress/dom';
  */
 import { store as blockEditorStore } from '../../store';
 
-/** @typedef {import('react').SyntheticEvent} SyntheticEvent */
+/** @typedef {React.SyntheticEvent} SyntheticEvent */
 /** @typedef {import('./types').WPDropOperation} WPDropOperation */
 
 /**
