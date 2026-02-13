@@ -60,15 +60,8 @@ function BulkSelectionCheckbox< Item >( {
 			indeterminate={ ! areAllSelected && hasSelection }
 			onChange={ () => {
 				if ( areAllSelected ) {
-					// Deselect all - remove loaded items from selection
-					onChangeSelection(
-						selection.filter(
-							( id ) =>
-								! data.some(
-									( item ) => id === getItemId( item )
-								)
-						)
-					);
+					// Deselect all - clear entire selection
+					onChangeSelection( EMPTY_ARRAY );
 				} else {
 					// Select all - merge loaded items into selection
 					const selectionSet = new Set( [
