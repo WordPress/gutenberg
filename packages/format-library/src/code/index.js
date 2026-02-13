@@ -27,25 +27,51 @@ export const code = {
 			return value;
 		}
 
-		if ( start - 2 < 0 ) {
+		const searchStartIndex = start - 2;
+
+		// First, try to find a backtick before (closing backtick scenario).
+		if ( searchStartIndex >= 0 ) {
+			const indexBefore = text.lastIndexOf( BACKTICK, searchStartIndex );
+
+			if ( indexBefore !== -1 ) {
+				const startIndex = indexBefore;
+				const endIndex = searchStartIndex;
+
+				if ( startIndex !== endIndex ) {
+					value = remove( value, startIndex, startIndex + 1 );
+					value = remove( value, endIndex, endIndex + 1 );
+					value = applyFormat(
+						value,
+						{ type: name },
+						startIndex,
+						endIndex
+					);
+
+					return value;
+				}
+			}
+		}
+
+		// If not found before, try to find a backtick after (opening backtick scenario).
+		const indexAfter = text.indexOf( BACKTICK, start );
+
+		if ( indexAfter === -1 ) {
 			return value;
 		}
 
-		const indexBefore = text.lastIndexOf( BACKTICK, start - 2 );
-		if ( indexBefore === -1 ) {
-			return value;
-		}
-
-		const startIndex = indexBefore;
-		const endIndex = start - 2;
+		const startIndex = start - 1;
+		const endIndex = indexAfter;
 
 		if ( startIndex === endIndex ) {
 			return value;
 		}
 
-		value = remove( value, startIndex, startIndex + 1 );
+		// Remove closing backtick first (at higher index) to avoid index shifting issues
 		value = remove( value, endIndex, endIndex + 1 );
-		value = applyFormat( value, { type: name }, startIndex, endIndex );
+		// Then remove opening backtick
+		value = remove( value, startIndex, startIndex + 1 );
+		// Apply format (note: endIndex - 1 because we removed the closing backtick first)
+		value = applyFormat( value, { type: name }, startIndex, endIndex - 1 );
 
 		return value;
 	},
