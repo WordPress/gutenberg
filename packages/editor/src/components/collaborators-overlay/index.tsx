@@ -26,8 +26,6 @@ interface Props {
  * @return The CollaboratorsOverlay component
  */
 export function CollaboratorsOverlay( { postId, postType }: Props ) {
-	// A single instance of the cursor registry is shared between CollaboratorsPresence
-	// and CollaboratorsOverlay. A ref is used to persist the instance across re-renders.
 	const [ cursorRegistry ] = useState( createCursorRegistry );
 
 	return (
