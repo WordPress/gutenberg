@@ -25,29 +25,10 @@ $waveform-player-height: 100px;
 		min-width: $waveform-player-height;
 		background: currentColor;
 		margin: 0;
-
-		// Focus styles for keyboard accessibility.
-		&:focus {
-			outline: 2px solid currentColor;
-			outline-offset: 2px;
-		}
-
-		&:focus:not(:focus-visible) {
-			outline: none;
-		}
-
-		&:focus-visible {
-			outline: 2px solid currentColor;
-			outline-offset: 2px;
-		}
 	}
 
 	.waveform-track.waveform-align-bottom .waveform-btn {
 		margin-bottom: 0;
-	}
-
-	.waveform-progress {
-		background: color-mix(in srgb, currentColor 30%, transparent);
 	}
 
 	// Override WaveformPlayer's inline text colors to inherit from the block.
@@ -79,10 +60,5 @@ $waveform-player-height: 100px;
 		&.wp-block-playlist__tracklist-show-numbers {
 			counter-reset: playlist-track;
 		}
-	}
-
-	li.block-list-appender.block-list-appender {
-		position: initial;
-		margin-top: var(--wp--preset--spacing--30, 1em);
 	}
 }
