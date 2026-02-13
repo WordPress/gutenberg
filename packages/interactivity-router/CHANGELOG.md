@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Update cached styles for re-fetched pages. ([#75097](https://github.com/WordPress/gutenberg/pull/75097))
+
 ## 2.39.0 (2026-01-29)
 
 ### Bug Fixes

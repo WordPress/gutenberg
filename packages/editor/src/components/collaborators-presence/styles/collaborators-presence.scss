@@ -1,0 +1,83 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+
+.editor-collaborators-presence {
+	display: flex;
+	align-items: center;
+	height: $button-size-compact;
+	min-width: 0;
+	background: $gray-100;
+	border-radius: $grid-unit-05;
+	margin-right: $grid-unit-10;
+
+	&:hover {
+		background-color: $gray-200;
+	}
+}
+
+.editor-collaborators-presence__button.editor-collaborators-presence__button.components-button {
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	position: relative;
+	padding: $grid-unit-05;
+	border-radius: $grid-unit-05;
+	height: 100%;
+	box-sizing: border-box;
+	color: $gray-800;
+	background: transparent;
+
+	// Override default button hover
+	&:hover {
+		background: transparent;
+		color: $gray-800;
+	}
+
+	// Override pressed state - keep it like document bar style
+	&.is-pressed,
+	&.is-pressed:hover {
+		background: $gray-300;
+		color: $gray-800;
+	}
+
+	// Fix focus ring to be contained within the button
+	&:focus:not(:active) {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) var(--wp-admin-theme-color, #007cba);
+		outline: none;
+	}
+
+	// Avatar remaining count
+	.editor-collaborators-presence__remaining {
+		margin-right: $grid-unit-05 + 2;
+	}
+
+	// Avatar styles
+	.editor-collaborators-presence__avatar {
+		margin-left: -16px;
+		flex-shrink: 0;
+		border-color: $gray-100;
+
+		&:nth-child(1) {
+			margin-left: 0;
+			z-index: 3;
+		}
+
+		&:nth-child(2) {
+			z-index: 2;
+		}
+
+		&:nth-child(3) {
+			z-index: 1;
+		}
+	}
+
+	// Avatar hover state
+	.editor-collaborators-presence:hover & .editor-collaborators-presence__avatar {
+		border-color: $gray-300;
+	}
+
+	// Avatar pressed state
+	&.is-pressed .editor-collaborators-presence__avatar {
+		border-color: $gray-300;
+	}
+}

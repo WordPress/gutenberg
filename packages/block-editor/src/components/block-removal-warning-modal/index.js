@@ -80,7 +80,6 @@ export function BlockRemovalWarningModal( { rules } ) {
 				</div>
 				{ requireConfirmation && (
 					<CheckboxControl
-						__nextHasNoMarginBottom
 						label={ __( 'I understand the consequences' ) }
 						checked={ confirmed }
 						onChange={ setConfirmed }

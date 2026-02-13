@@ -15,10 +15,10 @@ import { isAppleOS } from '@wordpress/keycodes';
  *
  * @typedef {Object} WPKeyboardShortcutConfig
  *
- * @property {boolean}                                [bindGlobal] Handle keyboard events anywhere including inside textarea/input fields.
- * @property {string}                                 [eventName]  Event name used to trigger the handler, defaults to keydown.
- * @property {boolean}                                [isDisabled] Disables the keyboard handler if the value is true.
- * @property {import('react').RefObject<HTMLElement>} [target]     React reference to the DOM element used to catch the keyboard event.
+ * @property {boolean}                      [bindGlobal] Handle keyboard events anywhere including inside textarea/input fields.
+ * @property {string}                       [eventName]  Event name used to trigger the handler, defaults to keydown.
+ * @property {boolean}                      [isDisabled] Disables the keyboard handler if the value is true.
+ * @property {React.RefObject<HTMLElement>} [target]     React reference to the DOM element used to catch the keyboard event.
  */
 
 /**
@@ -26,9 +26,9 @@ import { isAppleOS } from '@wordpress/keycodes';
  *
  * @see https://craig.is/killing/mice#api.bind for information about the `callback` parameter.
  *
- * @param {string[]|string}                                                       shortcuts Keyboard Shortcuts.
- * @param {(e: import('mousetrap').ExtendedKeyboardEvent, combo: string) => void} callback  Shortcut callback.
- * @param {WPKeyboardShortcutConfig}                                              options   Shortcut options.
+ * @param {string[]|string}                                             shortcuts Keyboard Shortcuts.
+ * @param {(e: Mousetrap.ExtendedKeyboardEvent, combo: string) => void} callback  Shortcut callback.
+ * @param {WPKeyboardShortcutConfig}                                    options   Shortcut options.
  */
 function useKeyboardShortcut(
 	shortcuts,

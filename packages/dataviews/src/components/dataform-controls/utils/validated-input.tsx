@@ -34,6 +34,7 @@ export default function ValidatedText< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	type,
 	prefix,
 	suffix,
@@ -57,6 +58,7 @@ export default function ValidatedText< Item >( {
 	return (
 		<ValidatedInputControl
 			required={ !! isValid.required }
+			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }

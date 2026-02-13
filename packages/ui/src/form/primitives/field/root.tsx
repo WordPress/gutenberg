@@ -6,7 +6,7 @@ import type { FieldRootProps } from './types';
 import { Stack } from '../../../stack';
 
 const DEFAULT_RENDER = ( props: React.ComponentProps< typeof Stack > ) => (
-	<Stack { ...props } direction="column" gap="xs" />
+	<Stack { ...props } direction="column" gap="sm" />
 );
 
 /**

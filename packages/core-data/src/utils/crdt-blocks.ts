@@ -10,12 +10,13 @@ import fastDeepEqual from 'fast-deep-equal/es6/index.js';
 // @ts-expect-error No exported types.
 import { getBlockTypes } from '@wordpress/blocks';
 import { RichTextData } from '@wordpress/rich-text';
-import { Y, Delta } from '@wordpress/sync';
+import { Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies
  */
 import { createYMap, type YMapRecord, type YMapWrap } from './crdt-utils';
+import { Delta } from '../sync';
 
 interface BlockAttributes {
 	[ key: string ]: unknown;
@@ -472,10 +473,10 @@ let localDoc: Y.Doc;
  * @param updatedValue   The updated value.
  * @param cursorPosition The position of the cursor after the change occurs.
  */
-function mergeRichTextUpdate(
+export function mergeRichTextUpdate(
 	blockYText: Y.Text,
 	updatedValue: string,
-	cursorPosition: number | null
+	cursorPosition: number | null = null
 ): void {
 	// Gutenberg does not use Yjs shared types natively, so we can only subscribe
 	// to changes from store and apply them to Yjs types that we create and

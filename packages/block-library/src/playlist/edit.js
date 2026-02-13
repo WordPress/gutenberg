@@ -147,7 +147,6 @@ const PlaylistEdit = ( {
 		showImages,
 		showArtists,
 		currentTrack,
-		tagName: TagName = showNumbers ? 'ol' : 'ul',
 	} = attributes;
 	const [ trackListIndex, setTrackListIndex ] = useState( 0 );
 	const blockProps = useBlockProps();
@@ -421,7 +420,6 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show Tracklist' ) }
 							onChange={ toggleAttribute( 'showTracklist' ) }
 							checked={ showTracklist }
@@ -438,7 +436,6 @@ const PlaylistEdit = ( {
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __(
 										'Show artist name in Tracklist'
 									) }
@@ -457,7 +454,6 @@ const PlaylistEdit = ( {
 								}
 							>
 								<ToggleControl
-									__nextHasNoMarginBottom
 									label={ __( 'Show number in Tracklist' ) }
 									onChange={ toggleAttribute(
 										'showNumbers'
@@ -476,7 +472,6 @@ const PlaylistEdit = ( {
 						}
 					>
 						<ToggleControl
-							__nextHasNoMarginBottom
 							label={ __( 'Show images' ) }
 							onChange={ toggleAttribute( 'showImages' ) }
 							checked={ showImages }
@@ -490,7 +485,6 @@ const PlaylistEdit = ( {
 					>
 						<SelectControl
 							__next40pxDefaultSize
-							__nextHasNoMarginBottom
 							label={ __( 'Order' ) }
 							value={ order }
 							options={ [
@@ -511,9 +505,14 @@ const PlaylistEdit = ( {
 					/>
 				</Disabled>
 				{ showTracklist && (
-					<TagName className="wp-block-playlist__tracklist">
+					<ol
+						className={ clsx( 'wp-block-playlist__tracklist', {
+							'wp-block-playlist__tracklist-show-numbers':
+								showNumbers,
+						} ) }
+					>
 						{ innerBlocksProps.children }
-					</TagName>
+					</ol>
 				) }
 				<Caption
 					attributes={ attributes }

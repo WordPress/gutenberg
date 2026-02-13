@@ -30,6 +30,7 @@ import DisableNonPageContentBlocks from './disable-non-page-content-blocks';
 import NavigationBlockEditingMode from './navigation-block-editing-mode';
 import { useHideBlocksFromInserter } from './use-hide-blocks-from-inserter';
 import useCommands from '../commands';
+import useUploadSaveLock from './use-upload-save-lock';
 import BlockRemovalWarnings from '../block-removal-warnings';
 import StartPageOptions from '../start-page-options';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
@@ -351,6 +352,9 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 
 		// Register the editor commands.
 		useCommands();
+
+		// Lock post saving when media uploads are in progress (experimental feature).
+		useUploadSaveLock();
 
 		if ( ! isReady || ! mode ) {
 			return null;

@@ -170,13 +170,13 @@
 		}
 
 		[data-orientation="horizontal"] & {
-			padding-inline: calc(4 * var(--wpds-dimension-base)); /* TODO: Use or create new control/interactive padding token */
-			height: calc(12 * var(--wpds-dimension-base)); /* TODO: Can we eliminate or hard-code? */
+			padding-inline: var(--wpds-dimension-padding-lg);
+			height: 48px; /* TODO: use semantic size/height tokens when available */
 			scroll-margin: 24px;
 
 			&::after {
 				content: "";
-				inset: calc(3 * var(--wpds-dimension-base)); /* TODO: Use or create new control/interactive padding token */
+				inset: var(--wpds-dimension-padding-md);
 			}
 		}
 
@@ -185,18 +185,17 @@
 
 			&::after {
 				/*
-				 * Add enough inset to prevent the focus ring (which is 1.5px thick)
-				 * from being visually clipped by the tablist.
+				 * Prevent clipping the focus ring at the tablist edge.
+				 * Use rounding, as the focus ring width may have sub-pixel values
+				 * depending on the screen pixel ratio.
 				 */
-				inset-inline: 2px;
+				inset-inline: round(up, var(--wpds-border-width-focus), 1px);
 			}
 		}
 
 		[data-orientation="vertical"] & {
-			padding:
-				calc(2 * var(--wpds-dimension-base))
-				calc(3 * var(--wpds-dimension-base)); /* TODO: Use or create new control/interactive padding token */
-			min-height: calc(10 * var(--wpds-dimension-base)); /* TODO: Can we eliminate or hard-code? */
+			padding: var(--wpds-dimension-padding-sm) var(--wpds-dimension-padding-md);
+			min-height: 40px;  /* TODO: use semantic size/height tokens when available */
 		}
 
 		[data-orientation="vertical"][data-select-on-move="false"] &::after {
@@ -222,7 +221,7 @@
 
 	.tab-chevron {
 		flex-shrink: 0;
-		margin-inline-end: calc(var(--wpds-dimension-base) * -1); /* TODO: Use or create new control/interactive padding token */
+		margin-inline-end: calc(var(--wpds-dimension-gap-xs) * -1);
 
 		[data-orientation="horizontal"] & {
 			display: none;

@@ -20,6 +20,7 @@ import {
 import { useResourcePermissions } from '@wordpress/core-data';
 import { plus } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -37,22 +38,25 @@ import { useEntityBinding } from '../shared/use-entity-binding';
  * @return {{ type?: string, subtype?: string }} Search query params.
  */
 export function getSuggestionsQuery( type, kind ) {
+	// How many results to show initially and per search.
+	const perPage = 20;
+
 	switch ( type ) {
 		case 'post':
 		case 'page':
-			return { type: 'post', subtype: type };
+			return { type: 'post', subtype: type, perPage };
 		case 'category':
-			return { type: 'term', subtype: 'category' };
+			return { type: 'term', subtype: 'category', perPage };
 		case 'tag':
-			return { type: 'term', subtype: 'post_tag' };
+			return { type: 'term', subtype: 'post_tag', perPage };
 		case 'post_format':
-			return { type: 'post-format' };
+			return { type: 'post-format', perPage };
 		default:
 			if ( kind === 'taxonomy' ) {
-				return { type: 'term', subtype: type };
+				return { type: 'term', subtype: type, perPage };
 			}
 			if ( kind === 'post-type' ) {
-				return { type: 'post', subtype: type };
+				return { type: 'post', subtype: type, perPage };
 			}
 			return {
 				// for custom link which has no type
@@ -60,7 +64,7 @@ export function getSuggestionsQuery( type, kind ) {
 				initialSuggestionsSearchOptions: {
 					type: 'post',
 					subtype: 'page',
-					perPage: 20,
+					perPage,
 				},
 			};
 	}
@@ -74,6 +78,10 @@ function UnforwardedLinkUI( props, ref ) {
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ addingPage, setAddingPage ] = useState( false );
 	const [ shouldFocusPane, setShouldFocusPane ] = useState( null );
+	// Tracks search input value. Only read when LinkControl remounts (Back from
+	// Create page) — ref updates don't cause re-renders, so we never pass a changed
+	// inputValue to LinkControl (which causes warnings since it's uncontrolled).
+	const searchInputValueRef = useRef( '' );
 	const linkControlWrapperRef = useRef();
 	const addPageButtonRef = useRef();
 	const addBlockButtonRef = useRef();
@@ -108,6 +116,8 @@ function UnforwardedLinkUI( props, ref ) {
 		// Return to main Link UI and focus the first focusable element
 		setAddingPage( false );
 		setShouldFocusPane( true );
+		// Clear search input value
+		searchInputValueRef.current = '';
 	};
 
 	const dialogTitleId = useInstanceId(
@@ -177,6 +187,10 @@ function UnforwardedLinkUI( props, ref ) {
 						noURLSuggestion={ !! type }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 						onChange={ props.onChange }
+						onInputChange={ ( value ) => {
+							searchInputValueRef.current = value;
+						} }
+						inputValue={ searchInputValueRef.current }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
 						handleEntities={ isBoundEntityAvailable }
@@ -230,7 +244,12 @@ function UnforwardedLinkUI( props, ref ) {
 						setShouldFocusPane( addPageButtonRef );
 					} }
 					onPageCreated={ handlePageCreated }
-					initialTitle={ link?.url || '' }
+					initialTitle={
+						searchInputValueRef.current &&
+						! isURL( searchInputValueRef.current )
+							? searchInputValueRef.current
+							: ''
+					}
 				/>
 			) }
 		</Popover>

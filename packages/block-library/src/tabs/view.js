@@ -87,11 +87,12 @@ const { actions: privateActions, state: privateState } = store(
 			},
 			/**
 			 * The value of the tabindex attribute.
+			 * Only the active tab should be in the tab sequence.
 			 *
-			 * @type {false|string}
+			 * @type {number}
 			 */
 			get tabIndexAttribute() {
-				return privateState.isActiveTab ? -1 : 0;
+				return privateState.isActiveTab ? 0 : -1;
 			},
 		},
 		actions: {
@@ -101,33 +102,26 @@ const { actions: privateActions, state: privateState } = store(
 			 * @param {KeyboardEvent} event The keydown event.
 			 */
 			handleTabKeyDown: withSyncEvent( ( event ) => {
-				// If this is the enter key then lets get the tab index from context and set the active tab to that index.
-				const { isVertical } = getContext();
-				if ( event.key === 'Enter' ) {
-					const { tabIndex } = privateState;
-					if ( tabIndex !== null ) {
-						privateActions.setActiveTab( tabIndex );
-					}
-				} else if ( event.key === 'ArrowRight' && ! isVertical ) {
-					const { tabIndex } = privateState;
-					if ( tabIndex !== null ) {
-						privateActions.setActiveTab( tabIndex + 1 );
-					}
+				const context = getContext();
+				const { isVertical } = context;
+				const { tabIndex } = privateState;
+
+				if ( tabIndex === null ) {
+					return;
+				}
+
+				if ( event.key === 'ArrowRight' && ! isVertical ) {
+					event.preventDefault();
+					privateActions.moveFocus( tabIndex + 1 );
 				} else if ( event.key === 'ArrowLeft' && ! isVertical ) {
-					const { tabIndex } = privateState;
-					if ( tabIndex !== null ) {
-						privateActions.setActiveTab( tabIndex - 1 );
-					}
+					event.preventDefault();
+					privateActions.moveFocus( tabIndex - 1 );
 				} else if ( event.key === 'ArrowDown' && isVertical ) {
-					const { tabIndex } = privateState;
-					if ( tabIndex !== null ) {
-						privateActions.setActiveTab( tabIndex + 1 );
-					}
+					event.preventDefault();
+					privateActions.moveFocus( tabIndex + 1 );
 				} else if ( event.key === 'ArrowUp' && isVertical ) {
-					const { tabIndex } = privateState;
-					if ( tabIndex !== null ) {
-						privateActions.setActiveTab( tabIndex - 1 );
-					}
+					event.preventDefault();
+					privateActions.moveFocus( tabIndex - 1 );
 				}
 			} ),
 			/**
@@ -144,16 +138,55 @@ const { actions: privateActions, state: privateState } = store(
 				}
 			} ),
 			/**
+			 * Moves focus to a specific tab without activating it.
+			 *
+			 * @param {number} tabIndex The index to move focus to.
+			 */
+			moveFocus: ( tabIndex ) => {
+				const { tabsList } = privateState;
+
+				if ( ! tabsList || tabsList.length === 0 ) {
+					return;
+				}
+
+				let newIndex = tabIndex;
+				if ( newIndex < 0 ) {
+					newIndex = tabsList.length - 1;
+				} else if ( newIndex >= tabsList.length ) {
+					newIndex = 0;
+				}
+
+				const tabId = tabsList[ newIndex ].id;
+				const tabElement = document.getElementById( 'tab__' + tabId );
+				if ( tabElement ) {
+					tabElement.focus();
+				}
+			},
+			/**
 			 * Sets the active tab index (internal implementation).
 			 *
 			 * @param {number}  tabIndex    The index of the active tab.
 			 * @param {boolean} scrollToTab Whether to scroll to the tab element.
 			 */
 			setActiveTab: ( tabIndex, scrollToTab = false ) => {
+				const { tabsList } = privateState;
+
+				if ( ! tabsList || tabsList.length === 0 ) {
+					return;
+				}
+
+				let newIndex = tabIndex;
+				if ( newIndex < 0 ) {
+					newIndex = 0;
+				} else if ( newIndex >= tabsList.length ) {
+					newIndex = tabsList.length - 1;
+				}
+
 				const context = getContext();
-				context.activeTabIndex = tabIndex;
+				context.activeTabIndex = newIndex;
+
 				if ( scrollToTab ) {
-					const tabId = privateState.tabsList[ tabIndex ].id;
+					const tabId = tabsList[ newIndex ].id;
 					const tabElement = document.getElementById( tabId );
 					if ( tabElement ) {
 						setTimeout( () => {
@@ -173,6 +206,7 @@ const { actions: privateActions, state: privateState } = store(
 				if ( tabsList.length === 0 ) {
 					return;
 				}
+
 				const { hash } = window.location;
 				const tabId = hash.replace( '#', '' );
 				const tabIndex = tabsList.findIndex( ( t ) => t.id === tabId );

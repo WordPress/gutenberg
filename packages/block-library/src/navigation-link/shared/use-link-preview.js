@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { safeDecodeURI } from '@wordpress/url';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
@@ -93,10 +93,17 @@ function computeBadges( {
 	}
 
 	// Status badge
-	if ( ! url ) {
+	if ( hasBinding && ! isEntityAvailable ) {
+		badges.push( {
+			label: sprintf(
+				/* translators: %s is the entity type (e.g., "page", "post", "category") */
+				__( 'Missing %s' ),
+				type
+			),
+			intent: 'error',
+		} );
+	} else if ( ! url ) {
 		badges.push( { label: __( 'No link selected' ), intent: 'error' } );
-	} else if ( hasBinding && ! isEntityAvailable ) {
-		badges.push( { label: __( 'Deleted' ), intent: 'error' } );
 	} else if ( entityStatus ) {
 		const statusMap = {
 			publish: { label: __( 'Published' ), intent: 'success' },

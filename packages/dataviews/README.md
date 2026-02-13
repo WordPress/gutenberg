@@ -14,6 +14,19 @@ Install the module
 npm install @wordpress/dataviews --save
 ```
 
+## Stylesheet Dependencies
+
+DataViews depends on stylesheets from `@wordpress/components` and `@wordpress/theme`. In a WordPress admin page context, these are loaded automatically. For applications outside WordPress, you will need to include these stylesheets:
+
+```bash
+npm install @wordpress/components @wordpress/theme
+```
+
+```tsx
+import '@wordpress/components/build-style/style.css';
+import '@wordpress/theme/design-tokens.css';
+```
+
 ## `DataViews`
 
 <div class="callout callout-info">At <a href="https://wordpress.github.io/gutenberg/">WordPress Gutenberg's Storybook</a> there's an <a href="https://wordpress.github.io/gutenberg/?path=/docs/dataviews-dataviews--docs">example implementation of the Dataviews component</a>.</div>
@@ -464,6 +477,33 @@ Optional. Pass an object with a list of `perPageSizes` to control the available 
 #### `empty`: React node
 
 An element to display when the `data` prop is empty. Defaults to `<p>No results</p>`.
+
+#### `onReset`: `( () => void ) | false`
+
+Callback function to reset the view to its default state, or `false` to indicate the view is not modified.
+
+-   Type: `function` or `false`
+-   Optional
+
+This prop controls the "Reset view" button in the view configuration dropdown:
+
+-   When `undefined` (not provided): No reset functionality is shown. Use this when view persistence is not supported.
+-   When `false`: The "Reset view" button is shown but disabled. Use this when view persistence is supported but the current view matches the default (not modified).
+-   When a function: The "Reset view" button is shown and enabled. A blue dot indicator appears on the view options button to signal that the view has been modified. The function is called when the user clicks the reset button.
+
+Example:
+
+```jsx
+const { view, setView, isModified, resetToDefault } = useView( 'my-view-key' );
+
+<DataViews
+	data={ data }
+	view={ view }
+	onChangeView={ setView }
+	onReset={ isModified ? resetToDefault : false }
+	// ...other props
+/>
+```
 
 ### Styling
 
@@ -1202,7 +1242,7 @@ Example:
 	id: 'title',
 	type: 'text',
 	header: (
-		<Stack direction="row" gap="2xs" justify="start">
+		<Stack direction="row" gap="xs" justify="start">
 			<Icon icon={ icon } />
 			<span>Title</span>
 		</Stack>

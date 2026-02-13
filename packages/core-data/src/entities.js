@@ -374,7 +374,7 @@ async function loadPostTypeEntities() {
 				 *
 				 * @param {import('@wordpress/sync').CRDTDoc}  ydoc
 				 * @param {import('@wordpress/sync').ObjectID} objectId
-				 * @return {import('@wordpress/sync').AwarenessState} AwarenessState instance
+				 * @return {import('@wordpress/sync').Awareness} Awareness instance
 				 */
 				createAwareness: ( ydoc, objectId ) => {
 					const kind = 'postType';

@@ -56,13 +56,13 @@ function ViewGrid< Item >( {
 			{
 				// Render multiple groups.
 				hasData && groupField && dataByGroup && (
-					<Stack direction="column" gap="md">
+					<Stack direction="column" gap="lg">
 						{ Array.from( dataByGroup.entries() ).map(
 							( [ groupName, groupItems ] ) => (
 								<Stack
 									direction="column"
 									key={ groupName }
-									gap="xs"
+									gap="sm"
 								>
 									<h3 className="dataviews-view-grid__group-header">
 										{ view.groupBy?.showLabel === false

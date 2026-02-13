@@ -83,7 +83,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 		} );
 
 		mockGetPatternBySlug.mockReturnValue( {
-			name: 'gutenberg/navigation-overlay',
+			name: 'core/navigation-overlay',
 			title: 'Navigation Overlay',
 			content:
 				'<!-- wp:group --><div class="wp-block-group"><!-- wp:navigation-overlay-close /--><!-- wp:navigation /--></div><!-- /wp:group -->',
@@ -199,7 +199,7 @@ describe( 'useCreateOverlayTemplatePart', () => {
 		} );
 
 		expect( mockGetPatternBySlug ).toHaveBeenCalledWith(
-			'gutenberg/navigation-overlay'
+			'core/navigation-overlay'
 		);
 
 		expect( parse ).toHaveBeenCalledWith( mockGetPatternBySlug().content, {

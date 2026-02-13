@@ -198,18 +198,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-customizable-navigation-overlays',
-		__( 'Customizable Navigation Overlays', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables custom mobile overlay design and content control for Navigation blocks, allowing you to create flexible, professional menu experiences.', 'gutenberg' ),
-			'id'    => 'gutenberg-customizable-navigation-overlays',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-extensible-site-editor',
 		__( 'Extensible Site Editor', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -252,7 +240,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enables a REST API endpoint for accessing SVG icons.', 'gutenberg' ),
+			'label' => __( 'Enables a REST API endpoint for accessing SVG icons as well as the associated Icon block.', 'gutenberg' ),
 			'id'    => 'gutenberg-svg-icon-registry',
 		)
 	);

@@ -18,6 +18,7 @@ export default function Textarea< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	config,
 	validity,
 }: DataFormControlProps< Item > ) {
@@ -34,6 +35,7 @@ export default function Textarea< Item >( {
 	return (
 		<ValidatedTextareaControl
 			required={ !! isValid.required }
+			markWhenOptional={ markWhenOptional }
 			customValidity={ getCustomValidity( isValid, validity ) }
 			label={ label }
 			placeholder={ placeholder }

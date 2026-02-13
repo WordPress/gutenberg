@@ -14,7 +14,12 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useMergeRefs, useRefEffect, useDisabled } from '@wordpress/compose';
+import {
+	useMergeRefs,
+	useRefEffect,
+	useDisabled,
+	useViewportMatch,
+} from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
@@ -25,6 +30,8 @@ import { useWritingFlow } from '../writing-flow';
 import { getCompatibilityStyles } from './get-compatibility-styles';
 import { useScaleCanvas } from './use-scale-canvas';
 import { store as blockEditorStore } from '../../store';
+
+const ViewportWidthProvider = useViewportMatch.__experimentalWidthProvider;
 
 function bubbleEvent( event, Constructor, frame ) {
 	const init = {};
@@ -115,7 +122,7 @@ function Iframe( {
 		};
 	}, [] );
 	const { styles = '', scripts = '' } = resolvedAssets;
-	/** @type {[Document, import('react').Dispatch<Document>]} */
+	/** @type {[Document, React.Dispatch<Document>]} */
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
 	const [ before, writingFlowRef, after ] = useWritingFlow();
@@ -227,6 +234,7 @@ function Iframe( {
 	const {
 		contentResizeListener,
 		containerResizeListener,
+		containerWidth,
 		isZoomedOut,
 		scaleContainerWidth,
 	} = useScaleCanvas( {
@@ -347,7 +355,9 @@ function Iframe( {
 						>
 							{ contentResizeListener }
 							<StyleProvider document={ iframeDocument }>
-								{ children }
+								<ViewportWidthProvider value={ containerWidth }>
+									{ children }
+								</ViewportWidthProvider>
 							</StyleProvider>
 						</body>,
 						iframeDocument.documentElement

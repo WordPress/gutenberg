@@ -17,7 +17,7 @@ import { unlock } from '../../lock-unlock';
 /**
  * Slider component for navigating revisions.
  *
- * @return {JSX.Element} The revisions slider component.
+ * @return {React.JSX.Element} The revisions slider component.
  */
 function RevisionsSlider() {
 	const { revisions, isLoading, currentRevisionId } = useSelect(
@@ -104,7 +104,6 @@ function RevisionsSlider() {
 
 	return (
 		<RangeControl
-			__nextHasNoMarginBottom
 			__next40pxDefaultSize
 			className="editor-revisions-header__slider"
 			hideLabelFromVision

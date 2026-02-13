@@ -23,7 +23,7 @@ import type {
 	Field,
 	NormalizedForm,
 	NormalizedFormField,
-	NormalizedField,
+	FieldLayoutProps,
 } from '../../../types';
 import { DataFormLayout } from '../data-form-layout';
 import { DEFAULT_LAYOUT } from '../normalize-form';
@@ -31,6 +31,7 @@ import SummaryButton from './summary-button';
 import useFormValidity from '../../../hooks/use-form-validity';
 import useReportValidity from '../../../hooks/use-report-validity';
 import DataFormContext from '../../dataform-context';
+import useFieldFromFormField from './utils/use-field-from-form-field';
 
 function ModalContent< Item >( {
 	data,
@@ -117,13 +118,19 @@ function ModalContent< Item >( {
 					onChange={ handleOnChange }
 					validity={ validity }
 				>
-					{ ( FieldLayout, childField, childFieldValidity ) => (
+					{ (
+						FieldLayout,
+						childField,
+						childFieldValidity,
+						markWhenOptional
+					) => (
 						<FieldLayout
 							key={ childField.id }
 							data={ modalData }
 							field={ childField }
 							onChange={ handleOnChange }
 							hideLabelFromVision={ form.fields.length < 2 }
+							markWhenOptional={ markWhenOptional }
 							validity={ childFieldValidity }
 						/>
 					) }
@@ -132,7 +139,7 @@ function ModalContent< Item >( {
 			<Stack
 				direction="row"
 				className="dataforms-layouts-panel__modal-footer"
-				gap="sm"
+				gap="md"
 			>
 				<Spacer style={ { flex: 1 } } />
 				<Button
@@ -158,37 +165,32 @@ function PanelModal< Item >( {
 	data,
 	field,
 	onChange,
-	labelPosition,
-	summaryFields,
-	fieldDefinition,
-	onClose: onCloseCallback,
-	touched,
-}: {
-	data: Item;
-	field: NormalizedFormField;
-	onChange: ( value: any ) => void;
-	labelPosition: 'side' | 'top' | 'none';
-	summaryFields: NormalizedField< Item >[];
-	fieldDefinition: NormalizedField< Item >;
-	onClose?: () => void;
-	touched: boolean;
-} ) {
+	validity,
+}: FieldLayoutProps< Item > ) {
+	const [ touched, setTouched ] = useState( false );
+
 	const [ isOpen, setIsOpen ] = useState( false );
 
-	const fieldLabel = !! field.children ? field.label : fieldDefinition?.label;
+	const { fieldDefinition, fieldLabel, summaryFields } =
+		useFieldFromFormField( field );
+	if ( ! fieldDefinition ) {
+		return null;
+	}
 
 	const handleClose = () => {
 		setIsOpen( false );
-		onCloseCallback?.();
+		setTouched( true );
 	};
 
 	return (
 		<>
 			<SummaryButton
-				summaryFields={ summaryFields }
 				data={ data }
-				labelPosition={ labelPosition }
+				field={ field }
 				fieldLabel={ fieldLabel }
+				summaryFields={ summaryFields }
+				validity={ validity }
+				touched={ touched }
 				disabled={ fieldDefinition.readOnly === true }
 				onClick={ () => setIsOpen( true ) }
 				aria-expanded={ isOpen }

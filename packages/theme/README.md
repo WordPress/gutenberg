@@ -26,7 +26,7 @@ This separation allows the design system to maintain consistency while providing
 
 Design tokens are the visual design atoms of a design system. They are named entities that store visual design attributes like colors, spacing, typography, and shadows. They serve as a single source of truth that bridges design and development, ensuring consistency across platforms and making it easy to maintain and evolve the visual language of an application.
 
-Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-bg-interactive-brand-strong` or `--wpds-dimension-padding-surface-md` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
+Rather than hardcoding values like `#3858e9` or `16px` throughout your code, tokens provide semantic names like `--wpds-color-bg-interactive-brand-strong` or `--wpds-dimension-padding-2xl` that describe the purpose and context of the value. This makes code more maintainable and allows the design system to evolve. When a token's value changes, all components using that token automatically reflect the update.
 
 #### Structure
 
@@ -89,7 +89,7 @@ Semantic tokens follow a consistent naming pattern:
 
 | Value                               | Description          |
 | ----------------------------------- | -------------------- |
-| `2xs`, `xs`, `sm`, `md`, `lg`, `xl` | Size scale modifiers |
+| `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` | Size scale modifiers |
 
 #### Color Token Modifiers
 

@@ -1655,4 +1655,40 @@ test.describe( 'List (@firefox)', () => {
 			},
 		] );
 	} );
+
+	test( 'should select the list wrapper with select all in empty list item', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/list' } );
+
+		// Verify the list item is selected after insertion.
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlock()?.name
+				)
+			)
+			.toBe( 'core/list-item' );
+
+		// The list item is empty. Press cmd+a to select all, then again to select the list block.
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+
+		// Verify the list block is selected using the block-editor store.
+		await expect
+			.poll( () =>
+				page.evaluate(
+					() =>
+						window.wp.data
+							.select( 'core/block-editor' )
+							.getSelectedBlock()?.name
+				)
+			)
+			.toBe( 'core/list' );
+	} );
 } );

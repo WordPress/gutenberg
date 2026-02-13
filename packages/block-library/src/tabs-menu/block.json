@@ -1,6 +1,5 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"__experimental": true,
 	"apiVersion": 3,
 	"name": "core/tabs-menu",
 	"title": "Tabs Menu",
@@ -8,12 +7,8 @@
 	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
-	"parent": [
-		"core/tabs"
-	],
-	"allowedBlocks": [
-		"core/tabs-menu-item"
-	],
+	"parent": [ "core/tabs" ],
+	"allowedBlocks": [ "core/tabs-menu-item" ],
 	"usesContext": [
 		"core/tabs-list",
 		"core/tabs-id",

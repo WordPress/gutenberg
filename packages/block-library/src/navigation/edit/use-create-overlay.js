@@ -27,7 +27,7 @@ export default function useCreateOverlayTemplatePart( overlayTemplateParts ) {
 	const pattern = useSelect(
 		( select ) =>
 			unlock( select( blockEditorStore ) ).getPatternBySlug(
-				'gutenberg/navigation-overlay'
+				'core/navigation-overlay'
 			),
 		[]
 	);

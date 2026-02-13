@@ -4,7 +4,9 @@
 
 ### Bug Fixes
 
+-   Playground runtime now supports zip archive themes, matching Docker runtime behavior. ([#75140](https://github.com/WordPress/gutenberg/issues/75140)).
 -   Add MySQL healthcheck to prevent race condition where WordPress containers start before MySQL is fully initialized. Uses MariaDB's official `healthcheck.sh` script with `MARIADB_AUTO_UPGRADE` to support both new and existing installations.
+-   Remove non-functional `WP_ENV_MULTISITE` config.
 
 ### Breaking Changes
 
@@ -13,6 +15,8 @@
 ### New Features
 
 -   Added `status` command that shows comprehensive environment information including running state, URLs, ports, configuration, and paths.
+-   Added `--config` global option to specify a custom configuration file path, enabling multiple parallel environments from the same directory.
+-   Added `testsEnvironment` configuration option. Set to `false` to skip creating test containers (`tests-mysql`, `tests-wordpress`, `tests-cli`, `tests-phpmyadmin`), reducing resource usage when test isolation is achieved via separate config files.
 
 ## 10.39.0 (2026-01-29)
 

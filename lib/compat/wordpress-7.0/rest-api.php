@@ -49,25 +49,23 @@ function gutenberg_modify_wp_template_part_post_type_args_7_0( $args ) {
 add_filter( 'register_wp_template_part_post_type_args', 'gutenberg_modify_wp_template_part_post_type_args_7_0' );
 
 /**
- * Registers the 'navigation-overlay' template part area when the experiment is enabled.
+ * Registers the 'navigation-overlay' template part area.
  *
  * @param array $areas Array of template part area definitions.
  * @return array Modified array of template part area definitions.
  */
-if ( gutenberg_is_experiment_enabled( 'gutenberg-customizable-navigation-overlays' ) ) {
-	function gutenberg_register_overlay_template_part_area( $areas ) {
-		$areas[] = array(
-			'area'        => 'navigation-overlay',
-			'label'       => __( 'Navigation Overlay', 'gutenberg' ),
-			'description' => __( 'Custom overlay area for navigation overlays.', 'gutenberg' ),
-			'icon'        => 'overlay',
-			'area_tag'    => 'div',
-		);
+function gutenberg_register_overlay_template_part_area( $areas ) {
+	$areas[] = array(
+		'area'        => 'navigation-overlay',
+		'label'       => __( 'Navigation Overlay', 'gutenberg' ),
+		'description' => __( 'Custom overlay area for navigation overlays.', 'gutenberg' ),
+		'icon'        => 'navigation-overlay',
+		'area_tag'    => 'div',
+	);
 
-		return $areas;
-	}
-	add_filter( 'default_wp_template_part_areas', 'gutenberg_register_overlay_template_part_area' );
+	return $areas;
 }
+add_filter( 'default_wp_template_part_areas', 'gutenberg_register_overlay_template_part_area' );
 
 /**
  * Adds user global styles link relation to all theme responses.
@@ -110,3 +108,24 @@ function gutenberg_rest_theme_global_styles_link_rel_7_0( $response, $theme ) {
 	return $response;
 }
 add_filter( 'rest_prepare_theme', 'gutenberg_rest_theme_global_styles_link_rel_7_0', 10, 2 );
+
+/**
+ * Overrides the default REST controller for autosaves to fix real-time
+ * collaboration on draft posts.
+ *
+ * When RTC is enabled, draft autosaves from all users update the post directly
+ * instead of creating per-user autosave revisions depending on post lock and
+ * assigned author.
+ *
+ * Only overrides when autosave_rest_controller_class is not explicitly set,
+ * i.e. when WP_REST_Autosaves_Controller would be used by default. Post types
+ * with their own specialized autosave controller (e.g. templates) are left alone.
+ */
+function gutenberg_override_autosaves_rest_controller( $args ) {
+	if ( empty( $args['autosave_rest_controller_class'] ) ) {
+		$args['autosave_rest_controller_class'] = 'Gutenberg_REST_Autosaves_Controller';
+	}
+	return $args;
+}
+
+add_filter( 'register_post_type_args', 'gutenberg_override_autosaves_rest_controller', 10, 1 );

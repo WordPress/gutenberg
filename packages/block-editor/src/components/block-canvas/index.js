@@ -70,6 +70,7 @@ export function ExperimentalBlockCanvas( {
 					style={ {
 						height: '100%',
 						width: '100%',
+						overflow: 'auto',
 					} }
 				>
 					{ children }

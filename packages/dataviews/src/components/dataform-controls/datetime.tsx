@@ -43,6 +43,7 @@ function CalendarDateTimeControl< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	validity,
 }: DataFormControlProps< Item > ) {
 	const { id, label, description, setValue, getValue, isValid } = field;
@@ -55,7 +56,8 @@ function CalendarDateTimeControl< Item >( {
 	} );
 
 	const inputControlRef = useRef< HTMLInputElement >( null );
-	const validationTimeoutRef = useRef< ReturnType< typeof setTimeout > >();
+	const validationTimeoutRef =
+		useRef< ReturnType< typeof setTimeout > >( undefined );
 	const previousFocusRef = useRef< Element | null >( null );
 
 	const onChangeCallback = useCallback(
@@ -155,10 +157,16 @@ function CalendarDateTimeControl< Item >( {
 		timezone: { string: timezoneString },
 	} = getSettings();
 
-	const displayLabel =
-		isValid?.required && ! hideLabelFromVision
-			? `${ label } (${ __( 'Required' ) })`
-			: label;
+	let displayLabel = label;
+	if ( isValid?.required && ! markWhenOptional && ! hideLabelFromVision ) {
+		displayLabel = `${ label } (${ __( 'Required' ) })`;
+	} else if (
+		! isValid?.required &&
+		markWhenOptional &&
+		! hideLabelFromVision
+	) {
+		displayLabel = `${ label } (${ __( 'Optional' ) })`;
+	}
 
 	return (
 		<BaseControl
@@ -167,7 +175,7 @@ function CalendarDateTimeControl< Item >( {
 			help={ description }
 			hideLabelFromVision={ hideLabelFromVision }
 		>
-			<Stack direction="column" gap="md">
+			<Stack direction="column" gap="lg">
 				{ /* Calendar widget */ }
 				<DateCalendar
 					style={ { width: '100%' } }
@@ -208,6 +216,7 @@ export default function DateTime< Item >( {
 	field,
 	onChange,
 	hideLabelFromVision,
+	markWhenOptional,
 	operator,
 	validity,
 }: DataFormControlProps< Item > ) {
@@ -230,6 +239,7 @@ export default function DateTime< Item >( {
 			field={ field }
 			onChange={ onChange }
 			hideLabelFromVision={ hideLabelFromVision }
+			markWhenOptional={ markWhenOptional }
 			validity={ validity }
 		/>
 	);

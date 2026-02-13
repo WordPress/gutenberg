@@ -65,8 +65,6 @@ import NavigationMenuDeleteControl from './navigation-menu-delete-control';
 import useNavigationNotice from './use-navigation-notice';
 import OverlayMenuPreview from './overlay-menu-preview';
 import OverlayPanel from './overlay-panel';
-import OverlayVisibilityControl from './overlay-visibility-control';
-import OverlayMenuPreviewButton from './overlay-menu-preview-button';
 import useConvertClassicToBlockMenu, {
 	CLASSIC_MENU_CONVERSION_ERROR,
 	CLASSIC_MENU_CONVERSION_PENDING,
@@ -87,14 +85,13 @@ import {
 	DEFAULT_BLOCK,
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 } from '../constants';
-import { getSubmenuVisibility } from '../utils/get-submenu-visibility';
 
 /**
  * Component that renders the Add page button for the Navigation block.
  *
  * @param {Object} props          Component props.
  * @param {string} props.clientId Block client ID.
- * @return {JSX.Element|null} The Add page button component or null if not applicable.
+ * @return {React.JSX.Element} The Add page button component or null if not applicable.
  */
 function NavigationAddPageButton( { clientId } ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
@@ -339,10 +336,6 @@ function Navigation( {
 	const hasAlreadyRendered = isPreviewMode ? false : recursionDetected;
 
 	const blockEditingMode = useBlockEditingMode();
-
-	const isOverlayExperimentEnabled =
-		typeof window !== 'undefined' &&
-		window.__experimentalNavigationOverlays === true;
 
 	// Preload classic menus, so that they don't suddenly pop-in when viewing
 	// the Select Menu dropdown.
@@ -726,12 +719,10 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
-	const computedSubmenuVisibility = getSubmenuVisibility( attributes );
-
 	const submenuAccessibilityNotice =
 		! showSubmenuIcon &&
-		computedSubmenuVisibility !== 'click' &&
-		computedSubmenuVisibility !== 'always'
+		submenuVisibility !== 'click' &&
+		submenuVisibility !== 'always'
 			? __(
 					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
 			  )
@@ -755,7 +746,7 @@ function Navigation( {
 	const stylingInspectorControls = (
 		<>
 			<InspectorControls>
-				{ ( ! isOverlayExperimentEnabled || hasSubmenus ) && (
+				{ hasSubmenus && (
 					<ToolsPanel
 						label={ __( 'Display' ) }
 						resetAll={ () => {
@@ -769,50 +760,6 @@ function Navigation( {
 						} }
 						dropdownMenuProps={ dropdownMenuProps }
 					>
-						{ ! isOverlayExperimentEnabled && (
-							<>
-								{ isResponsive && (
-									<OverlayMenuPreviewButton
-										isResponsive={ isResponsive }
-										overlayMenuPreview={
-											overlayMenuPreview
-										}
-										setOverlayMenuPreview={
-											setOverlayMenuPreview
-										}
-										hasIcon={ hasIcon }
-										icon={ icon }
-										setAttributes={ setAttributes }
-										overlayMenuPreviewClasses={
-											overlayMenuPreviewClasses
-										}
-										overlayMenuPreviewId={
-											overlayMenuPreviewId
-										}
-										containerStyle={ {
-											gridColumn: 'span 2',
-										} }
-									/>
-								) }
-
-								<ToolsPanelItem
-									hasValue={ () => overlayMenu !== 'mobile' }
-									label={ __( 'Overlay Visibility' ) }
-									onDeselect={ () =>
-										setAttributes( {
-											overlayMenu: 'mobile',
-										} )
-									}
-									isShownByDefault
-								>
-									<OverlayVisibilityControl
-										overlayMenu={ overlayMenu }
-										setAttributes={ setAttributes }
-									/>
-								</ToolsPanelItem>
-							</>
-						) }
-
 						{ hasSubmenus && (
 							<>
 								<h3 className="wp-block-navigation__submenu-header">
@@ -831,7 +778,6 @@ function Navigation( {
 									isShownByDefault
 								>
 									<ToggleGroupControl
-										__nextHasNoMarginBottom
 										__next40pxDefaultSize
 										label={ __( 'Submenu Visibility' ) }
 										value={ submenuVisibility }
@@ -883,8 +829,8 @@ function Navigation( {
 										} )
 									}
 									isDisabled={
-										computedSubmenuVisibility === 'click' ||
-										computedSubmenuVisibility === 'always'
+										submenuVisibility === 'click' ||
+										submenuVisibility === 'always'
 									}
 									isShownByDefault
 								>
@@ -896,10 +842,8 @@ function Navigation( {
 											} );
 										} }
 										disabled={
-											computedSubmenuVisibility ===
-												'click' ||
-											computedSubmenuVisibility ===
-												'always'
+											submenuVisibility === 'click' ||
+											submenuVisibility === 'always'
 										}
 										label={ __( 'Show arrow' ) }
 									/>
@@ -920,7 +864,7 @@ function Navigation( {
 					</ToolsPanel>
 				) }
 			</InspectorControls>
-			{ isOverlayExperimentEnabled && ! isWithinOverlay && (
+			{ ! isWithinOverlay && (
 				<InspectorControls>
 					<OverlayPanel
 						overlayMenu={ overlayMenu }

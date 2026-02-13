@@ -43,7 +43,7 @@ function TabBlockMover( {
 		__unstableMarkNextChangeAsNotPersistent,
 	} = useDispatch( blockEditorStore );
 
-	const { tabPanelsClientId, orientation } = useSelect(
+	const { tabPanelClientId, orientation } = useSelect(
 		( select ) => {
 			const { getBlockRootClientId, getBlockAttributes } =
 				select( blockEditorStore );
@@ -53,7 +53,7 @@ function TabBlockMover( {
 				? getBlockAttributes( tabsMenuClientId )
 				: null;
 			return {
-				tabPanelsClientId: getBlockRootClientId( tabClientId ),
+				tabPanelClientId: getBlockRootClientId( tabClientId ),
 				orientation:
 					tabsMenuAttributes?.layout?.orientation || 'horizontal',
 			};
@@ -88,7 +88,7 @@ function TabBlockMover( {
 
 	// Handle moving tab and updating active index to follow the moved tab
 	const handleMoveUp = () => {
-		moveBlocksUp( [ tabClientId ], tabPanelsClientId );
+		moveBlocksUp( [ tabClientId ], tabPanelClientId );
 		// Update editorActiveTabIndex to follow the moved tab
 		if ( tabsClientId ) {
 			__unstableMarkNextChangeAsNotPersistent();
@@ -99,7 +99,7 @@ function TabBlockMover( {
 	};
 
 	const handleMoveDown = () => {
-		moveBlocksDown( [ tabClientId ], tabPanelsClientId );
+		moveBlocksDown( [ tabClientId ], tabPanelClientId );
 		// Update editorActiveTabIndex to follow the moved tab
 		if ( tabsClientId ) {
 			__unstableMarkNextChangeAsNotPersistent();
@@ -204,7 +204,7 @@ export default function Controls( {
 				<ColorGradientSettingsDropdown
 					settings={ [
 						{
-							label: __( 'Active Background' ),
+							label: __( 'Active background' ),
 							colorValue:
 								activeBackgroundColor?.color ??
 								customActiveBackgroundColor,
@@ -216,7 +216,7 @@ export default function Controls( {
 							},
 						},
 						{
-							label: __( 'Active Text' ),
+							label: __( 'Active text' ),
 							colorValue:
 								activeTextColor?.color ?? customActiveTextColor,
 							onColorChange: ( value ) => {
@@ -227,7 +227,7 @@ export default function Controls( {
 							},
 						},
 						{
-							label: __( 'Hover Background' ),
+							label: __( 'Hover background' ),
 							colorValue:
 								hoverBackgroundColor?.color ??
 								customHoverBackgroundColor,
@@ -239,7 +239,7 @@ export default function Controls( {
 							},
 						},
 						{
-							label: __( 'Hover Text' ),
+							label: __( 'Hover text' ),
 							colorValue:
 								hoverTextColor?.color ?? customHoverTextColor,
 							onColorChange: ( value ) => {

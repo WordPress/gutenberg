@@ -51,13 +51,13 @@ export function DataViewsPagination() {
 				className="dataviews-pagination"
 				justify="end"
 				align="center"
-				gap="lg"
+				gap="xl"
 			>
 				<Stack
 					direction="row"
 					justify="flex-start"
 					align="center"
-					gap="2xs"
+					gap="xs"
 					className="dataviews-pagination__page-select"
 				>
 					{ createInterpolateElement(
@@ -90,7 +90,7 @@ export function DataViewsPagination() {
 						}
 					) }
 				</Stack>
-				<Stack direction="row" gap="2xs" align="center">
+				<Stack direction="row" gap="xs" align="center">
 					<Button
 						onClick={ () =>
 							onChangeView( {

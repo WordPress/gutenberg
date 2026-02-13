@@ -517,11 +517,12 @@ export function moveBlockToPosition(
  * Only allowed blocks are inserted. The action may fail silently for blocks that are not allowed or if
  * a templateLock is active on the block list.
  *
- * @param {Object}   block           Block object to insert.
- * @param {?number}  index           Index at which block should be inserted.
- * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
- * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
- * @param {?Object}  meta            Optional Meta values to be passed to the action object.
+ * @param {Object}    block           Block object to insert.
+ * @param {?number}   index           Index at which block should be inserted.
+ * @param {?string}   rootClientId    Optional root client ID of block list on which to insert.
+ * @param {?boolean}  updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
+ * @param {0|-1|null} initialPosition Initial focus position. Setting it to null prevent focusing the inserted block.
+ * @param {?Object}   meta            Optional Meta values to be passed to the action object.
  *
  * @return {Object} Action object.
  */
@@ -530,6 +531,7 @@ export function insertBlock(
 	index,
 	rootClientId,
 	updateSelection,
+	initialPosition,
 	meta
 ) {
 	return insertBlocks(
@@ -537,7 +539,7 @@ export function insertBlock(
 		index,
 		rootClientId,
 		updateSelection,
-		0,
+		initialPosition,
 		meta
 	);
 }
@@ -2140,5 +2142,55 @@ export function unsetBlockEditingMode( clientId = '' ) {
 	return {
 		type: 'UNSET_BLOCK_EDITING_MODE',
 		clientId,
+	};
+}
+
+/**
+ * Sets which List View panel should be opened.
+ *
+ * @param {string|null} clientId The client ID of the panel to open, or null to close all.
+ * @return {Object} Action object.
+ */
+export function __unstableSetOpenListViewPanel( clientId ) {
+	return {
+		type: 'SET_OPEN_LIST_VIEW_PANEL',
+		clientId,
+	};
+}
+
+/**
+ * Sets all List View panels to be opened.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableSetAllListViewPanelsOpen() {
+	return {
+		type: 'SET_ALL_LIST_VIEW_PANELS_OPEN',
+	};
+}
+
+/**
+ * Toggles a List View panel open/closed state.
+ *
+ * @param {string}  clientId The client ID of the panel to toggle.
+ * @param {boolean} isOpen   Whether the panel should be open.
+ * @return {Object} Action object.
+ */
+export function __unstableToggleListViewPanel( clientId, isOpen ) {
+	return {
+		type: 'TOGGLE_LIST_VIEW_PANEL',
+		clientId,
+		isOpen,
+	};
+}
+
+/**
+ * Increments the List View expand revision to force re-render.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableIncrementListViewExpandRevision() {
+	return {
+		type: 'INCREMENT_LIST_VIEW_EXPAND_REVISION',
 	};
 }

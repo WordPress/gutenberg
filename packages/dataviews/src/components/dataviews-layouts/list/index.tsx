@@ -219,7 +219,7 @@ function ListItem< Item >( {
 	const usedActions = eligibleActions?.length > 0 && (
 		<Stack
 			direction="row"
-			gap="sm"
+			gap="md"
 			className="dataviews-view-list__item-actions"
 		>
 			{ primaryAction && (
@@ -312,7 +312,7 @@ function ListItem< Item >( {
 				</div>
 				<Stack
 					direction="row"
-					gap="sm"
+					gap="md"
 					justify="start"
 					align="flex-start"
 					style={ { flex: 1, minWidth: 0 } }
@@ -320,7 +320,7 @@ function ListItem< Item >( {
 					{ renderedMediaField }
 					<Stack
 						direction="column"
-						gap="2xs"
+						gap="xs"
 						className="dataviews-view-list__field-wrapper"
 					>
 						<Stack direction="row" align="center">
@@ -550,7 +550,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 			>
 				<Stack
 					direction="column"
-					gap="md"
+					gap="lg"
 					className={ clsx( 'dataviews-view-list', className ) }
 				>
 					{ Array.from( dataByGroup.entries() ).map(
@@ -558,7 +558,7 @@ export default function ViewList< Item >( props: ViewListProps< Item > ) {
 							<Stack
 								direction="column"
 								key={ groupName }
-								gap="xs"
+								gap="sm"
 							>
 								<h3 className="dataviews-view-list__group-header">
 									{ view.groupBy?.showLabel === false

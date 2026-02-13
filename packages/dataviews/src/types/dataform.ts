@@ -165,5 +165,6 @@ export interface FieldLayoutProps< Item > {
 	field: NormalizedFormField;
 	onChange: ( value: any ) => void;
 	hideLabelFromVision?: boolean;
+	markWhenOptional?: boolean;
 	validity?: FieldValidity;
 }

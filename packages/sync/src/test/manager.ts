@@ -33,18 +33,6 @@ import type {
 	RecordHandlers,
 	SyncConfig,
 } from '../types';
-import { AwarenessState } from '../awareness/awareness-state';
-
-/**
- * A minimal mock awareness class for testing.
- */
-class MockAwarenessState extends AwarenessState {
-	protected equalityFieldChecks = {};
-
-	protected onSetUp(): void {
-		// No-op for testing.
-	}
-}
 
 // Mock dependencies.
 jest.mock( '../providers', () => ( {
@@ -96,7 +84,7 @@ describe( 'SyncManager', () => {
 			),
 			supports: {},
 			createAwareness: jest.fn(
-				( ydoc: Y.Doc ) => new MockAwarenessState( ydoc )
+				( ydoc: Y.Doc ) => new Awareness( ydoc )
 			),
 		};
 
@@ -492,6 +480,9 @@ describe( 'SyncManager', () => {
 			jest.clearAllMocks();
 			manager.update( 'post', '456', { title: 'Updated' }, 'local' );
 
+			// Wait a tick for yieldToEventLoop.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalled();
 		} );
 	} );
@@ -520,6 +511,9 @@ describe( 'SyncManager', () => {
 			const changes = { title: 'Updated Title' };
 			manager.update( 'post', '123', changes, 'local-editor' );
 
+			// Wait a tick for yieldToEventLoop.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
 			// Verify that applyChangesToCRDTDoc was called with the changes.
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(
 				expect.any( Y.Doc ),
@@ -533,11 +527,14 @@ describe( 'SyncManager', () => {
 			expect( metadataMap.get( SAVED_BY_KEY ) ).toBeUndefined();
 		} );
 
-		it( 'does not update when entity is not loaded', () => {
+		it( 'does not update when entity is not loaded', async () => {
 			const manager = createSyncManager();
 
 			const changes = { title: 'Updated Title' };
 			manager.update( 'post', '999', changes, 'local-editor' );
+
+			// Wait a tick for yieldToEventLoop.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			expect(
 				mockSyncConfig.applyChangesToCRDTDoc
@@ -576,6 +573,9 @@ describe( 'SyncManager', () => {
 
 			manager.update( 'post', '123', changes, customOrigin );
 
+			// Wait a tick for yieldToEventLoop.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
+
 			expect( transactSpy ).toHaveBeenCalledWith(
 				expect.any( Function ),
 				customOrigin
@@ -608,6 +608,9 @@ describe( 'SyncManager', () => {
 			manager.update( 'post', '123', changes, 'local-editor', {
 				isSave: true,
 			} );
+
+			// Wait a tick for yieldToEventLoop.
+			await new Promise( ( resolve ) => setTimeout( resolve, 0 ) );
 
 			// Verify that applyChangesToCRDTDoc was called with the changes.
 			expect( mockSyncConfig.applyChangesToCRDTDoc ).toHaveBeenCalledWith(

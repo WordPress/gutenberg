@@ -28,6 +28,11 @@ const meta: Meta< typeof TextControl > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Prefer `InputControl` when placing buttons or icons in the prefix/suffix slots.',
+		},
 	},
 };
 export default meta;

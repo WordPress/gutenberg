@@ -219,7 +219,7 @@ export function processItem( id: QueueItemId ) {
 				onSuccess?.( [ attachment ] );
 			}
 
-			// dispatch.removeItem( id );
+			dispatch.removeItem( id );
 			dispatch.revokeBlobUrls( id );
 
 			if ( batchId && select.isBatchUploaded( batchId ) ) {
