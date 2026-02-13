@@ -502,7 +502,7 @@ return array(
 		'filePath' => 'library/format-uppercase.svg',
 	),
 	'full-height'                    => array(
-		'label'    => _x( 'Full height', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'Full Height', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/full-height.svg',
 	),
 	'fullscreen'                     => array(
