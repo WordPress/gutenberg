@@ -79,6 +79,15 @@ export function ExperimentalBlockCanvas( {
 				__unstableContentRef={ localRef }
 				style={ { height, display: 'flex' } }
 			>
+				<BlockCanvasCover.Slot fillProps={ { containerRef: localRef } }>
+					{ ( covers ) =>
+						covers.map( ( cover, index ) => (
+							<BlockCanvasCoverWrapper key={ index }>
+								{ cover }
+							</BlockCanvasCoverWrapper>
+						) )
+					}
+				</BlockCanvasCover.Slot>
 				<EditorStyles
 					styles={ styles }
 					scope=":where(.editor-styles-wrapper)"
@@ -96,15 +105,6 @@ export function ExperimentalBlockCanvas( {
 				>
 					{ children }
 				</WritingFlow>
-				<BlockCanvasCover.Slot fillProps={ { containerRef: localRef } }>
-					{ ( covers ) =>
-						covers.map( ( cover, index ) => (
-							<BlockCanvasCoverWrapper key={ index }>
-								{ cover }
-							</BlockCanvasCoverWrapper>
-						) )
-					}
-				</BlockCanvasCover.Slot>
 			</BlockTools>
 		);
 	}
@@ -124,8 +124,6 @@ export function ExperimentalBlockCanvas( {
 				} }
 				name="editor-canvas"
 			>
-				<EditorStyles styles={ styles } />
-				{ children }
 				<BlockCanvasCover.Slot fillProps={ { containerRef: localRef } }>
 					{ ( covers ) =>
 						covers.map( ( cover, index ) => (
@@ -135,6 +133,8 @@ export function ExperimentalBlockCanvas( {
 						) )
 					}
 				</BlockCanvasCover.Slot>
+				<EditorStyles styles={ styles } />
+				{ children }
 			</Iframe>
 		</BlockTools>
 	);
