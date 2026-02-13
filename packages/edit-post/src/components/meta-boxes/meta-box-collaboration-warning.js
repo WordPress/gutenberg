@@ -6,6 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -68,12 +69,24 @@ function extractMetaKey( fieldName ) {
  *
  * @param {HTMLElement} metaBoxElement The meta box DOM element.
  * @param {Object}      registeredMeta Object whose keys are REST-registered meta key names.
+ * @param {string}      id             The meta box ID.
  * @return {boolean} True if the meta box has non-REST-registered fields.
  */
-function hasNonRestFields( metaBoxElement, registeredMeta ) {
+function hasNonRestFields( metaBoxElement, registeredMeta, id ) {
 	const formFields = metaBoxElement.querySelectorAll(
 		'input[name], select[name], textarea[name]'
 	);
+
+	const extraIgnoredFields = applyFilters(
+		'editPost.metaBoxCollaborationWarning.ignoredFields',
+		[],
+		id
+	);
+
+	const ignoredFields = new Set( [
+		...KNOWN_CORE_FIELDS,
+		...extraIgnoredFields,
+	] );
 
 	const registeredKeys = new Set( Object.keys( registeredMeta ) );
 
@@ -96,8 +109,8 @@ function hasNonRestFields( metaBoxElement, registeredMeta ) {
 
 		const metaKey = extractMetaKey( name );
 
-		// Skip known WordPress core fields.
-		if ( KNOWN_CORE_FIELDS.has( metaKey ) ) {
+		// Skip known WordPress core fields and extra ignored fields.
+		if ( ignoredFields.has( metaKey ) ) {
 			continue;
 		}
 
@@ -203,15 +216,20 @@ export default function MetaBoxCollaborationWarning( { id } ) {
 		}
 
 		// Custom Fields meta box can edit arbitrary meta — always flag.
+		let shouldWarn;
 		if ( id === 'postcustom' ) {
-			updateWarningElement( metaBoxElement, id, true );
+			shouldWarn = true;
 		} else {
-			const shouldWarn = hasNonRestFields(
-				metaBoxElement,
-				registeredMeta
-			);
-			updateWarningElement( metaBoxElement, id, shouldWarn );
+			shouldWarn = hasNonRestFields( metaBoxElement, registeredMeta, id );
 		}
+
+		shouldWarn = applyFilters(
+			'editPost.metaBoxCollaborationWarning.shouldShow',
+			shouldWarn,
+			id
+		);
+
+		updateWarningElement( metaBoxElement, id, shouldWarn );
 
 		return () => {
 			const warningEl = document.getElementById(
