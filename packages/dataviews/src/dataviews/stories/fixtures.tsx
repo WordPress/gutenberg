@@ -347,6 +347,7 @@ export const data: SpaceObject[] = [
 		date: '2022-02-15',
 		datetime: '2022-02-15T08:30:00Z',
 		email: 'titan@example.com',
+		author: 'saturn_system_researcher',
 	},
 	{
 		id: 21,
@@ -362,6 +363,7 @@ export const data: SpaceObject[] = [
 		date: '2023-03-20',
 		datetime: '2023-03-20T11:45:00Z',
 		email: 'enceladus@example.com',
+		author: 'cryovolcanism_observer',
 	},
 	{
 		id: 22,
@@ -377,6 +379,7 @@ export const data: SpaceObject[] = [
 		date: '2021-07-12',
 		datetime: '2021-07-12T15:20:00Z',
 		email: 'mimas@example.com',
+		author: 'impact_crater_analyst',
 	},
 	{
 		id: 23,
@@ -392,6 +395,7 @@ export const data: SpaceObject[] = [
 		date: '2020-09-25',
 		datetime: '2020-09-25T13:15:00Z',
 		email: 'charon@example.com',
+		author: 'pluto_system_mapper',
 	},
 	{
 		id: 24,
@@ -407,6 +411,7 @@ export const data: SpaceObject[] = [
 		date: '2019-06-14',
 		datetime: '2019-06-14T07:45:00Z',
 		email: 'phobos@example.com',
+		author: 'martian_surface_cartographer',
 	},
 	{
 		id: 25,
@@ -422,6 +427,7 @@ export const data: SpaceObject[] = [
 		date: '2018-11-30',
 		datetime: '2018-11-30T16:00:00Z',
 		email: 'deimos@example.com',
+		author: 'small_moon_surveyor',
 	},
 	{
 		id: 26,
@@ -437,6 +443,7 @@ export const data: SpaceObject[] = [
 		date: '2022-08-19',
 		datetime: '2022-08-19T10:30:00Z',
 		email: 'rhea@example.com',
+		author: 'saturn_geology_specialist',
 	},
 	{
 		id: 27,
@@ -452,6 +459,7 @@ export const data: SpaceObject[] = [
 		date: '2023-01-22',
 		datetime: '2023-01-22T14:20:00Z',
 		email: 'iapetus@example.com',
+		author: 'two_tone_surface_expert',
 	},
 	{
 		id: 28,
@@ -467,6 +475,7 @@ export const data: SpaceObject[] = [
 		date: '2021-04-17',
 		datetime: '2021-04-17T12:00:00Z',
 		email: 'dione@example.com',
+		author: 'icy_surface_geochemist',
 	},
 	{
 		id: 29,
@@ -482,6 +491,7 @@ export const data: SpaceObject[] = [
 		date: '2020-12-05',
 		datetime: '2020-12-05T09:40:00Z',
 		email: 'tethys@example.com',
+		author: 'middle_satellite_researcher',
 	},
 	{
 		id: 30,
@@ -497,6 +507,7 @@ export const data: SpaceObject[] = [
 		date: '2024-02-28',
 		datetime: '2024-02-28T11:15:00Z',
 		email: 'miranda@example.com',
+		author: 'uranian_moon_geologist',
 	},
 	{
 		id: 31,
@@ -512,6 +523,7 @@ export const data: SpaceObject[] = [
 		date: '2023-09-10',
 		datetime: '2023-09-10T08:25:00Z',
 		email: 'ariel@example.com',
+		author: 'planetary_reflectance_specialist',
 	},
 	{
 		id: 32,
@@ -527,6 +539,7 @@ export const data: SpaceObject[] = [
 		date: '2022-05-03',
 		datetime: '2022-05-03T15:50:00Z',
 		email: 'umbriel@example.com',
+		author: 'dark_surface_researcher',
 	},
 	{
 		id: 33,
@@ -542,6 +555,7 @@ export const data: SpaceObject[] = [
 		date: '2021-10-18',
 		datetime: '2021-10-18T13:35:00Z',
 		email: 'titania@example.com',
+		author: 'uranian_system_surveyor',
 	},
 	{
 		id: 34,
@@ -557,6 +571,7 @@ export const data: SpaceObject[] = [
 		date: '2020-07-22',
 		datetime: '2020-07-22T10:05:00Z',
 		email: 'oberon@example.com',
+		author: 'outer_uranian_orbitalist',
 	},
 	{
 		id: 35,
@@ -572,6 +587,7 @@ export const data: SpaceObject[] = [
 		date: '2024-08-14',
 		datetime: '2024-08-14T16:40:00Z',
 		email: 'ceres@example.com',
+		author: 'asteroid_belt_specialist',
 	},
 	{
 		id: 36,
@@ -587,6 +603,7 @@ export const data: SpaceObject[] = [
 		date: '2022-03-29',
 		datetime: '2022-03-29T12:55:00Z',
 		email: 'makemake@example.com',
+		author: 'trans_neptunian_researcher',
 	},
 	{
 		id: 37,
@@ -602,6 +619,7 @@ export const data: SpaceObject[] = [
 		date: '2021-11-11',
 		datetime: '2021-11-11T09:10:00Z',
 		email: 'haumea@example.com',
+		author: 'dwarf_planet_dynamics_specialist',
 	},
 ];
 
