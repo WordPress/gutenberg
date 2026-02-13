@@ -29,23 +29,19 @@ export function CollaboratorsOverlay( { postId, postType }: Props ) {
 	const [ cursorRegistry ] = useState( createCursorRegistry );
 
 	return (
-		BlockCanvasCover?.Fill && (
-			<BlockCanvasCover.Fill>
-				{ ( {
-					containerRef,
-				}: {
-					containerRef: React.MutableRefObject< HTMLElement | null >;
-				} ) => (
-					<Overlay
-						blockEditorDocument={
-							containerRef.current?.ownerDocument
-						}
-						cursorRegistry={ cursorRegistry }
-						postId={ postId }
-						postType={ postType }
-					/>
-				) }
-			</BlockCanvasCover.Fill>
-		)
+		<BlockCanvasCover.Fill>
+			{ ( {
+				containerRef,
+			}: {
+				containerRef: React.MutableRefObject< HTMLElement | null >;
+			} ) => (
+				<Overlay
+					blockEditorDocument={ containerRef.current?.ownerDocument }
+					cursorRegistry={ cursorRegistry }
+					postId={ postId }
+					postType={ postType }
+				/>
+			) }
+		</BlockCanvasCover.Fill>
 	);
 }
