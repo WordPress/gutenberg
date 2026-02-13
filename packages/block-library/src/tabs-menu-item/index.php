@@ -69,7 +69,7 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 /**
  * Registers the `core/tabs-menu-item` block on the server.
  *
- * @since 6.9.0
+ * @since 7.0.0
  */
 function register_block_core_tabs_menu_item() {
 	register_block_type_from_metadata(

@@ -156,7 +156,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 /**
  * Registers the `core/tabs` block on the server.
  *
- * @since 6.8.0
+ * @since 7.0.0
  */
 function register_block_core_tabs() {
 	register_block_type_from_metadata(
