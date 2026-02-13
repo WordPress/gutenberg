@@ -30,7 +30,7 @@ class Gutenberg_Content_Guidelines_Post_Type {
 		'copy',
 		'images',
 		'site',
-		'other',
+		'additional',
 	);
 
 	/**
@@ -191,10 +191,10 @@ class Gutenberg_Content_Guidelines_Post_Type {
 	 */
 	public static function get_guideline_categories_from_meta( $post_id ) {
 		$category_labels = array(
-			'copy'   => __( 'Copy Guidelines', 'gutenberg' ),
-			'images' => __( 'Image Guidelines', 'gutenberg' ),
-			'site'   => __( 'Site Context', 'gutenberg' ),
-			'other'  => __( 'Other Guidelines', 'gutenberg' ),
+			'copy'       => __( 'Copy Guidelines', 'gutenberg' ),
+			'images'     => __( 'Image Guidelines', 'gutenberg' ),
+			'site'       => __( 'Site Context', 'gutenberg' ),
+			'additional' => __( 'Additional Guidelines', 'gutenberg' ),
 		);
 
 		$guideline_categories = array();

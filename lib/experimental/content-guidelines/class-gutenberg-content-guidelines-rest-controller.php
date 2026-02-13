@@ -61,7 +61,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 						'category' => array(
 							'description'       => __( 'Limit response to a specific guideline category.', 'gutenberg' ),
 							'type'              => 'string',
-							'enum'              => array( 'copy', 'images', 'site', 'blocks', 'other' ),
+							'enum'              => array( 'copy', 'images', 'site', 'blocks', 'additional' ),
 							'sanitize_callback' => 'sanitize_text_field',
 						),
 						'block'    => array(
@@ -124,7 +124,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 *
 	 * Supports query parameters:
 	 * - ?status=published|draft - Filter by status
-	 * - ?category=copy|images|site|blocks|other - Return only specific category
+	 * - ?category=copy|images|site|blocks|additional - Return only specific category
 	 * - ?block=core/paragraph - Return only specific block's guidelines
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
@@ -424,7 +424,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 			return array();
 		}
 
-		$valid_categories = array( 'copy', 'images', 'site', 'blocks', 'other' );
+		$valid_categories = array( 'copy', 'images', 'site', 'blocks', 'additional' );
 		$sanitized        = array_intersect_key( $categories, array_flip( $valid_categories ) );
 
 		foreach ( $sanitized as $key => &$category ) {
@@ -574,7 +574,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 						},
 					),
 					'properties'  => array(
-						'copy'   => array(
+						'copy'       => array(
 							'type'       => 'object',
 							'properties' => array(
 								'label'      => array(
@@ -587,7 +587,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 								),
 							),
 						),
-						'images' => array(
+						'images'     => array(
 							'type'       => 'object',
 							'properties' => array(
 								'label'      => array(
@@ -600,7 +600,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 								),
 							),
 						),
-						'site'   => array(
+						'site'       => array(
 							'type'       => 'object',
 							'properties' => array(
 								'label'      => array(
@@ -613,7 +613,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 								),
 							),
 						),
-						'blocks' => array(
+						'blocks'     => array(
 							'type'                 => 'object',
 							'additionalProperties' => array(
 								'type'       => 'object',
@@ -625,7 +625,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 								),
 							),
 						),
-						'other'  => array(
+						'additional' => array(
 							'type'       => 'object',
 							'properties' => array(
 								'label'      => array(
