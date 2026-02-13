@@ -61,7 +61,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 						'category' => array(
 							'description'       => __( 'Limit response to a specific guideline category.', 'gutenberg' ),
 							'type'              => 'string',
-							'enum'              => array( 'copy', 'images', 'site', 'blocks', 'additional' ),
+							'enum'              => Gutenberg_Content_Guidelines_Post_Type::VALID_CATEGORIES,
 							'sanitize_callback' => 'sanitize_text_field',
 						),
 						'block'    => array(
@@ -72,7 +72,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 						'status'   => array(
 							'description'       => __( 'Limit response to guidelines with a specific status.', 'gutenberg' ),
 							'type'              => 'string',
-							'enum'              => array( 'draft', 'published' ),
+							'enum'              => Gutenberg_Content_Guidelines_Post_Type::VALID_STATUSES,
 							'sanitize_callback' => 'sanitize_text_field',
 						),
 					),
@@ -424,7 +424,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 			return array();
 		}
 
-		$valid_categories = array( 'copy', 'images', 'site', 'blocks', 'additional' );
+		$valid_categories = Gutenberg_Content_Guidelines_Post_Type::VALID_CATEGORIES;
 		$sanitized        = array_intersect_key( $categories, array_flip( $valid_categories ) );
 
 		foreach ( $sanitized as $key => &$category ) {
@@ -551,7 +551,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 				'status'               => array(
 					'description' => __( 'The status of the guidelines (draft or published).', 'gutenberg' ),
 					'type'        => 'string',
-					'enum'        => array( 'draft', 'published' ),
+					'enum'        => Gutenberg_Content_Guidelines_Post_Type::VALID_STATUSES,
 					'context'     => array( 'view', 'edit' ),
 				),
 				'guideline_categories' => array(

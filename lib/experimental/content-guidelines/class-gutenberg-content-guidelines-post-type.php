@@ -34,6 +34,31 @@ class Gutenberg_Content_Guidelines_Post_Type {
 	);
 
 	/**
+	 * All valid guideline category keys for filtering.
+	 *
+	 * Includes standard categories plus 'blocks'.
+	 *
+	 * @var array
+	 */
+	const VALID_CATEGORIES = array(
+		'copy',
+		'images',
+		'site',
+		'additional',
+		'blocks',
+	);
+
+	/**
+	 * Valid guideline statuses.
+	 *
+	 * @var array
+	 */
+	const VALID_STATUSES = array(
+		'draft',
+		'published',
+	);
+
+	/**
 	 * Prefix for block-specific guideline meta keys.
 	 *
 	 * @var string
