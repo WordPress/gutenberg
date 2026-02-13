@@ -262,9 +262,17 @@ mark.wp-note {
 	}
 }
 
+.editor-collab-sidebar-panel__comment-content-wrapper {
+	position: relative;
+}
+
 .editor-collab-sidebar-panel__add-reaction-button {
 	display: inline-flex;
 	margin: 0;
+	position: absolute;
+	top: 0;
+	right: -$grid-unit-05;
+	z-index: 1;
 	align-items: center;
 	justify-content: center;
 	width: 28px;

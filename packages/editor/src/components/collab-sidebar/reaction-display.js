@@ -269,7 +269,7 @@ export default function ReactionDisplay( { reactions, onToggleReaction } ) {
  */
 export function AddReactionButton( { onToggleReaction } ) {
 	return (
-		<Menu placement="bottom-start">
+		<Menu placement="bottom-end">
 			<Menu.TriggerButton
 				render={
 					<Button
