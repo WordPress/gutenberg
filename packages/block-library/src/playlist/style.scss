@@ -31,12 +31,6 @@ $waveform-player-height: 100px;
 		margin-bottom: 0;
 	}
 
-	// Override WaveformPlayer's inline text colors to inherit from the block.
-	.waveform-title,
-	.waveform-subtitle {
-		color: currentColor !important;
-	}
-
 	.waveform-subtitle {
 		opacity: 0.7;
 	}

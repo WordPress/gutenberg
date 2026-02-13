@@ -72,6 +72,8 @@ export function createWaveformContainer( {
 	container.setAttribute( 'data-waveform-color', waveformColor );
 	container.setAttribute( 'data-progress-color', progressColor );
 	container.setAttribute( 'data-button-color', buttonColor );
+	container.setAttribute( 'data-text-color', buttonColor );
+	container.setAttribute( 'data-text-secondary-color', buttonColor );
 	if ( title ) {
 		container.setAttribute( 'data-title', title );
 	}
