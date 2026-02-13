@@ -14,6 +14,8 @@
 
 ### New Features
 
+-   Added `phpmyadmin` boolean configuration option to enable phpMyAdmin. Setting `phpmyadminPort` also enables phpMyAdmin for backward compatibility.
+-   Added phpMyAdmin support to the Playground runtime. When enabled, phpMyAdmin is available at `http://localhost:<port>/phpmyadmin`.
 -   Added `status` command that shows comprehensive environment information including running state, URLs, ports, configuration, and paths.
 -   Added `--config` global option to specify a custom configuration file path, enabling multiple parallel environments from the same directory.
 -   Added `testsEnvironment` configuration option. Set to `false` to skip creating test containers (`tests-mysql`, `tests-wordpress`, `tests-cli`, `tests-phpmyadmin`), reducing resource usage when test isolation is achieved via separate config files.

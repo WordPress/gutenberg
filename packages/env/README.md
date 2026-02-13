@@ -41,7 +41,7 @@ $ wp-env start --runtime=playground
 | Requires Docker | Yes | No |
 | Xdebug | Yes | Yes |
 | SPX profiling | Yes | No |
-| phpMyAdmin | Yes | No |
+| phpMyAdmin | Yes | Yes |
 | MySQL database | Yes | No (SQLite) |
 | Multisite | Yes | Yes |
 | Custom PHP version | Yes | Yes |
@@ -596,7 +596,8 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"config"`           | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`         | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
 | `"mysqlPort"`        | `integer`      | `null` (randomly assigned)             | The MySQL port number to expose.                                                                                                 |
-| `"phpmyadminPort"`   | `integer`      | `null`                                 | The port number for phpMyAdmin. If provided, you'll access phpMyAdmin through: http://localhost:<port>                           |
+| `"phpmyadmin"`       | `boolean`      | `false`                                | Whether to enable phpMyAdmin for database management.                                                                            |
+| `"phpmyadminPort"`   | `integer`      | `null` (randomly assigned)             | The port number for phpMyAdmin (Docker only). Setting this also enables phpMyAdmin.                                              |
 | `"multisite"`        | `boolean`      | `false`                                | Whether to set up a multisite installation.                                                                                      |
 | `"lifecycleScripts"` | `Object`       | `"{}"`                                 | Mapping of commands that should be executed at certain points in the lifecycle.                                                   |
 
@@ -785,7 +786,7 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 These can also be set via environment variables:
 
 - `WP_ENV_PORT` to override the web server's port.
-- phpMyAdmin is not enabled by default, but its port can also be overridden via `WP_ENV_PHPMYADMIN_PORT`.
+- phpMyAdmin is not enabled by default. Enable it with `"phpmyadmin": true` in `.wp-env.json`. The Docker runtime port can also be overridden via `WP_ENV_PHPMYADMIN_PORT`.
 - By default, MySQL isn't exposed to the host, which means no chance of port conflicts. But this can also be overridden via `WP_ENV_MYSQL_PORT`.
 
 ### Specific PHP Version
