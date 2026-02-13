@@ -50,7 +50,7 @@ jobs:
 
             - name: Install WordPress and start the server
               run: |
-                  npm run wp-env-test start
+                  npm run wp-env-test start -- --runtime=playground
 
             - name: Run the tests
               env:

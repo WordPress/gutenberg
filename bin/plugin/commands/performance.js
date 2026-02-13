@@ -400,6 +400,8 @@ async function runPerformanceTests( branches, options ) {
 			wpEnvConfigPath,
 			JSON.stringify(
 				{
+					testsEnvironment: false,
+					port: 8889,
 					config: {
 						WP_DEBUG: false,
 						SCRIPT_DEBUG: false,
@@ -407,29 +409,23 @@ async function runPerformanceTests( branches, options ) {
 					core: wpZipUrl || 'WordPress/WordPress',
 					plugins: [ buildDir ],
 					themes: [ path.join( testRunnerDir, 'test/emptytheme' ) ],
-					env: {
-						tests: {
-							mappings: {
-								'wp-content/mu-plugins': path.join(
-									testRunnerDir,
-									'packages/e2e-tests/mu-plugins'
-								),
-								'wp-content/plugins/gutenberg-test-plugins':
-									path.join(
-										testRunnerDir,
-										'packages/e2e-tests/plugins'
-									),
-								'wp-content/themes/gutenberg-test-themes':
-									path.join(
-										testRunnerDir,
-										'test/gutenberg-test-themes'
-									),
-								'wp-content/themes/gutenberg-test-themes/twentytwentyone':
-									'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
-								'wp-content/themes/gutenberg-test-themes/twentytwentythree':
-									'https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip',
-							},
-						},
+					mappings: {
+						'wp-content/mu-plugins': path.join(
+							testRunnerDir,
+							'packages/e2e-tests/mu-plugins'
+						),
+						'wp-content/plugins/gutenberg-test-plugins': path.join(
+							testRunnerDir,
+							'packages/e2e-tests/plugins'
+						),
+						'wp-content/themes/gutenberg-test-themes': path.join(
+							testRunnerDir,
+							'test/gutenberg-test-themes'
+						),
+						'wp-content/themes/gutenberg-test-themes/twentytwentyone':
+							'https://downloads.wordpress.org/theme/twentytwentyone.1.7.zip',
+						'wp-content/themes/gutenberg-test-themes/twentytwentythree':
+							'https://downloads.wordpress.org/theme/twentytwentythree.1.0.zip',
 					},
 				},
 				null,
@@ -479,7 +475,10 @@ async function runPerformanceTests( branches, options ) {
 				const envDir = branchDirs[ branch ];
 
 				logAtIndent( 3, 'Starting environment' );
-				await runShellScript( `${ wpEnvPath } start`, envDir );
+				await runShellScript(
+					`${ wpEnvPath } start --runtime=playground`,
+					envDir
+				);
 
 				logAtIndent( 3, 'Running tests' );
 				await runTestSuite( testSuite, testRunnerDir, runKey );
