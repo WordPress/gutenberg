@@ -45,7 +45,6 @@ import { useFloatingThread } from './hooks';
 import { AddComment } from './add-comment';
 import { store as editorStore } from '../../store';
 import ReactionDisplay, { AddReactionButton } from './reaction-display';
-import ReactionDetailsPopover from './reaction-details-popover';
 
 const { useBlockElement } = unlock( blockEditorPrivateApis );
 const { Menu } = unlock( componentsPrivateApis );
@@ -776,9 +775,7 @@ const CommentBoard = ( {
 } ) => {
 	const [ actionState, setActionState ] = useState( false );
 	const [ showConfirmDialog, setShowConfirmDialog ] = useState( false );
-	const [ showReactionDetails, setShowReactionDetails ] = useState( false );
 	const actionButtonRef = useRef( null );
-	const reactionDetailsAnchorRef = useRef( null );
 
 	const handleConfirmDelete = () => {
 		onDelete( thread );
@@ -799,11 +796,6 @@ const CommentBoard = ( {
 		( thread.meta._wp_note_status === 'resolved' ||
 			thread.meta._wp_note_status === 'reopen' );
 
-	// Check if there are any reactions.
-	const hasReactions =
-		thread.meta?._wp_note_reactions &&
-		Object.keys( thread.meta._wp_note_reactions ).length > 0;
-
 	const actions = [
 		{
 			id: 'edit',
@@ -819,14 +811,6 @@ const CommentBoard = ( {
 			isEligible: ( { status } ) => status === 'approved',
 			onClick: () => {
 				onEdit( { id: thread.id, status: 'hold' } );
-			},
-		},
-		{
-			id: 'reaction-details',
-			title: __( 'See emoji reaction details' ),
-			isEligible: () => hasReactions,
-			onClick: () => {
-				setShowReactionDetails( true );
 			},
 		},
 		{
@@ -996,23 +980,14 @@ const CommentBoard = ( {
 				</RawHTML>
 			) }
 			{ isExpanded && (
-				<div ref={ reactionDetailsAnchorRef }>
-					<ReactionDisplay
-						reactions={ thread.meta?._wp_note_reactions }
-						onToggleReaction={ ( emoji ) =>
-							onToggleReaction?.( {
-								commentId: thread.id,
-								emoji,
-							} )
-						}
-					/>
-				</div>
-			) }
-			{ showReactionDetails && (
-				<ReactionDetailsPopover
+				<ReactionDisplay
 					reactions={ thread.meta?._wp_note_reactions }
-					onClose={ () => setShowReactionDetails( false ) }
-					anchor={ reactionDetailsAnchorRef.current }
+					onToggleReaction={ ( emoji ) =>
+						onToggleReaction?.( {
+							commentId: thread.id,
+							emoji,
+						} )
+					}
 				/>
 			) }
 			{ 'delete' === actionState && (

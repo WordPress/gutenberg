@@ -892,14 +892,14 @@ test.describe( 'Block Comments', () => {
 			await expect( reactionButton ).toBeHidden();
 		} );
 
-		test( 'can see emoji reaction details', async ( {
+		test( 'can see reaction tooltip on hover', async ( {
 			page,
 			blockCommentUtils,
 		} ) => {
 			await blockCommentUtils.addBlockWithComment( {
 				type: 'core/paragraph',
-				attributes: { content: 'Testing reaction details' },
-				comment: 'Test comment for reaction details',
+				attributes: { content: 'Testing reaction tooltip' },
+				comment: 'Test comment for reaction tooltip',
 			} );
 
 			// Add a reaction.
@@ -910,16 +910,17 @@ test.describe( 'Block Comments', () => {
 					.filter( { hasText: 'Reaction added.' } )
 			).toBeVisible();
 
-			// Open the reaction details via menu.
-			await blockCommentUtils.clickBlockCommentActionMenuItem(
-				'See emoji reaction details'
+			// Hover over the reaction button to trigger tooltip.
+			const reactionButton = page.locator(
+				'.editor-collab-sidebar-panel__reaction-button'
 			);
+			await reactionButton.hover();
 
-			// Verify the popover is visible with user info.
-			const popover = page.locator(
-				'.editor-collab-sidebar-panel__reaction-details'
-			);
-			await expect( popover ).toBeVisible();
+			// Verify the tooltip is visible and contains expected text.
+			const tooltip = page.getByRole( 'tooltip' );
+			await expect( tooltip ).toBeVisible();
+			await expect( tooltip ).toContainText( 'reacted with' );
+			await expect( tooltip ).toContainText( 'Celebration' );
 		} );
 
 		test( 'reaction buttons are keyboard accessible', async ( {
