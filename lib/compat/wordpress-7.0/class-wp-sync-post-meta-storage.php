@@ -2,71 +2,88 @@
 /**
  * WP_Sync_Post_Meta_Storage class
  *
- * @package Gutenberg
+ * @package gutenberg
  */
 
 if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 
 	/**
-	 * Class that implements an interface for storing and retrieving sync
+	 * Core class that provides an interface for storing and retrieving sync
 	 * updates and awareness data during a collaborative session.
 	 *
 	 * Data is stored as post meta on a singleton post of a custom post type.
 	 *
+	 * @since 7.0.0
+	 *
 	 * @access private
-	 * @internal
 	 */
 	class WP_Sync_Post_Meta_Storage implements WP_Sync_Storage {
 		/**
-		 * Post type for sync storage
+		 * Post type for sync storage.
+		 *
+		 * @since 7.0.0
+		 * @var string
 		 */
-		const POST_TYPE = 'sync_storage';
+		const POST_TYPE = 'wp_sync_storage';
 
 		/**
-		 * Singleton post ID for storing sync data
+		 * Cache of cursors by room.
+		 *
+		 * @var array<string, int>
+		 */
+		private $room_cursors = array();
+
+		/**
+		 * Cache of update counts by room.
+		 *
+		 * @var array<string, int>
+		 */
+		private $room_update_counts = array();
+
+		/**
+		 * Singleton post ID for storing sync data.
 		 *
 		 * @var int|null
 		 */
-		private static $storage_post_id = null;
+		private static ?int $storage_post_id = null;
 
 		/**
-		 * Register the custom post type for sync storage.
+		 * Initializer.
+		 *
+		 * @since 7.0.0
 		 */
-		public function init(): void {
-			register_post_type(
-				self::POST_TYPE,
-				array(
-					'label'              => 'Gutenberg Sync Storage',
-					'public'             => false,
-					'publicly_queryable' => false,
-					'show_in_menu'       => false,
-					'show_in_rest'       => false,
-					'show_ui'            => false,
-					'supports'           => array( 'custom-fields' ),
-				)
-			);
-		}
+		public function init(): void {}
 
 		/**
-		 * Add a sync update to a given room.
+		 * Adds a sync update to a given room.
+		 *
+		 * @since 7.0.0
 		 *
 		 * @param string $room   Room identifier.
-		 * @param array  $update Sync update.
+		 * @param mixed  $update Sync update.
 		 */
-		public function add_update( string $room, array $update ): void {
+		public function add_update( string $room, mixed $update ): void {
 			$post_id  = $this->get_storage_post_id();
 			$meta_key = $this->get_room_meta_key( $room );
 
-			add_post_meta( $post_id, $meta_key, $update, false );
+			// Create an envelope and stamp each update to enable cursor-based filtering.
+			$envelope = array(
+				'timestamp' => $this->get_time_marker(),
+				'value'     => $update,
+			);
+
+			add_post_meta( $post_id, $meta_key, $envelope, false );
 		}
 
 		/**
-		 * Retrieve sync updates for a given room.
+		 * Retrieve all sync updates for a given room.
 		 *
 		 * @param string $room Room identifier.
-		 * @return array Array of sync updates.
+		 * @return array<mixed> Array of sync updates.
 		 */
-		public function get_all_updates( string $room ): array {
+		private function get_all_updates( string $room ): array {
+			$this->room_cursors[ $room ] = $this->get_time_marker() - 100; // Small buffer to ensure consistency.
+
 			$post_id  = $this->get_storage_post_id();
 			$meta_key = $this->get_room_meta_key( $room );
 			$updates  = get_post_meta( $post_id, $meta_key, false );
@@ -75,24 +92,18 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 				$updates = array();
 			}
 
+			$this->room_update_counts[ $room ] = count( $updates );
+
 			return $updates;
 		}
 
 		/**
-		 * Get the meta key for a room's awareness state.
+		 * Gets awareness state for a given room.
+		 *
+		 * @since 7.0.0
 		 *
 		 * @param string $room Room identifier.
-		 * @return string Meta key.
-		 */
-		private function get_awareness_meta_key( string $room ): string {
-			return 'sync_awareness_' . md5( $room );
-		}
-
-		/**
-		 * Get awareness state for a given room.
-		 *
-		 * @param string $room Room identifier.
-		 * @return array Merged awarenessstate.
+		 * @return array<int, mixed> Awareness state.
 		 */
 		public function get_awareness_state( string $room ): array {
 			$post_id   = $this->get_storage_post_id();
@@ -107,51 +118,94 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		}
 
 		/**
-		 * Get the meta key for a room's updates.
+		 * Sets awareness state for a given room.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param string            $room      Room identifier.
+		 * @param array<int, mixed> $awareness Serializable awareness state.
+		 */
+		public function set_awareness_state( string $room, mixed $awareness ): void {
+			$post_id  = $this->get_storage_post_id();
+			$meta_key = $this->get_awareness_meta_key( $room );
+
+			update_post_meta( $post_id, $meta_key, $awareness );
+		}
+
+		/**
+		 * Gets the meta key for a room's awareness state.
+		 *
+		 * @param string $room Room identifier.
+		 * @return string Meta key.
+		 */
+		private function get_awareness_meta_key( string $room ): string {
+			return 'wp_sync_awareness_' . md5( $room );
+		}
+
+		/**
+		 * Gets the current cursor for a given room.
+		 *
+		 * The cursor is set during get_updates_after_cursor() and represents the
+		 * point in time just before the updates were retrieved, with a small buffer
+		 * to ensure consistency.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return int Current cursor for the room.
+		 */
+		public function get_cursor( string $room ): int {
+			return $this->room_cursors[ $room ] ?? 0;
+		}
+
+		/**
+		 * Gets the meta key for a room's updates.
 		 *
 		 * @param string $room Room identifier.
 		 * @return string Meta key.
 		 */
 		private function get_room_meta_key( string $room ): string {
-			return 'sync_update_' . md5( $room );
+			return 'wp_sync_update_' . md5( $room );
 		}
 
 		/**
-		 * Get or create the singleton post for storing sync data.
+		 * Gets or creates the singleton post for storing sync data.
 		 *
-		 * @return int Post ID.
+		 * @return int|null Post ID.
 		 */
-		private function get_storage_post_id(): int {
+		private function get_storage_post_id(): ?int {
 			if ( is_int( self::$storage_post_id ) ) {
 				return self::$storage_post_id;
 			}
 
-			// Try to find existing post
+			// Try to find existing post.
 			$posts = get_posts(
 				array(
 					'post_type'      => self::POST_TYPE,
 					'posts_per_page' => 1,
 					'post_status'    => 'publish',
-					'orderby'        => 'ID',
+					'fields'         => 'ids',
 					'order'          => 'ASC',
 				)
 			);
 
-			if ( ! empty( $posts ) ) {
-				self::$storage_post_id = $posts[0]->ID;
+			// array_first not introduced until WP 6.9
+			$post_id = $posts[0] ?? null;
+			if ( is_int( $post_id ) ) {
+				self::$storage_post_id = $post_id;
 				return self::$storage_post_id;
 			}
 
-			// Create new post if none exists
+			// Create new post if none exists.
 			$post_id = wp_insert_post(
 				array(
 					'post_type'   => self::POST_TYPE,
 					'post_status' => 'publish',
-					'post_title'  => 'Gutenberg Sync Storage',
+					'post_title'  => 'Sync Storage',
 				)
 			);
 
-			if ( ! is_wp_error( $post_id ) ) {
+			if ( is_int( $post_id ) ) {
 				self::$storage_post_id = $post_id;
 			}
 
@@ -159,11 +213,63 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		}
 
 		/**
-		 * Remove all sync updates for a given room.
+		 * Gets the current time in milliseconds as a comparable time marker.
+		 *
+		 * @return int Current time in milliseconds.
+		 */
+		private function get_time_marker(): int {
+			return floor( microtime( true ) * 1000 );
+		}
+
+		/**
+		 * Gets the number of updates stored for a given room.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param string $room Room identifier.
+		 * @return int Number of updates stored for the room.
+		 */
+		public function get_update_count( string $room ): int {
+			return $this->room_update_counts[ $room ] ?? 0;
+		}
+
+		/**
+		 * Retrieves sync updates from a room for a given client and cursor. Updates
+		 * from the specified client should be excluded.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @param string $room   Room identifier.
+		 * @param int    $cursor Return updates after this cursor.
+		 * @return array<mixed> Array of sync updates.
+		 */
+		public function get_updates_after_cursor( string $room, int $cursor ): array {
+			$all_updates = $this->get_all_updates( $room );
+			$updates     = array();
+
+			foreach ( $all_updates as $update ) {
+				if ( $update['timestamp'] > $cursor ) {
+					$updates[] = $update;
+				}
+			}
+
+			// Sort by timestamp to ensure order.
+			usort(
+				$updates,
+				function ( $a, $b ) {
+					return ( $a['timestamp'] ?? 0 ) <=> ( $b['timestamp'] ?? 0 );
+				}
+			);
+
+			return wp_list_pluck( $updates, 'value' );
+		}
+
+		/**
+		 * Removes all sync updates for a given room.
 		 *
 		 * @param string $room Room identifier.
 		 */
-		public function remove_all_updates( string $room ): void {
+		private function remove_all_updates( string $room ): void {
 			$post_id  = $this->get_storage_post_id();
 			$meta_key = $this->get_room_meta_key( $room );
 
@@ -171,16 +277,26 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		}
 
 		/**
-		 * Set awareness state for a given room.
+		 * Removes updates from a room that are older than the given cursor.
 		 *
-		 * @param string $room      Room identifier.
-		 * @param array  $awareness Merged awareness state.
+		 * @since 7.0.0
+		 *
+		 * @param string $room   Room identifier.
+		 * @param int    $cursor Remove updates with markers < this cursor.
 		 */
-		public function set_awareness_state( string $room, array $awareness ): void {
-			$post_id  = $this->get_storage_post_id();
-			$meta_key = $this->get_awareness_meta_key( $room );
+		public function remove_updates_before_cursor( string $room, int $cursor ): void {
+			$all_updates = $this->get_all_updates( $room );
+			$this->remove_all_updates( $room );
 
-			update_post_meta( $post_id, $meta_key, $awareness );
+			$post_id  = $this->get_storage_post_id();
+			$meta_key = $this->get_room_meta_key( $room );
+
+			// Re-store envelopes directly to avoid double-wrapping by add_update().
+			foreach ( $all_updates as $envelope ) {
+				if ( $envelope['timestamp'] >= $cursor ) {
+					add_post_meta( $post_id, $meta_key, $envelope, false );
+				}
+			}
 		}
 	}
 }
