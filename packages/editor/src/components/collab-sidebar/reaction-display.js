@@ -7,6 +7,8 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { SVG, Path } from '@wordpress/primitives';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -81,14 +83,14 @@ function getReactedSlugs( reactions ) {
  *
  * @param {Object}   props                  Component props.
  * @param {Object}   props.reactions        The reactions object from comment meta.
- * @param {number}   props.currentUserId    The current user's ID.
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
  */
-export default function ReactionDisplay( {
-	reactions,
-	currentUserId,
-	onToggleReaction,
-} ) {
+export default function ReactionDisplay( { reactions, onToggleReaction } ) {
+	const currentUserId = useSelect( ( select ) => {
+		const { getCurrentUser } = select( coreStore );
+		const user = getCurrentUser();
+		return user?.id;
+	}, [] );
 	const reactedSlugs = getReactedSlugs( reactions );
 
 	if ( reactedSlugs.length === 0 ) {
