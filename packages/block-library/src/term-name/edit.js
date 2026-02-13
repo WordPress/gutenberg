@@ -25,15 +25,15 @@ import { decodeEntities } from '@wordpress/html-entities';
  * Internal dependencies
  */
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { useTermName } from './use-term-name';
+import { useTermContext } from '../utils/use-template-context';
 
 export default function TermNameEdit( {
 	attributes,
 	setAttributes,
-	context: { termId, taxonomy },
+	context: { termId, taxonomy, templateSlug },
 } ) {
 	const { textAlign, level = 0, isLink, levelOptions } = attributes;
-	const { term } = useTermName( termId, taxonomy );
+	const { term } = useTermContext( templateSlug, termId, taxonomy );
 
 	const termName = term?.name
 		? decodeEntities( term.name )

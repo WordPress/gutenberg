@@ -22,10 +22,14 @@ export default function TermDescriptionEdit( {
 	attributes,
 	setAttributes,
 	mergedStyle,
-	context: { termId, taxonomy },
+	context: { termId, taxonomy, templateSlug },
 } ) {
 	const { textAlign } = attributes;
-	const { termDescription } = useTermDescription( termId, taxonomy );
+	const { termDescription } = useTermDescription(
+		templateSlug,
+		termId,
+		taxonomy
+	);
 
 	const blockProps = useBlockProps( {
 		className: clsx( {

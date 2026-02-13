@@ -48,10 +48,10 @@ const BRACKET_TYPES = {
 export default function TermCountEdit( {
 	attributes,
 	setAttributes,
-	context: { termId, taxonomy },
+	context: { termId, taxonomy, templateSlug },
 } ) {
 	const { bracketType } = attributes;
-	const term = useTermCount( termId, taxonomy );
+	const term = useTermCount( templateSlug, termId, taxonomy );
 
 	const termCount = term?.termCount || 0;
 

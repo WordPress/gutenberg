@@ -34,7 +34,7 @@
 			"type": "search"
 		}
 	},
-	"usesContext": [ "query" ],
+	"usesContext": [ "query", "templateSlug" ],
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ],
