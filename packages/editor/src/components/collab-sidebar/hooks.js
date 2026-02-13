@@ -509,7 +509,7 @@ export function useNoteActions( reflowComments = () => {} ) {
 			}
 
 			// Get existing reactions or initialize empty object.
-			const existingReactions = comment.meta?._wp_reactions || {};
+			const existingReactions = comment.meta?._wp_note_reactions || {};
 
 			// Check if user already reacted with this emoji.
 			const emojiReactions = existingReactions[ emoji ] || [];
@@ -538,7 +538,7 @@ export function useNoteActions( reflowComments = () => {} ) {
 				{
 					id: commentId,
 					meta: {
-						_wp_reactions: updatedReactions,
+						_wp_note_reactions: updatedReactions,
 					},
 				},
 				{ throwOnError: true }
@@ -570,7 +570,7 @@ export function useNoteActions( reflowComments = () => {} ) {
 			}
 
 			// Get existing reactions.
-			const existingReactions = comment.meta?._wp_reactions || {};
+			const existingReactions = comment.meta?._wp_note_reactions || {};
 			const emojiReactions = existingReactions[ emoji ] || [];
 
 			// Filter out current user's reaction.
@@ -592,7 +592,7 @@ export function useNoteActions( reflowComments = () => {} ) {
 				{
 					id: commentId,
 					meta: {
-						_wp_reactions:
+						_wp_note_reactions:
 							Object.keys( updatedReactions ).length > 0
 								? updatedReactions
 								: {},
@@ -627,7 +627,7 @@ export function useNoteActions( reflowComments = () => {} ) {
 			}
 
 			// Check if user already reacted with this emoji.
-			const existingReactions = comment.meta?._wp_reactions || {};
+			const existingReactions = comment.meta?._wp_note_reactions || {};
 			const emojiReactions = existingReactions[ emoji ] || [];
 			const alreadyReacted = emojiReactions.some(
 				( reaction ) => reaction.userId === userId
