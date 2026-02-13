@@ -38,7 +38,7 @@ function isObjectEmpty( object ) {
  * @param {Object}             props      Component props.
  * @param {string}             props.path Current path in global styles.
  * @param {React.ForwardedRef} ref        Ref to the Revisions component.
- * @return {JSX.Element|null} The Revisions component or null if loading.
+ * @return {React.JSX.Element} The Revisions component or null if loading.
  */
 function StylesCanvasRevisions( { path }, ref ) {
 	const blocks = useSelect( ( select ) => {

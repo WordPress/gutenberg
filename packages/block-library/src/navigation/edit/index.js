@@ -92,7 +92,7 @@ import { getSubmenuVisibility } from '../utils/get-submenu-visibility';
  *
  * @param {Object} props          Component props.
  * @param {string} props.clientId Block client ID.
- * @return {JSX.Element|null} The Add page button component or null if not applicable.
+ * @return {React.JSX.Element} The Add page button component or null if not applicable.
  */
 function NavigationAddPageButton( { clientId } ) {
 	const { insertBlock } = useDispatch( blockEditorStore );
