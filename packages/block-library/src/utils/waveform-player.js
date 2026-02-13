@@ -38,15 +38,36 @@ export function WaveformPlayer( { src, title, artist, image, onEnded } ) {
 				return;
 			}
 
-			const { destroy } = initWaveformPlayer( element, {
-				src,
-				title,
-				artist,
-				image,
-				onEnded: () => onEndedRef.current?.(),
-			} );
+			let cancelled = false;
+			let playerDestroy;
 
-			return destroy;
+			function init() {
+				if ( cancelled ) {
+					return;
+				}
+				const { destroy } = initWaveformPlayer( element, {
+					src,
+					title,
+					artist,
+					image,
+					onEnded: () => onEndedRef.current?.(),
+				} );
+				playerDestroy = destroy;
+			}
+
+			// Defer initialization so the element inherits the correct
+			// text color, which is used to derive waveform colors. In the
+			// editor iframe, theme styles (CSS custom properties) are
+			// injected dynamically, so getComputedStyle may return the
+			// default black on first render.
+			// Using a requestAnimationFrame loop isn't sufficient to solve the issue.
+			const timeoutId = setTimeout( init, 100 );
+
+			return () => {
+				cancelled = true;
+				clearTimeout( timeoutId );
+				playerDestroy?.();
+			};
 		},
 		[ src, title, artist, image ]
 	);
