@@ -26,6 +26,7 @@ export default function Radio< Item >( {
 	const { elements, isLoading } = useElements( {
 		elements: field.elements,
 		getElements: field.getElements,
+		item: data,
 	} );
 	const value = getValue( { item: data } );
 

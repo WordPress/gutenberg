@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -10,12 +10,14 @@ import type { Option } from '../types';
 
 const EMPTY_ARRAY: Option[] = [];
 
-export default function useElements( {
+export default function useElements< Item >( {
 	elements,
 	getElements,
+	item,
 }: {
 	elements?: Option[];
-	getElements?: () => Promise< Option[] >;
+	getElements?: ( args?: { item: Item } ) => Promise< Option[] >;
+	item?: Item;
 } ) {
 	const staticElements =
 		Array.isArray( elements ) && elements.length > 0
@@ -23,6 +25,8 @@ export default function useElements( {
 			: EMPTY_ARRAY;
 	const [ records, setRecords ] = useState< Option[] >( staticElements );
 	const [ isLoading, setIsLoading ] = useState( false );
+	const itemRef = useRef( item );
+	itemRef.current = item;
 
 	useEffect( () => {
 		if ( ! getElements ) {
@@ -32,7 +36,11 @@ export default function useElements( {
 
 		let cancelled = false;
 		setIsLoading( true );
-		getElements()
+		getElements(
+			itemRef.current !== undefined
+				? { item: itemRef.current }
+				: undefined
+		)
 			.then( ( fetchedElements ) => {
 				if ( ! cancelled ) {
 					const dynamicElements =

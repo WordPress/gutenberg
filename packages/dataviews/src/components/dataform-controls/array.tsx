@@ -28,6 +28,7 @@ export default function ArrayControl< Item >( {
 	const { elements, isLoading } = useElements( {
 		elements: field.elements,
 		getElements: field.getElements,
+		item: data,
 	} );
 
 	// Convert stored values to element objects for the token field

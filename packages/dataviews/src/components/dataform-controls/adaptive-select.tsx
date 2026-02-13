@@ -15,6 +15,7 @@ export default function AdaptiveSelect< Item >(
 	const { elements } = useElements( {
 		elements: field.elements,
 		getElements: field.getElements,
+		item: props.data,
 	} );
 	if ( elements.length >= ELEMENTS_THRESHOLD ) {
 		return <Combobox { ...props } />;

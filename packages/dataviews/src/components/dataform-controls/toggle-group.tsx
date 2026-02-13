@@ -38,6 +38,7 @@ export default function ToggleGroup< Item >( {
 	const { elements, isLoading } = useElements( {
 		elements: field.elements,
 		getElements: field.getElements,
+		item: data,
 	} );
 
 	if ( isLoading ) {

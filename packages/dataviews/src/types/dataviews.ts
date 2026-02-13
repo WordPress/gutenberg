@@ -63,7 +63,7 @@ export interface NormalizedFilter {
 	/**
 	 * Retrieval function to get the elements.
 	 */
-	getElements?: () => Promise< Option[] >;
+	getElements?: ( args?: { item: any } ) => Promise< Option[] >;
 
 	/**
 	 * Whether the filter has elements.

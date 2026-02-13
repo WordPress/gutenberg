@@ -548,7 +548,7 @@ function validateFormField< Item >(
 		typeof formField.field.getElements === 'function'
 	) {
 		handleElementsValidationAsync(
-			formField.field.getElements(),
+			formField.field.getElements( { item } ),
 			formField,
 			promiseHandler
 		);

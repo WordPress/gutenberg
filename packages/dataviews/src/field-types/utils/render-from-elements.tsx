@@ -11,6 +11,7 @@ export default function RenderFromElements< Item >( {
 	const { elements, isLoading } = useElements( {
 		elements: field.elements,
 		getElements: field.getElements,
+		item,
 	} );
 
 	const value = field.getValue( { item } );
