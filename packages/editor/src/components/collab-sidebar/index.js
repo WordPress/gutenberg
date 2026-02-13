@@ -137,8 +137,7 @@ function NotesSidebar( { postId } ) {
 			openTheSidebar();
 		},
 		{
-			isDisabled:
-				isDistractionFree || isClassicBlock || ! clientId,
+			isDisabled: isDistractionFree || isClassicBlock || ! clientId,
 		}
 	);
 
