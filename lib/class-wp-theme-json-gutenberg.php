@@ -2558,10 +2558,6 @@ class WP_Theme_JSON_Gutenberg {
 			}
 		}
 
-		if ( is_array( $value ) ) {
-			return $value;
-		}
-
 		return $value;
 	}
 
