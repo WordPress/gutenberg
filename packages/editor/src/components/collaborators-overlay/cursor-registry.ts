@@ -21,74 +21,84 @@ interface ScrollToCursorOptions {
  * components that need it. It's important that we create a single instance and
  * not a new instance per component or render; use useRef to accomplish this.
  */
-export class CursorRegistry {
-	private cursorMap: Map< number, HTMLElement > = new Map();
-
-	/**
-	 * Register a cursor element when it's created
-	 * @param clientId - The clientId of the cursor to register
-	 * @param element  - The cursor element to register
-	 */
-	public registerCursor( clientId: number, element: HTMLElement ): void {
-		this.cursorMap.set( clientId, element );
-	}
-
-	/**
-	 * Scroll to a cursor by clientId
-	 * @param clientId - The clientId of the cursor to scroll to
-	 * @param options  - The options for the scroll
-	 * @return true if cursor was found and scrolled to, false otherwise
-	 */
-	public scrollToCursor(
+export interface CursorRegistry {
+	registerCursor: ( clientId: number, element: HTMLElement ) => void;
+	scrollToCursor: (
 		clientId: number,
 		options?: ScrollToCursorOptions
-	): boolean {
-		const cursorElement = this.cursorMap.get( clientId );
+	) => boolean;
+	removeAll: () => void;
+}
 
-		if ( ! cursorElement ) {
-			return false;
-		}
+/**
+ * Add a temporary highlight effect to the cursor
+ * @param element  - The cursor element to highlight
+ * @param duration - The duration of the highlight effect in milliseconds
+ */
+function highlightCursor( element: HTMLElement, duration: number ): void {
+	element.classList.add( 'collaborators-overlay-cursor-highlighted' );
+	setTimeout( () => {
+		element.classList.remove( 'collaborators-overlay-cursor-highlighted' );
+	}, duration );
+}
 
-		// Scroll the cursor into view - browser automatically finds scrollable container
-		cursorElement.scrollIntoView( {
-			behavior: options?.behavior ?? 'smooth',
-			block: options?.block ?? 'center',
-			inline: options?.inline ?? 'nearest',
-		} );
+/**
+ * Create a cursor registry instance.
+ * @return A cursor registry with registerCursor, scrollToCursor, and removeAll methods.
+ */
+export function createCursorRegistry(): CursorRegistry {
+	const cursorMap = new Map< number, HTMLElement >();
 
-		// Optional: Add highlight effect
-		if ( options?.highlightDuration ) {
-			this.highlightCursor( cursorElement, options.highlightDuration );
-		}
+	return {
+		/**
+		 * Register a cursor element when it's created
+		 * @param clientId - The clientId of the cursor to register
+		 * @param element  - The cursor element to register
+		 */
+		registerCursor( clientId: number, element: HTMLElement ): void {
+			cursorMap.set( clientId, element );
+		},
 
-		return true;
-	}
+		/**
+		 * Scroll to a cursor by clientId
+		 * @param clientId - The clientId of the cursor to scroll to
+		 * @param options  - The options for the scroll
+		 * @return true if cursor was found and scrolled to, false otherwise
+		 */
+		scrollToCursor(
+			clientId: number,
+			options?: ScrollToCursorOptions
+		): boolean {
+			const cursorElement = cursorMap.get( clientId );
 
-	/**
-	 * Remove all cursor elements from DOM and clear the registry.
-	 * Uses stored refs instead of DOM queries for better performance.
-	 */
-	public removeAll(): void {
-		// Remove each cursor element using stored refs
-		this.cursorMap.forEach( ( element ) => element.remove() );
-		// Clear the registry
-		this.cursorMap.clear();
-	}
+			if ( ! cursorElement ) {
+				return false;
+			}
 
-	/**
-	 * Add a temporary highlight effect to the cursor
-	 * @param element  - The cursor element to highlight
-	 * @param duration - The duration of the highlight effect in milliseconds
-	 */
-	private highlightCursor( element: HTMLElement, duration: number ): void {
-		// Add highlight class
-		element.classList.add( 'collaborators-overlay-cursor-highlighted' );
+			// Scroll the cursor into view - browser automatically finds scrollable container
+			cursorElement.scrollIntoView( {
+				behavior: options?.behavior ?? 'smooth',
+				block: options?.block ?? 'center',
+				inline: options?.inline ?? 'nearest',
+			} );
 
-		// Remove after duration
-		setTimeout( () => {
-			element.classList.remove(
-				'collaborators-overlay-cursor-highlighted'
-			);
-		}, duration );
-	}
+			// Optional: Add highlight effect
+			if ( options?.highlightDuration ) {
+				highlightCursor( cursorElement, options.highlightDuration );
+			}
+
+			return true;
+		},
+
+		/**
+		 * Remove all cursor elements from DOM and clear the registry.
+		 * Uses stored refs instead of DOM queries for better performance.
+		 */
+		removeAll(): void {
+			// Remove each cursor element using stored refs
+			cursorMap.forEach( ( element ) => element.remove() );
+			// Clear the registry
+			cursorMap.clear();
+		},
+	};
 }

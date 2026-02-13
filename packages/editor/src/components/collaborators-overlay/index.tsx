@@ -8,7 +8,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { CursorRegistry } from './cursor-registry';
+import { createCursorRegistry } from './cursor-registry';
 import { Overlay } from './overlay';
 
 const { BlockCanvasCover } = unlock( privateApis );
@@ -28,9 +28,7 @@ interface Props {
 export function CollaboratorsOverlay( { postId, postType }: Props ) {
 	// A single instance of the cursor registry is shared between CollaboratorsPresence
 	// and CollaboratorsOverlay. A ref is used to persist the instance across re-renders.
-	const [ cursorRegistry ] = useState< CursorRegistry >(
-		() => new CursorRegistry()
-	);
+	const [ cursorRegistry ] = useState( createCursorRegistry );
 
 	return (
 		BlockCanvasCover?.Fill && (
