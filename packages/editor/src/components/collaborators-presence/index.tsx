@@ -11,8 +11,6 @@ import { CollaboratorsList } from './list';
 import { unlock } from '../../lock-unlock';
 
 import './styles/collaborators-presence.scss';
-import { CollaboratorsOverlay } from '../collaborators-overlay';
-
 const { useActiveCollaborators } = unlock( privateApis );
 
 interface CollaboratorsPresenceProps {
@@ -61,49 +59,44 @@ export function CollaboratorsPresence( {
 		.join( ', ' );
 
 	return visibleCollaborators.length > 0 ? (
-		<>
-			<div className="editor-collaborators-presence">
-				<Button
-					__next40pxDefaultSize
-					className="editor-collaborators-presence__button"
-					onClick={ () => setIsPopoverVisible( ! isPopoverVisible ) }
-					isPressed={ isPopoverVisible }
-					ref={ setPopoverAnchor }
-					aria-label={ sprintf(
-						// translators: %d: number of online collaborators.
-						__( 'Collaborators list, %d online' ),
-						otherActiveCollaborators.length
-					) }
-				>
-					{ visibleCollaborators.map( ( collaboratorState ) => (
-						<Avatar
-							key={ collaboratorState.clientId }
-							collaboratorInfo={
-								collaboratorState.collaboratorInfo
-							}
-							showCollaboratorColorBorder={ false }
-							size="small"
-						/>
-					) ) }
-
-					{ remainingCollaborators.length > 0 && (
-						<div
-							className="editor-collaborators-presence__remaining"
-							title={ remainingCollaboratorsText }
-						>
-							+{ remainingCollaborators.length }
-						</div>
-					) }
-				</Button>
-				{ isPopoverVisible && (
-					<CollaboratorsList
-						activeCollaborators={ otherActiveCollaborators }
-						popoverAnchor={ popoverAnchor }
-						setIsPopoverVisible={ setIsPopoverVisible }
-					/>
+		<div className="editor-collaborators-presence">
+			<Button
+				__next40pxDefaultSize
+				className="editor-collaborators-presence__button"
+				onClick={ () => setIsPopoverVisible( ! isPopoverVisible ) }
+				isPressed={ isPopoverVisible }
+				ref={ setPopoverAnchor }
+				aria-label={ sprintf(
+					// translators: %d: number of online collaborators.
+					__( 'Collaborators list, %d online' ),
+					otherActiveCollaborators.length
 				) }
-			</div>
-			<CollaboratorsOverlay postId={ postId } postType={ postType } />
-		</>
+			>
+				{ visibleCollaborators.map( ( collaboratorState ) => (
+					<Avatar
+						key={ collaboratorState.clientId }
+						collaboratorInfo={ collaboratorState.collaboratorInfo }
+						showCollaboratorColorBorder={ false }
+						size="small"
+					/>
+				) ) }
+
+				{ remainingCollaborators.length > 0 && (
+					<div
+						className="editor-collaborators-presence__remaining"
+						title={ remainingCollaboratorsText }
+					>
+						+{ remainingCollaborators.length }
+					</div>
+				) }
+			</Button>
+			{ isPopoverVisible && (
+				<CollaboratorsList
+					activeCollaborators={ otherActiveCollaborators }
+					popoverAnchor={ popoverAnchor }
+					setIsPopoverVisible={ setIsPopoverVisible }
+				/>
+			) }
+		</div>
 	) : null;
 }
