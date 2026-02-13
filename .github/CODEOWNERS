@@ -18,10 +18,10 @@
 /packages/block-library/src/table-of-contents   @ZebulanStanphill
 
 # Duotone
-/lib/block-supports/duotone.php
-/packages/block-editor/src/components/duotone-control
-/packages/block-editor/src/hooks/duotone.js
-/packages/components/src/duotone-picker
+/lib/block-supports/duotone.php									@sgomes
+/packages/block-editor/src/components/duotone-control	@sgomes
+/packages/block-editor/src/hooks/duotone.js			@sgomes
+/packages/components/src/duotone-picker					@sgomes
 
 # Editor
 /packages/annotations                           @atimmer
