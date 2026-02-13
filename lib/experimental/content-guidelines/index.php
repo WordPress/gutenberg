@@ -11,18 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require_once __DIR__ . '/class-gutenberg-content-guidelines-post-type.php';
 require_once __DIR__ . '/class-gutenberg-content-guidelines-rest-controller.php';
+require_once __DIR__ . '/class-gutenberg-content-guidelines-revisions-controller.php';
 
-// Register CPT.
+// Register CPT (controllers auto-instantiated via post type args).
 add_action( 'init', array( 'Gutenberg_Content_Guidelines_Post_Type', 'register' ) );
 
-// Register REST routes and post meta (at rest_api_init so block registry is available).
-add_action(
-	'rest_api_init',
-	function () {
-		Gutenberg_Content_Guidelines_Post_Type::register_post_meta();
-
-		$controller = new Gutenberg_Content_Guidelines_REST_Controller();
-		$controller->register_routes();
-	}
-);
-
+// Register post meta at rest_api_init (block registry needs to be available).
+add_action( 'rest_api_init', array( 'Gutenberg_Content_Guidelines_Post_Type', 'register_post_meta' ) );

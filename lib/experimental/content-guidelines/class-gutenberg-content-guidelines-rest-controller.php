@@ -2,6 +2,10 @@
 /**
  * Content Guidelines REST API Controller.
  *
+ * Extends WP_REST_Posts_Controller to inherit standard WordPress CRUD behavior,
+ * permission checks, and response formatting. Follows the pattern used by
+ * WP_REST_Global_Styles_Controller.
+ *
  * @package gutenberg
  */
 
@@ -12,14 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * REST API controller for Content Guidelines.
  */
-class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
-
-	/**
-	 * Post type.
-	 *
-	 * @var string
-	 */
-	protected $post_type = 'wp_guidelines';
+class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Controller {
 
 	/**
 	 * Maximum length for guideline text strings.
@@ -39,23 +36,27 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->namespace = 'wp/v2';
-		$this->rest_base = 'content-guidelines';
+		parent::__construct( Gutenberg_Content_Guidelines_Post_Type::POST_TYPE );
 	}
 
 	/**
-	 * Registers the routes for the objects of the controller.
+	 * Registers the routes for content guidelines.
+	 *
+	 * Calls parent to register standard /{id} CRUD routes, then overrides the
+	 * collection route with a singleton GET endpoint.
 	 */
 	public function register_routes() {
+		parent::register_routes();
 
+		// Override collection route with singleton GET + create.
 		register_rest_route(
 			$this->namespace,
 			'/' . $this->rest_base,
 			array(
 				array(
 					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_item' ),
-					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+					'callback'            => array( $this, 'get_guidelines' ),
+					'permission_callback' => array( $this, 'get_guidelines_permissions_check' ),
 					'args'                => array(
 						'category' => array(
 							'description'       => __( 'Limit response to a specific guideline category.', 'gutenberg' ),
@@ -83,132 +84,31 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
-			)
-		);
-
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\d]+)',
-			array(
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_item_by_id' ),
-					'permission_callback' => array( $this, 'get_item_permissions_check' ),
-					'args'                => array(
-						'id' => array(
-							'description' => __( 'Unique identifier for the guidelines.', 'gutenberg' ),
-							'type'        => 'integer',
-						),
-					),
-				),
-				array(
-					'methods'             => WP_REST_Server::EDITABLE,
-					'callback'            => array( $this, 'update_item' ),
-					'permission_callback' => array( $this, 'update_item_permissions_check' ),
-					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
-				),
-				array(
-					'methods'             => WP_REST_Server::DELETABLE,
-					'callback'            => array( $this, 'delete_item' ),
-					'permission_callback' => array( $this, 'delete_item_permissions_check' ),
-					'args'                => array(
-						'id' => array(
-							'description' => __( 'Unique identifier for the guidelines.', 'gutenberg' ),
-							'type'        => 'integer',
-						),
-					),
-				),
-				'schema' => array( $this, 'get_public_item_schema' ),
-			)
-		);
-
-		// Revisions route.
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\d]+)/revisions',
-			array(
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_revisions' ),
-					'permission_callback' => array( $this, 'get_item_permissions_check' ),
-					'args'                => array(
-						'id'       => array(
-							'description' => __( 'Unique identifier for the guidelines.', 'gutenberg' ),
-							'type'        => 'integer',
-						),
-						'page'     => array(
-							'description' => __( 'Current page of the revisions collection.', 'gutenberg' ),
-							'type'        => 'integer',
-							'default'     => 1,
-							'minimum'     => 1,
-						),
-						'per_page' => array(
-							'description' => __( 'Maximum number of revisions to be returned per page.', 'gutenberg' ),
-							'type'        => 'integer',
-							'default'     => 5,
-							'minimum'     => 1,
-							'maximum'     => 100,
-						),
-					),
-				),
-			)
-		);
-
-		// Single revision route.
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\d]+)/revisions/(?P<revision_id>[\d]+)',
-			array(
-				array(
-					'methods'             => WP_REST_Server::READABLE,
-					'callback'            => array( $this, 'get_revision' ),
-					'permission_callback' => array( $this, 'get_item_permissions_check' ),
-					'args'                => array(
-						'id'          => array(
-							'description' => __( 'Unique identifier for the guidelines.', 'gutenberg' ),
-							'type'        => 'integer',
-						),
-						'revision_id' => array(
-							'description' => __( 'Unique identifier for the revision.', 'gutenberg' ),
-							'type'        => 'integer',
-						),
-					),
-				),
-			)
-		);
-
-		// Restore revision route.
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\d]+)/revisions/(?P<revision_id>[\d]+)/restore',
-			array(
-				array(
-					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => array( $this, 'restore_revision' ),
-					'permission_callback' => array( $this, 'update_item_permissions_check' ),
-					'args'                => array(
-						'id'          => array(
-							'description' => __( 'Unique identifier for the guidelines.', 'gutenberg' ),
-							'type'        => 'integer',
-						),
-						'revision_id' => array(
-							'description' => __( 'Unique identifier for the revision to restore.', 'gutenberg' ),
-							'type'        => 'integer',
-						),
-					),
-				),
-			)
+			),
+			true
 		);
 	}
 
 	/**
-	 * Checks if a given request has access to read guidelines.
+	 * Retrieves the query params for the collection.
+	 *
+	 * Overridden to return empty since we use a singleton pattern, not a collection.
+	 *
+	 * @return array Empty collection parameters.
+	 */
+	public function get_collection_params() {
+		return array();
+	}
+
+	/**
+	 * Checks if a given request has access to read the singleton guidelines.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		if ( ! current_user_can( 'edit_posts' ) ) {
+	public function get_guidelines_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+		$post_type = get_post_type_object( $this->post_type );
+		if ( ! current_user_can( $post_type->cap->read ) ) {
 			return new WP_Error(
 				'rest_forbidden',
 				__( 'Sorry, you are not allowed to view content guidelines.', 'gutenberg' ),
@@ -220,73 +120,26 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Checks if a given request has access to create guidelines.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return true|WP_Error True if the request has create access, WP_Error object otherwise.
-	 */
-	public function create_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return new WP_Error(
-				'rest_forbidden',
-				__( 'Sorry, you are not allowed to create content guidelines.', 'gutenberg' ),
-				array( 'status' => rest_authorization_required_code() )
-			);
-		}
-
-		return true;
-	}
-
-	/**
-	 * Checks if a given request has access to update guidelines.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return true|WP_Error True if the request has update access, WP_Error object otherwise.
-	 */
-	public function update_item_permissions_check( $request ) {
-		return $this->create_item_permissions_check( $request );
-	}
-
-	/**
-	 * Checks if a given request has access to delete guidelines.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return true|WP_Error True if the request has delete access, WP_Error object otherwise.
-	 */
-	public function delete_item_permissions_check( $request ) {
-		return $this->create_item_permissions_check( $request );
-	}
-
-	/**
-	 * Gets the content guidelines.
+	 * Gets the singleton content guidelines.
 	 *
 	 * Supports query parameters:
 	 * - ?status=published|draft - Filter by status
 	 * - ?category=copy|images|site|blocks|other - Return only specific category
+	 * - ?block=core/paragraph - Return only specific block's guidelines
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error on failure.
+	 * @return WP_REST_Response Response object.
 	 */
-	public function get_item( $request ) {
+	public function get_guidelines( $request ) {
 		$status_filter = $request->get_param( 'status' );
 		$post          = $this->get_guidelines_post( $status_filter );
 
 		if ( ! $post ) {
-			// If filtering by status and no match, return empty response.
-			if ( $status_filter ) {
-				return rest_ensure_response(
-					array(
-						'id'                   => 0,
-						'status'               => $status_filter,
-						'guideline_categories' => new stdClass(),
-					)
-				);
-			}
-
+			$empty_status = $status_filter ? $status_filter : 'draft';
 			return rest_ensure_response(
 				array(
 					'id'                   => 0,
-					'status'               => 'draft',
+					'status'               => $empty_status,
 					'guideline_categories' => new stdClass(),
 				)
 			);
@@ -296,33 +149,14 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Gets the content guidelines by ID.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error on failure.
-	 */
-	public function get_item_by_id( $request ) {
-		$post = $this->get_validated_post( $request['id'] );
-
-		if ( ! $post ) {
-			return new WP_Error(
-				'rest_post_not_found',
-				__( 'Content guidelines not found.', 'gutenberg' ),
-				array( 'status' => 404 )
-			);
-		}
-
-		return $this->prepare_item_for_response( $post, $request );
-	}
-
-	/**
 	 * Creates content guidelines.
+	 *
+	 * Enforces singleton pattern — only one guidelines post per site.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error on failure.
 	 */
 	public function create_item( $request ) {
-		// Check if guidelines already exist.
 		$existing = $this->get_guidelines_post();
 		if ( $existing ) {
 			return new WP_Error(
@@ -332,283 +166,111 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 			);
 		}
 
-		$prepared = $this->prepare_item_for_database( $request );
+		$prepared             = $this->prepare_item_for_database( $request );
+		$prepared->post_type  = $this->post_type;
+		$prepared->post_title = __( 'Content Guidelines', 'gutenberg' );
 
-		$post_id = wp_insert_post(
-			array(
-				'post_type'   => $this->post_type,
-				'post_status' => isset( $prepared['status'] ) && 'published' === $prepared['status'] ? 'publish' : 'draft',
-				'post_title'  => __( 'Content Guidelines', 'gutenberg' ),
-			),
-			true
-		);
+		if ( ! isset( $prepared->post_status ) ) {
+			$prepared->post_status = 'draft';
+		}
+
+		$post_id = wp_insert_post( wp_slash( (array) $prepared ), true );
 
 		if ( is_wp_error( $post_id ) ) {
 			return $post_id;
 		}
 
-		// Save guideline categories to post meta.
-		if ( ! empty( $prepared['categories'] ) ) {
-			$this->save_guideline_categories_to_meta( $post_id, $prepared['categories'] );
+		if ( isset( $request['guideline_categories'] ) ) {
+			$categories = $this->sanitize_guideline_categories( $request['guideline_categories'] );
+			$this->save_guideline_categories_to_meta( $post_id, $categories );
 		}
 
 		$post = get_post( $post_id );
-		return $this->prepare_item_for_response( $post, $request );
-	}
 
-	/**
-	 * Updates content guidelines.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error on failure.
-	 */
-	public function update_item( $request ) {
-		$post = $this->get_validated_post( $request['id'] );
-
-		if ( ! $post ) {
-			return new WP_Error(
-				'rest_post_not_found',
-				__( 'Content guidelines not found.', 'gutenberg' ),
-				array( 'status' => 404 )
-			);
-		}
-
-		$prepared = $this->prepare_item_for_database( $request );
-
-		// Save guideline categories to post meta.
-		if ( ! empty( $prepared['categories'] ) ) {
-			$this->save_guideline_categories_to_meta( $post->ID, $prepared['categories'] );
-		}
-
-		// Update post status if provided.
-		$update_args = array( 'ID' => $post->ID );
-		if ( isset( $prepared['status'] ) ) {
-			$update_args['post_status'] = 'published' === $prepared['status'] ? 'publish' : 'draft';
-		}
-
-		// Trigger a post update to create a revision with the meta changes.
-		// We update post_modified to ensure a revision is created.
-		$result = wp_update_post( $update_args, true );
-
-		if ( is_wp_error( $result ) ) {
-			return $result;
-		}
-
-		$post = get_post( $post->ID );
-		return $this->prepare_item_for_response( $post, $request );
-	}
-
-	/**
-	 * Deletes content guidelines.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error on failure.
-	 */
-	public function delete_item( $request ) {
-		$post = $this->get_validated_post( $request['id'] );
-
-		if ( ! $post ) {
-			return new WP_Error(
-				'rest_post_not_found',
-				__( 'Content guidelines not found.', 'gutenberg' ),
-				array( 'status' => 404 )
-			);
-		}
-
-		$result = wp_delete_post( $post->ID, true );
-
-		if ( ! $result ) {
-			return new WP_Error(
-				'rest_cannot_delete',
-				__( 'The content guidelines cannot be deleted.', 'gutenberg' ),
-				array( 'status' => 500 )
-			);
-		}
-
-		return rest_ensure_response(
-			array(
-				'deleted' => true,
-				'id'      => $post->ID,
-			)
-		);
-	}
-
-	/**
-	 * Gets revisions for the content guidelines.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error on failure.
-	 */
-	public function get_revisions( $request ) {
-		$post = $this->get_validated_post( $request['id'] );
-
-		if ( ! $post ) {
-			return new WP_Error(
-				'rest_post_not_found',
-				__( 'Content guidelines not found.', 'gutenberg' ),
-				array( 'status' => 404 )
-			);
-		}
-
-		$page     = $request->get_param( 'page' );
-		$per_page = $request->get_param( 'per_page' );
-		$offset   = ( $page - 1 ) * $per_page;
-
-		// Get total count of revisions.
-		$all_revision_ids = wp_get_post_revisions(
-			$post->ID,
-			array(
-				'fields' => 'ids',
-			)
-		);
-		$total_items      = count( $all_revision_ids );
-		$total_pages      = (int) ceil( $total_items / $per_page );
-
-		// Get paginated revisions.
-		$revisions = wp_get_post_revisions(
-			$post->ID,
-			array(
-				'posts_per_page' => $per_page,
-				'offset'         => $offset,
-				'orderby'        => 'date',
-				'order'          => 'DESC',
-				'no_found_rows'  => true,
-			)
-		);
-
-		$data = array();
-		foreach ( $revisions as $revision ) {
-			$author = get_user_by( 'id', $revision->post_author );
-			$data[] = array(
-				'id'          => $revision->ID,
-				'date'        => mysql_to_rfc3339( $revision->post_date ),
-				'date_gmt'    => mysql_to_rfc3339( $revision->post_date_gmt ),
-				'author'      => $revision->post_author,
-				'author_name' => $author ? $author->display_name : __( 'Unknown', 'gutenberg' ),
-			);
-		}
-
-		$response = rest_ensure_response( $data );
-		$response->header( 'X-WP-Total', $total_items );
-		$response->header( 'X-WP-TotalPages', $total_pages );
+		$request->set_param( 'context', 'edit' );
+		$response = $this->prepare_item_for_response( $post, $request );
+		$response = rest_ensure_response( $response );
+		$response->set_status( 201 );
+		$response->header( 'Location', rest_url( sprintf( '%s/%s/%d', $this->namespace, $this->rest_base, $post_id ) ) );
 
 		return $response;
 	}
 
 	/**
-	 * Gets a single revision for the content guidelines.
+	 * Updates content guidelines.
+	 *
+	 * Saves guideline categories to meta before updating the post so that
+	 * the revision captures the updated meta values.
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error on failure.
 	 */
-	public function get_revision( $request ) {
-		$post = $this->get_validated_post( $request['id'] );
-
-		if ( ! $post ) {
-			return new WP_Error(
-				'rest_post_not_found',
-				__( 'Content guidelines not found.', 'gutenberg' ),
-				array( 'status' => 404 )
-			);
+	public function update_item( $request ) {
+		$post = $this->get_post( $request['id'] );
+		if ( is_wp_error( $post ) ) {
+			return $post;
 		}
 
-		$revision = get_post( $request['revision_id'] );
-
-		if ( ! $revision || 'revision' !== $revision->post_type || (int) $revision->post_parent !== (int) $post->ID ) {
-			return new WP_Error(
-				'rest_revision_not_found',
-				__( 'Revision not found.', 'gutenberg' ),
-				array( 'status' => 404 )
-			);
+		// Save guideline categories to meta first (so revision captures them).
+		if ( isset( $request['guideline_categories'] ) ) {
+			$categories = $this->sanitize_guideline_categories( $request['guideline_categories'] );
+			$this->save_guideline_categories_to_meta( $post->ID, $categories );
 		}
 
-		// Get guideline categories from revision meta.
-		$guideline_categories = $this->get_guideline_categories_from_meta( $revision->ID );
+		$prepared     = $this->prepare_item_for_database( $request );
+		$prepared->ID = $post->ID;
 
-		$author = get_user_by( 'id', $revision->post_author );
-
-		$data = array(
-			'id'                   => $revision->ID,
-			'parent'               => $revision->post_parent,
-			'date'                 => mysql_to_rfc3339( $revision->post_date ),
-			'date_gmt'             => mysql_to_rfc3339( $revision->post_date_gmt ),
-			'author'               => $revision->post_author,
-			'author_name'          => $author ? $author->display_name : __( 'Unknown', 'gutenberg' ),
-			'guideline_categories' => ! empty( $guideline_categories ) ? $guideline_categories : new stdClass(),
-		);
-
-		return rest_ensure_response( $data );
-	}
-
-	/**
-	 * Restores a revision to the main guidelines post.
-	 *
-	 * Uses WordPress's native wp_restore_post_revision() function which:
-	 * - Restores all revision fields (not just post_content)
-	 * - Sets _edit_last post meta to current user
-	 * - Fires wp_restore_post_revision action for plugin compatibility
-	 * - Creates a new revision for audit trail
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error on failure.
-	 */
-	public function restore_revision( $request ) {
-		$post = $this->get_validated_post( $request['id'] );
-
-		if ( ! $post ) {
-			return new WP_Error(
-				'rest_post_not_found',
-				__( 'Content guidelines not found.', 'gutenberg' ),
-				array( 'status' => 404 )
-			);
-		}
-
-		$revision = get_post( $request['revision_id'] );
-
-		if ( ! $revision || 'revision' !== $revision->post_type || (int) $revision->post_parent !== (int) $post->ID ) {
-			return new WP_Error(
-				'rest_revision_not_found',
-				__( 'Revision not found.', 'gutenberg' ),
-				array( 'status' => 404 )
-			);
-		}
-
-		// Use WordPress's native revision restore function.
-		// This restores all fields, sets _edit_last meta, and fires hooks.
-		$result = wp_restore_post_revision( $revision->ID );
+		// Trigger a post update to create a revision with the meta changes.
+		$result = wp_update_post( wp_slash( (array) $prepared ), true );
 
 		if ( is_wp_error( $result ) ) {
 			return $result;
 		}
 
-		if ( ! $result ) {
-			return new WP_Error(
-				'rest_cannot_restore',
-				__( 'Could not restore revision.', 'gutenberg' ),
-				array( 'status' => 500 )
-			);
+		$post = get_post( $post->ID );
+
+		$request->set_param( 'context', 'edit' );
+
+		return $this->prepare_item_for_response( $post, $request );
+	}
+
+	/**
+	 * Prepares a single guidelines post for database.
+	 *
+	 * Returns a stdClass with standard post fields. Guideline categories
+	 * are handled separately via save_guideline_categories_to_meta().
+	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @return stdClass Prepared post data.
+	 */
+	protected function prepare_item_for_database( $request ) {
+		$prepared = new stdClass();
+
+		if ( isset( $request['id'] ) ) {
+			$prepared->ID = $request['id'];
 		}
 
-		// Get the updated post and return the response.
-		$post = get_post( $post->ID );
-		return $this->prepare_item_for_response( $post, $request );
+		if ( isset( $request['status'] ) ) {
+			$prepared->post_status = 'published' === $request['status'] ? 'publish' : 'draft';
+		}
+
+		return $prepared;
 	}
 
 	/**
 	 * Prepares a single guidelines output for response.
 	 *
-	 * Supports ?category and ?block query parameters to filter response.
+	 * Builds the guideline_categories structured response from post meta
+	 * and includes standard _links.
 	 *
 	 * @param WP_Post         $post    Post object.
 	 * @param WP_REST_Request $request Request object.
 	 * @return WP_REST_Response Response object.
 	 */
 	public function prepare_item_for_response( $post, $request ) {
-		$guideline_categories = $this->get_guideline_categories_from_meta( $post->ID );
+		$guideline_categories = Gutenberg_Content_Guidelines_Post_Type::get_guideline_categories_from_meta( $post->ID );
 
-		$author = get_user_by( 'id', $post->post_author );
-
-		// Handle ?block filter - return only the requested block's guidelines.
+		// Handle ?block filter.
 		$block_filter = $request->get_param( 'block' );
 		if ( $block_filter && ! empty( $guideline_categories ) ) {
 			if ( isset( $guideline_categories['blocks'][ $block_filter ] ) ) {
@@ -621,7 +283,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 				$guideline_categories = new stdClass();
 			}
 		} elseif ( $request->get_param( 'category' ) ) {
-			// Handle ?category filter - return only the requested category.
+			// Handle ?category filter.
 			$category_filter = $request->get_param( 'category' );
 			if ( isset( $guideline_categories[ $category_filter ] ) ) {
 				$guideline_categories = array(
@@ -636,92 +298,86 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 			$guideline_categories = new stdClass();
 		}
 
-		$data = array(
-			'id'                   => $post->ID,
-			'status'               => 'publish' === $post->post_status ? 'published' : 'draft',
-			'guideline_categories' => $guideline_categories,
-			'date'                 => mysql_to_rfc3339( $post->post_date ),
-			'date_gmt'             => mysql_to_rfc3339( $post->post_date_gmt ),
-			'modified'             => mysql_to_rfc3339( $post->post_modified ),
-			'modified_gmt'         => mysql_to_rfc3339( $post->post_modified_gmt ),
-			'author'               => $post->post_author,
-			'author_name'          => $author ? $author->display_name : __( 'Unknown', 'gutenberg' ),
-		);
+		$fields = $this->get_fields_for_response( $request );
+		$data   = array();
 
-		return rest_ensure_response( $data );
+		if ( rest_is_field_included( 'id', $fields ) ) {
+			$data['id'] = $post->ID;
+		}
+
+		if ( rest_is_field_included( 'status', $fields ) ) {
+			$data['status'] = 'publish' === $post->post_status ? 'published' : 'draft';
+		}
+
+		if ( rest_is_field_included( 'guideline_categories', $fields ) ) {
+			$data['guideline_categories'] = $guideline_categories;
+		}
+
+		if ( rest_is_field_included( 'date', $fields ) ) {
+			$data['date'] = mysql_to_rfc3339( $post->post_date );
+		}
+
+		if ( rest_is_field_included( 'date_gmt', $fields ) ) {
+			$data['date_gmt'] = mysql_to_rfc3339( $post->post_date_gmt );
+		}
+
+		if ( rest_is_field_included( 'modified', $fields ) ) {
+			$data['modified'] = mysql_to_rfc3339( $post->post_modified );
+		}
+
+		if ( rest_is_field_included( 'modified_gmt', $fields ) ) {
+			$data['modified_gmt'] = mysql_to_rfc3339( $post->post_modified_gmt );
+		}
+
+		if ( rest_is_field_included( 'author', $fields ) ) {
+			$data['author'] = (int) $post->post_author;
+		}
+
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
+
+		$response = rest_ensure_response( $data );
+
+		if ( rest_is_field_included( '_links', $fields ) || rest_is_field_included( '_embedded', $fields ) ) {
+			$response->add_links( $this->prepare_links( $post->ID ) );
+		}
+
+		return $response;
 	}
 
 	/**
-	 * Gets guideline categories from post meta.
+	 * Prepares links for the request.
 	 *
-	 * @param int $post_id Post ID.
-	 * @return array Guideline categories.
+	 * Includes self, about, and version-history links.
+	 *
+	 * @param int $id Post ID.
+	 * @return array Links for the given post.
 	 */
-	protected function get_guideline_categories_from_meta( $post_id ) {
-		$category_labels = array(
-			'copy'   => __( 'Copy Guidelines', 'gutenberg' ),
-			'images' => __( 'Image Guidelines', 'gutenberg' ),
-			'site'   => __( 'Site Context', 'gutenberg' ),
-			'other'  => __( 'Other Guidelines', 'gutenberg' ),
+	protected function prepare_links( $id ) {
+		$base = sprintf( '%s/%s', $this->namespace, $this->rest_base );
+
+		$links = array(
+			'self'  => array(
+				'href' => rest_url( trailingslashit( $base ) . $id ),
+			),
+			'about' => array(
+				'href' => rest_url( 'wp/v2/types/' . $this->post_type ),
+			),
 		);
 
-		$guideline_categories = array();
+		if ( post_type_supports( $this->post_type, 'revisions' ) ) {
+			$revisions       = wp_get_latest_revision_id_and_total_count( $id );
+			$revisions_count = ! is_wp_error( $revisions ) ? $revisions['count'] : 0;
+			$revisions_base  = sprintf( '/%s/%d/revisions', $base, $id );
 
-		// Get standard categories.
-		foreach ( Gutenberg_Content_Guidelines_Post_Type::CATEGORY_META_KEYS as $category ) {
-			$meta_key = '_content_guideline_' . $category;
-			$value    = get_post_meta( $post_id, $meta_key, true );
-
-			$guideline_categories[ $category ] = array(
-				'label'      => $category_labels[ $category ],
-				'guidelines' => $value,
+			$links['version-history'] = array(
+				'href'  => rest_url( $revisions_base ),
+				'count' => $revisions_count,
 			);
 		}
 
-		// Get block-specific guidelines from individual meta keys.
-		$all_meta = get_post_meta( $post_id );
-
-		$blocks = array();
-		foreach ( $all_meta as $meta_key => $meta_values ) {
-			if ( Gutenberg_Content_Guidelines_Post_Type::is_block_meta_key( $meta_key ) ) {
-				$block_name = Gutenberg_Content_Guidelines_Post_Type::meta_key_to_block_name( $meta_key );
-				$value      = isset( $meta_values[0] ) ? $meta_values[0] : '';
-
-				if ( ! empty( $value ) ) {
-					$blocks[ $block_name ] = array(
-						'guidelines' => $value,
-					);
-				}
-			}
-		}
-
-		if ( ! empty( $blocks ) ) {
-			$guideline_categories['blocks'] = $blocks;
-		}
-
-		return $guideline_categories;
-	}
-
-	/**
-	 * Prepares a single guidelines for database.
-	 *
-	 * @param WP_REST_Request $request Request object.
-	 * @return array Prepared data.
-	 */
-	protected function prepare_item_for_database( $request ) {
-		$prepared = array(
-			'categories' => array(),
-		);
-
-		if ( isset( $request['status'] ) ) {
-			$prepared['status'] = $request['status'];
-		}
-
-		if ( isset( $request['guideline_categories'] ) ) {
-			$prepared['categories'] = $this->sanitize_guideline_categories( $request['guideline_categories'] );
-		}
-
-		return $prepared;
+		return $links;
 	}
 
 	/**
@@ -743,7 +399,6 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 		}
 
 		// Handle block-specific guidelines as individual meta keys.
-		// No registration needed - just save directly, revisions handled via filter.
 		if ( isset( $categories['blocks'] ) && is_array( $categories['blocks'] ) ) {
 			foreach ( $categories['blocks'] as $block_name => $block_data ) {
 				$meta_key = Gutenberg_Content_Guidelines_Post_Type::block_name_to_meta_key( $block_name );
@@ -752,7 +407,6 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 				if ( ! empty( $value ) ) {
 					update_post_meta( $post_id, $meta_key, $value );
 				} else {
-					// Remove meta if value is empty (block guideline deleted).
 					delete_post_meta( $post_id, $meta_key );
 				}
 			}
@@ -761,9 +415,6 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 
 	/**
 	 * Sanitizes guideline categories data.
-	 *
-	 * Strips unknown category and property keys, validates block name format,
-	 * and runs wp_kses_post() on all string values.
 	 *
 	 * @param mixed $categories Raw guideline categories from the request.
 	 * @return array Sanitized guideline categories.
@@ -788,6 +439,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 				$category = $this->sanitize_standard_category( $category );
 			}
 		}
+		unset( $category );
 
 		return $sanitized;
 	}
@@ -801,9 +453,14 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	private function sanitize_standard_category( $category ) {
 		$sanitized = array_intersect_key( $category, array_flip( array( 'label', 'guidelines' ) ) );
 
-		foreach ( $sanitized as &$value ) {
-			$value = is_string( $value ) ? wp_kses_post( $value ) : '';
+		foreach ( $sanitized as $key => &$value ) {
+			$value = is_string( $value ) ? sanitize_textarea_field( $value ) : '';
+			$max   = 'label' === $key ? self::MAX_LABEL_LENGTH : self::MAX_GUIDELINE_LENGTH;
+			if ( mb_strlen( $value, 'UTF-8' ) > $max ) {
+				$value = mb_substr( $value, 0, $max, 'UTF-8' );
+			}
 		}
+		unset( $value );
 
 		return $sanitized;
 	}
@@ -830,28 +487,17 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 
 			if ( isset( $sanitized_block['guidelines'] ) ) {
 				$sanitized_block['guidelines'] = is_string( $sanitized_block['guidelines'] )
-					? wp_kses_post( $sanitized_block['guidelines'] )
+					? sanitize_textarea_field( $sanitized_block['guidelines'] )
 					: '';
+				if ( mb_strlen( $sanitized_block['guidelines'], 'UTF-8' ) > self::MAX_GUIDELINE_LENGTH ) {
+					$sanitized_block['guidelines'] = mb_substr( $sanitized_block['guidelines'], 0, self::MAX_GUIDELINE_LENGTH, 'UTF-8' );
+				}
 			}
 
 			$sanitized[ $block_name ] = $sanitized_block;
 		}
 
 		return $sanitized;
-	}
-
-	/**
-	 * Gets a guidelines post by ID with type validation.
-	 *
-	 * @param int $id Post ID.
-	 * @return WP_Post|null Post object or null if not found/invalid.
-	 */
-	protected function get_validated_post( $id ) {
-		$post = get_post( $id );
-		if ( ! $post || $this->post_type !== $post->post_type ) {
-			return null;
-		}
-		return $post;
 	}
 
 	/**
@@ -1025,12 +671,6 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 				'author'               => array(
 					'description' => __( 'The ID of the author of the guidelines.', 'gutenberg' ),
 					'type'        => 'integer',
-					'context'     => array( 'view', 'edit' ),
-					'readonly'    => true,
-				),
-				'author_name'          => array(
-					'description' => __( 'The display name of the author.', 'gutenberg' ),
-					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 				),

@@ -19,7 +19,7 @@ class Gutenberg_Content_Guidelines_Post_Type {
 	 *
 	 * @var string
 	 */
-	const POST_TYPE = 'wp_guidelines';
+	const POST_TYPE = 'wp_content_guideline';
 
 	/**
 	 * The standard guideline category meta keys.
@@ -45,20 +45,21 @@ class Gutenberg_Content_Guidelines_Post_Type {
 	 */
 	public static function register() {
 		$args = array(
-			'labels'                => array(
+			'labels'                          => array(
 				'name'          => __( 'Content Guidelines', 'gutenberg' ),
 				'singular_name' => __( 'Content Guidelines', 'gutenberg' ),
 			),
-			'public'                => false,
-			'publicly_queryable'    => false,
-			'show_ui'               => false,
-			'show_in_menu'          => false,
-			'show_in_rest'          => true,
-			'rest_namespace'        => 'wp/v2',
-			'rest_base'             => 'content-guidelines',
-			'rest_controller_class' => 'Gutenberg_Content_Guidelines_REST_Controller',
-			'capability_type'       => 'post',
-			'capabilities'          => array(
+			'public'                          => false,
+			'publicly_queryable'              => false,
+			'show_ui'                         => false,
+			'show_in_menu'                    => false,
+			'show_in_rest'                    => true,
+			'rest_namespace'                  => '__experimental',
+			'rest_base'                       => 'content-guidelines',
+			'rest_controller_class'           => 'Gutenberg_Content_Guidelines_REST_Controller',
+			'revisions_rest_controller_class' => 'Gutenberg_Content_Guidelines_Revisions_Controller',
+			'capability_type'                 => 'post',
+			'capabilities'                    => array(
 				'read'                   => 'edit_posts',
 				'create_posts'           => 'manage_options',
 				'edit_posts'             => 'manage_options',
@@ -69,13 +70,13 @@ class Gutenberg_Content_Guidelines_Post_Type {
 				'delete_others_posts'    => 'manage_options',
 				'publish_posts'          => 'manage_options',
 			),
-			'map_meta_cap'          => true,
-			'supports'              => array( 'revisions' ),
-			'hierarchical'          => false,
-			'has_archive'           => false,
-			'rewrite'               => false,
-			'query_var'             => false,
-			'can_export'            => true,
+			'map_meta_cap'                    => true,
+			'supports'                        => array( 'revisions' ),
+			'hierarchical'                    => false,
+			'has_archive'                     => false,
+			'rewrite'                         => false,
+			'query_var'                       => false,
+			'can_export'                      => true,
 		);
 
 		register_post_type( self::POST_TYPE, $args );
@@ -178,5 +179,58 @@ class Gutenberg_Content_Guidelines_Post_Type {
 	 */
 	public static function is_block_meta_key( $meta_key ) {
 		return strpos( $meta_key, self::BLOCK_META_PREFIX ) === 0;
+	}
+
+	/**
+	 * Gets guideline categories from post meta.
+	 *
+	 * Shared between the post controller and revisions controller.
+	 *
+	 * @param int $post_id Post ID (can be a post or revision ID).
+	 * @return array Guideline categories.
+	 */
+	public static function get_guideline_categories_from_meta( $post_id ) {
+		$category_labels = array(
+			'copy'   => __( 'Copy Guidelines', 'gutenberg' ),
+			'images' => __( 'Image Guidelines', 'gutenberg' ),
+			'site'   => __( 'Site Context', 'gutenberg' ),
+			'other'  => __( 'Other Guidelines', 'gutenberg' ),
+		);
+
+		$guideline_categories = array();
+
+		// Get standard categories.
+		foreach ( self::CATEGORY_META_KEYS as $category ) {
+			$meta_key = '_content_guideline_' . $category;
+			$value    = get_post_meta( $post_id, $meta_key, true );
+
+			$guideline_categories[ $category ] = array(
+				'label'      => $category_labels[ $category ],
+				'guidelines' => $value,
+			);
+		}
+
+		// Get block-specific guidelines from individual meta keys.
+		$all_meta = get_post_meta( $post_id );
+
+		$blocks = array();
+		foreach ( $all_meta as $meta_key => $meta_values ) {
+			if ( self::is_block_meta_key( $meta_key ) ) {
+				$block_name = self::meta_key_to_block_name( $meta_key );
+				$value      = isset( $meta_values[0] ) ? $meta_values[0] : '';
+
+				if ( ! empty( $value ) ) {
+					$blocks[ $block_name ] = array(
+						'guidelines' => $value,
+					);
+				}
+			}
+		}
+
+		if ( ! empty( $blocks ) ) {
+			$guideline_categories['blocks'] = $blocks;
+		}
+
+		return $guideline_categories;
 	}
 }
