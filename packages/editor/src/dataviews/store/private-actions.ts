@@ -35,6 +35,7 @@ import {
 	pageTitleField,
 	patternTitleField,
 	notesField,
+	mediaEditTestFields,
 } from '@wordpress/fields';
 import {
 	altTextField,
@@ -272,6 +273,7 @@ export const registerPostTypeSchema =
 					postPreviewField,
 				hasEditorNotesSupport( postTypeConfig.supports ) && notesField,
 			].filter( Boolean );
+			fields.push( ...mediaEditTestFields ); // Add the media test fields.
 			if ( postTypeConfig.supports?.title ) {
 				let _titleField;
 				if ( postType === 'page' ) {

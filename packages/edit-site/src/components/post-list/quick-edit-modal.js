@@ -76,12 +76,16 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 	const form = useMemo( () => {
 		const allFields = [
 			{
-				id: 'featured_media',
-				layout: {
-					type: 'regular',
-					labelPosition: 'none',
-				},
+				id: 'test_media_gallery',
+				layout: { type: 'regular' },
 			},
+			// {
+			// 	id: 'featured_media',
+			// 	layout: {
+			// 		type: 'regular',
+			// 		labelPosition: 'none',
+			// 	},
+			// },
 			{
 				id: 'status',
 				label: __( 'Status & Visibility' ),

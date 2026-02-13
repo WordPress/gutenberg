@@ -15,3 +15,4 @@ export { default as discussionField } from './discussion';
 export { default as dateField } from './date';
 export { default as authorField } from './author';
 export { default as notesField } from './notes';
+export { mediaEditTestFields } from './media-edit-test-fields';
