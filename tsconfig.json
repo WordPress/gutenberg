@@ -14,7 +14,6 @@
 		{ "path": "packages/block-serialization-default-parser" },
 		{ "path": "packages/boot" },
 		{ "path": "packages/components" },
-		{ "path": "packages/content-guidelines" },
 		{ "path": "packages/compose" },
 		{ "path": "packages/core-abilities" },
 		{ "path": "packages/core-data" },

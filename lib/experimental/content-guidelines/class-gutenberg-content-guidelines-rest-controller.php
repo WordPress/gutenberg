@@ -63,6 +63,11 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 							'enum'              => array( 'copy', 'images', 'site', 'blocks', 'other' ),
 							'sanitize_callback' => 'sanitize_text_field',
 						),
+						'block'    => array(
+							'description'       => __( 'Limit response to guidelines for a specific block type.', 'gutenberg' ),
+							'type'              => 'string',
+							'sanitize_callback' => 'sanitize_text_field',
+						),
 						'status'   => array(
 							'description'       => __( 'Limit response to guidelines with a specific status.', 'gutenberg' ),
 							'type'              => 'string',
@@ -592,7 +597,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 	/**
 	 * Prepares a single guidelines output for response.
 	 *
-	 * Supports ?category query parameter to return only a specific category.
+	 * Supports ?category and ?block query parameters to filter response.
 	 *
 	 * @param WP_Post         $post    Post object.
 	 * @param WP_REST_Request $request Request object.
@@ -603,9 +608,21 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Controller {
 
 		$author = get_user_by( 'id', $post->post_author );
 
-		// Handle ?category filter - return only the requested category.
-		$category_filter = $request->get_param( 'category' );
-		if ( $category_filter && ! empty( $guideline_categories ) ) {
+		// Handle ?block filter - return only the requested block's guidelines.
+		$block_filter = $request->get_param( 'block' );
+		if ( $block_filter && ! empty( $guideline_categories ) ) {
+			if ( isset( $guideline_categories['blocks'][ $block_filter ] ) ) {
+				$guideline_categories = array(
+					'blocks' => array(
+						$block_filter => $guideline_categories['blocks'][ $block_filter ],
+					),
+				);
+			} else {
+				$guideline_categories = new stdClass();
+			}
+		} elseif ( $request->get_param( 'category' ) ) {
+			// Handle ?category filter - return only the requested category.
+			$category_filter = $request->get_param( 'category' );
 			if ( isset( $guideline_categories[ $category_filter ] ) ) {
 				$guideline_categories = array(
 					$category_filter => $guideline_categories[ $category_filter ],

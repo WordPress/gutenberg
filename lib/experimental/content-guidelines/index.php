@@ -11,7 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 require_once __DIR__ . '/class-gutenberg-content-guidelines-post-type.php';
 require_once __DIR__ . '/class-gutenberg-content-guidelines-rest-controller.php';
-require_once __DIR__ . '/class-gutenberg-content-guidelines-admin-page.php';
 
 // Register CPT.
 add_action( 'init', array( 'Gutenberg_Content_Guidelines_Post_Type', 'register' ) );
@@ -26,8 +25,4 @@ add_action(
 		$controller->register_routes();
 	}
 );
-
-// Register admin page.
-add_action( 'admin_menu', array( 'Gutenberg_Content_Guidelines_Admin_Page', 'register_menu' ) );
-add_action( 'admin_enqueue_scripts', array( 'Gutenberg_Content_Guidelines_Admin_Page', 'enqueue_scripts' ) );
 
