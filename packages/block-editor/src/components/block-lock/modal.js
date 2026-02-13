@@ -41,6 +41,7 @@ function getTemplateLockValue( lock ) {
 }
 
 export default function BlockLockModal( { clientId, onClose } ) {
+	const [ lock, setLock ] = useState( { move: false, remove: false } );
 	const { isEditLocked, isMoveLocked, isRemoveLocked } =
 		useBlockLock( clientId );
 	const { allowsEditLocking, templateLock, hasTemplateLock } = useSelect(
@@ -58,11 +59,6 @@ export default function BlockLockModal( { clientId, onClose } ) {
 		},
 		[ clientId ]
 	);
-	const [ lock, setLock ] = useState( {
-		move: isMoveLocked,
-		remove: isRemoveLocked,
-		...( allowsEditLocking ? { edit: isEditLocked } : {} ),
-	} );
 	const [ applyTemplateLock, setApplyTemplateLock ] = useState(
 		!! templateLock
 	);
