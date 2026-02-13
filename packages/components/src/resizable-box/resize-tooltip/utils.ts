@@ -19,7 +19,7 @@ interface UseResizeLabelProps {
 	/** The label value. */
 	label?: string;
 	/** Element to be rendered for resize listening events. */
-	resizeListener: JSX.Element;
+	resizeListener: React.JSX.Element;
 }
 
 interface UseResizeLabelArgs {

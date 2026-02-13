@@ -36,10 +36,8 @@ export type WordPressComponent<
 	< TT extends React.ElementType >(
 		props: WordPressComponentProps< O, TT, IsPolymorphic > &
 			( IsPolymorphic extends true ? { as: TT } : {} )
-	): JSX.Element | null;
-	(
-		props: WordPressComponentProps< O, T, IsPolymorphic >
-	): JSX.Element | null;
+	): React.ReactNode;
+	( props: WordPressComponentProps< O, T, IsPolymorphic > ): React.ReactNode;
 	displayName?: string;
 	/**
 	 * A CSS selector used to fake component interpolation in styled components

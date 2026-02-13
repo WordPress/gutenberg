@@ -294,7 +294,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: Dangerously-rendering component.
+-   Dangerously-rendering component.
 
 ### render
 

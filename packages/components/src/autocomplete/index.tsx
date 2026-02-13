@@ -66,7 +66,7 @@ export function useAutocomplete( {
 		null
 	);
 	const [ AutocompleterUI, setAutocompleterUI ] = useState<
-		( ( props: AutocompleterUIProps ) => JSX.Element | null ) | null
+		( ( props: AutocompleterUIProps ) => React.JSX.Element | null ) | null
 	>( null );
 
 	const backspacingRef = useRef( false );

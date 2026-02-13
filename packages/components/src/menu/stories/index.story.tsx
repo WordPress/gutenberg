@@ -513,7 +513,7 @@ const Fill = ( { children }: { children: React.ReactNode } ) => {
 				const { forwardedContext = [] } = fillProps;
 
 				return forwardedContext.reduce(
-					( inner: JSX.Element, [ Provider, props ] ) => (
+					( inner: React.JSX.Element, [ Provider, props ] ) => (
 						<Provider { ...props }>{ inner }</Provider>
 					),
 					innerMarkup
