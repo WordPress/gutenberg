@@ -268,36 +268,6 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 * @return WP_REST_Response Response object.
 	 */
 	public function prepare_item_for_response( $post, $request ) {
-		$guideline_categories = Gutenberg_Content_Guidelines_Post_Type::get_guideline_categories_from_meta( $post->ID );
-
-		// Handle ?block filter.
-		$block_filter = $request->get_param( 'block' );
-		if ( $block_filter && ! empty( $guideline_categories ) ) {
-			if ( isset( $guideline_categories['blocks'][ $block_filter ] ) ) {
-				$guideline_categories = array(
-					'blocks' => array(
-						$block_filter => $guideline_categories['blocks'][ $block_filter ],
-					),
-				);
-			} else {
-				$guideline_categories = new stdClass();
-			}
-		} elseif ( $request->get_param( 'category' ) ) {
-			// Handle ?category filter.
-			$category_filter = $request->get_param( 'category' );
-			if ( isset( $guideline_categories[ $category_filter ] ) ) {
-				$guideline_categories = array(
-					$category_filter => $guideline_categories[ $category_filter ],
-				);
-			} else {
-				$guideline_categories = new stdClass();
-			}
-		}
-
-		if ( empty( $guideline_categories ) ) {
-			$guideline_categories = new stdClass();
-		}
-
 		$fields = $this->get_fields_for_response( $request );
 		$data   = array();
 
@@ -310,6 +280,36 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		}
 
 		if ( rest_is_field_included( 'guideline_categories', $fields ) ) {
+			$guideline_categories = Gutenberg_Content_Guidelines_Post_Type::get_guideline_categories_from_meta( $post->ID );
+
+			// Handle ?block filter.
+			$block_filter = $request->get_param( 'block' );
+			if ( $block_filter && ! empty( $guideline_categories ) ) {
+				if ( isset( $guideline_categories['blocks'][ $block_filter ] ) ) {
+					$guideline_categories = array(
+						'blocks' => array(
+							$block_filter => $guideline_categories['blocks'][ $block_filter ],
+						),
+					);
+				} else {
+					$guideline_categories = new stdClass();
+				}
+			} elseif ( $request->get_param( 'category' ) ) {
+				// Handle ?category filter.
+				$category_filter = $request->get_param( 'category' );
+				if ( isset( $guideline_categories[ $category_filter ] ) ) {
+					$guideline_categories = array(
+						$category_filter => $guideline_categories[ $category_filter ],
+					);
+				} else {
+					$guideline_categories = new stdClass();
+				}
+			}
+
+			if ( empty( $guideline_categories ) ) {
+				$guideline_categories = new stdClass();
+			}
+
 			$data['guideline_categories'] = $guideline_categories;
 		}
 

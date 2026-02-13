@@ -66,10 +66,14 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 			return $response;
 		}
 
-		$data                         = $response->get_data();
-		$guideline_categories         = Gutenberg_Content_Guidelines_Post_Type::get_guideline_categories_from_meta( $item->ID );
-		$data['guideline_categories'] = ! empty( $guideline_categories ) ? $guideline_categories : new stdClass();
-		$response->set_data( $data );
+		$fields = $this->get_fields_for_response( $request );
+
+		if ( rest_is_field_included( 'guideline_categories', $fields ) ) {
+			$data                         = $response->get_data();
+			$guideline_categories         = Gutenberg_Content_Guidelines_Post_Type::get_guideline_categories_from_meta( $item->ID );
+			$data['guideline_categories'] = ! empty( $guideline_categories ) ? $guideline_categories : new stdClass();
+			$response->set_data( $data );
+		}
 
 		return $response;
 	}
