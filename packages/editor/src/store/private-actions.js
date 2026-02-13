@@ -217,7 +217,7 @@ export const saveDirtyEntities =
 					registry
 						.dispatch( noticesStore )
 						.createSuccessNotice(
-							successNoticeContent ?? __( 'Site updated.' ),
+							successNoticeContent || __( 'Site updated.' ),
 							{
 								type: 'snackbar',
 								id: saveNoticeId,
