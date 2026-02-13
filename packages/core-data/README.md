@@ -174,6 +174,16 @@ _Returns_
 
 -   `Object`: Action object.
 
+### clearEntityRecordEdits
+
+Action triggered to clear all edits from an entity record.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the entity.
+-   _name_ `string`: Name of the entity.
+-   _recordId_ `number|string`: Record ID of the entity record.
+
 ### deleteEntityRecord
 
 Action triggered to delete an entity record.

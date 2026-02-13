@@ -1,0 +1,100 @@
+[
+	{
+		"blockName": "core/tabs",
+		"attrs": {
+			"className": "is-example"
+		},
+		"innerBlocks": [
+			{
+				"blockName": "core/tabs-menu",
+				"attrs": {},
+				"innerBlocks": [
+					{
+						"blockName": "core/tabs-menu-item",
+						"attrs": {},
+						"innerBlocks": [],
+						"innerHTML": "\n\t\t<a class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" hidden><span class=\"screen-reader-text\">Tab menu item</span></a>\n\t\t",
+						"innerContent": [
+							"\n\t\t<a class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" hidden><span class=\"screen-reader-text\">Tab menu item</span></a>\n\t\t"
+						]
+					}
+				],
+				"innerHTML": "\n\t<div class=\"wp-block-tabs-menu\" role=\"tablist\">\n\t\t\n\t</div>\n\t",
+				"innerContent": [
+					"\n\t<div class=\"wp-block-tabs-menu\" role=\"tablist\">\n\t\t",
+					null,
+					"\n\t</div>\n\t"
+				]
+			},
+			{
+				"blockName": "core/tab-panel",
+				"attrs": {},
+				"innerBlocks": [
+					{
+						"blockName": "core/tab",
+						"attrs": {
+							"label": "Tab 1"
+						},
+						"innerBlocks": [
+							{
+								"blockName": "core/paragraph",
+								"attrs": {},
+								"innerBlocks": [],
+								"innerHTML": "\n\t\t\t<p>Pariatur commodo sint mollit. Veniam Lorem labore voluptate fugiat. Ad nulla est labore cillum cillum qui nostrud do incididunt eiusmod.</p>\n\t\t\t",
+								"innerContent": [
+									"\n\t\t\t<p>Pariatur commodo sint mollit. Veniam Lorem labore voluptate fugiat. Ad nulla est labore cillum cillum qui nostrud do incididunt eiusmod.</p>\n\t\t\t"
+								]
+							}
+						],
+						"innerHTML": "\n\t\t<section class=\"wp-block-tab\">\n\t\t\t\n\t\t</section>\n\t\t",
+						"innerContent": [
+							"\n\t\t<section class=\"wp-block-tab\">\n\t\t\t",
+							null,
+							"\n\t\t</section>\n\t\t"
+						]
+					},
+					{
+						"blockName": "core/tab",
+						"attrs": {
+							"label": "Tab 2"
+						},
+						"innerBlocks": [],
+						"innerHTML": "\n\t\t<section class=\"wp-block-tab\"></section>\n\t\t",
+						"innerContent": [
+							"\n\t\t<section class=\"wp-block-tab\"></section>\n\t\t"
+						]
+					},
+					{
+						"blockName": "core/tab",
+						"attrs": {
+							"label": "Tab 3"
+						},
+						"innerBlocks": [],
+						"innerHTML": "\n\t\t<section class=\"wp-block-tab\"></section>\n\t\t",
+						"innerContent": [
+							"\n\t\t<section class=\"wp-block-tab\"></section>\n\t\t"
+						]
+					}
+				],
+				"innerHTML": "\n\t<div class=\"wp-block-tab-panel\">\n\t\t\n\n\t\t\n\n\t\t\n\t</div>\n\t",
+				"innerContent": [
+					"\n\t<div class=\"wp-block-tab-panel\">\n\t\t",
+					null,
+					"\n\n\t\t",
+					null,
+					"\n\n\t\t",
+					null,
+					"\n\t</div>\n\t"
+				]
+			}
+		],
+		"innerHTML": "\n<div class=\"wp-block-tabs is-example\">\n\t\n\n\t\n</div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-tabs is-example\">\n\t",
+			null,
+			"\n\n\t",
+			null,
+			"\n</div>\n"
+		]
+	}
+]

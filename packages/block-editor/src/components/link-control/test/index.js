@@ -2832,14 +2832,10 @@ describe( 'Entity handling', () => {
 
 		// Verify that onChange was called with entity metadata cleared.
 		// Kind should be undefined (no longer an entity).
-		// Note: Currently when clicking Apply (vs selecting a suggestion),
-		// type and id are also undefined - that's a separate issue with the
-		// TODO: Apply button handler not processing URLs through handleDirectEntry,
-		// so the shape of the data for a custom link can be different depending on
-		// how it was submitted.
+		// The URL should be normalized (https:// prepended to bare domain).
 		expect( onChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
-				url: 'www.wordpress.org',
+				url: 'https://www.wordpress.org',
 				kind: undefined,
 			} )
 		);
@@ -3271,80 +3267,102 @@ describe( 'URL validation', () => {
 		mockOnChange.mockClear();
 	} );
 
-	it( 'should prevent submission for invalid URLs', async () => {
-		render(
-			<LinkControl
-				value={ { url: '' } }
-				forceIsEditingLink
-				onChange={ mockOnChange }
-			/>
-		);
+	it.each( [
+		{
+			description: 'URLs with spaces',
+			inputUrl: 'not a url',
+		},
+		{
+			description: 'single words without TLD or protocol',
+			inputUrl: 'wordpress',
+		},
+	] )(
+		'should prevent submission for $description',
+		async ( { inputUrl } ) => {
+			render(
+				<LinkControl
+					value={ { url: '' } }
+					forceIsEditingLink
+					onChange={ mockOnChange }
+				/>
+			);
 
-		const searchInput = screen.getByRole( 'combobox' );
-		// Use a string that is not a valid URL
-		await user.type( searchInput, 'not a url' );
+			const searchInput = screen.getByRole( 'combobox' );
+			await user.type( searchInput, inputUrl );
 
-		// Press Enter - this should trigger validation
-		// Since the value doesn't pass isURLLike, it won't create a suggestion,
-		// but if it did, validation would prevent submission
-		triggerEnter( searchInput );
+			// Press Enter - this should trigger validation
+			triggerEnter( searchInput );
 
-		// For URLs that don't pass isURLLike, no suggestion is created,
-		// so onChange won't be called (which is the expected behavior)
-		expect( mockOnChange ).not.toHaveBeenCalled();
-	} );
+			// Wait for validation error to appear
+			await waitFor( () => {
+				expect(
+					screen.getByText( 'Please enter a valid URL.' )
+				).toBeInTheDocument();
+			} );
+
+			// onChange should NOT have been called (submission prevented)
+			expect( mockOnChange ).not.toHaveBeenCalled();
+		}
+	);
 
 	it.each( [
 		{
 			description: 'valid URLs with protocol',
-			url: 'https://wordpress.org',
+			inputUrl: 'https://wordpress.org',
+			expectedUrl: 'https://wordpress.org',
 			searchPattern: /https:\/\/wordpress\.org/,
 		},
 		{
 			description: 'valid URLs without protocol (without http://)',
-			url: 'www.wordpress.org',
+			inputUrl: 'www.wordpress.org',
+			expectedUrl: 'https://www.wordpress.org',
 			searchPattern: /www\.wordpress\.org/,
 		},
 		{
 			description: 'hash links (internal anchor links)',
-			url: '#section',
+			inputUrl: '#section',
+			expectedUrl: '#section',
 			searchPattern: /#section/,
 		},
 		{
 			description: 'relative paths (URLs starting with /)',
-			url: '/handbook',
+			inputUrl: '/handbook',
+			expectedUrl: '/handbook',
 			searchPattern: /\/handbook/,
 		},
-	] )( 'should accept $description', async ( { url, searchPattern } ) => {
-		render(
-			<LinkControl
-				value={ { url: '' } }
-				forceIsEditingLink
-				onChange={ mockOnChange }
-			/>
-		);
+	] )(
+		'should accept $description',
+		async ( { inputUrl, expectedUrl, searchPattern } ) => {
+			render(
+				<LinkControl
+					value={ { url: '' } }
+					forceIsEditingLink
+					onChange={ mockOnChange }
+				/>
+			);
 
-		const searchInput = screen.getByRole( 'combobox' );
-		await user.type( searchInput, url );
+			const searchInput = screen.getByRole( 'combobox' );
+			await user.type( searchInput, inputUrl );
 
-		// Wait for suggestion to appear and become stable
-		await screen.findByRole( 'option', {
-			name: searchPattern,
-		} );
+			// Wait for suggestion to appear and become stable
+			await screen.findByRole( 'option', {
+				name: searchPattern,
+			} );
 
-		triggerEnter( searchInput );
+			triggerEnter( searchInput );
 
-		// No validation error - should succeed
-		await waitFor( () => {
-			expect( mockOnChange ).toHaveBeenCalled();
-		} );
+			// No validation error - should succeed
+			await waitFor( () => {
+				expect( mockOnChange ).toHaveBeenCalled();
+			} );
 
-		expect( mockOnChange ).toHaveBeenCalledWith(
-			expect.objectContaining( {
-				url,
-			} )
-		);
-	} );
+			expect( mockOnChange ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					url: expectedUrl,
+				} )
+			);
+		}
+	);
 
 	it( 'should skip validation for entity suggestions (posts, pages, categories)', async () => {
 		const entityLink = {
@@ -3484,9 +3502,10 @@ describe( 'URL validation', () => {
 		// a useful URL in practice. However, our validation philosophy is to
 		// trust the native URL constructor as the authoritative source - if the
 		// browser accepts it, we accept it.
+		// Note: The URL gets normalized with https:// prepended since it's a bare domain.
 		expect( mockOnChange ).toHaveBeenCalledWith(
 			expect.objectContaining( {
-				url: 'www.wordpress',
+				url: 'https://www.wordpress',
 			} )
 		);
 	} );

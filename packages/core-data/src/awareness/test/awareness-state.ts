@@ -9,7 +9,11 @@ import {
 	beforeEach,
 	afterEach,
 } from '@jest/globals';
-import * as Y from 'yjs';
+
+/**
+ * WordPress dependencies
+ */
+import { Y } from '@wordpress/sync';
 
 /**
  * Internal dependencies

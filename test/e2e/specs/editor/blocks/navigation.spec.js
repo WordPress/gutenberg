@@ -194,9 +194,9 @@ test.describe( 'Navigation block', () => {
 
 			await editor.insertBlock( { name: 'core/navigation' } );
 
-			const navBlockInserter = editor.canvas.getByRole( 'button', {
-				name: 'Add block',
-			} );
+			const navBlockInserter = editor.canvas
+				.getByRole( 'document', { name: 'Block: Navigation' } )
+				.getByRole( 'button', { name: 'Add page' } );
 			await navBlockInserter.click();
 
 			await page.keyboard.type( 'https://example.com' );
@@ -460,7 +460,7 @@ test.describe( 'Navigation block', () => {
 				} );
 
 				const submenuBlockInserter =
-					submenuBlock.getByLabel( 'Add block' );
+					submenuBlock.getByLabel( 'Add page' );
 				await expect( submenuBlockInserter ).toBeVisible();
 				await expect( submenuBlockInserter ).toBeFocused();
 
@@ -822,7 +822,8 @@ test.describe( 'Navigation block', () => {
 			await test.step( 'Creating a new category link should respect new block selection', async () => {
 				// Use the block inserter to add a new category link
 				await editor.canvas
-					.getByRole( 'button', { name: 'Add block' } )
+					.getByRole( 'document', { name: 'Block: Navigation' } )
+					.getByRole( 'button', { name: 'Add page' } )
 					.click();
 
 				// Verify the popover is visible (we want the invalid link click to have opened the popover)
@@ -1054,7 +1055,7 @@ test.describe( 'Navigation block', () => {
 
 		await editor.selectBlocks( navBlock );
 
-		await navBlock.getByRole( 'button', { name: 'Add block' } ).click();
+		await navBlock.getByRole( 'button', { name: 'Add page' } ).click();
 
 		// This relies on network so allow additional time for
 		// the request to complete.
@@ -2152,13 +2153,13 @@ class Navigation {
 	}
 
 	getNavBlockInserter() {
-		return this.getNavBlock().getByLabel( 'Add block' ).first();
+		return this.getNavBlock().getByLabel( 'Add page' ).first();
 	}
 
 	getSubmenuBlockInserter() {
 		return this.editor.canvas
 			.getByRole( 'document', { name: 'Block: Submenu' } )
-			.getByLabel( 'Add block' );
+			.getByLabel( 'Add page' );
 	}
 
 	getLinkControlSearch() {
