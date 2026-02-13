@@ -495,7 +495,6 @@ describe( 'clearEntityRecordEdits', () => {
 
 	it( 'clears all edits for an entity record', () => {
 		const dispatch = jest.fn();
-		const undoManager = { addRecord: jest.fn() };
 		const select = {
 			getEntityConfig: () => ( {
 				kind: 'postType',
@@ -510,7 +509,6 @@ describe( 'clearEntityRecordEdits', () => {
 				title: 'New Title',
 				content: 'New Content',
 			} ),
-			getUndoManager: () => undoManager,
 		};
 
 		clearEntityRecordEdits(
