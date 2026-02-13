@@ -109,13 +109,7 @@ function ListViewEdit( { clientId, name } ) {
 		return null;
 	}
 
-	return (
-		<ListViewPanel
-			clientId={ clientId }
-			name={ name }
-			hasChildren={ hasChildren }
-		/>
-	);
+	return <ListViewPanel clientId={ clientId } hasChildren={ hasChildren } />;
 }
 
 /**
