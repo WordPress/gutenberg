@@ -14,33 +14,38 @@ import { applyFilters } from '@wordpress/hooks';
 import { unlock } from '../../lock-unlock';
 
 /**
- * Known WordPress core form field names that are not post meta keys.
- * These should be excluded when inspecting meta box form fields.
+ * Classic editor form field names that are not post meta.
+ * These are form/UI-specific fields (nonces, actions, submit buttons,
+ * taxonomy creation inputs) that have no REST API equivalent.
  */
-const KNOWN_CORE_FIELDS = new Set( [
-	'post_ID',
-	'post_type',
+const FORM_ONLY_FIELDS = new Set( [
 	'_wpnonce',
+	'_wp_http_referer',
 	'originalaction',
 	'action',
 	'referredby',
-	'_wp_http_referer',
 	'original_post_status',
+	'hidden_post_status',
 	'save',
 	'publish',
-	'post_status',
-	'hidden_post_status',
-	'post_author',
-	'comment_status',
-	'ping_status',
-	'sticky',
-	'post_format',
-	'tax_input',
 	'newtag',
-	'post_category',
 	'newcategory',
 	'newcategory_parent',
 ] );
+
+/**
+ * Maps classic editor form field names to their REST API property equivalents.
+ * Fields not in this map are assumed to use the same name in both contexts.
+ */
+const FORM_FIELD_TO_REST_PROPERTY = {
+	post_ID: 'id',
+	post_type: 'type',
+	post_status: 'status',
+	post_author: 'author',
+	post_format: 'format',
+	post_category: 'categories',
+	tax_input: 'categories',
+};
 
 /**
  * Extracts likely meta key names from a form field's `name` attribute.
@@ -70,9 +75,10 @@ function extractMetaKey( fieldName ) {
  * @param {HTMLElement} metaBoxElement The meta box DOM element.
  * @param {Object}      registeredMeta Object whose keys are REST-registered meta key names.
  * @param {string}      id             The meta box ID.
+ * @param {string[]}    postFields     REST API property names from the post entity record.
  * @return {boolean} True if the meta box has non-REST-registered fields.
  */
-function hasNonRestFields( metaBoxElement, registeredMeta, id ) {
+function hasNonRestFields( metaBoxElement, registeredMeta, id, postFields ) {
 	const formFields = metaBoxElement.querySelectorAll(
 		'input[name], select[name], textarea[name]'
 	);
@@ -83,8 +89,13 @@ function hasNonRestFields( metaBoxElement, registeredMeta, id ) {
 		id
 	);
 
+	// Build the set of fields to ignore: form-only fields, REST property
+	// names from the entity record, form-field aliases that map to REST
+	// properties, and any extra fields added via filter.
 	const ignoredFields = new Set( [
-		...KNOWN_CORE_FIELDS,
+		...FORM_ONLY_FIELDS,
+		...postFields,
+		...Object.keys( FORM_FIELD_TO_REST_PROPERTY ),
 		...extraIgnoredFields,
 	] );
 
@@ -109,7 +120,7 @@ function hasNonRestFields( metaBoxElement, registeredMeta, id ) {
 
 		const metaKey = extractMetaKey( name );
 
-		// Skip known WordPress core fields and extra ignored fields.
+		// Skip known core fields, REST properties, and extra ignored fields.
 		if ( ignoredFields.has( metaKey ) ) {
 			continue;
 		}
@@ -182,22 +193,34 @@ function updateWarningElement( metaBoxElement, id, shouldShow ) {
 }
 
 export default function MetaBoxCollaborationWarning( { id } ) {
-	const { isCollaborationEnabled, registeredMeta } = useSelect(
+	const { isCollaborationEnabled, registeredMeta, postFields } = useSelect(
 		( select ) => {
-			const { isCollaborationEnabledForCurrentPost, getCurrentPostType } =
-				select( editorStore );
+			const {
+				isCollaborationEnabledForCurrentPost,
+				getCurrentPostType,
+				getCurrentPostId,
+			} = select( editorStore );
 			const isEnabled = isCollaborationEnabledForCurrentPost();
 			let meta = {};
+			let fields = [];
 			if ( isEnabled ) {
 				const postType = getCurrentPostType();
+				const postId = getCurrentPostId();
 				meta =
 					unlock( select( coreStore ) ).getRegisteredPostMeta(
 						postType
 					) ?? {};
+				const record = select( coreStore ).getEditedEntityRecord(
+					'postType',
+					postType,
+					postId
+				);
+				fields = record ? Object.keys( record ) : [];
 			}
 			return {
 				isCollaborationEnabled: isEnabled,
 				registeredMeta: meta,
+				postFields: fields,
 			};
 		},
 		[]
@@ -220,7 +243,12 @@ export default function MetaBoxCollaborationWarning( { id } ) {
 		if ( id === 'postcustom' ) {
 			shouldWarn = true;
 		} else {
-			shouldWarn = hasNonRestFields( metaBoxElement, registeredMeta, id );
+			shouldWarn = hasNonRestFields(
+				metaBoxElement,
+				registeredMeta,
+				id,
+				postFields
+			);
 		}
 
 		shouldWarn = applyFilters(
@@ -239,7 +267,7 @@ export default function MetaBoxCollaborationWarning( { id } ) {
 				warningEl.remove();
 			}
 		};
-	}, [ id, isCollaborationEnabled, registeredMeta ] );
+	}, [ id, isCollaborationEnabled, registeredMeta, postFields ] );
 
 	return null;
 }
