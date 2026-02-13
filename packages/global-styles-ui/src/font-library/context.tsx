@@ -82,9 +82,10 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 				id: fontFamilyPost.id,
 				...( fontFamilyPost.font_family_settings || {} ),
 				fontFace:
-					fontFamilyPost?._embedded?.font_faces?.map(
-						( face ) => face.font_face_settings
-					) || [],
+					fontFamilyPost?._embedded?.font_faces?.map( ( face ) => ( {
+						...face.font_face_settings,
+						fileStatus: face.file_status,
+					} ) ) || [],
 			};
 		} ) || [];
 
@@ -267,10 +268,10 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 							fontFace:
 								(
 									fontFamilyPost?._embedded?.font_faces ?? []
-								).map(
-									( face: CollectionFontFace ) =>
-										face.font_face_settings
-								) || [],
+								).map( ( face: CollectionFontFace ) => ( {
+									...face.font_face_settings,
+									fileStatus: face.file_status,
+								} ) ) || [],
 					  }
 					: null;
 
@@ -340,7 +341,10 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 					// Use font data from REST API not from client to ensure
 					// correct font information is used.
 					installedFontFamily.fontFace = [
-						...successfullyInstalledFontFaces,
+						...successfullyInstalledFontFaces.map( ( face ) => ( {
+							...face,
+							fileStatus: face.fileStatus ?? 'existing',
+						} ) ),
 					];
 
 					fontFamiliesToActivate.push( installedFontFamily );
@@ -492,6 +496,10 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 		fonts.forEach( ( font ) => {
 			if ( font.fontFace ) {
 				font.fontFace.forEach( ( face ) => {
+					// Skip loading font faces with missing files.
+					if ( face.fileStatus === 'missing' ) {
+						return;
+					}
 					const displaySrc = getDisplaySrcFromFontFace(
 						face?.src ?? ''
 					);
@@ -528,7 +536,7 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 		} else {
 			const displaySrc = getDisplaySrcFromFontFace( face?.src ?? '' );
 			// If the font doesn't have a src, don't load it.
-			if ( face && displaySrc ) {
+			if ( face && displaySrc && face.fileStatus !== 'missing' ) {
 				loadFontFaceInBrowser( face, displaySrc, 'all' );
 			}
 		}
@@ -537,6 +545,10 @@ function FontLibraryProvider( { children }: { children: React.ReactNode } ) {
 	const loadFontFaceAsset = async ( fontFace: FontFace ) => {
 		// If the font doesn't have a src, don't load it.
 		if ( ! fontFace.src ) {
+			return;
+		}
+		// Skip loading font faces with missing files.
+		if ( fontFace.fileStatus === 'missing' ) {
 			return;
 		}
 		// Get the src of the font.

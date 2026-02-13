@@ -123,7 +123,18 @@ export async function loadFontFaceInBrowser(
 		}
 	);
 
-	const loadedFace = await newFont.load();
+	let loadedFace;
+	try {
+		loadedFace = await newFont.load();
+	} catch ( error ) {
+		// Font file may be missing or corrupt. Log and bail gracefully.
+		// eslint-disable-next-line no-console
+		console.warn(
+			`Failed to load font face "${ fontFace.fontFamily }" (${ fontFace.fontStyle } ${ fontFace.fontWeight }):`,
+			error
+		);
+		return;
+	}
 
 	if ( addTo === 'document' || addTo === 'all' ) {
 		document.fonts.add( loadedFace );

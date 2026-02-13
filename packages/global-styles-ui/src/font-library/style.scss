@@ -214,6 +214,20 @@ button.font-library__upload-area {
 	}
 }
 
+.font-library__font-card.has-missing-file {
+	.font-library__font-variant_demo-text {
+		opacity: 0.5;
+		text-decoration: line-through;
+	}
+}
+
+.font-library__missing-file-icon {
+	color: colors.$alert-red;
+	display: flex;
+	align-items: center;
+	flex-shrink: 0;
+}
+
 .font-library__select-all {
 	padding:
 		variables.$grid-unit-20 variables.$grid-unit-20
