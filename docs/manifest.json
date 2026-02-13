@@ -522,9 +522,9 @@
 		"parent": "core-concepts"
 	},
 	{
-		"title": "Understanding global state, local context and derived state",
-		"slug": "undestanding-global-state-local-context-and-derived-state",
-		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md",
+		"title": "Understanding global state, local context, derived state and config",
+		"slug": "understanding-global-state-local-context-derived-state-and-config",
+		"markdown_source": "../docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md",
 		"parent": "core-concepts"
 	},
 	{
