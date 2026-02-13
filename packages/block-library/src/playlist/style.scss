@@ -1,25 +1,12 @@
-@use "@wordpress/base-styles/variables" as *;
-
 // Waveform player dimensions.
 $waveform-player-height: 100px;
 
 .wp-block-playlist {
-	audio {
-		width: 100%;
-		margin-top: var(--wp--preset--spacing--20, 0.625em);
-	}
-
 	// Main waveform player container.
 	.wp-block-playlist__waveform-player {
 		width: 100%;
-		margin-top: 10px;
-		margin-bottom: $grid-unit-20;
+		margin: var(--wp--preset--spacing--20, 0.625em) 0;
 		position: relative;
-
-		// Style the audio element inside WaveformPlayer.
-		audio {
-			margin-top: 0;
-		}
 	}
 
 	// Set the waveform track height and remove gap between button and waveform.
