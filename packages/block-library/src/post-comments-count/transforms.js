@@ -9,20 +9,16 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/post-comments-link' ],
 			transform: ( { style } ) => {
-				const textAlign = style.typography?.textAlign;
-				
-				return createBlock(
-					'core/post-comments-link',
-					{
-						...( textAlign && {
-							style: {
-								typography: {
-									textAlign,
-								},
+				const textAlign = style?.typography?.textAlign;
+				return createBlock( 'core/post-comments-link', {
+					...( textAlign && {
+						style: {
+							typography: {
+								textAlign,
 							},
-						} ),
-					}
-				);
+						},
+					} ),
+				} );
 			},
 		},
 	],
