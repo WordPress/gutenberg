@@ -23,8 +23,12 @@
 		"align": true,
 		"anchor": true,
 		"color": {
-			"text": false,
-			"background": false
+			"text": true,
+			"background": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
 		},
 		"layout": {
 			"default": {

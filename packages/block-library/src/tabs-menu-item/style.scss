@@ -7,6 +7,12 @@
 	flex-basis: inherit !important;
 	flex-grow: inherit !important;
 
+	// Button reset
+	border: none;
+	background: none;
+	appearance: none;
+	-webkit-appearance: none;
+
 	margin: 0;
 	padding-block: var(--tab-padding-block, var(--wp--preset--spacing--20, 0.5em));
 	padding-inline: var(--tab-padding-inline, var(--wp--preset--spacing--30, 1em));

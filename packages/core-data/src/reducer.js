@@ -660,6 +660,22 @@ export function editorAssets( state = null, action ) {
 	return state;
 }
 
+/**
+ * Reducer managing icons.
+ *
+ * @param {Array}  state  Current state.
+ * @param {Object} action Action object.
+ *
+ * @return {Array} Updated state.
+ */
+export function icons( state = [], action ) {
+	switch ( action.type ) {
+		case 'RECEIVE_ICONS':
+			return action.icons;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -682,4 +698,5 @@ export default combineReducers( {
 	registeredPostMeta,
 	editorSettings,
 	editorAssets,
+	icons,
 } );

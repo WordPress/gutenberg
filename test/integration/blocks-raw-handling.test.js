@@ -358,6 +358,7 @@ describe( 'Blocks raw handling', () => {
 				} )
 			)
 		).toBe( block );
+		expect( console ).toHaveLogged();
 	} );
 
 	it( 'should handle transforms that return an array of blocks', () => {
@@ -496,6 +497,7 @@ describe( 'Blocks raw handling', () => {
 				path.join( __dirname, 'fixtures/documents/windows.html' )
 			);
 			expect( serialize( pasteHandler( { HTML } ) ) ).toMatchSnapshot();
+			expect( console ).toHaveLogged();
 		} );
 
 		it( 'should strip HTML formatting space from inline text', () => {

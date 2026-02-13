@@ -42,6 +42,7 @@ import {
 	zoomLevel,
 	editedContentOnlySection,
 	withDerivedBlockEditingModes,
+	viewportModalClientIds,
 } from '../reducer';
 
 import { unlock } from '../../lock-unlock';
@@ -4568,6 +4569,37 @@ describe( 'state', () => {
 					)
 				);
 			} );
+		} );
+	} );
+
+	describe( 'viewportModalClientIds', () => {
+		it( 'should default to null', () => {
+			const state = viewportModalClientIds( undefined, {} );
+			expect( state ).toBeNull();
+		} );
+
+		it( 'should return clientIds on SHOW_VIEWPORT_MODAL', () => {
+			const clientIds = [ 'client-1', 'client-2' ];
+			const state = viewportModalClientIds( null, {
+				type: 'SHOW_VIEWPORT_MODAL',
+				clientIds,
+			} );
+			expect( state ).toEqual( clientIds );
+		} );
+
+		it( 'should return null on HIDE_VIEWPORT_MODAL', () => {
+			const state = viewportModalClientIds( [ 'client-1' ], {
+				type: 'HIDE_VIEWPORT_MODAL',
+			} );
+			expect( state ).toBeNull();
+		} );
+
+		it( 'should return current state for unknown actions', () => {
+			const currentState = [ 'client-1' ];
+			const state = viewportModalClientIds( currentState, {
+				type: 'UNKNOWN_ACTION',
+			} );
+			expect( state ).toBe( currentState );
 		} );
 	} );
 } );

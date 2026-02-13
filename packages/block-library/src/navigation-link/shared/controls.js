@@ -158,6 +158,14 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 			?.home;
 	}, [] );
 
+	const blockEditingMode = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockEditingMode( clientId ),
+		[ clientId ]
+	);
+
+	const isContentOnly = blockEditingMode === 'contentOnly';
+
 	const preview = useLinkPreview( {
 		url,
 		title: linkTitle,
@@ -310,7 +318,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				hasValue={ () => !! description }
 				label={ __( 'Description' ) }
 				onDeselect={ () => setAttributes( { description: '' } ) }
-				isShownByDefault
+				isShownByDefault={ ! isContentOnly }
 			>
 				<TextareaControl
 					label={ __( 'Description' ) }
@@ -328,7 +336,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				hasValue={ () => !! rel }
 				label={ __( 'Rel attribute' ) }
 				onDeselect={ () => setAttributes( { rel: '' } ) }
-				isShownByDefault
+				isShownByDefault={ ! isContentOnly }
 			>
 				<TextControl
 					__next40pxDefaultSize

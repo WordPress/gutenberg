@@ -1,0 +1,13 @@
+/**
+ * Editor and frontend styles for the Icon Block.
+ */
+
+/* Icon Block styles. */
+.wp-block-icon {
+	line-height: 0;
+	svg {
+		width: 100%;
+		height: 100%;
+		fill: currentColor;
+	}
+}
