@@ -24,7 +24,7 @@ export type WordPressComponentProps<
 	( IsPolymorphic extends true
 		? {
 				/** The HTML element or React component to render the component as. */
-				as?: T | keyof JSX.IntrinsicElements;
+				as?: T | keyof React.JSX.IntrinsicElements;
 		  }
 		: {} );
 
