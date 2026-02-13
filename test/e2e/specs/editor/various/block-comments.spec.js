@@ -886,6 +886,13 @@ test.describe( 'Multiple notes per block', () => {
 			comment: 'First note on block',
 		} );
 
+		// Dismiss the first "Note added." snackbar so it won't interfere
+		// with the second note's snackbar check.
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Note added.' } )
+			.click();
+
 		// Click "Add note" again to add a second note.
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
 
@@ -932,6 +939,13 @@ test.describe( 'Multiple notes per block', () => {
 			attributes: { content: 'Block with multiple notes' },
 			comment: 'First note',
 		} );
+
+		// Dismiss the first "Note added." snackbar so it won't interfere
+		// with the second note's snackbar check.
+		await page
+			.getByRole( 'button', { name: 'Dismiss this notice' } )
+			.filter( { hasText: 'Note added.' } )
+			.click();
 
 		// Add second note.
 		await editor.clickBlockOptionsMenuItem( 'Add note' );
