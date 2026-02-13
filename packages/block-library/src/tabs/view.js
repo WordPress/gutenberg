@@ -96,48 +96,13 @@ const { actions: privateActions, state: privateState } = store(
 			},
 			/**
 			 * The value of the tabindex attribute for tab panels.
-			 * Returns 0 if the panel contains no focusable elements,
-			 * -1 if it does (to allow direct tabbing to content).
 			 *
 			 * Guidelines: https://www.w3.org/WAI/ARIA/apg/patterns/tabs/
 			 *
 			 * @type {number}
 			 */
 			get tabPanelTabIndexAttribute() {
-				const { attributes } = getElement();
-				const panelId = attributes?.id;
-
-				if ( ! panelId ) {
-					return -1;
-				}
-
-				// Get the DOM element
-				const panelElement = document.getElementById( panelId );
-				if ( ! panelElement ) {
-					return -1;
-				}
-
-				// Check if panel contains any focusable elements
-				const focusableSelector = [
-					'a[href]',
-					'button:not([disabled])',
-					'input:not([disabled])',
-					'select:not([disabled])',
-					'textarea:not([disabled])',
-					'audio[controls]',
-					'video[controls]',
-					'[contenteditable]:not([contenteditable="false"])',
-					'details > summary:first-of-type',
-					'details',
-					'iframe',
-				].join( ', ' );
-
-				const hasFocusableContent =
-					panelElement.querySelector( focusableSelector ) !== null;
-
-				// If panel has focusable content, use -1
-				// If panel has no focusable content, use 0
-				return hasFocusableContent ? -1 : 0;
+				return 0;
 			},
 		},
 		actions: {
