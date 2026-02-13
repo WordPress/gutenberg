@@ -119,7 +119,7 @@ describe( 'filters', () => {
 		);
 
 		// Should find items with "Planet" in categories (case-insensitive)
-		expect( result ).toHaveLength( 12 );
+		expect( result ).toHaveLength( 13 );
 		expect( result.map( ( r ) => r.name.title ) ).toContain( 'Neptune' );
 		expect( result.map( ( r ) => r.name.title ) ).toContain( 'Mercury' );
 		expect( result.map( ( r ) => r.name.title ) ).toContain( 'Earth' );
