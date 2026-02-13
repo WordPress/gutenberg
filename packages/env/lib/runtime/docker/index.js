@@ -140,13 +140,19 @@ class DockerRuntime {
 		 * the container before continuing allows the docker entrypoint script,
 		 * which restores the files, to run again when we start the containers.
 		 *
-		 * Additionally, this serves as a way to restart the container entirely
-		 * should the need arise.
+		 * Additionally, --remove-orphans ensures containers from services that
+		 * were removed in the new config (e.g., tests-* after setting
+		 * testsEnvironment: false) are properly stopped.
 		 *
 		 * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-587228440
 		 */
 		if ( shouldConfigureWp ) {
-			await this.stop( fullConfig, { spinner, debug } );
+			spinner.text = 'Stopping WordPress.';
+			await dockerCompose.down( {
+				config: dockerComposeConfigPath,
+				log: debug,
+				commandOptions: [ '--remove-orphans' ],
+			} );
 			// Update the images before starting the services again.
 			spinner.text = 'Updating docker images.';
 
