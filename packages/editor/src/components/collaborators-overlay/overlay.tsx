@@ -1,3 +1,4 @@
+// @ts-expect-error No exported types
 import { useStyleOverride } from '@wordpress/block-editor';
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
 import { useEffect, useRef } from '@wordpress/element';
