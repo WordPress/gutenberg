@@ -110,9 +110,12 @@ export function computeBadges( {
 				label: __( 'Internal link' ),
 				intent: 'default',
 			} );
-		} else if ( type ) {
+		} else if ( type && type !== 'custom' ) {
+			// Show entity type badge (page, post, category, etc.)
+			// but not 'custom' since that's just a manual link
 			badges.push( { label: capitalize( type ), intent: 'default' } );
-		} else if ( isRelativePath( url ) ) {
+		} else {
+			// Internal link (not external, not hash, not entity)
 			badges.push( {
 				label: __( 'Page' ),
 				intent: 'default',

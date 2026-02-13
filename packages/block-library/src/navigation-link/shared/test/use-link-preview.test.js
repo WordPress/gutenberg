@@ -231,3 +231,22 @@ test.each( [
 		} );
 	}
 );
+
+it( 'should show "Page" badge for internal custom links', () => {
+	const badges = computeBadges( {
+		url: 'http://localhost:8888/test',
+		type: 'custom',
+		isExternal: false,
+	} );
+
+	// Should show Page badge for internal custom links
+	expect( badges ).toContainEqual( {
+		label: 'Page',
+		intent: 'default',
+	} );
+	// Should NOT show Custom badge
+	expect( badges ).not.toContainEqual( {
+		label: 'Custom',
+		intent: 'default',
+	} );
+} );
