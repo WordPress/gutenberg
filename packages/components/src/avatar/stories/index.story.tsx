@@ -43,10 +43,18 @@ export const WithBorderColor: Story = {
 	},
 };
 
-export const CustomSize: Story = {
+export const Small: Story = {
 	args: {
 		...Default.args,
-		size: 48,
+		size: 'small',
+	},
+};
+
+export const SmallWithBorderColor: Story = {
+	args: {
+		...Default.args,
+		size: 'small',
+		borderColor: '#3858e9',
 	},
 };
 

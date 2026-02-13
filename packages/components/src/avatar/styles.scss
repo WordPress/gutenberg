@@ -3,13 +3,19 @@
 
 .components-avatar {
 	box-sizing: border-box;
-	width: var(--components-avatar-size, #{$button-size-compact});
-	height: var(--components-avatar-size, #{$button-size-compact});
-	border-radius: $radius-round;
-	border: $border-width solid $gray-300;
-	background-color: $gray-100;
+	width: $button-size-compact;
+	height: $button-size-compact;
+	border-radius: $radius-full;
+	border: 0;
+	background-color: $gray-700;
+	overflow: clip;
 	flex-shrink: 0;
 	font-size: 0;
+
+	&.is-small {
+		width: $button-size-small;
+		height: $button-size-small;
+	}
 
 	&.has-src {
 		background-image: var(--components-avatar-url);
@@ -18,8 +24,8 @@
 	}
 
 	&.has-border-color {
-		border-color: var(--components-avatar-border-color);
-		box-shadow: inset 0 0 0 $border-width rgba($white, 0.7);
+		border: $border-width-tab solid var(--components-avatar-border-color);
+		box-shadow: inset 0 0 0 $border-width-tab $white;
 		background-clip: padding-box;
 	}
 }

@@ -13,14 +13,13 @@ function Avatar( {
 	className,
 	src,
 	name,
-	size = 32,
+	size = 'default',
 	borderColor,
 	style,
 	...props
 }: WordPressComponentProps< AvatarProps, 'div', false > ) {
 	const customProperties = {
 		...style,
-		'--components-avatar-size': `${ size }px`,
 		...( src ? { '--components-avatar-url': `url(${ src })` } : {} ),
 		...( borderColor
 			? { '--components-avatar-border-color': borderColor }
@@ -32,6 +31,7 @@ function Avatar( {
 			className={ clsx( 'components-avatar', className, {
 				'has-border-color': !! borderColor,
 				'has-src': !! src,
+				'is-small': size === 'small',
 			} ) }
 			style={ customProperties }
 			role="img"

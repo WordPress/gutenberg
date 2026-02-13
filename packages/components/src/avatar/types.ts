@@ -10,11 +10,14 @@ export type AvatarProps = {
 	 */
 	name?: string;
 	/**
-	 * Diameter of the avatar in pixels.
+	 * Size of the avatar.
 	 *
-	 * @default 32
+	 * - `'default'`: 32px
+	 * - `'small'`: 24px
+	 *
+	 * @default 'default'
 	 */
-	size?: number;
+	size?: 'default' | 'small';
 	/**
 	 * CSS color value for an accent border ring around the avatar.
 	 *

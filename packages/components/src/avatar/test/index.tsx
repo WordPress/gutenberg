@@ -34,12 +34,16 @@ describe( 'Avatar', () => {
 		).toBe( 'url(https://example.com/avatar.jpg)' );
 	} );
 
-	it( 'should apply size via CSS custom property', () => {
-		render( <Avatar data-testid="avatar" size={ 48 } /> );
+	it( 'should apply is-small class for small size', () => {
+		render( <Avatar data-testid="avatar" size="small" /> );
 		const avatar = screen.getByTestId( 'avatar' );
-		expect(
-			avatar.style.getPropertyValue( '--components-avatar-size' )
-		).toBe( '48px' );
+		expect( avatar ).toHaveClass( 'is-small' );
+	} );
+
+	it( 'should not apply is-small class for default size', () => {
+		render( <Avatar data-testid="avatar" /> );
+		const avatar = screen.getByTestId( 'avatar' );
+		expect( avatar ).not.toHaveClass( 'is-small' );
 	} );
 
 	it( 'should apply border color when provided', () => {
