@@ -166,9 +166,9 @@ class PlaygroundRuntime {
 			...mountArgs,
 		];
 
-		if ( debug ) {
-			cliArgs.push( '--verbosity', 'debug' );
-		}
+		// Always use debug verbosity to aid troubleshooting.
+		// TODO: Remove this once the Playground runtime is stable.
+		cliArgs.push( '--verbosity', 'debug' );
 
 		if ( envConfig.phpmyadmin ) {
 			cliArgs.push( '--phpmyadmin' );
