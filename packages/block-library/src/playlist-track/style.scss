@@ -1,10 +1,19 @@
+@use "@wordpress/base-styles/variables" as *;
+
 .wp-block-playlist-track {
-	&:has([aria-current="true"]) {
-		background-color: color-mix(in srgb, currentColor 10%, transparent);
+	// Only show border between tracks when block has a border specified.
+	border-bottom: var(--wp-block-playlist-border-width, 0) solid var(--wp-block-playlist-border-color, transparent);
+	padding: $grid-unit-10;
+
+	// Hover effect for tracks.
+	&:hover {
+		background-color: color-mix(in srgb, currentColor 5%, transparent);
+		cursor: pointer;
 	}
 
-	&:hover {
-		background-color: color-mix(in srgb, currentColor 15%, transparent);
+	// Apply background to the li (includes track number) when track is playing.
+	&:has([aria-current="true"]) {
+		background-color: color-mix(in srgb, currentColor 10%, transparent);
 	}
 
 	.wp-block-playlist__tracklist-show-numbers & {
@@ -14,11 +23,13 @@
 	.wp-block-playlist-track__button {
 		display: flex;
 		align-items: center;
+		gap: $grid-unit-10;
 		width: 100%;
-		padding: var(--wp--preset--spacing--20, 0.5em);
-		font-size: inherit;
+		padding: 0;
 		font-family: inherit;
-		text-align: left;
+		font-size: inherit;
+		text-align: left; // Override default button text-align.
+		line-height: 1.5;
 		background-color: transparent;
 		color: inherit;
 		border: 0;
@@ -27,8 +38,8 @@
 
 		.wp-block-playlist__tracklist-show-numbers &::before {
 			content: counter(playlist-track);
+			flex-shrink: 0;
 			width: 2ch;
-			margin-right: var(--wp--preset--spacing--20, 0.5em);
 			font-size: 0.85em;
 			opacity: 0.7;
 		}
@@ -43,8 +54,12 @@
 			object-fit: cover;
 		}
 
+		// Content wrapper holds title and artist stacked vertically.
 		.wp-block-playlist-track__content {
-			flex: 1 1 0;
+			display: flex;
+			flex-direction: column;
+			gap: 2px;
+			flex: 1;
 			min-width: 0;
 		}
 
@@ -54,14 +69,12 @@
 
 		.wp-block-playlist-track__artist {
 			display: block;
-			font-size: 0.85em;
 			opacity: 0.7;
-			margin-top: 0.125em;
+			font-size: 0.85em;
 		}
 
 		.wp-block-playlist-track__length {
-			margin-left: auto;
-			font-size: 0.85em;
+			flex-shrink: 0;
 			opacity: 0.7;
 		}
 	}
