@@ -18,6 +18,34 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revisions_Controller {
 
 	/**
+	 * The base of the parent controller's route.
+	 *
+	 * @var string
+	 */
+	protected $parent_base;
+
+	/**
+	 * Parent post type.
+	 *
+	 * @var string
+	 */
+	protected $parent_post_type;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param string $parent_post_type Post type of the parent.
+	 */
+	public function __construct( $parent_post_type = 'wp_content_guideline' ) {
+		parent::__construct( $parent_post_type );
+
+		// Re-set private properties from WP_REST_Revisions_Controller.
+		$this->parent_post_type = $parent_post_type;
+		$post_type_object       = get_post_type_object( $parent_post_type );
+		$this->parent_base      = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type_object->name;
+	}
+
+	/**
 	 * Registers the routes for content guideline revisions.
 	 *
 	 * Calls parent to register standard list + single revision routes,
