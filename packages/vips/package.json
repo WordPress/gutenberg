@@ -43,7 +43,12 @@
 		"./package.json": "./package.json"
 	},
 	"wpWorkers": {
-		"./worker": "./src/worker.ts"
+		"./worker": {
+			"entry": "./src/worker.ts",
+			"resolve": {
+				"vips-es6.js": "vips.js"
+			}
+		}
 	},
 	"wpScriptModuleExports": {
 		"./worker": "./build-module/vips-worker.mjs",
