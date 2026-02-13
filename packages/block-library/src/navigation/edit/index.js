@@ -85,7 +85,6 @@ import {
 	DEFAULT_BLOCK,
 	NAVIGATION_OVERLAY_TEMPLATE_PART_AREA,
 } from '../constants';
-import { getSubmenuVisibility } from '../utils/get-submenu-visibility';
 
 /**
  * Component that renders the Add page button for the Navigation block.
@@ -720,12 +719,10 @@ function Navigation( {
 		{ open: overlayMenuPreview }
 	);
 
-	const computedSubmenuVisibility = getSubmenuVisibility( attributes );
-
 	const submenuAccessibilityNotice =
 		! showSubmenuIcon &&
-		computedSubmenuVisibility !== 'click' &&
-		computedSubmenuVisibility !== 'always'
+		submenuVisibility !== 'click' &&
+		submenuVisibility !== 'always'
 			? __(
 					'The current menu options offer reduced accessibility for users and are not recommended. Enabling either "Open on Click" or "Show arrow" offers enhanced accessibility by allowing keyboard users to browse submenus selectively.'
 			  )
@@ -832,8 +829,8 @@ function Navigation( {
 										} )
 									}
 									isDisabled={
-										computedSubmenuVisibility === 'click' ||
-										computedSubmenuVisibility === 'always'
+										submenuVisibility === 'click' ||
+										submenuVisibility === 'always'
 									}
 									isShownByDefault
 								>
@@ -845,10 +842,8 @@ function Navigation( {
 											} );
 										} }
 										disabled={
-											computedSubmenuVisibility ===
-												'click' ||
-											computedSubmenuVisibility ===
-												'always'
+											submenuVisibility === 'click' ||
+											submenuVisibility === 'always'
 										}
 										label={ __( 'Show arrow' ) }
 									/>

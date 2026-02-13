@@ -290,7 +290,7 @@ function ViewTable< Item >( {
 	const headerMenuRefs = useRef<
 		Map< string, { node: HTMLButtonElement; fallback: string } >
 	>( new Map() );
-	const headerMenuToFocusRef = useRef< HTMLButtonElement >();
+	const headerMenuToFocusRef = useRef< HTMLButtonElement >( undefined );
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );

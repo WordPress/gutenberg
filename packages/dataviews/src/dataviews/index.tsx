@@ -144,7 +144,7 @@ function DataViews< Item >( {
 	onReset,
 }: DataViewsProps< Item > ) {
 	const { infiniteScrollHandler } = paginationInfo;
-	const containerRef = useRef< HTMLDivElement | null >( null );
+	const containerRef = useRef< HTMLDivElement >( null );
 	const [ containerWidth, setContainerWidth ] = useState( 0 );
 	const resizeObserverRef = useResizeObserver(
 		( resizeObserverEntries: any ) => {

@@ -20,7 +20,7 @@ export function useHeading(
 		...otherProps
 	} = useContextSystem( props, 'Heading' );
 
-	const as = ( asProp || `h${ level }` ) as keyof JSX.IntrinsicElements;
+	const as = ( asProp || `h${ level }` ) as keyof React.JSX.IntrinsicElements;
 
 	const a11yProps: {
 		role?: string;

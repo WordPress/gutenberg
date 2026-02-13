@@ -8,6 +8,8 @@
 /**
  * Render callback for core/tabs-menu.
  *
+ * @since 7.0.0
+ *
  * @param array     $attributes Block attributes.
  * @param string    $content    Block content (contains the tabs-menu-item template).
  * @param \WP_Block $block      WP_Block instance.
@@ -61,7 +63,7 @@ function block_core_tabs_menu_render_callback( array $attributes, string $conten
 /**
  * Registers the `core/tabs-menu` block on the server.
  *
- * @since 6.9.0
+ * @since 7.0.0
  */
 function register_block_core_tabs_menu() {
 	register_block_type_from_metadata(

@@ -8,6 +8,8 @@
 /**
  * Render callback for core/tab.
  *
+ * @since 7.0.0
+ *
  * @param array     $attributes Block attributes.
  * @param string    $content    Block content.
  *
@@ -57,7 +59,7 @@ function block_core_tab_render( array $attributes, string $content ): string {
  *
  * @hook init
  *
- * @since 6.9.0
+ * @since 7.0.0
  */
 function register_block_core_tab() {
 	register_block_type_from_metadata(
