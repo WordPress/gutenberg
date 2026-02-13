@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { Button, __experimentalVStack as VStack } from '@wordpress/components';
+import {
+	Button,
+	__experimentalVStack as VStack,
+	__experimentalText as Text,
+	__experimentalHStack as HStack,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { Icon, close } from '@wordpress/icons';
 
@@ -23,6 +28,7 @@ import OverlayMenuPreviewControls from './overlay-menu-preview-controls';
  * @param {Function} props.setAttributes             Function to update block attributes.
  * @param {string}   props.overlayMenuPreviewClasses CSS classes for overlay menu preview button.
  * @param {string}   props.overlayMenuPreviewId      ID for overlay menu preview.
+ * @param {string}   props.overlay                   Currently selected overlay template part ID.
  * @param {string}   props.containerStyle            Optional style for the preview container.
  * @return {React.JSX.Element}                       The overlay menu preview button or null if not responsive.
  */
@@ -35,6 +41,7 @@ export default function OverlayMenuPreviewButton( {
 	setAttributes,
 	overlayMenuPreviewClasses,
 	overlayMenuPreviewId,
+	overlay,
 	containerStyle,
 } ) {
 	if ( ! isResponsive ) {
@@ -43,6 +50,7 @@ export default function OverlayMenuPreviewButton( {
 
 	return (
 		<>
+			<h3>{ __( 'Overlay icons' ) }</h3>
 			<Button
 				__next40pxDefaultSize
 				className={ overlayMenuPreviewClasses }
@@ -54,16 +62,30 @@ export default function OverlayMenuPreviewButton( {
 				{ hasIcon && (
 					<>
 						<OverlayMenuIcon icon={ icon } />
-						<Icon icon={ close } />
+						{ ! overlay && <Icon icon={ close } /> }
 					</>
 				) }
 				{ ! hasIcon && (
 					<>
 						<span>{ __( 'Menu' ) }</span>
-						<span>{ __( 'Close' ) }</span>
+						{ ! overlay && <span>{ __( 'Close' ) }</span> }
 					</>
 				) }
 			</Button>
+			<HStack
+				alignment="flex-start"
+				className="wp-block-navigation__overlay-help-text-wrapper"
+			>
+				<Text
+					variant="muted"
+					isBlock
+					className="wp-block-navigation__overlay-help-text"
+				>
+					{ __(
+						'Configure the visual appearance and display of the menu button.'
+					) }
+				</Text>
+			</HStack>
 			{ overlayMenuPreview && (
 				<VStack
 					id={ overlayMenuPreviewId }

@@ -4,6 +4,7 @@
 import {
 	PanelBody,
 	__experimentalVStack as VStack,
+	__experimentalText as Text,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -61,19 +62,6 @@ export default function OverlayPanel( {
 				/>
 
 				{ overlayMenu !== 'never' && (
-					<OverlayMenuPreviewButton
-						isResponsive={ isResponsive }
-						overlayMenuPreview={ overlayMenuPreview }
-						setOverlayMenuPreview={ setOverlayMenuPreview }
-						hasIcon={ hasIcon }
-						icon={ icon }
-						setAttributes={ setAttributes }
-						overlayMenuPreviewClasses={ overlayMenuPreviewClasses }
-						overlayMenuPreviewId={ overlayMenuPreviewId }
-					/>
-				) }
-
-				{ overlayMenu !== 'never' && (
 					<OverlayTemplatePartSelector
 						overlay={ overlay }
 						setAttributes={ setAttributes }
@@ -83,14 +71,36 @@ export default function OverlayPanel( {
 					/>
 				) }
 
+				{ overlayMenu !== 'never' && (
+					<OverlayMenuPreviewButton
+						isResponsive={ isResponsive }
+						overlayMenuPreview={ overlayMenuPreview }
+						setOverlayMenuPreview={ setOverlayMenuPreview }
+						hasIcon={ hasIcon }
+						icon={ icon }
+						setAttributes={ setAttributes }
+						overlayMenuPreviewClasses={ overlayMenuPreviewClasses }
+						overlayMenuPreviewId={ overlayMenuPreviewId }
+						overlay={ overlay }
+					/>
+				) }
+
 				{ overlayMenu !== 'never' &&
 					overlay &&
 					hasOverlays &&
 					! isCreatingOverlay && (
-						<OverlayPreview
-							overlay={ overlay }
-							currentTheme={ currentTheme }
-						/>
+						<>
+							<h3>{ __( 'Preview' ) }</h3>
+							<OverlayPreview
+								overlay={ overlay }
+								currentTheme={ currentTheme }
+							/>
+							<Text variant="muted">
+								{ __(
+									'Visual preview of your overlay template.'
+								) }
+							</Text>
+						</>
 					) }
 			</VStack>
 		</PanelBody>
