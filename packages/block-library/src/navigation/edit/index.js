@@ -379,10 +379,31 @@ function Navigation( {
 		innerBlocks,
 	} = useInnerBlocks( clientId );
 
-	const hasSubmenus = !! innerBlocks.find(
-		( block ) =>
-			block.name === 'core/navigation-submenu' ||
-			block.name === 'core/page-list'
+	// Check for submenus using getBlocks to include controlled innerBlocks
+	const hasSubmenus = useSelect(
+		( select ) => {
+			// First check for navigation-submenu (fast, no selector needed)
+			const hasNavigationSubmenu = innerBlocks.some(
+				( block ) => block.name === 'core/navigation-submenu'
+			);
+			if ( hasNavigationSubmenu ) {
+				return true;
+			}
+
+			// Only check page-list if we didn't find a submenu already
+			const pageList = innerBlocks.find(
+				( block ) => block.name === 'core/page-list'
+			);
+			if ( ! pageList ) {
+				return false;
+			}
+
+			// We have a page-list, check its controlled innerBlocks
+			const { getBlocks } = select( blockEditorStore );
+			const pageListBlocks = getBlocks( pageList.clientId );
+			return pageListBlocks.length > 0;
+		},
+		[ innerBlocks ]
 	);
 
 	// Check if any overlay template parts exist
