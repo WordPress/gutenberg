@@ -33,7 +33,6 @@ import {
 	store as blockEditorStore,
 	privateApis as blockEditorPrivateApis,
 } from '@wordpress/block-editor';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -781,12 +780,6 @@ const CommentBoard = ( {
 	const actionButtonRef = useRef( null );
 	const reactionDetailsAnchorRef = useRef( null );
 
-	// Get current user ID for reaction display.
-	const currentUserId = useSelect( ( select ) => {
-		const { getCurrentUser } = select( coreStore );
-		const user = getCurrentUser();
-		return user?.id;
-	}, [] );
 	const handleConfirmDelete = () => {
 		onDelete( thread );
 		setActionState( false );
@@ -1006,7 +999,6 @@ const CommentBoard = ( {
 				<div ref={ reactionDetailsAnchorRef }>
 					<ReactionDisplay
 						reactions={ thread.meta?._wp_note_reactions }
-						currentUserId={ currentUserId }
 						onToggleReaction={ ( emoji ) =>
 							onToggleReaction?.( {
 								commentId: thread.id,
