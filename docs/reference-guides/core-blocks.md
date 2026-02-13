@@ -102,7 +102,7 @@ Prompt visitors to take action with a button-style link. ([Source](https://githu
 -	**Category:** design
 -	**Parent:** core/buttons
 -	**Supports:** anchor, color (background, gradients, text), dimensions (width), interactivity (clientNavigation), shadow, spacing (padding), splitting, typography (fontSize, lineHeight, textAlign), ~~alignWide~~, ~~align~~, ~~reusable~~
--	**Attributes:** backgroundColor, gradient, linkTarget, placeholder, rel, tagName, text, textColor, title, type, url
+-	**Attributes:** backgroundColor, gradient, isFullWidthOnMobile, linkTarget, placeholder, rel, tagName, text, textColor, title, type, url
 
 ## Buttons
 
