@@ -25,7 +25,7 @@ export { metadata, name };
 
 export const settings = {
 	icon: symbolFilled,
-	__experimentalLabel: ( { slug, theme } ) => {
+	label: ( { slug, theme } ) => {
 		// Attempt to find entity title if block is a template part.
 		// Require slug to request, otherwise entity is uncreated and will throw 404.
 		if ( ! slug ) {

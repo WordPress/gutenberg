@@ -31,7 +31,7 @@ export const settings = {
 			),
 		},
 	},
-	__experimentalLabel( attributes, { context } ) {
+	label( attributes, { context } ) {
 		const customName = attributes?.metadata?.name;
 
 		if (

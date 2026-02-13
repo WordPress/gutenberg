@@ -27,7 +27,7 @@ export { metadata, name };
 export const settings = {
 	icon: linkIcon,
 
-	__experimentalLabel: ( { label } ) => label,
+	label: ( { label } ) => label,
 
 	merge( leftAttributes, { label: rightLabel = '' } ) {
 		return {

@@ -36,7 +36,7 @@ export const settings = {
 			textAlign: 'center',
 		},
 	},
-	__experimentalLabel( attributes, { context } ) {
+	label( attributes, { context } ) {
 		const { content, level } = attributes;
 
 		const customName = attributes?.metadata?.name;

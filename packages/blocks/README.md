@@ -88,6 +88,21 @@ _Returns_
 
 -   `?Object`: Highest-priority transform candidate.
 
+### getAccessibleBlockLabel
+
+Get a label for the block for use by screenreaders, this is more descriptive than the visual label and includes the block title and the value of the `getLabel` function if it's specified.
+
+_Parameters_
+
+-   _blockType_ `?Object`: The block type.
+-   _attributes_ `Object`: The values of the block's attributes.
+-   _position_ `?number`: The position of the block in the block list.
+-   _direction_ `[string]`: The direction of the block layout.
+
+_Returns_
+
+-   `string`: The block label.
+
 ### getBlockAttributes
 
 Returns the block attributes of a registered block node given its type.
@@ -179,6 +194,20 @@ _Parameters_
 _Returns_
 
 -   `Object`: block.
+
+### getBlockLabel
+
+Get the label for the block, usually this is either the block title, or the value of the block's `label` function when that's specified.
+
+_Parameters_
+
+-   _blockType_ `Object`: The block type.
+-   _attributes_ `Object`: The values of the block's attributes.
+-   _context_ `Object`: The intended use for the label.
+
+_Returns_
+
+-   `string`: The block label.
 
 ### getBlockMenuDefaultClassName
 

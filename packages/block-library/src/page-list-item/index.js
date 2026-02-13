@@ -15,7 +15,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	__experimentalLabel: ( { label } ) => label,
+	label: ( { label } ) => label,
 	icon,
 	example: {},
 	edit,

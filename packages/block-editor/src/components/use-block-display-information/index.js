@@ -6,7 +6,7 @@ import {
 	store as blocksStore,
 	isReusableBlock,
 	isTemplatePart,
-	__experimentalGetBlockLabel as getBlockLabel,
+	getBlockLabel,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { symbol } from '@wordpress/icons';

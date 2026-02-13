@@ -22,7 +22,7 @@ export const settings = {
 	deprecated,
 	edit,
 	icon,
-	__experimentalLabel: ( { ref } ) => {
+	label: ( { ref } ) => {
 		if ( ! ref ) {
 			return;
 		}

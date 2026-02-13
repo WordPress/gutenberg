@@ -32,7 +32,7 @@ export const settings = {
 			caption: __( 'Mont Blanc appears—still, snowy, and serene.' ),
 		},
 	},
-	__experimentalLabel( attributes, { context } ) {
+	label( attributes, { context } ) {
 		const customName = attributes?.metadata?.name;
 
 		if (

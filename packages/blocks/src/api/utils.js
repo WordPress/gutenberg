@@ -185,7 +185,17 @@ export function normalizeBlockType( blockTypeOrName ) {
  * @return {string} The block label.
  */
 export function getBlockLabel( blockType, attributes, context = 'visual' ) {
-	const { __experimentalLabel: getLabel, title } = blockType;
+	const { title } = blockType;
+	let getLabel = blockType.label;
+	if ( ! getLabel && blockType.__experimentalLabel ) {
+		deprecated( '__experimentalLabel block type property', {
+			since: '6.12',
+			version: '7.0',
+			alternative: 'label',
+			hint: 'Update your block registration to use the stable `label` property.',
+		} );
+		getLabel = blockType.__experimentalLabel;
+	}
 
 	const label = getLabel && getLabel( attributes, { context } );
 
@@ -283,6 +293,24 @@ export function getAccessibleBlockLabel(
 		title
 	);
 }
+
+export const __experimentalGetBlockLabel = ( ...args ) => {
+	deprecated( '__experimentalGetBlockLabel', {
+		since: '6.12',
+		version: '7.0',
+		alternative: 'getBlockLabel',
+	} );
+	return getBlockLabel( ...args );
+};
+
+export const __experimentalGetAccessibleBlockLabel = ( ...args ) => {
+	deprecated( '__experimentalGetAccessibleBlockLabel', {
+		since: '6.12',
+		version: '7.0',
+		alternative: 'getAccessibleBlockLabel',
+	} );
+	return getAccessibleBlockLabel( ...args );
+};
 
 export function getDefault( attributeSchema ) {
 	if ( attributeSchema.default !== undefined ) {

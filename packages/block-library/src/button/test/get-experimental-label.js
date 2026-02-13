@@ -3,8 +3,8 @@
  */
 import { settings } from '..';
 
-describe( 'Button block __experimentalLabel', () => {
-	const { __experimentalLabel: getLabel } = settings;
+describe( 'Button block label', () => {
+	const { label: getLabel } = settings;
 
 	it( 'returns custom name when metadata.name exists', () => {
 		const attributes = {
