@@ -72,7 +72,7 @@ export function getSuggestionsQuery( type, kind ) {
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind, id } = props.link;
 
-	const { entityRecord, hasBinding, isEntityAvailable } = props.entity;
+	const { entityRecord, hasBinding, isEntityAvailable } = props.entity || {};
 
 	const { image, badges } = useLinkPreview( {
 		url,
