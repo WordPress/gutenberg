@@ -26,7 +26,7 @@ if ( file_exists( __DIR__ . '/../navigation-link/shared/item-should-render.php' 
  * @return string The visibility mode: 'hover', 'click', or 'always'.
  */
 function block_core_navigation_submenu_get_submenu_visibility( $context ) {
-	return gutenberg_block_core_shared_navigation_get_submenu_visibility( $context );
+	return block_core_shared_navigation_get_submenu_visibility( $context );
 }
 
 /**
