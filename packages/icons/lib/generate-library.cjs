@@ -1,3 +1,14 @@
+/*
+ * SCRIPT OVERVIEW
+ * ===============
+ *
+ * - Find *.svg files in ./library
+ * - For each, generate a sibling .tsx file
+ * - Build an index of these at ./library/index.ts
+ *
+ * Note that the generated files are ignored by Git.
+ */
+
 /**
  * External dependencies
  */
@@ -17,7 +28,7 @@ const execFileAsync = promisify( execFile );
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
 
 /**
- *  List of SVG attributes whose names need to be converted from kebab-case
+ * List of SVG attributes whose names need to be converted from kebab-case
  * to camelCase when transforming SVG into JSX elements.
  *
  * List from: https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute.
@@ -97,12 +108,6 @@ const SVG_ATTRIBUTE_WITH_DASHES = [
 	'xmlns-xlink',
 	'x-height',
 ];
-
-// - Find *.svg files in ./library
-// - For each, generate a sibling .tsx file
-// - Build an index of these at ./library/index.ts
-//
-// Note that the generated files are ignored by Git.
 
 // The SOURCE OF TRUTH for this package's library of icons consists of the SVG
 // files found under `src/library`. We must thus first generate the TSX files
