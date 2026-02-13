@@ -107,6 +107,12 @@ export function Comments( {
 		[ rawNoteId ]
 	);
 
+	const selectedNoteRef = useRef( selectedNote );
+	selectedNoteRef.current = selectedNote;
+
+	const noteThreadsRef = useRef( noteThreads );
+	noteThreadsRef.current = noteThreads;
+
 	const relatedBlockElement = useBlockElement( selectedBlockClientId );
 
 	const threads = useMemo( () => {
@@ -177,21 +183,25 @@ export function Comments( {
 
 	// Auto-select the related comment thread when a block is selected.
 	useEffect( () => {
+		// Don't overwrite when the user explicitly opened the new note form.
+		if ( selectedNoteRef.current === 'new' ) {
+			return;
+		}
 		if ( blockNoteIds.length > 0 ) {
 			// Find first unresolved thread for this block, or use first thread.
-			const unresolvedThread = noteThreads.find(
+			const unresolvedThread = noteThreadsRef.current.find(
 				( thread ) =>
 					blockNoteIds.includes( thread.id ) &&
 					thread.status === 'hold'
 			);
-			const firstThread = noteThreads.find( ( thread ) =>
+			const firstThread = noteThreadsRef.current.find( ( thread ) =>
 				blockNoteIds.includes( thread.id )
 			);
 			selectNote( unresolvedThread?.id ?? firstThread?.id ?? undefined );
 		} else {
 			selectNote( undefined );
 		}
-	}, [ blockNoteIds, noteThreads, selectNote ] );
+	}, [ blockNoteIds, selectNote ] );
 
 	// Focus the selected note when requested.
 	useEffect( () => {
