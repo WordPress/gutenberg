@@ -4,10 +4,7 @@ import { useEffect, useState } from '@wordpress/element';
 
 import { useBlockHighlighting } from './use-block-highlighting';
 import { useRenderCursors } from './use-render-cursors';
-import {
-	ELEVATION_X_SMALL,
-	COLLABORATOR_CONTRAST_SHADOW,
-} from './collaborator-styles';
+import { ELEVATION_X_SMALL } from './collaborator-styles';
 
 const COLLABORATORS_OVERLAY_STYLES = `
 .block-canvas-cover {
@@ -37,6 +34,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 .collaborators-overlay-user-cursor {
 	position: absolute;
 	width: 2px;
+	border-radius: 1px;
 	outline: 1px solid #fff;
 	box-shadow: ${ ELEVATION_X_SMALL };
 	animation: collaborators-overlay-cursor-blink 1s infinite;
@@ -47,7 +45,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	align-items: center;
 	max-width: 240px;
 	border-radius: 9999px;
-	transform: translate(-12px, -100%);
+	transform: translate(-11px, -100%);
 	margin-top: -4px;
 	white-space: nowrap;
 	overflow: clip;
@@ -73,7 +71,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	line-height: 20px;
 	color: #fff;
 	max-width: 0;
-	padding: 0;
+	padding: 0 0 2px 0;
 	overflow: hidden;
 	opacity: 0;
 	transition: max-width 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
@@ -84,8 +82,9 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	opacity: 1;
 }
 @keyframes collaborators-overlay-cursor-blink {
-	0%, 100% { opacity: 1; }
-	50% { opacity: 0.5; }
+	0%, 45% { opacity: 1; }
+	55%, 95% { opacity: 0; }
+	100% { opacity: 1; }
 }
 .collaborators-overlay-cursor-highlighted .collaborators-overlay-user-cursor {
 	animation: collaborators-overlay-cursor-highlight 0.6s ease-in-out 3;
@@ -105,11 +104,11 @@ const COLLABORATORS_OVERLAY_STYLES = `
 }
 @keyframes collaborators-overlay-label-highlight {
 	0%, 100% {
-		transform: translate(-12px, -100%) scale(1);
+		transform: translate(-11px, -100%) scale(1);
 		filter: drop-shadow(0 0 0 transparent);
 	}
 	50% {
-		transform: translate(-12px, -100%) scale(1.1);
+		transform: translate(-11px, -100%) scale(1.1);
 		filter: drop-shadow(0 0 6px currentColor);
 	}
 }
