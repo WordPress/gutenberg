@@ -204,11 +204,8 @@ export function applyPostChangesToCRDTDoc(
 					rawValue = '';
 				}
 
-				if (
-					currentValue instanceof Y.Text &&
-					rawValue !== undefined
-				) {
-					mergeRichTextUpdate( currentValue, rawValue );
+				if ( currentValue instanceof Y.Text ) {
+					mergeRichTextUpdate( currentValue, rawValue ?? '' );
 				} else {
 					const newYText = new Y.Text( rawValue ?? '' );
 					ymap.set( key, newYText );
