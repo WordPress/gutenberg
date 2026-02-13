@@ -182,6 +182,9 @@ export default function PageListEdit( {
 				'background-color',
 				context.backgroundColor
 			) ]: !! context.backgroundColor,
+			'open-on-click': context.submenuVisibility === 'click',
+			'open-on-hover': context.submenuVisibility === 'hover',
+			'open-always': context.submenuVisibility === 'always',
 		} ),
 		style: { ...context.style?.color },
 	} );

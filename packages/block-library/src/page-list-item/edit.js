@@ -40,6 +40,17 @@ export default function PageListItemEdit( { context, attributes } ) {
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const frontPageId = useFrontPageId();
 
+	// Compute submenu visibility with backward compatibility
+	// Check old attribute first, then fall back to new attribute
+	let submenuVisibility = 'hover';
+	if ( context.openSubmenusOnClick !== undefined ) {
+		submenuVisibility = context.openSubmenusOnClick ? 'click' : 'hover';
+	} else if ( context.submenuVisibility ) {
+		submenuVisibility = context.submenuVisibility;
+	}
+
+	const openOnClick = submenuVisibility === 'click';
+
 	const innerBlocksColors = getColors( context, true );
 
 	const navigationChildBlockProps =
@@ -56,13 +67,14 @@ export default function PageListItemEdit( { context, attributes } ) {
 			className={ clsx( 'wp-block-pages-list__item', {
 				'has-child': hasChildren,
 				'wp-block-navigation-item': isNavigationChild,
-				'open-on-click': context.openSubmenusOnClick,
-				'open-on-hover-click':
-					! context.openSubmenusOnClick && context.showSubmenuIcon,
+				'open-on-click': openOnClick,
+				'open-on-hover': submenuVisibility === 'hover',
+				'open-always': submenuVisibility === 'always',
+				'open-on-hover-click': ! openOnClick && context.showSubmenuIcon,
 				'menu-item-home': id === frontPageId,
 			} ) }
 		>
-			{ hasChildren && context.openSubmenusOnClick ? (
+			{ hasChildren && openOnClick ? (
 				<>
 					<button
 						type="button"
@@ -87,16 +99,15 @@ export default function PageListItemEdit( { context, attributes } ) {
 			) }
 			{ hasChildren && (
 				<>
-					{ ! context.openSubmenusOnClick &&
-						context.showSubmenuIcon && (
-							<button
-								className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"
-								aria-expanded="false"
-								type="button"
-							>
-								<ItemSubmenuIcon />
-							</button>
-						) }
+					{ ! openOnClick && context.showSubmenuIcon && (
+						<button
+							className="wp-block-navigation-item__content wp-block-navigation-submenu__toggle wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"
+							aria-expanded="false"
+							type="button"
+						>
+							<ItemSubmenuIcon />
+						</button>
+					) }
 					<ul { ...innerBlocksProps }></ul>
 				</>
 			) }
