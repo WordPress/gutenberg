@@ -178,3 +178,22 @@ describe( 'computeBadges', () => {
 		} );
 	} );
 } );
+
+it( 'should show "Internal link" badge for hash links even when type is present', () => {
+	const badges = computeBadges( {
+		url: '#section',
+		type: 'page', // Bug: type is set from previous link
+		isExternal: false,
+	} );
+
+	// Should prioritize hash link detection over type
+	expect( badges ).toContainEqual( {
+		label: 'Internal link',
+		intent: 'default',
+	} );
+	// Should NOT show Page badge
+	expect( badges ).not.toContainEqual( {
+		label: 'Page',
+		intent: 'default',
+	} );
+} );

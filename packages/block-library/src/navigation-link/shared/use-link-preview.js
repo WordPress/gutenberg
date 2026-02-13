@@ -108,13 +108,15 @@ export function computeBadges( {
 				label: __( 'External link' ),
 				intent: 'default',
 			} );
-		} else if ( type ) {
-			badges.push( { label: capitalize( type ), intent: 'default' } );
 		} else if ( isHashLink( url ) ) {
+			// Hash links should be detected before type check
+			// because they're not entity links even if type is set
 			badges.push( {
 				label: __( 'Internal link' ),
 				intent: 'default',
 			} );
+		} else if ( type ) {
+			badges.push( { label: capitalize( type ), intent: 'default' } );
 		} else if ( isRelativePath( url ) ) {
 			badges.push( {
 				label: __( 'Page' ),
