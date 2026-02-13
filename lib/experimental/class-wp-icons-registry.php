@@ -58,6 +58,11 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 					return;
 				}
 
+				$status = $icon_data['status'] ?? '';
+				if ( 'hidden' === $status || 'disabled' === $status ) {
+					continue;
+				}
+
 				$this->register(
 					'core/' . $icon_name,
 					array(
