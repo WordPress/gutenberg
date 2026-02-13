@@ -125,7 +125,7 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @param string            $room      Room identifier.
 		 * @param array<int, mixed> $awareness Serializable awareness state.
 		 */
-		public function set_awareness_state( string $room, mixed $awareness ): void {
+		public function set_awareness_state( string $room, array $awareness ): void {
 			$post_id  = $this->get_storage_post_id();
 			$meta_key = $this->get_awareness_meta_key( $room );
 
