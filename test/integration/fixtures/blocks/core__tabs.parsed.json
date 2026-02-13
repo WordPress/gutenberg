@@ -13,9 +13,9 @@
 						"blockName": "core/tabs-menu-item",
 						"attrs": {},
 						"innerBlocks": [],
-						"innerHTML": "\n\t\t<a class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" hidden><span class=\"screen-reader-text\">Tab menu item</span></a>\n\t\t",
+						"innerHTML": "\n\t\t<button class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" hidden type=\"button\" role=\"tab\"><span class=\"screen-reader-text\">Tab menu item</span></button>\n\t\t",
 						"innerContent": [
-							"\n\t\t<a class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" hidden><span class=\"screen-reader-text\">Tab menu item</span></a>\n\t\t"
+							"\n\t\t<button class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" hidden type=\"button\" role=\"tab\"><span class=\"screen-reader-text\">Tab menu item</span></button>\n\t\t"
 						]
 					}
 				],
