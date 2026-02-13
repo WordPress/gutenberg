@@ -147,7 +147,7 @@ function DataViewsPicker< Item >( {
 		getItemId: getItemId as any,
 		paginationInfo,
 	} ) as {
-		data: Item[];
+		data: ( Item & { position?: number } )[];
 		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
 	};
 	const containerRef = useRef< HTMLDivElement >( null );

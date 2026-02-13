@@ -170,7 +170,7 @@ function DataViews< Item >( {
 		isLoading,
 		paginationInfo,
 	} ) as {
-		data: Item[];
+		data: ( Item & { position?: number } )[];
 		paginationInfo: { totalItems: number; totalPages: number };
 		hasInitiallyLoaded: boolean;
 		setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;

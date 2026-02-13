@@ -22,7 +22,7 @@ interface UseDataParams< Item > {
 }
 
 interface UseDataResult< Item > {
-	data: Item[];
+	data: ( Item & { position?: number } )[];
 	paginationInfo: PaginationInfo;
 	hasInitiallyLoaded: boolean;
 	setVisibleEntries?: React.Dispatch< React.SetStateAction< number[] > >;
@@ -261,11 +261,15 @@ export default function useData< Item >( {
 
 	// When infinite scroll is disabled, preserve previous data while loading
 	if ( ! isInfiniteScrollEnabled ) {
+		const dataToReturn =
+			isLoading && previousDataRef.current?.length
+				? previousDataRef.current
+				: shownData;
 		return {
-			data:
-				isLoading && previousDataRef.current?.length
-					? previousDataRef.current
-					: shownData,
+			data: dataToReturn.map( ( item ) => ( {
+				...item,
+				position: undefined,
+			} ) ) as ( Item & { position?: number } )[],
 			paginationInfo:
 				isLoading && previousDataRef.current?.length
 					? previousPaginationInfoRef.current
@@ -276,7 +280,7 @@ export default function useData< Item >( {
 	}
 
 	return {
-		data: allLoadedRecords,
+		data: allLoadedRecords as ( Item & { position?: number } )[],
 		paginationInfo,
 		hasInitiallyLoaded,
 		setVisibleEntries,
