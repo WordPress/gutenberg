@@ -1,0 +1,14 @@
+[
+	{
+		"name": "core/icon",
+		"isValid": true,
+		"attributes": {
+			"style": {
+				"dimensions": {
+					"width": "24px"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]

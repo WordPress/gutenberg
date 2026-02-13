@@ -511,9 +511,9 @@ describe( 'DataForm component', () => {
 				/>
 			);
 
-			const titleField = screen.getByText( data.title );
+			const titleButton = fieldsSelector.title.view();
 			const user = await userEvent.setup();
-			await user.click( titleField );
+			await user.click( titleButton );
 			const titleEditField = screen.getByText(
 				'This is the Title Field'
 			);

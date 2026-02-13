@@ -73,6 +73,11 @@ const CONFIG = [
 		ltr: [ designTokens ],
 		rtl: [ designTokens ],
 	},
+	{
+		componentIdMatcher: /^design-system-patterns-/,
+		ltr: [ componentsLtr, dataviewsLtr ],
+		rtl: [ componentsRtl, dataviewsRtl ],
+	},
 ];
 
 export default CONFIG;

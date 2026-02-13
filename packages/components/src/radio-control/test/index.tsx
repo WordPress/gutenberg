@@ -238,7 +238,8 @@ describe.each( [
 					name: defaultProps.options[ 1 ].label,
 				} )
 			).toHaveFocus();
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 2 );
+
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 1 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith(
 				defaultProps.options[ 1 ].value
 			);
@@ -253,8 +254,8 @@ describe.each( [
 					name: defaultProps.options[ 0 ].label,
 				} )
 			).toHaveFocus();
-			// TODO: why called twice for every interaction?
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 6 );
+
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 3 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith(
 				defaultProps.options[ 0 ].value
 			);
@@ -268,7 +269,7 @@ describe.each( [
 				} )
 			).toHaveFocus();
 
-			expect( onChangeSpy ).toHaveBeenCalledTimes( 8 );
+			expect( onChangeSpy ).toHaveBeenCalledTimes( 4 );
 			expect( onChangeSpy ).toHaveBeenLastCalledWith(
 				defaultProps.options[ 2 ].value
 			);

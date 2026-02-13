@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, TextControl } from '@wordpress/components';
+import {
+	TextControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
+} from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
 
 /**
@@ -10,6 +14,7 @@ import { InspectorControls } from '@wordpress/block-editor';
  */
 import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
 import RemoveTabToolbarControl from '../tab/remove-tab-toolbar-control';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 export default function Controls( { attributes, setAttributes, clientId } ) {
 	const {
@@ -18,26 +23,47 @@ export default function Controls( { attributes, setAttributes, clientId } ) {
 		},
 	} = attributes;
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	return (
 		<>
 			<AddTabToolbarControl tabsClientId={ clientId } />
 			<RemoveTabToolbarControl tabsClientId={ clientId } />
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<TextControl
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							metadata: { ...metadata, name: '' },
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
 						label={ __( 'Title' ) }
-						help={ __(
-							'The tabs title is used by screen readers to describe the purpose and content of the tab panel.'
-						) }
-						value={ metadata.name }
-						onChange={ ( value ) => {
+						hasValue={ () => !! metadata.name }
+						onDeselect={ () => {
 							setAttributes( {
-								metadata: { ...metadata, name: value },
+								metadata: { ...metadata, name: '' },
 							} );
 						} }
-						__next40pxDefaultSize
-					/>
-				</PanelBody>
+						isShownByDefault
+					>
+						<TextControl
+							label={ __( 'Title' ) }
+							help={ __(
+								'The tabs title is used by screen readers to describe the purpose and content of the tab panel.'
+							) }
+							value={ metadata.name }
+							onChange={ ( value ) => {
+								setAttributes( {
+									metadata: { ...metadata, name: value },
+								} );
+							} }
+							__next40pxDefaultSize
+						/>
+					</ToolsPanelItem>
+				</ToolsPanel>
 			</InspectorControls>
 		</>
 	);

@@ -1372,6 +1372,31 @@ test.describe( 'Multi-block selection (@firefox, @webkit)', () => {
 			.poll( multiBlockSelectionUtils.getSelectedFlatIndices )
 			.toEqual( [ 1, 2 ] );
 	} );
+
+	test( 'should select all with formatting', async ( {
+		pageUtils,
+		editor,
+		multiBlockSelectionUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<strong>a</strong>' },
+		} );
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: { content: '<strong>b</strong>' },
+		} );
+
+		await pageUtils.pressKeys( 'primary+a' );
+		await pageUtils.pressKeys( 'primary+a' );
+
+		await expect
+			.poll( multiBlockSelectionUtils.getSelectedBlocks )
+			.toMatchObject( [
+				{ name: 'core/paragraph' },
+				{ name: 'core/paragraph' },
+			] );
+	} );
 } );
 
 class MultiBlockSelectionUtils {

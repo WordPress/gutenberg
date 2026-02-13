@@ -1,0 +1,39 @@
+import { Canvas, Meta } from '@storybook/addon-docs/blocks';
+import * as SaveSubmitStories from './save-and-submit.story';
+
+<Meta of={ SaveSubmitStories } />
+
+# Save & Submit
+
+Guidelines for form submission and saving settings.
+
+## Feedback
+
+The following feedback patterns help users interpret save and submit results.
+
+### Saving
+
+- While saving the button state switches to a busy or loading state.
+- A [Snackbar](https://wordpress.github.io/gutenberg/?path=/docs/components-snackbar--docs) confirms a successful save.
+
+<Canvas of={ SaveSubmitStories.SaveFormLayoutCard } />
+
+### No unsaved changes
+
+When all changes are saved the Save button is disabled and reveals a “No unsaved changes” tooltip on hover or focus.
+
+### Invalid fields
+
+If the save or submit fails due to user error (an invalid field or a required field is omitted) then the page scrolls with animation to the first invalid field, which shows a validation error message.
+
+### Failed save
+
+If the save process fails for any reason the user is notified via `ConfirmDialog`.
+
+### Auto-save
+
+- Auto-saving is restricted to `ToggleControl` fields.
+- Follows the same feedback conventions as other save methods.
+- It is preferable to use a toggle instead of a checkbox for turning features on and off. The exception would be if the checkbox is part of a form with other fields that also need to be updated at the same time.
+- Keep labels short. Use the description under the toggle or in the card title to provide more context.
+- Lead labels with a verb like “Use, Allow, Show,” or “Enable”.

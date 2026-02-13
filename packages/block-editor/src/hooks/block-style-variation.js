@@ -40,7 +40,7 @@ function getVariationMatches( className ) {
  *
  * @return {string|null} The name of the first registered variation.
  */
-function getVariationNameFromClass( className, registeredStyles = [] ) {
+export function getVariationNameFromClass( className, registeredStyles = [] ) {
 	// The global flag affects how capturing groups work in JS. So the regex
 	// below will only return full CSS classes not just the variation name.
 	const matches = getVariationMatches( className );

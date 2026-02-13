@@ -591,4 +591,46 @@ describe( 'TimePicker', () => {
 			} );
 		} );
 	} );
+
+	describe( 'ISO 8601 compliance', () => {
+		it( 'should handle years below 1000 with zero-padded output', async () => {
+			const user = userEvent.setup();
+			const onChangeSpy = jest.fn();
+
+			render(
+				<TimePicker
+					currentTime="0999-10-18T11:00:00"
+					onChange={ onChangeSpy }
+					is12Hour
+				/>
+			);
+
+			const yearInput = screen.getByLabelText( 'Year' );
+
+			// Verify initial input displays correctly
+			expect( yearInput ).toHaveValue( 999 );
+
+			// Change to year 500
+			await user.clear( yearInput );
+			await user.type( yearInput, '500' );
+			await user.keyboard( '{Tab}' );
+
+			// Verify input field value after change (human-readable, not zero-padded)
+			expect( yearInput ).toHaveValue( 500 );
+
+			// Verify onChange emits zero-padded ISO 8601 format
+			expect( onChangeSpy ).toHaveBeenCalled();
+			const lastCall =
+				onChangeSpy.mock.calls[ onChangeSpy.mock.calls.length - 1 ];
+			const outputDate = lastCall[ 0 ];
+
+			// Extract year from output and verify it's zero-padded to 4 digits
+			const yearMatch = outputDate.match( /^(\d{4})-/ );
+			expect( yearMatch ).not.toBeNull();
+			expect( yearMatch[ 1 ] ).toBe( '0500' ); // Explicitly verify zero-padded year
+
+			expect( outputDate ).not.toContain( 'NaN' );
+			expect( outputDate ).not.toContain( 'Invalid' );
+		} );
+	} );
 } );

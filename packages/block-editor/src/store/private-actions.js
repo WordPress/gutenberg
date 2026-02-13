@@ -453,3 +453,50 @@ export function toggleBlockSpotlight( clientId, hasBlockSpotlight ) {
 		hasBlockSpotlight,
 	};
 }
+
+/**
+ * Opens the list view content panel popover.
+ *
+ * @return {Object} Action object.
+ */
+export function openListViewContentPanel() {
+	return {
+		type: 'OPEN_LIST_VIEW_CONTENT_PANEL',
+	};
+}
+
+/**
+ * Closes the list view content panel popover.
+ *
+ * @return {Object} Action object.
+ */
+export function closeListViewContentPanel() {
+	return {
+		type: 'CLOSE_LIST_VIEW_CONTENT_PANEL',
+	};
+}
+
+/**
+ * Returns an action object used to open the viewport modal
+ * for the given client IDs.
+ *
+ * @param {string[]} clientIds Client IDs of blocks to configure viewport settings for.
+ * @return {Object} Action object.
+ */
+export function showViewportModal( clientIds ) {
+	return {
+		type: 'SHOW_VIEWPORT_MODAL',
+		clientIds,
+	};
+}
+
+/**
+ * Returns an action object used to close the viewport modal.
+ *
+ * @return {Object} Action object.
+ */
+export function hideViewportModal() {
+	return {
+		type: 'HIDE_VIEWPORT_MODAL',
+	};
+}

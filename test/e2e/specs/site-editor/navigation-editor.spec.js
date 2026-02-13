@@ -93,10 +93,13 @@ test.describe( 'Editing Navigation Menus', () => {
 
 			await expect( sidebar ).toBeVisible();
 
-			// Check that the `Menu` control is visible.
+			// Check that the `Navigation` control is visible.
 			// This is effectively the contents of the "List View" tab.
 			await expect(
-				sidebar.getByRole( 'heading', { name: 'Menu', exact: true } )
+				sidebar.getByRole( 'heading', {
+					name: 'Navigation',
+					exact: true,
+				} )
 			).toBeVisible();
 
 			// Check the Document Overview tab is not present.

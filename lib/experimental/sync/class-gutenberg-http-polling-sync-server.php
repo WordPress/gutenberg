@@ -87,6 +87,7 @@ class Gutenberg_HTTP_Polling_Sync_Server {
 			),
 			'awareness' => array(
 				'required' => true,
+				'type'     => 'object',
 			),
 			'client_id' => array(
 				'minimum'  => 1,

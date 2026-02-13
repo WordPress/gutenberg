@@ -35,8 +35,6 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 
 		// Set tab-specific attributes
 		$tag_processor->set_attribute( 'id', 'tab__' . $tab_id );
-		$tag_processor->set_attribute( 'href', '#' . $tab_id );
-		$tag_processor->set_attribute( 'role', 'tab' );
 		$tag_processor->set_attribute( 'aria-controls', $tab_id );
 
 		// Add IAPI directives
@@ -55,10 +53,10 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 	// Get updated HTML and inject the label
 	$output = $tag_processor->get_updated_html();
 
-	// The save.js outputs <a><span class="screen-reader-text">...</span></a>
-	// Replace the anchor content with the actual tab label
+	// The save.js outputs <button><span class="screen-reader-text">...</span></button>
+	// Replace the button content with the actual tab label
 	$output = preg_replace(
-		'/(<a[^>]*>).*?(<\/a>)/s',
+		'/(<button[^>]*>).*?(<\/button>)/s',
 		'$1' . '<span>' . esc_html( html_entity_decode( $tab_label ) ) . '</span>' . '$2',
 		$output
 	);
