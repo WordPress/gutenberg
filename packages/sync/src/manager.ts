@@ -143,6 +143,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			addUndoMeta: debugWrap( handlers.addUndoMeta ),
 			editRecord: debugWrap( handlers.editRecord ),
 			getEditedRecord: debugWrap( handlers.getEditedRecord ),
+			onStateChange: debugWrap( handlers.onStateChange ),
 			refetchRecord: debugWrap( handlers.refetchRecord ),
 			restoreUndoMeta: debugWrap( handlers.restoreUndoMeta ),
 			saveRecord: debugWrap( handlers.saveRecord ),
