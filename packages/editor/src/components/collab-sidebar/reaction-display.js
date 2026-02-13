@@ -8,12 +8,16 @@ import {
 } from '@wordpress/components';
 import { SVG, Path } from '@wordpress/primitives';
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import ReactionEmojiPicker, { getEmojiBySlug } from './reaction-emoji-picker';
+import ReactionEmojiPicker, {
+	getEmojiBySlug,
+	getLabelBySlug,
+} from './reaction-emoji-picker';
 import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );
@@ -79,6 +83,59 @@ function getReactedSlugs( reactions ) {
 }
 
 /**
+ * Generate GitHub-style tooltip text for a reaction.
+ *
+ * @param {Object} users   Map of user data by ID.
+ * @param {Array}  userIds Array of user IDs who reacted.
+ * @param {string} slug    The reaction slug.
+ * @return {string} The tooltip text.
+ */
+function getReactionTooltipText( users, userIds, slug ) {
+	const names = userIds
+		.map( ( id ) => users?.[ id ]?.name )
+		.filter( Boolean );
+
+	if ( names.length === 0 ) {
+		return '';
+	}
+
+	const emojiLabel = getLabelBySlug( slug );
+
+	if ( names.length === 1 ) {
+		return sprintf(
+			/* translators: 1: user name, 2: emoji label. */
+			__( '%1$s reacted with %2$s emoji' ),
+			names[ 0 ],
+			emojiLabel
+		);
+	}
+
+	if ( names.length === 2 ) {
+		return sprintf(
+			/* translators: 1: first user name, 2: second user name, 3: emoji label. */
+			__( '%1$s and %2$s reacted with %3$s emoji' ),
+			names[ 0 ],
+			names[ 1 ],
+			emojiLabel
+		);
+	}
+
+	const othersCount = names.length - 2;
+	return sprintf(
+		/* translators: 1: first user name, 2: second user name, 3: number of other users, 4: emoji label. */
+		_n(
+			'%1$s, %2$s, and %3$d other reacted with %4$s emoji',
+			'%1$s, %2$s, and %3$d others reacted with %4$s emoji',
+			othersCount
+		),
+		names[ 0 ],
+		names[ 1 ],
+		othersCount,
+		emojiLabel
+	);
+}
+
+/**
  * Display current reactions with counts as pill-shaped buttons.
  *
  * @param {Object}   props                  Component props.
@@ -92,6 +149,47 @@ export default function ReactionDisplay( { reactions, onToggleReaction } ) {
 		return user?.id;
 	}, [] );
 	const reactedSlugs = getReactedSlugs( reactions );
+
+	// Collect all unique user IDs from reactions.
+	const userIdArray = useMemo( () => {
+		if ( ! reactions ) {
+			return [];
+		}
+		const userIdSet = new Set();
+		Object.values( reactions ).forEach( ( reactionList ) => {
+			reactionList?.forEach( ( reaction ) => {
+				if ( reaction.userId ) {
+					userIdSet.add( reaction.userId );
+				}
+			} );
+		} );
+		return Array.from( userIdSet ).sort( ( a, b ) => a - b );
+	}, [ reactions ] );
+
+	// Fetch user data for all users who reacted.
+	const users = useSelect(
+		( select ) => {
+			if ( ! userIdArray.length ) {
+				return {};
+			}
+			const { getUsers } = select( coreStore );
+			const userList = getUsers( {
+				include: userIdArray,
+				context: 'view',
+				_fields: 'id,name',
+				per_page: -1,
+			} );
+			if ( ! userList ) {
+				return {};
+			}
+			const userData = {};
+			userList.forEach( ( user ) => {
+				userData[ user.id ] = user;
+			} );
+			return userData;
+		},
+		[ userIdArray ]
+	);
 
 	if ( reactedSlugs.length === 0 ) {
 		return null;
@@ -107,6 +205,29 @@ export default function ReactionDisplay( { reactions, onToggleReaction } ) {
 					currentUserId
 				);
 				const emoji = getEmojiBySlug( slug );
+
+				const reactionUserIds = ( reactions?.[ slug ] || [] ).map(
+					( r ) => r.userId
+				);
+				const tooltipText = getReactionTooltipText(
+					users,
+					reactionUserIds,
+					slug
+				);
+
+				// Use tooltip text when user data is loaded, otherwise fall back to basic label.
+				const buttonLabel = tooltipText
+					? tooltipText
+					: sprintf(
+							/* translators: 1: emoji, 2: count of reactions */
+							_n(
+								'%1$s, %2$d reaction',
+								'%1$s, %2$d reactions',
+								count
+							),
+							emoji,
+							count
+					  );
 
 				return (
 					<Button
@@ -128,16 +249,8 @@ export default function ReactionDisplay( { reactions, onToggleReaction } ) {
 							onToggleReaction( slug );
 						} }
 						isPressed={ isActive }
-						aria-label={ sprintf(
-							/* translators: 1: emoji, 2: count of reactions */
-							_n(
-								'%1$s, %2$d reaction',
-								'%1$s, %2$d reactions',
-								count
-							),
-							emoji,
-							count
-						) }
+						label={ buttonLabel }
+						showTooltip
 					>
 						<span>{ emoji }</span>
 						<span>{ count }</span>

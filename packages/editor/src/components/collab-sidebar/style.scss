@@ -320,32 +320,3 @@ mark.wp-note {
 	justify-content: center;
 }
 
-.editor-collab-sidebar-panel__reaction-details .components-popover__content {
-	width: 260px;
-}
-
-.editor-collab-sidebar-panel__reaction-details-content {
-	padding: $grid-unit-30;
-	max-height: 300px;
-	overflow-y: auto;
-}
-
-.editor-collab-sidebar-panel__reaction-details-emoji {
-	font-size: 20px;
-	line-height: 1;
-}
-
-.editor-collab-sidebar-panel__reaction-details-user {
-	padding: $grid-unit-05 0;
-}
-
-.editor-collab-sidebar-panel__reaction-details-avatar {
-	width: 24px;
-	height: 24px;
-	border-radius: $radius-round;
-	flex-shrink: 0;
-}
-
-.editor-collab-sidebar-panel__reaction-details-timestamp {
-	font-size: 12px;
-}
