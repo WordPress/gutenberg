@@ -859,14 +859,6 @@ const CommentBoard = ( {
 						} }
 					>
 						<HStack spacing="0">
-							<AddReactionButton
-								onToggleReaction={ ( emoji ) =>
-									onToggleReaction?.( {
-										commentId: thread.id,
-										emoji,
-									} )
-								}
-							/>
 							{ canResolve && (
 								<Button
 									label={ _x(
@@ -944,40 +936,53 @@ const CommentBoard = ( {
 					reflowComments={ reflowComments }
 				/>
 			) : (
-				<RawHTML
-					className={ clsx(
-						'editor-collab-sidebar-panel__user-comment',
-						{
-							'editor-collab-sidebar-panel__resolution-text':
-								isResolutionComment,
-						}
-					) }
-				>
-					{ isResolutionComment
-						? ( () => {
-								const actionText =
-									thread.meta._wp_note_status === 'resolved'
-										? __( 'Marked as resolved' )
-										: __( 'Reopened' );
-								const content = thread?.content?.raw;
+				<div className="editor-collab-sidebar-panel__comment-content-wrapper">
+					<RawHTML
+						className={ clsx(
+							'editor-collab-sidebar-panel__user-comment',
+							{
+								'editor-collab-sidebar-panel__resolution-text':
+									isResolutionComment,
+							}
+						) }
+					>
+						{ isResolutionComment
+							? ( () => {
+									const actionText =
+										thread.meta._wp_note_status ===
+										'resolved'
+											? __( 'Marked as resolved' )
+											: __( 'Reopened' );
+									const content = thread?.content?.raw;
 
-								if (
-									content &&
-									typeof content === 'string' &&
-									content.trim() !== ''
-								) {
-									return sprintf(
-										// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
-										__( '%1$s: %2$s' ),
-										actionText,
-										content
-									);
-								}
-								// If no content, just show the action.
-								return actionText;
-						  } )()
-						: thread?.content?.rendered }
-				</RawHTML>
+									if (
+										content &&
+										typeof content === 'string' &&
+										content.trim() !== ''
+									) {
+										return sprintf(
+											// translators: %1$s: action label ("Marked as resolved" or "Reopened"); %2$s: note text.
+											__( '%1$s: %2$s' ),
+											actionText,
+											content
+										);
+									}
+									// If no content, just show the action.
+									return actionText;
+							  } )()
+							: thread?.content?.rendered }
+					</RawHTML>
+					{ isExpanded && (
+						<AddReactionButton
+							onToggleReaction={ ( emoji ) =>
+								onToggleReaction?.( {
+									commentId: thread.id,
+									emoji,
+								} )
+							}
+						/>
+					) }
+				</div>
 			) }
 			{ isExpanded && (
 				<ReactionDisplay
