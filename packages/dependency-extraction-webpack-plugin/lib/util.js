@@ -1,14 +1,17 @@
 const WORDPRESS_NAMESPACE = '@wordpress/';
 const BUNDLED_PACKAGES = [
 	'@wordpress/admin-ui',
+	'@wordpress/boot',
 	'@wordpress/dataviews',
 	'@wordpress/dataviews/wp',
+	'@wordpress/fields',
 	'@wordpress/icons',
 	'@wordpress/interface',
-	'@wordpress/undo-manager',
-	'@wordpress/fields',
-	'@wordpress/views',
+	'@wordpress/route',
+	'@wordpress/theme',
 	'@wordpress/ui',
+	'@wordpress/undo-manager',
+	'@wordpress/views',
 ];
 
 /**
