@@ -182,12 +182,18 @@ function block_core_page_list_build_css_font_sizes( $context ) {
  *
  * @return string List markup.
  */
-function block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $nested_pages, $is_nested, $active_page_ancestor_ids = array(), $colors = array(), $depth = 0 ) {
+function block_core_page_list_render_nested_page_list( $submenu_visibility, $show_submenu_icons, $is_navigation_child, $nested_pages, $is_nested, $active_page_ancestor_ids = array(), $colors = array(), $depth = 0 ) {
 	if ( empty( $nested_pages ) ) {
 		return;
 	}
 	$front_page_id = (int) get_option( 'page_on_front' );
 	$markup        = '';
+
+	// Compute visibility mode flags once
+	$open_on_click = 'click' === $submenu_visibility;
+	$open_on_hover = 'hover' === $submenu_visibility;
+	$open_always   = 'always' === $submenu_visibility;
+
 	foreach ( (array) $nested_pages as $page ) {
 		$css_class       = $page['is_active'] ? ' current-menu-item' : '';
 		$aria_current    = $page['is_active'] ? ' aria-current="page"' : '';
@@ -201,10 +207,14 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 		if ( $is_navigation_child ) {
 			$css_class .= ' wp-block-navigation-item';
 
-			if ( $open_submenus_on_click ) {
+			if ( $open_on_click ) {
 				$css_class .= ' open-on-click';
-			} elseif ( $show_submenu_icons ) {
+			} elseif ( $open_on_hover && $show_submenu_icons ) {
 				$css_class .= ' open-on-hover-click';
+			}
+
+			if ( $open_always ) {
+				$css_class .= ' open-always';
 			}
 		}
 
@@ -232,7 +242,7 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 
 		$markup .= '<li class="wp-block-pages-list__item' . esc_attr( $css_class ) . '"' . $style_attribute . '>';
 
-		if ( isset( $page['children'] ) && $is_navigation_child && $open_submenus_on_click ) {
+		if ( isset( $page['children'] ) && $is_navigation_child && $open_on_click ) {
 			$markup .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="' . esc_attr( $navigation_child_content_class ) . ' wp-block-navigation-submenu__toggle" aria-expanded="false">' . wp_kses_post( $title ) .
 			'</button><span class="wp-block-page-list__submenu-icon wp-block-navigation__submenu-icon"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg></span>';
 		} else {
@@ -240,13 +250,13 @@ function block_core_page_list_render_nested_page_list( $open_submenus_on_click, 
 		}
 
 		if ( isset( $page['children'] ) ) {
-			if ( $is_navigation_child && $show_submenu_icons && ! $open_submenus_on_click ) {
+			if ( $is_navigation_child && $show_submenu_icons && ! $open_on_click ) {
 				$markup .= '<button aria-label="' . esc_attr( $aria_label ) . '" class="wp-block-navigation__submenu-icon wp-block-navigation-submenu__toggle" aria-expanded="false">';
 				$markup .= '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 				$markup .= '</button>';
 			}
 			$markup .= '<ul class="wp-block-navigation__submenu-container">';
-			$markup .= block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $page['children'], $is_nested, $active_page_ancestor_ids, $colors, $depth + 1 );
+			$markup .= block_core_page_list_render_nested_page_list( $submenu_visibility, $show_submenu_icons, $is_navigation_child, $page['children'], $is_nested, $active_page_ancestor_ids, $colors, $depth + 1 );
 			$markup .= '</ul>';
 		}
 		$markup .= '</li>';
@@ -363,14 +373,13 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$is_navigation_child = array_key_exists( 'showSubmenuIcon', $block->context );
 
 	// Get submenu visibility with backward compatibility for openSubmenusOnClick.
-	$computed_visibility    = block_core_page_list_get_submenu_visibility( $block->context );
-	$open_submenus_on_click = 'click' === $computed_visibility;
+	$submenu_visibility = block_core_page_list_get_submenu_visibility( $block->context );
 
 	$show_submenu_icons = array_key_exists( 'showSubmenuIcon', $block->context ) ? $block->context['showSubmenuIcon'] : false;
 
 	$wrapper_markup = $is_nested ? '%2$s' : '<ul %1$s>%2$s</ul>';
 
-	$items_markup = block_core_page_list_render_nested_page_list( $open_submenus_on_click, $show_submenu_icons, $is_navigation_child, $nested_pages, $is_nested, $active_page_ancestor_ids, $colors );
+	$items_markup = block_core_page_list_render_nested_page_list( $submenu_visibility, $show_submenu_icons, $is_navigation_child, $nested_pages, $is_nested, $active_page_ancestor_ids, $colors );
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
