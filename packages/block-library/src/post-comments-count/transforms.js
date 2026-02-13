@@ -12,13 +12,13 @@ const transforms = {
 				const textAlign = style?.typography?.textAlign;
 				return createBlock( 'core/post-comments-link', {
 					...( textAlign && {
-						style: {
-							typography: {
-								textAlign,
+							style: {
+								typography: {
+									textAlign,
+								},
 							},
-						},
-					}),
-				});
+						} ),
+				} );
 			},
 		},
 	],
