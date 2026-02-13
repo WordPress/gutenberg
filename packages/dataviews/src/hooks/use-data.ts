@@ -134,9 +134,7 @@ export default function useData< Item >( {
 			view.search !== prevViewParamsRef.current.search ||
 			currentFiltersKey !== prevFiltersKey ||
 			view.perPage !== prevViewParamsRef.current.perPage;
-
 		hasInitializedRef.current = true;
-
 		// Update tracked view parameters
 		prevViewParamsRef.current = {
 			search: view.search,
@@ -150,7 +148,7 @@ export default function useData< Item >( {
 			// Reset scroll direction to prevent stale directional filtering
 			scrollDirectionRef.current = undefined;
 			// Use the view's startPosition if defined, otherwise default to 1
-			const startPosition = view.startPosition ?? 1;
+			const startPosition = view.search ? 1 : view.startPosition ?? 1;
 			const records = shownData.map( ( record, index ) => {
 				const position = startPosition + index;
 				positionMapRef.current.set( getItemId( record ), position );
@@ -173,8 +171,9 @@ export default function useData< Item >( {
 		// offset in the dataset. This ensures aria-posinset values are
 		// semantically correct - if startPosition is 40, there are exactly
 		// 39 items before the first item in shownData.
-		const basePosition = view.startPosition ?? 1;
-
+		// When there's an active search, always start from position 1 since
+		// search results are a filtered subset, not a paginated view.
+		const basePosition = view.search ? 1 : view.startPosition ?? 1;
 		const newRecords = shownData.map( ( record, index ) => {
 			const itemId = getItemId( record );
 			const position = view.infiniteScrollEnabled
@@ -227,23 +226,39 @@ export default function useData< Item >( {
 			// are unloaded, which could trigger unwanted scroll events.
 			const buffer = 20;
 
-			result = allRecords.filter( ( record ) => {
-				const itemPosition = ( record as Item & { position: number } )
-					.position;
-				// When scrolling, only trim items from the end we're scrolling away from
-				if ( scrollDirection === 'up' ) {
-					// When scrolling up, only trim items below the visible range
-					return itemPosition <= visibleMax + buffer;
-				} else if ( scrollDirection === 'down' ) {
-					// When scrolling down, only trim items above the visible range
-					return itemPosition >= visibleMin - buffer;
-				}
-				// When not scrolling or first load, keep items within buffer range
-				return (
-					itemPosition >= visibleMin - buffer &&
-					itemPosition <= visibleMax + buffer
-				);
-			} );
+			const recordPositions = allRecords.map(
+				( r ) => ( r as Item & { position: number } ).position
+			);
+			const minRecordPos = Math.min( ...recordPositions );
+			const maxRecordPos = Math.max( ...recordPositions );
+
+			// Check if there's any overlap between visible range and actual record positions
+			// to avoid filtering when visibleEntries are stale (e.g., after search/filter reset)
+			const hasOverlap = ! (
+				maxRecordPos < visibleMin - buffer ||
+				minRecordPos > visibleMax + buffer
+			);
+
+			if ( hasOverlap ) {
+				result = allRecords.filter( ( record ) => {
+					const itemPosition = (
+						record as Item & { position: number }
+					 ).position;
+					// When scrolling, only trim items from the end we're scrolling away from
+					if ( scrollDirection === 'up' ) {
+						// When scrolling up, only trim items below the visible range
+						return itemPosition <= visibleMax + buffer;
+					} else if ( scrollDirection === 'down' ) {
+						// When scrolling down, only trim items above the visible range
+						return itemPosition >= visibleMin - buffer;
+					}
+					// When not scrolling or first load, keep items within buffer range
+					return (
+						itemPosition >= visibleMin - buffer &&
+						itemPosition <= visibleMax + buffer
+					);
+				} );
+			}
 		}
 
 		allLoadedRecordsRef.current = result;

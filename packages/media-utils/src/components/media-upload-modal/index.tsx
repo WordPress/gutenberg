@@ -255,7 +255,7 @@ export function MediaUploadModal( {
 			const itemsNeeded = view.endPosition - view.startPosition + 1;
 
 			return {
-				offset: view.startPosition - 1,
+				offset: !! view.search ? 0 : view.startPosition - 1,
 				per_page: itemsNeeded,
 				status: 'inherit',
 				order: view.sort?.direction,
