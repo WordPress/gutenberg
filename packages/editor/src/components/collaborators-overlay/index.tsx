@@ -1,8 +1,4 @@
-import {
-	// @ts-ignore
-	privateApis,
-	// @ts-ignore
-} from '@wordpress/block-editor';
+import { privateApis } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { CursorRegistry } from './cursor-registry';
