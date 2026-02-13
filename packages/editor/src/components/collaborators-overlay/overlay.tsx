@@ -1,11 +1,10 @@
 // @ts-expect-error No exported types
 import { useStyleOverride } from '@wordpress/block-editor';
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 import { useBlockHighlighting } from './use-block-highlighting';
 import { useRenderCursors } from './use-render-cursors';
-import { type CursorRegistry } from './cursor-registry';
 
 const COLLABORATORS_OVERLAY_STYLES = `
 .block-canvas-cover {
@@ -52,37 +51,10 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	0%, 100% { opacity: 1; }
 	50% { opacity: 0.5; }
 }
-.collaborators-overlay-cursor-highlighted .collaborators-overlay-user-cursor {
-	animation: collaborators-overlay-cursor-highlight 0.6s ease-in-out 3;
-}
-.collaborators-overlay-cursor-highlighted .collaborators-overlay-user-label {
-	animation: collaborators-overlay-label-highlight 0.6s ease-in-out 3;
-}
-@keyframes collaborators-overlay-cursor-highlight {
-	0%, 100% {
-		transform: scale(1);
-		filter: drop-shadow(0 0 0 transparent);
-	}
-	50% {
-		transform: scale(1.2);
-		filter: drop-shadow(0 0 8px currentColor);
-	}
-}
-@keyframes collaborators-overlay-label-highlight {
-	0%, 100% {
-		transform: translateY(-100%) scale(1);
-		filter: drop-shadow(0 0 0 transparent);
-	}
-	50% {
-		transform: translateY(-100%) scale(1.1);
-		filter: drop-shadow(0 0 6px currentColor);
-	}
-}
 `;
 
 interface OverlayProps {
 	blockEditorDocument?: Document;
-	cursorRegistry: CursorRegistry;
 	postId: number | null;
 	postType: string | null;
 }
@@ -92,14 +64,12 @@ interface OverlayProps {
  *
  * @param props                     - The overlay props.
  * @param props.blockEditorDocument - The block editor document.
- * @param props.cursorRegistry      - The cursor registry.
  * @param props.postId              - The ID of the post.
  * @param props.postType            - The type of the post.
  * @return The Overlay component.
  */
 export function Overlay( {
 	blockEditorDocument,
-	cursorRegistry,
 	postId,
 	postType,
 }: OverlayProps ) {
@@ -108,11 +78,13 @@ export function Overlay( {
 		css: COLLABORATORS_OVERLAY_STYLES,
 	} );
 
-	const overlayRef = useRef< HTMLDivElement >( null );
-	const rerenderCursorsAfterDelay = useRenderCursors(
-		overlayRef,
+	// Use state for the overlay element so that the hook re-runs once the ref is attached.
+	const [ overlayElement, setOverlayElement ] =
+		useState< HTMLDivElement | null >( null );
+
+	const { cursors, rerenderCursorsAfterDelay } = useRenderCursors(
+		overlayElement,
 		blockEditorDocument ?? null,
-		cursorRegistry,
 		postId ?? null,
 		postType ?? null
 	);
@@ -123,7 +95,7 @@ export function Overlay( {
 	useEffect( rerenderCursorsAfterDelay, [ rerenderCursorsAfterDelay ] );
 
 	// Merge the refs to use the same element for both overlay and resize observation
-	const mergedRef = useMergeRefs( [ overlayRef, resizeObserverRef ] );
+	const mergedRef = useMergeRefs( [ setOverlayElement, resizeObserverRef ] );
 
 	useBlockHighlighting(
 		blockEditorDocument ?? null,
@@ -133,5 +105,34 @@ export function Overlay( {
 
 	// This is a full overlay that covers the entire iframe document. Good for
 	// scrollable elements like cursor indicators.
-	return <div className="collaborators-overlay-full" ref={ mergedRef } />;
+	return (
+		<div className="collaborators-overlay-full" ref={ mergedRef }>
+			{ cursors.map( ( cursor ) => (
+				<div
+					key={ cursor.clientId }
+					className="collaborators-overlay-user"
+					style={ {
+						left: `${ cursor.x }px`,
+						top: `${ cursor.y }px`,
+					} }
+				>
+					<div
+						className="collaborators-overlay-user-cursor"
+						style={ {
+							backgroundColor: cursor.color,
+							height: `${ cursor.height }px`,
+						} }
+					/>
+					<div
+						className="collaborators-overlay-user-label"
+						style={ {
+							backgroundColor: cursor.color,
+						} }
+					>
+						{ cursor.userName }
+					</div>
+				</div>
+			) ) }
+		</div>
+	);
 }

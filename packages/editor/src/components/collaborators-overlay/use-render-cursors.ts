@@ -1,36 +1,39 @@
 import {
 	privateApis as coreDataPrivateApis,
 	type SelectionCursor,
-	type SelectionState,
 	SelectionType,
 } from '@wordpress/core-data';
-import { type RefObject, useEffect, useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 
-import { type CursorRegistry } from './cursor-registry';
 import { unlock } from '../../lock-unlock';
 
 const { useActiveCollaborators, useGetAbsolutePositionIndex } =
 	unlock( coreDataPrivateApis );
 
-type RenderCursorsFunction = () => void;
+export interface CursorData {
+	userName: string;
+	clientId: number;
+	color: string;
+	x: number;
+	y: number;
+	height: number;
+}
 
 /**
- * Custom hook for rendering cursors for each user in the editor.
+ * Custom hook that computes cursor positions for each remote user in the editor.
  *
- * @param overlayRef          - The reference to the overlay element
+ * @param overlayElement      - The overlay element
  * @param blockEditorDocument - The block editor document
- * @param cursorRegistry      - The cursor registry
  * @param postId              - The ID of the post
  * @param postType            - The type of the post
- * @return A cursor render function. Can be used by parent to redraw cursors as needed.
+ * @return An array of cursor data for rendering, and a function to trigger a delayed recompute.
  */
 export function useRenderCursors(
-	overlayRef: RefObject< HTMLElement | null >,
+	overlayElement: HTMLElement | null,
 	blockEditorDocument: Document | null,
-	cursorRegistry: CursorRegistry,
 	postId: number | null,
 	postType: string | null
-) {
+): { cursors: CursorData[]; rerenderCursorsAfterDelay: () => () => void } {
 	const sortedUsers = useActiveCollaborators(
 		postId ?? null,
 		postType ?? null
@@ -40,163 +43,110 @@ export function useRenderCursors(
 		postType ?? null
 	);
 
-	const renderCursors = useMemo< RenderCursorsFunction >(
-		() => (): void => {
-			if ( ! overlayRef.current || ! blockEditorDocument ) {
+	const [ cursorPositions, setCursorPositions ] = useState< CursorData[] >(
+		[]
+	);
+
+	const computeCursors = useMemo(
+		() => () => {
+			if ( ! overlayElement || ! blockEditorDocument ) {
+				setCursorPositions( [] );
 				return;
 			}
 
-			const userSelections = sortedUsers.map( ( user: any ) => ( {
-				userName: user.collaboratorInfo.name,
-				clientId: user.clientId,
-				// Replace local user's selection with the current selection from the editor state.
-				selection: user.editorState?.selection ?? {
-					type: SelectionType.None,
-				},
-				color: user.collaboratorInfo.color,
-				isMe: user.isMe,
-			} ) );
+			const results: CursorData[] = [];
 
-			drawUserSelections(
-				overlayRef.current,
-				blockEditorDocument,
-				userSelections,
-				cursorRegistry,
-				getAbsolutePositionIndex
-			);
+			sortedUsers.forEach( ( user: any ) => {
+				if ( user.isMe ) {
+					return;
+				}
+
+				const selection = user.editorState?.selection ?? {
+					type: SelectionType.None,
+				};
+				const userName = user.collaboratorInfo.name;
+				const clientId = user.clientId;
+				const color = user.collaboratorInfo.color;
+
+				let coords: {
+					x: number;
+					y: number;
+					height: number;
+				} | null = null;
+
+				if ( selection.type === SelectionType.None ) {
+					// Nothing selected.
+				} else if ( selection.type === SelectionType.WholeBlock ) {
+					// Don't draw a cursor for a whole block selection.
+				} else if ( selection.type === SelectionType.Cursor ) {
+					coords = getCursorPosition(
+						getAbsolutePositionIndex( selection ),
+						selection.blockId,
+						blockEditorDocument,
+						overlayElement
+					);
+				} else if (
+					selection.type === SelectionType.SelectionInOneBlock
+				) {
+					const selectionAsCursor: SelectionCursor = {
+						type: SelectionType.Cursor,
+						blockId: selection.blockId,
+						cursorPosition: selection.cursorStartPosition,
+					};
+					coords = getCursorPosition(
+						getAbsolutePositionIndex( selectionAsCursor ),
+						selectionAsCursor.blockId,
+						blockEditorDocument,
+						overlayElement
+					);
+				} else if (
+					selection.type === SelectionType.SelectionInMultipleBlocks
+				) {
+					const selectionAsCursor: SelectionCursor = {
+						type: SelectionType.Cursor,
+						blockId: selection.blockStartId,
+						cursorPosition: selection.cursorStartPosition,
+					};
+					coords = getCursorPosition(
+						getAbsolutePositionIndex( selectionAsCursor ),
+						selectionAsCursor.blockId,
+						blockEditorDocument,
+						overlayElement
+					);
+				}
+
+				if ( coords ) {
+					results.push( {
+						userName,
+						clientId,
+						color,
+						...coords,
+					} );
+				}
+			} );
+
+			setCursorPositions( results );
 		},
 		[
 			blockEditorDocument,
-			cursorRegistry,
 			getAbsolutePositionIndex,
-			overlayRef,
+			overlayElement,
 			sortedUsers,
 		]
 	);
 
-	useEffect( renderCursors, [ renderCursors, sortedUsers ] );
+	useEffect( computeCursors, [ computeCursors ] );
 
-	// Return function so that it can be called manually.
-	return () => {
-		const timeout = setTimeout( renderCursors, 500 );
-
-		return () => clearTimeout( timeout );
-	};
-}
-
-/**
- * Draws user selections on the overlay.
- *
- * @param overlay                  - The overlay element
- * @param editorDocument           - The editor document
- * @param userSelections           - The user selections
- * @param cursorRegistry           - The cursor registry
- * @param getAbsolutePositionIndex - The function to get the absolute position index
- */
-const drawUserSelections = (
-	overlay: HTMLElement | null,
-	editorDocument: Document | null,
-	userSelections: {
-		userName: string;
-		clientId: number;
-		selection: SelectionState;
-		color: string;
-		isMe: boolean;
-	}[],
-	cursorRegistry: CursorRegistry,
-	getAbsolutePositionIndex: ( selection: SelectionCursor ) => number | null
-) => {
-	if ( ! overlay || ! editorDocument ) {
-		return;
-	}
-
-	// Clear up previous state
-	cursorRegistry.removeAll();
-
-	userSelections.forEach(
-		( { userName, clientId, selection, color, isMe } ) => {
-			if ( isMe ) {
-				// Skip drawing the local user's cursor.
-				return;
-			}
-
-			let coords: { x: number; y: number; height: number } | null = null;
-
-			if ( selection.type === SelectionType.None ) {
-				// Nothing selected.
-			} else if ( selection.type === SelectionType.WholeBlock ) {
-				// Don't draw a cursor for a whole block selection.
-			} else if ( selection.type === SelectionType.Cursor ) {
-				coords = getCursorPosition(
-					getAbsolutePositionIndex( selection ),
-					selection.blockId,
-					editorDocument,
-					overlay
-				);
-			} else if ( selection.type === SelectionType.SelectionInOneBlock ) {
-				// Until selection logic is implemented, render a selection as a cursor at the beginning of the selection.
-				const selectionAsCursor: SelectionCursor = {
-					type: SelectionType.Cursor,
-					blockId: selection.blockId,
-					cursorPosition: selection.cursorStartPosition,
-				};
-
-				coords = getCursorPosition(
-					getAbsolutePositionIndex( selectionAsCursor ),
-					selectionAsCursor.blockId,
-					editorDocument,
-					overlay
-				);
-			} else if (
-				selection.type === SelectionType.SelectionInMultipleBlocks
-			) {
-				// Until selection logic is implemented, render a selection as a cursor at the beginning of the selection.
-				const selectionAsCursor: SelectionCursor = {
-					type: SelectionType.Cursor,
-					blockId: selection.blockStartId,
-					cursorPosition: selection.cursorStartPosition,
-				};
-
-				coords = getCursorPosition(
-					getAbsolutePositionIndex( selectionAsCursor ),
-					selectionAsCursor.blockId,
-					editorDocument,
-					overlay
-				);
-			}
-
-			if ( coords ) {
-				// Create parent container
-				// Use `document` instead of `editorDocument` because the overlay is in the parent document.
-				const userContainer = document.createElement( 'div' );
-				userContainer.className = 'collaborators-overlay-user';
-				userContainer.style.left = `${ coords.x }px`;
-				userContainer.style.top = `${ coords.y }px`;
-
-				// Create cursor element
-				const cursor = document.createElement( 'div' );
-				cursor.className = 'collaborators-overlay-user-cursor';
-				cursor.style.backgroundColor = color;
-				cursor.style.height = `${ coords.height }px`;
-
-				// Create label
-				const label = document.createElement( 'div' );
-				label.className = 'collaborators-overlay-user-label';
-				label.textContent = userName;
-				label.style.backgroundColor = color;
-
-				// Append cursor and label to the container
-				userContainer.appendChild( cursor );
-				userContainer.appendChild( label );
-
-				overlay.appendChild( userContainer );
-
-				// Register cursor in the registry
-				cursorRegistry.registerCursor( clientId, userContainer );
-			}
-		}
+	const rerenderCursorsAfterDelay = useMemo(
+		() => () => {
+			const timeout = setTimeout( computeCursors, 500 );
+			return () => clearTimeout( timeout );
+		},
+		[ computeCursors ]
 	);
-};
+
+	return { cursors: cursorPositions, rerenderCursorsAfterDelay };
+}
 
 /**
  * Given a selection, returns the coordinates of the cursor in the block.
@@ -228,14 +178,14 @@ const getCursorPosition = (
 		return null;
 	}
 
-	const coords = getOffsetPositionInBlock(
-		blockElement,
-		absolutePositionIndex,
-		editorDocument,
-		overlay
+	return (
+		getOffsetPositionInBlock(
+			blockElement,
+			absolutePositionIndex,
+			editorDocument,
+			overlay
+		) ?? null
 	);
-
-	return coords ?? null;
 };
 
 /**
