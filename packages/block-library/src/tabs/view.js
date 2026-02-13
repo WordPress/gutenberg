@@ -94,16 +94,6 @@ const { actions: privateActions, state: privateState } = store(
 			get tabIndexAttribute() {
 				return privateState.isActiveTab ? 0 : -1;
 			},
-			/**
-			 * The value of the tabindex attribute for tab panels.
-			 *
-			 * Guidelines: https://www.w3.org/WAI/ARIA/apg/patterns/tabs/
-			 *
-			 * @type {number}
-			 */
-			get tabPanelTabIndexAttribute() {
-				return 0;
-			},
 		},
 		actions: {
 			/**
