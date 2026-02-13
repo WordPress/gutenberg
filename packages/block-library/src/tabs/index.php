@@ -8,6 +8,8 @@
 /**
  * Extract tabs list from tab-panel innerblocks.
  *
+ * @since 7.0.0
+ *
  * @param array $innerblocks Parsed inner blocks of tabs block.
  *
  * @return array List of tabs with id, label, index.
@@ -56,6 +58,8 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array() ): arr
  * It is more performant to do this here, once, rather than in the tabs render and tabs context filters.
  * In this way core/tabs is both a provider and a consumer of the core/tabs-list context.
  *
+ * @since 7.0.0
+ *
  * @param array $context      Default block context.
  * @param array $parsed_block The block being rendered.
  *
@@ -74,6 +78,8 @@ add_filter( 'render_block_context', 'block_core_tabs_provide_context', 10, 2 );
 
 /**
  * Render callback for core/tabs.
+ *
+ * @since 7.0.0
  *
  * @param array     $attributes Block attributes.
  * @param string    $content    Block content.
@@ -150,7 +156,7 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 /**
  * Registers the `core/tabs` block on the server.
  *
- * @since 6.8.0
+ * @since 7.0.0
  */
 function register_block_core_tabs() {
 	register_block_type_from_metadata(
