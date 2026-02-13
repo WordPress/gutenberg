@@ -21,11 +21,12 @@ function gutenberg_register_block_comment_reaction_metadata() {
 						'items' => array(
 							'type'       => 'object',
 							'properties' => array(
-								'userId'    => array(
+								'userId' => array(
 									'type' => 'integer',
 								),
-								'timestamp' => array(
-									'type' => 'string',
+								'date'   => array(
+									'type'   => array( 'string', 'null' ),
+									'format' => 'date-time',
 								),
 							),
 						),
