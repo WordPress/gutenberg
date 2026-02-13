@@ -26,17 +26,21 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 	const isBulk = postId.length > 1;
 
 	const [ localEdits, setLocalEdits ] = useState( {} );
-	const { record, hasFinishedResolution } = useSelect(
+	const { record, hasFinishedResolution, isTemplateReadOnly } = useSelect(
 		( select ) => {
 			const {
 				getEditedEntityRecord,
 				hasFinishedResolution: hasFinished,
 			} = select( coreDataStore );
 
+			const { getPostsPageId } = unlock( select( coreDataStore ) );
+			const isPostsPage = +getPostsPageId() === +postId[ 0 ];
+
 			if ( isBulk ) {
 				return {
 					record: null,
 					hasFinishedResolution: true,
+					isTemplateReadOnly: isPostsPage,
 				};
 			}
 
@@ -47,6 +51,7 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 					'getEditedEntityRecord',
 					args
 				),
+				isTemplateReadOnly: isPostsPage,
 			};
 		},
 		[ postType, postId, isBulk ]
@@ -66,9 +71,17 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 						),
 					};
 				}
+
+				if ( field.id === 'template' ) {
+					return {
+						...field,
+						readOnly: isTemplateReadOnly,
+					};
+				}
+
 				return field;
 			} ),
-		[ _fields ]
+		[ _fields, isTemplateReadOnly ]
 	);
 
 	const form = useMemo( () => {
