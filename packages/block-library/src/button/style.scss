@@ -1,3 +1,5 @@
+@use "@wordpress/base-styles/breakpoints" as *;
+
 // This variable is repeated across Button, Buttons, and Buttons editor styles.
 $blocks-block__margin: 0.5em;
 
@@ -95,6 +97,16 @@ $blocks-block__margin: 0.5em;
 	&.wp-block-button__width-100 {
 		width: 100%;
 		flex-basis: 100%;
+	}
+
+	&.is-full-width-on-mobile {
+		@media (max-width: #{ ($break-medium - 1) }) {
+			width: 100%;
+			flex-basis: 100%;
+			.wp-block-button__link {
+				width: 100%;
+			}
+		}
 	}
 }
 
