@@ -153,10 +153,7 @@ export interface SideloadMediaArgs {
 
 export interface Settings {
 	// Registered image sizes from the server.
-	allImageSizes?: Record<
-		string,
-		{ width: number; height: number; crop: boolean }
-	>;
+	allImageSizes?: Record< string, ImageSizeCrop >;
 	// Function for uploading files to the server.
 	mediaUpload: ( args: UploadMediaArgs ) => void;
 	// Function for sideloading files to existing attachments.
