@@ -182,7 +182,7 @@ function DataViewsPicker< Item >( {
 		hasPrimaryOrLockedFilters
 	);
 
-	const { intersectionObserverCallback } = useInfiniteScroll( {
+	const { intersectionObserver } = useInfiniteScroll( {
 		view,
 		onChangeView,
 		isLoading,
@@ -243,7 +243,7 @@ function DataViewsPicker< Item >( {
 				itemListLabel,
 				empty,
 				hasInitiallyLoaded: true,
-				intersectionObserverCallback,
+				intersectionObserver,
 			} }
 		>
 			<div className="dataviews-picker-wrapper">

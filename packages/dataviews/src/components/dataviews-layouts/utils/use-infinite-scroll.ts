@@ -19,32 +19,20 @@ export function useIntersectionObserver(
 	elementRef: React.RefObject< HTMLElement | null >,
 	posinset: number | undefined
 ) {
-	const { intersectionObserverCallback } = useContext( DataViewsContext );
+	const { intersectionObserver } = useContext( DataViewsContext );
 
 	useEffect( () => {
-		if (
-			! intersectionObserverCallback ||
-			! elementRef.current ||
-			posinset === undefined
-		) {
+		const element = elementRef.current;
+		if ( ! element || posinset === undefined || ! intersectionObserver ) {
 			return;
 		}
 
-		const observer = new IntersectionObserver(
-			intersectionObserverCallback,
-			{
-				root: null,
-				rootMargin: '0px',
-				threshold: 0.1,
-			}
-		);
-
-		observer.observe( elementRef.current );
+		intersectionObserver.observe( element );
 
 		return () => {
-			observer.disconnect();
+			intersectionObserver.unobserve( element );
 		};
-	}, [ elementRef, intersectionObserverCallback, posinset ] );
+	}, [ elementRef, intersectionObserver, posinset ] );
 }
 
 /**

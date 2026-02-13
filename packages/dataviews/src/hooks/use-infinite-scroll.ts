@@ -79,7 +79,7 @@ type UseInfiniteScrollProps = {
 };
 
 type UseInfiniteScrollResult = {
-	intersectionObserverCallback: IntersectionObserverCallback | undefined;
+	intersectionObserver?: IntersectionObserver | null;
 };
 
 export function useInfiniteScroll( {
@@ -176,6 +176,32 @@ export function useInfiniteScroll( {
 		// Reset the anchor state now that we've adjusted
 		anchorElementRef.current = null;
 	}, [ containerRef, isLoading, view.infiniteScrollEnabled ] );
+
+	// Create and expose a shared IntersectionObserver for provider-level reuse.
+	const intersectionObserverRef = useRef< IntersectionObserver | null >(
+		null
+	);
+	useEffect( () => {
+		if ( ! view.infiniteScrollEnabled || ! intersectionObserverCallback ) {
+			if ( intersectionObserverRef.current ) {
+				intersectionObserverRef.current.disconnect();
+				intersectionObserverRef.current = null;
+			}
+			return;
+		}
+
+		intersectionObserverRef.current = new IntersectionObserver(
+			intersectionObserverCallback,
+			{ root: null, rootMargin: '0px', threshold: 0.1 }
+		);
+
+		return () => {
+			if ( intersectionObserverRef.current ) {
+				intersectionObserverRef.current.disconnect();
+				intersectionObserverRef.current = null;
+			}
+		};
+	}, [ view.infiniteScrollEnabled, intersectionObserverCallback ] );
 
 	// Attach scroll event listener for infinite scroll
 	useEffect( () => {
@@ -278,8 +304,6 @@ export function useInfiniteScroll( {
 	] );
 
 	return {
-		intersectionObserverCallback: view.infiniteScrollEnabled
-			? intersectionObserverCallback
-			: undefined,
+		intersectionObserver: intersectionObserverRef.current,
 	};
 }

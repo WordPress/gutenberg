@@ -59,7 +59,8 @@ type DataViewsContextType< Item > = {
 	hasInitiallyLoaded?: boolean;
 	itemListLabel?: string;
 	onReset?: ( () => void ) | false;
-	intersectionObserverCallback?: IntersectionObserverCallback;
+	/** Shared IntersectionObserver instance created by the provider when infinite scroll is enabled. */
+	intersectionObserver?: IntersectionObserver | null;
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {
@@ -89,7 +90,7 @@ const DataViewsContext = createContext< DataViewsContextType< any > >( {
 	config: {
 		perPageSizes: [],
 	},
-	intersectionObserverCallback: undefined,
+	intersectionObserver: null,
 } );
 
 DataViewsContext.displayName = 'DataViewsContext';

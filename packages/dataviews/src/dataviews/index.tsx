@@ -224,7 +224,7 @@ function DataViews< Item >( {
 		hasPrimaryOrLockedFilters
 	);
 
-	const { intersectionObserverCallback } = useInfiniteScroll( {
+	const { intersectionObserver } = useInfiniteScroll( {
 		view,
 		onChangeView,
 		isLoading,
@@ -288,7 +288,7 @@ function DataViews< Item >( {
 				empty,
 				hasInitiallyLoaded,
 				onReset,
-				intersectionObserverCallback,
+				intersectionObserver,
 			} }
 		>
 			<div className="dataviews-wrapper">
