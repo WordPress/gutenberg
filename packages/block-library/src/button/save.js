@@ -28,6 +28,7 @@ export default function save( { attributes } ) {
 		text,
 		title,
 		url,
+		isFullWidthOnMobile,
 	} = attributes;
 	const TagName = tagName || 'a';
 	const isButtonTag = 'button' === TagName;
@@ -63,8 +64,14 @@ export default function save( { attributes } ) {
 	// if it had already been assigned, for the sake of backward-compatibility.
 	// A title will no longer be assigned for new or updated button block links.
 
+	const blockProps = useBlockProps.save( {
+		className: clsx( {
+			'is-full-width-on-mobile': isFullWidthOnMobile,
+		} ),
+	} );
+
 	return (
-		<div { ...useBlockProps.save() }>
+		<div { ...blockProps }>
 			<RichText.Content
 				tagName={ TagName }
 				type={ isButtonTag ? buttonType : null }
