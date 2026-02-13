@@ -11,7 +11,7 @@ Relevant docs and discussions:
 
 ## Availability
 
-Real-time collaboration can be enabled via WordPress settings: Writing > Enable real-time collaboration.
+Real-time collaboration is automatically enabled when using the Gutenberg plugin. The `core-data` package checks for `IS_GUTENBERG_PLUGIN` to determine whether entity syncing is available.
 
 ## The data flow
 
