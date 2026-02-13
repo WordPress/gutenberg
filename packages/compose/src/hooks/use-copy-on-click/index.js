@@ -14,10 +14,10 @@ import deprecated from '@wordpress/deprecated';
  *
  * @deprecated
  *
- * @param {import('react').RefObject<string | Element | NodeListOf<Element>>} ref       Reference with the element.
- * @param {string|Function}                                                   text      The text to copy.
- * @param {number}                                                            [timeout] Optional timeout to reset the returned
- *                                                                                      state. 4 seconds by default.
+ * @param {React.RefObject<string | Element | NodeListOf<Element>>} ref       Reference with the element.
+ * @param {string|Function}                                         text      The text to copy.
+ * @param {number}                                                  [timeout] Optional timeout to reset the returned
+ *                                                                            state. 4 seconds by default.
  *
  * @return {boolean} Whether or not the text has been copied. Resets after the
  *                   timeout.
@@ -28,7 +28,7 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 		alternative: 'wp.compose.useCopyToClipboard',
 	} );
 
-	/** @type {import('react').MutableRefObject<Clipboard | undefined>} */
+	/** @type {React.MutableRefObject<Clipboard | undefined>} */
 	const clipboardRef = useRef();
 	const [ hasCopied, setHasCopied ] = useState( false );
 

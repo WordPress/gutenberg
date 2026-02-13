@@ -28,7 +28,7 @@ import useDeprecatedTextAlign from '../utils/deprecated-text-align-attributes';
  * @param {Object} props.context               Inherited context.
  * @param {string} props.context.commentId     The comment ID.
  *
- * @return {JSX.Element} React element.
+ * @return {React.JSX.Element} React element.
  */
 export default function Edit( props ) {
 	const {

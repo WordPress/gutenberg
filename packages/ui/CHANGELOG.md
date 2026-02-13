@@ -8,8 +8,13 @@
 
 ### New Features
 
+-   Add `Dialog` primitive ([#75183](https://github.com/WordPress/gutenberg/pull/75183)).
 -   Add `Tabs` primitive ([#74652](https://github.com/WordPress/gutenberg/pull/74652)).
 -   Add `Textarea` primitive ([#74707](https://github.com/WordPress/gutenberg/pull/74707)).
+
+### Bug Fixes
+
+-   `Field`: Fix default gap spacing ([#75446](https://github.com/WordPress/gutenberg/pull/75446)).
 
 ### Enhancements
 

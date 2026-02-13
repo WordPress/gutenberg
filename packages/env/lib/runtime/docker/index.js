@@ -107,7 +107,10 @@ class DockerRuntime {
 			xdebug,
 			spx,
 			writeChanges: true,
+			customConfigPath: config.customConfigPath,
 		} );
+
+		const testsEnabled = fullConfig.testsEnvironment !== false;
 
 		// Check if the hash of the config has changed. If so, run configuration.
 		const configHash = md5( fullConfig );
@@ -137,13 +140,19 @@ class DockerRuntime {
 		 * the container before continuing allows the docker entrypoint script,
 		 * which restores the files, to run again when we start the containers.
 		 *
-		 * Additionally, this serves as a way to restart the container entirely
-		 * should the need arise.
+		 * Additionally, --remove-orphans ensures containers from services that
+		 * were removed in the new config (e.g., tests-* after setting
+		 * testsEnvironment: false) are properly stopped.
 		 *
 		 * @see https://github.com/WordPress/gutenberg/pull/20253#issuecomment-587228440
 		 */
 		if ( shouldConfigureWp ) {
-			await this.stop( fullConfig, { spinner, debug } );
+			spinner.text = 'Stopping WordPress.';
+			await dockerCompose.down( {
+				config: dockerComposeConfigPath,
+				log: debug,
+				commandOptions: [ '--remove-orphans' ],
+			} );
 			// Update the images before starting the services again.
 			spinner.text = 'Updating docker images.';
 
@@ -154,7 +163,9 @@ class DockerRuntime {
 			// as docker volumes, simply updating the image will not change those
 			// files. Thus, we need to remove those volumes in order for the files
 			// to be updated when pulling the new images.
-			const volumesToRemove = `${ directoryHash }_wordpress ${ directoryHash }_tests-wordpress`;
+			const volumesToRemove = testsEnabled
+				? `${ directoryHash }_wordpress ${ directoryHash }_tests-wordpress`
+				: `${ directoryHash }_wordpress`;
 
 			try {
 				if ( fullConfig.debug ) {
@@ -171,8 +182,12 @@ class DockerRuntime {
 			spinner.text = 'Downloading sources.';
 		}
 
+		const mysqlServices = [ 'mysql' ];
+		if ( testsEnabled ) {
+			mysqlServices.push( 'tests-mysql' );
+		}
 		await Promise.all( [
-			dockerCompose.upMany( [ 'mysql', 'tests-mysql' ], {
+			dockerCompose.upMany( mysqlServices, {
 				...dockerComposeConfig,
 				commandOptions: shouldConfigureWp
 					? [ '--build', '--force-recreate' ]
@@ -187,37 +202,44 @@ class DockerRuntime {
 			await setupWordPressDirectories( fullConfig );
 
 			// Use the WordPress versions to download the PHPUnit suite.
-			const wpVersions = await Promise.all( [
+			const wpVersionPromises = [
 				readWordPressVersion(
 					fullConfig.env.development.coreSource,
 					spinner,
 					debug
 				),
-				readWordPressVersion(
-					fullConfig.env.tests.coreSource,
-					spinner,
-					debug
-				),
-			] );
-			await downloadWPPHPUnit(
-				fullConfig,
-				{ development: wpVersions[ 0 ], tests: wpVersions[ 1 ] },
-				spinner,
-				debug
-			);
+			];
+			if ( testsEnabled ) {
+				wpVersionPromises.push(
+					readWordPressVersion(
+						fullConfig.env.tests.coreSource,
+						spinner,
+						debug
+					)
+				);
+			}
+			const wpVersions = await Promise.all( wpVersionPromises );
+			const wpVersionMap = {
+				development: wpVersions[ 0 ],
+			};
+			if ( testsEnabled ) {
+				wpVersionMap.tests = wpVersions[ 1 ];
+			}
+			await downloadWPPHPUnit( fullConfig, wpVersionMap, spinner, debug );
 		}
 
 		spinner.text = 'Starting WordPress.';
 
-		await dockerCompose.upMany(
-			[ 'wordpress', 'tests-wordpress', 'cli', 'tests-cli' ],
-			{
-				...dockerComposeConfig,
-				commandOptions: shouldConfigureWp
-					? [ '--build', '--force-recreate' ]
-					: [],
-			}
-		);
+		const wpServices = [ 'wordpress', 'cli' ];
+		if ( testsEnabled ) {
+			wpServices.push( 'tests-wordpress', 'tests-cli' );
+		}
+		await dockerCompose.upMany( wpServices, {
+			...dockerComposeConfig,
+			commandOptions: shouldConfigureWp
+				? [ '--build', '--force-recreate' ]
+				: [],
+		} );
 
 		if ( fullConfig.env.development.phpmyadminPort ) {
 			await dockerCompose.upOne( 'phpmyadmin', {
@@ -228,7 +250,7 @@ class DockerRuntime {
 			} );
 		}
 
-		if ( fullConfig.env.tests.phpmyadminPort ) {
+		if ( testsEnabled && fullConfig.env.tests.phpmyadminPort ) {
 			await dockerCompose.upOne( 'tests-phpmyadmin', {
 				...dockerComposeConfig,
 				commandOptions: shouldConfigureWp
@@ -249,7 +271,7 @@ class DockerRuntime {
 			spinner.text = 'Configuring WordPress.';
 
 			// Retry WordPress installation in case MySQL *still* wasn't ready.
-			await Promise.all( [
+			const configTasks = [
 				retry(
 					() =>
 						configureWordPress(
@@ -261,13 +283,19 @@ class DockerRuntime {
 						times: 2,
 					}
 				),
-				retry(
-					() => configureWordPress( 'tests', fullConfig, spinner ),
-					{
-						times: 2,
-					}
-				),
-			] );
+			];
+			if ( testsEnabled ) {
+				configTasks.push(
+					retry(
+						() =>
+							configureWordPress( 'tests', fullConfig, spinner ),
+						{
+							times: 2,
+						}
+					)
+				);
+			}
+			await Promise.all( configTasks );
 
 			// Set the cache key once everything has been configured.
 			await setCache( CONFIG_CACHE_KEY, configHash, {
@@ -277,16 +305,9 @@ class DockerRuntime {
 
 		// Get port information for the result message
 		const siteUrl = fullConfig.env.development.config.WP_SITEURL;
-		const testsSiteUrl = fullConfig.env.tests.config.WP_SITEURL;
 
 		const mySQLPort = await this._getPublicDockerPort(
 			'mysql',
-			3306,
-			dockerComposeConfig
-		);
-
-		const testsMySQLPort = await this._getPublicDockerPort(
-			'tests-mysql',
 			3306,
 			dockerComposeConfig
 		);
@@ -299,31 +320,42 @@ class DockerRuntime {
 			  )
 			: null;
 
-		const testsPhpmyadminPort = fullConfig.env.tests.phpmyadminPort
-			? await this._getPublicDockerPort(
-					'tests-phpmyadmin',
-					80,
-					dockerComposeConfig
-			  )
-			: null;
-
 		const message = [
 			'WordPress development site started' +
 				( siteUrl ? ` at ${ siteUrl }` : '.' ),
-			'WordPress test site started' +
-				( testsSiteUrl ? ` at ${ testsSiteUrl }` : '.' ),
 			`MySQL is listening on port ${ mySQLPort }`,
-			`MySQL for automated testing is listening on port ${ testsMySQLPort }`,
 			phpmyadminPort &&
 				`phpMyAdmin started at http://localhost:${ phpmyadminPort }`,
-			testsPhpmyadminPort &&
-				`phpMyAdmin for automated testing started at http://localhost:${ testsPhpmyadminPort }`,
-		]
-			.filter( Boolean )
-			.join( '\n' );
+		];
+
+		if ( testsEnabled ) {
+			const testsSiteUrl = fullConfig.env.tests.config.WP_SITEURL;
+			const testsMySQLPort = await this._getPublicDockerPort(
+				'tests-mysql',
+				3306,
+				dockerComposeConfig
+			);
+			const testsPhpmyadminPort = fullConfig.env.tests.phpmyadminPort
+				? await this._getPublicDockerPort(
+						'tests-phpmyadmin',
+						80,
+						dockerComposeConfig
+				  )
+				: null;
+
+			message.push(
+				'WordPress test site started' +
+					( testsSiteUrl ? ` at ${ testsSiteUrl }` : '.' ),
+				`MySQL for automated testing is listening on port ${ testsMySQLPort }`,
+				testsPhpmyadminPort &&
+					`phpMyAdmin for automated testing started at http://localhost:${ testsPhpmyadminPort }`
+			);
+		}
+
+		const formattedMessage = message.filter( Boolean ).join( '\n' );
 
 		return {
-			message,
+			message: formattedMessage,
 			siteUrl,
 		};
 	}
@@ -375,6 +407,7 @@ class DockerRuntime {
 		const { dockerComposeConfigPath } = await initConfig( {
 			spinner,
 			debug,
+			customConfigPath: config.customConfigPath,
 		} );
 
 		spinner.text = 'Stopping WordPress.';
@@ -452,7 +485,19 @@ class DockerRuntime {
 	 * @param {boolean}  options.debug       True if debug mode is enabled.
 	 */
 	async clean( config, { environment, spinner, debug } ) {
-		const fullConfig = await initConfig( { spinner, debug } );
+		const fullConfig = await initConfig( {
+			spinner,
+			debug,
+			customConfigPath: config.customConfigPath,
+		} );
+
+		const testsEnabled = fullConfig.testsEnvironment !== false;
+
+		if ( ! testsEnabled && environment === 'tests' ) {
+			throw new Error(
+				'Cannot reset the tests environment because it is disabled in the configuration.'
+			);
+		}
 
 		const description = `${ environment } environment${
 			environment === 'all' ? 's' : ''
@@ -469,7 +514,10 @@ class DockerRuntime {
 		if ( environment === 'all' || environment === 'development' ) {
 			mysqlServices.push( 'mysql' );
 		}
-		if ( environment === 'all' || environment === 'tests' ) {
+		if (
+			testsEnabled &&
+			( environment === 'all' || environment === 'tests' )
+		) {
 			mysqlServices.push( 'tests-mysql' );
 		}
 
@@ -488,7 +536,10 @@ class DockerRuntime {
 			);
 		}
 
-		if ( environment === 'all' || environment === 'tests' ) {
+		if (
+			testsEnabled &&
+			( environment === 'all' || environment === 'tests' )
+		) {
 			tasks.push(
 				resetDatabase( 'tests', fullConfig )
 					.then( () => configureWordPress( 'tests', fullConfig ) )
@@ -525,7 +576,20 @@ class DockerRuntime {
 		// Validate the container name (throws for deprecated containers)
 		validateRunContainer( container );
 
-		const fullConfig = await initConfig( { spinner, debug } );
+		if (
+			config.testsEnvironment === false &&
+			container.startsWith( 'tests-' )
+		) {
+			throw new Error(
+				`Cannot run commands on "${ container }" because the tests environment is disabled in the configuration.`
+			);
+		}
+
+		const fullConfig = await initConfig( {
+			spinner,
+			debug,
+			customConfigPath: config.customConfigPath,
+		} );
 
 		// Shows a contextual tip for the given command.
 		const joinedCommand = command.join( ' ' );
@@ -552,7 +616,19 @@ class DockerRuntime {
 	 * @param {boolean}  options.debug       True if debug mode is enabled.
 	 */
 	async logs( config, { environment, watch, spinner, debug } ) {
-		const fullConfig = await initConfig( { spinner, debug } );
+		const fullConfig = await initConfig( {
+			spinner,
+			debug,
+			customConfigPath: config.customConfigPath,
+		} );
+
+		const testsEnabled = fullConfig.testsEnvironment !== false;
+
+		if ( ! testsEnabled && environment === 'tests' ) {
+			throw new Error(
+				'Cannot show logs for the tests environment because it is disabled in the configuration.'
+			);
+		}
 
 		// If we show text while watching the logs, it will continue showing up every
 		// few lines in the logs as they happen, which isn't a good look. So only
@@ -561,10 +637,16 @@ class DockerRuntime {
 			spinner.text = `Showing logs for the ${ environment } environment.`;
 		}
 
-		const servicesToWatch =
-			environment === 'all'
+		let servicesToWatch;
+		if ( environment === 'all' ) {
+			servicesToWatch = testsEnabled
 				? [ 'tests-wordpress', 'wordpress' ]
-				: [ environment === 'tests' ? 'tests-wordpress' : 'wordpress' ];
+				: [ 'wordpress' ];
+		} else {
+			servicesToWatch = [
+				environment === 'tests' ? 'tests-wordpress' : 'wordpress',
+			];
+		}
 
 		const output = await Promise.all( [
 			...servicesToWatch.map( ( service ) =>
@@ -621,7 +703,11 @@ class DockerRuntime {
 	async getStatus( config, { spinner, debug } ) {
 		spinner.text = 'Getting environment status.';
 
-		const fullConfig = await initConfig( { spinner, debug } );
+		const fullConfig = await initConfig( {
+			spinner,
+			debug,
+			customConfigPath: config.customConfigPath,
+		} );
 		const dockerComposeConfig = {
 			config: fullConfig.dockerComposeConfigPath,
 			log: debug,
@@ -653,6 +739,8 @@ class DockerRuntime {
 
 		const siteUrl = fullConfig.env.development.config.WP_SITEURL;
 
+		const testsEnabled = fullConfig.testsEnvironment !== false;
+
 		return {
 			status: isRunning ? 'running' : 'stopped',
 			runtime: 'docker',
@@ -665,7 +753,9 @@ class DockerRuntime {
 			},
 			ports: {
 				development: fullConfig.env.development.port,
-				tests: fullConfig.env.tests.port,
+				...( testsEnabled && {
+					tests: fullConfig.env.tests.port,
+				} ),
 				mysql: mySQLPort,
 			},
 			config: {

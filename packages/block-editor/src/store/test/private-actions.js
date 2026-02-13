@@ -9,6 +9,8 @@ import {
 	setInsertionPoint,
 	startDragging,
 	stopDragging,
+	showViewportModal,
+	hideViewportModal,
 } from '../private-actions';
 
 describe( 'private actions', () => {
@@ -118,6 +120,24 @@ describe( 'private actions', () => {
 			).toEqual( {
 				type: 'SET_INSERTION_POINT',
 				value: { rootClientId: '', index: '123' },
+			} );
+		} );
+	} );
+
+	describe( 'showViewportModal', () => {
+		it( 'should return the SHOW_VIEWPORT_MODAL action with clientIds', () => {
+			const clientIds = [ 'client-1', 'client-2' ];
+			expect( showViewportModal( clientIds ) ).toEqual( {
+				type: 'SHOW_VIEWPORT_MODAL',
+				clientIds,
+			} );
+		} );
+	} );
+
+	describe( 'hideViewportModal', () => {
+		it( 'should return the HIDE_VIEWPORT_MODAL action', () => {
+			expect( hideViewportModal() ).toEqual( {
+				type: 'HIDE_VIEWPORT_MODAL',
 			} );
 		} );
 	} );

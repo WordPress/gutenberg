@@ -1,11 +1,15 @@
 /**
+ * WordPress dependencies
+ */
+import { contents as icon } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import edit from './edit';
 import save from './save';
 import metadata from './block.json';
 import initBlock from '../utils/init-block';
-import icon from './icon';
 
 const { name } = metadata;
 

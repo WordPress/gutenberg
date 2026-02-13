@@ -17,7 +17,7 @@ import { unlock } from '../../lock-unlock';
 /**
  * Slider component for navigating revisions.
  *
- * @return {JSX.Element} The revisions slider component.
+ * @return {React.JSX.Element} The revisions slider component.
  */
 function RevisionsSlider() {
 	const { revisions, isLoading, currentRevisionId } = useSelect(

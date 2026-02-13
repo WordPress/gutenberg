@@ -1,6 +1,5 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"__experimental": true,
 	"apiVersion": 3,
 	"name": "core/tab",
 	"title": "Tab",
@@ -31,14 +30,7 @@
 				"text": true
 			}
 		},
-		"layout": {
-			"allowSwitching": true,
-			"allowInheriting": false,
-			"allowVerticalAlignment": true,
-			"allowJustification": true,
-			"allowOrientation": true,
-			"allowSizingOnChildren": true
-		},
+		"layout": true,
 		"spacing": {
 			"blockGap": true,
 			"padding": true,

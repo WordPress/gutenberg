@@ -4,6 +4,7 @@
 import {
 	privateApis as blocksPrivateApis,
 	getBlockType,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import {
 	__experimentalHStack as HStack,
@@ -19,6 +20,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import BlockContext from '../../components/block-context';
 import BlockIcon from '../../components/block-icon';
 import useBlockDisplayTitle from '../../components/block-title/use-block-display-title';
 import useBlockDisplayInformation from '../../components/use-block-display-information';
@@ -72,9 +74,34 @@ function BlockFields( {
 
 	const blockTypeFields = blockType?.[ fieldsKey ];
 
+	const blockContext = useContext( BlockContext );
+
 	const attributes = useSelect(
-		( select ) => select( blockEditorStore ).getBlockAttributes( clientId ),
-		[ clientId ]
+		( select ) => {
+			const _attributes =
+				select( blockEditorStore ).getBlockAttributes( clientId );
+			if ( ! _attributes?.metadata?.bindings ) {
+				return _attributes;
+			}
+
+			const { getBlockBindingsSource } = unlock( select( blocksStore ) );
+			return Object.entries( _attributes.metadata.bindings ).reduce(
+				( acc, [ attribute, binding ] ) => {
+					const source = getBlockBindingsSource( binding.source );
+					if ( ! source ) {
+						return acc;
+					}
+					const values = source.getValues( {
+						select,
+						context: blockContext,
+						bindings: { [ attribute ]: binding },
+					} );
+					return { ...acc, ...values };
+				},
+				_attributes
+			);
+		},
+		[ blockContext, clientId ]
 	);
 
 	const computedForm = useMemo( () => {

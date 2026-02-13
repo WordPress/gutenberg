@@ -42,7 +42,7 @@ function EditorHistoryRedo( props, ref ) {
 	);
 }
 
-/** @typedef {import('react').Ref<HTMLElement>} Ref */
+/** @typedef {React.Ref<HTMLElement>} Ref */
 
 /**
  * Renders the redo button for the editor history.

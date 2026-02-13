@@ -473,10 +473,10 @@ let localDoc: Y.Doc;
  * @param updatedValue   The updated value.
  * @param cursorPosition The position of the cursor after the change occurs.
  */
-function mergeRichTextUpdate(
+export function mergeRichTextUpdate(
 	blockYText: Y.Text,
 	updatedValue: string,
-	cursorPosition: number | null
+	cursorPosition: number | null = null
 ): void {
 	// Gutenberg does not use Yjs shared types natively, so we can only subscribe
 	// to changes from store and apply them to Yjs types that we create and

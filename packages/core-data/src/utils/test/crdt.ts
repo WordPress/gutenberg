@@ -53,7 +53,9 @@ describe( 'crdt', () => {
 
 			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
 
-			expect( map.get( 'title' ) ).toBe( 'New Title' );
+			const title = map.get( 'title' );
+			expect( title ).toBeInstanceOf( Y.Text );
+			expect( title?.toString() ).toBe( 'New Title' );
 		} );
 
 		it( 'does not sync disallowed properties', () => {
@@ -65,7 +67,7 @@ describe( 'crdt', () => {
 			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
 
 			expect( map.has( 'unsyncedProperty' ) ).toBe( false );
-			expect( map.get( 'title' ) ).toBe( 'New Title' );
+			expect( map.get( 'title' )?.toString() ).toBe( 'New Title' );
 		} );
 
 		it( 'does not sync function values', () => {
@@ -85,7 +87,9 @@ describe( 'crdt', () => {
 
 			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
 
-			expect( map.get( 'title' ) ).toBe( 'Raw Title' );
+			const title = map.get( 'title' );
+			expect( title ).toBeInstanceOf( Y.Text );
+			expect( title?.toString() ).toBe( 'Raw Title' );
 		} );
 
 		it( 'skips "Auto Draft" template title when no current value exists', () => {
@@ -95,7 +99,9 @@ describe( 'crdt', () => {
 
 			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
 
-			expect( map.get( 'title' ) ).toBe( '' );
+			const title = map.get( 'title' );
+			expect( title ).toBeInstanceOf( Y.Text );
+			expect( title?.toString() ).toBe( '' );
 		} );
 
 		it( 'handles excerpt with RenderedText format', () => {
@@ -109,7 +115,9 @@ describe( 'crdt', () => {
 
 			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
 
-			expect( map.get( 'excerpt' ) ).toBe( 'Raw excerpt' );
+			const excerpt = map.get( 'excerpt' );
+			expect( excerpt ).toBeInstanceOf( Y.Text );
+			expect( excerpt?.toString() ).toBe( 'Raw excerpt' );
 		} );
 
 		it( 'does not sync empty slug', () => {
@@ -161,6 +169,110 @@ describe( 'crdt', () => {
 
 			const blocks = map.get( 'blocks' );
 			expect( blocks ).toBeInstanceOf( Y.Array );
+		} );
+
+		it( 'sets blocks to undefined when blocks value is undefined', () => {
+			// First, set some blocks.
+			map.set( 'blocks', new Y.Array< YBlock >() );
+
+			const changes = {
+				blocks: undefined,
+			};
+
+			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+
+			// The key should still exist, but the value should be undefined.
+			expect( map.has( 'blocks' ) ).toBe( true );
+			expect( map.get( 'blocks' ) ).toBeUndefined();
+		} );
+
+		it( 'syncs content as Y.Text', () => {
+			const changes = {
+				content: 'Hello, world!',
+			} as PostChanges;
+
+			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+
+			const content = map.get( 'content' );
+			expect( content ).toBeInstanceOf( Y.Text );
+			expect( content?.toString() ).toBe( 'Hello, world!' );
+		} );
+
+		it( 'syncs content with RenderedText format', () => {
+			const changes = {
+				content: {
+					raw: '<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->',
+					rendered: '<p>Hello</p>',
+				},
+			} as PostChanges;
+
+			applyPostChangesToCRDTDoc( doc, changes, mockPostType );
+
+			const content = map.get( 'content' );
+			expect( content ).toBeInstanceOf( Y.Text );
+			expect( content?.toString() ).toBe(
+				'<!-- wp:paragraph --><p>Hello</p><!-- /wp:paragraph -->'
+			);
+		} );
+
+		it( 'updates existing Y.Text title in place via mergeRichTextUpdate', () => {
+			// First apply to create the Y.Text.
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ title: 'Old Title' } as PostChanges,
+				mockPostType
+			);
+			const titleRef = map.get( 'title' );
+
+			// Apply again — should update in place, not replace.
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ title: 'New Title' } as PostChanges,
+				mockPostType
+			);
+
+			expect( map.get( 'title' ) ).toBe( titleRef );
+			expect( map.get( 'title' )?.toString() ).toBe( 'New Title' );
+		} );
+
+		it( 'updates existing Y.Text content in place via mergeRichTextUpdate', () => {
+			// First apply to create the Y.Text.
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ content: 'Old content' } as PostChanges,
+				mockPostType
+			);
+			const contentRef = map.get( 'content' );
+
+			// Apply again — should update in place, not replace.
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ content: 'New content' } as PostChanges,
+				mockPostType
+			);
+
+			expect( map.get( 'content' ) ).toBe( contentRef );
+			expect( map.get( 'content' )?.toString() ).toBe( 'New content' );
+		} );
+
+		it( 'updates existing Y.Text excerpt in place via mergeRichTextUpdate', () => {
+			// First apply to create the Y.Text.
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ excerpt: 'Old excerpt' } as PostChanges,
+				mockPostType
+			);
+			const excerptRef = map.get( 'excerpt' );
+
+			// Apply again — should update in place, not replace.
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ excerpt: 'New excerpt' } as PostChanges,
+				mockPostType
+			);
+
+			expect( map.get( 'excerpt' ) ).toBe( excerptRef );
+			expect( map.get( 'excerpt' )?.toString() ).toBe( 'New excerpt' );
 		} );
 
 		it( 'syncs meta fields', () => {
@@ -226,7 +338,7 @@ describe( 'crdt', () => {
 
 		beforeEach( () => {
 			map = getRootMap< YPostRecord >( doc, CRDT_RECORD_MAP_KEY );
-			map.set( 'title', 'CRDT Title' );
+			map.set( 'title', new Y.Text( 'CRDT Title' ) );
 			map.set( 'status', 'draft' );
 			map.set( 'date', '2025-01-01' );
 		} );
@@ -247,7 +359,7 @@ describe( 'crdt', () => {
 		} );
 
 		it( 'filters out disallowed properties', () => {
-			map.set( 'title', 'Test title' );
+			map.set( 'title', new Y.Text( 'Test title' ) );
 			map.set( 'unsyncedProp', 'value' );
 
 			const editedRecord = {} as Post;
@@ -350,6 +462,77 @@ describe( 'crdt', () => {
 			);
 
 			expect( changes ).toHaveProperty( 'blocks' );
+		} );
+
+		it( 'includes undefined blocks in changes', () => {
+			map.set( 'blocks', undefined );
+
+			const editedRecord = {
+				blocks: [
+					{
+						name: 'core/paragraph',
+						attributes: { content: 'Test' },
+						innerBlocks: [],
+					},
+				],
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changes ).toHaveProperty( 'blocks' );
+			expect( changes.blocks ).toBeUndefined();
+		} );
+
+		it( 'detects content changes from string value', () => {
+			map.set( 'content', new Y.Text( 'New content' ) );
+
+			const editedRecord = {
+				content: 'Old content',
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changes.content ).toBe( 'New content' );
+		} );
+
+		it( 'detects content changes from RenderedText value', () => {
+			map.set( 'content', new Y.Text( 'New content' ) );
+
+			const editedRecord = {
+				content: { raw: 'Old content', rendered: 'Old content' },
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changes.content ).toBe( 'New content' );
+		} );
+
+		it( 'excludes content when unchanged from RenderedText value', () => {
+			map.set( 'content', new Y.Text( 'Same content' ) );
+
+			const editedRecord = {
+				content: { raw: 'Same content', rendered: 'Same content' },
+			} as unknown as Post;
+
+			const changes = getPostChangesFromCRDTDoc(
+				doc,
+				editedRecord,
+				mockPostType
+			);
+
+			expect( changes ).not.toHaveProperty( 'content' );
 		} );
 
 		it( 'includes meta in changes', () => {

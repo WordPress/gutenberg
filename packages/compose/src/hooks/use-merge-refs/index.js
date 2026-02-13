@@ -5,20 +5,19 @@ import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
 
 /**
  * @template T
- * @typedef {T extends import('react').Ref<infer R> ? R : never} TypeFromRef
+ * @typedef {T extends React.Ref<infer R> ? R : never} TypeFromRef
  */
 
 /**
  * @template T
- * @param {import('react').Ref<T>} ref
- * @param {T}                      value
+ * @param {React.Ref<T>} ref
+ * @param {T}            value
  */
 function assignRef( ref, value ) {
 	if ( typeof ref === 'function' ) {
 		ref( value );
 	} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
-		/** @type {import('react').MutableRefObject<T>} */ ( ref ).current =
-			value;
+		/** @type {React.MutableRefObject<T>} */ ( ref ).current = value;
 	}
 }
 
@@ -60,16 +59,16 @@ function assignRef( ref, value ) {
  * return <div ref={ mergedRefs } />;
  * ```
  *
- * @template {import('react').Ref<any>} TRef
+ * @template {React.Ref<any>} TRef
  * @param {Array<TRef>} refs The refs to be merged.
  *
- * @return {import('react').RefCallback<TypeFromRef<TRef>>} The merged ref callback.
+ * @return {React.RefCallback<TypeFromRef<TRef>>} The merged ref callback.
  */
 export default function useMergeRefs( refs ) {
 	const element = useRef();
 	const isAttachedRef = useRef( false );
 	const didElementChangeRef = useRef( false );
-	/** @type {import('react').MutableRefObject<TRef[]>} */
+	/** @type {React.MutableRefObject<TRef[]>} */
 	const previousRefsRef = useRef( [] );
 	const currentRefsRef = useRef( refs );
 

@@ -101,6 +101,11 @@ module.exports = function cli() {
 		describe: 'Enable debug output.',
 		default: false,
 	} );
+	yargs.option( 'config', {
+		type: 'string',
+		describe: 'Path to a custom .wp-env.json configuration file.',
+		requiresArg: true,
+	} );
 
 	yargs.parserConfiguration( {
 		// Treats unknown options as arguments for commands to deal with instead of discarding them.
@@ -174,7 +179,7 @@ module.exports = function cli() {
 				type: 'string',
 				describe: "Which environments' databases to reset.",
 				choices: [ 'all', 'development', 'tests' ],
-				default: 'tests',
+				default: 'development',
 			} );
 			args.option( 'scripts', {
 				type: 'boolean',
@@ -192,7 +197,7 @@ module.exports = function cli() {
 				type: 'string',
 				describe: "Which environments' databases to reset.",
 				choices: [ 'all', 'development', 'tests' ],
-				default: 'tests',
+				default: 'development',
 			} );
 			args.option( 'scripts', {
 				type: 'boolean',

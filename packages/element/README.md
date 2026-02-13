@@ -126,7 +126,7 @@ _Related_
 
 _Parameters_
 
--   _child_ `import('react').ReactElement`: Any renderable child, such as an element, string, or fragment.
+-   _child_ `React.ReactElement`: Any renderable child, such as an element, string, or fragment.
 -   _container_ `HTMLElement`: DOM node into which element should be rendered.
 
 ### createRef
@@ -155,7 +155,7 @@ Finds the dom node of a React component.
 
 _Parameters_
 
--   _component_ `import('react').ComponentType`: Component's instance.
+-   _component_ `React.ComponentType`: Component's instance.
 
 ### flushSync
 

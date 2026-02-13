@@ -3,8 +3,8 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
-import { hasBlockSupport } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { hasBlockSupport, getBlockType } from '@wordpress/blocks';
 import { useContext } from '@wordpress/element';
 
 /**
@@ -14,7 +14,9 @@ import { store as blockEditorStore } from '../store';
 import { PrivateListView } from '../components/list-view';
 import InspectorControls from '../components/inspector-controls/fill';
 import { PrivateBlockContext } from '../components/block-list/private-block-context';
-import useBlockDisplayTitle from '../components/block-title/use-block-display-title';
+import useListViewPanelState from '../components/use-list-view-panel-state';
+
+import { unlock } from '../lock-unlock';
 
 export const LIST_VIEW_SUPPORT_KEY = 'listView';
 
@@ -39,6 +41,15 @@ export function hasListViewSupport( nameOrType ) {
 export function ListViewPanel( { clientId, name } ) {
 	const { isSelectionWithinCurrentSection } =
 		useContext( PrivateBlockContext );
+
+	const { isOpened, expandRevision, handleToggle } =
+		useListViewPanelState( clientId );
+
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const { openListViewContentPanel } = unlock(
+		useDispatch( blockEditorStore )
+	);
+
 	const isEnabled = hasListViewSupport( name );
 	const { hasChildren, isNestedListView } = useSelect(
 		( select ) => {
@@ -65,10 +76,9 @@ export function ListViewPanel( { clientId, name } ) {
 		},
 		[ clientId ]
 	);
-	const title = useBlockDisplayTitle( {
-		clientId,
-		context: 'list-view',
-	} );
+
+	const blockType = getBlockType( name );
+	const title = blockType?.title || name;
 
 	if ( ! isEnabled || isNestedListView ) {
 		return null;
@@ -78,17 +88,23 @@ export function ListViewPanel( { clientId, name } ) {
 
 	return (
 		<InspectorControls group="list">
-			<PanelBody title={ showBlockTitle ? title : undefined }>
+			<PanelBody
+				title={ showBlockTitle ? title : undefined }
+				opened={ isOpened }
+				onToggle={ handleToggle }
+			>
 				{ ! hasChildren && (
 					<p className="block-editor-block-inspector__no-blocks">
 						{ __( 'No items yet.' ) }
 					</p>
 				) }
 				<PrivateListView
+					key={ `${ clientId }-${ expandRevision }` }
 					rootClientId={ clientId }
 					isExpanded
 					description={ title }
 					showAppender
+					onSelect={ openListViewContentPanel }
 				/>
 			</PanelBody>
 		</InspectorControls>

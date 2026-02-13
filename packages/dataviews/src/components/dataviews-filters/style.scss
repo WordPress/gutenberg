@@ -231,6 +231,13 @@
 		}
 	}
 
+	.dataviews-filters__search-widget-listitem-value {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		min-width: 0;
+	}
+
 	.dataviews-filters__search-widget-listitem-description {
 		display: block;
 		overflow: hidden;
@@ -275,6 +282,7 @@
 
 	.dataviews-filters__search-widget-listitem-multi-selection {
 		--checkbox-size: 24px; // Width & height for small viewports.
+		flex-shrink: 0;
 
 		@include checkbox-control;
 		position: relative;

@@ -2,17 +2,23 @@
  * WordPress dependencies
  */
 import {
+	Button,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalHStack as HStack,
 	CheckboxControl,
 	TextControl,
 	TextareaControl,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
+import {
+	privateApis as blockEditorPrivateApis,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -25,7 +31,9 @@ import { useLinkPreview } from './use-link-preview';
 import { useIsInvalidLink } from './use-is-invalid-link';
 import { unlock } from '../../lock-unlock';
 
-const { LinkPicker } = unlock( blockEditorPrivateApis );
+const { LinkPicker, isHashLink, isRelativePath } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Get a human-readable entity type name.
@@ -139,6 +147,25 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		[ entityRecord?.featured_media ]
 	);
 
+	const onNavigateToEntityRecord = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
+		[]
+	);
+
+	const homeUrl = useSelect( ( select ) => {
+		return select( coreStore ).getEntityRecord( 'root', '__unstableBase' )
+			?.home;
+	}, [] );
+
+	const blockEditingMode = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockEditingMode( clientId ),
+		[ clientId ]
+	);
+
+	const isContentOnly = blockEditingMode === 'contentOnly';
+
 	const preview = useLinkPreview( {
 		url,
 		title: linkTitle,
@@ -148,6 +175,21 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		hasBinding: hasUrlBinding,
 		isEntityAvailable: isBoundEntityAvailable,
 	} );
+
+	// Check if URL is viewable (not hash link or other relative path like ./ or ../)
+	const isViewableUrl =
+		url &&
+		( ! isHashLink( url ) ||
+			( isRelativePath( url ) && ! url.startsWith( '/' ) ) );
+
+	// Construct full URL for viewing (prepend home URL for absolute paths starting with /)
+	const viewUrl =
+		isViewableUrl && url.startsWith( '/' ) && homeUrl ? homeUrl + url : url;
+
+	const entityTypeName = getEntityTypeName(
+		attributes.type,
+		attributes.kind
+	);
 
 	return (
 		<ToolsPanel
@@ -205,6 +247,58 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				/>
 			</ToolsPanelItem>
 
+			{ url && (
+				<HStack
+					className="navigation-link-to__actions"
+					alignment="left"
+					justify="left"
+					style={ { gridColumn: '1 / -1' } }
+				>
+					{ hasUrlBinding &&
+						isBoundEntityAvailable &&
+						entityRecord?.id &&
+						attributes.kind === 'post-type' &&
+						onNavigateToEntityRecord && (
+							<Button
+								size="compact"
+								variant="secondary"
+								onClick={ () => {
+									onNavigateToEntityRecord( {
+										postId: entityRecord.id,
+										postType: attributes.type,
+									} );
+								} }
+								__next40pxDefaultSize
+							>
+								{ sprintf(
+									/* translators: %s: entity type (e.g., "page", "post", "category") */
+									__( 'Edit %s' ),
+									entityTypeName
+								) }
+							</Button>
+						) }
+					{ isViewableUrl && (
+						<Button
+							size="compact"
+							variant="secondary"
+							href={ viewUrl }
+							target="_blank"
+							icon={ external }
+							iconPosition="right"
+							__next40pxDefaultSize
+						>
+							{ sprintf(
+								/* translators: %s: entity type (e.g., "page", "post", "category") or "site" for external links */
+								__( 'View %s' ),
+								entityTypeName !== 'item'
+									? entityTypeName
+									: __( 'site' )
+							) }
+						</Button>
+					) }
+				</HStack>
+			) }
+
 			<ToolsPanelItem
 				hasValue={ () => !! opensInNewTab }
 				label={ __( 'Open in new tab' ) }
@@ -224,7 +318,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				hasValue={ () => !! description }
 				label={ __( 'Description' ) }
 				onDeselect={ () => setAttributes( { description: '' } ) }
-				isShownByDefault
+				isShownByDefault={ ! isContentOnly }
 			>
 				<TextareaControl
 					label={ __( 'Description' ) }
@@ -242,7 +336,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				hasValue={ () => !! rel }
 				label={ __( 'Rel attribute' ) }
 				onDeselect={ () => setAttributes( { rel: '' } ) }
-				isShownByDefault
+				isShownByDefault={ ! isContentOnly }
 			>
 				<TextControl
 					__next40pxDefaultSize

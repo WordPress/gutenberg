@@ -164,7 +164,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		} );
 
 		const appender = listView.getByRole( 'button', {
-			name: 'Add block',
+			name: 'Add page',
 		} );
 
 		await expect( appender ).toBeVisible();
@@ -310,7 +310,7 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await expect(
 			blockSettings.getByRole( 'tab', {
-				name: 'Settings',
+				name: 'Content',
 				selected: true,
 			} )
 		).toBeVisible();
@@ -318,7 +318,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			blockSettings
 				.getByRole( 'tabpanel', {
-					name: 'Settings',
+					name: 'Content',
 				} )
 				.getByRole( 'heading', {
 					name: 'Settings',
@@ -476,7 +476,7 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await listView
 			.getByRole( 'button', {
-				name: 'Add block',
+				name: 'Add page',
 			} )
 			.click();
 
@@ -548,7 +548,7 @@ test.describe( 'Navigation block - List view editing', () => {
 				.getByRole( 'document', {
 					name: 'Block: Navigation',
 				} )
-				.getByLabel( 'Add block' )
+				.getByLabel( 'Add page' )
 		).toBeFocused();
 	} );
 } );

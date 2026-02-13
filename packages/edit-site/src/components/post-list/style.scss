@@ -76,3 +76,99 @@
 		margin-left: -$grid-unit-05;
 	}
 }
+
+.fields-controls__password {
+	border-top: $border-width solid $gray-200;
+	padding-top: $grid-unit-20;
+}
+
+.dataviews-action-modal__quick-edit {
+	justify-content: flex-end;
+	align-items: stretch;
+
+	.components-modal__frame {
+		margin: $grid-unit-20 $grid-unit-20 $grid-unit-20 0;
+		height: calc(100% - #{$grid-unit-20 * 2});
+		max-height: calc(100% - #{$grid-unit-20 * 2});
+		max-width: 400px;
+		border-radius: $radius-large;
+		position: relative;
+		animation-name: none;
+
+		@media (prefers-reduced-motion: no-preference) {
+			animation-name: quick-edit-slide-in-right;
+			animation-duration: 0.2s;
+			animation-timing-function: ease-out;
+		}
+	}
+
+	&.is-animating-out .components-modal__frame {
+		animation-name: none;
+
+		@media (prefers-reduced-motion: no-preference) {
+			animation-name: quick-edit-slide-out-right;
+			animation-duration: 0.2s;
+			animation-timing-function: ease-out;
+		}
+	}
+
+	.components-modal__content {
+		display: flex;
+		flex-direction: column;
+		overflow: hidden;
+		padding: 0;
+
+		> * {
+			display: flex;
+			flex-direction: column;
+			flex: 1;
+			min-height: 0;
+		}
+	}
+
+	.dataviews-action-modal__quick-edit-header {
+		padding: $grid-unit-30 $grid-unit-30 0;
+	}
+
+	.dataviews-action-modal__quick-edit-content {
+		flex: 1;
+		min-height: 0;
+		overflow-y: auto;
+		padding-top: $grid-unit-20;
+
+		.dataforms-layouts__wrapper {
+			flex: 1;
+			padding: 0 $grid-unit-30 $grid-unit-05; // Horizontal + bottom space for focus ring
+		}
+	}
+
+	.dataviews-action-modal__quick-edit-footer {
+		position: sticky;
+		bottom: 0;
+		flex-shrink: 0;
+		padding: $grid-unit-20 $grid-unit-30 $grid-unit-30;
+
+		.components-button {
+			flex: 1;
+			justify-content: center;
+		}
+	}
+}
+
+@keyframes quick-edit-slide-in-right {
+	from {
+		transform: translateX(100%);
+	}
+	to {
+		transform: translateX(0);
+	}
+}
+
+@keyframes quick-edit-slide-out-right {
+	from {
+		transform: translateX(0);
+	}
+	to {
+		transform: translateX(100%);
+	}
+}

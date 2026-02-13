@@ -35,7 +35,7 @@ import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
  * @param {Function} props.onNavigateToEntityRecord Function to navigate to template part editor.
  * @param {boolean}  props.isCreatingOverlay        Whether an overlay is being created (lifted state).
  * @param {Function} props.setIsCreatingOverlay     Function to set creating overlay state (lifted state).
- * @return {JSX.Element} The overlay template part selector component.
+ * @return {React.JSX.Element} The overlay template part selector component.
  */
 export default function OverlayTemplatePartSelector( {
 	overlay,

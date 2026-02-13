@@ -133,10 +133,10 @@ export function createLinkFormat( {
 	return format;
 }
 
-/* eslint-disable jsdoc/no-undefined-types */
 /**
- * Get the start and end boundaries of a given format from a rich text value.
+ * @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue
  *
+ * Get the start and end boundaries of a given format from a rich text value.
  *
  * @param {RichTextValue} value      the rich text value to interrogate.
  * @param {string}        format     the identifier for the target format (e.g. `core/link`, `core/bold`).
@@ -144,7 +144,6 @@ export function createLinkFormat( {
  * @param {number?}       endIndex   optional endIndex to seek from.
  * @return {Object}	object containing start and end values for the given format.
  */
-/* eslint-enable jsdoc/no-undefined-types */
 export function getFormatBoundary(
 	value,
 	format,
@@ -152,8 +151,8 @@ export function getFormatBoundary(
 	endIndex = value.end
 ) {
 	const EMPTY_BOUNDARIES = {
-		start: null,
-		end: null,
+		start: undefined,
+		end: undefined,
 	};
 
 	const { formats } = value;
@@ -210,10 +209,14 @@ export function getFormatBoundary(
 	// Safe guard: start index cannot be less than 0.
 	startIndex = startIndex < 0 ? 0 : startIndex;
 
-	// // Return the indices of the "edges" as the boundaries.
+	// Return the indices of the "edges" as the boundaries.
+	// walkToEnd returns the last index that has the format (e.g. 10),
+	// but rich-text APIs like applyFormat and slice expect the end to be
+	// one position past the last character (e.g. 11), just like
+	// String.prototype.slice. Adding 1 here so consumers don't have to.
 	return {
 		start: startIndex,
-		end: endIndex,
+		end: endIndex + 1,
 	};
 }
 

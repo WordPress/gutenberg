@@ -50,10 +50,11 @@ import {
 import { store as blockEditorStore } from '../../store';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { useBlockLock } from '../block-lock';
+import { useBlockRename, BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
-import { useBlockVisibility, BlockVisibilityModal } from '../block-visibility';
+import { useBlockVisibility } from '../block-visibility';
 import { deviceTypeKey } from '../../store/private-keys';
 import { BLOCK_VISIBILITY_VIEWPORTS } from '../block-visibility/constants';
 
@@ -81,8 +82,7 @@ function ListViewBlock( {
 	const settingsRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ settingsAnchorRect, setSettingsAnchorRect ] = useState();
-	const [ visibilityModalClientIds, setVisibilityModalClientIds ] =
-		useState( null );
+	const [ isRenameModalOpen, setIsRenameModalOpen ] = useState( false );
 	const { isLocked } = useBlockLock( clientId );
 
 	const isFirstSelectedBlock =
@@ -99,6 +99,7 @@ function ListViewBlock( {
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
+		showViewportModal,
 	} = unlock( useDispatch( blockEditorStore ) );
 
 	const debouncedToggleBlockHighlight = useDebounce(
@@ -113,6 +114,7 @@ function ListViewBlock( {
 		getBlockRootClientId,
 		getBlockOrder,
 		getBlockParents,
+		getBlockEditingMode,
 		getBlocksByClientId,
 		canEditBlock,
 		canMoveBlock,
@@ -144,7 +146,7 @@ function ListViewBlock( {
 			},
 			[ clientId ]
 		);
-
+	const { canRename } = useBlockRename( blockName );
 	// Use hook to get current viewport and if block is currently hidden (accurate viewport detection)
 	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
 		blockVisibility: block?.attributes?.metadata?.blockVisibility,
@@ -410,8 +412,26 @@ function ListViewBlock( {
 				return;
 			}
 
+			// Don't allow visibility toggle for blocks that
+			// are not in the default editing mode.
+			if (
+				blocksToUpdate.some(
+					( id ) => getBlockEditingMode( id ) !== 'default'
+				)
+			) {
+				return;
+			}
+
 			// Open the visibility breakpoints modal.
-			setVisibilityModalClientIds( blocksToUpdate );
+			showViewportModal( blocksToUpdate );
+		} else if ( isMatch( 'core/block-editor/rename', event ) ) {
+			const { blocksToUpdate } = getBlocksToUpdate();
+			const isContentOnly =
+				getBlockEditingMode( blocksToUpdate[ 0 ] ) === 'contentOnly';
+			if ( blocksToUpdate.length === 1 && canRename && ! isContentOnly ) {
+				event.preventDefault();
+				setIsRenameModalOpen( true );
+			}
 		}
 	}
 
@@ -710,10 +730,10 @@ function ListViewBlock( {
 					) }
 				</TreeGridCell>
 			) }
-			{ visibilityModalClientIds && (
-				<BlockVisibilityModal
-					clientIds={ visibilityModalClientIds }
-					onClose={ () => setVisibilityModalClientIds( null ) }
+			{ isRenameModalOpen && (
+				<BlockRenameModal
+					clientId={ clientId }
+					onClose={ () => setIsRenameModalOpen( false ) }
 				/>
 			) }
 		</ListViewLeaf>
