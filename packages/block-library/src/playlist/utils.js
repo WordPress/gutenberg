@@ -68,12 +68,6 @@ export function getTrackAttributes( media ) {
 }
 
 /**
- * Width of the waveform player button in pixels.
- * Keep in sync with $waveform-button-size in style.scss.
- */
-export const WAVEFORM_BUTTON_WIDTH = 100;
-
-/**
  * Get computed style for an element, using ownerDocument for iframe compatibility.
  *
  * @param {Element} element - The element to get styles from.
