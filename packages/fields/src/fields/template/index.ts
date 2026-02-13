@@ -62,6 +62,11 @@ const templateField: Field< BasePost > = {
 
 		let currentTemplateElement: Option | undefined;
 		if ( postType ) {
+			// TODO: this template id is computed differently than the templateId in the editor inspector
+			// Compare with
+			// https://github.com/WordPress/gutenberg/blob/8c2a7c775f5b5fb19d8dca66a09d18977cf42b7d/packages/editor/src/components/post-template/panel.js#L21
+			// The editor inspector computes it from the editor store (that we cannot use in this package),
+			// that ends up being using the getTemplateId private selector from core data.
 			const templateId = await resolveSelect(
 				coreDataStore
 			).getDefaultTemplateId( {
