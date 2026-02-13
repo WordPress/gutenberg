@@ -31,13 +31,13 @@
  * @return string The visibility mode: 'hover', 'click', or 'always'.
  */
 function block_core_navigation_submenu_get_submenu_visibility( $context ) {
-	$open_submenus_on_click = $context['openSubmenusOnClick'] ?? null;
+	$deprecated_open_submenus_on_click = $context['openSubmenusOnClick'] ?? null;
 
 	// For backward compatibility, prioritize the legacy attribute if present. If it has been loaded and saved in the editor, then
 	// the deprecated attribute will be replaced by submenuVisibility.
-	if ( null !== $open_submenus_on_click ) {
+	if ( null !== $deprecated_open_submenus_on_click ) {
 		// Convert boolean to string: true -> 'click', false -> 'hover'.
-		return ! empty( $open_submenus_on_click ) ? 'click' : 'hover';
+		return ! empty( $deprecated_open_submenus_on_click ) ? 'click' : 'hover';
 	}
 
 	$submenu_visibility = $context['submenuVisibility'] ?? null;
