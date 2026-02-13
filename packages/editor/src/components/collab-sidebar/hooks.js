@@ -351,7 +351,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 			}
 
 			// Get existing reactions or initialize empty object.
-			const existingReactions = comment.meta?._wp_reactions || {};
+			const existingReactions = comment.meta?._wp_note_reactions || {};
 
 			// Check if user already reacted with this emoji.
 			const emojiReactions = existingReactions[ emoji ] || [];
@@ -380,7 +380,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				{
 					id: commentId,
 					meta: {
-						_wp_reactions: updatedReactions,
+						_wp_note_reactions: updatedReactions,
 					},
 				},
 				{ throwOnError: true }
@@ -412,7 +412,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 			}
 
 			// Get existing reactions.
-			const existingReactions = comment.meta?._wp_reactions || {};
+			const existingReactions = comment.meta?._wp_note_reactions || {};
 			const emojiReactions = existingReactions[ emoji ] || [];
 
 			// Filter out current user's reaction.
@@ -434,7 +434,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 				{
 					id: commentId,
 					meta: {
-						_wp_reactions:
+						_wp_note_reactions:
 							Object.keys( updatedReactions ).length > 0
 								? updatedReactions
 								: {},
@@ -469,7 +469,7 @@ export function useBlockCommentsActions( reflowComments = noop ) {
 			}
 
 			// Check if user already reacted with this emoji.
-			const existingReactions = comment.meta?._wp_reactions || {};
+			const existingReactions = comment.meta?._wp_note_reactions || {};
 			const emojiReactions = existingReactions[ emoji ] || [];
 			const alreadyReacted = emojiReactions.some(
 				( reaction ) => reaction.userId === userId

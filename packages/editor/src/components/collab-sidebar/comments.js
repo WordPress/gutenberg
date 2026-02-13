@@ -808,8 +808,8 @@ const CommentBoard = ( {
 
 	// Check if there are any reactions.
 	const hasReactions =
-		thread.meta?._wp_reactions &&
-		Object.keys( thread.meta._wp_reactions ).length > 0;
+		thread.meta?._wp_note_reactions &&
+		Object.keys( thread.meta._wp_note_reactions ).length > 0;
 
 	const actions = [
 		{
@@ -1005,7 +1005,7 @@ const CommentBoard = ( {
 			{ isExpanded && (
 				<div ref={ reactionDetailsAnchorRef }>
 					<ReactionDisplay
-						reactions={ thread.meta?._wp_reactions }
+						reactions={ thread.meta?._wp_note_reactions }
 						currentUserId={ currentUserId }
 						onToggleReaction={ ( emoji ) =>
 							onToggleReaction?.( {
@@ -1018,7 +1018,7 @@ const CommentBoard = ( {
 			) }
 			{ showReactionDetails && (
 				<ReactionDetailsPopover
-					reactions={ thread.meta?._wp_reactions }
+					reactions={ thread.meta?._wp_note_reactions }
 					onClose={ () => setShowReactionDetails( false ) }
 					anchor={ reactionDetailsAnchorRef.current }
 				/>

@@ -51,7 +51,7 @@ function gutenberg_register_block_comment_metadata() {
 
 	register_meta(
 		'comment',
-		'_wp_reactions',
+		'_wp_note_reactions',
 		array(
 			'type'          => 'object',
 			'description'   => __( 'Emoji reactions', 'gutenberg' ),
