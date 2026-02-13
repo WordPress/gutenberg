@@ -36,7 +36,7 @@ class Tests_Blocks_Render_Playlist extends WP_UnitTestCase {
 	 * @return string Block markup.
 	 */
 	private function build_playlist_markup( $playlist_attrs, $tracks = array() ) {
-		$attrs_json   = wp_json_encode( $playlist_attrs );
+		$attrs_json  = wp_json_encode( (object) $playlist_attrs );
 		$track_markup = '';
 		foreach ( $tracks as $track ) {
 			$track_json    = wp_json_encode( $track );
