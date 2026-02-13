@@ -62,9 +62,4 @@ export interface UndoManager< T = unknown > {
 	 * @return Whether there are changes to redo.
 	 */
 	hasRedo: () => boolean;
-
-	/**
-	 * Clear undo/redo history entries matching the given identifier.
-	 */
-	clearById: ( id: string | Record< string, unknown > ) => void;
 }
