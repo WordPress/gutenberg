@@ -6,9 +6,11 @@ import { createBlock } from '@wordpress/blocks';
 
 /**
  * Video file extensions that indicate a URL points directly to a video.
+ *
+ * 'mp4', 'm4v', 'webm', 'ogv', 'avi', 'mov', 'wmv', 'mpg', 'mpeg', 'ogg'
  */
 const VIDEO_EXTENSIONS =
-	/\.(?:mp4|m4v|webm|ogv|flv|avi|mov|wmv|mkv)(?:\?.*)?$/i;
+	/\.(?:mp4|m4v|webm|ogv|avi|mov|wmv|mpg|mpeg|ogg)(?:\?.*)?$/i;
 
 const transforms = {
 	from: [
