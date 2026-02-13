@@ -146,6 +146,17 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 		[ viewportChecked ]
 	);
 
+	const isDirty = useMemo( () => {
+		if ( hideEverywhere !== initialViewportValues.hideEverywhere ) {
+			return true;
+		}
+		return BLOCK_VISIBILITY_VIEWPORT_ENTRIES.some(
+			( [ , { key } ] ) =>
+				viewportChecked[ key ] !==
+				initialViewportValues.viewportChecked[ key ]
+		);
+	}, [ hideEverywhere, viewportChecked, initialViewportValues ] );
+
 	const hasIndeterminateValues = useMemo( () => {
 		if ( hideEverywhere === null ) {
 			return true;
@@ -348,6 +359,8 @@ export default function BlockVisibilityModal( { clientIds, onClose } ) {
 						<Button
 							variant="primary"
 							type="submit"
+							disabled={ ! isDirty }
+							accessibleWhenDisabled
 							__next40pxDefaultSize
 						>
 							{ __( 'Apply' ) }
