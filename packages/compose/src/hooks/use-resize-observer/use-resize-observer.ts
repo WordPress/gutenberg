@@ -18,8 +18,8 @@ export function useResizeObserver< T extends HTMLElement >(
 ): ( element?: T | null ) => void {
 	const callbackEvent = useEvent( callback );
 
-	const observedElementRef = useRef< T | null >();
-	const resizeObserverRef = useRef< ResizeObserver >();
+	const observedElementRef = useRef< T | null >( null );
+	const resizeObserverRef = useRef< ResizeObserver >( undefined );
 	return useEvent( ( element?: T | null ) => {
 		if ( element === observedElementRef.current ) {
 			return;
@@ -35,7 +35,7 @@ export function useResizeObserver< T extends HTMLElement >(
 		}
 
 		// Observe new element.
-		observedElementRef.current = element;
+		observedElementRef.current = element ?? null;
 		if ( element ) {
 			resizeObserver.observe( element, resizeObserverOptions );
 		}

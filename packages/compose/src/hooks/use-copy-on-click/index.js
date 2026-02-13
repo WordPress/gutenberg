@@ -29,7 +29,7 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 	} );
 
 	/** @type {React.MutableRefObject<Clipboard | undefined>} */
-	const clipboardRef = useRef();
+	const clipboardRef = useRef( undefined );
 	const [ hasCopied, setHasCopied ] = useState( false );
 
 	useEffect( () => {

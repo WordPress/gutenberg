@@ -677,7 +677,7 @@ export default function MediaEdit< Item >( {
 	// handler as `setTargetItemId()` would open the modal with stale
 	// `value`/`multiple` props. Setting a pending flag defers the open
 	// until after the next render when props are up to date.
-	const openModalRef = useRef< ( () => void ) | null >( null );
+	const openModalRef = useRef< () => void >( undefined );
 	const [ pendingOpen, setPendingOpen ] = useState( false );
 	const [ blobs, setBlobs ] = useState< string[] >( [] );
 	useEffect( () => {

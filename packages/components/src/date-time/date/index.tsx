@@ -314,7 +314,7 @@ function Day( {
 	onClick,
 	onKeyDown,
 }: DayProps ) {
-	const ref = useRef< HTMLButtonElement >();
+	const ref = useRef< HTMLButtonElement >( null );
 
 	// Focus the day when it becomes focusable, e.g. because an arrow key is
 	// pressed. Only do this if focus is allowed - this stops us stealing focus
