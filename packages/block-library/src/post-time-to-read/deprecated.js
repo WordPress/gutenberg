@@ -23,14 +23,14 @@ const v1 = {
 	},
 	supports: {
 		anchor: true,
-		spacing: {
-			margin: true,
-			padding: true,
+		color: {
+			gradients: true,
 			__experimentalDefaultControls: {
-				margin: false,
-				padding: false,
+				background: true,
+				text: true,
 			},
 		},
+		html: false,
 		typography: {
 			fontSize: true,
 			lineHeight: true,
