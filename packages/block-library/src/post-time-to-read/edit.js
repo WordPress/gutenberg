@@ -19,9 +19,7 @@ import { count as wordCount } from '@wordpress/wordcount';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 function PostTimeToReadEdit( { attributes, setAttributes, context } ) {
-	const { displayAsRange, displayMode, averageReadingSpeed } =
-		attributes;
-
+	const { displayAsRange, displayMode, averageReadingSpeed } = attributes;
 	const { postId, postType } = context;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
