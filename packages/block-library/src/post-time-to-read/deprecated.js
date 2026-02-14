@@ -45,7 +45,7 @@ const v1 = {
 			}
 		},
 		interactivity: {
-			clientNavigation: true
+			clientNavigation: true,
 		},
 		__experimentalBorder: {
 			radius: true,
