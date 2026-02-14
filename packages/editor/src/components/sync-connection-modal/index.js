@@ -6,8 +6,8 @@ import { useCopyToClipboard } from '@wordpress/compose';
 import { serialize } from '@wordpress/blocks';
 import { store as coreDataStore } from '@wordpress/core-data';
 import {
+	privateApis,
 	store as blockEditorStore,
-	BlockCanvasCover,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -24,6 +24,9 @@ import { error as errorIcon } from '@wordpress/icons';
  * Internal dependencies
  */
 import { getSyncErrorMessages } from '../../utils';
+import { unlock } from '../../lock-unlock';
+
+const { BlockCanvasCover } = unlock( privateApis );
 
 // Debounce time for initial disconnected status to allow connection to establish.
 const INITIAL_DISCONNECTED_DEBOUNCE_MS = 5000;
