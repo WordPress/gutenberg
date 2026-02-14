@@ -5,6 +5,7 @@ import { store as blocksStore } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
+	privateApis as blockLibraryPrivateApis,
 } from '@wordpress/block-library';
 import deprecated from '@wordpress/deprecated';
 import { createRoot, StrictMode } from '@wordpress/element';
@@ -29,6 +30,8 @@ const {
 	BackButton: __experimentalMainDashboardButton,
 	registerCoreBlockBindingsSources,
 } = unlock( editorPrivateApis );
+
+const { registerPHPOnlyBlocks } = unlock( blockLibraryPrivateApis );
 
 /**
  * Initializes and returns an instance of Editor.
@@ -95,6 +98,7 @@ export function initializeEditor(
 	}
 
 	registerCoreBlocks();
+	registerPHPOnlyBlocks( settings.autoRegisterBlocks );
 	registerCoreBlockBindingsSources();
 	registerLegacyWidgetBlock( { inserter: false } );
 	registerWidgetGroupBlock( { inserter: false } );

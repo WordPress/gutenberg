@@ -12,7 +12,7 @@ export function generateFieldsFromAttributes( attributes ) {
 	const fieldIds = [];
 
 	Object.entries( attributes ).forEach( ( [ name, def ] ) => {
-		if ( ! def.__experimentalAutoInspectorControl ) {
+		if ( ! def.autoGenerateControl ) {
 			return;
 		}
 

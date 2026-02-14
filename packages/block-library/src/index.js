@@ -6,19 +6,7 @@ import {
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 	setGroupingBlockName,
-	registerBlockType,
-	store as blocksStore,
 } from '@wordpress/blocks';
-import { useDisabled } from '@wordpress/compose';
-import { select } from '@wordpress/data';
-import { useBlockProps } from '@wordpress/block-editor';
-import { useServerSideRender } from '@wordpress/server-side-render';
-import { __, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import HtmlRenderer from './utils/html-renderer';
 
 /**
  * Internal dependencies
@@ -155,7 +143,6 @@ import * as video from './video';
 import * as footnotes from './footnotes';
 
 import isBlockMetadataExperimental from './utils/is-block-metadata-experimental';
-import { unlock } from './lock-unlock';
 
 /**
  * Function to get all the block-library blocks in an array
@@ -350,62 +337,6 @@ export const registerCoreBlocks = (
 	blocks = __experimentalGetCoreBlocks()
 ) => {
 	blocks.forEach( ( { init } ) => init() );
-
-	// Auto-register PHP-only blocks with ServerSideRender
-	if ( window.__unstableAutoRegisterBlocks ) {
-		window.__unstableAutoRegisterBlocks.forEach( ( blockName ) => {
-			const bootstrappedBlockType = unlock(
-				select( blocksStore )
-			).getBootstrappedBlockType( blockName );
-
-			registerBlockType( blockName, {
-				// Use all metadata from PHP registration,
-				// but fall back title to block name if not provided,
-				// ensure minimum apiVersion 3 for block wrapper support,
-				// and override with a ServerSideRender-based edit function.
-				...bootstrappedBlockType,
-				title: bootstrappedBlockType?.title || blockName,
-				...( ( bootstrappedBlockType?.apiVersion ?? 0 ) < 3 && {
-					apiVersion: 3,
-				} ),
-				// Inspector controls are rendered by the auto-register hook in block-editor
-				edit: function Edit( { attributes } ) {
-					const disabledRef = useDisabled();
-					const blockProps = useBlockProps( { ref: disabledRef } );
-					const { content, status, error } = useServerSideRender( {
-						block: blockName,
-						attributes,
-					} );
-
-					if ( status === 'loading' ) {
-						return (
-							<div { ...blockProps }>{ __( 'Loading…' ) }</div>
-						);
-					}
-
-					if ( status === 'error' ) {
-						return (
-							<div { ...blockProps }>
-								{ sprintf(
-									/* translators: %s: error message describing the problem */
-									__( 'Error loading block: %s' ),
-									error
-								) }
-							</div>
-						);
-					}
-
-					return (
-						<HtmlRenderer
-							wrapperProps={ blockProps }
-							html={ content }
-						/>
-					);
-				},
-				save: () => null,
-			} );
-		} );
-	}
 
 	setDefaultBlockName( paragraph.name );
 	if (

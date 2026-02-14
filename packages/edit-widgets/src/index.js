@@ -14,6 +14,7 @@ import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
+	privateApis as blockLibraryPrivateApis,
 } from '@wordpress/block-library';
 import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 import {
@@ -34,6 +35,9 @@ import {
 	ALLOW_REUSABLE_BLOCKS,
 	ENABLE_EXPERIMENTAL_FSE_BLOCKS,
 } from './constants';
+import { unlock } from './lock-unlock';
+
+const { registerPHPOnlyBlocks } = unlock( blockLibraryPrivateApis );
 
 const disabledBlocks = [
 	'core/more',
@@ -72,6 +76,7 @@ export function initializeEditor( id, settings ) {
 
 	dispatch( blocksStore ).reapplyBlockTypeFilters();
 	registerCoreBlocks( coreBlocks );
+	registerPHPOnlyBlocks( settings.autoRegisterBlocks );
 	registerLegacyWidgetBlock();
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {

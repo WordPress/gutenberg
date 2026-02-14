@@ -6,14 +6,16 @@
  */
 
 /**
- * Tests for gutenberg_mark_auto_inspector_control_attributes().
+ * Test the auto-register block support.
  *
  * @group blocks
  */
-class Tests_Blocks_Auto_Register extends WP_UnitTestCase {
+class Tests_Block_Supports_Auto_Register_Test extends WP_UnitTestCase {
 
 	/**
 	 * Tests that attributes are marked when auto_register is enabled.
+	 *
+	 * @covers ::gutenberg_mark_auto_generate_control_attributes
 	 */
 	public function test_marks_attributes_with_auto_register_flag() {
 		$settings = array(
@@ -24,15 +26,17 @@ class Tests_Blocks_Auto_Register extends WP_UnitTestCase {
 			),
 		);
 
-		$result = gutenberg_mark_auto_inspector_control_attributes( $settings );
+		$result = gutenberg_mark_auto_generate_control_attributes( $settings );
 
-		$this->assertTrue( $result['attributes']['title']['__experimentalAutoInspectorControl'] );
-		$this->assertTrue( $result['attributes']['count']['__experimentalAutoInspectorControl'] );
+		$this->assertTrue( $result['attributes']['title']['autoGenerateControl'] );
+		$this->assertTrue( $result['attributes']['count']['autoGenerateControl'] );
 	}
 
 	/**
 	 * Tests that attributes are not marked without auto_register flag.
-	 */
+	 *
+	 * @covers ::gutenberg_mark_auto_generate_control_attributes
+	*/
 	public function test_does_not_mark_attributes_without_auto_register() {
 		$settings = array(
 			'attributes' => array(
@@ -40,13 +44,15 @@ class Tests_Blocks_Auto_Register extends WP_UnitTestCase {
 			),
 		);
 
-		$result = gutenberg_mark_auto_inspector_control_attributes( $settings );
+		$result = gutenberg_mark_auto_generate_control_attributes( $settings );
 
-		$this->assertArrayNotHasKey( '__experimentalAutoInspectorControl', $result['attributes']['title'] );
+		$this->assertArrayNotHasKey( 'autoGenerateControl', $result['attributes']['title'] );
 	}
 
 	/**
 	 * Tests that attributes with source are excluded.
+	 *
+	 * @covers ::gutenberg_mark_auto_generate_control_attributes
 	 */
 	public function test_excludes_attributes_with_source() {
 		$settings = array(
@@ -60,10 +66,10 @@ class Tests_Blocks_Auto_Register extends WP_UnitTestCase {
 			),
 		);
 
-		$result = gutenberg_mark_auto_inspector_control_attributes( $settings );
+		$result = gutenberg_mark_auto_generate_control_attributes( $settings );
 
-		$this->assertTrue( $result['attributes']['title']['__experimentalAutoInspectorControl'] );
-		$this->assertArrayNotHasKey( '__experimentalAutoInspectorControl', $result['attributes']['content'] );
+		$this->assertTrue( $result['attributes']['title']['autoGenerateControl'] );
+		$this->assertArrayNotHasKey( 'autoGenerateControl', $result['attributes']['content'] );
 	}
 
 	/**
@@ -85,10 +91,10 @@ class Tests_Blocks_Auto_Register extends WP_UnitTestCase {
 			),
 		);
 
-		$result = gutenberg_mark_auto_inspector_control_attributes( $settings );
+		$result = gutenberg_mark_auto_generate_control_attributes( $settings );
 
-		$this->assertTrue( $result['attributes']['title']['__experimentalAutoInspectorControl'] );
-		$this->assertArrayNotHasKey( '__experimentalAutoInspectorControl', $result['attributes']['blob'] );
+		$this->assertTrue( $result['attributes']['title']['autoGenerateControl'] );
+		$this->assertArrayNotHasKey( 'autoGenerateControl', $result['attributes']['blob'] );
 	}
 
 	/**
@@ -99,7 +105,7 @@ class Tests_Blocks_Auto_Register extends WP_UnitTestCase {
 			'supports' => array( 'auto_register' => true ),
 		);
 
-		$result = gutenberg_mark_auto_inspector_control_attributes( $settings );
+		$result = gutenberg_mark_auto_generate_control_attributes( $settings );
 
 		$this->assertSame( $settings, $result );
 	}
