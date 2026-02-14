@@ -29,7 +29,7 @@ const v1 = {
 			__experimentalDefaultControls: {
 				margin: false,
 				padding: false,
-			}
+			},
 		},
 		typography: {
 			fontSize: true,
@@ -42,7 +42,7 @@ const v1 = {
 			__experimentalLetterSpacing: true,
 			__experimentalDefaultControls: {
 				fontSize: true,
-			}
+			},
 		},
 		interactivity: {
 			clientNavigation: true,
@@ -52,7 +52,7 @@ const v1 = {
 			color: true,
 			width: true,
 			style: true,
-		}
+		},
 	},
 	migrate: migrateTextAlign,
 	isEligible( attributes ) {
