@@ -1,0 +1,41 @@
+[
+	{
+		"name": "core/post-terms",
+		"isValid": true,
+		"attributes": {
+			"term": "category",
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/post-terms",
+		"isValid": true,
+		"attributes": {
+			"term": "category",
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/post-terms",
+		"isValid": true,
+		"attributes": {
+			"term": "category",
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]
