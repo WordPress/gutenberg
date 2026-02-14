@@ -10,15 +10,15 @@ const v1 = {
 		},
 		displayAsRange: {
 			type: 'boolean',
-			default: true
+			default: true,
 		},
 		displayMode: {
 			type: 'string',
-			default: 'time'
+			default: 'time',
 		},
 		averageReadingSpeed: {
 			type: 'number',
-			default: 189
+			default: 189,
 		}
 	},
 	supports: {
@@ -28,7 +28,7 @@ const v1 = {
 			padding: true,
 			__experimentalDefaultControls: {
 				margin: false,
-				padding: false
+				padding: false,
 			}
 		},
 		typography: {
@@ -41,7 +41,7 @@ const v1 = {
 			__experimentalTextDecoration: true,
 			__experimentalLetterSpacing: true,
 			__experimentalDefaultControls: {
-				fontSize: true
+				fontSize: true,
 			}
 		},
 		interactivity: {
@@ -51,7 +51,7 @@ const v1 = {
 			radius: true,
 			color: true,
 			width: true,
-			style: true
+			style: true,
 		}
 	},
 	migrate: migrateTextAlign,

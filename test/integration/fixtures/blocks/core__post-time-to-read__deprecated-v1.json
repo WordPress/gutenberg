@@ -3,8 +3,9 @@
 		"name": "core/post-time-to-read",
 		"isValid": true,
 		"attributes": {
-			"isLink": false,
-			"linkTarget": "_self",
+			"averageReadingSpeed": 189,
+		    "displayAsRange": true,
+		    "displayMode": "time",
 			"style": {
 				"typography": {
 					"textAlign": "left"
@@ -17,8 +18,9 @@
 		"name": "core/post-time-to-read",
 		"isValid": true,
 		"attributes": {
-			"isLink": false,
-			"linkTarget": "_self",
+			"averageReadingSpeed": 189,
+		    "displayAsRange": true,
+		    "displayMode": "time",
 			"style": {
 				"typography": {
 					"textAlign": "center"
@@ -31,8 +33,9 @@
 		"name": "core/post-time-to-read",
 		"isValid": true,
 		"attributes": {
-			"isLink": false,
-			"linkTarget": "_self",
+			"averageReadingSpeed": 189,
+		    "displayAsRange": true,
+		    "displayMode": "time",
 			"style": {
 				"typography": {
 					"textAlign": "right"
