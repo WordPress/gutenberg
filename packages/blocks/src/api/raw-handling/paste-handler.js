@@ -85,6 +85,10 @@ export function pasteHandler( {
 	mode = 'AUTO',
 	tagName,
 } ) {
+	// Allows us to ask for this information when we get a report.
+	log( 'Received HTML (pasteHandler):\n\n', HTML );
+	log( 'Received plain text (pasteHandler):\n\n', plainText );
+
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/g, '' );
 	// Strip Windows markers.

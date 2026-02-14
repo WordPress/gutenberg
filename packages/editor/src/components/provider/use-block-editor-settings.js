@@ -101,6 +101,7 @@ const {
 	getMediaSelectKey,
 	isIsolatedEditorKey,
 	deviceTypeKey,
+	isNavigationOverlayContextKey,
 } = unlock( privateApis );
 
 /**
@@ -138,6 +139,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		restBlockPatternCategories,
 		sectionRootClientId,
 		deviceType,
+		isNavigationOverlayContext,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -213,6 +215,14 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
 				deviceType: getDeviceType(),
+				isNavigationOverlayContext:
+					postType === 'wp_template_part' && postId
+						? getEntityRecord(
+								'postType',
+								'wp_template_part',
+								postId
+						  )?.area === 'navigation-overlay'
+						: false,
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -411,6 +421,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				'wp_navigation',
 			].includes( postType ),
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
+			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
 		};
 
 		return blockEditorSettings;
@@ -448,6 +459,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		jpegInterlaced,
 		pngInterlaced,
 		gifInterlaced,
+		isNavigationOverlayContext,
 	] );
 }
 

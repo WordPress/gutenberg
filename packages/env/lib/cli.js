@@ -101,6 +101,11 @@ module.exports = function cli() {
 		describe: 'Enable debug output.',
 		default: false,
 	} );
+	yargs.option( 'config', {
+		type: 'string',
+		describe: 'Path to a custom .wp-env.json configuration file.',
+		requiresArg: true,
+	} );
 
 	yargs.parserConfiguration( {
 		// Treats unknown options as arguments for commands to deal with instead of discarding them.

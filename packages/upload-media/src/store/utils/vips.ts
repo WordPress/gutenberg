@@ -1,22 +1,45 @@
 /**
- * External dependencies
- */
-import {
-	vipsConvertImageFormat as convertImageFormat,
-	vipsCompressImage as compressImage,
-	vipsHasTransparency as hasTransparency,
-	vipsResizeImage as resizeImage,
-	vipsRotateImage as rotateImage,
-	vipsCancelOperations as cancelOperations,
-	terminateVipsWorker,
-} from '@wordpress/vips/worker';
-
-/**
  * Internal dependencies
  */
 import { ImageFile } from '../../image-file';
 import { getFileBasename } from '../../utils';
 import type { ImageSizeCrop, QueueItemId } from '../types';
+
+/**
+ * Cached dynamic import promise for @wordpress/vips/worker.
+ *
+ * The module contains ~10MB of inlined WASM code. By using a dynamic import,
+ * the WASM is only loaded when vips functions are actually called at image
+ * processing time, rather than at module parse time.
+ *
+ * The promise is cached so the module is only resolved once.
+ */
+let vipsModulePromise:
+	| Promise< typeof import('@wordpress/vips/worker') >
+	| undefined;
+
+/**
+ * The resolved module reference, available synchronously after the first
+ * load completes. Used by terminateVipsWorker() and vipsCancelOperations().
+ */
+let vipsModule: typeof import('@wordpress/vips/worker') | undefined;
+
+/**
+ * Lazily loads and caches the @wordpress/vips/worker module.
+ *
+ * @return The vips worker module.
+ */
+function loadVipsModule(): Promise< typeof import('@wordpress/vips/worker') > {
+	if ( ! vipsModulePromise ) {
+		vipsModulePromise = import( '@wordpress/vips/worker' ).then(
+			( mod ) => {
+				vipsModule = mod;
+				return mod;
+			}
+		);
+	}
+	return vipsModulePromise;
+}
 
 /**
  * Converts an image to a different format using vips in a web worker.
@@ -40,6 +63,8 @@ export async function vipsConvertImageFormat(
 	quality: number,
 	interlaced?: boolean
 ) {
+	const { vipsConvertImageFormat: convertImageFormat } =
+		await loadVipsModule();
 	const buffer = await convertImageFormat(
 		id,
 		await file.arrayBuffer(),
@@ -70,6 +95,7 @@ export async function vipsCompressImage(
 	quality: number,
 	interlaced?: boolean
 ) {
+	const { vipsCompressImage: compressImage } = await loadVipsModule();
 	const buffer = await compressImage(
 		id,
 		await file.arrayBuffer(),
@@ -92,6 +118,7 @@ export async function vipsCompressImage(
  */
 export async function vipsHasTransparency( url: string ) {
 	try {
+		const { vipsHasTransparency: hasTransparency } = await loadVipsModule();
 		const response = await fetch( url );
 		if ( ! response.ok ) {
 			throw new Error( `Failed to fetch image: ${ response.status }` );
@@ -129,6 +156,7 @@ export async function vipsResizeImage(
 		throw new Error( 'Operation aborted' );
 	}
 
+	const { vipsResizeImage: resizeImage } = await loadVipsModule();
 	const { buffer, width, height, originalWidth, originalHeight } =
 		await resizeImage(
 			id,
@@ -201,6 +229,7 @@ export async function vipsRotateImage(
 		return file;
 	}
 
+	const { vipsRotateImage: rotateImage } = await loadVipsModule();
 	const { buffer, width, height } = await rotateImage(
 		id,
 		await file.arrayBuffer(),
@@ -230,11 +259,27 @@ export async function vipsRotateImage(
 /**
  * Cancels all ongoing image operations for the given item.
  *
+ * If the vips module has not been loaded yet, there can be no active
+ * operations to cancel.
+ *
  * @param id Queue item ID to cancel operations for.
  * @return Whether any operation was cancelled.
  */
 export async function vipsCancelOperations( id: QueueItemId ) {
-	return cancelOperations( id );
+	if ( ! vipsModule ) {
+		return false;
+	}
+	return vipsModule.vipsCancelOperations( id );
 }
 
-export { terminateVipsWorker };
+/**
+ * Terminates the vips worker if it has been loaded.
+ *
+ * If the vips module has not been loaded yet (i.e., no image processing
+ * has occurred), this is a no-op since there is no worker to terminate.
+ */
+export function terminateVipsWorker(): void {
+	if ( vipsModule ) {
+		vipsModule.terminateVipsWorker();
+	}
+}

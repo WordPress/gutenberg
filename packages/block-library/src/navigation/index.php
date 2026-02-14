@@ -21,8 +21,8 @@
  * @return string The visibility mode: 'hover', 'click', or 'always'.
  */
 function block_core_navigation_get_submenu_visibility( $attributes ) {
-	$submenu_visibility     = isset( $attributes['submenuVisibility'] ) ? $attributes['submenuVisibility'] : null;
-	$open_submenus_on_click = isset( $attributes['openSubmenusOnClick'] ) ? $attributes['openSubmenusOnClick'] : null;
+	$submenu_visibility     = $attributes['submenuVisibility'] ?? null;
+	$open_submenus_on_click = $attributes['openSubmenusOnClick'] ?? null;
 
 	// If new attribute is set, use it.
 	if ( null !== $submenu_visibility ) {
@@ -1094,8 +1094,8 @@ if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
  * @return string Overlay close markup with the directives injected.
  */
 function block_core_navigation_add_directives_to_overlay_close( $tags ) {
-	// Find the navigation-overlay-close button.
-	if ( $tags->next_tag(
+	// Find all navigation-overlay-close buttons.
+	while ( $tags->next_tag(
 		array(
 			'tag_name'   => 'BUTTON',
 			'class_name' => 'wp-block-navigation-overlay-close',

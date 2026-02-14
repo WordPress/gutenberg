@@ -30,6 +30,10 @@ const meta: Meta< typeof FontSizePicker > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'editor',
+		},
 	},
 };
 export default meta;

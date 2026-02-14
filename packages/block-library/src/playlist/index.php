@@ -35,17 +35,17 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 				$inner_block->context['playlistId'] = $playlist_id;
 
 				$track_attributes  = $inner_block->attributes;
-				$unique_id         = isset( $track_attributes['uniqueId'] ) ? $track_attributes['uniqueId'] : wp_unique_id( 'playlist-track-' );
+				$unique_id         = $track_attributes['uniqueId'] ?? wp_unique_id( 'playlist-track-' );
 				$playlist_tracks[] = $unique_id;
 
 				$inner_block->attributes['uniqueId'] = $unique_id;
 
 				// Extract track metadata from block attributes.
 				$title      = isset( $track_attributes['title'] ) && ! empty( $track_attributes['title'] ) ? $track_attributes['title'] : __( 'Unknown title' );
-				$artist     = isset( $track_attributes['artist'] ) ? $track_attributes['artist'] : '';
-				$album      = isset( $track_attributes['album'] ) ? $track_attributes['album'] : '';
-				$image      = isset( $track_attributes['image'] ) ? $track_attributes['image'] : '';
-				$url        = isset( $track_attributes['src'] ) ? $track_attributes['src'] : '';
+				$artist     = $track_attributes['artist'] ?? '';
+				$album      = $track_attributes['album'] ?? '';
+				$image      = $track_attributes['image'] ?? '';
+				$url        = $track_attributes['src'] ?? '';
 				$aria_label = $title;
 
 				if ( $title && $artist && $album ) {
@@ -100,7 +100,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 	$html = '<div class="wp-block-playlist__current-item">';
 
 	// The alt attribute is intentionally left empty, as the image is decorative.
-	if ( isset( $attributes['showImages'] ) ? $attributes['showImages'] : false ) {
+	if ( $attributes['showImages'] ?? false ) {
 		$html .=
 		'<img
 			class="wp-block-playlist__item-image"

@@ -310,7 +310,7 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await expect(
 			blockSettings.getByRole( 'tab', {
-				name: 'Settings',
+				name: 'Content',
 				selected: true,
 			} )
 		).toBeVisible();
@@ -318,7 +318,7 @@ test.describe( 'Navigation block - List view editing', () => {
 		await expect(
 			blockSettings
 				.getByRole( 'tabpanel', {
-					name: 'Settings',
+					name: 'Content',
 				} )
 				.getByRole( 'heading', {
 					name: 'Settings',

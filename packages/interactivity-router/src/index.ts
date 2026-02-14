@@ -220,7 +220,7 @@ const preparePage: PreparePage = async ( url, dom, { vdom } = {} ) => {
 
 	// Wait for styles and modules to be ready.
 	const [ styles, scriptModules ] = await Promise.all( [
-		Promise.all( preloadStyles( dom, url ) ),
+		Promise.all( preloadStyles( dom ) ),
 		Promise.all( preloadScriptModules( dom ) ),
 	] );
 

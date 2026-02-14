@@ -1,11 +1,4 @@
-/**
- * External dependencies
- */
 import clsx from 'clsx';
-
-/**
- * WordPress dependencies
- */
 import {
 	createPortal,
 	useCallback,
@@ -14,7 +7,6 @@ import {
 	useState,
 	forwardRef,
 	useLayoutEffect,
-	createContext,
 	useContext,
 } from '@wordpress/element';
 import {
@@ -27,10 +19,6 @@ import {
 import { __ } from '@wordpress/i18n';
 import { close } from '@wordpress/icons';
 import { getScrollContainer } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
 import * as ariaHelper from './aria-helper';
 import Button from '../button';
 import StyleProvider from '../style-provider';
@@ -38,13 +26,7 @@ import type { ModalProps } from './types';
 import { withIgnoreIMEEvents } from '../utils/with-ignore-ime-events';
 import { Spacer } from '../spacer';
 import { useModalExitAnimation } from './use-modal-exit-animation';
-
-// Used to track and dismiss the prior modal when another opens unless nested.
-type Dismissers = Set<
-	React.RefObject< ModalProps[ 'onRequestClose' ] | undefined >
->;
-const ModalContext = createContext< Dismissers >( new Set() );
-ModalContext.displayName = 'ModalContext';
+import { ModalContext, type Dismissers } from './context';
 
 // Used to track body class names applied while modals are open.
 const bodyOpenClasses = new Map< string, number >();

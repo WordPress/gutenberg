@@ -63,11 +63,9 @@ function Edit( {
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
 	/**
-	 * Compute tabs list from innerblocks to provide via context.
-	 * This traverses the tab-panel block to find all tab blocks
-	 * and extracts their label and anchor for the tabs-menu to consume.
+	 * Construct a list of core/tab blocks, used to create tabs-list context.
 	 */
-	const tabsList = useSelect(
+	const tabs = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
@@ -81,14 +79,9 @@ function Edit( {
 				return [];
 			}
 
-			return tabPanel.innerBlocks
-				.filter( ( block ) => block.name === 'core/tab' )
-				.map( ( tab, index ) => ( {
-					id: tab.attributes.anchor || `tab-${ index }`,
-					label: tab.attributes.label || '',
-					clientId: tab.clientId,
-					index,
-				} ) );
+			return tabPanel.innerBlocks.filter(
+				( block ) => block.name === 'core/tab'
+			);
 		},
 		[ clientId ]
 	);
@@ -96,15 +89,26 @@ function Edit( {
 	/**
 	 * Memoize context value to prevent unnecessary re-renders.
 	 */
-	const contextValue = useMemo(
-		() => ( {
-			'core/tabs-list': tabsList,
+	const contextValue = useMemo( () => {
+		/**
+		 * Compute tabs list from innerblocks to provide via context.
+		 * This traverses the tab-panel block to find all tab blocks
+		 * and extracts their label and anchor for the tabs-menu to consume.
+		 */
+		const tabList = tabs.map( ( tab, index ) => ( {
+			id: tab.attributes.anchor || `tab-${ index }`,
+			label: tab.attributes.label || '',
+			clientId: tab.clientId,
+			index,
+		} ) );
+
+		return {
+			'core/tabs-list': tabList,
 			'core/tabs-id': anchor,
 			'core/tabs-activeTabIndex': activeTabIndex,
 			'core/tabs-editorActiveTabIndex': editorActiveTabIndex,
-		} ),
-		[ tabsList, anchor, activeTabIndex, editorActiveTabIndex ]
-	);
+		};
+	}, [ tabs, anchor, activeTabIndex, editorActiveTabIndex ] );
 
 	/**
 	 * Block props for the tabs container.
@@ -117,10 +121,10 @@ function Edit( {
 	 * Innerblocks props for the tabs container.
 	 */
 	const innerBlockProps = useInnerBlocksProps( blockProps, {
+		__experimentalCaptureToolbars: true,
 		template: TABS_TEMPLATE,
 		templateLock: false,
 		renderAppender: false,
-		__experimentalCaptureToolbars: true,
 	} );
 
 	return (

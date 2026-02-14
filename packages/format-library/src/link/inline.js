@@ -31,8 +31,6 @@ import { createLinkFormat, isValidHref, getFormatBoundary } from './utils';
 import { link as settings } from './index';
 import CSSClassesSettingComponent from './css-classes-setting';
 
-// CSSClassesSettingComponent moved to its own file and imported above.
-
 const LINK_SETTINGS = [
 	...LinkControl.DEFAULT_LINK_SETTINGS,
 	{
@@ -167,7 +165,18 @@ function InlineLinkUI( {
 
 			return;
 		} else if ( newText === richTextText ) {
-			newValue = applyFormat( value, linkFormat );
+			// Use explicit format boundaries rather than relying on
+			// the current selection which may be collapsed or
+			// misaligned after external value changes.
+			const boundary = getFormatBoundary( value, {
+				type: 'core/link',
+			} );
+			newValue = applyFormat(
+				value,
+				linkFormat,
+				boundary.start,
+				boundary.end
+			);
 		} else {
 			// Scenario: Editing an existing link.
 
@@ -318,10 +327,7 @@ function getRichTextValueFromSelection( value, isActive ) {
 		} );
 
 		textStart = boundary.start;
-
-		// Text *selection* always extends +1 beyond the edge of the format.
-		// We account for that here.
-		textEnd = boundary.end + 1;
+		textEnd = boundary.end;
 	}
 
 	// Get a RichTextValue containing the selected text content.

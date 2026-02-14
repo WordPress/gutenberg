@@ -136,12 +136,12 @@ Do not edit directly.
 
 ### Elevation
 
-| Variable name              | Description                                                                                                                       |
-| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| `--wpds-elevation-x-small` | For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame.     |
-| `--wpds-elevation-small`   | For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. |
-| `--wpds-elevation-medium`  | For components that offer additional actions. Example: Menus, Command Palette                                                     |
-| `--wpds-elevation-large`   | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
+| Variable name         | Description                                                                                                                       |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `--wpds-elevation-xs` | For sections and containers that group related content and controls, which may overlap other content. Example: Preview Frame.     |
+| `--wpds-elevation-sm` | For components that provide contextual feedback without being intrusive. Generally non-interruptive. Example: Tooltips, Snackbar. |
+| `--wpds-elevation-md` | For components that offer additional actions. Example: Menus, Command Palette                                                     |
+| `--wpds-elevation-lg` | For components that confirm decisions or handle necessary interruptions. Example: Modals.                                         |
 
 ### Typography
 

@@ -38,8 +38,16 @@
 		},
 		"./package.json": "./package.json"
 	},
+	"wpScript": true,
 	"types": "build-types",
-	"sideEffects": false,
+	"sideEffects": [
+		"src/index.ts",
+		"src/store/index.ts",
+		"build/index.cjs",
+		"build/store/index.cjs",
+		"build-module/index.mjs",
+		"build-module/store/index.mjs"
+	],
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",

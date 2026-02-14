@@ -21,6 +21,10 @@ const meta: Meta< typeof GradientPicker > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+		},
 	},
 	args: {
 		onChange: fn(),

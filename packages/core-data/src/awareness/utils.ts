@@ -2,10 +2,10 @@
  * Internal dependencies
  */
 import type { User } from '../entity-types';
-import type { UserInfo } from './types';
+import type { CollaboratorInfo } from './types';
 
 /**
- * The color palette for the user highlight.
+ * The color palette for the collaborator highlight.
  */
 const COLOR_PALETTE = [
 	'#3858E9', // blueberry
@@ -30,13 +30,13 @@ function generateRandomInt( min: number, max: number ): number {
 }
 
 /**
- * Get a unique user color from the palette, or generate a variation if none are available.
+ * Get a unique collaborator color from the palette, or generate a variation if none are available.
  * If the previously used color is available from localStorage, use it.
  *
  * @param existingColors - Colors that are already in use.
- * @return The new user color, in hex format.
+ * @return The new collaborator color, in hex format.
  */
-function getNewUserColor( existingColors: string[] ): string {
+function getNewCollaboratorColor( existingColors: string[] ): string {
 	const availableColors = COLOR_PALETTE.filter(
 		( color ) => ! existingColors.includes( color )
 	);
@@ -137,45 +137,48 @@ export function areMapsEqual< Key, Value >(
 }
 
 /**
- * Check if two user infos are equal.
+ * Check if two collaborator infos are equal.
  *
- * @param userInfo1 - The first user info.
- * @param userInfo2 - The second user info.
- * @return True if the user infos are equal, false otherwise.
+ * @param collaboratorInfo1 - The first collaborator info.
+ * @param collaboratorInfo2 - The second collaborator info.
+ * @return True if the collaborator infos are equal, false otherwise.
  */
-export function areUserInfosEqual(
-	userInfo1?: UserInfo,
-	userInfo2?: UserInfo
+export function areCollaboratorInfosEqual(
+	collaboratorInfo1?: CollaboratorInfo,
+	collaboratorInfo2?: CollaboratorInfo
 ): boolean {
-	if ( ! userInfo1 || ! userInfo2 ) {
-		return userInfo1 === userInfo2;
+	if ( ! collaboratorInfo1 || ! collaboratorInfo2 ) {
+		return collaboratorInfo1 === collaboratorInfo2;
 	}
 
-	if ( Object.keys( userInfo1 ).length !== Object.keys( userInfo2 ).length ) {
+	if (
+		Object.keys( collaboratorInfo1 ).length !==
+		Object.keys( collaboratorInfo2 ).length
+	) {
 		return false;
 	}
 
-	return Object.entries( userInfo1 ).every( ( [ key, value ] ) => {
-		// Update this function with any non-primitive fields added to UserInfo.
-		return value === userInfo2[ key as keyof UserInfo ];
+	return Object.entries( collaboratorInfo1 ).every( ( [ key, value ] ) => {
+		// Update this function with any non-primitive fields added to CollaboratorInfo.
+		return value === collaboratorInfo2[ key as keyof CollaboratorInfo ];
 	} );
 }
 
 /**
- * Generate a user info object from a current user and a list of existing colors.
+ * Generate a collaborator info object from a current collaborator and a list of existing colors.
  *
- * @param currentUser    - The current user.
- * @param existingColors - The existing colors.
- * @return The user info object.
+ * @param currentCollaborator - The current collaborator.
+ * @param existingColors      - The existing colors.
+ * @return The collaborator info object.
  */
-export function generateUserInfo(
-	currentUser: User< 'view' >,
+export function generateCollaboratorInfo(
+	currentCollaborator: User< 'view' >,
 	existingColors: string[]
-): UserInfo {
+): CollaboratorInfo {
 	return {
-		...currentUser,
+		...currentCollaborator,
 		browserType: getBrowserName(),
-		color: getNewUserColor( existingColors ),
+		color: getNewCollaboratorColor( existingColors ),
 		enteredAt: Date.now(),
 	};
 }

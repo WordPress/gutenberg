@@ -66,16 +66,7 @@
 			}
 		},
 		"layout": {
-			"default": {
-				"type": "flex",
-				"orientation": "vertical",
-				"flexWrap": "nowrap"
-			},
-			"allowVerticalAlignment": true,
-			"allowJustification": true,
-			"allowSwitching": false,
-			"allowOrientation": false,
-			"allowWrap": false
+			"allowEditing": false
 		},
 		"spacing": {
 			"padding": true,

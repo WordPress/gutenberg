@@ -15,6 +15,6 @@
 		font-size: var(--wpds-font-size-sm);
 		line-height: 1.4; /* TODO: use DS token for line height */
 		color: var(--wpds-color-fg-content-neutral);
-		box-shadow: var(--wpds-elevation-small);
+		box-shadow: var(--wpds-elevation-sm);
 	}
 }

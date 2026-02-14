@@ -3,13 +3,13 @@
  */
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { comment as commentIcon } from '@wordpress/icons';
 import {
 	privateApis as blockEditorPrivateApis,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { getUnregisteredTypeHandlerName } from '@wordpress/blocks';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -24,6 +24,13 @@ const AddCommentMenuItem = ( { clientId, onClick, isDistractionFree } ) => {
 			return select( blockEditorStore ).getBlock( clientId );
 		},
 		[ clientId ]
+	);
+	const shortcut = useSelect(
+		( select ) =>
+			select( keyboardShortcutsStore ).getShortcutRepresentation(
+				'core/editor/new-note'
+			),
+		[]
 	);
 
 	if (
@@ -45,11 +52,11 @@ const AddCommentMenuItem = ( { clientId, onClick, isDistractionFree } ) => {
 
 	return (
 		<MenuItem
-			icon={ commentIcon }
 			onClick={ onClick }
 			aria-haspopup="dialog"
 			disabled={ isDisabled }
 			info={ infoText }
+			shortcut={ shortcut }
 		>
 			{ __( 'Add note' ) }
 		</MenuItem>

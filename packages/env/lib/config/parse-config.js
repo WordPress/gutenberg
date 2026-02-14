@@ -111,22 +111,27 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
  * constructs an object in the format used internally.
  *
  *
- * @param {string} configDirectoryPath A path to the directory we are parsing the config for.
- * @param {string} cacheDirectoryPath  Path to the work directory located in ~/.wp-env.
+ * @param {string}      configDirectoryPath A path to the directory we are parsing the config for.
+ * @param {string}      cacheDirectoryPath  Path to the work directory located in ~/.wp-env.
+ * @param {string|null} customConfigPath    Optional custom config file path.
  *
  * @return {Promise<WPRootConfig>} Parsed config.
  */
-async function parseConfig( configDirectoryPath, cacheDirectoryPath ) {
+async function parseConfig(
+	configDirectoryPath,
+	cacheDirectoryPath,
+	customConfigPath = null
+) {
 	// The local config will be used to override any defaults.
 	const localConfig = await parseConfigFile(
-		getConfigFilePath( configDirectoryPath ),
+		getConfigFilePath( configDirectoryPath, 'local', customConfigPath ),
 		{ cacheDirectoryPath }
 	);
 
 	// Any overrides that can be used in place
 	// of properties set by the local config.
 	const overrideConfig = await parseConfigFile(
-		getConfigFilePath( configDirectoryPath, 'override' ),
+		getConfigFilePath( configDirectoryPath, 'override', customConfigPath ),
 		{ cacheDirectoryPath }
 	);
 
@@ -161,27 +166,37 @@ async function parseConfig( configDirectoryPath, cacheDirectoryPath ) {
 /**
  * Gets the path to the config file.
  *
- * @param {string} configDirectoryPath The path to the directory containing config files.
- * @param {string} type                The type of config file we're interested in: 'local' or 'override'.
+ * @param {string}      configDirectoryPath The path to the directory containing config files.
+ * @param {string}      type                The type of config file we're interested in: 'local' or 'override'.
+ * @param {string|null} customConfigPath    Optional custom config file path (only used for 'local' type).
  *
  * @return {string} The path to the config file.
  */
-function getConfigFilePath( configDirectoryPath, type = 'local' ) {
-	let fileName;
-	switch ( type ) {
-		case 'local': {
-			fileName = '.wp-env.json';
-			break;
-		}
+function getConfigFilePath(
+	configDirectoryPath,
+	type = 'local',
+	customConfigPath = null
+) {
+	// If a custom config path is provided for the local config, use it.
+	if ( type === 'local' && customConfigPath ) {
+		return path.resolve( customConfigPath );
+	}
 
-		case 'override': {
-			fileName = '.wp-env.override.json';
-			break;
-		}
+	// For override, derive from custom config: staging.json -> staging.override.json
+	if ( type === 'override' && customConfigPath ) {
+		const resolved = path.resolve( customConfigPath );
+		const ext = path.extname( resolved );
+		const base = path.basename( resolved, ext );
+		const dir = path.dirname( resolved );
+		return path.join( dir, `${ base }.override${ ext }` );
+	}
 
-		default: {
-			throw new Error( `Invalid config file type "${ type }.` );
-		}
+	// Default behavior.
+	const fileName =
+		type === 'local' ? '.wp-env.json' : '.wp-env.override.json';
+
+	if ( type !== 'local' && type !== 'override' ) {
+		throw new Error( `Invalid config file type "${ type }.` );
 	}
 
 	return path.resolve( configDirectoryPath, fileName );

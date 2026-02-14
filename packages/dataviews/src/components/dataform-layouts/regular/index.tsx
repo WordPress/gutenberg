@@ -98,7 +98,9 @@ export default function FormRegularField< Item >( {
 						`dataforms-layouts-regular__field-label--label-position-${ labelPosition }`
 					) }
 				>
-					{ fieldDefinition.label }
+					<BaseControl.VisualLabel>
+						{ fieldDefinition.label }
+					</BaseControl.VisualLabel>
 				</div>
 				<div className="dataforms-layouts-regular__field-control">
 					{ fieldDefinition.readOnly === true ? (

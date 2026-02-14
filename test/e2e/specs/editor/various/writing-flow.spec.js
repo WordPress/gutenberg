@@ -1133,6 +1133,28 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 			editor.canvas.locator( '[data-type="core/block"]' )
 		).toBeFocused();
 	} );
+
+	test( 'should select non-contenteditable block via click after partial selection', async ( {
+		editor,
+		pageUtils,
+	} ) => {
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await editor.insertBlock( { name: 'core/spacer' } );
+		await editor.canvas
+			.getByRole( 'document', { name: 'Empty block' } )
+			.fill( 'A partial selection' );
+		await pageUtils.pressKeys( 'shiftAlt+ArrowLeft' );
+
+		const spacer = editor.canvas.getByRole( 'document', {
+			name: 'Block: Spacer',
+		} );
+		await spacer.click();
+
+		await expect( spacer ).toBeFocused();
+		await expect(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		).not.toBeFocused();
+	} );
 } );
 
 class WritingFlowUtils {

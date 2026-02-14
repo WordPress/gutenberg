@@ -107,6 +107,7 @@ class DockerRuntime {
 			xdebug,
 			spx,
 			writeChanges: true,
+			customConfigPath: config.customConfigPath,
 		} );
 
 		// Check if the hash of the config has changed. If so, run configuration.
@@ -375,6 +376,7 @@ class DockerRuntime {
 		const { dockerComposeConfigPath } = await initConfig( {
 			spinner,
 			debug,
+			customConfigPath: config.customConfigPath,
 		} );
 
 		spinner.text = 'Stopping WordPress.';
@@ -452,7 +454,11 @@ class DockerRuntime {
 	 * @param {boolean}  options.debug       True if debug mode is enabled.
 	 */
 	async clean( config, { environment, spinner, debug } ) {
-		const fullConfig = await initConfig( { spinner, debug } );
+		const fullConfig = await initConfig( {
+			spinner,
+			debug,
+			customConfigPath: config.customConfigPath,
+		} );
 
 		const description = `${ environment } environment${
 			environment === 'all' ? 's' : ''
@@ -525,7 +531,11 @@ class DockerRuntime {
 		// Validate the container name (throws for deprecated containers)
 		validateRunContainer( container );
 
-		const fullConfig = await initConfig( { spinner, debug } );
+		const fullConfig = await initConfig( {
+			spinner,
+			debug,
+			customConfigPath: config.customConfigPath,
+		} );
 
 		// Shows a contextual tip for the given command.
 		const joinedCommand = command.join( ' ' );
@@ -552,7 +562,11 @@ class DockerRuntime {
 	 * @param {boolean}  options.debug       True if debug mode is enabled.
 	 */
 	async logs( config, { environment, watch, spinner, debug } ) {
-		const fullConfig = await initConfig( { spinner, debug } );
+		const fullConfig = await initConfig( {
+			spinner,
+			debug,
+			customConfigPath: config.customConfigPath,
+		} );
 
 		// If we show text while watching the logs, it will continue showing up every
 		// few lines in the logs as they happen, which isn't a good look. So only
@@ -621,7 +635,11 @@ class DockerRuntime {
 	async getStatus( config, { spinner, debug } ) {
 		spinner.text = 'Getting environment status.';
 
-		const fullConfig = await initConfig( { spinner, debug } );
+		const fullConfig = await initConfig( {
+			spinner,
+			debug,
+			customConfigPath: config.customConfigPath,
+		} );
 		const dockerComposeConfig = {
 			config: fullConfig.dockerComposeConfigPath,
 			log: debug,

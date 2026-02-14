@@ -216,6 +216,10 @@ $z-layers: (
 
 	// Needs to be below media library (.media-model) that has a z-index of 160000.
 	".components-popover.components-dropdown__content.dataforms-layouts-panel__field-dropdown": 160000 - 10,
+
+	// Needs to be below the media library (.media-modal) that has a z-index of 160000.
+	// And the new experimental media modal that has a z-index of 100000.
+	".dataviews-action-modal__quick-edit": 100000 - 10,
 );
 
 @function z-index( $key ) {

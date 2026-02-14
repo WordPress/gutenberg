@@ -66,6 +66,7 @@ type DataViewsProps< Item > = {
 		perPageSizes: number[];
 	};
 	empty?: ReactNode;
+	onReset?: ( () => void ) | false;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
@@ -140,6 +141,7 @@ function DataViews< Item >( {
 	children,
 	config = { perPageSizes: [ 10, 20, 50, 100 ] },
 	empty,
+	onReset,
 }: DataViewsProps< Item > ) {
 	const { infiniteScrollHandler } = paginationInfo;
 	const containerRef = useRef< HTMLDivElement | null >( null );
@@ -267,6 +269,7 @@ function DataViews< Item >( {
 				config,
 				empty,
 				hasInfiniteScrollHandler: !! infiniteScrollHandler,
+				onReset,
 			} }
 		>
 			<div className="dataviews-wrapper" ref={ containerRef }>

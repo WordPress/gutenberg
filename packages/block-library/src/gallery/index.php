@@ -35,15 +35,34 @@ function block_core_gallery_data_id_backcompatibility( $parsed_block ) {
 add_filter( 'render_block_data', 'block_core_gallery_data_id_backcompatibility' );
 
 /**
+ * Adds a unique ID to the gallery block context.
+ *
+ * @since 7.0.0
+ *
+ * @param array $context      Default context.
+ * @param array $parsed_block Block being rendered, filtered by render_block_data.
+ * @return array Filtered context.
+ */
+function block_core_gallery_render_context( $context, $parsed_block ) {
+	if ( 'core/gallery' === $parsed_block['blockName'] ) {
+		$context['galleryId'] = uniqid();
+	}
+	return $context;
+}
+
+add_filter( 'render_block_context', 'block_core_gallery_render_context', 10, 2 );
+
+/**
  * Renders the `core/gallery` block on the server.
  *
  * @since 6.0.0
  *
  * @param array  $attributes Attributes of the block being rendered.
- * @param string $content Content of the block being rendered.
+ * @param string $content    Content of the block being rendered.
+ * @param array  $block      The block instance being rendered.
  * @return string The content of the block being rendered.
  */
-function block_core_gallery_render( $attributes, $content ) {
+function block_core_gallery_render( $attributes, $content, $block ) {
 	// Adds a style tag for the --wp--style--unstable-gallery-gap var.
 	// The Gallery block needs to recalculate Image block width based on
 	// the current gap setting in order to maintain the number of flex columns
@@ -116,10 +135,62 @@ function block_core_gallery_render( $attributes, $content ) {
 
 	wp_style_engine_get_stylesheet_from_css_rules(
 		$gallery_styles,
-		array(
-			'context' => 'block-supports',
+		array( 'context' => 'block-supports' )
+	);
+
+	// Gets all image IDs from the state that match this gallery's ID.
+	$state      = wp_interactivity_state( 'core/image' );
+	$gallery_id = $block->context['galleryId'] ?? null;
+	$image_ids  = array();
+	if ( isset( $gallery_id ) && isset( $state['metadata'] ) ) {
+		foreach ( $state['metadata'] as $image_id => $metadata ) {
+			if ( isset( $metadata['galleryId'] ) && $metadata['galleryId'] === $gallery_id ) {
+				$image_ids[] = $image_id;
+			}
+		}
+	}
+
+	// Randomize image IDs when `randomOrder` setting is enabled
+	if ( ! empty( $attributes['randomOrder'] ) && ! empty( $image_ids ) ) {
+		shuffle( $image_ids );
+	}
+
+	$processed_content->set_attribute( 'data-wp-interactive', 'core/gallery' );
+	$processed_content->set_attribute(
+		'data-wp-context',
+		wp_json_encode(
+			array( 'galleryId' => $gallery_id ),
+			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
 		)
 	);
+
+	// Populates the aria label for each image in the gallery.
+	if ( ! empty( $image_ids ) ) {
+		if ( 1 <= count( $image_ids ) ) {
+			for ( $i = 0; $i < count( $image_ids ); $i++ ) {
+				$image_id = $image_ids[ $i ];
+				$alt      = $state['metadata'][ $image_id ]['alt'];
+				wp_interactivity_state(
+					'core/image',
+					array(
+						'metadata' => array(
+							$image_id => array(
+								'customAriaLabel'        => empty( $alt )
+									/* translators: %1$s: current image index, %2$s: total number of images */
+									? sprintf( __( 'Enlarged image %1$s of %2$s' ), $i + 1, count( $image_ids ) )
+									/* translators: %1$s: current image index, %2$s: total number of images, %3$s: Image alt text */
+									: sprintf( __( 'Enlarged image %1$s of %2$s: %3$s' ), $i + 1, count( $image_ids ), $alt ),
+								/* translators: %1$s: current image index, %2$s: total number of images */
+								'triggerButtonAriaLabel' => sprintf( __( 'Enlarge %1$s of %2$s' ), $i + 1, count( $image_ids ) ),
+								// This metadata is used to store the order of the images in the gallery.
+								'order'                  => $i,
+							),
+						),
+					)
+				);
+			}
+		}
+	}
 
 	// The WP_HTML_Tag_Processor class calls get_updated_html() internally
 	// when the instance is treated as a string, but here we explicitly
@@ -151,13 +222,22 @@ function block_core_gallery_render( $attributes, $content ) {
 	}
 	$image_blocks = $matches[0];
 
-	// Randomize the order of Image blocks.
-	shuffle( $image_blocks );
+	// Reorder image blocks according to the randomized `$image_ids` order
+	$reordered_blocks = array();
+	foreach ( $image_ids as $image_id ) {
+		foreach ( $image_blocks as $block ) {
+			if ( strpos( $block, $image_id ) !== false ) {
+				$reordered_blocks[] = $block;
+				break;
+			}
+		}
+	}
+
 	$i       = 0;
 	$content = preg_replace_callback(
 		$pattern,
-		static function () use ( $image_blocks, &$i ) {
-			$new_image_block = $image_blocks[ $i ];
+		static function () use ( $reordered_blocks, &$i ) {
+			$new_image_block = $reordered_blocks[ $i ];
 			++$i;
 			return $new_image_block;
 		},
@@ -166,6 +246,7 @@ function block_core_gallery_render( $attributes, $content ) {
 
 	return $content;
 }
+
 /**
  * Registers the `core/gallery` block on server.
  *

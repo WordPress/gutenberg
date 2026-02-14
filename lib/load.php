@@ -61,7 +61,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-6.9/post-data-block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/term-data-block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/rest-api.php';
-	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-hierarchical-sort.php';
 	require __DIR__ . '/compat/wordpress-6.9/block-comments.php';
 	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-comment-controller-6-9.php';
 
@@ -78,8 +77,13 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/class-wp-rest-edit-site-export-controller-gutenberg.php';
 	require_once __DIR__ . '/rest-api.php';
 
+	// Experimental autosaves controller override for real-time collaboration.
+	require_once __DIR__ . '/experimental/sync/class-gutenberg-rest-autosaves-controller.php';
+
 	require_once __DIR__ . '/experimental/rest-api.php';
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
+
+	require_once __DIR__ . '/experimental/class-gutenberg-hierarchical-sort.php';
 }
 
 // Experimental HTTP polling sync server.

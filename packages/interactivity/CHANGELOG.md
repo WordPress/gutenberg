@@ -179,7 +179,7 @@
 
 ### Enhancements
 
--   Export `splitTask` function from `@wordpress/interactivity` package to facilitate yielding to the main thread. See example in [async actions](https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/interactivity-api/api-reference.md#async-actions) documentation. ([#62665](https://github.com/WordPress/gutenberg/pull/62665))
+-   Export `splitTask` function from `@wordpress/interactivity` package to facilitate yielding to the main thread. See example in [async actions](https://github.com/WordPress/gutenberg/blob/trunk/docs/reference-guides/interactivity-api/directives-and-store.md#async-actions) documentation. ([#62665](https://github.com/WordPress/gutenberg/pull/62665))
 
 ## 6.1.0 (2024-06-15)
 

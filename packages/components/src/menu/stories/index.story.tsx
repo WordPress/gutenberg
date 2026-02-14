@@ -55,6 +55,11 @@ const meta: Meta< typeof Menu > = {
 			canvas: { sourceState: 'shown' },
 			source: { excludeDecorators: true },
 		},
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'When building for the Gutenberg repo, use this component instead of `DropdownMenu`. Otherwise, continue using `DropdownMenu` for now.',
+		},
 	},
 };
 export default meta;

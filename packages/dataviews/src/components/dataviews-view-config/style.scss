@@ -59,6 +59,27 @@
 	}
 }
 
+.dataviews-view-config__sort-controls > * {
+	flex: 1;
+}
+
 .dataviews-view-config__label {
 	text-wrap: nowrap;
 }
+
+.dataviews-view-config__toggle-wrapper {
+	position: relative;
+	display: inline-flex;
+}
+
+.dataviews-view-config__modified-indicator {
+	position: absolute;
+	top: $grid-unit-05;
+	right: $grid-unit-05;
+	width: $grid-unit-05;
+	height: $grid-unit-05;
+	background: var(--wp-admin-theme-color, #3858e9);
+	border-radius: 50%;
+	pointer-events: none;
+}
+

@@ -546,9 +546,9 @@
 		"parent": "interactivity-api"
 	},
 	{
-		"title": "API Reference",
-		"slug": "api-reference",
-		"markdown_source": "../docs/reference-guides/interactivity-api/api-reference.md",
+		"title": "Directives and Store",
+		"slug": "directives-and-store",
+		"markdown_source": "../docs/reference-guides/interactivity-api/directives-and-store.md",
 		"parent": "interactivity-api"
 	},
 	{

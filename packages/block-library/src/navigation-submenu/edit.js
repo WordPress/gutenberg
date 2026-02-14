@@ -13,8 +13,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
-	useInnerBlocksProps,
 	InspectorControls,
+	useInnerBlocksProps,
 	RichText,
 	useBlockProps,
 	useBlockEditingMode,
@@ -333,7 +333,7 @@ export default function NavigationSubmenuEdit( {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			<InspectorControls>
+			<InspectorControls group="content">
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }

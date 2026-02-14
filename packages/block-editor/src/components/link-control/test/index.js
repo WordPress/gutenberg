@@ -3498,6 +3498,100 @@ describe( 'URL validation', () => {
 	// isURLLike validation which checks for valid protocols.
 } );
 
+describe( 'inputValue prop', () => {
+	it( 'should use inputValue as initial value when no link value is provided', () => {
+		render( <LinkControl inputValue="wordpress" /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		expect( searchInput.value ).toBe( 'wordpress' );
+	} );
+
+	it( 'should not use inputValue when value.url is provided', () => {
+		const value = {
+			url: 'https://example.com',
+		};
+
+		render(
+			<LinkControl
+				value={ value }
+				inputValue="wordpress"
+				forceIsEditingLink
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		expect( searchInput.value ).toBe( 'https://example.com' );
+	} );
+
+	it( 'should respect user input over inputValue after user types', async () => {
+		const user = userEvent.setup();
+
+		render( <LinkControl inputValue="wordpress" /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initial value from inputValue
+		expect( searchInput.value ).toBe( 'wordpress' );
+
+		// User types something
+		await user.clear( searchInput );
+		await user.type( searchInput, 'example' );
+
+		expect( searchInput.value ).toBe( 'example' );
+	} );
+
+	it( 'should respect empty string after user clears input, not revert to inputValue', async () => {
+		const user = userEvent.setup();
+
+		render( <LinkControl inputValue="wordpress" /> );
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// Initial value from inputValue
+		expect( searchInput.value ).toBe( 'wordpress' );
+
+		// User clears the input
+		await user.clear( searchInput );
+
+		// Should be empty, NOT revert to "wordpress"
+		expect( searchInput.value ).toBe( '' );
+	} );
+
+	it( 'should call onInputChange when user types, with observable pattern', async () => {
+		const user = userEvent.setup();
+		const onInputChange = jest.fn();
+
+		render(
+			<LinkControl
+				inputValue="wordpress"
+				onInputChange={ onInputChange }
+			/>
+		);
+
+		const searchInput = screen.getByRole( 'combobox', {
+			name: 'Search or type URL',
+		} );
+
+		// User types
+		await user.type( searchInput, 'test' );
+
+		// onInputChange should be called for each character typed
+		expect( onInputChange ).toHaveBeenCalled();
+		// Last call should have the full value
+		expect( onInputChange ).toHaveBeenLastCalledWith( 'wordpresstest' );
+	} );
+} );
+
 function getSettingsDrawerToggle() {
 	return screen.queryByRole( 'button', {
 		name: 'Advanced',

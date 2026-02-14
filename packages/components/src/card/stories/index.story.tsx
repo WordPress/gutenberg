@@ -36,6 +36,11 @@ const meta: Meta< typeof Card > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'Design is in flux, and may differ from the version used in `@wordpress/dataviews`.',
+		},
 	},
 };
 

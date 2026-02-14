@@ -21,14 +21,15 @@ const { getRuntime, getSavedRuntime, saveRuntime } = require( '../runtime' );
 /**
  * Starts the development server.
  *
- * @param {Object}  options
- * @param {Object}  options.spinner A CLI spinner which indicates progress.
- * @param {boolean} options.update  If true, update sources.
- * @param {string}  options.xdebug  The Xdebug mode to set.
- * @param {string}  options.spx     The SPX mode to set.
- * @param {boolean} options.scripts Indicates whether or not lifecycle scripts should be executed.
- * @param {boolean} options.debug   True if debug mode is enabled.
- * @param {string}  options.runtime The runtime to use ('docker' or 'playground').
+ * @param {Object}      options
+ * @param {Object}      options.spinner A CLI spinner which indicates progress.
+ * @param {boolean}     options.update  If true, update sources.
+ * @param {string}      options.xdebug  The Xdebug mode to set.
+ * @param {string}      options.spx     The SPX mode to set.
+ * @param {boolean}     options.scripts Indicates whether or not lifecycle scripts should be executed.
+ * @param {boolean}     options.debug   True if debug mode is enabled.
+ * @param {string}      options.runtime The runtime to use ('docker' or 'playground').
+ * @param {string|null} options.config  Path to a custom .wp-env.json configuration file.
  */
 module.exports = async function start( {
 	spinner,
@@ -38,6 +39,7 @@ module.exports = async function start( {
 	scripts,
 	debug,
 	runtime: runtimeName = 'docker',
+	config: customConfigPath,
 } ) {
 	spinner.text = 'Reading configuration.';
 
@@ -48,7 +50,7 @@ module.exports = async function start( {
 		await checkForLegacyInstall( spinner );
 	}
 
-	const config = await loadConfig( path.resolve( '.' ) );
+	const config = await loadConfig( path.resolve( '.' ), customConfigPath );
 	config.debug = debug;
 
 	// Check if switching runtimes and prompt user to destroy old environment first.

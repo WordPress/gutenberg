@@ -37,7 +37,6 @@ export default function Edit( {
 	clientId,
 	context,
 	isSelected,
-	setAttributes,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	const focusRef = useRef();
@@ -161,8 +160,6 @@ export default function Edit( {
 	return (
 		<section { ...innerBlocksProps }>
 			<Controls
-				attributes={ attributes }
-				setAttributes={ setAttributes }
 				tabsClientId={ tabsClientId }
 				blockIndex={ blockIndex }
 				isDefaultTab={ isDefaultTab }

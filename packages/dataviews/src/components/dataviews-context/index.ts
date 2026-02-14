@@ -58,6 +58,7 @@ type DataViewsContextType< Item > = {
 	empty?: ReactNode;
 	hasInfiniteScrollHandler: boolean;
 	itemListLabel?: string;
+	onReset?: ( () => void ) | false;
 };
 
 const DataViewsContext = createContext< DataViewsContextType< any > >( {
