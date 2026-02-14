@@ -19,7 +19,7 @@ const v1 = {
 		averageReadingSpeed: {
 			type: 'number',
 			default: 189,
-		}
+		},
 	},
 	supports: {
 		anchor: true,
