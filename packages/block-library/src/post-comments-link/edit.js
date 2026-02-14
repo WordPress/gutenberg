@@ -78,7 +78,6 @@ function PostCommentsLinkEdit( { context } ) {
 			) }
 		</div>
 	);
-
 }
 
 export default PostCommentsLinkEdit;
