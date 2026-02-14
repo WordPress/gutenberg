@@ -10,6 +10,13 @@
 		"innerContent": []
 	},
 	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
 		"blockName": "core/post-terms",
 		"attrs": {
 			"term": "category",
@@ -20,7 +27,14 @@
 		"innerContent": []
 	},
 	{
-		"blockName": "core/post-terms",
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
+	},
+	{
+		"blockName": "post-terms",
 		"attrs": {
 			"term": "category",
 			"textAlign": "right"
