@@ -772,8 +772,8 @@ Show minutes required to finish reading the post. Can also show a word count. ([
 
 -	**Name:** core/post-time-to-read
 -	**Category:** theme
--	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
--	**Attributes:** averageReadingSpeed, displayAsRange, displayMode, textAlign
+-	**Supports:** anchor, color (background, gradients, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textAlign), ~~html~~
+-	**Attributes:** averageReadingSpeed, displayAsRange, displayMode
 
 ## Title
 
