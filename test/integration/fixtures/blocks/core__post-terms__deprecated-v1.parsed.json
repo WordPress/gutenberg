@@ -3,11 +3,7 @@
 		"blockName": "core/post-terms",
 		"attrs": {
 			"term": "category",
-			"style": {
-				"typography": {
-					"textAlign": "left"
-				}
-			}
+			"textAlign": "left"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
@@ -17,11 +13,7 @@
 		"blockName": "core/post-terms",
 		"attrs": {
 			"term": "category",
-			"style": {
-				"typography": {
-					"textAlign": "center"
-				}
-			}
+			"textAlign": "center"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
@@ -31,11 +23,7 @@
 		"blockName": "core/post-terms",
 		"attrs": {
 			"term": "category",
-			"style": {
-				"typography": {
-					"textAlign": "right"
-				}
-			}
+			"textAlign": "right"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
