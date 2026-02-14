@@ -35,3 +35,9 @@ $pages_file = __DIR__ . '/pages.php';
 if ( file_exists( $pages_file ) ) {
 	require_once $pages_file;
 }
+
+// Load dashboard widgets registration.
+$widgets_file = __DIR__ . '/dashboard-widgets.php';
+if ( file_exists( $widgets_file ) ) {
+	require_once $widgets_file;
+}
