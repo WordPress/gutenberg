@@ -14,7 +14,7 @@ const v1 = {
 		},
 		displayMode: {
 			type: 'string',
-			default: "time"
+			default: 'time'
 		},
 		averageReadingSpeed: {
 			type: 'number',
