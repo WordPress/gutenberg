@@ -5,6 +5,7 @@
 		"attributes": {
 			"prefix": "",
 			"separator": ", ",
+			"suffix": "",
 			"term": "category",
 			"style": {
 				"typography": {
@@ -18,6 +19,9 @@
 		"name": "core/post-terms",
 		"isValid": true,
 		"attributes": {
+			"prefix": "",
+			"separator": ", ",
+			"suffix": "",
 			"term": "category",
 			"style": {
 				"typography": {
@@ -31,6 +35,9 @@
 		"name": "core/post-terms",
 		"isValid": true,
 		"attributes": {
+			"prefix": "",
+			"separator": ", ",
+			"suffix": "",
 			"term": "category",
 			"style": {
 				"typography": {
