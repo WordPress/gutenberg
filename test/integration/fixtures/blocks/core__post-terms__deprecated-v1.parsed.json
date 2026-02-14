@@ -34,7 +34,7 @@
 		"innerContent": [ "\n\n" ]
 	},
 	{
-		"blockName": "post-terms",
+		"blockName": "core/post-terms",
 		"attrs": {
 			"term": "category",
 			"textAlign": "right"
