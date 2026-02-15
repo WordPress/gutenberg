@@ -49,7 +49,6 @@ export default function PostNavigationLinkEdit( {
 
 	const ariaLabel = isNext ? __( 'Next post' ) : __( 'Previous post' );
 	const blockProps = useBlockProps();
-
 	const taxonomies = useSelect(
 		( select ) => {
 			const { getTaxonomies } = select( coreStore );
