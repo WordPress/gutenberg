@@ -2,7 +2,8 @@
 	{
 		"blockName": "core/post-navigation-link",
 		"attrs": {
-			"textAlign": "left"
+			"textAlign": "left",
+			"type": "previous"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
@@ -18,7 +19,8 @@
 	{
 		"blockName": "core/post-navigation-link",
 		"attrs": {
-			"textAlign": "center"
+			"textAlign": "center",
+			"type": "previous"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
@@ -34,7 +36,8 @@
 	{
 		"blockName": "core/post-navigation-link",
 		"attrs": {
-			"textAlign": "right"
+			"textAlign": "right",
+			"type": "previous"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
