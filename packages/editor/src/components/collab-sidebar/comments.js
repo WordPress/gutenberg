@@ -59,6 +59,7 @@ export function Comments( {
 	reflowComments,
 	isFloating = false,
 	commentLastUpdated,
+	reactionsMap,
 } ) {
 	const [ heights, setHeights ] = useState( {} );
 	const [ boardOffsets, setBoardOffsets ] = useState( {} );
@@ -433,6 +434,7 @@ export function Comments( {
 					setHeights={ setHeights }
 					setBlockRef={ setBlockRef }
 					commentLastUpdated={ commentLastUpdated }
+					reactionsMap={ reactionsMap }
 					onKeyDown={ ( event ) =>
 						handleThreadNavigation(
 							event,
@@ -460,6 +462,7 @@ function Thread( {
 	setHeights,
 	setBlockRef,
 	commentLastUpdated,
+	reactionsMap,
 	onKeyDown,
 } ) {
 	const { toggleBlockHighlight, selectBlock, toggleBlockSpotlight } = unlock(
@@ -646,6 +649,7 @@ function Thread( {
 				} }
 				onDelete={ onCommentDelete }
 				onToggleReaction={ onToggleReaction }
+				reactions={ reactionsMap?.[ thread.id ] }
 				reflowComments={ reflowComments }
 			/>
 			{ isSelected &&
@@ -658,6 +662,7 @@ function Thread( {
 						onEdit={ onEditComment }
 						onDelete={ onCommentDelete }
 						onToggleReaction={ onToggleReaction }
+						reactions={ reactionsMap?.[ reply.id ] }
 						reflowComments={ reflowComments }
 					/>
 				) ) }
@@ -695,6 +700,7 @@ function Thread( {
 					onEdit={ onEditComment }
 					onDelete={ onCommentDelete }
 					onToggleReaction={ onToggleReaction }
+					reactions={ reactionsMap?.[ lastReply.id ] }
 					reflowComments={ reflowComments }
 				/>
 			) }
@@ -771,6 +777,7 @@ const CommentBoard = ( {
 	onEdit,
 	onDelete,
 	onToggleReaction,
+	reactions,
 	reflowComments,
 } ) => {
 	const [ actionState, setActionState ] = useState( false );
@@ -986,7 +993,7 @@ const CommentBoard = ( {
 			) }
 			{ isExpanded && (
 				<ReactionDisplay
-					reactions={ thread.meta?._wp_note_reactions }
+					reactions={ reactions }
 					onToggleReaction={ ( emoji ) =>
 						onToggleReaction?.( {
 							commentId: thread.id,

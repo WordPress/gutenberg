@@ -10,7 +10,7 @@
 class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller {
 
 	public function get_items_permissions_check( $request ) {
-		$is_note         = 'note' === $request['type'];
+		$is_note         = in_array( $request['type'], array( 'note', 'note_reaction' ), true );
 		$is_edit_context = 'edit' === $request['context'];
 
 		if ( ! empty( $request['post'] ) ) {
@@ -99,9 +99,9 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			return $comment;
 		}
 
-		// Re-map edit context capabilities when requesting `note` type.
+		// Re-map edit context capabilities when requesting `note` or `note_reaction` type.
 		// Note: This is only relevant change for the backport.
-		$edit_cap = 'note' === $comment->comment_type ? array( 'edit_comment', $comment->comment_ID ) : array( 'moderate_comments' );
+		$edit_cap = in_array( $comment->comment_type, array( 'note', 'note_reaction' ), true ) ? array( 'edit_comment', $comment->comment_ID ) : array( 'moderate_comments' );
 		if ( ! empty( $request['context'] ) && 'edit' === $request['context'] && ! current_user_can( ...$edit_cap ) ) {
 			return new WP_Error(
 				'rest_forbidden_context',
@@ -132,7 +132,7 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 	}
 
 	public function create_item_permissions_check( $request ) {
-		$is_note = ! empty( $request['type'] ) && 'note' === $request['type'];
+		$is_note = ! empty( $request['type'] ) && in_array( $request['type'], array( 'note', 'note_reaction' ), true );
 
 		// Note: This is only relevant change for the backport.
 		if ( ! is_user_logged_in() && $is_note ) {
@@ -292,12 +292,64 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 
 		// Note: Removes non-default comment type check for the backport.
 		// Do not allow comments to be created with a non-core type.
-		if ( ! empty( $request['type'] ) && ! in_array( $request['type'], array( 'comment', 'note' ), true ) ) {
+		if ( ! empty( $request['type'] ) && ! in_array( $request['type'], array( 'comment', 'note', 'note_reaction' ), true ) ) {
 			return new WP_Error(
 				'rest_invalid_comment_type',
 				__( 'Cannot create a comment with that type.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
+		}
+
+		// Validate note_reaction specific requirements.
+		if ( ! empty( $request['type'] ) && 'note_reaction' === $request['type'] ) {
+			// Validate parent is a note.
+			if ( empty( $request['parent'] ) ) {
+				return new WP_Error(
+					'rest_comment_invalid_parent',
+					__( 'A reaction must have a parent note.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			$parent_comment = get_comment( $request['parent'] );
+			if ( ! $parent_comment || 'note' !== $parent_comment->comment_type ) {
+				return new WP_Error(
+					'rest_comment_invalid_parent',
+					__( 'A reaction must be attached to a note.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			// Validate content is a valid emoji slug.
+			$valid_slugs = array( 'heart', 'celebration', 'smile', 'eyes', 'rocket' );
+			$emoji_slug  = isset( $request['content'] ) ? wp_strip_all_tags( $request['content'] ) : '';
+			if ( ! in_array( $emoji_slug, $valid_slugs, true ) ) {
+				return new WP_Error(
+					'rest_comment_invalid_reaction',
+					__( 'Invalid reaction emoji.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			// Enforce uniqueness: prevent duplicate emoji per user per note.
+			$existing = get_comments(
+				array(
+					'parent'  => $request['parent'],
+					'user_id' => get_current_user_id(),
+					'type'    => 'note_reaction',
+					'status'  => 'any',
+				)
+			);
+
+			foreach ( $existing as $existing_reaction ) {
+				if ( wp_strip_all_tags( $existing_reaction->comment_content ) === $emoji_slug ) {
+					return new WP_Error(
+						'rest_comment_duplicate_reaction',
+						__( 'You have already reacted with this emoji.', 'gutenberg' ),
+						array( 'status' => 409 )
+					);
+				}
+			}
 		}
 
 		$prepared_comment = $this->prepare_item_for_database( $request );
@@ -378,9 +430,9 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		// Don't check for duplicates or flooding for notes.
+		// Don't check for duplicates or flooding for notes and reactions.
 		$prepared_comment['comment_approved'] =
-			'note' === $prepared_comment['comment_type'] ?
+			in_array( $prepared_comment['comment_type'], array( 'note', 'note_reaction' ), true ) ?
 			'1' :
 			wp_allow_comment( $prepared_comment, true );
 
@@ -528,7 +580,7 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 
 		// Embedding children for notes requires `type` and `status` inheritance.
 		// Note: This is only relevant change for the backport.
-		if ( isset( $links['children'] ) && 'note' === $comment->comment_type ) {
+		if ( isset( $links['children'] ) && in_array( $comment->comment_type, array( 'note', 'note_reaction' ), true ) ) {
 			$args = array(
 				'parent' => $comment->comment_ID,
 				'type'   => $comment->comment_type,
@@ -602,6 +654,11 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			isset( $check['meta']['_wp_note_status'] ) &&
 			in_array( $check['meta']['_wp_note_status'], array( 'resolved', 'reopen' ), true )
 		) {
+			return true;
+		}
+
+		// Note reactions always have content (the emoji slug).
+		if ( isset( $check['comment_type'] ) && 'note_reaction' === $check['comment_type'] ) {
 			return true;
 		}
 

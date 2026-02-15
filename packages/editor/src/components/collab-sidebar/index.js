@@ -40,10 +40,11 @@ function NotesSidebarContent( {
 	commentSidebarRef,
 	reflowComments,
 	commentLastUpdated,
+	reactionsMap,
 	isFloating = false,
 } ) {
 	const { onCreate, onEdit, onDelete, onToggleReaction } =
-		useBlockCommentsActions( reflowComments );
+		useBlockCommentsActions( reflowComments, reactionsMap );
 
 	return (
 		<VStack
@@ -72,6 +73,7 @@ function NotesSidebarContent( {
 				commentSidebarRef={ commentSidebarRef }
 				reflowComments={ reflowComments }
 				commentLastUpdated={ commentLastUpdated }
+				reactionsMap={ reactionsMap }
 				isFloating={ isFloating }
 			/>
 		</VStack>
@@ -114,6 +116,7 @@ function NotesSidebar( { postId } ) {
 		unresolvedSortedThreads,
 		reflowComments,
 		commentLastUpdated,
+		reactionsMap,
 	} = useBlockComments( postId );
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
@@ -190,6 +193,7 @@ function NotesSidebar( { postId } ) {
 					<NotesSidebarContent
 						comments={ resultComments }
 						commentSidebarRef={ commentSidebarRef }
+						reactionsMap={ reactionsMap }
 					/>
 				</PluginSidebar>
 			) }
@@ -207,6 +211,7 @@ function NotesSidebar( { postId } ) {
 						commentSidebarRef={ commentSidebarRef }
 						reflowComments={ reflowComments }
 						commentLastUpdated={ commentLastUpdated }
+						reactionsMap={ reactionsMap }
 						styles={ {
 							backgroundColor,
 						} }
