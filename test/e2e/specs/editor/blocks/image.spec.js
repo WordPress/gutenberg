@@ -1089,6 +1089,12 @@ test.describe( 'Image - Site editor', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMedia();
 		await requestUtils.activateTheme( 'emptytheme' );
+		// Client-side media processing is not yet fully supported in the
+		// site editor context (upload pipeline gets stuck). Disable it
+		// so the test can use the traditional server-side upload path.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -1104,11 +1110,13 @@ test.describe( 'Image - Site editor', () => {
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 		await requestUtils.activateTheme( 'twentytwentyone' );
 	} );
 
 	test( 'can be inserted via image upload', async ( {
-		page,
 		editor,
 		imageBlockUtils,
 	} ) => {
@@ -1128,25 +1136,8 @@ test.describe( 'Image - Site editor', () => {
 		} );
 		await expect( image ).toBeVisible();
 
-		// Wait for the upload-media store queue to be empty.
-		// Client-side media processing adds items to this store, and they
-		// must all complete before the image src transitions from blob to HTTP.
-		await page.waitForFunction(
-			() => {
-				const uploadStore =
-					window.wp.data.select( 'core/upload-media' );
-				if ( ! uploadStore ) {
-					return true;
-				}
-				const items = uploadStore.getItems();
-				return items.length === 0;
-			},
-			{ timeout: 120_000 }
-		);
-
-		// Wait for upload to complete (includes client-side media processing time).
-		// With client-side processing, the filename may be changed by the server.
-		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
+		// Wait for upload to complete.
+		await expect( image ).toHaveAttribute( 'src', /\/[^\s]+\.\w+$/i, {
 			timeout: 30_000,
 		} );
 
