@@ -58,7 +58,7 @@ export default function PostTermsEdit( {
 	const hasPost = postId && postType;
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockProps = useBlockProps( {
-		className: term ? `taxonomy-${ term }` : undefined,
+		className: term && `taxonomy-${ term }`,
 	} );
 
 	return (
