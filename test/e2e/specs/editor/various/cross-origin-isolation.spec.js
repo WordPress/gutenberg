@@ -40,9 +40,7 @@ test.describe( 'Cross-origin isolation', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'should be cross-origin isolated by default', async ( {
-		page,
-	} ) => {
+	test( 'should be cross-origin isolated by default', async ( { page } ) => {
 		// Verify that cross-origin isolation IS enabled (default state
 		// now that client-side media processing is graduated).
 		const isCrossOriginIsolated = await page.evaluate(
@@ -100,8 +98,7 @@ test.describe( 'Cross-origin isolation', () => {
 		embedUtils,
 	} ) => {
 		await embedUtils.interceptRequests( {
-			'https://twitter.com/notnownikki':
-				MOCK_EMBED_RICH_SUCCESS_RESPONSE,
+			'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
 		} );
 
 		await embedUtils.insertEmbed( 'https://twitter.com/notnownikki' );
@@ -133,8 +130,7 @@ test.describe( 'Cross-origin isolation', () => {
 		);
 
 		await embedUtils.interceptRequests( {
-			'https://twitter.com/notnownikki':
-				MOCK_EMBED_RICH_SUCCESS_RESPONSE,
+			'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
 		} );
 
 		await embedUtils.insertEmbed( 'https://twitter.com/notnownikki' );
@@ -166,8 +162,7 @@ test.describe( 'Cross-origin isolation', () => {
 		);
 
 		await embedUtils.interceptRequests( {
-			'https://twitter.com/notnownikki':
-				MOCK_EMBED_RICH_SUCCESS_RESPONSE,
+			'https://twitter.com/notnownikki': MOCK_EMBED_RICH_SUCCESS_RESPONSE,
 		} );
 
 		await embedUtils.insertEmbed( 'https://twitter.com/notnownikki' );
