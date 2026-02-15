@@ -44,6 +44,8 @@ interface UploadMediaArgs {
 	signal?: AbortSignal;
 	// Whether to allow multiple files to be uploaded.
 	multiple?: boolean;
+	// Function called once all files in the batch have finished uploading (or failed).
+	onBatchSuccess?: () => void;
 }
 
 /**
@@ -60,6 +62,7 @@ interface UploadMediaArgs {
  * @param $0.wpAllowedMimeTypes List of allowed mime types and file extensions.
  * @param $0.signal             Abort signal.
  * @param $0.multiple           Whether to allow multiple files to be uploaded.
+ * @param $0.onBatchSuccess     Function called once all files in the batch have finished uploading (or failed).
  */
 export function uploadMedia( {
 	wpAllowedMimeTypes,
@@ -71,9 +74,11 @@ export function uploadMedia( {
 	onFileChange,
 	signal,
 	multiple = true,
+	onBatchSuccess,
 }: UploadMediaArgs ) {
 	if ( ! multiple && filesList.length > 1 ) {
 		onError?.( new Error( __( 'Only one file can be used here.' ) ) );
+		onBatchSuccess?.();
 		return;
 	}
 
@@ -131,7 +136,7 @@ export function uploadMedia( {
 		}
 	}
 
-	validFiles.map( async ( file, index ) => {
+	const uploadPromises = validFiles.map( async ( file, index ) => {
 		try {
 			const attachment = await uploadToServer(
 				file,
@@ -172,4 +177,6 @@ export function uploadMedia( {
 			);
 		}
 	} );
+
+	Promise.allSettled( uploadPromises ).then( () => onBatchSuccess?.() );
 }

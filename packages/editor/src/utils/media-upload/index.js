@@ -29,6 +29,7 @@ const noop = () => {};
  * @param {Function} $0.onError           Function called when an error happens.
  * @param {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
  * @param {Function} $0.onSuccess         Function called after the final representation of the file is available.
+ * @param {Function} $0.onBatchSuccess    Function called once all files in the batch have finished uploading (or failed).
  * @param {boolean}  $0.multiple          Whether to allow multiple files to be uploaded.
  */
 export default function mediaUpload( {
@@ -39,6 +40,7 @@ export default function mediaUpload( {
 	onError = noop,
 	onFileChange,
 	onSuccess,
+	onBatchSuccess,
 	multiple = true,
 } ) {
 	const { receiveEntityRecords } = dispatch( coreDataStore );
@@ -105,6 +107,7 @@ export default function mediaUpload( {
 			}
 		},
 		onSuccess,
+		onBatchSuccess,
 		additionalData: {
 			...postData,
 			...additionalData,
