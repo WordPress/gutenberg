@@ -57,5 +57,5 @@ function gutenberg_get_note_reaction_emojis() {
 	 *
 	 * @param array[] $emojis Array of emoji definitions.
 	 */
-	return apply_filters( 'note_reaction_emojis', $default_emojis );
+return apply_filters( 'note_reaction_emojis', $default_emojis );
 }
