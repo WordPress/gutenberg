@@ -97,12 +97,6 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 		return '';
 	}
 
-	$title = $attributes['metadata']['name'] ?? '';
-	if ( empty( $title ) ) {
-		$title = 'Tab Contents';
-	}
-	$title = wp_sprintf( '<h3 class="wp-block-tabs__title">%s</h3>', esc_html( $title ) );
-
 	$is_vertical = false;
 
 	$tag_processor = new WP_HTML_Tag_Processor( $content );
@@ -134,9 +128,6 @@ function block_core_tabs_render_block_callback( array $attributes, string $conte
 	$tag_processor->set_attribute( 'data-wp-on--keydown', 'actions.handleTabKeyDown' );
 
 	$output = $tag_processor->get_updated_html();
-
-	// Insert the title after the first opening tag.
-	$output = preg_replace( '/^(<[^>]+>)/', '$1' . $title, $output );
 
 	/**
 	 * Builds a client side state for just this tabs instance.
