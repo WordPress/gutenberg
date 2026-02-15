@@ -1108,6 +1108,7 @@ test.describe( 'Image - Site editor', () => {
 	} );
 
 	test( 'can be inserted via image upload', async ( {
+		page,
 		editor,
 		imageBlockUtils,
 	} ) => {
@@ -1126,6 +1127,23 @@ test.describe( 'Image - Site editor', () => {
 			name: 'This image has an empty alt attribute',
 		} );
 		await expect( image ).toBeVisible();
+
+		// Wait for the upload-media store queue to be empty.
+		// Client-side media processing adds items to this store, and they
+		// must all complete before the image src transitions from blob to HTTP.
+		await page.waitForFunction(
+			() => {
+				const uploadStore =
+					window.wp.data.select( 'core/upload-media' );
+				if ( ! uploadStore ) {
+					return true;
+				}
+				const items = uploadStore.getItems();
+				return items.length === 0;
+			},
+			{ timeout: 120_000 }
+		);
+
 		// Wait for upload to complete (includes client-side media processing time).
 		// With client-side processing, the filename may be changed by the server.
 		await expect( image ).toHaveAttribute( 'src', /^https?:\/\//, {
