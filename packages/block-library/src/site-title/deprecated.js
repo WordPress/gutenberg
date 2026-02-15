@@ -42,8 +42,12 @@ const v2 = {
 			},
 		},
 		spacing: {
-			margin: true,
 			padding: true,
+			margin: true,
+			__experimentalDefaultControls: {
+				margin: false,
+				padding: false,
+			},
 		},
 		typography: {
 			fontSize: true,
