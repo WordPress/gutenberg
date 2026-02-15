@@ -1,0 +1,47 @@
+[
+	{
+		"name": "core/site-title",
+		"isValid": true,
+		"attributes": {
+			"level": 1,
+			"isLink": true,
+			"linkTarget": "_self",
+			"style": {
+				"typography": {
+					"textAlign": "left"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/site-title",
+		"isValid": true,
+		"attributes": {
+			"level": 1,
+			"isLink": true,
+			"linkTarget": "_blank",
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		},
+		"innerBlocks": []
+	},
+	{
+		"name": "core/site-title",
+		"isValid": true,
+		"attributes": {
+			"level": 1,
+			"isLink": false,
+			"linkTarget": "_self",
+			"style": {
+				"typography": {
+					"textAlign": "right"
+				}
+			}
+		},
+		"innerBlocks": []
+	}
+]
