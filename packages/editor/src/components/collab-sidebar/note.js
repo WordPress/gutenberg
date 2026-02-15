@@ -13,7 +13,7 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 // eslint-disable-next-line @wordpress/use-recommended-components
-import { Button as UIButton } from '@wordpress/ui';
+import { Stack, Button as UIButton } from '@wordpress/ui';
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { moreVertical, published } from '@wordpress/icons';
 
@@ -22,6 +22,7 @@ import { moreVertical, published } from '@wordpress/icons';
  */
 import { NoteCard } from './note-card';
 import { NoteForm } from './note-form';
+import ReactionDisplay, { AddReactionButton } from './reaction-display';
 import { unlock } from '../../lock-unlock';
 
 const { Menu } = unlock( componentsPrivateApis );
@@ -64,6 +65,8 @@ export function Note( {
 	onEditNote,
 	onDeleteNote,
 	onResolve,
+	onToggleReaction,
+	reactions,
 } ) {
 	const [ actionState, setActionState ] = useState( null );
 	const actionButtonRef = useRef( null );
@@ -216,6 +219,29 @@ export function Note( {
 			role={ note.parent !== 0 ? 'treeitem' : undefined }
 		>
 			{ body }
+			{ isSelected && (
+				<Stack direction="row" gap="xs" justify="flex-start">
+					<AddReactionButton
+						disabled={ note.status === 'approved' }
+						onToggleReaction={ ( emoji ) =>
+							onToggleReaction?.( {
+								commentId: note.id,
+								emoji,
+							} )
+						}
+					/>
+					<ReactionDisplay
+						noteId={ note.id }
+						reactions={ reactions }
+						onToggleReaction={ ( emoji ) =>
+							onToggleReaction?.( {
+								commentId: note.id,
+								emoji,
+							} )
+						}
+					/>
+				</Stack>
+			) }
 			{ actionState === 'delete' && (
 				<ConfirmDialog
 					isOpen

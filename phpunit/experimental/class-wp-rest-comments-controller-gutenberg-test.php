@@ -455,4 +455,224 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 			'reopen'   => array( 'reopen' ),
 		);
 	}
+
+	/**
+	 * Helper to create a note on a post.
+	 *
+	 * @param int $post_id Post ID.
+	 * @param int $user_id User ID.
+	 * @return int Note comment ID.
+	 */
+	protected function create_note( $post_id, $user_id ) {
+		wp_set_current_user( $user_id );
+		$params  = array(
+			'post'    => $post_id,
+			'content' => 'Test note for reactions',
+			'author'  => $user_id,
+			'type'    => 'note',
+		);
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status(), 'Failed to create note for test setup.' );
+		$data = $response->get_data();
+		return $data['id'];
+	}
+
+	public function test_create_note_reaction() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		$params = array(
+			'post'    => $post_id,
+			'type'    => 'note_reaction',
+			'parent'  => $note_id,
+			'content' => 'heart',
+			'author'  => self::$editor_id,
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+
+		$data        = $response->get_data();
+		$new_comment = get_comment( $data['id'] );
+		$this->assertSame( 'note_reaction', $new_comment->comment_type );
+		$this->assertSame( 'heart', $new_comment->comment_content );
+		$this->assertSame( (string) $note_id, $new_comment->comment_parent );
+		$this->assertSame( '1', $new_comment->comment_approved );
+	}
+
+	public function test_cannot_create_note_reaction_without_parent() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+
+		$params = array(
+			'post'    => $post_id,
+			'type'    => 'note_reaction',
+			'content' => 'heart',
+			'author'  => self::$editor_id,
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+	}
+
+	public function test_cannot_create_note_reaction_with_invalid_emoji() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		$params = array(
+			'post'    => $post_id,
+			'type'    => 'note_reaction',
+			'parent'  => $note_id,
+			'content' => 'invalid_emoji',
+			'author'  => self::$editor_id,
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_reaction', $response, 400 );
+	}
+
+	public function test_cannot_create_duplicate_note_reaction() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		$params = array(
+			'post'    => $post_id,
+			'type'    => 'note_reaction',
+			'parent'  => $note_id,
+			'content' => 'rocket',
+			'author'  => self::$editor_id,
+		);
+
+		// First reaction should succeed.
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertSame( 201, $response->get_status() );
+
+		// Duplicate reaction should fail.
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertErrorResponse( 'rest_comment_duplicate_reaction', $response, 409 );
+	}
+
+	public function test_can_create_different_reactions_on_same_note() {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		$emojis = array( 'heart', 'rocket', 'smile' );
+		foreach ( $emojis as $emoji ) {
+			$params  = array(
+				'post'    => $post_id,
+				'type'    => 'note_reaction',
+				'parent'  => $note_id,
+				'content' => $emoji,
+				'author'  => self::$editor_id,
+			);
+			$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+			$request->add_header( 'Content-Type', 'application/json' );
+			$request->set_body( wp_json_encode( $params ) );
+			$response = rest_get_server()->dispatch( $request );
+			$this->assertSame( 201, $response->get_status() );
+		}
+	}
+
+	public function test_cannot_create_note_reaction_on_regular_comment() {
+		wp_set_current_user( self::$editor_id );
+		$post_id    = self::factory()->post->create();
+		$comment_id = self::factory()->comment->create(
+			array(
+				'comment_post_ID' => $post_id,
+				'comment_type'    => 'comment',
+			)
+		);
+
+		$params = array(
+			'post'    => $post_id,
+			'type'    => 'note_reaction',
+			'parent'  => $comment_id,
+			'content' => 'heart',
+			'author'  => self::$editor_id,
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
+	}
+
+	public function test_create_note_reaction_requires_login() {
+		wp_set_current_user( 0 );
+		$post_id = self::factory()->post->create();
+
+		$params = array(
+			'post'    => $post_id,
+			'type'    => 'note_reaction',
+			'content' => 'heart',
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertErrorResponse( 'rest_comment_login_required', $response, 401 );
+	}
+
+	/**
+	 * @dataProvider data_valid_reaction_emojis
+	 */
+	public function test_create_note_reaction_valid_emojis( $emoji ) {
+		wp_set_current_user( self::$editor_id );
+		$post_id = self::factory()->post->create();
+		$note_id = $this->create_note( $post_id, self::$editor_id );
+
+		$params = array(
+			'post'    => $post_id,
+			'type'    => 'note_reaction',
+			'parent'  => $note_id,
+			'content' => $emoji,
+			'author'  => self::$editor_id,
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/comments' );
+		$request->add_header( 'Content-Type', 'application/json' );
+		$request->set_body( wp_json_encode( $params ) );
+		$response = rest_get_server()->dispatch( $request );
+
+		$this->assertSame( 201, $response->get_status() );
+	}
+
+	public function data_valid_reaction_emojis() {
+		return array(
+			'heart'       => array( 'heart' ),
+			'celebration' => array( 'celebration' ),
+			'smile'       => array( 'smile' ),
+			'eyes'        => array( 'eyes' ),
+			'rocket'      => array( 'rocket' ),
+		);
+	}
 }

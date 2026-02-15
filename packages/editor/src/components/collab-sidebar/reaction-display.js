@@ -265,9 +265,10 @@ export default function ReactionDisplay( { reactions, onToggleReaction } ) {
  * Standalone add-reaction button with emoji picker dropdown.
  *
  * @param {Object}   props                  Component props.
+ * @param {boolean}  props.disabled         Whether the button is disabled.
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
  */
-export function AddReactionButton( { onToggleReaction } ) {
+export function AddReactionButton( { disabled = false, onToggleReaction } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	return (
 		<Menu placement="bottom-end" open={ isOpen } onOpenChange={ setIsOpen }>
@@ -278,6 +279,8 @@ export function AddReactionButton( { onToggleReaction } ) {
 						className="editor-collab-sidebar-panel__add-reaction-button"
 						icon={ smileyIcon }
 						label={ __( 'Add reaction' ) }
+						disabled={ disabled }
+						accessibleWhenDisabled
 					/>
 				}
 			/>

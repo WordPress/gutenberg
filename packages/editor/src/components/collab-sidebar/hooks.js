@@ -56,6 +56,52 @@ export function useNoteThreads( postId ) {
 		{ enabled: !! postId && typeof postId === 'number' }
 	);
 
+	const { records: reactionRecords } = useEntityRecords(
+		'root',
+		'comment',
+		{
+			post: postId,
+			type: 'note_reaction',
+			status: 'all',
+			per_page: -1,
+		},
+		{ enabled: !! postId && typeof postId === 'number' }
+	);
+
+	// Build a reactionsMap: { [noteId]: { [emojiSlug]: [{ userId, date, reactionId }] } }
+	const reactionsMap = useMemo( () => {
+		if ( ! reactionRecords || reactionRecords.length === 0 ) {
+			return {};
+		}
+
+		const map = {};
+		reactionRecords.forEach( ( reaction ) => {
+			const noteId = reaction.parent;
+			const slug =
+				typeof reaction.content === 'object'
+					? reaction.content?.raw || reaction.content?.rendered
+					: reaction.content;
+			// Strip HTML tags from rendered content.
+			const cleanSlug = slug?.replace?.( /<[^>]*>/g, '' )?.trim();
+			if ( ! noteId || ! cleanSlug ) {
+				return;
+			}
+
+			if ( ! map[ noteId ] ) {
+				map[ noteId ] = {};
+			}
+			if ( ! map[ noteId ][ cleanSlug ] ) {
+				map[ noteId ][ cleanSlug ] = [];
+			}
+			map[ noteId ][ cleanSlug ].push( {
+				userId: reaction.author,
+				date: reaction.date,
+				reactionId: reaction.id,
+			} );
+		} );
+		return map;
+	}, [ reactionRecords ] );
+
 	const { getBlockAttributes } = useSelect( blockEditorStore );
 	const { clientIds } = useSelect( ( select ) => {
 		const { getClientIdsWithDescendants } = select( blockEditorStore );
@@ -168,6 +214,7 @@ export function useNoteThreads( postId ) {
 	return {
 		notes,
 		unresolvedNotes,
+		reactionsMap,
 	};
 }
 
@@ -269,7 +316,7 @@ function clearInlineNoteMarker(
 	}
 }
 
-export function useNoteActions( reflowComments = () => {} ) {
+export function useNoteActions( reactionsMap = {} ) {
 	const registry = useRegistry();
 	const { createNotice } = useDispatch( noticesStore );
 	const { saveEntityRecord, deleteEntityRecord } = useDispatch( coreStore );
@@ -499,71 +546,47 @@ export function useNoteActions( reflowComments = () => {} ) {
 				registry.select( coreStore ).getCurrentUser() || {};
 			const userId = currentUser.id;
 
-			// Get current comment data.
-			const comment = registry
-				.select( coreStore )
-				.getEntityRecord( 'root', 'comment', commentId );
-
-			if ( ! comment ) {
-				throw new Error( __( 'Comment not found.' ) );
-			}
-
-			// Get existing reactions or initialize empty object.
-			const existingReactions = comment.meta?._wp_note_reactions || {};
-			const emojiReactions = existingReactions[ emoji ] || [];
-			const alreadyReacted = emojiReactions.some(
+			// Check if the user already reacted with this emoji.
+			const noteReactions = reactionsMap[ commentId ] || {};
+			const emojiReactions = noteReactions[ emoji ] || [];
+			const existingReaction = emojiReactions.find(
 				( reaction ) => reaction.userId === userId
 			);
 
-			let updatedReactions;
-
-			if ( alreadyReacted ) {
-				// Remove the user's reaction.
-				const updatedEmojiReactions = emojiReactions.filter(
-					( reaction ) => reaction.userId !== userId
+			if ( existingReaction ) {
+				// Remove the reaction by deleting the comment record.
+				await deleteEntityRecord(
+					'root',
+					'comment',
+					existingReaction.reactionId,
+					undefined,
+					{ throwOnError: true }
 				);
 
-				updatedReactions = { ...existingReactions };
-				if ( updatedEmojiReactions.length > 0 ) {
-					updatedReactions[ emoji ] = updatedEmojiReactions;
-				} else {
-					delete updatedReactions[ emoji ];
-				}
-			} else {
-				// Add new reaction.
-				const newReaction = {
-					userId,
-					timestamp: new Date().toISOString(),
-				};
-
-				updatedReactions = {
-					...existingReactions,
-					[ emoji ]: [ ...emojiReactions, newReaction ],
-				};
-			}
-
-			await saveEntityRecord(
-				'root',
-				'comment',
-				{
-					id: commentId,
-					meta: {
-						_wp_note_reactions: updatedReactions,
-					},
-				},
-				{ throwOnError: true }
-			);
-
-			createNotice(
-				'snackbar',
-				alreadyReacted
-					? __( 'Reaction removed.' )
-					: __( 'Reaction added.' ),
-				{
+				createNotice( 'snackbar', __( 'Reaction removed.' ), {
 					type: 'snackbar',
 					isDismissible: true,
-				}
-			);
+				} );
+			} else {
+				// Add a new reaction as a comment record.
+				await saveEntityRecord(
+					'root',
+					'comment',
+					{
+						post: getCurrentPostId(),
+						type: 'note_reaction',
+						parent: commentId,
+						content: emoji,
+						status: 'approve',
+					},
+					{ throwOnError: true }
+				);
+
+				createNotice( 'snackbar', __( 'Reaction added.' ), {
+					type: 'snackbar',
+					isDismissible: true,
+				} );
+			}
 		} catch ( error ) {
 			onError( error );
 		}

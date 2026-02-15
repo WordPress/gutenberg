@@ -41,6 +41,8 @@ export function NoteThread( {
 	onEditNote,
 	onAddReply,
 	onDeleteNote,
+	onToggleReaction,
+	reactionsMap,
 	isSelected,
 	sidebarRef,
 	floating,
@@ -104,6 +106,12 @@ export function NoteThread( {
 		);
 		const isDialogFocused =
 			event.relatedTarget?.closest( '[role="dialog"]' );
+		// Popovers anchored from inside the note (e.g. emoji reaction
+		// pickers) portal their content to <body>, so focus moving into them
+		// looks like focus leaving the thread.
+		const isPopoverFocused = event.relatedTarget?.closest(
+			'.components-popover'
+		);
 		const isTabbing = isKeyboardTabbingRef.current;
 
 		// When another note is clicked, do nothing because the current note is automatically closed.
@@ -112,6 +120,9 @@ export function NoteThread( {
 		}
 		// When deleting a note, a dialog appears, but the note should not be collapsed.
 		if ( isDialogFocused ) {
+			return;
+		}
+		if ( isPopoverFocused ) {
 			return;
 		}
 		// When tabbing, do nothing if the focus is within the current note.
@@ -242,6 +253,8 @@ export function NoteThread( {
 				onEditNote={ onEditNote }
 				onDeleteNote={ onDeleteNote }
 				onResolve={ handleResolve }
+				onToggleReaction={ onToggleReaction }
+				reactions={ reactionsMap?.[ note.id ] }
 			/>
 			{ isSelected &&
 				allReplies.map( ( reply ) => (
@@ -252,6 +265,8 @@ export function NoteThread( {
 						isSelected={ isSelected }
 						onEditNote={ onEditNote }
 						onDeleteNote={ onDeleteNote }
+						onToggleReaction={ onToggleReaction }
+						reactions={ reactionsMap?.[ reply.id ] }
 					/>
 				) ) }
 			{ ! isSelected && restReplies.length > 0 && (
@@ -289,6 +304,8 @@ export function NoteThread( {
 					isSelected={ false }
 					onEditNote={ onEditNote }
 					onDeleteNote={ onDeleteNote }
+					onToggleReaction={ onToggleReaction }
+					reactions={ reactionsMap?.[ lastReply.id ] }
 				/>
 			) }
 			{ isSelected && (
