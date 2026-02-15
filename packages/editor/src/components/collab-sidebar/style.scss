@@ -309,6 +309,11 @@ mark.wp-note {
 		outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
 	}
 
+	// On touch devices without hover, always show the button so it's discoverable.
+	@media (hover: none) {
+		opacity: 1;
+	}
+
 	svg {
 		fill: none;
 		color: $gray-700;
