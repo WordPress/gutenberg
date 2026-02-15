@@ -38,9 +38,8 @@
 		z-index: 1;
 	}
 
-	// Show the add-reaction button on thread hover or focus.
-	&:hover,
-	&:focus-within {
+	// Show the add-reaction button on thread hover.
+	&:hover {
 		.editor-collab-sidebar-panel__add-reaction-button {
 			opacity: 1;
 		}
