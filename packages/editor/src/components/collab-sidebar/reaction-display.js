@@ -17,6 +17,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import ReactionEmojiPicker, {
 	getEmojiBySlug,
 	getLabelBySlug,
+	useReactionEmojis,
 } from './reaction-emoji-picker';
 import { unlock } from '../../lock-unlock';
 
@@ -88,9 +89,10 @@ function getReactedSlugs( reactions ) {
  * @param {Object} users   Map of user data by ID.
  * @param {Array}  userIds Array of user IDs who reacted.
  * @param {string} slug    The reaction slug.
+ * @param {Array}  emojis  The emoji list to look up labels.
  * @return {string} The tooltip text.
  */
-function getReactionTooltipText( users, userIds, slug ) {
+function getReactionTooltipText( users, userIds, slug, emojis ) {
 	const names = userIds
 		.map( ( id ) => users?.[ id ]?.name )
 		.filter( Boolean );
@@ -99,7 +101,7 @@ function getReactionTooltipText( users, userIds, slug ) {
 		return '';
 	}
 
-	const emojiLabel = getLabelBySlug( slug );
+	const emojiLabel = getLabelBySlug( slug, emojis );
 
 	if ( names.length === 1 ) {
 		return sprintf(
@@ -143,6 +145,7 @@ function getReactionTooltipText( users, userIds, slug ) {
  * @param {Function} props.onToggleReaction Callback to toggle a reaction.
  */
 export default function ReactionDisplay( { reactions, onToggleReaction } ) {
+	const emojis = useReactionEmojis();
 	const currentUserId = useSelect( ( select ) => {
 		const { getCurrentUser } = select( coreStore );
 		const user = getCurrentUser();
@@ -204,7 +207,7 @@ export default function ReactionDisplay( { reactions, onToggleReaction } ) {
 					slug,
 					currentUserId
 				);
-				const emoji = getEmojiBySlug( slug );
+				const emoji = getEmojiBySlug( slug, emojis );
 
 				const reactionUserIds = ( reactions?.[ slug ] || [] ).map(
 					( r ) => r.userId
@@ -212,7 +215,8 @@ export default function ReactionDisplay( { reactions, onToggleReaction } ) {
 				const tooltipText = getReactionTooltipText(
 					users,
 					reactionUserIds,
-					slug
+					slug,
+					emojis
 				);
 
 				// Use tooltip text when user data is loaded, otherwise fall back to basic label.
