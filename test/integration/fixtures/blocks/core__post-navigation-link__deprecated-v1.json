@@ -4,7 +4,6 @@
 		"isValid": true,
 		"attributes": {
 			"type": "previous",
-			"label": "",
 			"showTitle": false,
 			"linkLabel": false,
 			"arrow": "none",
@@ -22,7 +21,6 @@
 		"isValid": true,
 		"attributes": {
 			"type": "previous",
-			"label": "",
 			"showTitle": false,
 			"linkLabel": false,
 			"arrow": "none",
@@ -40,7 +38,6 @@
 		"isValid": true,
 		"attributes": {
 			"type": "previous",
-			"label": "",
 			"showTitle": false,
 			"linkLabel": false,
 			"arrow": "none",
