@@ -10,6 +10,7 @@ export {
 	useColorProps as __experimentalUseColorProps,
 	useCustomSides as __experimentalUseCustomSides,
 	getSpacingClassesAndStyles as __experimentalGetSpacingClassesAndStyles,
+	getDimensionsClassesAndStyles,
 	getGapCSSValue as __experimentalGetGapCSSValue,
 	getShadowClassesAndStyles as __experimentalGetShadowClassesAndStyles,
 	useCachedTruthy,

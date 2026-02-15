@@ -99,6 +99,7 @@ export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
 export { getShadowClassesAndStyles } from './use-shadow-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';
 export { getSpacingClassesAndStyles } from './use-spacing-props';
+export { getDimensionsClassesAndStyles } from './use-dimensions-props';
 export { getTypographyClassesAndStyles } from './use-typography-props';
 export { getGapCSSValue } from './gap';
 export { useCachedTruthy } from './use-cached-truthy';
