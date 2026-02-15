@@ -22,7 +22,7 @@
 			"level": 2,
 			"levelOptions": [ 0, 1, 2, 3, 4, 5, 6 ],
 			"isLink": true,
-			"linkTarget": "_blank",
+			"linkTarget": "_self",
 			"style": {
 				"typography": {
 					"textAlign": "center"
@@ -37,7 +37,7 @@
 		"attributes": {
 			"level": 2,
 			"levelOptions": [ 0, 1, 2, 3, 4, 5, 6 ],
-			"isLink": false,
+			"isLink": true,
 			"linkTarget": "_self",
 			"style": {
 				"typography": {
