@@ -37,9 +37,8 @@
 		z-index: 1;
 	}
 
-	// Show the add-reaction button on thread hover or focus.
-	&:hover,
-	&:focus-within {
+	// Show the add-reaction button on thread hover.
+	&:hover {
 		.editor-collab-sidebar-panel__add-reaction-button {
 			opacity: 1;
 		}
@@ -264,6 +263,11 @@
 		opacity: 1;
 		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
 		outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
+	}
+
+	// On touch devices without hover, always show the button so it's discoverable.
+	@media (hover: none) {
+		opacity: 1;
 	}
 
 	svg {
