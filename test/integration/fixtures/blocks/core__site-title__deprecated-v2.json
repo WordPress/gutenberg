@@ -3,7 +3,8 @@
 		"name": "core/site-title",
 		"isValid": true,
 		"attributes": {
-			"level": 1,
+			"level": 2,
+			"levelOptions": [ 0, 1, 2, 3, 4, 5, 6 ],
 			"isLink": true,
 			"linkTarget": "_self",
 			"style": {
@@ -18,7 +19,8 @@
 		"name": "core/site-title",
 		"isValid": true,
 		"attributes": {
-			"level": 1,
+			"level": 2,
+			"levelOptions": [ 0, 1, 2, 3, 4, 5, 6 ],
 			"isLink": true,
 			"linkTarget": "_blank",
 			"style": {
@@ -33,7 +35,8 @@
 		"name": "core/site-title",
 		"isValid": true,
 		"attributes": {
-			"level": 1,
+			"level": 2,
+			"levelOptions": [ 0, 1, 2, 3, 4, 5, 6 ],
 			"isLink": false,
 			"linkTarget": "_self",
 			"style": {
