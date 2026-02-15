@@ -2,8 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { select } from '@wordpress/data';
 import { paragraph as icon } from '@wordpress/icons';
 import { privateApis as blocksPrivateApis } from '@wordpress/blocks';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -32,13 +34,29 @@ export const settings = {
 		},
 	},
 	__experimentalLabel( attributes, { context } ) {
+		const { content } = attributes;
 		const customName = attributes?.metadata?.name;
+		const hasContent = content?.trim().length > 0;
 
-		if (
-			( context === 'list-view' || context === 'breadcrumb' ) &&
-			customName
-		) {
+		if ( context === 'breadcrumb' && customName ) {
 			return customName;
+		}
+
+		if ( context === 'list-view' ) {
+			if ( customName ) {
+				return customName;
+			}
+
+			if ( hasContent ) {
+				const autoLabelContentBlocks = select( preferencesStore ).get(
+					'core',
+					'autoLabelContentBlocks',
+					true
+				);
+				if ( autoLabelContentBlocks ) {
+					return content;
+				}
+			}
 		}
 
 		if ( context === 'accessibility' ) {
@@ -46,8 +64,7 @@ export const settings = {
 				return customName;
 			}
 
-			const { content } = attributes;
-			return ! content || content.length === 0 ? __( 'Empty' ) : content;
+			return ! content || content?.length === 0 ? __( 'Empty' ) : content;
 		}
 	},
 	transforms,

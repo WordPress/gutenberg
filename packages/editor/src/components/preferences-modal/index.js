@@ -120,6 +120,14 @@ function PreferencesModalContents( { extraSections = {} } ) {
 									) }
 									label={ __( 'Show starter patterns' ) }
 								/>
+								<PreferenceToggleControl
+									scope="core"
+									featureName="autoLabelContentBlocks"
+									help={ __(
+										'Use content as labels within list view.'
+									) }
+									label={ __( 'Auto-label content blocks' ) }
+								/>
 							</PreferencesModalSection>
 							<PreferencesModalSection
 								title={ __( 'Document settings' ) }

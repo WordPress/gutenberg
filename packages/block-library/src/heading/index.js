@@ -3,11 +3,13 @@
  */
 import { heading as icon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
+import { select } from '@wordpress/data';
 import {
 	privateApis as blocksPrivateApis,
 	getBlockType,
 	unregisterBlockVariation,
 } from '@wordpress/blocks';
+import { store as preferencesStore } from '@wordpress/preferences';
 
 /**
  * Internal dependencies
@@ -45,7 +47,17 @@ export const settings = {
 		// In the list view, use the block's content as the label.
 		// If the content is empty, fall back to the default label.
 		if ( context === 'list-view' && ( customName || hasContent ) ) {
-			return customName || content;
+			if ( customName ) {
+				return customName;
+			}
+			const autoLabelContentBlocks = select( preferencesStore ).get(
+				'core',
+				'autoLabelContentBlocks',
+				true
+			);
+			if ( autoLabelContentBlocks && hasContent ) {
+				return content;
+			}
 		}
 
 		if ( context === 'breadcrumb' && customName ) {

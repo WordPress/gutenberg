@@ -61,6 +61,7 @@ export function initializeEditor(
 
 	dispatch( preferencesStore ).setDefaults( 'core', {
 		allowRightClickOverrides: true,
+		autoLabelContentBlocks: true,
 		editorMode: 'visual',
 		editorTool: 'edit',
 		fixedToolbar: false,
