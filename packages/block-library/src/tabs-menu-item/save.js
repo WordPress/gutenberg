@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -36,11 +35,7 @@ export default function save( { attributes } ) {
 		role: 'tab',
 	} );
 
-	return (
-		<button { ...blockProps }>
-			<span className="screen-reader-text">
-				{ __( 'Tab menu item' ) }
-			</span>
-		</button>
-	);
+	// The button content is replaced by PHP during rendering (see index.php),
+	// so we output an empty button as a template.
+	return <button { ...blockProps } />;
 }
