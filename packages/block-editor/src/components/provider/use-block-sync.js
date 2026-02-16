@@ -296,10 +296,15 @@ export default function useBlockSync( {
 			// subsequent renders.
 			pendingChangesRef.current.outgoing = [];
 			setControlledBlocks();
-		}
 
-		// Restore selection from context if it targets our scope.
-		restoreSelection();
+			// Restore selection from context if it targets our scope.
+			// Only done when blocks were reset from an external source
+			// (undo/redo, entity navigation) — NOT for outgoing changes,
+			// because dispatching resetSelection between keystrokes breaks
+			// the isUpdatingSameBlockAttribute chain and creates per-
+			// character undo levels.
+			restoreSelection();
+		}
 	}, [ controlledBlocks, clientId ] );
 
 	useEffect( () => {

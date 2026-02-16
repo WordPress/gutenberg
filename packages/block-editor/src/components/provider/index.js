@@ -121,6 +121,18 @@ function mediaUpload(
 	} );
 }
 
+/**
+ * Calls useBlockSync as a child of SelectionContext.Provider so that the
+ * hook can read selection state from the context provided by this tree
+ * rather than from a parent provider (which may not exist for the root).
+ *
+ * @param {Object} props Props forwarded to useBlockSync.
+ */
+function BlockSyncEffect( props ) {
+	useBlockSync( props );
+	return null;
+}
+
 export const ExperimentalBlockEditorProvider = withRegistryProvider(
 	( props ) => {
 		const {
@@ -165,9 +177,6 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			__experimentalUpdateSettings,
 		] );
 
-		// Syncs the entity provider with changes in the block-editor store.
-		useBlockSync( props );
-
 		const selectionContextValue = useMemo(
 			() => ( {
 				selection: props.selection ?? undefined,
@@ -177,13 +186,21 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 		);
 
 		const children = (
+			<SlotFillProvider passthrough>
+				{ ! settings?.isPreviewMode && <KeyboardShortcuts.Register /> }
+				<BlockRefsProvider>{ props.children }</BlockRefsProvider>
+			</SlotFillProvider>
+		);
+
+		const content = (
 			<SelectionContext.Provider value={ selectionContextValue }>
-				<SlotFillProvider passthrough>
-					{ ! settings?.isPreviewMode && (
-						<KeyboardShortcuts.Register />
-					) }
-					<BlockRefsProvider>{ props.children }</BlockRefsProvider>
-				</SlotFillProvider>
+				<BlockSyncEffect
+					clientId={ props.clientId }
+					value={ props.value }
+					onChange={ props.onChange }
+					onInput={ props.onInput }
+				/>
+				{ children }
 			</SelectionContext.Provider>
 		);
 
@@ -193,12 +210,12 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 					settings={ mediaUploadSettings }
 					useSubRegistry={ false }
 				>
-					{ children }
+					{ content }
 				</MediaUploadProvider>
 			);
 		}
 
-		return children;
+		return content;
 	}
 );
 
