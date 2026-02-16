@@ -266,6 +266,7 @@ const getAllBlocks = () => {
 		postCommentsForm,
 		tableOfContents,
 		homeLink,
+		icon,
 		logInOut,
 		navigationOverlayClose,
 		termCount,
@@ -293,10 +294,6 @@ const getAllBlocks = () => {
 	if ( window?.__experimentalEnableBlockExperiments ) {
 		blocks.push( playlist );
 		blocks.push( playlistTrack );
-	}
-
-	if ( window?.__experimentalEnableIconBlock ) {
-		blocks.push( icon );
 	}
 
 	// When in a WordPress context, conditionally

@@ -69,11 +69,6 @@ function gutenberg_enable_block_experiments() {
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-block-experiments', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableBlockExperiments = true', 'before' );
 	}
-
-	// Adding explicit support for the Icon block if the SVG icon registry is active.
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-svg-icon-registry', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableIconBlock = true', 'before' );
-	}
 }
 
 add_action( 'admin_init', 'gutenberg_enable_block_experiments' );
