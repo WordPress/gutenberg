@@ -1267,7 +1267,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').ComponentType`: The component.
+-   `React.ComponentType`: The component.
 
 ### PostSchedule
 

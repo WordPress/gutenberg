@@ -236,7 +236,7 @@ export function CommandMenu() {
 
 	useShortcut(
 		'core/commands',
-		/** @type {import('react').KeyboardEventHandler} */
+		/** @type {React.KeyboardEventHandler} */
 		withIgnoreIMEEvents( ( event ) => {
 			// Bails to avoid obscuring the effect of the preceding handler(s).
 			if ( event.defaultPrevented ) {

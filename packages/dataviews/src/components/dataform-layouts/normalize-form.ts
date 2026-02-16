@@ -60,6 +60,7 @@ function normalizeLayout( layout?: Layout ): NormalizedLayout {
 			labelPosition: layout?.labelPosition ?? 'side',
 			openAs: layout?.openAs ?? 'dropdown',
 			summary: normalizedSummary,
+			editVisibility: layout?.editVisibility ?? 'on-hover',
 		} satisfies NormalizedPanelLayout;
 	} else if ( layout?.type === 'card' ) {
 		if ( layout.withHeader === false ) {

@@ -112,3 +112,33 @@ describe( 'getEntityRecord', () => {
 		expect( triggerFetch ).not.toHaveBeenCalled();
 	} );
 } );
+
+describe( 'clearEntityRecordEdits', () => {
+	let registry;
+
+	beforeEach( () => {
+		registry = createTestRegistry();
+		triggerFetch.mockReset();
+	} );
+
+	it( 'should return the persisted record after clearing edits', () => {
+		const post = createTestPost( 1 );
+		const dispatch = registry.dispatch( coreDataStore );
+		const select = registry.select( coreDataStore );
+
+		dispatch.receiveEntityRecords( 'postType', 'post', post );
+		dispatch.editEntityRecord( 'postType', 'post', post.id, {
+			slug: 'updated-slug',
+		} );
+
+		expect(
+			select.getEditedEntityRecord( 'postType', 'post', post.id ).slug
+		).toBe( 'updated-slug' );
+
+		dispatch.clearEntityRecordEdits( 'postType', 'post', post.id );
+
+		expect(
+			select.getEditedEntityRecord( 'postType', 'post', post.id )
+		).toEqual( select.getRawEntityRecord( 'postType', 'post', post.id ) );
+	} );
+} );

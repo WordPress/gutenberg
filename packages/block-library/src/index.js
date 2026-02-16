@@ -276,15 +276,12 @@ const getAllBlocks = () => {
 		queryTitle,
 		postAuthorBiography,
 		breadcrumbs,
+		tab,
+		tabs,
+		tabsMenu,
+		tabsMenuItem,
+		tabPanel,
 	];
-
-	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( tab );
-		blocks.push( tabs );
-		blocks.push( tabsMenu );
-		blocks.push( tabsMenuItem );
-		blocks.push( tabPanel );
-	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
 		blocks.push( form );

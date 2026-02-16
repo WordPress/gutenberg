@@ -115,38 +115,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		setAttributes,
 	} );
 
-	const linkTitle =
-		entityRecord?.title?.rendered ||
-		entityRecord?.title ||
-		entityRecord?.name;
-
-	const linkImage = useSelect(
-		( select ) => {
-			// Only fetch for post-type entities with featured media
-			if ( ! entityRecord?.featured_media ) {
-				return null;
-			}
-
-			const { getEntityRecord } = select( coreStore );
-
-			// Get the media entity to fetch the image URL
-			const media = getEntityRecord(
-				'postType',
-				'attachment',
-				entityRecord.featured_media
-			);
-
-			// Return the thumbnail or medium size URL, fallback to source_url
-			return (
-				media?.media_details?.sizes?.thumbnail?.source_url ||
-				media?.media_details?.sizes?.medium?.source_url ||
-				media?.source_url ||
-				null
-			);
-		},
-		[ entityRecord?.featured_media ]
-	);
-
 	const onNavigateToEntityRecord = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
@@ -168,10 +136,8 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 
 	const preview = useLinkPreview( {
 		url,
-		title: linkTitle,
-		image: linkImage,
+		entityRecord,
 		type: attributes.type,
-		entityStatus: entityRecord?.status,
 		hasBinding: hasUrlBinding,
 		isEntityAvailable: isBoundEntityAvailable,
 	} );

@@ -17,7 +17,7 @@ import type { WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE } from './config';
 /* globalThis */
 declare global {
 	interface Window {
-		__wpSyncEnabled?: string;
+		_wpCollaborationEnabled?: string;
 	}
 }
 

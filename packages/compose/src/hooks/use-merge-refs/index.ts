@@ -2,23 +2,13 @@
  * WordPress dependencies
  */
 import { useRef, useCallback, useLayoutEffect } from '@wordpress/element';
+import type { MutableRefObject, Ref, RefCallback } from 'react';
 
-/**
- * @template T
- * @typedef {T extends import('react').Ref<infer R> ? R : never} TypeFromRef
- */
-
-/**
- * @template T
- * @param {import('react').Ref<T>} ref
- * @param {T}                      value
- */
-function assignRef( ref, value ) {
+function assignRef< T >( ref: Ref< T >, value: T ) {
 	if ( typeof ref === 'function' ) {
 		ref( value );
 	} else if ( ref && ref.hasOwnProperty( 'current' ) ) {
-		/** @type {import('react').MutableRefObject<T>} */ ( ref ).current =
-			value;
+		( ref as MutableRefObject< T > ).current = value;
 	}
 }
 
@@ -60,17 +50,16 @@ function assignRef( ref, value ) {
  * return <div ref={ mergedRefs } />;
  * ```
  *
- * @template {import('react').Ref<any>} TRef
- * @param {Array<TRef>} refs The refs to be merged.
- *
- * @return {import('react').RefCallback<TypeFromRef<TRef>>} The merged ref callback.
+ * @param refs The refs to be merged.
+ * @return The merged ref callback.
  */
-export default function useMergeRefs( refs ) {
-	const element = useRef();
+export default function useMergeRefs< T >(
+	refs: Ref< T >[]
+): RefCallback< T > {
+	const element = useRef( null );
 	const isAttachedRef = useRef( false );
 	const didElementChangeRef = useRef( false );
-	/** @type {import('react').MutableRefObject<TRef[]>} */
-	const previousRefsRef = useRef( [] );
+	const previousRefsRef = useRef< Ref< T >[] >( [] );
 	const currentRefsRef = useRef( refs );
 
 	// Update on render before the ref callback is called, so the ref callback
@@ -105,7 +94,7 @@ export default function useMergeRefs( refs ) {
 
 	// There should be no dependencies so that `callback` is only called when
 	// the node changes.
-	return useCallback( ( value ) => {
+	return useCallback( ( value: T | null ) => {
 		// Update the element so it can be used when calling ref callbacks on a
 		// dependency change.
 		assignRef( element, value );

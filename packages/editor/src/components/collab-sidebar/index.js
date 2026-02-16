@@ -31,7 +31,6 @@ import {
 	useBlockCommentsActions,
 	useEnableFloatingSidebar,
 } from './hooks';
-import { focusCommentThread } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
@@ -81,7 +80,9 @@ function NotesSidebarContent( {
 function NotesSidebar( { postId } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
-	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockSpotlight, selectBlock } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
@@ -160,11 +161,18 @@ function NotesSidebar( { postId } ) {
 		? resultComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
 
-	async function openTheSidebar() {
+	async function openTheSidebar( selectedClientId ) {
 		const prevArea = await getActiveComplementaryArea( 'core' );
 		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
+		const targetClientId =
+			selectedClientId && selectedClientId !== clientId
+				? selectedClientId
+				: clientId;
+		const targetNote = resultComments.find(
+			( note ) => note.blockClientId === targetClientId
+		);
 
-		if ( currentThread?.status === 'approved' ) {
+		if ( targetNote?.status === 'approved' ) {
 			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
 		} else if ( ! activeNotesArea || ! showAllNotesSidebar ) {
 			enableComplementaryArea(
@@ -179,14 +187,11 @@ function NotesSidebar( { postId } ) {
 			return;
 		}
 
-		selectNote( currentThread ? currentThread.id : 'new' );
-		focusCommentThread(
-			currentThread?.id,
-			commentSidebarRef.current,
-			// Focus the textarea when creating a new note.
-			! currentThread ? 'textarea' : undefined
-		);
-		toggleBlockSpotlight( clientId, true );
+		// A special case for the List View, where block selection isn't required to trigger an action.
+		// The action won't do anything if the block is already selected.
+		selectBlock( targetClientId, null );
+		toggleBlockSpotlight( targetClientId, true );
+		selectNote( targetNote ? targetNote.id : 'new', { focus: true } );
 	}
 
 	if ( isDistractionFree ) {

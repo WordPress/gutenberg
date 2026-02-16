@@ -287,7 +287,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: Block title.
+-   `React.JSX.Element`: Block title.
 
 ### BlockToolbar
 
@@ -504,6 +504,18 @@ _Parameters_
 _Returns_
 
 -   `string`: Mapping of the spacing preset to its equivalent custom value.
+
+### getDimensionsClassesAndStyles
+
+Provides the CSS class names and inline styles for a block's dimensions support attributes.
+
+_Parameters_
+
+-   _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+-   `Object`: Dimensions block support derived CSS classes & styles.
 
 ### getFontSize
 
@@ -838,11 +850,11 @@ _Parameters_
 -   _props_ `Object`:
 -   _props.uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
 -   _props.blockName_ `string`: Optional block name.
--   _props.children_ `JSX.Element`: React children.
+-   _props.children_ `React.JSX.Element`: React children.
 
 _Returns_
 
--   `JSX.Element`: A React element.
+-   `React.JSX.Element`: A React element.
 
 ### RichText
 

@@ -38,6 +38,7 @@ import useInternalValue from './use-internal-value';
 import { ViewerFill } from './viewer-slot';
 import { DEFAULT_LINK_SETTINGS, LINK_ENTRY_TYPES } from './constants';
 import isURLLike, { isHashLink, isRelativePath } from './is-url-like';
+import normalizeUrl from './normalize-url';
 
 /**
  * Default properties associated with a link control value.
@@ -423,6 +424,13 @@ function LinkControl( {
 				setCustomValidity( validation );
 				return;
 			}
+
+			// Validation passed - normalize the URL
+			const { url: normalizedUrl } = normalizeUrl( urlToValidate );
+			updatedValue = {
+				...updatedValue,
+				url: normalizedUrl,
+			};
 		}
 
 		// Preserve the URL for taxonomy entities before binding overrides it
@@ -504,7 +512,7 @@ function LinkControl( {
 			onChange( {
 				...value,
 				...internalControlValue,
-				url: currentUrlInputValue,
+				url: normalizeUrl( currentUrlInputValue ).url,
 			} );
 		}
 		stopEditing();

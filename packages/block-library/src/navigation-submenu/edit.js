@@ -48,7 +48,6 @@ import {
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
 import { DEFAULT_BLOCK } from '../navigation/constants';
-import { getSubmenuVisibility } from '../navigation/utils/get-submenu-visibility';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -85,18 +84,21 @@ export default function NavigationSubmenuEdit( {
 } ) {
 	const { label, url, description, kind, type, id } = attributes;
 
-	const { showSubmenuIcon, maxNestingLevel } = context;
+	const { showSubmenuIcon, maxNestingLevel, submenuVisibility } = context;
 	const blockEditingMode = useBlockEditingMode();
-
-	// Determine effective submenu visibility with backward compatibility
-	const submenuVisibility = getSubmenuVisibility( context );
 
 	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
 	const openSubmenusOnClick =
 		blockEditingMode !== 'default' ? true : submenuVisibility === 'click';
 
 	// URL binding logic
-	const { clearBinding, createBinding } = useEntityBinding( {
+	const {
+		clearBinding,
+		createBinding,
+		hasUrlBinding,
+		isBoundEntityAvailable,
+		entityRecord,
+	} = useEntityBinding( {
 		clientId,
 		attributes,
 	} );
@@ -382,6 +384,11 @@ export default function NavigationSubmenuEdit( {
 						<LinkUI
 							clientId={ clientId }
 							link={ attributes }
+							entity={ {
+								entityRecord,
+								hasBinding: hasUrlBinding,
+								isEntityAvailable: isBoundEntityAvailable,
+							} }
 							onClose={ () => {
 								setIsLinkOpen( false );
 							} }

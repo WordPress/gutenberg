@@ -572,7 +572,7 @@ function CompactMediaEditAttachments( {
  * @param {boolean}              [props.hideLabelFromVision] - Whether the label should be hidden from vision.
  * @param {boolean}              [props.isExpanded]          - Whether to render in an expanded form. Default `false`.
  *
- * @return {JSX.Element} The media edit control component.
+ * @return {React.JSX.Element} The media edit control component.
  *
  * @example
  * ```tsx
@@ -677,7 +677,7 @@ export default function MediaEdit< Item >( {
 	// handler as `setTargetItemId()` would open the modal with stale
 	// `value`/`multiple` props. Setting a pending flag defers the open
 	// until after the next render when props are up to date.
-	const openModalRef = useRef< ( () => void ) | null >( null );
+	const openModalRef = useRef< () => void >( undefined );
 	const [ pendingOpen, setPendingOpen ] = useState( false );
 	const [ blobs, setBlobs ] = useState< string[] >( [] );
 	useEffect( () => {
