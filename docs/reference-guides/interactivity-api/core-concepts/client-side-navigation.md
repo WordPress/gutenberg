@@ -311,6 +311,32 @@ WordPress does not currently disable client-side navigation automatically when a
 
 ## More advanced use cases
 
+### Handling scroll and focus
+
+The router does not automatically manage scroll position or focus after navigation — this is the responsibility of the action that calls `actions.navigate()`. After a client-side navigation completes, the page will remain at its current scroll position and the focus will stay on the element that triggered the navigation (or be lost if that element was removed during the region update).
+
+You should handle scroll and focus explicitly in your navigation action. For example, to scroll to the top after navigation:
+
+```js
+store( 'myPlugin', {
+    actions: {
+        navigateTo: withSyncEvent( function* ( event ) {
+            event.preventDefault();
+
+            const { actions } = yield import(
+                '@wordpress/interactivity-router'
+            );
+            yield actions.navigate( event.target.href );
+
+            // Scroll to top after navigation.
+            window.scrollTo( { top: 0, behavior: 'smooth' } );
+        } ),
+    },
+} );
+```
+
+For accessibility, consider moving focus to a meaningful element after navigation, such as the main content area or a heading, so keyboard and screen reader users know where they are on the new page.
+
 ### Adding new regions on navigation
 
 Sometimes you need UI elements — like modals, sidebars, or notification panels — that only appear on certain pages. With regular router regions, a region must already exist on the current page to be updated during navigation. The `attachTo` option solves this by letting you define regions that are dynamically created and inserted into the DOM when navigating to a page where they exist, even if they weren't present on the original page.
@@ -576,7 +602,7 @@ When `clientNavigationDisabled` is `true`:
 ### Disabling navigation feedback
 
 The Interactivity API router includes built-in feedback during navigation:
-- **Loading animation**: A progress bar that appears during navigation.
+- **Loading animation**: A progress bar that appears at the top of the page during navigation. The bar appears after a short delay (400ms) if navigation hasn't completed yet.
 - **Screen reader announcements**: Accessibility announcements for navigation progress.
 
 In some cases, you may want to disable these:
