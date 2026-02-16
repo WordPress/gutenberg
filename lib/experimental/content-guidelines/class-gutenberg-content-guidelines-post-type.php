@@ -6,7 +6,7 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	die( 'Silence is golden.' );
+	exit;
 }
 
 /**
@@ -55,7 +55,7 @@ class Gutenberg_Content_Guidelines_Post_Type {
 	 */
 	const VALID_STATUSES = array(
 		'draft',
-		'published',
+		'publish',
 	);
 
 	/**

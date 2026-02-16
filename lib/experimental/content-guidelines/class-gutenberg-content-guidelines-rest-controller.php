@@ -10,7 +10,7 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	die( 'Silence is golden.' );
+	exit;
 }
 
 /**
@@ -106,7 +106,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_guidelines_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+	public function get_guidelines_permissions_check( $request ) {
 		$post_type = get_post_type_object( $this->post_type );
 		if ( ! current_user_can( $post_type->cap->read ) ) {
 			return new WP_Error(
@@ -123,7 +123,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 * Gets the singleton content guidelines.
 	 *
 	 * Supports query parameters:
-	 * - ?status=published|draft - Filter by status
+	 * - ?status=publish|draft - Filter by status
 	 * - ?category=copy|images|site|blocks|additional - Return only specific category
 	 * - ?block=core/paragraph - Return only specific block's guidelines
 	 *
@@ -251,7 +251,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		}
 
 		if ( isset( $request['status'] ) ) {
-			$prepared->post_status = 'published' === $request['status'] ? 'publish' : 'draft';
+			$prepared->post_status = $request['status'];
 		}
 
 		return $prepared;
@@ -276,7 +276,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		}
 
 		if ( rest_is_field_included( 'status', $fields ) ) {
-			$data['status'] = 'publish' === $post->post_status ? 'published' : 'draft';
+			$data['status'] = $post->post_status;
 		}
 
 		if ( rest_is_field_included( 'guideline_categories', $fields ) ) {
@@ -475,7 +475,8 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 		$sanitized = array();
 
 		foreach ( $blocks as $block_name => $block_data ) {
-			if ( ! is_string( $block_name ) || ! preg_match( '/^[a-z][a-z0-9-]*\/[a-z][a-z0-9-]*$/', $block_name ) ) {
+			// Matches the block name validation in WP_Block_Type_Registry::register().
+			if ( ! is_string( $block_name ) || ! preg_match( '/^[a-z0-9-]+\/[a-z0-9-]+$/', $block_name ) ) {
 				continue;
 			}
 
@@ -503,14 +504,14 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	/**
 	 * Gets the single guidelines post.
 	 *
-	 * @param string|null $status_filter Optional. Filter by status ('published' or 'draft').
+	 * @param string|null $status_filter Optional. Filter by status ('publish' or 'draft').
 	 * @return WP_Post|null The guidelines post or null if not found.
 	 */
 	protected function get_guidelines_post( $status_filter = null ) {
 		$post_status = array( 'publish', 'draft' );
 
 		if ( $status_filter ) {
-			$post_status = 'published' === $status_filter ? 'publish' : 'draft';
+			$post_status = $status_filter;
 		}
 
 		$posts = get_posts(
@@ -549,7 +550,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 					'readonly'    => true,
 				),
 				'status'               => array(
-					'description' => __( 'The status of the guidelines (draft or published).', 'gutenberg' ),
+					'description' => __( 'The status of the guidelines (draft or publish).', 'gutenberg' ),
 					'type'        => 'string',
 					'enum'        => Gutenberg_Content_Guidelines_Post_Type::VALID_STATUSES,
 					'context'     => array( 'view', 'edit' ),

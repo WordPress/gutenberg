@@ -9,7 +9,7 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	die( 'Silence is golden.' );
+	exit;
 }
 
 /**
@@ -197,20 +197,12 @@ class Gutenberg_Content_Guidelines_Revisions_Controller extends WP_REST_Revision
 			);
 		}
 
-		// Return the updated parent post data.
-		$post                 = get_post( $parent->ID );
-		$guideline_categories = Gutenberg_Content_Guidelines_Post_Type::get_guideline_categories_from_meta( $post->ID );
+		// Return the updated parent post using its registered controller for
+		// consistent response formatting including _links and field filtering.
+		$post             = get_post( $parent->ID );
+		$post_type_object = get_post_type_object( $this->parent_post_type );
+		$controller       = $post_type_object->get_rest_controller();
 
-		return rest_ensure_response(
-			array(
-				'id'                   => $post->ID,
-				'status'               => 'publish' === $post->post_status ? 'published' : 'draft',
-				'guideline_categories' => ! empty( $guideline_categories ) ? $guideline_categories : new stdClass(),
-				'date'                 => mysql_to_rfc3339( $post->post_date ),
-				'date_gmt'             => mysql_to_rfc3339( $post->post_date_gmt ),
-				'modified'             => mysql_to_rfc3339( $post->post_modified ),
-				'modified_gmt'         => mysql_to_rfc3339( $post->post_modified_gmt ),
-			)
-		);
+		return $controller->prepare_item_for_response( $post, $request );
 	}
 }

@@ -6,7 +6,7 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
-	die( 'Silence is golden.' );
+	exit;
 }
 
 require_once __DIR__ . '/class-gutenberg-content-guidelines-post-type.php';
