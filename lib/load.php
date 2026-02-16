@@ -200,7 +200,6 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 // Block patterns for navigation overlays.
 require __DIR__ . '/overlay-patterns.php';
 
-if ( gutenberg_is_experiment_enabled( 'gutenberg-svg-icon-registry' ) ) {
-	require __DIR__ . '/experimental/class-wp-icons-registry.php';
-	require __DIR__ . '/experimental/class-wp-rest-icons-controller.php';
-}
+// SVG Icons API.
+require __DIR__ . '/experimental/class-wp-icons-registry.php';
+require __DIR__ . '/experimental/class-wp-rest-icons-controller.php';
