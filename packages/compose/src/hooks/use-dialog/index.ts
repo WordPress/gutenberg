@@ -66,7 +66,7 @@ type useDialogReturn = [
  * @param options Dialog Options.
  */
 function useDialog( options: DialogOptions ): useDialogReturn {
-	const currentOptions = useRef< DialogOptions | undefined >();
+	const currentOptions = useRef< DialogOptions >( undefined );
 	const { constrainTabbing = options.focusOnMount !== false } = options;
 	useEffect( () => {
 		currentOptions.current = options;

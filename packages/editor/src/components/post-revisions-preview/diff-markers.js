@@ -73,7 +73,7 @@ function calculatePosition( el ) {
  * @param {string}   props.clientId  The block client ID.
  * @param {string}   props.status    The diff status (added/removed/modified).
  * @param {Function} props.subscribe Function to subscribe to position updates.
- * @return {JSX.Element|null} The diff marker button or null if position not calculated.
+ * @return {React.JSX.Element} The diff marker button or null if position not calculated.
  */
 function DiffMarkerButton( { clientId, status, subscribe } ) {
 	const blockRef = useRef();

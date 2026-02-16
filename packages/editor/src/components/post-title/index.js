@@ -13,7 +13,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 import { ENTER } from '@wordpress/keycodes';
 import { pasteHandler } from '@wordpress/blocks';
 import {
-	__unstableUseRichText as useRichText,
+	privateApis as richTextPrivateApis,
 	create,
 	insert,
 } from '@wordpress/rich-text';
@@ -29,6 +29,8 @@ import usePostTitle from './use-post-title';
 import PostTypeSupportCheck from '../post-type-support-check';
 
 import { unlock } from '../../lock-unlock';
+
+const { useRichText } = unlock( richTextPrivateApis );
 
 const PostTitle = forwardRef( ( _, forwardedRef ) => {
 	const { placeholder, isEditingContentOnlySection, isPreview } = useSelect(
@@ -128,10 +130,6 @@ const PostTitle = forwardRef( ( _, forwardedRef ) => {
 			// behaviour.
 			return;
 		}
-
-		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', html );
-		window.console.log( 'Received plain text:\n\n', plainText );
 
 		const content = pasteHandler( {
 			HTML: html,

@@ -17,7 +17,7 @@ import useEvent from '../use-event';
  * @param {(e: MouseEvent) => void} [props.onDragEnd]       Called when dragging has ended.
  * @param {(e: DragEvent) => void}  [props.onDrop]          Called when dropping in the zone.
  *
- * @return {import('react').RefCallback<HTMLElement>} Ref callback to be passed to the drop zone element.
+ * @return {React.RefCallback<HTMLElement>} Ref callback to be passed to the drop zone element.
  */
 export default function useDropZone( {
 	dropZoneElement,

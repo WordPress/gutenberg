@@ -12,6 +12,10 @@
 -   Add `Tabs` primitive ([#74652](https://github.com/WordPress/gutenberg/pull/74652)).
 -   Add `Textarea` primitive ([#74707](https://github.com/WordPress/gutenberg/pull/74707)).
 
+### Bug Fixes
+
+-   `Field`: Fix default gap spacing ([#75446](https://github.com/WordPress/gutenberg/pull/75446)).
+
 ### Enhancements
 
 -   `Button`: Add minimum content width (`6ch` + padding) to prevent overly narrow buttons with short labels ([#75133](https://github.com/WordPress/gutenberg/pull/75133)).

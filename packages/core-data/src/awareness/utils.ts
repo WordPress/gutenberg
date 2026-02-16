@@ -175,11 +175,16 @@ export function generateCollaboratorInfo(
 	currentCollaborator: User< 'view' >,
 	existingColors: string[]
 ): CollaboratorInfo {
+	// eslint-disable-next-line camelcase
+	const { avatar_urls, id, name, slug } = currentCollaborator;
 	return {
-		...currentCollaborator,
+		avatar_urls, // eslint-disable-line camelcase
 		browserType: getBrowserName(),
 		color: getNewCollaboratorColor( existingColors ),
 		enteredAt: Date.now(),
+		id,
+		name,
+		slug,
 	};
 }
 

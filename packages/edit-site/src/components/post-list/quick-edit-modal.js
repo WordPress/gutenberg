@@ -25,35 +25,6 @@ const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 const fieldsWithBulkEditSupport = [ 'status', 'date', 'author', 'discussion' ];
 
 export function QuickEditModal( { postType, postId, closeModal } ) {
-	// Before calling the onRequestClose callback, the modal introduces a animation delay
-	// that produces a visual glitch, see https://github.com/WordPress/gutenberg/pull/75173#pullrequestreview-3755585506
-	// Handling the ESC key and click-outside ourselves fixes it.
-	useEffect( () => {
-		const handleKeyDown = ( event ) => {
-			if ( event.key === 'Escape' || event.code === 'Escape' ) {
-				event.preventDefault();
-				event.stopPropagation();
-				closeModal?.();
-			}
-		};
-
-		const handleClickOutside = ( event ) => {
-			if (
-				event.target.classList.contains(
-					'dataviews-action-modal__quick-edit'
-				)
-			) {
-				closeModal?.();
-			}
-		};
-		document.addEventListener( 'keydown', handleKeyDown );
-		document.addEventListener( 'mousedown', handleClickOutside );
-		return () => {
-			document.removeEventListener( 'keydown', handleKeyDown );
-			document.removeEventListener( 'mousedown', handleClickOutside );
-		};
-	}, [ closeModal ] );
-
 	const isBulk = postId.length > 1;
 
 	const [ localEdits, setLocalEdits ] = useState( {} );
@@ -221,8 +192,8 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 		<Modal
 			overlayClassName="dataviews-action-modal__quick-edit"
 			__experimentalHideHeader
-			shouldCloseOnEsc={ false }
-			shouldCloseOnClickOutside={ false }
+			onRequestClose={ closeModal }
+			focusOnMount="firstElement"
 		>
 			<div className="dataviews-action-modal__quick-edit-header">
 				<PostCardPanel

@@ -5,13 +5,16 @@ import { __, sprintf } from '@wordpress/i18n';
 import { safeDecodeURI } from '@wordpress/url';
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
+import { store as coreDataStore } from '@wordpress/core-data';
+
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
 
-const { useRemoteUrlData } = unlock( blockEditorPrivateApis );
+const { useRemoteUrlData, isHashLink, isRelativePath } = unlock(
+	blockEditorPrivateApis
+);
 
 /**
  * Capitalize the first letter of a string.
@@ -26,34 +29,46 @@ function capitalize( str ) {
 /**
  * Compute display URL - strips site URL if internal, shows full URL if external.
  *
- * @param {string} url - The URL to process
+ * @param {Object} options         - Parameters object
+ * @param {string} options.linkUrl - The URL to process
+ * @param {string} options.siteUrl - The WordPress site URL (falls back to window.location.origin)
  * @return {Object} Object with displayUrl and isExternal flag
  */
-function computeDisplayUrl( url ) {
-	if ( ! url ) {
+export function computeDisplayUrl( { linkUrl, siteUrl } = {} ) {
+	if ( ! linkUrl ) {
 		return { displayUrl: '', isExternal: false };
 	}
 
-	let displayUrl = safeDecodeURI( url );
+	let displayUrl = safeDecodeURI( linkUrl );
 	let isExternal = false;
 
+	// Check hash links and relative paths first - these are always internal
+	if ( isRelativePath( linkUrl ) || isHashLink( linkUrl ) ) {
+		return { displayUrl, isExternal: false };
+	}
+
+	// Try to parse as a full URL to determine if it's actually external
+	// This must happen before trusting the type attribute
 	try {
-		const linkUrl = new URL( url );
-		const siteUrl = window.location.origin;
-		if ( linkUrl.origin === siteUrl ) {
+		const parsedUrl = new URL( linkUrl );
+		// Use provided siteUrl or fall back to window.location.origin
+		const siteDomain = siteUrl || window.location.origin;
+		if ( parsedUrl.origin === siteDomain ) {
 			// Show only the pathname (and search/hash if present)
-			let path = linkUrl.pathname + linkUrl.search + linkUrl.hash;
+			let path = parsedUrl.pathname + parsedUrl.search + parsedUrl.hash;
 			// Remove trailing slash
 			if ( path.endsWith( '/' ) && path.length > 1 ) {
 				path = path.slice( 0, -1 );
 			}
 			displayUrl = path;
 		} else {
+			// Different origin - this is an external link
 			isExternal = true;
 		}
 	} catch ( e ) {
-		// If URL parsing fails, use the original URL
-		displayUrl = safeDecodeURI( url );
+		// URL parsing failed - this means it's likely a URL without a protocol (e.g., "www.example.com")
+		// Since we already checked for relative paths and hash links above, treat as external
+		isExternal = true;
 	}
 
 	return { displayUrl, isExternal };
@@ -71,7 +86,7 @@ function computeDisplayUrl( url ) {
  * @param {boolean} options.isEntityAvailable - Whether bound entity exists
  * @return {Array} Array of badge objects with label and intent
  */
-function computeBadges( {
+export function computeBadges( {
 	url,
 	type,
 	isExternal,
@@ -88,8 +103,23 @@ function computeBadges( {
 				label: __( 'External link' ),
 				intent: 'default',
 			} );
-		} else if ( type ) {
+		} else if ( isHashLink( url ) ) {
+			// Hash links should be detected before type check
+			// because they're not entity links even if type is set
+			badges.push( {
+				label: __( 'Internal link' ),
+				intent: 'default',
+			} );
+		} else if ( type && type !== 'custom' ) {
+			// Show entity type badge (page, post, category, etc.)
+			// but not 'custom' since that's just a manual link
 			badges.push( { label: capitalize( type ), intent: 'default' } );
+		} else {
+			// Internal link (not external, not hash, not entity)
+			badges.push( {
+				label: __( 'Page' ),
+				intent: 'default',
+			} );
 		}
 	}
 
@@ -144,6 +174,15 @@ export function useLinkPreview( {
 	hasBinding,
 	isEntityAvailable,
 } ) {
+	// Get the WordPress site URL from settings
+	const siteUrl = useSelect( ( select ) => {
+		const siteEntity = select( coreDataStore ).getEntityRecord(
+			'root',
+			'site'
+		);
+		return siteEntity?.url;
+	}, [] );
+
 	const title =
 		entityRecord?.title?.rendered ||
 		entityRecord?.title ||
@@ -153,7 +192,10 @@ export function useLinkPreview( {
 	const { richData } = useRemoteUrlData( title ? null : url );
 
 	// Compute display URL and external flag
-	const { displayUrl, isExternal } = computeDisplayUrl( url );
+	const { displayUrl, isExternal } = computeDisplayUrl( {
+		linkUrl: url,
+		siteUrl,
+	} );
 
 	const image = useSelect(
 		( select ) => {
@@ -162,7 +204,7 @@ export function useLinkPreview( {
 				return null;
 			}
 
-			const { getEntityRecord } = select( coreStore );
+			const { getEntityRecord } = select( coreDataStore );
 
 			// Get the media entity to fetch the image URL
 			const media = getEntityRecord(

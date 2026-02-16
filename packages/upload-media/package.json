@@ -58,6 +58,7 @@
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url",
+		"@wordpress/vips": "1.0.0-prerelease",
 		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {

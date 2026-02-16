@@ -37,6 +37,22 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		// Clear caches.
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
+
+			/*
+		 * Register a style variation with a custom blockGap value for testing.
+		 */
+		register_block_style(
+			'core/group',
+			array(
+				'name'       => 'custom-gap',
+				'label'      => 'Custom Gap',
+				'style_data' => array(
+					'spacing' => array(
+						'blockGap' => '99px',
+					),
+				),
+			)
+		);
 	}
 
 	public function tear_down() {
@@ -44,6 +60,11 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 		wp_clean_themes_cache();
 		unset( $GLOBALS['wp_themes'] );
 		WP_Style_Engine_CSS_Rules_Store_Gutenberg::remove_all_stores();
+
+		// Clean up variation test data.
+		unregister_block_style( 'core/group', 'custom-gap' );
+		WP_Theme_JSON_Resolver::clean_cached_data();
+
 		parent::tear_down();
 	}
 
@@ -776,5 +797,49 @@ class WP_Block_Supports_Layout_Test extends WP_UnitTestCase {
 				'expected_class'   => 'wp-container-core-group-is-layout-cda6dc4f',
 			),
 		);
+	}
+
+	/**
+	 * Tests that block style variations with blockGap values are applied to layout styles.
+	 *
+	 * @covers ::wp_render_layout_support_flag
+	 */
+	public function test_layout_support_flag_uses_variation_block_gap_value() {
+		switch_theme( 'block-theme' );
+		add_theme_support( 'appearance-tools' );
+
+		$block_content = '<div class="wp-block-group is-style-custom-gap"></div>';
+		$block         = array(
+			'blockName'    => 'core/group',
+			'attrs'        => array(
+				'className' => 'is-style-custom-gap',
+				'layout'    => array(
+					'type'               => 'grid',
+					'columnCount'        => 3,
+					'minimumColumnWidth' => '12rem',
+
+				),
+			),
+			'innerBlocks'  => array(),
+			'innerHTML'    => '<div class="wp-block-group is-style-custom-gap"></div>',
+			'innerContent' => array(
+				'<div class="wp-block-group is-style-custom-gap"></div>',
+			),
+		);
+
+		gutenberg_render_layout_support_flag( $block_content, $block );
+
+		// Get the generated CSS from the style engine.
+		$actual_stylesheet = gutenberg_style_engine_get_stylesheet_from_context( 'block-supports', array( 'prettify' => false ) );
+
+		// The CSS grid declaration should contain the variation's blockGap value of 99px.
+		$this->assertStringContainsString(
+			'grid-template-columns:repeat(auto-fill, minmax(max(min(12rem, 100%), (100% - (99px * (3 - 1))) /3), 1fr))',
+			$actual_stylesheet,
+			'Generated CSS should contain the variation blockGap value of 99px.'
+		);
+
+		// Clean up.
+		remove_theme_support( 'appearance-tools' );
 	}
 }

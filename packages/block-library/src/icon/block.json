@@ -1,0 +1,65 @@
+{
+	"apiVersion": 3,
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"name": "core/icon",
+	"title": "Icon",
+	"__experimental": true,
+	"category": "media",
+	"description": "Insert an SVG icon.",
+	"keywords": [ "icon", "svg" ],
+	"textdomain": "default",
+	"attributes": {
+		"icon": {
+			"type": "string",
+			"role": "content"
+		},
+		"style": {
+			"type": "object",
+			"default": {
+				"dimensions": {
+					"width": "24px"
+				}
+			}
+		}
+	},
+	"supports": {
+		"anchor": true,
+		"ariaLabel": {
+			"__experimentalSkipSerialization": true
+		},
+		"align": [ "left", "center", "right" ],
+		"html": false,
+		"color": {
+			"background": true,
+			"text": true
+		},
+		"interactivity": {
+			"clientNavigation": true
+		},
+		"__experimentalBorder": {
+			"color": true,
+			"radius": true,
+			"style": true,
+			"width": true,
+			"__experimentalDefaultControls": {
+				"color": false,
+				"radius": false,
+				"style": false,
+				"width": false
+			}
+		},
+		"spacing": {
+			"padding": true,
+			"margin": true,
+			"__experimentalDefaultControls": {
+				"margin": false,
+				"padding": false
+			}
+		},
+		"dimensions": {
+			"width": true
+		}
+	},
+	"style": "wp-block-icon",
+	"editorStyle": "wp-block-icon-editor"
+}

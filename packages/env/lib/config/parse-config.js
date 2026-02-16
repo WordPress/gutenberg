@@ -382,6 +382,14 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 		checkPort( configFile, `testsPort`, rawConfig.testsPort );
 		parsedConfig.testsPort = rawConfig.testsPort;
 	}
+	if ( rawConfig.testsEnvironment !== undefined ) {
+		if ( typeof rawConfig.testsEnvironment !== 'boolean' ) {
+			throw new ValidationError(
+				`Invalid ${ configFile }: "testsEnvironment" must be a boolean.`
+			);
+		}
+		parsedConfig.testsEnvironment = rawConfig.testsEnvironment;
+	}
 	parsedConfig.lifecycleScripts = {};
 	if ( rawConfig.lifecycleScripts ) {
 		checkObjectWithValues(
@@ -459,6 +467,7 @@ async function parseEnvironmentConfig(
 		// configuration options that we will parse.
 		switch ( key ) {
 			case 'testsPort':
+			case 'testsEnvironment':
 			case 'lifecycleScripts':
 			case 'env': {
 				if ( options.rootConfig ) {

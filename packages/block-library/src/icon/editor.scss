@@ -1,0 +1,57 @@
+@use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/colors" as *;
+
+// Style for the icon library modal.
+.wp-block-icon__inserter {
+	padding: 0 $grid-unit-30;
+	margin: 0 (-1 * $grid-unit-30);
+}
+
+.wp-block-icon__inserter-header {
+	align-items: center;
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: $grid-unit-20;
+}
+
+.wp-block-icon__inserter-grid-icons-list {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.wp-block-icon__inserter-grid-no-results {
+	display: flex;
+	justify-content: center;
+}
+
+.wp-block-icon__inserter-grid-icons-list-item {
+	display: flex;
+	flex-direction: column;
+	height: auto !important;
+}
+
+.wp-block-icon__inserter-grid-icons-list-item-icon {
+	padding: $grid-unit-15;
+}
+
+.wp-block-icon__inserter-grid-icons-list-item-title {
+	font-size: $font-size-small;
+	padding: $grid-unit-05 $grid-unit-05 $grid-unit-10;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.wp-block-icon__toolbar-content {
+	width: 250px;
+}
+
+// Provide special styling for the placeholder.
+// @todo this particular minimal style of placeholder could be componentized further.
+.wp-block-icon .components-placeholder {
+	padding: 0;
+	min-height: $grid-unit-30;
+	min-width: $grid-unit-30;
+	height: 100%;
+	width: 100%;
+}

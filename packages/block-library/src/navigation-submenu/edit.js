@@ -13,8 +13,8 @@ import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
-	useInnerBlocksProps,
 	InspectorControls,
+	useInnerBlocksProps,
 	RichText,
 	useBlockProps,
 	useBlockEditingMode,
@@ -48,7 +48,6 @@ import {
 	getNavigationChildBlockProps,
 } from '../navigation/edit/utils';
 import { DEFAULT_BLOCK } from '../navigation/constants';
-import { getSubmenuVisibility } from '../navigation/utils/get-submenu-visibility';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -85,11 +84,8 @@ export default function NavigationSubmenuEdit( {
 } ) {
 	const { label, url, description, kind, type, id } = attributes;
 
-	const { showSubmenuIcon, maxNestingLevel } = context;
+	const { showSubmenuIcon, maxNestingLevel, submenuVisibility } = context;
 	const blockEditingMode = useBlockEditingMode();
-
-	// Determine effective submenu visibility with backward compatibility
-	const submenuVisibility = getSubmenuVisibility( context );
 
 	// Force click-only behavior in contentOnly mode to prevent hover dropdowns
 	const openSubmenusOnClick =
@@ -339,7 +335,7 @@ export default function NavigationSubmenuEdit( {
 					/>
 				</ToolbarGroup>
 			</BlockControls>
-			<InspectorControls>
+			<InspectorControls group="content">
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }

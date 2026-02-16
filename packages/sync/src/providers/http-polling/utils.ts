@@ -14,7 +14,7 @@ import {
 	type UpdateQueue,
 } from './types';
 
-const SYNC_API_PATH = '/wp/v2/sync/updates';
+const SYNC_API_PATH = '/wp-sync/v1/updates';
 
 export function uint8ArrayToBase64( data: Uint8Array ): string {
 	let binary = '';
