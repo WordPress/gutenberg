@@ -8,1452 +8,1448 @@ return array(
 	'add-card'                       => array(
 		'label'    => _x( 'Add Card', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/add-card.svg',
-		'status'   => 'hidden',
 	),
 	'add-submenu'                    => array(
 		'label'    => _x( 'Add Submenu', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/add-submenu.svg',
-		'status'   => 'hidden',
 	),
 	'add-template'                   => array(
 		'label'    => _x( 'Add Template', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/add-template.svg',
-		'status'   => 'hidden',
 	),
 	'align-center'                   => array(
 		'label'    => _x( 'Align Center', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/align-center.svg',
-		'status'   => 'hidden',
 	),
 	'align-justify'                  => array(
 		'label'    => _x( 'Align Justify', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/align-justify.svg',
-		'status'   => 'hidden',
 	),
 	'align-left'                     => array(
 		'label'    => _x( 'Align Left', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/align-left.svg',
-		'status'   => 'hidden',
 	),
 	'align-none'                     => array(
 		'label'    => _x( 'Align None', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/align-none.svg',
-		'status'   => 'hidden',
 	),
 	'align-right'                    => array(
 		'label'    => _x( 'Align Right', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/align-right.svg',
-		'status'   => 'hidden',
 	),
 	'archive'                        => array(
 		'label'    => _x( 'Archive', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/archive.svg',
-		'status'   => 'hidden',
 	),
 	'arrow-down-left'                => array(
 		'label'    => _x( 'Arrow Down Left', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/arrow-down-left.svg',
+		'public'   => true,
 	),
 	'arrow-down-right'               => array(
 		'label'    => _x( 'Arrow Down Right', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/arrow-down-right.svg',
+		'public'   => true,
 	),
 	'arrow-down'                     => array(
 		'label'    => _x( 'Arrow Down', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/arrow-down.svg',
+		'public'   => true,
 	),
 	'arrow-left'                     => array(
 		'label'    => _x( 'Arrow Left', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/arrow-left.svg',
+		'public'   => true,
 	),
 	'arrow-right'                    => array(
 		'label'    => _x( 'Arrow Right', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/arrow-right.svg',
+		'public'   => true,
 	),
 	'arrow-up-left'                  => array(
 		'label'    => _x( 'Arrow Up Left', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/arrow-up-left.svg',
+		'public'   => true,
 	),
 	'arrow-up-right'                 => array(
 		'label'    => _x( 'Arrow Up Right', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/arrow-up-right.svg',
+		'public'   => true,
 	),
 	'arrow-up'                       => array(
 		'label'    => _x( 'Arrow Up', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/arrow-up.svg',
+		'public'   => true,
 	),
 	'aspect-ratio'                   => array(
 		'label'    => _x( 'Aspect Ratio', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/aspect-ratio.svg',
-		'status'   => 'hidden',
 	),
 	'at-symbol'                      => array(
 		'label'    => _x( 'At Symbol (@)', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/at-symbol.svg',
+		'public'   => true,
 	),
 	'audio'                          => array(
 		'label'    => _x( 'Audio', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/audio.svg',
+		'public'   => true,
 	),
 	'background'                     => array(
 		'label'    => _x( 'Background', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/background.svg',
+		'public'   => true,
 	),
 	'backup'                         => array(
 		'label'    => _x( 'Backup', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/backup.svg',
+		'public'   => true,
 	),
 	'bell'                           => array(
 		'label'    => _x( 'Bell', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/bell.svg',
+		'public'   => true,
 	),
 	'bell-unread'                    => array(
 		'label'    => _x( 'Bell Unread', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/bell-unread.svg',
-		'status'   => 'hidden',
 	),
 	'block-default'                  => array(
 		'label'    => _x( 'Block Default', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/block-default.svg',
+		'public'   => true,
 	),
 	'block-meta'                     => array(
 		'label'    => _x( 'Block Meta', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/block-meta.svg',
+		'public'   => true,
 	),
 	'block-table'                    => array(
 		'label'    => _x( 'Block Table', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/block-table.svg',
+		'public'   => true,
 	),
 	'border'                         => array(
 		'label'    => _x( 'Border', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/border.svg',
-		'status'   => 'hidden',
 	),
 	'box'                            => array(
 		'label'    => _x( 'Box', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/box.svg',
+		'public'   => true,
 	),
 	'breadcrumbs'                    => array(
 		'label'    => _x( 'Breadcrumbs', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/breadcrumbs.svg',
-		'status'   => 'hidden',
 	),
 	'brush'                          => array(
 		'label'    => _x( 'Brush', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/brush.svg',
+		'public'   => true,
 	),
 	'bug'                            => array(
 		'label'    => _x( 'Bug', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/bug.svg',
+		'public'   => true,
 	),
 	'button'                         => array(
 		'label'    => _x( 'Button', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/button.svg',
-		'status'   => 'hidden',
 	),
 	'buttons'                        => array(
 		'label'    => _x( 'Buttons', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/buttons.svg',
-		'status'   => 'hidden',
 	),
 	'calendar'                       => array(
 		'label'    => _x( 'Calendar', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/calendar.svg',
+		'public'   => true,
 	),
 	'cancel-circle-filled'           => array(
 		'label'    => _x( 'Cancel Circle Filled', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/cancel-circle-filled.svg',
-		'status'   => 'hidden',
 	),
 	'caption'                        => array(
 		'label'    => _x( 'Caption', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/caption.svg',
-		'status'   => 'hidden',
 	),
 	'capture-photo'                  => array(
 		'label'    => _x( 'Capture Photo', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/capture-photo.svg',
+		'public'   => true,
 	),
 	'capture-video'                  => array(
 		'label'    => _x( 'Capture Video', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/capture-video.svg',
+		'public'   => true,
 	),
 	'cart'                           => array(
 		'label'    => _x( 'Cart', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/cart.svg',
+		'public'   => true,
 	),
 	'category'                       => array(
 		'label'    => _x( 'Category', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/category.svg',
+		'public'   => true,
 	),
 	'caution'                        => array(
 		'label'    => _x( 'Caution', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/caution.svg',
+		'public'   => true,
 	),
 	'caution-filled'                 => array(
 		'label'    => _x( 'Caution Filled', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/caution-filled.svg',
+		'public'   => true,
 	),
 	'chart-bar'                      => array(
 		'label'    => _x( 'Chart Bar', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/chart-bar.svg',
+		'public'   => true,
 	),
 	'check'                          => array(
 		'label'    => _x( 'Check', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/check.svg',
+		'public'   => true,
 	),
 	'chevron-down'                   => array(
 		'label'    => _x( 'Chevron Down', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/chevron-down.svg',
+		'public'   => true,
 	),
 	'chevron-down-small'             => array(
 		'label'    => _x( 'Chevron Down Small', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/chevron-down-small.svg',
+		'public'   => true,
 	),
 	'chevron-left'                   => array(
 		'label'    => _x( 'Chevron Left', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/chevron-left.svg',
+		'public'   => true,
 	),
 	'chevron-left-small'             => array(
 		'label'    => _x( 'Chevron Left Small', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/chevron-left-small.svg',
+		'public'   => true,
 	),
 	'chevron-right'                  => array(
 		'label'    => _x( 'Chevron Right', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/chevron-right.svg',
+		'public'   => true,
 	),
 	'chevron-right-small'            => array(
 		'label'    => _x( 'Chevron Right Small', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/chevron-right-small.svg',
+		'public'   => true,
 	),
 	'chevron-up'                     => array(
 		'label'    => _x( 'Chevron Up', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/chevron-up.svg',
+		'public'   => true,
 	),
 	'chevron-up-down'                => array(
 		'label'    => _x( 'Chevron Up Down', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/chevron-up-down.svg',
+		'public'   => true,
 	),
 	'chevron-up-small'               => array(
 		'label'    => _x( 'Chevron Up Small', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/chevron-up-small.svg',
+		'public'   => true,
 	),
 	'classic'                        => array(
 		'label'    => _x( 'Classic', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/classic.svg',
+		'public'   => true,
 	),
 	'close'                          => array(
 		'label'    => _x( 'Close', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/close.svg',
+		'public'   => true,
 	),
 	'close-small'                    => array(
 		'label'    => _x( 'Close Small', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/close-small.svg',
+		'public'   => true,
 	),
 	'cloud'                          => array(
 		'label'    => _x( 'Cloud', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/cloud.svg',
+		'public'   => true,
 	),
 	'cloud-download'                 => array(
 		'label'    => _x( 'Cloud Download', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/cloud-download.svg',
+		'public'   => true,
 	),
 	'cloud-upload'                   => array(
 		'label'    => _x( 'Cloud Upload', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/cloud-upload.svg',
+		'public'   => true,
 	),
 	'code'                           => array(
 		'label'    => _x( 'Code', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/code.svg',
+		'public'   => true,
 	),
 	'cog'                            => array(
 		'label'    => _x( 'Cog', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/cog.svg',
+		'public'   => true,
 	),
 	'color'                          => array(
 		'label'    => _x( 'Color', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/color.svg',
+		'public'   => true,
 	),
 	'column'                         => array(
 		'label'    => _x( 'Column', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/column.svg',
-		'status'   => 'hidden',
 	),
 	'columns'                        => array(
 		'label'    => _x( 'Columns', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/columns.svg',
-		'status'   => 'hidden',
 	),
 	'comment'                        => array(
 		'label'    => _x( 'Comment', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/comment.svg',
+		'public'   => true,
 	),
 	'comment-author-avatar'          => array(
 		'label'    => _x( 'Comment Author Avatar', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/comment-author-avatar.svg',
-		'status'   => 'hidden',
 	),
 	'comment-author-name'            => array(
 		'label'    => _x( 'Comment Author Name', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/comment-author-name.svg',
-		'status'   => 'hidden',
 	),
 	'comment-content'                => array(
 		'label'    => _x( 'Comment Content', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/comment-content.svg',
-		'status'   => 'hidden',
 	),
 	'comment-edit-link'              => array(
 		'label'    => _x( 'Comment Edit Link', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/comment-edit-link.svg',
-		'status'   => 'hidden',
 	),
 	'comment-reply-link'             => array(
 		'label'    => _x( 'Comment Reply Link', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/comment-reply-link.svg',
-		'status'   => 'hidden',
 	),
 	'connection'                     => array(
 		'label'    => _x( 'Connection', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/connection.svg',
-		'status'   => 'hidden',
 	),
 	'copy'                           => array(
 		'label'    => _x( 'Copy', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/copy.svg',
-		'status'   => 'hidden',
 	),
 	'copy-small'                     => array(
 		'label'    => _x( 'Copy Small', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/copy-small.svg',
+		'public'   => true,
 	),
 	'corner-all'                     => array(
 		'label'    => _x( 'Corner All', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/corner-all.svg',
-		'status'   => 'hidden',
 	),
 	'corner-bottom-left'             => array(
 		'label'    => _x( 'Corner Bottom Left', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/corner-bottom-left.svg',
-		'status'   => 'hidden',
 	),
 	'corner-bottom-right'            => array(
 		'label'    => _x( 'Corner Bottom Right', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/corner-bottom-right.svg',
-		'status'   => 'hidden',
 	),
 	'corner-top-left'                => array(
 		'label'    => _x( 'Corner Top Left', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/corner-top-left.svg',
-		'status'   => 'hidden',
 	),
 	'corner-top-right'               => array(
 		'label'    => _x( 'Corner Top Right', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/corner-top-right.svg',
-		'status'   => 'hidden',
 	),
 	'cover'                          => array(
 		'label'    => _x( 'Cover', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/cover.svg',
+		'public'   => true,
 	),
 	'create'                         => array(
 		'label'    => _x( 'Create', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/create.svg',
+		'public'   => true,
 	),
 	'crop'                           => array(
 		'label'    => _x( 'Crop', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/crop.svg',
+		'public'   => true,
 	),
 	'currency-dollar'                => array(
 		'label'    => _x( 'Currency Dollar', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/currency-dollar.svg',
+		'public'   => true,
 	),
 	'currency-euro'                  => array(
 		'label'    => _x( 'Currency Euro', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/currency-euro.svg',
+		'public'   => true,
 	),
 	'currency-pound'                 => array(
 		'label'    => _x( 'Currency Pound', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/currency-pound.svg',
+		'public'   => true,
 	),
 	'custom-link'                    => array(
 		'label'    => _x( 'Custom Link', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/custom-link.svg',
+		'public'   => true,
 	),
 	'custom-post-type'               => array(
 		'label'    => _x( 'Custom Post Type', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/custom-post-type.svg',
-		'status'   => 'hidden',
 	),
 	'dashboard'                      => array(
 		'label'    => _x( 'Dashboard', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/dashboard.svg',
+		'public'   => true,
 	),
 	'desktop'                        => array(
 		'label'    => _x( 'Desktop', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/desktop.svg',
+		'public'   => true,
 	),
 	'details'                        => array(
 		'label'    => _x( 'Details', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/details.svg',
-		'status'   => 'hidden',
 	),
 	'download'                       => array(
 		'label'    => _x( 'Download', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/download.svg',
+		'public'   => true,
 	),
 	'drafts'                         => array(
 		'label'    => _x( 'Drafts', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/drafts.svg',
-		'status'   => 'hidden',
 	),
 	'drag-handle'                    => array(
 		'label'    => _x( 'Drag Handle', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/drag-handle.svg',
-		'status'   => 'hidden',
 	),
 	'drawer-left'                    => array(
 		'label'    => _x( 'Drawer Left', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/drawer-left.svg',
+		'public'   => true,
 	),
 	'drawer-right'                   => array(
 		'label'    => _x( 'Drawer Right', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/drawer-right.svg',
+		'public'   => true,
 	),
 	'envelope'                       => array(
 		'label'    => _x( 'Envelope', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/envelope.svg',
+		'public'   => true,
 	),
 	'error'                          => array(
 		'label'    => _x( 'Error', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/error.svg',
+		'public'   => true,
 	),
 	'external'                       => array(
 		'label'    => _x( 'External', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/external.svg',
+		'public'   => true,
 	),
 	'file'                           => array(
 		'label'    => _x( 'File', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/file.svg',
+		'public'   => true,
 	),
 	'filter'                         => array(
 		'label'    => _x( 'Filter', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/filter.svg',
+		'public'   => true,
 	),
 	'flip-horizontal'                => array(
 		'label'    => _x( 'Flip Horizontal', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/flip-horizontal.svg',
+		'public'   => true,
 	),
 	'flip-vertical'                  => array(
 		'label'    => _x( 'Flip Vertical', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/flip-vertical.svg',
+		'public'   => true,
 	),
 	'footer'                         => array(
 		'label'    => _x( 'Footer', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/footer.svg',
-		'status'   => 'hidden',
 	),
 	'format-bold'                    => array(
 		'label'    => _x( 'Format Bold', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-bold.svg',
-		'status'   => 'hidden',
 	),
 	'format-capitalize'              => array(
 		'label'    => _x( 'Format Capitalize', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-capitalize.svg',
-		'status'   => 'hidden',
 	),
 	'format-indent'                  => array(
 		'label'    => _x( 'Format Indent', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-indent.svg',
-		'status'   => 'hidden',
 	),
 	'format-indent-rtl'              => array(
 		'label'    => _x( 'Format Indent Rtl', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-indent-rtl.svg',
-		'status'   => 'hidden',
 	),
 	'format-italic'                  => array(
 		'label'    => _x( 'Format Italic', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-italic.svg',
-		'status'   => 'hidden',
 	),
 	'format-list-bullets'            => array(
 		'label'    => _x( 'Format List Bullets', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-list-bullets.svg',
-		'status'   => 'hidden',
 	),
 	'format-list-bullets-rtl'        => array(
 		'label'    => _x( 'Format List Bullets Rtl', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-list-bullets-rtl.svg',
-		'status'   => 'hidden',
 	),
 	'format-list-numbered'           => array(
 		'label'    => _x( 'Format List Numbered', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-list-numbered.svg',
-		'status'   => 'hidden',
 	),
 	'format-list-numbered-rtl'       => array(
 		'label'    => _x( 'Format List Numbered Rtl', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-list-numbered-rtl.svg',
-		'status'   => 'hidden',
 	),
 	'format-lowercase'               => array(
 		'label'    => _x( 'Format Lowercase', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-lowercase.svg',
-		'status'   => 'hidden',
 	),
 	'format-ltr'                     => array(
 		'label'    => _x( 'Format Ltr', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-ltr.svg',
-		'status'   => 'hidden',
 	),
 	'format-outdent'                 => array(
 		'label'    => _x( 'Format Outdent', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-outdent.svg',
-		'status'   => 'hidden',
 	),
 	'format-outdent-rtl'             => array(
 		'label'    => _x( 'Format Outdent Rtl', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-outdent-rtl.svg',
-		'status'   => 'hidden',
 	),
 	'format-rtl'                     => array(
 		'label'    => _x( 'Format Rtl', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-rtl.svg',
-		'status'   => 'hidden',
 	),
 	'format-strikethrough'           => array(
 		'label'    => _x( 'Format Strikethrough', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-strikethrough.svg',
-		'status'   => 'hidden',
 	),
 	'format-underline'               => array(
 		'label'    => _x( 'Format Underline', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-underline.svg',
-		'status'   => 'hidden',
 	),
 	'format-uppercase'               => array(
 		'label'    => _x( 'Format Uppercase', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-uppercase.svg',
-		'status'   => 'hidden',
 	),
 	'full-height'                    => array(
 		'label'    => _x( 'Full height', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/full-height.svg',
-		'status'   => 'hidden',
 	),
 	'fullscreen'                     => array(
 		'label'    => _x( 'Fullscreen', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/fullscreen.svg',
+		'public'   => true,
 	),
 	'funnel'                         => array(
 		'label'    => _x( 'Funnel', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/funnel.svg',
+		'public'   => true,
 	),
 	'gallery'                        => array(
 		'label'    => _x( 'Gallery', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/gallery.svg',
+		'public'   => true,
 	),
 	'gift'                           => array(
 		'label'    => _x( 'Gift', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/gift.svg',
+		'public'   => true,
 	),
 	'globe'                          => array(
 		'label'    => _x( 'Globe', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/globe.svg',
+		'public'   => true,
 	),
 	'grid'                           => array(
 		'label'    => _x( 'Grid', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/grid.svg',
+		'public'   => true,
 	),
 	'group'                          => array(
 		'label'    => _x( 'Group', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/group.svg',
+		'public'   => true,
 	),
 	'handle'                         => array(
 		'label'    => _x( 'Handle', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/handle.svg',
-		'status'   => 'hidden',
 	),
 	'header'                         => array(
 		'label'    => _x( 'Header', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/header.svg',
-		'status'   => 'hidden',
 	),
 	'heading'                        => array(
 		'label'    => _x( 'Heading', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/heading.svg',
+		'public'   => true,
 	),
 	'heading-level-1'                => array(
 		'label'    => _x( 'Heading Level 1', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/heading-level-1.svg',
-		'status'   => 'hidden',
 	),
 	'heading-level-2'                => array(
 		'label'    => _x( 'Heading Level 2', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/heading-level-2.svg',
-		'status'   => 'hidden',
 	),
 	'heading-level-3'                => array(
 		'label'    => _x( 'Heading Level 3', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/heading-level-3.svg',
-		'status'   => 'hidden',
 	),
 	'heading-level-4'                => array(
 		'label'    => _x( 'Heading Level 4', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/heading-level-4.svg',
-		'status'   => 'hidden',
 	),
 	'heading-level-5'                => array(
 		'label'    => _x( 'Heading Level 5', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/heading-level-5.svg',
-		'status'   => 'hidden',
 	),
 	'heading-level-6'                => array(
 		'label'    => _x( 'Heading Level 6', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/heading-level-6.svg',
-		'status'   => 'hidden',
 	),
 	'help'                           => array(
 		'label'    => _x( 'Help', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/help.svg',
+		'public'   => true,
 	),
 	'help-filled'                    => array(
 		'label'    => _x( 'Help Filled', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/help-filled.svg',
+		'public'   => true,
 	),
 	'home'                           => array(
 		'label'    => _x( 'Home', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/home.svg',
+		'public'   => true,
 	),
 	'home-button'                    => array(
 		'label'    => _x( 'Home Button', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/home-button.svg',
-		'status'   => 'hidden',
 	),
 	'html'                           => array(
 		'label'    => _x( 'Html', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/html.svg',
-		'status'   => 'hidden',
 	),
 	'image'                          => array(
 		'label'    => _x( 'Image', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/image.svg',
+		'public'   => true,
 	),
 	'inbox'                          => array(
 		'label'    => _x( 'Inbox', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/inbox.svg',
+		'public'   => true,
 	),
 	'info'                           => array(
 		'label'    => _x( 'Info', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/info.svg',
+		'public'   => true,
 	),
 	'insert-after'                   => array(
 		'label'    => _x( 'Insert After', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/insert-after.svg',
-		'status'   => 'hidden',
 	),
 	'insert-before'                  => array(
 		'label'    => _x( 'Insert Before', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/insert-before.svg',
-		'status'   => 'hidden',
 	),
 	'institution'                    => array(
 		'label'    => _x( 'Institution', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/institution.svg',
+		'public'   => true,
 	),
 	'justify-bottom'                 => array(
 		'label'    => _x( 'Justify Bottom', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/justify-bottom.svg',
-		'status'   => 'hidden',
 	),
 	'justify-center'                 => array(
 		'label'    => _x( 'Justify Center', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/justify-center.svg',
-		'status'   => 'hidden',
 	),
 	'justify-center-vertical'        => array(
 		'label'    => _x( 'Justify Center Vertical', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/justify-center-vertical.svg',
-		'status'   => 'hidden',
 	),
 	'justify-left'                   => array(
 		'label'    => _x( 'Justify Left', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/justify-left.svg',
-		'status'   => 'hidden',
 	),
 	'justify-right'                  => array(
 		'label'    => _x( 'Justify Right', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/justify-right.svg',
-		'status'   => 'hidden',
 	),
 	'justify-space-between'          => array(
 		'label'    => _x( 'Justify Space Between', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/justify-space-between.svg',
-		'status'   => 'hidden',
 	),
 	'justify-space-between-vertical' => array(
 		'label'    => _x( 'Justify Space Between Vertical', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/justify-space-between-vertical.svg',
-		'status'   => 'hidden',
 	),
 	'justify-stretch'                => array(
 		'label'    => _x( 'Justify Stretch', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/justify-stretch.svg',
-		'status'   => 'hidden',
 	),
 	'justify-stretch-vertical'       => array(
 		'label'    => _x( 'Justify Stretch Vertical', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/justify-stretch-vertical.svg',
-		'status'   => 'hidden',
 	),
 	'justify-top'                    => array(
 		'label'    => _x( 'Justify Top', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/justify-top.svg',
-		'status'   => 'hidden',
 	),
 	'key'                            => array(
 		'label'    => _x( 'Key', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/key.svg',
+		'public'   => true,
 	),
 	'keyboard'                       => array(
 		'label'    => _x( 'Keyboard', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/keyboard.svg',
-		'status'   => 'hidden',
 	),
 	'keyboard-close'                 => array(
 		'label'    => _x( 'Keyboard Close', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/keyboard-close.svg',
-		'status'   => 'hidden',
 	),
 	'keyboard-return'                => array(
 		'label'    => _x( 'Keyboard Return', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/keyboard-return.svg',
+		'public'   => true,
 	),
 	'language'                       => array(
 		'label'    => _x( 'Language', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/language.svg',
+		'public'   => true,
 	),
 	'layout'                         => array(
 		'label'    => _x( 'Layout', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/layout.svg',
+		'public'   => true,
 	),
 	'level-up'                       => array(
 		'label'    => _x( 'Level Up', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/level-up.svg',
+		'public'   => true,
 	),
 	'lifesaver'                      => array(
 		'label'    => _x( 'Lifesaver', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/lifesaver.svg',
+		'public'   => true,
 	),
 	'line-dashed'                    => array(
 		'label'    => _x( 'Line Dashed', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/line-dashed.svg',
-		'status'   => 'hidden',
 	),
 	'line-dotted'                    => array(
 		'label'    => _x( 'Line Dotted', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/line-dotted.svg',
-		'status'   => 'hidden',
 	),
 	'line-solid'                     => array(
 		'label'    => _x( 'Line Solid', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/line-solid.svg',
-		'status'   => 'hidden',
 	),
 	'link'                           => array(
 		'label'    => _x( 'Link', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/link.svg',
+		'public'   => true,
 	),
 	'link-off'                       => array(
 		'label'    => _x( 'Link Off', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/link-off.svg',
+		'public'   => true,
 	),
 	'list'                           => array(
 		'label'    => _x( 'List', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/list.svg',
-		'status'   => 'hidden',
 	),
 	'list-item'                      => array(
 		'label'    => _x( 'List Item', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/list-item.svg',
-		'status'   => 'hidden',
 	),
 	'list-view'                      => array(
 		'label'    => _x( 'List View', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/list-view.svg',
-		'status'   => 'hidden',
 	),
 	'lock'                           => array(
 		'label'    => _x( 'Lock', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/lock.svg',
+		'public'   => true,
 	),
 	'lock-outline'                   => array(
 		'label'    => _x( 'Lock Outline', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/lock-outline.svg',
+		'public'   => true,
 	),
 	'lock-small'                     => array(
 		'label'    => _x( 'Lock Small', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/lock-small.svg',
+		'public'   => true,
 	),
 	'login'                          => array(
 		'label'    => _x( 'Login', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/login.svg',
+		'public'   => true,
 	),
 	'loop'                           => array(
 		'label'    => _x( 'Loop', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/loop.svg',
-		'status'   => 'hidden',
 	),
 	'map-marker'                     => array(
 		'label'    => _x( 'Map Marker', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/map-marker.svg',
+		'public'   => true,
 	),
 	'math'                           => array(
 		'label'    => _x( 'Math', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/math.svg',
-		'status'   => 'hidden',
 	),
 	'media'                          => array(
 		'label'    => _x( 'Media', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/media.svg',
+		'public'   => true,
 	),
 	'media-and-text'                 => array(
 		'label'    => _x( 'Media And Text', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/media-and-text.svg',
-		'status'   => 'hidden',
 	),
 	'megaphone'                      => array(
 		'label'    => _x( 'Megaphone', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/megaphone.svg',
+		'public'   => true,
 	),
 	'menu'                           => array(
 		'label'    => _x( 'Menu', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/menu.svg',
+		'public'   => true,
 	),
 	'mobile'                         => array(
 		'label'    => _x( 'Mobile', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/mobile.svg',
+		'public'   => true,
 	),
 	'more'                           => array(
 		'label'    => _x( 'More', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/more.svg',
-		'status'   => 'hidden',
 	),
 	'more-horizontal'                => array(
 		'label'    => _x( 'More Horizontal', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/more-horizontal.svg',
+		'public'   => true,
 	),
 	'more-vertical'                  => array(
 		'label'    => _x( 'More Vertical', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/more-vertical.svg',
+		'public'   => true,
 	),
 	'move-to'                        => array(
 		'label'    => _x( 'Move To', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/move-to.svg',
+		'public'   => true,
 	),
 	'navigation'                     => array(
 		'label'    => _x( 'Navigation', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/navigation.svg',
-		'status'   => 'hidden',
 	),
 	'next'                           => array(
 		'label'    => _x( 'Next', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/next.svg',
+		'public'   => true,
 	),
 	'not-allowed'                    => array(
 		'label'    => _x( 'Not Allowed', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/not-allowed.svg',
+		'public'   => true,
 	),
 	'not-found'                      => array(
 		'label'    => _x( 'Not Found', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/not-found.svg',
-		'status'   => 'hidden',
 	),
 	'offline'                        => array(
 		'label'    => _x( 'Offline', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/offline.svg',
-		'status'   => 'hidden',
 	),
 	'overlay-text'                   => array(
 		'label'    => _x( 'Overlay Text', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/overlay-text.svg',
-		'status'   => 'hidden',
 	),
 	'page'                           => array(
 		'label'    => _x( 'Page', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/page.svg',
+		'public'   => true,
 	),
 	'page-break'                     => array(
 		'label'    => _x( 'Page Break', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/page-break.svg',
-		'status'   => 'hidden',
 	),
 	'pages'                          => array(
 		'label'    => _x( 'Pages', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/pages.svg',
+		'public'   => true,
 	),
 	'paragraph'                      => array(
 		'label'    => _x( 'Paragraph', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/paragraph.svg',
+		'public'   => true,
 	),
 	'payment'                        => array(
 		'label'    => _x( 'Payment', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/payment.svg',
+		'public'   => true,
 	),
 	'pencil'                         => array(
 		'label'    => _x( 'Pencil', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/pencil.svg',
+		'public'   => true,
 	),
 	'pending'                        => array(
 		'label'    => _x( 'Pending', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/pending.svg',
-		'status'   => 'hidden',
 	),
 	'people'                         => array(
 		'label'    => _x( 'People', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/people.svg',
+		'public'   => true,
 	),
 	'percent'                        => array(
 		'label'    => _x( 'Percent', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/percent.svg',
+		'public'   => true,
 	),
 	'pin'                            => array(
 		'label'    => _x( 'Pin', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/pin.svg',
+		'public'   => true,
 	),
 	'pin-small'                      => array(
 		'label'    => _x( 'Pin Small', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/pin-small.svg',
+		'public'   => true,
 	),
 	'plugins'                        => array(
 		'label'    => _x( 'Plugins', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/plugins.svg',
-		'status'   => 'hidden',
 	),
 	'plus'                           => array(
 		'label'    => _x( 'Plus', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/plus.svg',
+		'public'   => true,
 	),
 	'plus-circle'                    => array(
 		'label'    => _x( 'Plus Circle', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/plus-circle.svg',
+		'public'   => true,
 	),
 	'plus-circle-filled'             => array(
 		'label'    => _x( 'Plus Circle Filled', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/plus-circle-filled.svg',
-		'status'   => 'hidden',
 	),
 	'position-center'                => array(
 		'label'    => _x( 'Position Center', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/position-center.svg',
-		'status'   => 'hidden',
 	),
 	'position-left'                  => array(
 		'label'    => _x( 'Position Left', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/position-left.svg',
-		'status'   => 'hidden',
 	),
 	'position-right'                 => array(
 		'label'    => _x( 'Position Right', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/position-right.svg',
-		'status'   => 'hidden',
 	),
 	'post'                           => array(
 		'label'    => _x( 'Post', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/post.svg',
-		'status'   => 'hidden',
 	),
 	'post-author'                    => array(
 		'label'    => _x( 'Post Author', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/post-author.svg',
-		'status'   => 'hidden',
 	),
 	'post-categories'                => array(
 		'label'    => _x( 'Post Categories', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/post-categories.svg',
-		'status'   => 'hidden',
 	),
 	'post-comments'                  => array(
 		'label'    => _x( 'Post Comments', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/post-comments.svg',
+		'public'   => true,
 	),
 	'post-comments-count'            => array(
 		'label'    => _x( 'Post Comments Count', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/post-comments-count.svg',
-		'status'   => 'hidden',
 	),
 	'post-comments-form'             => array(
 		'label'    => _x( 'Post Comments Form', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/post-comments-form.svg',
-		'status'   => 'hidden',
 	),
 	'post-content'                   => array(
 		'label'    => _x( 'Post Content', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/post-content.svg',
-		'status'   => 'hidden',
 	),
 	'post-date'                      => array(
 		'label'    => _x( 'Post Date', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/post-date.svg',
-		'status'   => 'hidden',
 	),
 	'post-excerpt'                   => array(
 		'label'    => _x( 'Post Excerpt', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/post-excerpt.svg',
-		'status'   => 'hidden',
 	),
 	'post-featured-image'            => array(
 		'label'    => _x( 'Post Featured Image', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/post-featured-image.svg',
-		'status'   => 'hidden',
 	),
 	'post-list'                      => array(
 		'label'    => _x( 'Post List', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/post-list.svg',
-		'status'   => 'hidden',
 	),
 	'post-terms'                     => array(
 		'label'    => _x( 'Post Terms', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/post-terms.svg',
-		'status'   => 'hidden',
 	),
 	'preformatted'                   => array(
 		'label'    => _x( 'Preformatted', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/preformatted.svg',
-		'status'   => 'hidden',
 	),
 	'previous'                       => array(
 		'label'    => _x( 'Previous', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/previous.svg',
+		'public'   => true,
 	),
 	'published'                      => array(
 		'label'    => _x( 'Published', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/published.svg',
+		'public'   => true,
 	),
 	'pull-left'                      => array(
 		'label'    => _x( 'Pull Left', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/pull-left.svg',
-		'status'   => 'hidden',
 	),
 	'pull-right'                     => array(
 		'label'    => _x( 'Pull Right', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/pull-right.svg',
-		'status'   => 'hidden',
 	),
 	'pullquote'                      => array(
 		'label'    => _x( 'Pullquote', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/pullquote.svg',
-		'status'   => 'hidden',
 	),
 	'query-pagination'               => array(
 		'label'    => _x( 'Query Pagination', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/query-pagination.svg',
-		'status'   => 'hidden',
 	),
 	'query-pagination-next'          => array(
 		'label'    => _x( 'Query Pagination Next', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/query-pagination-next.svg',
-		'status'   => 'hidden',
 	),
 	'query-pagination-numbers'       => array(
 		'label'    => _x( 'Query Pagination Numbers', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/query-pagination-numbers.svg',
-		'status'   => 'hidden',
 	),
 	'query-pagination-previous'      => array(
 		'label'    => _x( 'Query Pagination Previous', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/query-pagination-previous.svg',
-		'status'   => 'hidden',
 	),
 	'quote'                          => array(
 		'label'    => _x( 'Quote', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/quote.svg',
+		'public'   => true,
 	),
 	'receipt'                        => array(
 		'label'    => _x( 'Receipt', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/receipt.svg',
+		'public'   => true,
 	),
 	'redo'                           => array(
 		'label'    => _x( 'Redo', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/redo.svg',
-		'status'   => 'hidden',
 	),
 	'remove-bug'                     => array(
 		'label'    => _x( 'Remove Bug', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/remove-bug.svg',
-		'status'   => 'hidden',
 	),
 	'remove-submenu'                 => array(
 		'label'    => _x( 'Remove Submenu', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/remove-submenu.svg',
-		'status'   => 'hidden',
 	),
 	'replace'                        => array(
 		'label'    => _x( 'Replace', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/replace.svg',
-		'status'   => 'hidden',
 	),
 	'reset'                          => array(
 		'label'    => _x( 'Reset', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/reset.svg',
-		'status'   => 'hidden',
 	),
 	'resize-corner-n-e'              => array(
 		'label'    => _x( 'Resize Corner N E', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/resize-corner-n-e.svg',
+		'public'   => true,
 	),
 	'reusable-block'                 => array(
 		'label'    => _x( 'Reusable Block', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/reusable-block.svg',
+		'public'   => true,
 	),
 	'rotate-left'                    => array(
 		'label'    => _x( 'Rotate Left', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/rotate-left.svg',
+		'public'   => true,
 	),
 	'rotate-right'                   => array(
 		'label'    => _x( 'Rotate Right', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/rotate-right.svg',
+		'public'   => true,
 	),
 	'row'                            => array(
 		'label'    => _x( 'Row', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/row.svg',
+		'public'   => true,
 	),
 	'rss'                            => array(
 		'label'    => _x( 'Rss', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/rss.svg',
+		'public'   => true,
 	),
 	'scheduled'                      => array(
 		'label'    => _x( 'Scheduled', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/scheduled.svg',
+		'public'   => true,
 	),
 	'search'                         => array(
 		'label'    => _x( 'Search', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/search.svg',
+		'public'   => true,
 	),
 	'seen'                           => array(
 		'label'    => _x( 'Seen', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/seen.svg',
+		'public'   => true,
 	),
 	'send'                           => array(
 		'label'    => _x( 'Send', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/send.svg',
+		'public'   => true,
 	),
 	'separator'                      => array(
 		'label'    => _x( 'Separator', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/separator.svg',
-		'status'   => 'hidden',
 	),
 	'settings'                       => array(
 		'label'    => _x( 'Settings', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/settings.svg',
+		'public'   => true,
 	),
 	'shadow'                         => array(
 		'label'    => _x( 'Shadow', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/shadow.svg',
+		'public'   => true,
 	),
 	'share'                          => array(
 		'label'    => _x( 'Share', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/share.svg',
+		'public'   => true,
 	),
 	'shield'                         => array(
 		'label'    => _x( 'Shield', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/shield.svg',
+		'public'   => true,
 	),
 	'shipping'                       => array(
 		'label'    => _x( 'Shipping', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/shipping.svg',
+		'public'   => true,
 	),
 	'shortcode'                      => array(
 		'label'    => _x( 'Shortcode', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/shortcode.svg',
-		'status'   => 'hidden',
 	),
 	'shuffle'                        => array(
 		'label'    => _x( 'Shuffle', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/shuffle.svg',
+		'public'   => true,
 	),
 	'sidebar'                        => array(
 		'label'    => _x( 'Sidebar', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/sidebar.svg',
-		'status'   => 'hidden',
 	),
 	'sides-all'                      => array(
 		'label'    => _x( 'Sides All', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/sides-all.svg',
-		'status'   => 'hidden',
 	),
 	'sides-axial'                    => array(
 		'label'    => _x( 'Sides Axial', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/sides-axial.svg',
-		'status'   => 'hidden',
 	),
 	'sides-bottom'                   => array(
 		'label'    => _x( 'Sides Bottom', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/sides-bottom.svg',
-		'status'   => 'hidden',
 	),
 	'sides-horizontal'               => array(
 		'label'    => _x( 'Sides Horizontal', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/sides-horizontal.svg',
-		'status'   => 'hidden',
 	),
 	'sides-left'                     => array(
 		'label'    => _x( 'Sides Left', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/sides-left.svg',
-		'status'   => 'hidden',
 	),
 	'sides-right'                    => array(
 		'label'    => _x( 'Sides Right', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/sides-right.svg',
-		'status'   => 'hidden',
 	),
 	'sides-top'                      => array(
 		'label'    => _x( 'Sides Top', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/sides-top.svg',
-		'status'   => 'hidden',
 	),
 	'sides-vertical'                 => array(
 		'label'    => _x( 'Sides Vertical', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/sides-vertical.svg',
-		'status'   => 'hidden',
 	),
 	'site-logo'                      => array(
 		'label'    => _x( 'Site Logo', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/site-logo.svg',
-		'status'   => 'hidden',
 	),
 	'square'                         => array(
 		'label'    => _x( 'Square', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/square.svg',
-		'status'   => 'hidden',
 	),
 	'stack'                          => array(
 		'label'    => _x( 'Stack', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/stack.svg',
-		'status'   => 'hidden',
 	),
 	'star-empty'                     => array(
 		'label'    => _x( 'Star Empty', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/star-empty.svg',
+		'public'   => true,
 	),
 	'star-filled'                    => array(
 		'label'    => _x( 'Star Filled', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/star-filled.svg',
+		'public'   => true,
 	),
 	'star-half'                      => array(
 		'label'    => _x( 'Star Half', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/star-half.svg',
+		'public'   => true,
 	),
 	'store'                          => array(
 		'label'    => _x( 'Store', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/store.svg',
+		'public'   => true,
 	),
 	'stretch-full-width'             => array(
 		'label'    => _x( 'Stretch Full Width', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/stretch-full-width.svg',
-		'status'   => 'hidden',
 	),
 	'stretch-wide'                   => array(
 		'label'    => _x( 'Stretch Wide', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/stretch-wide.svg',
-		'status'   => 'hidden',
 	),
 	'styles'                         => array(
 		'label'    => _x( 'Styles', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/styles.svg',
+		'public'   => true,
 	),
 	'subscript'                      => array(
 		'label'    => _x( 'Subscript', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/subscript.svg',
-		'status'   => 'hidden',
 	),
 	'superscript'                    => array(
 		'label'    => _x( 'Superscript', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/superscript.svg',
-		'status'   => 'hidden',
 	),
 	'swatch'                         => array(
 		'label'    => _x( 'Swatch', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/swatch.svg',
-		'status'   => 'hidden',
 	),
 	'symbol'                         => array(
 		'label'    => _x( 'Symbol', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/symbol.svg',
+		'public'   => true,
 	),
 	'symbol-filled'                  => array(
 		'label'    => _x( 'Symbol Filled', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/symbol-filled.svg',
+		'public'   => true,
 	),
 	'table'                          => array(
 		'label'    => _x( 'Table', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/table.svg',
+		'public'   => true,
 	),
 	'table-column-after'             => array(
 		'label'    => _x( 'Table Column After', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/table-column-after.svg',
-		'status'   => 'hidden',
 	),
 	'table-column-before'            => array(
 		'label'    => _x( 'Table Column Before', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/table-column-before.svg',
-		'status'   => 'hidden',
 	),
 	'table-column-delete'            => array(
 		'label'    => _x( 'Table Column Delete', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/table-column-delete.svg',
-		'status'   => 'hidden',
 	),
 	'table-of-contents'              => array(
 		'label'    => _x( 'Table Of Contents', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/table-of-contents.svg',
-		'status'   => 'hidden',
 	),
 	'table-row-after'                => array(
 		'label'    => _x( 'Table Row After', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/table-row-after.svg',
-		'status'   => 'hidden',
 	),
 	'table-row-before'               => array(
 		'label'    => _x( 'Table Row Before', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/table-row-before.svg',
-		'status'   => 'hidden',
 	),
 	'table-row-delete'               => array(
 		'label'    => _x( 'Table Row Delete', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/table-row-delete.svg',
-		'status'   => 'hidden',
 	),
 	'tablet'                         => array(
 		'label'    => _x( 'Tablet', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/tablet.svg',
+		'public'   => true,
 	),
 	'tag'                            => array(
 		'label'    => _x( 'Tag', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/tag.svg',
+		'public'   => true,
 	),
 	'term-count'                     => array(
 		'label'    => _x( 'Term Count', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/term-count.svg',
-		'status'   => 'hidden',
 	),
 	'term-description'               => array(
 		'label'    => _x( 'Term Description', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/term-description.svg',
-		'status'   => 'hidden',
 	),
 	'term-name'                      => array(
 		'label'    => _x( 'Term Name', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/term-name.svg',
-		'status'   => 'hidden',
 	),
 	'text-color'                     => array(
 		'label'    => _x( 'Text Color', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/text-color.svg',
-		'status'   => 'hidden',
 	),
 	'text-horizontal'                => array(
 		'label'    => _x( 'Text Horizontal', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/text-horizontal.svg',
-		'status'   => 'hidden',
 	),
 	'text-vertical'                  => array(
 		'label'    => _x( 'Text Vertical', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/text-vertical.svg',
-		'status'   => 'hidden',
 	),
 	'thumbs-down'                    => array(
 		'label'    => _x( 'Thumbs Down', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/thumbs-down.svg',
+		'public'   => true,
 	),
 	'thumbs-up'                      => array(
 		'label'    => _x( 'Thumbs Up', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/thumbs-up.svg',
+		'public'   => true,
 	),
 	'time-to-read'                   => array(
 		'label'    => _x( 'Time To Read', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/time-to-read.svg',
-		'status'   => 'hidden',
 	),
 	'tip'                            => array(
 		'label'    => _x( 'Tip', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/tip.svg',
+		'public'   => true,
 	),
 	'title'                          => array(
 		'label'    => _x( 'Title', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/title.svg',
-		'status'   => 'hidden',
 	),
 	'tool'                           => array(
 		'label'    => _x( 'Tool', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/tool.svg',
-		'status'   => 'hidden',
 	),
 	'trash'                          => array(
 		'label'    => _x( 'Trash', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/trash.svg',
+		'public'   => true,
 	),
 	'trending-down'                  => array(
 		'label'    => _x( 'Trending Down', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/trending-down.svg',
+		'public'   => true,
 	),
 	'trending-up'                    => array(
 		'label'    => _x( 'Trending Up', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/trending-up.svg',
+		'public'   => true,
 	),
 	'typography'                     => array(
 		'label'    => _x( 'Typography', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/typography.svg',
+		'public'   => true,
 	),
 	'undo'                           => array(
 		'label'    => _x( 'Undo', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/undo.svg',
-		'status'   => 'hidden',
 	),
 	'ungroup'                        => array(
 		'label'    => _x( 'Ungroup', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/ungroup.svg',
+		'public'   => true,
 	),
 	'unlock'                         => array(
 		'label'    => _x( 'Unlock', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/unlock.svg',
+		'public'   => true,
 	),
 	'unseen'                         => array(
 		'label'    => _x( 'Unseen', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/unseen.svg',
+		'public'   => true,
 	),
 	'update'                         => array(
 		'label'    => _x( 'Update', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/update.svg',
+		'public'   => true,
 	),
 	'upload'                         => array(
 		'label'    => _x( 'Upload', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/upload.svg',
+		'public'   => true,
 	),
 	'verse'                          => array(
 		'label'    => _x( 'Verse', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/verse.svg',
+		'public'   => true,
 	),
 	'video'                          => array(
 		'label'    => _x( 'Video', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/video.svg',
-		'status'   => 'hidden',
 	),
 	'widget'                         => array(
 		'label'    => _x( 'Widget', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/widget.svg',
-		'status'   => 'hidden',
 	),
 	'word-count'                     => array(
 		'label'    => _x( 'Word Count', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/word-count.svg',
-		'status'   => 'hidden',
 	),
 	'wordpress'                      => array(
 		'label'    => _x( 'WordPress', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/wordpress.svg',
-		'status'   => 'hidden',
 	),
 );

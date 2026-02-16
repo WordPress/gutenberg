@@ -58,8 +58,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 					return;
 				}
 
-				$status = $icon_data['status'] ?? '';
-				if ( 'hidden' === $status || 'disabled' === $status ) {
+				if ( ! ( $icon_data['public'] ?? false ) ) {
 					continue;
 				}
 
