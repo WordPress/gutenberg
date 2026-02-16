@@ -96,6 +96,9 @@ export default function BlockLockModal( { clientId, onClose } ) {
 			<form
 				onSubmit={ ( event ) => {
 					event.preventDefault();
+					if ( ! isDirty ) {
+						return;
+					}
 					updateBlockAttributes( [ clientId ], {
 						lock,
 						templateLock: applyTemplateLock
