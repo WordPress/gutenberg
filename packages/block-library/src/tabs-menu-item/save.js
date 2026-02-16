@@ -26,16 +26,14 @@ export default function save( { attributes } ) {
 	}
 
 	// useBlockProps.save includes all core style engine classes and styles
-	// We add our custom classes and the hidden attribute for PHP template extraction
+	// The button content is replaced by PHP during rendering, so we output
+	// an empty button as a template.
 	const blockProps = useBlockProps.save( {
 		className: 'wp-block-tabs-menu-item__template',
 		style: customColorStyles,
-		hidden: true,
 		type: 'button',
 		role: 'tab',
 	} );
 
-	// The button content is replaced by PHP during rendering (see index.php),
-	// so we output an empty button as a template.
 	return <button { ...blockProps } />;
 }
