@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useMemo, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	Button,
 	CheckboxControl,
@@ -76,27 +76,11 @@ export default function BlockLockModal( { clientId, onClose } ) {
 	const isAllChecked = Object.values( lock ).every( Boolean );
 	const isMixed = Object.values( lock ).some( Boolean ) && ! isAllChecked;
 
-	const isDirty = useMemo( () => {
-		if ( lock.move !== isMoveLocked || lock.remove !== isRemoveLocked ) {
-			return true;
-		}
-		if ( allowsEditLocking && lock.edit !== isEditLocked ) {
-			return true;
-		}
-		if ( hasTemplateLock && applyTemplateLock !== !! templateLock ) {
-			return true;
-		}
-		return false;
-	}, [
-		lock,
-		isMoveLocked,
-		isRemoveLocked,
-		isEditLocked,
-		allowsEditLocking,
-		applyTemplateLock,
-		templateLock,
-		hasTemplateLock,
-	] );
+	const isDirty =
+		lock.move !== isMoveLocked ||
+		lock.remove !== isRemoveLocked ||
+		( allowsEditLocking && lock.edit !== isEditLocked ) ||
+		( hasTemplateLock && applyTemplateLock !== !! templateLock );
 
 	return (
 		<Modal
