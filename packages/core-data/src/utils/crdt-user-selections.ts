@@ -11,6 +11,7 @@ import type { YPostRecord } from './crdt';
 import type { YBlock, YBlocks } from './crdt-blocks';
 import { getRootMap } from './crdt-utils';
 import type {
+	AbsoluteBlockIndexPath,
 	WPBlockSelection,
 	SelectionState,
 	SelectionNone,
@@ -35,15 +36,21 @@ export enum SelectionType {
 /**
  * Converts WordPress block editor selection to a SelectionState.
  *
- * @param selectionStart - The start position of the selection
- * @param selectionEnd   - The end position of the selection
- * @param yDoc           - The Yjs document
+ * Uses a blockPathResolver to locate blocks in the Yjs document by their
+ * tree position (index path) rather than clientId, since clientIds may differ
+ * between the block-editor store and the Yjs document (e.g. in "Show Template" mode).
+ *
+ * @param selectionStart    - The start position of the selection
+ * @param selectionEnd      - The end position of the selection
+ * @param yDoc              - The Yjs document
+ * @param blockPathResolver - Resolves a block clientId to its index path in the block tree
  * @return The SelectionState
  */
 export function getSelectionState(
 	selectionStart: WPBlockSelection,
 	selectionEnd: WPBlockSelection,
-	yDoc: Y.Doc
+	yDoc: Y.Doc,
+	blockPathResolver: ( clientId: string ) => AbsoluteBlockIndexPath | null
 ): SelectionState {
 	const ymap = getRootMap< YPostRecord >( yDoc, CRDT_RECORD_MAP_KEY );
 	const yBlocks = ymap.get( 'blocks' ) ?? new Y.Array< YBlock >();
@@ -70,10 +77,8 @@ export function getSelectionState(
 
 	if ( isSelectionAWholeBlock ) {
 		// Case 2: A whole block is selected.
-		const blockPos = findBlockPositionByClientId(
-			selectionStart.clientId,
-			yBlocks
-		);
+		const path = blockPathResolver( selectionStart.clientId );
+		const blockPos = path ? findBlockPositionByPath( path, yBlocks ) : null;
 
 		if ( ! blockPos ) {
 			return noSelection;
@@ -88,7 +93,11 @@ export function getSelectionState(
 		};
 	} else if ( isCursorOnly ) {
 		// Case 3: Cursor only, no text selected
-		const cursorPosition = getCursorPosition( selectionStart, yBlocks );
+		const cursorPosition = getCursorPosition(
+			selectionStart,
+			yBlocks,
+			blockPathResolver
+		);
 
 		if ( ! cursorPosition ) {
 			// If we can't find the cursor position in block text, treat it as a non-selection.
@@ -103,9 +112,14 @@ export function getSelectionState(
 		// Case 4: Selection in a single block
 		const cursorStartPosition = getCursorPosition(
 			selectionStart,
-			yBlocks
+			yBlocks,
+			blockPathResolver
 		);
-		const cursorEndPosition = getCursorPosition( selectionEnd, yBlocks );
+		const cursorEndPosition = getCursorPosition(
+			selectionEnd,
+			yBlocks,
+			blockPathResolver
+		);
 
 		if ( ! cursorStartPosition || ! cursorEndPosition ) {
 			// If we can't find the cursor positions in block text, treat it as a non-selection.
@@ -119,9 +133,17 @@ export function getSelectionState(
 		};
 	}
 
-	// Caes 5: Selection in multiple blocks
-	const cursorStartPosition = getCursorPosition( selectionStart, yBlocks );
-	const cursorEndPosition = getCursorPosition( selectionEnd, yBlocks );
+	// Case 5: Selection in multiple blocks
+	const cursorStartPosition = getCursorPosition(
+		selectionStart,
+		yBlocks,
+		blockPathResolver
+	);
+	const cursorEndPosition = getCursorPosition(
+		selectionEnd,
+		yBlocks,
+		blockPathResolver
+	);
 	if ( ! cursorStartPosition || ! cursorEndPosition ) {
 		// If we can't find the cursor positions in block text, treat it as a non-selection.
 		return noSelection;
@@ -137,15 +159,18 @@ export function getSelectionState(
 /**
  * Get the cursor position from a selection.
  *
- * @param selection - The selection.
- * @param blocks    - The blocks to search through.
+ * @param selection         - The selection.
+ * @param blocks            - The blocks to search through.
+ * @param blockPathResolver - Resolves a block clientId to its index path in the block tree.
  * @return The cursor position, or null if not found.
  */
 function getCursorPosition(
 	selection: WPBlockSelection,
-	blocks: YBlocks
+	blocks: YBlocks,
+	blockPathResolver: ( clientId: string ) => AbsoluteBlockIndexPath | null
 ): CursorPosition | null {
-	const block = findBlockByClientId( selection.clientId, blocks );
+	const path = blockPathResolver( selection.clientId );
+	const block = path ? findBlockByPath( path, blocks ) : null;
 	if (
 		! block ||
 		! selection.attributeKey ||
@@ -169,100 +194,59 @@ function getCursorPosition(
 }
 
 /**
- * Find a block by its client ID.
+ * Find a block by navigating a tree index path in the Yjs block hierarchy.
  *
- * @param blockId - The client ID of the block.
- * @param blocks  - The blocks to search through.
- * @return The block if found, null otherwise.
+ * @param path   - The index path, e.g. [0, 1] for blocks[0].innerBlocks[1].
+ * @param blocks - The root-level Yjs blocks array.
+ * @return The block Y.Map if found, null otherwise.
  */
-function findBlockByClientId(
-	blockId: string,
+function findBlockByPath(
+	path: AbsoluteBlockIndexPath,
 	blocks: YBlocks
 ): YBlock | null {
-	for ( const block of blocks ) {
-		if ( block.get( 'clientId' ) === blockId ) {
+	let currentBlocks = blocks;
+	for ( let i = 0; i < path.length; i++ ) {
+		if ( path[ i ] >= currentBlocks.length ) {
+			return null;
+		}
+		const block = currentBlocks.get( path[ i ] );
+		if ( ! block ) {
+			return null;
+		}
+		if ( i === path.length - 1 ) {
 			return block;
 		}
-
-		const innerBlocks = block.get( 'innerBlocks' );
-
-		if ( innerBlocks && innerBlocks.length > 0 ) {
-			const innerBlock = findBlockByClientId( blockId, innerBlocks );
-
-			if ( innerBlock ) {
-				return innerBlock;
-			}
-		}
+		currentBlocks =
+			block.get( 'innerBlocks' ) ?? ( new Y.Array() as YBlocks );
 	}
-
 	return null;
 }
 
 /**
- * Find a block's position (parent array and index) by its client ID.
+ * Find a block's position (parent array and index) by navigating a tree index path.
  * Used for WholeBlock selections where we need to create a Y.RelativePosition.
  *
- * @param blockId - The client ID of the block.
- * @param blocks  - The blocks to search through.
+ * @param path   - The index path, e.g. [0, 1] for blocks[0].innerBlocks[1].
+ * @param blocks - The root-level Yjs blocks array.
  * @return The parent array and index if found, null otherwise.
  */
-function findBlockPositionByClientId(
-	blockId: string,
+function findBlockPositionByPath(
+	path: AbsoluteBlockIndexPath,
 	blocks: YBlocks
 ): { parentArray: YBlocks; index: number } | null {
-	for ( let i = 0; i < blocks.length; i++ ) {
-		const block = blocks.get( i );
-		if ( block.get( 'clientId' ) === blockId ) {
-			return { parentArray: blocks, index: i };
+	let currentBlocks = blocks;
+	for ( let i = 0; i < path.length; i++ ) {
+		if ( path[ i ] >= currentBlocks.length ) {
+			return null;
 		}
-
-		const innerBlocks = block.get( 'innerBlocks' );
-
-		if ( innerBlocks && innerBlocks.length > 0 ) {
-			const result = findBlockPositionByClientId( blockId, innerBlocks );
-
-			if ( result ) {
-				return result;
-			}
+		if ( i === path.length - 1 ) {
+			return { parentArray: currentBlocks, index: path[ i ] };
 		}
+		const block = currentBlocks.get( path[ i ] );
+		currentBlocks =
+			block?.get( 'innerBlocks' ) ?? ( new Y.Array() as YBlocks );
 	}
-
 	return null;
-}
-
-/**
- * Resolve a block's Y.RelativePosition to a local client ID.
- * Used on the receiver side to find which block a WholeBlock selection refers to.
- *
- * @param blockPosition - The relative position of the block in its parent Y.Array.
- * @param yDoc          - The Yjs document.
- * @return The block's local client ID, or null if not found.
- */
-export function resolveBlockClientId(
-	blockPosition: Y.RelativePosition,
-	yDoc: Y.Doc
-): string | null {
-	const absolutePos = Y.createAbsolutePositionFromRelativePosition(
-		blockPosition,
-		yDoc
-	);
-
-	if ( ! absolutePos ) {
-		return null;
-	}
-
-	const parentArray = absolutePos.type as Y.Array< YBlock >;
-
-	if ( ! ( parentArray instanceof Y.Array ) ) {
-		return null;
-	}
-
-	const block = parentArray.get( absolutePos.index );
-	if ( ! block ) {
-		return null;
-	}
-
-	return ( block.get( 'clientId' ) as string ) ?? null;
 }
 
 /**

@@ -13,6 +13,30 @@ export interface AnyFunction {
 }
 
 /**
+ * An index path from the root of the block tree to a specific block.
+ *
+ * For example, `[0, 1]` refers to `blocks[0].innerBlocks[1]`.
+ *
+ * These paths are "absolute" in that they start from the post content root
+ * (not from the template root when "Show Template" mode is active).
+ * Both the Yjs document and the block-editor store share the same tree
+ * structure for post content blocks, so the same path can be used to
+ * navigate either tree.
+ */
+export type AbsoluteBlockIndexPath = number[];
+
+/**
+ * A block as represented in the block-editor store (from `getBlocks()`).
+ *
+ * This is a minimal interface covering only the fields used by RTC awareness.
+ */
+export interface EditorStoreBlock {
+	clientId: string;
+	name: string;
+	innerBlocks: EditorStoreBlock[];
+}
+
+/**
  * Avoid a circular dependency with @wordpress/editor
  *
  * Additionaly, this type marks `attributeKey` and `offset` as possibly

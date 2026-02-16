@@ -19,10 +19,14 @@ import {
 	areSelectionsStatesEqual,
 	getSelectionState,
 	SelectionType,
-	resolveBlockClientId,
 } from '../utils/crdt-user-selections';
 
-import type { SelectionState, WPBlockSelection } from '../types';
+import type {
+	AbsoluteBlockIndexPath,
+	EditorStoreBlock,
+	SelectionState,
+	WPBlockSelection,
+} from '../types';
 import type {
 	DebugCollaboratorData,
 	EditorState,
@@ -60,7 +64,45 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			getSelectionStart,
 			getSelectionEnd,
 			getSelectedBlocksInitialCaretPosition,
+			getBlockIndex,
+			getBlockRootClientId,
+			getBlockName,
 		} = select( blockEditorStore );
+
+		// Resolves a block's clientId (which may be an internal/cloned ID) to its
+		// index path relative to the post content blocks. This allows finding the
+		// corresponding block in the Yjs document even when clientIds differ
+		// (e.g. in "Show Template" mode where blocks are cloned).
+		//
+		// In template mode, the block tree includes template parts and wrapper blocks
+		// around a core/post-content block. The Yjs document only contains the post
+		// content blocks, so we stop the upward walk when the parent is
+		// core/post-content (its inner blocks correspond to the Yjs root blocks).
+		const blockPathResolver = (
+			clientId: string
+		): AbsoluteBlockIndexPath | null => {
+			const path: AbsoluteBlockIndexPath = [];
+			let current: string | null = clientId;
+			while ( current ) {
+				const index = getBlockIndex( current );
+				if ( index === -1 ) {
+					return null;
+				}
+				path.unshift( index );
+				const parent = getBlockRootClientId( current );
+				if ( ! parent ) {
+					break;
+				}
+				// If the parent is core/post-content, stop here — the Yjs doc
+				// root blocks correspond to post-content's inner blocks.
+				const parentName = getBlockName( parent );
+				if ( parentName === 'core/post-content' ) {
+					break;
+				}
+				current = parent;
+			}
+			return path.length > 0 ? path : null;
+		};
 
 		// Keep track of the current selection in the outer scope so we can compare
 		// in the subscription.
@@ -105,7 +147,8 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				const selectionState = getSelectionState(
 					selectionStart,
 					selectionEnd,
-					this.doc
+					this.doc,
+					blockPathResolver
 				);
 
 				this.setThrottledLocalStateField(
@@ -177,8 +220,14 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	 * Resolve a selection state to a text index and block client ID.
 	 *
 	 * For text-based selections, navigates up from the resolved Y.Text via
-	 * AbstractType.parent to find the containing block.
-	 * For WholeBlock selections, resolves the block's relative position directly.
+	 * AbstractType.parent to find the containing block, then resolves the
+	 * local clientId via the block's tree path.
+	 * For WholeBlock selections, resolves the block's relative position and
+	 * then finds the local clientId via tree path.
+	 *
+	 * Tree-path resolution is used instead of reading the clientId directly
+	 * from the Yjs block because the local block-editor store may use different
+	 * clientIds (e.g. in "Show Template" mode where blocks are cloned).
 	 *
 	 * @param selection - The selection state.
 	 * @return The text index and block client ID, or nulls if not resolvable.
@@ -192,13 +241,22 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		}
 
 		if ( selection.type === SelectionType.WholeBlock ) {
-			return {
-				textIndex: null,
-				blockClientId: resolveBlockClientId(
-					selection.blockPosition,
-					this.doc
-				),
-			};
+			const absolutePos = Y.createAbsolutePositionFromRelativePosition(
+				selection.blockPosition,
+				this.doc
+			);
+			let blockClientId: string | null = null;
+			if ( absolutePos ) {
+				const parentArray = absolutePos.type as Y.Array< any >;
+				const block = parentArray.get( absolutePos.index );
+				if ( block ) {
+					const path = this.getBlockPathFromYjs( block );
+					blockClientId = path
+						? this.resolveBlockClientIdByPath( path )
+						: null;
+				}
+			}
+			return { textIndex: null, blockClientId };
 		}
 
 		// Text-based selections: resolve cursor position and navigate up.
@@ -218,9 +276,152 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 
 		// Navigate up: Y.Text → attributes Y.Map → block Y.Map
 		const blockMap = absolutePosition.type.parent?.parent;
-		const blockClientId = ( blockMap as any )?.get?.( 'clientId' ) ?? null;
+		const path = blockMap ? this.getBlockPathFromYjs( blockMap ) : null;
+		const blockClientId = path
+			? this.resolveBlockClientIdByPath( path )
+			: null;
 
 		return { textIndex: absolutePosition.index, blockClientId };
+	}
+
+	/**
+	 * Walk up the Yjs parent chain from a block Y.Map to build its index path.
+	 *
+	 * For example, the second inner block of the first root block returns [0, 1].
+	 *
+	 * @param blockMap - The Yjs block Y.Map to start from.
+	 * @return The index path from root, or null if traversal fails.
+	 */
+	private getBlockPathFromYjs(
+		blockMap: any
+	): AbsoluteBlockIndexPath | null {
+		const path: AbsoluteBlockIndexPath = [];
+		let current = blockMap;
+
+		while ( current ) {
+			const parentArray = current.parent;
+			if ( ! parentArray || ! ( parentArray instanceof Y.Array ) ) {
+				return null;
+			}
+
+			// Find index of current block in its parent array.
+			let index = -1;
+			for ( let i = 0; i < parentArray.length; i++ ) {
+				if ( parentArray.get( i ) === current ) {
+					index = i;
+					break;
+				}
+			}
+			if ( index === -1 ) {
+				return null;
+			}
+			path.unshift( index );
+
+			// Walk up: is the parent array's parent a block Y.Map or the root?
+			const grandparent = parentArray.parent as any;
+			if ( grandparent?.get?.( 'clientId' ) !== undefined ) {
+				current = grandparent; // It's a block — keep going.
+			} else {
+				break; // It's the root map — done.
+			}
+		}
+
+		return path;
+	}
+
+	/**
+	 * Navigate the block-editor store's block tree by an index path
+	 * and return the local block's clientId.
+	 *
+	 * In template mode, getBlocks() returns the full template tree, but Yjs
+	 * paths are relative to the post content. This method finds the
+	 * core/post-content block (if present) and uses its inner blocks as the
+	 * navigation root, so paths align with the Yjs document structure.
+	 *
+	 * @param path - The index path, e.g. [0, 1] for blocks[0].innerBlocks[1].
+	 * @return The local block clientId, or null if the path is invalid.
+	 */
+	private resolveBlockClientIdByPath(
+		path: AbsoluteBlockIndexPath
+	): string | null {
+		const { getBlocks } = select( blockEditorStore );
+		const postContentBlocks = this.getPostContentBlocks(
+			getBlocks(),
+			getBlocks
+		);
+
+		let blocks = postContentBlocks;
+
+		for ( let i = 0; i < path.length; i++ ) {
+			const block = blocks[ path[ i ] ];
+			if ( ! block ) {
+				return null;
+			}
+			if ( i === path.length - 1 ) {
+				return block.clientId;
+			}
+			blocks = block.innerBlocks;
+		}
+		return null;
+	}
+
+	/**
+	 * Find the post content blocks to use as the navigation root.
+	 *
+	 * In template mode, the block tree contains template parts wrapping a
+	 * core/post-content block. The Yjs document only stores the post content
+	 * blocks, so we need to find the core/post-content block and use
+	 * getBlocks(clientId) to retrieve its inner blocks from the store.
+	 *
+	 * We must use getBlocks(clientId) rather than reading .innerBlocks from
+	 * the block object because useBlockSync() injects post content as
+	 * controlled inner blocks — they exist in the store's block order map
+	 * but are not populated in the .innerBlocks property of the tree
+	 * returned by getBlocks().
+	 *
+	 * @param rootBlocks - The root-level blocks from getBlocks().
+	 * @param getBlocks  - The getBlocks selector.
+	 * @return The blocks that correspond to the Yjs document root.
+	 */
+	private getPostContentBlocks(
+		rootBlocks: EditorStoreBlock[],
+		getBlocks: ( rootClientId?: string ) => EditorStoreBlock[]
+	): EditorStoreBlock[] {
+		const postContentBlock = this.findBlockByName(
+			rootBlocks,
+			'core/post-content'
+		);
+		if ( postContentBlock ) {
+			// Use getBlocks(clientId) to read controlled inner blocks from
+			// the store, since postContentBlock.innerBlocks is empty.
+			return getBlocks( postContentBlock.clientId );
+		}
+		return rootBlocks;
+	}
+
+	/**
+	 * Recursively search the block tree for a block with a given name.
+	 *
+	 * @param blocks - The blocks to search.
+	 * @param name   - The block name to find.
+	 * @return The first matching block, or null if not found.
+	 */
+	private findBlockByName(
+		blocks: EditorStoreBlock[],
+		name: string
+	): EditorStoreBlock | null {
+		for ( const block of blocks ) {
+			if ( block.name === name ) {
+				return block;
+			}
+			if ( block.innerBlocks?.length ) {
+				const found = this.findBlockByName( block.innerBlocks, name );
+				if ( found ) {
+					return found;
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
