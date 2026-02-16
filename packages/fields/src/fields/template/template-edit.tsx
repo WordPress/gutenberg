@@ -15,6 +15,7 @@ import { __ } from '@wordpress/i18n';
 import { getItemTitle } from '../../actions/utils';
 import type { BasePost } from '../../types';
 import { getDefaultTemplateLabel } from './utils';
+import { unlock } from '../../lock-unlock';
 
 const EMPTY_ARRAY: [] = [];
 
@@ -25,12 +26,13 @@ export const TemplateEdit = ( {
 }: DataFormControlProps< BasePost > ) => {
 	const { id } = field;
 	const postType = data.type;
-
+	const postId =
+		typeof data.id === 'number' ? data.id : parseInt( data.id, 10 );
 	const slug = data.slug;
 
-	const templates = useSelect(
+	const { templates, canSwitchTemplate } = useSelect(
 		( select ) => {
-			return (
+			const allTemplates =
 				select( coreStore ).getEntityRecords< WpTemplate >(
 					'postType',
 					'wp_template',
@@ -38,10 +40,25 @@ export const TemplateEdit = ( {
 						per_page: -1,
 						post_type: postType,
 					}
-				) ?? EMPTY_ARRAY
+				) ?? EMPTY_ARRAY;
+
+			const { getHomePage, getPostsPageId } = unlock(
+				select( coreStore )
 			);
+			const singlePostId = String( postId );
+			const isPostsPage =
+				singlePostId !== undefined && getPostsPageId() === singlePostId;
+			const isFrontPage =
+				singlePostId !== undefined &&
+				postType === 'page' &&
+				getHomePage()?.postId === singlePostId;
+
+			return {
+				templates: allTemplates,
+				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
+			};
 		},
-		[ postType ]
+		[ postId, postType ]
 	);
 
 	const defaultTemplateLabel = useSelect(
@@ -78,6 +95,7 @@ export const TemplateEdit = ( {
 			value={ value }
 			options={ options }
 			onChange={ onChangeControl }
+			disabled={ ! canSwitchTemplate }
 		/>
 	);
 };

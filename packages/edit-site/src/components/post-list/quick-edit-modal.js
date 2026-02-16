@@ -46,14 +46,13 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 			const { getHomePage, getPostsPageId } = unlock(
 				select( coreDataStore )
 			);
-			const singlePostId = postId[ 0 ];
+			const singlePostId = String( postId[ 0 ] );
 			const isPostsPage =
-				singlePostId !== undefined &&
-				getPostsPageId() === String( singlePostId );
+				singlePostId !== undefined && getPostsPageId() === singlePostId;
 			const isFrontPage =
 				singlePostId !== undefined &&
 				postType === 'page' &&
-				getHomePage()?.postId === String( singlePostId );
+				getHomePage()?.postId === singlePostId;
 
 			return {
 				record: getEditedEntityRecord( ...args ),
