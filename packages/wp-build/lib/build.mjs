@@ -1649,10 +1649,10 @@ async function buildWidget( widgetName ) {
 
 	// Build render entry point if it exists
 	if ( files.hasRender ) {
-		const entryPoints = await glob(
-			`render.${ SOURCE_EXTENSIONS }`,
-			{ cwd: widgetDir, absolute: true }
-		);
+		const entryPoints = await glob( `render.${ SOURCE_EXTENSIONS }`, {
+			cwd: widgetDir,
+			absolute: true,
+		} );
 
 		if ( entryPoints.length > 0 ) {
 			builds.push(
@@ -1698,10 +1698,10 @@ async function buildWidget( widgetName ) {
 
 	// Build widget entry point if it exists
 	if ( files.hasWidget ) {
-		const entryPoints = await glob(
-			`widget.${ SOURCE_EXTENSIONS }`,
-			{ cwd: widgetDir, absolute: true }
-		);
+		const entryPoints = await glob( `widget.${ SOURCE_EXTENSIONS }`, {
+			cwd: widgetDir,
+			absolute: true,
+		} );
 
 		if ( entryPoints.length > 0 ) {
 			builds.push(
