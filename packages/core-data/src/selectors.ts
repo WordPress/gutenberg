@@ -1640,23 +1640,21 @@ export function getSyncConnectionState(
 		return undefined;
 	}
 
-	for ( const connectionState of Object.values(
-		state.syncConnectionStates
-	) ) {
-		if ( connectionState.status === 'disconnected' ) {
-			return connectionState;
-		}
-	}
+	let coalescedState: SyncConnectionState | undefined;
+
+	const prioritizedStatuses = [ 'disconnected', 'connecting', 'connected' ];
 
 	for ( const connectionState of Object.values(
 		state.syncConnectionStates
 	) ) {
-		if ( connectionState.status === 'connecting' ) {
-			return connectionState;
+		if (
+			! coalescedState ||
+			prioritizedStatuses.indexOf( connectionState.status ) <
+				prioritizedStatuses.indexOf( coalescedState.status )
+		) {
+			coalescedState = connectionState;
 		}
 	}
 
-	return {
-		status: 'connected',
-	};
+	return coalescedState;
 }
