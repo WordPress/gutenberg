@@ -1,4 +1,2 @@
-import type { PluginCreator } from 'postcss';
-
-declare const plugin: PluginCreator<never>;
+declare const plugin: import('postcss').PluginCreator< never >;
 export default plugin;

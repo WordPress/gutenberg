@@ -1,4 +1,2 @@
-import type { Plugin } from 'vite';
-
-declare const plugin: () => Plugin;
+declare const plugin: () => import('vite').Plugin;
 export default plugin;

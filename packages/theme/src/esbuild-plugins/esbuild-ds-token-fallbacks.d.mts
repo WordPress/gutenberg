@@ -1,4 +1,2 @@
-import type { Plugin } from 'esbuild';
-
-declare const plugin: Plugin;
+declare const plugin: import('esbuild').Plugin;
 export default plugin;
