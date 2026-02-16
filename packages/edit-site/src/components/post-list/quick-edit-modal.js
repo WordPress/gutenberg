@@ -37,7 +37,6 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 				return {
 					record: null,
 					hasFinishedResolution: true,
-					canSwitchTemplate: true,
 				};
 			}
 
