@@ -10,35 +10,14 @@
 		margin-inline-start: -$grid-unit-10;
 	}
 
-	// Stack avatars so the first sits on top.
+	// Elevate hovered avatar so the expanding badge renders on top.
 	> .components-avatar {
 		position: relative;
 
-		&:nth-child(1) {
-			z-index: 3;
-		}
-
-		&:nth-child(2) {
-			z-index: 2;
-		}
-
-		&:nth-child(3) {
-			z-index: 1;
+		&:hover {
+			z-index: 100;
 		}
 	}
-}
-
-// Suppress badge behavior inside groups: hide name and remove shadow.
-.components-avatar-group .components-avatar {
-	box-shadow: none;
-}
-
-.components-avatar-group .components-avatar__name {
-	display: none;
-}
-
-.components-avatar-group .components-avatar__status-indicator {
-	display: none;
 }
 
 .components-avatar-group__overflow {

@@ -15,7 +15,7 @@ import Avatar from '..';
 
 const meta: Meta< typeof Avatar > = {
 	component: Avatar,
-	title: 'Components/Containers/Avatar',
+	title: 'Design System/Components/Avatar',
 	id: 'components-avatar',
 	tags: [ 'status-private' ],
 	parameters: {

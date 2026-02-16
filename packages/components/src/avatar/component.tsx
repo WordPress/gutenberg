@@ -7,6 +7,7 @@ import clsx from 'clsx';
  * Internal dependencies
  */
 import Icon from '../icon';
+import Tooltip from '../tooltip';
 import type { AvatarProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -40,7 +41,7 @@ function Avatar( {
 			: {} ),
 	} as React.CSSProperties;
 
-	return (
+	const avatar = (
 		<div
 			className={ clsx( 'components-avatar', className, {
 				'has-border-color': !! borderColor,
@@ -70,6 +71,12 @@ function Avatar( {
 			) }
 		</div>
 	);
+
+	if ( ! showBadge && name ) {
+		return <Tooltip text={ name }>{ avatar }</Tooltip>;
+	}
+
+	return avatar;
 }
 
 export default Avatar;

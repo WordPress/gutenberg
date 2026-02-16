@@ -63,20 +63,37 @@
 	font-size: $font-size-medium;
 	line-height: $font-line-height-small;
 	color: $white;
-	max-width: 0;
-	padding: 0 0 calc($grid-unit-05 / 2) 0;
+	min-width: 0;
+	padding-bottom: calc($grid-unit-05 / 2);
 	overflow: hidden;
 	opacity: 0;
 	white-space: nowrap;
-	transition: max-width 0.3s ease, padding 0.3s ease, opacity 0.2s ease;
+	transition: opacity 0.15s cubic-bezier(0.15, 0, 0.15, 1);
 }
 
-// Badge mode: pill with always-on shadow, hover-expand name.
+// Badge mode: use grid so the name column animates from 0 to natural width.
+// Spacing is on the container (column-gap + padding-inline-end) so it
+// transitions alongside grid-template-columns instead of causing a bump.
 .components-avatar.has-badge {
+	display: inline-grid;
+	grid-template-columns: min-content 0fr;
+	column-gap: 0;
+	padding-inline-end: 0;
+	transition:
+		grid-template-columns 0.3s cubic-bezier(0.15, 0, 0.15, 1),
+		column-gap 0.3s cubic-bezier(0.15, 0, 0.15, 1),
+		padding-inline-end 0.3s cubic-bezier(0.15, 0, 0.15, 1);
+
+	&:hover {
+		grid-template-columns: min-content 1fr;
+		column-gap: $grid-unit-05;
+		padding-inline-end: $grid-unit-10;
+		transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
+	}
+
 	&:hover .components-avatar__name {
-		max-width: 200px;
-		padding: 0 $grid-unit-10 calc($grid-unit-05 / 2) $grid-unit-05;
 		opacity: 1;
+		transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
 	}
 }
 
@@ -138,6 +155,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+	.components-avatar.has-badge,
 	.components-avatar__name {
 		transition: none;
 	}

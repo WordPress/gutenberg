@@ -11,7 +11,7 @@ import Avatar from '../../avatar';
 
 const meta: Meta< typeof AvatarGroup > = {
 	component: AvatarGroup,
-	title: 'Components/Containers/AvatarGroup',
+	title: 'Design System/Components/AvatarGroup',
 	id: 'components-avatar-group',
 	tags: [ 'status-private' ],
 	parameters: {
@@ -54,6 +54,38 @@ export const Overflow: Story = {
 			<Avatar src={ avatarUrl( 'fff' ) } name="Frank" />
 		</AvatarGroup>
 	),
+};
+
+export const WithBadges: Story = {
+	render: ( args ) => (
+		<AvatarGroup { ...args }>
+			<Avatar
+				src={ avatarUrl( 'aaa' ) }
+				name="Alice"
+				borderColor="#3858e9"
+				badge
+			/>
+			<Avatar
+				src={ avatarUrl( 'bbb' ) }
+				name="Bob"
+				borderColor="#e93858"
+				badge
+			/>
+			<Avatar
+				src={ avatarUrl( 'ccc' ) }
+				name="Charlie"
+				borderColor="#58e938"
+				badge
+			/>
+		</AvatarGroup>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: 'Avatars with `badge` enabled expand on hover to reveal the name, pushing siblings aside.',
+			},
+		},
+	},
 };
 
 export const CustomMax: Story = {
