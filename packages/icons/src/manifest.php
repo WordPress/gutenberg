@@ -538,11 +538,10 @@ return array(
 		'filePath' => 'library/format-uppercase.svg',
 		'status'   => 'hidden',
 	),
-	// FIXME should we remove it altogether?
 	'full-height'                    => array(
 		'label'    => _x( 'Full height', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/full-height.svg',
-		'status'   => 'disabled',
+		'status'   => 'hidden',
 	),
 	'fullscreen'                     => array(
 		'label'    => _x( 'Fullscreen', 'icon label', 'gutenberg' ),
