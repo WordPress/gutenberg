@@ -120,6 +120,26 @@ function DefaultUI( {
 	);
 }
 
+function useDelayedLoading(
+	isLoading: boolean,
+	options: { delay: number } = { delay: 400 }
+): boolean {
+	const [ showLoader, setShowLoader ] = useState( false );
+	useEffect( () => {
+		if ( ! isLoading ) {
+			return;
+		}
+		const timeout = setTimeout( () => {
+			setShowLoader( true );
+		}, options.delay );
+		return () => {
+			clearTimeout( timeout );
+			setShowLoader( false );
+		};
+	}, [ isLoading, options.delay ] );
+	return showLoader;
+}
+
 function DataViews< Item >( {
 	view,
 	onChangeView,
@@ -237,6 +257,8 @@ function DataViews< Item >( {
 		[ defaultLayoutsProperty ]
 	);
 
+	const showLoader = useDelayedLoading( isLoading );
+
 	if ( ! defaultLayouts[ view.type ] ) {
 		return null;
 	}
@@ -274,7 +296,7 @@ function DataViews< Item >( {
 			} }
 		>
 			<div className="dataviews-wrapper" ref={ containerRef }>
-				{ isLoading && ! infiniteScrollHandler && (
+				{ showLoader && ! infiniteScrollHandler && (
 					<ProgressBar className="dataviews-wrapper__loading-progress" />
 				) }
 				{ children ?? (
