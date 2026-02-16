@@ -149,7 +149,7 @@ export default function useBlockSync( {
 	onInput = noop,
 } ) {
 	const registry = useRegistry();
-	const { selection, onChangeSelection } = useContext( SelectionContext );
+	const { getSelection, onChangeSelection } = useContext( SelectionContext );
 
 	const {
 		resetBlocks,
@@ -182,6 +182,7 @@ export default function useBlockSync( {
 	// idMapping.  Called after blocks are (re-)cloned so that the
 	// mapping is guaranteed to be fresh.
 	const restoreSelection = () => {
+		const selection = getSelection();
 		if (
 			! selection?.selectionStart?.clientId ||
 			selection === appliedSelectionRef.current

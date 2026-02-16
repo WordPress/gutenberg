@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useDispatch } from '@wordpress/data';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import {
 	MediaUploadProvider,
@@ -177,12 +177,20 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			__experimentalUpdateSettings,
 		] );
 
+		// Store selection in a ref and expose a stable getter so that
+		// the context value doesn't change on every keystroke.
+		// This prevents re-rendering the entire block tree (including
+		// async-rendered off-screen blocks) when selection changes.
+		const selectionRef = useRef( props.selection );
+		selectionRef.current = props.selection;
+		const getSelection = useCallback( () => selectionRef.current, [] );
+
 		const selectionContextValue = useMemo(
 			() => ( {
-				selection: props.selection ?? undefined,
+				getSelection,
 				onChangeSelection: props.onChangeSelection ?? noop,
 			} ),
-			[ props.selection, props.onChangeSelection ]
+			[ getSelection, props.onChangeSelection ]
 		);
 
 		const children = (
