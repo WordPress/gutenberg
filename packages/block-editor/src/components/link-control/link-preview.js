@@ -160,14 +160,16 @@ export default function LinkPreview( {
 										alignment="left"
 										gap={ 1 }
 									>
-										{ value.badges.map( ( badge ) => (
-											<Badge
-												key={ `${ badge.label }|${ badge.intent }` }
-												intent={ badge.intent }
-											>
-												{ badge.label }
-											</Badge>
-										) ) }
+										{ value.badges.map(
+											( badge, index ) => (
+												<Badge
+													key={ `${ badge.label }|${ badge.intent }|${ index }` }
+													intent={ badge.intent }
+												>
+													{ badge.label }
+												</Badge>
+											)
+										) }
 									</HStack>
 								) }
 							</>
