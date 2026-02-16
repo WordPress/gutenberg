@@ -286,20 +286,6 @@ For these blocks, set only `clientNavigation` to `true`:
 
 Examples of non-interactive blocks include the Paragraph, Heading, Image, and List blocks. Even though they don't use Interactivity API directives, they are fully compatible with client-side navigation because their output is purely static HTML.
 
-### Interactive blocks using the Interactivity API
-
-Blocks that use the Interactivity API for their client-side behavior are compatible with client-side navigation. The Interactivity API's directive system integrates with the router, so interactive state, event handlers, and reactive bindings are properly preserved or re-initialized when regions are updated during navigation.
-
-For these blocks, set both properties to `true` (or use the shorthand):
-
-```json
-{
-    "supports": {
-        "interactivity": true
-    }
-}
-```
-
 ### Interactive blocks using other libraries
 
 Blocks that use vanilla JavaScript, jQuery, or other JavaScript frameworks for interactivity are **not compatible** with client-side navigation. When the router replaces a region's content, any event listeners attached via these libraries are lost, and the block's JavaScript will not re-initialize for the new content.
