@@ -73,6 +73,15 @@ describe( 'addFallbackToVar', () => {
 		);
 	} );
 
+	it( 'injects a fallback inside calc()', () => {
+		expect(
+			addFallbackToVar(
+				'calc(var(--wpds-dimension-gap-sm) * 2)',
+				mockFallbacks
+			)
+		).toBe( 'calc(var(--wpds-dimension-gap-sm, 8px) * 2)' );
+	} );
+
 	it( 'is idempotent — running twice gives the same result', () => {
 		const input = 'var(--wpds-border-radius-sm)';
 		const first = addFallbackToVar( input, mockFallbacks );

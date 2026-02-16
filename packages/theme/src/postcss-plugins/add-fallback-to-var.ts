@@ -6,6 +6,9 @@
  * are left untouched, making the function safe to run multiple times
  * (idempotent).
  *
+ * NOTE: The regex and replacement logic here is mirrored in
+ * `ds-token-fallbacks.mjs`. If you update one, update the other to match.
+ *
  * @param cssValue       A CSS declaration value.
  * @param tokenFallbacks Map of CSS variable names to their fallback expressions.
  * @return The value with fallbacks injected.
