@@ -10,7 +10,6 @@ import {
 describe( 'feature-detection', () => {
 	const originalWebAssembly = global.WebAssembly;
 	const originalSharedArrayBuffer = global.SharedArrayBuffer;
-	const originalCrossOriginIsolated = window.crossOriginIsolated;
 	const originalWorker = global.Worker;
 	const originalCreateObjectURL = global.URL.createObjectURL;
 	const originalRevokeObjectURL = global.URL.revokeObjectURL;
@@ -38,11 +37,6 @@ describe( 'feature-detection', () => {
 		global.Worker = originalWorker;
 		global.URL.createObjectURL = originalCreateObjectURL;
 		global.URL.revokeObjectURL = originalRevokeObjectURL;
-		Object.defineProperty( window, 'crossOriginIsolated', {
-			value: originalCrossOriginIsolated,
-			writable: true,
-			configurable: true,
-		} );
 	} );
 
 	describe( 'detectClientSideMediaSupport', () => {
@@ -50,11 +44,6 @@ describe( 'feature-detection', () => {
 			// Ensure all features are available.
 			global.WebAssembly = originalWebAssembly;
 			global.SharedArrayBuffer = originalSharedArrayBuffer;
-			Object.defineProperty( window, 'crossOriginIsolated', {
-				value: true,
-				writable: true,
-				configurable: true,
-			} );
 
 			const result = detectClientSideMediaSupport();
 
@@ -85,29 +74,9 @@ describe( 'feature-detection', () => {
 			expect( result.reason ).toContain( 'SharedArrayBuffer' );
 		} );
 
-		it( 'returns not supported when cross-origin isolation is disabled', () => {
-			global.WebAssembly = originalWebAssembly;
-			global.SharedArrayBuffer = originalSharedArrayBuffer;
-			Object.defineProperty( window, 'crossOriginIsolated', {
-				value: false,
-				writable: true,
-				configurable: true,
-			} );
-
-			const result = detectClientSideMediaSupport();
-
-			expect( result.supported ).toBe( false );
-			expect( result.reason ).toContain( 'Cross-origin isolation' );
-		} );
-
 		it( 'returns not supported when CSP blocks blob workers', () => {
 			global.WebAssembly = originalWebAssembly;
 			global.SharedArrayBuffer = originalSharedArrayBuffer;
-			Object.defineProperty( window, 'crossOriginIsolated', {
-				value: true,
-				writable: true,
-				configurable: true,
-			} );
 
 			// Simulate CSP blocking blob URL workers by throwing a SecurityError.
 			global.Worker = class ThrowingWorker {
@@ -129,11 +98,6 @@ describe( 'feature-detection', () => {
 		it( 'caches the result', () => {
 			global.WebAssembly = originalWebAssembly;
 			global.SharedArrayBuffer = originalSharedArrayBuffer;
-			Object.defineProperty( window, 'crossOriginIsolated', {
-				value: true,
-				writable: true,
-				configurable: true,
-			} );
 
 			const result1 = detectClientSideMediaSupport();
 			expect( result1.supported ).toBe( true );
@@ -152,11 +116,6 @@ describe( 'feature-detection', () => {
 		it( 'returns true when all features are available', () => {
 			global.WebAssembly = originalWebAssembly;
 			global.SharedArrayBuffer = originalSharedArrayBuffer;
-			Object.defineProperty( window, 'crossOriginIsolated', {
-				value: true,
-				writable: true,
-				configurable: true,
-			} );
 
 			expect( isClientSideMediaSupported() ).toBe( true );
 		} );
@@ -173,11 +132,6 @@ describe( 'feature-detection', () => {
 		it( 'clears the cached result', () => {
 			global.WebAssembly = originalWebAssembly;
 			global.SharedArrayBuffer = originalSharedArrayBuffer;
-			Object.defineProperty( window, 'crossOriginIsolated', {
-				value: true,
-				writable: true,
-				configurable: true,
-			} );
 
 			const result1 = detectClientSideMediaSupport();
 			expect( result1.supported ).toBe( true );
