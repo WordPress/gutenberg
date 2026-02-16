@@ -23,7 +23,7 @@ import { error as errorIcon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { getSyncErrorMessages } from '../../utils';
+import { getSyncErrorMessages } from '../../utils/sync-error-messages';
 import { unlock } from '../../lock-unlock';
 
 const { BlockCanvasCover } = unlock( privateApis );
@@ -43,7 +43,7 @@ export function SyncConnectionModal() {
 		const serializedContent = serialize( blocks );
 
 		// Get the current sync connection state from core-data.
-		const syncState = select( coreDataStore ).getSyncConnectionState();
+		const syncState = select( coreDataStore ).getSyncConnectionStatus();
 
 		return {
 			connectionState: syncState || null,

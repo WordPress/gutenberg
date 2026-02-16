@@ -440,20 +440,6 @@ getDerivedStateFromError is used to render a fallback UI after an error has been
 
 > **Deprecated** since 5.3, use `wp.blockEditor.getFontSizeClass` instead.
 
-### getSyncErrorMessages
-
-Get user-facing title and description from a sync connection error.
-
-Provides default messages based on error.code.
-
-_Parameters_
-
--   _error_ `Object`: - Connection error object.
-
-_Returns_
-
--   `Object`: Object with title and description strings.
-
 ### getTemplatePartIcon
 
 Helper function to retrieve the corresponding icon by area name.
