@@ -90,7 +90,7 @@ createBlockSaveFilter( [
 ] );
 
 export { useCustomSides } from './dimensions';
-export { getDimensionsClassesAndStyles } from './get-dimensions-classes-and-styles';
+export { getDimensionsClassesAndStyles } from './use-dimensions-props';
 export { useLayoutClasses, useLayoutStyles } from './layout';
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
 export { getShadowClassesAndStyles } from './use-shadow-props';

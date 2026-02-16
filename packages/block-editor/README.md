@@ -505,6 +505,18 @@ _Returns_
 
 -   `string`: Mapping of the spacing preset to its equivalent custom value.
 
+### getDimensionsClassesAndStyles
+
+Provides the CSS class names and inline styles for a block's dimensions support attributes.
+
+_Parameters_
+
+-   _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+-   `Object`: Dimensions block support derived CSS classes & styles.
+
 ### getFontSize
 
 Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values. If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.

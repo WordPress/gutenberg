@@ -1,10 +1,10 @@
 /**
  * Internal dependencies
  */
-import { getDimensionsClassesAndStyles } from '../get-dimensions-classes-and-styles';
+import { getDimensionsClassesAndStyles } from '../use-dimensions-props';
 
 describe( 'getDimensionsClassesAndStyles', () => {
-	it( 'should return empty className and style if no dimensions attributes', () => {
+	it( 'should return empty className and style when no dimensions attributes are provided', () => {
 		const attributes = { style: {} };
 		expect( getDimensionsClassesAndStyles( attributes ) ).toEqual( {
 			className: undefined,
@@ -12,7 +12,7 @@ describe( 'getDimensionsClassesAndStyles', () => {
 		} );
 	} );
 
-	it( 'should return className and style for aspect ratio', () => {
+	it( 'should return has-aspect-ratio className and aspectRatio style', () => {
 		const attributes = {
 			style: {
 				dimensions: {
@@ -24,42 +24,6 @@ describe( 'getDimensionsClassesAndStyles', () => {
 			className: 'has-aspect-ratio',
 			style: {
 				aspectRatio: '16/9',
-				height: 'unset',
-				minHeight: 'unset',
-			},
-		} );
-	} );
-
-	it( 'should unset aspect ratio if minHeight is present', () => {
-		const attributes = {
-			style: {
-				dimensions: {
-					minHeight: '500px',
-				},
-			},
-		};
-		expect( getDimensionsClassesAndStyles( attributes ) ).toEqual( {
-			className: undefined,
-			style: {
-				minHeight: '500px',
-				aspectRatio: 'unset',
-			},
-		} );
-	} );
-
-	it( 'should unset aspect ratio if height is present', () => {
-		const attributes = {
-			style: {
-				dimensions: {
-					height: '500px',
-				},
-			},
-		};
-		expect( getDimensionsClassesAndStyles( attributes ) ).toEqual( {
-			className: undefined,
-			style: {
-				height: '500px',
-				aspectRatio: 'unset',
 			},
 		} );
 	} );
@@ -80,38 +44,52 @@ describe( 'getDimensionsClassesAndStyles', () => {
 		} );
 	} );
 
-	it( 'should prioritize aspect ratio over explicit height attributes', () => {
-		const attributes = {
-			height: '100px',
-			style: {
-				dimensions: {
-					aspectRatio: '1',
-				},
-			},
-		};
-		expect( getDimensionsClassesAndStyles( attributes ) ).toEqual( {
-			className: 'has-aspect-ratio',
-			style: {
-				aspectRatio: '1',
-				minHeight: 'unset',
-				height: 'unset',
-			},
-		} );
-	} );
-
-	it( 'should prioritize height over unset aspect ratio', () => {
+	it( 'should return height style', () => {
 		const attributes = {
 			style: {
 				dimensions: {
-					minHeight: '100px',
+					height: '500px',
 				},
 			},
 		};
 		expect( getDimensionsClassesAndStyles( attributes ) ).toEqual( {
 			className: undefined,
 			style: {
-				minHeight: '100px',
-				aspectRatio: 'unset',
+				height: '500px',
+			},
+		} );
+	} );
+
+	it( 'should return minHeight style', () => {
+		const attributes = {
+			style: {
+				dimensions: {
+					minHeight: '300px',
+				},
+			},
+		};
+		expect( getDimensionsClassesAndStyles( attributes ) ).toEqual( {
+			className: undefined,
+			style: {
+				minHeight: '300px',
+			},
+		} );
+	} );
+
+	it( 'should return all dimension styles when multiple are provided', () => {
+		const attributes = {
+			style: {
+				dimensions: {
+					aspectRatio: '4/3',
+					width: '100%',
+				},
+			},
+		};
+		expect( getDimensionsClassesAndStyles( attributes ) ).toEqual( {
+			className: 'has-aspect-ratio',
+			style: {
+				aspectRatio: '4/3',
+				width: '100%',
 			},
 		} );
 	} );
