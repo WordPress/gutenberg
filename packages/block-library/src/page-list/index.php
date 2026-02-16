@@ -207,6 +207,8 @@ function block_core_page_list_render_nested_page_list( $submenu_visibility, $sho
 		if ( $is_navigation_child ) {
 			$css_class .= ' wp-block-navigation-item';
 
+			// Class assignment logic matches JS editor rendering in page-list-item/edit.js lines 65-70
+			// Note: elseif ensures open-on-hover-click is mutually exclusive with open-on-click
 			if ( $open_on_click ) {
 				$css_class .= ' open-on-click';
 			} elseif ( $open_on_hover && $show_submenu_icons ) {

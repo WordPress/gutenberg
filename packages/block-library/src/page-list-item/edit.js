@@ -40,8 +40,9 @@ export default function PageListItemEdit( { context, attributes } ) {
 	const isNavigationChild = 'showSubmenuIcon' in context;
 	const frontPageId = useFrontPageId();
 
-	// Compute submenu visibility with backward compatibility
-	// Check old attribute first, then fall back to new attribute
+	// Get submenu visibility from context. The Navigation block handles
+	// backward compatibility by migrating openSubmenusOnClick to submenuVisibility
+	// via its deprecation handler before this context is received.
 	const submenuVisibility = context.submenuVisibility;
 
 	const openOnClick = submenuVisibility === 'click';
@@ -62,10 +63,13 @@ export default function PageListItemEdit( { context, attributes } ) {
 			className={ clsx( 'wp-block-pages-list__item', {
 				'has-child': hasChildren,
 				'wp-block-navigation-item': isNavigationChild,
+				// Class assignment logic matches PHP rendering in page-list/index.php lines 210-218
 				'open-on-click': openOnClick,
 				'open-on-hover': submenuVisibility === 'hover',
 				'open-always': submenuVisibility === 'always',
-				'open-on-hover-click': ! openOnClick && context.showSubmenuIcon,
+				// Must check hover mode explicitly to match PHP elseif structure (index.php:212)
+				'open-on-hover-click':
+					submenuVisibility === 'hover' && context.showSubmenuIcon,
 				'menu-item-home': id === frontPageId,
 			} ) }
 		>
