@@ -13,9 +13,9 @@
 				"innerContent": [ "\n\t<p>Tab content goes here.</p>\n\t" ]
 			}
 		],
-		"innerHTML": "\n<section class=\"wp-block-tab\">\n\t\n</section>\n",
+		"innerHTML": "\n<section role=\"tabpanel\" class=\"wp-block-tab\">\n\t\n</section>\n",
 		"innerContent": [
-			"\n<section class=\"wp-block-tab\">\n\t",
+			"\n<section role=\"tabpanel\" class=\"wp-block-tab\">\n\t",
 			null,
 			"\n</section>\n"
 		]
