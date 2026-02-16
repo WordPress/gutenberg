@@ -671,6 +671,10 @@ Place this callback on an element that is always present in the DOM (like a site
 </div>
 ```
 
+<div class="callout callout-info">
+The <code>state.url</code> approach has a known limitation: when navigating with <code>force: true</code> to the same URL, the callback won't re-run because the URL value doesn't actually change. A more explicit API for subscribing to navigation events will be provided in the future.
+</div>
+
 ## The Interactivity Router in depth
 
 This section provides a detailed technical explanation of how client-side navigation works internally. Understanding these internals can help you debug issues, optimize performance, and make informed decisions about how to structure your interactive blocks.
