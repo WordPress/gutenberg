@@ -771,7 +771,7 @@ class WP_Navigation_Block_Renderer {
 
 		if ( $has_custom_overlay ) {
 			$custom_overlay_markup = sprintf(
-				'<div class="wp-block-navigation__overlay-container">%s</div>',
+				'<div class="wp-block-navigation__overlay-container wp-block-template-part">%s</div>',
 				$overlay_blocks_html
 			);
 		}
