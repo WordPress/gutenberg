@@ -77,10 +77,6 @@ Here's how to implement a link that navigates client-side. First, the HTML in yo
 </a>
 ```
 
-<div class="callout callout-info">
-This element must be placed inside an element with the <code>data-wp-interactive="myPlugin"</code> directive (like the router region defined above), so the directive knows which store namespace to look up the action in. Alternatively, you can specify the namespace explicitly in the directive value itself: <code>data-wp-on--click="myPlugin::actions.navigateTo"</code>. For more details on how namespaces work, see the <a href="https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/">Interactivity API Reference</a>.
-</div>
-
 Then, in your `view.js`, you define the `navigateTo` action. It prevents the browser's default full-page navigation and uses the router's `navigate()` function instead:
 
 ```js
