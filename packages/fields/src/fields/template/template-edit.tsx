@@ -44,7 +44,7 @@ export const TemplateEdit = ( {
 		[ postType ]
 	);
 
-	const currentTemplateLabel = useSelect(
+	const defaultTemplateLabel = useSelect(
 		( select ) => getDefaultTemplateLabel( select, postType, slug ),
 		[ postType, slug ]
 	);
@@ -65,10 +65,10 @@ export const TemplateEdit = ( {
 			value: template.slug,
 		} ) );
 		return [
-			{ label: currentTemplateLabel, value: '' },
+			{ label: defaultTemplateLabel, value: '' },
 			...templateOptions,
 		];
-	}, [ templates, currentTemplateLabel ] );
+	}, [ templates, defaultTemplateLabel ] );
 
 	return (
 		<SelectControl

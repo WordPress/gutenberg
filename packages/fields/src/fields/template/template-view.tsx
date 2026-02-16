@@ -23,9 +23,6 @@ export const TemplateView = ( {
 
 	const templateLabel = useSelect(
 		( select ) => {
-			// If the post has an explicit template assigned, find it in the
-			// full list of templates (same query the edit component uses,
-			// so the result will be cached).
 			if ( templateSlug ) {
 				const allTemplates = select(
 					coreStore
@@ -39,7 +36,6 @@ export const TemplateView = ( {
 				return match ? getItemTitle( match ) : templateSlug;
 			}
 
-			// Otherwise resolve the default template via the hierarchy.
 			return getDefaultTemplateLabel( select, postType, slug );
 		},
 		[ postType, slug, templateSlug ]
