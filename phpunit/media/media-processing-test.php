@@ -6,7 +6,7 @@
  * Client-side media processing is a core feature that uses the browser's
  * capabilities to handle tasks like image resizing and compression before
  * uploading to the server. It can be disabled via the
- * 'gutenberg_client_side_media_processing_enabled' filter or checked using
+ * 'wp_client_side_media_processing_enabled' filter or checked using
  * the gutenberg_is_client_side_media_processing_enabled() helper function.
  */
 class Media_Processing_Test extends WP_UnitTestCase {
@@ -216,9 +216,9 @@ HTML;
 	 * @covers ::gutenberg_is_client_side_media_processing_enabled
 	 */
 	public function test_client_side_media_processing_can_be_disabled() {
-		add_filter( 'gutenberg_client_side_media_processing_enabled', '__return_false' );
+		add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
 		$enabled = gutenberg_is_client_side_media_processing_enabled();
-		remove_filter( 'gutenberg_client_side_media_processing_enabled', '__return_false' );
+		remove_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
 
 		$this->assertFalse( $enabled );
 	}
@@ -229,11 +229,11 @@ HTML;
 	 * @covers ::gutenberg_override_attachments_rest_controller
 	 */
 	public function test_compat_rest_controller_used_when_filter_disabled() {
-		add_filter( 'gutenberg_client_side_media_processing_enabled', '__return_false' );
+		add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
 
 		$result = gutenberg_override_attachments_rest_controller( array(), 'attachment' );
 
-		remove_filter( 'gutenberg_client_side_media_processing_enabled', '__return_false' );
+		remove_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
 
 		$this->assertSame(
 			array( 'rest_controller_class' => 'Gutenberg_REST_Attachments_Controller_6_9' ),
