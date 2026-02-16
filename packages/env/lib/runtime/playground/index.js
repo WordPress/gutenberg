@@ -151,12 +151,15 @@ class PlaygroundRuntime {
 		// Determine port
 		const port = envConfig.port || 8888;
 		const phpVersion = envConfig.phpVersion || '8.2';
+		const siteUrl = `http://localhost:${ port }`;
 
 		// Build command arguments for direct execution
 		const cliArgs = [
 			'server',
 			'--port',
 			String( port ),
+			'--site-url',
+			siteUrl,
 			'--php',
 			phpVersion,
 			'--blueprint',
@@ -180,7 +183,6 @@ class PlaygroundRuntime {
 
 		spinner.text = `Starting Playground on port ${ port }...`;
 
-		const siteUrl = `http://localhost:${ port }`;
 		const logFile = path.join( config.workDirectoryPath, 'playground.log' );
 		const pidFile = path.join( config.workDirectoryPath, 'playground.pid' );
 
