@@ -17,6 +17,7 @@
 
 ### Internal
 
+-   `Avatar`, `AvatarGroup`: Add new private components ([#75591](https://github.com/WordPress/gutenberg/pull/75591)).
 -   Remove `Picker` from private APIs ([#75394](https://github.com/WordPress/gutenberg/pull/75394)).
 -   Expose `useDrag` from `@use-gesture/react` package via private API's ([#66735](https://github.com/WordPress/gutenberg/pull/66735)).
 -   `Disabled`, `Modal`, `Popover`, `Tooltip`: Move context code to separate files to help docgen prop extraction ([#75316](https://github.com/WordPress/gutenberg/pull/75316)).

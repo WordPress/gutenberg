@@ -44,7 +44,9 @@ describe( 'AvatarGroup', () => {
 		expect(
 			screen.queryByRole( 'img', { name: 'Charlie' } )
 		).not.toBeInTheDocument();
-		expect( screen.getByText( '+2' ) ).toBeInTheDocument();
+		const overflow = screen.getByText( '+2' );
+		expect( overflow ).toBeInTheDocument();
+		expect( overflow ).toHaveAttribute( 'aria-label', '2 more' );
 	} );
 
 	it( 'should default max to 3', () => {
@@ -86,5 +88,17 @@ describe( 'AvatarGroup', () => {
 		const group = screen.getByTestId( 'group' );
 		expect( group ).toHaveClass( 'components-avatar-group' );
 		expect( group ).toHaveClass( 'custom' );
+	} );
+
+	it( 'should have group role and support aria-label', () => {
+		render(
+			<AvatarGroup aria-label="Collaborators">
+				<Avatar name="A" />
+			</AvatarGroup>
+		);
+		const group = screen.getByRole( 'group', {
+			name: 'Collaborators',
+		} );
+		expect( group ).toBeInTheDocument();
 	} );
 } );

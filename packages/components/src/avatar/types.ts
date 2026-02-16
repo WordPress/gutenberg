@@ -20,7 +20,7 @@ export type AvatarProps = {
 	label?: string;
 	/**
 	 * Whether to show the hover-expand badge that reveals the user's
-	 * name (or `label`) on hover.
+	 * name (or `label`) on hover. Requires `name` to be set.
 	 *
 	 * @default false
 	 */
@@ -38,15 +38,13 @@ export type AvatarProps = {
 	 * CSS color value for an accent border ring around the avatar.
 	 *
 	 * When not provided, no border is rendered and the hover badge
-	 * uses the admin theme color as its background.
+	 * and avatar status uses the admin theme color as its background.
 	 */
 	borderColor?: string;
 	/**
-	 * The current status of the user. When set, the avatar image is
-	 * dimmed to indicate a non-default state.
-	 *
-	 * - `'active'`: 20% image opacity (e.g. typing, editing).
-	 * - `'idle'`: 30% image opacity (e.g. session timeout).
+	 * A status string applied to the avatar. When set, the image is
+	 * dimmed to indicate a non-default state. A corresponding
+	 * `is-{status}` class is added for custom styling.
 	 */
 	status?: string;
 	/**

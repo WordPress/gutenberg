@@ -88,6 +88,34 @@ export const WithBadges: Story = {
 	},
 };
 
+export const MixedBadgeAndTooltip: Story = {
+	render: ( args ) => (
+		<AvatarGroup { ...args }>
+			<Avatar
+				src={ avatarUrl( 'aaa' ) }
+				name="Alice"
+				borderColor="#3858e9"
+				badge
+			/>
+			<Avatar src={ avatarUrl( 'bbb' ) } name="Bob" />
+			<Avatar
+				src={ avatarUrl( 'ccc' ) }
+				name="Charlie"
+				borderColor="#58e938"
+				badge
+				label="You"
+			/>
+		</AvatarGroup>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: 'Mixing badge avatars with tooltip-only avatars. The third avatar uses `label` to show "You" in the badge while preserving the full name in the tooltip.',
+			},
+		},
+	},
+};
+
 export const CustomMax: Story = {
 	args: {
 		max: 2,

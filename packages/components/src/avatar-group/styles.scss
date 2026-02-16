@@ -10,9 +10,16 @@
 		margin-inline-start: -$grid-unit-10;
 	}
 
-	// Elevate hovered avatar so the expanding badge renders on top.
+	// Stack earlier avatars on top of later ones so the overlap
+	// is visually correct, and elevate on hover for badge expansion.
 	> .components-avatar {
 		position: relative;
+
+		@for $i from 1 through 10 {
+			&:nth-child(#{$i}) {
+				z-index: #{11 - $i};
+			}
+		}
 
 		&:hover {
 			z-index: 100;
@@ -24,6 +31,6 @@
 	margin-inline-start: $grid-unit-05;
 	font-size: $font-size-small;
 	line-height: $font-line-height-small;
-	color: $gray-700;
+	color: $gray-900;
 	white-space: nowrap;
 }

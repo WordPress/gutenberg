@@ -122,6 +122,14 @@ describe( 'Avatar', () => {
 			const avatar = screen.getByRole( 'img', { name: 'Jane Doe' } );
 			expect( avatar ).toBeInTheDocument();
 		} );
+
+		it( 'should wrap in tooltip when label differs from name', () => {
+			render( <Avatar name="Jane Doe" label="You" badge /> );
+			const avatar = screen.getByRole( 'img', { name: 'Jane Doe' } );
+			// The Tooltip's Ariakit.TooltipAnchor makes the element
+			// focusable so the tooltip can be triggered via keyboard.
+			expect( avatar ).toHaveAttribute( 'tabindex', '0' );
+		} );
 	} );
 
 	describe( 'status', () => {

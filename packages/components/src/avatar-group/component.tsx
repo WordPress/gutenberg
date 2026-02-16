@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement, isValidElement } from '@wordpress/element';
+import { Children } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,25 +26,16 @@ function AvatarGroup( {
 
 	return (
 		<div
+			role="group"
 			className={ clsx( 'components-avatar-group', className ) }
 			{ ...props }
 		>
-			{ visible.map( ( child, index ) =>
-				isValidElement( child )
-					? cloneElement( child, {
-							style: {
-								...( (
-									child.props as {
-										style?: React.CSSProperties;
-									}
-								 ).style ?? {} ),
-								zIndex: visible.length - index,
-							},
-					  } )
-					: child
-			) }
+			{ visible }
 			{ overflowCount > 0 && (
-				<span className="components-avatar-group__overflow">
+				<span
+					className="components-avatar-group__overflow"
+					aria-label={ `${ overflowCount } more` }
+				>
 					{ `+${ overflowCount }` }
 				</span>
 			) }

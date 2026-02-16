@@ -128,16 +128,6 @@
 	background-color: var(--components-avatar-border-color);
 }
 
-.components-avatar.is-active.has-src > .components-avatar__image {
-	&::before {
-		opacity: 0.2;
-	}
-}
-
-.components-avatar.is-active:not(.has-src) > .components-avatar__image {
-	color: rgba($white, 0.2);
-}
-
 .components-avatar__status-indicator {
 	position: absolute;
 	inset: 0;

@@ -72,7 +72,7 @@ function Avatar( {
 		</div>
 	);
 
-	if ( ! showBadge && name ) {
+	if ( name && ( ! showBadge || label ) ) {
 		return <Tooltip text={ name }>{ avatar }</Tooltip>;
 	}
 
