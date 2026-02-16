@@ -200,10 +200,8 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 				}
 			);
 
-			const isVisible = await submenuVisibilityGroup.isVisible();
-			expect( isVisible ).toBe( true );
+			await expect( submenuVisibilityGroup ).toBeVisible();
 		} );
-
 		await test.step( 'Set submenu visibility to always', async () => {
 			const settingsPanel = page
 				.getByRole( 'region', { name: 'Editor settings' } )
