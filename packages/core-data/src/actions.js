@@ -487,6 +487,8 @@ export const editEntityRecord =
  * @param {string}        kind     Kind of the entity.
  * @param {string}        name     Name of the entity.
  * @param {number|string} recordId Record ID of the entity record.
+ *
+ * @return {Object} Action object.
  */
 export const clearEntityRecordEdits =
 	( kind, name, recordId ) =>
