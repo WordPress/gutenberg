@@ -29,7 +29,8 @@ const BLOCK_INSPECTOR_AREA = 'edit-post/block';
  * @return {React.JSX.Element} The Edit navigation button component or null if not applicable.
  */
 function TemplatePartNavigationEditButton( { clientId } ) {
-	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );
+	const { selectBlock, flashBlock, __unstableRequestInspectorTab } =
+		useDispatch( blockEditorStore );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const {
@@ -78,12 +79,18 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 
 			// Enable the complementary area (inspector)
 			enableComplementaryArea( 'core', BLOCK_INSPECTOR_AREA );
+
+			// Request the List View tab with the navigation panel opened
+			__unstableRequestInspectorTab( 'list', {
+				openPanel: firstNavigationBlockId,
+			} );
 		}
 	}, [
 		firstNavigationBlockId,
 		selectBlock,
 		flashBlock,
 		enableComplementaryArea,
+		__unstableRequestInspectorTab,
 	] );
 
 	// Only show if template part contains navigation blocks and they are editable

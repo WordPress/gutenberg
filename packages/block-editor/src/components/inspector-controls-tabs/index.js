@@ -45,12 +45,52 @@ export default function InspectorControlsTabs( {
 		__unstableIncrementListViewExpandRevision:
 			incrementListViewExpandRevision,
 		__unstableSetAllListViewPanelsOpen: setAllListViewPanelsOpen,
+		__unstableClearRequestedInspectorTab: clearRequestedInspectorTab,
 	} = useDispatch( blockEditorStore );
+
+	// Get any requested inspector tab
+	const requestedTab = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__unstableGetRequestedInspectorTab(),
+		[]
+	);
 
 	// Reset when switching blocks
 	useEffect( () => {
 		hasUserSelectionRef.current = false;
 	}, [ clientId ] );
+
+	// Handle explicit inspector tab requests
+	useEffect( () => {
+		if ( ! requestedTab ) {
+			return;
+		}
+
+		// Switch to the requested tab
+		setSelectedTabId( requestedTab.tabName );
+
+		// Handle tab-specific options
+		if (
+			requestedTab.tabName === TAB_LIST_VIEW.name &&
+			requestedTab.options?.openPanel
+		) {
+			// Open the specific panel for List View
+			setOpenListViewPanel( requestedTab.options.openPanel );
+			incrementListViewExpandRevision();
+		}
+
+		// Mark as handled (programmatic switch)
+		isProgrammaticSwitchRef.current = true;
+		hasUserSelectionRef.current = true;
+
+		// Clear the request
+		clearRequestedInspectorTab();
+	}, [
+		requestedTab,
+		setOpenListViewPanel,
+		incrementListViewExpandRevision,
+		clearRequestedInspectorTab,
+	] );
 
 	// Initialize List View panels when the tab is selected and clientId changes
 	useEffect( () => {

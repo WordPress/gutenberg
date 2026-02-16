@@ -3286,3 +3286,14 @@ export function __unstableGetTemporarilyEditingAsBlocks( state ) {
 	);
 	return getEditedContentOnlySection( state );
 }
+
+/**
+ * Returns the requested inspector tab state, if any.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object|null} The requested tab state with tabName and options, or null if no request is pending.
+ */
+export function __unstableGetRequestedInspectorTab( state ) {
+	return state.requestedInspectorTab;
+}

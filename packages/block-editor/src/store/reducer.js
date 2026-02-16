@@ -2305,6 +2305,29 @@ export function listViewContentPanelOpen( state = false, action ) {
 	return state;
 }
 
+/**
+ * Reducer tracking the requested inspector tab state.
+ * Stores a request to open a specific inspector tab with optional configuration.
+ *
+ * @param {Object|null} state  Current state.
+ * @param {Object}      action Dispatched action.
+ *
+ * @return {Object|null} Updated state.
+ */
+export function requestedInspectorTab( state = null, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_INSPECTOR_TAB':
+			return {
+				tabName: action.tabName,
+				options: action.options,
+			};
+		case 'CLEAR_REQUESTED_INSPECTOR_TAB':
+			return null;
+	}
+
+	return state;
+}
+
 const combinedReducers = combineReducers( {
 	blocks,
 	isDragging,
@@ -2340,6 +2363,7 @@ const combinedReducers = combineReducers( {
 	openedListViewPanels,
 	listViewExpandRevision,
 	listViewContentPanelOpen,
+	requestedInspectorTab,
 } );
 
 /**
