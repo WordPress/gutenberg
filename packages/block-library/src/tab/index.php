@@ -49,7 +49,7 @@ function block_core_tab_render( array $attributes, string $content ): string {
 	$tag_processor->set_attribute( 'role', 'tabpanel' );
 	$tag_processor->set_attribute( 'aria-labelledby', 'tab__' . $tab_id );
 	$tag_processor->set_attribute( 'data-wp-bind--hidden', '!state.isActiveTab' );
-	$tag_processor->set_attribute( 'data-wp-bind--tabindex', 'state.tabIndexAttribute' );
+	$tag_processor->set_attribute( 'tabindex', 0 );
 
 	return (string) $tag_processor->get_updated_html();
 }

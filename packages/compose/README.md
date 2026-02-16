@@ -467,11 +467,11 @@ return <div ref={ mergedRefs } />;
 
 _Parameters_
 
--   _refs_ `Array<TRef>`: The refs to be merged.
+-   _refs_ `Ref< T >[]`: The refs to be merged.
 
 _Returns_
 
--   `React.RefCallback<TypeFromRef<TRef>>`: The merged ref callback.
+-   `RefCallback< T >`: The merged ref callback.
 
 ### useObservableValue
 

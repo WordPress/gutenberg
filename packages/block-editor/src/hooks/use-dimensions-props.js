@@ -12,7 +12,6 @@ import { getInlineStyles } from './style';
  * attributes.
  *
  * @param {Object} attributes Block attributes.
- *
  * @return {Object} Dimensions block support derived CSS classes & styles.
  */
 export function getDimensionsClassesAndStyles( attributes ) {
@@ -23,6 +22,9 @@ export function getDimensionsClassesAndStyles( attributes ) {
 	const styleProp = getInlineStyles( { dimensions: dimensionsStyles } );
 
 	return {
+		className: dimensionsStyles.aspectRatio
+			? 'has-aspect-ratio'
+			: undefined,
 		style: styleProp,
 	};
 }

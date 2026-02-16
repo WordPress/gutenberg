@@ -122,10 +122,15 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 				// Get the EXIF orientation from the image metadata.
 				// This is stored by wp_read_image_metadata() during upload.
+				// Values:
+				//   0 = undefined (no EXIF data), treat as no rotation needed
+				//   1 = normal (no rotation needed)
+				//   2-8 = various rotations/flips needed
 				$orientation = 1; // Default: no rotation needed.
 				if (
 					is_array( $metadata ) &&
-					isset( $metadata['image_meta']['orientation'] )
+					isset( $metadata['image_meta']['orientation'] ) &&
+					(int) $metadata['image_meta']['orientation'] > 0
 				) {
 					$orientation = (int) $metadata['image_meta']['orientation'];
 				}

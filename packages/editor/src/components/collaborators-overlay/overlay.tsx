@@ -95,7 +95,10 @@ export function Overlay( {
 	useEffect( rerenderCursorsAfterDelay, [ rerenderCursorsAfterDelay ] );
 
 	// Merge the refs to use the same element for both overlay and resize observation
-	const mergedRef = useMergeRefs( [ setOverlayElement, resizeObserverRef ] );
+	const mergedRef = useMergeRefs< HTMLDivElement | null >( [
+		setOverlayElement,
+		resizeObserverRef,
+	] );
 
 	useBlockHighlighting(
 		blockEditorDocument ?? null,

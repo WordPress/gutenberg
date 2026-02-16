@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
-import { useRegistry, useSelect } from '@wordpress/data';
+import { useRegistry } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 
 /**
@@ -162,15 +162,6 @@ export default function useBlockSync( {
 	} = registry.dispatch( blockEditorStore );
 	const { getBlockName, getBlocks, getSelectionStart, getSelectionEnd } =
 		registry.select( blockEditorStore );
-	const isControlled = useSelect(
-		( select ) => {
-			return (
-				! clientId ||
-				select( blockEditorStore ).areInnerBlocksControlled( clientId )
-			);
-		},
-		[ clientId ]
-	);
 
 	const pendingChangesRef = useRef( { incoming: null, outgoing: [] } );
 	const subscribedRef = useRef( false );
@@ -279,29 +270,11 @@ export default function useBlockSync( {
 		}
 	}, [ controlledBlocks, clientId ] );
 
-	const isMountedRef = useRef( false );
-
-	useEffect( () => {
-		// On mount, controlled blocks are already set in the effect above.
-		if ( ! isMountedRef.current ) {
-			isMountedRef.current = true;
-			return;
-		}
-
-		// When the block becomes uncontrolled, it means its inner state has been reset
-		// we need to take the blocks again from the external value property.
-		if ( ! isControlled ) {
-			pendingChangesRef.current.outgoing = [];
-			setControlledBlocks();
-		}
-	}, [ isControlled ] );
-
 	useEffect( () => {
 		const {
 			getSelectedBlocksInitialCaretPosition,
 			isLastBlockChangePersistent,
 			__unstableIsLastBlockChangeIgnored,
-			areInnerBlocksControlled,
 		} = registry.select( blockEditorStore );
 
 		let blocks = getBlocks( clientId );
@@ -318,16 +291,6 @@ export default function useBlockSync( {
 			// and its block name can't be found because it's not on the list.
 			// (`getBlockName( clientId ) === null`).
 			if ( clientId !== null && getBlockName( clientId ) === null ) {
-				return;
-			}
-
-			// When RESET_BLOCKS on parent blocks get called, the controlled blocks
-			// can reset to uncontrolled, in these situations, it means we need to populate
-			// the blocks again from the external blocks (the value property here)
-			// and we should stop triggering onChange
-			const isStillControlled =
-				! clientId || areInnerBlocksControlled( clientId );
-			if ( ! isStillControlled ) {
 				return;
 			}
 

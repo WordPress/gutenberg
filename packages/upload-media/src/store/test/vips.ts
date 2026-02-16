@@ -165,6 +165,27 @@ describe( 'vips utilities', () => {
 
 			expect( result ).toBe( false );
 		} );
+
+		it( 'throws when fetch fails', async () => {
+			mockFetch.mockResolvedValue( {
+				ok: false,
+				status: 404,
+			} as Response );
+
+			await expect(
+				vipsHasTransparency( 'blob:test-url' )
+			).rejects.toThrow( 'Failed to fetch image: 404' );
+		} );
+
+		it( 'throws when vips check fails', async () => {
+			mockHasTransparency.mockRejectedValue(
+				new Error( 'WASM load failed' )
+			);
+
+			await expect(
+				vipsHasTransparency( 'blob:test-url' )
+			).rejects.toThrow( 'WASM load failed' );
+		} );
 	} );
 
 	describe( 'vipsResizeImage', () => {

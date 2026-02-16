@@ -92,7 +92,7 @@ function FilterVisibilityToggle( {
 	filtersCount,
 	children,
 }: {
-	buttonRef: React.RefObject< HTMLButtonElement >;
+	buttonRef: React.RefObject< HTMLButtonElement | null >;
 	filtersCount?: number;
 	children: React.ReactNode;
 } ) {

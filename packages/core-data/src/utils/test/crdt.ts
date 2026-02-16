@@ -104,6 +104,28 @@ describe( 'crdt', () => {
 			expect( title?.toString() ).toBe( '' );
 		} );
 
+		it( 'skips "Auto Draft" template title when current value is empty Y.Text', () => {
+			// First set an empty title (simulates a prior sync that cleared it).
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ title: '' } as PostChanges,
+				mockPostType
+			);
+
+			const title = map.get( 'title' );
+			expect( title ).toBeInstanceOf( Y.Text );
+			expect( title?.toString() ).toBe( '' );
+
+			// Now sync "Auto Draft" — should still be suppressed.
+			applyPostChangesToCRDTDoc(
+				doc,
+				{ title: 'Auto Draft' } as PostChanges,
+				mockPostType
+			);
+
+			expect( map.get( 'title' )?.toString() ).toBe( '' );
+		} );
+
 		it( 'handles excerpt with RenderedText format', () => {
 			const changes = {
 				excerpt: {
