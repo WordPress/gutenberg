@@ -213,9 +213,7 @@ function block_core_page_list_render_nested_page_list( $submenu_visibility, $sho
 				$css_class .= ' open-on-click';
 			} elseif ( $open_on_hover && $show_submenu_icons ) {
 				$css_class .= ' open-on-hover-click';
-			}
-
-			if ( $open_always ) {
+			} elseif ( $open_always ) {
 				$css_class .= ' open-always';
 			}
 		}
