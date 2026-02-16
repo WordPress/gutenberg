@@ -474,7 +474,6 @@ test.describe( 'Page List', () => {
 		// } );
 
 		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.setGutenbergExperiments( [] );
 			await requestUtils.deleteAllUsers();
 		} );
 	} );
