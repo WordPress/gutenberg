@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, select } from '@wordpress/data';
 import { useCopyToClipboard } from '@wordpress/compose';
 import { serialize } from '@wordpress/blocks';
 import { store as coreDataStore } from '@wordpress/core-data';
@@ -38,20 +38,14 @@ const INITIAL_DISCONNECTED_DEBOUNCE_MS = 5000;
  * @return {Element|null} The modal component or null if not disconnected.
  */
 export function SyncConnectionModal() {
-	const { connectionState, content } = useSelect( ( select ) => {
-		const blocks = select( blockEditorStore ).getBlocks();
-		const serializedContent = serialize( blocks );
-
-		// Get the current sync connection state from core-data.
-		const syncState = select( coreDataStore ).getSyncConnectionStatus();
-
-		return {
-			connectionState: syncState || null,
-			content: serializedContent,
-		};
+	const connectionState = useSelect( ( selectFn ) => {
+		return selectFn( coreDataStore ).getSyncConnectionStatus() || null;
 	}, [] );
 
-	const copyButtonRef = useCopyToClipboard( content ?? '' );
+	const copyButtonRef = useCopyToClipboard( () => {
+		const blocks = select( blockEditorStore ).getBlocks();
+		return serialize( blocks );
+	} );
 	const [ syncConnectionMessage, setSyncConnectionMessage ] =
 		useState( null );
 	const debounceTimerRef = useRef( null );
