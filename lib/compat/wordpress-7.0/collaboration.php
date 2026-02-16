@@ -98,7 +98,7 @@ if ( ! function_exists( 'wp_collaboration_register_meta' ) ) {
 	add_action( 'init', 'gutenberg_rest_api_crdt_post_meta' );
 }
 
-if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
+if ( class_exists( 'WP_HTTP_Polling_Sync_Server' ) && ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	/**
 	 * Registers the real-time collaboration setting.
 	 */
