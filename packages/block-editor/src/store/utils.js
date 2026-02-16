@@ -136,6 +136,7 @@ export const getInsertBlockTypeDependants = () => ( state, rootClientId ) => {
 	return [
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId.get( rootClientId ),
+		state.blocks.order.get( rootClientId || '' ),
 		state.settings.allowedBlockTypes,
 		state.settings.templateLock,
 		getBlockEditingMode( state, rootClientId ),
