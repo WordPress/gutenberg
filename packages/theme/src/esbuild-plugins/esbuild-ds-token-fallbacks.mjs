@@ -7,6 +7,9 @@ const LOADER_MAP = {
 	'.ts': 'tsx',
 	'.tsx': 'tsx',
 	'.mjs': 'jsx',
+	'.mts': 'tsx',
+	'.cjs': 'jsx',
+	'.cts': 'tsx',
 };
 
 /**

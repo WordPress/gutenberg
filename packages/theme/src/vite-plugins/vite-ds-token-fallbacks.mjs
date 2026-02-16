@@ -13,10 +13,13 @@ const plugin = () => ( {
 		if ( ! /\.[mc]?[jt]sx?$/.test( id ) ) {
 			return null;
 		}
+		if ( id.includes( 'node_modules' ) ) {
+			return null;
+		}
 		if ( ! code.includes( '--wpds-' ) ) {
 			return null;
 		}
-		return addFallbackToVar( code );
+		return { code: addFallbackToVar( code ), map: null };
 	},
 } );
 
