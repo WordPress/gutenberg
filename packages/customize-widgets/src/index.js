@@ -6,7 +6,6 @@ import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
-	privateApis as blockLibraryPrivateApis,
 } from '@wordpress/block-library';
 import {
 	registerLegacyWidgetBlock,
@@ -27,9 +26,7 @@ import CustomizeWidgets from './components/customize-widgets';
 import getSidebarSection from './controls/sidebar-section';
 import getSidebarControl from './controls/sidebar-control';
 import './filters';
-import { unlock } from './lock-unlock';
 
-const { registerPHPOnlyBlocks } = unlock( blockLibraryPrivateApis );
 const { wp } = window;
 
 const DISABLED_BLOCKS = [
@@ -64,7 +61,6 @@ export function initialize( editorName, blockEditorSettings ) {
 		);
 	} );
 	registerCoreBlocks( coreBlocks );
-	registerPHPOnlyBlocks( blockEditorSettings.autoRegisterBlocks );
 	registerLegacyWidgetBlock();
 	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
 		__experimentalRegisterExperimentalCoreBlocks( {

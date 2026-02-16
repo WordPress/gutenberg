@@ -22,12 +22,16 @@ function gutenberg_auto_register_blocks( $settings ) {
 	}
 
 	if ( ! empty( $auto_register_blocks ) ) {
-		$settings['autoRegisterBlocks'] = $auto_register_blocks;
+		wp_add_inline_script(
+			'wp-block-library',
+			sprintf( 'window.__unstableAutoRegisterBlocks = %s;', wp_json_encode( $auto_register_blocks ) ),
+			'before'
+		);
 	}
 
 	return $settings;
 }
-add_filter( 'block_editor_settings_all', 'gutenberg_auto_register_blocks' );
+add_action( 'enqueue_block_editor_assets', 'gutenberg_auto_register_blocks', 5 );
 
 /**
  * Mark user-defined attributes for auto-generated inspector controls.

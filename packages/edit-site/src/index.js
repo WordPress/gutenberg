@@ -6,7 +6,6 @@ import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
-	privateApis as blockLibraryPrivateApis,
 } from '@wordpress/block-library';
 import { dispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -26,7 +25,6 @@ import { unlock } from './lock-unlock';
 import App from './components/app';
 
 const { registerCoreBlockBindingsSources } = unlock( editorPrivateApis );
-const { registerPHPOnlyBlocks } = unlock( blockLibraryPrivateApis );
 
 /**
  * Initializes the site editor screen.
@@ -43,7 +41,6 @@ export function initializeEditor( id, settings ) {
 		( { name } ) => name !== 'core/freeform'
 	);
 	registerCoreBlocks( coreBlocks );
-	registerPHPOnlyBlocks( settings.autoRegisterBlocks );
 	registerCoreBlockBindingsSources();
 	dispatch( blocksStore ).setFreeformFallbackBlockName( 'core/html' );
 	registerLegacyWidgetBlock( { inserter: false } );
