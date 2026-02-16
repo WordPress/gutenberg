@@ -63,7 +63,7 @@ export default function PageListItemEdit( { context, attributes } ) {
 			className={ clsx( 'wp-block-pages-list__item', {
 				'has-child': hasChildren,
 				'wp-block-navigation-item': isNavigationChild,
-				// Class assignment logic matches PHP rendering in page-list/index.php lines 210-218
+				// Class assignment logic matches PHP rendering in page-list/index.php
 				'open-on-click': openOnClick,
 				'open-always': submenuVisibility === 'always',
 				// Must check hover mode explicitly to match PHP elseif structure (index.php:212)
