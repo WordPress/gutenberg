@@ -416,21 +416,6 @@ export default function useBlockSync( {
 							? restoreExternalIds( blocks, idMappingRef.current )
 							: blocks;
 
-						// Build selection state for the undo level.
-						const selectionInfo = {
-							selectionStart: newSelectionStart,
-							selectionEnd: newSelectionEnd,
-							initialPosition:
-								getSelectedBlocksInitialCaretPosition(),
-						};
-						// Restore external IDs in selection for inner block controllers.
-						const selectionForParent = clientId
-							? restoreSelectionIds(
-									selectionInfo,
-									idMappingRef.current
-							  )
-							: selectionInfo;
-
 						pendingChangesRef.current.outgoing.push(
 							blocksForParent
 						);
@@ -438,18 +423,16 @@ export default function useBlockSync( {
 						const updateParent = isPersistent
 							? onChangeRef.current
 							: onInputRef.current;
-						updateParent( blocksForParent, {
-							selection: selectionForParent,
-						} );
+						updateParent( blocksForParent );
 					}
 
+					// Report selection via onChangeSelection for both
+					// block changes and selection-only changes.
 					if (
 						selectionChanged &&
-						! blocksChanged &&
 						newSelectionStart?.clientId &&
 						! isRestoringSelectionRef.current
 					) {
-						// Report selection via onChangeSelection.
 						// Each useBlockSync only reports if the selected block
 						// is within its own scope.
 						// Inner block controllers own the block if the internal
@@ -479,7 +462,8 @@ export default function useBlockSync( {
 											selectionInfo,
 											idMappingRef.current
 									  )
-									: selectionInfo
+									: selectionInfo,
+								{ isBlockChange: blocksChanged }
 							);
 						}
 					}

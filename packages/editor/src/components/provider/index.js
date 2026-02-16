@@ -299,13 +299,13 @@ export const ExperimentalEditorProvider = withRegistryProvider(
 		const { editEntityRecord } = useDispatch( coreStore );
 
 		const onChangeSelection = useCallback(
-			( newSelection ) => {
+			( newSelection, { isBlockChange } = {} ) => {
 				editEntityRecord(
 					'postType',
 					post.type,
 					post.id,
 					{ selection: newSelection },
-					{ undoIgnore: true }
+					isBlockChange ? { undoAmend: true } : { undoIgnore: true }
 				);
 			},
 			[ editEntityRecord, post.type, post.id ]

@@ -58,6 +58,17 @@ export function createUndoManager(): SyncUndoManager {
 		},
 
 		/**
+		 * Amend the latest undo record with additional changes.
+		 * This is a no-op for Yjs since it automatically tracks changes.
+		 *
+		 * @param _record A record of changes to merge.
+		 */
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		amendRecord( _record: HistoryRecord< ObjectData > ): void {
+			// This is a no-op for Yjs since it automatically tracks changes.
+		},
+
+		/**
 		 * Add a Yjs map to the scope of the undo manager.
 		 *
 		 * @param {Y.Map< any >} ymap                     The Yjs map to add to the scope.

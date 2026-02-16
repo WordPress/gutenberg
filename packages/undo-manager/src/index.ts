@@ -183,6 +183,29 @@ export function createUndoManager< T = unknown >(): UndoManager< T > {
 			return redoRecord;
 		},
 
+		amendRecord( record: HistoryRecord< T > ): void {
+			if ( ! record?.length ) {
+				return;
+			}
+			if ( stagedRecord.length ) {
+				record.forEach( ( changes ) => {
+					stagedRecord = addHistoryChangesIntoRecord(
+						stagedRecord,
+						changes
+					);
+				} );
+			} else {
+				const index = history.length - 1 + offset;
+				if ( index >= 0 && index < history.length ) {
+					let entry = history[ index ];
+					record.forEach( ( changes ) => {
+						entry = addHistoryChangesIntoRecord( entry, changes );
+					} );
+					history[ index ] = entry;
+				}
+			}
+		},
+
 		hasUndo(): boolean {
 			return !! history[ history.length - 1 + offset ];
 		},

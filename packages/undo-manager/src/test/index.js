@@ -215,6 +215,102 @@ describe( 'Undo Manager', () => {
 		] );
 	} );
 
+	describe( 'amendRecord', () => {
+		it( 'merges into the latest committed history entry', () => {
+			const manager = createUndoManager();
+
+			manager.addRecord( [
+				{ id: '1', changes: { value: { from: undefined, to: 1 } } },
+			] );
+			manager.amendRecord( [
+				{
+					id: '1',
+					changes: { selection: { from: undefined, to: 'sel1' } },
+				},
+			] );
+
+			expect( manager.undo() ).toEqual( [
+				{
+					id: '1',
+					changes: {
+						value: { from: undefined, to: 1 },
+						selection: { from: undefined, to: 'sel1' },
+					},
+				},
+			] );
+		} );
+
+		it( 'merges into the staged record', () => {
+			const manager = createUndoManager();
+
+			manager.addRecord(
+				[
+					{
+						id: '1',
+						changes: { value: { from: undefined, to: 1 } },
+					},
+				],
+				true
+			);
+			manager.amendRecord( [
+				{
+					id: '1',
+					changes: { selection: { from: undefined, to: 'sel1' } },
+				},
+			] );
+
+			// Flush the staged record by adding a non-staged record.
+			manager.addRecord();
+			expect( manager.undo() ).toEqual( [
+				{
+					id: '1',
+					changes: {
+						value: { from: undefined, to: 1 },
+						selection: { from: undefined, to: 'sel1' },
+					},
+				},
+			] );
+		} );
+
+		it( 'is a no-op when history is empty', () => {
+			const manager = createUndoManager();
+
+			manager.amendRecord( [
+				{
+					id: '1',
+					changes: { selection: { from: undefined, to: 'sel1' } },
+				},
+			] );
+
+			expect( manager.undo() ).toBeUndefined();
+		} );
+
+		it( 'merges changes for a different entity into the same record', () => {
+			const manager = createUndoManager();
+
+			manager.addRecord( [
+				{ id: '1', changes: { value: { from: undefined, to: 1 } } },
+			] );
+			manager.amendRecord( [
+				{
+					id: '2',
+					changes: { selection: { from: undefined, to: 'sel1' } },
+				},
+			] );
+
+			expect( manager.undo() ).toEqual( [
+				{
+					id: '1',
+					changes: { value: { from: undefined, to: 1 } },
+				},
+				{
+					id: '2',
+					changes: { selection: { from: undefined, to: 'sel1' } },
+				},
+			] );
+		} );
+	} );
+
 	it( 'should ignore empty records', () => {
 		const manager = createUndoManager();
 

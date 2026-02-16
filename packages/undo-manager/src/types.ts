@@ -36,6 +36,18 @@ export interface UndoManager< T = unknown > {
 	addRecord: ( record?: HistoryRecord< T >, isStaged?: boolean ) => void;
 
 	/**
+	 * Amend the latest undo record with additional changes.
+	 *
+	 * Merges into the staged record if one exists, otherwise into the
+	 * most recent committed history entry. This is useful for grouping
+	 * related changes (e.g. selection) into the same undo level as a
+	 * preceding change (e.g. block content).
+	 *
+	 * @param record A record of changes to merge.
+	 */
+	amendRecord: ( record: HistoryRecord< T > ) => void;
+
+	/**
 	 * Undo the last recorded changes.
 	 *
 	 * @return The undone record or undefined if nothing to undo.
