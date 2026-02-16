@@ -9,10 +9,9 @@ import { Awareness } from 'y-protocols/awareness';
  * Internal dependencies
  */
 import type {
+	ConnectionStatus,
 	ProviderCreator,
 	ProviderCreatorResult,
-	SyncConnectionState,
-	SyncConnectionStatus,
 } from '../../types';
 import { pollingManager } from './polling-manager';
 
@@ -28,7 +27,7 @@ export interface ProviderOptions {
  * ObservableV2 expects event handlers as functions.
  */
 type HttpPollingEvents = {
-	'sync-connection-status': ( data: SyncConnectionState ) => void;
+	status: ( status: ConnectionStatus ) => void;
 };
 
 /**
@@ -37,6 +36,7 @@ type HttpPollingEvents = {
  */
 class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	protected awareness: Awareness;
+	protected status: ConnectionStatus[ 'status' ] = 'disconnected';
 	protected synced = false;
 
 	public constructor( protected options: ProviderOptions ) {
@@ -58,8 +58,8 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 			doc: this.options.ydoc,
 			awareness: this.awareness,
 			log: this.log,
+			onStatusChange: this.emitStatus,
 			onSync: this.onSync,
-			onStatusChange: this.onStatusChange,
 		} );
 	}
 
@@ -78,19 +78,32 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 		this.log( 'Disconnecting' );
 
 		pollingManager.unregisterRoom( this.options.room );
-		this.emitStatus( 'disconnected' );
+		this.emitStatus( { status: 'disconnected' } );
 	}
 
 	/**
 	 * Emit connection status.
 	 *
-	 * @param status The connection status
+	 * @param status        The connection status
+	 * @param status.error  Optional error information when status is 'disconnected'
+	 * @param status.status The connection status ('connected', 'connecting', 'disconnected')
 	 */
-	protected emitStatus( status: SyncConnectionStatus ): void {
-		const connectionState: SyncConnectionState = { status };
+	protected emitStatus = ( { error, status }: ConnectionStatus ): void => {
+		if ( this.status === status && ! error ) {
+			return;
+		}
+
+		// Only emit 'connecting' status if transitioning from 'disconnected'.
+		if ( status === 'connecting' && this.status !== 'disconnected' ) {
+			return;
+		}
+
+		this.log( 'Status change', { status, error } );
+
 		// ObservableV2 expects arguments as an array
-		this.emit( 'sync-connection-status', [ connectionState ] );
-	}
+		this.status = status;
+		this.emit( 'status', [ { error, status } ] );
+	};
 
 	/**
 	 * Log debug messages if debugging is enabled.
@@ -110,14 +123,7 @@ class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 
 	/**
 	 * Handle synchronization events from the polling manager.
-	 *
-	 * @param status The synchronization status
 	 */
-	protected onStatusChange = ( status: SyncConnectionStatus ): void => {
-		this.log( 'Status changed', { status } );
-		this.emitStatus( status );
-	};
-
 	protected onSync = (): void => {
 		if ( ! this.synced ) {
 			this.synced = true;

@@ -66,48 +66,44 @@ export interface ProviderCreatorResult {
 	on: ProviderOn;
 }
 
-export type SyncConnectionStatus = 'connected' | 'connecting' | 'disconnected';
+/**
+ * Error codes for connection errors that can occur in sync providers.
+ */
+export type ConnectionErrorCode =
+	| 'authentication-error'
+	| 'connection-expired'
+	| 'connection-limit-exceeded'
+	| 'unknown-error';
 
 /**
  * Sync connection error object.
  */
-export interface SyncConnectionError {
+export interface ConnectionError extends Error {
 	/**
 	 * Error code identifier for programmatic handling and default message lookup.
 	 */
-	code: string;
-
-	/**
-	 * Short error title/message to display in UI.
-	 * If not provided, UI components will use a default based on the code.
-	 */
-	message?: string;
-
-	/**
-	 * Longer error description for display.
-	 * If not provided, UI components will use a default based on the code.
-	 */
-	description?: string;
+	code: ConnectionErrorCode;
 }
 
-export interface SyncConnectionState {
-	status: SyncConnectionStatus;
+/**
+ * Current connection status of a sync provider, including status and optional error information.
+ */
+export interface ConnectionStatus {
+	status: 'connected' | 'connecting' | 'disconnected';
 
 	/**
-	 * Error information when status is 'disconnected'.
+	 * Optional error information when status is 'disconnected'.
 	 */
-	error?: SyncConnectionError;
+	error?: ConnectionError;
 }
 
-export type OnStateChangeCallback = ( state: SyncConnectionState ) => void;
+export type OnStatusChangeCallback = (
+	status: ConnectionStatus | null
+) => void;
 
-export interface ProviderCreatorOptions {
-	objectType: ObjectType;
-	objectId: ObjectID | null;
-	ydoc: Y.Doc;
-	awareness?: Awareness;
-}
-
+/**
+ * Options passed to a provider creator function when initializing a sync provider.
+ */
 export interface ProviderCreatorOptions {
 	objectType: ObjectType;
 	objectId: ObjectID | null;
@@ -120,8 +116,8 @@ export type ProviderCreator = (
 ) => Promise< ProviderCreatorResult >;
 
 export interface CollectionHandlers {
+	onStatusChange: OnStatusChangeCallback;
 	refetchRecords: () => Promise< void >;
-	onStateChange: OnStateChangeCallback;
 }
 
 export interface SyncManagerUpdateOptions {
@@ -136,7 +132,7 @@ export interface RecordHandlers {
 		options?: { undoIgnore?: boolean }
 	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
-	onStateChange: OnStateChangeCallback;
+	onStatusChange: OnStatusChangeCallback;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	saveRecord: () => Promise< void >;

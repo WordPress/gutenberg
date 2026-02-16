@@ -11,7 +11,7 @@ import * as syncProtocol from 'y-protocols/sync';
 /**
  * Internal dependencies
  */
-import type { SyncConnectionStatus } from '../../types';
+import type { ConnectionStatus } from '../../types';
 import {
 	type AwarenessState,
 	type LocalAwarenessState,
@@ -44,8 +44,8 @@ interface RegisterRoomOptions {
 	doc: Y.Doc;
 	awareness: Awareness;
 	log: LogFunction;
+	onStatusChange: ( status: ConnectionStatus ) => void;
 	onSync: () => void;
-	onStatusChange: ( status: SyncConnectionStatus ) => void;
 }
 
 interface RoomState {
@@ -53,7 +53,7 @@ interface RoomState {
 	endCursor: number;
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
-	onStatusChange: ( status: SyncConnectionStatus ) => void;
+	onStatusChange: ( status: ConnectionStatus ) => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
 	unregister: () => void;
@@ -61,13 +61,6 @@ interface RoomState {
 }
 
 const roomStates: Map< string, RoomState > = new Map();
-
-/**
- * Module-level connection status shared by all rooms.
- * All rooms use the same polling loop and make requests to the same API endpoint,
- * so they share the same connection status (connected, connecting, or disconnected).
- */
-let lastConnectionStatus: SyncConnectionStatus = 'disconnected';
 
 /**
  * Create a compaction update by merging existing updates. This preserves
@@ -254,13 +247,10 @@ function poll(): void {
 			return;
 		}
 
-		// If we're disconnected and about to retry, emit 'connecting' status.
-		if ( lastConnectionStatus === 'disconnected' ) {
-			lastConnectionStatus = 'connecting';
-			roomStates.forEach( ( state ) => {
-				state.onStatusChange( 'connecting' );
-			} );
-		}
+		// Emit 'connecting' status.
+		roomStates.forEach( ( state ) => {
+			state.onStatusChange( { status: 'connecting' } );
+		} );
 
 		// Create a payload with all queued updates. We include rooms even if they
 		// have no updates to ensure we receive any incoming updates. Note that we
@@ -284,14 +274,10 @@ function poll(): void {
 			// Reset poll interval on success.
 			pollInterval = POLLING_INTERVAL_IN_MS;
 
-			// Only emit 'connected' if we're transitioning from another state.
-			// This avoids emitting duplicate events on every successful poll
-			if ( lastConnectionStatus !== 'connected' ) {
-				lastConnectionStatus = 'connected';
-				roomStates.forEach( ( state ) => {
-					state.onStatusChange( 'connected' );
-				} );
-			}
+			// Emit 'connected' status.
+			roomStates.forEach( ( state ) => {
+				state.onStatusChange( { status: 'connected' } );
+			} );
 
 			rooms.forEach( ( room ) => {
 				if ( ! roomStates.has( room.room ) ) {
@@ -352,9 +338,8 @@ function poll(): void {
 				);
 			}
 
-			lastConnectionStatus = 'disconnected';
 			roomStates.forEach( ( state ) => {
-				state.onStatusChange( 'disconnected' );
+				state.onStatusChange( { status: 'disconnected' } );
 			} );
 		}
 
@@ -426,12 +411,6 @@ function registerRoom( {
 function unregisterRoom( room: string ): void {
 	roomStates.get( room )?.unregister();
 	roomStates.delete( room );
-
-	// Reset connection status when all rooms are unregistered.
-	// This ensures the next registered room starts with 'connecting' status.
-	if ( roomStates.size === 0 ) {
-		lastConnectionStatus = 'disconnected';
-	}
 }
 
 export const pollingManager: PollingManager = {

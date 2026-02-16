@@ -444,7 +444,7 @@ getDerivedStateFromError is used to render a fallback UI after an error has been
 
 Get user-facing title and description from a sync connection error.
 
-Provides default messages based on error.code, which can be overridden by error.message and error.description.
+Provides default messages based on error.code.
 
 _Parameters_
 

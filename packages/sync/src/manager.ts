@@ -143,7 +143,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			addUndoMeta: debugWrap( handlers.addUndoMeta ),
 			editRecord: debugWrap( handlers.editRecord ),
 			getEditedRecord: debugWrap( handlers.getEditedRecord ),
-			onStateChange: debugWrap( handlers.onStateChange ),
+			onStatusChange: debugWrap( handlers.onStatusChange ),
 			refetchRecord: debugWrap( handlers.refetchRecord ),
 			restoreUndoMeta: debugWrap( handlers.restoreUndoMeta ),
 			saveRecord: debugWrap( handlers.saveRecord ),
@@ -157,6 +157,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			providerResults.forEach( ( result ) => result.destroy() );
+			handlers.onStatusChange( null );
 			recordMap.unobserveDeep( onRecordUpdate );
 			recordMetaMap.unobserve( onRecordMetaUpdate );
 			ydoc.destroy();
@@ -238,7 +239,7 @@ export function createSyncManager( debug = false ): SyncManager {
 				} );
 
 				// Attach status listener after provider creation.
-				provider.on( 'sync-connection-status', handlers.onStateChange );
+				provider.on( 'status', handlers.onStatusChange );
 
 				return provider;
 			} )
@@ -281,6 +282,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			providerResults.forEach( ( result ) => result.destroy() );
+			handlers.onStatusChange( null );
 			recordMetaMap.unobserve( onRecordMetaUpdate );
 			ydoc.destroy();
 			collectionStates.delete( objectType );
@@ -332,7 +334,7 @@ export function createSyncManager( debug = false ): SyncManager {
 				} );
 
 				// Attach status listener after provider creation.
-				provider.on( 'sync-connection-status', handlers.onStateChange );
+				provider.on( 'status', handlers.onStatusChange );
 
 				return provider;
 			} )

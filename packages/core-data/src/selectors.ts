@@ -5,7 +5,7 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import { addQueryArgs } from '@wordpress/url';
 import type { UndoManager } from '@wordpress/undo-manager';
 import deprecated from '@wordpress/deprecated';
-import type { SyncConnectionState } from '@wordpress/sync';
+import type { ConnectionStatus } from '@wordpress/sync';
 
 /**
  * Internal dependencies
@@ -54,7 +54,7 @@ export interface State {
 	editorSettings: Record< string, any > | null;
 	editorAssets: Record< string, any > | null;
 	icons: Icon[];
-	syncConnectionStates?: Record< string, SyncConnectionState >;
+	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 }
 
 type EntityRecordKey = string | number;
@@ -1606,55 +1606,33 @@ export const getRevision = createSelector(
 );
 
 /**
- * Returns the sync connection state for a specific entity record or collection.
- *
- * @param state Data state.
- * @param kind  Entity kind.
- * @param name  Entity name.
- * @param key   Entity key, or null for collections.
- *
- * @return The sync connection state, or undefined if not set.
- */
-export function getEntitySyncConnectionState(
-	state: State,
-	kind: string,
-	name: string,
-	key: string | number | null
-): SyncConnectionState | undefined {
-	const stateKey = `${ kind }/${ name }:${ key }`;
-	return state.syncConnectionStates?.[ stateKey ];
-}
-
-/**
- * Returns the current sync connection state across all entities.
- * Prioritizes disconnected states, then connecting, then connected.
+ * Returns the current sync connection status across all entities. Prioritizes
+ * disconnected states, then connecting, then connected.
  *
  * @param state Data state.
  *
  * @return The current sync connection state, prioritized by importance.
  */
-export function getSyncConnectionState(
+export function getSyncConnectionStatus(
 	state: State
-): SyncConnectionState | undefined {
-	if ( ! state.syncConnectionStates ) {
+): ConnectionStatus | undefined {
+	if ( ! state.syncConnectionStatuses ) {
 		return undefined;
 	}
 
-	let coalescedState: SyncConnectionState | undefined;
+	const PRIORITIZED_STATUSES = [ 'disconnected', 'connecting', 'connected' ];
 
-	const prioritizedStatuses = [ 'disconnected', 'connecting', 'connected' ];
+	let coalesced: ConnectionStatus | undefined;
 
-	for ( const connectionState of Object.values(
-		state.syncConnectionStates
-	) ) {
+	for ( const status of Object.values( state.syncConnectionStatuses ) ) {
 		if (
-			! coalescedState ||
-			prioritizedStatuses.indexOf( connectionState.status ) <
-				prioritizedStatuses.indexOf( coalescedState.status )
+			! coalesced ||
+			PRIORITIZED_STATUSES.indexOf( status.status ) <
+				PRIORITIZED_STATUSES.indexOf( coalesced.status )
 		) {
-			coalescedState = connectionState;
+			coalesced = status;
 		}
 	}
 
-	return coalescedState;
+	return coalesced;
 }

@@ -1125,44 +1125,30 @@ export const receiveRevisions =
 	};
 
 /**
- * Returns an action object used to set the sync connection state for an entity or collection.
+ * Returns an action object used to set the sync connection status for an entity or collection.
  *
- * @param {string}             kind            Kind of the entity.
- * @param {string}             name            Name of the entity.
- * @param {number|string|null} key             The entity key, or null for collections.
- * @param {Object}             connectionState The connection state object.
+ * @param {string}             kind   Kind of the entity.
+ * @param {string}             name   Name of the entity.
+ * @param {number|string|null} key    The entity key, or null for collections.
+ * @param {Object|null}        status The connection state object or null on unload.
  *
  * @return {Object} Action object.
  */
-export function setEntitySyncConnectionState(
-	kind,
-	name,
-	key,
-	connectionState
-) {
-	return {
-		type: 'SET_ENTITY_SYNC_CONNECTION_STATE',
-		kind,
-		name,
-		key,
-		connectionState,
-	};
-}
+export function setSyncConnectionStatus( kind, name, key, status ) {
+	if ( ! status ) {
+		return {
+			type: 'CLEAR_SYNC_CONNECTION_STATUS',
+			kind,
+			name,
+			key,
+		};
+	}
 
-/**
- * Returns an action object used to clear the sync connection state for an entity or collection.
- *
- * @param {string}             kind Kind of the entity.
- * @param {string}             name Name of the entity.
- * @param {number|string|null} key  The entity key, or null for collections.
- *
- * @return {Object} Action object.
- */
-export function clearEntitySyncConnectionState( kind, name, key ) {
 	return {
-		type: 'CLEAR_ENTITY_SYNC_CONNECTION_STATE',
+		type: 'SET_SYNC_CONNECTION_STATUS',
 		kind,
 		name,
 		key,
+		status,
 	};
 }

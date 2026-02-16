@@ -188,20 +188,6 @@ _Returns_
 
 -   `Object`: Action object.
 
-### clearEntitySyncConnectionState
-
-Returns an action object used to clear the sync connection state for an entity or collection.
-
-_Parameters_
-
--   _kind_ `string`: Kind of the entity.
--   _name_ `string`: Name of the entity.
--   _key_ `number|string|null`: The entity key, or null for collections.
-
-_Returns_
-
--   `Object`: Action object.
-
 ### deleteEntityRecord
 
 Action triggered to delete an entity record.
@@ -343,16 +329,16 @@ _Parameters_
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
 -   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
 
-### setEntitySyncConnectionState
+### setSyncConnectionStatus
 
-Returns an action object used to set the sync connection state for an entity or collection.
+Returns an action object used to set the sync connection status for an entity or collection.
 
 _Parameters_
 
 -   _kind_ `string`: Kind of the entity.
 -   _name_ `string`: Name of the entity.
 -   _key_ `number|string|null`: The entity key, or null for collections.
--   _connectionState_ `Object`: The connection state object.
+-   _status_ `Object|null`: The connection state object or null on unload.
 
 _Returns_
 
@@ -708,21 +694,6 @@ _Returns_
 
 -   `number | null`: number | null.
 
-### getEntitySyncConnectionState
-
-Returns the sync connection state for a specific entity record or collection.
-
-_Parameters_
-
--   _state_ `State`: Data state.
--   _kind_ `string`: Entity kind.
--   _name_ `string`: Entity name.
--   _key_ `string | number | null`: Entity key, or null for collections.
-
-_Returns_
-
--   `SyncConnectionState | undefined`: The sync connection state, or undefined if not set.
-
 ### getLastEntityDeleteError
 
 Returns the specified entity record's last delete error.
@@ -834,9 +805,9 @@ _Returns_
 
 -   `RevisionRecord[] | null`: Record.
 
-### getSyncConnectionState
+### getSyncConnectionStatus
 
-Returns the current sync connection state across all entities. Prioritizes disconnected states, then connecting, then connected.
+Returns the current sync connection status across all entities. Prioritizes disconnected states, then connecting, then connected.
 
 _Parameters_
 
@@ -844,7 +815,7 @@ _Parameters_
 
 _Returns_
 
--   `SyncConnectionState | undefined`: The current sync connection state, prioritized by importance.
+-   `ConnectionStatus | undefined`: The current sync connection state, prioritized by importance.
 
 ### getThemeSupports
 

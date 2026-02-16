@@ -685,16 +685,16 @@ export function icons( state = [], action ) {
  *
  * @return {Object} Updated state.
  */
-export function syncConnectionStates( state = {}, action ) {
+export function syncConnectionStatuses( state = {}, action ) {
 	switch ( action.type ) {
-		case 'SET_ENTITY_SYNC_CONNECTION_STATE': {
+		case 'SET_SYNC_CONNECTION_STATUS': {
 			const key = `${ action.kind }/${ action.name }:${ action.key }`;
 			return {
 				...state,
-				[ key ]: action.connectionState,
+				[ key ]: action.status,
 			};
 		}
-		case 'CLEAR_ENTITY_SYNC_CONNECTION_STATE': {
+		case 'CLEAR_SYNC_CONNECTION_STATUS': {
 			const key = `${ action.kind }/${ action.name }:${ action.key }`;
 			const { [ key ]: _, ...rest } = state;
 			return rest;
@@ -726,5 +726,5 @@ export default combineReducers( {
 	editorSettings,
 	editorAssets,
 	icons,
-	syncConnectionStates,
+	syncConnectionStatuses,
 } );

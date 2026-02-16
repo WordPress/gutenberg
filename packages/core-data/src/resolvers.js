@@ -217,6 +217,15 @@ export const getEntityRecord =
 									name,
 									key
 								),
+							// Handle sync connection status changes.
+							onStatusChange: ( status ) => {
+								dispatch.setSyncConnectionStatus(
+									kind,
+									name,
+									key,
+									status
+								);
+							},
 							// Refetch the current entity record from the database.
 							refetchRecord: async () => {
 								dispatch.receiveEntityRecords(
@@ -263,15 +272,6 @@ export const getEntityRecord =
 										);
 									}, 0 );
 								}
-							},
-							// Handle sync connection state changes.
-							onStateChange: ( connectionState ) => {
-								dispatch.setEntitySyncConnectionState(
-									kind,
-									name,
-									key,
-									connectionState
-								);
 							},
 						}
 					);
@@ -478,21 +478,20 @@ export const getEntityRecords =
 						entityConfig.syncConfig,
 						objectType,
 						{
+							onStatusChange: ( status ) => {
+								dispatch.setSyncConnectionStatus(
+									kind,
+									name,
+									null,
+									status
+								);
+							},
 							refetchRecords: async () => {
 								dispatch.receiveEntityRecords(
 									kind,
 									name,
 									await apiFetch( { path, parse: true } ),
 									query
-								);
-							},
-							// Handle sync connection state changes for collections.
-							onStateChange: ( connectionState ) => {
-								dispatch.setEntitySyncConnectionState(
-									kind,
-									name,
-									null,
-									connectionState
 								);
 							},
 						}
