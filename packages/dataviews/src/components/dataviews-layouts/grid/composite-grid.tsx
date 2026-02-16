@@ -326,14 +326,13 @@ const GridItem = forwardRef< HTMLDivElement, GridItemProps< any > >(
 					) }
 				</Stack>
 			</Stack>
-		</Stack>
-	);
-} ) as < Item >(
+		);
+	}
+) as < Item >(
 	props: GridItemProps< Item > & {
 		ref?: React.ForwardedRef< HTMLDivElement >;
 	}
 ) => React.ReactNode;
-}
 interface CompositeGridProps< Item > {
 	data: Item[];
 	isInfiniteScroll: boolean;
