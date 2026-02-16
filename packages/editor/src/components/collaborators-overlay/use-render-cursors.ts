@@ -1,6 +1,5 @@
 import {
 	privateApis as coreDataPrivateApis,
-	type SelectionCursor,
 	SelectionType,
 } from '@wordpress/core-data';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -79,40 +78,33 @@ export function useRenderCursors(
 				} else if ( selection.type === SelectionType.WholeBlock ) {
 					// Don't draw a cursor for a whole block selection.
 				} else if ( selection.type === SelectionType.Cursor ) {
-					coords = getCursorPosition(
-						getAbsolutePositionIndex( selection ),
-						selection.blockId,
-						blockEditorDocument,
-						overlayElement
-					);
+					const { textIndex, blockClientId } =
+						getAbsolutePositionIndex( selection );
+					if ( blockClientId ) {
+						coords = getCursorPosition(
+							textIndex,
+							blockClientId,
+							blockEditorDocument,
+							overlayElement
+						);
+					}
 				} else if (
-					selection.type === SelectionType.SelectionInOneBlock
-				) {
-					const selectionAsCursor: SelectionCursor = {
-						type: SelectionType.Cursor,
-						blockId: selection.blockId,
-						cursorPosition: selection.cursorStartPosition,
-					};
-					coords = getCursorPosition(
-						getAbsolutePositionIndex( selectionAsCursor ),
-						selectionAsCursor.blockId,
-						blockEditorDocument,
-						overlayElement
-					);
-				} else if (
+					selection.type === SelectionType.SelectionInOneBlock ||
 					selection.type === SelectionType.SelectionInMultipleBlocks
 				) {
-					const selectionAsCursor: SelectionCursor = {
-						type: SelectionType.Cursor,
-						blockId: selection.blockStartId,
-						cursorPosition: selection.cursorStartPosition,
-					};
-					coords = getCursorPosition(
-						getAbsolutePositionIndex( selectionAsCursor ),
-						selectionAsCursor.blockId,
-						blockEditorDocument,
-						overlayElement
-					);
+					const { textIndex, blockClientId } =
+						getAbsolutePositionIndex( {
+							type: SelectionType.Cursor,
+							cursorPosition: selection.cursorStartPosition,
+						} );
+					if ( blockClientId ) {
+						coords = getCursorPosition(
+							textIndex,
+							blockClientId,
+							blockEditorDocument,
+							overlayElement
+						);
+					}
 				}
 
 				if ( coords ) {

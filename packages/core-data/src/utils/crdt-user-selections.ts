@@ -70,9 +70,21 @@ export function getSelectionState(
 
 	if ( isSelectionAWholeBlock ) {
 		// Case 2: A whole block is selected.
+		const blockPos = findBlockPositionByClientId(
+			selectionStart.clientId,
+			yBlocks
+		);
+
+		if ( ! blockPos ) {
+			return noSelection;
+		}
+
 		return {
 			type: SelectionType.WholeBlock,
-			blockId: selectionStart.clientId,
+			blockPosition: Y.createRelativePositionFromTypeIndex(
+				blockPos.parentArray,
+				blockPos.index
+			),
 		};
 	} else if ( isCursorOnly ) {
 		// Case 3: Cursor only, no text selected
@@ -85,7 +97,6 @@ export function getSelectionState(
 
 		return {
 			type: SelectionType.Cursor,
-			blockId: selectionStart.clientId,
 			cursorPosition,
 		};
 	} else if ( isSelectionInOneBlock ) {
@@ -103,7 +114,6 @@ export function getSelectionState(
 
 		return {
 			type: SelectionType.SelectionInOneBlock,
-			blockId: selectionStart.clientId,
 			cursorStartPosition,
 			cursorEndPosition,
 		};
@@ -119,8 +129,6 @@ export function getSelectionState(
 
 	return {
 		type: SelectionType.SelectionInMultipleBlocks,
-		blockStartId: selectionStart.clientId,
-		blockEndId: selectionEnd.clientId,
 		cursorStartPosition,
 		cursorEndPosition,
 	};
@@ -191,6 +199,73 @@ function findBlockByClientId(
 }
 
 /**
+ * Find a block's position (parent array and index) by its client ID.
+ * Used for WholeBlock selections where we need to create a Y.RelativePosition.
+ *
+ * @param blockId - The client ID of the block.
+ * @param blocks  - The blocks to search through.
+ * @return The parent array and index if found, null otherwise.
+ */
+function findBlockPositionByClientId(
+	blockId: string,
+	blocks: YBlocks
+): { parentArray: YBlocks; index: number } | null {
+	for ( let i = 0; i < blocks.length; i++ ) {
+		const block = blocks.get( i );
+		if ( block.get( 'clientId' ) === blockId ) {
+			return { parentArray: blocks, index: i };
+		}
+
+		const innerBlocks = block.get( 'innerBlocks' );
+
+		if ( innerBlocks && innerBlocks.length > 0 ) {
+			const result = findBlockPositionByClientId( blockId, innerBlocks );
+
+			if ( result ) {
+				return result;
+			}
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Resolve a block's Y.RelativePosition to a local client ID.
+ * Used on the receiver side to find which block a WholeBlock selection refers to.
+ *
+ * @param blockPosition - The relative position of the block in its parent Y.Array.
+ * @param yDoc          - The Yjs document.
+ * @return The block's local client ID, or null if not found.
+ */
+export function resolveBlockClientId(
+	blockPosition: Y.RelativePosition,
+	yDoc: Y.Doc
+): string | null {
+	const absolutePos = Y.createAbsolutePositionFromRelativePosition(
+		blockPosition,
+		yDoc
+	);
+
+	if ( ! absolutePos ) {
+		return null;
+	}
+
+	const parentArray = absolutePos.type as Y.Array< YBlock >;
+
+	if ( ! ( parentArray instanceof Y.Array ) ) {
+		return null;
+	}
+
+	const block = parentArray.get( absolutePos.index );
+	if ( ! block ) {
+		return null;
+	}
+
+	return ( block.get( 'clientId' ) as string ) ?? null;
+}
+
+/**
  * Check if two selection states are equal.
  *
  * @param selection1 - The first selection state.
@@ -210,19 +285,13 @@ export function areSelectionsStatesEqual(
 			return true;
 
 		case SelectionType.Cursor:
-			return (
-				selection1.blockId ===
-					( selection2 as SelectionCursor ).blockId &&
-				areCursorPositionsEqual(
-					selection1.cursorPosition,
-					( selection2 as SelectionCursor ).cursorPosition
-				)
+			return areCursorPositionsEqual(
+				selection1.cursorPosition,
+				( selection2 as SelectionCursor ).cursorPosition
 			);
 
 		case SelectionType.SelectionInOneBlock:
 			return (
-				selection1.blockId ===
-					( selection2 as SelectionInOneBlock ).blockId &&
 				areCursorPositionsEqual(
 					selection1.cursorStartPosition,
 					( selection2 as SelectionInOneBlock ).cursorStartPosition
@@ -235,10 +304,6 @@ export function areSelectionsStatesEqual(
 
 		case SelectionType.SelectionInMultipleBlocks:
 			return (
-				selection1.blockStartId ===
-					( selection2 as SelectionInMultipleBlocks ).blockStartId &&
-				selection1.blockEndId ===
-					( selection2 as SelectionInMultipleBlocks ).blockEndId &&
 				areCursorPositionsEqual(
 					selection1.cursorStartPosition,
 					( selection2 as SelectionInMultipleBlocks )
@@ -252,8 +317,10 @@ export function areSelectionsStatesEqual(
 			);
 		case SelectionType.WholeBlock:
 			return (
-				selection1.blockId ===
-				( selection2 as SelectionWholeBlock ).blockId
+				JSON.stringify( selection1.blockPosition ) ===
+				JSON.stringify(
+					( selection2 as SelectionWholeBlock ).blockPosition
+				)
 			);
 
 		default:

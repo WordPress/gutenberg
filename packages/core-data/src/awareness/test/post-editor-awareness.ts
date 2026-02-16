@@ -9,7 +9,11 @@ import { dispatch, select, subscribe, resolveSelect } from '@wordpress/data';
  */
 import { PostEditorAwareness } from '../post-editor-awareness';
 import { SelectionType } from '../../utils/crdt-user-selections';
-import type { SelectionNone, SelectionCursor } from '../../types';
+import type {
+	SelectionNone,
+	SelectionCursor,
+	SelectionWholeBlock,
+} from '../../types';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
 import type { CollaboratorInfo } from '../types';
 
@@ -340,7 +344,7 @@ describe( 'PostEditorAwareness', () => {
 	} );
 
 	describe( 'getAbsolutePositionIndex', () => {
-		test( 'should return null when relative position cannot be resolved', () => {
+		test( 'should return nulls when relative position cannot be resolved', () => {
 			const awareness = new PostEditorAwareness(
 				doc,
 				'postType',
@@ -361,7 +365,6 @@ describe( 'PostEditorAwareness', () => {
 
 			const selection: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition: {
 					relativePosition,
 					absoluteOffset: 2,
@@ -370,11 +373,12 @@ describe( 'PostEditorAwareness', () => {
 
 			const result = awareness.getAbsolutePositionIndex( selection );
 
-			// Should return null when the relative position's type cannot be found
-			expect( result ).toBeNull();
+			// Should return nulls when the relative position's type cannot be found
+			expect( result.textIndex ).toBeNull();
+			expect( result.blockClientId ).toBeNull();
 		} );
 
-		test( 'should return absolute position index for valid selection', () => {
+		test( 'should return text index and block client ID for valid cursor selection', () => {
 			const awareness = new PostEditorAwareness(
 				doc,
 				'postType',
@@ -399,7 +403,6 @@ describe( 'PostEditorAwareness', () => {
 
 			const selection: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition: {
 					relativePosition,
 					absoluteOffset: 5,
@@ -408,7 +411,39 @@ describe( 'PostEditorAwareness', () => {
 
 			const result = awareness.getAbsolutePositionIndex( selection );
 
-			expect( result ).toBe( 5 );
+			expect( result.textIndex ).toBe( 5 );
+			expect( result.blockClientId ).toBe( 'block-1' );
+		} );
+
+		test( 'should resolve WholeBlock selection to block client ID', () => {
+			const awareness = new PostEditorAwareness(
+				doc,
+				'postType',
+				'post',
+				123
+			);
+
+			// Get the blocks array from the doc
+			const documentMap = doc.getMap( CRDT_RECORD_MAP_KEY );
+			const blocks = documentMap.get( 'blocks' ) as Y.Array<
+				Y.Map< any >
+			>;
+
+			// Create a block relative position
+			const blockPosition = Y.createRelativePositionFromTypeIndex(
+				blocks,
+				0
+			);
+
+			const selection: SelectionWholeBlock = {
+				type: SelectionType.WholeBlock,
+				blockPosition,
+			};
+
+			const result = awareness.getAbsolutePositionIndex( selection );
+
+			expect( result.textIndex ).toBeNull();
+			expect( result.blockClientId ).toBe( 'block-1' );
 		} );
 	} );
 

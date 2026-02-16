@@ -243,33 +243,37 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 	} );
 
 	describe( 'useGetAbsolutePositionIndex', () => {
-		test( 'should return function that returns null when postId is null', () => {
+		test( 'should return function that returns default when postId is null', () => {
 			const { result } = renderHook( () =>
 				useGetAbsolutePositionIndex( null, 'post' )
 			);
 
 			const mockSelection: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition: {
 					relativePosition: {} as any,
 					absoluteOffset: 5,
 				},
 			};
 
-			expect( result.current( mockSelection ) ).toBeNull();
+			expect( result.current( mockSelection ) ).toEqual( {
+				textIndex: null,
+				blockClientId: null,
+			} );
 		} );
 
 		test( 'should call awareness.getAbsolutePositionIndex with selection', () => {
 			const mockSelection: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition: {
 					relativePosition: {} as any,
 					absoluteOffset: 5,
 				},
 			};
-			mockAwareness.getAbsolutePositionIndex.mockReturnValue( 10 );
+			mockAwareness.getAbsolutePositionIndex.mockReturnValue( {
+				textIndex: 10,
+				blockClientId: 'block-1',
+			} );
 
 			const { result } = renderHook( () =>
 				useGetAbsolutePositionIndex( 123, 'post' )
@@ -280,7 +284,10 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			expect(
 				mockAwareness.getAbsolutePositionIndex
 			).toHaveBeenCalledWith( mockSelection );
-			expect( position ).toBe( 10 );
+			expect( position ).toEqual( {
+				textIndex: 10,
+				blockClientId: 'block-1',
+			} );
 		} );
 	} );
 

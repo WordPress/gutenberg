@@ -18,9 +18,11 @@ import { STORE_NAME as coreStore } from '../name';
 import {
 	areSelectionsStatesEqual,
 	getSelectionState,
+	SelectionType,
+	resolveBlockClientId,
 } from '../utils/crdt-user-selections';
 
-import type { SelectionCursor, WPBlockSelection } from '../types';
+import type { SelectionState, WPBlockSelection } from '../types';
 import type {
 	DebugCollaboratorData,
 	EditorState,
@@ -172,20 +174,53 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	}
 
 	/**
-	 * Get the absolute position index from a selection cursor.
+	 * Resolve a selection state to a text index and block client ID.
 	 *
-	 * @param selection - The selection cursor.
-	 * @return The absolute position index, or null if not found.
+	 * For text-based selections, navigates up from the resolved Y.Text via
+	 * AbstractType.parent to find the containing block.
+	 * For WholeBlock selections, resolves the block's relative position directly.
+	 *
+	 * @param selection - The selection state.
+	 * @return The text index and block client ID, or nulls if not resolvable.
 	 */
-	public getAbsolutePositionIndex(
-		selection: SelectionCursor
-	): number | null {
-		return (
-			Y.createAbsolutePositionFromRelativePosition(
-				selection.cursorPosition.relativePosition,
-				this.doc
-			)?.index ?? null
+	public getAbsolutePositionIndex( selection: SelectionState ): {
+		textIndex: number | null;
+		blockClientId: string | null;
+	} {
+		if ( selection.type === SelectionType.None ) {
+			return { textIndex: null, blockClientId: null };
+		}
+
+		if ( selection.type === SelectionType.WholeBlock ) {
+			return {
+				textIndex: null,
+				blockClientId: resolveBlockClientId(
+					selection.blockPosition,
+					this.doc
+				),
+			};
+		}
+
+		// Text-based selections: resolve cursor position and navigate up.
+		const cursorPos =
+			'cursorPosition' in selection
+				? selection.cursorPosition
+				: selection.cursorStartPosition;
+
+		const absolutePosition = Y.createAbsolutePositionFromRelativePosition(
+			cursorPos.relativePosition,
+			this.doc
 		);
+
+		if ( ! absolutePosition ) {
+			return { textIndex: null, blockClientId: null };
+		}
+
+		// Navigate up: Y.Text → attributes Y.Map → block Y.Map
+		const blockMap = absolutePosition.type.parent?.parent;
+		const blockClientId = ( blockMap as any )?.get?.( 'clientId' ) ?? null;
+
+		return { textIndex: absolutePosition.index, blockClientId };
 	}
 
 	/**
