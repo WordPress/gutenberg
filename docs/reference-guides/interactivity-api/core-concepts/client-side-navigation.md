@@ -506,7 +506,7 @@ Use `replace: true` when:
 
 ### Changing the timeout
 
-Navigation will abort if it takes too long. The default timeout is 10 seconds. Use the `timeout` option to change this:
+If navigation takes too long, the router falls back to a traditional full-page load. The default timeout is 10 seconds. Use the `timeout` option to change this:
 
 ```js
 // Shorter timeout for faster failure.
