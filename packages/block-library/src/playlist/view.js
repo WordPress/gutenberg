@@ -27,8 +27,14 @@ store(
 		actions: {
 			changeTrack() {
 				const context = getContext();
-				context.currentId = context.uniqueId;
-				context.isPlaying = true;
+				// Toggle play/pause if clicking the same track
+				if ( context.currentId === context.uniqueId ) {
+					context.isPlaying = ! context.isPlaying;
+				} else {
+					// Switch to a different track and play it
+					context.currentId = context.uniqueId;
+					context.isPlaying = true;
+				}
 			},
 			isPlaying() {
 				const context = getContext();
@@ -61,6 +67,8 @@ store(
 				const { ref } = getElement();
 				if ( context.currentId && context.isPlaying ) {
 					ref.play();
+				} else if ( context.currentId && ! context.isPlaying ) {
+					ref.pause();
 				}
 			},
 		},

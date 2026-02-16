@@ -51,7 +51,7 @@ function render_block_core_playlist_track( $attributes ) {
 		$html .= '</span>';
 	}
 
-	$html .= '<span class="screen-reader-text">' . esc_html__( 'Select to play this track' ) . '</span>';
+	$html .= '<span class="screen-reader-text">' . esc_html__( 'Select to play or pause this track' ) . '</span>';
 	$html .= '</button>';
 	$html .= '</li>';
 
