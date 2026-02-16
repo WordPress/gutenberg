@@ -430,7 +430,7 @@ For more details, see the [Understanding global state, local context, and derive
 
 ### Overriding cached pages
 
-By default, once a page is cached, subsequent navigations use the cached version. Use the `force` option to re-fetch a page even if it's cached:
+By default, once a page is stored in the router's internal in-memory cache, subsequent navigations use the cached version without making a new network request. Use the `force` option to bypass the router's cache and re-fetch the page from the server:
 
 ```js
 // Force re-fetch with navigate().
