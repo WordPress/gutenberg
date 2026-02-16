@@ -642,8 +642,6 @@ Place this callback on an element that is always present in the DOM (like a site
 </div>
 ```
 
-The router also exposes `state.navigation.hasStarted` and `state.navigation.hasFinished` properties if you need to track the navigation lifecycle more granularly — for example, to show custom loading indicators or to time how long navigations take.
-
 ## The Interactivity Router in depth
 
 This section provides a detailed technical explanation of how client-side navigation works internally. Understanding these internals can help you debug issues, optimize performance, and make informed decisions about how to structure your interactive blocks.
