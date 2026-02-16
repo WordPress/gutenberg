@@ -11,7 +11,7 @@ The Interactivity API supports two navigation modes:
 
 ## How client-side navigation works
 
-When a user triggers a navigation (for example, by clicking a link), the Interactivity Router:
+When a user triggers a navigation, for example, by clicking a link that has a `data-wp-on--click` directive that calls `actions.navigate()`, the Interactivity Router:
 
 1. **Fetches the new page**: The router requests the HTML of the destination URL.
 2. **Parses the response**: It extracts the relevant regions, styles, scripts, and server-rendered data from the fetched HTML.
