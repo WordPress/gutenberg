@@ -234,13 +234,16 @@ export default function pluginDsTokenFallbacks( {
 				}
 			}
 
-			// Step 4: Apply hard-coded overrides for tokens where the
-			// algorithmic fallback can cause contrast issues.
+			// Step 4: Apply hard-coded overrides for tokens that need
+			// special fallback treatment.
 			const overrides: Record< string, string > = {
 				// These foreground tokens sit on a strong brand background.
 				// White is the safest fallback regardless of admin theme color.
 				'--wpds-color-fg-interactive-brand-strong': '#fff',
 				'--wpds-color-fg-interactive-brand-strong-active': '#fff',
+				// Prefer the WP admin focus width when available.
+				'--wpds-border-width-focus':
+					'var(--wp-admin-border-width-focus, 2px)',
 			};
 
 			for ( const [ key, value ] of Object.entries( overrides ) ) {

@@ -8,7 +8,7 @@ export default {
 	'--wpds-border-radius-md': '4px',
 	'--wpds-border-radius-sm': '2px',
 	'--wpds-border-radius-xs': '1px',
-	'--wpds-border-width-focus': '2px',
+	'--wpds-border-width-focus': 'var(--wp-admin-border-width-focus, 2px)',
 	'--wpds-border-width-lg': '8px',
 	'--wpds-border-width-md': '4px',
 	'--wpds-border-width-sm': '2px',
