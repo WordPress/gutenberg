@@ -1720,13 +1720,19 @@ const canInsertBlockTypeUnmemoized = (
 	// some cases when the block is a content block.
 	const isContentRoleBlock = isContentBlock( blockName );
 	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
-	const isBlockWithinSection = !! getParentSectionBlock(
-		state,
-		rootClientId
-	);
+	const parentSection = getParentSectionBlock( state, rootClientId );
+	const isBlockWithinSection = !! parentSection;
 	if (
 		( isParentSectionBlock || isBlockWithinSection ) &&
 		! isContentRoleBlock
+	) {
+		return false;
+	}
+
+	// Don't allow insertion into synced patterns.
+	if (
+		parentSection &&
+		getBlockName( state, parentSection ) === 'core/block'
 	) {
 		return false;
 	}
