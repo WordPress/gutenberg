@@ -5,6 +5,7 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getBlockVariations,
+	getDefaultBlockName,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	switchToBlockType,
@@ -1704,7 +1705,10 @@ const canInsertBlockTypeUnmemoized = (
 	}
 
 	const blockEditingMode = getBlockEditingMode( state, rootClientId ?? '' );
-	if ( blockEditingMode === 'disabled' && blockName !== 'core/paragraph' ) {
+	if (
+		blockEditingMode === 'disabled' &&
+		blockName !== getDefaultBlockName()
+	) {
 		return false;
 	}
 
@@ -1745,15 +1749,15 @@ const canInsertBlockTypeUnmemoized = (
 			rootClientId
 		)
 	) {
-		// Allow inserting a Paragraph block anywhere that another Paragraph block already exists
+		// Allow inserting the default block anywhere that another default block already exists
 		// when in contentOnly mode.
-		if ( blockName === 'core/paragraph' ) {
+		if ( blockName === getDefaultBlockName() ) {
 			const existingBlocks = getBlockOrder( state, rootClientId );
-			const hasParagraphBlock = existingBlocks.some(
+			const hasDefaultBlock = existingBlocks.some(
 				( clientId ) =>
-					getBlockName( state, clientId ) === 'core/paragraph'
+					getBlockName( state, clientId ) === getDefaultBlockName()
 			);
-			if ( ! hasParagraphBlock ) {
+			if ( ! hasDefaultBlock ) {
 				return false;
 			}
 		} else {
@@ -1934,26 +1938,26 @@ export function canRemoveBlock( state, clientId ) {
 
 	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
 	const blockName = getBlockName( state, clientId );
-	// Check if the parent container allows insertion/removal in contentOnly mode
+	// Check if the parent container allows insertion/removal in contentOnly mode.
 	if (
 		( isParentSectionBlock ||
 			rootBlockEditingMode === 'contentOnly' ||
-			blockName === 'core/paragraph' ) &&
+			blockName === getDefaultBlockName() ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
 			getBlockName( state, clientId ),
 			rootClientId
 		)
 	) {
-		// Allow removing a Paragraph block when other Paragraph blocks exist
+		// Allow removing the default block when other default blocks exist
 		// in contentOnly mode.
-		if ( blockName === 'core/paragraph' ) {
+		if ( blockName === getDefaultBlockName() ) {
 			const existingBlocks = getBlockOrder( state, rootClientId );
-			const paragraphBlocks = existingBlocks.filter(
-				( id ) => getBlockName( state, id ) === 'core/paragraph'
+			const defaultBlocks = existingBlocks.filter(
+				( id ) => getBlockName( state, id ) === getDefaultBlockName()
 			);
-			// Allow removal if there are other paragraph blocks besides this one
-			if ( paragraphBlocks.length > 1 ) {
+			// Allow removal if there are other default blocks besides this one
+			if ( defaultBlocks.length > 1 ) {
 				return true;
 			}
 		} else {
