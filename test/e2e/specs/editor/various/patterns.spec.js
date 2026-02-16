@@ -979,3 +979,82 @@ test.describe( 'Synced pattern', () => {
 		).toBeVisible();
 	} );
 } );
+
+test.describe( 'Synced pattern - entity navigation', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'emptytheme' );
+		await requestUtils.deleteAllBlocks();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deleteAllBlocks();
+	} );
+
+	test( 'should restore selection after navigating back from pattern editing', async ( {
+		admin,
+		editor,
+		page,
+		requestUtils,
+	} ) => {
+		const { id } = await requestUtils.createBlock( {
+			title: 'Navigation test pattern',
+			content:
+				'<!-- wp:paragraph -->\n<p>Pattern content</p>\n<!-- /wp:paragraph -->',
+			status: 'publish',
+		} );
+
+		await admin.createNewPost();
+
+		// Insert a pattern block within the post content.
+		await editor.insertBlock( {
+			name: 'core/block',
+			attributes: { ref: id },
+		} );
+
+		// Enable "Show template" to enter template-locked mode.
+		await page.evaluate( () => {
+			window.wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+		} );
+		await editor.openDocumentSettingsSidebar();
+		await page
+			.getByRole( 'region', { name: 'Editor settings' } )
+			.getByRole( 'button', { name: 'Template options' } )
+			.click();
+		await page
+			.getByRole( 'menuitemcheckbox', { name: 'Show template' } )
+			.click();
+		// Close the dropdown.
+		await page.keyboard.press( 'Escape' );
+
+		// Select the pattern block.
+		const patternBlock = editor.canvas.getByRole( 'document', {
+			name: 'Block: Pattern',
+		} );
+		await editor.selectBlocks( patternBlock );
+
+		// Click "Edit original" in the block toolbar.
+		await editor.showBlockToolbar();
+		await page
+			.getByRole( 'toolbar', { name: 'Block tools' } )
+			.getByRole( 'button', { name: 'Edit original' } )
+			.click();
+
+		// Verify we navigated to the pattern editing view.
+		const editorTopBar = page.getByRole( 'region', {
+			name: 'Editor top bar',
+		} );
+		await expect(
+			editorTopBar.getByRole( 'heading', {
+				name: 'Navigation test pattern',
+				level: 1,
+			} )
+		).toBeVisible();
+
+		// Click "Back" to return to the post.
+		await editorTopBar.getByRole( 'button', { name: 'Back' } ).click();
+
+		// The pattern block should still be selected.
+		await expect( patternBlock ).toHaveClass( /is-selected/ );
+	} );
+} );
