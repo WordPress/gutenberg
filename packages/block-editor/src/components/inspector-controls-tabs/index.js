@@ -105,6 +105,8 @@ export default function InspectorControlsTabs( {
 				setOpenListViewPanel( selectedBlockClientId );
 				incrementListViewExpandRevision();
 				isProgrammaticSwitchRef.current = true;
+				// Mark as handled so the second useEffect doesn't override our specific panel opening
+				hasUserSelectionRef.current = true;
 			}
 		}
 	}, [
