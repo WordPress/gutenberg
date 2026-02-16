@@ -96,14 +96,7 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 				label: __( 'Discussion' ),
 				children: [ 'comment_status', 'ping_status' ],
 			},
-			{
-				label: __( 'Template' ),
-				id: 'template',
-				layout: {
-					type: 'regular',
-					labelPosition: 'side',
-				},
-			},
+			'template',
 		];
 
 		return {
