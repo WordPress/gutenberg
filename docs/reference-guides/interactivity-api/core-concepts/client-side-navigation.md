@@ -317,7 +317,7 @@ For these blocks, leave `supports.interactivity` at its default value (`false`) 
 ```
 
 <div class="callout callout-warning">
-If a block that is not compatible with client-side navigation is detected inside a router region, WordPress may automatically disable client-side navigation on that page to prevent broken behavior. For example, the Query block's enhanced pagination checks for incompatible blocks and falls back to full page reloads when they are found.
+WordPress does not currently disable client-side navigation automatically when an incompatible block is detected inside a router region. However, blocks can check for incompatible descendants and disable it manually. For example, the Query block's enhanced pagination detects incompatible inner blocks and sets <code>clientNavigationDisabled</code> to <code>true</code> using <code>wp_interactivity_config()</code>, which causes the router to fall back to full page reloads. See <a href="#disabling-client-side-navigation-on-certain-pages">Disabling client-side navigation on certain pages</a> for details on <code>clientNavigationDisabled</code>.
 </div>
 
 ## More advanced use cases
