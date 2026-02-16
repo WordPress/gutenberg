@@ -21,6 +21,8 @@ import {
 	getClientIdsWithDescendants,
 	getBlockRootClientId,
 	getBlockAttributes,
+	getSelectedBlockClientId,
+	getClientIdsOfDescendants,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -975,7 +977,27 @@ export function isListViewPanelOpened( state, clientId ) {
 	if ( state.openedListViewPanels?.allOpen ) {
 		return true;
 	}
-	return state.openedListViewPanels?.panels?.[ clientId ] === true;
+	// Check if panel is explicitly set to open
+	if ( state.openedListViewPanels?.panels?.[ clientId ] === true ) {
+		return true;
+	}
+	// When clicking on "Edit Navigation" button, we open the panel for the selected navigation block.
+	const selectedClientId = getSelectedBlockClientId( state );
+	if (
+		selectedClientId === clientId &&
+		getBlockName( state, clientId ) === 'core/navigation'
+	) {
+		// Check if navigation block has contentOnly children (indicating Edit Navigation context)
+		const descendants = getClientIdsOfDescendants( state, clientId );
+		const hasContentOnlyChildren = descendants.some(
+			( descendantId ) =>
+				getBlockEditingMode( state, descendantId ) === 'contentOnly'
+		);
+		if ( hasContentOnlyChildren ) {
+			return true;
+		}
+	}
+	return false;
 }
 
 /**
