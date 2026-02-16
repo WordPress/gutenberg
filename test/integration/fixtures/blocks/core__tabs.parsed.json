@@ -1,9 +1,7 @@
 [
 	{
 		"blockName": "core/tabs",
-		"attrs": {
-			"className": "is-example"
-		},
+		"attrs": {},
 		"innerBlocks": [
 			{
 				"blockName": "core/tabs-menu",
@@ -88,9 +86,9 @@
 				]
 			}
 		],
-		"innerHTML": "\n<div class=\"wp-block-tabs is-example\">\n\t\n\n\t\n</div>\n",
+		"innerHTML": "\n<div class=\"wp-block-tabs\">\n\t\n\n\t\n</div>\n",
 		"innerContent": [
-			"\n<div class=\"wp-block-tabs is-example\">\n\t",
+			"\n<div class=\"wp-block-tabs\">\n\t",
 			null,
 			"\n\n\t",
 			null,

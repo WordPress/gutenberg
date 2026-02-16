@@ -67,7 +67,11 @@ function UnforwardedExternalLink(
 				{ children }
 			</span>
 			<span
-				className="components-external-link__icon"
+				className={ clsx(
+					'components-external-link__icon',
+					// This class prevents the arrow from being replaced by a Twemoji image.
+					'wp-exclude-emoji'
+				) }
 				aria-label={
 					/* translators: accessibility text */
 					__( '(opens in a new tab)' )

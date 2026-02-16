@@ -93,7 +93,7 @@ export const Default: StoryObj< typeof Popover > = {
 	decorators: [
 		( Story ) => {
 			const [ isVisible, setIsVisible ] = useState( false );
-			const buttonRef = useRef< HTMLButtonElement | undefined >();
+			const buttonRef = useRef< HTMLButtonElement >( undefined );
 			const toggleVisible = ( event: React.MouseEvent ) => {
 				if ( buttonRef.current && event.target !== buttonRef.current ) {
 					return;

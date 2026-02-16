@@ -45,8 +45,8 @@ export default function SummaryButton< Item >( {
 	onClick: () => void;
 	'aria-expanded'?: boolean;
 } ) {
-	const labelPosition = ( field.layout as NormalizedPanelLayout )
-		.labelPosition;
+	const { labelPosition, editVisibility } =
+		field.layout as NormalizedPanelLayout;
 	const errorMessage = getFirstValidationError( validity );
 	const showError = touched && !! errorMessage;
 	const labelClassName = getLabelClassName( labelPosition, showError );
@@ -54,7 +54,11 @@ export default function SummaryButton< Item >( {
 	const className = clsx(
 		'dataforms-layouts-panel__field-trigger',
 		`dataforms-layouts-panel__field-trigger--label-${ labelPosition }`,
-		{ 'is-disabled': disabled }
+		{
+			'is-disabled': disabled,
+			'dataforms-layouts-panel__field-trigger--edit-always':
+				editVisibility === 'always',
+		}
 	);
 
 	const controlId = useInstanceId(

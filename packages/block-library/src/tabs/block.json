@@ -56,55 +56,6 @@
 		},
 		"renaming": true
 	},
-	"example": {
-		"attributes": {
-			"className": "is-example"
-		},
-		"innerBlocks": [
-			{
-				"name": "core/tabs-menu",
-				"attributes": {},
-				"innerBlocks": [
-					{
-						"name": "core/tabs-menu-item",
-						"attributes": {}
-					}
-				]
-			},
-			{
-				"name": "core/tab-panel",
-				"attributes": {},
-				"innerBlocks": [
-					{
-						"name": "core/tab",
-						"attributes": {
-							"label": "Tab 1"
-						},
-						"innerBlocks": [
-							{
-								"name": "core/paragraph",
-								"attributes": {
-									"content": "Pariatur commodo sint mollit. Veniam Lorem labore voluptate fugiat. Ad nulla est labore cillum cillum qui nostrud do incididunt eiusmod."
-								}
-							}
-						]
-					},
-					{
-						"name": "core/tab",
-						"attributes": {
-							"label": "Tab 2"
-						}
-					},
-					{
-						"name": "core/tab",
-						"attributes": {
-							"label": "Tab 3"
-						}
-					}
-				]
-			}
-		]
-	},
 	"providesContext": {
 		"core/tabs-activeTabIndex": "activeTabIndex",
 		"core/tabs-editorActiveTabIndex": "editorActiveTabIndex"

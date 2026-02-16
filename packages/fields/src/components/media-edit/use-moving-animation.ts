@@ -30,7 +30,7 @@ export default function useMovingAnimation(
 	triggerAnimationOnChange: unknown
 ) {
 	const ref = useRef< HTMLDivElement >( null );
-	const previousRef = useRef< { top: number; left: number } | null >( null );
+	const previousRef = useRef< { top: number; left: number } >( undefined );
 	// Capture position before DOM updates (during render).
 	// This runs synchronously during render, before layout effects.
 	if ( ref.current ) {

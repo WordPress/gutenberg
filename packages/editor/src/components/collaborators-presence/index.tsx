@@ -11,7 +11,6 @@ import { CollaboratorsList } from './list';
 import { unlock } from '../../lock-unlock';
 
 import './styles/collaborators-presence.scss';
-
 const { useActiveCollaborators } = unlock( privateApis );
 
 interface CollaboratorsPresenceProps {

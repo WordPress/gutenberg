@@ -17,6 +17,7 @@
 
 ### Enhancements
 
+- DataForm: add edit variant. [#75462](https://github.com/WordPress/gutenberg/pull/75462)
 - DataForm: Update trigger mechanism for panel layout. [#75290](https://github.com/WordPress/gutenberg/pull/75290)
 - DataViews: Add `onReset` prop to control view reset functionality from the view config dropdown. [#75093](https://github.com/WordPress/gutenberg/pull/75093)
 - DataForm: Add automatic field labeling - forms now automatically mark the minority of fields (required or optional) to reduce visual noise. [#74430](https://github.com/WordPress/gutenberg/pull/74430)
@@ -30,7 +31,10 @@
 ### Internal
 
 - DataForm: Use public `ColorPicker` component instead of internal `Picker` in color control. [#75394](https://github.com/WordPress/gutenberg/pull/75394)
-- Update Testing Library packages used in unit tests ([#75340](https://github.com/WordPress/gutenberg/pull/75340))
+- Update Testing Library packages used in unit tests. [#75340](https://github.com/WordPress/gutenberg/pull/75340)
+- Always specify initial values for `useRef` calls. [#75513](https://github.com/WordPress/gutenberg/pull/75513)
+- Clean up type declarations using the `React` namespace. ([#75508](https://github.com/WordPress/gutenberg/pull/75508)
+- Update `RefObject` type usage for React 19 compatibility. [#75567](https://github.com/WordPress/gutenberg/pull/75567)
 
 ## 11.3.0 (2026-01-29)
 

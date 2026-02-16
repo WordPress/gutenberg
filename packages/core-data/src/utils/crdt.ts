@@ -198,7 +198,7 @@ export function applyPostChangesToCRDTDoc(
 				// Draft" template title is not synced.
 				if (
 					key === 'title' &&
-					! currentValue &&
+					! currentValue?.toString() &&
 					'Auto Draft' === rawValue
 				) {
 					rawValue = '';
