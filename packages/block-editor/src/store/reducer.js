@@ -2268,6 +2268,10 @@ function openedListViewPanels(
 /**
  * Reducer returning the List View expand revision.
  *
+ * This is a counter used to force ListView components to remount. When incremented,
+ * the ListView key changes, causing the component to remount with a fresh
+ * isExpanded=true state.
+ *
  * @param {number} state  Current state.
  * @param {Object} action Dispatched action.
  *
