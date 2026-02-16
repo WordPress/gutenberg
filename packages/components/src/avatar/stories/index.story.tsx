@@ -4,6 +4,11 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 /**
+ * WordPress dependencies
+ */
+import { moreHorizontal } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import Avatar from '..';
@@ -50,16 +55,52 @@ export const Small: Story = {
 	},
 };
 
-export const SmallWithBorderColor: Story = {
+export const Initials: Story = {
 	args: {
-		...Default.args,
-		size: 'small',
-		borderColor: '#3858e9',
+		name: 'Tanner Robinson',
 	},
 };
 
-export const NoImage: Story = {
+export const Badge: Story = {
 	args: {
-		name: 'No Image',
+		...WithBorderColor.args,
+		badge: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: 'When `badge` is true, hovering the avatar expands a pill that reveals the name. Use the `label` prop to override the visible text.',
+			},
+		},
+	},
+};
+
+export const WithLabel: Story = {
+	args: {
+		...WithBorderColor.args,
+		badge: true,
+		label: 'You',
+	},
+};
+
+export const Active: Story = {
+	args: {
+		...Default.args,
+		status: 'active',
+		statusIndicator: moreHorizontal,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: 'When `status` is set, the avatar image is dimmed and the `statusIndicator` is rendered as an overlay.',
+			},
+		},
+	},
+};
+
+export const Idle: Story = {
+	args: {
+		...Default.args,
+		status: 'idle',
 	},
 };

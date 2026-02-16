@@ -6,6 +6,7 @@ import clsx from 'clsx';
 /**
  * Internal dependencies
  */
+import Icon from '../icon';
 import type { AvatarProps } from './types';
 import type { WordPressComponentProps } from '../context';
 
@@ -13,11 +14,24 @@ function Avatar( {
 	className,
 	src,
 	name,
+	label,
+	badge = false,
 	size = 'default',
 	borderColor,
+	status,
+	statusIndicator,
 	style,
 	...props
 }: WordPressComponentProps< AvatarProps, 'div', false > ) {
+	const showBadge = badge && !! name;
+	const initials = name
+		? name
+				.split( /\s+/ )
+				.slice( 0, 2 )
+				.map( ( word ) => word[ 0 ] )
+				.join( '' )
+				.toUpperCase()
+		: undefined;
 	const customProperties = {
 		...style,
 		...( src ? { '--components-avatar-url': `url(${ src })` } : {} ),
@@ -31,13 +45,30 @@ function Avatar( {
 			className={ clsx( 'components-avatar', className, {
 				'has-border-color': !! borderColor,
 				'has-src': !! src,
+				'has-badge': showBadge,
 				'is-small': size === 'small',
+				'has-status': !! status,
+				[ `is-${ status }` ]: !! status,
 			} ) }
 			style={ customProperties }
 			role="img"
 			aria-label={ name }
 			{ ...props }
-		/>
+		>
+			<span className="components-avatar__image">
+				{ ! src && initials }
+				{ !! status && !! statusIndicator && (
+					<span className="components-avatar__status-indicator">
+						<Icon icon={ statusIndicator } />
+					</span>
+				) }
+			</span>
+			{ showBadge && (
+				<span className="components-avatar__name">
+					{ label || name }
+				</span>
+			) }
+		</div>
 	);
 }
 

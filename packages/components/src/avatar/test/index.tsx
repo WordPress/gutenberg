@@ -67,4 +67,125 @@ describe( 'Avatar', () => {
 		expect( avatar ).toHaveClass( 'components-avatar' );
 		expect( avatar ).toHaveClass( 'custom' );
 	} );
+
+	describe( 'badge', () => {
+		it( 'should not show badge by default', () => {
+			render( <Avatar data-testid="avatar" name="Zoraya" /> );
+			const avatar = screen.getByTestId( 'avatar' );
+			expect( avatar ).not.toHaveClass( 'has-badge' );
+			expect( screen.queryByText( 'Zoraya' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should render name span when badge is true', () => {
+			render( <Avatar data-testid="avatar" name="Zoraya" badge /> );
+			const avatar = screen.getByTestId( 'avatar' );
+			expect( avatar ).toHaveClass( 'has-badge' );
+			expect( screen.getByText( 'Zoraya' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should render name span with borderColor too', () => {
+			render(
+				<Avatar
+					data-testid="avatar"
+					name="Zoraya"
+					borderColor="#3d5eef"
+					badge
+				/>
+			);
+			const avatar = screen.getByTestId( 'avatar' );
+			expect( avatar ).toHaveClass( 'has-badge' );
+			expect( screen.getByText( 'Zoraya' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should not show badge when badge is true but name is missing', () => {
+			render( <Avatar data-testid="avatar" badge /> );
+			const avatar = screen.getByTestId( 'avatar' );
+			expect( avatar ).not.toHaveClass( 'has-badge' );
+		} );
+
+		it( 'should still set aria-label even when badge is visible', () => {
+			render( <Avatar name="Zoraya" badge /> );
+			const avatar = screen.getByRole( 'img', { name: 'Zoraya' } );
+			expect( avatar ).toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'label', () => {
+		it( 'should show label text instead of name in the badge', () => {
+			render( <Avatar name="Jane Doe" label="You" badge /> );
+			expect( screen.getByText( 'You' ) ).toBeInTheDocument();
+			expect( screen.queryByText( 'Jane Doe' ) ).not.toBeInTheDocument();
+		} );
+
+		it( 'should keep aria-label as name when label is provided', () => {
+			render( <Avatar name="Jane Doe" label="You" badge /> );
+			const avatar = screen.getByRole( 'img', { name: 'Jane Doe' } );
+			expect( avatar ).toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'status', () => {
+		it( 'should apply has-status and is-active classes', () => {
+			render( <Avatar data-testid="avatar" status="active" /> );
+			const avatar = screen.getByTestId( 'avatar' );
+			expect( avatar ).toHaveClass( 'has-status' );
+			expect( avatar ).toHaveClass( 'is-active' );
+		} );
+
+		it( 'should apply has-status and is-idle classes', () => {
+			render( <Avatar data-testid="avatar" status="idle" /> );
+			const avatar = screen.getByTestId( 'avatar' );
+			expect( avatar ).toHaveClass( 'has-status' );
+			expect( avatar ).toHaveClass( 'is-idle' );
+		} );
+
+		it( 'should not apply status classes when status is not set', () => {
+			render( <Avatar data-testid="avatar" /> );
+			const avatar = screen.getByTestId( 'avatar' );
+			expect( avatar ).not.toHaveClass( 'has-status' );
+		} );
+
+		it( 'should render statusIndicator when status is set', () => {
+			render(
+				<Avatar
+					data-testid="avatar"
+					status="active"
+					statusIndicator={ <span>icon</span> }
+				/>
+			);
+			expect( screen.getByText( 'icon' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should not render statusIndicator when status is not set', () => {
+			render(
+				<Avatar
+					data-testid="avatar"
+					statusIndicator={ <span>icon</span> }
+				/>
+			);
+			expect( screen.queryByText( 'icon' ) ).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'initials', () => {
+		it( 'should show initials when no src is provided', () => {
+			render( <Avatar name="Tanner Robinson" /> );
+			expect( screen.getByText( 'TR' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should show single initial for single-word name', () => {
+			render( <Avatar name="Zoraya" /> );
+			expect( screen.getByText( 'Z' ) ).toBeInTheDocument();
+		} );
+
+		it( 'should not show initials when src is provided', () => {
+			render(
+				<Avatar
+					name="Tanner Robinson"
+					src="https://example.com/avatar.jpg"
+				/>
+			);
+			expect( screen.queryByText( 'TR' ) ).not.toBeInTheDocument();
+		} );
+	} );
 } );
