@@ -1720,19 +1720,18 @@ const canInsertBlockTypeUnmemoized = (
 	// some cases when the block is a content block.
 	const isContentRoleBlock = isContentBlock( blockName );
 	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
-	const parentSectionClientId = getParentSectionBlock( state, rootClientId );
-	const isBlockWithinSection = !! parentSectionClientId;
-	if (
-		( isParentSectionBlock || isBlockWithinSection ) &&
-		! isContentRoleBlock
-	) {
+	const sectionClientId = isParentSectionBlock
+		? rootClientId
+		: getParentSectionBlock( state, rootClientId );
+	const isWithinSection = !! sectionClientId;
+	if ( isWithinSection && ! isContentRoleBlock ) {
 		return false;
 	}
 
 	// Don't allow insertion into synced patterns.
 	if (
-		isBlockWithinSection &&
-		getBlockName( state, parentSectionClientId ) === 'core/block'
+		isWithinSection &&
+		getBlockName( state, sectionClientId ) === 'core/block'
 	) {
 		return false;
 	}
@@ -1913,24 +1912,26 @@ export function canRemoveBlock( state, clientId ) {
 
 	// It shouldn't be possible to move in a section block unless in
 	// some cases when the block is a content block.
-	const parentSectionClientId = getParentSectionBlock( state, clientId );
-	const isBlockWithinSection = !! parentSectionClientId;
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const sectionClientId = isParentSectionBlock
+		? rootClientId
+		: getParentSectionBlock( state, rootClientId );
+	const isWithinSection = !! sectionClientId;
 	const isContentRoleBlock = isContentBlock(
 		getBlockName( state, clientId )
 	);
-	if ( isBlockWithinSection && ! isContentRoleBlock ) {
+	if ( isWithinSection && ! isContentRoleBlock ) {
 		return false;
 	}
 
 	// Disallow removal from synced patterns.
 	if (
-		isBlockWithinSection &&
-		getBlockName( state, parentSectionClientId ) === 'core/block'
+		isWithinSection &&
+		getBlockName( state, sectionClientId ) === 'core/block'
 	) {
 		return false;
 	}
 
-	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
 	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
 	const blockName = getBlockName( state, clientId );
 	// Check if the parent container allows insertion/removal in contentOnly mode
