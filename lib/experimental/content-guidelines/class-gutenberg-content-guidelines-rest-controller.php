@@ -106,7 +106,7 @@ class Gutenberg_Content_Guidelines_REST_Controller extends WP_REST_Posts_Control
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
 	 */
-	public function get_guidelines_permissions_check( $request ) {
+	public function get_guidelines_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$post_type = get_post_type_object( $this->post_type );
 		if ( ! current_user_can( $post_type->cap->read ) ) {
 			return new WP_Error(
