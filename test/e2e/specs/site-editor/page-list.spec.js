@@ -340,9 +340,6 @@ test.describe( 'Page List', () => {
 		};
 
 		test.beforeAll( async ( { requestUtils } ) => {
-			await requestUtils.setGutenbergExperiments( [
-				'gutenberg-quick-edit-dataviews',
-			] );
 			// Create a test user for `author` field testing.
 			await requestUtils.createUser( {
 				username: 'testauthor',
