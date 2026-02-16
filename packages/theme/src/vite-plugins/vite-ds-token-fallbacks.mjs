@@ -1,0 +1,23 @@
+import { addFallbackToVar } from '../postcss-plugins/ds-token-fallbacks.mjs';
+
+/**
+ * Vite plugin that injects design-system token fallbacks into JS/TS files.
+ *
+ * Replaces bare `var(--wpds-*)` references in string literals with
+ * `var(--wpds-*, <fallback>)` so components render correctly without
+ * a ThemeProvider.
+ */
+const plugin = () => ( {
+	name: 'ds-token-fallbacks-js',
+	transform( code, id ) {
+		if ( ! /\.[mc]?[jt]sx?$/.test( id ) ) {
+			return null;
+		}
+		if ( ! code.includes( '--wpds-' ) ) {
+			return null;
+		}
+		return addFallbackToVar( code );
+	},
+} );
+
+export default plugin;

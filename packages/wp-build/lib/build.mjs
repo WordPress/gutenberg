@@ -21,6 +21,26 @@ import babel from 'esbuild-plugin-babel';
 import { camelCase } from 'change-case';
 import { NodePackageImporter } from 'sass-embedded';
 
+// Optional dependency: @wordpress/theme provides plugins that inject fallback
+// values for design system tokens. Fails gracefully when the package is not
+// installed (it is an optional peerDependency).
+let dsTokenFallbacks;
+let dsTokenFallbacksJs;
+try {
+	const { default: postcssPlugin } = await import(
+		// eslint-disable-next-line import/no-unresolved
+		'@wordpress/theme/postcss-plugins/postcss-ds-token-fallbacks'
+	);
+	const { default: esbuildPlugin } = await import(
+		// eslint-disable-next-line import/no-unresolved
+		'@wordpress/theme/esbuild-plugins/esbuild-ds-token-fallbacks'
+	);
+	dsTokenFallbacks = postcssPlugin;
+	dsTokenFallbacksJs = esbuildPlugin;
+} catch {
+	// @wordpress/theme is optional; skip token fallbacks if not available.
+}
+
 /**
  * Internal dependencies
  */
@@ -150,8 +170,9 @@ function compileInlineStyle( { cssModules = false, minify = true } = {} ) {
 
 		let moduleExports = null;
 
-		// Transform the code: CSS modules and minification.
+		// Transform the code: token fallbacks, CSS modules and minification.
 		const plugins = [
+			dsTokenFallbacks,
 			cssModules &&
 				postcssModules( {
 					generateScopedName: '[contenthash]__[local]',
@@ -1251,6 +1272,7 @@ async function transpilePackage( packageName ) {
 		},
 	};
 	const plugins = [
+		dsTokenFallbacksJs,
 		needsEmotionPlugin && emotionPlugin,
 		wasmInlinePlugin,
 		externalizeAllExceptCssPlugin,

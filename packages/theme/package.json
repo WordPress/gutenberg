@@ -43,6 +43,21 @@
 			"import": "./build-module/prebuilt/js/design-tokens.mjs",
 			"default": "./build/prebuilt/js/design-tokens.cjs"
 		},
+		"./postcss-plugins/postcss-ds-token-fallbacks": {
+			"types": "./src/postcss-plugins/postcss-ds-token-fallbacks.d.mts",
+			"import": "./src/postcss-plugins/postcss-ds-token-fallbacks.mjs",
+			"default": "./src/postcss-plugins/postcss-ds-token-fallbacks.mjs"
+		},
+		"./esbuild-plugins/esbuild-ds-token-fallbacks": {
+			"types": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.d.mts",
+			"import": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.mjs",
+			"default": "./src/esbuild-plugins/esbuild-ds-token-fallbacks.mjs"
+		},
+		"./vite-plugins/vite-ds-token-fallbacks": {
+			"types": "./src/vite-plugins/vite-ds-token-fallbacks.d.mts",
+			"import": "./src/vite-plugins/vite-ds-token-fallbacks.mjs",
+			"default": "./src/vite-plugins/vite-ds-token-fallbacks.mjs"
+		},
 		"./stylelint-plugins/no-unknown-ds-tokens": {
 			"types": "./build-types/stylelint-plugins/no-unknown-ds-tokens.d.ts",
 			"import": "./src/stylelint-plugins/no-unknown-ds-tokens.mjs",
