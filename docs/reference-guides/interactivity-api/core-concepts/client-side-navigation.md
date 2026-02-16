@@ -4,7 +4,10 @@ Client-side navigation is a technique that allows navigation between pages witho
 
 The Interactivity API provides client-side navigation through the `@wordpress/interactivity-router` package. The central concept is the **router region**: a section of your page that the router knows how to update during navigation. You mark these sections with the `data-wp-router-region` directive, and when the user navigates to a new URL, the router fetches the destination page and replaces only the content inside matching regions — leaving everything else on the page untouched.
 
-This is known as **region-based client-side navigation**, and it is the recommended approach for implementing client-side navigation in WordPress. There is also an experimental **full-page client-side navigation** mode, which treats the entire `<body>` element as a single region — effectively updating the whole page content without a traditional reload. Full-page navigation is covered at the end of this guide in [Full-page client-side navigation (experimental)](#full-page-client-side-navigation-experimental).
+The Interactivity API supports two navigation modes:
+
+- **Region-based client-side navigation** — The recommended approach for implementing client-side navigation in WordPress.
+- **Full-page client-side navigation** _(experimental)_ — Treats the entire `<body>` element as a single region, effectively updating the whole page content without a traditional reload. Covered at the end of this guide in [Full-page client-side navigation (experimental)](#full-page-client-side-navigation-experimental).
 
 ## How client-side navigation works
 
