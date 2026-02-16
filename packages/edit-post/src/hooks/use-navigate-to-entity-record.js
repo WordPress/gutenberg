@@ -68,11 +68,7 @@ export default function useNavigateToEntityRecord(
 			// Read entity selection (already has external IDs from onChangeSelection)
 			const entityEdits = registry
 				.select( coreStore )
-				.getEntityRecordEdits(
-					'postType',
-					post.postType,
-					post.postId
-				);
+				.getEntityRecordEdits( 'postType', post.postType, post.postId );
 			const externalClientId =
 				entityEdits?.selection?.selectionStart?.clientId ?? null;
 

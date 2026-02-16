@@ -65,6 +65,34 @@ function restoreExternalIds( blocks, mapping ) {
 }
 
 /**
+ * Restores external client IDs in selection state.
+ *
+ * @param {Object} selectionState The selection state with internal client IDs.
+ * @param {Object} mapping        The mapping object with internalToExternal Map.
+ * @return {Object} Selection state with external client IDs.
+ */
+function restoreSelectionIds( selectionState, mapping ) {
+	const { selectionStart, selectionEnd, initialPosition } = selectionState;
+
+	const restoreClientId = ( sel ) => {
+		if ( ! sel?.clientId ) {
+			return sel;
+		}
+		const externalId = mapping.internalToExternal.get( sel.clientId );
+		return {
+			...sel,
+			clientId: externalId ?? sel.clientId,
+		};
+	};
+
+	return {
+		selectionStart: restoreClientId( selectionStart ),
+		selectionEnd: restoreClientId( selectionEnd ),
+		initialPosition,
+	};
+}
+
+/**
  * A function to call when the block value has been updated in the block-editor
  * store.
  *
@@ -385,6 +413,21 @@ export default function useBlockSync( {
 							? restoreExternalIds( blocks, idMappingRef.current )
 							: blocks;
 
+						// Build selection state for the undo level.
+						const selectionInfo = {
+							selectionStart: newSelectionStart,
+							selectionEnd: newSelectionEnd,
+							initialPosition:
+								getSelectedBlocksInitialCaretPosition(),
+						};
+						// Restore external IDs in selection for inner block controllers.
+						const selectionForParent = clientId
+							? restoreSelectionIds(
+									selectionInfo,
+									idMappingRef.current
+							  )
+							: selectionInfo;
+
 						pendingChangesRef.current.outgoing.push(
 							blocksForParent
 						);
@@ -392,7 +435,9 @@ export default function useBlockSync( {
 						const updateParent = isPersistent
 							? onChangeRef.current
 							: onInputRef.current;
-						updateParent( blocksForParent );
+						updateParent( blocksForParent, {
+							selection: selectionForParent,
+						} );
 					}
 
 					if (
