@@ -410,6 +410,6 @@ test.describe( 'Template Part', () => {
 		// Undo the change.
 		await pageUtils.pressKeys( 'primary+z' );
 
-		await expect( siteTitleInGroup ).toBeFocused();
+		await expect( siteTitleInGroup ).toHaveClass( /is-selected/ );
 	} );
 } );
