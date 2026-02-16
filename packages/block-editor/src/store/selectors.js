@@ -1704,7 +1704,7 @@ const canInsertBlockTypeUnmemoized = (
 	}
 
 	const blockEditingMode = getBlockEditingMode( state, rootClientId ?? '' );
-	if ( blockEditingMode === 'disabled' ) {
+	if ( blockEditingMode === 'disabled' && blockName !== 'core/paragraph' ) {
 		return false;
 	}
 
@@ -1917,9 +1917,12 @@ export function canRemoveBlock( state, clientId ) {
 
 	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
 	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
+	const blockName = getBlockName( state, clientId );
 	// Check if the parent container allows insertion/removal in contentOnly mode
 	if (
-		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
+		( isParentSectionBlock ||
+			rootBlockEditingMode === 'contentOnly' ||
+			blockName === 'core/paragraph' ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
 			getBlockName( state, clientId ),
@@ -1928,18 +1931,14 @@ export function canRemoveBlock( state, clientId ) {
 	) {
 		// Allow removing a Paragraph block when other Paragraph blocks exist
 		// in contentOnly mode.
-		const blockName = getBlockName( state, clientId );
-		if (
-			rootBlockEditingMode === 'contentOnly' &&
-			blockName === 'core/paragraph'
-		) {
+		if ( blockName === 'core/paragraph' ) {
 			const existingBlocks = getBlockOrder( state, rootClientId );
 			const paragraphBlocks = existingBlocks.filter(
 				( id ) => getBlockName( state, id ) === 'core/paragraph'
 			);
 			// Allow removal if there are other paragraph blocks besides this one
-			if ( ! ( paragraphBlocks.length > 0 ) ) {
-				return false;
+			if ( paragraphBlocks.length > 0 ) {
+				return true;
 			}
 		} else {
 			return false;
