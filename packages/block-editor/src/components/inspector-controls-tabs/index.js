@@ -52,6 +52,22 @@ export default function InspectorControlsTabs( {
 		hasUserSelectionRef.current = false;
 	}, [ clientId ] );
 
+	// Initialize List View panels when the tab is selected and clientId changes
+	useEffect( () => {
+		if (
+			selectedTabId === TAB_LIST_VIEW.name &&
+			! hasUserSelectionRef.current
+		) {
+			setAllListViewPanelsOpen();
+			incrementListViewExpandRevision();
+		}
+	}, [
+		clientId,
+		selectedTabId,
+		setAllListViewPanelsOpen,
+		incrementListViewExpandRevision,
+	] );
+
 	// Auto-select first available tab unless user has made a selection
 	useEffect( () => {
 		if (
