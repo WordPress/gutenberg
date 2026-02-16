@@ -461,26 +461,20 @@ export default function useBlockSync( {
 							  );
 
 						if ( isOurs ) {
-							// Convert internal→external IDs for nested controllers;
-							// root blocks use the same IDs (no mapping needed).
-							const convert = ( sel ) => {
-								if ( ! sel?.clientId || ! clientId ) {
-									return sel;
-								}
-								return {
-									...sel,
-									clientId:
-										idMappingRef.current.internalToExternal.get(
-											sel.clientId
-										) ?? sel.clientId,
-								};
-							};
-							onChangeSelectionRef.current( {
-								selectionStart: convert( newSelectionStart ),
-								selectionEnd: convert( newSelectionEnd ),
+							const selectionInfo = {
+								selectionStart: newSelectionStart,
+								selectionEnd: newSelectionEnd,
 								initialPosition:
 									getSelectedBlocksInitialCaretPosition(),
-							} );
+							};
+							onChangeSelectionRef.current(
+								clientId
+									? restoreSelectionIds(
+											selectionInfo,
+											idMappingRef.current
+									  )
+									: selectionInfo
+							);
 						}
 					}
 				} );
