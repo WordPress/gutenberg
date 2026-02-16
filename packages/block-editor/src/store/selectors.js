@@ -1937,7 +1937,7 @@ export function canRemoveBlock( state, clientId ) {
 				( id ) => getBlockName( state, id ) === 'core/paragraph'
 			);
 			// Allow removal if there are other paragraph blocks besides this one
-			if ( paragraphBlocks.length > 0 ) {
+			if ( paragraphBlocks.length > 1 ) {
 				return true;
 			}
 		} else {
