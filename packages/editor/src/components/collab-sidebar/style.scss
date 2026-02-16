@@ -38,13 +38,6 @@
 		z-index: 1;
 	}
 
-	// Show the add-reaction button on thread hover.
-	&:hover {
-		.editor-collab-sidebar-panel__add-reaction-button {
-			opacity: 1;
-		}
-	}
-
 	&:focus {
 		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
 		outline-offset: calc((-1 * var(--wp-admin-border-width-focus)));
@@ -237,12 +230,19 @@ mark.wp-note {
 }
 
 // Emoji Reactions
-.editor-collab-sidebar-panel__reactions {
+.editor-collab-sidebar-panel__reactions-row {
 	display: flex;
 	flex-wrap: wrap;
 	gap: $grid-unit-05;
 	align-items: center;
 	margin-top: $grid-unit-10;
+}
+
+.editor-collab-sidebar-panel__reactions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: $grid-unit-05;
+	align-items: center;
 }
 
 .editor-collab-sidebar-panel__reaction-button {
@@ -271,17 +271,9 @@ mark.wp-note {
 	}
 }
 
-.editor-collab-sidebar-panel__comment-content-wrapper {
-	position: relative;
-}
-
 .editor-collab-sidebar-panel__add-reaction-button {
 	display: inline-flex;
 	margin: 0;
-	position: absolute;
-	top: 0;
-	right: -$grid-unit-05;
-	z-index: 1;
 	align-items: center;
 	justify-content: center;
 	width: 28px;
@@ -291,26 +283,15 @@ mark.wp-note {
 	border-radius: $radius-round;
 	border: $border-width solid $gray-300;
 	background-color: $white;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 	cursor: pointer;
-	opacity: 0;
-	transition: opacity 0.15s ease, background-color 0.1s ease, box-shadow 0.1s ease;
 
 	&:hover {
 		background-color: $gray-100;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 	}
 
-	&:focus,
-	&[aria-expanded="true"] {
-		opacity: 1;
+	&:focus {
 		outline: var(--wp-admin-border-width-focus) solid var(--wp-admin-theme-color);
 		outline-offset: calc(-1 * var(--wp-admin-border-width-focus));
-	}
-
-	// On touch devices without hover, always show the button so it's discoverable.
-	@media (hover: none) {
-		opacity: 1;
 	}
 
 	svg {
