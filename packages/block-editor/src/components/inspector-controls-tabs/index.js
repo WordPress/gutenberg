@@ -96,7 +96,8 @@ export default function InspectorControlsTabs( {
 
 		if (
 			shouldShowListViewForNavigation &&
-			selectedTabId !== TAB_LIST_VIEW.name
+			selectedTabId !== TAB_LIST_VIEW.name &&
+			! hasUserSelectionRef.current
 		) {
 			setSelectedTabId( TAB_LIST_VIEW.name );
 			// Open the navigation block's accordion in List View
