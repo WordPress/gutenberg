@@ -173,8 +173,11 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 			// Wait for navigation block to be visible
 			await expect( navBlock ).toBeVisible();
 
-			// Wait for page list to load
+			// Wait for page list to load and populate with pages
 			await expect( pageListBlock ).toBeVisible();
+			await expect( pageListBlock ).toContainText( 'Products' );
+			await expect( pageListBlock ).toContainText( 'Laptops' );
+			await expect( pageListBlock ).toContainText( 'Phones' );
 		} );
 
 		await test.step( 'Submenu Visibility control appears for page-list', async () => {
