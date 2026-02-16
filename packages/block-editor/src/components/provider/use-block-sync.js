@@ -442,6 +442,7 @@ export default function useBlockSync( {
 
 					if (
 						selectionChanged &&
+						! blocksChanged &&
 						newSelectionStart?.clientId &&
 						! isRestoringSelectionRef.current
 					) {
