@@ -1720,8 +1720,8 @@ const canInsertBlockTypeUnmemoized = (
 	// some cases when the block is a content block.
 	const isContentRoleBlock = isContentBlock( blockName );
 	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
-	const parentSection = getParentSectionBlock( state, rootClientId );
-	const isBlockWithinSection = !! parentSection;
+	const parentSectionClientId = getParentSectionBlock( state, rootClientId );
+	const isBlockWithinSection = !! parentSectionClientId;
 	if (
 		( isParentSectionBlock || isBlockWithinSection ) &&
 		! isContentRoleBlock
@@ -1731,8 +1731,8 @@ const canInsertBlockTypeUnmemoized = (
 
 	// Don't allow insertion into synced patterns.
 	if (
-		parentSection &&
-		getBlockName( state, parentSection ) === 'core/block'
+		isBlockWithinSection &&
+		getBlockName( state, parentSectionClientId ) === 'core/block'
 	) {
 		return false;
 	}
@@ -1913,11 +1913,20 @@ export function canRemoveBlock( state, clientId ) {
 
 	// It shouldn't be possible to move in a section block unless in
 	// some cases when the block is a content block.
-	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+	const parentSectionClientId = getParentSectionBlock( state, clientId );
+	const isBlockWithinSection = !! parentSectionClientId;
 	const isContentRoleBlock = isContentBlock(
 		getBlockName( state, clientId )
 	);
 	if ( isBlockWithinSection && ! isContentRoleBlock ) {
+		return false;
+	}
+
+	// Disallow removal from synced patterns.
+	if (
+		isBlockWithinSection &&
+		getBlockName( state, parentSectionClientId ) === 'core/block'
+	) {
 		return false;
 	}
 
