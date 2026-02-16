@@ -38,8 +38,6 @@ If you already have an interactive block and want to add client-side navigation,
 2. **Define router regions**: Mark the HTML elements that should be updated during navigation using the `data-wp-router-region` attribute.
 3. **Trigger navigation**: Use the router's `actions.navigate()` function to navigate programmatically when the user interacts with your block.
 
-For detailed API documentation, see the [`@wordpress/interactivity-router` package README](/packages/interactivity-router/README.md).
-
 ### Setting up router regions
 
 Router regions are the parts of your page that the router will update during client-side navigation. You mark them with the `data-wp-router-region` directive, which takes a unique ID as its value. When navigation occurs, the router matches regions on the current page with regions on the target page by their IDs and replaces their content — leaving everything outside router regions untouched.
