@@ -185,8 +185,8 @@ export const getEntityRecord =
 								transientConfig.read( recordWithTransients );
 						} );
 
-					// Load the entity record for syncing.
-					await getSyncManager()?.load(
+					// Load the entity record for syncing. Do not await promise.
+					void getSyncManager()?.load(
 						entityConfig.syncConfig,
 						objectType,
 						objectId,
@@ -1253,4 +1253,16 @@ export const getEditorAssets =
 			path: '/wp-block-editor/v1/assets',
 		} );
 		dispatch.receiveEditorAssets( assets );
+	};
+
+/**
+ * Requests icons from the REST API.
+ */
+export const getIcons =
+	() =>
+	async ( { dispatch } ) => {
+		const icons = await apiFetch( {
+			path: '/wp/v2/icons',
+		} );
+		dispatch.receiveIcons( icons );
 	};

@@ -78,10 +78,14 @@ export default function mediaUpload( {
 		allowedTypes,
 		filesList,
 		onFileChange: ( file ) => {
-			if ( ! imageIsUploading ) {
-				setSaveLock();
-			} else {
-				clearSaveLock();
+			// When client-side media processing is enabled, save locking
+			// is handled by useUploadSaveLock in the editor provider.
+			if ( ! window.__experimentalMediaProcessing ) {
+				if ( ! imageIsUploading ) {
+					setSaveLock();
+				} else {
+					clearSaveLock();
+				}
 			}
 			onFileChange?.( file );
 
@@ -107,7 +111,9 @@ export default function mediaUpload( {
 		},
 		maxUploadFileSize,
 		onError: ( { message } ) => {
-			clearSaveLock();
+			if ( ! window.__experimentalMediaProcessing ) {
+				clearSaveLock();
+			}
 			onError( message );
 		},
 		wpAllowedMimeTypes,

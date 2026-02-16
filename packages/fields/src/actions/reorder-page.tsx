@@ -29,7 +29,7 @@ interface Action< Item > {
 	label: string;
 	isEligible?: ( item: Item ) => boolean;
 	modalFocusOnMount?: string;
-	RenderModal: ( props: RenderModalProps< Item > ) => JSX.Element;
+	RenderModal: ( props: RenderModalProps< Item > ) => React.JSX.Element;
 }
 
 function isItemValid( item: BasePost ): boolean {

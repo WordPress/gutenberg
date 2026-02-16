@@ -24,7 +24,7 @@
 	}
 
 	&--with-color-border {
-		border-color: var(--user-color);
+		border-color: var(--collaborator-color);
 		box-shadow: inset 0 0 0 1px rgba($white, 0.7);
 		background-clip: padding-box;
 	}

@@ -139,7 +139,7 @@ export function setInConfiguredTimezone(
 		...updates,
 	};
 
-	const year = String( values.year );
+	const year = String( values.year ).padStart( 4, '0' );
 	const month = String( values.month + 1 ).padStart( 2, '0' );
 	const day = String( values.date ).padStart( 2, '0' );
 	const hours = String( values.hours ).padStart( 2, '0' );

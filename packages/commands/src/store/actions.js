@@ -5,14 +5,14 @@
  *
  * @typedef {Object} WPCommandConfig
  *
- * @property {string}      name        Command name.
- * @property {string}      label       Command label.
- * @property {string=}     searchLabel Command search label.
- * @property {string=}     context     Command context.
- * @property {JSX.Element} icon        Command icon.
- * @property {Function}    callback    Command callback.
- * @property {boolean}     disabled    Whether to disable the command.
- * @property {string[]=}   keywords    Command keywords for search matching.
+ * @property {string}            name        Command name.
+ * @property {string}            label       Command label.
+ * @property {string=}           searchLabel Command search label.
+ * @property {string=}           context     Command context.
+ * @property {React.JSX.Element} icon        Command icon.
+ * @property {Function}          callback    Command callback.
+ * @property {boolean}           disabled    Whether to disable the command.
+ * @property {string[]=}         keywords    Command keywords for search matching.
  */
 
 /**

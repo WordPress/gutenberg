@@ -7,7 +7,13 @@ import { useMemo, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import DataForm from '../index';
-import type { Field, Form, Layout, PanelLayout } from '../../types';
+import type {
+	Field,
+	Form,
+	Layout,
+	PanelLayout,
+	EditVisibility,
+} from '../../types';
 
 type SamplePost = {
 	title: string;
@@ -261,10 +267,12 @@ const getPanelLayoutFromStoryArgs = ( {
 	summary,
 	labelPosition,
 	openAs,
+	editVisibility,
 }: {
 	summary?: string[];
 	labelPosition?: 'default' | 'top' | 'side' | 'none';
 	openAs?: 'default' | 'dropdown' | 'modal';
+	editVisibility?: 'default' | EditVisibility;
 } ): Layout | undefined => {
 	const panelLayout: PanelLayout = {
 		type: 'panel',
@@ -282,16 +290,22 @@ const getPanelLayoutFromStoryArgs = ( {
 		panelLayout.summary = summary;
 	}
 
+	if ( editVisibility !== 'default' ) {
+		panelLayout.editVisibility = editVisibility;
+	}
+
 	return panelLayout;
 };
 
 const LayoutPanelComponent = ( {
 	labelPosition,
 	openAs,
+	editVisibility,
 }: {
 	type: 'default' | 'regular' | 'panel' | 'card';
 	labelPosition: 'default' | 'top' | 'side' | 'none';
 	openAs: 'default' | 'dropdown' | 'modal';
+	editVisibility: 'default' | EditVisibility;
 } ) => {
 	const [ post, setPost ] = useState< SamplePost >( {
 		title: 'Hello, World!',
@@ -321,6 +335,7 @@ const LayoutPanelComponent = ( {
 			layout: getPanelLayoutFromStoryArgs( {
 				labelPosition,
 				openAs,
+				editVisibility,
 			} ),
 			fields: [
 				'title',
@@ -357,6 +372,7 @@ const LayoutPanelComponent = ( {
 						summary: [ 'origin', 'destination', 'flight_status' ],
 						labelPosition,
 						openAs,
+						editVisibility,
 					} ),
 				},
 				{
@@ -367,11 +383,12 @@ const LayoutPanelComponent = ( {
 						summary: [ 'author', 'seat' ],
 						labelPosition,
 						openAs,
+						editVisibility,
 					} ),
 				},
 			],
 		};
-	}, [ labelPosition, openAs ] );
+	}, [ labelPosition, openAs, editVisibility ] );
 
 	return (
 		<DataForm< SamplePost >

@@ -80,7 +80,7 @@
 	"devDependencies": {
 		"@storybook/addon-docs": "^10.1.11",
 		"@storybook/react-vite": "^10.1.11",
-		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/jest-dom": "^6.9.1",
 		"@types/jest": "^29.5.14",
 		"esbuild": "^0.27.2",
 		"storybook": "^10.1.11"

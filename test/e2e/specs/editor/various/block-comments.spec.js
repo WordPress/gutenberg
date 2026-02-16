@@ -829,6 +829,33 @@ test.describe( 'Block Comments', () => {
 			// Should focus the newly added comment thread.
 			await expect( thread ).toBeFocused();
 		} );
+
+		test( 'can add a note using global keyboard shortcut', async ( {
+			editor,
+			page,
+			pageUtils,
+		} ) => {
+			await editor.insertBlock( {
+				name: 'core/paragraph',
+				attributes: { content: 'Testing block comments' },
+			} );
+			await pageUtils.pressKeys( 'primaryAlt+M' );
+			const textbox = page.getByRole( 'textbox', {
+				name: 'New note',
+				exact: true,
+			} );
+			const thread = page
+				.getByRole( 'region', { name: 'Editor settings' } )
+				.getByRole( 'treeitem', {
+					name: 'Note: A test comment',
+				} );
+
+			await textbox.fill( 'A test comment' );
+			await pageUtils.pressKeys( 'primary+Enter' );
+
+			await expect( thread ).toBeVisible();
+			await expect( thread ).toBeFocused();
+		} );
 	} );
 } );
 

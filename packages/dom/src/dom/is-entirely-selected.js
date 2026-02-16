@@ -93,6 +93,18 @@ function isDeepChild( query, container, propName ) {
 			return true;
 		}
 		candidate = candidate[ propName ];
+		// There may be empty text nodes between the first/last child, so ignore
+		// them.
+		while (
+			candidate &&
+			candidate.nodeType === candidate.TEXT_NODE &&
+			candidate.nodeValue === ''
+		) {
+			candidate =
+				candidate[
+					propName === 'lastChild' ? 'previousSibling' : 'nextSibling'
+				];
+		}
 	} while ( candidate );
 	return false;
 }

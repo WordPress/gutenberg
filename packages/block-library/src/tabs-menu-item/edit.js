@@ -14,42 +14,13 @@ import {
 	RichText,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { decodeEntities } from '@wordpress/html-entities';
-import {
-	RawHTML,
-	useRef,
-	useCallback,
-	useState,
-	useEffect,
-	useMemo,
-} from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import slugFromLabel from '../tab/slug-from-label';
 import Controls from './controls';
-
-const { requestAnimationFrame, cancelAnimationFrame } = window;
-
-function StaticLabel( { label, index } ) {
-	if ( label ) {
-		return (
-			<span>
-				<RawHTML>{ decodeEntities( label ) }</RawHTML>
-			</span>
-		);
-	}
-	return (
-		<span>
-			{ sprintf(
-				/* translators: %d is the tab index + 1 */
-				__( 'Tab %d' ),
-				index + 1
-			) }
-		</span>
-	);
-}
 
 function Edit( {
 	attributes,
@@ -90,10 +61,6 @@ function Edit( {
 
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
-	const focusRef = useRef();
-	const labelElementRef = useRef( null );
-	const [ isEditing, setIsEditing ] = useState( false );
-	const [ editingLabel, setEditingLabel ] = useState( '' );
 
 	// Get parent tabs clientId for updating editorActiveTabIndex
 	const { tabsClientId, tabsMenuClientId, selectedTabClientId } = useSelect(
@@ -161,13 +128,8 @@ function Edit( {
 					editorActiveTabIndex: tabIndex,
 				} );
 			}
-
-			// Don't select block if we're editing this tab's label
-			if ( isEditing ) {
-			}
 		},
 		[
-			isEditing,
 			tabsClientId,
 			tabIndex,
 			effectiveActiveIndex,
@@ -175,31 +137,6 @@ function Edit( {
 			__unstableMarkNextChangeAsNotPersistent,
 		]
 	);
-
-	// Callback ref for label RichText
-	const labelRef = useCallback(
-		( node ) => {
-			labelElementRef.current = node;
-			if ( node && isEditing ) {
-				const animationId = requestAnimationFrame( () => {
-					if ( node ) {
-						node.focus();
-					}
-				} );
-				focusRef.current = animationId;
-			}
-		},
-		[ isEditing ]
-	);
-
-	// Cleanup animation frames
-	useEffect( () => {
-		return () => {
-			if ( focusRef.current ) {
-				cancelAnimationFrame( focusRef.current );
-			}
-		};
-	}, [] );
 
 	// Build CSS custom properties for active/hover color states
 	const customColorStyles = useMemo( () => {
@@ -256,12 +193,8 @@ function Edit( {
 		'aria-selected': isActiveTab,
 		id: tabLabelId,
 		role: 'tab',
-		tabIndex: isActiveTab ? 0 : -1,
+		tabIndex: -1,
 		onClick: handleTabClick,
-		onDoubleClick: () => {
-			setIsEditing( true );
-			setEditingLabel( tabLabel || '' );
-		},
 	} );
 
 	return (
@@ -287,28 +220,17 @@ function Edit( {
 				} }
 			/>
 			<div { ...blockProps }>
-				{ isEditing ? (
-					<RichText
-						ref={ labelRef }
-						tagName="span"
-						withoutInteractiveFormatting
-						placeholder={ sprintf(
-							/* translators: %d is the tab index + 1 */
-							__( 'Tab title %d' ),
-							tabIndex + 1
-						) }
-						value={ decodeEntities( editingLabel ) }
-						onChange={ ( value ) => {
-							setEditingLabel( value );
-							handleLabelChange( value );
-						} }
-						onBlur={ () => {
-							setIsEditing( false );
-						} }
-					/>
-				) : (
-					<StaticLabel label={ tabLabel } index={ tabIndex } />
-				) }
+				<RichText
+					tagName="span"
+					withoutInteractiveFormatting
+					placeholder={ sprintf(
+						/* translators: %d is the tab index + 1 */
+						__( 'Tab title %d' ),
+						tabIndex + 1
+					) }
+					value={ tabLabel || '' }
+					onChange={ handleLabelChange }
+				/>
 			</div>
 		</>
 	);

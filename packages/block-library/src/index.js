@@ -74,6 +74,7 @@ import * as group from './group';
 import * as heading from './heading';
 import * as homeLink from './home-link';
 import * as html from './html';
+import * as icon from './icon';
 import * as image from './image';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
@@ -275,15 +276,12 @@ const getAllBlocks = () => {
 		queryTitle,
 		postAuthorBiography,
 		breadcrumbs,
+		tab,
+		tabs,
+		tabsMenu,
+		tabsMenuItem,
+		tabPanel,
 	];
-
-	if ( window?.__experimentalEnableBlockExperiments ) {
-		blocks.push( tab );
-		blocks.push( tabs );
-		blocks.push( tabsMenu );
-		blocks.push( tabsMenuItem );
-		blocks.push( tabPanel );
-	}
 
 	if ( window?.__experimentalEnableFormBlocks ) {
 		blocks.push( form );
@@ -295,6 +293,10 @@ const getAllBlocks = () => {
 	if ( window?.__experimentalEnableBlockExperiments ) {
 		blocks.push( playlist );
 		blocks.push( playlistTrack );
+	}
+
+	if ( window?.__experimentalEnableIconBlock ) {
+		blocks.push( icon );
 	}
 
 	// When in a WordPress context, conditionally

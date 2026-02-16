@@ -1,5 +1,6 @@
 export * from './badge';
 export * from './button';
+export * as Dialog from './dialog';
 export * from './form/primitives';
 export * from './icon';
 export * from './icon-button';

@@ -8,7 +8,7 @@ import {
 } from '@wordpress/components';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -17,8 +17,10 @@ import { TAB_SETTINGS, TAB_STYLES, TAB_LIST_VIEW, TAB_CONTENT } from './utils';
 import SettingsTab from './settings-tab';
 import StylesTab from './styles-tab';
 import ContentTab from './content-tab';
+import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
 import InspectorControls from '../inspector-controls';
 import { unlock } from '../../lock-unlock';
+import { store as blockEditorStore } from '../../store';
 
 const { Tabs } = unlock( componentsPrivateApis );
 
@@ -30,17 +32,41 @@ export default function InspectorControlsTabs( {
 	isSectionBlock,
 	contentClientIds,
 } ) {
+	const listViewRef = useRef( null );
 	const showIconLabels = useSelect( ( select ) => {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
 	}, [] );
 
 	const [ selectedTabId, setSelectedTabId ] = useState( tabs[ 0 ]?.name );
 	const hasUserSelectionRef = useRef( false );
+	const isProgrammaticSwitchRef = useRef( false );
+	const {
+		__unstableSetOpenListViewPanel: setOpenListViewPanel,
+		__unstableIncrementListViewExpandRevision:
+			incrementListViewExpandRevision,
+		__unstableSetAllListViewPanelsOpen: setAllListViewPanelsOpen,
+	} = useDispatch( blockEditorStore );
 
 	// Reset when switching blocks
 	useEffect( () => {
 		hasUserSelectionRef.current = false;
 	}, [ clientId ] );
+
+	// Initialize List View panels when the tab is selected and clientId changes
+	useEffect( () => {
+		if (
+			selectedTabId === TAB_LIST_VIEW.name &&
+			! hasUserSelectionRef.current
+		) {
+			setAllListViewPanelsOpen();
+			incrementListViewExpandRevision();
+		}
+	}, [
+		clientId,
+		selectedTabId,
+		setAllListViewPanelsOpen,
+		incrementListViewExpandRevision,
+	] );
 
 	// Auto-select first available tab unless user has made a selection
 	useEffect( () => {
@@ -61,6 +87,33 @@ export default function InspectorControlsTabs( {
 	const handleTabSelect = ( tabId ) => {
 		setSelectedTabId( tabId );
 		hasUserSelectionRef.current = true;
+
+		// If manually switching to List View tab (not via click-through), open all panels
+		if (
+			tabId === TAB_LIST_VIEW.name &&
+			! isProgrammaticSwitchRef.current
+		) {
+			setAllListViewPanelsOpen();
+			incrementListViewExpandRevision();
+		}
+
+		// Reset the flag
+		isProgrammaticSwitchRef.current = false;
+	};
+
+	const hasListViewTab = tabs.some(
+		( tab ) => tab.name === TAB_LIST_VIEW.name
+	);
+
+	const switchToListView = ( targetClientId ) => {
+		if ( hasListViewTab ) {
+			// Open only the target panel
+			setOpenListViewPanel( targetClientId );
+			incrementListViewExpandRevision();
+			// Mark this as a programmatic switch
+			isProgrammaticSwitchRef.current = true;
+			handleTabSelect( TAB_LIST_VIEW.name );
+		}
 	};
 
 	return (
@@ -88,6 +141,18 @@ export default function InspectorControlsTabs( {
 						)
 					) }
 				</Tabs.TabList>
+				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
+					<ContentTab
+						contentClientIds={ contentClientIds }
+						onSwitchToListView={ switchToListView }
+						hasListViewTab={ hasListViewTab }
+					/>
+					<InspectorControls.Slot group="content" />
+				</Tabs.TabPanel>
+				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name } focusable={ false }>
+					<InspectorControls.Slot group="list" ref={ listViewRef } />
+					<ListViewContentPopover listViewRef={ listViewRef } />
+				</Tabs.TabPanel>
 				<Tabs.TabPanel tabId={ TAB_SETTINGS.name } focusable={ false }>
 					<SettingsTab showAdvancedControls={ !! blockName } />
 				</Tabs.TabPanel>
@@ -99,13 +164,6 @@ export default function InspectorControlsTabs( {
 						isSectionBlock={ isSectionBlock }
 						contentClientIds={ contentClientIds }
 					/>
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ TAB_CONTENT.name } focusable={ false }>
-					<ContentTab contentClientIds={ contentClientIds } />
-					<InspectorControls.Slot group="content" />
-				</Tabs.TabPanel>
-				<Tabs.TabPanel tabId={ TAB_LIST_VIEW.name } focusable={ false }>
-					<InspectorControls.Slot group="list" />
 				</Tabs.TabPanel>
 			</Tabs>
 		</div>

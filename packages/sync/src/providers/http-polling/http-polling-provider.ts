@@ -52,7 +52,8 @@ class HttpPollingProvider extends ObservableV2< BaseEventTypes > {
 			this.options.room,
 			this.options.ydoc,
 			this.awareness,
-			this.onSync
+			this.onSync,
+			this.log
 		);
 		this.emitStatus( 'connected' );
 	}
@@ -90,7 +91,7 @@ class HttpPollingProvider extends ObservableV2< BaseEventTypes > {
 	 * @param message The debug message
 	 * @param debug   Additional debug information
 	 */
-	protected log( message: string, debug: object = {} ): void {
+	protected log = ( message: string, debug: object = {} ): void => {
 		if ( this.options.debug ) {
 			// eslint-disable-next-line no-console
 			console.log( `[${ this.constructor.name }]: ${ message }`, {
@@ -98,8 +99,11 @@ class HttpPollingProvider extends ObservableV2< BaseEventTypes > {
 				...debug,
 			} );
 		}
-	}
+	};
 
+	/**
+	 * Handle synchronization events from the polling manager.
+	 */
 	protected onSync = (): void => {
 		if ( ! this.synced ) {
 			this.synced = true;

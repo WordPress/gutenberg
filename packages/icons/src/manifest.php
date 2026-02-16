@@ -5,6 +5,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 return array(
+	'accordion'                      => array(
+		'label'    => _x( 'Accordion', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/accordion.svg',
+	),
+	'accordion-heading'              => array(
+		'label'    => _x( 'Accordion Heading', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/accordion-heading.svg',
+	),
+	'accordion-item'                 => array(
+		'label'    => _x( 'Accordion Item', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/accordion-item.svg',
+	),
 	'add-card'                       => array(
 		'label'    => _x( 'Add Card', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/add-card.svg',
@@ -379,6 +391,10 @@ return array(
 		'filePath' => 'library/create.svg',
 		'public'   => true,
 	),
+	'contents'                       => array(
+		'label'    => _x( 'Contents', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/contents.svg',
+	),
 	'crop'                           => array(
 		'label'    => _x( 'Crop', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/crop.svg',
@@ -525,7 +541,7 @@ return array(
 		'filePath' => 'library/format-lowercase.svg',
 	),
 	'format-ltr'                     => array(
-		'label'    => _x( 'Format Ltr', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'Format LTR', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-ltr.svg',
 	),
 	'format-outdent'                 => array(
@@ -533,11 +549,11 @@ return array(
 		'filePath' => 'library/format-outdent.svg',
 	),
 	'format-outdent-rtl'             => array(
-		'label'    => _x( 'Format Outdent Rtl', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'Format Outdent RTL', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-outdent-rtl.svg',
 	),
 	'format-rtl'                     => array(
-		'label'    => _x( 'Format Rtl', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'Format RTL', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/format-rtl.svg',
 	),
 	'format-strikethrough'           => array(
@@ -553,7 +569,7 @@ return array(
 		'filePath' => 'library/format-uppercase.svg',
 	),
 	'full-height'                    => array(
-		'label'    => _x( 'Full height', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'Full Height', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/full-height.svg',
 	),
 	'fullscreen'                     => array(
@@ -648,7 +664,7 @@ return array(
 		'filePath' => 'library/home-button.svg',
 	),
 	'html'                           => array(
-		'label'    => _x( 'Html', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'HTML', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/html.svg',
 	),
 	'image'                          => array(
@@ -870,6 +886,10 @@ return array(
 	'navigation'                     => array(
 		'label'    => _x( 'Navigation', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/navigation.svg',
+	),
+	'navigation-overlay'             => array(
+		'label'    => _x( 'Navigation Overlay', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/navigation-overlay.svg',
 	),
 	'next'                           => array(
 		'label'    => _x( 'Next', 'icon label', 'gutenberg' ),
@@ -1123,7 +1143,7 @@ return array(
 		'public'   => true,
 	),
 	'rss'                            => array(
-		'label'    => _x( 'Rss', 'icon label', 'gutenberg' ),
+		'label'    => _x( 'RSS', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/rss.svg',
 		'public'   => true,
 	),
@@ -1325,6 +1345,22 @@ return array(
 		'label'    => _x( 'Tablet', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/tablet.svg',
 		'public'   => true,
+	),
+	'tab'                            => array(
+		'label'    => _x( 'Tab', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/tab.svg',
+	),
+	'tabs'                           => array(
+		'label'    => _x( 'Tabs', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/tabs.svg',
+	),
+	'tabs-menu'                      => array(
+		'label'    => _x( 'Tabs Menu', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/tabs-menu.svg',
+	),
+	'tabs-menu-item'                 => array(
+		'label'    => _x( 'Tabs Menu Item', 'icon label', 'gutenberg' ),
+		'filePath' => 'library/tabs-menu-item.svg',
 	),
 	'tag'                            => array(
 		'label'    => _x( 'Tag', 'icon label', 'gutenberg' ),
