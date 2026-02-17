@@ -36,6 +36,7 @@ import NavigableToolbar from '../navigable-toolbar';
 import { useHasBlockToolbar } from './use-has-block-toolbar';
 import ChangeDesign from './change-design';
 import SwitchSectionStyle from './switch-section-style';
+import EditSectionButton from './edit-section-button';
 import { unlock } from '../../lock-unlock';
 import { deviceTypeKey } from '../../store/private-keys';
 import BlockToolbarIcon from './block-toolbar-icon';
@@ -244,6 +245,7 @@ export function PrivateBlockToolbar( {
 					shouldShowVisualToolbar &&
 					isMultiToolbar &&
 					showGroupButtons && <BlockGroupToolbar /> }
+				<EditSectionButton clientIds={ blockClientIds } />
 				{ ! areSelectedBlocksHiddenOnViewport && showShuffleButton && (
 					<ChangeDesign clientId={ blockClientIds[ 0 ] } />
 				) }
