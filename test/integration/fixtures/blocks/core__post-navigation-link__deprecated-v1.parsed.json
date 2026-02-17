@@ -2,8 +2,8 @@
 	{
 		"blockName": "core/post-navigation-link",
 		"attrs": {
-			"textAlign": "left",
-			"type": "previous"
+			"type": "previous",
+			"textAlign": "left"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
@@ -13,14 +13,14 @@
 		"blockName": null,
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\n\n",
-		"innerContent": [ "\n\n" ]
+		"innerHTML": "\r\n\r\n",
+		"innerContent": [ "\r\n\r\n" ]
 	},
 	{
 		"blockName": "core/post-navigation-link",
 		"attrs": {
-			"textAlign": "center",
-			"type": "previous"
+			"type": "previous",
+			"textAlign": "center"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
@@ -30,14 +30,14 @@
 		"blockName": null,
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\n\n",
-		"innerContent": [ "\n\n" ]
+		"innerHTML": "\r\n\r\n",
+		"innerContent": [ "\r\n\r\n" ]
 	},
 	{
 		"blockName": "core/post-navigation-link",
 		"attrs": {
-			"textAlign": "right",
-			"type": "previous"
+			"type": "previous",
+			"textAlign": "right"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
