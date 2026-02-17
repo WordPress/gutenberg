@@ -68,7 +68,7 @@ add_action(
 				},
 				'supports'        => array(
 					'autoRegister' => true,
-					'color'         => array(
+					'color'        => array(
 						'background' => true,
 						'text'       => false,
 					),
