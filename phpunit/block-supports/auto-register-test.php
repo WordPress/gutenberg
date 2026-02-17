@@ -130,7 +130,7 @@ class Tests_Block_Supports_Auto_Register_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$result = wp_mark_auto_generate_control_attributes( $settings );
+		$result = gutenberg_mark_auto_generate_control_attributes( $settings );
 
 		$this->assertTrue( $result['attributes']['text']['autoGenerateControl'] );
 		$this->assertTrue( $result['attributes']['price']['autoGenerateControl'] );
