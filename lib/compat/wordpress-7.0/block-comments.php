@@ -59,4 +59,3 @@ function gutenberg_get_note_reaction_emojis() {
 	 */
 	return apply_filters( 'note_reaction_emojis', $default_emojis );
 }
-add_action( 'init', 'gutenberg_register_block_comment_reaction_metadata' );
