@@ -230,21 +230,6 @@ mark.wp-note {
 }
 
 // Emoji Reactions
-.editor-collab-sidebar-panel__reactions-row {
-	display: flex;
-	flex-wrap: wrap;
-	gap: $grid-unit-05;
-	align-items: center;
-	margin-top: $grid-unit-10;
-}
-
-.editor-collab-sidebar-panel__reactions {
-	display: flex;
-	flex-wrap: wrap;
-	gap: $grid-unit-05;
-	align-items: center;
-}
-
 .editor-collab-sidebar-panel__reaction-button {
 	gap: $grid-unit-05;
 	border: $border-width solid $gray-300;
