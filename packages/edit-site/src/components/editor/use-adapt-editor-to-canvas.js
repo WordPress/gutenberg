@@ -10,18 +10,23 @@ import { store as preferencesStore } from '@wordpress/preferences';
 export function useAdaptEditorToCanvas( canvas ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const {
+		editPost,
 		setDeviceType,
 		closePublishSidebar,
 		setIsListViewOpened,
 		setIsInserterOpened,
 	} = useDispatch( editorStore );
 	const { get: getPreference } = useSelect( preferencesStore );
+	const { getCurrentPost } = useSelect( editorStore );
 	const registry = useRegistry();
 	useLayoutEffect( () => {
 		const isMediumOrBigger =
 			window.matchMedia( '(min-width: 782px)' ).matches;
 		registry.batch( () => {
 			clearSelectedBlock();
+			if ( getCurrentPost()?.type ) {
+				editPost( { selection: undefined }, { undoIgnore: true } );
+			}
 			setDeviceType( 'Desktop' );
 			closePublishSidebar();
 			setIsInserterOpened( false );
@@ -44,10 +49,12 @@ export function useAdaptEditorToCanvas( canvas ) {
 		canvas,
 		registry,
 		clearSelectedBlock,
+		editPost,
 		setDeviceType,
 		closePublishSidebar,
 		setIsInserterOpened,
 		setIsListViewOpened,
 		getPreference,
+		getCurrentPost,
 	] );
 }
