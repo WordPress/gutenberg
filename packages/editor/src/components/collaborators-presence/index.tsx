@@ -2,7 +2,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import {
 	privateApis,
 	type PostEditorAwarenessState,
@@ -11,6 +11,11 @@ import { __, sprintf } from '@wordpress/i18n';
 
 import { CollaboratorsList } from './list';
 import { unlock } from '../../lock-unlock';
+import {
+	getAvatarUrl,
+	resolveGravatarUrl,
+} from '../collaborators-overlay/gravatar-check';
+import { useResolveGravatars } from '../collaborators-overlay/use-resolve-gravatars';
 
 import './styles/collaborators-presence.scss';
 import { CollaboratorsOverlay } from '../collaborators-overlay';
@@ -21,16 +26,6 @@ const { Avatar, AvatarGroup } = unlock( componentsPrivateApis );
 interface CollaboratorsPresenceProps {
 	postId: number | null;
 	postType: string | null;
-}
-
-function getAvatarUrl(
-	collaboratorInfo: PostEditorAwarenessState[ 'collaboratorInfo' ]
-) {
-	return (
-		collaboratorInfo.avatar_urls?.[ 48 ] ||
-		collaboratorInfo.avatar_urls?.[ 96 ] ||
-		collaboratorInfo.avatar_urls?.[ 24 ]
-	);
 }
 
 /**
@@ -54,6 +49,17 @@ export function CollaboratorsPresence( {
 	const otherActiveCollaborators = activeCollaborators.filter(
 		( collaborator ) => ! collaborator.isMe
 	);
+
+	// Initiate gravatar default-detection so the Avatar component can show
+	// initials when no custom gravatar exists.
+	const collaboratorAvatarUrls = useMemo(
+		() =>
+			otherActiveCollaborators.map( ( c ) =>
+				getAvatarUrl( c.collaboratorInfo.avatar_urls )
+			),
+		[ otherActiveCollaborators ]
+	);
+	useResolveGravatars( collaboratorAvatarUrls );
 
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
 	const [ popoverAnchor, setPopoverAnchor ] = useState< HTMLElement | null >(
@@ -87,8 +93,11 @@ export function CollaboratorsPresence( {
 							( collaboratorState ) => (
 								<Avatar
 									key={ collaboratorState.clientId }
-									src={ getAvatarUrl(
-										collaboratorState.collaboratorInfo
+									src={ resolveGravatarUrl(
+										getAvatarUrl(
+											collaboratorState.collaboratorInfo
+												.avatar_urls
+										)
 									) }
 									name={
 										collaboratorState.collaboratorInfo.name

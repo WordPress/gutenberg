@@ -82,6 +82,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 }
 .has-avatar-border-color > .components-avatar__image {
 	border: var(--wp-admin-border-width-focus, 2px) solid var(--components-avatar-border-color);
+	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) #fff;
 	background-clip: padding-box;
 }
 .components-avatar:not(.has-src) > .components-avatar__image {

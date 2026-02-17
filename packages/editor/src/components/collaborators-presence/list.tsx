@@ -8,6 +8,10 @@ import { close } from '@wordpress/icons';
 import { type PostEditorAwarenessState } from '@wordpress/core-data';
 
 import { unlock } from '../../lock-unlock';
+import {
+	getAvatarUrl,
+	resolveGravatarUrl,
+} from '../collaborators-overlay/gravatar-check';
 
 import './styles/collaborators-list.scss';
 
@@ -69,14 +73,12 @@ export function CollaboratorsList( {
 							} }
 						>
 							<Avatar
-								src={
-									collaboratorState.collaboratorInfo
-										.avatar_urls?.[ 48 ] ||
-									collaboratorState.collaboratorInfo
-										.avatar_urls?.[ 96 ] ||
-									collaboratorState.collaboratorInfo
-										.avatar_urls?.[ 24 ]
-								}
+								src={ resolveGravatarUrl(
+									getAvatarUrl(
+										collaboratorState.collaboratorInfo
+											.avatar_urls
+									)
+								) }
 								name={ collaboratorState.collaboratorInfo.name }
 								borderColor={
 									collaboratorState.collaboratorInfo

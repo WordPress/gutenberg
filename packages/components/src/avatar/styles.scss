@@ -38,7 +38,7 @@
 
 	.has-avatar-border-color > & {
 		border: var(--wp-admin-border-width-focus) solid var(--components-avatar-border-color);
-		// box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
 		background-clip: padding-box;
 	}
 }
