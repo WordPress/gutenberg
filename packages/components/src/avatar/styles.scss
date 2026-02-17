@@ -101,10 +101,10 @@
 	background-color: var(--components-avatar-outline-color);
 }
 
-// Status: dim and desaturate content so the background color shows through.
+// Dimmed: desaturate and fade content so the background color shows through.
 // Images: move to ::before with luminosity blend over the solid bg color.
 // Initials: reduce text opacity.
-.components-avatar.has-status.has-src > .components-avatar__image {
+.components-avatar.is-dimmed.has-src > .components-avatar__image {
 	background-image: none;
 
 	&::before {
@@ -120,11 +120,11 @@
 	}
 }
 
-.components-avatar.has-status:not(.has-src) > .components-avatar__image {
+.components-avatar.is-dimmed:not(.has-src) > .components-avatar__image {
 	color: rgba($white, 0.3);
 }
 
-.components-avatar.has-status.has-avatar-border-color > .components-avatar__image {
+.components-avatar.is-dimmed.has-avatar-border-color > .components-avatar__image {
 	background-color: var(--components-avatar-outline-color);
 }
 

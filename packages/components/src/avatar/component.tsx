@@ -19,7 +19,7 @@ function Avatar( {
 	badge = false,
 	size = 'default',
 	borderColor,
-	status,
+	dimmed = false,
 	statusIndicator,
 	style,
 	...props
@@ -48,8 +48,7 @@ function Avatar( {
 				'has-src': !! src,
 				'has-badge': showBadge,
 				'is-small': size === 'small',
-				'has-status': !! status,
-				[ `is-${ status }` ]: !! status,
+				'is-dimmed': dimmed,
 			} ) }
 			style={ customProperties }
 			role="img"
@@ -58,7 +57,7 @@ function Avatar( {
 		>
 			<span className="components-avatar__image">
 				{ ! src && initials }
-				{ !! status && !! statusIndicator && (
+				{ dimmed && !! statusIndicator && (
 					<span className="components-avatar__status-indicator">
 						<Icon icon={ statusIndicator } />
 					</span>

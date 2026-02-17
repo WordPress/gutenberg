@@ -132,39 +132,31 @@ describe( 'Avatar', () => {
 		} );
 	} );
 
-	describe( 'status', () => {
-		it( 'should apply has-status and is-active classes', () => {
-			render( <Avatar data-testid="avatar" status="active" /> );
+	describe( 'dimmed', () => {
+		it( 'should apply is-dimmed class when dimmed', () => {
+			render( <Avatar data-testid="avatar" dimmed /> );
 			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).toHaveClass( 'has-status' );
-			expect( avatar ).toHaveClass( 'is-active' );
+			expect( avatar ).toHaveClass( 'is-dimmed' );
 		} );
 
-		it( 'should apply has-status and is-idle classes', () => {
-			render( <Avatar data-testid="avatar" status="idle" /> );
-			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).toHaveClass( 'has-status' );
-			expect( avatar ).toHaveClass( 'is-idle' );
-		} );
-
-		it( 'should not apply status classes when status is not set', () => {
+		it( 'should not apply is-dimmed class by default', () => {
 			render( <Avatar data-testid="avatar" /> );
 			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).not.toHaveClass( 'has-status' );
+			expect( avatar ).not.toHaveClass( 'is-dimmed' );
 		} );
 
-		it( 'should render statusIndicator when status is set', () => {
+		it( 'should render statusIndicator when dimmed', () => {
 			render(
 				<Avatar
 					data-testid="avatar"
-					status="active"
+					dimmed
 					statusIndicator={ <span>icon</span> }
 				/>
 			);
 			expect( screen.getByText( 'icon' ) ).toBeInTheDocument();
 		} );
 
-		it( 'should not render statusIndicator when status is not set', () => {
+		it( 'should not render statusIndicator when not dimmed', () => {
 			render(
 				<Avatar
 					data-testid="avatar"

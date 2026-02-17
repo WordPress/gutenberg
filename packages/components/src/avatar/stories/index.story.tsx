@@ -83,24 +83,31 @@ export const WithLabel: Story = {
 	},
 };
 
-export const Active: Story = {
+export const Dimmed: Story = {
 	args: {
 		...Default.args,
-		status: 'active',
-		statusIndicator: moreHorizontal,
+		dimmed: true,
 	},
 	parameters: {
 		docs: {
 			description: {
-				story: 'When `status` is set, the avatar image is dimmed and the `statusIndicator` is rendered as an overlay.',
+				story: 'When `dimmed` is true, the avatar is desaturated and faded to indicate an inactive state.',
 			},
 		},
 	},
 };
 
-export const Idle: Story = {
+export const DimmedWithIndicator: Story = {
 	args: {
 		...Default.args,
-		status: 'idle',
+		dimmed: true,
+		statusIndicator: moreHorizontal,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: 'When `dimmed` is true and a `statusIndicator` is provided, the icon is rendered as an overlay.',
+			},
+		},
 	},
 };
