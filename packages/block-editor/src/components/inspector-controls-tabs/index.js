@@ -38,14 +38,11 @@ export default function InspectorControlsTabs( {
 	}, [] );
 
 	// Get any requested inspector tab (used for initial state when programmatically switching)
-	const { requestedTab } = useSelect(
-		( select ) => ( {
-			requestedTab: unlock(
-				select( blockEditorStore )
-			).getRequestedInspectorTab(),
-		} ),
-		[]
-	);
+	const { requestedTab } = useSelect( ( select ) => ( {
+		requestedTab: unlock(
+			select( blockEditorStore )
+		).getRequestedInspectorTab(),
+	} ) );
 
 	const [ selectedTabId, setSelectedTabId ] = useState(
 		() => requestedTab?.tabName ?? tabs[ 0 ]?.name
@@ -73,6 +70,9 @@ export default function InspectorControlsTabs( {
 		if ( ! requestedTab ) {
 			return;
 		}
+
+		// Switch to the requested tab
+		setSelectedTabId( requestedTab.tabName );
 
 		// Handle tab-specific options
 		if (
