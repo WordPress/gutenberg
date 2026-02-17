@@ -6,7 +6,7 @@
  */
 
 /**
- * Expose blocks with auto_register flag for ServerSideRender in the editor.
+ * Exposes blocks with auto_register flag for ServerSideRender in the editor.
  *
  * Detects blocks that have the auto_register flag set in their supports
  * and passes them to JavaScript for auto-registration with ServerSideRender.
@@ -38,11 +38,11 @@ if ( has_action( 'enqueue_block_editor_assets', 'wp_enqueue_auto_register_blocks
 add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_auto_register_blocks' );
 
 /**
- * Mark user-defined attributes for auto-generated inspector controls.
+ * Marks user-defined attributes for auto-generated inspector controls.
  *
  * This filter runs during block type registration, before the WP_Block_Type
  * is instantiated. Block supports add their attributes AFTER the block type
- * is created (via WP_Block_Supports::register_attributes()), so any attributes
+ * is created (via {@see WP_Block_Supports::register_attributes()}), so any attributes
  * present at this stage are user-defined.
  *
  * The marker tells generateFieldsFromAttributes() which attributes should
@@ -83,4 +83,4 @@ if ( has_filter( 'register_block_type_args', 'wp_mark_auto_generate_control_attr
 	remove_filter( 'register_block_type_args', 'wp_mark_auto_generate_control_attributes', 5 );
 }
 // Priority 5 to mark original attributes before other filters (priority 10+) might add their own.
-add_filter( 'register_block_type_args', 'gutenberg_mark_auto_generate_control_attributes', 5, 1 );
+add_filter( 'register_block_type_args', 'gutenberg_mark_auto_generate_control_attributes', 5 );
