@@ -762,7 +762,19 @@ export function prepareItem( id: QueueItemId ) {
 			operations,
 		} );
 
-		dispatch.finishOperation( id, {} );
+		// If the file is not processed by vips, tell the server to
+		// generate sub-sizes since they won't be created client-side.
+		const updates =
+			! isVipsSupported || ! isImage
+				? {
+						additionalData: {
+							...item.additionalData,
+							generate_sub_sizes: true,
+						},
+				  }
+				: {};
+
+		dispatch.finishOperation( id, updates );
 	};
 }
 

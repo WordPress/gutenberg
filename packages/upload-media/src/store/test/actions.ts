@@ -188,6 +188,10 @@ describe( 'actions', () => {
 					OperationType.ThumbnailGeneration,
 				] )
 			);
+			// Server should not generate sub-sizes for vips-supported images.
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				false
+			);
 		} );
 
 		it( 'should add only Upload for non-image types', async () => {
@@ -212,6 +216,10 @@ describe( 'actions', () => {
 			);
 			expect( updatedItem.operations ).not.toEqual(
 				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
+			);
+			// Server should generate sub-sizes for non-vips files.
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
 			);
 		} );
 
@@ -243,6 +251,9 @@ describe( 'actions', () => {
 			expect( updatedItem.operations ).not.toEqual(
 				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
 			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
 		} );
 
 		it( 'should add only Upload for unsupported image types like BMP', async () => {
@@ -273,6 +284,9 @@ describe( 'actions', () => {
 			expect( updatedItem.operations ).not.toEqual(
 				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
 			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
 		} );
 
 		it( 'should add only Upload for PDF files', async () => {
@@ -302,6 +316,9 @@ describe( 'actions', () => {
 			);
 			expect( updatedItem.operations ).not.toEqual(
 				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
 			);
 		} );
 	} );
