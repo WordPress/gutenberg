@@ -246,10 +246,8 @@ test.describe( 'Navigation Overlay Template Part', () => {
 			} );
 			await openMenuButton.click();
 
-			const siteTitleFrontend = page.getByRole( 'link', {
-				name: new RegExp( '.+' ),
-			} );
-			await expect( siteTitleFrontend.first() ).toBeVisible();
+			const ctaButton = page.getByText( 'Get started today!' );
+			await expect( ctaButton ).toBeVisible();
 		} );
 	} );
 } );
