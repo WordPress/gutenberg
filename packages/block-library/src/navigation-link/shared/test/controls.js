@@ -304,4 +304,53 @@ describe( 'Controls', () => {
 			expect( screen.getByText( 'View link' ) ).toBeVisible();
 		} );
 	} );
+
+	describe( 'openSubmenusOnClick prop', () => {
+		it( 'hides Link to control when openSubmenusOnClick is true', () => {
+			const propsWithOpenOnClick = {
+				...defaultProps,
+				openSubmenusOnClick: true,
+			};
+
+			render( <Controls { ...propsWithOpenOnClick } /> );
+
+			// Link to control should not be visible
+			expect( screen.queryByText( 'Link to' ) ).not.toBeInTheDocument();
+
+			// Other controls should still be visible
+			expect( screen.getByLabelText( 'Text' ) ).toBeInTheDocument();
+			expect(
+				screen.getByLabelText( 'Open in new tab' )
+			).toBeInTheDocument();
+			expect(
+				screen.getByLabelText( 'Description' )
+			).toBeInTheDocument();
+			expect(
+				screen.getByLabelText( 'Rel attribute' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'shows Link to control when openSubmenusOnClick is false (default)', () => {
+			render( <Controls { ...defaultProps } /> );
+
+			// Link to control should be visible
+			expect( screen.getByText( 'Link to' ) ).toBeInTheDocument();
+		} );
+
+		it( 'hides View/Edit buttons when openSubmenusOnClick is true', () => {
+			const propsWithUrl = {
+				...defaultProps,
+				openSubmenusOnClick: true,
+				attributes: {
+					...defaultProps.attributes,
+					url: 'https://example.com',
+				},
+			};
+
+			render( <Controls { ...propsWithUrl } /> );
+
+			// View button should not be visible
+			expect( screen.queryByText( 'View link' ) ).not.toBeInTheDocument();
+		} );
+	} );
 } );
