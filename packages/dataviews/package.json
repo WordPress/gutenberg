@@ -52,7 +52,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@ariakit/react": "^0.4.15",
+		"@ariakit/react": "^0.4.21",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
