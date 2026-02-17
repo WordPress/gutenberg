@@ -100,6 +100,7 @@ function checkSubmenuOverflow( submenuContainer ) {
 	submenuContainer.style.position = 'absolute';
 
 	// Get the submenu width (use scrollWidth for accuracy)
+	// Include SUBMENU_MIN_WIDTH as a fallback in case the element hasn't been rendered yet
 	const submenuWidth = Math.max(
 		submenuContainer.offsetWidth,
 		submenuContainer.scrollWidth,
