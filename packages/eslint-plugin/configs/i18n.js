@@ -10,6 +10,5 @@ module.exports = {
 		'@wordpress/i18n-ellipsis': 'error',
 		'@wordpress/i18n-no-flanking-whitespace': 'error',
 		'@wordpress/i18n-hyphenated-range': 'error',
-		'@wordpress/no-i18n-in-save': 'error',
 	},
 };

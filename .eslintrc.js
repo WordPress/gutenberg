@@ -148,6 +148,7 @@ module.exports = {
 				allowedTextDomain: 'default',
 			},
 		],
+		'@wordpress/no-i18n-in-save': 'error',
 		'@wordpress/no-unsafe-wp-apis': 'off',
 		'@wordpress/data-no-store-string-literals': 'error',
 		'eslint-comments/no-unused-disable': 'error',
