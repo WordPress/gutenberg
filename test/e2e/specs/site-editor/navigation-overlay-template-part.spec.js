@@ -219,12 +219,11 @@ test.describe( 'Navigation Overlay Template Part', () => {
 			} );
 			await expect( designTab ).toBeVisible();
 
-			await designTab.click();
+			await expect( page.getByRole( 'option' ).first() ).toBeVisible();
 
-			// Find and click the "Overlay with site info and CTA" pattern
-			const ctaPattern = page
-				.getByRole( 'option' )
-				.filter( { hasText: /site info and CTA/i } );
+			const ctaPattern = page.getByRole( 'option', {
+				name: /Overlay with site info and CTA/i,
+			} );
 			await expect( ctaPattern ).toBeVisible();
 			await ctaPattern.click();
 
