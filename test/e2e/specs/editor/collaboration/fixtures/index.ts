@@ -7,7 +7,7 @@ export { expect } from '@wordpress/e2e-test-utils-playwright';
 /**
  * Internal dependencies
  */
-import CollaborationUtils from './collaboration-utils';
+import CollaborationUtils, { SECOND_USER } from './collaboration-utils';
 
 type Fixtures = {
 	collaborationUtils: CollaborationUtils;
@@ -25,7 +25,7 @@ export const test = base.extend< Fixtures >( {
 			page,
 		} );
 		await utils.enableCollaboration();
-		await utils.createSecondUser();
+		await requestUtils.createUser( SECOND_USER );
 		await use( utils );
 		await utils.teardown();
 	},

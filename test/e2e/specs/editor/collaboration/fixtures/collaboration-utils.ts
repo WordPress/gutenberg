@@ -12,7 +12,7 @@ import {
 	type RequestUtils,
 } from '@wordpress/e2e-test-utils-playwright';
 
-const SECOND_USER = {
+export const SECOND_USER = {
 	username: 'collaborator',
 	email: 'collaborator@example.com',
 	firstName: 'Test',
@@ -98,13 +98,6 @@ export default class CollaborationUtils {
 			form: formData,
 			failOnStatusCode: true,
 		} );
-	}
-
-	/**
-	 * Create the second collaborator user.
-	 */
-	async createSecondUser() {
-		await this.requestUtils.createUser( SECOND_USER );
 	}
 
 	/**
@@ -214,7 +207,7 @@ export default class CollaborationUtils {
 	 * @param page   The Playwright page to wait on.
 	 * @param cycles Number of sync responses to wait for (default 3).
 	 */
-	async waitForSyncCycle( page: Page, cycles = 3 ) {
+	private async waitForSyncCycle( page: Page, cycles = 3 ) {
 		for ( let i = 0; i < cycles; i++ ) {
 			await page.waitForResponse(
 				( response ) =>
@@ -223,27 +216,6 @@ export default class CollaborationUtils {
 				{ timeout: 10000 }
 			);
 		}
-	}
-
-	/**
-	 * Ensure React has flushed block changes to the entity record.
-	 *
-	 * After dispatching to the block-editor store (e.g. insertBlock), the
-	 * BlockEditorProvider's onChange callback fires asynchronously during
-	 * the next React render cycle. This callback pushes block changes to
-	 * the entity record and sync manager. Without this flush, the CRDT
-	 * update may never be enqueued and the change won't propagate to the
-	 * other user.
-	 *
-	 * @param targetPage The page to flush React on.
-	 */
-	async flushReact( targetPage: Page ) {
-		await targetPage.evaluate(
-			() =>
-				new Promise< void >( ( resolve ) =>
-					requestAnimationFrame( () => resolve() )
-				)
-		);
 	}
 
 	/**

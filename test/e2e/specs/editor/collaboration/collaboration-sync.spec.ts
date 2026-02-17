@@ -8,7 +8,6 @@ test.describe( 'Collaboration - Sync', () => {
 		collaborationUtils,
 		requestUtils,
 		editor,
-		page,
 	} ) => {
 		const post = await requestUtils.createPost( {
 			title: 'Sync Test - A to B',
@@ -23,9 +22,6 @@ test.describe( 'Collaboration - Sync', () => {
 			name: 'core/paragraph',
 			attributes: { content: 'Hello from User A' },
 		} );
-
-		// Ensure React flushes the block change to the entity/sync layer.
-		await collaborationUtils.flushReact( page );
 
 		// User B should see the paragraph after sync propagation.
 		await expect
@@ -59,9 +55,6 @@ test.describe( 'Collaboration - Sync', () => {
 			window.wp.data.dispatch( 'core/block-editor' ).insertBlock( block );
 		} );
 
-		// Ensure React flushes on User B's page.
-		await collaborationUtils.flushReact( page2 );
-
 		// User A should see the paragraph after sync propagation.
 		await expect
 			.poll( () => editor.getBlocks(), { timeout: 5000 } )
@@ -77,7 +70,6 @@ test.describe( 'Collaboration - Sync', () => {
 		collaborationUtils,
 		requestUtils,
 		editor,
-		page,
 	} ) => {
 		const post = await requestUtils.createPost( {
 			title: 'Sync Test - Simultaneous',
@@ -101,12 +93,6 @@ test.describe( 'Collaboration - Sync', () => {
 					.dispatch( 'core/block-editor' )
 					.insertBlock( block );
 			} ),
-		] );
-
-		// Ensure React flushes on both pages.
-		await Promise.all( [
-			collaborationUtils.flushReact( page ),
-			collaborationUtils.flushReact( page2 ),
 		] );
 
 		// Both users should eventually see both blocks.
