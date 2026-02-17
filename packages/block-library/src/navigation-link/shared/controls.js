@@ -274,23 +274,25 @@ export function Controls( {
 							) }
 						</HStack>
 					) }
+
+					<ToolsPanelItem
+						hasValue={ () => !! opensInNewTab }
+						label={ __( 'Open in new tab' ) }
+						onDeselect={ () =>
+							setAttributes( { opensInNewTab: false } )
+						}
+						isShownByDefault
+					>
+						<CheckboxControl
+							label={ __( 'Open in new tab' ) }
+							checked={ opensInNewTab }
+							onChange={ ( value ) =>
+								setAttributes( { opensInNewTab: value } )
+							}
+						/>
+					</ToolsPanelItem>
 				</>
 			) }
-
-			<ToolsPanelItem
-				hasValue={ () => !! opensInNewTab }
-				label={ __( 'Open in new tab' ) }
-				onDeselect={ () => setAttributes( { opensInNewTab: false } ) }
-				isShownByDefault
-			>
-				<CheckboxControl
-					label={ __( 'Open in new tab' ) }
-					checked={ opensInNewTab }
-					onChange={ ( value ) =>
-						setAttributes( { opensInNewTab: value } )
-					}
-				/>
-			</ToolsPanelItem>
 
 			<ToolsPanelItem
 				hasValue={ () => !! description }
