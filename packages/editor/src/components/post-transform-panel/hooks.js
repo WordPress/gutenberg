@@ -50,8 +50,9 @@ function filterPatterns( patterns, template ) {
 
 	// Filter out core/directory patterns not included in theme.json.
 	// Exception: navigation-overlay patterns should always show core patterns.
+	// We only want them to show here, we want them excluded everywhere else
+	// to avoid showing them in the inserter or the patterns page.
 	const filterOutExcludedPatternSources = ( pattern ) => {
-		// Allow core patterns for navigation-overlay template parts
 		if (
 			template.area === 'navigation-overlay' &&
 			pattern.blockTypes?.includes(
