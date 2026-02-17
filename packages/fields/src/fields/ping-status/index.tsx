@@ -44,7 +44,7 @@ function PingStatusEdit( {
 const pingStatusField: Field< BasePost > = {
 	id: 'ping_status',
 	label: __( 'Trackbacks & Pingbacks' ),
-	type: 'text',
+	type: 'string',
 	Edit: PingStatusEdit,
 	enableSorting: false,
 	enableHiding: false,

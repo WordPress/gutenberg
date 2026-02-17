@@ -273,7 +273,7 @@ export function MediaUploadModal( {
 			},
 			{
 				id: 'title',
-				type: 'text' as const,
+				type: 'string',
 				label: __( 'Title' ),
 				getValue: ( { item }: { item: RestAttachment } ) => {
 					const titleValue = item.title.raw || item.title.rendered;

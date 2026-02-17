@@ -23,7 +23,7 @@ import isValidElements from './utils/is-valid-elements';
 import getValueFormatted from './utils/get-value-formatted-default';
 
 export default {
-	type: 'text',
+	type: 'string',
 	render,
 	Edit: 'text',
 	sort,

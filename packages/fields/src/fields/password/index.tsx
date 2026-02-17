@@ -12,7 +12,7 @@ import PasswordEdit from './edit';
 
 const passwordField: Field< BasePost > = {
 	id: 'password',
-	type: 'text',
+	type: 'string',
 	label: __( 'Password' ),
 	Edit: PasswordEdit,
 	enableSorting: false,

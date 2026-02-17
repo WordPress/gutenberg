@@ -12,7 +12,7 @@ describe( 'mediaDimensionsField', () => {
 	it( 'has correct field configuration', () => {
 		expect( mediaDimensionsField ).toMatchObject( {
 			id: 'media_dimensions',
-			type: 'text',
+			type: 'string',
 			label: 'Dimensions',
 			enableSorting: false,
 			filterBy: false,

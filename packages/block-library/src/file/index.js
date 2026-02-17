@@ -59,13 +59,13 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'fileName',
 			label: __( 'Filename' ),
-			type: 'text',
+			type: 'string',
 			Edit: 'rich-text', // TODO: replace with custom component
 		},
 		{
 			id: 'downloadButtonText',
 			label: __( 'Button Text' ),
-			type: 'text',
+			type: 'string',
 			Edit: 'rich-text', // TODO: replace with custom component
 		},
 	];

@@ -12,7 +12,7 @@ import { TemplateEdit } from './template-edit';
 
 const templateField: Field< BasePost > = {
 	id: 'template',
-	type: 'text',
+	type: 'string',
 	label: __( 'Template' ),
 	Edit: TemplateEdit,
 	enableSorting: false,

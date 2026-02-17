@@ -376,7 +376,7 @@ describe( 'normalizeFields: default getValue', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'title',
-					type: 'text',
+					type: 'string',
 				},
 			];
 			const normalizedFields = normalizeFields( fields );

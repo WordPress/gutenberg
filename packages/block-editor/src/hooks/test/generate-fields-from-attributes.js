@@ -33,7 +33,7 @@ describe( 'generateFieldsFromAttributes', () => {
 		expect( result.fields[ 0 ] ).toEqual( {
 			id: 'message',
 			label: 'message',
-			type: 'text',
+			type: 'string',
 		} );
 		expect( result.form.fields ).toContain( 'message' );
 	} );
@@ -108,7 +108,7 @@ describe( 'generateFieldsFromAttributes', () => {
 		expect( result.fields[ 0 ] ).toEqual( {
 			id: 'size',
 			label: 'size',
-			type: 'text',
+			type: 'string',
 			elements: [
 				{ value: 'small', label: 'small' },
 				{ value: 'medium', label: 'medium' },

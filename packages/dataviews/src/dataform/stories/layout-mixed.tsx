@@ -35,12 +35,12 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'title',
 		label: 'Title',
-		type: 'text',
+		type: 'string',
 	},
 	{
 		id: 'status',
 		label: 'Status',
-		type: 'text',
+		type: 'string',
 		Edit: 'toggleGroup',
 		elements: [
 			{ value: 'draft', label: 'Draft' },
@@ -51,12 +51,12 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'origin',
 		label: 'Origin',
-		type: 'text',
+		type: 'string',
 	},
 	{
 		id: 'destination',
 		label: 'Destination',
-		type: 'text',
+		type: 'string',
 	},
 ];
 

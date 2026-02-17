@@ -8,7 +8,7 @@ describe( 'filenameField', () => {
 	it( 'has correct field configuration', () => {
 		expect( filenameField ).toMatchObject( {
 			id: 'filename',
-			type: 'text',
+			type: 'string',
 			label: 'File name',
 			enableSorting: false,
 			filterBy: false,

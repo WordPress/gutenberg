@@ -13,7 +13,7 @@ import MediaAttachedToEdit from './edit';
 
 const attachedToField: Partial< Field< MediaItem > > = {
 	id: 'attached_to',
-	type: 'text',
+	type: 'string',
 	label: __( 'Attached to' ),
 	Edit: MediaAttachedToEdit,
 	render: MediaAttachedToView,

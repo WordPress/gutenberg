@@ -30,7 +30,7 @@ const VisibilityComponent = () => {
 		{
 			id: 'name',
 			label: 'Name',
-			type: 'text',
+			type: 'string',
 			isVisible: ( post ) => post.isActive === true,
 		},
 		{

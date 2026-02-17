@@ -40,7 +40,6 @@ function createFieldFromAttribute( name, def ) {
 	const type = def.type;
 
 	// Skip unsupported types (object, union types, etc.)
-	// Supported: string→text, number, integer, boolean (1:1 with DataForm)
 	if ( ! [ 'string', 'number', 'integer', 'boolean' ].includes( type ) ) {
 		return null;
 	}
@@ -48,9 +47,7 @@ function createFieldFromAttribute( name, def ) {
 	const field = {
 		id: name,
 		label: def.label || name,
-		// Only 'string' needs mapping to 'text'; others are 1:1 with DataForm types.
-		// This mapping will be unnecessary once #74105 lands.
-		type: type === 'string' ? 'text' : type,
+		type,
 	};
 
 	// Add elements for enums (DataForm shows select UI when elements are present)

@@ -12,7 +12,7 @@ import type { BasePost } from '../../types';
 const discussionField: Field< BasePost > = {
 	id: 'discussion',
 	label: __( 'Discussion' ),
-	type: 'text',
+	type: 'string',
 	render: ( { item } ) => {
 		const commentsOpen = item.comment_status === 'open';
 		const pingsOpen = item.ping_status === 'open';

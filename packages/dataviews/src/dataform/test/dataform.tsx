@@ -15,17 +15,17 @@ const fields = [
 	{
 		id: 'title',
 		label: 'Title',
-		type: 'text' as const,
+		type: 'string',
 	},
 	{
 		id: 'order',
 		label: 'Order',
-		type: 'integer' as const,
+		type: 'integer',
 	},
 	{
 		id: 'author',
 		label: 'Author',
-		type: 'integer' as const,
+		type: 'integer',
 		elements: [
 			{ value: 1, label: 'Jane' },
 			{ value: 2, label: 'John' },
@@ -151,7 +151,7 @@ describe( 'DataForm component', () => {
 				{
 					id: 'price',
 					label: 'Price',
-					type: 'number' as const,
+					type: 'number',
 				},
 			];
 			const formWithNumber = {
@@ -213,7 +213,7 @@ describe( 'DataForm component', () => {
 			layout: {
 				type: 'panel',
 				labelPosition: 'side',
-			} as const,
+			},
 		};
 		it( 'should display fields', async () => {
 			render(
@@ -270,7 +270,7 @@ describe( 'DataForm component', () => {
 					type: 'panel',
 					labelPosition: 'side',
 					openAs: 'dropdown',
-				} as const,
+				},
 			};
 
 			render(
@@ -299,7 +299,7 @@ describe( 'DataForm component', () => {
 					type: 'panel',
 					labelPosition: 'side',
 					openAs: 'modal',
-				} as const,
+				},
 			};
 
 			render(
@@ -329,7 +329,7 @@ describe( 'DataForm component', () => {
 					type: 'panel',
 					labelPosition: 'side',
 					openAs: 'modal',
-				} as const,
+				},
 			};
 
 			render(
@@ -366,7 +366,7 @@ describe( 'DataForm component', () => {
 					type: 'panel',
 					labelPosition: 'side',
 					openAs: 'modal',
-				} as const,
+				},
 			};
 
 			render(

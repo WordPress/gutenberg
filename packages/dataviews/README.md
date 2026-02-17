@@ -140,7 +140,7 @@ const AUTHORS = [
 const fields = [
 	{
 		id: 'title',
-		type: 'text',
+		type: 'string',
 		label: 'Title',
 		enableHiding: false,
 	},
@@ -165,7 +165,7 @@ const fields = [
 	},
 	{
 		id: 'status',
-		type: 'text',
+		type: 'string',
 		label: 'Status',
 		getValue: ( { item } ) =>
 			STATUSES.find( ( { value } ) => value === item.status )?.label ??
@@ -803,7 +803,7 @@ Example:
 const fields = [
 	{
 		id: 'title',
-		type: 'text',
+		type: 'string',
 		label: 'Title',
 	},
 	{
@@ -813,7 +813,7 @@ const fields = [
 	},
 	{
 		id: 'author',
-		type: 'text',
+		type: 'string',
 		label: 'Author',
 		elements: [
 			{ value: 1, label: 'Admin' },
@@ -1194,7 +1194,7 @@ Example:
 
 ### `type`
 
-Field type. One of `text`, `integer`, `number`, `datetime`, `date`, `media`, `boolean`, `email`, `password`, `telephone`, `color`, `url`, `array`.
+Field type. One of `string`, `integer`, `number`, `datetime`, `date`, `media`, `boolean`, `email`, `password`, `telephone`, `color`, `url`, `array`.
 
 -   Type: `string`.
 -   Optional.
@@ -1205,7 +1205,7 @@ Example:
 ```js
 {
 	id: 'title',
-	type: 'text',
+	type: 'string',
 }
 ```
 
@@ -1222,7 +1222,7 @@ Example:
 ```js
 {
 	id: 'title',
-	type: 'text',
+	type: 'string',
 	label: 'Title',
 }
 ```
@@ -1240,7 +1240,7 @@ Example:
 ```js
 {
 	id: 'title',
-	type: 'text',
+	type: 'string',
 	header: (
 		<Stack direction="row" gap="xs" justify="start">
 			<Icon icon={ icon } />
@@ -1305,7 +1305,7 @@ const item = {
 // Field definition
 {
 	id: 'title',
-	type: 'text',
+	type: 'string',
 	label: 'Title'
 	// getValue: automatically becomes ( { item } ) => item.title
 	// setValue: automatically becomes ( { value } ) => ( { title: value } )
@@ -1330,7 +1330,7 @@ const item = {
 // Field definition - using dot notation (automatic)
 {
 	id: 'user.profile.name',
-	type: 'text',
+	type: 'string',
 	label: 'User Name'
 	// getValue: automatically becomes ( { item } ) => item.user.profile.name
 	// setValue: automatically becomes ( { value } ) => ( { user: { profile: { name: value } } } )
@@ -1339,7 +1339,7 @@ const item = {
 // Alternative - using simple ID with custom functions
 {
 	id: 'userName',
-	type: 'text',
+	type: 'string',
 	label: 'User Name',
 	getValue: ( { item } ) => item.user.profile.name,
 	setValue: ( { value } ) => ( {
@@ -1459,7 +1459,7 @@ Example of a custom render function:
 ```js
 {
 	id: 'title',
-	type: 'text',
+	type: 'string',
 	label: 'Title',
 	render: ( { item, field, config } ) => {
 		/* React element to be displayed. */
@@ -1480,7 +1480,7 @@ Fields that provide a `type` will have a default Edit control:
 ```js
 {
 	id: 'categories',
-	type: 'text',
+	type: 'string',
 	label: 'Categories',
 }
 ```
@@ -1490,7 +1490,7 @@ Field authors can override the default Edit control by providing a string that m
 ```js
 {
 	id: 'categories',
-	type: 'text',
+	type: 'string',
 	label: 'Categories',
 	Edit: 'radio',
 }
@@ -1503,7 +1503,7 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 ```js
 {
 	id: 'description',
-	type: 'text',
+	type: 'string',
 	label: 'Description',
 	Edit: {
 		control: 'textarea',
@@ -1517,7 +1517,7 @@ Additionally, some of the bundled Edit controls are configurable via a config ob
 ```js
 {
 	id: 'title',
-	type: 'text',
+	type: 'string',
 	label: 'Title',
 	Edit: {
 		control: 'text',
@@ -1585,7 +1585,7 @@ When the field declares a type, it gets a default sort function:
 ```js
 {
 	id: 'title',
-	type: 'text',
+	type: 'string',
 	label: 'Title',
 }
 ```
@@ -1605,7 +1605,7 @@ It should return a number where:
 ```js
 {
 	id: 'title',
-	type: 'text',
+	type: 'string',
 	label: 'Title',
 	sort: ( a, b, direction ) => {
 		return direction === 'asc'
@@ -1681,7 +1681,7 @@ This can be useful to hide fields based on the state of other fields. For exampl
 ```js
 {
 	id: 'homepageDisplay',
-	type: 'text',
+	type: 'string',
 	label: 'Homepage display',
 	elements: [
 		{ value: 'latest', label: 'Latest post' },
@@ -1690,7 +1690,7 @@ This can be useful to hide fields based on the state of other fields. For exampl
 },
 {
 	id: 'staticHomepage',
-	type: 'text',
+	type: 'string',
 	label: 'Static homepage',
 	elements: [
 		{ value: 'welcome', label: 'Welcome to my website' },
@@ -1713,7 +1713,7 @@ Example to disable sorting by a field:
 ```js
 {
 	id: 'title',
-	type: 'text',
+	type: 'string',
 	label: 'Title',
 	enableSorting: false,
 }
@@ -1732,7 +1732,7 @@ Example to disable hiding of a field:
 ```js
 {
 	id: 'title',
-	type: 'text',
+	type: 'string',
 	label: 'Title',
 	enableHiding: false,
 }
@@ -1751,7 +1751,7 @@ Example to enable global search for a field:
 ```js
 {
 	id: 'title',
-	type: 'text',
+	type: 'string',
 	label: 'Title',
 	enableGlobalSearch: true,
 }
@@ -1822,7 +1822,7 @@ By default, fields have filtering enabled by using the field's `Edit` function:
 ```js
 {
 	id: 'product',
-	type: 'text',
+	type: 'string',
 	label: 'Product',
 }
 ```
@@ -1832,7 +1832,7 @@ If the field provides `elements`, the filter will use those as predefined option
 ```js
 {
 	id: 'product',
-	type: 'text',
+	type: 'string',
 	label: 'Title',
 	elements: [
 		{ value: 'a', label: 'Product A' },
@@ -1848,7 +1848,7 @@ A field can opt-out of filtering by setting `filterBy` to `false`:
 ```js
 {
 	id: 'product',
-	type: 'text',
+	type: 'string',
 	label: 'Product',
 	filterBy: false;
 }
@@ -1859,7 +1859,7 @@ Fields can declare its filter as primary, which means it'll always be visible an
 ```js
 {
 	id: 'title',
-	type: 'text',
+	type: 'string',
 	label: 'Title',
 	filterBy: {
 		isPrimary: true;
@@ -1872,7 +1872,7 @@ Filters come with default operators per field type, but this is configurable by 
 ```js
 {
 	id: 'product',
-	type: 'text',
+	type: 'string',
 	label: 'Product',
 	elements: [
 		{ value: 'a', label: 'Product A' },
@@ -1891,7 +1891,7 @@ Or multi-selection operators:
 ```js
 {
 	id: 'product',
-	type: 'text',
+	type: 'string',
 	label: 'Product',
 	elements: [
 		{ value: 'a', label: 'Product A' },

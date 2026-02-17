@@ -59,7 +59,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'text',
 			label: __( 'Content' ),
-			type: 'text',
+			type: 'string',
 			Edit: 'rich-text', // TODO: replace with custom component
 		},
 		{

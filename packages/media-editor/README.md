@@ -41,8 +41,8 @@ function MyMediaEditor( { mediaId } ) {
 
 	// Define fields using the Field type from @wordpress/dataviews
 	const fields: Field[] = [
-		{ id: 'title', label: 'Title', type: 'text' },
-		{ id: 'alt_text', label: 'Alt Text', type: 'text' },
+		{ id: 'title', label: 'Title', type: 'string' },
+		{ id: 'alt_text', label: 'Alt Text', type: 'string' },
 		{ id: 'caption', label: 'Caption', type: 'textarea' },
 		{ id: 'description', label: 'Description', type: 'textarea' },
 	];

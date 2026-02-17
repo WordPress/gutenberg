@@ -12,7 +12,7 @@ import { getItemTitle } from '../../actions/utils';
 import PageTitleView from './view';
 
 const pageTitleField: Field< BasePost > = {
-	type: 'text',
+	type: 'string',
 	id: 'title',
 	label: __( 'Title' ),
 	placeholder: __( 'No title' ),

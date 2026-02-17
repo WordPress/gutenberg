@@ -62,7 +62,7 @@ export type Operator =
 	| 'over';
 
 export type FieldTypeName =
-	| 'text'
+	| 'string'
 	| 'integer'
 	| 'number'
 	| 'datetime'
@@ -156,11 +156,32 @@ export type EditConfigText = {
 	suffix?: React.ComponentType;
 };
 
+export type ControlTypeName =
+	| 'adaptiveSelect'
+	| 'array'
+	| 'checkbox'
+	| 'color'
+	| 'combobox'
+	| 'datetime'
+	| 'date'
+	| 'email'
+	| 'telephone'
+	| 'url'
+	| 'integer'
+	| 'number'
+	| 'password'
+	| 'radio'
+	| 'select'
+	| 'text'
+	| 'toggle'
+	| 'textarea'
+	| 'toggleGroup';
+
 /**
  * Edit configuration for other control types (excluding 'text' and 'textarea').
  */
 export type EditConfigGeneric = {
-	control: Exclude< FieldTypeName, 'text' | 'textarea' >;
+	control: Exclude< ControlTypeName, 'text' | 'textarea' >;
 };
 
 /**

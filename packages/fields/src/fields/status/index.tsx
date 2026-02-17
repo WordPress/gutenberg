@@ -16,7 +16,7 @@ const OPERATOR_IS_ANY = 'isAny';
 const statusField: Field< BasePost > = {
 	label: __( 'Status' ),
 	id: 'status',
-	type: 'text',
+	type: 'string',
 	elements: STATUSES,
 	render: StatusView,
 	Edit: 'radio',

@@ -13,7 +13,7 @@ import SlugView from './slug-view';
 
 const slugField: Field< BasePost > = {
 	id: 'slug',
-	type: 'text',
+	type: 'string',
 	label: __( 'Slug' ),
 	Edit: SlugEdit,
 	render: SlugView,

@@ -197,13 +197,13 @@ function generateAdditionalElements(
 const fields: Field< DataType >[] = [
 	{
 		id: 'text',
-		type: 'text',
+		type: 'string',
 		label: 'Text',
 		description: 'Help for text.',
 	},
 	{
 		id: 'textWithElements',
-		type: 'text',
+		type: 'string',
 		label: 'Text (with elements)',
 		description: 'Help for text with elements.',
 		elements: [
@@ -214,7 +214,7 @@ const fields: Field< DataType >[] = [
 	},
 	{
 		id: 'textWithRadio',
-		type: 'text',
+		type: 'string',
 		label: 'Text (with radio)',
 		description: 'Help for text with radio.',
 		Edit: 'radio',
@@ -226,7 +226,7 @@ const fields: Field< DataType >[] = [
 	},
 	{
 		id: 'textWithTextarea',
-		type: 'text',
+		type: 'string',
 		label: 'Textarea',
 		description: 'Help for textarea.',
 		Edit: 'textarea',
@@ -510,7 +510,7 @@ const fields: Field< DataType >[] = [
 	{
 		id: 'priceWithPrefix',
 		label: 'Text with Prefix',
-		type: 'text',
+		type: 'string',
 		description: 'Text field with dollar sign prefix.',
 		Edit: {
 			control: 'text',
@@ -520,7 +520,7 @@ const fields: Field< DataType >[] = [
 	{
 		id: 'ratingWithIcon',
 		label: 'Text with Icon Prefix',
-		type: 'text',
+		type: 'string',
 		description: 'Text field with star icon prefix.',
 		Edit: {
 			control: 'text',
@@ -530,7 +530,7 @@ const fields: Field< DataType >[] = [
 	{
 		id: 'percentageWithSuffix',
 		label: 'Text with Suffix',
-		type: 'text',
+		type: 'string',
 		description: 'Text field with percent sign suffix.',
 		Edit: {
 			control: 'text',
@@ -540,7 +540,7 @@ const fields: Field< DataType >[] = [
 	{
 		id: 'priceWithBoth',
 		label: 'Text with Prefix and Suffix',
-		type: 'text',
+		type: 'string',
 		description: 'Text field with both dollar prefix and USD suffix.',
 		Edit: {
 			control: 'text',
@@ -774,7 +774,7 @@ export const TextComponent = ( {
 	manyElements: boolean;
 } ) => {
 	const textFields = useMemo(
-		() => fields.filter( ( field ) => field.type === 'text' ),
+		() => fields.filter( ( field ) => field.type === 'string' ),
 		[]
 	);
 
@@ -788,7 +788,7 @@ export const TextComponent = ( {
 		/>
 	);
 };
-TextComponent.storyName = 'text';
+TextComponent.storyName = 'string';
 
 export const IntegerComponent = ( {
 	type,
