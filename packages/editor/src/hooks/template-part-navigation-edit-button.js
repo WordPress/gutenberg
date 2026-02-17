@@ -13,6 +13,11 @@ import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
+
 // Block name constants
 const NAVIGATION_BLOCK_NAME = 'core/navigation';
 const TEMPLATE_PART_BLOCK_NAME = 'core/template-part';
@@ -29,8 +34,8 @@ const BLOCK_INSPECTOR_AREA = 'edit-post/block';
  * @return {React.JSX.Element} The Edit navigation button component or null if not applicable.
  */
 function TemplatePartNavigationEditButton( { clientId } ) {
-	const { selectBlock, flashBlock, __unstableRequestInspectorTab } =
-		useDispatch( blockEditorStore );
+	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );
+	const { requestInspectorTab } = unlock( useDispatch( blockEditorStore ) );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const {
@@ -81,7 +86,7 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 			enableComplementaryArea( 'core', BLOCK_INSPECTOR_AREA );
 
 			// Request the List View tab with the navigation panel opened
-			__unstableRequestInspectorTab( 'list', {
+			requestInspectorTab( 'list', {
 				openPanel: firstNavigationBlockId,
 			} );
 		}
@@ -90,7 +95,7 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 		selectBlock,
 		flashBlock,
 		enableComplementaryArea,
-		__unstableRequestInspectorTab,
+		requestInspectorTab,
 	] );
 
 	// Only show if template part contains navigation blocks and they are editable

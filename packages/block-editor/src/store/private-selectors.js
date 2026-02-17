@@ -1000,3 +1000,14 @@ export function getListViewExpandRevision( state ) {
 export function getViewportModalClientIds( state ) {
 	return state.viewportModalClientIds;
 }
+
+/**
+ * Returns the requested inspector tab state, if any.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object|null} The requested tab state with tabName and options, or null if no request is pending.
+ */
+export function getRequestedInspectorTab( state ) {
+	return state.requestedInspectorTab;
+}

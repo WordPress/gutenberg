@@ -45,13 +45,15 @@ export default function InspectorControlsTabs( {
 		__unstableIncrementListViewExpandRevision:
 			incrementListViewExpandRevision,
 		__unstableSetAllListViewPanelsOpen: setAllListViewPanelsOpen,
-		__unstableClearRequestedInspectorTab: clearRequestedInspectorTab,
 	} = useDispatch( blockEditorStore );
+	const { clearRequestedInspectorTab } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	// Get any requested inspector tab
 	const requestedTab = useSelect(
 		( select ) =>
-			select( blockEditorStore ).__unstableGetRequestedInspectorTab(),
+			unlock( select( blockEditorStore ) ).getRequestedInspectorTab(),
 		[]
 	);
 
