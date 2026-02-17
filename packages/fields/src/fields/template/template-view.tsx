@@ -19,6 +19,7 @@ export const TemplateView = ( {
 }: DataViewRenderFieldProps< BasePost > ) => {
 	const postType = item.type;
 	const slug = item.slug;
+	const postId = item.id;
 	const templateSlug = field.getValue( { item } );
 
 	const templateLabel = useSelect(
@@ -36,9 +37,9 @@ export const TemplateView = ( {
 				return match ? getItemTitle( match ) : templateSlug;
 			}
 
-			return getDefaultTemplateLabel( select, postType, slug );
+			return getDefaultTemplateLabel( select, postType, postId, slug );
 		},
-		[ postType, slug, templateSlug ]
+		[ postType, postId, slug, templateSlug ]
 	);
 
 	return <>{ templateLabel }</>;

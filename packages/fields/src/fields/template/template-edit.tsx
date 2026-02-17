@@ -62,8 +62,8 @@ export const TemplateEdit = ( {
 	);
 
 	const defaultTemplateLabel = useSelect(
-		( select ) => getDefaultTemplateLabel( select, postType, slug ),
-		[ postType, slug ]
+		( select ) => getDefaultTemplateLabel( select, postType, postId, slug ),
+		[ postType, postId, slug ]
 	);
 
 	const value = field.getValue( { item: data } );
