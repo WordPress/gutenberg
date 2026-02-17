@@ -7,7 +7,7 @@
 	border-radius: $grid-unit-05;
 	width: calc(100% - #{$grid-unit-40});
 	margin: auto;
-	max-width: 400px;
+	max-width: 512px;
 	position: relative;
 	top: calc(5% + #{$header-height});
 
@@ -108,6 +108,7 @@
 			min-height: $button-size-next-default-40px;
 			padding: $grid-unit-05;
 			padding-left: $grid-unit-50; // Account for commands without icons.
+			padding-right: $grid-unit-20; // Accounts for the command category.
 		}
 
 		> .has-icon {
@@ -156,6 +157,21 @@
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	flex: 1;
+}
+
+.commands-command-menu__item-category {
+	flex: 0 0 auto;
+	margin-left: auto;
+	padding-left: $grid-unit-30;
+	color: $gray-700;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+	text-align: right;
+
+	[aria-selected="true"] &,
+	[cmdk-item]:active & {
+		color: rgba($white, 0.8);
+	}
 }
 
 .commands-command-menu__item mark {

@@ -45,6 +45,7 @@ const REGISTERABLE_CATEGORIES = new Set( [
  *
  * @property {string}              name     Command loader name.
  * @property {string=}             context  Command loader context.
+ * @property {WPCommandCategory=}  category Command loader category.
  * @property {WPCommandLoaderHook} hook     Command loader hook.
  * @property {boolean}             disabled Whether to disable the command loader.
  */
@@ -93,9 +94,17 @@ export function unregisterCommand( name ) {
  * @return {Object} action.
  */
 export function registerCommandLoader( config ) {
+	let { category } = config;
+
+	// Defaults to 'action' if no category is provided or if the category is invalid. Future versions will emit a warning.
+	if ( ! category || ! REGISTERABLE_CATEGORIES.has( category ) ) {
+		category = 'action';
+	}
+
 	return {
 		type: 'REGISTER_COMMAND_LOADER',
 		...config,
+		category,
 	};
 }
 
