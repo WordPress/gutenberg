@@ -449,6 +449,113 @@ test.describe( 'Unsynced pattern', () => {
 			} )
 		).toBeVisible();
 	} );
+
+	test( 'supports editing pattern via Edit section toolbar button', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Insert the pattern structure.
+		await editor.setContent( `<!-- wp:group {"metadata":{"patternName":"core/block/123","name":"My pattern"},"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:group {"layout":{"type":"constrained"}} -->
+<div class="wp-block-group"><!-- wp:heading -->
+<h2 class="wp-block-heading">Test heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:separator -->
+<hr class="wp-block-separator has-alpha-channel-opacity"/>
+<!-- /wp:separator -->
+
+<!-- wp:paragraph -->
+<p>Test paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image -->
+<figure class="wp-block-image"><img alt=""/></figure>
+<!-- /wp:image --></div>
+<!-- /wp:group --></div>
+<!-- /wp:group -->` );
+
+		// Open List View.
+		await pageUtils.pressKeys( 'access+o' );
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		// Expand the pattern to see its inner blocks in content-only mode.
+		await listView
+			.getByRole( 'gridcell', { name: 'My pattern' } )
+			.getByTestId( 'list-view-expander' )
+			.click( { force: true } );
+
+		// Verify separator is initially hidden in content-only mode.
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Separator',
+				exact: true,
+			} )
+		).not.toBeAttached();
+
+		// Click on the pattern in List View to select it.
+		await listView.getByRole( 'gridcell', { name: 'My pattern' } ).click();
+
+		// Click "Edit section" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Edit section' );
+
+		// Expand the inner Group to see all blocks including separator.
+		await listView
+			.getByRole( 'gridcell', { name: 'Group' } )
+			.getByTestId( 'list-view-expander' )
+			.click( { force: true } );
+
+		// Assert all blocks are now visible in List View.
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Separator',
+				exact: true,
+			} )
+		).toBeVisible();
+
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Group',
+				exact: true,
+			} )
+		).toBeVisible();
+
+		// Exit pattern editing by clicking "Exit section" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Exit section' );
+
+		// Verify pattern is back to content-only mode (separator hidden again).
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Separator',
+				exact: true,
+			} )
+		).not.toBeAttached();
+
+		// Verify content blocks are still visible.
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Test heading',
+				exact: true,
+			} )
+		).toBeVisible();
+
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Paragraph',
+				exact: true,
+			} )
+		).toBeVisible();
+
+		await expect(
+			listView.getByRole( 'gridcell', {
+				name: 'Image',
+				exact: true,
+			} )
+		).toBeVisible();
+	} );
 } );
 
 test.describe( 'Synced pattern', () => {
