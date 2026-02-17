@@ -237,7 +237,7 @@ describe( 'Controls', () => {
 
 			render( <Controls { ...propsWithExternalLink } /> );
 
-			expect( screen.getByText( 'View link' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'View link' ) ).toBeVisible();
 		} );
 
 		it( 'shows "View page" for page links', () => {
@@ -253,7 +253,7 @@ describe( 'Controls', () => {
 
 			render( <Controls { ...propsWithPageLink } /> );
 
-			expect( screen.getByText( 'View page' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'View page' ) ).toBeVisible();
 		} );
 
 		it( 'shows "View post" for post links', () => {
@@ -269,7 +269,7 @@ describe( 'Controls', () => {
 
 			render( <Controls { ...propsWithPostLink } /> );
 
-			expect( screen.getByText( 'View post' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'View post' ) ).toBeVisible();
 		} );
 
 		it( 'shows "View category" for category links', () => {
@@ -285,7 +285,22 @@ describe( 'Controls', () => {
 
 			render( <Controls { ...propsWithCategoryLink } /> );
 
-			expect( screen.getByText( 'View category' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'View category' ) ).toBeVisible();
+		} );
+
+		it( 'shows "View link" for custom type links', () => {
+			const propsWithCustomLink = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					url: 'https://example.com',
+					type: 'custom',
+				},
+			};
+
+			render( <Controls { ...propsWithCustomLink } /> );
+
+			expect( screen.getByText( 'View link' ) ).toBeVisible();
 		} );
 	} );
 } );
