@@ -1,11 +1,6 @@
 /** @typedef {import('@wordpress/keycodes').WPKeycodeModifier} WPKeycodeModifier */
 
 /**
- * WordPress dependencies
- */
-import warning from '@wordpress/warning';
-
-/**
  * @typedef {'command'|'view'|'edit'|'workflow'|'action'} WPCommandCategory
  */
 
@@ -64,14 +59,8 @@ const REGISTERABLE_CATEGORIES = new Set( [
 export function registerCommand( config ) {
 	let { category } = config;
 
+	// Defaults to 'action' if no category is provided or if the category is invalid. Future versions will emit a warning.
 	if ( ! category || ! REGISTERABLE_CATEGORIES.has( category ) ) {
-		warning(
-			'Command "' +
-				config.name +
-				'" has invalid category "' +
-				category +
-				'". Defaulting to "action".'
-		);
 		category = 'action';
 	}
 
