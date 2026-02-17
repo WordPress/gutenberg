@@ -17,11 +17,13 @@ import {
 	isValidElement,
 	Component,
 } from '@wordpress/element';
+import { useDebounce } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	Modal,
 	TextHighlight,
 	__experimentalHStack as HStack,
+	Spinner,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import {
@@ -60,13 +62,34 @@ export function isValidIcon( icon ) {
 	);
 }
 
-function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
-	const { isLoading, commands = [] } = hook( { search } ) ?? {};
-	useEffect( () => {
-		setLoader( name, isLoading );
-	}, [ setLoader, name, isLoading ] );
+function useDebouncedValue( value ) {
+	const [ debouncedValue, setDebouncedValue ] = useState( '' );
+	const debounced = useDebounce( setDebouncedValue, 250 );
 
-	if ( ! commands.length ) {
+	useEffect( () => {
+		debounced( value );
+		return () => debounced.cancel();
+	}, [ debounced, value ] );
+
+	return debouncedValue;
+}
+
+function CommandMenuLoader( {
+	isLoading,
+	name,
+	search,
+	hook,
+	setLoader,
+	close,
+} ) {
+	const { isLoading: isLoadingCommands, commands = [] } =
+		hook( { search } ) ?? {};
+
+	useEffect( () => {
+		setLoader( name, isLoadingCommands );
+	}, [ setLoader, name, isLoadingCommands ] );
+
+	if ( ! commands.length || isLoadingCommands || isLoading ) {
 		return null;
 	}
 
@@ -102,7 +125,14 @@ function CommandMenuLoader( { name, search, hook, setLoader, close } ) {
 	);
 }
 
-export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
+export function CommandMenuLoaderWrapper( {
+	isLoading,
+	name,
+	hook,
+	search,
+	setLoader,
+	close,
+} ) {
 	// The "hook" prop is actually a custom React hook
 	// so to avoid breaking the rules of hooks
 	// the CommandMenuLoaderWrapper component need to be
@@ -121,14 +151,22 @@ export function CommandMenuLoaderWrapper( { hook, search, setLoader, close } ) {
 		<CommandMenuLoader
 			key={ key }
 			hook={ currentLoaderRef.current }
+			name={ name }
 			search={ search }
 			setLoader={ setLoader }
 			close={ close }
+			isLoading={ isLoading }
 		/>
 	);
 }
 
-export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
+export function CommandMenuGroup( {
+	isLoading,
+	isContextual,
+	search,
+	setLoader,
+	close,
+} ) {
 	const { commands, loaders } = useSelect(
 		( select ) => {
 			const { getCommands, getCommandLoaders } = select( commandsStore );
@@ -146,37 +184,40 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 
 	return (
 		<Command.Group>
-			{ commands.map( ( command ) => (
-				<Command.Item
-					key={ command.name }
-					value={ command.searchLabel ?? command.label }
-					keywords={ command.keywords }
-					onSelect={ () => command.callback( { close } ) }
-					id={ command.name }
-				>
-					<HStack
-						alignment="left"
-						className={ clsx( 'commands-command-menu__item', {
-							'has-icon': command.icon,
-						} ) }
+			{ ! isLoading &&
+				commands.map( ( command ) => (
+					<Command.Item
+						key={ command.name }
+						value={ command.searchLabel ?? command.label }
+						keywords={ command.keywords }
+						onSelect={ () => command.callback( { close } ) }
+						id={ command.name }
 					>
-						{ command.icon && <Icon icon={ command.icon } /> }
-						<span>
-							<TextHighlight
-								text={ command.label }
-								highlight={ search }
-							/>
-						</span>
-					</HStack>
-				</Command.Item>
-			) ) }
+						<HStack
+							alignment="left"
+							className={ clsx( 'commands-command-menu__item', {
+								'has-icon': command.icon,
+							} ) }
+						>
+							{ command.icon && <Icon icon={ command.icon } /> }
+							<span>
+								<TextHighlight
+									text={ command.label }
+									highlight={ search }
+								/>
+							</span>
+						</HStack>
+					</Command.Item>
+				) ) }
 			{ loaders.map( ( loader ) => (
 				<CommandMenuLoaderWrapper
 					key={ loader.name }
+					name={ loader.name }
 					hook={ loader.hook }
 					search={ search }
 					setLoader={ setLoader }
 					close={ close }
+					isLoading={ isLoading }
 				/>
 			) ) }
 		</Command.Group>
@@ -215,6 +256,9 @@ function CommandInput( { isOpen, search, setSearch } ) {
 export function CommandMenu() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const [ search, setSearch ] = useState( '' );
+
+	const debouncedSearch = useDebouncedValue( search );
+
 	const isOpen = useSelect(
 		( select ) => select( commandsStore ).isOpen(),
 		[]
@@ -296,22 +340,39 @@ export function CommandMenu() {
 						/>
 					</div>
 					<Command.List label={ __( 'Command suggestions' ) }>
-						{ search && ! isLoading && (
+						{ debouncedSearch && ! isLoading && (
 							<Command.Empty>
 								{ __( 'No results found.' ) }
 							</Command.Empty>
 						) }
+						{ isLoading && (
+							<Command.Loading>
+								<div
+									style={ {
+										display: 'flex',
+										justifyContent: 'center',
+										alignItems: 'center',
+										paddingBottom: '16px',
+									} }
+								>
+									<Spinner />
+									{ __( 'Loading commands…' ) }
+								</div>
+							</Command.Loading>
+						) }
 						<CommandMenuGroup
-							search={ search }
+							search={ debouncedSearch }
 							setLoader={ setLoader }
 							close={ closeAndReset }
+							isLoading={ isLoading }
 							isContextual
 						/>
-						{ search && (
+						{ debouncedSearch && (
 							<CommandMenuGroup
-								search={ search }
+								search={ debouncedSearch }
 								setLoader={ setLoader }
 								close={ closeAndReset }
+								isLoading={ isLoading }
 							/>
 						) }
 					</Command.List>

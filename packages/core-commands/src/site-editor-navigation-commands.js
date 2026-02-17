@@ -3,7 +3,7 @@
  */
 import { useCommandLoader } from '@wordpress/commands';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useEffect, useState } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -18,7 +18,6 @@ import {
 } from '@wordpress/icons';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { addQueryArgs, getPath } from '@wordpress/url';
-import { useDebounce } from '@wordpress/compose';
 import { decodeEntities } from '@wordpress/html-entities';
 
 /**
@@ -35,18 +34,6 @@ const icons = {
 	wp_template: layout,
 	wp_template_part: symbolFilled,
 };
-
-function useDebouncedValue( value ) {
-	const [ debouncedValue, setDebouncedValue ] = useState( '' );
-	const debounced = useDebounce( setDebouncedValue, 250 );
-
-	useEffect( () => {
-		debounced( value );
-		return () => debounced.cancel();
-	}, [ debounced, value ] );
-
-	return debouncedValue;
-}
 
 // Route mapping for experimental site editor
 const ROUTE_MAPPING = {
@@ -107,17 +94,17 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 			},
 			[]
 		);
-		const delayedSearch = useDebouncedValue( search );
+
 		const { records, isLoading } = useSelect(
 			( select ) => {
-				if ( ! delayedSearch ) {
+				if ( ! search ) {
 					return {
 						isLoading: false,
 					};
 				}
 
 				const query = {
-					search: delayedSearch,
+					search,
 					per_page: 10,
 					orderby: 'relevance',
 					status: [
@@ -140,7 +127,7 @@ const getNavigationCommandLoaderPerPostType = ( postType ) =>
 					),
 				};
 			},
-			[ delayedSearch ]
+			[ search ]
 		);
 
 		const commands = useMemo( () => {

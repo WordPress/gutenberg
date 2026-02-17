@@ -411,11 +411,14 @@ const getManipulateDocumentCommands = () =>
 		const { revertTemplate } = unlock( useDispatch( editorStore ) );
 
 		if (
-			! hasResolved ||
 			! [ TEMPLATE_PART_POST_TYPE, TEMPLATE_POST_TYPE ].includes(
 				postType
 			)
 		) {
+			return { isLoading: false, commands: [] };
+		}
+
+		if ( ! hasResolved ) {
 			return { isLoading: true, commands: [] };
 		}
 
