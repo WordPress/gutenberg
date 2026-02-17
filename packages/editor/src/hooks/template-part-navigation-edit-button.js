@@ -77,8 +77,9 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 
 	const onEditNavigation = useCallback( () => {
 		if ( firstNavigationBlockId ) {
-			// Batch all dispatches so order doesn't matter - listeners are
-			// notified once with the final state when InspectorControlsTabs mounts.
+			// Batch all dispatches so the request is in the store before
+			// InspectorControlsTabs mounts. Without this, the Content tab flashes
+			// before animating to List View.
 			registry.batch( () => {
 				selectBlock( firstNavigationBlockId );
 				flashBlock( firstNavigationBlockId, 500 );
