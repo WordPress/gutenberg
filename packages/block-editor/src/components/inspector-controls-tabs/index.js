@@ -37,7 +37,19 @@ export default function InspectorControlsTabs( {
 		return select( preferencesStore ).get( 'core', 'showIconLabels' );
 	}, [] );
 
-	const [ selectedTabId, setSelectedTabId ] = useState( tabs[ 0 ]?.name );
+	// Get any requested inspector tab (used for initial state when programmatically switching)
+	const { requestedTab } = useSelect(
+		( select ) => ( {
+			requestedTab: unlock(
+				select( blockEditorStore )
+			).getRequestedInspectorTab(),
+		} ),
+		[]
+	);
+
+	const [ selectedTabId, setSelectedTabId ] = useState(
+		() => requestedTab?.tabName ?? tabs[ 0 ]?.name
+	);
 	const hasUserSelectionRef = useRef( false );
 	const isProgrammaticSwitchRef = useRef( false );
 	const {
@@ -50,29 +62,17 @@ export default function InspectorControlsTabs( {
 		useDispatch( blockEditorStore )
 	);
 
-	// Get any requested inspector tab
-	const { requestedTab } = useSelect(
-		( select ) => ( {
-			requestedTab: unlock(
-				select( blockEditorStore )
-			).getRequestedInspectorTab(),
-		} ),
-		[]
-	);
-
 	// Reset when switching blocks
 	useEffect( () => {
 		hasUserSelectionRef.current = false;
 	}, [ clientId ] );
 
-	// Handle explicit inspector tab requests
+	// Handle explicit inspector tab requests (panel opening, refs, clear).
+	// Tab state is initialized from requestedTab above.
 	useEffect( () => {
 		if ( ! requestedTab ) {
 			return;
 		}
-
-		// Switch to the requested tab
-		setSelectedTabId( requestedTab.tabName );
 
 		// Handle tab-specific options
 		if (

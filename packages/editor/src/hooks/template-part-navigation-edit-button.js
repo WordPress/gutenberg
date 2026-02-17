@@ -10,7 +10,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
 
 /**
@@ -34,6 +34,7 @@ const BLOCK_INSPECTOR_AREA = 'edit-post/block';
  * @return {React.JSX.Element} The Edit navigation button component or null if not applicable.
  */
 function TemplatePartNavigationEditButton( { clientId } ) {
+	const registry = useRegistry();
 	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );
 	const { requestInspectorTab } = unlock( useDispatch( blockEditorStore ) );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
@@ -76,22 +77,20 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 
 	const onEditNavigation = useCallback( () => {
 		if ( firstNavigationBlockId ) {
-			// Select the first Navigation block
-			selectBlock( firstNavigationBlockId );
-
-			// Flash the block for 500ms to make it obvious
-			flashBlock( firstNavigationBlockId, 500 );
-
-			// Enable the complementary area (inspector)
-			enableComplementaryArea( 'core', BLOCK_INSPECTOR_AREA );
-
-			// Request the List View tab with the navigation panel opened
-			requestInspectorTab( 'list', {
-				openPanel: firstNavigationBlockId,
+			// Batch all dispatches so order doesn't matter - listeners are
+			// notified once with the final state when InspectorControlsTabs mounts.
+			registry.batch( () => {
+				selectBlock( firstNavigationBlockId );
+				flashBlock( firstNavigationBlockId, 500 );
+				enableComplementaryArea( 'core', BLOCK_INSPECTOR_AREA );
+				requestInspectorTab( 'list', {
+					openPanel: firstNavigationBlockId,
+				} );
 			} );
 		}
 	}, [
 		firstNavigationBlockId,
+		registry,
 		selectBlock,
 		flashBlock,
 		enableComplementaryArea,
