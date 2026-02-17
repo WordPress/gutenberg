@@ -21,7 +21,7 @@
 function block_core_tabs_menu_item_render_callback( array $attributes, string $content, \WP_Block $block ): string {
 	// Get tab-specific context
 	$tab_index = $block->context['core/tabs-menu-item-index'] ?? 0;
-	$tab_id    = $block->context['core/tabs-menu-item-id'] ?? '';
+	$tab_id    = sanitize_html_class( $block->context['core/tabs-menu-item-id'] ?? '' );
 	$tab_label = $block->context['core/tabs-menu-item-label'] ?? '';
 
 	if ( empty( $tab_id ) ) {
