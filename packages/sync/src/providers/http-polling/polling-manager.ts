@@ -50,7 +50,7 @@ interface RoomState {
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
-	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
+	processDocUpdates: ( updates: SyncUpdate[] ) => SyncUpdate[];
 	unregister: () => void;
 	updateQueue: UpdateQueue;
 }
@@ -283,11 +283,9 @@ function poll(): void {
 				}
 
 				// Process each incoming update and collect any responses.
-				const responseUpdates = room.updates
-					.map( ( update ) => roomState.processDocUpdate( update ) )
-					.filter( ( update ): update is SyncUpdate =>
-						Boolean( update )
-					);
+				const responseUpdates = roomState.processDocUpdates(
+					room.updates
+				);
 				roomState.updateQueue.addBulk( responseUpdates );
 
 				// Respond to compaction requests from server. The server asks only one
@@ -372,8 +370,20 @@ function registerRoom(
 		log,
 		processAwarenessUpdate: ( state: AwarenessState ) =>
 			processAwarenessUpdate( state, awareness ),
-		processDocUpdate: ( update: SyncUpdate ) =>
-			processDocUpdate( update, doc, onSync ),
+		processDocUpdates: ( updates: SyncUpdate[] ): SyncUpdate[] => {
+			const responses: SyncUpdate[] = [];
+
+			doc.transact( () => {
+				updates.forEach( ( update ) => {
+					const response = processDocUpdate( update, doc, onSync );
+					if ( response ) {
+						responses.push( response );
+					}
+				} );
+			}, POLLING_MANAGER_ORIGIN );
+
+			return responses;
+		},
 		unregister,
 		updateQueue,
 	};
