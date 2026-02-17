@@ -56,7 +56,7 @@ function getPostType( name ) {
 
 export function useResolveEditedEntity() {
 	const { editEntityRecord } = useDispatch( coreDataStore );
-	const { getEntityRecord } = useSelect( coreDataStore );
+	const { hasEntityRecord } = useSelect( coreDataStore );
 	const { name, params = {}, query } = useLocation();
 	const { postId = query?.postId } = params; // Fallback to query param for postId for list view routes.
 	const postType = getPostType( name, postId ) ?? query?.postType;
@@ -169,7 +169,7 @@ export function useResolveEditedEntity() {
 		// Only apply selection if the entity record is loaded,
 		// otherwise editEntityRecord will throw.
 		if (
-			getEntityRecord( 'postType', selectionPostType, selectionPostId )
+			hasEntityRecord( 'postType', selectionPostType, selectionPostId )
 		) {
 			editEntityRecord(
 				'postType',
