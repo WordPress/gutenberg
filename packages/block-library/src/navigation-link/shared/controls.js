@@ -72,12 +72,18 @@ function getEntityTypeName( type, kind ) {
  * This component provides the inspector controls (ToolsPanel) that are identical
  * between both navigation blocks.
  *
- * @param {Object}   props               - Component props
- * @param {Object}   props.attributes    - Block attributes
- * @param {Function} props.setAttributes - Function to update block attributes
- * @param {string}   props.clientId      - Block client ID
+ * @param {Object}   props                      - Component props
+ * @param {Object}   props.attributes           - Block attributes
+ * @param {Function} props.setAttributes        - Function to update block attributes
+ * @param {string}   props.clientId             - Block client ID
+ * @param {boolean}  props.openSubmenusOnClick  - Whether submenus open on click (for Submenu blocks only)
  */
-export function Controls( { attributes, setAttributes, clientId } ) {
+export function Controls( {
+	attributes,
+	setAttributes,
+	clientId,
+	openSubmenusOnClick = false,
+} ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -188,32 +194,34 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				/>
 			</ToolsPanelItem>
 
-			<ToolsPanelItem
-				hasValue={ () => !! url }
-				label={ __( 'Link to' ) }
-				onDeselect={ () =>
-					setAttributes( {
-						url: undefined,
-						id: undefined,
-						kind: undefined,
-						type: undefined,
-					} )
-				}
-				isShownByDefault
-			>
-				<LinkPicker
-					preview={ preview }
-					onSelect={ handleLinkChange }
-					suggestionsQuery={ getSuggestionsQuery(
-						attributes.type,
-						attributes.kind
-					) }
+			{ ! openSubmenusOnClick && (
+				<ToolsPanelItem
+					hasValue={ () => !! url }
 					label={ __( 'Link to' ) }
-					help={ helpText ? helpText : undefined }
-				/>
-			</ToolsPanelItem>
+					onDeselect={ () =>
+						setAttributes( {
+							url: undefined,
+							id: undefined,
+							kind: undefined,
+							type: undefined,
+						} )
+					}
+					isShownByDefault
+				>
+					<LinkPicker
+						preview={ preview }
+						onSelect={ handleLinkChange }
+						suggestionsQuery={ getSuggestionsQuery(
+							attributes.type,
+							attributes.kind
+						) }
+						label={ __( 'Link to' ) }
+						help={ helpText ? helpText : undefined }
+					/>
+				</ToolsPanelItem>
+			) }
 
-			{ url && (
+			{ url && ! openSubmenusOnClick && (
 				<HStack
 					className="navigation-link-to__actions"
 					alignment="left"
