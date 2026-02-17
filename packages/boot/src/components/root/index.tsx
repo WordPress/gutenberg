@@ -68,7 +68,7 @@ export default function Root() {
 						} ) }
 					>
 						<SavePanel />
-						<SnackbarNotices className="editor-notices__snackbar" />
+						<SnackbarNotices className="boot-notices__snackbar" />
 						{ isMobileViewport && (
 							<Page.SidebarToggleFill>
 								<Button
