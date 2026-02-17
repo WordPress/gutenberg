@@ -37,9 +37,11 @@ import ValidationBadge from '../validation-badge';
 
 const NonCollapsibleCardHeader = ( {
 	children,
+	isExpanded, // FIX: Destructure this so it doesn't get passed to DOM
 	...props
 }: {
 	children: React.ReactNode;
+	isExpanded?: boolean;
 } ) => (
 	<OriginalCardHeader isBorderless { ...props }>
 		<div
@@ -62,25 +64,29 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 	const [ touched, setTouched ] = useState( false );
 
 	// Sync internal state when the isOpened prop changes.
-	// This is unlikely to happen in production, but it helps with storybook controls.
 	useEffect( () => {
 		setIsOpen( isOpened );
 	}, [ isOpened ] );
 
+	// FIX: Stabilize toggle by removing isOpen dependency
 	const toggle = useCallback( () => {
-		// Mark as touched when collapsing (going from open to closed)
-		if ( isOpen ) {
-			setTouched( true );
-		}
-		setIsOpen( ( prev ) => ! prev );
-	}, [ isOpen ] );
+		setIsOpen( ( prev ) => {
+			if ( prev ) {
+				setTouched( true );
+			}
+			return ! prev;
+		} );
+	}, [] );
 
+	// FIX: Accept isExpanded prop and remove isOpen/toggle dependencies
 	const CollapsibleCardHeader = useCallback(
 		( {
 			children,
+			isExpanded,
 			...props
 		}: {
 			children: React.ReactNode;
+			isExpanded?: boolean;
 			[ key: string ]: any;
 		} ) => (
 			<OriginalCardHeader
@@ -105,13 +111,14 @@ export function useCardHeader( layout: NormalizedCardLayout ) {
 				<Button
 					__next40pxDefaultSize
 					variant="tertiary"
-					icon={ isOpen ? chevronUp : chevronDown }
-					aria-expanded={ isOpen }
-					aria-label={ isOpen ? 'Collapse' : 'Expand' }
+					// FIX: Use prop instead of state
+					icon={ isExpanded ? chevronUp : chevronDown }
+					aria-expanded={ isExpanded }
+					aria-label={ isExpanded ? 'Collapse' : 'Expand' }
 				/>
 			</OriginalCardHeader>
 		),
-		[ toggle, isOpen ]
+		[ toggle ]
 	);
 
 	const effectiveIsOpen = isCollapsible ? isOpen : true;
@@ -243,7 +250,10 @@ export default function FormCardField< Item >( {
 		return (
 			<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 				{ withHeader && (
-					<CardHeader className="dataforms-layouts-card__field-header">
+					<CardHeader
+						className="dataforms-layouts-card__field-header"
+						isExpanded={ isOpen }
+					>
 						<span className="dataforms-layouts-card__field-header-label">
 							{ field.label }
 						</span>
@@ -314,7 +324,10 @@ export default function FormCardField< Item >( {
 	return (
 		<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 			{ withHeader && (
-				<CardHeader className="dataforms-layouts-card__field-header">
+				<CardHeader
+					className="dataforms-layouts-card__field-header"
+					isExpanded={ isOpen }
+				>
 					<span className="dataforms-layouts-card__field-header-label">
 						{ fieldDefinition.label }
 					</span>
