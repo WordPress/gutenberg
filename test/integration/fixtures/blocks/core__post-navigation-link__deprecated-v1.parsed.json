@@ -13,8 +13,8 @@
 		"blockName": null,
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\r\n\r\n",
-		"innerContent": [ "\r\n\r\n" ]
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
 	},
 	{
 		"blockName": "core/post-navigation-link",
@@ -30,8 +30,8 @@
 		"blockName": null,
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\r\n\r\n",
-		"innerContent": [ "\r\n\r\n" ]
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
 	},
 	{
 		"blockName": "core/post-navigation-link",
