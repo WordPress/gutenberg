@@ -195,84 +195,86 @@ export function Controls( {
 			</ToolsPanelItem>
 
 			{ isLinkEditable && (
-				<ToolsPanelItem
-					hasValue={ () => !! url }
-					label={ __( 'Link to' ) }
-					onDeselect={ () =>
-						setAttributes( {
-							url: undefined,
-							id: undefined,
-							kind: undefined,
-							type: undefined,
-						} )
-					}
-					isShownByDefault
-				>
-					<LinkPicker
-						preview={ preview }
-						onSelect={ handleLinkChange }
-						suggestionsQuery={ getSuggestionsQuery(
-							attributes.type,
-							attributes.kind
-						) }
+				<>
+					<ToolsPanelItem
+						hasValue={ () => !! url }
 						label={ __( 'Link to' ) }
-						help={ helpText ? helpText : undefined }
-					/>
-				</ToolsPanelItem>
-			) }
-
-			{ url && isLinkEditable && (
-				<HStack
-					className="navigation-link-to__actions"
-					alignment="left"
-					justify="left"
-					style={ { gridColumn: '1 / -1' } }
-				>
-					{ hasUrlBinding &&
-						isBoundEntityAvailable &&
-						entityRecord?.id &&
-						attributes.kind === 'post-type' &&
-						onNavigateToEntityRecord && (
-							<Button
-								size="compact"
-								variant="secondary"
-								onClick={ () => {
-									onNavigateToEntityRecord( {
-										postId: entityRecord.id,
-										postType: attributes.type,
-									} );
-								} }
-								__next40pxDefaultSize
-							>
-								{ sprintf(
-									/* translators: %s: entity type (e.g., "page", "post", "category") */
-									__( 'Edit %s' ),
-									entityTypeName
-								) }
-							</Button>
-						) }
-					{ isViewableUrl && (
-						<Button
-							size="compact"
-							variant="secondary"
-							href={ viewUrl }
-							target="_blank"
-							icon={ external }
-							iconPosition="right"
-							__next40pxDefaultSize
-						>
-							{ sprintf(
-								/* translators: %s: entity type (e.g., "page", "post", "category") or "link" for external links */
-								__( 'View %s' ),
-								attributes.kind &&
-									attributes.type &&
-									attributes.kind !== 'custom'
-									? entityTypeName
-									: __( 'link' )
+						onDeselect={ () =>
+							setAttributes( {
+								url: undefined,
+								id: undefined,
+								kind: undefined,
+								type: undefined,
+							} )
+						}
+						isShownByDefault
+					>
+						<LinkPicker
+							preview={ preview }
+							onSelect={ handleLinkChange }
+							suggestionsQuery={ getSuggestionsQuery(
+								attributes.type,
+								attributes.kind
 							) }
-						</Button>
+							label={ __( 'Link to' ) }
+							help={ helpText ? helpText : undefined }
+						/>
+					</ToolsPanelItem>
+
+					{ url && (
+						<HStack
+							className="navigation-link-to__actions"
+							alignment="left"
+							justify="left"
+							style={ { gridColumn: '1 / -1' } }
+						>
+							{ hasUrlBinding &&
+								isBoundEntityAvailable &&
+								entityRecord?.id &&
+								attributes.kind === 'post-type' &&
+								onNavigateToEntityRecord && (
+									<Button
+										size="compact"
+										variant="secondary"
+										onClick={ () => {
+											onNavigateToEntityRecord( {
+												postId: entityRecord.id,
+												postType: attributes.type,
+											} );
+										} }
+										__next40pxDefaultSize
+									>
+										{ sprintf(
+											/* translators: %s: entity type (e.g., "page", "post", "category") */
+											__( 'Edit %s' ),
+											entityTypeName
+										) }
+									</Button>
+								) }
+							{ isViewableUrl && (
+								<Button
+									size="compact"
+									variant="secondary"
+									href={ viewUrl }
+									target="_blank"
+									icon={ external }
+									iconPosition="right"
+									__next40pxDefaultSize
+								>
+									{ sprintf(
+										/* translators: %s: entity type (e.g., "page", "post", "category") or "link" for external links */
+										__( 'View %s' ),
+										attributes.kind &&
+											attributes.type &&
+											attributes.kind !== 'custom'
+											? entityTypeName
+											: __( 'link' )
+									) }
+								</Button>
+							) }
+						</HStack>
 					) }
-				</HStack>
+				</>
 			) }
 
 			<ToolsPanelItem
