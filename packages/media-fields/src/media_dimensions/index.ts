@@ -7,7 +7,7 @@ import type { Field } from '@wordpress/dataviews';
 
 const mediaDimensionsField: Partial< Field< Updatable< Attachment > > > = {
 	id: 'media_dimensions',
-	type: 'text',
+	type: 'string',
 	label: __( 'Dimensions' ),
 	getValue: ( { item } ) =>
 		item?.media_details?.width && item?.media_details?.height

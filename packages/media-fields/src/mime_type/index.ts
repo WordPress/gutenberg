@@ -7,7 +7,7 @@ import type { Field } from '@wordpress/dataviews';
 
 const mimeTypeField: Partial< Field< Updatable< Attachment > > > = {
 	id: 'mime_type',
-	type: 'text',
+	type: 'string',
 	label: __( 'File type' ),
 	getValue: ( { item } ) => item?.mime_type || '',
 	render: ( { item } ) => item?.mime_type || '-',

@@ -79,7 +79,7 @@ function formatFileSize( bytes: number, decimals = 2 ): string {
 
 const filesizeField: Partial< Field< MediaItem > > = {
 	id: 'filesize',
-	type: 'text',
+	type: 'string',
 	label: __( 'File size' ),
 	getValue: ( { item }: { item: MediaItem } ) =>
 		item?.media_details?.filesize

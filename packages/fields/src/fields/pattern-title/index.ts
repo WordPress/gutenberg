@@ -12,7 +12,7 @@ import { getItemTitle } from '../../actions/utils';
 import PatternTitleView from './view';
 
 const patternTitleField: Field< Pattern > = {
-	type: 'text',
+	type: 'string',
 	id: 'title',
 	label: __( 'Title' ),
 	placeholder: __( 'No title' ),

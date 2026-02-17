@@ -12,7 +12,7 @@ import { getItemTitle } from '../../actions/utils';
 import TitleView from './view';
 
 const titleField: Field< CommonPost > = {
-	type: 'text',
+	type: 'string',
 	id: 'title',
 	label: __( 'Title' ),
 	placeholder: __( 'No title' ),

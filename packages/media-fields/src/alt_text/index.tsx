@@ -8,7 +8,7 @@ import type { Attachment, Updatable } from '@wordpress/core-data';
 
 const altTextField: Partial< Field< Updatable< Attachment > > > = {
 	id: 'alt_text',
-	type: 'text',
+	type: 'string',
 	label: __( 'Alt text' ),
 	isVisible: ( item ) => item?.media_type === 'image',
 	render: ( { item } ) => item?.alt_text || '-',

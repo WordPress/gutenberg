@@ -13,7 +13,7 @@ import { getRawContent } from '../utils/get-raw-content';
 
 const captionField: Partial< Field< Updatable< Attachment > > > = {
 	id: 'caption',
-	type: 'text',
+	type: 'string',
 	label: __( 'Caption' ),
 	getValue: ( { item } ) => getRawContent( item?.caption ),
 	render: ( { item } ) => getRawContent( item?.caption ) || '-',

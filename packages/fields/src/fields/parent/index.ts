@@ -13,7 +13,7 @@ import { ParentView } from './parent-view';
 
 const parentField: Field< BasePost > = {
 	id: 'parent',
-	type: 'text',
+	type: 'string',
 	label: __( 'Parent' ),
 	Edit: ParentEdit,
 	render: ParentView,

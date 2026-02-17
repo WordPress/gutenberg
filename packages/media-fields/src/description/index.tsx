@@ -13,7 +13,7 @@ import { getRawContent } from '../utils/get-raw-content';
 
 const descriptionField: Partial< Field< Updatable< Attachment > > > = {
 	id: 'description',
-	type: 'text',
+	type: 'string',
 	label: __( 'Description' ),
 	getValue: ( { item } ) => getRawContent( item?.description ),
 	render: ( { item } ) => (

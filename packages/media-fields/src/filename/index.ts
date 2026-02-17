@@ -13,7 +13,7 @@ import FileNameView from './view';
 
 const filenameField: Partial< Field< MediaItem > > = {
 	id: 'filename',
-	type: 'text',
+	type: 'string',
 	label: __( 'File name' ),
 	getValue: ( { item }: { item: MediaItem } ) =>
 		getFilename( item?.source_url || '' ),
