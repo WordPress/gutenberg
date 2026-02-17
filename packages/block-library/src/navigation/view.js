@@ -75,12 +75,16 @@ function checkSubmenuOverflow( submenuContainer ) {
 	// where submenus can open horizontally
 	if ( ! window.matchMedia( '(min-width: 782px)' ).matches ) {
 		// On small screens, ensure the class is not present
-		parentItem.classList.remove( 'submenu-opens-on-horizontal-hover' );
+		if ( parentItem.classList.contains( 'submenu-opens-on-horizontal-hover' ) ) {
+			parentItem.classList.remove( 'submenu-opens-on-horizontal-hover' );
+		}
 		return;
 	}
 
 	// Add the class first (enables horizontal opening) to get accurate measurements
-	parentItem.classList.add( 'submenu-opens-on-horizontal-hover' );
+	if ( ! parentItem.classList.contains( 'submenu-opens-on-horizontal-hover' ) ) {
+		parentItem.classList.add( 'submenu-opens-on-horizontal-hover' );
+	}
 
 	// Get the parent's position
 	const parentRect = parentItem.getBoundingClientRect();
