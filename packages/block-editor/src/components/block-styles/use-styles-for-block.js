@@ -15,6 +15,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { getActiveStyle, getRenderedStyles, replaceActiveStyle } from './utils';
 import { store as blockEditorStore } from '../../store';
+import { cleanEmptyObject } from '../../hooks/utils';
 
 /**
  *
@@ -83,8 +84,34 @@ export default function useStylesForBlocks( { clientId, onSwitch } ) {
 			activeStyle,
 			style
 		);
+
+		// When applying a block style, clear color-related attributes so that
+		// the block style's CSS can take effect. This is necessary because
+		// explicit color attributes (like those set by patterns) take precedence
+		// over CSS classes.
+		const updatedStyle = cleanEmptyObject( {
+			...block?.attributes?.style,
+			color: {
+				...block?.attributes?.style?.color,
+				background: undefined,
+				text: undefined,
+				gradient: undefined,
+			},
+			elements: {
+				...block?.attributes?.style?.elements,
+				link: cleanEmptyObject( {
+					...block?.attributes?.style?.elements?.link,
+					color: undefined,
+				} ),
+			},
+		} );
+
 		updateBlockAttributes( clientId, {
 			className: styleClassName,
+			backgroundColor: undefined,
+			textColor: undefined,
+			gradient: undefined,
+			style: updatedStyle,
 		} );
 		onSwitch();
 	};
