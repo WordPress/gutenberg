@@ -9,7 +9,7 @@ import { type PostEditorAwarenessState } from '@wordpress/core-data';
 
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
-import { getAvatarBorderColor } from '../collab-sidebar/utils';
+import { getAvatarBorderColor } from '../collaborators-overlay/avatar-colors';
 
 import './styles/collaborators-list.scss';
 
