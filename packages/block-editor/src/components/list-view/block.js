@@ -54,9 +54,7 @@ import { useBlockRename, BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
-import { useBlockVisibility } from '../block-visibility';
-import { deviceTypeKey } from '../../store/private-keys';
-import { BLOCK_VISIBILITY_VIEWPORTS } from '../block-visibility/constants';
+import { BLOCK_VISIBILITY_VIEWPORT_ENTRIES } from '../block-visibility/constants';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -127,50 +125,66 @@ function ListViewBlock( {
 
 	const pasteStyles = usePasteStyles();
 
-	const { block, blockName, allowRightClickOverrides, selectedDeviceType } =
-		useSelect(
-			( select ) => {
-				const { getBlock, getBlockName, getSettings } = unlock(
-					select( blockEditorStore )
-				);
-
-				return {
-					block: getBlock( clientId ),
-					blockName: getBlockName( clientId ),
-					allowRightClickOverrides:
-						getSettings().allowRightClickOverrides,
-					selectedDeviceType:
-						getSettings()?.[ deviceTypeKey ]?.toLowerCase() ||
-						BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
-				};
-			},
-			[ clientId ]
-		);
-	const { canRename } = useBlockRename( blockName );
-	// Use hook to get current viewport and if block is currently hidden (accurate viewport detection)
-	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
-		blockVisibility: block?.attributes?.metadata?.blockVisibility,
-		deviceType: selectedDeviceType,
-	} );
-
-	// Determine label based on whether block or parent is hidden
-	const blockVisibilityDescription = useMemo( () => {
-		if ( isBlockCurrentlyHidden ) {
-			if ( block?.attributes?.metadata?.blockVisibility === false ) {
-				return __( 'Block is hidden' );
-			}
-			return sprintf(
-				/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
-				__( 'Block is hidden on %s' ),
-				BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ]?.label ||
-					currentViewport
+	const { block, blockName, allowRightClickOverrides } = useSelect(
+		( select ) => {
+			const { getBlock, getBlockName, getSettings } = unlock(
+				select( blockEditorStore )
 			);
+
+			return {
+				block: getBlock( clientId ),
+				blockName: getBlockName( clientId ),
+				allowRightClickOverrides:
+					getSettings().allowRightClickOverrides,
+			};
+		},
+		[ clientId ]
+	);
+	const { canRename } = useBlockRename( blockName );
+
+	const { isBlockHiddenAnywhere } = useSelect(
+		( select ) => {
+			return {
+				isBlockHiddenAnywhere: unlock(
+					select( blockEditorStore )
+				).isBlockHiddenAnywhere( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	// Determine label based on where block is hidden (not when/current viewport)
+	const blockVisibilityDescription = useMemo( () => {
+		if ( ! isBlockHiddenAnywhere ) {
+			return null;
 		}
+
+		const blockVisibility = block?.attributes?.metadata?.blockVisibility;
+
+		if ( blockVisibility === false ) {
+			// Hidden on all viewports
+			return __( 'Block is hidden' );
+		}
+
+		if ( blockVisibility?.viewport ) {
+			// Hidden on specific viewports - list them
+			const hiddenViewports = BLOCK_VISIBILITY_VIEWPORT_ENTRIES.filter(
+				( [ key ] ) => blockVisibility.viewport[ key ] === false
+			).map( ( [ , viewport ] ) => viewport.label );
+
+			if ( hiddenViewports.length > 0 ) {
+				return sprintf(
+					/* translators: %s: comma-separated list of viewport names (Desktop, Tablet, Mobile) */
+					__( 'Block is hidden on %s' ),
+					hiddenViewports.join( ', ' )
+				);
+			}
+		}
+
 		return null;
 	}, [
-		isBlockCurrentlyHidden,
+		isBlockHiddenAnywhere,
 		block?.attributes?.metadata?.blockVisibility,
-		currentViewport,
 	] );
 
 	const showBlockActions =
