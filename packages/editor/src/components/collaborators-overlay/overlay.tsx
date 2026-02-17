@@ -48,12 +48,12 @@ const COLLABORATORS_OVERLAY_STYLES = `
 
 /* ── Avatar component (compiled from packages/components/src/avatar/styles.scss) ── */
 .components-avatar {
+	position: relative;
 	display: inline-flex;
 	align-items: center;
 	border-radius: 9999px;
 	overflow: clip;
 	flex-shrink: 0;
-	background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 	box-shadow: 0 0 0 var(--wp-admin-border-width-focus, 2px) #fff, ${ ELEVATION_X_SMALL };
 }
 .components-avatar__image {
@@ -111,6 +111,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 .components-avatar.is-badge {
 	display: inline-grid;
 	grid-template-columns: min-content 0fr;
+	background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
 	column-gap: 0;
 	padding-inline-end: 0;
 	transition:

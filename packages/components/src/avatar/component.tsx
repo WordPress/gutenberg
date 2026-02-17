@@ -71,12 +71,12 @@ function Avatar( {
 		>
 			<span className="components-avatar__image">
 				{ ! src && initials }
-				{ dimmed && !! statusIndicator && (
-					<span className="components-avatar__status-indicator">
-						<Icon icon={ statusIndicator } />
-					</span>
-				) }
 			</span>
+			{ dimmed && !! statusIndicator && (
+				<span className="components-avatar__status-indicator">
+					<Icon icon={ statusIndicator } />
+				</span>
+			) }
 			{ showBadge && (
 				<span className="components-avatar__name">
 					{ label || name }
