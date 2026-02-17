@@ -74,7 +74,7 @@ export function CollaboratorsPresence( {
 						otherActiveCollaborators.length
 					) }
 				>
-					<AvatarGroup max={ 3 }>
+					<AvatarGroup max={ 4 }>
 						{ otherActiveCollaborators.map(
 							( collaboratorState ) => (
 								<Avatar
