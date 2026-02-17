@@ -68,13 +68,33 @@ function checkSubmenuOverflow( submenuContainer ) {
 		'.wp-block-navigation__submenu-container'
 	);
 
-	// For top-level submenus on medium+ screens, they open horizontally to the right
-	// We need to check if opening to the right would overflow
-	const submenuWidth = submenuContainer.offsetWidth || 200; // Default minimum width from CSS
-
 	// Only check for overflow on medium+ breakpoints (782px+)
 	// where submenus open horizontally
 	if ( window.matchMedia( '(min-width: 782px)' ).matches ) {
+		// Temporarily make submenu visible to measure it if needed
+		const wasHidden =
+			submenuContainer.style.visibility === 'hidden' ||
+			window.getComputedStyle( submenuContainer ).visibility === 'hidden';
+		if ( wasHidden ) {
+			submenuContainer.style.visibility = 'hidden';
+			submenuContainer.style.display = 'block';
+			submenuContainer.style.opacity = '0';
+		}
+
+		// Get the submenu width (use scrollWidth for accuracy)
+		const submenuWidth = Math.max(
+			submenuContainer.offsetWidth,
+			submenuContainer.scrollWidth,
+			200 // Minimum width from CSS
+		);
+
+		// Restore visibility
+		if ( wasHidden ) {
+			submenuContainer.style.visibility = '';
+			submenuContainer.style.display = '';
+			submenuContainer.style.opacity = '';
+		}
+
 		// Calculate where the right edge of the submenu would be
 		// if it opens to the right
 		const submenuRightEdge = parentRect.right + submenuWidth;
