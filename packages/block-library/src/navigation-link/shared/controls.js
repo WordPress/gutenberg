@@ -72,17 +72,17 @@ function getEntityTypeName( type, kind ) {
  * This component provides the inspector controls (ToolsPanel) that are identical
  * between both navigation blocks.
  *
- * @param {Object}   props                     - Component props
- * @param {Object}   props.attributes          - Block attributes
- * @param {Function} props.setAttributes       - Function to update block attributes
- * @param {string}   props.clientId            - Block client ID
- * @param {boolean}  props.openSubmenusOnClick - Whether submenus open on click (for Submenu blocks only)
+ * @param {Object}   props                - Component props
+ * @param {Object}   props.attributes     - Block attributes
+ * @param {Function} props.setAttributes  - Function to update block attributes
+ * @param {string}   props.clientId       - Block client ID
+ * @param {boolean}  props.isLinkEditable - Whether link editing should be allowed
  */
 export function Controls( {
 	attributes,
 	setAttributes,
 	clientId,
-	openSubmenusOnClick = false,
+	isLinkEditable = true,
 } ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
@@ -194,7 +194,7 @@ export function Controls( {
 				/>
 			</ToolsPanelItem>
 
-			{ ! openSubmenusOnClick && (
+			{ isLinkEditable && (
 				<ToolsPanelItem
 					hasValue={ () => !! url }
 					label={ __( 'Link to' ) }
@@ -221,7 +221,7 @@ export function Controls( {
 				</ToolsPanelItem>
 			) }
 
-			{ url && ! openSubmenusOnClick && (
+			{ url && isLinkEditable && (
 				<HStack
 					className="navigation-link-to__actions"
 					alignment="left"

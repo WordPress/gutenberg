@@ -305,14 +305,14 @@ describe( 'Controls', () => {
 		} );
 	} );
 
-	describe( 'openSubmenusOnClick prop', () => {
-		it( 'hides Link to control when openSubmenusOnClick is true', () => {
-			const propsWithOpenOnClick = {
+	describe( 'isLinkEditable prop', () => {
+		it( 'hides Link to control when isLinkEditable is false', () => {
+			const propsWithNonEditableLink = {
 				...defaultProps,
-				openSubmenusOnClick: true,
+				isLinkEditable: false,
 			};
 
-			render( <Controls { ...propsWithOpenOnClick } /> );
+			render( <Controls { ...propsWithNonEditableLink } /> );
 
 			// Link to control should not be visible
 			expect( screen.queryByText( 'Link to' ) ).not.toBeInTheDocument();
@@ -330,17 +330,17 @@ describe( 'Controls', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'shows Link to control when openSubmenusOnClick is false (default)', () => {
+		it( 'shows Link to control when isLinkEditable is true (default)', () => {
 			render( <Controls { ...defaultProps } /> );
 
 			// Link to control should be visible
 			expect( screen.getByText( 'Link to' ) ).toBeInTheDocument();
 		} );
 
-		it( 'hides View/Edit buttons when openSubmenusOnClick is true', () => {
+		it( 'hides View/Edit buttons when isLinkEditable is false', () => {
 			const propsWithUrl = {
 				...defaultProps,
-				openSubmenusOnClick: true,
+				isLinkEditable: false,
 				attributes: {
 					...defaultProps.attributes,
 					url: 'https://example.com',
