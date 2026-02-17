@@ -28,6 +28,11 @@
 	min-width: 0;
 }
 
+// Fix for Stack blocks (vertical orientation) - embeds need explicit width to maintain aspect ratio.
+.wp-block-group.is-layout-flex.is-vertical .wp-block-embed {
+	width: 100%;
+}
+
 .wp-block-embed {
 	overflow-wrap: break-word; // Break long strings of text without spaces so they don't overflow the block.
 
