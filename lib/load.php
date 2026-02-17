@@ -106,6 +106,8 @@ require __DIR__ . '/compat/wordpress-7.0/preload.php';
 require __DIR__ . '/compat/wordpress-7.0/auto-register.php';
 require __DIR__ . '/compat/wordpress-7.0/blocks.php';
 require __DIR__ . '/compat/wordpress-7.0/kses.php';
+require __DIR__ . '/compat/class-wp-icons-registry.php';
+require __DIR__ . '/compat/class-wp-rest-icons-controller.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -200,6 +202,4 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 // Block patterns for navigation overlays.
 require __DIR__ . '/overlay-patterns.php';
 
-// SVG Icons API.
-require __DIR__ . '/experimental/class-wp-icons-registry.php';
-require __DIR__ . '/experimental/class-wp-rest-icons-controller.php';
+
