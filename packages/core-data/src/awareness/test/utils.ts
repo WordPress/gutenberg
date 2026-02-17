@@ -31,9 +31,6 @@ describe( 'Awareness Utils', () => {
 			slug: 'test-user',
 			avatar_urls: sharedAvatarUrls,
 			browserType: 'Chrome',
-			color: '#3858E9',
-			strokeColor: '#3858e9',
-			backgroundColor: '#3858e9',
 			enteredAt: 1704067200000,
 			...overrides,
 		} );
@@ -125,51 +122,6 @@ describe( 'Awareness Utils', () => {
 			).toBe( false );
 		} );
 
-		test( 'should return false when color differs', () => {
-			const collaboratorInfo1 = createCollaboratorInfo( {
-				color: '#3858E9',
-			} );
-			const collaboratorInfo2 = createCollaboratorInfo( {
-				color: '#B42AED',
-			} );
-			expect(
-				areCollaboratorInfosEqual(
-					collaboratorInfo1,
-					collaboratorInfo2
-				)
-			).toBe( false );
-		} );
-
-		test( 'should return false when strokeColor differs', () => {
-			const collaboratorInfo1 = createCollaboratorInfo( {
-				strokeColor: '#3858e9',
-			} );
-			const collaboratorInfo2 = createCollaboratorInfo( {
-				strokeColor: '#9500ff',
-			} );
-			expect(
-				areCollaboratorInfosEqual(
-					collaboratorInfo1,
-					collaboratorInfo2
-				)
-			).toBe( false );
-		} );
-
-		test( 'should return false when backgroundColor differs', () => {
-			const collaboratorInfo1 = createCollaboratorInfo( {
-				backgroundColor: '#3858e9',
-			} );
-			const collaboratorInfo2 = createCollaboratorInfo( {
-				backgroundColor: '#9500ff',
-			} );
-			expect(
-				areCollaboratorInfosEqual(
-					collaboratorInfo1,
-					collaboratorInfo2
-				)
-			).toBe( false );
-		} );
-
 		test( 'should return false when enteredAt differs', () => {
 			const collaboratorInfo1 = createCollaboratorInfo( {
 				enteredAt: 1000,
@@ -231,7 +183,7 @@ describe( 'Awareness Utils', () => {
 
 		test( 'should generate collaboratorInfo with user properties', () => {
 			const user = createMockUser( { id: 42, name: 'Jane Doe' } );
-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user );
 
 			expect( collaboratorInfo.id ).toBe( 42 );
 			expect( collaboratorInfo.name ).toBe( 'Jane Doe' );
@@ -240,7 +192,7 @@ describe( 'Awareness Utils', () => {
 
 		test( 'should include browser type', () => {
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Chrome' );
 		} );
@@ -250,7 +202,7 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:89.0) Gecko/20100101 Firefox/89.0'
 			);
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Firefox' );
 		} );
@@ -260,7 +212,7 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36 Edg/91.0.864.59'
 			);
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Microsoft Edge' );
 		} );
@@ -270,7 +222,7 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.1 Safari/605.1.15'
 			);
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Safari' );
 		} );
@@ -280,7 +232,7 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; SLCC2; .NET CLR 2.0.50727; MSIE 10.0; rv:11.0) like Gecko'
 			);
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Internet Explorer' );
 		} );
@@ -290,7 +242,7 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; rv:11.0) like Gecko'
 			);
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Internet Explorer' );
 		} );
@@ -300,7 +252,7 @@ describe( 'Awareness Utils', () => {
 				'Opera/9.80 (Windows NT 6.1; WOW64) Presto/2.12.388 Version/12.18'
 			);
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Opera' );
 		} );
@@ -313,7 +265,7 @@ describe( 'Awareness Utils', () => {
 				'Mozilla/5.0 (Windows NT 10.0; Win64; x64) OPR/77.0.4054.203'
 			);
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Opera' );
 		} );
@@ -321,86 +273,16 @@ describe( 'Awareness Utils', () => {
 		test( 'should return Unknown for unrecognized browser', () => {
 			mockUserAgent( 'Some Unknown Browser/1.0' );
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user );
 
 			expect( collaboratorInfo.browserType ).toBe( 'Unknown' );
 		} );
 
 		test( 'should include enteredAt timestamp', () => {
 			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user );
 
 			expect( collaboratorInfo.enteredAt ).toBe( 1704067200000 );
-		} );
-
-		test( 'should assign a color from the palette when no existing colors', () => {
-			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
-
-			const colorPalette = [
-				'#3858E9',
-				'#9500FF',
-				'#FF0080',
-				'#F4800B',
-				'#FF00EA',
-				'#C3E619',
-				'#4DB3A2',
-				'#00D5FF',
-			];
-			expect( colorPalette ).toContain( collaboratorInfo.color );
-		} );
-
-		test( 'should derive strokeColor and backgroundColor from seed', () => {
-			const user = createMockUser();
-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
-
-			expect( collaboratorInfo.strokeColor ).toMatch( /^#[0-9a-f]{6}$/i );
-			expect( collaboratorInfo.backgroundColor ).toMatch(
-				/^#[0-9a-f]{6}$/i
-			);
-		} );
-
-		test( 'should avoid existing colors when assigning', () => {
-			const user = createMockUser();
-			const existingColors = [
-				'#3858E9',
-				'#9500FF',
-				'#FF0080',
-				'#F4800B',
-				'#FF00EA',
-				'#C3E619',
-				'#4DB3A2',
-			];
-			const collaboratorInfo = generateCollaboratorInfo(
-				user,
-				existingColors
-			);
-
-			// The only available color from the palette is #00D5FF (cyan)
-			expect( collaboratorInfo.color ).toBe( '#00D5FF' );
-		} );
-
-		test( 'should generate color variation when all palette colors are in use', () => {
-			const user = createMockUser();
-			const existingColors = [
-				'#3858E9',
-				'#9500FF',
-				'#FF0080',
-				'#F4800B',
-				'#FF00EA',
-				'#C3E619',
-				'#4DB3A2',
-				'#00D5FF',
-			];
-			const collaboratorInfo = generateCollaboratorInfo(
-				user,
-				existingColors
-			);
-
-			// Should be a valid hex color
-			expect( collaboratorInfo.color ).toMatch( /^#[0-9a-f]{6}$/i );
-			// And should not be one of the original colors
-			// (it's a hue-rotated variation)
 		} );
 
 		test( 'should include avatar_urls from user', () => {
@@ -411,7 +293,7 @@ describe( 'Awareness Utils', () => {
 					'96': 'https://example.com/large.png',
 				},
 			} );
-			const collaboratorInfo = generateCollaboratorInfo( user, [] );
+			const collaboratorInfo = generateCollaboratorInfo( user );
 
 			expect( collaboratorInfo.avatar_urls ).toEqual( {
 				'24': 'https://example.com/small.png',

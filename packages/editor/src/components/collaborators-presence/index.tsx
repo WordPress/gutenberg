@@ -16,6 +16,7 @@ import {
 	resolveGravatarUrl,
 } from '../collaborators-overlay/gravatar-check';
 import { useResolveGravatars } from '../collaborators-overlay/use-resolve-gravatars';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 import './styles/collaborators-presence.scss';
 import { CollaboratorsOverlay } from '../collaborators-overlay';
@@ -102,10 +103,9 @@ export function CollaboratorsPresence( {
 									name={
 										collaboratorState.collaboratorInfo.name
 									}
-									borderColor={
-										collaboratorState.collaboratorInfo
-											.strokeColor
-									}
+									borderColor={ getAvatarBorderColor(
+										collaboratorState.collaboratorInfo.id
+									) }
 									size="small"
 								/>
 							)

@@ -12,6 +12,7 @@ import { useEffect, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 const { useActiveCollaborators } = unlock( coreDataPrivateApis );
 
@@ -70,7 +71,9 @@ export function useBlockHighlighting(
 
 					return {
 						blockId: selection.blockId,
-						color: userState.collaboratorInfo.strokeColor,
+						color: getAvatarBorderColor(
+							userState.collaboratorInfo.id
+						),
 					};
 				}
 

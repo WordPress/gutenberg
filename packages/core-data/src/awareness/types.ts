@@ -14,9 +14,6 @@ export type CollaboratorInfo = Pick<
 	'id' | 'name' | 'slug' | 'avatar_urls'
 > & {
 	browserType: string;
-	color: string;
-	strokeColor: string;
-	backgroundColor: string;
 	enteredAt: number;
 };
 

@@ -12,6 +12,7 @@ import {
 	getAvatarUrl,
 	resolveGravatarUrl,
 } from '../collaborators-overlay/gravatar-check';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 import './styles/collaborators-list.scss';
 
@@ -80,10 +81,9 @@ export function CollaboratorsList( {
 									)
 								) }
 								name={ collaboratorState.collaboratorInfo.name }
-								borderColor={
-									collaboratorState.collaboratorInfo
-										.strokeColor
-								}
+								borderColor={ getAvatarBorderColor(
+									collaboratorState.collaboratorInfo.id
+								) }
 							/>
 							<div className="editor-collaborators-presence__list-item-info">
 								<div className="editor-collaborators-presence__list-item-name">

@@ -8,6 +8,7 @@ import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl, resolveGravatarUrl } from './gravatar-check';
 import { useResolveGravatars } from './use-resolve-gravatars';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 const { useActiveCollaborators, useGetAbsolutePositionIndex } =
 	unlock( coreDataPrivateApis );
@@ -82,7 +83,7 @@ export function useRenderCursors(
 				};
 				const userName = user.collaboratorInfo.name;
 				const clientId = user.clientId;
-				const color = user.collaboratorInfo.backgroundColor;
+				const color = getAvatarBorderColor( user.collaboratorInfo.id );
 				const avatarUrl = resolveGravatarUrl(
 					getAvatarUrl( user.collaboratorInfo.avatar_urls )
 				);
