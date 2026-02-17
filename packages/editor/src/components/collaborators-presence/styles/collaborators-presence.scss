@@ -46,27 +46,4 @@
 		outline: none;
 	}
 
-	// Avatar remaining count
-	.editor-collaborators-presence__remaining {
-		margin-right: $grid-unit-05 + 2;
-	}
-
-	// Avatar styles
-	.editor-collaborators-presence__avatar {
-		margin-left: -$grid-unit-20;
-		flex-shrink: 0;
-
-		&:nth-child(1) {
-			margin-left: 0;
-			z-index: 3;
-		}
-
-		&:nth-child(2) {
-			z-index: 2;
-		}
-
-		&:nth-child(3) {
-			z-index: 1;
-		}
-	}
 }

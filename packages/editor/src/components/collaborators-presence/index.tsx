@@ -1,4 +1,7 @@
-import { Button } from '@wordpress/components';
+import {
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import {
 	privateApis,
@@ -6,7 +9,6 @@ import {
 } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
 
-import { Avatar } from './avatar';
 import { CollaboratorsList } from './list';
 import { unlock } from '../../lock-unlock';
 
@@ -14,19 +16,30 @@ import './styles/collaborators-presence.scss';
 import { CollaboratorsOverlay } from '../collaborators-overlay';
 
 const { useActiveCollaborators } = unlock( privateApis );
+const { Avatar, AvatarGroup } = unlock( componentsPrivateApis );
 
 interface CollaboratorsPresenceProps {
 	postId: number | null;
 	postType: string | null;
 }
 
+function getAvatarUrl(
+	collaboratorInfo: PostEditorAwarenessState[ 'collaboratorInfo' ]
+) {
+	return (
+		collaboratorInfo.avatar_urls?.[ 48 ] ||
+		collaboratorInfo.avatar_urls?.[ 96 ] ||
+		collaboratorInfo.avatar_urls?.[ 24 ]
+	);
+}
+
 /**
  * Renders a list of avatars for the active collaborators, with a maximum of 3 visible avatars.
  * Shows a popover with all collaborators on hover.
  *
- * @param {Object} props          CollaboratorsPresence component props
- * @param {number} props.postId   ID of the post
- * @param {string} props.postType Type of the post
+ * @param props          CollaboratorsPresence component props
+ * @param props.postId   ID of the post
+ * @param props.postType Type of the post
  */
 export function CollaboratorsPresence( {
 	postId,
@@ -54,13 +67,7 @@ export function CollaboratorsPresence( {
 		return null;
 	}
 
-	const visibleCollaborators = otherActiveCollaborators.slice( 0, 3 );
-	const remainingCollaborators = otherActiveCollaborators.slice( 3 );
-	const remainingCollaboratorsText = remainingCollaborators
-		.map( ( { collaboratorInfo } ) => collaboratorInfo.name )
-		.join( ', ' );
-
-	return visibleCollaborators.length > 0 ? (
+	return (
 		<>
 			<div className="editor-collaborators-presence">
 				<Button
@@ -75,25 +82,26 @@ export function CollaboratorsPresence( {
 						otherActiveCollaborators.length
 					) }
 				>
-					{ visibleCollaborators.map( ( collaboratorState ) => (
-						<Avatar
-							key={ collaboratorState.clientId }
-							collaboratorInfo={
-								collaboratorState.collaboratorInfo
-							}
-							showCollaboratorColorBorder
-							size="small"
-						/>
-					) ) }
-
-					{ remainingCollaborators.length > 0 && (
-						<div
-							className="editor-collaborators-presence__remaining"
-							title={ remainingCollaboratorsText }
-						>
-							+{ remainingCollaborators.length }
-						</div>
-					) }
+					<AvatarGroup max={ 3 }>
+						{ otherActiveCollaborators.map(
+							( collaboratorState ) => (
+								<Avatar
+									key={ collaboratorState.clientId }
+									src={ getAvatarUrl(
+										collaboratorState.collaboratorInfo
+									) }
+									name={
+										collaboratorState.collaboratorInfo.name
+									}
+									borderColor={
+										collaboratorState.collaboratorInfo
+											.strokeColor
+									}
+									size="small"
+								/>
+							)
+						) }
+					</AvatarGroup>
 				</Button>
 				{ isPopoverVisible && (
 					<CollaboratorsList
@@ -105,5 +113,5 @@ export function CollaboratorsPresence( {
 			</div>
 			<CollaboratorsOverlay postId={ postId } postType={ postType } />
 		</>
-	) : null;
+	);
 }
