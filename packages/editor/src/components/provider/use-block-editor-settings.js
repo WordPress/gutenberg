@@ -57,7 +57,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'clearBlockSelection',
 	'codeEditingEnabled',
 	'colors',
-	'disableContentOnlySections',
+	'disableContentOnlyForUnsyncedPatterns',
 	'disableCustomColors',
 	'disableCustomFontSizes',
 	'disableCustomSpacingSizes',

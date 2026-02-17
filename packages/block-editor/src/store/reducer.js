@@ -2398,13 +2398,13 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	// don't apply contentOnly mode to nested unsynced patterns or template parts.
 	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
 
-	const disableContentOnlySections =
-		state.settings?.disableContentOnlySections;
+	const disableContentOnlyForUnsyncedPatterns =
+		state.settings?.disableContentOnlyForUnsyncedPatterns;
 
 	// Use array.from for better back compat. Older versions of the iterator returned
 	// from `keys()` didn't have the `filter` method.
 	const unsyncedPatternClientIds =
-		isIsolatedEditor || disableContentOnlySections
+		isIsolatedEditor || disableContentOnlyForUnsyncedPatterns
 			? []
 			: Array.from( state.blocks.attributes.keys() ).filter(
 					( clientId ) =>
@@ -2706,10 +2706,10 @@ export function withDerivedBlockEditingModes( reducer ) {
 				// Handle unsynced patterns which indicate their contentOnly-ness via
 				// the `attributes.metadata.patternName` property.
 				// Check when this is added or removed and update blockEditingModes.
-				const disableContentOnlySections =
-					nextState.settings?.disableContentOnlySections;
+				const disableContentOnlyForUnsyncedPatterns =
+					nextState.settings?.disableContentOnlyForUnsyncedPatterns;
 
-				if ( disableContentOnlySections ) {
+				if ( disableContentOnlyForUnsyncedPatterns ) {
 					break;
 				}
 
@@ -2926,12 +2926,14 @@ export function withDerivedBlockEditingModes( reducer ) {
 			}
 			case 'UPDATE_SETTINGS': {
 				// Recompute the entire tree if the section root or
-				// the effective disableContentOnlySections value changes.
+				// the effective disableContentOnlyForUnsyncedPatterns value changes.
 				if (
 					state?.settings?.[ sectionRootClientIdKey ] !==
 						nextState?.settings?.[ sectionRootClientIdKey ] ||
-					!! state?.settings?.disableContentOnlySections !==
-						!! nextState?.settings?.disableContentOnlySections
+					!! state?.settings
+						?.disableContentOnlyForUnsyncedPatterns !==
+						!! nextState?.settings
+							?.disableContentOnlyForUnsyncedPatterns
 				) {
 					return {
 						...nextState,
