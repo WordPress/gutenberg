@@ -36,8 +36,8 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 		$tag_processor->remove_attribute( 'hidden' );
 
 		// Set tab-specific attributes
-		$tag_processor->set_attribute( 'id', esc_attr( 'tab__' . $tab_id ) );
-		$tag_processor->set_attribute( 'aria-controls', esc_attr( $tab_id ) );
+		$tag_processor->set_attribute( 'id', 'tab__' . $tab_id );
+		$tag_processor->set_attribute( 'aria-controls', $tab_id );
 
 		// Add IAPI directives
 		$tag_processor->set_attribute( 'data-wp-on--click', 'actions.handleTabClick' );

@@ -34,7 +34,6 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array() ): arr
 							$tab_id = $tag_processor->get_attribute( 'id' ) ?? '';
 						}
 					}
-
 					if ( empty( $tab_id ) ) {
 						$tab_id = 'tab-' . $tab_index;
 					}
