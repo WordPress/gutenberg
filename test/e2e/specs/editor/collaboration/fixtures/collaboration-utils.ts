@@ -51,29 +51,15 @@ export default class CollaborationUtils {
 	}
 
 	/**
-	 * Enable the real-time collaboration WordPress setting.
+	 * Set the real-time collaboration WordPress setting.
 	 *
 	 * Uses the form-based approach (similar to setGutenbergExperiments)
 	 * because this setting is registered on admin_init in the "writing"
 	 * group and is not exposed via /wp/v2/settings.
-	 */
-	async enableCollaboration() {
-		await this.setCollaborationOption( true );
-	}
-
-	/**
-	 * Disable the real-time collaboration WordPress setting.
-	 */
-	async disableCollaboration() {
-		await this.setCollaborationOption( false );
-	}
-
-	/**
-	 * Toggle the real-time collaboration setting via the Writing settings form.
 	 *
 	 * @param enabled Whether to enable or disable collaboration.
 	 */
-	private async setCollaborationOption( enabled: boolean ) {
+	async setCollaboration( enabled: boolean ) {
 		const response = await this.requestUtils.request.get(
 			'/wp-admin/options-writing.php'
 		);
@@ -252,7 +238,7 @@ export default class CollaborationUtils {
 			this.secondPage = null;
 			this.secondEditor = null;
 		}
-		await this.disableCollaboration();
+		await this.setCollaboration( false );
 		await this.requestUtils.deleteAllUsers();
 	}
 }

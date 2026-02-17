@@ -24,7 +24,7 @@ export const test = base.extend< Fixtures >( {
 			requestUtils,
 			page,
 		} );
-		await utils.enableCollaboration();
+		await utils.setCollaboration( true );
 		await requestUtils.createUser( SECOND_USER );
 		await use( utils );
 		await utils.teardown();
