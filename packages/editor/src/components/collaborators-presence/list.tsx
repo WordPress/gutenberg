@@ -4,7 +4,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { close } from '@wordpress/icons';
+import { closeSmall } from '@wordpress/icons';
 import { type PostEditorAwarenessState } from '@wordpress/core-data';
 
 import { unlock } from '../../lock-unlock';
@@ -51,8 +51,8 @@ export function CollaboratorsList( {
 					<div className="editor-collaborators-presence__list-header-action">
 						<Button
 							__next40pxDefaultSize
-							icon={ close }
-							iconSize={ 16 }
+							icon={ closeSmall }
+							iconSize={ 24 }
 							label={ __( 'Close Collaborators List' ) }
 							onClick={ () => setIsPopoverVisible( false ) }
 						/>
