@@ -36,6 +36,7 @@ jest.mock( '../../../lock-unlock', () => ( {
 import {
 	computeDisplayUrl,
 	computeBadges,
+	getActionableStatus,
 	useLinkPreview,
 } from '../use-link-preview';
 
@@ -294,6 +295,143 @@ it( 'should show "Page" badge for internal custom links', () => {
 	expect( badges ).not.toContainEqual( {
 		label: 'Custom',
 		intent: 'default',
+	} );
+} );
+
+describe( 'getActionableStatus', () => {
+	describe( 'error states', () => {
+		it( 'should return error for missing entity', () => {
+			const status = getActionableStatus( {
+				url: '/some-page',
+				type: 'page',
+				hasBinding: true,
+				isEntityAvailable: false,
+			} );
+
+			expect( status ).toEqual( {
+				label: 'Missing page',
+				intent: 'error',
+			} );
+		} );
+
+		it( 'should return error for no URL', () => {
+			const status = getActionableStatus( {
+				url: '',
+			} );
+
+			expect( status ).toEqual( {
+				label: 'No link selected',
+				intent: 'error',
+			} );
+		} );
+
+		it( 'should return error for trash status', () => {
+			const status = getActionableStatus( {
+				url: '/my-page',
+				type: 'page',
+				entityStatus: 'trash',
+			} );
+
+			expect( status ).toEqual( {
+				label: 'Trash',
+				intent: 'error',
+			} );
+		} );
+	} );
+
+	describe( 'warning states', () => {
+		it( 'should return warning for draft status', () => {
+			const status = getActionableStatus( {
+				url: '/my-draft',
+				type: 'post',
+				entityStatus: 'draft',
+			} );
+
+			expect( status ).toEqual( {
+				label: 'Draft',
+				intent: 'warning',
+			} );
+		} );
+
+		it( 'should return warning for pending status', () => {
+			const status = getActionableStatus( {
+				url: '/my-post',
+				type: 'post',
+				entityStatus: 'pending',
+			} );
+
+			expect( status ).toEqual( {
+				label: 'Pending',
+				intent: 'warning',
+			} );
+		} );
+
+		it( 'should return warning for scheduled status', () => {
+			const status = getActionableStatus( {
+				url: '/my-post',
+				type: 'post',
+				entityStatus: 'future',
+			} );
+
+			expect( status ).toEqual( {
+				label: 'Scheduled',
+				intent: 'warning',
+			} );
+		} );
+	} );
+
+	describe( 'no action needed', () => {
+		it( 'should return null for published status', () => {
+			const status = getActionableStatus( {
+				url: '/my-page',
+				type: 'page',
+				entityStatus: 'publish',
+			} );
+
+			expect( status ).toBeNull();
+		} );
+
+		it( 'should return null for private status', () => {
+			const status = getActionableStatus( {
+				url: '/my-page',
+				type: 'page',
+				entityStatus: 'private',
+			} );
+
+			expect( status ).toBeNull();
+		} );
+
+		it( 'should return null for external links', () => {
+			const status = getActionableStatus( {
+				url: 'https://example.com',
+			} );
+
+			expect( status ).toBeNull();
+		} );
+
+		it( 'should return null for internal links without entity status', () => {
+			const status = getActionableStatus( {
+				url: '/some-page',
+				type: 'page',
+			} );
+
+			expect( status ).toBeNull();
+		} );
+	} );
+
+	describe( 'priority', () => {
+		it( 'should prioritize missing entity over no URL', () => {
+			// This shouldn't happen in practice, but test priority
+			const status = getActionableStatus( {
+				url: '',
+				type: 'page',
+				hasBinding: true,
+				isEntityAvailable: false,
+			} );
+
+			expect( status.intent ).toBe( 'error' );
+			expect( status.label ).toBe( 'Missing page' );
+		} );
 	} );
 } );
 

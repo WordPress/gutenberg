@@ -14,7 +14,9 @@ import {
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { useContext } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
+import { info, error } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -28,6 +30,7 @@ import {
 	LinkUI,
 	updateAttributes,
 	useEntityBinding,
+	getActionableStatus,
 } from '../../navigation-link/shared';
 
 const actionLabel =
@@ -160,6 +163,99 @@ const MainContent = ( {
 
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
+	// Get all navigation-link blocks with their entity data
+	const navigationLinksWithEntity = useSelect(
+		( select ) => {
+			const { getBlocks } = select( blockEditorStore );
+			const { getEntityRecord } = select( coreStore );
+			const allBlocks = getBlocks( clientId );
+
+			// Recursively get all navigation-link and navigation-submenu blocks
+			const getAllNavigationLinks = ( blocks ) => {
+				return blocks.flatMap( ( block ) => {
+					const isNavigationLink =
+						block.name === 'core/navigation-link' ||
+						block.name === 'core/navigation-submenu';
+					const children =
+						block.innerBlocks.length > 0
+							? getAllNavigationLinks( block.innerBlocks )
+							: [];
+					if ( ! isNavigationLink ) {
+						return children;
+					}
+
+					// Get entity data if the link has an ID and type
+					const { id, type, kind } = block.attributes || {};
+					let entityRecord = null;
+					let isEntityAvailable = true;
+
+					// Fetch entity record for any link with id/kind/type (bound or not)
+					if ( id && kind && type ) {
+						const isPostType = kind === 'post-type';
+						const isTaxonomy = kind === 'taxonomy';
+
+						if ( isPostType || isTaxonomy ) {
+							const entityType = isTaxonomy
+								? 'taxonomy'
+								: 'postType';
+							const typeForAPI =
+								type === 'tag' ? 'post_tag' : type;
+							entityRecord = getEntityRecord(
+								entityType,
+								typeForAPI,
+								id
+							);
+							isEntityAvailable = !! entityRecord;
+						}
+					}
+
+					return [
+						{
+							block,
+							entityRecord,
+							isEntityAvailable,
+						},
+						...children,
+					];
+				} );
+			};
+
+			return getAllNavigationLinks( allBlocks );
+		},
+		[ clientId ]
+	);
+
+	// Compute icon overrides for navigation links that need status indicators
+	const blockIconOverrides = useMemo( () => {
+		const overrides = new Map();
+
+		navigationLinksWithEntity.forEach(
+			( { block, entityRecord, isEntityAvailable } ) => {
+				const { url, type, metadata, id } = block.attributes || {};
+				const hasUrlBinding = !! metadata?.bindings?.url && !! id;
+
+				const status = getActionableStatus( {
+					url,
+					type,
+					entityStatus: entityRecord?.status,
+					hasBinding: hasUrlBinding,
+					isEntityAvailable,
+				} );
+
+				if ( status ) {
+					const isError = status.intent === 'error';
+					overrides.set( block.clientId, {
+						src: isError ? error : info,
+						foreground: isError ? '#660c0c' : '#f0b849',
+						label: status.label,
+					} );
+				}
+			}
+		);
+
+		return overrides;
+	}, [ navigationLinksWithEntity ] );
+
 	if ( currentMenuId && isNavigationMenuMissing ) {
 		return (
 			<DeletedNavigationWarning onCreateNew={ onCreateNew } isNotice />
@@ -195,6 +291,7 @@ const MainContent = ( {
 				showAppender
 				blockSettingsMenu={ LeafMoreMenu }
 				additionalBlockContent={ AdditionalBlockContent }
+				blockIconOverrides={ blockIconOverrides }
 				onSelect={ openListViewContentPanel }
 			/>
 		</div>

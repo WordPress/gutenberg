@@ -75,6 +75,59 @@ export function computeDisplayUrl( { linkUrl, siteUrl } = {} ) {
 }
 
 /**
+ * Get actionable status for a navigation item.
+ * Returns status information only for items that require user action (error or warning states).
+ *
+ * @param {Object}  options                   - Options object
+ * @param {string}  options.url               - Link URL
+ * @param {string}  options.type              - Entity type (page, post, etc.)
+ * @param {string}  options.entityStatus      - Entity status (publish, draft, etc.)
+ * @param {boolean} options.hasBinding        - Whether link has entity binding
+ * @param {boolean} options.isEntityAvailable - Whether bound entity exists
+ * @return {Object|null} Object with label and intent, or null if no action needed
+ */
+export function getActionableStatus( {
+	url,
+	type,
+	entityStatus,
+	hasBinding,
+	isEntityAvailable,
+} ) {
+	// Check for error states first (highest priority)
+	if ( hasBinding && ! isEntityAvailable ) {
+		return {
+			label: sprintf(
+				/* translators: %s is the entity type (e.g., "page", "post", "category") */
+				__( 'Missing %s' ),
+				type
+			),
+			intent: 'error',
+		};
+	}
+
+	if ( ! url ) {
+		return { label: __( 'No link selected' ), intent: 'error' };
+	}
+
+	// Check for warning/error states in entity status
+	if ( entityStatus ) {
+		const actionableStatuses = {
+			draft: { label: __( 'Draft' ), intent: 'warning' },
+			pending: { label: __( 'Pending' ), intent: 'warning' },
+			future: { label: __( 'Scheduled' ), intent: 'warning' },
+			trash: { label: __( 'Trash' ), intent: 'error' },
+		};
+
+		if ( actionableStatuses[ entityStatus ] ) {
+			return actionableStatuses[ entityStatus ];
+		}
+	}
+
+	// No action needed
+	return null;
+}
+
+/**
  * Compute badges for the link preview.
  *
  * @param {Object}  options                   - Options object
@@ -123,28 +176,25 @@ export function computeBadges( {
 		}
 	}
 
-	// Status badge
-	if ( hasBinding && ! isEntityAvailable ) {
-		badges.push( {
-			label: sprintf(
-				/* translators: %s is the entity type (e.g., "page", "post", "category") */
-				__( 'Missing %s' ),
-				type
-			),
-			intent: 'error',
-		} );
-	} else if ( ! url ) {
-		badges.push( { label: __( 'No link selected' ), intent: 'error' } );
+	// Status badge - reuse getActionableStatus for error/warning states
+	const actionableStatus = getActionableStatus( {
+		url,
+		type,
+		entityStatus,
+		hasBinding,
+		isEntityAvailable,
+	} );
+
+	if ( actionableStatus ) {
+		// Add error or warning status badge
+		badges.push( actionableStatus );
 	} else if ( entityStatus ) {
-		const statusMap = {
+		// Only add success/default badges if no actionable status
+		const nonActionableStatusMap = {
 			publish: { label: __( 'Published' ), intent: 'success' },
-			future: { label: __( 'Scheduled' ), intent: 'warning' },
-			draft: { label: __( 'Draft' ), intent: 'warning' },
-			pending: { label: __( 'Pending' ), intent: 'warning' },
 			private: { label: __( 'Private' ), intent: 'default' },
-			trash: { label: __( 'Trash' ), intent: 'error' },
 		};
-		const badge = statusMap[ entityStatus ];
+		const badge = nonActionableStatusMap[ entityStatus ];
 		if ( badge ) {
 			badges.push( badge );
 		}
