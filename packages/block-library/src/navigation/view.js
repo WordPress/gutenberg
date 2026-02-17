@@ -48,7 +48,7 @@ function getFocusableElements( ref ) {
 
 /**
  * Checks if a submenu would overflow the viewport horizontally.
- * If it would overflow, adds a class to open it downward instead.
+ * If it would overflow, adds a class to revert to mobile positioning.
  *
  * @param {HTMLElement} submenuContainer - The submenu container element
  */
@@ -72,7 +72,7 @@ function checkSubmenuOverflow( submenuContainer ) {
 	}
 
 	// Remove the class first to get accurate measurements
-	parentItem.classList.remove( 'open-downward' );
+	parentItem.classList.remove( 'submenu-revert-overflow' );
 
 	// Only check for overflow on medium+ breakpoints (782px+)
 	// where submenus open horizontally
@@ -130,9 +130,9 @@ function checkSubmenuOverflow( submenuContainer ) {
 	// if it opens to the right
 	const submenuRightEdge = parentRect.right + submenuWidth;
 
-	// If submenu would overflow viewport, open it downward instead
+	// If submenu would overflow viewport, revert to mobile positioning
 	if ( submenuRightEdge > viewportWidth ) {
-		parentItem.classList.add( 'open-downward' );
+		parentItem.classList.add( 'submenu-revert-overflow' );
 	}
 }
 
