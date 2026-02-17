@@ -233,9 +233,8 @@ test.describe( 'List (@firefox)', () => {
 		editor,
 		page,
 	} ) => {
-		await editor.canvas
-			.locator( 'role=button[name="Add default block"i]' )
-			.click();
+		await editor.insertBlock( { name: 'core/paragraph' } );
+		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '* ' );
 		await expect(
 			editor.canvas.locator( '[data-type="core/list"]' )
