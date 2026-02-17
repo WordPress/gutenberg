@@ -146,7 +146,7 @@ const MenuInspectorControls = ( props ) => {
 	return (
 		<InspectorControls group="list">
 			<PanelBody
-				title={ __( 'Navigation' ) }
+				title={ blockTitle }
 				opened={ isOpened }
 				onToggle={ handleToggle }
 			>
