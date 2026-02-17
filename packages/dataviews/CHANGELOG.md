@@ -5,6 +5,7 @@
 ### Breaking Changes
 
 - The design tokens stylesheet (`@wordpress/theme/design-tokens.css`) is no longer embedded in the DataViews stylesheet. Applications using DataViews outside of WordPress must now explicitly include the design tokens stylesheet. See the README for installation instructions. [#75182](https://github.com/WordPress/gutenberg/pull/75182)
+- Rename `text` field type to `string` to align with block.json API. [#74105](https://github.com/WordPress/gutenberg/pull/74105)
 
 ### Bug Fixes
 
