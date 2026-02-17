@@ -7,7 +7,7 @@
 	border-radius: $grid-unit-05;
 	width: calc(100% - #{$grid-unit-40});
 	margin: auto;
-	max-width: 400px;
+	max-width: 512px;
 	position: relative;
 	top: calc(5% + #{$header-height});
 
@@ -173,6 +173,21 @@
 	white-space: nowrap;
 	flex: 1;
 	min-width: 0;
+}
+
+.commands-command-menu__item-category {
+	flex: 0 0 auto;
+	margin-left: auto;
+	padding-left: $grid-unit-30;
+	color: $gray-700;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+	text-align: right;
+
+	[aria-selected="true"] &,
+	[cmdk-item]:active & {
+		color: rgba($white, 0.8);
+	}
 }
 
 .commands-command-menu__item-category {
