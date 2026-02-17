@@ -35,10 +35,9 @@ import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import {
-	BLOCK_VISIBILITY_VIEWPORTS,
-	BLOCK_VISIBILITY_VIEWPORT_ENTRIES,
-} from '../block-visibility/constants';
+import { BLOCK_VISIBILITY_VIEWPORTS } from '../block-visibility/constants';
+import useBlockVisibility from '../block-visibility/use-block-visibility';
+import { deviceTypeKey } from '../../store/private-keys';
 
 const { Badge } = unlock( componentsPrivateApis );
 
@@ -66,17 +65,26 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { isBlockHidden, hasPatternName, blockVisibility } = useSelect(
+	const {
+		isBlockHidden,
+		hasPatternName,
+		blockVisibility,
+		selectedDeviceType,
+	} = useSelect(
 		( select ) => {
 			const {
 				isBlockHiddenAnywhere: _isBlockHidden,
 				getBlockAttributes,
+				getSettings,
 			} = unlock( select( blockEditorStore ) );
 			const attributes = getBlockAttributes( clientId );
 			return {
 				isBlockHidden: _isBlockHidden( clientId ),
 				hasPatternName: !! attributes?.metadata?.patternName,
 				blockVisibility: attributes?.metadata?.blockVisibility,
+				selectedDeviceType:
+					getSettings()?.[ deviceTypeKey ]?.toLowerCase() ||
+					BLOCK_VISIBILITY_VIEWPORTS.desktop.value,
 			};
 		},
 		[ clientId ]
@@ -86,27 +94,25 @@ function ListViewBlockSelectButton(
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
 
-	// Determine which viewports the block is hidden on.
-	let hiddenViewports = [];
-	if ( isBlockHidden ) {
-		if ( blockVisibility === false ) {
-			hiddenViewports = Object.values( BLOCK_VISIBILITY_VIEWPORTS );
-		} else if ( blockVisibility?.viewport ) {
-			hiddenViewports = BLOCK_VISIBILITY_VIEWPORT_ENTRIES.filter(
-				( [ key ] ) => blockVisibility.viewport[ key ] === false
-			).map( ( [ , viewport ] ) => viewport );
-		}
-	}
+	// Use hook to get current viewport and if block is currently hidden
+	const { isBlockCurrentlyHidden, currentViewport } = useBlockVisibility( {
+		blockVisibility,
+		deviceType: selectedDeviceType,
+	} );
 
+	// Determine visibility label and current viewport icon
 	let visibilityLabel;
+	let currentViewportIcon;
 	if ( isBlockHidden ) {
 		if ( blockVisibility === false ) {
 			visibilityLabel = __( 'Hidden on all viewports' );
-		} else if ( hiddenViewports.length > 0 ) {
+		} else if ( isBlockCurrentlyHidden && currentViewport ) {
+			const viewport = BLOCK_VISIBILITY_VIEWPORTS[ currentViewport ];
+			currentViewportIcon = viewport?.icon;
 			visibilityLabel = sprintf(
-				/* translators: %s: comma-separated list of viewport names (Desktop, Tablet, Mobile) */
+				/* translators: %s: viewport name (Desktop, Tablet, Mobile) */
 				__( 'Hidden on %s' ),
-				hiddenViewports.map( ( v ) => v.label ).join( ', ' )
+				viewport?.label || currentViewport
 			);
 		}
 	}
@@ -195,16 +201,14 @@ function ListViewBlockSelectButton(
 				) : null }
 				{ isBlockHidden && (
 					<Tooltip text={ visibilityLabel }>
-						<span className="block-editor-list-view-block-select-button__block-visibility">
+						<span
+							className="block-editor-list-view-block-select-button__block-visibility"
+							aria-hidden="true"
+						>
 							<Icon icon={ unseen } />
-							{ blockVisibility !== false &&
-								hiddenViewports.map( ( viewport ) => (
-									<Icon
-										key={ viewport.key }
-										icon={ viewport.icon }
-										size={ 20 }
-									/>
-								) ) }
+							{ currentViewportIcon && (
+								<Icon icon={ currentViewportIcon } />
+							) }
 						</span>
 					</Tooltip>
 				) }
