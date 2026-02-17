@@ -88,7 +88,7 @@ function ListViewBlockSelectButton(
 	if ( isBlockHidden ) {
 		if ( blockVisibility === false ) {
 			// Hidden on all viewports
-			visibilityLabel = __( 'Hidden on all viewports' );
+			visibilityLabel = __( 'Block is hidden' );
 		} else if ( blockVisibility?.viewport ) {
 			// Hidden on specific viewports - list them
 			const hiddenViewports = BLOCK_VISIBILITY_VIEWPORT_ENTRIES.filter(
