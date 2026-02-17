@@ -25,11 +25,10 @@ import {
 	__experimentalUseBorderProps as useBorderProps,
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getDimensionsClassesAndStyles as useDimensionsProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -40,12 +39,9 @@ import { CustomInserterModal } from './components';
 import { unlock } from '../lock-unlock';
 
 export function Edit( { attributes, setAttributes } ) {
-	const { icon, ariaLabel, style } = attributes;
+	const { icon, ariaLabel } = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
-
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
 
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
 
@@ -57,30 +53,6 @@ export function Edit( { attributes, setAttributes } ) {
 	const allIcons = useSelect( ( select ) => {
 		return unlock( select( coreDataStore ) ).getIcons();
 	}, [] );
-
-	// Is the width value is 0, reset it to the minimum value.
-	useEffect( () => {
-		if (
-			! style?.dimensions?.width ||
-			parseFloat( style?.dimensions?.width ) === 0
-		) {
-			// To avoid interfering with undo/redo operations any changes in this
-			// effect must not make history and should be preceded by
-			// `__unstableMarkNextChangeAsNotPersistent()`.
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				style: {
-					...style,
-					dimensions: { ...style?.dimensions, width: '12px' },
-				},
-			} );
-		}
-	}, [
-		icon,
-		style,
-		setAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
-	] );
 
 	const iconToDisplay =
 		allIcons?.length > 0
