@@ -9,12 +9,8 @@ import {
 } from '@wordpress/core-data';
 import { useState, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	DataViews,
-	DataForm,
-	filterSortAndPaginate,
-} from '@wordpress/dataviews';
+import { useSelect } from '@wordpress/data';
+import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import { useEvent, usePrevious } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
@@ -279,39 +275,6 @@ export default function PostList( { postType } ) {
 		);
 	};
 
-	const { editEntityRecord } = useDispatch( coreStore );
-
-	const testRecord = useSelect(
-		( select ) => {
-			if ( postType !== 'page' || ! data?.length ) {
-				return null;
-			}
-			return select( coreStore ).getEditedEntityRecord(
-				'postType',
-				postType,
-				data[ 0 ].id
-			);
-		},
-		[ postType, data ]
-	);
-
-	const testFormConfig = useMemo(
-		() => ( {
-			type: 'regular',
-			fields: [ 'test_media_gallery' ],
-		} ),
-		[]
-	);
-
-	const testFormOnChange = useCallback(
-		( edits ) => {
-			if ( data?.length ) {
-				editEntityRecord( 'postType', postType, data[ 0 ].id, edits );
-			}
-		},
-		[ editEntityRecord, postType, data ]
-	);
-
 	return (
 		<Page
 			title={ labels?.name }
@@ -338,16 +301,6 @@ export default function PostList( { postType } ) {
 				</>
 			}
 		>
-			{ testRecord && (
-				<div style={ { padding: '20px' } }>
-					<DataForm
-						data={ testRecord }
-						fields={ fields }
-						form={ testFormConfig }
-						onChange={ testFormOnChange }
-					/>
-				</div>
-			) }
 			<DataViews
 				key={ activeView }
 				paginationInfo={ paginationInfo }
