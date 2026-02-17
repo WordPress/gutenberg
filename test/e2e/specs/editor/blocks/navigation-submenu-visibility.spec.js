@@ -6,6 +6,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Navigation block - Submenu Visibility', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deleteAllMenus();
+		await requestUtils.deleteAllPages();
 	} );
 
 	test.beforeEach( async ( { admin, editor, requestUtils } ) => {
@@ -256,8 +257,5 @@ test.describe( 'Navigation block - Submenu Visibility', () => {
 			await expect( laptopsLink ).toBeVisible();
 			await expect( phonesLink ).toBeVisible();
 		} );
-
-		// Clean up
-		await requestUtils.deleteAllPages();
 	} );
 } );
