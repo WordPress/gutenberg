@@ -6,9 +6,9 @@
  */
 
 /**
- * Exposes blocks with auto_register flag for ServerSideRender in the editor.
+ * Exposes blocks with autoRegister flag for ServerSideRender in the editor.
  *
- * Detects blocks that have the auto_register flag set in their supports
+ * Detects blocks that have the autoRegister flag set in their supports
  * and passes them to JavaScript for auto-registration with ServerSideRender.
  */
 function _gutenberg_enqueue_auto_register_blocks( $settings ) {
@@ -16,7 +16,7 @@ function _gutenberg_enqueue_auto_register_blocks( $settings ) {
 	$registered_blocks    = WP_Block_Type_Registry::get_instance()->get_all_registered();
 
 	foreach ( $registered_blocks as $block_name => $block_type ) {
-		if ( ! empty( $block_type->supports['auto_register'] ) && ! empty( $block_type->render_callback ) ) {
+		if ( ! empty( $block_type->supports['autoRegister'] ) && ! empty( $block_type->render_callback ) ) {
 			$auto_register_blocks[] = $block_name;
 		}
 	}
@@ -59,7 +59,7 @@ function gutenberg_mark_auto_generate_control_attributes( array $args ): array {
 		return $args;
 	}
 
-	$has_auto_register = ! empty( $args['supports']['auto_register'] );
+	$has_auto_register = ! empty( $args['supports']['autoRegister'] );
 	if ( ! $has_auto_register ) {
 		return $args;
 	}
