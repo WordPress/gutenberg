@@ -9,21 +9,57 @@ import {
 	__experimentalView as View,
 	__experimentalText as Text,
 	Navigator,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
 } from '@wordpress/components';
-import { isRTL, __ } from '@wordpress/i18n';
-import { chevronRight, chevronLeft } from '@wordpress/icons';
+import { isRTL, __, sprintf } from '@wordpress/i18n';
+import { chevronRight, chevronLeft, chevronDown } from '@wordpress/icons';
 
 interface ScreenHeaderProps {
 	title: string;
 	description?: string | React.ReactElement;
 	onBack?: () => void;
+	pseudoSelectors?: string[];
+	selectedPseudoSelector?: string;
+	onChangePseudoSelector?: ( value: string ) => void;
 }
 
 export function ScreenHeader( {
 	title,
 	description,
 	onBack,
+	pseudoSelectors,
+	selectedPseudoSelector = 'default',
+	onChangePseudoSelector,
 }: ScreenHeaderProps ) {
+	const hasPseudoSelectors =
+		pseudoSelectors && pseudoSelectors.length > 0 && onChangePseudoSelector;
+
+	const stateOptions = hasPseudoSelectors
+		? [
+				{ label: __( 'Default' ), value: 'default' },
+				...pseudoSelectors.map( ( pseudo ) => {
+					// Convert :hover to Hover, :focus-visible to Focus Visible
+					const label = pseudo
+						.replace( /^:/, '' )
+						.replace( /-/g, ' ' )
+						.replace( /\b\w/g, ( char ) => char.toUpperCase() );
+					return {
+						label,
+						value: pseudo,
+					};
+				} ),
+		  ]
+		: [];
+
+	const getCurrentStateLabel = () => {
+		const currentOption = stateOptions.find(
+			( option ) => option.value === selectedPseudoSelector
+		);
+		return currentOption?.label || __( 'Default' );
+	};
+
 	return (
 		<VStack spacing={ 0 }>
 			<View>
@@ -37,13 +73,55 @@ export function ScreenHeader( {
 								onClick={ onBack }
 							/>
 							<Spacer>
-								<Heading
-									className="global-styles-ui-header"
-									level={ 2 }
-									size={ 13 }
-								>
-									{ title }
-								</Heading>
+								<HStack spacing={ 2 } alignment="center">
+									<Heading
+										className="global-styles-ui-header"
+										level={ 2 }
+										size={ 13 }
+									>
+										{ title }
+									</Heading>
+									{ hasPseudoSelectors && (
+										<DropdownMenu
+											icon={ chevronDown }
+											label={ sprintf(
+												/* translators: %s: Current state (e.g. "Hover", "Focus") */
+												__( 'State: %s' ),
+												getCurrentStateLabel()
+											) }
+											text={ getCurrentStateLabel() }
+											toggleProps={ {
+												size: 'compact',
+											} }
+										>
+											{ ( { onClose } ) => (
+												<MenuGroup>
+													{ stateOptions.map(
+														( option ) => (
+															<MenuItem
+																key={
+																	option.value
+																}
+																onClick={ () => {
+																	onChangePseudoSelector(
+																		option.value
+																	);
+																	onClose();
+																} }
+																isPressed={
+																	selectedPseudoSelector ===
+																	option.value
+																}
+															>
+																{ option.label }
+															</MenuItem>
+														)
+													) }
+												</MenuGroup>
+											) }
+										</DropdownMenu>
+									) }
+								</HStack>
 							</Spacer>
 						</HStack>
 						{ description && (

@@ -5,6 +5,59 @@ import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 
 /**
+ * Valid pseudo selectors for elements.
+ * This mirrors the PHP constant in lib/class-wp-theme-json-gutenberg.php
+ */
+export const VALID_ELEMENT_PSEUDO_SELECTORS: Record< string, string[] > = {
+	link: [
+		':link',
+		':any-link',
+		':visited',
+		':hover',
+		':focus',
+		':focus-visible',
+		':active',
+	],
+	button: [
+		':link',
+		':any-link',
+		':visited',
+		':hover',
+		':focus',
+		':focus-visible',
+		':active',
+	],
+};
+
+/**
+ * Valid pseudo selectors for blocks.
+ * This mirrors the PHP constant in lib/class-wp-theme-json-gutenberg.php
+ */
+export const VALID_BLOCK_PSEUDO_SELECTORS: Record< string, string[] > = {
+	'core/button': [ ':hover', ':focus', ':focus-visible', ':active' ],
+};
+
+/**
+ * Get the valid pseudo selectors for a given block or element.
+ *
+ * @param name The block name (e.g., 'core/button') or element name (e.g., 'button')
+ * @return Array of valid pseudo selectors, or empty array if none
+ */
+export function getValidPseudoSelectors( name: string ): string[] {
+	// Check if it's a block
+	if ( VALID_BLOCK_PSEUDO_SELECTORS[ name ] ) {
+		return VALID_BLOCK_PSEUDO_SELECTORS[ name ];
+	}
+
+	// Check if it's an element
+	if ( VALID_ELEMENT_PSEUDO_SELECTORS[ name ] ) {
+		return VALID_ELEMENT_PSEUDO_SELECTORS[ name ];
+	}
+
+	return [];
+}
+
+/**
  * Removes all instances of properties from an object.
  *
  * @param object     The object to remove the properties from.

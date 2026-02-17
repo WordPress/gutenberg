@@ -5,7 +5,7 @@
 import { getBlockType } from '@wordpress/blocks';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useContext, useMemo } from '@wordpress/element';
+import { useContext, useMemo, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -33,6 +33,7 @@ import {
 import { useStyle, useSetting } from './hooks';
 import { GlobalStylesContext } from './context';
 import { unlock } from './lock-unlock';
+import { getValidPseudoSelectors } from './utils';
 
 // Initial control values.
 const BACKGROUND_BLOCK_DEFAULT_VALUES = {
@@ -109,13 +110,51 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 	}
 	const prefix = prefixParts.join( '.' );
 
-	const [ style ] = useStyle( prefix, name, 'user', false );
-	const [ inheritedStyle, setStyle ] = useStyle(
+	// Pseudo selector state
+	const [ selectedPseudoSelector, setSelectedPseudoSelector ] =
+		useState< string >( 'default' );
+	const validPseudoSelectors = useMemo(
+		() => getValidPseudoSelectors( name ),
+		[ name ]
+	);
+
+	const [ rawStyle ] = useStyle( prefix, name, 'user', false );
+	const [ rawInheritedStyle, rawSetStyle ] = useStyle(
 		prefix,
 		name,
 		'merged',
 		false
 	);
+
+	// Extract style for the selected pseudo selector
+	const style = useMemo( () => {
+		if ( selectedPseudoSelector === 'default' ) {
+			return rawStyle || {};
+		}
+		return rawStyle?.[ selectedPseudoSelector ] || {};
+	}, [ rawStyle, selectedPseudoSelector ] );
+
+	const inheritedStyle = useMemo( () => {
+		if ( selectedPseudoSelector === 'default' ) {
+			return rawInheritedStyle || {};
+		}
+		return rawInheritedStyle?.[ selectedPseudoSelector ] || {};
+	}, [ rawInheritedStyle, selectedPseudoSelector ] );
+
+	// Wrapper for setStyle that handles pseudo selectors
+	const setStyle = ( newStyle: any ) => {
+		if ( selectedPseudoSelector === 'default' ) {
+			rawSetStyle( newStyle );
+		} else {
+			// Merge the new style into the pseudo selector
+			const updatedStyle = {
+				...rawStyle,
+				[ selectedPseudoSelector ]: newStyle,
+			};
+			rawSetStyle( updatedStyle );
+		}
+	};
+
 	const [ userSettings ] = useSetting( '', name, 'user' );
 	const [ rawSettings, setSettings ] = useSetting( '', name );
 	const settingsForBlockElement = useSettingsForBlockElement(
@@ -312,6 +351,9 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				title={
 					variation ? currentBlockStyle?.label : blockType?.title
 				}
+				pseudoSelectors={ validPseudoSelectors }
+				selectedPseudoSelector={ selectedPseudoSelector }
+				onChangePseudoSelector={ setSelectedPseudoSelector }
 			/>
 			<BlockPreviewPanel name={ name } variation={ variation } />
 			{ hasVariationsPanel && (
