@@ -201,5 +201,3 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 
 // Block patterns for navigation overlays.
 require __DIR__ . '/overlay-patterns.php';
-
-
