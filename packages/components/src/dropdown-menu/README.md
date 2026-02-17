@@ -67,6 +67,7 @@ const MyDropdownMenu = () => (
 	<DropdownMenu
 		icon={ more }
 		label="Select a direction"
+		toggleProps={ { size: 'compact' } }
 		controls={ [
 			{
 				title: 'Up',
@@ -100,7 +101,11 @@ import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { more, arrowUp, arrowDown, trash } from '@wordpress/icons';
 
 const MyDropdownMenu = () => (
-	<DropdownMenu icon={ more } label="Select a direction">
+	<DropdownMenu
+		icon={ more }
+		label="Select a direction"
+		toggleProps={ { size: 'compact' } }
+	>
 		{ ( { onClose } ) => (
 			<>
 				<MenuGroup>

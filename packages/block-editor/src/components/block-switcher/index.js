@@ -334,6 +334,7 @@ export const BlockSwitcher = ( { clientIds } ) => {
 						}
 						text={ blockIndicatorText }
 						toggleProps={ {
+							size: 'compact',
 							description: blockSwitcherDescription,
 							...toggleProps,
 						} }

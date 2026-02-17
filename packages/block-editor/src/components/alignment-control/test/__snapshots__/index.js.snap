@@ -67,7 +67,7 @@ exports[`AlignmentUI should match snapshot when controls are hidden 1`] = `
       aria-expanded="false"
       aria-haspopup="true"
       aria-label="Align text"
-      class="components-button components-dropdown-menu__toggle has-icon"
+      class="components-button components-dropdown-menu__toggle is-compact has-icon"
       data-toolbar-item="true"
       type="button"
     >

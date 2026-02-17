@@ -28,6 +28,7 @@ function ToolbarGroupCollapsed( {
 			controls={ controls }
 			toggleProps={ {
 				...internalToggleProps,
+				size: 'compact',
 				'data-toolbar-item': true,
 			} }
 			{ ...props }

@@ -47,6 +47,7 @@ export default meta;
 export const Default: StoryObj< typeof DropdownMenu > = {
 	args: {
 		label: 'Select a direction.',
+		toggleProps: { size: 'compact' },
 		icon: menu,
 		controls: [
 			{
@@ -72,7 +73,11 @@ export const WithChildren: StoryObj< typeof DropdownMenu > = {
 	parameters: {
 		docs: {
 			source: {
-				code: `<DropdownMenu label="Select a direction." icon={ more }>
+				code: `<DropdownMenu
+  label="Select a direction."
+  icon={ more }
+  toggleProps={ { size: 'compact' } }
+>
   <MenuGroup>
     <MenuItem icon={ arrowUp } onClick={ onClose }>
       Move Up
@@ -94,6 +99,7 @@ export const WithChildren: StoryObj< typeof DropdownMenu > = {
 	},
 	args: {
 		label: 'Select a direction.',
+		toggleProps: { size: 'compact' },
 		icon: more,
 		children: ( { onClose } ) => (
 			<>

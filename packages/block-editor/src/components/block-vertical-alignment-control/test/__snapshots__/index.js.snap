@@ -10,7 +10,7 @@ exports[`BlockVerticalAlignmentUI should match snapshot when controls are hidden
       aria-expanded="false"
       aria-haspopup="true"
       aria-label="Change vertical alignment"
-      class="components-button components-dropdown-menu__toggle has-icon"
+      class="components-button components-dropdown-menu__toggle is-compact has-icon"
       data-toolbar-item="true"
       type="button"
     >

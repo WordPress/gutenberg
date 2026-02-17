@@ -20,6 +20,7 @@ import type {
 	DropdownOption,
 	DropdownMenuInternalContext,
 } from './types';
+import { maybeWarnDeprecated36pxSize } from '../utils/deprecated-36px-size';
 
 function mergeProps<
 	T extends { className?: string; [ key: string ]: unknown },
@@ -82,6 +83,17 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 		}
 	}
 
+	if ( toggleProps?.as === undefined ) {
+		maybeWarnDeprecated36pxSize( {
+			componentName: 'DropdownMenu',
+			__next40pxDefaultSize: toggleProps?.__next40pxDefaultSize,
+			size: toggleProps?.size,
+			feature:
+				'36px default size for default toggle button in wp.components.DropdownMenu',
+			hint: 'Set `toggleProps={ __next40pxDefaultSize: true }` to start opting into the new default size, which will become the default in a future version. For icon buttons, consider setting a non-default size like `toggleProps={ size: "compact" }`.',
+		} );
+	}
+
 	const mergedPopoverProps = mergeProps(
 		{
 			className: 'components-dropdown-menu__popover',
@@ -120,6 +132,9 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
 				return (
 					<Toggle
 						{ ...mergedToggleProps }
+						{ ...( toggleProps?.as === undefined
+							? { __shouldNotWarnDeprecated36pxSize: true }
+							: {} ) }
 						icon={ icon }
 						onClick={
 							( ( event ) => {
@@ -242,6 +257,7 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
  * 	<DropdownMenu
  * 		icon={ more }
  * 		label="Select a direction"
+ * 		toggleProps={ { size: 'compact' } }
  * 		controls={ [
  * 			{
  * 				title: 'Up',
@@ -276,7 +292,11 @@ function UnconnectedDropdownMenu( dropdownMenuProps: DropdownMenuProps ) {
  * import { more, arrowUp, arrowDown, trash } from '@wordpress/icons';
  *
  * const MyDropdownMenu = () => (
- * 	<DropdownMenu icon={ more } label="Select a direction">
+ * 	<DropdownMenu
+ * 		icon={ more }
+ * 		label="Select a direction"
+ * 		toggleProps={ { size: 'compact' } }
+ * 	>
  * 		{ ( { onClose } ) => (
  * 			<>
  * 				<MenuGroup>

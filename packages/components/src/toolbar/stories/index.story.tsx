@@ -109,7 +109,7 @@ Default.args = {
 									title: 'Align right',
 								},
 							] }
-							toggleProps={ toggleProps }
+							toggleProps={ { ...toggleProps, size: 'compact' } }
 						/>
 					) }
 				</ToolbarItem>

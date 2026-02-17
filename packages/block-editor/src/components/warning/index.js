@@ -40,6 +40,7 @@ function Warning( { className, actions, children, secondaryActions } ) {
 										className:
 											'block-editor-warning__dropdown',
 									} }
+									toggleProps={ { size: 'compact' } }
 									noIcons
 								>
 									{ () => (

@@ -12,8 +12,18 @@ import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import DropdownMenu from '..';
+import _DropdownMenu from '..';
 import MenuItem from '../../menu-item';
+
+const DropdownMenu = ( {
+	toggleProps,
+	...restProps
+}: React.ComponentProps< typeof _DropdownMenu > ) => (
+	<_DropdownMenu
+		toggleProps={ { size: 'compact', ...toggleProps } }
+		{ ...restProps }
+	/>
+);
 
 describe( 'DropdownMenu', () => {
 	it( 'should not render when neither controls nor children are assigned', () => {

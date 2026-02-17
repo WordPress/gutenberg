@@ -37,7 +37,10 @@ function ToolbarDropdownMenu(
 					popoverProps={ {
 						...props.popoverProps,
 					} }
-					toggleProps={ toolbarItemProps }
+					toggleProps={ {
+						size: 'compact',
+						...toolbarItemProps,
+					} }
 				/>
 			) }
 		</ToolbarItem>

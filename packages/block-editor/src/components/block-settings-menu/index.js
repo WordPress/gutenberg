@@ -18,7 +18,7 @@ export function BlockSettingsMenu( { clientIds, ...props } ) {
 				{ ( toggleProps ) => (
 					<BlockSettingsDropdown
 						clientIds={ clientIds }
-						toggleProps={ toggleProps }
+						toggleProps={ { ...toggleProps, size: 'compact' } }
 						{ ...props }
 					/>
 				) }

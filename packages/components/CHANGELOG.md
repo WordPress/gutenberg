@@ -15,6 +15,7 @@
 -   `RadioGroup`: Log deprecation warning ([#68067](https://github.com/WordPress/gutenberg/pull/68067)).
 -   Soft deprecate `ButtonGroup` component. Use `ToggleGroupControl` instead ([#65429](https://github.com/WordPress/gutenberg/pull/65429)).
 -   `Navigation`: Log deprecation warning for removal in WP 7.1. Use `Navigator` instead ([#68158](https://github.com/WordPress/gutenberg/pull/68158)).
+-   `DropdownMenu`: Deprecate 36px default size for default toggle button ([#68329](https://github.com/WordPress/gutenberg/pull/68329)).
 
 ### Bug Fixes
 
