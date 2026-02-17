@@ -21,6 +21,7 @@ function commands( state = {}, action ) {
 					label: action.label,
 					searchLabel: action.searchLabel,
 					context: action.context,
+					category: action.category,
 					callback: action.callback,
 					icon: action.icon,
 					keywords: action.keywords,

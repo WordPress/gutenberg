@@ -103,7 +103,7 @@ require __DIR__ . '/compat/wordpress-6.9/client-assets.php';
 
 // WordPress 7.0 compat.
 require __DIR__ . '/compat/wordpress-7.0/preload.php';
-require __DIR__ . '/compat/wordpress-7.0/php-only-blocks.php';
+require __DIR__ . '/compat/wordpress-7.0/auto-register.php';
 require __DIR__ . '/compat/wordpress-7.0/blocks.php';
 require __DIR__ . '/compat/wordpress-7.0/kses.php';
 

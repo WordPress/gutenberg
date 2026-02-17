@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import clsx from 'clsx';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -16,11 +21,14 @@ import {
 	InspectorControls,
 	useBlockProps,
 	useBlockEditingMode,
-	store as blockEditorStore,
+	__experimentalUseColorProps as useColorProps,
+	__experimentalUseBorderProps as useBorderProps,
+	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
+	getDimensionsClassesAndStyles as useDimensionsProps,
 } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -31,42 +39,20 @@ import { CustomInserterModal } from './components';
 import { unlock } from '../lock-unlock';
 
 export function Edit( { attributes, setAttributes } ) {
-	const { icon, ariaLabel, style } = attributes;
+	const { icon, ariaLabel } = attributes;
 
 	const [ isInserterOpen, setInserterOpen ] = useState( false );
 
-	const { __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
-
 	const isContentOnlyMode = useBlockEditingMode() === 'contentOnly';
+
+	const colorProps = useColorProps( attributes );
+	const spacingProps = useSpacingProps( attributes );
+	const borderProps = useBorderProps( attributes );
+	const dimensionsProps = useDimensionsProps( attributes );
 
 	const allIcons = useSelect( ( select ) => {
 		return unlock( select( coreDataStore ) ).getIcons();
 	}, [] );
-
-	// Is the width value is 0, reset it to the default value.
-	useEffect( () => {
-		if (
-			! style?.dimensions?.width ||
-			parseFloat( style?.dimensions?.width ) === 0
-		) {
-			// To avoid interfering with undo/redo operations any changes in this
-			// effect must not make history and should be preceded by
-			// `__unstableMarkNextChangeAsNotPersistent()`.
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( {
-				style: {
-					...style,
-					dimensions: { ...style?.dimensions, width: '12px' },
-				},
-			} );
-		}
-	}, [
-		icon,
-		style,
-		setAttributes,
-		__unstableMarkNextChangeAsNotPersistent,
-	] );
 
 	const iconToDisplay =
 		allIcons?.length > 0
@@ -161,13 +147,36 @@ export function Edit( { attributes, setAttributes } ) {
 			{ inspectorControls }
 			<div { ...useBlockProps() }>
 				{ icon ? (
-					<HtmlRenderer html={ iconToDisplay } />
+					<HtmlRenderer
+						html={ iconToDisplay }
+						wrapperProps={ {
+							className: clsx(
+								colorProps.className,
+								borderProps.className,
+								spacingProps.className,
+								dimensionsProps.className
+							),
+							style: {
+								...colorProps.style,
+								...borderProps.style,
+								...spacingProps.style,
+								...dimensionsProps.style,
+							},
+						} }
+					/>
 				) : (
 					<Placeholder
 						withIllustration
+						className={ clsx(
+							borderProps.className,
+							spacingProps.className,
+							dimensionsProps.className
+						) }
 						style={ {
-							height: attributes?.style?.dimensions?.width,
-							width: attributes?.style?.dimensions?.width,
+							...borderProps.style,
+							...spacingProps.style,
+							...dimensionsProps.style,
+							aspectRatio: '1',
 						} }
 					/>
 				) }

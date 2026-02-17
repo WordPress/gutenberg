@@ -76,6 +76,7 @@ export default function OverlayPanel( {
 				{ overlayMenu !== 'never' && (
 					<OverlayTemplatePartSelector
 						overlay={ overlay }
+						overlayMenu={ overlayMenu }
 						setAttributes={ setAttributes }
 						onNavigateToEntityRecord={ onNavigateToEntityRecord }
 						isCreatingOverlay={ isCreatingOverlay }

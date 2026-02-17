@@ -27,7 +27,7 @@ import { isURL } from '@wordpress/url';
  */
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
-import { useEntityBinding } from '../shared/use-entity-binding';
+import { useEntityBinding, useLinkPreview } from '../shared';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -72,6 +72,17 @@ export function getSuggestionsQuery( type, kind ) {
 
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind, id } = props.link;
+
+	const { entityRecord, hasBinding, isEntityAvailable } = props.entity || {};
+
+	const { image, badges } = useLinkPreview( {
+		url,
+		entityRecord,
+		type,
+		hasBinding,
+		isEntityAvailable,
+	} );
+
 	const { clientId } = props;
 	const postType = type || 'page';
 
@@ -106,8 +117,10 @@ function UnforwardedLinkUI( props, ref ) {
 			kind,
 			type,
 			id,
+			image,
+			badges,
 		} ),
-		[ label, opensInNewTab, url, kind, type, id ]
+		[ label, opensInNewTab, url, kind, type, id, image, badges ]
 	);
 
 	const handlePageCreated = ( pageLink ) => {

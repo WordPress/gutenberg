@@ -502,6 +502,8 @@ As a reference, some use cases for this directive may be:
 -   Setting the focus on an element with `.focus()`.
 -   Changing the state or context when certain conditions are met
 
+If you need a similar reactive callback that is not tied to a specific DOM element but runs at the store level, you can use the [`watch()` function](#watch).
+
 ### `wp-init`
 
 This directive runs a callback **only when the node is created**.
@@ -882,7 +884,6 @@ store( 'myPlugin', {
 
 You may notice the use of the [`withSyncEvent()`](#withsyncevent) utility function in this example. This is necessary due to an ongoing effort to handle store actions asynchronously by default, unless they require synchronous event access (which this example does due to the call to `event.preventDefault()`). Otherwise a deprecation warning will be triggered, and in a future release the behavior will change accordingly.
 
-
 #### Side Effects
 
 Automatically react to state changes. Usually triggered by `data-wp-watch` or `data-wp-init` directives.
@@ -1195,7 +1196,6 @@ This function serves the same purpose as `getServerContext()`, but it returns th
 
 The object returned is read-only, and includes the state defined in PHP with `wp_interactivity_state()`. When using [`actions.navigate()`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/#actions) from [`@wordpress/interactivity-router`](https://developer.wordpress.org/block-editor/reference-guides/packages/packages-interactivity-router/), the object returned by `getServerState()` is updated to reflect the changes in its properties, without affecting the state returned by `store()`. Directives can subscribe to those changes to update the state if needed.
 
-
 ```js
 const serverState = getServerState( 'namespace' );
 ```
@@ -1251,10 +1251,10 @@ Actions that require synchronous access to the `event` object need to use the `w
 
 Only very specific event methods and properties require synchronous access, so it is advised to only use `withSyncEvent()` when necessary. The following event methods and properties require synchronous access:
 
-* `event.currentTarget`
-* `event.preventDefault()`
-* `event.stopImmediatePropagation()`
-* `event.stopPropagation()`
+-   `event.currentTarget`
+-   `event.preventDefault()`
+-   `event.stopImmediatePropagation()`
+-   `event.stopPropagation()`
 
 Here is an example, where one action requires synchronous event access while the other actions do not:
 
@@ -1292,10 +1292,67 @@ store( 'myPlugin', {
 		// Combining withSyncEvent with a generator function for async operations.
 		navigate: withSyncEvent( function* ( event ) {
 			event.preventDefault();
-			const { actions } = yield import( '@wordpress/interactivity-router' );
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
 			yield actions.navigate( event.target.href );
 		} ),
 	},
+} );
+```
+
+### watch()
+
+Subscribes to changes in any signal accessed inside the callback, re-running the callback whenever those signals change. Returns a cleanup function to stop watching.
+
+Unlike `data-wp-watch`, which is a directive tied to a DOM element's lifecycle, the `watch()` function is a programmatic API that can be used anywhere in your JavaScript code, independently of the DOM.
+
+```js
+import { store, watch } from '@wordpress/interactivity';
+
+const { state } = store( 'myPlugin', {
+	state: {
+		counter: 0,
+	},
+	actions: {
+		increment: () => {
+			state.counter++;
+		},
+	},
+} );
+
+// Watch for changes to any state accessed inside the callback.
+watch( () => {
+	console.log( 'Counter is ' + state.counter );
+} );
+
+// The callback runs immediately and logs "Counter is 0".
+// Each time `state.counter` changes, it will re-run.
+```
+
+The `watch()` function returns an `unwatch` function that, when called, stops the watcher and prevents further re-runs:
+
+```js
+const unwatch = watch( () => {
+	console.log( 'Counter is ' + state.counter );
+} );
+
+// At a later point, when you want to stop watching:
+unwatch();
+```
+
+The callback passed to `watch()` can also return a cleanup function. This cleanup function runs just before the callback re-executes due to a signal change, and also when the watcher is disposed of via `unwatch()`:
+
+```js
+const unwatch = watch( () => {
+	const handler = () => { /* ... */ };
+	document.addEventListener( 'click', handler );
+
+	// This cleanup runs before the next re-execution, or when
+	// `unwatch()` is called.
+	return () => {
+		document.removeEventListener( 'click', handler );
+	};
 } );
 ```
 

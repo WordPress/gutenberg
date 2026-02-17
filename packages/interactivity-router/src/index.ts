@@ -25,6 +25,7 @@ const {
 	routerRegions,
 	h: createElement,
 	navigationSignal,
+	warn,
 } = privateApis(
 	'I acknowledge that using private APIs means my theme or plugin will inevitably break in the next version of WordPress.'
 );
@@ -394,12 +395,28 @@ interface Store {
 	};
 }
 
+const { state: privateState } = store(
+	'core/router/private',
+	{
+		state: {
+			navigation: {
+				hasStarted: false,
+				hasFinished: false,
+			},
+		},
+	},
+	{ lock: true }
+);
+
 export const { state, actions } = store< Store >( 'core/router', {
 	state: {
-		url: window.location.href,
-		navigation: {
-			hasStarted: false,
-			hasFinished: false,
+		get navigation() {
+			if ( globalThis.SCRIPT_DEBUG ) {
+				warn(
+					`The usage of state.navigation.{hasStarted|hasFinished} from core/router is deprecated and will stop working in WordPress 7.1.`
+				);
+			}
+			return privateState.navigation;
 		},
 	},
 	actions: {
@@ -428,7 +445,7 @@ export const { state, actions } = store< Store >( 'core/router', {
 			}
 
 			const pagePath = getPagePath( href );
-			const { navigation } = state;
+			const { navigation } = privateState;
 			const {
 				loadingAnimation = true,
 				screenReaderAnnouncement = true,
@@ -545,6 +562,9 @@ export const { state, actions } = store< Store >( 'core/router', {
 		},
 	},
 } );
+
+// Initialize the URL in the state if it hasn't been set yet in the server.
+state.url = state.url || window.location.href;
 
 /**
  * Announces a message to screen readers.

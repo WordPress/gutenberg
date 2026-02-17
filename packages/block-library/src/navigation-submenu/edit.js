@@ -92,7 +92,13 @@ export default function NavigationSubmenuEdit( {
 		blockEditingMode !== 'default' ? true : submenuVisibility === 'click';
 
 	// URL binding logic
-	const { clearBinding, createBinding } = useEntityBinding( {
+	const {
+		clearBinding,
+		createBinding,
+		hasUrlBinding,
+		isBoundEntityAvailable,
+		entityRecord,
+	} = useEntityBinding( {
 		clientId,
 		attributes,
 	} );
@@ -378,6 +384,11 @@ export default function NavigationSubmenuEdit( {
 						<LinkUI
 							clientId={ clientId }
 							link={ attributes }
+							entity={ {
+								entityRecord,
+								hasBinding: hasUrlBinding,
+								isEntityAvailable: isBoundEntityAvailable,
+							} }
 							onClose={ () => {
 								setIsLinkOpen( false );
 							} }

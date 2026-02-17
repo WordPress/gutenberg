@@ -8,12 +8,12 @@ import { generateFieldsFromAttributes } from '../generate-fields-from-attributes
  * In production, this marker is added by PHP during block registration.
  *
  * @param {Object} attrs - Attributes object
- * @return {Object} Attributes with __experimentalAutoInspectorControl marker
+ * @return {Object} Attributes with autoGenerateControl marker
  */
 function markForAutoInspectorControl( attrs ) {
 	const result = {};
 	for ( const [ name, def ] of Object.entries( attrs ) ) {
-		result[ name ] = { ...def, __experimentalAutoInspectorControl: true };
+		result[ name ] = { ...def, autoGenerateControl: true };
 	}
 	return result;
 }
@@ -164,11 +164,11 @@ describe( 'generateFieldsFromAttributes', () => {
 		expect( result.fields[ 0 ].label ).toBe( 'Background Color' );
 	} );
 
-	it( 'should skip attributes without __experimentalAutoInspectorControl marker', () => {
+	it( 'should skip attributes without autoGenerateControl marker', () => {
 		const attributes = {
 			userDefined: {
 				type: 'string',
-				__experimentalAutoInspectorControl: true,
+				autoGenerateControl: true,
 			},
 			supportAdded: {
 				type: 'string',

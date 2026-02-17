@@ -379,8 +379,47 @@ function Navigation( {
 		innerBlocks,
 	} = useInnerBlocks( clientId );
 
-	const hasSubmenus = !! innerBlocks.find(
-		( block ) => block.name === 'core/navigation-submenu'
+	// Use a ref to store whether we've confirmed a page-list has submenus.
+	// Once confirmed, we don't need to keep checking the page-list blocks.
+	const hasPageListWithSubmenuRef = useRef( false );
+
+	// Check for submenus using getBlocks to include controlled innerBlocks
+	const hasSubmenus = useSelect(
+		( select ) => {
+			// First check for navigation-submenu (fast, no selector needed)
+			const hasNavigationSubmenu = innerBlocks.some(
+				( block ) => block.name === 'core/navigation-submenu'
+			);
+			if ( hasNavigationSubmenu ) {
+				return true;
+			}
+
+			// Only check page-list if we didn't find a submenu already
+			const pageList = innerBlocks.find(
+				( block ) => block.name === 'core/page-list'
+			);
+			if ( ! pageList ) {
+				hasPageListWithSubmenuRef.current = false;
+				return false;
+			}
+
+			// If we've already confirmed page-list has submenus, return early
+			if ( hasPageListWithSubmenuRef.current ) {
+				return true;
+			}
+
+			// Check if the page-list has controlled innerBlocks
+			const { getBlocks } = select( blockEditorStore );
+			const pageListBlocks = getBlocks( pageList.clientId );
+			if ( pageListBlocks.length > 0 ) {
+				hasPageListWithSubmenuRef.current = true;
+				return true;
+			}
+
+			// No pageList returned with confirmed submenus, so assume it will not have submenus
+			return false;
+		},
+		[ innerBlocks ]
 	);
 
 	// Check if any overlay template parts exist
