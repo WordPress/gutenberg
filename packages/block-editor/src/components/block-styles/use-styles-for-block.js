@@ -97,13 +97,13 @@ export default function useStylesForBlocks( { clientId, onSwitch } ) {
 				text: undefined,
 				gradient: undefined,
 			},
-			elements: {
+			elements: cleanEmptyObject( {
 				...block?.attributes?.style?.elements,
 				link: cleanEmptyObject( {
 					...block?.attributes?.style?.elements?.link,
 					color: undefined,
 				} ),
-			},
+			} ),
 		} );
 
 		updateBlockAttributes( clientId, {
