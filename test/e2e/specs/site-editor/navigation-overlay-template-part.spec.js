@@ -169,5 +169,43 @@ test.describe( 'Navigation Overlay Template Part', () => {
 				'rgb(0, 0, 255)'
 			);
 		} );
+
+		test( 'As a user I want to be able to add multiple close buttons so that users can close the overlay from different positions', async ( {
+			editor,
+			page,
+		} ) => {
+			await editor.insertBlock(
+				{
+					name: 'core/navigation-overlay-close',
+				},
+				{ index: 0 }
+			);
+
+			await page
+				.getByRole( 'region', { name: 'Editor top bar' } )
+				.getByRole( 'button', { name: 'Back', exact: true } )
+				.click();
+
+			await editor.saveSiteEditorEntities();
+
+			await page.goto( '/' );
+
+			const openMenuButton = page.getByRole( 'button', {
+				name: 'Open menu',
+			} );
+			await openMenuButton.click();
+
+			const closeButtons = page.getByRole( 'button', {
+				name: 'Close',
+			} );
+			await expect( closeButtons ).toHaveCount( 2 );
+
+			await closeButtons.first().click();
+			await expect( openMenuButton ).toBeVisible();
+
+			await openMenuButton.click();
+			await closeButtons.last().click();
+			await expect( openMenuButton ).toBeVisible();
+		} );
 	} );
 } );
