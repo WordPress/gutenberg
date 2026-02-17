@@ -19,6 +19,12 @@ const focusableSelectors = [
 ];
 
 /**
+ * Minimum width for submenus in pixels.
+ * This matches the min-width: 200px set in the CSS for .wp-block-navigation__submenu-container.
+ */
+const SUBMENU_MIN_WIDTH = 200;
+
+/**
  * Gets all visible focusable elements within a container.
  * Filters out elements that are hidden.
  *
@@ -78,21 +84,19 @@ function checkSubmenuOverflow( submenuContainer ) {
 		if ( wasHidden ) {
 			submenuContainer.style.visibility = 'hidden';
 			submenuContainer.style.display = 'block';
-			submenuContainer.style.opacity = '0';
 		}
 
 		// Get the submenu width (use scrollWidth for accuracy)
 		const submenuWidth = Math.max(
 			submenuContainer.offsetWidth,
 			submenuContainer.scrollWidth,
-			200 // Minimum width from CSS
+			SUBMENU_MIN_WIDTH
 		);
 
 		// Restore visibility
 		if ( wasHidden ) {
 			submenuContainer.style.visibility = '';
 			submenuContainer.style.display = '';
-			submenuContainer.style.opacity = '';
 		}
 
 		// Calculate where the right edge of the submenu would be
