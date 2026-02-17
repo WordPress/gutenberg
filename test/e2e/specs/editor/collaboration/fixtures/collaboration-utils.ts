@@ -169,14 +169,14 @@ export default class CollaborationUtils {
 
 	/**
 	 * Wait for the collaboration runtime to be ready on a page.
-	 * Checks that `window._wpCollaborationEnabled` is true and wp.data is loaded.
+	 * Checks that `window.__wpSyncEnabled` is true and wp.data is loaded.
 	 *
 	 * @param page The Playwright page to wait on.
 	 */
 	private async waitForCollaborationReady( page: Page ) {
 		await page.waitForFunction(
 			() =>
-				( window as any )._wpCollaborationEnabled === true &&
+				( window as any ).__wpSyncEnabled === true &&
 				window?.wp?.data &&
 				window?.wp?.blocks,
 			{ timeout: 15000 }
