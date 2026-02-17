@@ -192,16 +192,20 @@ export default function useBlockSync( {
 
 		const startClientId = selection.selectionStart.clientId;
 
-		// Nested: it's ours if the external ID is in our mapping.
-		// Root: it's ours if the block exists directly in the store.
+		// Check if this selection belongs to this controller.
+		// Inner block controllers (clientId is set) own the block if
+		// the external ID appears in their clone mapping.
+		// The root controller (no clientId) owns it if the block
+		// exists directly in the store.
 		const isOurs = clientId
 			? idMappingRef.current.externalToInternal.has( startClientId )
 			: !! getBlockName( startClientId );
 
 		if ( isOurs ) {
 			appliedSelectionRef.current = selection;
-			// Convert external→internal IDs for nested controllers;
-			// root blocks use external IDs directly (no mapping needed).
+			// Inner block controllers need to convert external→internal
+			// IDs via the clone mapping; the root controller uses
+			// external IDs directly (no mapping needed).
 			const convert = ( sel ) => {
 				if ( ! sel?.clientId || ! clientId ) {
 					return sel;
@@ -450,8 +454,10 @@ export default function useBlockSync( {
 						// Report selection via onChangeSelection.
 						// Each useBlockSync only reports if the selected block
 						// is within its own scope.
-						// Nested: it's ours if the internal ID is in our mapping.
-						// Root: it's ours if not inside any controlled inner block.
+						// Inner block controllers own the block if the internal
+						// ID appears in their clone mapping.
+						// The root controller owns it if the block is not inside
+						// any controlled inner block.
 						const isOurs = clientId
 							? idMappingRef.current.internalToExternal.has(
 									newSelectionStart.clientId
