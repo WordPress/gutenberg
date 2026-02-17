@@ -85,5 +85,5 @@ if ( ! function_exists( '{{PREFIX}}_register_package_scripts' ) ) {
 		}
 	}
 
-	add_action( 'wp_default_scripts', '{{PREFIX}}_register_package_scripts' );
+	add_action( 'wp_default_scripts', '{{PREFIX}}_register_package_scripts', {{SCRIPT_PRIORITY}} );
 }

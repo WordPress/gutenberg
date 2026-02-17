@@ -23,6 +23,7 @@
 		"scriptGlobal": "wp",
 		"packageNamespace": "wordpress",
 		"handlePrefix": "wp",
+		"scriptRegistrationPriority": 10,
 		"pages": [
 			{
 				"id": "site-editor-v2",

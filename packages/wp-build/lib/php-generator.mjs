@@ -30,11 +30,15 @@ export async function getPhpReplacements( rootDir, baseUrlExpression ) {
 	// @ts-expect-error specific override to package.json
 	const name = rootPackageJson.wpPlugin?.name || 'gutenberg';
 	const version = rootPackageJson.version;
+	const scriptPriority =
+		// @ts-expect-error specific override to package.json
+		rootPackageJson.wpPlugin?.scriptRegistrationPriority ?? 9;
 
 	return {
 		'{{PREFIX}}': name,
 		'{{VERSION}}': version,
 		'{{BASE_URL}}': baseUrlExpression,
+		'{{SCRIPT_PRIORITY}}': String( scriptPriority ),
 	};
 }
 
