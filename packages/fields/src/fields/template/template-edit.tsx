@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { getItemTitle } from '../../actions/utils';
 import type { BasePost } from '../../types';
-import { getDefaultTemplateLabel } from './utils';
+import { useDefaultTemplateLabel } from './hooks';
 import { unlock } from '../../lock-unlock';
 
 const EMPTY_ARRAY: [] = [];
@@ -61,9 +61,10 @@ export const TemplateEdit = ( {
 		[ postId, postType ]
 	);
 
-	const defaultTemplateLabel = useSelect(
-		( select ) => getDefaultTemplateLabel( select, postType, postId, slug ),
-		[ postType, postId, slug ]
+	const defaultTemplateLabel = useDefaultTemplateLabel(
+		postType,
+		postId,
+		slug
 	);
 
 	const value = field.getValue( { item: data } );

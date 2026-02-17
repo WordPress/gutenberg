@@ -11,7 +11,7 @@ import type { DataViewRenderFieldProps } from '@wordpress/dataviews';
  */
 import { getItemTitle } from '../../actions/utils';
 import type { BasePost } from '../../types';
-import { getDefaultTemplateLabel } from './utils';
+import { useDefaultTemplateLabel } from './hooks';
 
 export const TemplateView = ( {
 	item,
@@ -22,25 +22,31 @@ export const TemplateView = ( {
 	const postId = item.id;
 	const templateSlug = field.getValue( { item } );
 
-	const templateLabel = useSelect(
-		( select ) => {
-			if ( templateSlug ) {
-				const allTemplates = select(
-					coreStore
-				).getEntityRecords< WpTemplate >( 'postType', 'wp_template', {
-					per_page: -1,
-					post_type: postType,
-				} );
-				const match = allTemplates?.find(
-					( t ) => t.slug === templateSlug
-				);
-				return match ? getItemTitle( match ) : templateSlug;
-			}
-
-			return getDefaultTemplateLabel( select, postType, postId, slug );
-		},
-		[ postType, postId, slug, templateSlug ]
+	const defaultTemplateLabel = useDefaultTemplateLabel(
+		postType,
+		postId,
+		slug
 	);
 
-	return <>{ templateLabel }</>;
+	const templateLabel = useSelect(
+		( select ) => {
+			if ( ! templateSlug ) {
+				return;
+			}
+
+			const allTemplates = select(
+				coreStore
+			).getEntityRecords< WpTemplate >( 'postType', 'wp_template', {
+				per_page: -1,
+				post_type: postType,
+			} );
+			const match = allTemplates?.find(
+				( t ) => t.slug === templateSlug
+			);
+			return match ? getItemTitle( match ) : undefined;
+		},
+		[ postType, templateSlug ]
+	);
+
+	return <>{ templateLabel ?? defaultTemplateLabel }</>;
 };
