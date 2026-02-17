@@ -58,7 +58,7 @@ export function Edit( { attributes, setAttributes } ) {
 		return unlock( select( coreDataStore ) ).getIcons();
 	}, [] );
 
-	// Is the width value is 0, reset it to the default value.
+	// Is the width value is 0, reset it to the minimum value.
 	useEffect( () => {
 		if (
 			! style?.dimensions?.width ||
@@ -71,7 +71,7 @@ export function Edit( { attributes, setAttributes } ) {
 			setAttributes( {
 				style: {
 					...style,
-					dimensions: { ...style?.dimensions, width: '48px' },
+					dimensions: { ...style?.dimensions, width: '12px' },
 				},
 			} );
 		}
