@@ -23,6 +23,18 @@ module.exports = {
 	create( context ) {
 		let insideSaveFunction = false;
 		const filename = context.getFilename();
+
+		// Skip deprecated files as they preserve old behavior including translation functions
+		const isDeprecatedFile =
+			filename.includes( '/deprecated.js' ) ||
+			filename.includes( '/deprecated.ts' ) ||
+			filename.includes( '/deprecated.jsx' ) ||
+			filename.includes( '/deprecated.tsx' );
+
+		if ( isDeprecatedFile ) {
+			return {};
+		}
+
 		const isSaveFile =
 			filename.endsWith( '/save.js' ) ||
 			filename.endsWith( '/save.ts' ) ||

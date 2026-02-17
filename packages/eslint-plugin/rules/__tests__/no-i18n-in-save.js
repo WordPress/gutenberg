@@ -59,6 +59,15 @@ export default function Edit() {
 }
 			`,
 		},
+		{
+			code: `
+// Translation in deprecated save function is allowed
+function save() {
+	return __( 'Hello World' );
+}
+			`,
+			filename: '/path/to/block/deprecated.js',
+		},
 	],
 	invalid: [
 		{
