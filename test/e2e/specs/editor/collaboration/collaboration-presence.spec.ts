@@ -15,10 +15,10 @@ test.describe( 'Collaboration - Presence', () => {
 		} );
 		await collaborationUtils.openCollaborativeSession( post.id );
 
-		// The CollaboratorsPresence component renders when other
+		// The collaborator presence button renders when other
 		// collaborators are present.
 		await expect(
-			page.locator( '.editor-collaborators-presence' )
+			page.getByRole( 'button', { name: /Collaborators list/ } )
 		).toBeVisible( { timeout: 10000 } );
 	} );
 
@@ -33,13 +33,11 @@ test.describe( 'Collaboration - Presence', () => {
 		} );
 		await collaborationUtils.openCollaborativeSession( post.id );
 
-		// Wait for the presence button to appear.
-		const presenceButton = page.locator(
-			'.editor-collaborators-presence__button'
-		);
+		// Wait for the presence button to appear and click to open popover.
+		const presenceButton = page.getByRole( 'button', {
+			name: /Collaborators list/,
+		} );
 		await expect( presenceButton ).toBeVisible( { timeout: 10000 } );
-
-		// Click to open the collaborators popover.
 		await presenceButton.click();
 
 		// The popover should list the second collaborator by name.

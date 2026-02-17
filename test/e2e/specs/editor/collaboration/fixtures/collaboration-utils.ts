@@ -122,9 +122,13 @@ export default class CollaborationUtils {
 
 		// Login the second user via the WordPress login form.
 		await this.secondPage.goto( '/wp-login.php' );
-		await this.secondPage.fill( '#user_login', SECOND_USER.username );
-		await this.secondPage.fill( '#user_pass', SECOND_USER.password );
-		await this.secondPage.click( '#wp-submit' );
+		await this.secondPage
+			.locator( '#user_login' )
+			.fill( SECOND_USER.username );
+		await this.secondPage
+			.locator( '#user_pass' )
+			.fill( SECOND_USER.password );
+		await this.secondPage.getByRole( 'button', { name: 'Log In' } ).click();
 		await this.secondPage.waitForURL( '**/wp-admin/**' );
 
 		// Navigate User 1 (admin) to the post editor.
@@ -168,24 +172,12 @@ export default class CollaborationUtils {
 		// The collaborator count button appears when another user is
 		// detected through the sync polling.
 		await Promise.all( [
-			this.primaryPage.waitForFunction(
-				() => {
-					const btn = document.querySelector(
-						'[aria-label*="Collaborators list"]'
-					);
-					return btn !== null;
-				},
-				{ timeout: 15000 }
-			),
-			this.secondPage.waitForFunction(
-				() => {
-					const btn = document.querySelector(
-						'[aria-label*="Collaborators list"]'
-					);
-					return btn !== null;
-				},
-				{ timeout: 15000 }
-			),
+			this.primaryPage
+				.getByRole( 'button', { name: /Collaborators list/ } )
+				.waitFor( { timeout: 15000 } ),
+			this.secondPage
+				.getByRole( 'button', { name: /Collaborators list/ } )
+				.waitFor( { timeout: 15000 } ),
 		] );
 
 		// Allow a full round of polling after awareness is established
