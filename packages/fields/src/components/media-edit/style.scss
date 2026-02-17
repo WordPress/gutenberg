@@ -165,8 +165,7 @@ fieldset.fields__media-edit {
 		.fields__media-edit-expanded-preview {
 			position: relative;
 			width: 100%;
-			aspect-ratio: 1/1;
-			max-height: 400px;
+			aspect-ratio: var(--fields-media-edit-expanded-multiple-aspect-ratio, 3/2);
 			border-radius: $radius-small;
 			padding: $grid-unit-05;
 			overflow: hidden;
@@ -275,7 +274,7 @@ fieldset.fields__media-edit {
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				aspect-ratio: 1/1;
+				aspect-ratio: var(--fields-media-edit-expanded-multiple-aspect-ratio, 3/2);
 			}
 		}
 	}
