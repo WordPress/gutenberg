@@ -62,54 +62,63 @@ function checkSubmenuOverflow( submenuContainer ) {
 		return;
 	}
 
+	// Check if this is a nested submenu (not a top-level submenu)
+	// Nested submenus always follow the default behavior, so skip the check
+	const isNested = parentItem.closest(
+		'.wp-block-navigation__submenu-container'
+	);
+	if ( isNested ) {
+		return;
+	}
+
 	// Remove the class first to get accurate measurements
 	parentItem.classList.remove( 'open-downward' );
+
+	// Only check for overflow on medium+ breakpoints (782px+)
+	// where submenus open horizontally
+	if ( ! window.matchMedia( '(min-width: 782px)' ).matches ) {
+		return;
+	}
 
 	// Get the parent's position
 	const parentRect = parentItem.getBoundingClientRect();
 	const viewportWidth = window.innerWidth;
 
-	// Check if this is a nested submenu (not a top-level submenu)
-	const isNested = parentItem.closest(
-		'.wp-block-navigation__submenu-container'
+	// Temporarily make submenu visible to measure it
+	// Save only explicitly set inline styles (not CSS-defined styles)
+	const hadInlineVisibility = submenuContainer.style.visibility !== '';
+	const hadInlineDisplay = submenuContainer.style.display !== '';
+	const hadInlinePosition = submenuContainer.style.position !== '';
+
+	const originalVisibility = submenuContainer.style.visibility;
+	const originalDisplay = submenuContainer.style.display;
+	const originalPosition = submenuContainer.style.position;
+
+	// Batch style changes for better performance
+	submenuContainer.style.cssText +=
+		'visibility: visible; display: flex; position: absolute;';
+
+	// Get the submenu width (use scrollWidth for accuracy)
+	const submenuWidth = Math.max(
+		submenuContainer.offsetWidth,
+		submenuContainer.scrollWidth,
+		SUBMENU_MIN_WIDTH
 	);
 
-	// Only check for overflow on medium+ breakpoints (782px+)
-	// where submenus open horizontally
-	if ( window.matchMedia( '(min-width: 782px)' ).matches ) {
-		// Temporarily make submenu visible to measure it
-		// Save current styles to restore later
-		const originalStyles = {
-			visibility: submenuContainer.style.visibility,
-			display: submenuContainer.style.display,
-			position: submenuContainer.style.position,
-		};
+	// Restore original inline styles or remove if they weren't set
+	submenuContainer.style.visibility = hadInlineVisibility
+		? originalVisibility
+		: '';
+	submenuContainer.style.display = hadInlineDisplay ? originalDisplay : '';
+	submenuContainer.style.position = hadInlinePosition ? originalPosition : '';
 
-		// Make submenu visible but off-screen for accurate measurement
-		submenuContainer.style.visibility = 'visible';
-		submenuContainer.style.display = 'flex';
-		submenuContainer.style.position = 'absolute';
+	// Calculate where the right edge of the submenu would be
+	// if it opens to the right
+	const submenuRightEdge = parentRect.right + submenuWidth;
 
-		// Get the submenu width (use scrollWidth for accuracy)
-		const submenuWidth = Math.max(
-			submenuContainer.offsetWidth,
-			submenuContainer.scrollWidth,
-			SUBMENU_MIN_WIDTH
-		);
-
-		// Restore original styles
-		submenuContainer.style.visibility = originalStyles.visibility;
-		submenuContainer.style.display = originalStyles.display;
-		submenuContainer.style.position = originalStyles.position;
-
-		// Calculate where the right edge of the submenu would be
-		// if it opens to the right
-		const submenuRightEdge = parentRect.right + submenuWidth;
-
-		// If submenu would overflow viewport, open it downward instead
-		if ( submenuRightEdge > viewportWidth && ! isNested ) {
-			parentItem.classList.add( 'open-downward' );
-		}
+	// If submenu would overflow viewport, open it downward instead
+	if ( submenuRightEdge > viewportWidth ) {
+		parentItem.classList.add( 'open-downward' );
 	}
 }
 
