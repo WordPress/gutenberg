@@ -177,19 +177,23 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			__experimentalUpdateSettings,
 		] );
 
-		// Store selection in a ref and expose a stable getter so that
-		// the context value doesn't change on every keystroke.
-		// This prevents re-rendering the entire block tree (including
-		// async-rendered off-screen blocks) when selection changes.
+		// Store selection and onChangeSelection in refs and expose
+		// stable getters/callers so that the context value is a
+		// complete constant.  This prevents re-rendering the entire
+		// block tree (including async-rendered off-screen blocks)
+		// when either value changes.
 		const selectionRef = useRef( props.selection );
 		selectionRef.current = props.selection;
+		const onChangeSelectionRef = useRef( props.onChangeSelection ?? noop );
+		onChangeSelectionRef.current = props.onChangeSelection ?? noop;
 
 		const selectionContextValue = useMemo(
 			() => ( {
 				getSelection: () => selectionRef.current,
-				onChangeSelection: props.onChangeSelection ?? noop,
+				onChangeSelection: ( ...args ) =>
+					onChangeSelectionRef.current( ...args ),
 			} ),
-			[ props.onChangeSelection ]
+			[]
 		);
 
 		const children = (

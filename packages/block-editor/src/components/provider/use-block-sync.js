@@ -294,12 +294,10 @@ export default function useBlockSync( {
 	// waiting for React renders for changes.
 	const onInputRef = useRef( onInput );
 	const onChangeRef = useRef( onChange );
-	const onChangeSelectionRef = useRef( onChangeSelection );
 	useEffect( () => {
 		onInputRef.current = onInput;
 		onChangeRef.current = onChange;
-		onChangeSelectionRef.current = onChangeSelection;
-	}, [ onInput, onChange, onChangeSelection ] );
+	}, [ onInput, onChange ] );
 
 	// Determine if blocks need to be reset when they change.
 	// Also restores selection from context after blocks are set.
@@ -475,7 +473,7 @@ export default function useBlockSync( {
 								initialPosition:
 									getSelectedBlocksInitialCaretPosition(),
 							};
-							onChangeSelectionRef.current(
+							onChangeSelection(
 								clientId
 									? restoreSelectionIds(
 											selectionInfo,
