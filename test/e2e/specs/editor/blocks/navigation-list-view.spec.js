@@ -551,6 +551,64 @@ test.describe( 'Navigation block - List view editing', () => {
 				.getByLabel( 'Add page' )
 		).toBeFocused();
 	} );
+
+	test( 'displays custom menu name in List View tab header', async ( {
+		page,
+		editor,
+		requestUtils,
+	} ) => {
+		// Create two navigation menus with different names
+		const headerMenu = await requestUtils.createNavigationMenu( {
+			title: 'Header Menu',
+			content: navMenuBlocksFixture.content,
+		} );
+		const footerMenu = await requestUtils.createNavigationMenu( {
+			title: 'Footer Menu',
+			content: navMenuBlocksFixture.content,
+		} );
+
+		// Insert both navigation blocks
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: {
+				ref: headerMenu.id,
+			},
+		} );
+		await editor.insertBlock( {
+			name: 'core/navigation',
+			attributes: {
+				ref: footerMenu.id,
+			},
+		} );
+
+		await editor.openDocumentSettingsSidebar();
+
+		// Select the first navigation block
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Header Menu' } )
+			.first()
+			.click();
+
+		// Verify the List View tab header shows "Header Menu"
+		const listViewTab = page.getByRole( 'tab', { name: 'List View' } );
+		await listViewTab.click();
+
+		// Check that the panel heading shows the custom menu name
+		await expect(
+			page.getByRole( 'button', { name: 'Header Menu' } )
+		).toBeVisible();
+
+		// Select the second navigation block
+		await editor.canvas
+			.getByRole( 'document', { name: 'Block: Footer Menu' } )
+			.first()
+			.click();
+
+		// Verify the List View tab header shows "Footer Menu"
+		await expect(
+			page.getByRole( 'button', { name: 'Footer Menu' } )
+		).toBeVisible();
+	} );
 } );
 
 class LinkControl {
