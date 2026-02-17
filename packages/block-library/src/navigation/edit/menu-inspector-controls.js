@@ -5,12 +5,14 @@ import {
 	privateApis as blockEditorPrivateApis,
 	InspectorControls,
 	store as blockEditorStore,
+	BlockIcon,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
 	Spinner,
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
+	VisuallyHidden,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -33,17 +35,19 @@ import {
 } from '../../navigation-link/shared';
 
 /**
- * Hook to get custom icon for navigation link blocks.
+ * Component that renders a custom BlockIcon for navigation link blocks with status indicators.
  *
- * @param {Object} block - The block object
- * @return {Object|null} Icon config or null
+ * @param {Object} props             - Component props
+ * @param {Object} props.block       - The block object
+ * @param {*}      props.defaultIcon - The default icon to use if no status indicator needed
+ * @return {React.JSX.Element} BlockIcon component
  */
-function useNavigationBlockIcon( block ) {
+function NavigationBlockIcon( { block, defaultIcon } ) {
 	const { clientId, attributes, name } = block;
 	const { url, type, metadata, id } = attributes || {};
 	const hasUrlBinding = !! metadata?.bindings?.url && !! id;
 
-	// Always call hooks before any conditional returns
+	// Get entity binding data
 	const { isBoundEntityAvailable, entityRecord } = useEntityBinding( {
 		clientId,
 		attributes,
@@ -54,7 +58,9 @@ function useNavigationBlockIcon( block ) {
 		name !== 'core/navigation-link' &&
 		name !== 'core/navigation-submenu'
 	) {
-		return null;
+		return (
+			<BlockIcon icon={ defaultIcon } showColors context="list-view" />
+		);
 	}
 
 	const status = getActionableStatus( {
@@ -65,16 +71,26 @@ function useNavigationBlockIcon( block ) {
 		isEntityAvailable: isBoundEntityAvailable,
 	} );
 
+	// No status indicator needed, use default
 	if ( ! status ) {
-		return null;
+		return (
+			<BlockIcon icon={ defaultIcon } showColors context="list-view" />
+		);
 	}
 
+	// Render status indicator icon
 	const isError = status.intent === 'error';
-	return {
+	const statusIcon = {
 		src: isError ? error : info,
 		foreground: isError ? '#660c0c' : '#f0b849',
-		label: status.label,
 	};
+
+	return (
+		<>
+			<BlockIcon icon={ statusIcon } showColors context="list-view" />
+			<VisuallyHidden>{ status.label }</VisuallyHidden>
+		</>
+	);
 }
 
 const actionLabel =
@@ -242,9 +258,7 @@ const MainContent = ( {
 				showAppender
 				blockSettingsMenu={ LeafMoreMenu }
 				additionalBlockContent={ AdditionalBlockContent }
-				// Passing a hook as a prop is safe here since it's memoized in context
-				// eslint-disable-next-line react-compiler/react-compiler
-				useBlockIcon={ useNavigationBlockIcon }
+				blockIcon={ NavigationBlockIcon }
 				onSelect={ openListViewContentPanel }
 			/>
 		</div>

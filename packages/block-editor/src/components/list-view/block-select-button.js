@@ -10,7 +10,6 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 	Tooltip,
-	VisuallyHidden,
 	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
@@ -60,7 +59,7 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { useBlockIcon = () => null } = useListViewContext();
+	const { BlockIconComponent } = useListViewContext();
 	const { hasPatternName, blockVisibility } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = unlock( select( blockEditorStore ) );
@@ -73,13 +72,6 @@ function ListViewBlockSelectButton(
 		[ clientId ]
 	);
 
-	// Call useBlockIcon hook - always defined (defaults to no-op that returns null)
-	// Note: useBlockIcon can be a custom hook that uses React hooks,
-	// which is valid since we're calling it during render
-	// The hook comes from stable context (memoized in ListView), so identity is preserved
-	// eslint-disable-next-line react-compiler/react-compiler
-	const iconOverride = useBlockIcon( block );
-
 	const shouldShowLockIcon = isLocked;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
@@ -87,18 +79,8 @@ function ListViewBlockSelectButton(
 	// Determine visibility label from blockVisibility metadata
 	const visibilityLabel = getBlockVisibilityLabel( blockVisibility );
 
-	// Compute icon for BlockIcon component
-	let blockIcon;
-	if ( iconOverride ) {
-		blockIcon = {
-			src: iconOverride.src,
-			foreground: iconOverride.foreground,
-		};
-	} else if ( hasPatternName ) {
-		blockIcon = symbol;
-	} else {
-		blockIcon = blockInformation?.icon;
-	}
+	// Compute default icon for BlockIcon component
+	const defaultIcon = hasPatternName ? symbol : blockInformation?.icon;
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -139,9 +121,17 @@ function ListViewBlockSelectButton(
 			aria-expanded={ isExpanded }
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
-			<BlockIcon icon={ blockIcon } showColors context="list-view" />
-			{ iconOverride?.label && (
-				<VisuallyHidden>{ iconOverride.label }</VisuallyHidden>
+			{ BlockIconComponent ? (
+				<BlockIconComponent
+					block={ block }
+					defaultIcon={ defaultIcon }
+				/>
+			) : (
+				<BlockIcon
+					icon={ defaultIcon }
+					showColors
+					context="list-view"
+				/>
 			) }
 			<HStack
 				alignment="center"
