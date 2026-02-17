@@ -300,20 +300,6 @@ const { state, actions } = store(
 					ctx.lastFocusableElement =
 						focusableElements[ focusableElements.length - 1 ];
 				}
-				// Set up resize handler for overflow detection
-				if ( ctx.type === 'submenu' && ref ) {
-					const submenuContainer = ref.querySelector(
-						'.wp-block-navigation__submenu-container'
-					);
-					if ( submenuContainer && ! ctx.resizeHandler ) {
-						ctx.resizeHandler = () => {
-							if ( state.isMenuOpen ) {
-								checkSubmenuOverflow( submenuContainer );
-							}
-						};
-						window.addEventListener( 'resize', ctx.resizeHandler );
-					}
-				}
 			},
 			focusFirstElement() {
 				const { ref } = getElement();
