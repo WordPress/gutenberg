@@ -972,7 +972,20 @@ const CommentBoard = ( {
 				</RawHTML>
 			) }
 			{ isExpanded && (
-				<div className="editor-collab-sidebar-panel__reactions-row">
+				<HStack
+					spacing="1"
+					justify="flex-start"
+					// expanded={ false }
+					// wrap
+				>
+					<AddReactionButton
+						onToggleReaction={ ( emoji ) =>
+							onToggleReaction?.( {
+								commentId: thread.id,
+								emoji,
+							} )
+						}
+					/>
 					<ReactionDisplay
 						reactions={ thread.meta?._wp_note_reactions }
 						onToggleReaction={ ( emoji ) =>
@@ -982,15 +995,7 @@ const CommentBoard = ( {
 							} )
 						}
 					/>
-					<AddReactionButton
-						onToggleReaction={ ( emoji ) =>
-							onToggleReaction?.( {
-								commentId: thread.id,
-								emoji,
-							} )
-						}
-					/>
-				</div>
+				</HStack>
 			) }
 			{ 'delete' === actionState && (
 				<ConfirmDialog
