@@ -203,24 +203,28 @@ $navigation-icon-size: 24px;
 		// Submenu indentation when there's no background.
 		left: -1px; // Border width.
 		top: 100%;
+	}
 
-		// Indentation for all submenus.
-		// Nested submenus sit to the left on large breakpoints.
-		// On smaller breakpoints, they open vertically, accordion-style.
+	// On medium+ breakpoints, submenus open horizontally when this class is present.
+	// JavaScript manages this class, removing it when overflow would occur to revert to downward opening.
+	&.submenu-opens-on-horizontal-hover {
 		@include break-medium {
-			.wp-block-navigation__submenu-container {
-				left: 100%;
-				top: -1px; // Border width.
+			> .wp-block-navigation__submenu-container {
+				// Nested submenus sit to the right on large breakpoints.
+				.wp-block-navigation__submenu-container {
+					left: 100%;
+					top: -1px; // Border width.
 
-				// Prevent the menu from disappearing when the mouse is over the gap
-				&::before {
-					content: "";
-					position: absolute;
-					right: 100%;
-					height: 100%;
-					display: block;
-					width: 0.5em;
-					background: transparent;
+					// Prevent the menu from disappearing when the mouse is over the gap
+					&::before {
+						content: "";
+						position: absolute;
+						right: 100%;
+						height: 100%;
+						display: block;
+						width: 0.5em;
+						background: transparent;
+					}
 				}
 			}
 
@@ -232,27 +236,6 @@ $navigation-icon-size: 24px;
 			// Reset the submenu indicator for horizontal flyouts.
 			.wp-block-navigation__submenu-icon svg {
 				transform: rotate(-90deg);
-			}
-		}
-	}
-
-	// When the submenu-revert-overflow class is present, revert to mobile positioning
-	// to prevent viewport overflow. This class is added by JavaScript when needed.
-	&.submenu-revert-overflow {
-		@include break-medium {
-			> .wp-block-navigation__submenu-container {
-				left: -1px; // Border width.
-				top: 100%;
-
-				// Remove the hover gap for downward-opening submenus
-				&::before {
-					display: none;
-				}
-			}
-
-			// Reset the submenu indicator for downward flyouts.
-			.wp-block-navigation__submenu-icon svg {
-				transform: rotate(0deg);
 			}
 		}
 	}
@@ -336,23 +319,17 @@ $navigation-icon-size: 24px;
 .wp-block-navigation__submenu-container {
 	left: 0;
 	top: 100%;
+}
 
-	// There's no border on submenus when there are backgrounds.
+// When the class is present, open horizontally on medium+ screens (with background)
+.wp-block-navigation.has-background
+.has-child.submenu-opens-on-horizontal-hover
+.wp-block-navigation__submenu-container {
 	@include break-medium {
 		.wp-block-navigation__submenu-container {
 			left: 100%;
 			top: 0;
 		}
-	}
-}
-
-// Revert to mobile positioning when overflow would occur (with background)
-.wp-block-navigation.has-background
-.has-child.submenu-revert-overflow
-.wp-block-navigation__submenu-container {
-	@include break-medium {
-		left: 0;
-		top: 100%;
 	}
 }
 

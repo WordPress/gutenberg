@@ -48,7 +48,7 @@ function getFocusableElements( ref ) {
 
 /**
  * Checks if a submenu would overflow the viewport horizontally.
- * If it would overflow, adds a class to revert to mobile positioning.
+ * If it would overflow, removes the horizontal-opening class to revert to mobile positioning.
  *
  * @param {HTMLElement} submenuContainer - The submenu container element
  */
@@ -71,14 +71,16 @@ function checkSubmenuOverflow( submenuContainer ) {
 		return;
 	}
 
-	// Remove the class first to get accurate measurements
-	parentItem.classList.remove( 'submenu-revert-overflow' );
-
 	// Only check for overflow on medium+ breakpoints (782px+)
-	// where submenus open horizontally
+	// where submenus can open horizontally
 	if ( ! window.matchMedia( '(min-width: 782px)' ).matches ) {
+		// On small screens, ensure the class is not present
+		parentItem.classList.remove( 'submenu-opens-on-horizontal-hover' );
 		return;
 	}
+
+	// Add the class first (enables horizontal opening) to get accurate measurements
+	parentItem.classList.add( 'submenu-opens-on-horizontal-hover' );
 
 	// Get the parent's position
 	const parentRect = parentItem.getBoundingClientRect();
@@ -130,9 +132,9 @@ function checkSubmenuOverflow( submenuContainer ) {
 	// if it opens to the right
 	const submenuRightEdge = parentRect.right + submenuWidth;
 
-	// If submenu would overflow viewport, revert to mobile positioning
+	// If submenu would overflow viewport, remove the class to revert to mobile positioning
 	if ( submenuRightEdge > viewportWidth ) {
-		parentItem.classList.add( 'submenu-revert-overflow' );
+		parentItem.classList.remove( 'submenu-opens-on-horizontal-hover' );
 	}
 }
 
