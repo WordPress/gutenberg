@@ -103,6 +103,7 @@ const getEditorCommandLoader = () =>
 			name: 'core/open-shortcut-help',
 			label: __( 'Keyboard shortcuts' ),
 			icon: keyboard,
+			category: 'view',
 			callback: ( { close } ) => {
 				close();
 				openModal( 'editor/keyboard-shortcut-help' );
@@ -114,6 +115,7 @@ const getEditorCommandLoader = () =>
 			label: isDistractionFree
 				? __( 'Exit Distraction free' )
 				: __( 'Enter Distraction free' ),
+			category: 'command',
 			callback: ( { close } ) => {
 				toggleDistractionFree();
 				close();
@@ -123,6 +125,7 @@ const getEditorCommandLoader = () =>
 		commands.push( {
 			name: 'core/open-preferences',
 			label: __( 'Editor preferences' ),
+			category: 'view',
 			callback: ( { close } ) => {
 				close();
 				openModal( 'editor/preferences' );
@@ -134,6 +137,7 @@ const getEditorCommandLoader = () =>
 			label: isFocusMode
 				? __( 'Exit Spotlight mode' )
 				: __( 'Enter Spotlight mode' ),
+			category: 'command',
 			callback: ( { close } ) => {
 				toggleSpotlightMode();
 				close();
@@ -146,6 +150,7 @@ const getEditorCommandLoader = () =>
 				? __( 'Close List View' )
 				: __( 'Open List View' ),
 			icon: listView,
+			category: 'command',
 			callback: ( { close } ) => {
 				setIsListViewOpened( ! isListViewOpen );
 				close();
@@ -164,6 +169,7 @@ const getEditorCommandLoader = () =>
 		commands.push( {
 			name: 'core/toggle-top-toolbar',
 			label: __( 'Top toolbar' ),
+			category: 'command',
 			callback: ( { close } ) => {
 				toggleTopToolbar();
 				close();
@@ -178,6 +184,7 @@ const getEditorCommandLoader = () =>
 						? __( 'Open code editor' )
 						: __( 'Exit code editor' ),
 				icon: code,
+				category: 'command',
 				callback: ( { close } ) => {
 					switchEditorMode(
 						editorMode === 'visual' ? 'text' : 'visual'
@@ -192,6 +199,7 @@ const getEditorCommandLoader = () =>
 			label: showBlockBreadcrumbs
 				? __( 'Hide block breadcrumbs' )
 				: __( 'Show block breadcrumbs' ),
+			category: 'command',
 			callback: ( { close } ) => {
 				toggle( 'core', 'showBlockBreadcrumbs' );
 				close();
@@ -211,6 +219,7 @@ const getEditorCommandLoader = () =>
 			name: 'core/open-settings-sidebar',
 			label: __( 'Show or hide the Settings panel' ),
 			icon: isRTL() ? drawerLeft : drawerRight,
+			category: 'command',
 			callback: ( { close } ) => {
 				const activeSidebar = getActiveComplementaryArea( 'core' );
 				close();
@@ -226,6 +235,7 @@ const getEditorCommandLoader = () =>
 			name: 'core/open-block-inspector',
 			label: __( 'Show or hide the Block settings panel' ),
 			icon: blockDefault,
+			category: 'command',
 			callback: ( { close } ) => {
 				const activeSidebar = getActiveComplementaryArea( 'core' );
 				close();
@@ -243,6 +253,7 @@ const getEditorCommandLoader = () =>
 				? __( 'Disable pre-publish checks' )
 				: __( 'Enable pre-publish checks' ),
 			icon: formatListBullets,
+			category: 'command',
 			callback: ( { close } ) => {
 				close();
 				toggle( 'core', 'isPublishSidebarEnabled' );
@@ -263,6 +274,7 @@ const getEditorCommandLoader = () =>
 				name: 'core/preview-link',
 				label: __( 'Preview in a new tab' ),
 				icon: external,
+				category: 'view',
 				callback: async ( { close } ) => {
 					close();
 					const postId = getCurrentPostId();
@@ -294,6 +306,7 @@ const getEditedEntityContextualCommands = () =>
 				name: 'core/rename-pattern',
 				label: __( 'Rename pattern' ),
 				icon: pencil,
+				category: 'edit',
 				callback: ( { close } ) => {
 					openModal( patternRenameModalName );
 					close();
@@ -303,6 +316,7 @@ const getEditedEntityContextualCommands = () =>
 				name: 'core/duplicate-pattern',
 				label: __( 'Duplicate pattern' ),
 				icon: symbol,
+				category: 'command',
 				callback: ( { close } ) => {
 					openModal( patternDuplicateModalName );
 					close();
@@ -367,6 +381,7 @@ const getPageContentFocusCommands = () =>
 					decodeEntities( template.title )
 				),
 				icon: layout,
+				category: 'edit',
 				callback: ( { close } ) => {
 					onNavigateToEntityRecord( {
 						postId: templateId,
@@ -382,6 +397,7 @@ const getPageContentFocusCommands = () =>
 				name: 'core/switch-to-previous-entity',
 				label: __( 'Go back' ),
 				icon: page,
+				category: 'view',
 				callback: ( { close } ) => {
 					goBack();
 					close();
@@ -438,6 +454,7 @@ const getManipulateDocumentCommands = () =>
 				name: 'core/reset-template',
 				label,
 				icon: isRTL() ? rotateRight : rotateLeft,
+				category: 'command',
 				callback: ( { close } ) => {
 					revertTemplate( template );
 					close();

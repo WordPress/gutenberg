@@ -136,6 +136,7 @@ const getTransformCommands = () =>
 					/* translators: %s: Block or block variation name. */
 					label: sprintf( __( 'Transform to %s' ), title ),
 					icon: blockIcon?.src,
+					category: 'command',
 					callback: ( { close } ) => {
 						onBlockTransform( name );
 						close();
@@ -326,6 +327,7 @@ const getQuickActionsCommands = () =>
 			commands: commands.map( ( command ) => ( {
 				...command,
 				name: 'core/block-editor/action-' + command.name,
+				category: 'command',
 				callback: ( { close } ) => {
 					command.callback();
 					close();

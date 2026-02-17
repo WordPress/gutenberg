@@ -373,6 +373,19 @@ export function MediaUploadModal( {
 					}
 				);
 
+				// Auto-select the newly uploaded items
+				const uploadedIds = attachments
+					.map( ( attachment ) => String( attachment.id ) )
+					.filter( Boolean );
+
+				if ( multiple ) {
+					// In multiple mode, add to existing selection
+					setSelection( ( prev ) => [ ...prev, ...uploadedIds ] );
+				} else {
+					// In single mode, replace selection with the first uploaded item
+					setSelection( uploadedIds.slice( 0, 1 ) );
+				}
+
 				// Invalidate the entity records resolution to refresh the view
 				invalidateResolution( 'getEntityRecords', [
 					'postType',
@@ -381,7 +394,7 @@ export function MediaUploadModal( {
 				] );
 			}
 		},
-		[ createSuccessNotice, invalidateResolution, queryArgs ]
+		[ createSuccessNotice, invalidateResolution, queryArgs, multiple ]
 	);
 
 	// Shared upload error handler

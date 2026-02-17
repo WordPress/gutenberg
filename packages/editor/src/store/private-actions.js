@@ -10,6 +10,7 @@ import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
+import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -648,12 +649,17 @@ export const restoreRevision =
 		await dispatch.savePost();
 
 		// Show success notice.
-		registry
-			.dispatch( noticesStore )
-			.createSuccessNotice( __( 'Revision restored.' ), {
+		registry.dispatch( noticesStore ).createSuccessNotice(
+			sprintf(
+				/* translators: %s: Date and time of the revision. */
+				__( 'Restored to revision from %s.' ),
+				dateI18n( getDateSettings().formats.datetime, revision.date )
+			),
+			{
 				type: 'snackbar',
 				id: 'editor-revision-restored',
-			} );
+			}
+		);
 	};
 
 /**

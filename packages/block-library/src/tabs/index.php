@@ -39,8 +39,8 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array() ): arr
 					}
 
 					$tabs_list[] = array(
-						'id'    => $tab_id,
-						'label' => esc_html( (string) $tab_label ),
+						'id'    => esc_attr( $tab_id ),
+						'label' => $tab_label,
 						'index' => $tab_index,
 					);
 					++$tab_index;

@@ -981,6 +981,8 @@ export function isListViewPanelOpened( state, clientId ) {
 /**
  * Returns the List View expand revision number.
  *
+ * This counter is used in the ListView component's key prop to force remounting.
+ *
  * @param {Object} state Global application state.
  *
  * @return {number} The expand revision number.

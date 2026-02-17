@@ -3,9 +3,9 @@
 		"blockName": "core/tabs-menu-item",
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\n<button class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" hidden type=\"button\" role=\"tab\"><span class=\"screen-reader-text\">Tab menu item</span></button>\n",
+		"innerHTML": "\n<button class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" type=\"button\" role=\"tab\"></button>\n",
 		"innerContent": [
-			"\n<button class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" hidden type=\"button\" role=\"tab\"><span class=\"screen-reader-text\">Tab menu item</span></button>\n"
+			"\n<button class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" type=\"button\" role=\"tab\"></button>\n"
 		]
 	}
 ]

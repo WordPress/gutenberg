@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Export `watch()` function for subscribing to signal changes outside of directives.
+
 ## 6.39.0 (2026-01-29)
 
 ## 6.38.0 (2026-01-16)

@@ -1,0 +1,152 @@
+@use "@wordpress/base-styles/colors" as *;
+@use "@wordpress/base-styles/variables" as *;
+@use "../utils/theme-variables" as *;
+
+.components-avatar {
+	display: inline-flex;
+	align-items: center;
+	border-radius: $radius-full;
+	overflow: clip;
+	flex-shrink: 0;
+	background-color: $components-color-accent;
+	box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $white, $elevation-x-small;
+}
+
+.components-avatar__image {
+	box-sizing: border-box;
+	position: relative;
+	width: $button-size-compact;
+	height: $button-size-compact;
+	border-radius: $radius-full;
+	border: 0;
+	background-color: $components-color-accent;
+	overflow: clip;
+	flex-shrink: 0;
+	font-size: 0;
+	color: $white;
+
+	.is-small > & {
+		width: $button-size-small;
+		height: $button-size-small;
+	}
+
+	.has-src > & {
+		background-image: var(--components-avatar-url);
+		background-size: cover;
+		background-position: center;
+	}
+
+	.has-avatar-border-color > & {
+		border: var(--wp-admin-border-width-focus) solid var(--components-avatar-outline-color);
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
+		background-clip: padding-box;
+	}
+}
+
+// Initials fallback: show name characters when no image.
+.components-avatar:not(.has-src) > .components-avatar__image {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: $font-size-x-small;
+	font-weight: $font-weight-medium;
+	border: 0;
+	box-shadow: none;
+	background-clip: border-box;
+}
+
+.components-avatar:not(.has-src).has-avatar-border-color > .components-avatar__image {
+	background-color: var(--components-avatar-outline-color);
+}
+
+.components-avatar__name {
+	font-size: $font-size-medium;
+	line-height: $font-line-height-small;
+	color: $white;
+	min-width: 0;
+	padding-bottom: calc($grid-unit-05 / 2);
+	overflow: hidden;
+	opacity: 0;
+	white-space: nowrap;
+	transition: opacity 0.15s cubic-bezier(0.15, 0, 0.15, 1);
+}
+
+// Badge mode: use grid so the name column animates from 0 to natural width.
+// Spacing is on the container (column-gap + padding-inline-end) so it
+// transitions alongside grid-template-columns instead of causing a bump.
+.components-avatar.has-badge {
+	display: inline-grid;
+	grid-template-columns: min-content 0fr;
+	column-gap: 0;
+	padding-inline-end: 0;
+	transition:
+		grid-template-columns 0.3s cubic-bezier(0.15, 0, 0.15, 1),
+		column-gap 0.3s cubic-bezier(0.15, 0, 0.15, 1),
+		padding-inline-end 0.3s cubic-bezier(0.15, 0, 0.15, 1);
+
+	&:hover {
+		grid-template-columns: min-content 1fr;
+		column-gap: $grid-unit-05;
+		padding-inline-end: $grid-unit-10;
+		transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
+	}
+
+	&:hover .components-avatar__name {
+		opacity: 1;
+		transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
+	}
+}
+
+.components-avatar.has-badge.has-avatar-border-color {
+	background-color: var(--components-avatar-outline-color);
+}
+
+// Status: dim and desaturate content so the background color shows through.
+// Images: move to ::before with luminosity blend over the solid bg color.
+// Initials: reduce text opacity.
+.components-avatar.has-status.has-src > .components-avatar__image {
+	background-image: none;
+
+	&::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		background-image: var(--components-avatar-url);
+		background-size: cover;
+		background-position: center;
+		mix-blend-mode: luminosity;
+		opacity: 0.3;
+	}
+}
+
+.components-avatar.has-status:not(.has-src) > .components-avatar__image {
+	color: rgba($white, 0.3);
+}
+
+.components-avatar.has-status.has-avatar-border-color > .components-avatar__image {
+	background-color: var(--components-avatar-outline-color);
+}
+
+.components-avatar__status-indicator {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 1;
+	color: $white;
+	fill: $white;
+
+	svg {
+		width: 75%;
+		height: 75%;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.components-avatar.has-badge,
+	.components-avatar__name {
+		transition: none;
+	}
+}
