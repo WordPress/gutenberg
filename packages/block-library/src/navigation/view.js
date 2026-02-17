@@ -47,6 +47,43 @@ function getFocusableElements( ref ) {
 }
 
 /**
+ * Temporarily applies styles to measure an element's dimensions.
+ *
+ * @param {HTMLElement} element - The element to measure
+ * @param {Function}    callback - Function to call while styles are applied
+ * @return {*} The callback's return value
+ */
+function withMeasurementStyles( element, callback ) {
+	const inlineStyles = {
+		visibility: element.style.visibility,
+		display: element.style.display,
+		position: element.style.position,
+	};
+	const hadInlineStyles = {
+		visibility: inlineStyles.visibility !== '',
+		display: inlineStyles.display !== '',
+		position: inlineStyles.position !== '',
+	};
+
+	element.style.visibility = 'visible';
+	element.style.display = 'flex';
+	element.style.position = 'absolute';
+
+	const result = callback();
+
+	// Restore or remove inline styles
+	Object.keys( inlineStyles ).forEach( ( prop ) => {
+		if ( hadInlineStyles[ prop ] ) {
+			element.style[ prop ] = inlineStyles[ prop ];
+		} else {
+			element.style.removeProperty( prop );
+		}
+	} );
+
+	return result;
+}
+
+/**
  * Checks if a submenu would overflow the viewport horizontally.
  * If it would overflow, removes the horizontal-opening class to revert to downward positioning.
  *
@@ -62,82 +99,41 @@ function checkSubmenuOverflow( submenuContainer ) {
 		return;
 	}
 
-	// Check if this is a nested submenu (not a top-level submenu)
-	// Nested submenus always follow the default behavior, so skip the check
-	const isNested = parentItem.closest(
-		'.wp-block-navigation__submenu-container'
-	);
-	if ( isNested ) {
+	// Nested submenus always follow the default behavior
+	if ( parentItem.closest( '.wp-block-navigation__submenu-container' ) ) {
 		return;
 	}
 
-	// Only check for overflow on medium+ breakpoints (782px+)
-	// where submenus can open horizontally
-	if ( ! window.matchMedia( '(min-width: 782px)' ).matches ) {
-		// On small screens, ensure the class is not present
-		if ( parentItem.classList.contains( 'submenu-opens-on-horizontal-hover' ) ) {
+	const isLargeScreen = window.matchMedia( '(min-width: 782px)' ).matches;
+	const hasClass = parentItem.classList.contains( 'submenu-opens-on-horizontal-hover' );
+
+	// On small screens, remove the class if present
+	if ( ! isLargeScreen ) {
+		if ( hasClass ) {
 			parentItem.classList.remove( 'submenu-opens-on-horizontal-hover' );
 		}
 		return;
 	}
 
-	// Add the class first (enables horizontal opening) to get accurate measurements
-	if ( ! parentItem.classList.contains( 'submenu-opens-on-horizontal-hover' ) ) {
+	// Add class to enable horizontal opening for measurement
+	if ( ! hasClass ) {
 		parentItem.classList.add( 'submenu-opens-on-horizontal-hover' );
 	}
 
-	// Get the parent's position
-	const parentRect = parentItem.getBoundingClientRect();
-	const viewportWidth = window.innerWidth;
-
-	// Temporarily make submenu visible to measure it
-	// Save only explicitly set inline styles (not CSS-defined styles)
-	const hadInlineVisibility = submenuContainer.style.visibility !== '';
-	const hadInlineDisplay = submenuContainer.style.display !== '';
-	const hadInlinePosition = submenuContainer.style.position !== '';
-
-	const originalVisibility = submenuContainer.style.visibility;
-	const originalDisplay = submenuContainer.style.display;
-	const originalPosition = submenuContainer.style.position;
-
-	// Set styles individually for clarity and maintainability
-	submenuContainer.style.visibility = 'visible';
-	submenuContainer.style.display = 'flex';
-	submenuContainer.style.position = 'absolute';
-
-	// Get the submenu width (use scrollWidth for accuracy)
-	// Include SUBMENU_MIN_WIDTH as a fallback in case the element hasn't been rendered yet
-	const submenuWidth = Math.max(
-		submenuContainer.offsetWidth,
-		submenuContainer.scrollWidth,
-		SUBMENU_MIN_WIDTH
+	// Measure submenu width while temporarily visible
+	const submenuWidth = withMeasurementStyles( submenuContainer, () =>
+		Math.max(
+			submenuContainer.offsetWidth,
+			submenuContainer.scrollWidth,
+			SUBMENU_MIN_WIDTH
+		)
 	);
 
-	// Restore original inline styles or remove properties if they weren't set
-	if ( hadInlineVisibility ) {
-		submenuContainer.style.visibility = originalVisibility;
-	} else {
-		submenuContainer.style.removeProperty( 'visibility' );
-	}
+	// Check if submenu would overflow
+	const parentRect = parentItem.getBoundingClientRect();
+	const wouldOverflow = parentRect.right + submenuWidth > window.innerWidth;
 
-	if ( hadInlineDisplay ) {
-		submenuContainer.style.display = originalDisplay;
-	} else {
-		submenuContainer.style.removeProperty( 'display' );
-	}
-
-	if ( hadInlinePosition ) {
-		submenuContainer.style.position = originalPosition;
-	} else {
-		submenuContainer.style.removeProperty( 'position' );
-	}
-
-	// Calculate where the right edge of the submenu would be
-	// if it opens to the right
-	const submenuRightEdge = parentRect.right + submenuWidth;
-
-	// If submenu would overflow viewport, remove the class to revert to downward positioning
-	if ( submenuRightEdge > viewportWidth ) {
+	if ( wouldOverflow ) {
 		parentItem.classList.remove( 'submenu-opens-on-horizontal-hover' );
 	}
 }
