@@ -12,12 +12,11 @@ import { store as editorStore } from '@wordpress/editor';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import {
-	DEFAULT_DEVICE_TYPE,
-	VALID_VIEWPORTS,
-} from './use-initial-viewport-sync';
+import { DEFAULT_DEVICE_TYPE } from './use-viewport-sync';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
+
+const VALID_VIEWPORTS = [ 'desktop', 'tablet', 'mobile' ];
 /**
  * Hook to handle navigation to entity records.
  *
@@ -72,14 +71,17 @@ export default function useNavigateToEntityRecord() {
 				const currentViewportLower = (
 					currentDeviceType || DEFAULT_DEVICE_TYPE
 				).toLowerCase();
-				if ( currentViewportLower === DEFAULT_DEVICE_TYPE.toLowerCase() ) {
+				if (
+					currentViewportLower === DEFAULT_DEVICE_TYPE.toLowerCase()
+				) {
 					delete urlUpdates.viewport;
 				} else {
 					urlUpdates.viewport = currentViewportLower;
 				}
 			}
 
-			const hasUpdatesToSave = externalClientId || isValidRequestedViewport;
+			const hasUpdatesToSave =
+				externalClientId || isValidRequestedViewport;
 			if ( hasUpdatesToSave ) {
 				history.navigate( addQueryArgs( path, urlUpdates ), {
 					replace: true,
