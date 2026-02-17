@@ -31,7 +31,7 @@ import { store } from '../../store';
  * @param {string[]} props.clientIds    Client ids of selected blocks.
  * @param {string}   props.rootClientId ID of the currently selected top-level block.
  * @param {()=>void} props.onClose      Callback to close the menu.
- * @return {import('react').ComponentType} The menu control or null.
+ * @return {React.ComponentType} The menu control or null.
  */
 export default function ReusableBlockConvertButton( {
 	clientIds,

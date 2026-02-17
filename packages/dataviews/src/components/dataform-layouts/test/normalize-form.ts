@@ -139,6 +139,7 @@ describe( 'normalizeFormFields', () => {
 					type: 'panel',
 					openAs: 'dropdown',
 					summary: [],
+					editVisibility: 'on-hover',
 				},
 				fields: [
 					{
@@ -148,6 +149,7 @@ describe( 'normalizeFormFields', () => {
 							labelPosition: 'side',
 							openAs: 'dropdown',
 							summary: [],
+							editVisibility: 'on-hover',
 						},
 					},
 				],
@@ -166,6 +168,7 @@ describe( 'normalizeFormFields', () => {
 					type: 'panel',
 					openAs: 'dropdown',
 					summary: [],
+					editVisibility: 'on-hover',
 				},
 				fields: [
 					{
@@ -175,6 +178,7 @@ describe( 'normalizeFormFields', () => {
 							labelPosition: 'top',
 							openAs: 'dropdown',
 							summary: [],
+							editVisibility: 'on-hover',
 						},
 					},
 				],
@@ -358,6 +362,7 @@ describe( 'normalizeFormFields', () => {
 							labelPosition: 'side',
 							openAs: 'dropdown',
 							summary: [],
+							editVisibility: 'on-hover',
 						},
 					},
 				],

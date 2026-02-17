@@ -491,7 +491,6 @@ describe( 'PostEditorAwareness', () => {
 				slug: 'test',
 				avatar_urls: mockAvatarUrls,
 				browserType: 'Chrome',
-				color: '#3858E9',
 				enteredAt: 1704067200000,
 			};
 

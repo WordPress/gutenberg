@@ -13,6 +13,11 @@ import {
 	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_KEY,
 	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
 } from './config';
+import {
+	logPerformanceTiming,
+	passThru,
+	yieldToEventLoop,
+} from './performance';
 import { createPersistedCRDTDoc, getPersistedCrdtDoc } from './persistence';
 import { getProviderCreators } from './providers';
 import type {
@@ -51,11 +56,27 @@ interface EntityState {
 }
 
 /**
+ * Get the entity ID for the given object type and object ID.
+ *
+ * @param {ObjectType}    objectType Object type.
+ * @param {ObjectID|null} objectId   Object ID.
+ */
+function getEntityId(
+	objectType: ObjectType,
+	objectId: ObjectID | null
+): EntityID {
+	return `${ objectType }_${ objectId }`;
+}
+
+/**
  * The sync manager orchestrates the lifecycle of syncing entity records. It
  * creates Yjs documents, connects to providers, creates awareness instances,
  * and coordinates with the `core-data` store.
+ *
+ * @param debug Whether to enable performance and debug logging.
  */
-export function createSyncManager(): SyncManager {
+export function createSyncManager( debug = false ): SyncManager {
+	const debugWrap = debug ? logPerformanceTiming : passThru;
 	const collectionStates: Map< ObjectType, CollectionState > = new Map();
 	const entityStates: Map< EntityID, EntityState > = new Map();
 
@@ -118,6 +139,15 @@ export function createSyncManager(): SyncManager {
 			return; // Already bootstrapped.
 		}
 
+		handlers = {
+			addUndoMeta: debugWrap( handlers.addUndoMeta ),
+			editRecord: debugWrap( handlers.editRecord ),
+			getEditedRecord: debugWrap( handlers.getEditedRecord ),
+			refetchRecord: debugWrap( handlers.refetchRecord ),
+			restoreUndoMeta: debugWrap( handlers.restoreUndoMeta ),
+			saveRecord: debugWrap( handlers.saveRecord ),
+		};
+
 		const ydoc = createYjsDoc( { objectType } );
 		const recordMap = ydoc.getMap( RECORD_KEY );
 		const recordMetaMap = ydoc.getMap( RECORD_METADATA_KEY );
@@ -148,7 +178,7 @@ export function createSyncManager(): SyncManager {
 				return;
 			}
 
-			void updateEntityRecord( objectType, objectId );
+			void internal.updateEntityRecord( objectType, objectId );
 		};
 
 		const onRecordMetaUpdate = (
@@ -208,7 +238,7 @@ export function createSyncManager(): SyncManager {
 		recordMetaMap.observe( onRecordMetaUpdate );
 
 		// Get and apply the persisted CRDT document, if it exists.
-		applyPersistedCrdtDoc( objectType, objectId, record );
+		internal.applyPersistedCrdtDoc( objectType, objectId, record );
 	}
 
 	/**
@@ -309,19 +339,6 @@ export function createSyncManager(): SyncManager {
 	}
 
 	/**
-	 * Get the entity ID for the given object type and object ID.
-	 *
-	 * @param {ObjectType}    objectType Object type.
-	 * @param {ObjectID|null} objectId   Object ID.
-	 */
-	function getEntityId(
-		objectType: ObjectType,
-		objectId: ObjectID | null
-	): EntityID {
-		return `${ objectType }_${ objectId }`;
-	}
-
-	/**
 	 * Get the awareness instance for the given object type and object ID, if supported.
 	 *
 	 * @template {Awareness} State
@@ -352,7 +369,7 @@ export function createSyncManager(): SyncManager {
 	 * @param {ObjectID}   objectId   Object ID.
 	 * @param {ObjectData} record     Entity record representing this object type.
 	 */
-	function applyPersistedCrdtDoc(
+	function _applyPersistedCrdtDoc(
 		objectType: ObjectType,
 		objectId: ObjectID,
 		record: ObjectData
@@ -505,7 +522,7 @@ export function createSyncManager(): SyncManager {
 	 * @param {ObjectType} objectType Object type of record to update.
 	 * @param {ObjectID}   objectId   Object ID of record to update.
 	 */
-	async function updateEntityRecord(
+	async function _updateEntityRecord(
 		objectType: ObjectType,
 		objectId: ObjectID
 	): Promise< void > {
@@ -556,16 +573,23 @@ export function createSyncManager(): SyncManager {
 		return createPersistedCRDTDoc( entityState.ydoc );
 	}
 
+	// Collect internal functions so that they can be wrapped before calling.
+	const internal = {
+		applyPersistedCrdtDoc: debugWrap( _applyPersistedCrdtDoc ),
+		updateEntityRecord: debugWrap( _updateEntityRecord ),
+	};
+
+	// Wrap and return the public API.
 	return {
-		createMeta: createEntityMeta,
+		createMeta: debugWrap( createEntityMeta ),
 		getAwareness,
-		load: loadEntity,
-		loadCollection,
+		load: debugWrap( loadEntity ),
+		loadCollection: debugWrap( loadCollection ),
 		// Use getter to ensure we always return the current value of `undoManager`.
 		get undoManager(): SyncUndoManager | undefined {
 			return undoManager;
 		},
-		unload: unloadEntity,
-		update: updateCRDTDoc,
+		unload: debugWrap( unloadEntity ),
+		update: debugWrap( yieldToEventLoop( updateCRDTDoc ) ),
 	};
 }

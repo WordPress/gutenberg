@@ -228,7 +228,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enables a REST API endpoint for accessing SVG icons.', 'gutenberg' ),
+			'label' => __( 'Enables a REST API endpoint for accessing SVG icons as well as the associated Icon block.', 'gutenberg' ),
 			'id'    => 'gutenberg-svg-icon-registry',
 		)
 	);

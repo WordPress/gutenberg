@@ -42,13 +42,22 @@
 		},
 		"./package.json": "./package.json"
 	},
-	"types": "build-types",
 	"wpWorkers": {
-		"./worker": "./src/worker.ts"
+		"./worker": {
+			"entry": "./src/worker.ts",
+			"resolve": {
+				"vips-es6.js": "vips.js"
+			}
+		}
 	},
+	"wpScriptModuleExports": {
+		"./worker": "./build-module/vips-worker.mjs",
+		"./loader": "./build-module/loader.mjs"
+	},
+	"types": "build-types",
 	"dependencies": {
 		"@wordpress/worker-threads": "file:../worker-threads",
-		"wasm-vips": "^0.0.10"
+		"wasm-vips": "^0.0.16"
 	},
 	"publishConfig": {
 		"access": "public"

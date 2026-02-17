@@ -45,15 +45,6 @@ When loaded, this package [adds the following state and actions](https://github.
 const { state, actions } = store( 'core/router', {
 	state: {
 		url: window.location.href,
-		navigation: {
-			hasStarted: false,
-			hasFinished: false,
-			texts: {
-				loading: '',
-				loaded: '',
-			},
-			message: '',
-		},
 	},
 	actions: {
 		*navigate(href, options) {...},
@@ -157,7 +148,6 @@ prefetch( url: string, options: PrefetchOptions = {} )
 ### State
 
 `state.url` is a reactive property synchronized with the current URL.
-Properties under `state.navigation` are meant for loading bar animations.
 
 ## Installation
 

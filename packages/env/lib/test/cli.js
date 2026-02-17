@@ -47,7 +47,7 @@ describe( 'env cli', () => {
 	it( 'parses reset commands for the default environment.', () => {
 		cli().parse( [ 'reset' ] );
 		const { environment, spinner } = env.reset.mock.calls[ 0 ][ 0 ];
-		expect( environment ).toBe( 'tests' );
+		expect( environment ).toBe( 'development' );
 		expect( spinner.text ).toBe( '' );
 	} );
 	it( 'parses reset commands for all environments.', () => {
@@ -72,7 +72,7 @@ describe( 'env cli', () => {
 	it( 'parses clean (deprecated) commands for the default environment.', () => {
 		cli().parse( [ 'clean' ] );
 		const { environment, spinner } = env.clean.mock.calls[ 0 ][ 0 ];
-		expect( environment ).toBe( 'tests' );
+		expect( environment ).toBe( 'development' );
 		expect( spinner.text ).toBe( '' );
 	} );
 

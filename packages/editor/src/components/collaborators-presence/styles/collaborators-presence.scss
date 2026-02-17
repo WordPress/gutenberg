@@ -46,38 +46,4 @@
 		outline: none;
 	}
 
-	// Avatar remaining count
-	.editor-collaborators-presence__remaining {
-		margin-right: $grid-unit-05 + 2;
-	}
-
-	// Avatar styles
-	.editor-collaborators-presence__avatar {
-		margin-left: -16px;
-		flex-shrink: 0;
-		border-color: $gray-100;
-
-		&:nth-child(1) {
-			margin-left: 0;
-			z-index: 3;
-		}
-
-		&:nth-child(2) {
-			z-index: 2;
-		}
-
-		&:nth-child(3) {
-			z-index: 1;
-		}
-	}
-
-	// Avatar hover state
-	.editor-collaborators-presence:hover & .editor-collaborators-presence__avatar {
-		border-color: $gray-300;
-	}
-
-	// Avatar pressed state
-	&.is-pressed .editor-collaborators-presence__avatar {
-		border-color: $gray-300;
-	}
 }

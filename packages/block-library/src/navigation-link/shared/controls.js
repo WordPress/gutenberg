@@ -115,38 +115,6 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 		setAttributes,
 	} );
 
-	const linkTitle =
-		entityRecord?.title?.rendered ||
-		entityRecord?.title ||
-		entityRecord?.name;
-
-	const linkImage = useSelect(
-		( select ) => {
-			// Only fetch for post-type entities with featured media
-			if ( ! entityRecord?.featured_media ) {
-				return null;
-			}
-
-			const { getEntityRecord } = select( coreStore );
-
-			// Get the media entity to fetch the image URL
-			const media = getEntityRecord(
-				'postType',
-				'attachment',
-				entityRecord.featured_media
-			);
-
-			// Return the thumbnail or medium size URL, fallback to source_url
-			return (
-				media?.media_details?.sizes?.thumbnail?.source_url ||
-				media?.media_details?.sizes?.medium?.source_url ||
-				media?.source_url ||
-				null
-			);
-		},
-		[ entityRecord?.featured_media ]
-	);
-
 	const onNavigateToEntityRecord = useSelect(
 		( select ) =>
 			select( blockEditorStore ).getSettings().onNavigateToEntityRecord,
@@ -158,12 +126,18 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 			?.home;
 	}, [] );
 
+	const blockEditingMode = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlockEditingMode( clientId ),
+		[ clientId ]
+	);
+
+	const isContentOnly = blockEditingMode === 'contentOnly';
+
 	const preview = useLinkPreview( {
 		url,
-		title: linkTitle,
-		image: linkImage,
+		entityRecord,
 		type: attributes.type,
-		entityStatus: entityRecord?.status,
 		hasBinding: hasUrlBinding,
 		isEntityAvailable: isBoundEntityAvailable,
 	} );
@@ -310,7 +284,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				hasValue={ () => !! description }
 				label={ __( 'Description' ) }
 				onDeselect={ () => setAttributes( { description: '' } ) }
-				isShownByDefault
+				isShownByDefault={ ! isContentOnly }
 			>
 				<TextareaControl
 					label={ __( 'Description' ) }
@@ -328,7 +302,7 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				hasValue={ () => !! rel }
 				label={ __( 'Rel attribute' ) }
 				onDeselect={ () => setAttributes( { rel: '' } ) }
-				isShownByDefault
+				isShownByDefault={ ! isContentOnly }
 			>
 				<TextControl
 					__next40pxDefaultSize

@@ -13,7 +13,7 @@ import useEntityId from './use-entity-id';
 import { updateFootnotesFromMeta } from '../footnotes';
 
 const EMPTY_ARRAY = [];
-const parsedBlocksCache = new WeakMap();
+const parsedBlocksCache = new Map();
 
 /**
  * Hook that returns block content getters and setters for
@@ -36,7 +36,6 @@ const parsedBlocksCache = new WeakMap();
 export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const providerId = useEntityId( kind, name );
 	const id = _id ?? providerId;
-	const { getEntityRecord, getEntityRecordEdits } = useSelect( STORE_NAME );
 	const { content, editedBlocks, meta } = useSelect(
 		( select ) => {
 			if ( ! id ) {
@@ -68,28 +67,21 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 			return EMPTY_ARRAY;
 		}
 
-		// If there's an edit, cache the parsed blocks by the edit.
-		// If not, cache by the original entity record.
-		const edits = getEntityRecordEdits( kind, name, id );
-		const isUnedited = ! edits || ! Object.keys( edits ).length;
-		const cackeKey = isUnedited ? getEntityRecord( kind, name, id ) : edits;
-		let _blocks = parsedBlocksCache.get( cackeKey );
+		// Cache parsed blocks by entity identity. Store the content
+		// alongside the blocks so we can validate it hasn't changed.
+		const cacheKey = `${ kind }:${ name }:${ id }`;
+		const cached = parsedBlocksCache.get( cacheKey );
+		let _blocks;
 
-		if ( ! _blocks ) {
+		if ( cached && cached.content === content ) {
+			_blocks = cached.blocks;
+		} else {
 			_blocks = parse( content );
-			parsedBlocksCache.set( cackeKey, _blocks );
+			parsedBlocksCache.set( cacheKey, { content, blocks: _blocks } );
 		}
 
 		return _blocks;
-	}, [
-		kind,
-		name,
-		id,
-		editedBlocks,
-		content,
-		getEntityRecord,
-		getEntityRecordEdits,
-	] );
+	}, [ kind, name, id, editedBlocks, content ] );
 
 	const onChange = useCallback(
 		( newBlocks, options ) => {

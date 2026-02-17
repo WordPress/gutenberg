@@ -7,6 +7,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Custom hook for managing List View panel state.
@@ -17,13 +18,12 @@ import { store as blockEditorStore } from '../../store';
 export default function useListViewPanelState( clientId ) {
 	const { isOpened, expandRevision } = useSelect(
 		( select ) => {
-			const {
-				__unstableIsListViewPanelOpened,
-				__unstableGetListViewExpandRevision,
-			} = select( blockEditorStore );
+			const { isListViewPanelOpened, getListViewExpandRevision } = unlock(
+				select( blockEditorStore )
+			);
 			return {
-				isOpened: __unstableIsListViewPanelOpened( clientId ),
-				expandRevision: __unstableGetListViewExpandRevision(),
+				isOpened: isListViewPanelOpened( clientId ),
+				expandRevision: getListViewExpandRevision(),
 			};
 		},
 		[ clientId ]

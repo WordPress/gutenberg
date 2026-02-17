@@ -133,7 +133,7 @@ function useEditorStyles( settings ) {
 
 /**
  * @param {Object}  props
- * @param {boolean} props.isLegacy True when the editor canvas is not in an iframe.
+ * @param {boolean} props.isLegacy True for device previews where split view is disabled.
  */
 function MetaBoxesMain( { isLegacy } ) {
 	const [ isOpen, openHeight, hasAnyVisible ] = useSelect( ( select ) => {
@@ -601,11 +601,7 @@ function Layout( {
 						extraContent={
 							! isDistractionFree &&
 							showMetaBoxes && (
-								<MetaBoxesMain
-									isLegacy={
-										! shouldIframe || isDevicePreview
-									}
-								/>
+								<MetaBoxesMain isLegacy={ isDevicePreview } />
 							)
 						}
 					>

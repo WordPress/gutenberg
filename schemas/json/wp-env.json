@@ -120,6 +120,11 @@
 					"type": "integer",
 					"default": 8889
 				},
+				"testsEnvironment": {
+					"description": "Whether to create the tests environment. Set to false to skip creating test containers, saving resources.",
+					"type": "boolean",
+					"default": true
+				},
 				"lifecycleScripts": {
 					"description": "Mapping of commands that should be executed at certain points in the lifecycle.",
 					"type": "object",
@@ -153,6 +158,7 @@
 							"$schema",
 							"env",
 							"testsPort",
+							"testsEnvironment",
 							"lifecycleScripts"
 						]
 					}

@@ -110,14 +110,13 @@
 	clear: both;
 }
 
-// Only when the split view is active the visual editor should allow shrinking and
-// its main size should be zero.
+// Only when the split view is active the visual editor should allow shrinking,
+// its main size should be zero, and overflow should be hidden so that the inner
+// container provides the scrollable viewport.
 .has-metaboxes .interface-interface-skeleton__content:has(.edit-post-meta-boxes-main) .editor-visual-editor {
 	flex-shrink: 1;
 	flex-basis: 0%;
-}
-
-.has-metaboxes .editor-visual-editor.is-iframed {
+	overflow: hidden;
 	isolation: isolate;
 }
 

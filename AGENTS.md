@@ -56,6 +56,23 @@ vendor/bin/phpcs         # Check PHP standards
 vendor/bin/phpcbf <path_to_php_file.php>
 ```
 
+## Architectural decisions
+
+-   **Package layering**: Three editor layers — `block-editor` (generic, WP-agnostic) → `editor` (WordPress post-type-aware) → `edit-post`/`edit-site` (full screens). Lower layers MUST NOT depend on higher ones.
+-   **Block data model**: Blocks are in-memory tree structures during editing, serialized as HTML with comment delimiters (`<!-- wp:name -->`). Work with the block tree via APIs, not the serialized HTML.
+-   **Data layer**: Uses `@wordpress/data` (Redux-like stores). Edit entities through `core-data` actions (`editEntityRecord` / `saveEditedEntityRecord`), not direct state manipulation.
+-   **Styles system**: Three-layer merge — WordPress defaults < `theme.json` < user preferences. Use Block Supports API and CSS custom properties (`--wp--preset--*`), not hardcoded values.
+-   **Modularity**: Packages are available both as npm packages and WordPress scripts (`wp-*` handles). Production packages must work in both contexts.
+
+For full architecture details, see `docs/explanations/architecture/`.
+
+## Common pitfalls
+
+-   PHP features in `lib/compat/` MUST target a specific `wordpress-X.Y/` subdirectory.
+-   Avoid using private APIs in bundled packages (packages without `wpScript` or `wpModuleExports`). Private APIs are intended for Core usage; bundled packages may also be imported via npm into plugin scripts, causing incompatibilities.
+-   `block-editor` is a WordPress-agnostic package. NEVER add `core-data` dependencies or direct REST API calls to it.
+-   `@wordpress/build` (`packages/wp-build`) is a generic build tool used both in Gutenberg and by plugins targeting WordPress Core directly. Avoid Gutenberg-specific changes in it.
+
 ## PR instructions
 
 -   Ensure build passes

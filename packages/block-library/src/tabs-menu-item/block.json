@@ -1,6 +1,5 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
-	"__experimental": true,
 	"apiVersion": 3,
 	"name": "core/tabs-menu-item",
 	"title": "Tab Menu Item",
@@ -66,16 +65,7 @@
 			}
 		},
 		"layout": {
-			"default": {
-				"type": "flex",
-				"orientation": "vertical",
-				"flexWrap": "nowrap"
-			},
-			"allowVerticalAlignment": true,
-			"allowJustification": true,
-			"allowSwitching": false,
-			"allowOrientation": false,
-			"allowWrap": false
+			"allowEditing": false
 		},
 		"spacing": {
 			"padding": true,
