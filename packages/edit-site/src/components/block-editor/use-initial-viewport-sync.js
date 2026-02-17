@@ -13,42 +13,23 @@ import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
 
-const VALID_VIEWPORTS = [ 'desktop', 'tablet', 'mobile' ];
-const VIEWPORT_TO_DEVICE_TYPE = {
-	desktop: 'Desktop',
-	tablet: 'Tablet',
-	mobile: 'Mobile',
-};
-const DEFAULT_DEVICE_TYPE = 'Desktop';
+export const DEFAULT_DEVICE_TYPE = 'Desktop';
 
-// Inverse mapping for URL serialization (device type → viewport param)
-export const DEVICE_TYPE_TO_VIEWPORT = Object.fromEntries(
-	Object.entries( VIEWPORT_TO_DEVICE_TYPE ).map( ( [ k, v ] ) => [ v, k ] )
-);
-export { VALID_VIEWPORTS, VIEWPORT_TO_DEVICE_TYPE, DEFAULT_DEVICE_TYPE };
+// URL viewport params are lowercase; the editor store uses PascalCase.
+const capitalize = ( str ) => str.charAt( 0 ).toUpperCase() + str.slice( 1 );
 
 /**
  * Syncs the editor's device type with the `viewport` URL query param.
- * - When viewport is in the URL and valid: use it (e.g. mobile when editing a specific entity).
- * - When no viewport or invalid: default to Desktop (full-size viewport), e.g. when
- *   returning from a focused entity editor without a saved viewport.
  */
 export default function useInitialViewportSync() {
 	const { query } = useLocation();
 	const { setDeviceType } = useDispatch( editorStore );
 
 	useEffect( () => {
-		const viewport = query?.viewport;
-		const isValidViewport =
-			viewport &&
-			typeof viewport === 'string' &&
-			VALID_VIEWPORTS.includes( viewport.toLowerCase() );
+		const viewport = query?.viewport?.toLowerCase();
+		const isValid = [ 'desktop', 'tablet', 'mobile' ].includes( viewport );
 
-		const deviceType = isValidViewport
-			? VIEWPORT_TO_DEVICE_TYPE[ viewport.toLowerCase() ]
-			: DEFAULT_DEVICE_TYPE;
-
-		setDeviceType( deviceType );
+		setDeviceType( isValid ? capitalize( viewport ) : DEFAULT_DEVICE_TYPE );
 	}, [ query?.viewport, setDeviceType ] );
 }
 
