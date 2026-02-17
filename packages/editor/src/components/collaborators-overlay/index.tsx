@@ -3,11 +3,13 @@
  */
 // @ts-expect-error No exported types
 import { privateApis } from '@wordpress/block-editor';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { createCursorRegistry } from './cursor-registry';
 import { Overlay } from './overlay';
 
 const { BlockCanvasCover } = unlock( privateApis );
@@ -25,6 +27,8 @@ interface Props {
  * @return The CollaboratorsOverlay component
  */
 export function CollaboratorsOverlay( { postId, postType }: Props ) {
+	const [ cursorRegistry ] = useState( createCursorRegistry );
+
 	return (
 		<BlockCanvasCover.Fill>
 			{ ( {
@@ -34,6 +38,7 @@ export function CollaboratorsOverlay( { postId, postType }: Props ) {
 			} ) => (
 				<Overlay
 					blockEditorDocument={ containerRef.current?.ownerDocument }
+					cursorRegistry={ cursorRegistry }
 					postId={ postId }
 					postType={ postType }
 				/>
