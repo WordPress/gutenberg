@@ -79,10 +79,6 @@ export function AddComment( {
 					: undefined
 			}
 			onBlur={ ( event ) => {
-				// Don't deselect notes when the browser window/tab loses focus.
-				if ( ! document.hasFocus() ) {
-					return;
-				}
 				if ( event.currentTarget.contains( event.relatedTarget ) ) {
 					return;
 				}
