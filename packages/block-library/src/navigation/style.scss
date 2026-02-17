@@ -239,8 +239,8 @@ $navigation-icon-size: 24px;
 	// When the submenu-revert-overflow class is present, revert to mobile positioning
 	// to prevent viewport overflow. This class is added by JavaScript when needed.
 	&.submenu-revert-overflow {
-		> .wp-block-navigation__submenu-container {
-			@include break-medium {
+		@include break-medium {
+			> .wp-block-navigation__submenu-container {
 				left: -1px; // Border width.
 				top: 100%;
 
@@ -248,14 +248,11 @@ $navigation-icon-size: 24px;
 				&::before {
 					display: none;
 				}
+			}
 
-				.wp-block-navigation__submenu-icon {
-					margin-right: 0;
-				}
-
-				.wp-block-navigation__submenu-icon svg {
-					transform: rotate(0deg);
-				}
+			// Reset the submenu indicator for downward flyouts.
+			.wp-block-navigation__submenu-icon svg {
+				transform: rotate(0deg);
 			}
 		}
 	}
