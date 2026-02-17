@@ -59,7 +59,8 @@ export default function useNavigateToEntityRecord() {
 				urlUpdates.selectedBlock = externalClientId;
 			}
 
-			// Save the current viewport for when we navigate back (e.g. from overlay editor)
+			// Save the current viewport for when we navigate back (e.g. from overlay editor).
+			// Omit viewport from URL when it's the default to keep URLs clean.
 			const requestedViewport =
 				typeof params.viewport === 'string'
 					? params.viewport.toLowerCase()
