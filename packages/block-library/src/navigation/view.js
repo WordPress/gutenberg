@@ -40,6 +40,52 @@ function getFocusableElements( ref ) {
 	} );
 }
 
+/**
+ * Checks if a submenu would overflow the viewport horizontally.
+ * If it would overflow, adds a class to open it downward instead.
+ *
+ * @param {HTMLElement} submenuContainer - The submenu container element
+ */
+function checkSubmenuOverflow( submenuContainer ) {
+	if ( ! submenuContainer ) {
+		return;
+	}
+
+	const parentItem = submenuContainer.closest( '.has-child' );
+	if ( ! parentItem ) {
+		return;
+	}
+
+	// Remove the class first to get accurate measurements
+	parentItem.classList.remove( 'open-downward' );
+
+	// Get the parent's position
+	const parentRect = parentItem.getBoundingClientRect();
+	const viewportWidth = window.innerWidth;
+
+	// Check if this is a nested submenu (not a top-level submenu)
+	const isNested = parentItem.closest(
+		'.wp-block-navigation__submenu-container'
+	);
+
+	// For top-level submenus on medium+ screens, they open horizontally to the right
+	// We need to check if opening to the right would overflow
+	const submenuWidth = submenuContainer.offsetWidth || 200; // Default minimum width from CSS
+
+	// Only check for overflow on medium+ breakpoints (782px+)
+	// where submenus open horizontally
+	if ( window.matchMedia( '(min-width: 782px)' ).matches ) {
+		// Calculate where the right edge of the submenu would be
+		// if it opens to the right
+		const submenuRightEdge = parentRect.right + submenuWidth;
+
+		// If submenu would overflow viewport, open it downward instead
+		if ( submenuRightEdge > viewportWidth && ! isNested ) {
+			parentItem.classList.add( 'open-downward' );
+		}
+	}
+}
+
 // This is a fix for Safari in iOS/iPadOS. Without it, Safari doesn't focus out
 // when the user taps in the body. It can be removed once we add an overlay to
 // capture the clicks, instead of relying on the focusout event.
@@ -188,10 +234,18 @@ const { state, actions } = store(
 
 			openMenu( menuOpenedOn = 'click' ) {
 				const { type } = getContext();
+				const { ref } = getElement();
 				state.menuOpenedBy[ menuOpenedOn ] = true;
 				if ( type === 'overlay' ) {
 					// Add a `has-modal-open` class to the <html> root.
 					document.documentElement.classList.add( 'has-modal-open' );
+				}
+				// Check for submenu overflow when opening
+				if ( type === 'submenu' && ref ) {
+					const submenuContainer = ref.querySelector(
+						'.wp-block-navigation__submenu-container'
+					);
+					checkSubmenuOverflow( submenuContainer );
 				}
 			},
 
@@ -225,6 +279,20 @@ const { state, actions } = store(
 					ctx.firstFocusableElement = focusableElements[ 0 ];
 					ctx.lastFocusableElement =
 						focusableElements[ focusableElements.length - 1 ];
+				}
+				// Set up resize handler for overflow detection
+				if ( ctx.type === 'submenu' && ref ) {
+					const submenuContainer = ref.querySelector(
+						'.wp-block-navigation__submenu-container'
+					);
+					if ( submenuContainer && ! ctx.resizeHandler ) {
+						ctx.resizeHandler = () => {
+							if ( state.isMenuOpen ) {
+								checkSubmenuOverflow( submenuContainer );
+							}
+						};
+						window.addEventListener( 'resize', ctx.resizeHandler );
+					}
 				}
 			},
 			focusFirstElement() {

@@ -236,6 +236,26 @@ $navigation-icon-size: 24px;
 		}
 	}
 
+	// Open submenu downward when it would overflow viewport horizontally
+	&.open-downward {
+		@include break-medium {
+			> .wp-block-navigation__submenu-container {
+				left: -1px; // Border width.
+				top: 100%;
+
+				// Remove the hover gap for downward-opening submenus
+				&::before {
+					display: none;
+				}
+			}
+
+			// Reset the submenu indicator for downward flyouts.
+			.wp-block-navigation__submenu-icon svg {
+				transform: rotate(0deg);
+			}
+		}
+	}
+
 	// Custom menu items.
 	// Mixin for showing submenu containers
 	@mixin show-submenu {
@@ -322,6 +342,16 @@ $navigation-icon-size: 24px;
 			left: 100%;
 			top: 0;
 		}
+	}
+}
+
+// Open submenu downward when it would overflow viewport (with background)
+.wp-block-navigation.has-background
+.has-child.open-downward
+.wp-block-navigation__submenu-container {
+	@include break-medium {
+		left: 0;
+		top: 100%;
 	}
 }
 
