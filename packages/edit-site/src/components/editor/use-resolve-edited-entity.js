@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useMemo, useRef } from '@wordpress/element';
-import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 
@@ -55,7 +55,8 @@ function getPostType( name ) {
 }
 
 export function useResolveEditedEntity() {
-	const registry = useRegistry();
+	const { editEntityRecord } = useDispatch( coreDataStore );
+	const { getEntityRecord } = useSelect( coreDataStore );
 	const { name, params = {}, query } = useLocation();
 	const { postId = query?.postId } = params; // Fallback to query param for postId for list view routes.
 	const postType = getPostType( name, postId ) ?? query?.postType;
@@ -165,19 +166,25 @@ export function useResolveEditedEntity() {
 			? entity.context.postId
 			: entity.postId;
 
-		registry.dispatch( coreDataStore ).editEntityRecord(
-			'postType',
-			selectionPostType,
-			selectionPostId,
-			{
-				selection: {
-					selectionStart: { clientId: selectedBlock },
-					selectionEnd: { clientId: selectedBlock },
+		// Only apply selection if the entity record is loaded,
+		// otherwise editEntityRecord will throw.
+		if (
+			getEntityRecord( 'postType', selectionPostType, selectionPostId )
+		) {
+			editEntityRecord(
+				'postType',
+				selectionPostType,
+				selectionPostId,
+				{
+					selection: {
+						selectionStart: { clientId: selectedBlock },
+						selectionEnd: { clientId: selectedBlock },
+					},
 				},
-			},
-			{ undoIgnore: true }
-		);
-		appliedSelectionRef.current = selectedBlock;
+				{ undoIgnore: true }
+			);
+			appliedSelectionRef.current = selectedBlock;
+		}
 	}
 
 	return entity;
