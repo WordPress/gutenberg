@@ -25,7 +25,7 @@ import {
 	memo,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { isShallowEqual } from '@wordpress/is-shallow-equal';
 import { __unstableUseShortcutEventMatch as useShortcutEventMatch } from '@wordpress/keyboard-shortcuts';
@@ -54,7 +54,7 @@ import { useBlockRename, BlockRenameModal } from '../block-rename';
 import AriaReferencedText from './aria-referenced-text';
 import { unlock } from '../../lock-unlock';
 import usePasteStyles from '../use-paste-styles';
-import { BLOCK_VISIBILITY_VIEWPORT_ENTRIES } from '../block-visibility/constants';
+import { getBlockVisibilityLabel } from '../block-visibility';
 
 function ListViewBlock( {
 	block: { clientId },
@@ -141,38 +141,6 @@ function ListViewBlock( {
 		[ clientId ]
 	);
 	const { canRename } = useBlockRename( blockName );
-
-	// Determine label based on where block is hidden (not when/current viewport)
-	const blockVisibilityDescription = useMemo( () => {
-		const blockVisibility = block?.attributes?.metadata?.blockVisibility;
-
-		// Not hidden at all
-		if ( ! blockVisibility && blockVisibility !== false ) {
-			return null;
-		}
-
-		if ( blockVisibility === false ) {
-			// Hidden on all viewports
-			return __( 'Block is hidden' );
-		}
-
-		if ( blockVisibility?.viewport ) {
-			// Hidden on specific viewports - list them
-			const hiddenViewports = BLOCK_VISIBILITY_VIEWPORT_ENTRIES.filter(
-				( [ key ] ) => blockVisibility.viewport?.[ key ] === false
-			).map( ( [ , viewport ] ) => viewport.label );
-
-			if ( hiddenViewports.length > 0 ) {
-				return sprintf(
-					/* translators: %s: comma-separated list of viewport names (Desktop, Tablet, Mobile) */
-					__( 'Block is hidden on %s' ),
-					hiddenViewports.join( ', ' )
-				);
-			}
-		}
-
-		return null;
-	}, [ block?.attributes?.metadata?.blockVisibility ] );
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
@@ -558,6 +526,11 @@ function ListViewBlock( {
 	const blockPropertiesDescription = getBlockPropertiesDescription(
 		blockInformation,
 		isLocked
+	);
+
+	// Determine label based on where block is hidden (not when/current viewport)
+	const blockVisibilityDescription = getBlockVisibilityLabel(
+		block?.attributes?.metadata?.blockVisibility
 	);
 
 	const hasSiblings = siblingBlockCount > 0;

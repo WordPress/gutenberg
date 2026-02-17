@@ -13,7 +13,6 @@ import {
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
 import {
 	Icon,
 	lockSmall as lock,
@@ -35,7 +34,7 @@ import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import { BLOCK_VISIBILITY_VIEWPORT_ENTRIES } from '../block-visibility/constants';
+import { getBlockVisibilityLabel } from '../block-visibility';
 
 const { Badge } = unlock( componentsPrivateApis );
 
@@ -80,24 +79,7 @@ function ListViewBlockSelectButton(
 	const images = useListViewImages( { clientId, isExpanded } );
 
 	// Determine visibility label from blockVisibility metadata
-	let visibilityLabel;
-	if ( blockVisibility === false ) {
-		// Hidden on all viewports
-		visibilityLabel = __( 'Block is hidden' );
-	} else if ( blockVisibility?.viewport ) {
-		// Hidden on specific viewports - list them
-		const hiddenViewports = BLOCK_VISIBILITY_VIEWPORT_ENTRIES.filter(
-			( [ key ] ) => blockVisibility.viewport?.[ key ] === false
-		).map( ( [ , viewport ] ) => viewport.label );
-
-		if ( hiddenViewports.length > 0 ) {
-			visibilityLabel = sprintf(
-				/* translators: %s: comma-separated list of viewport names (Desktop, Tablet, Mobile) */
-				__( 'Hidden on %s' ),
-				hiddenViewports.join( ', ' )
-			);
-		}
-	}
+	const visibilityLabel = getBlockVisibilityLabel( blockVisibility );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
