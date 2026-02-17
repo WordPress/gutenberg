@@ -68,6 +68,15 @@ function save() {
 			`,
 			filename: '/path/to/block/deprecated.js',
 		},
+		{
+			code: `
+// Translation in deprecated save function with Windows path
+function save() {
+	return __( 'Hello World' );
+}
+			`,
+			filename: 'D:\\path\\to\\block\\deprecated.js',
+		},
 	],
 	invalid: [
 		{

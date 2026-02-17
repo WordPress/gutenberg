@@ -25,21 +25,22 @@ module.exports = {
 		const filename = context.getFilename();
 
 		// Skip deprecated files as they preserve old behavior including translation functions
+		const normalizedFilename = filename.replace( /\\/g, '/' );
 		const isDeprecatedFile =
-			filename.includes( '/deprecated.js' ) ||
-			filename.includes( '/deprecated.ts' ) ||
-			filename.includes( '/deprecated.jsx' ) ||
-			filename.includes( '/deprecated.tsx' );
+			normalizedFilename.includes( '/deprecated.js' ) ||
+			normalizedFilename.includes( '/deprecated.ts' ) ||
+			normalizedFilename.includes( '/deprecated.jsx' ) ||
+			normalizedFilename.includes( '/deprecated.tsx' );
 
 		if ( isDeprecatedFile ) {
 			return {};
 		}
 
 		const isSaveFile =
-			filename.endsWith( '/save.js' ) ||
-			filename.endsWith( '/save.ts' ) ||
-			filename.endsWith( '/save.jsx' ) ||
-			filename.endsWith( '/save.tsx' );
+			normalizedFilename.endsWith( '/save.js' ) ||
+			normalizedFilename.endsWith( '/save.ts' ) ||
+			normalizedFilename.endsWith( '/save.jsx' ) ||
+			normalizedFilename.endsWith( '/save.tsx' );
 
 		return {
 			// Track when we enter a function named 'save'
