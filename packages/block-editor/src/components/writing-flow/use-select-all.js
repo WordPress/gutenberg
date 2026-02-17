@@ -37,9 +37,14 @@ export default function useSelectAll() {
 
 			const { ownerDocument } = event.target;
 			const [ firstSelectedClientId ] = selectedClientIds;
+			const activeClientId = getBlockClientId(
+				ownerDocument.activeElement
+			);
 
 			// Handle the case when an appender is selected.
 			if (
+				activeClientId &&
+				activeClientId !== firstSelectedClientId &&
 				! isInsideRootBlock(
 					ownerDocument.getElementById(
 						'block-' + firstSelectedClientId
@@ -47,7 +52,7 @@ export default function useSelectAll() {
 					ownerDocument.activeElement
 				)
 			) {
-				selectBlock( getBlockClientId( ownerDocument.activeElement ) );
+				selectBlock( activeClientId );
 				return;
 			}
 
