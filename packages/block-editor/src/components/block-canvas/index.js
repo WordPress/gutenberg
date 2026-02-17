@@ -105,15 +105,6 @@ export function ExperimentalBlockCanvas( {
 				>
 					{ children }
 				</WritingFlow>
-				<BlockCanvasCover.Slot fillProps={ { containerRef: localRef } }>
-					{ ( covers ) =>
-						covers.map( ( cover, index ) => (
-							<BlockCanvasCoverWrapper key={ index }>
-								{ cover }
-							</BlockCanvasCoverWrapper>
-						) )
-					}
-				</BlockCanvasCover.Slot>
 			</BlockTools>
 		);
 	}
@@ -144,15 +135,6 @@ export function ExperimentalBlockCanvas( {
 				</BlockCanvasCover.Slot>
 				<EditorStyles styles={ styles } />
 				{ children }
-				<BlockCanvasCover.Slot fillProps={ { containerRef: localRef } }>
-					{ ( covers ) =>
-						covers.map( ( cover, index ) => (
-							<BlockCanvasCoverWrapper key={ index }>
-								{ cover }
-							</BlockCanvasCoverWrapper>
-						) )
-					}
-				</BlockCanvasCover.Slot>
 			</Iframe>
 		</BlockTools>
 	);
