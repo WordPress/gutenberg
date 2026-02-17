@@ -35,14 +35,12 @@ function block_core_tabs_generate_tabs_list( array $innerblocks = array() ): arr
 						}
 					}
 
-					$tab_id = sanitize_html_class( $tab_id );
-
 					if ( empty( $tab_id ) ) {
 						$tab_id = 'tab-' . $tab_index;
 					}
 
 					$tabs_list[] = array(
-						'id'    => $tab_id,
+						'id'    => esc_attr( $tab_id ),
 						'label' => esc_html( (string) $tab_label ),
 						'index' => $tab_index,
 					);

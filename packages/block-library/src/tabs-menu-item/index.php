@@ -21,7 +21,7 @@
 function block_core_tabs_menu_item_render_callback( array $attributes, string $content, \WP_Block $block ): string {
 	// Get tab-specific context
 	$tab_index = $block->context['core/tabs-menu-item-index'] ?? 0;
-	$tab_id    = sanitize_html_class( $block->context['core/tabs-menu-item-id'] ?? '' );
+	$tab_id    = $block->context['core/tabs-menu-item-id'] ?? '';
 	$tab_label = $block->context['core/tabs-menu-item-label'] ?? '';
 
 	if ( empty( $tab_id ) ) {
@@ -36,8 +36,8 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 		$tag_processor->remove_attribute( 'hidden' );
 
 		// Set tab-specific attributes
-		$tag_processor->set_attribute( 'id', 'tab__' . $tab_id );
-		$tag_processor->set_attribute( 'aria-controls', $tab_id );
+		$tag_processor->set_attribute( 'id', esc_attr( 'tab__' . $tab_id ) );
+		$tag_processor->set_attribute( 'aria-controls', esc_attr( $tab_id ) );
 
 		// Add IAPI directives
 		$tag_processor->set_attribute( 'data-wp-on--click', 'actions.handleTabClick' );
