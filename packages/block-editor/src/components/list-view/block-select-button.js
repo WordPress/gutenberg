@@ -63,15 +63,11 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { isBlockHidden, hasPatternName, blockVisibility } = useSelect(
+	const { hasPatternName, blockVisibility } = useSelect(
 		( select ) => {
-			const {
-				isBlockHiddenAnywhere: _isBlockHidden,
-				getBlockAttributes,
-			} = unlock( select( blockEditorStore ) );
+			const { getBlockAttributes } = unlock( select( blockEditorStore ) );
 			const attributes = getBlockAttributes( clientId );
 			return {
-				isBlockHidden: _isBlockHidden( clientId ),
 				hasPatternName: !! attributes?.metadata?.patternName,
 				blockVisibility: attributes?.metadata?.blockVisibility,
 			};
@@ -85,23 +81,21 @@ function ListViewBlockSelectButton(
 
 	// Determine visibility label from blockVisibility metadata
 	let visibilityLabel;
-	if ( isBlockHidden ) {
-		if ( blockVisibility === false ) {
-			// Hidden on all viewports
-			visibilityLabel = __( 'Block is hidden' );
-		} else if ( blockVisibility?.viewport ) {
-			// Hidden on specific viewports - list them
-			const hiddenViewports = BLOCK_VISIBILITY_VIEWPORT_ENTRIES.filter(
-				( [ key ] ) => blockVisibility.viewport[ key ] === false
-			).map( ( [ , viewport ] ) => viewport.label );
+	if ( blockVisibility === false ) {
+		// Hidden on all viewports
+		visibilityLabel = __( 'Block is hidden' );
+	} else if ( blockVisibility?.viewport ) {
+		// Hidden on specific viewports - list them
+		const hiddenViewports = BLOCK_VISIBILITY_VIEWPORT_ENTRIES.filter(
+			( [ key ] ) => blockVisibility.viewport?.[ key ] === false
+		).map( ( [ , viewport ] ) => viewport.label );
 
-			if ( hiddenViewports.length > 0 ) {
-				visibilityLabel = sprintf(
-					/* translators: %s: comma-separated list of viewport names (Desktop, Tablet, Mobile) */
-					__( 'Hidden on %s' ),
-					hiddenViewports.join( ', ' )
-				);
-			}
+		if ( hiddenViewports.length > 0 ) {
+			visibilityLabel = sprintf(
+				/* translators: %s: comma-separated list of viewport names (Desktop, Tablet, Mobile) */
+				__( 'Hidden on %s' ),
+				hiddenViewports.join( ', ' )
+			);
 		}
 	}
 
@@ -187,7 +181,7 @@ function ListViewBlockSelectButton(
 						) ) }
 					</span>
 				) : null }
-				{ isBlockHidden && visibilityLabel && (
+				{ visibilityLabel && (
 					<Tooltip text={ visibilityLabel }>
 						<span
 							className="block-editor-list-view-block-select-button__block-visibility"

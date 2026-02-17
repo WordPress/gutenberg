@@ -142,24 +142,14 @@ function ListViewBlock( {
 	);
 	const { canRename } = useBlockRename( blockName );
 
-	const { isBlockHiddenAnywhere } = useSelect(
-		( select ) => {
-			return {
-				isBlockHiddenAnywhere: unlock(
-					select( blockEditorStore )
-				).isBlockHiddenAnywhere( clientId ),
-			};
-		},
-		[ clientId ]
-	);
-
 	// Determine label based on where block is hidden (not when/current viewport)
 	const blockVisibilityDescription = useMemo( () => {
-		if ( ! isBlockHiddenAnywhere ) {
+		const blockVisibility = block?.attributes?.metadata?.blockVisibility;
+
+		// Not hidden at all
+		if ( ! blockVisibility && blockVisibility !== false ) {
 			return null;
 		}
-
-		const blockVisibility = block?.attributes?.metadata?.blockVisibility;
 
 		if ( blockVisibility === false ) {
 			// Hidden on all viewports
@@ -169,7 +159,7 @@ function ListViewBlock( {
 		if ( blockVisibility?.viewport ) {
 			// Hidden on specific viewports - list them
 			const hiddenViewports = BLOCK_VISIBILITY_VIEWPORT_ENTRIES.filter(
-				( [ key ] ) => blockVisibility.viewport[ key ] === false
+				( [ key ] ) => blockVisibility.viewport?.[ key ] === false
 			).map( ( [ , viewport ] ) => viewport.label );
 
 			if ( hiddenViewports.length > 0 ) {
@@ -182,10 +172,7 @@ function ListViewBlock( {
 		}
 
 		return null;
-	}, [
-		isBlockHiddenAnywhere,
-		block?.attributes?.metadata?.blockVisibility,
-	] );
+	}, [ block?.attributes?.metadata?.blockVisibility ] );
 
 	const showBlockActions =
 		// When a block hides its toolbar it also hides the block settings menu,
