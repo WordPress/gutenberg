@@ -20,7 +20,7 @@ function Avatar( {
 	src,
 	name,
 	label,
-	badge = false,
+	variant,
 	size = 'default',
 	borderColor,
 	dimmed = false,
@@ -28,7 +28,7 @@ function Avatar( {
 	style,
 	...props
 }: WordPressComponentProps< AvatarProps, 'div', false > ) {
-	const showBadge = badge && !! name;
+	const showBadge = variant === 'badge' && !! name;
 	const initials = name
 		? name
 				.split( /\s+/ )
@@ -60,7 +60,7 @@ function Avatar( {
 			className={ clsx( 'components-avatar', className, {
 				'has-avatar-border-color': !! borderColor,
 				'has-src': !! src,
-				'has-badge': showBadge,
+				'is-badge': showBadge,
 				'is-small': size === 'small',
 				'is-dimmed': dimmed,
 			} ) }

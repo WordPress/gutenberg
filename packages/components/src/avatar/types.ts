@@ -19,12 +19,14 @@ export type AvatarProps = {
 	 */
 	label?: string;
 	/**
-	 * Whether to show the hover-expand badge that reveals the user's
-	 * name (or `label`) on hover. Requires `name` to be set.
+	 * Specifies the avatar's visual style treatment.
 	 *
-	 * @default false
+	 * - `'badge'`: Displays a hover-expand pill that reveals the user's
+	 *   name (or `label`) on hover. Requires `name` to be set.
+	 *
+	 * Leave undefined for the default circular avatar.
 	 */
-	badge?: boolean;
+	variant?: 'badge';
 	/**
 	 * Size of the avatar.
 	 *

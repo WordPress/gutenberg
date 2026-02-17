@@ -108,7 +108,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	white-space: nowrap;
 	transition: opacity 0.15s cubic-bezier(0.15, 0, 0.15, 1);
 }
-.components-avatar.has-badge {
+.components-avatar.is-badge {
 	display: inline-grid;
 	grid-template-columns: min-content 0fr;
 	column-gap: 0;
@@ -118,17 +118,17 @@ const COLLABORATORS_OVERLAY_STYLES = `
 		column-gap 0.3s cubic-bezier(0.15, 0, 0.15, 1),
 		padding-inline-end 0.3s cubic-bezier(0.15, 0, 0.15, 1);
 }
-.components-avatar.has-badge:hover {
+.components-avatar.is-badge:hover {
 	grid-template-columns: min-content 1fr;
 	column-gap: 4px;
 	padding-inline-end: 8px;
 	transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
 }
-.components-avatar.has-badge:hover .components-avatar__name {
+.components-avatar.is-badge:hover .components-avatar__name {
 	opacity: 1;
 	transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
 }
-.components-avatar.has-badge.has-avatar-border-color {
+.components-avatar.is-badge.has-avatar-border-color {
 	background-color: var(--components-avatar-outline-color);
 }
 /* ── end Avatar ── */
@@ -190,7 +190,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	z-index: 1;
 }
 @media (prefers-reduced-motion: reduce) {
-	.components-avatar.has-badge,
+	.components-avatar.is-badge,
 	.components-avatar__name,
 	.collaborators-overlay-user-label,
 	.collaborators-overlay-user-cursor {
@@ -271,7 +271,7 @@ export function Overlay( {
 					/>
 					<Avatar
 						className="collaborators-overlay-user-label"
-						badge
+						variant="badge"
 						size="small"
 						src={ cursor.avatarUrl }
 						name={ cursor.userName }

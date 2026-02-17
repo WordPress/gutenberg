@@ -64,12 +64,12 @@ export const Initials: Story = {
 export const Badge: Story = {
 	args: {
 		...WithBorderColor.args,
-		badge: true,
+		variant: 'badge',
 	},
 	parameters: {
 		docs: {
 			description: {
-				story: 'When `badge` is true, hovering the avatar expands a pill that reveals the name. Use the `label` prop to override the visible text.',
+				story: 'The `badge` variant displays a hover-expand pill that reveals the name. Use the `label` prop to override the visible text.',
 			},
 		},
 	},
@@ -78,7 +78,7 @@ export const Badge: Story = {
 export const WithLabel: Story = {
 	args: {
 		...WithBorderColor.args,
-		badge: true,
+		variant: 'badge',
 		label: 'You',
 	},
 };
@@ -90,13 +90,13 @@ export const BadgeContrastText: Story = {
 				src={ SAMPLE_AVATAR }
 				name="Dark background"
 				borderColor="#1D35B4"
-				badge
+				variant="badge"
 			/>
 			<Avatar
 				src={ SAMPLE_AVATAR }
 				name="Light background"
 				borderColor="#FFF972"
-				badge
+				variant="badge"
 			/>
 		</div>
 	),

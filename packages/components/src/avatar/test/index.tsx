@@ -68,18 +68,20 @@ describe( 'Avatar', () => {
 		expect( avatar ).toHaveClass( 'custom' );
 	} );
 
-	describe( 'badge', () => {
+	describe( 'variant: badge', () => {
 		it( 'should not show badge by default', () => {
 			render( <Avatar data-testid="avatar" name="Zoraya" /> );
 			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).not.toHaveClass( 'has-badge' );
+			expect( avatar ).not.toHaveClass( 'is-badge' );
 			expect( screen.queryByText( 'Zoraya' ) ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render name span when badge is true', () => {
-			render( <Avatar data-testid="avatar" name="Zoraya" badge /> );
+		it( 'should render name span with badge variant', () => {
+			render(
+				<Avatar data-testid="avatar" name="Zoraya" variant="badge" />
+			);
 			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).toHaveClass( 'has-badge' );
+			expect( avatar ).toHaveClass( 'is-badge' );
 			expect( screen.getByText( 'Zoraya' ) ).toBeInTheDocument();
 		} );
 
@@ -89,22 +91,22 @@ describe( 'Avatar', () => {
 					data-testid="avatar"
 					name="Zoraya"
 					borderColor="#3d5eef"
-					badge
+					variant="badge"
 				/>
 			);
 			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).toHaveClass( 'has-badge' );
+			expect( avatar ).toHaveClass( 'is-badge' );
 			expect( screen.getByText( 'Zoraya' ) ).toBeInTheDocument();
 		} );
 
-		it( 'should not show badge when badge is true but name is missing', () => {
-			render( <Avatar data-testid="avatar" badge /> );
+		it( 'should not show badge when name is missing', () => {
+			render( <Avatar data-testid="avatar" variant="badge" /> );
 			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).not.toHaveClass( 'has-badge' );
+			expect( avatar ).not.toHaveClass( 'is-badge' );
 		} );
 
 		it( 'should still set aria-label even when badge is visible', () => {
-			render( <Avatar name="Zoraya" badge /> );
+			render( <Avatar name="Zoraya" variant="badge" /> );
 			const avatar = screen.getByRole( 'img', { name: 'Zoraya' } );
 			expect( avatar ).toBeInTheDocument();
 		} );
@@ -112,19 +114,19 @@ describe( 'Avatar', () => {
 
 	describe( 'label', () => {
 		it( 'should show label text instead of name in the badge', () => {
-			render( <Avatar name="Jane Doe" label="You" badge /> );
+			render( <Avatar name="Jane Doe" label="You" variant="badge" /> );
 			expect( screen.getByText( 'You' ) ).toBeInTheDocument();
 			expect( screen.queryByText( 'Jane Doe' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'should keep aria-label as name when label is provided', () => {
-			render( <Avatar name="Jane Doe" label="You" badge /> );
+			render( <Avatar name="Jane Doe" label="You" variant="badge" /> );
 			const avatar = screen.getByRole( 'img', { name: 'Jane Doe' } );
 			expect( avatar ).toBeInTheDocument();
 		} );
 
 		it( 'should wrap in tooltip when label differs from name', () => {
-			render( <Avatar name="Jane Doe" label="You" badge /> );
+			render( <Avatar name="Jane Doe" label="You" variant="badge" /> );
 			const avatar = screen.getByRole( 'img', { name: 'Jane Doe' } );
 			// The Tooltip's Ariakit.TooltipAnchor makes the element
 			// focusable so the tooltip can be triggered via keyboard.

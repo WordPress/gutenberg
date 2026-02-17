@@ -75,7 +75,7 @@
 // Badge mode: use grid so the name column animates from 0 to natural width.
 // Spacing is on the container (column-gap + padding-inline-end) so it
 // transitions alongside grid-template-columns instead of causing a bump.
-.components-avatar.has-badge {
+.components-avatar.is-badge {
 	display: inline-grid;
 	grid-template-columns: min-content 0fr;
 	column-gap: 0;
@@ -98,7 +98,7 @@
 	}
 }
 
-.components-avatar.has-badge.has-avatar-border-color {
+.components-avatar.is-badge.has-avatar-border-color {
 	background-color: var(--components-avatar-outline-color);
 }
 
@@ -146,7 +146,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.components-avatar.has-badge,
+	.components-avatar.is-badge,
 	.components-avatar__name {
 		transition: none;
 	}
