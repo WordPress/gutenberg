@@ -94,9 +94,10 @@ function checkSubmenuOverflow( submenuContainer ) {
 	const originalDisplay = submenuContainer.style.display;
 	const originalPosition = submenuContainer.style.position;
 
-	// Batch style changes for better performance
-	submenuContainer.style.cssText +=
-		'visibility: visible; display: flex; position: absolute;';
+	// Set styles individually for clarity and maintainability
+	submenuContainer.style.visibility = 'visible';
+	submenuContainer.style.display = 'flex';
+	submenuContainer.style.position = 'absolute';
 
 	// Get the submenu width (use scrollWidth for accuracy)
 	const submenuWidth = Math.max(
@@ -105,12 +106,24 @@ function checkSubmenuOverflow( submenuContainer ) {
 		SUBMENU_MIN_WIDTH
 	);
 
-	// Restore original inline styles or remove if they weren't set
-	submenuContainer.style.visibility = hadInlineVisibility
-		? originalVisibility
-		: '';
-	submenuContainer.style.display = hadInlineDisplay ? originalDisplay : '';
-	submenuContainer.style.position = hadInlinePosition ? originalPosition : '';
+	// Restore original inline styles or remove properties if they weren't set
+	if ( hadInlineVisibility ) {
+		submenuContainer.style.visibility = originalVisibility;
+	} else {
+		submenuContainer.style.removeProperty( 'visibility' );
+	}
+
+	if ( hadInlineDisplay ) {
+		submenuContainer.style.display = originalDisplay;
+	} else {
+		submenuContainer.style.removeProperty( 'display' );
+	}
+
+	if ( hadInlinePosition ) {
+		submenuContainer.style.position = originalPosition;
+	} else {
+		submenuContainer.style.removeProperty( 'position' );
+	}
 
 	// Calculate where the right edge of the submenu would be
 	// if it opens to the right
