@@ -38,7 +38,7 @@ const { Badge } = unlock( componentsPrivateApis );
 function ListViewBlockSelectButton(
 	{
 		className,
-		block: { clientId },
+		block,
 		onClick,
 		onContextMenu,
 		onMouseDown,
@@ -53,13 +53,14 @@ function ListViewBlockSelectButton(
 	},
 	ref
 ) {
+	const { clientId } = block;
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { blockIconOverrides } = useListViewContext();
+	const { useBlockIcon = () => null } = useListViewContext();
 	const { hasPatternName, blockVisibility } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = unlock( select( blockEditorStore ) );
@@ -72,8 +73,12 @@ function ListViewBlockSelectButton(
 		[ clientId ]
 	);
 
-	// Check if there's a custom icon override for this block
-	const iconOverride = blockIconOverrides?.get( clientId );
+	// Call useBlockIcon hook - always defined (defaults to no-op that returns null)
+	// Note: useBlockIcon can be a custom hook that uses React hooks,
+	// which is valid since we're calling it during render
+	// The hook comes from stable context (memoized in ListView), so identity is preserved
+	// eslint-disable-next-line react-compiler/react-compiler
+	const iconOverride = useBlockIcon( block );
 
 	const shouldShowLockIcon = isLocked;
 	const isSticky = blockInformation?.positionType === 'sticky';

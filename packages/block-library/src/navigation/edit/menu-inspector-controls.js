@@ -12,11 +12,10 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { useSelect, useDispatch, select as dataSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
-import { useContext, useMemo } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 import { info, error } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -32,6 +31,51 @@ import {
 	useEntityBinding,
 	getActionableStatus,
 } from '../../navigation-link/shared';
+
+/**
+ * Hook to get custom icon for navigation link blocks.
+ *
+ * @param {Object} block - The block object
+ * @return {Object|null} Icon config or null
+ */
+function useNavigationBlockIcon( block ) {
+	const { clientId, attributes, name } = block;
+	const { url, type, metadata, id } = attributes || {};
+	const hasUrlBinding = !! metadata?.bindings?.url && !! id;
+
+	// Always call hooks before any conditional returns
+	const { isBoundEntityAvailable, entityRecord } = useEntityBinding( {
+		clientId,
+		attributes,
+	} );
+
+	// Only handle navigation link blocks
+	if (
+		name !== 'core/navigation-link' &&
+		name !== 'core/navigation-submenu'
+	) {
+		return null;
+	}
+
+	const status = getActionableStatus( {
+		url,
+		type,
+		entityStatus: entityRecord?.status,
+		hasBinding: hasUrlBinding,
+		isEntityAvailable: isBoundEntityAvailable,
+	} );
+
+	if ( ! status ) {
+		return null;
+	}
+
+	const isError = status.intent === 'error';
+	return {
+		src: isError ? error : info,
+		foreground: isError ? '#660c0c' : '#f0b849',
+		label: status.label,
+	};
+}
 
 const actionLabel =
 	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
@@ -163,81 +207,6 @@ const MainContent = ( {
 
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
-	// Get all navigation-link blocks
-	const navigationLinks = useSelect(
-		( select ) => {
-			const { getBlocks } = select( blockEditorStore );
-			const allBlocks = getBlocks( clientId );
-
-			// Recursively get all navigation-link and navigation-submenu blocks
-			const getAllNavigationLinks = ( blocks ) => {
-				return blocks.flatMap( ( block ) => {
-					const isNavigationLink =
-						block.name === 'core/navigation-link' ||
-						block.name === 'core/navigation-submenu';
-					const children =
-						block.innerBlocks.length > 0
-							? getAllNavigationLinks( block.innerBlocks )
-							: [];
-					return isNavigationLink ? [ block, ...children ] : children;
-				} );
-			};
-
-			return getAllNavigationLinks( allBlocks );
-		},
-		[ clientId ]
-	);
-
-	// Compute icon overrides for navigation links that need status indicators
-	const blockIconOverrides = useMemo( () => {
-		const overrides = new Map();
-		const { getEntityRecord } = dataSelect( coreStore );
-
-		navigationLinks.forEach( ( block ) => {
-			const { url, type, metadata, id, kind } = block.attributes || {};
-			const hasUrlBinding = !! metadata?.bindings?.url && !! id;
-
-			// Get entity record if block has id/kind/type
-			let entityRecord = null;
-			let isEntityAvailable = true;
-
-			if ( id && kind && type ) {
-				const isPostType = kind === 'post-type';
-				const isTaxonomy = kind === 'taxonomy';
-
-				if ( isPostType || isTaxonomy ) {
-					const entityType = isTaxonomy ? 'taxonomy' : 'postType';
-					const typeForAPI = type === 'tag' ? 'post_tag' : type;
-					entityRecord = getEntityRecord(
-						entityType,
-						typeForAPI,
-						id
-					);
-					isEntityAvailable = !! entityRecord;
-				}
-			}
-
-			const status = getActionableStatus( {
-				url,
-				type,
-				entityStatus: entityRecord?.status,
-				hasBinding: hasUrlBinding,
-				isEntityAvailable,
-			} );
-
-			if ( status ) {
-				const isError = status.intent === 'error';
-				overrides.set( block.clientId, {
-					src: isError ? error : info,
-					foreground: isError ? '#660c0c' : '#f0b849',
-					label: status.label,
-				} );
-			}
-		} );
-
-		return overrides;
-	}, [ navigationLinks ] );
-
 	if ( currentMenuId && isNavigationMenuMissing ) {
 		return (
 			<DeletedNavigationWarning onCreateNew={ onCreateNew } isNotice />
@@ -273,7 +242,9 @@ const MainContent = ( {
 				showAppender
 				blockSettingsMenu={ LeafMoreMenu }
 				additionalBlockContent={ AdditionalBlockContent }
-				blockIconOverrides={ blockIconOverrides }
+				// Passing a hook as a prop is safe here since it's memoized in context
+				// eslint-disable-next-line react-compiler/react-compiler
+				useBlockIcon={ useNavigationBlockIcon }
 				onSelect={ openListViewContentPanel }
 			/>
 		</div>
