@@ -12,7 +12,7 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
 } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, select as dataSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useContext, useMemo } from '@wordpress/element';
 import { info, error } from '@wordpress/icons';
@@ -163,11 +163,10 @@ const MainContent = ( {
 
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
 
-	// Get all navigation-link blocks with their entity data
-	const navigationLinksWithEntity = useSelect(
+	// Get all navigation-link blocks
+	const navigationLinks = useSelect(
 		( select ) => {
 			const { getBlocks } = select( blockEditorStore );
-			const { getEntityRecord } = select( coreStore );
 			const allBlocks = getBlocks( clientId );
 
 			// Recursively get all navigation-link and navigation-submenu blocks
@@ -180,43 +179,7 @@ const MainContent = ( {
 						block.innerBlocks.length > 0
 							? getAllNavigationLinks( block.innerBlocks )
 							: [];
-					if ( ! isNavigationLink ) {
-						return children;
-					}
-
-					// Get entity data if the link has an ID and type
-					const { id, type, kind } = block.attributes || {};
-					let entityRecord = null;
-					let isEntityAvailable = true;
-
-					// Fetch entity record for any link with id/kind/type (bound or not)
-					if ( id && kind && type ) {
-						const isPostType = kind === 'post-type';
-						const isTaxonomy = kind === 'taxonomy';
-
-						if ( isPostType || isTaxonomy ) {
-							const entityType = isTaxonomy
-								? 'taxonomy'
-								: 'postType';
-							const typeForAPI =
-								type === 'tag' ? 'post_tag' : type;
-							entityRecord = getEntityRecord(
-								entityType,
-								typeForAPI,
-								id
-							);
-							isEntityAvailable = !! entityRecord;
-						}
-					}
-
-					return [
-						{
-							block,
-							entityRecord,
-							isEntityAvailable,
-						},
-						...children,
-					];
+					return isNavigationLink ? [ block, ...children ] : children;
 				} );
 			};
 
@@ -228,33 +191,52 @@ const MainContent = ( {
 	// Compute icon overrides for navigation links that need status indicators
 	const blockIconOverrides = useMemo( () => {
 		const overrides = new Map();
+		const { getEntityRecord } = dataSelect( coreStore );
 
-		navigationLinksWithEntity.forEach(
-			( { block, entityRecord, isEntityAvailable } ) => {
-				const { url, type, metadata, id } = block.attributes || {};
-				const hasUrlBinding = !! metadata?.bindings?.url && !! id;
+		navigationLinks.forEach( ( block ) => {
+			const { url, type, metadata, id, kind } = block.attributes || {};
+			const hasUrlBinding = !! metadata?.bindings?.url && !! id;
 
-				const status = getActionableStatus( {
-					url,
-					type,
-					entityStatus: entityRecord?.status,
-					hasBinding: hasUrlBinding,
-					isEntityAvailable,
-				} );
+			// Get entity record if block has id/kind/type
+			let entityRecord = null;
+			let isEntityAvailable = true;
 
-				if ( status ) {
-					const isError = status.intent === 'error';
-					overrides.set( block.clientId, {
-						src: isError ? error : info,
-						foreground: isError ? '#660c0c' : '#f0b849',
-						label: status.label,
-					} );
+			if ( id && kind && type ) {
+				const isPostType = kind === 'post-type';
+				const isTaxonomy = kind === 'taxonomy';
+
+				if ( isPostType || isTaxonomy ) {
+					const entityType = isTaxonomy ? 'taxonomy' : 'postType';
+					const typeForAPI = type === 'tag' ? 'post_tag' : type;
+					entityRecord = getEntityRecord(
+						entityType,
+						typeForAPI,
+						id
+					);
+					isEntityAvailable = !! entityRecord;
 				}
 			}
-		);
+
+			const status = getActionableStatus( {
+				url,
+				type,
+				entityStatus: entityRecord?.status,
+				hasBinding: hasUrlBinding,
+				isEntityAvailable,
+			} );
+
+			if ( status ) {
+				const isError = status.intent === 'error';
+				overrides.set( block.clientId, {
+					src: isError ? error : info,
+					foreground: isError ? '#660c0c' : '#f0b849',
+					label: status.label,
+				} );
+			}
+		} );
 
 		return overrides;
-	}, [ navigationLinksWithEntity ] );
+	}, [ navigationLinks ] );
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
 		return (
