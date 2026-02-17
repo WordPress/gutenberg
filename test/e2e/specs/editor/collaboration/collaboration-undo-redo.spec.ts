@@ -13,6 +13,7 @@ test.describe( 'Collaboration - Undo/Redo', () => {
 		const post = await requestUtils.createPost( {
 			title: 'Undo Test',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openCollaborativeSession( post.id );
 
@@ -90,6 +91,7 @@ test.describe( 'Collaboration - Undo/Redo', () => {
 		const post = await requestUtils.createPost( {
 			title: 'Redo Test',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openCollaborativeSession( post.id );
 

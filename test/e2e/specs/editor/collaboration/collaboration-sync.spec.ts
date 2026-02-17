@@ -12,6 +12,7 @@ test.describe( 'Collaboration - Sync', () => {
 		const post = await requestUtils.createPost( {
 			title: 'Sync Test - A to B',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openCollaborativeSession( post.id );
 
@@ -42,6 +43,7 @@ test.describe( 'Collaboration - Sync', () => {
 		const post = await requestUtils.createPost( {
 			title: 'Sync Test - B to A',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openCollaborativeSession( post.id );
 
@@ -74,6 +76,7 @@ test.describe( 'Collaboration - Sync', () => {
 		const post = await requestUtils.createPost( {
 			title: 'Sync Test - Simultaneous',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openCollaborativeSession( post.id );
 
@@ -117,6 +120,7 @@ test.describe( 'Collaboration - Sync', () => {
 		const post = await requestUtils.createPost( {
 			title: 'Sync Test - Title',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openCollaborativeSession( post.id );
 

@@ -12,6 +12,7 @@ test.describe( 'Collaboration - Presence', () => {
 		const post = await requestUtils.createPost( {
 			title: 'Presence Test - Avatars',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openCollaborativeSession( post.id );
 
@@ -30,6 +31,7 @@ test.describe( 'Collaboration - Presence', () => {
 		const post = await requestUtils.createPost( {
 			title: 'Presence Test - Name',
 			status: 'draft',
+			date_gmt: new Date().toISOString(),
 		} );
 		await collaborationUtils.openCollaborativeSession( post.id );
 
