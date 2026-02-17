@@ -29,7 +29,7 @@ const capitalize = ( str ) => str.charAt( 0 ).toUpperCase() + str.slice( 1 );
  * viewport is restored correctly when navigating back (e.g. from overlay template
  * part editor to the previous entity).
  */
-export default function useInitialViewportSync() {
+export default function useViewportSync() {
 	const { query } = useLocation();
 	const { setDeviceType } = useDispatch( editorStore );
 
@@ -45,7 +45,7 @@ export default function useInitialViewportSync() {
  * Component wrapper that runs the viewport sync hook.
  * Renders nothing; used to run the hook inside the Editor tree (inside EditorProvider).
  */
-export function InitialViewportSync() {
-	useInitialViewportSync();
+export function ViewportSync() {
+	useViewportSync();
 	return null;
 }

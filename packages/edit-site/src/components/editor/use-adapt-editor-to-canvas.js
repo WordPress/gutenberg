@@ -10,7 +10,7 @@ import { store as preferencesStore } from '@wordpress/preferences';
 /**
  * Internal dependencies
  */
-import { DEFAULT_DEVICE_TYPE } from '../block-editor/use-initial-viewport-sync';
+import { DEFAULT_DEVICE_TYPE } from '../block-editor/use-viewport-sync';
 
 export function useAdaptEditorToCanvas( canvas ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
