@@ -108,13 +108,10 @@ export default function useBlockDisplayInformation( clientId ) {
 			const match = getActiveBlockVariation( blockName, attributes );
 			const isSynced =
 				isReusableBlock( blockType ) || isTemplatePart( blockType );
-			// Navigation blocks should also use getBlockLabel to display
-			// the custom menu name when available.
-			const shouldUseBlockLabel =
-				isSynced || blockName === 'core/navigation';
-			const customTitle = shouldUseBlockLabel
-				? getBlockLabel( blockType, attributes )
-				: undefined;
+			// Use getBlockLabel for all blocks to display custom labels when available.
+			// This includes navigation blocks (custom menu names), synced blocks,
+			// and any other blocks with __experimentalLabel defined.
+			const customTitle = getBlockLabel( blockType, attributes );
 			const title = customTitle || blockType.title;
 			const positionLabel = getPositionTypeLabel( attributes );
 			const blockTypeInfo = {
