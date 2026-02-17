@@ -77,14 +77,18 @@ function checkSubmenuOverflow( submenuContainer ) {
 	// Only check for overflow on medium+ breakpoints (782px+)
 	// where submenus open horizontally
 	if ( window.matchMedia( '(min-width: 782px)' ).matches ) {
-		// Temporarily make submenu visible to measure it if needed
-		const wasHidden =
-			submenuContainer.style.visibility === 'hidden' ||
-			window.getComputedStyle( submenuContainer ).visibility === 'hidden';
-		if ( wasHidden ) {
-			submenuContainer.style.visibility = 'hidden';
-			submenuContainer.style.display = 'block';
-		}
+		// Temporarily make submenu visible to measure it
+		// Save current styles to restore later
+		const originalStyles = {
+			visibility: submenuContainer.style.visibility,
+			display: submenuContainer.style.display,
+			position: submenuContainer.style.position,
+		};
+
+		// Make submenu visible but off-screen for accurate measurement
+		submenuContainer.style.visibility = 'visible';
+		submenuContainer.style.display = 'flex';
+		submenuContainer.style.position = 'absolute';
 
 		// Get the submenu width (use scrollWidth for accuracy)
 		const submenuWidth = Math.max(
@@ -93,11 +97,10 @@ function checkSubmenuOverflow( submenuContainer ) {
 			SUBMENU_MIN_WIDTH
 		);
 
-		// Restore visibility
-		if ( wasHidden ) {
-			submenuContainer.style.visibility = '';
-			submenuContainer.style.display = '';
-		}
+		// Restore original styles
+		submenuContainer.style.visibility = originalStyles.visibility;
+		submenuContainer.style.display = originalStyles.display;
+		submenuContainer.style.position = originalStyles.position;
 
 		// Calculate where the right edge of the submenu would be
 		// if it opens to the right
