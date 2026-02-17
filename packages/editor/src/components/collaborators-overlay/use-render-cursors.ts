@@ -3,11 +3,10 @@ import {
 	type SelectionCursor,
 	SelectionType,
 } from '@wordpress/core-data';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 
 import { unlock } from '../../lock-unlock';
-import { getAvatarUrl, resolveGravatarUrl } from './gravatar-check';
-import { useResolveGravatars } from './use-resolve-gravatars';
+import { getAvatarUrl } from './get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 const { useActiveCollaborators, useGetAbsolutePositionIndex } =
@@ -51,19 +50,6 @@ export function useRenderCursors(
 		[]
 	);
 
-	// Initiate gravatar default-detection for all remote users so the Avatar
-	// component can show initials when no custom gravatar exists.
-	const avatarUrls = useMemo(
-		() =>
-			sortedUsers
-				.filter( ( user: any ) => ! user.isMe )
-				.map( ( user: any ) =>
-					getAvatarUrl( user.collaboratorInfo.avatar_urls )
-				),
-		[ sortedUsers ]
-	);
-	const gravatarVersion = useResolveGravatars( avatarUrls );
-
 	const computeCursors = useMemo(
 		() => () => {
 			if ( ! overlayElement || ! blockEditorDocument ) {
@@ -84,8 +70,8 @@ export function useRenderCursors(
 				const userName = user.collaboratorInfo.name;
 				const clientId = user.clientId;
 				const color = getAvatarBorderColor( user.collaboratorInfo.id );
-				const avatarUrl = resolveGravatarUrl(
-					getAvatarUrl( user.collaboratorInfo.avatar_urls )
+				const avatarUrl = getAvatarUrl(
+					user.collaboratorInfo.avatar_urls
 				);
 
 				let coords: {
@@ -157,14 +143,6 @@ export function useRenderCursors(
 	);
 
 	useEffect( computeCursors, [ computeCursors ] );
-
-	// Recompute cursors when gravatar checks complete so resolved avatar
-	// URLs replace default placeholders with the component's initials fallback.
-	const computeCursorsRef = useRef( computeCursors );
-	computeCursorsRef.current = computeCursors;
-	useEffect( () => {
-		computeCursorsRef.current();
-	}, [ gravatarVersion ] );
 
 	const rerenderCursorsAfterDelay = useMemo(
 		() => () => {

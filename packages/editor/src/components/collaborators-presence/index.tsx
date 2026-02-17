@@ -2,7 +2,7 @@ import {
 	Button,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
-import { useMemo, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	privateApis,
 	type PostEditorAwarenessState,
@@ -11,11 +11,7 @@ import { __, sprintf } from '@wordpress/i18n';
 
 import { CollaboratorsList } from './list';
 import { unlock } from '../../lock-unlock';
-import {
-	getAvatarUrl,
-	resolveGravatarUrl,
-} from '../collaborators-overlay/gravatar-check';
-import { useResolveGravatars } from '../collaborators-overlay/use-resolve-gravatars';
+import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 import './styles/collaborators-presence.scss';
@@ -51,17 +47,6 @@ export function CollaboratorsPresence( {
 		( collaborator ) => ! collaborator.isMe
 	);
 
-	// Initiate gravatar default-detection so the Avatar component can show
-	// initials when no custom gravatar exists.
-	const collaboratorAvatarUrls = useMemo(
-		() =>
-			otherActiveCollaborators.map( ( c ) =>
-				getAvatarUrl( c.collaboratorInfo.avatar_urls )
-			),
-		[ otherActiveCollaborators ]
-	);
-	useResolveGravatars( collaboratorAvatarUrls );
-
 	const [ isPopoverVisible, setIsPopoverVisible ] = useState( false );
 	const [ popoverAnchor, setPopoverAnchor ] = useState< HTMLElement | null >(
 		null
@@ -94,11 +79,9 @@ export function CollaboratorsPresence( {
 							( collaboratorState ) => (
 								<Avatar
 									key={ collaboratorState.clientId }
-									src={ resolveGravatarUrl(
-										getAvatarUrl(
-											collaboratorState.collaboratorInfo
-												.avatar_urls
-										)
+									src={ getAvatarUrl(
+										collaboratorState.collaboratorInfo
+											.avatar_urls
 									) }
 									name={
 										collaboratorState.collaboratorInfo.name

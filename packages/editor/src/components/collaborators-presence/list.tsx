@@ -8,10 +8,7 @@ import { close } from '@wordpress/icons';
 import { type PostEditorAwarenessState } from '@wordpress/core-data';
 
 import { unlock } from '../../lock-unlock';
-import {
-	getAvatarUrl,
-	resolveGravatarUrl,
-} from '../collaborators-overlay/gravatar-check';
+import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 import './styles/collaborators-list.scss';
@@ -74,11 +71,9 @@ export function CollaboratorsList( {
 							} }
 						>
 							<Avatar
-								src={ resolveGravatarUrl(
-									getAvatarUrl(
-										collaboratorState.collaboratorInfo
-											.avatar_urls
-									)
+								src={ getAvatarUrl(
+									collaboratorState.collaboratorInfo
+										.avatar_urls
 								) }
 								name={ collaboratorState.collaboratorInfo.name }
 								borderColor={ getAvatarBorderColor(
