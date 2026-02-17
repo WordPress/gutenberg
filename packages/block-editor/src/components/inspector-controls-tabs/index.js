@@ -51,9 +51,12 @@ export default function InspectorControlsTabs( {
 	);
 
 	// Get any requested inspector tab
-	const requestedTab = useSelect(
-		( select ) =>
-			unlock( select( blockEditorStore ) ).getRequestedInspectorTab(),
+	const { requestedTab } = useSelect(
+		( select ) => ( {
+			requestedTab: unlock(
+				select( blockEditorStore )
+			).getRequestedInspectorTab(),
+		} ),
 		[]
 	);
 
