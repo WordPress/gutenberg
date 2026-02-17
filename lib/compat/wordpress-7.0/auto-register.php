@@ -11,7 +11,7 @@
  * Detects blocks that have the auto_register flag set in their supports
  * and passes them to JavaScript for auto-registration with ServerSideRender.
  */
-function gutenberg_enqueue_auto_register_blocks( $settings ) {
+function _gutenberg_enqueue_auto_register_blocks( $settings ) {
 	$auto_register_blocks = array();
 	$registered_blocks    = WP_Block_Type_Registry::get_instance()->get_all_registered();
 
@@ -32,10 +32,10 @@ function gutenberg_enqueue_auto_register_blocks( $settings ) {
 	return $settings;
 }
 
-if ( has_action( 'enqueue_block_editor_assets', 'wp_enqueue_auto_register_blocks' ) ) {
-	remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_auto_register_blocks' );
+if ( has_action( 'enqueue_block_editor_assets', '_wp_enqueue_auto_register_blocks' ) ) {
+	remove_action( 'enqueue_block_editor_assets', '_wp_enqueue_auto_register_blocks' );
 }
-add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_auto_register_blocks' );
+add_action( 'enqueue_block_editor_assets', '_gutenberg_enqueue_auto_register_blocks' );
 
 /**
  * Marks user-defined attributes for auto-generated inspector controls.
