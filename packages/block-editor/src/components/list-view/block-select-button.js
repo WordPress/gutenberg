@@ -163,7 +163,7 @@ function ListViewBlockSelectButton(
 						) ) }
 					</span>
 				) : null }
-				{ visibilityLabel && (
+				{ !! visibilityLabel && (
 					<Tooltip text={ visibilityLabel }>
 						<span
 							className="block-editor-list-view-block-select-button__block-visibility"
