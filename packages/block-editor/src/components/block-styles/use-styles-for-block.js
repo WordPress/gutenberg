@@ -89,18 +89,21 @@ export default function useStylesForBlocks( { clientId, onSwitch } ) {
 		// the block style's CSS can take effect. This is necessary because
 		// explicit color attributes (like those set by patterns) take precedence
 		// over CSS classes.
+		const existingStyle = block?.attributes?.style;
+		const existingElements = existingStyle?.elements;
+
 		const updatedStyle = cleanEmptyObject( {
-			...block?.attributes?.style,
-			color: {
-				...block?.attributes?.style?.color,
+			...existingStyle,
+			color: cleanEmptyObject( {
+				...existingStyle?.color,
 				background: undefined,
 				text: undefined,
 				gradient: undefined,
-			},
+			} ),
 			elements: cleanEmptyObject( {
-				...block?.attributes?.style?.elements,
+				...existingElements,
 				link: cleanEmptyObject( {
-					...block?.attributes?.style?.elements?.link,
+					...existingElements?.link,
 					color: undefined,
 				} ),
 			} ),
