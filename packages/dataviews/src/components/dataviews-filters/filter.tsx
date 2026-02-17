@@ -25,6 +25,7 @@ import { Stack } from '@wordpress/ui';
 import SearchWidget from './search-widget';
 import InputWidget from './input-widget';
 import { getOperatorByName } from '../../utils/operators';
+import { formatDateValue } from './utils';
 import type {
 	Filter,
 	NormalizedField,
@@ -215,6 +216,9 @@ export default function Filter( {
 		// or, filterInView.value can also be array
 		// for the between operator, as in [ 1, 2 ]
 		const label = filterInView.value.map( ( v ) => {
+			if ( field?.type === 'date' && typeof v === 'string' ) {
+				return formatDateValue( v );
+			}
 			const formattedValue = field?.getValueFormatted( {
 				item: { [ field.id ]: v },
 				field,
@@ -237,13 +241,20 @@ export default function Filter( {
 		];
 	} else if ( filterInView?.value !== undefined ) {
 		// otherwise, filterInView.value is a single value
-		const label =
-			field !== undefined
-				? field.getValueFormatted( {
-						item: { [ field.id ]: filterInView.value },
-						field,
-				  } )
-				: String( filterInView.value );
+		let label;
+		if (
+			field?.type === 'date' &&
+			typeof filterInView.value === 'string'
+		) {
+			label = formatDateValue( filterInView.value );
+		} else if ( field !== undefined ) {
+			label = field.getValueFormatted( {
+				item: { [ field.id ]: filterInView.value },
+				field,
+			} );
+		} else {
+			label = String( filterInView.value );
+		}
 
 		activeElements = [
 			{
