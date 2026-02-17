@@ -2,6 +2,10 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import { colord, extend } from 'colord';
+import a11yPlugin from 'colord/plugins/a11y';
+
+extend( [ a11yPlugin ] );
 
 /**
  * Internal dependencies
@@ -37,7 +41,17 @@ function Avatar( {
 		...style,
 		...( src ? { '--components-avatar-url': `url(${ src })` } : {} ),
 		...( borderColor
-			? { '--components-avatar-outline-color': borderColor }
+			? {
+					'--components-avatar-outline-color': borderColor,
+					'--components-avatar-name-color': colord(
+						borderColor
+					).isReadable( '#000', {
+						level: 'AA',
+						size: 'normal',
+					} )
+						? '#000'
+						: '#fff',
+			  }
 			: {} ),
 	} as React.CSSProperties;
 

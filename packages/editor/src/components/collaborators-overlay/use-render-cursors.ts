@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from './get-avatar-url';
-import { getAvatarBackgroundDarkColor } from './avatar-colors';
+import { getAvatarBorderColor } from './avatar-colors';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
@@ -68,9 +68,7 @@ export function useRenderCursors(
 				};
 				const userName = user.collaboratorInfo.name;
 				const clientId = user.clientId;
-				const color = getAvatarBackgroundDarkColor(
-					user.collaboratorInfo.id
-				);
+				const color = getAvatarBorderColor( user.collaboratorInfo.id );
 				const avatarUrl = getAvatarUrl(
 					user.collaboratorInfo.avatar_urls
 				);

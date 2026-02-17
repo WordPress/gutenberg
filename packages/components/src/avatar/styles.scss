@@ -61,8 +61,9 @@
 
 .components-avatar__name {
 	font-size: $font-size-medium;
+	font-weight: $font-weight-medium;
 	line-height: $font-line-height-small;
-	color: $white;
+	color: var(--components-avatar-name-color, $white);
 	min-width: 0;
 	padding-bottom: calc($grid-unit-05 / 2);
 	overflow: hidden;

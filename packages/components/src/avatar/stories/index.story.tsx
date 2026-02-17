@@ -83,6 +83,32 @@ export const WithLabel: Story = {
 	},
 };
 
+export const BadgeContrastText: Story = {
+	render: () => (
+		<div style={ { display: 'flex', gap: '16px' } }>
+			<Avatar
+				src={ SAMPLE_AVATAR }
+				name="Dark background"
+				borderColor="#1D35B4"
+				badge
+			/>
+			<Avatar
+				src={ SAMPLE_AVATAR }
+				name="Light background"
+				borderColor="#FFF972"
+				badge
+			/>
+		</div>
+	),
+	parameters: {
+		docs: {
+			description: {
+				story: 'Badge text color adapts automatically based on the `borderColor` lightness to maintain WCAG AA contrast.',
+			},
+		},
+	},
+};
+
 export const Dimmed: Story = {
 	args: {
 		...Default.args,

@@ -98,8 +98,9 @@ const COLLABORATORS_OVERLAY_STYLES = `
 }
 .components-avatar__name {
 	font-size: 13px;
+	font-weight: 499;
 	line-height: 20px;
-	color: #fff;
+	color: var(--components-avatar-name-color, #fff);
 	min-width: 0;
 	padding-bottom: 2px;
 	overflow: hidden;
