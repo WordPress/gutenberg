@@ -28,8 +28,11 @@ export type AvatarProps = {
 	/**
 	 * Size of the avatar.
 	 *
-	 * - `'default'`: 32px
-	 * - `'small'`: 24px
+	 * - `'default'`: For standalone avatars and list items where the
+	 *   avatar is a primary visual element (e.g. collaborator lists,
+	 *   user profiles).
+	 * - `'small'`: For inline or compact contexts where space is
+	 *   limited (e.g. cursor labels, toolbars, badges alongside text).
 	 *
 	 * @default 'default'
 	 */
