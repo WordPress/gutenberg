@@ -44,7 +44,7 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'title',
 		label: 'Title',
-		type: 'text',
+		type: 'string',
 	},
 	{
 		id: 'order',
@@ -83,7 +83,7 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'reviewer',
 		label: 'Reviewer',
-		type: 'text',
+		type: 'string',
 		Edit: 'radio',
 		elements: [
 			{ value: 'jane', label: 'Jane' },
@@ -95,7 +95,7 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'status',
 		label: 'Status',
-		type: 'text',
+		type: 'string',
 		Edit: 'toggleGroup',
 		elements: [
 			{ value: 'draft', label: 'Draft' },
@@ -111,7 +111,7 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'password',
 		label: 'Password',
-		type: 'text',
+		type: 'string',
 		isVisible: ( item: SamplePost ) => {
 			return item.status !== 'private';
 		},
@@ -136,7 +136,7 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'dimensions',
 		label: 'Dimensions',
-		type: 'text',
+		type: 'string',
 		readOnly: true,
 	},
 	{
@@ -156,28 +156,28 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'address1',
 		label: 'Address 1',
-		type: 'text',
+		type: 'string',
 	},
 	{
 		id: 'address2',
 		label: 'Address 2',
-		type: 'text',
+		type: 'string',
 	},
 	{
 		id: 'city',
 		label: 'City',
-		type: 'text',
+		type: 'string',
 	},
 	{
 		id: 'description',
 		label: 'Description',
-		type: 'text',
+		type: 'string',
 		Edit: 'textarea',
 	},
 	{
 		id: 'longDescription',
 		label: 'Long Description',
-		type: 'text',
+		type: 'string',
 		Edit: {
 			control: 'textarea',
 			rows: 5,
@@ -186,7 +186,7 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'comment_status',
 		label: 'Comment Status',
-		type: 'text',
+		type: 'string',
 		Edit: 'radio',
 		elements: [
 			{ value: 'open', label: 'Allow comments' },
@@ -201,7 +201,7 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'discussion',
 		label: 'Discussion',
-		type: 'text',
+		type: 'string',
 		render: ( { item } ) => {
 			const commentLabel =
 				item.comment_status === 'open'
@@ -220,17 +220,17 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'origin',
 		label: 'Origin',
-		type: 'text',
+		type: 'string',
 	},
 	{
 		id: 'destination',
 		label: 'Destination',
-		type: 'text',
+		type: 'string',
 	},
 	{
 		id: 'flight_status',
 		label: 'Flight Status',
-		type: 'text',
+		type: 'string',
 		Edit: 'radio',
 		elements: [
 			{ value: 'on-time', label: 'On Time' },
@@ -241,17 +241,17 @@ const fields: Field< SamplePost >[] = [
 	{
 		id: 'gate',
 		label: 'Gate',
-		type: 'text',
+		type: 'string',
 	},
 	{
 		id: 'seat',
 		label: 'Seat',
-		type: 'text',
+		type: 'string',
 	},
 	{
 		id: 'metadata_summary',
 		label: 'Metadata',
-		type: 'text',
+		type: 'string',
 		render: ( { item } ) => {
 			return (
 				<span>

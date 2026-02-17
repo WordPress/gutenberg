@@ -332,7 +332,7 @@ export const fields: Field< SpaceObject >[] = [
 	{
 		label: 'Title',
 		id: 'title',
-		type: 'text',
+		type: 'string',
 		enableHiding: true,
 		enableGlobalSearch: true,
 		filterBy: {
@@ -404,7 +404,7 @@ export const fields: Field< SpaceObject >[] = [
 	{
 		label: 'Description',
 		id: 'description',
-		type: 'text',
+		type: 'string',
 		enableSorting: false,
 		enableGlobalSearch: true,
 		filterBy: {

@@ -510,7 +510,7 @@ const ValidationComponent = ( {
 		return [
 			{
 				id: 'text',
-				type: 'text',
+				type: 'string',
 				label: 'Text',
 				placeholder: getValidationPlaceholder(
 					'user_name (alphanumeric+underscore)',
@@ -533,7 +533,7 @@ const ValidationComponent = ( {
 			},
 			{
 				id: 'select',
-				type: 'text',
+				type: 'string',
 				label: 'Select',
 				elements:
 					elements === 'async'
@@ -552,7 +552,7 @@ const ValidationComponent = ( {
 			},
 			{
 				id: 'textWithRadio',
-				type: 'text',
+				type: 'string',
 				Edit: 'radio',
 				label: 'Text with radio',
 				elements:
@@ -574,7 +574,7 @@ const ValidationComponent = ( {
 			},
 			{
 				id: 'textarea',
-				type: 'text',
+				type: 'string',
 				Edit: 'textarea',
 				label: 'Textarea',
 				placeholder: minMax ? 'Min 10, max 200 characters' : undefined,
@@ -782,7 +782,7 @@ const ValidationComponent = ( {
 			},
 			{
 				id: 'toggleGroup',
-				type: 'text',
+				type: 'string',
 				label: 'Toggle Group',
 				Edit: 'toggleGroup',
 				elements:
@@ -805,7 +805,7 @@ const ValidationComponent = ( {
 			},
 			{
 				id: 'combobox',
-				type: 'text',
+				type: 'string',
 				Edit: 'combobox',
 				label: 'Combobox',
 				placeholder: 'Search and select a fruit',

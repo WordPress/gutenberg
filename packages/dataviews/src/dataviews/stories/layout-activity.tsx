@@ -372,14 +372,14 @@ export const orderEventFields: Field< OrderEvent >[] = [
 	{
 		label: 'Order',
 		id: 'orderNumber',
-		type: 'text',
+		type: 'string',
 		enableHiding: true,
 		enableSorting: false,
 	},
 	{
 		label: 'Title',
 		id: 'title',
-		type: 'text',
+		type: 'string',
 		enableHiding: true,
 		enableGlobalSearch: true,
 		getValue: ( { item } ) => item.name.title,
@@ -391,7 +391,7 @@ export const orderEventFields: Field< OrderEvent >[] = [
 	{
 		label: 'Description',
 		id: 'description',
-		type: 'text',
+		type: 'string',
 		enableSorting: false,
 		enableGlobalSearch: true,
 		getValue: ( { item } ) => item.name.description,

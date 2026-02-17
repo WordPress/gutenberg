@@ -30,7 +30,7 @@ type Data = {
 };
 
 const DEFAULT_VIEW = {
-	type: 'table' as const,
+	type: 'table',
 	search: '',
 	page: 1,
 	perPage: 10,
@@ -49,17 +49,17 @@ const fields = [
 	{
 		id: 'title',
 		label: 'Title',
-		type: 'text' as const,
+		type: 'string',
 	},
 	{
 		id: 'order',
 		label: 'Order',
-		type: 'integer' as const,
+		type: 'integer',
 	},
 	{
 		id: 'author',
 		label: 'Author',
-		type: 'integer' as const,
+		type: 'integer',
 		elements: [
 			{ value: 1, label: 'Jane' },
 			{ value: 2, label: 'John' },
@@ -208,7 +208,7 @@ describe( 'DataViews component', () => {
 					{
 						id: 'author',
 						label: 'Author',
-						type: 'integer' as const,
+						type: 'integer',
 						elements: [
 							{ value: 1, label: 'Jane' },
 							{ value: 2, label: 'John' },
@@ -229,7 +229,7 @@ describe( 'DataViews component', () => {
 					{
 						id: 'title',
 						label: 'Title',
-						type: 'text' as const,
+						type: 'string',
 						render: ( { item }: { item: Data } ) => {
 							return item.title?.toUpperCase();
 						},

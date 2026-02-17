@@ -43,12 +43,12 @@ const LayoutRowComponent = ( {
 		{
 			id: 'name',
 			label: 'Customer Name',
-			type: 'text',
+			type: 'string',
 		},
 		{
 			id: 'phone',
 			label: 'Phone',
-			type: 'text',
+			type: 'string',
 		},
 		{
 			id: 'email',
@@ -58,37 +58,37 @@ const LayoutRowComponent = ( {
 		{
 			id: 'shippingAddress',
 			label: 'Shipping Address',
-			type: 'text',
+			type: 'string',
 		},
 		{
 			id: 'shippingCity',
 			label: 'Shipping City',
-			type: 'text',
+			type: 'string',
 		},
 		{
 			id: 'shippingPostalCode',
 			label: 'Shipping Postal Code',
-			type: 'text',
+			type: 'string',
 		},
 		{
 			id: 'shippingCountry',
 			label: 'Shipping Country',
-			type: 'text',
+			type: 'string',
 		},
 		{
 			id: 'billingAddress',
 			label: 'Billing Address',
-			type: 'text',
+			type: 'string',
 		},
 		{
 			id: 'billingCity',
 			label: 'Billing City',
-			type: 'text',
+			type: 'string',
 		},
 		{
 			id: 'billingPostalCode',
 			label: 'Billing Postal Code',
-			type: 'text',
+			type: 'string',
 		},
 		{
 			id: 'vat',
@@ -108,7 +108,7 @@ const LayoutRowComponent = ( {
 		{
 			id: 'plan',
 			label: 'Plan',
-			type: 'text',
+			type: 'string',
 			Edit: 'toggleGroup',
 			elements: [
 				{ value: 'basic', label: 'Basic' },
@@ -119,7 +119,7 @@ const LayoutRowComponent = ( {
 		{
 			id: 'renewal',
 			label: 'Renewal',
-			type: 'text',
+			type: 'string',
 			Edit: 'radio',
 			elements: [
 				{ value: 'weekly', label: 'Weekly' },

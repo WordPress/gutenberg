@@ -337,7 +337,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'status',
-					type: 'text',
+					type: 'string',
 					elements: [
 						{ value: 'draft', label: 'Draft' },
 						{ value: 'published', label: 'Published' },
@@ -362,7 +362,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'status',
-					type: 'text',
+					type: 'string',
 					elements: [
 						{ value: 'draft', label: 'Draft' },
 						{ value: 'published', label: 'Published' },
@@ -516,7 +516,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'username',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						pattern: '^[a-zA-Z0-9_]+$',
 					},
@@ -537,7 +537,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'username',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						pattern: '^[a-zA-Z0-9_]+$',
 					},
@@ -558,7 +558,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'username',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						pattern: '^[a-zA-Z0-9_]+$',
 					},
@@ -747,7 +747,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'username',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						pattern: '[invalid(regex',
 					},
@@ -1052,7 +1052,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'username',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						minLength: 5,
 					},
@@ -1073,7 +1073,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'username',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						minLength: 5,
 					},
@@ -1094,7 +1094,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'username',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						minLength: 5,
 					},
@@ -1115,7 +1115,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'username',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						minLength: 5,
 					},
@@ -1313,7 +1313,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'username',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						maxLength: 10,
 					},
@@ -1334,7 +1334,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'username',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						maxLength: 10,
 					},
@@ -1355,7 +1355,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'username',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						maxLength: 10,
 					},
@@ -1376,7 +1376,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'username',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						maxLength: 10,
 					},
@@ -1652,7 +1652,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< any >[] = [
 				{
 					id: 'status',
-					type: 'text',
+					type: 'string',
 					getElements: async () =>
 						await new Promise( ( resolve ) => {
 							setTimeout( resolve, 5 );
@@ -1698,7 +1698,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'title',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						custom: async () =>
 							await new Promise( ( resolve ) =>
@@ -1708,7 +1708,7 @@ describe( 'useFormValidity', () => {
 				},
 				{
 					id: 'status',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						custom: async () =>
 							await new Promise( ( resolve ) =>
@@ -1739,7 +1739,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'title',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						// This promise is never resolved.
 						// Serves to test in flight behavior of validation.
@@ -1776,7 +1776,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'title',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						custom: async () =>
 							await new Promise( ( resolve ) =>
@@ -1814,7 +1814,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'title',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						// @ts-ignore returns wrong type for testing purposes
 						custom: async () =>
@@ -1853,7 +1853,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< {} >[] = [
 				{
 					id: 'title',
-					type: 'text',
+					type: 'string',
 					isValid: {
 						custom: async () =>
 							await new Promise( ( resolve, reject ) =>
@@ -1896,7 +1896,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< any >[] = [
 				{
 					id: 'status',
-					type: 'text',
+					type: 'string',
 					getElements: async () =>
 						await new Promise( ( resolve ) => {
 							setTimeout( resolve, 5 );
@@ -1933,7 +1933,7 @@ describe( 'useFormValidity', () => {
 			const fields: Field< any >[] = [
 				{
 					id: 'status',
-					type: 'text',
+					type: 'string',
 					getElements: async () =>
 						await new Promise( ( resolve ) => {
 							setTimeout( resolve, 5 );

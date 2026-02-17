@@ -55,7 +55,7 @@ const DataAdapterComponent = () => {
 		{
 			id: 'user.profile.name',
 			label: 'User Name',
-			type: 'text',
+			type: 'string',
 		},
 		{
 			id: 'user.profile.email',

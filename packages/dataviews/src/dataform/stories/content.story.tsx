@@ -43,7 +43,7 @@ export const Labels: Story = {
 				{
 					id: 'name',
 					label: 'Name',
-					type: 'text',
+					type: 'string',
 				},
 				{
 					id: 'email',
@@ -101,7 +101,7 @@ export const HelpText: Story = {
 				{
 					id: 'name',
 					label: 'Name',
-					type: 'text',
+					type: 'string',
 					placeholder: 'Jane Doe',
 					description:
 						'Enter your full legal name as it appears on official documents.',
@@ -168,7 +168,7 @@ export const ValidationMessages: Story = {
 				{
 					id: 'name',
 					label: 'Name',
-					type: 'text',
+					type: 'string',
 					placeholder: 'Jane Doe',
 					isValid: {
 						required: true,
@@ -275,7 +275,7 @@ export const HighLevelHelpText: Story = {
 				{
 					id: 'name',
 					label: 'Name',
-					type: 'text',
+					type: 'string',
 				},
 				{
 					id: 'email',
@@ -347,7 +347,7 @@ export const Placeholders: Story = {
 				{
 					id: 'name',
 					label: 'Name',
-					type: 'text',
+					type: 'string',
 					placeholder: 'Jane Doe',
 				},
 				{

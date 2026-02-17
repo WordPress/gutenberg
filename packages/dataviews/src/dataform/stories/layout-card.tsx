@@ -45,12 +45,12 @@ const LayoutCardComponent = ( {
 		{
 			id: 'name',
 			label: 'Customer Name',
-			type: 'text',
+			type: 'string',
 		},
 		{
 			id: 'phone',
 			label: 'Phone',
-			type: 'text',
+			type: 'string',
 		},
 		{
 			id: 'email',
@@ -60,7 +60,7 @@ const LayoutCardComponent = ( {
 		{
 			id: 'plan',
 			label: 'Plan',
-			type: 'text',
+			type: 'string',
 			Edit: 'toggleGroup',
 			elements: [
 				{ value: 'basic', label: 'Basic' },
@@ -71,12 +71,12 @@ const LayoutCardComponent = ( {
 		{
 			id: 'shippingAddress',
 			label: 'Shipping Address',
-			type: 'text',
+			type: 'string',
 		},
 		{
 			id: 'billingAddress',
 			label: 'Billing Address',
-			type: 'text',
+			type: 'string',
 		},
 		{
 			id: 'displayPayments',
@@ -86,7 +86,7 @@ const LayoutCardComponent = ( {
 		{
 			id: 'payments',
 			label: 'Payments',
-			type: 'text',
+			type: 'string',
 			readOnly: true, // Triggers using the render method instead of Edit.
 			isVisible: ( item ) => item.displayPayments,
 			render: ( { item } ) => {
@@ -113,14 +113,14 @@ const LayoutCardComponent = ( {
 		{
 			id: 'dueDate',
 			label: 'Due Date',
-			type: 'text',
+			type: 'string',
 			render: ( { item } ) => {
 				return <Badge>Due on: { item.dueDate }</Badge>;
 			},
 		},
 		{
 			id: 'plan-summary',
-			type: 'text',
+			type: 'string',
 			readOnly: true,
 			render: ( { item } ) => {
 				return <Badge>{ item.plan }</Badge>;
