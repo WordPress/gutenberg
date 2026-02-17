@@ -37,7 +37,7 @@ function Avatar( {
 		...style,
 		...( src ? { '--components-avatar-url': `url(${ src })` } : {} ),
 		...( borderColor
-			? { '--components-avatar-border-color': borderColor }
+			? { '--components-avatar-outline-color': borderColor }
 			: {} ),
 	} as React.CSSProperties;
 

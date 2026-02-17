@@ -37,7 +37,7 @@
 	}
 
 	.has-avatar-border-color > & {
-		border: var(--wp-admin-border-width-focus) solid var(--components-avatar-border-color);
+		border: var(--wp-admin-border-width-focus) solid var(--components-avatar-outline-color);
 		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $white;
 		background-clip: padding-box;
 	}
@@ -56,7 +56,7 @@
 }
 
 .components-avatar:not(.has-src).has-avatar-border-color > .components-avatar__image {
-	background-color: var(--components-avatar-border-color);
+	background-color: var(--components-avatar-outline-color);
 }
 
 .components-avatar__name {
@@ -98,7 +98,7 @@
 }
 
 .components-avatar.has-badge.has-avatar-border-color {
-	background-color: var(--components-avatar-border-color);
+	background-color: var(--components-avatar-outline-color);
 }
 
 // Status: dim and desaturate content so the background color shows through.
@@ -125,7 +125,7 @@
 }
 
 .components-avatar.has-status.has-avatar-border-color > .components-avatar__image {
-	background-color: var(--components-avatar-border-color);
+	background-color: var(--components-avatar-outline-color);
 }
 
 .components-avatar__status-indicator {

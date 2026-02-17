@@ -81,7 +81,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	background-position: center;
 }
 .has-avatar-border-color > .components-avatar__image {
-	border: var(--wp-admin-border-width-focus, 2px) solid var(--components-avatar-border-color);
+	border: var(--wp-admin-border-width-focus, 2px) solid var(--components-avatar-outline-color);
 	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) #fff;
 	background-clip: padding-box;
 }
@@ -96,7 +96,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	background-clip: border-box;
 }
 .components-avatar:not(.has-src).has-avatar-border-color > .components-avatar__image {
-	background-color: var(--components-avatar-border-color);
+	background-color: var(--components-avatar-outline-color);
 }
 .components-avatar__name {
 	font-size: 13px;
@@ -130,7 +130,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
 }
 .components-avatar.has-badge.has-avatar-border-color {
-	background-color: var(--components-avatar-border-color);
+	background-color: var(--components-avatar-outline-color);
 }
 /* ── end Avatar ── */
 
@@ -243,7 +243,10 @@ export function Overlay( {
 	useEffect( rerenderCursorsAfterDelay, [ rerenderCursorsAfterDelay ] );
 
 	// Merge the refs to use the same element for both overlay and resize observation
-	const mergedRef = useMergeRefs( [ setOverlayElement, resizeObserverRef ] );
+	const mergedRef = useMergeRefs< HTMLDivElement | null >( [
+		setOverlayElement,
+		resizeObserverRef,
+	] );
 
 	useBlockHighlighting(
 		blockEditorDocument ?? null,
