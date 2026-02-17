@@ -45,13 +45,13 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'value',
 			label: __( 'Content' ),
-			type: 'text',
+			type: 'string',
 			Edit: 'rich-text', // TODO: replace with custom component
 		},
 		{
 			id: 'citation',
 			label: __( 'Citation' ),
-			type: 'text',
+			type: 'string',
 			Edit: 'rich-text', // TODO: replace with custom component
 		},
 	];

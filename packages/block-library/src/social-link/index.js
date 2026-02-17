@@ -45,7 +45,7 @@ if ( window.__experimentalContentOnlyInspectorFields ) {
 		{
 			id: 'label',
 			label: __( 'Label' ),
-			type: 'text',
+			type: 'string',
 		},
 	];
 	settings[ formKey ] = {
