@@ -19,6 +19,13 @@ const VIEWPORT_TO_DEVICE_TYPE = {
 	tablet: 'Tablet',
 	mobile: 'Mobile',
 };
+const DEFAULT_DEVICE_TYPE = 'Desktop';
+
+// Inverse mapping for URL serialization (device type → viewport param)
+export const DEVICE_TYPE_TO_VIEWPORT = Object.fromEntries(
+	Object.entries( VIEWPORT_TO_DEVICE_TYPE ).map( ( [ k, v ] ) => [ v, k ] )
+);
+export { VALID_VIEWPORTS, VIEWPORT_TO_DEVICE_TYPE, DEFAULT_DEVICE_TYPE };
 
 /**
  * Syncs the editor's device type with the `viewport` URL query param.
@@ -39,7 +46,7 @@ export default function useInitialViewportSync() {
 
 		const deviceType = isValidViewport
 			? VIEWPORT_TO_DEVICE_TYPE[ viewport.toLowerCase() ]
-			: 'Desktop';
+			: DEFAULT_DEVICE_TYPE;
 
 		setDeviceType( deviceType );
 	}, [ query?.viewport, setDeviceType ] );

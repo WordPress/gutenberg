@@ -12,12 +12,12 @@ import { store as editorStore } from '@wordpress/editor';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import {
+	DEFAULT_DEVICE_TYPE,
+	VALID_VIEWPORTS,
+} from './use-initial-viewport-sync';
 
 const { useHistory, useLocation } = unlock( routerPrivateApis );
-
-const DEFAULT_DEVICE_TYPE = 'Desktop';
-const VALID_VIEWPORTS = [ 'desktop', 'tablet', 'mobile' ];
-
 /**
  * Hook to handle navigation to entity records.
  *

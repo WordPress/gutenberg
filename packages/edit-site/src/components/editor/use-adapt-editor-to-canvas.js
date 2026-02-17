@@ -7,6 +7,11 @@ import { store as editorStore } from '@wordpress/editor';
 import { useLayoutEffect } from '@wordpress/element';
 import { store as preferencesStore } from '@wordpress/preferences';
 
+/**
+ * Internal dependencies
+ */
+import { DEFAULT_DEVICE_TYPE } from '../block-editor/use-initial-viewport-sync';
+
 export function useAdaptEditorToCanvas( canvas ) {
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const {
@@ -27,7 +32,7 @@ export function useAdaptEditorToCanvas( canvas ) {
 			if ( getCurrentPost()?.type ) {
 				editPost( { selection: undefined }, { undoIgnore: true } );
 			}
-			setDeviceType( 'Desktop' );
+			setDeviceType( DEFAULT_DEVICE_TYPE );
 			closePublishSidebar();
 			setIsInserterOpened( false );
 
