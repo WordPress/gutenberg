@@ -64,11 +64,6 @@ export function CollaboratorsList( {
 							key={ collaboratorState.clientId }
 							className="editor-collaborators-presence__list-item"
 							disabled
-							style={ {
-								opacity: collaboratorState.isConnected
-									? 1
-									: 0.5,
-							} }
 						>
 							<Avatar
 								src={ getAvatarUrl(
@@ -79,6 +74,7 @@ export function CollaboratorsList( {
 								borderColor={ getAvatarBorderColor(
 									collaboratorState.collaboratorInfo.id
 								) }
+								dimmed={ ! collaboratorState.isConnected }
 							/>
 							<div className="editor-collaborators-presence__list-item-info">
 								<div className="editor-collaborators-presence__list-item-name">
