@@ -106,8 +106,8 @@ require __DIR__ . '/compat/wordpress-7.0/preload.php';
 require __DIR__ . '/compat/wordpress-7.0/auto-register.php';
 require __DIR__ . '/compat/wordpress-7.0/blocks.php';
 require __DIR__ . '/compat/wordpress-7.0/kses.php';
-require __DIR__ . '/compat/class-wp-icons-registry.php';
-require __DIR__ . '/compat/class-wp-rest-icons-controller.php';
+require __DIR__ . '/compat/wordpress-7.0/class-wp-icons-registry.php';
+require __DIR__ . '/compat/wordpress-7.0/class-wp-rest-icons-controller.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
