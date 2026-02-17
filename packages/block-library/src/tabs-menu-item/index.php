@@ -59,7 +59,7 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 	// Replace the button content with the actual tab label
 	$output = preg_replace(
 		'/(<button[^>]*>).*?(<\/button>)/s',
-		'$1' . '<span>' . esc_html( html_entity_decode( $tab_label ) ) . '</span>' . '$2',
+		'$1' . '<span>' . wp_kses_post( $tab_label ) . '</span>' . '$2',
 		$output
 	);
 

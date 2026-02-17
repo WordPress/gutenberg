@@ -7,18 +7,18 @@
 				"blockName": "core/tabs-menu-item",
 				"attrs": {},
 				"innerBlocks": [],
-				"innerHTML": "\n\t<button class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" hidden type=\"button\" role=\"tab\"><span class=\"screen-reader-text\">Tab menu item</span></button>\n\t",
+				"innerHTML": "\n\t<button class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" type=\"button\" role=\"tab\"></button>\n\t",
 				"innerContent": [
-					"\n\t<button class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" hidden type=\"button\" role=\"tab\"><span class=\"screen-reader-text\">Tab menu item</span></button>\n\t"
+					"\n\t<button class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" type=\"button\" role=\"tab\"></button>\n\t"
 				]
 			},
 			{
 				"blockName": "core/tabs-menu-item",
 				"attrs": {},
 				"innerBlocks": [],
-				"innerHTML": "\n\t<button class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" hidden type=\"button\" role=\"tab\"><span class=\"screen-reader-text\">Tab menu item</span></button>\n\t",
+				"innerHTML": "\n\t<button class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" type=\"button\" role=\"tab\"></button>\n\t",
 				"innerContent": [
-					"\n\t<button class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" hidden type=\"button\" role=\"tab\"><span class=\"screen-reader-text\">Tab menu item</span></button>\n\t"
+					"\n\t<button class=\"wp-block-tabs-menu-item wp-block-tabs-menu-item__template\" type=\"button\" role=\"tab\"></button>\n\t"
 				]
 			}
 		],

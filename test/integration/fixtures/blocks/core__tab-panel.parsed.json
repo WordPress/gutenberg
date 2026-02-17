@@ -19,9 +19,9 @@
 						]
 					}
 				],
-				"innerHTML": "\n\t<section class=\"wp-block-tab\">\n\t\t\n\t</section>\n\t",
+				"innerHTML": "\n\t<section role=\"tabpanel\" class=\"wp-block-tab\">\n\t\t\n\t</section>\n\t",
 				"innerContent": [
-					"\n\t<section class=\"wp-block-tab\">\n\t\t",
+					"\n\t<section role=\"tabpanel\" class=\"wp-block-tab\">\n\t\t",
 					null,
 					"\n\t</section>\n\t"
 				]

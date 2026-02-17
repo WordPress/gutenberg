@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
@@ -27,20 +26,14 @@ export default function save( { attributes } ) {
 	}
 
 	// useBlockProps.save includes all core style engine classes and styles
-	// We add our custom classes and the hidden attribute for PHP template extraction
+	// The button content is replaced by PHP during rendering, so we output
+	// an empty button as a template.
 	const blockProps = useBlockProps.save( {
 		className: 'wp-block-tabs-menu-item__template',
 		style: customColorStyles,
-		hidden: true,
 		type: 'button',
 		role: 'tab',
 	} );
 
-	return (
-		<button { ...blockProps }>
-			<span className="screen-reader-text">
-				{ __( 'Tab menu item' ) }
-			</span>
-		</button>
-	);
+	return <button { ...blockProps } />;
 }
