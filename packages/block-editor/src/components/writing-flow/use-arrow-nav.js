@@ -9,6 +9,7 @@ import {
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 	isRTL,
+	isFormElement,
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -118,7 +119,12 @@ export function getClosestTabbable(
 		// there are better candidates.
 		if (
 			getBlockClientId( node ) &&
-			focus.focusable.find( node ).length !== 0
+			focus.focusable
+				.find( node )
+				// Exclude form elements for now because primary+a cannot be
+				// used to select the parent element.
+				.filter( ( element ) => ! isFormElement( element ) ).length !==
+				0
 		) {
 			return false;
 		}
