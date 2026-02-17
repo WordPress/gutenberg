@@ -72,11 +72,11 @@ function getEntityTypeName( type, kind ) {
  * This component provides the inspector controls (ToolsPanel) that are identical
  * between both navigation blocks.
  *
- * @param {Object}   props                      - Component props
- * @param {Object}   props.attributes           - Block attributes
- * @param {Function} props.setAttributes        - Function to update block attributes
- * @param {string}   props.clientId             - Block client ID
- * @param {boolean}  props.openSubmenusOnClick  - Whether submenus open on click (for Submenu blocks only)
+ * @param {Object}   props                     - Component props
+ * @param {Object}   props.attributes          - Block attributes
+ * @param {Function} props.setAttributes       - Function to update block attributes
+ * @param {string}   props.clientId            - Block client ID
+ * @param {boolean}  props.openSubmenusOnClick - Whether submenus open on click (for Submenu blocks only)
  */
 export function Controls( {
 	attributes,
