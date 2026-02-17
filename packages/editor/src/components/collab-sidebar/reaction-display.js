@@ -4,6 +4,7 @@
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	Button,
+	__experimentalHStack as HStack,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { SVG, Path } from '@wordpress/primitives';
@@ -199,7 +200,7 @@ export default function ReactionDisplay( { reactions, onToggleReaction } ) {
 	}
 
 	return (
-		<div className="editor-collab-sidebar-panel__reactions">
+		<HStack spacing="1" justify="flex-start" expanded={ false } wrap>
 			{ reactedSlugs.map( ( slug ) => {
 				const count = getReactionCount( reactions, slug );
 				const isActive = hasUserReacted(
@@ -261,7 +262,7 @@ export default function ReactionDisplay( { reactions, onToggleReaction } ) {
 					</Button>
 				);
 			} ) }
-		</div>
+		</HStack>
 	);
 }
 
