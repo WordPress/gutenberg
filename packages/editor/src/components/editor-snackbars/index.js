@@ -11,8 +11,8 @@ import { SnackbarNotices } from '@wordpress/notices';
  */
 export default function EditorSnackbars() {
 	deprecated( 'wp.editor.EditorSnackbars', {
-		since: '6.7',
-		version: '6.9',
+		since: '7.0',
+		version: '7.2',
 		alternative: 'wp.notices.SnackbarNotices',
 	} );
 
