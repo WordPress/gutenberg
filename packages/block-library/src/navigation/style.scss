@@ -210,7 +210,7 @@ $navigation-icon-size: 24px;
 	&.submenu-opens-on-horizontal-hover {
 		@include break-medium {
 			> .wp-block-navigation__submenu-container {
-				// Nested submenus sit to the right on large breakpoints.
+				// Nested submenus (second-level and deeper) sit to the right on large breakpoints.
 				.wp-block-navigation__submenu-container {
 					left: 100%;
 					top: -1px; // Border width.

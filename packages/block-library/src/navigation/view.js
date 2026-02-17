@@ -48,7 +48,7 @@ function getFocusableElements( ref ) {
 
 /**
  * Checks if a submenu would overflow the viewport horizontally.
- * If it would overflow, removes the horizontal-opening class to revert to mobile positioning.
+ * If it would overflow, removes the horizontal-opening class to revert to downward positioning.
  *
  * @param {HTMLElement} submenuContainer - The submenu container element
  */
@@ -132,7 +132,7 @@ function checkSubmenuOverflow( submenuContainer ) {
 	// if it opens to the right
 	const submenuRightEdge = parentRect.right + submenuWidth;
 
-	// If submenu would overflow viewport, remove the class to revert to mobile positioning
+	// If submenu would overflow viewport, remove the class to revert to downward positioning
 	if ( submenuRightEdge > viewportWidth ) {
 		parentItem.classList.remove( 'submenu-opens-on-horizontal-hover' );
 	}
