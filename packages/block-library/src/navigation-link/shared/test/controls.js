@@ -295,6 +295,7 @@ describe( 'Controls', () => {
 					...defaultProps.attributes,
 					url: 'https://example.com',
 					type: 'custom',
+					kind: 'custom',
 				},
 			};
 

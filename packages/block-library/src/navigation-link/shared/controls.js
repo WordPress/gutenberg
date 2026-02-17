@@ -290,7 +290,9 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 							{ sprintf(
 								/* translators: %s: entity type (e.g., "page", "post", "category") or "link" for external links */
 								__( 'View %s' ),
-								attributes.kind && attributes.type
+								attributes.kind &&
+									attributes.type &&
+									attributes.kind !== 'custom'
 									? entityTypeName
 									: __( 'link' )
 							) }
