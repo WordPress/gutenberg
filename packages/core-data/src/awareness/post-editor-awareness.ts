@@ -10,6 +10,7 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { BaseAwarenessState, baseEqualityFieldChecks } from './base-awareness';
+import { getBlockPathInYdoc, resolveBlockClientIdByPath } from './block-lookup';
 import {
 	AWARENESS_CURSOR_UPDATE_THROTTLE_IN_MS,
 	LOCAL_CURSOR_UPDATE_DEBOUNCE_IN_MS,
@@ -21,12 +22,8 @@ import {
 	SelectionType,
 } from '../utils/crdt-user-selections';
 
-import type {
-	AbsoluteBlockIndexPath,
-	EditorStoreBlock,
-	SelectionState,
-	WPBlockSelection,
-} from '../types';
+import type { SelectionState, WPBlockSelection } from '../types';
+import type { YBlocks } from '../utils/crdt-blocks';
 import type {
 	DebugCollaboratorData,
 	EditorState,
@@ -209,14 +206,14 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 
 			let localClientId: string | null = null;
 
-			if ( absolutePos ) {
-				const parentArray = absolutePos.type as Y.Array< any >;
+			if ( absolutePos && absolutePos.type instanceof Y.Array ) {
+				const parentArray = absolutePos.type as YBlocks;
 				const block = parentArray.get( absolutePos.index );
 
-				if ( block ) {
-					const path = this.getBlockPathFromYjs( block );
+				if ( block instanceof Y.Map ) {
+					const path = getBlockPathInYdoc( block );
 					localClientId = path
-						? this.resolveBlockClientIdByPath( path )
+						? resolveBlockClientIdByPath( path )
 						: null;
 				}
 			}
@@ -239,154 +236,13 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			return { textIndex: null, localClientId: null };
 		}
 
-		// Navigate up: Y.Text → attributes Y.Map → block Y.Map
-		const blockMap = absolutePosition.type.parent?.parent;
-		const path = blockMap ? this.getBlockPathFromYjs( blockMap ) : null;
-		const localClientId = path
-			? this.resolveBlockClientIdByPath( path )
-			: null;
+		// Navigate up: Y.Text -> attributes Y.Map -> block Y.Map
+		const yType = absolutePosition.type.parent?.parent;
+		const path =
+			yType instanceof Y.Map ? getBlockPathInYdoc( yType ) : null;
+		const localClientId = path ? resolveBlockClientIdByPath( path ) : null;
 
 		return { textIndex: absolutePosition.index, localClientId };
-	}
-
-	/**
-	 * Walk up the Yjs parent chain from a block Y.Map to build its index path.
-	 *
-	 * For example, the second inner block of the first root block returns [0, 1].
-	 *
-	 * @param blockMap - The Yjs block Y.Map to start from.
-	 * @return The index path from root, or null if traversal fails.
-	 */
-	private getBlockPathFromYjs(
-		blockMap: any
-	): AbsoluteBlockIndexPath | null {
-		const path: AbsoluteBlockIndexPath = [];
-		let current = blockMap;
-
-		while ( current ) {
-			const parentArray = current.parent;
-			if ( ! parentArray || ! ( parentArray instanceof Y.Array ) ) {
-				return null;
-			}
-
-			// Find index of current block in its parent array.
-			let index = -1;
-			for ( let i = 0; i < parentArray.length; i++ ) {
-				if ( parentArray.get( i ) === current ) {
-					index = i;
-					break;
-				}
-			}
-			if ( index === -1 ) {
-				return null;
-			}
-			path.unshift( index );
-
-			// Walk up: is the parent array's parent a block Y.Map or the root?
-			const grandparent = parentArray.parent as any;
-			if ( grandparent?.get?.( 'clientId' ) !== undefined ) {
-				current = grandparent; // It's a block — keep going.
-			} else {
-				break; // It's the root map — done.
-			}
-		}
-
-		return path;
-	}
-
-	/**
-	 * Navigate the block-editor store's block tree by an index path
-	 * and return the local block's clientId.
-	 *
-	 * In template mode, getBlocks() returns the full template tree, but Yjs
-	 * paths are relative to the post content. This method finds the
-	 * core/post-content block (if present) and uses its inner blocks as the
-	 * navigation root, so paths align with the Yjs document structure.
-	 *
-	 * @param path - The index path, e.g. [0, 1] for blocks[0].innerBlocks[1].
-	 * @return The local block clientId, or null if the path is invalid.
-	 */
-	private resolveBlockClientIdByPath(
-		path: AbsoluteBlockIndexPath
-	): string | null {
-		const { getBlocks } = select( blockEditorStore );
-		const postContentBlocks = this.getPostContentBlocks(
-			getBlocks(),
-			getBlocks
-		);
-
-		let blocks = postContentBlocks;
-
-		for ( let i = 0; i < path.length; i++ ) {
-			const block = blocks[ path[ i ] ];
-			if ( ! block ) {
-				return null;
-			}
-			if ( i === path.length - 1 ) {
-				return block.clientId;
-			}
-			blocks = block.innerBlocks;
-		}
-		return null;
-	}
-
-	/**
-	 * Find the post content blocks to use as the navigation root.
-	 *
-	 * In template mode, the block tree contains template parts wrapping a
-	 * core/post-content block. The Yjs document only stores the post content
-	 * blocks, so we need to find the core/post-content block and use
-	 * getBlocks(clientId) to retrieve its inner blocks from the store.
-	 *
-	 * We must use getBlocks(clientId) rather than reading .innerBlocks from
-	 * the block object because useBlockSync() injects post content as
-	 * controlled inner blocks — they exist in the store's block order map
-	 * but are not populated in the .innerBlocks property of the tree
-	 * returned by getBlocks().
-	 *
-	 * @param rootBlocks - The root-level blocks from getBlocks().
-	 * @param getBlocks  - The getBlocks selector.
-	 * @return The blocks that correspond to the Yjs document root.
-	 */
-	private getPostContentBlocks(
-		rootBlocks: EditorStoreBlock[],
-		getBlocks: ( rootClientId?: string ) => EditorStoreBlock[]
-	): EditorStoreBlock[] {
-		const postContentBlock = this.findBlockByName(
-			rootBlocks,
-			'core/post-content'
-		);
-		if ( postContentBlock ) {
-			// Use getBlocks(clientId) to read controlled inner blocks from
-			// the store, since postContentBlock.innerBlocks is empty.
-			return getBlocks( postContentBlock.clientId );
-		}
-		return rootBlocks;
-	}
-
-	/**
-	 * Recursively search the block tree for a block with a given name.
-	 *
-	 * @param blocks - The blocks to search.
-	 * @param name   - The block name to find.
-	 * @return The first matching block, or null if not found.
-	 */
-	private findBlockByName(
-		blocks: EditorStoreBlock[],
-		name: string
-	): EditorStoreBlock | null {
-		for ( const block of blocks ) {
-			if ( block.name === name ) {
-				return block;
-			}
-			if ( block.innerBlocks?.length ) {
-				const found = this.findBlockByName( block.innerBlocks, name );
-				if ( found ) {
-					return found;
-				}
-			}
-		}
-		return null;
 	}
 
 	/**
