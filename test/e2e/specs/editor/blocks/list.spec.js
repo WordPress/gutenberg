@@ -1673,7 +1673,6 @@ test.describe( 'List (@firefox)', () => {
 		} );
 
 		await page.keyboard.press( 'ArrowDown' );
-		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.press( 'Backspace' );
 
