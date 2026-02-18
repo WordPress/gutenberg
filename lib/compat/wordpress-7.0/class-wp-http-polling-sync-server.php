@@ -175,6 +175,15 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * @return bool|WP_Error True if user has permission, otherwise WP_Error with details.
 		 */
 		public function check_permissions( WP_REST_Request $request ) {
+			// Minimum cap check. Is user logged in with a contributor role or higher?
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				return new WP_Error(
+					'forbidden',
+					__( 'You do not have permission to perform this action', 'gutenberg' ),
+					array( 'status' => 401 )
+				);
+			}
+
 			$rooms = $request['rooms'];
 
 			foreach ( $rooms as $room ) {
