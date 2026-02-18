@@ -19,16 +19,17 @@ const LOCK_NAME = 'upload-in-progress';
  * Only active when client-side media processing is enabled.
  */
 export default function useUploadSaveLock() {
-	const isExperimentEnabled = window.__clientSideMediaProcessing;
+	const isClientSideMediaProcessingEnabled =
+		window.__clientSideMediaProcessing;
 
 	const isUploading = useSelect(
 		( select ) => {
-			if ( ! isExperimentEnabled ) {
+			if ( ! isClientSideMediaProcessingEnabled ) {
 				return false;
 			}
 			return select( uploadStore ).isUploading();
 		},
-		[ isExperimentEnabled ]
+		[ isClientSideMediaProcessingEnabled ]
 	);
 
 	const {
@@ -39,7 +40,7 @@ export default function useUploadSaveLock() {
 	} = useDispatch( editorStore );
 
 	useEffect( () => {
-		if ( ! isExperimentEnabled ) {
+		if ( ! isClientSideMediaProcessingEnabled ) {
 			return;
 		}
 
@@ -56,7 +57,7 @@ export default function useUploadSaveLock() {
 			unlockPostAutosaving( LOCK_NAME );
 		};
 	}, [
-		isExperimentEnabled,
+		isClientSideMediaProcessingEnabled,
 		isUploading,
 		lockPostSaving,
 		unlockPostSaving,
