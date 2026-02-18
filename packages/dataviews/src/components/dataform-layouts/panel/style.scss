@@ -49,6 +49,17 @@
 	}
 }
 
+.dataforms-layouts-panel__field-trigger--edit-always
+.dataforms-layouts-panel__field-trigger-icon {
+	opacity: 1;
+	fill: currentColor;
+
+	&:hover,
+	&:focus-visible {
+		fill: var(--wp-admin-theme-color);
+	}
+}
+
 .dataforms-layouts-panel__field-trigger-icon {
 	padding: 0;
 	color: var(--wp-admin-theme-color);
@@ -64,6 +75,9 @@
 
 	&:focus-visible {
 		opacity: 1;
+		outline:
+			var(--wpds-border-width-focus) solid
+			var(--wp-admin-theme-color);
 	}
 }
 
@@ -125,15 +139,18 @@
 	}
 }
 
-.dataforms-layouts-panel__field-trigger--label-top .dataforms-layouts-panel__field-label {
+.dataforms-layouts-panel__field-trigger--label-top
+.dataforms-layouts-panel__field-label {
 	width: 100%;
 }
 
-.dataforms-layouts-panel__field-trigger--label-top .dataforms-layouts-panel__field-control {
+.dataforms-layouts-panel__field-trigger--label-top
+.dataforms-layouts-panel__field-control {
 	grid-column: 1 / -1;
 }
 
-.dataforms-layouts-panel__field-trigger--label-top .dataforms-layouts-panel__field-trigger-icon {
+.dataforms-layouts-panel__field-trigger--label-top
+.dataforms-layouts-panel__field-trigger-icon {
 	grid-row: 1;
 	grid-column: 2;
 }

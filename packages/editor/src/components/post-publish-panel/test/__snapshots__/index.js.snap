@@ -99,7 +99,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
             </span>
             <span
               aria-label="(opens in a new tab)"
-              class="components-external-link__icon"
+              class="components-external-link__icon wp-exclude-emoji"
             >
               ↗
             </span>
@@ -326,7 +326,7 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
             </span>
             <span
               aria-label="(opens in a new tab)"
-              class="components-external-link__icon"
+              class="components-external-link__icon wp-exclude-emoji"
             >
               ↗
             </span>

@@ -233,18 +233,6 @@ function gutenberg_initialize_experiments_settings() {
 		)
 	);
 
-	add_settings_field(
-		'gutenberg-svg-icon-registry',
-		__( 'SVG Icon Registration API', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables a REST API endpoint for accessing SVG icons as well as the associated Icon block.', 'gutenberg' ),
-			'id'    => 'gutenberg-svg-icon-registry',
-		)
-	);
-
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'

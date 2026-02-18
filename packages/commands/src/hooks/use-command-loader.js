@@ -54,6 +54,7 @@ import { store as commandsStore } from '../store';
  *                     ? record.title?.rendered
  *                     : __( '(no title)' ),
  *                 icon: page,
+ *                 category: 'edit',
  *                 callback: ( { close } ) => {
  *                     const args = {
  * 							p: '/page',

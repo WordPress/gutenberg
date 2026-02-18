@@ -3622,3 +3622,119 @@ async function toggleSettingsDrawer( user ) {
 
 	await user.click( settingsToggle );
 }
+
+describe( 'Link preview with entity data from navigation blocks', () => {
+	describe( 'Featured image display', () => {
+		it( 'should display featured image in link preview when entity provides image', () => {
+			const linkWithImage = {
+				url: 'https://example.com/my-page',
+				title: 'My Test Page',
+				image: 'https://example.com/featured.jpg',
+			};
+
+			render( <LinkControl value={ linkWithImage } /> );
+
+			const linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const imagePreview = linkPreview.querySelector(
+				'.block-editor-link-control__preview-image img'
+			);
+
+			expect( imagePreview ).toBeInTheDocument();
+			expect( imagePreview ).toHaveAttribute(
+				'src',
+				'https://example.com/featured.jpg'
+			);
+		} );
+
+		it( 'should not display featured image section when entity has no image', () => {
+			const linkWithoutImage = {
+				url: 'https://example.com/my-page',
+				title: 'My Test Page',
+			};
+
+			render( <LinkControl value={ linkWithoutImage } /> );
+
+			const linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const imagePreview = linkPreview.querySelector(
+				'.block-editor-link-control__preview-image'
+			);
+
+			expect( imagePreview ).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'Entity status badges', () => {
+		it( 'should display badges in link preview when entity provides badges', () => {
+			const linkWithBadges = {
+				url: 'https://example.com/my-page',
+				title: 'My Test Page',
+				badges: [
+					{ label: 'Draft', intent: 'warning' },
+					{ label: 'Page', intent: 'default' },
+				],
+			};
+
+			render( <LinkControl value={ linkWithBadges } /> );
+
+			const linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const badgesContainer = linkPreview.querySelector(
+				'.block-editor-link-control__preview-badges'
+			);
+
+			expect( badgesContainer ).toBeInTheDocument();
+		} );
+
+		it( 'should not display badges section when entity provides no badges', () => {
+			const linkWithoutBadges = {
+				url: 'https://example.com/my-page',
+				title: 'My Test Page',
+			};
+
+			render( <LinkControl value={ linkWithoutBadges } /> );
+
+			const linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const badgesContainer = linkPreview.querySelector(
+				'.block-editor-link-control__preview-badges'
+			);
+
+			expect( badgesContainer ).not.toBeInTheDocument();
+		} );
+
+		it( 'should not display badges section when entity provides empty badges array', () => {
+			const linkWithEmptyBadges = {
+				url: 'https://example.com/my-page',
+				title: 'My Test Page',
+				badges: [],
+			};
+
+			render( <LinkControl value={ linkWithEmptyBadges } /> );
+
+			const linkPreview = screen.getByRole( 'group', {
+				name: 'Manage link',
+			} );
+
+			// eslint-disable-next-line testing-library/no-node-access
+			const badgesContainer = linkPreview.querySelector(
+				'.block-editor-link-control__preview-badges'
+			);
+
+			expect( badgesContainer ).not.toBeInTheDocument();
+		} );
+	} );
+} );

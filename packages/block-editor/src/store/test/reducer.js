@@ -2404,6 +2404,71 @@ describe( 'state', () => {
 						)
 					);
 				} );
+
+				it( 'should preserve controlledInnerBlocks flags across RESET_BLOCKS', () => {
+					const original = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					} );
+					const withControlled = blocks( original, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'chicken',
+						hasControlledInnerBlocks: true,
+					} );
+					expect( withControlled.controlledInnerBlocks.chicken ).toBe(
+						true
+					);
+
+					const state = blocks( withControlled, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					} );
+
+					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+				} );
+
+				it( 'should not create new state references when setting controlled inner blocks on a block with no inner blocks', () => {
+					const original = blocks( undefined, {
+						type: 'RESET_BLOCKS',
+						blocks: [
+							{
+								clientId: 'chicken',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					} );
+
+					const state = blocks( original, {
+						type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+						clientId: 'chicken',
+						hasControlledInnerBlocks: true,
+					} );
+
+					expect( state.controlledInnerBlocks.chicken ).toBe( true );
+					// The order and byClientId Maps should be the same
+					// reference because the block has no inner blocks to
+					// remove, so REPLACE_INNER_BLOCKS should be skipped.
+					expect( state.order ).toBe( original.order );
+					expect( state.byClientId ).toBe( original.byClientId );
+					expect( state.attributes ).toBe( original.attributes );
+					expect( state.parents ).toBe( original.parents );
+				} );
 			} );
 		} );
 	} );
@@ -3226,11 +3291,43 @@ describe( 'state', () => {
 			const state = blockListSettings( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
+				blocks: [],
 			} );
 
 			expect( state ).toEqual( {
 				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
 					allowedBlocks: [ 'core/paragraph' ],
+				},
+			} );
+		} );
+
+		it( 'should preserve the settings of a block when its clientId is reused in replacement', () => {
+			const original = deepFreeze( {
+				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
+					allowedBlocks: [ 'core/paragraph' ],
+				},
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+					allowedBlocks: true,
+				},
+			} );
+
+			const state = blockListSettings( original, {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
+				blocks: [
+					{
+						clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						innerBlocks: [],
+					},
+				],
+			} );
+
+			expect( state ).toEqual( {
+				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
+					allowedBlocks: [ 'core/paragraph' ],
+				},
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+					allowedBlocks: true,
 				},
 			} );
 		} );
@@ -4454,6 +4551,114 @@ describe( 'state', () => {
 						} )
 					)
 				);
+			} );
+		} );
+
+		describe( 'unsynced patterns with disableContentOnlyForUnsyncedPatterns enabled', () => {
+			let initialState;
+			beforeAll( () => {
+				initialState = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								disableContentOnlyForUnsyncedPatterns: true,
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-1',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
+											name: 'core/group',
+											clientId: 'group-2',
+											attributes: {},
+											innerBlocks: [
+												{
+													name: 'core/paragraph',
+													clientId: 'paragraph-2',
+													attributes: {},
+													innerBlocks: [],
+												},
+											],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+			} );
+
+			it( 'returns no derived editing modes for unsynced patterns when disableContentOnlyForUnsyncedPatterns is true', () => {
+				expect( initialState.derivedBlockEditingModes ).toEqual(
+					new Map()
+				);
+			} );
+
+			it( 'does not add editing modes when a patternName attribute is set via UPDATE_BLOCK_ATTRIBUTES', () => {
+				const stateWithoutPatternName = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								disableContentOnlyForUnsyncedPatterns: true,
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-1',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'UPDATE_BLOCK_ATTRIBUTES',
+							clientIds: [ 'group-1' ],
+							attributes: {
+								metadata: {
+									patternName: 'test-pattern',
+								},
+							},
+						},
+					],
+					testReducer,
+					stateWithoutPatternName
+				);
+
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
 			} );
 		} );
 
