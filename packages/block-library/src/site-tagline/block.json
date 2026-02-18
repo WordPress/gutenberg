@@ -8,9 +8,6 @@
 	"keywords": [ "description" ],
 	"textdomain": "default",
 	"attributes": {
-		"textAlign": {
-			"type": "string"
-		},
 		"level": {
 			"type": "number",
 			"default": 0
@@ -21,10 +18,7 @@
 		}
 	},
 	"example": {
-		"viewportWidth": 350,
-		"attributes": {
-			"textAlign": "center"
-		}
+		"viewportWidth": 350
 	},
 	"supports": {
 		"anchor": true,
@@ -49,6 +43,7 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
+			"textAlign": true,
 			"__experimentalFontFamily": true,
 			"__experimentalTextTransform": true,
 			"__experimentalTextDecoration": true,
