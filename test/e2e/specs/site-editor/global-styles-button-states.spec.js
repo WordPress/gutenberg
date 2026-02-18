@@ -52,17 +52,11 @@ test.describe( 'Global Styles - Button States', () => {
 			.getByRole( 'menuitem', { name: 'Hover', exact: true } )
 			.click();
 
-		await page
-			.getByRole( 'button', { name: 'Color options', exact: true } )
-			.click();
-
 		await page.getByRole( 'button', { name: 'Background' } ).click();
 
-		const backgroundColorButton = page
-			.getByRole( 'button', { name: 'Color: Orange' } )
-			.first();
-
-		await backgroundColorButton.click();
+		await page
+			.getByRole( 'option', { name: 'Luminous vivid orange' } )
+			.click();
 
 		await page
 			.getByRole( 'region', { name: 'Editor top bar' } )
@@ -70,7 +64,7 @@ test.describe( 'Global Styles - Button States', () => {
 			.click();
 
 		await page
-			.getByRole( 'region', { name: 'Save panel' } )
+			.getByRole( 'region', { name: 'Editor publish' } )
 			.getByRole( 'button', { name: 'Save', exact: true } )
 			.click();
 
@@ -88,15 +82,11 @@ test.describe( 'Global Styles - Button States', () => {
 
 		await buttonBlock.fill( 'Test Button' );
 
-		await editor.publishPost();
-
-		const postId = await editor.getPostId();
+		const postId = await editor.publishPost();
 
 		await page.goto( `/?p=${ postId }` );
 
-		const frontendButton = page.getByRole( 'link', {
-			name: 'Test Button',
-		} );
+		const frontendButton = page.getByText( 'Test Button' );
 
 		await expect( frontendButton ).toBeVisible();
 
@@ -104,7 +94,7 @@ test.describe( 'Global Styles - Button States', () => {
 
 		await expect( frontendButton ).toHaveCSS(
 			'background-color',
-			'rgb(255, 165, 0)'
+			'rgb(255, 105, 0)'
 		);
 	} );
 } );
