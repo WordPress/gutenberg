@@ -580,9 +580,6 @@ test.describe( 'Navigation block', () => {
 			// One ArrowUp to get to Dog (skips wrapper)
 			await page.keyboard.press( 'ArrowUp' );
 			await navigation.checkLabelFocus( 'Dog' );
-			// Use Cmd+A twice to select the block (since ArrowUp no longer goes to wrapper)
-			await pageUtils.pressKeys( 'primary+a' );
-			await pageUtils.pressKeys( 'primary+a' );
 			await pageUtils.pressKeys( 'access+z' );
 			await pageUtils.pressKeys( 'ArrowDown' );
 			await navigation.checkLabelFocus( 'example.com' );
