@@ -203,7 +203,7 @@ _Parameters_
 
 -   _blockType_ `Object`: The block type.
 -   _attributes_ `Object`: The values of the block's attributes.
--   _context_ `Object`: The intended use for the label.
+-   _context_ `string`: The intended use for the label (defaults to `'visual'`).
 
 _Returns_
 
