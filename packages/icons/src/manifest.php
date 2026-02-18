@@ -1333,12 +1333,10 @@ return array(
 	'thumbs-down'                    => array(
 		'label'    => _x( 'Thumbs Down', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/thumbs-down.svg',
-		'public'   => true,
 	),
 	'thumbs-up'                      => array(
 		'label'    => _x( 'Thumbs Up', 'icon label', 'gutenberg' ),
 		'filePath' => 'library/thumbs-up.svg',
-		'public'   => true,
 	),
 	'time-to-read'                   => array(
 		'label'    => _x( 'Time To Read', 'icon label', 'gutenberg' ),
