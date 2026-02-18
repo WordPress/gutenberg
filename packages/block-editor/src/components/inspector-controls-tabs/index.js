@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
@@ -60,10 +61,66 @@ export default function InspectorControlsTabs( {
 		useDispatch( blockEditorStore )
 	);
 
-	// Reset when switching blocks
+	const selectedTabIdRef = useRef( selectedTabId );
+	selectedTabIdRef.current = selectedTabId;
+
+	// Reset when switching to a different block context.
+	const prevClientIdRef = useRef( clientId );
 	useEffect( () => {
 		hasUserSelectionRef.current = false;
+		// When the rendered block changes, the List View content from
+		// the previous block is no longer relevant. Switch back to Content.
+		// Explicit requestInspectorTab requests (e.g. "Edit navigation")
+		// will override this in a subsequent effect.
+		if (
+			prevClientIdRef.current !== clientId &&
+			selectedTabIdRef.current === TAB_LIST_VIEW.name
+		) {
+			setSelectedTabId( TAB_CONTENT.name );
+		}
+		prevClientIdRef.current = clientId;
 	}, [ clientId ] );
+
+	// When a content list item is selected that doesn't navigate to List View
+	// (e.g. a Heading), switch back to the Content tab from List View.
+	// This prevents the tab from staying stuck on List View after clicking
+	// a list-view-enabled block (e.g. Button) and then selecting a different block.
+	const shouldResetToContentTab = useSelect(
+		( select ) => {
+			if ( ! isSectionBlock ) {
+				return false;
+			}
+			const { getSelectedBlockClientId, getBlockName, getBlockCount } =
+				select( blockEditorStore );
+			const selectedId = getSelectedBlockClientId();
+			if ( ! selectedId || ! contentClientIds?.includes( selectedId ) ) {
+				return false;
+			}
+			const name = getBlockName( selectedId );
+			const hasListView =
+				name === 'core/navigation' ||
+				hasBlockSupport( name, 'listView' );
+			const hasChildren = getBlockCount( selectedId ) > 0;
+			return ! ( hasListView && hasChildren );
+		},
+		[ isSectionBlock, contentClientIds ]
+	);
+
+	const prevShouldResetRef = useRef( shouldResetToContentTab );
+	useEffect( () => {
+		// Only act when shouldResetToContentTab transitions from false to true
+		// (i.e. the user selected a non-list-view content item).
+		// Reading selectedTabId via ref avoids triggering on manual tab switches.
+		if (
+			shouldResetToContentTab &&
+			! prevShouldResetRef.current &&
+			selectedTabIdRef.current === TAB_LIST_VIEW.name
+		) {
+			setSelectedTabId( TAB_CONTENT.name );
+			hasUserSelectionRef.current = false;
+		}
+		prevShouldResetRef.current = shouldResetToContentTab;
+	}, [ shouldResetToContentTab ] );
 
 	// Handle explicit inspector tab requests (panel opening, refs, clear).
 	// Tab state is initialized from requestedTab above.
