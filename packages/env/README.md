@@ -488,7 +488,7 @@ Success: Installed 1 of 1 plugins.
 
 #### Changing the permalink structure
 
-You might want to do this to enable access to the REST API (`wp-env/wp/v2/`) endpoint in your wp-env environment. The endpoint is not available with plain permalinks.
+Pretty permalinks are enabled by default using the `/%year%/%monthnum%/%day%/%postname%/` structure, matching the WordPress core behavior on fresh installs. You can change the structure if needed:
 
 **Examples**
 
