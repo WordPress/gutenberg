@@ -12,6 +12,49 @@
 class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Controller_6_9 {
 
 	/**
+	 * Retrieves the comment schema, adding reaction_emojis.
+	 *
+	 * Extends the parent schema with a read-only `reaction_emojis`
+	 * property whose default value exposes the filtered emoji list.
+	 * Clients can read this from the OPTIONS response to discover
+	 * which reaction emojis the server accepts.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		$schema = parent::get_item_schema();
+
+		$schema['properties']['reaction_emojis'] = array(
+			'description' => __( 'Allowed emoji reactions for notes.', 'gutenberg' ),
+			'type'        => 'array',
+			'items'       => array(
+				'type'       => 'object',
+				'properties' => array(
+					'emoji' => array(
+						'description' => __( 'The emoji character.', 'gutenberg' ),
+						'type'        => 'string',
+					),
+					'label' => array(
+						'description' => __( 'A human-readable label for the emoji.', 'gutenberg' ),
+						'type'        => 'string',
+					),
+					'value' => array(
+						'description' => __( 'The slug used as the storage key.', 'gutenberg' ),
+						'type'        => 'string',
+					),
+				),
+			),
+			'default'     => gutenberg_get_note_reaction_emojis(),
+			'context'     => array( 'view', 'edit' ),
+			'readonly'    => true,
+		);
+
+		return $schema;
+	}
+
+	/**
 	 * Checks whether the request type is a note or reaction.
 	 *
 	 * @param string $type The comment type from the request.
@@ -312,7 +355,8 @@ class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Contr
 			}
 
 			// Validate content is a valid emoji slug.
-			$valid_slugs = array( 'heart', 'celebration', 'smile', 'eyes', 'rocket' );
+			$emojis      = gutenberg_get_note_reaction_emojis();
+			$valid_slugs = wp_list_pluck( $emojis, 'value' );
 			$emoji_slug  = isset( $request['content'] ) ? wp_strip_all_tags( $request['content'] ) : '';
 			if ( ! in_array( $emoji_slug, $valid_slugs, true ) ) {
 				return new WP_Error(
