@@ -67,7 +67,7 @@ export default function NavigationListViewProviderWrapper( { clientId } ) {
 	}, [ createNavigationMenu ] );
 
 	// Get navigation state from the block's context
-	const { currentMenuId, blockEditingMode, isLoading } = useSelect(
+	const { currentMenuId, blockEditingMode } = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getBlockEditingMode } =
 				select( blockEditorStore );
@@ -76,7 +76,6 @@ export default function NavigationListViewProviderWrapper( { clientId } ) {
 			return {
 				currentMenuId: attributes?.ref,
 				blockEditingMode: getBlockEditingMode( clientId ),
-				isLoading: false, // TODO: Could track actual loading state
 			};
 		},
 		[ clientId ]
@@ -91,7 +90,6 @@ export default function NavigationListViewProviderWrapper( { clientId } ) {
 		onCreateNew: createUntitledEmptyNavigationMenu,
 		onSelectClassicMenu: convertClassicMenu,
 		isManageMenusButtonDisabled: false,
-		isLoading,
 		isNavigationMenuMissing: false,
 	};
 

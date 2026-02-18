@@ -11,7 +11,6 @@ const NavigationListViewContext = createContext( {
 	onSelectClassicMenu: () => {},
 	onSelectNavigationMenu: () => {},
 	isManageMenusButtonDisabled: false,
-	isLoading: false,
 	isNavigationMenuMissing: false,
 	blockEditingMode: 'default',
 } );
