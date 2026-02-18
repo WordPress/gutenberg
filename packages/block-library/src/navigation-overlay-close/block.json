@@ -14,7 +14,8 @@
 			"default": "icon"
 		},
 		"text": {
-			"type": "string"
+			"type": "string",
+			"default": "Close"
 		}
 	},
 	"supports": {
