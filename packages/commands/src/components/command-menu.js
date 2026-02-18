@@ -7,7 +7,12 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	useSelect,
+	useDispatch,
+	select as globalSelect,
+} from '@wordpress/data';
+import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	useState,
 	useEffect,
@@ -39,6 +44,7 @@ import { unlock } from '../lock-unlock';
 const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );
 
 const inputLabel = __( 'Search commands and settings' );
+const MAX_RECENTLY_USED = 5;
 
 /**
  * Icons enforced per command category.
@@ -80,6 +86,57 @@ export function isValidIcon( icon ) {
 	);
 }
 
+function CommandItem( {
+	command,
+	search,
+	close,
+	category,
+	recordUsage,
+	valuePrefix,
+} ) {
+	const commandCategory = category ?? command.category;
+	const label = command.searchLabel ?? command.label;
+	return (
+		<Command.Item
+			key={ command.name }
+			value={ valuePrefix ? `${ valuePrefix }${ label }` : label }
+			keywords={ command.keywords }
+			onSelect={ () => {
+				recordUsage?.( command.name );
+				command.callback( { close } );
+			} }
+			id={ command.name }
+		>
+			<HStack
+				alignment="left"
+				className={ clsx( 'commands-command-menu__item', {
+					'has-icon':
+						CATEGORY_ICONS[ commandCategory ] || command.icon,
+				} ) }
+			>
+				{ CATEGORY_ICONS[ commandCategory ] ? (
+					<Icon icon={ CATEGORY_ICONS[ commandCategory ] } />
+				) : (
+					isValidIcon( command.icon ) && (
+						<Icon icon={ command.icon } />
+					)
+				) }
+				<span className="commands-command-menu__item-label">
+					<TextHighlight
+						text={ command.label }
+						highlight={ search }
+					/>
+				</span>
+				{ CATEGORY_LABELS[ commandCategory ] && (
+					<span className="commands-command-menu__item-category">
+						{ CATEGORY_LABELS[ commandCategory ] }
+					</span>
+				) }
+			</HStack>
+		</Command.Item>
+	);
+}
+
 function CommandMenuLoader( {
 	name,
 	search,
@@ -87,60 +144,36 @@ function CommandMenuLoader( {
 	setLoader,
 	close,
 	category,
+	filterNames,
+	recordUsage,
+	valuePrefix,
 } ) {
 	const { isLoading, commands = [] } = hook( { search } ) ?? {};
 	useEffect( () => {
 		setLoader( name, isLoading );
 	}, [ setLoader, name, isLoading ] );
 
-	if ( ! commands.length ) {
+	const filtered = filterNames
+		? commands.filter( ( command ) => filterNames.has( command.name ) )
+		: commands;
+
+	if ( ! filtered.length ) {
 		return null;
 	}
 
 	return (
 		<>
-			{ commands.map( ( command ) => {
-				const commandCategory = command.category ?? category;
-				return (
-					<Command.Item
-						key={ command.name }
-						value={ command.searchLabel ?? command.label }
-						keywords={ command.keywords }
-						onSelect={ () => command.callback( { close } ) }
-						id={ command.name }
-					>
-						<HStack
-							alignment="left"
-							className={ clsx( 'commands-command-menu__item', {
-								'has-icon':
-									CATEGORY_ICONS[ commandCategory ] ||
-									command.icon,
-							} ) }
-						>
-							{ CATEGORY_ICONS[ commandCategory ] && (
-								<Icon
-									icon={ CATEGORY_ICONS[ commandCategory ] }
-								/>
-							) }
-							{ ! CATEGORY_ICONS[ commandCategory ] &&
-								isValidIcon( command.icon ) && (
-									<Icon icon={ command.icon } />
-								) }
-							<span className="commands-command-menu__item-label">
-								<TextHighlight
-									text={ command.label }
-									highlight={ search }
-								/>
-							</span>
-							{ CATEGORY_LABELS[ commandCategory ] && (
-								<span className="commands-command-menu__item-category">
-									{ CATEGORY_LABELS[ commandCategory ] }
-								</span>
-							) }
-						</HStack>
-					</Command.Item>
-				);
-			} ) }
+			{ filtered.map( ( command ) => (
+				<CommandItem
+					key={ command.name }
+					command={ command }
+					search={ search }
+					close={ close }
+					category={ command.category ?? category }
+					recordUsage={ recordUsage }
+					valuePrefix={ valuePrefix }
+				/>
+			) ) }
 		</>
 	);
 }
@@ -151,6 +184,9 @@ export function CommandMenuLoaderWrapper( {
 	setLoader,
 	close,
 	category,
+	filterNames,
+	recordUsage,
+	valuePrefix,
 } ) {
 	// The "hook" prop is actually a custom React hook
 	// so to avoid breaking the rules of hooks
@@ -174,11 +210,21 @@ export function CommandMenuLoaderWrapper( {
 			setLoader={ setLoader }
 			close={ close }
 			category={ category }
+			filterNames={ filterNames }
+			recordUsage={ recordUsage }
+			valuePrefix={ valuePrefix }
 		/>
 	);
 }
 
-export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
+export function CommandMenuGroup( {
+	isContextual,
+	search,
+	setLoader,
+	close,
+	recordUsage,
+	heading,
+} ) {
 	const { commands, loaders } = useSelect(
 		( select ) => {
 			const { getCommands, getCommandLoaders } = select( commandsStore );
@@ -195,57 +241,113 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 	}
 
 	return (
-		<Command.Group>
-			{ commands.map( ( command ) => (
-				<Command.Item
-					key={ command.name }
-					value={ command.searchLabel ?? command.label }
-					keywords={ command.keywords }
-					onSelect={ () => command.callback( { close } ) }
-					id={ command.name }
+		<>
+			{ heading && (
+				<div
+					className="commands-command-menu__section-heading"
+					aria-hidden="true"
 				>
-					<HStack
-						alignment="left"
-						className={ clsx( 'commands-command-menu__item', {
-							'has-icon':
-								CATEGORY_ICONS[ command.category ] ||
-								command.icon,
-						} ) }
-					>
-						{ CATEGORY_ICONS[ command.category ] ? (
-							<Icon icon={ CATEGORY_ICONS[ command.category ] } />
-						) : (
-							command.icon && <Icon icon={ command.icon } />
-						) }
-						<span>
-							<TextHighlight
-								text={ command.label }
-								highlight={ search }
-							/>
-						</span>
-						{ CATEGORY_LABELS[ command.category ] && (
-							<span className="commands-command-menu__item-category">
-								{ CATEGORY_LABELS[ command.category ] }
-							</span>
-						) }
-					</HStack>
-				</Command.Item>
-			) ) }
-			{ loaders.map( ( loader ) => (
-				<CommandMenuLoaderWrapper
-					key={ loader.name }
-					hook={ loader.hook }
-					search={ search }
-					setLoader={ setLoader }
-					close={ close }
-					category={ loader.category }
-				/>
-			) ) }
-		</Command.Group>
+					{ heading }
+				</div>
+			) }
+			<Command.Group>
+				{ commands.map( ( command ) => (
+					<CommandItem
+						key={ command.name }
+						command={ command }
+						search={ search }
+						close={ close }
+						recordUsage={ recordUsage }
+					/>
+				) ) }
+				{ loaders.map( ( loader ) => (
+					<CommandMenuLoaderWrapper
+						key={ loader.name }
+						hook={ loader.hook }
+						search={ search }
+						setLoader={ setLoader }
+						close={ close }
+						category={ loader.category }
+						recordUsage={ recordUsage }
+					/>
+				) ) }
+			</Command.Group>
+		</>
 	);
 }
 
-function SectionHeading( { search } ) {
+function RecentlyUsedGroup( { search, setLoader, close, recordUsage } ) {
+	const {
+		commands: allCommands,
+		loaders,
+		recentlyUsedNames,
+	} = useSelect( ( select ) => {
+		const { getCommands, getCommandLoaders } = select( commandsStore );
+		return {
+			commands: [ ...getCommands( true ), ...getCommands( false ) ],
+			loaders: [
+				...getCommandLoaders( true ),
+				...getCommandLoaders( false ),
+			],
+			recentlyUsedNames:
+				select( preferencesStore ).get(
+					'core/commands',
+					'recentlyUsed'
+				) ?? [],
+		};
+	}, [] );
+
+	if ( ! recentlyUsedNames.length ) {
+		return null;
+	}
+
+	const recentlyUsedSet = new Set( recentlyUsedNames );
+	const recentStaticCommands = allCommands.filter( ( command ) =>
+		recentlyUsedSet.has( command.name )
+	);
+
+	if ( ! recentStaticCommands.length && ! loaders.length ) {
+		return null;
+	}
+
+	return (
+		<>
+			<div
+				className="commands-command-menu__section-heading"
+				aria-hidden="true"
+			>
+				{ __( 'Recent' ) }
+			</div>
+			<Command.Group>
+				{ recentStaticCommands.map( ( command ) => (
+					<CommandItem
+						key={ command.name }
+						command={ command }
+						search={ search }
+						close={ close }
+						recordUsage={ recordUsage }
+						valuePrefix="recent-"
+					/>
+				) ) }
+				{ loaders.map( ( loader ) => (
+					<CommandMenuLoaderWrapper
+						key={ loader.name }
+						hook={ loader.hook }
+						search={ search }
+						setLoader={ setLoader }
+						close={ close }
+						category={ loader.category }
+						filterNames={ recentlyUsedSet }
+						recordUsage={ recordUsage }
+						valuePrefix="recent-"
+					/>
+				) ) }
+			</Command.Group>
+		</>
+	);
+}
+
+function SearchResultsHeading() {
 	const filteredCount = useCommandState( ( state ) => state.filtered.count );
 
 	if ( filteredCount === 0 ) {
@@ -257,7 +359,7 @@ function SectionHeading( { search } ) {
 			className="commands-command-menu__section-heading"
 			aria-hidden="true"
 		>
-			{ search ? __( 'Results' ) : __( 'Suggestions' ) }
+			{ __( 'Results' ) }
 		</div>
 	);
 }
@@ -299,7 +401,24 @@ export function CommandMenu() {
 		[]
 	);
 	const { open, close } = useDispatch( commandsStore );
+	const { set: setPreference } = useDispatch( preferencesStore );
 	const [ loaders, setLoaders ] = useState( {} );
+
+	const recordUsage = useCallback(
+		( name ) => {
+			const current =
+				globalSelect( preferencesStore ).get(
+					'core/commands',
+					'recentlyUsed'
+				) ?? [];
+			const next = [
+				name,
+				...current.filter( ( n ) => n !== name ),
+			].slice( 0, MAX_RECENTLY_USED );
+			setPreference( 'core/commands', 'recentlyUsed', next );
+		},
+		[ setPreference ]
+	);
 
 	useEffect( () => {
 		registerShortcut( {
@@ -380,18 +499,31 @@ export function CommandMenu() {
 								{ __( 'No results found.' ) }
 							</Command.Empty>
 						) }
-						<SectionHeading search={ search } />
+						{ ! search && (
+							<RecentlyUsedGroup
+								search={ search }
+								setLoader={ setLoader }
+								close={ closeAndReset }
+								recordUsage={ recordUsage }
+							/>
+						) }
+						{ search && <SearchResultsHeading /> }
 						<CommandMenuGroup
 							search={ search }
 							setLoader={ setLoader }
 							close={ closeAndReset }
 							isContextual
+							recordUsage={ recordUsage }
+							heading={
+								! search ? __( 'Suggestions' ) : undefined
+							}
 						/>
 						{ search && (
 							<CommandMenuGroup
 								search={ search }
 								setLoader={ setLoader }
 								close={ closeAndReset }
+								recordUsage={ recordUsage }
 							/>
 						) }
 					</Command.List>
