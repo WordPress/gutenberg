@@ -355,7 +355,16 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				selectedPseudoSelector={ selectedPseudoSelector }
 				onChangePseudoSelector={ setSelectedPseudoSelector }
 			/>
-			<BlockPreviewPanel name={ name } variation={ variation } />
+			<BlockPreviewPanel
+				name={ name }
+				variation={ variation }
+				selectedState={ selectedPseudoSelector }
+				stateStyles={
+					selectedPseudoSelector !== 'default'
+						? rawStyle?.[ selectedPseudoSelector ]
+						: undefined
+				}
+			/>
 			{ hasVariationsPanel && (
 				<div className="global-styles-ui-screen-variations">
 					<VStack spacing={ 3 }>
