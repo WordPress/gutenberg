@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- DataForm: Fix focus loss when collapsing in Card view. [#75689](https://github.com/WordPress/gutenberg/pull/75689)
+
 ## 12.0.0 (2026-02-18)
 
 ### Breaking Changes
