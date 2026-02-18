@@ -66,29 +66,29 @@ class Render_Block_Navigation_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * @covers block_core_navigation_block_tree_has_block_type
+	 * @covers gutenberg_block_core_navigation_block_tree_has_block_type
 	 */
 	public function test_block_core_navigation_block_contains_core_navigation() {
 		$parsed_blocks = parse_blocks( '<!-- wp:navigation /-->' );
 		$inner_blocks  = new WP_Block_List( $parsed_blocks );
-		$this->assertTrue( block_core_navigation_block_tree_has_block_type( $inner_blocks, 'core/navigation' ) );
+		$this->assertTrue( gutenberg_block_core_navigation_block_tree_has_block_type( $inner_blocks, 'core/navigation' ) );
 	}
 
 	/**
-	 * @covers block_core_navigation_block_tree_has_block_type
+	 * @covers gutenberg_block_core_navigation_block_tree_has_block_type
 	 */
 	public function test_block_core_navigation_block_contains_core_navigation_deep() {
 		$parsed_blocks = parse_blocks( '<!-- wp:group --><!-- /wp:group --><!-- wp:group --><!-- wp:group --><!-- wp:navigation /--><!-- /wp:group --><!-- /wp:group -->' );
 		$inner_blocks  = new WP_Block_List( $parsed_blocks );
-		$this->assertTrue( block_core_navigation_block_tree_has_block_type( $inner_blocks, 'core/navigation' ) );
+		$this->assertTrue( gutenberg_block_core_navigation_block_tree_has_block_type( $inner_blocks, 'core/navigation' ) );
 	}
 
 	/**
-	 * @covers block_core_navigation_block_tree_has_block_type
+	 * @covers gutenberg_block_core_navigation_block_tree_has_block_type
 	 */
 	public function test_block_core_navigation_block_contains_core_navigation_no_navigation() {
 		$parsed_blocks = parse_blocks( '<!-- wp:group --><!-- wp:group --><!-- /wp:group --><!-- /wp:group -->' );
 		$inner_blocks  = new WP_Block_List( $parsed_blocks );
-		$this->assertFalse( block_core_navigation_block_tree_has_block_type( $inner_blocks, 'core/navigation' ) );
+		$this->assertFalse( gutenberg_block_core_navigation_block_tree_has_block_type( $inner_blocks, 'core/navigation' ) );
 	}
 }
