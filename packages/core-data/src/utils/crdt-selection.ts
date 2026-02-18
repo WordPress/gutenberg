@@ -95,7 +95,7 @@ function convertYSelectionToBlockSelection(
  * @param selectionHistory The selection history to check
  * @return The most recent selection that exists in the document, or null if no selection exists.
  */
-function findSelectionFromHistory(
+export function findSelectionFromHistory(
 	ydoc: Y.Doc,
 	selectionHistory: YFullSelection[]
 ): WPSelection | null {
