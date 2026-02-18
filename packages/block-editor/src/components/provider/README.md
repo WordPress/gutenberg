@@ -31,6 +31,20 @@ In the context of an editor, an example usage of this distinction is for managin
 
 A callback invoked when the blocks have been modified in a non-persistent manner. Contrasted with `onChange`, a "non-persistent" change is one which is part of a composed input. Any sequence of updates to the same block attribute are treated as non-persistent, except for the first.
 
+### `selection`
+
+-   **Type:** `Object`
+-   **Required** `no`
+
+The current selection state, typically containing `selectionStart`, `selectionEnd`, and `initialPosition`. Used to restore cursor position when blocks are reset from an external source (e.g. undo/redo).
+
+### `onChangeSelection`
+
+-   **Type:** `Function`
+-   **Required** `no`
+
+A callback invoked when the selection changes within the block editor. Receives the new selection state as the first argument and an options object as the second. The options object contains an `isBlockChange` boolean indicating whether the selection change accompanied a block content change.
+
 ### `children`
 
 -   **Type:** `Element`

@@ -22,18 +22,23 @@ import {
 } from "@wordpress/block-editor";
 
 function Editor() {
-	const { value, setValue, hasUndo, hasRedo, undo, redo } =
+	const { value, setValue, amendValue, hasUndo, hasRedo, undo, redo } =
 		useStateWithHistory( { blocks: [] } );
 
 	return (
         <BlockEditorProvider
             value={ value.blocks }
             selection={ value.selection }
-            onInput={ ( blocks, { selection } ) =>
-                setValue( { blocks, selection }, true )
+            onInput={ ( blocks ) =>
+                setValue( { blocks, selection: value.selection }, true )
             }
-            onChange={ ( blocks, { selection } ) =>
-                setValue( { blocks, selection }, false )
+            onChange={ ( blocks ) =>
+                setValue( { blocks, selection: value.selection }, false )
+            }
+            onChangeSelection={ ( selection, { isBlockChange } = {} ) =>
+                isBlockChange
+                    ? amendValue( { ...value, selection } )
+                    : setValue( { ...value, selection }, true )
             }
         >
             <div className="undo-redo-toolbar">
@@ -54,12 +59,15 @@ The `useStateWithHistory` hook returns an object with the following properties:
 
 - `value`: the current value of the state.
 - `setValue`: a function that can be used to update the state.
+- `amendValue`: a function that merges a new value into the most recent undo entry without creating a new one.
 - `hasUndo`: a boolean indicating whether there are any actions that can be undone.
 - `hasRedo`: a boolean indicating whether there are any actions that can be redone.
 - `undo`: a function that can be used to undo the last action.
 - `redo`: a function that can be used to redo the last action.
 
 Notice that in addition to the `blocks` property, the `value` object also tracks a `selection` property. This property is used to store and control the cursor position within the block editor. This allows the editor to restore the right position when undoing or redoing changes.
+
+Selection changes are reported separately via the `onChangeSelection` callback rather than being bundled with `onChange`/`onInput`. When a selection change accompanies a block change (`isBlockChange` is `true`), `amendValue` merges the selection into the most recent undo entry so that undoing restores both blocks and cursor position together. For selection-only changes (e.g. clicking to reposition the cursor), the update is recorded as staged so it doesn't create a separate undo step.
 
 ## Going Further...
 

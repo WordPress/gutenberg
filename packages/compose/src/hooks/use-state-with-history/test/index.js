@@ -28,6 +28,38 @@ const TestComponent = () => {
 	);
 };
 
+const AmendTestComponent = () => {
+	const { value, setValue, amendValue, hasUndo, undo, redo } =
+		useStateWithHistory( { text: 'foo', cursor: 0 } );
+
+	return (
+		<div>
+			<span data-testid="text">{ value.text }</span>
+			<span data-testid="cursor">{ value.cursor }</span>
+			<button
+				className="change"
+				onClick={ () =>
+					setValue( { text: 'bar', cursor: value.cursor }, false )
+				}
+			>
+				Change
+			</button>
+			<button
+				className="amend"
+				onClick={ () => amendValue( { ...value, cursor: 5 } ) }
+			>
+				Amend
+			</button>
+			<button className="undo" onClick={ undo } disabled={ ! hasUndo }>
+				Undo
+			</button>
+			<button className="redo" onClick={ redo }>
+				Redo
+			</button>
+		</div>
+	);
+};
+
 describe( 'useStateWithHistory', () => {
 	it( 'should allow undo/redo', async () => {
 		render( <TestComponent /> );
@@ -55,5 +87,32 @@ describe( 'useStateWithHistory', () => {
 		expect( input ).toHaveValue( 'bar' );
 		expect( buttonUndo ).toBeEnabled();
 		expect( buttonRedo ).toBeDisabled();
+	} );
+
+	it( 'should amend the latest undo entry', () => {
+		render( <AmendTestComponent /> );
+
+		expect( screen.getByTestId( 'text' ) ).toHaveTextContent( 'foo' );
+		expect( screen.getByTestId( 'cursor' ) ).toHaveTextContent( '0' );
+
+		// Make a persistent change.
+		fireEvent.click( screen.getByText( 'Change' ) );
+		expect( screen.getByTestId( 'text' ) ).toHaveTextContent( 'bar' );
+		expect( screen.getByTestId( 'cursor' ) ).toHaveTextContent( '0' );
+
+		// Amend cursor into the same undo entry.
+		fireEvent.click( screen.getByText( 'Amend' ) );
+		expect( screen.getByTestId( 'text' ) ).toHaveTextContent( 'bar' );
+		expect( screen.getByTestId( 'cursor' ) ).toHaveTextContent( '5' );
+
+		// Undo should restore both text and cursor together.
+		fireEvent.click( screen.getByText( 'Undo' ) );
+		expect( screen.getByTestId( 'text' ) ).toHaveTextContent( 'foo' );
+		expect( screen.getByTestId( 'cursor' ) ).toHaveTextContent( '0' );
+
+		// Redo should restore both text and cursor together.
+		fireEvent.click( screen.getByText( 'Redo' ) );
+		expect( screen.getByTestId( 'text' ) ).toHaveTextContent( 'bar' );
+		expect( screen.getByTestId( 'cursor' ) ).toHaveTextContent( '5' );
 	} );
 } );

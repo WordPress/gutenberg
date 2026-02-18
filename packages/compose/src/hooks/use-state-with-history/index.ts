@@ -16,6 +16,7 @@ function undoRedoReducer< T >(
 		| { type: 'UNDO' }
 		| { type: 'REDO' }
 		| { type: 'RECORD'; value: T; isStaged: boolean }
+		| { type: 'AMEND'; value: T }
 ): UndoRedoState< T > {
 	switch ( action.type ) {
 		case 'UNDO': {
@@ -55,6 +56,20 @@ function undoRedoReducer< T >(
 				value: action.value,
 			};
 		}
+		case 'AMEND': {
+			state.manager.amendRecord( [
+				{
+					id: 'object',
+					changes: {
+						prop: { from: state.value, to: action.value },
+					},
+				},
+			] );
+			return {
+				...state,
+				value: action.value,
+			};
+		}
 	}
 
 	return state;
@@ -87,6 +102,12 @@ export default function useStateWithHistory< T >( initialValue: T ) {
 				type: 'RECORD',
 				value: newValue,
 				isStaged,
+			} );
+		}, [] ),
+		amendValue: useCallback( ( newValue: T ) => {
+			dispatch( {
+				type: 'AMEND',
+				value: newValue,
 			} );
 		}, [] ),
 		hasUndo: state.manager.hasUndo(),
