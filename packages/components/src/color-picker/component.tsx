@@ -114,21 +114,21 @@ const UnconnectedColorPicker = (
 	// provide raw HSLA values without information loss.
 	// Uses direct setColor (not debounced) to prevent race conditions
 	// where a stale debounced hex would overwrite newer internalHSLA.
-	const currentHex = safeColordColor.toHex();
 
 	const handleHSLAChange = useCallback(
 		( nextHSLA: HslaColor ) => {
 			setInternalHSLA( nextHSLA );
+			const previousHex = lastProducedHexRef.current;
 			const nextHex = colord( nextHSLA ).toHex();
-			lastProducedHexRef.current = nextHex;
 			// Only notify parent when the hex actually changes. This
 			// avoids firing onChange for H/S changes on achromatic
 			// colors (e.g. adjusting hue on pure white).
-			if ( nextHex !== currentHex ) {
+			if ( nextHex !== previousHex ) {
+				lastProducedHexRef.current = nextHex;
 				setColor( nextHex );
 			}
 		},
-		[ setColor, currentHex ]
+		[ setColor ]
 	);
 
 	// Handler for components that provide Colord values (RGB, Hex inputs).
