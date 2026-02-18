@@ -25,7 +25,9 @@ test.describe( 'ColorPicker HSL inputs', () => {
 			.click();
 
 		// Switch to HSL mode.
-		await page.getByRole( 'combobox' ).selectOption( 'hsl' );
+		await page
+			.getByRole( 'combobox', { name: 'Color format' } )
+			.selectOption( 'hsl' );
 	} );
 
 	test( 'should preserve hue and saturation when lightness is set to white', async ( {
