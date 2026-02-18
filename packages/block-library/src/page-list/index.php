@@ -5,29 +5,25 @@
  * @package WordPress
  */
 
+// Path differs between source and build: '../navigation/shared/' in source, './navigation/shared/' in build.
+if ( file_exists( __DIR__ . '/../navigation/shared/get-submenu-visibility.php' ) ) {
+	require_once __DIR__ . '/../navigation/shared/get-submenu-visibility.php';
+} else {
+	require_once __DIR__ . '/navigation/shared/get-submenu-visibility.php';
+}
+
 /**
  * Returns the submenu visibility value with backward compatibility
  * for the deprecated openSubmenusOnClick attribute.
  *
  * @since 6.9.0
+ * @deprecated Use block_core_shared_get_submenu_visibility() instead.
  *
  * @param array $context Block context from parent Navigation block.
  * @return string The visibility mode: 'hover', 'click', or 'always'.
  */
 function block_core_page_list_get_submenu_visibility( $context ) {
-	$deprecated_open_submenus_on_click = $context['openSubmenusOnClick'] ?? null;
-
-	// For backward compatibility, prioritize the legacy attribute if present. If it has been loaded and saved in the editor, then
-	// the deprecated attribute will be replaced by submenuVisibility.
-	if ( null !== $deprecated_open_submenus_on_click ) {
-		// Convert boolean to string: true -> 'click', false -> 'hover'.
-		return ! empty( $deprecated_open_submenus_on_click ) ? 'click' : 'hover';
-	}
-
-	$submenu_visibility = $context['submenuVisibility'] ?? null;
-
-	// Use submenuVisibility for migrated/new blocks.
-	return $submenu_visibility ?? 'hover';
+	return block_core_shared_get_submenu_visibility( $context );
 }
 
 /**
