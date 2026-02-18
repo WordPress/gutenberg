@@ -3,47 +3,69 @@
  */
 import { areGlobalStylesEqual } from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
+import { __ } from '@wordpress/i18n';
 
 /**
- * Valid pseudo selectors for elements.
+ * Pseudo selector definition with value and label.
+ */
+export interface PseudoSelectorDefinition {
+	value: string;
+	label: string;
+}
+
+/**
+ * Valid pseudo selectors for elements with their labels.
  * This mirrors the PHP constant in lib/class-wp-theme-json-gutenberg.php
  */
-export const VALID_ELEMENT_PSEUDO_SELECTORS: Record< string, string[] > = {
+export const VALID_ELEMENT_PSEUDO_SELECTORS: Record<
+	string,
+	PseudoSelectorDefinition[]
+> = {
 	link: [
-		':link',
-		':any-link',
-		':visited',
-		':hover',
-		':focus',
-		':focus-visible',
-		':active',
+		{ value: ':link', label: __( 'Link' ) },
+		{ value: ':any-link', label: __( 'Any Link' ) },
+		{ value: ':visited', label: __( 'Visited' ) },
+		{ value: ':hover', label: __( 'Hover' ) },
+		{ value: ':focus', label: __( 'Focus' ) },
+		{ value: ':focus-visible', label: __( 'Focus Visible' ) },
+		{ value: ':active', label: __( 'Active' ) },
 	],
 	button: [
-		':link',
-		':any-link',
-		':visited',
-		':hover',
-		':focus',
-		':focus-visible',
-		':active',
+		{ value: ':link', label: __( 'Link' ) },
+		{ value: ':any-link', label: __( 'Any Link' ) },
+		{ value: ':visited', label: __( 'Visited' ) },
+		{ value: ':hover', label: __( 'Hover' ) },
+		{ value: ':focus', label: __( 'Focus' ) },
+		{ value: ':focus-visible', label: __( 'Focus Visible' ) },
+		{ value: ':active', label: __( 'Active' ) },
 	],
 };
 
 /**
- * Valid pseudo selectors for blocks.
+ * Valid pseudo selectors for blocks with their labels.
  * This mirrors the PHP constant in lib/class-wp-theme-json-gutenberg.php
  */
-export const VALID_BLOCK_PSEUDO_SELECTORS: Record< string, string[] > = {
-	'core/button': [ ':hover', ':focus', ':focus-visible', ':active' ],
+export const VALID_BLOCK_PSEUDO_SELECTORS: Record<
+	string,
+	PseudoSelectorDefinition[]
+> = {
+	'core/button': [
+		{ value: ':hover', label: __( 'Hover' ) },
+		{ value: ':focus', label: __( 'Focus' ) },
+		{ value: ':focus-visible', label: __( 'Focus Visible' ) },
+		{ value: ':active', label: __( 'Active' ) },
+	],
 };
 
 /**
  * Get the valid pseudo selectors for a given block or element.
  *
  * @param name The block name (e.g., 'core/button') or element name (e.g., 'button')
- * @return Array of valid pseudo selectors, or empty array if none
+ * @return Array of valid pseudo selector definitions, or empty array if none
  */
-export function getValidPseudoSelectors( name: string ): string[] {
+export function getValidPseudoSelectors(
+	name: string
+): PseudoSelectorDefinition[] {
 	// Check if it's a block
 	if ( VALID_BLOCK_PSEUDO_SELECTORS[ name ] ) {
 		return VALID_BLOCK_PSEUDO_SELECTORS[ name ];

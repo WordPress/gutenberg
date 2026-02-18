@@ -21,11 +21,16 @@ import {
 	check,
 } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import type { PseudoSelectorDefinition } from './utils';
+
 interface ScreenHeaderProps {
 	title: string;
 	description?: string | React.ReactElement;
 	onBack?: () => void;
-	pseudoSelectors?: string[];
+	pseudoSelectors?: PseudoSelectorDefinition[];
 	selectedPseudoSelector?: string;
 	onChangePseudoSelector?: ( value: string ) => void;
 }
@@ -44,17 +49,10 @@ export function ScreenHeader( {
 	const stateOptions = hasPseudoSelectors
 		? [
 				{ label: __( 'Default' ), value: 'default' },
-				...pseudoSelectors.map( ( pseudo ) => {
-					// Convert :hover to Hover, :focus-visible to Focus Visible
-					const label = pseudo
-						.replace( /^:/, '' )
-						.replace( /-/g, ' ' )
-						.replace( /\b\w/g, ( char ) => char.toUpperCase() );
-					return {
-						label,
-						value: pseudo,
-					};
-				} ),
+				...pseudoSelectors.map( ( pseudo ) => ( {
+					label: pseudo.label,
+					value: pseudo.value,
+				} ) ),
 		  ]
 		: [];
 
