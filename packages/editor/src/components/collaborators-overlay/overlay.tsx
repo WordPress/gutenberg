@@ -1,7 +1,7 @@
 // @ts-expect-error No exported types
 import { useStyleOverride } from '@wordpress/block-editor';
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 
 import Avatar from '../collaborators-presence/avatar';
 import { useBlockHighlighting } from './use-block-highlighting';
@@ -142,6 +142,14 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	overflow: visible;
 	width: max-content;
 }
+/* Avatar label positioned above a highlighted block. */
+.collaborators-overlay-block-label.components-avatar {
+	position: absolute;
+	transform: translateY(calc(-100% - 8px));
+	pointer-events: auto;
+	overflow: visible;
+	width: max-content;
+}
 
 @keyframes collaborators-overlay-cursor-blink {
 	0%, 45% { opacity: 1; }
@@ -231,22 +239,36 @@ export function Overlay( {
 		postType ?? null
 	);
 
+	const { highlights, rerenderHighlightsAfterDelay } = useBlockHighlighting(
+		overlayElement,
+		blockEditorDocument ?? null,
+		postId ?? null,
+		postType ?? null
+	);
+
+	// Combine both delayed rerenders so layout changes recompute everything.
+	const rerenderAfterDelay = useMemo(
+		() => () => {
+			const cleanupCursors = rerenderCursorsAfterDelay();
+			const cleanupHighlights = rerenderHighlightsAfterDelay();
+			return () => {
+				cleanupCursors();
+				cleanupHighlights();
+			};
+		},
+		[ rerenderCursorsAfterDelay, rerenderHighlightsAfterDelay ]
+	);
+
 	// Detect layout changes on overlay (e.g. turning on "Show Template") and window
-	// resizes, and re-render the cursors.
-	const resizeObserverRef = useResizeObserver( rerenderCursorsAfterDelay );
-	useEffect( rerenderCursorsAfterDelay, [ rerenderCursorsAfterDelay ] );
+	// resizes, and re-render the cursors and block highlights.
+	const resizeObserverRef = useResizeObserver( rerenderAfterDelay );
+	useEffect( rerenderAfterDelay, [ rerenderAfterDelay ] );
 
 	// Merge the refs to use the same element for both overlay and resize observation
 	const mergedRef = useMergeRefs< HTMLDivElement | null >( [
 		setOverlayElement,
 		resizeObserverRef,
 	] );
-
-	useBlockHighlighting(
-		blockEditorDocument ?? null,
-		postId ?? null,
-		postType ?? null
-	);
 
 	// This is a full overlay that covers the entire iframe document. Good for
 	// scrollable elements like cursor indicators.
@@ -278,6 +300,21 @@ export function Overlay( {
 						borderColor={ cursor.color }
 					/>
 				</div>
+			) ) }
+			{ highlights.map( ( highlight ) => (
+				<Avatar
+					key={ highlight.blockId }
+					className="collaborators-overlay-block-label"
+					variant="badge"
+					size="small"
+					src={ highlight.avatarUrl }
+					name={ highlight.userName }
+					borderColor={ highlight.color }
+					style={ {
+						left: `${ highlight.x }px`,
+						top: `${ highlight.y }px`,
+					} }
+				/>
 			) ) }
 		</div>
 	);
