@@ -15,14 +15,14 @@ import Avatar from '..';
 
 const meta: Meta< typeof Avatar > = {
 	component: Avatar,
-	title: 'Design System/Components/Avatar',
-	id: 'components-avatar',
+	title: 'Editor/Collaborators/Avatar',
+	id: 'editor-collaborators-avatar',
 	tags: [ 'status-private' ],
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'Private API. Only available for internal WordPress core usage.',
+			notes: 'Internal component for real-time collaboration UI.',
 		},
 	},
 };

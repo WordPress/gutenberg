@@ -8,12 +8,14 @@ import a11yPlugin from 'colord/plugins/a11y';
 extend( [ a11yPlugin ] );
 
 /**
+ * WordPress dependencies
+ */
+import { Icon, Tooltip } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
-import Icon from '../icon';
-import Tooltip from '../tooltip';
 import type { AvatarProps } from './types';
-import type { WordPressComponentProps } from '../context';
 
 function Avatar( {
 	className,
@@ -27,7 +29,8 @@ function Avatar( {
 	statusIndicator,
 	style,
 	...props
-}: WordPressComponentProps< AvatarProps, 'div', false > ) {
+}: AvatarProps &
+	Omit< React.HTMLAttributes< HTMLDivElement >, keyof AvatarProps > ) {
 	const showBadge = variant === 'badge' && !! name;
 	const initials = name
 		? name

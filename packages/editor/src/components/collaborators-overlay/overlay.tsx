@@ -1,13 +1,12 @@
-import { privateApis as componentsPrivateApis } from '@wordpress/components';
+// @ts-expect-error No exported types
+import { useStyleOverride } from '@wordpress/block-editor';
 import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
 import { useEffect, useState } from '@wordpress/element';
 
-import { unlock } from '../../lock-unlock';
+import Avatar from '../collaborators-presence/avatar';
 import { useBlockHighlighting } from './use-block-highlighting';
 import { useRenderCursors } from './use-render-cursors';
 import { ELEVATION_X_SMALL } from './collaborator-styles';
-
-const { Avatar } = unlock( componentsPrivateApis );
 
 // wp-components styles are excluded from the editor canvas iframe, so the
 // Avatar component's SCSS is not available there. We inject compiled versions

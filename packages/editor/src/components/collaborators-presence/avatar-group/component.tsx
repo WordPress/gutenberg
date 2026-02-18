@@ -12,14 +12,14 @@ import { Children } from '@wordpress/element';
  * Internal dependencies
  */
 import type { AvatarGroupProps } from './types';
-import type { WordPressComponentProps } from '../context';
 
 function AvatarGroup( {
 	className,
 	max = 3,
 	children,
 	...props
-}: WordPressComponentProps< AvatarGroupProps, 'div', false > ) {
+}: AvatarGroupProps &
+	Omit< React.HTMLAttributes< HTMLDivElement >, keyof AvatarGroupProps > ) {
 	const childArray = Children.toArray( children );
 	const visible = childArray.slice( 0, max );
 	const overflowCount = childArray.length - max;

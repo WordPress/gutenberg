@@ -11,14 +11,14 @@ import Avatar from '../../avatar';
 
 const meta: Meta< typeof AvatarGroup > = {
 	component: AvatarGroup,
-	title: 'Design System/Components/AvatarGroup',
-	id: 'components-avatar-group',
+	title: 'Editor/Collaborators/AvatarGroup',
+	id: 'editor-collaborators-avatar-group',
 	tags: [ 'status-private' ],
 	parameters: {
 		componentStatus: {
 			status: 'use-with-caution',
 			whereUsed: 'global',
-			notes: 'Private API. Only available for internal WordPress core usage.',
+			notes: 'Internal component for real-time collaboration UI.',
 		},
 	},
 };
@@ -63,26 +63,26 @@ export const WithBadges: Story = {
 				src={ avatarUrl( 'aaa' ) }
 				name="Alice"
 				borderColor="#3858e9"
-				badge
+				variant="badge"
 			/>
 			<Avatar
 				src={ avatarUrl( 'bbb' ) }
 				name="Bob"
 				borderColor="#e93858"
-				badge
+				variant="badge"
 			/>
 			<Avatar
 				src={ avatarUrl( 'ccc' ) }
 				name="Charlie"
 				borderColor="#58e938"
-				badge
+				variant="badge"
 			/>
 		</AvatarGroup>
 	),
 	parameters: {
 		docs: {
 			description: {
-				story: 'Avatars with `badge` enabled expand on hover to reveal the name, pushing siblings aside.',
+				story: 'Avatars with `badge` variant expand on hover to reveal the name, pushing siblings aside.',
 			},
 		},
 	},
@@ -95,14 +95,14 @@ export const MixedBadgeAndTooltip: Story = {
 				src={ avatarUrl( 'aaa' ) }
 				name="Alice"
 				borderColor="#3858e9"
-				badge
+				variant="badge"
 			/>
 			<Avatar src={ avatarUrl( 'bbb' ) } name="Bob" />
 			<Avatar
 				src={ avatarUrl( 'ccc' ) }
 				name="Charlie"
 				borderColor="#58e938"
-				badge
+				variant="badge"
 				label="You"
 			/>
 		</AvatarGroup>

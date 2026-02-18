@@ -1,4 +1,4 @@
-import type { IconType } from '../icon';
+import type { IconType } from '@wordpress/components';
 
 export type AvatarProps = {
 	/**
