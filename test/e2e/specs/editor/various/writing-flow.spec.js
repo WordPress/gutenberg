@@ -868,6 +868,7 @@ test.describe( 'Writing Flow (@firefox, @webkit)', () => {
 
 		// Select the previous block.
 		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.press( 'ArrowUp' );
 
 		// Confirm correct setup.
 		await expect.poll( editor.getEditedPostContent )
