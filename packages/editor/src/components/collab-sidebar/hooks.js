@@ -61,7 +61,7 @@ export function useNoteThreads( postId ) {
 		'comment',
 		{
 			post: postId,
-			type: 'note_reaction',
+			type: 'reaction',
 			status: 'all',
 			per_page: -1,
 		},
@@ -574,7 +574,7 @@ export function useNoteActions( reactionsMap = {} ) {
 					'comment',
 					{
 						post: getCurrentPostId(),
-						type: 'note_reaction',
+						type: 'reaction',
 						parent: commentId,
 						content: emoji,
 						status: 'approve',
