@@ -42,7 +42,7 @@ function getBlockElementColors( blockEl, blockType ) {
 	// Get computed colors from the appropriate elements
 	const textColor = getComputedValue( textElement, 'color' );
 	const linkColor =
-		linkElement && linkElement.innerText
+		linkElement && linkElement.textContent
 			? getComputedValue( linkElement, 'color' )
 			: undefined;
 
@@ -117,11 +117,7 @@ export default function BlockColorContrastChecker( { clientId, name } ) {
 		}
 
 		const observer = new window.MutationObserver( () => {
-			window.requestAnimationFrame( () =>
-				window.requestAnimationFrame( () =>
-					setColors( getBlockElementColors( blockEl, blockType ) )
-				)
-			);
+			setColors( getBlockElementColors( blockEl, blockType ) );
 		} );
 
 		observer.observe( blockEl, {
