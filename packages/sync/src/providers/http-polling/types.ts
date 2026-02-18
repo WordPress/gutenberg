@@ -31,8 +31,8 @@ interface SyncEnvelopeFromClient {
 
 interface SyncEnvelopeFromServer {
 	awareness: AwarenessState;
-	compaction_request?: SyncUpdate[];
 	end_cursor: number; // use as `after` in next request
+	should_compact?: boolean;
 	room: string;
 	updates: SyncUpdate[];
 }
