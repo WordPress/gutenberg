@@ -478,6 +478,33 @@ Optional. Pass an object with a list of `perPageSizes` to control the available 
 
 An element to display when the `data` prop is empty. Defaults to `<p>No results</p>`.
 
+#### `onReset`: `( () => void ) | false`
+
+Callback function to reset the view to its default state, or `false` to indicate the view is not modified.
+
+-   Type: `function` or `false`
+-   Optional
+
+This prop controls the "Reset view" button in the view configuration dropdown:
+
+-   When `undefined` (not provided): No reset functionality is shown. Use this when view persistence is not supported.
+-   When `false`: The "Reset view" button is shown but disabled. Use this when view persistence is supported but the current view matches the default (not modified).
+-   When a function: The "Reset view" button is shown and enabled. A blue dot indicator appears on the view options button to signal that the view has been modified. The function is called when the user clicks the reset button.
+
+Example:
+
+```jsx
+const { view, setView, isModified, resetToDefault } = useView( 'my-view-key' );
+
+<DataViews
+	data={ data }
+	view={ view }
+	onChangeView={ setView }
+	onReset={ isModified ? resetToDefault : false }
+	// ...other props
+/>
+```
+
 ### Styling
 
 These are the CSS Custom Properties that can be used to tweak the appearance of the component:
@@ -2030,7 +2057,9 @@ For example:
 #### Panel
 
 -   `type`: `panel`. Required.
--   `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+-   `labelPosition`: one of `side`, `top`, or `none`. Optional. `side` by default.
+-   `editVisibility`: one of `always`, or `on-hover`. Optional. `on-hover` by default.
+-   `openAs`: one of `dropdown`, `modal`. Optional. `dropdown` by default.
 -   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
     -   A string (single field ID)
     -   An array of strings (multiple field IDs)

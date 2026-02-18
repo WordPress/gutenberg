@@ -51,9 +51,14 @@ export function markEntityAsSaved( ydoc: CRDTDoc ): void {
 	recordMeta.set( SAVED_BY_KEY, ydoc.clientID );
 }
 
+function pseudoRandomID(): number {
+	return Math.floor( Math.random() * 1000000000 );
+}
+
 export function serializeCrdtDoc( crdtDoc: CRDTDoc ): string {
 	return JSON.stringify( {
 		document: buffer.toBase64( Y.encodeStateAsUpdateV2( crdtDoc ) ),
+		updateId: pseudoRandomID(), // helps with debugging
 	} );
 }
 
@@ -76,7 +81,7 @@ export function deserializeCrdtDoc(
 		// Overwrite the client ID (which is from a previous session) with a random
 		// client ID. Deserialized documents should not be used directly. Instead,
 		// their state should be applied to another in-use document.
-		ydoc.clientID = Math.floor( Math.random() * 1000000000 );
+		ydoc.clientID = pseudoRandomID();
 
 		return ydoc;
 	} catch ( e ) {

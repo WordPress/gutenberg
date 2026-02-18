@@ -181,5 +181,12 @@ export {
 const fieldsKey = Symbol( 'fields' );
 const formKey = Symbol( 'form' );
 
+import { parseRawBlock as _parseRawBlock } from './parser';
+
 export const privateApis = {};
-lock( privateApis, { isContentBlock, fieldsKey, formKey } );
+lock( privateApis, {
+	isContentBlock,
+	fieldsKey,
+	formKey,
+	parseRawBlock: _parseRawBlock,
+} );

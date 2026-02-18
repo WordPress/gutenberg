@@ -8,7 +8,11 @@ import { Awareness } from 'y-protocols/awareness';
 /**
  * Internal dependencies
  */
-import type { ProviderCreator, ProviderCreatorResult } from '../../types';
+import type {
+	ConnectionStatus,
+	ProviderCreator,
+	ProviderCreatorResult,
+} from '../../types';
 import { pollingManager } from './polling-manager';
 
 export interface ProviderOptions {
@@ -18,24 +22,25 @@ export interface ProviderOptions {
 	ydoc: Y.Doc;
 }
 
-type EventTypes = Record< string, ( ...args: any[] ) => void >;
-
-interface BaseEventTypes extends EventTypes {
-	status: ( ...args: any[] ) => void;
-	synced: ( event: { synced: boolean } ) => void;
-}
+/**
+ * Event types for HttpPollingProvider.
+ * ObservableV2 expects event handlers as functions.
+ */
+type HttpPollingEvents = {
+	status: ( status: ConnectionStatus ) => void;
+};
 
 /**
  * Yjs provider that uses HTTP polling for real-time synchronization. It manages
  * document updates and awareness states through a central sync server.
  */
-class HttpPollingProvider extends ObservableV2< BaseEventTypes > {
+class HttpPollingProvider extends ObservableV2< HttpPollingEvents > {
 	protected awareness: Awareness;
+	protected status: ConnectionStatus[ 'status' ] = 'disconnected';
 	protected synced = false;
 
 	public constructor( protected options: ProviderOptions ) {
 		super();
-
 		this.log( 'Initializing', { room: options.room } );
 
 		this.awareness = options.awareness ?? new Awareness( options.ydoc );
@@ -48,13 +53,14 @@ class HttpPollingProvider extends ObservableV2< BaseEventTypes > {
 	public connect(): void {
 		this.log( 'Connecting' );
 
-		pollingManager.registerRoom(
-			this.options.room,
-			this.options.ydoc,
-			this.awareness,
-			this.onSync
-		);
-		this.emitStatus( 'connected' );
+		pollingManager.registerRoom( {
+			room: this.options.room,
+			doc: this.options.ydoc,
+			awareness: this.awareness,
+			log: this.log,
+			onStatusChange: this.emitStatus,
+			onSync: this.onSync,
+		} );
 	}
 
 	/**
@@ -72,17 +78,32 @@ class HttpPollingProvider extends ObservableV2< BaseEventTypes > {
 		this.log( 'Disconnecting' );
 
 		pollingManager.unregisterRoom( this.options.room );
-		this.emitStatus( 'disconnected' );
+		this.emitStatus( { status: 'disconnected' } );
 	}
 
 	/**
 	 * Emit connection status.
 	 *
-	 * @param status The connection status
+	 * @param status        The connection status
+	 * @param status.error  Optional error information when status is 'disconnected'
+	 * @param status.status The connection status ('connected', 'connecting', 'disconnected')
 	 */
-	protected emitStatus( status: 'connected' | 'disconnected' ): void {
-		this.emit( 'status', [ { status } ] );
-	}
+	protected emitStatus = ( { error, status }: ConnectionStatus ): void => {
+		if ( this.status === status && ! error ) {
+			return;
+		}
+
+		// Only emit 'connecting' status if transitioning from 'disconnected'.
+		if ( status === 'connecting' && this.status !== 'disconnected' ) {
+			return;
+		}
+
+		this.log( 'Status change', { status, error } );
+
+		// ObservableV2 expects arguments as an array
+		this.status = status;
+		this.emit( 'status', [ { error, status } ] );
+	};
 
 	/**
 	 * Log debug messages if debugging is enabled.
@@ -90,7 +111,7 @@ class HttpPollingProvider extends ObservableV2< BaseEventTypes > {
 	 * @param message The debug message
 	 * @param debug   Additional debug information
 	 */
-	protected log( message: string, debug: object = {} ): void {
+	protected log = ( message: string, debug: object = {} ): void => {
 		if ( this.options.debug ) {
 			// eslint-disable-next-line no-console
 			console.log( `[${ this.constructor.name }]: ${ message }`, {
@@ -98,13 +119,15 @@ class HttpPollingProvider extends ObservableV2< BaseEventTypes > {
 				...debug,
 			} );
 		}
-	}
+	};
 
+	/**
+	 * Handle synchronization events from the polling manager.
+	 */
 	protected onSync = (): void => {
 		if ( ! this.synced ) {
 			this.synced = true;
 			this.log( 'Synced' );
-			this.emit( 'synced', [ { synced: true } ] );
 		}
 	};
 }
@@ -130,6 +153,11 @@ export function createHttpPollingProvider(): ProviderCreator {
 
 		return {
 			destroy: () => provider.destroy(),
+			// Adapter: ObservableV2.on is compatible with ProviderOn
+			// The callback receives data as the first parameter
+			on: ( event, callback ) => {
+				provider.on( event, callback );
+			},
 		};
 	};
 }

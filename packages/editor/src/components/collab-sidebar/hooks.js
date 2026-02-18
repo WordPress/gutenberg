@@ -31,7 +31,7 @@ import { store as interfaceStore } from '@wordpress/interface';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
-import { collabSidebarName } from './constants';
+import { FLOATING_NOTES_SIDEBAR } from './constants';
 import { unlock } from '../../lock-unlock';
 import { noop } from './utils';
 
@@ -351,14 +351,16 @@ export function useEnableFloatingSidebar( enabled = false ) {
 		const unsubscribe = registry.subscribe( () => {
 			// Return `null` to indicate the user hid the complementary area.
 			if ( getActiveComplementaryArea( 'core' ) === null ) {
-				enableComplementaryArea( 'core', collabSidebarName );
+				enableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
 			}
 		} );
 
 		return () => {
 			unsubscribe();
-			if ( getActiveComplementaryArea( 'core' ) === collabSidebarName ) {
-				disableComplementaryArea( 'core', collabSidebarName );
+			if (
+				getActiveComplementaryArea( 'core' ) === FLOATING_NOTES_SIDEBAR
+			) {
+				disableComplementaryArea( 'core', FLOATING_NOTES_SIDEBAR );
 			}
 		};
 	}, [ enabled, registry ] );

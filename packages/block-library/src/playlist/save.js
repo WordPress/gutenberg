@@ -14,27 +14,22 @@ import {
 } from '@wordpress/block-editor';
 
 export default function saveWithInnerBlocks( { attributes } ) {
-	const {
-		caption,
-		showNumbers,
-		showTracklist,
-		showArtists,
-		tagName: TagName = showNumbers ? 'ol' : 'ul',
-	} = attributes;
+	const { caption, showNumbers, showTracklist, showArtists } = attributes;
 
 	const blockProps = useBlockProps.save();
 	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
 	return (
 		<figure { ...innerBlocksProps }>
-			<TagName
+			<ol
 				className={ clsx( 'wp-block-playlist__tracklist', {
 					'wp-block-playlist__tracklist-is-hidden': ! showTracklist,
 					'wp-block-playlist__tracklist-artist-is-hidden':
 						! showArtists,
+					'wp-block-playlist__tracklist-show-numbers': showNumbers,
 				} ) }
 			>
 				{ innerBlocksProps.children }
-			</TagName>
+			</ol>
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
 					tagName="figcaption"

@@ -8,7 +8,7 @@ import { createHigherOrderComponent, pure } from '@wordpress/compose';
  */
 import useSelect from '../use-select';
 
-/** @typedef {import('react').ComponentType} ComponentType */
+/** @typedef {React.ComponentType} ComponentType */
 
 /**
  * Higher-order component used to inject state-derived props using registered

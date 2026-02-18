@@ -114,7 +114,7 @@
 		"remove-accents": "^0.5.0"
 	},
 	"devDependencies": {
-		"@ariakit/test": "^0.4.7",
+		"@ariakit/test": "^0.4.13",
 		"deep-freeze": "0.0.1"
 	},
 	"peerDependencies": {

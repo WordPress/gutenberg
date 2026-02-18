@@ -11,6 +11,7 @@ import {
 } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { store as interfaceStore, PinnedItems } from '@wordpress/interface';
@@ -21,8 +22,8 @@ import { store as preferencesStore } from '@wordpress/preferences';
  */
 import PluginSidebar from '../plugin-sidebar';
 import {
-	collabHistorySidebarName,
-	collabSidebarName,
+	ALL_NOTES_SIDEBAR,
+	FLOATING_NOTES_SIDEBAR,
 	SIDEBARS,
 } from './constants';
 import { Comments } from './comments';
@@ -35,7 +36,6 @@ import {
 	useBlockCommentsActions,
 	useEnableFloatingSidebar,
 } from './hooks';
-import { focusCommentThread } from './utils';
 import PostTypeSupportCheck from '../post-type-support-check';
 import { unlock } from '../../lock-unlock';
 
@@ -89,33 +89,40 @@ function NotesSidebar( { postId } ) {
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
-	const { toggleBlockSpotlight } = unlock( useDispatch( blockEditorStore ) );
+	const { toggleBlockSpotlight, selectBlock } = unlock(
+		useDispatch( blockEditorStore )
+	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
 
-	const { clientId, blockCommentId, isCompactNote, isAllNotesSidebarActive } =
-		useSelect( ( select ) => {
-			const { getBlockAttributes, getSelectedBlockClientId } =
-				select( blockEditorStore );
-			const _clientId = getSelectedBlockClientId();
-			return {
-				clientId: _clientId,
-				blockCommentId: _clientId
-					? getBlockAttributes( _clientId )?.metadata?.noteId
-					: null,
-				isCompactNote:
-					select( preferencesStore ).get(
-						'core',
-						'notesDisplayMode'
-					) === 'minimize',
-				isAllNotesSidebarActive:
-					select( interfaceStore ).getActiveComplementaryArea(
-						'core'
-					) === collabHistorySidebarName,
-			};
-		}, [] );
-
+	const {
+		clientId,
+		blockCommentId,
+		isClassicBlock,
+		isCompactNote,
+		isAllNotesSidebarActive,
+	} = useSelect( ( select ) => {
+		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
+			select( blockEditorStore );
+		const _clientId = getSelectedBlockClientId();
+		return {
+			clientId: _clientId,
+			blockCommentId: _clientId
+				? getBlockAttributes( _clientId )?.metadata?.noteId
+				: null,
+			isClassicBlock: _clientId
+				? getBlockName( _clientId ) === 'core/freeform'
+				: false,
+			isCompactNote:
+				select( preferencesStore ).get( 'core', 'notesDisplayMode' ) ===
+				'minimize',
+			isAllNotesSidebarActive:
+				select( interfaceStore ).getActiveComplementaryArea(
+					'core'
+				) === ALL_NOTES_SIDEBAR,
+		};
+	}, [] );
 	const { isDistractionFree } = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
 		return {
@@ -127,16 +134,38 @@ function NotesSidebar( { postId } ) {
 		[]
 	);
 
-	const showFloatingSidebar = isLargeViewport;
 	const {
 		resultComments,
 		unresolvedSortedThreads,
 		reflowComments,
 		commentLastUpdated,
 	} = useBlockComments( postId );
+
+	// Only enable the floating sidebar for large viewports.
+	const showFloatingSidebar = isLargeViewport;
+	// Fallback to "All notes" sidebar on smaller viewports.
+	const showAllNotesSidebar =
+		resultComments.length > 0 || ! showFloatingSidebar;
 	useEnableFloatingSidebar(
 		showFloatingSidebar &&
 			( unresolvedSortedThreads.length > 0 || selectedNote !== undefined )
+	);
+
+	useShortcut(
+		'core/editor/new-note',
+		( event ) => {
+			event.preventDefault();
+			openTheSidebar();
+		},
+		{
+			// When multiple notes per block are supported. Remove note ID check.
+			// See: https://github.com/WordPress/gutenberg/pull/75147.
+			isDisabled:
+				isDistractionFree ||
+				isClassicBlock ||
+				! clientId ||
+				!! blockCommentId,
+		}
 	);
 
 	// Get the global styles to set the background color of the sidebar.
@@ -147,20 +176,24 @@ function NotesSidebar( { postId } ) {
 	const currentThread = blockCommentId
 		? resultComments.find( ( thread ) => thread.id === blockCommentId )
 		: null;
-	const showAllNotesSidebar = resultComments.length > 0;
 
-	async function openTheSidebar() {
+	async function openTheSidebar( selectedClientId ) {
 		const prevArea = await getActiveComplementaryArea( 'core' );
 		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
+		const targetClientId =
+			selectedClientId && selectedClientId !== clientId
+				? selectedClientId
+				: clientId;
+		const targetNote = resultComments.find(
+			( note ) => note.blockClientId === targetClientId
+		);
 
-		if ( currentThread?.status === 'approved' ) {
-			enableComplementaryArea( 'core', collabHistorySidebarName );
+		if ( targetNote?.status === 'approved' ) {
+			enableComplementaryArea( 'core', ALL_NOTES_SIDEBAR );
 		} else if ( ! activeNotesArea || ! showAllNotesSidebar ) {
 			enableComplementaryArea(
 				'core',
-				showFloatingSidebar
-					? collabSidebarName
-					: collabHistorySidebarName
+				showFloatingSidebar ? FLOATING_NOTES_SIDEBAR : ALL_NOTES_SIDEBAR
 			);
 		}
 
@@ -170,14 +203,11 @@ function NotesSidebar( { postId } ) {
 			return;
 		}
 
-		selectNote( currentThread ? currentThread.id : 'new' );
-		focusCommentThread(
-			currentThread?.id,
-			commentSidebarRef.current,
-			// Focus the textarea when creating a new note.
-			! currentThread ? 'textarea' : undefined
-		);
-		toggleBlockSpotlight( clientId, true );
+		// A special case for the List View, where block selection isn't required to trigger an action.
+		// The action won't do anything if the block is already selected.
+		selectBlock( targetClientId, null );
+		toggleBlockSpotlight( targetClientId, true );
+		selectNote( targetNote ? targetNote.id : 'new', { focus: true } );
 	}
 
 	let notesDropdownValue = 'expand';
@@ -231,7 +261,7 @@ function NotesSidebar( { postId } ) {
 										if ( value === 'show-all' ) {
 											enableComplementaryArea(
 												'core',
-												collabHistorySidebarName
+												ALL_NOTES_SIDEBAR
 											);
 										} else {
 											if ( isAllNotesSidebarActive ) {
@@ -255,8 +285,8 @@ function NotesSidebar( { postId } ) {
 			{ showAllNotesSidebar && (
 				<PluginSidebar
 					isPinnable={ ! isLargeViewport }
-					identifier={ collabHistorySidebarName }
-					name={ collabHistorySidebarName }
+					identifier={ ALL_NOTES_SIDEBAR }
+					name={ ALL_NOTES_SIDEBAR }
 					title={ __( 'All notes' ) }
 					header={
 						<h2 className="interface-complementary-area-header__title">
@@ -276,7 +306,7 @@ function NotesSidebar( { postId } ) {
 				<PluginSidebar
 					isPinnable={ false }
 					header={ false }
-					identifier={ collabSidebarName }
+					identifier={ FLOATING_NOTES_SIDEBAR }
 					className="editor-collab-sidebar"
 					headerClassName="editor-collab-sidebar__header"
 					backgroundColor={ backgroundColor }

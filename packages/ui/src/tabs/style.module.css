@@ -121,9 +121,9 @@
 		/* Appearance */
 		cursor: pointer;
 
-		/* Typography (TODO: replace with theme tokens when available) */
-		font-family: sans-serif;
-		font-size: 13px;
+		/* Typography */
+		font-family: var(--wpds-font-family-body);
+		font-size: var(--wpds-font-size-md);
 		white-space: nowrap;
 
 		/* Characters in some languages (e.g. Japanese) may have a native higher line-height. */

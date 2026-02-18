@@ -10,6 +10,7 @@ import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
+import { dateI18n, getSettings as getDateSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -124,14 +125,21 @@ export const hideBlockTypes =
 /**
  * Save entity records marked as dirty.
  *
- * @param {Object}   options                      Options for the action.
- * @param {Function} [options.onSave]             Callback when saving happens.
- * @param {object[]} [options.dirtyEntityRecords] Array of dirty entities.
- * @param {object[]} [options.entitiesToSkip]     Array of entities to skip saving.
- * @param {Function} [options.close]              Callback when the actions is called. It should be consolidated with `onSave`.
+ * @param {Object}   options                        Options for the action.
+ * @param {Function} [options.onSave]               Callback when saving happens.
+ * @param {object[]} [options.dirtyEntityRecords]   Array of dirty entities.
+ * @param {object[]} [options.entitiesToSkip]       Array of entities to skip saving.
+ * @param {Function} [options.close]                Callback when the actions is called. It should be consolidated with `onSave`.
+ * @param {string}   [options.successNoticeContent] Optional custom success notice content. Defaults to 'Site updated.'.
  */
 export const saveDirtyEntities =
-	( { onSave, dirtyEntityRecords = [], entitiesToSkip = [], close } = {} ) =>
+	( {
+		onSave,
+		dirtyEntityRecords = [],
+		entitiesToSkip = [],
+		close,
+		successNoticeContent,
+	} = {} ) =>
 	( { registry } ) => {
 		const PUBLISH_ON_SAVE_ENTITIES = [
 			{ kind: 'postType', name: 'wp_navigation' },
@@ -209,17 +217,20 @@ export const saveDirtyEntities =
 				} else {
 					registry
 						.dispatch( noticesStore )
-						.createSuccessNotice( __( 'Site updated.' ), {
-							type: 'snackbar',
-							id: saveNoticeId,
-							actions: [
-								{
-									label: __( 'View site' ),
-									url: homeUrl,
-									openInNewTab: true,
-								},
-							],
-						} );
+						.createSuccessNotice(
+							successNoticeContent || __( 'Site updated.' ),
+							{
+								type: 'snackbar',
+								id: saveNoticeId,
+								actions: [
+									{
+										label: __( 'View site' ),
+										url: homeUrl,
+										openInNewTab: true,
+									},
+								],
+							}
+						);
 				}
 			} )
 			.catch( ( error ) =>
@@ -615,7 +626,7 @@ export const restoreRevision =
 
 		// Build the edits object with all restorable fields from the revision.
 		const edits = {
-			blocks: parse( revision.content.raw ),
+			blocks: undefined,
 			content: revision.content.raw,
 		};
 		if ( revision.title?.raw !== undefined ) {
@@ -638,12 +649,17 @@ export const restoreRevision =
 		await dispatch.savePost();
 
 		// Show success notice.
-		registry
-			.dispatch( noticesStore )
-			.createSuccessNotice( __( 'Revision restored.' ), {
+		registry.dispatch( noticesStore ).createSuccessNotice(
+			sprintf(
+				/* translators: %s: Date and time of the revision. */
+				__( 'Restored to revision from %s.' ),
+				dateI18n( getDateSettings().formats.datetime, revision.date )
+			),
+			{
 				type: 'snackbar',
 				id: 'editor-revision-restored',
-			} );
+			}
+		);
 	};
 
 /**

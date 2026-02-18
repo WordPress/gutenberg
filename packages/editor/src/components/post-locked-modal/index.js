@@ -26,6 +26,7 @@ function PostLockedModal() {
 	const hookName = 'core/editor/post-locked-modal-' + instanceId;
 	const { autosave, updatePostLock } = useDispatch( editorStore );
 	const {
+		isCollaborationEnabled,
 		isLocked,
 		isTakeover,
 		user,
@@ -34,22 +35,21 @@ function PostLockedModal() {
 		activePostLock,
 		postType,
 		previewLink,
-		supportsSync,
 	} = useSelect( ( select ) => {
 		const {
+			isCollaborationEnabledForCurrentPost,
 			isPostLocked,
 			isPostLockTakeover,
 			getPostLockUser,
 			getCurrentPostId,
-			getCurrentPostType,
 			getActivePostLock,
 			getEditedPostAttribute,
 			getEditedPostPreviewLink,
 			getEditorSettings,
 		} = select( editorStore );
-		const { getPostType, getEntityConfig } = select( coreStore );
-		const currentPostType = getCurrentPostType();
+		const { getPostType } = select( coreStore );
 		return {
+			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
 			user: getPostLockUser(),
@@ -58,9 +58,6 @@ function PostLockedModal() {
 			activePostLock: getActivePostLock(),
 			postType: getPostType( getEditedPostAttribute( 'type' ) ),
 			previewLink: getEditedPostPreviewLink(),
-			supportsSync: Boolean(
-				getEntityConfig( 'postType', currentPostType )?.syncConfig
-			),
 		};
 	}, [] );
 
@@ -155,8 +152,8 @@ function PostLockedModal() {
 	}
 
 	// Avoid sending the modal if sync is supported, but retain functionality around locks etc.
-	if ( supportsSync ) {
-		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		if ( isCollaborationEnabled ) {
 			return null;
 		}
 	}

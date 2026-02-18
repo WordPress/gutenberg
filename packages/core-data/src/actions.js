@@ -481,6 +481,55 @@ export const editEntityRecord =
 	};
 
 /**
+ * Action triggered to clear all edits from
+ * an entity record.
+ *
+ * @param {string}        kind     Kind of the entity.
+ * @param {string}        name     Name of the entity.
+ * @param {number|string} recordId Record ID of the entity record.
+ *
+ * @return {Object} Action object.
+ */
+export const clearEntityRecordEdits =
+	( kind, name, recordId ) =>
+	( { select, dispatch } ) => {
+		const entityConfig = select.getEntityConfig( kind, name );
+		logEntityDeprecation( kind, name, 'clearEntityRecordEdits' );
+		if ( ! entityConfig ) {
+			throw new Error(
+				`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
+			);
+		}
+
+		const currentEdits = select.getEntityRecordEdits(
+			kind,
+			name,
+			recordId
+		);
+		if ( ! currentEdits ) {
+			return;
+		}
+
+		// Build an edits object with all current edit keys set to undefined
+		// so the reducer removes them.
+		const clearedEdits = Object.keys( currentEdits ).reduce(
+			( acc, key ) => {
+				acc[ key ] = undefined;
+				return acc;
+			},
+			{}
+		);
+
+		dispatch( {
+			type: 'EDIT_ENTITY_RECORD',
+			kind,
+			name,
+			recordId,
+			edits: clearedEdits,
+		} );
+	};
+
+/**
  * Action triggered to undo the last edit to
  * an entity record, if any.
  */
@@ -1074,3 +1123,32 @@ export const receiveRevisions =
 			invalidateCache,
 		} );
 	};
+
+/**
+ * Returns an action object used to set the sync connection status for an entity or collection.
+ *
+ * @param {string}             kind   Kind of the entity.
+ * @param {string}             name   Name of the entity.
+ * @param {number|string|null} key    The entity key, or null for collections.
+ * @param {Object|null}        status The connection state object or null on unload.
+ *
+ * @return {Object} Action object.
+ */
+export function setSyncConnectionStatus( kind, name, key, status ) {
+	if ( ! status ) {
+		return {
+			type: 'CLEAR_SYNC_CONNECTION_STATUS',
+			kind,
+			name,
+			key,
+		};
+	}
+
+	return {
+		type: 'SET_SYNC_CONNECTION_STATUS',
+		kind,
+		name,
+		key,
+		status,
+	};
+}

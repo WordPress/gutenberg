@@ -5,11 +5,13 @@ import * as Y from 'yjs';
 import * as encoding from 'lib0/encoding';
 import * as decoding from 'lib0/decoding';
 import type { Awareness } from 'y-protocols/awareness';
+import { removeAwarenessStates } from 'y-protocols/awareness';
 import * as syncProtocol from 'y-protocols/sync';
 
 /**
  * Internal dependencies
  */
+import type { ConnectionStatus } from '../../types';
 import {
 	type AwarenessState,
 	type LocalAwarenessState,
@@ -30,20 +32,28 @@ const POLLING_INTERVAL_WITH_COLLABORATORS_IN_MS = 250; // 250 milliseconds
 const MAX_ERROR_BACKOFF_IN_MS = 30 * 1000; // 30 seconds
 const POLLING_MANAGER_ORIGIN = 'polling-manager';
 
+type LogFunction = ( message: string, debug?: object ) => void;
+
 interface PollingManager {
-	registerRoom: (
-		room: string,
-		doc: Y.Doc,
-		awareness: Awareness,
-		onSync: () => void
-	) => void;
+	registerRoom: ( options: RegisterRoomOptions ) => void;
 	unregisterRoom: ( room: string ) => void;
+}
+
+interface RegisterRoomOptions {
+	room: string;
+	doc: Y.Doc;
+	awareness: Awareness;
+	log: LogFunction;
+	onStatusChange: ( status: ConnectionStatus ) => void;
+	onSync: () => void;
 }
 
 interface RoomState {
 	clientId: number;
 	endCursor: number;
 	localAwarenessState: LocalAwarenessState;
+	log: LogFunction;
+	onStatusChange: ( status: ConnectionStatus ) => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
 	unregister: () => void;
@@ -162,14 +172,23 @@ function processAwarenessUpdate(
 		}
 	} );
 
-	if ( added.size + updated.size + removed.size > 0 ) {
+	if ( added.size + updated.size > 0 ) {
 		awareness.emit( 'change', [
 			{
 				added: Array.from( added ),
 				updated: Array.from( updated ),
-				removed: Array.from( removed ),
+				// Left blank on purpose, as the removal of clients is handled in the if condition below.
+				removed: [],
 			},
 		] );
+	}
+
+	if ( removed.size > 0 ) {
+		removeAwarenessStates(
+			awareness,
+			Array.from( removed ),
+			POLLING_MANAGER_ORIGIN
+		);
 	}
 }
 
@@ -228,6 +247,11 @@ function poll(): void {
 			return;
 		}
 
+		// Emit 'connecting' status.
+		roomStates.forEach( ( state ) => {
+			state.onStatusChange( { status: 'connecting' } );
+		} );
+
 		// Create a payload with all queued updates. We include rooms even if they
 		// have no updates to ensure we receive any incoming updates. Note that we
 		// withhold our own updates until we detect another collaborator using the
@@ -249,6 +273,11 @@ function poll(): void {
 
 			// Reset poll interval on success.
 			pollInterval = POLLING_INTERVAL_IN_MS;
+
+			// Emit 'connected' status.
+			roomStates.forEach( ( state ) => {
+				state.onStatusChange( { status: 'connected' } );
+			} );
 
 			rooms.forEach( ( room ) => {
 				if ( ! roomStates.has( room.room ) ) {
@@ -286,6 +315,12 @@ function poll(): void {
 				}
 			} );
 		} catch ( error ) {
+			// Exponential backoff on error: double the backoff time, up to max
+			pollInterval = Math.min(
+				pollInterval * 2,
+				MAX_ERROR_BACKOFF_IN_MS
+			);
+
 			// Restore updates to queues on failure so they can be retried.
 			for ( const room of payload.rooms ) {
 				if ( ! roomStates.has( room.room ) ) {
@@ -294,13 +329,18 @@ function poll(): void {
 
 				const state = roomStates.get( room.room )!;
 				state.updateQueue.restore( room.updates );
+				state.log(
+					'Error posting sync update, will retry with backoff',
+					{
+						error,
+						nextPoll: pollInterval,
+					}
+				);
 			}
 
-			// Exponential backoff on error: double the backoff time, up to max
-			pollInterval = Math.min(
-				pollInterval * 2,
-				MAX_ERROR_BACKOFF_IN_MS
-			);
+			roomStates.forEach( ( state ) => {
+				state.onStatusChange( { status: 'disconnected' } );
+			} );
 		}
 
 		setTimeout( poll, pollInterval );
@@ -310,12 +350,14 @@ function poll(): void {
 	void start();
 }
 
-function registerRoom(
-	room: string,
-	doc: Y.Doc,
-	awareness: Awareness,
-	onSync: () => void
-): void {
+function registerRoom( {
+	room,
+	doc,
+	awareness,
+	log,
+	onSync,
+	onStatusChange,
+}: RegisterRoomOptions ): void {
 	if ( roomStates.has( room ) ) {
 		return;
 	}
@@ -347,6 +389,8 @@ function registerRoom(
 		clientId: doc.clientID,
 		endCursor: 0,
 		localAwarenessState: awareness.getLocalState() ?? {},
+		log,
+		onStatusChange,
 		processAwarenessUpdate: ( state: AwarenessState ) =>
 			processAwarenessUpdate( state, awareness ),
 		processDocUpdate: ( update: SyncUpdate ) =>

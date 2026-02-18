@@ -521,8 +521,13 @@ export function isSectionBlock( state, clientId ) {
 	// don't treat nested unsynced patterns as section blocks.
 	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
 
+	const disableContentOnlyForUnsyncedPatterns =
+		state.settings?.disableContentOnlyForUnsyncedPatterns;
+
 	if (
-		( attributes?.metadata?.patternName || isTemplatePart ) &&
+		( ( ! disableContentOnlyForUnsyncedPatterns &&
+			attributes?.metadata?.patternName ) ||
+			isTemplatePart ) &&
 		! isIsolatedEditor
 	) {
 		return true;
@@ -949,4 +954,67 @@ export function isLockedBlock( state, clientId ) {
 		isMoveLockedBlock( state, clientId ) ||
 		isRemoveLockedBlock( state, clientId )
 	);
+}
+
+/**
+ * Returns whether the list view content panel popover is open.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the popover is open.
+ */
+export function isListViewContentPanelOpen( state ) {
+	return state.listViewContentPanelOpen;
+}
+
+/**
+ * Returns whether a List View panel is opened.
+ *
+ * @param {Object} state    Global application state.
+ * @param {string} clientId Client ID of the block.
+ *
+ * @return {boolean} Whether the panel is opened.
+ */
+export function isListViewPanelOpened( state, clientId ) {
+	// If allOpen flag is set, all panels are open
+	if ( state.openedListViewPanels?.allOpen ) {
+		return true;
+	}
+	return state.openedListViewPanels?.panels?.[ clientId ] === true;
+}
+
+/**
+ * Returns the List View expand revision number.
+ *
+ * This counter is used in the ListView component's key prop to force remounting.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {number} The expand revision number.
+ */
+export function getListViewExpandRevision( state ) {
+	return state.listViewExpandRevision || 0;
+}
+
+/**
+ * Returns the client IDs for the viewport modal, or null if
+ * the modal is not open.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string[]|null} Client IDs for the visibility modal, or null.
+ */
+export function getViewportModalClientIds( state ) {
+	return state.viewportModalClientIds;
+}
+
+/**
+ * Returns the requested inspector tab state, if any.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object|null} The requested tab state with tabName and options, or null if no request is pending.
+ */
+export function getRequestedInspectorTab( state ) {
+	return state.requestedInspectorTab;
 }

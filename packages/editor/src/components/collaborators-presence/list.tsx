@@ -1,14 +1,22 @@
 import { __ } from '@wordpress/i18n';
-import { Popover, Button } from '@wordpress/components';
+import {
+	Popover,
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { close } from '@wordpress/icons';
 import { type PostEditorAwarenessState } from '@wordpress/core-data';
 
-import { Avatar } from './avatar';
+import { unlock } from '../../lock-unlock';
+import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 import './styles/collaborators-list.scss';
 
+const { Avatar } = unlock( componentsPrivateApis );
+
 interface CollaboratorsListProps {
-	activeUsers: PostEditorAwarenessState[];
+	activeCollaborators: PostEditorAwarenessState[];
 	popoverAnchor?: HTMLElement | null;
 	setIsPopoverVisible: ( isVisible: boolean ) => void;
 }
@@ -17,12 +25,12 @@ interface CollaboratorsListProps {
  * Renders a list showing all active collaborators with their details.
  * Note: activeUsers should already exclude the current user (filtered by parent component).
  * @param props                     Component props
- * @param props.activeUsers         List of active users
+ * @param props.activeCollaborators List of active collaborators
  * @param props.popoverAnchor       Anchor element for the popover
  * @param props.setIsPopoverVisible Callback to set the visibility of the popover
  */
 export function CollaboratorsList( {
-	activeUsers,
+	activeCollaborators,
 	popoverAnchor,
 	setIsPopoverVisible,
 }: CollaboratorsListProps ) {
@@ -38,7 +46,7 @@ export function CollaboratorsList( {
 				<div className="editor-collaborators-presence__list-header">
 					<div className="editor-collaborators-presence__list-header-title">
 						{ __( 'Collaborators' ) }
-						<span> { activeUsers.length } </span>
+						<span> { activeCollaborators.length } </span>
 					</div>
 					<div className="editor-collaborators-presence__list-header-action">
 						<Button
@@ -51,23 +59,30 @@ export function CollaboratorsList( {
 					</div>
 				</div>
 				<div className="editor-collaborators-presence__list-items">
-					{ activeUsers.map( ( userState ) => (
+					{ activeCollaborators.map( ( collaboratorState ) => (
 						<button
-							key={ userState.clientId }
+							key={ collaboratorState.clientId }
 							className="editor-collaborators-presence__list-item"
 							disabled
 							style={ {
-								opacity: userState.isConnected ? 1 : 0.5,
+								opacity: collaboratorState.isConnected
+									? 1
+									: 0.5,
 							} }
 						>
 							<Avatar
-								userInfo={ userState.userInfo }
-								showUserColorBorder
-								size="medium"
+								src={ getAvatarUrl(
+									collaboratorState.collaboratorInfo
+										.avatar_urls
+								) }
+								name={ collaboratorState.collaboratorInfo.name }
+								borderColor={ getAvatarBorderColor(
+									collaboratorState.collaboratorInfo.id
+								) }
 							/>
 							<div className="editor-collaborators-presence__list-item-info">
 								<div className="editor-collaborators-presence__list-item-name">
-									{ userState.userInfo.name }
+									{ collaboratorState.collaboratorInfo.name }
 								</div>
 							</div>
 						</button>

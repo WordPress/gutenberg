@@ -84,7 +84,7 @@ supports: {
 }
 ```
 
-## auto_register
+## autoRegister
 
 -   Type: `boolean`
 -   Default value: `false`
@@ -102,7 +102,7 @@ register_block_type( 'my-plugin/server-block', array(
 		);
 	},
 	'supports' => array(
-		'auto_register' => true,
+		'autoRegister' => true,
 	),
 ) );
 ```

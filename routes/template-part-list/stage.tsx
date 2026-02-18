@@ -24,7 +24,6 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import type { WpTemplatePart } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
 import { CreateTemplatePartModal } from '@wordpress/fields';
 
 /**
@@ -254,26 +253,16 @@ function TemplatePartList() {
 			subTitle={ postTypeObject.labels?.description }
 			className="template-part-page"
 			actions={
-				<>
-					{ isModified && (
-						<Button
-							variant="tertiary"
-							size="compact"
-							onClick={ onReset }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					{ labels?.add_new_item && canCreateRecord && (
-						<Button
-							variant="primary"
-							onClick={ () => setShowTemplatePartModal( true ) }
-							size="compact"
-						>
-							{ labels.add_new_item }
-						</Button>
-					) }
-				</>
+				labels?.add_new_item &&
+				canCreateRecord && (
+					<Button
+						variant="primary"
+						onClick={ () => setShowTemplatePartModal( true ) }
+						size="compact"
+					>
+						{ labels.add_new_item }
+					</Button>
+				)
 			}
 			hasPadding={ false }
 		>
@@ -312,6 +301,7 @@ function TemplatePartList() {
 				defaultLayouts={ DEFAULT_LAYOUTS }
 				getItemId={ getItemId }
 				selection={ selection }
+				onReset={ isModified ? onReset : false }
 				onChangeSelection={ ( items: string[] ) => {
 					navigate( {
 						search: {

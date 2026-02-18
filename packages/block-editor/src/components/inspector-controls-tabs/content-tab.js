@@ -9,7 +9,11 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockQuickNavigation from '../block-quick-navigation';
 
-const ContentTab = ( { contentClientIds } ) => {
+const ContentTab = ( {
+	contentClientIds,
+	onSwitchToListView,
+	hasListViewTab,
+} ) => {
 	if ( ! contentClientIds || contentClientIds.length === 0 ) {
 		return null;
 	}
@@ -21,7 +25,11 @@ const ContentTab = ( { contentClientIds } ) => {
 		<>
 			{ ! shouldShowBlockFields && (
 				<PanelBody title={ __( 'Content' ) }>
-					<BlockQuickNavigation clientIds={ contentClientIds } />
+					<BlockQuickNavigation
+						clientIds={ contentClientIds }
+						onSwitchToListView={ onSwitchToListView }
+						hasListViewTab={ hasListViewTab }
+					/>
 				</PanelBody>
 			) }
 		</>

@@ -20,7 +20,7 @@ import { createTemplatePartId } from '../../template-part/edit/utils/create-temp
  * @param {Object} props              Component props.
  * @param {string} props.overlay      The overlay template part slug.
  * @param {string} props.currentTheme The current theme stylesheet name.
- * @return {JSX.Element|null} The overlay preview component or null if no overlay is selected.
+ * @return {React.JSX.Element} The overlay preview component or null if no overlay is selected.
  */
 export default function OverlayPreview( { overlay, currentTheme } ) {
 	const templatePartId = useMemo( () => {

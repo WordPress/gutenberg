@@ -8,7 +8,7 @@ export type MediaKind = 'image' | 'video' | 'audio' | 'application';
 export interface MediaType {
 	type: MediaKind;
 	label: string;
-	icon: JSX.Element;
+	icon: React.JSX.Element;
 }
 
 // TODO: Update the Attachment type separately.

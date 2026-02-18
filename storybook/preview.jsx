@@ -207,8 +207,8 @@ export const parameters = {
 					if ( aIndex !== bIndex ) {
 						return aIndex - bIndex;
 					}
-					// Same index (both not in order list), sort alphabetically
-					return aSegment.localeCompare( bSegment );
+					// Same index (both not in order list), preserve export order
+					return 0;
 				}
 
 				// Same segment, descend into nested order
@@ -241,8 +241,8 @@ export const parameters = {
 				return aPriority - bPriority;
 			}
 
-			// Same priority, sort alphabetically by name
-			return a.name.localeCompare( b.name );
+			// Same priority, preserve export order
+			return 0;
 		},
 	},
 };

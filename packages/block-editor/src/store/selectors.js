@@ -5,6 +5,7 @@ import {
 	getBlockType,
 	getBlockTypes,
 	getBlockVariations,
+	getDefaultBlockName,
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	switchToBlockType,
@@ -1704,7 +1705,10 @@ const canInsertBlockTypeUnmemoized = (
 	}
 
 	const blockEditingMode = getBlockEditingMode( state, rootClientId ?? '' );
-	if ( blockEditingMode === 'disabled' ) {
+	if (
+		blockEditingMode === 'disabled' &&
+		blockName !== getDefaultBlockName()
+	) {
 		return false;
 	}
 
@@ -1720,13 +1724,18 @@ const canInsertBlockTypeUnmemoized = (
 	// some cases when the block is a content block.
 	const isContentRoleBlock = isContentBlock( blockName );
 	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
-	const isBlockWithinSection = !! getParentSectionBlock(
-		state,
-		rootClientId
-	);
+	const sectionClientId = isParentSectionBlock
+		? rootClientId
+		: getParentSectionBlock( state, rootClientId );
+	const isWithinSection = !! sectionClientId;
+	if ( isWithinSection && ! isContentRoleBlock ) {
+		return false;
+	}
+
+	// Don't allow insertion into synced patterns.
 	if (
-		( isParentSectionBlock || isBlockWithinSection ) &&
-		! isContentRoleBlock
+		isWithinSection &&
+		getBlockName( state, sectionClientId ) === 'core/block'
 	) {
 		return false;
 	}
@@ -1740,7 +1749,20 @@ const canInsertBlockTypeUnmemoized = (
 			rootClientId
 		)
 	) {
-		return false;
+		// Allow inserting the default block anywhere that another default block already exists
+		// when in contentOnly mode.
+		if ( blockName === getDefaultBlockName() ) {
+			const existingBlocks = getBlockOrder( state, rootClientId );
+			const hasDefaultBlock = existingBlocks.some(
+				( clientId ) =>
+					getBlockName( state, clientId ) === getDefaultBlockName()
+			);
+			if ( ! hasDefaultBlock ) {
+				return false;
+			}
+		} else {
+			return false;
+		}
 	}
 
 	const parentName = getBlockName( state, rootClientId );
@@ -1894,26 +1916,53 @@ export function canRemoveBlock( state, clientId ) {
 
 	// It shouldn't be possible to move in a section block unless in
 	// some cases when the block is a content block.
-	const isBlockWithinSection = !! getParentSectionBlock( state, clientId );
+	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
+	const sectionClientId = isParentSectionBlock
+		? rootClientId
+		: getParentSectionBlock( state, rootClientId );
+	const isWithinSection = !! sectionClientId;
 	const isContentRoleBlock = isContentBlock(
 		getBlockName( state, clientId )
 	);
-	if ( isBlockWithinSection && ! isContentRoleBlock ) {
+	if ( isWithinSection && ! isContentRoleBlock ) {
 		return false;
 	}
 
-	const isParentSectionBlock = !! isSectionBlock( state, rootClientId );
-	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
-	// Check if the parent container allows insertion/removal in contentOnly mode
+	// Disallow removal from synced patterns.
 	if (
-		( isParentSectionBlock || rootBlockEditingMode === 'contentOnly' ) &&
+		isWithinSection &&
+		getBlockName( state, sectionClientId ) === 'core/block'
+	) {
+		return false;
+	}
+
+	const rootBlockEditingMode = getBlockEditingMode( state, rootClientId );
+	const blockName = getBlockName( state, clientId );
+	// Check if the parent container allows insertion/removal in contentOnly mode.
+	if (
+		( isParentSectionBlock ||
+			rootBlockEditingMode === 'contentOnly' ||
+			blockName === getDefaultBlockName() ) &&
 		! isContainerInsertableToInContentOnlyMode(
 			state,
 			getBlockName( state, clientId ),
 			rootClientId
 		)
 	) {
-		return false;
+		// Allow removing the default block when other default blocks exist
+		// in contentOnly mode.
+		if ( blockName === getDefaultBlockName() ) {
+			const existingBlocks = getBlockOrder( state, rootClientId );
+			const defaultBlocks = existingBlocks.filter(
+				( id ) => getBlockName( state, id ) === getDefaultBlockName()
+			);
+			// Allow removal if there are other default blocks besides this one
+			if ( defaultBlocks.length > 1 ) {
+				return true;
+			}
+		} else {
+			return false;
+		}
 	}
 
 	return rootBlockEditingMode !== 'disabled';
