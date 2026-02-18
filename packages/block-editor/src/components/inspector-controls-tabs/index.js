@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
@@ -111,6 +112,53 @@ export default function InspectorControlsTabs( {
 
 		skipNextContentResetRef.current = false;
 	}, [ selectedContentBlockId ] );
+
+	// Detect when a child of a list-view-enabled content block is selected
+	// (e.g. clicking Button 1 inside a Buttons block in the canvas).
+	// When this happens, auto-switch to List View so the inspector matches.
+	const isListChildSelected = useSelect(
+		( select ) => {
+			if ( ! isSectionBlock ) {
+				return false;
+			}
+			const { getSelectedBlockClientId, getBlockParents, getBlockName } =
+				select( blockEditorStore );
+			const selectedId = getSelectedBlockClientId();
+			if ( ! selectedId || contentClientIds?.includes( selectedId ) ) {
+				return false;
+			}
+			const parents = getBlockParents( selectedId );
+			return parents.some( ( parentId ) => {
+				if ( ! contentClientIds?.includes( parentId ) ) {
+					return false;
+				}
+				const parentName = getBlockName( parentId );
+				return (
+					parentName === 'core/navigation' ||
+					hasBlockSupport( parentName, 'listView' )
+				);
+			} );
+		},
+		[ isSectionBlock, contentClientIds ]
+	);
+
+	const prevIsListChildRef = useRef( isListChildSelected );
+	useEffect( () => {
+		const prev = prevIsListChildRef.current;
+		prevIsListChildRef.current = isListChildSelected;
+
+		if ( isListChildSelected === prev ) {
+			return;
+		}
+
+		if (
+			isListChildSelected &&
+			selectedTabIdRef.current !== TAB_LIST_VIEW.name
+		) {
+			setSelectedTabId( TAB_LIST_VIEW.name );
+			hasUserSelectionRef.current = false;
+		}
+	}, [ isListChildSelected ] );
 
 	// Handle explicit inspector tab requests (panel opening, refs, clear).
 	// Tab state is initialized from requestedTab above.
