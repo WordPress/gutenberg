@@ -124,17 +124,3 @@ function gutenberg_get_block_editor_settings( $settings ) {
 	return $settings;
 }
 add_filter( 'block_editor_settings_all', 'gutenberg_get_block_editor_settings', 0 );
-
-/**
- * Injects the filtered note reaction emoji list into block editor settings.
- *
- * @since 7.0.0
- *
- * @param array $settings Existing block editor settings.
- * @return array Updated block editor settings.
- */
-function gutenberg_add_note_reaction_emojis_setting( $settings ) {
-	$settings['noteReactionEmojis'] = gutenberg_get_note_reaction_emojis();
-	return $settings;
-}
-add_filter( 'block_editor_settings_all', 'gutenberg_add_note_reaction_emojis_setting' );
