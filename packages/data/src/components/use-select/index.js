@@ -252,6 +252,44 @@ function _useMappingSelect( suspense, mapSelect, deps ) {
  * In general, this custom React hook follows the
  * [rules of hooks](https://react.dev/reference/rules/rules-of-hooks).
  *
+ * @template {MapSelect} M
+ * @overload
+ * @param {M}         mapSelect Function called on every state change. The returned value is
+ *                              exposed to the component implementing this hook. The function
+ *                              receives the `registry.select` method on the first argument
+ *                              and the `registry` on the second argument.
+ *                              When a store key is passed, all selectors for the store will be
+ *                              returned. This is only meant for usage of these selectors in event
+ *                              callbacks, not for data needed to create the element tree.
+ * @param {unknown[]} deps      If provided, this memoizes the mapSelect so the same `mapSelect` is
+ *                              invoked on every state change unless the dependencies change.
+ * @return {UseSelectReturn<M>} A custom react hook.
+ */
+
+/**
+ * Custom react hook for retrieving props from registered selectors.
+ *
+ * In general, this custom React hook follows the
+ * [rules of hooks](https://react.dev/reference/rules/rules-of-hooks).
+ *
+ * @template {StoreDescriptor<any>} S
+ * @overload
+ * @param {S} mapSelect Function called on every state change. The returned value is
+ *                      exposed to the component implementing this hook. The function
+ *                      receives the `registry.select` method on the first argument
+ *                      and the `registry` on the second argument.
+ *                      When a store key is passed, all selectors for the store will be
+ *                      returned. This is only meant for usage of these selectors in event
+ *                      callbacks, not for data needed to create the element tree.
+ * @return {UseSelectReturn<S>} A custom react hook.
+ */
+
+/**
+ * Custom react hook for retrieving props from registered selectors.
+ *
+ * In general, this custom React hook follows the
+ * [rules of hooks](https://react.dev/reference/rules/rules-of-hooks).
+ *
  * @template {MapSelect | StoreDescriptor<any>} T
  * @param {T}          mapSelect Function called on every state change. The returned value is
  *                               exposed to the component implementing this hook. The function
