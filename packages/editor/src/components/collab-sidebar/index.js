@@ -268,6 +268,7 @@ function NotesSidebar( { postId } ) {
 												'core',
 												ALL_NOTES_SIDEBAR
 											);
+											setNotesDisplayMode( 'expand' );
 										} else {
 											if ( isAllNotesSidebarActive ) {
 												disableComplementaryArea(
