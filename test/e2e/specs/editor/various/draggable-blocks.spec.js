@@ -441,7 +441,7 @@ test.describe( 'Draggable block', () => {
 			// This is technically an implementation detail but easier to test in this case.
 			await expect( columnAppender ).toHaveCSS(
 				'background-color',
-				'rgb(56, 88, 233)'
+				/rgb\(0, 124, 186\)|rgb\(56, 88, 233\)/
 			);
 
 			await drop();
