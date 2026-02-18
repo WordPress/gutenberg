@@ -64,6 +64,33 @@ interface RoomState {
 const roomStates: Map< string, RoomState > = new Map();
 
 /**
+ * Create a compaction update by merging existing updates. This preserves
+ * the original operation metadata (client IDs, logical clocks) so that
+ * Yjs deduplication works correctly when the compaction is applied.
+ *
+ * Deprecated: The server is moving towards full state updates for compaction.
+ *
+ * @param updates The updates to merge
+ */
+function createDeprecatedCompactionUpdate( updates: SyncUpdate[] ): SyncUpdate {
+	// Extract only compaction and update types for merging (skip sync-step updates).
+	// Decode base64 updates to Uint8Array for merging.
+	const mergeable = updates
+		.filter( ( u ) =>
+			[ SyncUpdateType.COMPACTION, SyncUpdateType.UPDATE ].includes(
+				u.type
+			)
+		)
+		.map( ( u ) => base64ToUint8Array( u.data ) );
+
+	// Merge all updates while preserving operation metadata.
+	return createSyncUpdate(
+		Y.mergeUpdates( mergeable ),
+		SyncUpdateType.COMPACTION
+	);
+}
+
+/**
  * Create sync step 1 update (announce our state vector).
  *
  * @param doc The Yjs document
@@ -285,8 +312,17 @@ function poll(): void {
 				// client at a time to compact (lowest active client ID). We encode our
 				// full document state to replace all prior updates on the server.
 				if ( room.should_compact ) {
+					roomState.log( 'Server requested compaction update' );
 					roomState.updateQueue.add(
 						roomState.createCompactionUpdate()
+					);
+				} else if ( room.compaction_request ) {
+					// Deprecated
+					roomState.log( 'Server requested (old) compaction update' );
+					roomState.updateQueue.add(
+						createDeprecatedCompactionUpdate(
+							room.compaction_request
+						)
 					);
 				}
 			} );
