@@ -144,7 +144,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	overflow: visible;
 	width: max-content;
 }
-/* Avatar label positioned above a highlighted block. */
+/* Avatar positioned above a highlighted block as a label. */
 .collaborators-overlay-block-label.editor-avatar {
 	position: absolute;
 	transform: translateY(calc(-100% - 8px));
