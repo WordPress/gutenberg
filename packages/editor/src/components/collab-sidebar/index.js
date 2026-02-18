@@ -9,7 +9,7 @@ import {
 	MenuGroup,
 	MenuItemsChoice,
 } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { comment as commentIcon } from '@wordpress/icons';
@@ -88,19 +88,18 @@ function NotesSidebar( { postId } ) {
 	const { getActiveComplementaryArea } = useSelect( interfaceStore );
 	const { enableComplementaryArea, disableComplementaryArea } =
 		useDispatch( interfaceStore );
-	const { set: setPreference } = useDispatch( preferencesStore );
 	const { toggleBlockSpotlight, selectBlock } = unlock(
 		useDispatch( blockEditorStore )
 	);
 	const { selectNote } = unlock( useDispatch( editorStore ) );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const commentSidebarRef = useRef( null );
+	const [ notesDisplayMode, setNotesDisplayMode ] = useState( 'expand' );
 
 	const {
 		clientId,
 		blockCommentId,
 		isClassicBlock,
-		isCompactNote,
 		isAllNotesSidebarActive,
 	} = useSelect( ( select ) => {
 		const { getBlockAttributes, getSelectedBlockClientId, getBlockName } =
@@ -114,9 +113,6 @@ function NotesSidebar( { postId } ) {
 			isClassicBlock: _clientId
 				? getBlockName( _clientId ) === 'core/freeform'
 				: false,
-			isCompactNote:
-				select( preferencesStore ).get( 'core', 'notesDisplayMode' ) ===
-				'minimize',
 			isAllNotesSidebarActive:
 				select( interfaceStore ).getActiveComplementaryArea(
 					'core'
@@ -213,7 +209,7 @@ function NotesSidebar( { postId } ) {
 	let notesDropdownValue = 'expand';
 	if ( isAllNotesSidebarActive ) {
 		notesDropdownValue = 'show-all';
-	} else if ( isCompactNote ) {
+	} else if ( notesDisplayMode === 'minimize' ) {
 		notesDropdownValue = 'minimize';
 	}
 
@@ -269,11 +265,7 @@ function NotesSidebar( { postId } ) {
 													'core'
 												);
 											}
-											setPreference(
-												'core',
-												'notesDisplayMode',
-												value
-											);
+											setNotesDisplayMode( value );
 										}
 									} }
 								/>
@@ -320,7 +312,7 @@ function NotesSidebar( { postId } ) {
 							backgroundColor,
 						} }
 						isFloating
-						isCompactNote={ isCompactNote }
+						isCompactNote={ notesDisplayMode === 'minimize' }
 					/>
 				</PluginSidebar>
 			) }
