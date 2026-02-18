@@ -59,7 +59,8 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { BlockBadgeComponent } = useListViewContext();
+	const { getBlockBadge } = useListViewContext();
+	const blockBadge = getBlockBadge?.( block ) ?? null;
 	const { hasPatternName, blockVisibility } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = unlock( select( blockEditorStore ) );
@@ -132,8 +133,15 @@ function ListViewBlockSelectButton(
 				<span className="block-editor-list-view-block-select-button__title">
 					<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
 				</span>
-				{ BlockBadgeComponent ? (
-					<BlockBadgeComponent block={ block } />
+				{ blockBadge ? (
+					<Tooltip text={ blockBadge.label }>
+						<span className="block-editor-list-view-block-select-button__anchor-wrapper">
+							<Badge
+								className="block-editor-list-view-block-select-button__anchor"
+								intent={ blockBadge.intent }
+							/>
+						</span>
+					</Tooltip>
 				) : (
 					blockInformation?.anchor && (
 						<span className="block-editor-list-view-block-select-button__anchor-wrapper">

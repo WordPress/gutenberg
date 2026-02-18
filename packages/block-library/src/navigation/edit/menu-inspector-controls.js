@@ -9,14 +9,13 @@ import {
 import {
 	PanelBody,
 	Spinner,
-	Tooltip,
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
-	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { __, sprintf } from '@wordpress/i18n';
-import { useContext } from '@wordpress/element';
+import { useCallback, useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -33,54 +32,79 @@ import {
 	getActionableStatus,
 } from '../../navigation-link/shared';
 
-const { Badge } = unlock( componentsPrivateApis );
-
 /**
- * Component that renders a status badge in the list view anchor area for navigation link blocks.
- * Returns null for blocks with no actionable status (e.g. published links).
+ * Returns a map of clientId → badge data for all navigation link descendants.
+ * Badge data is `{ label, intent }` or absent if the link has no actionable status.
+ * Intended to be called once per list view render, not per block.
  *
- * @param {Object} props       - Component props
- * @param {Object} props.block - The block object
- * @return {React.JSX.Element|null} Badge element or null
+ * @param {string} rootClientId - Client ID of the root navigation block
+ * @return {Map<string, {label: string, intent: string}>} Badge data keyed by clientId
  */
-function NavigationBlockBadge( { block } ) {
-	const { clientId, attributes, name } = block;
-	const { url, type, metadata, id } = attributes || {};
-	const hasUrlBinding = !! metadata?.bindings?.url && !! id;
+function useNavigationBadgeMap( rootClientId ) {
+	return useSelect(
+		( select ) => {
+			const { getClientIdsOfDescendants, getBlock } =
+				select( blockEditorStore );
+			const { getEntityRecord, hasFinishedResolution } =
+				select( coreStore );
+			const map = new Map();
 
-	const { isBoundEntityAvailable, entityRecord } = useEntityBinding( {
-		clientId,
-		attributes,
-	} );
+			for ( const clientId of getClientIdsOfDescendants(
+				rootClientId
+			) ) {
+				const block = getBlock( clientId );
+				if (
+					! block ||
+					( block.name !== 'core/navigation-link' &&
+						block.name !== 'core/navigation-submenu' )
+				) {
+					continue;
+				}
 
-	if (
-		name !== 'core/navigation-link' &&
-		name !== 'core/navigation-submenu'
-	) {
-		return null;
-	}
+				const { url, type, kind, metadata, id } =
+					block.attributes || {};
+				const hasBinding = !! metadata?.bindings?.url && !! id;
+				let entityRecord = null;
+				let isEntityAvailable = false;
 
-	const status = getActionableStatus( {
-		url,
-		type,
-		entityStatus: entityRecord?.status,
-		hasBinding: hasUrlBinding,
-		isEntityAvailable: isBoundEntityAvailable,
-	} );
+				if ( hasBinding && id ) {
+					const isPostType = kind === 'post-type';
+					const isTaxonomy = kind === 'taxonomy';
+					if ( isPostType || isTaxonomy ) {
+						const entityType = isTaxonomy ? 'taxonomy' : 'postType';
+						const typeForAPI = type === 'tag' ? 'post_tag' : type;
+						const record = getEntityRecord(
+							entityType,
+							typeForAPI,
+							id
+						);
+						const hasResolved = hasFinishedResolution(
+							'getEntityRecord',
+							[ entityType, typeForAPI, id ]
+						);
+						entityRecord = record || null;
+						isEntityAvailable = hasResolved
+							? record !== undefined
+							: true;
+					}
+				}
 
-	if ( ! status ) {
-		return null;
-	}
+				const status = getActionableStatus( {
+					url,
+					type,
+					entityStatus: entityRecord?.status,
+					hasBinding,
+					isEntityAvailable,
+				} );
 
-	return (
-		<Tooltip text={ status.label }>
-			<span className="block-editor-list-view-block-select-button__anchor-wrapper">
-				<Badge
-					className="block-editor-list-view-block-select-button__anchor"
-					intent={ status.intent }
-				/>
-			</span>
-		</Tooltip>
+				if ( status ) {
+					map.set( clientId, status );
+				}
+			}
+
+			return map;
+		},
+		[ rootClientId ]
 	);
 }
 
@@ -213,6 +237,11 @@ const MainContent = ( {
 	);
 
 	const { navigationMenu } = useNavigationMenu( currentMenuId );
+	const badgeMap = useNavigationBadgeMap( clientId );
+	const getBlockBadge = useCallback(
+		( block ) => badgeMap.get( block.clientId ) ?? null,
+		[ badgeMap ]
+	);
 
 	if ( currentMenuId && isNavigationMenuMissing ) {
 		return (
@@ -249,7 +278,7 @@ const MainContent = ( {
 				showAppender
 				blockSettingsMenu={ LeafMoreMenu }
 				additionalBlockContent={ AdditionalBlockContent }
-				blockBadge={ NavigationBlockBadge }
+				getBlockBadge={ getBlockBadge }
 				onSelect={ openListViewContentPanel }
 			/>
 		</div>
