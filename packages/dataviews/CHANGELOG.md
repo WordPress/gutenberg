@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- DataForm: Fix focus loss when collapsing in Card view. [#75689](https://github.com/WordPress/gutenberg/pull/75689)
+
 ## 12.0.0 (2026-02-18)
 
 ### Breaking Changes
@@ -17,7 +21,6 @@
 - DataViews: Fix title truncation in list layout. [#75063](https://github.com/WordPress/gutenberg/pull/75063)
 - DataViews: Fix fields async validation. [#74948](https://github.com/WordPress/gutenberg/pull/74948)
 - DataForm: Fix color picker styles. [#75427](https://github.com/WordPress/gutenberg/pull/75427)
-- DataForm: Fix focus loss when collapsing in Card view. [#75689](https://github.com/WordPress/gutenberg/pull/75689)
 
 ### Enhancements
 
