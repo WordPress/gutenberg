@@ -85,7 +85,7 @@ function withMeasurementStyles( element, callback ) {
 
 /**
  * Checks if a submenu would overflow the viewport horizontally.
- * If it would overflow, removes the horizontal-opening class to revert to downward positioning.
+ * Only adds the horizontal-opening class if the submenu will fit.
  *
  * @param {HTMLElement} submenuContainer - The submenu container element
  */
@@ -115,12 +115,7 @@ function checkSubmenuOverflow( submenuContainer ) {
 		return;
 	}
 
-	// Add class to enable horizontal opening for measurement
-	if ( ! hasClass ) {
-		parentItem.classList.add( 'submenu-opens-on-horizontal-hover' );
-	}
-
-	// Measure submenu width while temporarily visible
+	// Measure submenu width to check if it would fit horizontally
 	const submenuWidth = withMeasurementStyles( submenuContainer, () =>
 		Math.max(
 			submenuContainer.offsetWidth,
@@ -133,8 +128,15 @@ function checkSubmenuOverflow( submenuContainer ) {
 	const parentRect = parentItem.getBoundingClientRect();
 	const wouldOverflow = parentRect.right + submenuWidth > window.innerWidth;
 
+	// Only add the class if submenu will fit, remove it if it won't
 	if ( wouldOverflow ) {
-		parentItem.classList.remove( 'submenu-opens-on-horizontal-hover' );
+		if ( hasClass ) {
+			parentItem.classList.remove( 'submenu-opens-on-horizontal-hover' );
+		}
+	} else {
+		if ( ! hasClass ) {
+			parentItem.classList.add( 'submenu-opens-on-horizontal-hover' );
+		}
 	}
 }
 
