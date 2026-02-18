@@ -42,5 +42,9 @@ if ( ! function_exists( '{{PREFIX}}_register_script_modules' ) ) {
 	}
 
 	add_action( 'wp_default_scripts', '{{PREFIX}}_register_script_modules' );
-	remove_action( 'wp_default_scripts', 'wp_default_script_modules' );
+
+	if ( defined( 'IS_GUTENBERG_PLUGIN' ) && IS_GUTENBERG_PLUGIN ) {
+		// Remove Core's default script modules registration so Gutenberg can replace them with its own.
+		remove_action( 'wp_default_scripts', 'wp_default_script_modules' );
+	}
 }
