@@ -8,9 +8,10 @@ import { useBlockHighlighting } from './use-block-highlighting';
 import { useRenderCursors } from './use-render-cursors';
 import { ELEVATION_X_SMALL } from './collaborator-styles';
 
-// wp-components styles are excluded from the editor canvas iframe, so the
+// Editor package styles are excluded from the editor canvas iframe, so the
 // Avatar component's SCSS is not available there. We inject compiled versions
 // of the relevant rules alongside the overlay-specific positioning styles.
+// Values are hardcoded from @wordpress/base-styles tokens (see comments).
 const COLLABORATORS_OVERLAY_STYLES = `
 .block-canvas-cover {
 	position: absolute;
@@ -45,14 +46,14 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	animation: collaborators-overlay-cursor-blink 1s infinite;
 }
 
-/* ── Avatar component (compiled from collaborators-presence/avatar/styles.scss) ──
+/* ── Avatar (compiled from collaborators-presence/avatar/styles.scss) ──
    Dimmed and status-indicator styles are intentionally omitted — not used in
    the overlay. Keep in sync when editing the SCSS source. ── */
 .editor-avatar {
 	position: relative;
 	display: inline-flex;
 	align-items: center;
-	border-radius: 9999px;
+	border-radius: 9999px; /* $radius-full */
 	overflow: clip;
 	flex-shrink: 0;
 	box-shadow: 0 0 0 var(--wp-admin-border-width-focus, 2px) #fff, ${ ELEVATION_X_SMALL };
@@ -60,19 +61,19 @@ const COLLABORATORS_OVERLAY_STYLES = `
 .editor-avatar__image {
 	box-sizing: border-box;
 	position: relative;
-	width: 32px;
-	height: 32px;
-	border-radius: 9999px;
+	width: 32px; /* $button-size-compact */
+	height: 32px; /* $button-size-compact */
+	border-radius: 9999px; /* $radius-full */
 	border: 0;
-	background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	background-color: var(--wp-admin-theme-color, #3858e9);
 	overflow: clip;
 	flex-shrink: 0;
 	font-size: 0;
-	color: #fff;
+	color: #fff; /* $white */
 }
 .is-small > .editor-avatar__image {
-	width: 24px;
-	height: 24px;
+	width: 24px; /* $button-size-small */
+	height: 24px; /* $button-size-small */
 }
 .has-src > .editor-avatar__image {
 	background-image: var(--editor-avatar-url);
@@ -88,8 +89,8 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 11px;
-	font-weight: 499;
+	font-size: 11px; /* $font-size-x-small */
+	font-weight: 499; /* $font-weight-medium */
 	border: 0;
 	box-shadow: none;
 	background-clip: border-box;
@@ -98,12 +99,12 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	background-color: var(--editor-avatar-outline-color);
 }
 .editor-avatar__name {
-	font-size: 13px;
-	font-weight: 499;
-	line-height: 20px;
+	font-size: 13px; /* $font-size-medium */
+	font-weight: 499; /* $font-weight-medium */
+	line-height: 20px; /* $font-line-height-small */
 	color: var(--editor-avatar-name-color, #fff);
 	min-width: 0;
-	padding-bottom: 2px;
+	padding-bottom: 2px; /* $grid-unit-05 / 2 */
 	overflow: hidden;
 	opacity: 0;
 	white-space: nowrap;
@@ -112,7 +113,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 .editor-avatar.is-badge {
 	display: inline-grid;
 	grid-template-columns: min-content 0fr;
-	background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
+	background-color: var(--wp-admin-theme-color, #3858e9);
 	column-gap: 0;
 	padding-inline-end: 0;
 	transition:
@@ -122,8 +123,8 @@ const COLLABORATORS_OVERLAY_STYLES = `
 }
 .editor-avatar.is-badge:hover {
 	grid-template-columns: min-content 1fr;
-	column-gap: 4px;
-	padding-inline-end: 8px;
+	column-gap: 4px; /* $grid-unit-05 */
+	padding-inline-end: 8px; /* $grid-unit-10 */
 	transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
 }
 .editor-avatar.is-badge:hover .editor-avatar__name {

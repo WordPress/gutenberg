@@ -48,11 +48,11 @@ function Avatar( {
 					'--editor-avatar-outline-color': borderColor,
 					'--editor-avatar-name-color': colord(
 						borderColor
-					).isReadable( '#000', {
+					).isReadable( '#1e1e1e', {
 						level: 'AA',
 						size: 'normal',
 					} )
-						? '#000'
+						? '#1e1e1e'
 						: '#fff',
 			  }
 			: {} ),
