@@ -174,6 +174,9 @@ function NotesSidebar( { postId } ) {
 		: null;
 
 	async function openTheSidebar( selectedClientId ) {
+		if ( notesDisplayMode === 'hide' ) {
+			setNotesDisplayMode( 'expand' );
+		}
 		const prevArea = await getActiveComplementaryArea( 'core' );
 		const activeNotesArea = SIDEBARS.find( ( name ) => name === prevArea );
 		const targetClientId =
@@ -211,6 +214,8 @@ function NotesSidebar( { postId } ) {
 		notesDropdownValue = 'show-all';
 	} else if ( notesDisplayMode === 'minimize' ) {
 		notesDropdownValue = 'minimize';
+	} else if ( notesDisplayMode === 'hide' ) {
+		notesDropdownValue = 'hide';
 	}
 
 	if ( isDistractionFree ) {
@@ -251,6 +256,10 @@ function NotesSidebar( { postId } ) {
 											value: 'expand',
 											label: __( 'Expand notes' ),
 										},
+										{
+											value: 'hide',
+											label: __( 'Hide notes' ),
+										},
 									] }
 									value={ notesDropdownValue }
 									onSelect={ ( value ) => {
@@ -274,7 +283,7 @@ function NotesSidebar( { postId } ) {
 					</DropdownMenu>
 				</PinnedItems>
 			) }
-			{ showAllNotesSidebar && (
+			{ showAllNotesSidebar && notesDisplayMode !== 'hide' && (
 				<PluginSidebar
 					isPinnable={ ! isLargeViewport }
 					identifier={ ALL_NOTES_SIDEBAR }
@@ -294,7 +303,7 @@ function NotesSidebar( { postId } ) {
 					/>
 				</PluginSidebar>
 			) }
-			{ isLargeViewport && (
+			{ isLargeViewport && notesDisplayMode !== 'hide' && (
 				<PluginSidebar
 					isPinnable={ false }
 					header={ false }
