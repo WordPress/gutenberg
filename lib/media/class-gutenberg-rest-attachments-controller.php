@@ -6,34 +6,6 @@
  */
 
 /**
- * Debug logging for client-side media processing.
- * Set $debug_enabled to true to enable logging.
- *
- * @param string $message Log message.
- * @param array  $data    Optional data to include in log.
- */
-function gutenberg_media_debug_log( $message, $data = array() ) {
-	// Set to true to enable debug logging.
-	$debug_enabled = false;
-
-	if ( ! $debug_enabled ) {
-		return;
-	}
-
-	$timestamp = gmdate( 'H:i:s.v' );
-	$prefix    = "[MEDIA:PHP] $timestamp";
-
-	if ( ! empty( $data ) ) {
-		$data_str = wp_json_encode( $data, JSON_PRETTY_PRINT );
-		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-		error_log( "$prefix $message\n  └─ Details: $data_str" );
-	} else {
-		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-		error_log( "$prefix $message" );
-	}
-}
-
-/**
  * REST API controller for media attachments.
  *
  * Extends the core attachments controller to add client-side media processing
