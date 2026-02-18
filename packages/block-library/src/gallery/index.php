@@ -236,8 +236,8 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	$i       = 0;
 	$content = preg_replace_callback(
 		$pattern,
-		static function ( $match ) use ( $reordered_blocks, &$i ) {
-			$new_image_block = $reordered_blocks[ $i ] ?? $match[0];
+		static function ( $matches ) use ( $reordered_blocks, &$i ) {
+			$new_image_block = $reordered_blocks[ $i ] ?? $matches[0];
 			++$i;
 			return $new_image_block;
 		},
