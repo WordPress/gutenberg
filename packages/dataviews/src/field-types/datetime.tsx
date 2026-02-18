@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { getSettings } from '@wordpress/date';
+import { dateI18n, getDate, getSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
  */
-import type { NormalizedField, SortDirection } from '../types';
+import type { FormatDatetime, NormalizedField, SortDirection } from '../types';
 import type { FieldType } from '../types/private';
 import isValidElements from './utils/is-valid-elements';
 import {
@@ -21,7 +21,6 @@ import {
 } from '../constants';
 import isValidRequired from './utils/is-valid-required';
 import render from './utils/render-default';
-import parseDateTime from './utils/parse-date-time';
 
 const format = {
 	datetime: getSettings().formats.datetime,
@@ -40,8 +39,19 @@ function getValueFormatted< Item >( {
 		return '';
 	}
 
-	const dateValue = parseDateTime( value );
-	return dateValue !== null ? dateValue.toLocaleString() : '';
+	let formatDatetime: Required< FormatDatetime >;
+	if ( field.type !== 'datetime' ) {
+		formatDatetime = format;
+	} else {
+		formatDatetime = field.format as Required< FormatDatetime >;
+	}
+
+	// Use the browser's local timezone to display the datetime value.
+	// The filter input (datetime-local) operates in browser local time, converting
+	// the user's selection to a UTC ISO string for storage. We must convert back to
+	// local time here so the filter chip shows the same time the user originally selected.
+	const localTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+	return dateI18n( formatDatetime.datetime, getDate( value ), localTimezone );
 }
 
 const sort = ( a: any, b: any, direction: SortDirection ) => {
