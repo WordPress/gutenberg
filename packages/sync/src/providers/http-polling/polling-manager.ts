@@ -313,6 +313,7 @@ function poll(): void {
 				// full document state to replace all prior updates on the server.
 				if ( room.should_compact ) {
 					roomState.log( 'Server requested compaction update' );
+					roomState.updateQueue.clear();
 					roomState.updateQueue.add(
 						roomState.createCompactionUpdate()
 					);
