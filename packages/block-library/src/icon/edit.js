@@ -28,12 +28,11 @@ import {
 import { useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
+import { SVG, Rect, Path } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
  */
-import { SVG, Rect, Path } from '@wordpress/primitives';
-
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
