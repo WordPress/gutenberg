@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
@@ -69,46 +68,49 @@ export default function InspectorControlsTabs( {
 	const selectedTabIdRef = useRef( selectedTabId );
 	selectedTabIdRef.current = selectedTabId;
 
-	// When a content list item is selected that doesn't navigate to List View
-	// (e.g. a Heading), switch back to the Content tab from List View.
-	// This prevents the tab from staying stuck on List View after clicking
-	// a list-view-enabled block (e.g. Button) and then selecting a different block.
-	const shouldResetToContentTab = useSelect(
+	// Track which content block is selected to auto-switch between
+	// Content and List View tabs. Returns the selected block's clientId
+	// when it's a content item, or null otherwise.
+	const selectedContentBlockId = useSelect(
 		( select ) => {
 			if ( ! isSectionBlock ) {
-				return false;
+				return null;
 			}
-			const { getSelectedBlockClientId, getBlockName, getBlockCount } =
-				select( blockEditorStore );
-			const selectedId = getSelectedBlockClientId();
+			const selectedId =
+				select( blockEditorStore ).getSelectedBlockClientId();
 			if ( ! selectedId || ! contentClientIds?.includes( selectedId ) ) {
-				return false;
+				return null;
 			}
-			const name = getBlockName( selectedId );
-			const hasListView =
-				name === 'core/navigation' ||
-				hasBlockSupport( name, 'listView' );
-			const hasChildren = getBlockCount( selectedId ) > 0;
-			return ! ( hasListView && hasChildren );
+			return selectedId;
 		},
 		[ isSectionBlock, contentClientIds ]
 	);
 
-	const prevShouldResetRef = useRef( shouldResetToContentTab );
+	// When a content block is selected while on List View, reset to
+	// Content tab. skipNextContentResetRef prevents this from firing
+	// when switchToListView or requestInspectorTab intentionally
+	// opened List View for that same block.
+	const skipNextContentResetRef = useRef( false );
+	const prevSelectedContentBlockRef = useRef( selectedContentBlockId );
 	useEffect( () => {
-		// Only act when shouldResetToContentTab transitions from false to true
-		// (i.e. the user selected a non-list-view content item).
-		// Reading selectedTabId via ref avoids triggering on manual tab switches.
+		const prev = prevSelectedContentBlockRef.current;
+		prevSelectedContentBlockRef.current = selectedContentBlockId;
+
+		if ( selectedContentBlockId === prev ) {
+			return;
+		}
+
 		if (
-			shouldResetToContentTab &&
-			! prevShouldResetRef.current &&
-			selectedTabIdRef.current === TAB_LIST_VIEW.name
+			selectedContentBlockId &&
+			selectedTabIdRef.current === TAB_LIST_VIEW.name &&
+			! skipNextContentResetRef.current
 		) {
 			setSelectedTabId( TAB_CONTENT.name );
 			hasUserSelectionRef.current = false;
 		}
-		prevShouldResetRef.current = shouldResetToContentTab;
-	}, [ shouldResetToContentTab ] );
+
+		skipNextContentResetRef.current = false;
+	}, [ selectedContentBlockId ] );
 
 	// Handle explicit inspector tab requests (panel opening, refs, clear).
 	// Tab state is initialized from requestedTab above.
@@ -121,13 +123,14 @@ export default function InspectorControlsTabs( {
 		setSelectedTabId( requestedTab.tabName );
 
 		// Handle tab-specific options
-		if (
-			requestedTab.tabName === TAB_LIST_VIEW.name &&
-			requestedTab.options?.openPanel
-		) {
-			// Open the specific panel for List View
-			setOpenListViewPanel( requestedTab.options.openPanel );
-			incrementListViewExpandRevision();
+		if ( requestedTab.tabName === TAB_LIST_VIEW.name ) {
+			if ( requestedTab.options?.openPanel ) {
+				// Open the specific panel for List View
+				setOpenListViewPanel( requestedTab.options.openPanel );
+				incrementListViewExpandRevision();
+			}
+			// Prevent the content-reset effect from undoing this switch.
+			skipNextContentResetRef.current = true;
 		}
 
 		// Mark as handled (programmatic switch)
@@ -203,6 +206,8 @@ export default function InspectorControlsTabs( {
 			incrementListViewExpandRevision();
 			// Mark this as a programmatic switch
 			isProgrammaticSwitchRef.current = true;
+			// Prevent the content-reset effect from immediately undoing this.
+			skipNextContentResetRef.current = true;
 			handleTabSelect( TAB_LIST_VIEW.name );
 		}
 	};
