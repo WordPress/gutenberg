@@ -149,6 +149,20 @@ _Changelog_
 
 `6.2.0` Introduced in WordPress core.
 
+### findDOMNode
+
+> **Deprecated** since WordPress 6.2.0. Use DOM refs instead.
+
+Finds the DOM node of a React component instance.
+
+_Related_
+
+-   <https://react.dev/reference/react-dom/findDOMNode>
+
+_Parameters_
+
+-   _instance_ `React.ReactInstance`: Component's instance.
+
 ### flushSync
 
 Forces React to flush any updates inside the provided callback synchronously.
