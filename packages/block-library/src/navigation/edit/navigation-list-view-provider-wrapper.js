@@ -89,8 +89,6 @@ export default function NavigationListViewProviderWrapper( { clientId } ) {
 		onSelectNavigationMenu: handleUpdateMenu,
 		onCreateNew: createUntitledEmptyNavigationMenu,
 		onSelectClassicMenu: convertClassicMenu,
-		isManageMenusButtonDisabled: false,
-		isNavigationMenuMissing: false,
 	};
 
 	return (

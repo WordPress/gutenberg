@@ -10,8 +10,6 @@ const NavigationListViewContext = createContext( {
 	onCreateNew: () => {},
 	onSelectClassicMenu: () => {},
 	onSelectNavigationMenu: () => {},
-	isManageMenusButtonDisabled: false,
-	isNavigationMenuMissing: false,
 	blockEditingMode: 'default',
 } );
 
