@@ -13,20 +13,6 @@ if ( file_exists( __DIR__ . '/shared/get-submenu-visibility.php' ) ) {
 }
 
 /**
- * Returns the submenu visibility value with backward compatibility
- * for the deprecated openSubmenusOnClick attribute.
- *
- * @since 6.9.0
- * @deprecated Use block_core_shared_get_submenu_visibility() instead.
- *
- * @param array $attributes Block attributes containing submenuVisibility and/or openSubmenusOnClick.
- * @return string The visibility mode: 'hover', 'click', or 'always'.
- */
-function block_core_navigation_get_submenu_visibility( $attributes ) {
-	return block_core_shared_get_submenu_visibility( $attributes );
-}
-
-/**
  * Helper functions used to render the navigation block.
  *
  * @since 6.5.0
@@ -131,7 +117,7 @@ class WP_Navigation_Block_Renderer {
 	private static function is_interactive( $attributes, $inner_blocks ) {
 		$has_submenus        = static::has_submenus( $inner_blocks );
 		$is_responsive_menu  = static::is_responsive( $attributes );
-		$computed_visibility = block_core_navigation_get_submenu_visibility( $attributes );
+		$computed_visibility = gutenberg_block_core_shared_get_submenu_visibility( $attributes );
 		$open_on_click       = 'click' === $computed_visibility;
 		$show_submenu_icon   = ! empty( $attributes['showSubmenuIcon'] );
 		return ( $has_submenus && ( $open_on_click || $show_submenu_icon ) ) || $is_responsive_menu;
@@ -1171,7 +1157,7 @@ function block_core_navigation_add_directives_to_submenu( $tags, $block_attribut
 		// event.
 		$tags->set_attribute( 'tabindex', '-1' );
 
-		$computed_visibility = block_core_navigation_get_submenu_visibility( $block_attributes );
+		$computed_visibility = gutenberg_block_core_shared_get_submenu_visibility( $block_attributes );
 		$open_on_hover       = 'hover' === $computed_visibility;
 
 		if ( $open_on_hover ) {

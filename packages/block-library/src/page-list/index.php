@@ -13,20 +13,6 @@ if ( file_exists( __DIR__ . '/../navigation/shared/get-submenu-visibility.php' )
 }
 
 /**
- * Returns the submenu visibility value with backward compatibility
- * for the deprecated openSubmenusOnClick attribute.
- *
- * @since 6.9.0
- * @deprecated Use block_core_shared_get_submenu_visibility() instead.
- *
- * @param array $context Block context from parent Navigation block.
- * @return string The visibility mode: 'hover', 'click', or 'always'.
- */
-function block_core_page_list_get_submenu_visibility( $context ) {
-	return block_core_shared_get_submenu_visibility( $context );
-}
-
-/**
  * Build an array with CSS classes and inline styles defining the colors
  * which will be applied to the pages markup in the front-end when it is a descendant of navigation.
  *
@@ -364,7 +350,7 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	$is_navigation_child = array_key_exists( 'showSubmenuIcon', $block->context );
 
 	// Get submenu visibility with backward compatibility for openSubmenusOnClick.
-	$submenu_visibility = $is_navigation_child ? block_core_page_list_get_submenu_visibility( $block->context ) : 'hover';
+	$submenu_visibility = $is_navigation_child ? gutenberg_block_core_shared_get_submenu_visibility( $block->context ) : 'hover';
 
 	$show_submenu_icons = array_key_exists( 'showSubmenuIcon', $block->context ) ? $block->context['showSubmenuIcon'] : false;
 
