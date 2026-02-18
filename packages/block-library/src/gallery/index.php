@@ -222,24 +222,17 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	}
 	$image_blocks = $matches[0];
 
-	// Reorder image blocks according to the randomized `$image_ids` order
-	$reordered_blocks = array();
-	foreach ( $image_ids as $image_id ) {
-		foreach ( $image_blocks as $block ) {
-			if ( strpos( $block, $image_id ) !== false ) {
-				$reordered_blocks[] = $block;
-				break;
-			}
-		}
-	}
+	// Shuffle the matched image blocks directly. This avoids a mismatch between
+	// the number of regex matches and the reordered array: `$image_ids` only
+	// contains images with lightbox enabled (no link), while the regex matches
+	// all images in the gallery.
+	shuffle( $image_blocks );
 
 	$i       = 0;
 	$content = preg_replace_callback(
 		$pattern,
-		static function ( $matches ) use ( $reordered_blocks, &$i ) {
-			$new_image_block = $reordered_blocks[ $i ] ?? $matches[0];
-			++$i;
-			return $new_image_block;
+		static function () use ( $image_blocks, &$i ) {
+			return $image_blocks[ $i++ ];
 		},
 		$updated_content
 	);
