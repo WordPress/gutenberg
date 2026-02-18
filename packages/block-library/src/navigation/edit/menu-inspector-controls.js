@@ -5,19 +5,18 @@ import {
 	privateApis as blockEditorPrivateApis,
 	InspectorControls,
 	store as blockEditorStore,
-	BlockIcon,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
 	Spinner,
+	Tooltip,
 	__experimentalHStack as HStack,
 	__experimentalHeading as Heading,
-	VisuallyHidden,
+	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { useContext } from '@wordpress/element';
-import { info, error } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -34,33 +33,31 @@ import {
 	getActionableStatus,
 } from '../../navigation-link/shared';
 
+const { Badge } = unlock( componentsPrivateApis );
+
 /**
- * Component that renders a custom BlockIcon for navigation link blocks with status indicators.
+ * Component that renders a status badge in the list view anchor area for navigation link blocks.
+ * Returns null for blocks with no actionable status (e.g. published links).
  *
- * @param {Object} props             - Component props
- * @param {Object} props.block       - The block object
- * @param {*}      props.defaultIcon - The default icon to use if no status indicator needed
- * @return {React.JSX.Element} BlockIcon component
+ * @param {Object} props       - Component props
+ * @param {Object} props.block - The block object
+ * @return {React.JSX.Element|null} Badge element or null
  */
-function NavigationBlockIcon( { block, defaultIcon } ) {
+function NavigationBlockBadge( { block } ) {
 	const { clientId, attributes, name } = block;
 	const { url, type, metadata, id } = attributes || {};
 	const hasUrlBinding = !! metadata?.bindings?.url && !! id;
 
-	// Get entity binding data
 	const { isBoundEntityAvailable, entityRecord } = useEntityBinding( {
 		clientId,
 		attributes,
 	} );
 
-	// Only handle navigation link blocks
 	if (
 		name !== 'core/navigation-link' &&
 		name !== 'core/navigation-submenu'
 	) {
-		return (
-			<BlockIcon icon={ defaultIcon } showColors context="list-view" />
-		);
+		return null;
 	}
 
 	const status = getActionableStatus( {
@@ -71,25 +68,19 @@ function NavigationBlockIcon( { block, defaultIcon } ) {
 		isEntityAvailable: isBoundEntityAvailable,
 	} );
 
-	// No status indicator needed, use default
 	if ( ! status ) {
-		return (
-			<BlockIcon icon={ defaultIcon } showColors context="list-view" />
-		);
+		return null;
 	}
 
-	// Render status indicator icon
-	const isError = status.intent === 'error';
-	const statusIcon = {
-		src: isError ? error : info,
-		foreground: isError ? '#660c0c' : '#f0b849',
-	};
-
 	return (
-		<>
-			<BlockIcon icon={ statusIcon } showColors context="list-view" />
-			<VisuallyHidden>{ status.label }</VisuallyHidden>
-		</>
+		<Tooltip text={ status.label }>
+			<span className="block-editor-list-view-block-select-button__anchor-wrapper">
+				<Badge
+					className="block-editor-list-view-block-select-button__anchor"
+					intent={ status.intent }
+				/>
+			</span>
+		</Tooltip>
 	);
 }
 
@@ -258,7 +249,7 @@ const MainContent = ( {
 				showAppender
 				blockSettingsMenu={ LeafMoreMenu }
 				additionalBlockContent={ AdditionalBlockContent }
-				blockIcon={ NavigationBlockIcon }
+				blockBadge={ NavigationBlockBadge }
 				onSelect={ openListViewContentPanel }
 			/>
 		</div>

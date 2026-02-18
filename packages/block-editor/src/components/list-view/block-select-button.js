@@ -59,7 +59,7 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { BlockIconComponent } = useListViewContext();
+	const { BlockBadgeComponent } = useListViewContext();
 	const { hasPatternName, blockVisibility } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = unlock( select( blockEditorStore ) );
@@ -78,9 +78,6 @@ function ListViewBlockSelectButton(
 
 	// Determine visibility label from blockVisibility metadata
 	const visibilityLabel = getBlockVisibilityLabel( blockVisibility );
-
-	// Compute default icon for BlockIcon component
-	const defaultIcon = hasPatternName ? symbol : blockInformation?.icon;
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -121,18 +118,11 @@ function ListViewBlockSelectButton(
 			aria-expanded={ isExpanded }
 		>
 			<ListViewExpander onClick={ onToggleExpanded } />
-			{ BlockIconComponent ? (
-				<BlockIconComponent
-					block={ block }
-					defaultIcon={ defaultIcon }
-				/>
-			) : (
-				<BlockIcon
-					icon={ defaultIcon }
-					showColors
-					context="list-view"
-				/>
-			) }
+			<BlockIcon
+				icon={ hasPatternName ? symbol : blockInformation?.icon }
+				showColors
+				context="list-view"
+			/>
 			<HStack
 				alignment="center"
 				className="block-editor-list-view-block-select-button__label-wrapper"
@@ -142,12 +132,16 @@ function ListViewBlockSelectButton(
 				<span className="block-editor-list-view-block-select-button__title">
 					<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
 				</span>
-				{ blockInformation?.anchor && (
-					<span className="block-editor-list-view-block-select-button__anchor-wrapper">
-						<Badge className="block-editor-list-view-block-select-button__anchor">
-							{ blockInformation.anchor }
-						</Badge>
-					</span>
+				{ BlockBadgeComponent ? (
+					<BlockBadgeComponent block={ block } />
+				) : (
+					blockInformation?.anchor && (
+						<span className="block-editor-list-view-block-select-button__anchor-wrapper">
+							<Badge className="block-editor-list-view-block-select-button__anchor">
+								{ blockInformation.anchor }
+							</Badge>
+						</span>
+					)
 				) }
 				{ isSticky && (
 					<span className="block-editor-list-view-block-select-button__sticky">

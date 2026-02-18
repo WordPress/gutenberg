@@ -1,24 +1,14 @@
 /**
  * Internal dependencies
  */
-import {
-	computeBadges,
-	getActionableStatus,
-} from '../../../navigation-link/shared';
+import { getActionableStatus } from '../../../navigation-link/shared';
 
-// These tests verify the integration between computeBadges and getActionableStatus
-// to ensure indicators show correctly for navigation items in list view.
+// These tests verify getActionableStatus returns the correct label and intent
+// that NavigationBlockBadge uses to display text badges in the navigation list view.
 
-describe( 'List View Indicators Integration', () => {
-	describe( 'Error status indicators', () => {
-		it( 'should return error status for missing entity', () => {
-			const badges = computeBadges( {
-				url: '/some-page',
-				type: 'page',
-				hasBinding: true,
-				isEntityAvailable: false,
-			} );
-
+describe( 'Navigation List View Badges', () => {
+	describe( 'Error badges', () => {
+		it( 'should show "Missing page" badge for missing entity', () => {
 			const status = getActionableStatus( {
 				url: '/some-page',
 				type: 'page',
@@ -29,15 +19,9 @@ describe( 'List View Indicators Integration', () => {
 			expect( status ).not.toBeNull();
 			expect( status.intent ).toBe( 'error' );
 			expect( status.label ).toBe( 'Missing page' );
-
-			// Verify badge and status are consistent
-			const errorBadge = badges.find(
-				( badge ) => badge.intent === 'error'
-			);
-			expect( errorBadge.label ).toBe( status.label );
 		} );
 
-		it( 'should return error status for no URL', () => {
+		it( 'should show "No link selected" badge when there is no URL', () => {
 			const status = getActionableStatus( {
 				url: '',
 			} );
@@ -47,7 +31,7 @@ describe( 'List View Indicators Integration', () => {
 			expect( status.label ).toBe( 'No link selected' );
 		} );
 
-		it( 'should return error status for trash', () => {
+		it( 'should show "Trash" badge for trashed links', () => {
 			const status = getActionableStatus( {
 				url: '/my-page',
 				type: 'page',
@@ -60,8 +44,8 @@ describe( 'List View Indicators Integration', () => {
 		} );
 	} );
 
-	describe( 'Warning status indicators', () => {
-		it( 'should return warning status for draft entity', () => {
+	describe( 'Warning badges', () => {
+		it( 'should show "Draft" badge for draft links', () => {
 			const status = getActionableStatus( {
 				url: '/my-draft',
 				type: 'post',
@@ -73,7 +57,7 @@ describe( 'List View Indicators Integration', () => {
 			expect( status.label ).toBe( 'Draft' );
 		} );
 
-		it( 'should return warning status for pending entity', () => {
+		it( 'should show "Pending" badge for pending links', () => {
 			const status = getActionableStatus( {
 				url: '/my-post',
 				type: 'post',
@@ -85,7 +69,7 @@ describe( 'List View Indicators Integration', () => {
 			expect( status.label ).toBe( 'Pending' );
 		} );
 
-		it( 'should return warning status for scheduled entity', () => {
+		it( 'should show "Scheduled" badge for scheduled links', () => {
 			const status = getActionableStatus( {
 				url: '/my-post',
 				type: 'post',
@@ -98,8 +82,8 @@ describe( 'List View Indicators Integration', () => {
 		} );
 	} );
 
-	describe( 'No indicator for valid items', () => {
-		it( 'should return null for published entity', () => {
+	describe( 'No badge shown for healthy links', () => {
+		it( 'should show no badge for published links', () => {
 			const status = getActionableStatus( {
 				url: '/my-page',
 				type: 'page',
@@ -109,7 +93,7 @@ describe( 'List View Indicators Integration', () => {
 			expect( status ).toBeNull();
 		} );
 
-		it( 'should return null for external links', () => {
+		it( 'should show no badge for external links', () => {
 			const status = getActionableStatus( {
 				url: 'https://example.com',
 			} );
@@ -117,7 +101,7 @@ describe( 'List View Indicators Integration', () => {
 			expect( status ).toBeNull();
 		} );
 
-		it( 'should return null for private posts', () => {
+		it( 'should show no badge for private links', () => {
 			const status = getActionableStatus( {
 				url: '/my-page',
 				type: 'page',
@@ -128,8 +112,8 @@ describe( 'List View Indicators Integration', () => {
 		} );
 	} );
 
-	describe( 'Priority when multiple issues present', () => {
-		it( 'should prioritize missing entity over no URL', () => {
+	describe( 'Badge priority', () => {
+		it( 'should show "Missing" badge (not "No link selected") when entity is missing', () => {
 			const status = getActionableStatus( {
 				url: '',
 				type: 'page',
