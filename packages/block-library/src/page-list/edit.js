@@ -22,13 +22,20 @@ import {
 	Notice,
 	ComboboxControl,
 	Button,
+	Modal,
+	TextControl,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
+	__experimentalVStack as VStack,
+	__experimentalHStack as HStack,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useMemo, useState, useEffect, useCallback } from '@wordpress/element';
-import { useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecords, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
+import { decodeEntities } from '@wordpress/html-entities';
+import { Icon, plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -39,7 +46,6 @@ import {
 	ConvertToLinksModal,
 } from './convert-to-links-modal';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
-import { PageCreatorAppender } from './page-creator-appender';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
@@ -128,6 +134,10 @@ export default function PageListEdit( {
 	const closeModal = () => setOpen( false );
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
+	// Page creation state
+	const [ isCreatingPage, setIsCreatingPage ] = useState( false );
+	const [ pageTitle, setPageTitle ] = useState( '' );
+
 	const { records: pages, hasResolved: hasResolvedPages } = useEntityRecords(
 		'postType',
 		'page',
@@ -140,6 +150,92 @@ export default function PageListEdit( {
 			orderby: 'menu_order',
 			order: 'asc',
 		}
+	);
+
+	// Page creation helpers
+	const { lastError, isSaving } = useSelect(
+		( select ) => ( {
+			lastError: select( coreStore ).getLastEntitySaveError(
+				'postType',
+				'page'
+			),
+			isSaving: select( coreStore ).isSavingEntityRecord(
+				'postType',
+				'page'
+			),
+		} ),
+		[]
+	);
+
+	const { saveEntityRecord } = useDispatch( coreStore );
+	const { createSuccessNotice, createErrorNotice } =
+		useDispatch( noticesStore );
+
+	const isTitleValid = pageTitle.trim().length > 0;
+
+	const createPage = useCallback(
+		async ( event ) => {
+			event.preventDefault();
+			if ( isSaving || ! isTitleValid ) {
+				return;
+			}
+
+			try {
+				const pageData = {
+					title: pageTitle,
+					status: 'publish',
+				};
+
+				// If there's a parent page ID, set it
+				if ( parentPageID ) {
+					pageData.parent = parentPageID;
+				}
+
+				const savedRecord = await saveEntityRecord(
+					'postType',
+					'page',
+					pageData,
+					{ throwOnError: true }
+				);
+
+				if ( savedRecord ) {
+					// Show success notice
+					createSuccessNotice(
+						sprintf(
+							// translators: %s: the title of the new page.
+							__( 'Page "%s" created successfully.' ),
+							decodeEntities( savedRecord.title.rendered )
+						),
+						{
+							type: 'snackbar',
+							id: 'page-created-success',
+						}
+					);
+
+					// Reset the form
+					setPageTitle( '' );
+					setIsCreatingPage( false );
+				}
+			} catch ( error ) {
+				// Show error notice
+				createErrorNotice(
+					__( 'Failed to create page. Please try again.' ),
+					{
+						type: 'snackbar',
+						id: 'page-created-error',
+					}
+				);
+			}
+		},
+		[
+			isSaving,
+			isTitleValid,
+			pageTitle,
+			parentPageID,
+			saveEntityRecord,
+			createSuccessNotice,
+			createErrorNotice,
+		]
 	);
 
 	const allowConvertToLinks =
@@ -298,9 +394,17 @@ export default function PageListEdit( {
 		parentPageID,
 	} );
 
-	// Create a custom appender that allows creating new pages
+	// Create a custom appender that hijacks the block appender to create pages
 	const customAppender = () => (
-		<PageCreatorAppender parentPageID={ parentPageID } />
+		<Button
+			__next40pxDefaultSize
+			className="block-editor-button-block-appender"
+			onClick={ () => setIsCreatingPage( true ) }
+			label={ __( 'Add page' ) }
+			showTooltip
+		>
+			<Icon icon={ plus } />
+		</Button>
 	);
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
@@ -414,6 +518,64 @@ export default function PageListEdit( {
 				pages={ pages }
 				parentPageID={ parentPageID }
 			/>
+			{ isCreatingPage && (
+				<Modal
+					title={ __( 'Create new page' ) }
+					onRequestClose={ () => {
+						setIsCreatingPage( false );
+						setPageTitle( '' );
+					} }
+					size="small"
+				>
+					<form onSubmit={ createPage }>
+						<VStack spacing={ 4 }>
+							<p>
+								{ __(
+									'Create a new page to add to your Page List.'
+								) }
+							</p>
+
+							<TextControl
+								__next40pxDefaultSize
+								label={ __( 'Page title' ) }
+								onChange={ setPageTitle }
+								placeholder={ __( 'Enter page title' ) }
+								value={ pageTitle }
+							/>
+
+							{ lastError && (
+								<Notice status="error" isDismissible={ false }>
+									{ lastError.message }
+								</Notice>
+							) }
+
+							<HStack spacing={ 2 } justify="flex-end">
+								<Button
+									__next40pxDefaultSize
+									variant="tertiary"
+									onClick={ () => {
+										setIsCreatingPage( false );
+										setPageTitle( '' );
+									} }
+									disabled={ isSaving }
+									accessibleWhenDisabled
+								>
+									{ __( 'Cancel' ) }
+								</Button>
+								<Button
+									__next40pxDefaultSize
+									variant="primary"
+									type="submit"
+									isBusy={ isSaving }
+									aria-disabled={ isSaving || ! isTitleValid }
+								>
+									{ __( 'Create page' ) }
+								</Button>
+							</HStack>
+						</VStack>
+					</form>
+				</Modal>
+			) }
 		</>
 	);
 }
