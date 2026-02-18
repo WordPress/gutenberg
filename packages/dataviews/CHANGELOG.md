@@ -8,6 +8,7 @@
 
 ### Bug Fixes
 
+- DataForm: Fix text selection in panel layout summary rows by replacing `::after` overlay with accessible card pattern. [#75565](https://github.com/WordPress/gutenberg/pull/75565)
 - DataViews: Improve styling for filters when long values are in use. [#75369](https://github.com/WordPress/gutenberg/pull/75369)
 - DataForm: Fix label case for regular layout. [#75292](https://github.com/WordPress/gutenberg/pull/75292)
 - DataViews: Add title attribute in grid item title field. [#75085](https://github.com/WordPress/gutenberg/pull/75085)
@@ -33,8 +34,9 @@
 - DataForm: Use public `ColorPicker` component instead of internal `Picker` in color control. [#75394](https://github.com/WordPress/gutenberg/pull/75394)
 - Update Testing Library packages used in unit tests. [#75340](https://github.com/WordPress/gutenberg/pull/75340)
 - Always specify initial values for `useRef` calls. [#75513](https://github.com/WordPress/gutenberg/pull/75513)
-- Clean up type declarations using the `React` namespace. ([#75508](https://github.com/WordPress/gutenberg/pull/75508)
+- Clean up type declarations using the `React` namespace. [#75508](https://github.com/WordPress/gutenberg/pull/75508)
 - Update `RefObject` type usage for React 19 compatibility. [#75567](https://github.com/WordPress/gutenberg/pull/75567)
+- Upgraded `@ariakit/react` (v0.4.21). [#75620](https://github.com/WordPress/gutenberg/pull/75620)
 
 ## 11.3.0 (2026-01-29)
 

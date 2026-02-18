@@ -69,15 +69,23 @@ if ( window.crossOriginIsolated ) {
 
 						if ( ! isEmbedSandboxIframe ) {
 							iframeNode.addEventListener( 'load', () => {
-								if ( iframeNode.contentDocument ) {
-									observer.observe(
-										iframeNode.contentDocument,
-										{
-											childList: true,
-											attributes: true,
-											subtree: true,
-										}
-									);
+								try {
+									if (
+										iframeNode.contentDocument &&
+										iframeNode.contentDocument.body
+									) {
+										observer.observe(
+											iframeNode.contentDocument,
+											{
+												childList: true,
+												attributes: true,
+												subtree: true,
+											}
+										);
+									}
+								} catch ( e ) {
+									// Iframe may be cross-origin or otherwise inaccessible.
+									// Silently ignore these cases.
 								}
 							} );
 						}
@@ -100,11 +108,31 @@ if ( window.crossOriginIsolated ) {
 		} );
 	} );
 
-	observer.observe( document.body, {
-		childList: true,
-		attributes: true,
-		subtree: true,
-	} );
+	/**
+	 * Start observing the document body, waiting for it to be available if needed.
+	 */
+	function startObservingBody() {
+		if ( document.body ) {
+			observer.observe( document.body, {
+				childList: true,
+				attributes: true,
+				subtree: true,
+			} );
+		} else if ( document.readyState === 'loading' ) {
+			// Wait for DOM to be ready.
+			document.addEventListener( 'DOMContentLoaded', () => {
+				if ( document.body ) {
+					observer.observe( document.body, {
+						childList: true,
+						attributes: true,
+						subtree: true,
+					} );
+				}
+			} );
+		}
+	}
+
+	startObservingBody();
 }
 
 // Only apply the embed preview filter when cross-origin isolated.

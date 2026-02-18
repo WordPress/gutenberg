@@ -20,16 +20,18 @@ type InlineNoticesProps = {
 	children?: ReactNode;
 	pinnedNoticesClassName?: string;
 	dismissibleNoticesClassName?: string;
+	context?: string;
 };
 
 export default function InlineNotices( {
 	children,
 	pinnedNoticesClassName,
 	dismissibleNoticesClassName,
+	context,
 }: InlineNoticesProps ) {
 	const notices = useSelect(
-		( select ) => select( noticesStore ).getNotices(),
-		[]
+		( select ) => select( noticesStore ).getNotices( context ),
+		[ context ]
 	);
 	const { removeNotice } = useDispatch( noticesStore );
 	const dismissibleNotices = notices.filter(
@@ -54,7 +56,7 @@ export default function InlineNotices( {
 					'components-notices__dismissible',
 					dismissibleNoticesClassName
 				) }
-				onRemove={ removeNotice }
+				onRemove={ ( id ) => removeNotice( id, context ) }
 			>
 				{ children }
 			</NoticeList>

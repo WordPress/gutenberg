@@ -184,6 +184,10 @@ _Parameters_
 -   _name_ `string`: Name of the entity.
 -   _recordId_ `number|string`: Record ID of the entity record.
 
+_Returns_
+
+-   `Object`: Action object.
+
 ### deleteEntityRecord
 
 Action triggered to delete an entity record.
@@ -324,6 +328,21 @@ _Parameters_
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
 -   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a promise.
 -   _options.throwOnError_ `[boolean]`: If false, this action suppresses all the exceptions. Defaults to false.
+
+### setSyncConnectionStatus
+
+Returns an action object used to set the sync connection status for an entity or collection.
+
+_Parameters_
+
+-   _kind_ `string`: Kind of the entity.
+-   _name_ `string`: Name of the entity.
+-   _key_ `number|string|null`: The entity key, or null for collections.
+-   _status_ `Object|null`: The connection state object or null on unload.
+
+_Returns_
+
+-   `Object`: Action object.
 
 ### undo
 
@@ -785,6 +804,18 @@ _Parameters_
 _Returns_
 
 -   `RevisionRecord[] | null`: Record.
+
+### getSyncConnectionStatus
+
+Returns the current sync connection status across all entities. Prioritizes disconnected states, then connecting, then connected.
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `ConnectionStatus | undefined`: The current sync connection state, prioritized by importance.
 
 ### getThemeSupports
 

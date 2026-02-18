@@ -23,7 +23,7 @@ if ( ! class_exists( 'WP_Icons_Registry' ) ) {
 		 * WP_Icons_Registry is a singleton class, so keep this private.
 		 */
 		private function __construct() {
-			$icons_directory = __DIR__ . '/../../packages/icons/src/';
+			$icons_directory = __DIR__ . '/../../../packages/icons/src/';
 			$icons_directory = trailingslashit( $icons_directory );
 			$manifest_path   = $icons_directory . 'manifest.php';
 

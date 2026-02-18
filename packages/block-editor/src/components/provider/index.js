@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useDispatch } from '@wordpress/data';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import {
 	MediaUploadProvider,
@@ -20,6 +20,7 @@ import { BlockRefsProvider } from './block-refs-provider';
 import { unlock } from '../../lock-unlock';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import useMediaUploadSettings from './use-media-upload-settings';
+import { SelectionContext } from './selection-context';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
@@ -120,6 +121,18 @@ function mediaUpload(
 	} );
 }
 
+/**
+ * Calls useBlockSync as a child of SelectionContext.Provider so that the
+ * hook can read selection state from the context provided by this tree
+ * rather than from a parent provider (which may not exist for the root).
+ *
+ * @param {Object} props Props forwarded to useBlockSync.
+ */
+function BlockSyncEffect( props ) {
+	useBlockSync( props );
+	return null;
+}
+
 export const ExperimentalBlockEditorProvider = withRegistryProvider(
 	( props ) => {
 		const {
@@ -164,8 +177,24 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			__experimentalUpdateSettings,
 		] );
 
-		// Syncs the entity provider with changes in the block-editor store.
-		useBlockSync( props );
+		// Store selection and onChangeSelection in refs and expose
+		// stable getters/callers so that the context value is a
+		// complete constant.  This prevents re-rendering the entire
+		// block tree (including async-rendered off-screen blocks)
+		// when either value changes.
+		const selectionRef = useRef( props.selection );
+		selectionRef.current = props.selection;
+		const onChangeSelectionRef = useRef( props.onChangeSelection ?? noop );
+		onChangeSelectionRef.current = props.onChangeSelection ?? noop;
+
+		const selectionContextValue = useMemo(
+			() => ( {
+				getSelection: () => selectionRef.current,
+				onChangeSelection: ( ...args ) =>
+					onChangeSelectionRef.current( ...args ),
+			} ),
+			[]
+		);
 
 		const children = (
 			<SlotFillProvider passthrough>
@@ -174,18 +203,30 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			</SlotFillProvider>
 		);
 
+		const content = (
+			<SelectionContext.Provider value={ selectionContextValue }>
+				<BlockSyncEffect
+					clientId={ props.clientId }
+					value={ props.value }
+					onChange={ props.onChange }
+					onInput={ props.onInput }
+				/>
+				{ children }
+			</SelectionContext.Provider>
+		);
+
 		if ( isClientSideMediaEnabled ) {
 			return (
 				<MediaUploadProvider
 					settings={ mediaUploadSettings }
 					useSubRegistry={ false }
 				>
-					{ children }
+					{ content }
 				</MediaUploadProvider>
 			);
 		}
 
-		return children;
+		return content;
 	}
 );
 

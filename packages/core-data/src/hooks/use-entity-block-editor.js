@@ -120,8 +120,10 @@ export default function useEntityBlockEditor( kind, name, { id: _id } = {} ) {
 	const onInput = useCallback(
 		( newBlocks, options ) => {
 			const { selection, ...rest } = options;
-			const footnotesChanges = updateFootnotesFromMeta( newBlocks, meta );
-			const edits = { selection, ...footnotesChanges };
+			const edits = {
+				selection,
+				...updateFootnotesFromMeta( newBlocks, meta ),
+			};
 
 			editEntityRecord( kind, name, id, edits, {
 				isCached: true,

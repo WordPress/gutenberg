@@ -378,7 +378,6 @@ function Layout( {
 		currentPost: { postId: currentPostId, postType: currentPostType },
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
-		previousSelectedBlockPath,
 	} = useNavigateToEntityRecord(
 		initialPostId,
 		initialPostType,
@@ -594,7 +593,6 @@ function Layout( {
 						// eslint-disable-next-line jsx-a11y/no-autofocus
 						autoFocus={ ! isWelcomeGuideVisible }
 						onActionPerformed={ onActionPerformed }
-						initialSelection={ previousSelectedBlockPath }
 						extraSidebarPanels={
 							showMetaBoxes && <MetaBoxes location="side" />
 						}

@@ -51,7 +51,7 @@
 		"src/**/*.scss"
 	],
 	"dependencies": {
-		"@ariakit/react": "^0.4.15",
+		"@ariakit/react": "^0.4.21",
 		"@date-fns/utc": "^2.1.1",
 		"@emotion/cache": "^11.14.0",
 		"@emotion/css": "^11.13.5",
@@ -102,7 +102,7 @@
 		"uuid": "^9.0.1"
 	},
 	"devDependencies": {
-		"@ariakit/test": "^0.4.7",
+		"@ariakit/test": "^0.4.13",
 		"@storybook/addon-docs": "^10.1.11",
 		"@storybook/react-vite": "^10.1.11",
 		"@testing-library/jest-dom": "^6.9.1",

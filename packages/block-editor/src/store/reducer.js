@@ -1870,9 +1870,27 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
  */
 export const blockListSettings = ( state = {}, action ) => {
 	switch ( action.type ) {
-		// Even if the replaced blocks have the same client ID, our logic
-		// should correct the state.
-		case 'REPLACE_BLOCKS':
+		case 'REPLACE_BLOCKS': {
+			// Collect all clientIds from replacement blocks. If a clientId
+			// is reused, preserve its settings — the block instance (and
+			// its InnerBlocks config) survived the replace. Settings for
+			// clientIds that are truly removed get cleaned up so stale
+			// config from old block types doesn't linger.
+			const replacementIds = new Set();
+			const stack = [ ...action.blocks ];
+			while ( stack.length ) {
+				const block = stack.shift();
+				replacementIds.add( block.clientId );
+				stack.push( ...block.innerBlocks );
+			}
+			return Object.fromEntries(
+				Object.entries( state ).filter(
+					( [ id ] ) =>
+						! action.clientIds.includes( id ) ||
+						replacementIds.has( id )
+				)
+			);
+		}
 		case 'REMOVE_BLOCKS': {
 			return Object.fromEntries(
 				Object.entries( state ).filter(
@@ -2268,6 +2286,10 @@ function openedListViewPanels(
 /**
  * Reducer returning the List View expand revision.
  *
+ * This is a counter used to force ListView components to remount. When incremented,
+ * the ListView key changes, causing the component to remount with a fresh
+ * isExpanded=true state.
+ *
  * @param {number} state  Current state.
  * @param {Object} action Dispatched action.
  *
@@ -2300,6 +2322,29 @@ export function listViewContentPanelOpen( state = false, action ) {
 		// Close when selection is cleared
 		case 'CLEAR_SELECTED_BLOCK':
 			return false;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer tracking the requested inspector tab state.
+ * Stores a request to open a specific inspector tab with optional configuration.
+ *
+ * @param {Object|null} state  Current state.
+ * @param {Object}      action Dispatched action.
+ *
+ * @return {Object|null} Updated state.
+ */
+export function requestedInspectorTab( state = null, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_INSPECTOR_TAB':
+			return {
+				tabName: action.tabName,
+				options: action.options,
+			};
+		case 'CLEAR_REQUESTED_INSPECTOR_TAB':
+			return null;
 	}
 
 	return state;
@@ -2340,6 +2385,7 @@ const combinedReducers = combineReducers( {
 	openedListViewPanels,
 	listViewExpandRevision,
 	listViewContentPanelOpen,
+	requestedInspectorTab,
 } );
 
 /**
@@ -2488,15 +2534,19 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	// don't apply contentOnly mode to nested unsynced patterns or template parts.
 	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
 
+	const disableContentOnlyForUnsyncedPatterns =
+		state.settings?.disableContentOnlyForUnsyncedPatterns;
+
 	// Use array.from for better back compat. Older versions of the iterator returned
 	// from `keys()` didn't have the `filter` method.
-	const unsyncedPatternClientIds = isIsolatedEditor
-		? []
-		: Array.from( state.blocks.attributes.keys() ).filter(
-				( clientId ) =>
-					state.blocks.attributes.get( clientId )?.metadata
-						?.patternName
-		  );
+	const unsyncedPatternClientIds =
+		isIsolatedEditor || disableContentOnlyForUnsyncedPatterns
+			? []
+			: Array.from( state.blocks.attributes.keys() ).filter(
+					( clientId ) =>
+						state.blocks.attributes.get( clientId )?.metadata
+							?.patternName
+			  );
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
 		...unsyncedPatternClientIds,
@@ -2792,6 +2842,13 @@ export function withDerivedBlockEditingModes( reducer ) {
 				// Handle unsynced patterns which indicate their contentOnly-ness via
 				// the `attributes.metadata.patternName` property.
 				// Check when this is added or removed and update blockEditingModes.
+				const disableContentOnlyForUnsyncedPatterns =
+					nextState.settings?.disableContentOnlyForUnsyncedPatterns;
+
+				if ( disableContentOnlyForUnsyncedPatterns ) {
+					break;
+				}
+
 				const addedBlocks = [];
 				const removedClientIds = [];
 
@@ -3004,10 +3061,15 @@ export function withDerivedBlockEditingModes( reducer ) {
 				break;
 			}
 			case 'UPDATE_SETTINGS': {
-				// Recompute the entire tree if the section root changes.
+				// Recompute the entire tree if the section root or
+				// the effective disableContentOnlyForUnsyncedPatterns value changes.
 				if (
 					state?.settings?.[ sectionRootClientIdKey ] !==
-					nextState?.settings?.[ sectionRootClientIdKey ]
+						nextState?.settings?.[ sectionRootClientIdKey ] ||
+					!! state?.settings
+						?.disableContentOnlyForUnsyncedPatterns !==
+						!! nextState?.settings
+							?.disableContentOnlyForUnsyncedPatterns
 				) {
 					return {
 						...nextState,

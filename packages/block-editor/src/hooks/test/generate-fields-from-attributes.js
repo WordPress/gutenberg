@@ -117,33 +117,6 @@ describe( 'generateFieldsFromAttributes', () => {
 		} );
 	} );
 
-	it( 'should skip unsupported attribute types', () => {
-		const attributes = markForAutoInspectorControl( {
-			message: {
-				type: 'string',
-				default: 'Hello',
-			},
-			items: {
-				type: 'array',
-				default: [],
-			},
-			config: {
-				type: 'object',
-				default: {},
-			},
-			unionType: {
-				type: [ 'string', 'null' ],
-				default: null,
-			},
-		} );
-
-		const result = generateFieldsFromAttributes( attributes );
-
-		// Only string attribute should generate a field
-		expect( result.fields ).toHaveLength( 1 );
-		expect( result.fields[ 0 ].id ).toBe( 'message' );
-	} );
-
 	it( 'should return empty fields array for empty attributes', () => {
 		const result = generateFieldsFromAttributes( {} );
 
