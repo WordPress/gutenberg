@@ -121,7 +121,8 @@ export function PrivateBlockToolbar( {
 
 		const _isZoomOut = isZoomOut();
 		const _isSectionBlock = isSectionBlock( selectedBlockClientId );
-		const _showSwitchSectionStyleButton = _isZoomOut || _isSectionBlock;
+		const _showSwitchSectionStyleButton =
+			_isZoomOut || _isSectionBlock || editingMode === 'contentOnly';
 
 		const _currentDeviceType =
 			getSettings()?.[ deviceTypeKey ]?.toLowerCase() || 'desktop';
