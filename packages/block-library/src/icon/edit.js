@@ -14,7 +14,6 @@ import {
 	ToolbarGroup,
 	__experimentalToolsPanel as ToolsPanel,
 	__experimentalToolsPanelItem as ToolsPanelItem,
-	Placeholder,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -33,10 +32,32 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { SVG, Rect, Path } from '@wordpress/primitives';
+
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
 import { unlock } from '../lock-unlock';
+
+const IconPlaceholder = ( { className, style } ) => (
+	<SVG
+		xmlns="http://www.w3.org/2000/svg"
+		viewBox="0 0 60 60"
+		preserveAspectRatio="none"
+		fill="none"
+		aria-hidden="true"
+		className={ clsx( 'wp-block-icon__placeholder', className ) }
+		style={ style }
+	>
+		<Rect width="60" height="60" fill="currentColor" fillOpacity={ 0.1 } />
+		<Path
+			vectorEffect="non-scaling-stroke"
+			stroke="currentColor"
+			strokeOpacity={ 0.25 }
+			d="M60 60 0 0"
+		/>
+	</SVG>
+);
 
 export function Edit( { attributes, setAttributes } ) {
 	const { icon, ariaLabel } = attributes;
@@ -165,8 +186,7 @@ export function Edit( { attributes, setAttributes } ) {
 						} }
 					/>
 				) : (
-					<Placeholder
-						withIllustration
+					<IconPlaceholder
 						className={ clsx(
 							borderProps.className,
 							spacingProps.className,
@@ -176,7 +196,7 @@ export function Edit( { attributes, setAttributes } ) {
 							...borderProps.style,
 							...spacingProps.style,
 							...dimensionsProps.style,
-							aspectRatio: '1',
+							height: 'auto',
 						} }
 					/>
 				) }
