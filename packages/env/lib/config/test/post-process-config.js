@@ -274,6 +274,54 @@ describe( 'postProcessConfig', () => {
 				},
 			} );
 		} );
+
+		it( 'should not add port to URLs when preserveSiteUrl is true', () => {
+			const processed = postProcessConfig( {
+				env: {
+					development: {
+						port: 123,
+						preserveSiteUrl: true,
+						config: {
+							WP_TESTS_DOMAIN: 'https://wp.local',
+							WP_SITEURL: 'https://wp.local',
+							WP_HOME: 'https://wp.local',
+						},
+					},
+					tests: {
+						port: 456,
+						preserveSiteUrl: true,
+						config: {
+							WP_TESTS_DOMAIN: 'https://wp.local',
+							WP_SITEURL: 'https://wp.local',
+							WP_HOME: 'https://wp.local',
+						},
+					},
+				},
+			} );
+
+			expect( processed ).toEqual( {
+				env: {
+					development: {
+						port: 123,
+						preserveSiteUrl: true,
+						config: {
+							WP_TESTS_DOMAIN: 'https://wp.local',
+							WP_SITEURL: 'https://wp.local',
+							WP_HOME: 'https://wp.local',
+						},
+					},
+					tests: {
+						port: 456,
+						preserveSiteUrl: true,
+						config: {
+							WP_TESTS_DOMAIN: 'https://wp.local',
+							WP_SITEURL: 'https://wp.local',
+							WP_HOME: 'https://wp.local',
+						},
+					},
+				},
+			} );
+		} );
 	} );
 
 	describe( 'validatePortUniqueness', () => {

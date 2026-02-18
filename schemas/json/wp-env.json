@@ -70,6 +70,11 @@
 				"multisite": {
 					"description": "Whether to set up a multisite installation.",
 					"type": "boolean"
+				},
+				"preserveSiteUrl": {
+					"description": "Whether to prevent port number from being appended to the site URL.",
+					"type": "boolean",
+					"default": false
 				}
 			}
 		},
@@ -83,7 +88,8 @@
 				"config",
 				"mappings",
 				"phpmyadminPort",
-				"multisite"
+				"multisite",
+				"preserveSiteUrl"
 			]
 		}
 	},

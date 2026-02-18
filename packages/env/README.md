@@ -599,6 +599,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"phpmyadminPort"`   | `integer`      | `null`                                 | The port number for phpMyAdmin. If provided, you'll access phpMyAdmin through: http://localhost:<port>                           |
 | `"multisite"`        | `boolean`      | `false`                                | Whether to set up a multisite installation.                                                                                      |
 | `"lifecycleScripts"` | `Object`       | `"{}"`                                 | Mapping of commands that should be executed at certain points in the lifecycle.                                                   |
+| `"preserveSiteUrl"`  | `boolean`      | `false`                                | Whether to prevent port number from being appended to the site URL.                                                      |
 
 _Note: the port number environment variable (`WP_ENV_PORT`) takes precedence over the .wp-env.json value._
 
@@ -659,6 +660,20 @@ WP_HOME: 'http://localhost',
 These can be overridden by setting a value within the `config` configuration. Setting it to `null` will prevent the constant being defined entirely.
 
 The values referencing a URL include the specified port. So if you set `port: 2000`, `WP_HOME` (for example) will be `http://localhost:2000`.
+
+You can prevent port number from being appended to the site URL by setting the `preserveSiteUrl` option to `true`:
+
+```json
+{
+  "preserveSiteUrl": true,
+  "config": {
+    "WP_SITEURL": "https://wp.local",
+    "WP_HOME": "https://wp.local"
+  }
+}
+```
+
+This is useful when working with custom domains and HTTPS setups where port appending would break functionality.
 
 ## Lifecycle Scripts
 

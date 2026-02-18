@@ -46,16 +46,17 @@ const mergeConfigs = require( './merge-configs' );
  * The environment-specific configuration options. (development/tests/etc)
  *
  * @typedef WPEnvironmentConfig
- * @property {WPSource}                  coreSource     The WordPress installation to load in the environment.
- * @property {WPSource[]}                pluginSources  Plugins to load in the environment.
- * @property {WPSource[]}                themeSources   Themes to load in the environment.
- * @property {number}                    port           The port to use.
- * @property {number}                    mysqlPort      The port to use for MySQL. Random if empty.
- * @property {number}                    phpmyadminPort The port to use for phpMyAdmin. If empty, disabled phpMyAdmin.
- * @property {boolean}                   multisite      Whether to set up a multisite installation.
- * @property {Object}                    config         Mapping of wp-config.php constants to their desired values.
- * @property {Object.<string, WPSource>} mappings       Mapping of WordPress directories to local directories which should be mounted.
- * @property {string|null}               phpVersion     Version of PHP to use in the environments, of the format 0.0.
+ * @property {WPSource}                  coreSource      The WordPress installation to load in the environment.
+ * @property {WPSource[]}                pluginSources   Plugins to load in the environment.
+ * @property {WPSource[]}                themeSources    Themes to load in the environment.
+ * @property {number}                    port            The port to use.
+ * @property {number}                    mysqlPort       The port to use for MySQL. Random if empty.
+ * @property {number}                    phpmyadminPort  The port to use for phpMyAdmin. If empty, disabled phpMyAdmin.
+ * @property {boolean}                   multisite       Whether to set up a multisite installation.
+ * @property {boolean}                   preserveSiteUrl Whether to prevent port number from being appended to the site URL.
+ * @property {Object}                    config          Mapping of wp-config.php constants to their desired values.
+ * @property {Object.<string, WPSource>} mappings        Mapping of WordPress directories to local directories which should be mounted.
+ * @property {string|null}               phpVersion      Version of PHP to use in the environments, of the format 0.0.
  */
 
 /**
@@ -91,6 +92,7 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	mysqlPort: null,
 	phpmyadminPort: null,
 	multisite: false,
+	preserveSiteUrl: false,
 	mappings: {},
 	config: {
 		FS_METHOD: 'direct',
@@ -587,6 +589,10 @@ async function parseEnvironmentConfig(
 			},
 			{}
 		);
+	}
+
+	if ( config.preserveSiteUrl !== undefined ) {
+		parsedConfig.preserveSiteUrl = config.preserveSiteUrl;
 	}
 
 	return parsedConfig;
