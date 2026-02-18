@@ -52,7 +52,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@ariakit/react": "^0.4.15",
+		"@ariakit/react": "^0.4.21",
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
@@ -80,7 +80,7 @@
 	"devDependencies": {
 		"@storybook/addon-docs": "^10.1.11",
 		"@storybook/react-vite": "^10.1.11",
-		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/jest-dom": "^6.9.1",
 		"@types/jest": "^29.5.14",
 		"esbuild": "^0.27.2",
 		"storybook": "^10.1.11"

@@ -303,6 +303,12 @@ if ( ! class_exists( 'WP_Style_Engine' ) ) {
 					),
 					'path'          => array( 'typography', 'textDecoration' ),
 				),
+				'textIndent'     => array(
+					'property_keys' => array(
+						'default' => 'text-indent',
+					),
+					'path'          => array( 'typography', 'textIndent' ),
+				),
 				'textTransform'  => array(
 					'property_keys' => array(
 						'default' => 'text-transform',

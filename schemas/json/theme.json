@@ -637,6 +637,20 @@
 							"type": "boolean",
 							"default": false
 						},
+						"textIndent": {
+							"description": "Allow users to set custom line indent.",
+							"oneOf": [
+								{
+									"type": "boolean",
+									"enum": [ false ]
+								},
+								{
+									"type": "string",
+									"enum": [ "subsequent", "all" ]
+								}
+							],
+							"default": "subsequent"
+						},
 						"textAlign": {
 							"description": "Allow users to set the text align.",
 							"type": "boolean",
@@ -1730,6 +1744,13 @@
 						},
 						"lineHeight": {
 							"description": "Sets the `line-height` CSS property.",
+							"oneOf": [
+								{ "type": "string" },
+								{ "$ref": "#/definitions/refComplete" }
+							]
+						},
+						"textIndent": {
+							"description": "Sets the `text-indent` CSS property.",
 							"oneOf": [
 								{ "type": "string" },
 								{ "$ref": "#/definitions/refComplete" }

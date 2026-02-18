@@ -36,6 +36,11 @@ const meta: Meta< typeof RadioControl > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'global',
+			notes: 'Will be superseded by `RadioGroupControl` in `@wordpress/ui`, but continue using for now.',
+		},
 	},
 };
 export default meta;

@@ -1,4 +1,4 @@
-import { Fragment, useState } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { cog } from '@wordpress/icons';
 import { Button } from '../index';
@@ -166,8 +166,7 @@ export const Loading: Story = {
 
 /**
  * The pressed state is only available for buttons with `tone="neutral"` and
- * `variant="minimal"`. This represents a toggle button that is currently in an
- * active/pressed state.
+ * `variant="minimal"` and can be toggled via the `aria-pressed` HTML attribute.
  */
 export const Pressed: Story = {
 	...Default,
@@ -175,18 +174,6 @@ export const Pressed: Story = {
 		...Default.args,
 		tone: 'neutral',
 		variant: 'minimal',
-	},
-	render: ( args ) => {
-		const [ isPressed, setIsPressed ] = useState( true );
-
-		return (
-			<Button
-				{ ...args }
-				aria-pressed={ isPressed }
-				onClick={ () => setIsPressed( ! isPressed ) }
-			>
-				Button
-			</Button>
-		);
+		'aria-pressed': true,
 	},
 };

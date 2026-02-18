@@ -51,9 +51,14 @@ export function markEntityAsSaved( ydoc: CRDTDoc ): void {
 	recordMeta.set( SAVED_BY_KEY, ydoc.clientID );
 }
 
+function pseudoRandomID(): number {
+	return Math.floor( Math.random() * 1000000000 );
+}
+
 export function serializeCrdtDoc( crdtDoc: CRDTDoc ): string {
 	return JSON.stringify( {
 		document: buffer.toBase64( Y.encodeStateAsUpdateV2( crdtDoc ) ),
+		updateId: pseudoRandomID(), // helps with debugging
 	} );
 }
 
@@ -76,47 +81,10 @@ export function deserializeCrdtDoc(
 		// Overwrite the client ID (which is from a previous session) with a random
 		// client ID. Deserialized documents should not be used directly. Instead,
 		// their state should be applied to another in-use document.
-		ydoc.clientID = Math.floor( Math.random() * 1000000000 );
+		ydoc.clientID = pseudoRandomID();
 
 		return ydoc;
 	} catch ( e ) {
 		return null;
 	}
-}
-
-export function getRecordValue< RecordType, Key extends keyof RecordType >(
-	obj: unknown,
-	key: Key
-): RecordType[ Key ] | null {
-	if ( 'object' === typeof obj && null !== obj && key in obj ) {
-		return ( obj as RecordType )[ key ];
-	}
-
-	return null;
-}
-
-export function getTypedKeys< T extends object >( obj: T ): Array< keyof T > {
-	return Object.keys( obj ) as Array< keyof T >;
-}
-
-export function areMapsEqual< Key, Value >(
-	map1: Map< Key, Value >,
-	map2: Map< Key, Value >,
-	comparatorFn: ( value1: Value, value2: Value ) => boolean
-): boolean {
-	if ( map1.size !== map2.size ) {
-		return false;
-	}
-
-	for ( const [ key, value1 ] of map1.entries() ) {
-		if ( ! map2.has( key ) ) {
-			return false;
-		}
-
-		if ( ! comparatorFn( value1, map2.get( key )! ) ) {
-			return false;
-		}
-	}
-
-	return true;
 }

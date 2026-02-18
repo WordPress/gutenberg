@@ -138,18 +138,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-quick-edit-dataviews',
-		__( 'Data Views: add Quick Edit', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables access to a Quick Edit panel in the Site Editor Pages experience.', 'gutenberg' ),
-			'id'    => 'gutenberg-quick-edit-dataviews',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-dataviews-media-modal',
 		__( 'Data Views: new media modal', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -194,18 +182,6 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables the Workflow Palette for running workflows composed of abilities, from a unified interface.', 'gutenberg' ),
 			'id'    => 'gutenberg-workflow-palette',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-customizable-navigation-overlays',
-		__( 'Customizable Navigation Overlays', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables custom mobile overlay design and content control for Navigation blocks, allowing you to create flexible, professional menu experiences.', 'gutenberg' ),
-			'id'    => 'gutenberg-customizable-navigation-overlays',
 		)
 	);
 

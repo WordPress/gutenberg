@@ -354,3 +354,69 @@ export const getCurrentRevision = createRegistrySelector(
 		return revisions.find( ( r ) => r.id === revisionId ) ?? null;
 	}
 );
+
+/**
+ * Returns the currently selected note ID.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {undefined|number|'new'} The selected note ID, 'new' for the new note form, or undefined if none.
+ */
+export function getSelectedNote( state ) {
+	return state.selectedNote?.noteId;
+}
+
+/**
+ * Returns whether the selected note should be focused.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the selected note should be focused.
+ */
+export function isNoteFocused( state ) {
+	return !! state.selectedNote?.options?.focus;
+}
+
+/**
+ * Returns the previous revision (the one before the current revision).
+ * Used for diffing between revisions.
+ *
+ * @param {Object} state Global application state.
+ * @return {Object|null|undefined} The previous revision object, null if loading or no previous revision, or undefined if not in revisions mode.
+ */
+export const getPreviousRevision = createRegistrySelector(
+	( select ) => ( state ) => {
+		const currentRevisionId = getCurrentRevisionId( state );
+		if ( ! currentRevisionId ) {
+			return undefined;
+		}
+
+		const { type: postType, id: postId } = getCurrentPost( state );
+		const revisions = select( coreStore ).getRevisions(
+			'postType',
+			postType,
+			postId,
+			{ per_page: -1, context: 'edit' }
+		);
+		if ( ! revisions ) {
+			return null;
+		}
+
+		// Sort by date ascending (oldest first).
+		const sortedRevisions = [ ...revisions ].sort(
+			( a, b ) => new Date( a.date ) - new Date( b.date )
+		);
+
+		// Find current revision index.
+		const currentIndex = sortedRevisions.findIndex(
+			( r ) => r.id === currentRevisionId
+		);
+
+		// Return the previous revision (older one) if it exists.
+		if ( currentIndex > 0 ) {
+			return sortedRevisions[ currentIndex - 1 ];
+		}
+
+		return null;
+	}
+);

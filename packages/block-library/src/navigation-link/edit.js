@@ -37,7 +37,7 @@ import {
 	Controls,
 	LinkUI,
 	useEntityBinding,
-	MissingEntityHelpText,
+	getInvalidLinkHelpText,
 	useHandleLinkChange,
 	useIsInvalidLink,
 	InvalidDraftDisplay,
@@ -167,10 +167,11 @@ export default function NavigationLinkEdit( {
 	const { getBlocks } = useSelect( blockEditorStore );
 
 	// URL binding logic
-	const { hasUrlBinding, isBoundEntityAvailable } = useEntityBinding( {
-		clientId,
-		attributes,
-	} );
+	const { hasUrlBinding, isBoundEntityAvailable, entityRecord } =
+		useEntityBinding( {
+			clientId,
+			attributes,
+		} );
 
 	const handleLinkChange = useHandleLinkChange( {
 		clientId,
@@ -366,6 +367,7 @@ export default function NavigationLinkEdit( {
 	} );
 
 	const missingText = getMissingText( type );
+	const invalidLinkHelpText = getInvalidLinkHelpText();
 
 	return (
 		<>
@@ -390,7 +392,7 @@ export default function NavigationLinkEdit( {
 					) }
 				</ToolbarGroup>
 			</BlockControls>
-			<InspectorControls>
+			<InspectorControls group="content">
 				<Controls
 					attributes={ attributes }
 					setAttributes={ setAttributes }
@@ -400,7 +402,7 @@ export default function NavigationLinkEdit( {
 			<div { ...blockProps }>
 				{ hasMissingEntity && (
 					<VisuallyHidden id={ missingEntityDescriptionId }>
-						<MissingEntityHelpText type={ type } kind={ kind } />
+						{ invalidLinkHelpText }
 					</VisuallyHidden>
 				) }
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
@@ -461,6 +463,11 @@ export default function NavigationLinkEdit( {
 							ref={ linkUIref }
 							clientId={ clientId }
 							link={ attributes }
+							entity={ {
+								entityRecord,
+								hasBinding: hasUrlBinding,
+								isEntityAvailable: isBoundEntityAvailable,
+							} }
 							onClose={ () => {
 								setIsLinkOpen( false );
 								// If there is no link and no binding, remove the auto-inserted block.

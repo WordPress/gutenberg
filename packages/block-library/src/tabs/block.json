@@ -8,10 +8,7 @@
 	"version": "1.0.0",
 	"category": "design",
 	"textdomain": "default",
-	"allowedBlocks": [
-		"core/tabs-menu",
-		"core/tab-panels"
-	],
+	"allowedBlocks": [ "core/tabs-menu", "core/tab-panel" ],
 	"attributes": {
 		"activeTabIndex": {
 			"type": "number",
@@ -26,8 +23,12 @@
 		"align": true,
 		"anchor": true,
 		"color": {
-			"text": false,
-			"background": false
+			"text": true,
+			"background": true,
+			"__experimentalDefaultControls": {
+				"text": true,
+				"background": true
+			}
 		},
 		"layout": {
 			"default": {
@@ -56,63 +57,11 @@
 		},
 		"renaming": true
 	},
-	"example": {
-		"attributes": {
-			"className": "is-example"
-		},
-		"innerBlocks": [
-			{
-				"name": "core/tabs-menu",
-				"attributes": {},
-				"innerBlocks": [
-					{
-						"name": "core/tabs-menu-item",
-						"attributes": {}
-					}
-				]
-			},
-			{
-				"name": "core/tab-panels",
-				"attributes": {},
-				"innerBlocks": [
-					{
-						"name": "core/tab",
-						"attributes": {
-							"label": "Tab 1"
-						},
-						"innerBlocks": [
-							{
-								"name": "core/paragraph",
-								"attributes": {
-									"content": "Pariatur commodo sint mollit. Veniam Lorem labore voluptate fugiat. Ad nulla est labore cillum cillum qui nostrud do incididunt eiusmod."
-								}
-							}
-						]
-					},
-					{
-						"name": "core/tab",
-						"attributes": {
-							"label": "Tab 2"
-						}
-					},
-					{
-						"name": "core/tab",
-						"attributes": {
-							"label": "Tab 3"
-						}
-					}
-				]
-			}
-		]
-	},
 	"providesContext": {
 		"core/tabs-activeTabIndex": "activeTabIndex",
 		"core/tabs-editorActiveTabIndex": "editorActiveTabIndex"
 	},
-	"usesContext": [
-		"core/tabs-list",
-		"core/tabs-id"
-	],
+	"usesContext": [ "core/tabs-list", "core/tabs-id" ],
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css",

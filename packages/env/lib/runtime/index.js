@@ -1,17 +1,17 @@
 'use strict';
 
 /**
- * External dependencies
- */
-const { existsSync } = require( 'fs' );
-const path = require( 'path' );
-
-/**
  * Internal dependencies
  */
 const DockerRuntime = require( './docker' );
 const PlaygroundRuntime = require( './playground' );
-const { UnsupportedCommandError } = require( './errors' );
+const {
+	UnsupportedCommandError,
+	EnvironmentNotInitializedError,
+} = require( './errors' );
+const { setCache, getCache } = require( '../cache' );
+
+const RUNTIME_CACHE_KEY = 'runtime';
 
 const runtimes = {
 	docker: DockerRuntime,
@@ -42,28 +42,50 @@ function getAvailableRuntimes() {
 }
 
 /**
- * Detect which runtime was used based on files in the work directory.
- * Returns 'playground' if playground-blueprint.json exists, otherwise 'docker'.
+ * Save the runtime type to the cache file.
+ * Called when start command initializes the environment.
+ *
+ * @param {string} runtimeName       The runtime name ('docker' or 'playground').
+ * @param {string} workDirectoryPath Path to the wp-env work directory.
+ */
+async function saveRuntime( runtimeName, workDirectoryPath ) {
+	await setCache( RUNTIME_CACHE_KEY, runtimeName, { workDirectoryPath } );
+}
+
+/**
+ * Get the saved runtime type from cache.
  *
  * @param {string} workDirectoryPath Path to the wp-env work directory.
- * @return {string} Runtime name ('docker' or 'playground').
+ * @return {Promise<string|undefined>} The saved runtime name, or undefined if not set.
  */
-function detectRuntime( workDirectoryPath ) {
-	const playgroundBlueprintFile = path.join(
-		workDirectoryPath,
-		'playground-blueprint.json'
-	);
-	if ( existsSync( playgroundBlueprintFile ) ) {
-		return 'playground';
+async function getSavedRuntime( workDirectoryPath ) {
+	return await getCache( RUNTIME_CACHE_KEY, { workDirectoryPath } );
+}
+
+/**
+ * Detect which runtime was used by reading from the cache.
+ * Throws EnvironmentNotInitializedError if no runtime has been saved.
+ *
+ * @param {string} workDirectoryPath Path to the wp-env work directory.
+ * @return {Promise<string>} Runtime name ('docker' or 'playground').
+ * @throws {EnvironmentNotInitializedError} If environment not initialized.
+ */
+async function detectRuntime( workDirectoryPath ) {
+	const savedRuntime = await getSavedRuntime( workDirectoryPath );
+	if ( ! savedRuntime ) {
+		throw new EnvironmentNotInitializedError();
 	}
-	return 'docker';
+	return savedRuntime;
 }
 
 module.exports = {
 	getRuntime,
 	getAvailableRuntimes,
 	detectRuntime,
+	saveRuntime,
+	getSavedRuntime,
 	DockerRuntime,
 	PlaygroundRuntime,
 	UnsupportedCommandError,
+	EnvironmentNotInitializedError,
 };

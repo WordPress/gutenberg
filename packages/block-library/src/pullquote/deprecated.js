@@ -68,6 +68,7 @@ function multilineToInline( value ) {
 	return values.join( '<br>' );
 }
 
+// Version 5 created in #43210 / c4b2ca7f3f. Supports match block.json at the time.
 const v5 = {
 	attributes: {
 		value: {
@@ -86,6 +87,51 @@ const v5 = {
 		},
 		textAlign: {
 			type: 'string',
+		},
+	},
+	supports: {
+		anchor: true,
+		align: [ 'left', 'right', 'wide', 'full' ],
+		color: {
+			gradients: true,
+			background: true,
+			link: true,
+			__experimentalDefaultControls: {
+				background: true,
+				text: true,
+			},
+		},
+		typography: {
+			fontSize: true,
+			lineHeight: true,
+			__experimentalFontFamily: true,
+			__experimentalFontWeight: true,
+			__experimentalFontStyle: true,
+			__experimentalTextTransform: true,
+			__experimentalTextDecoration: true,
+			__experimentalLetterSpacing: true,
+			__experimentalDefaultControls: {
+				fontSize: true,
+				fontAppearance: true,
+			},
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			style: true,
+			width: true,
+			__experimentalDefaultControls: {
+				color: true,
+				radius: true,
+				style: true,
+				width: true,
+			},
+		},
+		__experimentalStyle: {
+			typography: {
+				fontSize: '1.5em',
+				lineHeight: '1.6',
+			},
 		},
 	},
 	save( { attributes } ) {
@@ -119,9 +165,25 @@ const v5 = {
 
 // TODO: this is ripe for a bit of a clean up according to the example in https://developer.wordpress.org/block-editor/reference-guides/block-api/block-deprecation/#example
 
+// Version 4 created in #30951 / 92d36a4ea1. Supports match block.json at the time.
 const v4 = {
 	attributes: {
 		...blockAttributes,
+	},
+	supports: {
+		anchor: true,
+		align: [ 'left', 'right', 'wide', 'full' ],
+		color: {
+			gradients: true,
+			background: true,
+			link: true,
+		},
+		__experimentalBorder: {
+			color: true,
+			radius: true,
+			style: true,
+			width: true,
+		},
 	},
 	save( { attributes } ) {
 		const {

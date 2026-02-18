@@ -14,17 +14,19 @@ import { BlockBreadcrumb, BlockToolbar } from '@wordpress/block-editor';
 import { useViewportMatch } from '@wordpress/compose';
 import { useState, useCallback } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
+import { InlineNotices } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
-import EditorNotices from '../editor-notices';
+import TemplateValidationNotice from '../template-validation-notice';
 import Header from '../header';
 import InserterSidebar from '../inserter-sidebar';
 import ListViewSidebar from '../list-view-sidebar';
 import { RevisionsHeader, RevisionsCanvas } from '../post-revisions-preview';
+import { CollaboratorsOverlay } from '../collaborators-overlay';
 import SavePublishPanels from '../save-publish-panels';
 import TextEditor from '../text-editor';
 import VisualEditor from '../visual-editor';
@@ -44,6 +46,15 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
+const Notices = () => (
+	<InlineNotices
+		pinnedNoticesClassName="editor-notices__pinned"
+		dismissibleNoticesClassName="editor-notices__dismissible"
+	>
+		<TemplateValidationNotice />
+	</InlineNotices>
+);
+
 export default function EditorInterface( {
 	className,
 	children,
@@ -58,6 +69,8 @@ export default function EditorInterface( {
 } ) {
 	const {
 		mode,
+		postId,
+		postType,
 		isAttachment,
 		isInserterOpened,
 		isListViewOpened,
@@ -70,8 +83,12 @@ export default function EditorInterface( {
 		isRevisionsMode,
 	} = useSelect( ( select ) => {
 		const { get } = select( preferencesStore );
-		const { getEditorSettings, getPostTypeLabel, getCurrentPostType } =
-			select( editorStore );
+		const {
+			getEditorSettings,
+			getPostTypeLabel,
+			getCurrentPostType,
+			getCurrentPostId,
+		} = select( editorStore );
 		const {
 			getStylesPath,
 			getShowStylebook,
@@ -89,6 +106,8 @@ export default function EditorInterface( {
 
 		return {
 			mode: _mode,
+			postId: getCurrentPostId(),
+			postType: getCurrentPostType(),
 			isInserterOpened: select( editorStore ).isInserterOpened(),
 			isListViewOpened: select( editorStore ).isListViewOpened(),
 			isDistractionFree: get( 'core', 'distractionFree' ),
@@ -128,14 +147,22 @@ export default function EditorInterface( {
 		[ entitiesSavedStatesCallback ]
 	);
 
+	// Local state for diff toggle in revisions mode.
+	const [ showDiff, setShowDiff ] = useState( true );
+
 	// When in revisions mode, render the revisions interface.
 	if ( isRevisionsMode ) {
 		return (
 			<InterfaceSkeleton
 				className={ clsx( 'editor-editor-interface', className ) }
 				labels={ interfaceLabels }
-				header={ <RevisionsHeader /> }
-				content={ <RevisionsCanvas /> }
+				header={
+					<RevisionsHeader
+						showDiff={ showDiff }
+						onToggleDiff={ () => setShowDiff( ! showDiff ) }
+					/>
+				}
+				content={ <RevisionsCanvas showDiff={ showDiff } /> }
 				sidebar={ <ComplementaryArea.Slot scope="core" /> }
 			/>
 		);
@@ -164,7 +191,7 @@ export default function EditorInterface( {
 					/>
 				)
 			}
-			editorNotices={ <EditorNotices /> }
+			editorNotices={ <Notices /> }
 			secondarySidebar={
 				! isAttachment &&
 				! isPreviewMode &&
@@ -178,9 +205,7 @@ export default function EditorInterface( {
 			}
 			content={
 				<>
-					{ ! isDistractionFree && ! isPreviewMode && (
-						<EditorNotices />
-					) }
+					{ ! isDistractionFree && ! isPreviewMode && <Notices /> }
 					{ shouldShowMediaEditor && (
 						<MediaPreview { ...iframeProps } />
 					) }
@@ -210,6 +235,10 @@ export default function EditorInterface( {
 								/>
 							) }
 							{ children }
+							<CollaboratorsOverlay
+								postId={ postId }
+								postType={ postType }
+							/>
 						</>
 					) }
 				</>

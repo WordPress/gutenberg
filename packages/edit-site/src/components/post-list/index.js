@@ -12,8 +12,6 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { useSelect } from '@wordpress/data';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { __ } from '@wordpress/i18n';
-import { drawerRight } from '@wordpress/icons';
 import { useEvent, usePrevious } from '@wordpress/compose';
 import { addQueryArgs } from '@wordpress/url';
 import { useView } from '@wordpress/views';
@@ -31,9 +29,17 @@ import {
 
 import AddNewPostModal from '../add-new-post';
 import { unlock } from '../../lock-unlock';
-import { useEditPostAction } from '../dataviews-actions';
-import { defaultLayouts, getDefaultView } from './view-utils';
+import {
+	useEditPostAction,
+	useQuickEditPostAction,
+} from '../dataviews-actions';
+import {
+	defaultLayouts,
+	DEFAULT_VIEW,
+	getActiveViewOverridesForTab,
+} from './view-utils';
 import useNotesCount from './use-notes-count';
+import { QuickEditModal } from './quick-edit-modal';
 
 const { usePostActions, usePostFields } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
@@ -54,17 +60,17 @@ export default function PostList( { postType } ) {
 	const { path, query } = useLocation();
 	const { activeView = 'all', postId, quickEdit = false } = query;
 	const history = useHistory();
-	const postTypeObject = useSelect(
-		( select ) => {
-			const { getPostType } = select( coreStore );
-			return getPostType( postType );
-		},
-		[ postType ]
+	const defaultView = DEFAULT_VIEW;
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTab( activeView ),
+		[ activeView ]
 	);
 	const { view, updateView, isModified, resetToDefault } = useView( {
 		kind: 'postType',
 		name: postType,
-		slug: activeView,
+		slug: 'default',
+		defaultView,
+		activeViewOverrides,
 		queryParams: {
 			page: query.pageNumber,
 			search: query.search,
@@ -78,15 +84,14 @@ export default function PostList( { postType } ) {
 				} )
 			);
 		},
-		defaultView: getDefaultView( postTypeObject, activeView ),
 	} );
 
 	const onChangeView = useEvent( ( newView ) => {
+		updateView( newView );
 		if ( newView.type !== view.type ) {
 			// Retrigger the routing areas resolution.
 			history.invalidate();
 		}
-		updateView( newView );
 	} );
 
 	const [ selection, setSelection ] = useState( postId?.split( ',' ) ?? [] );
@@ -101,6 +106,10 @@ export default function PostList( { postType } ) {
 		},
 		[ path, history ]
 	);
+	useEffect( () => {
+		const newSelection = postId?.split( ',' ) ?? [];
+		setSelection( newSelection );
+	}, [ postId ] );
 
 	const fields = usePostFields( {
 		postType,
@@ -234,10 +243,15 @@ export default function PostList( { postType } ) {
 		context: 'list',
 	} );
 	const editAction = useEditPostAction();
-	const actions = useMemo(
-		() => [ editAction, ...postTypeActions ],
-		[ postTypeActions, editAction ]
-	);
+	const quickEditAction = useQuickEditPostAction();
+	const actions = useMemo( () => {
+		if ( view.type === LAYOUT_LIST ) {
+			const editActionPrimary = { ...editAction, isPrimary: true };
+			return [ editActionPrimary, ...postTypeActions ];
+		}
+
+		return [ editAction, quickEditAction, ...postTypeActions ];
+	}, [ view.type, editAction, quickEditAction, postTypeActions ] );
 
 	const [ showAddPostModal, setShowAddPostModal ] = useState( false );
 
@@ -247,23 +261,20 @@ export default function PostList( { postType } ) {
 		history.navigate( `/${ type }/${ id }?canvas=edit` );
 		closeModal();
 	};
+	const closeQuickEditModal = () => {
+		history.navigate(
+			addQueryArgs( path, {
+				...query,
+				quickEdit: undefined,
+			} )
+		);
+	};
 
 	return (
 		<Page
 			title={ labels?.name }
 			actions={
 				<>
-					{ isModified && (
-						<Button
-							__next40pxDefaultSize
-							onClick={ () => {
-								resetToDefault();
-								history.invalidate();
-							} }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
 					{ labels?.add_new_item && canCreateRecord && (
 						<>
 							<Button
@@ -303,26 +314,25 @@ export default function PostList( { postType } ) {
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
 				defaultLayouts={ defaultLayouts }
-				header={
-					window.__experimentalQuickEditDataViews &&
-					view.type !== LAYOUT_LIST &&
-					postType === 'page' && (
-						<Button
-							size="compact"
-							isPressed={ quickEdit }
-							icon={ drawerRight }
-							label={ __( 'Details' ) }
-							onClick={ () => {
-								history.navigate(
-									addQueryArgs( path, {
-										quickEdit: quickEdit ? undefined : true,
-									} )
-								);
-							} }
-						/>
-					)
+				onReset={
+					isModified
+						? () => {
+								resetToDefault();
+								history.invalidate();
+						  }
+						: false
 				}
 			/>
+			{ quickEdit &&
+				! isLoadingData &&
+				selection.length > 0 &&
+				view.type !== LAYOUT_LIST && (
+					<QuickEditModal
+						postType={ postType }
+						postId={ selection }
+						closeModal={ closeQuickEditModal }
+					/>
+				) }
 		</Page>
 	);
 }

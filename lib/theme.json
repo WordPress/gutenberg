@@ -308,6 +308,7 @@
 			"textAlign": true,
 			"textColumns": false,
 			"textDecoration": true,
+			"textIndent": "subsequent",
 			"textTransform": true,
 			"writingMode": false
 		},
@@ -320,6 +321,11 @@
 			"core/image": {
 				"lightbox": {
 					"allowEditing": true
+				}
+			},
+			"core/icon": {
+				"dimensions": {
+					"width": true
 				}
 			},
 			"core/pullquote": {
@@ -355,6 +361,11 @@
 							}
 						}
 					}
+				}
+			},
+			"core/icon": {
+				"dimensions": {
+					"width": "24px"
 				}
 			},
 			"core/site-logo": {

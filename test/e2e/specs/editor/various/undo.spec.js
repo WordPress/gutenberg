@@ -53,6 +53,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 0,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primaryShift+z' );
@@ -128,6 +130,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( '' );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 0,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primaryShift+z' );
@@ -221,6 +225,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( thirdBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 2,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primary+z' ); // Undo 3rd block.
@@ -237,6 +243,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( secondBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 1,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primary+z' ); // Undo 2nd block.
@@ -253,6 +261,8 @@ test.describe( 'undo', () => {
 		await expect.poll( editor.getEditedPostContent ).toBe( firstBlock );
 		await expect.poll( undoUtils.getSelection ).toEqual( {
 			blockIndex: 0,
+			startOffset: 0,
+			endOffset: 0,
 		} );
 
 		await pageUtils.pressKeys( 'primary+z' ); // Undo 1st block.

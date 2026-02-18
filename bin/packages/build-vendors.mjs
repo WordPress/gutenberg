@@ -1,9 +1,5 @@
 #!/usr/bin/env node
 
-/**
- * External dependencies
- */
-import { copyFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import esbuild from 'esbuild';
@@ -13,112 +9,100 @@ const ROOT_DIR = path.resolve( __dirname, '../..' );
 const BUILD_DIR = path.join( ROOT_DIR, 'build', 'scripts' );
 const VENDORS_DIR = path.join( BUILD_DIR, 'vendors' );
 
+const VENDOR_SCRIPTS = [
+	{
+		name: 'react',
+		global: 'React',
+		handle: 'react',
+	},
+	{
+		name: 'react-dom',
+		global: 'ReactDOM',
+		handle: 'react-dom',
+	},
+	{
+		name: 'react/jsx-runtime',
+		global: 'ReactJSXRuntime',
+		handle: 'react-jsx-runtime',
+	},
+];
+
 /**
- * Copy React and ReactDOM UMD files from node_modules.
- * These are pre-built browser-ready bundles that don't need processing.
+ * Bundle a vendor script from node_modules into an IIFE script.
+ * This is used to build packages like React that don't ship UMD builds.
+ *
+ * @param {Object} config        Vendor script configuration.
+ * @param {string} config.name   Package name (e.g., 'react', 'react-dom', 'react/jsx-runtime').
+ * @param {string} config.global Global variable name (e.g., 'React', 'ReactDOM').
+ * @param {string} config.handle WordPress script handle (e.g., 'react', 'react-dom').
+ * @return {Promise<void>} Promise that resolves when all builds are finished.
  */
-async function copyReactUMDFiles() {
-	console.log( '📦 Copying React UMD files...' );
+async function bundleVendorScript( config ) {
+	const { name, global, handle } = config;
 
-	const filesToCopy = [
-		{
-			from: 'node_modules/react/umd/react.development.js',
-			to: 'react.js',
-		},
-		{
-			from: 'node_modules/react/umd/react.production.min.js',
-			to: 'react.min.js',
-		},
-		{
-			from: 'node_modules/react-dom/umd/react-dom.development.js',
-			to: 'react-dom.js',
-		},
-		{
-			from: 'node_modules/react-dom/umd/react-dom.production.min.js',
-			to: 'react-dom.min.js',
-		},
-	];
+	// Plugin that externalizes the `react` package.
+	const reactExternalPlugin = {
+		name: 'react-external',
+		setup( build ) {
+			build.onResolve( { filter: /^react$/ }, ( args ) => {
+				if ( args.kind === 'entry-point' ) {
+					return null;
+				}
+				return {
+					path: 'react',
+					namespace: 'react-external',
+				};
+			} );
 
-	await mkdir( VENDORS_DIR, { recursive: true } );
+			build.onLoad(
+				{ filter: /.*/, namespace: 'react-external' },
+				() => ( {
+					contents: `module.exports = globalThis.React`,
+					loader: 'js',
+				} )
+			);
+		},
+	};
 
+	// Build both minified and non-minified versions
 	await Promise.all(
-		filesToCopy.map( ( { from, to } ) => {
-			const source = path.join( ROOT_DIR, from );
-			const dest = path.join( VENDORS_DIR, to );
-			return copyFile( source, dest );
+		[ false, true ].map( ( production ) => {
+			const outputFile = handle + ( production ? '.min.js' : '.js' );
+			return esbuild.build( {
+				entryPoints: [ name ],
+				outfile: path.join( VENDORS_DIR, outputFile ),
+				bundle: true,
+				format: 'iife',
+				globalName: global,
+				minify: production,
+				target: 'esnext', // Don't transpile, just bundle.
+				platform: 'browser',
+				plugins: [ reactExternalPlugin ],
+			} );
 		} )
 	);
-
-	console.log( '   ✔ Copied React UMD files' );
-}
-
-/**
- * Bundle react-jsx-runtime using esbuild.
- * Creates a browser-ready bundle that exposes ReactJSXRuntime global.
- */
-async function bundleReactJsxRuntime() {
-	console.log( '📦 Bundling react-jsx-runtime...' );
-
-	// Plugin to map React import to global window.React
-	const reactGlobalPlugin = {
-		name: 'react-global',
-		setup( build ) {
-			// Intercept imports of 'react' and provide window.React instead
-			build.onResolve( { filter: /^react$/ }, ( args ) => ( {
-				path: args.path,
-				namespace: 'react-global',
-			} ) );
-
-			build.onLoad( { filter: /.*/, namespace: 'react-global' }, () => ( {
-				contents: 'module.exports = window.React',
-				loader: 'js',
-			} ) );
-		},
-	};
-
-	const baseConfig = {
-		entryPoints: [ 'react/jsx-runtime' ],
-		bundle: true,
-		format: 'iife',
-		globalName: 'ReactJSXRuntime',
-		target: 'es2015',
-		platform: 'browser',
-		plugins: [ reactGlobalPlugin ],
-		banner: {
-			js: '/* React JSX Runtime - https://react.dev/ */\n',
-		},
-	};
-
-	await Promise.all( [
-		// Development build
-		esbuild.build( {
-			...baseConfig,
-			outfile: path.join( VENDORS_DIR, 'react-jsx-runtime.js' ),
-			minify: false,
-		} ),
-		// Production build
-		esbuild.build( {
-			...baseConfig,
-			outfile: path.join( VENDORS_DIR, 'react-jsx-runtime.min.js' ),
-			minify: true,
-		} ),
-	] );
-
-	console.log( '   ✔ Bundled react-jsx-runtime' );
 }
 
 /**
  * Main build function.
  */
 async function buildVendors() {
-	console.log( '🔨 Building vendor files...\n' );
+	console.log( '\n📦 Bundling vendor scripts...\n' );
 
-	const startTime = Date.now();
-
-	await Promise.all( [ copyReactUMDFiles(), bundleReactJsxRuntime() ] );
-
-	const totalTime = Date.now() - startTime;
-	console.log( `\n🎉 Vendor files built successfully! (${ totalTime }ms)` );
+	for ( const vendorConfig of VENDOR_SCRIPTS ) {
+		try {
+			const startTime = Date.now();
+			await bundleVendorScript( vendorConfig );
+			const buildTime = Date.now() - startTime;
+			console.log(
+				`   ✔ Bundled vendor ${ vendorConfig.name } (${ buildTime }ms)`
+			);
+		} catch ( error ) {
+			console.error(
+				`   ✘ Failed to bundle vendor ${ vendorConfig.name }: ${ error.message }`
+			);
+		}
+	}
 }
 
 buildVendors().catch( ( error ) => {

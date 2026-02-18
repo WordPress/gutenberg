@@ -72,7 +72,7 @@ function UnforwardedNumberControl(
 			version: '6.3',
 		} );
 	}
-	const inputRef = useRef< HTMLInputElement >();
+	const inputRef = useRef< HTMLInputElement >( null );
 	const mergedRef = useMergeRefs( [ inputRef, forwardedRef ] );
 
 	const isStepAny = step === 'any';

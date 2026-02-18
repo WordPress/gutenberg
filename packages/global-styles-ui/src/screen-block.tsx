@@ -5,7 +5,7 @@
 import { getBlockType } from '@wordpress/blocks';
 // @ts-expect-error: Not typed yet.
 import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
-import { useMemo } from '@wordpress/element';
+import { useContext, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import {
@@ -14,6 +14,10 @@ import {
 	__experimentalHasSplitBorders as hasSplitBorders,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import {
+	setStyle as setStyleHelper,
+	setSetting as setSettingHelper,
+} from '@wordpress/global-styles-engine';
 import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 
 /**
@@ -27,6 +31,7 @@ import {
 	VariationsPanel,
 } from './variations/variations-panel';
 import { useStyle, useSetting } from './hooks';
+import { GlobalStylesContext } from './context';
 import { unlock } from './lock-unlock';
 
 // Initial control values.
@@ -95,6 +100,9 @@ interface ScreenBlockProps {
 }
 
 function ScreenBlock( { name, variation }: ScreenBlockProps ) {
+	const { user: userConfig, onChange: onChangeGlobalStyles } =
+		useContext( GlobalStylesContext );
+
 	let prefixParts: string[] = [];
 	if ( variation ) {
 		prefixParts = [ 'variations', variation ].concat( prefixParts );
@@ -234,6 +242,34 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 			} );
 		}
 	};
+
+	const onChangeTypography = ( newStyle: any ) => {
+		// Extract settings if present (e.g., from textIndent toggle)
+		const { settings: newSettings, ...styleWithoutSettings } = newStyle;
+
+		// If there are settings changes, we need to update both styles and
+		// settings atomically to avoid race conditions.
+		if ( newSettings?.typography ) {
+			let updatedConfig = setStyleHelper(
+				userConfig,
+				prefix,
+				styleWithoutSettings,
+				name
+			);
+			updatedConfig = setSettingHelper(
+				updatedConfig,
+				'typography',
+				{
+					...userSettings.typography,
+					...newSettings.typography,
+				},
+				name
+			);
+			onChangeGlobalStyles( updatedConfig );
+		} else {
+			setStyle( styleWithoutSettings );
+		}
+	};
 	const onChangeBorders = ( newStyle: any ) => {
 		if ( ! newStyle?.border ) {
 			setStyle( newStyle );
@@ -307,8 +343,9 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				<StylesTypographyPanel
 					inheritedValue={ inheritedStyle }
 					value={ style }
-					onChange={ setStyle }
+					onChange={ onChangeTypography }
 					settings={ settings }
+					isGlobalStyles
 				/>
 			) }
 			{ hasDimensionsPanel && (

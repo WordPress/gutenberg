@@ -12,6 +12,17 @@ class UnsupportedCommandError extends Error {
 	}
 }
 
+/**
+ * Error thrown when the environment has not been initialized.
+ */
+class EnvironmentNotInitializedError extends Error {
+	constructor() {
+		super( 'Environment not initialized. Run `wp-env start` first.' );
+		this.name = 'EnvironmentNotInitializedError';
+	}
+}
+
 module.exports = {
 	UnsupportedCommandError,
+	EnvironmentNotInitializedError,
 };

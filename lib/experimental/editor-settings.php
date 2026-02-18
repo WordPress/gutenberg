@@ -19,9 +19,6 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 		wp_add_inline_script( 'wp-block-library', 'window.__experimentalDisableTinymce = true', 'before' );
 	}
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-quick-edit-dataviews', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalQuickEditDataViews = true', 'before' );
-	}
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-dataviews-media-modal', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDataViewsMediaModal = true', 'before' );
 	}
@@ -30,9 +27,6 @@ function gutenberg_enable_experiments() {
 	}
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-content-only-inspector-fields', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalContentOnlyInspectorFields = true', 'before' );
-	}
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-customizable-navigation-overlays', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalNavigationOverlays = true', 'before' );
 	}
 	if ( gutenberg_is_experiment_enabled( 'active_templates' ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalTemplateActivate = true', 'before' );

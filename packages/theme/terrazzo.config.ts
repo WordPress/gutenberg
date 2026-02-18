@@ -64,13 +64,6 @@ export default defineConfig( {
 			modeSelectors: [
 				{
 					tokens: [ 'wpds-dimension.*' ],
-					mode: '.',
-					selectors: [
-						"[data-wpds-theme-provider-id][data-wpds-density='default']",
-					],
-				},
-				{
-					tokens: [ 'wpds-dimension.*' ],
 					mode: 'compact',
 					selectors: [
 						"[data-wpds-theme-provider-id][data-wpds-density='compact']",
@@ -81,6 +74,13 @@ export default defineConfig( {
 					mode: 'comfortable',
 					selectors: [
 						"[data-wpds-theme-provider-id][data-wpds-density='comfortable']",
+					],
+				},
+				{
+					tokens: [ 'wpds-dimension.*' ],
+					mode: '.',
+					selectors: [
+						"[data-wpds-theme-provider-id][data-wpds-density='default']",
 					],
 				},
 				{
@@ -104,7 +104,7 @@ export default defineConfig( {
 				{
 					name: 'PaddingSize',
 					description: 'Size scale for padding tokens.',
-					patterns: [ /^wpds-dimension\.padding\.[^.]+\.([^.]+)$/ ],
+					patterns: [ /^wpds-dimension\.padding\.([^.]+)$/ ],
 				},
 				{
 					name: 'GapSize',

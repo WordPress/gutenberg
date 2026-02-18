@@ -27,7 +27,7 @@ import {
 	fullscreen,
 	linkOff,
 } from '@wordpress/icons';
-import { prependHTTP } from '@wordpress/url';
+import { prependHTTPS } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -156,7 +156,7 @@ const ImageURLInputUI = ( {
 					)?.linkDestination || LINK_DESTINATION_CUSTOM;
 
 				onChangeUrl( {
-					href: prependHTTP( urlInput ),
+					href: prependHTTPS( urlInput ),
 					linkDestination: selectedDestination,
 					lightbox: { enabled: false },
 				} );

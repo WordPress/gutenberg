@@ -76,6 +76,15 @@ class PlaygroundRuntime {
 	}
 
 	/**
+	 * Get the warning message for cleanup confirmation.
+	 *
+	 * @return {string} Warning message.
+	 */
+	getCleanupWarningMessage() {
+		return 'WARNING! This will remove the WordPress Playground environment and all local files.';
+	}
+
+	/**
 	 * Start the WordPress Playground environment.
 	 *
 	 * @param {Object}  config          The wp-env config object.
@@ -351,6 +360,25 @@ class PlaygroundRuntime {
 	}
 
 	/**
+	 * Cleanup the WordPress Playground environment.
+	 *
+	 * For Playground, cleanup is the same as destroy since there are no
+	 * shared resources like Docker images to preserve.
+	 *
+	 * @param {Object} config          The wp-env config object.
+	 * @param {Object} options         Cleanup options.
+	 * @param {Object} options.spinner A CLI spinner which indicates progress.
+	 */
+	async cleanup( config, { spinner } ) {
+		await this.stop( config, { spinner } );
+
+		spinner.text = 'Removing local files.';
+		await rimraf( config.workDirectoryPath );
+
+		spinner.text = 'Cleaned up WordPress Playground environment.';
+	}
+
+	/**
 	 * Run a command in the Playground environment.
 	 *
 	 * @param {Object}   config            The wp-env config object.
@@ -367,21 +395,71 @@ class PlaygroundRuntime {
 	}
 
 	/**
-	 * Clean/reset the WordPress database.
+	 * Reset the WordPress database.
 	 *
 	 * @param {Object}  config          The wp-env config object.
-	 * @param {Object}  options         Clean options.
+	 * @param {Object}  options         Reset options.
 	 * @param {Object}  options.spinner A CLI spinner which indicates progress.
 	 * @param {boolean} options.debug   True if debug mode is enabled.
 	 */
 	async clean( config, { spinner, debug } ) {
-		spinner.text = 'Cleaning WordPress Playground environment.';
+		spinner.text = 'Resetting WordPress Playground environment.';
 
 		// For Playground, we restart the server to reset the database
 		await this.stop( config, { spinner } );
 		await this.start( config, { spinner, debug } );
 
-		spinner.text = 'Cleaned WordPress Playground environment.';
+		spinner.text = 'Reset WordPress Playground environment.';
+	}
+
+	/**
+	 * Get the status of the Playground environment.
+	 *
+	 * @param {Object} config          The wp-env config object.
+	 * @param {Object} options         Status options.
+	 * @param {Object} options.spinner A CLI spinner which indicates progress.
+	 * @return {Promise<Object>} Status object with environment information.
+	 */
+	async getStatus( config, { spinner } ) {
+		spinner.text = 'Getting environment status.';
+
+		const envConfig = config.env.development;
+		const port = envConfig.port || 8888;
+		const pidFile = path.join( config.workDirectoryPath, 'playground.pid' );
+
+		// Check if server is running.
+		let isRunning = false;
+
+		try {
+			const pidContent = await fs.readFile( pidFile, 'utf8' );
+			const pid = parseInt( pidContent.trim(), 10 );
+
+			// Check if process is still alive.
+			process.kill( pid, 0 );
+
+			// Check if server is responding.
+			await this._checkServer( port );
+			isRunning = true;
+		} catch {
+			// Process not running or server not responding.
+		}
+
+		return {
+			status: isRunning ? 'running' : 'stopped',
+			runtime: 'playground',
+			urls: {
+				development: isRunning ? `http://localhost:${ port }` : null,
+			},
+			ports: {
+				development: port,
+			},
+			config: {
+				multisite: envConfig.multisite,
+				xdebug: 'off',
+			},
+			configPath: config.configDirectoryPath,
+			installPath: config.workDirectoryPath,
+		};
 	}
 
 	/**

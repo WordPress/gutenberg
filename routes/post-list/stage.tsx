@@ -24,7 +24,6 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, useCallback } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
 import type { Post } from '@wordpress/core-data';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -32,6 +31,7 @@ import { __ } from '@wordpress/i18n';
 import { unlock } from '../lock-unlock';
 import {
 	getDefaultView,
+	getActiveViewOverridesForTab,
 	DEFAULT_VIEWS,
 	DEFAULT_LAYOUTS,
 	viewToQuery,
@@ -78,8 +78,13 @@ function PostList() {
 	);
 
 	const defaultView: View = useMemo( () => {
-		return getDefaultView( postTypeObject, slug );
-	}, [ postTypeObject, slug ] );
+		return getDefaultView( postTypeObject );
+	}, [ postTypeObject ] );
+
+	const activeViewOverrides = useMemo(
+		() => getActiveViewOverridesForTab( slug ),
+		[ slug ]
+	);
 
 	// Callback to handle URL query parameter changes
 	const handleQueryParamsChange = useCallback(
@@ -98,8 +103,9 @@ function PostList() {
 	const { view, isModified, updateView, resetToDefault } = useView( {
 		kind: 'postType',
 		name: postType,
-		slug,
+		slug: 'default-new',
 		defaultView,
+		activeViewOverrides,
 		queryParams: searchParams,
 		onChangeQueryParams: handleQueryParamsChange,
 	} );
@@ -270,32 +276,21 @@ function PostList() {
 			subTitle={ postTypeObject.labels?.description }
 			className={ `${ postTypeObject.name.toLowerCase() }-page` }
 			actions={
-				<>
-					{ isModified && (
-						<Button
-							variant="tertiary"
-							size="compact"
-							onClick={ onReset }
-						>
-							{ __( 'Reset view' ) }
-						</Button>
-					) }
-					{ labels?.add_new_item &&
-						canCreateRecord &&
-						postType !== 'attachment' && (
-							<Button
-								variant="primary"
-								onClick={ () => {
-									navigate( {
-										to: `/types/${ postType }/new`,
-									} );
-								} }
-								size="compact"
-							>
-								{ labels.add_new_item }
-							</Button>
-						) }
-				</>
+				labels?.add_new_item &&
+				canCreateRecord &&
+				postType !== 'attachment' && (
+					<Button
+						variant="primary"
+						onClick={ () => {
+							navigate( {
+								to: `/types/${ postType }/new`,
+							} );
+						} }
+						size="compact"
+					>
+						{ labels.add_new_item }
+					</Button>
+				)
 			}
 			hasPadding={ false }
 		>
@@ -335,6 +330,7 @@ function PostList() {
 				getItemId={ getItemId }
 				getItemLevel={ getItemLevel }
 				selection={ selection }
+				onReset={ isModified ? onReset : false }
 				onChangeSelection={ ( items: string[] ) => {
 					navigate( {
 						search: {

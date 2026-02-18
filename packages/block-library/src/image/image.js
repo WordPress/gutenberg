@@ -39,7 +39,13 @@ import {
 	privateApis as blockEditorPrivateApis,
 	BlockSettingsMenuControls,
 } from '@wordpress/block-editor';
-import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	createInterpolateElement,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { __, _x, sprintf, isRTL } from '@wordpress/i18n';
 import { getFilename } from '@wordpress/url';
 import { getBlockBindingsSource, switchToBlockType } from '@wordpress/blocks';
@@ -230,16 +236,16 @@ function ContentOnlyControls( {
 								lockTitleControls ? (
 									<>{ lockTitleControlsMessage }</>
 								) : (
-									<>
-										{ __(
-											'Describe the role of this image on the page.'
-										) }
-										<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
-											{ __(
-												'(Note: many devices and browsers do not display this text.)'
-											) }
-										</ExternalLink>
-									</>
+									createInterpolateElement(
+										__(
+											'Describe the role of this image on the page. <a>(Note: many devices and browsers do not display this text.)</a>'
+										),
+										{
+											a: (
+												<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute" />
+											),
+										}
+									)
 								)
 							}
 						/>
@@ -252,6 +258,7 @@ function ContentOnlyControls( {
 
 export default function Image( {
 	temporaryURL,
+	isSideloading,
 	attributes,
 	setAttributes,
 	isSingleSelected,
@@ -868,7 +875,9 @@ export default function Image( {
 									onSelectURL={ onSelectURL }
 									onError={ onUploadError }
 									onReset={ () => onSelectImage( undefined ) }
-									isUploading={ !! temporaryURL }
+									isUploading={
+										!! temporaryURL || isSideloading
+									}
 									emptyLabel={ __( 'Add image' ) }
 								/>
 							</ToolsPanelItem>
@@ -981,16 +990,16 @@ export default function Image( {
 						lockTitleControls ? (
 							<>{ lockTitleControlsMessage }</>
 						) : (
-							<>
-								{ __(
-									'Describe the role of this image on the page.'
-								) }
-								<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
-									{ __(
-										'(Note: many devices and browsers do not display this text.)'
-									) }
-								</ExternalLink>
-							</>
+							createInterpolateElement(
+								__(
+									'Describe the role of this image on the page. <a>(Note: many devices and browsers do not display this text.)</a>'
+								),
+								{
+									a: (
+										<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute" />
+									),
+								}
+							)
 						)
 					}
 				/>
@@ -1059,7 +1068,7 @@ export default function Image( {
 						...shadowProps.style,
 					} }
 				/>
-				{ temporaryURL && <Spinner /> }
+				{ ( temporaryURL || isSideloading ) && <Spinner /> }
 			</>
 		);
 

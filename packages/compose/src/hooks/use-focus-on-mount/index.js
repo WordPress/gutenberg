@@ -13,7 +13,7 @@ import useRefEffect from '../use-ref-effect';
  * Hook used to focus the first tabbable element on mount.
  *
  * @param {boolean | 'firstElement' | 'firstInputElement'} focusOnMount Focus on mount mode.
- * @return {import('react').RefCallback<HTMLElement>} Ref callback.
+ * @return {React.RefCallback<HTMLElement>} Ref callback.
  *
  * @example
  * ```js
@@ -48,8 +48,8 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 		} );
 	};
 
-	/** @type {import('react').MutableRefObject<ReturnType<setTimeout> | undefined>} */
-	const timerIdRef = useRef();
+	/** @type {React.MutableRefObject<ReturnType<setTimeout> | undefined>} */
+	const timerIdRef = useRef( undefined );
 
 	useEffect( () => {
 		focusOnMountRef.current = focusOnMount;

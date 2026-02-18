@@ -662,7 +662,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 				name: 'Search',
 			} )
 			.first()
-			.fill( 'Verse' );
+			.fill( 'Poetry' );
 		await page.getByRole( 'button', { name: 'Browse All' } ).click();
 
 		await expect(
@@ -672,7 +672,7 @@ test.describe( 'Inserting blocks (@firefox, @webkit)', () => {
 					name: 'Search',
 				} )
 				.first()
-		).toHaveValue( 'Verse' );
+		).toHaveValue( 'Poetry' );
 		await expect(
 			page.getByRole( 'listbox', { name: 'Blocks' } ).first()
 		).toHaveCount( 1 );

@@ -100,6 +100,18 @@ const textDecoration = {
 	},
 };
 
+const textIndent = {
+	name: 'textIndent',
+	generate: ( style: Style, options: StyleOptions ) => {
+		return generateRule(
+			style,
+			options,
+			[ 'typography', 'textIndent' ],
+			'textIndent'
+		);
+	},
+};
+
 const textTransform = {
 	name: 'textTransform',
 	generate: ( style: Style, options: StyleOptions ) => {
@@ -133,6 +145,7 @@ export default [
 	lineHeight,
 	textColumns,
 	textDecoration,
+	textIndent,
 	textTransform,
 	writingMode,
 ];

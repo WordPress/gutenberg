@@ -7,14 +7,8 @@ import {
 	privateApis as coreDataPrivateApis,
 	store as coreStore,
 } from '@wordpress/core-data';
-import { resolveSelect, useDispatch, useSelect } from '@wordpress/data';
-import {
-	Modal,
-	DropZone,
-	FormFileUpload,
-	Button,
-	SnackbarList,
-} from '@wordpress/components';
+import { resolveSelect, useDispatch } from '@wordpress/data';
+import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
 import type { View, Field, ActionButton } from '@wordpress/dataviews';
@@ -32,7 +26,7 @@ import {
 	mediaThumbnailField,
 	mimeTypeField,
 } from '@wordpress/media-fields';
-import { store as noticesStore } from '@wordpress/notices';
+import { store as noticesStore, SnackbarNotices } from '@wordpress/notices';
 import { isBlobURL } from '@wordpress/blob';
 
 /**
@@ -58,7 +52,6 @@ const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
 interface MediaUploadModalProps {
 	/**
 	 * Array of allowed media types.
-	 * @default ['image']
 	 */
 	allowedTypes?: string[];
 
@@ -153,7 +146,7 @@ interface MediaUploadModalProps {
  * @return JSX element or null
  */
 export function MediaUploadModal( {
-	allowedTypes = [ 'image' ],
+	allowedTypes,
 	multiple = false,
 	value,
 	onSelect,
@@ -175,20 +168,10 @@ export function MediaUploadModal( {
 			: [ String( value ) ];
 	} );
 
-	const {
-		createSuccessNotice,
-		createErrorNotice,
-		createInfoNotice,
-		removeNotice,
-	} = useDispatch( noticesStore );
+	const { createSuccessNotice, createErrorNotice, createInfoNotice } =
+		useDispatch( noticesStore );
 	// @ts-expect-error - invalidateResolution is not in the typed actions but is available at runtime
 	const { invalidateResolution } = useDispatch( coreStore );
-
-	// Get notices for this modal context
-	const notices = useSelect(
-		( select ) => select( noticesStore ).getNotices( NOTICES_CONTEXT ),
-		[]
-	);
 
 	// DataViews configuration - allow view updates
 	const [ view, setView ] = useState< View >( () => ( {
@@ -201,6 +184,9 @@ export function MediaUploadModal( {
 		page: 1,
 		perPage: 20,
 		filters: [],
+		layout: {
+			previewSize: 170,
+		},
 	} ) );
 
 	// Build query args based on view properties, similar to PostList
@@ -236,7 +222,7 @@ export function MediaUploadModal( {
 
 		// Base media type on allowedTypes if no filter is set
 		if ( ! filters.media_type ) {
-			filters.media_type = allowedTypes.includes( '*' )
+			filters.media_type = allowedTypes?.includes( '*' )
 				? undefined
 				: allowedTypes;
 		}
@@ -371,6 +357,19 @@ export function MediaUploadModal( {
 					}
 				);
 
+				// Auto-select the newly uploaded items
+				const uploadedIds = attachments
+					.map( ( attachment ) => String( attachment.id ) )
+					.filter( Boolean );
+
+				if ( multiple ) {
+					// In multiple mode, add to existing selection
+					setSelection( ( prev ) => [ ...prev, ...uploadedIds ] );
+				} else {
+					// In single mode, replace selection with the first uploaded item
+					setSelection( uploadedIds.slice( 0, 1 ) );
+				}
+
 				// Invalidate the entity records resolution to refresh the view
 				invalidateResolution( 'getEntityRecords', [
 					'postType',
@@ -379,7 +378,7 @@ export function MediaUploadModal( {
 				] );
 			}
 		},
-		[ createSuccessNotice, invalidateResolution, queryArgs ]
+		[ createSuccessNotice, invalidateResolution, queryArgs, multiple ]
 	);
 
 	// Shared upload error handler
@@ -467,10 +466,10 @@ export function MediaUploadModal( {
 
 	// Build accept attribute from allowedTypes
 	const acceptTypes = useMemo( () => {
-		if ( allowedTypes.includes( '*' ) ) {
+		if ( allowedTypes?.includes( '*' ) ) {
 			return undefined;
 		}
-		return allowedTypes.join( ',' );
+		return allowedTypes?.join( ',' );
 	}, [ allowedTypes ] );
 
 	if ( ! isOpen ) {
@@ -566,12 +565,9 @@ export function MediaUploadModal( {
 				searchLabel={ searchLabel }
 				itemListLabel={ __( 'Media items' ) }
 			/>
-			<SnackbarList
-				notices={ notices.filter(
-					( { type } ) => type === 'snackbar'
-				) }
+			<SnackbarNotices
 				className="media-upload-modal__snackbar"
-				onRemove={ ( id ) => removeNotice( id, NOTICES_CONTEXT ) }
+				context={ NOTICES_CONTEXT }
 			/>
 		</Modal>
 	);

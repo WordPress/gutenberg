@@ -96,7 +96,7 @@ const UnforwardedVisualLabel = (
 export const VisualLabel = forwardRef( UnforwardedVisualLabel );
 
 /**
- * `BaseControl` is a component used to generate labels and help text for components handling user inputs.
+ * `BaseControl` is a low-level component used to generate labels and help text for components handling user inputs.
  *
  * ```jsx
  * import { BaseControl, useBaseControlProps } from '@wordpress/components';

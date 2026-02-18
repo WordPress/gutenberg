@@ -29,6 +29,10 @@ const meta: Meta< typeof AnglePickerControl > = {
 			expanded: true,
 		},
 		docs: { canvas: { sourceState: 'shown' } },
+		componentStatus: {
+			status: 'stable',
+			whereUsed: 'editor',
+		},
 	},
 };
 

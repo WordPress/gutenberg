@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef, useRef, useEffect } from '@wordpress/element';
+import { forwardRef, useRef } from '@wordpress/element';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -25,14 +25,6 @@ const UnforwardedValidatedToggleControl = (
 	const validityTargetRef = useRef< HTMLInputElement >( null );
 	const mergedRefs = useMergeRefs( [ forwardedRef, validityTargetRef ] );
 
-	// TODO: Upstream limitation - The `required` attribute is not passed down to the input,
-	// so we need to set it manually.
-	useEffect( () => {
-		if ( validityTargetRef.current ) {
-			validityTargetRef.current.required = required ?? false;
-		}
-	}, [ required ] );
-
 	return (
 		<ControlWithError
 			required={ required }
@@ -40,7 +32,11 @@ const UnforwardedValidatedToggleControl = (
 			customValidity={ customValidity }
 			getValidityTarget={ () => validityTargetRef.current }
 		>
-			<ToggleControl ref={ mergedRefs } { ...restProps } />
+			<ToggleControl
+				ref={ mergedRefs }
+				required={ required }
+				{ ...restProps }
+			/>
 		</ControlWithError>
 	);
 };

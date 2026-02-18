@@ -2,8 +2,7 @@
 
 @layer wp-ui-components {
 	.input-layout {
-		/* TODO: Use padding tokens */
-		--wp-ui-input-layout-padding-inline: calc(var(--wpds-dimension-base) * 3);
+		--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-md);
 
 		display: flex;
 		height: 40px;
@@ -22,14 +21,12 @@
 		}
 
 		&.is-size-compact {
-			/* TODO: Use padding tokens */
-			--wp-ui-input-layout-padding-inline: calc(var(--wpds-dimension-base) * 2);
+			--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-sm);
 			height: 32px;
 		}
 
 		&.is-size-small {
-			/* TODO: Use padding tokens */
-			--wp-ui-input-layout-padding-inline: calc(var(--wpds-dimension-base) * 2);
+			--wp-ui-input-layout-padding-inline: var(--wpds-dimension-padding-sm);
 			height: 24px;
 		}
 
@@ -66,10 +63,10 @@
 		&.is-padding-minimal {
 			--wp-ui-input-layout-prefix-padding-start:
 				calc(var(--wp-ui-input-layout-padding-inline) -
-				var(--wpds-dimension-base));
+				var(--wpds-dimension-padding-xs));
 			--wp-ui-input-layout-suffix-padding-end:
 				calc(var(--wp-ui-input-layout-padding-inline) -
-				var(--wpds-dimension-base));
+				var(--wpds-dimension-padding-xs));
 		}
 
 		&.is-prefix {

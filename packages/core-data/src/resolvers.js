@@ -185,8 +185,8 @@ export const getEntityRecord =
 								transientConfig.read( recordWithTransients );
 						} );
 
-					// Load the entity record for syncing.
-					await getSyncManager()?.load(
+					// Load the entity record for syncing. Do not await promise.
+					void getSyncManager()?.load(
 						entityConfig.syncConfig,
 						objectType,
 						objectId,
@@ -217,6 +217,15 @@ export const getEntityRecord =
 									name,
 									key
 								),
+							// Handle sync connection status changes.
+							onStatusChange: ( status ) => {
+								dispatch.setSyncConnectionStatus(
+									kind,
+									name,
+									key,
+									status
+								);
+							},
 							// Refetch the current entity record from the database.
 							refetchRecord: async () => {
 								dispatch.receiveEntityRecords(
@@ -469,6 +478,14 @@ export const getEntityRecords =
 						entityConfig.syncConfig,
 						objectType,
 						{
+							onStatusChange: ( status ) => {
+								dispatch.setSyncConnectionStatus(
+									kind,
+									name,
+									null,
+									status
+								);
+							},
 							refetchRecords: async () => {
 								dispatch.receiveEntityRecords(
 									kind,
@@ -1253,4 +1270,16 @@ export const getEditorAssets =
 			path: '/wp-block-editor/v1/assets',
 		} );
 		dispatch.receiveEditorAssets( assets );
+	};
+
+/**
+ * Requests icons from the REST API.
+ */
+export const getIcons =
+	() =>
+	async ( { dispatch } ) => {
+		const icons = await apiFetch( {
+			path: '/wp/v2/icons',
+		} );
+		dispatch.receiveIcons( icons );
 	};

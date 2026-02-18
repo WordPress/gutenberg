@@ -171,6 +171,7 @@ div.dataviews-view-list {
 	.dataviews-view-list__field-wrapper {
 		min-height: $grid-unit-05 * 13; // Ensures title is centrally aligned when all fields are hidden
 		flex-grow: 1;
+		min-width: 0;
 	}
 
 	.dataviews-view-list__field {

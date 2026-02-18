@@ -33,6 +33,11 @@ const meta: Meta< typeof Draggable > = {
 	parameters: {
 		controls: { expanded: true },
 		docs: { source: { code: '' } },
+		componentStatus: {
+			status: 'use-with-caution',
+			whereUsed: 'global',
+			notes: 'May be deprecated.',
+		},
 	},
 };
 export default meta;

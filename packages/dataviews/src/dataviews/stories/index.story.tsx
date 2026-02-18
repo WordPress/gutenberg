@@ -119,6 +119,7 @@ export const LayoutGrid = {
 export const LayoutList = {
 	render: LayoutListComponent,
 	args: {
+		fullWidth: false,
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
@@ -129,6 +130,11 @@ export const LayoutList = {
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',
+		},
+		fullWidth: {
+			control: 'boolean',
+			description:
+				'Whether to use full width or a contained layout (400px)',
 		},
 		groupBy: {
 			control: 'boolean',
@@ -157,6 +163,7 @@ export const LayoutList = {
 export const LayoutActivity = {
 	render: LayoutActivityComponent,
 	args: {
+		fullWidth: false,
 		groupBy: false,
 		groupByLabel: true,
 		hasClickableItems: true,
@@ -167,6 +174,11 @@ export const LayoutActivity = {
 		backgroundColor: {
 			control: 'color',
 			description: 'Background color of the DataViews component',
+		},
+		fullWidth: {
+			control: 'boolean',
+			description:
+				'Whether to use full width or a contained layout (400px)',
 		},
 		groupBy: {
 			control: 'boolean',

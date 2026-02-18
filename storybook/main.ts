@@ -1,4 +1,9 @@
-import { type InlineConfig, mergeConfig, transformWithEsbuild } from 'vite';
+import {
+	type InlineConfig,
+	type PluginOption,
+	mergeConfig,
+	transformWithEsbuild,
+} from 'vite';
 import react from '@vitejs/plugin-react';
 import type { StorybookConfig } from '@storybook/react-vite';
 
@@ -12,6 +17,7 @@ const stories = [
 	//   both slow and redundant with individual component stories.
 	NODE_ENV === 'test' ? '' : './stories/playground/**/*.story.@(jsx|tsx)',
 	NODE_ENV === 'test' ? '' : './stories/**/*.mdx',
+	'./stories/design-system/**/*.story.@(ts|tsx)',
 	'../packages/block-editor/src/**/stories/*.story.@(js|jsx|tsx|mdx)',
 	'../packages/components/src/**/stories/*.story.@(jsx|tsx)',
 	'../packages/components/src/**/stories/*.mdx',
@@ -26,7 +32,7 @@ const stories = [
 	'../packages/ui/src/**/stories/*.story.@(ts|tsx)',
 ].filter( Boolean );
 
-export default {
+const config: StorybookConfig = {
 	core: {
 		disableTelemetry: true,
 	},
@@ -68,15 +74,15 @@ export default {
 			savePropValueAsString: true,
 		},
 	},
-	viteFinal: async ( config ) => {
-		return mergeConfig( config, {
+	viteFinal: async ( viteConfig ) => {
+		return mergeConfig( viteConfig, {
 			plugins: [
 				react( {
 					jsxImportSource: '@emotion/react',
 					babel: {
 						plugins: [ '@emotion/babel-plugin' ],
 					},
-				} ),
+				} ) as PluginOption,
 				{
 					name: 'load-js-files-as-jsx',
 					async transform( code: string, id: string ) {
@@ -88,6 +94,62 @@ export default {
 							loader: 'jsx',
 							jsx: 'automatic',
 						} );
+					},
+				},
+				// Stub the vips and wasm-vips packages for Storybook since they use WASM modules that Vite can't handle.
+				{
+					name: 'stub-vips',
+					enforce: 'pre',
+					resolveId( id: string ) {
+						// Stub @wordpress/vips imports.
+						if (
+							id === '@wordpress/vips' ||
+							id.startsWith( '@wordpress/vips/' )
+						) {
+							return '\0virtual:vips-stub';
+						}
+						// Stub wasm-vips imports.
+						if (
+							id === 'wasm-vips' ||
+							id.startsWith( 'wasm-vips/' )
+						) {
+							return '\0virtual:wasm-vips-stub';
+						}
+						// Stub WASM file imports.
+						if ( id.endsWith( '.wasm' ) ) {
+							return '\0virtual:wasm-stub';
+						}
+						return null;
+					},
+					load( id: string ) {
+						if ( id === '\0virtual:vips-stub' ) {
+							// Return a stub module with no-op exports for Storybook.
+							return `
+								export const setLocation = () => {};
+								export const cancelOperations = async () => false;
+								export const convertImageFormat = async () => new ArrayBuffer(0);
+								export const compressImage = async () => new ArrayBuffer(0);
+								export const resizeImage = async () => ({ buffer: new ArrayBuffer(0), width: 0, height: 0, originalWidth: 0, originalHeight: 0 });
+								export const rotateImage = async () => ({ buffer: new ArrayBuffer(0), width: 0, height: 0 });
+								export const hasTransparency = async () => false;
+								export const vipsConvertImageFormat = convertImageFormat;
+								export const vipsCompressImage = compressImage;
+								export const vipsResizeImage = resizeImage;
+								export const vipsRotateImage = rotateImage;
+								export const vipsHasTransparency = hasTransparency;
+								export const vipsCancelOperations = cancelOperations;
+								export const terminateVipsWorker = () => {};
+							`;
+						}
+						if ( id === '\0virtual:wasm-vips-stub' ) {
+							// Return a stub for wasm-vips default export.
+							return `export default () => Promise.resolve({});`;
+						}
+						if ( id === '\0virtual:wasm-stub' ) {
+							// Return empty string for WASM files.
+							return `export default '';`;
+						}
+						return null;
 					},
 				},
 			],
@@ -121,4 +183,6 @@ export default {
 			},
 		} satisfies InlineConfig );
 	},
-} satisfies StorybookConfig;
+};
+
+export default config;

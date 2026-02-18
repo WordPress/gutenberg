@@ -44,7 +44,9 @@
 	"types": "build-types",
 	"dependencies": {
 		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/data": "file:../data"
+		"@wordpress/components": "file:../components",
+		"@wordpress/data": "file:../data",
+		"clsx": "^2.1.1"
 	},
 	"devDependencies": {
 		"deep-freeze": "0.0.1"

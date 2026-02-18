@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import type { View } from '@wordpress/dataviews';
+import type { View, Filter } from '@wordpress/dataviews';
 
 export interface ViewConfig {
 	/**
@@ -25,6 +25,16 @@ export interface ViewConfig {
 	 * Default view configuration
 	 */
 	defaultView: View;
+
+	/**
+	 * View overrides applied on top of the persisted view but never persisted.
+	 * These represent tab-specific configuration (filters, sort) that should
+	 * override the persisted view settings.
+	 */
+	activeViewOverrides?: {
+		filters?: Filter[];
+		sort?: View[ 'sort' ];
+	};
 
 	/**
 	 * Optional query parameters from URL (page, search)

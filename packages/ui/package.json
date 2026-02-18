@@ -45,9 +45,11 @@
 	"dependencies": {
 		"@base-ui/react": "^1.0.0",
 		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/theme": "file:../theme",
@@ -56,7 +58,7 @@
 	"devDependencies": {
 		"@storybook/addon-docs": "^10.1.11",
 		"@storybook/react-vite": "^10.1.11",
-		"@testing-library/jest-dom": "^6.6.3",
+		"@testing-library/jest-dom": "^6.9.1",
 		"@types/jest": "^29.5.14",
 		"@types/node": "^20.17.10",
 		"storybook": "^10.1.11"

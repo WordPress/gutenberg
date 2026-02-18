@@ -108,9 +108,10 @@ export function focusCommentThread( commentId, container, additionalSelector ) {
 	}
 
 	// A thread without a commentId is a new comment thread.
-	const threadSelector = commentId
-		? `[role=treeitem][id="comment-thread-${ commentId }"]`
-		: '[role=treeitem]:not([id])';
+	const threadSelector =
+		commentId && commentId !== 'new'
+			? `[role=treeitem][id="comment-thread-${ commentId }"]`
+			: '[role=treeitem]:not([id])';
 	const selector = additionalSelector
 		? `${ threadSelector } ${ additionalSelector }`
 		: threadSelector;

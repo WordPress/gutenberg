@@ -1,8 +1,10 @@
 export * from './badge';
-export * from './box';
 export * from './button';
+export * as Dialog from './dialog';
 export * from './form/primitives';
 export * from './icon';
+export * from './icon-button';
 export * from './stack';
+export * as Tabs from './tabs';
 export * as Tooltip from './tooltip';
 export * from './visually-hidden';
