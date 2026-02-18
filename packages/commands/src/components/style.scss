@@ -121,8 +121,6 @@
 	[cmdk-root] > [cmdk-list] {
 		max-height: $palette-max-height; // Specific to not have commands overflow oddly.
 		overflow: auto;
-		-ms-overflow-style: none;
-		scrollbar-width: none;
 		scroll-padding-top: $grid-unit-10;
 		scroll-padding-bottom: $grid-unit-10;
 
