@@ -12,6 +12,7 @@ import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import NavigationMenuSelector from './navigation-menu-selector';
+import { useNavigationListViewContext } from './navigation-list-view-context';
 import { unlock } from '../../lock-unlock';
 
 const { useBlockDisplayTitle } = unlock( blockEditorPrivateApis );
@@ -19,17 +20,26 @@ const { useBlockDisplayTitle } = unlock( blockEditorPrivateApis );
 const actionLabel =
 	/* translators: %s: The name of a menu. */ __( "Switch to '%s'" );
 
-export default function NavigationListViewHeader( {
-	clientId,
-	blockEditingMode,
-	currentMenuId,
-	onSelectClassicMenu,
-	onSelectNavigationMenu,
-	onCreateNew,
-	createNavigationMenuIsSuccess,
-	createNavigationMenuIsError,
-	isManageMenusButtonDisabled,
-} ) {
+/**
+ * Header component for the navigation list view panel.
+ * Renders the block title and menu selector.
+ *
+ * @param {Object} props          Component props.
+ * @param {string} props.clientId Block client ID.
+ * @return {Element} The header component.
+ */
+export default function NavigationListViewHeader( { clientId } ) {
+	const {
+		currentMenuId,
+		blockEditingMode,
+		createNavigationMenuIsSuccess,
+		createNavigationMenuIsError,
+		onSelectClassicMenu,
+		onSelectNavigationMenu,
+		onCreateNew,
+		isManageMenusButtonDisabled,
+	} = useNavigationListViewContext();
+
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 		context: 'list-view',

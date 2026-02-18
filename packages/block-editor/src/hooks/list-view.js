@@ -63,10 +63,7 @@ export function ListViewPanel( { clientId, name } ) {
 			const parents = getBlockParents( clientId, false );
 			const _isNestedListView = parents.find( ( parentId ) => {
 				const parentName = getBlockName( parentId );
-				return (
-					parentName === 'core/navigation' ||
-					hasBlockSupport( parentName, 'listView' )
-				);
+				return hasBlockSupport( parentName, 'listView' );
 			} );
 
 			return {
@@ -86,6 +83,17 @@ export function ListViewPanel( { clientId, name } ) {
 
 	const showBlockTitle = isSelectionWithinCurrentSection;
 
+	// Get custom list view configuration from block type
+	const listViewConfig = blockType?.listView || {};
+	const {
+		blockSettingsMenu,
+		additionalBlockContent,
+		description: customDescription,
+		panelHeader: PanelHeader,
+	} = listViewConfig;
+
+	const description = customDescription || title;
+
 	return (
 		<InspectorControls group="list">
 			<PanelBody
@@ -93,6 +101,7 @@ export function ListViewPanel( { clientId, name } ) {
 				opened={ isOpened }
 				onToggle={ handleToggle }
 			>
+				{ PanelHeader && <PanelHeader clientId={ clientId } /> }
 				{ ! hasChildren && (
 					<p className="block-editor-block-inspector__no-blocks">
 						{ __( 'No items yet.' ) }
@@ -102,8 +111,10 @@ export function ListViewPanel( { clientId, name } ) {
 					key={ `${ clientId }-${ expandRevision }` }
 					rootClientId={ clientId }
 					isExpanded
-					description={ title }
+					description={ description }
 					showAppender
+					blockSettingsMenu={ blockSettingsMenu }
+					additionalBlockContent={ additionalBlockContent }
 					onSelect={ openListViewContentPanel }
 				/>
 			</PanelBody>

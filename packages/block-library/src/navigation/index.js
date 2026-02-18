@@ -15,6 +15,9 @@ import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import deprecated from './deprecated';
+import LeafMoreMenu from './edit/leaf-more-menu';
+import { AdditionalBlockContent } from './edit/additional-block-content';
+import NavigationListViewProviderWrapper from './edit/navigation-list-view-provider-wrapper';
 
 const { name } = metadata;
 
@@ -71,6 +74,11 @@ export const settings = {
 		}
 
 		return decodeEntities( navigation.title );
+	},
+	listView: {
+		blockSettingsMenu: LeafMoreMenu,
+		additionalBlockContent: AdditionalBlockContent,
+		panelHeader: NavigationListViewProviderWrapper,
 	},
 	deprecated,
 };
