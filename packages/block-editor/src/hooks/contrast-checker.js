@@ -93,6 +93,10 @@ export default function BlockColorContrastChecker( { clientId, name } ) {
 		[ name ]
 	);
 
+	function updateColors() {
+		setColors( getBlockElementColors( blockEl, blockType ) );
+	}
+
 	// There are so many things that can change the color of a block
 	// So we perform this check on every render.
 	useLayoutEffect( () => {
@@ -100,15 +104,19 @@ export default function BlockColorContrastChecker( { clientId, name } ) {
 			return;
 		}
 
-		function updateColors() {
-			setColors( getBlockElementColors( blockEl, blockType ) );
-		}
-
 		// Combine `useLayoutEffect` and two rAF calls to ensure that values are read
 		// after the current paint but before the next paint.
 		window.requestAnimationFrame( () =>
 			window.requestAnimationFrame( updateColors )
 		);
+	} );
+
+	// Runs in its own effect with dependencies so the observer is only
+	// recreated when the block element or block type changes.
+	useLayoutEffect( () => {
+		if ( ! blockEl || ! blockType ) {
+			return;
+		}
 
 		const observer = new window.MutationObserver( () => {
 			window.requestAnimationFrame( updateColors );
@@ -122,7 +130,7 @@ export default function BlockColorContrastChecker( { clientId, name } ) {
 		return () => {
 			observer.disconnect();
 		};
-	} );
+	}, [ blockEl, blockType ] );
 
 	return (
 		<ContrastChecker
