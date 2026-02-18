@@ -39,6 +39,7 @@ import {
 	ConvertToLinksModal,
 } from './convert-to-links-modal';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
+import { PageCreatorAppender } from './page-creator-appender';
 
 // We only show the edit option when page count is <= MAX_PAGE_COUNT
 // Performance of Navigation Links is not good past this value.
@@ -259,12 +260,14 @@ export default function PageListEdit( {
 		parentClientId,
 		hasDraggedChild,
 		isChildOfNavigation,
+		isSelected,
 	} = useSelect(
 		( select ) => {
 			const {
 				getBlockParentsByBlockName,
 				hasSelectedInnerBlock,
 				hasDraggedInnerBlock,
+				getSelectedBlockClientId,
 			} = select( blockEditorStore );
 			const blockParents = getBlockParentsByBlockName(
 				clientId,
@@ -282,6 +285,7 @@ export default function PageListEdit( {
 				hasSelectedChild: hasSelectedInnerBlock( clientId, true ),
 				hasDraggedChild: hasDraggedInnerBlock( clientId, true ),
 				parentClientId: navigationBlockParents[ 0 ],
+				isSelected: getSelectedBlockClientId() === clientId,
 			};
 		},
 		[ clientId ]
@@ -294,8 +298,14 @@ export default function PageListEdit( {
 		parentPageID,
 	} );
 
+	// Create a custom appender that allows creating new pages
+	const customAppender = () => (
+		<PageCreatorAppender parentPageID={ parentPageID } />
+	);
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		renderAppender: false,
+		renderAppender:
+			isChildOfNavigation && isSelected ? customAppender : false,
 		__unstableDisableDropZone: true,
 		templateLock: isChildOfNavigation ? false : 'all',
 		onInput: NOOP,

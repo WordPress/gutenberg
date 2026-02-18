@@ -61,3 +61,15 @@
 .wp-block-page-list__loading-indicator-container {
 	padding: $grid-unit-10 $grid-unit-15;
 }
+
+// Page creator appender styling
+.page-list-appender {
+	display: flex;
+	gap: $grid-unit-10;
+	align-items: center;
+	padding: $grid-unit-10;
+
+	&__button {
+		flex-shrink: 0;
+	}
+}
