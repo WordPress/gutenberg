@@ -14,7 +14,12 @@ import {
 	MenuItem,
 } from '@wordpress/components';
 import { isRTL, __, sprintf } from '@wordpress/i18n';
-import { chevronRight, chevronLeft, chevronDown } from '@wordpress/icons';
+import {
+	chevronRight,
+	chevronLeft,
+	chevronDown,
+	check,
+} from '@wordpress/icons';
 
 interface ScreenHeaderProps {
 	title: string;
@@ -73,7 +78,10 @@ export function ScreenHeader( {
 								onClick={ onBack }
 							/>
 							<Spacer>
-								<HStack spacing={ 2 } alignment="center">
+								<HStack
+									justify="space-between"
+									alignment="center"
+								>
 									<Heading
 										className="global-styles-ui-header"
 										level={ 2 }
@@ -91,11 +99,15 @@ export function ScreenHeader( {
 											) }
 											text={ getCurrentStateLabel() }
 											toggleProps={ {
-												size: 'compact',
+												__next40pxDefaultSize: true,
+												variant: 'tertiary',
+												iconPosition: 'right',
 											} }
 										>
 											{ ( { onClose } ) => (
-												<MenuGroup>
+												<MenuGroup
+													label={ __( 'State' ) }
+												>
 													{ stateOptions.map(
 														( option ) => (
 															<MenuItem
@@ -108,9 +120,11 @@ export function ScreenHeader( {
 																	);
 																	onClose();
 																} }
-																isPressed={
+																icon={
 																	selectedPseudoSelector ===
 																	option.value
+																		? check
+																		: null
 																}
 															>
 																{ option.label }
