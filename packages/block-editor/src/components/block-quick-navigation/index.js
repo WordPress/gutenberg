@@ -78,8 +78,7 @@ function BlockQuickNavigationItem( {
 		);
 
 	const blockType = getBlockType( blockName );
-	const blockTitle =
-		blockInformation?.title || blockType?.title || blockName;
+	const blockTitle = blockInformation?.title || blockType?.title || blockName;
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const hasChildren = childBlocks && childBlocks.length > 0;
