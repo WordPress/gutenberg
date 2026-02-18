@@ -3,7 +3,8 @@
 		"name": "core/navigation-overlay-close",
 		"isValid": true,
 		"attributes": {
-			"displayMode": "icon"
+			"displayMode": "icon",
+			"text": "Close"
 		},
 		"innerBlocks": []
 	}
