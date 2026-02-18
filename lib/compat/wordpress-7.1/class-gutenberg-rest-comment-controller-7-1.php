@@ -1,23 +1,34 @@
 <?php
 /**
- * A custom REST server for Gutenberg.
+ * REST API comment controller with reaction support for WordPress 7.1 compatibility.
+ *
+ * Extends the 6.9 comment controller to add support for the 'reaction'
+ * comment type, enabling emoji reactions on notes.
  *
  * @package gutenberg
- * @since   6.9.0
+ * @since   7.1.0
  */
 
-// Create a new class that extends WP_REST_Comments_Controller
-class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller {
+class Gutenberg_REST_Comment_Controller_7_1 extends Gutenberg_REST_Comment_Controller_6_9 {
+
+	/**
+	 * Checks whether the request type is a note or reaction.
+	 *
+	 * @param string $type The comment type from the request.
+	 * @return bool True if the type is 'note' or 'reaction'.
+	 */
+	protected function is_note_or_reaction( $type ) {
+		return in_array( $type, array( 'note', 'reaction' ), true );
+	}
 
 	public function get_items_permissions_check( $request ) {
-		$is_note         = 'note' === $request['type'];
+		$is_note         = $this->is_note_or_reaction( $request['type'] );
 		$is_edit_context = 'edit' === $request['context'];
 
 		if ( ! empty( $request['post'] ) ) {
 			foreach ( (array) $request['post'] as $post_id ) {
 				$post = get_post( $post_id );
 
-				// Note: This is only relevant change for the backport.
 				if ( $post && $is_note && ! $this->check_post_type_supports_notes( $post->post_type ) ) {
 					return new WP_Error(
 						'rest_comment_not_supported_post_type',
@@ -42,8 +53,6 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			}
 		}
 
-		// Re-map edit context capabilities when requesting `note` for a post.
-		// Note: This is only relevant change for the backport.
 		if ( $is_edit_context && $is_note && ! empty( $request['post'] ) ) {
 			foreach ( (array) $request['post'] as $post_id ) {
 				if ( ! current_user_can( 'edit_post', $post_id ) ) {
@@ -99,9 +108,8 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			return $comment;
 		}
 
-		// Re-map edit context capabilities when requesting `note` type.
-		// Note: This is only relevant change for the backport.
-		$edit_cap = 'note' === $comment->comment_type ? array( 'edit_comment', $comment->comment_ID ) : array( 'moderate_comments' );
+		// Re-map edit context capabilities when requesting `note` or `reaction` type.
+		$edit_cap = $this->is_note_or_reaction( $comment->comment_type ) ? array( 'edit_comment', $comment->comment_ID ) : array( 'moderate_comments' );
 		if ( ! empty( $request['context'] ) && 'edit' === $request['context'] && ! current_user_can( ...$edit_cap ) ) {
 			return new WP_Error(
 				'rest_forbidden_context',
@@ -132,9 +140,8 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 	}
 
 	public function create_item_permissions_check( $request ) {
-		$is_note = ! empty( $request['type'] ) && 'note' === $request['type'];
+		$is_note = ! empty( $request['type'] ) && $this->is_note_or_reaction( $request['type'] );
 
-		// Note: This is only relevant change for the backport.
 		if ( ! is_user_logged_in() && $is_note ) {
 			return new WP_Error(
 				'rest_comment_login_required',
@@ -152,18 +159,7 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 				);
 			}
 
-			/**
-			 * Filters whether comments can be created via the REST API without authentication.
-			 *
-			 * Enables creating comments for anonymous users.
-			 *
-			 * @since 4.7.0
-			 *
-			 * @param bool $allow_anonymous Whether to allow anonymous comments to
-			 *                              be created. Default `false`.
-			 * @param WP_REST_Request $request Request used to generate the
-			 *                                 response.
-			 */
+			/** This filter is documented in wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php */
 			$allow_anonymous = apply_filters( 'rest_allow_anonymous_comments', false, $request );
 
 			if ( ! $allow_anonymous ) {
@@ -175,7 +171,6 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			}
 		}
 
-		// Limit who can set comment `author`, `author_ip` or `status` to anything other than the default.
 		if ( isset( $request['author'] ) && get_current_user_id() !== $request['author'] && ! current_user_can( 'moderate_comments' ) ) {
 			return new WP_Error(
 				'rest_comment_invalid_author',
@@ -196,7 +191,6 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			}
 		}
 
-		// Note: This is only relevant change for the backport.
 		$edit_cap = $is_note ? array( 'edit_post', (int) $request['post'] ) : array( 'moderate_comments' );
 		if ( isset( $request['status'] ) && ! current_user_can( ...$edit_cap ) ) {
 			return new WP_Error(
@@ -225,7 +219,6 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		// Note: This is only relevant change for the backport.
 		if ( $is_note && ! $this->check_post_type_supports_notes( $post->post_type ) ) {
 			return new WP_Error(
 				'rest_comment_not_supported_post_type',
@@ -234,7 +227,6 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		// Note: This is only relevant change for the backport.
 		if ( 'draft' === $post->post_status && ! $is_note ) {
 			return new WP_Error(
 				'rest_comment_draft_post',
@@ -259,7 +251,6 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		// Note: This is only relevant change for the backport.
 		if ( ! comments_open( $post->ID ) && ! $is_note ) {
 			return new WP_Error(
 				'rest_comment_closed',
@@ -274,14 +265,15 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 	/**
 	 * Creates a comment.
 	 *
-	 * @since 4.7.0
+	 * Extends the 6.9 implementation to support 'reaction' comment type
+	 * with validation for parent note, valid emoji slugs, and uniqueness.
+	 *
+	 * @since 7.1.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Response|WP_Error Response object on success, or error object on failure.
 	 */
 	public function create_item( $request ) {
-		// This code is copied exactly from (core file name) except for sectioned marked with the comment.
-		// '// Note: This is only relevant change for the backport.'
 		if ( ! empty( $request['id'] ) ) {
 			return new WP_Error(
 				'rest_comment_exists',
@@ -290,14 +282,65 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		// Note: Removes non-default comment type check for the backport.
-		// Do not allow comments to be created with a non-core type.
-		if ( ! empty( $request['type'] ) && ! in_array( $request['type'], array( 'comment', 'note' ), true ) ) {
+		// Allow 'comment', 'note', and 'reaction' types.
+		if ( ! empty( $request['type'] ) && ! in_array( $request['type'], array( 'comment', 'note', 'reaction' ), true ) ) {
 			return new WP_Error(
 				'rest_invalid_comment_type',
 				__( 'Cannot create a comment with that type.', 'gutenberg' ),
 				array( 'status' => 400 )
 			);
+		}
+
+		// Validate reaction-specific requirements.
+		if ( ! empty( $request['type'] ) && 'reaction' === $request['type'] ) {
+			// Validate parent is a note.
+			if ( empty( $request['parent'] ) ) {
+				return new WP_Error(
+					'rest_comment_invalid_parent',
+					__( 'A reaction must have a parent note.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			$parent_comment = get_comment( $request['parent'] );
+			if ( ! $parent_comment || 'note' !== $parent_comment->comment_type ) {
+				return new WP_Error(
+					'rest_comment_invalid_parent',
+					__( 'A reaction must be attached to a note.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			// Validate content is a valid emoji slug.
+			$valid_slugs = array( 'heart', 'celebration', 'smile', 'eyes', 'rocket' );
+			$emoji_slug  = isset( $request['content'] ) ? wp_strip_all_tags( $request['content'] ) : '';
+			if ( ! in_array( $emoji_slug, $valid_slugs, true ) ) {
+				return new WP_Error(
+					'rest_comment_invalid_reaction',
+					__( 'Invalid reaction emoji.', 'gutenberg' ),
+					array( 'status' => 400 )
+				);
+			}
+
+			// Enforce uniqueness: prevent duplicate emoji per user per note.
+			$existing = get_comments(
+				array(
+					'parent'  => $request['parent'],
+					'user_id' => get_current_user_id(),
+					'type'    => 'reaction',
+					'status'  => 'any',
+				)
+			);
+
+			foreach ( $existing as $existing_reaction ) {
+				if ( wp_strip_all_tags( $existing_reaction->comment_content ) === $emoji_slug ) {
+					return new WP_Error(
+						'rest_comment_duplicate_reaction',
+						__( 'You have already reacted with this emoji.', 'gutenberg' ),
+						array( 'status' => 409 )
+					);
+				}
+			}
 		}
 
 		$prepared_comment = $this->prepare_item_for_database( $request );
@@ -378,9 +421,9 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		// Don't check for duplicates or flooding for notes.
+		// Don't check for duplicates or flooding for notes and reactions.
 		$prepared_comment['comment_approved'] =
-			'note' === $prepared_comment['comment_type'] ?
+			$this->is_note_or_reaction( $prepared_comment['comment_type'] ) ?
 			'1' :
 			wp_allow_comment( $prepared_comment, true );
 
@@ -407,19 +450,7 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			return $prepared_comment['comment_approved'];
 		}
 
-		/**
-		 * Filters a comment before it is inserted via the REST API.
-		 *
-		 * Allows modification of the comment right before it is inserted via wp_insert_comment().
-		 * Returning a WP_Error value from the filter will short-circuit insertion and allow
-		 * skipping further processing.
-		 *
-		 * @since 4.7.0
-		 * @since 4.8.0 `$prepared_comment` can now be a WP_Error to short-circuit insertion.
-		 *
-		 * @param array|WP_Error  $prepared_comment The prepared comment data for wp_insert_comment().
-		 * @param WP_REST_Request $request          Request used to insert the comment.
-		 */
+		/** This filter is documented in wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php */
 		$prepared_comment = apply_filters( 'rest_pre_insert_comment', $prepared_comment, $request );
 		if ( is_wp_error( $prepared_comment ) ) {
 			return $prepared_comment;
@@ -441,16 +472,7 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 
 		$comment = get_comment( $comment_id );
 
-		/**
-		 * Fires after a comment is created or updated via the REST API.
-		 *
-		 * @since 4.7.0
-		 *
-		 * @param WP_Comment      $comment  Inserted or updated comment object.
-		 * @param WP_REST_Request $request  Request object.
-		 * @param bool            $creating True when creating a comment, false
-		 *                                  when updating.
-		 */
+		/** This action is documented in wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php */
 		do_action( 'rest_insert_comment', $comment, $request, true );
 
 		$schema = $this->get_item_schema();
@@ -472,16 +494,7 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 		$context = current_user_can( 'moderate_comments' ) ? 'edit' : 'view';
 		$request->set_param( 'context', $context );
 
-		/**
-		 * Fires completely after a comment is created or updated via the REST API.
-		 *
-		 * @since 5.0.0
-		 *
-		 * @param WP_Comment      $comment  Inserted or updated comment object.
-		 * @param WP_REST_Request $request  Request object.
-		 * @param bool            $creating True when creating a comment, false
-		 *                                  when updating.
-		 */
+		/** This action is documented in wp-includes/rest-api/endpoints/class-wp-rest-comments-controller.php */
 		do_action( 'rest_after_insert_comment', $comment, $request, true );
 
 		$response = $this->prepare_item_for_response( $comment, $request );
@@ -494,41 +507,21 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 	}
 
 	/**
-	 * Check if post type supports block comments.
-	 *
-	 * @param string $post_type Post type name.
-	 * @return bool True if post type supports block comments, false otherwise.
-	 */
-	protected function check_post_type_supports_notes( $post_type ) {
-		$supports = get_all_post_type_supports( $post_type );
-		if ( ! isset( $supports['editor'] ) ) {
-			return false;
-		}
-		if ( ! is_array( $supports['editor'] ) ) {
-			return false;
-		}
-		foreach ( $supports['editor'] as $item ) {
-			if ( ! empty( $item['notes'] ) ) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * Prepares links for the request.
 	 *
-	 * @since 4.7.0
+	 * Extends the 6.9 implementation to also handle 'reaction' type
+	 * for children link embedding.
+	 *
+	 * @since 7.1.0
 	 *
 	 * @param WP_Comment $comment Comment object.
 	 * @return array Links for the given comment.
 	 */
 	protected function prepare_links( $comment ) {
-		$links = parent::prepare_links( $comment );
+		$links = WP_REST_Comments_Controller::prepare_links( $comment );
 
-		// Embedding children for notes requires `type` and `status` inheritance.
-		// Note: This is only relevant change for the backport.
-		if ( isset( $links['children'] ) && 'note' === $comment->comment_type ) {
+		// Embedding children for notes and reactions requires `type` and `status` inheritance.
+		if ( isset( $links['children'] ) && $this->is_note_or_reaction( $comment->comment_type ) ) {
 			$args = array(
 				'parent' => $comment->comment_ID,
 				'type'   => $comment->comment_type,
@@ -547,77 +540,35 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 	}
 
 	/**
-	 * Override the schema to change `type` property.
+	 * Checks if comment content is allowed.
 	 *
-	 * @return array
-	 */
-	public function get_item_schema() {
-		$schema                       = parent::get_item_schema();
-		$schema['properties']['type'] = array(
-			'description' => __( 'Type of the comment.', 'gutenberg' ),
-			'type'        => 'string',
-			'context'     => array( 'view', 'edit', 'embed' ),
-			'readonly'    => true,
-		);
-
-		return $schema;
-	}
-
-	/**
-	 * If empty comments are not allowed, checks if the provided comment content is not empty.
+	 * Extends the 6.9 implementation to also allow reaction content
+	 * (emoji slugs are always valid content).
 	 *
-	 * @since 6.9.0
+	 * @since 7.1.0
 	 *
 	 * @param array $prepared_comment The prepared comment data.
 	 * @return bool True if the content is allowed, false otherwise.
 	 */
 	protected function check_is_comment_content_allowed( $prepared_comment ) {
-		if ( ! isset( $prepared_comment['comment_content'] ) ) {
+		// Note reactions always have content (the emoji slug).
+		if ( isset( $prepared_comment['comment_type'] ) && 'reaction' === $prepared_comment['comment_type'] ) {
 			return true;
 		}
 
-		$check = wp_parse_args(
-			$prepared_comment,
-			array(
-				'comment_post_ID'      => 0,
-				'comment_author'       => null,
-				'comment_author_email' => null,
-				'comment_author_url'   => null,
-				'comment_parent'       => 0,
-				'user_id'              => 0,
-			)
-		);
-
-		/** This filter is documented in wp-includes/comment.php */
-		$allow_empty = apply_filters( 'allow_empty_comment', false, $check );
-
-		if ( $allow_empty ) {
-			return true;
-		}
-
-		// Allow empty block comments only when resolution metadata is valid [backport].
-		if (
-			isset( $check['comment_type'] ) &&
-			'note' === $check['comment_type'] &&
-			isset( $check['meta']['_wp_note_status'] ) &&
-			in_array( $check['meta']['_wp_note_status'], array( 'resolved', 'reopen' ), true )
-		) {
-			return true;
-		}
-
-		/*
-		 * Do not allow a comment to be created with missing or empty
-		 * comment_content. See wp_handle_comment_submission().
-		 */
-		return '' !== $check['comment_content'];
+		return parent::check_is_comment_content_allowed( $prepared_comment );
 	}
 }
 
 /**
- * Registers the Gutenberg REST comment controller for WordPress 6.9 compatibility.
+ * Registers the Gutenberg REST comment controller for WordPress 7.1 compatibility.
+ *
+ * Replaces the 6.9 controller registration to use the 7.1 controller
+ * which adds reaction support.
  */
-function gutenberg_register_comment_controller_6_9() {
-	$controller = new Gutenberg_REST_Comment_Controller_6_9();
+function gutenberg_register_comment_controller_7_1() {
+	$controller = new Gutenberg_REST_Comment_Controller_7_1();
 	$controller->register_routes();
 }
-add_action( 'rest_api_init', 'gutenberg_register_comment_controller_6_9' );
+remove_action( 'rest_api_init', 'gutenberg_register_comment_controller_6_9' );
+add_action( 'rest_api_init', 'gutenberg_register_comment_controller_7_1' );

@@ -1,0 +1,108 @@
+<?php
+/**
+ * Block comments compatibility for WordPress 7.1.
+ *
+ * Extends note-related block comment functions to also handle
+ * the 'reaction' comment type for emoji reactions on notes.
+ *
+ * @package gutenberg
+ */
+
+/**
+ * Updates the comment type for avatars to include reactions.
+ *
+ * Replaces the 6.9 implementation to also add the 'reaction' type
+ * to the list of comment types for which avatars should be retrieved.
+ *
+ * @param array $comment_type The array of comment types.
+ * @return array The updated array of comment types.
+ */
+function gutenberg_update_get_avatar_comment_type_7_1( $comment_type ) {
+	$comment_type[] = 'note';
+	$comment_type[] = 'reaction';
+	return $comment_type;
+}
+remove_filter( 'get_avatar_comment_types', 'update_get_avatar_comment_type' );
+add_filter( 'get_avatar_comment_types', 'gutenberg_update_get_avatar_comment_type_7_1' );
+
+/**
+ * Excludes block comments and reactions from the admin comments query.
+ *
+ * Replaces the 6.9 implementation to also exclude 'reaction' type.
+ *
+ * @global wpdb $wpdb WordPress database abstraction object.
+ *
+ * @param string[] $clauses The current SQL clauses for the comments query.
+ * @param WP_Comment_Query $query The current comments query.
+ *
+ * @return string[] The modified SQL clauses for the comments query.
+ */
+function gutenberg_exclude_block_comments_from_admin_7_1( $clauses, $query ) {
+	if ( isset( $query->query_vars['type'] ) && '' === $query->query_vars['type'] ) {
+		$query->set( 'type', '' );
+
+		global $wpdb;
+		$clauses['where'] .= " AND {$wpdb->comments}.comment_type != 'note' AND {$wpdb->comments}.comment_type != 'reaction'";
+	}
+
+	return $clauses;
+}
+remove_action( 'comments_clauses', 'exclude_block_comments_from_admin', 10 );
+add_action( 'comments_clauses', 'gutenberg_exclude_block_comments_from_admin_7_1', 10, 2 );
+
+/**
+ * Filter the comment count query to exclude notes and reactions.
+ *
+ * Replaces the 6.9 implementation to also exclude 'reaction' type.
+ *
+ * @param string $query The SQL query string.
+ * @return string The modified SQL query string.
+ */
+function gutenberg_filter_comment_count_query_exclude_block_comments_7_1( $query ) {
+	if ( str_starts_with( $query, 'SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM' ) && str_contains( $query, 'comment_approved' ) ) {
+		if ( ! str_contains( $query, "comment_type != 'note'" ) ) {
+			$query = str_replace( 'comment_approved', "comment_type != 'note' AND comment_type != 'reaction' AND comment_approved", $query );
+		}
+	}
+	return $query;
+}
+remove_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments' );
+add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comments_7_1' );
+
+/**
+ * Adjusts the comments list table query so notes and reactions never display.
+ *
+ * Replaces the 6.9 implementation to also handle 'reaction' type.
+ *
+ * @param array $args An array of get_comments() arguments.
+ * @return array Possibly modified arguments for get_comments().
+ */
+function gutenberg_hide_note_from_comment_list_table_7_1( $args ) {
+	if ( ! empty( $_REQUEST['comment_type'] ) && in_array( $_REQUEST['comment_type'], array( 'note', 'reaction' ), true ) ) {
+		unset( $args['type'] );
+	}
+	return $args;
+}
+remove_filter( 'comments_list_table_query_args', 'gutenberg_hide_note_from_comment_list_table' );
+add_filter( 'comments_list_table_query_args', 'gutenberg_hide_note_from_comment_list_table_7_1' );
+
+/**
+ * Override comment_count to exclude notes and reactions from the comment count.
+ *
+ * Replaces the 6.9 implementation to also exclude 'reaction' type.
+ *
+ * @param int|null $new     The new comment count. Default null.
+ * @param int      $old     The old comment count.
+ * @param int      $post_id Post ID.
+ * @return int|null The modified comment count.
+ */
+function gutenberg_exclude_notes_from_comment_count_7_1( $new_count, $old_count, $post_id ) {
+	global $wpdb;
+	if ( null !== $new_count ) {
+		return $new_count;
+	}
+	$new_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_approved = '1' AND comment_type != 'note' AND comment_type != 'reaction'", $post_id ) );
+	return $new_count;
+}
+remove_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count', 10 );
+add_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count_7_1', 10, 3 );
