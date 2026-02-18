@@ -64,12 +64,12 @@ export const Initials: Story = {
 export const Badge: Story = {
 	args: {
 		...WithBorderColor.args,
-		badge: true,
+		variant: 'badge',
 	},
 	parameters: {
 		docs: {
 			description: {
-				story: 'When `badge` is true, hovering the avatar expands a pill that reveals the name. Use the `label` prop to override the visible text.',
+				story: 'The `badge` variant displays a hover-expand pill that reveals the name. Use the `label` prop to override the visible text.',
 			},
 		},
 	},
@@ -78,29 +78,62 @@ export const Badge: Story = {
 export const WithLabel: Story = {
 	args: {
 		...WithBorderColor.args,
-		badge: true,
+		variant: 'badge',
 		label: 'You',
 	},
 };
 
-export const Active: Story = {
-	args: {
-		...Default.args,
-		status: 'active',
-		statusIndicator: moreHorizontal,
-	},
+export const BadgeContrastText: Story = {
+	render: () => (
+		<div style={ { display: 'flex', gap: '16px' } }>
+			<Avatar
+				src={ SAMPLE_AVATAR }
+				name="Dark background"
+				borderColor="#1D35B4"
+				variant="badge"
+			/>
+			<Avatar
+				src={ SAMPLE_AVATAR }
+				name="Light background"
+				borderColor="#FFF972"
+				variant="badge"
+			/>
+		</div>
+	),
 	parameters: {
 		docs: {
 			description: {
-				story: 'When `status` is set, the avatar image is dimmed and the `statusIndicator` is rendered as an overlay.',
+				story: 'Badge text color adapts automatically based on the `borderColor` lightness to maintain WCAG AA contrast.',
 			},
 		},
 	},
 };
 
-export const Idle: Story = {
+export const Dimmed: Story = {
 	args: {
 		...Default.args,
-		status: 'idle',
+		dimmed: true,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: 'When `dimmed` is true, the avatar is desaturated and faded to indicate an inactive state.',
+			},
+		},
+	},
+};
+
+export const DimmedWithIndicator: Story = {
+	args: {
+		...Default.args,
+		dimmed: true,
+		statusIndicator: moreHorizontal,
+	},
+	parameters: {
+		docs: {
+			description: {
+				story: 'When `dimmed` is true and a `statusIndicator` is provided, the icon is rendered as an overlay.',
+			},
+		},
 	},
 };

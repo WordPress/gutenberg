@@ -63,26 +63,26 @@ export const WithBadges: Story = {
 				src={ avatarUrl( 'aaa' ) }
 				name="Alice"
 				borderColor="#3858e9"
-				badge
+				variant="badge"
 			/>
 			<Avatar
 				src={ avatarUrl( 'bbb' ) }
 				name="Bob"
 				borderColor="#e93858"
-				badge
+				variant="badge"
 			/>
 			<Avatar
 				src={ avatarUrl( 'ccc' ) }
 				name="Charlie"
 				borderColor="#58e938"
-				badge
+				variant="badge"
 			/>
 		</AvatarGroup>
 	),
 	parameters: {
 		docs: {
 			description: {
-				story: 'Avatars with `badge` enabled expand on hover to reveal the name, pushing siblings aside.',
+				story: 'Avatars with `badge` variant expand on hover to reveal the name, pushing siblings aside.',
 			},
 		},
 	},
@@ -95,14 +95,14 @@ export const MixedBadgeAndTooltip: Story = {
 				src={ avatarUrl( 'aaa' ) }
 				name="Alice"
 				borderColor="#3858e9"
-				badge
+				variant="badge"
 			/>
 			<Avatar src={ avatarUrl( 'bbb' ) } name="Bob" />
 			<Avatar
 				src={ avatarUrl( 'ccc' ) }
 				name="Charlie"
 				borderColor="#58e938"
-				badge
+				variant="badge"
 				label="You"
 			/>
 		</AvatarGroup>

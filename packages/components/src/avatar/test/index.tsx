@@ -49,9 +49,9 @@ describe( 'Avatar', () => {
 	it( 'should apply border color when provided', () => {
 		render( <Avatar data-testid="avatar" borderColor="#3858e9" /> );
 		const avatar = screen.getByTestId( 'avatar' );
-		expect( avatar ).toHaveClass( 'has-border-color' );
+		expect( avatar ).toHaveClass( 'has-avatar-border-color' );
 		expect(
-			avatar.style.getPropertyValue( '--components-avatar-border-color' )
+			avatar.style.getPropertyValue( '--components-avatar-outline-color' )
 		).toBe( '#3858e9' );
 	} );
 
@@ -72,14 +72,16 @@ describe( 'Avatar', () => {
 		it( 'should not show badge by default', () => {
 			render( <Avatar data-testid="avatar" name="Zoraya" /> );
 			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).not.toHaveClass( 'has-badge' );
+			expect( avatar ).not.toHaveClass( 'is-badge' );
 			expect( screen.queryByText( 'Zoraya' ) ).not.toBeInTheDocument();
 		} );
 
-		it( 'should render name span when badge is true', () => {
-			render( <Avatar data-testid="avatar" name="Zoraya" badge /> );
+		it( 'should render name span when variant is badge', () => {
+			render(
+				<Avatar data-testid="avatar" name="Zoraya" variant="badge" />
+			);
 			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).toHaveClass( 'has-badge' );
+			expect( avatar ).toHaveClass( 'is-badge' );
 			expect( screen.getByText( 'Zoraya' ) ).toBeInTheDocument();
 		} );
 
@@ -89,22 +91,22 @@ describe( 'Avatar', () => {
 					data-testid="avatar"
 					name="Zoraya"
 					borderColor="#3d5eef"
-					badge
+					variant="badge"
 				/>
 			);
 			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).toHaveClass( 'has-badge' );
+			expect( avatar ).toHaveClass( 'is-badge' );
 			expect( screen.getByText( 'Zoraya' ) ).toBeInTheDocument();
 		} );
 
-		it( 'should not show badge when badge is true but name is missing', () => {
-			render( <Avatar data-testid="avatar" badge /> );
+		it( 'should not show badge when variant is badge but name is missing', () => {
+			render( <Avatar data-testid="avatar" variant="badge" /> );
 			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).not.toHaveClass( 'has-badge' );
+			expect( avatar ).not.toHaveClass( 'is-badge' );
 		} );
 
 		it( 'should still set aria-label even when badge is visible', () => {
-			render( <Avatar name="Zoraya" badge /> );
+			render( <Avatar name="Zoraya" variant="badge" /> );
 			const avatar = screen.getByRole( 'img', { name: 'Zoraya' } );
 			expect( avatar ).toBeInTheDocument();
 		} );
@@ -112,19 +114,19 @@ describe( 'Avatar', () => {
 
 	describe( 'label', () => {
 		it( 'should show label text instead of name in the badge', () => {
-			render( <Avatar name="Jane Doe" label="You" badge /> );
+			render( <Avatar name="Jane Doe" label="You" variant="badge" /> );
 			expect( screen.getByText( 'You' ) ).toBeInTheDocument();
 			expect( screen.queryByText( 'Jane Doe' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'should keep aria-label as name when label is provided', () => {
-			render( <Avatar name="Jane Doe" label="You" badge /> );
+			render( <Avatar name="Jane Doe" label="You" variant="badge" /> );
 			const avatar = screen.getByRole( 'img', { name: 'Jane Doe' } );
 			expect( avatar ).toBeInTheDocument();
 		} );
 
 		it( 'should wrap in tooltip when label differs from name', () => {
-			render( <Avatar name="Jane Doe" label="You" badge /> );
+			render( <Avatar name="Jane Doe" label="You" variant="badge" /> );
 			const avatar = screen.getByRole( 'img', { name: 'Jane Doe' } );
 			// The Tooltip's Ariakit.TooltipAnchor makes the element
 			// focusable so the tooltip can be triggered via keyboard.
@@ -132,39 +134,31 @@ describe( 'Avatar', () => {
 		} );
 	} );
 
-	describe( 'status', () => {
-		it( 'should apply has-status and is-active classes', () => {
-			render( <Avatar data-testid="avatar" status="active" /> );
+	describe( 'dimmed', () => {
+		it( 'should apply is-dimmed class when dimmed is true', () => {
+			render( <Avatar data-testid="avatar" dimmed /> );
 			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).toHaveClass( 'has-status' );
-			expect( avatar ).toHaveClass( 'is-active' );
+			expect( avatar ).toHaveClass( 'is-dimmed' );
 		} );
 
-		it( 'should apply has-status and is-idle classes', () => {
-			render( <Avatar data-testid="avatar" status="idle" /> );
-			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).toHaveClass( 'has-status' );
-			expect( avatar ).toHaveClass( 'is-idle' );
-		} );
-
-		it( 'should not apply status classes when status is not set', () => {
+		it( 'should not apply is-dimmed class when dimmed is false', () => {
 			render( <Avatar data-testid="avatar" /> );
 			const avatar = screen.getByTestId( 'avatar' );
-			expect( avatar ).not.toHaveClass( 'has-status' );
+			expect( avatar ).not.toHaveClass( 'is-dimmed' );
 		} );
 
-		it( 'should render statusIndicator when status is set', () => {
+		it( 'should render statusIndicator when dimmed is true', () => {
 			render(
 				<Avatar
 					data-testid="avatar"
-					status="active"
+					dimmed
 					statusIndicator={ <span>icon</span> }
 				/>
 			);
 			expect( screen.getByText( 'icon' ) ).toBeInTheDocument();
 		} );
 
-		it( 'should not render statusIndicator when status is not set', () => {
+		it( 'should not render statusIndicator when dimmed is false', () => {
 			render(
 				<Avatar
 					data-testid="avatar"

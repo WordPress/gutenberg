@@ -2,6 +2,10 @@
  * External dependencies
  */
 import clsx from 'clsx';
+import { colord, extend } from 'colord';
+import a11yPlugin from 'colord/plugins/a11y';
+
+extend( [ a11yPlugin ] );
 
 /**
  * Internal dependencies
@@ -16,15 +20,15 @@ function Avatar( {
 	src,
 	name,
 	label,
-	badge = false,
+	variant,
 	size = 'default',
 	borderColor,
-	status,
+	dimmed = false,
 	statusIndicator,
 	style,
 	...props
 }: WordPressComponentProps< AvatarProps, 'div', false > ) {
-	const showBadge = badge && !! name;
+	const showBadge = variant === 'badge' && !! name;
 	const initials = name
 		? name
 				.split( /\s+/ )
@@ -37,19 +41,28 @@ function Avatar( {
 		...style,
 		...( src ? { '--components-avatar-url': `url(${ src })` } : {} ),
 		...( borderColor
-			? { '--components-avatar-border-color': borderColor }
+			? {
+					'--components-avatar-outline-color': borderColor,
+					'--components-avatar-name-color': colord(
+						borderColor
+					).isReadable( '#000', {
+						level: 'AA',
+						size: 'normal',
+					} )
+						? '#000'
+						: '#fff',
+			  }
 			: {} ),
 	} as React.CSSProperties;
 
 	const avatar = (
 		<div
 			className={ clsx( 'components-avatar', className, {
-				'has-border-color': !! borderColor,
+				'has-avatar-border-color': !! borderColor,
 				'has-src': !! src,
-				'has-badge': showBadge,
+				'is-badge': showBadge,
 				'is-small': size === 'small',
-				'has-status': !! status,
-				[ `is-${ status }` ]: !! status,
+				'is-dimmed': dimmed,
 			} ) }
 			style={ customProperties }
 			role="img"
@@ -58,12 +71,12 @@ function Avatar( {
 		>
 			<span className="components-avatar__image">
 				{ ! src && initials }
-				{ !! status && !! statusIndicator && (
-					<span className="components-avatar__status-indicator">
-						<Icon icon={ statusIndicator } />
-					</span>
-				) }
 			</span>
+			{ dimmed && !! statusIndicator && (
+				<span className="components-avatar__status-indicator">
+					<Icon icon={ statusIndicator } />
+				</span>
+			) }
 			{ showBadge && (
 				<span className="components-avatar__name">
 					{ label || name }
