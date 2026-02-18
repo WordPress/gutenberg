@@ -202,6 +202,8 @@ export default function FormCardField< Item >( {
 				>
 					<div
 						style={ {
+							// Match the expand/collapse button's height to avoid layout
+							// differences when that button is not displayed.
 							height: isCollapsible ? undefined : '40px',
 							width: '100%',
 							display: 'flex',
