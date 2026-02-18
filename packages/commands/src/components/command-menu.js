@@ -80,7 +80,14 @@ export function isValidIcon( icon ) {
 	);
 }
 
-function CommandMenuLoader( { name, search, hook, setLoader, close, category } ) {
+function CommandMenuLoader( {
+	name,
+	search,
+	hook,
+	setLoader,
+	close,
+	category,
+} ) {
 	const { isLoading, commands = [] } = hook( { search } ) ?? {};
 	useEffect( () => {
 		setLoader( name, isLoading );
@@ -93,56 +100,41 @@ function CommandMenuLoader( { name, search, hook, setLoader, close, category } )
 	return (
 		<>
 			{ commands.map( ( command ) => {
-				const commandCategory =
-					command.category ?? category;
+				const commandCategory = command.category ?? category;
 				return (
 					<Command.Item
 						key={ command.name }
-						value={
-							command.searchLabel ?? command.label
-						}
+						value={ command.searchLabel ?? command.label }
 						keywords={ command.keywords }
-						onSelect={ () =>
-							command.callback( { close } )
-						}
+						onSelect={ () => command.callback( { close } ) }
 						id={ command.name }
 					>
 						<HStack
 							alignment="left"
-							className={ clsx(
-								'commands-command-menu__item',
-								{
-									'has-icon':
-										CATEGORY_ICONS[
-											commandCategory
-										] || command.icon,
-								}
-							) }
+							className={ clsx( 'commands-command-menu__item', {
+								'has-icon':
+									CATEGORY_ICONS[ commandCategory ] ||
+									command.icon,
+							} ) }
 						>
-							{ CATEGORY_ICONS[ commandCategory ] ? (
+							{ CATEGORY_ICONS[ commandCategory ] && (
 								<Icon
-									icon={
-										CATEGORY_ICONS[
-											commandCategory
-										]
-									}
+									icon={ CATEGORY_ICONS[ commandCategory ] }
 								/>
-							) : isValidIcon( command.icon ) ? (
-								<Icon icon={ command.icon } />
-							) : null }
-							<span>
+							) }
+							{ ! CATEGORY_ICONS[ commandCategory ] &&
+								isValidIcon( command.icon ) && (
+									<Icon icon={ command.icon } />
+								) }
+							<span className="commands-command-menu__item-label">
 								<TextHighlight
 									text={ command.label }
 									highlight={ search }
 								/>
 							</span>
-							{ CATEGORY_LABELS[
-								commandCategory
-							] && (
+							{ CATEGORY_LABELS[ commandCategory ] && (
 								<span className="commands-command-menu__item-category">
-									{ CATEGORY_LABELS[
-										commandCategory
-									] }
+									{ CATEGORY_LABELS[ commandCategory ] }
 								</span>
 							) }
 						</HStack>
@@ -221,15 +213,9 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 						} ) }
 					>
 						{ CATEGORY_ICONS[ command.category ] ? (
-							<Icon
-								icon={
-									CATEGORY_ICONS[ command.category ]
-								}
-							/>
+							<Icon icon={ CATEGORY_ICONS[ command.category ] } />
 						) : (
-							command.icon && (
-								<Icon icon={ command.icon } />
-							)
+							command.icon && <Icon icon={ command.icon } />
 						) }
 						<span>
 							<TextHighlight
