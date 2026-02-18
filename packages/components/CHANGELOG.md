@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 32.2.0 (2026-02-18)
+
 ### Bug Fixes
 
 -   `Tabs`: Set explicit `font-family` on tab buttons to prevent inheriting unintended fonts ([#75537](https://github.com/WordPress/gutenberg/pull/75537)).

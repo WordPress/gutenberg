@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 12.0.0 (2026-02-18)
+
 ### Breaking Changes
 
 - The design tokens stylesheet (`@wordpress/theme/design-tokens.css`) is no longer embedded in the DataViews stylesheet. Applications using DataViews outside of WordPress must now explicitly include the design tokens stylesheet. See the README for installation instructions. [#75182](https://github.com/WordPress/gutenberg/pull/75182)
