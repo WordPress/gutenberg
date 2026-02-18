@@ -22,9 +22,6 @@ function gutenberg_enable_experiments() {
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-dataviews-media-modal', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDataViewsMediaModal = true', 'before' );
 	}
-	if ( gutenberg_is_client_side_media_processing_enabled() ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
-	}
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-content-only-inspector-fields', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalContentOnlyInspectorFields = true', 'before' );
 	}
