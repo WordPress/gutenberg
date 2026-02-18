@@ -4,212 +4,10 @@ import { useResizeObserver, useMergeRefs } from '@wordpress/compose';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 
 import Avatar from '../collaborators-presence/avatar';
+import { AVATAR_IFRAME_STYLES } from './avatar-iframe-styles';
+import { OVERLAY_IFRAME_STYLES } from './overlay-iframe-styles';
 import { useBlockHighlighting } from './use-block-highlighting';
 import { useRenderCursors } from './use-render-cursors';
-import { ELEVATION_X_SMALL } from './collaborator-styles';
-
-// Editor package styles are excluded from the editor canvas iframe, so the
-// Avatar component's SCSS is not available there. We inject compiled versions
-// of the relevant rules alongside the overlay-specific positioning styles.
-// Values are hardcoded from @wordpress/base-styles tokens (see comments).
-const COLLABORATORS_OVERLAY_STYLES = `
-.block-canvas-cover {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	pointer-events: none;
-	z-index: 20000;
-}
-.block-canvas-cover .collaborators-overlay-full {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-}
-.block-canvas-cover .collaborators-overlay-fixed {
-	position: fixed;
-	width: 100%;
-	height: 100%;
-}
-.collaborators-overlay-user {
-	position: absolute;
-}
-.collaborators-overlay-user-cursor {
-	position: absolute;
-	width: 2px;
-	border-radius: 1px;
-	outline: 1px solid #fff;
-	box-shadow: ${ ELEVATION_X_SMALL };
-	animation: collaborators-overlay-cursor-blink 1s infinite;
-}
-
-/* ── Avatar (compiled from collaborators-presence/avatar/styles.scss) ──
-   Dimmed and status-indicator styles are intentionally omitted — not used in
-   the overlay. Keep in sync when editing the SCSS source. ── */
-.editor-avatar {
-	position: relative;
-	display: inline-flex;
-	align-items: center;
-	border-radius: 9999px; /* $radius-full */
-	overflow: clip;
-	flex-shrink: 0;
-	box-shadow: 0 0 0 var(--wp-admin-border-width-focus, 2px) #fff, ${ ELEVATION_X_SMALL };
-}
-.editor-avatar__image {
-	box-sizing: border-box;
-	position: relative;
-	width: 32px; /* $button-size-compact */
-	height: 32px; /* $button-size-compact */
-	border-radius: 9999px; /* $radius-full */
-	border: 0;
-	background-color: var(--wp-admin-theme-color, #3858e9);
-	overflow: clip;
-	flex-shrink: 0;
-	font-size: 0;
-	color: #fff; /* $white */
-}
-.is-small > .editor-avatar__image {
-	width: 24px; /* $button-size-small */
-	height: 24px; /* $button-size-small */
-}
-.has-src > .editor-avatar__image {
-	background-image: var(--editor-avatar-url);
-	background-size: cover;
-	background-position: center;
-}
-.has-avatar-border-color > .editor-avatar__image {
-	border: var(--wp-admin-border-width-focus, 2px) solid var(--editor-avatar-outline-color);
-	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) #fff;
-	background-clip: padding-box;
-}
-.editor-avatar:not(.has-src) > .editor-avatar__image {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 11px; /* $font-size-x-small */
-	font-weight: 499; /* $font-weight-medium */
-	border: 0;
-	box-shadow: none;
-	background-clip: border-box;
-}
-.editor-avatar:not(.has-src).has-avatar-border-color > .editor-avatar__image {
-	background-color: var(--editor-avatar-outline-color);
-}
-.editor-avatar__name {
-	font-size: 13px; /* $font-size-medium */
-	font-weight: 499; /* $font-weight-medium */
-	line-height: 20px; /* $font-line-height-small */
-	color: var(--editor-avatar-name-color, #fff);
-	min-width: 0;
-	padding-bottom: 2px; /* $grid-unit-05 / 2 */
-	overflow: hidden;
-	opacity: 0;
-	white-space: nowrap;
-	transition: opacity 0.15s cubic-bezier(0.15, 0, 0.15, 1);
-}
-.editor-avatar.is-badge {
-	display: inline-grid;
-	grid-template-columns: min-content 0fr;
-	background-color: var(--wp-admin-theme-color, #3858e9);
-	column-gap: 0;
-	padding-inline-end: 0;
-	transition:
-		grid-template-columns 0.3s cubic-bezier(0.15, 0, 0.15, 1),
-		column-gap 0.3s cubic-bezier(0.15, 0, 0.15, 1),
-		padding-inline-end 0.3s cubic-bezier(0.15, 0, 0.15, 1);
-}
-.editor-avatar.is-badge:hover {
-	grid-template-columns: min-content 1fr;
-	column-gap: 4px; /* $grid-unit-05 */
-	padding-inline-end: 8px; /* $grid-unit-10 */
-	transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
-}
-.editor-avatar.is-badge:hover .editor-avatar__name {
-	opacity: 1;
-	transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
-}
-.editor-avatar.is-badge.has-avatar-border-color {
-	background-color: var(--editor-avatar-outline-color);
-}
-/* ── end Avatar ── */
-
-/* Overlay-specific positioning applied to the Avatar cursor label. */
-.collaborators-overlay-user-label.editor-avatar {
-	position: absolute;
-	transform: translate(-11px, -100%);
-	margin-top: -4px;
-	pointer-events: auto;
-	overflow: visible;
-	width: max-content;
-}
-/* Avatar positioned above a highlighted block as a label. */
-.collaborators-overlay-block-label.editor-avatar {
-	position: absolute;
-	transform: translateY(calc(-100% - 8px));
-	pointer-events: auto;
-	overflow: visible;
-	width: max-content;
-}
-
-@keyframes collaborators-overlay-cursor-blink {
-	0%, 45% { opacity: 1; }
-	55%, 95% { opacity: 0; }
-	100% { opacity: 1; }
-}
-.collaborators-overlay-cursor-highlighted .collaborators-overlay-user-cursor {
-	animation: collaborators-overlay-cursor-highlight 0.6s ease-in-out 3;
-}
-.collaborators-overlay-cursor-highlighted .collaborators-overlay-user-label {
-	animation: collaborators-overlay-label-highlight 0.6s ease-in-out 3;
-}
-@keyframes collaborators-overlay-cursor-highlight {
-	0%, 100% {
-		transform: scale(1);
-		filter: drop-shadow(0 0 0 transparent);
-	}
-	50% {
-		transform: scale(1.2);
-		filter: drop-shadow(0 0 8px currentColor);
-	}
-}
-@keyframes collaborators-overlay-label-highlight {
-	0%, 100% {
-		transform: translate(-11px, -100%) scale(1);
-		filter: drop-shadow(0 0 0 transparent);
-	}
-	50% {
-		transform: translate(-11px, -100%) scale(1.1);
-		filter: drop-shadow(0 0 6px currentColor);
-	}
-}
-.block-editor-block-list__block.is-collaborator-selected:not(:focus)::after {
-	content: "";
-	position: absolute;
-	pointer-events: none;
-	top: 0;
-	right: 0;
-	bottom: 0;
-	left: 0;
-	outline-color: var(--collaborator-outline-color);
-	outline-style: solid;
-	outline-width: calc(var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
-	outline-offset: calc(-1 * var(--wp-admin-border-width-focus) / var(--wp-block-editor-iframe-zoom-out-scale, 1));
-	box-shadow: inset 0 0 0 calc(var(--wp-admin-border-width-focus, 2px) + 1px) #fff, 0 0 0 1px #fff, ${ ELEVATION_X_SMALL };
-	z-index: 1;
-}
-@media (prefers-reduced-motion: reduce) {
-	.editor-avatar.is-badge,
-	.editor-avatar__name,
-	.collaborators-overlay-user-label,
-	.collaborators-overlay-user-cursor {
-		transition: none;
-		animation: none;
-	}
-}
-`;
 
 interface OverlayProps {
 	blockEditorDocument?: Document;
@@ -231,6 +29,11 @@ export function Overlay( {
 	postId,
 	postType,
 }: OverlayProps ) {
+	useStyleOverride( {
+		id: 'collaborators-overlay',
+		css: AVATAR_IFRAME_STYLES + OVERLAY_IFRAME_STYLES,
+	} );
+
 	// Use state for the overlay element so that the hook re-runs once the ref is attached.
 	const [ overlayElement, setOverlayElement ] =
 		useState< HTMLDivElement | null >( null );
@@ -277,7 +80,6 @@ export function Overlay( {
 	// scrollable elements like cursor indicators.
 	return (
 		<div className="collaborators-overlay-full" ref={ mergedRef }>
-			<style>{ COLLABORATORS_OVERLAY_STYLES }</style>
 			{ cursors.map( ( cursor ) => (
 				<div
 					key={ cursor.clientId }
