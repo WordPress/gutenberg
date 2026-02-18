@@ -6,8 +6,8 @@ The Interactivity API provides client-side navigation through the `@wordpress/in
 
 The Interactivity API supports two navigation modes:
 
-- **Region-based client-side navigation** — The recommended approach for implementing client-side navigation in WordPress.
-- **Full-page client-side navigation** _(experimental)_ — Treats the entire `<body>` element as a single region, effectively updating the whole page content without a traditional reload. Covered at the end of this guide in [Full-page client-side navigation (experimental)](#full-page-client-side-navigation-experimental).
+-   **Region-based client-side navigation** — The recommended approach for implementing client-side navigation in WordPress.
+-   **Full-page client-side navigation** _(experimental)_ — Treats the entire `<body>` element as a single region, effectively updating the whole page content without a traditional reload. Covered at the end of this guide in [Full-page client-side navigation (experimental)](#full-page-client-side-navigation-experimental).
 
 ## How client-side navigation works
 
@@ -22,10 +22,10 @@ When a user triggers a navigation, for example, by clicking a link that has a `d
 
 This approach offers several benefits:
 
-- **Improved performance**: Only the changed parts of the page are updated, reducing data transfer and DOM manipulation.
-- **Preserved state**: Client-side state (global state, local context) is preserved across navigations.
-- **Smooth transitions**: No flash of white screen between pages; transitions feel instant and app-like.
-- **SEO-friendly**: Since the server still renders complete HTML pages, search engines can crawl your site normally.
+-   **Improved performance**: Only the changed parts of the page are updated, reducing data transfer and DOM manipulation.
+-   **Preserved state**: Client-side state (global state, local context) is preserved across navigations.
+-   **Smooth transitions**: No flash of white screen between pages; transitions feel instant and app-like.
+-   **SEO-friendly**: Since the server still renders complete HTML pages, search engines can crawl your site normally.
 
 ## Getting started with the Interactivity Router
 
@@ -70,12 +70,7 @@ To trigger client-side navigation, you define an **action** in your block's stor
 Here's how to implement a link that navigates client-side. First, the HTML in your block's `render.php` connects the link's click event to the `navigateTo` action:
 
 ```html
-<a
-    data-wp-on--click="actions.navigateTo"
-    href="/page-2/"
->
-    Go to Page 2
-</a>
+<a data-wp-on--click="actions.navigateTo" href="/page-2/"> Go to Page 2 </a>
 ```
 
 Then, in your `view.js`, you define the `navigateTo` action. It prevents the browser's default full-page navigation and uses the router's `navigate()` function instead:
@@ -85,16 +80,16 @@ Then, in your `view.js`, you define the `navigateTo` action. It prevents the bro
 import { store, withSyncEvent } from '@wordpress/interactivity';
 
 store( 'myPlugin', {
-    actions: {
-        navigateTo: withSyncEvent( function* ( event ) {
-            event.preventDefault();
+	actions: {
+		navigateTo: withSyncEvent( function* ( event ) {
+			event.preventDefault();
 
-            const { actions } = yield import(
-                '@wordpress/interactivity-router'
-            );
-            yield actions.navigate( event.target.href );
-        } ),
-    },
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
+			yield actions.navigate( event.target.href );
+		} ),
+	},
 } );
 ```
 
@@ -110,11 +105,11 @@ A common pattern is to prefetch a page when the user hovers over a link, and nav
 
 ```html
 <a
-    data-wp-on--mouseenter="actions.prefetchPage"
-    data-wp-on--click="actions.navigateTo"
-    href="/page-2/"
+	data-wp-on--mouseenter="actions.prefetchPage"
+	data-wp-on--click="actions.navigateTo"
+	href="/page-2/"
 >
-    Hover to prefetch, click to navigate
+	Hover to prefetch, click to navigate
 </a>
 ```
 
@@ -125,23 +120,23 @@ The corresponding actions in `view.js` handle each event:
 import { store, withSyncEvent } from '@wordpress/interactivity';
 
 store( 'myPlugin', {
-    actions: {
-        prefetchPage: function* ( event ) {
-            const { actions } = yield import(
-                '@wordpress/interactivity-router'
-            );
-            yield actions.prefetch( event.target.href );
-        },
+	actions: {
+		prefetchPage: function* ( event ) {
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
+			yield actions.prefetch( event.target.href );
+		},
 
-        navigateTo: withSyncEvent( function* ( event ) {
-            event.preventDefault();
+		navigateTo: withSyncEvent( function* ( event ) {
+			event.preventDefault();
 
-            const { actions } = yield import(
-                '@wordpress/interactivity-router'
-            );
-            yield actions.navigate( event.target.href );
-        } ),
-    },
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
+			yield actions.navigate( event.target.href );
+		} ),
+	},
 } );
 ```
 
@@ -152,6 +147,7 @@ This example brings together router regions, navigation, and prefetching to impl
 The block queries posts for the current page and renders them inside a router region. Pagination links at the bottom allow the user to move between pages. When the user hovers over a "Previous" or "Next" link, the target page is prefetched. When they click, the router navigates client-side — replacing only the content inside the router region without a full page reload. After navigation, the page scrolls smoothly to the top.
 
 **PHP (render.php):**
+
 ```php
 <?php
 $current_page = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
@@ -201,30 +197,31 @@ $query = new WP_Query( array(
 ```
 
 **JavaScript (view.js):**
+
 ```js
 import { store, withSyncEvent } from '@wordpress/interactivity';
 
 store( 'myPagination', {
-    actions: {
-        prefetch: function* ( event ) {
-            const { actions } = yield import(
-                '@wordpress/interactivity-router'
-            );
-            yield actions.prefetch( event.target.href );
-        },
+	actions: {
+		prefetch: function* ( event ) {
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
+			yield actions.prefetch( event.target.href );
+		},
 
-        navigate: withSyncEvent( function* ( event ) {
-            event.preventDefault();
+		navigate: withSyncEvent( function* ( event ) {
+			event.preventDefault();
 
-            const { actions } = yield import(
-                '@wordpress/interactivity-router'
-            );
-            yield actions.navigate( event.target.href );
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
+			yield actions.navigate( event.target.href );
 
-            // Scroll to top after navigation.
-            window.scrollTo( { top: 0, behavior: 'smooth' } );
-        } ),
-    },
+			// Scroll to top after navigation.
+			window.scrollTo( { top: 0, behavior: 'smooth' } );
+		} ),
+	},
 } );
 ```
 
@@ -238,16 +235,16 @@ Blocks declare their compatibility with client-side navigation through the `supp
 
 The `supports.interactivity` field in `block.json` can be set as a boolean or as an object with two sub-properties:
 
-- **`interactive`** (`boolean`, default: `false`): Indicates whether the block uses Interactivity API directives.
-- **`clientNavigation`** (`boolean`, default: `false`): Indicates whether the block is compatible with client-side navigation.
+-   **`interactive`** (`boolean`, default: `false`): Indicates whether the block uses Interactivity API directives.
+-   **`clientNavigation`** (`boolean`, default: `false`): Indicates whether the block is compatible with client-side navigation.
 
 Setting `supports.interactivity` to `true` is a shorthand for setting both `interactive` and `clientNavigation` to `true`:
 
 ```json
 {
-    "supports": {
-        "interactivity": true
-    }
+	"supports": {
+		"interactivity": true
+	}
 }
 ```
 
@@ -255,19 +252,19 @@ This is equivalent to:
 
 ```json
 {
-    "supports": {
-        "interactivity": {
-            "clientNavigation": true,
-            "interactive": true
-        }
-    }
+	"supports": {
+		"interactivity": {
+			"clientNavigation": true,
+			"interactive": true
+		}
+	}
 }
 ```
 
 The `clientNavigation` property is the key to compatibility. Set it to `true` only if:
 
-- The block is **not interactive** (it renders only static HTML), or
-- The block **is interactive and uses the Interactivity API** for all its client-side behavior.
+-   The block is **not interactive** (it renders only static HTML), or
+-   The block **is interactive and uses the Interactivity API** for all its client-side behavior.
 
 Set it to `false` (or leave it unset) if the block is interactive but uses vanilla JavaScript, jQuery, or any other JavaScript framework or library other than the Interactivity API.
 
@@ -279,11 +276,11 @@ For these blocks, set only `clientNavigation` to `true`:
 
 ```json
 {
-    "supports": {
-        "interactivity": {
-            "clientNavigation": true
-        }
-    }
+	"supports": {
+		"interactivity": {
+			"clientNavigation": true
+		}
+	}
 }
 ```
 
@@ -297,11 +294,11 @@ For these blocks, leave `supports.interactivity` at its default value (`false`) 
 
 ```json
 {
-    "supports": {
-        "interactivity": {
-            "clientNavigation": false
-        }
-    }
+	"supports": {
+		"interactivity": {
+			"clientNavigation": false
+		}
+	}
 }
 ```
 
@@ -319,19 +316,19 @@ You should handle scroll and focus explicitly in your navigation action. For exa
 
 ```js
 store( 'myPlugin', {
-    actions: {
-        navigateTo: withSyncEvent( function* ( event ) {
-            event.preventDefault();
+	actions: {
+		navigateTo: withSyncEvent( function* ( event ) {
+			event.preventDefault();
 
-            const { actions } = yield import(
-                '@wordpress/interactivity-router'
-            );
-            yield actions.navigate( event.target.href );
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
+			yield actions.navigate( event.target.href );
 
-            // Scroll to top after navigation.
-            window.scrollTo( { top: 0, behavior: 'smooth' } );
-        } ),
-    },
+			// Scroll to top after navigation.
+			window.scrollTo( { top: 0, behavior: 'smooth' } );
+		} ),
+	},
 } );
 ```
 
@@ -345,15 +342,15 @@ Sometimes you need UI elements — like modals, sidebars, or notification panels
 
 ```html
 <div
-    data-wp-interactive="myPlugin"
-    data-wp-router-region='{ "id": "myPlugin/modal", "attachTo": "body" }'
+	data-wp-interactive="myPlugin"
+	data-wp-router-region='{ "id": "myPlugin/modal", "attachTo": "body" }'
 >
-    <div class="modal-overlay">
-        <div class="modal-content">
-            <h2>Modal Title</h2>
-            <p>Modal content here...</p>
-        </div>
-    </div>
+	<div class="modal-overlay">
+		<div class="modal-content">
+			<h2>Modal Title</h2>
+			<p>Modal content here...</p>
+		</div>
+	</div>
 </div>
 ```
 
@@ -362,6 +359,7 @@ The `attachTo` value is a CSS selector. When navigating to this page from a page
 **Example: Modal that appears on navigation**
 
 _Page without modal (page-1.php):_
+
 ```php
 <div
     data-wp-interactive="myPlugin"
@@ -378,6 +376,7 @@ _Page without modal (page-1.php):_
 ```
 
 _Page with modal (page-2.php):_
+
 ```php
 <div
     data-wp-interactive="myPlugin"
@@ -414,30 +413,30 @@ Use `getServerState()` and `getServerContext()` to react specifically to server-
 
 ```js
 import {
-    store,
-    getContext,
-    getServerState,
-    getServerContext,
+	store,
+	getContext,
+	getServerState,
+	getServerContext,
 } from '@wordpress/interactivity';
 
 const { state } = store( 'myPlugin', {
-    callbacks: {
-        syncWithServer() {
-            const serverState = getServerState();
-            const serverContext = getServerContext();
-            const context = getContext();
+	callbacks: {
+		syncWithServer() {
+			const serverState = getServerState();
+			const serverContext = getServerContext();
+			const context = getContext();
 
-            // Keep the product count in sync with the server across navigations.
-            if ( serverState.productCount !== undefined ) {
-                state.productCount = serverState.productCount;
-            }
+			// Keep the product count in sync with the server across navigations.
+			if ( serverState.productCount !== undefined ) {
+				state.productCount = serverState.productCount;
+			}
 
-            // Reset the expanded state based on the new page's context.
-            if ( serverContext.isExpanded !== undefined ) {
-                context.isExpanded = serverContext.isExpanded;
-            }
-        },
-    },
+			// Reset the expanded state based on the new page's context.
+			if ( serverContext.isExpanded !== undefined ) {
+				context.isExpanded = serverContext.isExpanded;
+			}
+		},
+	},
 } );
 ```
 
@@ -461,18 +460,18 @@ If you're using <code>force: true</code> to refresh a page after a mutation (POS
 
 ```js
 store( 'myPlugin', {
-    actions: {
-        deleteAndRefresh: function* () {
-            // Wait for the deletion to complete.
-            yield fetch( '/api/items/123', { method: 'DELETE' } );
+	actions: {
+		deleteAndRefresh: function* () {
+			// Wait for the deletion to complete.
+			yield fetch( '/api/items/123', { method: 'DELETE' } );
 
-            // Now refresh the page to show updated data.
-            const { actions } = yield import(
-                '@wordpress/interactivity-router'
-            );
-            yield actions.navigate( window.location.href, { force: true } );
-        },
-    },
+			// Now refresh the page to show updated data.
+			const { actions } = yield import(
+				'@wordpress/interactivity-router'
+			);
+			yield actions.navigate( window.location.href, { force: true } );
+		},
+	},
 } );
 ```
 
@@ -498,9 +497,10 @@ yield actions.prefetch( '/custom-page/', {
 ```
 
 This is useful for:
-- Optimistic UI updates where you construct the expected HTML before the server responds.
-- Offline scenarios where you provide cached or fallback content.
-- Testing and development.
+
+-   Optimistic UI updates where you construct the expected HTML before the server responds.
+-   Offline scenarios where you provide cached or fallback content.
+-   Testing and development.
 
 ### Managing browser history
 
@@ -515,9 +515,10 @@ yield actions.navigate( '/page-2/', { replace: true } );
 ```
 
 Use `replace: true` when:
-- Implementing redirects where the original URL shouldn't be in history.
-- Updating query parameters for filtering/sorting where each change shouldn't be a separate history entry.
-- Implementing infinite scroll where you update the URL but don't want each page to be a separate history entry.
+
+-   Implementing redirects where the original URL shouldn't be in history.
+-   Updating query parameters for filtering/sorting where each change shouldn't be a separate history entry.
+-   Implementing infinite scroll where you update the URL but don't want each page to be a separate history entry.
 
 ### Changing the timeout
 
@@ -539,33 +540,33 @@ If you need custom error handling (for example, showing an error message instead
 
 ```js
 store( 'myPlugin', {
-    actions: {
-        navigateWithCustomErrorHandling: withSyncEvent( function* ( event ) {
-            event.preventDefault();
-            const url = event.target.href;
+	actions: {
+		navigateWithCustomErrorHandling: withSyncEvent( function* ( event ) {
+			event.preventDefault();
+			const url = event.target.href;
 
-            try {
-                // Fetch the page manually.
-                const response = yield fetch( url );
+			try {
+				// Fetch the page manually.
+				const response = yield fetch( url );
 
-                if ( ! response.ok ) {
-                    // Handle HTTP errors.
-                    state.error = `Error: ${response.status}`;
-                    return;
-                }
+				if ( ! response.ok ) {
+					// Handle HTTP errors.
+					state.error = `Error: ${ response.status }`;
+					return;
+				}
 
-                const html = yield response.text();
+				const html = yield response.text();
 
-                // Navigate using the fetched HTML.
-                const { actions } = yield import(
-                    '@wordpress/interactivity-router'
-                );
-                yield actions.navigate( url, { html } );
-            } catch ( error ) {
-                state.error = 'Network error. Please check your connection.';
-            }
-        } ),
-    },
+				// Navigate using the fetched HTML.
+				const { actions } = yield import(
+					'@wordpress/interactivity-router'
+				);
+				yield actions.navigate( url, { html } );
+			} catch ( error ) {
+				state.error = 'Network error. Please check your connection.';
+			}
+		} ),
+	},
 } );
 ```
 
@@ -587,15 +588,17 @@ add_action( 'wp', function() {
 ```
 
 When `clientNavigationDisabled` is `true`:
-- `actions.navigate()` triggers a full page reload.
-- `actions.prefetch()` does nothing.
-- Navigating from another page to this page forces a reload.
+
+-   `actions.navigate()` triggers a full page reload.
+-   `actions.prefetch()` does nothing.
+-   Navigating from another page to this page forces a reload.
 
 ### Disabling navigation feedback
 
 The Interactivity API router includes built-in feedback during navigation:
-- **Loading animation**: A progress bar that appears at the top of the page during navigation. The bar appears after a short delay (400ms) if navigation hasn't completed yet.
-- **Screen reader announcements**: Accessibility announcements for navigation progress.
+
+-   **Loading animation**: A progress bar that appears at the top of the page during navigation. The bar appears after a short delay (400ms) if navigation hasn't completed yet.
+-   **Screen reader announcements**: Accessibility announcements for navigation progress.
 
 In some cases, you may want to disable these:
 
@@ -614,9 +617,10 @@ yield actions.navigate( '/page/', {
 ```
 
 Use cases for disabling feedback:
-- **Silent updates**: Background refreshes where you don't want to draw attention.
-- **Custom loading UI**: When you're implementing your own loading indicators.
-- **Custom accessibility**: When you're providing your own screen reader announcements.
+
+-   **Silent updates**: Background refreshes where you don't want to draw attention.
+-   **Custom loading UI**: When you're implementing your own loading indicators.
+-   **Custom accessibility**: When you're providing your own screen reader announcements.
 
 ### Subscribing to page changes
 
@@ -628,18 +632,18 @@ import { watch, store } from '@wordpress/interactivity';
 
 // Store-wide subscription.
 watch( () => {
-    const { state } = store( 'core/router' );
-    sendAnalyticsPageView( state.url );
+	const { state } = store( 'core/router' );
+	sendAnalyticsPageView( state.url );
 } );
 
 // Element-based subscription: <div data-wp-watch="callbacks.sendPageView">
 store( 'myPlugin', {
-    callbacks: {
-        sendPageView() {
-            const { state } = store( 'core/router' );
-            sendAnalyticsPageView( state.url );
-        },
-    },
+	callbacks: {
+		sendPageView() {
+			const { state } = store( 'core/router' );
+			sendAnalyticsPageView( state.url );
+		},
+	},
 } );
 ```
 
@@ -655,11 +659,11 @@ The cache uses a normalized version of the URL as its key. This normalization st
 
 Each entry in the cache stores not just the fetched HTML, but a fully processed page representation containing:
 
-- **Virtual DOM trees** for each router region found in the page
-- **Style sheet references** needed by the page
-- **Script module information** for JavaScript that should be loaded
-- **The page title** for updating the document title
-- **Server state** that was embedded in the page by WordPress
+-   **Virtual DOM trees** for each router region found in the page
+-   **Style sheet references** needed by the page
+-   **Script module information** for JavaScript that should be loaded
+-   **The page title** for updating the document title
+-   **Server state** that was embedded in the page by WordPress
 
 An important detail is that the cache stores promises rather than resolved values. When a fetch begins, the router immediately stores the pending promise in the cache. This means that if multiple calls to `prefetch()` or `navigate()` target the same URL simultaneously (for example, if a user rapidly hovers over multiple links pointing to the same page), only one network request is made. All callers receive the same promise and wait for the same result.
 
@@ -674,7 +678,9 @@ const { actions } = store( 'myPlugin', {
 		*submitForm() {
 			yield fetch( '/wp-json/my-plugin/v1/submit', {
 				method: 'POST',
-				body: JSON.stringify( { /* form data */ } ),
+				body: JSON.stringify( {
+					/* form data */
+				} ),
 			} );
 			// Navigate to the same page, bypassing the cache
 			// to reflect the updated content.
@@ -695,24 +701,25 @@ You define a router region by adding the `data-wp-router-region` attribute to an
 The attribute value serves as a unique identifier for that region. You can specify it in two ways:
 
 1. As a simple string:
-   ```html
-   <div
-       data-wp-interactive="myPlugin"
-       data-wp-router-region="myPlugin/main-content"
-   >
-       <!-- Region content -->
-   </div>
-   ```
+
+    ```html
+    <div
+    	data-wp-interactive="myPlugin"
+    	data-wp-router-region="myPlugin/main-content"
+    >
+    	<!-- Region content -->
+    </div>
+    ```
 
 2. As a JSON object (when you need to pass other options):
-   ```html
-   <div
-       data-wp-interactive="myPlugin"
-       data-wp-router-region='{ "id": "myPlugin/modal", "attachTo": "body" }'
-   >
-       <!-- Region content -->
-   </div>
-   ```
+    ```html
+    <div
+    	data-wp-interactive="myPlugin"
+    	data-wp-router-region='{ "id": "myPlugin/modal", "attachTo": "body" }'
+    >
+    	<!-- Region content -->
+    </div>
+    ```
 
 The region ID must be unique within a single page and consistent across pages that share the same region. For example, if both your "Products" page and "Product Detail" page have a sidebar, and you want that sidebar to update during navigation, both pages should define a region with the same ID (e.g., `"myPlugin/sidebar"`).
 
@@ -729,19 +736,19 @@ For a router region to function correctly, it must meet these requirements:
 ```html
 <!-- Correct: The region element has data-wp-interactive -->
 <div data-wp-interactive="myPlugin">
-    <div
-        data-wp-interactive="myPlugin"
-        data-wp-router-region="myPlugin/sidebar"
-    >
-        <!-- Sidebar content -->
-    </div>
+	<div
+		data-wp-interactive="myPlugin"
+		data-wp-router-region="myPlugin/sidebar"
+	>
+		<!-- Sidebar content -->
+	</div>
 </div>
 
 <!-- Incorrect: This region may not update properly -->
 <div data-wp-interactive="myPlugin">
-    <div data-wp-router-region="myPlugin/sidebar">
-        <!-- This won't work reliably! -->
-    </div>
+	<div data-wp-router-region="myPlugin/sidebar">
+		<!-- This won't work reliably! -->
+	</div>
 </div>
 ```
 
@@ -803,17 +810,14 @@ For example, consider a shopping cart icon in the header that displays the numbe
 ```html
 <!-- This header is NOT inside a router region -->
 <header data-wp-interactive="myShop">
-    <div class="cart-icon">
-        <span data-wp-text="state.cartCount"></span> items
-    </div>
+	<div class="cart-icon">
+		<span data-wp-text="state.cartCount"></span> items
+	</div>
 </header>
 
 <!-- This is the router region that updates during navigation -->
-<main
-    data-wp-interactive="myShop"
-    data-wp-router-region="myShop/content"
->
-    <!-- Page content -->
+<main data-wp-interactive="myShop" data-wp-router-region="myShop/content">
+	<!-- Page content -->
 </main>
 ```
 
@@ -823,12 +827,12 @@ But if you use `getServerState()` instead:
 
 ```js
 const { state } = store( 'myShop', {
-    state: {
-        get cartCount() {
-            // This reacts to server state changes during navigation.
-            return getServerState().cartCount;
-        },
-    },
+	state: {
+		get cartCount() {
+			// This reacts to server state changes during navigation.
+			return getServerState().cartCount;
+		},
+	},
 } );
 ```
 
@@ -871,24 +875,26 @@ When inserting new style sheets, the router must preserve the correct cascade or
 Given the current page's style sheets (sequence X) and the target page's style sheets (sequence Y), the SCS algorithm finds the shortest sequence that contains both X and Y as subsequences while preserving their internal order. This tells the router exactly where to insert new elements and which existing elements to keep.
 
 For example:
-- Current page styles (X): [A, C, D]
-- Target page styles (Y): [A, B, C, E]
-- Shortest Common Supersequence: [A, B, C, D, E]
+
+-   Current page styles (X): [A, C, D]
+-   Target page styles (Y): [A, B, C, E]
+-   Shortest Common Supersequence: [A, B, C, D, E]
 
 The algorithm then determines: keep A and C in place, insert B between A and C, keep D after C, and insert E at the end.
 
 This approach ensures that:
-- Style sheets that appear in both pages remain in their correct relative order
-- New style sheets are inserted at the proper position to maintain cascade correctness
-- The minimum number of DOM operations is performed
+
+-   Style sheets that appear in both pages remain in their correct relative order
+-   New style sheets are inserted at the proper position to maintain cascade correctness
+-   The minimum number of DOM operations is performed
 
 **Activating and deactivating styles during navigation**
 
 When `navigate()` actually renders the new page, the router toggles style sheets on and off:
 
-- **Activating styles**: For each style sheet that belongs to the target page, the router removes the `media="preload"` override (or restores the original `media` attribute if one was specified). This causes the browser to apply those styles.
+-   **Activating styles**: For each style sheet that belongs to the target page, the router removes the `media="preload"` override (or restores the original `media` attribute if one was specified). This causes the browser to apply those styles.
 
-- **Deactivating styles**: For each style sheet that was in the current page but not the target page, the router sets `media="preload"`. This disables the styles without removing the element from the DOM.
+-   **Deactivating styles**: For each style sheet that was in the current page but not the target page, the router sets `media="preload"`. This disables the styles without removing the element from the DOM.
 
 By keeping deactivated style elements in the DOM (rather than removing them), the router can quickly reactivate them if the user navigates back. The styles are already loaded and parsed; they just need to be enabled.
 
@@ -902,9 +908,9 @@ Not all script modules should be loaded during client-side navigation. Some modu
 
 ```html
 <script
-    type="module"
-    src="/wp-content/plugins/my-plugin/view.js"
-    data-wp-router-options='{"loadOnClientNavigation": true}'
+	type="module"
+	src="/wp-content/plugins/my-plugin/view.js"
+	data-wp-router-options='{"loadOnClientNavigation": true}'
 ></script>
 ```
 
@@ -916,12 +922,12 @@ Modern JavaScript uses import maps to resolve bare module specifiers (like `@wor
 
 ```html
 <script type="importmap">
-{
-    "imports": {
-        "@wordpress/interactivity": "/wp-includes/js/dist/interactivity.min.js",
-        "@wordpress/interactivity-router": "/wp-includes/js/dist/interactivity-router.min.js"
-    }
-}
+	{
+		"imports": {
+			"@wordpress/interactivity": "/wp-includes/js/dist/interactivity.min.js",
+			"@wordpress/interactivity-router": "/wp-includes/js/dist/interactivity-router.min.js"
+		}
+	}
 </script>
 ```
 
@@ -955,8 +961,8 @@ When `navigate()` renders the new page, it imports all the script modules that w
 
 ```js
 // Simplified conceptual view of what happens.
-for (const moduleInfo of page.scriptModules) {
-    await import(moduleInfo.blobUrl);
+for ( const moduleInfo of page.scriptModules ) {
+	await import( moduleInfo.blobUrl );
 }
 ```
 
@@ -974,15 +980,18 @@ When WordPress renders a page with interactive blocks, it embeds server-provided
 
 ```html
 <!-- Global state -->
-<script type="application/json" id="wp-script-module-data-@wordpress/interactivity">
-{
-    "state": {
-        "myPlugin":{
-            "cartItemCount": 3,
-            "userLoggedIn": true
-        }
-    }
-}
+<script
+	type="application/json"
+	id="wp-script-module-data-@wordpress/interactivity"
+>
+	{
+		"state": {
+			"myPlugin": {
+				"cartItemCount": 3,
+				"userLoggedIn": true
+			}
+		}
+	}
 </script>
 ```
 
@@ -990,10 +999,10 @@ Local context is embedded directly in the `data-wp-context` attribute of element
 
 ```html
 <div
-    data-wp-interactive="myPlugin"
-    data-wp-context='{ "productId": 42, "inStock": true }'
+	data-wp-interactive="myPlugin"
+	data-wp-context='{ "productId": 42, "inStock": true }'
 >
-    <!-- Block content -->
+	<!-- Block content -->
 </div>
 ```
 
@@ -1053,8 +1062,8 @@ After navigation:
 
 The Interactivity API provides two functions for accessing server-provided data that updates during navigation:
 
-- `getServerState()`: Returns the global state as provided by the server for the current page
-- `getServerContext()`: Returns the local context as provided by the server for the current element
+-   `getServerState()`: Returns the global state as provided by the server for the current page
+-   `getServerContext()`: Returns the local context as provided by the server for the current element
 
 These functions are reactive. When used inside a callback or derived state getter, they automatically set up a subscription. When navigation occurs and new server data arrives, any code using these functions will re-run with the new values.
 
@@ -1090,11 +1099,11 @@ When `navigate()` is called (for example, on link click):
 4. A loading indicator may appear if the wait exceeds a threshold (400ms).
 5. Script modules for the new page are imported and executed.
 6. The rendering phase begins (wrapped in a batch for efficiency):
-   - Server state is merged with client state.
-   - Each router region is updated with its new virtual DOM.
-   - Regions with `attachTo` that don't exist are created and appended.
-   - Styles are activated/deactivated as needed.
-   - The document title is updated.
+    - Server state is merged with client state.
+    - Each router region is updated with its new virtual DOM.
+    - Regions with `attachTo` that don't exist are created and appended.
+    - Styles are activated/deactivated as needed.
+    - The document title is updated.
 7. Browser history is updated (pushState or replaceState).
 8. Screen reader announcement is made for accessibility.
 9. If the URL has a hash, the page scrolls to that element.
