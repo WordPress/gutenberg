@@ -5,7 +5,7 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 const WARNING_TEXT = 'This color combination may be hard for people to read';
 
-test.describe( 'ContrastChecker', () => {
+test.describe( 'Contrast Checker', () => {
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
@@ -30,31 +30,23 @@ test.describe( 'ContrastChecker', () => {
 				name: 'Editor settings',
 			} );
 
-			// Check if Styles tab exists and click it if needed
-			const stylesTab = editorSettings.getByRole( 'tab', {
-				name: 'Styles',
-			} );
-			if ( ( await stylesTab.count() ) > 0 ) {
-				await stylesTab.click();
-			}
-
 			const textButton = editorSettings.getByRole( 'button', {
 				name: 'Text',
 			} );
+			const backgroundButton = editorSettings.getByRole( 'button', {
+				name: 'Background',
+			} );
+
 			await expect( textButton ).toBeVisible();
 			await textButton.click();
 			await page.getByRole( 'option', { name: 'Black' } ).click();
 
-			// Close the popover by clicking outside before opening background
+			// Close the popover by clicking outside before opening background.
 			await textButton.click();
-
-			const backgroundButton = page
-				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Background' } );
 			await backgroundButton.click();
 			await page.getByRole( 'option', { name: 'Black' } ).click();
 
-			// Close the popover to ensure colors are fully applied
+			// Close the popover to ensure colors are fully applied.
 			await backgroundButton.click();
 
 			await expect( lowContrastWarning ).toBeVisible();
@@ -71,14 +63,6 @@ test.describe( 'ContrastChecker', () => {
 				name: 'Editor settings',
 			} );
 
-			// Check if Styles tab exists and click it if needed
-			const stylesTab = editorSettings.getByRole( 'tab', {
-				name: 'Styles',
-			} );
-			if ( ( await stylesTab.count() ) > 0 ) {
-				await stylesTab.click();
-			}
-
 			const textButton = editorSettings.getByRole( 'button', {
 				name: 'Text',
 			} );
@@ -86,7 +70,7 @@ test.describe( 'ContrastChecker', () => {
 			await textButton.click();
 			await page.getByRole( 'option', { name: 'White' } ).click();
 
-			// Close the popover to ensure colors are fully applied
+			// Close the popover to ensure colors are fully applied.
 			await textButton.click();
 
 			await expect( lowContrastWarning ).toBeVisible();
@@ -113,34 +97,25 @@ test.describe( 'ContrastChecker', () => {
 			name: 'Editor settings',
 		} );
 
-		// Check if Styles tab exists and click it if needed
-		const stylesTab = editorSettings.getByRole( 'tab', {
-			name: 'Styles',
-		} );
-		if ( ( await stylesTab.count() ) > 0 ) {
-			await stylesTab.click();
-		}
-
 		const textButton = editorSettings.getByRole( 'button', {
 			name: 'Text',
+		} );
+		const backgroundButton = editorSettings.getByRole( 'button', {
+			name: 'Background',
 		} );
 		await expect( textButton ).toBeVisible();
 		await textButton.click();
 		await page.getByRole( 'option', { name: 'Black' } ).click();
 
-		// Close the popover before opening background
+		// Close the popover before opening background.
 		await textButton.click();
-
-		const backgroundButton = page
-			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Background' } );
 		await backgroundButton.click();
 		await page.getByRole( 'option', { name: 'White' } ).click();
 
 		// Close the popover to ensure colors are fully applied
 		await backgroundButton.click();
 
-		await expect( lowContrastWarning ).not.toBeVisible();
+		await expect( lowContrastWarning ).toBeHidden();
 	} );
 
 	test( 'should hide warning when contrast is fixed', async ( {
@@ -162,26 +137,18 @@ test.describe( 'ContrastChecker', () => {
 			name: 'Editor settings',
 		} );
 
-		// Check if Styles tab exists and click it if needed
-		const stylesTab = editorSettings.getByRole( 'tab', {
-			name: 'Styles',
-		} );
-		if ( ( await stylesTab.count() ) > 0 ) {
-			await stylesTab.click();
-		}
-
 		// Set poor contrast: black text on black background
 		const textButton = editorSettings.getByRole( 'button', {
 			name: 'Text',
 		} );
-		await expect( textButton ).toBeVisible();
-		await textButton.click();
-		await page.getByRole( 'option', { name: 'Black' } ).click();
-		await textButton.click();
-
 		const backgroundButton = editorSettings.getByRole( 'button', {
 			name: 'Background',
 		} );
+		await expect( textButton ).toBeVisible();
+		await textButton.click();
+		await page.getByRole( 'option', { name: 'Black' } ).click();
+
+		await textButton.click();
 		await backgroundButton.click();
 		await page.getByRole( 'option', { name: 'Black' } ).click();
 		await backgroundButton.click();
@@ -195,7 +162,7 @@ test.describe( 'ContrastChecker', () => {
 		await backgroundButton.click();
 
 		// Verify warning disappears
-		await expect( lowContrastWarning ).not.toBeVisible();
+		await expect( lowContrastWarning ).toBeHidden();
 	} );
 
 	test( 'should show warning for insufficient link color contrast', async ( {
@@ -220,14 +187,6 @@ test.describe( 'ContrastChecker', () => {
 		const editorSettings = page.getByRole( 'region', {
 			name: 'Editor settings',
 		} );
-
-		// Check if Styles tab exists and click it if needed
-		const stylesTab = editorSettings.getByRole( 'tab', {
-			name: 'Styles',
-		} );
-		if ( ( await stylesTab.count() ) > 0 ) {
-			await stylesTab.click();
-		}
 
 		// Set background to black first
 		const backgroundButton = editorSettings.getByRole( 'button', {
@@ -275,13 +234,11 @@ test.describe( 'ContrastChecker', () => {
 			name: 'Editor settings',
 		} );
 
-		// Check if Styles tab exists and click it if needed
-		const stylesTab = editorSettings.getByRole( 'tab', {
-			name: 'Styles',
-		} );
-		if ( ( await stylesTab.count() ) > 0 ) {
-			await stylesTab.click();
-		}
+		await editorSettings
+			.getByRole( 'tab', {
+				name: 'Styles',
+			} )
+			.click();
 
 		// Set text color to black
 		const textButton = editorSettings.getByRole( 'button', {
@@ -323,13 +280,11 @@ test.describe( 'ContrastChecker', () => {
 			name: 'Editor settings',
 		} );
 
-		// Check if Styles tab exists and click it if needed
-		const stylesTab = editorSettings.getByRole( 'tab', {
-			name: 'Styles',
-		} );
-		if ( ( await stylesTab.count() ) > 0 ) {
-			await stylesTab.click();
-		}
+		await editorSettings
+			.getByRole( 'tab', {
+				name: 'Styles',
+			} )
+			.click();
 
 		// Set text color to black
 		const textButton = editorSettings.getByRole( 'button', {
@@ -349,6 +304,6 @@ test.describe( 'ContrastChecker', () => {
 		await backgroundButton.click();
 
 		// Verify no warning appears
-		await expect( lowContrastWarning ).not.toBeVisible();
+		await expect( lowContrastWarning ).toBeHidden();
 	} );
 } );
