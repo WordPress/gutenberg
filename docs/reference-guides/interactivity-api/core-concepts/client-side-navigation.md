@@ -443,9 +443,9 @@ const { state } = store( 'myPlugin', {
 
 For more details, see the [Understanding global state, local context, and derived state](/docs/reference-guides/interactivity-api/core-concepts/understanding-global-state-local-context-derived-state-and-config.md#subscribing-to-server-state-and-context) guide.
 
-### Overriding cached pages
+### Overriding router's internal in-memory cached pages
 
-By default, once a page is stored in the router's internal in-memory cache, subsequent navigations use the cached version without making a new network request. Use the `force` option to bypass the router's cache and re-fetch the page from the server:
+By default, once a page is stored in the router's internal in-memory cache, subsequent navigations use the cached version without making a new network request. Use the `force` option to bypass the router's internal in-memory cache and re-fetch the page from the server:
 
 ```js
 // Force re-fetch with navigate().
@@ -677,11 +677,11 @@ The <code>state.url</code> approach has a known limitation: when navigating with
 
 ## The Interactivity Router in depth
 
-This section provides a detailed technical explanation of how client-side navigation works internally. Understanding these internals can help you debug issues, optimize performance, and make informed decisions about how to structure your interactive blocks.
+This section provides a detailed technical explanation of how client-side navigation works internally. Understanding these internals can help you debug issues, optimize performance, and make informed decisions about how to structure your code.
 
-### The page cache
+### The internal page cache
 
-At the heart of the Interactivity API router is a page cache — a simple in-memory store that maps URLs to their processed page representations. When you call `prefetch()` or `navigate()`, the router first checks this cache to see if the target page has already been fetched and processed.
+At the heart of the Interactivity API router is an internal in-memory page cache — a simple in-memory store that maps URLs to their processed page representations. When you call `prefetch()` or `navigate()`, the router first checks this cache to see if the target page has already been fetched and processed.
 
 The cache uses a normalized version of the URL as its key. This normalization strips away the domain and any hash fragments, keeping only the pathname and query parameters. For example, `https://example.com/products/?category=shoes#details` becomes `/products/?category=shoes`. This ensures that navigations to the same logical page (regardless of how the URL was constructed) share the same cache entry.
 
@@ -698,6 +698,23 @@ An important detail is that the cache stores promises rather than resolved value
 Once a page is in the cache, it remains there for the duration of the browser session. Subsequent navigations to that URL will use the cached version instantly, without any network request. This is why client-side navigation feels so fast after the initial visit — the page is already prepared and ready to render.
 
 If you need to force a fresh fetch (for example, after submitting a form that changes the page's content), you can use the `force: true` option with `navigate()` or `prefetch()`. This bypasses the cache check and fetches the page anew, replacing the existing cache entry with the fresh content.
+
+```js
+// Force a fresh fetch after a form submission.
+const { actions } = store( 'myPlugin', {
+	actions: {
+		*submitForm() {
+			yield fetch( '/wp-json/my-plugin/v1/submit', {
+				method: 'POST',
+				body: JSON.stringify( { /* form data */ } ),
+			} );
+			// Navigate to the same page, bypassing the cache
+			// to reflect the updated content.
+			yield navigate( window.location.href, { force: true } );
+		},
+	},
+} );
+```
 
 ### Router regions
 
@@ -719,7 +736,7 @@ The attribute value serves as a unique identifier for that region. You can speci
    </div>
    ```
 
-2. As a JSON object (when you need the `attachTo` feature, explained later):
+2. As a JSON object (when you need to pass other options):
    ```html
    <div
        data-wp-interactive="myPlugin"
@@ -768,7 +785,7 @@ First, the router parses the fetched HTML into a document structure using the br
 
 Next, the router scans this document for all elements that have both `data-wp-interactive` and `data-wp-router-region` attributes. For each region found, it extracts the region ID and checks whether the region is nested inside another region. Only top-level regions are processed directly; nested regions are handled as part of their parent's content.
 
-For each top-level region, the router converts the HTML into a virtual DOM (vDOM) representation. The virtual DOM is a lightweight JavaScript object structure that mirrors the actual DOM but can be compared and manipulated much more efficiently. Importantly, the region element itself is included in this conversion — not just its children. This means that attributes on the region element, such as `data-wp-context`, will also be processed and updated during navigation.
+For each top-level region, the router converts the HTML into a virtual DOM (vDOM) representation. The virtual DOM is a lightweight JavaScript object structure that mirrors the actual DOM but can be compared and manipulated much more efficiently by the Interactivity API. Importantly, the region element itself is included in this conversion — not just its children. This means that attributes on the region element, such as `data-wp-context`, will also be processed and updated during navigation.
 
 Finally, each region's virtual DOM is stored in the page cache entry, indexed by its region ID. The cache entry now contains a map of region IDs to their corresponding virtual DOM trees.
 
@@ -849,7 +866,7 @@ const { state } = store( 'myShop', {
 
 Now the cart icon will update whenever navigation brings in a new `cartCount` value from the server, even though the header itself is outside any router region. This is because `getServerState()` creates a reactive subscription to server-provided state, which is updated during every navigation.
 
-This pattern is useful for global UI elements that need to stay synchronized with server data across navigations, without requiring them to be inside a router region.
+This pattern is useful for global UI elements that need to stay synchronized with server data across navigations, without requiring them to be inside a router region. However, `getServerState()` can also be used to synchronize the `state` of interactive blocks inside router regions, as described in the [Handling server state updates](#handling-server-state-updates) section.
 
 ### CSS handling
 
@@ -909,9 +926,9 @@ By keeping deactivated style elements in the DOM (rather than removing them), th
 
 ### Script module handling
 
-Modern WordPress blocks often use JavaScript modules (ES modules) for their interactive behavior. The router must ensure that when navigating to a new page, any JavaScript modules required by that page are loaded and executed.
+Interactive blocks use [script modules](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/) for their interactive behavior. The router must ensure that when navigating to a new page, any script modules required by that page are loaded and executed.
 
-**Identifying modules for client-side navigation**
+**Identifying script modules for client-side navigation**
 
 Not all script modules should be loaded during client-side navigation. Some modules might be for admin functionality, or for features that only apply on initial page load. To distinguish which modules should be loaded, WordPress uses a special data attribute:
 
@@ -940,33 +957,33 @@ Modern JavaScript uses import maps to resolve bare module specifiers (like `@wor
 </script>
 ```
 
-When the router fetches a new page, it extracts the import map from that page and merges any new mappings with the current page's import map. This ensures that modules can resolve their dependencies correctly even when navigating between pages that have different sets of scripts.
+When the router fetches a new page, it extracts the import map from that page and merges any new mappings with the current page's import map. This ensures that script modules can resolve their dependencies correctly even when navigating between pages that have different sets of scripts.
 
-**Preloading modules and their dependencies**
+**Preloading script modules and their dependencies**
 
-Preloading script modules is more complex than preloading styles because modules can import other modules. A single entry-point module might depend on dozens of other modules, which might depend on dozens more.
+Preloading script modules is more complex than preloading styles because script modules can import other script modules. A single entry-point module might depend on dozens of other script modules, which might depend on dozens more.
 
 To handle this, the router performs a recursive dependency resolution:
 
-1. It fetches the source code of each entry-point module
+1. It fetches the source code of each entry-point script module
 2. It parses the source to find all `import` statements
-3. For each import, it resolves the module specifier using the import map
+3. For each import, it resolves the script module specifier using the import map
 4. It recursively fetches and parses each dependency
-5. This continues until all modules in the dependency tree have been fetched
+5. This continues until all script modules in the dependency tree have been fetched
 
-The router is smart about avoiding redundant work. If a module has already been loaded by the initial page (it appears in the initial import map), the router doesn't fetch it again — the browser already has it cached.
+The router is smart about avoiding redundant work. If a script module has already been loaded by the initial page (it appears in the initial import map), the router doesn't fetch it again — the browser already has it cached.
 
 **Handling the import timing**
 
-An important subtlety is that module code shouldn't execute until navigation actually happens. The router needs to have the module code ready (to avoid delays during navigation), but it shouldn't run that code while the user is still viewing the current page.
+An important subtlety is that script module code shouldn't execute until navigation actually happens. The router needs to have the script module code ready (to avoid delays during navigation), but it shouldn't run that code while the user is still viewing the current page.
 
-The router accomplishes this by transforming the fetched modules. It rewrites the source code to use blob URLs (data embedded directly in the URL) and caches these transformed modules. When navigation occurs, the router uses dynamic `import()` to execute the cached modules.
+The router accomplishes this by transforming the fetched script modules. It rewrites the source code to use blob URLs (data embedded directly in the URL) and caches these transformed script modules. When navigation occurs, the router uses dynamic `import()` to execute the cached script modules.
 
-Because the browser's module system caches modules by URL, importing the same blob URL multiple times returns the same module instance. This ensures that each module is only executed once, even if multiple code paths try to import it.
+Because the browser's module system caches script modules by URL, importing the same blob URL multiple times returns the same module instance. This ensures that each script module is only executed once, even if multiple code paths try to import it.
 
-**Module execution during navigation**
+**Script module execution during navigation**
 
-When `navigate()` renders the new page, it imports all the modules that were preloaded for that page:
+When `navigate()` renders the new page, it imports all the script modules that were preloaded for that page:
 
 ```js
 // Simplified conceptual view of what happens.
@@ -975,11 +992,13 @@ for (const moduleInfo of page.scriptModules) {
 }
 ```
 
-Each module's top-level code runs, which typically includes calls to `store()` to register actions, callbacks, and state. Because the Interactivity API's store is global and additive, these registrations merge with existing store definitions from the initial page load.
+Each script module's top-level code runs, which typically includes calls to `store()` to register actions, callbacks, and state. Because the Interactivity API's store is global and additive, these registrations merge with existing store definitions from the initial page load.
 
 ### Server state and context
 
-WordPress blocks often need data from the server — configuration values, content from the database, user preferences, and more. The Interactivity API provides two mechanisms for this: global state and local context. During client-side navigation, this server-provided data needs to be extracted from the new page and made available to the client-side code.
+Interactive blocks often need data from the server — configuration values, content from the database, user preferences, and more. The Interactivity API provides two mechanisms for this: [global state and local context](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md).
+
+During client-side navigation, this server-provided data needs to be extracted from the new page and made available to the client-side code.
 
 **How server data is embedded in pages**
 
@@ -1014,7 +1033,7 @@ Local context is embedded directly in the `data-wp-context` attribute of element
 
 When the router fetches a new page, it extracts both types of server data:
 
-1. **Global state**: The router finds the `<script type="application/json">` element with ID `wp-script-module-data-@wordpress/interactivity` and parses its JSON content. This state is stored in the page cache entry.
+1. **Global state**: The router finds the `<script type="application/json">` element with ID `wp-script-module-data-@wordpress/interactivity` and parses its JSON content. This state is stored in the internal in-memory page cache entry.
 
 2. **Local context**: Context values are embedded in the virtual DOM representation of each router region. When a region's HTML is converted to vDOM, the `data-wp-context` attributes are preserved and will be processed during rendering.
 
@@ -1024,7 +1043,43 @@ When navigation renders the new page, the server-provided data may need to merge
 
 For **global state**, the merge works as follows: properties that already exist on the client are left untouched, and only new properties (those that don't exist on the client yet) are added from the server data. If you need the client state to reflect server changes during navigation, use `getServerState()` to subscribe to the server-provided values and update the client state yourself.
 
+```
+Server state from the initial page:
+  { "totalResults": 120, "isFiltersOpen": false }
+
+Before navigation (User opened the filters, modifying client state):
+  getServerState()  → { "totalResults": 120, "isFiltersOpen": false }
+  state             → { "totalResults": 120, "isFiltersOpen": true }
+
+Server state from the new page:
+  { "totalResults": 85, "sortOrder": "date" }
+
+After navigation:
+  getServerState()  → { "totalResults": 85, "sortOrder": "date" }
+  state             → { "totalResults": 120, "isFiltersOpen": true, "sortOrder": "date" }
+```
+
+`totalResults` stays at `120` in `state` because it already existed on the client. `isFiltersOpen` is also preserved. `sortOrder` is added because it didn't exist on the client yet. Meanwhile, `getServerState()` always reflects exactly what the server sent for the new page.
+
 For **local context**, the behavior follows the same principle. The Interactivity API tracks server context and client context separately. During navigation, the server context is updated with the values from the new page, but the client context remains unchanged. Use `getServerContext()` to read the server-provided values and `getContext()` to read the client-side values, choosing whichever is appropriate for your use case.
+
+```
+Server context from the initial page:
+  { "isAvailable": true, "isLiked": false }
+
+Before navigation (User has liked the item, modifying client context):
+  getServerContext() → { "isAvailable": true, "isLiked": false }
+  getContext()       → { "isAvailable": true, "isLiked": true }
+
+Server context from the new page:
+  { "isAvailable": false, "discount": 15 }
+
+After navigation:
+  getServerContext() → { "isAvailable": false, "discount": 15 }
+  getContext()       → { "isAvailable": true, "isLiked": true, "discount": 15 }
+```
+
+`isAvailable` stays `true` in `getContext()` because it already existed on the client. `isLiked` is also preserved. `discount` is added because it didn't exist on the client yet. Meanwhile, `getServerContext()` always reflects exactly what the server sent for the new page.
 
 **Subscribing to server data changes**
 
@@ -1045,21 +1100,21 @@ Now that we've examined each component, let's trace through a complete navigatio
 
 #### Phase 1: Prefetch (optional but recommended)
 
-When the user hovers over a link, your code might call `prefetch()`:
+When `prefetch()` is called (for example, on link hover):
 
 1. The router normalizes the URL and checks the page cache.
 2. If not cached, it begins fetching the HTML.
 3. The fetched HTML is parsed into a document.
 4. Router regions are extracted and converted to virtual DOM.
-5. Style sheets are compared with current page; new ones are added with `media="preload"`.
-6. Script modules are identified, dependencies resolved, and source code fetched.
+5. Style sheets are compared with the previously loaded ones; new ones are added with `media="preload"`.
+6. Script modules are identified and compared with the previously loaded ones; new ones have their dependencies resolved and source code fetched.
 7. Server state is extracted.
 8. The fully processed page is stored in the cache.
 9. The function returns (the page is now ready for instant navigation).
 
 #### Phase 2: Navigate
 
-When the user clicks the link and your code calls `navigate()`:
+When `navigate()` is called (for example, on link click):
 
 1. The router checks if client navigation is disabled; if so, falls back to full page load.
 2. If not already prefetched, the fetch process from Phase 1 runs now.
@@ -1089,7 +1144,7 @@ This ensures that rapid clicking through multiple links doesn't cause visual gli
 
 Full-page client-side navigation is an experimental feature that extends the region-based approach described throughout this guide. Instead of requiring you to define individual router regions, full-page navigation treats the entire `<body>` element as a single region — effectively replacing all page content during navigation.
 
-This feature is only available in the Gutenberg plugin and must be enabled manually. To activate it, go to **Admin Panel > Gutenberg > Experiments** and check the **"Interactivity API: Full-page client-side navigation"** option.
+This feature is only available in the Gutenberg plugin and must be enabled manually. To activate it, go to **WP Admin > Gutenberg > Experiments** and check the **"Interactivity API: Full-page client-side navigation"** option.
 
 Once enabled, this mode automatically intercepts all link clicks and hover events on the page, triggering client-side navigation and prefetching without you needing to write any custom action handlers. It is available through a separate entry point in the router package:
 
