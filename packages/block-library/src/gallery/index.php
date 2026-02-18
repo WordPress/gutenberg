@@ -138,58 +138,6 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 		array( 'context' => 'block-supports' )
 	);
 
-	// Gets all image IDs from the state that match this gallery's ID.
-	$state      = wp_interactivity_state( 'core/image' );
-	$gallery_id = $block->context['galleryId'] ?? null;
-	$image_ids  = array();
-	if ( isset( $gallery_id ) && isset( $state['metadata'] ) ) {
-		foreach ( $state['metadata'] as $image_id => $metadata ) {
-			if ( isset( $metadata['galleryId'] ) && $metadata['galleryId'] === $gallery_id ) {
-				$image_ids[] = $image_id;
-			}
-		}
-	}
-
-	if ( ! empty( $image_ids ) ) {
-		// Randomize image IDs when `randomOrder` setting is enabled.
-		if ( ! empty( $attributes['randomOrder'] ) ) {
-			shuffle( $image_ids );
-		}
-
-		$processed_content->set_attribute( 'data-wp-interactive', 'core/gallery' );
-		$processed_content->set_attribute(
-			'data-wp-context',
-			wp_json_encode(
-				array( 'galleryId' => $gallery_id ),
-				JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
-			)
-		);
-
-		// Populates the aria label for each image in the gallery.
-		for ( $i = 0; $i < count( $image_ids ); $i++ ) {
-			$image_id = $image_ids[ $i ];
-			$alt      = $state['metadata'][ $image_id ]['alt'];
-			wp_interactivity_state(
-				'core/image',
-				array(
-					'metadata' => array(
-						$image_id => array(
-							'customAriaLabel'        => empty( $alt )
-								/* translators: %1$s: current image index, %2$s: total number of images */
-								? sprintf( __( 'Enlarged image %1$s of %2$s' ), $i + 1, count( $image_ids ) )
-								/* translators: %1$s: current image index, %2$s: total number of images, %3$s: Image alt text */
-								: sprintf( __( 'Enlarged image %1$s of %2$s: %3$s' ), $i + 1, count( $image_ids ), $alt ),
-							/* translators: %1$s: current image index, %2$s: total number of images */
-							'triggerButtonAriaLabel' => sprintf( __( 'Enlarge %1$s of %2$s' ), $i + 1, count( $image_ids ) ),
-							// This metadata is used to store the order of the images in the gallery.
-							'order'                  => $i,
-						),
-					),
-				)
-			);
-		}
-	}
-
 	// The WP_HTML_Tag_Processor class calls get_updated_html() internally
 	// when the instance is treated as a string, but here we explicitly
 	// convert it to a string.
@@ -205,37 +153,85 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	 *
 	 * @see: https://github.com/WordPress/gutenberg/pull/58733
 	 */
-	if ( empty( $attributes['randomOrder'] ) || empty( $image_ids ) ) {
-		return $updated_content;
+	if ( ! empty( $attributes['randomOrder'] ) ) {
+		// This pattern matches figure elements with the `wp-block-image`
+		// class to avoid the gallery's wrapping `figure` element and
+		// extract images only.
+		$pattern = '/<figure[^>]*\bwp-block-image\b[^>]*>.*?<\/figure>/s';
+
+		preg_match_all( $pattern, $updated_content, $matches );
+		if ( $matches ) {
+			$image_blocks = $matches[0];
+			shuffle( $image_blocks );
+
+			$i               = 0;
+			$updated_content = preg_replace_callback(
+				$pattern,
+				static function () use ( $image_blocks, &$i ) {
+					return $image_blocks[ $i++ ];
+				},
+				$updated_content
+			);
+		}
 	}
 
-	// This pattern matches figure elements with the `wp-block-image` class to
-	// avoid the gallery's wrapping `figure` element and extract images only.
-	$pattern = '/<figure[^>]*\bwp-block-image\b[^>]*>.*?<\/figure>/s';
+	// Gets all image IDs from the state that match this gallery's ID.
+	$state      = wp_interactivity_state( 'core/image' );
+	$gallery_id = $block->context['galleryId'] ?? null;
+	$image_ids  = array();
 
-	// Find all Image blocks.
-	preg_match_all( $pattern, $updated_content, $matches );
-	if ( ! $matches ) {
-		return $updated_content;
+	// Extracts image IDs from state metadata that match the current gallery ID.
+	if ( isset( $gallery_id ) && isset( $state['metadata'] ) ) {
+		foreach ( $state['metadata'] as $image_id => $metadata ) {
+			if ( isset( $metadata['galleryId'] ) && $metadata['galleryId'] === $gallery_id ) {
+				$image_ids[] = $image_id;
+			}
+		}
 	}
-	$image_blocks = $matches[0];
 
-	// Shuffle the matched image blocks directly. This avoids a mismatch between
-	// the number of regex matches and the reordered array: `$image_ids` only
-	// contains images with lightbox enabled (no link), while the regex matches
-	// all images in the gallery.
-	shuffle( $image_blocks );
+	// If there are image IDs associated with this gallery, set interactivity
+	// attributes and order metadata for lightbox navigation.
+	if ( ! empty( $image_ids ) ) {
+		$total          = count( $image_ids );
+		$lightbox_index = 0;
+		$processor      = new WP_HTML_Tag_Processor( $updated_content );
+		$processor->next_tag();
+		$processor->set_attribute( 'data-wp-interactive', 'core/gallery' );
+		$processor->set_attribute(
+			'data-wp-context',
+			wp_json_encode(
+				array( 'galleryId' => $gallery_id ),
+				JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
+			)
+		);
+		while ( $processor->next_tag( 'figure' ) ) {
+			$wp_key = $processor->get_attribute( 'data-wp-key' );
+			if ( $wp_key && isset( $state['metadata'][ $wp_key ] ) ) {
+				$alt = $state['metadata'][ $wp_key ]['alt'];
+				wp_interactivity_state(
+					'core/image',
+					array(
+						'metadata' => array(
+							$wp_key => array(
+								'customAriaLabel'        => empty( $alt )
+									/* translators: %1$s: current image index, %2$s: total number of images */
+									? sprintf( __( 'Enlarged image %1$s of %2$s' ), $lightbox_index + 1, $total )
+									/* translators: %1$s: current image index, %2$s: total number of images, %3$s: Image alt text */
+									: sprintf( __( 'Enlarged image %1$s of %2$s: %3$s' ), $lightbox_index + 1, $total, $alt ),
+								/* translators: %1$s: current image index, %2$s: total number of images */
+								'triggerButtonAriaLabel' => sprintf( __( 'Enlarge %1$s of %2$s' ), $lightbox_index + 1, $total ),
+								'order'                  => $lightbox_index,
+							),
+						),
+					)
+				);
+				++$lightbox_index;
+			}
+		}
+		return $processor->get_updated_html();
+	}
 
-	$i       = 0;
-	$content = preg_replace_callback(
-		$pattern,
-		static function () use ( $image_blocks, &$i ) {
-			return $image_blocks[ $i++ ];
-		},
-		$updated_content
-	);
-
-	return $content;
+	return $updated_content;
 }
 
 /**
