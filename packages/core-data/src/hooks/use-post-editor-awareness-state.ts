@@ -16,12 +16,12 @@ import type { PostEditorAwareness } from '../awareness/post-editor-awareness';
 
 interface ResolvedSelection {
 	textIndex: number | null;
-	blockClientId: string | null;
+	localClientId: string | null;
 }
 
 interface AwarenessState {
 	activeCollaborators: ActiveCollaborator[];
-	getAbsolutePositionIndex: (
+	convertSelectionStateToAbsolute: (
 		selection: SelectionState
 	) => ResolvedSelection;
 	getDebugData: () => YDocDebugData;
@@ -30,12 +30,12 @@ interface AwarenessState {
 
 const defaultResolvedSelection: ResolvedSelection = {
 	textIndex: null,
-	blockClientId: null,
+	localClientId: null,
 };
 
 const defaultState: AwarenessState = {
 	activeCollaborators: [],
-	getAbsolutePositionIndex: () => defaultResolvedSelection,
+	convertSelectionStateToAbsolute: () => defaultResolvedSelection,
 	getDebugData: () => ( {
 		doc: {},
 		clients: {},
@@ -52,8 +52,8 @@ function getAwarenessState(
 
 	return {
 		activeCollaborators,
-		getAbsolutePositionIndex: ( selection: SelectionState ) =>
-			awareness.getAbsolutePositionIndex( selection ),
+		convertSelectionStateToAbsolute: ( selection: SelectionState ) =>
+			awareness.convertSelectionStateToAbsolute( selection ),
 		getDebugData: () => awareness.getDebugData(),
 		isCurrentCollaboratorDisconnected:
 			activeCollaborators.find( ( collaborator ) => collaborator.isMe )
@@ -123,12 +123,12 @@ export function useActiveCollaborators(
  * @param postType - The type of the post.
  * @return A function that resolves a selection to its text index and block client ID.
  */
-export function useGetAbsolutePositionIndex(
+export function useConvertSelectionStateToAbsolute(
 	postId: number | null,
 	postType: string | null
 ): ( selection: SelectionState ) => ResolvedSelection {
 	return usePostEditorAwarenessState( postId, postType )
-		.getAbsolutePositionIndex;
+		.convertSelectionStateToAbsolute;
 }
 
 /**

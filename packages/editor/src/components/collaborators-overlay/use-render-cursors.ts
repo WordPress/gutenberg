@@ -8,7 +8,7 @@ import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from './get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
-const { useActiveCollaborators, useGetAbsolutePositionIndex } =
+const { useActiveCollaborators, useConvertSelectionStateToAbsolute } =
 	unlock( coreDataPrivateApis );
 
 export interface CursorData {
@@ -40,7 +40,7 @@ export function useRenderCursors(
 		postId ?? null,
 		postType ?? null
 	);
-	const getAbsolutePositionIndex = useGetAbsolutePositionIndex(
+	const convertSelectionStateToAbsolute = useConvertSelectionStateToAbsolute(
 		postId ?? null,
 		postType ?? null
 	);
@@ -84,12 +84,12 @@ export function useRenderCursors(
 				} else if ( selection.type === SelectionType.WholeBlock ) {
 					// Don't draw a cursor for a whole block selection.
 				} else if ( selection.type === SelectionType.Cursor ) {
-					const { textIndex, blockClientId } =
-						getAbsolutePositionIndex( selection );
-					if ( blockClientId ) {
+					const { textIndex, localClientId } =
+						convertSelectionStateToAbsolute( selection );
+					if ( localClientId ) {
 						coords = getCursorPosition(
 							textIndex,
-							blockClientId,
+							localClientId,
 							blockEditorDocument,
 							overlayElement
 						);
@@ -98,15 +98,15 @@ export function useRenderCursors(
 					selection.type === SelectionType.SelectionInOneBlock ||
 					selection.type === SelectionType.SelectionInMultipleBlocks
 				) {
-					const { textIndex, blockClientId } =
-						getAbsolutePositionIndex( {
+					const { textIndex, localClientId } =
+						convertSelectionStateToAbsolute( {
 							type: SelectionType.Cursor,
 							cursorPosition: selection.cursorStartPosition,
 						} );
-					if ( blockClientId ) {
+					if ( localClientId ) {
 						coords = getCursorPosition(
 							textIndex,
-							blockClientId,
+							localClientId,
 							blockEditorDocument,
 							overlayElement
 						);
@@ -128,7 +128,7 @@ export function useRenderCursors(
 		},
 		[
 			blockEditorDocument,
-			getAbsolutePositionIndex,
+			convertSelectionStateToAbsolute,
 			overlayElement,
 			sortedUsers,
 		]

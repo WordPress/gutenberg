@@ -8,7 +8,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
  */
 import {
 	useActiveCollaborators,
-	useGetAbsolutePositionIndex,
+	useConvertSelectionStateToAbsolute,
 	useGetDebugData,
 	useIsDisconnected,
 } from '../use-post-editor-awareness-state';
@@ -64,7 +64,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		setUp: jest.Mock;
 		getCurrentState: jest.Mock;
 		onStateChange: jest.Mock;
-		getAbsolutePositionIndex: jest.Mock;
+		convertSelectionStateToAbsolute: jest.Mock;
 		getDebugData: jest.Mock;
 	};
 	let mockSyncManager: {
@@ -84,7 +84,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 				stateChangeCallback = callback;
 				return jest.fn(); // unsubscribe function
 			} ),
-			getAbsolutePositionIndex: jest.fn().mockReturnValue( null ),
+			convertSelectionStateToAbsolute: jest.fn().mockReturnValue( null ),
 			getDebugData: jest.fn().mockReturnValue( createMockDebugData() ),
 		};
 
@@ -241,10 +241,10 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 	} );
 
-	describe( 'useGetAbsolutePositionIndex', () => {
+	describe( 'useConvertSelectionStateToAbsolute', () => {
 		test( 'should return function that returns default when postId is null', () => {
 			const { result } = renderHook( () =>
-				useGetAbsolutePositionIndex( null, 'post' )
+				useConvertSelectionStateToAbsolute( null, 'post' )
 			);
 
 			const mockSelection: SelectionCursor = {
@@ -257,11 +257,11 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 
 			expect( result.current( mockSelection ) ).toEqual( {
 				textIndex: null,
-				blockClientId: null,
+				localClientId: null,
 			} );
 		} );
 
-		test( 'should call awareness.getAbsolutePositionIndex with selection', () => {
+		test( 'should call awareness.convertSelectionStateToAbsolute with selection', () => {
 			const mockSelection: SelectionCursor = {
 				type: SelectionType.Cursor,
 				cursorPosition: {
@@ -269,23 +269,23 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 					absoluteOffset: 5,
 				},
 			};
-			mockAwareness.getAbsolutePositionIndex.mockReturnValue( {
+			mockAwareness.convertSelectionStateToAbsolute.mockReturnValue( {
 				textIndex: 10,
-				blockClientId: 'block-1',
+				localClientId: 'block-1',
 			} );
 
 			const { result } = renderHook( () =>
-				useGetAbsolutePositionIndex( 123, 'post' )
+				useConvertSelectionStateToAbsolute( 123, 'post' )
 			);
 
 			const position = result.current( mockSelection );
 
 			expect(
-				mockAwareness.getAbsolutePositionIndex
+				mockAwareness.convertSelectionStateToAbsolute
 			).toHaveBeenCalledWith( mockSelection );
 			expect( position ).toEqual( {
 				textIndex: 10,
-				blockClientId: 'block-1',
+				localClientId: 'block-1',
 			} );
 		} );
 	} );

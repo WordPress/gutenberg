@@ -427,7 +427,7 @@ describe( 'PostEditorAwareness', () => {
 		} );
 	} );
 
-	describe( 'getAbsolutePositionIndex', () => {
+	describe( 'convertSelectionStateToAbsolute', () => {
 		test( 'should return nulls when relative position cannot be resolved', () => {
 			const awareness = new PostEditorAwareness(
 				doc,
@@ -455,11 +455,12 @@ describe( 'PostEditorAwareness', () => {
 				},
 			};
 
-			const result = awareness.getAbsolutePositionIndex( selection );
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
 
 			// Should return nulls when the relative position's type cannot be found
 			expect( result.textIndex ).toBeNull();
-			expect( result.blockClientId ).toBeNull();
+			expect( result.localClientId ).toBeNull();
 		} );
 
 		test( 'should return text index and block client ID for valid cursor selection', () => {
@@ -493,10 +494,11 @@ describe( 'PostEditorAwareness', () => {
 				},
 			};
 
-			const result = awareness.getAbsolutePositionIndex( selection );
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBe( 5 );
-			expect( result.blockClientId ).toBe( 'block-1' );
+			expect( result.localClientId ).toBe( 'block-1' );
 		} );
 
 		test( 'should resolve WholeBlock selection to block client ID', () => {
@@ -524,10 +526,11 @@ describe( 'PostEditorAwareness', () => {
 				blockPosition,
 			};
 
-			const result = awareness.getAbsolutePositionIndex( selection );
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBeNull();
-			expect( result.blockClientId ).toBe( 'block-1' );
+			expect( result.localClientId ).toBe( 'block-1' );
 		} );
 	} );
 
@@ -678,7 +681,7 @@ describe( 'PostEditorAwareness', () => {
 		} );
 	} );
 
-	describe( 'getAbsolutePositionIndex with nested blocks', () => {
+	describe( 'convertSelectionStateToAbsolute with nested blocks', () => {
 		test( 'should resolve cursor in second root block (path [1])', () => {
 			const nestedDoc = createTestDocWithBlocks( [
 				createYBlock( 'yjs-block-0', 'core/paragraph', {
@@ -729,10 +732,11 @@ describe( 'PostEditorAwareness', () => {
 				},
 			};
 
-			const result = awareness.getAbsolutePositionIndex( selection );
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBe( 2 );
-			expect( result.blockClientId ).toBe( 'local-2' );
+			expect( result.localClientId ).toBe( 'local-2' );
 
 			nestedDoc.destroy();
 		} );
@@ -801,10 +805,11 @@ describe( 'PostEditorAwareness', () => {
 				},
 			};
 
-			const result = awareness.getAbsolutePositionIndex( selection );
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBe( 5 );
-			expect( result.blockClientId ).toBe( 'local-inner-1' );
+			expect( result.localClientId ).toBe( 'local-inner-1' );
 
 			nestedDoc.destroy();
 		} );
@@ -855,10 +860,11 @@ describe( 'PostEditorAwareness', () => {
 				blockPosition,
 			};
 
-			const result = awareness.getAbsolutePositionIndex( selection );
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBeNull();
-			expect( result.blockClientId ).toBe( 'local-img' );
+			expect( result.localClientId ).toBe( 'local-img' );
 
 			nestedDoc.destroy();
 		} );
@@ -948,10 +954,11 @@ describe( 'PostEditorAwareness', () => {
 				},
 			};
 
-			const result = awareness.getAbsolutePositionIndex( selection );
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBe( 7 );
-			expect( result.blockClientId ).toBe( 'local-deep-1' );
+			expect( result.localClientId ).toBe( 'local-deep-1' );
 
 			nestedDoc.destroy();
 		} );
@@ -1048,11 +1055,12 @@ describe( 'PostEditorAwareness', () => {
 				},
 			};
 
-			const result = awareness.getAbsolutePositionIndex( selection );
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBe( 4 );
 			// Should resolve to the post-content inner block, not a template block
-			expect( result.blockClientId ).toBe( 'local-para-1' );
+			expect( result.localClientId ).toBe( 'local-para-1' );
 			// Verify getBlocks was called with the post-content clientId
 			expect( mockGetBlocks ).toHaveBeenCalledWith( postContentClientId );
 
@@ -1119,10 +1127,11 @@ describe( 'PostEditorAwareness', () => {
 				blockPosition,
 			};
 
-			const result = awareness.getAbsolutePositionIndex( selection );
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBeNull();
-			expect( result.blockClientId ).toBe( 'local-img' );
+			expect( result.localClientId ).toBe( 'local-img' );
 
 			templateDoc.destroy();
 		} );
@@ -1167,10 +1176,11 @@ describe( 'PostEditorAwareness', () => {
 				},
 			};
 
-			const result = awareness.getAbsolutePositionIndex( selection );
+			const result =
+				awareness.convertSelectionStateToAbsolute( selection );
 
 			expect( result.textIndex ).toBe( 3 );
-			expect( result.blockClientId ).toBe( 'local-para' );
+			expect( result.localClientId ).toBe( 'local-para' );
 
 			normalDoc.destroy();
 		} );

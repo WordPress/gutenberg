@@ -5,7 +5,7 @@ import { useEntityRecordsWithPermissions } from './hooks/use-entity-records';
 import { RECEIVE_INTERMEDIATE_RESULTS } from './utils';
 import {
 	useActiveCollaborators,
-	useGetAbsolutePositionIndex,
+	useConvertSelectionStateToAbsolute,
 } from './hooks/use-post-editor-awareness-state';
 import { lock } from './lock-unlock';
 
@@ -14,5 +14,5 @@ lock( privateApis, {
 	useEntityRecordsWithPermissions,
 	RECEIVE_INTERMEDIATE_RESULTS,
 	useActiveCollaborators,
-	useGetAbsolutePositionIndex,
+	useConvertSelectionStateToAbsolute,
 } );

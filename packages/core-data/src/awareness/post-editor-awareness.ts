@@ -193,12 +193,12 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	 * @param selection - The selection state.
 	 * @return The text index and block client ID, or nulls if not resolvable.
 	 */
-	public getAbsolutePositionIndex( selection: SelectionState ): {
+	public convertSelectionStateToAbsolute( selection: SelectionState ): {
 		textIndex: number | null;
-		blockClientId: string | null;
+		localClientId: string | null;
 	} {
 		if ( selection.type === SelectionType.None ) {
-			return { textIndex: null, blockClientId: null };
+			return { textIndex: null, localClientId: null };
 		}
 
 		if ( selection.type === SelectionType.WholeBlock ) {
@@ -206,18 +206,22 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				selection.blockPosition,
 				this.doc
 			);
-			let blockClientId: string | null = null;
+
+			let localClientId: string | null = null;
+
 			if ( absolutePos ) {
 				const parentArray = absolutePos.type as Y.Array< any >;
 				const block = parentArray.get( absolutePos.index );
+
 				if ( block ) {
 					const path = this.getBlockPathFromYjs( block );
-					blockClientId = path
+					localClientId = path
 						? this.resolveBlockClientIdByPath( path )
 						: null;
 				}
 			}
-			return { textIndex: null, blockClientId };
+
+			return { textIndex: null, localClientId };
 		}
 
 		// Text-based selections: resolve cursor position and navigate up.
@@ -232,17 +236,17 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 		);
 
 		if ( ! absolutePosition ) {
-			return { textIndex: null, blockClientId: null };
+			return { textIndex: null, localClientId: null };
 		}
 
 		// Navigate up: Y.Text → attributes Y.Map → block Y.Map
 		const blockMap = absolutePosition.type.parent?.parent;
 		const path = blockMap ? this.getBlockPathFromYjs( blockMap ) : null;
-		const blockClientId = path
+		const localClientId = path
 			? this.resolveBlockClientIdByPath( path )
 			: null;
 
-		return { textIndex: absolutePosition.index, blockClientId };
+		return { textIndex: absolutePosition.index, localClientId };
 	}
 
 	/**
