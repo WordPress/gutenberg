@@ -19,6 +19,8 @@ import {
 	useRef,
 	useCallback,
 	useMemo,
+	useContext,
+	createContext,
 	isValidElement,
 	Component,
 } from '@wordpress/element';
@@ -67,6 +69,12 @@ const CATEGORY_LABELS = {
 };
 
 /**
+ * Context that maps cmdk's lowercased item values to command names.
+ * Populated by CommandItem, consumed by useSelectedCommandName.
+ */
+const CommandNameContext = createContext( null );
+
+/**
  * Function that checks if the parameter is a valid icon.
  * Taken from @wordpress/blocks/src/api/utils.js and copied
  * in case requirements diverge and to avoid a dependency on @wordpress/blocks.
@@ -94,8 +102,23 @@ function CommandItem( {
 	recordUsage,
 	valuePrefix,
 } ) {
+	const commandNameMapRef = useContext( CommandNameContext );
 	const commandCategory = category ?? command.category;
 	const label = command.searchLabel ?? command.label;
+	const cmdkValue = (
+		valuePrefix ? `${ valuePrefix }${ label }` : label
+	).toLowerCase();
+
+	useEffect( () => {
+		if ( commandNameMapRef ) {
+			const mapRef = commandNameMapRef.current;
+			mapRef.set( cmdkValue, command.name );
+			return () => {
+				mapRef.delete( cmdkValue );
+			};
+		}
+	}, [ commandNameMapRef, cmdkValue, command.name ] );
+
 	return (
 		<Command.Item
 			key={ command.name }
@@ -105,7 +128,6 @@ function CommandItem( {
 				recordUsage?.( command.name );
 				command.callback( { close } );
 			} }
-			id={ command.name }
 		>
 			<HStack
 				alignment="left"
@@ -276,6 +298,77 @@ export function CommandMenuGroup( {
 	);
 }
 
+function FavoritesGroup( { search, setLoader, close, recordUsage } ) {
+	const {
+		commands: allCommands,
+		loaders,
+		favoriteNames,
+	} = useSelect( ( select ) => {
+		const { getCommands, getCommandLoaders } = select( commandsStore );
+		return {
+			commands: [ ...getCommands( true ), ...getCommands( false ) ],
+			loaders: [
+				...getCommandLoaders( true ),
+				...getCommandLoaders( false ),
+			],
+			favoriteNames:
+				select( preferencesStore ).get(
+					'core/commands',
+					'favorites'
+				) ?? [],
+		};
+	}, [] );
+
+	if ( ! favoriteNames.length ) {
+		return null;
+	}
+
+	const favoritesSet = new Set( favoriteNames );
+	const favoriteStaticCommands = allCommands.filter( ( command ) =>
+		favoritesSet.has( command.name )
+	);
+
+	if ( ! favoriteStaticCommands.length && ! loaders.length ) {
+		return null;
+	}
+
+	return (
+		<>
+			<div
+				className="commands-command-menu__section-heading"
+				aria-hidden="true"
+			>
+				{ __( 'Favorites' ) }
+			</div>
+			<Command.Group>
+				{ favoriteStaticCommands.map( ( command ) => (
+					<CommandItem
+						key={ command.name }
+						command={ command }
+						search={ search }
+						close={ close }
+						recordUsage={ recordUsage }
+						valuePrefix="favorite-"
+					/>
+				) ) }
+				{ loaders.map( ( loader ) => (
+					<CommandMenuLoaderWrapper
+						key={ loader.name }
+						hook={ loader.hook }
+						search={ search }
+						setLoader={ setLoader }
+						close={ close }
+						category={ loader.category }
+						filterNames={ favoritesSet }
+						recordUsage={ recordUsage }
+						valuePrefix="favorite-"
+					/>
+				) ) }
+			</Command.Group>
+		</>
+	);
+}
+
 function RecentlyUsedGroup( { search, setLoader, close, recordUsage } ) {
 	const {
 		commands: allCommands,
@@ -364,15 +457,25 @@ function SearchResultsHeading() {
 	);
 }
 
-function CommandInput( { isOpen, search, setSearch } ) {
-	const commandMenuInput = useRef();
+function useSelectedCommandName() {
 	const _value = useCommandState( ( state ) => state.value );
-	const selectedItemId = useMemo( () => {
+	const commandNameMapRef = useContext( CommandNameContext );
+	return commandNameMapRef?.current?.get( _value ) ?? null;
+}
+
+function useSelectedItemId() {
+	const _value = useCommandState( ( state ) => state.value );
+	return useMemo( () => {
 		const item = document.querySelector(
 			`[cmdk-item=""][data-value="${ _value }"]`
 		);
-		return item?.getAttribute( 'id' );
+		return item?.getAttribute( 'id' ) ?? null;
 	}, [ _value ] );
+}
+
+function CommandInput( { isOpen, search, setSearch } ) {
+	const commandMenuInput = useRef();
+	const selectedItemId = useSelectedItemId();
 	useEffect( () => {
 		// Focus the command palette input when mounting the modal.
 		if ( isOpen ) {
@@ -390,6 +493,19 @@ function CommandInput( { isOpen, search, setSearch } ) {
 	);
 }
 
+function FavoriteShortcutHandler( { toggleFavorite } ) {
+	const selectedCommandName = useSelectedCommandName();
+
+	useShortcut( 'core/commands/toggle-favorite', ( event ) => {
+		event.preventDefault();
+		if ( selectedCommandName ) {
+			toggleFavorite( selectedCommandName );
+		}
+	} );
+
+	return null;
+}
+
 /**
  * @ignore
  */
@@ -403,6 +519,7 @@ export function CommandMenu() {
 	const { open, close } = useDispatch( commandsStore );
 	const { set: setPreference } = useDispatch( preferencesStore );
 	const [ loaders, setLoaders ] = useState( {} );
+	const commandNameMapRef = useRef( new Map() );
 
 	const recordUsage = useCallback(
 		( name ) => {
@@ -420,6 +537,21 @@ export function CommandMenu() {
 		[ setPreference ]
 	);
 
+	const toggleFavorite = useCallback(
+		( name ) => {
+			const current =
+				globalSelect( preferencesStore ).get(
+					'core/commands',
+					'favorites'
+				) ?? [];
+			const next = current.includes( name )
+				? current.filter( ( n ) => n !== name )
+				: [ ...current, name ];
+			setPreference( 'core/commands', 'favorites', next );
+		},
+		[ setPreference ]
+	);
+
 	useEffect( () => {
 		registerShortcut( {
 			name: 'core/commands',
@@ -428,6 +560,15 @@ export function CommandMenu() {
 			keyCombination: {
 				modifier: 'primary',
 				character: 'k',
+			},
+		} );
+		registerShortcut( {
+			name: 'core/commands/toggle-favorite',
+			category: 'global',
+			description: __( 'Mark or unmark command as favorite.' ),
+			keyCombination: {
+				modifier: 'primaryShift',
+				character: 'd',
 			},
 		} );
 	}, [ registerShortcut ] );
@@ -473,62 +614,75 @@ export function CommandMenu() {
 	const isLoading = Object.values( loaders ).some( Boolean );
 
 	return (
-		<Modal
-			className="commands-command-menu"
-			overlayClassName="commands-command-menu__overlay"
-			onRequestClose={ closeAndReset }
-			__experimentalHideHeader
-			contentLabel={ __( 'Command palette' ) }
-		>
-			<div className="commands-command-menu__container">
-				<Command label={ inputLabel }>
-					<div className="commands-command-menu__header">
-						<Icon
-							className="commands-command-menu__header-search-icon"
-							icon={ inputIcon }
+		<CommandNameContext.Provider value={ commandNameMapRef }>
+			<Modal
+				className="commands-command-menu"
+				overlayClassName="commands-command-menu__overlay"
+				onRequestClose={ closeAndReset }
+				__experimentalHideHeader
+				contentLabel={ __( 'Command palette' ) }
+			>
+				<div className="commands-command-menu__container">
+					<Command label={ inputLabel }>
+						<FavoriteShortcutHandler
+							toggleFavorite={ toggleFavorite }
 						/>
-						<CommandInput
-							search={ search }
-							setSearch={ setSearch }
-							isOpen={ isOpen }
-						/>
-					</div>
-					<Command.List label={ __( 'Command suggestions' ) }>
-						{ search && ! isLoading && (
-							<Command.Empty>
-								{ __( 'No results found.' ) }
-							</Command.Empty>
-						) }
-						{ ! search && (
-							<RecentlyUsedGroup
-								search={ search }
-								setLoader={ setLoader }
-								close={ closeAndReset }
-								recordUsage={ recordUsage }
+						<div className="commands-command-menu__header">
+							<Icon
+								className="commands-command-menu__header-search-icon"
+								icon={ inputIcon }
 							/>
-						) }
-						{ search && <SearchResultsHeading /> }
-						<CommandMenuGroup
-							search={ search }
-							setLoader={ setLoader }
-							close={ closeAndReset }
-							isContextual
-							recordUsage={ recordUsage }
-							heading={
-								! search ? __( 'Suggestions' ) : undefined
-							}
-						/>
-						{ search && (
+							<CommandInput
+								search={ search }
+								setSearch={ setSearch }
+								isOpen={ isOpen }
+							/>
+						</div>
+						<Command.List label={ __( 'Command suggestions' ) }>
+							{ search && ! isLoading && (
+								<Command.Empty>
+									{ __( 'No results found.' ) }
+								</Command.Empty>
+							) }
+							{ ! search && (
+								<FavoritesGroup
+									search={ search }
+									setLoader={ setLoader }
+									close={ closeAndReset }
+									recordUsage={ recordUsage }
+								/>
+							) }
+							{ ! search && (
+								<RecentlyUsedGroup
+									search={ search }
+									setLoader={ setLoader }
+									close={ closeAndReset }
+									recordUsage={ recordUsage }
+								/>
+							) }
+							{ search && <SearchResultsHeading /> }
 							<CommandMenuGroup
 								search={ search }
 								setLoader={ setLoader }
 								close={ closeAndReset }
+								isContextual
 								recordUsage={ recordUsage }
+								heading={
+									! search ? __( 'Suggestions' ) : undefined
+								}
 							/>
-						) }
-					</Command.List>
-				</Command>
-			</div>
-		</Modal>
+							{ search && (
+								<CommandMenuGroup
+									search={ search }
+									setLoader={ setLoader }
+									close={ closeAndReset }
+									recordUsage={ recordUsage }
+								/>
+							) }
+						</Command.List>
+					</Command>
+				</div>
+			</Modal>
+		</CommandNameContext.Provider>
 	);
 }
