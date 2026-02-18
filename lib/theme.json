@@ -323,6 +323,11 @@
 					"allowEditing": true
 				}
 			},
+			"core/icon": {
+				"dimensions": {
+					"width": true
+				}
+			},
 			"core/pullquote": {
 				"border": {
 					"color": true,

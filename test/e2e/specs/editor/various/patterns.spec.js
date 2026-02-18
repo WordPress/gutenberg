@@ -335,7 +335,7 @@ test.describe( 'Unsynced pattern', () => {
 		).toHaveCount( 2 );
 	} );
 
-	test( 'supports editing pattern via Edit section button', async ( {
+	test( 'supports editing pattern via Edit pattern button', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -384,12 +384,12 @@ test.describe( 'Unsynced pattern', () => {
 		// Click on the pattern in List View to select it.
 		await listView.getByRole( 'gridcell', { name: 'My pattern' } ).click();
 
-		// Open settings sidebar and click "Edit section" button.
+		// Open settings sidebar and click "Edit pattern" button.
 		await editor.openDocumentSettingsSidebar();
 
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Edit section' } )
+			.getByRole( 'button', { name: 'Edit pattern' } )
 			.click();
 
 		// Expand the inner Group to see all blocks including separator.
@@ -413,10 +413,10 @@ test.describe( 'Unsynced pattern', () => {
 			} )
 		).toBeVisible();
 
-		// Exit pattern editing by clicking the "Exit section" button.
+		// Exit pattern editing by clicking the "Exit pattern" button.
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Exit section' } )
+			.getByRole( 'button', { name: 'Exit pattern' } )
 			.click();
 
 		// Verify pattern is back to content-only mode (separator hidden again).
@@ -450,7 +450,7 @@ test.describe( 'Unsynced pattern', () => {
 		).toBeVisible();
 	} );
 
-	test( 'supports editing pattern via Edit section toolbar button', async ( {
+	test( 'supports editing pattern via Edit pattern toolbar button', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -499,8 +499,8 @@ test.describe( 'Unsynced pattern', () => {
 		// Click on the pattern in List View to select it.
 		await listView.getByRole( 'gridcell', { name: 'My pattern' } ).click();
 
-		// Click "Edit section" in the block toolbar.
-		await editor.clickBlockToolbarButton( 'Edit section' );
+		// Click "Edit pattern" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Edit pattern' );
 
 		// Expand the inner Group to see all blocks including separator.
 		await listView
@@ -523,8 +523,8 @@ test.describe( 'Unsynced pattern', () => {
 			} )
 		).toBeVisible();
 
-		// Exit pattern editing by clicking "Exit section" in the block toolbar.
-		await editor.clickBlockToolbarButton( 'Exit section' );
+		// Exit pattern editing by clicking "Exit pattern" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Exit pattern' );
 
 		// Verify pattern is back to content-only mode (separator hidden again).
 		await expect(

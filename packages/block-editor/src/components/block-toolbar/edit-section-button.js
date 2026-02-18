@@ -33,9 +33,9 @@ export default function EditSectionButton( { clientId } ) {
 	);
 
 	// Don't show for synced patterns or template parts — they already have
-	// their own toolbar buttons ("Edit original" / "Edit section").
+	// their own toolbar buttons ("Edit original").
 	// Note: isSectionBlock returns false while the section is being edited,
-	// so we also check isEditingContentOnlySection to show "Exit section".
+	// so we also check isEditingContentOnlySection to show "Exit pattern".
 	if (
 		! clientId ||
 		( ! isSectionBlock && ! isEditingContentOnlySection ) ||
@@ -58,7 +58,7 @@ export default function EditSectionButton( { clientId } ) {
 	return (
 		<ToolbarGroup>
 			<ToolbarButton onClick={ handleClick }>
-				{ isEditing ? __( 'Exit section' ) : __( 'Edit section' ) }
+				{ isEditing ? __( 'Exit pattern' ) : __( 'Edit pattern' ) }
 			</ToolbarButton>
 		</ToolbarGroup>
 	);
