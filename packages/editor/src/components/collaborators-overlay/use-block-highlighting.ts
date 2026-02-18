@@ -4,8 +4,15 @@
 import {
 	privateApis as coreDataPrivateApis,
 	SelectionType,
+	type PostEditorAwarenessState,
 } from '@wordpress/core-data';
-import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -46,7 +53,7 @@ export function useBlockHighlighting(
 	rerenderHighlightsAfterDelay: () => () => void;
 } {
 	const highlightedBlockIds = useRef< Set< string > >( new Set() );
-	const userStates = useActiveCollaborators(
+	const userStates: PostEditorAwarenessState[] = useActiveCollaborators(
 		postId ?? null,
 		postType ?? null
 	);
@@ -59,54 +66,50 @@ export function useBlockHighlighting(
 		[]
 	);
 
-	const computeHighlights = useMemo(
-		() => () => {
-			if ( ! blockEditorDocument ) {
-				setHighlights( [] );
-				return;
-			}
+	const computeHighlights = useCallback( () => {
+		if ( ! blockEditorDocument ) {
+			setHighlights( [] );
+			return;
+		}
 
-			const blocksToHighlight = userStates
-				.map( ( userState: any ) => {
-					const isWholeBlockSelected =
-						userState.editorState?.selection?.type ===
-						SelectionType.WholeBlock;
-					const shouldDrawUser = ! userState.isMe;
+		const blocksToHighlight = userStates
+			.filter(
+				( userState ) =>
+					! userState.isMe &&
+					userState.editorState?.selection?.type ===
+						SelectionType.WholeBlock
+			)
+			.map( ( userState ) => {
+				const { localClientId } = resolveSelection(
+					userState.editorState?.selection
+				);
 
-					if ( isWholeBlockSelected && shouldDrawUser ) {
-						const { localClientId } = resolveSelection(
-							userState.editorState?.selection
-						);
-
-						if ( ! localClientId ) {
-							return null;
-						}
-
-						return {
-							blockId: localClientId,
-							color: getAvatarBorderColor(
-								userState.collaboratorInfo.id
-							),
-							userName: userState.collaboratorInfo.name,
-							avatarUrl: getAvatarUrl(
-								userState.collaboratorInfo.avatar_urls
-							),
-						};
-					}
-
+				if ( ! localClientId ) {
 					return null;
-				} )
-				.filter( ( block: any ) => block !== null );
+				}
 
-			// Unhighlight blocks that are no longer selected.
-			const selectedBlockIds = blocksToHighlight.map(
-				( block: any ) => block.blockId
-			);
-			const blocksIdsToUnhighlight = Array.from(
-				highlightedBlockIds.current
-			).filter( ( blockId ) => ! selectedBlockIds.includes( blockId ) );
+				return {
+					blockId: localClientId,
+					color: getAvatarBorderColor(
+						userState.collaboratorInfo.id
+					),
+					userName: userState.collaboratorInfo.name,
+					avatarUrl: getAvatarUrl(
+						userState.collaboratorInfo.avatar_urls
+					),
+				};
+			} )
+			.filter( ( block ): block is NonNullable< typeof block > => {
+				return block !== null;
+			} );
 
-			blocksIdsToUnhighlight.forEach( ( blockId ) => {
+		// Unhighlight blocks that are no longer selected.
+		const selectedBlockIds = new Set(
+			blocksToHighlight.map( ( block ) => block.blockId )
+		);
+
+		for ( const blockId of highlightedBlockIds.current ) {
+			if ( ! selectedBlockIds.has( blockId ) ) {
 				const blockElement = getBlockElementById(
 					blockEditorDocument,
 					blockId
@@ -120,48 +123,47 @@ export function useBlockHighlighting(
 				}
 
 				highlightedBlockIds.current.delete( blockId );
-			} );
+			}
+		}
 
-			// Highlight blocks and compute positions for avatar labels.
-			const results: BlockHighlightData[] = [];
+		// Highlight blocks and compute positions for avatar labels.
+		const results: BlockHighlightData[] = [];
 
-			blocksToHighlight.forEach( ( block: any ) => {
-				const { color, blockId, userName, avatarUrl } = block;
-				const blockElement = getBlockElementById(
-					blockEditorDocument,
-					blockId
-				);
+		blocksToHighlight.forEach( ( block ) => {
+			const { color, blockId, userName, avatarUrl } = block;
+			const blockElement = getBlockElementById(
+				blockEditorDocument,
+				blockId
+			);
 
-				if ( ! blockElement ) {
-					return;
-				}
+			if ( ! blockElement ) {
+				return;
+			}
 
-				blockElement.classList.add( 'is-collaborator-selected' );
-				blockElement.style.setProperty(
-					'--collaborator-outline-color',
-					color
-				);
-				highlightedBlockIds.current.add( blockId );
+			blockElement.classList.add( 'is-collaborator-selected' );
+			blockElement.style.setProperty(
+				'--collaborator-outline-color',
+				color
+			);
+			highlightedBlockIds.current.add( blockId );
 
-				if ( overlayElement ) {
-					const blockRect = blockElement.getBoundingClientRect();
-					const overlayRect = overlayElement.getBoundingClientRect();
+			if ( overlayElement ) {
+				const blockRect = blockElement.getBoundingClientRect();
+				const overlayRect = overlayElement.getBoundingClientRect();
 
-					results.push( {
-						blockId,
-						userName,
-						avatarUrl,
-						color,
-						x: blockRect.left - overlayRect.left,
-						y: blockRect.top - overlayRect.top,
-					} );
-				}
-			} );
+				results.push( {
+					blockId,
+					userName,
+					avatarUrl,
+					color,
+					x: blockRect.left - overlayRect.left,
+					y: blockRect.top - overlayRect.top,
+				} );
+			}
+		} );
 
-			setHighlights( results );
-		},
-		[ userStates, blockEditorDocument, overlayElement, resolveSelection ]
-	);
+		setHighlights( results );
+	}, [ userStates, blockEditorDocument, overlayElement, resolveSelection ] );
 
 	useEffect( computeHighlights, [ computeHighlights ] );
 

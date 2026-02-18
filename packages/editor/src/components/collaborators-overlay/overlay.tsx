@@ -45,7 +45,9 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	animation: collaborators-overlay-cursor-blink 1s infinite;
 }
 
-/* ── Avatar component (compiled from packages/components/src/avatar/styles.scss) ── */
+/* ── Avatar component (compiled from collaborators-presence/avatar/styles.scss) ──
+   Dimmed and status-indicator styles are intentionally omitted — not used in
+   the overlay. Keep in sync when editing the SCSS source. ── */
 .components-avatar {
 	position: relative;
 	display: inline-flex;

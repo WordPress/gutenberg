@@ -40,7 +40,7 @@ export function CollaboratorsList( {
 				<div className="editor-collaborators-presence__list-header">
 					<div className="editor-collaborators-presence__list-header-title">
 						{ __( 'Collaborators' ) }
-						<span> { activeCollaborators.length } </span>
+						<span>{ activeCollaborators.length }</span>
 					</div>
 					<div className="editor-collaborators-presence__list-header-action">
 						<Button
