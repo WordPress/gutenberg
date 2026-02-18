@@ -71,7 +71,7 @@ const AddCommentMenuItemFill = ( { onClick, isDistractionFree } ) => {
 					clientId={ clientId }
 					isDistractionFree={ isDistractionFree }
 					onClick={ () => {
-						onClick();
+						onClick( clientId );
 						onClose();
 					} }
 				/>

@@ -7,6 +7,7 @@ import { SlotFillProvider } from '@wordpress/components';
 import {
 	MediaUploadProvider,
 	store as uploadStore,
+	detectClientSideMediaSupport,
 } from '@wordpress/upload-media';
 
 /**
@@ -23,6 +24,64 @@ import useMediaUploadSettings from './use-media-upload-settings';
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
 const noop = () => {};
+
+/**
+ * Flag to track if we've already logged the fallback message.
+ */
+let hasLoggedFallback = false;
+
+/**
+ * Cached result of whether client-side media processing should be enabled.
+ * This is computed once per session for efficiency and stability.
+ */
+let isClientSideMediaEnabledCache = null;
+
+/**
+ * Checks if client-side media processing should be enabled.
+ *
+ * Returns true only if:
+ * 1. The experimental media processing flag is enabled
+ * 2. The browser supports WebAssembly, SharedArrayBuffer, cross-origin isolation, and CSP allows blob workers
+ *
+ * The result is cached for the session to ensure stability during React renders.
+ *
+ * @return {boolean} Whether client-side media processing should be enabled.
+ */
+function shouldEnableClientSideMediaProcessing() {
+	// Return cached result if available.
+	if ( isClientSideMediaEnabledCache !== null ) {
+		return isClientSideMediaEnabledCache;
+	}
+
+	// Check if experimental flag is enabled first.
+	if ( ! window.__experimentalMediaProcessing ) {
+		isClientSideMediaEnabledCache = false;
+		return false;
+	}
+
+	// Safety check in case the import is unavailable.
+	if ( typeof detectClientSideMediaSupport !== 'function' ) {
+		isClientSideMediaEnabledCache = false;
+		return false;
+	}
+
+	const detection = detectClientSideMediaSupport();
+	if ( ! detection || ! detection.supported ) {
+		// Only log once per session to avoid console spam.
+		if ( ! hasLoggedFallback ) {
+			// eslint-disable-next-line no-console
+			console.info(
+				`Client-side media processing unavailable: ${ detection.reason }. Using server-side processing.`
+			);
+			hasLoggedFallback = true;
+		}
+		isClientSideMediaEnabledCache = false;
+		return false;
+	}
+
+	isClientSideMediaEnabledCache = true;
+	return true;
+}
 
 /**
  * Upload a media file when the file upload button is activated
@@ -71,11 +130,11 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 
 		const mediaUploadSettings = useMediaUploadSettings( _settings );
 
+		const isClientSideMediaEnabled =
+			shouldEnableClientSideMediaProcessing();
+
 		const settings = useMemo( () => {
-			if (
-				window.__experimentalMediaProcessing &&
-				_settings?.mediaUpload
-			) {
+			if ( isClientSideMediaEnabled && _settings?.mediaUpload ) {
 				// Create a new object so that the original props.settings.mediaUpload is not modified.
 				return {
 					..._settings,
@@ -83,7 +142,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 				};
 			}
 			return _settings;
-		}, [ _settings, registry ] );
+		}, [ _settings, registry, isClientSideMediaEnabled ] );
 
 		const { __experimentalUpdateSettings } = unlock(
 			useDispatch( blockEditorStore )
@@ -115,7 +174,7 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			</SlotFillProvider>
 		);
 
-		if ( window.__experimentalMediaProcessing ) {
+		if ( isClientSideMediaEnabled ) {
 			return (
 				<MediaUploadProvider
 					settings={ mediaUploadSettings }

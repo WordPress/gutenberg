@@ -139,16 +139,8 @@ export default {
 			}
 		}
 
-		// If a block's block.json skips serialization for spacing or spacing.blockGap,
-		// don't apply the user-defined value to the styles.
-		const blockGapValue =
-			style?.spacing?.blockGap &&
-			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
-				? getGapCSSValue( style?.spacing?.blockGap, '0.5em' )
-				: undefined;
-
-		// Use the global blockGap value for grid column calculations when available
-		// If the gap value has both top and left (separated by space), use the left value for horizontal calculations
+		// Use the global blockGap value as fallback when available.
+		// If the gap value has both top and left (separated by space), use the left value for horizontal calculations.
 		let fallbackGapValue = '1.2rem';
 		if ( globalBlockGapValue ) {
 			const processedGap = getGapCSSValue( globalBlockGapValue, '0.5em' );
@@ -156,6 +148,14 @@ export default {
 			fallbackGapValue =
 				gapParts.length > 1 ? gapParts[ 1 ] : gapParts[ 0 ];
 		}
+
+		// If a block's block.json skips serialization for spacing or spacing.blockGap,
+		// don't apply the user-defined value to the styles.
+		const blockGapValue =
+			style?.spacing?.blockGap &&
+			! shouldSkipSerialization( blockName, 'spacing', 'blockGap' )
+				? getGapCSSValue( style?.spacing?.blockGap, fallbackGapValue )
+				: undefined;
 
 		let output = '';
 		const rules = [];

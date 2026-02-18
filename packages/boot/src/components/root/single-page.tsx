@@ -54,7 +54,7 @@ export default function RootSinglePage() {
 						) }
 					>
 						<SavePanel />
-						<SnackbarNotices className="editor-notices__snackbar" />
+						<SnackbarNotices className="boot-notices__snackbar" />
 						<div className="boot-layout__surfaces">
 							<UserThemeProvider color={ { bg: '#ffffff' } }>
 								<Outlet />

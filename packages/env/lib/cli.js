@@ -179,7 +179,7 @@ module.exports = function cli() {
 				type: 'string',
 				describe: "Which environments' databases to reset.",
 				choices: [ 'all', 'development', 'tests' ],
-				default: 'tests',
+				default: 'development',
 			} );
 			args.option( 'scripts', {
 				type: 'boolean',
@@ -197,7 +197,7 @@ module.exports = function cli() {
 				type: 'string',
 				describe: "Which environments' databases to reset.",
 				choices: [ 'all', 'development', 'tests' ],
-				default: 'tests',
+				default: 'development',
 			} );
 			args.option( 'scripts', {
 				type: 'boolean',

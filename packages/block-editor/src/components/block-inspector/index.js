@@ -10,6 +10,7 @@ import {
 } from '@wordpress/blocks';
 import { __unstableMotion as motion } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -22,7 +23,8 @@ import BlockVariationTransforms from '../block-variation-transforms';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 import BlockStyles from '../block-styles';
-import { default as InspectorControls } from '../inspector-controls';
+import { ListViewContentPopover } from '../inspector-controls/list-view-content-popover';
+import InspectorControls from '../inspector-controls';
 import { default as InspectorControlsTabs } from '../inspector-controls-tabs';
 import useInspectorControlsTabs from '../inspector-controls-tabs/use-inspector-controls-tabs';
 import InspectorControlsLastItem from '../inspector-controls/last-item';
@@ -314,6 +316,7 @@ const BlockInspectorSingleBlock = ( {
 	hasBlockStyles,
 	editedContentOnlySection,
 } ) => {
+	const listViewRef = useRef( null );
 	const hasMultipleTabs = availableTabs?.length > 1;
 	const hasParentChildBlockCards =
 		editedContentOnlySection &&
@@ -364,7 +367,8 @@ const BlockInspectorSingleBlock = ( {
 					) }
 					<ContentTab contentClientIds={ contentClientIds } />
 					<InspectorControls.Slot group="content" />
-					<InspectorControls.Slot group="list" />
+					<InspectorControls.Slot group="list" ref={ listViewRef } />
+					<ListViewContentPopover listViewRef={ listViewRef } />
 					{ ! isSectionBlock && (
 						<StyleInspectorSlots blockName={ blockName } />
 					) }

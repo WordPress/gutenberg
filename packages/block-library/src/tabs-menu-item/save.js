@@ -32,13 +32,15 @@ export default function save( { attributes } ) {
 		className: 'wp-block-tabs-menu-item__template',
 		style: customColorStyles,
 		hidden: true,
+		type: 'button',
+		role: 'tab',
 	} );
 
 	return (
-		<a { ...blockProps }>
+		<button { ...blockProps }>
 			<span className="screen-reader-text">
 				{ __( 'Tab menu item' ) }
 			</span>
-		</a>
+		</button>
 	);
 }

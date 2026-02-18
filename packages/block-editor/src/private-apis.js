@@ -31,7 +31,10 @@ import DimensionsTool from './components/dimensions-tool';
 import ResolutionTool from './components/resolution-tool';
 import TextAlignmentControl from './components/text-alignment-control';
 import { usesContextKey } from './components/rich-text/format-edit';
-import { ExperimentalBlockCanvas } from './components/block-canvas';
+import {
+	ExperimentalBlockCanvas,
+	BlockCanvasCover,
+} from './components/block-canvas';
 import { getDuotoneFilter } from './components/duotone/utils';
 import { useFlashEditableBlocks } from './components/use-flash-editable-blocks';
 import {
@@ -42,9 +45,9 @@ import {
 	sectionRootClientIdKey,
 	mediaEditKey,
 	getMediaSelectKey,
-	essentialFormatKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
+	isNavigationOverlayContextKey,
 } from './store/private-keys';
 import { requiresWrapperOnCopy } from './components/writing-flow/utils';
 import { PrivateRichText } from './components/rich-text/';
@@ -77,6 +80,7 @@ export const privateApis = {};
 lock( privateApis, {
 	...globalStyles,
 	ExperimentalBlockCanvas,
+	BlockCanvasCover,
 	ExperimentalBlockEditorProvider,
 	getDuotoneFilter,
 	getRichTextValues,
@@ -122,9 +126,9 @@ lock( privateApis, {
 	CommentIconToolbarSlotFill,
 	mediaEditKey,
 	getMediaSelectKey,
-	essentialFormatKey,
 	deviceTypeKey,
 	isIsolatedEditorKey,
+	isNavigationOverlayContextKey,
 	useBlockElement,
 	useBlockElementRef,
 	LinkPicker,

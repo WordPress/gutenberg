@@ -20,13 +20,14 @@ import {
 import { useResourcePermissions } from '@wordpress/core-data';
 import { plus } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
+import { isURL } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import { LinkUIPageCreator } from './page-creator';
 import LinkUIBlockInserter from './block-inserter';
-import { useEntityBinding } from '../shared/use-entity-binding';
+import { useEntityBinding, useLinkPreview } from '../shared';
 
 /**
  * Given the Link block's type attribute, return the query params to give to
@@ -71,12 +72,27 @@ export function getSuggestionsQuery( type, kind ) {
 
 function UnforwardedLinkUI( props, ref ) {
 	const { label, url, opensInNewTab, type, kind, id } = props.link;
+
+	const { entityRecord, hasBinding, isEntityAvailable } = props.entity || {};
+
+	const { image, badges } = useLinkPreview( {
+		url,
+		entityRecord,
+		type,
+		hasBinding,
+		isEntityAvailable,
+	} );
+
 	const { clientId } = props;
 	const postType = type || 'page';
 
 	const [ addingBlock, setAddingBlock ] = useState( false );
 	const [ addingPage, setAddingPage ] = useState( false );
 	const [ shouldFocusPane, setShouldFocusPane ] = useState( null );
+	// Tracks search input value. Only read when LinkControl remounts (Back from
+	// Create page) — ref updates don't cause re-renders, so we never pass a changed
+	// inputValue to LinkControl (which causes warnings since it's uncontrolled).
+	const searchInputValueRef = useRef( '' );
 	const linkControlWrapperRef = useRef();
 	const addPageButtonRef = useRef();
 	const addBlockButtonRef = useRef();
@@ -101,8 +117,10 @@ function UnforwardedLinkUI( props, ref ) {
 			kind,
 			type,
 			id,
+			image,
+			badges,
 		} ),
-		[ label, opensInNewTab, url, kind, type, id ]
+		[ label, opensInNewTab, url, kind, type, id, image, badges ]
 	);
 
 	const handlePageCreated = ( pageLink ) => {
@@ -111,6 +129,8 @@ function UnforwardedLinkUI( props, ref ) {
 		// Return to main Link UI and focus the first focusable element
 		setAddingPage( false );
 		setShouldFocusPane( true );
+		// Clear search input value
+		searchInputValueRef.current = '';
 	};
 
 	const dialogTitleId = useInstanceId(
@@ -180,6 +200,10 @@ function UnforwardedLinkUI( props, ref ) {
 						noURLSuggestion={ !! type }
 						suggestionsQuery={ getSuggestionsQuery( type, kind ) }
 						onChange={ props.onChange }
+						onInputChange={ ( value ) => {
+							searchInputValueRef.current = value;
+						} }
+						inputValue={ searchInputValueRef.current }
 						onRemove={ props.onRemove }
 						onCancel={ props.onCancel }
 						handleEntities={ isBoundEntityAvailable }
@@ -233,7 +257,12 @@ function UnforwardedLinkUI( props, ref ) {
 						setShouldFocusPane( addPageButtonRef );
 					} }
 					onPageCreated={ handlePageCreated }
-					initialTitle={ link?.url || '' }
+					initialTitle={
+						searchInputValueRef.current &&
+						! isURL( searchInputValueRef.current )
+							? searchInputValueRef.current
+							: ''
+					}
 				/>
 			) }
 		</Popover>

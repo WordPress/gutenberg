@@ -15,7 +15,7 @@ const POPOVER_PROPS = {
 	className: 'block-library-heading-level-dropdown',
 };
 
-/** @typedef {import('react').ComponentType} ComponentType */
+/** @typedef {React.ComponentType} ComponentType */
 
 /**
  * HeadingLevelDropdown props.

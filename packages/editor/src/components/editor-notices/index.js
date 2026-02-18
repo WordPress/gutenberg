@@ -10,14 +10,7 @@ import { InlineNotices } from '@wordpress/notices';
 import TemplateValidationNotice from '../template-validation-notice';
 
 /**
- * This component renders the notices displayed in the editor. It displays pinned notices first, followed by dismissible
- *
- * @example
- * ```jsx
- * <EditorNotices />
- * ```
- *
- * @return {React.ReactNode} The rendered EditorNotices component.
+ * @deprecated since 7.0, use `wp.notices.InlineNotices` instead.
  */
 export function EditorNotices() {
 	deprecated( 'wp.editor.EditorNotices', {

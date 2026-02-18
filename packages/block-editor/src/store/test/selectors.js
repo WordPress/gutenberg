@@ -2676,6 +2676,8 @@ describe( 'selectors', () => {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
+					order: new Map(),
+					parents: new Map(),
 				},
 				blockListSettings: {},
 				settings: {},
@@ -2689,6 +2691,8 @@ describe( 'selectors', () => {
 				blocks: {
 					byClientId: new Map(),
 					attributes: new Map(),
+					order: new Map(),
+					parents: new Map(),
 				},
 				blockListSettings: {},
 				settings: {
@@ -2726,6 +2730,7 @@ describe( 'selectors', () => {
 					byClientId: new Map(),
 					attributes: new Map(),
 					order: new Map(),
+					parents: new Map(),
 				},
 				blockListSettings: {},
 				settings: {

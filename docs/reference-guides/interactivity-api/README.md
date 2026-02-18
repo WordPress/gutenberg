@@ -20,7 +20,7 @@ Use the following links to locate the topic you're interested in. If you have ne
 -   **[Quick Start Guide](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/iapi-quick-start-guide/):** Get a custom block using the Interactivity API up and running in less than one minute.
 -   **[Tutorial: A first look at the Interactivity API](https://developer.wordpress.org/news/2024/04/11/a-first-look-at-the-interactivity-api/)** This article from the [WordPress Developer Blog](https://developer.wordpress.org/news/) is a great way to get introduced to the Interactivity API.
 -   **[Core Concepts](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/core-concepts/)** Gain a better understanding of concepts and mental models related to Interactivity API development from this section.
--   **[API Reference](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/):** To take a deep dive into how the API works internally, the list of Directives, and how the Store works.
+-   **[Directives and Store](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/):** To take a deep dive into how the API works internally, the list of Directives, and how the Store works.
 -   **[Docs and Examples](#docs-examples):** Additional resources to learn/read more about the Interactivity API.
 
 To get a deeper understanding of what the Interactivity API is or find answers to questions you may have about this standard, check the following resources:
@@ -50,7 +50,7 @@ Install the Interactivity API to your project with the following command:
 npm install @wordpress/interactivity --save
 ```
 
-Import the store into your `view.js`. Refer to the [store documentation](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#the-store) for more information.
+Import the store into your `view.js`. Refer to the [store documentation](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#the-store) for more information.
 
 ```js
 import { store } from '@wordpress/interactivity';
@@ -103,7 +103,7 @@ To "activate" the Interactivity API in a DOM element (and its children), add the
 </div>
 ```
 
-Refer to the [`wp-interactive` documentation](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/api-reference/#wp-interactive) for a more detailed description of this directive.
+Refer to the [`wp-interactive` documentation](https://developer.wordpress.org/block-editor/reference-guides/interactivity-api/directives-and-store/#wp-interactive) for a more detailed description of this directive.
 
 ## Docs & Examples
 
