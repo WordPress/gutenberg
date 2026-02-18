@@ -9,6 +9,8 @@ if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
 	return;
 }
 
+wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
+
 /**
  * Returns a list of all available image sizes.
  *
