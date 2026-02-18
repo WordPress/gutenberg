@@ -162,11 +162,28 @@ export default function FormCardField< Item >( {
 		inlineEnd: 'medium' as const,
 	};
 
-	// For the single-field case, resolve the field definition and layout component.
 	let label = field.label;
-	let SingleFieldLayout;
+	let withHeader: boolean;
+	let bodyContent: React.ReactNode;
 
-	if ( ! field.children ) {
+	if ( field.children ) {
+		withHeader = !! label && layout.withHeader;
+		bodyContent = (
+			<>
+				{ field.description && (
+					<div className="dataforms-layouts-card__field-description">
+						{ field.description }
+					</div>
+				) }
+				<DataFormLayout
+					data={ data }
+					form={ form }
+					onChange={ onChange }
+					validity={ validity?.children }
+				/>
+			</>
+		);
+	} else {
 		const fieldDefinition = fields.find(
 			( fieldDef ) => fieldDef.id === field.id
 		);
@@ -175,20 +192,32 @@ export default function FormCardField< Item >( {
 			return null;
 		}
 
-		SingleFieldLayout = getFormFieldLayout( 'regular' )?.component;
+		const SingleFieldLayout = getFormFieldLayout( 'regular' )?.component;
 		if ( ! SingleFieldLayout ) {
 			return null;
 		}
 
 		label = fieldDefinition.label;
+		withHeader = !! label && layout.withHeader;
+		bodyContent = (
+			<SingleFieldLayout
+				data={ data }
+				field={ field }
+				onChange={ onChange }
+				hideLabelFromVision={ hideLabelFromVision || withHeader }
+				markWhenOptional={ markWhenOptional }
+				validity={ validity }
+			/>
+		);
 	}
-	const withHeader = !! label && layout.withHeader;
+
 	const sizeCardBody = {
 		blockStart: withHeader ? ( 'none' as const ) : ( 'medium' as const ),
 		blockEnd: 'medium' as const,
 		inlineStart: 'medium' as const,
 		inlineEnd: 'medium' as const,
 	};
+
 	return (
 		<Card className="dataforms-layouts-card__field" size={ sizeCard }>
 			{ withHeader && (
@@ -254,34 +283,7 @@ export default function FormCardField< Item >( {
 					ref={ cardBodyRef }
 					onBlur={ handleBlur }
 				>
-					{ field.children ? (
-						<>
-							{ field.description && (
-								<div className="dataforms-layouts-card__field-description">
-									{ field.description }
-								</div>
-							) }
-							<DataFormLayout
-								data={ data }
-								form={ form }
-								onChange={ onChange }
-								validity={ validity?.children }
-							/>
-						</>
-					) : (
-						SingleFieldLayout && (
-							<SingleFieldLayout
-								data={ data }
-								field={ field }
-								onChange={ onChange }
-								hideLabelFromVision={
-									hideLabelFromVision || withHeader
-								}
-								markWhenOptional={ markWhenOptional }
-								validity={ validity }
-							/>
-						)
-					) }
+					{ bodyContent }
 				</CardBody>
 			) }
 		</Card>
