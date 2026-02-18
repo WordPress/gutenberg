@@ -99,8 +99,7 @@ export function ScreenHeader( {
 											) }
 											text={ getCurrentStateLabel() }
 											toggleProps={ {
-												__next40pxDefaultSize: true,
-												variant: 'tertiary',
+												size: 'compact',
 												iconPosition: 'right',
 											} }
 										>
