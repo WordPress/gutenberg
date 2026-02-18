@@ -5,7 +5,7 @@ import { type PostEditorAwarenessState } from '@wordpress/core-data';
 
 import Avatar from './avatar';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
-import { getAvatarBorderColor } from '../collaborators-overlay/avatar-colors';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 import './styles/collaborators-list.scss';
 

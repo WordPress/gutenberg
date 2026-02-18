@@ -6,7 +6,7 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from './get-avatar-url';
-import { getAvatarBorderColor } from './avatar-colors';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );

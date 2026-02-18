@@ -23,14 +23,13 @@ export function noop() {}
  * @see https://www.figma.com/design/HOJTpCFfa3tR0EccUlu0CM/WordPress.org-Design-Library?node-id=1-2193&t=M6WdRvTpt0mh8n6T-1
  */
 const AVATAR_BORDER_COLORS = [
-	'#3858E9', // Blueberry
-	'#9fB1FF', // Blueberry 2
-	'#1D35B4', // Dark Blueberry
-	'#1A1919', // Charcoal 0
-	'#E26F56', // Pomegranate
-	'#33F078', // Acid Green
-	'#FFF972', // Lemon
-	'#7A00DF', // Purple
+	'#C36EFF',
+	'#FF51A8',
+	'#E4780A',
+	'#FF35EE',
+	'#879F11',
+	'#46A494',
+	'#00A2C3',
 ];
 
 /**

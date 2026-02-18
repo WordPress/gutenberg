@@ -18,7 +18,7 @@ import {
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import { getAvatarBorderColor } from './avatar-colors';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 import { getAvatarUrl } from './get-avatar-url';
 
 const { useActiveCollaborators, useResolvedSelection } =

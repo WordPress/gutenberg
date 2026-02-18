@@ -11,7 +11,7 @@ import AvatarGroup from './avatar-group';
 import { CollaboratorsList } from './list';
 import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
-import { getAvatarBorderColor } from '../collaborators-overlay/avatar-colors';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 import './styles/collaborators-presence.scss';
 import { CollaboratorsOverlay } from '../collaborators-overlay';
