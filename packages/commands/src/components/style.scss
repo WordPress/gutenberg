@@ -7,7 +7,7 @@
 	border-radius: $grid-unit-05;
 	width: calc(100% - #{$grid-unit-40});
 	margin: auto;
-	max-width: 400px;
+	max-width: $modal-width-medium;
 	position: relative;
 	top: calc(5% + #{$header-height});
 
@@ -119,7 +119,7 @@
 	}
 
 	[cmdk-root] > [cmdk-list] {
-		max-height: $palette-max-height; // Specific to not have commands overflow oddly.
+		height: min($palette-max-height, calc(70vh - $palette-header-height));
 		overflow: auto;
 		scroll-padding-top: $grid-unit-10;
 		scroll-padding-bottom: $grid-unit-10;
