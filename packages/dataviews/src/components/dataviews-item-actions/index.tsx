@@ -303,7 +303,7 @@ export function PrimaryActions< Item >( {
 		return null;
 	}
 	return (
-		<>
+		<div className="dataviews-primary-actions">
 			{ actions.map( ( action ) => (
 				<ButtonTrigger
 					key={ action.id }
@@ -326,6 +326,6 @@ export function PrimaryActions< Item >( {
 					closeModal={ () => setActiveModalAction( null ) }
 				/>
 			) }
-		</>
+		</div>
 	);
 }
