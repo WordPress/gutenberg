@@ -10,7 +10,7 @@
 class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller {
 
 	public function get_items_permissions_check( $request ) {
-		$is_note         = in_array( $request['type'], array( 'note', 'note_reaction' ), true );
+		$is_note         = in_array( $request['type'], array( 'note', 'reaction' ), true );
 		$is_edit_context = 'edit' === $request['context'];
 
 		if ( ! empty( $request['post'] ) ) {
@@ -99,9 +99,9 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			return $comment;
 		}
 
-		// Re-map edit context capabilities when requesting `note` or `note_reaction` type.
+		// Re-map edit context capabilities when requesting `note` or `reaction` type.
 		// Note: This is only relevant change for the backport.
-		$edit_cap = in_array( $comment->comment_type, array( 'note', 'note_reaction' ), true ) ? array( 'edit_comment', $comment->comment_ID ) : array( 'moderate_comments' );
+		$edit_cap = in_array( $comment->comment_type, array( 'note', 'reaction' ), true ) ? array( 'edit_comment', $comment->comment_ID ) : array( 'moderate_comments' );
 		if ( ! empty( $request['context'] ) && 'edit' === $request['context'] && ! current_user_can( ...$edit_cap ) ) {
 			return new WP_Error(
 				'rest_forbidden_context',
@@ -132,7 +132,7 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 	}
 
 	public function create_item_permissions_check( $request ) {
-		$is_note = ! empty( $request['type'] ) && in_array( $request['type'], array( 'note', 'note_reaction' ), true );
+		$is_note = ! empty( $request['type'] ) && in_array( $request['type'], array( 'note', 'reaction' ), true );
 
 		// Note: This is only relevant change for the backport.
 		if ( ! is_user_logged_in() && $is_note ) {
@@ -292,7 +292,7 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 
 		// Note: Removes non-default comment type check for the backport.
 		// Do not allow comments to be created with a non-core type.
-		if ( ! empty( $request['type'] ) && ! in_array( $request['type'], array( 'comment', 'note', 'note_reaction' ), true ) ) {
+		if ( ! empty( $request['type'] ) && ! in_array( $request['type'], array( 'comment', 'note', 'reaction' ), true ) ) {
 			return new WP_Error(
 				'rest_invalid_comment_type',
 				__( 'Cannot create a comment with that type.', 'gutenberg' ),
@@ -300,8 +300,8 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 			);
 		}
 
-		// Validate note_reaction specific requirements.
-		if ( ! empty( $request['type'] ) && 'note_reaction' === $request['type'] ) {
+		// Validate reaction-specific requirements.
+		if ( ! empty( $request['type'] ) && 'reaction' === $request['type'] ) {
 			// Validate parent is a note.
 			if ( empty( $request['parent'] ) ) {
 				return new WP_Error(
@@ -336,7 +336,7 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 				array(
 					'parent'  => $request['parent'],
 					'user_id' => get_current_user_id(),
-					'type'    => 'note_reaction',
+					'type'    => 'reaction',
 					'status'  => 'any',
 				)
 			);
@@ -432,7 +432,7 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 
 		// Don't check for duplicates or flooding for notes and reactions.
 		$prepared_comment['comment_approved'] =
-			in_array( $prepared_comment['comment_type'], array( 'note', 'note_reaction' ), true ) ?
+			in_array( $prepared_comment['comment_type'], array( 'note', 'reaction' ), true ) ?
 			'1' :
 			wp_allow_comment( $prepared_comment, true );
 
@@ -580,7 +580,7 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 
 		// Embedding children for notes requires `type` and `status` inheritance.
 		// Note: This is only relevant change for the backport.
-		if ( isset( $links['children'] ) && in_array( $comment->comment_type, array( 'note', 'note_reaction' ), true ) ) {
+		if ( isset( $links['children'] ) && in_array( $comment->comment_type, array( 'note', 'reaction' ), true ) ) {
 			$args = array(
 				'parent' => $comment->comment_ID,
 				'type'   => $comment->comment_type,
@@ -658,7 +658,7 @@ class Gutenberg_REST_Comment_Controller_6_9 extends WP_REST_Comments_Controller 
 		}
 
 		// Note reactions always have content (the emoji slug).
-		if ( isset( $check['comment_type'] ) && 'note_reaction' === $check['comment_type'] ) {
+		if ( isset( $check['comment_type'] ) && 'reaction' === $check['comment_type'] ) {
 			return true;
 		}
 

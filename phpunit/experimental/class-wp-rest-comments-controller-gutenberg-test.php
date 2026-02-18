@@ -480,14 +480,14 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		return $data['id'];
 	}
 
-	public function test_create_note_reaction() {
+	public function test_create_reaction() {
 		wp_set_current_user( self::$editor_id );
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_note( $post_id, self::$editor_id );
 
 		$params = array(
 			'post'    => $post_id,
-			'type'    => 'note_reaction',
+			'type'    => 'reaction',
 			'parent'  => $note_id,
 			'content' => 'heart',
 			'author'  => self::$editor_id,
@@ -502,19 +502,19 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		$data        = $response->get_data();
 		$new_comment = get_comment( $data['id'] );
-		$this->assertSame( 'note_reaction', $new_comment->comment_type );
+		$this->assertSame( 'reaction', $new_comment->comment_type );
 		$this->assertSame( 'heart', $new_comment->comment_content );
 		$this->assertSame( (string) $note_id, $new_comment->comment_parent );
 		$this->assertSame( '1', $new_comment->comment_approved );
 	}
 
-	public function test_cannot_create_note_reaction_without_parent() {
+	public function test_cannot_create_reaction_without_parent() {
 		wp_set_current_user( self::$editor_id );
 		$post_id = self::factory()->post->create();
 
 		$params = array(
 			'post'    => $post_id,
-			'type'    => 'note_reaction',
+			'type'    => 'reaction',
 			'content' => 'heart',
 			'author'  => self::$editor_id,
 		);
@@ -527,14 +527,14 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
 	}
 
-	public function test_cannot_create_note_reaction_with_invalid_emoji() {
+	public function test_cannot_create_reaction_with_invalid_emoji() {
 		wp_set_current_user( self::$editor_id );
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_note( $post_id, self::$editor_id );
 
 		$params = array(
 			'post'    => $post_id,
-			'type'    => 'note_reaction',
+			'type'    => 'reaction',
 			'parent'  => $note_id,
 			'content' => 'invalid_emoji',
 			'author'  => self::$editor_id,
@@ -548,14 +548,14 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertErrorResponse( 'rest_comment_invalid_reaction', $response, 400 );
 	}
 
-	public function test_cannot_create_duplicate_note_reaction() {
+	public function test_cannot_create_duplicate_reaction() {
 		wp_set_current_user( self::$editor_id );
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_note( $post_id, self::$editor_id );
 
 		$params = array(
 			'post'    => $post_id,
-			'type'    => 'note_reaction',
+			'type'    => 'reaction',
 			'parent'  => $note_id,
 			'content' => 'rocket',
 			'author'  => self::$editor_id,
@@ -585,7 +585,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		foreach ( $emojis as $emoji ) {
 			$params  = array(
 				'post'    => $post_id,
-				'type'    => 'note_reaction',
+				'type'    => 'reaction',
 				'parent'  => $note_id,
 				'content' => $emoji,
 				'author'  => self::$editor_id,
@@ -598,7 +598,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		}
 	}
 
-	public function test_cannot_create_note_reaction_on_regular_comment() {
+	public function test_cannot_create_reaction_on_regular_comment() {
 		wp_set_current_user( self::$editor_id );
 		$post_id    = self::factory()->post->create();
 		$comment_id = self::factory()->comment->create(
@@ -610,7 +610,7 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 
 		$params = array(
 			'post'    => $post_id,
-			'type'    => 'note_reaction',
+			'type'    => 'reaction',
 			'parent'  => $comment_id,
 			'content' => 'heart',
 			'author'  => self::$editor_id,
@@ -624,13 +624,13 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 		$this->assertErrorResponse( 'rest_comment_invalid_parent', $response, 400 );
 	}
 
-	public function test_create_note_reaction_requires_login() {
+	public function test_create_reaction_requires_login() {
 		wp_set_current_user( 0 );
 		$post_id = self::factory()->post->create();
 
 		$params = array(
 			'post'    => $post_id,
-			'type'    => 'note_reaction',
+			'type'    => 'reaction',
 			'content' => 'heart',
 		);
 
@@ -645,14 +645,14 @@ class WP_Test_REST_Comments_Controller_Gutenberg extends WP_Test_REST_TestCase {
 	/**
 	 * @dataProvider data_valid_reaction_emojis
 	 */
-	public function test_create_note_reaction_valid_emojis( $emoji ) {
+	public function test_create_reaction_valid_emojis( $emoji ) {
 		wp_set_current_user( self::$editor_id );
 		$post_id = self::factory()->post->create();
 		$note_id = $this->create_note( $post_id, self::$editor_id );
 
 		$params = array(
 			'post'    => $post_id,
-			'type'    => 'note_reaction',
+			'type'    => 'reaction',
 			'parent'  => $note_id,
 			'content' => $emoji,
 			'author'  => self::$editor_id,

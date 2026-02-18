@@ -63,7 +63,7 @@ add_action( 'init', 'gutenberg_register_block_comment_metadata' );
 if ( ! function_exists( 'update_get_avatar_comment_type' ) ) {
 	function update_get_avatar_comment_type( $comment_type ) {
 		$comment_type[] = 'note';
-		$comment_type[] = 'note_reaction';
+		$comment_type[] = 'reaction';
 		return $comment_type;
 	}
 	add_filter( 'get_avatar_comment_types', 'update_get_avatar_comment_type' );
@@ -89,7 +89,7 @@ if ( ! function_exists( 'exclude_block_comments_from_admin' ) ) {
 			$query->set( 'type', '' );
 
 			global $wpdb;
-			$clauses['where'] .= " AND {$wpdb->comments}.comment_type != 'note' AND {$wpdb->comments}.comment_type != 'note_reaction'";
+			$clauses['where'] .= " AND {$wpdb->comments}.comment_type != 'note' AND {$wpdb->comments}.comment_type != 'reaction'";
 		}
 
 		return $clauses;
@@ -110,7 +110,7 @@ function gutenberg_filter_comment_count_query_exclude_block_comments( $query ) {
 	// Adjust the query if it is a comment count query.
 	if ( str_starts_with( $query, 'SELECT comment_post_ID, COUNT(comment_ID) as num_comments FROM' ) && str_contains( $query, 'comment_approved' ) ) {
 		if ( ! str_contains( $query, "comment_type != 'note'" ) ) {
-			$query = str_replace( 'comment_approved', "comment_type != 'note' AND comment_type != 'note_reaction' AND comment_approved", $query );
+			$query = str_replace( 'comment_approved', "comment_type != 'note' AND comment_type != 'reaction' AND comment_approved", $query );
 		}
 	}
 	return $query;
@@ -124,7 +124,7 @@ add_filter( 'query', 'gutenberg_filter_comment_count_query_exclude_block_comment
  * @return array Possibly modified arguments for get_comments().
  */
 function gutenberg_hide_note_from_comment_list_table( $args ) {
-	if ( ! empty( $_REQUEST['comment_type'] ) && in_array( $_REQUEST['comment_type'], array( 'note', 'note_reaction' ), true ) ) {
+	if ( ! empty( $_REQUEST['comment_type'] ) && in_array( $_REQUEST['comment_type'], array( 'note', 'reaction' ), true ) ) {
 		unset( $args['type'] );
 	}
 	return $args;
@@ -145,7 +145,7 @@ function gutenberg_exclude_notes_from_comment_count( $new_count, $old_count, $po
 	if ( null !== $new_count ) {
 		return $new_count;
 	}
-	$new_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_approved = '1' AND comment_type != 'note' AND comment_type != 'note_reaction'", $post_id ) );
+	$new_count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->comments WHERE comment_post_ID = %d AND comment_approved = '1' AND comment_type != 'note' AND comment_type != 'reaction'", $post_id ) );
 	return $new_count;
 }
 add_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count', 10, 3 );
