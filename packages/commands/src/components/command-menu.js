@@ -245,6 +245,23 @@ export function CommandMenuGroup( { isContextual, search, setLoader, close } ) {
 	);
 }
 
+function SectionHeading( { search } ) {
+	const filteredCount = useCommandState( ( state ) => state.filtered.count );
+
+	if ( filteredCount === 0 ) {
+		return null;
+	}
+
+	return (
+		<div
+			className="commands-command-menu__section-heading"
+			aria-hidden="true"
+		>
+			{ search ? __( 'Results' ) : __( 'Suggestions' ) }
+		</div>
+	);
+}
+
 function CommandInput( { isOpen, search, setSearch } ) {
 	const commandMenuInput = useRef();
 	const _value = useCommandState( ( state ) => state.value );
@@ -363,6 +380,7 @@ export function CommandMenu() {
 								{ __( 'No results found.' ) }
 							</Command.Empty>
 						) }
+						<SectionHeading search={ search } />
 						<CommandMenuGroup
 							search={ search }
 							setLoader={ setLoader }

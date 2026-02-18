@@ -130,11 +130,6 @@
 			border-top: $border-width solid $gray-300;
 		}
 
-		// Only add vertical padding when there are commands to show.
-		&:has([cmdk-group-items]:not(:empty)) {
-			padding-top: $grid-unit-10;
-		}
-
 		// Ensures there is always padding bottom on the last group, when there are commands.
 		&
 		[cmdk-list-sizer] > [cmdk-group]:last-child
@@ -144,6 +139,15 @@
 
 		& [cmdk-list-sizer] > [cmdk-group] > [cmdk-group-items]:not(:empty) {
 			padding: 0 $grid-unit-10;
+		}
+
+		.commands-command-menu__section-heading {
+			padding: $grid-unit-15 $grid-unit-20;
+			line-height: $grid-unit-20;
+			font-size: $font-size-x-small;
+			font-weight: 500;
+			text-transform: uppercase;
+			color: $gray-900;
 		}
 	}
 
