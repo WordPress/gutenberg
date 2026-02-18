@@ -5,11 +5,12 @@
  * @package WordPress
  */
 
-// Path differs between source and build: 'shared/' in source, 'shared/' in build.
+// Path differs between source and build: 'shared/' in source, 'navigation/shared/' in build.
 if ( file_exists( __DIR__ . '/shared/get-submenu-visibility.php' ) ) {
-	require_once __DIR__ . '/shared/get-submenu-visibility.php';
+    require_once __DIR__ . '/shared/get-submenu-visibility.php';
 } else {
-	require_once __DIR__ . '/../navigation/shared/get-submenu-visibility.php';
+    require_once __DIR__ . '/navigation/shared/get-submenu-visibility.php';
+}
 }
 
 /**
