@@ -115,50 +115,58 @@ export default function InspectorControlsTabs( {
 
 	// Detect when a child of a list-view-enabled content block is selected
 	// (e.g. clicking Button 1 inside a Buttons block in the canvas).
-	// When this happens, auto-switch to List View so the inspector matches.
-	const isListChildSelected = useSelect(
+	// Returns the parent list-view block's clientId, or null.
+	const listChildParentId = useSelect(
 		( select ) => {
 			if ( ! isSectionBlock ) {
-				return false;
+				return null;
 			}
 			const { getSelectedBlockClientId, getBlockParents, getBlockName } =
 				select( blockEditorStore );
 			const selectedId = getSelectedBlockClientId();
 			if ( ! selectedId || contentClientIds?.includes( selectedId ) ) {
-				return false;
+				return null;
 			}
 			const parents = getBlockParents( selectedId );
-			return parents.some( ( parentId ) => {
+			for ( const parentId of parents ) {
 				if ( ! contentClientIds?.includes( parentId ) ) {
-					return false;
+					continue;
 				}
 				const parentName = getBlockName( parentId );
-				return (
+				if (
 					parentName === 'core/navigation' ||
 					hasBlockSupport( parentName, 'listView' )
-				);
-			} );
+				) {
+					return parentId;
+				}
+			}
+			return null;
 		},
 		[ isSectionBlock, contentClientIds ]
 	);
 
-	const prevIsListChildRef = useRef( isListChildSelected );
+	const prevListChildParentRef = useRef( listChildParentId );
 	useEffect( () => {
-		const prev = prevIsListChildRef.current;
-		prevIsListChildRef.current = isListChildSelected;
+		const prev = prevListChildParentRef.current;
+		prevListChildParentRef.current = listChildParentId;
 
-		if ( isListChildSelected === prev ) {
+		if ( listChildParentId === prev ) {
 			return;
 		}
 
-		if (
-			isListChildSelected &&
-			selectedTabIdRef.current !== TAB_LIST_VIEW.name
-		) {
-			setSelectedTabId( TAB_LIST_VIEW.name );
+		if ( listChildParentId ) {
+			setOpenListViewPanel( listChildParentId );
+			incrementListViewExpandRevision();
+			if ( selectedTabIdRef.current !== TAB_LIST_VIEW.name ) {
+				setSelectedTabId( TAB_LIST_VIEW.name );
+			}
 			hasUserSelectionRef.current = true;
 		}
-	}, [ isListChildSelected ] );
+	}, [
+		listChildParentId,
+		setOpenListViewPanel,
+		incrementListViewExpandRevision,
+	] );
 
 	// Handle explicit inspector tab requests (panel opening, refs, clear).
 	// Tab state is initialized from requestedTab above.
