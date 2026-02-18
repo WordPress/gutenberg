@@ -12,10 +12,7 @@ import { isReusableBlock, isTemplatePart } from '@wordpress/blocks';
 import { store as blockEditorStore } from '../../store';
 import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit';
 
-export default function EditSectionButton( { clientIds } ) {
-	// Only works for single block selection.
-	const clientId = clientIds.length === 1 ? clientIds[ 0 ] : undefined;
-
+export default function EditSectionButton( { clientId } ) {
 	const {
 		isSectionBlock,
 		isEditingContentOnlySection,

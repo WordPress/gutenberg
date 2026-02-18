@@ -245,7 +245,9 @@ export function PrivateBlockToolbar( {
 					shouldShowVisualToolbar &&
 					isMultiToolbar &&
 					showGroupButtons && <BlockGroupToolbar /> }
-				<EditSectionButton clientIds={ blockClientIds } />
+				{ ! isMultiToolbar && (
+					<EditSectionButton clientId={ blockClientIds[ 0 ] } />
+				) }
 				{ ! areSelectedBlocksHiddenOnViewport && showShuffleButton && (
 					<ChangeDesign clientId={ blockClientIds[ 0 ] } />
 				) }
