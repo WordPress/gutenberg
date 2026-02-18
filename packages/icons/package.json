@@ -57,6 +57,6 @@
 	"scripts": {
 		"prelint:js": "npm run build",
 		"prepare": "npm run build",
-		"build": "node lib/generate-library.cjs"
+		"build": "node lib/generate-library.cjs && node lib/generate-manifest-php.cjs"
 	}
 }
