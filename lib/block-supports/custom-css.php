@@ -21,6 +21,10 @@ function gutenberg_render_custom_css_support_styles( $parsed_block ) {
 	}
 
 	$custom_css = trim( $parsed_block['attrs']['style']['css'] ?? '' );
+	// Decode HTML entities (e.g. &amp; → &) that may be introduced
+	// during block serialisation so that nested selectors using &
+	// are processed correctly by process_blocks_custom_css().
+	$custom_css = html_entity_decode( $custom_css, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
 
 	if ( empty( $custom_css ) ) {
 		return $parsed_block;

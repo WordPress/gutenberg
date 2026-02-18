@@ -415,6 +415,41 @@ class WP_Block_Supports_Custom_CSS_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests that HTML-encoded ampersands in nested CSS selectors are decoded
+	 * before processing, so that `&amp;` becomes `&` and nested selectors work.
+	 *
+	 * Block serialisation may encode `&` as `&amp;` in the stored CSS attribute.
+	 *
+	 * @covers ::gutenberg_render_custom_css_support_styles
+	 */
+	public function test_custom_css_decodes_html_entities_in_nested_selectors() {
+		$this->register_custom_css_block_with_support(
+			'test/custom-css-encoded-amp',
+			array( 'customCSS' => true )
+		);
+
+		$parsed_block = array(
+			'blockName' => 'test/custom-css-encoded-amp',
+			'attrs'     => array(
+				'style' => array(
+					'css' => '&amp;:hover { color: red; }',
+				),
+			),
+		);
+
+		$result = gutenberg_render_custom_css_support_styles( $parsed_block );
+
+		$this->assertArrayHasKey( 'className', $result['attrs'], 'Block should have className added when CSS contains encoded ampersand.' );
+
+		// Verify the inline style contains the decoded nested selector.
+		$expected_class = preg_replace( '/.*?(wp-custom-css-\S+).*/', '$1', $result['attrs']['className'] );
+		$inline_css     = wp_styles()->get_data( 'wp-block-custom-css', 'after' );
+
+		$this->assertNotEmpty( $inline_css, 'Inline CSS should be registered.' );
+		$this->assertStringContainsString( '.' . $expected_class . ':hover', implode( '', $inline_css ), 'Decoded & should produce a valid nested selector in the output CSS.' );
+	}
+
+	/**
 	 * Tests that valid CSS without HTML markup is accepted.
 	 *
 	 * @covers ::gutenberg_render_custom_css_support_styles
