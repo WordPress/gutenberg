@@ -17,8 +17,10 @@ class Block_Core_Shared_Get_Submenu_Visibility_Test extends WP_UnitTestCase {
 	public static function set_up_before_class() {
 		parent::set_up_before_class();
 
-		// The function is already loaded by WordPress during bootstrap from the build directory.
-		// We don't need to manually require it here.
+		$shared_file = dirname( __DIR__, 2 ) . '/packages/block-library/src/navigation/shared/get-submenu-visibility.php';
+		if ( ! function_exists( 'block_core_shared_get_submenu_visibility' ) && file_exists( $shared_file ) ) {
+			require_once $shared_file;
+		}
 	}
 
 	/**
