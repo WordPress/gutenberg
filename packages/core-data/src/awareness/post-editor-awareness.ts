@@ -64,45 +64,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 			getSelectionStart,
 			getSelectionEnd,
 			getSelectedBlocksInitialCaretPosition,
-			getBlockIndex,
-			getBlockRootClientId,
-			getBlockName,
 		} = select( blockEditorStore );
-
-		// Resolves a block's clientId (which may be an internal/cloned ID) to its
-		// index path relative to the post content blocks. This allows finding the
-		// corresponding block in the Yjs document even when clientIds differ
-		// (e.g. in "Show Template" mode where blocks are cloned).
-		//
-		// In template mode, the block tree includes template parts and wrapper blocks
-		// around a core/post-content block. The Yjs document only contains the post
-		// content blocks, so we stop the upward walk when the parent is
-		// core/post-content (its inner blocks correspond to the Yjs root blocks).
-		const blockPathResolver = (
-			clientId: string
-		): AbsoluteBlockIndexPath | null => {
-			const path: AbsoluteBlockIndexPath = [];
-			let current: string | null = clientId;
-			while ( current ) {
-				const index = getBlockIndex( current );
-				if ( index === -1 ) {
-					return null;
-				}
-				path.unshift( index );
-				const parent = getBlockRootClientId( current );
-				if ( ! parent ) {
-					break;
-				}
-				// If the parent is core/post-content, stop here — the Yjs doc
-				// root blocks correspond to post-content's inner blocks.
-				const parentName = getBlockName( parent );
-				if ( parentName === 'core/post-content' ) {
-					break;
-				}
-				current = parent;
-			}
-			return path.length > 0 ? path : null;
-		};
 
 		// Keep track of the current selection in the outer scope so we can compare
 		// in the subscription.
@@ -147,8 +109,7 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 				const selectionState = getSelectionState(
 					selectionStart,
 					selectionEnd,
-					this.doc,
-					blockPathResolver
+					this.doc
 				);
 
 				this.setThrottledLocalStateField(
