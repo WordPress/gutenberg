@@ -38,6 +38,7 @@ _Props_
 -   `children: ReactNode` (optional): Additional content rendered in the dismissible notice list.
 -   `pinnedNoticesClassName: string` (optional): Extra class name added to the pinned list.
 -   `dismissibleNoticesClassName: string` (optional): Extra class name added to the dismissible list.
+-   `context: string` (optional): Notice context to read and remove notices from. Defaults to `default`.
 
 ### `SnackbarNotices`
 
@@ -49,6 +50,7 @@ Renders notices with type `snackbar` using `SnackbarList`.
 _Props_
 
 -   `className: string` (optional): Extra class name added to the snackbar list.
+-   `context: string` (optional): Notice context to read and remove notices from. Defaults to `default`.
 
 ## Example
 
@@ -62,6 +64,7 @@ import {
 
 function AppNotices() {
 	const { createSuccessNotice } = useDispatch( noticesStore );
+	const noticeContext = 'my-plugin/screen';
 
 	return (
 		<>
@@ -69,6 +72,7 @@ function AppNotices() {
 				onClick={ () =>
 					createSuccessNotice( 'Saved successfully.', {
 						type: 'snackbar',
+						context: noticeContext,
 					} )
 				}
 			>
@@ -78,8 +82,12 @@ function AppNotices() {
 			<InlineNotices
 				pinnedNoticesClassName="my-plugin-notices__pinned"
 				dismissibleNoticesClassName="my-plugin-notices__dismissible"
+				context={ noticeContext }
 			/>
-			<SnackbarNotices className="my-plugin-notices__snackbar" />
+			<SnackbarNotices
+				className="my-plugin-notices__snackbar"
+				context={ noticeContext }
+			/>
 		</>
 	);
 }
