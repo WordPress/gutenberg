@@ -38,7 +38,7 @@ export function useMarkPersistent( { html, value } ) {
 		}
 
 		if (
-			registry.select( blockEditorStore ).isLastBlockChangePersistent()
+			! registry.select( blockEditorStore ).isLastBlockChangePersistent()
 		) {
 			__unstableMarkLastChangeAsPersistent();
 		}
