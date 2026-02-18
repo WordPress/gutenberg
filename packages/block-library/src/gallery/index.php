@@ -150,45 +150,43 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 		}
 	}
 
-	// Randomize image IDs when `randomOrder` setting is enabled
-	if ( ! empty( $attributes['randomOrder'] ) && ! empty( $image_ids ) ) {
-		shuffle( $image_ids );
-	}
-
-	$processed_content->set_attribute( 'data-wp-interactive', 'core/gallery' );
-	$processed_content->set_attribute(
-		'data-wp-context',
-		wp_json_encode(
-			array( 'galleryId' => $gallery_id ),
-			JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
-		)
-	);
-
-	// Populates the aria label for each image in the gallery.
 	if ( ! empty( $image_ids ) ) {
-		if ( 1 <= count( $image_ids ) ) {
-			for ( $i = 0; $i < count( $image_ids ); $i++ ) {
-				$image_id = $image_ids[ $i ];
-				$alt      = $state['metadata'][ $image_id ]['alt'];
-				wp_interactivity_state(
-					'core/image',
-					array(
-						'metadata' => array(
-							$image_id => array(
-								'customAriaLabel'        => empty( $alt )
-									/* translators: %1$s: current image index, %2$s: total number of images */
-									? sprintf( __( 'Enlarged image %1$s of %2$s' ), $i + 1, count( $image_ids ) )
-									/* translators: %1$s: current image index, %2$s: total number of images, %3$s: Image alt text */
-									: sprintf( __( 'Enlarged image %1$s of %2$s: %3$s' ), $i + 1, count( $image_ids ), $alt ),
+		// Randomize image IDs when `randomOrder` setting is enabled.
+		if ( ! empty( $attributes['randomOrder'] ) ) {
+			shuffle( $image_ids );
+		}
+
+		$processed_content->set_attribute( 'data-wp-interactive', 'core/gallery' );
+		$processed_content->set_attribute(
+			'data-wp-context',
+			wp_json_encode(
+				array( 'galleryId' => $gallery_id ),
+				JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP
+			)
+		);
+
+		// Populates the aria label for each image in the gallery.
+		for ( $i = 0; $i < count( $image_ids ); $i++ ) {
+			$image_id = $image_ids[ $i ];
+			$alt      = $state['metadata'][ $image_id ]['alt'];
+			wp_interactivity_state(
+				'core/image',
+				array(
+					'metadata' => array(
+						$image_id => array(
+							'customAriaLabel'        => empty( $alt )
 								/* translators: %1$s: current image index, %2$s: total number of images */
-								'triggerButtonAriaLabel' => sprintf( __( 'Enlarge %1$s of %2$s' ), $i + 1, count( $image_ids ) ),
-								// This metadata is used to store the order of the images in the gallery.
-								'order'                  => $i,
-							),
+								? sprintf( __( 'Enlarged image %1$s of %2$s' ), $i + 1, count( $image_ids ) )
+								/* translators: %1$s: current image index, %2$s: total number of images, %3$s: Image alt text */
+								: sprintf( __( 'Enlarged image %1$s of %2$s: %3$s' ), $i + 1, count( $image_ids ), $alt ),
+							/* translators: %1$s: current image index, %2$s: total number of images */
+							'triggerButtonAriaLabel' => sprintf( __( 'Enlarge %1$s of %2$s' ), $i + 1, count( $image_ids ) ),
+							// This metadata is used to store the order of the images in the gallery.
+							'order'                  => $i,
 						),
-					)
-				);
-			}
+					),
+				)
+			);
 		}
 	}
 
@@ -207,7 +205,7 @@ function block_core_gallery_render( $attributes, $content, $block ) {
 	 *
 	 * @see: https://github.com/WordPress/gutenberg/pull/58733
 	 */
-	if ( empty( $attributes['randomOrder'] ) ) {
+	if ( empty( $attributes['randomOrder'] ) || empty( $image_ids ) ) {
 		return $updated_content;
 	}
 
