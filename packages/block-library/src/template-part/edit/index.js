@@ -249,7 +249,7 @@ export default function TemplatePartEdit( {
 									} );
 								} }
 							>
-								{ __( 'Edit section' ) }
+								{ __( 'Edit original' ) }
 							</ToolbarButton>
 						</BlockControls>
 					) }

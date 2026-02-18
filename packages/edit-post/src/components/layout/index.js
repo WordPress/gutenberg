@@ -12,7 +12,6 @@ import {
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorKeyboardShortcutsRegister,
-	EditorSnackbars,
 	ErrorBoundary,
 	PostLockedModal,
 	store as editorStore,
@@ -31,7 +30,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { chevronDown, chevronUp } from '@wordpress/icons';
-import { store as noticesStore } from '@wordpress/notices';
+import { SnackbarNotices, store as noticesStore } from '@wordpress/notices';
 import { store as preferencesStore } from '@wordpress/preferences';
 import { privateApis as commandsPrivateApis } from '@wordpress/commands';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
@@ -379,7 +378,6 @@ function Layout( {
 		currentPost: { postId: currentPostId, postType: currentPostType },
 		onNavigateToEntityRecord,
 		onNavigateToPreviousEntityRecord,
-		previousSelectedBlockPath,
 	} = useNavigateToEntityRecord(
 		initialPostId,
 		initialPostType,
@@ -595,7 +593,6 @@ function Layout( {
 						// eslint-disable-next-line jsx-a11y/no-autofocus
 						autoFocus={ ! isWelcomeGuideVisible }
 						onActionPerformed={ onActionPerformed }
-						initialSelection={ previousSelectedBlockPath }
 						extraSidebarPanels={
 							showMetaBoxes && <MetaBoxes location="side" />
 						}
@@ -622,7 +619,7 @@ function Layout( {
 						<PluginArea onError={ onPluginAreaError } />
 						<PostEditorMoreMenu />
 						{ backButton }
-						<EditorSnackbars />
+						<SnackbarNotices className="edit-post-layout__snackbar" />
 					</Editor>
 				</div>
 			</ErrorBoundary>

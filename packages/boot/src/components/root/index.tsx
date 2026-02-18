@@ -7,7 +7,7 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { privateApis as routePrivateApis } from '@wordpress/route';
-import { EditorSnackbars } from '@wordpress/editor';
+import { SnackbarNotices } from '@wordpress/notices';
 import { useViewportMatch, useReducedMotion } from '@wordpress/compose';
 import {
 	__unstableMotion as motion,
@@ -68,7 +68,7 @@ export default function Root() {
 						} ) }
 					>
 						<SavePanel />
-						<EditorSnackbars />
+						<SnackbarNotices className="boot-notices__snackbar" />
 						{ isMobileViewport && (
 							<Page.SidebarToggleFill>
 								<Button

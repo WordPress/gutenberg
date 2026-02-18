@@ -11,6 +11,7 @@ import { useEffect, useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 const { useActiveCollaborators, useGetAbsolutePositionIndex } =
 	unlock( coreDataPrivateApis );
@@ -51,8 +52,10 @@ export function useBlockHighlighting(
 				);
 
 				if ( blockElement ) {
-					blockElement.style.boxShadow = '';
-					blockElement.style.borderRadius = '';
+					blockElement.classList.remove( 'is-collaborator-selected' );
+					blockElement.style.removeProperty(
+						'--collaborator-outline-color'
+					);
 				}
 
 				highlightedBlockIds.current.delete( blockId );
@@ -77,7 +80,9 @@ export function useBlockHighlighting(
 
 					return {
 						blockId: blockClientId,
-						color: userState.collaboratorInfo.color,
+						color: getAvatarBorderColor(
+							userState.collaboratorInfo.id
+						),
 					};
 				}
 
@@ -108,8 +113,11 @@ export function useBlockHighlighting(
 			}
 
 			if ( blockElement ) {
-				blockElement.style.boxShadow = `${ color } 0 0 0 2px`;
-				blockElement.style.borderRadius = '4px';
+				blockElement.classList.add( 'is-collaborator-selected' );
+				blockElement.style.setProperty(
+					'--collaborator-outline-color',
+					color
+				);
 				highlightedBlockIds.current.add( blockId );
 			}
 		} );

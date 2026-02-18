@@ -4,7 +4,8 @@
 
 /* Root of the component. */
 // Internal variables
-$wp-components-calendar-outline-focus: var(--wp-admin-border-width-focus) solid $components-color-accent;
+$wp-components-calendar-outline-focus: var(--wp-admin-border-width-focus)
+	solid $components-color-accent;
 $wp-components-calendar-button-height: $grid-unit-40;
 $wp-components-calendar-button-width: $grid-unit-40;
 $wp-components-calendar-nav-height: $grid-unit-40;
@@ -39,7 +40,8 @@ $wp-components-calendar-preview-border-color: color-mix(in srgb, $components-col
 	// date follows the same color as the button's text, since the button
 	// inherits its text color.
 	&:has(.components-calendar__day-button:disabled) {
-		color: $components-color-disabled;
+		// Use a lighter shade of gray for less visual prominence.
+		color: $components-color-gray-400;
 	}
 	&:has(.components-calendar__day-button:hover:not(:disabled)),
 	&:has(.components-calendar__day-button:focus-visible) {

@@ -9,6 +9,7 @@ on:
             - 'lib/**'
             - '!lib/load.php'
             - '!lib/experiments-page.php'
+            - '!lib/theme.json'
             - '!lib/experimental/**'
             - 'phpunit/**'
             - '!phpunit/experimental/**'

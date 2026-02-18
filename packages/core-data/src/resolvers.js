@@ -217,6 +217,15 @@ export const getEntityRecord =
 									name,
 									key
 								),
+							// Handle sync connection status changes.
+							onStatusChange: ( status ) => {
+								dispatch.setSyncConnectionStatus(
+									kind,
+									name,
+									key,
+									status
+								);
+							},
 							// Refetch the current entity record from the database.
 							refetchRecord: async () => {
 								dispatch.receiveEntityRecords(
@@ -469,6 +478,14 @@ export const getEntityRecords =
 						entityConfig.syncConfig,
 						objectType,
 						{
+							onStatusChange: ( status ) => {
+								dispatch.setSyncConnectionStatus(
+									kind,
+									name,
+									null,
+									status
+								);
+							},
 							refetchRecords: async () => {
 								dispatch.receiveEntityRecords(
 									kind,

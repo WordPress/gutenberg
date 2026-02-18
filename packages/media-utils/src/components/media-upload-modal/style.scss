@@ -1,4 +1,5 @@
 @use "@wordpress/base-styles/variables" as *;
+@use "@wordpress/base-styles/mixins" as *;
 
 .media-upload-modal {
 	.components-modal__header {
@@ -22,10 +23,6 @@
 	}
 
 	.media-upload-modal__snackbar {
-		position: absolute;
-		left: 0;
-		bottom: 16px;
-		padding-left: 16px;
-		padding-right: 16px;
+		@include snackbar-container();
 	}
 }

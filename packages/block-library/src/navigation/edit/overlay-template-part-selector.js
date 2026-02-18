@@ -31,6 +31,7 @@ import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
  *
  * @param {Object}   props                          Component props.
  * @param {string}   props.overlay                  Currently selected overlay template part ID.
+ * @param {string}   props.overlayMenu              Overlay visibility setting ('never', 'mobile', 'always').
  * @param {Function} props.setAttributes            Function to update block attributes.
  * @param {Function} props.onNavigateToEntityRecord Function to navigate to template part editor.
  * @param {boolean}  props.isCreatingOverlay        Whether an overlay is being created (lifted state).
@@ -39,6 +40,7 @@ import { NAVIGATION_OVERLAY_TEMPLATE_PART_AREA } from '../constants';
  */
 export default function OverlayTemplatePartSelector( {
 	overlay,
+	overlayMenu,
 	setAttributes,
 	onNavigateToEntityRecord,
 	isCreatingOverlay,
@@ -165,10 +167,14 @@ export default function OverlayTemplatePartSelector( {
 		const theme = selectedTemplatePart.theme || currentTheme;
 		const templatePartId = createTemplatePartId( theme, overlay );
 
-		onNavigateToEntityRecord( {
+		const params = {
 			postId: templatePartId,
 			postType: 'wp_template_part',
-		} );
+		};
+		if ( overlayMenu === 'mobile' ) {
+			params.viewport = 'mobile';
+		}
+		onNavigateToEntityRecord( params );
 	};
 
 	const handleCreateOverlay = useCallback( async () => {
@@ -189,10 +195,14 @@ export default function OverlayTemplatePartSelector( {
 					theme,
 					templatePart.slug
 				);
-				onNavigateToEntityRecord( {
+				const params = {
 					postId: templatePartId,
 					postType: 'wp_template_part',
-				} );
+				};
+				if ( overlayMenu === 'mobile' ) {
+					params.viewport = 'mobile';
+				}
+				onNavigateToEntityRecord( params );
 			} else {
 				setIsCreating( false );
 			}
@@ -219,6 +229,7 @@ export default function OverlayTemplatePartSelector( {
 		createErrorNotice,
 		currentTheme,
 		setIsCreating,
+		overlayMenu,
 	] );
 
 	const handleClearOverlay = useCallback( () => {

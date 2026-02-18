@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 11.7.0 (2026-02-18)
+
 ### Enhancements
 
 -   Add new `navigation-overlay` icon. ([#75249](https://github.com/WordPress/gutenberg/issues/75249))

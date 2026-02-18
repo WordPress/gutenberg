@@ -437,7 +437,7 @@ Insert an SVG icon. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/
 -	**Experimental:** true
 -	**Category:** media
 -	**Supports:** align (center, left, right), anchor, ariaLabel, color (background, text), dimensions (width), interactivity (clientNavigation), spacing (margin, padding), ~~html~~
--	**Attributes:** icon, style
+-	**Attributes:** icon
 
 ## Image
 
@@ -726,7 +726,7 @@ Display the excerpt. ([Source](https://github.com/WordPress/gutenberg/tree/trunk
 
 -	**Name:** core/post-excerpt
 -	**Category:** theme
--	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight), ~~html~~
+-	**Supports:** anchor, color (background, gradients, link, text), interactivity (clientNavigation), spacing (margin, padding), typography (fontSize, lineHeight, textColumns), ~~html~~
 -	**Attributes:** excerptLength, moreText, showMoreOnNewLine, textAlign
 
 ## Featured Image
@@ -994,6 +994,7 @@ Add white space between blocks and customize its height. ([Source](https://githu
 Content for a tab in a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab))
 
 -	**Name:** core/tab
+-	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/tab-panel
 -	**Supports:** anchor, color (background, text), layout, renaming, spacing (blockGap, padding, ~~margin~~), typography (fontSize), ~~html~~, ~~reusable~~
@@ -1004,6 +1005,7 @@ Content for a tab in a tabbed interface. ([Source](https://github.com/WordPress/
 Container for tab panel content in a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tab-panel))
 
 -	**Name:** core/tab-panel
+-	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/tabs
 -	**Allowed Blocks:** core/tab
@@ -1033,6 +1035,7 @@ Summarize your post with a list of headings. Add HTML anchors to Heading blocks 
 Display content in a tabbed interface to help users navigate detailed content with ease. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs))
 
 -	**Name:** core/tabs
+-	**Experimental:** true
 -	**Category:** design
 -	**Allowed Blocks:** core/tabs-menu, core/tab-panel
 -	**Supports:** align, anchor, color (background, text), interactivity, layout (allowJustification, allowOrientation, allowSizingOnChildren, allowVerticalAlignment, default, ~~allowSwitching~~), renaming, spacing (blockGap, margin, padding), typography (fontSize), ~~html~~
@@ -1043,6 +1046,7 @@ Display content in a tabbed interface to help users navigate detailed content wi
 Display the tab buttons for a tabbed interface. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs-menu))
 
 -	**Name:** core/tabs-menu
+-	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/tabs
 -	**Allowed Blocks:** core/tabs-menu-item
@@ -1053,6 +1057,7 @@ Display the tab buttons for a tabbed interface. ([Source](https://github.com/Wor
 A single tab button in the tabs menu. Used as a template for styling all tab buttons. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/tabs-menu-item))
 
 -	**Name:** core/tabs-menu-item
+-	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/tabs-menu
 -	**Supports:** color (background, text), layout (~~allowEditing~~), shadow, spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~
@@ -1129,7 +1134,7 @@ This block is deprecated. Please use the Columns block instead. ([Source](https:
 -	**Supports:** interactivity (clientNavigation), ~~inserter~~
 -	**Attributes:** columns, content, width
 
-## Verse
+## Poetry
 
 Insert poetry. Use special spacing formats. Or quote song lyrics. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/verse))
 

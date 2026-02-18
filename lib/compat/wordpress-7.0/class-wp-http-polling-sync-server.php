@@ -175,6 +175,15 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * @return bool|WP_Error True if user has permission, otherwise WP_Error with details.
 		 */
 		public function check_permissions( WP_REST_Request $request ) {
+			// Minimum cap check. Is user logged in with a contributor role or higher?
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				return new WP_Error(
+					'forbidden',
+					__( 'You do not have permission to perform this action', 'gutenberg' ),
+					array( 'status' => 401 )
+				);
+			}
+
 			$rooms = $request['rooms'];
 
 			foreach ( $rooms as $room ) {
@@ -434,17 +443,14 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			}
 
 			// Determine if this client should perform compaction.
-			$compaction_request = null;
-			if ( $is_compactor && $total_updates > self::COMPACTION_THRESHOLD ) {
-				$compaction_request = $updates_after_cursor;
-			}
+			$should_compact = $is_compactor && $total_updates > self::COMPACTION_THRESHOLD;
 
 			return array(
-				'compaction_request' => $compaction_request,
-				'end_cursor'         => $this->storage->get_cursor( $room ),
-				'room'               => $room,
-				'total_updates'      => $total_updates,
-				'updates'            => $typed_updates,
+				'end_cursor'     => $this->storage->get_cursor( $room ),
+				'room'           => $room,
+				'should_compact' => $should_compact,
+				'total_updates'  => $total_updates,
+				'updates'        => $typed_updates,
 			);
 		}
 	}

@@ -340,9 +340,6 @@ test.describe( 'Page List', () => {
 		};
 
 		test.beforeAll( async ( { requestUtils } ) => {
-			await requestUtils.setGutenbergExperiments( [
-				'gutenberg-quick-edit-dataviews',
-			] );
 			// Create a test user for `author` field testing.
 			await requestUtils.createUser( {
 				username: 'testauthor',
@@ -361,7 +358,9 @@ test.describe( 'Page List', () => {
 			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
 			// Trigger Quick Edit action on Privacy Policy row
-			const row = page.getByRole( 'row', { name: /Privacy Policy/ } );
+			const row = page
+				.getByRole( 'row', { name: /Privacy Policy/ } )
+				.first();
 			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
 		} );
 
@@ -477,7 +476,6 @@ test.describe( 'Page List', () => {
 		// } );
 
 		test.afterAll( async ( { requestUtils } ) => {
-			await requestUtils.setGutenbergExperiments( [] );
 			await requestUtils.deleteAllUsers();
 		} );
 	} );
