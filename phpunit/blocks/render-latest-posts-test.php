@@ -84,7 +84,7 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 			'addLinkToFeaturedImage' => false,
 		);
 
-		gutenberg_render_block_core_latest_posts( $attributes );
+		render_block_core_latest_posts( $attributes );
 		$args      = $action->get_args();
 		$last_args = end( $args );
 		$this->assertSameSets( self::$attachment_ids, $last_args[1] );
@@ -106,7 +106,7 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 			'addLinkToFeaturedImage' => false,
 		);
 
-		gutenberg_render_block_core_latest_posts( $attributes );
+		render_block_core_latest_posts( $attributes );
 		$args      = $action->get_args();
 		$last_args = end( $args );
 		$this->assertContains( self::$posts[0]->ID, $last_args[1], 'Ensure that post is in array of post ids that are primed' );
@@ -171,7 +171,7 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 	 * block to a post (with gallery blocks) caused memory exhaustion when that post
 	 * was displayed by the Latest Posts block.
 	 *
-	 * @covers ::gutenberg_render_block_core_latest_posts
+	 * @covers ::render_block_core_latest_posts
 	 */
 	public function test_render_block_core_latest_posts_prevents_recursion() {
 		// Create attachment IDs for gallery block (matching the test scenario).
@@ -224,7 +224,7 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 
 		// This should not cause a fatal error or memory exhaustion.
 		// The recursion protection should prevent infinite loops.
-		$output = gutenberg_render_block_core_latest_posts( $attributes );
+		$output = render_block_core_latest_posts( $attributes );
 
 		// Verify the output contains the wrapper for the outer Latest Posts block.
 		$this->assertStringContainsString(
@@ -307,7 +307,7 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 	 * This test uses a gallery block as an example, but the issue affects
 	 * all block types. See #61477 and #69517.
 	 *
-	 * @covers ::gutenberg_render_block_core_latest_posts
+	 * @covers ::render_block_core_latest_posts
 	 */
 	public function test_render_block_core_latest_posts_full_content_blocks_parsed() {
 		// Create attachment IDs for gallery block (used as example block type).
@@ -351,7 +351,7 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 			'displayPostContentRadio' => 'full_post',
 		);
 
-		$output = gutenberg_render_block_core_latest_posts( $attributes );
+		$output = render_block_core_latest_posts( $attributes );
 
 		// Verify that the post content is included in the output.
 		$this->assertStringContainsString(
