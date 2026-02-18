@@ -106,3 +106,55 @@ function gutenberg_exclude_notes_from_comment_count_7_1( $new_count, $old_count,
 }
 remove_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count', 10 );
 add_filter( 'pre_wp_update_comment_count_now', 'gutenberg_exclude_notes_from_comment_count_7_1', 10, 3 );
+
+/**
+ * Returns the allowed emojis for note reactions.
+ *
+ * Each emoji is an associative array with:
+ * - `emoji` (string) The emoji character.
+ * - `label` (string) A translated human-readable label.
+ * - `value` (string) A slug used as the storage key.
+ *
+ * @since 7.1.0
+ *
+ * @return array[] List of emoji definitions.
+ */
+function gutenberg_get_note_reaction_emojis() {
+	$default_emojis = array(
+		array(
+			'emoji' => '❤️',
+			'label' => __( 'Heart', 'gutenberg' ),
+			'value' => 'heart',
+		),
+		array(
+			'emoji' => '🎉',
+			'label' => __( 'Celebration', 'gutenberg' ),
+			'value' => 'celebration',
+		),
+		array(
+			'emoji' => '😄',
+			'label' => __( 'Smile', 'gutenberg' ),
+			'value' => 'smile',
+		),
+		array(
+			'emoji' => '👀',
+			'label' => __( 'Eyes', 'gutenberg' ),
+			'value' => 'eyes',
+		),
+		array(
+			'emoji' => '🚀',
+			'label' => __( 'Rocket', 'gutenberg' ),
+			'value' => 'rocket',
+		),
+	);
+
+	/**
+	 * Filters the list of allowed emojis for note reactions.
+	 *
+	 * @since 7.1.0
+	 *
+	 * @param array[] $emojis List of emoji definitions. Each item has
+	 *                        `emoji`, `label`, and `value` keys.
+	 */
+	return apply_filters( 'gutenberg_note_reaction_emojis', $default_emojis );
+}
