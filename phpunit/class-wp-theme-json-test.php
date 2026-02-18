@@ -5257,7 +5257,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 	 */
 	public function data_update_button_width_declarations() {
 		return array(
-			'direct percentage value'              => array(
+			'direct percentage value'                   => array(
 				array(
 					'styles' => array(
 						'blocks' => array(
@@ -5271,7 +5271,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => ':root :where(.wp-block-button){width: calc(25 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 25 / 100)));}',
 			),
-			'decimal percentage value'             => array(
+			'decimal percentage value'                  => array(
 				array(
 					'styles' => array(
 						'blocks' => array(
@@ -5285,7 +5285,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => ':root :where(.wp-block-button){width: calc(33.33 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 33.33 / 100)));}',
 			),
-			'non-percentage value is unchanged'    => array(
+			'non-percentage value is unchanged'         => array(
 				array(
 					'styles' => array(
 						'blocks' => array(
@@ -5299,14 +5299,43 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 				),
 				'expected_output' => ':root :where(.wp-block-button){width: 200px;}',
 			),
-			'preset dimension with percentage size' => array(
+			'preset dimension with percentage size (block-level settings)' => array(
+				array(
+					'settings' => array(
+						'blocks' => array(
+							'core/button' => array(
+								'dimensions' => array(
+									'dimensionSizes' => array(
+										array(
+											'slug' => '50',
+											'name' => '50%',
+											'size' => '50%',
+										),
+									),
+								),
+							),
+						),
+					),
+					'styles'   => array(
+						'blocks' => array(
+							'core/button' => array(
+								'dimensions' => array(
+									'width' => 'var(--wp--preset--dimension--50)',
+								),
+							),
+						),
+					),
+				),
+				'expected_output' => ':root :where(.wp-block-button){width: calc(50 * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - 50 / 100)));}',
+			),
+			'preset dimension with percentage size (top-level settings)' => array(
 				array(
 					'settings' => array(
 						'dimensions' => array(
 							'dimensionSizes' => array(
 								array(
-									'slug' => 'quarter',
-									'name' => 'Quarter',
+									'slug' => '25',
+									'name' => '25%',
 									'size' => '25%',
 								),
 							),
@@ -5316,7 +5345,7 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 						'blocks' => array(
 							'core/button' => array(
 								'dimensions' => array(
-									'width' => 'var(--wp--preset--dimension--quarter)',
+									'width' => 'var(--wp--preset--dimension--25)',
 								),
 							),
 						),
@@ -5327,12 +5356,16 @@ class WP_Theme_JSON_Gutenberg_Test extends WP_UnitTestCase {
 			'preset dimension with non-percentage size' => array(
 				array(
 					'settings' => array(
-						'dimensions' => array(
-							'dimensionSizes' => array(
-								array(
-									'slug' => 'wide',
-									'name' => 'Wide',
-									'size' => '400px',
+						'blocks' => array(
+							'core/button' => array(
+								'dimensions' => array(
+									'dimensionSizes' => array(
+										array(
+											'slug' => 'wide',
+											'name' => 'Wide',
+											'size' => '400px',
+										),
+									),
 								),
 							),
 						),

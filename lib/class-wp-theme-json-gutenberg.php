@@ -2855,13 +2855,17 @@ class WP_Theme_JSON_Gutenberg {
 				$percentage = (float) $value;
 			}
 
-			// Case 2: Preset CSS var e.g. "var(--wp--preset--dimension--quarter)".
+			// Case 2: Preset CSS var e.g. "var(--wp--preset--dimension--50)".
 			if ( null === $percentage && is_string( $value ) && str_starts_with( $value, 'var(--wp--preset--dimension--' ) ) {
 				// Extract the slug from the var name.
 				$slug = substr( $value, strlen( 'var(--wp--preset--dimension--' ), -1 );
 
-				// Look up the preset size across all origins.
-				$dimension_sizes = $settings['dimensions']['dimensionSizes'] ?? array();
+				/*
+				 * Look up the preset size across all origins.
+				 * Check block-level settings first (core/button), then top-level settings.
+				 */
+				$dimension_sizes = ( $settings['blocks']['core/button']['dimensions']['dimensionSizes'] ?? array() )
+					+ ( $settings['dimensions']['dimensionSizes'] ?? array() );
 				foreach ( $dimension_sizes as $origin_sizes ) {
 					if ( ! is_array( $origin_sizes ) ) {
 						continue;

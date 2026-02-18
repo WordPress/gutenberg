@@ -334,6 +334,102 @@ const updateParagraphTextIndentSelector = (
 };
 
 /**
+ * Updates button width declarations to use a calc() formula for percentage values.
+ *
+ * When a percentage width is set on the Button block via Global Styles, the
+ * resulting CSS needs to account for block gap spacing so that buttons tile
+ * correctly on a row (e.g. 4 buttons at 25% width all fit on one row).
+ *
+ * This mirrors the dynamic calc() formula applied at the block instance level
+ * in the button block's stylesheet (style.scss).
+ *
+ * @param featureDeclarations Feature declarations keyed by selector.
+ * @param settings            The theme.json settings.
+ * @return Updated feature declarations.
+ */
+const updateButtonWidthDeclarations = (
+	featureDeclarations: Record< string, string[] >,
+	settings: Record< string, any > | undefined
+): Record< string, string[] > => {
+	const buttonSelector = '.wp-block-button';
+	if ( ! ( buttonSelector in featureDeclarations ) ) {
+		return featureDeclarations;
+	}
+
+	const updated = { ...featureDeclarations };
+	updated[ buttonSelector ] = updated[ buttonSelector ].map(
+		( declaration ) => {
+			// Match "width: <value>" declarations.
+			const match = declaration.match( /^width:\s*(.+)$/ );
+			if ( ! match ) {
+				return declaration;
+			}
+
+			const value = match[ 1 ];
+			let percentage: number | null = null;
+
+			// Case 1: Direct percentage value e.g. "25%".
+			if ( value.endsWith( '%' ) ) {
+				percentage = parseFloat( value );
+			}
+
+			// Case 2: Preset CSS var e.g. "var(--wp--preset--dimension--50)".
+			const presetPrefix = 'var(--wp--preset--dimension--';
+			if (
+				percentage === null &&
+				value.startsWith( presetPrefix ) &&
+				value.endsWith( ')' )
+			) {
+				const slug = value.slice( presetPrefix.length, -1 );
+
+				/*
+				 * Look up the preset size across all origins.
+				 * Check block-level settings first (core/button), then top-level settings.
+				 * Spread block-level entries first so they take precedence.
+				 */
+				const dimensionSizes = {
+					...( settings?.dimensions?.dimensionSizes ?? {} ),
+					...( settings?.blocks?.[ 'core/button' ]?.dimensions
+						?.dimensionSizes ?? {} ),
+				};
+				for ( const origin of Object.values( dimensionSizes ) ) {
+					if ( ! Array.isArray( origin ) ) {
+						continue;
+					}
+					for ( const preset of origin ) {
+						if (
+							preset.slug === slug &&
+							typeof preset.size === 'string' &&
+							preset.size.endsWith( '%' )
+						) {
+							percentage = parseFloat( preset.size );
+							break;
+						}
+					}
+					if ( percentage !== null ) {
+						break;
+					}
+				}
+			}
+
+			if ( percentage === null || isNaN( percentage ) ) {
+				return declaration;
+			}
+
+			/*
+			 * Apply the same calc() formula as the block instance level (style.scss).
+			 * The numeric percentage value is used as a unitless number:
+			 * - Multiplied by 1% to get the percentage width.
+			 * - Divided by 100 to calculate the gap adjustment proportion.
+			 */
+			return `width: calc(${ percentage } * 1% - (var(--wp--style--block-gap, 0.5em) * (1 - ${ percentage } / 100)))`;
+		}
+	);
+
+	return updated;
+};
+
+/**
  * Generate style declarations for a block's custom feature and subfeature
  * selectors.
  *
@@ -1324,6 +1420,12 @@ export const transformToStyles = (
 						name
 					);
 
+					// Update button width declarations for percentage values to use calc() with block gap.
+					featureDeclarations = updateButtonWidthDeclarations(
+						featureDeclarations,
+						tree.settings
+					);
+
 					Object.entries( featureDeclarations ).forEach(
 						( [ cssSelector, declarations ] ) => {
 							if ( declarations.length ) {
@@ -1407,6 +1509,13 @@ export const transformToStyles = (
 											featureDeclarations,
 											tree.settings,
 											name
+										);
+
+									// Update button width declarations for percentage values to use calc() with block gap.
+									featureDeclarations =
+										updateButtonWidthDeclarations(
+											featureDeclarations,
+											tree.settings
 										);
 
 									Object.entries(
