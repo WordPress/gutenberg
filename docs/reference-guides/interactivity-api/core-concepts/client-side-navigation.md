@@ -583,14 +583,6 @@ add_action( 'wp', function() {
             array( 'clientNavigationDisabled' => true )
         );
     }
-
-    // Disable on admin-like pages.
-    if ( is_page( 'dashboard' ) ) {
-        wp_interactivity_config(
-            'core/router',
-            array( 'clientNavigationDisabled' => true )
-        );
-    }
 } );
 ```
 
