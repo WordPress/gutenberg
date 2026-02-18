@@ -5,9 +5,7 @@ import deprecated from '@wordpress/deprecated';
 import { SnackbarNotices } from '@wordpress/notices';
 
 /**
- * Renders the editor snackbars component.
- *
- * @return {React.ReactNode} The rendered component.
+ * @deprecated since 7.0, use `wp.notices.SnackbarNotices` instead.
  */
 export default function EditorSnackbars() {
 	deprecated( 'wp.editor.EditorSnackbars', {
