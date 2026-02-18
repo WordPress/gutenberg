@@ -42,11 +42,11 @@ function Avatar( {
 		: undefined;
 	const customProperties = {
 		...style,
-		...( src ? { '--components-avatar-url': `url(${ src })` } : {} ),
+		...( src ? { '--editor-avatar-url': `url(${ src })` } : {} ),
 		...( borderColor
 			? {
-					'--components-avatar-outline-color': borderColor,
-					'--components-avatar-name-color': colord(
+					'--editor-avatar-outline-color': borderColor,
+					'--editor-avatar-name-color': colord(
 						borderColor
 					).isReadable( '#000', {
 						level: 'AA',
@@ -60,7 +60,7 @@ function Avatar( {
 
 	const avatar = (
 		<div
-			className={ clsx( 'components-avatar', className, {
+			className={ clsx( 'editor-avatar', className, {
 				'has-avatar-border-color': !! borderColor,
 				'has-src': !! src,
 				'is-badge': showBadge,
@@ -72,18 +72,14 @@ function Avatar( {
 			aria-label={ name }
 			{ ...props }
 		>
-			<span className="components-avatar__image">
-				{ ! src && initials }
-			</span>
+			<span className="editor-avatar__image">{ ! src && initials }</span>
 			{ dimmed && !! statusIndicator && (
-				<span className="components-avatar__status-indicator">
+				<span className="editor-avatar__status-indicator">
 					<Icon icon={ statusIndicator } />
 				</span>
 			) }
 			{ showBadge && (
-				<span className="components-avatar__name">
-					{ label || name }
-				</span>
+				<span className="editor-avatar__name">{ label || name }</span>
 			) }
 		</div>
 	);

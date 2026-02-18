@@ -48,7 +48,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 /* ── Avatar component (compiled from collaborators-presence/avatar/styles.scss) ──
    Dimmed and status-indicator styles are intentionally omitted — not used in
    the overlay. Keep in sync when editing the SCSS source. ── */
-.components-avatar {
+.editor-avatar {
 	position: relative;
 	display: inline-flex;
 	align-items: center;
@@ -57,7 +57,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	flex-shrink: 0;
 	box-shadow: 0 0 0 var(--wp-admin-border-width-focus, 2px) #fff, ${ ELEVATION_X_SMALL };
 }
-.components-avatar__image {
+.editor-avatar__image {
 	box-sizing: border-box;
 	position: relative;
 	width: 32px;
@@ -70,21 +70,21 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	font-size: 0;
 	color: #fff;
 }
-.is-small > .components-avatar__image {
+.is-small > .editor-avatar__image {
 	width: 24px;
 	height: 24px;
 }
-.has-src > .components-avatar__image {
-	background-image: var(--components-avatar-url);
+.has-src > .editor-avatar__image {
+	background-image: var(--editor-avatar-url);
 	background-size: cover;
 	background-position: center;
 }
-.has-avatar-border-color > .components-avatar__image {
-	border: var(--wp-admin-border-width-focus, 2px) solid var(--components-avatar-outline-color);
+.has-avatar-border-color > .editor-avatar__image {
+	border: var(--wp-admin-border-width-focus, 2px) solid var(--editor-avatar-outline-color);
 	box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus, 2px) #fff;
 	background-clip: padding-box;
 }
-.components-avatar:not(.has-src) > .components-avatar__image {
+.editor-avatar:not(.has-src) > .editor-avatar__image {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -94,14 +94,14 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	box-shadow: none;
 	background-clip: border-box;
 }
-.components-avatar:not(.has-src).has-avatar-border-color > .components-avatar__image {
-	background-color: var(--components-avatar-outline-color);
+.editor-avatar:not(.has-src).has-avatar-border-color > .editor-avatar__image {
+	background-color: var(--editor-avatar-outline-color);
 }
-.components-avatar__name {
+.editor-avatar__name {
 	font-size: 13px;
 	font-weight: 499;
 	line-height: 20px;
-	color: var(--components-avatar-name-color, #fff);
+	color: var(--editor-avatar-name-color, #fff);
 	min-width: 0;
 	padding-bottom: 2px;
 	overflow: hidden;
@@ -109,7 +109,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	white-space: nowrap;
 	transition: opacity 0.15s cubic-bezier(0.15, 0, 0.15, 1);
 }
-.components-avatar.is-badge {
+.editor-avatar.is-badge {
 	display: inline-grid;
 	grid-template-columns: min-content 0fr;
 	background-color: var(--wp-components-color-accent, var(--wp-admin-theme-color, #3858e9));
@@ -120,23 +120,23 @@ const COLLABORATORS_OVERLAY_STYLES = `
 		column-gap 0.3s cubic-bezier(0.15, 0, 0.15, 1),
 		padding-inline-end 0.3s cubic-bezier(0.15, 0, 0.15, 1);
 }
-.components-avatar.is-badge:hover {
+.editor-avatar.is-badge:hover {
 	grid-template-columns: min-content 1fr;
 	column-gap: 4px;
 	padding-inline-end: 8px;
 	transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
 }
-.components-avatar.is-badge:hover .components-avatar__name {
+.editor-avatar.is-badge:hover .editor-avatar__name {
 	opacity: 1;
 	transition-timing-function: cubic-bezier(0.85, 0, 0.85, 1);
 }
-.components-avatar.is-badge.has-avatar-border-color {
-	background-color: var(--components-avatar-outline-color);
+.editor-avatar.is-badge.has-avatar-border-color {
+	background-color: var(--editor-avatar-outline-color);
 }
 /* ── end Avatar ── */
 
 /* Overlay-specific positioning applied to the Avatar cursor label. */
-.collaborators-overlay-user-label.components-avatar {
+.collaborators-overlay-user-label.editor-avatar {
 	position: absolute;
 	transform: translate(-11px, -100%);
 	margin-top: -4px;
@@ -145,7 +145,7 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	width: max-content;
 }
 /* Avatar label positioned above a highlighted block. */
-.collaborators-overlay-block-label.components-avatar {
+.collaborators-overlay-block-label.editor-avatar {
 	position: absolute;
 	transform: translateY(calc(-100% - 8px));
 	pointer-events: auto;
@@ -200,8 +200,8 @@ const COLLABORATORS_OVERLAY_STYLES = `
 	z-index: 1;
 }
 @media (prefers-reduced-motion: reduce) {
-	.components-avatar.is-badge,
-	.components-avatar__name,
+	.editor-avatar.is-badge,
+	.editor-avatar__name,
 	.collaborators-overlay-user-label,
 	.collaborators-overlay-user-cursor {
 		transition: none;

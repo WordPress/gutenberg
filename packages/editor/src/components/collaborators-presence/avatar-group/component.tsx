@@ -27,13 +27,13 @@ function AvatarGroup( {
 	return (
 		<div
 			role="group"
-			className={ clsx( 'components-avatar-group', className ) }
+			className={ clsx( 'editor-avatar-group', className ) }
 			{ ...props }
 		>
 			{ visible }
 			{ overflowCount > 0 && (
 				<span
-					className="components-avatar-group__overflow"
+					className="editor-avatar-group__overflow"
 					aria-label={ `${ overflowCount } more` }
 				>
 					{ `+${ overflowCount }` }
