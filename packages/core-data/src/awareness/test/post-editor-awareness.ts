@@ -50,9 +50,6 @@ const createMockUser = () => ( {
 	avatar_urls: mockAvatarUrls,
 } );
 
-/**
- * EditorStoreBlock-like objects for the mock getBlocks return value.
- */
 type MockBlock = {
 	clientId: string;
 	name?: string;

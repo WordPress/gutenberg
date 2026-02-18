@@ -9,7 +9,18 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import type { AbsoluteBlockIndexPath, EditorStoreBlock } from '../types';
+import type { AbsoluteBlockIndexPath } from '../types';
+
+/**
+ * A block as represented in the block-editor store (from `getBlocks()`).
+ *
+ * This is a minimal interface covering only the fields used by RTC awareness.
+ */
+interface EditorStoreBlock {
+	clientId: string;
+	name: string;
+	innerBlocks: EditorStoreBlock[];
+}
 
 /**
  * Given a Y.Map within a Ydoc, traverse up the Yjs block tree to compute the

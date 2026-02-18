@@ -26,17 +26,6 @@ export interface AnyFunction {
 export type AbsoluteBlockIndexPath = number[];
 
 /**
- * A block as represented in the block-editor store (from `getBlocks()`).
- *
- * This is a minimal interface covering only the fields used by RTC awareness.
- */
-export interface EditorStoreBlock {
-	clientId: string;
-	name: string;
-	innerBlocks: EditorStoreBlock[];
-}
-
-/**
  * Avoid a circular dependency with @wordpress/editor
  *
  * Additionaly, this type marks `attributeKey` and `offset` as possibly
