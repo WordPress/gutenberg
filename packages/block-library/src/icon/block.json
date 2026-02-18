@@ -12,14 +12,6 @@
 		"icon": {
 			"type": "string",
 			"role": "content"
-		},
-		"style": {
-			"type": "object",
-			"default": {
-				"dimensions": {
-					"width": "24px"
-				}
-			}
 		}
 	},
 	"supports": {

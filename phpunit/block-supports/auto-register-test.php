@@ -109,4 +109,36 @@ class Tests_Block_Supports_Auto_Register_Test extends WP_UnitTestCase {
 
 		$this->assertSame( $settings, $result );
 	}
+
+	/**
+	 * Tests that only allowed attributes are marked.
+	 */
+	public function test_excludes_unsupported_types() {
+		$settings = array(
+			'supports'   => array( 'autoRegister' => true ),
+			'attributes' => array(
+				// Supported types
+				'text'     => array( 'type' => 'string' ),
+				'price'    => array( 'type' => 'number' ),
+				'count'    => array( 'type' => 'integer' ),
+				'enabled'  => array( 'type' => 'boolean' ),
+				// Unsupported types
+				'metadata' => array( 'type' => 'object' ),
+				'items'    => array( 'type' => 'array' ),
+				'config'   => array( 'type' => 'null' ),
+				'unknown'  => array( 'type' => 'unknown' ),
+			),
+		);
+
+		$result = gutenberg_mark_auto_generate_control_attributes( $settings );
+
+		$this->assertTrue( $result['attributes']['text']['autoGenerateControl'] );
+		$this->assertTrue( $result['attributes']['price']['autoGenerateControl'] );
+		$this->assertTrue( $result['attributes']['count']['autoGenerateControl'] );
+		$this->assertTrue( $result['attributes']['enabled']['autoGenerateControl'] );
+		$this->assertArrayNotHasKey( 'autoGenerateControl', $result['attributes']['metadata'] );
+		$this->assertArrayNotHasKey( 'autoGenerateControl', $result['attributes']['items'] );
+		$this->assertArrayNotHasKey( 'autoGenerateControl', $result['attributes']['config'] );
+		$this->assertArrayNotHasKey( 'autoGenerateControl', $result['attributes']['unknown'] );
+	}
 }

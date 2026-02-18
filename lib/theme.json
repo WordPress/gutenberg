@@ -358,6 +358,11 @@
 					}
 				}
 			},
+			"core/icon": {
+				"dimensions": {
+					"width": "24px"
+				}
+			},
 			"core/site-logo": {
 				"variations": {
 					"rounded": {

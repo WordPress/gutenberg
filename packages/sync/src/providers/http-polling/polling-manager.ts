@@ -11,6 +11,7 @@ import * as syncProtocol from 'y-protocols/sync';
 /**
  * Internal dependencies
  */
+import type { ConnectionStatus } from '../../types';
 import {
 	type AwarenessState,
 	type LocalAwarenessState,
@@ -34,14 +35,17 @@ const POLLING_MANAGER_ORIGIN = 'polling-manager';
 type LogFunction = ( message: string, debug?: object ) => void;
 
 interface PollingManager {
-	registerRoom: (
-		room: string,
-		doc: Y.Doc,
-		awareness: Awareness,
-		onSync: () => void,
-		log: LogFunction
-	) => void;
+	registerRoom: ( options: RegisterRoomOptions ) => void;
 	unregisterRoom: ( room: string ) => void;
+}
+
+interface RegisterRoomOptions {
+	room: string;
+	doc: Y.Doc;
+	awareness: Awareness;
+	log: LogFunction;
+	onStatusChange: ( status: ConnectionStatus ) => void;
+	onSync: () => void;
 }
 
 interface RoomState {
@@ -49,6 +53,7 @@ interface RoomState {
 	endCursor: number;
 	localAwarenessState: LocalAwarenessState;
 	log: LogFunction;
+	onStatusChange: ( status: ConnectionStatus ) => void;
 	processAwarenessUpdate: ( state: AwarenessState ) => void;
 	processDocUpdate: ( update: SyncUpdate ) => SyncUpdate | void;
 	unregister: () => void;
@@ -242,6 +247,11 @@ function poll(): void {
 			return;
 		}
 
+		// Emit 'connecting' status.
+		roomStates.forEach( ( state ) => {
+			state.onStatusChange( { status: 'connecting' } );
+		} );
+
 		// Create a payload with all queued updates. We include rooms even if they
 		// have no updates to ensure we receive any incoming updates. Note that we
 		// withhold our own updates until we detect another collaborator using the
@@ -263,6 +273,11 @@ function poll(): void {
 
 			// Reset poll interval on success.
 			pollInterval = POLLING_INTERVAL_IN_MS;
+
+			// Emit 'connected' status.
+			roomStates.forEach( ( state ) => {
+				state.onStatusChange( { status: 'connected' } );
+			} );
 
 			rooms.forEach( ( room ) => {
 				if ( ! roomStates.has( room.room ) ) {
@@ -322,6 +337,10 @@ function poll(): void {
 					}
 				);
 			}
+
+			roomStates.forEach( ( state ) => {
+				state.onStatusChange( { status: 'disconnected' } );
+			} );
 		}
 
 		setTimeout( poll, pollInterval );
@@ -331,13 +350,14 @@ function poll(): void {
 	void start();
 }
 
-function registerRoom(
-	room: string,
-	doc: Y.Doc,
-	awareness: Awareness,
-	onSync: () => void,
-	log: LogFunction
-): void {
+function registerRoom( {
+	room,
+	doc,
+	awareness,
+	log,
+	onSync,
+	onStatusChange,
+}: RegisterRoomOptions ): void {
 	if ( roomStates.has( room ) ) {
 		return;
 	}
@@ -370,6 +390,7 @@ function registerRoom(
 		endCursor: 0,
 		localAwarenessState: awareness.getLocalState() ?? {},
 		log,
+		onStatusChange,
 		processAwarenessUpdate: ( state: AwarenessState ) =>
 			processAwarenessUpdate( state, awareness ),
 		processDocUpdate: ( update: SyncUpdate ) =>

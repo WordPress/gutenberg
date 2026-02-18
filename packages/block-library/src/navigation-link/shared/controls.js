@@ -254,11 +254,13 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 							__next40pxDefaultSize
 						>
 							{ sprintf(
-								/* translators: %s: entity type (e.g., "page", "post", "category") or "site" for external links */
+								/* translators: %s: entity type (e.g., "page", "post", "category") or "link" for external links */
 								__( 'View %s' ),
-								entityTypeName !== 'item'
+								attributes.kind &&
+									attributes.type &&
+									attributes.kind !== 'custom'
 									? entityTypeName
-									: __( 'site' )
+									: __( 'link' )
 							) }
 						</Button>
 					) }

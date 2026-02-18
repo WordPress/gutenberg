@@ -73,6 +73,11 @@ function gutenberg_mark_auto_generate_control_attributes( array $args ): array {
 		if ( isset( $attr_schema['role'] ) && 'local' === $attr_schema['role'] ) {
 			continue;
 		}
+		// Skip unsupported types (only 'string', 'number', 'integer', 'boolean' are supported).
+		$type = $attr_schema['type'] ?? null;
+		if ( ! in_array( $type, array( 'string', 'number', 'integer', 'boolean' ), true ) ) {
+			continue;
+		}
 		$args['attributes'][ $attr_key ]['autoGenerateControl'] = true;
 	}
 

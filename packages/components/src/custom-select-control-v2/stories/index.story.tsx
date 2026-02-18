@@ -55,11 +55,11 @@ const meta: Meta< typeof CustomSelectControlV2 > = {
 export default meta;
 
 const Template: StoryFn< typeof CustomSelectControlV2 > = ( props ) => {
-	const [ value, setValue ] = useState< string | string[] >();
+	const [ value, setValue ] = useState< string | readonly string[] >();
 	return (
 		<CustomSelectControlV2
 			{ ...props }
-			onChange={ ( nextValue: string | string[] ) => {
+			onChange={ ( nextValue ) => {
 				setValue( nextValue );
 				props.onChange?.( nextValue );
 			} }
@@ -114,7 +114,7 @@ MultipleSelection.args = {
 	),
 };
 
-const renderItem = ( gravatar: string | string[] ) => {
+const renderItem = ( gravatar: string | readonly string[] ) => {
 	const avatar = `https://gravatar.com/avatar?d=${ gravatar }`;
 	return (
 		<div style={ { display: 'flex', alignItems: 'center' } }>

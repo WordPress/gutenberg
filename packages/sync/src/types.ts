@@ -43,10 +43,67 @@ export interface ObjectMeta extends Record< string, unknown > {
 	[ WORDPRESS_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]?: string;
 }
 
-export interface ProviderCreatorResult {
-	destroy: () => void;
+/**
+ * Event map for provider events.
+ * Add new event types here as needed.
+ */
+export interface ProviderEventMap {
+	status: ConnectionStatus;
 }
 
+/**
+ * Generic event listener type for providers.
+ * Providers should call registered callbacks when events occur like connection status changes.
+ * Providers are responsible for cleaning up listeners in their destroy() method.
+ */
+export type ProviderOn = < K extends keyof ProviderEventMap >(
+	event: K,
+	callback: ( data: ProviderEventMap[ K ] ) => void
+) => void;
+
+export interface ProviderCreatorResult {
+	destroy: () => void;
+	on: ProviderOn;
+}
+
+/**
+ * Error codes for connection errors that can occur in sync providers.
+ */
+export type ConnectionErrorCode =
+	| 'authentication-error'
+	| 'connection-expired'
+	| 'connection-limit-exceeded'
+	| 'unknown-error';
+
+/**
+ * Sync connection error object.
+ */
+export interface ConnectionError extends Error {
+	/**
+	 * Error code identifier for programmatic handling and default message lookup.
+	 */
+	code: ConnectionErrorCode;
+}
+
+/**
+ * Current connection status of a sync provider, including status and optional error information.
+ */
+export interface ConnectionStatus {
+	status: 'connected' | 'connecting' | 'disconnected';
+
+	/**
+	 * Optional error information when status is 'disconnected'.
+	 */
+	error?: ConnectionError;
+}
+
+export type OnStatusChangeCallback = (
+	status: ConnectionStatus | null
+) => void;
+
+/**
+ * Options passed to a provider creator function when initializing a sync provider.
+ */
 export interface ProviderCreatorOptions {
 	objectType: ObjectType;
 	objectId: ObjectID | null;
@@ -59,6 +116,7 @@ export type ProviderCreator = (
 ) => Promise< ProviderCreatorResult >;
 
 export interface CollectionHandlers {
+	onStatusChange: OnStatusChangeCallback;
 	refetchRecords: () => Promise< void >;
 }
 
@@ -74,6 +132,7 @@ export interface RecordHandlers {
 		options?: { undoIgnore?: boolean }
 	) => void;
 	getEditedRecord: () => Promise< ObjectData >;
+	onStatusChange: OnStatusChangeCallback;
 	refetchRecord: () => Promise< void >;
 	restoreUndoMeta: ( ydoc: Y.Doc, meta: Map< string, any > ) => void;
 	saveRecord: () => Promise< void >;

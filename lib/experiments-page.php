@@ -138,18 +138,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-quick-edit-dataviews',
-		__( 'Data Views: add Quick Edit', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables access to a Quick Edit panel in the Site Editor Pages experience.', 'gutenberg' ),
-			'id'    => 'gutenberg-quick-edit-dataviews',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-dataviews-media-modal',
 		__( 'Data Views: new media modal', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -218,18 +206,6 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables editing media items (attachments) directly in the block editor with a dedicated media preview and metadata panel.', 'gutenberg' ),
 			'id'    => 'gutenberg-media-editor',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-svg-icon-registry',
-		__( 'SVG Icon Registration API', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables a REST API endpoint for accessing SVG icons as well as the associated Icon block.', 'gutenberg' ),
-			'id'    => 'gutenberg-svg-icon-registry',
 		)
 	);
 

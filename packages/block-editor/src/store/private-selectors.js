@@ -521,8 +521,13 @@ export function isSectionBlock( state, clientId ) {
 	// don't treat nested unsynced patterns as section blocks.
 	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
 
+	const disableContentOnlyForUnsyncedPatterns =
+		state.settings?.disableContentOnlyForUnsyncedPatterns;
+
 	if (
-		( attributes?.metadata?.patternName || isTemplatePart ) &&
+		( ( ! disableContentOnlyForUnsyncedPatterns &&
+			attributes?.metadata?.patternName ) ||
+			isTemplatePart ) &&
 		! isIsolatedEditor
 	) {
 		return true;
@@ -981,6 +986,8 @@ export function isListViewPanelOpened( state, clientId ) {
 /**
  * Returns the List View expand revision number.
  *
+ * This counter is used in the ListView component's key prop to force remounting.
+ *
  * @param {Object} state Global application state.
  *
  * @return {number} The expand revision number.
@@ -999,4 +1006,15 @@ export function getListViewExpandRevision( state ) {
  */
 export function getViewportModalClientIds( state ) {
 	return state.viewportModalClientIds;
+}
+
+/**
+ * Returns the requested inspector tab state, if any.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object|null} The requested tab state with tabName and options, or null if no request is pending.
+ */
+export function getRequestedInspectorTab( state ) {
+	return state.requestedInspectorTab;
 }
