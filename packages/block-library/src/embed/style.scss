@@ -29,7 +29,7 @@
 }
 
 // Fix for Stack blocks (vertical orientation) - embeds need explicit width to maintain aspect ratio.
-.wp-block-group.is-layout-flex.is-vertical .wp-block-embed {
+.wp-block-group.is-layout-flex.is-vertical > .wp-block-embed {
 	width: 100%;
 }
 
