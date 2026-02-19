@@ -35,7 +35,20 @@ test.describe( 'Preload', () => {
 					urlObject.searchParams.delete( '_locale' );
 					requests.push( restRoute + urlObject.search );
 				} else {
-					requests.push( url );
+					// With pretty permalinks, REST API calls use
+					// the /wp-json/ prefix instead of ?rest_route=.
+					const wpJsonPrefix = '/wp-json';
+					const wpJsonIndex =
+						urlObject.pathname.indexOf( wpJsonPrefix );
+					if ( wpJsonIndex !== -1 ) {
+						const route = urlObject.pathname.substring(
+							wpJsonIndex + wpJsonPrefix.length
+						);
+						urlObject.searchParams.delete( '_locale' );
+						requests.push( route + urlObject.search );
+					} else {
+						requests.push( url );
+					}
 				}
 			}
 		}
