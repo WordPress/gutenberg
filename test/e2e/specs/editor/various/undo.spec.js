@@ -540,14 +540,14 @@ class UndoUtils {
 				return {};
 			}
 
-			const blockEditor = window.wp.data.select( 'core/block-editor' );
-			const selectionStart = blockEditor.getSelectionStart();
-			const selectionEnd = blockEditor.getSelectionEnd();
-
 			return {
 				blockIndex,
-				startOffset: selectionStart.offset,
-				endOffset: selectionEnd.offset,
+				startOffset: window.wp.data
+					.select( 'core/block-editor' )
+					.getSelectionStart().offset,
+				endOffset: window.wp.data
+					.select( 'core/block-editor' )
+					.getSelectionEnd().offset,
 			};
 		} );
 	}
