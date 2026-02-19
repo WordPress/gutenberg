@@ -8,10 +8,14 @@
 /**
  * Render callback for core/tabs-menu.
  *
+ * Re-renders each tabs-menu-item inner block with per-item context (index, id,
+ * label) injected from the tabs-list, so the tabs-menu-item render callback
+ * can add the correct IAPI directives for each button.
+ *
  * @since 7.0.0
  *
  * @param array     $attributes Block attributes.
- * @param string    $content    Block content (contains the tabs-menu-item template).
+ * @param string    $content    Block content (rendered inner blocks from save.js).
  * @param \WP_Block $block      WP_Block instance.
  *
  * @return string Updated HTML.
@@ -20,44 +24,41 @@ function block_core_tabs_menu_render_callback( array $attributes, string $conten
 	$tabs_list = $block->context['core/tabs-list'] ?? array();
 
 	if ( empty( $tabs_list ) ) {
-		return '';
+		return $content;
 	}
 
-	// Get the first inner block as template (tabs-menu-item)
-	$inner_blocks = $block->parsed_block['innerBlocks'] ?? array();
-	if ( empty( $inner_blocks ) ) {
-		return '';
-	}
-	$template_block = $inner_blocks[0];
+	// Re-render each tabs-menu-item with per-item context (index, id, label).
+	$tab_index    = 0;
+	$buttons_html = '';
 
-	// Build rendered tab items
-	$tabs_markup = '';
-	foreach ( $tabs_list as $index => $tab ) {
-		// Create context for this specific tab
-		$tab_context = array_merge(
+	foreach ( $block->parsed_block['innerBlocks'] ?? array() as $parsed_menu_item ) {
+		if ( 'core/tabs-menu-item' !== ( $parsed_menu_item['blockName'] ?? '' ) ) {
+			continue;
+		}
+
+		$tab = $tabs_list[ $tab_index ] ?? array();
+
+		$item_context = array_merge(
 			$block->context,
 			array(
-				'core/tabs-menu-item-index' => $index,
+				'core/tabs-menu-item-index' => $tab_index,
 				'core/tabs-menu-item-id'    => $tab['id'] ?? '',
 				'core/tabs-menu-item-label' => $tab['label'] ?? '',
 			)
 		);
 
-		// Create new WP_Block instance with template and context
-		$tab_block = new WP_Block( $template_block, $tab_context );
+		$menu_item_block = new WP_Block( $parsed_menu_item, $item_context );
+		$buttons_html   .= $menu_item_block->render();
 
-		// Render the block
-		$tabs_markup .= $tab_block->render();
+		++$tab_index;
 	}
 
-	// Find the template block and replace it in $content with $tabs_markup
-	$content = preg_replace(
-		'/<button\b[^>]*\bwp-block-tabs-menu-item__template\b[^>]*>.*?<\/button>/si',
-		$tabs_markup,
+	// Replace the saved inner block HTML with the re-rendered buttons.
+	return preg_replace(
+		'/(<div\b[^>]*\bwp-block-tabs-menu\b[^>]*>).*?(<\/div>)/s',
+		'$1' . $buttons_html . '$2',
 		$content
 	);
-
-	return $content;
 }
 
 /**

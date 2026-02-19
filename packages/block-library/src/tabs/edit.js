@@ -23,6 +23,7 @@ const TABS_TEMPLATE = [
 				remove: true,
 			},
 		},
+		[ [ 'core/tabs-menu-item', {} ] ],
 	],
 	[
 		'core/tab-panel',

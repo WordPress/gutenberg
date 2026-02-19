@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { tabsMenuItem as icon } from '@wordpress/icons';
-
-/**
  * Internal dependencies
  */
 import initBlock from '../utils/init-block';
@@ -16,7 +11,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	icon,
 	edit,
 	save,
 };

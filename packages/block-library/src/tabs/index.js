@@ -22,7 +22,11 @@ export const settings = {
 		innerBlocks: [
 			{
 				name: 'core/tabs-menu',
-				innerBlocks: [ { name: 'core/tabs-menu-item' } ],
+				innerBlocks: [
+					{ name: 'core/tabs-menu-item' },
+					{ name: 'core/tabs-menu-item' },
+					{ name: 'core/tabs-menu-item' },
+				],
 			},
 			{
 				name: 'core/tab-panel',

@@ -9,10 +9,7 @@ import clsx from 'clsx';
 import { __, isRTL } from '@wordpress/i18n';
 import {
 	BlockControls,
-	InspectorControls,
 	store as blockEditorStore,
-	__experimentalColorGradientSettingsDropdown as ColorGradientSettingsDropdown,
-	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarItem, Button } from '@wordpress/components';
 import {
@@ -29,12 +26,26 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import AddTabToolbarControl from '../tab/add-tab-toolbar-control';
 import RemoveTabToolbarControl from '../tab/remove-tab-toolbar-control';
 
+/**
+ * Toolbar controls for moving a tab (and its menu item) left/right/up/down.
+ * Both the core/tab block and the core/tabs-menu-item block are moved together
+ * to keep them in sync.
+ *
+ * @param {Object} props
+ * @param {string} props.tabClientId      Client ID of the core/tab block.
+ * @param {number} props.tabIndex         Zero-based position of this tab.
+ * @param {number} props.tabsCount        Total number of tabs.
+ * @param {string} props.tabsMenuClientId Client ID of the core/tabs-menu block.
+ * @param {string} props.tabsClientId     Client ID of the core/tabs block.
+ * @param {string} props.menuItemClientId Client ID of this core/tabs-menu-item.
+ */
 function TabBlockMover( {
 	tabClientId,
 	tabIndex,
 	tabsCount,
 	tabsMenuClientId,
 	tabsClientId,
+	menuItemClientId,
 } ) {
 	const {
 		moveBlocksUp,
@@ -47,8 +58,6 @@ function TabBlockMover( {
 		( select ) => {
 			const { getBlockRootClientId, getBlockAttributes } =
 				select( blockEditorStore );
-			// Get orientation directly from the tabs-menu block's layout attribute.
-			// This is more reliable than getBlockListSettings which is set asynchronously.
 			const tabsMenuAttributes = tabsMenuClientId
 				? getBlockAttributes( tabsMenuClientId )
 				: null;
@@ -65,7 +74,6 @@ function TabBlockMover( {
 	const isLast = tabIndex === tabsCount - 1;
 	const isHorizontal = orientation === 'horizontal';
 
-	// Icons and labels based on orientation (respects RTL for horizontal)
 	let upIcon, downIcon, upLabel, downLabel;
 	if ( isHorizontal ) {
 		if ( isRTL() ) {
@@ -86,10 +94,10 @@ function TabBlockMover( {
 		downLabel = __( 'Move tab down' );
 	}
 
-	// Handle moving tab and updating active index to follow the moved tab
 	const handleMoveUp = () => {
+		// Move both the tab content block and the menu item button together.
 		moveBlocksUp( [ tabClientId ], tabPanelClientId );
-		// Update editorActiveTabIndex to follow the moved tab
+		moveBlocksUp( [ menuItemClientId ], tabsMenuClientId );
 		if ( tabsClientId ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( tabsClientId, {
@@ -100,7 +108,7 @@ function TabBlockMover( {
 
 	const handleMoveDown = () => {
 		moveBlocksDown( [ tabClientId ], tabPanelClientId );
-		// Update editorActiveTabIndex to follow the moved tab
+		moveBlocksDown( [ menuItemClientId ], tabsMenuClientId );
 		if ( tabsClientId ) {
 			__unstableMarkNextChangeAsNotPersistent();
 			updateBlockAttributes( tabsClientId, {
@@ -109,7 +117,6 @@ function TabBlockMover( {
 		}
 	};
 
-	// Don't render if only one tab
 	if ( tabsCount <= 1 ) {
 		return null;
 	}
@@ -163,32 +170,13 @@ function TabBlockMover( {
 }
 
 export default function Controls( {
-	attributes,
-	setAttributes,
-	clientId,
-	tabsClientId,
-	tabClientId,
 	tabIndex,
 	tabsCount,
+	tabClientId,
+	tabsClientId,
 	tabsMenuClientId,
-	activeBackgroundColor,
-	setActiveBackgroundColor,
-	activeTextColor,
-	setActiveTextColor,
-	hoverBackgroundColor,
-	setHoverBackgroundColor,
-	hoverTextColor,
-	setHoverTextColor,
+	menuItemClientId,
 } ) {
-	const {
-		customActiveBackgroundColor,
-		customActiveTextColor,
-		customHoverBackgroundColor,
-		customHoverTextColor,
-	} = attributes;
-
-	const colorSettings = useMultipleOriginColorsAndGradients();
-
 	return (
 		<>
 			<TabBlockMover
@@ -197,94 +185,10 @@ export default function Controls( {
 				tabsCount={ tabsCount }
 				tabsMenuClientId={ tabsMenuClientId }
 				tabsClientId={ tabsClientId }
+				menuItemClientId={ menuItemClientId }
 			/>
 			<AddTabToolbarControl tabsClientId={ tabsClientId } />
 			<RemoveTabToolbarControl tabsClientId={ tabsClientId } />
-			<InspectorControls group="color">
-				<ColorGradientSettingsDropdown
-					settings={ [
-						{
-							label: __( 'Active background' ),
-							colorValue:
-								activeBackgroundColor?.color ??
-								customActiveBackgroundColor,
-							onColorChange: ( value ) => {
-								setActiveBackgroundColor( value );
-								setAttributes( {
-									customActiveBackgroundColor: value,
-								} );
-							},
-							resetAllFilter: () => {
-								setActiveBackgroundColor( undefined );
-								setAttributes( {
-									customActiveBackgroundColor: undefined,
-								} );
-							},
-							clearable: true,
-						},
-						{
-							label: __( 'Active text' ),
-							colorValue:
-								activeTextColor?.color ?? customActiveTextColor,
-							onColorChange: ( value ) => {
-								setActiveTextColor( value );
-								setAttributes( {
-									customActiveTextColor: value,
-								} );
-							},
-							resetAllFilter: () => {
-								setActiveTextColor( undefined );
-								setAttributes( {
-									customActiveTextColor: undefined,
-								} );
-							},
-							clearable: true,
-						},
-						{
-							label: __( 'Hover background' ),
-							colorValue:
-								hoverBackgroundColor?.color ??
-								customHoverBackgroundColor,
-							onColorChange: ( value ) => {
-								setHoverBackgroundColor( value );
-								setAttributes( {
-									customHoverBackgroundColor: value,
-								} );
-							},
-							resetAllFilter: () => {
-								setHoverBackgroundColor( undefined );
-								setAttributes( {
-									customHoverBackgroundColor: undefined,
-								} );
-							},
-							clearable: true,
-						},
-						{
-							label: __( 'Hover text' ),
-							colorValue:
-								hoverTextColor?.color ?? customHoverTextColor,
-							onColorChange: ( value ) => {
-								setHoverTextColor( value );
-								setAttributes( {
-									customHoverTextColor: value,
-								} );
-							},
-							resetAllFilter: () => {
-								setHoverTextColor( undefined );
-								setAttributes( {
-									customHoverTextColor: undefined,
-								} );
-							},
-							clearable: true,
-						},
-					] }
-					panelId={ clientId }
-					disableCustomColors={ false }
-					__experimentalIsRenderedInSidebar
-					__next40pxDefaultSize
-					{ ...colorSettings }
-				/>
-			</InspectorControls>
 		</>
 	);
 }
