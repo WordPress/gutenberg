@@ -7,8 +7,8 @@ import {
 	BlockContextProvider,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { useMemo, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useMemo, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -63,29 +63,77 @@ function Edit( {
 		}
 	}, [] ); // eslint-disable-line react-hooks/exhaustive-deps
 
+	const { removeBlock } = useDispatch( blockEditorStore );
+
 	/**
 	 * Construct a list of core/tab blocks, used to create tabs-list context.
+	 * Also select the menu item clientIds for deletion sync.
 	 */
-	const tabs = useSelect(
+	const { tabs, menuItemClientIds } = useSelect(
 		( select ) => {
-			const { getBlocks } = select( blockEditorStore );
+			const { getBlocks, getBlockOrder } = select( blockEditorStore );
 			const innerBlocks = getBlocks( clientId );
 
-			// Find tab-panel block and extract tab data
+			// Find tab-panel block and extract tab data.
 			const tabPanel = innerBlocks.find(
 				( block ) => block.name === 'core/tab-panel'
 			);
 
-			if ( ! tabPanel ) {
-				return [];
-			}
-
-			return tabPanel.innerBlocks.filter(
-				( block ) => block.name === 'core/tab'
+			// Find tabs-menu block to get its children's clientIds.
+			const tabsMenu = innerBlocks.find(
+				( block ) => block.name === 'core/tabs-menu'
 			);
+
+			return {
+				tabs: tabPanel
+					? tabPanel.innerBlocks.filter(
+							( block ) => block.name === 'core/tab'
+					  )
+					: [],
+				menuItemClientIds: tabsMenu
+					? getBlockOrder( tabsMenu.clientId )
+					: [],
+			};
 		},
 		[ clientId ]
 	);
+
+	/**
+	 * Sync tabs-menu-item blocks when a core/tab is deleted directly.
+	 */
+	const prevTabClientIdsRef = useRef( null );
+	useEffect( () => {
+		const currentClientIds = tabs.map( ( tab ) => tab.clientId );
+		const prevClientIds = prevTabClientIdsRef.current;
+
+		prevTabClientIdsRef.current = currentClientIds;
+
+		// Skip on initial render.
+		if ( prevClientIds === null ) {
+			return;
+		}
+
+		// Only act on tab removals.
+		if ( currentClientIds.length >= prevClientIds.length ) {
+			return;
+		}
+
+		// If menu items are already in sync, the toolbar already handled removal.
+		if ( menuItemClientIds.length <= currentClientIds.length ) {
+			return;
+		}
+
+		// Find which tab index was removed.
+		const removedIndex = prevClientIds.findIndex(
+			( id ) => ! currentClientIds.includes( id )
+		);
+
+		if ( removedIndex === -1 || ! menuItemClientIds[ removedIndex ] ) {
+			return;
+		}
+
+		removeBlock( menuItemClientIds[ removedIndex ], false );
+	}, [ tabs, menuItemClientIds, removeBlock ] );
 
 	/**
 	 * Memoize context value to prevent unnecessary re-renders.
