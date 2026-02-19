@@ -9,60 +9,37 @@ import {
 	__experimentalView as View,
 	__experimentalText as Text,
 	Navigator,
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
 } from '@wordpress/components';
-import { isRTL, __, sprintf } from '@wordpress/i18n';
-import {
-	chevronRight,
-	chevronLeft,
-	chevronDown,
-	check,
-} from '@wordpress/icons';
+import { isRTL, __ } from '@wordpress/i18n';
+import { chevronRight, chevronLeft } from '@wordpress/icons';
+// @ts-expect-error: Not typed yet.
+import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import type { PseudoSelectorDefinition } from './utils';
+import type { StateDefinition } from './utils';
+import { unlock } from './lock-unlock';
+
+const { StateControl } = unlock( blockEditorPrivateApis );
 
 interface ScreenHeaderProps {
 	title: string;
 	description?: string | React.ReactElement;
 	onBack?: () => void;
-	pseudoSelectors?: PseudoSelectorDefinition[];
-	selectedPseudoSelector?: string;
-	onChangePseudoSelector?: ( value: string ) => void;
+	states?: StateDefinition[];
+	selectedState?: string;
+	onChangeState?: ( value: string ) => void;
 }
 
 export function ScreenHeader( {
 	title,
 	description,
 	onBack,
-	pseudoSelectors,
-	selectedPseudoSelector = 'default',
-	onChangePseudoSelector,
+	states,
+	selectedState = 'default',
+	onChangeState,
 }: ScreenHeaderProps ) {
-	const hasPseudoSelectors =
-		pseudoSelectors && pseudoSelectors.length > 0 && onChangePseudoSelector;
-
-	const stateOptions = hasPseudoSelectors
-		? [
-				{ label: __( 'Default' ), value: 'default' },
-				...pseudoSelectors.map( ( pseudo ) => ( {
-					label: pseudo.label,
-					value: pseudo.value,
-				} ) ),
-		  ]
-		: [];
-
-	const getCurrentStateLabel = () => {
-		const currentOption = stateOptions.find(
-			( option ) => option.value === selectedPseudoSelector
-		);
-		return currentOption?.label || __( 'Default' );
-	};
-
 	return (
 		<VStack spacing={ 0 }>
 			<View>
@@ -87,51 +64,11 @@ export function ScreenHeader( {
 									>
 										{ title }
 									</Heading>
-									{ hasPseudoSelectors && (
-										<DropdownMenu
-											icon={ chevronDown }
-											label={ sprintf(
-												/* translators: %s: Current state (e.g. "Hover", "Focus") */
-												__( 'State: %s' ),
-												getCurrentStateLabel()
-											) }
-											text={ getCurrentStateLabel() }
-											toggleProps={ {
-												size: 'compact',
-												iconPosition: 'right',
-											} }
-										>
-											{ ( { onClose } ) => (
-												<MenuGroup
-													label={ __( 'State' ) }
-												>
-													{ stateOptions.map(
-														( option ) => (
-															<MenuItem
-																key={
-																	option.value
-																}
-																onClick={ () => {
-																	onChangePseudoSelector(
-																		option.value
-																	);
-																	onClose();
-																} }
-																icon={
-																	selectedPseudoSelector ===
-																	option.value
-																		? check
-																		: null
-																}
-															>
-																{ option.label }
-															</MenuItem>
-														)
-													) }
-												</MenuGroup>
-											) }
-										</DropdownMenu>
-									) }
+									<StateControl
+										states={ states }
+										value={ selectedState }
+										onChange={ onChangeState }
+									/>
 								</HStack>
 							</Spacer>
 						</HStack>

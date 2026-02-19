@@ -6,21 +6,18 @@ import type { GlobalStylesConfig } from '@wordpress/global-styles-engine';
 import { __ } from '@wordpress/i18n';
 
 /**
- * Pseudo selector definition with value and label.
+ * State definition with value and label.
  */
-export interface PseudoSelectorDefinition {
+export interface StateDefinition {
 	value: string;
 	label: string;
 }
 
 /**
- * Valid pseudo selectors for elements with their labels.
+ * Valid states for elements with their labels.
  * This mirrors the PHP constant in lib/class-wp-theme-json-gutenberg.php
  */
-export const VALID_ELEMENT_PSEUDO_SELECTORS: Record<
-	string,
-	PseudoSelectorDefinition[]
-> = {
+export const VALID_ELEMENT_STATES: Record< string, StateDefinition[] > = {
 	link: [
 		{ value: ':link', label: __( 'Link' ) },
 		{ value: ':any-link', label: __( 'Any Link' ) },
@@ -42,13 +39,10 @@ export const VALID_ELEMENT_PSEUDO_SELECTORS: Record<
 };
 
 /**
- * Valid pseudo selectors for blocks with their labels.
+ * Valid states for blocks with their labels.
  * This mirrors the PHP constant in lib/class-wp-theme-json-gutenberg.php
  */
-export const VALID_BLOCK_PSEUDO_SELECTORS: Record<
-	string,
-	PseudoSelectorDefinition[]
-> = {
+export const VALID_BLOCK_STATES: Record< string, StateDefinition[] > = {
 	'core/button': [
 		{ value: ':hover', label: __( 'Hover' ) },
 		{ value: ':focus', label: __( 'Focus' ) },
@@ -58,22 +52,20 @@ export const VALID_BLOCK_PSEUDO_SELECTORS: Record<
 };
 
 /**
- * Get the valid pseudo selectors for a given block or element.
+ * Get the valid states for a given block or element.
  *
  * @param name The block name (e.g., 'core/button') or element name (e.g., 'button')
- * @return Array of valid pseudo selector definitions, or empty array if none
+ * @return Array of valid state definitions, or empty array if none
  */
-export function getValidPseudoSelectors(
-	name: string
-): PseudoSelectorDefinition[] {
+export function getValidStates( name: string ): StateDefinition[] {
 	// Check if it's a block
-	if ( VALID_BLOCK_PSEUDO_SELECTORS[ name ] ) {
-		return VALID_BLOCK_PSEUDO_SELECTORS[ name ];
+	if ( VALID_BLOCK_STATES[ name ] ) {
+		return VALID_BLOCK_STATES[ name ];
 	}
 
 	// Check if it's an element
-	if ( VALID_ELEMENT_PSEUDO_SELECTORS[ name ] ) {
-		return VALID_ELEMENT_PSEUDO_SELECTORS[ name ];
+	if ( VALID_ELEMENT_STATES[ name ] ) {
+		return VALID_ELEMENT_STATES[ name ];
 	}
 
 	return [];

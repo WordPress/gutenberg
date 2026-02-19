@@ -33,7 +33,7 @@ import {
 import { useStyle, useSetting } from './hooks';
 import { GlobalStylesContext } from './context';
 import { unlock } from './lock-unlock';
-import { getValidPseudoSelectors } from './utils';
+import { getValidStates } from './utils';
 
 // Initial control values.
 const BACKGROUND_BLOCK_DEFAULT_VALUES = {
@@ -110,13 +110,9 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 	}
 	const prefix = prefixParts.join( '.' );
 
-	// Pseudo selector state
-	const [ selectedPseudoSelector, setSelectedPseudoSelector ] =
-		useState< string >( 'default' );
-	const validPseudoSelectors = useMemo(
-		() => getValidPseudoSelectors( name ),
-		[ name ]
-	);
+	// State selector state
+	const [ selectedState, setSelectedState ] = useState< string >( 'default' );
+	const validStates = useMemo( () => getValidStates( name ), [ name ] );
 
 	const [ rawStyle ] = useStyle( prefix, name, 'user', false );
 	const [ rawInheritedStyle, rawSetStyle ] = useStyle(
@@ -126,30 +122,30 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 		false
 	);
 
-	// Extract style for the selected pseudo selector
+	// Extract style for the selected state
 	const style = useMemo( () => {
-		if ( selectedPseudoSelector === 'default' ) {
+		if ( selectedState === 'default' ) {
 			return rawStyle || {};
 		}
-		return rawStyle?.[ selectedPseudoSelector ] || {};
-	}, [ rawStyle, selectedPseudoSelector ] );
+		return rawStyle?.[ selectedState ] || {};
+	}, [ rawStyle, selectedState ] );
 
 	const inheritedStyle = useMemo( () => {
-		if ( selectedPseudoSelector === 'default' ) {
+		if ( selectedState === 'default' ) {
 			return rawInheritedStyle || {};
 		}
-		return rawInheritedStyle?.[ selectedPseudoSelector ] || {};
-	}, [ rawInheritedStyle, selectedPseudoSelector ] );
+		return rawInheritedStyle?.[ selectedState ] || {};
+	}, [ rawInheritedStyle, selectedState ] );
 
-	// Wrapper for setStyle that handles pseudo selectors
+	// Wrapper for setStyle that handles states
 	const setStyle = ( newStyle: any ) => {
-		if ( selectedPseudoSelector === 'default' ) {
+		if ( selectedState === 'default' ) {
 			rawSetStyle( newStyle );
 		} else {
-			// Merge the new style into the pseudo selector
+			// Merge the new style into the state
 			const updatedStyle = {
 				...rawStyle,
-				[ selectedPseudoSelector ]: newStyle,
+				[ selectedState ]: newStyle,
 			};
 			rawSetStyle( updatedStyle );
 		}
@@ -351,17 +347,17 @@ function ScreenBlock( { name, variation }: ScreenBlockProps ) {
 				title={
 					variation ? currentBlockStyle?.label : blockType?.title
 				}
-				pseudoSelectors={ validPseudoSelectors }
-				selectedPseudoSelector={ selectedPseudoSelector }
-				onChangePseudoSelector={ setSelectedPseudoSelector }
+				states={ validStates }
+				selectedState={ selectedState }
+				onChangeState={ setSelectedState }
 			/>
 			<BlockPreviewPanel
 				name={ name }
 				variation={ variation }
-				selectedState={ selectedPseudoSelector }
+				selectedState={ selectedState }
 				stateStyles={
-					selectedPseudoSelector !== 'default'
-						? rawStyle?.[ selectedPseudoSelector ]
+					selectedState !== 'default'
+						? rawStyle?.[ selectedState ]
 						: undefined
 				}
 			/>
