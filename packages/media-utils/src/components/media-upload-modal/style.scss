@@ -25,4 +25,30 @@
 	.media-upload-modal__snackbar {
 		@include snackbar-container();
 	}
+
+	// Transient upload item thumbnail styles
+	.media-upload-modal__uploading-thumbnail {
+		background: rgba(0, 0, 0, 0.04);
+		animation: media-upload-modal__pulse 1.5s ease-in-out infinite;
+		pointer-events: none;
+
+		.components-spinner {
+			margin: 0;
+		}
+
+		&.is-complete {
+			animation: none;
+		}
+	}
+
+	@keyframes media-upload-modal__pulse {
+		0%,
+		100% {
+			opacity: 1;
+		}
+
+		50% {
+			opacity: 0.6;
+		}
+	}
 }

@@ -1,17 +1,36 @@
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useMemo } from '@wordpress/element';
+import {
+	useState,
+	useCallback,
+	useMemo,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import {
 	privateApis as coreDataPrivateApis,
 	store as coreStore,
 } from '@wordpress/core-data';
 import { resolveSelect, useDispatch } from '@wordpress/data';
-import { Modal, DropZone, FormFileUpload, Button } from '@wordpress/components';
+import {
+	Modal,
+	DropZone,
+	FormFileUpload,
+	Button,
+	Spinner,
+	__experimentalVStack as VStack,
+	__experimentalTruncate as Truncate,
+} from '@wordpress/components';
 import { upload as uploadIcon } from '@wordpress/icons';
 import { DataViewsPicker } from '@wordpress/dataviews';
-import type { View, Field, ActionButton } from '@wordpress/dataviews';
+import type {
+	View,
+	Field,
+	ActionButton,
+	DataViewRenderFieldProps,
+} from '@wordpress/dataviews';
 import {
 	altTextField,
 	attachedToField,
@@ -48,6 +67,61 @@ const NOTICES_CONTEXT = 'media-modal';
 
 // Notice ID - reused for all upload-related notices to prevent flooding
 const NOTICE_ID_UPLOAD_PROGRESS = 'media-modal-upload-progress';
+
+// Prefix for transient upload item IDs
+const TRANSIENT_ID_PREFIX = 'uploading-';
+
+/**
+ * Tracks a file being uploaded with its client-side state.
+ */
+interface TransientUploadItem {
+	/** Unique client-side ID (e.g. 'uploading-0') */
+	clientId: string;
+	/** The File object being uploaded */
+	file: File;
+	/** Current upload status */
+	status: 'uploading' | 'complete';
+}
+
+/**
+ * Renders a thumbnail placeholder for a file that is currently uploading
+ * or has just finished uploading.
+ *
+ * @param props            Component props.
+ * @param props.filename   The name of the file being uploaded.
+ * @param props.isComplete Whether the upload has completed.
+ */
+function UploadingThumbnailView( {
+	filename,
+	isComplete,
+}: {
+	filename: string;
+	isComplete?: boolean;
+} ) {
+	return (
+		<div
+			className={ `dataviews-media-field__media-thumbnail media-upload-modal__uploading-thumbnail${
+				isComplete ? ' is-complete' : ''
+			}` }
+		>
+			<VStack
+				justify="center"
+				alignment="center"
+				className="dataviews-media-field__media-thumbnail__stack"
+				spacing={ 0 }
+			>
+				<Spinner />
+				{ !! filename && (
+					<div className="dataviews-media-field__media-thumbnail__filename">
+						<Truncate className="dataviews-media-field__media-thumbnail__filename__truncate">
+							{ filename }
+						</Truncate>
+					</div>
+				) }
+			</VStack>
+		</div>
+	);
+}
 
 interface MediaUploadModalProps {
 	/**
@@ -173,6 +247,19 @@ export function MediaUploadModal( {
 	// @ts-expect-error - invalidateResolution is not in the typed actions but is available at runtime
 	const { invalidateResolution } = useDispatch( coreStore );
 
+	// Transient upload items state
+	const [ transientItems, setTransientItems ] = useState<
+		TransientUploadItem[]
+	>( [] );
+	const nextClientIdRef = useRef( 0 );
+
+	// Tracks the refetch lifecycle after uploads complete:
+	// false → 'pending' (uploads done, waiting for refetch to start)
+	// → 'loading' (refetch in progress) → false (done, transient items removed)
+	const [ awaitingRefresh, setAwaitingRefresh ] = useState<
+		false | 'pending' | 'loading'
+	>( false );
+
 	// DataViews configuration - allow view updates
 	const [ view, setView ] = useState< View >( () => ( {
 		type: LAYOUT_PICKER_GRID,
@@ -247,13 +334,104 @@ export function MediaUploadModal( {
 		totalPages,
 	} = useEntityRecordsWithPermissions( 'postType', 'attachment', queryArgs );
 
-	const fields: Field< RestAttachment >[] = useMemo(
-		() => [
-			// Media field definitions from @wordpress/media-fields
-			// Cast is safe because RestAttachment has the same properties as Attachment
+	// Compose transient upload items into the data array for DataViewsPicker.
+	// Transient items are prepended so they appear at the top of the grid.
+	const dataWithTransientItems = useMemo( () => {
+		if ( transientItems.length === 0 ) {
+			return mediaRecords || [];
+		}
+
+		const transientRecords = transientItems.map(
+			( item ) =>
+				( {
+					id: item.clientId,
+					slug: '',
+					status: 'inherit',
+					type: 'attachment',
+					mime_type: item.file.type || 'application/octet-stream',
+					source_url: '',
+					title: {
+						raw: item.file.name,
+						rendered: item.file.name,
+					},
+					alt_text: '',
+					caption: { rendered: '' },
+					description: { rendered: '' },
+					media_type: item.file.type?.startsWith( 'image/' )
+						? 'image'
+						: 'file',
+					media_details: {},
+					post: null,
+					featured_media: 0,
+					link: '',
+					date: '',
+					date_gmt: '',
+					modified: '',
+					modified_gmt: '',
+					author: 0,
+					comment_status: '',
+					ping_status: '',
+					meta: [],
+					template: '',
+					class_list: [],
+					_links: {},
+					_transientStatus: item.status,
+				} ) as unknown as RestAttachment
+		);
+
+		return [ ...transientRecords, ...( mediaRecords || [] ) ];
+	}, [ transientItems, mediaRecords ] );
+
+	// Custom getItemId that handles both real and transient items.
+	// Transient items use their clientId string; real items use their numeric ID.
+	const getItemId = useCallback(
+		( item: RestAttachment ) => String( item.id ),
+		[]
+	);
+
+	// Filter selection changes to prevent selecting transient items.
+	const handleSelectionChange = useCallback( ( newSelection: string[] ) => {
+		setSelection(
+			newSelection.filter(
+				( id ) => ! id.startsWith( TRANSIENT_ID_PREFIX )
+			)
+		);
+	}, [] );
+
+	// Fields with transient-aware thumbnail rendering
+	const fields: Field< RestAttachment >[] = useMemo( () => {
+		const OriginalThumbnailRender = mediaThumbnailField.render;
+		return [
 			{
 				...( mediaThumbnailField as Field< RestAttachment > ),
-				enableHiding: false, // Within the modal, the thumbnail should always be shown.
+				enableHiding: false,
+				render: function TransientAwareThumbnail(
+					props: DataViewRenderFieldProps< RestAttachment >
+				) {
+					const transientStatus = (
+						props.item as RestAttachment & {
+							_transientStatus?: string;
+						}
+					 )._transientStatus;
+					if ( transientStatus ) {
+						return (
+							<UploadingThumbnailView
+								filename={
+									props.item.title?.raw ||
+									props.item.title?.rendered ||
+									''
+								}
+								isComplete={ transientStatus === 'complete' }
+							/>
+						);
+					}
+					if ( OriginalThumbnailRender ) {
+						return (
+							<OriginalThumbnailRender { ...( props as any ) } />
+						);
+					}
+					return null;
+				},
 			},
 			{
 				id: 'title',
@@ -275,9 +453,8 @@ export function MediaUploadModal( {
 			mediaDimensionsField as Field< RestAttachment >,
 			mimeTypeField as Field< RestAttachment >,
 			attachedToField as Field< RestAttachment >,
-		],
-		[]
-	);
+		];
+	}, [] );
 
 	const actions: ActionButton< RestAttachment >[] = useMemo(
 		() => [
@@ -327,113 +504,199 @@ export function MediaUploadModal( {
 	// Use onUpload if provided, otherwise fall back to uploadMedia
 	const handleUpload = onUpload || uploadMedia;
 
-	// Shared upload success handler
-	const handleUploadComplete = useCallback(
-		( attachments: Partial< Attachment >[] ) => {
-			// Check if all uploads are complete (no blob URLs)
-			const allComplete = attachments.every(
-				( attachment ) =>
-					attachment.id &&
-					attachment.url &&
-					! isBlobURL( attachment.url )
+	// Initiate an upload with transient item tracking.
+	// Creates transient items for visual feedback, starts the upload,
+	// and handles completion/error by updating transient item state.
+	const initiateUpload = useCallback(
+		( files: File[] ) => {
+			// Create transient items for each file
+			const clientIds: string[] = [];
+			const newItems: TransientUploadItem[] = files.map( ( file ) => {
+				const clientId = `${ TRANSIENT_ID_PREFIX }${ nextClientIdRef.current++ }`;
+				clientIds.push( clientId );
+				return { clientId, file, status: 'uploading' as const };
+			} );
+
+			setTransientItems( ( prev ) => [ ...newItems, ...prev ] );
+
+			// Show uploading notice (important for screen reader announcements)
+			createInfoNotice(
+				sprintf(
+					// translators: %s: number of files
+					_n(
+						'Uploading %s file',
+						'Uploading %s files',
+						files.length
+					),
+					files.length.toLocaleString()
+				),
+				{
+					type: 'snackbar',
+					context: NOTICES_CONTEXT,
+					id: NOTICE_ID_UPLOAD_PROGRESS,
+					explicitDismiss: true,
+				}
 			);
 
-			if ( allComplete && attachments.length > 0 ) {
-				// Show success notice (replaces progress notice via ID)
-				createSuccessNotice(
-					sprintf(
-						// translators: %s: number of files
-						_n(
-							'Uploaded %s file',
-							'Uploaded %s files',
-							attachments.length
-						),
-						attachments.length.toLocaleString()
-					),
-					{
+			handleUpload( {
+				allowedTypes,
+				filesList: files,
+				onFileChange: ( attachments: Partial< Attachment >[] ) => {
+					if ( ! attachments ) {
+						return;
+					}
+
+					// Check if all uploads in this batch are complete
+					const allComplete = attachments.every(
+						( attachment ) =>
+							attachment &&
+							attachment.id &&
+							attachment.url &&
+							! isBlobURL( attachment.url )
+					);
+
+					if ( allComplete && attachments.length > 0 ) {
+						// Mark transient items in this batch as complete
+						setTransientItems( ( prev ) =>
+							prev.map( ( item ) => {
+								if (
+									clientIds.includes( item.clientId ) &&
+									item.status === 'uploading'
+								) {
+									return {
+										...item,
+										status: 'complete' as const,
+									};
+								}
+								return item;
+							} )
+						);
+
+						// Show success notice
+						createSuccessNotice(
+							sprintf(
+								// translators: %s: number of files
+								_n(
+									'Uploaded %s file',
+									'Uploaded %s files',
+									attachments.length
+								),
+								attachments.length.toLocaleString()
+							),
+							{
+								type: 'snackbar',
+								context: NOTICES_CONTEXT,
+								id: NOTICE_ID_UPLOAD_PROGRESS,
+							}
+						);
+
+						// Auto-select the newly uploaded items
+						const uploadedIds = attachments
+							.map( ( attachment ) => String( attachment.id ) )
+							.filter( Boolean );
+
+						if ( multiple ) {
+							setSelection( ( prev ) => [
+								...prev,
+								...uploadedIds,
+							] );
+						} else {
+							setSelection( uploadedIds.slice( 0, 1 ) );
+						}
+
+						// Invalidate resolution to refresh data
+						invalidateResolution( 'getEntityRecords', [
+							'postType',
+							'attachment',
+							queryArgs,
+						] );
+
+						// Reset view to page 1 so the new item is visible
+						setView( ( prev ) => ( {
+							...prev,
+							page: 1,
+							search: '',
+						} ) );
+
+						// Start awaiting refetch to remove transient items
+						setAwaitingRefresh( 'pending' );
+					}
+				},
+				onError: ( error: Error ) => {
+					// Remove the failed transient item by matching the File reference
+					const uploadError = error as Error & {
+						file?: File;
+					};
+					if ( uploadError.file ) {
+						setTransientItems( ( prev ) =>
+							prev.filter(
+								( item ) =>
+									! (
+										clientIds.includes( item.clientId ) &&
+										item.file === uploadError.file
+									)
+							)
+						);
+					}
+
+					// Show error notice
+					createErrorNotice( error.message, {
 						type: 'snackbar',
 						context: NOTICES_CONTEXT,
 						id: NOTICE_ID_UPLOAD_PROGRESS,
-					}
-				);
-
-				// Auto-select the newly uploaded items
-				const uploadedIds = attachments
-					.map( ( attachment ) => String( attachment.id ) )
-					.filter( Boolean );
-
-				if ( multiple ) {
-					// In multiple mode, add to existing selection
-					setSelection( ( prev ) => [ ...prev, ...uploadedIds ] );
-				} else {
-					// In single mode, replace selection with the first uploaded item
-					setSelection( uploadedIds.slice( 0, 1 ) );
-				}
-
-				// Invalidate the entity records resolution to refresh the view
-				invalidateResolution( 'getEntityRecords', [
-					'postType',
-					'attachment',
-					queryArgs,
-				] );
-			}
-		},
-		[ createSuccessNotice, invalidateResolution, queryArgs, multiple ]
-	);
-
-	// Shared upload error handler
-	const handleUploadError = useCallback(
-		( error: Error ) => {
-			// Show error notice (replaces progress notice via ID)
-			createErrorNotice( error.message, {
-				type: 'snackbar',
-				context: NOTICES_CONTEXT,
-				id: NOTICE_ID_UPLOAD_PROGRESS,
+					} );
+				},
 			} );
-		},
-		[ createErrorNotice ]
-	);
-
-	const handleFileSelect = useCallback(
-		( event: React.ChangeEvent< HTMLInputElement > ) => {
-			const files = event.target.files;
-			if ( files && files.length > 0 ) {
-				const filesArray = Array.from( files );
-
-				// Show upload start notice
-				createInfoNotice(
-					sprintf(
-						// translators: %s: number of files
-						_n(
-							'Uploading %s file',
-							'Uploading %s files',
-							filesArray.length
-						),
-						filesArray.length.toLocaleString()
-					),
-					{
-						type: 'snackbar',
-						context: NOTICES_CONTEXT,
-						id: NOTICE_ID_UPLOAD_PROGRESS,
-						explicitDismiss: true,
-					}
-				);
-
-				handleUpload( {
-					allowedTypes,
-					filesList: filesArray,
-					onFileChange: handleUploadComplete,
-					onError: handleUploadError,
-				} );
-			}
 		},
 		[
 			allowedTypes,
 			handleUpload,
 			createInfoNotice,
-			handleUploadComplete,
-			handleUploadError,
+			createSuccessNotice,
+			createErrorNotice,
+			invalidateResolution,
+			queryArgs,
+			multiple,
 		]
+	);
+
+	// Remove complete transient items after the data refetch completes.
+	// Two-phase detection: wait for isLoading to become true (refetch started),
+	// then wait for it to become false (refetch done).
+	useEffect( () => {
+		if ( awaitingRefresh === 'pending' && isLoading ) {
+			setAwaitingRefresh( 'loading' );
+		} else if ( awaitingRefresh === 'loading' && ! isLoading ) {
+			setTransientItems( ( prev ) =>
+				prev.filter( ( item ) => item.status !== 'complete' )
+			);
+			setAwaitingRefresh( false );
+		}
+	}, [ awaitingRefresh, isLoading ] );
+
+	// Fallback: remove complete transient items after a timeout in case
+	// the refetch lifecycle doesn't trigger as expected.
+	useEffect( () => {
+		if ( ! awaitingRefresh ) {
+			return;
+		}
+		const timeout = setTimeout( () => {
+			setTransientItems( ( prev ) =>
+				prev.filter( ( item ) => item.status !== 'complete' )
+			);
+			setAwaitingRefresh( false );
+		}, 3000 );
+		return () => clearTimeout( timeout );
+	}, [ awaitingRefresh ] );
+
+	const handleFileSelect = useCallback(
+		( event: React.ChangeEvent< HTMLInputElement > ) => {
+			const files = event.target.files;
+			if ( files && files.length > 0 ) {
+				initiateUpload( Array.from( files ) );
+			}
+		},
+		[ initiateUpload ]
 	);
 
 	const paginationInfo = useMemo(
@@ -520,47 +783,23 @@ export function MediaUploadModal( {
 						);
 					}
 					if ( filteredFiles.length > 0 ) {
-						// Show upload start notice
-						createInfoNotice(
-							sprintf(
-								// translators: %s: number of files
-								_n(
-									'Uploading %s file',
-									'Uploading %s files',
-									filteredFiles.length
-								),
-								filteredFiles.length.toLocaleString()
-							),
-							{
-								type: 'snackbar',
-								context: NOTICES_CONTEXT,
-								id: NOTICE_ID_UPLOAD_PROGRESS,
-								explicitDismiss: true,
-							}
-						);
-
-						handleUpload( {
-							allowedTypes,
-							filesList: filteredFiles,
-							onFileChange: handleUploadComplete,
-							onError: handleUploadError,
-						} );
+						initiateUpload( filteredFiles );
 					}
 				} }
 				label={ __( 'Drop files to upload' ) }
 			/>
 			<DataViewsPicker
-				data={ mediaRecords || [] }
+				data={ dataWithTransientItems }
 				fields={ fields }
 				view={ view }
 				onChangeView={ setView }
 				actions={ actions }
 				selection={ selection }
-				onChangeSelection={ setSelection }
+				onChangeSelection={ handleSelectionChange }
 				isLoading={ isLoading }
 				paginationInfo={ paginationInfo }
 				defaultLayouts={ defaultLayouts }
-				getItemId={ ( item: RestAttachment ) => String( item.id ) }
+				getItemId={ getItemId }
 				search={ search }
 				searchLabel={ searchLabel }
 				itemListLabel={ __( 'Media items' ) }
