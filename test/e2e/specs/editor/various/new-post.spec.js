@@ -95,11 +95,25 @@ test.describe( 'new editor state', () => {
 	} ) => {
 		await admin.createNewPost( { title: 'Here is the title' } );
 
-		// Verify saveable by presence of the Save Draft button.
+		// Verify saveable by presence of the Save Draft button or Saved indicator.
+		// With real-time collaboration enabled, the post may be auto-saved.
 		const saveDraftButton = page.locator(
 			'role=button[name="Save draft"i]'
 		);
-		await expect( saveDraftButton ).toBeVisible();
-		await expect( saveDraftButton ).toBeEnabled();
+		const savedButton = page.locator( 'role=button[name="Saved"i]' );
+
+		// Either the Save draft button is visible and enabled, or the Saved indicator is present.
+		const isSaveDraftVisible = await saveDraftButton
+			.isVisible()
+			.catch( () => false );
+		const isSavedVisible = await savedButton
+			.isVisible()
+			.catch( () => false );
+
+		expect( isSaveDraftVisible || isSavedVisible ).toBe( true );
+
+		if ( isSaveDraftVisible ) {
+			await expect( saveDraftButton ).toBeEnabled();
+		}
 	} );
 } );
