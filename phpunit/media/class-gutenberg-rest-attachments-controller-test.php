@@ -1,4 +1,11 @@
 <?php
+/**
+ * Tests for Gutenberg_REST_Attachments_Controller.
+ *
+ * Tests the REST API controller for media attachments which provides
+ * client-side media processing functionality including sideload support
+ * and sub-size generation control.
+ */
 
 /**
  * @coversDefaultClass \Gutenberg_REST_Attachments_Controller
