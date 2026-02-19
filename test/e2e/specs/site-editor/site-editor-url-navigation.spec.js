@@ -6,10 +6,18 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'Site editor url navigation', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'emptytheme' );
+		// Cross-origin isolation (COEP) prevents page navigations
+		// from working properly during template creation.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.beforeEach( async ( { requestUtils } ) => {
