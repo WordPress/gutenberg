@@ -94,7 +94,7 @@ const COLOR_MIX_DELTA_E_THRESHOLD = 0.08;
  * @param targetOklab.b
  * @param mixWith
  */
-function optimalMixPercentage(
+export function optimalMixPercentage(
 	seedOklab: { l: number; a: number; b: number },
 	targetOklab: { l: number; a: number; b: number },
 	mixWith: 'black' | 'white'
@@ -146,7 +146,7 @@ function optimalMixPercentage(
  * - The plain hex value if color-mix() cannot approximate it well enough.
  * @param stepHex
  */
-function computeBrandFallback( stepHex: string ): string {
+export function computeBrandFallback( stepHex: string ): string {
 	if ( stepHex.toLowerCase() === PRIMARY_SEED.toLowerCase() ) {
 		return adminColorVar();
 	}
