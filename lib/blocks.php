@@ -407,6 +407,7 @@ add_filter( 'force_filtered_html_on_import', '_gutenberg_footnotes_force_filtere
  * and removed after, preventing infinite loops when content references itself.
  *
  * @since 19.9.0
+ * @access private
  *
  * @param string      $content  The content to process.
  * @param string      $context  Optional. Context identifier for wp_filter_content_tags. Default empty string.
@@ -414,7 +415,7 @@ add_filter( 'force_filtered_html_on_import', '_gutenberg_footnotes_force_filtere
  * @param string|null $id       Optional. Unique identifier for this content, used with $seen_ids. Default null.
  * @return string The processed content.
  */
-function gutenberg_apply_content_filters( $content, $context = '', &$seen_ids = null, $id = null ) {
+function _gutenberg_apply_content_filters( $content, $context = '', &$seen_ids = null, $id = null ) {
 	$content = shortcode_unautop( $content );
 	$content = do_shortcode( $content );
 

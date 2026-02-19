@@ -196,8 +196,7 @@ function render_block_core_latest_posts( $attributes ) {
 
 					try {
 						// Run through the actions that are typically taken on the_content.
-						// phpcs:ignore Gutenberg.CodeAnalysis.ForbiddenFunctionsAndClasses.ForbiddenFunctionCall
-						$post_content = gutenberg_apply_content_filters( $post_content, 'latest-posts' );
+						$post_content = _gutenberg_apply_content_filters( $post_content, 'latest-posts' );
 					} finally {
 						array_pop( $rendering_stack );
 					}
