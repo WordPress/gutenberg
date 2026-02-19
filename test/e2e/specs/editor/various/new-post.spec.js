@@ -119,7 +119,7 @@ test.describe( 'new editor state', () => {
 		} );
 	} );
 
-	test( 'should be saveable with sufficient initial edits (RTC enabled)', async ( {
+	test( 'should be immediately auto saved with sufficient initial edits (RTC enabled)', async ( {
 		admin,
 		page,
 		requestUtils,
