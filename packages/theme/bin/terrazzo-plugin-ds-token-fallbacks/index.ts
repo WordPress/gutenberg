@@ -137,6 +137,24 @@ export function optimalMixPercentage(
 	return { roundedP, dE };
 }
 
+function parseHexAlpha( hex: string ): { opaqueHex: string; alpha: number } {
+	const digits = hex.replace( /^#/, '' );
+	if ( digits.length === 8 ) {
+		return {
+			opaqueHex: '#' + digits.slice( 0, 6 ),
+			alpha: parseInt( digits.slice( 6, 8 ), 16 ) / 255,
+		};
+	}
+	if ( digits.length === 4 ) {
+		const [ r, g, b, a ] = digits;
+		return {
+			opaqueHex: `#${ r }${ r }${ g }${ g }${ b }${ b }`,
+			alpha: parseInt( a + a, 16 ) / 255,
+		};
+	}
+	return { opaqueHex: hex, alpha: 1 };
+}
+
 /**
  * Compute the fallback expression for a brand token.
  *
@@ -144,46 +162,53 @@ export function optimalMixPercentage(
  * - `var(--wp-admin-theme-color, <hex>)` if the color matches the seed.
  * - `color-mix(in oklch, var(...) N%, black/white)` for derived shades.
  * - The plain hex value if color-mix() cannot approximate it well enough.
+ *
+ * Colors with an alpha channel are supported via relative color syntax:
+ * `rgb(from <opaque-fallback> r g b / <alpha>)`.
  * @param stepHex
  */
 export function computeBrandFallback( stepHex: string ): string {
-	const hexDigits = stepHex.replace( /^#/, '' );
-	if ( hexDigits.length === 8 || hexDigits.length === 4 ) {
-		throw new Error(
-			`computeBrandFallback does not support colors with alpha: ${ stepHex }. ` +
-				'The color-mix() fallback strategy does not model transparency.'
+	const { opaqueHex, alpha } = parseHexAlpha( stepHex );
+
+	let opaqueFallback: string;
+
+	if ( opaqueHex.toLowerCase() === PRIMARY_SEED.toLowerCase() ) {
+		opaqueFallback = adminColorVar();
+	} else {
+		const target = getOKLCHValues( opaqueHex );
+		const targetOklab = oklchToOklab( target.l, target.c, target.h );
+
+		// Try both black and white mixing and pick the closer result.
+		const withBlack = optimalMixPercentage(
+			PRIMARY_SEED_OKLAB,
+			targetOklab,
+			'black'
 		);
+		const withWhite = optimalMixPercentage(
+			PRIMARY_SEED_OKLAB,
+			targetOklab,
+			'white'
+		);
+
+		const best = withBlack.dE <= withWhite.dE ? withBlack : withWhite;
+		const mixWith = withBlack.dE <= withWhite.dE ? 'black' : 'white';
+
+		if ( best.dE > COLOR_MIX_DELTA_E_THRESHOLD ) {
+			// Can't approximate — return the original value as-is.
+			return stepHex;
+		}
+
+		opaqueFallback = `color-mix(in oklch, ${ adminColorVar() } ${
+			best.roundedP
+		}%, ${ mixWith })`;
 	}
 
-	if ( stepHex.toLowerCase() === PRIMARY_SEED.toLowerCase() ) {
-		return adminColorVar();
+	if ( alpha >= 1 ) {
+		return opaqueFallback;
 	}
 
-	const target = getOKLCHValues( stepHex );
-	const targetOklab = oklchToOklab( target.l, target.c, target.h );
-
-	// Try both black and white mixing and pick the closer result.
-	const withBlack = optimalMixPercentage(
-		PRIMARY_SEED_OKLAB,
-		targetOklab,
-		'black'
-	);
-	const withWhite = optimalMixPercentage(
-		PRIMARY_SEED_OKLAB,
-		targetOklab,
-		'white'
-	);
-
-	const best = withBlack.dE <= withWhite.dE ? withBlack : withWhite;
-	const mixWith = withBlack.dE <= withWhite.dE ? 'black' : 'white';
-
-	if ( best.dE > COLOR_MIX_DELTA_E_THRESHOLD ) {
-		return stepHex;
-	}
-
-	return `color-mix(in oklch, ${ adminColorVar() } ${
-		best.roundedP
-	}%, ${ mixWith })`;
+	const roundedAlpha = Math.round( alpha * 1000 ) / 1000;
+	return `rgb(from ${ opaqueFallback } r g b / ${ roundedAlpha })`;
 }
 
 export default function pluginDsTokenFallbacks( {

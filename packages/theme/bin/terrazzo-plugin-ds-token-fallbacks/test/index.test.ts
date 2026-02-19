@@ -85,15 +85,20 @@ describe( 'computeBrandFallback', () => {
 		expect( computeBrandFallback( '#ff0000' ) ).toBe( '#ff0000' );
 	} );
 
-	it( 'throws on colors with alpha (8-digit hex)', () => {
-		expect( () => computeBrandFallback( '#3858e980' ) ).toThrow(
-			/does not support colors with alpha/
+	it( 'wraps the seed fallback with relative color syntax for alpha', () => {
+		expect( computeBrandFallback( '#3858e980' ) ).toBe(
+			'rgb(from var(--wp-admin-theme-color, #3858e9) r g b / 0.502)'
 		);
 	} );
 
-	it( 'throws on colors with alpha (4-digit hex)', () => {
-		expect( () => computeBrandFallback( '#f008' ) ).toThrow(
-			/does not support colors with alpha/
+	it( 'wraps a color-mix fallback with relative color syntax for alpha', () => {
+		const result = computeBrandFallback( '#2e49d980' );
+		expect( result ).toMatch(
+			/^rgb\(from color-mix\(in oklch, var\(--wp-admin-theme-color, #3858e9\) \d+%, (black|white)\) r g b \/ [\d.]+\)$/
 		);
+	} );
+
+	it( 'returns the original hex when color-mix cannot approximate an alpha color', () => {
+		expect( computeBrandFallback( '#ff000080' ) ).toBe( '#ff000080' );
 	} );
 } );
