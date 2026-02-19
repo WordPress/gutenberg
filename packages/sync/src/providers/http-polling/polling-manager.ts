@@ -368,6 +368,23 @@ function poll(): void {
 				}
 
 				const roomState = roomStates.get( room.room )!;
+
+				// If the server indicates the room is full, notify
+				// the client and stop syncing this room.
+				if ( room.read_only ) {
+					roomState.onStatusChange( {
+						status: 'disconnected',
+						error: {
+							code: 'connection-limit-exceeded',
+							name: 'ConnectionError',
+							message:
+								'This post has reached its maximum number of simultaneous editors.',
+						},
+					} );
+					unregisterRoom( room.room );
+					return;
+				}
+
 				roomState.endCursor = room.end_cursor;
 
 				// Process awareness update.

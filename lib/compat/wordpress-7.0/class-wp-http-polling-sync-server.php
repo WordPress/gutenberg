@@ -40,6 +40,14 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		const COMPACTION_THRESHOLD = 50;
 
 		/**
+		 * Default maximum number of peers allowed in a single room.
+		 *
+		 * @since 7.0.0
+		 * @var int
+		 */
+		const DEFAULT_MAX_PEERS_PER_ROOM = 2;
+
+		/**
 		 * Sync update type: compaction.
 		 *
 		 * @since 7.0.0
@@ -246,8 +254,26 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				$cursor    = $room_request['after'];
 				$room      = $room_request['room'];
 
-				// Merge awareness state.
-				$merged_awareness = $this->process_awareness_update( $room, $client_id, $awareness );
+				// Merge awareness state and check room capacity.
+				$awareness_result = $this->process_awareness_update( $room, $client_id, $awareness );
+				$merged_awareness = $awareness_result['awareness'];
+				$read_only        = $awareness_result['read_only'];
+
+				if ( $read_only ) {
+					// Client exceeded the room's peer limit. Return a read_only
+					// response without processing their updates.
+					$response['rooms'][] = array(
+						'awareness'          => $merged_awareness,
+						'compaction_request' => null,
+						'end_cursor'         => $this->storage->get_cursor( $room ),
+						'read_only'          => true,
+						'room'               => $room,
+						'should_compact'     => false,
+						'total_updates'      => 0,
+						'updates'            => array(),
+					);
+					continue;
+				}
 
 				// The lowest client ID is nominated to perform compaction when needed.
 				$is_compactor = false;
@@ -331,21 +357,26 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		/**
 		 * Processes and stores an awareness update from a client.
 		 *
+		 * Enforces the per-room peer limit. If the client is not already
+		 * tracked and the room is full, the client is marked as read-only.
+		 *
 		 * @since 7.0.0
 		 *
 		 * @param string                    $room             Room identifier.
 		 * @param int                       $client_id        Client identifier.
 		 * @param array<string, mixed>|null $awareness_update Awareness state sent by the client.
-		 * @return array<int, array<string, mixed>> Map of client ID to awareness state.
+		 * @return array{ awareness: array<int, array<string, mixed>>, read_only: bool } Awareness map and read-only flag.
 		 */
 		private function process_awareness_update( string $room, int $client_id, ?array $awareness_update ): array {
 			$existing_awareness = $this->storage->get_awareness_state( $room );
 			$updated_awareness  = array();
 			$current_time       = time();
+			$was_tracked        = false;
 
 			foreach ( $existing_awareness as $entry ) {
-				// Remove this client's entry (it will be updated below).
+				// Check if this client was already tracked.
 				if ( $client_id === $entry['client_id'] ) {
+					$was_tracked = true;
 					continue;
 				}
 
@@ -357,26 +388,55 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				$updated_awareness[] = $entry;
 			}
 
-			// Add this client's awareness state.
+			// Enforce the per-room peer limit for new clients.
+			$max_peers = $this->get_max_peers_per_room();
+			$read_only = false;
+
 			if ( null !== $awareness_update ) {
-				$updated_awareness[] = array(
-					'client_id'  => $client_id,
-					'state'      => $awareness_update,
-					'updated_at' => $current_time,
-					'wp_user_id' => get_current_user_id(),
-				);
+				if ( ! $was_tracked && count( $updated_awareness ) >= $max_peers ) {
+					$read_only = true;
+				} else {
+					$updated_awareness[] = array(
+						'client_id'  => $client_id,
+						'state'      => $awareness_update,
+						'updated_at' => $current_time,
+						'wp_user_id' => get_current_user_id(),
+					);
+				}
 			}
 
 			// This action can fail, but it shouldn't fail the entire request.
 			$this->storage->set_awareness_state( $room, $updated_awareness );
 
 			// Convert to client_id => state map for response.
-			$response = array();
+			$awareness_map = array();
 			foreach ( $updated_awareness as $entry ) {
-				$response[ $entry['client_id'] ] = $entry['state'];
+				$awareness_map[ $entry['client_id'] ] = $entry['state'];
 			}
 
-			return $response;
+			return array(
+				'awareness' => $awareness_map,
+				'read_only' => $read_only,
+			);
+		}
+
+		/**
+		 * Returns the maximum number of peers allowed per room.
+		 *
+		 * @since 7.0.0
+		 *
+		 * @return int Maximum peers per room.
+		 */
+		private function get_max_peers_per_room(): int {
+			/**
+			 * Filters the maximum number of concurrent peers allowed in a
+			 * single real-time collaboration room.
+			 *
+			 * @since 7.0.0
+			 *
+			 * @param int $max_peers Default maximum peers per room.
+			 */
+			return (int) apply_filters( 'real_time_collaboration_max_peers_per_room', self::DEFAULT_MAX_PEERS_PER_ROOM );
 		}
 
 		/**
