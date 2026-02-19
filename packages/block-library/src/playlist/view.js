@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import '@arraypress/waveform-player/dist/waveform-player.css';
-
-/**
  * WordPress dependencies
  */
 import { store, getContext, getElement } from '@wordpress/interactivity';
