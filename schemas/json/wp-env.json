@@ -63,8 +63,13 @@
 					"type": "object",
 					"default": {}
 				},
+				"phpmyadmin": {
+					"description": "Whether to enable phpMyAdmin for database management.",
+					"type": "boolean",
+					"default": false
+				},
 				"phpmyadminPort": {
-					"description": "The port number to access phpMyAdmin.",
+					"description": "The port number to access phpMyAdmin. Setting this also enables phpMyAdmin.",
 					"type": "integer"
 				},
 				"multisite": {
@@ -82,6 +87,7 @@
 				"port",
 				"config",
 				"mappings",
+				"phpmyadmin",
 				"phpmyadminPort",
 				"multisite"
 			]

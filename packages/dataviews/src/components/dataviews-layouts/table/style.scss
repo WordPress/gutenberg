@@ -155,12 +155,12 @@
 
 			&:has(.dataviews-view-table-header-button):first-child {
 				// Table cell padding minus the header button padding.
-				padding-left: $grid-unit-50;
+				padding-left: $grid-unit-20;
 			}
 
 			&:has(.dataviews-view-table-header-button):last-child {
 				// Table cell padding minus the header button padding.
-				padding-right: $grid-unit-50;
+				padding-right: $grid-unit-20;
 			}
 		}
 	}
