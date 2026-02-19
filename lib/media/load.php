@@ -13,6 +13,9 @@ if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
  * Sets a global JS variable to indicate that client-side media processing is enabled.
  */
 function gutenberg_set_client_side_media_processing_flag() {
+	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
+		return;
+	}
 	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
 }
 add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
@@ -225,6 +228,12 @@ add_filter( 'mod_rewrite_rules', 'gutenberg_filter_mod_rewrite_rules' );
  * @link https://web.dev/coop-coep/
  */
 function gutenberg_set_up_cross_origin_isolation() {
+	// Re-check the filter at action time, since other plugins (loaded after Gutenberg)
+	// may have added a filter to disable client-side media processing.
+	if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
+		return;
+	}
+
 	$screen = get_current_screen();
 
 	if ( ! $screen ) {
