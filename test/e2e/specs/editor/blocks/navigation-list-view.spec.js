@@ -583,30 +583,31 @@ test.describe( 'Navigation block - List view editing', () => {
 
 		await editor.openDocumentSettingsSidebar();
 
-		// Select the first navigation block
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Header Menu' } )
-			.first()
-			.click();
+		// Select the first navigation block (the one above the currently selected block)
+		const navigationBlocks = editor.canvas.getByRole( 'document', {
+			name: 'Block: Navigation',
+		} );
+		await navigationBlocks.first().click();
 
 		// Verify the List View tab header shows "Header Menu"
 		const listViewTab = page.getByRole( 'tab', { name: 'List View' } );
 		await listViewTab.click();
 
+		const listViewPanel = page.getByRole( 'tabpanel', {
+			name: 'List View',
+		} );
+
 		// Check that the panel heading shows the custom menu name
 		await expect(
-			page.getByRole( 'button', { name: 'Header Menu' } )
+			listViewPanel.getByRole( 'heading', { name: 'Header Menu' } )
 		).toBeVisible();
 
 		// Select the second navigation block
-		await editor.canvas
-			.getByRole( 'document', { name: 'Block: Footer Menu' } )
-			.first()
-			.click();
+		await navigationBlocks.last().click();
 
 		// Verify the List View tab header shows "Footer Menu"
 		await expect(
-			page.getByRole( 'button', { name: 'Footer Menu' } )
+			listViewPanel.getByRole( 'heading', { name: 'Footer Menu' } )
 		).toBeVisible();
 	} );
 } );

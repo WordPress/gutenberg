@@ -20,7 +20,6 @@ import {
 	hasBlockSupport,
 	createBlock,
 	store as blocksStore,
-	__experimentalGetBlockLabel as getBlockLabel,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
@@ -642,8 +641,7 @@ function BlockListBlockProvider( props ) {
 				defaultClassName: hasLightBlockWrapper
 					? getBlockDefaultClassName( blockName )
 					: undefined,
-				blockTitle:
-					getBlockLabel( blockType, attributes ) || blockType?.title,
+				blockTitle: blockType?.title,
 				bindableAttributes,
 				blockVisibility,
 				deviceType,
@@ -711,10 +709,7 @@ function BlockListBlockProvider( props ) {
 						false
 					) && hasSelectedInnerBlock( clientId ),
 				blockApiVersion: blockType?.apiVersion || 1,
-				blockTitle:
-					getBlockLabel( blockType, attributes ) ||
-					match?.title ||
-					blockType?.title,
+				blockTitle: match?.title || blockType?.title,
 				isSubtreeDisabled:
 					blockEditingMode === 'disabled' &&
 					isBlockSubtreeDisabled( clientId ),
