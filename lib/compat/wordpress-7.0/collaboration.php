@@ -112,7 +112,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 				'type'              => 'boolean',
 				'description'       => __( 'Enable Real-Time Collaboration', 'gutenberg' ),
 				'sanitize_callback' => 'rest_sanitize_boolean',
-				'default'           => false,
+				'default'           => true,
 				'show_in_rest'      => true,
 			)
 		);
@@ -121,7 +121,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 			$option_name,
 			__( 'Collaboration', 'gutenberg' ),
 			function () use ( $option_name ) {
-				$option_value = get_option( $option_name );
+				$option_value = get_option( $option_name, 1 );
 
 				?>
 				<label for="wp_enable_real_time_collaboration">
@@ -139,7 +139,7 @@ if ( ! function_exists( 'wp_collaboration_inject_setting' ) ) {
 	 * Injects the real-time collaboration setting into a global variable.
 	 */
 	function gutenberg_inject_real_time_collaboration_setting() {
-		if ( get_option( 'wp_enable_real_time_collaboration', '0' ) ) {
+		if ( get_option( 'wp_enable_real_time_collaboration', 1 ) ) {
 			wp_add_inline_script(
 				'wp-core-data',
 				'window._wpCollaborationEnabled = true;',
