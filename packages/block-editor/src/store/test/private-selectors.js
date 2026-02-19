@@ -29,6 +29,7 @@ import {
 	hasSelectedStyleState,
 	isSelectedBlockStyleStateShownOnCanvas,
 	shouldRenderBlockListView,
+	getListViewChildParentId,
 } from '../private-selectors';
 import { getBlockEditingMode } from '../selectors';
 import { deviceTypeKey } from '../private-keys';
@@ -2526,6 +2527,139 @@ describe( 'private selectors', () => {
 			expect( getParentSectionBlock( state, 'inner-block' ) ).toBe(
 				'pattern-a'
 			);
+		} );
+	} );
+
+	describe( 'getListViewChildParentId', () => {
+		// Block name constants used across tests.
+		const BLOCK_WITH_LIST_VIEW = 'test/block-with-list-view';
+		const BLOCK_WITHOUT_LIST_VIEW = 'test/block-without-list-view';
+		const BLOCK_CHILD = 'test/block-child';
+
+		beforeAll( () => {
+			registerBlockType( BLOCK_WITH_LIST_VIEW, {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Block With List View',
+				supports: { listView: true },
+			} );
+
+			registerBlockType( BLOCK_WITHOUT_LIST_VIEW, {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Block Without List View',
+			} );
+
+			registerBlockType( BLOCK_CHILD, {
+				apiVersion: 3,
+				save: () => null,
+				category: 'text',
+				title: 'Child Block',
+			} );
+		} );
+
+		afterAll( () => {
+			unregisterBlockType( BLOCK_WITH_LIST_VIEW );
+			unregisterBlockType( BLOCK_WITHOUT_LIST_VIEW );
+			unregisterBlockType( BLOCK_CHILD );
+		} );
+
+		// Base block tree (IDs map to block names above):
+		//   list-view-parent  (BLOCK_WITH_LIST_VIEW, content item)
+		//     └─ child-of-list-view  (BLOCK_CHILD)
+		//   no-list-view-parent  (BLOCK_WITHOUT_LIST_VIEW, content item)
+		//     └─ child-of-no-list-view  (BLOCK_CHILD)
+		//   nav-parent  (core/navigation, content item — hardcoded special case)
+		//     └─ child-of-nav  (BLOCK_CHILD)
+		//   orphan  (BLOCK_CHILD, NOT a content item, no content ancestor)
+		const baseBlocks = {
+			byClientId: new Map( [
+				[ 'list-view-parent', { name: BLOCK_WITH_LIST_VIEW } ],
+				[ 'child-of-list-view', { name: BLOCK_CHILD } ],
+				[ 'no-list-view-parent', { name: BLOCK_WITHOUT_LIST_VIEW } ],
+				[ 'child-of-no-list-view', { name: BLOCK_CHILD } ],
+				[ 'nav-parent', { name: 'core/navigation' } ],
+				[ 'child-of-nav', { name: BLOCK_CHILD } ],
+				[ 'orphan', { name: BLOCK_CHILD } ],
+			] ),
+			parents: new Map( [
+				[ 'list-view-parent', '' ],
+				[ 'child-of-list-view', 'list-view-parent' ],
+				[ 'no-list-view-parent', '' ],
+				[ 'child-of-no-list-view', 'no-list-view-parent' ],
+				[ 'nav-parent', '' ],
+				[ 'child-of-nav', 'nav-parent' ],
+				[ 'orphan', '' ],
+			] ),
+			order: new Map( [] ),
+			attributes: new Map( [] ),
+		};
+
+		const contentClientIds = [
+			'list-view-parent',
+			'no-list-view-parent',
+			'nav-parent',
+		];
+
+		const makeState = ( clientId ) => ( {
+			blocks: baseBlocks,
+			selection: {
+				selectionStart: clientId ? { clientId } : {},
+				selectionEnd: clientId ? { clientId } : {},
+			},
+		} );
+
+		it( 'returns null when no block is selected', () => {
+			expect(
+				getListViewChildParentId( makeState( null ), contentClientIds )
+			).toBeNull();
+		} );
+
+		it( 'returns null when the selected block is itself a direct content item', () => {
+			expect(
+				getListViewChildParentId(
+					makeState( 'list-view-parent' ),
+					contentClientIds
+				)
+			).toBeNull();
+		} );
+
+		it( 'returns null when the selected block has no content-item ancestor', () => {
+			expect(
+				getListViewChildParentId(
+					makeState( 'orphan' ),
+					contentClientIds
+				)
+			).toBeNull();
+		} );
+
+		it( 'returns the parent clientId when a child of a listView-supporting block is selected', () => {
+			expect(
+				getListViewChildParentId(
+					makeState( 'child-of-list-view' ),
+					contentClientIds
+				)
+			).toBe( 'list-view-parent' );
+		} );
+
+		it( 'returns null when the ancestor content block does not have listView support', () => {
+			expect(
+				getListViewChildParentId(
+					makeState( 'child-of-no-list-view' ),
+					contentClientIds
+				)
+			).toBeNull();
+		} );
+
+		it( 'returns the parent clientId when a child of core/navigation is selected (hardcoded special case)', () => {
+			expect(
+				getListViewChildParentId(
+					makeState( 'child-of-nav' ),
+					contentClientIds
+				)
+			).toBe( 'nav-parent' );
 		} );
 	} );
 } );

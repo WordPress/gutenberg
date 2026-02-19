@@ -23,6 +23,7 @@ import {
 	getClientIdsWithDescendants,
 	getBlockRootClientId,
 	getBlockAttributes,
+	getSelectedBlockClientId,
 } from './selectors';
 import {
 	checkAllowListRecursive,
@@ -1392,4 +1393,37 @@ export function isSelectedBlockStyleStateShownOnCanvas( state, clientId ) {
 	}
 
 	return state.selectedBlockStyleState.showStateOnCanvas ?? true;
+}
+
+/**
+ * Returns the clientId of the nearest content-list ancestor that has list-view
+ * support, if the currently selected block is a descendant of one.
+ *
+ * Used to auto-switch the inspector to List View when a child of a list-view-
+ * enabled content block (e.g. a Button inside Buttons) is selected in the canvas.
+ *
+ * @param {Object}   state            Global application state.
+ * @param {string[]} contentClientIds Client IDs of direct content items.
+ *
+ * @return {?string} The clientId of the list-view-enabled ancestor, or null.
+ */
+export function getListViewChildParentId( state, contentClientIds ) {
+	const selectedId = getSelectedBlockClientId( state );
+	if ( ! selectedId || contentClientIds?.includes( selectedId ) ) {
+		return null;
+	}
+	const parents = getBlockParents( state, selectedId );
+	for ( const parentId of parents ) {
+		if ( ! contentClientIds?.includes( parentId ) ) {
+			continue;
+		}
+		const parentName = getBlockName( state, parentId );
+		if (
+			parentName === 'core/navigation' ||
+			hasBlockSupport( parentName, 'listView' )
+		) {
+			return parentId;
+		}
+	}
+	return null;
 }

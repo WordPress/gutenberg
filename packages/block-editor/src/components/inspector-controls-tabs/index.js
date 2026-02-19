@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { hasBlockSupport } from '@wordpress/blocks';
 import {
 	Icon as WCIcon,
 	privateApis as componentsPrivateApis,
@@ -92,15 +91,7 @@ export default function InspectorControlsTabs( {
 	// when switchToListView or requestInspectorTab intentionally
 	// opened List View for that same block.
 	const skipNextContentResetRef = useRef( false );
-	const prevSelectedContentBlockRef = useRef( selectedContentBlockId );
 	useEffect( () => {
-		const prev = prevSelectedContentBlockRef.current;
-		prevSelectedContentBlockRef.current = selectedContentBlockId;
-
-		if ( selectedContentBlockId === prev ) {
-			return;
-		}
-
 		if (
 			selectedContentBlockId &&
 			selectedTabIdRef.current === TAB_LIST_VIEW.name &&
@@ -121,45 +112,18 @@ export default function InspectorControlsTabs( {
 			if ( ! isSectionBlock ) {
 				return null;
 			}
-			const { getSelectedBlockClientId, getBlockParents, getBlockName } =
-				select( blockEditorStore );
-			const selectedId = getSelectedBlockClientId();
-			if ( ! selectedId || contentClientIds?.includes( selectedId ) ) {
-				return null;
-			}
-			const parents = getBlockParents( selectedId );
-			for ( const parentId of parents ) {
-				if ( ! contentClientIds?.includes( parentId ) ) {
-					continue;
-				}
-				const parentName = getBlockName( parentId );
-				if (
-					parentName === 'core/navigation' ||
-					hasBlockSupport( parentName, 'listView' )
-				) {
-					return parentId;
-				}
-			}
-			return null;
+			return unlock(
+				select( blockEditorStore )
+			).getListViewChildParentId( contentClientIds );
 		},
 		[ isSectionBlock, contentClientIds ]
 	);
 
-	const prevListChildParentRef = useRef( listChildParentId );
 	useEffect( () => {
-		const prev = prevListChildParentRef.current;
-		prevListChildParentRef.current = listChildParentId;
-
-		if ( listChildParentId === prev ) {
-			return;
-		}
-
 		if ( listChildParentId ) {
 			setOpenListViewPanel( listChildParentId );
 			incrementListViewExpandRevision();
-			if ( selectedTabIdRef.current !== TAB_LIST_VIEW.name ) {
-				setSelectedTabId( TAB_LIST_VIEW.name );
-			}
+			setSelectedTabId( TAB_LIST_VIEW.name );
 			hasUserSelectionRef.current = true;
 		}
 	}, [
@@ -189,7 +153,8 @@ export default function InspectorControlsTabs( {
 			skipNextContentResetRef.current = true;
 		}
 
-		// Mark as handled (programmatic switch)
+		// Flag as programmatic so handleTabSelect skips the setAllListViewPanelsOpen
+		// call — requestedTab already specified the exact panel to open.
 		isProgrammaticSwitchRef.current = true;
 		hasUserSelectionRef.current = true;
 
