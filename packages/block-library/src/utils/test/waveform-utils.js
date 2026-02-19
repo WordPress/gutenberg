@@ -50,33 +50,19 @@ describe( 'Waveform utilities', () => {
 			);
 		} );
 
-		it( 'should set title as data-title attribute', () => {
+		it( 'should set optional attributes when provided', () => {
 			const container = createWaveformContainer( {
 				...basePlayerData,
 				title: 'My Song',
+				artist: 'The Artist',
+				artwork: 'https://example.com/cover.jpg',
 			} );
 
 			expect( container ).toHaveAttribute( 'data-title', 'My Song' );
-		} );
-
-		it( 'should set artist as data-subtitle attribute', () => {
-			const container = createWaveformContainer( {
-				...basePlayerData,
-				artist: 'The Artist',
-			} );
-
 			expect( container ).toHaveAttribute(
 				'data-subtitle',
 				'The Artist'
 			);
-		} );
-
-		it( 'should set artwork as data-artwork attribute', () => {
-			const container = createWaveformContainer( {
-				...basePlayerData,
-				artwork: 'https://example.com/cover.jpg',
-			} );
-
 			expect( container ).toHaveAttribute(
 				'data-artwork',
 				'https://example.com/cover.jpg'
