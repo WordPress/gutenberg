@@ -66,7 +66,7 @@ function render_block_core_playlist( $attributes, $content, $block ) {
 					'artist'    => $artist,
 					'album'     => $album,
 					'image'     => esc_url( $image ),
-					'ariaLabel' => $aria_label,
+					'ariaLabel' => wp_strip_all_tags( $aria_label ),
 				);
 
 				if ( $unique_id === $current_media_id ) {
