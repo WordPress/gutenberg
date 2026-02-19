@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/admin-ui",
-	"version": "1.8.0",
+	"version": "1.8.1-next.v.202602191100.0+2f8ac7442",
 	"description": "Generic components to be used in the Admin UI.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

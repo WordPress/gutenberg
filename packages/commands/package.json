@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/commands",
-	"version": "1.40.0",
+	"version": "1.40.1-next.v.202602191100.0+2f8ac7442",
 	"description": "Handles the commands menu.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

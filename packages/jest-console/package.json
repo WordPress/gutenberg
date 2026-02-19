@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/jest-console",
-	"version": "8.40.0",
+	"version": "8.40.1-next.v.202602191100.0+2f8ac7442",
 	"description": "Custom Jest matchers for the Console object.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
