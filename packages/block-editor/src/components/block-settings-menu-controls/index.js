@@ -21,7 +21,6 @@ import { store as blockEditorStore } from '../../store';
 import BlockModeToggle from '../block-settings-menu/block-mode-toggle';
 import { BlockRenameControl, useBlockRename } from '../block-rename';
 import { BlockVisibilityViewportMenuItem } from '../block-visibility';
-import { EditSectionMenuItem } from './edit-section-menu-item';
 
 const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
 
@@ -98,12 +97,6 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 						{ showConvertToGroupButton && (
 							<ConvertToGroupButton
 								{ ...convertToGroupButtonProps }
-								onClose={ fillProps?.onClose }
-							/>
-						) }
-						{ selectedClientIds.length === 1 && (
-							<EditSectionMenuItem
-								clientId={ selectedClientIds[ 0 ] }
 								onClose={ fillProps?.onClose }
 							/>
 						) }

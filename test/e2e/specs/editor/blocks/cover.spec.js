@@ -57,18 +57,19 @@ test.describe( 'Cover', () => {
 			name: 'Block: Cover',
 		} );
 
-		const fileName = await coverBlockUtils.upload(
+		await coverBlockUtils.upload(
 			coverBlock.getByTestId( 'form-file-upload-input' )
 		);
-		const fileBasename = path.basename( fileName );
 
 		// Wait for the img's src attribute to be prefixed with http.
 		// Otherwise, the URL for the img src attribute starts is a placeholder
-		// beginning with `blob`.
-		await expect( async () => {
-			const src = await coverBlock.locator( 'img' ).getAttribute( 'src' );
-			expect( src.includes( fileBasename ) ).toBe( true );
-		} ).toPass();
+		// beginning with `blob`. Increased timeout for client-side media processing.
+		// With client-side processing, the filename may be changed by the server.
+		await expect( coverBlock.locator( 'img' ) ).toHaveAttribute(
+			'src',
+			/^https?:\/\//,
+			{ timeout: 30_000 }
+		);
 	} );
 
 	test( 'dims background image down by 50% with the average image color when an image is uploaded', async ( {

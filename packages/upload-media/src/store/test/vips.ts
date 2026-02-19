@@ -30,7 +30,7 @@ import {
 	vipsResizeImage,
 	vipsRotateImage,
 	vipsCancelOperations,
-} from '../utils/vips';
+} from '../utils';
 
 // Cast to jest.Mock for type safety.
 const mockConvertImageFormat = vipsWorker.vipsConvertImageFormat as jest.Mock;

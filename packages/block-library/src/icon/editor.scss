@@ -46,12 +46,6 @@
 	width: 250px;
 }
 
-// Provide special styling for the placeholder.
-// @todo this particular minimal style of placeholder could be componentized further.
-.wp-block-icon .components-placeholder {
-	padding: 0;
-	min-height: $grid-unit-30;
-	min-width: $grid-unit-30;
-	height: 100%;
-	width: 100%;
+.wp-block-icon__placeholder {
+	backdrop-filter: blur(100px);
 }

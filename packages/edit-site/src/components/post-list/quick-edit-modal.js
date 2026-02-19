@@ -12,13 +12,11 @@ import {
 } from '@wordpress/components';
 import { useEffect, useMemo, useState } from '@wordpress/element';
 import { privateApis as editorPrivateApis } from '@wordpress/editor';
-import { privateApis as blockEditorPrivateApis } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { unlock } from '../../lock-unlock';
-import usePatternSettings from '../page-patterns/use-pattern-settings';
 
 const { usePostFields, PostCardPanel } = unlock( editorPrivateApis );
 
@@ -28,7 +26,7 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 	const isBulk = postId.length > 1;
 
 	const [ localEdits, setLocalEdits ] = useState( {} );
-	const { record, hasFinishedResolution } = useSelect(
+	const { record, hasFinishedResolution, canSwitchTemplate } = useSelect(
 		( select ) => {
 			const {
 				getEditedEntityRecord,
@@ -43,12 +41,25 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 			}
 
 			const args = [ 'postType', postType, postId[ 0 ] ];
+
+			const { getHomePage, getPostsPageId } = unlock(
+				select( coreDataStore )
+			);
+			const singlePostId = String( postId[ 0 ] );
+			const isPostsPage =
+				singlePostId !== undefined && getPostsPageId() === singlePostId;
+			const isFrontPage =
+				singlePostId !== undefined &&
+				postType === 'page' &&
+				getHomePage()?.postId === singlePostId;
+
 			return {
 				record: getEditedEntityRecord( ...args ),
 				hasFinishedResolution: hasFinished(
 					'getEditedEntityRecord',
 					args
 				),
+				canSwitchTemplate: ! isPostsPage && ! isFrontPage,
 			};
 		},
 		[ postType, postId, isBulk ]
@@ -68,9 +79,17 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 						),
 					};
 				}
+
+				if ( field.id === 'template' ) {
+					return {
+						...field,
+						readOnly: ! canSwitchTemplate,
+					};
+				}
+
 				return field;
 			} ),
-		[ _fields ]
+		[ _fields, canSwitchTemplate ]
 	);
 
 	const form = useMemo( () => {
@@ -96,14 +115,7 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 				label: __( 'Discussion' ),
 				children: [ 'comment_status', 'ping_status' ],
 			},
-			{
-				label: __( 'Template' ),
-				id: 'template',
-				layout: {
-					type: 'regular',
-					labelPosition: 'side',
-				},
-			},
+			'template',
 		];
 
 		return {
@@ -162,32 +174,6 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 		closeModal?.();
 	};
 
-	const { ExperimentalBlockEditorProvider } = unlock(
-		blockEditorPrivateApis
-	);
-	const settings = usePatternSettings();
-
-	/**
-	 * The template field depends on the block editor settings.
-	 * This is a workaround to ensure that the block editor settings are available.
-	 * For more information, see: https://github.com/WordPress/gutenberg/issues/67521
-	 */
-	const fieldsWithDependency = useMemo( () => {
-		return fields.map( ( field ) => {
-			if ( field.id === 'template' ) {
-				return {
-					...field,
-					Edit: ( data ) => (
-						<ExperimentalBlockEditorProvider settings={ settings }>
-							<field.Edit { ...data } />
-						</ExperimentalBlockEditorProvider>
-					),
-				};
-			}
-			return field;
-		} );
-	}, [ fields, settings ] );
-
 	return (
 		<Modal
 			overlayClassName="dataviews-action-modal__quick-edit"
@@ -207,7 +193,7 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 				{ hasFinishedResolution && (
 					<DataForm
 						data={ { ...record, ...localEdits } }
-						fields={ fieldsWithDependency }
+						fields={ fields }
 						form={ form }
 						onChange={ onChange }
 					/>

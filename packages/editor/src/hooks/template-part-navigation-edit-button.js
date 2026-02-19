@@ -10,8 +10,13 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch, useRegistry } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
+
+/**
+ * Internal dependencies
+ */
+import { unlock } from '../lock-unlock';
 
 // Block name constants
 const NAVIGATION_BLOCK_NAME = 'core/navigation';
@@ -29,7 +34,9 @@ const BLOCK_INSPECTOR_AREA = 'edit-post/block';
  * @return {React.JSX.Element} The Edit navigation button component or null if not applicable.
  */
 function TemplatePartNavigationEditButton( { clientId } ) {
+	const registry = useRegistry();
 	const { selectBlock, flashBlock } = useDispatch( blockEditorStore );
+	const { requestInspectorTab } = unlock( useDispatch( blockEditorStore ) );
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 
 	const {
@@ -70,20 +77,25 @@ function TemplatePartNavigationEditButton( { clientId } ) {
 
 	const onEditNavigation = useCallback( () => {
 		if ( firstNavigationBlockId ) {
-			// Select the first Navigation block
-			selectBlock( firstNavigationBlockId );
-
-			// Flash the block for 500ms to make it obvious
-			flashBlock( firstNavigationBlockId, 500 );
-
-			// Enable the complementary area (inspector)
-			enableComplementaryArea( 'core', BLOCK_INSPECTOR_AREA );
+			// Batch all dispatches so the request is in the store before
+			// InspectorControlsTabs mounts. Without this, the Content tab flashes
+			// before animating to List View.
+			registry.batch( () => {
+				selectBlock( firstNavigationBlockId );
+				flashBlock( firstNavigationBlockId, 500 );
+				enableComplementaryArea( 'core', BLOCK_INSPECTOR_AREA );
+				requestInspectorTab( 'list', {
+					openPanel: firstNavigationBlockId,
+				} );
+			} );
 		}
 	}, [
 		firstNavigationBlockId,
+		registry,
 		selectBlock,
 		flashBlock,
 		enableComplementaryArea,
+		requestInspectorTab,
 	] );
 
 	// Only show if template part contains navigation blocks and they are editable

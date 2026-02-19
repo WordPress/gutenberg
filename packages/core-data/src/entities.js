@@ -229,10 +229,8 @@ export const rootEntitiesConfig = [
 ].map( ( entity ) => {
 	const syncEnabledRootEntities = new Set( [ 'comment' ] );
 
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		if ( syncEnabledRootEntities.has( entity.name ) ) {
-			entity.syncConfig = defaultSyncConfig;
-		}
+	if ( syncEnabledRootEntities.has( entity.name ) ) {
+		entity.syncConfig = defaultSyncConfig;
 	}
 	return entity;
 } );
@@ -295,16 +293,14 @@ export const prePersistPostType = (
 	}
 
 	// Add meta for persisted CRDT document.
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		if ( persistedRecord ) {
-			const objectType = `postType/${ name }`;
-			const objectId = persistedRecord.id;
-			const meta = getSyncManager()?.createMeta( objectType, objectId );
-			newEdits.meta = {
-				...edits.meta,
-				...meta,
-			};
-		}
+	if ( persistedRecord ) {
+		const objectType = `postType/${ name }`;
+		const objectId = persistedRecord.id;
+		const meta = getSyncManager()?.createMeta( objectType, objectId );
+		newEdits.meta = {
+			...edits.meta,
+			...meta,
+		};
 	}
 
 	return newEdits;
@@ -359,60 +355,54 @@ async function loadPostTypeEntities() {
 					: DEFAULT_ENTITY_KEY,
 		};
 
-		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
+		/**
+		 * @type {import('@wordpress/sync').SyncConfig}
+		 */
+		entity.syncConfig = {
 			/**
-			 * @type {import('@wordpress/sync').SyncConfig}
+			 * Apply changes from the local editor to the local CRDT document so
+			 * that those changes can be synced to other peers (via the provider).
+			 *
+			 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
+			 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
+			 * @return {void}
 			 */
-			entity.syncConfig = {
-				/**
-				 * Apply changes from the local editor to the local CRDT document so
-				 * that those changes can be synced to other peers (via the provider).
-				 *
-				 * @param {import('@wordpress/sync').CRDTDoc}               crdtDoc
-				 * @param {Partial< import('@wordpress/sync').ObjectData >} changes
-				 * @return {void}
-				 */
-				applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
-					applyPostChangesToCRDTDoc( crdtDoc, changes, postType ),
+			applyChangesToCRDTDoc: ( crdtDoc, changes ) =>
+				applyPostChangesToCRDTDoc( crdtDoc, changes, postType ),
 
-				/**
-				 * Create the awareness instance for the entity's CRDT document.
-				 *
-				 * @param {import('@wordpress/sync').CRDTDoc}  ydoc
-				 * @param {import('@wordpress/sync').ObjectID} objectId
-				 * @return {import('@wordpress/sync').Awareness} Awareness instance
-				 */
-				createAwareness: ( ydoc, objectId ) => {
-					const kind = 'postType';
-					const id = parseInt( objectId, 10 );
-					return new PostEditorAwareness( ydoc, kind, name, id );
-				},
+			/**
+			 * Create the awareness instance for the entity's CRDT document.
+			 *
+			 * @param {import('@wordpress/sync').CRDTDoc}  ydoc
+			 * @param {import('@wordpress/sync').ObjectID} objectId
+			 * @return {import('@wordpress/sync').Awareness} Awareness instance
+			 */
+			createAwareness: ( ydoc, objectId ) => {
+				const kind = 'postType';
+				const id = parseInt( objectId, 10 );
+				return new PostEditorAwareness( ydoc, kind, name, id );
+			},
 
-				/**
-				 * Extract changes from a CRDT document that can be used to update the
-				 * local editor state.
-				 *
-				 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
-				 * @param {import('@wordpress/sync').ObjectData} editedRecord
-				 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
-				 */
-				getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
-					getPostChangesFromCRDTDoc(
-						crdtDoc,
-						editedRecord,
-						postType
-					),
+			/**
+			 * Extract changes from a CRDT document that can be used to update the
+			 * local editor state.
+			 *
+			 * @param {import('@wordpress/sync').CRDTDoc}    crdtDoc
+			 * @param {import('@wordpress/sync').ObjectData} editedRecord
+			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
+			 */
+			getChangesFromCRDTDoc: ( crdtDoc, editedRecord ) =>
+				getPostChangesFromCRDTDoc( crdtDoc, editedRecord, postType ),
 
-				/**
-				 * Sync features supported by the entity.
-				 *
-				 * @type {Record< string, boolean >}
-				 */
-				supports: {
-					crdtPersistence: true,
-				},
-			};
-		}
+			/**
+			 * Sync features supported by the entity.
+			 *
+			 * @type {Record< string, boolean >}
+			 */
+			supports: {
+				crdtPersistence: true,
+			},
+		};
 
 		return entity;
 	} );
@@ -439,9 +429,7 @@ async function loadTaxonomyEntities() {
 			supportsPagination: true,
 		};
 
-		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-			entity.syncConfig = defaultSyncConfig;
-		}
+		entity.syncConfig = defaultSyncConfig;
 
 		return entity;
 	} );

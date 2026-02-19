@@ -43,7 +43,8 @@ export const IconButton = forwardRef< HTMLButtonElement, IconButtonProps >(
 					>
 						<Icon
 							icon={ icon }
-							size={ size === 'small' ? 22 : 24 }
+							size={ 24 }
+							className={ styles.icon }
 						/>
 					</Tooltip.Trigger>
 					<Tooltip.Popup>

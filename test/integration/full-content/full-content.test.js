@@ -66,9 +66,6 @@ describe( 'full post content fixture', () => {
 		// Form-related blocks will not be registered unless they are opted
 		// in on the experimental settings page.
 		window.__experimentalEnableFormBlocks = true;
-		// Icon block will not be registered unless are opted into on the
-		// experimental settings page.
-		window.__experimentalEnableIconBlock = true;
 		registerCoreBlocks();
 
 		if ( globalThis.IS_GUTENBERG_PLUGIN ) {

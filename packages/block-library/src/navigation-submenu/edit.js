@@ -340,6 +340,7 @@ export default function NavigationSubmenuEdit( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					clientId={ clientId }
+					isLinkEditable={ ! openSubmenusOnClick }
 				/>
 			</InspectorControls>
 			<div { ...blockProps }>

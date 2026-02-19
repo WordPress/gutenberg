@@ -214,6 +214,13 @@ export default function Controls( {
 									customActiveBackgroundColor: value,
 								} );
 							},
+							resetAllFilter: () => {
+								setActiveBackgroundColor( undefined );
+								setAttributes( {
+									customActiveBackgroundColor: undefined,
+								} );
+							},
+							clearable: true,
 						},
 						{
 							label: __( 'Active text' ),
@@ -225,6 +232,13 @@ export default function Controls( {
 									customActiveTextColor: value,
 								} );
 							},
+							resetAllFilter: () => {
+								setActiveTextColor( undefined );
+								setAttributes( {
+									customActiveTextColor: undefined,
+								} );
+							},
+							clearable: true,
 						},
 						{
 							label: __( 'Hover background' ),
@@ -237,6 +251,13 @@ export default function Controls( {
 									customHoverBackgroundColor: value,
 								} );
 							},
+							resetAllFilter: () => {
+								setHoverBackgroundColor( undefined );
+								setAttributes( {
+									customHoverBackgroundColor: undefined,
+								} );
+							},
+							clearable: true,
 						},
 						{
 							label: __( 'Hover text' ),
@@ -248,6 +269,13 @@ export default function Controls( {
 									customHoverTextColor: value,
 								} );
 							},
+							resetAllFilter: () => {
+								setHoverTextColor( undefined );
+								setAttributes( {
+									customHoverTextColor: undefined,
+								} );
+							},
+							clearable: true,
 						},
 					] }
 					panelId={ clientId }

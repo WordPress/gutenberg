@@ -241,7 +241,7 @@ class DockerRuntime {
 				: [],
 		} );
 
-		if ( fullConfig.env.development.phpmyadminPort ) {
+		if ( fullConfig.env.development.phpmyadmin ) {
 			await dockerCompose.upOne( 'phpmyadmin', {
 				...dockerComposeConfig,
 				commandOptions: shouldConfigureWp
@@ -250,7 +250,7 @@ class DockerRuntime {
 			} );
 		}
 
-		if ( testsEnabled && fullConfig.env.tests.phpmyadminPort ) {
+		if ( testsEnabled && fullConfig.env.tests.phpmyadmin ) {
 			await dockerCompose.upOne( 'tests-phpmyadmin', {
 				...dockerComposeConfig,
 				commandOptions: shouldConfigureWp
@@ -312,7 +312,7 @@ class DockerRuntime {
 			dockerComposeConfig
 		);
 
-		const phpmyadminPort = fullConfig.env.development.phpmyadminPort
+		const phpmyadminPort = fullConfig.env.development.phpmyadmin
 			? await this._getPublicDockerPort(
 					'phpmyadmin',
 					80,
@@ -335,7 +335,7 @@ class DockerRuntime {
 				3306,
 				dockerComposeConfig
 			);
-			const testsPhpmyadminPort = fullConfig.env.tests.phpmyadminPort
+			const testsPhpmyadminPort = fullConfig.env.tests.phpmyadmin
 				? await this._getPublicDockerPort(
 						'tests-phpmyadmin',
 						80,
@@ -726,7 +726,7 @@ class DockerRuntime {
 			);
 			isRunning = true;
 
-			if ( fullConfig.env.development.phpmyadminPort ) {
+			if ( fullConfig.env.development.phpmyadmin ) {
 				phpmyadminPort = await this._getPublicDockerPort(
 					'phpmyadmin',
 					80,
