@@ -171,7 +171,7 @@ describe( 'Waveform utilities', () => {
 			} ).not.toThrow();
 		} );
 
-		it( 'should use white for mid-dark colors', () => {
+		it( 'should use white for dark colors', () => {
 			const container = document.createElement( 'div' );
 			const svg = document.createElementNS(
 				'http://www.w3.org/2000/svg',
