@@ -99,8 +99,12 @@ function CommandItem( {
 	return (
 		<Command.Item
 			key={ command.name }
-			value={ valuePrefix ? `${ valuePrefix }${ label }` : label }
-			keywords={ command.keywords }
+			value={ valuePrefix ? `${ valuePrefix }${ command.name }` : label }
+			keywords={
+				valuePrefix
+					? [ ...( command.keywords ?? [] ), label ]
+					: command.keywords
+			}
 			onSelect={ () => {
 				recordUsage?.( command.name );
 				command.callback( { close } );
@@ -363,6 +367,31 @@ function SearchResultsHeading() {
 	);
 }
 
+function RemoveRecentHandler( { removeFromRecent } ) {
+	const _value = useCommandState( ( state ) => state.value );
+
+	useShortcut( 'core/commands/remove-recent', ( event ) => {
+		// eslint-disable-next-line no-console
+		console.log( 'Shift+Backspace pressed, current value:', _value );
+
+		if ( ! _value?.startsWith( 'recent-' ) ) {
+			// eslint-disable-next-line no-console
+			console.log(
+				'Ignoring: highlighted item is not in the Recent group'
+			);
+			return;
+		}
+
+		event.preventDefault();
+		const label = _value.slice( 'recent-'.length );
+		// eslint-disable-next-line no-console
+		console.log( 'Removing recent item with label:', label );
+		removeFromRecent( label );
+	} );
+
+	return null;
+}
+
 function useSelectedItemId() {
 	const _value = useCommandState( ( state ) => state.value );
 	return useMemo( () => {
@@ -423,6 +452,25 @@ export function CommandMenu() {
 		[ setPreference ]
 	);
 
+	const removeFromRecent = useCallback(
+		( commandName ) => {
+			// eslint-disable-next-line no-console
+			console.log( 'removeFromRecent called with:', commandName );
+			const current =
+				globalSelect( preferencesStore ).get(
+					'core/commands',
+					'recentlyUsed'
+				) ?? [];
+			// eslint-disable-next-line no-console
+			console.log( 'Current recentlyUsed:', current );
+			const next = current.filter( ( n ) => n !== commandName );
+			// eslint-disable-next-line no-console
+			console.log( 'Updated recentlyUsed:', next );
+			setPreference( 'core/commands', 'recentlyUsed', next );
+		},
+		[ setPreference ]
+	);
+
 	useEffect( () => {
 		registerShortcut( {
 			name: 'core/commands',
@@ -431,6 +479,15 @@ export function CommandMenu() {
 			keyCombination: {
 				modifier: 'primary',
 				character: 'k',
+			},
+		} );
+		registerShortcut( {
+			name: 'core/commands/remove-recent',
+			category: 'global',
+			description: __( 'Remove from recent commands.' ),
+			keyCombination: {
+				modifier: 'shift',
+				character: 'Backspace',
 			},
 		} );
 	}, [ registerShortcut ] );
@@ -484,7 +541,10 @@ export function CommandMenu() {
 			contentLabel={ __( 'Command palette' ) }
 		>
 			<div className="commands-command-menu__container">
-				<Command label={ inputLabel }>
+				<Command label={ inputLabel } loop>
+					<RemoveRecentHandler
+						removeFromRecent={ removeFromRecent }
+					/>
 					<div className="commands-command-menu__header">
 						<Icon
 							className="commands-command-menu__header-search-icon"

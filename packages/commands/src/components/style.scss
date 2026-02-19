@@ -3,7 +3,7 @@
 @use "@wordpress/base-styles/colors" as *;
 
 $palette-max-height: 376px;
-$palette-header-height: 56px;
+$palette-header-height: 48px;
 
 // Here we extend the modal styles to be tighter, and to the center. Because the palette uses the modal as a container.
 .commands-command-menu {
@@ -64,7 +64,7 @@ $palette-header-height: 56px;
 	[cmdk-input] {
 		border: none;
 		width: 100%;
-		padding: $grid-unit-20 $grid-unit-05;
+		padding: $grid-unit-15 $grid-unit-05;
 		outline: none;
 		color: $gray-900;
 		margin: 0;
@@ -83,22 +83,12 @@ $palette-header-height: 56px;
 	}
 
 	[cmdk-item] {
-		border-radius: $radius-small;
 		cursor: pointer;
 		display: flex;
 		align-items: center;
+		padding: $grid-unit-05 0;
 		color: $gray-900;
 		font-size: $default-font-size;
-
-		&[aria-selected="true"],
-		&:active {
-			background: var(--wp-admin-theme-color);
-			color: $white;
-
-			svg {
-				fill: $white;
-			}
-		}
 
 		&[aria-disabled="true"] {
 			color: $gray-600;
@@ -110,10 +100,21 @@ $palette-header-height: 56px;
 		}
 
 		> div {
-			min-height: $button-size-next-default-40px;
+			border-radius: $radius-small;
+			min-height: $grid-unit-40;
 			padding: $grid-unit-05;
 			padding-left: $grid-unit-50; // Account for commands without icons.
 			padding-right: $grid-unit-20; // Accounts for the command category.
+		}
+
+		&[aria-selected="true"] > div,
+		&:active > div {
+			background: var(--wp-admin-theme-color);
+			color: $white;
+
+			svg {
+				fill: $white;
+			}
 		}
 
 		> .has-icon {
@@ -145,7 +146,8 @@ $palette-header-height: 56px;
 		}
 
 		.commands-command-menu__section-heading {
-			padding: $grid-unit-15 $grid-unit-20;
+			margin-top: $grid-unit-10;
+			padding: $grid-unit-10 $grid-unit-20;
 			line-height: $grid-unit-20;
 			font-size: $font-size-x-small;
 			font-weight: $font-weight-medium;
