@@ -220,13 +220,12 @@ export function CommandMenuLoaderWrapper( {
 	);
 }
 
-export function CommandMenuGroup( {
+function CommandMenuItems( {
 	isContextual,
 	search,
 	setLoader,
 	close,
 	recordUsage,
-	heading,
 } ) {
 	const { commands, loaders } = useSelect(
 		( select ) => {
@@ -239,43 +238,50 @@ export function CommandMenuGroup( {
 		[ isContextual ]
 	);
 
-	if ( ! commands.length && ! loaders.length ) {
-		return null;
-	}
-
 	return (
 		<>
-			{ heading && (
-				<div
-					className="commands-command-menu__section-heading"
-					aria-hidden="true"
-				>
-					{ heading }
-				</div>
-			) }
-			<Command.Group>
-				{ commands.map( ( command ) => (
-					<CommandItem
-						key={ command.name }
-						command={ command }
-						search={ search }
-						close={ close }
-						recordUsage={ recordUsage }
-					/>
-				) ) }
-				{ loaders.map( ( loader ) => (
-					<CommandMenuLoaderWrapper
-						key={ loader.name }
-						hook={ loader.hook }
-						search={ search }
-						setLoader={ setLoader }
-						close={ close }
-						category={ loader.category }
-						recordUsage={ recordUsage }
-					/>
-				) ) }
-			</Command.Group>
+			{ commands.map( ( command ) => (
+				<CommandItem
+					key={ command.name }
+					command={ command }
+					search={ search }
+					close={ close }
+					recordUsage={ recordUsage }
+				/>
+			) ) }
+			{ loaders.map( ( loader ) => (
+				<CommandMenuLoaderWrapper
+					key={ loader.name }
+					hook={ loader.hook }
+					search={ search }
+					setLoader={ setLoader }
+					close={ close }
+					category={ loader.category }
+					recordUsage={ recordUsage }
+				/>
+			) ) }
 		</>
+	);
+}
+
+export function CommandMenuGroup( {
+	isContextual,
+	search,
+	setLoader,
+	close,
+	recordUsage,
+	heading,
+} ) {
+	return (
+		<Command.Group { ...( heading ? { heading } : {} ) }>
+			<CommandMenuItems
+				isContextual={ isContextual }
+				search={ search }
+				setLoader={ setLoader }
+				close={ close }
+				recordUsage={ recordUsage }
+			/>
+		</Command.Group>
 	);
 }
 
@@ -305,65 +311,41 @@ function RecentlyUsedGroup( { search, setLoader, close, recordUsage } ) {
 	}
 
 	const recentlyUsedSet = new Set( recentlyUsedNames );
-	const recentStaticCommands = allCommands.filter( ( command ) =>
-		recentlyUsedSet.has( command.name )
-	);
+	const commandsByName = new Map( allCommands.map( ( c ) => [ c.name, c ] ) );
+	const recentStaticCommands = recentlyUsedNames
+		.map( ( name ) => commandsByName.get( name ) )
+		.filter( Boolean );
 
 	if ( ! recentStaticCommands.length && ! loaders.length ) {
 		return null;
 	}
 
 	return (
-		<>
-			<div
-				className="commands-command-menu__section-heading"
-				aria-hidden="true"
-			>
-				{ __( 'Recent' ) }
-			</div>
-			<Command.Group>
-				{ recentStaticCommands.map( ( command ) => (
-					<CommandItem
-						key={ command.name }
-						command={ command }
-						search={ search }
-						close={ close }
-						recordUsage={ recordUsage }
-						valuePrefix="recent-"
-					/>
-				) ) }
-				{ loaders.map( ( loader ) => (
-					<CommandMenuLoaderWrapper
-						key={ loader.name }
-						hook={ loader.hook }
-						search={ search }
-						setLoader={ setLoader }
-						close={ close }
-						category={ loader.category }
-						filterNames={ recentlyUsedSet }
-						recordUsage={ recordUsage }
-						valuePrefix="recent-"
-					/>
-				) ) }
-			</Command.Group>
-		</>
-	);
-}
-
-function SearchResultsHeading() {
-	const filteredCount = useCommandState( ( state ) => state.filtered.count );
-
-	if ( filteredCount === 0 ) {
-		return null;
-	}
-
-	return (
-		<div
-			className="commands-command-menu__section-heading"
-			aria-hidden="true"
-		>
-			{ __( 'Results' ) }
-		</div>
+		<Command.Group heading={ __( 'Recent' ) }>
+			{ recentStaticCommands.map( ( command ) => (
+				<CommandItem
+					key={ command.name }
+					command={ command }
+					search={ search }
+					close={ close }
+					recordUsage={ recordUsage }
+					valuePrefix="recent-"
+				/>
+			) ) }
+			{ loaders.map( ( loader ) => (
+				<CommandMenuLoaderWrapper
+					key={ loader.name }
+					hook={ loader.hook }
+					search={ search }
+					setLoader={ setLoader }
+					close={ close }
+					category={ loader.category }
+					filterNames={ recentlyUsedSet }
+					recordUsage={ recordUsage }
+					valuePrefix="recent-"
+				/>
+			) ) }
+		</Command.Group>
 	);
 }
 
@@ -371,22 +353,13 @@ function RemoveRecentHandler( { removeFromRecent } ) {
 	const _value = useCommandState( ( state ) => state.value );
 
 	useShortcut( 'core/commands/remove-recent', ( event ) => {
-		// eslint-disable-next-line no-console
-		console.log( 'Shift+Backspace pressed, current value:', _value );
-
 		if ( ! _value?.startsWith( 'recent-' ) ) {
-			// eslint-disable-next-line no-console
-			console.log(
-				'Ignoring: highlighted item is not in the Recent group'
-			);
 			return;
 		}
 
 		event.preventDefault();
-		const label = _value.slice( 'recent-'.length );
-		// eslint-disable-next-line no-console
-		console.log( 'Removing recent item with label:', label );
-		removeFromRecent( label );
+		const commandName = _value.slice( 'recent-'.length );
+		removeFromRecent( commandName );
 	} );
 
 	return null;
@@ -454,18 +427,12 @@ export function CommandMenu() {
 
 	const removeFromRecent = useCallback(
 		( commandName ) => {
-			// eslint-disable-next-line no-console
-			console.log( 'removeFromRecent called with:', commandName );
 			const current =
 				globalSelect( preferencesStore ).get(
 					'core/commands',
 					'recentlyUsed'
 				) ?? [];
-			// eslint-disable-next-line no-console
-			console.log( 'Current recentlyUsed:', current );
 			const next = current.filter( ( n ) => n !== commandName );
-			// eslint-disable-next-line no-console
-			console.log( 'Updated recentlyUsed:', next );
 			setPreference( 'core/commands', 'recentlyUsed', next );
 		},
 		[ setPreference ]
@@ -570,24 +537,32 @@ export function CommandMenu() {
 								recordUsage={ recordUsage }
 							/>
 						) }
-						{ search && <SearchResultsHeading /> }
-						<CommandMenuGroup
-							search={ search }
-							setLoader={ setLoader }
-							close={ closeAndReset }
-							isContextual
-							recordUsage={ recordUsage }
-							heading={
-								! search ? __( 'Suggestions' ) : undefined
-							}
-						/>
-						{ search && (
+						{ ! search && (
 							<CommandMenuGroup
 								search={ search }
 								setLoader={ setLoader }
 								close={ closeAndReset }
+								isContextual
 								recordUsage={ recordUsage }
+								heading={ __( 'Suggestions' ) }
 							/>
+						) }
+						{ search && (
+							<Command.Group heading={ __( 'Results' ) }>
+								<CommandMenuItems
+									search={ search }
+									setLoader={ setLoader }
+									close={ closeAndReset }
+									recordUsage={ recordUsage }
+								/>
+								<CommandMenuItems
+									isContextual
+									search={ search }
+									setLoader={ setLoader }
+									close={ closeAndReset }
+									recordUsage={ recordUsage }
+								/>
+							</Command.Group>
 						) }
 					</Command.List>
 				</Command>

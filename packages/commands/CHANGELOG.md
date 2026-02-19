@@ -5,7 +5,6 @@
 ### Enhancements
 
 -   Add a new section of recently used commands to the Command Palette.
--   Add a new section of favorite commands to the Command Palette (using shift+cmd+d to mark a command as favorite).
 
 ## 1.42.0 (2026-03-18)
 
