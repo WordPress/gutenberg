@@ -5,3 +5,7 @@
 .dataviews-action-modal {
 	z-index: z-index(".dataviews-action-modal");
 }
+
+.dataviews-item-actions .components-button:not(.dataviews-all-actions-button) {
+	padding: 0 $grid-unit-05;
+}
