@@ -778,6 +778,8 @@ For each top-level region, the router converts the HTML into a virtual DOM (vDOM
 
 Finally, each region's virtual DOM is stored in the page cache entry, indexed by its region ID. The cache entry now contains a map of region IDs to their corresponding virtual DOM trees.
 
+Beyond processing regions, the router also extracts the page's CSS stylesheets and JavaScript script modules during this step. New stylesheets that haven't been loaded yet are added to the document in a disabled state so the browser can begin downloading them without applying them. Similarly, new script modules are identified and their dependency trees are resolved and fetched. These assets are prepared in advance so that when navigation actually renders the new content, all necessary styles and scripts are ready. The details of how styles and script modules are handled are covered in the [CSS handling](#css-handling) and [Script module handling](#script-module-handling) sections below.
+
 **How regions are rendered during navigation**
 
 When `navigate()` is called and the target page has been successfully fetched (or was already cached), the router needs to update the current page to show the new content. This rendering process is carefully orchestrated to be efficient and avoid visual glitches.
