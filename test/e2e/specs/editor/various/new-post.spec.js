@@ -95,24 +95,21 @@ test.describe( 'new editor state', () => {
 	} ) => {
 		await admin.createNewPost( { title: 'Here is the title' } );
 
-		// Verify saveable by presence of the Save Draft button or Saved indicator.
-		// With real-time collaboration enabled, the post may be auto-saved.
-		const saveDraftButton = page.locator(
-			'role=button[name="Save draft"i]'
+		// Check if real-time collaboration is enabled.
+		const isRtcEnabled = await page.evaluate(
+			() => window._wpCollaborationEnabled === true
 		);
-		const savedButton = page.locator( 'role=button[name="Saved"i]' );
 
-		// Either the Save draft button is visible and enabled, or the Saved indicator is present.
-		const isSaveDraftVisible = await saveDraftButton
-			.isVisible()
-			.catch( () => false );
-		const isSavedVisible = await savedButton
-			.isVisible()
-			.catch( () => false );
-
-		expect( isSaveDraftVisible || isSavedVisible ).toBe( true );
-
-		if ( isSaveDraftVisible ) {
+		if ( isRtcEnabled ) {
+			// With RTC enabled, the post is auto-saved, so we expect "Saved".
+			const savedButton = page.locator( 'role=button[name="Saved"i]' );
+			await expect( savedButton ).toBeVisible();
+		} else {
+			// Without RTC, expect the traditional "Save draft" button.
+			const saveDraftButton = page.locator(
+				'role=button[name="Save draft"i]'
+			);
+			await expect( saveDraftButton ).toBeVisible();
 			await expect( saveDraftButton ).toBeEnabled();
 		}
 	} );
