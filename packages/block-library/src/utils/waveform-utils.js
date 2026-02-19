@@ -117,7 +117,6 @@ export function setupPlayButtonAccessibility( container ) {
 	}
 
 	playBtn.setAttribute( 'aria-label', 'Play' );
-	playBtn.setAttribute( 'role', 'button' );
 
 	// Add keyboard support for seeking.
 	const keyboardHandler = ( event ) => {
