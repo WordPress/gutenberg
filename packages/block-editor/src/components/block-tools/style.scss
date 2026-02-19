@@ -194,12 +194,6 @@
 
 
 		}
-		// If the toolbar is collapsible, show the dot divider since the parent selector is inline.
-		.editor-collapsible-block-toolbar .block-editor-block-parent-selector {
-			&::after {
-				display: inline-flex;
-			}
-		}
 
 		.block-editor-block-mover__move-button-container,
 		.block-editor-block-toolbar__block-controls .block-editor-block-mover {
