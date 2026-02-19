@@ -403,7 +403,7 @@ function ViewTable< Item >( {
 						<col className="dataviews-view-table__col-checkbox" />
 					) }
 					{ hasPrimaryColumn && (
-						<col className="dataviews-view-table__col-expand" />
+						<col className="dataviews-view-table__col-first-data" />
 					) }
 					{ columns.map( ( column, index ) => (
 						<col
