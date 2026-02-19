@@ -1061,7 +1061,6 @@ A single tab button in the tabs menu. Used as a template for styling all tab but
 -	**Category:** design
 -	**Parent:** core/tabs-menu
 -	**Supports:** color (background, text), layout (~~allowEditing~~), shadow, spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~
--	**Attributes:** activeBackgroundColor, activeTextColor, customActiveBackgroundColor, customActiveTextColor, customHoverBackgroundColor, customHoverTextColor, hoverBackgroundColor, hoverTextColor
 
 ## Tag Cloud
 

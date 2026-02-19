@@ -9,7 +9,6 @@ import clsx from 'clsx';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useBlockProps,
-	withColors,
 	store as blockEditorStore,
 	RichText,
 } from '@wordpress/block-editor';
@@ -22,19 +21,9 @@ import { useCallback, useMemo } from '@wordpress/element';
 import slugFromLabel from '../tab/slug-from-label';
 import Controls from './controls';
 
-function Edit( {
-	attributes,
-	setAttributes,
+export default function Edit( {
 	context,
 	clientId,
-	activeBackgroundColor,
-	setActiveBackgroundColor,
-	activeTextColor,
-	setActiveTextColor,
-	hoverBackgroundColor,
-	setHoverBackgroundColor,
-	hoverTextColor,
-	setHoverTextColor,
 	__unstableLayoutClassNames: layoutClassNames,
 } ) {
 	// Context from tabs-menu (per-item context via BlockContextProvider)
@@ -138,47 +127,6 @@ function Edit( {
 		]
 	);
 
-	// Build CSS custom properties for active/hover color states
-	const customColorStyles = useMemo( () => {
-		const styles = {};
-
-		// Active/hover colors from custom attributes
-		const activeBg =
-			activeBackgroundColor?.color ||
-			attributes.customActiveBackgroundColor;
-		const activeText =
-			activeTextColor?.color || attributes.customActiveTextColor;
-		const hoverBg =
-			hoverBackgroundColor?.color ||
-			attributes.customHoverBackgroundColor;
-		const hoverText =
-			hoverTextColor?.color || attributes.customHoverTextColor;
-
-		if ( activeBg ) {
-			styles[ '--custom-tab-active-color' ] = activeBg;
-		}
-		if ( activeText ) {
-			styles[ '--custom-tab-active-text-color' ] = activeText;
-		}
-		if ( hoverBg ) {
-			styles[ '--custom-tab-hover-color' ] = hoverBg;
-		}
-		if ( hoverText ) {
-			styles[ '--custom-tab-hover-text-color' ] = hoverText;
-		}
-
-		return styles;
-	}, [
-		activeBackgroundColor?.color,
-		attributes.customActiveBackgroundColor,
-		activeTextColor?.color,
-		attributes.customActiveTextColor,
-		hoverBackgroundColor?.color,
-		attributes.customHoverBackgroundColor,
-		hoverTextColor?.color,
-		attributes.customHoverTextColor,
-	] );
-
 	const tabPanelId = tabId || `tab-${ tabIndex }`;
 	const tabLabelId = `${ tabPanelId }--tab`;
 
@@ -188,7 +136,6 @@ function Edit( {
 			'is-active': isActiveTab,
 			'is-selected': isSelectedTab,
 		} ),
-		style: customColorStyles,
 		'aria-controls': tabPanelId,
 		'aria-selected': isActiveTab,
 		id: tabLabelId,
@@ -200,24 +147,11 @@ function Edit( {
 	return (
 		<>
 			<Controls
-				{ ...{
-					attributes,
-					setAttributes,
-					clientId,
-					tabsClientId,
-					tabClientId,
-					tabIndex,
-					tabsCount: tabsList.length,
-					tabsMenuClientId,
-					activeBackgroundColor,
-					setActiveBackgroundColor,
-					activeTextColor,
-					setActiveTextColor,
-					hoverBackgroundColor,
-					setHoverBackgroundColor,
-					hoverTextColor,
-					setHoverTextColor,
-				} }
+				tabsClientId={ tabsClientId }
+				tabClientId={ tabClientId }
+				tabIndex={ tabIndex }
+				tabsCount={ tabsList.length }
+				tabsMenuClientId={ tabsMenuClientId }
 			/>
 			<div { ...blockProps }>
 				<RichText
@@ -235,10 +169,3 @@ function Edit( {
 		</>
 	);
 }
-
-export default withColors(
-	'activeBackgroundColor',
-	'activeTextColor',
-	'hoverBackgroundColor',
-	'hoverTextColor'
-)( Edit );
