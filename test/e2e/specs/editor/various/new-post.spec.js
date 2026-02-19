@@ -94,6 +94,11 @@ test.describe( 'new editor state', () => {
 		page,
 		requestUtils,
 	} ) => {
+		// Save the original setting value (default to false if not set).
+		const settings = await requestUtils.getSiteSettings();
+		const originalRtcSetting =
+			settings.enable_real_time_collaboration ?? false;
+
 		// Disable real-time collaboration.
 		await requestUtils.updateSiteSettings( {
 			enable_real_time_collaboration: false,
@@ -107,6 +112,11 @@ test.describe( 'new editor state', () => {
 		);
 		await expect( saveDraftButton ).toBeVisible();
 		await expect( saveDraftButton ).toBeEnabled();
+
+		// Restore the original setting value.
+		await requestUtils.updateSiteSettings( {
+			enable_real_time_collaboration: originalRtcSetting,
+		} );
 	} );
 
 	test( 'should be saveable with sufficient initial edits (RTC enabled)', async ( {
@@ -114,6 +124,11 @@ test.describe( 'new editor state', () => {
 		page,
 		requestUtils,
 	} ) => {
+		// Save the original setting value (default to false if not set).
+		const settings = await requestUtils.getSiteSettings();
+		const originalRtcSetting =
+			settings.enable_real_time_collaboration ?? false;
+
 		// Enable real-time collaboration.
 		await requestUtils.updateSiteSettings( {
 			enable_real_time_collaboration: true,
@@ -125,9 +140,9 @@ test.describe( 'new editor state', () => {
 		const savedButton = page.locator( 'role=button[name="Saved"i]' );
 		await expect( savedButton ).toBeVisible();
 
-		// Restore the setting to avoid affecting other tests.
+		// Restore the original setting value.
 		await requestUtils.updateSiteSettings( {
-			enable_real_time_collaboration: false,
+			enable_real_time_collaboration: originalRtcSetting,
 		} );
 	} );
 } );
