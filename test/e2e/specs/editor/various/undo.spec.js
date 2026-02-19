@@ -177,6 +177,17 @@ test.describe( 'undo', () => {
 		await editor.canvas.locator( '[data-type="core/paragraph"]' ).click();
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
+
+		// Ensure the formatting action is committed before undoing.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: '<strong>test</strong>',
+				},
+			},
+		] );
+
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
@@ -529,14 +540,21 @@ class UndoUtils {
 				return {};
 			}
 
+			const blockEditor = window.wp.data.select( 'core/block-editor' );
+			const selectionStart = blockEditor.getSelectionStart();
+			const selectionEnd = blockEditor.getSelectionEnd();
+
 			return {
 				blockIndex,
-				startOffset: window.wp.data
-					.select( 'core/block-editor' )
-					.getSelectionStart().offset,
-				endOffset: window.wp.data
-					.select( 'core/block-editor' )
-					.getSelectionEnd().offset,
+				// Block-only selection states can omit rich-text offsets.
+				startOffset:
+					typeof selectionStart.offset === 'number'
+						? selectionStart.offset
+						: 0,
+				endOffset:
+					typeof selectionEnd.offset === 'number'
+						? selectionEnd.offset
+						: 0,
 			};
 		} );
 	}
