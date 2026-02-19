@@ -617,19 +617,23 @@ class WP_Theme_JSON_Gutenberg {
 	/**
 	 * Custom states for blocks that map to CSS class selectors rather than
 	 * CSS pseudo-selectors. Keys use the '@' prefix (e.g. '@current') to
-	 * distinguish them from real CSS pseudo-selectors. Values are the CSS
-	 * selector fragment to append to the block's base selector (including
-	 * any leading space for descendant selectors).
+	 * distinguish them from real CSS pseudo-selectors.
+	 *
+	 * Selector values control how the CSS selector is built:
+	 * - Leading space (e.g. ' .child'): appended to the block's base selector
+	 *   as a descendant selector.
+	 * - No leading space (e.g. '.some-class'): used as a standalone selector,
+	 *   independent of the block's base selector.
 	 *
 	 * Blocks listed here also inherit their VALID_BLOCK_PSEUDO_SELECTORS as
 	 * valid sub-states within each custom state, producing compound selectors
-	 * such as `.wp-block-navigation-link.current-menu-item:hover`.
+	 * such as `.wp-block-navigation-item.current-menu-item:hover`.
 	 *
 	 * @var array
 	 */
 	const VALID_BLOCK_CUSTOM_STATES = array(
 		'core/navigation-link' => array(
-			'@current' => '.current-menu-item',
+			'@current' => '.wp-block-navigation-item.current-menu-item',
 		),
 	);
 
@@ -3086,7 +3090,10 @@ class WP_Theme_JSON_Gutenberg {
 				if ( isset( static::VALID_BLOCK_CUSTOM_STATES[ $name ] ) ) {
 					foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $name ] as $custom_state => $class_selector ) {
 						if ( isset( $theme_json['styles']['blocks'][ $name ][ $custom_state ] ) ) {
-							$custom_css_selector = static::append_to_selector( $selector, $class_selector );
+							// A leading space means a descendant selector; no leading space means standalone.
+					$custom_css_selector = str_starts_with( $class_selector, ' ' )
+						? static::append_to_selector( $selector, $class_selector )
+						: $class_selector;
 							$nodes[]             = array(
 								'name'       => $name,
 								'path'       => array( 'styles', 'blocks', $name, $custom_state ),
