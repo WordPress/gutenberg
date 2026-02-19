@@ -41,7 +41,7 @@ let isClientSideMediaEnabledCache = null;
  * Checks if client-side media processing should be enabled.
  *
  * Returns true only if:
- * 1. The experimental media processing flag is enabled
+ * 1. The client-side media processing flag is enabled
  * 2. The browser supports WebAssembly, SharedArrayBuffer, cross-origin isolation, and CSP allows blob workers
  *
  * The result is cached for the session to ensure stability during React renders.
@@ -54,8 +54,8 @@ function shouldEnableClientSideMediaProcessing() {
 		return isClientSideMediaEnabledCache;
 	}
 
-	// Check if experimental flag is enabled first.
-	if ( ! window.__experimentalMediaProcessing ) {
+	// Check if the client-side media processing flag is enabled first.
+	if ( ! window.__clientSideMediaProcessing ) {
 		isClientSideMediaEnabledCache = false;
 		return false;
 	}

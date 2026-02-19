@@ -6,6 +6,9 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'iframed inline styles', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+		await requestUtils.activatePlugin(
 			'gutenberg-test-iframed-inline-styles'
 		);
 	} );
@@ -13,6 +16,9 @@ test.describe( 'iframed inline styles', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-iframed-inline-styles'
+		);
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
 		);
 	} );
 
