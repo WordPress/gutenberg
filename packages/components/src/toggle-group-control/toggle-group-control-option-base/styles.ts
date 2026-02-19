@@ -83,8 +83,6 @@ const pressed = css`
 `;
 
 const deselectable = css`
-	color: ${ COLORS.theme.foreground };
-
 	&:focus {
 		outline: ${ CONFIG.borderWidthFocus } solid ${ COLORS.ui.borderFocus };
 		outline-offset: 2px;
@@ -112,7 +110,6 @@ const isIconStyles = ( {
 	};
 
 	return css`
-		color: ${ COLORS.theme.foreground };
 		height: ${ iconButtonSizes[ size ] };
 		aspect-ratio: 1;
 		padding-left: 0;
