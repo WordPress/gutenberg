@@ -65,8 +65,7 @@ function render_block_core_latest_posts( $attributes ) {
 		$args['author'] = $attributes['selectedAuthor'];
 	}
 
-	$query        = new WP_Query();
-	$recent_posts = $query->query( $args );
+	$query = new WP_Query( $args );
 
 	if ( isset( $attributes['displayFeaturedImage'] ) && $attributes['displayFeaturedImage'] ) {
 		update_post_thumbnail_cache( $query );
@@ -74,9 +73,10 @@ function render_block_core_latest_posts( $attributes ) {
 
 	$list_items_markup = '';
 
-	foreach ( $recent_posts as $post ) {
-		$post_link = esc_url( get_permalink( $post ) );
-		$title     = get_the_title( $post );
+	while ( $query->have_posts() ) {
+		$query->the_post();
+		$post_link = esc_url( get_permalink() );
+		$title     = get_the_title();
 
 		if ( ! $title ) {
 			$title = __( '(no title)' );
@@ -84,7 +84,7 @@ function render_block_core_latest_posts( $attributes ) {
 
 		$list_items_markup .= '<li>';
 
-		if ( $attributes['displayFeaturedImage'] && has_post_thumbnail( $post ) ) {
+		if ( $attributes['displayFeaturedImage'] && has_post_thumbnail() ) {
 			$image_style = '';
 			if ( isset( $attributes['featuredImageSizeWidth'] ) ) {
 				$image_style .= sprintf( 'max-width:%spx;', $attributes['featuredImageSizeWidth'] );
@@ -99,7 +99,7 @@ function render_block_core_latest_posts( $attributes ) {
 			}
 
 			$featured_image = get_the_post_thumbnail(
-				$post,
+				null,
 				$attributes['featuredImageSizeSlug'],
 				array(
 					'style' => esc_attr( $image_style ),
@@ -127,7 +127,7 @@ function render_block_core_latest_posts( $attributes ) {
 		);
 
 		if ( isset( $attributes['displayAuthor'] ) && $attributes['displayAuthor'] ) {
-			$author_display_name = get_the_author_meta( 'display_name', $post->post_author );
+			$author_display_name = get_the_author_meta( 'display_name' );
 
 			/* translators: byline. %s: author. */
 			$byline = sprintf( __( 'by %s' ), $author_display_name );
@@ -143,15 +143,15 @@ function render_block_core_latest_posts( $attributes ) {
 		if ( isset( $attributes['displayPostDate'] ) && $attributes['displayPostDate'] ) {
 			$list_items_markup .= sprintf(
 				'<time datetime="%1$s" class="wp-block-latest-posts__post-date">%2$s</time>',
-				esc_attr( get_the_date( 'c', $post ) ),
-				get_the_date( '', $post )
+				esc_attr( get_the_date( 'c' ) ),
+				get_the_date( '' )
 			);
 		}
 
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
 			&& isset( $attributes['displayPostContentRadio'] ) && 'excerpt' === $attributes['displayPostContentRadio'] ) {
 
-			$trimmed_excerpt = get_the_excerpt( $post );
+			$trimmed_excerpt = get_the_excerpt();
 
 			/*
 			 * Adds a "Read more" link with screen reader text.
@@ -171,7 +171,7 @@ function render_block_core_latest_posts( $attributes ) {
 				}
 			}
 
-			if ( post_password_required( $post ) ) {
+			if ( post_password_required() ) {
 				$trimmed_excerpt = __( 'This content is password protected.' );
 			}
 
@@ -184,15 +184,16 @@ function render_block_core_latest_posts( $attributes ) {
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
 			&& isset( $attributes['displayPostContentRadio'] ) && 'full_post' === $attributes['displayPostContentRadio'] ) {
 
-			if ( post_password_required( $post ) ) {
+			if ( post_password_required() ) {
 				$post_content = __( 'This content is password protected.' );
 			} else {
-				$post_content = $post->post_content;
+				$post_id      = get_the_ID();
+				$post_content = get_post_field( 'post_content', $post_id );
 				// Check if we're already rendering this post to prevent infinite recursion.
-				if ( in_array( $post->ID, $rendering_stack, true ) ) {
+				if ( in_array( $post_id, $rendering_stack, true ) ) {
 					$post_content = '';
 				} else {
-					$rendering_stack[] = $post->ID;
+					$rendering_stack[] = $post_id;
 
 					try {
 						// Run through the actions that are typically taken on the_content.
@@ -212,6 +213,13 @@ function render_block_core_latest_posts( $attributes ) {
 
 		$list_items_markup .= "</li>\n";
 	}
+
+	/*
+	 * Use this function to restore the context of the template tags
+	 * from a secondary query loop back to the main query loop.
+	 * Since we use a custom loop, it's safest to always restore.
+	 */
+	wp_reset_postdata();
 
 	remove_filter( 'excerpt_length', 'block_core_latest_posts_get_excerpt_length', 20 );
 
