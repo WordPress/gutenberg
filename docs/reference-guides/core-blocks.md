@@ -434,7 +434,6 @@ Add custom HTML code and preview it as you edit. ([Source](https://github.com/Wo
 Insert an SVG icon. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/icon))
 
 -	**Name:** core/icon
--	**Experimental:** true
 -	**Category:** media
 -	**Supports:** align (center, left, right), anchor, ariaLabel, color (background, text), dimensions (width), interactivity (clientNavigation), spacing (margin, padding), ~~html~~
 -	**Attributes:** icon
