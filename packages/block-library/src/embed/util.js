@@ -245,15 +245,11 @@ export function getClassNames(
 		const hasPercentageWidth = widthAttr && widthAttr.includes( '%' );
 		const hasPercentageHeight = heightAttr && heightAttr.includes( '%' );
 
-		// If the embed has percentage-based dimensions, we generally want to skip adding aspect ratio classes, because the embed should already be responsive. However, if only one of the dimensions is percentage-based and the other is a fixed size that is very large, we should add aspect ratio classes to prevent it from breaking the layout.
-		// also if both dimensions are percentage-based, we should add aspect ratio classes to prevent layout issues.
-		if (
-			( hasPercentageWidth || hasPercentageHeight ) &&
-			! ( hasPercentageWidth && hasPercentageHeight )
-		) {
-			// If width is percentage with a reasonable fixed height (e.g., Spotify: 100% x 352px),
-			// skip aspect ratio to let it render naturally. But if height is very large (>800px),
-			// apply a constraining aspect ratio to prevent breaking the layout.
+		// Handle embeds with percentage-based dimensions.
+		// If only one dimension is a percentage, we handle it specially.
+		// If both dimensions are percentages, we fall through to calculate the ratio.
+		if ( hasPercentageWidth !== hasPercentageHeight ) {
+			// Only one dimension is a percentage. Check if the fixed dimension is unreasonably large.
 			const numericHeight = parseFloat( heightAttr );
 			const numericWidth = parseFloat( widthAttr );
 
