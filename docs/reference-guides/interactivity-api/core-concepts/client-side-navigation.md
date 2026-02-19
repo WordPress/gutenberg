@@ -43,9 +43,11 @@ If you already have an interactive block and want to add client-side navigation,
 
 ### Setting up router regions
 
-Router regions are the parts of your page that the router will update during client-side navigation. You mark them with the `data-wp-router-region` directive, which takes a unique ID as its value. When navigation occurs, the router matches regions on the current page with regions on the target page by their IDs and replaces their content — leaving everything outside router regions untouched.
+A router region is a section of your page that the router updates during client-side navigation. You define one by adding both `data-wp-router-region` and `data-wp-interactive` to the same element — both directives are required at this moment.
 
-Define a router region in your block's markup by adding `data-wp-router-region` alongside `data-wp-interactive`:
+The `data-wp-router-region` directive takes a unique ID as its value. When navigation occurs, the router matches regions on the current page with regions on the target page by their IDs and replaces their content — leaving everything outside router regions untouched. Each region ID must be unique within a page; if two regions share the same ID, the router won't know which one to update.
+
+Here's a basic router region in a block's markup:
 
 ```php
 // render.php
@@ -60,6 +62,47 @@ Define a router region in your block's markup by adding `data-wp-router-region` 
             <p><?php echo esc_html( $post->post_excerpt ); ?></p>
         </article>
     <?php endforeach; ?>
+</div>
+```
+
+#### Where to place router regions
+
+Router regions can be placed anywhere on the page. Their behavior depends on where they sit relative to other interactive elements and other router regions:
+
+**As a standalone element** — When a router region is not inside any existing `data-wp-interactive` element, it serves a dual role: it is the interactive boundary (since it carries `data-wp-interactive`) _and_ its content is updated during navigation:
+
+```html
+<div data-wp-interactive="myPlugin" data-wp-router-region="myPlugin/content">
+	<!-- Interactive boundary + navigable region -->
+	<p data-wp-text="state.message">Hello</p>
+</div>
+```
+
+**Inside an interactive element** — When a router region is nested inside an element that already has `data-wp-interactive`, the region becomes part of that element's virtual DOM. The parent interactive element stays untouched during navigation, but the region's content is updated:
+
+```html
+<div data-wp-interactive="myPlugin">
+	<h1>This heading is never updated during navigation</h1>
+
+	<div data-wp-interactive="myPlugin" data-wp-router-region="myPlugin/posts">
+		<!-- This content is updated during navigation -->
+	</div>
+</div>
+```
+
+Note that the router region still needs its own `data-wp-interactive` directive, even though it is already inside one.
+
+**Inside another router region** — When a router region is nested inside another router region, it becomes part of the parent region. The parent region is updated as a single unit during navigation; the nested region is not processed independently:
+
+```html
+<div data-wp-interactive="myPlugin" data-wp-router-region="myPlugin/main">
+	<!-- This inner region is part of "myPlugin/main" -->
+	<div
+		data-wp-interactive="myPlugin"
+		data-wp-router-region="myPlugin/sidebar"
+	>
+		<!-- Updated together with the parent region -->
+	</div>
 </div>
 ```
 
@@ -696,7 +739,7 @@ Router regions are the sections of your page that the router knows how to update
 
 **Defining router regions**
 
-You define a router region by adding the `data-wp-router-region` attribute to an element. The element must also be interactive (either having `data-wp-interactive` directly, or being a descendant of an element with `data-wp-interactive`).
+You define a router region by adding the `data-wp-router-region` attribute to an element alongside `data-wp-interactive` (as described in [Setting up router regions](#setting-up-router-regions) above).
 
 The attribute value serves as a unique identifier for that region. You can specify it in two ways:
 
@@ -722,35 +765,6 @@ The attribute value serves as a unique identifier for that region. You can speci
     ```
 
 The region ID must be unique within a single page and consistent across pages that share the same region. For example, if both your "Products" page and "Product Detail" page have a sidebar, and you want that sidebar to update during navigation, both pages should define a region with the same ID (e.g., `"myPlugin/sidebar"`).
-
-**Requirements for router regions**
-
-For a router region to function correctly, it must meet these requirements:
-
-1. **Must be inside an interactive scope**: The element with `data-wp-router-region` must either have `data-wp-interactive` itself, or be nested inside an element that does. This is because the router relies on the Interactivity API's directive processing to handle the region content.
-
-2. **Must have a unique ID**: No two regions on the same page should share the same ID. If they do, the router won't know which region to update.
-
-3. **Should include `data-wp-interactive` on nested regions**: When you place a router region inside another interactive element, always include the `data-wp-interactive` attribute on the region element itself:
-
-```html
-<!-- Correct: The region element has data-wp-interactive -->
-<div data-wp-interactive="myPlugin">
-	<div
-		data-wp-interactive="myPlugin"
-		data-wp-router-region="myPlugin/sidebar"
-	>
-		<!-- Sidebar content -->
-	</div>
-</div>
-
-<!-- Incorrect: This region may not update properly -->
-<div data-wp-interactive="myPlugin">
-	<div data-wp-router-region="myPlugin/sidebar">
-		<!-- This won't work reliably! -->
-	</div>
-</div>
-```
 
 **How regions are processed during page fetch**
 
