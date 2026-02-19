@@ -1,13 +1,13 @@
 /**
- * External dependencies
- */
-import Clipboard from 'clipboard';
-
-/**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
+
+/**
+ * Internal dependencies
+ */
+import { clearSelection, copyToClipboard } from '../use-copy-to-clipboard';
 
 /**
  * Copies the text to the clipboard when the element is clicked.
@@ -28,48 +28,67 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 		alternative: 'wp.compose.useCopyToClipboard',
 	} );
 
-	/** @type {React.MutableRefObject<Clipboard | undefined>} */
-	const clipboardRef = useRef( undefined );
 	const [ hasCopied, setHasCopied ] = useState( false );
 
 	useEffect( () => {
 		/** @type {number | undefined} */
 		let timeoutId;
-
 		if ( ! ref.current ) {
 			return;
 		}
 
-		// Clipboard listens to click events.
-		clipboardRef.current = new Clipboard( ref.current, {
-			text: () => ( typeof text === 'function' ? text() : text ),
-		} );
+		let targets;
+		if ( typeof ref.current === 'string' ) {
+			targets =
+				typeof document !== 'undefined'
+					? Array.from( document.querySelectorAll( ref.current ) )
+					: [];
+		} else if (
+			'length' in ref.current &&
+			typeof ref.current.length === 'number'
+		) {
+			targets = Array.from( ref.current );
+		} else {
+			targets = [ /** @type {Element} */ ( ref.current ) ];
+		}
 
-		clipboardRef.current.on( 'success', ( { clearSelection, trigger } ) => {
-			// Clearing selection will move focus back to the triggering button,
-			// ensuring that it is not reset to the body, and further that it is
-			// kept within the rendered node.
-			clearSelection();
+		if ( targets.length === 0 ) {
+			return;
+		}
 
-			// Handle ClipboardJS focus bug, see https://github.com/zenorocha/clipboard.js/issues/680
-			if ( trigger ) {
-				/** @type {HTMLElement} */ ( trigger ).focus();
+		const handleClick = ( /** @type {Event} */ event ) => {
+			const trigger = /** @type {Element} */ ( event.currentTarget );
+			if ( ! trigger ) {
+				return;
 			}
+			copyToClipboard(
+				typeof text === 'function' ? text() : text || '',
+				trigger
+			).then( ( success ) => {
+				if ( success ) {
+					clearSelection( trigger );
+					if ( timeout ) {
+						setHasCopied( true );
+						clearTimeout( timeoutId );
+						timeoutId = setTimeout(
+							() => setHasCopied( false ),
+							timeout
+						);
+					}
+				}
+			} );
+		};
 
-			if ( timeout ) {
-				setHasCopied( true );
-				clearTimeout( timeoutId );
-				timeoutId = setTimeout( () => setHasCopied( false ), timeout );
-			}
-		} );
-
+		for ( const target of targets ) {
+			target.addEventListener( 'click', handleClick );
+		}
 		return () => {
-			if ( clipboardRef.current ) {
-				clipboardRef.current.destroy();
+			for ( const target of targets ) {
+				target.removeEventListener( 'click', handleClick );
 			}
 			clearTimeout( timeoutId );
 		};
-	}, [ text, timeout, setHasCopied ] );
+	}, [ ref, text, timeout ] );
 
 	return hasCopied;
 }
