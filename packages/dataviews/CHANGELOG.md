@@ -5,6 +5,7 @@
 ### Bug Fixes
 
 - DataForm: Fix focus loss when collapsing in Card view. [#75689](https://github.com/WordPress/gutenberg/pull/75689)
+- DataViews: Fix spacing in first column. [#75693](https://github.com/WordPress/gutenberg/pull/75693)
 
 ## 12.0.0 (2026-02-18)
 
@@ -14,6 +15,7 @@
 
 ### Bug Fixes
 
+- DataViews: Fix first/last column header text misalignment in table layout when no bulk actions are present. [#75372](https://github.com/WordPress/gutenberg/issues/75372)
 - DataForm: Fix text selection in panel layout summary rows by replacing `::after` overlay with accessible card pattern. [#75565](https://github.com/WordPress/gutenberg/pull/75565)
 - DataViews: Improve styling for filters when long values are in use. [#75369](https://github.com/WordPress/gutenberg/pull/75369)
 - DataForm: Fix label case for regular layout. [#75292](https://github.com/WordPress/gutenberg/pull/75292)
