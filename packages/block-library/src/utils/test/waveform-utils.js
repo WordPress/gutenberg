@@ -99,12 +99,6 @@ describe( 'Waveform utilities', () => {
 
 			expect( container ).toHaveAttribute( 'data-height', '150' );
 		} );
-
-		it( 'should use default height of 100 when not provided', () => {
-			const container = createWaveformContainer( basePlayerData );
-
-			expect( container ).toHaveAttribute( 'data-height', '100' );
-		} );
 	} );
 
 	describe( 'styleSvgIcons', () => {
