@@ -80,16 +80,18 @@
 
 		.dataviews-primary-actions {
 			display: flex;
+			align-items: center;
 			position: absolute;
 			right: 100%;
-			top: 50%;
-			transform: translateY(-50%);
+			top: -$grid-unit-15;
+			bottom: -$grid-unit-15;
 			gap: $grid-unit-05;
 			opacity: 0;
 			pointer-events: none;
 			white-space: nowrap;
 			background-color: var(--wp-dataviews-color-background, $white);
-			padding-inline: $grid-unit-05;
+			padding-inline: $grid-unit-10;
+			border-left: 1px solid $gray-100;
 		}
 
 		@media (hover: none) {
@@ -125,6 +127,16 @@
 			.dataviews-primary-actions {
 				opacity: 1;
 				pointer-events: auto;
+			}
+
+			.dataviews-view-table__actions-column--stuck::after {
+				display: none;
+			}
+		}
+
+		&.is-selected {
+			.dataviews-view-table__actions-column--stuck::after {
+				display: none;
 			}
 		}
 	}
@@ -274,12 +286,22 @@
 		th {
 			padding: var(--wpds-dimension-padding-xs) var(--wpds-dimension-padding-sm);
 		}
+
+		tr .dataviews-primary-actions {
+			top: -$grid-unit-05;
+			bottom: -$grid-unit-05;
+		}
 	}
 
 	&.has-comfortable-density {
 		td,
 		th {
 			padding: var(--wpds-dimension-padding-lg) var(--wpds-dimension-padding-md);
+		}
+
+		tr .dataviews-primary-actions {
+			top: -$grid-unit-20;
+			bottom: -$grid-unit-20;
 		}
 	}
 
