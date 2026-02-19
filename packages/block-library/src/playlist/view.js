@@ -16,7 +16,7 @@ import { initWaveformPlayer } from '../utils/waveform-utils';
 /**
  * Store player state for each element.
  */
-const playerState = new Map();
+const playerState = new WeakMap();
 
 const { state } = store(
 	'core/playlist',
