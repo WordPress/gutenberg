@@ -546,15 +546,8 @@ class UndoUtils {
 
 			return {
 				blockIndex,
-				// Block-only selection states can omit rich-text offsets.
-				startOffset:
-					typeof selectionStart.offset === 'number'
-						? selectionStart.offset
-						: 0,
-				endOffset:
-					typeof selectionEnd.offset === 'number'
-						? selectionEnd.offset
-						: 0,
+				startOffset: selectionStart.offset,
+				endOffset: selectionEnd.offset,
 			};
 		} );
 	}
