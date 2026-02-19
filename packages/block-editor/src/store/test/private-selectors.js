@@ -2661,5 +2661,36 @@ describe( 'private selectors', () => {
 				)
 			).toBe( 'nav-parent' );
 		} );
+
+		it( 'returns the outermost (top-level) content ancestor, not the nearest, matching #75166 behaviour', () => {
+			// Tree: outer-list-view (content item) → inner-list-view (also a content item) → deep-child (selected)
+			// Both ancestors have list-view support; the outermost should win.
+			const nestedBlocks = {
+				byClientId: new Map( [
+					[ 'outer-list-view', { name: BLOCK_WITH_LIST_VIEW } ],
+					[ 'inner-list-view', { name: BLOCK_WITH_LIST_VIEW } ],
+					[ 'deep-child', { name: BLOCK_CHILD } ],
+				] ),
+				parents: new Map( [
+					[ 'outer-list-view', '' ],
+					[ 'inner-list-view', 'outer-list-view' ],
+					[ 'deep-child', 'inner-list-view' ],
+				] ),
+				order: new Map( [] ),
+				attributes: new Map( [] ),
+			};
+			const nestedContentIds = [ 'outer-list-view', 'inner-list-view' ];
+			const nestedState = {
+				blocks: nestedBlocks,
+				selection: {
+					selectionStart: { clientId: 'deep-child' },
+					selectionEnd: { clientId: 'deep-child' },
+				},
+			};
+
+			expect(
+				getListViewChildParentId( nestedState, nestedContentIds )
+			).toBe( 'outer-list-view' );
+		} );
 	} );
 } );

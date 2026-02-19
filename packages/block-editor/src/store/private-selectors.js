@@ -1396,8 +1396,12 @@ export function isSelectedBlockStyleStateShownOnCanvas( state, clientId ) {
 }
 
 /**
- * Returns the clientId of the nearest content-list ancestor that has list-view
- * support, if the currently selected block is a descendant of one.
+ * Returns the clientId of the top-level content-list ancestor that has
+ * list-view support, if the currently selected block is a descendant of one.
+ *
+ * "Top-level" matches the behaviour introduced in #75166: when blocks with
+ * list-view support are nested, the outermost one (the direct content item)
+ * owns the List View panel, not the nearest ancestor.
  *
  * Used to auto-switch the inspector to List View when a child of a list-view-
  * enabled content block (e.g. a Button inside Buttons) is selected in the canvas.
