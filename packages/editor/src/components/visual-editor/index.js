@@ -321,12 +321,14 @@ function VisualEditor( {
 		.is-root-container.alignfull { max-width: none; margin-left: auto; margin-right: auto;}
 		.is-root-container.alignfull:where(.is-layout-flow) > :not(.alignleft):not(.alignright) { max-width: none;}`;
 
+	const isNavigationOrDesignPostType = [
+		NAVIGATION_POST_TYPE,
+		TEMPLATE_PART_POST_TYPE,
+		PATTERN_POST_TYPE,
+	].includes( postType );
+
 	const enableResizing =
-		[
-			NAVIGATION_POST_TYPE,
-			TEMPLATE_PART_POST_TYPE,
-			PATTERN_POST_TYPE,
-		].includes( postType ) &&
+		isNavigationOrDesignPostType &&
 		// Disable in previews / view mode.
 		! isPreview &&
 		// Disable resizing in mobile viewport.
@@ -370,15 +372,22 @@ function VisualEditor( {
 				}}
 				${ paddingStyle ? paddingStyle : '' }
 				${
-					enableResizing
+					isNavigationOrDesignPostType
 						? `.block-editor-iframe__html{background:var(--wp-editor-canvas-background);display:flex;align-items:center;justify-content:center;min-height:100vh;}.block-editor-iframe__body{width:100%;}`
 						: ''
 				}`,
-				// The CSS above centers the body content vertically when resizing is enabled and applies a background
-				// color to the iframe HTML element to match the background color of the editor canvas.
+				// The CSS above centers the body content vertically for navigation, template parts,
+				// and patterns in both view and edit modes, and applies a background color to the
+				// iframe HTML element to match the background color of the editor canvas.
 			},
 		];
-	}, [ styles, enableResizing, calculatedMinHeight, paddingStyle ] );
+	}, [
+		styles,
+		enableResizing,
+		isNavigationOrDesignPostType,
+		calculatedMinHeight,
+		paddingStyle,
+	] );
 
 	const typewriterRef = useTypewriter();
 	contentRef = useMergeRefs( [
