@@ -87,6 +87,10 @@ export function SnackbarList( {
 					return (
 						<motion.div
 							layout={ isReducedMotion ? false : 'position' } // See https://www.framer.com/docs/animation/#layout-animations
+							// Ensures a stable full-width bounding box so that
+							// `layout="position"` only ever detects vertical
+							// shifts, preventing horizontal animation when
+							// notice text changes in place.
 							style={ { width: '100%' } }
 							initial="init"
 							animate="open"
