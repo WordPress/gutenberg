@@ -9,7 +9,13 @@ if ( ! gutenberg_is_client_side_media_processing_enabled() ) {
 	return;
 }
 
-wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
+/**
+ * Sets a global JS variable to indicate that client-side media processing is enabled.
+ */
+function gutenberg_set_client_side_media_processing_flag() {
+	wp_add_inline_script( 'wp-block-editor', 'window.__clientSideMediaProcessing = true', 'before' );
+}
+add_action( 'admin_init', 'gutenberg_set_client_side_media_processing_flag' );
 
 /**
  * Returns a list of all available image sizes.
