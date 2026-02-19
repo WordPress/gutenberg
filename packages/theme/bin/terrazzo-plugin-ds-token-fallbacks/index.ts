@@ -10,6 +10,13 @@ import { DEFAULT_SEED_COLORS } from '../../src/color-ramps/lib/constants';
 const WP_ADMIN_THEME_COLOR_VAR = '--wp-admin-theme-color';
 const PRIMARY_SEED = DEFAULT_SEED_COLORS.primary;
 
+const PRIMARY_SEED_OKLCH = getOKLCHValues( PRIMARY_SEED );
+const PRIMARY_SEED_OKLAB = oklchToOklab(
+	PRIMARY_SEED_OKLCH.l,
+	PRIMARY_SEED_OKLCH.c,
+	PRIMARY_SEED_OKLCH.h
+);
+
 function adminColorVar(): string {
 	return `var(${ WP_ADMIN_THEME_COLOR_VAR }, ${ PRIMARY_SEED })`;
 }
@@ -144,15 +151,20 @@ function computeBrandFallback( stepHex: string ): string {
 		return adminColorVar();
 	}
 
-	const seed = getOKLCHValues( PRIMARY_SEED );
 	const target = getOKLCHValues( stepHex );
-
-	const seedOklab = oklchToOklab( seed.l, seed.c, seed.h );
 	const targetOklab = oklchToOklab( target.l, target.c, target.h );
 
 	// Try both black and white mixing and pick the closer result.
-	const withBlack = optimalMixPercentage( seedOklab, targetOklab, 'black' );
-	const withWhite = optimalMixPercentage( seedOklab, targetOklab, 'white' );
+	const withBlack = optimalMixPercentage(
+		PRIMARY_SEED_OKLAB,
+		targetOklab,
+		'black'
+	);
+	const withWhite = optimalMixPercentage(
+		PRIMARY_SEED_OKLAB,
+		targetOklab,
+		'white'
+	);
 
 	const best = withBlack.dE <= withWhite.dE ? withBlack : withWhite;
 	const mixWith = withBlack.dE <= withWhite.dE ? 'black' : 'white';
