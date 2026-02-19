@@ -89,28 +89,45 @@ test.describe( 'new editor state', () => {
 		await expect( page.locator( 'body' ) ).toBeFocused();
 	} );
 
-	test( 'should be saveable with sufficient initial edits', async ( {
+	test( 'should be saveable with sufficient initial edits (RTC disabled)', async ( {
 		admin,
 		page,
+		requestUtils,
 	} ) => {
+		// Disable real-time collaboration.
+		await requestUtils.updateSiteSettings( {
+			enable_real_time_collaboration: false,
+		} );
+
 		await admin.createNewPost( { title: 'Here is the title' } );
 
-		// Check if real-time collaboration is enabled.
-		const isRtcEnabled = await page.evaluate(
-			() => window._wpCollaborationEnabled === true
+		// Without RTC, expect the traditional "Save draft" button.
+		const saveDraftButton = page.locator(
+			'role=button[name="Save draft"i]'
 		);
+		await expect( saveDraftButton ).toBeVisible();
+		await expect( saveDraftButton ).toBeEnabled();
+	} );
 
-		if ( isRtcEnabled ) {
-			// With RTC enabled, the post is auto-saved, so we expect "Saved".
-			const savedButton = page.locator( 'role=button[name="Saved"i]' );
-			await expect( savedButton ).toBeVisible();
-		} else {
-			// Without RTC, expect the traditional "Save draft" button.
-			const saveDraftButton = page.locator(
-				'role=button[name="Save draft"i]'
-			);
-			await expect( saveDraftButton ).toBeVisible();
-			await expect( saveDraftButton ).toBeEnabled();
-		}
+	test( 'should be saveable with sufficient initial edits (RTC enabled)', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		// Enable real-time collaboration.
+		await requestUtils.updateSiteSettings( {
+			enable_real_time_collaboration: true,
+		} );
+
+		await admin.createNewPost( { title: 'Here is the title' } );
+
+		// With RTC enabled, the post is auto-saved, so we expect "Saved".
+		const savedButton = page.locator( 'role=button[name="Saved"i]' );
+		await expect( savedButton ).toBeVisible();
+
+		// Restore the setting to avoid affecting other tests.
+		await requestUtils.updateSiteSettings( {
+			enable_real_time_collaboration: false,
+		} );
 	} );
 } );
