@@ -122,7 +122,7 @@ describe( 'Playlist block edit utilities', () => {
 			expect( result.image ).toBe( '' );
 		} );
 
-		it( 'should include valid image URLs', () => {
+		it( 'should include image URLs', () => {
 			const media = {
 				url: 'https://example.com/song.mp3',
 				title: 'My Song',
