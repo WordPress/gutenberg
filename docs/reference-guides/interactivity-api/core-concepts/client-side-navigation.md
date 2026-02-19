@@ -949,7 +949,7 @@ When the router fetches a new page, it extracts the import map from that page an
 
 **Preloading script modules and their dependencies**
 
-Preloading script modules is more complex than preloading styles because script modules can import other script modules. A single entry-point module might depend on dozens of other script modules, which might depend on dozens more.
+Preloading script modules requires resolving their full dependency tree, since a single entry-point module might depend on dozens of other script modules, which might depend on dozens more.
 
 To handle this, the router performs a recursive dependency resolution:
 
