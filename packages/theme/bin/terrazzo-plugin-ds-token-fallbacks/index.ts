@@ -94,7 +94,7 @@ const COLOR_MIX_DELTA_E_THRESHOLD = 0.08;
  * @param targetOklab.b
  * @param mixWith
  */
-export function optimalMixPercentage(
+function optimalMixPercentage(
 	seedOklab: { l: number; a: number; b: number },
 	targetOklab: { l: number; a: number; b: number },
 	mixWith: 'black' | 'white'
