@@ -69,7 +69,7 @@ export const buttonView = ( {
 	}
 
 	&:hover {
-		color: ${ COLORS.theme.gray[ 900 ] };
+		color: ${ COLORS.theme.foreground };
 	}
 
 	${ isDeselectable && deselectable }
