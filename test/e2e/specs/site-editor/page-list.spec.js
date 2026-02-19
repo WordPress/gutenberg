@@ -357,10 +357,15 @@ test.describe( 'Page List', () => {
 			await page.getByRole( 'button', { name: 'Layout' } ).click();
 			await page.getByRole( 'menuitemradio', { name: 'Table' } ).click();
 
-			// Trigger Quick Edit action on Privacy Policy row
+			// Trigger Quick Edit action on Privacy Policy row.
 			const row = page
-				.getByRole( 'row', { name: /Privacy Policy/ } )
-				.first();
+				.getByRole( 'row', {
+					name: /Privacy Policy/,
+				} )
+				.filter( {
+					// Targets newly created pages which are published by default.
+					has: page.getByRole( 'cell', { name: 'Published' } ),
+				} );
 			await row.getByRole( 'button', { name: 'Quick Edit' } ).click();
 		} );
 
