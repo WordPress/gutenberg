@@ -2,8 +2,7 @@
 	{
 		"blockName": "core/post-title",
 		"attrs": {
-			"textAlign": "left",
-			"level": 1
+			"textAlign": "left"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
@@ -19,8 +18,7 @@
 	{
 		"blockName": "core/post-title",
 		"attrs": {
-			"textAlign": "center",
-			"level": 1
+			"textAlign": "center"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
@@ -36,8 +34,7 @@
 	{
 		"blockName": "core/post-title",
 		"attrs": {
-			"textAlign": "right",
-			"level": 1
+			"textAlign": "right"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",

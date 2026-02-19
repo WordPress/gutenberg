@@ -3,7 +3,6 @@
 		"name": "core/post-title",
 		"isValid": true,
 		"attributes": {
-			"level": 1,
 			"isLink": false,
 			"rel": "",
 			"linkTarget": "_self",
@@ -19,7 +18,6 @@
 		"name": "core/post-title",
 		"isValid": true,
 		"attributes": {
-			"level": 1,
 			"isLink": false,
 			"rel": "",
 			"linkTarget": "_self",
@@ -35,7 +33,6 @@
 		"name": "core/post-title",
 		"isValid": true,
 		"attributes": {
-			"level": 1,
 			"isLink": false,
 			"rel": "",
 			"linkTarget": "_self",
