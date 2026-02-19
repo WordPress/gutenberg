@@ -15,8 +15,8 @@
 	-webkit-appearance: none;
 
 	margin: 0;
-	padding-block: var(--tab-padding-block, var(--wp--preset--spacing--20, 0.5em));
-	padding-inline: var(--tab-padding-inline, var(--wp--preset--spacing--30, 1em));
+	padding-block: var(--wp--preset--spacing--20, 0.5em);
+	padding-inline: var(--wp--preset--spacing--30, 1em);
 
 	// Inherit typography from parent
 	font-size: inherit;
@@ -32,18 +32,18 @@
 	}
 
 	&:focus-visible {
-		outline: 2px solid var(--tab-border-color-active, #000);
+		outline: 2px solid #000;
 		outline-offset: 2px;
 	}
 
 	&:hover {
-		background-color: #eaeaea !important;
-		color: #000 !important;
+		background-color: #eaeaea;
+		color: #000;
 	}
 
 	&[aria-selected="true"],
 	&.is-active {
-		background-color: #000 !important;
-		color: #fff !important;
+		background-color: #000;
+		color: #fff;
 	}
 }
