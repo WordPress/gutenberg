@@ -62,6 +62,11 @@ export const LayoutPanel = {
 			description: 'Chooses how to open the panel.',
 			options: [ 'default', 'dropdown', 'modal' ],
 		},
+		editVisibility: {
+			control: { type: 'select' },
+			description: 'Chooses when the edit icon is visible.',
+			options: [ 'default', 'always', 'on-hover' ],
+		},
 	},
 };
 

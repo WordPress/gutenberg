@@ -8,7 +8,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  */
 import { useDispatchWithMap } from '../use-dispatch';
 
-/** @typedef {import('react').ComponentType} ComponentType */
+/** @typedef {React.ComponentType} ComponentType */
 
 /**
  * Higher-order component used to add dispatch props using registered action

@@ -144,24 +144,6 @@
 	--wpds-font-weight-regular: 400; /* Regular font weight for body text */
 }
 
-[data-wpds-theme-provider-id][data-wpds-density='default'] {
-	--wpds-dimension-base: 4px; /* Base dimension unit */
-	--wpds-dimension-gap-2xl: 32px; /* 2x extra large gap */
-	--wpds-dimension-gap-3xl: 40px; /* 3x extra large gap */
-	--wpds-dimension-gap-lg: 16px; /* Large gap */
-	--wpds-dimension-gap-md: 12px; /* Medium gap */
-	--wpds-dimension-gap-sm: 8px; /* Small gap */
-	--wpds-dimension-gap-xl: 24px; /* Extra large gap */
-	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
-	--wpds-dimension-padding-2xl: 24px; /* 2x extra large padding */
-	--wpds-dimension-padding-3xl: 32px; /* 3x extra large padding */
-	--wpds-dimension-padding-lg: 16px; /* Large padding */
-	--wpds-dimension-padding-md: 12px; /* Medium padding */
-	--wpds-dimension-padding-sm: 8px; /* Small padding */
-	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
-	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
-}
-
 [data-wpds-theme-provider-id][data-wpds-density='compact'] {
 	--wpds-dimension-gap-2xl: 24px; /* 2x extra large gap */
 	--wpds-dimension-gap-3xl: 32px; /* 3x extra large gap */
@@ -194,6 +176,24 @@
 	--wpds-dimension-padding-sm: 12px; /* Small padding */
 	--wpds-dimension-padding-xl: 24px; /* Extra large padding */
 	--wpds-dimension-padding-xs: 8px; /* Extra small padding */
+}
+
+[data-wpds-theme-provider-id][data-wpds-density='default'] {
+	--wpds-dimension-base: 4px; /* Base dimension unit */
+	--wpds-dimension-gap-2xl: 32px; /* 2x extra large gap */
+	--wpds-dimension-gap-3xl: 40px; /* 3x extra large gap */
+	--wpds-dimension-gap-lg: 16px; /* Large gap */
+	--wpds-dimension-gap-md: 12px; /* Medium gap */
+	--wpds-dimension-gap-sm: 8px; /* Small gap */
+	--wpds-dimension-gap-xl: 24px; /* Extra large gap */
+	--wpds-dimension-gap-xs: 4px; /* Extra small gap */
+	--wpds-dimension-padding-2xl: 24px; /* 2x extra large padding */
+	--wpds-dimension-padding-3xl: 32px; /* 3x extra large padding */
+	--wpds-dimension-padding-lg: 16px; /* Large padding */
+	--wpds-dimension-padding-md: 12px; /* Medium padding */
+	--wpds-dimension-padding-sm: 8px; /* Small padding */
+	--wpds-dimension-padding-xl: 20px; /* Extra large padding */
+	--wpds-dimension-padding-xs: 4px; /* Extra small padding */
 }
 
 @media ( -webkit-min-device-pixel-ratio: 2 ), ( min-resolution: 192dpi ) {

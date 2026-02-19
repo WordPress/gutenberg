@@ -80,7 +80,7 @@ const CommentAvatarIndicator = ( { onClick, thread } ) => {
 			<ToolbarButton
 				className="comment-avatar-indicator"
 				label={ __( 'View notes' ) }
-				onClick={ onClick }
+				onClick={ () => onClick() }
 				showTooltip
 			>
 				<HStack spacing="1">

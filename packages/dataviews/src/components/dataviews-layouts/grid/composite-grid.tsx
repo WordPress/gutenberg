@@ -287,7 +287,7 @@ const GridItem = forwardRef( function GridItem< Item >(
 	props: GridItemProps< Item > & {
 		ref?: React.ForwardedRef< HTMLDivElement >;
 	}
-) => JSX.Element;
+) => React.ReactNode;
 
 interface CompositeGridProps< Item > {
 	data: Item[];

@@ -9,6 +9,7 @@ import {
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 	isRTL,
+	isFormElement,
 } from '@wordpress/dom';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -17,7 +18,7 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { getBlockClientId, isInSameBlock } from '../../utils/dom';
+import { getBlockClientId } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -114,14 +115,18 @@ export function getClosestTabbable(
 	}
 
 	function isTabCandidate( node ) {
-		// Skip if there's only one child that is content editable (and thus a
-		// better candidate).
+		// If it's a block and there are nested focusable nodes, skip because
+		// there are better candidates.
 		if (
-			node.children.length === 1 &&
-			isInSameBlock( node, node.firstElementChild ) &&
-			node.firstElementChild.getAttribute( 'contenteditable' ) === 'true'
+			getBlockClientId( node ) &&
+			focus.focusable
+				.find( node )
+				// Exclude form elements for now because primary+a cannot be
+				// used to select the parent element.
+				.filter( ( element ) => ! isFormElement( element ) ).length !==
+				0
 		) {
-			return;
+			return false;
 		}
 
 		// Not a candidate if the node is not tabbable.

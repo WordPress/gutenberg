@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 0.7.0-next.0 (2026-02-11)
+## 0.7.0 (2026-02-18)
 
 ### Breaking Changes
 
@@ -14,6 +14,13 @@
 -   Add `Tabs` primitive ([#74652](https://github.com/WordPress/gutenberg/pull/74652)).
 -   Add `Textarea` primitive ([#74707](https://github.com/WordPress/gutenberg/pull/74707)).
 
+### Bug Fixes
+
+-   `Tabs`: Replace hardcoded font values with design tokens on tab buttons ([#75537](https://github.com/WordPress/gutenberg/pull/75537)).
+-   `Field`: Fix default gap spacing ([#75446](https://github.com/WordPress/gutenberg/pull/75446)).
+-   `Button`: Fix disabled styles while `focusableWhenDisabled={false}` ([#75568](https://github.com/WordPress/gutenberg/pull/75568)).
+-   `IconButton`: make icon always `24px` regardless of `size` prop ([#75677](https://github.com/WordPress/gutenberg/pull/75677)).
+
 ### Enhancements
 
 -   `Button`: Add minimum content width (`6ch` + padding) to prevent overly narrow buttons with short labels ([#75133](https://github.com/WordPress/gutenberg/pull/75133)).
@@ -21,6 +28,7 @@
 ### Internal
 
 -   `Button`, `InputLayout`, `Tabs`: use semantic dimension tokens ([#74557](https://github.com/WordPress/gutenberg/pull/74557)).
+-   `Button`: Fix overriding of internal CSS variables ([#75568](https://github.com/WordPress/gutenberg/pull/75568)).
 
 ## 0.6.0 (2026-01-29)
 

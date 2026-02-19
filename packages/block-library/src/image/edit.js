@@ -25,6 +25,7 @@ import { image as icon, plugins as pluginsIcon } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { useResizeObserver } from '@wordpress/compose';
 import { getProtocol, prependHTTPS } from '@wordpress/url';
+import { store as uploadStore } from '@wordpress/upload-media';
 
 /**
  * Internal dependencies
@@ -344,6 +345,17 @@ export function ImageEdit( {
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
+
+	const isSideloading = useSelect(
+		( select ) => {
+			if ( ! window.__experimentalMediaProcessing || ! id ) {
+				return false;
+			}
+			return select( uploadStore ).isUploadingById( id );
+		},
+		[ id ]
+	);
+
 	const mediaPreview = !! url && (
 		<img
 			alt={ __( 'Edit image' ) }
@@ -357,7 +369,7 @@ export function ImageEdit( {
 	const shadowProps = getShadowClassesAndStyles( attributes );
 
 	const classes = clsx( className, {
-		'is-transient': !! temporaryURL,
+		'is-transient': !! temporaryURL || isSideloading,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'has-custom-border':
@@ -448,6 +460,7 @@ export function ImageEdit( {
 			<figure { ...blockProps }>
 				<Image
 					temporaryURL={ temporaryURL }
+					isSideloading={ isSideloading }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					isSingleSelected={ isSingleSelected }

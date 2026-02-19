@@ -122,10 +122,10 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		await admin.createNewPost();
 	} );
 
-	test( 'should register blocks with auto_register flag', async ( {
+	test( 'should register blocks with autoRegister flag', async ( {
 		editor,
 	} ) => {
-		// Block with auto_register flag should be insertable
+		// Block with autoRegister flag should be insertable
 		await editor.insertBlock( { name: 'test/auto-register-block' } );
 
 		const block = editor.canvas.getByText( 'Auto-register block content' );
@@ -138,7 +138,7 @@ test.describe( 'PHP-only auto-register blocks', () => {
 		} );
 		expect( blockType.apiVersion ).toBe( 3 );
 
-		// Block without auto_register flag should NOT exist in registry
+		// Block without autoRegister flag should NOT exist in registry
 		const blockExists = await editor.page.evaluate( () => {
 			return (
 				window.wp.blocks.getBlockType(

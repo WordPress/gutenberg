@@ -70,7 +70,7 @@ export type ModalProps = {
 	/**
 	 * If this property is added, an icon will be added before the title.
 	 */
-	icon?: JSX.Element;
+	icon?: React.JSX.Element;
 	/**
 	 * If this property is set to false, the modal will not display a close icon
 	 * and cannot be dismissed.

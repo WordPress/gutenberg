@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-## 2.39.1-next.0 (2026-02-11)
+## 2.40.0 (2026-02-18)
+
+### Deprecations
+
+-   Move `state.navigation.hasStarted` and `state.navigation.hasFinished` to a private store and deprecate direct access from the public `core/router` store. ([#70882](https://github.com/WordPress/gutenberg/pull/70882))
 
 ### Bug Fixes
 
@@ -43,8 +47,7 @@
 
 -   Preserve `media` attribute on intial style sheets after client-side navigation. ([70668](https://github.com/WordPress/gutenberg/pull/70668))
 
--  Ignores `<noscript>` elements while preparing DOM. ([70905](https://github.com/WordPress/gutenberg/pull/70905))
-
+-   Ignores `<noscript>` elements while preparing DOM. ([70905](https://github.com/WordPress/gutenberg/pull/70905))
 
 ## 2.26.0 (2025-06-25)
 

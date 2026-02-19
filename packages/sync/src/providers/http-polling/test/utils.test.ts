@@ -599,7 +599,7 @@ describe( 'http-polling utils', () => {
 				},
 				method: 'POST',
 				parse: false,
-				path: '/wp/v2/sync/updates',
+				path: '/wp-sync/v1/updates',
 			} );
 		} );
 

@@ -21,17 +21,21 @@ export type NormalizedRegularLayout = {
 	labelPosition: LabelPosition;
 };
 
+export type EditVisibility = 'always' | 'on-hover';
+
 export type PanelLayout = {
 	type: 'panel';
 	labelPosition?: LabelPosition;
 	openAs?: 'dropdown' | 'modal';
 	summary?: PanelSummaryField;
+	editVisibility?: EditVisibility;
 };
 export type NormalizedPanelLayout = {
 	type: 'panel';
 	labelPosition: LabelPosition;
 	openAs: 'dropdown' | 'modal';
 	summary: NormalizedPanelSummaryField;
+	editVisibility: EditVisibility;
 };
 
 export type CardSummaryField =

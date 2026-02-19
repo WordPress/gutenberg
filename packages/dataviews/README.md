@@ -2057,7 +2057,9 @@ For example:
 #### Panel
 
 -   `type`: `panel`. Required.
--   `labelPosition`: one of `side`, `top`, or `none`. Optional. `top` by default.
+-   `labelPosition`: one of `side`, `top`, or `none`. Optional. `side` by default.
+-   `editVisibility`: one of `always`, or `on-hover`. Optional. `on-hover` by default.
+-   `openAs`: one of `dropdown`, `modal`. Optional. `dropdown` by default.
 -   `summary`: Summary field configuration. Optional. Specifies which field(s) to display in the panel header. Can be:
     -   A string (single field ID)
     -   An array of strings (multiple field IDs)

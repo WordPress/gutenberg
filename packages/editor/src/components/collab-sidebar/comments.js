@@ -158,6 +158,7 @@ export function Comments( {
 			focusCommentThread( prevThread.id, commentSidebarRef.current );
 		} else {
 			selectNote( undefined );
+			toggleBlockSpotlight( comment.blockClientId, false );
 			// Move focus to the related block.
 			relatedBlockElement?.focus();
 		}

@@ -133,10 +133,10 @@ export function createLinkFormat( {
 	return format;
 }
 
-/* eslint-disable jsdoc/no-undefined-types */
 /**
- * Get the start and end boundaries of a given format from a rich text value.
+ * @typedef {import('@wordpress/rich-text').RichTextValue} RichTextValue
  *
+ * Get the start and end boundaries of a given format from a rich text value.
  *
  * @param {RichTextValue} value      the rich text value to interrogate.
  * @param {string}        format     the identifier for the target format (e.g. `core/link`, `core/bold`).
@@ -144,7 +144,6 @@ export function createLinkFormat( {
  * @param {number?}       endIndex   optional endIndex to seek from.
  * @return {Object}	object containing start and end values for the given format.
  */
-/* eslint-enable jsdoc/no-undefined-types */
 export function getFormatBoundary(
 	value,
 	format,

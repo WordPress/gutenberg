@@ -137,10 +137,13 @@ $z-layers: (
 	".editor-post-template__swap-template-modal": 1000001,
 	".editor-post-template__create-template-modal": 1000001,
 	".edit-site-template-panel__replace-template-modal": 1000001,
-	".fields-controls__template-modal": 1000001,
 
 	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
 	// because it uses emotion and not sass. We need it to render on top its parent popover.
+
+	// Show media replace flow and similar popovers beneath the media modal when its open.
+	".components-popover.block-editor-media-replace-flow__options": 99999,
+	".components-popover.block-editor-inspector-list-view-content-popover": 99999,
 
 	// ...Except for popovers immediately beneath wp-admin menu on large breakpoints
 	".components-popover.block-editor-inserter__popover": 99999,

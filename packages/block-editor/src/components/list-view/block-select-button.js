@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
+	Tooltip,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
@@ -33,6 +34,7 @@ import { useBlockLock } from '../block-lock';
 import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
+import { getBlockVisibilityLabel } from '../block-visibility';
 
 const { Badge } = unlock( componentsPrivateApis );
 
@@ -60,16 +62,13 @@ function ListViewBlockSelectButton(
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
-	const { isBlockHidden, hasPatternName } = useSelect(
+	const { hasPatternName, blockVisibility } = useSelect(
 		( select ) => {
-			const {
-				isBlockHiddenAnywhere: _isBlockHidden,
-				getBlockAttributes,
-			} = unlock( select( blockEditorStore ) );
+			const { getBlockAttributes } = unlock( select( blockEditorStore ) );
+			const attributes = getBlockAttributes( clientId );
 			return {
-				isBlockHidden: _isBlockHidden( clientId ),
-				hasPatternName:
-					!! getBlockAttributes( clientId )?.metadata?.patternName,
+				hasPatternName: !! attributes?.metadata?.patternName,
+				blockVisibility: attributes?.metadata?.blockVisibility,
 			};
 		},
 		[ clientId ]
@@ -78,6 +77,9 @@ function ListViewBlockSelectButton(
 	const shouldShowLockIcon = isLocked;
 	const isSticky = blockInformation?.positionType === 'sticky';
 	const images = useListViewImages( { clientId, isExpanded } );
+
+	// Determine visibility label from blockVisibility metadata
+	const visibilityLabel = getBlockVisibilityLabel( blockVisibility );
 
 	// The `href` attribute triggers the browser's native HTML drag operations.
 	// When the link is dragged, the element's outerHTML is set in DataTransfer object as text/html.
@@ -161,10 +163,15 @@ function ListViewBlockSelectButton(
 						) ) }
 					</span>
 				) : null }
-				{ isBlockHidden && (
-					<span className="block-editor-list-view-block-select-button__block-visibility">
-						<Icon icon={ unseen } />
-					</span>
+				{ !! visibilityLabel && (
+					<Tooltip text={ visibilityLabel }>
+						<span
+							className="block-editor-list-view-block-select-button__block-visibility"
+							aria-hidden="true"
+						>
+							<Icon icon={ unseen } />
+						</span>
+					</Tooltip>
 				) }
 				{ shouldShowLockIcon && (
 					<span className="block-editor-list-view-block-select-button__lock">
