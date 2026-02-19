@@ -12,15 +12,18 @@ import {
 	logPlayError,
 } from '../waveform-utils';
 
+// Base player data used across tests
+const basePlayerData = {
+	url: 'https://example.com/song.mp3',
+	waveformColor: 'rgba(0, 0, 0, 0.3)',
+	progressColor: 'rgba(0, 0, 0, 0.6)',
+	buttonColor: '#000000',
+};
+
 describe( 'Waveform utilities', () => {
 	describe( 'createWaveformContainer', () => {
 		it( 'should create a container with required data attributes', () => {
-			const container = createWaveformContainer( {
-				url: 'https://example.com/song.mp3',
-				waveformColor: 'rgba(0, 0, 0, 0.3)',
-				progressColor: 'rgba(0, 0, 0, 0.6)',
-				buttonColor: '#000000',
-			} );
+			const container = createWaveformContainer( basePlayerData );
 
 			expect( container.tagName ).toBe( 'DIV' );
 			expect( container ).toHaveAttribute( 'data-waveform-player', '' );
@@ -49,11 +52,8 @@ describe( 'Waveform utilities', () => {
 
 		it( 'should set title as data-title attribute', () => {
 			const container = createWaveformContainer( {
-				url: 'https://example.com/song.mp3',
+				...basePlayerData,
 				title: 'My Song',
-				waveformColor: 'rgba(0, 0, 0, 0.3)',
-				progressColor: 'rgba(0, 0, 0, 0.6)',
-				buttonColor: '#000000',
 			} );
 
 			expect( container ).toHaveAttribute( 'data-title', 'My Song' );
@@ -61,11 +61,8 @@ describe( 'Waveform utilities', () => {
 
 		it( 'should set artist as data-subtitle attribute', () => {
 			const container = createWaveformContainer( {
-				url: 'https://example.com/song.mp3',
+				...basePlayerData,
 				artist: 'The Artist',
-				waveformColor: 'rgba(0, 0, 0, 0.3)',
-				progressColor: 'rgba(0, 0, 0, 0.6)',
-				buttonColor: '#000000',
 			} );
 
 			expect( container ).toHaveAttribute(
@@ -76,11 +73,8 @@ describe( 'Waveform utilities', () => {
 
 		it( 'should set artwork as data-artwork attribute', () => {
 			const container = createWaveformContainer( {
-				url: 'https://example.com/song.mp3',
+				...basePlayerData,
 				artwork: 'https://example.com/cover.jpg',
-				waveformColor: 'rgba(0, 0, 0, 0.3)',
-				progressColor: 'rgba(0, 0, 0, 0.6)',
-				buttonColor: '#000000',
 			} );
 
 			expect( container ).toHaveAttribute(
@@ -90,12 +84,7 @@ describe( 'Waveform utilities', () => {
 		} );
 
 		it( 'should not set optional attributes when not provided', () => {
-			const container = createWaveformContainer( {
-				url: 'https://example.com/song.mp3',
-				waveformColor: 'rgba(0, 0, 0, 0.3)',
-				progressColor: 'rgba(0, 0, 0, 0.6)',
-				buttonColor: '#000000',
-			} );
+			const container = createWaveformContainer( basePlayerData );
 
 			expect( container ).not.toHaveAttribute( 'data-title' );
 			expect( container ).not.toHaveAttribute( 'data-subtitle' );
@@ -104,10 +93,7 @@ describe( 'Waveform utilities', () => {
 
 		it( 'should use custom height when provided', () => {
 			const container = createWaveformContainer( {
-				url: 'https://example.com/song.mp3',
-				waveformColor: 'rgba(0, 0, 0, 0.3)',
-				progressColor: 'rgba(0, 0, 0, 0.6)',
-				buttonColor: '#000000',
+				...basePlayerData,
 				height: 150,
 			} );
 
@@ -115,12 +101,7 @@ describe( 'Waveform utilities', () => {
 		} );
 
 		it( 'should use default height of 100 when not provided', () => {
-			const container = createWaveformContainer( {
-				url: 'https://example.com/song.mp3',
-				waveformColor: 'rgba(0, 0, 0, 0.3)',
-				progressColor: 'rgba(0, 0, 0, 0.6)',
-				buttonColor: '#000000',
-			} );
+			const container = createWaveformContainer( basePlayerData );
 
 			expect( container ).toHaveAttribute( 'data-height', '100' );
 		} );
