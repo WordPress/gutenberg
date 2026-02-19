@@ -40,6 +40,21 @@ import type { ColorPickerProps, ColorType } from './types';
 
 extend( [ namesPlugin ] );
 
+/**
+ * Merges incoming HSLA with previous state, preserving hue for achromatic
+ * colors and saturation only at lightness extremes (black/white) where
+ * it has no visual effect.
+ */
+function mergeHSLA( nextHSLA: HslaColor, prevHSLA: HslaColor ): HslaColor {
+	if ( nextHSLA.s === 0 ) {
+		if ( nextHSLA.l === 0 || nextHSLA.l === 100 ) {
+			return { ...nextHSLA, h: prevHSLA.h, s: prevHSLA.s };
+		}
+		return { ...nextHSLA, h: prevHSLA.h };
+	}
+	return nextHSLA;
+}
+
 const options = [
 	{ label: 'RGB', value: 'rgb' as const },
 	{ label: 'HSL', value: 'hsl' as const },
@@ -98,25 +113,20 @@ const UnconnectedColorPicker = (
 		// Genuinely external change — sync internalHSLA.
 		lastProducedHexRef.current = incomingHex;
 		const externalHSLA = safeColordColor.toHsl();
-		if ( externalHSLA.s === 0 ) {
-			// Achromatic — preserve the user's hue and saturation.
-			setInternalHSLA( ( prev ) => ( {
-				...externalHSLA,
-				h: prev.h,
-				s: prev.s,
-			} ) );
-		} else {
-			setInternalHSLA( externalHSLA );
-		}
+		setInternalHSLA( ( prev ) => mergeHSLA( externalHSLA, prev ) );
 	}, [ safeColordColor ] );
 
 	// Handler for HSL-aware components (Picker, HSL inputs) that
 	// provide raw HSLA values without information loss.
 	// Uses direct setColor (not debounced) to prevent race conditions
 	// where a stale debounced hex would overwrite newer internalHSLA.
+	// This is safe performance-wise because react-colorful internally
+	// throttles its onChange callbacks using requestAnimationFrame.
 
 	const handleHSLAChange = useCallback(
 		( nextHSLA: HslaColor ) => {
+			// No mergeHSLA here — this handler receives the user's explicit
+			// choice from the picker or HSL inputs, with no lossy conversion.
 			setInternalHSLA( nextHSLA );
 			const previousHex = lastProducedHexRef.current;
 			const nextHex = colord( nextHSLA ).toHex();
@@ -136,15 +146,7 @@ const UnconnectedColorPicker = (
 	const handleChange = useCallback(
 		( nextValue: Colord ) => {
 			const nextHSLA = nextValue.toHsl();
-			if ( nextHSLA.s === 0 ) {
-				setInternalHSLA( ( prev ) => ( {
-					...nextHSLA,
-					h: prev.h,
-					s: prev.s,
-				} ) );
-			} else {
-				setInternalHSLA( nextHSLA );
-			}
+			setInternalHSLA( ( prev ) => mergeHSLA( nextHSLA, prev ) );
 			const nextHex = nextValue.toHex();
 			lastProducedHexRef.current = nextHex;
 			debouncedSetColor( nextHex );

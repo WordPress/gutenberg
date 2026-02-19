@@ -356,6 +356,43 @@ describe( 'ColorPicker', () => {
 			expect( onChange ).toHaveBeenLastCalledWith( '#000000' );
 		} );
 
+		it( 'should reset saturation to 0 when a mid-gray is entered via hex input', async () => {
+			const user = userEvent.setup();
+
+			render(
+				<ControlledColorPicker
+					enableAlpha={ false }
+					initialColor="#2ad5d5" // hsl(180, 67%, 50%)
+				/>
+			);
+
+			const formatSelector = screen.getByRole( 'combobox' );
+
+			// Start in hex mode and enter a mid-gray.
+			await user.selectOptions( formatSelector, 'hex' );
+			const hexInput = screen.getByRole( 'textbox' );
+			await user.clear( hexInput );
+			await user.type( hexInput, '808080' );
+
+			// Switch to HSL to inspect the values.
+			await user.selectOptions( formatSelector, 'hsl' );
+
+			const saturationSlider = screen.getByRole( 'slider', {
+				name: 'Saturation',
+			} );
+			const saturationNumberInput = screen.getByRole( 'spinbutton', {
+				name: 'Saturation',
+			} );
+
+			// #808080 is hsl(0, 0%, 50%) — a pure mid-gray.
+			// Saturation must be 0, not the stale value from the
+			// previous chromatic color.
+			await waitFor( () =>
+				expect( saturationSlider ).toHaveValue( '0' )
+			);
+			expect( saturationNumberInput ).toHaveValue( 0 );
+		} );
+
 		it( 'should preserve hue when saturation is set to 0', async () => {
 			const onChange = jest.fn();
 
