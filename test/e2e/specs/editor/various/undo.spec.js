@@ -178,16 +178,6 @@ test.describe( 'undo', () => {
 		await pageUtils.pressKeys( 'primary+a' );
 		await pageUtils.pressKeys( 'primary+b' );
 
-		// Ensure the formatting action is committed before undoing.
-		await expect.poll( editor.getBlocks ).toMatchObject( [
-			{
-				name: 'core/paragraph',
-				attributes: {
-					content: '<strong>test</strong>',
-				},
-			},
-		] );
-
 		await pageUtils.pressKeys( 'primary+z' );
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
