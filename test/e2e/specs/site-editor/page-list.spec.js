@@ -277,6 +277,7 @@ test.describe( 'Page List', () => {
 
 					await page
 						.getByRole( 'option', { name: 'Sample Page' } )
+						.first()
 						.click();
 				},
 				assertEditedState: async ( page ) => {
