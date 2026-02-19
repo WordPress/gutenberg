@@ -97,7 +97,7 @@ test.describe( 'new editor state', () => {
 		// Save the original setting value (default to false if not set).
 		const settings = await requestUtils.getSiteSettings();
 		const originalRtcSetting =
-			settings.enable_real_time_collaboration ?? false;
+			settings.enable_real_time_collaboration ?? true;
 
 		// Disable real-time collaboration.
 		await requestUtils.updateSiteSettings( {
@@ -127,7 +127,7 @@ test.describe( 'new editor state', () => {
 		// Save the original setting value (default to false if not set).
 		const settings = await requestUtils.getSiteSettings();
 		const originalRtcSetting =
-			settings.enable_real_time_collaboration ?? false;
+			settings.enable_real_time_collaboration ?? true;
 
 		// Enable real-time collaboration.
 		await requestUtils.updateSiteSettings( {
