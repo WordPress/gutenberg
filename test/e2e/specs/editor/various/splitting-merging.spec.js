@@ -545,7 +545,7 @@ test.describe( 'splitting and merging blocks (@firefox, @webkit)', () => {
 			await page.keyboard.type( 'item 1' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'item 2' );
-			await pageUtils.pressKeys( 'ArrowUp', { times: 3 } );
+			await pageUtils.pressKeys( 'ArrowUp', { times: 2 } );
 			await page.keyboard.press( 'Delete' );
 
 			expect( await editor.getBlocks() ).toMatchObject( snap1 );

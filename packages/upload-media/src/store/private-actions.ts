@@ -15,6 +15,7 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
  * Internal dependencies
  */
 import { cloneFile, convertBlobToFile, renameFile } from '../utils';
+import { CLIENT_SIDE_SUPPORTED_MIME_TYPES } from './constants';
 import { StubFile } from '../stub-file';
 import { UploadError } from '../upload-error';
 import {
@@ -710,9 +711,12 @@ export function prepareItem( id: QueueItemId ) {
 		const settings = select.getSettings();
 
 		const isImage = file.type.startsWith( 'image/' );
+		const isVipsSupported = CLIENT_SIDE_SUPPORTED_MIME_TYPES.includes(
+			file.type
+		);
 
-		// For images, check if we need to scale down based on threshold.
-		if ( isImage ) {
+		// For images that can be processed by vips, check if we need to scale down based on threshold.
+		if ( isImage && isVipsSupported ) {
 			const { bigImageSizeThreshold, imageOutputFormats } = settings;
 
 			// If a threshold is set, add a resize operation to scale down large images.
@@ -758,7 +762,19 @@ export function prepareItem( id: QueueItemId ) {
 			operations,
 		} );
 
-		dispatch.finishOperation( id, {} );
+		// If the file is not processed by vips, tell the server to
+		// generate sub-sizes since they won't be created client-side.
+		const updates =
+			! isVipsSupported || ! isImage
+				? {
+						additionalData: {
+							...item.additionalData,
+							generate_sub_sizes: true,
+						},
+				  }
+				: {};
+
+		dispatch.finishOperation( id, updates );
 	};
 }
 

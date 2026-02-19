@@ -58,6 +58,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'clearBlockSelection',
 	'codeEditingEnabled',
 	'colors',
+	'disableContentOnlyForUnsyncedPatterns',
 	'disableCustomColors',
 	'disableCustomFontSizes',
 	'disableCustomSpacingSizes',
@@ -282,27 +283,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ saveEntityRecord, userCanCreatePages ]
 	);
 
-	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
-
-	/**
-	 * Wraps onNavigateToEntityRecord to automatically include the currently selected block.
-	 * This ensures that navigation can restore the selection when returning to the previous entity.
-	 */
-	const wrappedOnNavigateToEntityRecord = useCallback(
-		( params ) => {
-			if ( ! settings.onNavigateToEntityRecord ) {
-				return;
-			}
-			const selectedBlockClientId = getSelectedBlockClientId();
-
-			return settings.onNavigateToEntityRecord( {
-				...params,
-				selectedBlockClientId,
-			} );
-		},
-		[ settings, getSelectedBlockClientId ]
-	);
-
 	const allowedBlockTypes = useMemo( () => {
 		// Omit hidden block types if exists and non-empty.
 		if ( hiddenBlockTypes && hiddenBlockTypes.length > 0 ) {
@@ -344,9 +324,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			hasFixedToolbar,
 			isDistractionFree,
 			keepCaretInsideBlock,
-			onNavigateToEntityRecord: settings.onNavigateToEntityRecord
-				? wrappedOnNavigateToEntityRecord
-				: undefined,
+			onNavigateToEntityRecord: settings.onNavigateToEntityRecord,
 			[ getMediaSelectKey ]: ( select, attachmentId ) => {
 				return select( coreStore ).getEntityRecord(
 					'postType',
@@ -439,7 +417,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		globalStylesLinksData,
 		renderingMode,
 		editMediaEntity,
-		wrappedOnNavigateToEntityRecord,
+		settings.onNavigateToEntityRecord,
 		deviceType,
 		allImageSizes,
 		bigImageSizeThreshold,

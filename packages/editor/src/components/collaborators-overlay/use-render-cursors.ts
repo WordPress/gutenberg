@@ -6,6 +6,8 @@ import {
 import { useEffect, useMemo, useState } from '@wordpress/element';
 
 import { unlock } from '../../lock-unlock';
+import { getAvatarUrl } from './get-avatar-url';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 const { useActiveCollaborators, useGetAbsolutePositionIndex } =
 	unlock( coreDataPrivateApis );
@@ -14,6 +16,7 @@ export interface CursorData {
 	userName: string;
 	clientId: number;
 	color: string;
+	avatarUrl?: string;
 	x: number;
 	y: number;
 	height: number;
@@ -66,7 +69,10 @@ export function useRenderCursors(
 				};
 				const userName = user.collaboratorInfo.name;
 				const clientId = user.clientId;
-				const color = user.collaboratorInfo.color;
+				const color = getAvatarBorderColor( user.collaboratorInfo.id );
+				const avatarUrl = getAvatarUrl(
+					user.collaboratorInfo.avatar_urls
+				);
 
 				let coords: {
 					x: number;
@@ -120,6 +126,7 @@ export function useRenderCursors(
 						userName,
 						clientId,
 						color,
+						avatarUrl,
 						...coords,
 					} );
 				}

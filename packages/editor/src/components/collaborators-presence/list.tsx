@@ -1,11 +1,19 @@
 import { __ } from '@wordpress/i18n';
-import { Popover, Button } from '@wordpress/components';
+import {
+	Popover,
+	Button,
+	privateApis as componentsPrivateApis,
+} from '@wordpress/components';
 import { close } from '@wordpress/icons';
 import { type PostEditorAwarenessState } from '@wordpress/core-data';
 
-import { Avatar } from './avatar';
+import { unlock } from '../../lock-unlock';
+import { getAvatarUrl } from '../collaborators-overlay/get-avatar-url';
+import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
 import './styles/collaborators-list.scss';
+
+const { Avatar } = unlock( componentsPrivateApis );
 
 interface CollaboratorsListProps {
 	activeCollaborators: PostEditorAwarenessState[];
@@ -63,11 +71,14 @@ export function CollaboratorsList( {
 							} }
 						>
 							<Avatar
-								collaboratorInfo={
+								src={ getAvatarUrl(
 									collaboratorState.collaboratorInfo
-								}
-								showCollaboratorColorBorder
-								size="medium"
+										.avatar_urls
+								) }
+								name={ collaboratorState.collaboratorInfo.name }
+								borderColor={ getAvatarBorderColor(
+									collaboratorState.collaboratorInfo.id
+								) }
 							/>
 							<div className="editor-collaborators-presence__list-item-info">
 								<div className="editor-collaborators-presence__list-item-name">

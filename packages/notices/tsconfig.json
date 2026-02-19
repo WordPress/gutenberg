@@ -5,5 +5,9 @@
 		"types": [ "gutenberg-env" ],
 		"checkJs": false
 	},
-	"references": [ { "path": "../a11y" }, { "path": "../data" } ]
+	"references": [
+		{ "path": "../a11y" },
+		{ "path": "../components" },
+		{ "path": "../data" }
+	]
 }

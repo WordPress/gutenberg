@@ -19,6 +19,7 @@ export default defineConfig( {
 	tokens: [
 		'./tokens/border.json',
 		'./tokens/color.json',
+		'./tokens/cursor.json',
 		'./tokens/dimension.json',
 		'./tokens/elevation.json',
 		'./tokens/typography.json',

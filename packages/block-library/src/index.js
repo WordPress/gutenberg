@@ -266,6 +266,7 @@ const getAllBlocks = () => {
 		postCommentsForm,
 		tableOfContents,
 		homeLink,
+		icon,
 		logInOut,
 		navigationOverlayClose,
 		termCount,
@@ -276,11 +277,6 @@ const getAllBlocks = () => {
 		queryTitle,
 		postAuthorBiography,
 		breadcrumbs,
-		tab,
-		tabs,
-		tabsMenu,
-		tabsMenuItem,
-		tabPanel,
 	];
 
 	if ( window?.__experimentalEnableFormBlocks ) {
@@ -291,12 +287,13 @@ const getAllBlocks = () => {
 	}
 
 	if ( window?.__experimentalEnableBlockExperiments ) {
+		blocks.push( tab );
+		blocks.push( tabs );
+		blocks.push( tabsMenu );
+		blocks.push( tabsMenuItem );
+		blocks.push( tabPanel );
 		blocks.push( playlist );
 		blocks.push( playlistTrack );
-	}
-
-	if ( window?.__experimentalEnableIconBlock ) {
-		blocks.push( icon );
 	}
 
 	// When in a WordPress context, conditionally

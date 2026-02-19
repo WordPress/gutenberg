@@ -676,6 +676,33 @@ export function icons( state = [], action ) {
 	return state;
 }
 
+/**
+ * Reducer managing sync connection states for entities.
+ * Keyed by "kind/name:id" (e.g., "postType/post:123").
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function syncConnectionStatuses( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_SYNC_CONNECTION_STATUS': {
+			const key = `${ action.kind }/${ action.name }:${ action.key }`;
+			return {
+				...state,
+				[ key ]: action.status,
+			};
+		}
+		case 'CLEAR_SYNC_CONNECTION_STATUS': {
+			const key = `${ action.kind }/${ action.name }:${ action.key }`;
+			const { [ key ]: _, ...rest } = state;
+			return rest;
+		}
+	}
+	return state;
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -699,4 +726,5 @@ export default combineReducers( {
 	editorSettings,
 	editorAssets,
 	icons,
+	syncConnectionStatuses,
 } );

@@ -245,11 +245,6 @@ export default function PostList( { postType } ) {
 	const editAction = useEditPostAction();
 	const quickEditAction = useQuickEditPostAction();
 	const actions = useMemo( () => {
-		if ( ! window.__experimentalQuickEditDataViews ) {
-			const editActionPrimary = { ...editAction, isPrimary: true };
-			return [ editActionPrimary, ...postTypeActions ];
-		}
-
 		if ( view.type === LAYOUT_LIST ) {
 			const editActionPrimary = { ...editAction, isPrimary: true };
 			return [ editActionPrimary, ...postTypeActions ];

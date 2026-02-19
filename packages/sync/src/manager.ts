@@ -143,6 +143,7 @@ export function createSyncManager( debug = false ): SyncManager {
 			addUndoMeta: debugWrap( handlers.addUndoMeta ),
 			editRecord: debugWrap( handlers.editRecord ),
 			getEditedRecord: debugWrap( handlers.getEditedRecord ),
+			onStatusChange: debugWrap( handlers.onStatusChange ),
 			refetchRecord: debugWrap( handlers.refetchRecord ),
 			restoreUndoMeta: debugWrap( handlers.restoreUndoMeta ),
 			saveRecord: debugWrap( handlers.saveRecord ),
@@ -156,6 +157,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			providerResults.forEach( ( result ) => result.destroy() );
+			handlers.onStatusChange( null );
 			recordMap.unobserveDeep( onRecordUpdate );
 			recordMetaMap.unobserve( onRecordMetaUpdate );
 			ydoc.destroy();
@@ -228,9 +230,19 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
-			providerCreators.map( ( create ) =>
-				create( { objectType, objectId, ydoc, awareness } )
-			)
+			providerCreators.map( async ( create ) => {
+				const provider = await create( {
+					objectType,
+					objectId,
+					ydoc,
+					awareness,
+				} );
+
+				// Attach status listener after provider creation.
+				provider.on( 'status', handlers.onStatusChange );
+
+				return provider;
+			} )
 		);
 
 		// Attach observers.
@@ -270,6 +282,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		// Clean up providers and in-memory state when the entity is unloaded.
 		const unload = (): void => {
 			providerResults.forEach( ( result ) => result.destroy() );
+			handlers.onStatusChange( null );
 			recordMetaMap.unobserve( onRecordMetaUpdate );
 			ydoc.destroy();
 			collectionStates.delete( objectType );
@@ -312,13 +325,18 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		// Create providers for the given entity and its Yjs document.
 		const providerResults = await Promise.all(
-			providerCreators.map( ( create ) => {
-				return create( {
+			providerCreators.map( async ( create ) => {
+				const provider = await create( {
 					awareness,
 					objectType,
 					objectId: null,
 					ydoc,
 				} );
+
+				// Attach status listener after provider creation.
+				provider.on( 'status', handlers.onStatusChange );
+
+				return provider;
 			} )
 		);
 

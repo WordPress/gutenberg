@@ -137,7 +137,6 @@ $z-layers: (
 	".editor-post-template__swap-template-modal": 1000001,
 	".editor-post-template__create-template-modal": 1000001,
 	".edit-site-template-panel__replace-template-modal": 1000001,
-	".fields-controls__template-modal": 1000001,
 
 	// Note: The ConfirmDialog component's z-index is being set to 1000001 in packages/components/src/confirm-dialog/styles.ts
 	// because it uses emotion and not sass. We need it to render on top its parent popover.

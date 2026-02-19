@@ -80,7 +80,7 @@
 /test/php/gutenberg-coding-standards            @anton-vlasenko
 
 # UI Components
-/packages/components                            @ajitbohra
+/packages/components                            @ajitbohra @WordPress/gutenberg-components
 /packages/compose                               @ajitbohra
 /packages/element                               @ajitbohra
 /packages/notices                               @ajitbohra

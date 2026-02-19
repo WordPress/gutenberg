@@ -6,13 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	createPortal,
-	forwardRef,
-	useMemo,
-	useEffect,
-} from '@wordpress/element';
+import { useState, createPortal, forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	useMergeRefs,
@@ -102,6 +96,54 @@ function useBubbleEvents( iframeDocument ) {
 	} );
 }
 
+const iframeSrcCache = new WeakMap();
+const iframeSrcCleanup = globalThis.FinalizationRegistry
+	? new globalThis.FinalizationRegistry( ( url ) =>
+			URL.revokeObjectURL( url )
+	  )
+	: undefined;
+
+function getIframeSrc( resolvedAssets ) {
+	let src = iframeSrcCache.get( resolvedAssets );
+	if ( src ) {
+		return src;
+	}
+
+	// Correct doctype is required to enable rendering in standards mode.
+	// Also preload the styles to avoid a flash of unstyled content.
+	const html = `<!doctype html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<base href="${ window.location.href }">
+		<script>window.frameElement._load()</script>
+		<style>
+			html{
+				height: auto !important;
+				min-height: 100%;
+			}
+			/* Lowest specificity to not override global styles */
+			:where(body) {
+				margin: 0;
+				/* Default background color in case zoom out mode background
+				colors the html element */
+				background-color: white;
+			}
+		</style>
+		${ resolvedAssets.styles ?? '' }
+		${ resolvedAssets.scripts ?? '' }
+	</head>
+	<body>
+		<script>document.currentScript.parentElement.remove()</script>
+	</body>
+</html>`;
+
+	src = URL.createObjectURL( new Blob( [ html ], { type: 'text/html' } ) );
+	iframeSrcCache.set( resolvedAssets, src );
+	iframeSrcCleanup?.register( resolvedAssets, src );
+	return src;
+}
+
 function Iframe( {
 	contentRef,
 	children,
@@ -114,14 +156,12 @@ function Iframe( {
 	...props
 } ) {
 	const { resolvedAssets, isPreviewMode } = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		const settings = getSettings();
+		const settings = select( blockEditorStore ).getSettings();
 		return {
 			resolvedAssets: settings.__unstableResolvedAssets,
 			isPreviewMode: settings.isPreviewMode,
 		};
 	}, [] );
-	const { styles = '', scripts = '' } = resolvedAssets;
 	/** @type {[Document, React.Dispatch<Document>]} */
 	const [ iframeDocument, setIframeDocument ] = useState();
 	const [ bodyClasses, setBodyClasses ] = useState( [] );
@@ -251,44 +291,7 @@ function Iframe( {
 		disabledRef,
 	] );
 
-	// Correct doctype is required to enable rendering in standards
-	// mode. Also preload the styles to avoid a flash of unstyled
-	// content.
-	const html = `<!doctype html>
-<html>
-	<head>
-		<meta charset="utf-8">
-		<base href="${ window.location.origin }">
-		<script>window.frameElement._load()</script>
-		<style>
-			html{
-				height: auto !important;
-				min-height: 100%;
-			}
-			/* Lowest specificity to not override global styles */
-			:where(body) {
-				margin: 0;
-				/* Default background color in case zoom out mode background
-				colors the html element */
-				background-color: white;
-			}
-		</style>
-		${ styles }
-		${ scripts }
-	</head>
-	<body>
-		<script>document.currentScript.parentElement.remove()</script>
-	</body>
-</html>`;
-
-	const [ src, cleanup ] = useMemo( () => {
-		const _src = URL.createObjectURL(
-			new window.Blob( [ html ], { type: 'text/html' } )
-		);
-		return [ _src, () => URL.revokeObjectURL( _src ) ];
-	}, [ html ] );
-
-	useEffect( () => cleanup, [ cleanup ] );
+	const src = getIframeSrc( resolvedAssets );
 
 	// Make sure to not render the before and after focusable div elements in view
 	// mode. They're only needed to capture focus in edit mode.
@@ -307,9 +310,6 @@ function Iframe( {
 				} }
 				ref={ useMergeRefs( [ ref, setRef ] ) }
 				tabIndex={ tabIndex }
-				// Correct doctype is required to enable rendering in standards
-				// mode. Also preload the styles to avoid a flash of unstyled
-				// content.
 				src={ src }
 				title={ title }
 				onKeyDown={ ( event ) => {

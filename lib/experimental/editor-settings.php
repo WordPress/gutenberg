@@ -19,14 +19,8 @@ function gutenberg_enable_experiments() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-no-tinymce' ) ) {
 		wp_add_inline_script( 'wp-block-library', 'window.__experimentalDisableTinymce = true', 'before' );
 	}
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-quick-edit-dataviews', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalQuickEditDataViews = true', 'before' );
-	}
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-dataviews-media-modal', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalDataViewsMediaModal = true', 'before' );
-	}
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-media-processing', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalMediaProcessing = true', 'before' );
 	}
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-content-only-inspector-fields', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalContentOnlyInspectorFields = true', 'before' );
@@ -68,11 +62,6 @@ function gutenberg_enable_block_experiments() {
 	// General experimental blocks that are not in the default block library.
 	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-block-experiments', $gutenberg_experiments ) ) {
 		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableBlockExperiments = true', 'before' );
-	}
-
-	// Adding explicit support for the Icon block if the SVG icon registry is active.
-	if ( $gutenberg_experiments && array_key_exists( 'gutenberg-svg-icon-registry', $gutenberg_experiments ) ) {
-		wp_add_inline_script( 'wp-block-editor', 'window.__experimentalEnableIconBlock = true', 'before' );
 	}
 }
 

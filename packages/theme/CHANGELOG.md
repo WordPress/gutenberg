@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `--wpds-cursor-control` design token for interactive non-link elements ([#75697](https://github.com/WordPress/gutenberg/pull/75697)).
+
+## 0.7.0 (2026-02-18)
+
 ### Breaking changes
 
 -   Renamed padding tokens to remove the `surface` segment and updated the scale from `2xs`–`lg` to `xs`–`3xl` ([#75054](https://github.com/WordPress/gutenberg/pull/75054)). To preserve the same values:
