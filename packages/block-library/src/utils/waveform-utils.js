@@ -246,6 +246,7 @@ export function initWaveformPlayer(
 			);
 			cleanupAccessibility?.();
 			instance.destroy();
+			container.remove();
 		},
 	};
 }
