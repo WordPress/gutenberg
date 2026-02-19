@@ -268,87 +268,6 @@ store( 'myPagination', {
 } );
 ```
 
-## Block compatibility
-
-For client-side navigation to work correctly, the blocks inside a router region need to be compatible with it. A block is compatible when it can be re-rendered by the router without breaking its functionality. This primarily depends on how the block handles interactivity.
-
-Blocks declare their compatibility with client-side navigation through the `supports.interactivity` field in their `block.json` file. This information tells WordPress whether a block can safely participate in region-based navigation.
-
-### The `supports.interactivity` field
-
-The `supports.interactivity` field in `block.json` can be set as a boolean or as an object with two sub-properties:
-
--   **`interactive`** (`boolean`, default: `false`): Indicates whether the block uses Interactivity API directives.
--   **`clientNavigation`** (`boolean`, default: `false`): Indicates whether the block is compatible with client-side navigation.
-
-Setting `supports.interactivity` to `true` is a shorthand for setting both `interactive` and `clientNavigation` to `true`:
-
-```json
-{
-	"supports": {
-		"interactivity": true
-	}
-}
-```
-
-This is equivalent to:
-
-```json
-{
-	"supports": {
-		"interactivity": {
-			"clientNavigation": true,
-			"interactive": true
-		}
-	}
-}
-```
-
-The `clientNavigation` property is the key to compatibility. Set it to `true` only if:
-
--   The block is **not interactive** (it renders only static HTML), or
--   The block **is interactive and uses the Interactivity API** for all its client-side behavior.
-
-Set it to `false` (or leave it unset) if the block is interactive but uses vanilla JavaScript, jQuery, or any other JavaScript framework or library other than the Interactivity API.
-
-### Non-interactive blocks
-
-Blocks that render only static HTML — with no JavaScript-driven interactivity — are inherently compatible with client-side navigation. Since they have no client-side state to manage or event listeners to re-attach, they can be safely re-rendered by the router at any time.
-
-For these blocks, set only `clientNavigation` to `true`:
-
-```json
-{
-	"supports": {
-		"interactivity": {
-			"clientNavigation": true
-		}
-	}
-}
-```
-
-Examples of non-interactive blocks include the Paragraph, Heading, Image, and List blocks. Even though they don't use Interactivity API directives, they are fully compatible with client-side navigation because their output is purely static HTML.
-
-### Interactive blocks using other libraries
-
-Blocks that use vanilla JavaScript, jQuery, or other JavaScript frameworks for interactivity are **not compatible** with client-side navigation. When the router replaces a region's content, any event listeners attached via these libraries are lost, and the block's JavaScript will not re-initialize for the new content.
-
-For these blocks, leave `supports.interactivity` at its default value (`false`) or explicitly set `clientNavigation` to `false`:
-
-```json
-{
-	"supports": {
-		"interactivity": {
-			"clientNavigation": false
-		}
-	}
-}
-```
-
-<div class="callout callout-warning">
-WordPress does not currently disable client-side navigation automatically when an incompatible block is detected inside a router region. However, blocks can check for incompatible descendants and disable it manually. For example, the Query block's enhanced pagination detects incompatible inner blocks and sets <code>clientNavigationDisabled</code> to <code>true</code> using <code>wp_interactivity_config()</code>, which causes the router to fall back to full page reloads. See <a href="#disabling-client-side-navigation-on-certain-pages">Disabling client-side navigation on certain pages</a> for details on <code>clientNavigationDisabled</code>.
-</div>
-
 ## More advanced use cases
 
 ### Handling scroll and focus
@@ -1145,7 +1064,7 @@ Once enabled, this mode automatically intercepts all link clicks and hover event
 import '@wordpress/interactivity-router/full-page';
 ```
 
-Full-page client-side navigation is essentially a special case of region-based navigation where there is only one region covering the whole page. Because it replaces all content, **every block on the page must be compatible with client-side navigation** — meaning all interactive blocks must use the Interactivity API (not jQuery or other libraries). See [Block compatibility](#block-compatibility) for details on how to declare block compatibility.
+Full-page client-side navigation is essentially a special case of region-based navigation where there is only one region covering the whole page. Because it replaces all content, **every interactive element on the page must use the Interactivity API** (not jQuery or other libraries) for client-side navigation to work correctly.
 
 <div class="callout callout-alert">
 This feature is experimental and still under active development. It may not work correctly in all scenarios. If you try it out, please report any issues you encounter in the <a href="https://github.com/WordPress/gutenberg/issues">Gutenberg GitHub repository</a>. Contributions are also welcome!
