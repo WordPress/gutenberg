@@ -40,7 +40,9 @@ function render_block_core_playlist_track( $attributes ) {
 		$html .= '<span class="wp-block-playlist-track__title">' . wp_kses_post( $title ) . '</span>';
 	}
 	if ( $artist ) {
+		$html .= '<span class="screen-reader-text">,</span>';
 		$html .= '<span class="wp-block-playlist-track__artist">' . wp_kses_post( $artist ) . '</span>';
+		$html .= '<span class="screen-reader-text">,</span>';
 	}
 	$html .= '</span>';
 
@@ -51,6 +53,7 @@ function render_block_core_playlist_track( $attributes ) {
 		$html .= '</span>';
 	}
 
+	$html .= '<span class="screen-reader-text">.</span>';
 	$html .= '<span class="screen-reader-text">' . esc_html__( 'Select to play this track' ) . '</span>';
 	$html .= '</button>';
 	$html .= '</li>';
