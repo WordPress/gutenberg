@@ -703,6 +703,24 @@ export function syncConnectionStatuses( state = {}, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning whether collaboration has been disabled at runtime
+ * (e.g. due to incompatible meta boxes).
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function collaborationDisabled( state = false, action ) {
+	switch ( action.type ) {
+		case 'DISABLE_COLLABORATION':
+			return true;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	users,
 	currentTheme,
@@ -727,4 +745,5 @@ export default combineReducers( {
 	editorAssets,
 	icons,
 	syncConnectionStatuses,
+	collaborationDisabled,
 } );

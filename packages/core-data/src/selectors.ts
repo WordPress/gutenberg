@@ -54,6 +54,7 @@ export interface State {
 	editorSettings: Record< string, any > | null;
 	editorAssets: Record< string, any > | null;
 	icons: Icon[];
+	collaborationDisabled: boolean;
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 }
 
@@ -1604,6 +1605,18 @@ export const getRevision = createSelector(
 		];
 	}
 );
+
+/**
+ * Returns true if collaboration was disabled at runtime (e.g. due to
+ * incompatible meta boxes).
+ *
+ * @param state Data state.
+ *
+ * @return Whether collaboration has been disabled.
+ */
+export function isCollaborationDisabled( state: State ): boolean {
+	return state.collaborationDisabled;
+}
 
 /**
  * Returns the current sync connection status across all entities. Prioritizes

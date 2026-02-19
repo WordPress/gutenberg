@@ -1887,6 +1887,10 @@ export function isPublishSidebarOpened( state ) {
  */
 export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 	( select ) => ( state ) => {
+		if ( select( coreStore ).isCollaborationDisabled() ) {
+			return false;
+		}
+
 		const currentPostType = getCurrentPostType( state );
 		const entityConfig = select( coreStore ).getEntityConfig(
 			'postType',

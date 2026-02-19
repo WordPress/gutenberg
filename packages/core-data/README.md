@@ -969,6 +969,18 @@ _Returns_
 
 -   `boolean`: Whether the entity record is autosaving or not.
 
+### isCollaborationDisabled
+
+Returns true if collaboration was disabled at runtime (e.g. due to incompatible meta boxes).
+
+_Parameters_
+
+-   _state_ `State`: Data state.
+
+_Returns_
+
+-   `boolean`: Whether collaboration has been disabled.
+
 ### isDeletingEntityRecord
 
 Returns true if the specified entity record is deleting, and false otherwise.

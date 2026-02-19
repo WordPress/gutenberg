@@ -24,6 +24,7 @@ import { PluginArea } from '@wordpress/plugins';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	useCallback,
+	useEffect,
 	useMemo,
 	useId,
 	useRef,
@@ -396,10 +397,13 @@ function Layout( {
 		isWelcomeGuideVisible,
 		templateId,
 		isDevicePreview,
+		areMetaBoxesReady,
+		isCollaborationEnabled,
 	} = useSelect(
 		( select ) => {
 			const { get } = select( preferencesStore );
-			const { isFeatureActive, hasMetaBoxes } = select( editPostStore );
+			const { isFeatureActive, hasMetaBoxes, areMetaBoxesInitialized } =
+				select( editPostStore );
 			const { canUser, getPostType, getTemplateId } = unlock(
 				select( coreStore )
 			);
@@ -447,6 +451,11 @@ function Layout( {
 						? _templateId
 						: null,
 				isDevicePreview: getDeviceType() !== 'Desktop',
+				areMetaBoxesReady: areMetaBoxesInitialized() && hasMetaBoxes(),
+				isCollaborationEnabled:
+					select(
+						editorStore
+					).isCollaborationEnabledForCurrentPost(),
 			};
 		},
 		[
@@ -459,6 +468,21 @@ function Layout( {
 	);
 
 	useMetaBoxInitialization( hasActiveMetaboxes && hasResolvedMode );
+
+	// Disable real-time collaboration when non-compatible meta boxes are detected.
+	const { disableCollaboration } = unlock( useDispatch( coreStore ) );
+
+	useEffect( () => {
+		if ( areMetaBoxesReady && isCollaborationEnabled ) {
+			disableCollaboration();
+		}
+	}, [
+		areMetaBoxesReady,
+		isCollaborationEnabled,
+		disableCollaboration,
+		currentPostType,
+		currentPostId,
+	] );
 
 	// Set the right context for the command palette
 	const commandContext = hasBlockSelected

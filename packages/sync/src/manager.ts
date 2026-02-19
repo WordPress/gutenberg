@@ -75,10 +75,12 @@ function getEntityId(
  *
  * @param debug Whether to enable performance and debug logging.
  */
-export function createSyncManager( debug = false ): SyncManager {
+export function createSyncManager( debug = true ): SyncManager {
 	const debugWrap = debug ? logPerformanceTiming : passThru;
 	const collectionStates: Map< ObjectType, CollectionState > = new Map();
 	const entityStates: Map< EntityID, EntityState > = new Map();
+
+	let isDisabled = false;
 
 	/**
 	 * A "sync-aware" undo manager for all synced entities. It is lazily created
@@ -112,6 +114,16 @@ export function createSyncManager( debug = false ): SyncManager {
 	let undoManager: SyncUndoManager | undefined;
 
 	/**
+	 * Disable syncing, unload all entities and collections, and clean up
+	 * providers and in-memory state.
+	 */
+	function disable(): void {
+		isDisabled = true;
+		entityStates.forEach( ( state ) => state.unload() );
+		collectionStates.forEach( ( state ) => state.unload() );
+	}
+
+	/**
 	 * Load an entity for syncing and manage its lifecycle.
 	 *
 	 * @param {SyncConfig}     syncConfig Sync configuration for the object type.
@@ -131,6 +143,10 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		if ( 0 === providerCreators.length ) {
 			return; // No provider creators, so syncing is effectively disabled.
+		}
+
+		if ( isDisabled ) {
+			return; // Syncing has been disabled.
 		}
 
 		const entityId = getEntityId( objectType, objectId );
@@ -269,6 +285,10 @@ export function createSyncManager( debug = false ): SyncManager {
 
 		if ( 0 === providerCreators.length ) {
 			return; // No provider creators, so syncing is effectively disabled.
+		}
+
+		if ( isDisabled ) {
+			return; // Syncing has been disabled.
 		}
 
 		if ( collectionStates.has( objectType ) ) {
@@ -600,6 +620,7 @@ export function createSyncManager( debug = false ): SyncManager {
 	// Wrap and return the public API.
 	return {
 		createMeta: debugWrap( createEntityMeta ),
+		disable: debugWrap( disable ),
 		getAwareness,
 		load: debugWrap( loadEntity ),
 		loadCollection: debugWrap( loadCollection ),

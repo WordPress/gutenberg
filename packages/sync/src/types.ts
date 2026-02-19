@@ -159,6 +159,7 @@ export interface SyncManager {
 		objectType: ObjectType,
 		objectId: ObjectID
 	) => Record< string, string >;
+	disable: () => void;
 	getAwareness: < State extends Awareness >(
 		objectType: ObjectType,
 		objectId: ObjectID

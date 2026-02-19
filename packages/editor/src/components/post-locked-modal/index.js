@@ -26,6 +26,7 @@ function PostLockedModal() {
 	const hookName = 'core/editor/post-locked-modal-' + instanceId;
 	const { autosave, updatePostLock } = useDispatch( editorStore );
 	const {
+		hasCollaborationBeenDisabled,
 		isCollaborationEnabled,
 		isLocked,
 		isTakeover,
@@ -47,8 +48,9 @@ function PostLockedModal() {
 			getEditedPostPreviewLink,
 			getEditorSettings,
 		} = select( editorStore );
-		const { getPostType } = select( coreStore );
+		const { getPostType, isCollaborationDisabled } = select( coreStore );
 		return {
+			hasCollaborationBeenDisabled: isCollaborationDisabled(),
 			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),
 			isLocked: isPostLocked(),
 			isTakeover: isPostLockTakeover(),
@@ -197,29 +199,38 @@ function PostLockedModal() {
 				) }
 				<div>
 					{ !! isTakeover && (
-						<p>
-							{ createInterpolateElement(
-								userDisplayName
-									? sprintf(
-											/* translators: %s: user's display name */
-											__(
-												'<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
-											),
-											userDisplayName
-									  )
-									: __(
-											'Another user now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
-									  ),
-								{
-									strong: <strong />,
-									PreviewLink: (
-										<ExternalLink href={ previewLink }>
-											{ __( 'preview' ) }
-										</ExternalLink>
-									),
-								}
+						<>
+							<p>
+								{ createInterpolateElement(
+									userDisplayName
+										? sprintf(
+												/* translators: %s: user's display name */
+												__(
+													'<strong>%s</strong> now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
+												),
+												userDisplayName
+										  )
+										: __(
+												'Another user now has editing control of this post (<PreviewLink />). Don’t worry, your changes up to this moment have been saved.'
+										  ),
+									{
+										strong: <strong />,
+										PreviewLink: (
+											<ExternalLink href={ previewLink }>
+												{ __( 'preview' ) }
+											</ExternalLink>
+										),
+									}
+								) }
+							</p>
+							{ hasCollaborationBeenDisabled && (
+								<p>
+									{ __(
+										'Real-time collaboration is not available for this post because it uses meta boxes that are not compatible with collaborative editing.'
+									) }
+								</p>
 							) }
-						</p>
+						</>
 					) }
 					{ ! isTakeover && (
 						<>
@@ -251,6 +262,13 @@ function PostLockedModal() {
 									'If you take over, the other user will lose editing control to the post, but their changes will be saved.'
 								) }
 							</p>
+							{ hasCollaborationBeenDisabled && (
+								<p>
+									{ __(
+										'Real-time collaboration is not available for this post because it uses meta boxes that are not compatible with collaborative editing.'
+									) }
+								</p>
+							) }
 						</>
 					) }
 
