@@ -21,7 +21,7 @@ import {
 	type PostChanges,
 	type YPostRecord,
 } from '../crdt';
-import type { YBlock, YBlocks } from '../crdt-blocks';
+import type { YBlock, YBlockRecord, YBlocks } from '../crdt-blocks';
 import { updateSelectionHistory } from '../crdt-selection';
 import { createYMap, getRootMap, type YMapWrap } from '../crdt-utils';
 import type { Post, Type } from '../../entity-types';
@@ -741,7 +741,7 @@ describe( 'crdt', () => {
  * @param content  Initial text content.
  */
 function addBlockToDoc(
-	map: Y.Map< unknown >,
+	map: YMapWrap< YPostRecord >,
 	clientId: string,
 	content: string
 ): Y.Text {
@@ -751,7 +751,7 @@ function addBlockToDoc(
 		map.set( 'blocks', blocks );
 	}
 
-	const block = new Y.Map() as YBlock;
+	const block = createYMap< YBlockRecord >();
 	block.set( 'clientId', clientId );
 	const attrs = new Y.Map();
 	const ytext = new Y.Text( content );
