@@ -122,6 +122,10 @@ $palette-header-height: 48px;
 		}
 	}
 
+	[cmdk-group]:has([cmdk-group-items]:empty) {
+		display: none;
+	}
+
 	[cmdk-root] > [cmdk-list] {
 		height: min($palette-max-height - $palette-header-height, calc(70vh - $palette-header-height));
 		overflow: auto;
@@ -145,7 +149,7 @@ $palette-header-height: 48px;
 			padding: 0 $grid-unit-10;
 		}
 
-		.commands-command-menu__section-heading {
+		[cmdk-group-heading] {
 			margin-top: $grid-unit-10;
 			padding: $grid-unit-10 $grid-unit-20;
 			line-height: $grid-unit-20;
@@ -153,13 +157,6 @@ $palette-header-height: 48px;
 			font-weight: $font-weight-medium;
 			text-transform: uppercase;
 			color: $gray-900;
-
-			// Hide heading when its adjacent group has no visible items.
-			&:has(
-			+ [cmdk-group] [cmdk-group-items]:not(:has([cmdk-item]))
-		) {
-				display: none;
-			}
 		}
 	}
 
