@@ -283,7 +283,7 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 
 			// Handle root comment entities
 			if ( 'root' === $entity_kind && 'comment' === $entity_name && is_numeric( $object_id ) ) {
-				return current_user_can( 'edit_comment', absint( $object_id ) );
+				return current_user_can( 'edit_comment', (int) $object_id );
 			}
 
 			// All of the remaining checks are for collections. If an object ID is
