@@ -84,4 +84,16 @@ describe( 'computeBrandFallback', () => {
 	it( 'returns the plain hex when color-mix cannot approximate', () => {
 		expect( computeBrandFallback( '#ff0000' ) ).toBe( '#ff0000' );
 	} );
+
+	it( 'throws on colors with alpha (8-digit hex)', () => {
+		expect( () => computeBrandFallback( '#3858e980' ) ).toThrow(
+			/does not support colors with alpha/
+		);
+	} );
+
+	it( 'throws on colors with alpha (4-digit hex)', () => {
+		expect( () => computeBrandFallback( '#f008' ) ).toThrow(
+			/does not support colors with alpha/
+		);
+	} );
 } );

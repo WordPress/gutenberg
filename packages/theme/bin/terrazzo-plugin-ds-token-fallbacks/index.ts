@@ -147,6 +147,14 @@ export function optimalMixPercentage(
  * @param stepHex
  */
 export function computeBrandFallback( stepHex: string ): string {
+	const hexDigits = stepHex.replace( /^#/, '' );
+	if ( hexDigits.length === 8 || hexDigits.length === 4 ) {
+		throw new Error(
+			`computeBrandFallback does not support colors with alpha: ${ stepHex }. ` +
+				'The color-mix() fallback strategy does not model transparency.'
+		);
+	}
+
 	if ( stepHex.toLowerCase() === PRIMARY_SEED.toLowerCase() ) {
 		return adminColorVar();
 	}
