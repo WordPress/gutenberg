@@ -26,6 +26,9 @@ export async function copyToClipboard( text, trigger ) {
 	}
 	const { defaultView } = ownerDocument;
 	try {
+		const isSecureContext = defaultView?.isSecureContext;
+		// eslint-disable-next-line no-console
+		console.log( 'isSecureContext:', isSecureContext );
 		if ( defaultView?.navigator?.clipboard?.writeText ) {
 			// eslint-disable-next-line no-console
 			console.log( 'Clipboard API is available.' );
