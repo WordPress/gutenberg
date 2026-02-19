@@ -74,7 +74,9 @@ function generatePrimitiveColorTokens() {
 			) ) {
 				colorJson[ 'wpds-color' ].primitive[ scaleName ][ tokenName ] =
 					{
-						$value: transformColorStringToDTCGValue( tokenValue ),
+						$value: transformColorStringToDTCGValue(
+							tokenValue as string
+						),
 					};
 			}
 		} );
