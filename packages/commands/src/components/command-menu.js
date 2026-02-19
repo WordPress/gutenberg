@@ -46,7 +46,8 @@ import { unlock } from '../lock-unlock';
 const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );
 
 const inputLabel = __( 'Search commands and settings' );
-const MAX_RECENTLY_USED = 5;
+const MAX_RECENTLY_SAVED = 15;
+const MAX_RECENTLY_DISPLAYED = 5;
 
 /**
  * Icons enforced per command category.
@@ -107,7 +108,7 @@ function useRecentCommands() {
 			const next = [
 				name,
 				...current.filter( ( n ) => n !== name ),
-			].slice( 0, MAX_RECENTLY_USED );
+			].slice( 0, MAX_RECENTLY_SAVED );
 			setPreference( 'core/commands', 'recentlyUsed', next );
 		},
 		[ setPreference ]
@@ -311,11 +312,12 @@ function RecentGroup() {
 		return null;
 	}
 
+	const displayNames = recentlyUsedNames.slice( 0, MAX_RECENTLY_DISPLAYED );
+	const displaySet = new Set( displayNames );
 	const commandsByName = new Map( allCommands.map( ( c ) => [ c.name, c ] ) );
-	const recentCommands = recentlyUsedNames
+	const recentCommands = displayNames
 		.map( ( name ) => commandsByName.get( name ) )
 		.filter( Boolean );
-	const recentlyUsedSet = new Set( recentlyUsedNames );
 
 	if ( ! recentCommands.length && ! loaders.length ) {
 		return null;
@@ -327,8 +329,8 @@ function RecentGroup() {
 				commands={ recentCommands }
 				loaders={ loaders }
 				valuePrefix="recent-"
-				filterNames={ recentlyUsedSet }
-				sortOrder={ recentlyUsedNames }
+				filterNames={ displaySet }
+				sortOrder={ displayNames }
 			/>
 		</Command.Group>
 	);
