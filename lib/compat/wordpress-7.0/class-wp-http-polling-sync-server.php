@@ -275,6 +275,12 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				return current_user_can( 'edit_post', absint( $object_id ) );
 			}
 
+			// Handle single taxonomy term entities with a defined object ID.
+			if ( 'taxonomy' === $entity_kind && is_numeric( $object_id ) ) {
+				$taxonomy = get_taxonomy( $entity_name );
+				return isset( $taxonomy->cap->assign_terms ) && current_user_can( $taxonomy->cap->assign_terms );
+			}
+
 			// All of the remaining checks are for collections. If an object ID is
 			// provided, reject the request.
 			if ( null !== $object_id ) {
