@@ -108,16 +108,15 @@ export function styleSvgIcons( container, buttonColor ) {
  * Set up play button accessibility: aria attributes and keyboard seeking.
  *
  * @param {Element} container - The waveform container element.
- * @param {string}  ariaLabel - The accessible label for the play button.
  * @return {Function} Cleanup function to remove event listener.
  */
-export function setupPlayButtonAccessibility( container, ariaLabel ) {
+export function setupPlayButtonAccessibility( container ) {
 	const playBtn = container.querySelector( '.waveform-btn' );
 	if ( ! playBtn ) {
 		return () => {};
 	}
 
-	playBtn.setAttribute( 'aria-label', ariaLabel );
+	playBtn.setAttribute( 'aria-label', 'Play' );
 	playBtn.setAttribute( 'role', 'button' );
 
 	// Add keyboard support for seeking.
@@ -172,20 +171,19 @@ export function logPlayError( error ) {
  * This is the shared core logic used by both the React component (editor)
  * and the Interactivity API (frontend).
  *
- * @param {Element}  element           - The container element (must be in DOM).
- * @param {Object}   options           - Configuration options.
- * @param {string}   options.src       - The audio file URL.
- * @param {string}   options.title     - The track title.
- * @param {string}   options.artist    - The artist name.
- * @param {string}   options.image     - The artwork image URL.
- * @param {string}   options.ariaLabel - Optional accessible label for play button. Enables accessibility features.
- * @param {boolean}  options.autoPlay  - Whether to auto-play when ready.
- * @param {Function} options.onEnded   - Callback when track ends.
+ * @param {Element}  element          - The container element (must be in DOM).
+ * @param {Object}   options          - Configuration options.
+ * @param {string}   options.src      - The audio file URL.
+ * @param {string}   options.title    - The track title.
+ * @param {string}   options.artist   - The artist name.
+ * @param {string}   options.image    - The artwork image URL.
+ * @param {boolean}  options.autoPlay - Whether to auto-play when ready.
+ * @param {Function} options.onEnded  - Callback when track ends.
  * @return {Object} Object with instance, container, and destroy function.
  */
 export function initWaveformPlayer(
 	element,
-	{ src, title, artist, image, ariaLabel, autoPlay, onEnded }
+	{ src, title, artist, image, autoPlay, onEnded }
 ) {
 	// Get colors from computed styles.
 	const { textColor, waveformColor, progressColor } =
@@ -207,19 +205,14 @@ export function initWaveformPlayer(
 	const instance = new WaveformPlayerLib( container );
 
 	// Track cleanup function for accessibility.
-	let cleanupAccessibility = null;
+	let cleanupAccessibility = () => {};
 
 	// Set up event handlers.
 	const handlers = {
 		ready: () => {
 			styleSvgIcons( container, textColor );
-			// Set up accessibility if ariaLabel was provided.
-			if ( ariaLabel ) {
-				cleanupAccessibility = setupPlayButtonAccessibility(
-					container,
-					ariaLabel
-				);
-			}
+			// Set up accessibility features.
+			cleanupAccessibility = setupPlayButtonAccessibility( container );
 			// Auto-play if requested.
 			if ( autoPlay ) {
 				instance.play()?.catch( logPlayError );
@@ -244,7 +237,7 @@ export function initWaveformPlayer(
 				'waveformplayer:ended',
 				handlers.ended
 			);
-			cleanupAccessibility?.();
+			cleanupAccessibility();
 			instance.destroy();
 			container.remove();
 		},

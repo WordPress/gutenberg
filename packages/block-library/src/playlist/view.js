@@ -89,7 +89,6 @@ function initPlayer( ref, track, shouldAutoPlay, context ) {
 		title: track.title,
 		artist: track.artist,
 		image: track.image,
-		ariaLabel: track.ariaLabel || track.title,
 		autoPlay: shouldAutoPlay,
 		onEnded: () => {
 			// Advance to next track (autoPlay handles playback).

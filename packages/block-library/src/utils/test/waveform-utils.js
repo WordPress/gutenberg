@@ -203,9 +203,9 @@ describe( 'Waveform utilities', () => {
 			playBtn.className = 'waveform-btn';
 			container.appendChild( playBtn );
 
-			setupPlayButtonAccessibility( container, 'Play My Song' );
+			setupPlayButtonAccessibility( container );
 
-			expect( playBtn ).toHaveAttribute( 'aria-label', 'Play My Song' );
+			expect( playBtn ).toHaveAttribute( 'aria-label', 'Play' );
 			expect( playBtn ).toHaveAttribute( 'role', 'button' );
 		} );
 
@@ -215,10 +215,7 @@ describe( 'Waveform utilities', () => {
 			playBtn.className = 'waveform-btn';
 			container.appendChild( playBtn );
 
-			const cleanup = setupPlayButtonAccessibility(
-				container,
-				'Play My Song'
-			);
+			const cleanup = setupPlayButtonAccessibility( container );
 
 			expect( typeof cleanup ).toBe( 'function' );
 			// Cleanup should not throw.
@@ -228,10 +225,7 @@ describe( 'Waveform utilities', () => {
 		it( 'should return no-op cleanup when play button not found', () => {
 			const container = document.createElement( 'div' );
 
-			const cleanup = setupPlayButtonAccessibility(
-				container,
-				'Play My Song'
-			);
+			const cleanup = setupPlayButtonAccessibility( container );
 
 			expect( typeof cleanup ).toBe( 'function' );
 			expect( () => cleanup() ).not.toThrow();
@@ -249,7 +243,7 @@ describe( 'Waveform utilities', () => {
 			audio.currentTime = 50;
 			container.appendChild( audio );
 
-			setupPlayButtonAccessibility( container, 'Play My Song' );
+			setupPlayButtonAccessibility( container );
 
 			// Simulate ArrowRight keydown.
 			const rightEvent = new window.KeyboardEvent( 'keydown', {
@@ -279,7 +273,7 @@ describe( 'Waveform utilities', () => {
 			audio.currentTime = 2;
 			container.appendChild( audio );
 
-			setupPlayButtonAccessibility( container, 'Play My Song' );
+			setupPlayButtonAccessibility( container );
 
 			// Seek left past 0.
 			const leftEvent = new window.KeyboardEvent( 'keydown', {
