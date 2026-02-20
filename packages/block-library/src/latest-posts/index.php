@@ -35,15 +35,14 @@ function block_core_latest_posts_get_excerpt_length() {
  *
  * @since 5.0.0
  *
- * @global WP_Post $post                                      Global post object.
- * @global int     $block_core_latest_posts_excerpt_length    Excerpt length set by the Latest Posts core block.
+ * @global int $block_core_latest_posts_excerpt_length Excerpt length set by the Latest Posts core block.
  *
  * @param array $attributes The block attributes.
  *
  * @return string Returns the post content with latest posts added.
  */
 function render_block_core_latest_posts( $attributes ) {
-	global $post, $block_core_latest_posts_excerpt_length;
+	global $block_core_latest_posts_excerpt_length;
 	static $rendering_stack = array();
 
 	$args = array(
