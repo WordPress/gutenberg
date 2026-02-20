@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { createRoot, StrictMode } from '@wordpress/element';
+import { dispatch } from '@wordpress/data';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
-import { CommandMenu } from '@wordpress/commands';
+import { store as commandsStore, CommandMenu } from '@wordpress/commands';
 
 /**
  * Internal dependencies
@@ -14,6 +15,8 @@ import { unlock } from './lock-unlock';
 export { privateApis } from './private-apis';
 
 const { RouterProvider } = unlock( routerPrivateApis );
+
+const ADMIN_BAR_TRIGGER_SELECTOR = '#wp-admin-bar-command-palette a';
 
 // Register core commands and render the Command Palette.
 function CommandPalette( { settings } ) {
@@ -41,4 +44,21 @@ export function initializeCommandPalette( settings ) {
 			<CommandPalette settings={ settings } />
 		</StrictMode>
 	);
+
+	function attachAdminBarTrigger() {
+		const trigger = document.querySelector( ADMIN_BAR_TRIGGER_SELECTOR );
+		if ( ! trigger ) {
+			return;
+		}
+		trigger.addEventListener( 'click', ( event ) => {
+			event.preventDefault();
+			dispatch( commandsStore ).open();
+		} );
+	}
+
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', attachAdminBarTrigger );
+	} else {
+		attachAdminBarTrigger();
+	}
 }
