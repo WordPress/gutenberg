@@ -77,7 +77,7 @@
 					"wp_get_typography_font_size_value",
 					"wp_style_engine_get_styles",
 					"wp_get_global_settings",
-					"block_core_shared_get_submenu_visibility"
+					"block_core_shared_navigation_render_submenu_icon"
 				],
 				"suffixClasses": [
 					"WP_Navigation_Block_Renderer"
