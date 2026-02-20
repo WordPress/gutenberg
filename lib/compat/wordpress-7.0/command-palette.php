@@ -24,6 +24,7 @@ function gutenberg_admin_bar_command_palette_button( $wp_admin_bar ) {
 			'id'    => 'command-palette',
 			'title' => $title,
 			'href'  => '#',
+			'meta'  => array( 'class' => 'hide-if-no-js' ),
 		)
 	);
 }
