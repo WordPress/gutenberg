@@ -3091,9 +3091,9 @@ class WP_Theme_JSON_Gutenberg {
 					foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $name ] as $custom_state => $class_selector ) {
 						if ( isset( $theme_json['styles']['blocks'][ $name ][ $custom_state ] ) ) {
 							// A leading space means a descendant selector; no leading space means standalone.
-					$custom_css_selector = str_starts_with( $class_selector, ' ' )
-						? static::append_to_selector( $selector, $class_selector )
-						: $class_selector;
+							$custom_css_selector = str_starts_with( $class_selector, ' ' )
+							? static::append_to_selector( $selector, $class_selector )
+							: $class_selector;
 							$nodes[]             = array(
 								'name'       => $name,
 								'path'       => array( 'styles', 'blocks', $name, $custom_state ),
