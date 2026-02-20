@@ -619,11 +619,16 @@ class WP_Theme_JSON_Gutenberg {
 	 * CSS pseudo-selectors. Keys use the '@' prefix (e.g. '@current') to
 	 * distinguish them from real CSS pseudo-selectors.
 	 *
-	 * Selector values control how the CSS selector is built:
-	 * - Leading space (e.g. ' .child'): appended to the block's base selector
-	 *   as a descendant selector.
-	 * - No leading space (e.g. '.some-class'): used as a standalone selector,
-	 *   independent of the block's base selector.
+	 * Each state is an array with:
+	 *   - 'selector'      (string) The CSS selector for the state.
+	 *   - 'selector_type' (string) How the selector is applied:
+	 *       - 'append'     (default) Appends to the block's base selector via
+	 *                      append_to_selector(), e.g. for a descendant or
+	 *                      compound relationship with the block's own element.
+	 *       - 'standalone' Uses the selector as-is, independent of the block's
+	 *                      base selector. Needed when the target element is
+	 *                      shared across multiple block types and cannot be
+	 *                      expressed relative to a single block's root selector.
 	 *
 	 * Blocks listed here also inherit their VALID_BLOCK_PSEUDO_SELECTORS as
 	 * valid sub-states within each custom state, producing compound selectors
@@ -633,7 +638,17 @@ class WP_Theme_JSON_Gutenberg {
 	 */
 	const VALID_BLOCK_CUSTOM_STATES = array(
 		'core/navigation-link' => array(
-			'@current' => '.wp-block-navigation-item.current-menu-item',
+			'@current' => array(
+				'selector'      => '.wp-block-navigation-item.current-menu-item',
+				/*
+				 * 'standalone' is required here because .wp-block-navigation-item
+				 * is a shared class added by both core/navigation-link and
+				 * core/navigation-submenu to their <li> wrappers. Using 'append'
+				 * would scope the selector to .wp-block-navigation-link only,
+				 * missing submenu items that are also marked current.
+				 */
+				'selector_type' => 'standalone',
+			),
 		),
 	);
 
@@ -3088,12 +3103,13 @@ class WP_Theme_JSON_Gutenberg {
 
 				// Handle custom states (e.g. '@current' for navigation).
 				if ( isset( static::VALID_BLOCK_CUSTOM_STATES[ $name ] ) ) {
-					foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $name ] as $custom_state => $class_selector ) {
+					foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $name ] as $custom_state => $state_config ) {
 						if ( isset( $theme_json['styles']['blocks'][ $name ][ $custom_state ] ) ) {
-							// A leading space means a descendant selector; no leading space means standalone.
-							$custom_css_selector = str_starts_with( $class_selector, ' ' )
-							? static::append_to_selector( $selector, $class_selector )
-							: $class_selector;
+							$class_selector      = $state_config['selector'];
+							$selector_type       = $state_config['selector_type'] ?? 'append';
+							$custom_css_selector = 'standalone' === $selector_type
+								? $class_selector
+								: static::append_to_selector( $selector, $class_selector );
 							$nodes[]             = array(
 								'name'       => $name,
 								'path'       => array( 'styles', 'blocks', $name, $custom_state ),
