@@ -19,7 +19,88 @@ import { unlock } from '../../lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
-const { NavigationLinkUI } = unlock( blockLibraryPrivateApis );
+const { LinkUI, updateAttributes, useEntityBinding } = unlock(
+	blockLibraryPrivateApis
+);
+
+const BLOCKS_WITH_LINK_UI_SUPPORT = [
+	'core/navigation-link',
+	'core/navigation-submenu',
+];
+
+function AdditionalBlockContent( { block, insertedBlock, setInsertedBlock } ) {
+	const {
+		updateBlockAttributes,
+		removeBlock,
+		__unstableMarkNextChangeAsNotPersistent,
+	} = useDispatch( blockEditorStore );
+	const supportsLinkControls = BLOCKS_WITH_LINK_UI_SUPPORT.includes(
+		insertedBlock?.name
+	);
+	const blockWasJustInserted = insertedBlock?.clientId === block.clientId;
+	const showLinkControls = supportsLinkControls && blockWasJustInserted;
+
+	const { createBinding, clearBinding } = useEntityBinding( {
+		clientId: insertedBlock?.clientId,
+		attributes: insertedBlock?.attributes || {},
+	} );
+
+	if ( ! showLinkControls ) {
+		return null;
+	}
+
+	const cleanupInsertedBlock = () => {
+		const shouldAutoSelectBlock = false;
+		if ( ! insertedBlock?.attributes?.url && insertedBlock?.clientId ) {
+			__unstableMarkNextChangeAsNotPersistent();
+			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
+		}
+		setInsertedBlock( null );
+	};
+
+	const setInsertedBlockAttributes =
+		( _insertedBlockClientId ) => ( _updatedAttributes ) => {
+			if ( ! _insertedBlockClientId ) {
+				return;
+			}
+			updateBlockAttributes( _insertedBlockClientId, _updatedAttributes );
+		};
+
+	const handleSetInsertedBlock = ( newBlock ) => {
+		const shouldAutoSelectBlock = false;
+		if ( insertedBlock?.clientId && newBlock ) {
+			removeBlock( insertedBlock.clientId, shouldAutoSelectBlock );
+		}
+		setInsertedBlock( newBlock );
+	};
+
+	return (
+		<LinkUI
+			clientId={ insertedBlock?.clientId }
+			link={ insertedBlock?.attributes }
+			onBlockInsert={ handleSetInsertedBlock }
+			onClose={ () => {
+				cleanupInsertedBlock();
+			} }
+			onChange={ ( updatedValue ) => {
+				const { isEntityLink, attributes: updatedAttributes } =
+					updateAttributes(
+						updatedValue,
+						setInsertedBlockAttributes( insertedBlock?.clientId ),
+						insertedBlock?.attributes
+					);
+
+				if ( isEntityLink ) {
+					createBinding( updatedAttributes );
+				} else {
+					clearBinding();
+				}
+
+				setInsertedBlock( null );
+			} }
+		/>
+	);
+}
 
 // Needs to be kept in sync with the query used at packages/block-library/src/page-list/edit.js.
 const MAX_PAGE_COUNT = 100;
@@ -104,7 +185,7 @@ export default function NavigationMenuContent( { rootClientId } ) {
 					onSelect={ offCanvasOnselect }
 					blockSettingsMenu={ LeafMoreMenu }
 					showAppender
-					additionalBlockContent={ NavigationLinkUI }
+					additionalBlockContent={ AdditionalBlockContent }
 					isExpanded
 				/>
 			) }
