@@ -170,7 +170,9 @@ export function restoreSelection(
 		const isBeginningOfEmptyBlock =
 			0 === selectionStart.offset &&
 			0 === selectionEnd.offset &&
-			isBlockEmpty;
+			isBlockEmpty &&
+			! selectionStart.attributeKey &&
+			! selectionEnd.attributeKey;
 
 		if ( isBeginningOfEmptyBlock ) {
 			// Case 2a: When the content in a block has been removed after an
