@@ -17,10 +17,6 @@
 		"animationDuration": {
 			"type": "number",
 			"default": 400
-		},
-		"enableDeepLink": {
-			"type": "boolean",
-			"default": false
 		}
 	},
 	"supports": {
@@ -71,12 +67,12 @@
 	"usesContext": [
 		"core/dialog-id",
 		"core/dialog-isDialogOpen",
-		"core/dialog-label"
+		"core/dialog-label",
+		"core/dialog-enableDeepLink"
 	],
 	"parent": [ "core/dialog" ],
 	"textdomain": "dialog-content",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
-	"style": "file:./style-index.css",
-	"viewScriptModule": "@wordpress/block-library/dialog-content/view"
+	"style": "file:./style-index.css"
 }

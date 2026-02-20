@@ -27,8 +27,11 @@ function render_block_core_dialog_content( array $attributes, string $content, W
 		return '';
 	}
 
-	// Check if the anchor hash in the URL matches the context_id
-	$enable_deep_link = array_key_exists( 'enableDeepLink', $attributes ) ? $attributes['enableDeepLink'] : false;
+	// Check if the anchor hash in the URL matches the context_id (from parent dialog block).
+	// Fall back to attribute for backwards compatibility with content saved before migration.
+	$enable_deep_link = isset( $block->context['core/dialog-enableDeepLink'] )
+		? (bool) $block->context['core/dialog-enableDeepLink']
+		: ( array_key_exists( 'enableDeepLink', $attributes ) ? (bool) $attributes['enableDeepLink'] : false );
 
 	// Animation duration in milliseconds. Used as a CSS custom property for styling.
 	// The JS uses animationend events instead of timing, so this is only for CSS.

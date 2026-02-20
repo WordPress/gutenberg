@@ -4,20 +4,17 @@
 import { __ } from '@wordpress/i18n';
 import { useRef, useMemo, useEffect } from '@wordpress/element';
 import {
-	BlockControls,
-	InspectorControls,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 	BlockContextProvider,
 } from '@wordpress/block-editor';
-import {
-	ToolbarButton,
-	ToolbarGroup,
-	PanelBody,
-	TextControl,
-} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { InspectorPanel, Toolbar } from './controls';
 const TEMPLATE = [
 	[
 		'core/dialog-trigger',
@@ -51,7 +48,11 @@ const TEMPLATE = [
 ];
 
 export default function Edit( { attributes, setAttributes, clientId } ) {
-	const { editorIsDialogOpen = false, dialogLabel = '' } = attributes;
+	const {
+		editorIsDialogOpen = false,
+		dialogLabel = '',
+		enableDeepLink = false,
+	} = attributes;
 
 	// Get the dialog-content block from inner blocks and check if it's selected.
 	const { dialogElementClientId, isDialogElementSelected } = useSelect(
@@ -86,7 +87,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
-	// Auto-open dialog when dialog-content or its children are selected
+	// Auto open dialog when dialog-content or its children are selected
 	useEffect( () => {
 		if ( isDialogElementSelected && ! editorIsDialogOpen ) {
 			__unstableMarkNextChangeAsNotPersistent();
@@ -130,43 +131,23 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 
 	return (
 		<>
-			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<TextControl
-						__nextHasNoMarginBottom
-						__next40pxDefaultSize
-						label={ __( 'Accessible label' ) }
-						help={ __(
-							'Describes the dialog for screen readers. Used as the accessible name when no heading is present.'
-						) }
-						value={ dialogLabel }
-						onChange={ ( value ) =>
-							setAttributes( { dialogLabel: value } )
-						}
-					/>
-				</PanelBody>
-			</InspectorControls>
-			<BlockControls __experimentalShareWithChildBlocks>
-				<ToolbarGroup>
-					<ToolbarButton
-						label={ buttonLabel }
-						onClick={ () => {
-							if ( ! dialogElementClientId ) {
-								return;
-							}
-							toggleDialog();
-						} }
-					>
-						{ buttonLabel }
-					</ToolbarButton>
-				</ToolbarGroup>
-			</BlockControls>
+			<InspectorPanel
+				dialogLabel={ dialogLabel }
+				setAttributes={ setAttributes }
+				enableDeepLink={ enableDeepLink }
+			/>
+			<Toolbar
+				buttonLabel={ buttonLabel }
+				dialogElementClientId={ dialogElementClientId }
+				toggleDialog={ toggleDialog }
+			/>
 			<div { ...blockProps }>
 				<BlockContextProvider
 					value={ {
 						'core/dialog-id': dialogId || null,
 						'core/dialog-isDialogOpen': editorIsDialogOpen,
 						'core/dialog-label': dialogLabel,
+						'core/dialog-enableDeepLink': enableDeepLink,
 					} }
 				>
 					{ innerBlocksProps.children }

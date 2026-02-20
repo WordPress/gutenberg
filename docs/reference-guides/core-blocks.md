@@ -314,7 +314,7 @@ Adds a button that opens a modal dialog to display content without leaving the p
 -	**Category:** media
 -	**Allowed Blocks:** core/dialog-trigger, core/dialog-content
 -	**Supports:** align (center, full, left, right, wide), anchor, interactivity, ~~html~~
--	**Attributes:** dialogLabel, editorIsDialogOpen
+-	**Attributes:** dialogLabel, editorIsDialogOpen, enableDeepLink
 
 ## Dialog Content
 
@@ -325,7 +325,7 @@ Displays content in a modal dialog that appears on top of the page. ([Source](ht
 -	**Category:** media
 -	**Parent:** core/dialog
 -	**Supports:** animations, color (background, button, enableContrastChecker, heading, link, text), interactivity, layout (allowEditing, ~~allowJustification~~), shadow, spacing (blockGap, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~
--	**Attributes:** animationDuration, backdropColor, customBackdropColor, enableDeepLink
+-	**Attributes:** animationDuration, backdropColor, customBackdropColor
 
 ## Trigger Button
 

@@ -10,12 +10,7 @@ import {
 	__experimentalUseMultipleOriginColorsAndGradients as useMultipleOriginColorsAndGradients,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	ToolbarButton,
-	ToolbarGroup,
-	PanelBody,
-	ToggleControl,
-} from '@wordpress/components';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 export function Toolbar( { openDialog, closeDialog, isOpen, clientId } ) {
@@ -61,29 +56,12 @@ export function InspectorPanel( {
 	attributes,
 	setAttributes,
 } ) {
-	const { customBackdropColor, enableDeepLink = false } = attributes || {};
+	const { customBackdropColor } = attributes || {};
 	const { backdropColor, setBackdropColor } = colors;
 	const colorSettings = useMultipleOriginColorsAndGradients();
 
 	return (
 		<>
-			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Enable deep linking' ) }
-						help={ __(
-							'Allow the dialog to be opened via its HTML Anchor (set in the Advanced panel).'
-						) }
-						checked={ enableDeepLink }
-						onChange={ ( newEnableDeepLink ) =>
-							setAttributes( {
-								enableDeepLink: newEnableDeepLink,
-							} )
-						}
-					/>
-				</PanelBody>
-			</InspectorControls>
 			<InspectorControls group="color">
 				<ColorGradientSettingsDropdown
 					settings={ [
