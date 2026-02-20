@@ -20,7 +20,11 @@ import InputControlPrefixWrapper from '../input-control/input-prefix-wrapper';
 
 export const HexInput = ( { color, onChange, enableAlpha }: HexInputProps ) => {
 	const handleChange = ( nextValue: string | undefined ) => {
+		// When input is empty, pass colord('') which creates an invalid Colord object.
+		// This is handled in component.tsx by setting the color to an empty string,
+		// representing "no color selected".
 		if ( ! nextValue ) {
+			onChange( colord( '' ) );
 			return;
 		}
 		const hexValue = nextValue.startsWith( '#' )
