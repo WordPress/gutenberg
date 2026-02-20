@@ -95,11 +95,15 @@ test.describe( 'Editing Navigation Menus', () => {
 
 			// Check that the list view panel heading is visible with the custom menu name.
 			// This is effectively the contents of the "List View" tab.
+			// Use the PanelBody title class to distinguish from the BlockCard heading,
+			// which also shows the custom menu name.
 			await expect(
-				sidebar.getByRole( 'heading', {
-					name: 'Primary Menu',
-					exact: true,
-				} )
+				sidebar
+					.locator( '.components-panel__body-title' )
+					.getByRole( 'heading', {
+						name: 'Primary Menu',
+						exact: true,
+					} )
 			).toBeVisible();
 
 			// Check the Document Overview tab is not present.
