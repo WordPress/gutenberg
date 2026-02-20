@@ -27,7 +27,8 @@ import {
 } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import { SVG, Rect, Path } from '@wordpress/primitives';
-import { useEntityRecords, useEntityRecord } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -68,19 +69,27 @@ export function Edit( { attributes, setAttributes } ) {
 	const borderProps = useBorderProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 
-	const { records: allIcons } = useEntityRecords(
-		'root',
-		'icon',
-		{
-			per_page: -1,
+	const { allIcons, selectedIcon } = useSelect(
+		( select ) => {
+			const _icon = icon
+				? select( coreDataStore ).getEntityRecord(
+						'root',
+						'icon',
+						icon
+				  )
+				: null;
+			const _allIcons = isInserterOpen
+				? select( coreDataStore ).getEntityRecords( 'root', 'icon', {
+						per_page: -1,
+				  } )
+				: [];
+			return {
+				selectedIcon: _icon,
+				allIcons: _allIcons,
+			};
 		},
-		// Only fetch all icons when the inserter modal is open
-		{ enabled: isInserterOpen }
+		[ isInserterOpen, icon ]
 	);
-
-	const { record: selectedIcon } = useEntityRecord( 'root', 'icon', icon, {
-		enabled: !! icon,
-	} );
 
 	const iconToDisplay = selectedIcon?.content || '';
 
