@@ -15,7 +15,7 @@
 	-webkit-appearance: none;
 
 	margin: 0;
-	padding: 0.5em 1em;
+	padding: var(--wp--preset--spacing--20, 0.5em) var(--wp--preset--spacing--30, 1em);
 
 	// Inherit typography from parent
 	font-size: inherit;
