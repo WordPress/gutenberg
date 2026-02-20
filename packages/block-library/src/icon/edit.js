@@ -70,14 +70,18 @@ export function Edit( { attributes, setAttributes } ) {
 	const borderProps = useBorderProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 
-	const allIcons = useSelect( ( select ) => {
-		return unlock( select( coreDataStore ) ).getIcons();
-	}, [] );
+	const { selectedIcon, allIcons } = useSelect(
+		( select ) => {
+			const { getIcon, getIcons } = unlock( select( coreDataStore ) );
+			return {
+				selectedIcon: icon ? getIcon( icon ) : null,
+				allIcons: isInserterOpen ? getIcons() : [],
+			};
+		},
+		[ icon, isInserterOpen ]
+	);
 
-	const iconToDisplay =
-		allIcons?.length > 0
-			? allIcons?.find( ( { name } ) => name === icon )?.content
-			: '';
+	const iconToDisplay = selectedIcon?.content ?? '';
 
 	const blockControls = (
 		<>

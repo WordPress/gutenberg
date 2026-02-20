@@ -1257,7 +1257,7 @@ export const getEditorAssets =
 	};
 
 /**
- * Requests icons from the REST API.
+ * Requests all available icons from the REST API.
  */
 export const getIcons =
 	() =>
@@ -1266,4 +1266,18 @@ export const getIcons =
 			path: '/wp/v2/icons',
 		} );
 		dispatch.receiveIcons( icons );
+	};
+
+/**
+ * Requests a single icon by name from the REST API.
+ *
+ * @param {string} iconName Icon name (e.g. 'core/arrow-left').
+ */
+export const getIcon =
+	( iconName ) =>
+	async ( { dispatch } ) => {
+		const icon = await apiFetch( {
+			path: `/wp/v2/icons/${ iconName }`,
+		} );
+		dispatch.receiveIcon( icon );
 	};

@@ -162,7 +162,7 @@ export function receiveEditorAssets( assets ) {
 }
 
 /**
- * Returns an action object used to receive icons.
+ * Returns an action object used to receive all available icons.
  *
  * @param {Array} icons List of icons.
  *
@@ -172,5 +172,19 @@ export function receiveIcons( icons ) {
 	return {
 		type: 'RECEIVE_ICONS',
 		icons,
+	};
+}
+
+/**
+ * Returns an action object used to receive a single icon.
+ *
+ * @param {Object} icon Icon object (name, label, content).
+ *
+ * @return {Object} Action object.
+ */
+export function receiveIcon( icon ) {
+	return {
+		type: 'RECEIVE_ICON',
+		icon,
 	};
 }

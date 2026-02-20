@@ -672,6 +672,17 @@ export function icons( state = [], action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_ICONS':
 			return action.icons;
+		case 'RECEIVE_ICON': {
+			const existingIndex = state.findIndex(
+				( i ) => i.name === action.icon.name
+			);
+			if ( existingIndex >= 0 ) {
+				const next = [ ...state ];
+				next[ existingIndex ] = action.icon;
+				return next;
+			}
+			return [ ...state, action.icon ];
+		}
 	}
 	return state;
 }

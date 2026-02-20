@@ -311,11 +311,23 @@ export function getEditorAssets( state: State ): Record< string, any > | null {
 }
 
 /**
- * Returns the list of available icons.
+ * Returns the list of all available icons.
  *
  * @param state Data state.
  * @return The list of icons or empty array if not loaded.
  */
 export function getIcons( state: State ): Icon[] {
 	return state.icons ?? [];
+}
+
+/**
+ * Returns a single icon by name.
+ *
+ * @param state Data state.
+ * @param name  Icon name (e.g. 'core/arrow-left').
+ * @return The icon object or undefined if not loaded.
+ */
+export function getIcon( state: State, name: string ): Icon | undefined {
+	const icons = state.icons ?? [];
+	return icons.find( ( i ) => i.name === name );
 }
