@@ -7,7 +7,6 @@ $palette-header-height: 48px;
 
 // Here we extend the modal styles to be tighter, and to the center. Because the palette uses the modal as a container.
 .commands-command-menu {
-	border-radius: $grid-unit-05;
 	margin: auto;
 	position: relative;
 	top: calc(5% + #{$header-height});
