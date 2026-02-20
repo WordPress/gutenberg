@@ -23,7 +23,7 @@ const TABS_TEMPLATE = [
 				remove: true,
 			},
 		},
-		[ [ 'core/tabs-menu-item', {} ] ],
+		[ [ 'core/tabs-menu-item', { anchor: 'tab-1-button' } ] ],
 	],
 	[
 		'core/tab-panel',
@@ -134,6 +134,42 @@ function Edit( {
 
 		removeBlock( menuItemClientIds[ removedIndex ], false );
 	}, [ tabs, menuItemClientIds, removeBlock ] );
+
+	/**
+	 * Sync core/tab blocks when a core/tabs-menu-item is deleted directly.
+	 */
+	const prevMenuItemClientIdsRef = useRef( null );
+	useEffect( () => {
+		const prevMenuItemIds = prevMenuItemClientIdsRef.current;
+
+		prevMenuItemClientIdsRef.current = menuItemClientIds;
+
+		// Skip on initial render.
+		if ( prevMenuItemIds === null ) {
+			return;
+		}
+
+		// Only act on menu item removals.
+		if ( menuItemClientIds.length >= prevMenuItemIds.length ) {
+			return;
+		}
+
+		// If tabs are already in sync, the toolbar already handled removal.
+		if ( tabs.length <= menuItemClientIds.length ) {
+			return;
+		}
+
+		// Find which index was removed.
+		const removedIndex = prevMenuItemIds.findIndex(
+			( id ) => ! menuItemClientIds.includes( id )
+		);
+
+		if ( removedIndex === -1 || ! tabs[ removedIndex ] ) {
+			return;
+		}
+
+		removeBlock( tabs[ removedIndex ].clientId, false );
+	}, [ menuItemClientIds, tabs, removeBlock ] );
 
 	/**
 	 * Memoize context value to prevent unnecessary re-renders.
