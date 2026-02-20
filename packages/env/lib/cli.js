@@ -119,13 +119,10 @@ module.exports = function cli() {
 
 	yargs.command(
 		'start',
-		chalk`Starts WordPress for development on port {bold.underline ${ terminalLink(
+		chalk`Starts WordPress on port {bold.underline ${ terminalLink(
 			'8888',
 			'http://localhost:8888'
-		) }} (override with WP_ENV_PORT) and tests on port {bold.underline ${ terminalLink(
-			'8889',
-			'http://localhost:8889'
-		) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first install, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`,
+		) }} (override with WP_ENV_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first install, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`,
 		( args ) => {
 			args.option( 'update', {
 				type: 'boolean',
@@ -162,7 +159,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'stop',
-		'Stops running WordPress for development and tests and frees the ports.',
+		'Stops running WordPress and frees the ports.',
 		() => {},
 		withSpinner( env.stop )
 	);
