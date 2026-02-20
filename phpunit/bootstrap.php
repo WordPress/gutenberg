@@ -96,6 +96,11 @@ $GLOBALS['wp_tests_options'] = array(
 // Enable the widget block editor.
 tests_add_filter( 'gutenberg_use_widgets_block_editor', '__return_true' );
 
+// Enable client-side media processing for tests.
+// The Gutenberg plugin disables this by default (lib/compat/plugin/media.php),
+// but tests need the media functions to be loaded.
+tests_add_filter( 'wp_client_side_media_processing_enabled', '__return_true', 20 );
+
 // Start up the WP testing environment.
 require $_tests_dir . '/includes/bootstrap.php';
 

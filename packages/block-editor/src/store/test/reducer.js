@@ -1841,6 +1841,43 @@ describe( 'state', () => {
 			] );
 		} );
 
+		it( 'should not remove last block when fromRootClientId is incorrect', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [
+							{
+								clientId: 'nested',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					},
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'nested' ],
+				fromRootClientId: '',
+				toRootClientId: '',
+				index: 0,
+			} );
+
+			// The state should be unchnaged - no blocks moved or removed.
+			expect( state.order.get( '' ) ).toEqual( [ 'chicken', 'ribs' ] );
+		} );
+
 		describe( 'blocks', () => {
 			describe( 'byClientId', () => {
 				it( 'should ignore updates to non-existent block', () => {
