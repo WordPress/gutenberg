@@ -235,11 +235,14 @@ HTML;
 	 * @covers ::gutenberg_override_attachments_rest_controller
 	 */
 	public function test_compat_rest_controller_used_when_filter_disabled() {
+		// Remove the test bootstrap override so the disable filter takes effect.
+		remove_filter( 'wp_client_side_media_processing_enabled', '__return_true', 20 );
 		add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
 
 		$result = gutenberg_override_attachments_rest_controller( array(), 'attachment' );
 
 		remove_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
+		add_filter( 'wp_client_side_media_processing_enabled', '__return_true', 20 );
 
 		$this->assertSame(
 			array( 'rest_controller_class' => 'Gutenberg_REST_Attachments_Controller_6_9' ),
