@@ -39,6 +39,56 @@ test.describe( 'Navigation sidebar - list view editing', () => {
 		},
 	} );
 
+	test( 'clicking an existing item opens the link editing popover and Escape returns focus', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		const createdMenu =
+			await requestUtils.createNavigationMenu( navMenuFixture );
+
+		await admin.visitSiteEditor( {
+			postId: createdMenu?.id,
+			postType: 'wp_navigation',
+		} );
+
+		const listView = page.getByRole( 'treegrid', {
+			name: 'Block navigation structure',
+		} );
+
+		await expect( listView ).toBeVisible();
+
+		// Click the existing navigation link in the list view.
+		await listView
+			.getByRole( 'gridcell', { name: 'Existing Item' } )
+			.click();
+
+		// The link editing controls popover should open.
+		const editPopover = page.locator(
+			'.edit-site-sidebar-navigation-screen-navigation-menus__link-editor'
+		);
+		await expect( editPopover ).toBeVisible();
+
+		// Focus should be placed within the popover.
+		const isFocusWithin = await editPopover.evaluate( ( el ) =>
+			el.contains( document.activeElement )
+		);
+		expect( isFocusWithin ).toBe( true );
+
+		// Press Escape to dismiss the popover.
+		await page.keyboard.press( 'Escape' );
+
+		// The popover should close.
+		await expect( editPopover ).toBeHidden();
+
+		// Focus should return to the clicked list item.
+		await expect(
+			listView
+				.getByRole( 'gridcell', { name: 'Existing Item' } )
+				.getByRole( 'link' )
+		).toBeFocused();
+	} );
+
 	test( 'can add new menu items from the sidebar list view', async ( {
 		admin,
 		page,

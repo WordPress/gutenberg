@@ -13,6 +13,7 @@ import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wor
 import { unlock } from '../../lock-unlock';
 import { store as editSiteStore } from '../../store';
 import NavigationMenuContent from '../sidebar-navigation-screen-navigation-menus/navigation-menu-content';
+import useNavigateToEntityRecord from '../block-editor/use-navigate-to-entity-record';
 
 const noop = () => {};
 
@@ -25,13 +26,16 @@ export default function NavigationMenuEditor( { navigationMenuId } ) {
 		};
 	}, [] );
 
+	const onNavigateToEntityRecord = useNavigateToEntityRecord();
+
 	const settings = useMemo( () => {
 		return {
 			...storedSettings,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, storedSettings ),
+			onNavigateToEntityRecord,
 		};
-	}, [ storedSettings ] );
+	}, [ storedSettings, onNavigateToEntityRecord ] );
 
 	const blocks = useMemo( () => {
 		if ( ! navigationMenuId ) {

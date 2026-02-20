@@ -8,6 +8,7 @@ import {
 	LinkUI,
 	updateAttributes,
 	useEntityBinding,
+	Controls as NavigationLinkControls,
 } from './navigation-link/shared';
 import { lock } from './lock-unlock';
 
@@ -22,4 +23,5 @@ lock( privateApis, {
 	LinkUI,
 	updateAttributes,
 	useEntityBinding,
+	NavigationLinkControls,
 } );

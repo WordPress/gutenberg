@@ -6,9 +6,9 @@ import {
 	store as blockEditorStore,
 	BlockList,
 } from '@wordpress/block-editor';
+import { Popover } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
-import { useCallback } from '@wordpress/element';
+import { useState, useLayoutEffect, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { privateApis as blockLibraryPrivateApis } from '@wordpress/block-library';
 
@@ -19,9 +19,8 @@ import { unlock } from '../../lock-unlock';
 import LeafMoreMenu from './leaf-more-menu';
 
 const { PrivateListView } = unlock( blockEditorPrivateApis );
-const { LinkUI, updateAttributes, useEntityBinding } = unlock(
-	blockLibraryPrivateApis
-);
+const { LinkUI, updateAttributes, useEntityBinding, NavigationLinkControls } =
+	unlock( blockLibraryPrivateApis );
 
 const BLOCKS_WITH_LINK_UI_SUPPORT = [
 	'core/navigation-link',
@@ -156,38 +155,75 @@ export default function NavigationMenuContent( { rootClientId } ) {
 		},
 		[ rootClientId ]
 	);
-	const { replaceBlock, __unstableMarkNextChangeAsNotPersistent } =
-		useDispatch( blockEditorStore );
 
-	const offCanvasOnselect = useCallback(
-		( block ) => {
-			if (
-				block.name === 'core/navigation-link' &&
-				! block.attributes.url
-			) {
-				__unstableMarkNextChangeAsNotPersistent();
-				replaceBlock(
-					block.clientId,
-					createBlock( 'core/navigation-link', block.attributes )
-				);
-			}
-		},
-		[ __unstableMarkNextChangeAsNotPersistent, replaceBlock ]
-	);
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
+
+	// Track the navigation-link block the user clicked to edit.
+	const [ editingBlock, setEditingBlock ] = useState( null );
+	// DOM element of the clicked list-view row, used to anchor the popover.
+	const [ anchorElement, setAnchorElement ] = useState( null );
+	const listViewRef = useRef();
+
+	// Resolve the anchor DOM element whenever the editing block changes.
+	useLayoutEffect( () => {
+		if ( ! editingBlock?.clientId || ! listViewRef.current ) {
+			setAnchorElement( null );
+			return;
+		}
+		const element = listViewRef.current.querySelector(
+			`[data-block="${ editingBlock.clientId }"]`
+		);
+		setAnchorElement( element ?? null );
+	}, [ editingBlock?.clientId ] );
+
+	const handleSelect = ( block ) => {
+		// Only open the controls panel for blocks that have an existing URL.
+		// Newly inserted empty blocks are handled by AdditionalBlockContent.
+		if (
+			BLOCKS_WITH_LINK_UI_SUPPORT.includes( block?.name ) &&
+			block?.attributes?.url
+		) {
+			setEditingBlock( block );
+		}
+	};
 
 	// The hidden block is needed because it makes block edit side effects trigger.
 	// For example a navigation page list load its items has an effect on edit to load its items.
 	return (
 		<>
 			{ ! isLoading && (
-				<PrivateListView
-					rootClientId={ listViewRootClientId }
-					onSelect={ offCanvasOnselect }
-					blockSettingsMenu={ LeafMoreMenu }
-					showAppender
-					additionalBlockContent={ AdditionalBlockContent }
-					isExpanded
-				/>
+				<div ref={ listViewRef }>
+					<PrivateListView
+						rootClientId={ listViewRootClientId }
+						onSelect={ handleSelect }
+						blockSettingsMenu={ LeafMoreMenu }
+						showAppender
+						additionalBlockContent={ AdditionalBlockContent }
+						isExpanded
+					/>
+				</div>
+			) }
+			{ editingBlock && anchorElement && (
+				<Popover
+					anchor={ anchorElement }
+					placement="right-start"
+					onClose={ () => setEditingBlock( null ) }
+					className="edit-site-sidebar-navigation-screen-navigation-menus__link-editor"
+				>
+					<div style={ { width: '280px' } }>
+						<NavigationLinkControls
+							attributes={ editingBlock.attributes }
+							setAttributes={ ( newAttrs ) => {
+								updateBlockAttributes(
+									editingBlock.clientId,
+									newAttrs
+								);
+							} }
+							clientId={ editingBlock.clientId }
+							contentOnly
+						/>
+					</div>
+				</Popover>
 			) }
 			<div className="edit-site-sidebar-navigation-screen-navigation-menus__helper-block-editor">
 				<BlockList />
