@@ -95,6 +95,7 @@ const withSpinner =
 
 module.exports = function cli() {
 	yargs.usage( '$0 <command>' );
+	yargs.usage( '$0 <command> -- --help' );
 	yargs.option( 'debug', {
 		type: 'boolean',
 		describe: 'Enable debug output.',
@@ -122,7 +123,7 @@ module.exports = function cli() {
 		chalk`Starts WordPress on port {bold.underline ${ terminalLink(
 			'8888',
 			'http://localhost:8888'
-		) }} (override with WP_ENV_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first install, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`,
+		) }} (override with WP_ENV_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file.`,
 		( args ) => {
 			args.option( 'update', {
 				type: 'boolean',
