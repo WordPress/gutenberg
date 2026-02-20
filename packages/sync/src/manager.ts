@@ -426,7 +426,10 @@ export function createSyncManager( debug = false ): SyncManager {
 			// via its pre-persist hook.)
 			targetDoc.transact( () => {
 				applyChangesToCRDTDoc( targetDoc, record );
-				handlers.saveRecord();
+
+				if ( 'auto-draft' !== record.status ) {
+					handlers.saveRecord();
+				}
 			}, LOCAL_SYNC_MANAGER_ORIGIN );
 			return;
 		}
