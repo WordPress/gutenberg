@@ -489,6 +489,10 @@ export const getParentSectionBlock = ( state, clientId ) => {
 	// If sections are nested, return the top level section block.
 	// Don't return early.
 	while ( ( current = state.blocks.parents.get( current ) ) ) {
+		if ( state.editedContentOnlySection === current ) {
+			return undefined;
+		}
+
 		if ( isSectionBlock( state, current ) ) {
 			result = current;
 		}
@@ -505,7 +509,13 @@ export const getParentSectionBlock = ( state, clientId ) => {
  * @return {boolean} Whether the block is a contentOnly section.
  */
 export function isSectionBlock( state, clientId ) {
-	if ( clientId === state.editedContentOnlySection ) {
+	// If the section is being edited or a parent section is being edited,
+	// this block is temporarily not considered a section.
+	if (
+		state.editedContentOnlySection &&
+		( isWithinEditedContentOnlySection( state, clientId ) ||
+			clientId === state.editedContentOnlySection )
+	) {
 		return false;
 	}
 
