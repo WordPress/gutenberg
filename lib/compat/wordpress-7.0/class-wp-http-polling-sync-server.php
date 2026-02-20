@@ -281,6 +281,11 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 				return isset( $taxonomy->cap->assign_terms ) && current_user_can( $taxonomy->cap->assign_terms );
 			}
 
+			// Handle root comment entities
+			if ( 'root' === $entity_kind && 'comment' === $entity_name && is_numeric( $object_id ) ) {
+				return current_user_can( 'edit_comment', (int) $object_id );
+			}
+
 			// All of the remaining checks are for collections. If an object ID is
 			// provided, reject the request.
 			if ( null !== $object_id ) {
