@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.8.0-next.0 (2026-02-20)
+
 ### New Features
 
 -   Add `--wpds-cursor-control` design token for interactive non-link elements ([#75697](https://github.com/WordPress/gutenberg/pull/75697)).

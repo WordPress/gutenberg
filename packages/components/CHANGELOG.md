@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 32.2.1-next.0 (2026-02-20)
+
 ### Bug Fixes
 
 -   `SnackbarList`: Fix scaling distortion when a snackbar's content is updated in place via a shared notice ID ([#75709](https://github.com/WordPress/gutenberg/pull/75709)).

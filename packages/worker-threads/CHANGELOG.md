@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.0.0-next.0 (2026-02-20)
+
 ### New Features
 
 -   Initial release of `@wordpress/worker-threads` package ([#74785](https://github.com/WordPress/gutenberg/pull/74785)).
