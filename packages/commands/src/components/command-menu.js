@@ -240,7 +240,7 @@ function CommandList( {
 	);
 }
 
-function RecentGroup( { search } ) {
+function RecentGroup() {
 	const { commands, loaders, displayNames, displaySet } =
 		useRecentCommandsData();
 
@@ -251,7 +251,6 @@ function RecentGroup( { search } ) {
 	return (
 		<Command.Group heading={ __( 'Recent' ) }>
 			<CommandList
-				search={ search }
 				commands={ commands }
 				loaders={ loaders }
 				valuePrefix="recent-"
@@ -262,7 +261,7 @@ function RecentGroup( { search } ) {
 	);
 }
 
-function SuggestionsGroup( { search } ) {
+function SuggestionsGroup() {
 	const { commands, loaders } = useSelect( ( select ) => {
 		const { getCommands, getCommandLoaders } = select( commandsStore );
 		return {
@@ -273,11 +272,7 @@ function SuggestionsGroup( { search } ) {
 
 	return (
 		<Command.Group heading={ __( 'Suggestions' ) }>
-			<CommandList
-				search={ search }
-				commands={ commands }
-				loaders={ loaders }
-			/>
+			<CommandList commands={ commands } loaders={ loaders } />
 		</Command.Group>
 	);
 }
@@ -414,8 +409,8 @@ export function CommandMenu() {
 								{ __( 'No results found.' ) }
 							</Command.Empty>
 						) }
-						{ ! search && <RecentGroup search={ search } /> }
-						{ ! search && <SuggestionsGroup search={ search } /> }
+						{ ! search && <RecentGroup /> }
+						{ ! search && <SuggestionsGroup /> }
 						{ search && <ResultsGroup search={ search } /> }
 					</Command.List>
 				</Command>
