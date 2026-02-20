@@ -737,7 +737,7 @@ test.describe( 'Synced pattern', () => {
 
 		// Save the reusable block and update the post.
 		await editorTopBar.getByRole( 'button', { name: 'Save' } ).click();
-		const entitiesSaveButton = this.page
+		const entitiesSaveButton = page
 			.getByRole( 'region', { name: 'Editor publish' } )
 			.getByRole( 'button', { name: 'Save', exact: true } );
 		const isEntitiesSavePanelVisible = await entitiesSaveButton.isVisible();
