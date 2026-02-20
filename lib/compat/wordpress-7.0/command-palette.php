@@ -4,7 +4,7 @@
  *
  * @param WP_Admin_Bar $wp_admin_bar The WP_Admin_Bar instance.
  */
-function gutenberg_admin_bar_command_palette_button( $wp_admin_bar ) {
+function gutenberg_admin_bar_command_palette_menu( $wp_admin_bar ) {
 	if ( ! is_admin() ) {
 		return;
 	}
@@ -28,4 +28,7 @@ function gutenberg_admin_bar_command_palette_button( $wp_admin_bar ) {
 		)
 	);
 }
-add_action( 'admin_bar_menu', 'gutenberg_admin_bar_command_palette_button', 35 );
+if ( has_action( 'admin_bar_menu', 'wp_admin_bar_command_palette_menu' ) ) {
+	remove_action( 'admin_bar_menu', 'wp_admin_bar_command_palette_menu', 55 );
+}
+add_action( 'admin_bar_menu', 'gutenberg_admin_bar_command_palette_menu', 55 );
