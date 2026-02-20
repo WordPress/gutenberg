@@ -3327,13 +3327,11 @@ class WP_Theme_JSON_Gutenberg {
 		) {
 			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_padding );
 		} elseif ( $is_processing_block_pseudo ) {
-			// Process block pseudo-selector styles.
-			// For block pseudo-selectors, we need to get the block data first, then access the pseudo-selector.
-			$block_name  = static::get_block_name_from_metadata_path( $block_metadata ); // 'core/button'
-			$block_data  = _wp_array_get( $this->theme_json, array( 'styles', 'blocks', $block_name ), array() );
-			$pseudo_data = $block_data[ $block_pseudo_selector ] ?? array();
-
-			$declarations = static::compute_style_properties( $pseudo_data, $settings, null, $this->theme_json, $selector, $use_root_padding );
+			// Process block pseudo-selector styles using $node, which already points to the
+			// correct data via _wp_array_get( $this->theme_json, $block_metadata['path'] ).
+			// This works for both top-level pseudo-selectors (e.g. core/button :hover) and
+			// compound state+pseudo paths (e.g. core/navigation-link @current :hover).
+			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
 		} else {
 			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
 		}
