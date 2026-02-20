@@ -6,6 +6,9 @@
  * It is disabled by default in the plugin until known issues are resolved,
  * but can still be enabled via the filter.
  *
+ * Remove this file when the linked issues are resolved and the plugin
+ * is ready to match Core's default.
+ *
  * @see https://github.com/WordPress/gutenberg/issues/75302
  * @see https://github.com/WordPress/gutenberg/issues/75605
  *
