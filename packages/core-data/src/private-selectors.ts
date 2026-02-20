@@ -9,15 +9,18 @@ import { createSelector, createRegistrySelector } from '@wordpress/data';
 import {
 	getDefaultTemplateId,
 	getEntityRecord,
+	getEntityRecords,
 	type State,
-	type Icon,
 } from './selectors';
+import type * as ET from './entity-types';
 import { STORE_NAME } from './name';
 import { unlock } from './lock-unlock';
 import { getSyncManager } from './sync';
 import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
+
+const EMPTY_ARRAY: ET.Icon[] = [];
 
 /**
  * Returns the previous edit from the current undo offset
@@ -316,6 +319,9 @@ export function getEditorAssets( state: State ): Record< string, any > | null {
  * @param state Data state.
  * @return The list of icons or empty array if not loaded.
  */
-export function getIcons( state: State ): Icon[] {
-	return state.icons ?? [];
+export function getIcons( state: State ): ET.Icon[] {
+	const icons = getEntityRecords< ET.Icon >( state, 'root', 'icon', {
+		per_page: -1,
+	} );
+	return icons ?? EMPTY_ARRAY;
 }

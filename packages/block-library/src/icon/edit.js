@@ -25,10 +25,9 @@ import {
 	__experimentalGetSpacingClassesAndStyles as useSpacingProps,
 	getDimensionsClassesAndStyles as useDimensionsProps,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
-import { store as coreDataStore } from '@wordpress/core-data';
 import { useState } from '@wordpress/element';
 import { SVG, Rect, Path } from '@wordpress/primitives';
+import { useEntityRecords, useEntityRecord } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -36,7 +35,6 @@ import { SVG, Rect, Path } from '@wordpress/primitives';
 import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
-import { unlock } from '../lock-unlock';
 
 const IconPlaceholder = ( { className, style } ) => (
 	<SVG
@@ -70,14 +68,21 @@ export function Edit( { attributes, setAttributes } ) {
 	const borderProps = useBorderProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 
-	const allIcons = useSelect( ( select ) => {
-		return unlock( select( coreDataStore ) ).getIcons();
-	}, [] );
+	const { records: allIcons } = useEntityRecords(
+		'root',
+		'icon',
+		{
+			per_page: -1,
+		},
+		// Only fetch all icons when the inserter modal is open
+		{ enabled: isInserterOpen }
+	);
 
-	const iconToDisplay =
-		allIcons?.length > 0
-			? allIcons?.find( ( { name } ) => name === icon )?.content
-			: '';
+	const { record: selectedIcon } = useEntityRecord( 'root', 'icon', icon, {
+		enabled: !! icon,
+	} );
+
+	const iconToDisplay = selectedIcon?.content || '';
 
 	const blockControls = (
 		<>
@@ -202,7 +207,7 @@ export function Edit( { attributes, setAttributes } ) {
 			</div>
 			{ isInserterOpen && (
 				<CustomInserterModal
-					icons={ allIcons }
+					icons={ allIcons ?? [] }
 					setInserterOpen={ setInserterOpen }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
