@@ -19,6 +19,8 @@ import logEntityDeprecation from './utils/log-entity-deprecation';
 
 type EntityRecordKey = string | number;
 
+const EMPTY_ARRAY = [] as [];
+
 /**
  * Returns the previous edit from the current undo offset
  * for the entity records edits history, if any.
@@ -316,9 +318,16 @@ export function getEditorAssets( state: State ): Record< string, any > | null {
  * @param state Data state.
  * @return The list of icons or empty array if not loaded.
  */
-export function getIcons( state: State ): Icon[] {
-	return Object.values( state.icons ?? {} );
-}
+export const getIcons = createSelector(
+	( state: State ): Icon[] => {
+		const icons = state.icons;
+		if ( ! icons || Object.keys( icons ).length === 0 ) {
+			return EMPTY_ARRAY;
+		}
+		return Object.values( icons );
+	},
+	( state: State ) => [ state.icons ]
+);
 
 /**
  * Returns a single icon by name.
