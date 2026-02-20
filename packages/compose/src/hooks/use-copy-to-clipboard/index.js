@@ -26,19 +26,10 @@ export async function copyToClipboard( text, trigger ) {
 	}
 	const { defaultView } = ownerDocument;
 	try {
-		const isSecureContext = defaultView?.isSecureContext;
-		// eslint-disable-next-line no-console
-		console.log( 'isSecureContext:', isSecureContext );
 		if ( defaultView?.navigator?.clipboard?.writeText ) {
-			// eslint-disable-next-line no-console
-			console.log( 'Clipboard API is available.' );
 			await defaultView.navigator.clipboard.writeText( text );
 			return true;
 		}
-		// eslint-disable-next-line no-console
-		console.log(
-			'Clipboard API is not available. Use execCommand instead.'
-		);
 		// Fallback for non-secure contexts (HTTP) and older browsers.
 		const textarea = ownerDocument.createElement( 'textarea' );
 		textarea.value = text;
