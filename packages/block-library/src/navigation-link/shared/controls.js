@@ -72,12 +72,18 @@ function getEntityTypeName( type, kind ) {
  * This component provides the inspector controls (ToolsPanel) that are identical
  * between both navigation blocks.
  *
- * @param {Object}   props               - Component props
- * @param {Object}   props.attributes    - Block attributes
- * @param {Function} props.setAttributes - Function to update block attributes
- * @param {string}   props.clientId      - Block client ID
+ * @param {Object}   props                - Component props
+ * @param {Object}   props.attributes     - Block attributes
+ * @param {Function} props.setAttributes  - Function to update block attributes
+ * @param {string}   props.clientId       - Block client ID
+ * @param {boolean}  props.isLinkEditable - Whether link editing should be allowed
  */
-export function Controls( { attributes, setAttributes, clientId } ) {
+export function Controls( {
+	attributes,
+	setAttributes,
+	clientId,
+	isLinkEditable = true,
+} ) {
 	const { label, url, description, rel, opensInNewTab } = attributes;
 	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
 
@@ -188,97 +194,105 @@ export function Controls( { attributes, setAttributes, clientId } ) {
 				/>
 			</ToolsPanelItem>
 
-			<ToolsPanelItem
-				hasValue={ () => !! url }
-				label={ __( 'Link to' ) }
-				onDeselect={ () =>
-					setAttributes( {
-						url: undefined,
-						id: undefined,
-						kind: undefined,
-						type: undefined,
-					} )
-				}
-				isShownByDefault
-			>
-				<LinkPicker
-					preview={ preview }
-					onSelect={ handleLinkChange }
-					suggestionsQuery={ getSuggestionsQuery(
-						attributes.type,
-						attributes.kind
-					) }
-					label={ __( 'Link to' ) }
-					help={ helpText ? helpText : undefined }
-				/>
-			</ToolsPanelItem>
-
-			{ url && (
-				<HStack
-					className="navigation-link-to__actions"
-					alignment="left"
-					justify="left"
-					style={ { gridColumn: '1 / -1' } }
-				>
-					{ hasUrlBinding &&
-						isBoundEntityAvailable &&
-						entityRecord?.id &&
-						attributes.kind === 'post-type' &&
-						onNavigateToEntityRecord && (
-							<Button
-								size="compact"
-								variant="secondary"
-								onClick={ () => {
-									onNavigateToEntityRecord( {
-										postId: entityRecord.id,
-										postType: attributes.type,
-									} );
-								} }
-								__next40pxDefaultSize
-							>
-								{ sprintf(
-									/* translators: %s: entity type (e.g., "page", "post", "category") */
-									__( 'Edit %s' ),
-									entityTypeName
-								) }
-							</Button>
-						) }
-					{ isViewableUrl && (
-						<Button
-							size="compact"
-							variant="secondary"
-							href={ viewUrl }
-							target="_blank"
-							icon={ external }
-							iconPosition="right"
-							__next40pxDefaultSize
-						>
-							{ sprintf(
-								/* translators: %s: entity type (e.g., "page", "post", "category") or "site" for external links */
-								__( 'View %s' ),
-								entityTypeName !== 'item'
-									? entityTypeName
-									: __( 'site' )
+			{ isLinkEditable && (
+				<>
+					<ToolsPanelItem
+						hasValue={ () => !! url }
+						label={ __( 'Link to' ) }
+						onDeselect={ () =>
+							setAttributes( {
+								url: undefined,
+								id: undefined,
+								kind: undefined,
+								type: undefined,
+							} )
+						}
+						isShownByDefault
+					>
+						<LinkPicker
+							preview={ preview }
+							onSelect={ handleLinkChange }
+							suggestionsQuery={ getSuggestionsQuery(
+								attributes.type,
+								attributes.kind
 							) }
-						</Button>
-					) }
-				</HStack>
-			) }
+							label={ __( 'Link to' ) }
+							help={ helpText ? helpText : undefined }
+						/>
+					</ToolsPanelItem>
 
-			<ToolsPanelItem
-				hasValue={ () => !! opensInNewTab }
-				label={ __( 'Open in new tab' ) }
-				onDeselect={ () => setAttributes( { opensInNewTab: false } ) }
-				isShownByDefault
-			>
-				<CheckboxControl
-					label={ __( 'Open in new tab' ) }
-					checked={ opensInNewTab }
-					onChange={ ( value ) =>
-						setAttributes( { opensInNewTab: value } )
-					}
-				/>
-			</ToolsPanelItem>
+					{ url && (
+						<HStack
+							className="navigation-link-to__actions"
+							alignment="left"
+							justify="left"
+							style={ { gridColumn: '1 / -1' } }
+						>
+							{ hasUrlBinding &&
+								isBoundEntityAvailable &&
+								entityRecord?.id &&
+								attributes.kind === 'post-type' &&
+								onNavigateToEntityRecord && (
+									<Button
+										size="compact"
+										variant="secondary"
+										onClick={ () => {
+											onNavigateToEntityRecord( {
+												postId: entityRecord.id,
+												postType: attributes.type,
+											} );
+										} }
+										__next40pxDefaultSize
+									>
+										{ sprintf(
+											/* translators: %s: entity type (e.g., "page", "post", "category") */
+											__( 'Edit %s' ),
+											entityTypeName
+										) }
+									</Button>
+								) }
+							{ isViewableUrl && (
+								<Button
+									size="compact"
+									variant="secondary"
+									href={ viewUrl }
+									target="_blank"
+									icon={ external }
+									iconPosition="right"
+									__next40pxDefaultSize
+								>
+									{ sprintf(
+										/* translators: %s: entity type (e.g., "page", "post", "category") or "link" for external links */
+										__( 'View %s' ),
+										attributes.kind &&
+											attributes.type &&
+											attributes.kind !== 'custom'
+											? entityTypeName
+											: __( 'link' )
+									) }
+								</Button>
+							) }
+						</HStack>
+					) }
+
+					<ToolsPanelItem
+						hasValue={ () => !! opensInNewTab }
+						label={ __( 'Open in new tab' ) }
+						onDeselect={ () =>
+							setAttributes( { opensInNewTab: false } )
+						}
+						isShownByDefault
+					>
+						<CheckboxControl
+							label={ __( 'Open in new tab' ) }
+							checked={ opensInNewTab }
+							onChange={ ( value ) =>
+								setAttributes( { opensInNewTab: value } )
+							}
+						/>
+					</ToolsPanelItem>
+				</>
+			) }
 
 			<ToolsPanelItem
 				hasValue={ () => !! description }

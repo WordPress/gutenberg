@@ -223,4 +223,85 @@ describe( 'Controls', () => {
 			expect( screen.queryByText( /This link/ ) ).not.toBeInTheDocument();
 		} );
 	} );
+
+	describe( 'View button', () => {
+		it( 'shows "View link" for external URLs', () => {
+			const propsWithExternalLink = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					url: 'https://example.com',
+					// No kind or type for external links
+				},
+			};
+
+			render( <Controls { ...propsWithExternalLink } /> );
+
+			expect( screen.getByText( 'View link' ) ).toBeVisible();
+		} );
+
+		it( 'shows "View page" for page links', () => {
+			const propsWithPageLink = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					url: '/about',
+					type: 'page',
+					kind: 'post-type',
+				},
+			};
+
+			render( <Controls { ...propsWithPageLink } /> );
+
+			expect( screen.getByText( 'View page' ) ).toBeVisible();
+		} );
+
+		it( 'shows "View post" for post links', () => {
+			const propsWithPostLink = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					url: '/blog/my-post',
+					type: 'post',
+					kind: 'post-type',
+				},
+			};
+
+			render( <Controls { ...propsWithPostLink } /> );
+
+			expect( screen.getByText( 'View post' ) ).toBeVisible();
+		} );
+
+		it( 'shows "View category" for category links', () => {
+			const propsWithCategoryLink = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					url: '/category/tech',
+					type: 'category',
+					kind: 'taxonomy',
+				},
+			};
+
+			render( <Controls { ...propsWithCategoryLink } /> );
+
+			expect( screen.getByText( 'View category' ) ).toBeVisible();
+		} );
+
+		it( 'shows "View link" for custom type links', () => {
+			const propsWithCustomLink = {
+				...defaultProps,
+				attributes: {
+					...defaultProps.attributes,
+					url: 'https://example.com',
+					type: 'custom',
+					kind: 'custom',
+				},
+			};
+
+			render( <Controls { ...propsWithCustomLink } /> );
+
+			expect( screen.getByText( 'View link' ) ).toBeVisible();
+		} );
+	} );
 } );

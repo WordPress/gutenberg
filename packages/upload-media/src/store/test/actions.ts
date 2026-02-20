@@ -9,7 +9,7 @@ type WPDataRegistry = ReturnType< typeof createRegistry >;
  * Internal dependencies
  */
 import { store as uploadStore } from '..';
-import { ItemStatus } from '../types';
+import { ItemStatus, OperationType } from '../types';
 import { unlock } from '../../lock-unlock';
 
 jest.mock( '@wordpress/blob', () => ( {
@@ -159,6 +159,167 @@ describe( 'actions', () => {
 			).getAllItems();
 			expect( items ).toHaveLength( 1 );
 			expect( items[ 0 ].status ).toBe( ItemStatus.Processing );
+		} );
+	} );
+
+	describe( 'prepareItem', () => {
+		it( 'should add Upload and ThumbnailGeneration for vips-supported image types', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: jpegFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Manually call prepareItem to determine operations.
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			// Should include Upload and ThumbnailGeneration (no ResizeCrop without bigImageSizeThreshold).
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [
+					OperationType.Upload,
+					OperationType.ThumbnailGeneration,
+				] )
+			);
+			// Server should not generate sub-sizes for vips-supported images.
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				false
+			);
+		} );
+
+		it( 'should add only Upload for non-image types', async () => {
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: mp4File,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [ OperationType.Upload ] )
+			);
+			expect( updatedItem.operations ).not.toEqual(
+				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
+			);
+			// Server should generate sub-sizes for non-vips files.
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
+		} );
+
+		it( 'should add only Upload for unsupported image types like SVG', async () => {
+			const svgFile = new File( [ '<svg></svg>' ], 'test.svg', {
+				lastModified: 1234567891,
+				type: 'image/svg+xml',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: svgFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [ OperationType.Upload ] )
+			);
+			expect( updatedItem.operations ).not.toEqual(
+				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
+		} );
+
+		it( 'should add only Upload for unsupported image types like BMP', async () => {
+			const bmpFile = new File( [ 'bmp' ], 'test.bmp', {
+				lastModified: 1234567891,
+				type: 'image/bmp',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: bmpFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [ OperationType.Upload ] )
+			);
+			expect( updatedItem.operations ).not.toEqual(
+				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
+		} );
+
+		it( 'should add only Upload for PDF files', async () => {
+			const pdfFile = new File( [ 'pdf' ], 'document.pdf', {
+				lastModified: 1234567891,
+				type: 'application/pdf',
+			} );
+
+			unlock( registry.dispatch( uploadStore ) ).addItem( {
+				file: pdfFile,
+			} );
+
+			const item = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			await unlock( registry.dispatch( uploadStore ) ).prepareItem(
+				item.id
+			);
+
+			const updatedItem = unlock(
+				registry.select( uploadStore )
+			).getAllItems()[ 0 ];
+
+			expect( updatedItem.operations ).toEqual(
+				expect.arrayContaining( [ OperationType.Upload ] )
+			);
+			expect( updatedItem.operations ).not.toEqual(
+				expect.arrayContaining( [ OperationType.ThumbnailGeneration ] )
+			);
+			expect( updatedItem.additionalData.generate_sub_sizes ).toBe(
+				true
+			);
 		} );
 	} );
 

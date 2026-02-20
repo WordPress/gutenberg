@@ -175,6 +175,15 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 		 * @return bool|WP_Error True if user has permission, otherwise WP_Error with details.
 		 */
 		public function check_permissions( WP_REST_Request $request ) {
+			// Minimum cap check. Is user logged in with a contributor role or higher?
+			if ( ! current_user_can( 'edit_posts' ) ) {
+				return new WP_Error(
+					'forbidden',
+					__( 'You do not have permission to perform this action', 'gutenberg' ),
+					array( 'status' => 401 )
+				);
+			}
+
 			$rooms = $request['rooms'];
 
 			foreach ( $rooms as $room ) {
@@ -264,6 +273,17 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			// Handle post type entities.
 			if ( 'postType' === $entity_kind && is_numeric( $object_id ) ) {
 				return current_user_can( 'edit_post', absint( $object_id ) );
+			}
+
+			// Handle single taxonomy term entities with a defined object ID.
+			if ( 'taxonomy' === $entity_kind && is_numeric( $object_id ) ) {
+				$taxonomy = get_taxonomy( $entity_name );
+				return isset( $taxonomy->cap->assign_terms ) && current_user_can( $taxonomy->cap->assign_terms );
+			}
+
+			// Handle root comment entities
+			if ( 'root' === $entity_kind && 'comment' === $entity_name && is_numeric( $object_id ) ) {
+				return current_user_can( 'edit_comment', (int) $object_id );
 			}
 
 			// All of the remaining checks are for collections. If an object ID is
@@ -434,17 +454,14 @@ if ( ! class_exists( 'WP_HTTP_Polling_Sync_Server' ) ) {
 			}
 
 			// Determine if this client should perform compaction.
-			$compaction_request = null;
-			if ( $is_compactor && $total_updates > self::COMPACTION_THRESHOLD ) {
-				$compaction_request = $updates_after_cursor;
-			}
+			$should_compact = $is_compactor && $total_updates > self::COMPACTION_THRESHOLD;
 
 			return array(
-				'compaction_request' => $compaction_request,
-				'end_cursor'         => $this->storage->get_cursor( $room ),
-				'room'               => $room,
-				'total_updates'      => $total_updates,
-				'updates'            => $typed_updates,
+				'end_cursor'     => $this->storage->get_cursor( $room ),
+				'room'           => $room,
+				'should_compact' => $should_compact,
+				'total_updates'  => $total_updates,
+				'updates'        => $typed_updates,
 			);
 		}
 	}

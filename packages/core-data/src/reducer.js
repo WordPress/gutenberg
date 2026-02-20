@@ -661,17 +661,28 @@ export function editorAssets( state = null, action ) {
 }
 
 /**
- * Reducer managing icons.
+ * Reducer managing sync connection states for entities.
+ * Keyed by "kind/name:id" (e.g., "postType/post:123").
  *
- * @param {Array}  state  Current state.
- * @param {Object} action Action object.
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
  *
- * @return {Array} Updated state.
+ * @return {Object} Updated state.
  */
-export function icons( state = [], action ) {
+export function syncConnectionStatuses( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_ICONS':
-			return action.icons;
+		case 'SET_SYNC_CONNECTION_STATUS': {
+			const key = `${ action.kind }/${ action.name }:${ action.key }`;
+			return {
+				...state,
+				[ key ]: action.status,
+			};
+		}
+		case 'CLEAR_SYNC_CONNECTION_STATUS': {
+			const key = `${ action.kind }/${ action.name }:${ action.key }`;
+			const { [ key ]: _, ...rest } = state;
+			return rest;
+		}
 	}
 	return state;
 }
@@ -698,5 +709,5 @@ export default combineReducers( {
 	registeredPostMeta,
 	editorSettings,
 	editorAssets,
-	icons,
+	syncConnectionStatuses,
 } );

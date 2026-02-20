@@ -341,17 +341,7 @@ _Returns_
 
 ### EditorNotices
 
-This component renders the notices displayed in the editor. It displays pinned notices first, followed by dismissible
-
-_Usage_
-
-```jsx
-<EditorNotices />
-```
-
-_Returns_
-
--   `React.ReactNode`: The rendered EditorNotices component.
+> **Deprecated** since 7.0, use `wp.notices.InlineNotices` instead.
 
 ### EditorProvider
 
@@ -387,11 +377,7 @@ _Returns_
 
 ### EditorSnackbars
 
-Renders the editor snackbars component.
-
-_Returns_
-
--   `React.ReactNode`: The rendered component.
+> **Deprecated** since 7.0, use `wp.notices.SnackbarNotices` instead.
 
 ### EntitiesSavedStates
 

@@ -47,7 +47,7 @@ function IsolatedEditButton( {
 				variant="secondary"
 				onClick={ handleClick }
 			>
-				{ __( 'Edit section' ) }
+				{ __( 'Edit original' ) }
 			</Button>
 		</VStack>
 	);
@@ -76,8 +76,8 @@ function InlineEditButton( {
 				onClick={ handleClick }
 			>
 				{ editedContentOnlySection
-					? __( 'Exit section' )
-					: __( 'Edit section' ) }
+					? __( 'Exit pattern' )
+					: __( 'Edit pattern' ) }
 			</Button>
 		</VStack>
 	);

@@ -10,6 +10,7 @@ import { Button, Icon, Tooltip } from '@wordpress/components';
 import { sprintf, _x } from '@wordpress/i18n';
 import { error as errorIcon, pencil } from '@wordpress/icons';
 import { useInstanceId } from '@wordpress/compose';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -78,8 +79,34 @@ export default function SummaryButton< Item >( {
 				fieldLabel || ''
 		  );
 
+	const rowRef = useRef< HTMLDivElement >( null );
+
+	const handleRowClick = () => {
+		const selection =
+			rowRef.current?.ownerDocument.defaultView?.getSelection();
+		if ( selection && selection.toString().length > 0 ) {
+			return;
+		}
+		onClick();
+	};
+
+	const handleKeyDown = ( event: React.KeyboardEvent ) => {
+		if (
+			event.target === event.currentTarget &&
+			( event.key === 'Enter' || event.key === ' ' )
+		) {
+			event.preventDefault();
+			onClick();
+		}
+	};
+
 	return (
-		<div className={ className }>
+		<div
+			ref={ rowRef }
+			className={ className }
+			onClick={ ! disabled ? handleRowClick : undefined }
+			onKeyDown={ ! disabled ? handleKeyDown : undefined }
+		>
 			{ labelPosition !== 'none' && (
 				<span className={ labelClassName }>{ labelContent }</span>
 			) }
@@ -136,7 +163,6 @@ export default function SummaryButton< Item >( {
 					aria-expanded={ ariaExpanded }
 					aria-haspopup="dialog"
 					aria-describedby={ `${ controlId }` }
-					onClick={ onClick }
 				/>
 			) }
 		</div>

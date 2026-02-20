@@ -2,12 +2,25 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- DataForm: Fix focus loss when collapsing in Card view. [#75689](https://github.com/WordPress/gutenberg/pull/75689)
+- DataViews: Fix spacing in first column. [#75693](https://github.com/WordPress/gutenberg/pull/75693)
+
+### Enhancements
+
+- DataViews: Adjust column spacing in table layout when no titleField is provided. [#75410](https://github.com/WordPress/gutenberg/pull/75410)
+
+## 12.0.0 (2026-02-18)
+
 ### Breaking Changes
 
 - The design tokens stylesheet (`@wordpress/theme/design-tokens.css`) is no longer embedded in the DataViews stylesheet. Applications using DataViews outside of WordPress must now explicitly include the design tokens stylesheet. See the README for installation instructions. [#75182](https://github.com/WordPress/gutenberg/pull/75182)
 
 ### Bug Fixes
 
+- DataViews: Fix first/last column header text misalignment in table layout when no bulk actions are present. [#75372](https://github.com/WordPress/gutenberg/issues/75372)
+- DataForm: Fix text selection in panel layout summary rows by replacing `::after` overlay with accessible card pattern. [#75565](https://github.com/WordPress/gutenberg/pull/75565)
 - DataViews: Improve styling for filters when long values are in use. [#75369](https://github.com/WordPress/gutenberg/pull/75369)
 - DataForm: Fix label case for regular layout. [#75292](https://github.com/WordPress/gutenberg/pull/75292)
 - DataViews: Add title attribute in grid item title field. [#75085](https://github.com/WordPress/gutenberg/pull/75085)
@@ -33,8 +46,9 @@
 - DataForm: Use public `ColorPicker` component instead of internal `Picker` in color control. [#75394](https://github.com/WordPress/gutenberg/pull/75394)
 - Update Testing Library packages used in unit tests. [#75340](https://github.com/WordPress/gutenberg/pull/75340)
 - Always specify initial values for `useRef` calls. [#75513](https://github.com/WordPress/gutenberg/pull/75513)
-- Clean up type declarations using the `React` namespace. ([#75508](https://github.com/WordPress/gutenberg/pull/75508)
+- Clean up type declarations using the `React` namespace. [#75508](https://github.com/WordPress/gutenberg/pull/75508)
 - Update `RefObject` type usage for React 19 compatibility. [#75567](https://github.com/WordPress/gutenberg/pull/75567)
+- Upgraded `@ariakit/react` (v0.4.21). [#75620](https://github.com/WordPress/gutenberg/pull/75620)
 
 ## 11.3.0 (2026-01-29)
 

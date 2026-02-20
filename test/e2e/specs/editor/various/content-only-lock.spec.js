@@ -77,7 +77,7 @@ test.describe( 'Content-only lock', () => {
 		] );
 	} );
 
-	test( 'should be able to edit all blocks via Edit section button and exit via Exit section button', async ( {
+	test( 'should be able to edit all blocks via Edit pattern button and exit via Exit pattern button', async ( {
 		editor,
 		page,
 		pageUtils,
@@ -106,10 +106,10 @@ test.describe( 'Content-only lock', () => {
 		await editor.canvas
 			.locator( 'role=document[name="Block: Group"i]' )
 			.click();
-		// Click "Edit section" button to temporarily edit as blocks.
+		// Click "Edit pattern" button to temporarily edit as blocks.
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Edit section' } )
+			.getByRole( 'button', { name: 'Edit pattern' } )
 			.click();
 		// Selected a nest paragraph verify Block is not content locked
 		// Styles can be changed and nested blocks can be removed
@@ -121,10 +121,10 @@ test.describe( 'Content-only lock', () => {
 			page.locator( '.color-block-support-panel' )
 		).toBeAttached();
 		await editor.clickBlockOptionsMenuItem( 'Delete' );
-		// Click "Exit section" button to exit edit mode
+		// Click "Exit pattern" button to exit edit mode
 		await page
 			.getByRole( 'region', { name: 'Editor settings' } )
-			.getByRole( 'button', { name: 'Exit section' } )
+			.getByRole( 'button', { name: 'Exit pattern' } )
 			.click();
 
 		// Select a locked nested paragraph block again
@@ -135,6 +135,82 @@ test.describe( 'Content-only lock', () => {
 		await expect(
 			page.locator( '.color-block-support-panel' )
 		).not.toBeAttached();
+	} );
+
+	test( 'allows editing all blocks via Edit pattern toolbar button and exiting via Exit pattern toolbar button', async ( {
+		editor,
+		page,
+		pageUtils,
+	} ) => {
+		// Add content only locked block in the code editor.
+		await pageUtils.pressKeys( 'secondary+M' );
+
+		await page.getByPlaceholder( 'Start writing with text or HTML' )
+			.fill( `<!-- wp:group {"templateLock":"contentOnly","layout":{"type":"constrained"}} -->
+			<div class="wp-block-group"><!-- wp:paragraph -->
+			<p>Locked block a</p>
+			<!-- /wp:paragraph -->
+
+			<!-- wp:paragraph -->
+			<p>Locked block b</p>
+			<!-- /wp:paragraph --></div>
+			<!-- /wp:group -->
+
+			<!-- wp:heading -->
+			<h2 class="wp-block-heading"><strong>outside block</strong></h2>
+			<!-- /wp:heading -->` );
+
+		await pageUtils.pressKeys( 'secondary+M' );
+		await editor.openDocumentSettingsSidebar();
+
+		const editorSettings = page.getByRole( 'region', {
+			name: 'Editor settings',
+		} );
+
+		// Select the content locked block.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Group"i]' )
+			.click();
+		// Click "Edit pattern" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Edit pattern' );
+		// Select a nested paragraph — verify block is not content locked.
+		// Style panels are visible when the block is unlocked for editing.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.first()
+			.click();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Color' } )
+		).toBeVisible();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Typography' } )
+		).toBeVisible();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Dimensions' } )
+		).toBeVisible();
+
+		// Re-select the group to access its toolbar.
+		await editor.selectBlocks(
+			editor.canvas.locator( 'role=document[name="Block: Group"i]' )
+		);
+		// Click "Exit pattern" in the block toolbar.
+		await editor.clickBlockToolbarButton( 'Exit pattern' );
+
+		// Select a locked nested paragraph block again.
+		await editor.canvas
+			.locator( 'role=document[name="Block: Paragraph"i]' )
+			.first()
+			.click();
+		// Block is content locked again — style panels are hidden.
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Color' } )
+		).toBeHidden();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Typography' } )
+		).toBeHidden();
+		await expect(
+			editorSettings.getByRole( 'heading', { name: 'Dimensions' } )
+		).toBeHidden();
 	} );
 
 	test( 'should be able to edit all blocks via double-click and exit by clicking outside', async ( {
@@ -172,11 +248,11 @@ test.describe( 'Content-only lock', () => {
 		} );
 		await separator.dblclick( { force: true } );
 
-		// Wait for edit mode to be entered - "Edit section" button should disappear
+		// Wait for edit mode to be entered - "Edit pattern" button should disappear
 		await expect(
 			page
 				.getByRole( 'region', { name: 'Editor settings' } )
-				.getByRole( 'button', { name: 'Edit section' } )
+				.getByRole( 'button', { name: 'Edit pattern' } )
 		).toBeHidden();
 
 		// Select first paragraph to verify it's not content locked

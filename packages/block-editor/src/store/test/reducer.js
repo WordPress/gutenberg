@@ -1841,6 +1841,43 @@ describe( 'state', () => {
 			] );
 		} );
 
+		it( 'should not remove last block when fromRootClientId is incorrect', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [
+							{
+								clientId: 'nested',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					},
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'nested' ],
+				fromRootClientId: '',
+				toRootClientId: '',
+				index: 0,
+			} );
+
+			// The state should be unchnaged - no blocks moved or removed.
+			expect( state.order.get( '' ) ).toEqual( [ 'chicken', 'ribs' ] );
+		} );
+
 		describe( 'blocks', () => {
 			describe( 'byClientId', () => {
 				it( 'should ignore updates to non-existent block', () => {
@@ -3291,11 +3328,43 @@ describe( 'state', () => {
 			const state = blockListSettings( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
+				blocks: [],
 			} );
 
 			expect( state ).toEqual( {
 				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
 					allowedBlocks: [ 'core/paragraph' ],
+				},
+			} );
+		} );
+
+		it( 'should preserve the settings of a block when its clientId is reused in replacement', () => {
+			const original = deepFreeze( {
+				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
+					allowedBlocks: [ 'core/paragraph' ],
+				},
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+					allowedBlocks: true,
+				},
+			} );
+
+			const state = blockListSettings( original, {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
+				blocks: [
+					{
+						clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+						innerBlocks: [],
+					},
+				],
+			} );
+
+			expect( state ).toEqual( {
+				'9db792c6-a25a-495d-adbd-97d56a4c4189': {
+					allowedBlocks: [ 'core/paragraph' ],
+				},
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': {
+					allowedBlocks: true,
 				},
 			} );
 		} );
@@ -4519,6 +4588,114 @@ describe( 'state', () => {
 						} )
 					)
 				);
+			} );
+		} );
+
+		describe( 'unsynced patterns with disableContentOnlyForUnsyncedPatterns enabled', () => {
+			let initialState;
+			beforeAll( () => {
+				initialState = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								disableContentOnlyForUnsyncedPatterns: true,
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-1',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
+											name: 'core/group',
+											clientId: 'group-2',
+											attributes: {},
+											innerBlocks: [
+												{
+													name: 'core/paragraph',
+													clientId: 'paragraph-2',
+													attributes: {},
+													innerBlocks: [],
+												},
+											],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+			} );
+
+			it( 'returns no derived editing modes for unsynced patterns when disableContentOnlyForUnsyncedPatterns is true', () => {
+				expect( initialState.derivedBlockEditingModes ).toEqual(
+					new Map()
+				);
+			} );
+
+			it( 'does not add editing modes when a patternName attribute is set via UPDATE_BLOCK_ATTRIBUTES', () => {
+				const stateWithoutPatternName = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								disableContentOnlyForUnsyncedPatterns: true,
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-1',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'UPDATE_BLOCK_ATTRIBUTES',
+							clientIds: [ 'group-1' ],
+							attributes: {
+								metadata: {
+									patternName: 'test-pattern',
+								},
+							},
+						},
+					],
+					testReducer,
+					stateWithoutPatternName
+				);
+
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
 			} );
 		} );
 

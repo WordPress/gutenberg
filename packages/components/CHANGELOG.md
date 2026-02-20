@@ -4,6 +4,18 @@
 
 ### Bug Fixes
 
+-   `ColorPicker`: Preserve hue and saturation when the selected color becomes achromatic ([#75493](https://github.com/WordPress/gutenberg/pull/75493)).
+-   `SnackbarList`: Fix scaling distortion when a snackbar's content is updated in place via a shared notice ID ([#75709](https://github.com/WordPress/gutenberg/pull/75709)).
+-   `ToggleGroupControl`: Fix hover styles on disabled items ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
+
+### Enhancements
+
+-   `ToggleGroupControl`: Make unselected item color consistent across all variants ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
+
+## 32.2.0 (2026-02-18)
+
+### Bug Fixes
+
 -   `Tabs`: Set explicit `font-family` on tab buttons to prevent inheriting unintended fonts ([#75537](https://github.com/WordPress/gutenberg/pull/75537)).
 -   `ExternalLink`: Add `wp-exclude-emoji` class to prevent Twemoji from replacing the arrow icon ([#75538](https://github.com/WordPress/gutenberg/pull/75538)).
 -   `TimePicker`: Fix date parsing for years below 1000 by implementing ISO 8601 compliant year formatting with zero-padding ([#75343](https://github.com/WordPress/gutenberg/pull/75343)).
@@ -16,6 +28,7 @@
 ### Enhancements
 
 -   Improve visual emphasis of the selected item in the ToggleGroupControl component ([#75138](https://github.com/WordPress/gutenberg/pull/75138)).
+-   `DateCalendar`, `DateRangeCalendar`: use lighter gray for disabled dates ([#75683](https://github.com/WordPress/gutenberg/pull/75683)).
 
 ### Internal
 
@@ -28,6 +41,7 @@
 -   Clean up type declarations using the `React` namespace ([#75499](https://github.com/WordPress/gutenberg/pull/75499) and ([#75508](https://github.com/WordPress/gutenberg/pull/75508))).
 -   Always specify initial values for `useRef` calls ([#75513](https://github.com/WordPress/gutenberg/pull/75513)).
 -   Update `RefObject` type usage for React 19 compatibility ([#75567](https://github.com/WordPress/gutenberg/pull/75567)).
+-   Upgraded `@ariakit/react` (v0.4.21) and `@ariakit/test` (v0.4.13) ([#75620](https://github.com/WordPress/gutenberg/pull/75620)).
 
 ## 32.1.0 (2026-01-29)
 

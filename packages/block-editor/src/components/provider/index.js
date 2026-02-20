@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useDispatch } from '@wordpress/data';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { SlotFillProvider } from '@wordpress/components';
 import {
 	MediaUploadProvider,
@@ -20,6 +20,7 @@ import { BlockRefsProvider } from './block-refs-provider';
 import { unlock } from '../../lock-unlock';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import useMediaUploadSettings from './use-media-upload-settings';
+import { SelectionContext } from './selection-context';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
@@ -40,7 +41,7 @@ let isClientSideMediaEnabledCache = null;
  * Checks if client-side media processing should be enabled.
  *
  * Returns true only if:
- * 1. The experimental media processing flag is enabled
+ * 1. The client-side media processing flag is enabled
  * 2. The browser supports WebAssembly, SharedArrayBuffer, cross-origin isolation, and CSP allows blob workers
  *
  * The result is cached for the session to ensure stability during React renders.
@@ -53,8 +54,8 @@ function shouldEnableClientSideMediaProcessing() {
 		return isClientSideMediaEnabledCache;
 	}
 
-	// Check if experimental flag is enabled first.
-	if ( ! window.__experimentalMediaProcessing ) {
+	// Check if the client-side media processing flag is enabled first.
+	if ( ! window.__clientSideMediaProcessing ) {
 		isClientSideMediaEnabledCache = false;
 		return false;
 	}
@@ -120,6 +121,18 @@ function mediaUpload(
 	} );
 }
 
+/**
+ * Calls useBlockSync as a child of SelectionContext.Provider so that the
+ * hook can read selection state from the context provided by this tree
+ * rather than from a parent provider (which may not exist for the root).
+ *
+ * @param {Object} props Props forwarded to useBlockSync.
+ */
+function BlockSyncEffect( props ) {
+	useBlockSync( props );
+	return null;
+}
+
 export const ExperimentalBlockEditorProvider = withRegistryProvider(
 	( props ) => {
 		const {
@@ -164,8 +177,24 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			__experimentalUpdateSettings,
 		] );
 
-		// Syncs the entity provider with changes in the block-editor store.
-		useBlockSync( props );
+		// Store selection and onChangeSelection in refs and expose
+		// stable getters/callers so that the context value is a
+		// complete constant.  This prevents re-rendering the entire
+		// block tree (including async-rendered off-screen blocks)
+		// when either value changes.
+		const selectionRef = useRef( props.selection );
+		selectionRef.current = props.selection;
+		const onChangeSelectionRef = useRef( props.onChangeSelection ?? noop );
+		onChangeSelectionRef.current = props.onChangeSelection ?? noop;
+
+		const selectionContextValue = useMemo(
+			() => ( {
+				getSelection: () => selectionRef.current,
+				onChangeSelection: ( ...args ) =>
+					onChangeSelectionRef.current( ...args ),
+			} ),
+			[]
+		);
 
 		const children = (
 			<SlotFillProvider passthrough>
@@ -174,18 +203,30 @@ export const ExperimentalBlockEditorProvider = withRegistryProvider(
 			</SlotFillProvider>
 		);
 
+		const content = (
+			<SelectionContext.Provider value={ selectionContextValue }>
+				<BlockSyncEffect
+					clientId={ props.clientId }
+					value={ props.value }
+					onChange={ props.onChange }
+					onInput={ props.onInput }
+				/>
+				{ children }
+			</SelectionContext.Provider>
+		);
+
 		if ( isClientSideMediaEnabled ) {
 			return (
 				<MediaUploadProvider
 					settings={ mediaUploadSettings }
 					useSubRegistry={ false }
 				>
-					{ children }
+					{ content }
 				</MediaUploadProvider>
 			);
 		}
 
-		return children;
+		return content;
 	}
 );
 

@@ -69,6 +69,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-block-patterns-controller-7-0.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-templates-controller-7-0.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-static-templates-controller.php';
+	require __DIR__ . '/compat/wordpress-7.0/class-wp-icons-registry.php';
+	require __DIR__ . '/compat/wordpress-7.0/class-wp-rest-icons-controller.php';
 	require __DIR__ . '/compat/wordpress-7.0/collaboration.php';
 	require __DIR__ . '/compat/wordpress-7.0/template-activate.php';
 	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
@@ -106,6 +108,10 @@ require __DIR__ . '/compat/wordpress-7.0/preload.php';
 require __DIR__ . '/compat/wordpress-7.0/auto-register.php';
 require __DIR__ . '/compat/wordpress-7.0/blocks.php';
 require __DIR__ . '/compat/wordpress-7.0/kses.php';
+require __DIR__ . '/compat/wordpress-7.0/media.php';
+
+// Gutenberg plugin compat: disable client-side media processing by default.
+require __DIR__ . '/compat/plugin/media.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
@@ -187,9 +193,7 @@ require __DIR__ . '/block-supports/block-visibility.php';
 require __DIR__ . '/block-supports/custom-css.php';
 
 // Client-side media processing.
-if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
-	require_once __DIR__ . '/experimental/media/load.php';
-}
+require_once __DIR__ . '/media/load.php';
 
 // Interactivity API full-page client-side navigation.
 if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
@@ -199,8 +203,3 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 
 // Block patterns for navigation overlays.
 require __DIR__ . '/overlay-patterns.php';
-
-if ( gutenberg_is_experiment_enabled( 'gutenberg-svg-icon-registry' ) ) {
-	require __DIR__ . '/experimental/class-wp-icons-registry.php';
-	require __DIR__ . '/experimental/class-wp-rest-icons-controller.php';
-}
