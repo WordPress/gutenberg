@@ -616,40 +616,23 @@ class WP_Theme_JSON_Gutenberg {
 
 	/**
 	 * Custom states for blocks that map to CSS class selectors rather than
-	 * CSS pseudo-selectors. Keys use the '@' prefix (e.g. '@current') to
+	 * CSS pseudo-selectors. Values use the '@' prefix (e.g. '@current') to
 	 * distinguish them from real CSS pseudo-selectors.
 	 *
-	 * Each state is an array with:
-	 *   - 'selector'      (string) The CSS selector for the state.
-	 *   - 'selector_type' (string) How the selector is applied:
-	 *       - 'append'     (default) Appends to the block's base selector via
-	 *                      append_to_selector(), e.g. for a descendant or
-	 *                      compound relationship with the block's own element.
-	 *       - 'standalone' Uses the selector as-is, independent of the block's
-	 *                      base selector. Needed when the target element is
-	 *                      shared across multiple block types and cannot be
-	 *                      expressed relative to a single block's root selector.
+	 * The CSS selector for each state is defined in the block's block.json
+	 * under `selectors.states`, e.g.:
 	 *
-	 * Blocks listed here also inherit their VALID_BLOCK_PSEUDO_SELECTORS as
-	 * valid sub-states within each custom state, producing compound selectors
-	 * such as `.wp-block-navigation-item.current-menu-item:hover`.
+	 *   "selectors": { "states": { "@current": ".some-css-selector" } }
+	 *
+	 * This constant controls which states are valid in theme.json for a given
+	 * block. Blocks listed here also inherit their VALID_BLOCK_PSEUDO_SELECTORS
+	 * as valid sub-states, producing compound selectors such as
+	 * `.wp-block-navigation-item.current-menu-item:hover`.
 	 *
 	 * @var array
 	 */
 	const VALID_BLOCK_CUSTOM_STATES = array(
-		'core/navigation-link' => array(
-			'@current' => array(
-				'selector'      => '.wp-block-navigation-item.current-menu-item',
-				/*
-				 * 'standalone' is required here because .wp-block-navigation-item
-				 * is a shared class added by both core/navigation-link and
-				 * core/navigation-submenu to their <li> wrappers. Using 'append'
-				 * would scope the selector to .wp-block-navigation-link only,
-				 * missing submenu items that are also marked current.
-				 */
-				'selector_type' => 'standalone',
-			),
-		),
+		'core/navigation-link' => array( '@current' ),
 	);
 
 	/**
@@ -1105,7 +1088,7 @@ class WP_Theme_JSON_Gutenberg {
 
 			// Add custom states for blocks that support them (e.g. '@current' for navigation).
 			if ( isset( static::VALID_BLOCK_CUSTOM_STATES[ $block ] ) ) {
-				foreach ( array_keys( static::VALID_BLOCK_CUSTOM_STATES[ $block ] ) as $custom_state ) {
+				foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $block ] as $custom_state ) {
 					$custom_state_schema = $styles_non_top_level;
 					// The same pseudo-selectors valid for the block at the top level
 					// are also valid within each custom state.
@@ -1343,6 +1326,11 @@ class WP_Theme_JSON_Gutenberg {
 
 			if ( ! empty( $style_selectors ) ) {
 				static::$blocks_metadata[ $block_name ]['styleVariations'] = $style_selectors;
+			}
+
+			// If the block has custom states defined in block.json, store their selectors.
+			if ( ! empty( $block_type->selectors['states'] ) && is_array( $block_type->selectors['states'] ) ) {
+				static::$blocks_metadata[ $block_name ]['states'] = $block_type->selectors['states'];
 			}
 		}
 
@@ -3103,13 +3091,12 @@ class WP_Theme_JSON_Gutenberg {
 
 				// Handle custom states (e.g. '@current' for navigation).
 				if ( isset( static::VALID_BLOCK_CUSTOM_STATES[ $name ] ) ) {
-					foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $name ] as $custom_state => $state_config ) {
-						if ( isset( $theme_json['styles']['blocks'][ $name ][ $custom_state ] ) ) {
-							$class_selector      = $state_config['selector'];
-							$selector_type       = $state_config['selector_type'] ?? 'append';
-							$custom_css_selector = 'standalone' === $selector_type
-								? $class_selector
-								: static::append_to_selector( $selector, $class_selector );
+					foreach ( static::VALID_BLOCK_CUSTOM_STATES[ $name ] as $custom_state ) {
+						if (
+							isset( $theme_json['styles']['blocks'][ $name ][ $custom_state ] ) &&
+							isset( $selectors[ $name ]['states'][ $custom_state ] )
+						) {
+							$custom_css_selector = $selectors[ $name ]['states'][ $custom_state ];
 							$nodes[]             = array(
 								'name'       => $name,
 								'path'       => array( 'styles', 'blocks', $name, $custom_state ),
