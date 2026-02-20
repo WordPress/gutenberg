@@ -14,7 +14,6 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 	PanelBody,
-	__experimentalNumberControl as NumberControl,
 	ToggleControl,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -40,7 +39,6 @@ export function Toolbar( { openDialog, closeDialog, isOpen, clientId } ) {
 			<ToolbarGroup>
 				<ToolbarButton
 					label={ buttonLabel }
-					isActive={ isOpen }
 					onClick={ () => {
 						if ( isOpen ) {
 							selectBlock( rootClientId );
@@ -63,11 +61,7 @@ export function InspectorPanel( {
 	attributes,
 	setAttributes,
 } ) {
-	const {
-		autoActivationTimer = -1,
-		customBackdropColor,
-		enableDeepLink = false,
-	} = attributes || {};
+	const { customBackdropColor, enableDeepLink = false } = attributes || {};
 	const { backdropColor, setBackdropColor } = colors;
 	const colorSettings = useMultipleOriginColorsAndGradients();
 
@@ -79,7 +73,7 @@ export function InspectorPanel( {
 						__nextHasNoMarginBottom
 						label={ __( 'Enable deep linking' ) }
 						help={ __(
-							'Allow the dialog to be opened via a URL hash (e.g., #dialog-id).'
+							'Allow the dialog to be opened via its HTML Anchor (set in the Advanced panel).'
 						) }
 						checked={ enableDeepLink }
 						onChange={ ( newEnableDeepLink ) =>
@@ -88,35 +82,6 @@ export function InspectorPanel( {
 							} )
 						}
 					/>
-					<ToggleControl
-						__nextHasNoMarginBottom
-						label={ __( 'Auto activation timer' ) }
-						help={ __(
-							'Automatically open the dialog after the specified time, in milliseconds.'
-						) }
-						checked={ 1 <= autoActivationTimer }
-						onChange={ ( newAutoActivationTimer ) =>
-							setAttributes( {
-								autoActivationTimer: newAutoActivationTimer
-									? 5000
-									: -1,
-							} )
-						}
-					/>
-					{ 1 <= autoActivationTimer && (
-						<NumberControl
-							__next40pxDefaultSize
-							label={ __( 'Activation timer duration' ) }
-							isShiftStepEnabled
-							onChange={ ( newDuration ) =>
-								setAttributes( {
-									autoActivationTimer: newDuration,
-								} )
-							}
-							shiftStep={ 100 }
-							value={ autoActivationTimer }
-						/>
-					) }
 				</PanelBody>
 			</InspectorControls>
 			<InspectorControls group="color">

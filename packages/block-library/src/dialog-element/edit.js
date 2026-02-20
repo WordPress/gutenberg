@@ -6,7 +6,7 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import { Icon, cancelCircleFilled } from '@wordpress/icons';
+import { Icon, close } from '@wordpress/icons';
 import {
 	useRef,
 	useEffect,
@@ -223,7 +223,7 @@ function Edit( {
 					aria-label="Close dialog"
 					onClick={ () => closeDialog() }
 				>
-					<Icon icon={ cancelCircleFilled } />
+					<Icon icon={ close } />
 				</button>
 				<div { ...innerBlocksProps } />
 			</dialog>

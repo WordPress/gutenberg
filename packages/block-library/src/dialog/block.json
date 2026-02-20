@@ -3,8 +3,8 @@
 	"apiVersion": 3,
 	"name": "core/dialog",
 	"version": "1.0.0",
-	"title": "Dialog Wrapper",
-	"description": "A container that pairs a trigger element with a dialog, enabling interactive modal experiences.",
+	"title": "Dialog",
+	"description": "Adds a button that opens a modal dialog to display content without leaving the page.",
 	"category": "media",
 	"keywords": [ "dialog", "modal", "popup" ],
 	"__experimental": true,
@@ -14,6 +14,10 @@
 			"type": "boolean",
 			"role": "local",
 			"default": false
+		},
+		"dialogLabel": {
+			"type": "string",
+			"default": ""
 		}
 	},
 	"supports": {
@@ -23,7 +27,8 @@
 		"interactivity": true
 	},
 	"providesContext": {
-		"core/dialog-isDialogOpen": "editorIsDialogOpen"
+		"core/dialog-isDialogOpen": "editorIsDialogOpen",
+		"core/dialog-label": "dialogLabel"
 	},
 	"usesContext": [ "core/dialog-id" ],
 	"textdomain": "dialog",

@@ -111,7 +111,7 @@ const BLOCK_REMOVAL_RULES = [
 						'Without it, visitors will have no way to open the dialog.'
 					),
 					subtext: __(
-						'If you still want the Dialog to appear, consider using the Auto Activation Timer feature in the Dialog settings.'
+						'Consider using the Deep Linking feature if you need the dialog to open without a trigger.'
 					),
 					requireConfirmation: true,
 				};

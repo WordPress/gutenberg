@@ -305,31 +305,31 @@ Hide and show additional content. ([Source](https://github.com/WordPress/gutenbe
 -	**Supports:** align (full, wide), allowedBlocks, anchor, color (background, gradients, link, text), interactivity (clientNavigation), layout (~~allowEditing~~), spacing (blockGap, margin, padding), typography (fontSize, lineHeight), ~~html~~
 -	**Attributes:** name, placeholder, showContent, summary
 
-## Dialog Wrapper
+## Dialog
 
-A container that pairs a trigger element with a dialog, enabling interactive modal experiences. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog))
+Adds a button that opens a modal dialog to display content without leaving the page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog))
 
 -	**Name:** core/dialog
 -	**Experimental:** true
 -	**Category:** media
 -	**Allowed Blocks:** core/dialog-trigger, core/dialog-element
 -	**Supports:** align (center, full, left, right, wide), anchor, interactivity, ~~html~~
--	**Attributes:** editorIsDialogOpen
+-	**Attributes:** dialogLabel, editorIsDialogOpen
 
-## Dialog
+## Dialog Content
 
-A dialog is a modal window that appears on top of the current page. It is used to display content that requires the user's attention or interaction. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-element))
+Displays content in a modal dialog that appears on top of the page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-element))
 
 -	**Name:** core/dialog-element
 -	**Experimental:** true
 -	**Category:** media
 -	**Parent:** core/dialog
--	**Supports:** animations, color (background, button, enableContrastChecker, heading, link, text), interactivity, layout (allowEditing, ~~allowJustification~~), shadow, spacing (blockGap, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~
--	**Attributes:** animationDuration, autoActivateOnRender, autoActivationTimer, backdropColor, customBackdropColor, dialogLabel, enableDeepLink
+-	**Supports:** animations, color (background, button, enableContrastChecker, heading, link, text), interactivity, layout (allowEditing, ~~allowJustification~~), shadow (), spacing (blockGap, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~
+-	**Attributes:** animationDuration, backdropColor, customBackdropColor, enableDeepLink
 
-## Dialog Trigger
+## Trigger Button
 
-Contains the interactive element that opens the associated dialog when activated. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-trigger))
+The trigger button that opens the dialog. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-trigger))
 
 -	**Name:** core/dialog-trigger
 -	**Experimental:** true

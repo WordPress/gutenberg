@@ -247,37 +247,6 @@ const { actions: privateActions, state: privateState } = store(
 				}
 				privateActions.close( id );
 			} ),
-			/**
-			 * Activates the current dialog element if there is an auto activation timer set.
-			 */
-			onAutoActivation: () => {
-				const { id, dialog, dialogs } = privateState;
-				if (
-					! id &&
-					! dialog.activationTimerDuration &&
-					-1 !== dialog.activationTimerDuration
-				) {
-					return;
-				}
-				// Check if any of the dialogs are already open,
-				// if so we don't want to close or auto active another dialog.
-				const dialogIds = Object.keys( dialogs );
-				for ( let i = 0; i < dialogIds.length; i++ ) {
-					const dialogId = dialogIds[ i ];
-					if ( dialogs[ dialogId ].isOpen ) {
-						return;
-					}
-				}
-				if ( 1 <= dialog.activationTimerDuration ) {
-					setTimeout(
-						withScope( () => {
-							privateActions.closeAll();
-							privateActions.open( id );
-						} ),
-						dialog.activationTimerDuration
-					);
-				}
-			},
 		},
 	},
 	{
@@ -322,23 +291,5 @@ store( 'core/dialog', {
 		closeAll() {
 			privateActions.closeAll();
 		},
-	},
-} );
-
-// This is a simple test to ensure 3rd party stores can interact with dialogs.
-store( 'core/dialog/test', {
-	actions: {
-		onClickOpen: withSyncEvent( ( event ) => {
-			const dialogContext = getContext( 'core/dialog/private' );
-			const id = dialogContext?.id;
-			if ( ! id ) {
-				// eslint-disable-next-line no-console
-				console.warn( 'No dialog id found in context.' );
-				return;
-			}
-			store( 'core/dialog' ).actions.open( id );
-			// Check for id.
-			event.preventDefault();
-		} ),
 	},
 } );

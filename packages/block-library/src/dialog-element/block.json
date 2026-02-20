@@ -3,28 +3,16 @@
 	"apiVersion": 3,
 	"name": "core/dialog-element",
 	"version": "1.0.0",
-	"title": "Dialog",
-	"description": "A dialog is a modal window that appears on top of the current page. It is used to display content that requires the user's attention or interaction.",
+	"title": "Dialog Content",
+	"description": "Displays content in a modal dialog that appears on top of the page.",
 	"category": "media",
 	"__experimental": true,
 	"attributes": {
-		"dialogLabel": {
-			"type": "string",
-			"default": ""
-		},
 		"backdropColor": {
 			"type": "string"
 		},
 		"customBackdropColor": {
 			"type": "string"
-		},
-		"autoActivateOnRender": {
-			"type": "boolean",
-			"default": false
-		},
-		"autoActivationTimer": {
-			"type": "number",
-			"default": -1
 		},
 		"animationDuration": {
 			"type": "number",
@@ -54,12 +42,17 @@
 			"allowEditing": true,
 			"allowJustification": false
 		},
-		"shadow": true,
+		"shadow": {
+			"__experimentalDefaultControls": true
+		},
 		"__experimentalBorder": {
 			"color": true,
 			"radius": true,
 			"style": true,
-			"width": true
+			"width": true,
+			"__experimentalDefaultControls": {
+				"radius": true
+			}
 		},
 		"spacing": {
 			"blockGap": true,
@@ -75,10 +68,11 @@
 		},
 		"interactivity": true
 	},
-	"usesContext": [ "core/dialog-id", "core/dialog-isDialogOpen" ],
-	"providesContext": {
-		"core/dialog-label": "dialogLabel"
-	},
+	"usesContext": [
+		"core/dialog-id",
+		"core/dialog-isDialogOpen",
+		"core/dialog-label"
+	],
 	"parent": [ "core/dialog" ],
 	"textdomain": "dialog-element",
 	"editorScript": "file:./index.js",

@@ -43,12 +43,8 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 		return '';
 	}
 
-	$is_open                 = get_query_var( 'dialogId', false ) === $context_id;
-	$auto_activate_on_render = array_key_exists( 'autoActivateOnRender', $attributes ) ? $attributes['autoActivateOnRender'] : false;
-	$default_is_open         = $auto_activate_on_render;
-	$auto_activation_timer   = array_key_exists( 'autoActivationTimer', $attributes ) ? $attributes['autoActivationTimer'] : -1;
-	$auto_activation_timer   = $default_is_open ? 0 : $auto_activation_timer;
-	$enable_deep_link        = array_key_exists( 'enableDeepLink', $attributes ) ? $attributes['enableDeepLink'] : false;
+	$is_open          = get_query_var( 'dialogId', false ) === $context_id;
+	$enable_deep_link = array_key_exists( 'enableDeepLink', $attributes ) ? $attributes['enableDeepLink'] : false;
 
 	// Animation duration in milliseconds. Used as a CSS custom property for styling.
 	// The JS uses animationend events instead of timing, so this is only for CSS.
@@ -61,11 +57,10 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 		array(
 			'dialogs' => array(
 				$context_id => array(
-					'id'                      => $context_id,
-					'activationTimerDuration' => (int) $auto_activation_timer,
-					'isOpen'                  => $is_open,
-					'enableDeepLink'          => $enable_deep_link,
-					'showClosingAnimation'    => false,
+					'id'                   => $context_id,
+					'isOpen'               => $is_open,
+					'enableDeepLink'       => $enable_deep_link,
+					'showClosingAnimation' => false,
 				),
 			),
 		)
@@ -83,7 +78,7 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 		$aria_labelledby = $heading_id;
 	} else {
 		// Fallback, to create a hidden H2 with the dialog label if no heading is found in the content.
-		$dialog_label    = isset( $attributes['dialogLabel'] ) ? $attributes['dialogLabel'] : __( 'Dialog', 'default' );
+		$dialog_label    = isset( $block->context['core/dialog-label'] ) && '' !== $block->context['core/dialog-label'] ? $block->context['core/dialog-label'] : __( 'Dialog', 'default' );
 		$hidden_id       = wp_unique_id( 'dialog-heading-' );
 		$hidden_h2       = wp_sprintf( '<h2 id="%1$s" class="screen-reader-text">%2$s</h2>', esc_attr( $hidden_id ), esc_html( $dialog_label ) );
 		$aria_labelledby = $hidden_id;
@@ -110,7 +105,6 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 		$tag_processor->set_attribute( 'data-wp-class--active', 'state.dialog.isOpen' );
 		$tag_processor->set_attribute( 'data-wp-class--show-closing-animation', 'state.dialog.showClosingAnimation' );
 		$tag_processor->set_attribute( 'data-wp-on--click', 'callbacks.onBackdropClick' );
-		$tag_processor->set_attribute( 'data-wp-init--on-auto-activation', 'callbacks.onAutoActivation' );
 		$tag_processor->set_attribute( 'data-wp-on-document--keydown', 'callbacks.onESCKey' );
 		$tag_processor->set_attribute( 'data-wp-watch--on-dialog-open', 'callbacks.onOpen' );
 		$tag_processor->set_attribute( 'data-wp-watch--on-dialog-close', 'callbacks.onClose' );
@@ -122,13 +116,13 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 	// Use the icon registry if available, otherwise fall back to inline SVG.
 	if ( class_exists( 'WP_Icons_Registry' ) ) {
 		$registry   = WP_Icons_Registry::get_instance();
-		$icon_data  = $registry->get_registered_icon( 'core/cancel-circle-filled' );
+		$icon_data  = $registry->get_registered_icon( 'core/close' );
 		$close_icon = $icon_data['content'] ?? '';
 	}
 
-	// Fallback to a copy of the core/cancel-circle-filled icon if the icon registry is not available. (it is experimental currently)
+	// Fallback to a copy of the core/close icon if the icon registry is not available. (it is experimental currently)
 	if ( empty( $close_icon ) ) {
-		$close_icon = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24" aria-hidden="true" focusable="false"><path d="M12 4c-4.4 0-8 3.6-8 8s3.6 8 8 8 8-3.6 8-8-3.6-8-8-8Zm3.8 10.7-1.1 1.1-2.7-2.7-2.7 2.7-1.1-1.1 2.7-2.7-2.7-2.7 1.1-1.1 2.7 2.7 2.7-2.7 1.1 1.1-2.7 2.7 2.7 2.7Z" /></svg>';
+		$close_icon = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="24" height="24" aria-hidden="true" focusable="false"><path d="m13.06 12 6.47-6.47-1.06-1.06L12 10.94 5.53 4.47 4.47 5.53 10.94 12l-6.47 6.47 1.06 1.06L12 13.06l6.47 6.47 1.06-1.06L13.06 12Z" /></svg>';
 	}
 
 	// Allow themes/plugins to customize the close icon.
@@ -162,16 +156,6 @@ function register_block_core_dialog_element() {
 		__DIR__ . '/dialog-element',
 		array(
 			'render_callback' => 'render_block_core_dialog_element',
-		)
-	);
-	register_block_bindings_source(
-		'core/dialog-element-label',
-		array(
-			'label'              => __( 'Dialog Element Label', 'default' ),
-			'get_value_callback' => function ( array $source_args, $block_instance ) {
-				return $block_instance->context['core/dialog-label'];
-			},
-			'uses_context'       => array( 'core/dialog-label' ),
 		)
 	);
 }

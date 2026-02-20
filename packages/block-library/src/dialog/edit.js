@@ -5,12 +5,18 @@ import { __ } from '@wordpress/i18n';
 import { useRef, useMemo, useEffect } from '@wordpress/element';
 import {
 	BlockControls,
+	InspectorControls,
 	useBlockProps,
 	useInnerBlocksProps,
 	store as blockEditorStore,
 	BlockContextProvider,
 } from '@wordpress/block-editor';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import {
+	ToolbarButton,
+	ToolbarGroup,
+	PanelBody,
+	TextControl,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 const TEMPLATE = [
 	[
@@ -40,27 +46,12 @@ const TEMPLATE = [
 				remove: true,
 			},
 		},
-		[
-			[
-				'core/heading',
-				{
-					level: 2,
-					placeholder: __( 'Add a dialog label…' ),
-					metadata: {
-						bindings: {
-							content: {
-								source: 'core/dialog-element-label',
-							},
-						},
-					},
-				},
-			],
-		],
+		[],
 	],
 ];
 
 export default function Edit( { attributes, setAttributes, clientId } ) {
-	const { editorIsDialogOpen = false } = attributes;
+	const { editorIsDialogOpen = false, dialogLabel = '' } = attributes;
 
 	// Get the dialog-element block from inner blocks and check if it's selected.
 	const { dialogElementClientId, isDialogElementSelected } = useSelect(
@@ -139,6 +130,22 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 
 	return (
 		<>
+			<InspectorControls>
+				<PanelBody title={ __( 'Settings' ) }>
+					<TextControl
+						__nextHasNoMarginBottom
+						__next40pxDefaultSize
+						label={ __( 'Accessible label' ) }
+						help={ __(
+							'Describes the dialog for screen readers. Used as the accessible name when no heading is present.'
+						) }
+						value={ dialogLabel }
+						onChange={ ( value ) =>
+							setAttributes( { dialogLabel: value } )
+						}
+					/>
+				</PanelBody>
+			</InspectorControls>
 			<BlockControls __experimentalShareWithChildBlocks>
 				<ToolbarGroup>
 					<ToolbarButton
@@ -159,6 +166,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 					value={ {
 						'core/dialog-id': dialogId || null,
 						'core/dialog-isDialogOpen': editorIsDialogOpen,
+						'core/dialog-label': dialogLabel,
 					} }
 				>
 					{ innerBlocksProps.children }
