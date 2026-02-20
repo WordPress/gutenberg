@@ -29,7 +29,10 @@ export default function DataViewsFooter() {
 	} = useContext( DataViewsContext );
 
 	const isRefreshing =
-		!! isLoading && hasInitiallyLoaded && ! hasInfiniteScrollHandler;
+		!! isLoading &&
+		hasInitiallyLoaded &&
+		! hasInfiniteScrollHandler &&
+		!! data?.length;
 
 	const hasBulkActions =
 		useSomeItemHasAPossibleBulkAction( actions, data ) &&
