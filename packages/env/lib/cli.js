@@ -180,7 +180,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'clean [environment]',
-		'[Deprecated: use reset] Resets the WordPress databases.',
+		false,
 		( args ) => {
 			args.positional( 'environment', {
 				type: 'string',
