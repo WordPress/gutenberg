@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useRef, useLayoutEffect } from '@wordpress/element';
+import type { MutableRefObject, RefCallback } from 'react';
 
 /**
  * Internal dependencies
@@ -12,11 +13,14 @@ import useRefEffect from '../use-ref-effect';
  * Copies text to the clipboard using the Clipboard API when available,
  * with a fallback for non-secure contexts (e.g. HTTP) and older browsers.
  *
- * @param {string}       text    The text to copy.
- * @param {Element|null} trigger The element that triggered the copy. Required for
- * @return {Promise<boolean>} Resolves to true if successful, false otherwise.
+ * @param text    The text to copy.
+ * @param trigger The element that triggered the copy.
+ * @return Resolves to true if successful, false otherwise.
  */
-export async function copyToClipboard( text, trigger ) {
+export async function copyToClipboard(
+	text: string,
+	trigger: Element | null
+): Promise< boolean > {
 	if ( ! text || ! trigger ) {
 		return false;
 	}
@@ -49,9 +53,9 @@ export async function copyToClipboard( text, trigger ) {
 /**
  * Clears the current selection and restores focus to the trigger element.
  *
- * @param {Element} trigger The element that triggered the copy.
+ * @param trigger The element that triggered the copy.
  */
-export function clearSelection( trigger ) {
+export function clearSelection( trigger: Element ): void {
 	if ( 'focus' in trigger && typeof trigger.focus === 'function' ) {
 		trigger.focus();
 	}
@@ -60,11 +64,11 @@ export function clearSelection( trigger ) {
 
 /**
  * @template T
- * @param {T} value
- * @return {React.RefObject<T>} The updated ref
+ * @param    value
+ * @return   A ref to assign to the target element.
  */
-function useUpdatedRef( value ) {
-	const ref = useRef( value );
+function useUpdatedRef< T >( value: T ): MutableRefObject< T > {
+	const ref = useRef< T >( value );
 	useLayoutEffect( () => {
 		ref.current = value;
 	}, [ value ] );
@@ -74,14 +78,17 @@ function useUpdatedRef( value ) {
 /**
  * Copies the given text to the clipboard when the element is clicked.
  *
- * @template {HTMLElement} TElementType
- * @param {string | (() => string)} text      The text to copy. Use a function if not
- *                                            already available and expensive to compute.
- * @param {Function}                onSuccess Called when to text is copied.
+ * @template T
+ * @param    text      The text to copy. Use a function if not
+ *                     already available and expensive to compute.
+ * @param    onSuccess Called when to text is copied.
  *
- * @return {React.Ref<TElementType>} A ref to assign to the target element.
+ * @return   A ref to assign to the target element.
  */
-export default function useCopyToClipboard( text, onSuccess ) {
+export default function useCopyToClipboard< T extends HTMLElement >(
+	text: string | ( () => string ),
+	onSuccess?: () => void
+): RefCallback< T > {
 	const textRef = useUpdatedRef( text );
 	const onSuccessRef = useUpdatedRef( onSuccess );
 	return useRefEffect( ( node ) => {

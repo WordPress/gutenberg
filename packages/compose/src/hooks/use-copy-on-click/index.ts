@@ -3,6 +3,7 @@
  */
 import { useEffect, useState } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
+import type { RefObject } from 'react';
 
 /**
  * Internal dependencies
@@ -13,16 +14,18 @@ import { clearSelection, copyToClipboard } from '../use-copy-to-clipboard';
  * Copies the text to the clipboard when the element is clicked.
  *
  * @deprecated
- *
- * @param {React.RefObject<string | Element | NodeListOf<Element>>} ref       Reference with the element.
- * @param {string|Function}                                         text      The text to copy.
- * @param {number}                                                  [timeout] Optional timeout to reset the returned
- *                                                                            state. 4 seconds by default.
- *
- * @return {boolean} Whether or not the text has been copied. Resets after the
- *                   timeout.
+ * @param ref      Reference with the element.
+ * @param text    The text to copy.
+ * @param timeout Optional timeout to reset the returned
+ *                state. 4 seconds by default.
+ * @return Whether or not the text has been copied. Resets after the
+ *         timeout.
  */
-export default function useCopyOnClick( ref, text, timeout = 4000 ) {
+export default function useCopyOnClick(
+	ref: RefObject< string | Element | NodeListOf< Element > >,
+	text: string | ( () => string ),
+	timeout: number = 4000
+): boolean {
 	deprecated( 'wp.compose.useCopyOnClick', {
 		since: '5.8',
 		alternative: 'wp.compose.useCopyToClipboard',
@@ -31,13 +34,12 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 	const [ hasCopied, setHasCopied ] = useState( false );
 
 	useEffect( () => {
-		/** @type {number | undefined} */
-		let timeoutId;
+		let timeoutId: ReturnType< typeof setTimeout > | undefined;
 		if ( ! ref.current ) {
 			return;
 		}
 
-		let targets;
+		let targets: Element[];
 		if ( typeof ref.current === 'string' ) {
 			targets =
 				typeof document !== 'undefined'
@@ -49,15 +51,15 @@ export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 		) {
 			targets = Array.from( ref.current );
 		} else {
-			targets = [ /** @type {Element} */ ( ref.current ) ];
+			targets = [ ref.current as Element ];
 		}
 
 		if ( targets.length === 0 ) {
 			return;
 		}
 
-		const handleClick = ( /** @type {Event} */ event ) => {
-			const trigger = /** @type {Element} */ ( event.currentTarget );
+		const handleClick = ( event: Event ) => {
+			const trigger = event.currentTarget as Element;
 			if ( ! trigger ) {
 				return;
 			}
