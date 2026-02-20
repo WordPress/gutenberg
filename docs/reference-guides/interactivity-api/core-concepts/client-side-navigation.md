@@ -41,18 +41,38 @@ If you already have an interactive block and want to add client-side navigation,
 2. **Define router regions**: Mark the HTML elements that should be updated during navigation using the `data-wp-router-region` attribute.
 3. **Trigger navigation**: Use the router's `actions.navigate()` function to navigate programmatically when the user interacts with your block.
 
+Client-side navigation is not limited to blocks — you can also use it in classic PHP themes by adding the Interactivity API directives directly in your theme's template files and processing them with `wp_interactivity_process_directives()`, as explained in the [Server-side rendering](/docs/reference-guides/interactivity-api/core-concepts/server-side-rendering.md#processing-directives-in-classic-themes). Instead of relying on a block's `block.json` to declare script module dependencies, you register and enqueue your script module manually, taking into account that the `@wordpress/interactivity-router` module should be dynamically imported:
+
+```php
+// functions.php
+add_action( 'wp_enqueue_scripts', function () {
+    wp_register_script_module(
+        'my-theme/navigation',
+        get_template_directory_uri() . '/assets/navigation.js',
+        array(
+			'@wordpress/interactivity',
+			array(
+				'id'     => '@wordpress/interactivity-router',
+				'import' => 'dynamic',
+			),
+		)
+    );
+    wp_enqueue_script_module( 'my-theme/navigation' );
+} );
+```
+
+The rest of the guide — router regions, prefetching, navigation options — applies in exactly the same way regardless of whether you are working with a block or a classic theme.
+
 ### Setting up router regions
 
 A router region is a section of your page that the router updates during client-side navigation. You define one by adding both `data-wp-router-region` and `data-wp-interactive` to the same element — both directives are required at this moment.
 
 The `data-wp-router-region` directive takes a unique ID as its value. When navigation occurs, the router matches regions on the current page with regions on the target page by their IDs and replaces their content — leaving everything outside router regions untouched. Each region ID must be unique within a page; if two regions share the same ID, the router won't know which one to update.
 
-Here's a basic router region in a block's markup:
+Here's a basic router region:
 
 ```php
-// render.php
 <div
-    <?php echo get_block_wrapper_attributes(); ?>
     data-wp-interactive="myPlugin"
     data-wp-router-region="myPlugin/posts-list"
 >
@@ -108,15 +128,15 @@ Note that the router region still needs its own `data-wp-interactive` directive,
 
 ### Implementing navigation
 
-To trigger client-side navigation, you define an **action** in your block's store and connect it to a DOM event using an Interactivity API directive. Actions are functions defined inside `store()` that handle user interactions — similar to event handlers in other frameworks. When connected to an element through a directive like `data-wp-on--click`, the action runs whenever that event fires.
+To trigger client-side navigation, you define an **action** in your store and connect it to a DOM event using an Interactivity API directive. Actions are functions defined inside `store()` that handle user interactions — similar to event handlers in other frameworks. When connected to an element through a directive like `data-wp-on--click`, the action runs whenever that event fires.
 
-Here's how to implement a link that navigates client-side. First, the HTML in your block's `render.php` connects the link's click event to the `navigateTo` action:
+Here's how to implement a link that navigates client-side. First, the HTML connects the link's click event to the `navigateTo` action:
 
 ```html
 <a data-wp-on--click="actions.navigateTo" href="/page-2/"> Go to Page 2 </a>
 ```
 
-Then, in your `view.js`, you define the `navigateTo` action. It prevents the browser's default full-page navigation and uses the router's `navigate()` function instead:
+Then, in your script module, you define the `navigateTo` action. It prevents the browser's default full-page navigation and uses the router's `navigate()` function instead:
 
 ```js
 // view.js
@@ -156,7 +176,7 @@ A common pattern is to prefetch a page when the user hovers over a link, and nav
 </a>
 ```
 
-The corresponding actions in `view.js` handle each event:
+The corresponding actions in the script module handle each event:
 
 ```js
 // view.js
@@ -187,9 +207,9 @@ store( 'myPlugin', {
 
 This example brings together router regions, navigation, and prefetching to implement client-side pagination for a list of posts.
 
-The block queries posts for the current page and renders them inside a router region. Pagination links at the bottom allow the user to move between pages. When the user hovers over a "Previous" or "Next" link, the target page is prefetched. When they click, the router navigates client-side — replacing only the content inside the router region without a full page reload. After navigation, the page scrolls smoothly to the top.
+The PHP template queries posts for the current page and renders them inside a router region. Pagination links at the bottom allow the user to move between pages. When the user hovers over a "Previous" or "Next" link, the target page is prefetched. When they click, the router navigates client-side — replacing only the content inside the router region without a full page reload. After navigation, the page scrolls smoothly to the top.
 
-**PHP (render.php):**
+**PHP:**
 
 ```php
 <?php
@@ -201,7 +221,6 @@ $query = new WP_Query( array(
 ?>
 
 <div
-    <?php echo get_block_wrapper_attributes(); ?>
     data-wp-interactive="myPagination"
     data-wp-router-region="myPagination/posts"
 >
@@ -239,7 +258,7 @@ $query = new WP_Query( array(
 </div>
 ```
 
-**JavaScript (view.js):**
+**JavaScript:**
 
 ```js
 import { store, withSyncEvent } from '@wordpress/interactivity';
@@ -738,7 +757,7 @@ An important detail to understand is that HTML outside of router regions remains
 
 This means that if you have static elements like a site header, footer, or navigation menu that aren't wrapped in a router region, they won't change when the user navigates between pages. This can be intentional (for elements that truly are the same across all pages) or it can be a source of confusion if you expect those elements to update.
 
-However, there's an important exception: **interactive elements outside router regions can still react to global state changes**. If you have an interactive block outside any router region, with directives that use `getServerState()` to read global state, these directives will automatically re-evaluate when navigation brings in new server state.
+However, there's an important exception: **interactive elements outside router regions can still react to global state changes**. If you have an interactive element outside any router region, with directives that use `getServerState()` to read global state, these directives will automatically re-evaluate when navigation brings in new server state.
 
 For example, consider a shopping cart icon in the header that displays the number of items:
 
@@ -773,7 +792,7 @@ const { state } = store( 'myShop', {
 
 Now the cart icon will update whenever navigation brings in a new `cartCount` value from the server, even though the header itself is outside any router region. This is because `getServerState()` creates a reactive subscription to server-provided state, which is updated during every navigation.
 
-This pattern is useful for global UI elements that need to stay synchronized with server data across navigations, without requiring them to be inside a router region. However, `getServerState()` can also be used to synchronize the `state` of interactive blocks inside router regions, as described in the [Handling server state updates](#handling-server-state-updates) section.
+This pattern is useful for global UI elements that need to stay synchronized with server data across navigations, without requiring them to be inside a router region. However, `getServerState()` can also be used to synchronize the `state` of interactive elements inside router regions, as described in the [Handling server state updates](#handling-server-state-updates) section.
 
 ### CSS handling
 
@@ -835,7 +854,7 @@ By keeping deactivated style elements in the DOM (rather than removing them), th
 
 ### Script module handling
 
-Interactive blocks use [script modules](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/) for their interactive behavior. The router must ensure that when navigating to a new page, any script modules required by that page are loaded and executed.
+The Interactivity API uses [script modules](https://make.wordpress.org/core/2024/03/04/script-modules-in-6-5/) for interactive behavior. The router must ensure that when navigating to a new page, any script modules required by that page are loaded and executed.
 
 **Identifying script modules for client-side navigation**
 
@@ -905,13 +924,13 @@ Each script module's top-level code runs, which typically includes calls to `sto
 
 ### Server state and context
 
-Interactive blocks often need data from the server — configuration values, content from the database, user preferences, and more. The Interactivity API provides two mechanisms for this: [global state and local context](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md).
+Interactive elements often need data from the server — configuration values, content from the database, user preferences, and more. The Interactivity API provides two mechanisms for this: [global state and local context](/docs/reference-guides/interactivity-api/core-concepts/undestanding-global-state-local-context-and-derived-state.md).
 
 During client-side navigation, this server-provided data needs to be extracted from the new page and made available to the client-side code.
 
 **How server data is embedded in pages**
 
-When WordPress renders a page with interactive blocks, it embeds server-provided data in special `<script>` tags:
+When WordPress renders a page with interactive elements, it embeds server-provided data in special `<script>` tags:
 
 ```html
 <!-- Global state -->
@@ -937,7 +956,7 @@ Local context is embedded directly in the `data-wp-context` attribute of element
 	data-wp-interactive="myPlugin"
 	data-wp-context='{ "productId": 42, "inStock": true }'
 >
-	<!-- Block content -->
+	<!-- Content -->
 </div>
 ```
 
