@@ -93,11 +93,11 @@ test.describe( 'Editing Navigation Menus', () => {
 
 			await expect( sidebar ).toBeVisible();
 
-			// Check that the `Navigation` control is visible.
+			// Check that the list view panel heading is visible with the custom menu name.
 			// This is effectively the contents of the "List View" tab.
 			await expect(
 				sidebar.getByRole( 'heading', {
-					name: 'Navigation',
+					name: 'Primary Menu',
 					exact: true,
 				} )
 			).toBeVisible();
