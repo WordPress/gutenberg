@@ -18,8 +18,8 @@ import { clearSelection, copyToClipboard } from '../use-copy-to-clipboard';
  * @param text    The text to copy.
  * @param timeout Optional timeout to reset the returned
  *                state. 4 seconds by default.
- * @return Whether or not the text has been copied. Resets after the
- *         timeout.
+ * @return   Whether or not the text has been copied. Resets after the
+ *           timeout.
  */
 export default function useCopyOnClick(
 	ref: RefObject< string | Element | NodeListOf< Element > >,
@@ -34,6 +34,8 @@ export default function useCopyOnClick(
 	const [ hasCopied, setHasCopied ] = useState( false );
 
 	useEffect( () => {
+		// Flag to prevent state updates after unmount when the Promise resolves.
+		let isActive = true;
 		let timeoutId: ReturnType< typeof setTimeout > | undefined;
 		if ( ! ref.current ) {
 			return;
@@ -67,6 +69,9 @@ export default function useCopyOnClick(
 				typeof text === 'function' ? text() : text || '',
 				trigger
 			).then( ( success ) => {
+				if ( ! isActive ) {
+					return;
+				}
 				if ( success ) {
 					clearSelection( trigger );
 					if ( timeout ) {
@@ -85,6 +90,7 @@ export default function useCopyOnClick(
 			target.addEventListener( 'click', handleClick );
 		}
 		return () => {
+			isActive = false;
 			for ( const target of targets ) {
 				target.removeEventListener( 'click', handleClick );
 			}
