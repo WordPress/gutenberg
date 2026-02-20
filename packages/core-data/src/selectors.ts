@@ -139,8 +139,6 @@ type EntityResource = { kind: string; name: string; id?: EntityRecordKey };
  */
 const EMPTY_OBJECT = {};
 
-const EMPTY_ARRAY = [];
-
 /**
  * Returns true if a request is in progress for embed preview data, or false
  * otherwise.
@@ -1630,17 +1628,4 @@ export function getSyncConnectionStatus(
 	}
 
 	return coalesced;
-}
-
-/**
- * Returns the list of available icons.
- *
- * @param state Data state.
- * @return The list of icons or empty array if not loaded.
- */
-export function getIcons( state: State ): ET.Icon[] {
-	const icons = getEntityRecords< ET.Icon >( state, 'root', 'icon', {
-		per_page: -1,
-	} );
-	return icons ?? EMPTY_ARRAY;
 }

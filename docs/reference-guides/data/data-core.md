@@ -443,18 +443,6 @@ _Returns_
 
 -   `number | null`: number | null.
 
-### getIcons
-
-Returns the list of available icons.
-
-_Parameters_
-
--   _state_ `State`: Data state.
-
-_Returns_
-
--   `ET.Icon[]`: The list of icons or empty array if not loaded.
-
 ### getLastEntityDeleteError
 
 Returns the specified entity record's last delete error.
