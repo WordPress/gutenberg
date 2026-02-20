@@ -162,7 +162,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'reset [environment]',
-		'Resets the WordPress databases.',
+		chalk`{bold.red Resets} the WordPress databases.`,
 		( args ) => {
 			args.positional( 'environment', {
 				type: 'string',
@@ -224,7 +224,7 @@ module.exports = function cli() {
 
 	yargs.command(
 		'run <container> [command...]',
-		'Runs an arbitrary command in one of the underlying Docker containers. A double dash can be used to pass arguments to the container without parsing them. This is necessary if you are using an option that is defined below. You can use `bash` to open a shell session and both `composer` and `phpunit` are available in all WordPress and CLI containers. WP-CLI is also available in the CLI containers.',
+		chalk`Runs an arbitrary command in one of the underlying Docker containers. Use a double dash to pass arguments to it. You can use {bold bash} to open a shell session. {bold composer} and {bold phpunit} are available in all WordPress and CLI containers. {bold wp} is also available in the CLI containers.`,
 		( args ) => {
 			args.option( 'env-cwd', {
 				type: 'string',
@@ -261,7 +261,7 @@ module.exports = function cli() {
 
 	yargs.command(
 		'destroy',
-		'Destroy the WordPress environment. Deletes docker containers, volumes, networks, and images associated with the WordPress environment and removes local files.',
+		chalk`{bold.red Destroys} the WordPress environment. Deletes docker containers, volumes, networks, and images associated with the WordPress environment and removes local files.`,
 		( args ) => {
 			args.option( 'scripts', {
 				type: 'boolean',
@@ -278,7 +278,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'cleanup',
-		'Cleanup the WordPress environment. Removes docker containers, volumes, networks, and local files, but preserves docker images for faster re-starts.',
+		chalk`{bold.red Cleans up} the WordPress environment. Removes docker containers, volumes, networks, and local files, but preserves docker images for faster re-starts.`,
 		( args ) => {
 			args.option( 'scripts', {
 				type: 'boolean',
