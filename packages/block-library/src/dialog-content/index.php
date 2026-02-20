@@ -91,7 +91,7 @@ function render_block_core_dialog_content( array $attributes, string $content, W
 		$merged_style           = $existing_style ? $existing_style . ' ' . $animation_duration_css : $animation_duration_css;
 		$tag_processor->set_attribute( 'style', $merged_style );
 		// Set the additional directives.
-		$tag_processor->set_attribute( 'data-wp-class--active', 'state.dialogs.isOpen' );
+		$tag_processor->set_attribute( 'data-wp-class--active', 'state.dialog.isOpen' );
 		$tag_processor->set_attribute( 'data-wp-class--show-closing-animation', 'state.dialog.showClosingAnimation' );
 		$tag_processor->set_attribute( 'data-wp-on--click', 'callbacks.onBackdropClick' );
 		$tag_processor->set_attribute( 'data-wp-on-document--keydown', 'callbacks.onESCKey' );
