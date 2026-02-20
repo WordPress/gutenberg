@@ -44,6 +44,18 @@ _Returns_
 
 -   `string`: Context.
 
+### isLoading
+
+Returns whether any command loader is currently loading.
+
+_Parameters_
+
+-   _state_ `Object`: State tree.
+
+_Returns_
+
+-   `boolean`: Whether any loader is loading.
+
 ### isOpen
 
 Returns whether the command palette is open.
@@ -97,6 +109,19 @@ Register command loader.
 _Parameters_
 
 -   _config_ `WPCommandLoaderConfig`: Command loader config.
+
+_Returns_
+
+-   `Object`: action.
+
+### setLoaderLoading
+
+Sets whether a command loader is currently loading.
+
+_Parameters_
+
+-   _name_ `string`: Command loader name.
+-   _isLoading_ `boolean`: Whether the loader is loading.
 
 _Returns_
 

@@ -7,20 +7,12 @@ import clsx from 'clsx';
 /**
  * WordPress dependencies
  */
-import {
-	useSelect,
-	useDispatch,
-	select as globalSelect,
-} from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	useState,
 	useEffect,
 	useRef,
-	useCallback,
-	useMemo,
-	createContext,
-	useContext,
 	isValidElement,
 	Component,
 } from '@wordpress/element';
@@ -42,11 +34,13 @@ import { Icon, search as inputIcon, arrowRight } from '@wordpress/icons';
  */
 import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
+import { useRecentCommands } from './use-recent-commands';
 
 const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );
 
+// Namespaces item ids to avoid collisions with other elements on the page.
+const ITEM_ID_PREFIX = 'command-palette-item-';
 const inputLabel = __( 'Search commands and settings' );
-const MAX_RECENTLY_SAVED = 15;
 const MAX_RECENTLY_DISPLAYED = 5;
 
 /**
@@ -89,65 +83,17 @@ export function isValidIcon( icon ) {
 	);
 }
 
-const CommandPaletteContext = createContext();
-
-function useCommandPalette() {
-	return useContext( CommandPaletteContext );
-}
-
-function useRecentCommands() {
-	const { set: setPreference } = useDispatch( preferencesStore );
-
-	const recordUsage = useCallback(
-		( name ) => {
-			const current =
-				globalSelect( preferencesStore ).get(
-					'core/commands',
-					'recentlyUsed'
-				) ?? [];
-			const next = [
-				name,
-				...current.filter( ( n ) => n !== name ),
-			].slice( 0, MAX_RECENTLY_SAVED );
-			setPreference( 'core/commands', 'recentlyUsed', next );
-		},
-		[ setPreference ]
-	);
-
-	const removeFromRecent = useCallback(
-		( commandName ) => {
-			const current =
-				globalSelect( preferencesStore ).get(
-					'core/commands',
-					'recentlyUsed'
-				) ?? [];
-			const next = current.filter( ( n ) => n !== commandName );
-			setPreference( 'core/commands', 'recentlyUsed', next );
-		},
-		[ setPreference ]
-	);
-
-	return { recordUsage, removeFromRecent };
-}
-
-function useSelectedItemId() {
-	const _value = useCommandState( ( state ) => state.value );
-	return useMemo( () => {
-		const item = document.querySelector(
-			`[cmdk-item=""][data-value="${ _value }"]`
-		);
-		return item?.getAttribute( 'id' ) ?? null;
-	}, [ _value ] );
-}
-
-function CommandItem( { command, category, valuePrefix } ) {
-	const { search, close, recordUsage } = useCommandPalette();
+function CommandItem( { command, search, category, valuePrefix } ) {
+	const { close } = useDispatch( commandsStore );
+	const { recordUsage } = useRecentCommands();
 	const commandCategory = category ?? command.category;
 	const label = command.searchLabel ?? command.label;
+	const value = valuePrefix ? `${ valuePrefix }${ command.name }` : label;
 	return (
 		<Command.Item
 			key={ command.name }
-			value={ valuePrefix ? `${ valuePrefix }${ command.name }` : label }
+			id={ `${ ITEM_ID_PREFIX }${ value.toLowerCase() }` }
+			value={ value }
 			keywords={
 				valuePrefix
 					? [ ...( command.keywords ?? [] ), label ]
@@ -190,17 +136,18 @@ function CommandItem( { command, category, valuePrefix } ) {
 
 function CommandMenuLoader( {
 	name,
+	search,
 	hook,
 	category,
 	filterNames,
 	sortOrder,
 	valuePrefix,
 } ) {
-	const { search, setLoader } = useCommandPalette();
-	const { isLoading, commands = [] } = hook( { search } ) ?? {};
+	const { setLoaderLoading } = useDispatch( commandsStore );
+	const { isLoading: loading, commands = [] } = hook( { search } ) ?? {};
 	useEffect( () => {
-		setLoader( name, isLoading );
-	}, [ setLoader, name, isLoading ] );
+		setLoaderLoading( name, loading );
+	}, [ setLoaderLoading, name, loading ] );
 
 	let filtered = filterNames
 		? commands.filter( ( command ) => filterNames.has( command.name ) )
@@ -225,6 +172,7 @@ function CommandMenuLoader( {
 				<CommandItem
 					key={ command.name }
 					command={ command }
+					search={ search }
 					category={ command.category ?? category }
 					valuePrefix={ valuePrefix }
 				/>
@@ -257,6 +205,7 @@ function CommandMenuLoaderWrapper( { hook, ...props } ) {
 }
 
 function CommandList( {
+	search,
 	commands,
 	loaders,
 	valuePrefix,
@@ -269,6 +218,7 @@ function CommandList( {
 				<CommandItem
 					key={ command.name }
 					command={ command }
+					search={ search }
 					valuePrefix={ valuePrefix }
 				/>
 			) ) }
@@ -276,6 +226,7 @@ function CommandList( {
 				<CommandMenuLoaderWrapper
 					key={ loader.name }
 					name={ loader.name }
+					search={ search }
 					hook={ loader.hook }
 					category={ loader.category }
 					valuePrefix={ valuePrefix }
@@ -287,7 +238,7 @@ function CommandList( {
 	);
 }
 
-function RecentGroup() {
+function RecentGroup( { search } ) {
 	const {
 		commands: allCommands,
 		loaders,
@@ -326,6 +277,7 @@ function RecentGroup() {
 	return (
 		<Command.Group heading={ __( 'Recent' ) }>
 			<CommandList
+				search={ search }
 				commands={ recentCommands }
 				loaders={ loaders }
 				valuePrefix="recent-"
@@ -336,7 +288,7 @@ function RecentGroup() {
 	);
 }
 
-function SuggestionsGroup() {
+function SuggestionsGroup( { search } ) {
 	const { commands, loaders } = useSelect( ( select ) => {
 		const { getCommands, getCommandLoaders } = select( commandsStore );
 		return {
@@ -347,12 +299,16 @@ function SuggestionsGroup() {
 
 	return (
 		<Command.Group heading={ __( 'Suggestions' ) }>
-			<CommandList commands={ commands } loaders={ loaders } />
+			<CommandList
+				search={ search }
+				commands={ commands }
+				loaders={ loaders }
+			/>
 		</Command.Group>
 	);
 }
 
-function ResultsGroup() {
+function ResultsGroup( { search } ) {
 	const { commands, contextualCommands, loaders, contextualLoaders } =
 		useSelect( ( select ) => {
 			const { getCommands, getCommandLoaders } = select( commandsStore );
@@ -366,8 +322,13 @@ function ResultsGroup() {
 
 	return (
 		<Command.Group heading={ __( 'Results' ) }>
-			<CommandList commands={ commands } loaders={ loaders } />
 			<CommandList
+				search={ search }
+				commands={ commands }
+				loaders={ loaders }
+			/>
+			<CommandList
+				search={ search }
 				commands={ contextualCommands }
 				loaders={ contextualLoaders }
 			/>
@@ -375,8 +336,9 @@ function ResultsGroup() {
 	);
 }
 
-function RemoveRecentHandler( { removeFromRecent } ) {
+function RemoveRecentHandler() {
 	const _value = useCommandState( ( state ) => state.value );
+	const { removeFromRecent } = useRecentCommands();
 
 	useShortcut( 'core/commands/remove-recent', ( event ) => {
 		if ( ! _value?.startsWith( 'recent-' ) ) {
@@ -393,7 +355,8 @@ function RemoveRecentHandler( { removeFromRecent } ) {
 
 function CommandInput( { isOpen, search, setSearch } ) {
 	const commandMenuInput = useRef();
-	const selectedItemId = useSelectedItemId();
+	const _value = useCommandState( ( state ) => state.value );
+	const selectedItemId = _value ? `${ ITEM_ID_PREFIX }${ _value }` : null;
 	useEffect( () => {
 		// Focus the command palette input when mounting the modal.
 		if ( isOpen ) {
@@ -417,13 +380,14 @@ function CommandInput( { isOpen, search, setSearch } ) {
 export function CommandMenu() {
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 	const [ search, setSearch ] = useState( '' );
-	const isOpen = useSelect(
-		( select ) => select( commandsStore ).isOpen(),
+	const { isOpen: paletteIsOpen, loadersLoading } = useSelect(
+		( select ) => ( {
+			isOpen: select( commandsStore ).isOpen(),
+			loadersLoading: select( commandsStore ).isLoading(),
+		} ),
 		[]
 	);
 	const { open, close } = useDispatch( commandsStore );
-	const { recordUsage, removeFromRecent } = useRecentCommands();
-	const [ loaders, setLoaders ] = useState( {} );
 
 	useEffect( () => {
 		registerShortcut( {
@@ -456,7 +420,7 @@ export function CommandMenu() {
 			}
 
 			event.preventDefault();
-			if ( isOpen ) {
+			if ( paletteIsOpen ) {
 				close();
 			} else {
 				open();
@@ -467,30 +431,14 @@ export function CommandMenu() {
 		}
 	);
 
-	const setLoader = useCallback(
-		( name, value ) =>
-			setLoaders( ( current ) => ( {
-				...current,
-				[ name ]: value,
-			} ) ),
-		[]
-	);
 	const closeAndReset = () => {
 		setSearch( '' );
 		close();
 	};
 
-	if ( ! isOpen ) {
+	if ( ! paletteIsOpen ) {
 		return false;
 	}
-
-	const isLoading = Object.values( loaders ).some( Boolean );
-	const contextValue = {
-		search,
-		setLoader,
-		close: closeAndReset,
-		recordUsage,
-	};
 
 	return (
 		<Modal
@@ -498,37 +446,34 @@ export function CommandMenu() {
 			overlayClassName="commands-command-menu__overlay"
 			onRequestClose={ closeAndReset }
 			__experimentalHideHeader
+			size="medium"
 			contentLabel={ __( 'Command palette' ) }
 		>
 			<div className="commands-command-menu__container">
-				<CommandPaletteContext.Provider value={ contextValue }>
-					<Command label={ inputLabel } loop>
-						<RemoveRecentHandler
-							removeFromRecent={ removeFromRecent }
+				<Command label={ inputLabel } loop>
+					<RemoveRecentHandler />
+					<div className="commands-command-menu__header">
+						<Icon
+							className="commands-command-menu__header-search-icon"
+							icon={ inputIcon }
 						/>
-						<div className="commands-command-menu__header">
-							<Icon
-								className="commands-command-menu__header-search-icon"
-								icon={ inputIcon }
-							/>
-							<CommandInput
-								search={ search }
-								setSearch={ setSearch }
-								isOpen={ isOpen }
-							/>
-						</div>
-						<Command.List label={ __( 'Command suggestions' ) }>
-							{ search && ! isLoading && (
-								<Command.Empty>
-									{ __( 'No results found.' ) }
-								</Command.Empty>
-							) }
-							{ ! search && <RecentGroup /> }
-							{ ! search && <SuggestionsGroup /> }
-							{ search && <ResultsGroup /> }
-						</Command.List>
-					</Command>
-				</CommandPaletteContext.Provider>
+						<CommandInput
+							search={ search }
+							setSearch={ setSearch }
+							isOpen={ paletteIsOpen }
+						/>
+					</div>
+					<Command.List label={ __( 'Command suggestions' ) }>
+						{ search && ! loadersLoading && (
+							<Command.Empty>
+								{ __( 'No results found.' ) }
+							</Command.Empty>
+						) }
+						{ ! search && <RecentGroup search={ search } /> }
+						{ ! search && <SuggestionsGroup search={ search } /> }
+						{ search && <ResultsGroup search={ search } /> }
+					</Command.List>
+				</Command>
 			</div>
 		</Modal>
 	);
