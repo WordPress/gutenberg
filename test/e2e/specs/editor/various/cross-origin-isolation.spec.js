@@ -35,17 +35,31 @@ test.use( {
 	},
 } );
 
-// Client-side media processing (and cross-origin isolation) is temporarily
-// disabled in the Gutenberg plugin. Skip until re-enabled.
-// See https://github.com/WordPress/gutenberg/pull/75756
-test.describe.skip( 'Cross-origin isolation', () => {
+test.describe( 'Cross-origin isolation', () => {
+	test.beforeAll( async ( { requestUtils } ) => {
+		// Client-side media processing (and cross-origin isolation) is
+		// temporarily disabled in the Gutenberg plugin.
+		// See https://github.com/WordPress/gutenberg/pull/75756
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-enable-client-side-media-processing'
+		);
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-enable-client-side-media-processing'
+		);
+	} );
+
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
 	} );
 
-	test( 'should be cross-origin isolated by default', async ( { page } ) => {
-		// Verify that cross-origin isolation IS enabled (default state
-		// now that client-side media processing is graduated).
+	test( 'should be cross-origin isolated when client-side media processing is enabled', async ( {
+		page,
+	} ) => {
+		// Verify that cross-origin isolation IS enabled when
+		// client-side media processing is active.
 		const isCrossOriginIsolated = await page.evaluate(
 			() => window.crossOriginIsolated
 		);
