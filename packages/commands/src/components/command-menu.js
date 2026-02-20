@@ -8,7 +8,6 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as preferencesStore } from '@wordpress/preferences';
 import {
 	useState,
 	useEffect,
@@ -34,14 +33,17 @@ import { Icon, search as inputIcon, arrowRight } from '@wordpress/icons';
  */
 import { store as commandsStore } from '../store';
 import { unlock } from '../lock-unlock';
-import { useRecentCommands } from './use-recent-commands';
+import {
+	useRecentCommands,
+	useRecentCommandsData,
+	useRemoveRecentShortcut,
+} from './use-recent-commands';
 
 const { withIgnoreIMEEvents } = unlock( componentsPrivateApis );
 
 // Namespaces item ids to avoid collisions with other elements on the page.
 const ITEM_ID_PREFIX = 'command-palette-item-';
 const inputLabel = __( 'Search commands and settings' );
-const MAX_RECENTLY_DISPLAYED = 5;
 
 /**
  * Icons enforced per command category.
@@ -239,38 +241,10 @@ function CommandList( {
 }
 
 function RecentGroup( { search } ) {
-	const {
-		commands: allCommands,
-		loaders,
-		recentlyUsedNames,
-	} = useSelect( ( select ) => {
-		const { getCommands, getCommandLoaders } = select( commandsStore );
-		return {
-			commands: [ ...getCommands( true ), ...getCommands( false ) ],
-			loaders: [
-				...getCommandLoaders( true ),
-				...getCommandLoaders( false ),
-			],
-			recentlyUsedNames:
-				select( preferencesStore ).get(
-					'core/commands',
-					'recentlyUsed'
-				) ?? [],
-		};
-	}, [] );
+	const { commands, loaders, displayNames, displaySet } =
+		useRecentCommandsData();
 
-	if ( ! recentlyUsedNames.length ) {
-		return null;
-	}
-
-	const displayNames = recentlyUsedNames.slice( 0, MAX_RECENTLY_DISPLAYED );
-	const displaySet = new Set( displayNames );
-	const commandsByName = new Map( allCommands.map( ( c ) => [ c.name, c ] ) );
-	const recentCommands = displayNames
-		.map( ( name ) => commandsByName.get( name ) )
-		.filter( Boolean );
-
-	if ( ! recentCommands.length && ! loaders.length ) {
+	if ( ! commands.length && ! loaders.length ) {
 		return null;
 	}
 
@@ -278,7 +252,7 @@ function RecentGroup( { search } ) {
 		<Command.Group heading={ __( 'Recent' ) }>
 			<CommandList
 				search={ search }
-				commands={ recentCommands }
+				commands={ commands }
 				loaders={ loaders }
 				valuePrefix="recent-"
 				filterNames={ displaySet }
@@ -336,33 +310,15 @@ function ResultsGroup( { search } ) {
 	);
 }
 
-function RemoveRecentHandler() {
-	const _value = useCommandState( ( state ) => state.value );
-	const { removeFromRecent } = useRecentCommands();
-
-	useShortcut( 'core/commands/remove-recent', ( event ) => {
-		if ( ! _value?.startsWith( 'recent-' ) ) {
-			return;
-		}
-
-		event.preventDefault();
-		const commandName = _value.slice( 'recent-'.length );
-		removeFromRecent( commandName );
-	} );
-
-	return null;
-}
-
-function CommandInput( { isOpen, search, setSearch } ) {
+function CommandInput( { search, setSearch } ) {
 	const commandMenuInput = useRef();
 	const _value = useCommandState( ( state ) => state.value );
+	useRemoveRecentShortcut();
 	const selectedItemId = _value ? `${ ITEM_ID_PREFIX }${ _value }` : null;
 	useEffect( () => {
 		// Focus the command palette input when mounting the modal.
-		if ( isOpen ) {
-			commandMenuInput.current.focus();
-		}
-	}, [ isOpen ] );
+		commandMenuInput.current.focus();
+	}, [] );
 	return (
 		<Command.Input
 			ref={ commandMenuInput }
@@ -397,15 +353,6 @@ export function CommandMenu() {
 			keyCombination: {
 				modifier: 'primary',
 				character: 'k',
-			},
-		} );
-		registerShortcut( {
-			name: 'core/commands/remove-recent',
-			category: 'global',
-			description: __( 'Remove from recent commands.' ),
-			keyCombination: {
-				modifier: 'shift',
-				character: 'Backspace',
 			},
 		} );
 	}, [ registerShortcut ] );
@@ -451,7 +398,6 @@ export function CommandMenu() {
 		>
 			<div className="commands-command-menu__container">
 				<Command label={ inputLabel } loop>
-					<RemoveRecentHandler />
 					<div className="commands-command-menu__header">
 						<Icon
 							className="commands-command-menu__header-search-icon"
@@ -460,7 +406,6 @@ export function CommandMenu() {
 						<CommandInput
 							search={ search }
 							setSearch={ setSearch }
-							isOpen={ paletteIsOpen }
 						/>
 					</div>
 					<Command.List label={ __( 'Command suggestions' ) }>
