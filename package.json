@@ -61,7 +61,7 @@
 		"@vitejs/plugin-react": "5.1.2",
 		"@wordpress/build": "file:./packages/wp-build",
 		"@wordpress/vips": "file:./packages/vips",
-		"ajv": "8.17.1",
+		"ajv": "8.18.0",
 		"babel-jest": "29.7.0",
 		"babel-loader": "9.2.1",
 		"babel-plugin-inline-json-import": "0.3.2",
