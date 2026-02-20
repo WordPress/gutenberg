@@ -30,10 +30,6 @@
 	}
 }
 
-.boot-layout .components-editor-notices__snackbar {
-	position: fixed;
-	right: 0;
-	bottom: 16px;
-	padding-left: 16px;
-	padding-right: 16px;
+.boot-layout .boot-notices__snackbar {
+	@include snackbar-container();
 }

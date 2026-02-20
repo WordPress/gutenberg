@@ -51,7 +51,8 @@ const mergeConfigs = require( './merge-configs' );
  * @property {WPSource[]}                themeSources   Themes to load in the environment.
  * @property {number}                    port           The port to use.
  * @property {number}                    mysqlPort      The port to use for MySQL. Random if empty.
- * @property {number}                    phpmyadminPort The port to use for phpMyAdmin. If empty, disabled phpMyAdmin.
+ * @property {boolean}                   phpmyadmin     Whether to enable phpMyAdmin.
+ * @property {number}                    phpmyadminPort The port to use for phpMyAdmin. Random if empty.
  * @property {boolean}                   multisite      Whether to set up a multisite installation.
  * @property {Object}                    config         Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings       Mapping of WordPress directories to local directories which should be mounted.
@@ -89,6 +90,7 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	port: 8888,
 	testsPort: 8889,
 	mysqlPort: null,
+	phpmyadmin: false,
 	phpmyadminPort: null,
 	multisite: false,
 	mappings: {},
@@ -306,6 +308,7 @@ function getEnvironmentVarOverrides( cacheDirectoryPath ) {
 	if ( overrides.phpmyadminPort ) {
 		overrideConfig.env.development.phpmyadminPort =
 			overrides.phpmyadminPort;
+		overrideConfig.env.development.phpmyadmin = true;
 	}
 
 	if ( overrides.testsPort ) {
@@ -381,6 +384,14 @@ async function parseRootConfig( configFile, rawConfig, options ) {
 	if ( rawConfig.testsPort !== undefined ) {
 		checkPort( configFile, `testsPort`, rawConfig.testsPort );
 		parsedConfig.testsPort = rawConfig.testsPort;
+	}
+	if ( rawConfig.testsEnvironment !== undefined ) {
+		if ( typeof rawConfig.testsEnvironment !== 'boolean' ) {
+			throw new ValidationError(
+				`Invalid ${ configFile }: "testsEnvironment" must be a boolean.`
+			);
+		}
+		parsedConfig.testsEnvironment = rawConfig.testsEnvironment;
 	}
 	parsedConfig.lifecycleScripts = {};
 	if ( rawConfig.lifecycleScripts ) {
@@ -459,6 +470,7 @@ async function parseEnvironmentConfig(
 		// configuration options that we will parse.
 		switch ( key ) {
 			case 'testsPort':
+			case 'testsEnvironment':
 			case 'lifecycleScripts':
 			case 'env': {
 				if ( options.rootConfig ) {
@@ -487,8 +499,17 @@ async function parseEnvironmentConfig(
 		parsedConfig.mysqlPort = config.mysqlPort;
 	}
 
+	if ( config.phpmyadmin !== undefined ) {
+		parsedConfig.phpmyadmin = config.phpmyadmin;
+	}
+
 	if ( config.phpmyadminPort !== undefined ) {
 		parsedConfig.phpmyadminPort = config.phpmyadminPort;
+		// Backward compat: setting phpmyadminPort implies phpmyadmin: true
+		// unless phpmyadmin was explicitly set.
+		if ( config.phpmyadmin === undefined ) {
+			parsedConfig.phpmyadmin = true;
+		}
 	}
 
 	if ( config.multisite !== undefined ) {

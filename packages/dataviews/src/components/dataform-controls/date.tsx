@@ -161,8 +161,8 @@ function ValidatedDateControl< Item >( {
 	field: NormalizedField< Item >;
 	validity?: FieldValidity;
 	inputRefs:
-		| React.RefObject< HTMLInputElement >
-		| React.RefObject< HTMLInputElement >[];
+		| React.RefObject< HTMLInputElement | null >
+		| React.RefObject< HTMLInputElement | null >[];
 	isTouched: boolean;
 	setIsTouched: ( touched: boolean ) => void;
 	children: React.ReactNode;

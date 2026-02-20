@@ -2,9 +2,7 @@
  * External dependencies
  */
 const path = require( 'path' );
-const { readdir, stat } = require( 'fs/promises' );
-const { createReadStream } = require( 'fs' );
-const { createInterface } = require( 'readline/promises' );
+const { readdir, stat, readFile } = require( 'fs/promises' );
 
 const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
 
@@ -14,7 +12,7 @@ const ICON_LIBRARY_DIR = path.join( __dirname, '..', 'src', 'library' );
  * vice versa.
  */
 async function validateCollection() {
-	const manifestPath = path.join( ICON_LIBRARY_DIR, '..', 'manifest.php' );
+	const manifestPath = path.join( ICON_LIBRARY_DIR, '..', 'manifest.json' );
 
 	try {
 		await stat( manifestPath );
@@ -24,81 +22,52 @@ async function validateCollection() {
 		);
 	}
 
+	const manifestContent = await readFile( manifestPath, 'utf8' );
+	const manifest = JSON.parse( manifestContent );
+
 	/*
 	 * Collect policy violations as strings.
 	 */
 	const problems = [];
 
 	/*
-	 * As a cheap substitute for actually parsing the PHP file, prepare to scan
-	 * it line by line, looking for specific patterns to find the
-	 * aforementioned violations.
-	 */
-	const rl = createInterface( {
-		input: createReadStream( manifestPath, {
-			encoding: 'utf8',
-		} ),
-	} );
-
-	/* Scan manifest.php for the keys (slugs) and `filePath` property (paths)
+	 * Scan manifest.json for the slugs and `filePath` property (paths)
 	 * of every icon, ensuring that for each icon the path matches the slug.
 	 *
-	 * Later we will reuse manifestSlugs to compare these with the SVG files
+	 * Later we will reuse manifestPaths to compare these with the SVG files
 	 * found in the file system.
 	 */
-	const manifestSlugs = [];
 	const manifestPaths = [];
-	for await ( const line of rl ) {
-		let match;
+	for ( const icon of manifest ) {
+		const expected = `library/${ icon.slug }.svg`;
 
 		/*
-		 * Spot the opening of an icon definition, e.g.
-		 *
-		 *     'wordpress' => array(
+		 * This is an unexpected failure and should thus throw an error
+		 * immediately, not be added to `problems`.
 		 */
-		if ( ( match = line.match( /^\t'([^']+)'\s+=> array\($/ )?.[ 1 ] ) ) {
-			manifestSlugs.push( match );
-			continue;
+		if ( icon.filePath !== expected ) {
+			throw new Error(
+				`Invalid icon definition for icon '${ icon.slug }': expected 'filePath' to be '${ expected }', saw '${ icon.filePath }'`
+			);
 		}
 
+		manifestPaths.push( icon.filePath );
+
 		/*
-		 * Spot the 'filePath' property inside an icon definition, e.g.
-		 *
-		 *     'filePath' => 'wordpress.svg',
+		 * Verify that the corresponding SVG file is found.
 		 */
-		if ( ( match = line.match( /^\t\t'filePath' => '(.*)',$/ )?.[ 1 ] ) ) {
-			const expected = `library/${ manifestSlugs.at( -1 ) }.svg`;
-
-			/*
-			 * This is an unexpected failure and should thus throw an error
-			 * immediately, not be added to `problems`.
-			 */
-			if ( match !== expected ) {
-				throw new Error(
-					`Invalid icon definition for icon '${ manifestSlugs.at(
-						-1
-					) }': expected 'filePath' to be '${ expected }', saw '${ match }'`
-				);
-			}
-
-			manifestPaths.push( match );
-
-			/*
-			 * Verify that the corresponding SVG file is found.
-			 */
-			if (
-				! ( await stat(
-					path.join( ICON_LIBRARY_DIR, '..', expected )
-				).catch( () => false ) )
-			) {
-				problems.push(
-					`- Icon file ${ path.join(
-						ICON_LIBRARY_DIR,
-						'..',
-						expected
-					) } not found`
-				);
-			}
+		if (
+			! ( await stat(
+				path.join( ICON_LIBRARY_DIR, '..', expected )
+			).catch( () => false ) )
+		) {
+			problems.push(
+				`- Icon file ${ path.join(
+					ICON_LIBRARY_DIR,
+					'..',
+					expected
+				) } not found`
+			);
 		}
 	}
 

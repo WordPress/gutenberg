@@ -31,7 +31,7 @@ import { unlock } from '../../lock-unlock';
  * @param {Object}   props              Component props.
  * @param {boolean}  props.showDiff     Whether diff highlighting is enabled.
  * @param {Function} props.onToggleDiff Callback to toggle diff highlighting.
- * @return {JSX.Element} The revisions header component.
+ * @return {React.JSX.Element} The revisions header component.
  */
 function RevisionsHeader( { showDiff, onToggleDiff } ) {
 	const isWideViewport = useViewportMatch( 'large' );

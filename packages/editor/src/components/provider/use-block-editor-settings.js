@@ -45,6 +45,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'__experimentalDiscussionSettings',
 	'__experimentalFeatures',
 	'__experimentalGlobalStylesBaseStyles',
+	'allImageSizes',
 	'alignWide',
 	'blockInspectorTabs',
 	'maxUploadFileSize',
@@ -57,6 +58,7 @@ const BLOCK_EDITOR_SETTINGS = [
 	'clearBlockSelection',
 	'codeEditingEnabled',
 	'colors',
+	'disableContentOnlyForUnsyncedPatterns',
 	'disableCustomColors',
 	'disableCustomFontSizes',
 	'disableCustomSpacingSizes',
@@ -100,6 +102,7 @@ const {
 	getMediaSelectKey,
 	isIsolatedEditorKey,
 	deviceTypeKey,
+	isNavigationOverlayContextKey,
 } = unlock( privateApis );
 
 /**
@@ -115,6 +118,8 @@ const {
 function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
+		allImageSizes,
+		bigImageSizeThreshold,
 		allowRightClickOverrides,
 		blockTypes,
 		focusMode,
@@ -131,6 +136,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		restBlockPatternCategories,
 		sectionRootClientId,
 		deviceType,
+		isNavigationOverlayContext,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -152,6 +158,9 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				? getEntityRecord( 'root', 'site' )
 				: undefined;
 
+			// Fetch image sizes from REST API index for client-side media processing.
+			const baseData = getEntityRecord( 'root', '__unstableBase' );
+
 			function getSectionRootBlock() {
 				if ( renderingMode === 'template-locked' ) {
 					return getBlocksByName( 'core/post-content' )?.[ 0 ] ?? '';
@@ -166,6 +175,8 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			}
 
 			return {
+				allImageSizes: baseData?.image_sizes,
+				bigImageSizeThreshold: baseData?.image_size_threshold,
 				allowRightClickOverrides: get(
 					'core',
 					'allowRightClickOverrides'
@@ -197,6 +208,14 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				restBlockPatternCategories: getBlockPatternCategories(),
 				sectionRootClientId: getSectionRootBlock(),
 				deviceType: getDeviceType(),
+				isNavigationOverlayContext:
+					postType === 'wp_template_part' && postId
+						? getEntityRecord(
+								'postType',
+								'wp_template_part',
+								postId
+						  )?.area === 'navigation-overlay'
+						: false,
 			};
 		},
 		[ postType, postId, isLargeViewport, renderingMode ]
@@ -264,27 +283,6 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		[ saveEntityRecord, userCanCreatePages ]
 	);
 
-	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
-
-	/**
-	 * Wraps onNavigateToEntityRecord to automatically include the currently selected block.
-	 * This ensures that navigation can restore the selection when returning to the previous entity.
-	 */
-	const wrappedOnNavigateToEntityRecord = useCallback(
-		( params ) => {
-			if ( ! settings.onNavigateToEntityRecord ) {
-				return;
-			}
-			const selectedBlockClientId = getSelectedBlockClientId();
-
-			return settings.onNavigateToEntityRecord( {
-				...params,
-				selectedBlockClientId,
-			} );
-		},
-		[ settings, getSelectedBlockClientId ]
-	);
-
 	const allowedBlockTypes = useMemo( () => {
 		// Omit hidden block types if exists and non-empty.
 		if ( hiddenBlockTypes && hiddenBlockTypes.length > 0 ) {
@@ -318,15 +316,15 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 			),
 			[ globalStylesDataKey ]: globalStylesData,
 			[ globalStylesLinksDataKey ]: globalStylesLinksData,
+			allImageSizes,
+			bigImageSizeThreshold,
 			allowedBlockTypes,
 			allowRightClickOverrides,
 			focusMode: focusMode && ! forceDisableFocusMode,
 			hasFixedToolbar,
 			isDistractionFree,
 			keepCaretInsideBlock,
-			onNavigateToEntityRecord: settings.onNavigateToEntityRecord
-				? wrappedOnNavigateToEntityRecord
-				: undefined,
+			onNavigateToEntityRecord: settings.onNavigateToEntityRecord,
 			[ getMediaSelectKey ]: ( select, attachmentId ) => {
 				return select( coreStore ).getEntityRecord(
 					'postType',
@@ -389,6 +387,7 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 				'wp_navigation',
 			].includes( postType ),
 			...( deviceType ? { [ deviceTypeKey ]: deviceType } : {} ),
+			[ isNavigationOverlayContextKey ]: isNavigationOverlayContext,
 		};
 
 		return blockEditorSettings;
@@ -418,8 +417,11 @@ function useBlockEditorSettings( settings, postType, postId, renderingMode ) {
 		globalStylesLinksData,
 		renderingMode,
 		editMediaEntity,
-		wrappedOnNavigateToEntityRecord,
+		settings.onNavigateToEntityRecord,
 		deviceType,
+		allImageSizes,
+		bigImageSizeThreshold,
+		isNavigationOverlayContext,
 	] );
 }
 

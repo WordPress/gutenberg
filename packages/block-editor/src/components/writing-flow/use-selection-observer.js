@@ -191,6 +191,26 @@ export default function useSelectionObserver() {
 					return;
 				}
 
+				// On mouseup, if the native selection is within one block
+				// but the click target is a different block, bail out
+				// and let the clicked block's focus handler manage
+				// selection.
+				if (
+					event.type === 'mouseup' &&
+					! event.shiftKey &&
+					! isMultiSelecting() &&
+					startClientId === endClientId
+				) {
+					const clickedClientId = getBlockClientId( event.target );
+					if (
+						clickedClientId &&
+						clickedClientId !== startClientId
+					) {
+						selection.removeAllRanges();
+						return;
+					}
+				}
+
 				const isSingularSelection = startClientId === endClientId;
 				if ( isSingularSelection ) {
 					if ( ! isMultiSelecting() ) {

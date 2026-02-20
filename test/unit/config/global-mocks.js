@@ -63,3 +63,39 @@ if ( ! global.TextEncoder ) {
 // Override jsdom built-ins with native node implementation.
 global.Blob = BlobPolyfill;
 global.File = FilePolyfill;
+
+/**
+ * Mock `userEvent.setup()` to fix the `HTMLElement.prototype` properties
+ * that `@testing-library/user-event` makes non-writable, which breaks
+ * `@ariakit/test` and other code that tries to override `focus` and `blur`.
+ * @see https://github.com/testing-library/user-event/pull/1265
+ */
+jest.mock( '@testing-library/user-event', () => {
+	const actual = jest.requireActual( '@testing-library/user-event' );
+	const patchedUserEvent = {
+		...actual.userEvent,
+		setup( ...args ) {
+			const user = actual.userEvent.setup( ...args );
+			const { focus, blur } = global.HTMLElement.prototype;
+			Object.defineProperties( global.HTMLElement.prototype, {
+				focus: {
+					configurable: true,
+					value: focus,
+					writable: true,
+				},
+				blur: {
+					configurable: true,
+					value: blur,
+					writable: true,
+				},
+			} );
+			return user;
+		},
+	};
+	return {
+		...actual,
+		userEvent: patchedUserEvent,
+		default: patchedUserEvent,
+		__esModule: true,
+	};
+} );

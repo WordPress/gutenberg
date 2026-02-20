@@ -37,11 +37,13 @@ const EntitiesSavedStatesForPreview = ( {
 	variant,
 } ) => {
 	const isDirtyProps = useEntitiesSavedStatesIsDirty();
-	let activateSaveLabel;
+	let activateSaveLabel, successNoticeContent;
 	if ( isDirtyProps.isDirty ) {
 		activateSaveLabel = __( 'Activate & Save' );
+		successNoticeContent = __( 'Theme activated and site updated.' );
 	} else {
 		activateSaveLabel = __( 'Activate' );
+		successNoticeContent = __( 'Theme activated.' );
 	}
 
 	const currentTheme = useActualCurrentTheme();
@@ -81,6 +83,7 @@ const EntitiesSavedStatesForPreview = ( {
 				saveLabel: activateSaveLabel,
 				renderDialog,
 				variant,
+				successNoticeContent,
 			} }
 		/>
 	);

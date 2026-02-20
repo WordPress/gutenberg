@@ -48,7 +48,7 @@ class PlaygroundRuntime {
 			testsEnvironment: false, // Single environment only
 			xdebug: true, // Supported via --xdebug flag
 			spx: false, // Not supported in WebAssembly
-			phpMyAdmin: false, // Supported on playground.wordpress.net but not in CLI yet
+			phpMyAdmin: true, // Supported via --phpmyadmin CLI flag
 			multisite: true, // Supported via Blueprint
 			customPhpVersion: true, // Supported via --php flag
 			persistentDatabase: false, // Could be supported via mounts (not yet implemented)
@@ -170,6 +170,10 @@ class PlaygroundRuntime {
 			cliArgs.push( '--verbosity', 'debug' );
 		}
 
+		if ( envConfig.phpmyadmin ) {
+			cliArgs.push( '--phpmyadmin' );
+		}
+
 		if ( xdebug ) {
 			cliArgs.push( '--xdebug' );
 		}
@@ -184,12 +188,27 @@ class PlaygroundRuntime {
 		// Create write stream for log file
 		const logFileStream = await fs.open( logFile, 'w' );
 
+		// Resolve the CLI binary directly so that it is found even when
+		// the package is nested inside workspace node_modules (where npx
+		// cannot discover it).
+		const cliPackageJson = require.resolve(
+			'@wp-playground/cli/package.json'
+		);
+		const cliEntryPoint = path.join(
+			path.dirname( cliPackageJson ),
+			'wp-playground.js'
+		);
+
 		return new Promise( ( resolve, reject ) => {
-			const child = spawn( 'npx', [ '@wp-playground/cli', ...cliArgs ], {
-				detached: true,
-				stdio: [ 'ignore', logFileStream.fd, logFileStream.fd ],
-				env: { ...process.env, FORCE_COLOR: '0' },
-			} );
+			const child = spawn(
+				process.execPath,
+				[ cliEntryPoint, ...cliArgs ],
+				{
+					detached: true,
+					stdio: [ 'ignore', logFileStream.fd, logFileStream.fd ],
+					env: { ...process.env, FORCE_COLOR: '0' },
+				}
+			);
 
 			// Store child process reference
 			this.serverProcess = child;
@@ -241,8 +260,17 @@ class PlaygroundRuntime {
 				.then( async () => {
 					spinner.text = `WordPress Playground started at ${ siteUrl }`;
 
-					const message =
-						'WordPress development site started at ' + siteUrl;
+					const phpmyadminUrl = envConfig.phpmyadmin
+						? `${ siteUrl }/phpmyadmin`
+						: null;
+
+					const message = [
+						'WordPress development site started at ' + siteUrl,
+						phpmyadminUrl &&
+							`phpMyAdmin started at ${ phpmyadminUrl }`,
+					]
+						.filter( Boolean )
+						.join( '\n' );
 
 					resolve( {
 						message,
@@ -449,6 +477,10 @@ class PlaygroundRuntime {
 			runtime: 'playground',
 			urls: {
 				development: isRunning ? `http://localhost:${ port }` : null,
+				phpmyadmin:
+					isRunning && envConfig.phpmyadmin
+						? `http://localhost:${ port }/phpmyadmin`
+						: null,
 			},
 			ports: {
 				development: port,
