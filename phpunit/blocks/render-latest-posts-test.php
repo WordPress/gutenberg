@@ -124,9 +124,7 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 		$gallery_output    = do_blocks( $processed_content );
 
 		// Check if gallery block is registered.
-		$registry      = WP_Block_Type_Registry::get_instance();
-		$gallery_block = $registry->get_registered( 'core/gallery' );
-		$image_block   = $registry->get_registered( 'core/image' );
+		$registry = WP_Block_Type_Registry::get_instance();
 
 		$this->assertTrue( $registry->is_registered( 'core/gallery' ), 'Gallery block should be registered' );
 		$this->assertTrue( $registry->is_registered( 'core/image' ), 'Image block should be registered' );
@@ -241,11 +239,6 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 	 * @covers ::render_block_core_latest_posts
 	 */
 	public function test_render_block_core_latest_posts_prevents_recursion() {
-		// Create attachment IDs for gallery block (matching the test scenario).
-		$file            = DIR_TESTDATA . '/images/canola.jpg';
-		$attachment_id_1 = self::factory()->attachment->create_upload_object( $file );
-		$attachment_id_2 = self::factory()->attachment->create_upload_object( $file );
-
 		// Create a paragraph block for testing block parsing.
 		$paragraph_block = '<!-- wp:paragraph --><p>Test content in a paragraph block.</p><!-- /wp:paragraph -->';
 
@@ -277,9 +270,17 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 			'displayPostContentRadio' => 'full_post',
 		);
 
-		// This should not cause a fatal error or memory exhaustion.
-		// The recursion protection should prevent infinite loops.
-		$output = render_block_core_latest_posts( $attributes );
+		// Render through the block pipeline so that the Gutenberg-registered
+		// callback (gutenberg_render_block_core_latest_posts) is used.
+		$output = render_block(
+			array(
+				'blockName'    => 'core/latest-posts',
+				'attrs'        => $attributes,
+				'innerBlocks'  => array(),
+				'innerHTML'    => '',
+				'innerContent' => array(),
+			)
+		);
 
 		// Verify the output contains the wrapper for the outer Latest Posts block.
 		$this->assertStringContainsString(
@@ -365,11 +366,6 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 	 * @covers ::render_block_core_latest_posts
 	 */
 	public function test_render_block_core_latest_posts_full_content_blocks_parsed() {
-		// Create attachment IDs for gallery block (used as example block type).
-		$file            = DIR_TESTDATA . '/images/canola.jpg';
-		$attachment_id_1 = self::factory()->attachment->create_upload_object( $file );
-		$attachment_id_2 = self::factory()->attachment->create_upload_object( $file );
-
 		// Create a post with block content that we know renders server-side.
 		// Use paragraph blocks as they have reliable server-side rendering.
 		$block_content = '<!-- wp:paragraph --><p>This is a test paragraph that should be rendered with block classes.</p><!-- /wp:paragraph -->';
@@ -394,7 +390,17 @@ class Tests_Blocks_RenderLatestPosts extends WP_UnitTestCase {
 			'displayPostContentRadio' => 'full_post',
 		);
 
-		$output = render_block_core_latest_posts( $attributes );
+		// Render through the block pipeline so that the Gutenberg-registered
+		// callback (gutenberg_render_block_core_latest_posts) is used.
+		$output = render_block(
+			array(
+				'blockName'    => 'core/latest-posts',
+				'attrs'        => $attributes,
+				'innerBlocks'  => array(),
+				'innerHTML'    => '',
+				'innerContent' => array(),
+			)
+		);
 
 		// Verify that the post content is included in the output.
 		$this->assertStringContainsString(
