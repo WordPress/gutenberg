@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/views",
-	"version": "1.7.0",
+	"version": "1.7.1-next.v.202602200903.0+06edfb869",
 	"description": "View persistence and management for WordPress DataViews.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
