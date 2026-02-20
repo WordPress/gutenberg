@@ -23,26 +23,36 @@ export default function DataViewsFooter() {
 		paginationInfo: { totalItems = 0, totalPages },
 		data,
 		actions = EMPTY_ARRAY,
+		isLoading,
+		hasInitiallyLoaded,
+		hasInfiniteScrollHandler,
 	} = useContext( DataViewsContext );
+
+	const isRefreshing =
+		!! isLoading && hasInitiallyLoaded && ! hasInfiniteScrollHandler;
+
 	const hasBulkActions =
 		useSomeItemHasAPossibleBulkAction( actions, data ) &&
 		[ LAYOUT_TABLE, LAYOUT_GRID ].includes( view.type );
 
 	if (
-		! totalItems ||
-		! totalPages ||
-		( totalPages <= 1 && ! hasBulkActions )
+		! isRefreshing &&
+		( ! totalItems ||
+			! totalPages ||
+			( totalPages <= 1 && ! hasBulkActions ) )
 	) {
 		return null;
 	}
 	return (
-		!! totalItems && (
+		( !! totalItems || isRefreshing ) && (
 			<Stack
 				direction="row"
 				justify="end"
 				align="center"
 				className="dataviews-footer"
 				gap="sm"
+				// @ts-ignore
+				inert={ isRefreshing ? 'true' : undefined }
 			>
 				{ hasBulkActions && <BulkActionsFooter /> }
 				<DataViewsPagination />

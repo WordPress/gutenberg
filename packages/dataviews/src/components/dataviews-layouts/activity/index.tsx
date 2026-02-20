@@ -20,37 +20,39 @@ import ActivityItems from './activity-items';
 export default function ViewActivity< Item >(
 	props: ViewActivityProps< Item >
 ) {
-	const { empty, data, fields, isLoading, view, className } = props;
+	const {
+		empty,
+		data,
+		fields,
+		isLoading,
+		hasInitiallyLoaded,
+		view,
+		className,
+	} = props;
 
-	// Handle empty/loading states
-	const hasData = data?.length;
-	if ( ! hasData ) {
-		return (
-			<div
-				className={ clsx( {
-					'dataviews-loading': isLoading,
-					'dataviews-no-results': ! hasData && ! isLoading,
-				} ) }
-			>
-				{ ! hasData &&
-					( isLoading ? (
-						<p>
-							<Spinner />
-						</p>
-					) : (
-						empty
-					) ) }
-			</div>
-		);
-	}
-
-	const wrapperClassName = clsx( 'dataviews-view-activity', className );
+	const hasData = !! data?.length;
 
 	// Check if data should be grouped
 	const groupField = view.groupBy?.field
 		? fields.find( ( field ) => field.id === view.groupBy?.field )
 		: null;
-	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
+	const dataByGroup =
+		hasData && groupField ? getDataByGroup( data, groupField ) : null;
+
+	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
+	const noResults = ! hasData && hasInitiallyLoaded;
+
+	if ( noResults ) {
+		return <div className="dataviews-no-results">{ empty }</div>;
+	}
+	if ( ! hasData && ! isInfiniteScroll ) {
+		return null;
+	}
+
+	const isRefreshing = ! isInfiniteScroll && isLoading;
+	const wrapperClassName = clsx( 'dataviews-view-activity', className, {
+		'is-refreshing': isRefreshing,
+	} );
 
 	// Convert dataByGroup entries into array.
 	const groupedEntries = dataByGroup
@@ -60,7 +62,13 @@ export default function ViewActivity< Item >(
 	// Render grouped activity
 	if ( hasData && groupField && dataByGroup ) {
 		return (
-			<Stack direction="column" gap="sm" className={ wrapperClassName }>
+			<Stack
+				direction="column"
+				gap="sm"
+				className={ wrapperClassName }
+				// @ts-ignore
+				inert={ isRefreshing ? 'true' : undefined }
+			>
 				{ groupedEntries.map(
 					( [ groupName, groupData ]: [ string, Item[] ] ) => (
 						<ActivityGroup< Item >
@@ -87,10 +95,12 @@ export default function ViewActivity< Item >(
 			<div
 				className={ wrapperClassName }
 				role={ view.infiniteScrollEnabled ? 'feed' : undefined }
+				// @ts-ignore
+				inert={ isRefreshing ? 'true' : undefined }
 			>
 				<ActivityItems< Item > { ...props } />
 			</div>
-			{ hasData && isLoading && (
+			{ isInfiniteScroll && isLoading && hasInitiallyLoaded && (
 				<p className="dataviews-loading-more">
 					<Spinner />
 				</p>

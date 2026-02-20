@@ -38,6 +38,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 		renderItemLink,
 		defaultLayouts,
 		empty = <p>{ __( 'No results' ) }</p>,
+		hasInitiallyLoaded,
 	} = useContext( DataViewsContext );
 
 	const ViewComponent = VIEW_LAYOUTS.find(
@@ -62,6 +63,7 @@ export default function DataViewsLayout( { className }: DataViewsLayoutProps ) {
 			isItemClickable={ isItemClickable }
 			view={ view }
 			empty={ empty }
+			hasInitiallyLoaded={ hasInitiallyLoaded }
 		/>
 	);
 }

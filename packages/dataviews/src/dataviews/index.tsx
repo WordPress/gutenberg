@@ -32,6 +32,7 @@ import DataViewsViewConfig, {
 	ViewTypeMenu,
 } from '../components/dataviews-view-config';
 import normalizeFields from '../field-types';
+import useData from '../hooks/use-data';
 import type { Action, Field, View, SupportedLayouts } from '../types';
 import type { SelectionOrUpdater } from '../types/private';
 type ItemWithId = { id: string };
@@ -257,7 +258,14 @@ function DataViews< Item >( {
 		[ defaultLayoutsProperty ]
 	);
 
-	const showLoader = useDelayedLoading( isLoading );
+	const { data: displayData, hasInitiallyLoaded } = useData(
+		data,
+		isLoading
+	);
+
+	const isDelayedLoading = useDelayedLoading( isLoading );
+	const showLoader =
+		isDelayedLoading && ( ! infiniteScrollHandler || ! hasInitiallyLoaded );
 
 	if ( ! defaultLayouts[ view.type ] ) {
 		return null;
@@ -270,8 +278,9 @@ function DataViews< Item >( {
 				onChangeView,
 				fields: _fields,
 				actions,
-				data,
+				data: displayData,
 				isLoading,
+				hasInitiallyLoaded,
 				paginationInfo,
 				selection: _selection,
 				onChangeSelection: setSelectionWithChange,
@@ -296,7 +305,7 @@ function DataViews< Item >( {
 			} }
 		>
 			<div className="dataviews-wrapper" ref={ containerRef }>
-				{ showLoader && ! infiniteScrollHandler && (
+				{ showLoader && (
 					<ProgressBar className="dataviews-wrapper__loading-progress" />
 				) }
 				{ children ?? (

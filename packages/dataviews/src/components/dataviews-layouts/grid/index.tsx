@@ -15,7 +15,6 @@ import { Stack } from '@wordpress/ui';
  */
 import type { ViewGridProps } from '../../../types';
 import getDataByGroup from '../utils/get-data-by-group';
-import useDisplayData from '../utils/use-display-data';
 import CompositeGrid from './composite-grid';
 
 function ViewGrid< Item >( {
@@ -32,23 +31,27 @@ function ViewGrid< Item >( {
 	view,
 	className,
 	empty,
+	hasInitiallyLoaded,
 }: ViewGridProps< Item > ) {
-	const displayData = useDisplayData( data, isLoading );
-
-	const hasData = !! displayData?.length;
+	const hasData = !! data?.length;
 	const groupField = view.groupBy?.field
 		? fields.find( ( f ) => f.id === view.groupBy?.field )
 		: null;
-	const dataByGroup = groupField
-		? getDataByGroup( displayData, groupField )
-		: null;
+	const dataByGroup = groupField ? getDataByGroup( data, groupField ) : null;
 	const isInfiniteScroll = view.infiniteScrollEnabled && ! dataByGroup;
-	const noResults = ! hasData && ! isLoading;
-	const showGrid = hasData || ( isLoading && isInfiniteScroll );
-	const isRefreshing = ! isInfiniteScroll && isLoading && hasData;
+	const noResults = ! hasData && hasInitiallyLoaded;
+
+	if ( noResults ) {
+		return <div className="dataviews-no-results">{ empty }</div>;
+	}
+	if ( ! hasData && ! isInfiniteScroll ) {
+		return null;
+	}
 	const gridProps = {
-		className: clsx( className, { 'is-refreshing': isRefreshing } ),
-		inert: isRefreshing ? 'true' : undefined,
+		className: clsx( className, {
+			'is-refreshing': ! isInfiniteScroll && isLoading,
+		} ),
+		inert: ! isInfiniteScroll && isLoading ? 'true' : undefined,
 		isLoading,
 		view,
 		fields,
@@ -96,21 +99,15 @@ function ViewGrid< Item >( {
 			}
 			{
 				// Render a single grid with all data.
-				showGrid && ! dataByGroup && (
+				! dataByGroup && (
 					<CompositeGrid
 						{ ...gridProps }
-						data={ displayData }
+						data={ data }
 						isInfiniteScroll={ !! isInfiniteScroll }
 					/>
 				)
 			}
-			{
-				// Render empty state.
-				noResults && (
-					<div className="dataviews-no-results">{ empty }</div>
-				)
-			}
-			{ isInfiniteScroll && isLoading && (
+			{ isInfiniteScroll && isLoading && hasInitiallyLoaded && (
 				<p className="dataviews-loading-more">
 					<Spinner />
 				</p>

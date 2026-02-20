@@ -211,6 +211,10 @@
 		}
 	}
 
+	&.is-refreshing {
+		opacity: 0.5;
+	}
+
 	& + .dataviews-pagination {
 		justify-content: space-between;
 	}
