@@ -671,6 +671,9 @@ export function editorAssets( state = null, action ) {
 export function icons( state = {}, action ) {
 	switch ( action.type ) {
 		case 'RECEIVE_ICONS': {
+			if ( ! action.icons?.length ) {
+				return state;
+			}
 			const next = { ...state };
 			for ( const icon of action.icons ) {
 				next[ icon.name ] = icon;
