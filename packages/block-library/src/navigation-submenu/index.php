@@ -46,14 +46,8 @@ function block_core_navigation_submenu_get_submenu_visibility( $context ) {
 	return $submenu_visibility ?? 'hover';
 }
 
-// Path differs between source and build: '../navigation-link/shared/' in source, './navigation-link/shared/' in build.
-if ( file_exists( __DIR__ . '/../navigation-link/shared/item-should-render.php' ) ) {
-	require_once __DIR__ . '/../navigation-link/shared/item-should-render.php';
-	require_once __DIR__ . '/../navigation-link/shared/render-submenu-icon.php';
-} else {
-	require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
-	require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
-}
+require_once __DIR__ . '/navigation-link/shared/item-should-render.php';
+require_once __DIR__ . '/navigation-link/shared/render-submenu-icon.php';
 
 /**
  * Build an array with CSS classes and inline styles defining the font sizes
