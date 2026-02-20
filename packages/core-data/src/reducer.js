@@ -661,22 +661,6 @@ export function editorAssets( state = null, action ) {
 }
 
 /**
- * Reducer managing icons.
- *
- * @param {Array}  state  Current state.
- * @param {Object} action Action object.
- *
- * @return {Array} Updated state.
- */
-export function icons( state = [], action ) {
-	switch ( action.type ) {
-		case 'RECEIVE_ICONS':
-			return action.icons;
-	}
-	return state;
-}
-
-/**
  * Reducer managing sync connection states for entities.
  * Keyed by "kind/name:id" (e.g., "postType/post:123").
  *
@@ -725,6 +709,5 @@ export default combineReducers( {
 	registeredPostMeta,
 	editorSettings,
 	editorAssets,
-	icons,
 	syncConnectionStatuses,
 } );

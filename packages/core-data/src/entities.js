@@ -226,6 +226,15 @@ export const rootEntitiesConfig = [
 		plural: 'fontCollections',
 		key: 'slug',
 	},
+	{
+		label: __( 'Icons' ),
+		name: 'icon',
+		kind: 'root',
+		baseURL: '/wp/v2/icons',
+		baseURLParams: { context: 'view' },
+		plural: 'icons',
+		key: 'name',
+	},
 ].map( ( entity ) => {
 	const syncEnabledRootEntities = new Set( [ 'comment' ] );
 
