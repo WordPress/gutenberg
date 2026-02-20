@@ -302,7 +302,7 @@ function normalizePath( p ) {
 	return p.replace( /\\/g, '/' );
 }
 
-function transformPhpContent( content, transforms ) {
+function transformPhpContent( content, transforms, allFunctionNames = [] ) {
 	const {
 		functionPrefix = '',
 		classSuffix = '',
@@ -313,6 +313,7 @@ function transformPhpContent( content, transforms ) {
 
 	content = content.toString();
 
+	// Prefix known external functions (e.g., WordPress core functions).
 	if ( prefixFunctions.length ) {
 		content = content.replace(
 			new RegExp(
@@ -333,18 +334,51 @@ function transformPhpContent( content, transforms ) {
 	}
 
 	if ( functionPrefix ) {
-		content = Array.from(
-			content.matchAll( /^\s*function ([^\(]+)/gm )
-		).reduce( ( result, [ , functionName ] ) => {
-			// Skip functions already prefixed (e.g., by the prefixFunctions step above).
+		// Find functions defined in this file.
+		const localFunctions = new Set(
+			Array.from(
+				content.matchAll( /^\s*function ([^\(]+)/gm )
+			).map( ( [ , name ] ) => name )
+		);
+
+		// Rename locally-defined functions and all their references in this file.
+		for ( const functionName of localFunctions ) {
 			if ( functionName.startsWith( functionPrefix ) ) {
-				return result;
+				continue;
 			}
-			return result.replace(
+			content = content.replace(
 				new RegExp( functionName + '(?![a-zA-Z0-9_])', 'g' ),
 				( match ) => functionPrefix + match.replace( /^wp_/, '' )
 			);
-		}, content );
+		}
+
+		// Prefix cross-file function references (functions defined in other
+		// files within the same package). Skip functions that are local to
+		// this file since they were already handled above. Matches inside
+		// PHP comments are left untouched.
+		const crossFileFunctions = allFunctionNames.filter(
+			( name ) => ! localFunctions.has( name )
+		);
+		if ( crossFileFunctions.length ) {
+			const funcPattern = crossFileFunctions.join( '|' );
+			content = content.replace(
+				new RegExp(
+					'\\/\\/[^\\n]*|\\/\\*[\\s\\S]*?\\*\\/|(?<![a-zA-Z0-9_])(?:' +
+						funcPattern +
+						')(?![a-zA-Z0-9_])',
+					'g'
+				),
+				( match ) => {
+					if (
+						match.startsWith( '//' ) ||
+						match.startsWith( '/*' )
+					) {
+						return match;
+					}
+					return `${ functionPrefix }${ match.replace( /^wp_/, '' ) }`;
+				}
+			);
+		}
 	}
 
 	if ( addActionPriority ) {
@@ -680,6 +714,29 @@ async function bundlePackage( packageName, options = {} ) {
 		const packageSourceDir = path.join( packageDir, 'src' );
 		const outputDir = path.join( BUILD_DIR, 'scripts', packageName );
 
+		// Collect all function definitions across PHP files so that
+		// cross-file references can be auto-prefixed without needing
+		// a manual prefixFunctions entry.
+		const allFunctionNames = [];
+		if ( transforms.php?.functionPrefix ) {
+			for ( const filePattern of files ) {
+				const matchedFiles = await glob(
+					normalizePath( path.join( packageDir, filePattern ) )
+				);
+				for ( const sourceFile of matchedFiles ) {
+					if ( ! sourceFile.endsWith( '.php' ) ) {
+						continue;
+					}
+					const content = await readFile( sourceFile, 'utf8' );
+					for ( const [ , name ] of content.matchAll(
+						/^\s*function ([^\(]+)/gm
+					) ) {
+						allFunctionNames.push( name );
+					}
+				}
+			}
+		}
+
 		for ( const filePattern of files ) {
 			const matchedFiles = await glob(
 				normalizePath( path.join( packageDir, filePattern ) )
@@ -705,7 +762,8 @@ async function bundlePackage( packageName, options = {} ) {
 							);
 							const transformed = transformPhpContent(
 								content,
-								transforms.php
+								transforms.php,
+								allFunctionNames
 							);
 
 							if ( transforms.php.filenameSuffix ) {
