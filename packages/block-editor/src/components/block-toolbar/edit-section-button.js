@@ -15,6 +15,7 @@ import useContentOnlySectionEdit from '../../hooks/use-content-only-section-edit
 export default function EditSectionButton( { clientId } ) {
 	const {
 		isSectionBlock,
+		isWithinEditedSection,
 		isEditingContentOnlySection,
 		editContentOnlySection,
 		stopEditingContentOnlySection,
@@ -42,6 +43,12 @@ export default function EditSectionButton( { clientId } ) {
 		isReusableBlock( blockType ) ||
 		isTemplatePart( blockType )
 	) {
+		return null;
+	}
+
+	// Nested patterns inside an already-edited parent section should not
+	// show their own "Edit pattern" button — they're already unlocked.
+	if ( isSectionBlock && isWithinEditedSection ) {
 		return null;
 	}
 
