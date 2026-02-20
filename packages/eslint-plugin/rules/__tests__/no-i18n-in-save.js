@@ -81,6 +81,21 @@ function save() {
 	invalid: [
 		{
 			code: `
+// Translation in save file outside save function
+function render() {
+	return __( 'Hello World' );
+}
+			`,
+			filename: '/path/to/block/save.js',
+			errors: [
+				{
+					messageId: 'noI18nInSave',
+					type: 'CallExpression',
+				},
+			],
+		},
+		{
+			code: `
 function save() {
 	return __( 'Hello World' );
 }
