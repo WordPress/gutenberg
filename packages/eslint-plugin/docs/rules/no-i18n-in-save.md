@@ -10,7 +10,7 @@ This rule aims to prevent the use of i18n translation functions (`__`, `_x`, `_n
 
 When translation functions are used in save methods:
 
-1. Translation is saved to database: The translated text is stored at the time of saving, not when the content is displayed
+1. Translation is saved to the database: The translated text is stored at the time of saving, not when the content is displayed
 2. No dynamic updates: If the site language changes, previously saved content will not update
 3. Block validation errors: Switching languages causes validation errors because the saved HTML no longer matches what the save function generates
 4. Content locked to language: Content becomes permanently associated with the language active at save time
