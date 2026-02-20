@@ -72,6 +72,7 @@ import {
 	isHashLink,
 	isRelativePath,
 } from './components/link-control/is-url-like';
+import { ListViewContentPopover } from './components/inspector-controls/list-view-content-popover';
 
 /**
  * Private @wordpress/block-editor APIs.
@@ -137,4 +138,5 @@ lock( privateApis, {
 	useListViewPanelState,
 	isHashLink,
 	isRelativePath,
+	ListViewContentPopover,
 } );
