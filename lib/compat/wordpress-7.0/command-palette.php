@@ -13,7 +13,12 @@ function gutenberg_admin_bar_command_palette_button( $wp_admin_bar ) {
 	$shortcut_label = $is_apple_os
 		? _x( '⌘K', 'keyboard shortcut to open the command palette', 'gutenberg' )
 		: _x( 'Ctrl+K', 'keyboard shortcut to open the command palette', 'gutenberg' );
-	$title          = sprintf( '<span class="ab-label">%s</span>', $shortcut_label );
+	$title          = sprintf(
+		'<span class="ab-label">%s<span class="screen-reader-text"> %s</span></span>',
+		$shortcut_label,
+		/* translators: Hidden accessibility text. */
+		__( 'Open command palette', 'gutenberg' ),
+	);
 	$wp_admin_bar->add_node(
 		array(
 			'id'    => 'command-palette',
