@@ -5,7 +5,6 @@
 const chalk = require( 'chalk' );
 const ora = require( 'ora' );
 const yargs = require( 'yargs' );
-const terminalLink = require( 'terminal-link' );
 
 /**
  * Internal dependencies
@@ -120,10 +119,7 @@ module.exports = function cli() {
 
 	yargs.command(
 		'start',
-		chalk`Starts WordPress on port {bold.underline ${ terminalLink(
-			'8888',
-			'http://localhost:8888'
-		) }} (override with WP_ENV_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file.`,
+		chalk`Starts WordPress, listening locally. The current working directory must be a WordPress installation, a plugin, a theme, or contain a {bold .wp-env.json} file. The config's port can be overridden via {bold WP_ENV_PORT}.`,
 		( args ) => {
 			args.option( 'update', {
 				type: 'boolean',
