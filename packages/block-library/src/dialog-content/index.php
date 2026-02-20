@@ -5,25 +5,9 @@
  * @package WordPress
  */
 
-/**
- * Add dialog ID query var
- *
- * @hook query_vars
- *
- * @param mixed $qvars Query vars.
- * @return mixed
- */
-function block_core_dialog_element_add_query_var( $qvars ) {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-block-experiments' ) ) {
-		return $qvars;
-	}
-	$qvars[] = 'dialogId';
-	return $qvars;
-}
-add_filter( 'query_vars', 'block_core_dialog_element_add_query_var' );
 
 /**
- * Render the 'core/dialog-element' block.
+ * Render the 'core/dialog-content' block.
  *
  * Applies IAPI directives and dialog-specific attributes to the saved content.
  *
@@ -33,7 +17,7 @@ add_filter( 'query_vars', 'block_core_dialog_element_add_query_var' );
  *
  * @return string Rendered block HTML.
  */
-function render_block_core_dialog_element( array $attributes, string $content, WP_Block $block ): string {
+function render_block_core_dialog_content( array $attributes, string $content, WP_Block $block ): string {
 	if ( empty( $content ) ) {
 		return '';
 	}
@@ -43,7 +27,7 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 		return '';
 	}
 
-	$is_open          = get_query_var( 'dialogId', false ) === $context_id;
+	// Check if the anchor hash in the URL matches the context_id
 	$enable_deep_link = array_key_exists( 'enableDeepLink', $attributes ) ? $attributes['enableDeepLink'] : false;
 
 	// Animation duration in milliseconds. Used as a CSS custom property for styling.
@@ -58,7 +42,7 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 			'dialogs' => array(
 				$context_id => array(
 					'id'                   => $context_id,
-					'isOpen'               => $is_open,
+					'isOpen'               => false,
 					'enableDeepLink'       => $enable_deep_link,
 					'showClosingAnimation' => false,
 				),
@@ -96,13 +80,15 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 
 		// Add IAPI directives.
 		$tag_processor->set_attribute( 'data-wp-interactive', 'core/dialog/private' );
+
 		// Set the animation duration as a CSS custom property to keep CSS animations in sync with JS.
 		// Merge with any existing inline styles from block supports.
 		$existing_style         = $tag_processor->get_attribute( 'style' ) ?? '';
 		$animation_duration_css = sprintf( '--wp--style--dialog-animation-duration: %dms;', $animation_duration );
 		$merged_style           = $existing_style ? $existing_style . ' ' . $animation_duration_css : $animation_duration_css;
 		$tag_processor->set_attribute( 'style', $merged_style );
-		$tag_processor->set_attribute( 'data-wp-class--active', 'state.dialog.isOpen' );
+		// Set the additional directives.
+		$tag_processor->set_attribute( 'data-wp-class--active', 'state.dialogs.isOpen' );
 		$tag_processor->set_attribute( 'data-wp-class--show-closing-animation', 'state.dialog.showClosingAnimation' );
 		$tag_processor->set_attribute( 'data-wp-on--click', 'callbacks.onBackdropClick' );
 		$tag_processor->set_attribute( 'data-wp-on-document--keydown', 'callbacks.onESCKey' );
@@ -129,7 +115,7 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 	$close_icon = apply_filters( 'block_core_dialog_close_icon', $close_icon );
 
 	$close_button = wp_sprintf(
-		'<button class="wp-block-dialog-element__close-button" data-wp-on--click="actions.onClickClose" type="button" aria-label="%1$s">%2$s</button>',
+		'<button class="wp-block-dialog-content__close-button" data-wp-on--click="actions.onClickClose" type="button" aria-label="%1$s">%2$s</button>',
 		esc_attr__( 'Close dialog', 'default' ),
 		$close_icon
 	);
@@ -137,8 +123,8 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 	// Inject close button and hidden heading (if needed) before the inner div.
 	$hidden_heading_html = isset( $hidden_h2 ) ? $hidden_h2 : '';
 	$output              = str_replace(
-		'<div class="wp-block-dialog-element__inner">',
-		$close_button . $hidden_heading_html . '<div class="wp-block-dialog-element__inner">',
+		'<div class="wp-block-dialog-content__inner">',
+		$close_button . $hidden_heading_html . '<div class="wp-block-dialog-content__inner">',
 		$output
 	);
 
@@ -146,17 +132,17 @@ function render_block_core_dialog_element( array $attributes, string $content, W
 }
 
 /**
- * Registers the `core/dialog-element` block on server.
+ * Registers the `core/dialog-content` block on server.
  *
  * @hook init
  * @return void
  */
-function register_block_core_dialog_element() {
+function register_block_core_dialog_content() {
 	register_block_type_from_metadata(
-		__DIR__ . '/dialog-element',
+		__DIR__ . '/dialog-content',
 		array(
-			'render_callback' => 'render_block_core_dialog_element',
+			'render_callback' => 'render_block_core_dialog_content',
 		)
 	);
 }
-add_action( 'init', 'register_block_core_dialog_element' );
+add_action( 'init', 'register_block_core_dialog_content' );

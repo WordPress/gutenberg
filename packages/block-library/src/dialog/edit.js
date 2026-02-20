@@ -39,7 +39,7 @@ const TEMPLATE = [
 		],
 	],
 	[
-		'core/dialog-element',
+		'core/dialog-content',
 		{
 			lock: {
 				move: true,
@@ -53,18 +53,18 @@ const TEMPLATE = [
 export default function Edit( { attributes, setAttributes, clientId } ) {
 	const { editorIsDialogOpen = false, dialogLabel = '' } = attributes;
 
-	// Get the dialog-element block from inner blocks and check if it's selected.
+	// Get the dialog-content block from inner blocks and check if it's selected.
 	const { dialogElementClientId, isDialogElementSelected } = useSelect(
 		( select ) => {
 			const { getBlock, isBlockSelected, hasSelectedInnerBlock } =
 				select( blockEditorStore );
 			const block = getBlock( clientId );
 			const dialogElementBlock = block?.innerBlocks?.find(
-				( innerBlock ) => innerBlock.name === 'core/dialog-element'
+				( innerBlock ) => innerBlock.name === 'core/dialog-content'
 			);
 			const dialogElementId = dialogElementBlock?.clientId;
 
-			// Check if dialog-element or any of its descendants are selected
+			// Check if dialog-content or any of its descendants are selected
 			const isSelected = dialogElementId
 				? isBlockSelected( dialogElementId ) ||
 				  hasSelectedInnerBlock( dialogElementId, true )
@@ -86,7 +86,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	const { __unstableMarkNextChangeAsNotPersistent } =
 		useDispatch( blockEditorStore );
 
-	// Auto-open dialog when dialog-element or its children are selected
+	// Auto-open dialog when dialog-content or its children are selected
 	useEffect( () => {
 		if ( isDialogElementSelected && ! editorIsDialogOpen ) {
 			__unstableMarkNextChangeAsNotPersistent();

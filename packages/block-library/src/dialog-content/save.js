@@ -18,7 +18,7 @@ export default function save( { attributes } ) {
 
 	return (
 		<dialog { ...blockProps }>
-			<div className="wp-block-dialog-element__inner">
+			<div className="wp-block-dialog-content__inner">
 				<InnerBlocks.Content />
 			</div>
 		</dialog>

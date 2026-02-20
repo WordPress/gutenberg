@@ -8,7 +8,7 @@
 	"category": "media",
 	"keywords": [ "dialog", "modal", "popup" ],
 	"__experimental": true,
-	"allowedBlocks": [ "core/dialog-trigger", "core/dialog-element" ],
+	"allowedBlocks": [ "core/dialog-trigger", "core/dialog-content" ],
 	"attributes": {
 		"editorIsDialogOpen": {
 			"type": "boolean",

@@ -182,7 +182,7 @@ function Edit( {
 
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			className: 'wp-block-dialog-element__inner',
+			className: 'wp-block-dialog-content__inner',
 		},
 		{
 			templateLock: false,
@@ -218,7 +218,7 @@ function Edit( {
 					attributes={ attributes }
 				/>
 				<button
-					className="wp-block-dialog-element__close-button"
+					className="wp-block-dialog-content__close-button"
 					type="button"
 					aria-label="Close dialog"
 					onClick={ () => closeDialog() }

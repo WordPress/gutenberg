@@ -312,19 +312,19 @@ Adds a button that opens a modal dialog to display content without leaving the p
 -	**Name:** core/dialog
 -	**Experimental:** true
 -	**Category:** media
--	**Allowed Blocks:** core/dialog-trigger, core/dialog-element
+-	**Allowed Blocks:** core/dialog-trigger, core/dialog-content
 -	**Supports:** align (center, full, left, right, wide), anchor, interactivity, ~~html~~
 -	**Attributes:** dialogLabel, editorIsDialogOpen
 
 ## Dialog Content
 
-Displays content in a modal dialog that appears on top of the page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-element))
+Displays content in a modal dialog that appears on top of the page. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/dialog-content))
 
--	**Name:** core/dialog-element
+-	**Name:** core/dialog-content
 -	**Experimental:** true
 -	**Category:** media
 -	**Parent:** core/dialog
--	**Supports:** animations, color (background, button, enableContrastChecker, heading, link, text), interactivity, layout (allowEditing, ~~allowJustification~~), shadow (), spacing (blockGap, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~
+-	**Supports:** animations, color (background, button, enableContrastChecker, heading, link, text), interactivity, layout (allowEditing, ~~allowJustification~~), shadow, spacing (blockGap, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~, ~~lock~~, ~~reusable~~
 -	**Attributes:** animationDuration, backdropColor, customBackdropColor, enableDeepLink
 
 ## Trigger Button

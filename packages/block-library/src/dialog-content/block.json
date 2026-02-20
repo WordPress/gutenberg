@@ -1,7 +1,7 @@
 {
 	"$schema": "https://schemas.wp.org/trunk/block.json",
 	"apiVersion": 3,
-	"name": "core/dialog-element",
+	"name": "core/dialog-content",
 	"version": "1.0.0",
 	"title": "Dialog Content",
 	"description": "Displays content in a modal dialog that appears on top of the page.",
@@ -74,9 +74,9 @@
 		"core/dialog-label"
 	],
 	"parent": [ "core/dialog" ],
-	"textdomain": "dialog-element",
+	"textdomain": "dialog-content",
 	"editorScript": "file:./index.js",
 	"editorStyle": "file:./index.css",
 	"style": "file:./style-index.css",
-	"viewScriptModule": "@wordpress/block-library/dialog-element/view"
+	"viewScriptModule": "@wordpress/block-library/dialog-content/view"
 }
