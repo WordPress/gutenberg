@@ -126,6 +126,46 @@ test.describe( 'Unsynced pattern', () => {
 			] );
 	} );
 
+	test( 'can detach unsynced pattern via block options and removes patternName', async ( {
+		editor,
+		page,
+	} ) => {
+		// Create an unsynced pattern block via setContent (paragraph with patternName in metadata).
+		await editor.setContent( `<!-- wp:paragraph {"metadata":{"patternName":"detach-test-pattern","name":"Detach test pattern"}} -->
+<p>Content to detach</p>
+<!-- /wp:paragraph -->` );
+
+		await editor.selectBlocks(
+			editor.canvas.getByRole( 'document', { name: 'Block: Paragraph' } )
+		);
+
+		// Verify "Detach pattern" appears in the block options menu and open the confirmation dialog.
+		await editor.showBlockToolbar();
+		await editor.clickBlockOptionsMenuItem( 'Detach pattern' );
+
+		// Verify the confirmation dialog shows with unsynced-specific copy.
+		const dialog = page.getByRole( 'dialog', { name: 'Detach pattern?' } );
+		await expect( dialog ).toBeVisible();
+		await expect( dialog ).toContainText(
+			'The blocks will no longer be associated with this pattern and editing restrictions will be removed.'
+		);
+
+		await dialog.getByRole( 'button', { name: 'Detach' } ).click();
+
+		// Verify patternName was removed from metadata; content is unchanged.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content: 'Content to detach',
+				},
+			},
+		] );
+
+		const blocks = await editor.getBlocks();
+		expect( blocks[ 0 ].attributes.metadata?.patternName ).toBeUndefined();
+	} );
+
 	test( 'inserts unsynced patterns in content only mode', async ( {
 		editor,
 		page,
