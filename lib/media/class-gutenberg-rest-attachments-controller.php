@@ -20,38 +20,41 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	public function register_routes(): void {
 		parent::register_routes();
 
-		$valid_image_sizes = array_keys( wp_get_registered_image_subsizes() );
+		// Only register the sideload route if the parent class doesn't already have it.
+		if ( ! method_exists( get_parent_class( $this ), 'sideload_item' ) ) {
+			$valid_image_sizes = array_keys( wp_get_registered_image_subsizes() );
 
-		// Special case to set 'original_image' in attachment metadata.
-		$valid_image_sizes[] = 'original';
-		// Used for PDF thumbnails.
-		$valid_image_sizes[] = 'full';
+			// Special case to set 'original_image' in attachment metadata.
+			$valid_image_sizes[] = 'original';
+			// Used for PDF thumbnails.
+			$valid_image_sizes[] = 'full';
 
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\d]+)/sideload',
-			array(
+			register_rest_route(
+				$this->namespace,
+				'/' . $this->rest_base . '/(?P<id>[\d]+)/sideload',
 				array(
-					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => array( $this, 'sideload_item' ),
-					'permission_callback' => array( $this, 'sideload_item_permissions_check' ),
-					'args'                => array(
-						'id'         => array(
-							'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
-							'type'        => 'integer',
-						),
-						'image_size' => array(
-							'description' => __( 'Image size.', 'gutenberg' ),
-							'type'        => 'string',
-							'enum'        => $valid_image_sizes,
-							'required'    => true,
+					array(
+						'methods'             => WP_REST_Server::CREATABLE,
+						'callback'            => array( $this, 'sideload_item' ),
+						'permission_callback' => array( $this, 'sideload_item_permissions_check' ),
+						'args'                => array(
+							'id'         => array(
+								'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
+								'type'        => 'integer',
+							),
+							'image_size' => array(
+								'description' => __( 'Image size.', 'gutenberg' ),
+								'type'        => 'string',
+								'enum'        => $valid_image_sizes,
+								'required'    => true,
+							),
 						),
 					),
-				),
-				'allow_batch' => $this->allow_batch,
-				'schema'      => array( $this, 'get_public_item_schema' ),
-			)
-		);
+					'allow_batch' => $this->allow_batch,
+					'schema'      => array( $this, 'get_public_item_schema' ),
+				)
+			);
+		}
 	}
 
 	/**

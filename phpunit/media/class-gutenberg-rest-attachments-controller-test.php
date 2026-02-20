@@ -46,7 +46,8 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertArrayHasKey( '/wp/v2/media/(?P<id>[\d]+)', $routes );
 		$this->assertCount( 3, $routes['/wp/v2/media/(?P<id>[\d]+)'] );
 		$this->assertArrayHasKey( '/wp/v2/media/(?P<id>[\d]+)/sideload', $routes );
-		$this->assertCount( 1, $routes['/wp/v2/media/(?P<id>[\d]+)/sideload'] );
+		// Core may already register the sideload route; Gutenberg only adds it when core doesn't have it.
+		$this->assertGreaterThanOrEqual( 1, count( $routes['/wp/v2/media/(?P<id>[\d]+)/sideload'] ) );
 	}
 
 	public function test_get_items() {
