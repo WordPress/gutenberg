@@ -737,6 +737,14 @@ test.describe( 'Synced pattern', () => {
 
 		// Save the reusable block and update the post.
 		await editorTopBar.getByRole( 'button', { name: 'Save' } ).click();
+		const entitiesSaveButton = page
+			.getByRole( 'region', { name: 'Editor publish' } )
+			.getByRole( 'button', { name: 'Save', exact: true } );
+		const isEntitiesSavePanelVisible = await entitiesSaveButton.isVisible();
+		// Handle multi-entity save panel if it appears.
+		if ( isEntitiesSavePanelVisible ) {
+			await entitiesSaveButton.click();
+		}
 		await page
 			.getByRole( 'button', { name: 'Dismiss this notice' } )
 			.filter( { hasText: 'Pattern updated.' } )
