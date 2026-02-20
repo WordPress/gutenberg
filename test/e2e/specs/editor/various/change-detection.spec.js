@@ -65,8 +65,13 @@ test.describe( 'Change detection', () => {
 			).toBeDisabled(),
 		] );
 
-		// With RTC enabled, all autosaves target an autosave revision.
-		expect( await changeDetectionUtils.getIsDirty() ).toBe( true );
+		// With RTC enabled, all autosaves target an autosave revision. Vary our
+		// expectation accordingly.
+		const isRTCEnabled = Boolean(
+			await page.evaluate( () => window._wpCollaborationEnabled )
+		);
+
+		expect( await changeDetectionUtils.getIsDirty() ).toBe( isRTCEnabled );
 	} );
 
 	test( 'Should prompt to confirm unsaved changes for autosaved draft for non-content fields', async ( {
