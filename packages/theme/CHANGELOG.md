@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   Fix TypeScript 5.9 type error in `generate-primitive-tokens` build script caused by `Object.entries` inferring `unknown` values when the key type is a union of string literals ([#75748](https://github.com/WordPress/gutenberg/pull/75748)).
+
 ### New Features
 
 -   Add `--wpds-cursor-control` design token for interactive non-link elements ([#75697](https://github.com/WordPress/gutenberg/pull/75697)).
