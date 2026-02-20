@@ -69,23 +69,19 @@ export function Edit( { attributes, setAttributes } ) {
 	const borderProps = useBorderProps( attributes );
 	const dimensionsProps = useDimensionsProps( attributes );
 
-	const { allIcons, selectedIcon } = useSelect(
+	const { selectedIcon, allIcons = [] } = useSelect(
 		( select ) => {
-			const _icon = icon
-				? select( coreDataStore ).getEntityRecord(
-						'root',
-						'icon',
-						icon
-				  )
-				: null;
-			const _allIcons = isInserterOpen
-				? select( coreDataStore ).getEntityRecords( 'root', 'icon', {
-						per_page: -1,
-				  } )
-				: [];
+			const { getEntityRecord, getEntityRecords } =
+				select( coreDataStore );
 			return {
-				selectedIcon: _icon,
-				allIcons: _allIcons,
+				selectedIcon: icon
+					? getEntityRecord( 'root', 'icon', icon )
+					: null,
+				allIcons: isInserterOpen
+					? getEntityRecords( 'root', 'icon', {
+							per_page: -1,
+					  } )
+					: undefined,
 			};
 		},
 		[ isInserterOpen, icon ]
@@ -216,7 +212,7 @@ export function Edit( { attributes, setAttributes } ) {
 			</div>
 			{ isInserterOpen && (
 				<CustomInserterModal
-					icons={ allIcons ?? [] }
+					icons={ allIcons }
 					setInserterOpen={ setInserterOpen }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
