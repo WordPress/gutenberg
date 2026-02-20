@@ -112,6 +112,12 @@ export default function LeafMoreMenu( props ) {
 		BlockTitle( { clientId, maximumLength: 25 } )
 	);
 
+	const goToLabel = sprintf(
+		/* translators: %s: block name */
+		__( 'Go to %s' ),
+		BlockTitle( { clientId, maximumLength: 25 } )
+	);
+
 	const rootClientId = useSelect(
 		( select ) => {
 			const { getBlockRootClientId } = select( blockEditorStore );
@@ -158,6 +164,20 @@ export default function LeafMoreMenu( props ) {
 							expand={ props.expand }
 							setInsertedBlock={ props.setInsertedBlock }
 						/>
+						{ block.attributes?.url && (
+							<MenuItem
+								onClick={ () => {
+									window.open(
+										block.attributes.url,
+										'_blank',
+										'noopener,noreferrer'
+									);
+									onClose();
+								} }
+							>
+								{ goToLabel }
+							</MenuItem>
+						) }
 					</MenuGroup>
 					<MenuGroup>
 						<MenuItem
