@@ -7,6 +7,10 @@
 - DataForm: Fix focus loss when collapsing in Card view. [#75689](https://github.com/WordPress/gutenberg/pull/75689)
 - DataViews: Fix spacing in first column. [#75693](https://github.com/WordPress/gutenberg/pull/75693)
 
+### Enhancements
+
+- DataViews: Adjust column spacing in table layout when no titleField is provided. [#75410](https://github.com/WordPress/gutenberg/pull/75410)
+
 ## 12.0.0 (2026-02-18)
 
 ### Breaking Changes
