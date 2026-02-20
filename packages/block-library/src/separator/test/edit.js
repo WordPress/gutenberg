@@ -120,7 +120,9 @@ describe( 'Separator block edit method', () => {
 		test( 'should render a decorative toggle when tagName is hr', () => {
 			render( <SeparatorEdit { ...defaultProps } /> );
 			expect(
-				screen.getByRole( 'checkbox', { name: /Decorative separator/i } )
+				screen.getByRole( 'checkbox', {
+					name: /Decorative separator/i,
+				} )
 			).toBeInTheDocument();
 		} );
 
@@ -136,7 +138,9 @@ describe( 'Separator block edit method', () => {
 				name: /Decorative separator/i,
 			} );
 			fireEvent.click( toggle );
-			expect( setAttributes ).toHaveBeenCalledWith( { isDecorative: false } );
+			expect( setAttributes ).toHaveBeenCalledWith( {
+				isDecorative: false,
+			} );
 		} );
 
 		test( 'should not render decorative toggle when tagName is div', () => {
@@ -146,7 +150,9 @@ describe( 'Separator block edit method', () => {
 			};
 			render( <SeparatorEdit { ...props } /> );
 			expect(
-				screen.queryByRole( 'checkbox', { name: /Decorative separator/i } )
+				screen.queryByRole( 'checkbox', {
+					name: /Decorative separator/i,
+				} )
 			).not.toBeInTheDocument();
 		} );
 
@@ -156,8 +162,12 @@ describe( 'Separator block edit method', () => {
 				attributes: { ...defaultAttributes, tagName: 'div' },
 			};
 			render( <SeparatorEdit { ...props } /> );
+			// Notice renders text in both the visible node and an aria-live
+			// announcer region, so use getAllByText and check at least one match.
 			expect(
-				screen.getByText( /Non-HR elements are automatically decorative/i )
+				screen.getAllByText(
+					/Non-HR elements are automatically decorative/i
+				)[ 0 ]
 			).toBeInTheDocument();
 		} );
 
@@ -170,7 +180,9 @@ describe( 'Separator block edit method', () => {
 			} );
 			fireEvent.change( select, { target: { value: 'div' } } );
 			expect( setAttributes ).toHaveBeenCalledWith( { tagName: 'div' } );
-			expect( setAttributes ).toHaveBeenCalledWith( { isDecorative: true } );
+			expect( setAttributes ).toHaveBeenCalledWith( {
+				isDecorative: true,
+			} );
 		} );
 	} );
 } );
