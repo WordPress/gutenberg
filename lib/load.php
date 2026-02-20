@@ -110,6 +110,9 @@ require __DIR__ . '/compat/wordpress-7.0/blocks.php';
 require __DIR__ . '/compat/wordpress-7.0/kses.php';
 require __DIR__ . '/compat/wordpress-7.0/media.php';
 
+// Gutenberg plugin compat: disable client-side media processing by default.
+require __DIR__ . '/compat/plugin/media.php';
+
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
