@@ -308,6 +308,9 @@ module.exports = function cli() {
 		},
 		withSpinner( env.status )
 	);
+	// Wrap at 100 chars unless the terminal is narrower than that, but ensure
+	// formatting is applied even when stdout is not a terminal.
+	yargs.wrap( Math.min( 100, yargs.terminalWidth() ?? 100 ) );
 
 	return yargs;
 };
