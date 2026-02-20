@@ -38,6 +38,8 @@ import HtmlRenderer from '../utils/html-renderer';
 import { CustomInserterModal } from './components';
 import { unlock } from '../lock-unlock';
 
+const EMPTY_ARRAY = [];
+
 const IconPlaceholder = ( { className, style } ) => (
 	<SVG
 		xmlns="http://www.w3.org/2000/svg"
@@ -75,7 +77,7 @@ export function Edit( { attributes, setAttributes } ) {
 			const { getIcon, getIcons } = unlock( select( coreDataStore ) );
 			return {
 				selectedIcon: icon ? getIcon( icon ) : null,
-				allIcons: isInserterOpen ? getIcons() : [],
+				allIcons: isInserterOpen ? getIcons() : EMPTY_ARRAY,
 			};
 		},
 		[ icon, isInserterOpen ]
