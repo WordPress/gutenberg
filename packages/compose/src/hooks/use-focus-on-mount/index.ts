@@ -2,12 +2,6 @@ import { focus } from '@wordpress/dom';
 import { useEffect, useRef } from '@wordpress/element';
 import useRefEffect from '../use-ref-effect';
 
-export namespace useFocusOnMount {
-	export type Mode = boolean | 'firstElement' | 'firstInputElement';
-}
-
-export default useFocusOnMount;
-
 /**
  * Determines focus behavior when the element mounts.
  *
@@ -97,3 +91,9 @@ export function useFocusOnMount(
 		};
 	}, [] );
 }
+
+export namespace useFocusOnMount {
+	export type Mode = boolean | 'firstElement' | 'firstInputElement';
+}
+
+export default useFocusOnMount;
