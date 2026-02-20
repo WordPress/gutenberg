@@ -21,7 +21,7 @@ module.exports = {
 		},
 	},
 	create( context ) {
-		let insideSaveFunction = false;
+		let saveFunctionDepth = 0;
 		const filename = context.getFilename();
 
 		// Skip deprecated files as they preserve old behavior including translation functions
@@ -46,12 +46,12 @@ module.exports = {
 			// Track when we enter a function named 'save'
 			FunctionDeclaration( node ) {
 				if ( node.id && node.id.name === 'save' ) {
-					insideSaveFunction = true;
+					saveFunctionDepth++;
 				}
 			},
 			'FunctionDeclaration:exit'( node ) {
 				if ( node.id && node.id.name === 'save' ) {
-					insideSaveFunction = false;
+					saveFunctionDepth--;
 				}
 			},
 
@@ -64,7 +64,7 @@ module.exports = {
 					( node.init.type === 'ArrowFunctionExpression' ||
 						node.init.type === 'FunctionExpression' )
 				) {
-					insideSaveFunction = true;
+					saveFunctionDepth++;
 				}
 			},
 			'VariableDeclarator:exit'( node ) {
@@ -75,7 +75,7 @@ module.exports = {
 					( node.init.type === 'ArrowFunctionExpression' ||
 						node.init.type === 'FunctionExpression' )
 				) {
-					insideSaveFunction = false;
+					saveFunctionDepth--;
 				}
 			},
 
@@ -86,7 +86,7 @@ module.exports = {
 					( node.value.type === 'FunctionExpression' ||
 						node.value.type === 'ArrowFunctionExpression' )
 				) {
-					insideSaveFunction = true;
+					saveFunctionDepth++;
 				}
 			},
 			'Property[key.name="save"]:exit'( node ) {
@@ -95,7 +95,7 @@ module.exports = {
 					( node.value.type === 'FunctionExpression' ||
 						node.value.type === 'ArrowFunctionExpression' )
 				) {
-					insideSaveFunction = false;
+					saveFunctionDepth--;
 				}
 			},
 
@@ -109,7 +109,7 @@ module.exports = {
 				}
 
 				// Report if we're in a save file or inside a save function
-				if ( isSaveFile || insideSaveFunction ) {
+				if ( isSaveFile || saveFunctionDepth > 0 ) {
 					context.report( {
 						node,
 						messageId: 'noI18nInSave',

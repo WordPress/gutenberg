@@ -251,5 +251,20 @@ function save() {
 				},
 			],
 		},
+		{
+			code: `
+// Translation after a nested inner function named save must still be caught
+function save() {
+	function save() {}
+	return __( 'Hello World' );
+}
+			`,
+			errors: [
+				{
+					messageId: 'noI18nInSave',
+					type: 'CallExpression',
+				},
+			],
+		},
 	],
 } );
