@@ -63,12 +63,13 @@ export const buttonView = ( {
 		border: 0;
 	}
 
-	&[disabled] {
+	&[disabled],
+	&[aria-disabled='true'] {
 		opacity: 0.4;
 		cursor: default;
 	}
 
-	&:hover {
+	&:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
 		color: ${ COLORS.theme.foreground };
 	}
 
