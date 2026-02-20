@@ -335,7 +335,7 @@ The trigger button that opens the dialog. ([Source](https://github.com/WordPress
 -	**Experimental:** true
 -	**Category:** media
 -	**Parent:** core/dialog
--	**Allowed Blocks:** core/buttons, core/paragraph, core/heading, core/image, core/group
+-	**Allowed Blocks:** core/buttons, core/button, core/paragraph, core/heading, core/image, core/group
 -	**Supports:** interactivity, spacing (margin, padding), typography (fontSize), ~~align~~, ~~html~~, ~~inserter~~, ~~reusable~~
 
 ## Embed

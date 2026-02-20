@@ -10,6 +10,7 @@
 	"attributes": {},
 	"allowedBlocks": [
 		"core/buttons",
+		"core/button",
 		"core/paragraph",
 		"core/heading",
 		"core/image",

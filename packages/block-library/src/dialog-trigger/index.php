@@ -15,19 +15,50 @@
  */
 function render_block_core_dialog_trigger( $attributes, $content, $block ) {
 	$context_id = isset( $block->context['core/dialog-id'] ) ? $block->context['core/dialog-id'] : null;
+	$trigger_id = wp_unique_id( 'dialog-trigger-' );
 
+	$trigger_attrs = array(
+		'aria-haspopup'               => 'dialog',
+		'aria-controls'               => $context_id,
+		'data-wp-bind--aria-expanded' => 'state.isOpen',
+		'data-wp-interactive'         => 'core/dialog/private',
+		'data-wp-on--click'           => 'actions.onClickOpen',
+	);
+
+	// If the only inner block is a core/button attach directives directly to the rendered
+	// button or anchor element to avoid a nested <button> situation.
+	$inner_blocks = $block->inner_blocks;
+	$only_one_block = 1 === count( $inner_blocks );
+	$singular_block_name = $only_one_block ? $inner_blocks[0]->name : null;
+	if ( $only_one_block && 'core/buttons' === $singular_block_name ) {
+		$tag_processor = new WP_HTML_Tag_Processor( $content );
+		while ( $tag_processor->next_tag() ) {
+			$tag = strtolower( $tag_processor->get_tag() );
+			if ( 'button' === $tag || 'a' === $tag ) {
+				$tag_processor->add_class( 'wp-block-core-dialog-trigger' );
+				$tag_processor->set_attribute( 'id', $trigger_id );
+				foreach ( $trigger_attrs as $attr => $value ) {
+					$tag_processor->set_attribute( $attr, $value );
+				}
+				if ( 'button' === $tag && ! $tag_processor->get_attribute( 'type' ) ) {
+					$tag_processor->set_attribute( 'type', 'button' );
+				}
+				break;
+			}
+		}
+		return $tag_processor->get_updated_html();
+	}
+
+	// Default: wrap inner content in a <button> with all trigger attributes.
 	return wp_sprintf(
 		'<button %1$s>%2$s</button>',
 		get_block_wrapper_attributes(
-			array(
-				'class'                       => 'wp-block-dialog-trigger',
-				'id'                          => wp_unique_id( 'dialog-trigger-' ),
-				'aria-haspopup'               => 'dialog',
-				'aria-controls'               => $context_id,
-				'data-wp-bind--aria-expanded' => 'state.isOpen',
-				'data-wp-interactive'         => 'core/dialog/private',
-				'data-wp-on--click'           => 'actions.onClickOpen',
-				'type'                        => 'button',
+			array_merge(
+				$trigger_attrs,
+				array(
+					'id'    => $trigger_id,
+					'type'  => 'button',
+				)
 			)
 		),
 		$content,
