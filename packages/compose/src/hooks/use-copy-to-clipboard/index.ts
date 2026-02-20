@@ -21,7 +21,7 @@ export async function copyToClipboard(
 	text: string,
 	trigger: Element | null
 ): Promise< boolean > {
-	if ( ! text || ! trigger ) {
+	if ( ! trigger ) {
 		return false;
 	}
 	const { ownerDocument } = trigger;
