@@ -358,7 +358,7 @@ const WithFocusOnMount = () => {
 
 _Parameters_
 
--   _focusOnMount_ `boolean | 'firstElement' | 'firstInputElement'`: Behavioral mode. Defaults to `"firstElement"`. - `"firstElement"` focuses the first tabbable element within. - `"firstInputElement"` focuses the first value control within. - `true` focuses the element itself. - `false` does nothing and _should not be used unless an accessible substitute behavior is implemented_.
+-   _focusOnMount_ `useFocusOnMount.Mode`: Behavioral mode. Defaults to `"firstElement"` which focuses the first tabbable element within; `"firstInputElement"` focuses the first value control within; `true` focuses the element itself; `false` does nothing.
 
 _Returns_
 
