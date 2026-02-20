@@ -21,13 +21,6 @@ const {
 	EnvironmentNotInitializedError,
 } = require( './runtime' );
 
-// Colors.
-const boldWhite = chalk.bold.white;
-const wpPrimary = boldWhite.bgHex( '#00669b' );
-const wpGreen = boldWhite.bgHex( '#4ab866' );
-const wpRed = boldWhite.bgHex( '#d94f4f' );
-const wpYellow = boldWhite.bgHex( '#f0b849' );
-
 // Spinner.
 const withSpinner =
 	( command ) =>
@@ -101,7 +94,7 @@ const withSpinner =
 	};
 
 module.exports = function cli() {
-	yargs.usage( wpPrimary( '$0 <command>' ) );
+	yargs.usage( '$0 <command>' );
 	yargs.option( 'debug', {
 		type: 'boolean',
 		describe: 'Enable debug output.',
@@ -126,15 +119,13 @@ module.exports = function cli() {
 
 	yargs.command(
 		'start',
-		wpGreen(
-			chalk`Starts WordPress for development on port {bold.underline ${ terminalLink(
-				'8888',
-				'http://localhost:8888'
-			) }} (override with WP_ENV_PORT) and tests on port {bold.underline ${ terminalLink(
-				'8889',
-				'http://localhost:8889'
-			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first install, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`
-		),
+		chalk`Starts WordPress for development on port {bold.underline ${ terminalLink(
+			'8888',
+			'http://localhost:8888'
+		) }} (override with WP_ENV_PORT) and tests on port {bold.underline ${ terminalLink(
+			'8889',
+			'http://localhost:8889'
+		) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first install, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`,
 		( args ) => {
 			args.option( 'update', {
 				type: 'boolean',
@@ -171,15 +162,13 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'stop',
-		wpRed(
-			'Stops running WordPress for development and tests and frees the ports.'
-		),
+		'Stops running WordPress for development and tests and frees the ports.',
 		() => {},
 		withSpinner( env.stop )
 	);
 	yargs.command(
 		'reset [environment]',
-		wpYellow( 'Resets the WordPress databases.' ),
+		'Resets the WordPress databases.',
 		( args ) => {
 			args.positional( 'environment', {
 				type: 'string',
@@ -197,7 +186,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'clean [environment]',
-		chalk.gray( '[Deprecated: use reset] Resets the WordPress databases.' ),
+		'[Deprecated: use reset] Resets the WordPress databases.',
 		( args ) => {
 			args.positional( 'environment', {
 				type: 'string',
@@ -278,9 +267,7 @@ module.exports = function cli() {
 
 	yargs.command(
 		'destroy',
-		wpRed(
-			'Destroy the WordPress environment. Deletes docker containers, volumes, networks, and images associated with the WordPress environment and removes local files.'
-		),
+		'Destroy the WordPress environment. Deletes docker containers, volumes, networks, and images associated with the WordPress environment and removes local files.',
 		( args ) => {
 			args.option( 'scripts', {
 				type: 'boolean',
@@ -297,9 +284,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'cleanup',
-		wpYellow(
-			'Cleanup the WordPress environment. Removes docker containers, volumes, networks, and local files, but preserves docker images for faster re-starts.'
-		),
+		'Cleanup the WordPress environment. Removes docker containers, volumes, networks, and local files, but preserves docker images for faster re-starts.',
 		( args ) => {
 			args.option( 'scripts', {
 				type: 'boolean',
