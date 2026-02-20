@@ -306,6 +306,6 @@
 }
 
 /* Column width intents via colgroup: make non-primary columns shrink-to-fit */
-.dataviews-view-table col[class^="dataviews-view-table__col-"]:not(.dataviews-view-table__col-first-data) {
+.dataviews-view-table col[class^="dataviews-view-table__col-"]:not(.dataviews-view-table__col-first-data):not(.dataviews-view-table__col-expand) {
 	width: 1%;
 }

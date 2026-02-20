@@ -1083,6 +1083,9 @@ export const blocks = pipe(
 				if ( fromRootClientId === toRootClientId ) {
 					const subState = state.get( toRootClientId );
 					const fromIndex = subState.indexOf( clientIds[ 0 ] );
+					if ( fromIndex === -1 ) {
+						return state;
+					}
 					const newState = new Map( state );
 					newState.set(
 						toRootClientId,

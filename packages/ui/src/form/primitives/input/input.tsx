@@ -6,7 +6,7 @@ import styles from './style.module.css';
 import type { InputProps } from './types';
 import { InputLayout } from '../input-layout';
 
-export const Input = forwardRef< HTMLInputElement, InputProps >( function Input(
+export const Input = forwardRef< HTMLElement, InputProps >( function Input(
 	{ className, size = 'default', prefix, suffix, style, ...restProps },
 	ref
 ) {

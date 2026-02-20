@@ -74,7 +74,7 @@ export function initializeEditor(
 		isPublishSidebarEnabled: true,
 	} );
 
-	if ( window.__experimentalMediaProcessing ) {
+	if ( window.__clientSideMediaProcessing ) {
 		dispatch( preferencesStore ).setDefaults( 'core/media', {
 			requireApproval: true,
 			optimizeOnUpload: true,

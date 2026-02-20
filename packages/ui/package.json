@@ -43,7 +43,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@base-ui/react": "^1.0.0",
+		"@base-ui/react": "^1.2.0",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
