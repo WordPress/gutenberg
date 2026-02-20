@@ -202,25 +202,31 @@ HTML;
 	}
 
 	/**
-	 * Tests that client-side media processing is enabled by default.
+	 * Tests that client-side media processing is disabled by default in the Gutenberg plugin.
+	 *
+	 * The core compat layer defaults to true, but the Gutenberg plugin
+	 * adds a filter to disable it by default (lib/compat/plugin/media.php)
+	 * until known issues are resolved.
 	 *
 	 * @covers ::gutenberg_is_client_side_media_processing_enabled
 	 */
-	public function test_client_side_media_processing_enabled_by_default() {
-		$this->assertTrue( gutenberg_is_client_side_media_processing_enabled() );
+	public function test_client_side_media_processing_disabled_by_default_in_plugin() {
+		// Remove the test bootstrap override to check the plugin's actual default.
+		remove_filter( 'wp_client_side_media_processing_enabled', '__return_true', 20 );
+		$enabled = gutenberg_is_client_side_media_processing_enabled();
+		// Restore the test bootstrap override.
+		add_filter( 'wp_client_side_media_processing_enabled', '__return_true', 20 );
+
+		$this->assertFalse( $enabled );
 	}
 
 	/**
-	 * Tests that client-side media processing can be disabled via filter.
+	 * Tests that client-side media processing can be enabled via filter.
 	 *
 	 * @covers ::gutenberg_is_client_side_media_processing_enabled
 	 */
-	public function test_client_side_media_processing_can_be_disabled() {
-		add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
-		$enabled = gutenberg_is_client_side_media_processing_enabled();
-		remove_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
-
-		$this->assertFalse( $enabled );
+	public function test_client_side_media_processing_can_be_enabled() {
+		$this->assertTrue( gutenberg_is_client_side_media_processing_enabled() );
 	}
 
 	/**
@@ -229,11 +235,14 @@ HTML;
 	 * @covers ::gutenberg_override_attachments_rest_controller
 	 */
 	public function test_compat_rest_controller_used_when_filter_disabled() {
+		// Remove the test bootstrap override so the disable filter takes effect.
+		remove_filter( 'wp_client_side_media_processing_enabled', '__return_true', 20 );
 		add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
 
 		$result = gutenberg_override_attachments_rest_controller( array(), 'attachment' );
 
 		remove_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
+		add_filter( 'wp_client_side_media_processing_enabled', '__return_true', 20 );
 
 		$this->assertSame(
 			array( 'rest_controller_class' => 'Gutenberg_REST_Attachments_Controller_6_9' ),
@@ -242,11 +251,12 @@ HTML;
 	}
 
 	/**
-	 * Tests that the 6.9 compat REST controller is not used when filter is enabled (default).
+	 * Tests that the 6.9 compat REST controller is not used when filter is enabled.
 	 *
 	 * @covers ::gutenberg_override_attachments_rest_controller
 	 */
 	public function test_compat_rest_controller_not_used_when_filter_enabled() {
+		// Feature is enabled via test bootstrap filter at priority 20.
 		$result = gutenberg_override_attachments_rest_controller( array(), 'attachment' );
 
 		$this->assertSame( array(), $result );
