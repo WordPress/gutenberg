@@ -275,6 +275,10 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 			}
 		}
 
+		if ( rest_is_field_included( 'post_types', $fields ) && 'wp_template' === $template->type ) {
+			$data['post_types'] = isset( $template->post_types ) ? $template->post_types : array();
+		}
+
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		$data    = $this->add_additional_fields_to_object( $data, $request );
 		$data    = $this->filter_response_by_context( $data, $context );
@@ -409,5 +413,28 @@ class Gutenberg_REST_Templates_Controller_7_0 extends WP_REST_Templates_Controll
 
 		// Fail-safe to return a string should the original source ever fall through.
 		return '';
+	}
+
+	/**
+	 * Retrieves the template's schema, conforming to JSON Schema.
+	 *
+	 * @since 7.0.0
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		$schema = parent::get_item_schema();
+
+		$schema['properties']['post_types'] = array(
+			'description' => __( 'The post types that can use this template.' ),
+			'type'        => 'array',
+			'items'       => array(
+				'type' => 'string',
+			),
+			'readonly'    => true,
+			'context'     => array( 'view', 'edit', 'embed' ),
+		);
+
+		return $schema;
 	}
 }

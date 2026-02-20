@@ -19,7 +19,12 @@ import AddNewTemplate from '../add-new-template-legacy';
 import { TEMPLATE_POST_TYPE } from '../../utils/constants';
 import { unlock } from '../../lock-unlock';
 import { useEditPostAction } from '../dataviews-actions';
-import { authorField, descriptionField, previewField } from './fields';
+import {
+	authorField,
+	descriptionField,
+	previewField,
+	postTypesField,
+} from './fields';
 import {
 	defaultLayouts,
 	DEFAULT_VIEW,
@@ -99,6 +104,7 @@ export default function PageTemplates() {
 			previewField,
 			templateTitleField,
 			descriptionField,
+			postTypesField,
 			{
 				...authorField,
 				elements: authors,

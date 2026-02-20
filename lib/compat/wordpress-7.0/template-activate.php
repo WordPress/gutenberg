@@ -208,7 +208,12 @@ function gutenberg_get_registered_block_templates( $query ) {
 	}
 
 	foreach ( $template_files as $template_file ) {
-		$query_result[] = _build_block_template_result_from_file( $template_file, 'wp_template' );
+		$template = _build_block_template_result_from_file( $template_file, 'wp_template' );
+		// Add post_types from the template file data if available.
+		if ( isset( $template_file['postTypes'] ) ) {
+			$template->post_types = $template_file['postTypes'];
+		}
+		$query_result[] = $template;
 	}
 
 	// Add templates registered in the template registry. Filtering out the ones which have a theme file.
@@ -779,7 +784,12 @@ function gutenberg_get_block_templates( $output, $query = array(), $template_typ
 					in_array( $query['post_type'], $template_file['postTypes'], true )
 				)
 			) {
-				$query_result[] = _build_block_template_result_from_file( $template_file, $template_type );
+				$template = _build_block_template_result_from_file( $template_file, $template_type );
+				// Add post_types from the template file data if available.
+				if ( isset( $template_file['postTypes'] ) ) {
+					$template->post_types = $template_file['postTypes'];
+				}
+				$query_result[] = $template;
 			} elseif ( ! isset( $template_file['postTypes'] ) ) {
 				// The custom templates with no associated post types are available for all post types as long
 				// as they are not default templates.

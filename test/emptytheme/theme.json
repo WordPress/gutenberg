@@ -13,6 +13,16 @@
 			"name": "custom-template",
 			"title": "Custom",
 			"postTypes": [ "post" ]
+		},
+		{
+			"name": "page-wide",
+			"title": "Page: Wide",
+			"postTypes": [ "page" ]
+		},
+		{
+			"name": "full-width",
+			"title": "Full Width",
+			"postTypes": [ "post", "page" ]
 		}
 	],
 	"patterns": [ "short-text-surrounded-by-round-images", "partner-logos" ]

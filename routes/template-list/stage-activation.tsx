@@ -36,6 +36,7 @@ import { authorField } from './fields/author';
 import { descriptionField } from './fields/description';
 import { activeField } from './fields/active';
 import { slugField } from './fields/slug';
+import { postTypesField } from './fields/post-types';
 import { useTemplates } from './use-templates';
 import { useSetActiveTemplateAction } from './actions/set-active-template';
 import AddNewTemplate from './add-new-template';
@@ -149,6 +150,7 @@ function TemplateListActivation() {
 			descriptionField,
 			activeField,
 			slugField,
+			postTypesField,
 			{
 				...authorField,
 				elements,

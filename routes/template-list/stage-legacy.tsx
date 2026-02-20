@@ -31,6 +31,7 @@ import {
 import { previewField } from './fields/preview';
 import { authorField } from './fields/author';
 import { descriptionField } from './fields/description';
+import { postTypesField } from './fields/post-types';
 import { useTemplatesLegacy } from './use-templates-legacy';
 import AddNewTemplate from './add-new-template';
 
@@ -139,6 +140,7 @@ function TemplateListLegacy() {
 			previewField,
 			templateTitleField,
 			descriptionField,
+			postTypesField,
 			{
 				...authorField,
 				elements,

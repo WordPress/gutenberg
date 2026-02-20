@@ -35,6 +35,7 @@ import {
 	previewField,
 	activeField,
 	slugField,
+	postTypesField,
 	useThemeField,
 } from './fields';
 import {
@@ -230,6 +231,7 @@ export default function PageTemplates() {
 			descriptionField,
 			activeField,
 			slugField,
+			postTypesField,
 		];
 		if ( activeView === 'user' ) {
 			_fields.push( themeField );
