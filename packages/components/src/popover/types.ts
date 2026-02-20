@@ -83,7 +83,7 @@ export type PopoverProps = {
 	 *
 	 * @default 'firstElement'
 	 */
-	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
+	focusOnMount?: useFocusOnMount.Mode;
 	/**
 	 * A callback invoked when the focus leaves the opened popover. This should
 	 * only be provided in advanced use-cases when a popover should close under

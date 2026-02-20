@@ -62,9 +62,7 @@ export type ModalProps = {
 	 *
 	 * @default true
 	 */
-	focusOnMount?:
-		| Parameters< typeof useFocusOnMount >[ 0 ]
-		| 'firstContentElement';
+	focusOnMount?: useFocusOnMount.Mode | 'firstContentElement';
 	/**
 	 * Elements that are injected into the modal header to the left of the close button (if rendered).
 	 * Hidden if `__experimentalHideHeader` is `true`.

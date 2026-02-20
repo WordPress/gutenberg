@@ -46,7 +46,7 @@ export type DropdownProps = {
 	 *
 	 * @default 'firstElement'
 	 */
-	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
+	focusOnMount?: useFocusOnMount.Mode;
 	/**
 	 * Set this to customize the text that is shown in the dropdown's header
 	 * when it is fullscreen on mobile.

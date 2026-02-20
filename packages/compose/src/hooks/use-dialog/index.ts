@@ -30,7 +30,7 @@ type DialogOptions = {
 	 *
 	 * @default 'firstElement'
 	 */
-	focusOnMount?: Parameters< typeof useFocusOnMount >[ 0 ];
+	focusOnMount?: useFocusOnMount.Mode;
 	/**
 	 * Determines whether tabbing is constrained to within the popover,
 	 * preventing keyboard focus from leaving the popover content without
