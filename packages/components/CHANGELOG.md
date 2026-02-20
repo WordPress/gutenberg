@@ -8,7 +8,7 @@
 
 ### Enhancements
 
--   `ToggleGroupControl`: tweak deselected item color ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
+-   `ToggleGroupControl`: Make unselected item color consistent across all variants ([#75737](https://github.com/WordPress/gutenberg/pull/75737)).
 
 ## 32.2.0 (2026-02-18)
 
