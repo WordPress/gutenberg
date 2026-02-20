@@ -112,24 +112,23 @@ export function useRecentCommandsData() {
 		};
 	}, [] );
 
-	const allCommands = [ ...contextualCommands, ...staticCommands ];
-	const loaders = [ ...contextualLoaders, ...staticLoaders ];
-
 	if ( ! recentlyUsedNames.length ) {
 		return {
 			commands: [],
 			loaders: [],
-			displayNames: [],
-			displaySet: new Set(),
+			recentNames: [],
+			recentSet: new Set(),
 		};
 	}
 
-	const displayNames = recentlyUsedNames.slice( 0, MAX_RECENTLY_DISPLAYED );
-	const displaySet = new Set( displayNames );
-	const commandsByName = new Map( allCommands.map( ( c ) => [ c.name, c ] ) );
-	const commands = displayNames
-		.map( ( name ) => commandsByName.get( name ) )
+	const allCommands = [ ...contextualCommands, ...staticCommands ];
+	const loaders = [ ...contextualLoaders, ...staticLoaders ];
+
+	const recentNames = recentlyUsedNames.slice( 0, MAX_RECENTLY_DISPLAYED );
+	const recentSet = new Set( recentNames );
+	const commands = recentNames
+		.map( ( name ) => allCommands.find( ( c ) => c.name === name ) )
 		.filter( Boolean );
 
-	return { commands, loaders, displayNames, displaySet };
+	return { commands, loaders, recentNames, recentSet };
 }

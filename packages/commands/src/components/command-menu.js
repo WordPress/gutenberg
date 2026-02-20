@@ -241,7 +241,7 @@ function CommandList( {
 }
 
 function RecentGroup() {
-	const { commands, loaders, displayNames, displaySet } =
+	const { commands, loaders, recentNames, recentSet } =
 		useRecentCommandsData();
 
 	if ( ! commands.length && ! loaders.length ) {
@@ -254,8 +254,8 @@ function RecentGroup() {
 				commands={ commands }
 				loaders={ loaders }
 				valuePrefix="recent-"
-				filterNames={ displaySet }
-				sortOrder={ displayNames }
+				filterNames={ recentSet }
+				sortOrder={ recentNames }
 			/>
 		</Command.Group>
 	);
