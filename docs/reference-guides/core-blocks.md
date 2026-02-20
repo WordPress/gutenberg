@@ -1060,7 +1060,7 @@ A single tab button in the tabs menu. Can be styled individually. ([Source](http
 -	**Experimental:** true
 -	**Category:** design
 -	**Parent:** core/tabs-menu
--	**Supports:** color (background, text), layout (~~allowEditing~~), spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~
+-	**Supports:** anchor, color (background, text), layout (~~allowEditing~~), spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~
 
 ## Tag Cloud
 

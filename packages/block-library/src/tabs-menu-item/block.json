@@ -20,6 +20,7 @@
 	"attributes": {},
 	"supports": {
 		"html": false,
+		"anchor": true,
 		"reusable": false,
 		"lock": false,
 		"color": {

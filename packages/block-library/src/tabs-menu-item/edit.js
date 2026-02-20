@@ -110,14 +110,18 @@ function Edit( {
 
 	const handleLabelChange = useCallback(
 		( newLabel ) => {
+			const newAnchor = slugFromLabel( newLabel, tabIndex );
 			if ( tabClientId ) {
 				updateBlockAttributes( tabClientId, {
 					label: newLabel,
-					anchor: slugFromLabel( newLabel, tabIndex ),
+					anchor: newAnchor,
 				} );
 			}
+			updateBlockAttributes( clientId, {
+				anchor: `${ newAnchor }-button`,
+			} );
 		},
-		[ tabClientId, updateBlockAttributes, tabIndex ]
+		[ tabClientId, clientId, updateBlockAttributes, tabIndex ]
 	);
 
 	const blockProps = useBlockProps( {
