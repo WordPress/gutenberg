@@ -46,5 +46,5 @@ jobs:
               run: |
                   npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
                   "npx http-server ./storybook/build --port 50240 --silent" \
-                  "npx wait-on http-get://127.0.0.1:50240 && \
+                  "npx wait-on tcp:127.0.0.1:50240 && \
                   npx test-storybook --url http://localhost:50240 --config-dir ./storybook"
