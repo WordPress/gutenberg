@@ -92,12 +92,17 @@ export default function useCopyToClipboard< T extends HTMLElement >(
 	const textRef = useUpdatedRef( text );
 	const onSuccessRef = useUpdatedRef( onSuccess );
 	return useRefEffect( ( node ) => {
+		// Flag to prevent callbacks after unmount when the Promise resolves.
+		let isActive = true;
 		const handleClick = async () => {
 			const textToCopy =
 				typeof textRef.current === 'function'
 					? textRef.current()
 					: textRef.current || '';
 			const success = await copyToClipboard( textToCopy, node );
+			if ( ! isActive ) {
+				return;
+			}
 			if ( success ) {
 				clearSelection( node );
 				if ( onSuccessRef.current ) {
@@ -107,6 +112,7 @@ export default function useCopyToClipboard< T extends HTMLElement >(
 		};
 		node.addEventListener( 'click', handleClick );
 		return () => {
+			isActive = false;
 			node.removeEventListener( 'click', handleClick );
 		};
 	}, [] );
