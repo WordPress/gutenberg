@@ -116,10 +116,10 @@ function render_block_core_button( $attributes, $content ) {
 				$width_style = "--wp--block-button--width: $numeric_width;";
 				$p->set_attribute( 'style', $width_style . ( $existing_style ? ' ' . $existing_style : '' ) );
 			} else {
-			    $css_value   = $is_preset
-			        ? 'var(--wp--preset--dimension--' . _wp_to_kebab_case( $slug ) . ')'
-			        : $width;
-			    $width_style = "width: $css_value;";
+				$css_value   = $is_preset
+					? 'var(--wp--preset--dimension--' . _wp_to_kebab_case( $slug ) . ')'
+					: $width;
+				$width_style = "width: $css_value;";
 				$p->set_attribute( 'style', $width_style . ( $existing_style ? ' ' . $existing_style : '' ) );
 			}
 
