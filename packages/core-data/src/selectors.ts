@@ -53,7 +53,7 @@ export interface State {
 	registeredPostMeta: Record< string, Object >;
 	editorSettings: Record< string, any > | null;
 	editorAssets: Record< string, any > | null;
-	icons: Icon[];
+	icons: Record< string, Icon >;
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 }
 

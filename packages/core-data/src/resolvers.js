@@ -1279,5 +1279,5 @@ export const getIcon =
 		const icon = await apiFetch( {
 			path: `/wp/v2/icons/${ iconName }`,
 		} );
-		dispatch.receiveIcon( icon );
+		dispatch.receiveIcons( [ icon ] );
 	};

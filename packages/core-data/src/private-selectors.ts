@@ -317,7 +317,7 @@ export function getEditorAssets( state: State ): Record< string, any > | null {
  * @return The list of icons or empty array if not loaded.
  */
 export function getIcons( state: State ): Icon[] {
-	return state.icons ?? [];
+	return Object.values( state.icons ?? {} );
 }
 
 /**
@@ -328,6 +328,5 @@ export function getIcons( state: State ): Icon[] {
  * @return The icon object or undefined if not loaded.
  */
 export function getIcon( state: State, name: string ): Icon | undefined {
-	const icons = state.icons ?? [];
-	return icons.find( ( i ) => i.name === name );
+	return state.icons?.[ name ];
 }

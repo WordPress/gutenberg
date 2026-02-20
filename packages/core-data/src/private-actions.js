@@ -174,17 +174,3 @@ export function receiveIcons( icons ) {
 		icons,
 	};
 }
-
-/**
- * Returns an action object used to receive a single icon.
- *
- * @param {Object} icon Icon object (name, label, content).
- *
- * @return {Object} Action object.
- */
-export function receiveIcon( icon ) {
-	return {
-		type: 'RECEIVE_ICON',
-		icon,
-	};
-}

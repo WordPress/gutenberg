@@ -663,25 +663,19 @@ export function editorAssets( state = null, action ) {
 /**
  * Reducer managing icons.
  *
- * @param {Array}  state  Current state.
+ * @param {Object} state  Current state (keyed by icon name).
  * @param {Object} action Action object.
  *
- * @return {Array} Updated state.
+ * @return {Object} Updated state.
  */
-export function icons( state = [], action ) {
+export function icons( state = {}, action ) {
 	switch ( action.type ) {
-		case 'RECEIVE_ICONS':
-			return action.icons;
-		case 'RECEIVE_ICON': {
-			const existingIndex = state.findIndex(
-				( i ) => i.name === action.icon.name
-			);
-			if ( existingIndex >= 0 ) {
-				const next = [ ...state ];
-				next[ existingIndex ] = action.icon;
-				return next;
+		case 'RECEIVE_ICONS': {
+			const next = { ...state };
+			for ( const icon of action.icons ) {
+				next[ icon.name ] = icon;
 			}
-			return [ ...state, action.icon ];
+			return next;
 		}
 	}
 	return state;
