@@ -639,4 +639,104 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 		$this->assertSame( $meta_server['shutter_speed'], $meta_client['shutter_speed'] );
 		$this->assertSame( $meta_server['created_timestamp'], $meta_client['created_timestamp'] );
 	}
+
+	/**
+	 * Verifies that image_output_format and image_save_progressive are in the schema.
+	 *
+	 * @covers ::get_item_schema
+	 */
+	public function test_image_output_format_in_schema() {
+		$controller = new Gutenberg_REST_Attachments_Controller( 'attachment' );
+		$schema     = $controller->get_item_schema();
+
+		$this->assertArrayHasKey( 'image_output_format', $schema['properties'] );
+		$this->assertSame( array( 'string', 'null' ), $schema['properties']['image_output_format']['type'] );
+		$this->assertContains( 'edit', $schema['properties']['image_output_format']['context'] );
+		$this->assertTrue( $schema['properties']['image_output_format']['readonly'] );
+
+		$this->assertArrayHasKey( 'image_save_progressive', $schema['properties'] );
+		$this->assertSame( 'boolean', $schema['properties']['image_save_progressive']['type'] );
+		$this->assertContains( 'edit', $schema['properties']['image_save_progressive']['context'] );
+		$this->assertTrue( $schema['properties']['image_save_progressive']['readonly'] );
+	}
+
+	/**
+	 * Verifies that image_output_format is null by default (no conversion needed).
+	 *
+	 * @covers ::create_item
+	 * @covers ::prepare_item_for_response
+	 */
+	public function test_image_output_format_in_create_response() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertArrayHasKey( 'image_output_format', $data );
+		// No custom filter, so output format should be null (no conversion needed).
+		$this->assertNull( $data['image_output_format'] );
+	}
+
+	/**
+	 * Verifies that image_output_format reflects a custom filter converting JPEG to WebP.
+	 *
+	 * @covers ::create_item
+	 * @covers ::prepare_item_for_response
+	 */
+	public function test_image_output_format_with_custom_filter() {
+		wp_set_current_user( self::$admin_id );
+
+		// Add a filter to convert JPEG to WebP.
+		$filter = function ( $formats ) {
+			$formats['image/jpeg'] = 'image/webp';
+			return $formats;
+		};
+		add_filter( 'image_editor_output_format', $filter );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		remove_filter( 'image_editor_output_format', $filter );
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertArrayHasKey( 'image_output_format', $data );
+		$this->assertSame( 'image/webp', $data['image_output_format'] );
+	}
+
+	/**
+	 * Verifies that image_save_progressive is returned in the response.
+	 *
+	 * @covers ::create_item
+	 * @covers ::prepare_item_for_response
+	 */
+	public function test_image_save_progressive_in_response() {
+		wp_set_current_user( self::$admin_id );
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_header( 'Content-Type', 'image/jpeg' );
+		$request->set_header( 'Content-Disposition', 'attachment; filename=canola.jpg' );
+		$request->set_param( 'generate_sub_sizes', false );
+
+		$request->set_body( file_get_contents( DIR_TESTDATA . '/images/canola.jpg' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertSame( 201, $response->get_status() );
+		$this->assertArrayHasKey( 'image_save_progressive', $data );
+		// Default is false.
+		$this->assertFalse( $data['image_save_progressive'] );
+	}
 }

@@ -607,29 +607,6 @@ function isValidImageFormat( format: string ): format is ImageFormat {
 }
 
 /**
- * Gets the appropriate interlace setting for the given output format.
- *
- * @param outputMimeType The output mime type.
- * @param settings       The upload settings.
- * @return Whether to use interlaced encoding.
- */
-function getInterlacedSetting(
-	outputMimeType: string,
-	settings: Settings
-): boolean {
-	switch ( outputMimeType ) {
-		case 'image/jpeg':
-			return settings.jpegInterlaced ?? false;
-		case 'image/png':
-			return settings.pngInterlaced ?? false;
-		case 'image/gif':
-			return settings.gifInterlaced ?? false;
-		default:
-			return false;
-	}
-}
-
-/**
  * Determines if an image should be transcoded to a different format.
  *
  * Handles PNG to JPEG conversion carefully by checking for transparency
@@ -637,13 +614,13 @@ function getInterlacedSetting(
  *
  * @param file           The image file.
  * @param outputMimeType The target output MIME type.
- * @param settings       Media settings.
+ * @param interlaced     Whether to use interlaced encoding.
  * @return The transcode operation tuple if transcoding is needed, null otherwise.
  */
 export async function getTranscodeImageOperation(
 	file: File,
 	outputMimeType: string,
-	settings: Settings
+	interlaced: boolean = false
 ): Promise<
 	| [
 			OperationType.TranscodeImage,
@@ -680,7 +657,7 @@ export async function getTranscodeImageOperation(
 		{
 			outputFormat: formatPart,
 			outputQuality: DEFAULT_OUTPUT_QUALITY,
-			interlaced: getInterlacedSetting( outputMimeType, settings ),
+			interlaced,
 		},
 	];
 }
@@ -717,7 +694,7 @@ export function prepareItem( id: QueueItemId ) {
 
 		// For images that can be processed by vips, check if we need to scale down based on threshold.
 		if ( isImage && isVipsSupported ) {
-			const { bigImageSizeThreshold, imageOutputFormats } = settings;
+			const { bigImageSizeThreshold } = settings;
 
 			// If a threshold is set, add a resize operation to scale down large images.
 			// This matches WordPress core's behavior in wp_create_image_subsizes().
@@ -734,19 +711,8 @@ export function prepareItem( id: QueueItemId ) {
 				] );
 			}
 
-			// Check if we need to transcode to a different format.
-			// Uses WordPress image_editor_output_format filter settings.
-			const outputMimeType = imageOutputFormats?.[ file.type ];
-			if ( outputMimeType && outputMimeType !== file.type ) {
-				const transcodeOperation = await getTranscodeImageOperation(
-					file,
-					outputMimeType,
-					settings
-				);
-				if ( transcodeOperation ) {
-					operations.push( transcodeOperation );
-				}
-			}
+			// Format conversion is now determined per-file from the attachment
+			// response (image_output_format field) and handled in generateThumbnails().
 
 			operations.push(
 				OperationType.Upload,
@@ -1117,6 +1083,36 @@ export function generateThumbnails( id: QueueItemId ) {
 			}
 		}
 
+		// If the server indicates format conversion is needed for the main image,
+		// convert and sideload it as the 'original' image size.
+		// This mirrors the EXIF rotation pattern above.
+		if (
+			attachment.image_output_format &&
+			attachment.id &&
+			! item.parentId
+		) {
+			const mainInterlaced = attachment.image_save_progressive ?? false;
+			const mainTranscodeOp = await getTranscodeImageOperation(
+				item.sourceFile,
+				attachment.image_output_format,
+				mainInterlaced
+			);
+
+			if ( mainTranscodeOp ) {
+				dispatch.addSideloadItem( {
+					file: item.sourceFile,
+					batchId: uuidv4(),
+					parentId: item.id,
+					additionalData: {
+						post: attachment.id,
+						image_size: 'original',
+						convert_format: false,
+					},
+					operations: [ mainTranscodeOp, OperationType.Upload ],
+				} );
+			}
+		}
+
 		// Client-side thumbnail generation for images.
 		if (
 			! item.parentId &&
@@ -1133,14 +1129,14 @@ export function generateThumbnails( id: QueueItemId ) {
 
 			const settings = select.getSettings();
 			const allImageSizes = settings.allImageSizes || {};
-			const { imageOutputFormats } = settings;
+
+			// Read per-file format conversion data from the attachment response.
+			const outputMimeType = attachment.image_output_format;
+			const interlaced = attachment.image_save_progressive ?? false;
 
 			// Check if thumbnails should be transcoded to a different format.
 			// Uses the same transparency-aware logic as the main image
 			// to avoid converting transparent PNGs to JPEG.
-			const sourceType = item.sourceFile.type;
-			const outputMimeType = imageOutputFormats?.[ sourceType ];
-
 			let thumbnailTranscodeOperation:
 				| [
 						OperationType.TranscodeImage,
@@ -1148,11 +1144,11 @@ export function generateThumbnails( id: QueueItemId ) {
 				  ]
 				| null = null;
 
-			if ( outputMimeType && outputMimeType !== sourceType ) {
+			if ( outputMimeType ) {
 				thumbnailTranscodeOperation = await getTranscodeImageOperation(
 					item.sourceFile,
 					outputMimeType,
-					settings
+					interlaced
 				);
 			}
 
