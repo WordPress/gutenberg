@@ -11,14 +11,14 @@ import {
 
 function addDialogIdToUrl( id ) {
 	const url = new URL( window.location.href );
-	url.searchParams.set( 'dialogId', id );
+	url.hash = id;
 	// Update the URL without adding to history
 	window.history.replaceState( {}, '', url );
 }
 
 function removeDialogIdFromUrl() {
 	const url = new URL( window.location.href );
-	url.searchParams.delete( 'dialogId' );
+	url.hash = '';
 	// Update the URL without adding to history
 	window.history.replaceState( {}, '', url );
 }
@@ -175,9 +175,7 @@ const { actions: privateActions, state: privateState } = store(
 				if ( ! dialog.isOpen ) {
 					return;
 				}
-				if ( dialog.enableDeepLink ) {
-					addDialogIdToUrl( id );
-				}
+				addDialogIdToUrl( id );
 				dialogElement?.showModal();
 			},
 			/**

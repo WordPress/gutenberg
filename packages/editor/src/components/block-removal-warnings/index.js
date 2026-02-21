@@ -111,7 +111,7 @@ const BLOCK_REMOVAL_RULES = [
 						'Without it, visitors will have no way to open the dialog.'
 					),
 					subtext: __(
-						'Consider using the Deep Linking feature if you need the dialog to open without a trigger.'
+						'You can also activate a dialog by adding dialog anchor ID to the end of the URL (e.g. example.com#my-dialog) if you need the dialog to open without a trigger.'
 					),
 					requireConfirmation: true,
 				};
