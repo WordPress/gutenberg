@@ -1777,7 +1777,20 @@ export function generateGlobalStyles(
 	blocks.forEach( ( blockType: BlockType ) => {
 		const blockStyles = updatedConfig?.styles?.blocks?.[ blockType.name ];
 		if ( blockStyles?.css ) {
-			const selector = blockSelectors[ blockType.name ].selector;
+			const { featureSelectors } = blockSelectors[ blockType.name ];
+			const cssFeatureSelector =
+				typeof featureSelectors === 'object'
+					? featureSelectors?.css
+					: undefined;
+			const resolvedCssSelector =
+				typeof cssFeatureSelector === 'string'
+					? cssFeatureSelector
+					: typeof cssFeatureSelector === 'object'
+					? ( cssFeatureSelector as Record< string, string > )?.root
+					: undefined;
+			const selector =
+				resolvedCssSelector ??
+				blockSelectors[ blockType.name ].selector;
 			styles.push( {
 				css: processCSSNesting( blockStyles.css, selector ),
 				isGlobalStyles: true,
