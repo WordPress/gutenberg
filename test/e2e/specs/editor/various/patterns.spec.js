@@ -5,8 +5,19 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 
 test.describe( 'Unsynced pattern', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
+		// Cross-origin isolation (COEP) prevents page navigations
+		// from working properly during pattern editing.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
@@ -560,12 +571,23 @@ test.describe( 'Unsynced pattern', () => {
 
 test.describe( 'Synced pattern', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
+		// Cross-origin isolation (COEP) prevents page navigations
+		// from working properly during pattern editing.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 		await requestUtils.deleteAllBlocks();
 		await requestUtils.deleteAllPatternCategories();
 	} );
 
 	test.beforeEach( async ( { admin } ) => {
 		await admin.createNewPost();
+	} );
+
+	test.afterAll( async ( { requestUtils } ) => {
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {

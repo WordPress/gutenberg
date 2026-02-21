@@ -100,6 +100,7 @@
 	--wpds-color-stroke-surface-success-strong: #007f30; /* Decorative stroke color used to define success-toned surface boundaries with strong emphasis. */
 	--wpds-color-stroke-surface-warning: #d0b381; /* Decorative stroke color used to define warning-toned surface boundaries with normal emphasis. */
 	--wpds-color-stroke-surface-warning-strong: #926300; /* Decorative stroke color used to define warning-toned surface boundaries with strong emphasis. */
+	--wpds-cursor-control: default; /* Cursor style for interactive controls that are not links (e.g. buttons, checkboxes, and toggles). */
 	--wpds-dimension-base: 4px; /* Base dimension unit */
 	--wpds-dimension-gap-2xl: 32px; /* 2x extra large gap */
 	--wpds-dimension-gap-3xl: 40px; /* 3x extra large gap */

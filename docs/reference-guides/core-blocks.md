@@ -434,7 +434,6 @@ Add custom HTML code and preview it as you edit. ([Source](https://github.com/Wo
 Insert an SVG icon. ([Source](https://github.com/WordPress/gutenberg/tree/trunk/packages/block-library/src/icon))
 
 -	**Name:** core/icon
--	**Experimental:** true
 -	**Category:** media
 -	**Supports:** align (center, left, right), anchor, ariaLabel, color (background, text), dimensions (width), interactivity (clientNavigation), spacing (margin, padding), ~~html~~
 -	**Attributes:** icon
@@ -807,7 +806,7 @@ An advanced block that allows displaying post types based on different query par
 
 -	**Name:** core/query
 -	**Category:** theme
--	**Supports:** align (full, wide), anchor, contentRole, interactivity, layout, ~~html~~
+-	**Supports:** align (full, wide), anchor, interactivity, layout, ~~html~~
 -	**Attributes:** enhancedPagination, namespace, query, queryId, tagName
 
 ## No Results
@@ -1061,7 +1060,6 @@ A single tab button in the tabs menu. Used as a template for styling all tab but
 -	**Category:** design
 -	**Parent:** core/tabs-menu
 -	**Supports:** color (background, text), layout (~~allowEditing~~), shadow, spacing (padding), typography (fontSize, textAlign), ~~html~~, ~~lock~~, ~~reusable~~
--	**Attributes:** activeBackgroundColor, activeTextColor, customActiveBackgroundColor, customActiveTextColor, customHoverBackgroundColor, customHoverTextColor, hoverBackgroundColor, hoverTextColor
 
 ## Tag Cloud
 

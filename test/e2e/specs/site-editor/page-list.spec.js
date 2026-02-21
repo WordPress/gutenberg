@@ -252,7 +252,7 @@ test.describe( 'Page List', () => {
 					await editButton.click();
 					await expect(
 						page.getByRole( 'link', {
-							name: 'http://localhost:8889/?',
+							name: /http:\/\/localhost:8889\//,
 						} )
 					).toBeVisible();
 				},

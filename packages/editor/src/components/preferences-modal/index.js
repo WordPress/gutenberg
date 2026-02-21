@@ -298,7 +298,7 @@ function PreferencesModalContents( { extraSections = {} } ) {
 						</>
 					),
 				},
-				window.__experimentalMediaProcessing && {
+				window.__clientSideMediaProcessing && {
 					name: 'media',
 					tabLabel: __( 'Media' ),
 					content: (

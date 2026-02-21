@@ -18,32 +18,7 @@
 		"core/tabs-activeTabIndex",
 		"core/tabs-editorActiveTabIndex"
 	],
-	"attributes": {
-		"activeBackgroundColor": {
-			"type": "string"
-		},
-		"customActiveBackgroundColor": {
-			"type": "string"
-		},
-		"activeTextColor": {
-			"type": "string"
-		},
-		"customActiveTextColor": {
-			"type": "string"
-		},
-		"hoverBackgroundColor": {
-			"type": "string"
-		},
-		"customHoverBackgroundColor": {
-			"type": "string"
-		},
-		"hoverTextColor": {
-			"type": "string"
-		},
-		"customHoverTextColor": {
-			"type": "string"
-		}
-	},
+	"attributes": {},
 	"supports": {
 		"html": false,
 		"reusable": false,
