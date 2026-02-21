@@ -67,8 +67,7 @@
 	"usesContext": [
 		"core/dialog-id",
 		"core/dialog-isDialogOpen",
-		"core/dialog-label",
-		"core/dialog-enableDeepLink"
+		"core/dialog-label"
 	],
 	"parent": [ "core/dialog" ],
 	"textdomain": "dialog-content",

@@ -62,6 +62,7 @@ function render_block_core_dialog( $attributes, $content, $block ) {
 	$tag_processor->set_attribute( 'data-wp-interactive', 'core/dialog/private' );
 	$tag_processor->set_attribute( 'data-wp-key', $block_id );
 	$tag_processor->set_attribute( 'data-wp-context', $context );
+	$tag_processor->set_attribute( 'data-wp-init', 'callbacks.onInit' );
 
 	return $tag_processor->get_updated_html();
 }

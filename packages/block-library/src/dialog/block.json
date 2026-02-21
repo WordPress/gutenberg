@@ -18,10 +18,6 @@
 		"dialogLabel": {
 			"type": "string",
 			"default": ""
-		},
-		"enableDeepLink": {
-			"type": "boolean",
-			"default": false
 		}
 	},
 	"supports": {
@@ -32,8 +28,7 @@
 	},
 	"providesContext": {
 		"core/dialog-isDialogOpen": "editorIsDialogOpen",
-		"core/dialog-label": "dialogLabel",
-		"core/dialog-enableDeepLink": "enableDeepLink"
+		"core/dialog-label": "dialogLabel"
 	},
 	"usesContext": [ "core/dialog-id" ],
 	"textdomain": "dialog",

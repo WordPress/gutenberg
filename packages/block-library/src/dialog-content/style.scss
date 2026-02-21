@@ -53,7 +53,7 @@
 	}
 
 	&::backdrop {
-		cursor: zoom-out;
+		cursor: default;
 		background-color: var(--wp--style--dialog-backdrop-color, rgba(0, 0, 0, 0.5));
 		opacity: 0;
 
@@ -81,7 +81,7 @@
 		appearance: none;
 		background: none;
 		border: none;
-		padding: 0;
+		padding: 10px;
 		float: right;
 		cursor: pointer;
 		position: relative;

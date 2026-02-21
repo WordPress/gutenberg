@@ -41,10 +41,11 @@ export default function Edit( { context, clientId } ) {
 	};
 
 	const blockProps = useBlockProps( {
+		role: 'button',
+		tabIndex: 0,
 		'aria-haspopup': 'dialog',
 		'aria-controls': dialogId,
 		'aria-expanded': isDialogOpen ? 'true' : 'false',
-		type: 'button',
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
@@ -70,7 +71,7 @@ export default function Edit( { context, clientId } ) {
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
-			<button { ...innerBlocksProps } />
+			<div { ...innerBlocksProps } />
 		</>
 	);
 }

@@ -87,6 +87,13 @@ const { actions: privateActions, state: privateState } = store(
 				const { id } = privateState;
 				privateActions.open( id );
 			} ),
+			onTriggerKeydown: withSyncEvent( ( event ) => {
+				if ( event.key === 'Enter' || event.key === ' ' ) {
+					event.preventDefault();
+					const { id } = privateState;
+					privateActions.open( id );
+				}
+			} ),
 			/**
 			 * This function is used by the close button in the dialog element, when clicked it closes the dialog.
 			 * @param event
@@ -131,6 +138,16 @@ const { actions: privateActions, state: privateState } = store(
 			},
 		},
 		callbacks: {
+			onInit: () => {
+				// Check if the url has a #<id> hash, check if the hash exists in state.dialogs, if it does, open the dialog.
+				const hash = window.location.hash;
+				if ( hash ) {
+					const hashId = hash.replace( '#', '' );
+					if ( privateState.dialogs[ hashId ] ) {
+						privateActions.open( hashId );
+					}
+				}
+			},
 			/**
 			 * Handles the escape key event to close the dialog if it's open.
 			 *
@@ -196,6 +213,9 @@ const { actions: privateActions, state: privateState } = store(
 					// Close immediately without animation
 					dialogElement.close();
 					removeDialogIdFromUrl( id );
+					document
+						.querySelector( '[aria-controls="' + id + '"]' )
+						?.focus();
 					return;
 				}
 
@@ -217,6 +237,9 @@ const { actions: privateActions, state: privateState } = store(
 					dialogElement.close();
 					removeDialogIdFromUrl( id );
 					privateState.dialogs[ id ].showClosingAnimation = false;
+					document
+						.querySelector( '[aria-controls="' + id + '"]' )
+						?.focus();
 				} );
 
 				dialogElement.addEventListener(

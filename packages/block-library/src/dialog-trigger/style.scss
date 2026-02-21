@@ -3,7 +3,8 @@
 	width: 100%;
 }
 
-button.wp-block-dialog-trigger {
+button.wp-block-dialog-trigger,
+.wp-block-dialog-trigger[role="button"] {
 	appearance: none;
 	padding: none;
 	margin: none;
@@ -14,7 +15,8 @@ button.wp-block-dialog-trigger {
 	font-family: inherit;
 	color: inherit;
 	cursor: pointer;
-	&:focus {
-		outline: none;
+	&:focus-visible {
+		outline: 2px solid currentColor;
+		outline-offset: 2px;
 	}
 }

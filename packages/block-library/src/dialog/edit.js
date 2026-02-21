@@ -48,11 +48,7 @@ const TEMPLATE = [
 ];
 
 export default function Edit( { attributes, setAttributes, clientId } ) {
-	const {
-		editorIsDialogOpen = false,
-		dialogLabel = '',
-		enableDeepLink = false,
-	} = attributes;
+	const { editorIsDialogOpen = false, dialogLabel = '' } = attributes;
 
 	// Get the dialog-content block from inner blocks and check if it's selected.
 	const { dialogElementClientId, isDialogElementSelected } = useSelect(
@@ -64,7 +60,6 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 				( innerBlock ) => innerBlock.name === 'core/dialog-content'
 			);
 			const dialogElementId = dialogElementBlock?.clientId;
-
 			// Check if dialog-content or any of its descendants are selected
 			const isSelected = dialogElementId
 				? isBlockSelected( dialogElementId ) ||
@@ -103,9 +98,7 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 	// Set up a ref for the block container
 	const ref = useRef( null );
 
-	const blockProps = useBlockProps( {
-		ref,
-	} );
+	const blockProps = useBlockProps( { ref } );
 
 	// We're locking down the template and allowed blocks to only allow the dialog trigger and dialog element.
 	const innerBlocksProps = useInnerBlocksProps(
@@ -134,7 +127,6 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 			<InspectorPanel
 				dialogLabel={ dialogLabel }
 				setAttributes={ setAttributes }
-				enableDeepLink={ enableDeepLink }
 			/>
 			<Toolbar
 				buttonLabel={ buttonLabel }
@@ -147,7 +139,6 @@ export default function Edit( { attributes, setAttributes, clientId } ) {
 						'core/dialog-id': dialogId || null,
 						'core/dialog-isDialogOpen': editorIsDialogOpen,
 						'core/dialog-label': dialogLabel,
-						'core/dialog-enableDeepLink': enableDeepLink,
 					} }
 				>
 					{ innerBlocksProps.children }

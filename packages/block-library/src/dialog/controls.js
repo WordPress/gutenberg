@@ -6,16 +6,11 @@ import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import {
 	PanelBody,
 	TextControl,
-	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
 
-export function InspectorPanel( {
-	dialogLabel,
-	setAttributes,
-	enableDeepLink,
-} ) {
+export function InspectorPanel( { dialogLabel, setAttributes } ) {
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
@@ -29,19 +24,6 @@ export function InspectorPanel( {
 					value={ dialogLabel }
 					onChange={ ( value ) =>
 						setAttributes( { dialogLabel: value } )
-					}
-				/>
-				<ToggleControl
-					__nextHasNoMarginBottom
-					label={ __( 'Enable deep linking' ) }
-					help={ __(
-						'Allow the dialog to be opened via its HTML Anchor (set in the Advanced panel).'
-					) }
-					checked={ enableDeepLink }
-					onChange={ ( newEnableDeepLink ) =>
-						setAttributes( {
-							enableDeepLink: newEnableDeepLink,
-						} )
 					}
 				/>
 			</PanelBody>

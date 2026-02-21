@@ -314,7 +314,7 @@ Adds a button that opens a modal dialog to display content without leaving the p
 -	**Category:** media
 -	**Allowed Blocks:** core/dialog-trigger, core/dialog-content
 -	**Supports:** align (center, full, left, right, wide), anchor, interactivity, ~~html~~
--	**Attributes:** dialogLabel, editorIsDialogOpen, enableDeepLink
+-	**Attributes:** dialogLabel, editorIsDialogOpen
 
 ## Dialog Content
 

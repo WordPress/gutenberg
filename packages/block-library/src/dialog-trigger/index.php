@@ -20,9 +20,11 @@ function render_block_core_dialog_trigger( $attributes, $content, $block ) {
 	$trigger_attrs = array(
 		'aria-haspopup'               => 'dialog',
 		'aria-controls'               => $context_id,
-		'data-wp-bind--aria-expanded' => 'state.isOpen',
+		'aria-expanded'               => 'false',
+		'data-wp-bind--aria-expanded' => 'state.dialog.isOpen',
 		'data-wp-interactive'         => 'core/dialog/private',
 		'data-wp-on--click'           => 'actions.onClickOpen',
+		'data-wp-on--keydown'         => 'actions.onTriggerKeydown',
 	);
 
 	// If the only inner block is a core/button attach directives directly to the rendered
@@ -35,7 +37,7 @@ function render_block_core_dialog_trigger( $attributes, $content, $block ) {
 		while ( $tag_processor->next_tag() ) {
 			$tag = strtolower( $tag_processor->get_tag() );
 			if ( 'button' === $tag || 'a' === $tag ) {
-				$tag_processor->add_class( 'wp-block-core-dialog-trigger' );
+				$tag_processor->add_class( 'wp-block-dialog-trigger' );
 				$tag_processor->set_attribute( 'id', $trigger_id );
 				foreach ( $trigger_attrs as $attr => $value ) {
 					$tag_processor->set_attribute( $attr, $value );
@@ -49,15 +51,17 @@ function render_block_core_dialog_trigger( $attributes, $content, $block ) {
 		return $tag_processor->get_updated_html();
 	}
 
-	// Default: wrap inner content in a <button> with all trigger attributes.
+	// Default: wrap inner content in a <div role="button"> to allow block-level content
+	// (e.g. <p>, <h*>) which would be invalid inside a native <button>.
 	return wp_sprintf(
-		'<button %1$s>%2$s</button>',
+		'<div %1$s>%2$s</div>',
 		get_block_wrapper_attributes(
 			array_merge(
 				$trigger_attrs,
 				array(
-					'id'    => $trigger_id,
-					'type'  => 'button',
+					'id'       => $trigger_id,
+					'role'     => 'button',
+					'tabindex' => '0',
 				)
 			)
 		),
