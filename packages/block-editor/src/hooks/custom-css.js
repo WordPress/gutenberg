@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { addFilter } from '@wordpress/hooks';
 import { useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
@@ -23,6 +24,36 @@ const CUSTOM_CSS_INSTANCE_REFERENCE = {};
 
 // Stable empty object reference for useSelect.
 const EMPTY_STYLE = {};
+
+/**
+ * Filters registered block settings, extending attributes to include `style`
+ * when the block has customCSS support.
+ *
+ * @param {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
+ */
+function addAttribute( settings ) {
+	if ( ! hasBlockSupport( settings, 'customCSS', true ) ) {
+		return settings;
+	}
+
+	if ( ! settings.attributes?.style ) {
+		Object.assign( settings.attributes, {
+			style: {
+				type: 'object',
+			},
+		} );
+	}
+
+	return settings;
+}
+
+addFilter(
+	'blocks.registerBlockType',
+	'core/customCSS/addAttribute',
+	addAttribute
+);
 
 /**
  * Inspector control for custom CSS.
