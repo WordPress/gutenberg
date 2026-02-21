@@ -29,8 +29,8 @@ function render_block_core_dialog_trigger( $attributes, $content, $block ) {
 
 	// If the only inner block is a core/button attach directives directly to the rendered
 	// button or anchor element to avoid a nested <button> situation.
-	$inner_blocks = $block->inner_blocks;
-	$only_one_block = 1 === count( $inner_blocks );
+	$inner_blocks        = $block->inner_blocks;
+	$only_one_block      = 1 === count( $inner_blocks );
 	$singular_block_name = $only_one_block ? $inner_blocks[0]->name : null;
 	if ( $only_one_block && 'core/buttons' === $singular_block_name ) {
 		$tag_processor = new WP_HTML_Tag_Processor( $content );
