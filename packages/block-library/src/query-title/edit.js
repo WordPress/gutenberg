@@ -40,7 +40,9 @@ export default function QueryTitleEdit( props ) {
 
 	const TagName = level === 0 ? 'p' : `h${ level }`;
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: 'wp-block-query-title__placeholder',
+	} );
 
 	if ( ! SUPPORTED_TYPES.includes( type ) ) {
 		return (
