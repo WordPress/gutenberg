@@ -12,8 +12,8 @@
 		"blockName": null,
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\r\n\r\n",
-		"innerContent": [ "\r\n\r\n" ]
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
 	},
 	{
 		"blockName": "core/post-title",
@@ -28,8 +28,8 @@
 		"blockName": null,
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "\r\n\r\n",
-		"innerContent": [ "\r\n\r\n" ]
+		"innerHTML": "\n\n",
+		"innerContent": [ "\n\n" ]
 	},
 	{
 		"blockName": "core/post-title",
