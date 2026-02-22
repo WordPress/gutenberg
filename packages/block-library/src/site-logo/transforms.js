@@ -8,18 +8,10 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/site-title' ],
-			transform: ( { isLink, linkTarget, style } ) => {
-				const textAlign = style?.typography?.textAlign;
+			transform: ( { isLink, linkTarget } ) => {
 				return createBlock( 'core/site-title', {
 					isLink,
 					linkTarget,
-					...( textAlign && {
-						style: {
-							typography: {
-								textAlign,
-							},
-						},
-					} ),
 				} );
 			},
 		},
