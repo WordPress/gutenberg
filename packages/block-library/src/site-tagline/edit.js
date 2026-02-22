@@ -45,7 +45,13 @@ export default function SiteTaglineEdit( props ) {
 		} );
 	}
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className:
+			! canUserEdit && ! tagline
+				? 'wp-block-site-tagline__placeholder'
+				: undefined,
+	} );
+
 	const siteTaglineContent = canUserEdit ? (
 		<RichText
 			allowedFormats={ [] }

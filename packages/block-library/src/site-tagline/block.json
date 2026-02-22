@@ -18,7 +18,14 @@
 		}
 	},
 	"example": {
-		"viewportWidth": 350
+		"viewportWidth": 350,
+		"attributes": {
+			"style": {
+				"typography": {
+					"textAlign": "center"
+				}
+			}
+		}
 	},
 	"supports": {
 		"anchor": true,
