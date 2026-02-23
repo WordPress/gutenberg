@@ -287,7 +287,7 @@ _Parameters_
 
 _Returns_
 
--   `JSX.Element`: Block title.
+-   `React.JSX.Element`: Block title.
 
 ### BlockToolbar
 
@@ -505,6 +505,18 @@ _Returns_
 
 -   `string`: Mapping of the spacing preset to its equivalent custom value.
 
+### getDimensionsClassesAndStyles
+
+Provides the CSS class names and inline styles for a block's dimensions support attributes.
+
+_Parameters_
+
+-   _attributes_ `Object`: Block attributes.
+
+_Returns_
+
+-   `Object`: Dimensions block support derived CSS classes & styles.
+
 ### getFontSize
 
 Returns the font size object based on an array of named font sizes and the namedFontSize and customFontSize values. If namedFontSize is undefined or not found in fontSizes an object with just the size value based on customFontSize is returned.
@@ -692,6 +704,43 @@ _Related_
 
 Renders a link control. A link control is a controlled input which maintains a value associated with a link (HTML anchor element) and relevant settings for how that link is expected to behave.
 
+### Usage Patterns
+
+The component does not support a fully controlled implementation, but it does support an observable implementation.
+
+### Uncontrolled (default)
+
+The component manages its own search input state:
+
+```jsx
+<LinkControl value={ link } onChange={ setLink } />
+```
+
+### Observable
+
+Observe input changes without controlling the value:
+
+```jsx
+<LinkControl
+	value={ link }
+	onChange={ setLink }
+	onInputChange={ ( newValue ) => console.log( newValue ) }
+/>
+```
+
+### Uncontrolled with Initial Value
+
+Pre-populate the search input with a default value:
+
+```jsx
+<LinkControl
+	value={ link }
+	onChange={ setLink }
+	inputValue="wordpress"
+	onInputChange={ ( newValue ) => console.log( newValue ) }
+/>
+```
+
 _Parameters_
 
 -   _props_ `WPLinkControlProps`: Component props.
@@ -801,11 +850,11 @@ _Parameters_
 -   _props_ `Object`:
 -   _props.uniqueId_ `*`: Any value that acts as a unique identifier for a block instance.
 -   _props.blockName_ `string`: Optional block name.
--   _props.children_ `JSX.Element`: React children.
+-   _props.children_ `React.JSX.Element`: React children.
 
 _Returns_
 
--   `JSX.Element`: A React element.
+-   `React.JSX.Element`: A React element.
 
 ### RichText
 

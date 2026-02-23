@@ -22,7 +22,7 @@ const blockTransforms = [
 	'Heading',
 	'Preformatted',
 	'Pullquote',
-	'Verse',
+	'Poetry',
 	'Code',
 	...transformsWithInnerBlocks,
 ];

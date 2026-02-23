@@ -290,7 +290,7 @@ function ViewTable< Item >( {
 	const headerMenuRefs = useRef<
 		Map< string, { node: HTMLButtonElement; fallback: string } >
 	>( new Map() );
-	const headerMenuToFocusRef = useRef< HTMLButtonElement >();
+	const headerMenuToFocusRef = useRef< HTMLButtonElement >( undefined );
 	const [ nextHeaderMenuToFocus, setNextHeaderMenuToFocus ] =
 		useState< HTMLButtonElement >();
 	const hasBulkActions = useSomeItemHasAPossibleBulkAction( actions, data );
@@ -411,8 +411,9 @@ function ViewTable< Item >( {
 							className={ clsx(
 								`dataviews-view-table__col-${ column }`,
 								{
-									'dataviews-view-table__col-first-data':
-										! hasPrimaryColumn && index === 0,
+									'dataviews-view-table__col-expand':
+										! hasPrimaryColumn &&
+										index === columns.length - 1,
 								}
 							) }
 						/>

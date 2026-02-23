@@ -21,7 +21,7 @@ type Story = StoryObj< typeof Stack >;
 
 export const Default: Story = {
 	args: {
-		gap: 'sm',
+		gap: 'md',
 		children: (
 			<>
 				<DemoBox />
@@ -90,7 +90,7 @@ export const Nested: Story = {
 		children: (
 			<>
 				<DemoBox variant="lg" />
-				<Stack gap="md">
+				<Stack gap="lg">
 					<DemoBox />
 					<DemoBox />
 				</Stack>

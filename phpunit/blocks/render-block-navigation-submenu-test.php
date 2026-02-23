@@ -209,4 +209,43 @@ class Render_Block_Navigation_Submenu_Test extends WP_UnitTestCase {
 			'Submenu block should not apply "has-*" color classes if missing from context'
 		);
 	}
+
+	/**
+	 * Test backward compatibility for blocks saved with legacy openSubmenusOnClick attribute.
+	 *
+	 * This test verifies that navigation blocks saved with the old openSubmenusOnClick: true
+	 * attribute still render correctly with the "open-on-click" class, even though
+	 * openSubmenusOnClick was removed from the context pipeline.
+	 *
+	 * @group submenu-backward-compatibility
+	 * @covers ::gutenberg_render_block_core_navigation_submenu
+	 */
+	public function test_should_apply_open_on_click_for_legacy_openSubmenusOnClick_attribute() {
+		$page_id = self::$page->ID;
+
+		// Test the full rendering pipeline with a Navigation block containing a submenu.
+		// The Navigation block has the legacy openSubmenusOnClick: true attribute.
+		// This tests that the context is correctly passed from parent to child.
+		$markup = '<!-- wp:navigation {"openSubmenusOnClick":true,"overlayMenu":"never"} -->
+<!-- wp:navigation-submenu {"label":"Submenu Label","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type"} -->
+<!-- wp:navigation-link {"label":"Submenu Item","type":"page","id":' . $page_id . ',"url":"http://localhost:8888/?page_id=' . $page_id . '","kind":"post-type"} /-->
+<!-- /wp:navigation-submenu -->
+<!-- /wp:navigation -->';
+
+		$rendered_html = do_blocks( $markup );
+
+		// The submenu should have the "open-on-click" class for backward compatibility.
+		$this->assertStringContainsString(
+			'open-on-click',
+			$rendered_html,
+			'Submenu should apply "open-on-click" class for blocks saved with legacy openSubmenusOnClick: true attribute'
+		);
+
+		// It should NOT have the hover-click class.
+		$this->assertStringNotContainsString(
+			'open-on-hover-click',
+			$rendered_html,
+			'Submenu should not have "open-on-hover-click" class when legacy openSubmenusOnClick was true'
+		);
+	}
 }

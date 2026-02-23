@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { hasBlockSupport, getBlockType } from '@wordpress/blocks';
 import { useContext } from '@wordpress/element';
 
@@ -15,6 +15,8 @@ import { PrivateListView } from '../components/list-view';
 import InspectorControls from '../components/inspector-controls/fill';
 import { PrivateBlockContext } from '../components/block-list/private-block-context';
 import useListViewPanelState from '../components/use-list-view-panel-state';
+
+import { unlock } from '../lock-unlock';
 
 export const LIST_VIEW_SUPPORT_KEY = 'listView';
 
@@ -42,6 +44,11 @@ export function ListViewPanel( { clientId, name } ) {
 
 	const { isOpened, expandRevision, handleToggle } =
 		useListViewPanelState( clientId );
+
+	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+	const { openListViewContentPanel } = unlock(
+		useDispatch( blockEditorStore )
+	);
 
 	const isEnabled = hasListViewSupport( name );
 	const { hasChildren, isNestedListView } = useSelect(
@@ -97,6 +104,7 @@ export function ListViewPanel( { clientId, name } ) {
 					isExpanded
 					description={ title }
 					showAppender
+					onSelect={ openListViewContentPanel }
 				/>
 			</PanelBody>
 		</InspectorControls>

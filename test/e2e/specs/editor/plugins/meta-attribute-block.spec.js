@@ -11,6 +11,9 @@ const VARIATIONS = [
 test.describe( 'Block with a meta attribute', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+		await requestUtils.activatePlugin(
 			'gutenberg-test-meta-attribute-block'
 		);
 	} );
@@ -18,6 +21,9 @@ test.describe( 'Block with a meta attribute', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-meta-attribute-block'
+		);
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
 		);
 	} );
 

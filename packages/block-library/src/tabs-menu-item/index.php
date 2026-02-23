@@ -10,6 +10,8 @@
  *
  * Applies IAPI directives and tab-specific attributes to the saved content.
  *
+ * @since 7.0.0
+ *
  * @param array     $attributes Block attributes.
  * @param string    $content    Block content.
  * @param \WP_Block $block      WP_Block instance.
@@ -35,8 +37,6 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 
 		// Set tab-specific attributes
 		$tag_processor->set_attribute( 'id', 'tab__' . $tab_id );
-		$tag_processor->set_attribute( 'href', '#' . $tab_id );
-		$tag_processor->set_attribute( 'role', 'tab' );
 		$tag_processor->set_attribute( 'aria-controls', $tab_id );
 
 		// Add IAPI directives
@@ -55,11 +55,11 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 	// Get updated HTML and inject the label
 	$output = $tag_processor->get_updated_html();
 
-	// The save.js outputs <a><span class="screen-reader-text">...</span></a>
-	// Replace the anchor content with the actual tab label
+	// The save.js outputs <button><span class="screen-reader-text">...</span></button>
+	// Replace the button content with the actual tab label
 	$output = preg_replace(
-		'/(<a[^>]*>).*?(<\/a>)/s',
-		'$1' . '<span>' . esc_html( html_entity_decode( $tab_label ) ) . '</span>' . '$2',
+		'/(<button[^>]*>).*?(<\/button>)/s',
+		'$1' . '<span>' . wp_kses_post( $tab_label ) . '</span>' . '$2',
 		$output
 	);
 
@@ -69,7 +69,7 @@ function block_core_tabs_menu_item_render_callback( array $attributes, string $c
 /**
  * Registers the `core/tabs-menu-item` block on the server.
  *
- * @since 6.9.0
+ * @since 7.0.0
  */
 function register_block_core_tabs_menu_item() {
 	register_block_type_from_metadata(

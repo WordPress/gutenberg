@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### New Features
+
+-   Add `--wpds-cursor-control` design token for interactive non-link elements ([#75697](https://github.com/WordPress/gutenberg/pull/75697)).
+
+## 0.7.0 (2026-02-18)
+
 ### Breaking changes
 
 -   Renamed padding tokens to remove the `surface` segment and updated the scale from `2xs`–`lg` to `xs`–`3xl` ([#75054](https://github.com/WordPress/gutenberg/pull/75054)). To preserve the same values:
@@ -16,8 +22,7 @@
     -   `--wpds-dimension-gap-sm`: use `--wpds-dimension-gap-md` instead.
     -   `--wpds-dimension-gap-md`: use `--wpds-dimension-gap-lg` instead.
     -   `--wpds-dimension-gap-lg`: use `--wpds-dimension-gap-xl` instead.
-    -   `--wpds-dimension-gap-xl`: use `--wpds-dimension-gap-2xl` instead.
-    -   `--wpds-dimension-gap-2xl`: use `--wpds-dimension-gap-3xl` instead.
+    -   `--wpds-dimension-gap-xl`: use `--wpds-dimension-gap-3xl` instead.
 -   Renamed elevation tokens to use abbreviated size names for consistency with other tokens ([#75103](https://github.com/WordPress/gutenberg/pull/75103)):
     -   `--wpds-elevation-x-small`: use `--wpds-elevation-xs` instead.
     -   `--wpds-elevation-small`: use `--wpds-elevation-sm` instead.

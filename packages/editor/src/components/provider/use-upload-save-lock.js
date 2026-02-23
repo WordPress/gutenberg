@@ -16,19 +16,20 @@ const LOCK_NAME = 'upload-in-progress';
  * A hook that locks post saving and autosaving while media uploads are in progress.
  * This prevents users from publishing or saving while files are still uploading.
  *
- * Only active when the experimental media processing feature is enabled.
+ * Only active when client-side media processing is enabled.
  */
 export default function useUploadSaveLock() {
-	const isExperimentEnabled = window.__experimentalMediaProcessing;
+	const isClientSideMediaProcessingEnabled =
+		window.__clientSideMediaProcessing;
 
 	const isUploading = useSelect(
 		( select ) => {
-			if ( ! isExperimentEnabled ) {
+			if ( ! isClientSideMediaProcessingEnabled ) {
 				return false;
 			}
 			return select( uploadStore ).isUploading();
 		},
-		[ isExperimentEnabled ]
+		[ isClientSideMediaProcessingEnabled ]
 	);
 
 	const {
@@ -39,7 +40,7 @@ export default function useUploadSaveLock() {
 	} = useDispatch( editorStore );
 
 	useEffect( () => {
-		if ( ! isExperimentEnabled ) {
+		if ( ! isClientSideMediaProcessingEnabled ) {
 			return;
 		}
 
@@ -56,7 +57,7 @@ export default function useUploadSaveLock() {
 			unlockPostAutosaving( LOCK_NAME );
 		};
 	}, [
-		isExperimentEnabled,
+		isClientSideMediaProcessingEnabled,
 		isUploading,
 		lockPostSaving,
 		unlockPostSaving,
