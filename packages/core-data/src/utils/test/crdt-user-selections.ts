@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { Y } from '@wordpress/sync';
+import { select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -12,6 +13,14 @@ import {
 	SelectionType,
 } from '../crdt-user-selections';
 import { CRDT_RECORD_MAP_KEY } from '../../sync';
+
+jest.mock( '@wordpress/data', () => ( {
+	select: jest.fn(),
+} ) );
+
+jest.mock( '@wordpress/block-editor', () => ( {
+	store: 'core/block-editor',
+} ) );
 import type {
 	CursorPosition,
 	SelectionNone,
@@ -26,6 +35,8 @@ import type {
 // Shared Y.Doc and Y.Map for creating Y.Text instances
 const yDoc = new Y.Doc();
 const yMap = yDoc.getMap( 'test-map' );
+let textCounter = 0;
+let blockCounter = 0;
 
 /**
  * Helper to create a Y.Text instance attached to a Y.Doc.
@@ -36,10 +47,29 @@ const yMap = yDoc.getMap( 'test-map' );
  * @return The Y.Text instance, attached to the Y.Doc.
  */
 function createYText( yTextValue: string, yTextKey?: string ): Y.Text {
-	const key = yTextKey ?? `test-text-${ Math.random() }`;
+	textCounter++;
+	const key = yTextKey ?? `test-text-${ textCounter }`;
 	const yText = new Y.Text( yTextValue );
 	yMap.set( key, yText );
 	return yText;
+}
+
+/**
+ * Helper to create a Y.RelativePosition pointing to an index in a Y.Array.
+ *
+ * @param index - The index in the Y.Array.
+ * @return The Y.RelativePosition.
+ */
+function createBlockPosition( index: number ): Y.RelativePosition {
+	blockCounter++;
+	const yArray = new Y.Array();
+	yMap.set( `test-array-${ blockCounter }`, yArray );
+
+	for ( let i = 0; i <= index; i++ ) {
+		yArray.push( [ new Y.Map() ] );
+	}
+
+	return Y.createRelativePositionFromTypeIndex( yArray, index );
 }
 
 /**
@@ -68,7 +98,6 @@ describe( 'areSelectionsStatesEqual', () => {
 			const selection1: SelectionNone = { type: SelectionType.None };
 			const selection2: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition: createCursorPosition( 'test', 0 ),
 			};
 
@@ -94,12 +123,10 @@ describe( 'areSelectionsStatesEqual', () => {
 			const cursorPosition = createCursorPosition( 'test text', 5 );
 			const selection1: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition,
 			};
 			const selection2: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition,
 			};
 
@@ -108,33 +135,13 @@ describe( 'areSelectionsStatesEqual', () => {
 			);
 		} );
 
-		test( 'returns false when blockId differs', () => {
-			const cursorPosition = createCursorPosition( 'test text', 5 );
-			const selection1: SelectionCursor = {
-				type: SelectionType.Cursor,
-				blockId: 'block-1',
-				cursorPosition,
-			};
-			const selection2: SelectionCursor = {
-				type: SelectionType.Cursor,
-				blockId: 'block-2',
-				cursorPosition,
-			};
-
-			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
-				false
-			);
-		} );
-
 		test( 'returns false when relative position differs', () => {
 			const selection1: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition: createCursorPosition( 'test text', 5 ),
 			};
 			const selection2: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition: createCursorPosition( 'test text', 3 ),
 			};
 
@@ -152,7 +159,6 @@ describe( 'areSelectionsStatesEqual', () => {
 
 			const selection1: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition: {
 					relativePosition,
 					absoluteOffset: 5,
@@ -160,7 +166,6 @@ describe( 'areSelectionsStatesEqual', () => {
 			};
 			const selection2: SelectionCursor = {
 				type: SelectionType.Cursor,
-				blockId: 'block-1',
 				cursorPosition: {
 					relativePosition,
 					absoluteOffset: 6,
@@ -179,13 +184,11 @@ describe( 'areSelectionsStatesEqual', () => {
 			const cursorEndPosition = createCursorPosition( 'test text', 4 );
 			const selection1: SelectionInOneBlock = {
 				type: SelectionType.SelectionInOneBlock,
-				blockId: 'block-1',
 				cursorStartPosition,
 				cursorEndPosition,
 			};
 			const selection2: SelectionInOneBlock = {
 				type: SelectionType.SelectionInOneBlock,
-				blockId: 'block-1',
 				cursorStartPosition,
 				cursorEndPosition,
 			};
@@ -195,37 +198,14 @@ describe( 'areSelectionsStatesEqual', () => {
 			);
 		} );
 
-		test( 'returns false when blockId differs', () => {
-			const cursorStartPosition = createCursorPosition( 'test text', 0 );
-			const cursorEndPosition = createCursorPosition( 'test text', 4 );
-			const selection1: SelectionInOneBlock = {
-				type: SelectionType.SelectionInOneBlock,
-				blockId: 'block-1',
-				cursorStartPosition,
-				cursorEndPosition,
-			};
-			const selection2: SelectionInOneBlock = {
-				type: SelectionType.SelectionInOneBlock,
-				blockId: 'block-2',
-				cursorStartPosition,
-				cursorEndPosition,
-			};
-
-			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
-				false
-			);
-		} );
-
 		test( 'returns false when start position differs', () => {
 			const selection1: SelectionInOneBlock = {
 				type: SelectionType.SelectionInOneBlock,
-				blockId: 'block-1',
 				cursorStartPosition: createCursorPosition( 'test text', 0 ),
 				cursorEndPosition: createCursorPosition( 'test text', 4 ),
 			};
 			const selection2: SelectionInOneBlock = {
 				type: SelectionType.SelectionInOneBlock,
-				blockId: 'block-1',
 				cursorStartPosition: createCursorPosition( 'test text', 1 ),
 				cursorEndPosition: createCursorPosition( 'test text', 4 ),
 			};
@@ -238,13 +218,11 @@ describe( 'areSelectionsStatesEqual', () => {
 		test( 'returns false when end position differs', () => {
 			const selection1: SelectionInOneBlock = {
 				type: SelectionType.SelectionInOneBlock,
-				blockId: 'block-1',
 				cursorStartPosition: createCursorPosition( 'test text', 0 ),
 				cursorEndPosition: createCursorPosition( 'test text', 4 ),
 			};
 			const selection2: SelectionInOneBlock = {
 				type: SelectionType.SelectionInOneBlock,
-				blockId: 'block-1',
 				cursorStartPosition: createCursorPosition( 'test text', 0 ),
 				cursorEndPosition: createCursorPosition( 'test text', 5 ),
 			};
@@ -264,7 +242,6 @@ describe( 'areSelectionsStatesEqual', () => {
 
 			const selection1: SelectionInOneBlock = {
 				type: SelectionType.SelectionInOneBlock,
-				blockId: 'block-1',
 				cursorStartPosition: {
 					relativePosition,
 					absoluteOffset: 0,
@@ -273,7 +250,6 @@ describe( 'areSelectionsStatesEqual', () => {
 			};
 			const selection2: SelectionInOneBlock = {
 				type: SelectionType.SelectionInOneBlock,
-				blockId: 'block-1',
 				cursorStartPosition: {
 					relativePosition,
 					absoluteOffset: 1,
@@ -296,15 +272,11 @@ describe( 'areSelectionsStatesEqual', () => {
 			const cursorEndPosition = createCursorPosition( 'second block', 3 );
 			const selection1: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				blockStartId: 'block-1',
-				blockEndId: 'block-2',
 				cursorStartPosition,
 				cursorEndPosition,
 			};
 			const selection2: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				blockStartId: 'block-1',
-				blockEndId: 'block-2',
 				cursorStartPosition,
 				cursorEndPosition,
 			};
@@ -314,70 +286,14 @@ describe( 'areSelectionsStatesEqual', () => {
 			);
 		} );
 
-		test( 'returns false when blockStartId differs', () => {
-			const cursorStartPosition = createCursorPosition(
-				'first block',
-				5
-			);
-			const cursorEndPosition = createCursorPosition( 'second block', 3 );
-			const selection1: SelectionInMultipleBlocks = {
-				type: SelectionType.SelectionInMultipleBlocks,
-				blockStartId: 'block-1',
-				blockEndId: 'block-2',
-				cursorStartPosition,
-				cursorEndPosition,
-			};
-			const selection2: SelectionInMultipleBlocks = {
-				type: SelectionType.SelectionInMultipleBlocks,
-				blockStartId: 'block-0',
-				blockEndId: 'block-2',
-				cursorStartPosition,
-				cursorEndPosition,
-			};
-
-			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
-				false
-			);
-		} );
-
-		test( 'returns false when blockEndId differs', () => {
-			const cursorStartPosition = createCursorPosition(
-				'first block',
-				5
-			);
-			const cursorEndPosition = createCursorPosition( 'second block', 3 );
-			const selection1: SelectionInMultipleBlocks = {
-				type: SelectionType.SelectionInMultipleBlocks,
-				blockStartId: 'block-1',
-				blockEndId: 'block-2',
-				cursorStartPosition,
-				cursorEndPosition,
-			};
-			const selection2: SelectionInMultipleBlocks = {
-				type: SelectionType.SelectionInMultipleBlocks,
-				blockStartId: 'block-1',
-				blockEndId: 'block-3',
-				cursorStartPosition,
-				cursorEndPosition,
-			};
-
-			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
-				false
-			);
-		} );
-
 		test( 'returns false when start cursor position differs', () => {
 			const selection1: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				blockStartId: 'block-1',
-				blockEndId: 'block-2',
 				cursorStartPosition: createCursorPosition( 'first block', 5 ),
 				cursorEndPosition: createCursorPosition( 'second block', 3 ),
 			};
 			const selection2: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				blockStartId: 'block-1',
-				blockEndId: 'block-2',
 				cursorStartPosition: createCursorPosition( 'first block', 6 ),
 				cursorEndPosition: createCursorPosition( 'second block', 3 ),
 			};
@@ -390,15 +306,11 @@ describe( 'areSelectionsStatesEqual', () => {
 		test( 'returns false when end cursor position differs', () => {
 			const selection1: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				blockStartId: 'block-1',
-				blockEndId: 'block-2',
 				cursorStartPosition: createCursorPosition( 'first block', 5 ),
 				cursorEndPosition: createCursorPosition( 'second block', 3 ),
 			};
 			const selection2: SelectionInMultipleBlocks = {
 				type: SelectionType.SelectionInMultipleBlocks,
-				blockStartId: 'block-1',
-				blockEndId: 'block-2',
 				cursorStartPosition: createCursorPosition( 'first block', 5 ),
 				cursorEndPosition: createCursorPosition( 'second block', 4 ),
 			};
@@ -411,13 +323,14 @@ describe( 'areSelectionsStatesEqual', () => {
 
 	describe( 'SelectionType.WholeBlock', () => {
 		test( 'returns true when whole block selections are identical', () => {
+			const blockPosition = createBlockPosition( 0 );
 			const selection1: SelectionWholeBlock = {
 				type: SelectionType.WholeBlock,
-				blockId: 'block-1',
+				blockPosition,
 			};
 			const selection2: SelectionWholeBlock = {
 				type: SelectionType.WholeBlock,
-				blockId: 'block-1',
+				blockPosition,
 			};
 
 			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
@@ -425,14 +338,14 @@ describe( 'areSelectionsStatesEqual', () => {
 			);
 		} );
 
-		test( 'returns false when blockId differs', () => {
+		test( 'returns false when blockPosition differs', () => {
 			const selection1: SelectionWholeBlock = {
 				type: SelectionType.WholeBlock,
-				blockId: 'block-1',
+				blockPosition: createBlockPosition( 0 ),
 			};
 			const selection2: SelectionWholeBlock = {
 				type: SelectionType.WholeBlock,
-				blockId: 'block-2',
+				blockPosition: createBlockPosition( 1 ),
 			};
 
 			expect( areSelectionsStatesEqual( selection1, selection2 ) ).toBe(
@@ -508,8 +421,36 @@ function createTestDocWithBlocks() {
 describe( 'getSelectionState', () => {
 	let testDoc: Y.Doc;
 
+	const blockIndexMap: Record< string, number > = {
+		'block-1': 0,
+		'block-2': 1,
+		'block-3': 2,
+		'inner-block-1': 0,
+	};
+
+	const blockParentMap: Record< string, string > = {
+		'block-1': '',
+		'block-2': '',
+		'block-3': '',
+		'inner-block-1': 'block-3',
+	};
+
 	beforeEach( () => {
 		testDoc = createTestDocWithBlocks();
+
+		( select as jest.Mock ).mockReturnValue( {
+			getBlockIndex: jest
+				.fn()
+				.mockImplementation(
+					( clientId: string ) => blockIndexMap[ clientId ] ?? -1
+				),
+			getBlockRootClientId: jest
+				.fn()
+				.mockImplementation(
+					( clientId: string ) => blockParentMap[ clientId ] ?? ''
+				),
+			getBlockName: jest.fn().mockReturnValue( 'core/paragraph' ),
+		} );
 	} );
 
 	afterEach( () => {
@@ -551,9 +492,9 @@ describe( 'getSelectionState', () => {
 			);
 
 			expect( result.type ).toBe( SelectionType.WholeBlock );
-			expect( ( result as SelectionWholeBlock ).blockId ).toBe(
-				'block-1'
-			);
+			expect(
+				( result as SelectionWholeBlock ).blockPosition
+			).toBeDefined();
 		} );
 	} );
 
@@ -577,7 +518,6 @@ describe( 'getSelectionState', () => {
 			);
 
 			expect( result.type ).toBe( SelectionType.Cursor );
-			expect( ( result as SelectionCursor ).blockId ).toBe( 'block-1' );
 			expect(
 				( result as SelectionCursor ).cursorPosition
 			).toBeDefined();
@@ -694,9 +634,6 @@ describe( 'getSelectionState', () => {
 			);
 
 			expect( result.type ).toBe( SelectionType.SelectionInOneBlock );
-			expect( ( result as SelectionInOneBlock ).blockId ).toBe(
-				'block-1'
-			);
 			expect(
 				( result as SelectionInOneBlock ).cursorStartPosition
 					.absoluteOffset
@@ -750,12 +687,6 @@ describe( 'getSelectionState', () => {
 
 			expect( result.type ).toBe(
 				SelectionType.SelectionInMultipleBlocks
-			);
-			expect( ( result as SelectionInMultipleBlocks ).blockStartId ).toBe(
-				'block-1'
-			);
-			expect( ( result as SelectionInMultipleBlocks ).blockEndId ).toBe(
-				'block-2'
 			);
 			expect(
 				( result as SelectionInMultipleBlocks ).cursorStartPosition
@@ -830,9 +761,6 @@ describe( 'getSelectionState', () => {
 			);
 
 			expect( result.type ).toBe( SelectionType.Cursor );
-			expect( ( result as SelectionCursor ).blockId ).toBe(
-				'inner-block-1'
-			);
 		} );
 
 		test( 'returns SelectionInMultipleBlocks spanning parent and inner block', () => {
@@ -855,12 +783,6 @@ describe( 'getSelectionState', () => {
 
 			expect( result.type ).toBe(
 				SelectionType.SelectionInMultipleBlocks
-			);
-			expect( ( result as SelectionInMultipleBlocks ).blockStartId ).toBe(
-				'block-3'
-			);
-			expect( ( result as SelectionInMultipleBlocks ).blockEndId ).toBe(
-				'inner-block-1'
 			);
 		} );
 	} );

@@ -1,6 +1,5 @@
 import {
 	privateApis as coreDataPrivateApis,
-	type SelectionCursor,
 	SelectionType,
 } from '@wordpress/core-data';
 import { useEffect, useMemo, useState } from '@wordpress/element';
@@ -9,7 +8,7 @@ import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from './get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
-const { useActiveCollaborators, useGetAbsolutePositionIndex } =
+const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
 
 export interface CursorData {
@@ -41,7 +40,7 @@ export function useRenderCursors(
 		postId ?? null,
 		postType ?? null
 	);
-	const getAbsolutePositionIndex = useGetAbsolutePositionIndex(
+	const resolveSelection = useResolvedSelection(
 		postId ?? null,
 		postType ?? null
 	);
@@ -85,40 +84,32 @@ export function useRenderCursors(
 				} else if ( selection.type === SelectionType.WholeBlock ) {
 					// Don't draw a cursor for a whole block selection.
 				} else if ( selection.type === SelectionType.Cursor ) {
-					coords = getCursorPosition(
-						getAbsolutePositionIndex( selection ),
-						selection.blockId,
-						blockEditorDocument,
-						overlayElement
-					);
+					const { textIndex, localClientId } =
+						resolveSelection( selection );
+					if ( localClientId ) {
+						coords = getCursorPosition(
+							textIndex,
+							localClientId,
+							blockEditorDocument,
+							overlayElement
+						);
+					}
 				} else if (
-					selection.type === SelectionType.SelectionInOneBlock
-				) {
-					const selectionAsCursor: SelectionCursor = {
-						type: SelectionType.Cursor,
-						blockId: selection.blockId,
-						cursorPosition: selection.cursorStartPosition,
-					};
-					coords = getCursorPosition(
-						getAbsolutePositionIndex( selectionAsCursor ),
-						selectionAsCursor.blockId,
-						blockEditorDocument,
-						overlayElement
-					);
-				} else if (
+					selection.type === SelectionType.SelectionInOneBlock ||
 					selection.type === SelectionType.SelectionInMultipleBlocks
 				) {
-					const selectionAsCursor: SelectionCursor = {
+					const { textIndex, localClientId } = resolveSelection( {
 						type: SelectionType.Cursor,
-						blockId: selection.blockStartId,
 						cursorPosition: selection.cursorStartPosition,
-					};
-					coords = getCursorPosition(
-						getAbsolutePositionIndex( selectionAsCursor ),
-						selectionAsCursor.blockId,
-						blockEditorDocument,
-						overlayElement
-					);
+					} );
+					if ( localClientId ) {
+						coords = getCursorPosition(
+							textIndex,
+							localClientId,
+							blockEditorDocument,
+							overlayElement
+						);
+					}
 				}
 
 				if ( coords ) {
@@ -134,12 +125,7 @@ export function useRenderCursors(
 
 			setCursorPositions( results );
 		},
-		[
-			blockEditorDocument,
-			getAbsolutePositionIndex,
-			overlayElement,
-			sortedUsers,
-		]
+		[ blockEditorDocument, resolveSelection, overlayElement, sortedUsers ]
 	);
 
 	useEffect( computeCursors, [ computeCursors ] );
