@@ -71,22 +71,6 @@ test.describe( 'Collaboration - CRDT persistence', () => {
 	} ) => {
 		await collaborationUtils.setCollaboration( true );
 
-		page.on( 'request', ( request ) => {
-			if (
-				request.url().includes( '/wp/v2/posts' ) &&
-				[ 'PUT', 'POST' ].includes( request.method() )
-			) {
-				try {
-					const body = request.postDataJSON();
-					if ( body?.meta?._crdt_document ) {
-						savedWithCrdtDoc = true;
-					}
-				} catch {
-					// Ignore parse errors.
-				}
-			}
-		} );
-
 		// Navigate to create a new post (auto-draft).
 		await admin.visitAdminPage( 'post-new.php' );
 		await editor.setPreferences( 'core/edit-post', {
