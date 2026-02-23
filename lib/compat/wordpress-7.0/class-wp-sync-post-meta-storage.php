@@ -304,22 +304,22 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 				return false;
 			}
 
+			// Get all existing updates (envelopes) for the room.
 			$all_updates = $this->get_all_updates( $room );
-
-			// Remove all updates for the room and re-store only those that are newer than the cursor.
-			if ( ! delete_post_meta( $post_id, self::SYNC_UPDATE_META_KEY ) ) {
-				return false;
-			}
-
-			// Re-store envelopes directly to avoid double-wrapping by add_update().
-			$add_result = true;
+			$deleted_any = false;
 			foreach ( $all_updates as $envelope ) {
-				if ( $add_result && $envelope['timestamp'] >= $cursor ) {
-					$add_result = (bool) add_post_meta( $post_id, self::SYNC_UPDATE_META_KEY, $envelope, false );
+				if ( isset( $envelope['timestamp'] ) && $envelope['timestamp'] < $cursor ) {
+					/*
+					 * Use delete_post_meta with serialized value to ensure only this specific update is removed.
+					 * This avoids removing all, and ensures that only the targeted updates are deleted.
+					 */
+					if ( delete_post_meta( $post_id, self::SYNC_UPDATE_META_KEY, $envelope ) ) {
+						$deleted_any = true;
+					}
 				}
 			}
 
-			return $add_result;
+			return $deleted_any;
 		}
 	}
 }
