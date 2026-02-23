@@ -8,7 +8,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
  */
 import {
 	useActiveCollaborators,
-	useConvertSelectionStateToAbsolute,
+	useResolvedSelection,
 	useGetDebugData,
 	useIsDisconnected,
 } from '../use-post-editor-awareness-state';
@@ -241,10 +241,10 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 		} );
 	} );
 
-	describe( 'useConvertSelectionStateToAbsolute', () => {
+	describe( 'useResolvedSelection', () => {
 		test( 'should return function that returns default when postId is null', () => {
 			const { result } = renderHook( () =>
-				useConvertSelectionStateToAbsolute( null, 'post' )
+				useResolvedSelection( null, 'post' )
 			);
 
 			const mockSelection: SelectionCursor = {
@@ -275,7 +275,7 @@ describe( 'use-post-editor-awareness-state hooks', () => {
 			} );
 
 			const { result } = renderHook( () =>
-				useConvertSelectionStateToAbsolute( 123, 'post' )
+				useResolvedSelection( 123, 'post' )
 			);
 
 			const position = result.current( mockSelection );

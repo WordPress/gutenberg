@@ -13,7 +13,7 @@ import { useEffect, useRef } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
-const { useActiveCollaborators, useConvertSelectionStateToAbsolute } =
+const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
 
 /**
@@ -32,7 +32,7 @@ export function useBlockHighlighting(
 		postId ?? null,
 		postType ?? null
 	);
-	const convertSelectionStateToAbsolute = useConvertSelectionStateToAbsolute(
+	const resolveSelection = useResolvedSelection(
 		postId ?? null,
 		postType ?? null
 	);
@@ -70,7 +70,7 @@ export function useBlockHighlighting(
 				const shouldDrawUser = ! userState.isMe;
 
 				if ( isWholeBlockSelected && shouldDrawUser ) {
-					const { localClientId } = convertSelectionStateToAbsolute(
+					const { localClientId } = resolveSelection(
 						userState.editorState?.selection
 					);
 
@@ -121,7 +121,7 @@ export function useBlockHighlighting(
 				highlightedBlockIds.current.add( blockId );
 			}
 		} );
-	}, [ userStates, blockEditorDocument, convertSelectionStateToAbsolute ] );
+	}, [ userStates, blockEditorDocument, resolveSelection ] );
 }
 
 const getBlockElementById = (

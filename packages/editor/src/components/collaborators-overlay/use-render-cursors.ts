@@ -8,7 +8,7 @@ import { unlock } from '../../lock-unlock';
 import { getAvatarUrl } from './get-avatar-url';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
-const { useActiveCollaborators, useConvertSelectionStateToAbsolute } =
+const { useActiveCollaborators, useResolvedSelection } =
 	unlock( coreDataPrivateApis );
 
 export interface CursorData {
@@ -40,7 +40,7 @@ export function useRenderCursors(
 		postId ?? null,
 		postType ?? null
 	);
-	const convertSelectionStateToAbsolute = useConvertSelectionStateToAbsolute(
+	const resolveSelection = useResolvedSelection(
 		postId ?? null,
 		postType ?? null
 	);
@@ -85,7 +85,7 @@ export function useRenderCursors(
 					// Don't draw a cursor for a whole block selection.
 				} else if ( selection.type === SelectionType.Cursor ) {
 					const { textIndex, localClientId } =
-						convertSelectionStateToAbsolute( selection );
+						resolveSelection( selection );
 					if ( localClientId ) {
 						coords = getCursorPosition(
 							textIndex,
@@ -98,11 +98,10 @@ export function useRenderCursors(
 					selection.type === SelectionType.SelectionInOneBlock ||
 					selection.type === SelectionType.SelectionInMultipleBlocks
 				) {
-					const { textIndex, localClientId } =
-						convertSelectionStateToAbsolute( {
-							type: SelectionType.Cursor,
-							cursorPosition: selection.cursorStartPosition,
-						} );
+					const { textIndex, localClientId } = resolveSelection( {
+						type: SelectionType.Cursor,
+						cursorPosition: selection.cursorStartPosition,
+					} );
 					if ( localClientId ) {
 						coords = getCursorPosition(
 							textIndex,
@@ -126,12 +125,7 @@ export function useRenderCursors(
 
 			setCursorPositions( results );
 		},
-		[
-			blockEditorDocument,
-			convertSelectionStateToAbsolute,
-			overlayElement,
-			sortedUsers,
-		]
+		[ blockEditorDocument, resolveSelection, overlayElement, sortedUsers ]
 	);
 
 	useEffect( computeCursors, [ computeCursors ] );

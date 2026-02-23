@@ -21,9 +21,7 @@ interface ResolvedSelection {
 
 interface AwarenessState {
 	activeCollaborators: ActiveCollaborator[];
-	convertSelectionStateToAbsolute: (
-		selection: SelectionState
-	) => ResolvedSelection;
+	resolveSelection: ( selection: SelectionState ) => ResolvedSelection;
 	getDebugData: () => YDocDebugData;
 	isCurrentCollaboratorDisconnected: boolean;
 }
@@ -35,7 +33,7 @@ const defaultResolvedSelection: ResolvedSelection = {
 
 const defaultState: AwarenessState = {
 	activeCollaborators: [],
-	convertSelectionStateToAbsolute: () => defaultResolvedSelection,
+	resolveSelection: () => defaultResolvedSelection,
 	getDebugData: () => ( {
 		doc: {},
 		clients: {},
@@ -52,7 +50,7 @@ function getAwarenessState(
 
 	return {
 		activeCollaborators,
-		convertSelectionStateToAbsolute: ( selection: SelectionState ) =>
+		resolveSelection: ( selection: SelectionState ) =>
 			awareness.convertSelectionStateToAbsolute( selection ),
 		getDebugData: () => awareness.getDebugData(),
 		isCurrentCollaboratorDisconnected:
@@ -123,12 +121,11 @@ export function useActiveCollaborators(
  * @param postType - The type of the post.
  * @return A function that resolves a selection to its text index and block client ID.
  */
-export function useConvertSelectionStateToAbsolute(
+export function useResolvedSelection(
 	postId: number | null,
 	postType: string | null
 ): ( selection: SelectionState ) => ResolvedSelection {
-	return usePostEditorAwarenessState( postId, postType )
-		.convertSelectionStateToAbsolute;
+	return usePostEditorAwarenessState( postId, postType ).resolveSelection;
 }
 
 /**
