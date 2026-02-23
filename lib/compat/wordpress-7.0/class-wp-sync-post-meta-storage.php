@@ -306,20 +306,21 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 
 			// Get all existing updates (envelopes) for the room.
 			$all_updates = $this->get_all_updates( $room );
-			$deleted_any = false;
+
 			foreach ( $all_updates as $envelope ) {
 				if ( isset( $envelope['timestamp'] ) && $envelope['timestamp'] < $cursor ) {
 					/*
 					 * Use delete_post_meta with serialized value to ensure only this specific update is removed.
 					 * This avoids removing all, and ensures that only the targeted updates are deleted.
 					 */
-					if ( delete_post_meta( $post_id, self::SYNC_UPDATE_META_KEY, $envelope ) ) {
-						$deleted_any = true;
+					if ( ! delete_post_meta( $post_id, self::SYNC_UPDATE_META_KEY, $envelope ) ) {
+						// stop deleting and return false if an update fails to delete
+						return false;
 					}
 				}
 			}
 
-			return $deleted_any;
+			return true;
 		}
 	}
 }
