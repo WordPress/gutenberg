@@ -327,11 +327,9 @@ export function areSelectionsStatesEqual(
 				)
 			);
 		case SelectionType.WholeBlock:
-			return (
-				JSON.stringify( selection1.blockPosition ) ===
-				JSON.stringify(
-					( selection2 as SelectionWholeBlock ).blockPosition
-				)
+			return Y.compareRelativePositions(
+				selection1.blockPosition,
+				( selection2 as SelectionWholeBlock ).blockPosition
 			);
 
 		default:
