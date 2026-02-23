@@ -26,12 +26,16 @@ const TEMPLATE = [
 		},
 		[
 			[
-				'core/paragraph',
-				{
-					placeholder: __(
-						'Start typing to add dialog trigger text…'
-					),
-				},
+				'core/buttons',
+				{},
+				[
+					[
+						'core/button',
+						{
+							text: __( 'Open dialog' ),
+						},
+					],
+				],
 			],
 		],
 	],
