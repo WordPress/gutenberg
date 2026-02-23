@@ -109,8 +109,8 @@ describe( 'feature-detection', () => {
 		} );
 
 		it( 'returns false when features are unavailable', () => {
-			// @ts-ignore - Intentionally setting WebAssembly to undefined for testing.
-			global.WebAssembly = undefined;
+			// @ts-ignore - Intentionally setting SharedArrayBuffer to undefined for testing.
+			global.SharedArrayBuffer = undefined;
 
 			expect( isClientSideMediaSupported() ).toBe( false );
 		} );
@@ -126,8 +126,8 @@ describe( 'feature-detection', () => {
 
 			// Clear cache and set WebAssembly to undefined.
 			clearFeatureDetectionCache();
-			// @ts-ignore - Intentionally setting WebAssembly to undefined for testing.
-			global.WebAssembly = undefined;
+			// @ts-ignore - Intentionally setting SharedArrayBuffer to undefined for testing.
+			global.SharedArrayBuffer = undefined;
 
 			const result2 = detectClientSideMediaSupport();
 			expect( result2.supported ).toBe( false );
