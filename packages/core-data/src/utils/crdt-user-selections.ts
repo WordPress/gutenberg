@@ -147,7 +147,12 @@ function getCursorPosition(
 	}
 
 	const attributes = block.get( 'attributes' );
-	const currentYText = attributes?.get( selection.attributeKey ) as Y.Text;
+	const currentYText = attributes?.get( selection.attributeKey );
+
+	// If the attribute is not a Y.Text, return null.
+	if ( ! ( currentYText instanceof Y.Text ) ) {
+		return null;
+	}
 
 	const relativePosition = Y.createRelativePositionFromTypeIndex(
 		currentYText,
