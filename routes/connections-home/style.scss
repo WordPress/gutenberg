@@ -1,0 +1,61 @@
+.connections-page {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 24px;
+}
+
+.connections-card {
+	background: #fff;
+	border: 1px solid #e0e0e0;
+	border-radius: 8px;
+	padding: 8px 24px;
+}
+
+.connections-connectors-list {
+	display: flex;
+	flex-direction: column;
+}
+
+.connections-connector-item {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding: 16px 0;
+	border-top: 1px solid #e0e0e0;
+
+	&:first-child {
+		border-top: none;
+	}
+}
+
+.connections-connector-item__icon {
+	flex-shrink: 0;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #1e1e1e;
+}
+
+.connections-connector-item__content {
+	flex: 1;
+	min-width: 0;
+}
+
+.connections-connector-item__name {
+	font-size: 14px;
+	font-weight: 600;
+	color: #1e1e1e;
+	margin-bottom: 2px;
+}
+
+.connections-connector-item__description {
+	font-size: 13px;
+	color: #757575;
+	line-height: 1.4;
+}
+
+.connections-connector-item__action {
+	flex-shrink: 0;
+}
