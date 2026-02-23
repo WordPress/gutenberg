@@ -3,23 +3,37 @@
  */
 import { Page } from '@wordpress/admin-ui';
 import {
-	__experimentalHStack as HStack,
-	__experimentalVStack as VStack,
 	__experimentalItemGroup as ItemGroup,
-	__experimentalItem as Item,
-	__experimentalText as Text,
-	FlexBlock,
-	Button,
-	TextControl,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
-import { chevronUp, chevronDown } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import './style.scss';
+import {
+	registerConnector,
+	ConnectorItem,
+	DefaultConnectorSettings,
+	store,
+} from './api';
+
+// Expose the public API globally for vanilla JS plugins
+declare global {
+	interface Window {
+		wp: {
+			connectors?: {
+				registerConnector: typeof registerConnector;
+			};
+		};
+	}
+}
+
+window.wp = window.wp || {};
+window.wp.connectors = {
+	registerConnector,
+};
 
 // OpenAI logo as inline SVG
 const OpenAILogo = () => (
@@ -37,76 +51,33 @@ const OpenAILogo = () => (
 	</svg>
 );
 
-function ConnectorItem( {
-	icon,
-	name,
-	description,
-}: {
-	icon: React.ReactNode;
-	name: string;
-	description: string;
-} ) {
-	const [ isExpanded, setIsExpanded ] = useState( false );
-	const [ apiKey, setApiKey ] = useState( '' );
+// Register built-in OpenAI connector
+registerConnector( 'core/openai', {
+	label: __( 'OpenAI' ),
+	description: __( 'Text, image, and code generation with GPT and DALL-E.' ),
+	icon: <OpenAILogo />,
+	render: ( { label, description } ) => (
+		<ConnectorItem
+			icon={ <OpenAILogo /> }
+			name={ label }
+			description={ description }
+		>
+			<DefaultConnectorSettings
+				onSave={ ( apiKey ) => {
+					// eslint-disable-next-line no-console
+					console.log( 'Saving OpenAI API key:', apiKey );
+				} }
+			/>
+		</ConnectorItem>
+	),
+} );
 
-	return (
-		<Item>
-			<VStack spacing={ 4 }>
-				<HStack alignment="center" spacing={ 4 }>
-					{ icon }
-					<FlexBlock>
-						<VStack spacing={ 0 }>
-							<Text weight={ 600 }>{ name }</Text>
-							<Text variant="muted">{ description }</Text>
-						</VStack>
-					</FlexBlock>
-					<Button
-						variant="secondary"
-						size="compact"
-						icon={ isExpanded ? chevronUp : chevronDown }
-						iconPosition="right"
-						onClick={ () => setIsExpanded( ! isExpanded ) }
-						aria-expanded={ isExpanded }
-					>
-						{ isExpanded ? __( 'Close' ) : __( 'Install' ) }
-					</Button>
-				</HStack>
-
-				{ isExpanded && (
-					<VStack spacing={ 4 } className="connector-settings">
-						<TextControl
-							__nextHasNoMarginBottom
-							label={ __( 'API Key' ) }
-							value={ apiKey }
-							onChange={ setApiKey }
-							placeholder={ __( 'Enter your API key' ) }
-							type="password"
-						/>
-						<HStack justify="flex-end">
-							<Button
-								variant="secondary"
-								onClick={ () => setIsExpanded( false ) }
-							>
-								{ __( 'Cancel' ) }
-							</Button>
-							<Button
-								variant="primary"
-								onClick={ () => {
-									// Demo: just close for now
-									setIsExpanded( false );
-								} }
-							>
-								{ __( 'Save' ) }
-							</Button>
-						</HStack>
-					</VStack>
-				) }
-			</VStack>
-		</Item>
+function ConnectorsPage() {
+	const connectors = useSelect(
+		( select ) => select( store ).getConnectors(),
+		[]
 	);
-}
 
-function ConnectionsPage() {
 	return (
 		<Page
 			title={ __( 'Connectors' ) }
@@ -116,13 +87,29 @@ function ConnectionsPage() {
 		>
 			<div className="connections-page">
 				<ItemGroup isBordered isSeparated>
-					<ConnectorItem
-						icon={ <OpenAILogo /> }
-						name={ __( 'OpenAI' ) }
-						description={ __(
-							'Text, image, and code generation with GPT and DALL-E.'
-						) }
-					/>
+					{ connectors.map( ( connector ) => {
+						if ( connector.render ) {
+							return (
+								<connector.render
+									key={ connector.slug }
+									slug={ connector.slug }
+									label={ connector.label }
+									description={ connector.description }
+								/>
+							);
+						}
+						// Default rendering for connectors without custom render
+						return (
+							<ConnectorItem
+								key={ connector.slug }
+								icon={ connector.icon }
+								name={ connector.label }
+								description={ connector.description }
+							>
+								<DefaultConnectorSettings />
+							</ConnectorItem>
+						);
+					} ) }
 				</ItemGroup>
 			</div>
 		</Page>
@@ -130,7 +117,7 @@ function ConnectionsPage() {
 }
 
 function Stage() {
-	return <ConnectionsPage />;
+	return <ConnectorsPage />;
 }
 
 export const stage = Stage;
