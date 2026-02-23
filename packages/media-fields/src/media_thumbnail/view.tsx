@@ -40,10 +40,7 @@ function getBestImageUrl(
 		return featuredMedia.source_url;
 	}
 
-	const sizeEntries = Object.values( sizes ) as Array< {
-		source_url: string;
-		width: number;
-	} >;
+	const sizeEntries = Object.values( sizes );
 
 	if ( ! sizeEntries.length ) {
 		return featuredMedia.source_url;
