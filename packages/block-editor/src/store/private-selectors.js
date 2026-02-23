@@ -511,11 +511,7 @@ export const getParentSectionBlock = ( state, clientId ) => {
 export function isSectionBlock( state, clientId ) {
 	// If the section is being edited or a parent section is being edited,
 	// this block is temporarily not considered a section.
-	if (
-		state.editedContentOnlySection &&
-		( isWithinEditedContentOnlySection( state, clientId ) ||
-			clientId === state.editedContentOnlySection )
-	) {
+	if ( isWithinEditedContentOnlySection( state, clientId ) ) {
 		return false;
 	}
 
