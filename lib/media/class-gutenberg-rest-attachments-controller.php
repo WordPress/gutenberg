@@ -20,9 +20,9 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	public function register_routes(): void {
 		parent::register_routes();
 
-		// Always register the sideload route to ensure 'scaled' is in the
-		// enum. When the parent class also registers this route, WordPress
-		// tries each handler and uses the first that passes validation.
+		// Override the parent's sideload route so that 'scaled' is included
+		// in the image_size enum. Without the override, core's handler
+		// validates first and rejects 'scaled' before ours is tried.
 		$valid_image_sizes = array_keys( wp_get_registered_image_subsizes() );
 
 		// Special case to set 'original_image' in attachment metadata.
@@ -55,7 +55,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 				),
 				'allow_batch' => $this->allow_batch,
 				'schema'      => array( $this, 'get_public_item_schema' ),
-			)
+			),
+			true // Override core's route so 'scaled' is included in the enum.
 		);
 	}
 
