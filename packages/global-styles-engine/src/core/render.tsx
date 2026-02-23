@@ -1782,12 +1782,14 @@ export function generateGlobalStyles(
 				typeof featureSelectors === 'object'
 					? featureSelectors?.css
 					: undefined;
-			const resolvedCssSelector =
-				typeof cssFeatureSelector === 'string'
-					? cssFeatureSelector
-					: typeof cssFeatureSelector === 'object'
-					? ( cssFeatureSelector as Record< string, string > )?.root
-					: undefined;
+			let resolvedCssSelector: string | undefined;
+			if ( typeof cssFeatureSelector === 'string' ) {
+				resolvedCssSelector = cssFeatureSelector;
+			} else if ( typeof cssFeatureSelector === 'object' ) {
+				resolvedCssSelector = (
+					cssFeatureSelector as Record< string, string >
+				 )?.root;
+			}
 			const selector =
 				resolvedCssSelector ??
 				blockSelectors[ blockType.name ].selector;
