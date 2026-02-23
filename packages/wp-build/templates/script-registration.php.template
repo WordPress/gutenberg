@@ -66,13 +66,9 @@ if ( ! function_exists( '{{PREFIX}}_register_package_scripts' ) ) {
 
 		$scripts_data = require $scripts_file;
 
-		// Default to minified. When SCRIPT_DEBUG is enabled, check whether unminified
-		// files are available — they may be excluded from production distributions.
 		$extension = '.min.js';
-		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-			if ( ! empty( $scripts_data[0]['path'] ) && file_exists( $scripts_dir . '/' . $scripts_data[0]['path'] . '.js' ) ) {
-				$extension = '.js';
-			}
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG && $build_constants['has_debug_assets'] ) {
+			$extension = '.js';
 		}
 		$plugin_dir   = dirname( __FILE__ );
 

@@ -422,6 +422,7 @@ async function bundlePackage( packageName, options = {} ) {
 		handlePrefix = HANDLE_PREFIX,
 		scriptGlobal = SCRIPT_GLOBAL,
 		packageNamespace = PACKAGE_NAMESPACE,
+		production = false,
 	} = options;
 
 	const builtModules = [];
@@ -484,23 +485,28 @@ async function bundlePackage( packageName, options = {} ) {
 						true // Generate asset file for minified build
 					),
 				],
-			} ),
-			esbuild.build( {
-				...baseConfig,
-				outfile: path.join( outputDir, 'index.js' ),
-				minify: false,
-				define: getDefine( true ),
-				plugins: [
-					...baseBundlePlugins,
-					wordpressExternalsPlugin(
-						'index.min',
-						'iife',
-						packageJson.wpScriptExtraDependencies || [],
-						false // Skip asset file for non-minified build
-					),
-				],
 			} )
 		);
+
+		if ( ! production ) {
+			builds.push(
+				esbuild.build( {
+					...baseConfig,
+					outfile: path.join( outputDir, 'index.js' ),
+					minify: false,
+					define: getDefine( true ),
+					plugins: [
+						...baseBundlePlugins,
+						wordpressExternalsPlugin(
+							'index.min',
+							'iife',
+							packageJson.wpScriptExtraDependencies || [],
+							false // Skip asset file for non-minified build
+						),
+					],
+				} )
+			);
+		}
 
 		builtScripts.push( {
 			handle: `${ handlePrefix }-${ packageName }`,
@@ -552,30 +558,35 @@ async function bundlePackage( packageName, options = {} ) {
 							true // Generate asset file for minified build
 						),
 					],
-				} ),
-				esbuild.build( {
-					entryPoints: [ entryPoint ],
-					outfile: path.join(
-						rootBuildModuleDir,
-						`${ fileName }.js`
-					),
-					bundle: true,
-					sourcemap: true,
-					format: 'esm',
-					target,
-					platform: 'browser',
-					minify: false,
-					define: getDefine( true ),
-					plugins: [
-						wordpressExternalsPlugin(
-							`${ baseFileName }.min`,
-							'esm',
-							[],
-							false // Skip asset file for non-minified build
-						),
-					],
 				} )
 			);
+
+			if ( ! production ) {
+				builds.push(
+					esbuild.build( {
+						entryPoints: [ entryPoint ],
+						outfile: path.join(
+							rootBuildModuleDir,
+							`${ fileName }.js`
+						),
+						bundle: true,
+						sourcemap: true,
+						format: 'esm',
+						target,
+						platform: 'browser',
+						minify: false,
+						define: getDefine( true ),
+						plugins: [
+							wordpressExternalsPlugin(
+								`${ baseFileName }.min`,
+								'esm',
+								[],
+								false // Skip asset file for non-minified build
+							),
+						],
+					} )
+				);
+			}
 
 			const scriptModuleId =
 				exportName === '.'
@@ -612,18 +623,17 @@ async function bundlePackage( packageName, options = {} ) {
 			// Generate minified path: style.css -> style.min.css, style-rtl.css -> style-rtl.min.css
 			const minifiedPath = destPath.replace( /\.css$/, '.min.css' );
 
-			// Always produce both versions (like JavaScript does):
-			// 1. Non-minified version (for SCRIPT_DEBUG=true)
-			// 2. Minified version (for SCRIPT_DEBUG=false)
 			builds.push(
 				( async () => {
 					await mkdir( destDir, { recursive: true } );
 					const content = await readFile( cssFile, 'utf8' );
 
-					// Write non-minified version
-					await writeFile( destPath, content );
+					// Write non-minified version (for SCRIPT_DEBUG=true)
+					if ( ! production ) {
+						await writeFile( destPath, content );
+					}
 
-					// Write minified version
+					// Write minified version (for SCRIPT_DEBUG=false)
 					const result = await postcss( [
 						cssnano( {
 							preset: [
@@ -1501,7 +1511,7 @@ function getPackageName( filename ) {
  * @param {string} routeName Route name.
  * @return {Promise<number>} Build time in milliseconds.
  */
-async function buildRoute( routeName ) {
+async function buildRoute( routeName, { production = false } = {} ) {
 	const startTime = Date.now();
 	const routeDir = path.join( ROOT_DIR, 'routes', routeName );
 	const outputDir = path.join( BUILD_DIR, 'routes', routeName );
@@ -1519,8 +1529,7 @@ async function buildRoute( routeName ) {
 		} );
 
 		if ( routeEntryPoints.length > 0 ) {
-			// Build both minified and non-minified versions in parallel
-			await Promise.all( [
+			const routeBuilds = [
 				esbuild.build( {
 					entryPoints: routeEntryPoints,
 					outfile: path.join( outputDir, 'route.min.js' ),
@@ -1538,24 +1547,31 @@ async function buildRoute( routeName ) {
 						),
 					],
 				} ),
-				esbuild.build( {
-					entryPoints: routeEntryPoints,
-					outfile: path.join( outputDir, 'route.js' ),
-					bundle: true,
-					format: 'esm',
-					target: browserslistToEsbuild(),
-					minify: false,
-					define: getDefine( true ),
-					plugins: [
-						wordpressExternalsPlugin(
-							'route.min',
-							'esm',
-							[],
-							false // Skip asset file for non-minified build
-						),
-					],
-				} ),
-			] );
+			];
+
+			if ( ! production ) {
+				routeBuilds.push(
+					esbuild.build( {
+						entryPoints: routeEntryPoints,
+						outfile: path.join( outputDir, 'route.js' ),
+						bundle: true,
+						format: 'esm',
+						target: browserslistToEsbuild(),
+						minify: false,
+						define: getDefine( true ),
+						plugins: [
+							wordpressExternalsPlugin(
+								'route.min',
+								'esm',
+								[],
+								false // Skip asset file for non-minified build
+							),
+						],
+					} )
+				);
+			}
+
+			await Promise.all( routeBuilds );
 		}
 	}
 
@@ -1568,8 +1584,7 @@ async function buildRoute( routeName ) {
 		// Write temporary entry file
 		await writeFile( tempEntryPath, syntheticEntry );
 
-		// Build both minified and non-minified versions in parallel
-		await Promise.all( [
+		const contentBuilds = [
 			esbuild.build( {
 				entryPoints: [ tempEntryPath ],
 				outfile: path.join( outputDir, 'content.min.js' ),
@@ -1588,25 +1603,32 @@ async function buildRoute( routeName ) {
 					...createStyleBundlingPlugins( routeDir ),
 				],
 			} ),
-			esbuild.build( {
-				entryPoints: [ tempEntryPath ],
-				outfile: path.join( outputDir, 'content.js' ),
-				bundle: true,
-				format: 'esm',
-				target: browserslistToEsbuild(),
-				minify: false,
-				define: getDefine( true ),
-				plugins: [
-					wordpressExternalsPlugin(
-						'content.min',
-						'esm',
-						[],
-						false // Skip asset file for non-minified build
-					),
-					...createStyleBundlingPlugins( routeDir ),
-				],
-			} ),
-		] );
+		];
+
+		if ( ! production ) {
+			contentBuilds.push(
+				esbuild.build( {
+					entryPoints: [ tempEntryPath ],
+					outfile: path.join( outputDir, 'content.js' ),
+					bundle: true,
+					format: 'esm',
+					target: browserslistToEsbuild(),
+					minify: false,
+					define: getDefine( true ),
+					plugins: [
+						wordpressExternalsPlugin(
+							'content.min',
+							'esm',
+							[],
+							false // Skip asset file for non-minified build
+						),
+						...createStyleBundlingPlugins( routeDir ),
+					],
+				} )
+			);
+		}
+
+		await Promise.all( contentBuilds );
 
 		await unlink( tempEntryPath );
 	}
@@ -1619,7 +1641,7 @@ async function buildRoute( routeName ) {
  *
  * @return {Promise<void>}
  */
-async function buildAllRoutes() {
+async function buildAllRoutes( { production = false } = {} ) {
 	console.log( '\n🚦 Phase 3: Building routes...\n' );
 
 	const routes = getAllRoutes( ROOT_DIR );
@@ -1631,7 +1653,7 @@ async function buildAllRoutes() {
 
 	await Promise.all(
 		routes.map( async ( routeName ) => {
-			const buildTime = await buildRoute( routeName );
+			const buildTime = await buildRoute( routeName, { production } );
 			console.log(
 				`   ✔ Built route ${ routeName } (${ buildTime }ms)`
 			);
@@ -1644,7 +1666,7 @@ async function buildAllRoutes() {
  *
  * @param {string?} baseUrlExpression
  */
-async function buildAll( baseUrlExpression ) {
+async function buildAll( baseUrlExpression, { production = false } = {} ) {
 	console.log( '🔨 Building packages...\n' );
 
 	const startTime = Date.now();
@@ -1685,7 +1707,9 @@ async function buildAll( baseUrlExpression ) {
 	await Promise.all(
 		PACKAGES.map( async ( packageName ) => {
 			const startBundleTime = Date.now();
-			const ret = await bundlePackage( packageName );
+			const ret = await bundlePackage( packageName, {
+				production,
+			} );
 			const buildTime = Date.now() - startBundleTime;
 			if ( ret ) {
 				console.log(
@@ -1706,7 +1730,7 @@ async function buildAll( baseUrlExpression ) {
 	);
 
 	// Build routes
-	await buildAllRoutes();
+	await buildAllRoutes( { production } );
 
 	// Collect route and page data for PHP generation
 	// Use flatMap to expand routes with multiple pages into separate entries
@@ -1805,6 +1829,7 @@ async function buildAll( baseUrlExpression ) {
 		ROOT_DIR,
 		baseUrlExpression
 	);
+	phpReplacements[ '{{HAS_DEBUG_ASSETS}}' ] = production ? 'false' : 'true';
 	await Promise.all( [
 		generateMainBuildPhp( phpReplacements ),
 		generateModuleRegistrationPhp( modules, phpReplacements ),
@@ -2099,6 +2124,10 @@ async function main() {
 				short: 'w',
 				default: false,
 			},
+			production: {
+				type: 'boolean',
+				default: false,
+			},
 			'base-url': {
 				type: 'string',
 				default: 'plugin_dir_url( __FILE__ )',
@@ -2108,8 +2137,16 @@ async function main() {
 	} );
 
 	const baseUrlExpression = values[ 'base-url' ];
+	let production = values.production;
 
-	await buildAll( baseUrlExpression );
+	if ( production && values.watch ) {
+		console.warn(
+			'⚠️  --production is ignored in watch mode (watch is for development).'
+		);
+		production = false;
+	}
+
+	await buildAll( baseUrlExpression, { production } );
 
 	if ( values.watch ) {
 		console.log( '\n👀 Watching for changes...\n' );

@@ -54,10 +54,8 @@ if ( ! function_exists( '{{PREFIX}}_register_page_routes' ) ) {
 					$content_asset = require $content_asset_path;
 					$content_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/content';
 					$extension = '.min.js';
-					if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-						if ( file_exists( __DIR__ . '/routes/' . $route['name'] . '/content.js' ) ) {
-							$extension = '.js';
-						}
+					if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG && $build_constants['has_debug_assets'] ) {
+						$extension = '.js';
 					}
 					wp_register_script_module(
 						$content_handle,
@@ -75,10 +73,8 @@ if ( ! function_exists( '{{PREFIX}}_register_page_routes' ) ) {
 					$route_asset = require $route_asset_path;
 					$route_handle = '{{HANDLE_PREFIX}}/routes/' . $route['name'] . '/route';
 					$extension = '.min.js';
-					if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-						if ( file_exists( __DIR__ . '/routes/' . $route['name'] . '/route.js' ) ) {
-							$extension = '.js';
-						}
+					if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG && $build_constants['has_debug_assets'] ) {
+						$extension = '.js';
 					}
 					wp_register_script_module(
 						$route_handle,

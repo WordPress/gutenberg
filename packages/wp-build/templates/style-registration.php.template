@@ -56,13 +56,9 @@ if ( ! function_exists( '{{PREFIX}}_register_package_styles' ) ) {
 
 		$styles_data = require $styles_file;
 
-		// Default to minified. When SCRIPT_DEBUG is enabled, check whether unminified
-		// files are available — they may be excluded from production distributions.
 		$suffix = '.min';
-		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
-			if ( ! empty( $styles_data[0]['path'] ) && file_exists( $styles_dir . '/' . $styles_data[0]['path'] . '.css' ) ) {
-				$suffix = '';
-			}
+		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG && $build_constants['has_debug_assets'] ) {
+			$suffix = '';
 		}
 		$plugin_dir  = dirname( __FILE__ );
 
