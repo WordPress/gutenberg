@@ -116,7 +116,6 @@ function getIframeSrc( resolvedAssets ) {
 	<head>
 		<meta charset="utf-8">
 		<base href="${ window.location.href }">
-		<script>window.frameElement._load()</script>
 		<style>
 			html{
 				height: auto !important;
@@ -133,9 +132,6 @@ function getIframeSrc( resolvedAssets ) {
 		${ resolvedAssets.styles ?? '' }
 		${ resolvedAssets.scripts ?? '' }
 	</head>
-	<body>
-		<script>document.currentScript.parentElement.remove()</script>
-	</body>
 </html>`;
 
 	src = URL.createObjectURL( new Blob( [ html ], { type: 'text/html' } ) );
@@ -168,9 +164,6 @@ function Iframe( {
 	const [ before, writingFlowRef, after ] = useWritingFlow();
 
 	const setRef = useRefEffect( ( node ) => {
-		node._load = () => {
-			setIframeDocument( node.contentDocument );
-		};
 		let iFrameDocument;
 		// Prevent the default browser action for files dropped outside of dropzones.
 		function preventFileDropDefault( event ) {
@@ -218,6 +211,7 @@ function Iframe( {
 			const { contentDocument } = node;
 			const { documentElement } = contentDocument;
 			iFrameDocument = contentDocument;
+			setIframeDocument( contentDocument );
 
 			documentElement.classList.add( 'block-editor-iframe__html' );
 
@@ -257,7 +251,7 @@ function Iframe( {
 		node.addEventListener( 'load', onLoad );
 
 		return () => {
-			delete node._load;
+			setIframeDocument( undefined );
 			node.removeEventListener( 'load', onLoad );
 			iFrameDocument?.removeEventListener(
 				'dragover',
@@ -284,12 +278,25 @@ function Iframe( {
 	} );
 
 	const disabledRef = useDisabled( { isDisabled: ! readonly } );
-	const bodyRef = useMergeRefs( [
+
+	const unguardedBodyRef = useMergeRefs( [
 		useBubbleEvents( iframeDocument ),
 		contentRef,
 		writingFlowRef,
 		disabledRef,
 	] );
+
+	// Attach the body ref only when the iframe document and window are available.
+	const bodyRef = useRefEffect(
+		( node ) => {
+			if ( node.ownerDocument.defaultView ) {
+				unguardedBodyRef( node );
+				return () => unguardedBodyRef( null );
+			}
+			return () => {};
+		},
+		[ unguardedBodyRef ]
+	);
 
 	const src = getIframeSrc( resolvedAssets );
 
