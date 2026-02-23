@@ -10,7 +10,6 @@ export { UploadError } from './upload-error';
 export {
 	detectClientSideMediaSupport,
 	isClientSideMediaSupported,
-	clearFeatureDetectionCache,
 } from './feature-detection';
 
 export type { ImageFormat } from './store/types';
