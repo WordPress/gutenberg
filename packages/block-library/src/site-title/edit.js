@@ -58,7 +58,10 @@ export default function SiteTitleEdit( props ) {
 	}
 
 	const TagName = level === 0 ? 'p' : `h${ level }`;
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className:
+			! canUserEdit && ! title && 'wp-block-site-title__placeholder',
+	} );
 	const siteTitleContent = canUserEdit ? (
 		<TagName { ...blockProps }>
 			<RichText
