@@ -4,6 +4,7 @@
 import { Page } from '@wordpress/admin-ui';
 import {
 	__experimentalItemGroup as ItemGroup,
+	Button,
 } from '@wordpress/components';
 import {
 	registerConnector,
@@ -14,6 +15,8 @@ import {
 	type ConnectorConfig,
 } from '@wordpress/connectors';
 import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { chevronUp, chevronDown } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -37,25 +40,47 @@ const OpenAILogo = () => (
 	</svg>
 );
 
+// OpenAI connector render component
+function OpenAIConnector( { label, description }: ConnectorRenderProps ) {
+	const [ isExpanded, setIsExpanded ] = useState( false );
+
+	return (
+		<ConnectorItem
+			icon={ <OpenAILogo /> }
+			name={ label }
+			description={ description }
+			actionArea={
+				<Button
+					variant="secondary"
+					size="compact"
+					icon={ isExpanded ? chevronUp : chevronDown }
+					iconPosition="right"
+					onClick={ () => setIsExpanded( ! isExpanded ) }
+					aria-expanded={ isExpanded }
+				>
+					{ isExpanded ? __( 'Close' ) : __( 'Install' ) }
+				</Button>
+			}
+		>
+			{ isExpanded && (
+				<DefaultConnectorSettings
+					onSave={ ( apiKey: string ) => {
+						// eslint-disable-next-line no-console
+						console.log( 'Saving OpenAI API key:', apiKey );
+					} }
+					onCancel={ () => setIsExpanded( false ) }
+				/>
+			) }
+		</ConnectorItem>
+	);
+}
+
 // Register built-in OpenAI connector
 registerConnector( 'core/openai', {
 	label: __( 'OpenAI' ),
 	description: __( 'Text, image, and code generation with GPT and DALL-E.' ),
 	icon: <OpenAILogo />,
-	render: ( { label, description }: ConnectorRenderProps ) => (
-		<ConnectorItem
-			icon={ <OpenAILogo /> }
-			name={ label }
-			description={ description }
-		>
-			<DefaultConnectorSettings
-				onSave={ ( apiKey ) => {
-					// eslint-disable-next-line no-console
-					console.log( 'Saving OpenAI API key:', apiKey );
-				} }
-			/>
-		</ConnectorItem>
-	),
+	render: OpenAIConnector,
 } );
 
 function ConnectorsPage() {

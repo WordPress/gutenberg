@@ -11,7 +11,6 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { chevronUp, chevronDown } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -23,6 +22,7 @@ export interface ConnectorItemProps {
 	icon?: ReactNode;
 	name: string;
 	description: string;
+	actionArea?: ReactNode;
 	children?: ReactNode;
 }
 
@@ -30,10 +30,9 @@ export function ConnectorItem( {
 	icon,
 	name,
 	description,
+	actionArea,
 	children,
 }: ConnectorItemProps ) {
-	const [ isExpanded, setIsExpanded ] = useState( false );
-
 	return (
 		<Item>
 			<VStack spacing={ 4 }>
@@ -45,26 +44,16 @@ export function ConnectorItem( {
 							<Text variant="muted">{ description }</Text>
 						</VStack>
 					</FlexBlock>
-					<Button
-						variant="secondary"
-						size="compact"
-						icon={ isExpanded ? chevronUp : chevronDown }
-						iconPosition="right"
-						onClick={ () => setIsExpanded( ! isExpanded ) }
-						aria-expanded={ isExpanded }
-					>
-						{ isExpanded ? __( 'Close' ) : __( 'Install' ) }
-					</Button>
+					{ actionArea }
 				</HStack>
-
-				{ isExpanded && children }
+				{ children }
 			</VStack>
 		</Item>
 	);
 }
 
 /**
- * Default settings form for connectors that don't provide custom render.
+ * Default settings form for connectors.
  */
 export function DefaultConnectorSettings( {
 	onSave,
