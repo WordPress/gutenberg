@@ -129,7 +129,7 @@ export function resolveBlockClientIdByPath(
  * @param getBlocks  - The getBlocks selector.
  * @return The blocks that correspond to the Yjs document root.
  */
-export function getPostContentBlocks(
+function getPostContentBlocks(
 	rootBlocks: EditorStoreBlock[],
 	getBlocks: ( rootClientId?: string ) => EditorStoreBlock[]
 ): EditorStoreBlock[] {
@@ -139,6 +139,7 @@ export function getPostContentBlocks(
 		// the store, since postContentBlock.innerBlocks is empty.
 		return getBlocks( postContentBlock.clientId );
 	}
+
 	return rootBlocks;
 }
 
@@ -149,7 +150,7 @@ export function getPostContentBlocks(
  * @param name   - The block name to find.
  * @return The first matching block, or null if not found.
  */
-export function findBlockByName(
+function findBlockByName(
 	blocks: EditorStoreBlock[],
 	name: string
 ): EditorStoreBlock | null {
