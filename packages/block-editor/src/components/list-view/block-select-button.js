@@ -10,16 +10,11 @@ import {
 	__experimentalHStack as HStack,
 	__experimentalTruncate as Truncate,
 	Tooltip,
+	Icon,
 	privateApis as componentsPrivateApis,
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
-import {
-	Icon,
-	lockSmall as lock,
-	pinSmall,
-	unseen,
-	symbol,
-} from '@wordpress/icons';
+import { lockSmall as lock, pinSmall, unseen, symbol } from '@wordpress/icons';
 import { SPACE, ENTER } from '@wordpress/keycodes';
 import { useSelect } from '@wordpress/data';
 
@@ -35,13 +30,14 @@ import useListViewImages from './use-list-view-images';
 import { store as blockEditorStore } from '../../store';
 import { unlock } from '../../lock-unlock';
 import { getBlockVisibilityLabel } from '../block-visibility';
+import { useListViewContext } from './context';
 
 const { Badge } = unlock( componentsPrivateApis );
 
 function ListViewBlockSelectButton(
 	{
 		className,
-		block: { clientId },
+		block,
 		onClick,
 		onContextMenu,
 		onMouseDown,
@@ -56,12 +52,15 @@ function ListViewBlockSelectButton(
 	},
 	ref
 ) {
+	const { clientId } = block;
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const blockTitle = useBlockDisplayTitle( {
 		clientId,
 		context: 'list-view',
 	} );
 	const { isLocked } = useBlockLock( clientId );
+	const { getBlockBadge } = useListViewContext();
+	const blockBadge = getBlockBadge?.( block ) ?? null;
 	const { hasPatternName, blockVisibility } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = unlock( select( blockEditorStore ) );
@@ -134,12 +133,23 @@ function ListViewBlockSelectButton(
 				<span className="block-editor-list-view-block-select-button__title">
 					<Truncate ellipsizeMode="auto">{ blockTitle }</Truncate>
 				</span>
-				{ blockInformation?.anchor && (
-					<span className="block-editor-list-view-block-select-button__anchor-wrapper">
-						<Badge className="block-editor-list-view-block-select-button__anchor">
-							{ blockInformation.anchor }
-						</Badge>
-					</span>
+				{ blockBadge ? (
+					<Tooltip text={ blockBadge.label }>
+						<span className="block-editor-list-view-block-select-button__anchor-wrapper">
+							<Badge
+								className="block-editor-list-view-block-select-button__anchor"
+								intent={ blockBadge.intent }
+							/>
+						</span>
+					</Tooltip>
+				) : (
+					blockInformation?.anchor && (
+						<span className="block-editor-list-view-block-select-button__anchor-wrapper">
+							<Badge className="block-editor-list-view-block-select-button__anchor">
+								{ blockInformation.anchor }
+							</Badge>
+						</span>
+					)
 				) }
 				{ isSticky && (
 					<span className="block-editor-list-view-block-select-button__sticky">

@@ -18,4 +18,8 @@ export { InvalidDraftDisplay } from './invalid-draft-display';
 export { useEnableLinkStatusValidation } from './use-enable-link-status-validation';
 export { useIsDraggingWithin } from './use-is-dragging-within';
 export { selectLabelText } from './select-label-text';
-export { useLinkPreview } from './use-link-preview';
+export {
+	useLinkPreview,
+	getActionableStatus,
+	computeBadges,
+} from './use-link-preview';
