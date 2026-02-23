@@ -20,20 +20,20 @@ export default function EditSectionButton( { clientId } ) {
 		stopEditingContentOnlySection,
 	} = useContentOnlySectionEdit( clientId );
 
-	const { blockType, isPreviewMode } = useSelect(
+	const { blockName, isPreviewMode } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return { blockType: null, isPreviewMode: false };
+				return { blockName: null, isPreviewMode: false };
 			}
 			const { getBlockName, getSettings } = select( blockEditorStore );
-			const blockName = getBlockName( clientId );
 			return {
-				blockType: blockName ? { name: blockName } : null,
+				blockName: getBlockName( clientId ),
 				isPreviewMode: getSettings().isPreviewMode,
 			};
 		},
 		[ clientId ]
 	);
+	const blockType = blockName ? { name: blockName } : null;
 
 	// Don't show for synced patterns or template parts — they already have
 	// their own toolbar buttons ("Edit original").
