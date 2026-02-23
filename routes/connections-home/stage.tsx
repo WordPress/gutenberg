@@ -76,7 +76,6 @@ function OpenAIConnector( { label, description }: ConnectorRenderProps ) {
 registerConnector( 'core/openai', {
 	label: __( 'OpenAI' ),
 	description: __( 'Text, image, and code generation with GPT and DALL-E.' ),
-	icon: <OpenAILogo />,
 	render: OpenAIConnector,
 } );
 
