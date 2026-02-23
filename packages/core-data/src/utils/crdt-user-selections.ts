@@ -55,15 +55,15 @@ export function getSelectionState(
 	yDoc: Y.Doc
 ): SelectionState {
 	const ymap = getRootMap< YPostRecord >( yDoc, CRDT_RECORD_MAP_KEY );
-	const yBlocks = ymap.get( 'blocks' ) ?? new Y.Array< YBlock >();
+	const yBlocks = ymap.get( 'blocks' );
 
 	const isSelectionEmpty = Object.keys( selectionStart ).length === 0;
 	const noSelection: SelectionNone = {
 		type: SelectionType.None,
 	};
 
-	if ( isSelectionEmpty ) {
-		// Case 1: No selection
+	if ( isSelectionEmpty || ! yBlocks ) {
+		// Case 1: No selection, or no blocks in the document.
 		return noSelection;
 	}
 
