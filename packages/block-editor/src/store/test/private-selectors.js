@@ -1415,6 +1415,37 @@ describe( 'private selectors', () => {
 			expect( isSectionBlock( state, 'block-1' ) ).toBe( true );
 		} );
 
+		it( 'returns false when nested inside another section block', () => {
+			const state = {
+				blocks: {
+					byClientId: new Map( [
+						[ 'outer-pattern', { name: 'core/group' } ],
+						[ 'inner-pattern', { name: 'core/group' } ],
+					] ),
+					attributes: new Map( [
+						[
+							'outer-pattern',
+							{ metadata: { patternName: 'outer' } },
+						],
+						[
+							'inner-pattern',
+							{ metadata: { patternName: 'inner' } },
+						],
+					] ),
+					parents: new Map( [
+						[ 'outer-pattern', '' ],
+						[ 'inner-pattern', 'outer-pattern' ],
+					] ),
+				},
+				blockListSettings: {},
+				settings: {},
+				editedContentOnlySection: undefined,
+			};
+			// inner-pattern is nested inside outer-pattern (also a section),
+			// so it is not considered a section itself.
+			expect( isSectionBlock( state, 'inner-pattern' ) ).toBe( false );
+		} );
+
 		it( 'returns false when the block itself is the editedContentOnlySection', () => {
 			const state = {
 				...createState( {
