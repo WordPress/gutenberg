@@ -163,7 +163,8 @@
 		"interactivity": {
 			"clientNavigation": true
 		},
-		"listView": true
+		"listView": true,
+		"contentRole": true
 	},
 	"editorStyle": "wp-block-gallery-editor",
 	"style": "wp-block-gallery"

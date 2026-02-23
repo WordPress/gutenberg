@@ -78,7 +78,8 @@
 		},
 		"interactivity": {
 			"clientNavigation": true
-		}
+		},
+		"contentRole": true
 	},
 	"editorStyle": "wp-block-navigation-submenu-editor",
 	"style": "wp-block-navigation-submenu"
