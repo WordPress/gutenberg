@@ -19,6 +19,7 @@ import {
 	applyPostChangesToCRDTDoc,
 	defaultSyncConfig,
 	getPostChangesFromCRDTDoc,
+	POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE,
 } from './utils/crdt';
 
 export const DEFAULT_ENTITY_KEY = 'id';
@@ -305,11 +306,17 @@ export const prePersistPostType = (
 	if ( persistedRecord ) {
 		const objectType = `postType/${ name }`;
 		const objectId = persistedRecord.id;
-		const meta = getSyncManager()?.createMeta( objectType, objectId );
-		newEdits.meta = {
-			...edits.meta,
-			...meta,
-		};
+		const serializedDoc = getSyncManager()?.createPersistedCRDTDoc(
+			objectType,
+			objectId
+		);
+
+		if ( serializedDoc ) {
+			newEdits.meta = {
+				...edits.meta,
+				[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ]: serializedDoc,
+			};
+		}
 	}
 
 	return newEdits;
@@ -404,13 +411,14 @@ async function loadPostTypeEntities() {
 				getPostChangesFromCRDTDoc( crdtDoc, editedRecord, postType ),
 
 			/**
-			 * Sync features supported by the entity.
+			 * Extract changes from a CRDT document that can be used to update the
+			 * local editor state.
 			 *
-			 * @type {Record< string, boolean >}
+			 * @param {import('@wordpress/sync').ObjectData} record
+			 * @return {Partial< import('@wordpress/sync').ObjectData >} Changes to record
 			 */
-			supports: {
-				crdtPersistence: true,
-			},
+			getPersistedCRDTDoc: ( record ) =>
+				record[ POST_META_KEY_FOR_CRDT_DOC_PERSISTENCE ] || null,
 		};
 
 		return entity;

@@ -8,17 +8,16 @@ import type { Awareness } from 'y-protocols/awareness';
  * Internal dependencies
  */
 import {
-	CRDT_RECORD_MAP_KEY as RECORD_KEY,
-	LOCAL_SYNC_MANAGER_ORIGIN,
+	CRDT_RECORD_MAP_KEY,
 	CRDT_STATE_MAP_KEY,
 	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
+	LOCAL_SYNC_MANAGER_ORIGIN,
 } from './config';
 import {
 	logPerformanceTiming,
 	passThru,
 	yieldToEventLoop,
 } from './performance';
-import { createPersistedCRDTDoc, getPersistedCrdtDoc } from './persistence';
 import { getProviderCreators } from './providers';
 import type {
 	CollectionHandlers,
@@ -35,7 +34,12 @@ import type {
 	SyncUndoManager,
 } from './types';
 import { createUndoManager } from './undo-manager';
-import { createYjsDoc, markEntityAsSaved } from './utils';
+import {
+	createYjsDoc,
+	deserializeCrdtDoc,
+	markEntityAsSaved,
+	serializeCrdtDoc,
+} from './utils';
 
 interface CollectionState {
 	awareness?: Awareness;
@@ -150,7 +154,7 @@ export function createSyncManager( debug = false ): SyncManager {
 		};
 
 		const ydoc = createYjsDoc( { objectType } );
-		const recordMap = ydoc.getMap( RECORD_KEY );
+		const recordMap = ydoc.getMap( CRDT_RECORD_MAP_KEY );
 		const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
 		const now = Date.now();
 
@@ -404,32 +408,22 @@ export function createSyncManager( debug = false ): SyncManager {
 			syncConfig: {
 				applyChangesToCRDTDoc,
 				getChangesFromCRDTDoc,
-				supports,
+				getPersistedCrdtDoc,
 			},
 			ydoc: targetDoc,
 		} = entityState;
 
-		if ( ! supports?.crdtPersistence ) {
-			// Apply the current record as changes.
-			targetDoc.transact( () => {
-				applyChangesToCRDTDoc( targetDoc, record );
-			}, LOCAL_SYNC_MANAGER_ORIGIN );
-			return;
-		}
-
 		// Get the persisted CRDT document, if it exists.
-		const tempDoc = getPersistedCrdtDoc( record );
+		const serialized = getPersistedCrdtDoc?.( record );
+		const tempDoc = serialized ? deserializeCrdtDoc( serialized ) : null;
 
 		if ( ! tempDoc ) {
 			// Apply the current record as changes and trigger a save, which will
-			// persist the CRDT document. (The entity should call `createEntityMeta`
+			// persist the CRDT document. (The entity should call `createPersistedCRDTDoc`
 			// via its pre-persist hook.)
 			targetDoc.transact( () => {
 				applyChangesToCRDTDoc( targetDoc, record );
-
-				if ( 'auto-draft' !== record.status ) {
-					handlers.saveRecord();
-				}
+				handlers.saveRecord();
 			}, LOCAL_SYNC_MANAGER_ORIGIN );
 			return;
 		}
@@ -477,8 +471,8 @@ export function createSyncManager( debug = false ): SyncManager {
 		);
 
 		// Apply the changes and trigger a save, which will persist the CRDT
-		// document. (The entity should call `createEntityMeta` via its pre-persist
-		// hook.)
+		// document. (The entity should call `createPersistedCRDTDoc` via its
+		// pre-persist hook.)
 		targetDoc.transact( () => {
 			applyChangesToCRDTDoc( targetDoc, changes );
 			handlers.saveRecord();
@@ -580,18 +574,18 @@ export function createSyncManager( debug = false ): SyncManager {
 	 * @param {ObjectType} objectType Object type.
 	 * @param {ObjectID}   objectId   Object ID.
 	 */
-	function createEntityMeta(
+	function createPersistedCRDTDoc(
 		objectType: ObjectType,
 		objectId: ObjectID
-	): Record< string, string > {
+	): string | null {
 		const entityId = getEntityId( objectType, objectId );
 		const entityState = entityStates.get( entityId );
 
-		if ( ! entityState?.syncConfig.supports?.crdtPersistence ) {
-			return {};
+		if ( ! entityState?.ydoc ) {
+			return null;
 		}
 
-		return createPersistedCRDTDoc( entityState.ydoc );
+		return serializeCrdtDoc( entityState.ydoc );
 	}
 
 	// Collect internal functions so that they can be wrapped before calling.
@@ -602,7 +596,7 @@ export function createSyncManager( debug = false ): SyncManager {
 
 	// Wrap and return the public API.
 	return {
-		createMeta: debugWrap( createEntityMeta ),
+		createPersistedCRDTDoc: debugWrap( createPersistedCRDTDoc ),
 		getAwareness,
 		load: debugWrap( loadEntity ),
 		loadCollection: debugWrap( loadCollection ),
