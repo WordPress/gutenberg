@@ -47,9 +47,7 @@ export default function SiteTaglineEdit( props ) {
 
 	const blockProps = useBlockProps( {
 		className:
-			! canUserEdit && ! tagline
-				? 'wp-block-site-tagline__placeholder'
-				: undefined,
+			! canUserEdit && ! tagline && 'wp-block-site-tagline__placeholder',
 	} );
 
 	const siteTaglineContent = canUserEdit ? (
