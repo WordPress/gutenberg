@@ -45,7 +45,7 @@ function ConnectorItem( {
 } ) {
 	return (
 		<Item>
-			<HStack alignment="center" spacing={ 3 }>
+			<HStack alignment="center" spacing={ 4 }>
 				{ icon }
 				<FlexBlock>
 					<VStack spacing={ 0 }>
@@ -53,7 +53,9 @@ function ConnectorItem( {
 						<Text variant="muted">{ description }</Text>
 					</VStack>
 				</FlexBlock>
-				<Button variant="secondary">{ __( 'Install' ) }</Button>
+				<Button variant="secondary" size="compact">
+					{ __( 'Install' ) }
+				</Button>
 			</HStack>
 		</Item>
 	);

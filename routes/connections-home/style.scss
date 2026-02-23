@@ -2,4 +2,13 @@
 	max-width: 800px;
 	margin: 0 auto;
 	padding: 24px;
+
+	.components-item-group {
+		border-radius: 8px;
+	}
+
+	.components-item {
+		padding: 16px 20px;
+		border-radius: 8px;
+	}
 }
