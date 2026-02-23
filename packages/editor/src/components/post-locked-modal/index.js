@@ -15,6 +15,7 @@ import { useEffect, createInterpolateElement } from '@wordpress/element';
 import { addAction, removeAction } from '@wordpress/hooks';
 import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
+import { unlock } from '../../lock-unlock';
 
 /**
  * Internal dependencies
@@ -48,7 +49,8 @@ function PostLockedModal() {
 			getEditedPostPreviewLink,
 			getEditorSettings,
 		} = select( editorStore );
-		const { getPostType, isCollaborationDisabled } = select( coreStore );
+		const { isCollaborationDisabled } = unlock( select( coreStore ) );
+		const { getPostType } = select( coreStore );
 		return {
 			hasCollaborationBeenDisabled: isCollaborationDisabled(),
 			isCollaborationEnabled: isCollaborationEnabledForCurrentPost(),

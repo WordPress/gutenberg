@@ -75,7 +75,7 @@ function getEntityId(
  *
  * @param debug Whether to enable performance and debug logging.
  */
-export function createSyncManager( debug = true ): SyncManager {
+export function createSyncManager( debug = false ): SyncManager {
 	const debugWrap = debug ? logPerformanceTiming : passThru;
 	const collectionStates: Map< ObjectType, CollectionState > = new Map();
 	const entityStates: Map< EntityID, EntityState > = new Map();

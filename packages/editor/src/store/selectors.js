@@ -1887,7 +1887,7 @@ export function isPublishSidebarOpened( state ) {
  */
 export const isCollaborationEnabledForCurrentPost = createRegistrySelector(
 	( select ) => ( state ) => {
-		if ( select( coreStore ).isCollaborationDisabled() ) {
+		if ( unlock( select( coreStore ) ).isCollaborationDisabled() ) {
 			return false;
 		}
 
