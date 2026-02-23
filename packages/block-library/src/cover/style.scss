@@ -377,3 +377,11 @@ body:not(.editor-styles-wrapper) .wp-block-cover:not(
 		}
 	}
 }
+
+// Adjust min-height for Cover blocks when there's a sticky header.
+// This prevents content from being hidden behind sticky headers.
+// The attribute selector targets inline styles set to 100vh.
+.wp-block-cover[style*="min-height:100vh"],
+.wp-block-cover[style*="min-height: 100vh"] {
+	min-height: calc(100vh - var(--wp-sticky-header-height, 0px)) !important;
+}
