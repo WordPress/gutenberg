@@ -1110,8 +1110,8 @@ export function generateThumbnails( id: QueueItemId ) {
 			// Use sourceFile for thumbnail generation to preserve quality.
 			// WordPress core generates thumbnails from the original (unscaled) image.
 			// Vips will auto-rotate based on EXIF orientation during thumbnail generation.
-			const file = attachment.media_filename
-				? renameFile( item.sourceFile, attachment.media_filename )
+			const file = attachment.filename
+				? renameFile( item.sourceFile, attachment.filename )
 				: item.sourceFile;
 			const batchId = uuidv4();
 
