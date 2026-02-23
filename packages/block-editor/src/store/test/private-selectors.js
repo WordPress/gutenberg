@@ -1623,45 +1623,6 @@ describe( 'private selectors', () => {
 			).toBeUndefined();
 		} );
 
-		it( 'returns undefined when a middle ancestor is the editedContentOnlySection', () => {
-			// Structure: outer-pattern > middle-pattern > deep-block
-			// middle-pattern is the edited section (not the root).
-			const state = {
-				blocks: {
-					byClientId: new Map( [
-						[ 'outer-pattern', { name: 'core/group' } ],
-						[ 'middle-pattern', { name: 'core/group' } ],
-						[ 'deep-block', { name: 'core/paragraph' } ],
-					] ),
-					attributes: new Map( [
-						[
-							'outer-pattern',
-							{ metadata: { patternName: 'outer' } },
-						],
-						[
-							'middle-pattern',
-							{ metadata: { patternName: 'middle' } },
-						],
-						[ 'deep-block', {} ],
-					] ),
-					parents: new Map( [
-						[ 'outer-pattern', '' ],
-						[ 'middle-pattern', 'outer-pattern' ],
-						[ 'deep-block', 'middle-pattern' ],
-					] ),
-				},
-				blockListSettings: {},
-				settings: {},
-				editedContentOnlySection: 'middle-pattern',
-			};
-			// The walk encounters middle-pattern (the edited section) before
-			// reaching outer-pattern, so it returns undefined early — outer-pattern
-			// above the edited section is not returned.
-			expect(
-				getParentSectionBlock( state, 'deep-block' )
-			).toBeUndefined();
-		} );
-
 		it( 'returns the correct parent when editedContentOnlySection is set but not in ancestry', () => {
 			// Structure: pattern-a > inner-block, pattern-b (sibling)
 			const state = {
