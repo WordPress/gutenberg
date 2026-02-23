@@ -4,7 +4,6 @@
 import {
 	privateApis as coreDataPrivateApis,
 	SelectionType,
-	type SelectionWholeBlock,
 } from '@wordpress/core-data';
 import { useEffect, useRef } from '@wordpress/element';
 
@@ -14,7 +13,8 @@ import { useEffect, useRef } from '@wordpress/element';
 import { unlock } from '../../lock-unlock';
 import { getAvatarBorderColor } from '../collab-sidebar/utils';
 
-const { useActiveCollaborators } = unlock( coreDataPrivateApis );
+const { useActiveCollaborators, useResolvedSelection } =
+	unlock( coreDataPrivateApis );
 
 /**
  * Custom hook for highlighting selected blocks in the editor
@@ -29,6 +29,10 @@ export function useBlockHighlighting(
 ) {
 	const highlightedBlockIds = useRef< Set< string > >( new Set() );
 	const userStates = useActiveCollaborators(
+		postId ?? null,
+		postType ?? null
+	);
+	const resolveSelection = useResolvedSelection(
 		postId ?? null,
 		postType ?? null
 	);
@@ -66,11 +70,16 @@ export function useBlockHighlighting(
 				const shouldDrawUser = ! userState.isMe;
 
 				if ( isWholeBlockSelected && shouldDrawUser ) {
-					const selection = userState.editorState
-						?.selection as unknown as SelectionWholeBlock;
+					const { localClientId } = resolveSelection(
+						userState.editorState?.selection
+					);
+
+					if ( ! localClientId ) {
+						return null;
+					}
 
 					return {
-						blockId: selection.blockId,
+						blockId: localClientId,
 						color: getAvatarBorderColor(
 							userState.collaboratorInfo.id
 						),
@@ -112,7 +121,7 @@ export function useBlockHighlighting(
 				highlightedBlockIds.current.add( blockId );
 			}
 		} );
-	}, [ userStates, blockEditorDocument ] );
+	}, [ userStates, blockEditorDocument, resolveSelection ] );
 }
 
 const getBlockElementById = (
