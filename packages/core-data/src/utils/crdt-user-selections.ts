@@ -350,9 +350,10 @@ function areCursorPositionsEqual(
 	cursorPosition1: CursorPosition,
 	cursorPosition2: CursorPosition
 ): boolean {
-	const isRelativePositionEqual =
-		JSON.stringify( cursorPosition1.relativePosition ) ===
-		JSON.stringify( cursorPosition2.relativePosition );
+	const isRelativePositionEqual = Y.compareRelativePositions(
+		cursorPosition1.relativePosition,
+		cursorPosition2.relativePosition
+	);
 
 	// Ensure a change in calculated absolute offset results in a treating the cursor as modified.
 	// This is necessary because Y.Text relative positions can remain the same after text changes.
