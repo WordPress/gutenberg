@@ -2,7 +2,15 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import { Button } from '@wordpress/components';
+import {
+	__experimentalHStack as HStack,
+	__experimentalVStack as VStack,
+	__experimentalItemGroup as ItemGroup,
+	__experimentalItem as Item,
+	__experimentalText as Text,
+	FlexBlock,
+	Button,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -36,18 +44,18 @@ function ConnectorItem( {
 	description: string;
 } ) {
 	return (
-		<div className="connections-connector-item">
-			<div className="connections-connector-item__icon">{ icon }</div>
-			<div className="connections-connector-item__content">
-				<div className="connections-connector-item__name">{ name }</div>
-				<div className="connections-connector-item__description">
-					{ description }
-				</div>
-			</div>
-			<div className="connections-connector-item__action">
+		<Item>
+			<HStack alignment="center" spacing={ 3 }>
+				{ icon }
+				<FlexBlock>
+					<VStack spacing={ 0 }>
+						<Text weight={ 600 }>{ name }</Text>
+						<Text variant="muted">{ description }</Text>
+					</VStack>
+				</FlexBlock>
 				<Button variant="secondary">{ __( 'Install' ) }</Button>
-			</div>
-		</div>
+			</HStack>
+		</Item>
 	);
 }
 
@@ -60,17 +68,15 @@ function ConnectionsPage() {
 			) }
 		>
 			<div className="connections-page">
-				<div className="connections-card">
-					<div className="connections-connectors-list">
-						<ConnectorItem
-							icon={ <OpenAILogo /> }
-							name={ __( 'OpenAI' ) }
-							description={ __(
-								'Text, image, and code generation with GPT and DALL-E.'
-							) }
-						/>
-					</div>
-				</div>
+				<ItemGroup isBordered isSeparated>
+					<ConnectorItem
+						icon={ <OpenAILogo /> }
+						name={ __( 'OpenAI' ) }
+						description={ __(
+							'Text, image, and code generation with GPT and DALL-E.'
+						) }
+					/>
+				</ItemGroup>
 			</div>
 		</Page>
 	);
