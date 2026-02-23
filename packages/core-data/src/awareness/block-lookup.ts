@@ -89,6 +89,10 @@ export function getBlockPathInYdoc(
 export function resolveBlockClientIdByPath(
 	path: AbsoluteBlockIndexPath
 ): string | null {
+	if ( path.length === 0 ) {
+		return null;
+	}
+
 	const { getBlocks } = select( blockEditorStore );
 	const postContentBlocks = getPostContentBlocks( getBlocks(), getBlocks );
 
