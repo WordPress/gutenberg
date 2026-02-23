@@ -10,7 +10,10 @@ import {
 	__experimentalText as Text,
 	FlexBlock,
 	Button,
+	TextControl,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+import { chevronUp, chevronDown } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -43,20 +46,62 @@ function ConnectorItem( {
 	name: string;
 	description: string;
 } ) {
+	const [ isExpanded, setIsExpanded ] = useState( false );
+	const [ apiKey, setApiKey ] = useState( '' );
+
 	return (
 		<Item>
-			<HStack alignment="center" spacing={ 4 }>
-				{ icon }
-				<FlexBlock>
-					<VStack spacing={ 0 }>
-						<Text weight={ 600 }>{ name }</Text>
-						<Text variant="muted">{ description }</Text>
+			<VStack spacing={ 4 }>
+				<HStack alignment="center" spacing={ 4 }>
+					{ icon }
+					<FlexBlock>
+						<VStack spacing={ 0 }>
+							<Text weight={ 600 }>{ name }</Text>
+							<Text variant="muted">{ description }</Text>
+						</VStack>
+					</FlexBlock>
+					<Button
+						variant="secondary"
+						size="compact"
+						icon={ isExpanded ? chevronUp : chevronDown }
+						iconPosition="right"
+						onClick={ () => setIsExpanded( ! isExpanded ) }
+						aria-expanded={ isExpanded }
+					>
+						{ isExpanded ? __( 'Close' ) : __( 'Install' ) }
+					</Button>
+				</HStack>
+
+				{ isExpanded && (
+					<VStack spacing={ 4 } className="connector-settings">
+						<TextControl
+							__nextHasNoMarginBottom
+							label={ __( 'API Key' ) }
+							value={ apiKey }
+							onChange={ setApiKey }
+							placeholder={ __( 'Enter your API key' ) }
+							type="password"
+						/>
+						<HStack justify="flex-end">
+							<Button
+								variant="secondary"
+								onClick={ () => setIsExpanded( false ) }
+							>
+								{ __( 'Cancel' ) }
+							</Button>
+							<Button
+								variant="primary"
+								onClick={ () => {
+									// Demo: just close for now
+									setIsExpanded( false );
+								} }
+							>
+								{ __( 'Save' ) }
+							</Button>
+						</HStack>
 					</VStack>
-				</FlexBlock>
-				<Button variant="secondary" size="compact">
-					{ __( 'Install' ) }
-				</Button>
-			</HStack>
+				) }
+			</VStack>
 		</Item>
 	);
 }
