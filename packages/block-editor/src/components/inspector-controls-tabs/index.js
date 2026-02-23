@@ -68,20 +68,33 @@ export default function InspectorControlsTabs( {
 	const selectedTabIdRef = useRef( selectedTabId );
 	selectedTabIdRef.current = selectedTabId;
 
-	// Track which content block is selected to auto-switch between
-	// Content and List View tabs. Returns the selected block's clientId
-	// when it's a content item, or null otherwise.
-	const selectedContentBlockId = useSelect(
+	// Track content-block selection state to auto-switch between Content and
+	// List View tabs. Both values share the same dependencies and are computed
+	// in a single store subscription to avoid redundant re-renders.
+	//   - selectedContentBlockId: set when the selected block is a direct
+	//     content item (triggers a reset back to Content tab).
+	//   - listChildParentId: set when the selected block is a descendant of a
+	//     list-view-enabled content item (triggers a switch to List View tab).
+	const { selectedContentBlockId, listChildParentId } = useSelect(
 		( select ) => {
 			if ( ! isSectionBlock ) {
-				return null;
+				return {
+					selectedContentBlockId: null,
+					listChildParentId: null,
+				};
 			}
-			const selectedId =
-				select( blockEditorStore ).getSelectedBlockClientId();
-			if ( ! selectedId || ! contentClientIds?.includes( selectedId ) ) {
-				return null;
-			}
-			return selectedId;
+			const store = select( blockEditorStore );
+			const selectedId = store.getSelectedBlockClientId();
+			return {
+				selectedContentBlockId:
+					selectedId && contentClientIds?.includes( selectedId )
+						? selectedId
+						: null,
+				listChildParentId:
+					unlock( store ).getListViewChildParentId(
+						contentClientIds
+					),
+			};
 		},
 		[ isSectionBlock, contentClientIds ]
 	);
@@ -103,21 +116,6 @@ export default function InspectorControlsTabs( {
 
 		skipNextContentResetRef.current = false;
 	}, [ selectedContentBlockId ] );
-
-	// Detect when a child of a list-view-enabled content block is selected
-	// (e.g. clicking Button 1 inside a Buttons block in the canvas).
-	// Returns the parent list-view block's clientId, or null.
-	const listChildParentId = useSelect(
-		( select ) => {
-			if ( ! isSectionBlock ) {
-				return null;
-			}
-			return unlock(
-				select( blockEditorStore )
-			).getListViewChildParentId( contentClientIds );
-		},
-		[ isSectionBlock, contentClientIds ]
-	);
 
 	useEffect( () => {
 		if ( listChildParentId ) {
