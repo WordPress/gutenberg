@@ -2559,30 +2559,6 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	traverseBlockTree( state, treeClientId, ( block ) => {
 		const { clientId, name: blockName } = block;
 
-		// Set the edited section and all blocks within it to 'default', so that all changes can be made.
-		if ( state.editedContentOnlySection ) {
-			// If this is the edited section, use the default mode.
-			if ( state.editedContentOnlySection === clientId ) {
-				derivedBlockEditingModes.set( clientId, 'default' );
-				return;
-			}
-
-			// If the block is within the edited section also use the default mode.
-			const parentTempEditedClientId = findParentInClientIdsList(
-				state,
-				clientId,
-				[ state.editedContentOnlySection ]
-			);
-			if ( parentTempEditedClientId ) {
-				derivedBlockEditingModes.set( clientId, 'default' );
-				return;
-			}
-
-			// Disable blocks that are outside of the edited section.
-			derivedBlockEditingModes.set( clientId, 'disabled' );
-			return;
-		}
-
 		// If the block already has an explicit block editing mode set,
 		// don't override it.
 		if ( state.blockEditingModes.has( clientId ) ) {
@@ -2643,7 +2619,8 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 		if ( syncedPatternClientIds.length ) {
 			// Synced pattern blocks (core/block).
 			if ( syncedPatternClientIds.includes( clientId ) ) {
-				// This is a pattern nested in another pattern, it should be disabled.
+				// This is a synced pattern nested in another synced pattern,
+				// disable the core/block itself.
 				if (
 					findParentInClientIdsList(
 						state,
@@ -2660,17 +2637,18 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 			}
 
 			// Inner blocks of synced patterns.
-			const parentPatternClientId = findParentInClientIdsList(
+			const parentSyncedPatternClientId = findParentInClientIdsList(
 				state,
 				clientId,
 				syncedPatternClientIds
 			);
-			if ( parentPatternClientId ) {
-				// This is a pattern nested in another pattern, it should be disabled.
+			if ( parentSyncedPatternClientId ) {
+				// This is an inner block of a synced pattern that's nested in another synced pattern,
+				// disable its contents.
 				if (
 					findParentInClientIdsList(
 						state,
-						parentPatternClientId,
+						parentSyncedPatternClientId,
 						syncedPatternClientIds
 					)
 				) {
@@ -2687,7 +2665,32 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 				// from the instance, the user has to edit the pattern source,
 				// so return 'disabled'.
 				derivedBlockEditingModes.set( clientId, 'disabled' );
+				return;
 			}
+		}
+
+		// Set the edited section and all blocks within it to 'default', so that all changes can be made.
+		if ( state.editedContentOnlySection ) {
+			// If this is the edited section, use the default mode.
+			if ( state.editedContentOnlySection === clientId ) {
+				derivedBlockEditingModes.set( clientId, 'default' );
+				return;
+			}
+
+			// If the block is within the edited section also use the default mode.
+			const parentTempEditedClientId = findParentInClientIdsList(
+				state,
+				clientId,
+				[ state.editedContentOnlySection ]
+			);
+			if ( parentTempEditedClientId ) {
+				derivedBlockEditingModes.set( clientId, 'default' );
+				return;
+			}
+
+			// Disable blocks that are outside of the edited section.
+			derivedBlockEditingModes.set( clientId, 'disabled' );
+			return;
 		}
 
 		// Handle `templateLock=contentOnly` blocks and unsynced patterns.
