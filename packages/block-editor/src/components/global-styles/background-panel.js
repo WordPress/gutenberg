@@ -6,13 +6,13 @@ import {
 	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import { useCallback, Platform } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
 import BackgroundImageControl from '../background-image-control';
 import { useToolsPanelDropdownMenuProps } from './utils';
 import { setImmutably } from '../../utils/object';
-import { __ } from '@wordpress/i18n';
 
 const DEFAULT_CONTROLS = {
 	backgroundImage: true,
@@ -96,7 +96,7 @@ export default function BackgroundImagePanel( {
 	panelId,
 	defaultControls = DEFAULT_CONTROLS,
 	defaultValues = {},
-	headerLabel = __( 'Background image' ),
+	headerLabel = __( 'Background' ),
 } ) {
 	const showBackgroundImageControl = useHasBackgroundPanel( settings );
 	const resetBackground = () =>

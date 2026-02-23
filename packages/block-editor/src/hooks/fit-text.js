@@ -232,14 +232,14 @@ function useFitText( { fitText, name, clientId } ) {
 /**
  * Fit text control component for the typography panel.
  *
- * @param {Object}      props               Component props.
- * @param {string}      props.clientId      Block client ID.
- * @param {Function}    props.setAttributes Function to set block attributes.
- * @param {string}      props.name          Block name.
- * @param {boolean}     props.fitText       Whether fit text is enabled.
- * @param {string}      props.fontSize      Font size slug.
- * @param {Object}      props.style         Block style object.
- * @param {JSX.Element} props.warning       Warning component to display.
+ * @param {Object}            props               Component props.
+ * @param {string}            props.clientId      Block client ID.
+ * @param {Function}          props.setAttributes Function to set block attributes.
+ * @param {string}            props.name          Block name.
+ * @param {boolean}           props.fitText       Whether fit text is enabled.
+ * @param {string}            props.fontSize      Font size slug.
+ * @param {Object}            props.style         Block style object.
+ * @param {React.JSX.Element} props.warning       Warning component to display.
  */
 export function FitTextControl( {
 	clientId,

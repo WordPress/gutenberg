@@ -46,7 +46,7 @@ _See the [full block example](https://github.com/WordPress/block-development-exa
 
 ### PHP-only blocks with auto-registration
 
-For blocks that only need server-side rendering, you can register them exclusively in PHP using the [`auto_register`](/docs/reference-guides/block-api/block-supports.md#auto_register) flag and a `render_callback`. These blocks automatically appear in the editor without requiring any JavaScript registration or client-side code and use [dynamic rendering](/docs/getting-started/fundamentals/static-dynamic-rendering.md).
+For blocks that only need server-side rendering, you can register them exclusively in PHP using the [`autoRegister`](/docs/reference-guides/block-api/block-supports.md#auto_register) flag and a `render_callback`. These blocks automatically appear in the editor without requiring any JavaScript registration or client-side code and use [dynamic rendering](/docs/getting-started/fundamentals/static-dynamic-rendering.md).
 
 ```php
 register_block_type( 'my-plugin/server-block', array(
@@ -59,7 +59,7 @@ register_block_type( 'my-plugin/server-block', array(
 		);
 	},
 	'supports' => array(
-		'auto_register' => true,
+		'autoRegister' => true,
 		'color' => array(
 			'background' => true,
 		),

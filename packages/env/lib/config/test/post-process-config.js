@@ -295,5 +295,57 @@ describe( 'postProcessConfig', () => {
 				)
 			);
 		} );
+
+		it( 'should skip port validation for disabled tests environment', () => {
+			expect( () => {
+				postProcessConfig( {
+					testsEnvironment: false,
+					port: 123,
+					env: {
+						development: {},
+						tests: {},
+					},
+				} );
+			} ).not.toThrow();
+		} );
+	} );
+
+	describe( 'testsEnvironment', () => {
+		it( 'should ignore env overrides entirely when testsEnvironment is false', () => {
+			const processed = postProcessConfig( {
+				testsEnvironment: false,
+				port: 123,
+				testsPort: 456,
+				coreSource: {
+					type: 'test',
+				},
+				config: {
+					TESTS_ROOT: 'root',
+				},
+				pluginSources: [
+					{
+						type: 'root-plugin',
+					},
+				],
+				env: {
+					development: {
+						config: {
+							TEST_ENV: 'development',
+						},
+					},
+					tests: {},
+				},
+			} );
+
+			// Development should get root options but NOT env overrides.
+			expect( processed.env.development.port ).toEqual( 123 );
+			expect( processed.env.development.config.TESTS_ROOT ).toEqual(
+				'root'
+			);
+			expect( processed.env.development.config.TEST_ENV ).toBeUndefined();
+
+			// Tests should not get root options merged.
+			expect( processed.env.tests ).toEqual( {} );
+		} );
 	} );
 } );

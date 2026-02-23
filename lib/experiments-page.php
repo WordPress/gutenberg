@@ -114,18 +114,6 @@ function gutenberg_initialize_experiments_settings() {
 	);
 
 	add_settings_field(
-		'gutenberg-media-processing',
-		__( 'Client-side media processing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables client-side media processing to leverage the browser\'s capabilities to handle tasks like image resizing and compression.', 'gutenberg' ),
-			'id'    => 'gutenberg-media-processing',
-		)
-	);
-
-	add_settings_field(
 		'gutenberg-color-randomizer',
 		__( 'Color randomizer', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -134,18 +122,6 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables the Global Styles color randomizer in the Site Editor; a utility that lets you mix the current color palette pseudo-randomly.', 'gutenberg' ),
 			'id'    => 'gutenberg-color-randomizer',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-quick-edit-dataviews',
-		__( 'Data Views: add Quick Edit', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables access to a Quick Edit panel in the Site Editor Pages experience.', 'gutenberg' ),
-			'id'    => 'gutenberg-quick-edit-dataviews',
 		)
 	);
 
@@ -218,18 +194,6 @@ function gutenberg_initialize_experiments_settings() {
 		array(
 			'label' => __( 'Enables editing media items (attachments) directly in the block editor with a dedicated media preview and metadata panel.', 'gutenberg' ),
 			'id'    => 'gutenberg-media-editor',
-		)
-	);
-
-	add_settings_field(
-		'gutenberg-svg-icon-registry',
-		__( 'SVG Icon Registration API', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enables a REST API endpoint for accessing SVG icons.', 'gutenberg' ),
-			'id'    => 'gutenberg-svg-icon-registry',
 		)
 	);
 

@@ -6,6 +6,9 @@ const { test, expect } = require( '@wordpress/e2e-test-utils-playwright' );
 test.describe( 'iframed masonry block', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
+		await requestUtils.activatePlugin(
 			'gutenberg-test-iframed-masonry-block'
 		);
 	} );
@@ -17,6 +20,9 @@ test.describe( 'iframed masonry block', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.deactivatePlugin(
 			'gutenberg-test-iframed-masonry-block'
+		);
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
 		);
 	} );
 

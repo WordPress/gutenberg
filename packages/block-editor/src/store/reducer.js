@@ -599,6 +599,17 @@ const withInnerBlocksRemoveCascade = ( reducer ) => ( state, action ) => {
  */
 const withBlockReset = ( reducer ) => ( state, action ) => {
 	if ( action.type === 'RESET_BLOCKS' ) {
+		/**
+		 * Preserve controlled inner block flags across RESET_BLOCKS.
+		 * Previously this was cleared to `{}`, which caused nested
+		 * controllers (e.g. post-content, patterns) to lose their
+		 * controlled status and unnecessarily re-clone blocks. Stale
+		 * flags are cleaned up naturally by unsetControlledBlocks()
+		 * when useBlockSync unmounts.
+		 */
+		const preservedControlledInnerBlocks =
+			state?.controlledInnerBlocks ?? {};
+
 		const newState = {
 			...state,
 			byClientId: new Map(
@@ -607,11 +618,82 @@ const withBlockReset = ( reducer ) => ( state, action ) => {
 			attributes: new Map( getFlattenedBlockAttributes( action.blocks ) ),
 			order: mapBlockOrder( action.blocks ),
 			parents: new Map( mapBlockParents( action.blocks ) ),
-			controlledInnerBlocks: {},
+			controlledInnerBlocks: preservedControlledInnerBlocks,
 		};
+
+		// Preserve controlled inner blocks data from the old state.
+		// The maps above are rebuilt solely from action.blocks, but
+		// controlled inner blocks live under cloned IDs that aren't
+		// present in action.blocks. Re-inject them so the state
+		// remains consistent with the preserved flags.
+		if ( state?.order ) {
+			for ( const clientId of Object.keys(
+				preservedControlledInnerBlocks
+			) ) {
+				if ( ! preservedControlledInnerBlocks[ clientId ] ) {
+					continue;
+				}
+				// Only preserve if the parent block still exists.
+				if ( ! newState.byClientId.has( clientId ) ) {
+					continue;
+				}
+				const oldOrder = state.order.get( clientId );
+				if ( ! oldOrder?.length ) {
+					continue;
+				}
+				newState.order.set( clientId, oldOrder );
+				const preserveBlock = ( blockId, parentId ) => {
+					const blockData = state.byClientId?.get( blockId );
+					if ( ! blockData ) {
+						return;
+					}
+					newState.byClientId.set( blockId, blockData );
+					newState.attributes.set(
+						blockId,
+						state.attributes?.get( blockId )
+					);
+					newState.parents.set( blockId, parentId );
+					const childOrder = state.order?.get( blockId ) || [];
+					newState.order.set( blockId, childOrder );
+					childOrder.forEach( ( childId ) =>
+						preserveBlock( childId, blockId )
+					);
+				};
+				oldOrder.forEach( ( id ) => preserveBlock( id, clientId ) );
+			}
+		}
 
 		newState.tree = new Map( state?.tree );
 		updateBlockTreeForBlocks( newState, action.blocks );
+
+		// Fix tree entries for controlled blocks. updateBlockTreeForBlocks
+		// built tree entries using action.blocks' inner block structure
+		// (entity-level IDs), but we need them to reference the preserved
+		// cloned inner blocks instead. Mutating the existing object
+		// preserves references held by ancestor tree entries.
+		for ( const clientId of Object.keys(
+			preservedControlledInnerBlocks
+		) ) {
+			if ( ! preservedControlledInnerBlocks[ clientId ] ) {
+				continue;
+			}
+			if ( ! newState.byClientId.has( clientId ) ) {
+				continue;
+			}
+			const controlledOrder = newState.order.get( clientId );
+			if ( ! controlledOrder?.length ) {
+				continue;
+			}
+			const innerBlocks = controlledOrder.map( ( id ) =>
+				newState.tree.get( id )
+			);
+			const existingEntry = newState.tree.get( clientId );
+			if ( existingEntry ) {
+				existingEntry.innerBlocks = innerBlocks;
+			}
+			newState.tree.set( 'controlled||' + clientId, { innerBlocks } );
+		}
+
 		newState.tree.set( '', {
 			innerBlocks: action.blocks.map( ( subBlock ) =>
 				newState.tree.get( subBlock.clientId )
@@ -741,14 +823,22 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
  */
 const withResetControlledBlocks = ( reducer ) => ( state, action ) => {
 	if ( action.type === 'SET_HAS_CONTROLLED_INNER_BLOCKS' ) {
-		// when switching a block from controlled to uncontrolled or inverse,
-		// we need to remove its content first.
-		const tempState = reducer( state, {
-			type: 'REPLACE_INNER_BLOCKS',
-			rootClientId: action.clientId,
-			blocks: [],
-		} );
-		return reducer( tempState, action );
+		// When switching a block from controlled to uncontrolled or inverse,
+		// we need to remove its content first — but only if there are inner
+		// blocks to remove. Skipping the no-op dispatch is important because
+		// REPLACE_INNER_BLOCKS creates new state references even when empty,
+		// which propagates tree changes up to the root and triggers false-
+		// positive change detection in parent subscriptions.
+		const innerBlockOrder = state.order.get( action.clientId );
+		if ( innerBlockOrder?.length ) {
+			const tempState = reducer( state, {
+				type: 'REPLACE_INNER_BLOCKS',
+				rootClientId: action.clientId,
+				blocks: [],
+			} );
+			return reducer( tempState, action );
+		}
+		return reducer( state, action );
 	}
 
 	return reducer( state, action );
@@ -993,6 +1083,9 @@ export const blocks = pipe(
 				if ( fromRootClientId === toRootClientId ) {
 					const subState = state.get( toRootClientId );
 					const fromIndex = subState.indexOf( clientIds[ 0 ] );
+					if ( fromIndex === -1 ) {
+						return state;
+					}
 					const newState = new Map( state );
 					newState.set(
 						toRootClientId,
@@ -1503,6 +1596,25 @@ export function isSelectionEnabled( state = true, action ) {
 }
 
 /**
+ * Reducer returning the client IDs for the viewport modal,
+ * or null if the modal is not open.
+ *
+ * @param {string[]|null} state  Current state.
+ * @param {Object}        action Dispatched action.
+ *
+ * @return {string[]|null} Client IDs for the viewport modal.
+ */
+export function viewportModalClientIds( state = null, action ) {
+	switch ( action.type ) {
+		case 'SHOW_VIEWPORT_MODAL':
+			return action.clientIds;
+		case 'HIDE_VIEWPORT_MODAL':
+			return null;
+	}
+	return state;
+}
+
+/**
  * Reducer returning the data needed to display a prompt when certain blocks
  * are removed, or `false` if no such prompt is requested.
  *
@@ -1761,9 +1873,27 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
  */
 export const blockListSettings = ( state = {}, action ) => {
 	switch ( action.type ) {
-		// Even if the replaced blocks have the same client ID, our logic
-		// should correct the state.
-		case 'REPLACE_BLOCKS':
+		case 'REPLACE_BLOCKS': {
+			// Collect all clientIds from replacement blocks. If a clientId
+			// is reused, preserve its settings — the block instance (and
+			// its InnerBlocks config) survived the replace. Settings for
+			// clientIds that are truly removed get cleaned up so stale
+			// config from old block types doesn't linger.
+			const replacementIds = new Set();
+			const stack = [ ...action.blocks ];
+			while ( stack.length ) {
+				const block = stack.shift();
+				replacementIds.add( block.clientId );
+				stack.push( ...block.innerBlocks );
+			}
+			return Object.fromEntries(
+				Object.entries( state ).filter(
+					( [ id ] ) =>
+						! action.clientIds.includes( id ) ||
+						replacementIds.has( id )
+				)
+			);
+		}
 		case 'REMOVE_BLOCKS': {
 			return Object.fromEntries(
 				Object.entries( state ).filter(
@@ -2159,6 +2289,10 @@ function openedListViewPanels(
 /**
  * Reducer returning the List View expand revision.
  *
+ * This is a counter used to force ListView components to remount. When incremented,
+ * the ListView key changes, causing the component to remount with a fresh
+ * isExpanded=true state.
+ *
  * @param {number} state  Current state.
  * @param {Object} action Dispatched action.
  *
@@ -2169,6 +2303,53 @@ function listViewExpandRevision( state = 0, action ) {
 		case 'INCREMENT_LIST_VIEW_EXPAND_REVISION':
 			return state + 1;
 	}
+	return state;
+}
+
+/**
+ * Reducer tracking whether the list view content panel popover is open.
+ *
+ * @param {boolean} state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state.
+ */
+export function listViewContentPanelOpen( state = false, action ) {
+	switch ( action.type ) {
+		case 'OPEN_LIST_VIEW_CONTENT_PANEL':
+			return true;
+
+		case 'CLOSE_LIST_VIEW_CONTENT_PANEL':
+			return false;
+
+		// Close when selection is cleared
+		case 'CLEAR_SELECTED_BLOCK':
+			return false;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer tracking the requested inspector tab state.
+ * Stores a request to open a specific inspector tab with optional configuration.
+ *
+ * @param {Object|null} state  Current state.
+ * @param {Object}      action Dispatched action.
+ *
+ * @return {Object|null} Updated state.
+ */
+export function requestedInspectorTab( state = null, action ) {
+	switch ( action.type ) {
+		case 'REQUEST_INSPECTOR_TAB':
+			return {
+				tabName: action.tabName,
+				options: action.options,
+			};
+		case 'CLEAR_REQUESTED_INSPECTOR_TAB':
+			return null;
+	}
+
 	return state;
 }
 
@@ -2196,6 +2377,7 @@ const combinedReducers = combineReducers( {
 	lastBlockInserted,
 	editedContentOnlySection,
 	blockVisibility,
+	viewportModalClientIds,
 	blockEditingModes,
 	styleOverrides,
 	removalPromptData,
@@ -2205,6 +2387,8 @@ const combinedReducers = combineReducers( {
 	hasBlockSpotlight,
 	openedListViewPanels,
 	listViewExpandRevision,
+	listViewContentPanelOpen,
+	requestedInspectorTab,
 } );
 
 /**
@@ -2353,15 +2537,19 @@ function getDerivedBlockEditingModesForTree( state, treeClientId = '' ) {
 	// don't apply contentOnly mode to nested unsynced patterns or template parts.
 	const isIsolatedEditor = state.settings?.[ isIsolatedEditorKey ];
 
+	const disableContentOnlyForUnsyncedPatterns =
+		state.settings?.disableContentOnlyForUnsyncedPatterns;
+
 	// Use array.from for better back compat. Older versions of the iterator returned
 	// from `keys()` didn't have the `filter` method.
-	const unsyncedPatternClientIds = isIsolatedEditor
-		? []
-		: Array.from( state.blocks.attributes.keys() ).filter(
-				( clientId ) =>
-					state.blocks.attributes.get( clientId )?.metadata
-						?.patternName
-		  );
+	const unsyncedPatternClientIds =
+		isIsolatedEditor || disableContentOnlyForUnsyncedPatterns
+			? []
+			: Array.from( state.blocks.attributes.keys() ).filter(
+					( clientId ) =>
+						state.blocks.attributes.get( clientId )?.metadata
+							?.patternName
+			  );
 	const contentOnlyParents = [
 		...contentOnlyTemplateLockedClientIds,
 		...unsyncedPatternClientIds,
@@ -2657,6 +2845,13 @@ export function withDerivedBlockEditingModes( reducer ) {
 				// Handle unsynced patterns which indicate their contentOnly-ness via
 				// the `attributes.metadata.patternName` property.
 				// Check when this is added or removed and update blockEditingModes.
+				const disableContentOnlyForUnsyncedPatterns =
+					nextState.settings?.disableContentOnlyForUnsyncedPatterns;
+
+				if ( disableContentOnlyForUnsyncedPatterns ) {
+					break;
+				}
+
 				const addedBlocks = [];
 				const removedClientIds = [];
 
@@ -2869,10 +3064,15 @@ export function withDerivedBlockEditingModes( reducer ) {
 				break;
 			}
 			case 'UPDATE_SETTINGS': {
-				// Recompute the entire tree if the section root changes.
+				// Recompute the entire tree if the section root or
+				// the effective disableContentOnlyForUnsyncedPatterns value changes.
 				if (
 					state?.settings?.[ sectionRootClientIdKey ] !==
-					nextState?.settings?.[ sectionRootClientIdKey ]
+						nextState?.settings?.[ sectionRootClientIdKey ] ||
+					!! state?.settings
+						?.disableContentOnlyForUnsyncedPatterns !==
+						!! nextState?.settings
+							?.disableContentOnlyForUnsyncedPatterns
 				) {
 					return {
 						...nextState,

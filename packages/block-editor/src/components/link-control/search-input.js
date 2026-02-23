@@ -46,7 +46,6 @@ const LinkControlSearchInput = forwardRef(
 			suffix,
 			isEntity = false,
 			customValidity: customValidityProp,
-			required,
 		},
 		ref
 	) => {
@@ -149,11 +148,10 @@ const LinkControlSearchInput = forwardRef(
 						showInitialSuggestions
 					}
 					customValidity={ customValidityProp }
-					// When required=false, validation is handled manually via onSubmit and handleSubmit.
-					// When required=true (e.g., in modals with text control), browser validation is used.
-					// Use markWhenOptional when required=true to suppress the "(Required)" indicator.
-					required={ required }
-					markWhenOptional={ required }
+					// Validation is handled manually via onSubmit and handleSubmit. We may be able to rely
+					// on browser validation when enhancements land to base level components:
+					// https://github.com/WordPress/gutenberg/pull/75188#issuecomment-3861757260
+					required={ false }
 					onSubmit={ ( suggestion, event ) => {
 						const hasSuggestion = suggestion || focusedSuggestion;
 

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/upload-media",
-	"version": "0.24.0",
+	"version": "0.25.0",
 	"description": "Core media upload logic.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -58,6 +58,7 @@
 		"@wordpress/preferences": "file:../preferences",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/url": "file:../url",
+		"@wordpress/vips": "file:../vips",
 		"uuid": "^9.0.1"
 	},
 	"peerDependencies": {

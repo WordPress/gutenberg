@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import type { Meta, StoryFn } from '@storybook/react-vite';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
 /**
@@ -38,11 +38,13 @@ const meta: Meta< typeof FontSizePicker > = {
 };
 export default meta;
 
-const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
+type FontSizePickerStory = StoryObj< typeof FontSizePicker >;
+
+const FontSizePickerWithState = ( {
 	value,
 	onChange,
 	...props
-} ) => {
+}: React.ComponentProps< typeof FontSizePicker > ) => {
 	const [ fontSize, setFontSize ] = useState( value );
 	return (
 		<FontSizePicker
@@ -57,10 +59,10 @@ const FontSizePickerWithState: StoryFn< typeof FontSizePicker > = ( {
 	);
 };
 
-const TwoFontSizePickersWithState: StoryFn< typeof FontSizePicker > = ( {
+const TwoFontSizePickersWithState = ( {
 	fontSizes,
 	...props
-} ) => {
+}: React.ComponentProps< typeof FontSizePicker > ) => {
 	return (
 		<>
 			<h2>Fewer font sizes</h2>
@@ -75,148 +77,154 @@ const TwoFontSizePickersWithState: StoryFn< typeof FontSizePicker > = ( {
 	);
 };
 
-export const Default: StoryFn< typeof FontSizePicker > =
-	FontSizePickerWithState.bind( {} );
-Default.args = {
-	__next40pxDefaultSize: true,
-	disableCustomFontSizes: false,
-	fontSizes: [
-		{
-			name: 'Small',
-			slug: 'small',
-			size: 12,
-		},
-		{
-			name: 'Normal',
-			slug: 'normal',
-			size: 16,
-		},
-		{
-			name: 'Big',
-			slug: 'big',
-			size: 26,
-		},
-	],
-	value: 16,
-	withSlider: false,
+export const Default: FontSizePickerStory = {
+	render: FontSizePickerWithState,
+	args: {
+		__next40pxDefaultSize: true,
+		disableCustomFontSizes: false,
+		fontSizes: [
+			{
+				name: 'Small',
+				slug: 'small',
+				size: 12,
+			},
+			{
+				name: 'Normal',
+				slug: 'normal',
+				size: 16,
+			},
+			{
+				name: 'Big',
+				slug: 'big',
+				size: 26,
+			},
+		],
+		value: 16,
+		withSlider: false,
+	},
 };
 
-export const WithSlider: StoryFn< typeof FontSizePicker > =
-	FontSizePickerWithState.bind( {} );
-WithSlider.args = {
-	...Default.args,
-	fallbackFontSize: 16,
-	value: undefined,
-	withSlider: true,
+export const WithSlider: FontSizePickerStory = {
+	render: FontSizePickerWithState,
+	args: {
+		...Default.args,
+		fallbackFontSize: 16,
+		value: undefined,
+		withSlider: true,
+	},
 };
 
 /**
  * With custom font sizes disabled via the `disableCustomFontSizes` prop, the user will
  * only be able to pick one of the predefined sizes passed in `fontSizes`.
  */
-export const WithCustomSizesDisabled: StoryFn< typeof FontSizePicker > =
-	FontSizePickerWithState.bind( {} );
-WithCustomSizesDisabled.args = {
-	...Default.args,
-	disableCustomFontSizes: true,
+export const WithCustomSizesDisabled: FontSizePickerStory = {
+	render: FontSizePickerWithState,
+	args: {
+		...Default.args,
+		disableCustomFontSizes: true,
+	},
 };
 
 /**
  * When there are more than 5 font size options, the UI is no longer a toggle group.
  */
-export const WithMoreFontSizes: StoryFn< typeof FontSizePicker > =
-	FontSizePickerWithState.bind( {} );
-WithMoreFontSizes.args = {
-	...Default.args,
-	fontSizes: [
-		{
-			name: 'Tiny',
-			slug: 'tiny',
-			size: 8,
-		},
-		{
-			name: 'Small',
-			slug: 'small',
-			size: 12,
-		},
-		{
-			name: 'Normal',
-			slug: 'normal',
-			size: 16,
-		},
-		{
-			name: 'Big',
-			slug: 'big',
-			size: 26,
-		},
-		{
-			name: 'Bigger',
-			slug: 'bigger',
-			size: 30,
-		},
-		{
-			name: 'Huge',
-			slug: 'huge',
-			size: 36,
-		},
-	],
-	value: 8,
+export const WithMoreFontSizes: FontSizePickerStory = {
+	render: FontSizePickerWithState,
+	args: {
+		...Default.args,
+		fontSizes: [
+			{
+				name: 'Tiny',
+				slug: 'tiny',
+				size: 8,
+			},
+			{
+				name: 'Small',
+				slug: 'small',
+				size: 12,
+			},
+			{
+				name: 'Normal',
+				slug: 'normal',
+				size: 16,
+			},
+			{
+				name: 'Big',
+				slug: 'big',
+				size: 26,
+			},
+			{
+				name: 'Bigger',
+				slug: 'bigger',
+				size: 30,
+			},
+			{
+				name: 'Huge',
+				slug: 'huge',
+				size: 36,
+			},
+		],
+		value: 8,
+	},
 };
 
 /**
  * When units like `px` are specified explicitly, it will be shown as a label hint.
  */
-export const WithUnits: StoryFn< typeof FontSizePicker > =
-	TwoFontSizePickersWithState.bind( {} );
-WithUnits.args = {
-	...WithMoreFontSizes.args,
-	fontSizes: WithMoreFontSizes.args.fontSizes?.map( ( option ) => ( {
-		...option,
-		size: `${ option.size }px`,
-	} ) ),
-	value: '8px',
+export const WithUnits: FontSizePickerStory = {
+	render: TwoFontSizePickersWithState,
+	args: {
+		...WithMoreFontSizes.args,
+		fontSizes: WithMoreFontSizes.args?.fontSizes?.map( ( option ) => ( {
+			...option,
+			size: `${ option.size }px`,
+		} ) ),
+		value: '8px',
+	},
 };
 
 /**
  * The label hint will not be shown if it is a complex CSS value. Some examples of complex CSS values
  * in this context are CSS functions like `calc()`, `clamp()`, and `var()`.
  */
-export const WithComplexCSSValues: StoryFn< typeof FontSizePicker > =
-	TwoFontSizePickersWithState.bind( {} );
-WithComplexCSSValues.args = {
-	...Default.args,
-	fontSizes: [
-		{
-			name: 'Small',
-			slug: 'small',
-			// Adding just one complex css value is enough
-			size: 'clamp(1.75rem, 3vw, 2.25rem)',
-		},
-		{
-			name: 'Medium',
-			slug: 'medium',
-			size: '1.125rem',
-		},
-		{
-			name: 'Large',
-			slug: 'large',
-			size: '1.7rem',
-		},
-		{
-			name: 'Extra Large',
-			slug: 'extra-large',
-			size: '1.95rem',
-		},
-		{
-			name: 'Extra Extra Large',
-			slug: 'extra-extra-large',
-			size: '2.5rem',
-		},
-		{
-			name: 'Huge',
-			slug: 'huge',
-			size: '2.8rem',
-		},
-	],
-	value: '1.125rem',
+export const WithComplexCSSValues: FontSizePickerStory = {
+	render: TwoFontSizePickersWithState,
+	args: {
+		...Default.args,
+		fontSizes: [
+			{
+				name: 'Small',
+				slug: 'small',
+				// Adding just one complex css value is enough
+				size: 'clamp(1.75rem, 3vw, 2.25rem)',
+			},
+			{
+				name: 'Medium',
+				slug: 'medium',
+				size: '1.125rem',
+			},
+			{
+				name: 'Large',
+				slug: 'large',
+				size: '1.7rem',
+			},
+			{
+				name: 'Extra Large',
+				slug: 'extra-large',
+				size: '1.95rem',
+			},
+			{
+				name: 'Extra Extra Large',
+				slug: 'extra-extra-large',
+				size: '2.5rem',
+			},
+			{
+				name: 'Huge',
+				slug: 'huge',
+				size: '2.8rem',
+			},
+		],
+		value: '1.125rem',
+	},
 };

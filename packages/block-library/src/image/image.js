@@ -258,6 +258,7 @@ function ContentOnlyControls( {
 
 export default function Image( {
 	temporaryURL,
+	isSideloading,
 	attributes,
 	setAttributes,
 	isSingleSelected,
@@ -874,7 +875,9 @@ export default function Image( {
 									onSelectURL={ onSelectURL }
 									onError={ onUploadError }
 									onReset={ () => onSelectImage( undefined ) }
-									isUploading={ !! temporaryURL }
+									isUploading={
+										!! temporaryURL || isSideloading
+									}
 									emptyLabel={ __( 'Add image' ) }
 								/>
 							</ToolsPanelItem>
@@ -1065,7 +1068,7 @@ export default function Image( {
 						...shadowProps.style,
 					} }
 				/>
-				{ temporaryURL && <Spinner /> }
+				{ ( temporaryURL || isSideloading ) && <Spinner /> }
 			</>
 		);
 

@@ -162,9 +162,6 @@ function gutenberg_maintain_templates_routes() {
 //    EditorProvider assumes templates are posts.
 add_action( 'init', 'gutenberg_setup_static_template' );
 
-/**
- * @global array $wp_post_types List of post types.
- */
 function gutenberg_setup_static_template() {
 	register_setting(
 		'reading',

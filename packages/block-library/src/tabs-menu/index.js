@@ -1,11 +1,14 @@
 /**
+ * WordPress dependencies
+ */
+import { tabsMenu as icon } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import initBlock from '../utils/init-block';
 import edit from './edit';
 import save from './save';
-import icon from './icon';
-
 import metadata from './block.json';
 
 const { name } = metadata;

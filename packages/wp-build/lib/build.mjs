@@ -837,6 +837,9 @@ async function inferStyleDependencies( scriptDependencies, packageName ) {
  * @param {Record<string, string>} replacements PHP template replacements.
  */
 async function generateModuleRegistrationPhp( modules, replacements ) {
+	// Sort modules by ID for deterministic output.
+	modules.sort( ( a, b ) => a.id.localeCompare( b.id ) );
+
 	// Generate modules array for registry
 	const modulesArray = modules
 		.map(
@@ -870,6 +873,9 @@ async function generateModuleRegistrationPhp( modules, replacements ) {
  * @param {Record<string, string>} replacements PHP template replacements.
  */
 async function generateScriptRegistrationPhp( scripts, replacements ) {
+	// Sort scripts by handle for deterministic output.
+	scripts.sort( ( a, b ) => a.handle.localeCompare( b.handle ) );
+
 	// Generate scripts array for registry
 	const scriptsArray = scripts
 		.map(
@@ -916,6 +922,9 @@ async function generateConstantsPhp( replacements ) {
  * @param {Record<string, string>} replacements PHP template replacements.
  */
 async function generateStyleRegistrationPhp( styles, replacements ) {
+	// Sort styles by handle for deterministic output.
+	styles.sort( ( a, b ) => a.handle.localeCompare( b.handle ) );
+
 	// Generate styles array for registry
 	const stylesArray = styles
 		.map(

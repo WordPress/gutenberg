@@ -16,7 +16,7 @@ import useRefEffect from '../use-ref-effect';
 /**
  * @template T
  * @param {T} value
- * @return {import('react').RefObject<T>} The updated ref
+ * @return {React.RefObject<T>} The updated ref
  */
 function useUpdatedRef( value ) {
 	const ref = useRef( value );
@@ -34,7 +34,7 @@ function useUpdatedRef( value ) {
  *                                            already available and expensive to compute.
  * @param {Function}                onSuccess Called when to text is copied.
  *
- * @return {import('react').Ref<TElementType>} A ref to assign to the target element.
+ * @return {React.Ref<TElementType>} A ref to assign to the target element.
  */
 export default function useCopyToClipboard( text, onSuccess ) {
 	// Store the dependencies as refs and continuously update them so they're

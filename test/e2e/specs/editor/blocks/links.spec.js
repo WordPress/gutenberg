@@ -53,14 +53,11 @@ test.describe( 'Links', () => {
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content:
-						'Here comes a link: <a href="http://localhost:8889/?p=' +
-						postId +
-						'" data-type="post" data-id="' +
-						postId +
-						'">' +
-						titleText +
-						'</a>',
+					content: expect.stringMatching(
+						new RegExp(
+							`Here comes a link: <a href="[^"]*" data-type="post" data-id="${ postId }">${ titleText }</a>`
+						)
+					),
 				},
 			},
 		] );
@@ -385,7 +382,7 @@ test.describe( 'Links', () => {
 		await expect(
 			page.getByRole( 'option', {
 				// "post" disambiguates from the "Create page" option.
-				name: `${ titleText } post`,
+				name: new RegExp( `${ titleText }.*post` ),
 			} )
 		).toBeVisible();
 
@@ -641,11 +638,12 @@ test.describe( 'Links', () => {
 
 		await expect( linkPopover ).toBeHidden();
 
+		// LinkControl normalizes bare domains to https://
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
-					content: 'This is <a href="http://w.org">WordPress</a>',
+					content: 'This is <a href="https://w.org">WordPress</a>',
 				},
 			},
 		] );
@@ -672,12 +670,54 @@ test.describe( 'Links', () => {
 		await expect( linkPopover ).toBeHidden();
 
 		// The link should have been updated.
+		// LinkControl normalizes bare domains to https://
 		await expect.poll( editor.getBlocks ).toMatchObject( [
 			{
 				name: 'core/paragraph',
 				attributes: {
 					content:
-						'This is <a href="http://wordpress.org">WordPress</a>',
+						'This is <a href="https://wordpress.org">WordPress</a>',
+				},
+			},
+		] );
+	} );
+
+	test( 'correctly updates the link when caret at outer edge of format boundary', async ( {
+		page,
+		editor,
+		LinkUtils,
+	} ) => {
+		await editor.insertBlock( {
+			name: 'core/paragraph',
+			attributes: {
+				content:
+					'<a href="https://wordpress.org/gutenberg">Gutenberg</a> is awesome',
+			},
+		} );
+
+		// Change the link text by typing to trigger a RichText value change.
+		await editor.canvas
+			.getByRole( 'link', { name: 'Gutenberg' } )
+			.dblclick();
+		await page.keyboard.type( 'Block Editor' );
+
+		const linkPopover = LinkUtils.getLinkPopover();
+		await expect( linkPopover ).toBeVisible();
+
+		// Edit only the URL.
+		await linkPopover.getByRole( 'button', { name: 'Edit' } ).click();
+		await linkPopover
+			.getByPlaceholder( 'Search or type URL' )
+			.fill( 'https://wordpress.org' );
+		await linkPopover.getByRole( 'button', { name: 'Apply' } ).click();
+
+		// The link should have the updated URL.
+		await expect.poll( editor.getBlocks ).toMatchObject( [
+			{
+				name: 'core/paragraph',
+				attributes: {
+					content:
+						'<a href="https://wordpress.org">Block Editor</a> is awesome',
 				},
 			},
 		] );
@@ -1184,12 +1224,13 @@ test.describe( 'Links', () => {
 			await pageUtils.pressKeys( 'Enter' );
 
 			// Check that the correct (i.e. last) instance of "a" was replaced with "z".
+			// LinkControl normalizes bare domains to https://
 			await expect.poll( editor.getBlocks ).toMatchObject( [
 				{
 					name: 'core/paragraph',
 					attributes: {
 						content:
-							'a b c <a href="http://www.wordpress.org">z</a>',
+							'a b c <a href="https://www.wordpress.org">z</a>',
 					},
 				},
 			] );

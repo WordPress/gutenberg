@@ -23,6 +23,11 @@ test.use( {
 test.describe( 'Post Editor Template mode', () => {
 	test.beforeAll( async ( { requestUtils } ) => {
 		await requestUtils.activatePlugin( 'gutenberg-test-block-templates' );
+		// Cross-origin isolation (COEP) prevents page navigations
+		// from working properly during template creation.
+		await requestUtils.activatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test.afterEach( async ( { requestUtils } ) => {
@@ -35,6 +40,9 @@ test.describe( 'Post Editor Template mode', () => {
 	test.afterAll( async ( { requestUtils } ) => {
 		await requestUtils.activateTheme( 'twentytwentyone' );
 		await requestUtils.deactivatePlugin( 'gutenberg-test-block-templates' );
+		await requestUtils.deactivatePlugin(
+			'gutenberg-test-plugin-disable-client-side-media-processing'
+		);
 	} );
 
 	test( 'Allow to switch to template mode, edit the template and check the result', async ( {

@@ -61,14 +61,17 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require __DIR__ . '/compat/wordpress-6.9/post-data-block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/term-data-block-bindings.php';
 	require __DIR__ . '/compat/wordpress-6.9/rest-api.php';
-	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-hierarchical-sort.php';
 	require __DIR__ . '/compat/wordpress-6.9/block-comments.php';
 	require __DIR__ . '/compat/wordpress-6.9/class-gutenberg-rest-comment-controller-6-9.php';
 
 	// WordPress 7.0 compat.
+	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-autosaves-controller.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-block-patterns-controller-7-0.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-templates-controller-7-0.php';
 	require __DIR__ . '/compat/wordpress-7.0/class-gutenberg-rest-static-templates-controller.php';
+	require __DIR__ . '/compat/wordpress-7.0/class-wp-icons-registry.php';
+	require __DIR__ . '/compat/wordpress-7.0/class-wp-rest-icons-controller.php';
+	require __DIR__ . '/compat/wordpress-7.0/collaboration.php';
 	require __DIR__ . '/compat/wordpress-7.0/template-activate.php';
 	require __DIR__ . '/compat/wordpress-7.0/rest-api.php';
 	require __DIR__ . '/compat/wordpress-7.0/global-styles.php';
@@ -79,17 +82,11 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	require_once __DIR__ . '/rest-api.php';
 
 	// Experimental autosaves controller override for real-time collaboration.
-	require_once __DIR__ . '/experimental/sync/class-gutenberg-rest-autosaves-controller.php';
 
 	require_once __DIR__ . '/experimental/rest-api.php';
 	require_once __DIR__ . '/experimental/kses-allowed-html.php';
-}
 
-// Experimental HTTP polling sync server.
-if ( ! class_exists( 'Gutenberg_HTTP_Polling_Sync_Server' ) ) {
-	require_once __DIR__ . '/experimental/sync/interface-gutenberg-sync-storage.php';
-	require_once __DIR__ . '/experimental/sync/class-gutenberg-sync-post-meta-storage.php';
-	require_once __DIR__ . '/experimental/sync/class-gutenberg-http-polling-sync-server.php';
+	require_once __DIR__ . '/experimental/class-gutenberg-hierarchical-sort.php';
 }
 
 require_once __DIR__ . '/remove-core-enqueue-scripts.php';
@@ -108,16 +105,19 @@ require __DIR__ . '/compat/wordpress-6.9/client-assets.php';
 
 // WordPress 7.0 compat.
 require __DIR__ . '/compat/wordpress-7.0/preload.php';
-require __DIR__ . '/compat/wordpress-7.0/php-only-blocks.php';
+require __DIR__ . '/compat/wordpress-7.0/auto-register.php';
 require __DIR__ . '/compat/wordpress-7.0/blocks.php';
 require __DIR__ . '/compat/wordpress-7.0/kses.php';
+require __DIR__ . '/compat/wordpress-7.0/media.php';
+
+// Gutenberg plugin compat: disable client-side media processing by default.
+require __DIR__ . '/compat/plugin/media.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
 require __DIR__ . '/experimental/blocks.php';
 require __DIR__ . '/experimental/navigation-theme-opt-in.php';
 require __DIR__ . '/experimental/kses.php';
-require __DIR__ . '/experimental/synchronization.php';
 require __DIR__ . '/experimental/script-modules.php';
 require __DIR__ . '/experimental/pages/site-editor.php';
 require __DIR__ . '/experimental/extensible-site-editor.php';
@@ -193,9 +193,7 @@ require __DIR__ . '/block-supports/block-visibility.php';
 require __DIR__ . '/block-supports/custom-css.php';
 
 // Client-side media processing.
-if ( gutenberg_is_experiment_enabled( 'gutenberg-media-processing' ) ) {
-	require_once __DIR__ . '/experimental/media/load.php';
-}
+require_once __DIR__ . '/media/load.php';
 
 // Interactivity API full-page client-side navigation.
 if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigation' ) ) {
@@ -205,8 +203,3 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-page-client-side-navigatio
 
 // Block patterns for navigation overlays.
 require __DIR__ . '/overlay-patterns.php';
-
-if ( gutenberg_is_experiment_enabled( 'gutenberg-svg-icon-registry' ) ) {
-	require __DIR__ . '/experimental/class-wp-icons-registry.php';
-	require __DIR__ . '/experimental/class-wp-rest-icons-controller.php';
-}
