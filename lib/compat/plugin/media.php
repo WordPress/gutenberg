@@ -16,4 +16,4 @@
  */
 
 // @core-merge: Do not merge this into WordPress core.
-add_filter( 'wp_client_side_media_processing_enabled', '__return_false' );
+add_filter( 'wp_client_side_media_processing_enabled', '__return_true' );
