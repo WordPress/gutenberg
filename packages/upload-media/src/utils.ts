@@ -5,6 +5,11 @@ import { getFilename } from '@wordpress/url';
 import { _x } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import { detectClientSideMediaSupport } from './feature-detection';
+
+/**
  * Converts a Blob to a File with a default name like "image.png".
  *
  * If it is already a File object, it is returned unchanged.
@@ -87,4 +92,60 @@ export function getFileBasename( name: string ): string {
  */
 export function getFileNameFromUrl( url: string ) {
 	return getFilename( url ) || _x( 'unnamed', 'file name' );
+}
+
+/**
+ * Flag to track if we've already logged the fallback message.
+ */
+let hasLoggedFallback = false;
+
+/**
+ * Cached result of whether client-side media processing should be enabled.
+ * This is computed once per session for efficiency and stability.
+ */
+let isClientSideMediaEnabledCache: boolean | null = null;
+
+/**
+ * Checks if client-side media processing should be enabled.
+ *
+ * Returns true only if:
+ * 1. The client-side media processing flag is enabled
+ * 2. The browser supports WebAssembly, SharedArrayBuffer, cross-origin isolation, and CSP allows blob workers
+ *
+ * The result is cached for the session to ensure stability during React renders.
+ *
+ * @return Whether client-side media processing should be enabled.
+ */
+export function shouldEnableClientSideMediaProcessing(): boolean {
+	// Return cached result if available.
+	if ( isClientSideMediaEnabledCache !== null ) {
+		return isClientSideMediaEnabledCache;
+	}
+
+	// Check if the client-side media processing flag is enabled first.
+	if (
+		typeof window !== 'undefined' &&
+		! ( window as any ).__clientSideMediaProcessing
+	) {
+		isClientSideMediaEnabledCache = false;
+		return false;
+	}
+
+	const detection = detectClientSideMediaSupport();
+
+	if ( ! detection || ! detection.supported ) {
+		// Only log once per session to avoid console spam.
+		if ( ! hasLoggedFallback ) {
+			// eslint-disable-next-line no-console
+			console.info(
+				`Client-side media processing unavailable: ${ detection.reason }. Using server-side processing.`
+			);
+			hasLoggedFallback = true;
+		}
+		isClientSideMediaEnabledCache = false;
+		return false;
+	}
+
+	isClientSideMediaEnabledCache = true;
+	return true;
 }

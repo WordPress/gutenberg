@@ -12,5 +12,7 @@ export {
 	isClientSideMediaSupported,
 } from './feature-detection';
 
+export { shouldEnableClientSideMediaProcessing } from './utils';
+
 export type { ImageFormat } from './store/types';
 export type { FeatureDetectionResult } from './feature-detection';
