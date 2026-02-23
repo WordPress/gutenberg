@@ -28,7 +28,7 @@
 
 		"resolveJsonModule": true,
 
-		"typeRoots": [ "./typings", "./node_modules/@types" ],
+		"typeRoots": [ "./typings", "${configDir}/node_modules/@types" ],
 		"types": [],
 
 		"rootDir": "${configDir}/src",

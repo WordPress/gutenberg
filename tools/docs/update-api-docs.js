@@ -221,14 +221,7 @@ glob.stream( [
 					resolve( dirname( file ), path )
 				);
 				await execa(
-					join(
-						__dirname,
-						'..',
-						'..',
-						'node_modules',
-						'.bin',
-						'docgen'
-					),
+					join( __dirname, 'node_modules', '.bin', 'docgen' ),
 					[
 						sourcePath,
 						'--output',

@@ -55,15 +55,35 @@ function run( command, args, options = {} ) {
 	}
 }
 
+/*
+ * Under an isolated install layout, transitive deps are not hoisted to the root `node_modules/`.
+ * `@wordpress/scripts` shells out to webpack, eslint, etc. via `resolve-bin`,
+ * which calls `require.resolve` from its own location in the dep store and
+ * therefore can't see those sibling packages. Adding `packages/scripts/`'s
+ * own `node_modules/` as a `NODE_PATH` fallback lets Node find them.
+ */
+const NODE_PATH = [
+	path.join( ROOT, 'packages/scripts/node_modules' ),
+	process.env.NODE_PATH,
+]
+	.filter( Boolean )
+	.join( path.delimiter );
+
+const VALIDATION_BIN = path.join( __dirname, 'node_modules', '.bin' );
+const ROOT_BIN = path.join( ROOT, 'node_modules', '.bin' );
+
 /**
- * Execute a command via `npm exec` and exit on failure.
+ * Execute a binary from this workspace's `node_modules/.bin/` and exit on
+ * failure. Avoids `npm exec`, which can't find bins only installed in
+ * `tools/validation/node_modules/.bin/` (e.g. `wp-create-block`) when invoked
+ * from the repo root under an isolated install.
  *
- * @param {string}   bin     Binary to execute (must be in `devDependencies`).
+ * @param {string}   bin     Bin name (must be in this workspace's `devDependencies`).
  * @param {string[]} args    Command arguments.
  * @param {Object}   options Spawn options.
  */
-function npmExec( bin, args, options = {} ) {
-	run( 'npm', [ 'exec', '--no', '--', bin, ...args ], options );
+function workspaceBin( bin, args, options = {} ) {
+	run( path.join( VALIDATION_BIN, bin ), args, options );
 }
 
 /**
@@ -72,7 +92,10 @@ function npmExec( bin, args, options = {} ) {
  * @param {...string} args Command arguments forwarded to `wp-scripts`.
  */
 function wpScripts( ...args ) {
-	npmExec( 'wp-scripts', args, { cwd: STATIC_BLOCK } );
+	run( path.join( ROOT_BIN, 'wp-scripts' ), args, {
+		cwd: STATIC_BLOCK,
+		env: { ...process.env, NODE_PATH },
+	} );
 }
 
 /**
@@ -135,7 +158,7 @@ process.on( 'SIGTERM', () => process.exit( 1 ) );
 
 // First test block.
 status( 'Scaffolding Example Static (ES5) block...' );
-npmExec( 'wp-create-block', [ 'example-static-es5', '-t', 'es5' ], {
+workspaceBin( 'wp-create-block', [ 'example-static-es5', '-t', 'es5' ], {
 	cwd: ROOT,
 } );
 
@@ -144,7 +167,7 @@ expectFileCount( ES5_BLOCK, 'the project root', 1, 8 );
 
 // Second test block.
 status( 'Scaffolding Example Static block...' );
-npmExec( 'wp-create-block', [ 'example-static', '--no-wp-scripts' ], {
+workspaceBin( 'wp-create-block', [ 'example-static', '--no-wp-scripts' ], {
 	cwd: ROOT,
 } );
 

@@ -51,12 +51,19 @@ jobs:
 
             - name: Install test-runner and Playwright dependencies
               run: |
-                  npm install --no-save @storybook/test-runner@0.24.2
+                  # storybook and playwright are needed as peer dependencies of @storybook/test-runner
+                  STORYBOOK_VERSION=$(node -p "require('./storybook/package.json').devDependencies.storybook")
+                  npm install --save-dev "storybook@$STORYBOOK_VERSION" @storybook/test-runner@0.24.2 playwright
                   npx playwright install --with-deps
 
             - name: Serve Storybook and run tests
               run: |
-                  npx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
-                  "npx http-server ./storybook/build --port 50240 --silent" \
-                  "npx wait-on tcp:127.0.0.1:50240 && \
-                  npx test-storybook --url http://localhost:50240 --config-dir ./storybook"
+                  npx http-server ./storybook/build --port 50240 --silent &
+                  SERVER_PID=$!
+                  # Wait for server to be ready
+                  until curl -sf http://127.0.0.1:50240 > /dev/null 2>&1; do sleep 1; done
+                  # Run tests (kill server on exit)
+                  npx test-storybook --url http://localhost:50240 --config-dir ./storybook
+                  EXIT_CODE=$?
+                  kill $SERVER_PID 2>/dev/null || true
+                  exit $EXIT_CODE

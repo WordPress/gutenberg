@@ -34,9 +34,20 @@ runs:
 
         - name: Cache node_modules
           id: cache-node_modules
+          # Skip on Windows: restoring the linked layout's symlinks via the cache is unreliable there.
+          if: runner.os != 'Windows'
           uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
           with:
-              path: '**/node_modules'
+              # List workspace node_modules explicitly. A '**/node_modules' glob
+              # follows the linked layout's symlinks and stalls the cache step.
+              path: |
+                  node_modules
+                  packages/*/node_modules
+                  routes/*/node_modules
+                  storybook/node_modules
+                  test/*/node_modules
+                  tools/*/node_modules
+                  widgets/*/node_modules
               key: node_modules-${{ runner.os }}-${{ runner.arch }}-${{ steps.node-version.outputs.NODE_VERSION }}-${{ hashFiles('package-lock.json', 'patches/**') }}
 
         - name: Install npm dependencies
