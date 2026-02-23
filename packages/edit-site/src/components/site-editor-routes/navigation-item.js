@@ -9,6 +9,7 @@ import { privateApis as routerPrivateApis } from '@wordpress/router';
 import Editor from '../editor';
 import SidebarNavigationScreenNavigationMenu from '../sidebar-navigation-screen-navigation-menu';
 import SidebarNavigationScreenUnsupported from '../sidebar-navigation-screen-unsupported';
+import NavigationMenuTemplateAreas from '../sidebar-navigation-screen-navigation-menu/navigation-menu-template-areas';
 import { unlock } from '../../lock-unlock';
 
 const { useLocation } = unlock( routerPrivateApis );
@@ -39,7 +40,7 @@ export const navigationItemRoute = {
 		preview( { siteData } ) {
 			const isBlockTheme = siteData.currentTheme?.is_block_theme;
 			return isBlockTheme ? (
-				<Editor />
+				<NavigationMenuTemplateAreas />
 			) : (
 				<SidebarNavigationScreenUnsupported />
 			);
