@@ -148,24 +148,6 @@ export function findSelectionFromHistory(
 }
 
 /**
- * Given a Y.Doc and a selection history, convert only the latest (first) entry
- * in the history to a WPSelection.
- * @param ydoc             The Y.Doc to resolve positions against
- * @param selectionHistory The selection history to check
- * @return The latest selection converted to WPSelection, or null if it cannot be converted or the history is empty.
- */
-export function getLatestSelectionFromHistory(
-	ydoc: Y.Doc,
-	selectionHistory: YFullSelection[]
-): WPSelection | null {
-	if ( selectionHistory.length === 0 ) {
-		return null;
-	}
-
-	return convertYFullSelectionToWPSelection( selectionHistory[ 0 ], ydoc );
-}
-
-/**
  * Restore the selection to the most recent selection in history that is
  * available in the document.
  * @param selectionHistory The selection history to restore
@@ -235,4 +217,49 @@ export function restoreSelection(
 		// where the user's cursor ended.
 		resetSelection( selectionEnd, selectionEnd, 0 );
 	}
+}
+
+/**
+ * If the latest selection has been shifted by remote edits, resolve and return
+ * it as a WPSelection. Returns null when the history is empty or neither
+ * endpoint has moved.
+ *
+ * @param ydoc             The Y.Doc to resolve positions against
+ * @param selectionHistory The selection history to check
+ * @return The shifted WPSelection, or null if nothing moved.
+ */
+export function getShiftedSelection(
+	ydoc: Y.Doc,
+	selectionHistory: YFullSelection[]
+): WPSelection | null {
+	if ( selectionHistory.length === 0 ) {
+		return null;
+	}
+
+	const { start, end } = selectionHistory[ 0 ];
+
+	// Block-level selections have no offset that can shift.
+	if (
+		start.type === YSelectionType.BlockSelection ||
+		end.type === YSelectionType.BlockSelection
+	) {
+		return null;
+	}
+
+	const selectionStart = convertYSelectionToBlockSelection( start, ydoc );
+	const selectionEnd = convertYSelectionToBlockSelection( end, ydoc );
+
+	if ( ! selectionStart || ! selectionEnd ) {
+		return null;
+	}
+
+	// Only dispatch if at least one endpoint actually moved.
+	const startShifted = selectionStart.offset !== start.offset;
+	const endShifted = selectionEnd.offset !== end.offset;
+
+	if ( ! startShifted && ! endShifted ) {
+		return null;
+	}
+
+	return { selectionStart, selectionEnd };
 }

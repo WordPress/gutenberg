@@ -35,8 +35,8 @@ import {
 } from '../sync';
 import type { WPSelection } from '../types';
 import {
-	getLatestSelectionFromHistory,
 	getSelectionHistory,
+	getShiftedSelection,
 	updateSelectionHistory,
 } from './crdt-selection';
 import {
@@ -426,18 +426,12 @@ export function getPostChangesFromCRDTDoc(
 	// relative positions to absolute gives corrected offsets. Including the
 	// selection in PostChanges ensures it dispatches atomically with content.
 	const selectionHistory = getSelectionHistory( ydoc );
-	if ( selectionHistory.length > 0 ) {
-		const recalculatedSelection = getLatestSelectionFromHistory(
-			ydoc,
-			selectionHistory
-		);
-
-		if ( recalculatedSelection ) {
-			changes.selection = {
-				...recalculatedSelection,
-				initialPosition: 0,
-			};
-		}
+	const shiftedSelection = getShiftedSelection( ydoc, selectionHistory );
+	if ( shiftedSelection ) {
+		changes.selection = {
+			...shiftedSelection,
+			initialPosition: 0,
+		};
 	}
 
 	return changes;
