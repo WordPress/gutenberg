@@ -33,15 +33,6 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
 		return cachedResult;
 	}
 
-	// Check WebAssembly support.
-	if ( typeof WebAssembly === 'undefined' ) {
-		cachedResult = {
-			supported: false,
-			reason: 'WebAssembly is not supported in this browser',
-		};
-		return cachedResult;
-	}
-
 	// Check SharedArrayBuffer support (required for WASM threading).
 	if ( typeof SharedArrayBuffer === 'undefined' ) {
 		cachedResult = {

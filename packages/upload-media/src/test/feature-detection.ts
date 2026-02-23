@@ -51,18 +51,6 @@ describe( 'feature-detection', () => {
 			expect( result.reason ).toBeUndefined();
 		} );
 
-		it( 'returns not supported when WebAssembly is unavailable', () => {
-			// @ts-ignore - Intentionally setting WebAssembly to undefined for testing.
-			global.WebAssembly = undefined;
-
-			const result = detectClientSideMediaSupport();
-
-			expect( result.supported ).toBe( false );
-			expect( result.reason ).toBe(
-				'WebAssembly is not supported in this browser'
-			);
-		} );
-
 		it( 'returns not supported when SharedArrayBuffer is unavailable', () => {
 			global.WebAssembly = originalWebAssembly;
 			// @ts-ignore - Intentionally setting SharedArrayBuffer to undefined for testing.
