@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import { Button } from '@wordpress/components';
 import {
 	registerConnector,
@@ -8,7 +9,7 @@ import {
 	DefaultConnectorSettings,
 	type ConnectorRenderProps,
 } from '@wordpress/connectors';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -142,9 +143,109 @@ function ClaudeConnector( { label, description }: ConnectorRenderProps ) {
 	);
 }
 
+type PluginStatus = 'checking' | 'not-installed' | 'inactive' | 'active';
+
 // Gemini connector render component
 function GeminiConnector( { label, description }: ConnectorRenderProps ) {
+	const [ pluginStatus, setPluginStatus ] =
+		useState< PluginStatus >( 'checking' );
 	const [ isExpanded, setIsExpanded ] = useState( false );
+	const [ isBusy, setIsBusy ] = useState( false );
+
+	// Check plugin status on mount
+	useEffect( () => {
+		const checkPluginStatus = async () => {
+			try {
+				const plugins = await apiFetch<
+					Array< { plugin: string; status: string } >
+				>( {
+					path: '/wp/v2/plugins',
+				} );
+
+				const googleAiPlugin = plugins.find(
+					( p ) => p.plugin === 'google-ai-provider/plugin'
+				);
+
+				if ( ! googleAiPlugin ) {
+					setPluginStatus( 'not-installed' );
+				} else if ( googleAiPlugin.status === 'active' ) {
+					setPluginStatus( 'active' );
+				} else {
+					setPluginStatus( 'inactive' );
+				}
+			} catch {
+				// If we can't check, assume not installed
+				setPluginStatus( 'not-installed' );
+			}
+		};
+
+		checkPluginStatus();
+	}, [] );
+
+	const installPlugin = async () => {
+		setIsBusy( true );
+		try {
+			await apiFetch( {
+				method: 'POST',
+				path: '/wp/v2/plugins',
+				data: { slug: 'google-ai-provider', status: 'active' },
+			} );
+			setPluginStatus( 'active' );
+			setIsExpanded( true );
+		} catch {
+			// Handle error (could show notice)
+		} finally {
+			setIsBusy( false );
+		}
+	};
+
+	const activatePlugin = async () => {
+		setIsBusy( true );
+		try {
+			await apiFetch( {
+				method: 'PUT',
+				path: '/wp/v2/plugins/google-ai-provider/plugin',
+				data: { status: 'active' },
+			} );
+			setPluginStatus( 'active' );
+			setIsExpanded( true );
+		} catch {
+			// Handle error
+		} finally {
+			setIsBusy( false );
+		}
+	};
+
+	const handleButtonClick = () => {
+		if ( pluginStatus === 'not-installed' ) {
+			installPlugin();
+		} else if ( pluginStatus === 'inactive' ) {
+			activatePlugin();
+		} else {
+			setIsExpanded( ! isExpanded );
+		}
+	};
+
+	const getButtonLabel = () => {
+		if ( isBusy ) {
+			return pluginStatus === 'not-installed'
+				? __( 'Installing…' )
+				: __( 'Activating…' );
+		}
+		if ( isExpanded ) {
+			return __( 'Close' );
+		}
+		switch ( pluginStatus ) {
+			case 'checking':
+				return __( 'Checking…' );
+			case 'not-installed':
+				return __( 'Install' );
+			case 'inactive':
+				return __( 'Activate' );
+			case 'active':
+				return __( 'Set up' );
+		}
+	};
 
 	return (
 		<ConnectorItem
@@ -155,16 +256,22 @@ function GeminiConnector( { label, description }: ConnectorRenderProps ) {
 				<Button
 					variant="secondary"
 					size="compact"
-					icon={ isExpanded ? chevronUp : chevronDown }
+					icon={
+						pluginStatus === 'active' && isExpanded
+							? chevronUp
+							: undefined
+					}
 					iconPosition="right"
-					onClick={ () => setIsExpanded( ! isExpanded ) }
+					onClick={ handleButtonClick }
+					disabled={ pluginStatus === 'checking' || isBusy }
+					isBusy={ isBusy }
 					aria-expanded={ isExpanded }
 				>
-					{ isExpanded ? __( 'Close' ) : __( 'Install' ) }
+					{ getButtonLabel() }
 				</Button>
 			}
 		>
-			{ isExpanded && (
+			{ isExpanded && pluginStatus === 'active' && (
 				<DefaultConnectorSettings
 					onSave={ ( apiKey: string ) => {
 						// eslint-disable-next-line no-console
