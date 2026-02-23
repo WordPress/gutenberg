@@ -19,9 +19,9 @@ import {
 import { createSyncManager } from '../manager';
 import {
 	CRDT_RECORD_MAP_KEY,
-	CRDT_RECORD_METADATA_MAP_KEY as RECORD_METADATA_MAP_KEY,
-	CRDT_RECORD_METADATA_SAVED_AT_KEY as SAVED_AT_KEY,
-	CRDT_RECORD_METADATA_SAVED_BY_KEY as SAVED_BY_KEY,
+	CRDT_STATE_MAP_KEY,
+	CRDT_STATE_MAP_SAVED_AT_KEY as SAVED_AT_KEY,
+	CRDT_STATE_MAP_SAVED_BY_KEY as SAVED_BY_KEY,
 } from '../config';
 import { createPersistedCRDTDoc } from '../persistence';
 import { getProviderCreators } from '../providers';
@@ -524,9 +524,9 @@ describe( 'SyncManager', () => {
 
 			// Verify that the record metadata was not updated.
 			const ydoc = capturedDoc as unknown as Y.Doc;
-			const metadataMap = ydoc.getMap( RECORD_METADATA_MAP_KEY );
-			expect( metadataMap.get( SAVED_AT_KEY ) ).toBeUndefined();
-			expect( metadataMap.get( SAVED_BY_KEY ) ).toBeUndefined();
+			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+			expect( stateMap.get( SAVED_AT_KEY ) ).toBeUndefined();
+			expect( stateMap.get( SAVED_BY_KEY ) ).toBeUndefined();
 		} );
 
 		it( 'does not update when entity is not loaded', async () => {
@@ -622,11 +622,11 @@ describe( 'SyncManager', () => {
 
 			// Verify that the record metadata was updated.
 			const ydoc = capturedDoc as unknown as Y.Doc;
-			const metadataMap = ydoc.getMap( RECORD_METADATA_MAP_KEY );
-			expect( metadataMap.get( SAVED_AT_KEY ) ).toBeGreaterThanOrEqual(
+			const stateMap = ydoc.getMap( CRDT_STATE_MAP_KEY );
+			expect( stateMap.get( SAVED_AT_KEY ) ).toBeGreaterThanOrEqual(
 				now
 			);
-			expect( metadataMap.get( SAVED_BY_KEY ) ).toBe( ydoc.clientID );
+			expect( stateMap.get( SAVED_BY_KEY ) ).toBe( ydoc.clientID );
 		} );
 	} );
 
