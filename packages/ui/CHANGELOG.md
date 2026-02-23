@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+-   `IconButton`: Hide tooltip when the button is truly disabled ([#75754](https://github.com/WordPress/gutenberg/pull/75754)).
+
+### Internal
+
+-   Update `@base-ui/react` from 1.0.0 to 1.2.0 ([#75698](https://github.com/WordPress/gutenberg/pull/75698)).
+-   `Input`: Align ref type with upstream widening to `HTMLElement` ([#75698](https://github.com/WordPress/gutenberg/pull/75698)).
+
 ## 0.7.0 (2026-02-18)
 
 ### Breaking Changes

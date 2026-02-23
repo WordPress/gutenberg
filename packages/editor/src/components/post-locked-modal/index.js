@@ -152,10 +152,8 @@ function PostLockedModal() {
 	}
 
 	// Avoid sending the modal if sync is supported, but retain functionality around locks etc.
-	if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-		if ( isCollaborationEnabled ) {
-			return null;
-		}
+	if ( isCollaborationEnabled ) {
+		return null;
 	}
 
 	const userDisplayName = user.name;

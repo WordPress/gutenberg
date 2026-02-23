@@ -598,6 +598,7 @@ class LinkControl {
 
 		return result
 			.locator( '.components-menu-item__item' ) // this is the only way to get the label text without the URL.
+			.last()
 			.innerText();
 	}
 }

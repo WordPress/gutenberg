@@ -5,8 +5,10 @@ on:
         branches:
             - trunk
     # We also want to attempt cherry-picking when a PR is labeled after the PR
-    # is merged.
-    pull_request:
+    # is merged. Using pull_request_target instead of pull_request so that
+    # the workflow has access to repository secrets for fork PRs.
+    # https://docs.github.com/en/actions/writing-workflows/choosing-when-your-workflow-runs/events-that-trigger-workflows#pull_request_target
+    pull_request_target:
         types: [labeled]
         branches:
             - trunk

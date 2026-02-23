@@ -340,13 +340,11 @@ export const deleteEntityRecord =
 
 				await dispatch( removeItems( kind, name, recordId, true ) );
 
-				if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-					if ( entityConfig.syncConfig ) {
-						const objectType = `${ kind }/${ name }`;
-						const objectId = recordId;
+				if ( entityConfig.syncConfig ) {
+					const objectType = `${ kind }/${ name }`;
+					const objectId = recordId;
 
-						getSyncManager()?.unload( objectType, objectId );
-					}
+					getSyncManager()?.unload( objectType, objectId );
 				}
 			} catch ( _error ) {
 				hasError = true;
@@ -427,35 +425,33 @@ export const editEntityRecord =
 				return acc;
 			}, {} ),
 		};
-		if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-			if ( entityConfig.syncConfig ) {
-				const objectType = `${ kind }/${ name }`;
-				const objectId = recordId;
+		if ( entityConfig.syncConfig ) {
+			const objectType = `${ kind }/${ name }`;
+			const objectId = recordId;
 
-				// Determine whether this edit should create a new undo level.
-				//
-				// In Gutenberg, block changes flow through two callbacks:
-				// - `onInput`: For transient/in-progress changes (e.g., typing each
-				//   character). These use `isCached: true` and get merged into
-				//   the current undo item.
-				// - `onChange`: For persistent/completed changes (e.g., formatting
-				//   transforms, block insertions). These use `isCached: false` and
-				//   should create a new undo level.
-				//
-				// Additionally, `undoIgnore: true` means the change should not
-				// affect the undo history at all (e.g., selection-only changes).
-				const isNewUndoLevel = options.undoIgnore
-					? false
-					: ! options.isCached;
+			// Determine whether this edit should create a new undo level.
+			//
+			// In Gutenberg, block changes flow through two callbacks:
+			// - `onInput`: For transient/in-progress changes (e.g., typing each
+			//   character). These use `isCached: true` and get merged into
+			//   the current undo item.
+			// - `onChange`: For persistent/completed changes (e.g., formatting
+			//   transforms, block insertions). These use `isCached: false` and
+			//   should create a new undo level.
+			//
+			// Additionally, `undoIgnore: true` means the change should not
+			// affect the undo history at all (e.g., selection-only changes).
+			const isNewUndoLevel = options.undoIgnore
+				? false
+				: ! options.isCached;
 
-				getSyncManager()?.update(
-					objectType,
-					objectId,
-					editsWithMerges,
-					LOCAL_EDITOR_ORIGIN,
-					{ isNewUndoLevel }
-				);
-			}
+			getSyncManager()?.update(
+				objectType,
+				objectId,
+				editsWithMerges,
+				LOCAL_EDITOR_ORIGIN,
+				{ isNewUndoLevel }
+			);
 		}
 		if ( ! options.undoIgnore ) {
 			select.getUndoManager().addRecord(
@@ -796,16 +792,14 @@ export const saveEntityRecord =
 						true,
 						edits
 					);
-					if ( globalThis.IS_GUTENBERG_PLUGIN ) {
-						if ( entityConfig.syncConfig ) {
-							getSyncManager()?.update(
-								`${ kind }/${ name }`,
-								recordId,
-								updatedRecord,
-								LOCAL_EDITOR_ORIGIN,
-								{ isSave: true }
-							);
-						}
+					if ( entityConfig.syncConfig ) {
+						getSyncManager()?.update(
+							`${ kind }/${ name }`,
+							recordId,
+							updatedRecord,
+							LOCAL_EDITOR_ORIGIN,
+							{ isSave: true }
+						);
 					}
 				}
 			} catch ( _error ) {

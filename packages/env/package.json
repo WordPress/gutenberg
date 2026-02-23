@@ -44,7 +44,7 @@
 	},
 	"dependencies": {
 		"@inquirer/prompts": "^7.2.0",
-		"@wp-playground/cli": "^3.0.0",
+		"@wp-playground/cli": "^3.0.48",
 		"chalk": "^4.0.0",
 		"copy-dir": "^1.3.0",
 		"cross-spawn": "^7.0.6",

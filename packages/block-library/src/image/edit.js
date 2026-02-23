@@ -348,7 +348,7 @@ export function ImageEdit( {
 
 	const isSideloading = useSelect(
 		( select ) => {
-			if ( ! window.__experimentalMediaProcessing || ! id ) {
+			if ( ! window.__clientSideMediaProcessing || ! id ) {
 				return false;
 			}
 			return select( uploadStore ).isUploadingById( id );
