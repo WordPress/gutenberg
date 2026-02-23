@@ -60,7 +60,7 @@ module.exports = async function loadConfig(
 	// If a custom config path was provided, verify the file exists.
 	if ( customConfigPath ) {
 		try {
-			await fs.stat( configFilePath );
+			await fsPromises.stat( configFilePath );
 		} catch {
 			throw new ValidationError(
 				`Config file not found: ${ configFilePath }`
