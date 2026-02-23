@@ -1077,6 +1077,17 @@ export const getRevisions =
 				records = Object.values( response );
 			}
 
+			// Normalize: if the entity uses a custom revisionKey (e.g. 'wp_id'
+			// for templates), copy that value into 'id' so all downstream code
+			// can reference revisions consistently via 'id'.
+			const revKey = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
+			if ( revKey !== DEFAULT_ENTITY_KEY ) {
+				records = records.map( ( record ) => ( {
+					...record,
+					id: record[ revKey ],
+				} ) );
+			}
+
 			// If we request fields but the result doesn't contain the fields,
 			// explicitly set these fields as "undefined"
 			// that way we consider the query "fulfilled".
@@ -1185,6 +1196,12 @@ export const getRevision =
 		}
 
 		if ( record ) {
+			// Normalize: if the entity uses a custom revisionKey (e.g. 'wp_id'
+			// for templates), copy that value into 'id' for consistency.
+			const revKey = entityConfig.revisionKey || DEFAULT_ENTITY_KEY;
+			if ( revKey !== DEFAULT_ENTITY_KEY && record[ revKey ] ) {
+				record = { ...record, id: record[ revKey ] };
+			}
 			dispatch.receiveRevisions( kind, name, recordKey, record, query );
 		}
 	};
