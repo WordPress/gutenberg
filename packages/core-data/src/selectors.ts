@@ -53,18 +53,11 @@ export interface State {
 	registeredPostMeta: Record< string, Object >;
 	editorSettings: Record< string, any > | null;
 	editorAssets: Record< string, any > | null;
-	icons: Icon[];
 	collaborationDisabled: boolean;
 	syncConnectionStatuses?: Record< string, ConnectionStatus >;
 }
 
 type EntityRecordKey = string | number;
-
-export interface Icon {
-	name: string;
-	content: string;
-	label: string;
-}
 
 interface EntitiesState {
 	config: EntityConfig[];

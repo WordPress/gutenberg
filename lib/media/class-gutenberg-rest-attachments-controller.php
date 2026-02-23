@@ -20,38 +20,41 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	public function register_routes(): void {
 		parent::register_routes();
 
-		$valid_image_sizes = array_keys( wp_get_registered_image_subsizes() );
+		// Only register the sideload route if the parent class doesn't already have it.
+		if ( ! method_exists( get_parent_class( $this ), 'sideload_item' ) ) {
+			$valid_image_sizes = array_keys( wp_get_registered_image_subsizes() );
 
-		// Special case to set 'original_image' in attachment metadata.
-		$valid_image_sizes[] = 'original';
-		// Used for PDF thumbnails.
-		$valid_image_sizes[] = 'full';
+			// Special case to set 'original_image' in attachment metadata.
+			$valid_image_sizes[] = 'original';
+			// Used for PDF thumbnails.
+			$valid_image_sizes[] = 'full';
 
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[\d]+)/sideload',
-			array(
+			register_rest_route(
+				$this->namespace,
+				'/' . $this->rest_base . '/(?P<id>[\d]+)/sideload',
 				array(
-					'methods'             => WP_REST_Server::CREATABLE,
-					'callback'            => array( $this, 'sideload_item' ),
-					'permission_callback' => array( $this, 'sideload_item_permissions_check' ),
-					'args'                => array(
-						'id'         => array(
-							'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
-							'type'        => 'integer',
-						),
-						'image_size' => array(
-							'description' => __( 'Image size.', 'gutenberg' ),
-							'type'        => 'string',
-							'enum'        => $valid_image_sizes,
-							'required'    => true,
+					array(
+						'methods'             => WP_REST_Server::CREATABLE,
+						'callback'            => array( $this, 'sideload_item' ),
+						'permission_callback' => array( $this, 'sideload_item_permissions_check' ),
+						'args'                => array(
+							'id'         => array(
+								'description' => __( 'Unique identifier for the attachment.', 'gutenberg' ),
+								'type'        => 'integer',
+							),
+							'image_size' => array(
+								'description' => __( 'Image size.', 'gutenberg' ),
+								'type'        => 'string',
+								'enum'        => $valid_image_sizes,
+								'required'    => true,
+							),
 						),
 					),
-				),
-				'allow_batch' => $this->allow_batch,
-				'schema'      => array( $this, 'get_public_item_schema' ),
-			)
-		);
+					'allow_batch' => $this->allow_batch,
+					'schema'      => array( $this, 'get_public_item_schema' ),
+				)
+			);
+		}
 	}
 
 	/**
@@ -251,16 +254,14 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 	 *
 	 * @link https://github.com/WordPress/wordpress-develop/blob/30954f7ac0840cfdad464928021d7f380940c347/src/wp-includes/functions.php#L2576-L2582
 	 *
-	 * @param string        $filename                 Unique file name.
-	 * @param string        $ext                      File extension. Example: ".png".
-	 * @param string        $dir                      Directory path.
-	 * @param callable|null $unique_filename_callback Callback function that generates the unique file name.
-	 * @param string[]      $alt_filenames            Array of alternate file names that were checked for collisions.
-	 * @param int|string    $number                   The highest number that was used to make the file name unique
-	 *                                                or an empty string if unused.
+	 * @param string     $filename            Unique file name.
+	 * @param string     $dir                 Directory path.
+	 * @param int|string $number              The highest number that was used to make the file name unique
+	 *                                        or an empty string if unused.
+	 * @param string     $attachment_filename Original attachment file name.
 	 * @return string Filtered file name.
 	 */
-	private function filter_wp_unique_filename( $filename, $ext, $dir, $unique_filename_callback, $alt_filenames, $number, $attachment_filename ) {
+	private static function filter_wp_unique_filename( $filename, $dir, $number, $attachment_filename ) {
 		if ( empty( $number ) || ! $attachment_filename ) {
 			return $filename;
 		}
@@ -338,8 +339,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		 *                                                or an empty string if unused.
 		 * @return string Filtered file name.
 		 */
-		$filter_filename = function ( $filename, $ext, $dir, $unique_filename_callback, $alt_filenames, $number ) use ( $attachment_filename ) {
-			return $this->filter_wp_unique_filename( $filename, $ext, $dir, $unique_filename_callback, $alt_filenames, $number, $attachment_filename );
+		$filter_filename = static function ( $filename, $ext, $dir, $unique_filename_callback, $alt_filenames, $number ) use ( $attachment_filename ) {
+			return self::filter_wp_unique_filename( $filename, $dir, $number, $attachment_filename );
 		};
 
 		add_filter( 'wp_unique_filename', $filter_filename, 10, 6 );

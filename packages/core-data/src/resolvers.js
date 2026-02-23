@@ -1255,15 +1255,3 @@ export const getEditorAssets =
 		} );
 		dispatch.receiveEditorAssets( assets );
 	};
-
-/**
- * Requests icons from the REST API.
- */
-export const getIcons =
-	() =>
-	async ( { dispatch } ) => {
-		const icons = await apiFetch( {
-			path: '/wp/v2/icons',
-		} );
-		dispatch.receiveIcons( icons );
-	};

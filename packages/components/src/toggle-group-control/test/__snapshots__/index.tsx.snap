@@ -137,7 +137,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   user-select: none;
   width: 100%;
   z-index: 2;
-  color: var(--wp-components-color-foreground, #1e1e1e);
   height: 38px;
   aspect-ratio: 1;
   padding-left: 0;
@@ -157,12 +156,13 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   border: 0;
 }
 
-.emotion-12[disabled] {
+.emotion-12[disabled],
+.emotion-12[aria-disabled='true'] {
   opacity: 0.4;
   cursor: default;
 }
 
-.emotion-12:hover {
+.emotion-12:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
   color: var(--wp-components-color-foreground, #1e1e1e);
 }
 
@@ -211,7 +211,6 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   user-select: none;
   width: 100%;
   z-index: 2;
-  color: var(--wp-components-color-foreground, #1e1e1e);
   height: 38px;
   aspect-ratio: 1;
   padding-left: 0;
@@ -229,12 +228,13 @@ exports[`ToggleGroupControl controlled should render correctly with icons 1`] = 
   border: 0;
 }
 
-.emotion-17[disabled] {
+.emotion-17[disabled],
+.emotion-17[aria-disabled='true'] {
   opacity: 0.4;
   cursor: default;
 }
 
-.emotion-17:hover {
+.emotion-17:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
   color: var(--wp-components-color-foreground, #1e1e1e);
 }
 
@@ -491,12 +491,13 @@ exports[`ToggleGroupControl controlled should render correctly with text options
   border: 0;
 }
 
-.emotion-12[disabled] {
+.emotion-12[disabled],
+.emotion-12[aria-disabled='true'] {
   opacity: 0.4;
   cursor: default;
 }
 
-.emotion-12:hover {
+.emotion-12:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
   color: var(--wp-components-color-foreground, #1e1e1e);
 }
 
@@ -726,7 +727,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   user-select: none;
   width: 100%;
   z-index: 2;
-  color: var(--wp-components-color-foreground, #1e1e1e);
   height: 38px;
   aspect-ratio: 1;
   padding-left: 0;
@@ -746,12 +746,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   border: 0;
 }
 
-.emotion-12[disabled] {
+.emotion-12[disabled],
+.emotion-12[aria-disabled='true'] {
   opacity: 0.4;
   cursor: default;
 }
 
-.emotion-12:hover {
+.emotion-12:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
   color: var(--wp-components-color-foreground, #1e1e1e);
 }
 
@@ -800,7 +801,6 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   user-select: none;
   width: 100%;
   z-index: 2;
-  color: var(--wp-components-color-foreground, #1e1e1e);
   height: 38px;
   aspect-ratio: 1;
   padding-left: 0;
@@ -818,12 +818,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with icons 1`] 
   border: 0;
 }
 
-.emotion-17[disabled] {
+.emotion-17[disabled],
+.emotion-17[aria-disabled='true'] {
   opacity: 0.4;
   cursor: default;
 }
 
-.emotion-17:hover {
+.emotion-17:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
   color: var(--wp-components-color-foreground, #1e1e1e);
 }
 
@@ -1074,12 +1075,13 @@ exports[`ToggleGroupControl uncontrolled should render correctly with text optio
   border: 0;
 }
 
-.emotion-12[disabled] {
+.emotion-12[disabled],
+.emotion-12[aria-disabled='true'] {
   opacity: 0.4;
   cursor: default;
 }
 
-.emotion-12:hover {
+.emotion-12:hover:not( [disabled] ):not( [aria-disabled='true'] ) {
   color: var(--wp-components-color-foreground, #1e1e1e);
 }
 
