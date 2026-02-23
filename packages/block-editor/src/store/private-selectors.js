@@ -513,12 +513,12 @@ function isSectionBlockCandidate( state, clientId ) {
 	// TemplateLock cascades to all inner parent blocks. Only the top-level
 	// block that's contentOnly templateLocked is the true contentLocker,
 	// all the others are mere imitators.
-	const hasContentOnlyTempateLock =
+	const hasContentOnlyTemplateLock =
 		getTemplateLock( state, clientId ) === 'contentOnly';
 	const rootClientId = getBlockRootClientId( state, clientId );
 	const hasRootContentOnlyTemplateLock =
 		getTemplateLock( state, rootClientId ) === 'contentOnly';
-	if ( hasContentOnlyTempateLock && ! hasRootContentOnlyTemplateLock ) {
+	if ( hasContentOnlyTemplateLock && ! hasRootContentOnlyTemplateLock ) {
 		return true;
 	}
 
