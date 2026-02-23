@@ -3946,6 +3946,248 @@ describe( 'state', () => {
 				expect( derivedBlockEditingModes ).toEqual( new Map() );
 			} );
 
+			it( 'synced pattern inner blocks keep their editing modes when inside an editedContentOnlySection', () => {
+				// Set up an unsynced pattern containing a synced pattern.
+				// When the unsynced pattern is the editedContentOnlySection,
+				// synced pattern inner blocks should retain their locked modes
+				// rather than becoming fully editable ('default').
+				const stateWithSyncedInUnsynced = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ sectionRootClientIdKey ]: '',
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'unsynced-pattern-group',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-in-unsynced',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
+											name: 'core/block',
+											clientId: 'synced-in-unsynced',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'synced-in-unsynced',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'synced-in-unsynced',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId: 'synced-inner-paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+								{
+									name: 'core/group',
+									clientId: 'synced-inner-group',
+									attributes: {},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId:
+												'synced-inner-paragraph-with-overrides',
+											attributes: {
+												metadata: {
+													bindings: {
+														__default:
+															'core/pattern-overrides',
+													},
+												},
+											},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+
+				// Start editing the unsynced pattern section.
+				const editingState = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+							clientId: 'unsynced-pattern-group',
+						},
+					],
+					testReducer,
+					stateWithSyncedInUnsynced
+				);
+
+				expect( editingState.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							// Root is outside the edited section.
+							'': 'disabled',
+							// The edited section itself is fully editable.
+							'unsynced-pattern-group': 'default',
+							// Non-synced child of the edited section is fully editable.
+							'paragraph-in-unsynced': 'default',
+							// synced-in-unsynced (core/block) has no derived mode —
+							// the synced pattern logic returns early without setting one.
+							// Inner blocks of the synced pattern retain their locked modes.
+							'synced-inner-paragraph': 'disabled',
+							'synced-inner-group': 'disabled',
+							'synced-inner-paragraph-with-overrides':
+								'contentOnly',
+						} )
+					)
+				);
+			} );
+
+			it( 'nested synced patterns remain disabled when inside an editedContentOnlySection', () => {
+				// Set up an unsynced pattern containing a synced pattern,
+				// which itself contains another synced pattern.
+				// All doubly-nested synced pattern blocks should remain disabled.
+				const stateWithNestedSynced = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ sectionRootClientIdKey ]: '',
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'unsynced-pattern-group',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-in-unsynced',
+											attributes: {},
+											innerBlocks: [],
+										},
+										{
+											name: 'core/block',
+											clientId: 'synced-in-unsynced',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'synced-in-unsynced',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'synced-in-unsynced',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId:
+										'synced-inner-paragraph-with-overrides',
+									attributes: {
+										metadata: {
+											bindings: {
+												__default:
+													'core/pattern-overrides',
+											},
+										},
+									},
+									innerBlocks: [],
+								},
+								{
+									name: 'core/block',
+									clientId: 'nested-synced',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'nested-synced',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'nested-synced',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId: 'deeply-nested-paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+
+				// Start editing the unsynced pattern section.
+				const editingState = dispatchActions(
+					[
+						{
+							type: 'EDIT_CONTENT_ONLY_SECTION',
+							clientId: 'unsynced-pattern-group',
+						},
+					],
+					testReducer,
+					stateWithNestedSynced
+				);
+
+				expect( editingState.derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							// Root is outside the edited section.
+							'': 'disabled',
+							// The edited section itself is fully editable.
+							'unsynced-pattern-group': 'default',
+							// Non-synced child of the edited section is fully editable.
+							'paragraph-in-unsynced': 'default',
+							// synced-in-unsynced (core/block) has no derived mode.
+							// Its direct inner block with bindings retains contentOnly.
+							'synced-inner-paragraph-with-overrides':
+								'contentOnly',
+							// The doubly-nested synced pattern and its inner blocks
+							// are all disabled.
+							'nested-synced': 'disabled',
+							'deeply-nested-paragraph': 'disabled',
+						} )
+					)
+				);
+			} );
+
 			it( 'returns the expected block editing modes for synced patterns when switching to zoomed out mode', () => {
 				const { derivedBlockEditingModes } = dispatchActions(
 					[
