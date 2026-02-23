@@ -100,32 +100,16 @@ function FallbackView( {
 	);
 }
 
-export default function MediaThumbnailView( {
+function ImageView( {
 	item,
-	config,
-}: DataViewRenderFieldProps< MediaItem > ) {
-	const [ imageError, setImageError ] = useState( false );
-
-	const _featuredMedia = useSelect(
-		( select ) => {
-			// Avoid the network request if it's not needed. `featured_media` is
-			// 0 for images and media without featured media.
-			if ( ! item.featured_media ) {
-				return;
-			}
-			return select( coreStore ).getEntityRecord< Attachment >(
-				'postType',
-				'attachment',
-				item.featured_media
-			);
-		},
-		[ item.featured_media ]
-	);
-	const featuredMedia = item.featured_media ? _featuredMedia : item;
-
-	const imageUrl = featuredMedia
-		? getBestImageUrl( featuredMedia, config?.sizes )
-		: undefined;
+	configSizes,
+	onError,
+}: {
+	item: Attachment | MediaItem;
+	configSizes?: string;
+	onError: () => void;
+} ) {
+	const imageUrl = getBestImageUrl( item, configSizes );
 
 	/*
 	 * Use three states to avoid fade-in animation for cached images:
@@ -154,6 +138,49 @@ export default function MediaThumbnailView( {
 		}
 	};
 
+	return (
+		<div
+			className={ clsx( 'dataviews-media-field__media-thumbnail', {
+				'is-loading': loadingState === 'loading',
+				'is-loaded': loadingState === 'loaded',
+			} ) }
+		>
+			<img
+				ref={ imgRef }
+				className="dataviews-media-field__media-thumbnail--image"
+				src={ imageUrl }
+				alt={ item.alt_text || item.title.raw }
+				onLoad={ handleLoad }
+				onError={ onError }
+				loading="lazy"
+			/>
+		</div>
+	);
+}
+
+export default function MediaThumbnailView( {
+	item,
+	config,
+}: DataViewRenderFieldProps< MediaItem > ) {
+	const [ imageError, setImageError ] = useState( false );
+
+	const _featuredMedia = useSelect(
+		( select ) => {
+			// Avoid the network request if it's not needed. `featured_media` is
+			// 0 for images and media without featured media.
+			if ( ! item.featured_media ) {
+				return;
+			}
+			return select( coreStore ).getEntityRecord< Attachment >(
+				'postType',
+				'attachment',
+				item.featured_media
+			);
+		},
+		[ item.featured_media ]
+	);
+	const featuredMedia = item.featured_media ? _featuredMedia : item;
+
 	// Fetching.
 	if ( ! featuredMedia ) {
 		return null;
@@ -172,21 +199,10 @@ export default function MediaThumbnailView( {
 	}
 
 	return (
-		<div
-			className={ clsx( 'dataviews-media-field__media-thumbnail', {
-				'is-loading': loadingState === 'loading',
-				'is-loaded': loadingState === 'loaded',
-			} ) }
-		>
-			<img
-				ref={ imgRef }
-				className="dataviews-media-field__media-thumbnail--image"
-				src={ imageUrl }
-				alt={ featuredMedia.alt_text || featuredMedia.title.raw }
-				onLoad={ handleLoad }
-				onError={ () => setImageError( true ) }
-				loading="lazy"
-			/>
-		</div>
+		<ImageView
+			item={ featuredMedia }
+			configSizes={ config?.sizes }
+			onError={ () => setImageError( true ) }
+		/>
 	);
 }
