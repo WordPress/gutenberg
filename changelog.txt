@@ -1,5 +1,65 @@
 == Changelog ==
 
+= 22.6.0-rc.2 =
+
+## Changelog
+
+### Bug Fixes
+
+- Fix undo end-to-end test. ([75740](https://github.com/WordPress/gutenberg/pull/75740))
+
+#### Block Library
+- Icon Block: Corrects style selectors when global styles are set. ([75724](https://github.com/WordPress/gutenberg/pull/75724))
+- Query: Remove content role from block. ([75760](https://github.com/WordPress/gutenberg/pull/75760))
+- Remove experimental property from Icon block. ([75742](https://github.com/WordPress/gutenberg/pull/75742))
+
+#### Block Editor
+- Only show dot divider for parent selector in top toolbar. ([75710](https://github.com/WordPress/gutenberg/pull/75710))
+- Pattern Editing: Fix nested patterns/sections. ([75772](https://github.com/WordPress/gutenberg/pull/75772))
+
+#### npm Packages
+- Update wordpress/vips in root package.json to use a relative path. ([75758](https://github.com/WordPress/gutenberg/pull/75758))
+- Vips and worker-threads packages: Remove private flag so that packages can be published to npm. ([75752](https://github.com/WordPress/gutenberg/pull/75752))
+
+#### Collaboration
+- RTC: Add cap check for single taxonomy term entities. ([75708](https://github.com/WordPress/gutenberg/pull/75708))
+- Real-time collaboration: Fix comment syncing on site editor. ([75746](https://github.com/WordPress/gutenberg/pull/75746))
+
+#### Plugin
+- Client-side media processing: Disable in Gutenberg just for now. ([75756](https://github.com/WordPress/gutenberg/pull/75756))
+
+#### Components
+- Snackbar: Fix scaling issue with snackbars that update their content via a common id. ([75709](https://github.com/WordPress/gutenberg/pull/75709))
+
+
+### Performance
+
+#### Block Library
+- Core Data: Create icons entity. ([75773](https://github.com/WordPress/gutenberg/pull/75773))
+
+
+### Experiments
+
+#### Collaboration
+- Real-time Collaboration: Bug fix for CRDT user selection and add tests. ([75075](https://github.com/WordPress/gutenberg/pull/75075))
+
+
+### Various
+
+#### Post Editor
+- Media: Graduate client-side media processing from experimental. ([75112](https://github.com/WordPress/gutenberg/pull/75112))
+- RTC: Remove IS_GUTENBERG_PLUGIN checks for collaborative editing. ([75699](https://github.com/WordPress/gutenberg/pull/75699))
+
+
+
+
+## Contributors
+
+The following contributors merged PRs in this release:
+
+@adamsilverstein @alecgeatches @andrewserong @chriszarate @ingeniumed @jorgefilipecosta @ryanwelcher @shimotmk @t-hamano @talldan @tellthemachines
+
+
 = 22.6.0-rc.1 =
 
 ## Changelog
