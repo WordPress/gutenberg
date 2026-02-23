@@ -1191,11 +1191,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				} );
 			}
 
-			// After all sub-sizes, create and sideload the scaled version.
-			// This must be added AFTER sub-sizes so it's queued last.
-			// The shouldPauseForSideload mechanism serializes sideloads per
-			// attachment, ensuring sub-sizes complete first (keeping attached_file
-			// as the original during sub-size sideloads).
+			// Create and sideload the scaled version.
 			const { bigImageSizeThreshold } = settings;
 			if ( bigImageSizeThreshold && attachment.id ) {
 				try {
