@@ -3281,21 +3281,6 @@ class WP_Theme_JSON_Gutenberg {
 		}
 
 		/*
-		 * Check if we're processing a block pseudo-selector.
-		 * $block_metadata['path'] = array( 'styles', 'blocks', 'core/button', ':hover' );
-		 */
-		$is_processing_block_pseudo = false;
-		if ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 4 ) {
-			$block_name        = static::get_block_name_from_metadata_path( $block_metadata ); // 'core/button'
-			$last_path_element = $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ]; // ':hover'
-
-			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ) &&
-				in_array( $last_path_element, static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ], true ) ) {
-				$is_processing_block_pseudo = true;
-			}
-		}
-
-		/*
 		 * Check for allowed pseudo classes (e.g. ":hover") from the $selector ("a:hover").
 		 * This also resets the array keys.
 		 */
@@ -3324,12 +3309,6 @@ class WP_Theme_JSON_Gutenberg {
 			&& in_array( $pseudo_selector, static::VALID_ELEMENT_PSEUDO_SELECTORS[ $current_element ], true )
 		) {
 			$declarations = static::compute_style_properties( $node[ $pseudo_selector ], $settings, null, $this->theme_json, $selector, $use_root_padding );
-		} elseif ( $is_processing_block_pseudo ) {
-			// Process block pseudo-selector styles using $node, which already points to the
-			// correct data via _wp_array_get( $this->theme_json, $block_metadata['path'] ).
-			// This works for both top-level pseudo-selectors (e.g. core/button :hover) and
-			// compound state+pseudo paths (e.g. core/navigation-link @current :hover).
-			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
 		} else {
 			$declarations = static::compute_style_properties( $node, $settings, null, $this->theme_json, $selector, $use_root_padding );
 		}
