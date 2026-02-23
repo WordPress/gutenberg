@@ -130,7 +130,7 @@ function convertYFullSelectionToWPSelection(
  * @param selectionHistory The selection history to check
  * @return The most recent selection that exists in the document, or null if no selection exists.
  */
-export function findSelectionFromHistory(
+function findSelectionFromHistory(
 	ydoc: Y.Doc,
 	selectionHistory: YFullSelection[]
 ): WPSelection | null {
