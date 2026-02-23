@@ -158,11 +158,6 @@ export function Controls( {
 	const viewUrl =
 		isViewableUrl && url.startsWith( '/' ) && homeUrl ? homeUrl + url : url;
 
-	const entityTypeName = getEntityTypeName(
-		attributes.type,
-		attributes.kind
-	);
-
 	return (
 		<ToolsPanel
 			label={ __( 'Settings' ) }
@@ -262,11 +257,7 @@ export function Controls( {
 											justifyContent: 'center',
 										} }
 									>
-										{ sprintf(
-											/* translators: %s: entity type (e.g., "page", "post", "category") */
-											__( 'Edit %s' ),
-											entityTypeName
-										) }
+										{ __( 'Edit' ) }
 									</Button>
 								) }
 							{ isViewableUrl && (
@@ -282,15 +273,7 @@ export function Controls( {
 										justifyContent: 'center',
 									} }
 								>
-									{ sprintf(
-										/* translators: %s: entity type (e.g., "page", "post", "category") or "link" for external links */
-										__( 'View %s' ),
-										attributes.kind &&
-											attributes.type &&
-											attributes.kind !== 'custom'
-											? entityTypeName
-											: __( 'link' )
-									) }
+									{ __( 'View' ) }
 								</Button>
 							) }
 						</HStack>
