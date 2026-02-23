@@ -3285,7 +3285,6 @@ class WP_Theme_JSON_Gutenberg {
 		 * $block_metadata['path'] = array( 'styles', 'blocks', 'core/button', ':hover' );
 		 */
 		$is_processing_block_pseudo = false;
-		$block_pseudo_selector      = null;
 		if ( in_array( 'blocks', $block_metadata['path'], true ) && count( $block_metadata['path'] ) >= 4 ) {
 			$block_name        = static::get_block_name_from_metadata_path( $block_metadata ); // 'core/button'
 			$last_path_element = $block_metadata['path'][ count( $block_metadata['path'] ) - 1 ]; // ':hover'
@@ -3293,7 +3292,6 @@ class WP_Theme_JSON_Gutenberg {
 			if ( isset( static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ] ) &&
 				in_array( $last_path_element, static::VALID_BLOCK_PSEUDO_SELECTORS[ $block_name ], true ) ) {
 				$is_processing_block_pseudo = true;
-				$block_pseudo_selector      = $last_path_element;
 			}
 		}
 
