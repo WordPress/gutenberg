@@ -145,12 +145,13 @@ test.describe( 'NavigationMenuTemplateAreas', () => {
 		await expect( page.getByText( 'Preview Test Header' ) ).toBeVisible();
 	} );
 
-	test( 'preview area shows template part with unbound nav block when it is the only menu', async ( {
+	test( 'preview area shows unbound nav block (no inner items) when it is the fallback menu', async ( {
 		admin,
 		page,
 		requestUtils,
 	} ) => {
-		// Only one navigation menu exists — unbound nav blocks default to it.
+		// Single menu = it is the fallback. Unbound block with no inner
+		// items will resolve to it at render time.
 		const menu = await requestUtils.createNavigationMenu( {
 			title: 'Only Menu',
 			content: '<!-- wp:navigation-link {"label":"Home","url":"/"} /-->',
@@ -173,21 +174,55 @@ test.describe( 'NavigationMenuTemplateAreas', () => {
 			} )
 		).toBeVisible();
 
-		// Single menu on the site: unbound nav block defaults to it.
+		// This menu is the fallback → unbound empty nav block matches.
 		await expect( page.getByText( 'Unbound Single Header' ) ).toBeVisible();
 	} );
 
-	test( 'preview area does NOT show template part with unbound nav block when multiple menus exist', async ( {
+	test( 'preview area does NOT show unbound nav block with inline items even for the fallback menu', async ( {
 		admin,
 		page,
 		requestUtils,
 	} ) => {
-		// Two menus exist — can't know which one an unbound block uses.
+		// A nav block with its own navigation-link children is self-contained
+		// and does not resolve to any navigation menu — never shown.
+		const menu = await requestUtils.createNavigationMenu( {
+			title: 'Fallback Menu',
+			content: '<!-- wp:navigation-link {"label":"Home","url":"/"} /-->',
+		} );
+
+		await requestUtils.createTemplate( 'wp_template_part', {
+			slug: 'inline-nav-header',
+			title: 'Inline Nav Header',
+			content: `<!-- wp:navigation --><!-- wp:navigation-link {"label":"Blog","url":"#"} /--><!-- /wp:navigation -->`,
+		} );
+
+		await admin.visitAdminPage(
+			'site-editor.php',
+			`postId=${ menu.id }&postType=wp_navigation`
+		);
+
+		await expect(
+			page.getByRole( 'treegrid', {
+				name: 'Block navigation structure',
+			} )
+		).toBeVisible();
+
+		// Nav block has inline items → self-contained, not shown.
+		await expect( page.getByText( 'Inline Nav Header' ) ).toBeHidden();
+	} );
+
+	test( 'with multiple menus: unbound block shown for fallback (newest) menu only', async ( {
+		admin,
+		page,
+		requestUtils,
+	} ) => {
+		// menuA is created first, menuB second → menuB is the fallback
+		// (WordPress uses the most recently created published menu).
 		const menuA = await requestUtils.createNavigationMenu( {
 			title: 'Multi Menu A',
 			content: '<!-- wp:navigation-link {"label":"Home","url":"/"} /-->',
 		} );
-		await requestUtils.createNavigationMenu( {
+		const menuB = await requestUtils.createNavigationMenu( {
 			title: 'Multi Menu B',
 			content:
 				'<!-- wp:navigation-link {"label":"About","url":"/about"} /-->',
@@ -199,19 +234,25 @@ test.describe( 'NavigationMenuTemplateAreas', () => {
 			content: `<!-- wp:navigation /-->`,
 		} );
 
+		// Viewing the NON-fallback menu (menuA) → unbound block not shown.
 		await admin.visitAdminPage(
 			'site-editor.php',
 			`postId=${ menuA.id }&postType=wp_navigation`
 		);
-
 		await expect(
-			page.getByRole( 'treegrid', {
-				name: 'Block navigation structure',
-			} )
+			page.getByRole( 'treegrid', { name: 'Block navigation structure' } )
 		).toBeVisible();
-
-		// Multiple menus: unbound nav block is ambiguous, should not appear.
 		await expect( page.getByText( 'Unbound Multi Header' ) ).toBeHidden();
+
+		// Viewing the fallback menu (menuB, most recently created) → shown.
+		await admin.visitAdminPage(
+			'site-editor.php',
+			`postId=${ menuB.id }&postType=wp_navigation`
+		);
+		await expect(
+			page.getByRole( 'treegrid', { name: 'Block navigation structure' } )
+		).toBeVisible();
+		await expect( page.getByText( 'Unbound Multi Header' ) ).toBeVisible();
 	} );
 
 	test( 'preview area does NOT show template part using a different nav menu', async ( {
