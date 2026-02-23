@@ -46,7 +46,7 @@ import {
 } from '../reducer';
 
 import { unlock } from '../../lock-unlock';
-import { sectionRootClientIdKey } from '.././private-keys';
+import { sectionRootClientIdKey, isIsolatedEditorKey } from '.././private-keys';
 
 const { isContentBlock } = unlock( privateApis );
 
@@ -4696,6 +4696,176 @@ describe( 'state', () => {
 				);
 
 				expect( derivedBlockEditingModes ).toEqual( new Map() );
+			} );
+		} );
+
+		describe( 'isIsolatedEditor setting', () => {
+			let stateWithUnsyncedPatternAndTemplatePart;
+			beforeAll( () => {
+				// Set up a state with both an unsynced pattern and a template part.
+				stateWithUnsyncedPatternAndTemplatePart = dispatchActions(
+					[
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'unsynced-pattern',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'pattern-paragraph',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+								{
+									name: 'core/template-part',
+									clientId: 'template-part',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+						{
+							type: 'SET_HAS_CONTROLLED_INNER_BLOCKS',
+							clientId: 'template-part',
+							hasControlledInnerBlocks: true,
+						},
+						{
+							type: 'REPLACE_INNER_BLOCKS',
+							rootClientId: 'template-part',
+							blocks: [
+								{
+									name: 'core/paragraph',
+									clientId: 'template-part-paragraph',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+			} );
+
+			it( 'applies contentOnly modes to unsynced patterns and template parts when isIsolatedEditor is false', () => {
+				expect(
+					stateWithUnsyncedPatternAndTemplatePart.derivedBlockEditingModes
+				).toEqual(
+					new Map(
+						Object.entries( {
+							'pattern-paragraph': 'contentOnly',
+							'template-part-paragraph': 'contentOnly',
+						} )
+					)
+				);
+			} );
+
+			it( 'clears contentOnly modes when isIsolatedEditor changes to true', () => {
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ isIsolatedEditorKey ]: true,
+							},
+						},
+					],
+					testReducer,
+					stateWithUnsyncedPatternAndTemplatePart
+				);
+
+				expect( derivedBlockEditingModes ).toEqual( new Map() );
+			} );
+
+			it( 'recomputes contentOnly modes when isIsolatedEditor changes from true to false', () => {
+				const stateWithIsolatedEditor = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ isIsolatedEditorKey ]: true,
+							},
+						},
+					],
+					testReducer,
+					stateWithUnsyncedPatternAndTemplatePart
+				);
+
+				// Verify that no derived modes exist with isIsolatedEditor enabled.
+				expect(
+					stateWithIsolatedEditor.derivedBlockEditingModes
+				).toEqual( new Map() );
+
+				// Now disable isIsolatedEditor and verify modes are recomputed.
+				const { derivedBlockEditingModes } = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ isIsolatedEditorKey ]: false,
+							},
+						},
+					],
+					testReducer,
+					stateWithIsolatedEditor
+				);
+
+				expect( derivedBlockEditingModes ).toEqual(
+					new Map(
+						Object.entries( {
+							'pattern-paragraph': 'contentOnly',
+							'template-part-paragraph': 'contentOnly',
+						} )
+					)
+				);
+			} );
+
+			it( 'returns no derived editing modes for unsynced patterns when isIsolatedEditor is initially true', () => {
+				const stateWithIsolatedEditorFromStart = dispatchActions(
+					[
+						{
+							type: 'UPDATE_SETTINGS',
+							settings: {
+								[ isIsolatedEditorKey ]: true,
+							},
+						},
+						{
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									name: 'core/group',
+									clientId: 'group-1',
+									attributes: {
+										metadata: {
+											patternName: 'test-pattern',
+										},
+									},
+									innerBlocks: [
+										{
+											name: 'core/paragraph',
+											clientId: 'paragraph-1',
+											attributes: {},
+											innerBlocks: [],
+										},
+									],
+								},
+							],
+						},
+					],
+					testReducer
+				);
+
+				expect(
+					stateWithIsolatedEditorFromStart.derivedBlockEditingModes
+				).toEqual( new Map() );
 			} );
 		} );
 
