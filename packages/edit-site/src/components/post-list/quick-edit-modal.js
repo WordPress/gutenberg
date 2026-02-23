@@ -104,7 +104,13 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 			{
 				id: 'status',
 				label: __( 'Status' ),
-				children: [ 'status', 'password' ],
+				children: [
+					{
+						id: 'status',
+						layout: { type: 'regular', labelPosition: 'none' },
+					},
+					'password',
+				],
 			},
 			'author',
 			'date',
