@@ -5,6 +5,14 @@ import { Page } from '@wordpress/admin-ui';
 import {
 	__experimentalItemGroup as ItemGroup,
 } from '@wordpress/components';
+import {
+	registerConnector,
+	ConnectorItem,
+	DefaultConnectorSettings,
+	store,
+	type ConnectorRenderProps,
+	type ConnectorConfig,
+} from '@wordpress/connectors';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -12,28 +20,6 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import './style.scss';
-import {
-	registerConnector,
-	ConnectorItem,
-	DefaultConnectorSettings,
-	store,
-} from './api';
-
-// Expose the public API globally for vanilla JS plugins
-declare global {
-	interface Window {
-		wp: {
-			connectors?: {
-				registerConnector: typeof registerConnector;
-			};
-		};
-	}
-}
-
-window.wp = window.wp || {};
-window.wp.connectors = {
-	registerConnector,
-};
 
 // OpenAI logo as inline SVG
 const OpenAILogo = () => (
@@ -56,7 +42,7 @@ registerConnector( 'core/openai', {
 	label: __( 'OpenAI' ),
 	description: __( 'Text, image, and code generation with GPT and DALL-E.' ),
 	icon: <OpenAILogo />,
-	render: ( { label, description } ) => (
+	render: ( { label, description }: ConnectorRenderProps ) => (
 		<ConnectorItem
 			icon={ <OpenAILogo /> }
 			name={ label }
@@ -87,7 +73,7 @@ function ConnectorsPage() {
 		>
 			<div className="connections-page">
 				<ItemGroup isBordered isSeparated>
-					{ connectors.map( ( connector ) => {
+					{ connectors.map( ( connector: ConnectorConfig ) => {
 						if ( connector.render ) {
 							return (
 								<connector.render

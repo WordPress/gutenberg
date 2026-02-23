@@ -13,7 +13,7 @@ import type { ConnectorConfig, ConnectorRenderProps } from './types';
 export type { ConnectorConfig, ConnectorRenderProps };
 
 /**
- * Register a connector thatdsfsdfdsfdsfdsfds will appear in the Connectors settings page.
+ * Register a connector that will appear in the Connectors settings page.
  *
  * @param slug   Unique identifier for the connector.
  * @param config Connector configuration.

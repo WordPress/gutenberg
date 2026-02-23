@@ -58,22 +58,3 @@ function gutenberg_menu() {
 }
 add_action( 'admin_menu', 'gutenberg_menu', 9 );
 
-/**
- * Enqueues the Connectors page extension script.
- *
- * @param string $hook_suffix The current admin page.
- */
-function gutenberg_enqueue_connectors_extension( $hook_suffix ) {
-	if ( 'settings_page_connections-wp-admin' !== $hook_suffix ) {
-		return;
-	}
-
-	wp_enqueue_script(
-		'gutenberg-connectors-extension',
-		plugins_url( 'lib/experimental/connectors/connectors-extension.js', dirname( __FILE__ ) ),
-		array(),
-		filemtime( plugin_dir_path( dirname( __FILE__ ) ) . 'lib/experimental/connectors/connectors-extension.js' ),
-		true
-	);
-}
-add_action( 'admin_enqueue_scripts', 'gutenberg_enqueue_connectors_extension' );
