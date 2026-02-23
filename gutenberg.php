@@ -16,6 +16,13 @@ defined( 'GUTENBERG_MINIMUM_WP_VERSION' ) or define( 'GUTENBERG_MINIMUM_WP_VERSI
 
 gutenberg_pre_init();
 
+register_deactivation_hook(
+	__FILE__,
+	function () {
+		wp_clear_scheduled_hook( 'wp_sync_cleanup' );
+	}
+);
+
 /**
  * Display a version notice and deactivate the Gutenberg plugin.
  *

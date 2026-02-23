@@ -11,6 +11,10 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 	require_once __DIR__ . '/class-wp-http-polling-sync-server.php';
 }
 
+if ( ! class_exists( 'Gutenberg_Sync_Cleanup' ) ) {
+	require_once __DIR__ . '/class-gutenberg-sync-cleanup.php';
+}
+
 if ( ! function_exists( 'gutenberg_register_sync_storage_post_type' ) ) {
 	/**
 	 * Registers the custom post type for sync storage.
@@ -163,3 +167,15 @@ function gutenberg_inject_real_time_collaboration_setting() {
 }
 add_action( 'admin_init', 'gutenberg_inject_real_time_collaboration_setting' );
 add_filter( 'default_option_wp_enable_real_time_collaboration', '__return_true' );
+
+if ( ! function_exists( 'wp_sync_cleanup_init' ) ) {
+	/**
+	 * Initializes the sync cleanup cron event.
+	 */
+	function wp_sync_cleanup_init(): void {
+		$cleanup = new Gutenberg_Sync_Cleanup();
+		$cleanup->init();
+		Gutenberg_Sync_Cleanup::schedule();
+	}
+}
+add_action( 'init', 'wp_sync_cleanup_init' );
