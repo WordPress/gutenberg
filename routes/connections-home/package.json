@@ -1,0 +1,16 @@
+{
+	"name": "@wordpress/connections-home-route",
+	"version": "1.0.0",
+	"private": true,
+	"route": {
+		"path": "/",
+		"page": [
+			"connections"
+		]
+	},
+	"dependencies": {
+		"@wordpress/admin-ui": "file:../../packages/admin-ui",
+		"@wordpress/components": "file:../../packages/components",
+		"@wordpress/i18n": "file:../../packages/i18n"
+	}
+}
