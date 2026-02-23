@@ -717,22 +717,7 @@ export function prepareItem( id: QueueItemId ) {
 
 		// For images that can be processed by vips, check if we need to scale down based on threshold.
 		if ( isImage && isVipsSupported ) {
-			const { bigImageSizeThreshold, imageOutputFormats } = settings;
-
-			// If a threshold is set, add a resize operation to scale down large images.
-			// This matches WordPress core's behavior in wp_create_image_subsizes().
-			if ( bigImageSizeThreshold ) {
-				operations.push( [
-					OperationType.ResizeCrop,
-					{
-						resize: {
-							width: bigImageSizeThreshold,
-							height: bigImageSizeThreshold,
-						},
-						isThresholdResize: true,
-					},
-				] );
-			}
+			const { imageOutputFormats } = settings;
 
 			// Check if we need to transcode to a different format.
 			// Uses WordPress image_editor_output_format filter settings.
@@ -1204,6 +1189,72 @@ export function generateThumbnails( id: QueueItemId ) {
 					},
 					operations: thumbnailOperations,
 				} );
+			}
+
+			// After all sub-sizes, create and sideload the scaled version.
+			// This must be added AFTER sub-sizes so it's queued last.
+			// The shouldPauseForSideload mechanism serializes sideloads per
+			// attachment, ensuring sub-sizes complete first (keeping attached_file
+			// as the original during sub-size sideloads).
+			const { bigImageSizeThreshold } = settings;
+			if ( bigImageSizeThreshold && attachment.id ) {
+				try {
+					// Rename sourceFile to match the server attachment filename.
+					const sourceForScaled = attachment.filename
+						? renameFile( item.sourceFile, attachment.filename )
+						: item.sourceFile;
+
+					const scaledFile = await vipsResizeImage(
+						item.id,
+						sourceForScaled,
+						{
+							width: bigImageSizeThreshold,
+							height: bigImageSizeThreshold,
+						},
+						false, // smartCrop
+						false, // addSuffix
+						item.abortController?.signal,
+						true // scaledSuffix
+					);
+
+					if ( scaledFile.wasResized ) {
+						const scaledOperations: Operation[] = [];
+
+						// Add transcoding if format conversion is configured.
+						if ( thumbnailTranscodeOperation ) {
+							scaledOperations.push(
+								thumbnailTranscodeOperation
+							);
+						}
+
+						scaledOperations.push( OperationType.Upload );
+
+						dispatch.addSideloadItem( {
+							file: scaledFile,
+							onChange: ( [ updatedAttachment ] ) => {
+								if ( isBlobURL( updatedAttachment.url ) ) {
+									return;
+								}
+								item.onChange?.( [ updatedAttachment ] );
+							},
+							batchId,
+							parentId: item.id,
+							additionalData: {
+								post: attachment.id,
+								image_size: 'scaled',
+								convert_format: false,
+							},
+							operations: scaledOperations,
+						} );
+					}
+				} catch {
+					// If scaled version creation fails, continue.
+					// The original will remain as the attached file.
+					// eslint-disable-next-line no-console
+					console.warn(
+						'Failed to create scaled version, continuing without it'
+					);
+				}
 			}
 		}
 

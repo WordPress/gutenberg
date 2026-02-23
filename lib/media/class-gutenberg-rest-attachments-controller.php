@@ -26,6 +26,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 			// Special case to set 'original_image' in attachment metadata.
 			$valid_image_sizes[] = 'original';
+			// Client-side big image threshold: sideload the scaled version.
+			$valid_image_sizes[] = 'scaled';
 			// Used for PDF thumbnails.
 			$valid_image_sizes[] = 'full';
 
@@ -210,6 +212,8 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 			// Disable server-side EXIF rotation so the client can handle it.
 			// This preserves the original orientation value in the metadata.
 			add_filter( 'wp_image_maybe_exif_rotate', '__return_false', 100 );
+			// Disable server-side big image scaling since the client handles it.
+			add_filter( 'big_image_size_threshold', '__return_zero', 100 );
 		}
 
 		if ( ! $request['convert_format'] ) {
@@ -221,6 +225,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		remove_filter( 'intermediate_image_sizes_advanced', '__return_empty_array', 100 );
 		remove_filter( 'fallback_intermediate_image_sizes', '__return_empty_array', 100 );
 		remove_filter( 'wp_image_maybe_exif_rotate', '__return_false', 100 );
+		remove_filter( 'big_image_size_threshold', '__return_zero', 100 );
 		remove_filter( 'image_editor_output_format', '__return_empty_array', 100 );
 
 		return $response;
@@ -275,7 +280,7 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 		}
 
 		$matches = array();
-		if ( preg_match( '/(.*)(-\d+x\d+)-' . $number . '$/', $name, $matches ) ) {
+		if ( preg_match( '/(.*)(-\d+x\d+|-scaled)-' . $number . '$/', $name, $matches ) ) {
 			$filename_without_suffix = $matches[1] . $matches[2] . ".$ext";
 			if ( $matches[1] === $orig_name && ! file_exists( "$dir/$filename_without_suffix" ) ) {
 				return $filename_without_suffix;
@@ -381,6 +386,20 @@ class Gutenberg_REST_Attachments_Controller extends WP_REST_Attachments_Controll
 
 		if ( 'original' === $image_size ) {
 			$metadata['original_image'] = wp_basename( $path );
+		} elseif ( 'scaled' === $image_size ) {
+			// The current attached file is the original; record it as original_image.
+			$current_file = get_attached_file( $attachment_id, true );
+			$metadata['original_image'] = wp_basename( $current_file );
+
+			// Update the attached file to point to the scaled version.
+			update_attached_file( $attachment_id, $path );
+
+			$size = wp_getimagesize( $path );
+
+			$metadata['width']    = $size ? $size[0] : 0;
+			$metadata['height']   = $size ? $size[1] : 0;
+			$metadata['filesize'] = wp_filesize( $path );
+			$metadata['file']     = _wp_relative_upload_path( $path );
 		} else {
 			$metadata['sizes'] = $metadata['sizes'] ?? array();
 
