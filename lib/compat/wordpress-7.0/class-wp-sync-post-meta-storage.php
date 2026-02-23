@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
+if (!class_exists('WP_Sync_Post_Meta_Storage')) {
 
 	/**
 	 * Core class that provides an interface for storing and retrieving sync
@@ -17,7 +17,8 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 	 *
 	 * @access private
 	 */
-	class WP_Sync_Post_Meta_Storage implements WP_Sync_Storage {
+	class WP_Sync_Post_Meta_Storage implements WP_Sync_Storage
+	{
 		/**
 		 * Post type for sync storage.
 		 *
@@ -75,19 +76,20 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @param mixed  $update Sync update.
 		 * @return bool True on success, false on failure.
 		 */
-		public function add_update( string $room, $update ): bool {
-			$post_id = $this->get_storage_post_id( $room );
-			if ( null === $post_id ) {
+		public function add_update(string $room, $update): bool
+		{
+			$post_id = $this->get_storage_post_id($room);
+			if (null === $post_id) {
 				return false;
 			}
 
 			// Create an envelope and stamp each update to enable cursor-based filtering.
 			$envelope = array(
 				'timestamp' => $this->get_time_marker(),
-				'value'     => $update,
+				'value' => $update,
 			);
 
-			return (bool) add_post_meta( $post_id, self::SYNC_UPDATE_META_KEY, $envelope, false );
+			return (bool) add_post_meta($post_id, self::SYNC_UPDATE_META_KEY, $envelope, false);
 		}
 
 		/**
@@ -98,29 +100,30 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @param string $room Room identifier.
 		 * @return array<int, array{ timestamp: int, value: mixed }> Sync updates.
 		 */
-		private function get_all_updates( string $room ): array {
-			$this->room_cursors[ $room ] = $this->get_time_marker() - 100; // Small buffer to ensure consistency.
+		private function get_all_updates(string $room): array
+		{
+			$this->room_cursors[$room] = $this->get_time_marker() - 100; // Small buffer to ensure consistency.
 
-			$post_id = $this->get_storage_post_id( $room );
-			if ( null === $post_id ) {
+			$post_id = $this->get_storage_post_id($room);
+			if (null === $post_id) {
 				return array();
 			}
 
-			$updates = get_post_meta( $post_id, self::SYNC_UPDATE_META_KEY, false );
+			$updates = get_post_meta($post_id, self::SYNC_UPDATE_META_KEY, false);
 
-			if ( ! is_array( $updates ) ) {
+			if (!is_array($updates)) {
 				$updates = array();
 			}
 
 			// Filter out any updates that don't have the expected structure.
 			$updates = array_filter(
 				$updates,
-				static function ( $update ): bool {
-					return is_array( $update ) && isset( $update['timestamp'], $update['value'] ) && is_int( $update['timestamp'] );
+				static function ($update): bool {
+					return is_array($update) && isset($update['timestamp'], $update['value']) && is_int($update['timestamp']);
 				}
 			);
 
-			$this->room_update_counts[ $room ] = count( $updates );
+			$this->room_update_counts[$room] = count($updates);
 
 			return $updates;
 		}
@@ -133,19 +136,20 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @param string $room Room identifier.
 		 * @return array<int, mixed> Awareness state.
 		 */
-		public function get_awareness_state( string $room ): array {
-			$post_id = $this->get_storage_post_id( $room );
-			if ( null === $post_id ) {
+		public function get_awareness_state(string $room): array
+		{
+			$post_id = $this->get_storage_post_id($room);
+			if (null === $post_id) {
 				return array();
 			}
 
-			$awareness = get_post_meta( $post_id, self::AWARENESS_META_KEY, true );
+			$awareness = get_post_meta($post_id, self::AWARENESS_META_KEY, true);
 
-			if ( ! is_array( $awareness ) ) {
+			if (!is_array($awareness)) {
 				return array();
 			}
 
-			return array_values( $awareness );
+			return array_values($awareness);
 		}
 
 		/**
@@ -157,14 +161,15 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @param array<int, mixed> $awareness Serializable awareness state.
 		 * @return bool True on success, false on failure.
 		 */
-		public function set_awareness_state( string $room, array $awareness ): bool {
-			$post_id = $this->get_storage_post_id( $room );
-			if ( null === $post_id ) {
+		public function set_awareness_state(string $room, array $awareness): bool
+		{
+			$post_id = $this->get_storage_post_id($room);
+			if (null === $post_id) {
 				return false;
 			}
 
 			// update_post_meta returns false if the value is the same as the existing value.
-			update_post_meta( $post_id, self::AWARENESS_META_KEY, $awareness );
+			update_post_meta($post_id, self::AWARENESS_META_KEY, $awareness);
 			return true;
 		}
 
@@ -180,8 +185,9 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @param string $room Room identifier.
 		 * @return int Current cursor for the room.
 		 */
-		public function get_cursor( string $room ): int {
-			return $this->room_cursors[ $room ] ?? 0;
+		public function get_cursor(string $room): int
+		{
+			return $this->room_cursors[$room] ?? 0;
 		}
 
 		/**
@@ -195,42 +201,43 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @param string $room Room identifier.
 		 * @return int|null Post ID.
 		 */
-		private function get_storage_post_id( string $room ): ?int {
-			$room_hash = md5( $room );
+		private function get_storage_post_id(string $room): ?int
+		{
+			$room_hash = md5($room);
 
-			if ( isset( self::$storage_post_ids[ $room_hash ] ) ) {
-				return self::$storage_post_ids[ $room_hash ];
+			if (isset(self::$storage_post_ids[$room_hash])) {
+				return self::$storage_post_ids[$room_hash];
 			}
 
 			// Try to find an existing post for this room.
 			$posts = get_posts(
 				array(
-					'post_type'      => self::POST_TYPE,
+					'post_type' => self::POST_TYPE,
 					'posts_per_page' => 1,
-					'post_status'    => 'publish',
-					'name'           => $room_hash,
-					'fields'         => 'ids',
+					'post_status' => 'publish',
+					'name' => $room_hash,
+					'fields' => 'ids',
 				)
 			);
 
-			$post_id = array_first( $posts );
-			if ( is_int( $post_id ) ) {
-				self::$storage_post_ids[ $room_hash ] = $post_id;
+			$post_id = array_first($posts);
+			if (is_int($post_id)) {
+				self::$storage_post_ids[$room_hash] = $post_id;
 				return $post_id;
 			}
 
 			// Create new post for this room.
 			$post_id = wp_insert_post(
 				array(
-					'post_type'   => self::POST_TYPE,
+					'post_type' => self::POST_TYPE,
 					'post_status' => 'publish',
-					'post_title'  => 'Sync Storage',
-					'post_name'   => $room_hash,
+					'post_title' => 'Sync Storage',
+					'post_name' => $room_hash,
 				)
 			);
 
-			if ( is_int( $post_id ) ) {
-				self::$storage_post_ids[ $room_hash ] = $post_id;
+			if (is_int($post_id)) {
+				self::$storage_post_ids[$room_hash] = $post_id;
 				return $post_id;
 			}
 
@@ -244,8 +251,9 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 *
 		 * @return int Current time in milliseconds.
 		 */
-		private function get_time_marker(): int {
-			return (int) floor( microtime( true ) * 1000 );
+		private function get_time_marker(): int
+		{
+			return (int) floor(microtime(true) * 1000);
 		}
 
 		/**
@@ -256,8 +264,9 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @param string $room Room identifier.
 		 * @return int Number of updates stored for the room.
 		 */
-		public function get_update_count( string $room ): int {
-			return $this->room_update_counts[ $room ] ?? 0;
+		public function get_update_count(string $room): int
+		{
+			return $this->room_update_counts[$room] ?? 0;
 		}
 
 		/**
@@ -270,12 +279,13 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @param int    $cursor Return updates after this cursor.
 		 * @return array<int, mixed> Sync updates.
 		 */
-		public function get_updates_after_cursor( string $room, int $cursor ): array {
-			$all_updates = $this->get_all_updates( $room );
-			$updates     = array();
+		public function get_updates_after_cursor(string $room, int $cursor): array
+		{
+			$all_updates = $this->get_all_updates($room);
+			$updates = array();
 
-			foreach ( $all_updates as $update ) {
-				if ( $update['timestamp'] > $cursor ) {
+			foreach ($all_updates as $update) {
+				if ($update['timestamp'] > $cursor) {
 					$updates[] = $update;
 				}
 			}
@@ -283,10 +293,10 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 			// Sort by timestamp to ensure order.
 			usort(
 				$updates,
-				fn ( $a, $b ) => $a['timestamp'] <=> $b['timestamp']
+				fn($a, $b) => $a['timestamp'] <=> $b['timestamp']
 			);
 
-			return wp_list_pluck( $updates, 'value' );
+			return wp_list_pluck($updates, 'value');
 		}
 
 		/**
@@ -298,25 +308,56 @@ if ( ! class_exists( 'WP_Sync_Post_Meta_Storage' ) ) {
 		 * @param int    $cursor Remove updates with markers < this cursor.
 		 * @return bool True on success, false on failure.
 		 */
-		public function remove_updates_before_cursor( string $room, int $cursor ): bool {
-			$post_id = $this->get_storage_post_id( $room );
-			if ( null === $post_id ) {
+		public function remove_updates_before_cursor(string $room, int $cursor): bool
+		{
+			global $wpdb;
+
+			$post_id = $this->get_storage_post_id($room);
+			if (null === $post_id) {
 				return false;
 			}
 
-			// Get all existing updates (envelopes) for the room.
-			$all_updates = $this->get_all_updates( $room );
+			// Fetch all metas for the sync update meta key for this post, including meta_id and value.
+			$meta_key = self::SYNC_UPDATE_META_KEY;
+			$metas = $wpdb->get_results(
+				$wpdb->prepare(
+					"
+					SELECT meta_id, meta_value
+					FROM $wpdb->postmeta
+					WHERE post_id = %d 
+						AND meta_key = %s
+					",
+					$post_id,
+					$meta_key
+				),
+				ARRAY_A
+			);
 
-			foreach ( $all_updates as $envelope ) {
-				if ( isset( $envelope['timestamp'] ) && $envelope['timestamp'] < $cursor ) {
-					/*
-					 * Use delete_post_meta with serialized value to ensure only this specific update is removed.
-					 * This avoids removing all, and ensures that only the targeted updates are deleted.
-					 */
-					if ( ! delete_post_meta( $post_id, self::SYNC_UPDATE_META_KEY, $envelope ) ) {
-						// stop deleting and return false if an update fails to delete
-						return false;
-					}
+			if (!is_array($metas)) {
+				return true;
+			}
+
+			$delete_ids = array();
+			foreach ($metas as $meta) {
+				$envelope = maybe_unserialize($meta['meta_value']);
+				if (
+					is_array($envelope) &&
+					isset($envelope['timestamp']) &&
+					is_int($envelope['timestamp']) &&
+					$envelope['timestamp'] < $cursor
+				) {
+					$delete_ids[] = (int) $meta['meta_id'];
+				}
+			}
+
+			if (empty($delete_ids)) {
+				return true;
+			}
+
+			foreach ($delete_ids as $meta_id) {
+				$deleted = delete_metadata_by_mid('post', $meta_id);
+				if (! $deleted) {
+					return false;
 				}
 			}
 
