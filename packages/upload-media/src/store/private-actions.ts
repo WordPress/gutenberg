@@ -1194,63 +1194,49 @@ export function generateThumbnails( id: QueueItemId ) {
 			// Create and sideload the scaled version.
 			const { bigImageSizeThreshold } = settings;
 			if ( bigImageSizeThreshold && attachment.id ) {
-				try {
-					// Rename sourceFile to match the server attachment filename.
-					const sourceForScaled = attachment.filename
-						? renameFile( item.sourceFile, attachment.filename )
-						: item.sourceFile;
+				// Rename sourceFile to match the server attachment filename.
+				const sourceForScaled = attachment.filename
+					? renameFile( item.sourceFile, attachment.filename )
+					: item.sourceFile;
 
-					const scaledFile = await vipsResizeImage(
-						item.id,
-						sourceForScaled,
+				// Add scaling to queue.
+				const scaledOperations: Operation[] = [
+					[
+						OperationType.ResizeCrop,
 						{
-							width: bigImageSizeThreshold,
-							height: bigImageSizeThreshold,
+							resize: {
+								width: bigImageSizeThreshold,
+								height: bigImageSizeThreshold,
+							},
+							isThresholdResize: true,
 						},
-						false, // smartCrop
-						false, // addSuffix
-						item.abortController?.signal,
-						true // scaledSuffix
-					);
+					],
+				];
 
-					if ( scaledFile.wasResized ) {
-						const scaledOperations: Operation[] = [];
-
-						// Add transcoding if format conversion is configured.
-						if ( thumbnailTranscodeOperation ) {
-							scaledOperations.push(
-								thumbnailTranscodeOperation
-							);
-						}
-
-						scaledOperations.push( OperationType.Upload );
-
-						dispatch.addSideloadItem( {
-							file: scaledFile,
-							onChange: ( [ updatedAttachment ] ) => {
-								if ( isBlobURL( updatedAttachment.url ) ) {
-									return;
-								}
-								item.onChange?.( [ updatedAttachment ] );
-							},
-							batchId,
-							parentId: item.id,
-							additionalData: {
-								post: attachment.id,
-								image_size: 'scaled',
-								convert_format: false,
-							},
-							operations: scaledOperations,
-						} );
-					}
-				} catch {
-					// If scaled version creation fails, continue.
-					// The original will remain as the attached file.
-					// eslint-disable-next-line no-console
-					console.warn(
-						'Failed to create scaled version, continuing without it'
-					);
+				// Add transcoding if format conversion is configured.
+				if ( thumbnailTranscodeOperation ) {
+					scaledOperations.push( thumbnailTranscodeOperation );
 				}
+
+				scaledOperations.push( OperationType.Upload );
+
+				dispatch.addSideloadItem( {
+					file: sourceForScaled,
+					onChange: ( [ updatedAttachment ] ) => {
+						if ( isBlobURL( updatedAttachment.url ) ) {
+							return;
+						}
+						item.onChange?.( [ updatedAttachment ] );
+					},
+					batchId,
+					parentId: item.id,
+					additionalData: {
+						post: attachment.id,
+						image_size: 'scaled',
+						convert_format: false,
+					},
+					operations: scaledOperations,
+				} );
 			}
 		}
 
