@@ -77,7 +77,7 @@ export default class CollaborationUtils {
 		};
 
 		if ( enabled ) {
-			formData.enable_real_time_collaboration = 1;
+			formData.wp_enable_real_time_collaboration = 1;
 		}
 
 		await this.requestUtils.request.post( '/wp-admin/options.php', {
