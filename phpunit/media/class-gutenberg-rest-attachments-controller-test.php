@@ -598,7 +598,7 @@ class Gutenberg_REST_Attachments_Controller_Test extends WP_Test_REST_Post_Type_
 	 * and updates the attached file to the scaled version, matching core behavior.
 	 *
 	 * @see https://github.com/WordPress/wordpress-develop/blob/trunk/tests/phpunit/tests/media.php
-	 *      Core's test_heic_image_upload_is_converted_to_jpeg() verifies equivalent server-side behavior.
+	 *      For similar core media tests that verify equivalent server-side behavior.
 	 *
 	 * @covers ::sideload_item
 	 */
