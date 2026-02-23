@@ -119,7 +119,13 @@ export function QuickEditModal( { postType, postId, closeModal } ) {
 			{
 				id: 'discussion',
 				label: __( 'Discussion' ),
-				children: [ 'comment_status', 'ping_status' ],
+				children: [
+					{
+						id: 'comment_status',
+						layout: { type: 'regular', labelPosition: 'none' },
+					},
+					'ping_status',
+				],
 			},
 			'template',
 		];
