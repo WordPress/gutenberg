@@ -698,10 +698,10 @@ test.describe( 'Pattern Overrides', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
 		await editor.showBlockToolbar();
-		await editor.clickBlockOptionsMenuItem( 'Detach pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Detach' } )
+			.getByRole( 'button', { name: 'Disconnect' } )
 			.click();
 
 		// Check that the overrides remain.
@@ -744,10 +744,10 @@ test.describe( 'Pattern Overrides', () => {
 			editor.canvas.getByRole( 'document', { name: 'Block: Pattern' } )
 		);
 		await editor.showBlockToolbar();
-		await editor.clickBlockOptionsMenuItem( 'Detach pattern' );
+		await editor.clickBlockOptionsMenuItem( 'Disconnect pattern' );
 		await page
 			.getByRole( 'dialog' )
-			.getByRole( 'button', { name: 'Detach' } )
+			.getByRole( 'button', { name: 'Disconnect' } )
 			.click();
 
 		// Check that the overrides remain.
