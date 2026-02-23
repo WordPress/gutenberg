@@ -220,61 +220,6 @@ export function Controls( {
 							help={ helpText ? helpText : undefined }
 						/>
 					</ToolsPanelItem>
-
-					{ url && (
-						<HStack
-							className="navigation-link-to__actions"
-							alignment="left"
-							justify="left"
-							style={ { gridColumn: '1 / -1' } }
-						>
-							{ hasUrlBinding &&
-								isBoundEntityAvailable &&
-								entityRecord?.id &&
-								attributes.kind === 'post-type' &&
-								onNavigateToEntityRecord && (
-									<Button
-										size="compact"
-										variant="secondary"
-										onClick={ () => {
-											onNavigateToEntityRecord( {
-												postId: entityRecord.id,
-												postType: attributes.type,
-											} );
-										} }
-										__next40pxDefaultSize
-									>
-										{ sprintf(
-											/* translators: %s: entity type (e.g., "page", "post", "category") */
-											__( 'Edit %s' ),
-											entityTypeName
-										) }
-									</Button>
-								) }
-							{ isViewableUrl && (
-								<Button
-									size="compact"
-									variant="secondary"
-									href={ viewUrl }
-									target="_blank"
-									icon={ external }
-									iconPosition="right"
-									__next40pxDefaultSize
-								>
-									{ sprintf(
-										/* translators: %s: entity type (e.g., "page", "post", "category") or "link" for external links */
-										__( 'View %s' ),
-										attributes.kind &&
-											attributes.type &&
-											attributes.kind !== 'custom'
-											? entityTypeName
-											: __( 'link' )
-									) }
-								</Button>
-							) }
-						</HStack>
-					) }
-
 					<ToolsPanelItem
 						hasValue={ () => !! opensInNewTab }
 						label={ __( 'Open in new tab' ) }
@@ -291,6 +236,65 @@ export function Controls( {
 							}
 						/>
 					</ToolsPanelItem>
+
+					{ url && (
+						<HStack
+							className="navigation-link-to__actions"
+							alignment="stretch"
+							style={ { gridColumn: '1 / -1' } }
+						>
+							{ hasUrlBinding &&
+								isBoundEntityAvailable &&
+								entityRecord?.id &&
+								attributes.kind === 'post-type' &&
+								onNavigateToEntityRecord && (
+									<Button
+										variant="secondary"
+										onClick={ () => {
+											onNavigateToEntityRecord( {
+												postId: entityRecord.id,
+												postType: attributes.type,
+											} );
+										} }
+										__next40pxDefaultSize
+										style={ {
+											flex: 1,
+											justifyContent: 'center',
+										} }
+									>
+										{ sprintf(
+											/* translators: %s: entity type (e.g., "page", "post", "category") */
+											__( 'Edit %s' ),
+											entityTypeName
+										) }
+									</Button>
+								) }
+							{ isViewableUrl && (
+								<Button
+									variant="secondary"
+									href={ viewUrl }
+									target="_blank"
+									icon={ external }
+									iconPosition="right"
+									__next40pxDefaultSize
+									style={ {
+										flex: 1,
+										justifyContent: 'center',
+									} }
+								>
+									{ sprintf(
+										/* translators: %s: entity type (e.g., "page", "post", "category") or "link" for external links */
+										__( 'View %s' ),
+										attributes.kind &&
+											attributes.type &&
+											attributes.kind !== 'custom'
+											? entityTypeName
+											: __( 'link' )
+									) }
+								</Button>
+							) }
+						</HStack>
+					) }
 				</>
 			) }
 
