@@ -25,7 +25,8 @@ function PatternsManageButton( { clientId } ) {
 		isUnsyncedPattern,
 	} = useSelect(
 		( select ) => {
-			const { canRemoveBlock, getBlock } = select( blockEditorStore );
+			const { canRemoveBlock, getBlock, getSettings } =
+				select( blockEditorStore );
 			const { canUser } = select( coreStore );
 			const block = getBlock( clientId );
 
@@ -41,6 +42,8 @@ function PatternsManageButton( { clientId } ) {
 					id: block.attributes.ref,
 				} );
 
+			const isPreviewMode = getSettings().isPreviewMode;
+
 			return {
 				attributes: block.attributes,
 				// For unsynced patterns, detaching is simply removing the `patternName` attribute.
@@ -51,7 +54,9 @@ function PatternsManageButton( { clientId } ) {
 					( _isSyncedPattern && canRemoveBlock( clientId ) ),
 				isUnsyncedPattern: _isUnsyncedPattern,
 				isSyncedPattern: _isSyncedPattern,
-				isVisible: _isUnsyncedPattern || _isSyncedPattern,
+				isVisible:
+					( _isUnsyncedPattern || _isSyncedPattern ) &&
+					! isPreviewMode,
 				// The site editor and templates both check whether the user
 				// has edit_theme_options capabilities. We can leverage that here
 				// and omit the manage patterns link if the user can't access it.

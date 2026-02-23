@@ -45,17 +45,20 @@ function SwitchSectionStyle( { clientId } ) {
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
 	// Get global styles data
-	const { globalSettings, globalStyles, blockName } = useSelect(
-		( select ) => {
-			const settings = select( blockEditorStore ).getSettings();
-			return {
-				globalSettings: settings.__experimentalFeatures,
-				globalStyles: settings[ globalStylesDataKey ],
-				blockName: select( blockEditorStore ).getBlockName( clientId ),
-			};
-		},
-		[ clientId ]
-	);
+	const { globalSettings, globalStyles, blockName, isPreviewMode } =
+		useSelect(
+			( select ) => {
+				const settings = select( blockEditorStore ).getSettings();
+				return {
+					globalSettings: settings.__experimentalFeatures,
+					globalStyles: settings[ globalStylesDataKey ],
+					blockName:
+						select( blockEditorStore ).getBlockName( clientId ),
+					isPreviewMode: settings.isPreviewMode,
+				};
+			},
+			[ clientId ]
+		);
 
 	// Get the background color for the active style
 	const activeStyleBackground = activeStyle?.name
@@ -69,7 +72,7 @@ function SwitchSectionStyle( { clientId } ) {
 		  )?.color?.background
 		: undefined;
 
-	if ( ! stylesToRender || stylesToRender.length === 0 ) {
+	if ( ! stylesToRender || stylesToRender.length === 0 || isPreviewMode ) {
 		return null;
 	}
 
