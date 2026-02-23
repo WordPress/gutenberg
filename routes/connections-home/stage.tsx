@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { Page } from '@wordpress/admin-ui';
-import {
-	__experimentalItemGroup as ItemGroup,
-	Button,
-} from '@wordpress/components';
+import { __experimentalVStack as VStack, Button } from '@wordpress/components';
 import {
 	registerConnector,
 	ConnectorItem,
@@ -97,7 +94,7 @@ function ConnectorsPage() {
 			) }
 		>
 			<div className="connections-page">
-				<ItemGroup isBordered isSeparated>
+				<VStack spacing={ 4 }>
 					{ connectors.map( ( connector: ConnectorConfig ) => {
 						if ( connector.render ) {
 							return (
@@ -109,19 +106,9 @@ function ConnectorsPage() {
 								/>
 							);
 						}
-						// Default rendering for connectors without custom render
-						return (
-							<ConnectorItem
-								key={ connector.slug }
-								icon={ connector.icon }
-								name={ connector.label }
-								description={ connector.description }
-							>
-								<DefaultConnectorSettings />
-							</ConnectorItem>
-						);
+						return null;
 					} ) }
-				</ItemGroup>
+				</VStack>
 			</div>
 		</Page>
 	);
