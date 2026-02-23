@@ -35,7 +35,7 @@ import {
 } from '../sync';
 import type { WPSelection } from '../types';
 import {
-	findSelectionFromHistory,
+	getLatestSelectionFromHistory,
 	getSelectionHistory,
 	updateSelectionHistory,
 } from './crdt-selection';
@@ -427,10 +427,11 @@ export function getPostChangesFromCRDTDoc(
 	// selection in PostChanges ensures it dispatches atomically with content.
 	const selectionHistory = getSelectionHistory( ydoc );
 	if ( selectionHistory.length > 0 ) {
-		const recalculatedSelection = findSelectionFromHistory(
+		const recalculatedSelection = getLatestSelectionFromHistory(
 			ydoc,
 			selectionHistory
 		);
+
 		if ( recalculatedSelection ) {
 			changes.selection = {
 				...recalculatedSelection,

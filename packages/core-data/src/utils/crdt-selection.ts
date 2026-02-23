@@ -89,6 +89,41 @@ function convertYSelectionToBlockSelection(
 }
 
 /**
+ * Convert a YFullSelection to a WPSelection by resolving relative positions
+ * and verifying the blocks exist in the document.
+ * @param yFullSelection The YFullSelection to convert
+ * @param ydoc           The Y.Doc to resolve positions against
+ * @return The converted WPSelection, or null if the conversion fails
+ */
+function convertYFullSelectionToWPSelection(
+	yFullSelection: YFullSelection,
+	ydoc: Y.Doc
+): WPSelection | null {
+	const { start, end } = yFullSelection;
+	const startBlock = findBlockByClientIdInDoc( start.clientId, ydoc );
+	const endBlock = findBlockByClientIdInDoc( end.clientId, ydoc );
+
+	if ( ! startBlock || ! endBlock ) {
+		return null;
+	}
+
+	const startBlockSelection = convertYSelectionToBlockSelection(
+		start,
+		ydoc
+	);
+	const endBlockSelection = convertYSelectionToBlockSelection( end, ydoc );
+
+	if ( startBlockSelection === null || endBlockSelection === null ) {
+		return null;
+	}
+
+	return {
+		selectionStart: startBlockSelection,
+		selectionEnd: endBlockSelection,
+	};
+}
+
+/**
  * Given a Y.Doc and a selection history, find the most recent selection
  * that exists in the document. Skip any selections that are not in the document.
  * @param ydoc             The Y.Doc to find the selection in
@@ -99,37 +134,35 @@ export function findSelectionFromHistory(
 	ydoc: Y.Doc,
 	selectionHistory: YFullSelection[]
 ): WPSelection | null {
-	// Try each position until we find one that exists in the document
 	for ( const positionToTry of selectionHistory ) {
-		const { start, end } = positionToTry;
-		const startBlock = findBlockByClientIdInDoc( start.clientId, ydoc );
-		const endBlock = findBlockByClientIdInDoc( end.clientId, ydoc );
-
-		if ( ! startBlock || ! endBlock ) {
-			// This block no longer exists, skip it.
-			continue;
-		}
-
-		const startBlockSelection = convertYSelectionToBlockSelection(
-			start,
+		const result = convertYFullSelectionToWPSelection(
+			positionToTry,
 			ydoc
 		);
-		const endBlockSelection = convertYSelectionToBlockSelection(
-			end,
-			ydoc
-		);
-
-		if ( startBlockSelection === null || endBlockSelection === null ) {
-			continue;
+		if ( result !== null ) {
+			return result;
 		}
-
-		return {
-			selectionStart: startBlockSelection,
-			selectionEnd: endBlockSelection,
-		};
 	}
 
 	return null;
+}
+
+/**
+ * Given a Y.Doc and a selection history, convert only the latest (first) entry
+ * in the history to a WPSelection.
+ * @param ydoc             The Y.Doc to resolve positions against
+ * @param selectionHistory The selection history to check
+ * @return The latest selection converted to WPSelection, or null if it cannot be converted or the history is empty.
+ */
+export function getLatestSelectionFromHistory(
+	ydoc: Y.Doc,
+	selectionHistory: YFullSelection[]
+): WPSelection | null {
+	if ( selectionHistory.length === 0 ) {
+		return null;
+	}
+
+	return convertYFullSelectionToWPSelection( selectionHistory[ 0 ], ydoc );
 }
 
 /**
