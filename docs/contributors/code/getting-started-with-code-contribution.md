@@ -235,6 +235,12 @@ You can start with this workspace settings file:
 		"**/node_modules/**": true,
 		"**/vendor/**": true
 	},
+	// Use TypeScript from the workspace instead of VS Code's built-in TypeScript version.
+	"js/ts.tsdk.path": "tools/build-scripts/node_modules/@typescript/native/lib",
+	// Use ESLint, Prettier and Stylelint from the respective paths.
+	"eslint.nodePath": "tools/eslint/node_modules",
+	"prettier.prettierPath": "packages/prettier-config/node_modules/prettier",
+	"stylelint.stylelintPath": "tools/stylelint/node_modules/stylelint",
 	"[php]": {
 		"editor.formatOnSave": true,
 		"editor.defaultFormatter": "obliviousharmony.vscode-php-codesniffer"
