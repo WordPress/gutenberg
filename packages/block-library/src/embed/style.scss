@@ -22,14 +22,14 @@
 	min-height: 240px;
 }
 
-// Allow embeds to grow and shrink inside flex group blocks (Stack/Row), preventing collapse while fitting available space.
-.wp-block-group.is-layout-flex .wp-block-embed {
+// Allow embeds to grow and shrink inside flex layouts (Stack/Row), preventing collapse while fitting available space.
+.is-layout-flex .wp-block-embed {
 	flex: 1 1 0%;
 	min-width: 0;
 }
 
-// Fix for Stack blocks (vertical orientation) - embeds need explicit width to maintain aspect ratio.
-.wp-block-group.is-layout-flex.is-vertical > .wp-block-embed {
+// Fix for vertical flex layouts (e.g., Stack blocks) - embeds need explicit width to maintain aspect ratio.
+.is-layout-flex.is-vertical .wp-block-embed {
 	width: 100%;
 }
 
