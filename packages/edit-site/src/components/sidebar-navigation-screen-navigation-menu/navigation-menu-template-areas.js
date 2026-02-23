@@ -10,6 +10,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __, sprintf } from '@wordpress/i18n';
 import { privateApis as routerPrivateApis } from '@wordpress/router';
 import { DataViews, filterSortAndPaginate } from '@wordpress/dataviews';
+import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -25,6 +26,33 @@ const { patternTitleField } = unlock( editorPrivateApis );
 const { useLocation, useHistory } = unlock( routerPrivateApis );
 
 const EMPTY_ARRAY = [];
+
+/**
+ * Recursively injects a navigation menu ref into unbound core/navigation
+ * blocks so that BlockPreview can load and reflect unsaved navigation edits.
+ *
+ * @param {Array}  blocks - The block tree to search.
+ * @param {number} menuId - The navigation menu ID to inject.
+ * @return {Array} The modified block tree with the navigation menu ref injected.
+ */
+function injectNavigationRef( blocks, menuId ) {
+	return blocks.map( ( block ) => {
+		if ( block.name === 'core/navigation' && ! block.attributes?.ref ) {
+			return {
+				...block,
+				attributes: { ...block.attributes, ref: menuId },
+			};
+		}
+		if ( block.innerBlocks?.length ) {
+			return {
+				...block,
+				innerBlocks: injectNavigationRef( block.innerBlocks, menuId ),
+			};
+		}
+		return block;
+	} );
+}
+
 const DEFAULT_VIEW = {
 	type: LAYOUT_GRID,
 	perPage: 20,
@@ -59,12 +87,31 @@ export default function NavigationMenuTemplateAreas() {
 	const { usageMap, isResolving } = useNavigationMenusUsedIn( menuIds );
 	const matchingParts = usageMap.get( navigationMenuId ) ?? EMPTY_ARRAY;
 
+	// Augment each template part with pre-parsed blocks that have
+	// the navigation ref injected. This ensures BlockPreview loads
+	// the navigation content and reflects unsaved edits in real time
+	// (the navigation block uses getEditedEntityRecord internally).
+	const augmentedParts = useMemo( () => {
+		return matchingParts.map( ( part ) => {
+			if ( ! part?.content?.raw ) {
+				return part;
+			}
+			const parsedBlocks = parse( part.content.raw, {
+				__unstableSkipMigrationLogs: true,
+			} );
+			return {
+				...part,
+				blocks: injectNavigationRef( parsedBlocks, navigationMenuId ),
+			};
+		} );
+	}, [ matchingParts, navigationMenuId ] );
+
 	const settings = usePatternSettings();
 	const fields = useMemo( () => [ previewField, patternTitleField ], [] );
 
 	const { data, paginationInfo } = useMemo(
-		() => filterSortAndPaginate( matchingParts, view, fields ),
-		[ matchingParts, view, fields ]
+		() => filterSortAndPaginate( augmentedParts, view, fields ),
+		[ augmentedParts, view, fields ]
 	);
 
 	const title = menuTitle
