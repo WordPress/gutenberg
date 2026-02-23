@@ -114,7 +114,7 @@ test.describe( 'Page List', () => {
 			statusVisibility: {
 				performEdit: async ( page ) => {
 					const editButton = page.getByRole( 'button', {
-						name: 'Edit Status & Visibility',
+						name: 'Edit Status',
 					} );
 					await editButton.locator( '..' ).hover();
 					await editButton.click();
@@ -146,7 +146,7 @@ test.describe( 'Page List', () => {
 				assertInitialState: async ( page ) => {
 					const statusAndVisibility = page
 						.getByRole( 'button', {
-							name: 'Edit Status & Visibility',
+							name: 'Edit Status',
 						} )
 						.locator( '..' );
 					await expect( statusAndVisibility ).toContainText(
@@ -156,7 +156,7 @@ test.describe( 'Page List', () => {
 				assertEditedState: async ( page ) => {
 					const statusAndVisibility = page
 						.getByRole( 'button', {
-							name: 'Edit Status & Visibility',
+							name: 'Edit Status',
 						} )
 						.locator( '..' );
 					await expect( statusAndVisibility ).toContainText(
