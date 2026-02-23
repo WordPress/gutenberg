@@ -37,7 +37,7 @@ export function detectClientSideMediaSupport(): FeatureDetectionResult {
 	if ( typeof SharedArrayBuffer === 'undefined' ) {
 		cachedResult = {
 			supported: false,
-			reason: 'SharedArrayBuffer is not available. This may be due to missing cross-origin isolation headers.',
+			reason: 'SharedArrayBuffer is not available. This may be due to missing cross-origin isolation headers',
 		};
 		return cachedResult;
 	}
