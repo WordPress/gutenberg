@@ -6,6 +6,7 @@ import { RECEIVE_INTERMEDIATE_RESULTS } from './utils';
 import {
 	useActiveCollaborators,
 	useResolvedSelection,
+	useBroadcastSaveEvent,
 } from './hooks/use-post-editor-awareness-state';
 import { lock } from './lock-unlock';
 
@@ -15,4 +16,5 @@ lock( privateApis, {
 	RECEIVE_INTERMEDIATE_RESULTS,
 	useActiveCollaborators,
 	useResolvedSelection,
+	useBroadcastSaveEvent,
 } );

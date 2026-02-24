@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -155,4 +155,37 @@ export function useIsDisconnected(
 ): boolean {
 	return usePostEditorAwarenessState( postId, postType )
 		.isCurrentCollaboratorDisconnected;
+}
+
+/**
+ * Hook that returns a callback to broadcast a save event to all collaborators
+ * via the awareness system. When called, it sets the `lastSaveEvent` field on
+ * the local awareness state so that other collaborators can display a notification.
+ *
+ * @param postId   The ID of the post.
+ * @param postType The type of the post.
+ */
+export function useBroadcastSaveEvent(
+	postId: number | null,
+	postType: string | null
+): ( status: string ) => void {
+	return useCallback(
+		( status: string ) => {
+			if ( null === postId || null === postType ) {
+				return;
+			}
+
+			const awareness =
+				getSyncManager()?.getAwareness< PostEditorAwareness >(
+					`postType/${ postType }`,
+					postId.toString()
+				);
+
+			awareness?.setLocalStateField( 'lastSaveEvent', {
+				savedAt: Date.now(),
+				status,
+			} );
+		},
+		[ postId, postType ]
+	);
 }

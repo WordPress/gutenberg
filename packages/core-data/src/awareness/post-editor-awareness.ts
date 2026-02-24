@@ -36,6 +36,10 @@ export class PostEditorAwareness extends BaseAwarenessState< PostEditorState > {
 	protected equalityFieldChecks = {
 		...baseEqualityFieldChecks,
 		editorState: this.areEditorStatesEqual,
+		lastSaveEvent: (
+			a?: PostEditorState[ 'lastSaveEvent' ],
+			b?: PostEditorState[ 'lastSaveEvent' ]
+		) => a?.savedAt === b?.savedAt,
 	};
 
 	public constructor(
