@@ -130,20 +130,22 @@ export default function NavigationMenuTemplateAreas() {
 					'A list of all the template parts using this navigation menu'
 				) }
 			>
-				<DataViews
-					paginationInfo={ paginationInfo }
-					fields={ fields }
-					data={ data ?? EMPTY_ARRAY }
-					isLoading={ isResolving }
-					view={ view }
-					onChangeView={ setView }
-					defaultLayouts={ DEFAULT_LAYOUTS }
-					onClickItem={ ( item ) => {
-						history.navigate(
-							`/${ item.type }/${ item.id }?canvas=edit`
-						);
-					} }
-				/>
+				<div className="navigation-menu-template-areas">
+					<DataViews
+						paginationInfo={ paginationInfo }
+						fields={ fields }
+						data={ data ?? EMPTY_ARRAY }
+						isLoading={ isResolving }
+						view={ view }
+						onChangeView={ setView }
+						defaultLayouts={ DEFAULT_LAYOUTS }
+						onClickItem={ ( item ) => {
+							history.navigate(
+								`/${ item.type }/${ item.id }?canvas=edit`
+							);
+						} }
+					/>
+				</div>
 			</Page>
 		</ExperimentalBlockEditorProvider>
 	);
