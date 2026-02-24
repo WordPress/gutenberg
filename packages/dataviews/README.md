@@ -1583,6 +1583,8 @@ Finally, the field author can always provide its own custom `Edit` control. It r
 -   `field`: the field definition
 -   `onChange`: the callback with the updates
 -   `hideLabelFromVision`: boolean representing if the label should be hidden
+-   `markWhenOptional`: boolean indicating whether to label the control as "optional" when the field is not required, instead of showing "required"
+-   `operator`: the currently selected filter operator for this field. Used by DataViews filters to determine which control to render based on the operator type
 -   `validity`: object representing the validity of the field's value (see validity section)
 -   `config`: object representing extra config for the component:
     -   `prefix`: a React component to be rendered as a prefix
