@@ -1303,7 +1303,7 @@ store( 'myPlugin', {
 
 ### watch()
 
-Subscribes to changes in any signal accessed inside the callback, re-running the callback whenever those signals change. Returns a cleanup function to stop watching.
+Subscribes to changes in any reactive value accessed inside the callback, re-running the callback whenever those reactive values change. Returns a cleanup function to stop watching.
 
 Unlike `data-wp-watch`, which is a directive tied to a DOM element's lifecycle, the `watch()` function is a programmatic API that can be used anywhere in your JavaScript code, independently of the DOM.
 
@@ -1341,7 +1341,7 @@ const unwatch = watch( () => {
 unwatch();
 ```
 
-The callback passed to `watch()` can also return a cleanup function. This cleanup function runs just before the callback re-executes due to a signal change, and also when the watcher is disposed of via `unwatch()`:
+The callback passed to `watch()` can also return a cleanup function. This cleanup function runs just before the callback re-executes due to a reactive value change, and also when the watcher is disposed of via `unwatch()`:
 
 ```js
 const unwatch = watch( () => {
