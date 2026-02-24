@@ -91,6 +91,15 @@
 		},
 		"html": false
 	},
+	"selectors": {
+		"root": ".wp-block-search",
+		"color": {
+			"root": ".wp-block-search__button"
+		},
+		"border": {
+			"root": ".wp-block-search__input, .wp-block-search__button"
+		}
+	},
 	"editorStyle": "wp-block-search-editor",
 	"style": "wp-block-search"
 }
