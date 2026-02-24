@@ -128,6 +128,8 @@ interface UploadMediaArgs {
 	wpAllowedMimeTypes?: Record< string, string > | null;
 	// Abort signal.
 	signal?: AbortSignal;
+	// Function called with upload progress (0-100).
+	onProgress?: ( progress: number ) => void;
 }
 
 /**
@@ -149,6 +151,8 @@ export interface SideloadMediaArgs {
 	onFileChange?: OnChangeHandler;
 	/** Abort signal to cancel the sideload operation. */
 	signal?: AbortSignal;
+	/** Function called with upload progress (0-100). */
+	onProgress?: ( progress: number ) => void;
 }
 
 export interface Settings {
@@ -198,6 +202,7 @@ export interface Attachment {
 	mime_type: string;
 	featured_media?: number;
 	missing_image_sizes?: string[];
+	media_filename?: string;
 	poster?: string;
 	/**
 	 * EXIF orientation value from the original image.

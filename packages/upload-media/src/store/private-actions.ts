@@ -738,7 +738,22 @@ export function prepareItem( id: QueueItemId ) {
 
 		// For images that can be processed by vips, check if we need to scale down based on threshold.
 		if ( isImage && isVipsSupported ) {
-			const { imageOutputFormats } = settings;
+			const { bigImageSizeThreshold, imageOutputFormats } = settings;
+
+			// If a threshold is set, add a resize operation to scale down large images.
+			// This matches WordPress core's behavior in wp_create_image_subsizes().
+			if ( bigImageSizeThreshold ) {
+				operations.push( [
+					OperationType.ResizeCrop,
+					{
+						resize: {
+							width: bigImageSizeThreshold,
+							height: bigImageSizeThreshold,
+						},
+						isThresholdResize: true,
+					},
+				] );
+			}
 
 			// Check if we need to transcode to a different format.
 			// Uses WordPress image_editor_output_format filter settings.
@@ -801,6 +816,9 @@ export function uploadItem( id: QueueItemId ) {
 			filesList: [ item.file ],
 			additionalData: item.additionalData,
 			signal: item.abortController?.signal,
+			onProgress: ( progress: number ) => {
+				dispatch.updateItemProgress( id, progress );
+			},
 			onFileChange: ( [ attachment ] ) => {
 				if ( ! isBlobURL( attachment.url ) ) {
 					dispatch.finishOperation( id, {
@@ -847,6 +865,9 @@ export function sideloadItem( id: QueueItemId ) {
 			attachmentId: post as number,
 			additionalData,
 			signal: item.abortController?.signal,
+			onProgress: ( progress: number ) => {
+				dispatch.updateItemProgress( id, progress );
+			},
 			onFileChange: ( [ attachment ] ) => {
 				dispatch.finishOperation( id, { attachment } );
 				dispatch.resumeItemByPostId( post as number );
@@ -1138,8 +1159,8 @@ export function generateThumbnails( id: QueueItemId ) {
 			// Use sourceFile for thumbnail generation to preserve quality.
 			// WordPress core generates thumbnails from the original (unscaled) image.
 			// Vips will auto-rotate based on EXIF orientation during thumbnail generation.
-			const file = attachment.filename
-				? renameFile( item.sourceFile, attachment.filename )
+			const file = attachment.media_filename
+				? renameFile( item.sourceFile, attachment.media_filename )
 				: item.sourceFile;
 			const batchId = uuidv4();
 
@@ -1216,6 +1237,7 @@ export function generateThumbnails( id: QueueItemId ) {
 				} );
 			}
 
+
 			// Create and sideload the scaled version.
 			const { bigImageSizeThreshold } = settings;
 			if ( bigImageSizeThreshold && attachment.id ) {
@@ -1273,40 +1295,6 @@ export function generateThumbnails( id: QueueItemId ) {
 						operations: scaledOperations,
 					} );
 				}
-			}
-		}
-
-		dispatch.finishOperation( id, {} );
-	};
-}
-
-/**
- * Finalizes an uploaded item by calling the server's finalize endpoint.
- *
- * This triggers the wp_generate_attachment_metadata filter so that PHP
- * plugins can process the attachment after all client-side operations
- * (including thumbnail sideloads) are complete.
- *
- * @param id Item ID.
- */
-export function finalizeItem( id: QueueItemId ) {
-	return async ( { select, dispatch }: ThunkArgs ) => {
-		const item = select.getItem( id );
-		if ( ! item ) {
-			return;
-		}
-
-		const attachment = item.attachment;
-		const { mediaFinalize } = select.getSettings();
-
-		// Only finalize if we have an attachment ID and a mediaFinalize callback.
-		if ( attachment?.id && mediaFinalize ) {
-			try {
-				await mediaFinalize( attachment.id );
-			} catch ( error ) {
-				// Log but don't fail the upload if finalization fails.
-				// eslint-disable-next-line no-console
-				console.warn( 'Media finalization failed:', error );
 			}
 		}
 

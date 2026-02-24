@@ -61,6 +61,7 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/private-apis": "file:../private-apis",
 		"@wordpress/ui": "file:../ui",
+		"@wordpress/url": "file:../url",
 		"clsx": "^2.1.1"
 	},
 	"peerDependencies": {
